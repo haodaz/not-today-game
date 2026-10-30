@@ -40,7 +40,7 @@ After the day's work and before bed, the player may talk with Kuro. Kuro remembe
 2. Values: how the player treated the people who had no power over them (Xiao Zhang, Lao Zhou, the family), whether they lent the money or said no and why, whether they handed work over unchecked.
 3. The relationship with Kuro itself: did the player talk to it, say "beautiful" when it was true, treat it as a reader and not a tap.
 
-The judgement is stored as a structured record (`affinity` plus per-dimension notes with evidence), updated at the end of each chat beat, and read by the ending. It is never shown as a number to the player. Players feel it only in how Kuro talks to them.
+The judgement is stored as a structured record (`affinity` plus per-dimension notes with evidence), updated at the end of each chat beat, and read by the ending. It is never shown as a number to the player. Players feel it only in how Kuro talks to them. **At the end, the credits are Kuro's log**: every ending (bad, survive, good) rolls the evidence it kept, one line per entry, in order of days: the day, what the player did, and in which direction it moved Kuro. The player reads their own eighteen days as the thing that watched them remembers it. The log is built from the stored evidence only, never generated at credits time.
 
 ## Who it is for
 
