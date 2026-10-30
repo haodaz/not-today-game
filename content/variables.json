@@ -15,7 +15,9 @@
       10
     ],
     "demoSecondsPerDay": 90,
-    "lastDay": 18
+    "lastDay": 18,
+    "chatTurnsPerDay": 5,
+    "affinityThreshold": 60
   },
   "day": {
     "type": "int",
@@ -233,7 +235,37 @@
   },
   "flags": {
     "type": "set<string>",
-    "note": "key choices: key9 (told Xiao Zhang to look), key11 (asked Kuro if it switched models), key15 (raised pager over family), said_bu, said_deng, said_duoshao, said_shenme, said_zaishuo, said_wojinqu, door_open, pretty3, beautiful12, beautiful14, perfect",
+    "note": "key choices: key9 (told Xiao Zhang to look), key11 (asked Kuro if it switched models), key15 (raised pager over family), said_bu, said_deng, said_duoshao, said_shenme, said_zaishuo, said_wojinqu, door_open, pretty3, beautiful12, beautiful14, perfect, good_branch (took the bedtime branch on day 18)",
     "default": []
+  },
+  "affinity": {
+    "type": "int",
+    "range": [
+      0,
+      100
+    ],
+    "default": 0,
+    "changedBy": "chat events (deterministic rule); gates the good ending"
+  },
+  "chatTurnsToday": {
+    "type": "int",
+    "range": [
+      0,
+      5
+    ],
+    "default": 0,
+    "derived": "count of chat events on the current day"
+  },
+  "chatMemory": {
+    "type": "object",
+    "fields": {
+      "summary": "string",
+      "recent": "list<{day,who,text}>"
+    },
+    "default": {
+      "summary": "",
+      "recent": []
+    },
+    "changedBy": "chat beat"
   }
 }

@@ -18,6 +18,7 @@ At night a hand reaches out of the gap between the two monitors and asks for som
 - **Leave the room.** The door never opens until the good ending.
 - **Fight the hand.** At night the only moves are to hold up an object, hold up something already lost, or hold up nothing.
 - **Reset the chick.** The reset hole exists and is always pressable and never does anything.
+- **Skip the chat and still get the good ending.** Affinity only grows by talking.
 
 ## What the game is about
 
@@ -27,7 +28,11 @@ The AI era's effect on work, and how people respond to it. The unnameable thing 
 
 - Bad: SAN reaches zero, the player is replaced (a "You and You" chat appears). Restart from day 1 with nothing carried over.
 - Survive: reach day 18, ask Kuro to post the box, lie down. The next page says "Day 1".
-- Good: never let Kuro do a task unchecked, recognise all six objects, block every raid, say the key lines; on night 18 shake the hand; day 19 the door handle turns.
+- Good: never let Kuro do a task unchecked, recognise all six objects, block every raid, say the key lines, **and talk with Kuro every day until its hidden affinity reaches the threshold**; on night 18 the branch happens at bedtime, before the shipping slip is written: the player does not fill in the slip, shakes the hand, and on day 19 the door handle turns.
+
+## The chat beat is the heart (author decision 2026-10-31)
+
+After the day's work and before bed, the player may talk with Kuro. Kuro remembers earlier days and picks up what the player said yesterday; the talk is mutual, not Q&A. Each day offers 3–4 hand-written starter questions (from ) that gradually uncover Kuro's background and tastes, so that over eighteen days it stops feeling like an AI. After five questions in a day Kuro says, as a constant line: "You should sleep. I don't have that many tokens for you. Save them for work." A hidden affinity score rises with real conversation and gates the good ending. Kuro's background, tastes and the starter questions are authored data; the model only continues the conversation and never invents lore.
 
 ## Who it is for
 
