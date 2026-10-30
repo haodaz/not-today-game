@@ -1,25 +1,239 @@
 {
   "_note": "Appendix 3 of the bible. Every `delta` in content/days/*.json must reference a key here. Anything not here does not exist in the game.",
-  "day": {"type": "int", "range": [1, null], "derived": "realCalendarDay - startDay + 1"},
-  "stage": {"type": "int", "range": [0, 5], "derived": "stages.json byDay[day]"},
-  "found": {"type": "set", "of": ["chick", "textbook", "pager", "iccard", "tape", "dictionary", "calculator", "phone"], "changedBy": "open box"},
-  "recognised": {"type": "set", "of": ["chick", "pager", "iccard", "tape", "dictionary", "calculator"], "changedBy": "recognise choice on first sight"},
-  "chickFrame": {"type": "enum", "values": ["grave", "blink", "crack", "peck", "light", "phoenix", "out"], "changedBy": "stage + key presses + dream"},
-  "pagerUnread": {"type": "string|null", "changedBy": "night schedule (kid.json) + player replies"},
-  "repliedNumbers": {"type": "list<string>", "changedBy": "calculator input"},
-  "translated": {"type": "set<dayNumber>", "changedBy": "dictionary lookups of Kuro lines"},
-  "dream": {"type": "map<object, {until: day}|null>", "changedBy": "night hand (hand object => 3 days)"},
-  "readCount": {"type": "int", "changedBy": "opening messages"},
-  "replyOptions": {"type": "subset", "of": ["fine", "received", "whatever", "salary", "lol", "what-llm"], "derived": "stage, raids, object words"},
-  "objectWords": {"type": "map<object, {word, used: bool}>", "values": {"chick": "no", "pager": "wait", "calculator": "how-much", "dictionary": "what-do-you-mean", "tape": "say-it-again", "iccard": "im-going-in"}},
-  "loan": {"type": "enum", "values": ["none", "lent", "repaid", "refused"], "changedBy": "day 5 choice, day 12"},
-  "balance": {"type": "number", "changedBy": "loan, new world (row-50 move on day 10)"},
-  "overdueDays": {"type": "int", "derived": "30 + day"},
-  "newWorld": {"type": "enum", "values": ["normal", "locked", "light", "none"], "derived": "stage"},
-  "san": {"type": "int", "range": [0, 100], "changedBy": "see san-and-endings spec"},
-  "letItDoUnchecked": {"type": "int", "changedBy": "task completion mode"},
-  "raids": {"type": "map<day, {taken: bool, blockedWith: object|null}>", "changedBy": "night hand"},
-  "pokedReset": {"type": "bool", "changedBy": "player; never has an effect"},
-  "names": {"type": "object", "fields": {"login": "string", "nick": "string", "calledBy": "string", "bossCalls": "string", "pronoun": "she|he|null"}, "changedBy": "title page only"},
-  "flags": {"type": "set<string>", "note": "key choices: key9 (told Xiao Zhang to look), key11 (asked Kuro if it switched models), key15 (raised pager over family), said_bu, said_deng, said_duoshao, said_shenme, said_zaishuo, said_wojinqu, door_open, pretty3, beautiful12, beautiful14, perfect"}
+  "constants": {
+    "_note": "Engine constants. Code reads these; never hardcode them.",
+    "overdueBase": 30,
+    "loanAmount": 44000,
+    "loanReplyDay": 5,
+    "repayDay": 12,
+    "dreamDays": 3,
+    "sanStart": 100,
+    "sanThresholds": [
+      70,
+      50,
+      30,
+      10
+    ],
+    "demoSecondsPerDay": 90,
+    "lastDay": 18
+  },
+  "day": {
+    "type": "int",
+    "range": [
+      1,
+      null
+    ],
+    "derived": "realCalendarDay - startDay + 1",
+    "default": 1
+  },
+  "stage": {
+    "type": "int",
+    "range": [
+      0,
+      5
+    ],
+    "derived": "stages.json byDay[day]",
+    "default": 0
+  },
+  "found": {
+    "type": "set",
+    "of": [
+      "chick",
+      "textbook",
+      "pager",
+      "iccard",
+      "tape",
+      "dictionary",
+      "calculator",
+      "phone"
+    ],
+    "changedBy": "open box",
+    "default": []
+  },
+  "recognised": {
+    "type": "set",
+    "of": [
+      "chick",
+      "pager",
+      "iccard",
+      "tape",
+      "dictionary",
+      "calculator"
+    ],
+    "changedBy": "recognise choice on first sight",
+    "default": []
+  },
+  "chickFrame": {
+    "type": "enum",
+    "values": [
+      "grave",
+      "blink",
+      "crack",
+      "peck",
+      "light",
+      "phoenix",
+      "out"
+    ],
+    "changedBy": "stage + key presses + dream",
+    "default": "grave"
+  },
+  "pagerUnread": {
+    "type": "string|null",
+    "changedBy": "night schedule (kid.json) + player replies",
+    "default": null
+  },
+  "repliedNumbers": {
+    "type": "list<string>",
+    "changedBy": "calculator input",
+    "default": []
+  },
+  "translated": {
+    "type": "set<dayNumber>",
+    "changedBy": "dictionary lookups of Kuro lines",
+    "default": []
+  },
+  "dream": {
+    "type": "map<object, {until: day}|null>",
+    "changedBy": "night hand (hand object => 3 days)",
+    "default": {}
+  },
+  "readCount": {
+    "type": "int",
+    "changedBy": "opening messages",
+    "default": 0
+  },
+  "replyOptions": {
+    "type": "subset",
+    "of": [
+      "fine",
+      "received",
+      "whatever",
+      "salary",
+      "lol",
+      "what-llm"
+    ],
+    "derived": "stage, raids, object words",
+    "default": [
+      "fine",
+      "received",
+      "whatever",
+      "salary"
+    ]
+  },
+  "objectWords": {
+    "type": "map<object, {word, used: bool}>",
+    "values": {
+      "chick": "no",
+      "pager": "wait",
+      "calculator": "how-much",
+      "dictionary": "what-do-you-mean",
+      "tape": "say-it-again",
+      "iccard": "im-going-in"
+    },
+    "default": {
+      "chick": {
+        "word": "no",
+        "used": false
+      },
+      "pager": {
+        "word": "wait",
+        "used": false
+      },
+      "calculator": {
+        "word": "how-much",
+        "used": false
+      },
+      "dictionary": {
+        "word": "what-do-you-mean",
+        "used": false
+      },
+      "tape": {
+        "word": "say-it-again",
+        "used": false
+      },
+      "iccard": {
+        "word": "im-going-in",
+        "used": false
+      }
+    }
+  },
+  "loan": {
+    "type": "enum",
+    "values": [
+      "none",
+      "lent",
+      "repaid",
+      "refused"
+    ],
+    "changedBy": "day 5 choice, day 12",
+    "default": "none"
+  },
+  "balance": {
+    "type": "number",
+    "changedBy": "loan, new world (row-50 move on day 10)",
+    "default": 44000
+  },
+  "overdueDays": {
+    "type": "int",
+    "derived": "30 + day",
+    "default": 31
+  },
+  "newWorld": {
+    "type": "enum",
+    "values": [
+      "normal",
+      "locked",
+      "light",
+      "none"
+    ],
+    "derived": "stage",
+    "default": "normal"
+  },
+  "san": {
+    "type": "int",
+    "range": [
+      0,
+      100
+    ],
+    "changedBy": "see san-and-endings spec",
+    "default": 100
+  },
+  "letItDoUnchecked": {
+    "type": "int",
+    "changedBy": "task completion mode",
+    "default": 0
+  },
+  "raids": {
+    "type": "map<day, {taken: bool, blockedWith: object|null}>",
+    "changedBy": "night hand",
+    "default": {}
+  },
+  "pokedReset": {
+    "type": "bool",
+    "changedBy": "player; never has an effect",
+    "default": false
+  },
+  "names": {
+    "type": "object",
+    "fields": {
+      "login": "string",
+      "nick": "string",
+      "calledBy": "string",
+      "bossCalls": "string",
+      "pronoun": "she|he|null"
+    },
+    "changedBy": "title page only",
+    "default": {
+      "login": "",
+      "nick": "",
+      "calledBy": "老大",
+      "bossCalls": "",
+      "pronoun": null
+    }
+  },
+  "flags": {
+    "type": "set<string>",
+    "note": "key choices: key9 (told Xiao Zhang to look), key11 (asked Kuro if it switched models), key15 (raised pager over family), said_bu, said_deng, said_duoshao, said_shenme, said_zaishuo, said_wojinqu, door_open, pretty3, beautiful12, beautiful14, perfect",
+    "default": []
+  }
 }
