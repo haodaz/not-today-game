@@ -1,0 +1,22 @@
+{
+  "_note": "Appendix 1. HAND-WRITTEN CONSTANTS. Code renders these; code never generates, reorders or edits them. Two ciphers: calculator upside-down letters (0=O 1=I 2=Z 3=E 4=h 5=S 6=g 7=L 8=B 9=G, order reverses) and Chinese homophones. The player decides which to use.",
+  "cipher": {"0": "O", "1": "I", "2": "Z", "3": "E", "4": "h", "5": "S", "6": "g", "7": "L", "8": "B", "9": "G", "AI": "爱"},
+  "schedule": [
+    {"day": 4,  "text": "0.7734", "read": "upsideDown", "meaning": "hELLO", "note": "first message; decoded on day 7"},
+    {"day": 6,  "text": "505",    "read": "upsideDown", "meaning": "SOS"},
+    {"day": 7,  "text": "530",    "read": "homophone",  "meaning": "我想你 / I miss you", "after": "player's first reply"},
+    {"day": 8,  "text": "0487",   "read": "homophone",  "meaning": "你是白痴 / you're an idiot"},
+    {"day": 9,  "text": "345",    "read": "upsideDown", "meaning": "ShE"},
+    {"day": 12, "text": "3351",   "read": "upsideDown", "meaning": "I SEE"},
+    {"day": 15, "text": "5317",   "read": "upsideDown", "meaning": "LIES"},
+    {"day": 16, "text": "918",    "read": "homophone",  "meaning": "加油吧 / keep going"},
+    {"day": 17, "text": "555",    "read": "homophone",  "meaning": "呜呜呜 / crying"},
+    {"day": 18, "text": "I AI U", "read": "kid",        "meaning": "我爱你 / I love you; AI = 爱 (pinyin) = artificial intelligence", "note": "the only letters in eighteen days"}
+  ],
+  "spare": [
+    {"text": "2010000", "read": "homophone", "meaning": "爱你一万年"},
+    {"text": "1314", "read": "homophone", "meaning": "一生一世"}
+  ],
+  "neverUsed": [{"text": "886", "reason": "the child would not say goodbye"}],
+  "replyRule": "Numbers the player types on the calculator are answered that night only if they are in the cipher or homophone tables; otherwise the pager shows '?' or nothing."
+}
