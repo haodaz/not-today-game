@@ -22,7 +22,7 @@ stages.
 src/state/
   variables.ts     load content/variables.json → VariableTable (names, types, ranges, defaults, constants)
   stages.ts        load content/stages.json → stageOf(day)
-  clock.ts         Clock: URL param / CLOCK_OVERRIDE / demo / real, one read path
+  clock.ts         Clock: cosmetic wall time only (injectable); day advances on lie-down (changed 2026-10-30)
   day.ts           dayOf(realDay) = realDay - startDay + 1
   events.ts        Event discriminated union + applyEvent reducer (left-fold step)
   fday.ts          f(day): base state; applyDayTransitions(): day-driven changes incl. loan repay

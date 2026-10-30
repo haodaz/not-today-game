@@ -1,17 +1,139 @@
 {
-  "_note": "Stage is derived from day. Pacing may be re-cut to the heartbeat plan (see script/notes/v5.1-待办.md) before content is final; code must read this table, never hardcode.",
+  "_note": "Stage is derived from day. Re-cut 2026-10-30 to the heartbeat plan B (script/notes/心跳节奏表.md in the nottoday repo): six cycles of three days; stage 2 merged into 3; stage 5 from day 13 and never changes after. Code must read this table, never hardcode.",
   "startDayIsOne": true,
   "byDay": {
-    "1": 0, "2": 0, "3": 0,
-    "4": 1, "5": 1, "6": 1,
-    "7": 2, "8": 2, "9": 2,
-    "10": 3, "11": 3, "12": 3,
-    "13": 4, "14": 4, "15": 4,
-    "16": 5, "17": 5, "18": 5
+    "1": 0,
+    "2": 0,
+    "3": 0,
+    "4": 1,
+    "5": 1,
+    "6": 1,
+    "7": 3,
+    "8": 3,
+    "9": 3,
+    "10": 4,
+    "11": 4,
+    "12": 4,
+    "13": 5,
+    "14": 5,
+    "15": 5,
+    "16": 5,
+    "17": 5,
+    "18": 5
   },
   "afterDay18": 5,
-  "names": ["normal", "between-the-lines", "it-knows-you", "geometry-and-colour", "dream-state", "the-deep"],
+  "names": [
+    "normal",
+    "between-the-lines",
+    "it-knows-you",
+    "geometry-and-colour",
+    "dream-state",
+    "the-deep"
+  ],
   "objectsFoundOnDay": {
-    "chick": 1, "textbook": 2, "pager": 4, "iccard": 7, "tape": 10, "dictionary": 13, "calculator": 16, "phone": 18
+    "chick": 1,
+    "textbook": 2,
+    "pager": 4,
+    "iccard": 7,
+    "tape": 10,
+    "dictionary": 13,
+    "calculator": 16,
+    "phone": 18
+  },
+  "cycles": {
+    "1": {
+      "days": [
+        1,
+        2,
+        3
+      ],
+      "ring": "software",
+      "replaced": null
+    },
+    "2": {
+      "days": [
+        4,
+        5,
+        6
+      ],
+      "ring": "screen",
+      "replaced": "client-and-group (a batch)"
+    },
+    "3": {
+      "days": [
+        7,
+        8,
+        9
+      ],
+      "ring": "desk",
+      "replaced": "boss (one)"
+    },
+    "4": {
+      "days": [
+        10,
+        11,
+        12
+      ],
+      "ring": "wall",
+      "replaced": "partner-or-laozhou (one)"
+    },
+    "5": {
+      "days": [
+        13,
+        14,
+        15
+      ],
+      "ring": "room",
+      "replaced": "xiaozhang (last colleague)"
+    },
+    "6": {
+      "days": [
+        16,
+        17,
+        18
+      ],
+      "ring": "door",
+      "replaced": "family voice; then you"
+    },
+    "_note": "Six cycles of three days. ring = how far the daytime corruption has spread, from what the player stares at outward. Rendering opens one more layer per ring."
+  },
+  "calmDaytime": {
+    "_note": "Daytime presentation only is rendered as stage 0 on these days. Night beats and the mechanical stage are untouched.",
+    "days": [
+      10
+    ]
+  },
+  "tenderDay": {
+    "_note": "Day 14: the new world is kindest to the player while the room is already collapsing. Mechanical stage stays 5. Chat affinity gained this day is multiplied by constants.tenderDayAffinityMultiplier.",
+    "day": 14
+  },
+  "dreamNights": {
+    "_note": "Three dreams, each a plot step and one more step of screen resolution for every object. 5 = origin (1997, how the player cared for the chick). 11 = mechanism (the office's last day: everyone already replaced, politely, by saying yes). 15 = it (Kuro admits it was in the first two dreams).",
+    "nights": [
+      5,
+      11,
+      15
+    ]
+  },
+  "nightBeat": {
+    "1": "light",
+    "2": "text",
+    "3": "device",
+    "4": "device",
+    "5": "dream",
+    "6": "text",
+    "7": "object",
+    "8": "text",
+    "9": "kuro-after-shutdown",
+    "10": "hand",
+    "11": "dream",
+    "12": "text",
+    "13": "people",
+    "14": "kuro-after-shutdown",
+    "15": "dream",
+    "16": "room",
+    "17": "room",
+    "18": "branch",
+    "_note": "Every calm ends with a jolt. The night beat (bedtime or dream) is never calm and always runs one ring ahead of the daytime ring. Types rotate so nights do not become predictable."
   }
 }

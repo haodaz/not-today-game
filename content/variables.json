@@ -14,10 +14,11 @@
       30,
       10
     ],
-    "demoSecondsPerDay": 90,
     "lastDay": 18,
     "chatTurnsPerDay": 5,
-    "affinityThreshold": 60
+    "affinityThreshold": 60,
+    "tenderDayAffinityMultiplier": 2,
+    "_dreamDaysNote": "dreamDays is the count; the nights themselves are stages.json dreamNights."
   },
   "day": {
     "type": "int",
@@ -25,7 +26,7 @@
       1,
       null
     ],
-    "derived": "realCalendarDay - startDay + 1",
+    "derived": "counter in the run save; +1 on the lie-down event (changed 2026-10-30; no wall clock)",
     "default": 1
   },
   "stage": {

@@ -8,8 +8,8 @@ Stack: Vite + TypeScript, no large framework, one store. Rendering: DOM for the 
 
 ## State
 
-- **State is a function of time, not an accumulation of operations.** `state = f(day) ⊕ replay(events)`. `day = realCalendarDay - startDay + 1`. Stage is derived from day by the table in `content/stages.json`. Player actions are appended to an event log (open layer, press key, reply, let-it-do, looked, poke reset, lie down, hand object to the hand). Replaying the same log twice must give identical state.
-- **The clock must be fakeable.** `CLOCK_OVERRIDE` env var or `?day=N&t=HH:MM` URL param. Demo mode compresses a day to about 90 seconds. Tests always run on a fake clock.
+- **State is a function of time, not an accumulation of operations.** `state = f(day) ⊕ replay(events)`. `day` is a counter in the run save that increases by exactly one on the `lie-down` event; it never reads the wall clock (decision 2026-10-30). Stage is derived from day by the table in `content/stages.json`. Player actions are appended to an event log (open layer, press key, reply, let-it-do, looked, poke reset, lie down, hand object to the hand). Replaying the same log twice must give identical state.
+- **Time of day is story, not clock.** Within a day the five beats give the "time" (morning boot, work, evening desk, night). The wall clock is read only for cosmetics (e.g. a timestamp in a chat bubble) through one injectable `Clock` so tests stay deterministic. `?day=N` remains as a debug jump that builds the day-N state by replaying nothing; it is not a feature.
 - **Single source of truth.** Every object and every piece of new-world UI is a pure view of the store. Objects never talk to each other and never write state directly; they emit events.
 - **Two save slots, separate.** The run save (`nt_run`, cleared on bad-ending restart) and the cross-run profile (`nt_profile`, never cleared, never readable by the story: it only feeds the title page). Saves carry an integer `version`, migrate forward step by step, write to a temp key then rename, keep the previous good save.
 

@@ -35,7 +35,8 @@ their values — they are read at runtime.
 
 ### FR2. Day and stage
 
-- `day = realCalendarDay - startDay + 1`, where `realCalendarDay` and `startDay` are calendar-day
+- **Changed 2026-10-30 (author decision, see steering/product.md):** `day` is a counter in the run save, starting at 1 and incremented by exactly one when the `lie-down` event is appended. It never derives from the wall clock. The line below is superseded and kept only for history.
+- ~~`day = realCalendarDay - startDay + 1`~~, where `realCalendarDay` and `startDay` are calendar-day
   numbers obtained from the clock (FR4).
 - `stage = content/stages.json[byDay][day]` when `byDay` has an entry for `day`; for any day after
   18, `stage = afterDay18`.
@@ -63,7 +64,7 @@ their values — they are read at runtime.
   - `balance` follows `loan`: minus 44000 while `"lent"`, restored when `"repaid"`; unchanged
     while `"refused"`.
 
-### FR4. Fakeable clock
+### FR4. Fakeable clock (reduced 2026-10-30: the clock no longer drives `day`; it is cosmetic only, still injectable for tests. Demo mode and CLOCK_OVERRIDE are dropped; `?day=N` stays as a debug jump.)
 
 - The clock can be overridden without code changes. Mechanisms and precedence:
   - `CLOCK_OVERRIDE` env var.

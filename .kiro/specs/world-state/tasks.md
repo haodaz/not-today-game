@@ -31,8 +31,7 @@ If a task would require writing a story string, stop and ask before proceeding.
 - [ ] Tests: acceptance mapping `stage(1,4,7,10,13,16,18) = (0,1,2,3,4,5,5)`, `stage(25)=5`; `dayOf` offset.
 
 ## 6. clock.ts
-- [ ] `Clock` interface + `now() → { realDay, t }`; sources with precedence: test inject → URL param → `CLOCK_OVERRIDE` → demo → real.
-- [ ] Demo: one game day ≈ `constants.demoSecondsPerDay` wall-clock; map elapsed to `day`/`t`.
+- [ ] (changed 2026-10-30) `day` is a save counter incremented by the `lie-down` event; `Clock` is cosmetic and injectable; `?day=N` debug jump only. No demo clock, no CLOCK_OVERRIDE.
 - [ ] Tests: each source resolves correctly; precedence order; demo time compression.
 
 ## 7. events.ts — union + applyEvent (non-loan)

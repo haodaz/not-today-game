@@ -4,7 +4,7 @@ inclusion: always
 
 # NOT TODAY — product
 
-NOT TODAY is an eighteen-day desktop narrative horror game that runs in the browser. One real calendar day is one game day.
+NOT TODAY is an eighteen-day desktop narrative horror game that runs in the browser. The player moves the days forward themselves: a day ends when they lie down, and the next day starts when they boot again. (Decision 2026-10-30: the earlier "one real calendar day is one game day" rule is dropped; nothing in the game reads the wall clock for story purposes.)
 
 The player is a tired co-founder working from a rented room in a rainy city. Every day has the same five beats: boot, open the box, work, look at the desk, shut down. Two external monitors show a modern work system (messages, documents, spreadsheet, code) and an assistant named Kuro, a black Labrador puppy's head on a small round octopus body. The system gets kinder every day and harder to read. A cardboard box with no sender gives up one layer per day: a knock-off Tamagotchi that starved in 1997, a numeric pager, a phone card, a cassette and Walkman, an English-only pocket dictionary, a solar calculator, a dead feature phone. These low-resolution objects are the only things still trying to keep the player alive.
 
@@ -14,7 +14,7 @@ At night a hand reaches out of the gap between the two monitors and asks for som
 
 - **Die.** There is no death and no game over screen from damage. The only failure is being replaced (SAN reaches 0), and that restarts from day 1.
 - **Speak freely to the people above them.** To the boss, the partner, the client and the family the player has a fixed menu of a few replies (`Fine. Received. Whatever works. What about salary?`); the menu shrinks as stages advance and objects can lend one extra word each. The whole keyboard exists only in the company group and with Xiao Zhang and Lao Zhou, and it is taken away over time.
-- **Skip a day or a beat.** The five beats run in order; the bed is locked until the day's tasks are done. Days advance with the real clock.
+- **Skip a day or a beat.** The five beats run in order; the bed is locked until the day's tasks are done. Lying down ends the day; there is no other way to advance it and no way to go back.
 - **Leave the room.** The door never opens until the good ending.
 - **Fight the hand.** At night the only moves are to hold up an object, hold up something already lost, or hold up nothing.
 - **Reset the chick.** The reset hole exists and is always pressable and never does anything.
