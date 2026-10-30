@@ -21,7 +21,9 @@ An object is three things: which state fields it subscribes to, its render chann
 
 - Work tasks do **not** call an LLM. Each task is a hand-written quick-reply dialogue tree from `content/tasks/`. Completion is decided deterministically by which tool calls happened.
 - The free chat beat (after work, before bed) **may** call a real LLM. Its influence on the world goes only through tools. Each day has a fixed tool allow-list (`content/tools-by-day.json`); calls outside the list are rejected and logged. A daily steering snippet (`content/kuro-days/day-NN.md`) sets its stance. Its daily idiom is injected as a constant, never generated. Its output passes through the **decay filter**, a pure function that replaces a stage-dependent share of characters with unreadable glyphs; snapshot-test it.
-- If no LLM key is configured, the chat beat falls back to scripted lines from `content/`. The game must be fully playable offline.
+- The chat beat has memory: a compact per-run transcript summary (last N turns plus a running summary) is stored in the run save and fed back as context, so Kuro can refer to earlier days. Hard cap of five player turns per day; the sixth attempt gets the constant bedtime line from `content/` and the input closes until tomorrow.
+- **Kuro's judgement of the player** is a structured assessment, not free text: at the end of each chat beat the model is asked for JSON `{truth: -2..2, values: -2..2, bond: -2..2, evidence: string[]}` against a fixed rubric in `content/kuro-rubric.md`, where every evidence item must cite a real event id from the log (checked in code; uncited claims are dropped). The game folds these into `affinity` and `judgement` in state with a deterministic formula. Offline (no key) a rule-based scorer over flags produces the same shape. The good ending reads `affinity >= constants.affinityThreshold`; a property test guarantees the offline scorer and the model path write the same schema.
+- If no LLM key is configured, the chat beat falls back to scripted lines from `content/` (each starter question has a written answer path). The game must be fully playable offline.
 
 ## Content vs code
 

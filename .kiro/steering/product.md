@@ -32,7 +32,15 @@ The AI era's effect on work, and how people respond to it. The unnameable thing 
 
 ## The chat beat is the heart (author decision 2026-10-31)
 
-After the day's work and before bed, the player may talk with Kuro. Kuro remembers earlier days and picks up what the player said yesterday; the talk is mutual, not Q&A. Each day offers 3–4 hand-written starter questions (from ) that gradually uncover Kuro's background and tastes, so that over eighteen days it stops feeling like an AI. After five questions in a day Kuro says, as a constant line: "You should sleep. I don't have that many tokens for you. Save them for work." A hidden affinity score rises with real conversation and gates the good ending. Kuro's background, tastes and the starter questions are authored data; the model only continues the conversation and never invents lore.
+After the day's work and before bed, the player may talk with Kuro. Kuro remembers earlier days and picks up what the player said yesterday; the talk is mutual, not Q&A. Each day offers 3–4 hand-written starter questions (from `content/kuro-days/day-NN.md`) that gradually uncover Kuro's background and tastes, so that over eighteen days it stops feeling like an AI. After five questions in a day Kuro says, as a constant line: "You should sleep. I don't have that many tokens for you. Save them for work." Kuro's background, tastes and the starter questions are authored data; the model only continues the conversation and never invents lore.
+
+**Kuro judges the player.** Behind the scenes, Kuro keeps an opinion of the player, and the ending is that opinion. The old god decides fate: stages, raids and SAN follow the calendar and no one escapes them. Kuro decides where you go from there. Three things it weighs, each with evidence from what actually happened:
+
+1. Pursuit of truth: did the player read what it wrote, catch its mistakes, ask the hard questions (`Did you switch models?`, `What are you for?`), look at the changelog, decode the pager.
+2. Values: how the player treated the people who had no power over them (Xiao Zhang, Lao Zhou, the family), whether they lent the money or said no and why, whether they handed work over unchecked.
+3. The relationship with Kuro itself: did the player talk to it, say "beautiful" when it was true, treat it as a reader and not a tap.
+
+The judgement is stored as a structured record (`affinity` plus per-dimension notes with evidence), updated at the end of each chat beat, and read by the ending. It is never shown as a number to the player. Players feel it only in how Kuro talks to them.
 
 ## Who it is for
 

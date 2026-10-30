@@ -267,5 +267,21 @@
       "recent": []
     },
     "changedBy": "chat beat"
+  },
+  "judgement": {
+    "type": "object",
+    "fields": {
+      "truth": "int -10..10",
+      "values": "int -10..10",
+      "bond": "int -10..10",
+      "evidence": "list<{day,eventId,note}>"
+    },
+    "default": {
+      "truth": 0,
+      "values": 0,
+      "bond": 0,
+      "evidence": []
+    },
+    "changedBy": "end of each chat beat (structured model assessment or offline rule scorer); never shown to the player"
   }
 }
