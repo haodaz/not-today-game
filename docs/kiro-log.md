@@ -10,3 +10,4 @@ Appended after each task. Neither Kiro nor Claude edits the other's area without
   in `src/`.
 - `day` is a save counter, +1 on the `lieDown` event. No wall-clock time, no demo mode, no
   `CLOCK_OVERRIDE` (decision 2026-10-30).
+- 2026-10-31 07:36 · world-state task 11: FC_RUNS=5000 vitest run → 13 files, 210 tests passed in 0.8 s (stage(day) monotonic, replay idempotent + prefix-monotonic, overdueDays 1..lastDay, day counter). Run by Claude; Kiro's last attempt returned no output.

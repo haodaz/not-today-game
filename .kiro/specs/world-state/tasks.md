@@ -70,5 +70,5 @@ dreamNights, nightBeat); all constants come from `content/variables.json` `const
 - [x] Tests: profile write leaves run save unchanged; `clearRun` leaves profile unchanged; one-step migration.
 
 ## 11. Property tests — collect and close the gaps
-- [ ] Confirm each property from requirements §5 exists and passes: `stage(day)` monotonic, replay idempotent, `overdueDays` for `1..lastDay`, `day` counter.
-- [ ] Run them with a high `numRuns` once and record the result in `docs/kiro-log.md`.
+- [x] Confirm each property from requirements §5 exists and passes: `stage(day)` monotonic, replay idempotent, `overdueDays` for `1..lastDay`, `day` counter.
+- [x] Run them with a high `numRuns` once and record the result in `docs/kiro-log.md`.
