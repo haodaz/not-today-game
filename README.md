@@ -21,7 +21,7 @@ Three hands, each with its own job:
 - **Claude** (Anthropic, Claude Fable 5.1, in Claude Code) writes the content and the design: `content/` (replies, days, tasks, browser pages, delivery, Kuro's days and rubric, strings), `.kiro/steering/`, every `requirements.md`, the static HTML mocks in `design/`, the asset pipelines, and this README. Claude writes no game code.
 - **Kiro** writes every line of game code from the steering and the specs: for each spec it writes `design.md` and `tasks.md`, implements task by task, and keeps the tests green. Its own notes and the decisions it asked about are in [`docs/kiro-log.md`](docs/kiro-log.md).
 
-Kiro features used: steering (`.kiro/steering/product.md`, `voices.md`, `tech.md`, `structure.md`, `threejs.md`), specs (`.kiro/specs/*`, fourteen so far), and hooks as described in `tech.md`. The spec flow is the whole workflow: Claude writes the requirements, Kiro writes design and tasks, the author reviews in the browser, Claude writes the next requirements from what the author says.
+Kiro features used: steering (`.kiro/steering/product.md`, `voices.md`, `tech.md`, `structure.md`, `threejs.md`), specs (`.kiro/specs/*`, fourteen so far). Agent hooks (content validation on save, tests on state changes) are described in `tech.md` and are the next thing Kiro sets up. The spec flow is the whole workflow: Claude writes the requirements, Kiro writes design and tasks, the author reviews in the browser, Claude writes the next requirements from what the author says.
 
 ## Architecture in one paragraph
 
