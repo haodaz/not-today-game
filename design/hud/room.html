@@ -1,10 +1,10 @@
 <!doctype html><html lang="zh"><meta charset="utf-8"><title>HUD · 房间视角</title>
 <style>
-:root{--ink:#1d2129;--paper:rgba(250,248,243,.92);--line:rgba(0,0,0,.08);--red:#8b2f2a;--font:"PingFang SC","Hiragino Sans GB",sans-serif;--mono:Menlo,monospace}
+:root{--ink:#1d2129;--paper:rgba(232,228,220,.62);--line:rgba(0,0,0,.08);--red:#8b2f2a;--font:"PingFang SC","Hiragino Sans GB",sans-serif;--mono:Menlo,monospace}
 html,body{margin:0;background:#111}
 .stage{position:relative;width:1600px;height:900px;overflow:hidden;background:#000 url(bg_desk.jpg) center/cover;font-family:var(--font);color:var(--ink)}
 /* 今日清单 */
-.list{position:absolute;left:28px;top:28px;width:300px;background:var(--paper);border-radius:10px;padding:14px 16px;box-shadow:0 10px 30px rgba(0,0,0,.25);font-size:15px;line-height:1.7}
+.list{position:absolute;left:28px;top:28px;width:280px;background:var(--paper);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.35);border-radius:10px;padding:12px 16px;box-shadow:0 6px 24px rgba(0,0,0,.12);font-size:15px;line-height:1.7}
 .list .h{font-size:11px;letter-spacing:.2em;color:#8a7f70;margin-bottom:6px}
 .list .done{color:#9a9a9a;font-size:13px}
 .list .it{display:flex;gap:8px;align-items:baseline}.list .it i{width:12px;height:12px;border:1.5px solid #555;border-radius:2px;flex:0 0 auto;transform:translateY(2px)}
@@ -12,24 +12,24 @@ html,body{margin:0;background:#111}
 /* 右上 */
 .day{position:absolute;right:28px;top:28px;text-align:right;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.6);font-size:15px;line-height:1.5}
 .day b{display:block;font-size:22px;font-weight:600}.day .ov{color:#ffb3ad}
-.hr{position:absolute;right:28px;top:118px;background:rgba(255,255,255,.9);border-radius:8px;padding:6px 10px;font:12px var(--mono);color:#333;display:flex;gap:8px;align-items:center}.hr i{width:8px;height:8px;border-radius:50%;background:#e5484d;box-shadow:0 0 0 3px rgba(229,72,77,.2)}
+.hr{position:absolute;right:28px;top:118px;background:rgba(232,228,220,.7);backdrop-filter:blur(8px);border-radius:8px;padding:6px 10px;font:12px var(--mono);color:#333;display:flex;gap:8px;align-items:center}.hr i{width:8px;height:8px;border-radius:50%;background:#e5484d;box-shadow:0 0 0 3px rgba(229,72,77,.2)}
 /* 桌面条 */
-.bar{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);display:flex;gap:10px;padding:10px 12px;background:var(--paper);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-.slot{width:84px;height:84px;border-radius:10px;background:#fff;border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11px;color:#666;position:relative}
+.bar{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);display:flex;gap:8px;padding:8px 10px;background:var(--paper);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.35);border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,.12)}
+.slot{width:80px;height:80px;border-radius:10px;background:transparent;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11px;color:#666;position:relative}
 .slot img{max-width:60px;max-height:52px;object-fit:contain}
 .slot .lcd{width:52px;height:26px;background:#9fb59a;border:2px solid #556;border-radius:3px;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;font:12px var(--mono);color:#233}
 .slot .box{width:52px;height:40px;background:#c8a97a;border-radius:3px;position:relative}.slot .box::after{content:"剩 4 层";position:absolute;left:0;right:0;bottom:-16px;font-size:10px;color:#666;text-align:center}
 .slot .cup{width:26px;height:34px;border:2px solid #789;border-radius:0 0 8px 8px;background:linear-gradient(180deg,#fff 40%,#cfe0ea 40%)}
 .slot .phone{width:28px;height:50px;background:#222;border-radius:5px;border:2px solid #555}
-.slot.empty{background:transparent;border-style:dashed;color:#bbb}
+.slot.empty{color:rgba(0,0,0,.18)}
 /* 对话框 */
-.dlg{position:absolute;left:50%;bottom:132px;transform:translateX(-50%);width:980px;background:rgba(28,26,23,.92);color:#f4efe6;border-radius:12px;padding:18px 24px;font-size:18px;line-height:1.6;box-shadow:0 12px 40px rgba(0,0,0,.4)}
+.dlg{position:absolute;left:50%;bottom:128px;transform:translateX(-50%);width:980px;background:rgba(28,26,23,.82);backdrop-filter:blur(6px);color:#f4efe6;border-radius:12px;padding:18px 24px;font-size:18px;line-height:1.6;box-shadow:0 12px 40px rgba(0,0,0,.4)}
 .dlg .who{display:inline-block;font-size:12px;letter-spacing:.12em;color:#c9a86a;margin-bottom:4px}
 .dlg .inner{font-style:italic;color:#e8b4ae}
 .dlg .more{position:absolute;right:16px;bottom:10px;color:#c9a86a;font-size:12px}
 /* 镜头 */
-.cams{position:absolute;right:28px;bottom:28px;display:flex;gap:6px}.cams span{background:rgba(250,248,243,.9);border-radius:8px;padding:8px 14px;font-size:14px;color:#333}.cams span.on{background:var(--red);color:#f4efe6}
-.menu{position:absolute;left:28px;bottom:28px;background:rgba(250,248,243,.7);border-radius:8px;padding:6px 10px;font-size:12px;color:#555}
+.cams{position:absolute;right:28px;bottom:28px;display:flex;gap:6px}.cams span{background:rgba(232,228,220,.7);backdrop-filter:blur(8px);border-radius:8px;padding:8px 14px;font-size:14px;color:#333}.cams span.on{background:var(--red);color:#f4efe6}
+.menu{position:absolute;left:28px;bottom:28px;background:rgba(232,228,220,.55);border-radius:8px;padding:6px 10px;font-size:12px;color:#555}
 .note{position:absolute;left:0;right:0;bottom:0;background:#111;color:#bbb;font:12px var(--mono);padding:6px 12px}
 </style>
 <div class="stage">

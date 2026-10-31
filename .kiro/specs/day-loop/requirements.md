@@ -35,7 +35,7 @@ Every `delta`/flag referenced must exist in variables.json; every string is inli
 No inventory, no health bar, no clock. The HUD in the room / desk / door views:
 - Top-left: the checklist (FR1).
 - Top-right: `第 N 天 · 时段` and under it `拖欠 N 天` (the only number that always rises). From the day stages.json/content says, a heart-rate chip appears under it: it is the new world's widget, and it is the only visible proxy for SAN; the game itself never shows SAN.
-- Bottom: the **desk bar**, not an inventory: the box (layers left), the phone, the cup (cold for N minutes, from live state), then each object taken out, in day order. An object's icon is its own screen (the chick's current frame, the pager's digits) rendered by the device skeleton at integer pixels. Empty slots are dashed and silent.
+- Bottom: the **desk bar**, not an inventory: the box (layers left), the phone, the cup (cold for N minutes, from live state), then each object taken out, in day order. An object's icon is its own screen (the chick's current frame, the pager's digits) rendered by the device skeleton at integer pixels. Objects sit directly on the bar as transparent cutouts: no card-in-card, no slot frames (author 2026-11-01). Empty positions are just gaps. The HUD cards themselves are translucent warm grey with blur, never solid white.
 - The dialogue box (FR2) overlays the desk bar when active.
 - Bottom-right: three camera chips 房间 / 桌面 / 门 (桌面 opens the desktop view). Bottom-left: a small menu (sound, language, restart); saves are automatic.
 - Kuro is not in the room HUD; at night the right monitor's small window glows inside the 3D view.
