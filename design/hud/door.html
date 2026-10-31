@@ -1,0 +1,23 @@
+<!doctype html><html lang="zh"><meta charset="utf-8"><title>门口</title>
+<style>
+html,body{margin:0;background:#111}
+.stage{position:relative;width:1600px;height:900px;overflow:hidden;background:#000 url(door_chain.png) center/cover;font-family:"PingFang SC",sans-serif}
+.list{position:absolute;left:28px;top:28px;width:280px;background:rgba(232,228,220,.62);backdrop-filter:blur(10px);border-radius:10px;padding:12px 16px;font-size:15px;line-height:1.7;color:#1d2129}
+.list .h{font-size:11px;letter-spacing:.2em;color:#8a7f70}.list b{font-weight:600}
+.steps{position:absolute;right:28px;top:28px;display:flex;flex-direction:column;gap:6px;font-size:13px;color:#f4efe6;text-shadow:0 1px 6px rgba(0,0,0,.6)}
+.steps span{opacity:.45}.steps span.on{opacity:1;font-weight:600}
+.dlg{position:absolute;left:50%;bottom:128px;transform:translateX(-50%);width:980px;background:rgba(28,26,23,.82);backdrop-filter:blur(6px);color:#f4efe6;border-radius:12px;padding:18px 24px;font-size:18px;line-height:1.6}
+.dlg .who{display:inline-block;font-size:12px;letter-spacing:.12em;color:#c9a86a;margin-bottom:4px}
+.hand{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:420px;height:220px;background:radial-gradient(ellipse at 50% 100%,rgba(0,0,0,.55),transparent 70%)}
+.cams{position:absolute;right:28px;bottom:28px;display:flex;gap:6px}.cams span{background:rgba(232,228,220,.7);backdrop-filter:blur(8px);border-radius:8px;padding:8px 14px;font-size:14px;color:#333}.cams span.on{background:#8b2f2a;color:#f4efe6}
+.note{position:absolute;left:0;right:0;bottom:0;background:#111;color:#bbb;font:12px Menlo,monospace;padding:6px 12px}
+</style>
+<div class="stage">
+  <div class="list"><div class="h">今日</div><b>□ 去拿。</b><br><span style="color:#777">□ 吃。</span></div>
+  <div class="steps"><span>已送达</span><span>走到门边</span><span class="on">开到链条</span><span>伸手拿</span><span>关门，上链</span><span>袋子在桌角</span></div>
+  <div class="hand"></div>
+  <div class="dlg"><div class="who">门外</div>走廊的灯是白的。袋子在。没有人。</div>
+  <div class="cams"><span>房间</span><span>桌面</span><span class="on">门</span></div>
+</div>
+<div class="note">design/hud/door.html · 门口拿外卖：镜头转到门墙（第二个 splat / 门面片），六步在右上淡淡列着、只亮当前这一步；每步一次点击；门缝那条光按 ring 变色；伸手时画面底下只有一个暗影，不画手</div>
+</html>

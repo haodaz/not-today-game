@@ -1,0 +1,36 @@
+<!doctype html><html lang="zh"><meta charset="utf-8"><title>举起来</title>
+<style>
+:root{--ink:#1d2129;--paper:rgba(232,228,220,.62);--font:"PingFang SC",sans-serif;--mono:Menlo,monospace}
+html,body{margin:0;background:#111}
+.stage{position:relative;width:1600px;height:900px;overflow:hidden;background:#000 url(bg_desk.jpg) center/cover;font-family:var(--font);color:var(--ink)}
+.dim{position:absolute;inset:0;background:rgba(10,10,12,.55)}
+.list{position:absolute;left:28px;top:28px;width:280px;background:var(--paper);backdrop-filter:blur(10px);border-radius:10px;padding:12px 16px;font-size:15px;line-height:1.7;opacity:.5}
+.list .h{font-size:11px;letter-spacing:.2em;color:#8a7f70}
+.bar{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);display:flex;gap:8px;padding:8px 10px;background:var(--paper);backdrop-filter:blur(10px);border-radius:14px;opacity:.5}
+.slot{width:80px;height:80px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:#666}
+/* 举起的手机：从底部升到正中，微倾 */
+.phone{position:absolute;left:50%;top:50%;width:340px;height:700px;transform:translate(-50%,-50%) rotate(-3deg);background:#1a1a1c;border-radius:40px;box-shadow:0 30px 80px rgba(0,0,0,.6),inset 0 0 0 3px #333}
+.phone .scr{position:absolute;inset:14px;background:#fff;border-radius:30px;overflow:hidden;font-size:15px}
+.phone .top{height:44px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#888;border-bottom:1px solid #eee}
+.phone .app{padding:14px 16px}
+.phone .app h2{font-size:18px;margin:0 0 10px}
+.phone .shop{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #f1f1f1}.phone .shop i{width:48px;height:48px;border-radius:12px;background:#f3e2c2;flex:0 0 auto}.phone .shop b{display:block;font-weight:500}.phone .shop small{color:#999}
+.phone .shop.off{opacity:.4}.phone .shop.off small{color:#c33}
+.phone .home{position:absolute;left:50%;bottom:10px;width:120px;height:5px;background:#ccc;border-radius:3px;transform:translateX(-50%)}
+.hint{position:absolute;left:50%;bottom:130px;transform:translateX(-50%);color:#f4efe6;font-size:14px;opacity:.7}
+.note{position:absolute;left:0;right:0;bottom:0;background:#111;color:#bbb;font:12px var(--mono);padding:6px 12px}
+</style>
+<div class="stage"><div class="dim"></div>
+  <div class="list"><div class="h">今日</div>□ 点个午饭。</div>
+  <div class="phone"><div class="scr"><div class="top">12:02 · 外卖</div><div class="app"><h2>附近的店</h2>
+    <div class="shop"><i></i><div><b>黄焖鸡米饭（东门店）</b><small>老周的 · 微辣 / 不放香菜 · ¥18</small></div></div>
+    <div class="shop"><i style="background:#e7e2d6"></i><div><b>沙县小吃</b><small>扁肉 ¥10 · 拌面 ¥8 · 蒸饺 ¥12</small></div></div>
+    <div class="shop"><i style="background:#dbe8ff"></i><div><b>全家便利店</b><small>饭团 ¥6 · 关东煮 ¥12 · 纽扣电池 ¥9</small></div></div>
+    <div class="shop"><i style="background:#dfe3ea"></i><div><b>瑞幸</b><small>拿铁 ¥15 · 美式 ¥12</small></div></div>
+    <div class="shop off"><i style="background:#eee"></i><div><b>麻辣烫（夜宵）</b><small>18:00 开</small></div></div>
+  </div><div class="home"></div></div></div>
+  <div class="hint">点屏幕外面放下</div>
+  <div class="bar"><div class="slot">剩 8 层</div><div class="slot">手机</div><div class="slot">杯子</div></div>
+</div>
+<div class="note">design/hud/held.html · 举起手机：房间压暗 200ms，手机从桌面条升到正中 320ms 缓出、微倾 3°，软件在它的屏幕里；点屏幕外放下。物件同理：壳在正中，屏幕是自己的像素</div>
+</html>

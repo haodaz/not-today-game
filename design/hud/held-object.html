@@ -1,0 +1,29 @@
+<!doctype html><html lang="zh"><meta charset="utf-8"><title>举起物件</title>
+<style>
+html,body{margin:0;background:#111}
+.stage{position:relative;width:1600px;height:900px;overflow:hidden;background:#000 url(bg_desk.jpg) center/cover;font-family:"PingFang SC",sans-serif}
+.dim{position:absolute;inset:0;background:rgba(10,10,12,.6)}
+.obj{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%) rotate(-4deg);width:440px;filter:drop-shadow(0 30px 50px rgba(0,0,0,.6))}
+.obj img{width:100%}
+/* 小鸡的屏：32×16 像素，整数放大，贴在壳的屏幕位置 */
+.lcd{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%) translate(96px,-6px) rotate(-4deg);width:150px;height:176px;background:#9fb59a;border-radius:6px;display:flex;align-items:center;justify-content:center}.lcd .g{width:144px;height:72px;image-rendering:pixelated;display:grid;grid-template-columns:repeat(32,1fr);grid-template-rows:repeat(16,1fr)}
+.lcd .g i{background:#233}
+.dlg{position:absolute;left:50%;bottom:128px;transform:translateX(-50%);width:980px;background:rgba(28,26,23,.82);backdrop-filter:blur(6px);color:#f4efe6;border-radius:12px;padding:18px 24px;font-size:18px;line-height:1.6}
+.dlg .inner{font-style:italic;color:#e8b4ae}
+.note{position:absolute;left:0;right:0;bottom:0;background:#111;color:#bbb;font:12px Menlo,monospace;padding:6px 12px}
+</style>
+<div class="stage"><div class="dim"></div>
+  <div class="obj"><img src="chick.png" alt=""></div>
+  <div class="lcd"><div class="g" id="lcd"></div></div>
+  <div class="dlg">壳在手心里是温的，边缘有一道没磨平的合缝。<div class="inner">当年戳了也没用。</div></div>
+</div>
+<script>
+// 坟茔帧：粗略画一个墓碑 + 草
+const g=document.getElementById('lcd');const on=new Set();
+for(let y=6;y<14;y++)for(let x=12;x<20;x++)on.add(x+','+y);
+for(let x=13;x<19;x++)on.add(x+',5');for(let x=14;x<18;x++)on.add(x+',4');
+for(const x of [6,8,23,25,27])on.add(x+',13');for(let x=0;x<32;x++)on.add(x+',15');
+for(let y=0;y<16;y++)for(let x=0;x<32;x++){const i=document.createElement('i');if(!on.has(x+','+y))i.style.background='transparent';g.appendChild(i);}
+</script>
+<div class="note">design/hud/held-object.html · 举起小鸡：壳是抠好的透明图（以后是 3D 素模），屏幕是 32×16 的 canvas 整数放大、不抗锯齿；对话框在下面，旁白 + 内心；夜里对着缝的版本背景换成缝的粉光</div>
+</html>
