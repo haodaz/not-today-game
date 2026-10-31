@@ -1,5 +1,6 @@
 // f(startDay): the deterministic starting state for a day, and derive(): everything that is a
 // function of the `day` counter alone. Constants and the stage table are read, never inlined.
+import { applyUndeliveredMealFlags } from "./delivery/effects";
 import { applyIncomingFlags } from "./replies/effects";
 import { stageOf } from "./stages";
 import type { State } from "./types.gen";
@@ -27,9 +28,9 @@ export function derive(state: State): State {
     next = { ...next, loan: "repaid", balance: next.balance + constants.loanAmount };
   }
 
-  // Messages that arrive whether or not the player answers (replies spec). Last, because their
-  // conditions may read the loan.
-  return applyIncomingFlags(next);
+  // Messages that arrive whether or not the player answers (replies spec), and meals that never
+  // come (delivery spec). Last, because their conditions may read the loan.
+  return applyUndeliveredMealFlags(applyIncomingFlags(next));
 }
 
 /**

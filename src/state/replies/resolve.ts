@@ -1,5 +1,6 @@
 // What the player can say to whom, and what a word means right now. Pure lookups over the reply
 // tables and the current state; no clock, no strings of its own.
+import { isHeld } from "../objects";
 import type { State } from "../types.gen";
 import { defaults } from "../variables";
 import { dayTable, type Condition, type Entry, type Status } from "./table";
@@ -42,17 +43,19 @@ export function objectOfWord(word: string, state: State): string | undefined {
   return Object.entries(state.objectWords).find(([, lent]) => lent.word === word)?.[0];
 }
 
-export type ObjectWordState = "notObjectWord" | "hidden" | "available" | "used";
+export type ObjectWordState = "notObjectWord" | "hidden" | "available" | "lost";
 
 /**
- * D3: an object word is on the menu only once its object has been found, and only until it has
- * been used once.
+ * D3 (revised 2026-10-31): a lent word is available every day, to every recipient, while its
+ * object is held. Using it does not consume it (`objectWords[x].used` only records the first use).
+ * Before the object is found the word is not on the menu; once the object is lost to the hand the
+ * word is struck through.
  */
 export function objectWordState(word: string, state: State): ObjectWordState {
   const object = objectOfWord(word, state);
   if (object === undefined) return "notObjectWord";
   if (!(state.found as string[]).includes(object)) return "hidden";
-  return state.objectWords[object]!.used ? "used" : "available";
+  return isHeld(object, state) ? "available" : "lost";
 }
 
 export function isDeregistered(recipient: string, state: State): boolean {
@@ -65,7 +68,7 @@ function isShrunk(word: string, state: State): boolean {
   return startingReplyOptions.includes(word) && !(state.replyOptions as string[]).includes(word);
 }
 
-export type GoneReason = "content" | "shrunk" | "used";
+export type GoneReason = "content" | "shrunk" | "lost";
 
 export type Resolution =
   | { readonly status: "gone"; readonly inner: string | null; readonly reason: GoneReason }
@@ -90,7 +93,7 @@ export function resolve(day: number, recipient: string, word: string, state: Sta
 
   const inner = cell.inner ? cell.inner : null;
   if (cell.status === "gone") return { status: "gone", inner, reason: "content" };
-  if (objectWord === "used") return { status: "gone", inner: null, reason: "used" };
+  if (objectWord === "lost") return { status: "gone", inner: null, reason: "lost" };
   if (isShrunk(word, state)) return { status: "gone", inner: null, reason: "shrunk" };
 
   const deregistered = isDeregistered(recipient, state);

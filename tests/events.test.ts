@@ -19,11 +19,12 @@ function onlyChanged(before: State, after: State, keys: (keyof State)[]): void {
 }
 
 describe("the twelve event kinds", () => {
-  it("are exactly the kinds in the spec", () => {
+  it("are exactly the kinds in the specs (world-state twelve + delivery three)", () => {
     expect([...eventKinds].sort()).toEqual(
       [
         "openLayer", "recognise", "pressKey", "reply", "letItDo", "looked",
         "pokeReset", "lieDown", "sitUp", "handObject", "handLost", "handNothing",
+        "order", "pickup", "useItem",
       ].sort(),
     );
   });

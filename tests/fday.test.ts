@@ -1,6 +1,7 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { derive, f } from "@state/fday";
+import { applyUndeliveredMealFlags } from "@state/delivery/effects";
 import { applyIncomingFlags } from "@state/replies/effects";
 import { stageOf } from "@state/stages";
 import { constants, defaults, validate } from "@state/variables";
@@ -22,12 +23,12 @@ describe("f(startDay)", () => {
     }
   });
 
-  it("leaves every other variable at its default (flags come from the day's incoming messages)", () => {
-    for (const day of [1, 7, 13, constants.lastDay]) {
+  it("leaves every other variable at its default (flags come from the day's incoming messages and undelivered meals)", () => {
+    for (const day of [1, 7, 13, 16, constants.lastDay]) {
       const { day: d, stage, overdueDays, flags, ...rest } = f(day) as unknown as Record<string, unknown>;
       const { day: _d, stage: _s, overdueDays: _o, flags: _f, ...expected } = defaults();
       expect(rest, `day ${day}`).toEqual(expected);
-      expect(flags, `day ${day}`).toEqual(applyIncomingFlags({ ...f(day), flags: [] }).flags);
+      expect(flags, `day ${day}`).toEqual(applyUndeliveredMealFlags(applyIncomingFlags({ ...f(day), flags: [] })).flags);
       expect([d, stage, overdueDays].every((v) => typeof v === "number")).toBe(true);
     }
   });

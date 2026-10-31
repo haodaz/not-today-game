@@ -2,6 +2,7 @@
 //   applyReplyEvent   a word the player sent in a conversation (one `reply` event with a recipient)
 //   applyIncomingFlags  the messages that arrive whether or not the player answers; day-driven,
 //                       called by derive, idempotent (flags are a set)
+import { withFlags } from "../flags";
 import type { State } from "../types.gen";
 import { rangeOf } from "../variables";
 import { condHolds, objectOfWord, objectWordState, resolve } from "./resolve";
@@ -13,11 +14,6 @@ const knownRecipients: ReadonlySet<string> = new Set(
 );
 
 const lastTableDay = Math.max(0, ...replyTable.keys());
-
-function withFlags(state: State, added: readonly string[]): State {
-  const missing = added.filter((flag) => !state.flags.includes(flag));
-  return missing.length ? { ...state, flags: [...state.flags, ...new Set(missing)] } : state;
-}
 
 function clampSan(value: number): number {
   const [min, max] = rangeOf("san") ?? [null, null];
@@ -33,7 +29,8 @@ export interface ReplySent {
 /**
  * Applies a word sent to `recipient`. Resolves it against the state so far, on the day the event
  * was recorded. Nothing happens if nothing was sent: a word not on that day's menu, a `gone` word,
- * or a deregistered recipient (the message cannot go). Otherwise a lent object word is used up,
+ * or a deregistered recipient (the message cannot go). Otherwise the first use of a lent object
+ * word is recorded (`used` only records it; the word stays available while the object is held),
  * and the entry's `effects` apply: flags are added, `san` moves and is clamped to the table range.
  */
 export function applyReplyEvent(state: State, event: ReplySent): State {
@@ -46,7 +43,9 @@ export function applyReplyEvent(state: State, event: ReplySent): State {
   let next = state;
   if (objectWordState(event.choice, next) === "available") {
     const object = objectOfWord(event.choice, next)!;
-    next = { ...next, objectWords: { ...next.objectWords, [object]: { ...next.objectWords[object]!, used: true } } };
+    if (!next.objectWords[object]!.used) {
+      next = { ...next, objectWords: { ...next.objectWords, [object]: { ...next.objectWords[object]!, used: true } } };
+    }
   }
 
   const effects = resolution.entry.effects;

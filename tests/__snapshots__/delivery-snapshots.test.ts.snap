@@ -1,0 +1,127 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`FR4 door beat snapshots > day 1 lunch: the bag and the cardboard box 1`] = `
+[
+  "<section class="door-beat" data-day="1" data-meal="lunch" data-state="idle">
+</section>",
+  "<section class="door-beat" data-day="1" data-meal="lunch" data-state="delivered" data-step="0">
+  <p class="door-step">手机上显示「已送达」</p>
+</section>",
+  "<section class="door-beat" data-day="1" data-meal="lunch" data-state="atDoor" data-step="1">
+  <p class="door-step">走到门边（机位转向门墙）</p>
+</section>",
+  "<section class="door-beat" data-day="1" data-meal="lunch" data-state="chainOpen" data-step="2">
+  <p class="door-step">开到链条</p>
+  <p class="door-corridor">走廊的灯是白的，一个人的脚步下楼。门口两样东西：一袋黄焖鸡，一个没有寄件人的纸箱。</p>
+</section>",
+  "<section class="door-beat" data-day="1" data-meal="lunch" data-state="holding" data-step="3">
+  <p class="door-step">伸手拿</p>
+  <p class="door-corridor">走廊的灯是白的，一个人的脚步下楼。门口两样东西：一袋黄焖鸡，一个没有寄件人的纸箱。</p>
+  <p class="door-bag">热的。袋口打了个死结。</p>
+</section>",
+  "<section class="door-beat" data-day="1" data-meal="lunch" data-state="closing" data-step="4">
+  <p class="door-step">关门，上链</p>
+</section>",
+  "<section class="door-beat" data-day="1" data-meal="lunch" data-state="onDesk" data-step="5">
+  <p class="door-step">袋子出现在桌角</p>
+  <div class="desk-corner">
+    <p class="door-bag">热的。袋口打了个死结。</p>
+    <p class="door-receipt">黄焖鸡米饭 · 微辣 · 备注：别放香菜（老周）</p>
+    <ul class="door-extras">
+      <li data-extra="box"></li>
+    </ul>
+  </div>
+</section>",
+]
+`;
+
+exports[`FR4 door beat snapshots > day 9 dinner: the bag is moving 1`] = `
+[
+  "<section class="door-beat" data-day="9" data-meal="dinner" data-state="idle">
+</section>",
+  "<section class="door-beat" data-day="9" data-meal="dinner" data-state="delivered" data-step="0">
+  <p class="door-step">手机上显示「已送达」</p>
+</section>",
+  "<section class="door-beat" data-day="9" data-meal="dinner" data-state="atDoor" data-step="1">
+  <p class="door-step">走到门边（机位转向门墙）</p>
+</section>",
+  "<section class="door-beat" data-day="9" data-meal="dinner" data-state="chainOpen" data-step="2">
+  <p class="door-step">开到链条</p>
+  <p class="door-corridor">脚步。</p>
+</section>",
+  "<section class="door-beat" data-day="9" data-meal="dinner" data-state="holding" data-step="3">
+  <p class="door-step">伸手拿</p>
+  <p class="door-corridor">脚步。</p>
+  <p class="door-bag">温的。袋子在轻轻动，像里面有心跳。打开是汤在晃。</p>
+</section>",
+  "<section class="door-beat" data-day="9" data-meal="dinner" data-state="closing" data-step="4">
+  <p class="door-step">关门，上链</p>
+</section>",
+  "<section class="door-beat" data-day="9" data-meal="dinner" data-state="onDesk" data-step="5">
+  <p class="door-step">袋子出现在桌角</p>
+  <div class="desk-corner">
+    <p class="door-bag">温的。袋子在轻轻动，像里面有心跳。打开是汤在晃。</p>
+    <p class="door-receipt">扁肉</p>
+    <p class="door-inner">袋子在动。</p>
+  </div>
+</section>",
+]
+`;
+
+exports[`FR4 door beat snapshots > day 13 dinner: a notice slid under the door 1`] = `
+[
+  "<section class="door-beat" data-day="13" data-meal="dinner" data-state="idle">
+</section>",
+  "<section class="door-beat" data-day="13" data-meal="dinner" data-state="delivered" data-step="0">
+  <p class="door-step">手机上显示「已送达」</p>
+</section>",
+  "<section class="door-beat" data-day="13" data-meal="dinner" data-state="atDoor" data-step="1">
+  <p class="door-step">走到门边（机位转向门墙）</p>
+</section>",
+  "<section class="door-beat" data-day="13" data-meal="dinner" data-state="chainOpen" data-step="2">
+  <p class="door-step">开到链条</p>
+  <p class="door-corridor">没有人。袋子是从门缝底下塞进来的，扁的。</p>
+</section>",
+  "<section class="door-beat" data-day="13" data-meal="dinner" data-state="holding" data-step="3">
+  <p class="door-step">伸手拿</p>
+  <p class="door-corridor">没有人。袋子是从门缝底下塞进来的，扁的。</p>
+  <p class="door-bag">扁的。里面是纸：一张升级通知。</p>
+</section>",
+  "<section class="door-beat" data-day="13" data-meal="dinner" data-state="closing" data-step="4">
+  <p class="door-step">关门，上链</p>
+</section>",
+  "<section class="door-beat" data-day="13" data-meal="dinner" data-state="onDesk" data-step="5">
+  <p class="door-step">袋子出现在桌角</p>
+  <div class="desk-corner">
+    <p class="door-bag">扁的。里面是纸：一张升级通知。</p>
+    <p class="door-receipt">—</p>
+    <p class="door-inner">没有饭。是一张升级通知。</p>
+  </div>
+</section>",
+]
+`;
+
+exports[`FR4 door beat snapshots > day 16: closed; nothing comes and the door does not open 1`] = `
+{
+  "dinner": [
+    "<section class="door-beat" data-day="16" data-meal="dinner" data-state="none">
+  <p class="door-outside">门外有脚步，停在门口。你没有开。</p>
+  <p class="door-anomaly">没有开门。门是锁着的，锁是你锁的。</p>
+</section>",
+    "<section class="door-beat" data-day="16" data-meal="dinner" data-state="none">
+  <p class="door-outside">门外有脚步，停在门口。你没有开。</p>
+  <p class="door-anomaly">没有开门。门是锁着的，锁是你锁的。</p>
+</section>",
+  ],
+  "lunch": [
+    "<section class="door-beat" data-day="16" data-meal="lunch" data-state="none">
+  <p class="door-outside">软件上：商家已打烊。四家店都打烊了，包括便利店。</p>
+  <p class="door-anomaly">外卖不来了。你第一次饿着。</p>
+</section>",
+    "<section class="door-beat" data-day="16" data-meal="lunch" data-state="none">
+  <p class="door-outside">软件上：商家已打烊。四家店都打烊了，包括便利店。</p>
+  <p class="door-anomaly">外卖不来了。你第一次饿着。</p>
+</section>",
+  ],
+}
+`;

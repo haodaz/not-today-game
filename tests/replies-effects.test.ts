@@ -31,9 +31,16 @@ describe("applyReplyEvent", () => {
     expect(after.san).toBe(100);
   });
 
-  it("a used word is gone: sending it again changes nothing", () => {
+  it("a lent word is not consumed: it plays again for someone else, and `used` stays recorded", () => {
     const once = applyReplyEvent(day5({ san: 50 }), { day: 5, recipient: "group", choice: "no" });
-    expect(applyReplyEvent(once, { day: 5, recipient: "boss", choice: "no" })).toBe(once);
+    const twice = applyReplyEvent(once, { day: 5, recipient: "boss", choice: "no" });
+    for (const flag of cell(5, "boss", "no").effects!.flags!) expect(twice.flags).toContain(flag);
+    expect(twice.objectWords[chick]!.used).toBe(true);
+  });
+
+  it("a lent word whose object was handed to the hand sends nothing", () => {
+    const lost = day5({ raids: { 4: { taken: false, blockedWith: chick } } });
+    expect(applyReplyEvent(lost, { day: 5, recipient: "group", choice: "no" })).toBe(lost);
   });
 
   it("does nothing for a gone word, a word not on the menu, or an unfound object's word", () => {

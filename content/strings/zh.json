@@ -21,5 +21,12 @@
   "reply.status.recalled": "[撤回了一条消息]",
   "reply.status.deregistered": "[该账号已注销]",
   "reply.hint.boss": "对老板，你能说的话是一张很小的表。",
-  "reply.hint.gone": "这句今天说不了了。"
+  "reply.hint.gone": "这句今天说不了了。",
+  "delivery.shop.closed": "商家已打烊",
+  "delivery.arrived": "已送达",
+  "delivery.window.lunch": "午饭",
+  "delivery.window.dinner": "晚饭",
+  "delivery.door.chain": "开到链条",
+  "delivery.door.take": "伸手拿",
+  "delivery.bag.onDesk": "袋子在桌角"
 }

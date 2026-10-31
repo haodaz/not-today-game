@@ -29,11 +29,14 @@ These come from reading the data. Each is implemented as described and is easy t
   words in the *default* `replyOptions`. Nothing derives `replyOptions` yet, so applying it to
   every word would grey out `what-llm`, which the data makes live from day 11. Additions come from
   the day table and removals from either the table's `gone` or `state.replyOptions`.
-- **D3. Object words: one use, globally, per FR1.** A lent word is on the menu only while its
-  object is in `found` and `objectWords[x].used === false`. Sending it sets `used = true`, and after
-  that it is `gone` everywhere. **This makes most of the content unreachable.** For example, `no`
-  has 70 cells across 13 days, and only the first one sent would ever play. If `used` should reset
-  per day or per recipient, it's a one-line change in `objectWordState`.
+- **D3. Object words (revised 2026-10-31, author decision).** A lent word is available every day,
+  to every recipient, while its object is held, i.e. found and not lost to the hand (see
+  `src/state/objects.ts`). Using it does not consume it, and `objectWords[x].used` only records
+  the first use. The word is off the menu before its object is found. It is struck through
+  (`gone`, reason `lost`) once the object is handed to the hand, or when the day's table marks it
+  `gone`.
+  - Side effect: an entry's `effects` apply each time it is sent, so the same chip sent twice
+    moves `san` twice. desktop-ui should offer each chip once per conversation per day.
 - **D4. `cond_show: {has: X}`.** True if `flags` contains `X`, or if `X === "lent"` and `loan` is
   `lent` or `repaid`. The second branch is needed because the day-12 "钱我还你了" lines are gated
   on `has: lent`, and `loan` turns `repaid` on day 12. When an entry's condition fails it resolves

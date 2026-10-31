@@ -1,11 +1,13 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { f } from "@state/fday";
+import { isHeld } from "@state/objects";
 import {
   condHolds,
   DEREGISTERED_BY_FLAG,
   isDeregistered,
   menu,
+  objectOfWord,
   objectWordState,
   recipientsOn,
   resolve,
@@ -26,6 +28,12 @@ const objectFor = (word: string) =>
 const withFound = (state: State, ...objects: string[]): State => ({
   ...state,
   found: [...new Set([...state.found, ...objects])] as State["found"],
+});
+
+/** The object held up to the hand on `night` (raids[night].blockedWith). */
+const handedOver = (state: State, object: string, night: number): State => ({
+  ...state,
+  raids: { ...state.raids, [night]: { taken: false, blockedWith: object } },
 });
 
 const usedWord = (state: State, word: string): State => {
@@ -78,14 +86,36 @@ describe("object words (D3)", () => {
     expect(menu(5, "boss", state).map((m) => m.word)).not.toContain(no);
   });
 
-  it("play once found, then are gone everywhere once used", () => {
+  it("play once found, and stay available to everyone after being used", () => {
     const found = withFound(at(5), chick);
     expect(resolve(5, "boss", no, found)).toMatchObject({ status: "reply" });
     expect(menu(5, "boss", found)).toContainEqual({ word: no, kind: "object", gone: false });
     const used = usedWord(found, no);
     for (const recipient of ["boss", "group", "xiaozhang"]) {
-      expect(resolve(5, recipient, no, used), recipient).toEqual({ status: "gone", inner: null, reason: "used" });
+      expect(resolve(5, recipient, no, used)?.status, recipient).not.toBe("gone");
     }
+    const later = usedWord(withFound(at(9), chick), no);
+    expect(resolve(9, "boss", no, later)?.status).not.toBe("gone");
+  });
+
+  it("are struck through once the object is lost to the hand", () => {
+    const lost = handedOver(withFound(at(7), chick), chick, 6);
+    for (const recipient of ["boss", "group"]) {
+      expect(resolve(7, recipient, no, lost), recipient).toEqual({ status: "gone", inner: null, reason: "lost" });
+    }
+    expect(objectWordState(no, lost)).toBe("lost");
+    expect(menu(7, "boss", lost)).toContainEqual({ word: no, kind: "object", gone: true });
+  });
+
+  it("a raid with nothing held up loses nothing", () => {
+    const state = withFound(at(7), chick);
+    const raided: State = { ...state, raids: { 6: { taken: true, blockedWith: null } } };
+    expect(objectWordState(no, raided)).toBe("available");
+  });
+
+  it("the day's table still wins: a content-gone lent word is gone while held", () => {
+    const state = withFound(at(16), chick);
+    expect(resolve(16, "boss", no, state)).toMatchObject({ status: "gone", reason: "content" });
   });
 
   it("a word the content never lends is not an object word", () => {
@@ -165,6 +195,7 @@ describe("FR5 property: every menu word resolves to an entry or gone", () => {
     used: fc.subarray(words),
     flags: fc.subarray([...contentFlags]),
     replyOptions: fc.subarray(starting),
+    handed: fc.subarray([...(membersOf("found") ?? [])]),
   });
 
   it("holds for every day and recipient under random states", () => {
@@ -180,6 +211,7 @@ describe("FR5 property: every menu word resolves to an entry or gone", () => {
           objectWords: Object.fromEntries(
             Object.entries(base.objectWords).map(([o, w]) => [o, { ...w, used: s.used.includes(o) }]),
           ),
+          raids: Object.fromEntries(s.handed.map((object, i) => [i + 1, { taken: false, blockedWith: object }])),
         };
         for (const recipient of recipientsOn(day)) {
           for (const item of menu(day, recipient, state)) {
@@ -187,6 +219,15 @@ describe("FR5 property: every menu word resolves to an entry or gone", () => {
             expect(r, `d${day} ${recipient}.${item.word}`).not.toBeNull();
             if (r!.status !== "gone") expect(r!.entry).toBeDefined();
             expect(item.gone).toBe(r!.status === "gone");
+
+            // Lent words: on the menu only once found; struck through exactly when the object is
+            // lost or the day's table says gone; `used` never matters.
+            if (item.kind === "object") {
+              const object = objectOfWord(item.word, state)!;
+              expect(state.found).toContain(object);
+              const contentGone = replyTable.get(day)!.recipients.get(recipient)!.cells.get(item.word)!.status === "gone";
+              expect(item.gone, `d${day} ${recipient}.${item.word}`).toBe(contentGone || !isHeld(object, state));
+            }
           }
         }
       }),

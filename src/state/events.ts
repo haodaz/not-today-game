@@ -2,6 +2,8 @@
 // applyEvent is pure: it never mutates its input and never reads a clock. An event may read the
 // state produced by earlier events; the only time it sees is its own recorded `day`.
 import type { State } from "./types.gen";
+import { applyOrder, applyPickup, applyUseItem } from "./delivery/effects";
+import type { Meal } from "./delivery/table";
 import { applyReplyEvent } from "./replies/effects";
 import { constants, membersOf } from "./variables";
 
@@ -27,11 +29,15 @@ export type GameEvent =
   | { kind: "sitUp"; day: number }
   | { kind: "handObject"; day: number; objectId: string }
   | { kind: "handLost"; day: number }
-  | { kind: "handNothing"; day: number };
+  | { kind: "handNothing"; day: number }
+  // delivery spec (amendment 2026-10-31): `t` is the beat time the order was placed.
+  | { kind: "order"; day: number; meal: Meal; shopId: string; itemId: string; t: string }
+  | { kind: "pickup"; day: number; meal: Meal }
+  | { kind: "useItem"; day: number; itemId: string; objectId: string };
 
 export type EventKind = GameEvent["kind"];
 
-/** Exactly the twelve kinds. Nothing else may be appended. */
+/** Exactly these kinds (twelve from world-state, three from delivery). Nothing else may be appended. */
 export const eventKinds: readonly EventKind[] = [
   "openLayer",
   "recognise",
@@ -45,6 +51,9 @@ export const eventKinds: readonly EventKind[] = [
   "handObject",
   "handLost",
   "handNothing",
+  "order",
+  "pickup",
+  "useItem",
 ];
 
 /** An event as a caller builds it, before the store stamps the day. */
@@ -111,6 +120,12 @@ export function applyEvent(state: State, event: GameEvent): State {
       return event.recipient === undefined
         ? applyLoanReply(state, event)
         : applyReplyEvent(state, { day: event.day, recipient: event.recipient, choice: event.choice });
+    case "order":
+      return applyOrder(state, event);
+    case "pickup":
+      return applyPickup(state, event);
+    case "useItem":
+      return applyUseItem(state, event);
     case "pressKey":
     case "looked":
     case "sitUp":
