@@ -42,3 +42,6 @@ Day/night: in the day beats the desktop is light. In the night beat the desktop 
 - Pure views of the store; no app writes state directly; they emit events.
 - Works at 1440×900 per monitor, both monitors visible side by side in the room scene; also a "focus one monitor" view.
 - Snapshot tests for each app at day 1, day 10 (calm), day 13 (ring room), night beat.
+
+## Amendment 2026-11-01 (author): one monitor at a time
+The desktop view never splits the viewport between the two monitors. It shows **one monitor at full size** (1440×900 fitted to the viewport, aspect kept) and switches between left and right: a small 左屏 / 右屏 toggle at the top edge, keyboard ← →, and the dock/app badges of the other monitor still visible as a thin tab on that side. The two-monitors-side-by-side layout exists only inside the 3D room view (room-scene), where both screens are seen on the desk. Default on open: the monitor that has the current app (messages on the left for day 1 morning).
