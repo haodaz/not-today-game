@@ -1,0 +1,15 @@
+{
+  "_note": "玩家什么都不给的夜里，它拿走别的（night-hand FR2）：9 心跳，18 手。其他夜只扣 san。 单独放是因为 nights.json 的加载器键名严格；night-hand 扩展加载器后可并入。",
+  "takes": {
+    "9": {
+      "what": "heartbeat",
+      "flag": "heartbeat_taken",
+      "say": "心率组件还在跳。里面的数没了，只剩跳。"
+    },
+    "18": {
+      "what": "hand",
+      "flag": "hand_taken",
+      "say": "它握住了。你没有抽回来。"
+    }
+  }
+}
