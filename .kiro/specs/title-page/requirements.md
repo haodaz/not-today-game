@@ -41,3 +41,8 @@ The launch screen is a full-screen game title, not a book cover and not a form. 
 ## FR8. Where the endings live: three figures on the desk
 - Each ending the player has ever reached (`nt_profile.endings: {bad, survive, good}` counts; set by san-and-endings) puts a small figure on the left end of the desk, by the window, in the title room and in the in-game room view: bad = a small grey figure of a person with no face (「第一日，改」: the one who was replaced); survive = a small cardboard box with a shipping slip (「回到第一日」); good = the chick, standing (「第十九日」). Assets `public/room/fig_{bad,survive,good}.png` (Claude provides, cutouts). Hovering shows the ending's name as a one-word chip; nothing else, no dates, no counts.
 - All three plus the book (FR4) are the whole collection. There is no achievements screen.
+
+## Correction 2026-11-01 (author): the questions live in a card, over the desk
+- Clicking 新游戏 first pushes the camera to the 桌子 framing (same path and 1.4 s as 房间→桌子; monitors wake during the push). The menu column fades out during the push.
+- The questions then appear in a **card**: a centred panel like the settings panel (translucent warm grey, hairline, 8 px radius, about 560 px wide), title `这是谁的故事？` as its header, one question row at a time inside it, 🎲 beside each, `开始` as the card's only button. Nothing is written straight onto the background any more. Esc closes the card and pulls back to the room framing.
+- 开始 closes the card and the day-1 room view begins from the desk framing (the lamp goes off, then the first beat). Mock: design/chrome/title-questions.html.
