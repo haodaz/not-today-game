@@ -301,3 +301,37 @@ Appended after each task. Neither Kiro nor Claude edits the other's area without
   - The door handle turning on day 19 (room-scene).
   - The credits get no direction from chat-rubric evidence until that source exists (`deltaOf`).
 - Tests: 43 files, 642 passing; typecheck clean. Not checked in a browser.
+
+## 2026-10-31 — two fixes: ghosting, the monitor glow
+
+1. Ghosting (motion layer).
+   - Every element the motion layer touches has a key (`motionKey`). A ghost only plays while
+     nothing live has its key, and of two ghosts with the same key the newer wins. So an element
+     that changes state replaces its old version at once; only one that truly leaves keeps its
+     exit.
+   - Checklist lines are keyed by item id (every line now has `data-id`), so a rewritten line is
+     the same line.
+   - Held phone → object, choices → choices and the like are replaced at once.
+   - Shutdown darkens the monitor and tab in place (`m-power-off`) instead of a ghost copy on top.
+   - Camera moves keep exactly one backdrop:
+     - a picture-only copy of a stage (`m-backdrop`) carries the move, behind the arriving
+       stage, which hides its own picture (`m-nobg`) until the move ends;
+     - the HUD is replaced at once;
+     - pushing in, the old photo zooms then cuts to the new framing; pulling out, the new photo
+       starts zoomed and settles;
+     - 屏幕 shrinks into, or grows out of, its monitor over the one photo;
+     - the door fades one picture out and then the other in.
+   - Fixed on the way: the settings panel's exit looked for the old `.settings-host` (now
+     `.hud-host`).
+   - New test `tests/motion-dom.test.ts` (happy-dom) drives the real controller, render and
+     motion layer through every camera level, held swaps, a rewritten checklist line, the
+     monitor push, shutdown, settings and the call. After each render, and mid-move, it asserts
+     no duplicate keys and one backdrop on a photo view.
+   - New dev dependency: `happy-dom` 21.0.4 (exact), used only by that file
+     (`// @vitest-environment happy-dom`).
+2. The glow on the right monitor is gone in every view: the shot rects, the CSS, the phase lock.
+   - Following "nothing breathing on the monitor", the small window's night pulse on 屏幕
+     (`.kmini.blink` animation) is removed too. Its static night look stays. Revert that one rule
+     if the desktop-ui night blink should stay.
+- Snapshots: the checklist lines' `data-id` (3) and the room HUD without the glow (2).
+- Tests: 44 files, 648 passing; typecheck clean. Not checked in a real browser.

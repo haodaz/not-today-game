@@ -11,8 +11,6 @@
 .room.desk-view{background-image:url(/room/shots/desk_close.jpg)}
 .room .shot-hit{position:absolute;border:0;padding:0;margin:0;background:transparent;cursor:pointer;border-radius:4px}
 .room .shot-hit:hover,.room .shot-hit:focus-visible{outline:2px solid rgba(232,228,220,.55);outline-offset:2px}
-/* Mood only: a faint glow where its small window sits on the right monitor (not a control) */
-.room .kuro-mood{position:absolute;border-radius:4px;background:rgba(246,250,255,.18);box-shadow:0 0 14px 3px rgba(246,166,35,.18);pointer-events:none;animation:m-blink var(--m-blink) ease-in-out infinite}
 /* Bottom right of the HUD: Kuro's body (the call button), then the camera chips (day-loop correction) */
 .hud-br{position:absolute;right:28px;bottom:28px;z-index:18;display:flex;align-items:flex-end;gap:12px}
 .hud-host .hud-br{position:fixed;right:12px;bottom:12px;z-index:40}

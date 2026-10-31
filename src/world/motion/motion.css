@@ -21,6 +21,14 @@
 /* Camera: the room pushes in toward the monitor; the desktop grows from it (and back) */
 @keyframes m-cam-out{to{translate:var(--m-tx) var(--m-ty);scale:var(--m-z);opacity:0}}
 @keyframes m-cam-in{from{translate:var(--m-tx) var(--m-ty);scale:var(--m-z);opacity:0}}
+/* One backdrop during a camera move: a picture-only copy carries it; the arriving stage hides its
+   own picture until the move ends (the HUD in it is there at once). */
+.stage.m-nobg{background-image:none !important;background-color:transparent !important;box-shadow:none !important}
+.stage.m-backdrop{pointer-events:none}
+@keyframes m-cam-push-out{to{translate:var(--m-tx) var(--m-ty);scale:var(--m-z)}}
+@keyframes m-cam-push-in{from{translate:var(--m-tx) var(--m-ty);scale:var(--m-z)}}
+/* Shutdown: the monitor darkens in place (it changes, it does not leave) */
+@keyframes m-power-off{from{filter:hue-rotate(var(--tint,0deg)) blur(var(--blur,0px)) brightness(1.8)}}
 /* Left ↔ right */
 @keyframes m-push-out{to{translate:var(--m-dx) 0}}
 @keyframes m-push-in{from{translate:var(--m-dx) 0}}
@@ -44,8 +52,7 @@
 .kpet{animation:m-bob var(--m-bob) ease-in-out infinite}
 @keyframes m-bob{50%{translate:0 calc(-1 * var(--m-bob-px))}}
 .kpet .layer{transition:opacity var(--m-kuro-fade) var(--m-ease)}
-.kmini.blink{animation:m-blink var(--m-blink) ease-in-out infinite}
-@keyframes m-blink{50%{box-shadow:0 0 0 1px rgba(246,166,35,.3),0 0 18px 2px rgba(246,166,35,.15),0 16px 48px rgba(0,0,0,.4)}}
+/* Nothing breathes on the monitor (day-loop correction): the small window's night look is static. */
 /* The chat overlay rises out of Kuro's body at the HUD's bottom right, and sinks back */
 @keyframes m-call-in{from{opacity:0;scale:.6;translate:0 24px}}
 @keyframes m-call-out{to{opacity:0;scale:.6;translate:0 24px}}

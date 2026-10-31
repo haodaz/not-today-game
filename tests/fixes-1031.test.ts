@@ -1,5 +1,7 @@
 // The six fixes of 2026-10-31 (no new spec): settings, Kuro's small window, camera levels,
 // night 18's take. The phone fixes are in polish.test.ts.
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import en from "@content/strings/en.json";
 import { createStore, type Store } from "@state/store";
@@ -141,8 +143,8 @@ describe("(5) four camera levels", () => {
     expect(out).toContain('class="stage room room-view"');
     expect(out).not.toContain('class="bar"');
     expect(out).toMatch(/class="shot-hit" data-action="view" data-view="desk" style="left:\d+px;top:\d+px;width:\d+px;height:\d+px"/);
-    expect(out).toMatch(/<div class="kuro-mood" style="[^"]+" aria-hidden="true"><\/div>/);
-    expect(out).not.toContain("kuro-glow");
+    // Nothing on the monitors: no glow, no box (day-loop correction).
+    expect(out).not.toMatch(/kuro-mood|kuro-glow/);
   });
 
   it("桌子 is the close-up: the desk bar is its object layer; each monitor opens 屏幕 on its side", () => {
@@ -152,21 +154,26 @@ describe("(5) four camera levels", () => {
     expect(out).toContain('class="bar"');
     expect(out).toContain('data-view="desktop" data-screen="left"');
     expect(out).toContain('data-view="desktop" data-screen="right"');
-    expect(out).toContain('class="kuro-mood"');
+    expect(out).not.toMatch(/kuro-mood|kuro-glow/);
     loopActions["view"]!(ctx, { view: "desktop", screen: "right" } as DOMStringMap, null as never);
     expect(ctx.session.view).toBe("desktop");
     expect(ctx.session.focus).toBe("right");
   });
 
-  it("every click area sits on the stage, the glow inside the right monitor", () => {
+  it("every click area sits on the stage; the gap is between the monitors", () => {
     for (const shot of [ROOM_SHOT, DESK_SHOT]) {
-      for (const r of [shot.monitors.left, shot.monitors.right, shot.kuro, shot.gap]) {
+      for (const r of [shot.monitors.left, shot.monitors.right, shot.gap]) {
         expect(r.l >= 0 && r.t >= 0 && r.l + r.w <= 1600 && r.t + r.h <= 900).toBe(true);
       }
-      const m = shot.monitors.right;
-      expect(shot.kuro.l >= m.l && shot.kuro.t >= m.t && shot.kuro.l + shot.kuro.w <= m.l + m.w && shot.kuro.t + shot.kuro.h <= m.t + m.h).toBe(true);
       expect(shot.monitors.left.l + shot.monitors.left.w).toBeLessThanOrEqual(shot.monitors.right.l);
+      expect(shot.gap.l).toBeGreaterThanOrEqual(shot.monitors.left.l + shot.monitors.left.w - shot.gap.w);
     }
+  });
+
+  it("nothing breathes on the monitor: the small window's night look has no animation", () => {
+    const css = readFileSync(resolve(__dirname, "../src/world/motion/motion.css"), "utf8") + readFileSync(resolve(__dirname, "../src/world/room/room.css"), "utf8");
+    expect(css).not.toMatch(/\.kmini\.blink\{[^}]*animation/);
+    expect(css).not.toMatch(/kuro-mood|kuro-glow/);
   });
 
   const render = (ctx: ActionContext) => (ctx.session.view === "desktop" ? renderGame(ctx.store, ctx.session, 0).value : room(ctx));

@@ -18,6 +18,11 @@ import { applyMotionVars, CHOSEN, choiceDelays, EASE, exitOf, MOTION, ROOM_PUSH 
 
 interface Ghost {
   readonly el: HTMLElement;
+  /**
+   * Its motion key (`motionKey`). A ghost only plays while nothing live has the same key: an
+   * element that is still there (changed, not gone) replaces its old version at once.
+   */
+  readonly key: string;
   readonly start: number;
   readonly end: number;
   /** Puts the ghost back at its place in the new DOM; false if its place is gone. */
@@ -64,7 +69,7 @@ interface Outgoing {
   readonly dlg: HTMLElement | null;
   readonly dlgLayer: HTMLElement | null;
   readonly choices: HTMLElement | null;
-  readonly items: { text: string; el: HTMLElement; height: number }[];
+  readonly items: { id: string; el: HTMLElement; height: number }[];
   readonly doneText: string | null;
   readonly doorBg: HTMLElement | null;
   readonly doorHand: HTMLElement | null;
@@ -78,6 +83,49 @@ const q = <T extends HTMLElement = HTMLElement>(root: ParentNode, sel: string): 
   ([...root.querySelectorAll<T>(sel)].find(live) ?? null) as T | null;
 const qa = <T extends HTMLElement = HTMLElement>(root: ParentNode, sel: string): T[] => [...root.querySelectorAll<T>(sel)].filter(live);
 const textOf = (el: Element): string => (el.textContent ?? "").trim();
+
+/** Everything the motion layer animates or turns into a ghost. */
+export const KEYED =
+  ".stage, .m-backdrop, .held-layer, .stage > .dlg, .dlg-layer, .choices, .room .list > .it, .monitor, .other-tab, .kuro-call, .settings-layer, .gap-glow, .door-bg.chain, .door-hand, .door-beat";
+
+/**
+ * The identity of a motion element across renders. Two elements with the same key are the same
+ * thing (one replaces the other at once); after a render no two may share one. A photo stage is
+ * "backdrop" unless its picture is hidden while a camera move carries it (`m-nobg`): there is
+ * exactly one backdrop on screen.
+ */
+export function motionKey(el: Element): string | null {
+  const c = el.classList;
+  if (c.contains("m-backdrop")) return "backdrop";
+  if (c.contains("stage")) {
+    if (c.contains("ending-page")) return "page";
+    if (c.contains("one-monitor")) return "screen";
+    return c.contains("m-nobg") ? "stage" : "backdrop";
+  }
+  if (c.contains("held-layer")) return "held";
+  if (c.contains("dlg-layer") || (c.contains("dlg") && el.parentElement?.classList.contains("stage"))) return "dlg";
+  if (c.contains("choices")) return "choices";
+  if (c.contains("it") && el.parentElement?.classList.contains("list")) return `item:${(el as HTMLElement).dataset.id ?? ""}`;
+  if (c.contains("monitor")) return `monitor:${(el as HTMLElement).dataset.side ?? ""}`;
+  if (c.contains("other-tab")) return "tab";
+  if (c.contains("kuro-call")) return "call";
+  if (c.contains("settings-layer")) return "settings";
+  if (c.contains("gap-glow")) return "gap";
+  if (c.contains("door-bg")) return "door-bg";
+  if (c.contains("door-hand")) return "door-hand";
+  if (c.contains("door-beat")) return "door-beat";
+  return null;
+}
+
+/** Keys that appear more than once in `root` (ghosts included): must be empty after a render. */
+export function duplicateKeys(root: ParentNode): string[] {
+  const seen = new Map<string, number>();
+  for (const el of root.querySelectorAll(KEYED)) {
+    const k = motionKey(el);
+    if (k) seen.set(k, (seen.get(k) ?? 0) + 1);
+  }
+  return [...seen].filter(([, n]) => n > 1).map(([k]) => k);
+}
 
 /** An animation that started at `start` (ms), continued at time `t`. */
 function anim(el: HTMLElement, name: string, dur: number, start: number, t: number, ease = EASE): void {
@@ -119,6 +167,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
   const since = (key: string): number | undefined => starts.get(key);
 
   const addGhost = (g: Ghost) => {
+    // Its descendants are not live things either: a leaving screen's monitor is not "the" monitor.
     g.el.classList.add("m-ghost");
     g.el.setAttribute("aria-hidden", "true");
     g.el.style.pointerEvents = "none";
@@ -173,7 +222,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       dlg: stage ? q(stage, ":scope > .dlg") : null,
       dlgLayer: q(root, ".dlg-layer"),
       choices: stage ? q(stage, ":scope > .choices") : null,
-      items: list ? qa(list, ":scope > .it").map((el) => ({ text: textOf(el), el, height: el.offsetHeight })) : [],
+      items: list ? qa(list, ":scope > .it").map((el) => ({ id: el.dataset.id ?? "", el, height: el.offsetHeight })) : [],
       doneText: list ? (q(list, ":scope > .done")?.textContent ?? null) : null,
       doorBg: q(root, ".door-bg.chain"),
       doorHand: q(root, ".door-hand"),
@@ -184,7 +233,8 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
   }
 
   // ---- held (FR1) -------------------------------------------------------------------------
-  const slotSelector = (held: string) => (held === "phone" ? '.bar [data-action="loop-phone"]' : `.bar [data-object="${CSS.escape(held)}"]`);
+  const esc = (s: string) => (typeof CSS !== "undefined" && typeof CSS.escape === "function" ? CSS.escape(s) : s.replace(/["\\]/g, "\\$&"));
+  const slotSelector = (held: string) => (held === "phone" ? '.bar [data-action="loop-phone"]' : `.bar [data-object="${esc(held)}"]`);
 
   /** The path from the centre to the slot, in stage px, written on the held element. */
   function liftVars(stage: HTMLElement, layer: HTMLElement, held: string): void {
@@ -224,6 +274,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
   function heldGhost(el: HTMLElement, held: string, t: number): void {
     addGhost({
       el,
+      key: "held",
       start: t,
       end: t + MOTION.putDown,
       place: (r) => {
@@ -362,6 +413,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     const fade = exitOf(MOTION.choice);
     addGhost({
       el,
+      key: "choices",
       start: t,
       end: t + CHOSEN.chosenHold + fade,
       place: (r) => {
@@ -380,24 +432,18 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     });
   }
 
-  function fadeGhost(el: HTMLElement, place: (r: HTMLElement) => boolean, dur: number, t: number, delay = 0): void {
-    addGhost({ el, start: t, end: t + delay + dur, place, apply: (g, now) => anim(g, "m-fade-out", dur, t + delay, now) });
+  function fadeGhost(el: HTMLElement, key: string, place: (r: HTMLElement) => boolean, dur: number, t: number, delay = 0): void {
+    addGhost({ el, key, start: t, end: t + delay + dur, place, apply: (g, now) => anim(g, "m-fade-out", dur, t + delay, now) });
   }
 
   // ---- checklist (FR4) --------------------------------------------------------------------
-  function itemSounds(): Map<string, string> {
-    const state = ctx.store.getState();
-    const file = dayFile(state.day);
-    const m = new Map<string, string>();
-    for (const it of file?.items ?? []) {
-      if (!it.sfx) continue;
-      m.set(it.text, it.sfx);
-      if (it.rewrite) m.set(it.rewrite, it.sfx);
-    }
-    return m;
+  /** Items of today with a sound, by id. */
+  function itemSounds(): Set<string> {
+    const file = dayFile(ctx.store.getState().day);
+    return new Set((file?.items ?? []).filter((it) => it.sfx).map((it) => it.id));
   }
 
-  function tickGhost(item: { text: string; el: HTMLElement; height: number }, index: number, doneText: string | null, t: number): void {
+  function tickGhost(item: { id: string; el: HTMLElement; height: number }, index: number, doneText: string | null, t: number): void {
     const fold = exitOf(MOTION.itemIn);
     const foldAt = t + MOTION.tickFill + MOTION.tickHold;
     item.el.style.height = `${item.height}px`;
@@ -405,6 +451,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     after(foldAt - t, ctx.rerender);
     addGhost({
       el: item.el,
+      key: `item:${item.id}`,
       start: t,
       end: foldAt + fold,
       place: (r) => {
@@ -430,41 +477,42 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
   function checklistMotion(t: number, sameDay: boolean): { bell: boolean } {
     const list = q(root, ".room .list");
     if (!list || !out) return { bell: false };
-    const lines = qa(list, ":scope > .it");
-    const texts = lines.map(textOf);
+    // Lines are keyed by item id: a line whose text changes (a wait rewrite) is the same line,
+    // replaced at once; only a line whose item is gone leaves with its exit.
+    const ids = qa(list, ":scope > .it").map((el) => el.dataset.id ?? "");
     const lc = loopContext(ctx.store.getState(), ctx.store.getEvents());
     const doneCount = lc ? checklist(lc).doneCount : 0;
     let bell = false;
     if (lastItems && sameDay) {
       const sounds = itemSounds();
-      texts.forEach((text) => {
-        if (lastItems!.includes(text) || since(`item:${text}`) !== undefined) return;
-        const sound = sounds.has(text);
+      ids.forEach((id) => {
+        if (lastItems!.includes(id) || since(`item:${id}`) !== undefined) return;
+        const sound = sounds.has(id);
         bell ||= sound;
         // A line with a sound comes after it (the doorbell, motion.md).
-        begin(`item:${text}`, t + (sound ? MOTION.bellToList : 0));
+        begin(`item:${id}`, t + (sound ? MOTION.bellToList : 0));
       });
       out.items.forEach((item, index) => {
-        if (texts.includes(item.text)) return;
+        if (ids.includes(item.id)) return;
         if (doneCount > lastDone) tickGhost(item, index, out!.doneText, t);
         else
-          fadeGhost(item.el, (r) => {
+          fadeGhost(item.el, `item:${item.id}`, (r) => {
             const l = q(r, ".room .list");
             if (!l) return false;
             l.insertBefore(item.el, qa(l, ":scope > .it")[index] ?? null);
             return true;
           }, exitOf(MOTION.itemIn), t);
-        starts.delete(`item:${item.text}`);
+        starts.delete(`item:${item.id}`);
       });
     }
-    lastItems = texts;
+    lastItems = ids;
     lastDone = doneCount;
     return { bell };
   }
 
   function checklistEntries(t: number): void {
     for (const el of qa(root, ".room .list > .it")) {
-      const start = since(`item:${textOf(el)}`);
+      const start = since(`item:${el.dataset.id ?? ""}`);
       if (start !== undefined && t - start < MOTION.itemIn) anim(el, "m-item-in", MOTION.itemIn, start, t);
     }
   }
@@ -507,43 +555,123 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     el.style.setProperty("--m-z", v.z.toFixed(4));
   };
 
-  /** The arriving stage's camera for the move under way (null: it fades in). */
-  let viewIn: Cam | null = null;
+  /**
+   * A camera move between views. Exactly one backdrop is on screen at any moment, and the HUD
+   * (checklist, chips, dialogue) is replaced at once, never doubled:
+   *  - the photo that carries the move is a copy of the stage without its children
+   *    (`m-backdrop`), behind the new stage, whose own picture is hidden (`m-nobg`) until the move ends;
+   *  - pushing in (房间 → 桌子, a shot → 屏幕) the old photo zooms, then cuts to the new framing;
+   *    pulling out (桌子 → 房间, 屏幕 → a shot) the new photo starts zoomed and settles;
+   *  - 屏幕 is not a backdrop: leaving, it shrinks into its monitor (it truly leaves); arriving, it
+   *    grows out of it over the old photo;
+   *  - without a camera (the door) the old photo fades out, then the new one fades in.
+   */
+  interface ViewMove {
+    readonly from: string;
+    readonly to: string;
+    readonly start: number;
+    readonly dur: number;
+    /** The arriving screen's camera (屏幕 only). */
+    readonly screenIn: Cam | null;
+  }
+  let move: ViewMove | null = null;
+  const isPhoto = (view: string) => view !== "desktop";
+
+  /** A copy of a stage that only draws its picture. */
+  function backdropOf(stage: HTMLElement): HTMLElement {
+    const b = stage.cloneNode(false) as HTMLElement;
+    b.classList.remove("m-nobg", "m-asleep", "m-wake", "raid");
+    b.classList.add("m-backdrop");
+    b.removeAttribute("data-view");
+    b.style.animation = "";
+    Object.assign(b.style, { position: "absolute", left: "0", top: "0", zIndex: "0" });
+    return b;
+  }
+  /** Backdrops go first in the root, so the new stage (HUD) and a leaving screen draw over them. */
+  const behind = (r: HTMLElement, el: HTMLElement) => {
+    r.insertBefore(el, r.firstChild);
+    return true;
+  };
 
   function viewChange(t: number, from: string, to: string): void {
     const old = out?.stage;
     const stage = q(root, ".stage");
     if (!old || !stage) return;
-    begin("view", t);
     const cam = camFor(from, to, old, stage, ctx.session.focus);
-    viewIn = cam?.in ?? null;
-    if (cam) setCam(old, cam.out);
     const dur = cam ? MOTION.view : CHOSEN.doorView;
-    addGhost({
-      el: old,
-      start: t,
-      end: t + dur,
-      place: (r) => {
-        old.style.position = "absolute";
-        old.style.left = "0";
-        old.style.top = "0";
-        old.style.zIndex = "40";
-        r.appendChild(old);
-        return true;
-      },
-      apply: (g, now) => anim(g, cam ? "m-cam-out" : "m-fade-out", dur, t, now),
-    });
+    move = { from, to, start: t, dur, screenIn: to === "desktop" && cam ? cam.in : null };
+    begin("view", t);
+
+    // 屏幕 leaving: it shrinks into its monitor (or fades), over the arriving photo.
+    if (from === "desktop") {
+      if (cam) setCam(old, cam.out);
+      addGhost({
+        el: old,
+        key: "screen",
+        start: t,
+        end: t + dur,
+        place: (r) => {
+          Object.assign(old.style, { position: "absolute", left: "0", top: "0", zIndex: "40" });
+          r.appendChild(old);
+          return true;
+        },
+        apply: (g, now) => anim(g, cam ? "m-cam-out" : "m-fade-out", dur, t, now),
+      });
+    }
+
+    if (cam && isPhoto(from) && cam.out.z > 1) {
+      // Pushing in: the old photo carries the move, then cuts to the new framing.
+      const b = backdropOf(old);
+      setCam(b, cam.out);
+      addGhost({ el: b, key: "backdrop", start: t, end: t + dur, place: (r) => behind(r, b), apply: (g, now) => anim(g, "m-cam-push-out", dur, t, now) });
+    } else if (cam && isPhoto(to) && cam.in.z > 1) {
+      // Pulling out: the new photo starts zoomed in and settles; the old one is gone at once.
+      const b = backdropOf(stage);
+      setCam(b, cam.in);
+      addGhost({ el: b, key: "backdrop", start: t, end: t + dur, place: (r) => behind(r, b), apply: (g, now) => anim(g, "m-cam-push-in", dur, t, now) });
+    } else if (!cam) {
+      // No camera: one picture after the other, never both.
+      const half = Math.round(dur / 2);
+      if (isPhoto(from)) {
+        const b = backdropOf(old);
+        addGhost({ el: b, key: "backdrop", start: t, end: t + half, place: (r) => behind(r, b), apply: (g, now) => anim(g, "m-fade-out", half, t, now) });
+      }
+      if (isPhoto(to)) {
+        const b = backdropOf(stage);
+        addGhost({
+          el: b,
+          key: "backdrop",
+          start: t,
+          end: t + dur,
+          // Not on screen during the first half: the old picture is still fading out.
+          place: (r) => now() >= t + half && behind(r, b),
+          apply: (g, n) => anim(g, "m-fade-in", dur - half, t + half, n),
+        });
+        after(half, ctx.rerender);
+      }
+    }
+    // The arriving photo shows its own picture again when the move ends.
+    after(dur + 16, ctx.rerender);
+  }
+
+  /** Before ghosts are placed: hide the arriving stage's own picture while a copy carries it. */
+  function viewHold(t: number): void {
+    const stage = q(root, ".stage");
+    if (!move || !stage || t - move.start >= move.dur) return;
+    if (isPhoto(move.to) && stage.classList.contains("room")) stage.classList.add("m-nobg");
   }
 
   function viewEntry(t: number): void {
-    const start = since("view");
     const stage = q(root, ".stage");
-    if (start === undefined || !stage || t - start >= MOTION.view) return;
-    if (viewIn) {
-      setCam(stage, viewIn);
-      anim(stage, "m-cam-in", MOTION.view, start, t);
-    } else {
-      anim(stage, "m-fade-in", CHOSEN.doorView, start, t);
+    if (!move || !stage || t - move.start >= move.dur) return;
+    if (move.to === "desktop") {
+      // 屏幕 arriving: it grows out of the monitor (or fades in) over the old photo.
+      if (move.screenIn) {
+        setCam(stage, move.screenIn);
+        anim(stage, "m-cam-in", move.dur, move.start, t);
+      } else {
+        anim(stage, "m-fade-in", move.dur, move.start, t);
+      }
     }
   }
 
@@ -555,8 +683,10 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     pushDir = focus === "right" ? 1 : -1;
     begin("screen", t);
     m.el.style.setProperty("--m-dx", `${-pushDir * m.width}px`);
+    // The other side's monitor truly leaves (its key is monitor:<side>), so it may push out.
     addGhost({
       el: m.el,
+      key: motionKey(m.el) ?? "monitor",
       start: t,
       end: t + MOTION.screen,
       place: (r) => placeAt(r, m),
@@ -584,23 +714,22 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     }
   }
 
-  // Shutdown: the day look fades off each monitor, right first, 150ms apart.
+  // Shutdown: each monitor darkens, right first, 150 ms apart. The monitor changes state, it
+  // does not leave, so it darkens in place: no copy of the day look stays on top.
+  let powerFocus = "left";
   function powerOff(t: number, focus: string): void {
-    const shownFirst = focus === "right";
-    const parts = [
-      { part: out?.monitor ?? null, delay: shownFirst ? 0 : MOTION.shutdownGap },
-      { part: out?.tab ?? null, delay: shownFirst ? MOTION.shutdownGap : 0 },
-    ];
-    for (const { part, delay } of parts) {
-      if (!part) continue;
-      addGhost({
-        el: part.el,
-        start: t,
-        end: t + delay + MOTION.shutdown,
-        place: (r) => placeAt(r, part),
-        apply: (g, now) => anim(g, "m-fade-out", MOTION.shutdown, t + delay, now),
-      });
-    }
+    powerFocus = focus;
+    begin("power", t);
+  }
+  function powerEntry(t: number): void {
+    const start = since("power");
+    const stage = q(root, ".stage.one-monitor");
+    if (start === undefined || !stage || t - start >= MOTION.shutdown + MOTION.shutdownGap) return;
+    const shownFirst = powerFocus === "right";
+    const mon = q(stage, ".monitor");
+    const tab = q(stage, ".other-tab");
+    if (mon) anim(mon, "m-power-off", MOTION.shutdown, start + (shownFirst ? 0 : MOTION.shutdownGap), t);
+    if (tab) anim(tab, "m-power-off", MOTION.shutdown, start + (shownFirst ? MOTION.shutdownGap : 0), t);
   }
 
   // ---- door (FR2) -------------------------------------------------------------------------
@@ -633,11 +762,11 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       return true;
     };
     if (q(stage, ".door-bg.chain") && !out.doorBg) begin("door-bg", t);
-    if (!q(stage, ".door-bg.chain") && out.doorBg) fadeGhost(out.doorBg, (r) => firstIn(r, out!.doorBg!), exitOf(CHOSEN.doorImage), t);
+    if (!q(stage, ".door-bg.chain") && out.doorBg) fadeGhost(out.doorBg, "door-bg", (r) => firstIn(r, out!.doorBg!), exitOf(CHOSEN.doorImage), t);
     if (q(stage, ".door-hand") && !out.doorHand) begin("door-hand", t);
     if (!q(stage, ".door-hand") && out.doorHand) {
       const hand = out.doorHand;
-      fadeGhost(hand, (r) => !!q(r, ".stage.door-view")?.appendChild(hand), exitOf(MOTION.itemIn), t);
+      fadeGhost(hand, "door-hand", (r) => !!q(r, ".stage.door-view")?.appendChild(hand), exitOf(MOTION.itemIn), t);
     }
   }
 
@@ -662,7 +791,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
   /** Endless loops keep their phase across re-renders (design P10). */
   function phaseLock(t: number): void {
     for (const el of qa(root, ".kpet")) el.style.animationDelay = `${-(t % MOTION.bob)}ms`;
-    for (const el of qa(root, ".kmini.blink, .kuro-mood")) el.style.animationDelay = `${-(t % MOTION.blink)}ms`;
+
   }
 
   // ---- sleep and wake (FR5) -----------------------------------------------------------------
@@ -721,10 +850,10 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
           const dur = exitOf(MOTION.dlgIn);
           if (out.dlgLayer) {
             const el = out.dlgLayer;
-            fadeGhost(el, (r) => !!r.appendChild(el), dur, t);
+            fadeGhost(el, "dlg", (r) => !!r.appendChild(el), dur, t);
           } else if (out.dlg) {
             const el = out.dlg;
-            fadeGhost(el, (r) => !!q(r, ".stage")?.appendChild(el), dur, t);
+            fadeGhost(el, "dlg", (r) => !!q(r, ".stage")?.appendChild(el), dur, t);
           }
         }
       }
@@ -739,6 +868,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
         const dur = exitOf(MOTION.lift);
         addGhost({
           el,
+          key: "call",
           start: t,
           end: t + dur,
           place: (r) => {
@@ -752,14 +882,14 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       }
       if (!snap.settings && prev.settings && out.settings) {
         const el = out.settings;
-        const host = el.parentElement?.classList.contains("settings-host") ? ".settings-host" : ".stage";
-        fadeGhost(el, (r) => !!q(r, host)?.appendChild(el), exitOf(MOTION.dim), t);
+        const host = el.parentElement?.classList.contains("hud-host") ? ".hud-host" : ".stage";
+        fadeGhost(el, "settings", (r) => !!q(r, host)?.appendChild(el), exitOf(MOTION.dim), t);
       }
       // The hand's dim and gap glow: in like the room dims for a held item, out faster.
       if (sameDay && snap.raid && !prev.raid) begin("gap", t);
       if (sameDay && !snap.raid && prev.raid && out.gap && snap.view === prev.view) {
         const el = out.gap;
-        fadeGhost(el, (r) => {
+        fadeGhost(el, "gap", (r) => {
           const s = q(r, ".stage.room");
           if (!s) return false;
           s.insertBefore(el, s.firstChild);
@@ -777,16 +907,29 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     }
     out = null;
 
-    // Put the ghosts back and continue every motion still under way.
-    ghosts = ghosts.filter((g) => {
-      if (t >= g.end || !g.place(root)) {
+    // While a copy carries the camera move, the arriving photo hides its own picture (before the
+    // ghosts are placed, so the copy is the one backdrop).
+    viewHold(t);
+
+    // Put the ghosts back and continue every motion still under way. A ghost plays only while
+    // nothing live has its key (an element that changed, not left, replaces its old version at
+    // once), and of two ghosts with the same key the newer one wins.
+    const liveKeys = new Set(qa(root, KEYED).map(motionKey).filter((k): k is string => k !== null));
+    const taken = new Set<string>();
+    const kept: Ghost[] = [];
+    for (const g of [...ghosts].reverse()) {
+      const replaced = liveKeys.has(g.key) || taken.has(g.key);
+      if (replaced || t >= g.end || !g.place(root)) {
         g.el.remove();
-        return false;
+        continue;
       }
+      taken.add(g.key);
       g.apply(g.el, t, root);
-      return true;
-    });
+      kept.unshift(g);
+    }
+    ghosts = kept;
     viewEntry(t);
+    powerEntry(t);
     screenEntry(t);
     if (snap.held && stage) {
       const start = since(`held:${snap.held}`);

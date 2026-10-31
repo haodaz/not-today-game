@@ -47,7 +47,7 @@ export function renderChecklist(view: ChecklistView): SafeHtml {
     const c = cls("it", l.state);
     return l.action
       ? html`<button type="button" class="${c}" data-action="loop-item" data-id="${l.id}">${inner}</button>`
-      : html`<div class="${c}">${inner}</div>`;
+      : html`<div class="${c}" data-id="${l.id}">${inner}</div>`;
   });
   const done = view.doneCount > 0 ? html`<div class="done">${tr("hud.done", { n: view.doneCount })}</div>` : null;
   return html`<div class="list"><div class="h">${tr("hud.today")}</div>${done}${lines}</div>`;
@@ -185,16 +185,14 @@ export interface RoomModel {
  * window on the right monitor calls Kuro. They sit under the HUD.
  */
 function shotHits(view: "room" | "desk"): SafeHtml {
-  const shot = view === "room" ? ROOM_SHOT : DESK_SHOT;
-  // Mood only: a faint glow where its small window is on the right monitor. Not a control (the
-  // call button is its body at the HUD's bottom right; day-loop correction).
-  const kuro = html`<div class="kuro-mood" style="${rectStyle(shot.kuro)}" aria-hidden="true"></div>`;
+  // Nothing on the monitors themselves: no glow, no box (day-loop correction). Kuro's call button
+  // is its body at the HUD's bottom right.
   if (view === "room") {
-    return html`<button type="button" class="shot-hit" data-action="view" data-view="desk" style="${rectStyle(ROOM_SHOT.desk)}" aria-label="${t("hud.cam.desk")}"></button>${kuro}`;
+    return html`<button type="button" class="shot-hit" data-action="view" data-view="desk" style="${rectStyle(ROOM_SHOT.desk)}" aria-label="${t("hud.cam.desk")}"></button>`;
   }
   const mon = (side: "left" | "right") =>
     html`<button type="button" class="shot-hit monitor-hit" data-action="view" data-view="desktop" data-screen="${side}" style="${rectStyle(DESK_SHOT.monitors[side])}" aria-label="${t("hud.cam.screen")} · ${t(`desktop.screen.${side}`)}"></button>`;
-  return html`${mon("left")}${mon("right")}${kuro}`;
+  return html`${mon("left")}${mon("right")}`;
 }
 
 /** Kuro's body (the call button) and the camera chips, one row at the bottom right. */
