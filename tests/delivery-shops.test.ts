@@ -88,13 +88,13 @@ describe("shopListView", () => {
     expect(view.shops.some((s) => s.typo)).toBe(false);
   });
 
-  it("from the screen ring, one shop's name has two adjacent characters swapped, nothing invented", () => {
+  it("from the screen ring, one shop shows its authored typo name, nothing invented", () => {
     const view = shopListView(typoDay, "lunch");
     const typos = view.shops.filter((s) => s.typo);
     expect(typos).toHaveLength(1);
-    const original = deliveryTable.shops.find((s) => s.id === typos[0]!.id)!.name;
-    expect(typos[0]!.name).not.toBe(original);
-    expect([...typos[0]!.name].sort()).toEqual([...original].sort());
+    const shop = deliveryTable.shops.find((s) => s.id === typos[0]!.id)!;
+    expect(shop.typo).toBeDefined();
+    expect(typos[0]!.name).toBe(shop.typo);
     expect(shopListView(typoDay, "lunch")).toEqual(view);
   });
 

@@ -15,7 +15,7 @@ export interface ItemView {
 
 export interface ShopView {
   readonly id: string;
-  /** The table's name, or (typo drift) the same name with two adjacent characters swapped. */
+  /** The table's name, or (typo drift) the shop's authored typo name. */
   readonly name: string;
   readonly tag: string;
   readonly open: boolean;
@@ -62,7 +62,8 @@ export function shopListView(day: number, meal: Meal): ShopListView {
     const typo = i === typoAt;
     return {
       id: e.shop.id,
-      name: typo ? swapAdjacent(e.shop.name, jitter(`shop-typo-pos:${day}`, 0, 64)) : e.shop.name,
+      // The authored typo name; a shop without one gets two adjacent characters swapped.
+      name: typo ? (e.shop.typo ?? swapAdjacent(e.shop.name, jitter(`shop-typo-pos:${day}`, 0, 64))) : e.shop.name,
       tag: e.shop.tag,
       open: e.open,
       closedKey: e.open || e.extra ? null : SHOP_CLOSED_KEY,

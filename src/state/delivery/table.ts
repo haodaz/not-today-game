@@ -29,6 +29,8 @@ export interface Shop {
   readonly tag: string;
   readonly hours?: readonly [string, string];
   readonly items: readonly Item[];
+  /** The shop's name with one wrong character, authored for the typo drift. */
+  readonly typo?: string;
 }
 
 export interface MealEntry {
@@ -129,7 +131,7 @@ function item(value: unknown, where: string): Item {
 
 function shop(value: unknown, where: string): Shop {
   if (!isRecord(value)) throw new ContentError(where, "a shop must be an object");
-  onlyKeys(value, ["id", "name", "tag", "hours", "items"], where);
+  onlyKeys(value, ["id", "name", "tag", "hours", "items", "typo"], where);
   if (!Array.isArray(value.items)) throw new ContentError(`${where}.items`, "must be a list");
   const items = value.items.map((it, i) => item(it, `${where}.items[${i}]`));
   if (new Set(items.map((it) => it.id)).size !== items.length) throw new ContentError(where, "duplicate item id");
@@ -139,6 +141,7 @@ function shop(value: unknown, where: string): Shop {
     tag: str(value.tag, `${where}.tag`),
     ...(value.hours !== undefined ? { hours: span(value.hours, `${where}.hours`) } : {}),
     items,
+    ...(value.typo !== undefined ? { typo: str(value.typo, `${where}.typo`) } : {}),
   };
 }
 

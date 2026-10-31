@@ -1,0 +1,53 @@
+{
+  "day": 1,
+  "_note": "格式样例。清单条目是主角自己的口气；对话框四种行：narration / inner / sfx / speaker。克总不走对话框。",
+  "beats": {
+    "boot": { "say": [
+      { "k": "narration", "t": "雨。窗玻璃上三层声音都在。" },
+      { "k": "narration", "t": "桌上一杯水，凉的。两块屏黑着。" },
+      { "k": "inner", "t": "第一天。或者第四百天，看怎么数。" }
+    ]},
+    "box": { "say": [
+      { "k": "sfx", "t": "叮咚。", "sfx": "doorbell" },
+      { "k": "narration", "t": "门口两样东西：一袋黄焖鸡，一个没有寄件人的纸箱。" },
+      { "k": "narration", "t": "箱子上有收件人，是你的名字。" }
+    ]},
+    "desk": { "say": [
+      { "k": "narration", "t": "你把它放在两块屏之间，放进那条缝里。刚好卡住，不倒。" },
+      { "k": "inner", "t": "旧得和这个房间不是一个年代的东西。" }
+    ]},
+    "shutdown": { "say": [
+      { "k": "narration", "t": "灯灭了，或者说，你关了屏幕。屋子一下子沉下去。" },
+      { "k": "narration", "t": "没有手从缝里伸出来。今天还没有。" }
+    ]},
+    "night": { "say": [
+      { "k": "narration", "t": "那道黑里有一点光。不是小鸡的壳，壳在更低的地方。" },
+      { "k": "narration", "t": "它在缝的中间，很小，偏粉。你数到七，它还在。" },
+      { "k": "inner", "t": "粉的。我这屋子里没有一样东西是粉的。" },
+      { "k": "narration", "t": "今天过去了。" }
+    ]}
+  },
+  "items": [
+    { "id": "boot", "text": "开机。", "unlock": "start", "done": "event:boot", "required": true },
+    { "id": "msgs", "text": "看一眼消息。", "unlock": "done:boot", "done": "event:openApp:msgs", "required": true,
+      "onDone": { "say": [ { "k": "inner", "t": "老板在最上面。四十一秒。" } ] } },
+    { "id": "lunch", "text": "点个午饭。", "unlock": "done:msgs", "done": "event:order:lunch", "required": true,
+      "rewrite": "午饭在路上。", "onDone": { "say": [ { "k": "narration", "t": "手机放回桌上。" } ] } },
+    { "id": "task1", "text": "v17 过一遍。", "unlock": "done:msgs", "done": "flag:task_v17_done", "required": true },
+    { "id": "pickup", "text": "去拿。", "unlock": "event:delivery:arrives:lunch", "done": "event:pickup:lunch", "required": true, "sfx": "doorbell",
+      "onUnlock": { "say": [ { "k": "sfx", "t": "叮咚。", "sfx": "doorbell" }, { "k": "inner", "t": "外卖。还有别的。" } ] } },
+    { "id": "eat", "text": "吃。", "unlock": "done:pickup", "done": "event:eat:lunch", "required": false,
+      "onDone": { "say": [ { "k": "narration", "t": "没放香菜。老周点的。" } ] } },
+    { "id": "box", "text": "把箱子拆了。", "unlock": "done:pickup", "done": "event:openBox", "required": true },
+    { "id": "task2", "text": "应收表改一个数。", "unlock": "done:task1", "done": "flag:task_receivable_done", "required": true },
+    { "id": "task3", "text": "存一份合并文档。", "unlock": "done:task2", "done": "flag:task_merge_done", "required": true },
+    { "id": "reply", "text": "回老板。", "unlock": "done:task3", "done": "event:reply:boss", "required": true,
+      "onUnlock": { "say": [ { "k": "inner", "t": "能说的话是一张很小的表。" } ] } },
+    { "id": "dinner", "text": "点个晚饭。", "unlock": "done:task2", "done": "event:order:dinner", "required": false, "rewrite": "晚饭在路上。" },
+    { "id": "desk", "text": "看一眼桌子。", "unlock": "done:reply", "done": "event:beat:desk", "required": true },
+    { "id": "shutdown", "text": "关机。", "unlock": "done:desk", "done": "event:beat:shutdown", "required": true },
+    { "id": "chat", "text": "和它说会儿话。", "unlock": "done:shutdown", "done": "event:chat:any", "required": false },
+    { "id": "bed", "text": "躺下。", "unlock": "done:shutdown", "done": "event:lieDown", "required": true, "locked": "requiredPending" }
+  ],
+  "delivery": { "minMinutes": 2, "waitMinutes": 6 }
+}

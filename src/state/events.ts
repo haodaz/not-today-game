@@ -4,7 +4,7 @@
 import type { State } from "./types.gen";
 import { applyOrder, applyPickup, applyUseItem } from "./delivery/effects";
 import type { Meal } from "./delivery/table";
-import { applyReplyEvent } from "./replies/effects";
+import { applyReplyEvent, knownRecipients } from "./replies/effects";
 import { constants, membersOf } from "./variables";
 
 /** The two reply choices world-state reacts to. "no" is the chick's word (objectWords.chick). */
@@ -21,7 +21,7 @@ export type GameEvent =
    * the word was sent in a conversation (replies spec); `text` holds what the player typed for the
    * `free` cell. Both are absent for prompt choices like the loan.
    */
-  | { kind: "reply"; day: number; choice: string; recipient?: string; text?: string }
+  | { kind: "reply"; day: number; choice: string; recipient?: string; text?: string; t?: string }
   | { kind: "letItDo"; day: number; taskId: string }
   | { kind: "looked"; day: number; objectId: string }
   | { kind: "pokeReset"; day: number }
@@ -33,11 +33,13 @@ export type GameEvent =
   // delivery spec (amendment 2026-10-31): `t` is the beat time the order was placed.
   | { kind: "order"; day: number; meal: Meal; shopId: string; itemId: string; t: string }
   | { kind: "pickup"; day: number; meal: Meal }
-  | { kind: "useItem"; day: number; itemId: string; objectId: string };
+  | { kind: "useItem"; day: number; itemId: string; objectId: string }
+  // desktop-ui spec (amendment 2026-10-31): opening the browser or a conversation, at beat time `t`.
+  | { kind: "open"; day: number; target: string; t: string };
 
 export type EventKind = GameEvent["kind"];
 
-/** Exactly these kinds (twelve from world-state, three from delivery). Nothing else may be appended. */
+/** Exactly these kinds (world-state twelve, delivery three, desktop-ui one). Nothing else may be appended. */
 export const eventKinds: readonly EventKind[] = [
   "openLayer",
   "recognise",
@@ -54,7 +56,24 @@ export const eventKinds: readonly EventKind[] = [
   "order",
   "pickup",
   "useItem",
+  "open",
 ];
+
+const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+/** The things that can be opened: the browser, or a conversation `conv:<recipient>`. */
+export function isOpenTarget(target: string): boolean {
+  if (target === "browser") return true;
+  const conv = /^conv:(.+)$/.exec(target);
+  return conv !== null && knownRecipients.has(conv[1]!);
+}
+
+/** Opening a conversation counts as reading messages (`readCount`); the browser changes nothing. */
+function applyOpen(state: State, event: Extract<GameEvent, { kind: "open" }>): State {
+  if (!isOpenTarget(event.target)) throw new Error(`open: unknown target "${event.target}"`);
+  if (!HHMM.test(event.t)) throw new Error(`open: time must be HH:MM, got "${event.t}"`);
+  return event.target.startsWith("conv:") ? { ...state, readCount: state.readCount + 1 } : state;
+}
 
 /** An event as a caller builds it, before the store stamps the day. */
 export type EventDraft = GameEvent extends infer E
@@ -114,7 +133,10 @@ export function applyEvent(state: State, event: GameEvent): State {
     case "lieDown":
       // The only thing that moves the day counter.
       return { ...state, day: state.day + 1 };
+    case "open":
+      return applyOpen(state, event);
     case "reply":
+      if (event.t !== undefined && !HHMM.test(event.t)) throw new Error(`reply: time must be HH:MM, got "${event.t}"`);
       // A word sent in a conversation plays the reply tables; a recipient-less reply is a prompt
       // choice such as the loan.
       return event.recipient === undefined

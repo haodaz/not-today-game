@@ -9,7 +9,7 @@ import { condHolds, objectOfWord, objectWordState, resolve } from "./resolve";
 import { replyTable } from "./table";
 
 /** Every conversation that exists on any day. A reply to anything else is a corrupt log. */
-const knownRecipients: ReadonlySet<string> = new Set(
+export const knownRecipients: ReadonlySet<string> = new Set(
   [...replyTable.values()].flatMap((table) => [...table.recipients.keys()]),
 );
 
