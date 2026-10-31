@@ -18,7 +18,10 @@
     "chatTurnsPerDay": 5,
     "affinityThreshold": 60,
     "tenderDayAffinityMultiplier": 2,
-    "_dreamDaysNote": "dreamDays is the count; the nights themselves are stages.json dreamNights."
+    "_dreamDaysNote": "dreamDays is the count; the nights themselves are stages.json dreamNights.",
+    "goodMaxUnchecked": 3,
+    "bpmAtFullSan": 72,
+    "bpmAtZeroSan": 110
   },
   "day": {
     "type": "int",
