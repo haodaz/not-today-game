@@ -150,7 +150,7 @@
     "lunch": {
       "shop": "huangmenji",
       "item": "hmj-no-cilantro",
-      "by": "老周替你点的"
+      "by": "老周给你点的，送到你家"
     },
     "dinner": {
       "shop": "shaxian",
@@ -165,7 +165,7 @@
         "arrives": "12:04",
         "outside": "走廊的灯是白的，一个人的脚步下楼。门口两样东西：一袋黄焖鸡，一个没有寄件人的纸箱。",
         "bag": "热的。袋口打了个死结。",
-        "receipt": "黄焖鸡米饭 · 微辣 · 备注：别放香菜（老周）",
+        "receipt": "黄焖鸡米饭 · 微辣 · 备注：别放香菜（老周点的）",
         "anomaly": null,
         "effects": {
           "flags": [
