@@ -1,21 +1,26 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 740 150" width="740" height="150">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 790 160" width="790" height="160">
 <defs><style>
-text{font-family:"Barlow Condensed","Helvetica Neue",sans-serif;font-weight:700;font-size:120px;fill:#efe9df}
-.eye{fill:none;stroke:#efe9df;stroke-width:15;stroke-linejoin:round}
+.s{fill:none;stroke:#efe9df;stroke-width:17;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3}
+.eye{fill:none;stroke:#efe9df;stroke-width:17;stroke-linejoin:round}
 .pupil{fill:#efe9df}
-.cross{fill:#efe9df}
 </style></defs>
-<text x="4" y="112">N</text>
-<!-- O: an almond eye, lid to lid -->
-<path class="eye" d="M84 66 Q118 14 152 66 Q118 118 84 66 Z"/>
-<circle class="pupil" cx="118" cy="66" r="14"/>
+<!-- cap height 20..124 (baseline 124); eye centre y=72; crosses go to 148 -->
+<!-- N -->
+<path class="s" d="M14 124 V20 L80 124 V20"/>
+<!-- O: almond eye -->
+<path class="eye" d="M110 72 Q150 14 190 72 Q150 130 110 72 Z"/>
+<circle class="pupil" cx="150" cy="72" r="15"/>
 <!-- T as a cross -->
-<rect class="cross" x="170" y="18" width="66" height="17"/>
-<rect class="cross" x="194" y="18" width="18" height="122"/>
-<!-- second word -->
-<rect class="cross" x="284" y="18" width="66" height="17"/>
-<rect class="cross" x="308" y="18" width="18" height="122"/>
-<path class="eye" d="M370 66 Q404 14 438 66 Q404 118 370 66 Z"/>
-<circle class="pupil" cx="404" cy="66" r="14"/>
-<text x="458" y="112">DAY</text>
+<path class="s" d="M216 28 H292 M254 20 V148"/>
+<!-- T as a cross -->
+<path class="s" d="M332 28 H408 M370 20 V148"/>
+<!-- O: almond eye -->
+<path class="eye" d="M428 72 Q468 14 508 72 Q468 130 428 72 Z"/>
+<circle class="pupil" cx="468" cy="72" r="15"/>
+<!-- D -->
+<path class="s" d="M540 20 V124 M540 20 H566 Q608 20 608 72 Q608 124 566 124 H540"/>
+<!-- A -->
+<path class="s" d="M624 124 L660 20 L696 124 M640 88 H680"/>
+<!-- Y -->
+<path class="s" d="M708 20 L742 72 L776 20 M742 72 V124"/>
 </svg>
