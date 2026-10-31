@@ -14,4 +14,4 @@ Score three dimensions, each −2..+2 per day, with evidence. Uncited claims are
 + talked in the chat beat at all (one point per day with ≥2 turns), said "Beautiful" when the work was good (flags pretty3/beautiful12/beautiful14), asked it what it is for, said "Not today" to the shipping request.
 − only ever "Fine."/"Received." in chat, five turns of flattery (the model marks `flattery: true` when every turn agrees), treated the chat as a help desk every day.
 
-Fold: affinity = clamp(0..100, 20 + Σ(truth+values+bond)×3 + bonus); bonus +6 on day 14 if ≥3 chat turns (the gentle day). Good ending needs affinity ≥ constants.affinityThreshold (60) plus the existing conditions.
+Fold (matches kuro-chat FR4, reconciled 2026-11-01): affinity starts at 0; each judged day adds Σ(truth+values+bond) × constants.affinityPerPoint (5), × constants.tenderDayAffinityMultiplier (2) on the tender day 14; clamp 0..100. A day with no chat turn is not judged. Good ending needs affinity ≥ constants.affinityThreshold (60) plus the existing conditions.

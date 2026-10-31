@@ -207,5 +207,14 @@
   "room.tower.off": "主机没开。",
   "desktop.shutdown": "关机",
   "room.bed": "床",
-  "room.meal": "外卖"
+  "room.meal": "外卖",
+  "judge.offline.looked": "你看了我写的东西。",
+  "judge.offline.checked": "它做的，你看了一眼再放手。",
+  "judge.offline.recognised": "你认出了箱子里的东西。",
+  "judge.offline.hard": "你问了那个不好答的问题。",
+  "judge.offline.unchecked": "你没看就交了。",
+  "judge.offline.replied": "你回了那个没人替他说话的人。",
+  "judge.offline.loan": "老周的事，你给了一句话。",
+  "judge.offline.talked": "你和我说了会儿话。",
+  "judge.offline.typed": "你自己打的字。"
 }

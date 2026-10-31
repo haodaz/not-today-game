@@ -541,3 +541,42 @@ Appended after each task. Neither Kiro nor Claude edits the other's area without
   - Fixture `tests/fixtures/browser-day-16.json` (Claude's draft, verbatim). `content/` untouched: Claude moves the three drafts into content/browser.
 - FR5: a canvas over the browser window only, never at night (the night plate replaces the page). The DOM driver runs from the motion layer and stops when the canvas is gone or the tab is hidden. The headline is never drawn over.
 - Tests: 49 files, 727 passing; typecheck clean. Not checked in a browser; the canvas drawing and the crawl path are untested by design (parameters and sampler are).
+
+## 2026-11-01 — Kuro crawls along edges; backend + kuro-chat
+
+- late-days correction:
+  - `late/crawl.ts`: bottom → right → top edges with rounded corners; feet to the edge; constant
+    speed (1 px/ms, 1.2–2.2 s); played with Web Animations; crawl frames at about 6 fps.
+  - The maw flashes after 2.2 s, so always after arrival.
+  - The way back: it drops off with the page and speaks from the box, then returns to the corner.
+- backend (nothing deployed by Kiro):
+  - `supabase/migrations/0001_init.sql` — **the SQL to apply**: profiles, runs, kuro_memory,
+    judgement, with RLS by `auth.uid()`.
+  - `supabase/config.toml` (anonymous sign-ins on).
+  - The function `supabase/functions/kuro-chat/index.ts` is thin Deno wiring around the pure
+    `_shared/kuro/handler.ts` (turns, prompt, judgement, llm).
+  - **Secrets the function reads:** `ANTHROPIC_API_KEY` (by the SDK); `KURO_MODEL` (optional,
+    default `claude-sonnet-5-5`); `SUPABASE_URL` and `SUPABASE_ANON_KEY` (provided by Supabase).
+  - The caller's JWT is forwarded, so RLS applies; no service-role key.
+  - `npm run bundle:kuro` writes `supabase/functions/kuro-chat/content.ts`. **Not generated here**
+    (only tsc / vitest may run); run it before deploying, and after any change to the bundled
+    content.
+- client:
+  - `src/net/supabase.ts`: supabase-js is loaded lazily and only with
+    `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`. Without them, or before `npm install` (Vite
+    aliases a stand-in), everything is offline.
+  - Anonymous sign-in on 开始; pull on 继续 (`src/net/sync.ts`: the logs decide; a conflict keeps
+    local and stores the cloud copy); push on lie-down and every 20 events.
+- kuro-chat:
+  - `chat` events carry `said` / `answer` / `offline` (memory).
+  - New event `judged` (Σ×5, ×2 on the tender day, clamp 0..100). Evidence entries carry
+    `delta` / `dims`, and the credits read them.
+  - The rule scorer has the same schema; the decay filter runs on model output only.
+  - The lie-down waits up to 20 s for an online judgement.
+- `@supabase/supabase-js` 2.49.4 is added to package.json; `npm install` has not been run.
+- TODO(Claude), strings: `judge.offline.looked`, `.checked`, `.recognised`, `.hard`, `.unchecked`,
+  `.replied`, `.loan`, `.talked`, `.typed` (the offline scorer's credit notes). Also
+  `variables.json`: `judgement.evidence` items now also carry `delta` and `dims`; consider
+  `constants.chatMemoryTurns` (12) and `constants.affinityPerPoint` (5).
+- Tests: 51 files, 776 passing; typecheck clean. The function, sign-in and sync are not run
+  against a real backend; everything above runs with mocks.

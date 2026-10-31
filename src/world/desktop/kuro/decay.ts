@@ -15,8 +15,14 @@ const LETTER = /[\p{L}\p{N}]/u;
 function hash(text: string, i: number): number {
   let h = 2166136261 ^ i;
   for (let k = 0; k < text.length; k += Math.max(1, Math.floor(text.length / 32))) h = Math.imul(h ^ text.charCodeAt(k), 16777619);
-  h = Math.imul(h ^ (i * 2654435761), 16777619);
-  return ((h >>> 0) % 100000) / 100000;
+  h = Math.imul(h ^ i, 0x9e3779b1);
+  // murmur3's fmix32: every input bit reaches every output bit, so positions are spread evenly.
+  h ^= h >>> 16;
+  h = Math.imul(h, 0x85ebca6b);
+  h ^= h >>> 13;
+  h = Math.imul(h, 0xc2b2ae35);
+  h ^= h >>> 16;
+  return (h >>> 0) / 4294967296;
 }
 
 export function decay(text: string, stage: number): string {

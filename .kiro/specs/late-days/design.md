@@ -102,3 +102,25 @@ event's day. It changes no state: nothing is lost, only closed. Judgement can ci
 - Properties:
   - no `_red` and no maw before the late ring (every day × beat × raid outcome);
   - no overlay before ring wall (every day × beat), and never in 工作台 / 消息.
+
+## Correction implemented (2026-11-01): Kuro crawls along edges
+
+- `src/world/late/crawl.ts` (pure) gives `edgePath(from, box, body)`:
+  - from the HUD corner onto the page window's bottom edge;
+  - along it to the right side, round the corner, up the right edge;
+  - round the top-right corner, along the top edge to the ×.
+
+  The body's centre stays half a body outside the edge it is on. Its rotation keeps its feet to
+  that edge: 180° under the bottom edge, 90° up the right edge, 0° standing on the top. It leaves
+  the corner upright.
+- Constant speed: keyframe offsets are by length and the easing is linear, at 1 px/ms (a typical
+  trip is about 1.6 s). The duration is clamped to 1.2–2.2 s (`crawlMs`).
+- The motion layer measures the corner, the window (`.br-page`, or the 工作台 `.win` for 文档) and
+  the slot once, then plays the path with the Web Animations API. It resumes at the elapsed time
+  after a re-render.
+- While it crawls, the crawl pair steps at about 6 fps (`kuro-step`, 333 ms a cycle, `steps(1)`).
+- The crawl phase lasts `CRAWL_MAX_MS` (2.2 s), so the maw flashes only after it has arrived. A
+  short trip waits at the × for the rest.
+- **The way back (decision): it drops off.** The page it crawled round is gone once it closes, so it
+  does not crawl back along it. It is in the box at once (its portrait, saying the line), and
+  returns to the HUD corner when the line ends (`m-kuro-back`, 320 ms).

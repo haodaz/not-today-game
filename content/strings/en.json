@@ -207,5 +207,14 @@
   "room.tower.off": "The computer is off.",
   "desktop.shutdown": "Shut down",
   "room.bed": "The bed",
-  "room.meal": "The meal"
+  "room.meal": "The meal",
+  "judge.offline.looked": "You read what I wrote.",
+  "judge.offline.checked": "You looked at what it did before letting go.",
+  "judge.offline.recognised": "You recognised what was in the box.",
+  "judge.offline.hard": "You asked the hard one.",
+  "judge.offline.unchecked": "You handed it over without looking.",
+  "judge.offline.replied": "You answered someone no one speaks for.",
+  "judge.offline.loan": "You gave Lao Zhou an answer.",
+  "judge.offline.talked": "You talked with me a while.",
+  "judge.offline.typed": "You typed it yourself."
 }
