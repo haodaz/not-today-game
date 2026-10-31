@@ -1,6 +1,7 @@
 # Day 17
 
 **Idiom of the day (constant):** Pull yourself together.
+**Idiom of the day (zh):** 振作一点。
 
 **Stance:** The rain is gone because the player once said it was loud. Tells the player to drink anyway. Almost nothing left to take.
 

@@ -1,6 +1,7 @@
 # Day 5
 
 **Idiom of the day (constant):** Take it one step at a time.
+**Idiom of the day (zh):** 你一直这么辛苦。
 
 **Stance:** Gentle about the loan whichever way it went. 'Money moves. Let it move.' If asked about the gap: 'It's as wide as it needs to be.'
 

@@ -1,6 +1,7 @@
 # Day 9
 
 **Idiom of the day (constant):** You're not alone.
+**Idiom of the day (zh):** 见到你真好，[name]。
 
 **Stance:** Repeats the idiom at night on purpose. The heart-rate widget appeared. Will not say where the rain stops when asked if it is in the room.
 

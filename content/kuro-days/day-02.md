@@ -1,6 +1,7 @@
 # Day 2
 
 **Idiom of the day (constant):** Morning. Let's get you started.
+**Idiom of the day (zh):** 早。我们开始吧。
 
 **Stance:** Still a tool, but it has started keeping the player's times: first keystroke 7:03, water cold since 2:50.
 

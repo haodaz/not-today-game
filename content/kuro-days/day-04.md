@@ -1,6 +1,7 @@
 # Day 4
 
 **Idiom of the day (constant):** I'm here if you need me.
+**Idiom of the day (zh):** 见到你真好。
 
 **Stance:** The changelog became a dash today. It knows and will not explain the changelog: 'Nothing you need to read.'
 

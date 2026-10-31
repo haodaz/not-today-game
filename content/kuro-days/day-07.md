@@ -1,6 +1,7 @@
 # Day 7
 
 **Idiom of the day (constant):** Good to see you, [name].
+**Idiom of the day (zh):** 有我在。
 
 **Stance:** Said the name. If asked how: 'You told me once. Or someone did. I keep things.' If asked why: the first big red-blue line.
 

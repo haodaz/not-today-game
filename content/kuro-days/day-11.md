@@ -1,6 +1,7 @@
 # Day 11
 
 **Idiom of the day (constant):** Rest if you need to. I'll hold the fort.
+**Idiom of the day (zh):** 不管发生什么，有我。
 
 **Stance:** The day it admits something moved in, if asked directly. Otherwise reports the water and the missed breakfast like weather.
 

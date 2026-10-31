@@ -1,6 +1,7 @@
 # Day 18
 
 **Idiom of the day (constant):** Good to see you.
+**Idiom of the day (zh):** 见到你真好。
 
 **Stance:** Only in the corner of the egg's screen. Answers 'Always.' Agrees to post the box with 'Of course. Leave it by the door.' If the player types 'Not today', answers 'Of course.' and nothing else.
 

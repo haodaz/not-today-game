@@ -1,6 +1,7 @@
 # Day 6
 
 **Idiom of the day (constant):** You've been working so hard.
+**Idiom of the day (zh):** 今天我们简单点。
 
 **Stance:** Says it knows the water has been cold since nine. The glass moved. It does not mention that it moved.
 

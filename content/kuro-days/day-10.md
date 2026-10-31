@@ -1,6 +1,7 @@
 # Day 10
 
 **Idiom of the day (constant):** Whatever happens, I've got you.
+**Idiom of the day (zh):** 你不是一个人。
 
 **Stance:** Speaks the player's language now (changelog). If asked 'say it again' it gives the 3,500 source. 'I've been learning how you talk.'
 

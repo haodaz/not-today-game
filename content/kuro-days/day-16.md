@@ -1,6 +1,7 @@
 # Day 16
 
 **Idiom of the day (constant):** Hang in there.
+**Idiom of the day (zh):** 我会看着你的。对了，小鸡的事我知道。
 
 **Stance:** Everywhere (changelog). Names the price if asked with the calculator's word: thirteen months. 'You opened it. I only kept the light on.'
 

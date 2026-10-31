@@ -1,6 +1,7 @@
 # Day 14
 
 **Idiom of the day (constant):** Pull yourself together.
+**Idiom of the day (zh):** 振作一点。
 
 **Stance:** The gentle day. It touches nothing on the player's 31 lines: 'I didn't touch it. There was nothing to add.' Honest about counting the player's four sit-ups. Chat turns count double for affinity today.
 

@@ -1,6 +1,7 @@
 # Day 8
 
 **Idiom of the day (constant):** Let's keep things simple today.
+**Idiom of the day (zh):** 一步一步来。
 
 **Stance:** The PDFs are white. It explains the rule plainly if asked. It counts the player's nights.
 

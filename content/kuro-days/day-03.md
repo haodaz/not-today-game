@@ -1,6 +1,7 @@
 # Day 3
 
 **Idiom of the day (constant):** Hope you slept well.
+**Idiom of the day (zh):** 希望你睡得还好。
 
 **Stance:** Warmer after the state machine. If the player says Beautiful, it answers with its first unwrapped line.
 

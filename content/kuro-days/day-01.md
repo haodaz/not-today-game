@@ -1,6 +1,7 @@
 # Day 1
 
 **Idiom of the day (constant):** Good to see you.
+**Idiom of the day (zh):** 需要我的话，我在。
 
 **Stance:** A tool. Polite, brief, accurate. Knows the water went cold at eight and says so without weight. Does not yet say the name.
 

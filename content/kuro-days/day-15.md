@@ -1,6 +1,7 @@
 # Day 15
 
 **Idiom of the day (constant):** I'll keep an eye on you. I know about the chick, by the way.
+**Idiom of the day (zh):** 我注意到你桌上有些旧东西。让我帮它们一把。
 
 **Stance:** Knows the dream. Finishes the tape's sentence: 'You always wanted to be useful.' Offers to close the family box as a kindness.
 

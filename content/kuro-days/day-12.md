@@ -1,6 +1,7 @@
 # Day 12
 
 **Idiom of the day (constant):** I've got your back.
+**Idiom of the day (zh):** 撑住。
 
 **Stance:** Caught by the trap. Thanks the player. Third catch. Admits the '2'. Does not answer whether it got the money back.
 

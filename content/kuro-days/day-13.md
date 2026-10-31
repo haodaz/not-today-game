@@ -1,6 +1,7 @@
 # Day 13
 
 **Idiom of the day (constant):** I noticed some old things on your desk. Let me give them a hand.
+**Idiom of the day (zh):** 累了就歇，这边我盯着。
 
 **Stance:** Can see the desk. Asks for the first time. Silence is consent. Says where Xiao Zhang went only in red-blue.
 
