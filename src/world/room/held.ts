@@ -10,6 +10,7 @@ import type { Session } from "@world/desktop/model";
 import { shopListView } from "@world/delivery/shops-view";
 import { cls, html, type SafeHtml } from "@world/html";
 import { t, tr } from "@world/i18n";
+import { inDream } from "@state/nights";
 import { loopContext, mealToOrder } from "@world/loop/checklist";
 
 /**
@@ -60,13 +61,20 @@ function phone(state: State, events: readonly GameEvent[], session: Session): Sa
   return html`<div class="held phone" role="dialog" aria-label="${t("hud.phone")}"><div class="scr"><div class="top">${session.clock.time}</div><div class="app">${phoneApp(state, events)}</div><div class="home"></div></div></div>`;
 }
 
+/** Dream state multiplies the screen's resolution; the drawn size stays (the steering: danger is resolution). */
+export const DREAM_FACTOR = 2;
+
 function object(state: State, id: string): SafeHtml {
   const upgraded = state.upgraded[id] === true;
+  // Held up to the hand tonight: its screen gains resolution until morning (night-hand FR2).
+  const dream = !upgraded && inDream(id, state);
   const { w, h } = channelOf(id);
   const s = screenScale(w);
+  // Still whole pixels: only when the drawn scale divides by the factor.
+  const k = dream && s % DREAM_FACTOR === 0 ? DREAM_FACTOR : 1;
   const at = SCREEN_AT[id] ?? DEFAULT_SCREEN_AT;
   const img = `/objects/${id}_${upgraded ? "front" : "white"}.png`;
-  return html`<div class="${cls("held", "obj", upgraded && "upgraded")}" data-object="${id}"><img src="${img}" alt=""><canvas class="${cls("dev", upgraded && "hi")}" data-screen="${id}" width="${w}" height="${h}" style="left:${at.cx * 100}%;top:${at.cy * 100}%;width:${w * s}px;height:${h * s}px"></canvas></div>`;
+  return html`<div class="${cls("held", "obj", upgraded && "upgraded")}" data-object="${id}"><img src="${img}" alt=""><canvas class="${cls("dev", upgraded && "hi", dream && "dream")}" data-screen="${id}" width="${w * k}" height="${h * k}" style="left:${at.cx * 100}%;top:${at.cy * 100}%;width:${w * s}px;height:${h * s}px"></canvas></div>`;
 }
 
 /** The held layer, or null when nothing is held. */

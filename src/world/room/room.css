@@ -64,6 +64,10 @@
 .room .held.obj canvas.dev.hi{image-rendering:auto;background:linear-gradient(180deg,#f4f8ff,#d9e6ff)}
 .room .held-layer .hint{position:absolute;left:50%;bottom:130px;transform:translateX(-50%);color:#f4efe6;font-size:14px;opacity:.7;pointer-events:none}
 .room > .dlg,.room > .choices{z-index:16}
+/* 夜里的手 (night-hand FR1): the desk dims, the gap between the monitors glows; the hand is never drawn */
+.room .gap-glow{position:absolute;inset:0;z-index:14;pointer-events:none;background:rgba(10,10,12,.55)}
+.room .gap-glow::after{content:"";position:absolute;left:50%;top:22%;width:6px;height:30%;transform:translateX(-50%);background:radial-gradient(ellipse,rgba(255,150,190,.9),rgba(255,150,190,0) 70%);filter:blur(2px)}
+.room .held.obj canvas.dev.dream{box-shadow:0 0 18px 2px rgba(255,150,190,.45)}
 /* 门 (door.html): six steps faint at the top right, only the current one lit; one click a step */
 .room .door-bg{position:absolute;inset:0;background:#000 url(/room/door_chain.png) center/cover;pointer-events:none}
 .room .door-hit{position:absolute;inset:0;border:0;padding:0;margin:0;background:transparent;cursor:pointer}

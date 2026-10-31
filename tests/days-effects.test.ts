@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import { choiceOf } from "@state/days/effects";
 import { dayFiles, taskFlags } from "@state/days/table";
 import { createStore } from "@state/store";
-import { constants } from "@state/variables";
 
 /** The first day whose shutdown offers a choice with each kind of effect. */
 const choiceDay = (test: (e: Record<string, unknown>) => boolean) => {
@@ -26,14 +25,18 @@ describe("step", () => {
 });
 
 describe("choose", () => {
-  it("holding up an object puts it in dream state for dreamDays and moves san", () => {
+  it("holding up an object puts it in dream state for that night only and moves san", () => {
     const { day, index } = choiceDay((e) => typeof e.item_dream === "string");
     const choice = choiceOf(day, "shutdown", index)!;
+    const object = choice.effects!.item_dream!;
     const store = createStore({ startDay: day });
+    // Only a found, recognised object can be held up (night-hand FR2).
+    store.appendEvent({ kind: "openLayer", objectId: object });
+    store.appendEvent({ kind: "recognise", objectId: object });
     const san = store.getState().san;
     store.appendEvent({ kind: "choose", beat: "shutdown", index });
     const state = store.getState();
-    expect(state.dream[choice.effects!.item_dream!]).toEqual({ until: day + constants.dreamDays });
+    expect(state.dream[object]).toEqual({ until: day + 1 });
     expect(state.san).toBe(Math.min(100, san + (choice.effects!.san ?? 0)));
   });
 

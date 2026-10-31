@@ -100,22 +100,22 @@ describe("held, lost and returned objects (state `lost`)", () => {
     expect(isHeld(a!, state)).toBe(false);
   });
 
-  it("the returned-objects pickup brings everything back, and the bag held it in order", () => {
+  it("the returned-objects pickup brings the objects back in order; the loan row stays lost (night-hand FR3)", () => {
     const before = handed(f(returnMeal!.day), [a!, "loan", b!]);
-    expect(returnedObjects(before)).toEqual([a, "loan", b]);
+    expect(returnedObjects(before)).toEqual([a, b]);
     const after = applyPickup(before, { day: returnMeal!.day, meal: returnMeal!.meal });
     expect(after.flags).toContain(RETURN_FLAG);
-    expect(after.lost).toEqual([]);
+    expect(after.lost).toEqual(["loan"]);
     expect(isHeld(a!, after) && isHeld(b!, after)).toBe(true);
   });
 
-  it("an item_lost choice adds to `lost`; raids are untouched", () => {
+  it("an item_lost choice adds to `lost` and the raid records what was given", () => {
     const store = createStore({ startDay: 5 });
     store.appendEvent({ kind: "reply", choice: "lend" });
     const index = dayFiles.get(5)!.beats.shutdown!.choices!.findIndex((c) => c.effects?.item_lost === "loan");
     store.appendEvent({ kind: "choose", beat: "shutdown", index });
     expect(store.getState().lost).toEqual(["loan"]);
-    expect(store.getState().raids).toEqual({});
+    expect(store.getState().raids).toEqual({ 5: { blockedWith: null, gave: "loan" } });
   });
 
   it("an object never found is not held", () => {

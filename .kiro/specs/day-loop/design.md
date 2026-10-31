@@ -20,7 +20,8 @@ Everything the loop knows comes from the event log and `content/days/day-NN.json
     It changes nothing.
   - `choose {beat, index}` records a dialogue choice. Its reducer applies the choice's
     `effects`: `flags`; `san`, clamped to the table range; and `item_dream` → `dream[object] =
-    {until: day + constants.dreamDays}`, per the variable table ("hand object => 3 days").
+    {until: day + 1}` (one night; night-hand N4 — `dreamDays` is the count of dream nights, not
+    a duration). On a raid night it also writes `raids[day]` (night-hand N1).
     `item_lost` (`"loan"` or an object id) is added to the `lost` set (variables.json, added
     2026-10-31 at the author's request). The day-17 pickup whose flags include
     `objects_returned` empties `lost`. Raids are unchanged.

@@ -36,8 +36,11 @@ export function applyPickup(state: State, event: { readonly day: number; readonl
   const entry = mealOf(event.day, event.meal);
   if (!entry || entry.arrives === null) throw new Error(`pickup: nothing arrives on day ${event.day} ${event.meal}`);
   const next = withFlags(state, entry.effects?.flags);
-  // The returned-objects bag: everything handed to the hand comes back.
-  return entry.effects?.flags?.includes(RETURN_FLAG) && next.lost.length ? { ...next, lost: [] } : next;
+  // The returned-objects bag: every object handed to the hand comes back; the loan row stays lost
+  // (night-hand FR3).
+  if (!entry.effects?.flags?.includes(RETURN_FLAG)) return next;
+  const kept = next.lost.filter((id) => id === "loan");
+  return kept.length === next.lost.length ? next : { ...next, lost: kept };
 }
 
 /** Using a bought item on an object (the battery in the chick). Logged; changes nothing. */

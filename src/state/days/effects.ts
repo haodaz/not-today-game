@@ -5,7 +5,8 @@
 import { withFlags } from "../flags";
 import { condHolds } from "../replies/resolve";
 import type { State } from "../types.gen";
-import { constants, membersOf, rangeOf } from "../variables";
+import { canHoldUp, isRaidNight, outcomeOf, raidMove } from "../nights";
+import { membersOf, rangeOf } from "../variables";
 import { dayFile, taskFlags, type BeatName, type Choice } from "./table";
 import { taskByFlag } from "./tasks";
 
@@ -39,26 +40,37 @@ export function choiceOf(day: number, beat: string, index: number): Choice | und
 }
 
 /**
- * Whether a choice is offered now: its cond_show holds, and it does not hold up an object that
- * has been upgraded (object-upgrade FR2: the hand does not want it; nothing says why).
+ * Whether a choice is offered now (night-hand FR2): its cond_show holds, and any object it holds
+ * up or hands over is one the player can hold up (found, recognised, not upgraded, not lost).
+ * Upgraded and lost objects are never offered; nothing says why. The loan row is not an object:
+ * an `item_lost: "loan"` choice is "hold up something already lost" and only needs its cond_show.
  */
 export function choiceOffered(choice: Choice, state: State): boolean {
   if (!condHolds(choice.cond_show, state)) return false;
-  const object = choice.effects?.item_dream ?? choice.effects?.item_lost;
-  return !(object && state.upgraded[object] === true);
+  const e = choice.effects ?? {};
+  if (e.item_dream) return canHoldUp(e.item_dream, state);
+  if (e.item_lost && e.item_lost !== "loan") {
+    const o = e.item_lost;
+    return (state.found as string[]).includes(o) && state.upgraded[o] !== true && !state.lost.includes(o);
+  }
+  return true;
 }
 
 export function applyChoose(state: State, event: { readonly day: number; readonly beat: string; readonly index: number }): State {
   const choice = choiceOf(event.day, event.beat, event.index);
   if (!choice) throw new Error(`choose: day ${event.day} ${event.beat} has no choice ${event.index}`);
   if (!choiceOffered(choice, state)) throw new Error(`choose: choice ${event.index} is not offered now`);
+  const raid = event.beat === "shutdown" && isRaidNight(event.day);
+  if (raid && state.raids[String(event.day)]) throw new Error(`choose: the raid of night ${event.day} is already answered`);
   const effects = choice.effects ?? {};
   let next = withFlags(state, effects.flags);
+  // san comes from the choice in content (+1 held up, −1 nothing, 0 handed over).
   if (effects.san) next = { ...next, san: clampSan(next.san + effects.san) };
   if (effects.item_dream) {
-    // "hand object => 3 days" (variables.json): the object is in dream state until then.
-    next = { ...next, dream: { ...next.dream, [effects.item_dream]: { until: event.day + constants.dreamDays } } };
+    // Held up to the hand: in dream state for that night only, back to integer pixels by morning.
+    next = { ...next, dream: { ...next.dream, [effects.item_dream]: { until: event.day + 1 } } };
   }
+  if (raid) next = { ...next, raids: { ...next.raids, [String(event.day)]: outcomeOf(raidMove(choice)) } };
   if (effects.item_lost && !next.lost.includes(effects.item_lost)) {
     // Handed to the hand: lost until the day-17 bag brings it back (delivery applyPickup).
     next = { ...next, lost: [...next.lost, effects.item_lost] };

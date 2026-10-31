@@ -36,6 +36,8 @@ interface Snap {
   readonly night: boolean | null;
   readonly door: string | null;
   readonly asleep: boolean;
+  /** The hand is here (night-hand): the dim and the gap glow are on screen. */
+  readonly raid: boolean;
 }
 
 /** A node with its layout measured while it was still on screen (a detached node measures 0). */
@@ -61,6 +63,7 @@ interface Outgoing {
   readonly doneText: string | null;
   readonly doorBg: HTMLElement | null;
   readonly doorHand: HTMLElement | null;
+  readonly gap: HTMLElement | null;
 }
 
 const live = (el: Element): boolean => !el.closest(".m-ghost");
@@ -144,6 +147,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       night,
       door: doorBeat ? `${doorBeat.dataset.meal}:${doorBeat.dataset.state}` : null,
       asleep: head?.ending.kind === "lieDown",
+      raid: !!q(root, ".gap-glow"),
     };
   }
 
@@ -164,6 +168,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       doneText: list ? (q(list, ":scope > .done")?.textContent ?? null) : null,
       doorBg: q(root, ".door-bg.chain"),
       doorHand: q(root, ".door-hand"),
+      gap: q(root, ".gap-glow"),
     };
   }
 
@@ -700,6 +705,17 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       }
       if (snap.choices && snap.choices !== prev.choices) begin(`choices:${snap.choices}`, t + delay);
       if (snap.asleep && !prev.asleep) begin("sleep", t);
+      // The hand's dim and gap glow: in like the room dims for a held item, out faster.
+      if (sameDay && snap.raid && !prev.raid) begin("gap", t);
+      if (sameDay && !snap.raid && prev.raid && out.gap && snap.view === prev.view) {
+        const el = out.gap;
+        fadeGhost(el, (r) => {
+          const s = q(r, ".stage.room");
+          if (!s) return false;
+          s.insertBefore(el, s.firstChild);
+          return true;
+        }, exitOf(MOTION.dim), t);
+      }
       chosen = null;
       last = snap;
       revealLine(t, delay);
@@ -737,6 +753,9 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       }
     }
     if (snap.choices) choicesEntry(t);
+    const gapStart = since("gap");
+    const gap = q(root, ".gap-glow");
+    if (gap && gapStart !== undefined && t - gapStart < MOTION.dim) anim(gap, "m-fade-in", MOTION.dim, gapStart, t);
     checklistEntries(t);
     doorEntries(t);
     kuroLines(t);

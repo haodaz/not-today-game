@@ -210,8 +210,9 @@
     "default": 0
   },
   "raids": {
-    "type": "map<day, {taken: bool, blockedWith: object|null}>",
+    "type": "map<day, {blockedWith: object|null, gave: string|null}>",
     "changedBy": "night hand",
+    "note": "Changed by Kiro 2026-10-31 for the night-hand spec (docs/kiro-log.md): was {taken, blockedWith}. One entry per raid night once answered: held up an object => {blockedWith: object, gave: null}; handed over something lost => {blockedWith: null, gave: \"loan\" | object}; nothing => both null. Taken = blockedWith is null.",
     "default": {}
   },
   "pokedReset": {

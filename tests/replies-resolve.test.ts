@@ -106,7 +106,7 @@ describe("object words (D3)", () => {
 
   it("a raid with nothing held up loses nothing", () => {
     const state = withFound(at(7), chick);
-    const raided: State = { ...state, raids: { 6: { taken: true, blockedWith: null } } };
+    const raided: State = { ...state, raids: { 7: { blockedWith: null, gave: null } } };
     expect(objectWordState(no, raided)).toBe("available");
   });
 

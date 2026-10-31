@@ -177,3 +177,28 @@ Appended after each task. Neither Kiro nor Claude edits the other's area without
 - Known: at the door, a queued dialogue box sits over the door-beat text (same place, as in the
   mock).
 - Tests: 39 files, 573 passing; typecheck clean. Not checked in a browser.
+
+## 2026-10-31 — night-hand
+
+- Spec `night-hand`: design (N1–N7) and tasks written; implemented in `src/state/nights.ts`, the
+  `choose` reducer, the runtime (the hand's line) and the room (dim + gap glow).
+- Raid nights come from content: shutdown beats with choices (5, 7, 9, 10, 13, 16, 18). What the
+  hand wants is `content/nights.json`, read strictly. It stays a separate file; it's not folded
+  into the day files.
+- Edit in Claude's area: `content/variables.json` `raids` is now
+  `{blockedWith: object|null, gave: string|null}` (was `{taken, blockedWith}`), with a note.
+  `types.gen.ts` was edited by hand to match; the generator test confirms it.
+- Behaviour changes:
+  - Dream state lasts one night (`until: night + 1`). `dreamDays` is the dream-night count.
+  - A hold-up choice is offered only for a found, recognised, not-upgraded, not-lost object.
+  - The day-17 bag brings back objects; the loan row stays lost.
+  - Four older tests were updated to the new rules.
+- Open, for the author:
+  - **N3.** Day 18's choices hold nothing up, so "every raid night has blockedWith" can never
+    hold. `blockedEveryRaid` counts the blockable nights (all but 18). Confirm.
+  - Nothing appends `recognise` yet (recognize spec), so no block is offered in real play
+    until then.
+  - "On days 9 and 18 the hand takes something else": no content field says what; stored as
+    nothing given. TODO(Claude) if wanted.
+  - The motion.md hold-up-to-the-gap push is still open.
+- Tests: 40 files, 585 passing; typecheck clean. Not checked in a browser.

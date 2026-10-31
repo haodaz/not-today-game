@@ -15,6 +15,7 @@ import { renderDoorView } from "@world/delivery/view";
 import { cls, html, raw, type SafeHtml } from "@world/html";
 import { tr } from "@world/i18n";
 import { checklist, loopContext, type ChecklistView } from "@world/loop/checklist";
+import { isRaidNight } from "@state/nights";
 import { heldItem, heldLayer } from "./held";
 import { showing } from "@world/loop/dialogue";
 import { fillPlaceholders } from "@world/replies/placeholders";
@@ -155,5 +156,13 @@ export function renderRoom({ state, events, session }: RoomModel): SafeHtml {
   const scene = door ? doorContent(state, events, session) : null;
   // The held item sits over everything but the dialogue box (held-object.html).
   const held = door ? null : heldLayer(state, events, session);
-  return html`<div class="${cls("stage", "room", door ? "door-view" : "no-shot")}" data-day="${state.day}" data-view="${session.view}">${scene}${list}${dayCorner(state, session)}${deskBar(state, session)}${held}${dialogueBox(state, session)}${cams(session.view)}${menu(session)}</div>`;
+  // The hand is here: the desk dims and the gap between the monitors glows (night-hand FR1; the
+  // room scene will draw the gap itself).
+  const raid = !door && raidShowing(state, session);
+  return html`<div class="${cls("stage", "room", door ? "door-view" : "no-shot", raid && "raid")}" data-day="${state.day}" data-view="${session.view}">${scene}${raid ? html`<div class="gap-glow"></div>` : null}${list}${dayCorner(state, session)}${deskBar(state, session)}${held}${dialogueBox(state, session)}${cams(session.view)}${menu(session)}</div>`;
+}
+
+/** The raid is in the dialogue box: tonight's shutdown sequence on a raid night. */
+export function raidShowing(state: State, session: Session): boolean {
+  return isRaidNight(state.day) && session.dialogue.queue[0]?.key === `d${state.day}:beat:shutdown`;
 }

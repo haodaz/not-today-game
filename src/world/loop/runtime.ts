@@ -5,6 +5,7 @@ import type { BeatName, Item, Sequence } from "@state/days/table";
 import { taskByFlag } from "@state/days/tasks";
 import type { Meal } from "@state/delivery/table";
 import type { GameEvent } from "@state/events";
+import { wantsOf } from "@state/nights";
 import { advanceTo, DEFAULT_CLOCK, type Beat, type BeatClock } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
 import type { LoopMemo } from "@world/desktop/model";
@@ -23,9 +24,12 @@ const at = (clock: BeatClock, beat: Beat, time?: string): BeatClock => ({ beat, 
 
 /** A day sequence as a queue entry (a beat's choices end it in a choice). */
 export function beatQueued(day: number, beat: BeatName, seq: Sequence, ending?: Ending) {
+  // A raid night: after the shutdown beat's lines, what the hand wants (content/nights.json),
+  // then the choices (night-hand FR1/FR2).
+  const wants = beat === "shutdown" ? wantsOf(day) : null;
   return {
     key: `d${day}:beat:${beat}`,
-    lines: seq.say,
+    lines: wants ? [...seq.say, { k: "narration" as const, t: wants }] : seq.say,
     ending: ending ?? (seq.choices?.length ? { kind: "beatChoices" as const, day, beat } : { kind: "none" as const }),
     sequence: seq,
   };

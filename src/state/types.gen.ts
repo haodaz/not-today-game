@@ -20,7 +20,7 @@ export interface State {
   newWorld: "normal" | "locked" | "light" | "none";
   san: number;
   letItDoUnchecked: number;
-  raids: Record<string, { taken: boolean; blockedWith: string | null }>;
+  raids: Record<string, { blockedWith: string | null; gave: string | null }>;
   pokedReset: boolean;
   names: { login: string; nick: string; calledBy: string; bossCalls: string; pronoun: "she" | "he" | null };
   flags: string[];

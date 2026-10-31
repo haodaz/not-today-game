@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { choiceOffered } from "@state/days/effects";
 import { dayFiles } from "@state/days/table";
 import type { EventDraft } from "@state/events";
 import { createStore, type Store } from "@state/store";
@@ -95,7 +96,9 @@ describe("dialogue queue (FR2)", () => {
     let d = push(EMPTY_DIALOGUE, { key: "d5:shutdown", lines: shutdown.say, ending: { kind: "beatChoices", day: 5, beat: "shutdown" }, sequence: shutdown });
     for (let i = 0; i < shutdown.say.length - 1; i++) d = advance(d).dialogue;
     const shown = showing(d, state)!;
-    expect(shown.choices!.map((c) => c.index)).toEqual(shutdown.choices!.map((c, i) => (c.cond_show ? -1 : i)).filter((i) => i >= 0));
+    // Hidden: a cond_show that fails, and (night-hand FR2) an object not found and recognised.
+    expect(shown.choices!.map((c) => c.index)).toEqual(shutdown.choices!.map((c, i) => (choiceOffered(c, state) ? i : -1)).filter((i) => i >= 0));
+    expect(shown.choices!.length).toBeLessThan(shutdown.choices!.length);
     expect(advance(d).dialogue).toEqual(d);
     expect(showing(finishChoice(d), state)).toBeNull();
   });
