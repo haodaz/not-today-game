@@ -1,0 +1,11 @@
+{
+  "_doc": "每个物件：素模文件、投影源图、投影俯角 el（度）、素模转到正面朝 +Z 顶朝 +Y 的旋转 rot（度，XYZ）。project.html 读这些参数验证；游戏里加载 glb 时套同样的旋转。",
+  "chick":      { "mesh": "chick_shape.glb",      "img": "white", "el": 0,  "rot": [0, 0, 0],   "ok": true },
+  "dictionary": { "mesh": "dictionary_shape.glb", "img": "front", "el": 25, "rot": [0, 0, 0],   "ok": true },
+  "pager":      { "mesh": "pager_shape.glb",      "img": "front", "el": 20, "rot": [-90, 0, 0], "ok": true },
+  "tape":       { "mesh": "tape_shape.glb",       "img": "front", "el": 30, "rot": [-90, 0, 0], "ok": true },
+  "calculator": { "mesh": "calculator_shape.glb", "img": "front", "el": 30, "rot": [90, 0, 0],  "ok": false, "note": "素模是竖着翻盖的姿态，和源图平摊不一致，贴图对不齐；用 calculator_v2_white 重新生成素模" },
+  "iccard":     { "mesh": "iccard_shape.glb",     "img": "front", "el": 60, "rot": [0, 0, 0],   "ok": null, "note": "薄卡，未验证" },
+  "phone":      { "mesh": null, "note": "Space 额度用尽，明天生成" },
+  "textbook":   { "mesh": null, "note": "Space 额度用尽，明天生成" }
+}
