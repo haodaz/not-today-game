@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run --passWithNoTests",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "gen:state": "node scripts/gen-state-types.ts"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",

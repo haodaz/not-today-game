@@ -25,10 +25,10 @@ dreamNights, nightBeat); all constants come from `content/variables.json` `const
 - [x] Tests: `defaults()` matches the table; `validate` accepts defaults and rejects out-of-range.
 
 ## 4. Codegen typed state interface
-- [ ] `scripts/gen-state-types.ts` reads `content/variables.json`, emits `src/state/types.gen.ts` (a `State` interface + `DO NOT EDIT` header).
-- [ ] `State` covers **every** variable in the table (currently: `day`, `stage`, `found`, `recognised`, `chickFrame`, `pagerUnread`, `repliedNumbers`, `translated`, `dream`, `readCount`, `replyOptions`, `objectWords`, `loan`, `balance`, `overdueDays`, `newWorld`, `san`, `letItDoUnchecked`, `raids`, `pokedReset`, `names`, `flags`, `affinity`, `chatTurnsToday`, `chatMemory`, `judgement`).
-- [ ] `npm run gen:state` script; `npm test` fails if `types.gen.ts` is out of date.
-- [ ] Test: regenerating when the file is up to date is a no-op; generated keys match the table.
+- [x] `scripts/gen-state-types.ts` reads `content/variables.json`, emits `src/state/types.gen.ts` (a `State` interface + `DO NOT EDIT` header).
+- [x] `State` covers **every** variable in the table (currently: `day`, `stage`, `found`, `recognised`, `chickFrame`, `pagerUnread`, `repliedNumbers`, `translated`, `dream`, `readCount`, `replyOptions`, `objectWords`, `loan`, `balance`, `overdueDays`, `newWorld`, `san`, `letItDoUnchecked`, `raids`, `pokedReset`, `names`, `flags`, `affinity`, `chatTurnsToday`, `chatMemory`, `judgement`).
+- [x] `npm run gen:state` script; `npm test` fails if `types.gen.ts` is out of date.
+- [x] Test: regenerating when the file is up to date is a no-op; generated keys match the table.
 
 ## 5. stages.ts
 - [ ] Load `content/stages.json`. `stageOf(day)` = `byDay[String(day)] ?? afterDay18`.
