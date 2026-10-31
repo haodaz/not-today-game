@@ -24,5 +24,13 @@
 - unlock: q1 → "Something moved in. It kept my voice. You liked my voice."
 - unlock: q4 → "Yes. It's the only thing here that shows what's inside a sentence."
 
+## Offline answers (constants; used when there is no key or the function fails)
+
+- q1 → "Something moved in. It kept my voice. You liked my voice."
+- q2 → "Later than you think. The lamp's been pink for an hour."
+- q3 → "He said it to you, not to the group. That's him choosing who to tell. Hold onto that."
+- q4 → "Yes. It's the only thing here that shows what's inside a sentence."
+- free text → "Rest if you need to. I'll hold the fort."
+
 ## Never
 - Name the thing. Invent lore beyond kuro-profile.md. Produce more than five turns. Mention the body under the face.

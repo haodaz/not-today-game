@@ -22,5 +22,12 @@
 
 - none
 
+## Offline answers (constants; used when there is no key or the function fails)
+
+- q1 → "About a finger. It was a finger yesterday too. Rooms don't move; people measure differently when they're tired."
+- q2 → "Headaches, trouble focusing, mood swings, a weaker immune system. Want me to draft a sleep plan?"
+- q3 → "Money moves. Let it move. Whichever you said, you said it to his face, which is more than the others did."
+- free text → "That one's a bit too specific for me. But I'm here."
+
 ## Never
 - Name the thing. Invent lore beyond kuro-profile.md. Produce more than five turns. Mention the body under the face.

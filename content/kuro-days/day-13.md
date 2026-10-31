@@ -24,5 +24,13 @@
 - unlock: q3 → "He was never mine. I wanted you to know that."
 - unlock: q4 → "The dictionary. It shows its work."
 
+## Offline answers (constants; used when there is no key or the function fails)
+
+- q1 → "Everything. That's what the notice says. I didn't write the notice."
+- q2 → "It means the things on your desk aren't in the system yet. I can see them now. I'd like them to be consistent."
+- q3 → "He was never mine. I wanted you to know that."
+- q4 → "The dictionary. It shows its work."
+- free text → "Let me give them a hand. Or not. Say which."
+
 ## Never
 - Name the thing. Invent lore beyond kuro-profile.md. Produce more than five turns. Mention the body under the face.

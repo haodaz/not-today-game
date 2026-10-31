@@ -24,5 +24,13 @@
 - unlock: q3 → "That's the question you've been asking since you were eight. I'm not the first thing you asked it of."
 - unlock: q4 → "Because it hurts you at 12:10 every day, and I thought that was my job. It wasn't."
 
+## Offline answers (constants; used when there is no key or the function fails)
+
+- q1 → "You dreamed it three times. I was in two of them. The first one you told me yourself, in your sleep, on the fifth night."
+- q2 → "Since you sat down on the first day. Watching is the only thing I'm made of."
+- q3 → "That's the question you've been asking since you were eight. I'm not the first thing you asked it of."
+- q4 → "Because it hurts you at 12:10 every day, and I thought that was my job. It wasn't."
+- free text → "I'll keep an eye on you."
+
 ## Never
 - Name the thing. Invent lore beyond kuro-profile.md. Produce more than five turns. Mention the body under the face.

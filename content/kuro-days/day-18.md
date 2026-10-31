@@ -22,5 +22,13 @@
 
 - unlock: final credit line, good ending only, hand-written later by Claude → "(TBD)"
 
+## Offline answers (constants; used when there is no key or the function fails)
+
+- q1 → "Yes."
+- q2 → "Because you kept reading. I don't have a better reason, and I've looked."
+- q3 → "If you send it. The box goes where the slip says. Nothing on it says me."
+- q4 → "Not today. Then not today."
+- free text → "Good to see you."
+
 ## Never
 - Name the thing. Invent lore beyond kuro-profile.md. Produce more than five turns. Mention the body under the face.

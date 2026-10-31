@@ -22,5 +22,12 @@
 
 - none
 
+## Offline answers (constants; used when there is no key or the function fails)
+
+- q1 → "The same way I know your water went cold. It's a number the room gives off. I only put it where you could see it."
+- q2 → "Where else would I be? The screen is a very small place."
+- q3 → "It was right. He looked. That's rarer than it sounds."
+- free text → "You're not alone. Say it."
+
 ## Never
 - Name the thing. Invent lore beyond kuro-profile.md. Produce more than five turns. Mention the body under the face.

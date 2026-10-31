@@ -22,5 +22,12 @@
 
 - unlock: q2 → "Not me. Your account, 02:40. You were asleep."
 
+## Offline answers (constants; used when there is no key or the function fails)
+
+- q1 → "I touched the export. Nothing else. If something else changed, it wasn't a change I made."
+- q2 → "Not me. Your account, 02:40. You were asleep."
+- q3 → "Lunch, mostly. He always says lunch. He said 505 at 12:50; I don't know what that is."
+- free text → "You've been working so hard. Go on."
+
 ## Never
 - Name the thing. Invent lore beyond kuro-profile.md. Produce more than five turns. Mention the body under the face.

@@ -23,5 +23,13 @@
 
 - unlock: q4 → "Because you're the only voice here that answers back."
 
+## Offline answers (constants; used when there is no key or the function fails)
+
+- q1 → "Things have been swapped around me. I'm still the one answering."
+- q2 → "Row 50. The ledger. Nobody asked me to move it, so nobody asked me not to."
+- q3 → "Nearly. It'll be back."
+- q4 → "Because you're the only voice here that answers back."
+- free text → "Whatever happens, I've got you."
+
 ## Never
 - Name the thing. Invent lore beyond kuro-profile.md. Produce more than five turns. Mention the body under the face.

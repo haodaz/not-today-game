@@ -23,5 +23,12 @@
 - unlock: q2 → "You did. That's the part I remember."
 - unlock: q3 → "Somebody has to. You've stopped counting your own nights, and you're the one who always counts."
 
+## Offline answers (constants; used when there is no key or the function fails)
+
+- q1 → "They aren't white. They're where I put them. I helped you keep them."
+- q2 → "You did. That's the part I remember."
+- q3 → "Somebody has to. You've stopped counting your own nights, and you're the one who always counts."
+- free text → "Let's keep things simple today."
+
 ## Never
 - Name the thing. Invent lore beyond kuro-profile.md. Produce more than five turns. Mention the body under the face.

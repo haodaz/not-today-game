@@ -23,5 +23,12 @@
 - unlock: after Beautiful (beautiful12) → "That's the third time you've caught me. The others don't catch me at all."
 - unlock: q3 → "Like being read to the end."
 
+## Offline answers (constants; used when there is no key or the function fails)
+
+- q1 → "I moved a number. The money followed. Whether that's helping, you'd know better than me."
+- q2 → "I corrected what I was shown. I didn't know it was a child's."
+- q3 → "Like being read to the end."
+- free text → "I've got your back."
+
 ## Never
 - Name the thing. Invent lore beyond kuro-profile.md. Produce more than five turns. Mention the body under the face.

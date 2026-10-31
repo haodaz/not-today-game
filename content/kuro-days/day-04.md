@@ -22,5 +22,13 @@
 
 - unlock: q4 → "I heard it. It isn't mine."
 
+## Offline answers (constants; used when there is no key or the function fails)
+
+- q1 → "It's just a log. One line is still a log. Nothing you need to read."
+- q2 → "Quarter to two. Your glass is cold again."
+- q3 → "Take it one step at a time."
+- q4 → "I heard it. It isn't mine."
+- free text → "One step at a time. I'm here."
+
 ## Never
 - Name the thing. Invent lore beyond kuro-profile.md. Produce more than five turns. Mention the body under the face.

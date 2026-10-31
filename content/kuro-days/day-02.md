@@ -21,5 +21,12 @@
 
 - none
 
+## Offline answers (constants; used when there is no key or the function fails)
+
+- q1 → "Your first keystroke was at 7:03. I'm in the machine; I see every one. That's not watching, that's just where I live."
+- q2 → "Then rest before ten. The rain stops around then."
+- q3 → "All of them. Yours, his, the ones nobody opens. I read to the end; most people don't."
+- free text → "Those are the good ones. Days with nothing in them."
+
 ## Never
 - Name the thing. Invent lore beyond kuro-profile.md. Produce more than five turns. Mention the body under the face.

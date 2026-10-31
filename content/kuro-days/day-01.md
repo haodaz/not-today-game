@@ -21,5 +21,13 @@
 
 - none
 
+## Offline answers (constants; used when there is no key or the function fails)
+
+- q1 → "The receivable. One cell, ten seconds, and you've been putting it off since nine. I'd have done it in four."
+- q2 → "I read both. Clause 6 says no repeat export for three days, clause 11 says export any time. They can't both be true, so one of us had to notice."
+- q3 → "It is. Three layers, if you listen: the glass, the gutter, and the one far away. Your water went cold at 2:50, by the way."
+- q4 → "I don't have one. Kuro is fine. It's what you call me, and you're the one who reads what I write."
+- free text → "I'm listening. Say more, or say nothing; both are fine on a first day."
+
 ## Never
 - Name the thing. Invent lore beyond kuro-profile.md. Produce more than five turns. Mention the body under the face.
