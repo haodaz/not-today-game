@@ -40,3 +40,10 @@ The probe showed the splat is sharp around the desk, the monitors, the bed and t
 
 ## Addition 2026-11-01 (author): the day-18 pull-out
 The camera can never be pulled back by the player; the clamp holds. But on **night 18**, after the bedtime branch and before the ending card, the camera pulls far out along the room's axis (about pos (67,-29,-1) looking at the room, 6 s, ease-in) until the lit room is a small island in black. The black is not empty: a layer of **eyes and tentacles** (sprites Claude will provide under `public/room/dark/`: `eye_*.png` cutouts and `tentacle_*.png`, plus a tiling `dark_tile.png`) fades in around the island over the last 3 s, dense at the edges, thinning toward the room, eyes blinking out of sync, tentacles drifting slowly. The good ending cuts it short at 2 s (the door opens instead); bad and survive hold the full pull-out, then the ending card. This is its own segment after the motion segment; the motion segment only has to leave the camera path and the clamp overridable for a scripted move.
+
+## Correction 2026-11-01 (author, after the first browser run): fit the splat to the stage
+Seen in the browser: the splat draws and leaves, but (1) the camera barely travels during the 400 ms move, (2) the canvas covers the whole window instead of the stage rectangle, so the cut to the photo jumps, and (3) the end pose does not match the 桌子 photo.
+- The splat canvas is **clipped to the stage rectangle** and uses the stage's scale and offset (`fit.ts`); nothing is drawn in the letterbox.
+- A splat move lasts **900 ms** (the CSS push for these two views is lengthened to match); the camera travels the whole way, ease-in-out.
+- The end pose of 房间→桌子 is the README's **close-desk pose** (the one measured on room.splat, not f43 from door.splat), and the field of view is chosen so the last splat frame lines up with `desk_close.jpg`'s framing: Kiro measures it by overlaying the photo at 50 % in a dev-only `?splatcal=1` mode and reports the FOV and pose used. Same for 桌子→房间 against `room.jpg`.
+- The 房间 pose may include the window; the vignette stays.
