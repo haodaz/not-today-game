@@ -19,3 +19,6 @@ One dialogue system for everything spoken in the 3D/room views: narration, inner
 ## FR3. Tests
 - Snapshot: a narration line, a paged line (2 pages), choices, the Kuro prompt, a Kuro line with avatar, the player box with questions, the player box with input open, history open.
 - Property: box height constant across every snapshot; no line exceeds three visual lines at the given width (measure with happy-dom + a monospace fallback width table); the sixth turn never renders the player box.
+
+## Correction 2026-11-01 (author): Kuro's face on the tag is too small
+56 px reads as an icon, not as who is speaking. Kuro's avatar on the tag becomes **112 px**, a portrait: it sits on the box's top-left corner and overhangs it (about half above the box's top edge, a little past its left edge), the name KURO to its right on the tag. The text starts below the tag as now. The narration tags (门外 / 缝里 / 桌上) do not change. Update `design/chrome/dialogue.html`'s numbers in the design doc and the dialogue snapshots after checking the diff.
