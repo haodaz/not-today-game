@@ -43,14 +43,15 @@ describe("poses (README) and interpolation", () => {
       expect(POSES[id].pos).toEqual({ x: f.pos[0], y: f.pos[1], z: f.pos[2] });
       expect(POSES[id].fov).toBe(f.fov);
     }
-    expect(CALIBRATION.desk.pos).toEqual([-1.0, 0, 6.0]);
-    expect(CALIBRATION.desk.look).toEqual([0.6, -0.1, 22.5]);
-    // lookOf goes back along the same direction.
+    // lookOf goes back along the same direction; yaw is atan2(dx, dz) of the table's look.
     const back = poseFromLook(POSES.room.pos, lookOf(POSES.room));
     near(back, POSES.room);
-    expect(deg(POSES.room.yaw)).toBeCloseTo(9.1, 1);
-    expect(deg(POSES.desk.yaw)).toBeCloseTo(5.54, 1);
-    expect(deg(POSES.bed.yaw)).toBeCloseTo(61.1, 1);
+    for (const id of ["room", "desk", "bed"] as const) {
+      const f = CALIBRATION[id];
+      expect(POSES[id].yaw).toBeCloseTo(Math.atan2(f.look[0] - f.pos[0], f.look[2] - f.pos[2]), 12);
+    }
+    // Window side is negative yaw: every framing faces away from it.
+    for (const p of Object.values(POSES)) expect(deg(p.yaw)).toBeGreaterThan(0);
   });
 
   it("the fov interpolates along a move when both ends have one", () => {
@@ -365,7 +366,7 @@ describe("the layer: fallback, the move, the cross-fade", () => {
     expect(gameSaw).toBe(0);
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "p" }));
     expect(printed).toHaveLength(1);
-    expect(printed[0]).toContain("desk: { pos: [-1, 0, 6]");
+    expect(printed[0]).toContain(formatCalibration({ desk: framingOf(POSES.desk) }));
     expect(r.hooks().calibration().room.look).not.toEqual(CALIBRATION.room.look);
     window.removeEventListener("keydown", onKey);
     destroy!();
@@ -410,7 +411,8 @@ describe("900 ms moves and calibration helpers", () => {
       expect(row.fov).toBe(CALIBRATION[id].fov);
       near(poseOfRow(row), POSES[id], 3);
     }
-    expect(formatCalibration({ desk: framingOf(POSES.desk) })).toMatch(/^ {2}desk: \{ pos: \[-1, 0, 6\], look: \[[-\d., ]+\], fov: 50 \},$/);
+    const d = CALIBRATION.desk;
+    expect(formatCalibration({ desk: framingOf(POSES.desk) })).toBe(`  desk: { pos: [${d.pos.join(", ")}], look: [${framingOf(POSES.desk).look.join(", ")}], fov: ${d.fov} },`);
   });
 
   it("destroy disposes the scene", async () => {

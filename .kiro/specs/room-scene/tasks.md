@@ -16,3 +16,12 @@
 - [x] 11. `calibration.ts` (pos / look / fov per framing). 桌子 = the close-desk pose. Optional fov on poses.
 - [x] 12. `?splatcal=1` (dev only): still pose, photo at 50 %, tuning keys, readout, P prints the table (`calibrate.ts`, pure helpers).
 - [ ] 13. Run the calibration in a browser against desk_close.jpg and room.jpg and paste the table. Measure load time and frame rate. (Not possible here.)
+
+## Calibration and the day-18 pull-out
+
+- [x] 14. Paste Claude's calibration (room fov 48.5, desk pose and fov 40). Tests read the table instead of repeating it.
+- [x] 15. `splat/pullout.ts`: the pure timeline (camera, island, dark), the cuts, `pullMove` (clamp: null).
+- [x] 16. Flow: `session.pullOut`, its cut timer, pages waiting, no skip. `renderPullOut` and the dark sprites. `createPullDriver`.
+- [x] 17. Splat layer: the scripted pull, `#app.splat-pull`. Black letterbox.
+- [x] 18. Tests (`tests/pullout.test.ts`); `tests/endings.test.ts` runs the cut before the pages.
+- [ ] 19. Browser check: the splat island against the mask; how the 2 s good cut feels; the door opening (later segment).

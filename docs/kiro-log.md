@@ -673,3 +673,17 @@ Appended after each task. Neither Kiro nor Claude edits the other's area without
   - Last full run: 817 / 818. The one failure was that test's 5 s default timeout; the sum of its
     waits is about 5.3 s.
   - Typecheck clean after the fix.
+
+## 2026-11-01 — splat calibration pasted; the day-18 pull-out
+
+- Calibration from Claude's `?splatcal=1` run is in `calibration.ts` (room fov 48.5; desk
+  (−0.345, 0, 11.562) → (2.013, −0.145, 35.446), fov 40; bed unchanged). The three tests that
+  repeated the old rows now read the table.
+- Pull-out (room-scene design S15–S18): a pure timeline, `session.pullOut` with the cut timer
+  (good 2 s, bad and survive 6 s), the pull-out page with the photo island and the dark layer
+  (dark_tile, eye_1..3, tentacles), a frame driver, and the scripted splat move with the clamp
+  bypassed. The ending event is unchanged; only the pages wait.
+- `tests/endings.test.ts` "the pages": on the last day it now runs the pull-out's cut timer before
+  reading the first page.
+- Tests: 54 files, 835 passing (which also confirms last turn's motion-dom timeout fix); typecheck
+  clean. Not seen in a browser.

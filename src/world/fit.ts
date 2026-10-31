@@ -35,11 +35,12 @@ export const BACKDROPS: Readonly<Record<View | "title", string>> = {
  * Writes the fit: `--scale`, `--stage-x`, `--stage-y` on the stage (so the motion layer's copies of
  * it keep their place) and `--letterbox` on the root (which survives re-renders).
  */
-export function applyFit(root: HTMLElement, stage: HTMLElement, size: { w: number; h: number }, backdrop: string): Fit {
+export function applyFit(root: HTMLElement, stage: HTMLElement, size: { w: number; h: number }, backdrop: string | null): Fit {
   const fit = fitStage(root.clientWidth, root.clientHeight, size.w, size.h);
   stage.style.setProperty("--scale", String(fit.scale));
   stage.style.setProperty("--stage-x", `${fit.left}px`);
   stage.style.setProperty("--stage-y", `${fit.top}px`);
-  root.style.setProperty("--letterbox", `url(${backdrop})`);
+  // No photo (the day-18 pull-out happens over black): the letterbox is plain black.
+  root.style.setProperty("--letterbox", backdrop ? `url(${backdrop})` : "none");
   return fit;
 }

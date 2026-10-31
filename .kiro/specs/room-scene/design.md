@@ -118,6 +118,50 @@ chunk is fetched after the first render and never by the title page, which doesn
     provisional 50° and the poses are the README's. The tool exists so the calibration run can be
     pasted back.
 
+## 2c. Addition 2026-11-01: the day-18 pull-out
+
+Calibrated framings (Claude, `?splatcal=1`): room fov 48.5, desk pos (−0.345, 0, 11.562) look
+(2.013, −0.145, 35.446) fov 40. Bed unchanged.
+
+- **S15. One timeline.** `splat/pullout.ts` is pure: `pullOutAt(elapsed, from) → { p, camera,
+  island, dark }`.
+  - Camera: position from the framing to `PULL_END` (67, −29, −1), ease-in cubic over 6 s. The
+    gaze turns from the framing's look onto `ROOM_CENTRE`, the mean of the three framings'
+    positions, by about 3.8 s.
+  - Island: start distance / current distance to `ROOM_CENTRE` (perspective). It is 1 at the
+    start and about 0.08–0.10 at 6 s.
+  - Dark: 0 until 3 s, then linear to 1 at 6 s.
+  - The CameraMove is scripted, with `path` and `clamp: null`. The player's moves still clamp.
+- **S16. The cut, in the flow.** `startEnding` on the last day sets `session.pullOut =
+  { ending, from, startMs, cutMs }` and schedules the cut: good 2 s, bad and survive 6 s.
+  - At the cut, `pullOut` goes back to null and the first page opens as before (bad: 你和你,
+    otherwise the credits).
+  - While it plays, `renderEnding` renders the pull-out page and `endingNext` does nothing, so
+    the pull-out can't be skipped.
+  - The `ending` event is still appended synchronously at lie-down; only the pages wait.
+  - From 屏幕 the view becomes 桌子, so the stage is the room's size.
+- **S17. Two renderings, one dark.**
+  - The pull-out page holds the photo island and the dark layer:
+    - the island is the framing's photo, scaled by `--island` around the centre, over black;
+    - the dark layer is dark_tile.png tiled, 22 eyes (eye_1..3) and 8 tentacles, at opacity
+      `--dark`.
+  - Sprites are seeded and pure (`darkSprites`): radius ≥ 0.42 of the stage ellipse, √-biased
+    toward the edges, bigger at the edges. The eyes blink out of sync (period and phase per
+    sprite); the tentacles drift slowly.
+  - The dark layer's mask is clear inside an ellipse √2 × the island's half size (it
+    circumscribes the island rectangle), fading out over 22 %, so it never covers the room.
+  - `createPullDriver` (a controller dep) writes `--island` and `--dark` every frame from the same
+    timeline; the render writes them too.
+  - With the splat ready at the start, the layer runs the scripted move under the page with the
+    night wash, and `#app.splat-pull` hides the photo island. Otherwise the photo island plays.
+  - A pull-out already under way never switches to the splat.
+  - The letterbox is black during the pull-out (`applyFit(…, null)`).
+- **S18. Open.**
+  - Good's "the door opens instead": no door animation exists yet. Good cuts at 2 s to its
+    usual credits → day 19.
+  - The splat's apparent room size follows the projection, not the perspective `island`
+    estimate, so the mask may differ slightly from what the splat shows. Check in a browser.
+
 ## 3. Flow
 
 1. First render of the game: `layer.after()` schedules `load()` at idle, or after 1 s.

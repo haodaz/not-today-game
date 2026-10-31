@@ -2,7 +2,10 @@
 // first jumps to the end of the roll. What happens after the last page belongs to the host
 // (main.ts): clearing the run, the profile, the title page. Tests stub `endingHost`.
 import type { Ending } from "@state/endings";
+import type { State } from "@state/types.gen";
+import { constants } from "@state/variables";
 import type { ActionContext } from "@world/desktop/controller";
+import { PULL_CUT_MS, pullFrom } from "@world/room/splat/pullout";
 import { creditLines, creditsShown, CREDIT_LINE_MS } from "./credits";
 
 export interface EndingHost {
@@ -17,16 +20,43 @@ export const endingHost: EndingHost = { afterBad: () => {}, newRun: () => {} };
 
 const nowOf = (ctx: ActionContext) => ctx.now?.() ?? Date.now();
 
-/** The run has just ended (or was ended when loaded): start at the first page. */
+/** The day-18 pull-out plays before the pages when the run ends on the last day (room-scene addition 2026-11-01). */
+export const pullOutApplies = (state: State): boolean => state.day === (constants.lastDay as number);
+
+/**
+ * The run has just ended (or was ended when loaded). On the last day the camera pulls out first
+ * (6 s; good cuts it at 2 s); then the first page. Nothing skips the pull-out.
+ */
 export function startEnding(ctx: ActionContext): void {
   const { session, store } = ctx;
-  const ending = store.getState().ending as Ending | "none";
-  if (ending === "none" || session.endingPage) return;
+  const state = store.getState();
+  const ending = state.ending as Ending | "none";
+  if (ending === "none" || session.endingPage || session.pullOut) return;
   session.dialogue = { queue: [], line: 0 };
   session.kuroInput = false;
   session.historyOpen = false;
-  session.endingPage = { phase: ending === "bad" ? "you" : "credits", startMs: nowOf(ctx), skipped: false };
-  if (session.endingPage.phase === "credits") rollCredits(ctx);
+  session.holding = null;
+  session.settingsOpen = false;
+  if (pullOutApplies(state)) {
+    const from = pullFrom(session.view);
+    // The ending stage is the room's (1600 × 900), whatever the last view was.
+    if (session.view === "desktop") session.view = "desk";
+    const pull = { ending, from, startMs: nowOf(ctx), cutMs: PULL_CUT_MS[ending] };
+    session.pullOut = pull;
+    ctx.later(pull.cutMs, () => {
+      if (ctx.session.pullOut !== pull) return;
+      ctx.session.pullOut = null;
+      firstPage(ctx, ending);
+    });
+    ctx.rerender();
+    return;
+  }
+  firstPage(ctx, ending);
+}
+
+function firstPage(ctx: ActionContext, ending: Ending): void {
+  ctx.session.endingPage = { phase: ending === "bad" ? "you" : "credits", startMs: nowOf(ctx), skipped: false };
+  if (ctx.session.endingPage.phase === "credits") rollCredits(ctx);
   ctx.rerender();
 }
 
@@ -47,7 +77,8 @@ export function endingNext(ctx: ActionContext): void {
   const { session, store } = ctx;
   const ending = store.getState().ending as Ending | "none";
   const page = session.endingPage;
-  if (ending === "none" || !page) return;
+  // During the pull-out nothing moves on (no page yet; a click does nothing).
+  if (ending === "none" || !page || session.pullOut) return;
   if (page.phase === "you") {
     session.endingPage = { phase: "credits", startMs: nowOf(ctx), skipped: false };
     rollCredits(ctx);

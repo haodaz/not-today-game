@@ -12,6 +12,7 @@ import { t, tr } from "@world/i18n";
 import { fillPlaceholders } from "@world/replies/placeholders";
 import { creditLines, creditsShown, lastLineKey } from "./credits";
 import { youAndYou } from "./youandyou";
+import { renderPullOut } from "./pullout";
 
 export interface EndingModel {
   readonly state: State;
@@ -60,6 +61,8 @@ export function renderAfter(m: EndingModel, ending: Ending): SafeHtml {
 }
 
 export function renderEnding(m: EndingModel): SafeHtml {
+  // Night 18: the pull-out first; the pages wait (room-scene addition 2026-11-01).
+  if (m.session.pullOut) return renderPullOut(m);
   const ending = m.state.ending as Ending;
   const phase = m.session.endingPage?.phase ?? (ending === "bad" ? "you" : "credits");
   if (phase === "you") return renderYouAndYou(m);

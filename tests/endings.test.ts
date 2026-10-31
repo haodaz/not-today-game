@@ -256,8 +256,14 @@ describe("credits are Kuro's log (FR3)", () => {
       calls.length = 0;
       const store = storeOver(state);
       store.appendEvent({ kind: "ending", ending });
-      const { ctx } = ctxFor(store);
+      const { ctx, timers } = ctxFor(store);
       startEnding(ctx);
+      // On the last day the pull-out plays first (room-scene addition 2026-11-01); its cut opens the pages.
+      if (store.getState().day === LAST) {
+        expect(ctx.session.pullOut?.ending).toBe(ending);
+        expect(ctx.session.endingPage).toBeNull();
+        for (const t of timers.splice(0)) t.fn();
+      }
       const phases = [ctx.session.endingPage!.phase];
       for (let i = 0; i < 5; i++) {
         endingNext(ctx);

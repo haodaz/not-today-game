@@ -255,3 +255,20 @@
 .splat-layer [hidden]{display:none}
 .splat-layer .splat-vignette{background:radial-gradient(ellipse at center,rgba(0,0,0,0) 55%,rgba(0,0,0,.35) 100%)}
 .splat-layer .splat-photo{opacity:0;background:center/cover no-repeat}
+/* The day-18 pull-out (room-scene addition 2026-11-01; design S15–S18). --island and --dark come from
+   the pure timeline (pullout.ts) every frame. Over black; the dark never covers the island: its
+   mask is clear inside an ellipse that circumscribes the island's rectangle (√2 × its half size). */
+.pullout-page{position:relative;width:1600px;height:900px;overflow:hidden;background:#000;cursor:default}
+.pullout-page .pull-island{position:absolute;inset:0;background:#000 center/cover no-repeat;transform:scale(var(--island,1));transform-origin:50% 50%;filter:brightness(.62) saturate(.85)}
+.pullout-page .pull-dark{position:absolute;inset:0;opacity:var(--dark,0);background-repeat:repeat;background-size:256px 256px;pointer-events:none;
+  -webkit-mask-image:radial-gradient(closest-side,transparent calc(var(--island,1) * 141.5%),#000 calc(var(--island,1) * 141.5% + 22%));
+  mask-image:radial-gradient(closest-side,transparent calc(var(--island,1) * 141.5%),#000 calc(var(--island,1) * 141.5% + 22%))}
+.pullout-page .pull-dark img{position:absolute;translate:-50% -50%;user-select:none}
+.pullout-page .pull-dark .eye{animation:pull-blink var(--period,3600ms) steps(1,end) var(--phase,0ms) infinite}
+.pullout-page .pull-dark .tentacle{animation:pull-drift var(--period,11000ms) ease-in-out var(--phase,0ms) infinite alternate}
+@keyframes pull-blink{0%,88%{opacity:1}89%,94%{opacity:0}95%,100%{opacity:1}}
+@keyframes pull-drift{from{translate:-50% -50%;rotate:-4deg}to{translate:calc(-50% + 14px) calc(-50% - 10px);rotate:5deg}}
+/* With the splat the room is drawn underneath by the splat layer: the photo island steps aside. */
+#app.splat-pull > .pullout-page{background:transparent}
+#app.splat-pull > .pullout-page .pull-island{visibility:hidden}
+@media (prefers-reduced-motion: reduce){.pullout-page .pull-dark img{animation:none}}

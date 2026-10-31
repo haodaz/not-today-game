@@ -13,6 +13,8 @@ import type { Framing } from "./calibration";
 import { splatMoveFor } from "./moves";
 import { easeInOutCubic, POSES, poseAt, type CameraMove, type Pose, type PoseId } from "./pose";
 import { splatLook, type SplatLook } from "./look";
+import { pullMove, pullOutAt } from "./pullout";
+import type { Session } from "@world/desktop/model";
 
 /** The arriving photo fades in over the move's last 200 ms. */
 export const SPLAT_FADE_MS = 200;
@@ -90,6 +92,8 @@ interface Running {
   readonly look: SplatLook;
   readonly start: number;
   readonly dur: number;
+  /** A scripted move (the day-18 pull-out): its own timeline; ends when the session drops it. */
+  readonly pull?: { readonly ref: object; readonly pose: (elapsed: number) => Pose };
 }
 
 const isPosed = (view: string): view is PoseId => view in POSES;
@@ -203,10 +207,15 @@ export function createSplatLayer(deps: SplatDeps) {
       if (!scene || !el) return;
       const elapsed = t - r.start;
       const p = Math.min(1, elapsed / r.dur);
-      scene.render(poseAt(r.move, p), r.look.mix);
+      scene.render(r.pull ? r.pull.pose(elapsed) : poseAt(r.move, p), r.look.mix);
       part(".splat-collapsed").style.opacity = String(collapsed === "yes" ? r.look.mix : 0);
-      part(".splat-photo").style.opacity = String(Math.min(1, Math.max(0, (elapsed - (r.dur - SPLAT_FADE_MS)) / SPLAT_FADE_MS)));
-      paintLayers(r.from, r.to, r.look, easeInOutCubic(p));
+      // The pull-out has no photo to arrive at: the ending card follows.
+      part(".splat-photo").style.opacity = r.pull ? "0" : String(Math.min(1, Math.max(0, (elapsed - (r.dur - SPLAT_FADE_MS)) / SPLAT_FADE_MS)));
+      // The gap and lamp layers are framed for the stills; the pull-out leaves them behind.
+      if (r.pull) {
+        part(".splat-gap").hidden = true;
+        part(".splat-lamp").hidden = true;
+      } else paintLayers(r.from, r.to, r.look, easeInOutCubic(p));
     }
 
     function tick(): void {
@@ -219,6 +228,12 @@ export function createSplatLayer(deps: SplatDeps) {
       const stage = liveStage();
       if (stage) place(stage);
       paint(r, t);
+      if (r.pull) {
+        // Until the flow drops the pull-out (its cut), when the ending card replaces the page.
+        if (ctx.session.pullOut !== r.pull.ref || t - r.start >= r.dur + SAFETY_MS) return finish();
+        frame = raf(tick);
+        return;
+      }
       // Stay until the stage has its own photo back (no gap), or the safety time.
       const done = t - r.start >= r.dur && (!stage || !stage.classList.contains("m-nobg"));
       if (done || t - r.start >= r.dur + SAFETY_MS) return finish();
@@ -226,6 +241,7 @@ export function createSplatLayer(deps: SplatDeps) {
     }
 
     function finish(): void {
+      if (running?.pull) root.classList.remove("splat-pull");
       running = null;
       if (frame) cancelRaf(frame);
       frame = 0;
@@ -255,6 +271,30 @@ export function createSplatLayer(deps: SplatDeps) {
       if (frame) cancelRaf(frame);
       frame = raf(tick);
     }
+
+    /**
+     * The pull-out over the splat. It joins only if it can from the first frame; a pull-out
+     * already under way (the splat became ready mid-way) stays with the photo fallback.
+     */
+    function startPull(pull: NonNullable<Session["pullOut"]>, stage: HTMLElement): void {
+      if (!scene || now() - toLayerClock(pull.startMs) > 100) return;
+      el ??= build(scene);
+      // Night 18: the night wash stays over the splat; the gap and lamp are framed for the stills.
+      const look = { ...lookNow(), night: true };
+      el.classList.toggle("night", true);
+      el.classList.toggle("pink", false);
+      sizeTo();
+      const move = pullMove(pull.from);
+      running = { from: pull.from, to: pull.from, move, look, start: toLayerClock(pull.startMs), dur: pull.cutMs, pull: { ref: pull, pose: (ms) => pullOutAt(ms, pull.from).camera } };
+      root.classList.add("splat-pull");
+      place(stage);
+      paint(running, now());
+      if (frame) cancelRaf(frame);
+      frame = raf(tick);
+    }
+
+    /** The flow stamps the pull-out with the game's wall clock; the layer runs on its own (performance.now). */
+    const toLayerClock = (wallMs: number): number => now() - ((ctx.now?.() ?? Date.now()) - wallMs);
 
     // ——— calibration (dev only, `?splatcal=1`) ———
 
@@ -316,6 +356,17 @@ export function createSplatLayer(deps: SplatDeps) {
         lastView = view;
         if (prev === null) return idle(load);
         const stage = liveStage();
+        // The day-18 pull-out: a scripted move, clamp bypassed (room-scene addition 2026-11-01).
+        const pull = ctx.session.pullOut;
+        if (running?.pull) {
+          if (stage) place(stage);
+          if (pull === running.pull.ref) return;
+          finish();
+        }
+        if (pull) {
+          if (status === "ready" && stage && !(lookNow().mix > 0 && collapsed !== "yes")) startPull(pull, stage);
+          return;
+        }
         if (running) {
           // A re-render mid-move replaced the markup: put the layer back before the new stage.
           if (stage) place(stage);

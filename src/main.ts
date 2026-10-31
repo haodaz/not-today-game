@@ -11,6 +11,7 @@ import "./ui/fonts.css";
 import "./ui/title/title.css";
 import { debugStartDay } from "@state/clock";
 import { splatForGame } from "@world/room/splat";
+import { createPullDriver } from "@world/endings/pullout-dom";
 import { createProfileWriter, createRunSlot } from "@state/saves";
 import { createStore, type Store } from "@state/store";
 import { parseBeatParams } from "@world/desktop/beat";
@@ -100,6 +101,8 @@ function startGame(store: Store, saved: boolean, from?: "desk"): void {
     motion: createMotion,
     // The room splat for 房间 ↔ 桌子 moves (room-scene): the game only, never the title page.
     splat: splatForGame(window),
+    // The day-18 pull-out's frames (splat or photo fallback).
+    pull: createPullDriver(),
   });
   // What finished runs left on the desk (presentation only; the story never reads it).
   game.session.collection = collection;
