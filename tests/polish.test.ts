@@ -183,7 +183,8 @@ describe("held phone and objects (FR1)", () => {
     expect(out).toContain('class="held-dim" data-action="loop-put-down"');
     expect(out).toContain(`<canvas class="dev" data-screen="${object}" width="${w}" height="${h}"`);
     expect(out).toContain(`width:${w * s}px;height:${h * s}px`);
-    expect(out).toContain(`class="slot lifted" data-object="${object}"`);
+    // Not recognised yet, so also `unknown` (recognise FR2).
+    expect(out).toContain(`class="slot unknown lifted" data-object="${object}"`);
   });
 
   it("an upgraded object's screen is the smooth one", () => {

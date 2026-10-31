@@ -17,8 +17,9 @@ import { mealView } from "@world/delivery/meals";
 import { html, type SafeHtml } from "@world/html";
 import { getLocale, setLocale, tr } from "@world/i18n";
 import { actionOf, itemStates, loopContext, mealToOrder, openTask, type ItemAction } from "@world/loop/checklist";
-import { advance, finishChoice, push } from "@world/loop/dialogue";
-import { beatQueued } from "@world/loop/runtime";
+import { advance, endsInChoice, finishChoice, push } from "@world/loop/dialogue";
+import { beatQueued, questionQueued } from "@world/loop/runtime";
+import { askedOn, knows } from "@state/recognise";
 import { gateAdvance } from "@world/motion/reveal";
 import { boxObjectFor, dialogueBox, doorMeal, renderRoom } from "./hud";
 
@@ -134,6 +135,9 @@ export const loopActions: Record<string, ActionHandler> = {
       ctx.store.appendEvent({ kind: "reply", choice: data.choice, t: ctx.session.clock.time });
     } else if (q.ending.kind === "beatChoices") {
       ctx.store.appendEvent({ kind: "choose", beat: q.ending.beat, index: Number(data.index) });
+    } else if (q.ending.kind === "recognise") {
+      // The reducer reads right / wrong from content; the runtime plays the answer's lines.
+      ctx.store.appendEvent({ kind: "recognise", objectId: q.ending.object, option: Number(data.index) });
     } else {
       return;
     }
@@ -161,6 +165,12 @@ export const loopActions: Record<string, ActionHandler> = {
     if (!onDesk) return;
     session.holding = session.holding === id ? null : id;
     session.phoneOpen = false;
+    // Picked up and still not known: the question comes back, once a day (recognise FR1).
+    const events = store.getEvents();
+    if (session.holding && !knows(id, state, events) && !askedOn(events, state.day, id)) {
+      const q = questionQueued(state.day, id, store.getRunId());
+      if (q) session.dialogue = push(session.dialogue, q);
+    }
     ctx.rerender();
   },
   "loop-put-down"(ctx) {
@@ -263,7 +273,7 @@ export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
   }
   if ((e.key === " " || e.key === "Enter") && ctx.session.view !== "desktop" && ctx.session.dialogue.queue.length) {
     const q = ctx.session.dialogue.queue[0]!;
-    const atChoice = (q.ending.kind === "beatChoices" || q.ending.kind === "loan") && ctx.session.dialogue.line >= q.lines.length - 1;
+    const atChoice = endsInChoice(q.ending) && ctx.session.dialogue.line >= q.lines.length - 1;
     // At a choice, keys do nothing: the choice is a click.
     if (!atChoice) loopActions["loop-advance"]!(ctx, {} as DOMStringMap, null as never);
     // At a choice a key can still complete the line above it.

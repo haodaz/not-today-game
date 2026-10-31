@@ -5,13 +5,15 @@ import type { BeatName, Item, Sequence } from "@state/days/table";
 import { taskByFlag } from "@state/days/tasks";
 import type { Meal } from "@state/delivery/table";
 import type { GameEvent } from "@state/events";
-import { wantsOf } from "@state/nights";
+import { choiceOf } from "@state/days/effects";
+import { isRaidNight, takeFor, wantsOf } from "@state/nights";
+import { knows, optionOrder, recogniseTable, wasRight } from "@state/recognise";
 import { advanceTo, DEFAULT_CLOCK, type Beat, type BeatClock } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
 import type { LoopMemo } from "@world/desktop/model";
 import { arrivalOf, ordersOn } from "@world/delivery/meals";
 import { itemStates, loopContext, selfTicking, workDone, type LoopContext } from "./checklist";
-import { push, type DialogueState, type Ending } from "./dialogue";
+import { push, type DialogueState, type Ending, type Queued } from "./dialogue";
 import { arrivalDue, msUntilDue, msUntilMinimum } from "./waiting";
 
 /** How long after it unlocks a self-ticking item ticks itself (the horror is that you watch it). */
@@ -35,6 +37,27 @@ export function beatQueued(day: number, beat: BeatName, seq: Sequence, ending?: 
   };
 }
 
+/** "Do you know what this is?": the question line, then the options in this run's order (recognise FR1). */
+export function questionQueued(day: number, object: string, runId: string): Queued | null {
+  const entry = recogniseTable.get(object);
+  if (!entry) return null;
+  return {
+    key: `d${day}:recognise:${object}`,
+    lines: [{ k: "narration", t: entry.q }],
+    ending: { kind: "recognise", object, order: optionOrder(runId, object) },
+  };
+}
+
+/** The answer's lines: what you remember (or don't), then the inner line. */
+export function answerQueued(day: number, object: string, right: boolean): Queued {
+  const a = recogniseTable.get(object)![right ? "right" : "wrong"];
+  return {
+    key: `d${day}:recognise:${object}:answer`,
+    lines: [...a.say.map((t) => ({ k: "narration" as const, t })), { k: "inner", t: a.inner }],
+    ending: { kind: "none" },
+  };
+}
+
 function itemQueued(day: number, item: Item, which: "onUnlock" | "onDone") {
   const seq = item[which];
   return seq ? { key: `d${day}:${item.id}:${which}`, lines: seq.say, ending: { kind: "none" as const }, sequence: seq } : null;
@@ -50,7 +73,7 @@ export interface LoopEffects {
  * Pure part: what the new events and the item changes mean for the dialogue, the clock and sounds.
  * Exported for tests.
  */
-export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEvent[], fx: LoopEffects): LoopEffects {
+export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEvent[], fx: LoopEffects, runId = "run-1"): LoopEffects {
   let { dialogue, clock } = fx;
   const sounds = [...fx.sounds];
   const day = lc.state.day;
@@ -78,8 +101,21 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
         const path = tree[e.mode];
         dialogue = push(dialogue, { key: `d${day}:task:${tree.id}`, lines: [...tree.start.say, ...path.say], ending: { kind: "none" } });
       }
-    } else if (e.kind === "openLayer" && file.beats.box) {
-      dialogue = push(dialogue, beatQueued(day, "box", file.beats.box));
+    } else if (e.kind === "openLayer") {
+      if (file.beats.box) dialogue = push(dialogue, beatQueued(day, "box", file.beats.box));
+      // Right after the box beat: do you know what this is? (recognise FR1)
+      const entry = recogniseTable.get(e.objectId);
+      if (entry && entry.day === day && !knows(e.objectId, lc.state, events)) {
+        const q = questionQueued(day, e.objectId, runId);
+        if (q) dialogue = push(dialogue, q);
+      }
+    } else if (e.kind === "recognise" && e.option !== undefined) {
+      dialogue = push(dialogue, answerQueued(day, e.objectId, wasRight(e)));
+    } else if (e.kind === "choose") {
+      // Nothing given on a night the hand takes something else: its line (night-hand, nights-takes).
+      const choice = choiceOf(day, e.beat, e.index);
+      const take = e.beat === "shutdown" && choice && isRaidNight(day) ? takeFor(day, choice) : null;
+      if (take) dialogue = push(dialogue, { key: `d${day}:take`, lines: [{ k: "narration", t: take.say }], ending: { kind: "none" } });
     } else if (e.kind === "pickup" && e.meal === "lunch" && (clock.beat === "boot" || clock.beat === "work")) {
       clock = at(clock, "afternoon");
     }
@@ -141,7 +177,7 @@ export function syncLoop(ctx: ActionContext, nowMs: number = Date.now()): void {
   }
 
   const memo = session.loop;
-  const fx = react(memo, lc, events, { dialogue: session.dialogue, clock: session.clock, sounds: [] });
+  const fx = react(memo, lc, events, { dialogue: session.dialogue, clock: session.clock, sounds: [] }, store.getRunId());
   // New orders start their wait.
   for (const e of events.slice(memo.seen)) {
     if (e.kind === "order" && e.day === state.day && !memo.orders.has(e.meal)) {

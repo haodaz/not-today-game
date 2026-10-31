@@ -3,13 +3,19 @@
 // The box never makes text: every line is content.
 import type { BeatName, SayLine, Sequence } from "@state/days/table";
 import { choiceOffered } from "@state/days/effects";
+import { recogniseTable } from "@state/recognise";
 import type { State } from "@state/types.gen";
 
 export type Ending =
   | { readonly kind: "none" }
   | { readonly kind: "beatChoices"; readonly day: number; readonly beat: BeatName }
   | { readonly kind: "loan" }
-  | { readonly kind: "lieDown" };
+  | { readonly kind: "lieDown" }
+  /** "Do you know what this is?" (recognise spec): the options in this run's order (content indexes). */
+  | { readonly kind: "recognise"; readonly object: string; readonly order: readonly number[] };
+
+/** Endings that wait for a choice. */
+export const endsInChoice = (e: Ending): boolean => e.kind === "beatChoices" || e.kind === "loan" || e.kind === "recognise";
 
 export interface Queued {
   /** Where it came from (for tests and to avoid queueing the same thing twice). */
@@ -57,6 +63,11 @@ export const LOAN_OPTIONS: readonly ChoiceOption[] = [
 
 function options(q: Queued, state: State): ChoiceOption[] | null {
   if (q.ending.kind === "loan") return [...LOAN_OPTIONS];
+  if (q.ending.kind === "recognise") {
+    // No hints: the same look for every option; the order is the run's, not content's.
+    const entry = recogniseTable.get(q.ending.object);
+    return entry ? q.ending.order.map((i) => ({ index: i, text: entry.options[i]!.t })) : null;
+  }
   if (q.ending.kind !== "beatChoices") return null;
   return (q.sequence?.choices ?? [])
     .map((c, index) => ({ c, index }))
@@ -82,7 +93,7 @@ export function advance(d: DialogueState): { dialogue: DialogueState; ended: End
   const q = d.queue[0];
   if (!q) return { dialogue: d, ended: null };
   if (d.line < q.lines.length - 1) return { dialogue: { ...d, line: d.line + 1 }, ended: null };
-  if (q.ending.kind === "beatChoices" || q.ending.kind === "loan") return { dialogue: d, ended: null };
+  if (endsInChoice(q.ending)) return { dialogue: d, ended: null };
   return { dialogue: { queue: d.queue.slice(1), line: 0 }, ended: q.ending };
 }
 

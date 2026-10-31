@@ -88,6 +88,8 @@
 .room .menu button{border:0;background:none;font:inherit;color:inherit;cursor:pointer;padding:0}
 .room .menu button.off{text-decoration:line-through}
 /* An upgraded object: the new world's hi-res icon, antialiased, no integer pixels (object-upgrade FR2). */
+/* Not yet recognised: slightly desaturated (recognise FR2). */
+.room .slot.unknown img{filter:saturate(.35) opacity(.9)}
 .room .slot.upgraded img{image-rendering:auto;filter:saturate(1.15) drop-shadow(0 0 6px rgba(120,170,255,.55))}
 .room .slot .screen-hi{width:52px;height:26px;border-radius:4px;background:linear-gradient(180deg,#f4f8ff,#d9e6ff);box-shadow:inset 0 0 0 1px rgba(80,120,200,.25)}
 /* The dialogue box over the desktop view (work-task narration). */

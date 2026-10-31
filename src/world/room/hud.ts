@@ -15,7 +15,11 @@ import { renderDoorView } from "@world/delivery/view";
 import { cls, html, raw, type SafeHtml } from "@world/html";
 import { tr } from "@world/i18n";
 import { checklist, loopContext, type ChecklistView } from "@world/loop/checklist";
-import { isRaidNight } from "@state/nights";
+import { isRaidNight, raidNights, takeOf } from "@state/nights";
+import { knows } from "@state/recognise";
+
+/** The flag the hand sets when it takes the heartbeat (content/nights-takes.json `what: heartbeat`). */
+const HEARTBEAT_TAKEN: string | null = raidNights.map(takeOf).find((t) => t?.what === "heartbeat")?.flag ?? null;
 import { heldItem, heldLayer } from "./held";
 import { showing } from "@world/loop/dialogue";
 import { fillPlaceholders } from "@world/replies/placeholders";
@@ -47,12 +51,16 @@ export function renderChecklist(view: ChecklistView): SafeHtml {
 }
 
 function dayCorner(state: State, session: Session): SafeHtml {
-  const hr = state.day >= HEART_RATE_FROM_DAY ? html`<div class="hr"><i></i>${tr("hud.hr", { bpm: heartRate(state.san) })}</div>` : null;
+  // Once the hand has taken the heartbeat (night 9, nothing given): it still beats, no number.
+  const taken = HEARTBEAT_TAKEN !== null && state.flags.includes(HEARTBEAT_TAKEN);
+  const hr = state.day >= HEART_RATE_FROM_DAY ? html`<div class="hr"><i></i>${taken ? null : tr("hud.hr", { bpm: heartRate(state.san) })}</div>` : null;
   return html`<div class="day"><b>${tr("shell.day", { day: state.day })} · ${tr(beatLabelKey(session.clock.beat))}</b><span class="ov">${tr("hud.overdue", { n: state.overdueDays })}</span></div>${hr}`;
 }
 
-function deskBar(state: State, session: Session): SafeHtml {
+function deskBar(state: State, events: readonly GameEvent[], session: Session): SafeHtml {
   const held = heldItem(session);
+  // Not yet recognised: slightly desaturated, the only tell (recognise FR2).
+  const unknown = (id: string) => !knows(id, state, events) && "unknown";
   const total = Object.keys(FOUND_ON_DAY).length;
   const left = total - state.found.length;
   // Objects on the desk, in found order; what was handed to the hand is not on the desk. An
@@ -63,8 +71,8 @@ function deskBar(state: State, session: Session): SafeHtml {
     // slot is empty (`lifted`).
     .map((id) =>
       state.upgraded[id] === true
-        ? html`<button type="button" class="${cls("slot", "upgraded", held === id && "lifted")}" data-object="${id}" data-res="hi" data-action="loop-hold"><img src="/objects/${id}_front.png" alt=""><div class="screen-hi" data-screen="${id}"></div></button>`
-        : html`<button type="button" class="${cls("slot", held === id && "lifted")}" data-object="${id}" data-action="loop-hold"><img src="/objects/${id}_white.png" alt=""><div class="lcd" data-screen="${id}"></div></button>`,
+        ? html`<button type="button" class="${cls("slot", "upgraded", unknown(id), held === id && "lifted")}" data-object="${id}" data-res="hi" data-action="loop-hold"><img src="/objects/${id}_front.png" alt=""><div class="screen-hi" data-screen="${id}"></div></button>`
+        : html`<button type="button" class="${cls("slot", unknown(id), held === id && "lifted")}" data-object="${id}" data-action="loop-hold"><img src="/objects/${id}_white.png" alt=""><div class="lcd" data-screen="${id}"></div></button>`,
     );
   return html`<div class="bar"><button type="button" class="slot" data-action="loop-box">${left > 0 ? html`<div class="box"></div><span>${tr("hud.box.left", { n: left })}</span>` : html`<div class="box" style="opacity:.3"></div>`}</button><button type="button" class="${cls("slot", held === "phone" && "lifted")}" data-action="loop-phone"><div class="phone"></div><span>${tr("hud.phone")}</span></button><div class="slot"><div class="cup"></div></div>${objects}</div>`;
 }
@@ -159,7 +167,7 @@ export function renderRoom({ state, events, session }: RoomModel): SafeHtml {
   // The hand is here: the desk dims and the gap between the monitors glows (night-hand FR1; the
   // room scene will draw the gap itself).
   const raid = !door && raidShowing(state, session);
-  return html`<div class="${cls("stage", "room", door ? "door-view" : "no-shot", raid && "raid")}" data-day="${state.day}" data-view="${session.view}">${scene}${raid ? html`<div class="gap-glow"></div>` : null}${list}${dayCorner(state, session)}${deskBar(state, session)}${held}${dialogueBox(state, session)}${cams(session.view)}${menu(session)}</div>`;
+  return html`<div class="${cls("stage", "room", door ? "door-view" : "no-shot", raid && "raid")}" data-day="${state.day}" data-view="${session.view}">${scene}${raid ? html`<div class="gap-glow"></div>` : null}${list}${dayCorner(state, session)}${deskBar(state, events, session)}${held}${dialogueBox(state, session)}${cams(session.view)}${menu(session)}</div>`;
 }
 
 /** The raid is in the dialogue box: tonight's shutdown sequence on a raid night. */

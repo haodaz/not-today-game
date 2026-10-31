@@ -19,3 +19,6 @@ Data: `content/delivery.json` (phone, windows, door steps, shops, defaults, 18 d
 ## FR4. Tests
 - Snapshot the door beat at day 1, day 9 (bag moving), day 13 dinner (notice under the door), day 16 (closed).
 - Property: every day has exactly two meals; `arrives` null ⇒ `bag` null.
+
+## Amendment 2026-11-01 (author): eating happens on the desk
+Eating is a 桌子-level act: the bag lands on the desk corner; opening it puts the item's sprite (`shops[].items[].sprite`, `content/delivery.json`) on the desk in front of the keyboard; `eat` swaps it for `<sprite>_done` when one exists, otherwise removes it; the empty box stays until the next meal. Sprites are photoreal white-background cutouts in `public/food/` (new-world things look real; old objects stay watercolour). The cup on the desk bar is unrelated.

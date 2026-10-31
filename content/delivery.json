@@ -38,17 +38,20 @@
         {
           "id": "hmj",
           "name": "黄焖鸡米饭 · 微辣",
-          "price": 18
+          "price": 18,
+          "sprite": "food/hmj"
         },
         {
           "id": "hmj-no-cilantro",
           "name": "黄焖鸡米饭 · 不放香菜",
-          "price": 18
+          "price": 18,
+          "sprite": "food/hmj"
         },
         {
           "id": "soup",
           "name": "紫菜蛋花汤",
-          "price": 4
+          "price": 4,
+          "sprite": "food/soup"
         }
       ],
       "typo": "黄闷鸡米饭（东门店）"
@@ -61,17 +64,20 @@
         {
           "id": "wonton",
           "name": "扁肉",
-          "price": 10
+          "price": 10,
+          "sprite": "food/wonton"
         },
         {
           "id": "noodle",
           "name": "拌面",
-          "price": 8
+          "price": 8,
+          "sprite": "food/noodle"
         },
         {
           "id": "steamed",
           "name": "蒸饺",
-          "price": 12
+          "price": 12,
+          "sprite": "food/steamed"
         }
       ],
       "typo": "沙县小汽"
@@ -84,12 +90,14 @@
         {
           "id": "onigiri",
           "name": "饭团 · 金枪鱼",
-          "price": 6
+          "price": 6,
+          "sprite": "food/onigiri"
         },
         {
           "id": "oden",
           "name": "关东煮 · 四串",
-          "price": 12
+          "price": 12,
+          "sprite": "food/oden"
         },
         {
           "id": "battery",
@@ -100,12 +108,14 @@
               "bought_battery"
             ]
           },
-          "note": "待办「买电池」从这里完成。装上，小鸡白天还是坟，夜里照样叫。它要的不是电。"
+          "note": "待办「买电池」从这里完成。装上，小鸡白天还是坟，夜里照样叫。它要的不是电。",
+          "sprite": "food/battery"
         },
         {
           "id": "water",
           "name": "矿泉水",
-          "price": 2
+          "price": 2,
+          "sprite": "food/water"
         }
       ],
       "typo": "全家便利占"
@@ -118,12 +128,14 @@
         {
           "id": "latte",
           "name": "拿铁 · 热",
-          "price": 15
+          "price": 15,
+          "sprite": "food/latte"
         },
         {
           "id": "americano",
           "name": "美式 · 冰",
-          "price": 12
+          "price": 12,
+          "sprite": "food/americano"
         }
       ],
       "typo": "端幸"
@@ -140,7 +152,8 @@
         {
           "id": "mlt",
           "name": "麻辣烫 · 自选",
-          "price": 22
+          "price": 22,
+          "sprite": "food/mlt"
         }
       ],
       "typo": "麻辣汤（夜宵）"
@@ -514,5 +527,9 @@
   },
   "chosen": {
     "_note": "玩家点了别的店：到的就是那样东西，小票和袋子照当天的异常改（备注、收件人、错字照样出现在那家的小票上）；只有第 1 天的箱子和第 17 天的退回不受选择影响。"
+  },
+  "sprites": {
+    "_note": "桌子那一层的贴图：public/<sprite>.png 吃前，public/<sprite>_done.png 吃完（有的话）；袋子 public/food/bag.png。写实白底抠图（新世界的东西），和老物件的水彩分开。",
+    "bag": "food/bag"
   }
 }
