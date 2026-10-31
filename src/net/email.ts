@@ -1,7 +1,7 @@
 // 绑定邮箱 in the settings panel (backend FR1). The row's three states come from one pure function;
 // what is typed and the last send's result live here, so a re-render (the game's or the title's)
 // keeps them. Hidden offline or without env: the anonymous session is what the email binds to.
-import { net } from "./supabase";
+import { net, onAccountChange } from "./supabase";
 
 export type EmailStatus = "idle" | "sending" | "sent" | "error";
 
@@ -58,6 +58,9 @@ export async function sendEmailLink(origin: string, changed: () => void): Promis
   status = await net.bindEmail(email, origin);
   changed();
 }
+
+/** Re-render the row when the account changes (the link was opened): the controller and the title subscribe. */
+export const onEmailChange = onAccountChange;
 
 export function resetEmailForTests(): void {
   draft = "";

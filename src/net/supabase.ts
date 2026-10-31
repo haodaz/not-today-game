@@ -14,6 +14,11 @@ export interface SupabaseLike {
     updateUser(attrs: { email: string }, options?: { emailRedirectTo?: string }): Promise<{ data: unknown; error: unknown }>;
     /** A magic link when there is no session at all. */
     signInWithOtp(params: { email: string; options?: { emailRedirectTo?: string; shouldCreateUser?: boolean } }): Promise<{ data: unknown; error: unknown }>;
+    /**
+     * Auth events (supabase-js 2.x; also from other tabs): USER_UPDATED / SIGNED_IN once the link
+     * is opened, so the row can show "bound" at once.
+     */
+    onAuthStateChange?(cb: (event: string, session: { user: SessionUser } | null) => void): { data: { subscription: { unsubscribe(): void } } };
   };
   from(table: string): {
     upsert(row: Record<string, unknown>): Promise<{ error: unknown }>;
@@ -68,7 +73,35 @@ let boundEmail: string | null = null;
 /** Tests: a mocked client (or null for offline); undefined = the real one from the env. */
 let testClient: SupabaseLike | null | undefined;
 
+/** Who re-renders when the account changes (the bound email): the game's controller, the title. */
+const listeners = new Set<() => void>();
+let authSub: { unsubscribe(): void } | null = null;
+
+/** Called when what the game knows of the account changes; returns the unsubscribe. */
+export function onAccountChange(fn: () => void): () => void {
+  listeners.add(fn);
+  return () => void listeners.delete(fn);
+}
+
+function setBound(email: string | null): void {
+  if (email === boundEmail) return;
+  boundEmail = email;
+  for (const fn of [...listeners]) fn();
+}
+
+/** Listen to auth events once per client: opening the link (here or in another tab) binds the email. */
+function watchAuth(c: SupabaseLike): void {
+  if (authSub || !c.auth.onAuthStateChange) return;
+  authSub = c.auth.onAuthStateChange((_event, session) => {
+    const email = emailOf(session?.user);
+    // A signed-out or still-anonymous session does not unbind what was seen bound this session.
+    if (email) setBound(email);
+  }).data.subscription;
+}
+
 export function setSupabaseForTests(c: SupabaseLike | null | undefined): void {
+  authSub?.unsubscribe();
+  authSub = null;
   testClient = c;
   clientPromise = null;
   userId = null;
@@ -130,8 +163,9 @@ export const net = {
     try {
       const c = await client();
       if (!c) return false;
+      watchAuth(c);
       const existing = await c.auth.getSession();
-      boundEmail = emailOf(existing.data.session?.user);
+      setBound(emailOf(existing.data.session?.user));
       userId = existing.data.session?.user.id ?? (await c.auth.signInAnonymously()).data.user?.id ?? null;
       if (userId && names !== undefined) await c.from("profiles").upsert({ id: userId, names });
       return userId !== null;

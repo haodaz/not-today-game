@@ -15,7 +15,7 @@ import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import { mountDesktop, type ActionContext } from "@world/desktop/controller";
 import { initialSession } from "@world/desktop/model";
 import { endingNext, startEnding } from "@world/endings/flow";
-import { DARK_ASSETS, DARK_INNER, darkSprites, EYE_COUNT, renderPullOut, TENTACLE_COUNT } from "@world/endings/pullout";
+import { DARK_ASSETS, DARK_INNER, darkLayerFor, darkSprites, EYE_COUNT, GIANT_ASSETS, pullFrameVars, renderPullOut, TENTACLE_COUNT } from "@world/endings/pullout";
 import { createPullDriver } from "@world/endings/pullout-dom";
 import { renderEnding } from "@world/endings/view";
 import { BACKDROPS } from "@world/fit";
@@ -24,7 +24,7 @@ import { createMotion } from "@world/motion/dom";
 import { loopActions, loopKeys, renderGame } from "@world/room/game";
 import { createSplatLayer, type SplatHooks, type SplatScene } from "@world/room/splat/layer";
 import { clampPose, lookOf, POSES, WINDOW_CLAMP, type Pose } from "@world/room/splat/pose";
-import { DARK_MS, easeInCubic, PULL_CUT_MS, PULL_END, PULL_LOOK_AT, PULL_MS, pullFrom, pullMove, pullOutAt, ROOM_CENTRE } from "@world/room/splat/pullout";
+import { BREATH, DARK_MS, darkKindOf, easeInCubic, GIANT, GIANT_MARGIN, giantAt, HEADS_FROM_MS, islandHalfDiagonalAtEnd, PULL_CUT_MS, PULL_END, PULL_LOOK_AT, PULL_MS, pullFrom, pullMove, pullOutAt, ROOM_CENTRE } from "@world/room/splat/pullout";
 import { CALIBRATION } from "@world/room/splat/calibration";
 import { dayFiles } from "@state/days/table";
 
@@ -140,10 +140,9 @@ const goodLast = (): State => {
 };
 
 describe("the three ending cuts", () => {
-  it("good cuts at 2 s (the dark never shows), bad and survive hold the full 6 s", () => {
-    expect(PULL_CUT_MS).toEqual({ good: 2000, bad: PULL_MS, survive: PULL_MS });
-    expect(pullOutAt(PULL_CUT_MS.good, "desk").dark).toBe(0);
-    expect(pullOutAt(PULL_CUT_MS.bad, "desk").dark).toBe(1);
+  it("every ending holds the full 6 s (correction 2026-11-01: good too); then the card", () => {
+    expect(PULL_CUT_MS).toEqual({ good: PULL_MS, bad: PULL_MS, survive: PULL_MS });
+    for (const e of ["good", "bad", "survive"] as const) expect(pullOutAt(PULL_CUT_MS[e], "desk").dark).toBe(1);
   });
 
   it.each([
@@ -213,7 +212,7 @@ describe("the photo fallback (splat off): same timeline over black, same dark", 
       expect(v.dark).toBeCloseTo(f0.dark, 4);
     }
     expect(renderPullOut(model(0, "room")).value).toContain(`class="pull-island" style="background-image:url(${BACKDROPS.room})"`);
-    expect(renderPullOut(model(0)).value).toContain(`class="pull-dark" style="background-image:url(${DARK_ASSETS.tile})"`);
+    expect(renderPullOut(model(0)).value).toContain(`class="pull-dark field" style="background-image:url(${DARK_ASSETS.tile})"`);
   });
 
   it("the sprites: three eyes and the tentacles, dense at the edges, none near the room; out of sync", () => {
@@ -352,5 +351,107 @@ describe("in the game", () => {
     await frame();
     expect(root.querySelector(".splat-layer")).toBeNull();
     expect(root.classList.contains("splat-pull")).toBe(false);
+  });
+});
+
+// ——— correction 2026-11-01: the good ending sees Kuro itself ———
+
+describe("what appears in the black: the giant for good, the field for bad and survive", () => {
+  const model = (ending: "bad" | "survive" | "good", nowMs: number) => {
+    const session = initialSession(DEFAULT_CLOCK, "left", "desk");
+    session.pullOut = { ending, from: "desk", startMs: 0, cutMs: PULL_CUT_MS[ending] };
+    return { state: f(LAST), events: [], session, startDay: 1, nowMs };
+  };
+
+  it("good → giant; bad, survive → field (the model and the markup)", () => {
+    expect([darkKindOf("good"), darkKindOf("bad"), darkKindOf("survive")]).toEqual(["giant", "field", "field"]);
+    expect(darkLayerFor("good")).toEqual({ kind: "giant", src: GIANT_ASSETS.body });
+    expect(darkLayerFor("bad").kind).toBe("field");
+    const good = renderPullOut(model("good", 0)).value;
+    expect(good).toContain('data-dark="giant"');
+    expect(good).toContain(`<img class="giant-body" src="${GIANT_ASSETS.body}"`);
+    expect(good).toContain(`<img class="giant-heads" src="${GIANT_ASSETS.body}"`);
+    expect(good).not.toContain('class="eye"');
+    expect(good).not.toContain(DARK_ASSETS.tile);
+    for (const e of ["bad", "survive"] as const) {
+      const out = renderPullOut(model(e, 0)).value;
+      expect(out).toContain('data-dark="field"');
+      expect((out.match(/class="eye"/g) ?? []).length).toBe(EYE_COUNT);
+      expect(out).not.toContain("giant");
+    }
+  });
+
+  it("the ring's hole sits on the island's centre, and scales about it", () => {
+    const good = renderPullOut(model("good", 0)).value;
+    const left = Number(/class="giant-box" style="left:(-?[\d.]+)px;top:(-?[\d.]+)px/.exec(good)![1]);
+    const top = Number(/class="giant-box" style="left:(-?[\d.]+)px;top:(-?[\d.]+)px/.exec(good)![2]);
+    expect(left + GIANT.holeX).toBe(800);
+    expect(top + GIANT.holeY).toBe(450);
+    expect(good).toContain(`transform-origin:${GIANT.holeX}px ${GIANT.holeY}px`);
+  });
+
+  it("alpha and scale at 3 s, 4.5 s and 6 s: body 0 → ½ → 1, heads last (0 → 0 → 1), breathing on a fixed base", () => {
+    const at = (ms: number) => giantAt(ms, "desk");
+    const breath = (ms: number) => 1 + BREATH.amp * Math.sin((2 * Math.PI * ms) / BREATH.periodMs);
+    expect([at(3000).body, at(4500).body, at(6000).body]).toEqual([0, 0.5, 1]);
+    expect([at(3000).heads, at(4500).heads, at(6000).heads]).toEqual([0, 0, 1]);
+    expect(HEADS_FROM_MS).toBe(4500);
+    for (const ms of [3000, 4500, 6000]) {
+      expect(at(ms).base).toBe(at(0).base);
+      expect(at(ms).breath).toBeCloseTo(breath(ms), 12);
+      expect(at(ms).scale).toBeCloseTo(at(ms).base * breath(ms), 12);
+    }
+    // The base: the hole's radius is the island's half diagonal at 6 s plus the margin.
+    expect(GIANT.holeR * at(6000).base).toBeCloseTo(islandHalfDiagonalAtEnd("desk") * (1 + GIANT_MARGIN), 9);
+    // The page carries the same frame (and the driver writes the same vars).
+    expect(pullFrameVars(4500, "desk", "giant")).toEqual({
+      "--island": pullOutAt(4500, "desk").island.toFixed(4),
+      "--giant-scale": at(4500).scale.toFixed(4),
+      "--giant-body": "0.5000",
+      "--giant-heads": "0.0000",
+    });
+    expect(renderPullOut(model("good", 4500)).value).toContain(`--giant-scale:${at(4500).scale.toFixed(4)};--giant-body:0.5000;--giant-heads:0.0000`);
+  });
+
+  it("the breathing is bounded (±2 %, 8 s), and even breathing in the hole never closes on the room", () => {
+    expect(BREATH).toEqual({ amp: 0.02, periodMs: 8000 });
+    fc.assert(
+      fc.property(fc.integer({ min: 0, max: 60_000 }), fc.constantFrom("room", "desk"), (ms, from) => {
+        const g = giantAt(ms, from);
+        expect(g.breath).toBeGreaterThanOrEqual(1 - BREATH.amp);
+        expect(g.breath).toBeLessThanOrEqual(1 + BREATH.amp);
+        // The smallest the hole gets is still wider than the island's half diagonal at 6 s.
+        expect(GIANT.holeR * g.scale).toBeGreaterThan(islandHalfDiagonalAtEnd(from));
+      }),
+    );
+    expect(GIANT_MARGIN).toBeGreaterThan(BREATH.amp);
+  });
+
+  it("good does the full pull-out, then the credits", () => {
+    const { ctx, timers } = ctxAt(goodLast(), "good");
+    startEnding(ctx);
+    expect(ctx.session.pullOut?.cutMs).toBe(PULL_MS);
+    timers.shift()!.fn();
+    expect(ctx.session.endingPage?.phase).toBe("credits");
+  });
+
+  it("the driver writes the giant's vars every frame", () => {
+    const root = document.createElement("div");
+    document.body.appendChild(root);
+    const session = initialSession(DEFAULT_CLOCK, "left", "desk");
+    session.pullOut = { ending: "good", from: "desk", startMs: 0, cutMs: PULL_MS };
+    root.innerHTML = renderPullOut({ state: f(LAST), events: [], session, startDay: 1, nowMs: 0 }).value;
+    let now = 0;
+    const queue: (() => void)[] = [];
+    const driver = createPullDriver((fn) => (queue.push(fn), queue.length), () => {})(root, { session, now: () => now } as unknown as ActionContext);
+    driver.after();
+    now = 6000;
+    queue.shift()!();
+    const page = root.querySelector<HTMLElement>(".pullout-page")!;
+    expect(page.style.getPropertyValue("--giant-body")).toBe("1.0000");
+    expect(page.style.getPropertyValue("--giant-heads")).toBe("1.0000");
+    expect(page.style.getPropertyValue("--giant-scale")).toBe(giantAt(6000, "desk").scale.toFixed(4));
+    driver.destroy();
+    root.remove();
   });
 });

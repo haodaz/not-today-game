@@ -3,7 +3,7 @@
 // 2026-11-01). The view is pure (view.ts); this file owns timers and sound only.
 import { getLocale, setLocale } from "@world/i18n";
 import { applyFit, BACKDROPS } from "@world/fit";
-import { sendEmailLink, setEmailDraft } from "@net/email";
+import { onEmailChange, sendEmailLink, setEmailDraft } from "@net/email";
 import type { State } from "@state/types.gen";
 import type { Collection } from "@world/room/collection";
 import { arrived, canStart, diceOptions, initialTitle, QUESTIONS, rowsShown, toMenu, toNames, toQuestions, withAnswer, withPronoun, type TextQuestion, type TitleModel } from "./model";
@@ -254,11 +254,16 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
   root.addEventListener("input", onInput);
   win.addEventListener("keydown", onKey);
   win.addEventListener("resize", fit);
+  // 绑定邮箱: opening the link binds the email; the settings row shows it at once.
+  const unsubscribeEmail = onEmailChange(() => {
+    if (model.settingsOpen) render();
+  });
   render();
 
   return {
     model: () => model,
     destroy() {
+      unsubscribeEmail();
       timers.forEach((id) => win.clearTimeout(id));
       root.removeEventListener("click", onClick);
       root.removeEventListener("input", onInput);

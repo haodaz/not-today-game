@@ -2,7 +2,7 @@
 // with a mocked client, hidden when offline; in the game's panel and the title's. Strings are read
 // through t().
 import { afterEach, describe, expect, it } from "vitest";
-import { emailRow, emailRowModel, looksLikeEmail, resetEmailForTests, sendEmailLink, setEmailDraft } from "@net/email";
+import { emailRow, emailRowModel, looksLikeEmail, onEmailChange, resetEmailForTests, sendEmailLink, setEmailDraft } from "@net/email";
 import { net, setSupabaseForTests, type SupabaseLike } from "@net/supabase";
 import { escapeHtml } from "@world/html";
 import { setLocale, t } from "@world/i18n";
@@ -137,6 +137,40 @@ describe("the call, with a mocked client", () => {
     // Typing again clears the error.
     setEmailDraft("me@x.io");
     expect(emailRow()).toMatchObject({ status: "idle" });
+  });
+
+  it("the auth-event listener: opening the link (USER_UPDATED with the email) shows bound at once and re-renders", async () => {
+    const { c } = mockClient({ id: "anon-1", is_anonymous: true });
+    let emit: ((event: string, session: { user: { id: string; email?: string | null; is_anonymous?: boolean } } | null) => void) | null = null;
+    let subscriptions = 0;
+    let unsubscribed = 0;
+    c.auth.onAuthStateChange = (cb) => {
+      subscriptions++;
+      emit = cb;
+      return { data: { subscription: { unsubscribe: () => void unsubscribed++ } } };
+    };
+    setSupabaseForTests(c);
+    await net.signIn();
+    await net.signIn();
+    expect(subscriptions).toBe(1);
+    let renders = 0;
+    const stop = onEmailChange(() => void renders++);
+    // Still anonymous: nothing changes.
+    emit!("TOKEN_REFRESHED", { user: { id: "anon-1", is_anonymous: true } });
+    expect(emailRow().kind).toBe("input");
+    expect(renders).toBe(0);
+    // The link was opened: the same user id, now with an email.
+    emit!("USER_UPDATED", { user: { id: "anon-1", is_anonymous: false, email: "me@x.io" } });
+    expect(emailRow()).toEqual({ kind: "bound", email: "me@x.io" });
+    expect(renders).toBe(1);
+    // The same again: no second re-render. A sign-out does not unbind what was seen this session.
+    emit!("USER_UPDATED", { user: { id: "anon-1", is_anonymous: false, email: "me@x.io" } });
+    emit!("SIGNED_OUT", null);
+    expect(renders).toBe(1);
+    expect(emailRow().kind).toBe("bound");
+    stop();
+    setSupabaseForTests(undefined);
+    expect(unsubscribed).toBe(1);
   });
 
   it("a session that already has an email: bound, no input", async () => {

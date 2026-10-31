@@ -11,8 +11,8 @@ import { easeInOutCubic, lookOf, POSES, poseFromLook, type CameraMove, type Pose
 export const PULL_MS = 6_000;
 /** The dark fades in over the last 3 s. */
 export const DARK_MS = 3_000;
-/** Where each ending stops the pull-out. */
-export const PULL_CUT_MS: Readonly<Record<"bad" | "survive" | "good", number>> = { bad: PULL_MS, survive: PULL_MS, good: 2_000 };
+/** Where each ending stops the pull-out: every ending does the full 6 s (correction 2026-11-01: good too). */
+export const PULL_CUT_MS: Readonly<Record<"bad" | "survive" | "good", number>> = { bad: PULL_MS, survive: PULL_MS, good: PULL_MS };
 
 /** The far end (the author's "about (67, −29, −1)"). */
 export const PULL_END: Vec3 = { x: 67, y: -29, z: -1 };
@@ -76,4 +76,47 @@ export function pullOutAt(elapsed: number, from: PoseId): PullFrame {
 /** The framing the pull-out starts from: the view if it has a pose, else 房间 (门, 屏幕). */
 export function pullFrom(view: string): PoseId {
   return view === "desk" || view === "room" ? view : view === "desktop" ? "desk" : "room";
+}
+
+// ——— what appears in the black (correction 2026-11-01: the good ending sees Kuro itself) ———
+
+/** Bad and survive: the field of eyes and tentacles; good: the giant (public/room/dark/giant/body.png). */
+export type DarkKind = "field" | "giant";
+export const darkKindOf = (ending: "bad" | "survive" | "good"): DarkKind => (ending === "good" ? "giant" : "field");
+
+/**
+ * body.png (1280 × 1280), measured by eye on the image: the empty centre of the ring of arms and
+ * its radius, and where the heads end (the top part fades in last). Image px.
+ */
+export const GIANT = { size: 1280, holeX: 640, holeY: 790, holeR: 175, headsSplit: 0.42 } as const;
+/** The ring's hole is the island at 6 s plus this margin (and more than the breathing, so it never closes on the room). */
+export const GIANT_MARGIN = 0.25;
+/** The slow breathing: ±2 % over 8 s. */
+export const BREATH = { amp: 0.02, periodMs: 8_000 } as const;
+/** The heads come last: they fade in over the final 1.5 s. */
+export const HEADS_FROM_MS = PULL_MS - 1_500;
+
+export interface GiantFrame {
+  /** Scale before breathing: the hole's radius = the island's half diagonal at 6 s × (1 + margin). */
+  readonly base: number;
+  /** The breathing factor, within 1 ± BREATH.amp. */
+  readonly breath: number;
+  /** base × breath. */
+  readonly scale: number;
+  /** Arms and body (the part below the heads): the last 3 s. */
+  readonly body: number;
+  /** The heads: the last 1.5 s. */
+  readonly heads: number;
+}
+
+/** The island's half diagonal at 6 s, in stage px (the stage is 1600 × 900). */
+export const islandHalfDiagonalAtEnd = (from: PoseId): number => pullOutAt(PULL_MS, from).island * Math.hypot(800, 450);
+
+/** The giant at `elapsed` ms of the pull-out. Pure. */
+export function giantAt(elapsed: number, from: PoseId): GiantFrame {
+  const base = (islandHalfDiagonalAtEnd(from) * (1 + GIANT_MARGIN)) / GIANT.holeR;
+  const breath = 1 + BREATH.amp * Math.sin((2 * Math.PI * Math.max(0, elapsed)) / BREATH.periodMs);
+  const body = Math.min(1, Math.max(0, (elapsed - (PULL_MS - DARK_MS)) / DARK_MS));
+  const heads = Math.min(1, Math.max(0, (elapsed - HEADS_FROM_MS) / (PULL_MS - HEADS_FROM_MS)));
+  return { base, breath, scale: base * breath, body, heads };
 }

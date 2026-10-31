@@ -9,7 +9,7 @@ import { KuroBodyElement } from "./kuro/body";
 import { playSfx } from "@world/loop/sfx";
 import { MOTION } from "@world/motion/timing";
 import { applyFit, BACKDROPS } from "@world/fit";
-import { setEmailDraft } from "@net/email";
+import { onEmailChange, setEmailDraft } from "@net/email";
 import { buildShell, initialSession, type AppRenderers, type Session } from "./model";
 import { renderDesktop, APPS, type AppId } from "./shell";
 
@@ -211,6 +211,8 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   window.addEventListener("keydown", onKey);
   window.addEventListener("resize", fit);
   const unsubscribe = deps.store.subscribe(onStore);
+  // 绑定邮箱: the link was opened (here or in another tab): the settings row shows "bound".
+  const unsubscribeEmail = onEmailChange(rerender);
   deps.onChange?.(ctx);
   render();
 
@@ -218,6 +220,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     session,
     destroy() {
       unsubscribe();
+      unsubscribeEmail();
       motion?.destroy();
       splat?.destroy();
       pull?.destroy();

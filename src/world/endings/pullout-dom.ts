@@ -2,7 +2,8 @@
 // writes `--island` and `--dark` on the page from the pure timeline. Works with or without the
 // splat; the controller runs it after every render. No game state is touched.
 import type { ActionContext } from "@world/desktop/controller";
-import { pullOutAt } from "@world/room/splat/pullout";
+import { darkKindOf } from "@world/room/splat/pullout";
+import { pullFrameVars } from "./pullout";
 
 export function createPullDriver(raf?: (fn: () => void) => number, cancel?: (id: number) => void) {
   return (root: HTMLElement, ctx: ActionContext) => {
@@ -17,9 +18,8 @@ export function createPullDriver(raf?: (fn: () => void) => number, cancel?: (id:
       if (!p) return;
       const page = root.querySelector<HTMLElement>(":scope > .pullout-page");
       if (page) {
-        const f = pullOutAt(now() - p.startMs, p.from);
-        page.style.setProperty("--island", f.island.toFixed(4));
-        page.style.setProperty("--dark", f.dark.toFixed(4));
+        const vars = pullFrameVars(now() - p.startMs, p.from, darkKindOf(p.ending));
+        for (const [k, v] of Object.entries(vars)) page.style.setProperty(k, v);
       }
       frame = req(tick);
     };

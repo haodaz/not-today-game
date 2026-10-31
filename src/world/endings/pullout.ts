@@ -7,7 +7,8 @@
 // `--island` and `--dark` are written from `pullOutAt` here and every frame by the driver.
 import { BACKDROPS } from "@world/fit";
 import { html, type SafeHtml } from "@world/html";
-import { pullOutAt } from "@world/room/splat/pullout";
+import type { PoseId } from "@world/room/splat/pose";
+import { darkKindOf, GIANT, giantAt, pullOutAt, type DarkKind } from "@world/room/splat/pullout";
 import type { EndingModel } from "./view";
 
 export const DARK_ASSETS = {
@@ -77,17 +78,52 @@ export function darkSprites(seed = 18): DarkSprite[] {
 
 const SPRITES = darkSprites();
 
-/** The style vars for a frame (the driver writes the same two). */
-export function pullVars(island: number, dark: number): string {
-  return `--island:${island.toFixed(4)};--dark:${dark.toFixed(4)}`;
+/** The giant (correction 2026-11-01): one image, the room inside its ring of arms. */
+export const GIANT_ASSETS = { body: "/room/dark/giant/body.png" } as const;
+
+/** What the dark layer is for an ending: the field (bad, survive) or the giant (good). */
+export type DarkLayer =
+  | { readonly kind: "field"; readonly tile: string; readonly sprites: readonly DarkSprite[] }
+  | { readonly kind: "giant"; readonly src: string };
+
+export function darkLayerFor(ending: "bad" | "survive" | "good"): DarkLayer {
+  return darkKindOf(ending) === "giant" ? { kind: "giant", src: GIANT_ASSETS.body } : { kind: "field", tile: DARK_ASSETS.tile, sprites: SPRITES };
+}
+
+/**
+ * The style vars for one frame; the render writes them once and the driver every frame.
+ * Field: `--island`, `--dark`. Giant: `--island`, `--giant-scale`, `--giant-body`, `--giant-heads`.
+ */
+export function pullFrameVars(elapsed: number, from: PoseId, kind: DarkKind): Record<string, string> {
+  const f = pullOutAt(elapsed, from);
+  if (kind === "field") return { "--island": f.island.toFixed(4), "--dark": f.dark.toFixed(4) };
+  const g = giantAt(elapsed, from);
+  return { "--island": f.island.toFixed(4), "--giant-scale": g.scale.toFixed(4), "--giant-body": g.body.toFixed(4), "--giant-heads": g.heads.toFixed(4) };
+}
+
+const styleOf = (vars: Record<string, string>) =>
+  Object.entries(vars)
+    .map(([k, v]) => `${k}:${v}`)
+    .join(";");
+
+function darkHtml(layer: DarkLayer): SafeHtml {
+  if (layer.kind === "field") {
+    const sprites = layer.sprites.map(
+      (s) =>
+        html`<img class="${s.kind}" src="${s.src}" alt="" draggable="false" style="left:${s.x}px;top:${s.y}px;width:${s.w}px;--period:${s.period}ms;--phase:-${s.phase}ms">`,
+    );
+    return html`<div class="pull-dark field" style="background-image:url(${layer.tile})">${sprites}</div>`;
+  }
+  // The same image twice: the body and arms below the heads, then the heads (they come last).
+  // The box is the image's own size, placed so the ring's hole sits on the stage's centre; it
+  // scales (and breathes) about that hole.
+  const box = `left:${800 - GIANT.holeX}px;top:${450 - GIANT.holeY}px;width:${GIANT.size}px;height:${GIANT.size}px;transform-origin:${GIANT.holeX}px ${GIANT.holeY}px;--split:${(GIANT.headsSplit * 100).toFixed(1)}%`;
+  return html`<div class="pull-dark giant"><div class="giant-box" style="${box}"><img class="giant-body" src="${layer.src}" alt="" draggable="false"><img class="giant-heads" src="${layer.src}" alt="" draggable="false"></div></div>`;
 }
 
 export function renderPullOut(m: EndingModel): SafeHtml {
   const p = m.session.pullOut!;
-  const f = pullOutAt(m.nowMs - p.startMs, p.from);
-  const sprites = SPRITES.map(
-    (s) =>
-      html`<img class="${s.kind}" src="${s.src}" alt="" draggable="false" style="left:${s.x}px;top:${s.y}px;width:${s.w}px;--period:${s.period}ms;--phase:-${s.phase}ms">`,
-  );
-  return html`<div class="stage ending-page pullout-page" data-ending="${p.ending}" data-from="${p.from}" aria-hidden="true" style="${pullVars(f.island, f.dark)}"><div class="pull-island" style="background-image:url(${BACKDROPS[p.from as keyof typeof BACKDROPS] ?? BACKDROPS.room})"></div><div class="pull-dark" style="background-image:url(${DARK_ASSETS.tile})">${sprites}</div></div>`;
+  const layer = darkLayerFor(p.ending);
+  const vars = pullFrameVars(m.nowMs - p.startMs, p.from, layer.kind);
+  return html`<div class="stage ending-page pullout-page" data-ending="${p.ending}" data-from="${p.from}" data-dark="${layer.kind}" aria-hidden="true" style="${styleOf(vars)}"><div class="pull-island" style="background-image:url(${BACKDROPS[p.from as keyof typeof BACKDROPS] ?? BACKDROPS.room})"></div>${darkHtml(layer)}</div>`;
 }
