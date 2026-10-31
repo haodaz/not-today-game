@@ -25,9 +25,11 @@ src/state/
   clock.ts         Clock: cosmetic wall time only (injectable); never feeds day (changed 2026-10-30)
   events.ts        Event discriminated union + applyEvent reducer (left-fold step); lieDown does day += 1
   fday.ts          f(startDay): defaults with day = startDay; derive(): stage, overdueDays, loan repay from day
-  replay.ts        fold(events, base) = events.reduce(applyEvent, base)
+  replay.ts        step = derive ∘ applyEvent; fold(events, base) = events.reduce(step, base)
   store.ts         computeState(day, events); subscribe(); getState(); appendEvent()
-  saves.ts         nt_run + nt_profile: version, stepwise migrations, atomic write, isolation
+  slot.ts          generic versioned slot: tmp → verify → backup → promote, stepwise migrations
+  saves.ts         nt_run (save/load/clear) and a write-only nt_profile; isolation
+  profile-read.ts  the only profile reader; importable from src/ui/ alone (a test enforces it)
   index.ts         public API
   types.gen.ts     generated typed State interface (from variables.json) — not hand-written
 scripts/
@@ -43,11 +45,14 @@ engine constants; code reads them and never hardcodes their values.
 
 ```
 computeState(startDay, events):
-  base   = f(startDay)                             // defaults with day = startDay (1 in a normal run)
-  folded = fold(events, base)                      // left fold; lieDown does day += 1
-  state  = derive(folded)                          // from folded.day: stage, overdueDays, loan repayment
+  base  = f(startDay)                              // defaults with day = startDay, then derive()
+  state = events.reduce(step, base)                // step(s, e) = derive(applyEvent(s, e))
   return state
 ```
+
+`derive` runs after every event, not only at the end, so `stage`, `overdueDays` and the loan are
+never stale mid-fold (for example right after a `lieDown`). It is idempotent, so the result equals
+"fold, then derive once".
 
 This is the concrete meaning of `state = f(day) ⊕ replay(events)`. `day` is itself part of state:
 the `lieDown` reducer is the only thing that increments it, and `startDay` is 1 except for the
@@ -84,8 +89,8 @@ payloads this spec recognises are `"lend"` and `"no"`; other reply choices pass 
 - **Event** is a hardcoded discriminated union — the 12 kinds are defined by this spec, not by
   external data, so they live in `events.ts`. Payloads are minimal:
   - `reply` → `{ choice: string }`
-  - `openLayer` → `{ layerIndex: number }`
-  - `recognise`, `looked`, `handObject` → `{ objectId: string }`
+  - `openLayer`, `recognise`, `looked`, `handObject` → `{ objectId: string }` (`openLayer` adds to
+    `found`, `recognise` to `recognised`; ids are checked against the table's `of` lists)
   - `pressKey` → `{ key: string }`
   - `letItDo` → `{ taskId: string }`
   - `pokeReset`, `lieDown`, `sitUp`, `handLost`, `handNothing` → `{}`
@@ -128,8 +133,12 @@ the URL query. The store then builds `computeState(N, [])`. There is no demo mod
 
 Mechanics:
 
-- Atomic write: serialise to `nt_X.tmp`, then rename to `nt_X`. The previous good save is moved to
-  `nt_X.bak` before the rename, so a failed write leaves the last good save intact.
+- Atomic write: serialise to `nt_X.tmp`, read it back to confirm, copy the current `nt_X` to
+  `nt_X.bak` (only if it is itself a good save), then write `nt_X` and remove the temp. A failed
+  write leaves the last good save intact. On load, a corrupt `nt_X` falls back to `nt_X.bak`.
+- `clearRun()` removes `nt_run`, its `.bak` and its `.tmp`, so an old run cannot come back.
+- The profile is opaque JSON to this spec. `saves.ts` can only write it; reading goes through
+  `profile-read.ts`, which only the title page imports.
 - `version`: integer on every save. `migrations[]` is a stepwise list `N → N+1`. Load detects the
   stored version and runs forward one step at a time, never skipping.
 - A profile write never touches `nt_run`; a `clearRun()` never touches `nt_profile`.

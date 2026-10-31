@@ -1,0 +1,114 @@
+// The append-only event log's vocabulary and the reducer that folds one event onto state.
+// applyEvent is pure: it never mutates its input and never reads a clock. An event may read the
+// state produced by earlier events; the only time it sees is its own recorded `day`.
+import type { State } from "./types.gen";
+import { constants, membersOf } from "./variables";
+
+/** The two reply choices world-state reacts to. "no" is the chick's word (objectWords.chick). */
+export const LOAN_CHOICE_LEND = "lend";
+export const LOAN_CHOICE_REFUSE = "no";
+
+/** Every event carries the `day` counter value at the moment it was appended. */
+export type GameEvent =
+  | { kind: "openLayer"; day: number; objectId: string }
+  | { kind: "recognise"; day: number; objectId: string }
+  | { kind: "pressKey"; day: number; key: string }
+  | { kind: "reply"; day: number; choice: string }
+  | { kind: "letItDo"; day: number; taskId: string }
+  | { kind: "looked"; day: number; objectId: string }
+  | { kind: "pokeReset"; day: number }
+  | { kind: "lieDown"; day: number }
+  | { kind: "sitUp"; day: number }
+  | { kind: "handObject"; day: number; objectId: string }
+  | { kind: "handLost"; day: number }
+  | { kind: "handNothing"; day: number };
+
+export type EventKind = GameEvent["kind"];
+
+/** Exactly the twelve kinds. Nothing else may be appended. */
+export const eventKinds: readonly EventKind[] = [
+  "openLayer",
+  "recognise",
+  "pressKey",
+  "reply",
+  "letItDo",
+  "looked",
+  "pokeReset",
+  "lieDown",
+  "sitUp",
+  "handObject",
+  "handLost",
+  "handNothing",
+];
+
+/** An event as a caller builds it, before the store stamps the day. */
+export type EventDraft = GameEvent extends infer E
+  ? E extends GameEvent
+    ? Omit<E, "day">
+    : never
+  : never;
+
+/** Adds `objectId` to a set variable. Idempotent. Throws if the id is not in the table's list. */
+function withMember(state: State, key: "found" | "recognised", objectId: string): State {
+  if (!(membersOf(key) ?? []).includes(objectId)) {
+    throw new Error(`${key}: unknown object "${objectId}"`);
+  }
+  const current: readonly string[] = state[key];
+  if (current.includes(objectId)) return state;
+  return { ...state, [key]: [...current, objectId] } as State;
+}
+
+/**
+ * The loan is decided by the reply recorded on `constants.loanReplyDay`. The first such reply
+ * wins; later ones cannot change it. The repayment on `constants.repayDay` is not an event: it
+ * is a day-driven change made by `derive` (fday.ts).
+ */
+function applyLoanReply(state: State, event: Extract<GameEvent, { kind: "reply" }>): State {
+  if (event.day !== constants.loanReplyDay || state.loan !== "none") return state;
+  if (event.choice === LOAN_CHOICE_LEND) {
+    return { ...state, loan: "lent", balance: state.balance - constants.loanAmount };
+  }
+  if (event.choice === LOAN_CHOICE_REFUSE) return { ...state, loan: "refused" };
+  return state;
+}
+
+/**
+ * Folds one event onto state and returns the new state.
+ *
+ * Reducers defined by world-state: openLayer -> found, recognise -> recognised,
+ * pokeReset -> pokedReset, letItDo -> letItDoUnchecked, lieDown -> day + 1, and reply -> loan and
+ * balance (loan choices only). Every other kind is a documented no-op for now and every other
+ * field passes through untouched; their reducers belong to later specs (devices,
+ * san-and-endings, night-hand, chat).
+ */
+export function applyEvent(state: State, event: GameEvent): State {
+  switch (event.kind) {
+    case "openLayer":
+      return withMember(state, "found", event.objectId);
+    case "recognise":
+      return withMember(state, "recognised", event.objectId);
+    case "pokeReset":
+      // The reset hole is always pressable and never does anything else.
+      return state.pokedReset ? state : { ...state, pokedReset: true };
+    case "letItDo":
+      return { ...state, letItDoUnchecked: state.letItDoUnchecked + 1 };
+    case "lieDown":
+      // The only thing that moves the day counter.
+      return { ...state, day: state.day + 1 };
+    case "reply":
+      return applyLoanReply(state, event);
+    case "pressKey":
+    case "looked":
+    case "sitUp":
+    case "handObject":
+    case "handLost":
+    case "handNothing":
+      return state;
+    default: {
+      // Compile-time: adding a kind to GameEvent without handling it is a type error here.
+      // Run-time: a corrupt save with an unknown kind fails loudly instead of being skipped.
+      const unknownEvent: never = event;
+      throw new Error(`unknown event kind: ${JSON.stringify(unknownEvent)}`);
+    }
+  }
+}

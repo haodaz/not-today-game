@@ -16,6 +16,7 @@ export default defineConfig({
   test: {
     // world-state is pure logic; no DOM needed for these specs.
     environment: "node",
+    setupFiles: ["tests/setup.ts"],
     include: ["tests/**/*.{test,spec}.ts", "src/**/*.{test,spec}.ts"],
     passWithNoTests: true,
   },

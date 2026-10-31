@@ -37,37 +37,37 @@ dreamNights, nightBeat); all constants come from `content/variables.json` `const
 - [x] Property test: `stageOf(day)` is monotonic non-decreasing.
 
 ## 6. clock.ts
-- [ ] `Clock` interface (`now(): Date`), `realClock`, `fakeClock(iso)`. Cosmetic only; never feeds `day`.
-- [ ] `debugStartDay(search)`: parse `?day=N` from a URL query string, `null` when absent or invalid.
-- [ ] No demo mode, no `CLOCK_OVERRIDE`.
-- [ ] Tests: `fakeClock` is deterministic; `debugStartDay` accepts `?day=7`, rejects `?day=0`, `?day=abc`, and a missing param.
+- [x] `Clock` interface (`now(): Date`), `realClock`, `fakeClock(iso)`. Cosmetic only; never feeds `day`.
+- [x] `debugStartDay(search)`: parse `?day=N` from a URL query string, `null` when absent or invalid.
+- [x] No demo mode, no `CLOCK_OVERRIDE`.
+- [x] Tests: `fakeClock` is deterministic; `debugStartDay` accepts `?day=7`, rejects `?day=0`, `?day=abc`, and a missing param.
 
 ## 7. events.ts — union + applyEvent (non-loan)
-- [ ] Discriminated union for all 12 kinds with the payloads in design §4, plus a recorded `day`.
-- [ ] `applyEvent` for the reducers this spec defines: `openLayer`→`found`, `recognise`→`recognised`, `pokeReset`→`pokedReset`, `letItDo`→`letItDoUnchecked`, `lieDown`→`day += 1`.
-- [ ] Other kinds (`pressKey`, `looked`, `sitUp`, `handObject`, `handLost`, `handNothing`, and `reply` apart from the loan choices in task 8) are documented no-ops; every field not listed passes through untouched.
-- [ ] Tests: the five reducers mutate the expected field; no-op kinds leave state `deep-equal`; `day` changes only on `lieDown`.
-- [ ] Property test: `day === startDay + count(lieDown)` for any event list.
+- [x] Discriminated union for all 12 kinds with the payloads in design §4, plus a recorded `day`.
+- [x] `applyEvent` for the reducers this spec defines: `openLayer`→`found`, `recognise`→`recognised`, `pokeReset`→`pokedReset`, `letItDo`→`letItDoUnchecked`, `lieDown`→`day += 1`.
+- [x] Other kinds (`pressKey`, `looked`, `sitUp`, `handObject`, `handLost`, `handNothing`, and `reply` apart from the loan choices in task 8) are documented no-ops; every field not listed passes through untouched.
+- [x] Tests: the five reducers mutate the expected field; no-op kinds leave state `deep-equal`; `day` changes only on `lieDown`.
+- [x] Property test: `day === startDay + count(lieDown)` for any event list.
 
 ## 8. fday.ts + replay.ts + loan
-- [ ] `fday.ts`: `f(startDay)` = `defaults()` with `day = startDay`. `derive(state)` sets `stage = stageOf(day)` and `overdueDays = constants.overdueBase + day`, and applies the loan repayment.
-- [ ] Read `loanReplyDay`, `repayDay`, `loanAmount`, `overdueBase` from `constants`. Never write them as literals.
-- [ ] `replay.ts`: `fold(events, base) = events.reduce(applyEvent, base)`; a `reply` stamped `loanReplyDay` with `choice: "lend"` sets `loan = "lent"` and `balance -= loanAmount`; `"no"` sets `loan = "refused"`.
-- [ ] `derive`: if `loan === "lent"` and `day >= repayDay` → `loan = "repaid"`, restore `balance`.
-- [ ] Tests: none / lent / repaid / refused across `repayDay − 1` and `repayDay`; `balance` follows.
-- [ ] Property test: `overdueDays === constants.overdueBase + day` for days `1..constants.lastDay`.
+- [x] `fday.ts`: `f(startDay)` = `defaults()` with `day = startDay`. `derive(state)` sets `stage = stageOf(day)` and `overdueDays = constants.overdueBase + day`, and applies the loan repayment.
+- [x] Read `loanReplyDay`, `repayDay`, `loanAmount`, `overdueBase` from `constants`. Never write them as literals.
+- [x] `replay.ts`: `fold(events, base) = events.reduce(applyEvent, base)`; a `reply` stamped `loanReplyDay` with `choice: "lend"` sets `loan = "lent"` and `balance -= loanAmount`; `"no"` sets `loan = "refused"`.
+- [x] `derive`: if `loan === "lent"` and `day >= repayDay` → `loan = "repaid"`, restore `balance`.
+- [x] Tests: none / lent / repaid / refused across `repayDay − 1` and `repayDay`; `balance` follows.
+- [x] Property test: `overdueDays === constants.overdueBase + day` for days `1..constants.lastDay`.
 
 ## 9. store.ts — computeState + API
-- [ ] `computeState(startDay, events) = derive(fold(events, f(startDay)))`.
-- [ ] `getState()`, `subscribe(fn)`, `appendEvent(kind, payload)` (stamps the event with `state.day`).
-- [ ] Integration test: a 200-event log replayed twice is `deep-equal`.
-- [ ] Property test: replay is idempotent.
+- [x] `computeState(startDay, events) = fold(events, f(startDay))`, where `fold` derives after every event.
+- [x] `getState()`, `subscribe(fn)`, `appendEvent(draft)` (stamps the event with `state.day`; a rejected event commits nothing).
+- [x] Integration test: a 200-event log replayed twice is `deep-equal`.
+- [x] Property test: replay is idempotent.
 
 ## 10. saves.ts — two slots, versioning, isolation
-- [ ] `nt_run` (`{ version, startDay, day, events }`) + `nt_profile`; atomic write (`X.tmp` → rename; previous → `X.bak`).
-- [ ] Integer `version`; stepwise `migrations[]` (N → N+1, never skip); load runs forward; reject a run save whose `day` disagrees with `startDay` + `lieDown` count.
-- [ ] `clearRun()` deletes only `nt_run`; profile accessor is the only reader of `nt_profile`.
-- [ ] Tests: profile write leaves run save unchanged; `clearRun` leaves profile unchanged; one-step migration.
+- [x] `nt_run` (`{ version, startDay, day, events }`) + `nt_profile`; atomic write (`X.tmp` → rename; previous → `X.bak`).
+- [x] Integer `version`; stepwise `migrations[]` (N → N+1, never skip); load runs forward; reject a run save whose `day` disagrees with `startDay` + `lieDown` count.
+- [x] `clearRun()` deletes only `nt_run`; profile accessor is the only reader of `nt_profile`.
+- [x] Tests: profile write leaves run save unchanged; `clearRun` leaves profile unchanged; one-step migration.
 
 ## 11. Property tests — collect and close the gaps
 - [ ] Confirm each property from requirements §5 exists and passes: `stage(day)` monotonic, replay idempotent, `overdueDays` for `1..lastDay`, `day` counter.

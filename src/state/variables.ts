@@ -32,6 +32,11 @@ function entryOf(name: string): VariableEntry {
   return entry;
 }
 
+/** The allowed members of a `set`/`subset` variable (its `of` list), or undefined if it has none. */
+export function membersOf(name: string): readonly string[] | undefined {
+  return entryOf(name).of;
+}
+
 /** A fresh copy of every variable's default. Callers may mutate the result freely. */
 export function defaults(): Record<string, Json> {
   const out: Record<string, Json> = {};
