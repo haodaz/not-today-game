@@ -2,7 +2,7 @@
 // in choices (a beat's branches, or the loan prompt) or in an action (lying down after the night).
 // The box never makes text: every line is content.
 import type { BeatName, SayLine, Sequence } from "@state/days/table";
-import { condHolds } from "@state/replies/resolve";
+import { choiceOffered } from "@state/days/effects";
 import type { State } from "@state/types.gen";
 
 export type Ending =
@@ -52,7 +52,7 @@ export interface Showing {
 /** The two loan replies (world-state LOAN_CHOICE_*). "no" is the chick's word. */
 export const LOAN_OPTIONS: readonly ChoiceOption[] = [
   { index: 0, text: null, choice: "lend", labelKey: "loop.loan.lend" },
-  { index: 1, text: null, choice: "no", labelKey: "word.no" },
+  { index: 1, text: null, choice: "no", labelKey: "loop.loan.refuse" },
 ];
 
 function options(q: Queued, state: State): ChoiceOption[] | null {
@@ -60,7 +60,7 @@ function options(q: Queued, state: State): ChoiceOption[] | null {
   if (q.ending.kind !== "beatChoices") return null;
   return (q.sequence?.choices ?? [])
     .map((c, index) => ({ c, index }))
-    .filter(({ c }) => condHolds(c.cond_show, state))
+    .filter(({ c }) => choiceOffered(c, state))
     .map(({ c, index }) => ({ index, text: c.text }));
 }
 

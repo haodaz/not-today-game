@@ -4,7 +4,7 @@ import { withFlags } from "../flags";
 import type { State } from "../types.gen";
 import { membersOf } from "../variables";
 import { canOrder, itemOf } from "./shops";
-import { deliveryTable, MEALS, mealOf, type Meal } from "./table";
+import { deliveryTable, MEALS, mealOf, RETURN_FLAG, type Meal } from "./table";
 
 const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
 
@@ -35,7 +35,9 @@ export function applyPickup(state: State, event: { readonly day: number; readonl
   if (!isMeal(event.meal)) throw new Error(`pickup: unknown meal "${String(event.meal)}"`);
   const entry = mealOf(event.day, event.meal);
   if (!entry || entry.arrives === null) throw new Error(`pickup: nothing arrives on day ${event.day} ${event.meal}`);
-  return withFlags(state, entry.effects?.flags);
+  const next = withFlags(state, entry.effects?.flags);
+  // The returned-objects bag: everything handed to the hand comes back.
+  return entry.effects?.flags?.includes(RETURN_FLAG) && next.lost.length ? { ...next, lost: [] } : next;
 }
 
 /** Using a bought item on an object (the battery in the chick). Logged; changes nothing. */

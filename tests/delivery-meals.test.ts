@@ -113,13 +113,9 @@ describe("mealView", () => {
     expect(v.anomaly).toBe(mealOf(day, "lunch")!.anomaly);
   });
 
-  it("the returning bag holds everything handed over before, in night order (E3)", () => {
+  it("the returning bag holds everything handed over, in the order given (state `lost`)", () => {
     const [a, b] = membersOf("found")! as string[];
-    const state: State = {
-      ...f(returnMeal!.day),
-      found: [a, b] as State["found"],
-      raids: { 9: { taken: false, blockedWith: b! }, 3: { taken: false, blockedWith: a! } },
-    };
+    const state: State = { ...f(returnMeal!.day), found: [a, b] as State["found"], lost: [a!, b!] };
     const v = mealView(returnMeal!.day, returnMeal!.meal, state, [], "12:00")!;
     expect(v.extras.returned).toEqual([a, b]);
     expect(mealView(returnMeal!.day, returnMeal!.meal, f(returnMeal!.day), [], "12:00")!.extras.returned).toEqual([]);

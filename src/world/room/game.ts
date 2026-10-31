@@ -5,6 +5,7 @@ import { TASK_MODES, type TaskMode } from "@state/days/effects";
 import { dayFile } from "@state/days/table";
 import { deliveryTable, type Meal } from "@state/delivery/table";
 import type { Store } from "@state/store";
+import { currentOffer, FINAL } from "@state/upgrades";
 import { desktopApps } from "@world/desktop/apps";
 import { advanceTo } from "@world/desktop/beat";
 import { shellActions, type ActionContext, type ActionHandler } from "@world/desktop/controller";
@@ -18,14 +19,16 @@ import { getLocale, setLocale, tr } from "@world/i18n";
 import { actionOf, itemStates, loopContext, mealToOrder, openTask, type ItemAction } from "@world/loop/checklist";
 import { advance, finishChoice, push } from "@world/loop/dialogue";
 import { beatQueued } from "@world/loop/runtime";
-import { boxObjectFor, doorMeal, renderRoom } from "./hud";
+import { boxObjectFor, dialogueBox, doorMeal, renderRoom } from "./hud";
 
 export function renderGame(store: Store, session: Session, nowMs: number): SafeHtml {
   const state = store.getState();
   const events = store.getEvents();
   if (session.view === "desktop") {
     const shell = buildShell(state, events, session, desktopApps, nowMs, store.getStartDay());
-    return html`${renderDesktop(shell)}<button type="button" class="back-room" data-action="view" data-view="room">${tr("hud.cam.room")}</button>`;
+    // Work-task narration plays in the dialogue box over the desktop too.
+    const dlg = dialogueBox(state, session);
+    return html`${renderDesktop(shell)}<button type="button" class="back-room" data-action="view" data-view="room">${tr("desktop.back")}</button>${dlg ? html`<div class="dlg-layer">${dlg}</div>` : null}`;
   }
   return renderRoom({ state, events, session });
 }
@@ -182,7 +185,8 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.rerender();
   },
 
-  // 工作台 stand-in for the work tasks (design L2): the modes choose how, the ask box does it.
+  // 工作台 work tasks (content/tasks): the modes choose the path, the ask box plays it. The
+  // reducer applies the path's effects; the runtime queues its lines; the small window shows Kuro's.
   "wb-mode"(ctx, data) {
     const mode = MODE_BY_KEY[data.mode ?? ""];
     if (mode) ctx.session.wbMode = mode;
@@ -193,6 +197,20 @@ export const loopActions: Record<string, ActionHandler> = {
     const task = lc ? openTask(lc) : null;
     if (!task || task.done.kind !== "flag") return;
     ctx.store.appendEvent({ kind: "task", flag: task.done.flag, mode: ctx.session.wbMode });
+  },
+
+  // Kuro's upgrade offer (object-upgrade FR1). The final offer upgrades everything it covers.
+  "upgrade-yes"(ctx, data) {
+    const offer = currentOffer(ctx.store.getState(), ctx.store.getEvents());
+    if (!offer) return;
+    const objects = offer.kind === "final" ? offer.objects : [offer.object];
+    if (data.object !== (offer.kind === "final" ? FINAL : offer.object)) return;
+    for (const object of objects) ctx.store.appendEvent({ kind: "upgrade", object });
+  },
+  "upgrade-no"(ctx, data) {
+    const offer = currentOffer(ctx.store.getState(), ctx.store.getEvents());
+    if (!offer || data.decline !== offer.kind) return;
+    ctx.store.appendEvent({ kind: "declineUpgrade", object: offer.kind === "final" ? FINAL : offer.object, decline: offer.kind });
   },
 
   // Asking Kuro anything counts as talking with it today (the answers are the kuro-chat spec's).

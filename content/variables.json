@@ -296,5 +296,11 @@
       "calculator": false
     },
     "changedBy": "upgrade event (object-upgrade spec)"
+  },
+  "lost": {
+    "type": "set<string>",
+    "note": "Added by Kiro 2026-11-01 at the author's request (docs/kiro-log.md). What was handed to the hand at night (item_lost choices): \"loan\" or an object id, in the order given. Emptied when the day-17 returned-objects bag is taken in. raids is unchanged.",
+    "changedBy": "item_lost choices; the objects_returned pickup",
+    "default": []
   }
 }

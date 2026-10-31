@@ -55,6 +55,8 @@ export function objectWordState(word: string, state: State): ObjectWordState {
   const object = objectOfWord(word, state);
   if (object === undefined) return "notObjectWord";
   if (!(state.found as string[]).includes(object)) return "hidden";
+  // object-upgrade FR2: an upgraded object's lent word is removed from the menu.
+  if (state.upgraded[object] === true) return "hidden";
   return isHeld(object, state) ? "available" : "lost";
 }
 

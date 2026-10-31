@@ -2,6 +2,7 @@
 // fills the dialogue box, plays sounds, ticks self-ticking items, runs delivery waiting, and moves
 // the stand-in beat clock. Everything it adds to the log goes through store.appendEvent.
 import type { BeatName, Item, Sequence } from "@state/days/table";
+import { taskByFlag } from "@state/days/tasks";
 import type { Meal } from "@state/delivery/table";
 import type { GameEvent } from "@state/events";
 import { advanceTo, DEFAULT_CLOCK, type Beat, type BeatClock } from "@world/desktop/beat";
@@ -65,6 +66,13 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
       } else if (e.name === "beat:shutdown") {
         clock = at(clock, "night", BEAT_TIMES.night);
         if (file.beats.shutdown) dialogue = push(dialogue, beatQueued(day, "shutdown", file.beats.shutdown));
+      }
+    } else if (e.kind === "task" && e.mode !== "auto") {
+      // A work task played from the workbench: its start, then the chosen path (content/tasks).
+      const tree = taskByFlag(day, e.flag);
+      if (tree) {
+        const path = tree[e.mode];
+        dialogue = push(dialogue, { key: `d${day}:task:${tree.id}`, lines: [...tree.start.say, ...path.say], ending: { kind: "none" } });
       }
     } else if (e.kind === "openLayer" && file.beats.box) {
       dialogue = push(dialogue, beatQueued(day, "box", file.beats.box));
@@ -154,7 +162,7 @@ function scheduleSelf(ctx: ActionContext, lc: LoopContext): void {
     ctx.later(SELF_TICK_MS, () => {
       const s = ctx.store.getState();
       if (s.day !== day || s.flags.includes(flag)) return;
-      ctx.store.appendEvent({ kind: "task", flag, mode: "self" });
+      ctx.store.appendEvent({ kind: "task", flag, mode: "auto" });
     });
   }
 }

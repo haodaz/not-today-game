@@ -39,7 +39,7 @@ describe("applyReplyEvent", () => {
   });
 
   it("a lent word whose object was handed to the hand sends nothing", () => {
-    const lost = day5({ raids: { 4: { taken: false, blockedWith: chick } } });
+    const lost = day5({ lost: [chick] });
     expect(applyReplyEvent(lost, { day: 5, recipient: "group", choice: "no" })).toBe(lost);
   });
 

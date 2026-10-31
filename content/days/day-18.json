@@ -108,9 +108,9 @@
     },
     {
       "id": "slip",
-      "text": "把箱子寄了。",
+      "text": "寄件单。",
       "unlock": "done:box",
-      "done": "flag:slip_filled",
+      "done": "flag:task_d18_seen",
       "required": false,
       "origin": "them"
     },

@@ -2,7 +2,8 @@
 // applyEvent is pure: it never mutates its input and never reads a clock. An event may read the
 // state produced by earlier events; the only time it sees is its own recorded `day`.
 import type { State } from "./types.gen";
-import { applyChoose, applyStep, applyTask, type TaskMode } from "./days/effects";
+import { applyChoose, applyStep, applyTask, type TaskEventMode } from "./days/effects";
+import { applyDeclineUpgrade, applyUpgrade, type DeclineKind } from "./upgrades";
 import { applyOrder, applyPickup, applyUseItem } from "./delivery/effects";
 import type { Meal } from "./delivery/table";
 import { applyReplyEvent, knownRecipients } from "./replies/effects";
@@ -40,11 +41,14 @@ export type GameEvent =
   // day-loop spec (amendment 2026-11-01).
   | { kind: "step"; day: number; name: string; t: string }
   | { kind: "choose"; day: number; beat: string; index: number }
-  | { kind: "task"; day: number; flag: string; mode: TaskMode };
+  | { kind: "task"; day: number; flag: string; mode: TaskEventMode }
+  // object-upgrade spec (2026-11-01): accepting / declining Kuro's offer.
+  | { kind: "upgrade"; day: number; object: string }
+  | { kind: "declineUpgrade"; day: number; object: string; decline: DeclineKind };
 
 export type EventKind = GameEvent["kind"];
 
-/** Exactly these kinds (world-state 12, delivery 3, desktop-ui 1, day-loop 3). Nothing else may be appended. */
+/** Exactly these kinds (world-state 12, delivery 3, desktop-ui 1, day-loop 3, object-upgrade 2). Nothing else may be appended. */
 export const eventKinds: readonly EventKind[] = [
   "openLayer",
   "recognise",
@@ -65,6 +69,8 @@ export const eventKinds: readonly EventKind[] = [
   "step",
   "choose",
   "task",
+  "upgrade",
+  "declineUpgrade",
 ];
 
 const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
@@ -149,6 +155,10 @@ export function applyEvent(state: State, event: GameEvent): State {
       return applyChoose(state, event);
     case "task":
       return applyTask(state, event);
+    case "upgrade":
+      return applyUpgrade(state, event);
+    case "declineUpgrade":
+      return applyDeclineUpgrade(state, event);
     case "reply":
       if (event.t !== undefined && !HHMM.test(event.t)) throw new Error(`reply: time must be HH:MM, got "${event.t}"`);
       // A word sent in a conversation plays the reply tables; a recipient-less reply is a prompt

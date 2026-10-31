@@ -21,15 +21,21 @@ Everything the loop knows comes from the event log and `content/days/day-NN.json
   - `choose {beat, index}` records a dialogue choice. Its reducer applies the choice's
     `effects`: `flags`; `san`, clamped to the table range; and `item_dream` → `dream[object] =
     {until: day + constants.dreamDays}`, per the variable table ("hand object => 3 days").
-    `item_lost` is logged, not applied: no variable holds a lost non-object (`"loan"`); that is
-    the night-hand spec's.
-  - `task {flag, mode: self|look|let}` sets a work-task flag; `let` also counts toward
-    `letItDoUnchecked`.
-- **L2. Work tasks stand-in.** `content/tasks/` doesn't exist, so the `flag:task_*` items could
-  never be done. Until the task trees land:
-  - the 工作台 ask box completes the first open task item;
-  - the three modes map to `self`, `look` and `let`.
-  - Self-ticking items (`self: true`) append `task {mode: self}` about 4 s after they unlock.
+    `item_lost` (`"loan"` or an object id) is added to the `lost` set (variables.json, added
+    2026-10-31 at the author's request). The day-17 pickup whose flags include
+    `objects_returned` empties `lost`. Raids are unchanged.
+  - `task {flag, mode: self|look|let|auto}` plays the day's task tree (see L2).
+- **L2. Work tasks (task trees, replaces the stand-in).** `content/tasks/day-NN.json` is read by
+  `src/state/days/tasks.ts` (strict guard; every path's `effects.flags` must include the task's
+  `done` flag). `taskByFlag(day, flag)` links a checklist item to its task.
+  - The 工作台 ask box and the three modes append `task {flag, mode}` for the first open task.
+  - The reducer applies the chosen path's effects: flags, `san` (clamped), `letItDoUnchecked`.
+    `looked` is the event itself; nothing else stores it.
+  - The runtime queues `start.say` + `path.say` to the dialogue box (shown over the desktop
+    too). The path's `kuro` lines show in the small window, derived from today's log.
+  - `auto` (self-ticking items, ~4 s after unlock) and tasks without a tree set only the flag.
+  - Known gap: day 18's task (`task1` / `task_d18_1`) does not match its checklist item
+    (`slip` / `slip_filled`); waiting on content.
 - **L3. Condition tokens.**
   - Supported: `start`, `done:<id>`, `flag:<f>`, and the event tokens `event:boot`,
     `openApp:<app>`, `order:<meal>`, `delivery:arrives:<meal>`, `pickup:<meal>`, `eat:<meal>`,

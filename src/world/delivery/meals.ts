@@ -127,8 +127,8 @@ export function mealView(day: number, meal: Meal, state: State, events: readonly
     flags,
     extras: {
       box: flags.includes(BOX_FLAG),
-      // What the bag holds: everything that comes back once it is taken in (design E3).
-      returned: returnsObjects ? returnedObjects({ ...state, flags: [...new Set([...state.flags, RETURN_FLAG])] }) : [],
+      // What the bag holds: everything handed to the hand so far (state `lost`), until it is taken in.
+      returned: returnsObjects ? returnedObjects(state) : [],
     },
   };
 }

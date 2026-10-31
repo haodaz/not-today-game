@@ -138,19 +138,24 @@ export function parseToken(raw: string, where: string): Token {
   }
 }
 
-function line(v: unknown, w: string): SayLine {
-  if (!isRecord(v)) fail(w, "a line must be an object");
-  keys(v, ["k", "t", "sfx", "who"], w);
-  const k = v.k as LineKind;
-  if (!LINE_KINDS.includes(k)) fail(w, `unknown line kind "${String(v.k)}"`);
-  if (k === "speaker" && v.who === undefined) fail(w, "a speaker line needs `who`");
+/** Parses one dialogue line (shared with content/tasks). `onFail` names the file family. */
+export function parseLine(v: unknown, w: string, onFail: (where: string, problem: string) => never = fail): SayLine {
+  if (!isRecord(v)) onFail(w, "a line must be an object");
+  const r = v as Raw;
+  for (const k of Object.keys(r)) if (!["k", "t", "sfx", "who"].includes(k)) onFail(w, `unknown key "${k}"`);
+  const k = r.k as LineKind;
+  if (!LINE_KINDS.includes(k)) onFail(w, `unknown line kind "${String(r.k)}"`);
+  if (k === "speaker" && r.who === undefined) onFail(w, "a speaker line needs `who`");
+  const s = (x: unknown, where: string) => (typeof x === "string" && x !== "" ? x : onFail(where, "expected a non-empty string"));
   return {
     k,
-    t: str(v.t, `${w}.t`),
-    ...(v.sfx !== undefined ? { sfx: str(v.sfx, `${w}.sfx`) } : {}),
-    ...(v.who !== undefined ? { who: str(v.who, `${w}.who`) } : {}),
+    t: s(r.t, `${w}.t`),
+    ...(r.sfx !== undefined ? { sfx: s(r.sfx, `${w}.sfx`) } : {}),
+    ...(r.who !== undefined ? { who: s(r.who, `${w}.who`) } : {}),
   };
 }
+
+const line = (v: unknown, w: string): SayLine => parseLine(v, w);
 
 const objectIds = (): readonly string[] => membersOf("found") ?? [];
 
@@ -171,7 +176,12 @@ function effects(v: unknown, w: string): ChoiceEffects {
     if (!objectIds().includes(object)) fail(`${w}.item_dream`, `unknown object "${object}"`);
     out.item_dream = object;
   }
-  if (v.item_lost !== undefined) out.item_lost = str(v.item_lost, `${w}.item_lost`);
+  if (v.item_lost !== undefined) {
+    // Handed to the hand: the loan row, or one of the objects.
+    const lost = str(v.item_lost, `${w}.item_lost`);
+    if (lost !== "loan" && !objectIds().includes(lost)) fail(`${w}.item_lost`, `unknown thing "${lost}"`);
+    out.item_lost = lost;
+  }
   return out as ChoiceEffects;
 }
 

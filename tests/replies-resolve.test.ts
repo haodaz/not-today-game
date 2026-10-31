@@ -30,11 +30,8 @@ const withFound = (state: State, ...objects: string[]): State => ({
   found: [...new Set([...state.found, ...objects])] as State["found"],
 });
 
-/** The object held up to the hand on `night` (raids[night].blockedWith). */
-const handedOver = (state: State, object: string, night: number): State => ({
-  ...state,
-  raids: { ...state.raids, [night]: { taken: false, blockedWith: object } },
-});
+/** The object handed to the hand (state `lost`). */
+const handedOver = (state: State, object: string, _night: number): State => ({ ...state, lost: [...state.lost, object] });
 
 const usedWord = (state: State, word: string): State => {
   const object = objectFor(word);
@@ -211,7 +208,7 @@ describe("FR5 property: every menu word resolves to an entry or gone", () => {
           objectWords: Object.fromEntries(
             Object.entries(base.objectWords).map(([o, w]) => [o, { ...w, used: s.used.includes(o) }]),
           ),
-          raids: Object.fromEntries(s.handed.map((object, i) => [i + 1, { taken: false, blockedWith: object }])),
+          lost: [...s.handed],
         };
         for (const recipient of recipientsOn(day)) {
           for (const item of menu(day, recipient, state)) {

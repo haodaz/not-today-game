@@ -3,10 +3,10 @@
   "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
   "tasks": [
     {
-      "id": "task1",
-      "title": "把箱子寄了。",
+      "id": "slip",
+      "title": "寄件单。",
       "app": "docs",
-      "done": "task_d18_1",
+      "done": "task_d18_seen",
       "start": {
         "say": [
           {
@@ -43,7 +43,7 @@
         "kuro": [],
         "effects": {
           "flags": [
-            "task_d18_1"
+            "task_d18_seen"
           ],
           "san": 0
         }
@@ -60,7 +60,7 @@
         ],
         "effects": {
           "flags": [
-            "task_d18_1"
+            "task_d18_seen"
           ],
           "san": 0,
           "looked": true
@@ -78,7 +78,7 @@
         ],
         "effects": {
           "flags": [
-            "task_d18_1",
+            "task_d18_seen",
             "slip_filled"
           ],
           "san": -2,

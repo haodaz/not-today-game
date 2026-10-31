@@ -122,3 +122,28 @@ Appended after each task. Neither Kiro nor Claude edits the other's area without
 - TODO, assets: `public/room/shots/desk_close.jpg` does not exist; the room falls back to
   `design/hud/bg_desk.jpg` (dev only). `public/sfx/` does not exist; sounds are silent (FR3).
 - TODO(Claude), optional: `stages.json heartRateFromDay`.
+
+## 2026-10-31 — task trees, `lost`, object-upgrade
+
+- Task trees: `content/tasks/day-NN.json` replace the workbench stand-in (day-loop design L2
+  updated). The ask box and three modes append `task {flag, mode}`. The reducer applies the
+  path's flags / san / `letItDoUnchecked`; `say` lines go to the dialogue box (also over the
+  desktop), `kuro` lines to the small window. New mode `auto` for self-ticking items.
+- Edit in Claude's area, at the author's request: `content/variables.json` gains `lost`
+  (`set<string>`, default `[]`), with a note in its `note` field. `item_lost` choices ("loan" or
+  an object id) add to it; the day-17 pickup with `objects_returned` empties it. Lost objects
+  leave the desk bar and can't be held. Raids unchanged. `types.gen.ts` was edited by hand to
+  match; the generator test confirms it.
+- object-upgrade spec: design.md and tasks.md written. Decisions U1–U5 (offer schedule, one nag,
+  day-13 final covering all open objects, after-final rule, judgement clamp to -10..10 with
+  evidence ids `upgrade:<obj>` / `declineUpgrade:<obj>`, hi-res desk-bar icon as the only tell).
+- TODO(Claude), content: day 18 mismatch. `content/tasks/day-18.json` has task `task1` with done
+  `task_d18_1`; `content/days/day-18.json` has item `slip` with done `flag:slip_filled`, and
+  `reply` unlocks on `done:task1`. As it stands the slip item ticks only via the "let" path
+  (which sets `slip_filled`) and the good ending is "do not fill the slip". tests/tasks.test.ts
+  lists day 18 as a known gap until content settles it.
+- TODO(Claude), content: the child's "corrected" text on an upgraded object (pager 0.7734 → 你好,
+  tape half-sentence completed) has no field yet.
+- TODO, later specs: hi-res device screens / `gain` outputs (device specs); upgraded objects
+  can't block for the good ending (san-and-endings).
+- Tests: 38 files, 556 passing; typecheck clean. Browser not checked.

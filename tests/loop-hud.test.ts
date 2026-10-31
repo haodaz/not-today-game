@@ -180,7 +180,7 @@ describe("runtime (design L5/L6)", () => {
     syncLoop(ctx, 0);
     const tick = timers.find((x) => x.ms === SELF_TICK_MS)!;
     tick.fn();
-    expect(store.getEvents().at(-1)).toMatchObject({ kind: "task", mode: "self" });
+    expect(store.getEvents().at(-1)).toMatchObject({ kind: "task", mode: "auto" });
   });
 
   it("lying down plays the night first, then appends lieDown; the next day starts in the room", () => {

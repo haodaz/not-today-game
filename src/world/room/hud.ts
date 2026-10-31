@@ -53,13 +53,19 @@ function dayCorner(state: State, session: Session): SafeHtml {
 function deskBar(state: State): SafeHtml {
   const total = Object.keys(FOUND_ON_DAY).length;
   const left = total - state.found.length;
-  const objects = state.found.map(
-    (id) => html`<div class="slot" data-object="${id}"><img src="/objects/${id}_white.png" alt=""><div class="lcd" data-screen="${id}"></div></div>`,
-  );
+  // Objects on the desk, in found order; what was handed to the hand is not on the desk. An
+  // upgraded object's icon is the hi-res one: the only visible tell (object-upgrade FR2).
+  const objects = state.found
+    .filter((id) => !state.lost.includes(id))
+    .map((id) =>
+      state.upgraded[id] === true
+        ? html`<div class="slot upgraded" data-object="${id}" data-res="hi"><img src="/objects/${id}_front.png" alt=""><div class="screen-hi" data-screen="${id}"></div></div>`
+        : html`<div class="slot" data-object="${id}"><img src="/objects/${id}_white.png" alt=""><div class="lcd" data-screen="${id}"></div></div>`,
+    );
   return html`<div class="bar"><button type="button" class="slot" data-action="loop-box">${left > 0 ? html`<div class="box"></div><span>${tr("hud.box.left", { n: left })}</span>` : html`<div class="box" style="opacity:.3"></div>`}</button><button type="button" class="slot" data-action="loop-phone"><div class="phone"></div><span>${tr("hud.phone")}</span></button><div class="slot"><div class="cup"></div></div>${objects}</div>`;
 }
 
-function dialogueBox(state: State, session: Session): SafeHtml | null {
+export function dialogueBox(state: State, session: Session): SafeHtml | null {
   const show = showing(session.dialogue, state);
   if (!show) return null;
   const fill = (s: string) => fillPlaceholders(s, state.names);
