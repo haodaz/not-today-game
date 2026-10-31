@@ -35,12 +35,22 @@
     {
       "h": "老周",
       "sec": "",
-      "when": "今天"
+      "when": "今天",
+      "kuroCloses": true,
+      "kuroClosesLine": {
+        "zh": "这个不用看。",
+        "en": "You don’t need this one."
+      }
     },
     {
       "h": "多少",
       "sec": "",
-      "when": "今天"
+      "when": "今天",
+      "kuroCloses": true,
+      "kuroClosesLine": {
+        "zh": "这个不用看。",
+        "en": "You don’t need this one."
+      }
     },
     {
       "h": "",

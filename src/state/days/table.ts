@@ -3,6 +3,7 @@
 // Read, checked strictly, frozen; no string is rewritten. Condition tokens are parsed here so a
 // token the engine does not understand fails at import, not at play.
 import { constants, membersOf } from "../variables";
+import { parseKuroCloses, type KuroCloses } from "../closes";
 
 export const LINE_KINDS = ["narration", "inner", "sfx", "speaker"] as const;
 export type LineKind = (typeof LINE_KINDS)[number];
@@ -73,6 +74,9 @@ export interface Item {
   readonly locked?: "requiredPending";
   readonly onUnlock?: Sequence;
   readonly onDone?: Sequence;
+  /** late-days FR4: Kuro closes this item's document (工作台 文档) when it is opened. */
+  readonly kuroCloses?: true;
+  readonly kuroClosesLine?: KuroCloses["kuroClosesLine"];
 }
 
 export interface DayFile {
@@ -214,7 +218,9 @@ function sequence(v: unknown, w: string, allowChoices: boolean): Sequence {
 
 function item(v: unknown, w: string): Item {
   if (!isRecord(v)) fail(w, "an item must be an object");
-  keys(v, ["id", "text", "unlock", "done", "required", "rewrite", "sfx", "self", "origin", "locked", "onUnlock", "onDone"], w);
+  keys(v, ["id", "text", "unlock", "done", "required", "rewrite", "sfx", "self", "origin", "locked", "onUnlock", "onDone", "kuroCloses", "kuroClosesLine"], w);
+  // late-days FR4: Kuro may close this item's document when it is opened.
+  const closes = parseKuroCloses(v, (field, problem) => fail(`${w}.${field}`, problem));
   if (typeof v.required !== "boolean") fail(`${w}.required`, "must be true or false");
   if (v.origin !== undefined && v.origin !== "them") fail(`${w}.origin`, `must be "them"`);
   if (v.locked !== undefined && v.locked !== "requiredPending") fail(`${w}.locked`, `must be "requiredPending"`);
@@ -236,6 +242,7 @@ function item(v: unknown, w: string): Item {
     ...(v.locked === "requiredPending" ? { locked: "requiredPending" as const } : {}),
     ...(v.onUnlock !== undefined ? { onUnlock: sequence(v.onUnlock, `${w}.onUnlock`, false) } : {}),
     ...(v.onDone !== undefined ? { onDone: sequence(v.onDone, `${w}.onDone`, false) } : {}),
+    ...(closes ?? {}),
   };
 }
 

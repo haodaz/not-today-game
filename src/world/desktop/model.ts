@@ -12,6 +12,7 @@ import { booted, loopContext, openItemFor } from "@world/loop/checklist";
 import type { Reveal } from "@world/motion/reveal";
 import type { LogEntry } from "@world/dialogue/history";
 import type { PointerId } from "@world/room/pointer";
+import type { KuroCloser } from "@world/late/closer";
 import { EMPTY_COLLECTION, type Collection } from "@world/room/collection";
 import { isNight, type BeatClock } from "./beat";
 import { browserPage, weatherKind } from "./browser/data";
@@ -72,6 +73,11 @@ export interface Session {
   historyOpen: boolean;
   /** One-time pointers already clicked this run (room/pointer.ts; session, not events). */
   pointed: Set<PointerId>;
+  /** The browser reading page open in the browser window (its index in today's list), or null. */
+  browserRead: number | null;
+  /** Kuro coming to close a page (late-days FR4), and its key counter. */
+  kuroCloser: KuroCloser | null;
+  closerSeq: number;
   /** What finished runs left on the desk (title-page FR4/FR8): set by the host from the profile; presentation only. */
   collection: Collection;
   /** The gamebook reader is open (title-page FR4). */
@@ -122,6 +128,9 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     dlgLog: [],
     historyOpen: false,
     pointed: new Set(),
+    browserRead: null,
+    kuroCloser: null,
+    closerSeq: 0,
     endingPage: null,
     collection: EMPTY_COLLECTION,
     bookOpen: false,

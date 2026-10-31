@@ -9,7 +9,9 @@ import { t, tr } from "@world/i18n";
 import { kuroInBox } from "@world/loop/dialogue";
 import type { AppContext } from "../model";
 import { pointerCls } from "@world/room/pointer";
-import { bodyState, frameUrl, FRAMES, type BodyState } from "./body";
+import { bodyState, frameUrl, FRAMES, type BodyState, type MawLook } from "./body";
+import { lateRing } from "@world/late/rings";
+import { closerOut } from "@world/late/closer";
 import { kuroDay } from "./days";
 
 /** Today's work-task lines, in the order the tasks were done. */
@@ -42,12 +44,30 @@ export function lastKuroLine(ctx: AppContext): string | null {
 export function renderKuro(ctx: AppContext): SafeHtml {
   const line = lastKuroLine(ctx);
   const status = ctx.night ? html`<span class="dotl" aria-hidden="true"></span>` : html`<span class="on">${tr("shell.kuro.online")}</span>`;
-  return html`<button type="button" class="${cls("kpill", ctx.night && "blink")}" data-action="kuro-call" aria-label="${t("kuro.name")}"><img src="${frameUrl(FRAMES.idle[0])}" alt=""><span class="ln">${line ?? ""}</span>${status}<span class="turns">${tr("kuro.turns", { n: ctx.state.chatTurnsToday })}</span></button>`;
+  return html`<button type="button" class="${cls("kpill", ctx.night && "blink")}" data-action="kuro-call" aria-label="${t("kuro.name")}"><img src="${frameUrl(FRAMES.idle[0], lateRing(ctx.state.day))}" alt=""><span class="ln">${line ?? ""}</span>${status}<span class="turns">${tr("kuro.turns", { n: ctx.state.chatTurnsToday })}</span></button>`;
 }
 
-/** The body's state now (desktop-ui FR5): rest > busy > happy > crawl > think > idle. */
+/**
+ * The maw look now, late ring only (late-days FR3): the flash while it closes a page; the
+ * tentacle on the last night; the rings after the player held up nothing to the hand tonight.
+ */
+export function kuroMaw(ctx: Pick<AppContext, "state" | "session" | "night">): MawLook | null {
+  const { state, session } = ctx;
+  if (!lateRing(state.day)) return null;
+  if (session.kuroCloser?.phase === "maw") return "maw";
+  if (!ctx.night) return null;
+  if (state.day === constants.lastDay) return "maw3";
+  const raid = state.raids[String(state.day)];
+  return raid && raid.blockedWith === null && raid.gave === null ? "maw2" : null;
+}
+
+/** Red eyes from the late ring (late-days FR2): the slot attribute the body element reads. */
+export const redAttr = (day: number): SafeHtml | null => (lateRing(day) ? html` data-red="1"` : null);
+
+/** The body's state now (desktop-ui FR5): maw > rest > busy > happy > crawl > think > idle. */
 export function kuroBodyState(ctx: AppContext): BodyState {
   return bodyState({
+    maw: kuroMaw(ctx),
     night: ctx.night,
     taskRunning: false, // no running task state yet
     saidPretty: false, // the chat beat is the kuro-chat spec's
@@ -70,9 +90,10 @@ export function kuroUnread(ctx: AppContext): boolean {
 export function hudKuro(ctx: AppContext): SafeHtml {
   // While it speaks in the box it stands there (its portrait); the corner is empty. There is
   // always exactly one body slot on the page.
-  if (kuroInBox(ctx.session.dialogue)) return html`<div class="hud-kuro away"></div>`;
+  // Likewise while it crawls to a page's close control to shut it (late-days FR4).
+  if (kuroInBox(ctx.session.dialogue) || closerOut(ctx.session)) return html`<div class="hud-kuro away"></div>`;
   const unread = kuroUnread(ctx);
   // The first upgrade offer has no checklist line: a one-time pointer on the body (rule 2026-11-01).
   const offer = pointerCls(ctx.session, "offer", !ctx.night && currentOffer(ctx.state, ctx.events) !== null);
-  return html`<div class="hud-kuro"><button type="button" class="${cls("kuro-btn", unread && "unread", offer)}" data-action="kuro-call" aria-label="${t("kuro.name")}"><span class="kpet" data-kuro-slot data-state="${kuroBodyState(ctx)}" aria-hidden="true"></span>${unread ? html`<i class="dot"></i>` : null}</button></div>`;
+  return html`<div class="hud-kuro"><button type="button" class="${cls("kuro-btn", unread && "unread", offer)}" data-action="kuro-call" aria-label="${t("kuro.name")}"><span class="kpet" data-kuro-slot data-state="${kuroBodyState(ctx)}"${redAttr(ctx.state.day)} aria-hidden="true"></span>${unread ? html`<i class="dot"></i>` : null}</button></div>`;
 }

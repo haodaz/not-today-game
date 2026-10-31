@@ -19,6 +19,7 @@ import { fillPlaceholders } from "@world/replies/placeholders";
 import { historyEntries, renderHistory } from "./history";
 import { playerBox, type PlayerBoxModel } from "./kuro";
 import { pointerCls } from "@world/room/pointer";
+import { lateRing } from "@world/late/rings";
 import { choiceScreens, fontPx, KURO_LINE_BOX, LINE_BOX, marker, screens, type BoxGeom, type Screen } from "./layout";
 
 /** Kuro's lines are laid out left of its portrait. */
@@ -64,6 +65,8 @@ export interface LineBoxModel {
   readonly portrait: BodyState | null;
   /** The one-time pointer on these choices (the first night's hand), or none. */
   readonly pointer: string | false;
+  /** Red eyes on the portrait (late-days FR2). */
+  readonly red: boolean;
 }
 
 /**
@@ -114,6 +117,7 @@ export function lineBoxModel(state: State, events: readonly GameEvent[], session
     portrait: head.voice === "kuro" ? portraitState(state, events, session, nowMs) : null,
     // The first night's hand has no checklist line: a one-time pointer on its choices.
     pointer: pointerCls(session, "raid", scr.choices.length > 0 && raidShowing(state, session)),
+    red: lateRing(state.day),
   };
 }
 
@@ -129,8 +133,8 @@ function tagOf(tag: BoxTag): SafeHtml | null {
  * page's only `data-kuro-slot`; the HUD body is away while Kuro is in the box), so it has the same
  * frames and crossfade as the HUD body.
  */
-const portraitOf = (state: BodyState): SafeHtml =>
-  html`<span class="kpet kuro-portrait" data-kuro-slot data-state="${state}" aria-hidden="true"></span>`;
+const portraitOf = (state: BodyState, red: boolean): SafeHtml =>
+  html`<span class="kpet kuro-portrait" data-kuro-slot data-state="${state}"${red ? html` data-red="1"` : null} aria-hidden="true"></span>`;
 
 const historyChip = (): SafeHtml => html`<button type="button" class="hist" data-action="dlg-history" aria-haspopup="dialog" aria-label="${t("dialogue.history")}">↺</button>`;
 
@@ -149,7 +153,7 @@ export function renderLineBox(m: LineBoxModel): SafeHtml {
   // A tag on the top edge pushes the text down below it (`tagged`).
   const tag = tagOf(m.tag);
   const c = cls("dlg", m.kind !== "line" && m.kind, tag && "tagged", m.tag?.kind === "kuro" && "kuro", m.choices.length > 0 && "has-choices", m.raised && "raised");
-  return html`<div class="${c}" data-screen="${m.screen + 1}/${m.count}">${tag}${historyChip()}${txt}${m.choices.length ? html`<div class="${cls("choices", m.pointer)}">${buttons}</div>` : null}${mk}${m.portrait ? portraitOf(m.portrait) : null}</div>`;
+  return html`<div class="${c}" data-screen="${m.screen + 1}/${m.count}">${tag}${historyChip()}${txt}${m.choices.length ? html`<div class="${cls("choices", m.pointer)}">${buttons}</div>` : null}${mk}${m.portrait ? portraitOf(m.portrait, m.red) : null}</div>`;
 }
 
 /** The player's box: the starter questions as choices, or one text input (Enter sends). */

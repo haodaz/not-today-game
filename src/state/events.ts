@@ -10,6 +10,7 @@ import { applyEnding, type Ending } from "./endings";
 import { applyRecognise } from "./recognise";
 import { applyReplyEvent, knownRecipients } from "./replies/effects";
 import { constants, membersOf } from "./variables";
+import { PAGE_ID } from "./closes";
 
 /** The two reply choices world-state reacts to. "no" is the chick's word (objectWords.chick). */
 export const LOAN_CHOICE_LEND = "lend";
@@ -56,11 +57,13 @@ export type GameEvent =
   // title-page spec: the answers to the title's questions, the run's first event (title page only).
   | { kind: "names"; day: number; names: State["names"] }
   // dialogue spec: one chat turn with Kuro (a starter question's number, or typed text).
-  | { kind: "chat"; day: number; q?: number; text?: string };
+  | { kind: "chat"; day: number; q?: number; text?: string }
+  // late-days FR4: Kuro closed a page or document the player had opened.
+  | { kind: "kuroClosed"; day: number; pageId: string };
 
 export type EventKind = GameEvent["kind"];
 
-/** Exactly these kinds (world-state 12, delivery 3, desktop-ui 1, day-loop 3, object-upgrade 2, san-and-endings 1, title-page 1, dialogue 1). Nothing else may be appended. */
+/** Exactly these kinds (world-state 12, delivery 3, desktop-ui 1, day-loop 3, object-upgrade 2, san-and-endings 1, title-page 1, dialogue 1, late-days 1). Nothing else may be appended. */
 export const eventKinds: readonly EventKind[] = [
   "openLayer",
   "recognise",
@@ -86,7 +89,21 @@ export const eventKinds: readonly EventKind[] = [
   "ending",
   "names",
   "chat",
+  "kuroClosed",
 ];
+
+/**
+ * Kuro closed a page the player opened (late-days FR4). `pageId` is `d<day>:reading:<index>`
+ * (0-based into that day's browser `reading` list) or `d<day>:item:<itemId>` (a day item's
+ * 工作台 document); its day is the event's day. Nothing changes: nothing is lost, only closed.
+ * The log keeps it so the judgement can cite it.
+ */
+function applyKuroClosed(state: State, event: Extract<GameEvent, { kind: "kuroClosed" }>): State {
+  const m = typeof event.pageId === "string" ? PAGE_ID.exec(event.pageId) : null;
+  if (!m) throw new Error(`kuroClosed: pageId must look like d16:reading:1 or d16:item:<id>, got ${JSON.stringify(event.pageId)}`);
+  if (Number(m[1]) !== event.day) throw new Error(`kuroClosed: ${event.pageId} is not a page of day ${event.day}`);
+  return state;
+}
 
 /** A typed chat turn's length limit (dialogue spec). */
 export const CHAT_TEXT_MAX = 500;
@@ -204,6 +221,8 @@ export function applyEvent(state: State, event: GameEvent): State {
       return { ...state, day: state.day + 1, chatTurnsToday: 0 };
     case "chat":
       return applyChat(state, event);
+    case "kuroClosed":
+      return applyKuroClosed(state, event);
     case "open":
       return applyOpen(state, event);
     case "step":

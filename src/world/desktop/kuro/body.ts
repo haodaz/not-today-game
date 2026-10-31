@@ -5,10 +5,17 @@ import { html, type SafeHtml } from "@world/html";
 import { MOTION } from "@world/motion/timing";
 
 export const BODY_STATES = ["idle", "busy", "think", "happy", "rest", "crawl"] as const;
-export type BodyState = (typeof BODY_STATES)[number];
+/**
+ * The maw (late-days FR3): three single frames, each its own look, cut (never crossfaded):
+ * `maw` one ring of teeth (the flash when it closes a page), `maw2` rings into the throat (a late
+ * night after the player held up nothing), `maw3` the tentacle (the last night only).
+ */
+export const MAW_LOOKS = ["maw", "maw2", "maw3"] as const;
+export type MawLook = (typeof MAW_LOOKS)[number];
+export type BodyState = (typeof BODY_STATES)[number] | MawLook;
 
 /** Two aligned frames per state (public/kuro/). */
-export const FRAMES: Readonly<Record<BodyState, readonly [string, string]>> = {
+export const FRAMES: Readonly<Record<(typeof BODY_STATES)[number], readonly [string, string]>> = {
   idle: ["k3d_base", "k3d_idle2"],
   busy: ["k3d_busy", "k3d_busy2"],
   think: ["k3d_think", "k3d_think2"],
@@ -17,12 +24,20 @@ export const FRAMES: Readonly<Record<BodyState, readonly [string, string]>> = {
   crawl: ["k3d_crawl1", "k3d_crawl2"],
 };
 
-export const frameUrl = (name: string): string => `/kuro/${name}.png`;
+/** The maw's one frame per look (public/kuro/k3d_maw*.png). */
+export const MAW_FRAMES: Readonly<Record<MawLook, string>> = { maw: "k3d_maw", maw2: "k3d_maw2", maw3: "k3d_maw3" };
+
+export const isMaw = (s: BodyState | null | undefined): s is MawLook => (MAW_LOOKS as readonly string[]).includes(s ?? "");
+
+/** A frame's file; from the late ring every state's frames are the `_red` ones (late-days FR2). */
+export const frameUrl = (name: string, red = false): string => `/kuro/${name}${red ? "_red" : ""}.png`;
 
 /** How long a state change takes to crossfade (matches .kpet .layer transition in desktop.css). */
 export const CROSSFADE_MS = MOTION.kuroFade;
 
 export interface BodyInputs {
+  /** A maw look, which outranks everything (late-days FR3); null or absent before the late ring. */
+  readonly maw?: MawLook | null;
   readonly night: boolean;
   readonly taskRunning: boolean;
   readonly saidPretty: boolean;
@@ -30,8 +45,9 @@ export interface BodyInputs {
   readonly waiting: boolean;
 }
 
-/** rest (night) > busy (a task runs) > happy (the player said 漂亮) > crawl (moving) > think (waiting) > idle. */
+/** maw > rest (night) > busy (a task runs) > happy (the player said 漂亮) > crawl (moving) > think (waiting) > idle. */
 export function bodyState(i: BodyInputs): BodyState {
+  if (i.maw) return i.maw;
   if (i.night) return "rest";
   if (i.taskRunning) return "busy";
   if (i.saidPretty) return "happy";
@@ -40,9 +56,11 @@ export function bodyState(i: BodyInputs): BodyState {
   return "idle";
 }
 
-export function renderLayer(state: BodyState): SafeHtml {
+export function renderLayer(state: BodyState, red = false): SafeHtml {
+  // The maw: one frame, its own look, no second frame to breathe between.
+  if (isMaw(state)) return html`<div class="layer cut" data-state="${state}"><img class="f1" src="${frameUrl(MAW_FRAMES[state])}" alt=""></div>`;
   const [a, b] = FRAMES[state];
-  return html`<div class="layer" data-state="${state}"><img class="f1" src="${frameUrl(a)}" alt=""><img class="f2" src="${frameUrl(b)}" alt=""></div>`;
+  return html`<div class="layer" data-state="${state}"${red ? html` data-red="1"` : null}><img class="f1" src="${frameUrl(a, red)}" alt=""><img class="f2" src="${frameUrl(b, red)}" alt=""></div>`;
 }
 
 /**
@@ -57,6 +75,7 @@ export function renderBodySlot(state: BodyState): SafeHtml {
 export class KuroBodyElement {
   readonly element: HTMLElement;
   private state: BodyState | null = null;
+  private red = false;
 
   constructor(doc: Document) {
     this.element = doc.createElement("div");
@@ -64,15 +83,23 @@ export class KuroBodyElement {
     this.element.style.cssText = "position:absolute;inset:0";
   }
 
-  set(state: BodyState): void {
-    if (state === this.state) return;
+  set(state: BodyState, red = false): void {
+    if (state === this.state && red === this.red) return;
+    const cut = isMaw(state) || isMaw(this.state);
     this.state = state;
+    this.red = red;
     const doc = this.element.ownerDocument;
     const holder = doc.createElement("div");
-    holder.innerHTML = renderLayer(state).value;
+    holder.innerHTML = renderLayer(state, red).value;
     const layer = holder.firstElementChild as HTMLElement;
-    layer.style.opacity = "0";
     const old = [...this.element.children] as HTMLElement[];
+    if (cut) {
+      // The maw is cut in and out, never crossfaded (late-days FR3).
+      old.forEach((o) => o.remove());
+      this.element.appendChild(layer);
+      return;
+    }
+    layer.style.opacity = "0";
     this.element.appendChild(layer);
     // Next frame: fade the new layer in and the old ones out, then drop the old ones.
     requestAnimationFrame(() => {
@@ -85,6 +112,6 @@ export class KuroBodyElement {
   /** Moves the body into the slot the latest render produced. */
   attach(slot: HTMLElement): void {
     if (this.element.parentElement !== slot) slot.appendChild(this.element);
-    this.set(slot.dataset.state as BodyState);
+    this.set(slot.dataset.state as BodyState, slot.dataset.red === "1");
   }
 }

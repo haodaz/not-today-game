@@ -77,7 +77,7 @@ describe("timings are motion.md's (FR0)", () => {
   it("motion.css has no literal duration; every --m-* it reads is defined (or set per element)", () => {
     const css = motionCss.replace(/\/\*[\s\S]*?\*\//g, "");
     expect(css.match(/(?<![\w.-])[1-9]\d*(\.\d+)?m?s\b/g)).toBeNull();
-    const perElement = new Set(["--m-t", "--m-flash-t", "--m-sleep-t", "--m-wake-t", "--m-tx", "--m-ty", "--m-z", "--m-dx"]);
+    const perElement = new Set(["--m-t", "--m-flash-t", "--m-sleep-t", "--m-wake-t", "--m-tx", "--m-ty", "--m-z", "--m-dx", "--m-cx", "--m-cy"]);
     const used = [...css.matchAll(/var\((--m-[\w-]+)/g)].map((m) => m[1]!);
     for (const v of used) expect(v in motionVars() || perElement.has(v), v).toBe(true);
   });

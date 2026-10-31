@@ -11,6 +11,7 @@ import { dayFile } from "@state/days/table";
 import type { ActionContext, ActionHandler, MotionHooks } from "@world/desktop/controller";
 import { loopContext, checklist } from "@world/loop/checklist";
 import { kuroInBox, showing } from "@world/loop/dialogue";
+import { createTentacleDriver } from "@world/desktop/browser/tentacles-dom";
 import { heldItem } from "@world/room/held";
 import { holdUntil, lineKey, revealBusy, revealDoneAt, revealShown, startReveal, type Reveal } from "./reveal";
 import { centre, DESK_SHOT, ROOM_SHOT, type Rect } from "@world/room/shots";
@@ -154,6 +155,8 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
   let frame = 0;
   let holdFor: { key: string; at: number } | null = null;
   const timers = new Set<number>();
+  // The browser's text tentacles (late-days FR5): drawn only while the browser window is shown.
+  const tentacles = createTentacleDriver(win);
 
   const after = (ms: number, fn: () => void) => {
     const id = win.setTimeout(() => {
@@ -917,12 +920,40 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     kuroLines(t);
     phaseLock(t);
     sleepWake(t);
+    closerEntry(t);
+    tentacles.after(root);
+  }
+
+  // ---- late-days FR4: Kuro crawls from the HUD corner to the page's close control -----------
+  const crawlFrom = new Map<number, { dx: number; dy: number }>();
+  function closerEntry(t: number): void {
+    const c = ctx.session.kuroCloser;
+    const el = q(root, ".kuro-closer");
+    if (!c || !el || c.phase !== "crawl") return;
+    const key = `closer:${c.token}`;
+    if (since(key) === undefined) {
+      begin(key, t);
+      // Where the body was: the (now empty) HUD corner. The slot is inside the scaled stage.
+      const corner = q(root, ".hud-kuro");
+      if (corner) {
+        const a = corner.getBoundingClientRect();
+        const b = el.getBoundingClientRect();
+        const k = scaleOf(q(root, ".stage"));
+        crawlFrom.set(c.token, { dx: (a.left - b.left) / k, dy: (a.top - b.top) / k });
+      }
+    }
+    const from = crawlFrom.get(c.token);
+    if (!from) return;
+    el.style.setProperty("--m-cx", `${Math.round(from.dx)}px`);
+    el.style.setProperty("--m-cy", `${Math.round(from.dy)}px`);
+    anim(el, "m-closer-in", MOTION.crawl, since(key)!, t, "linear");
   }
 
   return {
     before,
     after: afterRender,
     destroy() {
+      tentacles.destroy();
       if (frame) win.cancelAnimationFrame(frame);
       timers.forEach((id) => win.clearTimeout(id));
       ghosts.forEach((g) => g.el.remove());

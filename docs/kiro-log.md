@@ -522,3 +522,22 @@ Appended after each task. Neither Kiro nor Claude edits the other's area without
   - the first desk-bar object (举起来).
 - The bed and meal hotspots now use `room.bed` / `room.meal`.
 - Tests: 48 files, 710 passing; typecheck clean. Not checked in a browser.
+
+## 2026-11-01 — late-days FR2–FR6
+
+- Gates from the cycle table:
+  - `lateRing` (ring ≥ door, days 16–18): red eyes, the maw, the closer.
+  - `overlayRing` (presented ring ≥ wall): the tentacles.
+- FR2: `frameUrl(name, red)` and `data-red` on every body slot (HUD, portrait, closer). The pill's face is `k3d_base_red`.
+- FR3: `maw` / `maw2` / `maw3` single frames, cut not crossfaded.
+  - `maw` is the closer's flash.
+  - `maw2` is a late night after holding up nothing.
+  - `maw3` is the last night.
+- FR4:
+  - `kuroCloses` + `kuroClosesLine` on browser `reading[]` entries and day items (`src/state/closes.ts`, strict).
+  - Reading entries open as a small page in the browser window. A day item's document is 工作台 文档 while it is the open task.
+  - Timeline: wait 1.2 s (−0.3 s per earlier close today) → crawl to the × → maw 400 ms → closed.
+  - Event `kuroClosed { pageId }`, with `pageId` = `d<day>:reading:<0-based index>` or `d<day>:item:<id>`. Kuro's line in the box.
+  - Fixture `tests/fixtures/browser-day-16.json` (Claude's draft, verbatim). `content/` untouched: Claude moves the three drafts into content/browser.
+- FR5: a canvas over the browser window only, never at night (the night plate replaces the page). The DOM driver runs from the motion layer and stops when the canvas is gone or the tab is hidden. The headline is never drawn over.
+- Tests: 49 files, 727 passing; typecheck clean. Not checked in a browser; the canvas drawing and the crawl path are untested by design (parameters and sampler are).

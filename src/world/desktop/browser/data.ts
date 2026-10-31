@@ -1,6 +1,8 @@
 /// <reference types="vite/client" />
 // content/browser/day-NN.json (Claude's): one newspaper page per day. Read, checked, frozen.
-// Every field may be an empty string; empty renders as empty (white).
+// Every field may be an empty string; empty renders as empty (white). A reading entry may carry
+// `kuroCloses` + `kuroClosesLine` (late-days FR4; src/state/closes.ts).
+import { parseKuroCloses, type KuroCloses } from "@state/closes";
 
 export interface BrowserPage {
   readonly day: number;
@@ -8,8 +10,15 @@ export interface BrowserPage {
   readonly weather: string;
   readonly lead: { readonly h: string; readonly p: readonly string[] };
   readonly numbers: readonly { readonly v: string; readonly l: string; readonly dir: "up" | "down" | "" }[];
-  readonly reading: readonly { readonly h: string; readonly sec: string; readonly when: string }[];
+  readonly reading: readonly ReadingEntry[];
   readonly note?: string;
+}
+
+/** A 读者在读 entry; from the late ring it may be one Kuro closes (late-days FR4). */
+export interface ReadingEntry extends Partial<KuroCloses> {
+  readonly h: string;
+  readonly sec: string;
+  readonly when: string;
 }
 
 type Raw = Record<string, unknown>;
@@ -21,8 +30,11 @@ function fail(where: string, problem: string): never {
 
 function onlyKeys(value: Raw, keys: readonly string[], where: string): void {
   for (const key of Object.keys(value)) if (!keys.includes(key)) fail(where, `unknown key "${key}"`);
-  for (const key of keys) if (key !== "note" && !(key in value)) fail(where, `missing "${key}"`);
+  for (const key of keys) if (!OPTIONAL.has(key) && !(key in value)) fail(where, `missing "${key}"`);
 }
+
+/** Keys a file may leave out. */
+const OPTIONAL = new Set(["note", "kuroCloses", "kuroClosesLine"]);
 
 const str = (v: unknown, where: string): string => (typeof v === "string" ? v : fail(where, "expected a string"));
 
@@ -55,8 +67,9 @@ export function parseBrowserPage(raw: unknown, label: string): BrowserPage {
     reading: Object.freeze(
       list(raw.reading, `${label}.reading`, (x, w) => {
         if (!isRecord(x)) fail(w, "must be an object");
-        onlyKeys(x, ["h", "sec", "when"], w);
-        return Object.freeze({ h: str(x.h, `${w}.h`), sec: str(x.sec, `${w}.sec`), when: str(x.when, `${w}.when`) });
+        onlyKeys(x, ["h", "sec", "when", "kuroCloses", "kuroClosesLine"], w);
+        const closes = parseKuroCloses(x, (field, problem) => fail(`${w}.${field}`, problem));
+        return Object.freeze({ h: str(x.h, `${w}.h`), sec: str(x.sec, `${w}.sec`), when: str(x.when, `${w}.when`), ...(closes ?? {}) });
       }),
     ),
     ...(raw.note !== undefined ? { note: str(raw.note, `${label}.note`) } : {}),
@@ -77,9 +90,16 @@ export const browserPages: ReadonlyMap<number, BrowserPage> = (() => {
   return new Map([...pages].sort(([a], [b]) => a - b));
 })();
 
+/** Tests only: pages to read instead of content/browser (e.g. the late-days fixture). */
+let override: ReadonlyMap<number, BrowserPage> | null = null;
+export function setBrowserPagesForTests(pages: ReadonlyMap<number, BrowserPage> | null): void {
+  override = pages;
+}
+
 /** The page for a day; the README says day 1 stands in until a day's page exists. */
 export function browserPage(day: number): BrowserPage | undefined {
-  return browserPages.get(day) ?? browserPages.get(1);
+  const pages = override ?? browserPages;
+  return pages.get(day) ?? browserPages.get(day) ?? browserPages.get(1);
 }
 
 export type WeatherKind = "rain" | "fog" | "clear";

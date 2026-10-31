@@ -30,12 +30,22 @@
     {
       "h": "今天也辛苦了。",
       "sec": "",
-      "when": "今天"
+      "when": "今天",
+      "kuroCloses": true,
+      "kuroClosesLine": {
+        "zh": "今天不读了。睡吧。",
+        "en": "Not today. Sleep."
+      }
     },
     {
       "h": "早点睡。",
       "sec": "",
-      "when": "今天"
+      "when": "今天",
+      "kuroCloses": true,
+      "kuroClosesLine": {
+        "zh": "今天不读了。睡吧。",
+        "en": "Not today. Sleep."
+      }
     },
     {
       "h": "",

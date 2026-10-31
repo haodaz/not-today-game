@@ -37,6 +37,10 @@ import { endingNext } from "@world/endings/flow";
 import { renderEnding } from "@world/endings/view";
 import { boxObjectFor, doorMeal, raidShowing, renderRoom, settingsButton, settingsPanel } from "./hud";
 import { pointed } from "./pointer";
+import { itemPageId, readingPageId, type KuroCloses } from "@state/closes";
+import { browserPage } from "@world/desktop/browser/data";
+import { workbenchActions } from "@world/desktop/workbench/actions";
+import { cancelCloser, startCloser } from "@world/late/closer";
 
 export function renderGame(store: Store, session: Session, nowMs: number): SafeHtml {
   const state = store.getState();
@@ -68,6 +72,18 @@ function lookAt(ctx: ActionContext, app: AppId): void {
   if (booted(ctx.store.getState(), ctx.store.getEvents())) stepOnce(ctx, `openApp:${app}`);
 }
 
+/**
+ * The browser is no longer on screen (another app, the other monitor, another view): its open page
+ * closes and Kuro's errand is off (late-days FR4). So is a 文档 errand once 工作台 is not shown.
+ */
+function lookedAway(ctx: ActionContext): void {
+  const s = ctx.session;
+  const shown = s.view === "desktop" ? shownApp(s) : null;
+  if (shown !== "browser") s.browserRead = null;
+  const c = s.kuroCloser;
+  if (c && ((c.where === "browser" && shown !== "browser") || (c.where === "docs" && (shown !== "workbench" || s.workbenchPage !== "docs")))) cancelCloser(s);
+}
+
 /** 关机 → 房间 once both monitors have darkened (motion: right first, 150 ms apart). */
 export const SHUTDOWN_TO_ROOM_MS = MOTION.shutdown + MOTION.shutdownGap;
 
@@ -95,6 +111,7 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.session.view = view;
     ctx.session.phoneOpen = false;
     ctx.session.holding = null;
+    lookedAway(ctx);
     // The desktop opens on the monitor with the current app; looking at it counts.
     if (view === "desktop") lookAt(ctx, shownApp(ctx.session));
     // 看一眼桌子: arriving at 桌子 while the item is open is the look; the desk beat plays here.
@@ -106,10 +123,39 @@ export const loopActions: Record<string, ActionHandler> = {
   dock(ctx, data, el) {
     shellActions.dock!(ctx, data, el);
     lookAt(ctx, ctx.session.leftApp);
+    lookedAway(ctx);
   },
   screen(ctx, data, el) {
     shellActions.screen!(ctx, data, el);
     lookAt(ctx, shownApp(ctx.session));
+    lookedAway(ctx);
+  },
+
+  // ---- late-days FR4: pages Kuro closes --------------------------------------------------
+
+  // A 读者在读 entry opens as a small page in the browser window.
+  "br-open"(ctx, data) {
+    const i = Number(data.i);
+    const entry = browserPage(ctx.store.getState().day)?.reading[i];
+    if (!entry || !entry.h) return;
+    ctx.session.browserRead = i;
+    cancelCloser(ctx.session);
+    if (entry.kuroCloses) startCloser(ctx, readingPageId(ctx.store.getState().day, i), entry as KuroCloses, "browser");
+    ctx.rerender();
+  },
+  "br-close"(ctx) {
+    ctx.session.browserRead = null;
+    cancelCloser(ctx.session);
+    ctx.rerender();
+  },
+  // 工作台's 文档: the document of the open work task; Kuro may close it.
+  "wb-nav"(ctx, data, el) {
+    workbenchActions["wb-nav"]!(ctx, data, el);
+    cancelCloser(ctx.session);
+    if (ctx.session.workbenchPage !== "docs") return;
+    const lc = loopContext(ctx.store.getState(), ctx.store.getEvents());
+    const task = lc ? openTask(lc) : null;
+    if (task?.kuroCloses && task.kuroClosesLine) startCloser(ctx, itemPageId(lc!.state.day, task.id), { kuroCloses: true, kuroClosesLine: task.kuroClosesLine }, "docs");
   },
 
   // ---- the world's actuators (day-loop correction 2026-11-01: the checklist only watches) ----

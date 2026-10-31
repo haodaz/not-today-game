@@ -13,6 +13,7 @@ import { fillPlaceholders } from "@world/replies/placeholders";
 import { greetingKey } from "../beat";
 import { frameUrl, FRAMES } from "../kuro/body";
 import type { AppContext, WorkbenchPage } from "../model";
+import { closerSlot } from "@world/late/closer-view";
 import { RINGS } from "../rings";
 import { workbenchDay, workbenchDays, type DocColumn, type WorkbenchDay } from "./data";
 
@@ -154,8 +155,11 @@ export function renderWorkbench(ctx: AppContext, days: ReadonlyMap<number, Workb
     : page === "ledger" ? ledgerPage(ctx.state, data, fill)
     : page === "code" ? codePage(ctx.state, data, fill)
     : home(ctx, data, fill);
+  // late-days FR4: Kuro at the document's close corner while it comes to shut it.
+  const c = ctx.session.kuroCloser;
+  const closer = page === "docs" && c?.where === "docs" ? html`<div class="wb-closer">${closerSlot(ctx, c.pageId)}</div>` : null;
   return {
-    body: html`<div class="body">${side(data, page, fill)}${main}</div>`,
+    body: html`<div class="body">${side(data, page, fill)}${main}${closer}</div>`,
     badge: data?.doing.length ?? 0,
     tag: data?.docs?.tag ? html`${fill(data.docs.tag)}` : null,
   };
