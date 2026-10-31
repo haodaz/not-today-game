@@ -34,3 +34,6 @@ The probe showed the splat is sharp around the desk, the monitors, the bed and t
 - **The window side is never framed.** Poses are clamped so the camera never looks past the desk's left edge toward the window; a vignette (edges 35 % darker) hides floaters at the corners.
 - **Asset:** use `public/room/room_clean.splat` (pruned by Claude with script/tools/splat-prune.mjs: oversized and far-out gaussians removed, 1.5 % of the set; the window-side fog cannot be pruned away, hence the pose clamp and the vignette). Loader `@mkkellogg/gaussian-splats-3d` with three.js, loaded lazily after the first render, never on the title page.
 - FR3 objects and FR4 ring geometry stay as written but are a later segment; this segment is only the move, night and collapse layers, with the feature behind a `?splat=0` kill switch and off when WebGL is unavailable.
+
+## Addition 2026-11-01 (author): the over-pruned splat is the collapsed room
+`public/room/room_collapsed.splat` exists now: the same capture pruned hard (half the gaussians gone), which makes the walls go dark and holed and leaves threads in the fog. The author wants exactly that for the collapse: from ring `room` (day 13) the moves and the night layer cross-fade from room_clean to room_collapsed as the ring deepens (room: 40 % mix, door: 100 %); no second capture is needed. Same poses, same clamp.
