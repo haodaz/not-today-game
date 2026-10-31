@@ -223,5 +223,7 @@
   "settings.emailSend": "发送链接",
   "settings.emailSent": "链接已发到邮箱，点开就绑好了。",
   "settings.emailBound": "已绑定：{email}",
-  "settings.emailError": "没发出去，再试一次。"
+  "settings.emailError": "没发出去，再试一次。",
+  "hud.items": "道具",
+  "hud.itemsClose": "收起"
 }

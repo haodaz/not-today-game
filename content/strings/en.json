@@ -223,5 +223,7 @@
   "settings.emailSend": "Send link",
   "settings.emailSent": "Link sent. Open it and you are linked.",
   "settings.emailBound": "Linked: {email}",
-  "settings.emailError": "It did not send. Try again."
+  "settings.emailError": "It did not send. Try again.",
+  "hud.items": "Items",
+  "hud.itemsClose": "Close"
 }

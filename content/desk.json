@@ -1,0 +1,76 @@
+{
+  "_note": "桌子 framing (day-loop correction 2026-11-01): rects in stage px on public/room/shots/desk_top.jpg (1600×900). Objects are placed cutouts; nothing here is painted into the photo.",
+  "backdrop": "/room/shots/desk_top.jpg",
+  "monitors": {
+    "left": {
+      "l": 100,
+      "t": 0,
+      "w": 640,
+      "h": 270
+    },
+    "right": {
+      "l": 770,
+      "t": 0,
+      "w": 640,
+      "h": 270
+    }
+  },
+  "cup": {
+    "l": 60,
+    "t": 420,
+    "w": 200,
+    "h": 200
+  },
+  "phone": {
+    "l": 1230,
+    "t": 450,
+    "w": 130,
+    "h": 200
+  },
+  "box": {
+    "l": 1260,
+    "t": 640,
+    "w": 300,
+    "h": 230
+  },
+  "meal": {
+    "l": 600,
+    "t": 620,
+    "w": 320,
+    "h": 220
+  },
+  "slip": {
+    "l": 1380,
+    "t": 340,
+    "w": 200,
+    "h": 120
+  },
+  "objects": {
+    "row": {
+      "t": 290,
+      "h": 130,
+      "w": 170
+    },
+    "slots": [
+      120,
+      330,
+      540,
+      750,
+      960,
+      1170
+    ],
+    "_note": "six slots along the back edge under the monitors, in the order the objects arrive"
+  },
+  "keyboard": {
+    "l": 470,
+    "t": 440,
+    "w": 570,
+    "h": 160
+  },
+  "lamp": {
+    "l": 1380,
+    "t": 60,
+    "w": 220,
+    "h": 270
+  }
+}
