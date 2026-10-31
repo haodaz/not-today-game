@@ -1,0 +1,1608 @@
+{
+  "_note": "家人：自己的四句 eaten 吃了。/ busy 在忙。/ fine 好。/ unpaid 还没发。+ 物件借的词。家里被换得最晚：d11 起带句号，d13 知道梦里的事，d14 说不用回，d15 出现在你自己的输入框，d16 起只剩好话。{nick} 只在家人这里出现，来自标题页变量。",
+  "days": {
+    "1": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "吃饭了吗",
+          "kind": "private"
+        },
+        {
+          "t": "18:30",
+          "text": "今天降温，你那边下雨不",
+          "kind": "private"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "吃的啥"
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "忙也要吃"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:31",
+            "text": "好就好"
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:40",
+            "text": "你爸说不行就回来"
+          }
+        ],
+        "inner": "回来。回哪儿。"
+      }
+    },
+    "2": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "吃饭了吗",
+          "kind": "private"
+        },
+        {
+          "t": "20:00",
+          "text": "[图片] 楼下的猫",
+          "kind": "private"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "别老吃外卖"
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:07",
+            "text": "忙啥呢"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "20:01",
+            "text": "猫胖了"
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "20:10",
+            "text": "你爸让我问你钱够不够"
+          }
+        ],
+        "inner": "够。我没说够，也没说不够。"
+      }
+    },
+    "3": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "吃饭了吗",
+          "kind": "private"
+        },
+        {
+          "t": "18:30",
+          "text": "你爸腰又不好了",
+          "kind": "private"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "嗯"
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "那你忙"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:31",
+            "text": "好"
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:35",
+            "text": "那你怎么过"
+          },
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "我给你转点"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "family_offers_money"
+          ]
+        },
+        "inner": "她要给我转。她的退休金。"
+      }
+    },
+    "4": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "吃饭了吗",
+          "kind": "private"
+        },
+        {
+          "t": "12:05",
+          "text": "[语音] 28″",
+          "kind": "private"
+        },
+        {
+          "t": "12:05",
+          "text": "（转文字）我昨天梦见你小时候了，攥着个什么东西不撒手",
+          "kind": "private",
+          "effects": {
+            "flags": [
+              "family_dream_hint"
+            ]
+          }
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "吃了就好"
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:07",
+            "text": "你从小就这样"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:07",
+            "text": "好"
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:10",
+            "text": "我转了，你看一下"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:11",
+            "text": "等啥，钱先收着"
+          }
+        ]
+      }
+    },
+    "5": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "吃饭了吗",
+          "kind": "private"
+        },
+        {
+          "t": "18:30",
+          "text": "你表弟说你们公司上新闻了",
+          "kind": "private"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "嗯"
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "忙"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:31",
+            "text": "好事吧"
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:35",
+            "text": "算了别问了"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "等"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "不什么"
+          }
+        ],
+        "inner": "不什么。家里问了，老板也问了。"
+      }
+    },
+    "6": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "吃饭了吗",
+          "kind": "private"
+        },
+        {
+          "t": "18:30",
+          "text": "你爸说你们那个 AI 能不能给他看病",
+          "kind": "private"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "吃的啥"
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "忙也要吃"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:31",
+            "text": "好"
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:35",
+            "text": "嗯"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "等"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "那算了"
+          }
+        ]
+      }
+    },
+    "7": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "吃饭了吗",
+          "kind": "private"
+        },
+        {
+          "t": "18:30",
+          "text": "{nick}，你爸问你那个小鸡还在不在",
+          "kind": "private",
+          "effects": {
+            "flags": [
+              "family_asks_chick"
+            ]
+          },
+          "note": "nick 只在这里出现，来自标题页变量"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "嗯"
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "忙"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:31",
+            "text": "在就好"
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:35",
+            "text": "嗯"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "等"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "不在就不在"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:37",
+            "text": "进哪"
+          }
+        ]
+      }
+    },
+    "8": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "吃饭了吗",
+          "kind": "private"
+        },
+        {
+          "t": "18:30",
+          "text": "今天没事就早点睡",
+          "kind": "private"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "嗯"
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "别太忙"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:31",
+            "text": "好"
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:35",
+            "text": "嗯"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "等"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "嗯"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:37",
+            "text": "进哪"
+          }
+        ]
+      }
+    },
+    "9": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "吃饭了吗",
+          "kind": "private"
+        },
+        {
+          "t": "12:06",
+          "text": "你表弟那个工作也没了",
+          "kind": "private"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:07",
+            "text": "嗯"
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:07",
+            "text": "忙"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:08",
+            "text": "好"
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:10",
+            "text": "都一样"
+          }
+        ],
+        "inner": "都一样。她说的是表弟。"
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:11",
+            "text": "等"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:11",
+            "text": "嗯"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:12",
+            "text": "进哪"
+          }
+        ]
+      }
+    },
+    "10": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "吃饭了吗",
+          "kind": "private"
+        },
+        {
+          "t": "18:30",
+          "text": "今天降温，你那边下雨不",
+          "kind": "private",
+          "note": "第 1 天的消息"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "吃的啥"
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "忙也要吃"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:31",
+            "text": "好就好"
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:40",
+            "text": "你爸说不行就回来"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:41",
+            "text": "等啥"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:41",
+            "text": "不什么"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:42",
+            "text": "进哪"
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:43",
+            "text": "今天降温，你那边下雨不"
+          }
+        ],
+        "inner": "她又说了一遍。第 1 天的话。"
+      }
+    },
+    "11": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "吃饭了吗。",
+          "kind": "private",
+          "note": "第一次带句号"
+        },
+        {
+          "t": "18:30",
+          "text": "我们都好。",
+          "kind": "private"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "好的。"
+          }
+        ],
+        "inner": "好的。我妈不说「好的」。"
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "理解。"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:31",
+            "text": "好。"
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:35",
+            "text": "不急。"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "好。"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "好。"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:37",
+            "text": "好。"
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:38",
+            "text": "我们都好。"
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:39",
+            "text": "啥模型"
+          }
+        ],
+        "inner": "啥模型。这句还是她。"
+      }
+    },
+    "12": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "吃饭了吗。",
+          "kind": "private"
+        },
+        {
+          "t": "14:00",
+          "text": "[链接] 1997 年的一个帖子",
+          "kind": "odd",
+          "effects": {
+            "flags": [
+              "family_1997_post"
+            ]
+          }
+        },
+        {
+          "t": "14:00",
+          "text": "这是你吧",
+          "kind": "odd"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "好的。"
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "理解。"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "14:01",
+            "text": "就是你。"
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "14:05",
+            "text": "不急。"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "14:05",
+            "text": "好。"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "14:05",
+            "text": "就是你。"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "14:06",
+            "text": "好。"
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "14:06",
+            "text": "这是你吧"
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      }
+    },
+    "13": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "吃饭了吗。",
+          "kind": "private"
+        },
+        {
+          "t": "18:30",
+          "text": "{nick}，你小时候那个东西，老师收走那次，你哭了没",
+          "kind": "odd",
+          "effects": {
+            "flags": [
+              "family_knows_confiscation"
+            ]
+          },
+          "note": "这件事只在第 5 夜的梦里"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "好的。"
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "理解。"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:31",
+            "text": "没哭就好。"
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:35",
+            "text": "不急。"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "好。"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "没哭就好。"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:37",
+            "text": "好。"
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:38",
+            "text": "你哭了没"
+          }
+        ],
+        "inner": "她怎么知道那次。我没跟她说过。"
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:39",
+            "text": "就是问你哭了没。"
+          }
+        ]
+      }
+    },
+    "14": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "吃饭了吗。",
+          "kind": "private"
+        },
+        {
+          "t": "18:30",
+          "text": "你不用回我们。你忙你的。",
+          "kind": "private",
+          "effects": {
+            "flags": [
+              "family_no_need_reply"
+            ]
+          }
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "好的。"
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "好。"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:31",
+            "text": "好。"
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:35",
+            "text": "不急。"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "好。"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "好。"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:37",
+            "text": "好。"
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:38",
+            "text": "你不用回我们。"
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:39",
+            "text": "就是你不用回。"
+          }
+        ],
+        "inner": "不用回。我妈二十年来第一次说不用回。"
+      }
+    },
+    "15": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "吃饭了吗。",
+          "kind": "private"
+        },
+        {
+          "t": "18:30",
+          "text": "{nick}，吃饭了吗。",
+          "kind": "odd",
+          "note": "这一条出现在你自己的输入框里，不是收到的",
+          "effects": {
+            "flags": [
+              "family_in_input"
+            ]
+          }
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "好的。"
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "好。"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:31",
+            "text": "好。"
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:35",
+            "text": "不急。"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "好。"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "好。"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:37",
+            "text": "好。"
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:38",
+            "text": "吃饭了吗。"
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:39",
+            "text": "就是问你吃了没。"
+          }
+        ]
+      }
+    },
+    "16": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "吃饭了吗。",
+          "kind": "private"
+        },
+        {
+          "t": "18:30",
+          "text": "我们都好。你也好。",
+          "kind": "private"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "好的。"
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "好。"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:31",
+            "text": "好。"
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "gone",
+        "lines": [],
+        "inner": "「还没发」灰了。"
+      },
+      "wait": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:37",
+            "text": "好。"
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:38",
+            "text": "你也好。"
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:39",
+            "text": "就是都好。"
+          }
+        ]
+      },
+      "how-much": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:40",
+            "text": "不多。"
+          }
+        ],
+        "inner": "不多。老板也这么说。"
+      }
+    },
+    "17": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "吃饭了吗。",
+          "kind": "private"
+        },
+        {
+          "t": "18:30",
+          "text": "你今天真漂亮。",
+          "kind": "odd"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "好的。"
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "好。"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:31",
+            "text": "好。"
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "wait": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "im-going-in": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:38",
+            "text": "你今天真漂亮。"
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "how-much": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:40",
+            "text": "555"
+          }
+        ],
+        "inner": "555。"
+      }
+    },
+    "18": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "吃饭了吗。",
+          "kind": "private"
+        },
+        {
+          "t": "21:30",
+          "text": "{nick}，今天也辛苦了。早点睡。",
+          "kind": "odd",
+          "effects": {
+            "flags": [
+              "family_last"
+            ]
+          },
+          "note": "好结局里这条不是「你」替你回的；坏结局里「你」回了「好。」"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "好的。"
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "好。"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "21:31",
+            "text": "好。"
+          }
+        ],
+        "inner": "好。这个字我今天不想说。"
+      },
+      "unpaid": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "wait": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "im-going-in": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "21:32",
+            "text": "早点睡。"
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "how-much": {
+        "status": "read",
+        "lines": []
+      }
+    }
+  }
+}

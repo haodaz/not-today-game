@@ -1,0 +1,469 @@
+{
+  "day": 10,
+  "recipients": {
+    "boss": {
+      "incoming": [
+        {
+          "t": "09:12",
+          "text": "[语音] 41″",
+          "kind": "work"
+        },
+        {
+          "t": "09:12",
+          "text": "（转文字）那个 v17 今天过一下，下午我跟投资人那边要用，你让它先合一版，你看一眼就行，别自己从头弄。",
+          "kind": "work",
+          "note": "第 1 天那条语音，一字不差"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:14",
+            "text": "好，那你抓紧。下午三点前我要看到合并版。"
+          }
+        ],
+        "inner": "第 1 天的回复。一个字不差。"
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:14",
+            "text": "[语音] 12″"
+          },
+          {
+            "who": "boss",
+            "t": "09:14",
+            "text": "（转文字）嗯，收到就行，别自己从头弄，让它先合，你看一眼。"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": "「哪都行」灰了。今天菜单上少了一句。"
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "3s",
+        "interrupt": {
+          "who": "boss",
+          "where": "boss",
+          "t": "09:19",
+          "text": "[语音] 41″"
+        },
+        "inner": "和第 1 天一样。已读，然后四十一秒。"
+      },
+      "no": {
+        "status": "read",
+        "lines": []
+      },
+      "wait": {
+        "status": "read",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "read",
+        "lines": []
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:20",
+            "text": "[语音] 41″"
+          }
+        ],
+        "inner": "再说一遍。他真的又说了一遍。同一条。"
+      }
+    },
+    "partner": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "[卡片] 竞品 A 的叙事线 · 转发",
+          "kind": "work",
+          "note": "第 1 天的卡片"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:30",
+            "text": "[卡片] 竞品 A 的叙事线 · 转发"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:30",
+            "text": "👍"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "40s"
+      },
+      "no": {
+        "status": "read",
+        "lines": []
+      },
+      "wait": {
+        "status": "read",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "read",
+        "lines": []
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "[卡片] 竞品 A 的叙事线 · 转发"
+          }
+        ]
+      }
+    },
+    "group": {
+      "incoming": [
+        {
+          "t": "09:20",
+          "text": "老周：好什么好，快递谁去拿",
+          "kind": "work",
+          "note": "第 1 天的消息"
+        },
+        {
+          "t": "09:21",
+          "text": "member：收到+1",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:20",
+            "text": "好什么好，快递谁去拿"
+          }
+        ],
+        "inner": "老周回来了。说的是第 1 天的话。"
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:21",
+            "text": "收到+1"
+          },
+          {
+            "who": "member",
+            "t": "09:21",
+            "text": "收到"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "read",
+        "lines": []
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:22",
+            "text": "不就不"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:22",
+            "text": "等啥"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:22",
+            "text": "进去了就别回头"
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:23",
+            "text": "好什么好，快递谁去拿"
+          }
+        ],
+        "inner": "再说一遍。他说了一遍。"
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:23",
+            "text": "老大你今天话多"
+          },
+          {
+            "who": "xiaozhang",
+            "t": "09:23",
+            "text": "哈哈哈"
+          }
+        ]
+      }
+    },
+    "xiaozhang": {
+      "incoming": [
+        {
+          "t": "09:41",
+          "text": "好嘞{calledBy}",
+          "kind": "work"
+        },
+        {
+          "t": "14:40",
+          "text": "{calledBy}我那行注释删了",
+          "kind": "work",
+          "effects": {
+            "flags": [
+              "xz_deleted_comment"
+            ]
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "09:41",
+            "text": "好嘞{calledBy}"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "09:42",
+            "text": "{calledBy}你收到啥了"
+          },
+          {
+            "who": "xiaozhang",
+            "t": "09:42",
+            "text": "我还没发呢"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "09:44",
+            "text": "{calledBy}我的发了"
+          },
+          {
+            "who": "xiaozhang",
+            "t": "09:44",
+            "text": "你的没发？"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "09:45",
+            "text": "好"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "09:45",
+            "text": "等你"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "09:45",
+            "text": "{calledBy}你别"
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "09:46",
+            "text": "{calledBy}你今天怪怪的"
+          }
+        ],
+        "inner": "他说我怪。今天只有他不像第 1 天。"
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "09:48",
+            "text": "好的{calledBy}"
+          }
+        ]
+      }
+    },
+    "laozhou": {
+      "incoming": [
+        {
+          "t": "11:40",
+          "text": "中午吃啥",
+          "kind": "private"
+        },
+        {
+          "t": "11:41",
+          "text": "黄焖鸡？",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:40",
+            "text": "中午吃啥"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:41",
+            "text": "黄焖鸡？"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:45",
+            "text": "先吃饭"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:45",
+            "text": "不就不"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:45",
+            "text": "等啥"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:46",
+            "text": "别回头"
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:47",
+            "text": "中午吃啥"
+          }
+        ],
+        "inner": "他又问了一遍。像一盘带子倒回去。"
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:48",
+            "text": "嗯"
+          }
+        ]
+      }
+    }
+  }
+}

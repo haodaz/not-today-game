@@ -1,0 +1,325 @@
+{
+  "day": 3,
+  "recipients": {
+    "boss": {
+      "incoming": [
+        {
+          "t": "09:10",
+          "text": "[语音] 23″",
+          "kind": "work"
+        },
+        {
+          "t": "09:10",
+          "text": "（转文字）v18 今天出，让它写，你别自己写。",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:10",
+            "text": "[语音] 23″"
+          },
+          {
+            "who": "boss",
+            "t": "09:10",
+            "text": "（转文字）好，v18 今天出，让它写，你别自己写，你自己写要二十分钟。"
+          }
+        ],
+        "inner": "他知道我要二十分钟。他算过。"
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:10",
+            "text": "👌"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:11",
+            "text": "那就按它的。"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "boss_said_follow_it"
+          ]
+        },
+        "inner": "按它的。三个字，把我这一天的权交出去了。"
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s",
+        "inner": "一秒。他今天看得很快。"
+      }
+    },
+    "partner": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "[卡片] v18 验收标准 · 模板",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:30",
+            "text": "👍"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:30",
+            "text": "[卡片] v18 验收标准 · 模板"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "5s"
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "2min",
+        "interrupt": {
+          "who": "partner",
+          "where": "group",
+          "t": "09:40",
+          "text": "[卡片] 本周里程碑"
+        },
+        "inner": "我问工资，群里多了一张里程碑。"
+      }
+    },
+    "group": {
+      "incoming": [
+        {
+          "t": "11:19",
+          "text": "老周：黄焖鸡，报名",
+          "kind": "private"
+        },
+        {
+          "t": "11:20",
+          "text": "小张：[图片] 黄焖鸡",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:20",
+            "text": "好，黄焖鸡，老大也一份"
+          },
+          {
+            "who": "xiaozhang",
+            "t": "11:20",
+            "text": "[图片] 黄焖鸡"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:21",
+            "text": "收到收到"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:21",
+            "text": "哪都行那就黄焖鸡"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "lunch_d3"
+          ]
+        }
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "interrupt": {
+          "who": "member",
+          "where": "group",
+          "t": "11:25",
+          "text": "[图片] 黄焖鸡"
+        },
+        "inner": "群里回我的是一张鸡的照片。"
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:22",
+            "text": "老大你今天也吃？"
+          },
+          {
+            "who": "xiaozhang",
+            "t": "11:22",
+            "text": "{calledBy}别喝凉水"
+          }
+        ]
+      }
+    },
+    "xiaozhang": {
+      "incoming": [
+        {
+          "t": "15:02",
+          "text": "{calledBy}我那段你看了吗",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "15:03",
+            "text": "好的{calledBy}！"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "15:03",
+            "text": "{calledBy}你看了我写的那段吗"
+          }
+        ],
+        "inner": "看了。我是唯一看的人。"
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "15:04",
+            "text": "那我让它改了哈"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "xz_let_it_do_d3"
+          ]
+        },
+        "inner": "他学会了「让它改」。跟谁学的。"
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "15:05",
+            "text": "{calledBy}……"
+          }
+        ],
+        "inner": "省略号。他不知道该说什么，我也不知道。"
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "15:07",
+            "text": "收到{calledBy}"
+          }
+        ]
+      }
+    },
+    "laozhou": {
+      "incoming": [
+        {
+          "t": "11:19",
+          "text": "黄焖鸡？",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:19",
+            "text": "[图片] 黄焖鸡"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:19",
+            "text": "👍"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:19",
+            "text": "你这人真好说话"
+          }
+        ]
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:30",
+            "text": "别在群里说"
+          },
+          {
+            "who": "laozhou",
+            "t": "11:30",
+            "text": "吃饭"
+          }
+        ],
+        "inner": "别在群里说。他知道有人看群。"
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:32",
+            "text": "嗯嗯"
+          }
+        ]
+      }
+    }
+  }
+}

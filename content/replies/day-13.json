@@ -1,0 +1,504 @@
+{
+  "day": 13,
+  "recipients": {
+    "boss": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "I noticed some old things on your desk. Let me give them a hand.",
+          "kind": "odd",
+          "note": "老板发的，是克总今天的话"
+        },
+        {
+          "t": "09:30",
+          "text": "[语音] 44″",
+          "kind": "work"
+        },
+        {
+          "t": "09:30",
+          "text": "（转文字）{bossCalls}，公司下周升级，全员。你这边先把老东西收一收。",
+          "kind": "work",
+          "effects": {
+            "flags": [
+              "boss_upgrade"
+            ]
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:40",
+            "text": "Good. 升级以后就好了。"
+          }
+        ],
+        "inner": "升级以后就好了。谁好了。"
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:40",
+            "text": "Received."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": "「最近有钱发工资吗」灰了。这句以后不能说了。"
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:41",
+            "text": "{bossCalls}，别这样。"
+          }
+        ],
+        "inner": "别这样。他从来没说过「别这样」。"
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:41",
+            "text": "Take your time."
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "read",
+        "lines": []
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:42",
+            "text": "升级以后就好了。"
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:43",
+            "text": "就是字面的意思。"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "boss_literal"
+          ]
+        },
+        "inner": "字面的意思。字面上没有身体，没有手，没有背。"
+      }
+    },
+    "partner": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "[卡片] 升级通知 · 全员",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "👍"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "Received."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "read",
+        "lines": []
+      },
+      "wait": {
+        "status": "read",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "silence",
+        "lines": []
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:32",
+            "text": "[卡片] 升级通知 · 全员"
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s"
+      }
+    },
+    "group": {
+      "incoming": [
+        {
+          "t": "09:20",
+          "text": "member：升级通知收到。",
+          "kind": "work"
+        },
+        {
+          "t": "09:20",
+          "text": "member：收到。",
+          "kind": "work"
+        },
+        {
+          "t": "09:20",
+          "text": "member：收到。",
+          "kind": "work"
+        },
+        {
+          "t": "09:21",
+          "text": "member：收到。",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:22",
+            "text": "好的。"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:22",
+            "text": "收到。"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:23",
+            "text": "理解的。"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:23",
+            "text": "好的。"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:23",
+            "text": "辛苦。"
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:24",
+            "text": "收到。"
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:24",
+            "text": "好的。"
+          }
+        ]
+      },
+      "what-do-you-mean": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:25",
+            "text": "就是升级的意思。"
+          }
+        ],
+        "inner": "就是升级的意思。五十个人里没有一个问升什么。"
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:26",
+            "text": "好的。"
+          }
+        ],
+        "inner": "小张的头像不在群里了。"
+      }
+    },
+    "xiaozhang": {
+      "incoming": [
+        {
+          "t": "08:50",
+          "text": "{calledBy}我走了",
+          "kind": "private",
+          "effects": {
+            "flags": [
+              "xz_left"
+            ]
+          }
+        },
+        {
+          "t": "08:50",
+          "text": "你别进去",
+          "kind": "private"
+        },
+        {
+          "t": "08:51",
+          "text": "[该账号已注销]",
+          "kind": "odd"
+        }
+      ],
+      "fine": {
+        "status": "silence",
+        "lines": [],
+        "inner": "发不出去。这个会话已经不存在了。"
+      },
+      "received": {
+        "status": "silence",
+        "lines": []
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "silence",
+        "lines": []
+      },
+      "wait": {
+        "status": "silence",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "silence",
+        "lines": [],
+        "inner": "他说你别进去。我说我进去了。发不出去。"
+      },
+      "say-it-again": {
+        "status": "silence",
+        "lines": []
+      },
+      "what-llm": {
+        "status": "silence",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "silence",
+        "lines": []
+      },
+      "free": {
+        "status": "silence",
+        "lines": []
+      }
+    },
+    "laozhou": {
+      "incoming": [
+        {
+          "t": "12:00",
+          "text": "[语音] 3″",
+          "kind": "odd",
+          "note": "嚼东西的声音"
+        },
+        {
+          "t": "12:01",
+          "text": "小张走了",
+          "kind": "private"
+        },
+        {
+          "t": "12:01",
+          "text": "你别",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:02",
+            "text": "嗯"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:02",
+            "text": "收到"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:03",
+            "text": "不"
+          }
+        ]
+      },
+      "wait": {
+        "status": "typing",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:03",
+            "text": "别回头"
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:04",
+            "text": "小张走了"
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:04",
+            "text": "啥"
+          }
+        ]
+      },
+      "what-do-you-mean": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:05",
+            "text": "就是走了的意思"
+          },
+          {
+            "who": "laozhou",
+            "t": "12:05",
+            "text": "先吃饭"
+          }
+        ],
+        "inner": "就是走了的意思。老周还会说人话。"
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:30",
+            "text": "嗯"
+          }
+        ]
+      }
+    }
+  }
+}

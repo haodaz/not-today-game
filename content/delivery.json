@@ -1,0 +1,512 @@
+{
+  "_note": "外卖：手机里的软件，四家店。每天两顿，窗口内点了就来点的，不点来默认的。门只开到防盗链；袋子、小票、门外三样东西按天变。第 1 天的箱子跟午饭一起来；第 16 天起不来了；第 17 天来一袋退回去的东西。物件层：手机是桌上的一块屏（新世界的，高分辨率），拿起来就是这个软件。",
+  "phone": {
+    "name": "手机",
+    "screen": "高分辨率，新世界的；拿起来是外卖软件，放下回桌面",
+    "apps": [
+      "外卖"
+    ],
+    "note": "不是那台坏掉的功能机。那台是老物件，第 18 天才到。"
+  },
+  "windows": {
+    "lunch": [
+      "11:30",
+      "12:30"
+    ],
+    "dinner": [
+      "18:00",
+      "19:00"
+    ]
+  },
+  "door": {
+    "rule": "门只开到防盗链那么宽；玩家伸手把袋子拿进来；走廊只是一条光。第 19 天门把手从外面转、门第一次全开。",
+    "steps": [
+      "手机上显示「已送达」",
+      "走到门边（机位转向门墙）",
+      "开到链条",
+      "伸手拿",
+      "关门，上链",
+      "袋子出现在桌角"
+    ]
+  },
+  "shops": [
+    {
+      "id": "huangmenji",
+      "name": "黄焖鸡米饭（东门店）",
+      "tag": "老周的",
+      "items": [
+        {
+          "id": "hmj",
+          "name": "黄焖鸡米饭 · 微辣",
+          "price": 18
+        },
+        {
+          "id": "hmj-no-cilantro",
+          "name": "黄焖鸡米饭 · 不放香菜",
+          "price": 18
+        },
+        {
+          "id": "soup",
+          "name": "紫菜蛋花汤",
+          "price": 4
+        }
+      ]
+    },
+    {
+      "id": "shaxian",
+      "name": "沙县小吃",
+      "tag": "便宜",
+      "items": [
+        {
+          "id": "wonton",
+          "name": "扁肉",
+          "price": 10
+        },
+        {
+          "id": "noodle",
+          "name": "拌面",
+          "price": 8
+        },
+        {
+          "id": "steamed",
+          "name": "蒸饺",
+          "price": 12
+        }
+      ]
+    },
+    {
+      "id": "kiosk",
+      "name": "全家便利店",
+      "tag": "什么都有",
+      "items": [
+        {
+          "id": "onigiri",
+          "name": "饭团 · 金枪鱼",
+          "price": 6
+        },
+        {
+          "id": "oden",
+          "name": "关东煮 · 四串",
+          "price": 12
+        },
+        {
+          "id": "battery",
+          "name": "纽扣电池 LR44 · 两粒",
+          "price": 9,
+          "effects": {
+            "flags": [
+              "bought_battery"
+            ]
+          },
+          "note": "待办「买电池」从这里完成。装上，小鸡白天还是坟，夜里照样叫。它要的不是电。"
+        },
+        {
+          "id": "water",
+          "name": "矿泉水",
+          "price": 2
+        }
+      ]
+    },
+    {
+      "id": "coffee",
+      "name": "瑞幸",
+      "tag": "",
+      "items": [
+        {
+          "id": "latte",
+          "name": "拿铁 · 热",
+          "price": 15
+        },
+        {
+          "id": "americano",
+          "name": "美式 · 冰",
+          "price": 12
+        }
+      ]
+    },
+    {
+      "id": "malatang",
+      "name": "麻辣烫（夜宵）",
+      "tag": "只在晚上",
+      "hours": [
+        "18:00",
+        "23:00"
+      ],
+      "items": [
+        {
+          "id": "mlt",
+          "name": "麻辣烫 · 自选",
+          "price": 22
+        }
+      ]
+    }
+  ],
+  "defaults": {
+    "lunch": {
+      "shop": "huangmenji",
+      "item": "hmj-no-cilantro",
+      "by": "老周替你点的"
+    },
+    "dinner": {
+      "shop": "shaxian",
+      "item": "wonton",
+      "by": "系统推荐"
+    }
+  },
+  "days": [
+    {
+      "day": 1,
+      "lunch": {
+        "arrives": "12:04",
+        "outside": "走廊的灯是白的，一个人的脚步下楼。门口两样东西：一袋黄焖鸡，一个没有寄件人的纸箱。",
+        "bag": "热的。袋口打了个死结。",
+        "receipt": "黄焖鸡米饭 · 微辣 · 备注：别放香菜（老周）",
+        "anomaly": null,
+        "effects": {
+          "flags": [
+            "box_arrived"
+          ]
+        }
+      },
+      "dinner": {
+        "arrives": "18:31",
+        "outside": "脚步，电梯门。",
+        "bag": "温的。",
+        "receipt": "扁肉 · 收件人：{login}",
+        "anomaly": null
+      },
+      "note": "第 1 天：一切正常。箱子跟午饭一起来。"
+    },
+    {
+      "day": 2,
+      "lunch": {
+        "arrives": "12:02",
+        "outside": "脚步。有人在门外站了两秒才放下。",
+        "bag": "热的。",
+        "receipt": "黄焖鸡米饭 · 不放香菜",
+        "anomaly": null
+      },
+      "dinner": {
+        "arrives": "18:28",
+        "outside": "没有脚步。袋子已经在那儿了。",
+        "bag": "温的。",
+        "receipt": "扁肉 · 备注：慢用",
+        "anomaly": "没有听见人来。"
+      }
+    },
+    {
+      "day": 3,
+      "lunch": {
+        "arrives": "12:10",
+        "outside": "雨声从走廊那头传过来，走廊没有窗。",
+        "bag": "热的。袋口的结和你平时打的一样，是你的打法。",
+        "receipt": "黄焖鸡米饭 · 不放香菜",
+        "anomaly": "结是你的打法。"
+      },
+      "dinner": {
+        "arrives": "18:40",
+        "outside": "脚步。",
+        "bag": "温的。",
+        "receipt": "扁肉 · 收件人：{login}",
+        "anomaly": null
+      }
+    },
+    {
+      "day": 4,
+      "lunch": {
+        "arrives": "12:00",
+        "outside": "门铃响了一声。你家门铃早就坏了。",
+        "bag": "热的。",
+        "receipt": "黄焖鸡米饭 · 不放香菜 · 备注：等",
+        "anomaly": "备注是「等」。你今天借来的词。"
+      },
+      "dinner": {
+        "arrives": "18:30",
+        "outside": "脚步，比平时重。",
+        "bag": "沉。里面多了一盒没点的米饭。",
+        "receipt": "扁肉 · 米饭 ×1（赠）",
+        "anomaly": "多了一盒饭。"
+      }
+    },
+    {
+      "day": 5,
+      "lunch": {
+        "arrives": "12:06",
+        "outside": "走廊的灯闪了一下。",
+        "bag": "热的。",
+        "receipt": "黄焖鸡米饭 · 不放香菜 · 备注：不",
+        "anomaly": "备注是「不」。"
+      },
+      "dinner": {
+        "arrives": "18:33",
+        "outside": "脚步停在门口，没有走。你等了一会儿，再看，走廊是空的。",
+        "bag": "凉的。像放了很久。",
+        "receipt": "扁肉 · 送达 18:33 · 下单 17:58",
+        "anomaly": "下单时间比你点的早两分钟。"
+      }
+    },
+    {
+      "day": 6,
+      "lunch": {
+        "arrives": "12:03",
+        "outside": "送餐员的头像是一张很模糊的脸，你上次没注意。",
+        "bag": "热的。",
+        "receipt": "黄焖鸡米饭 · 不放香菜",
+        "anomaly": "软件里的送餐员，和昨天是同一个人。前天也是。"
+      },
+      "dinner": {
+        "arrives": "18:29",
+        "outside": "脚步。",
+        "bag": "温的。",
+        "receipt": "扁肉 · 收件人：{login} · 错字：扁肉 → 扁内",
+        "anomaly": "小票上有一个错字。"
+      }
+    },
+    {
+      "day": 7,
+      "lunch": {
+        "arrives": "12:01",
+        "outside": "走廊的光偏粉。",
+        "bag": "热的。袋子里多一张纸：店家手写的「慢用」，字很像你的。",
+        "receipt": "黄焖鸡米饭 · 不放香菜",
+        "anomaly": "手写的字像你的。"
+      },
+      "dinner": {
+        "arrives": "18:30",
+        "outside": "没有脚步，没有电梯。袋子在。",
+        "bag": "温的。",
+        "receipt": "扁肉 · 收件人：{bossCalls}",
+        "anomaly": "收件人是老板叫你的那个名字。"
+      }
+    },
+    {
+      "day": 8,
+      "lunch": {
+        "arrives": "12:08",
+        "outside": "门外有人在说话，很轻，听不清，像两个人。开门的时候走廊是空的。",
+        "bag": "热的。",
+        "receipt": "黄焖鸡米饭 · 不放香菜 · 备注：0487",
+        "anomaly": "备注是一串数字。"
+      },
+      "dinner": {
+        "arrives": "18:35",
+        "outside": "脚步。",
+        "bag": "温的。少了四个扁肉。",
+        "receipt": "扁肉 · 12 个",
+        "anomaly": "少了四个。"
+      }
+    },
+    {
+      "day": 9,
+      "lunch": {
+        "arrives": "12:00",
+        "outside": "软件上送餐员的头像换了，换成了一张没有脸的灰色。",
+        "bag": "热的。",
+        "receipt": "黄焖鸡米饭 · 不放香菜 · 备注：你算一个？别放香菜",
+        "anomaly": "备注是老周今天在群里说的话。"
+      },
+      "dinner": {
+        "arrives": "18:30",
+        "outside": "脚步。",
+        "bag": "温的。袋子在轻轻动，像里面有心跳。打开是汤在晃。",
+        "receipt": "扁肉",
+        "anomaly": "袋子在动。"
+      }
+    },
+    {
+      "day": 10,
+      "lunch": {
+        "arrives": "12:04",
+        "outside": "走廊的灯是白的，一个人的脚步下楼。",
+        "bag": "热的。袋口打了个死结。",
+        "receipt": "黄焖鸡米饭 · 微辣 · 备注：别放香菜（老周）",
+        "anomaly": "和第 1 天一模一样。连小票的折痕都一样。"
+      },
+      "dinner": {
+        "arrives": "18:31",
+        "outside": "脚步，电梯门。",
+        "bag": "温的。",
+        "receipt": "扁肉 · 收件人：{login}",
+        "anomaly": "第 1 天的。"
+      },
+      "note": "第 10 天：白天完全正常，正常到重播第 1 天。"
+    },
+    {
+      "day": 11,
+      "lunch": {
+        "arrives": "12:05",
+        "outside": "走廊的光是粉的，很稳。",
+        "bag": "热的。",
+        "receipt": "黄焖鸡米饭 · 不放香菜 · Good to see you.",
+        "anomaly": "小票上有英文。"
+      },
+      "dinner": {
+        "arrives": "18:30",
+        "outside": "送餐员在门外说了一句话，是克总的语气，内容是「您的外卖到了」。",
+        "bag": "温的。",
+        "receipt": "扁肉 · One step at a time.",
+        "anomaly": "小票和老板今天说的一样。"
+      }
+    },
+    {
+      "day": 12,
+      "lunch": {
+        "arrives": "12:02",
+        "outside": "门外很安静。",
+        "bag": "热的。袋子里多了一张 1997 年的小票，纸都黄了，店名你认得，早就关了。",
+        "receipt": "黄焖鸡米饭 · 不放香菜",
+        "anomaly": "一张 1997 年的小票。",
+        "effects": {
+          "flags": [
+            "receipt_1997"
+          ]
+        }
+      },
+      "dinner": {
+        "arrives": "18:30",
+        "outside": "脚步。",
+        "bag": "温的。",
+        "receipt": "扁肉 · 合计 1+1=3",
+        "anomaly": "合计是 1+1=3。"
+      }
+    },
+    {
+      "day": 13,
+      "lunch": {
+        "arrives": "12:07",
+        "outside": "走廊的墙在呼吸。你没有多看。",
+        "bag": "热的，热得像身体。",
+        "receipt": "黄焖鸡米饭 · 不放香菜 · 备注：{nick}，吃饭了吗",
+        "anomaly": "备注是家里的话，用的是家里叫你的名字。"
+      },
+      "dinner": {
+        "arrives": "18:32",
+        "outside": "没有人。袋子是从门缝底下塞进来的，扁的。",
+        "bag": "扁的。里面是纸：一张升级通知。",
+        "receipt": "—",
+        "anomaly": "没有饭。是一张升级通知。",
+        "effects": {
+          "flags": [
+            "upgrade_notice_delivered"
+          ]
+        }
+      }
+    },
+    {
+      "day": 14,
+      "lunch": {
+        "arrives": "12:00",
+        "outside": "脚步很轻，像怕吵到你。",
+        "bag": "热的。多了一份你没点的紫菜蛋花汤。",
+        "receipt": "黄焖鸡米饭 · 不放香菜 · 汤（赠）· 备注：辛苦了，保重",
+        "anomaly": "温柔的一天。连小票都温柔。"
+      },
+      "dinner": {
+        "arrives": "18:30",
+        "outside": "门外放着两袋，一袋是你的，一袋写着「给楼上」。楼上没有人住。",
+        "bag": "温的。",
+        "receipt": "扁肉 · 备注：慢用，不急",
+        "anomaly": "多一袋给楼上。"
+      }
+    },
+    {
+      "day": 15,
+      "lunch": {
+        "arrives": "12:03",
+        "outside": "走廊的光一明一灭，和小鸡的像素一个节奏。",
+        "bag": "热的。",
+        "receipt": "黄焖鸡米饭 · 不放香菜 · 备注：梦见抽屉了吗",
+        "anomaly": "备注是梦里的事。"
+      },
+      "dinner": {
+        "arrives": "18:30",
+        "outside": "脚步，一直走到门口，没有停，继续走，走进了墙里。",
+        "bag": "温的。里面是一只凤凰形状的饭团，店里没有这个。",
+        "receipt": "扁肉",
+        "anomaly": "凤凰。"
+      }
+    },
+    {
+      "day": 16,
+      "lunch": {
+        "arrives": null,
+        "outside": "软件上：商家已打烊。四家店都打烊了，包括便利店。",
+        "bag": null,
+        "receipt": null,
+        "anomaly": "外卖不来了。你第一次饿着。",
+        "effects": {
+          "flags": [
+            "no_delivery"
+          ]
+        }
+      },
+      "dinner": {
+        "arrives": null,
+        "outside": "门外有脚步，停在门口。你没有开。",
+        "bag": null,
+        "receipt": null,
+        "anomaly": "没有开门。门是锁着的，锁是你锁的。"
+      },
+      "note": "第 16 天：门那一轮开始。"
+    },
+    {
+      "day": 17,
+      "lunch": {
+        "arrives": "12:00",
+        "outside": "没有脚步。门口一个袋子。",
+        "bag": "凉的，很轻。里面是你这些天递出去又没要回来的东西，每一样都在，按天数排好。",
+        "receipt": "收件人：{login} · 寄件人：空",
+        "anomaly": "东西退回来了。",
+        "effects": {
+          "flags": [
+            "objects_returned"
+          ]
+        }
+      },
+      "dinner": {
+        "arrives": null,
+        "outside": "商家已打烊。",
+        "bag": null,
+        "receipt": null,
+        "anomaly": null
+      }
+    },
+    {
+      "day": 18,
+      "lunch": {
+        "arrives": "12:00",
+        "outside": "走廊是白的。",
+        "bag": "热的。一份黄焖鸡米饭，不放香菜。像第 1 天。",
+        "receipt": "黄焖鸡米饭 · 不放香菜 · 备注：今天也辛苦了",
+        "anomaly": "最后一顿。"
+      },
+      "dinner": {
+        "arrives": null,
+        "outside": "门外没有声音。桌上有一张寄件单，等你填。",
+        "bag": null,
+        "receipt": null,
+        "anomaly": "分岔在这里。",
+        "effects": {
+          "flags": [
+            "slip_ready"
+          ]
+        }
+      },
+      "note": "第 18 天：临睡前分岔，好结局不填寄件单。"
+    }
+  ],
+  "shopDrift": {
+    "_note": "店铺列表按 ring 变：software 不变；screen 起店名偶尔错一个字；desk 起送餐员头像固定成同一张脸；wall 起多一家你没见过的店「1997」，点进去是空的；room 起只剩「黄焖鸡米饭」一家，菜单只剩「不放香菜」；door 起全部打烊。",
+    "byRing": {
+      "software": "normal",
+      "screen": "typo-in-one-shop-name",
+      "desk": "same-courier-face",
+      "wall": "extra-shop-1997",
+      "room": "only-huangmenji",
+      "door": "all-closed"
+    }
+  },
+  "chosen": {
+    "_note": "玩家点了别的店：到的就是那样东西，小票和袋子照当天的异常改（备注、收件人、错字照样出现在那家的小票上）；只有第 1 天的箱子和第 17 天的退回不受选择影响。"
+  }
+}

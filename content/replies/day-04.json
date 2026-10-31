@@ -1,0 +1,373 @@
+{
+  "day": 4,
+  "recipients": {
+    "boss": {
+      "incoming": [
+        {
+          "t": "09:12",
+          "text": "[语音] 15″",
+          "kind": "work"
+        },
+        {
+          "t": "09:12",
+          "text": "（转文字）v17 v18 合一份，导出那两条合一下。",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:12",
+            "text": "好。"
+          }
+        ],
+        "inner": "一个字。他开始省了。"
+      },
+      "received": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "2s",
+        "inner": "收到都不回了。"
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:13",
+            "text": "[语音] 8″"
+          },
+          {
+            "who": "boss",
+            "t": "09:13",
+            "text": "（转文字）行，合并导出的那两条，让它合。"
+          }
+        ]
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s",
+        "inner": "已读。没有人在输入。我等了两分钟。"
+      },
+      "wait": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "20s",
+        "interrupt": {
+          "who": "boss",
+          "where": "boss",
+          "t": "09:20",
+          "text": "等什么？"
+        },
+        "effects": {
+          "flags": [
+            "boss_asked_wait"
+          ]
+        },
+        "inner": "等。他第一次没有顺着我的节奏，是我第一次没有顺着他的。"
+      }
+    },
+    "partner": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "[卡片] 导出规范 · 转发",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:30",
+            "text": "👍"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:30",
+            "text": "[卡片] 导出规范 · 转发"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "3s"
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "10min"
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:35",
+            "text": "等得起。"
+          }
+        ],
+        "inner": "等得起。他说的是他。"
+      }
+    },
+    "group": {
+      "incoming": [
+        {
+          "t": "09:12",
+          "text": "老周：谁去拿快递，有个箱子",
+          "kind": "work"
+        },
+        {
+          "t": "09:13",
+          "text": "member：老周去吧",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:12",
+            "text": "好，那快递我去"
+          },
+          {
+            "who": "member",
+            "t": "09:13",
+            "text": "辛苦老周"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:14",
+            "text": "收到。"
+          },
+          {
+            "who": "member",
+            "t": "09:14",
+            "text": "收到。"
+          }
+        ],
+        "inner": "两个收到，都带句号。昨天没有人带句号。"
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:15",
+            "text": "好的，哪都行。"
+          }
+        ],
+        "inner": "群里有人学我说话。学得很客气。"
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "inner": "已读。这回连鸡的照片都没有。"
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:16",
+            "text": "等啥，快递我拿了"
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:17",
+            "text": "好的。"
+          }
+        ],
+        "inner": "我打了一句玩笑。回我的是「好的。」"
+      }
+    },
+    "xiaozhang": {
+      "incoming": [
+        {
+          "t": "10:07",
+          "text": "{calledBy}日志你看了吗",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:08",
+            "text": "好的{calledBy}"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:08",
+            "text": "{calledBy}那个日志你看了吗，就一条横线"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "xz_saw_changelog"
+          ]
+        },
+        "inner": "他也看见了。两个人看见，就不是我眼花。"
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:09",
+            "text": "那我也不管它了"
+          }
+        ]
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:11",
+            "text": "{calledBy}你要是走我也走"
+          }
+        ],
+        "inner": "他说走。我没说走。"
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:12",
+            "text": "等你"
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:14",
+            "text": "哈哈哈{calledBy}"
+          }
+        ]
+      }
+    },
+    "laozhou": {
+      "incoming": [
+        {
+          "t": "12:00",
+          "text": "快递是你的",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:01",
+            "text": "好"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:01",
+            "text": "快递是你的，一个箱子，挺沉"
+          },
+          {
+            "who": "laozhou",
+            "t": "12:02",
+            "text": "没寄件人"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "lz_saw_box"
+          ]
+        },
+        "inner": "他拿过那个箱子。他说没寄件人。"
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:02",
+            "text": "放你门口了"
+          }
+        ]
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:05",
+            "text": "我这个月也没"
+          },
+          {
+            "who": "laozhou",
+            "t": "12:05",
+            "text": "先别说"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "lz_unpaid_too"
+          ]
+        },
+        "inner": "他这个月也没。他说先别说。"
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:06",
+            "text": "等啥"
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:08",
+            "text": "嗯"
+          }
+        ]
+      }
+    }
+  }
+}

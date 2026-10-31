@@ -1,0 +1,423 @@
+{
+  "day": 5,
+  "recipients": {
+    "boss": {
+      "incoming": [
+        {
+          "t": "09:12",
+          "text": "[语音] 41″",
+          "kind": "work"
+        },
+        {
+          "t": "09:12",
+          "text": "（转文字）新人的方案群里发了，你别拦，年轻人有想法是好事，一步一步来。",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:12",
+            "text": "[语音] 41″"
+          },
+          {
+            "who": "boss",
+            "t": "09:12",
+            "text": "（转文字）好。那个新人的方案群里发了，你别拦，年轻人有想法是好事，你把你那套先放一放，一步一步来。"
+          }
+        ],
+        "inner": "一步一步来。第五次。"
+      },
+      "received": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s"
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:13",
+            "text": "对，哪都行，别较真。"
+          }
+        ],
+        "inner": "他把「哪都行」当成了我同意。"
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s",
+        "interrupt": {
+          "who": "boss",
+          "where": "group",
+          "t": "09:30",
+          "text": "@所有人 新人方案大家多鼓励。"
+        },
+        "inner": "我问工资。他去群里鼓励新人。"
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:40",
+            "text": "不什么？"
+          },
+          {
+            "who": "boss",
+            "t": "09:40",
+            "text": "[语音] 6″"
+          },
+          {
+            "who": "boss",
+            "t": "09:40",
+            "text": "（转文字）你现在是合伙人，别用这种词。"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "boss_heard_no"
+          ]
+        },
+        "inner": "别用这种词。他知道这个词是哪来的吗。"
+      }
+    },
+    "partner": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "[卡片] 新人方案 · 转发",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:30",
+            "text": "👍"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:30",
+            "text": "[卡片] 新人方案 · 转发"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "2s"
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "30min"
+      },
+      "no": {
+        "status": "recalled",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:41",
+            "text": "不什么"
+          }
+        ],
+        "inner": "他问了，又撤回了。他也不想知道。"
+      }
+    },
+    "group": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "新人：[文档] 方案 v1，请大家指正",
+          "kind": "work"
+        },
+        {
+          "t": "09:31",
+          "text": "member：👍",
+          "kind": "work"
+        },
+        {
+          "t": "09:31",
+          "text": "member：👍",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:35",
+            "text": "好的！"
+          },
+          {
+            "who": "member",
+            "t": "09:35",
+            "text": "👍"
+          },
+          {
+            "who": "member",
+            "t": "09:35",
+            "text": "👍"
+          },
+          {
+            "who": "member",
+            "t": "09:36",
+            "text": "👍"
+          }
+        ],
+        "inner": "一排大拇指。新的压着旧的。"
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:36",
+            "text": "收到。"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:37",
+            "text": "好的，都行的。"
+          }
+        ],
+        "inner": "都行的。这个「的」不是我们公司的人会加的。"
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "inner": "群里五十个人，已读，一个都没有回。"
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:38",
+            "text": "哦，你看了啊。我以为没人看"
+          },
+          {
+            "who": "member",
+            "t": "09:39",
+            "text": "老大是不是有别的考虑"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "group_heard_no"
+          ],
+          "san": 1
+        },
+        "inner": "老周接了。他以为没人看。有人看。"
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:40",
+            "text": "好的，收到。"
+          }
+        ]
+      }
+    },
+    "xiaozhang": {
+      "incoming": [
+        {
+          "t": "13:00",
+          "text": "{calledBy}那个钱……",
+          "kind": "money",
+          "cond_show": {
+            "has": "lent"
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "13:02",
+            "text": "好的{calledBy}"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "13:02",
+            "text": "{calledBy}……那个钱你真借了？"
+          }
+        ],
+        "cond_show": {
+          "has": "lent"
+        },
+        "inner": "他知道了。"
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "13:03",
+            "text": "那我按新人的来？"
+          }
+        ]
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "13:04",
+            "text": "{calledBy}我妈问我还干不干"
+          }
+        ],
+        "inner": "他妈问。我妈没问，我妈不知道。"
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "13:05",
+            "text": "不！"
+          },
+          {
+            "who": "xiaozhang",
+            "t": "13:05",
+            "text": "哈哈我学你"
+          }
+        ],
+        "inner": "他学我。这个字他也不会用。"
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "13:07",
+            "text": "好的{calledBy}！"
+          }
+        ]
+      }
+    },
+    "laozhou": {
+      "incoming": [
+        {
+          "t": "09:44",
+          "text": "你看了啊",
+          "kind": "work"
+        },
+        {
+          "t": "12:08",
+          "text": "四万四",
+          "kind": "money",
+          "cond_show": {
+            "has": "lent"
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:44",
+            "text": "哦，你看了啊。我以为没人看"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:44",
+            "text": "可能吧。反正我现在也不写了"
+          },
+          {
+            "who": "laozhou",
+            "t": "09:45",
+            "text": "[撤回了一条消息]"
+          }
+        ],
+        "inner": "他撤回的那句，我没来得及看。"
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:45",
+            "text": "你这人"
+          }
+        ]
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:10",
+            "text": "四万四"
+          },
+          {
+            "who": "laozhou",
+            "t": "12:10",
+            "text": "我知道"
+          },
+          {
+            "who": "laozhou",
+            "t": "12:11",
+            "text": "先吃饭"
+          }
+        ],
+        "cond_show": {
+          "has": "lent"
+        },
+        "inner": "他知道数。谁告诉他的。"
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:46",
+            "text": "不就不"
+          }
+        ],
+        "inner": "不就不。他接得很快，像等了很久。"
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:48",
+            "text": "嗯"
+          }
+        ]
+      }
+    }
+  }
+}

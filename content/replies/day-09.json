@@ -1,0 +1,433 @@
+{
+  "day": 9,
+  "recipients": {
+    "boss": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "[语音] 52″",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "（转文字）{bossCalls}，两份计费模块今天过，你让它做就行，不用自己读，你自己读要很久。还有，你最近状态不错，继续保持。",
+          "kind": "work"
+        },
+        {
+          "t": "09:01",
+          "text": "[语音] 52″",
+          "kind": "odd",
+          "note": "同样 52 秒，转文字一字不差"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:10",
+            "text": "好的。"
+          }
+        ],
+        "inner": "好的。他用了句号。"
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:10",
+            "text": "Received."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:10",
+            "text": "Whatever works."
+          }
+        ]
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s",
+        "interrupt": {
+          "who": "boss",
+          "where": "boss",
+          "t": "09:11",
+          "text": "你最近状态不错，继续保持。"
+        },
+        "inner": "我问钱。他夸我状态。"
+      },
+      "no": {
+        "status": "read",
+        "lines": []
+      },
+      "wait": {
+        "status": "read",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "read",
+        "lines": []
+      }
+    },
+    "partner": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "[卡片] 计费模块 · 验收",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "👍"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "👍"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "👍"
+          }
+        ],
+        "inner": "三个大拇指，一模一样。"
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "6h"
+      },
+      "no": {
+        "status": "read",
+        "lines": []
+      },
+      "wait": {
+        "status": "read",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "silence",
+        "lines": []
+      }
+    },
+    "group": {
+      "incoming": [
+        {
+          "t": "11:20",
+          "text": "老周：中午吃啥",
+          "kind": "private"
+        },
+        {
+          "t": "11:20",
+          "text": "member：听安排",
+          "kind": "private"
+        },
+        {
+          "t": "11:20",
+          "text": "member：听安排",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "11:21",
+            "text": "好的。"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "11:21",
+            "text": "收到。"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:21",
+            "text": "行。你也吃一份"
+          }
+        ]
+      },
+      "salary": {
+        "status": "read",
+        "lines": []
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "11:22",
+            "text": "理解的。"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "11:22",
+            "text": "好的。"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "11:23",
+            "text": "辛苦。"
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:24",
+            "text": "你别又不吃饭，杯子里还是凉水吧"
+          }
+        ],
+        "inner": "老周还在。他知道我杯子里是凉水。"
+      }
+    },
+    "xiaozhang": {
+      "incoming": [
+        {
+          "t": "11:32",
+          "text": "{calledBy}这份我让它做了，要不要看一眼",
+          "kind": "work"
+        },
+        {
+          "t": "11:35",
+          "text": "{calledBy}你说别让它做？",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:36",
+            "text": "好的{calledBy}。我先去吃饭。"
+          }
+        ],
+        "inner": "句号。他从来不用句号。"
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:36",
+            "text": "收到{calledBy}"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:37",
+            "text": "那我让它做了"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "xz_let_it_do_d9"
+          ]
+        }
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:38",
+            "text": "{calledBy}……我想走"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "xz_wants_to_leave"
+          ]
+        },
+        "inner": "他说想走。这句不是今天能回答的。"
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:38",
+            "text": "好，我看一眼"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "xz_looked_d9"
+          ],
+          "san": 1
+        },
+        "inner": "他说他看一眼。"
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:38",
+            "text": "等"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:39",
+            "text": "{calledBy}你别"
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:41",
+            "text": "好的{calledBy}"
+          }
+        ]
+      }
+    },
+    "laozhou": {
+      "incoming": [
+        {
+          "t": "11:21",
+          "text": "你算一个？别放香菜",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:21",
+            "text": "行。你也吃一份"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:22",
+            "text": "行吧"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:22",
+            "text": "你这人"
+          }
+        ]
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:30",
+            "text": "我提了"
+          },
+          {
+            "who": "laozhou",
+            "t": "12:30",
+            "text": "他说一步一步来"
+          }
+        ],
+        "inner": "他也提了。他也听到了那句。"
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:23",
+            "text": "不就不"
+          }
+        ]
+      },
+      "wait": {
+        "status": "typing",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:23",
+            "text": "别回头"
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:35",
+            "text": "嗯"
+          }
+        ]
+      }
+    }
+  }
+}

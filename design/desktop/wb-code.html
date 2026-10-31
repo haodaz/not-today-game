@@ -1,0 +1,36 @@
+<!doctype html><html lang="zh"><meta charset="utf-8"><title>工作台 · 代码</title><link rel="stylesheet" href="design.css"><body><div class="stage"><div class="monitor"><div class="os"><div class="top"><span class="brand">未来智能 · 工作台</span><span>工作台 · 代码</span><div class="day"><span>第 1 天 · 早上 09:03</span><span>☁ 雨</span><span class="kuro-dot"></span><span>Kuro</span></div></div><div class="win wb" style="left:24px;top:54px;width:1392px;height:760px"><div class="bar"><div class="dots"><i></i><i></i><i></i></div><span class="title">工作台 · 代码</span><span style="margin-left:auto">自动保存</span></div><div class="body"><div class="side">
+  <div class="logo"><i></i><div><b>工作台</b><small>未来智能 · 你写的</small></div></div>
+  <div class="search">找活、找人、找文件…</div>
+  <div class="it ">首页</div>
+  <div class="it">新任务</div>
+  <div class="it ">文档 <span class="tag">v17</span></div>
+  <div class="it on">代码</div>
+  <div class="it ">账本</div>
+  <div class="it">工单</div>
+  <div class="it">项目</div>
+  <div class="sec">在办的事</div>
+  <div class="job">需求 v17 评审 <em>待你看</em></div>
+  <div class="job">应收表 · 拖欠天数 <em>待改</em></div>
+  <div class="job">存一份合并文档 <em class="g">克总可做</em></div>
+  <div class="sec">最近</div>
+  <div class="job">需求 v16 → v17 的改动</div>
+  <div class="job">export.ts · 两遍正则</div>
+  <div class="job">更新日志 v4.2</div>
+  <div class="job">工资页 · 差额</div>
+  <div class="me"><i></i><div><b>你</b><br><small style="color:var(--ink-3)">合伙人 · 研发</small></div></div>
+</div><div class="page"><div class="ph2"><b>export.ts</b><small>克总交的 · 34 行</small><span class="sp"></span><span class="btn">跑测试</span><span class="btn eye">看一眼</span><span class="btn do">通过</span></div>
+<div class="cols"><div class="col code"><span class="g">11</span><span class="kw">export</span> <span class="kw">function</span> exportPdf(doc: Doc) {
+<span class="g">12</span>  <span class="kw">const</span> ok = validate(doc);          <span class="c">// 校验</span>
+<span class="g">13</span>  <span class="kw">if</span> (!ok) <span class="kw">return</span>;
+<span class="g">14</span>  <span class="kw">const</span> ok2 = validate(doc);         <span class="r">// 同一个正则，第二遍</span>
+<span class="g">15</span>  write(doc, ok2);
+<span class="g">16</span>}
+<span class="g">17</span>
+<span class="g">18</span><span class="c">// for convenience</span>
+<span class="g">19</span><span class="kw">export</span> <span class="kw">const</span> uid = (u: User) =&gt; u.user_id;</div>
+<div class="log"><h4>更新日志 · 代码软件</h4>
+<div class="v"><b>v4.2</b><small>今天</small><p>修复导出超时；修复表格粘贴格式；修复中文标点。</p></div>
+<div class="v"><b>v4.1</b><small>昨天</small><p>修复两处崩溃。</p></div>
+<div class="v" style="opacity:.45"><b>v4.3</b><small>明天</small><p class="line"></p></div>
+<div style="margin-top:14px;color:var(--ink-3);font-size:11px">做产品的人会看这个面板。第 4 天起它只剩一条横线。</div></div></div></div></div></div><div class="kpet" style="right:392px;bottom:18px;width:120px;height:120px"><img src="assets/kuro/k3d_busy.png" alt="Kuro"></div>
+<div class="kmini"><div class="h"><img src="assets/kuro.jpg" alt=""><b>Kuro</b><span>在线</span><span class="turns">今天 <b>0</b>/5</span></div><div class="c"><div class="it">I'm here if you need me.</div></div><div class="qs"><span>你叫什么？</span><span>你是什么模型？</span><span>这屋子怎么样？</span></div><div class="in">和克总说点别的…</div></div></div></div></div><div class="note">design/desktop/wb-code.html · 代码内页 + 更新日志面板（预览了第 4 天的横线）</div></body></html>

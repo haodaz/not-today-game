@@ -1,0 +1,15 @@
+{
+  "_note": "中文是源语言。回复菜单的键在 variables.json replyOptions / objectWords；这里是显示文本。",
+  "reply.fine": "好。",
+  "reply.received": "收到。",
+  "reply.whatever": "哪都行。",
+  "reply.salary": "最近有钱发工资吗。",
+  "reply.lol": "哈哈",
+  "reply.what-llm": "你换模型了。",
+  "word.no": "不。",
+  "word.wait": "等。",
+  "word.how-much": "多少。",
+  "word.what-do-you-mean": "什么意思。",
+  "word.say-it-again": "再说一遍。",
+  "word.im-going-in": "我进去了。"
+}

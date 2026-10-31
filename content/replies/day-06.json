@@ -1,0 +1,396 @@
+{
+  "day": 6,
+  "recipients": {
+    "boss": {
+      "incoming": [
+        {
+          "t": "09:12",
+          "text": "Good morning. 导出加 CSV，今天。",
+          "kind": "work",
+          "note": "第一次夹英文"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:12",
+            "text": "Good. 一步一步来。"
+          }
+        ],
+        "inner": "Good。他第一次用英文。"
+      },
+      "received": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s"
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:12",
+            "text": "Whatever works."
+          }
+        ],
+        "effects": {
+          "flags": [
+            "boss_speaks_it"
+          ]
+        },
+        "inner": "Whatever works。这句不是他的，我知道是谁的。"
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s",
+        "interrupt": {
+          "who": "boss",
+          "where": "boss",
+          "t": "09:13",
+          "text": "[语音] 5″"
+        },
+        "inner": "五秒。我没点开。"
+      },
+      "no": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s",
+        "inner": "「不」。已读。他连「不什么」都不问了。"
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:14",
+            "text": "等得起。"
+          }
+        ],
+        "inner": "等得起。昨天合伙人说的。他们在用同一个本子。"
+      }
+    },
+    "partner": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "[卡片] 本周里程碑 · 更新",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:30",
+            "text": "👍"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:30",
+            "text": "[卡片] 本周里程碑 · 更新"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "Whatever works for you."
+          }
+        ],
+        "inner": "他也会了。"
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1h"
+      },
+      "no": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "2s"
+      },
+      "wait": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "2s"
+      }
+    },
+    "group": {
+      "incoming": [
+        {
+          "t": "09:19",
+          "text": "member：早上好。",
+          "kind": "private"
+        },
+        {
+          "t": "09:19",
+          "text": "member：早上好。",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:20",
+            "text": "好的。"
+          },
+          {
+            "who": "member",
+            "t": "09:20",
+            "text": "好的。"
+          },
+          {
+            "who": "member",
+            "t": "09:20",
+            "text": "好的。"
+          }
+        ],
+        "inner": "三个好的，三个句号，三秒钟。整齐得像一排。"
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:21",
+            "text": "收到，辛苦。"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:21",
+            "text": "都行的，听安排。"
+          }
+        ]
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "inner": "已读。老周的头像灰了。"
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:22",
+            "text": "理解的。"
+          }
+        ],
+        "inner": "理解的。谁理解。理解什么。"
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:22",
+            "text": "好的，等通知。"
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:24",
+            "text": "好的。"
+          }
+        ],
+        "inner": "不管我打什么。好的。"
+      }
+    },
+    "xiaozhang": {
+      "incoming": [
+        {
+          "t": "11:30",
+          "text": "{calledBy}文档里有错字，两处，不是我打的",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:31",
+            "text": "好的{calledBy}"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:31",
+            "text": "{calledBy}你那边文档是不是有错字，我看见两处"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "xz_saw_typos"
+          ]
+        },
+        "inner": "他看见了错字。错字不是我打的。"
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:32",
+            "text": "那我让它改"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "xz_let_it_do_d6"
+          ]
+        }
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:33",
+            "text": "{calledBy}我这个月也晚了三天"
+          }
+        ],
+        "inner": "三天。开始了。"
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:34",
+            "text": "不什么{calledBy}"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:34",
+            "text": "好，等你"
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:36",
+            "text": "好的{calledBy}"
+          }
+        ]
+      }
+    },
+    "laozhou": {
+      "incoming": [
+        {
+          "t": "12:38",
+          "text": "[语音] 3″",
+          "kind": "odd",
+          "note": "嚼东西的声音"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:40",
+            "text": "嗯"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:40",
+            "text": "收到"
+          }
+        ],
+        "inner": "老周说收到。他以前从来不说收到。"
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:41",
+            "text": "行"
+          }
+        ]
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:50",
+            "text": "505"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "lz_505"
+          ]
+        },
+        "inner": "505。他发了一个数字。倒过来是 SOS。他不会知道这个。"
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:41",
+            "text": "不"
+          }
+        ]
+      },
+      "wait": {
+        "status": "typing",
+        "lines": [],
+        "inner": "正在输入。很久。没有来。"
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:55",
+            "text": "先吃饭"
+          }
+        ]
+      }
+    }
+  }
+}
