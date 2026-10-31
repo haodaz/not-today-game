@@ -51,7 +51,7 @@ describe("desktop snapshots (requirements §3)", () => {
  * Strings the desktop asks for that content/strings does not have yet.
  * TODO(Claude): add them (docs/kiro-log.md lists them); then remove them here.
  */
-const KNOWN_MISSING = ["wb.now.count", "wb.now.letItDo"];
+const KNOWN_MISSING: string[] = [];
 
 describe("strings", () => {
   it("every string the desktop renders on every day exists, except the documented TODOs", () => {

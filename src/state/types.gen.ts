@@ -28,6 +28,7 @@ export interface State {
   chatTurnsToday: number;
   chatMemory: { summary: string; recent: { day: unknown; who: unknown; text: unknown }[] };
   judgement: { truth: number; values: number; bond: number; evidence: { day: unknown; eventId: unknown; note: unknown }[] };
+  upgraded: Record<string, boolean>;
 }
 
 export type StateKey = keyof State;
