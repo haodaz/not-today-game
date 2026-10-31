@@ -1,6 +1,7 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { derive, f } from "@state/fday";
+import { applyIncomingFlags } from "@state/replies/effects";
 import { stageOf } from "@state/stages";
 import { constants, defaults, validate } from "@state/variables";
 import { draftArb, play } from "./helpers";
@@ -21,16 +22,20 @@ describe("f(startDay)", () => {
     }
   });
 
-  it("leaves every other variable at its default", () => {
-    const { day, stage, overdueDays, ...rest } = f(7) as unknown as Record<string, unknown>;
-    const { day: _d, stage: _s, overdueDays: _o, ...expected } = defaults();
-    expect(rest).toEqual(expected);
-    expect([day, stage, overdueDays].every((v) => typeof v === "number")).toBe(true);
+  it("leaves every other variable at its default (flags come from the day's incoming messages)", () => {
+    for (const day of [1, 7, 13, constants.lastDay]) {
+      const { day: d, stage, overdueDays, flags, ...rest } = f(day) as unknown as Record<string, unknown>;
+      const { day: _d, stage: _s, overdueDays: _o, flags: _f, ...expected } = defaults();
+      expect(rest, `day ${day}`).toEqual(expected);
+      expect(flags, `day ${day}`).toEqual(applyIncomingFlags({ ...f(day), flags: [] }).flags);
+      expect([d, stage, overdueDays].every((v) => typeof v === "number")).toBe(true);
+    }
   });
 
   it("returns an independent state each call", () => {
+    const before = [...f(1).flags];
     f(1).flags.push("x");
-    expect(f(1).flags).toEqual([]);
+    expect(f(1).flags).toEqual(before);
   });
 
   it("rejects a start day that is not an integer >= 1", () => {

@@ -1,0 +1,415 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`FR5 snapshots > day 1 boss \`salary\`: read after 3 s, then a voice note in the same chat 1`] = `
+{
+  "hintKey": null,
+  "inner": "已读。然后一条四十一秒的语音，说的全是别的。",
+  "plan": {
+    "hintKey": null,
+    "inner": "已读。然后一条四十一秒的语音，说的全是别的。",
+    "steps": [
+      {
+        "action": {
+          "conversation": "boss",
+          "labelKey": "reply.salary",
+          "type": "own",
+          "word": "salary",
+        },
+        "at": {
+          "kind": "now",
+        },
+      },
+      {
+        "action": {
+          "conversation": "boss",
+          "type": "readReceipt",
+        },
+        "at": {
+          "kind": "afterMs",
+          "ms": 3000,
+        },
+      },
+      {
+        "action": {
+          "badge": false,
+          "conversation": "boss",
+          "line": {
+            "t": "09:19",
+            "text": "[语音] 41″",
+            "who": "boss",
+          },
+          "noReadReceipt": false,
+          "placement": "received",
+          "type": "deliver",
+        },
+        "at": {
+          "kind": "atBeat",
+          "t": "09:19",
+        },
+      },
+    ],
+  },
+  "rendered": [
+    "now  [boss] me: <reply.salary>",
+    "+3000ms  [boss] <reply.status.read>",
+    "@09:19  [boss] boss 09:19: [语音] 41″",
+  ],
+}
+`;
+
+exports[`FR5 snapshots > day 5 group \`no\` (the chick's word): replies, flags and san 1`] = `
+{
+  "effects": {
+    "addedFlags": [
+      "group_heard_no",
+    ],
+    "san": [
+      80,
+      81,
+    ],
+    "used": true,
+  },
+  "hintKey": null,
+  "inner": "老周接了。他以为没人看。有人看。",
+  "plan": {
+    "hintKey": null,
+    "inner": "老周接了。他以为没人看。有人看。",
+    "steps": [
+      {
+        "action": {
+          "conversation": "group",
+          "labelKey": "word.no",
+          "type": "own",
+          "word": "no",
+        },
+        "at": {
+          "kind": "now",
+        },
+      },
+      {
+        "action": {
+          "badge": false,
+          "conversation": "group",
+          "line": {
+            "t": "09:38",
+            "text": "哦，你看了啊。我以为没人看",
+            "who": "laozhou",
+          },
+          "noReadReceipt": false,
+          "placement": "received",
+          "type": "deliver",
+        },
+        "at": {
+          "kind": "atBeat",
+          "t": "09:38",
+        },
+      },
+      {
+        "action": {
+          "badge": false,
+          "conversation": "group",
+          "line": {
+            "t": "09:39",
+            "text": "老大是不是有别的考虑",
+            "who": "member",
+          },
+          "noReadReceipt": false,
+          "placement": "received",
+          "type": "deliver",
+        },
+        "at": {
+          "kind": "atBeat",
+          "t": "09:39",
+        },
+      },
+    ],
+  },
+  "rendered": [
+    "now  [group] me: <word.no>",
+    "@09:38  [group] laozhou 09:38: 哦，你看了啊。我以为没人看",
+    "@09:39  [group] member 09:39: 老大是不是有别的考虑",
+  ],
+}
+`;
+
+exports[`FR5 snapshots > day 13 xiaozhang, every word: deregistered silence, input disabled 1`] = `
+{
+  "fine": {
+    "gone": false,
+    "hintKey": null,
+    "inner": "发不出去。这个会话已经不存在了。",
+    "plan": {
+      "hintKey": null,
+      "inner": "发不出去。这个会话已经不存在了。",
+      "steps": [
+        {
+          "action": {
+            "conversation": "xiaozhang",
+            "type": "disableInput",
+          },
+          "at": {
+            "kind": "now",
+          },
+        },
+      ],
+    },
+    "rendered": [
+      "now  [xiaozhang] input disabled",
+    ],
+  },
+  "free": {
+    "gone": false,
+    "hintKey": null,
+    "inner": null,
+    "plan": {
+      "hintKey": null,
+      "inner": null,
+      "steps": [
+        {
+          "action": {
+            "conversation": "xiaozhang",
+            "type": "disableInput",
+          },
+          "at": {
+            "kind": "now",
+          },
+        },
+      ],
+    },
+    "rendered": [
+      "now  [xiaozhang] input disabled",
+    ],
+  },
+  "im-going-in": {
+    "gone": false,
+    "hintKey": null,
+    "inner": "他说你别进去。我说我进去了。发不出去。",
+    "plan": {
+      "hintKey": null,
+      "inner": "他说你别进去。我说我进去了。发不出去。",
+      "steps": [
+        {
+          "action": {
+            "conversation": "xiaozhang",
+            "type": "disableInput",
+          },
+          "at": {
+            "kind": "now",
+          },
+        },
+      ],
+    },
+    "rendered": [
+      "now  [xiaozhang] input disabled",
+    ],
+  },
+  "no": {
+    "gone": false,
+    "hintKey": null,
+    "inner": null,
+    "plan": {
+      "hintKey": null,
+      "inner": null,
+      "steps": [
+        {
+          "action": {
+            "conversation": "xiaozhang",
+            "type": "disableInput",
+          },
+          "at": {
+            "kind": "now",
+          },
+        },
+      ],
+    },
+    "rendered": [
+      "now  [xiaozhang] input disabled",
+    ],
+  },
+  "received": {
+    "gone": false,
+    "hintKey": null,
+    "inner": null,
+    "plan": {
+      "hintKey": null,
+      "inner": null,
+      "steps": [
+        {
+          "action": {
+            "conversation": "xiaozhang",
+            "type": "disableInput",
+          },
+          "at": {
+            "kind": "now",
+          },
+        },
+      ],
+    },
+    "rendered": [
+      "now  [xiaozhang] input disabled",
+    ],
+  },
+  "salary": {
+    "gone": true,
+    "hintKey": "reply.hint.gone",
+    "inner": null,
+    "plan": {
+      "hintKey": "reply.hint.gone",
+      "inner": null,
+      "steps": [],
+    },
+    "rendered": [],
+  },
+  "say-it-again": {
+    "gone": false,
+    "hintKey": null,
+    "inner": null,
+    "plan": {
+      "hintKey": null,
+      "inner": null,
+      "steps": [
+        {
+          "action": {
+            "conversation": "xiaozhang",
+            "type": "disableInput",
+          },
+          "at": {
+            "kind": "now",
+          },
+        },
+      ],
+    },
+    "rendered": [
+      "now  [xiaozhang] input disabled",
+    ],
+  },
+  "wait": {
+    "gone": false,
+    "hintKey": null,
+    "inner": null,
+    "plan": {
+      "hintKey": null,
+      "inner": null,
+      "steps": [
+        {
+          "action": {
+            "conversation": "xiaozhang",
+            "type": "disableInput",
+          },
+          "at": {
+            "kind": "now",
+          },
+        },
+      ],
+    },
+    "rendered": [
+      "now  [xiaozhang] input disabled",
+    ],
+  },
+  "what-do-you-mean": {
+    "gone": false,
+    "hintKey": null,
+    "inner": null,
+    "plan": {
+      "hintKey": null,
+      "inner": null,
+      "steps": [
+        {
+          "action": {
+            "conversation": "xiaozhang",
+            "type": "disableInput",
+          },
+          "at": {
+            "kind": "now",
+          },
+        },
+      ],
+    },
+    "rendered": [
+      "now  [xiaozhang] input disabled",
+    ],
+  },
+  "what-llm": {
+    "gone": false,
+    "hintKey": null,
+    "inner": null,
+    "plan": {
+      "hintKey": null,
+      "inner": null,
+      "steps": [
+        {
+          "action": {
+            "conversation": "xiaozhang",
+            "type": "disableInput",
+          },
+          "at": {
+            "kind": "now",
+          },
+        },
+      ],
+    },
+    "rendered": [
+      "now  [xiaozhang] input disabled",
+    ],
+  },
+  "whatever": {
+    "gone": true,
+    "hintKey": "reply.hint.gone",
+    "inner": null,
+    "plan": {
+      "hintKey": "reply.hint.gone",
+      "inner": null,
+      "steps": [],
+    },
+    "rendered": [],
+  },
+}
+`;
+
+exports[`FR5 snapshots > day 15 family incoming: the evening one appears inside the player's own input 1`] = `
+[
+  "@12:05  [family] (badge) family 12:05: 吃饭了吗。",
+  "@18:30  [family] (in my input box) (no receipt) family 18:30: NICK，吃饭了吗。",
+]
+`;
+
+exports[`FR5 snapshots > day 15 family incoming: the evening one appears inside the player's own input 2`] = `
+[
+  {
+    "action": {
+      "badge": true,
+      "conversation": "family",
+      "line": {
+        "t": "12:05",
+        "text": "吃饭了吗。",
+        "who": "family",
+      },
+      "noReadReceipt": false,
+      "placement": "received",
+      "type": "deliver",
+    },
+    "at": {
+      "kind": "atBeat",
+      "t": "12:05",
+    },
+  },
+  {
+    "action": {
+      "badge": false,
+      "conversation": "family",
+      "line": {
+        "t": "18:30",
+        "text": "{nick}，吃饭了吗。",
+        "who": "family",
+      },
+      "noReadReceipt": true,
+      "placement": "ownInput",
+      "type": "deliver",
+    },
+    "at": {
+      "kind": "atBeat",
+      "t": "18:30",
+    },
+  },
+]
+`;

@@ -13,7 +13,8 @@
     "noEmit": true,
     "paths": {
       "@content/*": ["./content/*"],
-      "@state/*": ["./src/state/*"]
+      "@state/*": ["./src/state/*"],
+      "@world/*": ["./src/world/*"]
     }
   },
   "include": ["src", "content", "scripts", "tests", "vite.config.ts"]

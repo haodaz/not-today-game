@@ -2,6 +2,7 @@
 // applyEvent is pure: it never mutates its input and never reads a clock. An event may read the
 // state produced by earlier events; the only time it sees is its own recorded `day`.
 import type { State } from "./types.gen";
+import { applyReplyEvent } from "./replies/effects";
 import { constants, membersOf } from "./variables";
 
 /** The two reply choices world-state reacts to. "no" is the chick's word (objectWords.chick). */
@@ -13,7 +14,12 @@ export type GameEvent =
   | { kind: "openLayer"; day: number; objectId: string }
   | { kind: "recognise"; day: number; objectId: string }
   | { kind: "pressKey"; day: number; key: string }
-  | { kind: "reply"; day: number; choice: string }
+  /**
+   * `choice` is the word (or a prompt choice such as the loan's "lend"). `recipient` is set when
+   * the word was sent in a conversation (replies spec); `text` holds what the player typed for the
+   * `free` cell. Both are absent for prompt choices like the loan.
+   */
+  | { kind: "reply"; day: number; choice: string; recipient?: string; text?: string }
   | { kind: "letItDo"; day: number; taskId: string }
   | { kind: "looked"; day: number; objectId: string }
   | { kind: "pokeReset"; day: number }
@@ -62,8 +68,12 @@ function withMember(state: State, key: "found" | "recognised", objectId: string)
  * The loan is decided by the reply recorded on `constants.loanReplyDay`. The first such reply
  * wins; later ones cannot change it. The repayment on `constants.repayDay` is not an event: it
  * is a day-driven change made by `derive` (fday.ts).
+ *
+ * Only a recipient-less reply (the loan prompt) counts. A word sent in a conversation never
+ * decides the loan, even "no" on the loan day: the reply tables use it as an ordinary word.
  */
 function applyLoanReply(state: State, event: Extract<GameEvent, { kind: "reply" }>): State {
+  if (event.recipient !== undefined) return state;
   if (event.day !== constants.loanReplyDay || state.loan !== "none") return state;
   if (event.choice === LOAN_CHOICE_LEND) {
     return { ...state, loan: "lent", balance: state.balance - constants.loanAmount };
@@ -96,7 +106,11 @@ export function applyEvent(state: State, event: GameEvent): State {
       // The only thing that moves the day counter.
       return { ...state, day: state.day + 1 };
     case "reply":
-      return applyLoanReply(state, event);
+      // A word sent in a conversation plays the reply tables; a recipient-less reply is a prompt
+      // choice such as the loan.
+      return event.recipient === undefined
+        ? applyLoanReply(state, event)
+        : applyReplyEvent(state, { day: event.day, recipient: event.recipient, choice: event.choice });
     case "pressKey":
     case "looked":
     case "sitUp":

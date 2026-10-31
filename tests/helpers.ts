@@ -2,6 +2,7 @@ import fc from "fast-check";
 import type { EventDraft, GameEvent } from "@state/events";
 import { f } from "@state/fday";
 import { fold } from "@state/replay";
+import { replyTable } from "@state/replies/table";
 import type { State } from "@state/types.gen";
 import { defaults, membersOf } from "@state/variables";
 
@@ -39,6 +40,19 @@ export function deepFreeze<T>(value: T): T {
 const objectIds = fc.constantFrom(...(membersOf("found") ?? []));
 const recognisableIds = fc.constantFrom(...(membersOf("recognised") ?? []));
 
+// Recipients and words come from the reply tables, never from this file.
+const replyRecipients = [...new Set([...replyTable.values()].flatMap((t) => [...t.recipients.keys()]))];
+const replyWords = [
+  ...new Set([...replyTable.values()].flatMap((t) => [...t.recipients.values()].flatMap((r) => [...r.cells.keys()]))),
+];
+const conversationReply: fc.Arbitrary<EventDraft> = fc
+  .tuple(fc.constantFrom(...replyRecipients), fc.constantFrom(...replyWords), fc.option(fc.string(), { nil: undefined }))
+  .map(([recipient, choice, text]): EventDraft =>
+    choice === "free" && text !== undefined
+      ? { kind: "reply", choice, recipient, text }
+      : { kind: "reply", choice, recipient },
+  );
+
 /** Any valid event draft. Object ids come from the table, never from this file. */
 export const draftArb: fc.Arbitrary<EventDraft> = fc.oneof(
   objectIds.map((objectId): EventDraft => ({ kind: "openLayer", objectId })),
@@ -47,6 +61,7 @@ export const draftArb: fc.Arbitrary<EventDraft> = fc.oneof(
   objectIds.map((objectId): EventDraft => ({ kind: "handObject", objectId })),
   fc.string().map((key): EventDraft => ({ kind: "pressKey", key })),
   fc.string().map((choice): EventDraft => ({ kind: "reply", choice })),
+  conversationReply,
   fc.string().map((taskId): EventDraft => ({ kind: "letItDo", taskId })),
   fc.constantFrom<EventDraft>(
     { kind: "pokeReset" },

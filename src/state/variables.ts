@@ -37,6 +37,12 @@ export function membersOf(name: string): readonly string[] | undefined {
   return entryOf(name).of;
 }
 
+/** The declared `[min, max]` of a numeric variable (null = unbounded), or undefined if none. */
+export function rangeOf(name: string): readonly [number | null, number | null] | undefined {
+  const range = entryOf(name).range;
+  return range ? [range[0] ?? null, range[1] ?? null] : undefined;
+}
+
 /** A fresh copy of every variable's default. Callers may mutate the result freely. */
 export function defaults(): Record<string, Json> {
   const out: Record<string, Json> = {};

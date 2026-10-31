@@ -81,6 +81,21 @@ describe("loan: none", () => {
     expect(refuseThenLend.loan).toBe("refused");
   });
 
+  it("a word sent in a conversation never decides the loan, even on the loan day", () => {
+    for (const recipient of ["group", "xiaozhang", "boss"]) {
+      const said = (choice: string): EventDraft => ({ kind: "reply", choice, recipient });
+      expect(play(1, [...lieDowns(loanReplyDay - 1), said(LOAN_CHOICE_REFUSE)]).loan, recipient).toBe("none");
+      expect(play(1, [...lieDowns(loanReplyDay - 1), said(LOAN_CHOICE_LEND)]).loan, recipient).toBe("none");
+    }
+    // ...and the loan prompt still works after such a word.
+    const after = play(1, [
+      ...lieDowns(loanReplyDay - 1),
+      { kind: "reply", choice: LOAN_CHOICE_REFUSE, recipient: "group" },
+      reply(LOAN_CHOICE_LEND),
+    ]);
+    expect(after.loan).toBe("lent");
+  });
+
   it("the ?day=N debug jump with no log has no loan", () => {
     expect(f(repayDay).loan).toBe("none");
     expect(f(repayDay).balance).toBe(startBalance);
