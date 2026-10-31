@@ -153,7 +153,8 @@ export function renderLineBox(m: LineBoxModel): SafeHtml {
   // A tag on the top edge pushes the text down below it (`tagged`).
   const tag = tagOf(m.tag);
   const c = cls("dlg", m.kind !== "line" && m.kind, tag && "tagged", m.tag?.kind === "kuro" && "kuro", m.choices.length > 0 && "has-choices", m.raised && "raised");
-  return html`<div class="${c}" data-screen="${m.screen + 1}/${m.count}">${tag}${historyChip()}${txt}${m.choices.length ? html`<div class="${cls("choices", m.pointer)}">${buttons}</div>` : null}${mk}${m.portrait ? portraitOf(m.portrait, m.red) : null}</div>`;
+  // The tag strip on the top edge: the name tag, then ↺ right after it (alone when there is no tag).
+  return html`<div class="${c}" data-screen="${m.screen + 1}/${m.count}"><div class="tagbar">${tag}${historyChip()}</div>${txt}${m.choices.length ? html`<div class="${cls("choices", m.pointer)}">${buttons}</div>` : null}${mk}${m.portrait ? portraitOf(m.portrait, m.red) : null}</div>`;
 }
 
 /** The player's box: the starter questions as choices, or one text input (Enter sends). */

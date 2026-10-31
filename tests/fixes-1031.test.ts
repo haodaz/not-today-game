@@ -8,7 +8,7 @@ import { createStore, type Store } from "@state/store";
 import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
 import { initialSession, type Session } from "@world/desktop/model";
-import { setLocale } from "@world/i18n";
+import { setLocale, t } from "@world/i18n";
 import { renderRoom } from "@world/room/hud";
 import { isNight } from "@world/desktop/beat";
 import { renderKuro } from "@world/desktop/kuro/mini";
@@ -174,7 +174,7 @@ describe("(5) four camera levels", () => {
       // The one body moved into the box: its portrait is the page's only slot.
       expect((out.match(/data-kuro-slot/g) ?? []).length, view).toBe(1);
       expect(out, view).toMatch(/<span class="kpet kuro-portrait" data-kuro-slot data-state="\w+" aria-hidden="true"><\/span><\/div>/);
-      expect(out, view).toMatch(/<div class="dlg tagged kuro[^"]*"[^>]*><span class="who tag k">Kuro<\/span>/);
+      expect(out, view).toMatch(new RegExp(`<div class="dlg tagged kuro[^"]*"[^>]*><div class="tagbar"><span class="who tag k">${t("kuro.name")}</span>`));
       expect(ctx.session.view).toBe(view);
       // A second click while talking queues nothing more.
       const queued = ctx.session.dialogue.queue.length;

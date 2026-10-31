@@ -153,6 +153,19 @@ describe("FR1 the box: snapshots", () => {
   });
 });
 
+describe("correction: ↺ sits beside the name tag", () => {
+  it("right after the tag on the tag strip; alone at the tag's place without one; same action and label", () => {
+    const ctx = ctxOf(storeAt(1), NIGHT);
+    act(ctx, "kuro-call");
+    expect(out(ctx)).toContain(`<div class="tagbar"><span class="who tag k">${t("kuro.name")}</span><button type="button" class="hist" data-action="dlg-history" aria-haspopup="dialog" aria-label="${t("dialogue.history")}">↺</button></div>`);
+    ctx.session.dialogue = push(EMPTY_DIALOGUE, queueOf("n", [narration]));
+    expect(out(ctx)).toMatch(/^<div class="dlg" [^>]*><div class="tagbar"><button type="button" class="hist"/);
+    const css = readFileSync(resolve(__dirname, "../src/world/room/room.css"), "utf8");
+    expect(css).toMatch(/\.dlg \.tagbar\{position:absolute;left:18px;top:-16px;display:flex/);
+    expect(css).not.toMatch(/\.dlg \.hist\{[^}]*right:/);
+  });
+});
+
 describe("FR2 talking to Kuro", () => {
   it("the body opens the prompt (snapshot): tag with its face, 要和克总聊聊吗？, 聊聊 / 先不聊; 先不聊 closes", () => {
     const ctx = ctxOf(storeAt(1), NIGHT);

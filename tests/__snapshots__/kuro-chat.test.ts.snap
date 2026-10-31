@@ -1,5 +1,51 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`the credits roll judgement.log (FR5) > snapshot: day 18 credits from a fixture log, in day order, direction from each day's scores 1`] = `
+[
+  {
+    "day": 1,
+    "eventId": "ev3",
+    "moved": [
+      {
+        "dim": "values",
+        "dir": 1,
+      },
+    ],
+    "note": "你回了那个没人替他说话的人。",
+  },
+  {
+    "day": 3,
+    "eventId": "ev12",
+    "moved": [
+      {
+        "dim": "truth",
+        "dir": 1,
+      },
+      {
+        "dim": "bond",
+        "dir": 1,
+      },
+    ],
+    "note": "Read the diff before approving.",
+  },
+  {
+    "day": 14,
+    "eventId": "ev201",
+    "moved": [
+      {
+        "dim": "truth",
+        "dir": -1,
+      },
+      {
+        "dim": "bond",
+        "dir": 1,
+      },
+    ],
+    "note": "Said beautiful, and meant it.",
+  },
+]
+`;
+
 exports[`the decay filter > snapshot: one reply at every stage 1`] = `
 [
   "Your water went cold at 2:50, by the way. Three layers, if you listen.",

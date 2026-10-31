@@ -21,7 +21,7 @@ import { judgementPending, startJudgement } from "@world/dialogue/judge";
 import { WAITING } from "@world/dialogue/kuro";
 import { creditLines } from "@world/endings/credits";
 import { escapeHtml } from "@world/html";
-import { setLocale } from "@world/i18n";
+import { setLocale, t } from "@world/i18n";
 import { lieDownOrEnd } from "@world/loop/runtime";
 import { loopActions } from "@world/room/game";
 import { setKuroOnlineForTests, type KuroOnline } from "@net/supabase";
@@ -287,7 +287,9 @@ describe("the credits roll judgement.log (FR5)", () => {
     for (const [day, j] of log) s = applyEvent(s, { kind: "judged", day, truth: 0, values: 0, bond: 0, evidence: [], source: "model", ...j } as GameEvent);
     const lines = creditLines(s);
     expect(lines.map((l) => l.day)).toEqual([1, 3, 14]);
-    expect(lines[0]!.note).toBe("⟦judge.offline.replied⟧"); // a string key, until Claude writes it
+    // The offline scorer's note is a string key; the credits show it through the strings table.
+    expect(lines[0]!.note).toBe(t("judge.offline.replied"));
+    expect(lines[0]!.note).not.toMatch(/⟦/);
     expect(lines[2]!.moved).toEqual([{ dim: "truth", dir: -1 }, { dim: "bond", dir: 1 }]);
     expect(lines).toMatchSnapshot();
   });

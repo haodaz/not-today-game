@@ -580,3 +580,11 @@ Appended after each task. Neither Kiro nor Claude edits the other's area without
   `constants.chatMemoryTurns` (12) and `constants.affinityPerPoint` (5).
 - Tests: 51 files, 776 passing; typecheck clean. The function, sign-in and sync are not run
   against a real backend; everything above runs with mocks.
+
+## 2026-11-01 — strings through t(); ↺ beside the name tag
+
+- The kuro-chat credits test reads the offline note through `t("judge.offline.replied")`; its
+  snapshot now holds Claude's string. fixes-1031's Kuro tag assertion reads `t("kuro.name")`.
+- The dialogue's ↺ moved onto the tag strip, right after the name tag (alone when there is no tag).
+  17 snapshots refreshed; the diffs were only the strip wrapper and that note.
+- Tests: 51 files, 777 passing; typecheck clean.

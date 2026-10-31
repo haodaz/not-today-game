@@ -155,3 +155,10 @@ Also in this change: Kuro's HUD body is 192 px (late-days FR1, only that line).
   layer 240 px), so the portrait stands at 300–500 px. The player's box is 120–252 px (60–192 on
   the desktop), so they never meet and nothing has to step aside. Tested from the CSS numbers.
 - Narration tags do not change.
+
+## Correction implemented (2026-11-01): ↺ sits beside the name tag
+
+- The box's top edge carries a tag strip (`.tagbar`, left 18 px, top −16 px): the name tag, then ↺
+  right after it at the same height (a small square plate, 4 px gap). With no tag, ↺ sits alone at
+  the tag's place. Same action (`dlg-history`) and label (`dialogue.history`). The loose circle at
+  the top-right, and Kuro's offset for it, are gone.

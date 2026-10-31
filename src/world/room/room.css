@@ -74,15 +74,18 @@
 .dlg.inner{color:#6a3a36}.dlg.inner .txt{font-style:italic}
 .dlg.sfx .txt{text-align:center;letter-spacing:.08em;color:#5b4a2e}
 .dlg .tag,.dlg-player .tag{position:absolute;left:18px;top:-16px;background:#2a2622;color:#efe9df;font-size:13px;line-height:1.4;letter-spacing:.2em;padding:5px 14px;border-radius:3px;white-space:nowrap}
+/* The tag strip (dialogue correction "↺ beside the name tag"): the name tag, then ↺ right after it,
+   the same height; alone at the tag's place when there is no tag. */
+.dlg .tagbar{position:absolute;left:18px;top:-16px;display:flex;align-items:stretch;gap:4px;z-index:2}
+.dlg .tagbar .tag{position:static}
 :lang(en) .dlg .tag,:lang(en) .dlg-player .tag{text-transform:uppercase;letter-spacing:.14em}
 /* Kuro speaking (dialogue correction 2026-11-01): the tag carries only the name; the portrait (the
    one animated body, 200 px) stands at the box's right end, feet on the bottom edge, head 68 px
    above the top; the text column is everything left of it (layout.ts KURO_LINE_BOX: 236 px). */
 .dlg.kuro{padding-right:236px}
-.dlg.kuro .hist{right:236px}
 .dlg .kpet.kuro-portrait{position:absolute;right:12px;bottom:0;left:auto;top:auto;width:200px;height:200px;z-index:1;pointer-events:none}
 .dlg-player .tag{background:#5b4a2e;top:-18px}
-.dlg .hist{position:absolute;right:14px;top:-14px;width:28px;height:28px;border:0;padding:0;border-radius:50%;background:#2a2622;color:#efe9df;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer}
+.dlg .hist{min-width:28px;min-height:28px;border:0;padding:0 7px;border-radius:3px;background:#2a2622;color:#efe9df;display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;cursor:pointer}
 .dlg .hist:hover,.dlg .hist:focus-visible{background:#8b2f2a;outline:none}
 .dlg .more,.dlg-player .more{position:absolute;right:18px;bottom:8px;border:0;padding:0;background:none;color:#8b2f2a;font-size:12px;line-height:1;animation:dlg-pulse 1.2s ease-in-out infinite}
 .dlg button.more,.dlg-player button.more{cursor:pointer;font-size:14px}
