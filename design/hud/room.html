@@ -1,0 +1,55 @@
+<!doctype html><html lang="zh"><meta charset="utf-8"><title>HUD · 房间视角</title>
+<style>
+:root{--ink:#1d2129;--paper:rgba(250,248,243,.92);--line:rgba(0,0,0,.08);--red:#8b2f2a;--font:"PingFang SC","Hiragino Sans GB",sans-serif;--mono:Menlo,monospace}
+html,body{margin:0;background:#111}
+.stage{position:relative;width:1600px;height:900px;overflow:hidden;background:#000 url(bg_desk.jpg) center/cover;font-family:var(--font);color:var(--ink)}
+/* 今日清单 */
+.list{position:absolute;left:28px;top:28px;width:300px;background:var(--paper);border-radius:10px;padding:14px 16px;box-shadow:0 10px 30px rgba(0,0,0,.25);font-size:15px;line-height:1.7}
+.list .h{font-size:11px;letter-spacing:.2em;color:#8a7f70;margin-bottom:6px}
+.list .done{color:#9a9a9a;font-size:13px}
+.list .it{display:flex;gap:8px;align-items:baseline}.list .it i{width:12px;height:12px;border:1.5px solid #555;border-radius:2px;flex:0 0 auto;transform:translateY(2px)}
+.list .it.now{font-weight:600}.list .it.next{color:#777}.list .it.wait i{border-style:dashed}.list .it.wait{color:#9a6400}
+/* 右上 */
+.day{position:absolute;right:28px;top:28px;text-align:right;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.6);font-size:15px;line-height:1.5}
+.day b{display:block;font-size:22px;font-weight:600}.day .ov{color:#ffb3ad}
+.hr{position:absolute;right:28px;top:118px;background:rgba(255,255,255,.9);border-radius:8px;padding:6px 10px;font:12px var(--mono);color:#333;display:flex;gap:8px;align-items:center}.hr i{width:8px;height:8px;border-radius:50%;background:#e5484d;box-shadow:0 0 0 3px rgba(229,72,77,.2)}
+/* 桌面条 */
+.bar{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);display:flex;gap:10px;padding:10px 12px;background:var(--paper);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.slot{width:84px;height:84px;border-radius:10px;background:#fff;border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11px;color:#666;position:relative}
+.slot img{max-width:60px;max-height:52px;object-fit:contain}
+.slot .lcd{width:52px;height:26px;background:#9fb59a;border:2px solid #556;border-radius:3px;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;font:12px var(--mono);color:#233}
+.slot .box{width:52px;height:40px;background:#c8a97a;border-radius:3px;position:relative}.slot .box::after{content:"剩 4 层";position:absolute;left:0;right:0;bottom:-16px;font-size:10px;color:#666;text-align:center}
+.slot .cup{width:26px;height:34px;border:2px solid #789;border-radius:0 0 8px 8px;background:linear-gradient(180deg,#fff 40%,#cfe0ea 40%)}
+.slot .phone{width:28px;height:50px;background:#222;border-radius:5px;border:2px solid #555}
+.slot.empty{background:transparent;border-style:dashed;color:#bbb}
+/* 对话框 */
+.dlg{position:absolute;left:50%;bottom:132px;transform:translateX(-50%);width:980px;background:rgba(28,26,23,.92);color:#f4efe6;border-radius:12px;padding:18px 24px;font-size:18px;line-height:1.6;box-shadow:0 12px 40px rgba(0,0,0,.4)}
+.dlg .who{display:inline-block;font-size:12px;letter-spacing:.12em;color:#c9a86a;margin-bottom:4px}
+.dlg .inner{font-style:italic;color:#e8b4ae}
+.dlg .more{position:absolute;right:16px;bottom:10px;color:#c9a86a;font-size:12px}
+/* 镜头 */
+.cams{position:absolute;right:28px;bottom:28px;display:flex;gap:6px}.cams span{background:rgba(250,248,243,.9);border-radius:8px;padding:8px 14px;font-size:14px;color:#333}.cams span.on{background:var(--red);color:#f4efe6}
+.menu{position:absolute;left:28px;bottom:28px;background:rgba(250,248,243,.7);border-radius:8px;padding:6px 10px;font-size:12px;color:#555}
+.note{position:absolute;left:0;right:0;bottom:0;background:#111;color:#bbb;font:12px var(--mono);padding:6px 12px}
+</style>
+<div class="stage">
+  <div class="list"><div class="h">今日</div><div class="done">已做 3 件</div>
+    <div class="it now"><i></i>v17 过一遍。</div>
+    <div class="it wait"><i></i>午饭在路上。</div>
+    <div class="it next"><i></i>应收表改一个数。</div></div>
+  <div class="day"><b>第 1 天 · 上午</b><span class="ov">拖欠 31 天</span></div>
+  <div class="hr" style="opacity:.35" title="第 9 天起才出现"><i></i>72 bpm</div>
+  <div class="dlg"><div class="who">桌上</div>嗡。寻呼机在桌面上滑了一小段。<div class="inner">它比它先知道。</div><div class="more">▼</div></div>
+  <div class="bar">
+    <div class="slot"><div class="box"></div></div>
+    <div class="slot"><div class="phone"></div><span>手机</span></div>
+    <div class="slot"><div class="cup"></div><span>凉的 · 40 分钟</span></div>
+    <div class="slot"><img src="chick.png" alt=""><div class="lcd" style="width:40px;height:20px;font-size:9px">▓▒░</div></div>
+    <div class="slot"><img src="pager.png" alt="" style="max-height:40px"><div class="lcd">0.7734</div></div>
+    <div class="slot empty">·</div><div class="slot empty">·</div>
+  </div>
+  <div class="cams"><span>房间</span><span class="on">桌面</span><span>门</span></div>
+  <div class="menu">声音 · 语言 · 重新开始</div>
+</div>
+<div class="note">design/hud/room.html · 房间视角 HUD：左上今日清单 · 右上第 N 天 / 时段 / 拖欠天数（心率第 9 天起）· 底部桌面条（箱子、手机、杯子、物件，物件图标就是它们的屏幕）· 对话框盖在上面 · 右下三个镜头 · 左下小菜单 · 没有背包、血条、时钟</div>
+</html>

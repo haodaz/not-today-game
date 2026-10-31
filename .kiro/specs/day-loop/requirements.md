@@ -30,3 +30,13 @@ Every `delta`/flag referenced must exist in variables.json; every string is inli
 ## FR5. Tests
 - Property: for every day, the required items form an order in which each item's `unlock` can be satisfied by the `done` of earlier items or by engine events; the bed is reachable.
 - Snapshot: day 1 checklist at boot, after ordering, after arrival; day 17 with a self-ticked item; day 18 last item.
+
+## FR6. Room-view HUD (author decision 2026-11-01; mock `design/hud/room.html`)
+No inventory, no health bar, no clock. The HUD in the room / desk / door views:
+- Top-left: the checklist (FR1).
+- Top-right: `第 N 天 · 时段` and under it `拖欠 N 天` (the only number that always rises). From the day stages.json/content says, a heart-rate chip appears under it: it is the new world's widget, and it is the only visible proxy for SAN; the game itself never shows SAN.
+- Bottom: the **desk bar**, not an inventory: the box (layers left), the phone, the cup (cold for N minutes, from live state), then each object taken out, in day order. An object's icon is its own screen (the chick's current frame, the pager's digits) rendered by the device skeleton at integer pixels. Empty slots are dashed and silent.
+- The dialogue box (FR2) overlays the desk bar when active.
+- Bottom-right: three camera chips 房间 / 桌面 / 门 (桌面 opens the desktop view). Bottom-left: a small menu (sound, language, restart); saves are automatic.
+- Kuro is not in the room HUD; at night the right monitor's small window glows inside the 3D view.
+- Status is shown by things, never bars: the cup, the room's width (room-scene), the shrinking reply menu.
