@@ -1,11 +1,11 @@
 <!doctype html><html lang="zh"><meta charset="utf-8"><title>标题页样稿</title>
-<style>
+<link rel="stylesheet" href="fonts.css"><style>
 html,body{margin:0;background:#000}
-.stage{position:relative;width:1600px;height:900px;overflow:hidden;font-family:"PingFang SC","Hiragino Sans GB",sans-serif;color:#efe9df}
+.stage{position:relative;width:1600px;height:900px;overflow:hidden;font-family:var(--zh);color:#efe9df}
 .bg{position:absolute;inset:-4%;background:url(room.jpg) center/cover;filter:brightness(.42) saturate(.8);animation:push 120s ease-in-out infinite alternate}
 @keyframes push{from{transform:scale(1)}to{transform:scale(1.07)}}
 .vig{position:absolute;inset:0;background:radial-gradient(120% 90% at 30% 50%,transparent 40%,rgba(0,0,0,.55) 100%)}
-h1{position:absolute;left:110px;top:120px;margin:0;font:700 96px/1 "Helvetica Neue",Arial,sans-serif;letter-spacing:.12em;text-shadow:0 2px 24px rgba(0,0,0,.6)}
+.logo{position:absolute;left:104px;top:110px;width:600px;filter:drop-shadow(0 2px 18px rgba(0,0,0,.6))}
 .menu{position:absolute;left:112px;top:300px;display:flex;flex-direction:column;gap:22px}
 .menu a{display:block;width:260px;padding:12px 0;text-align:center;border:1.5px solid rgba(239,233,223,.75);font-size:18px;letter-spacing:.3em;text-indent:.3em;color:#efe9df;text-decoration:none;transition:background .16s,color .16s}
 .menu a:hover,.menu a.on{background:#efe9df;color:#111}
@@ -16,7 +16,7 @@ h1{position:absolute;left:110px;top:120px;margin:0;font:700 96px/1 "Helvetica Ne
 </style>
 <div class="stage">
   <div class="bg"></div><div class="vig"></div>
-  <h1>NOT TODAY</h1>
+  <img class="logo" src="logo.svg" alt="NOT TODAY">
   <nav class="menu"><a href="#" class="on">新游戏</a><a href="#">设置</a><a href="#">制作</a></nav>
   <div class="ver">v0.1 · Kiroween 2026<br>好大壮 · 与 Claude 一起写成</div>
   <div class="lang">English</div>
