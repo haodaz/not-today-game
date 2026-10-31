@@ -18,7 +18,8 @@
 .title-page .idle.gap.on{background:linear-gradient(180deg,transparent,rgba(255,150,190,.75) 40%,rgba(255,150,190,.75) 60%,transparent)}
 .title-room.starting .idle.monitor{background:rgba(214,226,240,.22)}
 /* The words */
-.title-name{position:absolute;left:110px;top:120px;margin:0;font-size:96px;line-height:1;color:#efe9df;text-shadow:0 2px 24px rgba(0,0,0,.6)}
+.title-name{position:absolute;left:110px;top:120px;margin:0;line-height:0}
+.title-logo{display:block;width:600px;height:auto;filter:drop-shadow(0 2px 18px rgba(0,0,0,.6))}
 .title-menu{position:absolute;left:112px;top:300px;display:flex;flex-direction:column;gap:22px}
 .title-menu button,.title-start,.title-back{display:block;width:260px;padding:12px 0;text-align:center;border:2px solid rgba(239,233,223,.75);background:transparent;font-size:18px;letter-spacing:.3em;text-indent:.3em;color:#efe9df;cursor:pointer;transition:background 160ms,color 160ms}
 .title-menu button:hover,.title-menu button:focus-visible,.title-start.ready:hover,.title-start.ready:focus-visible,.title-back:hover,.title-back:focus-visible{background:#efe9df;color:#111;outline:none}
@@ -27,19 +28,32 @@
 .title-ver{position:absolute;left:112px;bottom:40px;font-size:12px;letter-spacing:.1em;color:rgba(239,233,223,.55);line-height:1.9}
 .title-lang{position:absolute;right:48px;bottom:40px;border:0;background:none;padding:0;font-size:13px;letter-spacing:.15em;color:rgba(239,233,223,.7);cursor:pointer}
 .title-lang:hover,.title-lang:focus-visible{color:#efe9df}
-/* The questions take the menu's place (FR3) */
-.title-q{position:absolute;left:112px;top:300px;display:flex;flex-direction:column;gap:26px;width:560px}
-.title-q .row{display:flex;align-items:center;gap:14px;font-size:18px;letter-spacing:.06em;animation:m-fade-up 240ms cubic-bezier(.2,.8,.2,1) both}
-.title-q .row.done{opacity:.55;animation:none}
-.title-q .row label,.title-q .row > span:first-child{flex:0 0 auto}
-.title-q .row input{flex:1;min-width:0;background:transparent;border:0;border-bottom:2px solid rgba(239,233,223,.6);color:#efe9df;font:inherit;padding:6px 2px;outline:0}
-.title-q .row input:focus{border-bottom-color:#efe9df}
-.title-q .row .d{width:34px;height:34px;border:2px solid rgba(239,233,223,.6);background:transparent;color:#efe9df;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;padding:0}
-.title-q .row .d:disabled{opacity:.3;cursor:default}
-.title-q .row .g{display:flex;gap:10px}
-.title-q .row .g button{border:2px solid rgba(239,233,223,.6);background:transparent;color:#efe9df;padding:6px 16px;letter-spacing:.2em;font:inherit;cursor:pointer}
-.title-q .row .g button.on{background:#efe9df;color:#111}
-.title-esc{position:absolute;left:112px;bottom:96px;font-size:12px;letter-spacing:.1em;color:rgba(239,233,223,.55)}
+/* The camera (correction 2026-11-01): 新游戏 pushes to 桌子 along 房间→桌子's path; Esc pulls back. */
+.title-room.cam-in,.title-room.cam-out,.title-room.cam-desk{transform-origin:0 0}
+/* --t-ago (negative, set by the mount on re-render) resumes a running move where it was. */
+.title-room.cam-in{animation:m-cam-push-out 1400ms var(--m-ease,ease-in-out) var(--t-ago,0ms) both}
+.title-room.cam-out{animation:m-cam-push-in 1400ms var(--m-ease,ease-in-out) var(--t-ago,0ms) both}
+.title-room.cam-desk{animation:none;translate:var(--m-tx) var(--m-ty);scale:var(--m-z)}
+.title-menu.leaving{animation:m-fade-out 600ms ease-out var(--t-ago,0ms) both;pointer-events:none}
+.title-menu.arriving{animation:m-fade-in 600ms ease-in calc(800ms + var(--t-ago,0ms)) both}
+.title-page.card-open .title-logo{opacity:.35;transition:opacity 300ms}
+/* The questions live in a card like the settings panel (FR3, correction 2026-11-01) */
+.title-card{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:560px;box-sizing:border-box;background:rgba(236,231,222,.88);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.6);border-radius:8px;padding:28px 34px 26px;box-shadow:0 18px 50px rgba(0,0,0,.45);color:#1d2129;animation:m-fade-up 240ms cubic-bezier(.2,.8,.2,1) both}
+.title-card h2{margin:0 0 22px;font-size:20px;font-weight:500;letter-spacing:.08em}
+.title-card .row{display:flex;align-items:center;gap:12px;font-size:17px;margin:14px 0;animation:m-fade-up 240ms cubic-bezier(.2,.8,.2,1) both}
+.title-card .row.done{opacity:.5;animation:none}
+.title-card .row label,.title-card .row > span:first-child{width:150px;flex:0 0 auto}
+.title-card .row input{flex:1;min-width:0;background:transparent;border:0;border-bottom:1px solid #8a7f70;color:#1d2129;font:inherit;padding:6px 2px;outline:0}
+.title-card .row input:focus{border-bottom-color:#1d2129}
+.title-card .row .d{width:32px;height:32px;flex:0 0 auto;border:1px solid #8a7f70;border-radius:4px;background:transparent;color:#1d2129;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;padding:0}
+.title-card .row .d:disabled{opacity:.3;cursor:default}
+.title-card .row .g{display:flex;gap:10px}
+.title-card .row .g button{border:1px solid #8a7f70;border-radius:4px;background:transparent;color:#1d2129;padding:5px 16px;letter-spacing:.2em;font:inherit;cursor:pointer}
+.title-card .row .g button.on{background:#2a2622;border-color:#2a2622;color:#efe9df}
+.title-card .title-start{margin-top:24px;width:100%;padding:11px 0;border:1px solid #2a2622;border-radius:4px;color:#1d2129;font-size:16px}
+.title-card .title-start.ready:hover,.title-card .title-start.ready:focus-visible{background:#2a2622;color:#efe9df}
+.title-card .title-start:disabled{border-color:#2a2622;opacity:.35}
+.title-esc{position:absolute;left:34px;bottom:-30px;font-size:12px;letter-spacing:.1em;color:rgba(239,233,223,.6)}
 /* 制作: a plain scrolling page */
 .title-credits-page{position:absolute;left:112px;top:280px;width:760px;max-height:520px;overflow:auto;line-height:1.8}
 .title-credits-page h2{margin:0 0 16px;font-size:14px;letter-spacing:.3em;font-weight:400;color:rgba(239,233,223,.7)}

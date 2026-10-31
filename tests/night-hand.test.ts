@@ -12,7 +12,8 @@ import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import { initialSession, type Session } from "@world/desktop/model";
 import { advance, EMPTY_DIALOGUE, push } from "@world/loop/dialogue";
 import { beatQueued } from "@world/loop/runtime";
-import { dialogueBox, renderRoom } from "@world/room/hud";
+import { renderRoom } from "@world/room/hud";
+import { everyScreen } from "./box-screens";
 import { ROOM_SHOT } from "@world/room/shots";
 
 const recognisable = membersOf("recognised")! as string[];
@@ -140,18 +141,18 @@ describe("what blocks it (FR2)", () => {
 describe("snapshots (FR4)", () => {
   it("night 5 with the loan lent: three choices; not lent: two", () => {
     const lent = holding(at(5, { loan: "lent" }), "chick");
-    const outLent = dialogueBox(lent, atRaid(5))!.value;
+    const outLent = everyScreen(lent, atRaid(5));
     expect(choiceCount(outLent)).toBe(3);
     expect(outLent).toMatchSnapshot();
     const refused = holding(at(5, { loan: "refused" }), "chick");
-    const outRefused = dialogueBox(refused, atRaid(5))!.value;
+    const outRefused = everyScreen(refused, atRaid(5));
     expect(choiceCount(outRefused)).toBe(2);
     expect(outRefused).toMatchSnapshot();
   });
 
   it("night 13 with the dictionary upgraded: no block possible", () => {
     const state = holding(at(13, { upgraded: { dictionary: true } }), "dictionary");
-    const out = dialogueBox(state, atRaid(13))!.value;
+    const out = everyScreen(state, atRaid(13));
     expect(choiceCount(out)).toBe(1);
     expect(out).not.toContain(`data-index="${indexOf(13, "block")}"`);
     expect(out).toMatchSnapshot();

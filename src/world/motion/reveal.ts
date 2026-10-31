@@ -56,9 +56,11 @@ export function holdUntil(r: Reveal): number {
 export const revealBusy = (r: Reveal, nowMs: number): boolean => nowMs < revealDoneAt(r);
 
 /** Which line is on screen: the reveal's key. */
-export function lineKey(d: { readonly queue: readonly { readonly key: string }[]; readonly line: number }): string | null {
+export function lineKey(d: { readonly queue: readonly { readonly key: string }[]; readonly line: number; readonly page?: number }): string | null {
   const q = d.queue[0];
-  return q ? `${q.key}:${d.line}` : null;
+  if (!q) return null;
+  // Each screen of a paged line reveals on its own (dialogue spec); page 0 keeps the plain key.
+  return d.page ? `${q.key}:${d.line}:p${d.page}` : `${q.key}:${d.line}`;
 }
 
 /**

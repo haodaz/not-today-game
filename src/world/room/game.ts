@@ -5,10 +5,15 @@ import { TASK_MODES, type TaskMode } from "@state/days/effects";
 import { dayFile } from "@state/days/table";
 import { deliveryTable, type Meal } from "@state/delivery/table";
 import type { Store } from "@state/store";
-import { currentOffer, FINAL } from "@state/upgrades";
 import { desktopApps } from "@world/desktop/apps";
 import { advanceTo, isNight } from "@world/desktop/beat";
-import { hudKuro, lastKuroLine } from "@world/desktop/kuro/mini";
+import { hudKuro } from "@world/desktop/kuro/mini";
+import { dialogueBox, lineScreens } from "@world/dialogue/box";
+import { logCurrent, logPlayer } from "@world/dialogue/history";
+import { acceptOffer, answerAsk, answerOffer, declineOffer, kuroActions } from "@world/dialogue/kuro";
+import { nextScreen } from "@world/dialogue/layout";
+import { stepOnce } from "@world/loop/steps";
+import { fillPlaceholders } from "@world/replies/placeholders";
 import { shellActions, type ActionContext, type ActionHandler } from "@world/desktop/controller";
 import { buildShell, rightApp, VIEWS, type Session, type View } from "@world/desktop/model";
 import { renderDesktop, type AppId } from "@world/desktop/shell";
@@ -16,15 +21,15 @@ import { placeOrder } from "@world/delivery/commands";
 import { nextInputs, startDoor, stepDoor } from "@world/delivery/door";
 import { mealView } from "@world/delivery/meals";
 import { html, type SafeHtml } from "@world/html";
-import { setLocale, tr } from "@world/i18n";
+import { setLocale, t, tr } from "@world/i18n";
 import { actionOf, itemStates, loopContext, mealToOrder, openTask, type ItemAction } from "@world/loop/checklist";
-import { advance, endsInChoice, finishChoice, push } from "@world/loop/dialogue";
+import { advance, endsInChoice, finishChoice, push, showing, talking, type DialogueState } from "@world/loop/dialogue";
 import { beatQueued, lieDownOrEnd, openChatIfDue, questionQueued } from "@world/loop/runtime";
 import { askedOn, knows } from "@state/recognise";
 import { gateAdvance } from "@world/motion/reveal";
 import { endingNext } from "@world/endings/flow";
 import { renderEnding } from "@world/endings/view";
-import { boxObjectFor, dialogueBox, doorMeal, renderRoom, settingsButton, settingsPanel } from "./hud";
+import { boxObjectFor, doorMeal, renderRoom, settingsButton, settingsPanel } from "./hud";
 
 export function renderGame(store: Store, session: Session, nowMs: number): SafeHtml {
   const state = store.getState();
@@ -33,8 +38,8 @@ export function renderGame(store: Store, session: Session, nowMs: number): SafeH
   if (state.ending !== "none") return renderEnding({ state, events, session, startDay: store.getStartDay(), nowMs });
   if (session.view === "desktop") {
     const shell = buildShell(state, events, session, desktopApps, nowMs, store.getStartDay());
-    // Work-task narration plays in the dialogue box over the desktop too.
-    const dlg = dialogueBox(state, session);
+    // Work-task narration and the conversation with Kuro play in the dialogue box over the desktop too.
+    const dlg = dialogueBox(state, events, session);
     return html`${renderDesktop(shell)}<button type="button" class="back-room" data-action="view" data-view="room">${tr("desktop.back")}</button>${dlg ? html`<div class="dlg-layer">${dlg}</div>` : null}<div class="hud-host">${settingsButton()}<div class="hud-br">${hudKuro({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs })}</div>${settingsPanel(session)}</div>`;
   }
   return renderRoom({ state, events, session, startDay: store.getStartDay(), nowMs });
@@ -43,16 +48,6 @@ export function renderGame(store: Store, session: Session, nowMs: number): SafeH
 /** The app on the monitor being shown. */
 export function shownApp(session: Session): AppId {
   return session.focus === "left" ? session.leftApp : rightApp(session.leftApp);
-}
-
-function hasStepToday(store: Store, name: string): boolean {
-  const day = store.getState().day;
-  return store.getEvents().some((e) => e.kind === "step" && e.day === day && e.name === name);
-}
-
-/** Logs a loop moment once per day. */
-function stepOnce(ctx: ActionContext, name: string): void {
-  if (!hasStepToday(ctx.store, name)) ctx.store.appendEvent({ kind: "step", name, t: ctx.session.clock.time });
 }
 
 function doItem(ctx: ActionContext, action: ItemAction): void {
@@ -78,11 +73,6 @@ function doItem(ctx: ActionContext, action: ItemAction): void {
   }
 }
 
-/** What Kuro says last, as seen now: the call button's dot goes. */
-function markKuroRead(ctx: ActionContext): void {
-  ctx.session.kuroRead = lastKuroLine(appContextOf(ctx));
-}
-
 /** The AppContext the Kuro components read, from an action's context. */
 export function appContextOf(ctx: ActionContext) {
   const { store, session } = ctx;
@@ -102,7 +92,6 @@ export const loopActions: Record<string, ActionHandler> = {
     if (!VIEWS.includes(view)) return;
     // 桌子's monitors open 屏幕 on their own side.
     if (view === "desktop" && (data.screen === "left" || data.screen === "right")) ctx.session.focus = data.screen;
-    ctx.session.kuroCall = false;
     // A finished door beat is forgotten once the player looks away (polish W1).
     if (ctx.session.view === "door" && view !== "door" && ctx.session.door?.state === "onDesk") ctx.session.door = null;
     ctx.session.view = view;
@@ -140,8 +129,23 @@ export const loopActions: Record<string, ActionHandler> = {
       ctx.rerender();
       return;
     }
-    const { dialogue, ended } = advance(ctx.session.dialogue);
-    ctx.session.dialogue = dialogue;
+    const { session } = ctx;
+    const state = ctx.store.getState();
+    const at = lineScreens(state, session);
+    // On a page of choices, ▼ shows the next page of them (the last cycles to the first); a
+    // click never picks or skips a choice (dialogue FR1).
+    if (at && at.all[at.page]!.choices.length) {
+      const next = nextScreen(at.all, at.page);
+      if (next !== at.page) {
+        session.dialogue = { ...session.dialogue, page: next };
+        ctx.rerender();
+      }
+      return;
+    }
+    const { dialogue, ended } = advance(session.dialogue, at?.all.length ?? 1);
+    // The line is left: it goes into today's history.
+    if (sameLine(session.dialogue, dialogue) === false) logCurrent(session, state);
+    session.dialogue = dialogue;
     // Lying down; on the last night the run ends instead (san-and-endings FR2).
     if (ended?.kind === "lieDown") lieDownOrEnd(ctx);
     // The box may have just emptied after shutdown: the evening chat opens itself.
@@ -152,6 +156,20 @@ export const loopActions: Record<string, ActionHandler> = {
   "loop-choice"(ctx, data) {
     const q = ctx.session.dialogue.queue[0];
     if (!q) return;
+    // Kuro's prompt and its upgrade offer (dialogue FR2).
+    if (q.ending.kind === "kuroAsk" || q.ending.kind === "kuroOffer") {
+      if (data.choice !== "yes" && data.choice !== "no") return;
+      if (q.ending.kind === "kuroAsk") answerAsk(ctx, data.choice === "yes");
+      else answerOffer(ctx, data.choice === "yes");
+      ctx.rerender();
+      return;
+    }
+    const state = ctx.store.getState();
+    const picked = showing(ctx.session.dialogue, state)?.choices?.find((c) => String(c.index) === data.index);
+    if (!picked) return;
+    // The line and the choice go into today's history (before the event: it may end the line).
+    logCurrent(ctx.session, state);
+    logPlayer(ctx.session, state, picked.text !== null ? fillPlaceholders(picked.text, state.names) : t(picked.labelKey!));
     if (q.ending.kind === "loan" && data.choice) {
       // The loan prompt: a recipient-less reply (world-state's loan reducer decides).
       ctx.store.appendEvent({ kind: "reply", choice: data.choice, t: ctx.session.clock.time });
@@ -285,18 +303,23 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.store.appendEvent({ kind: "task", flag: task.done.flag, mode: ctx.session.wbMode });
   },
 
-  // Kuro's upgrade offer (object-upgrade FR1). The final offer upgrades everything it covers.
+  // Kuro's upgrade offer (object-upgrade FR1; spoken in the box now, dialogue FR2). The final
+  // offer upgrades everything it covers.
   "upgrade-yes"(ctx, data) {
-    const offer = currentOffer(ctx.store.getState(), ctx.store.getEvents());
-    if (!offer) return;
-    const objects = offer.kind === "final" ? offer.objects : [offer.object];
-    if (data.object !== (offer.kind === "final" ? FINAL : offer.object)) return;
-    for (const object of objects) ctx.store.appendEvent({ kind: "upgrade", object });
+    acceptOffer(ctx, data.object);
   },
   "upgrade-no"(ctx, data) {
-    const offer = currentOffer(ctx.store.getState(), ctx.store.getEvents());
-    if (!offer || data.decline !== offer.kind) return;
-    ctx.store.appendEvent({ kind: "declineUpgrade", object: offer.kind === "final" ? FINAL : offer.object, decline: offer.kind });
+    declineOffer(ctx, data.decline);
+  },
+
+  // The box's history (dialogue FR1): ↺ opens it; a click outside, 关闭 or Esc closes it.
+  "dlg-history"(ctx) {
+    ctx.session.historyOpen = true;
+    ctx.rerender();
+  },
+  "dlg-history-close"(ctx) {
+    ctx.session.historyOpen = false;
+    ctx.rerender();
   },
 
   // The ending pages: on to the next (during the credits, first to the end of the roll).
@@ -304,34 +327,24 @@ export const loopActions: Record<string, ActionHandler> = {
     endingNext(ctx);
   },
 
-  // Kuro's small window: the pill opens it; a click outside or Esc folds it (desktop-ui amendment).
-  "kuro-expand"(ctx) {
-    ctx.session.kuroOpen = true;
-    markKuroRead(ctx);
-    ctx.rerender();
-  },
-  "kuro-fold"(ctx) {
-    ctx.session.kuroOpen = false;
-    ctx.session.kuroPeekUntil = 0;
-    ctx.rerender();
-  },
-  // Kuro's body at the HUD's bottom right is the call button, in every view (day-loop
-  // correction): it opens the chat overlay; clicking it again closes it.
-  "kuro-call"(ctx) {
-    ctx.session.kuroCall = !ctx.session.kuroCall;
-    if (ctx.session.kuroCall) markKuroRead(ctx);
-    ctx.rerender();
-  },
-  "kuro-hangup"(ctx) {
-    ctx.session.kuroCall = false;
-    ctx.rerender();
-  },
-
-  // Asking Kuro anything counts as talking with it today (the answers are the kuro-chat spec's).
-  "kuro-ask"(ctx) {
-    stepOnce(ctx, "chat:any");
-  },
+  // Talking to Kuro (dialogue FR2): its body or the desktop pill, the player's box, leaving.
+  ...kuroActions,
 };
+
+/** Whether two dialogue states show the same line (pages aside). */
+function sameLine(a: DialogueState, b: DialogueState): boolean {
+  return a.queue[0] === b.queue[0] && a.line === b.line;
+}
+
+/** The current screen waits for a choice (or the player's box): keys do not read on. */
+function atChoice(ctx: ActionContext): boolean {
+  const { store, session } = ctx;
+  const state = store.getState();
+  const at = lineScreens(state, session);
+  if (at && at.all[at.page]!.choices.length) return true;
+  const q = session.dialogue.queue[0];
+  return !!q && endsInChoice(q.ending) && session.dialogue.line >= q.lines.length - 1 && (!at || at.page >= at.all.length - 1);
+}
 
 /** Keys: space / Enter read on in the room and at the door; Esc goes back to the room. */
 export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
@@ -344,21 +357,22 @@ export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
     loopActions["book-close"]!(ctx, {} as DOMStringMap, null as never);
     return true;
   }
-  // Esc closes the settings panel first, then the Kuro call / folds its small window, then puts
-  // down what is held (polish FR1), then steps the camera out.
+  // Esc closes the box's history first, then the settings panel, then ends the conversation with
+  // Kuro, then puts down what is held (polish FR1), then steps the camera out.
+  if (e.key === "Escape" && ctx.session.historyOpen) {
+    loopActions["dlg-history-close"]!(ctx, {} as DOMStringMap, null as never);
+    return true;
+  }
   if (e.key === "Escape" && ctx.session.settingsOpen) {
     loopActions["settings-close"]!(ctx, {} as DOMStringMap, null as never);
     return true;
   }
-  if (e.key === "Escape" && ctx.session.kuroCall) {
-    loopActions["kuro-hangup"]!(ctx, {} as DOMStringMap, null as never);
+  if (e.key === "Escape" && talking(ctx.session.dialogue)) {
+    loopActions["kuro-leave"]!(ctx, {} as DOMStringMap, null as never);
     return true;
   }
-  const now = ctx.now?.() ?? Date.now();
-  if (e.key === "Escape" && ctx.session.view === "desktop" && (ctx.session.kuroOpen || now < ctx.session.kuroPeekUntil)) {
-    loopActions["kuro-fold"]!(ctx, {} as DOMStringMap, null as never);
-    return true;
-  }
+  // The history is open: nothing under it reads on.
+  if (ctx.session.historyOpen) return false;
   if (e.key === "Escape" && (ctx.session.phoneOpen || ctx.session.holding)) {
     loopActions["loop-put-down"]!(ctx, {} as DOMStringMap, null as never);
     return true;
@@ -369,10 +383,8 @@ export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
     return true;
   }
   if ((e.key === " " || e.key === "Enter") && ctx.session.view !== "desktop" && ctx.session.dialogue.queue.length) {
-    const q = ctx.session.dialogue.queue[0]!;
-    const atChoice = endsInChoice(q.ending) && ctx.session.dialogue.line >= q.lines.length - 1;
     // At a choice, keys do nothing: the choice is a click.
-    if (!atChoice) loopActions["loop-advance"]!(ctx, {} as DOMStringMap, null as never);
+    if (!atChoice(ctx)) loopActions["loop-advance"]!(ctx, {} as DOMStringMap, null as never);
     // At a choice a key can still complete the line above it.
     else if (gateAdvance(ctx.session, ctx.now?.() ?? Date.now())) ctx.rerender();
     return true;

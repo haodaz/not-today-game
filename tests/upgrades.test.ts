@@ -10,8 +10,7 @@ import type { State } from "@state/types.gen";
 import { currentOffer, FINAL, parseUpgrades, upgradeTable } from "@state/upgrades";
 import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
-import { renderKuroMini } from "@world/desktop/kuro/mini";
-import { initialSession, type AppContext } from "@world/desktop/model";
+import { initialSession } from "@world/desktop/model";
 import { renderRoom } from "@world/room/hud";
 import { loopActions } from "@world/room/game";
 
@@ -26,8 +25,16 @@ function storeAt(day: number, found: string[], drafts: EventDraft[] = []): Store
   for (const d of drafts) store.appendEvent(d);
   return store;
 }
-const ctxOf = (store: Store): AppContext => ({ state: store.getState(), events: store.getEvents(), startDay: 1, session: initialSession(DEFAULT_CLOCK), night: false, nowMs: 0 });
 const act = (store: Store): ActionContext => ({ store, session: initialSession(DEFAULT_CLOCK), rerender: () => {}, later: () => {} });
+/** Clicking Kuro's body: the offer is its first line in the box (dialogue FR2). */
+function offerBox(store: Store): { ctx: ActionContext; box: string } {
+  const ctx = act(store);
+  ctx.session.view = "room";
+  loopActions["kuro-call"]!(ctx, {} as DOMStringMap, null as never);
+  const out = renderRoom({ state: store.getState(), events: store.getEvents(), session: ctx.session }).value;
+  // The box comes right before the HUD's bottom-right row in the room's markup.
+  return { ctx, box: out.slice(out.indexOf('<div class="dlg'), out.indexOf('<div class="hud-br">')) };
+}
 
 describe("upgrades table", () => {
   it("loads and rejects unknown keys or objects", () => {
@@ -45,13 +52,22 @@ describe("offers (FR1)", () => {
     expect(currentOffer(storeAt(pager.offerFrom, []).getState(), [])).toBeNull();
   });
 
-  it("pager offer on day 5: the line and two buttons in the small window", () => {
+  it("pager offer on day 5: Kuro's first line in the box, with 升级 / 不了; then it asks to talk", () => {
     const store = storeAt(pager.offerFrom, ["pager"]);
     const offer = currentOffer(store.getState(), store.getEvents());
     expect(offer).toEqual({ kind: "offer", object: "pager", line: pager.offer });
-    const out = renderKuroMini(ctxOf(store)).value;
-    expect(out).toContain('data-action="upgrade-yes" data-object="pager"');
-    expect(out).toMatchSnapshot();
+    const { ctx, box } = offerBox(store);
+    expect(box).toContain('data-action="loop-choice" data-index="0" data-choice="yes"');
+    expect(ctx.session.dialogue.queue.map((q) => q.ending.kind)).toEqual(["kuroOffer", "kuroAsk"]);
+    expect(box).toMatchSnapshot();
+    loopActions["loop-choice"]!(ctx, { index: "0", choice: "yes" } as DOMStringMap, null as never);
+    expect(store.getState().upgraded.pager).toBe(true);
+    expect(ctx.session.dialogue.queue.map((q) => q.ending.kind)).toEqual(["kuroAsk"]);
+    // No offer at night: it only asks.
+    const night = act(storeAt(pager.offerFrom, ["pager"]));
+    night.session.clock = { beat: "night", time: "23:41" } as typeof night.session.clock;
+    loopActions["kuro-call"]!(night, {} as DOMStringMap, null as never);
+    expect(night.session.dialogue.queue.map((q) => q.ending.kind)).toEqual(["kuroAsk"]);
   });
 
   it("declining hides it; the nag comes once, nagAfterDays later (day 8)", () => {
@@ -61,8 +77,11 @@ describe("offers (FR1)", () => {
     while (store.getState().day < pager.offerFrom + upgradeTable.nagAfterDays) store.appendEvent(lieDown);
     expect(store.getState().day).toBe(8);
     expect(currentOffer(store.getState(), store.getEvents())).toEqual({ kind: "nag", object: "pager", line: pager.nag });
-    expect(renderKuroMini(ctxOf(store)).value).toMatchSnapshot();
-    loopActions["upgrade-no"]!(act(store), { object: "pager", decline: "nag" } as DOMStringMap, null as never);
+    const { ctx, box } = offerBox(store);
+    expect(box).toMatchSnapshot();
+    // 不了 in the box is the nag's decline.
+    loopActions["loop-choice"]!(ctx, { index: "1", choice: "no" } as DOMStringMap, null as never);
+    expect(store.getEvents().at(-1)).toMatchObject({ kind: "declineUpgrade", object: "pager", decline: "nag" });
     store.appendEvent(lieDown);
     expect(currentOffer(store.getState(), store.getEvents())).toBeNull();
   });
@@ -71,7 +90,7 @@ describe("offers (FR1)", () => {
     const store = storeAt(upgradeTable.finalOfferDay, ["chick", "pager", "iccard"]);
     const offer = currentOffer(store.getState(), store.getEvents());
     expect(offer).toEqual({ kind: "final", objects: ["chick", "pager", "iccard"], line: upgradeTable.finalOffer });
-    expect(renderKuroMini(ctxOf(store)).value).toMatchSnapshot();
+    expect(offerBox(store).box).toMatchSnapshot();
     loopActions["upgrade-yes"]!(act(store), { object: FINAL } as DOMStringMap, null as never);
     for (const o of ["chick", "pager", "iccard"]) expect(store.getState().upgraded[o]).toBe(true);
     expect(currentOffer(store.getState(), store.getEvents())).toBeNull();

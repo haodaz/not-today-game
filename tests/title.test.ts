@@ -15,7 +15,7 @@ import { EMPTY_COLLECTION, type Collection } from "@world/room/collection";
 import { renderRoom } from "@world/room/hud";
 import { loopActions, loopKeys } from "@world/room/game";
 import { readCollection } from "../src/ui/collection";
-import { canStart, diceOptions, initialTitle, NO_ANSWERS, QUESTIONS, rowsShown, toMenu, toNames, toQuestions, withAnswer, withPronoun, type Answers, type TitleModel } from "../src/ui/title/model";
+import { arrived, cardOpen, canStart, diceOptions, initialTitle, NO_ANSWERS, QUESTIONS, rowsShown, toMenu, toNames, toQuestions, withAnswer, withPronoun, type Answers, type TitleModel } from "../src/ui/title/model";
 import { idleDelay, pickIdle } from "../src/ui/title/mount";
 import { parseTitle, titleTable } from "../src/ui/title/table";
 import { renderTitle } from "../src/ui/title/view";
@@ -62,7 +62,7 @@ describe("the title page (FR1–FR3)", () => {
   });
 
   it("snapshot: the questions mid-way, then complete", () => {
-    let m = toQuestions(initialTitle(null, EMPTY_COLLECTION));
+    let m = arrived(toQuestions(initialTitle(null, EMPTY_COLLECTION)));
     m = withAnswer(withAnswer(m, "login", "林一"), "nick", "一一");
     const mid = page(m);
     expect((mid.match(/class="row[^"]*" data-q=/g) ?? []).length).toBe(3);
@@ -105,7 +105,7 @@ describe("the title page (FR1–FR3)", () => {
         const a: Answers = { login, nick, bossCalls, calledBy, pronoun: pronoun as Answers["pronoun"] };
         const all = [login, nick, bossCalls, calledBy].every((s) => s.trim() !== "") && pronoun !== null;
         expect(canStart(a)).toBe(all);
-        const m = { ...toQuestions(initialTitle(null, EMPTY_COLLECTION)), answers: a };
+        const m = { ...arrived(toQuestions(initialTitle(null, EMPTY_COLLECTION))), answers: a };
         expect(page(m).includes('data-action="title-start" disabled')).toBe(!all);
       }),
     );
@@ -135,6 +135,34 @@ describe("the title page (FR1–FR3)", () => {
     expect(store.getState().names).toEqual(names);
     expect(() => applyEvent(f(1), { kind: "names", day: 1, names: { ...names, pronoun: "they" } } as unknown as GameEvent)).toThrow(/pronoun/);
     expect(() => applyEvent(f(1), { kind: "names", day: 1, names: { ...names, extra: "x" } } as unknown as GameEvent)).toThrow(/unknown field/);
+  });
+
+  it("新游戏 pushes to the desk first; the card opens on arrival; Esc pulls back (correction 2026-11-01)", () => {
+    const base = initialTitle(null, EMPTY_COLLECTION);
+    expect(page(base)).toContain('<img class="title-logo" src="/logo.svg" alt="NOT TODAY">');
+    const pushing = toQuestions(base);
+    expect(pushing).toMatchObject({ framing: "desk", moving: true, monitorsAwake: true });
+    expect(cardOpen(pushing)).toBe(false);
+    const during = page(pushing);
+    expect(during).toContain('class="title-room cam-in"');
+    expect(during).toContain('class="title-menu leaving"');
+    expect(during).not.toContain("title-card");
+    const at = arrived(pushing);
+    const card = page(at);
+    expect(card).toContain('class="title-room cam-desk"');
+    expect(card).not.toContain("title-menu");
+    expect(card).toContain('<section class="title-card title-q" role="dialog"');
+    expect(card).toContain('<h2 id="title-card-h">这是谁的故事？</h2>');
+    expect(card).toContain('aria-labelledby="title-card-h" data-focus="title-login"');
+    expect((card.match(/data-action="title-start"/g) ?? []).length).toBe(1);
+    const section = card.match(/<section class="title-card[\s\S]*<\/section>/)![0];
+    expect(section.match(/<button/g)!.length).toBe(2); // the 🎲 and 开始
+    const back = toMenu(at);
+    expect(back).toMatchObject({ screen: "menu", framing: "room", moving: true, monitorsAwake: false });
+    expect(page(back)).toContain('class="title-room cam-out"');
+    expect(page(back)).toContain('class="title-menu arriving"');
+    expect(toMenu({ ...base, screen: "credits" }).moving).toBe(false);
+    expect(page({ ...at, starting: true })).not.toContain("title-card");
   });
 
   it("the questions are the five in order", () => {

@@ -9,6 +9,7 @@ import type { TaskMode } from "@state/days/effects";
 import type { DoorBeat } from "@world/delivery/door";
 import { EMPTY_DIALOGUE, type DialogueState } from "@world/loop/dialogue";
 import type { Reveal } from "@world/motion/reveal";
+import type { LogEntry } from "@world/dialogue/history";
 import { EMPTY_COLLECTION, type Collection } from "@world/room/collection";
 import { isNight, type BeatClock } from "./beat";
 import { browserPage, weatherKind } from "./browser/data";
@@ -49,18 +50,24 @@ export interface Session {
   phoneOpen: boolean;
   /** The ⚙ 设置 panel is open (day-loop amendment). */
   settingsOpen: boolean;
-  /** Kuro's small window, opened by a click (desktop-ui amendment: folded by default). */
-  kuroOpen: boolean;
-  /** Until when (ms epoch) it stays open after a new line (6 s). */
-  kuroPeekUntil: number;
   /** Its last line as last seen, to notice a new one; undefined before the first look. */
   kuroLast: string | null | undefined;
-  /** The chat overlay, rising from Kuro's body at the HUD's bottom right (day-loop correction). */
-  kuroCall: boolean;
-  /** Its last line when the player last looked (call or small window); the dot shows otherwise. */
+  /** Its last line when the player last talked to it; the dot shows otherwise. */
   kuroRead: string | null | undefined;
-  /** The day the evening chat beat last opened the overlay by itself (once a day). */
+  /** The day the evening chat beat last opened the conversation by itself (once a day). */
   kuroAutoDay: number;
+  /** The player's box is a text input (说点别的…), and what is typed in it (dialogue FR2). */
+  kuroInput: boolean;
+  kuroDraft: string;
+  /** Which page of the player's questions shows. */
+  playerPage: number;
+  /** The day the bedtime line was said after the turns ran out: no player's box again that day. */
+  kuroBedDay: number;
+  /** Counter for Kuro's queued items' keys. */
+  kuroSeq: number;
+  /** The box's history (dialogue FR1): this day's lines and choices; the panel is open. */
+  dlgLog: LogEntry[];
+  historyOpen: boolean;
   /** What finished runs left on the desk (title-page FR4/FR8): set by the host from the profile; presentation only. */
   collection: Collection;
   /** The gamebook reader is open (title-page FR4). */
@@ -100,12 +107,16 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     muted: false,
     phoneOpen: false,
     settingsOpen: false,
-    kuroOpen: false,
-    kuroPeekUntil: 0,
     kuroLast: undefined,
-    kuroCall: false,
     kuroRead: undefined,
     kuroAutoDay: 0,
+    kuroInput: false,
+    kuroDraft: "",
+    playerPage: 0,
+    kuroBedDay: 0,
+    kuroSeq: 0,
+    dlgLog: [],
+    historyOpen: false,
     endingPage: null,
     collection: EMPTY_COLLECTION,
     bookOpen: false,

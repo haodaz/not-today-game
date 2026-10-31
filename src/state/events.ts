@@ -54,11 +54,13 @@ export type GameEvent =
   // san-and-endings spec: the run ends, once (bad at a shutdown beat; survive / good on the last night).
   | { kind: "ending"; day: number; ending: Ending }
   // title-page spec: the answers to the title's questions, the run's first event (title page only).
-  | { kind: "names"; day: number; names: State["names"] };
+  | { kind: "names"; day: number; names: State["names"] }
+  // dialogue spec: one chat turn with Kuro (a starter question's number, or typed text).
+  | { kind: "chat"; day: number; q?: number; text?: string };
 
 export type EventKind = GameEvent["kind"];
 
-/** Exactly these kinds (world-state 12, delivery 3, desktop-ui 1, day-loop 3, object-upgrade 2, san-and-endings 1). Nothing else may be appended. */
+/** Exactly these kinds (world-state 12, delivery 3, desktop-ui 1, day-loop 3, object-upgrade 2, san-and-endings 1, title-page 1, dialogue 1). Nothing else may be appended. */
 export const eventKinds: readonly EventKind[] = [
   "openLayer",
   "recognise",
@@ -83,7 +85,27 @@ export const eventKinds: readonly EventKind[] = [
   "declineUpgrade",
   "ending",
   "names",
+  "chat",
 ];
+
+/** A typed chat turn's length limit (dialogue spec). */
+export const CHAT_TEXT_MAX = 500;
+
+/**
+ * One chat turn with Kuro (dialogue spec): a starter question's number or what was typed, never
+ * both. The fifth turn is the last; a sixth is rejected. Lying down starts the count again.
+ */
+function applyChat(state: State, event: Extract<GameEvent, { kind: "chat" }>): State {
+  const hasQ = event.q !== undefined;
+  const hasText = event.text !== undefined;
+  if (hasQ === hasText) throw new Error("chat: exactly one of q and text");
+  if (hasQ && !(Number.isInteger(event.q) && event.q! >= 1)) throw new Error(`chat: q must be a question number, got ${JSON.stringify(event.q)}`);
+  if (hasText && (typeof event.text !== "string" || event.text.trim() === "" || event.text.length > CHAT_TEXT_MAX)) {
+    throw new Error(`chat: text must be 1–${CHAT_TEXT_MAX} characters`);
+  }
+  if (state.chatTurnsToday >= constants.chatTurnsPerDay) throw new Error(`chat: no turns left today (${constants.chatTurnsPerDay})`);
+  return { ...state, chatTurnsToday: state.chatTurnsToday + 1 };
+}
 
 const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
 
@@ -178,8 +200,10 @@ export function applyEvent(state: State, event: GameEvent): State {
     case "letItDo":
       return { ...state, letItDoUnchecked: state.letItDoUnchecked + 1 };
     case "lieDown":
-      // The only thing that moves the day counter.
-      return { ...state, day: state.day + 1 };
+      // The only thing that moves the day counter; a new day has all its chat turns again.
+      return { ...state, day: state.day + 1, chatTurnsToday: 0 };
+    case "chat":
+      return applyChat(state, event);
     case "open":
       return applyOpen(state, event);
     case "step":

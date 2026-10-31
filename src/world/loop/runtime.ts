@@ -11,7 +11,8 @@ import { dueAtLieDown, dueAtShutdown } from "@state/endings";
 import { startEnding } from "@world/endings/flow";
 import { knows, optionOrder, recogniseTable, wasRight } from "@state/recognise";
 import { advanceTo, DEFAULT_CLOCK, isNight, type Beat, type BeatClock } from "@world/desktop/beat";
-import { KURO_PEEK_MS, lastKuroLine } from "@world/desktop/kuro/mini";
+import { lastKuroLine } from "@world/desktop/kuro/mini";
+import { startTalk } from "@world/dialogue/kuro";
 import type { ActionContext } from "@world/desktop/controller";
 import type { LoopMemo } from "@world/desktop/model";
 import { arrivalOf, ordersOn } from "@world/delivery/meals";
@@ -182,6 +183,12 @@ export function syncLoop(ctx: ActionContext, nowMs: number = Date.now()): void {
       session.phoneOpen = false;
       session.holding = null;
       session.door = null;
+      // The box's history is per day (dialogue FR1); a conversation does not carry over.
+      session.dlgLog = [];
+      session.historyOpen = false;
+      session.kuroInput = false;
+      session.kuroDraft = "";
+      session.playerPage = 0;
     }
     session.loop = freshMemo(lc, events, nowMs);
     scheduleSelf(ctx, lc);
@@ -238,17 +245,14 @@ export function openChatIfDue(ctx: ActionContext): void {
   const st = itemStates(lc).get(chat.id)!;
   if (!st.unlocked || st.done) return;
   session.kuroAutoDay = state.day;
-  session.kuroCall = true;
-  session.kuroRead = lastKuroLine({ state, events: store.getEvents(), startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs: ctx.now?.() ?? Date.now() });
+  // The conversation opens in the box (dialogue FR2): 要和克总聊聊吗？
+  startTalk(ctx);
   ctx.rerender();
 }
 
-/** Whether the pointer is over the open small window (the DOM only; never in tests). */
-const hovered = (): boolean => typeof document !== "undefined" && document.querySelector(".kmini:hover") !== null;
-
 /**
- * A new line from Kuro opens its small window for 6 s, then it folds unless hovered
- * (desktop-ui amendment). The first look of a run only remembers the line.
+ * Remembers Kuro's last line, so the call button's dot can show what is new (the first look of a
+ * run counts as read). Nothing opens by itself any more (dialogue FR2: the small window is a pill).
  */
 export function noticeKuroLine(ctx: ActionContext, nowMs: number): void {
   const { store, session } = ctx;
@@ -256,18 +260,7 @@ export function noticeKuroLine(ctx: ActionContext, nowMs: number): void {
   if (session.kuroLast === line) return;
   const first = session.kuroLast === undefined;
   session.kuroLast = line;
-  // The first look of a run counts as read: the dot is only for what it says after.
   if (first) session.kuroRead = line;
-  if (first || line === null) return;
-  session.kuroPeekUntil = nowMs + KURO_PEEK_MS;
-  const fold = () => {
-    if (hovered()) {
-      session.kuroPeekUntil = Date.now() + 1_000;
-      ctx.later(1_000, fold);
-    }
-    ctx.rerender();
-  };
-  ctx.later(KURO_PEEK_MS + 20, fold);
 }
 
 function scheduleSelf(ctx: ActionContext, lc: LoopContext): void {

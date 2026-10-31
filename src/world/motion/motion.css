@@ -53,17 +53,18 @@
 @keyframes m-bob{50%{translate:0 calc(-1 * var(--m-bob-px))}}
 .kpet .layer{transition:opacity var(--m-kuro-fade) var(--m-ease)}
 /* Nothing breathes on the monitor (day-loop correction): the small window's night look is static. */
-/* The chat overlay rises out of Kuro's body at the HUD's bottom right, and sinks back */
-@keyframes m-call-in{from{opacity:0;scale:.6;translate:0 24px}}
-@keyframes m-call-out{to{opacity:0;scale:.6;translate:0 24px}}
+/* Talking to Kuro (dialogue FR2): its body comes back to the HUD corner from the box (320 ms);
+   the player's box rises from the right edge. */
+@keyframes m-kuro-back{from{opacity:0;scale:.6;translate:-240px -60px}}
+@keyframes m-rise-right{from{opacity:0;translate:120px 0}}
 @keyframes m-kuro-line{from{opacity:0;scale:.92;translate:8px 8px}}
 .kmini .c > .it{transform-origin:right bottom}
 
 /* Lying down: rise a little, then black; the night's lines play in the black */
 @keyframes m-sleep-rise{to{translate:0 var(--m-sleep-rise)}}
 .stage.m-asleep::after{content:"";position:absolute;inset:0;background:#000;z-index:20;pointer-events:none;animation:m-fade-in var(--m-sleep) var(--m-ease) var(--m-sleep-t,0ms) both}
-.stage.m-asleep > :not(.dlg):not(.choices){animation:m-sleep-rise var(--m-sleep) var(--m-ease) var(--m-sleep-t,0ms) both}
-.stage.m-asleep > .dlg,.stage.m-asleep > .choices{z-index:21}
+.stage.m-asleep > :not(.dlg):not(.dlg-hist-layer){animation:m-sleep-rise var(--m-sleep) var(--m-ease) var(--m-sleep-t,0ms) both}
+.stage.m-asleep > .dlg,.stage.m-asleep > .dlg-hist-layer{z-index:21}
 /* The next day starts from white */
 .stage.m-wake::before{content:"";position:absolute;inset:0;background:#fff;z-index:60;pointer-events:none;animation:m-fade-out var(--m-wake) var(--m-ease) var(--m-wake-t,0ms) both}
 

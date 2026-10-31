@@ -390,3 +390,82 @@ Appended after each task. Neither Kiro nor Claude edits the other's area without
   and `public/gamebook/`.
 - Not done (named): `profiles.names` online (backend); the splat background (room-scene).
 - Tests: 45 files, 666 passing; typecheck clean. Not checked in a browser.
+
+## 2026-11-01 — title-page correction (the question card) + spec dialogue + Kuro at 192 px
+
+### Title correction ("Correction 2026-11-01", mock design/chrome/title-questions.html)
+- 新游戏 pushes the camera to 桌子 first (房间→桌子's path around the desk, ×1.6, over
+  `title.json start.pushMs` = 1400 ms). The monitors wake and the menu fades out during the push.
+  The card opens when the push ends.
+- The card: centred, warm translucent grey, hairline, 8 px radius, 560 px. The header is
+  `title.q.login`, one row at a time, 🎲 beside each, `开始` is its only button, and the Esc hint
+  sits under it.
+- Esc closes the card and pulls back to 房间; the monitors sleep.
+- 开始 closes the card and the lamp goes off (400 ms). The game then mounts at the 桌子 framing
+  (`main.ts`: a new run starts with `view: "desk"`).
+- Model: `framing: "room" | "desk"`, `moving`, `cardOpen()`, `arrived()`. A move keeps its
+  place across re-renders: the mount sets `--t-ago`, a negative animation delay.
+- The title's "NOT TODAY" text is now `<img class="title-logo" src="/logo.svg" alt="NOT TODAY">`,
+  at the same place, 600 px wide, .35 while the card is open.
+- The name row has no label of its own; its input is named by the card's header.
+  TODO(Claude): a short `title.q.name` (the mock's 名字) if the row should carry one.
+
+### dialogue (design.md, tasks.md T1–T11)
+- New event kind `chat {q?|text?}`.
+  - Exactly one of the two fields; text is 1–500 characters.
+  - Each one is a turn; a sixth turn in a day is rejected.
+  - `lieDown` resets `chatTurnsToday`.
+  - The first turn of a day also logs `step chat:any`, so the chat item ticks.
+- `parseKuroDay` reads `## Offline answers` strictly into `answers.q` / `answers.free`.
+  `offlineAnswer(day, n)` returns the question's answer, else the free-text one, else the idiom.
+- Queue changes:
+  - `page` (screens of a long line). `lineKey` gets `:pN` after page 0.
+  - `voice: "kuro"`.
+  - Endings `kuroOffer` / `kuroAsk` / `kuroTurn`.
+  - `advance(d, screens)`, `leaveKuro`, `replaceHead`.
+- `src/world/dialogue/`:
+  - `layout.ts`: the width table (CJK 1 em, else 0.6 em), `wrap`, `screens`, markers.
+  - `box.ts`: the box, the player's box and the history panel.
+  - `history.ts`: per-day `session.dlgLog`.
+  - `kuro.ts`: the conversation and its actions.
+  - `room/hud.ts` and the desktop root render `dialogueBox(state, events, session)`.
+- Choices are inside the box, at most 4 per page. A one-row prompt shares a page with ≤ 2 rows of
+  choices (as in the mock); otherwise the line comes first, then ▶, then the choices.
+- Kuro:
+  - The body or the desktop pill queues the conversation: today's upgrade offer first (not at
+    night, choices 升级 / 不了), then `kuro.ask`.
+  - The body is away while any Kuro item is queued; `m-kuro-back` (320 ms) brings it back.
+  - At night, 聊聊 brings the idiom and the player's box (unasked starters, 说点别的…, 先不聊). In
+    work beats it brings the idiom and only 好。, with no turn used.
+  - The sixth attempt gets `kuro.bedtime`, and the player's box is gone for the day
+    (`kuroBedDay`).
+- Removed: the chat overlay (`.kuro-call`), the expanded small window and its 6 s peek,
+  `renderKuroMini`, `kuro-expand` / `kuro-fold` / `kuro-hangup` / `kuro-ask`, and the session
+  fields `kuroOpen`, `kuroPeekUntil`, `kuroCall`. The desktop pill shows the last line, online or
+  the night dot, and `kuro.turns`.
+- Controller:
+  - An input's `data-enter` names its Enter action.
+  - Esc in the player's input leaves the conversation.
+  - Esc order: history → settings → conversation → held → camera.
+- Motion: the reveal wraps only `.txt`. Choices wait inside either box. `.dlg-player` is keyed
+  `player` and rises (`m-rise-right`). The chosen-choice ghost is gone, because the choices no
+  longer leave the box.
+- late-days FR1 (only that line): the HUD body is 192 px. The pill sits at `right:228px`.
+- Updated tests:
+  - `fixes-1031` and `motion-dom`: conversation, not overlay.
+  - `desktop-kuro`: the pill and offline answers.
+  - `upgrades`: the offer in the box.
+  - `night-hand` and `recognise`: every screen, through `tests/box-screens.ts`.
+  - Snapshots refreshed after checking that the diffs were the intended markup.
+- New: `tests/dialogue.test.ts` (FR3).
+  - Snapshots: narration, both pages of a paged line, choices, the prompt, Kuro's line with the
+    player's questions, the input, the history.
+  - Properties: wrap round-trip and width; screen limits and markers; happy-dom fixed size and
+    ≤ 3 rows for every content line; the sixth turn; `chat` replay.
+- TODO(Claude), strings:
+  - `dialogue.tag.door` 门外, `dialogue.tag.gap` 缝里, `dialogue.tag.desk` 桌上. Until they exist,
+    narration has no tag. Speaker lines already show their content `who`.
+  - `dialogue.page`: a label for the ▼ page button (it has none now).
+- Not done (kuro-chat's): the model path, memory and the judgement scorer. Answers are the
+  offline constants only.
+- Tests: 46 files, 681 passing; typecheck clean. Not checked in a browser.

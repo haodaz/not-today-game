@@ -11,7 +11,7 @@ import { initialSession, type Session } from "@world/desktop/model";
 import { setLocale } from "@world/i18n";
 import { renderRoom } from "@world/room/hud";
 import { isNight } from "@world/desktop/beat";
-import { KURO_PEEK_MS, renderKuro } from "@world/desktop/kuro/mini";
+import { renderKuro } from "@world/desktop/kuro/mini";
 import { noticeKuroLine, openChatIfDue } from "@world/loop/runtime";
 import { taskFiles } from "@state/days/tasks";
 import { dayFiles, type Item } from "@state/days/table";
@@ -76,57 +76,34 @@ describe("(3) one settings button", () => {
   });
 });
 
-describe("(4) Kuro's small window folds", () => {
+describe("(4) Kuro's small window is a pill (dialogue FR2: no window any more)", () => {
   const appCtx = (ctx: ActionContext, nowMs = 0) => ({ state: ctx.store.getState(), events: ctx.store.getEvents(), startDay: ctx.store.getStartDay(), session: ctx.session, night: isNight(ctx.session.clock), nowMs });
   const desk = (beat: "work" | "night" = "work") => ctxOf(createStore({ startDay: 1 }), initialSession({ beat, time: beat === "night" ? "23:41" : "10:00" }, "right", "desktop"));
 
-  it("is a pill beside the body by default; a click opens it", () => {
+  it("is a pill in every beat; clicking it is clicking the body: the conversation opens in the box", () => {
+    for (const beat of ["work", "night"] as const) {
+      const ctx = desk(beat);
+      expect(renderKuro(appCtx(ctx)).value).toContain('data-action="kuro-call"');
+      expect(renderKuro(appCtx(ctx)).value).not.toContain('class="kmini');
+    }
     const ctx = desk();
-    let out = renderKuro(appCtx(ctx)).value;
-    expect(out).toContain('class="kpill" data-action="kuro-expand"');
-    expect(out).not.toContain('class="kmini');
-    loopActions["kuro-expand"]!(ctx, none, null as never);
-    out = renderKuro(appCtx(ctx)).value;
-    expect(out).toContain('class="kmini');
-    expect(out).not.toContain("kpill");
+    loopActions["kuro-call"]!(ctx, none, null as never);
+    const out = renderGame(ctx.store, ctx.session, 0).value;
+    expect(out).toContain('<div class="dlg-layer"><div class="dlg kuro');
+    expect(ctx.session.view).toBe("desktop");
   });
 
-  it("open, it docks top-right over an app with an input; bottom-right over the browser", () => {
-    const ctx = desk();
-    ctx.session.kuroOpen = true;
-    ctx.session.focus = "left";
-    ctx.session.leftApp = "msgs";
-    expect(renderKuro(appCtx(ctx)).value).toContain('class="kmini-dock top"');
-    ctx.session.leftApp = "browser";
-    expect(renderKuro(appCtx(ctx)).value).toContain('class="kmini-dock bottom"');
-  });
-
-  it("stays open in the evening chat beat", () => {
-    expect(renderKuro(appCtx(desk("night"))).value).toContain('class="kmini');
-  });
-
-  it("a new line opens it for 6 s, then it folds; the first look only remembers", () => {
+  it("a new line is only remembered (the dot); nothing opens by itself", () => {
     const store = createStore({ startDay: 1 });
     const timers: { ms: number; fn: () => void }[] = [];
     const ctx: ActionContext = { store, session: initialSession({ beat: "work", time: "10:00" }, "right", "desktop"), rerender: () => {}, later: (ms, fn) => void timers.push({ ms, fn }) };
     noticeKuroLine(ctx, 1_000);
-    expect(ctx.session.kuroPeekUntil).toBe(0);
-    // A new line: what it says while doing a work task (content/tasks, the "look" path).
     const task = taskFiles.get(1)!.find((x) => x.look.kuro.length > 0)!;
     store.appendEvent({ kind: "task", flag: task.done, mode: "look" });
     noticeKuroLine(ctx, 2_000);
-    expect(ctx.session.kuroPeekUntil).toBe(2_000 + KURO_PEEK_MS);
-    expect(timers.some((x) => x.ms === KURO_PEEK_MS + 20)).toBe(true);
-    expect(renderKuro(appCtx(ctx, 3_000)).value).toContain('class="kmini');
-    expect(renderKuro(appCtx(ctx, 2_000 + KURO_PEEK_MS + 1)).value).toContain("kpill");
-  });
-
-  it("Esc folds it", () => {
-    const ctx = desk();
-    ctx.session.kuroOpen = true;
-    expect(loopKeys(ctx, { key: "Escape" } as KeyboardEvent)).toBe(true);
-    expect(ctx.session.kuroOpen).toBe(false);
-    expect(ctx.session.view).toBe("desktop");
+    expect(timers).toEqual([]);
+    expect(ctx.session.kuroLast).toBe(task.look.kuro.at(-1));
+    expect(ctx.session.dialogue.queue).toEqual([]);
   });
 });
 
@@ -182,7 +159,7 @@ describe("(5) four camera levels", () => {
     for (const view of ["room", "desk", "desktop", "door"] as const) {
       const out = render(at(view));
       const br = out.slice(out.indexOf('<div class="hud-br">'));
-      expect(br, view).toMatch(/^<div class="hud-br"><div class="hud-kuro"><button type="button" class="kuro-btn" data-action="kuro-call" aria-expanded="false"/);
+      expect(br, view).toMatch(/^<div class="hud-br"><div class="hud-kuro"><button type="button" class="kuro-btn" data-action="kuro-call" aria-label=/);
       expect(br, view).toContain('<span class="kpet" data-kuro-slot data-state=');
       // Left of the chips (they come after it in the same row); 屏幕 has no chips.
       if (view !== "desktop") expect(br.indexOf("kuro-btn")).toBeLessThan(br.indexOf('class="cams"'));
@@ -191,17 +168,22 @@ describe("(5) four camera levels", () => {
     }
   });
 
-  it("clicking it opens the chat overlay above it without changing view; clicking again or Esc closes", () => {
+  it("clicking it opens the conversation in the box without changing view; the body steps away; Esc ends it", () => {
     for (const view of ["room", "desk", "desktop", "door"] as const) {
       const ctx = at(view);
       loopActions["kuro-call"]!(ctx, none, null as never);
-      expect(render(ctx), view).toContain('<div class="hud-kuro"><div class="kuro-call" role="dialog"');
+      const out = render(ctx);
+      expect(out, view).toContain('<div class="hud-kuro away"></div>');
+      expect(out, view).not.toContain("data-kuro-slot");
+      expect(out, view).toMatch(/<div class="dlg kuro[^"]*"[^>]*><span class="who tag k">/);
       expect(ctx.session.view).toBe(view);
+      // A second click while talking queues nothing more.
+      const queued = ctx.session.dialogue.queue.length;
       loopActions["kuro-call"]!(ctx, none, null as never);
-      expect(ctx.session.kuroCall).toBe(false);
-      loopActions["kuro-call"]!(ctx, none, null as never);
+      expect(ctx.session.dialogue.queue.length).toBe(queued);
       expect(loopKeys(ctx, { key: "Escape" } as KeyboardEvent)).toBe(true);
-      expect(ctx.session.kuroCall).toBe(false);
+      expect(ctx.session.dialogue.queue).toEqual([]);
+      expect(render(ctx), view).toContain('class="kuro-btn"');
       expect(ctx.session.view).toBe(view);
     }
   });
@@ -232,11 +214,12 @@ describe("(5) four camera levels", () => {
   });
 });
 
-describe("(5) the evening chat beat opens the overlay by itself", () => {
+describe("(5) the evening chat beat opens the conversation by itself", () => {
+  const asking = (s: Session) => s.dialogue.queue.some((q) => q.ending.kind === "kuroAsk");
   it("not before the chat item opens; not over the box; then once a day", () => {
     const early = ctxOf(createStore({ startDay: 1 }), initialSession({ beat: "night", time: "23:41" }, "left", "room"));
     openChatIfDue(early);
-    expect(early.session.kuroCall).toBe(false);
+    expect(asking(early.session)).toBe(false);
     for (const [day, file] of dayFiles) {
       const chat = file.items.find((it) => it.done.kind === "event" && it.done.event.type === "chat");
       if (!chat) continue;
@@ -255,14 +238,14 @@ describe("(5) the evening chat beat opens the overlay by itself", () => {
       if (!unlocked()) continue;
       ctx.session.dialogue = { queue: [{ key: "x", lines: [{ k: "narration", t: "…" }], ending: { kind: "none" } }], line: 0 };
       openChatIfDue(ctx);
-      expect(ctx.session.kuroCall, `day ${day}: not over the box`).toBe(false);
+      expect(asking(ctx.session), `day ${day}: not over the box`).toBe(false);
       ctx.session.dialogue = EMPTY_DIALOGUE;
       openChatIfDue(ctx);
-      expect(ctx.session.kuroCall, `day ${day}`).toBe(true);
+      expect(asking(ctx.session), `day ${day}`).toBe(true);
       expect(ctx.session.kuroAutoDay).toBe(day);
-      ctx.session.kuroCall = false;
+      ctx.session.dialogue = EMPTY_DIALOGUE;
       openChatIfDue(ctx);
-      expect(ctx.session.kuroCall, "once a day").toBe(false);
+      expect(asking(ctx.session), "once a day").toBe(false);
       return; // one day is enough to show it
     }
     throw new Error("no day's chat item could be unlocked in the test");

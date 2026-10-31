@@ -14,15 +14,14 @@
 /* Bottom right of the HUD: Kuro's body (the call button), then the camera chips (day-loop correction) */
 .hud-br{position:absolute;right:28px;bottom:28px;z-index:18;display:flex;align-items:flex-end;gap:12px}
 .hud-host .hud-br{position:fixed;right:12px;bottom:12px;z-index:40}
-.hud-kuro{position:relative;width:96px;height:96px}
-.kuro-btn{position:relative;width:96px;height:96px;border:0;padding:0;margin:0;background:transparent;border-radius:50%;cursor:pointer}
-.kuro-btn .kpet{position:absolute;inset:0;width:96px;height:96px}
-.kuro-btn:hover,.kuro-btn:focus-visible,.kuro-btn.on{background:radial-gradient(closest-side,rgba(246,166,35,.22),transparent)}
+/* The body is 192 px (late-days FR1); during a conversation it is away (it is talking in the box). */
+.hud-kuro{position:relative;width:192px;height:192px}
+.hud-kuro.away{visibility:hidden;pointer-events:none}
+.kuro-btn{position:relative;width:192px;height:192px;border:0;padding:0;margin:0;background:transparent;border-radius:50%;cursor:pointer;transform-origin:right bottom}
+.kuro-btn .kpet{position:absolute;inset:0;width:192px;height:192px}
+.kuro-btn:hover,.kuro-btn:focus-visible{background:radial-gradient(closest-side,rgba(246,166,35,.22),transparent)}
 .kuro-btn:focus-visible{outline:2px solid #f6a623;outline-offset:2px}
-.kuro-btn .dot{position:absolute;right:10px;top:10px;width:12px;height:12px;border-radius:50%;background:#e5484d;box-shadow:0 0 0 2px #fff;pointer-events:none}
-/* The chat overlay rises from the body: same component as on the screen */
-.kuro-call{position:absolute;right:0;bottom:calc(100% + 10px);width:360px;transform-origin:right bottom}
-.kuro-call .kmini{position:relative;right:auto;bottom:auto;width:100%}
+.kuro-btn .dot{position:absolute;right:26px;top:26px;width:14px;height:14px;border-radius:50%;background:#e5484d;box-shadow:0 0 0 2px #fff;pointer-events:none}
 .room.door-view{background:#0f0e0c url(/room/door_wall.png) center/cover}
 /* 今日清单 */
 .room .list{position:absolute;left:28px;top:28px;width:280px;background:var(--paper);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.35);border-radius:10px;padding:12px 16px;box-shadow:0 6px 24px rgba(0,0,0,.12);font-size:15px;line-height:1.7}
@@ -48,16 +47,48 @@
 .room .slot .cup{width:26px;height:34px;border:2px solid #789;border-radius:0 0 8px 8px;background:linear-gradient(180deg,#fff 40%,#cfe0ea 40%)}
 .room .slot .phone{width:28px;height:50px;background:#222;border-radius:5px;border:2px solid #555}
 .room .slot.gap{width:20px}
-/* 对话框 */
-.room .dlg{position:absolute;left:50%;bottom:128px;transform:translateX(-50%);width:980px;background:rgba(28,26,23,.82);backdrop-filter:blur(6px);color:#f4efe6;border-radius:12px;padding:18px 24px;font-size:18px;line-height:1.6;box-shadow:0 12px 40px rgba(0,0,0,.4);border:0;text-align:left;font-family:var(--font)}
-.room button.dlg{cursor:pointer}
-.room .dlg .who{display:block;font-size:12px;letter-spacing:.12em;color:#c9a86a;margin-bottom:4px}
-.room .dlg .inner{font-style:italic;color:#e8b4ae}
-.room .dlg .sfx{color:#c9a86a;letter-spacing:.08em}
-.room .dlg .more{position:absolute;right:16px;bottom:10px;color:#c9a86a;font-size:12px}
-.room .choices{position:absolute;left:50%;bottom:128px;transform:translateX(-50%);width:980px;display:flex;flex-direction:column;gap:8px}
-.room .choices button{background:rgba(28,26,23,.86);color:#f4efe6;border:1px solid rgba(201,168,106,.4);border-radius:10px;padding:12px 20px;font:17px var(--font);text-align:left;cursor:pointer}
-.room .choices button:hover{border-color:#c9a86a}
+/* 对话框 (dialogue FR1, design/chrome/dialogue.html): one fixed box, bottom centre, three rows; never
+   grows, never scrolls. The tag sits on its top-left edge, ↺ on its top-right. */
+.dlg,.dlg-player{position:absolute;left:50%;bottom:120px;transform:translateX(-50%);width:992px;height:132px;box-sizing:border-box;display:flex;flex-direction:column;background:rgba(236,231,222,.86);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.6);border-radius:6px;padding:26px 30px 0;color:#1d2129;font-size:18px;line-height:1.6;box-shadow:0 10px 30px rgba(0,0,0,.35);text-align:left;font-family:var(--font, "PingFang SC","Hiragino Sans GB",sans-serif)}
+:lang(en) .dlg,:lang(en) .dlg-player{font-size:17px}
+.dlg.raised{bottom:300px}
+.dlg .txt{flex:1 1 auto;min-height:0;overflow:hidden;display:block;width:100%;margin:0;padding:0 0 8px;border:0;background:none;font:inherit;line-height:inherit;color:inherit;text-align:inherit;white-space:pre-line;cursor:pointer}
+.dlg.has-choices .txt{flex:0 0 auto;padding-bottom:0}
+.dlg .txt:focus-visible{outline:2px solid rgba(139,47,42,.45);outline-offset:4px}
+.dlg.inner{color:#6a3a36}.dlg.inner .txt{font-style:italic}
+.dlg.sfx .txt{text-align:center;letter-spacing:.08em;color:#5b4a2e}
+.dlg .tag,.dlg-player .tag{position:absolute;left:18px;top:-16px;background:#2a2622;color:#efe9df;font-size:13px;line-height:1.4;letter-spacing:.2em;padding:5px 14px;border-radius:3px;white-space:nowrap}
+:lang(en) .dlg .tag,:lang(en) .dlg-player .tag{text-transform:uppercase;letter-spacing:.14em}
+.dlg .tag.k{display:flex;align-items:center;gap:10px;top:-34px;padding:4px 14px 4px 4px;border-radius:30px}
+.dlg .tag.k img{width:56px;height:56px;border-radius:50%;object-fit:cover;background:#ddd}
+.dlg-player .tag{background:#5b4a2e}
+.dlg .hist{position:absolute;right:14px;top:-14px;width:28px;height:28px;border:0;padding:0;border-radius:50%;background:#2a2622;color:#efe9df;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer}
+.dlg .hist:hover,.dlg .hist:focus-visible{background:#8b2f2a;outline:none}
+.dlg .more,.dlg-player .more{position:absolute;right:18px;bottom:8px;border:0;padding:0;background:none;color:#8b2f2a;font-size:12px;line-height:1;animation:dlg-pulse 1.2s ease-in-out infinite}
+.dlg button.more,.dlg-player button.more{cursor:pointer;font-size:14px}
+@keyframes dlg-pulse{50%{opacity:.2}}
+/* Choices inside the box: a vertical list, ◆ on hover / focus, at most two lines each */
+.dlg .choices,.dlg-player .choices{display:flex;flex-direction:column;line-height:1.45}
+.dlg.has-choices{padding-top:20px}
+.dlg .choices button,.dlg-player .choices button{position:relative;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;width:100%;margin:0;padding:1px 0 1px 20px;border:0;background:none;font:inherit;line-height:inherit;color:#777;text-align:left;cursor:pointer}
+.dlg .choices button:hover,.dlg .choices button:focus-visible,.dlg-player .choices button:hover,.dlg-player .choices button:focus-visible{color:#1d2129;outline:none}
+.dlg .choices button:hover::before,.dlg .choices button:focus-visible::before,.dlg-player .choices button:hover::before,.dlg-player .choices button:focus-visible::before{content:"◆";position:absolute;left:0;color:#8b2f2a}
+/* The player's box rises from the right edge, the same height */
+.dlg-player{left:auto;right:64px;transform:none;width:560px;padding-top:20px}
+.dlg-player.input{padding-top:30px}
+.dlg-player .kuro-in{width:100%;border:0;border-bottom:1px solid #8a7f70;background:transparent;font:inherit;color:#1d2129;outline:0;padding:2px 0}
+.dlg-player .kuro-in:focus{border-bottom-color:#1d2129}
+/* History (FR1): a full-height scrolling log of this day; a click outside or Esc closes it */
+.dlg-hist-layer{position:absolute;inset:0;z-index:45}
+.dlg-hist-dim{position:absolute;inset:0;border:0;padding:0;margin:0;background:rgba(10,10,12,.55);cursor:default}
+.dlg-hist{position:absolute;left:50%;top:24px;bottom:24px;transform:translateX(-50%);width:760px;box-sizing:border-box;display:flex;flex-direction:column;background:rgba(236,231,222,.94);border:1px solid rgba(255,255,255,.6);border-radius:6px;padding:20px 28px;color:#1d2129;font-size:16px;line-height:1.6;box-shadow:0 20px 60px rgba(0,0,0,.45)}
+.dlg-hist h3{margin:0 0 12px;font-size:12px;letter-spacing:.2em;color:#8a7f70;font-weight:400}
+.dlg-hist ol{flex:1;overflow:auto;margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.dlg-hist .h-it b{display:inline-block;margin-right:10px;padding:1px 8px;border-radius:3px;background:#2a2622;color:#efe9df;font-size:12px;font-weight:400;letter-spacing:.12em}
+.dlg-hist .k-player b{background:#5b4a2e}.dlg-hist .k-player span{color:#5b4a2e}
+.dlg-hist .k-inner span{font-style:italic;color:#6a3a36}
+.dlg-hist .close{align-self:flex-end;margin-top:12px;border:1px solid rgba(0,0,0,.15);border-radius:4px;background:#fff;padding:6px 16px;font:inherit;font-size:13px;cursor:pointer}
+.dlg-hist .close:hover,.dlg-hist .close:focus-visible{border-color:#8b2f2a;color:#8b2f2a}
 /* 举起来 (held.html, held-object.html): the room dims, the item sits in the middle, tilted */
 .room .slot.lifted > *{visibility:hidden}
 .room .held-layer{position:absolute;inset:0;z-index:15}
@@ -83,7 +114,7 @@
 .room .held.obj canvas.dev{position:absolute;transform:translate(-50%,-50%);image-rendering:pixelated;background:#9fb59a;border-radius:2px}
 .room .held.obj canvas.dev.hi{image-rendering:auto;background:linear-gradient(180deg,#f4f8ff,#d9e6ff)}
 .room .held-layer .hint{position:absolute;left:50%;bottom:130px;transform:translateX(-50%);color:#f4efe6;font-size:14px;opacity:.7;pointer-events:none}
-.room > .dlg,.room > .choices{z-index:16}
+.room > .dlg,.room > .dlg-player{z-index:16}
 /* 夜里的手 (night-hand FR1): the desk dims, the gap between the monitors glows; the hand is never drawn */
 .room .gap-glow{position:absolute;inset:0;z-index:14;pointer-events:none;background:rgba(10,10,12,.55)}
 .room .gap-glow::after{content:"";position:absolute;left:var(--gap-x,50%);top:var(--gap-t,22%);width:6px;height:var(--gap-h,30%);transform:translateX(-50%);background:radial-gradient(ellipse,rgba(255,150,190,.9),rgba(255,150,190,0) 70%);filter:blur(2px)}
@@ -129,11 +160,12 @@
 .room .slot.upgraded img{image-rendering:auto;filter:saturate(1.15) drop-shadow(0 0 6px rgba(120,170,255,.55))}
 .room .slot .screen-hi{width:52px;height:26px;border-radius:4px;background:linear-gradient(180deg,#f4f8ff,#d9e6ff);box-shadow:inset 0 0 0 1px rgba(80,120,200,.25)}
 /* The dialogue box over the desktop view (work-task narration). */
-.dlg-layer{position:fixed;left:50%;bottom:0;width:0;height:0;z-index:30}
-.dlg-layer .dlg,.dlg-layer .choices{position:absolute;left:0;bottom:40px;transform:translateX(-50%);width:min(980px,90vw)}
-.dlg-layer .dlg{background:rgba(28,26,23,.86);backdrop-filter:blur(6px);color:#f4efe6;border-radius:12px;padding:18px 24px;font:18px/1.6 "PingFang SC","Hiragino Sans GB",sans-serif;box-shadow:0 12px 40px rgba(0,0,0,.4);border:0;text-align:left;cursor:pointer}
-.dlg-layer .dlg .inner{font-style:italic;color:#e8b4ae}.dlg-layer .dlg .who{display:block;font-size:12px;letter-spacing:.12em;color:#c9a86a}
-.dlg-layer .dlg .sfx{color:#c9a86a}.dlg-layer .dlg .more{position:absolute;right:16px;bottom:10px;color:#c9a86a;font-size:12px}
+.dlg-layer{position:fixed;inset:0;z-index:30;pointer-events:none}
+.dlg-layer > *{pointer-events:auto}
+.dlg-layer .dlg{bottom:60px}
+.dlg-layer .dlg.raised{bottom:240px}
+.dlg-layer .dlg-player{bottom:60px;right:24px}
+.dlg-layer .dlg-hist-layer{position:fixed}
 /* SAN bands (san-and-endings FR1, presentation only; SAN is never shown): the cup colder, the room
    one step narrower (a side vignette until room-scene), a denser grain over the text. */
 .room[data-san-band="1"] .slot .cup{background:linear-gradient(180deg,#fff 40%,#c3d6e3 40%)}
@@ -169,4 +201,4 @@
 .credits li.last{margin-top:18px;font-size:19px}
 .first-day{background:#fff;color:#1d2129;display:flex;align-items:center;justify-content:center}
 .first-day p{position:relative;z-index:2;margin:0;font-size:28px;letter-spacing:.4em;pointer-events:none}
-.day-19 .dlg{position:absolute;left:50%;bottom:128px;transform:translateX(-50%);width:980px;background:rgba(28,26,23,.82);color:#f4efe6;border-radius:12px;padding:18px 24px;font-size:18px;line-height:1.6}
+

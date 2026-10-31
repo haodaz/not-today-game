@@ -139,22 +139,12 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   const ctx: ActionContext = { store: deps.store, session, rerender, later, play: (id) => playSfx(id, session.muted), now: () => Date.now() };
   const motion: MotionHooks | null = deps.motion ? deps.motion(root, ctx, actions) : null;
 
-  // Kuro's small window folds on any click outside it (desktop-ui amendment).
-  const foldKuroUnless = (target: Element) => {
-    if (target.closest(".kmini,.kpill,.kuro-call")) return;
-    if (!session.kuroOpen && session.kuroPeekUntil <= Date.now()) return;
-    session.kuroOpen = false;
-    session.kuroPeekUntil = 0;
-    rerender();
-  };
   const onClick = (e: MouseEvent) => {
     const el = (e.target as HTMLElement).closest<HTMLElement>("[data-action]");
-    if (!el) foldKuroUnless(e.target as HTMLElement);
     if (!el || !root.contains(el) || (el as HTMLButtonElement).disabled) return;
     const handler = actions[el.dataset.action!];
     if (!handler) return;
     e.preventDefault();
-    foldKuroUnless(el);
     try {
       handler(ctx, el.dataset, el);
     } catch (error) {
@@ -164,11 +154,27 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   };
   const onInput = (e: Event) => {
     const el = e.target as HTMLInputElement;
-    if (el.dataset.input === "draft") session.draft = el.value; // no re-render while typing
+    // No re-render while typing.
+    if (el.dataset.input === "draft") session.draft = el.value;
+    if (el.dataset.input === "kuro-text") session.kuroDraft = el.value;
   };
   const onKey = (e: KeyboardEvent) => {
-    if ((e.target as HTMLElement).tagName === "INPUT") {
-      if (e.key === "Enter") (root.querySelector<HTMLElement>('[data-action="send"]'))?.click();
+    const target = e.target as HTMLElement;
+    if (target.tagName === "INPUT") {
+      // Enter runs the input's own action (the player's box: kuro-send), else 发送.
+      const enter = target.dataset.enter;
+      if (e.key === "Enter" && enter) {
+        e.preventDefault();
+        try {
+          actions[enter]?.(ctx, target.dataset, target);
+        } catch (error) {
+          console.warn(error);
+        }
+      } else if (e.key === "Enter") root.querySelector<HTMLElement>('[data-action="send"]')?.click();
+      // Esc in the player's box leaves the conversation (dialogue FR2).
+      if (e.key === "Escape" && enter) {
+        if (deps.onKey?.(ctx, e)) e.preventDefault();
+      }
       return;
     }
     if (session.view === "desktop" && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {

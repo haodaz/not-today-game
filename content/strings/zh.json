@@ -197,5 +197,10 @@
   "title.byline": "好大壮 · 与 Claude 一起写成",
   "title.creditsPage.team": "故事、设定、游戏书、水彩概念图：好大壮，与 Claude 一起写成（2026 年 10 月，黑客松之前）。游戏：好大壮决定一切；Claude（Anthropic，Claude Fable 5.1）写内容、规格和设计稿；Kiro 写全部游戏代码。克总由 Claude 扮演。",
   "title.creditsPage.tools": "Kiro（steering、specs、hooks）· Vite + TypeScript · three.js · Supabase · Meta Muse Image、Hunyuan3D、Gemini、COLMAP、Brush（素材）· 霞鹜文楷、Barlow Condensed、Alegreya（字体，OFL）。",
-  "title.creditsPage.disclosure": "故事、设定圣经、分支游戏书和概念图写于黑客松之前，发布在 github.com/haodaz/nottoday（CC BY-NC-ND）。本仓库里的每一行游戏代码、内容表、设计稿、生成的 3D 房间和物件、音效，都是黑客松期间做的。"
+  "title.creditsPage.disclosure": "故事、设定圣经、分支游戏书和概念图写于黑客松之前，发布在 github.com/haodaz/nottoday（CC BY-NC-ND）。本仓库里的每一行游戏代码、内容表、设计稿、生成的 3D 房间和物件、音效，都是黑客松期间做的。",
+  "dialogue.tag.door": "门外",
+  "dialogue.tag.gap": "缝里",
+  "dialogue.tag.desk": "桌上",
+  "dialogue.page": "下一页",
+  "title.q.name": "名字"
 }

@@ -15,7 +15,7 @@ import { renderDoorView } from "@world/delivery/view";
 import { cls, html, raw, type SafeHtml } from "@world/html";
 import { getLocale, t, tr, type Locale } from "@world/i18n";
 import { checklist, loopContext, type ChecklistView } from "@world/loop/checklist";
-import { isRaidNight, raidNights, takeOf } from "@state/nights";
+import { raidNights, takeOf } from "@state/nights";
 import { isNight } from "@world/desktop/beat";
 import { hudKuro } from "@world/desktop/kuro/mini";
 import { VIEWS, type View } from "@world/desktop/model";
@@ -27,8 +27,7 @@ import { bpm, sanBand } from "@state/endings";
 /** The flag the hand sets when it takes the heartbeat (content/nights-takes.json `what: heartbeat`). */
 const HEARTBEAT_TAKEN: string | null = raidNights.map(takeOf).find((t) => t?.what === "heartbeat")?.flag ?? null;
 import { heldItem, heldLayer } from "./held";
-import { showing } from "@world/loop/dialogue";
-import { fillPlaceholders } from "@world/replies/placeholders";
+import { dialogueBox, raidShowing } from "@world/dialogue/box";
 
 /** L7: the day the heart-rate widget appears (stages.json if it says; else day 9's narration). */
 export const HEART_RATE_FROM_DAY: number = (stagesFile as { heartRateFromDay?: number }).heartRateFromDay ?? 9;
@@ -79,35 +78,6 @@ function deskBar(state: State, events: readonly GameEvent[], session: Session): 
         : html`<button type="button" class="${cls("slot", unknown(id), held === id && "lifted")}" data-object="${id}" data-action="loop-hold"><img src="/objects/${id}_white.png" alt=""><div class="lcd" data-screen="${id}"></div></button>`,
     );
   return html`<div class="bar"><button type="button" class="slot" data-action="loop-box">${left > 0 ? html`<div class="box"></div><span>${tr("hud.box.left", { n: left })}</span>` : html`<div class="box" style="opacity:.3"></div>`}</button><button type="button" class="${cls("slot", held === "phone" && "lifted")}" data-action="loop-phone"><div class="phone"></div><span>${tr("hud.phone")}</span></button><div class="slot"><div class="cup"></div></div>${objects}</div>`;
-}
-
-export function dialogueBox(state: State, session: Session): SafeHtml | null {
-  const show = showing(session.dialogue, state);
-  if (!show) return null;
-  const fill = (s: string) => fillPlaceholders(s, state.names);
-  if (show.choices) {
-    // A click on the line above the choices completes its reveal (polish FR3); it never advances
-    // past a choice (dialogue.advance stops there).
-    const head = show.line ? html`<button type="button" class="dlg" data-action="loop-advance" style="bottom:${128 + 56 * show.choices.length + 12}px">${lineBody(show.line, fill)}</button>` : null;
-    const buttons = show.choices.map(
-      (c) => html`<button type="button" data-action="loop-choice" data-index="${c.index}"${c.choice ? html` data-choice="${c.choice}"` : null}>${c.text !== null ? fill(c.text) : tr(c.labelKey!)}</button>`,
-    );
-    return html`${head}<div class="choices">${buttons}</div>`;
-  }
-  return html`<button type="button" class="dlg" data-action="loop-advance">${show.line ? lineBody(show.line, fill) : null}${show.more ? html`<div class="more">▼</div>` : null}</button>`;
-}
-
-function lineBody(line: NonNullable<ReturnType<typeof showing>>["line"] & object, fill: (s: string) => string): SafeHtml {
-  switch (line.k) {
-    case "speaker":
-      return html`<span class="who">${fill(line.who ?? "")}</span>${fill(line.t)}`;
-    case "inner":
-      return html`<div class="inner">${fill(line.t)}</div>`;
-    case "sfx":
-      return html`<div class="sfx">${fill(line.t)}</div>`;
-    case "narration":
-      return html`${fill(line.t)}`;
-  }
 }
 
 /** The camera chips: 房间 · 桌子 · 屏幕 · 门 (`hud.cam.desk` is 桌子 now; 屏幕 is `hud.cam.screen`). */
@@ -222,10 +192,7 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const gap = (view === "room" ? ROOM_SHOT : DESK_SHOT).gap;
   // Things are picked up at 桌子 only: the desk bar is its object layer.
   const bar = view === "desk" ? deskBar(state, events, session) : null;
-  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid")}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}">${scene}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${bar}${held}${dialogueBox(state, session)}${bottomRight(model)}${settingsButton()}${settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
+  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid")}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}">${scene}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${bar}${held}${dialogueBox(state, events, session)}${bottomRight(model)}${settingsButton()}${settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
 }
 
-/** The raid is in the dialogue box: tonight's shutdown sequence on a raid night. */
-export function raidShowing(state: State, session: Session): boolean {
-  return isRaidNight(state.day) && session.dialogue.queue[0]?.key === `d${state.day}:beat:shutdown`;
-}
+export { raidShowing };

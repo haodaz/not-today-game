@@ -46,7 +46,7 @@ endingHost.newRun = () => {
 };
 
 /** Mount the game on `store`; `saved` stores keep themselves in the run save. */
-function startGame(store: Store, saved: boolean): void {
+function startGame(store: Store, saved: boolean, from?: "desk"): void {
   root.innerHTML = "";
   if (saved) store.subscribe(() => run.save(store));
   // Every ending reached goes into the profile once, when it happens (title-page T8).
@@ -62,7 +62,8 @@ function startGame(store: Store, saved: boolean): void {
     store,
     clock: parseBeatParams(search),
     focus: focus === "right" ? "right" : "left",
-    view: view === "desktop" || view === "door" || view === "desk" ? view : "room",
+    // A new run begins where the title's question card left the camera: at 桌子.
+    view: view === "desktop" || view === "door" || view === "desk" ? view : (from ?? "room"),
     render: renderGame,
     actions: {
       ...desktopActions,
@@ -99,7 +100,7 @@ if (jump !== null) {
       const store = createStore({ runId: crypto.randomUUID() });
       store.appendEvent({ kind: "names", names });
       run.save(store);
-      startGame(store, true);
+      startGame(store, true, "desk");
     },
   });
 }

@@ -1,12 +1,10 @@
 // The title page's DOM side (title-page FR1–FR3, FR7): clicks, typing, keys, the idle events,
-// the rain, and the push into the room before the game starts. The view is pure (view.ts); this
-// file owns timers and sound only.
-import { centre, ROOM_SHOT } from "@world/room/shots";
+// the rain, and the camera push to the desk where the question card opens (correction
+// 2026-11-01). The view is pure (view.ts); this file owns timers and sound only.
 import { getLocale, setLocale } from "@world/i18n";
-import { ROOM_PUSH } from "@world/motion/timing";
 import type { State } from "@state/types.gen";
 import type { Collection } from "@world/room/collection";
-import { canStart, diceOptions, initialTitle, QUESTIONS, rowsShown, toMenu, toNames, toQuestions, withAnswer, withPronoun, type TextQuestion, type TitleModel } from "./model";
+import { arrived, canStart, diceOptions, initialTitle, QUESTIONS, rowsShown, toMenu, toNames, toQuestions, withAnswer, withPronoun, type TextQuestion, type TitleModel } from "./model";
 import { titleTable, type IdleEvent } from "./table";
 import { renderTitle } from "./view";
 
@@ -24,6 +22,8 @@ export interface TitleDeps {
 const STAGE = { w: 1600, h: 900 };
 /** Rain volume: settled, and louder once the computer turns on (FR7). */
 const RAIN = { low: 0.12, high: 0.3 };
+/** 开始: the lamp's fade (title.css `.idle.lamp.off`) before the game takes over. */
+const LAMP_MS = 400;
 
 /** The wait before the next idle event: never in the first quiet stretch, then 20–40 s. */
 export function idleDelay(random: () => number, first: boolean): number {
@@ -43,6 +43,8 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
   const doc = root.ownerDocument;
   const win = doc.defaultView!;
   let model = initialTitle(deps.save, deps.collection);
+  /** When the running camera move began (performance.now), or null. */
+  let movedAt: number | null = null;
   const timers = new Set<number>();
   const later = (ms: number, fn: () => void) => {
     const id = win.setTimeout(() => {
@@ -85,6 +87,11 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     root.innerHTML = renderTitle(model).value;
     doc.documentElement.lang = getLocale() === "en" ? "en" : "zh";
     fit();
+    // A camera move in progress continues from where it was, not from the start.
+    if (movedAt !== null) {
+      const ago = `${-Math.round(win.performance.now() - movedAt)}ms`;
+      root.querySelector<HTMLElement>(".stage")?.style.setProperty("--t-ago", ago);
+    }
     if (focusKey) {
       const again = root.querySelector<HTMLInputElement>(`[data-focus="${focusKey}"]`);
       if (again) {
@@ -130,20 +137,35 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     });
   idleNext(true);
 
+  /**
+   * A camera move (correction 2026-11-01): 新游戏 pushes to the desk, Esc pulls back. The view
+   * draws the move as a class; each re-render during it resumes from where it was.
+   */
+  function move(next: TitleModel, then?: () => void): void {
+    movedAt = win.performance.now();
+    set(next);
+    later(titleTable.start.pushMs, () => {
+      movedAt = null;
+      set(arrived(model));
+      then?.();
+    });
+  }
+
+  /** Esc from the card or 返回 from 制作: the menu; from the desk the camera pulls back. */
+  function back(): void {
+    // The monitors sleep again and the rain settles (FR7).
+    rainVolume(RAIN.low);
+    const next = toMenu(model);
+    if (next.moving) move(next);
+    else set(next);
+  }
+
   function start(): void {
     if (!canStart(model.answers) || model.starting) return;
-    // The camera pushes in toward the desk along 房间→桌子's path; the lamp goes off (FR7).
+    // The card closes and the lamp goes off; the game begins at the desk framing (FR7).
     set({ ...model, starting: true });
-    const roomEl = root.querySelector<HTMLElement>(".title-room");
-    if (roomEl) {
-      const p = centre(ROOM_SHOT.desk);
-      roomEl.style.setProperty("--m-tx", `${Math.round(p.x * (1 - ROOM_PUSH))}px`);
-      roomEl.style.setProperty("--m-ty", `${Math.round(p.y * (1 - ROOM_PUSH))}px`);
-      roomEl.style.setProperty("--m-z", String(ROOM_PUSH));
-      roomEl.style.animation = `m-cam-push-out ${titleTable.start.pushMs}ms var(--m-ease, ease-in-out) both`;
-    }
     const names = toNames(model.answers);
-    later(titleTable.start.pushMs, () => deps.onStart(names));
+    later(LAMP_MS, () => deps.onStart(names));
   }
 
   const actions: Record<string, (el: HTMLElement) => void> = {
@@ -151,8 +173,8 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
       // The computer turns on: the monitors wake and stay lit, the rain gets louder.
       rainVolume(RAIN.high);
       playRain();
-      set(toQuestions(model));
-      focusOpen();
+      if (model.save) return;
+      move(toQuestions(model), focusOpen);
     },
     "title-continue": () => deps.onContinue(),
     "title-settings": () => set({ ...model, settingsOpen: true }),
@@ -172,7 +194,7 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
       else playRain();
     },
     "title-credits": () => set({ ...model, screen: "credits" }),
-    "title-back": () => set(toMenu(model)),
+    "title-back": () => back(),
     "title-pronoun": (el) => {
       const p = el.dataset.pronoun;
       if (p === "she" || p === "he" || p === "none") set(withPronoun(model, p));
@@ -190,7 +212,7 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
 
   const onClick = (e: MouseEvent) => {
     const el = (e.target as HTMLElement).closest<HTMLElement>("[data-action]");
-    if (!el || !root.contains(el) || (el as HTMLButtonElement).disabled || model.starting) return;
+    if (!el || !root.contains(el) || (el as HTMLButtonElement).disabled || model.starting || model.moving) return;
     const act = actions[el.dataset.action!];
     if (!act) return;
     e.preventDefault();
@@ -207,14 +229,10 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     if (rowsShown(model.answers) !== before.shown || canStart(model.answers) !== before.ready) render();
   };
   const onKey = (e: KeyboardEvent) => {
-    if (model.starting) return;
+    if (model.starting || model.moving) return;
     if (e.key === "Escape") {
       if (model.settingsOpen) set({ ...model, settingsOpen: false });
-      else if (model.screen !== "menu") {
-        // The monitors sleep again and the rain settles (FR7).
-        rainVolume(RAIN.low);
-        set(toMenu(model));
-      }
+      else if (model.screen !== "menu") back();
       e.preventDefault();
       return;
     }

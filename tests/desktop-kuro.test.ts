@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 import { createStore } from "@state/store";
 import { constants } from "@state/variables";
 import { bodyState, BODY_STATES, FRAMES, renderBodySlot, type BodyInputs } from "@world/desktop/kuro/body";
-import { kuroDays, parseKuroDay } from "@world/desktop/kuro/days";
-import { hudKuro, renderKuro, renderKuroMini } from "@world/desktop/kuro/mini";
+import { kuroDays, offlineAnswer, parseKuroDay } from "@world/desktop/kuro/days";
+import { hudKuro, renderKuro } from "@world/desktop/kuro/mini";
 import { initialSession, type AppContext } from "@world/desktop/model";
 import { escapeHtml } from "@world/html";
 import { t } from "@world/i18n";
@@ -36,7 +36,25 @@ describe("kuro-days parser", () => {
         { n: 1, zh: "你好？", en: "Hi?", hard: false },
         { n: 2, zh: "你是谁？", en: "Who?", hard: true },
       ],
+      answers: { q: new Map(), free: null },
     });
+  });
+
+  it("reads the offline answers strictly (dialogue spec); every day has a free-text answer", () => {
+    const head = "# Day 3\n**Idiom of the day (constant):** Hi.\n## Starter questions\n| 1 | a | b | |\n| 2 | c | d | |\n";
+    const parsed = parseKuroDay(`${head}## Offline answers (constants)\n\n- q1 → "One."\n- free text → "Go on."\n## Never\n- x\n`, "day-03.md");
+    expect(parsed.answers.q).toEqual(new Map([[1, "One."]]));
+    expect(parsed.answers.free).toBe("Go on.");
+    expect(offlineAnswer(parsed, 1)).toBe("One.");
+    expect(offlineAnswer(parsed, 2)).toBe("Go on."); // no answer to q2: the free one
+    expect(offlineAnswer(parsed, null)).toBe("Go on.");
+    expect(() => parseKuroDay(`${head}## Offline answers\n- q1: "One."\n`, "x")).toThrow(/unreadable/);
+    expect(() => parseKuroDay(`${head}## Offline answers\n- q9 → "Nine."\n`, "x")).toThrow(/not a starter/);
+    expect(() => parseKuroDay(`${head}## Offline answers\n- q1 → "A."\n- q1 → "B."\n`, "x")).toThrow(/two answers/);
+    for (const day of kuroDays.values()) {
+      expect(day.answers.free, `day ${day.day}`).not.toBeNull();
+      for (const s of day.starters) expect(offlineAnswer(day, s.n).length, `day ${day.day} q${s.n}`).toBeGreaterThan(0);
+    }
   });
 
   it("rejects a file without an idiom or starters", () => {
@@ -74,28 +92,30 @@ describe("body state (U8)", () => {
   });
 });
 
-describe("small window", () => {
-  it("shows the day's idiom, the starters, and the turn counter", () => {
-    const out = renderKuroMini(ctx()).value;
-    const day1 = kuroDays.get(1)!;
-    expect(out).toContain(escapeHtml(day1.idiom));
-    for (const q of day1.starters) expect(out).toContain(escapeHtml(q.zh));
+describe("the status pill (dialogue FR2)", () => {
+  it("shows its last line (the day's idiom), online, and today's turns; it takes no input", () => {
+    const out = renderKuro(ctx()).value;
+    expect(out).toContain('class="kpill" data-action="kuro-call"');
+    expect(out).toContain(escapeHtml(kuroDays.get(1)!.idiom));
+    expect(out).toContain(t("shell.kuro.online"));
     expect(out).toContain(t("kuro.turns", { n: 0 }));
-    expect(out).not.toContain("blink");
+    expect(out).not.toMatch(/<input|kuro-q|kuro-ask/);
   });
 
-  it("after the last turn shows the bedtime line and closes the questions", () => {
+  it("after the last turn its line is the bedtime line", () => {
     const base = ctx();
-    const out = renderKuroMini({ ...base, state: { ...base.state, chatTurnsToday: constants.chatTurnsPerDay } }).value;
+    const out = renderKuro({ ...base, state: { ...base.state, chatTurnsToday: constants.chatTurnsPerDay } }).value;
     expect(out).toContain(escapeHtml(t("kuro.bedtime")));
-    expect(out).not.toContain(escapeHtml(kuroDays.get(1)!.idiom));
-    expect(out.match(/disabled/g)?.length).toBe(kuroDays.get(1)!.starters.length);
+    expect(out).toContain(t("kuro.turns", { n: constants.chatTurnsPerDay }));
   });
 
-  // The body is the HUD's call button now (day-loop correction); its state is the same function.
-  it("glows at night; Kuro rests", () => {
+  // The body is the HUD's call button (day-loop correction); its state is the same function.
+  it("at night: the night dot instead of online; Kuro rests", () => {
     const night = ctx({ night: true, session: initialSession({ beat: "night", time: "23:41" }) });
-    expect(renderKuro(night).value).toContain("kmini blink");
+    const out = renderKuro(night).value;
+    expect(out).toContain('class="kpill blink"');
+    expect(out).toContain('class="dotl"');
+    expect(out).not.toContain(t("shell.kuro.online"));
     expect(hudKuro(night).value).toContain('data-state="rest"');
   });
 

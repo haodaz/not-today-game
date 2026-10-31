@@ -12,10 +12,17 @@ export type Ending =
   | { readonly kind: "loan" }
   | { readonly kind: "lieDown" }
   /** "Do you know what this is?" (recognise spec): the options in this run's order (content indexes). */
-  | { readonly kind: "recognise"; readonly object: string; readonly order: readonly number[] };
+  | { readonly kind: "recognise"; readonly object: string; readonly order: readonly number[] }
+  /** Kuro's upgrade offer as a line in the box (dialogue spec): 升级 / 不了. */
+  | { readonly kind: "kuroOffer"; readonly object: string; readonly decline: "offer" | "nag" | "final" }
+  /** 要和克总聊聊吗？ — 聊聊 / 先不聊. */
+  | { readonly kind: "kuroAsk" }
+  /** Kuro has spoken; the player's box answers (chat: the questions and typing; work: only 好。). */
+  | { readonly kind: "kuroTurn"; readonly mode: "chat" | "work" };
 
-/** Endings that wait for a choice. */
-export const endsInChoice = (e: Ending): boolean => e.kind === "beatChoices" || e.kind === "loan" || e.kind === "recognise";
+/** Endings that wait for a choice (Kuro's turn waits for the player's box). */
+export const endsInChoice = (e: Ending): boolean =>
+  e.kind === "beatChoices" || e.kind === "loan" || e.kind === "recognise" || e.kind === "kuroOffer" || e.kind === "kuroAsk" || e.kind === "kuroTurn";
 
 export interface Queued {
   /** Where it came from (for tests and to avoid queueing the same thing twice). */
@@ -24,15 +31,29 @@ export interface Queued {
   readonly ending: Ending;
   /** The sequence, so choices can be read with their cond_show. */
   readonly sequence?: Sequence;
+  /** Kuro's lines (dialogue spec): its avatar in the tag; Esc ends every one of them. */
+  readonly voice?: "kuro";
 }
 
 export interface DialogueState {
   readonly queue: readonly Queued[];
   /** Index of the line showing in the first queued sequence. */
   readonly line: number;
+  /** Which screen of that line (dialogue spec: paged, never scrolled); absent = 0. */
+  readonly page?: number;
 }
 
 export const EMPTY_DIALOGUE: DialogueState = { queue: [], line: 0 };
+
+/** A conversation with Kuro is under way (any of its items queued). */
+export const talking = (d: DialogueState): boolean => d.queue.some((q) => q.voice === "kuro");
+
+/** The conversation ends: every Kuro item leaves; what else was queued stays. */
+export function leaveKuro(d: DialogueState): DialogueState {
+  if (!talking(d)) return d;
+  const headGoes = d.queue[0]?.voice === "kuro";
+  return { queue: d.queue.filter((q) => q.voice !== "kuro"), line: headGoes ? 0 : d.line, page: headGoes ? 0 : d.page };
+}
 
 export function push(d: DialogueState, q: Queued): DialogueState {
   if (q.lines.length === 0 && q.ending.kind === "none") return d;
@@ -61,8 +82,20 @@ export const LOAN_OPTIONS: readonly ChoiceOption[] = [
   { index: 1, text: null, choice: "no", labelKey: "loop.loan.refuse" },
 ];
 
+/** Kuro's prompt and offer choices: strings, never content. */
+export const KURO_ASK_OPTIONS: readonly ChoiceOption[] = [
+  { index: 0, text: null, choice: "yes", labelKey: "kuro.yes" },
+  { index: 1, text: null, choice: "no", labelKey: "kuro.notNow" },
+];
+export const KURO_OFFER_OPTIONS: readonly ChoiceOption[] = [
+  { index: 0, text: null, choice: "yes", labelKey: "upgrade.yes" },
+  { index: 1, text: null, choice: "no", labelKey: "upgrade.no" },
+];
+
 function options(q: Queued, state: State): ChoiceOption[] | null {
   if (q.ending.kind === "loan") return [...LOAN_OPTIONS];
+  if (q.ending.kind === "kuroAsk") return [...KURO_ASK_OPTIONS];
+  if (q.ending.kind === "kuroOffer") return [...KURO_OFFER_OPTIONS];
   if (q.ending.kind === "recognise") {
     // No hints: the same look for every option; the order is the run's, not content's.
     const entry = recogniseTable.get(q.ending.object);
@@ -86,18 +119,27 @@ export function showing(d: DialogueState, state: State): Showing | null {
 }
 
 /**
- * The next line. At the end of a sequence with choices nothing happens (a choice must be made);
- * at the end of a plain sequence the next one starts. Returns the ending that was reached, if any.
+ * The next screen, then the next line (dialogue spec: a long line is paged). `screens` is how
+ * many screens the line on show has (layout.ts); 1 when unknown. At the end of a sequence with
+ * choices nothing happens (a choice must be made); at the end of a plain sequence the next one
+ * starts. Returns the ending that was reached, if any.
  */
-export function advance(d: DialogueState): { dialogue: DialogueState; ended: Ending | null } {
+export function advance(d: DialogueState, screens = 1): { dialogue: DialogueState; ended: Ending | null } {
   const q = d.queue[0];
   if (!q) return { dialogue: d, ended: null };
-  if (d.line < q.lines.length - 1) return { dialogue: { ...d, line: d.line + 1 }, ended: null };
+  const page = d.page ?? 0;
+  if (page < screens - 1) return { dialogue: { ...d, page: page + 1 }, ended: null };
+  if (d.line < q.lines.length - 1) return { dialogue: { queue: d.queue, line: d.line + 1, page: 0 }, ended: null };
   if (endsInChoice(q.ending)) return { dialogue: d, ended: null };
-  return { dialogue: { queue: d.queue.slice(1), line: 0 }, ended: q.ending };
+  return { dialogue: { queue: d.queue.slice(1), line: 0, page: 0 }, ended: q.ending };
 }
 
 /** After a choice: the sequence is over. */
 export function finishChoice(d: DialogueState): DialogueState {
-  return d.queue.length ? { queue: d.queue.slice(1), line: 0 } : d;
+  return d.queue.length ? { queue: d.queue.slice(1), line: 0, page: 0 } : d;
+}
+
+/** Kuro's next turn takes the place of the one just answered. */
+export function replaceHead(d: DialogueState, next: readonly Queued[]): DialogueState {
+  return { queue: [...next, ...d.queue.slice(1)], line: 0, page: 0 };
 }

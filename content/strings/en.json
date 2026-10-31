@@ -197,5 +197,10 @@
   "title.byline": "by 好大壮 · written with Claude",
   "title.creditsPage.team": "Story, setting, gamebook and watercolour concept art: 好大壮 (Elodie Hao Liu), written with Claude, October 2026, before the jam. Game: the author decides everything; Claude (Anthropic, Claude Fable 5.1) writes the content, the specs and the design mocks; Kiro writes every line of game code. Kuro is played by Claude.",
   "title.creditsPage.tools": "Kiro (steering, specs, hooks) · Vite + TypeScript · three.js · Supabase · Meta Muse Image, Hunyuan3D, Gemini, COLMAP, Brush (assets) · LXGW WenKai, Barlow Condensed, Alegreya (fonts, OFL).",
-  "title.creditsPage.disclosure": "The story, the setting bible, the branching gamebook and the concept art were written before the hackathon and are published at github.com/haodaz/nottoday (CC BY-NC-ND). Every line of game code, the content tables, the design mocks, the generated 3D room and objects and the sounds in this repository were made during the jam."
+  "title.creditsPage.disclosure": "The story, the setting bible, the branching gamebook and the concept art were written before the hackathon and are published at github.com/haodaz/nottoday (CC BY-NC-ND). Every line of game code, the content tables, the design mocks, the generated 3D room and objects and the sounds in this repository were made during the jam.",
+  "dialogue.tag.door": "At the door",
+  "dialogue.tag.gap": "From the gap",
+  "dialogue.tag.desk": "On the desk",
+  "dialogue.page": "Next page",
+  "title.q.name": "Name"
 }

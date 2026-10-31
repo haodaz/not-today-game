@@ -24,7 +24,7 @@ describe("the twelve event kinds", () => {
       [
         "openLayer", "recognise", "pressKey", "reply", "letItDo", "looked",
         "pokeReset", "lieDown", "sitUp", "handObject", "handLost", "handNothing",
-        "order", "pickup", "useItem", "open", "step", "choose", "task", "upgrade", "declineUpgrade", "ending", "names",
+        "order", "pickup", "useItem", "open", "step", "choose", "task", "upgrade", "declineUpgrade", "ending", "names", "chat",
       ].sort(),
     );
   });

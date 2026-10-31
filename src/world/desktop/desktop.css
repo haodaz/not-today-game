@@ -216,27 +216,20 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .kpet .layer img.f2{animation:kuro-frames 2.8s ease-in-out infinite alternate}
 @keyframes kuro-frames{0%,35%{opacity:0}65%,100%{opacity:1}}
 .kmini .c .bed{color:var(--ink-3);font-style:italic}
-.kmini .qs button{border:1px solid var(--line);background:#fff;color:var(--ink-2);padding:5px 10px;border-radius:14px;font-size:12px;cursor:pointer;font-family:inherit}
-.kmini .qs button:disabled{opacity:.4;cursor:default}
 /* Workbench */
 .wb .side .it{background:none;border:0;text-align:left;cursor:pointer;width:100%}
 .wb .empty{color:var(--ink-3);font-size:12px;padding:4px 0}
 .wb .col .cl.add,.wb .col .cl.del{padding-left:4px}
 /* Browser */
 .br .foot{padding:0 40px;color:var(--ink-3);font-family:var(--font);font-size:11px}
-/* The small window never covers the desktop (desktop-ui amendment): folded it is a pill beside the
-   body (its face, the start of its last line); open over an app with an input, it docks top-right. */
-/* The body is the HUD's call button now (day-loop correction); the pill and the bottom-docked window
-   keep clear of it at the monitor's bottom right. */
-.kmini-dock.bottom .kmini{right:132px}
-.kpill{position:absolute;right:132px;bottom:30px;z-index:6;display:flex;align-items:center;gap:8px;max-width:330px;padding:5px 12px 5px 5px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 6px 18px rgba(20,24,30,.12);font:12px var(--font);color:var(--ink-2);cursor:pointer}
+/* Kuro on the desktop is a status pill (dialogue FR2): its face, its last line, online or the night
+   dot, today's turns. No input; a click opens the conversation in the box. It keeps clear of the
+   192 px body at the HUD's bottom right (late-days FR1). */
+.kpill{position:absolute;right:228px;bottom:30px;z-index:6;display:flex;align-items:center;gap:8px;max-width:420px;padding:5px 12px 5px 5px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 6px 18px rgba(20,24,30,.12);font:12px var(--font);color:var(--ink-2);cursor:pointer}
 .kpill img{width:24px;height:24px;border-radius:50%;object-fit:cover;flex:0 0 auto}
-.kpill span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--mono)}
+.kpill .ln{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--mono)}
+.kpill .on{flex:0 0 auto;color:#2f9e5b}
+.kpill .dotl{flex:0 0 auto;width:8px;height:8px;border-radius:50%;background:#f6a623;box-shadow:0 0 10px 2px rgba(246,166,35,.8)}
+.kpill .turns{flex:0 0 auto;font-family:var(--mono);color:var(--ink-3)}
 .kpill:hover,.kpill:focus-visible{border-color:var(--accent)}
 .kpill.blink{box-shadow:0 0 0 2px rgba(246,166,35,.6),0 0 24px 4px rgba(246,166,35,.3)}
-.kmini-dock.top .kmini{top:64px;bottom:auto}
-/* Kuro's upgrade offer in the small window (object-upgrade FR1). */
-.kmini .offer{border-top:1px solid var(--line);padding-top:8px}
-.kmini .offer-btns{display:flex;gap:8px;margin-top:6px}
-.kmini .offer-btns button{border:1px solid var(--line);background:#fff;border-radius:14px;padding:4px 12px;font:12px var(--font);cursor:pointer}
-.kmini .offer-btns button:first-child{border-color:var(--accent);color:var(--accent)}

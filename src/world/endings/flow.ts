@@ -23,7 +23,8 @@ export function startEnding(ctx: ActionContext): void {
   const ending = store.getState().ending as Ending | "none";
   if (ending === "none" || session.endingPage) return;
   session.dialogue = { queue: [], line: 0 };
-  session.kuroCall = false;
+  session.kuroInput = false;
+  session.historyOpen = false;
   session.endingPage = { phase: ending === "bad" ? "you" : "credits", startMs: nowOf(ctx), skipped: false };
   if (session.endingPage.phase === "credits") rollCredits(ctx);
   ctx.rerender();

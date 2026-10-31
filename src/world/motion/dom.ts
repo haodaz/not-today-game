@@ -10,7 +10,7 @@
 import { dayFile } from "@state/days/table";
 import type { ActionContext, ActionHandler, MotionHooks } from "@world/desktop/controller";
 import { loopContext, checklist } from "@world/loop/checklist";
-import { showing } from "@world/loop/dialogue";
+import { showing, talking } from "@world/loop/dialogue";
 import { heldItem } from "@world/room/held";
 import { holdUntil, lineKey, revealBusy, revealDoneAt, revealShown, startReveal, type Reveal } from "./reveal";
 import { centre, DESK_SHOT, ROOM_SHOT, type Rect } from "@world/room/shots";
@@ -46,8 +46,10 @@ interface Snap {
   readonly raid: boolean;
   /** The ⚙ 设置 panel is open. */
   readonly settings: boolean;
-  /** The chat overlay is open over the call button. */
+  /** A conversation with Kuro is under way: its body is away from the HUD corner (dialogue FR2). */
   readonly call: boolean;
+  /** The player's box is up (which Kuro turn), or null. */
+  readonly player: string | null;
 }
 
 /** A node with its layout measured while it was still on screen (a detached node measures 0). */
@@ -68,14 +70,12 @@ interface Outgoing {
   readonly held: HTMLElement | null;
   readonly dlg: HTMLElement | null;
   readonly dlgLayer: HTMLElement | null;
-  readonly choices: HTMLElement | null;
   readonly items: { id: string; el: HTMLElement; height: number }[];
   readonly doneText: string | null;
   readonly doorBg: HTMLElement | null;
   readonly doorHand: HTMLElement | null;
   readonly gap: HTMLElement | null;
   readonly settings: HTMLElement | null;
-  readonly call: HTMLElement | null;
 }
 
 const live = (el: Element): boolean => !el.closest(".m-ghost");
@@ -86,7 +86,7 @@ const textOf = (el: Element): string => (el.textContent ?? "").trim();
 
 /** Everything the motion layer animates or turns into a ghost. */
 export const KEYED =
-  ".stage, .m-backdrop, .held-layer, .stage > .dlg, .dlg-layer, .choices, .room .list > .it, .monitor, .other-tab, .kuro-call, .settings-layer, .gap-glow, .door-bg.chain, .door-hand, .door-beat";
+  ".stage, .m-backdrop, .held-layer, .stage > .dlg, .dlg-layer, .dlg-player, .choices, .room .list > .it, .monitor, .other-tab, .settings-layer, .gap-glow, .door-bg.chain, .door-hand, .door-beat";
 
 /**
  * The identity of a motion element across renders. Two elements with the same key are the same
@@ -104,11 +104,11 @@ export function motionKey(el: Element): string | null {
   }
   if (c.contains("held-layer")) return "held";
   if (c.contains("dlg-layer") || (c.contains("dlg") && el.parentElement?.classList.contains("stage"))) return "dlg";
+  if (c.contains("dlg-player")) return "player";
   if (c.contains("choices")) return "choices";
   if (c.contains("it") && el.parentElement?.classList.contains("list")) return `item:${(el as HTMLElement).dataset.id ?? ""}`;
   if (c.contains("monitor")) return `monitor:${(el as HTMLElement).dataset.side ?? ""}`;
   if (c.contains("other-tab")) return "tab";
-  if (c.contains("kuro-call")) return "call";
   if (c.contains("settings-layer")) return "settings";
   if (c.contains("gap-glow")) return "gap";
   if (c.contains("door-bg")) return "door-bg";
@@ -151,7 +151,6 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
   let lastItems: string[] | null = null;
   let lastDone = 0;
   let lastKuro: string[] | null = null;
-  let chosen: string | null = null;
   let frame = 0;
   let holdFor: { key: string; at: number } | null = null;
   const timers = new Set<number>();
@@ -179,13 +178,6 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     });
   };
 
-  // A choice keeps its place when chosen; remember which one was clicked.
-  const onClickCapture = (e: MouseEvent) => {
-    const el = (e.target as HTMLElement).closest<HTMLElement>('[data-action="loop-choice"]');
-    if (el) chosen = el.dataset.index ?? null;
-  };
-  root.addEventListener("click", onClickCapture, true);
-
   function snapOf(): Snap {
     const s = ctx.session;
     const state = ctx.store.getState();
@@ -199,13 +191,15 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       focus: s.focus,
       held: s.view === "door" ? null : heldItem(s),
       dlg: !!show,
-      choices: show?.choices ? `${head!.key}` : null,
+      // Choices live in the box now (dialogue FR1): which item, and which page of them.
+      choices: q(root, ".dlg .choices, .dlg-player .choices") ? `${head?.key ?? ""}:${s.dialogue.page ?? 0}:${s.playerPage}:${s.kuroInput}` : null,
       night,
       door: doorBeat ? `${doorBeat.dataset.meal}:${doorBeat.dataset.state}` : null,
       asleep: head?.ending.kind === "lieDown",
       raid: !!q(root, ".gap-glow"),
       settings: !!q(root, ".settings-layer"),
-      call: !!q(root, ".kuro-call"),
+      call: talking(s.dialogue),
+      player: q(root, ".dlg-player") ? (head?.key ?? "") : null,
     };
   }
 
@@ -221,14 +215,12 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       held: q(root, ".held-layer"),
       dlg: stage ? q(stage, ":scope > .dlg") : null,
       dlgLayer: q(root, ".dlg-layer"),
-      choices: stage ? q(stage, ":scope > .choices") : null,
       items: list ? qa(list, ":scope > .it").map((el) => ({ id: el.dataset.id ?? "", el, height: el.offsetHeight })) : [],
       doneText: list ? (q(list, ":scope > .done")?.textContent ?? null) : null,
       doorBg: q(root, ".door-bg.chain"),
       doorHand: q(root, ".door-hand"),
       gap: q(root, ".gap-glow"),
       settings: q(root, ".settings-layer"),
-      call: q(root, ".kuro-call"),
     };
   }
 
@@ -299,13 +291,11 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
   let spans: HTMLElement[] = [];
   let shown = 0;
 
+  /** The page's text only (dialogue FR1: never the tag, the ↺ chip, the marker or the choices). */
   function wrapChars(box: HTMLElement): HTMLElement[] {
     const nodes: Text[] = [];
     const walker = doc.createTreeWalker(box, NodeFilter.SHOW_TEXT);
-    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
-      const parent = (n as Text).parentElement;
-      if (parent && !parent.closest(".who,.more")) nodes.push(n as Text);
-    }
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) nodes.push(n as Text);
     const out: HTMLElement[] = [];
     for (const node of nodes) {
       const frag = doc.createDocumentFragment();
@@ -321,8 +311,9 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     return out;
   }
 
+  /** The box's text on this page (it reveals; the rest of the box is there at once). */
   function lineBox(): HTMLElement | null {
-    return q(root, ".stage > .dlg") ?? q(root, ".dlg-layer .dlg");
+    return q(root, ".stage > .dlg .txt") ?? q(root, ".dlg-layer .dlg .txt");
   }
 
   function driveReveal(): void {
@@ -390,7 +381,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
 
   /** Choices: bottom to top, 60ms apart, once the line above is complete. */
   function choicesEntry(t: number): void {
-    const box = q(root, ".stage > .choices") ?? q(root, ".dlg-layer .choices");
+    const box = q(root, ".dlg .choices") ?? q(root, ".dlg-player .choices");
     if (!box) return;
     const buttons = qa(box, "button");
     const r = ctx.session.reveal;
@@ -406,29 +397,6 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       }
       b.classList.remove("m-wait");
       if (t - start < delays[i]! + MOTION.choice) anim(b, "m-fade-up", MOTION.choice, start + delays[i]!, t);
-    });
-  }
-
-  function choicesGhost(el: HTMLElement, stageSel: string, t: number, pick: string | null): void {
-    const fade = exitOf(MOTION.choice);
-    addGhost({
-      el,
-      key: "choices",
-      start: t,
-      end: t + CHOSEN.chosenHold + fade,
-      place: (r) => {
-        const stage = q(r, stageSel);
-        if (!stage) return false;
-        stage.appendChild(el);
-        return true;
-      },
-      apply: (g, now) => {
-        for (const b of qa(g, "button")) {
-          const kept = pick !== null && b.dataset.index === pick;
-          b.classList.remove("m-wait");
-          anim(b, "m-fade-out", fade, kept ? t + CHOSEN.chosenHold : t, now);
-        }
-      },
     });
   }
 
@@ -844,8 +812,6 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
         begin("dlg", t + delay);
       }
       if (sameDay && snap.view === prev.view) {
-        const stageSel = snap.view === "desktop" ? null : ".stage";
-        if (prev.choices && snap.choices !== prev.choices && out.choices && stageSel) choicesGhost(out.choices, stageSel, t, chosen);
         if (prev.dlg && !snap.dlg) {
           const dur = exitOf(MOTION.dlgIn);
           if (out.dlgLayer) {
@@ -861,25 +827,10 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       if (snap.asleep && !prev.asleep) begin("sleep", t);
       // The settings panel: in like the room dims for a held item, out faster.
       if (snap.settings && !prev.settings) begin("settings", t);
-      // The chat overlay rises from Kuro's body (320 ms) and sinks back into it, faster.
-      if (snap.call && !prev.call) begin("call", t);
-      if (!snap.call && prev.call && out.call) {
-        const el = out.call;
-        const dur = exitOf(MOTION.lift);
-        addGhost({
-          el,
-          key: "call",
-          start: t,
-          end: t + dur,
-          place: (r) => {
-            const host = q(r, ".hud-kuro");
-            if (!host) return false;
-            host.insertBefore(el, host.firstChild);
-            return true;
-          },
-          apply: (g, now) => anim(g, "m-call-out", dur, t, now),
-        });
-      }
+      // The conversation ends: Kuro's body comes back to the HUD corner along the same path (320 ms).
+      if (!snap.call && prev.call) begin("kuro-back", t);
+      // The player's box rises from the right edge once per Kuro turn.
+      if (snap.player && snap.player !== prev.player) begin("player", t);
       if (!snap.settings && prev.settings && out.settings) {
         const el = out.settings;
         const host = el.parentElement?.classList.contains("hud-host") ? ".hud-host" : ".stage";
@@ -896,7 +847,6 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
           return true;
         }, exitOf(MOTION.dim), t);
       }
-      chosen = null;
       last = snap;
       revealLine(t, delay);
     } else {
@@ -949,9 +899,12 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     const setStart = since("settings");
     const set = q(root, ".settings-layer");
     if (set && setStart !== undefined && t - setStart < MOTION.dim) anim(set, "m-fade-in", MOTION.dim, setStart, t);
-    const callStart = since("call");
-    const call = q(root, ".kuro-call");
-    if (call && callStart !== undefined && t - callStart < MOTION.lift) anim(call, "m-call-in", MOTION.lift, callStart, t);
+    const backStart = since("kuro-back");
+    const body = q(root, ".hud-kuro .kuro-btn");
+    if (body && backStart !== undefined && t - backStart < MOTION.lift) anim(body, "m-kuro-back", MOTION.lift, backStart, t);
+    const playerStart = since("player");
+    const player = q(root, ".dlg-player");
+    if (player && playerStart !== undefined && t - playerStart < MOTION.lift) anim(player, "m-rise-right", MOTION.lift, playerStart, t);
     const gapStart = since("gap");
     const gap = q(root, ".gap-glow");
     if (gap && gapStart !== undefined && t - gapStart < MOTION.dim) anim(gap, "m-fade-in", MOTION.dim, gapStart, t);
@@ -966,7 +919,6 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     before,
     after: afterRender,
     destroy() {
-      root.removeEventListener("click", onClickCapture, true);
       if (frame) win.cancelAnimationFrame(frame);
       timers.forEach((id) => win.clearTimeout(id));
       ghosts.forEach((g) => g.el.remove());

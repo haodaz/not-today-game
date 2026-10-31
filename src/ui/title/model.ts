@@ -37,14 +37,25 @@ export interface TitleModel {
   readonly chairCut: boolean;
   /** 新游戏 woke the monitors; Esc from the questions puts them to sleep. */
   readonly monitorsAwake: boolean;
-  /** 开始 was pressed: the camera is pushing in. */
+  /** 开始 was pressed: the card closes, the lamp goes off, the game takes over at the desk. */
   readonly starting: boolean;
+  /**
+   * Where the camera is (or is going): 房间, or pushed in to 桌子 for the question card
+   * (correction 2026-11-01). `moving` = the push or pull-back is still running.
+   */
+  readonly framing: "room" | "desk";
+  readonly moving: boolean;
   readonly collection: Collection;
 }
 
 export function initialTitle(save: TitleModel["save"], collection: Collection): TitleModel {
-  return { screen: "menu", save, answers: NO_ANSWERS, settingsOpen: false, muted: false, idle: null, chairCut: false, monitorsAwake: false, starting: false, collection };
+  return { screen: "menu", save, answers: NO_ANSWERS, settingsOpen: false, muted: false, idle: null, chairCut: false, monitorsAwake: false, starting: false, framing: "room", moving: false, collection };
 }
+
+/** The card shows only once the camera has arrived at the desk. */
+export const cardOpen = (m: TitleModel): boolean => m.screen === "questions" && m.framing === "desk" && !m.moving;
+/** The camera move finished. */
+export const arrived = (m: TitleModel): TitleModel => ({ ...m, moving: false });
 
 export function answered(a: Answers, q: Question): boolean {
   return q === "pronoun" ? a.pronoun !== null : a[q].trim() !== "";
@@ -82,7 +93,13 @@ export function diceOptions(q: TextQuestion, a: Answers, dice: readonly string[]
 export const withAnswer = (m: TitleModel, q: TextQuestion, value: string): TitleModel => ({ ...m, answers: { ...m.answers, [q]: value } });
 export const withPronoun = (m: TitleModel, p: Exclude<PronounAnswer, null>): TitleModel => ({ ...m, answers: { ...m.answers, pronoun: p } });
 
-/** 新游戏: the questions take the menu's place; the monitors wake (FR7). Never while a save exists. */
-export const toQuestions = (m: TitleModel): TitleModel => (m.save ? m : { ...m, screen: "questions", monitorsAwake: true });
-/** Esc from the questions: back to the menu; the monitors sleep. The answers are kept. */
-export const toMenu = (m: TitleModel): TitleModel => ({ ...m, screen: "menu", monitorsAwake: false, settingsOpen: false });
+/**
+ * 新游戏: the camera pushes to the desk (the menu fades, the monitors wake during the push); the
+ * question card opens when it arrives (FR7, correction 2026-11-01). Never while a save exists.
+ */
+export const toQuestions = (m: TitleModel): TitleModel => (m.save ? m : { ...m, screen: "questions", monitorsAwake: true, framing: "desk", moving: true });
+/**
+ * Esc from the card (or 返回 from 制作): back to the menu; the monitors sleep; from the desk the
+ * camera pulls back to the room. The answers are kept.
+ */
+export const toMenu = (m: TitleModel): TitleModel => ({ ...m, screen: "menu", monitorsAwake: false, settingsOpen: false, framing: "room", moving: m.framing === "desk" });

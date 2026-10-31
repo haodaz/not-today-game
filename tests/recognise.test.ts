@@ -18,7 +18,8 @@ import { initialSession, type Session } from "@world/desktop/model";
 import { EMPTY_DIALOGUE, push } from "@world/loop/dialogue";
 import { freshMemo, questionQueued, react } from "@world/loop/runtime";
 import { loopContext } from "@world/loop/checklist";
-import { dialogueBox, renderRoom } from "@world/room/hud";
+import { renderRoom } from "@world/room/hud";
+import { everyScreen } from "./box-screens";
 import { loopActions } from "@world/room/game";
 
 const objects = [...recogniseTable.keys()];
@@ -146,7 +147,7 @@ describe("when it is asked (FR1)", () => {
     store.appendEvent({ kind: "openLayer", objectId: "chick" });
     const session = initialSession(DEFAULT_CLOCK, "left", "room");
     session.dialogue = push(EMPTY_DIALOGUE, questionQueued(1, "chick", store.getRunId())!);
-    const out = dialogueBox(store.getState(), session)!.value;
+    const out = everyScreen(store.getState(), session);
     expect(out).toContain(recogniseTable.get("chick")!.q);
     const buttons = [...out.matchAll(/<button type="button" data-action="loop-choice" data-index="(\d)">/g)].map((m) => Number(m[1]));
     expect(buttons).toEqual(optionOrder(store.getRunId(), "chick"));
@@ -174,7 +175,7 @@ describe("when it is asked (FR1)", () => {
     store.appendEvent({ kind: "lieDown" });
     loopActions["loop-hold"]!(ctx, { object: "pager" } as DOMStringMap, null as never);
     expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["d5:recognise:pager"]);
-    expect(dialogueBox(store.getState(), ctx.session)!.value).toMatchSnapshot();
+    expect(everyScreen(store.getState(), ctx.session)).toMatchSnapshot();
     // Answered right this time: it is known, and the desk bar shows it in full colour.
     loopActions["loop-choice"]!(ctx, { index: String(rightIndex("pager")) } as DOMStringMap, null as never);
     expect(store.getState().recognised).toEqual(["pager"]);

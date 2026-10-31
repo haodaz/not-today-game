@@ -172,16 +172,22 @@ describe("the live DOM after a render (fix 2026-10-31)", () => {
     await midway(root, session, "shutdown");
   });
 
-  it("the call overlay and the settings panel: opening and closing never leave two", async () => {
+  it("talking to Kuro (dialogue FR2): opening, leaving and reopening never leave two boxes or two bodies", async () => {
     const store = storeAt(1, [{ kind: "step", name: "boot", t: "09:03" }]);
     const { root, session } = mount(store);
     await frame();
     await click(root, '[data-action="kuro-call"]');
-    check(root, session, "call open");
+    check(root, session, "talk open");
+    expect(root.querySelectorAll(".hud-kuro.away").length).toBe(1);
+    expect(root.querySelector(".stage > .dlg .txt .ch")).not.toBeNull(); // only the page's text reveals
+    expect(root.querySelector(".stage > .dlg .tag .ch")).toBeNull();
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+    await frame();
+    check(root, session, "talk left");
+    expect(root.querySelectorAll(".kuro-btn").length).toBe(1);
     await click(root, '[data-action="kuro-call"]');
-    check(root, session, "call closed");
-    await click(root, '[data-action="kuro-call"]');
-    check(root, session, "call reopened during its exit");
-    expect(root.querySelectorAll(".kuro-call").length).toBe(1);
+    check(root, session, "talk reopened during its exit");
+    expect(root.querySelectorAll(".stage > .dlg:not(.m-ghost)").length).toBe(1);
+    expect(root.querySelectorAll(".kuro-btn").length).toBe(0);
   });
 });
