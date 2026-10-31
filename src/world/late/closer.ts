@@ -1,16 +1,18 @@
 // Kuro closes what it does not want you to read (late-days FR4). Opening a page that content marks
 // `kuroCloses` (a browser reading entry, or a day item's 工作台 document) starts a timeline in the
 // session: wait (1.2 s, 0.3 s sooner for each time it has already closed that page today) →
-// crawl (the body crawls from the HUD corner to the page's close control) → maw (400 ms) →
-// closed: a `kuroClosed` event, the page shut, Kuro's line from content in the box. Leaving the
-// page, or closing it yourself, cancels it. Nothing is lost; it is only closed.
+// crawl (the body crawls along the page window's edges to its close control, late-days
+// correction; crawl.ts) → maw (400 ms) → closed: a `kuroClosed` event, the page shut, Kuro's line
+// from content in the box. Leaving the page, or closing it yourself, cancels it. Nothing is lost.
+// The way back: it does not crawl back along a page that is gone; it drops off with it, speaks
+// from the box (its portrait), and returns to the HUD corner when the line ends (m-kuro-back).
 import type { GameEvent } from "@state/events";
 import type { KuroCloses } from "@state/closes";
 import type { ActionContext } from "@world/desktop/controller";
 import { rightApp, type Session } from "@world/desktop/model";
 import { getLocale } from "@world/i18n";
 import { kuroInBox, push, type Queued } from "@world/loop/dialogue";
-import { MOTION } from "@world/motion/timing";
+import { CRAWL_MAX_MS } from "./crawl";
 import { lateRing } from "./rings";
 
 export type CloserPhase = "wait" | "crawl" | "maw";
@@ -96,7 +98,9 @@ export function startCloser(ctx: ActionContext, pageId: string, closes: KuroClos
     if (kuroInBox(session.dialogue)) return ctx.later(CLOSER_RETRY_MS, crawl);
     c.phase = "crawl";
     ctx.rerender();
-    ctx.later(MOTION.crawl, maw);
+    // The trip along the edges takes 1.2–2.2 s by distance (late-days correction); the maw waits
+    // for the longest, so it always flashes after it has arrived.
+    ctx.later(CRAWL_MAX_MS, maw);
   };
   ctx.later(closerDelay(closesToday(store.getEvents(), day, pageId)), crawl);
 }

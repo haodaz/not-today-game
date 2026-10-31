@@ -1,6 +1,8 @@
 // @vitest-environment happy-dom
 // late-days FR2–FR6: red eyes and the maw from the late ring, Kuro closing pages it does not want
 // read, and the browser's text tentacles (parameters and sampler; the canvas itself is not drawn).
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import fc from "fast-check";
 import { afterEach, describe, expect, it } from "vitest";
 import fixture from "./fixtures/browser-day-16.json";
@@ -21,7 +23,7 @@ import { initialSession, type Session } from "@world/desktop/model";
 import { setLocale } from "@world/i18n";
 import { closerDelay, CLOSER_MAW_MS } from "@world/late/closer";
 import { lateRing, overlayRing } from "@world/late/rings";
-import { MOTION } from "@world/motion/timing";
+import { crawlKeyframes, crawlMs, CRAWL_MAX_MS, CRAWL_MIN_MS, edgePath, pathLength } from "@world/late/crawl";
 import { loopActions, renderGame } from "@world/room/game";
 import { renderRoom } from "@world/room/hud";
 
@@ -183,7 +185,7 @@ describe("FR4 Kuro closes what it does not want you to read", () => {
     expect(crawling).toContain('<span class="kpet kuro-closer" data-kuro-slot data-state="crawl" data-phase="crawl" data-red="1"');
     expect(crawling).toContain('<div class="hud-kuro away"></div>');
     expect((crawling.match(/data-kuro-slot/g) ?? []).length).toBe(1);
-    expect(timers[0]!.ms).toBe(MOTION.crawl);
+    expect(timers[0]!.ms).toBe(CRAWL_MAX_MS); // the maw waits for the longest trip: it has arrived
     run();
     expect(desktop(ctx)).toContain('data-state="maw" data-phase="maw"');
     expect(timers[0]!.ms).toBe(CLOSER_MAW_MS);
@@ -255,6 +257,52 @@ describe("FR4 Kuro closes what it does not want you to read", () => {
     expect(applyEvent(s, { kind: "kuroClosed", day: 16, pageId: "d16:item:task1" } as GameEvent)).toBe(s);
     expect(() => applyEvent(s, { kind: "kuroClosed", day: 16, pageId: "d15:reading:1" } as GameEvent)).toThrow(/not a page of day 16/);
     expect(() => applyEvent(s, { kind: "kuroClosed", day: 16, pageId: "reading:1" } as GameEvent)).toThrow(/pageId must look like/);
+  });
+});
+
+describe("correction: Kuro crawls along edges, never in a straight line", () => {
+  // A page window above-left of the HUD corner; the body (140 px) ends at its slot (0, 0).
+  const box = { l: -600, t: 40, w: 640, h: 260 };
+  const from = { x: 700, y: 620 };
+  const path = edgePath(from, box, 140);
+
+  it("bottom edge → right edge → top edge to the ×, each leg axis-aligned (no diagonal)", () => {
+    const bottom = box.t + box.h + 70;
+    const right = box.l + box.w + 70;
+    expect(path[0]).toMatchObject({ x: 700, y: 620, at: 0 });
+    expect(path.at(-1)).toMatchObject({ x: 0, y: 0, rot: 0, at: 1 });
+    // After the drop onto the bottom edge, every leg runs along an edge or rounds a corner.
+    const legs = path.slice(1).map((p, i) => [path[i + 1]!, path[i + 2]] as const).filter(([, b]) => b);
+    for (const [a, b] of legs) {
+      const along = Math.abs(a.x - b!.x) < 0.5 || Math.abs(a.y - b!.y) < 0.5;
+      const corner = Math.abs(Math.abs(a.x - b!.x) - Math.abs(a.y - b!.y)) < 0.5; // the rounding
+      expect(along || corner, `${JSON.stringify(a)} → ${JSON.stringify(b)}`).toBe(true);
+    }
+    expect(path.some((p) => p.y === bottom)).toBe(true);
+    expect(path.some((p) => p.x === right)).toBe(true);
+  });
+
+  it("feet toward the edge: 180° under the bottom, 90° up the right, 0° on top; offsets by length", () => {
+    // The corner is right of the page, so it drops straight onto the bottom-right corner.
+    expect(path.map((p) => p.rot)).toEqual([0, 180, 90, 90, 0, 0]);
+    // From below-left it first runs along the bottom edge.
+    expect(edgePath({ x: -300, y: 620 }, box, 140).map((p) => p.rot)).toEqual([0, 180, 180, 90, 90, 0, 0]);
+    const ats = path.map((p) => p.at);
+    expect([...ats].sort((a, b) => a - b)).toEqual(ats);
+    const frames = crawlKeyframes(path);
+    expect(frames[0]).toEqual({ offset: 0, transform: "translate(700px, 620px) rotate(0deg)" });
+    expect(frames.at(-1)).toEqual({ offset: 1, transform: "translate(0px, 0px) rotate(0deg)" });
+  });
+
+  it("constant speed: the trip's time is its length, clamped to 1.2–2.2 s", () => {
+    expect(crawlMs(path)).toBe(Math.min(CRAWL_MAX_MS, Math.max(CRAWL_MIN_MS, Math.round(pathLength(path)))));
+    expect(crawlMs(edgePath({ x: 10, y: 400 }, { l: -100, t: 40, w: 120, h: 80 }, 140))).toBe(CRAWL_MIN_MS);
+    expect(crawlMs(edgePath({ x: 3000, y: 3000 }, box, 140))).toBe(CRAWL_MAX_MS);
+  });
+
+  it("the crawl frames step at ~6 fps while it crawls (CSS)", () => {
+    const css = readFileSync(resolve(__dirname, "../src/world/desktop/desktop.css"), "utf8");
+    expect(css).toContain('.kpet.kuro-closer[data-phase="crawl"] .layer img.f2{animation:kuro-step 333ms steps(1,end) infinite}');
   });
 });
 

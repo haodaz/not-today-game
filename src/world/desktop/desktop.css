@@ -242,8 +242,11 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .br .br-page .br-close:hover,.br .br-page .br-close:focus-visible{background:#f1f2f4}
 .br .br-page h2{margin:0 0 8px;font-size:22px}
 .br .br-page small{color:var(--ink-3)}
-/* The body at the close control (crawl, then the maw); it never takes clicks. */
-.kpet.kuro-closer{position:absolute;right:-6px;top:-58px;width:140px;height:140px;z-index:7;pointer-events:none}
+/* The body at the close control (crawl, then the maw); it never takes clicks. While it crawls the
+   crawl pair alternates at ~6 fps (each frame 167 ms) instead of the slow crossfade: its steps. */
+.kpet.kuro-closer{position:absolute;right:-6px;top:-58px;width:140px;height:140px;z-index:7;pointer-events:none;transform-origin:50% 50%}
+.kpet.kuro-closer[data-phase="crawl"] .layer img.f2{animation:kuro-step 333ms steps(1,end) infinite}
+@keyframes kuro-step{0%{opacity:0}50%{opacity:1}}
 .wb-closer{position:absolute;right:18px;top:0;width:1px;height:1px}
 .wb .body{position:relative}
 /* late-days FR5: the text tentacles, over the browser window only */

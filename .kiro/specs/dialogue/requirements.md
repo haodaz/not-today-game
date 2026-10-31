@@ -22,3 +22,6 @@ One dialogue system for everything spoken in the 3D/room views: narration, inner
 
 ## Correction 2026-11-01 (author): Kuro stands at the box's right end, not on the tag
 56 px on the tag reads as an icon. Kuro's face leaves the tag. When Kuro speaks, its **portrait stands at the right end of the dialogue box**: feet on the box's bottom edge, inside the box's right edge, and the head rising **above the box's top edge** (portrait about 200 px tall against the 132 px box; the current state's sprite frame, so it still blinks). The text column takes everything left of the portrait, so it gets wider than today, not narrower. The tag then carries only the name KURO. The player's box (rising from the right) keeps clear of the portrait: it sits below/left of it or the portrait steps aside while the player's box is up, Kiro decides and says which. Narration tags (门外 / 缝里 / 桌上) do not change. Update design/chrome/dialogue.html's numbers in the design doc and the dialogue snapshots after checking the diff.
+
+## Correction 2026-11-01 (author): the ↺ history button sits beside the name tag
+The ↺ (今日对话) button is no longer a loose circle at the box's top-right. It sits on the tag strip, immediately right of the name tag (KURO / 门外 / 缝里 / 桌上), same height as the tag, small, and when there is no tag it sits alone at the tag's position. Same action and label as before.

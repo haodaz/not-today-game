@@ -13,7 +13,7 @@ export const RUN_KEY = "nt_run";
 export const PROFILE_KEY = "nt_profile";
 
 /** Bump when the saved shape changes and add the step to the matching `migrations`. */
-const RUN_VERSION = 2;
+export const RUN_VERSION = 2;
 
 /** A run saved before run ids existed gets a fixed one, so its option orders stay stable. */
 export const LEGACY_RUN_ID = "run-legacy";

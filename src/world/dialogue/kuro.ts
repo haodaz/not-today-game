@@ -19,6 +19,10 @@ import { finishChoice, leaveKuro, push, replaceHead, talking, type Ending, type 
 import { stepOnce } from "@world/loop/steps";
 import { fillPlaceholders } from "@world/replies/placeholders";
 import { logCurrent, logPlayer } from "./history";
+import { kuroOnline } from "@net/supabase";
+import { decay } from "@world/desktop/kuro/decay";
+import { toLogEvents } from "@world/desktop/kuro/scorer";
+import { stageOf } from "@state/stages";
 import { pointed } from "@world/room/pointer";
 import { fontPx, KURO_LINE_BOX, nextScreen, PLAYER_BOX, screens, type Screen } from "./layout";
 
@@ -153,15 +157,54 @@ function turn(ctx: ActionContext, said: string, q: number | null, text: string |
     bedtime(ctx);
     return;
   }
-  store.appendEvent(q !== null ? { kind: "chat", q } : { kind: "chat", text: text! });
-  // Talking with it today ticks the chat item (day-loop).
-  stepOnce(ctx, "chat:any");
-  const day = kuroDay(state.day);
-  const answer = day ? offlineAnswer(day, q) : t("kuro.bedtime");
-  session.dialogue = replaceHead(session.dialogue, [item(session, state.day, answer, { kind: "kuroTurn", mode: "chat" })]);
   session.kuroInput = false;
   session.kuroDraft = "";
   session.playerPage = 0;
+  const dayNo = state.day;
+  const content = kuroDay(dayNo);
+  const scripted = content ? offlineAnswer(content, q) : t("kuro.bedtime");
+  const online = kuroOnline();
+  if (!online) {
+    answerTurn(ctx, dayNo, said, q, text, scripted, true);
+    return;
+  }
+  // Online (kuro-chat FR3): Kuro is answering; on any failure, the scripted answer, marked offline.
+  const wait = item(session, dayNo, WAITING, { kind: "kuroWait" });
+  session.dialogue = replaceHead(session.dialogue, [wait]);
+  online
+    .turn({ run_id: store.getRunId(), day: dayNo, said, events: toLogEvents(store.getEvents()) })
+    .then((r) => {
+      if (r.bedtime) return void answerBedtime(ctx, dayNo, wait);
+      answerTurn(ctx, dayNo, said, q, text, r.reply, false, wait);
+    })
+    .catch(() => answerTurn(ctx, dayNo, said, q, text, scripted, true, wait))
+    .finally(() => ctx.rerender());
+}
+
+/** Kuro's waiting line while the model answers (punctuation, not story text). */
+export const WAITING = "…";
+
+/**
+ * The turn is answered: one `chat` event (its words, Kuro's raw answer, whether it was offline)
+ * and Kuro's next turn in the box. The model's answer is shown through the decay filter; a
+ * scripted one is shown as written. If the conversation was left meanwhile, the turn is still
+ * logged (it was asked) but nothing is shown.
+ */
+function answerTurn(ctx: ActionContext, day: number, said: string, q: number | null, text: string | null, answer: string, offline: boolean, wait?: Queued): void {
+  const { store, session } = ctx;
+  if (store.getState().day !== day || store.getState().chatTurnsToday >= constants.chatTurnsPerDay) return;
+  store.appendEvent({ ...(q !== null ? { q } : { text: text! }), kind: "chat", said, answer, offline });
+  // Talking with it today ticks the chat item (day-loop).
+  stepOnce(ctx, "chat:any");
+  if (wait && session.dialogue.queue[0] !== wait) return;
+  const shown = offline ? answer : decay(fillPlaceholders(answer, store.getState().names), stageOf(day));
+  session.dialogue = replaceHead(session.dialogue, [item(session, day, shown, { kind: "kuroTurn", mode: "chat" })]);
+}
+
+/** The function counted the turns and says it is time to sleep (backend FR3). */
+function answerBedtime(ctx: ActionContext, day: number, wait: Queued): void {
+  if (ctx.store.getState().day !== day || ctx.session.dialogue.queue[0] !== wait) return;
+  bedtime(ctx);
 }
 
 /** A player's-box option. */

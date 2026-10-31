@@ -78,6 +78,8 @@ export interface Session {
   /** Kuro coming to close a page (late-days FR4), and its key counter. */
   kuroCloser: KuroCloser | null;
   closerSeq: number;
+  /** The day's online judgement on its way (kuro-chat FR4): lying down waits for it, ≤ 20 s. */
+  judging: { readonly day: number; readonly startedAt: number } | null;
   /** What finished runs left on the desk (title-page FR4/FR8): set by the host from the profile; presentation only. */
   collection: Collection;
   /** The gamebook reader is open (title-page FR4). */
@@ -131,6 +133,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     browserRead: null,
     kuroCloser: null,
     closerSeq: 0,
+    judging: null,
     endingPage: null,
     collection: EMPTY_COLLECTION,
     bookOpen: false,

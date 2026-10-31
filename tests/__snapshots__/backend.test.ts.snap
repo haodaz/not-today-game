@@ -1,0 +1,20 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`prompt assembly (FR3) > snapshot: day 1's opening prompt (no memory yet) 1`] = `
+[
+  "# Who you are
+# Kuro — who it is (authored data; the model continues, never invents)
+
+**Face.** A black Labrador puppy's head on a small round octopus body. Unc",
+  "# Today (day 1)
+Idiom of the day (say it verbatim when you greet): Good to see you.
+Stance: A tool. Polite, brief, accurate. Knows the water went cold at eight ",
+  "# The player's situation
+# Kuro's world knowledge (the player's background, as the new world knows it)
+
+This is the second of Kuro's three private sources (self",
+  "# What you remember
+Summary: (day 1: nothing yet)
+",
+]
+`;

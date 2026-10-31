@@ -13,6 +13,10 @@ import { knows, optionOrder, recogniseTable, wasRight } from "@state/recognise";
 import { advanceTo, DEFAULT_CLOCK, isNight, type Beat, type BeatClock } from "@world/desktop/beat";
 import { lastKuroLine } from "@world/desktop/kuro/mini";
 import { startTalk } from "@world/dialogue/kuro";
+import { judgementPending, startJudgement } from "@world/dialogue/judge";
+
+/** How often a waiting lie-down looks again for the judgement. */
+export const JUDGE_POLL_MS = 250;
 import type { ActionContext } from "@world/desktop/controller";
 import type { LoopMemo } from "@world/desktop/model";
 import { arrivalOf, ordersOn } from "@world/delivery/meals";
@@ -227,6 +231,17 @@ export function syncLoop(ctx: ActionContext, nowMs: number = Date.now()): void {
  * good, survive, or bad (san-and-endings FR2).
  */
 export function lieDownOrEnd(ctx: ActionContext): void {
+  // The day's judgement on its way from the model: lying down waits for it (≤ 20 s, kuro-chat FR4).
+  if (judgementPending(ctx)) {
+    ctx.later(JUDGE_POLL_MS, () => lieDownOrEnd(ctx));
+    return;
+  }
+  // Nothing was asked (e.g. the bed was skipped by a test path): assess the day now, offline if need be.
+  startJudgement(ctx);
+  if (judgementPending(ctx)) {
+    ctx.later(JUDGE_POLL_MS, () => lieDownOrEnd(ctx));
+    return;
+  }
   const ending = dueAtLieDown(ctx.store.getState());
   ctx.store.appendEvent(ending ? { kind: "ending", ending } : { kind: "lieDown" });
 }

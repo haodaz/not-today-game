@@ -6,6 +6,7 @@ import type { JudgementDelta } from "@state/judgement";
 import { RIGHT_DELTA } from "@state/recognise";
 import type { State } from "@state/types.gen";
 import { upgradeTable } from "@state/upgrades";
+import { t } from "@world/i18n";
 
 export const DIMENSIONS = ["truth", "values", "bond"] as const;
 export type Dimension = (typeof DIMENSIONS)[number];
@@ -32,18 +33,27 @@ export function deltaOf(eventId: string): JudgementDelta {
   return {};
 }
 
+/** A chat judgement's entry carries the day's scores (kuro-chat FR4); older entries do not. */
+const dimsOf = (e: unknown): JudgementDelta | null => {
+  const d = (e as { dims?: unknown }).dims;
+  return d && typeof d === "object" ? (d as JudgementDelta) : null;
+};
+
+/** The offline scorer's notes are string keys (`judge.offline.*`); the model's are text. */
+const noteOf = (note: string): string => (/^judge\.[\w.]+$/.test(note) ? t(note) : note);
+
 export function creditLines(state: State): CreditLine[] {
   return state.judgement.evidence
     .map((e, i) => ({ e, i }))
     // Day order; entries of the same day keep the order they were made.
     .sort((a, b) => Number(a.e.day) - Number(b.e.day) || a.i - b.i)
     .map(({ e }) => {
-      const d = deltaOf(String(e.eventId));
+      const d = dimsOf(e) ?? deltaOf(String(e.eventId));
       const moved = DIMENSIONS.flatMap((dim) => {
         const v = d[dim] ?? 0;
         return v === 0 ? [] : [{ dim, dir: (v > 0 ? 1 : -1) as 1 | -1 }];
       });
-      return { day: Number(e.day), eventId: String(e.eventId), note: String(e.note), moved };
+      return { day: Number(e.day), eventId: String(e.eventId), note: noteOf(String(e.note)), moved };
     });
 }
 

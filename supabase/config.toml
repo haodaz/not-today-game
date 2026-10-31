@@ -1,0 +1,27 @@
+# Supabase project config for NOT TODAY (backend spec). Local development only; the hosted
+# project is configured by the author. Anonymous sign-ins must be enabled (backend FR1).
+project_id = "not-today-game"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+
+[db]
+port = 54322
+major_version = 15
+
+[auth]
+enabled = true
+site_url = "http://localhost:5173"
+# backend FR1: the player never sees a form; 开始 signs in anonymously.
+enable_anonymous_sign_ins = true
+
+[auth.email]
+enable_signup = true
+# "绑定邮箱" (later): a magic link upgrades the anonymous user.
+enable_confirmations = false
+
+[functions.kuro-chat]
+# The client sends the user's JWT; the function forwards it so RLS applies.
+verify_jwt = true

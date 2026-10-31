@@ -41,6 +41,7 @@ import { itemPageId, readingPageId, type KuroCloses } from "@state/closes";
 import { browserPage } from "@world/desktop/browser/data";
 import { workbenchActions } from "@world/desktop/workbench/actions";
 import { cancelCloser, startCloser } from "@world/late/closer";
+import { startJudgement } from "@world/dialogue/judge";
 
 export function renderGame(store: Store, session: Session, nowMs: number): SafeHtml {
   const state = store.getState();
@@ -199,6 +200,8 @@ export const loopActions: Record<string, ActionHandler> = {
       ctx.rerender();
       return;
     }
+    // The chat beat is over: the day is assessed while the night plays (kuro-chat FR4).
+    startJudgement(ctx);
     const night = dayFile(day)?.beats.night;
     if (!night || night.say.length === 0) lieDownOrEnd(ctx);
     else session.dialogue = push(session.dialogue, beatQueued(day, "night", night, { kind: "lieDown" }));

@@ -11,6 +11,7 @@ import { applyRecognise } from "./recognise";
 import { applyReplyEvent, knownRecipients } from "./replies/effects";
 import { constants, membersOf } from "./variables";
 import { PAGE_ID } from "./closes";
+import { applyJudged, rememberTurn, type JudgedFields } from "./chat";
 
 /** The two reply choices world-state reacts to. "no" is the chick's word (objectWords.chick). */
 export const LOAN_CHOICE_LEND = "lend";
@@ -57,13 +58,17 @@ export type GameEvent =
   // title-page spec: the answers to the title's questions, the run's first event (title page only).
   | { kind: "names"; day: number; names: State["names"] }
   // dialogue spec: one chat turn with Kuro (a starter question's number, or typed text).
-  | { kind: "chat"; day: number; q?: number; text?: string }
+  // kuro-chat: `said` is the words shown, `answer` Kuro's raw reply, `offline` when the answer was
+  // the scripted one (no model, or the model failed); they feed chatMemory.
+  | { kind: "chat"; day: number; q?: number; text?: string; said?: string; answer?: string; offline?: boolean }
+  // kuro-chat FR4: the day's judgement at the end of the chat beat (model or rule scorer).
+  | ({ kind: "judged"; day: number } & JudgedFields)
   // late-days FR4: Kuro closed a page or document the player had opened.
   | { kind: "kuroClosed"; day: number; pageId: string };
 
 export type EventKind = GameEvent["kind"];
 
-/** Exactly these kinds (world-state 12, delivery 3, desktop-ui 1, day-loop 3, object-upgrade 2, san-and-endings 1, title-page 1, dialogue 1, late-days 1). Nothing else may be appended. */
+/** Exactly these kinds (world-state 12, delivery 3, desktop-ui 1, day-loop 3, object-upgrade 2, san-and-endings 1, title-page 1, dialogue 1, late-days 1, kuro-chat 1). Nothing else may be appended. */
 export const eventKinds: readonly EventKind[] = [
   "openLayer",
   "recognise",
@@ -90,6 +95,7 @@ export const eventKinds: readonly EventKind[] = [
   "names",
   "chat",
   "kuroClosed",
+  "judged",
 ];
 
 /**
@@ -121,7 +127,11 @@ function applyChat(state: State, event: Extract<GameEvent, { kind: "chat" }>): S
     throw new Error(`chat: text must be 1–${CHAT_TEXT_MAX} characters`);
   }
   if (state.chatTurnsToday >= constants.chatTurnsPerDay) throw new Error(`chat: no turns left today (${constants.chatTurnsPerDay})`);
-  return { ...state, chatTurnsToday: state.chatTurnsToday + 1 };
+  for (const k of ["said", "answer"] as const) {
+    if (event[k] !== undefined && typeof event[k] !== "string") throw new Error(`chat: ${k} must be a string`);
+  }
+  if (event.offline !== undefined && typeof event.offline !== "boolean") throw new Error("chat: offline must be true or false");
+  return rememberTurn({ ...state, chatTurnsToday: state.chatTurnsToday + 1 }, event.day, event.said, event.answer, event.offline);
 }
 
 const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
@@ -223,6 +233,8 @@ export function applyEvent(state: State, event: GameEvent): State {
       return applyChat(state, event);
     case "kuroClosed":
       return applyKuroClosed(state, event);
+    case "judged":
+      return applyJudged(state, event.day, event);
     case "open":
       return applyOpen(state, event);
     case "step":

@@ -12,6 +12,7 @@ import type { ActionContext, ActionHandler, MotionHooks } from "@world/desktop/c
 import { loopContext, checklist } from "@world/loop/checklist";
 import { kuroInBox, showing } from "@world/loop/dialogue";
 import { createTentacleDriver } from "@world/desktop/browser/tentacles-dom";
+import { crawlKeyframes, crawlMs, edgePath } from "@world/late/crawl";
 import { heldItem } from "@world/room/held";
 import { holdUntil, lineKey, revealBusy, revealDoneAt, revealShown, startReveal, type Reveal } from "./reveal";
 import { centre, DESK_SHOT, ROOM_SHOT, type Rect } from "@world/room/shots";
@@ -924,29 +925,37 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     tentacles.after(root);
   }
 
-  // ---- late-days FR4: Kuro crawls from the HUD corner to the page's close control -----------
-  const crawlFrom = new Map<number, { dx: number; dy: number }>();
+  // ---- late-days FR4 + correction: Kuro crawls along the page window's edges to its × --------
+  const crawlPaths = new Map<number, { frames: Keyframe[]; ms: number }>();
   function closerEntry(t: number): void {
     const c = ctx.session.kuroCloser;
     const el = q(root, ".kuro-closer");
-    if (!c || !el || c.phase !== "crawl") return;
+    if (!c || !el || c.phase !== "crawl" || typeof el.animate !== "function") return;
     const key = `closer:${c.token}`;
     if (since(key) === undefined) {
       begin(key, t);
-      // Where the body was: the (now empty) HUD corner. The slot is inside the scaled stage.
+      // Measured once, in the scaled stage's px, relative to the body's centre at its slot: the
+      // (now empty) HUD corner it leaves from, and the window it crawls round.
       const corner = q(root, ".hud-kuro");
-      if (corner) {
-        const a = corner.getBoundingClientRect();
-        const b = el.getBoundingClientRect();
+      const page = el.closest<HTMLElement>(".br-page, .win");
+      if (corner && page) {
         const k = scaleOf(q(root, ".stage"));
-        crawlFrom.set(c.token, { dx: (a.left - b.left) / k, dy: (a.top - b.top) / k });
+        const b = el.getBoundingClientRect();
+        const cx = b.left + b.width / 2;
+        const cy = b.top + b.height / 2;
+        const a = corner.getBoundingClientRect();
+        const p = page.getBoundingClientRect();
+        const from = { x: (a.left + a.width / 2 - cx) / k, y: (a.top + a.height / 2 - cy) / k };
+        const box = { l: (p.left - cx) / k, t: (p.top - cy) / k, w: p.width / k, h: p.height / k };
+        const path = edgePath(from, box, el.offsetWidth || b.width / k);
+        crawlPaths.set(c.token, { frames: crawlKeyframes(path), ms: crawlMs(path) });
       }
     }
-    const from = crawlFrom.get(c.token);
-    if (!from) return;
-    el.style.setProperty("--m-cx", `${Math.round(from.dx)}px`);
-    el.style.setProperty("--m-cy", `${Math.round(from.dy)}px`);
-    anim(el, "m-closer-in", MOTION.crawl, since(key)!, t, "linear");
+    const path = crawlPaths.get(c.token);
+    if (!path) return;
+    // Linear in time: constant speed along the edges; it holds at the × once it has arrived.
+    const a = el.animate(path.frames, { duration: path.ms, easing: "linear", fill: "both" });
+    a.currentTime = Math.max(0, t - since(key)!);
   }
 
   return {

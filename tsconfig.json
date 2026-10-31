@@ -11,11 +11,14 @@
     "skipLibCheck": true,
     "isolatedModules": true,
     "noEmit": true,
+    "allowImportingTsExtensions": true,
     "paths": {
       "@content/*": ["./content/*"],
       "@state/*": ["./src/state/*"],
-      "@world/*": ["./src/world/*"]
+      "@world/*": ["./src/world/*"],
+      "@kuro/*": ["./supabase/functions/_shared/kuro/*"],
+      "@net/*": ["./src/net/*"]
     }
   },
-  "include": ["src", "content", "scripts", "tests", "vite.config.ts"]
+  "include": ["src", "content", "scripts", "tests", "vite.config.ts", "supabase/functions/_shared"]
 }

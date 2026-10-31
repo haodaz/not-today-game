@@ -22,6 +22,9 @@ import { createMotion } from "@world/motion/dom";
 import { loopActions, loopKeys, renderGame } from "@world/room/game";
 import { readCollection } from "./ui/collection";
 import { mountTitle } from "./ui/title/mount";
+import { net, type RunSnapshot } from "@net/supabase";
+import { pushDue } from "@net/sync";
+import { RUN_VERSION as RUN_FORMAT_VERSION } from "@state/saves";
 
 const search = window.location.search;
 const params = new URLSearchParams(search);
@@ -46,9 +49,27 @@ endingHost.newRun = () => {
 };
 
 /** Mount the game on `store`; `saved` stores keep themselves in the run save. */
+/** The run as the cloud mirror keeps it (backend FR2/FR4). */
+function snapshot(store: Store): RunSnapshot {
+  const state = store.getState();
+  return { runId: store.getRunId(), version: RUN_FORMAT_VERSION, events: store.getEvents(), day: state.day, san: state.san, ended: state.ending === "none" ? null : state.ending, updatedAt: Date.now() };
+}
+
 function startGame(store: Store, saved: boolean, from?: "desk"): void {
   root.innerHTML = "";
   if (saved) store.subscribe(() => run.save(store));
+  // The cloud mirror (backend FR4): push on lie-down and every 20 events; a no-op offline.
+  if (saved) {
+    let pushed = store.getEvents().length;
+    store.subscribe(() => {
+      const events = store.getEvents();
+      const kinds = events.slice(pushed).map((e) => e.kind);
+      if (pushDue(pushed, events.length, kinds)) {
+        pushed = events.length;
+        void net.pushRun(snapshot(store));
+      }
+    });
+  }
   // Every ending reached goes into the profile once, when it happens (title-page T8).
   let seen = store.getEvents().length;
   store.subscribe(() => {
@@ -89,10 +110,23 @@ if (jump !== null) {
   const title = mountTitle(root, {
     save: saved ? { day: saved.day } : null,
     collection,
-    onContinue() {
+    async onContinue() {
       if (!saved) return;
       title.destroy();
-      startGame(createStore({ runId: saved.runId, startDay: saved.startDay, events: saved.events }), true);
+      // Boot (backend FR4): the cloud copy is used only if it is ahead of this one; on a conflict
+      // local wins and the cloud copy is kept. Offline (or no env) this is instant and does nothing.
+      let events = saved.events;
+      if (await net.signIn()) {
+        const local = { runId: saved.runId, events: saved.events, updatedAt: 0 };
+        const { decision, cloud } = await net.decide(local);
+        if (decision === "pull" && cloud) events = cloud.events as typeof saved.events;
+        const store = createStore({ runId: saved.runId, startDay: saved.startDay, events });
+        if (decision === "push") void net.pushRun(snapshot(store));
+        if (decision === "conflict") void net.pushRun(snapshot(store), cloud);
+        startGame(store, true);
+        return;
+      }
+      startGame(createStore({ runId: saved.runId, startDay: saved.startDay, events }), true);
     },
     onStart(names) {
       title.destroy();
@@ -101,6 +135,10 @@ if (jump !== null) {
       store.appendEvent({ kind: "names", names });
       run.save(store);
       startGame(store, true, "desk");
+      // Anonymous sign-in on the first 开始 (backend FR1); the mirror starts with this run.
+      void net.signIn(names).then((ok) => {
+        if (ok) void net.pushRun(snapshot(store));
+      });
     },
   });
 }

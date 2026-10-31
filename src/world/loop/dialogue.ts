@@ -18,11 +18,13 @@ export type Ending =
   /** 要和克总聊聊吗？ — 聊聊 / 先不聊. */
   | { readonly kind: "kuroAsk" }
   /** Kuro has spoken; the player's box answers (chat: the questions and typing; work: only 好。). */
-  | { readonly kind: "kuroTurn"; readonly mode: "chat" | "work" };
+  | { readonly kind: "kuroTurn"; readonly mode: "chat" | "work" }
+  /** Kuro is answering online (kuro-chat FR3): no player's box, no reading on, until it replies. */
+  | { readonly kind: "kuroWait" };
 
 /** Endings that wait for a choice (Kuro's turn waits for the player's box). */
 export const endsInChoice = (e: Ending): boolean =>
-  e.kind === "beatChoices" || e.kind === "loan" || e.kind === "recognise" || e.kind === "kuroOffer" || e.kind === "kuroAsk" || e.kind === "kuroTurn";
+  e.kind === "beatChoices" || e.kind === "loan" || e.kind === "recognise" || e.kind === "kuroOffer" || e.kind === "kuroAsk" || e.kind === "kuroTurn" || e.kind === "kuroWait";
 
 export interface Queued {
   /** Where it came from (for tests and to avoid queueing the same thing twice). */
