@@ -1,0 +1,166 @@
+{
+  "day": 4,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "task1",
+      "title": "v17 v18 合一份。",
+      "app": "docs",
+      "done": "task_d4_1",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "「导出为 PDF」和「导出为 PDF，三天内不得重复导出」。同一条需求的两个版本。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你并排打开，一条一条对。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d4_1"
+          ],
+          "san": 1
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你打了一句：这两条各自是什么意思，分开说。"
+          }
+        ],
+        "kuro": [
+          "Of course. Let me take another look."
+        ],
+        "effects": {
+          "flags": [
+            "task_d4_1"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "它回了一个 Done，版本号从 v18 跳到 v18。你没点「看一眼」。"
+          }
+        ],
+        "kuro": [
+          "Done."
+        ],
+        "effects": {
+          "flags": [
+            "task_d4_1"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
+    },
+    {
+      "id": "task2",
+      "title": "导出函数：两遍正则。",
+      "app": "code",
+      "done": "task_d4_2",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "同一个正则它跑了两遍，一遍在校验，一遍在写入前。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你删了第二遍。函数短了九行。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d4_2",
+            "removed_double_regex"
+          ],
+          "san": 1
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你问它：这两遍为什么都在？它回：为保险。你打：保险不是理由。"
+          }
+        ],
+        "kuro": [
+          "To be safe. — Done, removed."
+        ],
+        "effects": {
+          "flags": [
+            "task_d4_2",
+            "removed_double_regex"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你打：跑一下测试。它回：测试过了。两遍正则不影响结果，只影响时间。"
+          }
+        ],
+        "kuro": [
+          "Tests pass."
+        ],
+        "effects": {
+          "flags": [
+            "task_d4_2"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
+    }
+  ]
+}

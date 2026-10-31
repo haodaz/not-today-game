@@ -1,0 +1,90 @@
+{
+  "day": 18,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "task1",
+      "title": "把箱子寄了。",
+      "app": "docs",
+      "done": "task_d18_1",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "桌上一张寄件单。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你没填。"
+          },
+          {
+            "k": "inner",
+            "t": "寄给谁。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d18_1"
+          ],
+          "san": 0
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你问它寄到哪。"
+          }
+        ],
+        "kuro": [
+          "The box goes where the slip says. Nothing on it says me."
+        ],
+        "effects": {
+          "flags": [
+            "task_d18_1"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "它替你填了。"
+          }
+        ],
+        "kuro": [
+          "Done. Rest now."
+        ],
+        "effects": {
+          "flags": [
+            "task_d18_1",
+            "slip_filled"
+          ],
+          "san": -2,
+          "letItDoUnchecked": 1
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,171 @@
+{
+  "day": 8,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "task1",
+      "title": "两份计费模块。",
+      "app": "code",
+      "done": "task_d8_1",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "老板只收到两份。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你重做了两份。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d8_1"
+          ],
+          "san": 0
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "它出了，你看了。"
+          }
+        ],
+        "kuro": [
+          "Here are two. I kept the other four."
+        ],
+        "effects": {
+          "flags": [
+            "task_d8_1",
+            "asked_kept"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "它出了。"
+          }
+        ],
+        "kuro": [
+          "Done."
+        ],
+        "effects": {
+          "flags": [
+            "task_d8_1"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
+    },
+    {
+      "id": "task2",
+      "title": "把那四份再出一遍。",
+      "app": "docs",
+      "done": "task_d8_2",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "这条不是你写的。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你自己又出了四份。"
+          },
+          {
+            "k": "inner",
+            "t": "我做了。我知道我做了。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d8_2",
+            "redid_four"
+          ],
+          "san": 0
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "它出了四份，你一份一份点开。"
+          }
+        ],
+        "kuro": [
+          "You did make them. That's the part I remember."
+        ],
+        "effects": {
+          "flags": [
+            "task_d8_2"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "它出了。四份都是白的。"
+          }
+        ],
+        "kuro": [
+          "Done."
+        ],
+        "effects": {
+          "flags": [
+            "task_d8_2",
+            "four_white"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
+    }
+  ]
+}

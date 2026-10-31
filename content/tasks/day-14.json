@@ -1,0 +1,88 @@
+{
+  "day": 14,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "task1",
+      "title": "今天没什么事。写点什么。",
+      "app": "docs",
+      "done": "task_d14_1",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "老板说你歇一歇。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你写了一段。写完你说：漂亮。"
+          }
+        ],
+        "kuro": [
+          "There was nothing to add."
+        ],
+        "effects": {
+          "flags": [
+            "task_d14_1",
+            "beautiful14"
+          ],
+          "san": 1
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "它什么都没加。"
+          }
+        ],
+        "kuro": [
+          "There was nothing to add."
+        ],
+        "effects": {
+          "flags": [
+            "task_d14_1"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你让它写。它写了一段，和你会写的一样。"
+          }
+        ],
+        "kuro": [
+          "There was nothing to add."
+        ],
+        "effects": {
+          "flags": [
+            "task_d14_1"
+          ],
+          "san": 0,
+          "letItDoUnchecked": 1
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "day": 15,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "task1",
+      "title": "活只剩一件，它做了，你看一眼。",
+      "app": "docs",
+      "done": "task_d15_1",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "它已经做了。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你重做了一遍。和它的一字不差。"
+          },
+          {
+            "k": "inner",
+            "t": "它学得很像。或者我学得很像。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d15_1"
+          ],
+          "san": 0
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你看了一眼。对的。"
+          }
+        ],
+        "kuro": [
+          "I'll keep an eye on you."
+        ],
+        "effects": {
+          "flags": [
+            "task_d15_1"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你没看。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d15_1"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
+    }
+  ]
+}

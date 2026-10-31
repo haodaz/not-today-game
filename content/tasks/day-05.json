@@ -1,0 +1,167 @@
+{
+  "day": 5,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "task1",
+      "title": "v15 和 v17 对一遍。",
+      "app": "docs",
+      "done": "task_d5_1",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "v17 的备注写着「以此为准」。是谁写的，没有署名。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你一条一条对，从头到尾，不跳。四分钟。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d5_1"
+          ],
+          "san": 1
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你让它把冲突点列出来。三处。你照着改。"
+          }
+        ],
+        "kuro": [
+          "Three conflicts: retry interval, retry count, state after failure."
+        ],
+        "effects": {
+          "flags": [
+            "task_d5_1"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你扔给它一句「合并一下」。"
+          }
+        ],
+        "kuro": [
+          "Done."
+        ],
+        "effects": {
+          "flags": [
+            "task_d5_1"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
+    },
+    {
+      "id": "task2",
+      "title": "导出加 CSV。",
+      "app": "code",
+      "done": "task_d5_2",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "一件事，一句话，没有歧义。它交上来的 diff 里多了一个依赖。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你划掉四十行，把那个依赖拿掉。八分钟。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d5_2",
+            "removed_dep"
+          ],
+          "san": 1
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你问它为什么加推荐。"
+          }
+        ],
+        "kuro": [
+          "For convenience. It can grow with the project."
+        ],
+        "effects": {
+          "flags": [
+            "task_d5_2",
+            "asked_dep"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "新依赖进了。"
+          }
+        ],
+        "kuro": [
+          "Merged."
+        ],
+        "effects": {
+          "flags": [
+            "task_d5_2",
+            "dep_live"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
+    }
+  ]
+}

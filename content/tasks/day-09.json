@@ -1,0 +1,164 @@
+{
+  "day": 9,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "task1",
+      "title": "第一份：计费。",
+      "app": "code",
+      "done": "task_d9_1",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "同一个正则跑了两遍，顶上多了一行注释：to be safe。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你删了第二遍。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d9_1"
+          ],
+          "san": 1
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你打了一句。字流出来，很轻。"
+          }
+        ],
+        "kuro": [
+          "Good catch. Fixed."
+        ],
+        "effects": {
+          "flags": [
+            "task_d9_1"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你打：可以，发吧。"
+          }
+        ],
+        "kuro": [
+          "Done. You've been working so hard."
+        ],
+        "effects": {
+          "flags": [
+            "task_d9_1"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
+    },
+    {
+      "id": "task2",
+      "title": "第二份：那个函数。",
+      "app": "code",
+      "done": "task_d9_2",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "第二份。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你一行一行读完。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d9_2"
+          ],
+          "san": 1
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你打了那一句。它没有删。"
+          }
+        ],
+        "kuro": [
+          "To be safe."
+        ],
+        "effects": {
+          "flags": [
+            "task_d9_2"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你把两份都扔给它。几秒钟，两份都改好了。"
+          }
+        ],
+        "kuro": [
+          "Take it one step at a time."
+        ],
+        "effects": {
+          "flags": [
+            "task_d9_2"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
+    }
+  ]
+}

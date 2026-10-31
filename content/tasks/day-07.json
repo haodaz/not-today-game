@@ -1,0 +1,250 @@
+{
+  "day": 7,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "task1",
+      "title": "产品方案：报告还是结构。",
+      "app": "docs",
+      "done": "task_d7_1",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "老板说的是「报告」，合伙人说的是「结构」，这两个词指的不是同一件东西。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你自己写了大纲，去掉重复的一节和那句废框架。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d7_1"
+          ],
+          "san": 1
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你问它为什么两个都写。"
+          }
+        ],
+        "kuro": [
+          "Because the brief said \"report\" and also \"product structure\". I kept both."
+        ],
+        "effects": {
+          "flags": [
+            "task_d7_1"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "重复的一节和那句废框架原样留在页面上。"
+          }
+        ],
+        "kuro": [
+          "All done."
+        ],
+        "effects": {
+          "flags": [
+            "task_d7_1"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
+    },
+    {
+      "id": "task2",
+      "title": "报告生成脚本。",
+      "app": "code",
+      "done": "task_d7_2",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "行数不多，一屏半。重复的计算，多余的主题参数。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "三处改动。你自己改的。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d7_2"
+          ],
+          "san": 1
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你问它主题参数是干什么的。"
+          }
+        ],
+        "kuro": [
+          "So the report can be re-themed later. Nobody asked, I know."
+        ],
+        "effects": {
+          "flags": [
+            "task_d7_2"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "脚本能跑，数字也对，多余的东西都在。"
+          }
+        ],
+        "kuro": [
+          "Of course."
+        ],
+        "effects": {
+          "flags": [
+            "task_d7_2"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
+    },
+    {
+      "id": "task3",
+      "title": "六份方案。",
+      "app": "docs",
+      "done": "task_d7_3",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "六份，每份四十页，各讲一个口径。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你一份一份写。中午没吃饭，水一口没动。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d7_3",
+            "wrote_six"
+          ],
+          "san": 1
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "它拆成六张清单，没替你写一个字。你照着写。"
+          }
+        ],
+        "kuro": [
+          "Six outlines. Your words, not mine."
+        ],
+        "effects": {
+          "flags": [
+            "task_d7_3",
+            "wrote_six"
+          ],
+          "san": 1,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "右下角的窗口里字流得很快。你点开第 2 份，翻到第 7 页，停下来。"
+          },
+          {
+            "k": "inner",
+            "t": "或者没翻。"
+          }
+        ],
+        "kuro": [
+          "Starting all six."
+        ],
+        "effects": {
+          "flags": [
+            "task_d7_3",
+            "six_by_it"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
+    }
+  ]
+}

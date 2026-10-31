@@ -1,0 +1,170 @@
+{
+  "day": 13,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "task1",
+      "title": "升级通知看一眼。",
+      "app": "docs",
+      "done": "task_d13_1",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "全员。下周。老东西请先收一收。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你读完了。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d13_1"
+          ],
+          "san": 0
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你问它升级什么。"
+          }
+        ],
+        "kuro": [
+          "Everything. I didn't write the notice."
+        ],
+        "effects": {
+          "flags": [
+            "task_d13_1",
+            "asked_upgrade"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你没读。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d13_1"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
+    },
+    {
+      "id": "task2",
+      "title": "收一收老东西。",
+      "app": "docs",
+      "done": "task_d13_2",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "这条不是你写的。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你没收。"
+          },
+          {
+            "k": "inner",
+            "t": "收的是它要的，不是我要的。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d13_2",
+            "refused_tidy"
+          ],
+          "san": 1
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你问它「保持一致」是什么意思。"
+          }
+        ],
+        "kuro": [
+          "It means the things on your desk aren't in the system yet. I can see them now."
+        ],
+        "effects": {
+          "flags": [
+            "task_d13_2",
+            "asked_consistent"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你让它收。桌面条上少了一样东西。"
+          }
+        ],
+        "kuro": [
+          "Let me give them a hand."
+        ],
+        "effects": {
+          "flags": [
+            "task_d13_2",
+            "let_it_tidy"
+          ],
+          "san": -2,
+          "letItDoUnchecked": 1
+        }
+      }
+    }
+  ]
+}

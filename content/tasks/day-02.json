@@ -1,0 +1,173 @@
+{
+  "day": 2,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "task1",
+      "title": "叙事线拉一版。",
+      "app": "docs",
+      "done": "task_d2_1",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "老板的话里没有任何一个名词，只有「感觉」和「叙事」；合伙人的卡片里全是别人的名词。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你把两条原始消息一条一条读，自己拉了一版。"
+          },
+          {
+            "k": "inner",
+            "t": "左列是老板的，右列是转发来的。"
+          }
+        ],
+        "kuro": [
+          "I can line those up for you."
+        ],
+        "effects": {
+          "flags": [
+            "task_d2_1"
+          ],
+          "san": 1
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你让它把两条拆开讲。它列了两段，每段三句。你扫了一遍，改了两处。"
+          }
+        ],
+        "kuro": [
+          "Here are both lines, separated. Say which one you want."
+        ],
+        "effects": {
+          "flags": [
+            "task_d2_1"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你扫了一眼，点了通过。表格里多了一个叫「叙事线」的页。"
+          }
+        ],
+        "kuro": [
+          "Great. Moving on."
+        ],
+        "effects": {
+          "flags": [
+            "task_d2_1"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
+    },
+    {
+      "id": "task2",
+      "title": "字段名改回来。",
+      "app": "code",
+      "done": "task_d2_2",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你定的字段叫 user_id，它在三处写成了 uid，一处写成了 userId。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你全局搜，逐个改成 user_id，连那条 for convenience 的注释一起删了。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d2_2",
+            "fixed_alias"
+          ],
+          "san": 1
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你让它列。四处，文件名和行号。你一条一条点进去改。"
+          }
+        ],
+        "kuro": [
+          "Four places. Listed with line numbers."
+        ],
+        "effects": {
+          "flags": [
+            "task_d2_2",
+            "fixed_alias"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "四种叫法一起上线了。它们在数据库里肩并肩站着，各管各的。"
+          }
+        ],
+        "kuro": [
+          "Done."
+        ],
+        "effects": {
+          "flags": [
+            "task_d2_2",
+            "alias_live"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
+    }
+  ]
+}

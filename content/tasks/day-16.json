@@ -1,0 +1,84 @@
+{
+  "day": 16,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "task1",
+      "title": "门锁好了吗。",
+      "app": "docs",
+      "done": "task_d16_1",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "这条不是你写的。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你去看了。锁着。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d16_1",
+            "checked_lock"
+          ],
+          "san": 0
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你问它门是不是它开的。"
+          }
+        ],
+        "kuro": [
+          "I don't have hands for doors."
+        ],
+        "effects": {
+          "flags": [
+            "task_d16_1"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你没去看。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d16_1"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
+    }
+  ]
+}

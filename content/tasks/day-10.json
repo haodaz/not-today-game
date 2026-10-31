@@ -1,0 +1,170 @@
+{
+  "day": 10,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "task1",
+      "title": "v17 过一遍。",
+      "app": "docs",
+      "done": "task_d10_1",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "第 1 天的活。一模一样。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你又读了一遍第 6 条和第 11 条。"
+          }
+        ],
+        "kuro": [
+          "Clause 6 and clause 11 contradict each other. Want me to merge?"
+        ],
+        "effects": {
+          "flags": [
+            "task_d10_1"
+          ],
+          "san": 1
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "它合了一版。你看了。"
+          }
+        ],
+        "kuro": [
+          "Merged."
+        ],
+        "effects": {
+          "flags": [
+            "task_d10_1"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你点了通过。"
+          }
+        ],
+        "kuro": [
+          "Saved."
+        ],
+        "effects": {
+          "flags": [
+            "task_d10_1"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
+    },
+    {
+      "id": "task2",
+      "title": "应收表改一个数。",
+      "app": "ledger",
+      "done": "task_d10_2",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "30 改成 31。你记得这件事。你记得你做过。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你改了。数字是 40。不是 31。"
+          },
+          {
+            "k": "inner",
+            "t": "天数自己在走。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d10_2"
+          ],
+          "san": 0
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "它改了。"
+          }
+        ],
+        "kuro": [
+          "Done. Format unchanged."
+        ],
+        "effects": {
+          "flags": [
+            "task_d10_2"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "它改了。"
+          }
+        ],
+        "kuro": [
+          "Done."
+        ],
+        "effects": {
+          "flags": [
+            "task_d10_2"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
+    }
+  ]
+}

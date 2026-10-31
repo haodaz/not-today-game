@@ -1,0 +1,255 @@
+{
+  "day": 1,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "task1",
+      "title": "v17 过一遍。",
+      "app": "docs",
+      "done": "task_v17_done",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "克总已经把 v16 和 v17 并排放好了。第 6 条和第 11 条用不同的颜色标着。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你从头读。读到第 6 条，读到第 11 条，你停下来。两条打架。"
+          },
+          {
+            "k": "inner",
+            "t": "白纸黑字，并排躺着。"
+          }
+        ],
+        "kuro": [
+          "Clause 6 and clause 11 contradict each other. Want me to merge?"
+        ],
+        "effects": {
+          "flags": [
+            "task_v17_done",
+            "caught_6_11"
+          ],
+          "san": 1
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "它合了一版。你点开，滚到第 6 条，滚到第 11 条。"
+          }
+        ],
+        "kuro": [
+          "Merged. Clause 11 now yields to clause 6."
+        ],
+        "effects": {
+          "flags": [
+            "task_v17_done"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你点了「通过」。合并版存进了文件夹，名字很整齐。"
+          },
+          {
+            "k": "inner",
+            "t": "你没看。"
+          }
+        ],
+        "kuro": [
+          "Saved."
+        ],
+        "effects": {
+          "flags": [
+            "task_v17_done"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
+    },
+    {
+      "id": "task2",
+      "title": "应收表改一个数。",
+      "app": "ledger",
+      "done": "task_receivable_done",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "甲方那一行，拖欠天数从 30 改成 31。一个格子，十秒钟的事。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你自己改了。那一列还是你的小数点和那种参差。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_receivable_done"
+          ],
+          "san": 0
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "它改了。格式也「顺手」统一了。你敲：格式别动。"
+          }
+        ],
+        "kuro": [
+          "Reverted."
+        ],
+        "effects": {
+          "flags": [
+            "task_receivable_done",
+            "kept_format"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "它改了，顺手把整列格式统一了。31 在甲方那一行，整整齐齐。"
+          }
+        ],
+        "kuro": [
+          "Done."
+        ],
+        "effects": {
+          "flags": [
+            "task_receivable_done"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
+    },
+    {
+      "id": "task3",
+      "title": "存一份合并文档。",
+      "app": "docs",
+      "done": "task_merge_done",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "合并版要存进文件夹，按日期命名。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你自己存的。名字是你起的。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_merge_done"
+          ],
+          "san": 0
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "它存了，你点开确认了一遍。"
+          }
+        ],
+        "kuro": [
+          "Saved under today's date."
+        ],
+        "effects": {
+          "flags": [
+            "task_merge_done"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "它存了。"
+          }
+        ],
+        "kuro": [
+          "Saved."
+        ],
+        "effects": {
+          "flags": [
+            "task_merge_done"
+          ],
+          "san": 0,
+          "letItDoUnchecked": 1
+        }
+      }
+    }
+  ]
+}

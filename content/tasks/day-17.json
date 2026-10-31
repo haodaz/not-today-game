@@ -1,0 +1,83 @@
+{
+  "day": 17,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "task1",
+      "title": "把东西放回去。",
+      "app": "docs",
+      "done": "task_d17_1",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "这条自己打了勾。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "东西已经在桌上了。你没有动它们。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d17_1"
+          ],
+          "san": 0
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你问它是谁放的。"
+          }
+        ],
+        "kuro": [
+          "They came back on their own. I only noticed."
+        ],
+        "effects": {
+          "flags": [
+            "task_d17_1"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你没动。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d17_1"
+          ],
+          "san": 0,
+          "letItDoUnchecked": 1
+        }
+      }
+    }
+  ]
+}
