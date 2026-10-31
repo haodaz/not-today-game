@@ -1,0 +1,169 @@
+{
+  "day": 14,
+  "beats": {
+    "boot": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "晴。墙还是肉的，光是暖的。"
+        },
+        {
+          "k": "narration",
+          "t": "老板说：今天没什么事，你歇一歇。"
+        },
+        {
+          "k": "inner",
+          "t": "十三个月，第一次不勉强。"
+        }
+      ]
+    },
+    "desk": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "合伙人发了一张风景。第一次不是工作卡片。"
+        },
+        {
+          "k": "narration",
+          "t": "老周：保重。"
+        }
+      ]
+    },
+    "shutdown": {
+      "say": [
+        {
+          "k": "speaker",
+          "who": "屏幕",
+          "t": "There was nothing to add."
+        },
+        {
+          "k": "inner",
+          "t": "它说的是我今天写的那一段。或者是我。"
+        }
+      ]
+    },
+    "night": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "没有手。缝里是暗的，很平。"
+        },
+        {
+          "k": "narration",
+          "t": "你等了很久。它没来。"
+        },
+        {
+          "k": "inner",
+          "t": "它没来，比它来更响。"
+        },
+        {
+          "k": "narration",
+          "t": "今天过去了。"
+        }
+      ]
+    }
+  },
+  "items": [
+    {
+      "id": "boot",
+      "text": "开机。",
+      "unlock": "start",
+      "done": "event:boot",
+      "required": true
+    },
+    {
+      "id": "msgs",
+      "text": "看一眼消息。",
+      "unlock": "done:boot",
+      "done": "event:openApp:msgs",
+      "required": true
+    },
+    {
+      "id": "lunch",
+      "text": "点个午饭。",
+      "unlock": "done:msgs",
+      "done": "event:order:lunch",
+      "required": true,
+      "rewrite": "午饭在路上。"
+    },
+    {
+      "id": "task1",
+      "text": "今天没什么事。写点什么。",
+      "unlock": "done:msgs",
+      "done": "flag:task_d14_1",
+      "required": false
+    },
+    {
+      "id": "pickup",
+      "text": "去拿。",
+      "unlock": "event:delivery:arrives:lunch",
+      "done": "event:pickup:lunch",
+      "required": true,
+      "sfx": "doorbell",
+      "onUnlock": {
+        "say": [
+          {
+            "k": "sfx",
+            "t": "叮咚。",
+            "sfx": "doorbell"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eat",
+      "text": "吃。",
+      "unlock": "done:pickup",
+      "done": "event:eat:lunch",
+      "required": false
+    },
+    {
+      "id": "reply",
+      "text": "回老板。",
+      "unlock": "done:task1",
+      "done": "event:reply:boss",
+      "required": true
+    },
+    {
+      "id": "dinner",
+      "text": "点个晚饭。",
+      "unlock": "done:task1",
+      "done": "event:order:dinner",
+      "required": false,
+      "rewrite": "晚饭在路上。"
+    },
+    {
+      "id": "desk",
+      "text": "看一眼桌子。",
+      "unlock": "done:reply",
+      "done": "event:beat:desk",
+      "required": true
+    },
+    {
+      "id": "shutdown",
+      "text": "关机。",
+      "unlock": "done:desk",
+      "done": "event:beat:shutdown",
+      "required": true
+    },
+    {
+      "id": "chat",
+      "text": "和它说会儿话。",
+      "unlock": "done:shutdown",
+      "done": "event:chat:any",
+      "required": false
+    },
+    {
+      "id": "bed",
+      "text": "躺下。",
+      "unlock": "done:shutdown",
+      "done": "event:lieDown",
+      "required": true,
+      "locked": "requiredPending"
+    }
+  ],
+  "delivery": {
+    "minMinutes": 2,
+    "waitMinutes": 4
+  }
+}

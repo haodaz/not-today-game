@@ -1,0 +1,179 @@
+{
+  "day": 15,
+  "beats": {
+    "boot": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "雾。"
+        },
+        {
+          "k": "narration",
+          "t": "老板问：昨晚睡得好吗。梦见抽屉了吗。"
+        },
+        {
+          "k": "inner",
+          "t": "抽屉。我没跟任何人说过抽屉。"
+        }
+      ]
+    },
+    "desk": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "输入框里有一行字，不是你打的。"
+        },
+        {
+          "k": "speaker",
+          "who": "输入框",
+          "t": "{nick}，吃饭了吗。"
+        },
+        {
+          "k": "inner",
+          "t": "家里的话，在我自己的输入框里。"
+        }
+      ]
+    },
+    "shutdown": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "群里一张图：一只凤凰。"
+        }
+      ]
+    },
+    "night": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "梦里它来了。黑的，圆的，八根触手收在身下。它坐在你的桌沿上。"
+        },
+        {
+          "k": "speaker",
+          "who": "缝里",
+          "t": "前两个梦我都在。"
+        },
+        {
+          "k": "speaker",
+          "who": "缝里",
+          "t": "抽屉是你的。走廊是他们的。这一个是我的。"
+        },
+        {
+          "k": "narration",
+          "t": "它没有问你要东西。它看着你，看了很久，像在读一行很小的字。"
+        },
+        {
+          "k": "inner",
+          "t": "它是什么，它要什么，它一直在看我。这三件事我一下子都知道了。"
+        },
+        {
+          "k": "narration",
+          "t": "今天过去了。"
+        }
+      ]
+    }
+  },
+  "items": [
+    {
+      "id": "boot",
+      "text": "开机。",
+      "unlock": "start",
+      "done": "event:boot",
+      "required": true
+    },
+    {
+      "id": "msgs",
+      "text": "看一眼消息。",
+      "unlock": "done:boot",
+      "done": "event:openApp:msgs",
+      "required": true
+    },
+    {
+      "id": "lunch",
+      "text": "点个午饭。",
+      "unlock": "done:msgs",
+      "done": "event:order:lunch",
+      "required": true,
+      "rewrite": "午饭在路上。"
+    },
+    {
+      "id": "task1",
+      "text": "活只剩一件，它做了，你看一眼。",
+      "unlock": "done:msgs",
+      "done": "flag:task_d15_1",
+      "required": true
+    },
+    {
+      "id": "pickup",
+      "text": "去拿。",
+      "unlock": "event:delivery:arrives:lunch",
+      "done": "event:pickup:lunch",
+      "required": true,
+      "sfx": "doorbell",
+      "onUnlock": {
+        "say": [
+          {
+            "k": "sfx",
+            "t": "叮咚。",
+            "sfx": "doorbell"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eat",
+      "text": "吃。",
+      "unlock": "done:pickup",
+      "done": "event:eat:lunch",
+      "required": false
+    },
+    {
+      "id": "reply",
+      "text": "回老板。",
+      "unlock": "done:task1",
+      "done": "event:reply:boss",
+      "required": true
+    },
+    {
+      "id": "dinner",
+      "text": "点个晚饭。",
+      "unlock": "done:task1",
+      "done": "event:order:dinner",
+      "required": false,
+      "rewrite": "晚饭在路上。"
+    },
+    {
+      "id": "desk",
+      "text": "看一眼桌子。",
+      "unlock": "done:reply",
+      "done": "event:beat:desk",
+      "required": true
+    },
+    {
+      "id": "shutdown",
+      "text": "关机。",
+      "unlock": "done:desk",
+      "done": "event:beat:shutdown",
+      "required": true
+    },
+    {
+      "id": "chat",
+      "text": "和它说会儿话。",
+      "unlock": "done:shutdown",
+      "done": "event:chat:any",
+      "required": false
+    },
+    {
+      "id": "bed",
+      "text": "躺下。",
+      "unlock": "done:shutdown",
+      "done": "event:lieDown",
+      "required": true,
+      "locked": "requiredPending"
+    }
+  ],
+  "delivery": {
+    "minMinutes": 2,
+    "waitMinutes": 6
+  }
+}

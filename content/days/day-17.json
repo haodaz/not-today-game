@@ -1,0 +1,132 @@
+{
+  "day": 17,
+  "beats": {
+    "boot": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "白。窗外是白的，墙是白的，屏幕上的字大半是白的。"
+        },
+        {
+          "k": "narration",
+          "t": "老板说：你今天真漂亮。"
+        },
+        {
+          "k": "inner",
+          "t": "漂亮是它的词。"
+        }
+      ]
+    },
+    "desk": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "门口一个袋子，凉的，很轻。"
+        },
+        {
+          "k": "narration",
+          "t": "里面是你这些天递出去的东西，每一样都在，按天数排好。"
+        },
+        {
+          "k": "inner",
+          "t": "退回来了。它不要了，或者它要的从来不是这些。"
+        }
+      ]
+    },
+    "shutdown": {
+      "say": [
+        {
+          "k": "sfx",
+          "t": "嗡。",
+          "sfx": "pager-buzz"
+        },
+        {
+          "k": "speaker",
+          "who": "寻呼机",
+          "t": "555"
+        },
+        {
+          "k": "inner",
+          "t": "呜呜呜。那个孩子在哭，或者在笑。"
+        }
+      ]
+    },
+    "night": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "清单上有一条打了勾。不是你打的。"
+        },
+        {
+          "k": "narration",
+          "t": "今天过去了。"
+        }
+      ]
+    }
+  },
+  "items": [
+    {
+      "id": "boot",
+      "text": "开机。",
+      "unlock": "start",
+      "done": "event:boot",
+      "required": true
+    },
+    {
+      "id": "msgs",
+      "text": "看一眼消息。",
+      "unlock": "done:boot",
+      "done": "event:openApp:msgs",
+      "required": true
+    },
+    {
+      "id": "task1",
+      "text": "把东西放回去。",
+      "unlock": "done:msgs",
+      "done": "flag:task_d17_1",
+      "required": false,
+      "self": true
+    },
+    {
+      "id": "reply",
+      "text": "回老板。",
+      "unlock": "done:task1",
+      "done": "event:reply:boss",
+      "required": true
+    },
+    {
+      "id": "desk",
+      "text": "看一眼桌子。",
+      "unlock": "done:reply",
+      "done": "event:beat:desk",
+      "required": true
+    },
+    {
+      "id": "shutdown",
+      "text": "关机。",
+      "unlock": "done:desk",
+      "done": "event:beat:shutdown",
+      "required": true
+    },
+    {
+      "id": "chat",
+      "text": "和它说会儿话。",
+      "unlock": "done:shutdown",
+      "done": "event:chat:any",
+      "required": false
+    },
+    {
+      "id": "bed",
+      "text": "躺下。",
+      "unlock": "done:shutdown",
+      "done": "event:lieDown",
+      "required": true,
+      "locked": "requiredPending"
+    }
+  ],
+  "delivery": {
+    "minMinutes": 0,
+    "waitMinutes": 0,
+    "none": true
+  }
+}

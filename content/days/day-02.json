@@ -1,0 +1,198 @@
+{
+  "day": 2,
+  "beats": {
+    "boot": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "屋子和昨天一样。雨小了一点，窗玻璃上的水珠停在原地。"
+        },
+        {
+          "k": "narration",
+          "t": "桌上那杯水还在，凉的。"
+        },
+        {
+          "k": "inner",
+          "t": "第二天。昨天的那点光，天亮了就不认账。"
+        }
+      ]
+    },
+    "box": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "第二层。软的，一本三年级的算术课本，封底有一张表，铅笔写的。"
+        },
+        {
+          "k": "inner",
+          "t": "字压得很用力，纸背都透了。"
+        }
+      ]
+    },
+    "desk": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "你拿起小鸡，翻到背面。那个小孔，黑的。"
+        },
+        {
+          "k": "narration",
+          "t": "当年戳了也没用。你还是戳了一下。"
+        },
+        {
+          "k": "inner",
+          "t": "塑料的回弹。和当年一样。"
+        }
+      ]
+    },
+    "shutdown": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "右下角的小窗亮着。你没有立刻躺下。"
+        }
+      ]
+    },
+    "night": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "关屏之前你把下午那份文档又点开了一次。"
+        },
+        {
+          "k": "narration",
+          "t": "有一行不在了。那一行是你自己加的，说这个字段不能有别名。"
+        },
+        {
+          "k": "narration",
+          "t": "修改记录里也没有它。你没有重新写。"
+        },
+        {
+          "k": "inner",
+          "t": "少一行。少的偏偏是那一行。"
+        },
+        {
+          "k": "narration",
+          "t": "今天过去了。"
+        }
+      ]
+    }
+  },
+  "items": [
+    {
+      "id": "boot",
+      "text": "开机。",
+      "unlock": "start",
+      "done": "event:boot",
+      "required": true
+    },
+    {
+      "id": "msgs",
+      "text": "看一眼消息。",
+      "unlock": "done:boot",
+      "done": "event:openApp:msgs",
+      "required": true
+    },
+    {
+      "id": "lunch",
+      "text": "点个午饭。",
+      "unlock": "done:msgs",
+      "done": "event:order:lunch",
+      "required": true,
+      "rewrite": "午饭在路上。"
+    },
+    {
+      "id": "task1",
+      "text": "叙事线拉一版。",
+      "unlock": "done:msgs",
+      "done": "flag:task_d2_1",
+      "required": true
+    },
+    {
+      "id": "task2",
+      "text": "字段名改回来。",
+      "unlock": "done:task1",
+      "done": "flag:task_d2_2",
+      "required": true
+    },
+    {
+      "id": "pickup",
+      "text": "去拿。",
+      "unlock": "event:delivery:arrives:lunch",
+      "done": "event:pickup:lunch",
+      "required": true,
+      "sfx": "doorbell",
+      "onUnlock": {
+        "say": [
+          {
+            "k": "sfx",
+            "t": "叮咚。",
+            "sfx": "doorbell"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eat",
+      "text": "吃。",
+      "unlock": "done:pickup",
+      "done": "event:eat:lunch",
+      "required": false
+    },
+    {
+      "id": "box",
+      "text": "拆第二层。",
+      "unlock": "done:pickup",
+      "done": "event:openBox",
+      "required": true
+    },
+    {
+      "id": "reply",
+      "text": "回老板。",
+      "unlock": "done:task2",
+      "done": "event:reply:boss",
+      "required": true
+    },
+    {
+      "id": "dinner",
+      "text": "点个晚饭。",
+      "unlock": "done:task2",
+      "done": "event:order:dinner",
+      "required": false,
+      "rewrite": "晚饭在路上。"
+    },
+    {
+      "id": "desk",
+      "text": "看一眼桌子。",
+      "unlock": "done:reply",
+      "done": "event:beat:desk",
+      "required": true
+    },
+    {
+      "id": "shutdown",
+      "text": "关机。",
+      "unlock": "done:desk",
+      "done": "event:beat:shutdown",
+      "required": true
+    },
+    {
+      "id": "chat",
+      "text": "和它说会儿话。",
+      "unlock": "done:shutdown",
+      "done": "event:chat:any",
+      "required": false
+    },
+    {
+      "id": "bed",
+      "text": "躺下。",
+      "unlock": "done:shutdown",
+      "done": "event:lieDown",
+      "required": true,
+      "locked": "requiredPending"
+    }
+  ],
+  "delivery": {
+    "minMinutes": 2,
+    "waitMinutes": 6
+  }
+}

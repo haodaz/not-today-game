@@ -1,0 +1,204 @@
+{
+  "day": 4,
+  "beats": {
+    "boot": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "雨大了。窗上的水流成线。"
+        },
+        {
+          "k": "narration",
+          "t": "更新日志 v4.3。一条横线。没写改了什么。"
+        },
+        {
+          "k": "inner",
+          "t": "换版本不写日志，在我手下叫事故，在它这儿叫更新。"
+        }
+      ]
+    },
+    "box": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "第三层。一台寻呼机，黑壳，腰夹断了一半。"
+        },
+        {
+          "k": "narration",
+          "t": "电池仓是空的，两个弹簧片上有一点绿锈。"
+        },
+        {
+          "k": "inner",
+          "t": "它比我以为的轻。"
+        }
+      ]
+    },
+    "desk": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "你把寻呼机放在小鸡旁边。两样东西，一个黑一个黄。"
+        }
+      ]
+    },
+    "shutdown": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "你关了台灯，屋子彻底黑了，只有小鸡那块屏还有一点光。"
+        }
+      ]
+    },
+    "night": {
+      "say": [
+        {
+          "k": "sfx",
+          "t": "嗡。",
+          "sfx": "pager-buzz"
+        },
+        {
+          "k": "narration",
+          "t": "桌面震了一下。一声，短，很响，像有人在木头里敲了一下指节。"
+        },
+        {
+          "k": "narration",
+          "t": "寻呼机屏幕上有一串数字。"
+        },
+        {
+          "k": "speaker",
+          "who": "寻呼机",
+          "t": "0.7734"
+        },
+        {
+          "k": "narration",
+          "t": "你伸手去点克总的小窗。手还没碰到，寻呼机先震了半声。然后小窗才亮。"
+        },
+        {
+          "k": "inner",
+          "t": "它比它先知道。"
+        },
+        {
+          "k": "narration",
+          "t": "今天过去了。"
+        }
+      ]
+    }
+  },
+  "items": [
+    {
+      "id": "boot",
+      "text": "开机。",
+      "unlock": "start",
+      "done": "event:boot",
+      "required": true
+    },
+    {
+      "id": "msgs",
+      "text": "看一眼消息。",
+      "unlock": "done:boot",
+      "done": "event:openApp:msgs",
+      "required": true
+    },
+    {
+      "id": "lunch",
+      "text": "点个午饭。",
+      "unlock": "done:msgs",
+      "done": "event:order:lunch",
+      "required": true,
+      "rewrite": "午饭在路上。"
+    },
+    {
+      "id": "task1",
+      "text": "v17 v18 合一份。",
+      "unlock": "done:msgs",
+      "done": "flag:task_d4_1",
+      "required": true
+    },
+    {
+      "id": "task2",
+      "text": "导出函数：两遍正则。",
+      "unlock": "done:task1",
+      "done": "flag:task_d4_2",
+      "required": true
+    },
+    {
+      "id": "pickup",
+      "text": "去拿。",
+      "unlock": "event:delivery:arrives:lunch",
+      "done": "event:pickup:lunch",
+      "required": true,
+      "sfx": "doorbell",
+      "onUnlock": {
+        "say": [
+          {
+            "k": "sfx",
+            "t": "叮咚。",
+            "sfx": "doorbell"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eat",
+      "text": "吃。",
+      "unlock": "done:pickup",
+      "done": "event:eat:lunch",
+      "required": false
+    },
+    {
+      "id": "box",
+      "text": "拆第三层。",
+      "unlock": "done:pickup",
+      "done": "event:openBox",
+      "required": true
+    },
+    {
+      "id": "reply",
+      "text": "回老板。",
+      "unlock": "done:task2",
+      "done": "event:reply:boss",
+      "required": true
+    },
+    {
+      "id": "dinner",
+      "text": "点个晚饭。",
+      "unlock": "done:task2",
+      "done": "event:order:dinner",
+      "required": false,
+      "rewrite": "晚饭在路上。"
+    },
+    {
+      "id": "desk",
+      "text": "看一眼桌子。",
+      "unlock": "done:reply",
+      "done": "event:beat:desk",
+      "required": true
+    },
+    {
+      "id": "shutdown",
+      "text": "关机。",
+      "unlock": "done:desk",
+      "done": "event:beat:shutdown",
+      "required": true
+    },
+    {
+      "id": "chat",
+      "text": "和它说会儿话。",
+      "unlock": "done:shutdown",
+      "done": "event:chat:any",
+      "required": false
+    },
+    {
+      "id": "bed",
+      "text": "躺下。",
+      "unlock": "done:shutdown",
+      "done": "event:lieDown",
+      "required": true,
+      "locked": "requiredPending"
+    }
+  ],
+  "delivery": {
+    "minMinutes": 2,
+    "waitMinutes": 6
+  }
+}

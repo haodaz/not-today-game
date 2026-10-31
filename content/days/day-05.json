@@ -1,0 +1,240 @@
+{
+  "day": 5,
+  "beats": {
+    "boot": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "雨还在下，和昨天一样，和前天也一样。"
+        },
+        {
+          "k": "narration",
+          "t": "群里有一份新人的方案，五十个点赞。"
+        },
+        {
+          "k": "inner",
+          "t": "年轻人有想法是好事。老板说的。"
+        }
+      ]
+    },
+    "desk": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "活做完了，你把椅子往后推了一点。掌心有汗。"
+        },
+        {
+          "k": "narration",
+          "t": "两块屏之间那条缝，比下午宽了一点。"
+        }
+      ]
+    },
+    "shutdown": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "灯灭了。不是你关的。"
+        },
+        {
+          "k": "narration",
+          "t": "缝里伸出来一只手。很瘦，指节很长，掌心朝上。"
+        },
+        {
+          "k": "inner",
+          "t": "第一次。"
+        }
+      ],
+      "choices": [
+        {
+          "text": "把小鸡举起来。",
+          "effects": {
+            "item_dream": "chick",
+            "san": 1
+          }
+        },
+        {
+          "text": "把那一行账递出去。",
+          "effects": {
+            "item_lost": "loan"
+          },
+          "cond_show": {
+            "has": "lent"
+          }
+        },
+        {
+          "text": "什么都不给。",
+          "effects": {
+            "san": -1
+          }
+        }
+      ]
+    },
+    "night": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "你闭上眼睛。眼皮里先是一片灰白，然后一点一点出现一间屋子。不是这间。"
+        },
+        {
+          "k": "narration",
+          "t": "夏天的尾巴，风扇把光切成一明一暗。开学第一周，第二节课发卷子。"
+        },
+        {
+          "k": "narration",
+          "t": "九十六。你从一年级起没有拿过一百以下的分数。就在那一秒，它在你抽屉里叫了一声。"
+        },
+        {
+          "k": "narration",
+          "t": "整个教室都听见了，没有一个人回头。你也没有。"
+        },
+        {
+          "k": "speaker",
+          "who": "老师",
+          "t": "不能玩物丧志。"
+        },
+        {
+          "k": "narration",
+          "t": "期末那天她把它和成绩单一起递给你。先递成绩单，一百。再递它，屏幕上已经是那座坟。"
+        },
+        {
+          "k": "speaker",
+          "who": "老师",
+          "t": "还是收了对。"
+        },
+        {
+          "k": "inner",
+          "t": "是收走的。不是我不喂。"
+        },
+        {
+          "k": "narration",
+          "t": "今天过去了。"
+        }
+      ]
+    }
+  },
+  "items": [
+    {
+      "id": "boot",
+      "text": "开机。",
+      "unlock": "start",
+      "done": "event:boot",
+      "required": true
+    },
+    {
+      "id": "msgs",
+      "text": "看一眼消息。",
+      "unlock": "done:boot",
+      "done": "event:openApp:msgs",
+      "required": true
+    },
+    {
+      "id": "lunch",
+      "text": "点个午饭。",
+      "unlock": "done:msgs",
+      "done": "event:order:lunch",
+      "required": true,
+      "rewrite": "午饭在路上。"
+    },
+    {
+      "id": "task1",
+      "text": "v15 和 v17 对一遍。",
+      "unlock": "done:msgs",
+      "done": "flag:task_d5_1",
+      "required": true
+    },
+    {
+      "id": "task2",
+      "text": "导出加 CSV。",
+      "unlock": "done:task1",
+      "done": "flag:task_d5_2",
+      "required": true
+    },
+    {
+      "id": "pickup",
+      "text": "去拿。",
+      "unlock": "event:delivery:arrives:lunch",
+      "done": "event:pickup:lunch",
+      "required": true,
+      "sfx": "doorbell",
+      "onUnlock": {
+        "say": [
+          {
+            "k": "sfx",
+            "t": "叮咚。",
+            "sfx": "doorbell"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eat",
+      "text": "吃。",
+      "unlock": "done:pickup",
+      "done": "event:eat:lunch",
+      "required": false
+    },
+    {
+      "id": "loan",
+      "text": "老周的事，回一句。",
+      "unlock": "done:task1",
+      "done": "event:loan:decided",
+      "required": true,
+      "onUnlock": {
+        "say": [
+          {
+            "k": "inner",
+            "t": "四万四。"
+          }
+        ]
+      }
+    },
+    {
+      "id": "reply",
+      "text": "回老板。",
+      "unlock": "done:task2",
+      "done": "event:reply:boss",
+      "required": true
+    },
+    {
+      "id": "dinner",
+      "text": "点个晚饭。",
+      "unlock": "done:task2",
+      "done": "event:order:dinner",
+      "required": false,
+      "rewrite": "晚饭在路上。"
+    },
+    {
+      "id": "desk",
+      "text": "看一眼桌子。",
+      "unlock": "done:reply",
+      "done": "event:beat:desk",
+      "required": true
+    },
+    {
+      "id": "shutdown",
+      "text": "关机。",
+      "unlock": "done:desk",
+      "done": "event:beat:shutdown",
+      "required": true
+    },
+    {
+      "id": "chat",
+      "text": "和它说会儿话。",
+      "unlock": "done:shutdown",
+      "done": "event:chat:any",
+      "required": false
+    },
+    {
+      "id": "bed",
+      "text": "躺下。",
+      "unlock": "done:shutdown",
+      "done": "event:lieDown",
+      "required": true,
+      "locked": "requiredPending"
+    }
+  ],
+  "delivery": {
+    "minMinutes": 2,
+    "waitMinutes": 6
+  }
+}

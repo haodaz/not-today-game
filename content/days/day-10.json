@@ -1,0 +1,205 @@
+{
+  "day": 10,
+  "beats": {
+    "boot": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "台灯的光是黄的。昨天它粉过，今天是黄的，黄得和第一天一样。"
+        },
+        {
+          "k": "narration",
+          "t": "什么都不偏。按钮都在它们该在的地方。"
+        },
+        {
+          "k": "inner",
+          "t": "太正常了。正常得像有人把房间收拾过，等着客人来。"
+        }
+      ]
+    },
+    "box": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "第五层。一盘磁带，一台随身听。盒子的边角磨圆了。"
+        },
+        {
+          "k": "narration",
+          "t": "随身听比你记得的沉，电池仓鼓着一点。"
+        }
+      ]
+    },
+    "desk": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "随身听放在桌沿。仓盖的胶带翘着一角。"
+        }
+      ]
+    },
+    "shutdown": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "灯灭了。缝里伸出来一只手，比哪天都近。"
+        },
+        {
+          "k": "inner",
+          "t": "今天白天什么都没发生。所以是今天。"
+        }
+      ],
+      "choices": [
+        {
+          "text": "把随身听举起来。",
+          "effects": {
+            "item_dream": "tape",
+            "san": 1
+          }
+        },
+        {
+          "text": "什么都不给。",
+          "effects": {
+            "san": -1
+          }
+        }
+      ]
+    },
+    "night": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "黑里有一点光，灰绿色，像从很深的水里往上看。"
+        },
+        {
+          "k": "narration",
+          "t": "有人在很近的地方翻书页，纸边擦过你的耳朵。"
+        },
+        {
+          "k": "inner",
+          "t": "超级什么。空着的地方，我自己填。"
+        },
+        {
+          "k": "narration",
+          "t": "今天过去了。"
+        }
+      ]
+    }
+  },
+  "items": [
+    {
+      "id": "boot",
+      "text": "开机。",
+      "unlock": "start",
+      "done": "event:boot",
+      "required": true
+    },
+    {
+      "id": "msgs",
+      "text": "看一眼消息。",
+      "unlock": "done:boot",
+      "done": "event:openApp:msgs",
+      "required": true
+    },
+    {
+      "id": "lunch",
+      "text": "点个午饭。",
+      "unlock": "done:msgs",
+      "done": "event:order:lunch",
+      "required": true,
+      "rewrite": "午饭在路上。"
+    },
+    {
+      "id": "task1",
+      "text": "v17 过一遍。",
+      "unlock": "done:msgs",
+      "done": "flag:task_d10_1",
+      "required": true
+    },
+    {
+      "id": "task2",
+      "text": "应收表改一个数。",
+      "unlock": "done:task1",
+      "done": "flag:task_d10_2",
+      "required": true
+    },
+    {
+      "id": "pickup",
+      "text": "去拿。",
+      "unlock": "event:delivery:arrives:lunch",
+      "done": "event:pickup:lunch",
+      "required": true,
+      "sfx": "doorbell",
+      "onUnlock": {
+        "say": [
+          {
+            "k": "sfx",
+            "t": "叮咚。",
+            "sfx": "doorbell"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eat",
+      "text": "吃。",
+      "unlock": "done:pickup",
+      "done": "event:eat:lunch",
+      "required": false
+    },
+    {
+      "id": "box",
+      "text": "拆第五层。",
+      "unlock": "done:pickup",
+      "done": "event:openBox",
+      "required": true
+    },
+    {
+      "id": "reply",
+      "text": "回老板。",
+      "unlock": "done:task2",
+      "done": "event:reply:boss",
+      "required": true
+    },
+    {
+      "id": "dinner",
+      "text": "点个晚饭。",
+      "unlock": "done:task2",
+      "done": "event:order:dinner",
+      "required": false,
+      "rewrite": "晚饭在路上。"
+    },
+    {
+      "id": "desk",
+      "text": "看一眼桌子。",
+      "unlock": "done:reply",
+      "done": "event:beat:desk",
+      "required": true
+    },
+    {
+      "id": "shutdown",
+      "text": "关机。",
+      "unlock": "done:desk",
+      "done": "event:beat:shutdown",
+      "required": true
+    },
+    {
+      "id": "chat",
+      "text": "和它说会儿话。",
+      "unlock": "done:shutdown",
+      "done": "event:chat:any",
+      "required": false
+    },
+    {
+      "id": "bed",
+      "text": "躺下。",
+      "unlock": "done:shutdown",
+      "done": "event:lieDown",
+      "required": true,
+      "locked": "requiredPending"
+    }
+  ],
+  "delivery": {
+    "minMinutes": 2,
+    "waitMinutes": 6
+  }
+}

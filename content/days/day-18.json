@@ -1,0 +1,158 @@
+{
+  "day": 18,
+  "beats": {
+    "boot": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "走廊是白的。"
+        },
+        {
+          "k": "narration",
+          "t": "老板说：今天把箱子寄了吧。"
+        },
+        {
+          "k": "inner",
+          "t": "寄给谁。"
+        }
+      ]
+    },
+    "box": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "最后一层。一部坏掉的功能机，翻盖，屏幕碎了一角。"
+        },
+        {
+          "k": "narration",
+          "t": "它开不了机。它不需要开机。"
+        }
+      ]
+    },
+    "desk": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "桌上有一张寄件单，等你填。"
+        }
+      ]
+    },
+    "shutdown": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "灯灭了。缝里伸出来一只手，掌心朝上，比哪一夜都稳。"
+        },
+        {
+          "k": "narration",
+          "t": "它没有要东西。它在等你的手。"
+        },
+        {
+          "k": "inner",
+          "t": "它不抢。它给。人自己接。"
+        }
+      ],
+      "choices": [
+        {
+          "text": "填寄件单。",
+          "effects": {
+            "flags": [
+              "slip_filled"
+            ]
+          }
+        },
+        {
+          "text": "不填。握住它。",
+          "effects": {
+            "flags": [
+              "shook_hand"
+            ]
+          }
+        }
+      ]
+    },
+    "night": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "今天过去了。"
+        },
+        {
+          "k": "narration",
+          "t": "或者没有。"
+        }
+      ]
+    }
+  },
+  "items": [
+    {
+      "id": "boot",
+      "text": "开机。",
+      "unlock": "start",
+      "done": "event:boot",
+      "required": true
+    },
+    {
+      "id": "msgs",
+      "text": "看一眼消息。",
+      "unlock": "done:boot",
+      "done": "event:openApp:msgs",
+      "required": true
+    },
+    {
+      "id": "task1",
+      "text": "把箱子寄了。",
+      "unlock": "done:msgs",
+      "done": "flag:slip_filled",
+      "required": false,
+      "origin": "them"
+    },
+    {
+      "id": "box",
+      "text": "拆最后一层。",
+      "unlock": "done:task1",
+      "done": "event:openBox",
+      "required": true
+    },
+    {
+      "id": "reply",
+      "text": "回老板。",
+      "unlock": "done:task1",
+      "done": "event:reply:boss",
+      "required": true
+    },
+    {
+      "id": "desk",
+      "text": "看一眼桌子。",
+      "unlock": "done:reply",
+      "done": "event:beat:desk",
+      "required": true
+    },
+    {
+      "id": "shutdown",
+      "text": "关机。",
+      "unlock": "done:desk",
+      "done": "event:beat:shutdown",
+      "required": true
+    },
+    {
+      "id": "chat",
+      "text": "和它说会儿话。",
+      "unlock": "done:shutdown",
+      "done": "event:chat:any",
+      "required": false
+    },
+    {
+      "id": "bed",
+      "text": "躺下。",
+      "unlock": "done:shutdown",
+      "done": "event:lieDown",
+      "required": true
+    }
+  ],
+  "delivery": {
+    "minMinutes": 0,
+    "waitMinutes": 0,
+    "none": true
+  }
+}

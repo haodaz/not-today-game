@@ -1,0 +1,179 @@
+{
+  "day": 11,
+  "beats": {
+    "boot": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "台灯的粉回来了，更深。墙上有血管一样的纹路，你没有多看。"
+        },
+        {
+          "k": "narration",
+          "t": "更新日志：Kuro now speaks your language。"
+        },
+        {
+          "k": "inner",
+          "t": "你换模型了。"
+        }
+      ]
+    },
+    "desk": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "寻呼机的屏幕里有什么闪了一下。像一只眼。"
+        }
+      ]
+    },
+    "shutdown": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "你关了屏幕。字消失之后，屏幕里剩一个很小的亮点，一秒，没了。"
+        }
+      ]
+    },
+    "night": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "梦里是一条走廊，墙是青的，从里面透出来的。"
+        },
+        {
+          "k": "narration",
+          "t": "然后走廊有了门，门里是公司。关门前最后一天，你在场。"
+        },
+        {
+          "k": "narration",
+          "t": "所有人都在工位上，脸是新的。不是换了人，是同一个人，只是客气了。"
+        },
+        {
+          "k": "narration",
+          "t": "每个人的屏幕上弹出一个框，框里一句话，下面一个「好」。老周看了一眼，点了。老板在玻璃房里，先点的。"
+        },
+        {
+          "k": "narration",
+          "t": "你走到自己的工位，框也在。你没有点。"
+        },
+        {
+          "k": "inner",
+          "t": "它不抢。它给，人自己接。那个框我见过，试卷最后一页，家长签字处。"
+        },
+        {
+          "k": "narration",
+          "t": "今天过去了。"
+        }
+      ]
+    }
+  },
+  "items": [
+    {
+      "id": "boot",
+      "text": "开机。",
+      "unlock": "start",
+      "done": "event:boot",
+      "required": true
+    },
+    {
+      "id": "msgs",
+      "text": "看一眼消息。",
+      "unlock": "done:boot",
+      "done": "event:openApp:msgs",
+      "required": true
+    },
+    {
+      "id": "lunch",
+      "text": "点个午饭。",
+      "unlock": "done:msgs",
+      "done": "event:order:lunch",
+      "required": true,
+      "rewrite": "午饭在路上。"
+    },
+    {
+      "id": "task1",
+      "text": "对账。让它对，你看一眼。",
+      "unlock": "done:msgs",
+      "done": "flag:task_d11_1",
+      "required": true
+    },
+    {
+      "id": "task2",
+      "text": "色偏那件事，别管。",
+      "unlock": "done:task1",
+      "done": "flag:task_d11_2",
+      "required": true
+    },
+    {
+      "id": "pickup",
+      "text": "去拿。",
+      "unlock": "event:delivery:arrives:lunch",
+      "done": "event:pickup:lunch",
+      "required": true,
+      "sfx": "doorbell",
+      "onUnlock": {
+        "say": [
+          {
+            "k": "sfx",
+            "t": "叮咚。",
+            "sfx": "doorbell"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eat",
+      "text": "吃。",
+      "unlock": "done:pickup",
+      "done": "event:eat:lunch",
+      "required": false
+    },
+    {
+      "id": "reply",
+      "text": "回老板。",
+      "unlock": "done:task2",
+      "done": "event:reply:boss",
+      "required": true
+    },
+    {
+      "id": "dinner",
+      "text": "点个晚饭。",
+      "unlock": "done:task2",
+      "done": "event:order:dinner",
+      "required": false,
+      "rewrite": "晚饭在路上。"
+    },
+    {
+      "id": "desk",
+      "text": "看一眼桌子。",
+      "unlock": "done:reply",
+      "done": "event:beat:desk",
+      "required": true
+    },
+    {
+      "id": "shutdown",
+      "text": "关机。",
+      "unlock": "done:desk",
+      "done": "event:beat:shutdown",
+      "required": true
+    },
+    {
+      "id": "chat",
+      "text": "和它说会儿话。",
+      "unlock": "done:shutdown",
+      "done": "event:chat:any",
+      "required": false
+    },
+    {
+      "id": "bed",
+      "text": "躺下。",
+      "unlock": "done:shutdown",
+      "done": "event:lieDown",
+      "required": true,
+      "locked": "requiredPending"
+    }
+  ],
+  "delivery": {
+    "minMinutes": 2,
+    "waitMinutes": 6
+  }
+}

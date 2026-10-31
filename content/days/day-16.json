@@ -1,0 +1,165 @@
+{
+  "day": 16,
+  "beats": {
+    "boot": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "软件上：商家已打烊。四家店都打烊了。"
+        },
+        {
+          "k": "narration",
+          "t": "老板问：门锁好了吗。"
+        },
+        {
+          "k": "inner",
+          "t": "锁是我锁的。"
+        }
+      ]
+    },
+    "box": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "第七层。一个太阳能计算器，按键发黄。"
+        },
+        {
+          "k": "narration",
+          "t": "你按了几个数，倒过来看。"
+        },
+        {
+          "k": "inner",
+          "t": "它会说的字不多。"
+        }
+      ]
+    },
+    "desk": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "门外有脚步，停在门口。你没有开。"
+        }
+      ]
+    },
+    "shutdown": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "缝里伸出来一只手。"
+        },
+        {
+          "k": "inner",
+          "t": "第七次。"
+        }
+      ],
+      "choices": [
+        {
+          "text": "把计算器举起来。",
+          "effects": {
+            "item_dream": "calculator",
+            "san": 1
+          }
+        },
+        {
+          "text": "什么都不给。",
+          "effects": {
+            "san": -1
+          }
+        }
+      ]
+    },
+    "night": {
+      "say": [
+        {
+          "k": "sfx",
+          "t": "咔。",
+          "sfx": "lock"
+        },
+        {
+          "k": "narration",
+          "t": "门锁自己转了一下，又转回去。"
+        },
+        {
+          "k": "narration",
+          "t": "老周的账号注销了。"
+        },
+        {
+          "k": "narration",
+          "t": "今天过去了。"
+        }
+      ]
+    }
+  },
+  "items": [
+    {
+      "id": "boot",
+      "text": "开机。",
+      "unlock": "start",
+      "done": "event:boot",
+      "required": true
+    },
+    {
+      "id": "msgs",
+      "text": "看一眼消息。",
+      "unlock": "done:boot",
+      "done": "event:openApp:msgs",
+      "required": true
+    },
+    {
+      "id": "task1",
+      "text": "门锁好了吗。",
+      "unlock": "done:msgs",
+      "done": "flag:task_d16_1",
+      "required": true,
+      "origin": "them"
+    },
+    {
+      "id": "box",
+      "text": "拆第七层。",
+      "unlock": "done:task1",
+      "done": "event:openBox",
+      "required": true
+    },
+    {
+      "id": "reply",
+      "text": "回老板。",
+      "unlock": "done:task1",
+      "done": "event:reply:boss",
+      "required": true
+    },
+    {
+      "id": "desk",
+      "text": "看一眼桌子。",
+      "unlock": "done:reply",
+      "done": "event:beat:desk",
+      "required": true
+    },
+    {
+      "id": "shutdown",
+      "text": "关机。",
+      "unlock": "done:desk",
+      "done": "event:beat:shutdown",
+      "required": true
+    },
+    {
+      "id": "chat",
+      "text": "和它说会儿话。",
+      "unlock": "done:shutdown",
+      "done": "event:chat:any",
+      "required": false
+    },
+    {
+      "id": "bed",
+      "text": "躺下。",
+      "unlock": "done:shutdown",
+      "done": "event:lieDown",
+      "required": true,
+      "locked": "requiredPending"
+    }
+  ],
+  "delivery": {
+    "minMinutes": 0,
+    "waitMinutes": 0,
+    "none": true
+  }
+}

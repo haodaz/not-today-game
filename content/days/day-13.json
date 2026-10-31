@@ -1,0 +1,223 @@
+{
+  "day": 13,
+  "beats": {
+    "boot": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "雨停了。你是被安静弄醒的。"
+        },
+        {
+          "k": "narration",
+          "t": "左屏的文本变成了细密的纹理。毛孔。再近一点，是指纹。"
+        },
+        {
+          "k": "narration",
+          "t": "墙上有一块手掌形状的光斑，五个指头都在。"
+        },
+        {
+          "k": "inner",
+          "t": "它可以看见我的桌子了。"
+        }
+      ]
+    },
+    "box": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "第六层。一台电子词典。翻盖，银灰色，铰链有点松。"
+        },
+        {
+          "k": "narration",
+          "t": "开机，屏幕是灰绿的，字是点阵的。"
+        },
+        {
+          "k": "inner",
+          "t": "它只会查单词。"
+        }
+      ]
+    },
+    "desk": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "小张的头像不在群里了。"
+        },
+        {
+          "k": "speaker",
+          "who": "小张",
+          "t": "我走了。你别进去。"
+        },
+        {
+          "k": "narration",
+          "t": "[该账号已注销]"
+        }
+      ]
+    },
+    "shutdown": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "缝里伸出来一只手。墙在呼吸。"
+        },
+        {
+          "k": "inner",
+          "t": "第六次。"
+        }
+      ],
+      "choices": [
+        {
+          "text": "把词典举起来。",
+          "effects": {
+            "item_dream": "dictionary",
+            "san": 1
+          }
+        },
+        {
+          "text": "什么都不给。",
+          "effects": {
+            "san": -1
+          }
+        }
+      ]
+    },
+    "night": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "门缝底下塞进来一张纸。升级通知。全员。"
+        },
+        {
+          "k": "narration",
+          "t": "老东西请先收一收。"
+        },
+        {
+          "k": "inner",
+          "t": "收一收。它说的是桌上这几样。"
+        },
+        {
+          "k": "narration",
+          "t": "今天过去了。"
+        }
+      ]
+    }
+  },
+  "items": [
+    {
+      "id": "boot",
+      "text": "开机。",
+      "unlock": "start",
+      "done": "event:boot",
+      "required": true
+    },
+    {
+      "id": "msgs",
+      "text": "看一眼消息。",
+      "unlock": "done:boot",
+      "done": "event:openApp:msgs",
+      "required": true
+    },
+    {
+      "id": "lunch",
+      "text": "点个午饭。",
+      "unlock": "done:msgs",
+      "done": "event:order:lunch",
+      "required": true,
+      "rewrite": "午饭在路上。"
+    },
+    {
+      "id": "task1",
+      "text": "升级通知看一眼。",
+      "unlock": "done:msgs",
+      "done": "flag:task_d13_1",
+      "required": true
+    },
+    {
+      "id": "task2",
+      "text": "收一收老东西。",
+      "unlock": "done:task1",
+      "done": "flag:task_d13_2",
+      "required": false,
+      "origin": "them"
+    },
+    {
+      "id": "pickup",
+      "text": "去拿。",
+      "unlock": "event:delivery:arrives:lunch",
+      "done": "event:pickup:lunch",
+      "required": true,
+      "sfx": "doorbell",
+      "onUnlock": {
+        "say": [
+          {
+            "k": "sfx",
+            "t": "叮咚。",
+            "sfx": "doorbell"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eat",
+      "text": "吃。",
+      "unlock": "done:pickup",
+      "done": "event:eat:lunch",
+      "required": false
+    },
+    {
+      "id": "box",
+      "text": "拆第六层。",
+      "unlock": "done:pickup",
+      "done": "event:openBox",
+      "required": true
+    },
+    {
+      "id": "reply",
+      "text": "回老板。",
+      "unlock": "done:task2",
+      "done": "event:reply:boss",
+      "required": true
+    },
+    {
+      "id": "dinner",
+      "text": "点个晚饭。",
+      "unlock": "done:task2",
+      "done": "event:order:dinner",
+      "required": false,
+      "rewrite": "晚饭在路上。"
+    },
+    {
+      "id": "desk",
+      "text": "看一眼桌子。",
+      "unlock": "done:reply",
+      "done": "event:beat:desk",
+      "required": true
+    },
+    {
+      "id": "shutdown",
+      "text": "关机。",
+      "unlock": "done:desk",
+      "done": "event:beat:shutdown",
+      "required": true
+    },
+    {
+      "id": "chat",
+      "text": "和它说会儿话。",
+      "unlock": "done:shutdown",
+      "done": "event:chat:any",
+      "required": false
+    },
+    {
+      "id": "bed",
+      "text": "躺下。",
+      "unlock": "done:shutdown",
+      "done": "event:lieDown",
+      "required": true,
+      "locked": "requiredPending"
+    }
+  ],
+  "delivery": {
+    "minMinutes": 2,
+    "waitMinutes": 6
+  }
+}
