@@ -87,3 +87,23 @@ Push on lie-down and every 20 events (the store subscription in main.ts). Pull o
 The sync decision table; `decideTurn` (bedtime at the sixth call); the prompt assembly (order,
 cache_control, no names); judgement validation; the function's request/response helpers against a
 mocked SDK response; the client fallback with a mocked invoke. Nothing calls the real API.
+
+## 绑定邮箱 (FR1, 2026-11-01)
+
+- Row model (`src/net/email.ts`, pure): `hidden` unless configured and signed in; `bound` when the
+  session's user is not anonymous and has an email; otherwise `input` with draft and status
+  (idle / sending / sent / error). The draft and status live in the module, so re-renders in the
+  game and on the title page keep them.
+- Markup (`emailRowHtml` in `world/room/hud.ts`, inside `settingsPanel`, before the actions):
+  - a label, an `<input type="email">` (Enter sends) and 发送链接;
+  - a status line (`role="status"`) that shows the hint, then sent or error;
+  - while sending, the input and button are disabled;
+  - bound shows `settings.emailBound`.
+- Call (`net.bindEmail(email, origin)`):
+  - with a session: `auth.updateUser({ email }, { emailRedirectTo: origin })`, the anonymous →
+    email upgrade that keeps the user id;
+  - without one: `auth.signInWithOtp({ email, options: { emailRedirectTo: origin,
+    shouldCreateUser: true } })`.
+  - `origin` is `location.origin`.
+  - An address that doesn't look like one, or a server error, shows the error line; typing again
+    clears it.

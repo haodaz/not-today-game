@@ -687,3 +687,31 @@ Appended after each task. Neither Kiro nor Claude edits the other's area without
   reading the first page.
 - Tests: 54 files, 835 passing (which also confirms last turn's motion-dom timeout fix); typecheck
   clean. Not seen in a browser.
+
+## 2026-11-01 — pull-out answers; 绑定邮箱
+
+- Pull-out (room-scene S16b):
+  - It plays only after day 18's shutdown choice (the bedtime branch). A shutdown SAN-0 bad
+    ending skips it.
+  - The camera looks at the desk pose's look target.
+  - Good keeps the 2 s cut to the credits.
+  - `lerpPose` is bounded to its endpoints (a one-ulp overshoot past the new desk x tripped the
+    clamp in the property test).
+- 绑定邮箱 (backend FR1), in the settings panel in the game and on the title page:
+  - `src/net/email.ts` holds the pure row model (hidden / input / bound), the typed draft and the
+    status (idle / sending / sent / error).
+  - The row uses the existing strings `settings.bindEmail` … `settings.emailError`.
+  - Hidden unless configured and signed in. Bound when the session's user has an email and isn't
+    anonymous.
+  - Send:
+    - with a session (the anonymous user): `auth.updateUser({ email }, { emailRedirectTo: origin })`;
+    - with no session: `auth.signInWithOtp({ email, options: { emailRedirectTo: origin,
+      shouldCreateUser: true } })`.
+
+    The spec asked for `signInWithOtp`. In supabase-js 2.x that signs in as a separate user, while
+    `updateUser({ email })` is the documented anonymous → email upgrade, which keeps the user id and
+    therefore the run (RLS by `auth.uid()`). So that's the path used whenever a session exists.
+  - `setSupabaseForTests` injects a mocked client.
+- Snapshots: none changed. No snapshot has the settings panel open, and the row is hidden without
+  env, as in every other test. Tests in `tests/email.test.ts`.
+- Tests: 55 files, 847 passing; typecheck clean. Not seen in a browser; no real auth call made.

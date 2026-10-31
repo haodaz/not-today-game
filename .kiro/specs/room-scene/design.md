@@ -156,6 +156,16 @@ Calibrated framings (Claude, `?splatcal=1`): room fov 48.5, desk pos (−0.345, 
     night wash, and `#app.splat-pull` hides the photo island. Otherwise the photo island plays.
   - A pull-out already under way never switches to the splat.
   - The letterbox is black during the pull-out (`applyFit(…, null)`).
+- **S16b. Answers 2026-11-01.**
+  - The pull-out belongs to the bedtime branch only. `pullOutApplies(state, events)`: last day, and
+    a `choose` of day 18's `shutdown` beat in the log before the `ending`. A SAN-0 bad ending at
+    day 18's shutdown comes before that choice and goes straight to 你和你.
+  - The gaze turns onto `PULL_LOOK_AT`, the desk pose's look target from calibration.ts. The
+    island's size still uses `ROOM_CENTRE` (where the room is), because the look target lies about
+    24 units beyond the desk.
+  - Good keeps the 2 s cut to the credits; the door page comes with the door animation.
+  - Fix: `lerpPose` never leaves its endpoints. Floating point overshot the calibrated desk x by
+    one ulp and tripped the clamp.
 - **S18. Open.**
   - Good's "the door opens instead": no door animation exists yet. Good cuts at 2 s to its
     usual credits → day 19.

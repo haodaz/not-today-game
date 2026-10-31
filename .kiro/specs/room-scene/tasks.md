@@ -25,3 +25,4 @@
 - [x] 17. Splat layer: the scripted pull, `#app.splat-pull`. Black letterbox.
 - [x] 18. Tests (`tests/pullout.test.ts`); `tests/endings.test.ts` runs the cut before the pages.
 - [ ] 19. Browser check: the splat island against the mask; how the 2 s good cut feels; the door opening (later segment).
+- [x] 20. Answers: the pull-out only after the bedtime branch (a shutdown bad skips it); gaze on the desk pose's look target; good's 2 s cut kept. `lerpPose` bounded to its endpoints.

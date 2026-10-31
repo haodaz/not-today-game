@@ -65,13 +65,19 @@ const lerp = (a: number, b: number, t: number) => {
   return Math.min(Math.max(v, Math.min(a, b)), Math.max(a, b));
 };
 
+/** Where the short arc from a to b ends, exactly b when no turn through ±π is involved. */
+const arcEnd = (a: number, b: number): number => {
+  const end = a + angleDelta(a, b);
+  return Math.abs(end - b) < 1e-9 ? b : end;
+};
+
 /** From a (t = 0) to b (t = 1): position linear, yaw and pitch along the short arc. */
 export function lerpPose(a: Pose, b: Pose, t: number): Pose {
   const fov = a.fov !== undefined && b.fov !== undefined ? lerp(a.fov, b.fov, t) : (a.fov ?? b.fov);
   return {
     pos: v(lerp(a.pos.x, b.pos.x, t), lerp(a.pos.y, b.pos.y, t), lerp(a.pos.z, b.pos.z, t)),
-    yaw: a.yaw + angleDelta(a.yaw, b.yaw) * t,
-    pitch: a.pitch + angleDelta(a.pitch, b.pitch) * t,
+    yaw: lerp(a.yaw, arcEnd(a.yaw, b.yaw), t),
+    pitch: lerp(a.pitch, arcEnd(a.pitch, b.pitch), t),
     ...(fov !== undefined ? { fov } : {}),
   };
 }
