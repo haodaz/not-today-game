@@ -63,7 +63,7 @@ describe("FR5 checklist snapshots", () => {
     const store = storeAt(18, [
       step("boot"),
       step("openApp:msgs"),
-      { kind: "task", flag: "slip_filled", mode: "look" },
+      { kind: "task", flag: "task_d18_seen", mode: "look" },
       { kind: "openLayer", objectId: boxObjectFor(18)! },
       { kind: "reply", choice: "fine", recipient: "boss", t: "10:00" },
       step("beat:desk"),
