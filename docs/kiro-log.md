@@ -66,3 +66,33 @@ Appended after each task. Neither Kiro nor Claude edits the other's area without
   - `delivery.shop.closed` (closed-shop label) is not in `zh.json`;
   - the typo drift swaps two adjacent characters of one shop name; authored typo names would
     replace this.
+
+## desktop-ui
+
+- The desktop is real components: pure `(model) → HTML` views (auto-escaping template), one
+  controller that mounts, re-renders and turns `data-action` clicks into events or session
+  changes. `npm run dev` shows day 1; `?day=N` jumps (never touches saves); `?beat=night&t=23:41`
+  sets the stand-in beat clock; `?focus=left|right` or key F shows one monitor; `?lang=en`.
+- `src/world/desktop/desktop.css` is the mock's `design.css` with tokens and classes kept, the
+  mock-only `.note` removed, additions marked at the end.
+- world-state amendment: `reply` takes an optional beat time `t`; new event kind
+  `open {target: browser | conv:<recipient>, t}` (opening a conversation increments `readCount`;
+  opening the browser is citeable).
+- Decisions waiting on the author (design.md §2): U1 the beat clock is a stand-in until the day
+  engine (lines due later move it forward); U3 conversations are rebuilt from the log; U5 the
+  changelog collapses from the first day of the second ring; U6 ring layer values; U8 Kuro's
+  body precedence and frame table.
+- TODO(Claude), content:
+  - `content/workbench/day-NN.json` (schema proposed in desktop-ui design §6). None exist, so the
+    workbench shows its structure, the store's numbers and empty sections; no mock copy was
+    transcribed into `src/` or `content/`.
+  - `content/tasks/` (work-task trees): the workbench modes and buttons are inert hooks until then.
+  - strings `wb.now.letItDo` ("让它做而没看一眼 · {n} 次" in the mock) and `wb.now.count`; they
+    render as ⟦key⟧ and are the only keys missing on any day (a test enforces the list).
+  - optional `msgs.<conversation>.av` avatar letters (now: first character of the name).
+  - 朋友圈 has no content; it is a label only.
+  - an explicit changelog-collapse day in stages.json would replace U5.
+- The Kuro small window renders the day's idiom, starters, turns and the bedtime line;
+  answering is the kuro-chat spec's (`data-action="kuro-ask"` hook, unhandled).
+- Delivery: shops now carry authored `typo` names (Claude, 2026-10-31); the typo drift uses them.
+  The day-1 receipt text changed in content; its delivery snapshot was updated accordingly.

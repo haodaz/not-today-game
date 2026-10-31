@@ -82,19 +82,21 @@ src/world/
     beat.ts          BeatClock, parseBeatParams(search), beat labels, greeting key
     rings.ts         desktopRing(day, beat) with calm daytime
     shell.ts         renderDesktop(model): two monitors, top bars, dock, plates, layout
-    model.ts         DesktopModel (store state + events + session) → per-app view models
-    controller.ts    mount(root, deps): render loop, delegated actions, live plan runtime
+    model.ts         Session, AppContext, buildShell (store state + events + session → shell model)
+    apps.ts          the app renderers; actions.ts the app actions (each app module plugs in)
+    controller.ts    mount(root, deps): render loop, delegated actions, body crossfade, fit/focus
     messages/
       transcript.ts  conversation rebuild (U3), previews, unread
       bubbles.ts     line text → body (voice / transcript / card / attachment / system)
       view.ts        list + conversation + reply bar
+      actions.ts     conv / chip / gone / send, live plan runtime
     kuro/
       days.ts        kuro-days/day-NN.md parser (idiom, starter questions) + guard
       mini.ts        small window view
       body.ts        state precedence, frame table, sprite markup + DOM crossfade controller
     workbench/
       data.ts        content/workbench/day-NN.json loader + guard (none yet)
-      home.ts, docs.ts, ledger.ts, code.ts, side.ts
+      view.ts        sidebar, home, 文档, 账本, 代码; actions.ts wb-nav
     browser/
       data.ts        content/browser/day-NN.json loader + guard
       view.ts
