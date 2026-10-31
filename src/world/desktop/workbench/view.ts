@@ -2,8 +2,10 @@
 // pages (文档 / 账本 / 代码), as in design/desktop/wb-*.html. Copy from strings, day data from
 // content/workbench (design U4), live numbers from the store. Work-task actions are inert hooks
 // until content/tasks/ exists.
+import { TASK_MODES } from "@state/days/effects";
 import { constants } from "@state/variables";
 import { ringOf } from "@state/stages";
+import { loopContext, openTask } from "@world/loop/checklist";
 import type { State } from "@state/types.gen";
 import { cls, html, type SafeHtml } from "@world/html";
 import { tr } from "@world/i18n";
@@ -86,10 +88,13 @@ function home(ctx: AppContext, data: WorkbenchDay | null, fill: Fill): SafeHtml 
   const items = (data?.common?.items ?? []).map((i) => html`<div><em>${fill(i.tag)}</em>${fill(i.text)}</div>`);
   const chips = (data?.continue ?? []).map((c) => html`<span>${fill(c)}</span>`);
   const modes = (["wb.mode.self", "wb.mode.look", "wb.mode.let"] as const).map(
-    (key, i) => html`<span class="${i === 0 ? "on" : ""}" data-action="wb-mode" data-mode="${key}">${tr(key)}</span>`,
+    (key, i) => html`<span class="${TASK_MODES[i] === ctx.session.wbMode ? "on" : ""}" data-action="wb-mode" data-mode="${key}">${tr(key)}</span>`,
   );
+  // The work task waiting in the checklist (design day-loop L2), as written in content.
+  const lc = loopContext(ctx.state, ctx.events);
+  const task = lc ? openTask(lc) : null;
 
-  return html`<div class="main"><div class="hello"><img src="${frameUrl(FRAMES.idle[0])}" alt=""><div><h1>${tr(greetingKey(ctx.session.clock.beat))}</h1><p>${tr("wb.hello.sub")}</p></div></div><div class="ask"><div class="ph">${tr("wb.ask.ph")}</div><div class="modes">${modes}<span style="border:0;color:var(--ink-3)">${tr("wb.scope")}</span><button type="button" class="go" data-action="wb-ask">↑</button></div></div><div class="cards">${doing}${docs}${ledger}${now}${changelog}</div><div class="sect"><h3>${tr("wb.common")}<small>${tr("wb.common.sub")}</small></h3><div class="tabs">${tabs}</div><div class="qa">${items}</div></div><div class="sect"><h3>${tr("wb.continue")}</h3><div class="chips">${chips}</div></div></div>`;
+  return html`<div class="main"><div class="hello"><img src="${frameUrl(FRAMES.idle[0])}" alt=""><div><h1>${tr(greetingKey(ctx.session.clock.beat))}</h1><p>${tr("wb.hello.sub")}</p></div></div><div class="ask"><div class="ph"${task ? html` data-task="${task.id}" style="color:var(--ink)"` : null}>${task ? fill(task.text) : tr("wb.ask.ph")}</div><div class="modes">${modes}<span style="border:0;color:var(--ink-3)">${tr("wb.scope")}</span><button type="button" class="go" data-action="wb-ask">↑</button></div></div><div class="cards">${doing}${docs}${ledger}${now}${changelog}</div><div class="sect"><h3>${tr("wb.common")}<small>${tr("wb.common.sub")}</small></h3><div class="tabs">${tabs}</div><div class="qa">${items}</div></div><div class="sect"><h3>${tr("wb.continue")}</h3><div class="chips">${chips}</div></div></div>`;
 }
 
 function header(title: SafeHtml | string | null, meta: SafeHtml | string | null, buttons: readonly [string, "" | "eye" | "do", string][]): SafeHtml {

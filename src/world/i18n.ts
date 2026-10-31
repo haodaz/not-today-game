@@ -18,6 +18,10 @@ export function setLocale(next: Locale): void {
   locale = next;
 }
 
+export function getLocale(): Locale {
+  return locale;
+}
+
 function lookup(key: string): string | undefined {
   if (key.startsWith("_")) return undefined;
   // The chosen locale first; English falls back to Chinese, Chinese to English.

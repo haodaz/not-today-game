@@ -117,34 +117,45 @@ describe("renderDesktop", () => {
     night: false,
     monitors: [mon("left"), mon("right")],
     dock: { active: "msgs", badges: { msgs: 5, workbench: 0, browser: 0 } },
-    focus: "both",
+    focus: "left",
     ...over,
   });
 
-  it("shows brand, day and beat, weather, the dock with badges, and both app bodies", () => {
+  it("shows one monitor at a time: brand, day and beat, weather, the dock with badges, its app body", () => {
     const out = renderDesktop(model()).value;
     expect(out).toContain(t("shell.brand"));
     expect(out).toContain(`${t("shell.day", { day: 1 })} · ${t("shell.beat.boot")} 09:03`);
     expect(out).toContain(`☁ ${t("shell.weather.rain")}`);
     expect(out).toContain('<span class="badge">5</span>');
+    expect(out.match(/class="monitor/g)).toHaveLength(1);
     expect(out.match(/class="dock"/g)).toHaveLength(1);
     expect(out).toContain("BODY-left");
-    expect(out).toContain("BODY-right");
+    expect(out).not.toContain("BODY-right");
   });
 
-  it("at night every app shows its plate and the badges go", () => {
+  it("has a 左屏 / 右屏 toggle and the other monitor as a thin tab on its side (amendment 2026-11-01)", () => {
+    const left = renderDesktop(model()).value;
+    expect(left).toContain('class="screen-toggle"');
+    expect(left).toContain('<button type="button" class="on" data-action="screen" data-screen="left">');
+    expect(left).toContain('class="other-tab" data-side="right"');
+    const right = renderDesktop(model({ focus: "right" })).value;
+    expect(right).toContain("BODY-right");
+    expect(right).not.toContain('class="dock"');
+    // The left monitor's tab carries the dock's badges.
+    expect(right).toContain('class="other-tab" data-side="left"');
+    expect(right).toContain("<b>5</b>");
+  });
+
+  it("at night the app shows its plate and the badges go", () => {
     const out = renderDesktop(model({ night: true, clock: { beat: "night", time: "23:41" } })).value;
     expect(out).not.toContain("BODY-");
     expect(out).toContain(t("night.plate.title"));
-    expect(out).toContain(t("night.plate.sub.workbench"));
     expect(out).not.toContain('class="badge"');
-    expect(out.match(/class="monitor night"/g)).toHaveLength(2);
+    expect(out).toContain('class="monitor night"');
+    expect(renderDesktop(model({ night: true, focus: "right", clock: { beat: "night", time: "23:41" } })).value).toContain(t("night.plate.sub.workbench"));
   });
 
-  it("marks the ring on both monitors and can focus one", () => {
-    const out = renderDesktop(model({ ring: "room", focus: "right" })).value;
-    expect(out.match(/data-ring="room"/g)).toHaveLength(2);
-    expect(out).toContain("stage focus-right");
-    expect(out).not.toContain('class="gap"');
+  it("marks the ring on the monitor", () => {
+    expect(renderDesktop(model({ ring: "room", focus: "right" })).value.match(/data-ring="room"/g)).toHaveLength(1);
   });
 });

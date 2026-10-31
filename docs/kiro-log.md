@@ -96,3 +96,29 @@ Appended after each task. Neither Kiro nor Claude edits the other's area without
   answering is the kuro-chat spec's (`data-action="kuro-ask"` hook, unhandled).
 - Delivery: shops now carry authored `typo` names (Claude, 2026-10-31); the typo drift uses them.
   The day-1 receipt text changed in content; its delivery snapshot was updated accordingly.
+
+## day-loop (2026-11-01)
+
+- `content/days/` is Claude's; `src/state/days/table.ts` reads, checks strictly (keys, line kinds,
+  condition tokens, item references, choice effects) and freezes it.
+- world-state amendment: three event kinds. `step {name, t}` records loop moments; `choose
+  {beat, index}` applies a choice's effects (flags, san, item_dream → `dream`; `item_lost` is
+  logged only); `task {flag, mode}` sets a work-task flag (stand-in for `content/tasks/`).
+- `event:loan:decided` (day 5) is supported: the item opens a two-choice prompt that appends the
+  recipient-less `reply` (lend / no) world-state already uses for the loan.
+- Desktop amendment applied: one monitor at a time, 左屏 / 右屏 toggle, ← →, the other monitor as
+  a thin tab with its badges, Kuro's small window on the shown monitor, 房间 chip / Esc back.
+- Decisions waiting on the author (day-loop design §2): L2 the workbench ask box completes the
+  open work task until task trees exist; L5 arrival timing; L6 the loop drives the stand-in beat
+  clock (times from the mocks); L7 heart-rate chip from day 9 and its bpm formula; L9 desk bar.
+- Content question for Claude: day 18's `reply` unlocks on `done:task1`, whose flag `slip_filled`
+  is also what the shutdown choice "填寄件单" sets. Today the stand-in can set it from the
+  workbench, so the day is finishable, but the good ending is "do not fill the slip".
+- TODO(Claude), strings: `hud.today` 今日, `hud.done` 已做 {n} 件, `hud.overdue` 拖欠 {n} 天,
+  `hud.hr` {bpm} bpm, `hud.cam.room` 房间, `hud.cam.desk` 桌面, `hud.cam.door` 门,
+  `hud.menu.sound` 声音, `hud.menu.lang` 语言, `hud.menu.restart` 重新开始, `hud.phone` 手机,
+  `hud.box.left` 剩 {n} 层, `loop.loan.lend` (the lend choice), `desktop.screen.left` 左屏,
+  `desktop.screen.right` 右屏. Suggested values are the mocks'.
+- TODO, assets: `public/room/shots/desk_close.jpg` does not exist; the room falls back to
+  `design/hud/bg_desk.jpg` (dev only). `public/sfx/` does not exist; sounds are silent (FR3).
+- TODO(Claude), optional: `stages.json heartRateFromDay`.

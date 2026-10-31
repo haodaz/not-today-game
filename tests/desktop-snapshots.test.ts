@@ -6,14 +6,14 @@ import { constants } from "@state/variables";
 import { desktopApps } from "@world/desktop/apps";
 import { BEATS, type BeatClock } from "@world/desktop/beat";
 import { buildShell, initialSession, type Session, type WorkbenchPage } from "@world/desktop/model";
-import { renderDesktop, type AppId } from "@world/desktop/shell";
+import { renderDesktop, type AppId, type Side } from "@world/desktop/shell";
 import { missingKeys, resetMissing } from "@world/i18n";
 
 const NOW_MS = Date.UTC(2026, 9, 31, 12);
 
-function desktop(day: number, clock: BeatClock, leftApp: AppId = "msgs", page: WorkbenchPage = "home"): string {
+function desktop(day: number, clock: BeatClock, leftApp: AppId = "msgs", page: WorkbenchPage = "home", focus: Side = "left"): string {
   const store = createStore({ startDay: day });
-  const session: Session = { ...initialSession(clock), leftApp, workbenchPage: page };
+  const session: Session = { ...initialSession(clock, focus), leftApp, workbenchPage: page };
   return renderDesktop(buildShell(store.getState(), store.getEvents(), session, desktopApps, NOW_MS, day)).value;
 }
 
@@ -26,8 +26,11 @@ const scenes: readonly [string, number, BeatClock][] = [
 
 describe("desktop snapshots (requirements §3)", () => {
   for (const [name, day, clock] of scenes) {
-    it(`${name}: 消息 + 工作台 + Kuro`, () => {
-      expect(desktop(day, clock, "msgs")).toMatchSnapshot();
+    it(`${name}: 左屏 消息 + Kuro`, () => {
+      expect(desktop(day, clock, "msgs", "home", "left")).toMatchSnapshot();
+    });
+    it(`${name}: 右屏 工作台 + Kuro`, () => {
+      expect(desktop(day, clock, "msgs", "home", "right")).toMatchSnapshot();
     });
     it(`${name}: 浏览器`, () => {
       expect(desktop(day, clock, "browser")).toMatchSnapshot();
@@ -36,7 +39,13 @@ describe("desktop snapshots (requirements §3)", () => {
 
   it("day 1: 工作台 inner pages", () => {
     for (const page of ["docs", "ledger", "code"] as const) {
-      expect(desktop(1, { beat: "work", time: "10:00" }, "msgs", page), page).toMatchSnapshot();
+      expect(desktop(1, { beat: "work", time: "10:00" }, "msgs", page, "right"), page).toMatchSnapshot();
+    }
+  });
+
+  it("never shows the two monitors side by side (amendment 2026-11-01)", () => {
+    for (const focus of ["left", "right"] as const) {
+      expect(desktop(1, { beat: "work", time: "10:00" }, "msgs", "home", focus).match(/class="monitor/g), focus).toHaveLength(1);
     }
   });
 
@@ -59,7 +68,9 @@ describe("strings", () => {
     for (let day = 1; day <= constants.lastDay; day++) {
       for (const beat of BEATS) {
         for (const app of ["msgs", "workbench", "browser"] as const) {
-          for (const page of ["home", "docs", "ledger", "code"] as const) desktop(day, { beat, time: "12:00" }, app, page);
+          for (const page of ["home", "docs", "ledger", "code"] as const) {
+            for (const focus of ["left", "right"] as const) desktop(day, { beat, time: "12:00" }, app, page, focus);
+          }
         }
       }
     }

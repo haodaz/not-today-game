@@ -100,24 +100,24 @@
       "required": true
     },
     {
-      "id": "task1",
-      "text": "把箱子寄了。",
+      "id": "box",
+      "text": "拆最后一层。",
       "unlock": "done:msgs",
+      "done": "event:openBox",
+      "required": true
+    },
+    {
+      "id": "slip",
+      "text": "把箱子寄了。",
+      "unlock": "done:box",
       "done": "flag:slip_filled",
       "required": false,
       "origin": "them"
     },
     {
-      "id": "box",
-      "text": "拆最后一层。",
-      "unlock": "done:task1",
-      "done": "event:openBox",
-      "required": true
-    },
-    {
       "id": "reply",
       "text": "回老板。",
-      "unlock": "done:task1",
+      "unlock": "done:msgs",
       "done": "event:reply:boss",
       "required": true
     },

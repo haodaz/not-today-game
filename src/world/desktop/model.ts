@@ -5,17 +5,45 @@ import type { GameEvent } from "@state/events";
 import type { State } from "@state/types.gen";
 import { html, type SafeHtml } from "@world/html";
 import { tr } from "@world/i18n";
+import type { TaskMode } from "@state/days/effects";
+import type { DoorBeat } from "@world/delivery/door";
+import { EMPTY_DIALOGUE, type DialogueState } from "@world/loop/dialogue";
 import { isNight, type BeatClock } from "./beat";
 import { browserPage, weatherKind } from "./browser/data";
 import { desktopRing } from "./rings";
-import type { AppId, MonitorModel, ShellModel } from "./shell";
+import type { AppId, MonitorModel, ShellModel, Side } from "./shell";
 
 export type WorkbenchPage = "home" | "docs" | "ledger" | "code";
+export type View = "room" | "door" | "desktop";
+
+/** What the day-loop remembers between store changes (design L5/L6); session only. */
+export interface LoopMemo {
+  day: number;
+  /** id → unlocked/done as last seen, to find what just changed. */
+  items: Map<string, { unlocked: boolean; done: boolean }>;
+  /** How many events have been looked at. */
+  seen: number;
+  /** Meal → when it was ordered (session ms) and how many work items were done then. */
+  orders: Map<string, { readonly atMs: number; readonly workDone: number }>;
+  /** Self-ticking items already scheduled. */
+  selfScheduled: Set<string>;
+  /** Meals with an arrival check pending. */
+  timers: Set<string>;
+}
 
 export interface Session {
   clock: BeatClock;
   leftApp: AppId;
-  focus: "both" | "left" | "right";
+  /** The monitor shown in the desktop view (one at a time). */
+  focus: Side;
+  view: View;
+  dialogue: DialogueState;
+  muted: boolean;
+  phoneOpen: boolean;
+  wbMode: TaskMode;
+  loop: LoopMemo | null;
+  /** The door beat in progress (the delivery door machine). */
+  door: DoorBeat | null;
   /** The open conversation in 消息. */
   conversation: string;
   /** The chip chosen in the reply bar, waiting for 发送. */
@@ -31,11 +59,18 @@ export interface Session {
   movingUntil: number;
 }
 
-export function initialSession(clock: BeatClock, focus: Session["focus"] = "both"): Session {
+export function initialSession(clock: BeatClock, focus: Side = "left", view: View = "desktop"): Session {
   return {
     clock,
     leftApp: "msgs",
     focus,
+    view,
+    dialogue: EMPTY_DIALOGUE,
+    muted: false,
+    phoneOpen: false,
+    wbMode: "self",
+    loop: null,
+    door: null,
     conversation: "boss",
     selected: null,
     draft: "",
@@ -78,8 +113,9 @@ const WB_PAGE_KEY: Record<WorkbenchPage, string> = {
   code: "wb.nav.code",
 };
 
-function monitorFor(app: AppId, side: "left" | "right", ctx: AppContext, apps: AppRenderers): { monitor: MonitorModel; badge: number } {
-  const overlay = side === "right" ? apps.kuro(ctx) : null;
+function monitorFor(app: AppId, side: Side, ctx: AppContext, apps: AppRenderers): { monitor: MonitorModel; badge: number } {
+  // Kuro's small window is always on top: it sits on whichever monitor is shown.
+  const overlay = side === ctx.session.focus ? apps.kuro(ctx) : null;
   if (app === "msgs") {
     const { body, badge } = apps.msgs(ctx);
     return {

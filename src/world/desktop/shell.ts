@@ -1,5 +1,7 @@
-// The two monitors: top bar, one app window each, the dock (left only), night plates, ring layer.
-// Pure: model in, markup out. Layout and class names follow design/desktop/*.html.
+// The desktop view: one monitor at full size (amendment 2026-11-01), a 左屏 / 右屏 toggle at the
+// top edge, and the other monitor as a thin tab on its side with its badges. Each monitor: top bar,
+// one app window, the dock (left only), night plates, ring layer. Pure: model in, markup out.
+// Layout and class names follow design/desktop/*.html. Side by side exists only in the room scene.
 import { cls, html, type SafeHtml } from "@world/html";
 import { t, tr } from "@world/i18n";
 import { beatLabelKey, type BeatClock } from "./beat";
@@ -7,6 +9,7 @@ import type { WeatherKind } from "./browser/data";
 
 export const APPS = ["msgs", "workbench", "browser"] as const;
 export type AppId = (typeof APPS)[number];
+export type Side = "left" | "right";
 
 /** Dock class per app, as in the mock (消息 green, 工作台 blue, 浏览器 orange). */
 const DOCK_CLASS: Record<AppId, string> = { msgs: "msgs", workbench: "docs", browser: "feed" };
@@ -39,7 +42,8 @@ export interface ShellModel {
   readonly night: boolean;
   readonly monitors: readonly [MonitorModel, MonitorModel];
   readonly dock: { readonly active: AppId; readonly badges: Readonly<Record<AppId, number>> };
-  readonly focus: "both" | "left" | "right";
+  /** Which monitor is shown (amendment 2026-11-01: one at a time, never side by side). */
+  readonly focus: Side;
 }
 
 function topBar(m: ShellModel, monitor: MonitorModel): SafeHtml {
@@ -75,6 +79,25 @@ function monitor(m: ShellModel, mon: MonitorModel): SafeHtml {
   return html`<div class="${cls("monitor", m.night && "night")}" data-side="${mon.side}" data-ring="${m.ring}" data-app="${mon.app}"><div class="os">${topBar(m, mon)}${windowFrame(m, mon)}${mon.side === "left" ? dock(m) : null}${mon.overlay}</div></div>`;
 }
 
+/** The other monitor, as a thin tab on its side: its app and badges (the dock's, for the left one). */
+function otherTab(m: ShellModel, other: MonitorModel): SafeHtml {
+  const apps: readonly AppId[] = other.side === "left" ? APPS : [other.app];
+  const items = apps.map((app) => {
+    const badge = m.night ? 0 : m.dock.badges[app];
+    return html`<span class="${cls("tab-app", DOCK_CLASS[app])}">${tr(DOCK_KEY[app])}${badge > 0 ? html`<b>${badge}</b>` : null}</span>`;
+  });
+  return html`<button type="button" class="other-tab" data-side="${other.side}" data-action="screen" data-screen="${other.side}">${items}</button>`;
+}
+
+function toggle(focus: Side): SafeHtml {
+  const btn = (side: Side) =>
+    html`<button type="button" class="${focus === side ? "on" : ""}" data-action="screen" data-screen="${side}">${tr(`desktop.screen.${side}`)}</button>`;
+  return html`<div class="screen-toggle">${btn("left")}${btn("right")}</div>`;
+}
+
 export function renderDesktop(m: ShellModel): SafeHtml {
-  return html`<div class="${cls("stage", m.focus !== "both" && `focus-${m.focus}`)}" data-day="${m.day}" data-beat="${m.clock.beat}">${monitor(m, m.monitors[0])}${m.focus === "both" ? html`<div class="gap"></div>` : null}${monitor(m, m.monitors[1])}</div>`;
+  const [left, right] = m.monitors;
+  const shown = m.focus === "left" ? left : right;
+  const other = m.focus === "left" ? right : left;
+  return html`<div class="stage one-monitor" data-day="${m.day}" data-beat="${m.clock.beat}" data-focus="${m.focus}">${toggle(m.focus)}${monitor(m, shown)}${otherTab(m, other)}</div>`;
 }

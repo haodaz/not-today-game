@@ -2,18 +2,20 @@
 // on store or session change, turns clicks on [data-action] into events or session changes, and
 // scales the stage to the viewport. Game state changes only through store.appendEvent.
 import type { Store } from "@state/store";
+import type { SafeHtml } from "@world/html";
 import type { BeatClock } from "./beat";
 import { desktopApps } from "./apps";
 import { KuroBodyElement } from "./kuro/body";
+import { playSfx } from "@world/loop/sfx";
 import { buildShell, initialSession, type AppRenderers, type Session } from "./model";
 import { renderDesktop, APPS, type AppId } from "./shell";
 
-/** Stage size in CSS pixels (mock: 28px padding, 1440×900 monitors, 28px gap). */
+/** Stage size in CSS pixels: one monitor (mock: 28px padding, 1440×900), or the room (1600×900). */
 const MONITOR = { w: 1440, h: 900 };
 const PAD = 28;
-export function stageSize(focus: Session["focus"]): { w: number; h: number } {
-  const monitors = focus === "both" ? 2 : 1;
-  return { w: PAD * 2 + MONITOR.w * monitors + (monitors - 1) * PAD, h: PAD * 2 + MONITOR.h };
+export const ROOM_STAGE = { w: 1600, h: 900 };
+export function stageSize(view: Session["view"]): { w: number; h: number } {
+  return view === "desktop" ? { w: PAD * 2 + MONITOR.w, h: PAD * 2 + MONITOR.h } : ROOM_STAGE;
 }
 
 /** A handler for one data-action. It may change the session, append events, or both. */
@@ -26,10 +28,17 @@ export interface ActionContext {
   readonly rerender: () => void;
   /** Run `fn` after `ms`; cleared when the desktop is destroyed. */
   readonly later: (ms: number, fn: () => void) => void;
+  /** Plays a sound id (silent when muted or missing). */
+  readonly play?: (id: string) => void;
 }
 
-/** Built-in actions: the dock and focus. App modules add theirs through `mountDesktop(…, { actions })`. */
+/** Built-in actions: the dock and the 左屏 / 右屏 toggle. App modules add theirs through `mountDesktop(…, { actions })`. */
 export const shellActions: Record<string, ActionHandler> = {
+  screen(ctx, data) {
+    if (data.screen !== "left" && data.screen !== "right") return;
+    ctx.session.focus = data.screen;
+    ctx.rerender();
+  },
   dock(ctx, data) {
     const app = data.app as AppId;
     if (!(APPS as readonly string[]).includes(app)) return;
@@ -47,13 +56,26 @@ export interface DesktopDeps {
   readonly store: Store;
   readonly clock: BeatClock;
   readonly focus?: Session["focus"];
+  readonly view?: Session["view"];
   readonly apps?: AppRenderers;
   readonly actions?: Record<string, ActionHandler>;
+  /** Renders the whole root (default: the desktop). */
+  readonly render?: (store: Store, session: Session, nowMs: number) => SafeHtml;
+  /** Called after every store change, before the re-render (the day-loop runtime). */
+  readonly onChange?: (ctx: ActionContext) => void;
+  /** Keys the controller does not handle itself; return true if handled. */
+  readonly onKey?: (ctx: ActionContext, e: KeyboardEvent) => boolean;
+}
+
+function defaultRender(apps: AppRenderers) {
+  return (store: Store, session: Session, nowMs: number): SafeHtml =>
+    renderDesktop(buildShell(store.getState(), store.getEvents(), session, apps, nowMs, store.getStartDay()));
 }
 
 export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: () => void; session: Session } {
-  const session = initialSession(deps.clock, deps.focus ?? "both");
+  const session = initialSession(deps.clock, deps.focus ?? "left", deps.view ?? "desktop");
   const apps = deps.apps ?? desktopApps;
+  const renderRoot = deps.render ?? defaultRender(apps);
   const actions = { ...shellActions, ...(deps.actions ?? {}) };
   const timers = new Set<ReturnType<typeof setTimeout>>();
   const body = new KuroBodyElement(root.ownerDocument);
@@ -62,7 +84,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   const fit = () => {
     const stage = root.querySelector<HTMLElement>(".stage");
     if (!stage) return;
-    const { w, h } = stageSize(session.focus);
+    const { w, h } = stageSize(session.view);
     const scale = Math.min(1, root.clientWidth / w, root.clientHeight / h);
     stage.style.setProperty("--scale", String(scale));
   };
@@ -73,8 +95,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     const active = document.activeElement as HTMLInputElement | null;
     const focusKey = active?.dataset?.focus ?? null;
     const caret = active?.selectionStart ?? null;
-    const shell = buildShell(deps.store.getState(), deps.store.getEvents(), session, apps, Date.now(), deps.store.getStartDay());
-    root.innerHTML = renderDesktop(shell).value;
+    root.innerHTML = renderRoot(deps.store, session, Date.now()).value;
     // Kuro's body lives across renders so its state changes crossfade.
     const slot = root.querySelector<HTMLElement>("[data-kuro-slot]");
     if (slot) body.attach(slot);
@@ -99,7 +120,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     }, ms);
     timers.add(id);
   };
-  const ctx: ActionContext = { store: deps.store, session, rerender, later };
+  const ctx: ActionContext = { store: deps.store, session, rerender, later, play: (id) => playSfx(id, session.muted) };
 
   const onClick = (e: MouseEvent) => {
     const el = (e.target as HTMLElement).closest<HTMLElement>("[data-action]");
@@ -123,17 +144,32 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
       if (e.key === "Enter") (root.querySelector<HTMLElement>('[data-action="send"]'))?.click();
       return;
     }
-    if (e.key === "f" || e.key === "F") {
-      session.focus = session.focus === "both" ? "left" : session.focus === "left" ? "right" : "both";
+    if (session.view === "desktop" && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+      session.focus = e.key === "ArrowLeft" ? "left" : "right";
       rerender();
+      return;
     }
+    try {
+      if (deps.onKey?.(ctx, e)) e.preventDefault();
+    } catch (error) {
+      console.warn(error);
+    }
+  };
+  const onStore = () => {
+    try {
+      deps.onChange?.(ctx);
+    } catch (error) {
+      console.warn(error);
+    }
+    rerender();
   };
 
   root.addEventListener("click", onClick);
   root.addEventListener("input", onInput);
   window.addEventListener("keydown", onKey);
   window.addEventListener("resize", fit);
-  const unsubscribe = deps.store.subscribe(rerender);
+  const unsubscribe = deps.store.subscribe(onStore);
+  deps.onChange?.(ctx);
   render();
 
   return {

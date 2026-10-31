@@ -1,0 +1,63 @@
+/* NOT TODAY · room-view HUD. Ported from design/hud/room.html (the mock): tokens and class names
+   kept; the mock's note bar removed; objects sit on the desk bar as cutouts with no slot frames
+   (author 2026-11-01); HUD cards are translucent warm grey with blur, never solid white. */
+.room{--ink:#1d2129;--paper:rgba(232,228,220,.62);--line:rgba(0,0,0,.08);--red:#8b2f2a;--font:"PingFang SC","Hiragino Sans GB",sans-serif;--mono:Menlo,monospace}
+.room{position:relative;width:1600px;height:900px;overflow:hidden;font-family:var(--font);color:var(--ink);
+  /* Flat backdrop until the 3D room exists (design L8). */
+  background:#1a1814 url(/room/shots/desk_close.jpg) center/cover}
+.room.no-shot{background-image:url(/room/shots/desk_close.jpg),url(/design/hud/bg_desk.jpg);background-size:cover,cover;background-position:center,center}
+.room.door-view{background:#0f0e0c url(/room/door_wall.png) center/cover}
+/* 今日清单 */
+.room .list{position:absolute;left:28px;top:28px;width:280px;background:var(--paper);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.35);border-radius:10px;padding:12px 16px;box-shadow:0 6px 24px rgba(0,0,0,.12);font-size:15px;line-height:1.7}
+.room .list .h{font-size:11px;letter-spacing:.2em;color:#8a7f70;margin-bottom:6px}
+.room .list .done{color:#9a9a9a;font-size:13px}
+.room .list .it{display:flex;gap:8px;align-items:baseline;width:100%;background:none;border:0;padding:0;font:inherit;color:inherit;text-align:left}
+.room .list .it i{width:12px;height:12px;border:1.5px solid #555;border-radius:2px;flex:0 0 auto;transform:translateY(2px)}
+.room .list .it.now{font-weight:600}.room .list .it.next{color:#777}.room .list .it.wait i{border-style:dashed}.room .list .it.wait{color:#9a6400}
+.room .list .it.locked{color:#9a9a9a}
+.room .list button.it{cursor:pointer}.room .list button.it:hover i{border-color:var(--red)}
+/* 右上 */
+.room .day{position:absolute;right:28px;top:28px;text-align:right;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.6);font-size:15px;line-height:1.5}
+.room .day b{display:block;font-size:22px;font-weight:600}.room .day .ov{color:#ffb3ad}
+.room .hr{position:absolute;right:28px;top:118px;background:rgba(232,228,220,.7);backdrop-filter:blur(8px);border-radius:8px;padding:6px 10px;font:12px var(--mono);color:#333;display:flex;gap:8px;align-items:center}
+.room .hr i{width:8px;height:8px;border-radius:50%;background:#e5484d;box-shadow:0 0 0 3px rgba(229,72,77,.2)}
+/* 桌面条: things, not an inventory */
+.room .bar{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);display:flex;gap:8px;padding:8px 10px;background:var(--paper);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.35);border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,.12)}
+.room .slot{width:80px;height:80px;background:transparent;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font:11px var(--font);color:#666;position:relative;padding:0}
+.room button.slot{cursor:pointer}
+.room .slot img{max-width:60px;max-height:52px;object-fit:contain}
+.room .slot .lcd{width:52px;height:26px;background:#9fb59a;border:2px solid #556;border-radius:3px;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;font:12px var(--mono);color:#233}
+.room .slot .box{width:52px;height:40px;background:#c8a97a;border-radius:3px}
+.room .slot .cup{width:26px;height:34px;border:2px solid #789;border-radius:0 0 8px 8px;background:linear-gradient(180deg,#fff 40%,#cfe0ea 40%)}
+.room .slot .phone{width:28px;height:50px;background:#222;border-radius:5px;border:2px solid #555}
+.room .slot.gap{width:20px}
+/* 对话框 */
+.room .dlg{position:absolute;left:50%;bottom:128px;transform:translateX(-50%);width:980px;background:rgba(28,26,23,.82);backdrop-filter:blur(6px);color:#f4efe6;border-radius:12px;padding:18px 24px;font-size:18px;line-height:1.6;box-shadow:0 12px 40px rgba(0,0,0,.4);border:0;text-align:left;font-family:var(--font)}
+.room button.dlg{cursor:pointer}
+.room .dlg .who{display:block;font-size:12px;letter-spacing:.12em;color:#c9a86a;margin-bottom:4px}
+.room .dlg .inner{font-style:italic;color:#e8b4ae}
+.room .dlg .sfx{color:#c9a86a;letter-spacing:.08em}
+.room .dlg .more{position:absolute;right:16px;bottom:10px;color:#c9a86a;font-size:12px}
+.room .choices{position:absolute;left:50%;bottom:128px;transform:translateX(-50%);width:980px;display:flex;flex-direction:column;gap:8px}
+.room .choices button{background:rgba(28,26,23,.86);color:#f4efe6;border:1px solid rgba(201,168,106,.4);border-radius:10px;padding:12px 20px;font:17px var(--font);text-align:left;cursor:pointer}
+.room .choices button:hover{border-color:#c9a86a}
+/* 手机 */
+.room .phone-panel{position:absolute;left:50%;bottom:128px;transform:translateX(-50%);width:420px;max-height:560px;overflow:auto;background:rgba(232,228,220,.92);backdrop-filter:blur(10px);border-radius:14px;padding:14px 16px;box-shadow:0 12px 40px rgba(0,0,0,.3);font-size:14px}
+.room .phone-panel h4{margin:0 0 8px;font-size:12px;letter-spacing:.12em;color:#8a7f70;font-weight:400}
+.room .phone-panel .shop{padding:6px 0;border-top:1px solid var(--line)}
+.room .phone-panel .shop b{font-weight:500}.room .phone-panel .shop small{color:#8a7f70;margin-left:6px}
+.room .phone-panel .shop.closed{color:#9a9a9a}
+.room .phone-panel button{display:flex;justify-content:space-between;width:100%;border:0;background:none;padding:4px 0;font:inherit;color:inherit;cursor:pointer;text-align:left}
+.room .phone-panel button:hover{color:var(--red)}
+/* 门 */
+.room .door-beat{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);width:620px;background:rgba(28,26,23,.78);color:#f4efe6;border-radius:12px;padding:18px 24px;font-size:16px;line-height:1.6}
+.room .door-beat .door-step{color:#c9a86a;font-size:12px;letter-spacing:.12em}
+.room .door-beat .door-inner,.room .door-beat .door-anomaly{font-style:italic;color:#e8b4ae}
+.room .door-next{position:absolute;left:50%;top:64%;transform:translateX(-50%);border:0;border-radius:20px;padding:8px 22px;background:rgba(232,228,220,.8);font:14px var(--font);cursor:pointer}
+/* 镜头 + 菜单 */
+.room .cams{position:absolute;right:28px;bottom:28px;display:flex;gap:6px}
+.room .cams button{background:rgba(232,228,220,.7);backdrop-filter:blur(8px);border:0;border-radius:8px;padding:8px 14px;font:14px var(--font);color:#333;cursor:pointer}
+.room .cams button.on{background:var(--red);color:#f4efe6}
+.room .menu{position:absolute;left:28px;bottom:28px;background:rgba(232,228,220,.55);border-radius:8px;padding:6px 10px;font-size:12px;color:#555;display:flex;gap:8px}
+.room .menu button{border:0;background:none;font:inherit;color:inherit;cursor:pointer;padding:0}
+.room .menu button.off{text-decoration:line-through}

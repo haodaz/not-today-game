@@ -175,11 +175,19 @@ html,body{margin:0;background:#2b2e33;font-family:var(--font);color:var(--ink);f
 .br .list h3{font-size:13px;font-family:var(--font);color:var(--ink-3);font-weight:400;margin:0 0 8px}.br .list div{padding:8px 0;border-top:1px solid #f1f2f4;font-size:14px;line-height:1.5}.br .list div small{display:block;color:var(--ink-3);font-family:var(--font);font-size:11px;margin-top:2px}
 
 /* ===== added (not in the mock) ===== */
-/* Fit both monitors (or one, in focus mode) into the viewport. --scale is set by the controller. */
+/* Fit the stage (one monitor, or the room) into the viewport. --scale is set by the controller. */
 html,body{height:100%;overflow:hidden}
-#app{width:100vw;height:100vh;overflow:hidden}
+#app{width:100vw;height:100vh;overflow:hidden;background:#2b2e33}
 .stage{transform:scale(var(--scale,1));transform-origin:0 0}
-.stage.focus-left .monitor[data-side="right"],.stage.focus-right .monitor[data-side="left"]{display:none}
+/* One monitor at a time (amendment 2026-11-01): toggle at the top edge, the other monitor as a thin tab. */
+.stage.one-monitor{position:relative}
+.screen-toggle{position:absolute;left:50%;top:6px;transform:translateX(-50%);display:flex;gap:2px;z-index:8;background:rgba(20,22,26,.6);border-radius:8px;padding:2px}
+.screen-toggle button{border:0;background:transparent;color:#9aa3b0;font:12px var(--font);padding:2px 12px;border-radius:6px;cursor:pointer}
+.screen-toggle button.on{background:#3a3f46;color:#e8eaee}
+.other-tab{position:absolute;top:50%;transform:translateY(-50%);width:22px;padding:10px 0;display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(30,33,38,.75);border:0;border-radius:6px;cursor:pointer;z-index:8;color:#9aa3b0;font:10px var(--font);writing-mode:vertical-rl}
+.other-tab[data-side="left"]{left:4px}.other-tab[data-side="right"]{right:4px}
+.other-tab .tab-app b{display:inline-block;margin-top:4px;min-width:14px;border-radius:7px;background:var(--red);color:#fff;font-weight:500;writing-mode:horizontal-tb;text-align:center}
+.back-room{position:fixed;left:12px;top:10px;z-index:20;border:0;border-radius:8px;padding:6px 12px;background:rgba(232,228,220,.75);color:#333;font:13px var(--font);cursor:pointer;backdrop-filter:blur(8px)}
 /* A string the content does not have yet: visible on purpose. */
 .missing{outline:1px dashed var(--red);color:var(--red);font-family:var(--mono);font-size:11px}
 /* Ring layer (screen and beyond): stronger each ring; calm daytime renders as software. */
