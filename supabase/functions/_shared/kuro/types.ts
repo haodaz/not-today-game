@@ -28,7 +28,10 @@ export interface Memory {
 /** A day's file in content/kuro-days, as the function needs it. */
 export interface KuroDayContent {
   readonly day: number;
+  /** The English idiom (`Idiom of the day (constant)`), said verbatim in English. */
   readonly idiom: string;
+  /** The Chinese idiom (`Idiom of the day (zh)`), said verbatim in Chinese. */
+  readonly idiomZh: string;
   readonly stance: string;
   readonly recall: string;
   readonly mayReveal: string;

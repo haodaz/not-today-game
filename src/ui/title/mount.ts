@@ -2,6 +2,7 @@
 // the rain, and the camera push to the desk where the question card opens (correction
 // 2026-11-01). The view is pure (view.ts); this file owns timers and sound only.
 import { getLocale, setLocale } from "@world/i18n";
+import { applyFit, BACKDROPS } from "@world/fit";
 import type { State } from "@state/types.gen";
 import type { Collection } from "@world/room/collection";
 import { arrived, canStart, diceOptions, initialTitle, QUESTIONS, rowsShown, toMenu, toNames, toQuestions, withAnswer, withPronoun, type TextQuestion, type TitleModel } from "./model";
@@ -77,7 +78,7 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
   const fit = () => {
     const stage = root.querySelector<HTMLElement>(".stage");
     if (!stage) return;
-    stage.style.setProperty("--scale", String(Math.min(1, root.clientWidth / STAGE.w, root.clientHeight / STAGE.h) || 1));
+    applyFit(root, stage, STAGE, BACKDROPS.title);
   };
 
   const render = () => {

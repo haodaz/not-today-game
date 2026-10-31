@@ -73,7 +73,7 @@ const RULES = [
  * the English the stances are written in. One line, no newline inside.
  */
 export const LOCALE_LINES: Readonly<Record<ChatLocale, string>> = {
-  zh: "Reply language: Chinese (zh). Write every reply in natural written Simplified Chinese, not translated English; where today's idiom or a line above is only given in English, render it in Chinese yourself. Judgement notes are written in Chinese too.",
+  zh: "Reply language: Chinese (zh). Write every reply in natural written Simplified Chinese, not translated English. Judgement notes are written in Chinese too.",
   en: "Reply language: English (en). Write every reply in English. Judgement notes are written in English too.",
 };
 
@@ -87,7 +87,7 @@ export function buildSystem(c: KuroContent, day: number, events: readonly LogEve
   const d = c.days[String(day)];
   const stable = `# Who you are\n${c.profile}\n\n# Rules\n${RULES}${mode === "judge" ? `\n\n# How you judge\n${c.rubric}` : ""}`;
   const self = d
-    ? `# Today (day ${day})\nIdiom of the day (say it verbatim when you greet): ${d.idiom}\nStance: ${d.stance}\nRecall from earlier days: ${d.recall}\nYou may reveal today: ${d.mayReveal}\nNever: ${d.never}`
+    ? `# Today (day ${day})\nIdiom of the day (say it verbatim when you greet): ${locale === "zh" ? d.idiomZh : d.idiom}\nStance: ${d.stance}\nRecall from earlier days: ${d.recall}\nYou may reveal today: ${d.mayReveal}\nNever: ${d.never}`
     : `# Today (day ${day})`;
   const slice = worldSlice(events, day, c.gate, mode === "judge").map(describeEvent).filter((l): l is string => l !== null);
   const dreams = day === c.gate.dreamsOn ? Object.entries(c.dreams).map(([night, lines]) => `Night ${night}: ${lines.join(" ")}`) : [];
@@ -111,4 +111,4 @@ export function citableIds(events: readonly LogEvent[], day: number, gate: KuroC
 
 /** The user message for the judgement call. */
 export const JUDGE_ASK =
-  "The chat beat is over for today. Assess the player against the rubric for TODAY only: truth, values, bond, each an integer from -2 to 2. Every evidence item must cite an id from the log above (eventId) with a short note, in the reply language, of what the player did. Also rewrite the running summary of what you remember (at most 600 characters).";
+  "The chat beat is over for today. Assess the player against the rubric for TODAY only: truth, values, bond, each an integer from -2 to 2. Every evidence item must cite an id from the log above (eventId) with a short note, in the reply language, of what the player did. Also rewrite the running summary of what you remember (at most 600 characters). Write the summary in English, whatever the reply language: only you read it.";

@@ -93,7 +93,11 @@ and with it the local memory; the server memory belongs to the old run id and is
 - The rule "Speak English" became "in the reply language fixed at the very end". `JUDGE_ASK` asks
   for notes "in the reply language". The credits show those notes as written. Memory stores turns
   as said.
-- The kuro-days content stays in English; the zh line tells the model to render the idiom itself.
+- The idiom of the day comes in both languages from content. Each kuro-days file has
+  `**Idiom of the day (zh):**` under the English one, and the bundler reads it as `idiomZh`. The
+  prompt says the request locale's idiom verbatim (zh → `idiomZh`, en → `idiom`). The
+  "render it yourself" clause is gone.
+- The running summary is always English, since only the model reads it. `JUDGE_ASK` says so.
 
 ## Tests (FR6)
 

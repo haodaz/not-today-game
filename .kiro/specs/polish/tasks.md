@@ -12,4 +12,7 @@
   monitor push, shutdown, sleep/wake, Kuro lines, and phase-locked loops.
 - [x] 7. `motion.css`, plus Kuro timings (300ms crossfade, 3s ±3px bob, 1.2s crawl).
 - [x] 8. Tests (`tests/polish.test.ts`); the one snapshot updated (P9).
+- [x] 10. Correction 2026-11-01, the stage fills the window (P11): `src/world/fit.ts`, both mounts,
+  `desktop.css` letterbox. Tests: `tests/fit.test.ts` (the spec's 2185×1160 → 1.2889 and its left
+  offset, the cap, centring, resize, view photo, title page).
 - [ ] 9. Check in a browser: node tests cover the pure parts and the markup only, not the DOM layer.

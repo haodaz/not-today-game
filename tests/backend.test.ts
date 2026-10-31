@@ -73,6 +73,27 @@ describe("the bundle (npm run bundle:kuro)", () => {
     expect(Object.keys(content.tools)).toHaveLength(18);
   });
 
+  it("every day has a Chinese idiom (`Idiom of the day (zh)`), distinct from the English one", () => {
+    for (let day = 1; day <= 18; day++) {
+      const d = content.days[String(day)]!;
+      expect(d.idiomZh, `day ${day}`).toMatch(/\p{Script=Han}/u);
+      expect(d.idiomZh).not.toBe(d.idiom);
+    }
+  });
+
+  it("the idiom of the request's locale, verbatim: zh has the Chinese one and not the English, en the reverse", () => {
+    for (let day = 1; day <= 18; day++) {
+      const d = content.days[String(day)]!;
+      const zh = buildSystem(content, day, [], NO_MEMORY, "turn", "zh").map((b) => b.text).join("\n");
+      const en = buildSystem(content, day, [], NO_MEMORY, "turn", "en").map((b) => b.text).join("\n");
+      expect(zh, `day ${day}`).toContain(d.idiomZh);
+      expect(zh, `day ${day}`).not.toContain(d.idiom);
+      expect(en, `day ${day}`).toContain(d.idiom);
+      expect(en, `day ${day}`).not.toContain(d.idiomZh);
+    }
+    expect(LOCALE_LINES.zh).not.toMatch(/render/);
+  });
+
   it("is deterministic, and the generated file is typed", () => {
     const text = bundleKuroContent(read, list);
     expect(bundleKuroContent(read, list)).toBe(text);
@@ -129,7 +150,7 @@ describe("prompt assembly (FR3)", () => {
     expect(blocks[0]!.text).toContain(content.profile.slice(0, 40));
     expect(blocks[0]!.cache_control).toEqual({ type: "ephemeral" });
     expect(blocks.slice(1).every((b) => b.cache_control === undefined)).toBe(true);
-    expect(blocks[1]!.text).toContain("Good to see you.");
+    expect(blocks[1]!.text).toContain(content.days["1"]!.idiomZh);
     expect(blocks[2]!.text).toContain("# The player's situation");
     expect(blocks[3]!.text).toContain("# What you remember");
     expect(blocks[3]!.text).toContain("day 1 Player: hi");
@@ -260,7 +281,8 @@ describe("the function's handler, with a mocked model (FR3, FR5)", () => {
   it("the locale line is one line; no rule or ask pins English; a missing or unknown locale is Chinese", async () => {
     for (const line of Object.values(LOCALE_LINES)) expect(line).not.toContain("\n");
     expect(buildSystem(content, 1, [], NO_MEMORY, "judge", "zh")[0]!.text).not.toMatch(/Speak English/);
-    expect(JUDGE_ASK).not.toMatch(/in English/);
+    expect(JUDGE_ASK).not.toMatch(/note in English/);
+    expect(JUDGE_ASK).toMatch(/summary in English/);
     for (const locale of [undefined, "fr", 3]) {
       const { d, calls } = deps(() => say("ok"));
       await handle({ mode: "turn", run_id: "run-1", day: 2, said: "x", events: [], locale }, d);

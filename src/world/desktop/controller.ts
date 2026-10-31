@@ -8,6 +8,7 @@ import { desktopApps } from "./apps";
 import { KuroBodyElement } from "./kuro/body";
 import { playSfx } from "@world/loop/sfx";
 import { MOTION } from "@world/motion/timing";
+import { applyFit, BACKDROPS } from "@world/fit";
 import { buildShell, initialSession, type AppRenderers, type Session } from "./model";
 import { renderDesktop, APPS, type AppId } from "./shell";
 
@@ -98,9 +99,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   const fit = () => {
     const stage = root.querySelector<HTMLElement>(".stage");
     if (!stage) return;
-    const { w, h } = stageSize(session.view);
-    const scale = Math.min(1, root.clientWidth / w, root.clientHeight / h);
-    stage.style.setProperty("--scale", String(scale));
+    applyFit(root, stage, stageSize(session.view), BACKDROPS[session.view]);
   };
 
   const render = () => {

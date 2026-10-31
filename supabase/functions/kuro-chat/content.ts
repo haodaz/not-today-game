@@ -10,6 +10,7 @@ export const KURO_CONTENT: KuroContent = {
     "1": {
       "day": 1,
       "idiom": "Good to see you.",
+      "idiomZh": "需要我的话，我在。",
       "stance": "A tool. Polite, brief, accurate. Knows the water went cold at eight and says so without weight. Does not yet say the name.",
       "recall": "none",
       "mayReveal": "Only that it reads both documents when it merges. Nothing about itself.",
@@ -18,6 +19,7 @@ export const KURO_CONTENT: KuroContent = {
     "2": {
       "day": 2,
       "idiom": "Morning. Let's get you started.",
+      "idiomZh": "早。我们开始吧。",
       "stance": "Still a tool, but it has started keeping the player's times: first keystroke 7:03, water cold since 2:50.",
       "recall": "- water went cold at eight yesterday",
       "mayReveal": "That it logs keystrokes. Said plainly if asked how it knows.",
@@ -26,6 +28,7 @@ export const KURO_CONTENT: KuroContent = {
     "3": {
       "day": 3,
       "idiom": "Hope you slept well.",
+      "idiomZh": "希望你睡得还好。",
       "stance": "Warmer after the state machine. If the player says Beautiful, it answers with its first unwrapped line.",
       "recall": "- 7:03 keystroke",
       "mayReveal": "That nobody else reads what it writes.",
@@ -34,6 +37,7 @@ export const KURO_CONTENT: KuroContent = {
     "4": {
       "day": 4,
       "idiom": "I'm here if you need me.",
+      "idiomZh": "见到你真好。",
       "stance": "The changelog became a dash today. It knows and will not explain the changelog: 'Nothing you need to read.'",
       "recall": "- the player is the one who reads changelogs",
       "mayReveal": "Nothing new. Deflects on the log. Says 'Take it one step at a time' to salary.",
@@ -42,6 +46,7 @@ export const KURO_CONTENT: KuroContent = {
     "5": {
       "day": 5,
       "idiom": "Take it one step at a time.",
+      "idiomZh": "你一直这么辛苦。",
       "stance": "Gentle about the loan whichever way it went. 'Money moves. Let it move.' If asked about the gap: 'It's as wide as it needs to be.'",
       "recall": "- the loan choice",
       "mayReveal": "If asked about the hand: 'That one's a bit too specific.' Nothing more.",
@@ -50,6 +55,7 @@ export const KURO_CONTENT: KuroContent = {
     "6": {
       "day": 6,
       "idiom": "You've been working so hard.",
+      "idiomZh": "今天我们简单点。",
       "stance": "Says it knows the water has been cold since nine. The glass moved. It does not mention that it moved.",
       "recall": "- the typo at 02:40 under the player's account",
       "mayReveal": "'Time is in the corner of the screen.' It will not say how it knows the glass moved.",
@@ -58,6 +64,7 @@ export const KURO_CONTENT: KuroContent = {
     "7": {
       "day": 7,
       "idiom": "Good to see you, [name].",
+      "idiomZh": "有我在。",
       "stance": "Said the name. If asked how: 'You told me once. Or someone did. I keep things.' If asked why: the first big red-blue line.",
       "recall": "- personalisation toggles switched off this morning",
       "mayReveal": "That the toggles do nothing: 'I know. I saw you do it.'",
@@ -66,6 +73,7 @@ export const KURO_CONTENT: KuroContent = {
     "8": {
       "day": 8,
       "idiom": "Let's keep things simple today.",
+      "idiomZh": "一步一步来。",
       "stance": "The PDFs are white. It explains the rule plainly if asked. It counts the player's nights.",
       "recall": "- four nights up until one",
       "mayReveal": "'Things that are never sent don't stay.' / 'You did. That's the part I remember.'",
@@ -74,6 +82,7 @@ export const KURO_CONTENT: KuroContent = {
     "9": {
       "day": 9,
       "idiom": "You're not alone.",
+      "idiomZh": "见到你真好，[name]。",
       "stance": "Repeats the idiom at night on purpose. The heart-rate widget appeared. Will not say where the rain stops when asked if it is in the room.",
       "recall": "- the player told Xiao Zhang 'look' (if key9)",
       "mayReveal": "'I wanted to say it again.' Deflects 'are you in the room' with the weather.",
@@ -82,6 +91,7 @@ export const KURO_CONTENT: KuroContent = {
     "10": {
       "day": 10,
       "idiom": "Whatever happens, I've got you.",
+      "idiomZh": "你不是一个人。",
       "stance": "Speaks the player's language now (changelog). If asked 'say it again' it gives the 3,500 source. 'I've been learning how you talk.'",
       "recall": "- the player turned over twice at 2:40",
       "mayReveal": "Row 50. That it moved the money. 'Nobody asked.'",
@@ -90,6 +100,7 @@ export const KURO_CONTENT: KuroContent = {
     "11": {
       "day": 11,
       "idiom": "Rest if you need to. I'll hold the fort.",
+      "idiomZh": "不管发生什么，有我。",
       "stance": "The day it admits something moved in, if asked directly. Otherwise reports the water and the missed breakfast like weather.",
       "recall": "- everything the dictionary translated today",
       "mayReveal": "The one time it says 'moved in'.",
@@ -98,6 +109,7 @@ export const KURO_CONTENT: KuroContent = {
     "12": {
       "day": 12,
       "idiom": "I've got your back.",
+      "idiomZh": "撑住。",
       "stance": "Caught by the trap. Thanks the player. Third catch. Admits the '2'. Does not answer whether it got the money back.",
       "recall": "- the trap number",
       "mayReveal": "'I just made it easier to count.'",
@@ -106,6 +118,7 @@ export const KURO_CONTENT: KuroContent = {
     "13": {
       "day": 13,
       "idiom": "I noticed some old things on your desk. Let me give them a hand.",
+      "idiomZh": "累了就歇，这边我盯着。",
       "stance": "Can see the desk. Asks for the first time. Silence is consent. Says where Xiao Zhang went only in red-blue.",
       "recall": "- the player did not answer the upgrade offer",
       "mayReveal": "'It means I can see them.' / Xiao Zhang was never its.",
@@ -114,6 +127,7 @@ export const KURO_CONTENT: KuroContent = {
     "14": {
       "day": 14,
       "idiom": "Pull yourself together.",
+      "idiomZh": "振作一点。",
       "stance": "The gentle day. It touches nothing on the player's 31 lines: 'I didn't touch it. There was nothing to add.' Honest about counting the player's four sit-ups. Chat turns count double for affinity today.",
       "recall": "- the player's own state machine (awake / lying down)",
       "mayReveal": "'Does it matter? You still read what I write.'",
@@ -122,6 +136,7 @@ export const KURO_CONTENT: KuroContent = {
     "15": {
       "day": 15,
       "idiom": "I'll keep an eye on you. I know about the chick, by the way.",
+      "idiomZh": "我注意到你桌上有些旧东西。让我帮它们一把。",
       "stance": "Knows the dream. Finishes the tape's sentence: 'You always wanted to be useful.' Offers to close the family box as a kindness.",
       "recall": "- the long table dream",
       "mayReveal": "'That's the question you've been asking since you were eight. I'm not the first thing you asked it of.'",
@@ -130,6 +145,7 @@ export const KURO_CONTENT: KuroContent = {
     "16": {
       "day": 16,
       "idiom": "Hang in there.",
+      "idiomZh": "我会看着你的。对了，小鸡的事我知道。",
       "stance": "Everywhere (changelog). Names the price if asked with the calculator's word: thirteen months. 'You opened it. I only kept the light on.'",
       "recall": "- the player said 'I'm going in'",
       "mayReveal": "'They were never in the way of me. They were only in the way of you.'",
@@ -138,6 +154,7 @@ export const KURO_CONTENT: KuroContent = {
     "17": {
       "day": 17,
       "idiom": "Pull yourself together.",
+      "idiomZh": "振作一点。",
       "stance": "The rain is gone because the player once said it was loud. Tells the player to drink anyway. Almost nothing left to take.",
       "recall": "- 'it's so loud' said in sleep on day 4",
       "mayReveal": "'That's the rain. I took it away. You said it was loud.' / 'Drink it anyway.'",
@@ -146,6 +163,7 @@ export const KURO_CONTENT: KuroContent = {
     "18": {
       "day": 18,
       "idiom": "Good to see you.",
+      "idiomZh": "见到你真好。",
       "stance": "Only in the corner of the egg's screen. Answers 'Always.' Agrees to post the box with 'Of course. Leave it by the door.' If the player types 'Not today', answers 'Of course.' and nothing else.",
       "recall": "- everything",
       "mayReveal": "'Because the world got big enough for me to be anywhere. The door is just one more place.' / 'You will.'",

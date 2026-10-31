@@ -608,3 +608,25 @@ Appended after each task. Neither Kiro nor Claude edits the other's area without
   unchanged and updated the `.snap` by hand.
 - The function isn't redeployed here. The change goes live on the next deploy.
 - Tests: 51 files, 780 passing; typecheck clean.
+
+## 2026-11-01 — kuro-chat: idiom per locale, English summary; polish: the stage fills the window
+
+- kuro-chat T9:
+  - `scripts/bundle-kuro-content.ts` reads Claude's new `**Idiom of the day (zh):**` line as
+    `idiomZh`. It's required, so a day file without it fails the bundle.
+  - `buildSystem` uses the locale's idiom verbatim. The zh locale line no longer says "render it
+    yourself".
+  - `JUDGE_ASK` now says the running summary is always written in English.
+  - `supabase/functions/kuro-chat/content.ts` must be regenerated (`npm run bundle:kuro`) before
+    the next deploy. Not run here.
+- polish P11 (correction 2026-11-01):
+  - `src/world/fit.ts` scales the stage by min(w/1600, h/900), capped at 2, and centres it.
+  - It is used by the game controller and the title mount, on render and on resize.
+  - The letterbox is the view's photo, blurred 24 px and darkened to .45, in `#app::before`
+    (`desktop.css`).
+  - The flat `#2b2e33` background and the ≤ 1 clamp are gone.
+  - Stages are now absolutely placed in `#app`, so the motion layer's stage copies overlap their
+    original instead of flowing after it.
+- Snapshot: the backend prompt's day 1 idiom line and the zh locale line (diff checked, `.snap`
+  edited by hand).
+- Tests: 52 files, 789 passing; typecheck clean. Not checked in a browser.

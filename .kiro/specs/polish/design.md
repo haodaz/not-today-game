@@ -78,6 +78,24 @@ Pure parts (timings, the reveal clock, stagger delays, door step list) live in
 - **P10. Phase-locked loops.** Infinite animations (Kuro's bob, the night glow) get
   `animation-delay: -(now mod period)`, so a re-render never restarts them.
 
+- **P11. The stage fills the window (correction 2026-11-01).**
+  - `src/world/fit.ts`, used by the game controller and the title mount, on every render and on
+    resize. `fitStage(winW, winH, w, h)` is pure: scale = min(winW/w, winH/h, 2), offsets centre
+    the stage both ways.
+  - The stage is 1600×900 for every view except 屏幕, which uses its monitor's own stage size.
+  - An empty window (no layout, tests) gives scale 1 at 0,0.
+  - `applyFit` writes `--scale`, `--stage-x` and `--stage-y` on the stage, so the motion layer's
+    copies keep their place. It writes `--letterbox` on `#app`, which survives re-renders.
+  - CSS: `#app > .stage` is absolute at the offsets. `#app::before` draws the letterbox: the view's
+    photo, cover, `blur(24px) brightness(.45)`, with a 60 px bleed so the blur has no pale edge.
+  - The photo per view (`BACKDROPS`):
+    - title and 房间: room.jpg;
+    - 桌子 and 屏幕: desk_close.jpg, because the screens sit on the desk;
+    - 门: door_wall.png.
+  - The ending pages use the photo of the view they were reached from.
+  - Camera-move offsets are in stage px with `transform-origin: 0 0`, so they are unchanged by
+    the offset.
+
 ## 3. Modules
 
 ```

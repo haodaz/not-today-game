@@ -40,6 +40,7 @@ export function parseKuroDayForFunction(text: string, label: string): KuroDayCon
   return {
     day,
     idiom: field(text, "Idiom of the day (constant)", label),
+    idiomZh: field(text, "Idiom of the day (zh)", label),
     stance: field(text, "Stance", label),
     recall: field(text, "Recall from earlier days", label),
     mayReveal: field(text, "May reveal today", label),

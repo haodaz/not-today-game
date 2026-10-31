@@ -175,10 +175,14 @@ html,body{margin:0;background:#2b2e33;font-family:var(--font);color:var(--ink);f
 .br .list h3{font-size:13px;font-family:var(--font);color:var(--ink-3);font-weight:400;margin:0 0 8px}.br .list div{padding:8px 0;border-top:1px solid #f1f2f4;font-size:14px;line-height:1.5}.br .list div small{display:block;color:var(--ink-3);font-family:var(--font);font-size:11px;margin-top:2px}
 
 /* ===== added (not in the mock) ===== */
-/* Fit the stage (one monitor, or the room) into the viewport. --scale is set by the controller. */
+/* Fit the stage (one monitor, or the room) into the window (polish correction 2026-11-01):
+   --scale, --stage-x/--stage-y and #app's --letterbox are set by src/world/fit.ts. The letterbox
+   is the current view's photo covering the window, blurred and darkened, behind the stage. */
 html,body{height:100%;overflow:hidden}
-#app{width:100vw;height:100vh;overflow:hidden;background:#2b2e33}
+#app{position:relative;width:100vw;height:100vh;overflow:hidden;background:#0a0a0b}
+#app::before{content:"";position:absolute;inset:-60px;background:#0a0a0b var(--letterbox,none) center/cover no-repeat;filter:blur(24px) brightness(.45);pointer-events:none}
 .stage{transform:scale(var(--scale,1));transform-origin:0 0}
+#app > .stage{position:absolute;left:var(--stage-x,0px);top:var(--stage-y,0px)}
 /* One monitor at a time (amendment 2026-11-01): toggle at the top edge, the other monitor as a thin tab. */
 .stage.one-monitor{position:relative}
 .screen-toggle{position:absolute;left:50%;top:6px;transform:translateX(-50%);display:flex;gap:2px;z-index:8;background:rgba(20,22,26,.6);border-radius:8px;padding:2px}
