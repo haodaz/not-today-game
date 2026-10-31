@@ -380,6 +380,10 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.session.settingsOpen = false;
     ctx.rerender();
   },
+  // 绑定邮箱 (backend FR1): the link returns to this origin. Typing is kept by the controller's onInput.
+  "settings-email-send"(ctx) {
+    void sendEmailLink(window.location.origin, ctx.rerender);
+  },
   "settings-lang"(ctx, data) {
     if (data.lang !== "zh" && data.lang !== "en") return;
     setLocale(data.lang);

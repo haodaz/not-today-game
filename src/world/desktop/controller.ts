@@ -9,6 +9,7 @@ import { KuroBodyElement } from "./kuro/body";
 import { playSfx } from "@world/loop/sfx";
 import { MOTION } from "@world/motion/timing";
 import { applyFit, BACKDROPS } from "@world/fit";
+import { setEmailDraft } from "@net/email";
 import { buildShell, initialSession, type AppRenderers, type Session } from "./model";
 import { renderDesktop, APPS, type AppId } from "./shell";
 
@@ -164,6 +165,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     // No re-render while typing.
     if (el.dataset.input === "draft") session.draft = el.value;
     if (el.dataset.input === "kuro-text") session.kuroDraft = el.value;
+    if (el.dataset.input === "settings-email") setEmailDraft(el.value);
   };
   const onKey = (e: KeyboardEvent) => {
     const target = e.target as HTMLElement;

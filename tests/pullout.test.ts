@@ -24,7 +24,9 @@ import { createMotion } from "@world/motion/dom";
 import { loopActions, loopKeys, renderGame } from "@world/room/game";
 import { createSplatLayer, type SplatHooks, type SplatScene } from "@world/room/splat/layer";
 import { clampPose, lookOf, POSES, WINDOW_CLAMP, type Pose } from "@world/room/splat/pose";
-import { DARK_MS, easeInCubic, PULL_CUT_MS, PULL_END, PULL_MS, pullFrom, pullMove, pullOutAt, ROOM_CENTRE } from "@world/room/splat/pullout";
+import { DARK_MS, easeInCubic, PULL_CUT_MS, PULL_END, PULL_LOOK_AT, PULL_MS, pullFrom, pullMove, pullOutAt, ROOM_CENTRE } from "@world/room/splat/pullout";
+import { CALIBRATION } from "@world/room/splat/calibration";
+import { dayFiles } from "@state/days/table";
 
 const LAST = constants.lastDay as number;
 const dist = (a: { x: number; y: number; z: number }, b: { x: number; y: number; z: number }) => Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z);
@@ -39,9 +41,10 @@ describe("the timeline (pure): t → camera, island, dark", () => {
       expect(a.dark).toBe(0);
       const z = pullOutAt(PULL_MS, from);
       expect(z.camera.pos).toEqual(PULL_END);
-      // Looking at the room's centre: the look point lies on the ray to it.
-      const l = lookOf(z.camera, dist(PULL_END, ROOM_CENTRE));
-      expect(dist(l, ROOM_CENTRE)).toBeLessThan(1e-6);
+      // Looking at the desk pose's look target (from the calibration table): it lies on the camera's ray.
+      expect(PULL_LOOK_AT).toEqual({ x: CALIBRATION.desk.look[0], y: CALIBRATION.desk.look[1], z: CALIBRATION.desk.look[2] });
+      const l = lookOf(z.camera, dist(PULL_END, PULL_LOOK_AT));
+      expect(dist(l, PULL_LOOK_AT)).toBeLessThan(1e-6);
       expect(z.dark).toBe(1);
       expect(z.island).toBeCloseTo(dist(POSES[from].pos, ROOM_CENTRE) / dist(PULL_END, ROOM_CENTRE), 9);
       expect(z.island).toBeLessThan(0.15);
@@ -107,8 +110,13 @@ function storeOver(initial: State): Store {
   };
 }
 
-function ctxAt(state: State, ending: "bad" | "survive" | "good", nowMs = 1000) {
+/** Day 18's bedtime branch: the shutdown choice whose effects set `flag` (content's own choices). */
+const branch = (flag: string): number => dayFiles.get(LAST)!.beats.shutdown!.choices!.findIndex((c) => c.effects?.flags?.includes(flag));
+
+/** A store ended with `ending`; on the last day, through the bedtime branch unless `atShutdown`. */
+function ctxAt(state: State, ending: "bad" | "survive" | "good", nowMs = 1000, atShutdown = false) {
   const store = storeOver(state);
+  if (state.day === LAST && !atShutdown) store.appendEvent({ kind: "choose", beat: "shutdown", index: branch(ending === "good" ? "shook_hand" : "slip_filled") });
   store.appendEvent({ kind: "ending", ending });
   const timers: { ms: number; fn: () => void }[] = [];
   let now = nowMs;
@@ -156,6 +164,15 @@ describe("the three ending cuts", () => {
     timers.shift()!.fn();
     expect(ctx.session.pullOut).toBeNull();
     expect(ctx.session.endingPage?.phase).toBe(first);
+  });
+
+  it("a SAN-0 bad ending at day 18's shutdown (before the bedtime branch) skips the pull-out", () => {
+    const { ctx, timers } = ctxAt({ ...f(LAST), san: 0 }, "bad", 1000, true);
+    expect(ctx.store.getEvents().some((e) => e.kind === "choose")).toBe(false);
+    startEnding(ctx);
+    expect(ctx.session.pullOut).toBeNull();
+    expect(ctx.session.endingPage?.phase).toBe("you");
+    expect(timers).toHaveLength(0);
   });
 
   it("before the last day there is no pull-out (a SAN-0 bad ending on day 3 goes straight to its page)", () => {
@@ -287,6 +304,7 @@ describe("in the game", () => {
   it("splat off: the photo island over black, the dark layer, no splat, a black letterbox", async () => {
     const { root, store, session } = mountLast(null);
     await frame();
+    store.appendEvent({ kind: "choose", beat: "shutdown", index: branch("slip_filled") });
     store.appendEvent({ kind: "ending", ending: "survive" });
     await frame();
     expect(session.pullOut).not.toBeNull();
@@ -312,6 +330,7 @@ describe("in the game", () => {
     await wait(0);
     expect(hooks()!.status()).toBe("ready");
     // Which ending doesn't matter to the layer; survive is due on a plain last day.
+    store.appendEvent({ kind: "choose", beat: "shutdown", index: branch("slip_filled") });
     store.appendEvent({ kind: "ending", ending: "survive" });
     await frame();
     const layer = root.querySelector<HTMLElement>(":scope > .splat-layer");

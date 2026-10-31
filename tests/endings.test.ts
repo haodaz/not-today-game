@@ -258,12 +258,9 @@ describe("credits are Kuro's log (FR3)", () => {
       store.appendEvent({ kind: "ending", ending });
       const { ctx, timers } = ctxFor(store);
       startEnding(ctx);
-      // On the last day the pull-out plays first (room-scene addition 2026-11-01); its cut opens the pages.
-      if (store.getState().day === LAST) {
-        expect(ctx.session.pullOut?.ending).toBe(ending);
-        expect(ctx.session.endingPage).toBeNull();
-        for (const t of timers.splice(0)) t.fn();
-      }
+      // No bedtime branch in this log, so no pull-out (that flow is in tests/pullout.test.ts): the pages at once.
+      expect(ctx.session.pullOut).toBeNull();
+      expect(timers.every((t) => t.ms !== 6000)).toBe(true);
       const phases = [ctx.session.endingPage!.phase];
       for (let i = 0; i < 5; i++) {
         endingNext(ctx);

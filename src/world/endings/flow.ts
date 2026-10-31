@@ -2,6 +2,7 @@
 // first jumps to the end of the roll. What happens after the last page belongs to the host
 // (main.ts): clearing the run, the profile, the title page. Tests stub `endingHost`.
 import type { Ending } from "@state/endings";
+import type { GameEvent } from "@state/events";
 import type { State } from "@state/types.gen";
 import { constants } from "@state/variables";
 import type { ActionContext } from "@world/desktop/controller";
@@ -20,8 +21,18 @@ export const endingHost: EndingHost = { afterBad: () => {}, newRun: () => {} };
 
 const nowOf = (ctx: ActionContext) => ctx.now?.() ?? Date.now();
 
-/** The day-18 pull-out plays before the pages when the run ends on the last day (room-scene addition 2026-11-01). */
-export const pullOutApplies = (state: State): boolean => state.day === (constants.lastDay as number);
+/**
+ * The day-18 pull-out belongs to the bedtime branch only (author 2026-11-01): the run ended on the
+ * last day after its shutdown choice was made. A SAN-0 bad ending at day 18's shutdown comes
+ * before that choice and goes straight to its page.
+ */
+export function pullOutApplies(state: State, events: readonly GameEvent[]): boolean {
+  const last = constants.lastDay as number;
+  if (state.day !== last) return false;
+  const end = events.findIndex((e) => e.kind === "ending");
+  const upTo = end < 0 ? events : events.slice(0, end);
+  return upTo.some((e) => e.kind === "choose" && e.day === last && (e as { beat?: string }).beat === "shutdown");
+}
 
 /**
  * The run has just ended (or was ended when loaded). On the last day the camera pulls out first
@@ -37,7 +48,7 @@ export function startEnding(ctx: ActionContext): void {
   session.historyOpen = false;
   session.holding = null;
   session.settingsOpen = false;
-  if (pullOutApplies(state)) {
+  if (pullOutApplies(state, store.getEvents())) {
     const from = pullFrom(session.view);
     // The ending stage is the room's (1600 × 900), whatever the last view was.
     if (session.view === "desktop") session.view = "desk";

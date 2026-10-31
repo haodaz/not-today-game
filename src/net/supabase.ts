@@ -6,10 +6,14 @@ import type { ChatLocale, ChatResponse, LogEvent } from "@kuro/types.ts";
 import { syncDecision, type RunCopy, type SyncDecision } from "./sync";
 
 /** What the game calls on the client (a small slice of supabase-js). */
-interface SupabaseLike {
+export interface SupabaseLike {
   auth: {
-    getSession(): Promise<{ data: { session: { user: { id: string } } | null } }>;
+    getSession(): Promise<{ data: { session: { user: SessionUser } | null } }>;
     signInAnonymously(): Promise<{ data: { user: { id: string } | null }; error: unknown }>;
+    /** Anonymous → email (supabase-js 2.x): a confirmation link to the new address; the user id stays. */
+    updateUser(attrs: { email: string }, options?: { emailRedirectTo?: string }): Promise<{ data: unknown; error: unknown }>;
+    /** A magic link when there is no session at all. */
+    signInWithOtp(params: { email: string; options?: { emailRedirectTo?: string; shouldCreateUser?: boolean } }): Promise<{ data: unknown; error: unknown }>;
   };
   from(table: string): {
     upsert(row: Record<string, unknown>): Promise<{ error: unknown }>;
@@ -50,10 +54,31 @@ export function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
   });
 }
 
+/** What the game reads of the session's user. */
+interface SessionUser {
+  readonly id: string;
+  readonly email?: string | null;
+  readonly is_anonymous?: boolean;
+}
+
 let clientPromise: Promise<SupabaseLike | null> | null = null;
 let userId: string | null = null;
+/** The bound email of this session's user (not anonymous), or null. */
+let boundEmail: string | null = null;
+/** Tests: a mocked client (or null for offline); undefined = the real one from the env. */
+let testClient: SupabaseLike | null | undefined;
+
+export function setSupabaseForTests(c: SupabaseLike | null | undefined): void {
+  testClient = c;
+  clientPromise = null;
+  userId = null;
+  boundEmail = null;
+}
+
+const emailOf = (u: SessionUser | undefined): string | null => (u && !u.is_anonymous && typeof u.email === "string" && u.email ? u.email : null);
 
 async function client(): Promise<SupabaseLike | null> {
+  if (testClient !== undefined) return testClient;
   const cfg = netConfig();
   if (!cfg) return null;
   clientPromise ??= import("@supabase/supabase-js")
@@ -74,9 +99,31 @@ export interface RunSnapshot extends RunCopy {
 }
 
 export const net = {
-  configured: (): boolean => netConfig() !== null,
+  configured: (): boolean => (testClient !== undefined ? testClient !== null : netConfig() !== null),
   /** Signed in (anonymously) this session. */
   signedIn: (): boolean => userId !== null,
+  /** The email this session's user is bound to, or null (anonymous, offline). */
+  boundEmail: (): string | null => boundEmail,
+
+  /**
+   * 绑定邮箱 (backend FR1): send the link. With a session (the anonymous user) it is
+   * `updateUser({ email })`, which links the email to the same user id, so the run stays. Without
+   * a session, a magic link (`signInWithOtp`). The link returns to `origin`. Never throws.
+   */
+  async bindEmail(email: string, origin: string): Promise<"sent" | "error"> {
+    try {
+      const c = await client();
+      if (!c) return "error";
+      const user = (await c.auth.getSession()).data.session?.user;
+      const res = user
+        ? await c.auth.updateUser({ email }, { emailRedirectTo: origin })
+        : await c.auth.signInWithOtp({ email, options: { emailRedirectTo: origin, shouldCreateUser: true } });
+      return res.error ? "error" : "sent";
+    } catch (e) {
+      console.warn("email link failed", e);
+      return "error";
+    }
+  },
 
   /** 开始 / 继续: sign in anonymously once (FR1); the names go to `profiles`. Never throws. */
   async signIn(names?: unknown): Promise<boolean> {
@@ -84,6 +131,7 @@ export const net = {
       const c = await client();
       if (!c) return false;
       const existing = await c.auth.getSession();
+      boundEmail = emailOf(existing.data.session?.user);
       userId = existing.data.session?.user.id ?? (await c.auth.signInAnonymously()).data.user?.id ?? null;
       if (userId && names !== undefined) await c.from("profiles").upsert({ id: userId, names });
       return userId !== null;

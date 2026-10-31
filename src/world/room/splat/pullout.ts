@@ -5,6 +5,7 @@
 //             ease-in, the window clamp bypassed (a scripted move);
 //   3 … 6 s   the dark fades in around the island;
 //   cut       good at 2 s (the door opens instead), bad and survive at 6 s; then the ending card.
+import { CALIBRATION } from "./calibration";
 import { easeInOutCubic, lookOf, POSES, poseFromLook, type CameraMove, type Pose, type PoseId, type Vec3 } from "./pose";
 
 export const PULL_MS = 6_000;
@@ -15,7 +16,12 @@ export const PULL_CUT_MS: Readonly<Record<"bad" | "survive" | "good", number>> =
 
 /** The far end (the author's "about (67, −29, −1)"). */
 export const PULL_END: Vec3 = { x: 67, y: -29, z: -1 };
-/** What the camera keeps looking at: the middle of the reconstructed room (mean of the three framings' positions). */
+/** What the camera keeps looking at (author 2026-11-01): the desk pose's look target, from the calibration. */
+export const PULL_LOOK_AT: Vec3 = { x: CALIBRATION.desk.look[0], y: CALIBRATION.desk.look[1], z: CALIBRATION.desk.look[2] };
+/**
+ * Where the room is, for its apparent size (the island): the mean of the three framings'
+ * positions. Not where the camera looks: the look target lies ~24 units beyond the desk.
+ */
 export const ROOM_CENTRE: Vec3 = (() => {
   const ps = Object.values(POSES).map((p) => p.pos);
   const n = ps.length;
@@ -31,13 +37,13 @@ export const easeInCubic = (t: number): number => {
 const lerpV = (a: Vec3, b: Vec3, t: number): Vec3 => ({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, z: a.z + (b.z - a.z) * t });
 const dist = (a: Vec3, b: Vec3) => Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z);
 
-/** The pull-out from a framing: position to PULL_END, gaze turning onto the room's centre. */
+/** The pull-out from a framing: position to PULL_END, gaze turning onto the desk pose's look target. */
 export function pullPath(from: PoseId): (e: number) => Pose {
   const start = POSES[from];
   const look0 = lookOf(start);
   return (e) => {
     const pos = lerpV(start.pos, PULL_END, e);
-    const target = lerpV(look0, ROOM_CENTRE, easeInOutCubic(Math.min(1, e * 4)));
+    const target = lerpV(look0, PULL_LOOK_AT, easeInOutCubic(Math.min(1, e * 4)));
     return { ...poseFromLook(pos, target), fov: start.fov };
   };
 }

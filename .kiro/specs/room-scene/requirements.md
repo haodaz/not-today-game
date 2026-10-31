@@ -47,3 +47,8 @@ Seen in the browser: the splat draws and leaves, but (1) the camera barely trave
 - A splat move lasts **900 ms** (the CSS push for these two views is lengthened to match); the camera travels the whole way, ease-in-out.
 - The end pose of 房间→桌子 is the README's **close-desk pose** (the one measured on room.splat, not f43 from door.splat), and the field of view is chosen so the last splat frame lines up with `desk_close.jpg`'s framing: Kiro measures it by overlaying the photo at 50 % in a dev-only `?splatcal=1` mode and reports the FOV and pose used. Same for 桌子→房间 against `room.jpg`.
 - The 房间 pose may include the window; the vignette stays.
+
+## Correction 2026-11-01 (author): the good ending pulls out too, and sees Kuro itself
+Every ending on night 18 does the full 6 s pull-out. What appears in the black differs:
+- **Bad and survive:** the layer of eyes and tentacles as written above.
+- **Good:** no scattered eyes. A **single giant Kuro**, realistic, not the cartoon sprite: a black three-headed hound (Cerberus) whose body is an octopus, its arms wrapped around the whole space so the lit room sits inside its embrace. Assets Claude will provide under `public/room/dark/giant/`: `body.png` (the embrace, a ring of arms with the gap for the room at centre, transparent inside), `heads.png` (three heads above the room, eyes dull red), and `arm_*.png` for slow drift. It fades in over the same last 3 s, the heads last; the room is never covered. Then the credits. The 2 s cut for good is dropped once these assets exist; until then the earlier rule stands.

@@ -25,6 +25,7 @@ import { DESK_SHOT, rectStyle, ROOM_SHOT } from "./shots";
 import { bookReader, deskBook, figuresLayer } from "./collection";
 import { knows } from "@state/recognise";
 import { bpm, sanBand } from "@state/endings";
+import { emailRow, type EmailRow } from "@net/email";
 
 /** The flag the hand sets when it takes the heartbeat (content/nights-takes.json `what: heartbeat`). */
 const HEARTBEAT_TAKEN: string | null = raidNights.map(takeOf).find((t) => t?.what === "heartbeat")?.flag ?? null;
@@ -118,14 +119,32 @@ export function settingsButton(): SafeHtml {
  * The settings panel, centred over the current view with the view dimmed: 声音 on/off, 语言
  * 中文 · English (re-renders at once), 返回首页, 取消. Nothing here restarts the run.
  */
-export function settingsPanel(session: Pick<Session, "settingsOpen" | "muted">, opts: { readonly home: boolean } = { home: true }): SafeHtml | null {
+/**
+ * 绑定邮箱 (backend FR1): an email input with 发送链接 and a status line; once bound, the address;
+ * nothing offline or without env.
+ */
+export function emailRowHtml(row: EmailRow): SafeHtml | null {
+  if (row.kind === "hidden") return null;
+  if (row.kind === "bound") {
+    return html`<div class="row email" data-email="bound"><span>${tr("settings.bindEmail")}</span><span class="email-bound">${tr("settings.emailBound", { email: row.email })}</span></div>`;
+  }
+  const sending = row.status === "sending";
+  const statusKey = row.status === "sent" ? "settings.emailSent" : row.status === "error" ? "settings.emailError" : "settings.emailHint";
+  return html`<div class="row email" data-email="input" data-status="${row.status}"><label for="settings-email">${tr("settings.bindEmail")}</label><span class="email-in"><input id="settings-email" type="email" inputmode="email" autocomplete="email" spellcheck="false" data-input="settings-email" data-focus="settings-email" data-enter="settings-email-send" placeholder="${t("settings.emailPlaceholder")}" value="${row.draft}" aria-describedby="settings-email-status"${sending ? html` disabled` : null}><button type="button" data-action="settings-email-send"${sending ? html` disabled` : null}>${tr("settings.emailSend")}</button></span></div><p id="settings-email-status" class="${cls("email-status", row.status)}" role="status" aria-live="polite">${tr(statusKey)}</p>`;
+}
+
+export function settingsPanel(
+  session: Pick<Session, "settingsOpen" | "muted">,
+  opts: { readonly home: boolean; readonly email?: EmailRow } = { home: true },
+): SafeHtml | null {
   if (!session.settingsOpen) return null;
+  const email = emailRowHtml(opts.email ?? emailRow());
   const sound = !session.muted;
   // The title page has no 返回首页: it is the home (title-page FR2).
   const home = opts.home ? html`<button type="button" data-action="settings-home">${tr("settings.home")}</button>` : null;
   const lang = (l: Locale) =>
     html`<button type="button" class="${getLocale() === l ? "on" : ""}" data-action="settings-lang" data-lang="${l}" aria-pressed="${getLocale() === l ? "true" : "false"}">${tr(`settings.lang.${l}`)}</button>`;
-  return html`<div class="settings-layer"><button type="button" class="settings-dim" data-action="settings-close" aria-label="${t("settings.cancel")}"></button><div class="settings" role="dialog" aria-modal="true" aria-labelledby="settings-title"><h3 id="settings-title">${tr("settings.title")}</h3><div class="row"><span>${tr("settings.sound")}</span><button type="button" class="${cls("switch", sound && "on")}" data-action="loop-mute" role="switch" aria-checked="${sound ? "true" : "false"}" aria-label="${t("settings.sound")}"><i></i></button></div><div class="row"><span>${tr("settings.lang")}</span><span class="seg">${lang("zh")}<b>·</b>${lang("en")}</span></div><div class="actions">${home}<button type="button" data-action="settings-close">${tr("settings.cancel")}</button></div></div></div>`;
+  return html`<div class="settings-layer"><button type="button" class="settings-dim" data-action="settings-close" aria-label="${t("settings.cancel")}"></button><div class="settings" role="dialog" aria-modal="true" aria-labelledby="settings-title"><h3 id="settings-title">${tr("settings.title")}</h3><div class="row"><span>${tr("settings.sound")}</span><button type="button" class="${cls("switch", sound && "on")}" data-action="loop-mute" role="switch" aria-checked="${sound ? "true" : "false"}" aria-label="${t("settings.sound")}"><i></i></button></div><div class="row"><span>${tr("settings.lang")}</span><span class="seg">${lang("zh")}<b>·</b>${lang("en")}</span></div>${email}<div class="actions">${home}<button type="button" data-action="settings-close">${tr("settings.cancel")}</button></div></div></div>`;
 }
 
 /**
