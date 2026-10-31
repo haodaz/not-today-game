@@ -14,6 +14,7 @@ Why a backend at all: Kuro's online chat needs an LLM key, and a key can never s
 - Never store the login inputs as prompt material; `names` reach prompts only through the name variable, as voices.md says.
 
 ## FR3. Edge function `kuro-chat`
+- Kuro has exactly three private sources, assembled per call in this order: (1) self: `content/kuro-profile.md` + the day's `kuro-days/day-NN.md` stance and idiom; (2) the player's background: `content/kuro-world.md` plus the slice of the event log the day's gate allows (see that file's "by day" section); (3) memory: `kuro_memory` turns + summary. Nothing else enters the prompt. The login inputs never do.
 - Input: `{run_id, day, text}`. Server loads memory, the day's stance (`content/kuro-days/day-NN.md` bundled with the function), the allowed tools, the rubric; calls the LLM (provider and key in function secrets); returns `{reply, judgement?}`.
 - Counts turns per run per day server-side: the sixth call returns the constant bedtime line and `turnsLeft: 0`.
 - Writes memory and judgement rows; returns the reply raw. The decay filter runs on the client (pure, snapshot-tested).
