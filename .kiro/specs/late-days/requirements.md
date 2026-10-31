@@ -9,7 +9,7 @@ What the last cycles add on top of rings (stages.json `cycles[].ring`). All of i
 - From day 16 every Kuro state uses the `_red` variant of its frames (`public/kuro/k3d_<state>_red.png`, same alignment, eyes red). The avatar in dialogue uses `k3d_base_red.png`. No other change: it is just the eyes.
 
 ## FR3. The maw, days 16–18
-- New state `maw` (`k3d_maw.png`, `k3d_maw2.png`): mouth open, rows and rows of teeth, worm-like. Plays only in FR4 and in the night-hand beat of days 16–18 when the player holds up nothing.
+- New state `maw`, three frames, each its own look (no crossfade between them, cut): `k3d_maw.png` one ring of teeth (the flash in FR4), `k3d_maw2.png` rings receding into the throat (night-hand beat of days 16–18 when the player holds up nothing), `k3d_maw3.png` a black tentacle coming out of the maw (day 18 night only). Author 2026-11-01: keep all three.
 
 ## FR4. Kuro closes what it does not want you to read, days 16–18
 - `content/browser/day-16..18.json` pages and `content/days` items may carry `kuroCloses: true` (Claude adds). When the player opens such a page/document, after 1.2 s Kuro's HUD body crawls (crawl loop) from the corner to the window's close control, the `maw` frame flashes for 400 ms, the window closes, and the dialogue box shows Kuro's line from the content (`kuroClosesLine`, zh/en). The player can reopen; Kuro does it again, each time 0.3 s sooner. Nothing is lost; it is only closed. Logged as event `kuroClosed {pageId}` (judgement can cite it).
