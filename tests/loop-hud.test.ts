@@ -121,9 +121,7 @@ describe("room HUD (FR6)", () => {
       const store = storeAt(day);
       renderRoom({ state: store.getState(), events: [], session: initialSession(DEFAULT_CLOCK, "left", "room") });
     }
-    expect(missingKeys()).toEqual(
-      ["hud.box.left", "hud.cam.desk", "hud.cam.door", "hud.cam.room", "hud.hr", "hud.menu.lang", "hud.menu.restart", "hud.menu.sound", "hud.overdue", "hud.phone", "hud.today"].sort(),
-    );
+    expect(missingKeys()).toEqual([]);
     resetMissing();
   });
 });
