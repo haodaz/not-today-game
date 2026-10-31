@@ -42,6 +42,7 @@ import { browserPage } from "@world/desktop/browser/data";
 import { workbenchActions } from "@world/desktop/workbench/actions";
 import { cancelCloser, startCloser } from "@world/late/closer";
 import { startJudgement } from "@world/dialogue/judge";
+import { sendEmailLink } from "@net/email";
 
 export function renderGame(store: Store, session: Session, nowMs: number): SafeHtml {
   const state = store.getState();

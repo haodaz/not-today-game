@@ -272,3 +272,14 @@
 #app.splat-pull > .pullout-page{background:transparent}
 #app.splat-pull > .pullout-page .pull-island{visibility:hidden}
 @media (prefers-reduced-motion: reduce){.pullout-page .pull-dark img{animation:none}}
+/* 绑定邮箱 (backend FR1): input + 发送链接, a status line under it; once bound, the address. */
+.settings .row.email{flex-wrap:wrap;gap:8px}
+.settings .email-in{display:flex;gap:6px;flex:1 1 100%}
+.settings .email-in input{flex:1;min-width:0;min-height:32px;padding:4px 8px;border:1px solid rgba(29,33,41,.25);border-radius:6px;font:14px inherit;background:#fff;color:#1d2129}
+.settings .email-in input:focus-visible{outline:2px solid rgba(139,47,42,.45);outline-offset:1px}
+.settings .email-in button{min-height:32px;white-space:nowrap}
+.settings .email-in [disabled]{opacity:.55;cursor:default}
+.settings .email-status{margin:4px 0 8px;font-size:12px;line-height:1.5;color:#5b5f66}
+.settings .email-status.sent{color:#2f6b3a}
+.settings .email-status.error{color:#8b2f2a}
+.settings .email-bound{font-size:13px;color:#2f6b3a;word-break:break-all}

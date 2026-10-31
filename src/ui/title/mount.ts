@@ -3,6 +3,7 @@
 // 2026-11-01). The view is pure (view.ts); this file owns timers and sound only.
 import { getLocale, setLocale } from "@world/i18n";
 import { applyFit, BACKDROPS } from "@world/fit";
+import { sendEmailLink, setEmailDraft } from "@net/email";
 import type { State } from "@state/types.gen";
 import type { Collection } from "@world/room/collection";
 import { arrived, canStart, diceOptions, initialTitle, QUESTIONS, rowsShown, toMenu, toNames, toQuestions, withAnswer, withPronoun, type TextQuestion, type TitleModel } from "./model";
@@ -180,6 +181,8 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     "title-continue": () => deps.onContinue(),
     "title-settings": () => set({ ...model, settingsOpen: true }),
     "settings-close": () => set({ ...model, settingsOpen: false }),
+    // 绑定邮箱 (backend FR1): the same row as in the game; the link returns to this origin.
+    "settings-email-send": () => void sendEmailLink(win.location.origin, render),
     "settings-lang": (el) => {
       const l = el.dataset.lang;
       if (l === "zh" || l === "en") setLocale(l);
@@ -222,6 +225,7 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
   };
   const onInput = (e: Event) => {
     const el = e.target as HTMLInputElement;
+    if (el.dataset.input === "settings-email") return setEmailDraft(el.value);
     const q = el.dataset.q as TextQuestion | undefined;
     if (!q || !el.dataset.input?.startsWith("title-")) return;
     const before = { shown: rowsShown(model.answers), ready: canStart(model.answers) };
@@ -239,7 +243,9 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     }
     if (e.key === "Enter" && (e.target as HTMLElement).tagName === "INPUT") {
       e.preventDefault();
-      if (canStart(model.answers)) start();
+      // Enter in 绑定邮箱 sends the link; it never starts a run.
+      if ((e.target as HTMLElement).dataset.input === "settings-email") actions["settings-email-send"]!((e.target as HTMLElement));
+      else if (canStart(model.answers)) start();
       else focusOpen();
     }
   };
