@@ -25,3 +25,12 @@ The room is the backdrop for the five beats and the stage for rings desk/wall/ro
 
 ## FR5. Tests
 - Smoke test that the scene mounts headless (swiftshader) and renders a non-black frame for each named camera.
+
+## Scope decision 2026-11-01 (author, after a probe of room.splat): the splat is for motion only
+The probe showed the splat is sharp around the desk, the monitors, the bed and the back wall, and a fog toward the window side. So the room scene does **not** replace the photo stages. Scope now:
+- **Stills stay photos.** 房间 / 桌子 / 门 keep their photo backdrops, hotspots and HUD exactly as today.
+- **Moves use the splat.** A camera move between 房间 and 桌子 (and later 床 for the night beat) renders the splat for the duration of the move, from the pose of the departing framing to the pose of the arriving one (poses in `public/room/README.md`: 房间 = f080, 桌子 = f43, 床 = f159), then cross-fades to the photo of the arriving framing in the last 200 ms. The photo stage is shown underneath, so a slow load falls back to today's CSS push without any gap.
+- **Night and collapse** use the splat too: at night the room darkens with the lamp glow and the gap light as shader/DOM layers over the splat; from ring `room` (day 13+) the collapsed look is a colour grade and pore overlay on the splat; `room_collapsed.splat` stays optional.
+- **The window side is never framed.** Poses are clamped so the camera never looks past the desk's left edge toward the window; a vignette (edges 35 % darker) hides floaters at the corners.
+- **Asset:** use `public/room/room_clean.splat` (pruned by Claude with script/tools/splat-prune.mjs: oversized and far-out gaussians removed, 1.5 % of the set; the window-side fog cannot be pruned away, hence the pose clamp and the vignette). Loader `@mkkellogg/gaussian-splats-3d` with three.js, loaded lazily after the first render, never on the title page.
+- FR3 objects and FR4 ring geometry stay as written but are a later segment; this segment is only the move, night and collapse layers, with the feature behind a `?splat=0` kill switch and off when WebGL is unavailable.
