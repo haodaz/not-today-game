@@ -1,0 +1,34 @@
+{
+  "_note": "Test-only fixture for the workbench layout. Not content; neutral text on purpose.",
+  "day": 1,
+  "doing": [
+    { "title": "job one", "status": "status one", "tone": "warn" },
+    { "title": "job two", "status": "status two", "tone": "ok" }
+  ],
+  "recent": ["recent one"],
+  "docs": {
+    "tag": "v2",
+    "count": "2",
+    "countLabel": "count label",
+    "versions": [{ "v": "v2", "when": "when two" }, { "v": "v1", "when": "when one" }],
+    "page": {
+      "title": "doc title",
+      "meta": "doc meta",
+      "left": { "h": "left head", "lines": [{ "n": 1, "text": "line one", "mark": "y" }, { "n": 2, "text": "line two", "mark": "" }] },
+      "right": { "h": "right head", "lines": [{ "n": 1, "text": "line one", "mark": "y" }, { "n": 2, "text": "line two", "mark": "del" }, { "n": 2, "text": "line two b", "mark": "add" }] }
+    }
+  },
+  "ledger": {
+    "cardLabel": "card label",
+    "cardLines": [{ "label": "label one", "value": "100", "tone": "" }, { "label": "label two", "value": "x", "tone": "red" }],
+    "columns": { "receivable": ["c1", "c2", "c3", "c4"], "salary": ["s1", "s2", "s3", "s4"], "model": ["m1", "m2", "m3", ""] },
+    "receivable": [{ "client": "client one", "due": "10", "paid": "0", "overdue": "state" }, { "client": "client two", "due": "5", "paid": "5", "overdue": "0" }],
+    "salary": [{ "name": "name one", "due": "1", "paid": "1", "diff": "0", "me": false }, { "name": "{calledBy}", "due": "2", "paid": "0", "diff": "diff", "me": true }],
+    "model": [{ "date": "date one", "calls": "3", "amount": "0" }]
+  },
+  "now": [{ "left": "now left", "right": "now right" }],
+  "changelog": [{ "v": "v2", "when": "today", "text": "change two", "short": "short two" }, { "v": "v1", "when": "earlier", "text": "change one", "short": "short one" }],
+  "code": { "file": "file.ts", "meta": "code meta", "lines": [{ "n": 1, "seg": [{ "k": "kw", "s": "export" }, { "k": "", "s": " const x = 1; " }, { "k": "c", "s": "// note" }] }] },
+  "common": { "tabs": ["tab one", "tab two"], "items": [{ "tag": "tag", "text": "item text" }] },
+  "continue": ["chip one"]
+}
