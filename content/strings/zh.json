@@ -179,5 +179,9 @@
   "kuro.ask": "要和克总聊聊吗？",
   "kuro.yes": "聊聊",
   "kuro.notNow": "先不聊",
-  "room.book": "那本书"
+  "room.book": "那本书",
+  "title.fig.bad": "第一日，改",
+  "title.fig.survive": "回到第一日",
+  "title.fig.good": "第十九日",
+  "title.version": "v0.1 · Kiroween 2026"
 }

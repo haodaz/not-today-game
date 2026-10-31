@@ -1,0 +1,21 @@
+{
+  "idle": {
+    "firstQuietMs": 15000,
+    "everyMs": [20000, 40000],
+    "events": [
+      { "id": "lamp_dim", "layer": "lamp", "ms": 80 },
+      { "id": "right_monitor_wakes", "layer": "monitor_right", "ms": 200 },
+      { "id": "chair_shift", "layer": "chair", "ms": 0 },
+      { "id": "gap_light", "layer": "gap", "ms": 1000 },
+      { "id": "rain_stops", "layer": "rain", "ms": 3000 }
+    ]
+  },
+  "newGame": { "monitorsWakeMs": 600 },
+  "start": { "pushMs": 1400 },
+  "figures": {
+    "bad": { "src": "/room/fig_bad.png", "name": "title.fig.bad" },
+    "survive": { "src": "/room/fig_survive.png", "name": "title.fig.survive" },
+    "good": { "src": "/room/fig_good.png", "name": "title.fig.good" }
+  },
+  "book": { "src": "/room/book.png", "reader": "/gamebook/" }
+}

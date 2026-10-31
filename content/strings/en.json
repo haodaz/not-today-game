@@ -179,5 +179,9 @@
   "kuro.ask": "Talk with Kuro?",
   "kuro.yes": "Let’s talk",
   "kuro.notNow": "Not now",
-  "room.book": "The book"
+  "room.book": "The book",
+  "title.fig.bad": "Day one, again",
+  "title.fig.survive": "Back to day one",
+  "title.fig.good": "Day nineteen",
+  "title.version": "v0.1 · Kiroween 2026"
 }
