@@ -14,7 +14,10 @@ import { mealView } from "@world/delivery/meals";
 import { renderDoorView } from "@world/delivery/view";
 import { cls, html, raw, type SafeHtml } from "@world/html";
 import { getLocale, t, tr, type Locale } from "@world/i18n";
-import { checklist, loopContext, type ChecklistView } from "@world/loop/checklist";
+import { booted, checklist, deskMeal, loopContext, type ChecklistView, type LoopContext } from "@world/loop/checklist";
+import type { EventToken } from "@state/days/table";
+import { itemOf } from "@state/delivery/shops";
+import { ordersOn } from "@world/delivery/meals";
 import { raidNights, takeOf } from "@state/nights";
 import { isNight } from "@world/desktop/beat";
 import { hudKuro } from "@world/desktop/kuro/mini";
@@ -42,13 +45,8 @@ export function boxObjectFor(day: number): string | null {
 }
 
 export function renderChecklist(view: ChecklistView): SafeHtml {
-  const lines = view.lines.map((l) => {
-    const inner = html`<i></i>${l.text}`;
-    const c = cls("it", l.state);
-    return l.action
-      ? html`<button type="button" class="${c}" data-action="loop-item" data-id="${l.id}">${inner}</button>`
-      : html`<div class="${c}" data-id="${l.id}">${inner}</div>`;
-  });
+  // The checklist only watches (day-loop correction 2026-11-01): no line is a button.
+  const lines = view.lines.map((l) => html`<div class="${cls("it", l.state)}" data-id="${l.id}"><i></i>${l.text}</div>`);
   const done = view.doneCount > 0 ? html`<div class="done">${tr("hud.done", { n: view.doneCount })}</div>` : null;
   return html`<div class="list"><div class="h">${tr("hud.today")}</div>${done}${lines}</div>`;
 }
@@ -77,7 +75,28 @@ function deskBar(state: State, events: readonly GameEvent[], session: Session): 
         ? html`<button type="button" class="${cls("slot", "upgraded", unknown(id), held === id && "lifted")}" data-object="${id}" data-res="hi" data-action="loop-hold"><img src="/objects/${id}_front.png" alt=""><div class="screen-hi" data-screen="${id}"></div></button>`
         : html`<button type="button" class="${cls("slot", unknown(id), held === id && "lifted")}" data-object="${id}" data-action="loop-hold"><img src="/objects/${id}_white.png" alt=""><div class="lcd" data-screen="${id}"></div></button>`,
     );
-  return html`<div class="bar"><button type="button" class="slot" data-action="loop-box">${left > 0 ? html`<div class="box"></div><span>${tr("hud.box.left", { n: left })}</span>` : html`<div class="box" style="opacity:.3"></div>`}</button><button type="button" class="${cls("slot", held === "phone" && "lifted")}" data-action="loop-phone"><div class="phone"></div><span>${tr("hud.phone")}</span></button><div class="slot"><div class="cup"></div></div>${objects}</div>`;
+  return html`<div class="bar"><button type="button" class="slot" data-action="loop-box">${left > 0 ? html`<div class="box"></div><span>${tr("hud.box.left", { n: left })}</span>` : html`<div class="box" style="opacity:.3"></div>`}</button><button type="button" class="${cls("slot", held === "phone" && "lifted")}" data-action="loop-phone"><div class="phone"></div><span>${tr("hud.phone")}</span></button><div class="slot"><div class="cup"></div></div>${mealSlot(state, events)}${objects}</div>`;
+}
+
+/**
+ * The meal on the desk bar (day-loop correction 2026-11-01): after 去拿 it sits there as its food
+ * image (content/delivery.json `sprite`); clicking it eats. Eaten, its empty box stays until the
+ * next meal is taken in: `<sprite>_done.png` where content has one, else the food image greyed
+ * (the <object> falls back to its <img> when the _done file is missing).
+ */
+function mealSlot(state: State, events: readonly GameEvent[]): SafeHtml | null {
+  const lc = loopContext(state, events);
+  const at = lc ? deskMeal(lc) : null;
+  if (!lc || !at) return null;
+  const order = ordersOn(events, state.day)[at.meal];
+  const sprite = order ? itemOf(order.shopId, order.itemId)?.sprite : undefined;
+  const food = sprite ? `/${sprite}.png` : null;
+  if (at.eaten) {
+    const empty = food ? html`<object data="/${sprite}_done.png" type="image/png" aria-hidden="true"><img class="eaten" src="${food}" alt=""></object>` : null;
+    return html`<div class="slot meal done" data-meal="${at.meal}">${empty}</div>`;
+  }
+  const label = itemText(lc, (e) => e.type === "eat" && e.meal === at.meal);
+  return html`<button type="button" class="slot meal" data-action="loop-eat" data-meal="${at.meal}"${label ? html` aria-label="${label}"` : null}>${food ? html`<img src="${food}" alt="">` : null}</button>`;
 }
 
 /** The camera chips: 房间 · 桌子 · 屏幕 · 门 (`hud.cam.desk` is 桌子 now; 屏幕 is `hud.cam.screen`). */
@@ -157,15 +176,28 @@ export interface RoomModel {
  * monitors) goes to 桌子. 桌子: each monitor goes to 屏幕 on that side. Both: the glowing small
  * window on the right monitor calls Kuro. They sit under the HUD.
  */
-function shotHits(view: "room" | "desk"): SafeHtml {
+/** The text of today's item done by this event (content), as an actuator's accessible name. */
+function itemText(lc: LoopContext | null, match: (e: EventToken) => boolean): string {
+  return lc?.file.items.find((it) => it.done.kind === "event" && match(it.done.event))?.text ?? "";
+}
+
+function shotHits(view: "room" | "desk", state: State, events: readonly GameEvent[]): SafeHtml {
+  const lc = loopContext(state, events);
   // Nothing on the monitors themselves: no glow, no box (day-loop correction). Kuro's call button
   // is its body at the HUD's bottom right.
+  // The tower's power button boots the computer (day-loop correction 2026-11-01: the checklist
+  // only watches). While it is off a faint light shows on it; once on it is only the picture.
+  const shot = view === "room" ? ROOM_SHOT : DESK_SHOT;
+  const tower = booted(state, events)
+    ? null
+    : html`<button type="button" class="shot-hit tower-hit" data-action="tower-power" style="${rectStyle(shot.tower)}" aria-label="${t("room.tower.off")}"><i class="tower-led"></i></button>`;
   if (view === "room") {
-    return html`<button type="button" class="shot-hit" data-action="view" data-view="desk" style="${rectStyle(ROOM_SHOT.desk)}" aria-label="${t("hud.cam.desk")}"></button>`;
+    const bed = itemText(lc, (e) => e.type === "lieDown");
+    return html`<button type="button" class="shot-hit" data-action="view" data-view="desk" style="${rectStyle(ROOM_SHOT.desk)}" aria-label="${t("hud.cam.desk")}"></button>${tower}<button type="button" class="shot-hit bed-hit" data-action="bed" style="${rectStyle(ROOM_SHOT.bed)}"${bed ? html` aria-label="${bed}"` : null}></button>`;
   }
   const mon = (side: "left" | "right") =>
     html`<button type="button" class="shot-hit monitor-hit" data-action="view" data-view="desktop" data-screen="${side}" style="${rectStyle(DESK_SHOT.monitors[side])}" aria-label="${t("hud.cam.screen")} · ${t(`desktop.screen.${side}`)}"></button>`;
-  return html`${mon("left")}${mon("right")}`;
+  return html`${mon("left")}${mon("right")}${tower}`;
 }
 
 /** Kuro's body (the call button) and the camera chips, one row at the bottom right. */
@@ -183,7 +215,7 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const door = view === "door";
   // 房间 carries what finished runs left on the desk: the figures, and the book (title-page FR4/FR8).
   const kept = view === "room" ? html`${figuresLayer(session.collection)}${deskBook(session.collection)}` : null;
-  const scene = door ? doorContent(state, events, session) : html`${shotHits(view)}${kept}`;
+  const scene = door ? doorContent(state, events, session) : html`${shotHits(view, state, events)}${kept}`;
   // The held item sits over everything but the dialogue box (held-object.html).
   const held = door ? null : heldLayer(state, events, session);
   // The hand is here: the desk dims and the gap between the monitors glows (night-hand FR1; the
@@ -192,7 +224,7 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const gap = (view === "room" ? ROOM_SHOT : DESK_SHOT).gap;
   // Things are picked up at 桌子 only: the desk bar is its object layer.
   const bar = view === "desk" ? deskBar(state, events, session) : null;
-  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid")}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}">${scene}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${bar}${held}${dialogueBox(state, events, session)}${bottomRight(model)}${settingsButton()}${settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
+  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid")}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}">${scene}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${bar}${held}${dialogueBox(state, events, session, model.nowMs ?? 0)}${bottomRight(model)}${settingsButton()}${settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
 }
 
 export { raidShowing };

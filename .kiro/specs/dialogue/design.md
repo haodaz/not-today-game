@@ -27,7 +27,7 @@ Also in this change: Kuro's HUD body is 192 px (late-days FR1, only that line).
 ## The queue
 
 - `DialogueState` gains `page?: number` (default 0): which screen of the current line.
-- `Queued` gains `voice?: "kuro"`: its lines are Kuro's (avatar tag), and it belongs to a
+- `Queued` gains `voice?: "kuro"`: its lines are Kuro's (its portrait in the box), and it belongs to a
   conversation (Esc removes every `voice: "kuro"` item).
 - New endings:
   - `kuroOffer { object, decline }`: the upgrade offer, choices `upgrade.yes` / `upgrade.no`.
@@ -59,7 +59,7 @@ Also in this change: Kuro's HUD body is 192 px (late-days FR1, only that line).
 
 ```
 <div class="dlg [inner|sfx] [kuro]" data-screen="i/n">
-  <span class="who tag">…</span>  (or the Kuro tag: 56 px avatar + name)
+  <span class="who tag">…</span>  (Kuro's tag: its name only)
   <button class="hist" data-action="dlg-history">↺</button>
   <button class="txt" data-action="loop-advance">page text</button>
   <div class="choices"><button data-action="loop-choice" …>…</button>…</div>
@@ -69,14 +69,15 @@ Also in this change: Kuro's HUD body is 192 px (late-days FR1, only that line).
 
 - The box is a `div` (a choice button cannot sit in a button). It is fixed: 992 × 132 px at
   `bottom: 120px`, overflow hidden. When the player's box is up, it moves to `bottom: 300px`.
-- A box with a tag is `tagged`: its text starts below the tag (27 px top padding; 44 px under
-  Kuro's 56 px face). The player's box (`PLAYER_BOX`: five one-row choices) uses tighter rows.
+- A box with a tag is `tagged`: its text starts below the tag (27 px top padding). The player's
+  box (`PLAYER_BOX`: five one-row choices) uses tighter rows.
 - Tags:
   - a speaker line: its `who` (content);
   - narration: `dialogue.tag.door` / `.gap` / `.desk` when those strings exist (door view, raid,
     desk view). They do not exist yet, so narration has no tag (TODO Claude).
   - `inner`: italic, no tag. `sfx`: centred, no tag.
-  - Kuro: `public/kuro/k3d_base.png` + `kuro.name`. The player: `names.login`.
+  - Kuro: `kuro.name` only; its portrait stands at the box's right end (see the correction
+    below). The player: `names.login`.
 - History: `session.dlgLog` entries `{ day, who, kind, text }`, written when a line is left
   (advance, choice, Esc) and when the player picks or types. The panel shows today's entries
   plus the line on screen; `dlg-history` opens it, `dlg-history-close`, a click outside or Esc
@@ -121,7 +122,7 @@ Also in this change: Kuro's HUD body is 192 px (late-days FR1, only that line).
 ## Tests (FR3)
 
 - Snapshots: narration, a two-page line (first and last page), choices, the Kuro prompt, a Kuro
-  line with avatar, the player's box with questions, with the input, the history open.
+  line with its portrait, the player's box with questions, with the input, the history open.
 - Properties:
   - the box's markup carries the same fixed size class for every screen (no inline height) and
     every screen's measured rows are ≤ 3 (text) / ≤ 4 (choices);
@@ -129,3 +130,28 @@ Also in this change: Kuro's HUD body is 192 px (late-days FR1, only that line).
     width, is ≤ 3 lines;
   - after a sixth attempt no render that day contains `.dlg-player`;
   - `chat` replay: the turn count equals the chat events today and resets on lie-down.
+
+## Correction implemented (2026-11-01): Kuro stands at the box's right end
+
+- The tag carries only `kuro.name`; the 56 px face is gone from it (and the 44 px padding with
+  it).
+- The portrait is a slot, `<span class="kpet kuro-portrait" data-kuro-slot data-state=…>`, at
+  the end of Kuro's box. While Kuro is the head item (`kuroInBox`) the HUD corner is empty, so
+  the page's only slot is this one. The controller moves the one persistent body
+  (`KuroBodyElement`) into it: the same frames, the same crossfade on a state change, and the
+  idle pair alternating (its blink).
+- Its state (`portraitState`): `busy` while its line is appearing (the reveal on screen is this
+  line's and still running at `nowMs`); otherwise the body's own state (`kuroBodyState`), so
+  idle by day, `think` in the evening beat, `rest` at night. The motion layer renders again
+  when one of Kuro's reveals starts and when it ends, so the state follows.
+- Numbers (the mock's, updated): the box is 992 × 132 at `bottom:120`. The portrait is
+  200 × 200 (the frames are square), 12 px in from the right edge, feet on the bottom edge
+  (`bottom:0`), head 68 px above the top. Kuro's text column ends 24 px left of it: `padding-right`
+  is 236 px. The layout uses the same numbers (`KURO_PORTRAIT`, `KURO_LINE_BOX`), so Kuro's
+  pages are measured in that column (708 px of text at 18 px, against 932 px for other lines).
+  The ↺ chip moves left of the portrait (`right:236px`).
+- **The player's box keeps clear of the portrait (decision):** the portrait goes up with its
+  box. While the player's box is up, Kuro's box is `raised` (`bottom:300px`; on the desktop
+  layer 240 px), so the portrait stands at 300–500 px. The player's box is 120–252 px (60–192 on
+  the desktop), so they never meet and nothing has to step aside. Tested from the CSS numbers.
+- Narration tags do not change.

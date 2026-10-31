@@ -112,7 +112,13 @@ describe("room HUD (FR6)", () => {
     const desk = renderGame(store, ctx.session, 0).value;
     expect(desk.match(/class="monitor/g)).toHaveLength(1);
     expect(desk).toContain('class="back-room"');
-    // Opening the desktop on the messages monitor counts as looking at the messages.
+    // Not on yet: black, and looking at it counts for nothing.
+    expect(desk).toContain('class="monitor off"');
+    expect(store.getEvents()).toEqual([]);
+    // Once the tower is pressed, opening the desktop on the messages monitor counts as looking.
+    loopActions.view!(ctx, { view: "room" } as DOMStringMap, null as never);
+    loopActions["tower-power"]!(ctx, {} as DOMStringMap, null as never);
+    loopActions.view!(ctx, { view: "desktop" } as DOMStringMap, null as never);
     expect(store.getEvents().at(-1)).toMatchObject({ kind: "step", name: "openApp:msgs" });
   });
 
@@ -189,9 +195,10 @@ describe("runtime (design L5/L6)", () => {
     const { ctx } = fakeCtx(store);
     syncLoop(ctx, 0);
     ctx.session.dialogue = EMPTY_DIALOGUE;
-    // Jump straight to the bed for the test.
-    loopActions["loop-item"]!(ctx, { id: "bed" } as DOMStringMap, null as never);
-    expect(store.getState().day).toBe(1); // the bed is locked: nothing happened
+    // The bed in 房间 before the day is done: it only says so (day-loop correction 2026-11-01).
+    loopActions["bed"]!(ctx, {} as DOMStringMap, null as never);
+    expect(store.getState().day).toBe(1);
+    expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:bed:locked"]);
     const night = dayFiles.get(1)!.beats.night!.say.length;
     ctx.session.dialogue = { queue: [{ key: "n", lines: dayFiles.get(1)!.beats.night!.say, ending: { kind: "lieDown" } }], line: 0 };
     for (let i = 0; i < night; i++) loopActions["loop-advance"]!(ctx, {} as DOMStringMap, null as never);

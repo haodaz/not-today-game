@@ -27,3 +27,14 @@ commit.
 
 ## 7. Snapshots and wrap-up
 - [x] FR5 checklist snapshots; HUD snapshots; desktop one-monitor snapshots; strings TODO lists; log.
+
+## 8. Correction 2026-11-01: the checklist only watches; where Kuro's body sits
+- [x] Lines are not buttons; `ItemAction` / `actionOf` / `loop-item` removed; `openItemFor`, `booted`, `deskMeal`.
+- [x] Tower hotspot (房间, 桌子) + black monitors before boot; openApp counts only once booted.
+- [x] Meal on the desk bar (food image → eat → empty box until the next meal).
+- [x] 看一眼桌子 on entering 桌子; 关机 in the top bar → shutdown beat → 房间 after 750 ms.
+- [x] Bed hotspot: locked inner line `room.bed.locked`, else night → lieDown.
+- [x] Loan prompt from 老周's conversation.
+- [x] Rects measured into `shots.ts`; `tests/actuators.test.ts` (one test per table row, lines are not buttons).
+- [x] HUD body above the chip row, flush right; box right edge left of it (tested from the CSS).
+- [x] Snapshots refreshed after checking the diffs.

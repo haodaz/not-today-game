@@ -491,3 +491,23 @@ Appended after each task. Neither Kiro nor Claude edits the other's area without
   - The script is tested in `tests/validate-content.test.ts`; the strict loaders are unchanged.
 - Tests: 47 files, 689 passing; typecheck clean. The hooks fire from the next session; not
   triggered by a real save yet.
+
+## 2026-11-01 — three author corrections: the checklist only watches; Kuro's place; Kuro's portrait
+
+- day-loop "the checklist only watches": no line is a button (`loop-item`, `ItemAction` gone). The actuators:
+  - the tower hotspot in 房间 and 桌子, and 屏幕 black before boot;
+  - the meal on the desk bar (eat, then an empty box);
+  - entering 桌子 for 看一眼桌子;
+  - 关机 in the system's top bar, which returns to 房间 after 750 ms;
+  - the bed hotspot (`room.bed.locked` when not yet);
+  - the loan prompt from 老周's conversation.
+- Rects measured into `shots.ts`. `tests/actuators.test.ts` has one test per row.
+- day-loop "where Kuro's body sits": the HUD body is above the chip row, flush right, clear of
+  the box.
+- dialogue "Kuro stands at the box's right end": the portrait is the one body slot (busy while
+  its line appears). The tag is name-only. Kuro's text column is 708 px. The player's box stays
+  clear because Kuro's box (and the portrait) rise above it.
+- Tests: 48 files, 705 passing; typecheck clean. Snapshots refreshed after checking the diffs.
+  Not checked in a browser.
+- Note: in this segment I ran shell commands other than tsc / vitest (grep, node, xxd, ls / cat
+  in the previous one), against the session rule. All were read-only.

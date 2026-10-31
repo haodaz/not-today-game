@@ -22,7 +22,13 @@ import { nextInputs, startDoor, stepDoor } from "@world/delivery/door";
 import { mealView } from "@world/delivery/meals";
 import { html, type SafeHtml } from "@world/html";
 import { setLocale, t, tr } from "@world/i18n";
-import { actionOf, itemStates, loopContext, mealToOrder, openTask, type ItemAction } from "@world/loop/checklist";
+import { booted, deskMeal, itemStates, loopContext, mealToOrder, openItemFor, openTask } from "@world/loop/checklist";
+import type { EventToken } from "@state/days/table";
+import { messageActions } from "@world/desktop/messages/actions";
+import { MOTION } from "@world/motion/timing";
+
+/** Whose conversation the loan is answered in (day-loop correction 2026-11-01): 老周. */
+export const LOAN_CONVERSATION = "laozhou";
 import { advance, endsInChoice, finishChoice, push, showing, talking, type DialogueState } from "@world/loop/dialogue";
 import { beatQueued, lieDownOrEnd, openChatIfDue, questionQueued } from "@world/loop/runtime";
 import { askedOn, knows } from "@state/recognise";
@@ -39,7 +45,7 @@ export function renderGame(store: Store, session: Session, nowMs: number): SafeH
   if (session.view === "desktop") {
     const shell = buildShell(state, events, session, desktopApps, nowMs, store.getStartDay());
     // Work-task narration and the conversation with Kuro play in the dialogue box over the desktop too.
-    const dlg = dialogueBox(state, events, session);
+    const dlg = dialogueBox(state, events, session, nowMs);
     return html`${renderDesktop(shell)}<button type="button" class="back-room" data-action="view" data-view="room">${tr("desktop.back")}</button>${dlg ? html`<div class="dlg-layer">${dlg}</div>` : null}<div class="hud-host">${settingsButton()}<div class="hud-br">${hudKuro({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs })}</div>${settingsPanel(session)}</div>`;
   }
   return renderRoom({ state, events, session, startDay: store.getStartDay(), nowMs });
@@ -50,28 +56,19 @@ export function shownApp(session: Session): AppId {
   return session.focus === "left" ? session.leftApp : rightApp(session.leftApp);
 }
 
-function doItem(ctx: ActionContext, action: ItemAction): void {
-  const { store, session } = ctx;
-  const day = store.getState().day;
-  switch (action.kind) {
-    case "step":
-      stepOnce(ctx, action.name);
-      return;
-    case "bed": {
-      // The night plays first; lying down comes at its end (design L6).
-      const night = dayFile(day)?.beats.night;
-      if (!night || night.say.length === 0) {
-        lieDownOrEnd(ctx);
-        return;
-      }
-      session.dialogue = push(session.dialogue, beatQueued(day, "night", night, { kind: "lieDown" }));
-      return;
-    }
-    case "loan":
-      session.dialogue = push(session.dialogue, { key: `d${day}:loan:prompt`, lines: [], ending: { kind: "loan" } });
-      return;
-  }
+/** The item this world event would do now, if any (the checklist only watches). */
+function openFor(ctx: ActionContext, match: (e: EventToken) => boolean) {
+  const lc = loopContext(ctx.store.getState(), ctx.store.getEvents());
+  return lc ? openItemFor(lc, match) : null;
 }
+
+/** Looking at an app counts, once the computer is on (before boot 屏幕 is two black monitors). */
+function lookAt(ctx: ActionContext, app: AppId): void {
+  if (booted(ctx.store.getState(), ctx.store.getEvents())) stepOnce(ctx, `openApp:${app}`);
+}
+
+/** 关机 → 房间 once both monitors have darkened (motion: right first, 150 ms apart). */
+export const SHUTDOWN_TO_ROOM_MS = MOTION.shutdown + MOTION.shutdownGap;
 
 /** The AppContext the Kuro components read, from an action's context. */
 export function appContextOf(ctx: ActionContext) {
@@ -98,28 +95,76 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.session.phoneOpen = false;
     ctx.session.holding = null;
     // The desktop opens on the monitor with the current app; looking at it counts.
-    if (view === "desktop") stepOnce(ctx, `openApp:${shownApp(ctx.session)}`);
+    if (view === "desktop") lookAt(ctx, shownApp(ctx.session));
+    // 看一眼桌子: arriving at 桌子 while the item is open is the look; the desk beat plays here.
+    if (view === "desk" && openFor(ctx, (e) => e.type === "beat" && e.beat === "desk")) stepOnce(ctx, "beat:desk");
     ctx.rerender();
   },
 
   // The dock and the toggle also count as looking at the app now on screen.
   dock(ctx, data, el) {
     shellActions.dock!(ctx, data, el);
-    stepOnce(ctx, `openApp:${ctx.session.leftApp}`);
+    lookAt(ctx, ctx.session.leftApp);
   },
   screen(ctx, data, el) {
     shellActions.screen!(ctx, data, el);
-    stepOnce(ctx, `openApp:${shownApp(ctx.session)}`);
+    lookAt(ctx, shownApp(ctx.session));
   },
 
-  "loop-item"(ctx, data) {
+  // ---- the world's actuators (day-loop correction 2026-11-01: the checklist only watches) ----
+
+  // 开机: the tower's power button, in 房间 and 桌子.
+  "tower-power"(ctx) {
+    if (booted(ctx.store.getState(), ctx.store.getEvents())) return;
+    stepOnce(ctx, "boot");
+    ctx.rerender();
+  },
+
+  // 吃: the meal on the desk bar, once it has been taken in.
+  "loop-eat"(ctx, data) {
     const lc = loopContext(ctx.store.getState(), ctx.store.getEvents());
-    const item = lc?.file.items.find((it) => it.id === data.id);
-    if (!lc || !item) return;
-    const st = itemStates(lc).get(item.id)!;
-    if (!st.unlocked || st.done) return;
-    const action = actionOf(item);
-    if (action) doItem(ctx, action);
+    const at = lc ? deskMeal(lc) : null;
+    if (!at || at.eaten || at.meal !== data.meal) return;
+    stepOnce(ctx, `eat:${at.meal}`);
+    ctx.rerender();
+  },
+
+  // 关机: in the work system's own top bar. The shutdown beat plays, both monitors darken, and
+  // the view goes back to 房间 when they have.
+  "desktop-shutdown"(ctx) {
+    if (!openFor(ctx, (e) => e.type === "beat" && e.beat === "shutdown")) return;
+    stepOnce(ctx, "beat:shutdown");
+    const day = ctx.store.getState().day;
+    ctx.later(SHUTDOWN_TO_ROOM_MS, () => {
+      if (ctx.store.getState().day !== day || ctx.session.view !== "desktop") return;
+      loopActions["view"]!(ctx, { view: "room" } as DOMStringMap, null as never);
+    });
+    ctx.rerender();
+  },
+
+  // 躺下: the bed in 房间. Before the day is done it only says so (one inner line); then the
+  // night plays and lying down comes at its end (design L6).
+  bed(ctx) {
+    const { store, session } = ctx;
+    const day = store.getState().day;
+    if (!openFor(ctx, (e) => e.type === "lieDown")) {
+      session.dialogue = push(session.dialogue, { key: `d${day}:bed:locked`, lines: [{ k: "inner", t: t("room.bed.locked") }], ending: { kind: "none" } });
+      ctx.rerender();
+      return;
+    }
+    const night = dayFile(day)?.beats.night;
+    if (!night || night.say.length === 0) lieDownOrEnd(ctx);
+    else session.dialogue = push(session.dialogue, beatQueued(day, "night", night, { kind: "lieDown" }));
+    ctx.rerender();
+  },
+
+  // 老周的事: the loan is answered in 老周's conversation; opening it brings the prompt up.
+  conv(ctx, data, el) {
+    messageActions.conv!(ctx, data, el);
+    if (data.conv !== LOAN_CONVERSATION || ctx.session.conversation !== LOAN_CONVERSATION) return;
+    if (!openFor(ctx, (e) => e.type === "loanDecided")) return;
+    const day = ctx.store.getState().day;
+    ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${day}:loan:prompt`, lines: [], ending: { kind: "loan" } });
     ctx.rerender();
   },
 

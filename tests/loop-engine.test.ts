@@ -3,7 +3,7 @@ import { choiceOffered } from "@state/days/effects";
 import { dayFiles } from "@state/days/table";
 import type { EventDraft } from "@state/events";
 import { createStore, type Store } from "@state/store";
-import { checklist, loopContext, mealToOrder, openTask, selfTicking } from "@world/loop/checklist";
+import { checklist, loopContext, mealToOrder, openItemFor, openTask, selfTicking } from "@world/loop/checklist";
 import { advance, EMPTY_DIALOGUE, finishChoice, push, showing } from "@world/loop/dialogue";
 import { arrivalDue, msUntilDue } from "@world/loop/waiting";
 
@@ -63,11 +63,15 @@ describe("checklist (FR1)", () => {
     expect(selfTicking(loopContext(d17.getState(), d17.getEvents())!).map((i) => i.id)).toEqual(["task1"]);
   });
 
-  it("clicking does the thing only for items done by the loop itself", () => {
+  it("a line is never an action; the world asks which item an event would do (day-loop correction)", () => {
     const store = storeAt(1);
-    expect(view(store).lines[0]!.action).toEqual({ kind: "step", name: "boot" });
+    expect(Object.keys(view(store).lines[0]!)).toEqual(["id", "text", "state"]);
+    const ctx = () => loopContext(store.getState(), store.getEvents())!;
+    expect(openItemFor(ctx(), (e) => e.type === "boot")?.id).toBe("boot");
     store.appendEvent(step("boot"));
-    expect(view(store).lines[0]!.action).toBeNull();
+    expect(openItemFor(ctx(), (e) => e.type === "boot")).toBeNull();
+    // The bed is held by required items: not open.
+    expect(openItemFor(ctx(), (e) => e.type === "lieDown")).toBeNull();
   });
 
   void lunch;

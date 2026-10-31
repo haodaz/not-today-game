@@ -19,10 +19,7 @@ import { finishChoice, leaveKuro, push, replaceHead, talking, type Ending, type 
 import { stepOnce } from "@world/loop/steps";
 import { fillPlaceholders } from "@world/replies/placeholders";
 import { logCurrent, logPlayer } from "./history";
-import { fontPx, LINE_BOX, nextScreen, PLAYER_BOX, screens, type Screen } from "./layout";
-
-/** Kuro's face in the box's name tag (56 px, round). */
-export const KURO_AVATAR = "/kuro/k3d_base.png";
+import { fontPx, KURO_LINE_BOX, nextScreen, PLAYER_BOX, screens, type Screen } from "./layout";
 
 /** The chat beat: after shutdown (turns count only here). */
 export const chatBeatNow = (session: Pick<Session, "clock">): boolean => session.clock.beat === "night";
@@ -197,7 +194,7 @@ export function playerBox(state: State, events: readonly GameEvent[], session: S
   if (session.kuroBedDay === state.day) return null;
   const px = fontPx(getLocale());
   const line = head.lines[head.lines.length - 1];
-  const lineScreens = screens(line ? fillPlaceholders(line.t, state.names) : null, null, LINE_BOX, px).length;
+  const lineScreens = screens(line ? fillPlaceholders(line.t, state.names) : null, null, KURO_LINE_BOX, px).length;
   if ((d.page ?? 0) < lineScreens - 1) return null;
   const name = state.names.login.trim();
   if (head.ending.mode === "work") {

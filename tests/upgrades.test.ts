@@ -11,6 +11,7 @@ import { currentOffer, FINAL, parseUpgrades, upgradeTable } from "@state/upgrade
 import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
 import { initialSession } from "@world/desktop/model";
+import { everyScreen } from "./box-screens";
 import { renderRoom } from "@world/room/hud";
 import { loopActions } from "@world/room/game";
 
@@ -31,9 +32,8 @@ function offerBox(store: Store): { ctx: ActionContext; box: string } {
   const ctx = act(store);
   ctx.session.view = "room";
   loopActions["kuro-call"]!(ctx, {} as DOMStringMap, null as never);
-  const out = renderRoom({ state: store.getState(), events: store.getEvents(), session: ctx.session }).value;
-  // The box comes right before the HUD's bottom-right row in the room's markup.
-  return { ctx, box: out.slice(out.indexOf('<div class="dlg'), out.indexOf('<div class="hud-br">')) };
+  // Every screen of the offer line: the choices may sit on the page after the line (dialogue FR1).
+  return { ctx, box: everyScreen(store.getState(), ctx.session, store.getEvents()) };
 }
 
 describe("upgrades table", () => {

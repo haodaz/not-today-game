@@ -8,6 +8,8 @@ export interface BoxGeom {
   readonly width: number;
   /** Horizontal padding, each side. */
   readonly padX: number;
+  /** Right padding when something stands at the box's right end (Kuro's portrait); else padX. */
+  readonly padRight?: number;
   /** Text rows per screen. */
   readonly rows: number;
   /** Choice rows per screen, and choices per screen. */
@@ -19,6 +21,13 @@ export interface BoxGeom {
 
 /** The line box: about 62 % of the 1600 px stage, three rows (mock design/chrome/dialogue.html). */
 export const LINE_BOX: BoxGeom = { width: 992, padX: 30, rows: 3, choiceRows: 4, maxChoices: 4, choiceMaxRows: 2 };
+/**
+ * Kuro's portrait at the box's right end (dialogue correction 2026-11-01): 200 × 200, 12 px in
+ * from the right edge, feet on the bottom edge, head 68 px above the top. The text column ends
+ * 24 px left of it: 992 − 12 − 200 − 24 = 756, so the right padding is 236.
+ */
+export const KURO_PORTRAIT = { size: 200, right: 12, gap: 24 } as const;
+export const KURO_LINE_BOX: BoxGeom = { ...LINE_BOX, padRight: KURO_PORTRAIT.right + KURO_PORTRAIT.size + KURO_PORTRAIT.gap };
 /**
  * The player's box, rising from the right edge: the day's starters (at most four) and 说点别的…
  * on one page, one row each (author 2026-11-01; tighter rows, the text ellipsed if it must be).
@@ -98,7 +107,7 @@ export function wrap(text: string, maxWidth: number, px: number): string[] {
 
 /** The text area of a box, less one em of slack (the browser's punctuation rules may push a character on). */
 export function textArea(geom: BoxGeom, px: number): number {
-  return geom.width - 2 * geom.padX - px;
+  return geom.width - geom.padX - (geom.padRight ?? geom.padX) - px;
 }
 
 /** One screen of the box: a page of text (possibly empty) and the choices on it (indexes). */

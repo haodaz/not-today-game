@@ -17,10 +17,7 @@ import { taskFiles } from "@state/days/tasks";
 import { dayFiles, type Item } from "@state/days/table";
 import { itemStates, loopContext } from "@world/loop/checklist";
 import { EMPTY_DIALOGUE } from "@world/loop/dialogue";
-import { boxObjectFor } from "@world/room/hud";
-import { shopsOn } from "@state/delivery/shops";
-import { menu as replyMenu } from "@state/replies/resolve";
-import { deliveryTable } from "@state/delivery/table";
+import { completeItem } from "./complete-items";
 import { DESK_SHOT, ROOM_SHOT } from "@world/room/shots";
 import { loopActions, loopKeys, renderGame } from "@world/room/game";
 
@@ -161,7 +158,7 @@ describe("(5) four camera levels", () => {
       const br = out.slice(out.indexOf('<div class="hud-br">'));
       expect(br, view).toMatch(/^<div class="hud-br"><div class="hud-kuro"><button type="button" class="kuro-btn" data-action="kuro-call" aria-label=/);
       expect(br, view).toContain('<span class="kpet" data-kuro-slot data-state=');
-      // Left of the chips (they come after it in the same row); 屏幕 has no chips.
+      // Above the chip row (the column's first item); 屏幕 has no chips, so it is in the corner.
       if (view !== "desktop") expect(br.indexOf("kuro-btn")).toBeLessThan(br.indexOf('class="cams"'));
       // Exactly one body: the persistent sprite attaches to the one slot.
       expect((out.match(/data-kuro-slot/g) ?? []).length, view).toBe(1);
@@ -174,8 +171,10 @@ describe("(5) four camera levels", () => {
       loopActions["kuro-call"]!(ctx, none, null as never);
       const out = render(ctx);
       expect(out, view).toContain('<div class="hud-kuro away"></div>');
-      expect(out, view).not.toContain("data-kuro-slot");
-      expect(out, view).toMatch(/<div class="dlg tagged kuro[^"]*"[^>]*><span class="who tag k">/);
+      // The one body moved into the box: its portrait is the page's only slot.
+      expect((out.match(/data-kuro-slot/g) ?? []).length, view).toBe(1);
+      expect(out, view).toMatch(/<span class="kpet kuro-portrait" data-kuro-slot data-state="\w+" aria-hidden="true"><\/span><\/div>/);
+      expect(out, view).toMatch(/<div class="dlg tagged kuro[^"]*"[^>]*><span class="who tag k">Kuro<\/span>/);
       expect(ctx.session.view).toBe(view);
       // A second click while talking queues nothing more.
       const queued = ctx.session.dialogue.queue.length;
@@ -252,67 +251,3 @@ describe("(5) the evening chat beat opens the conversation by itself", () => {
   });
 });
 
-/** Does an item by appending the event its done token waits for; false if the test can't. */
-function completeItem(store: Store, it: Item): boolean {
-  try {
-    return tryComplete(store, it);
-  } catch {
-    return false; // the reducer rejected it today
-  }
-}
-
-function tryComplete(store: Store, it: Item): boolean {
-  const d = it.done;
-  if (d.kind === "flag") {
-    store.appendEvent({ kind: "task", flag: d.flag, mode: "auto" });
-    return true;
-  }
-  if (d.kind !== "event") return false;
-  const e = d.event;
-  switch (e.type) {
-    case "boot":
-      store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
-      return true;
-    case "openApp":
-      store.appendEvent({ kind: "step", name: `openApp:${e.app}`, t: "09:05" });
-      return true;
-    case "beat":
-      store.appendEvent({ kind: "step", name: `beat:${e.beat}`, t: "23:00" });
-      return true;
-    case "order": {
-      // Whatever is open today (shop drift closes some).
-      const meal = e.meal as "lunch" | "dinner";
-      const open = shopsOn(store.getState().day, meal).find((s) => s.open && s.items.length);
-      if (!open) return false;
-      store.appendEvent({ kind: "order", meal, shopId: open.shop.id, itemId: open.items[0]!.id, t: deliveryTable.windows[meal][0] });
-      return true;
-    }
-    case "arrives":
-      store.appendEvent({ kind: "step", name: `delivery:arrives:${e.meal}`, t: "12:04" });
-      return true;
-    case "pickup":
-      store.appendEvent({ kind: "pickup", meal: e.meal as "lunch" });
-      return true;
-    case "eat":
-      store.appendEvent({ kind: "step", name: `eat:${e.meal}`, t: "12:30" });
-      return true;
-    case "openBox": {
-      const o = boxObjectFor(store.getState().day);
-      if (!o) return false;
-      store.appendEvent({ kind: "openLayer", objectId: o });
-      return true;
-    }
-    case "loanDecided":
-      store.appendEvent({ kind: "reply", choice: "no" });
-      return true;
-    case "reply": {
-      // The first word the day's menu offers that recipient.
-      const word = replyMenu(store.getState().day, e.recipient, store.getState()).find((m) => !m.gone)?.word;
-      if (!word) return false;
-      store.appendEvent({ kind: "reply", recipient: e.recipient, choice: word, t: "17:00" });
-      return true;
-    }
-    default:
-      return false;
-  }
-}

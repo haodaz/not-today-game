@@ -205,5 +205,7 @@
   "title.q.name": "名字",
   "room.bed.locked": "还没完。",
   "room.tower.off": "主机没开。",
-  "desktop.shutdown": "关机"
+  "desktop.shutdown": "关机",
+  "room.bed": "床",
+  "room.meal": "外卖"
 }

@@ -11,8 +11,10 @@ import { missingKeys, resetMissing } from "@world/i18n";
 
 const NOW_MS = Date.UTC(2026, 9, 31, 12);
 
-function desktop(day: number, clock: BeatClock, leftApp: AppId = "msgs", page: WorkbenchPage = "home", focus: Side = "left"): string {
+function desktop(day: number, clock: BeatClock, leftApp: AppId = "msgs", page: WorkbenchPage = "home", focus: Side = "left", on = true): string {
   const store = createStore({ startDay: day });
+  // These scenes are of a running computer: the tower was pressed (day-loop correction 2026-11-01).
+  if (on) store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
   const session: Session = { ...initialSession(clock, focus), leftApp, workbenchPage: page };
   return renderDesktop(buildShell(store.getState(), store.getEvents(), session, desktopApps, NOW_MS, day)).value;
 }
@@ -41,6 +43,20 @@ describe("desktop snapshots (requirements §3)", () => {
     for (const page of ["docs", "ledger", "code"] as const) {
       expect(desktop(1, { beat: "work", time: "10:00" }, "msgs", page, "right"), page).toMatchSnapshot();
     }
+  });
+
+  it("before the tower is pressed: two black monitors and nothing else (snapshot)", () => {
+    const off = desktop(1, { beat: "boot", time: "09:00" }, "msgs", "home", "left", false);
+    expect(off).toContain('<div class="monitor off" data-side="left"');
+    expect(off).toContain('class="other-tab off"');
+    expect(off).not.toMatch(/class="(top|win|dock|kpill)"|data-action="(dock|desktop-shutdown|kuro-call)"/);
+    expect(off).toMatchSnapshot();
+  });
+
+  it("关机 sits next to the clock; usable only while the shutdown item is open; gone at night", () => {
+    const on = desktop(1, { beat: "work", time: "10:00" });
+    expect(on).toContain('<button type="button" class="sys-off" data-action="desktop-shutdown" disabled>关机</button>');
+    expect(desktop(5, { beat: "night", time: "23:41" })).not.toContain("sys-off");
   });
 
   it("never shows the two monitors side by side (amendment 2026-11-01)", () => {

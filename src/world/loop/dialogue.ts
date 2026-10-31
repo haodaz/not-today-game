@@ -47,6 +47,8 @@ export const EMPTY_DIALOGUE: DialogueState = { queue: [], line: 0 };
 
 /** A conversation with Kuro is under way (any of its items queued). */
 export const talking = (d: DialogueState): boolean => d.queue.some((q) => q.voice === "kuro");
+/** Kuro is the one in the box now: its body stands there, not in the HUD corner. */
+export const kuroInBox = (d: DialogueState): boolean => d.queue[0]?.voice === "kuro";
 
 /** The conversation ends: every Kuro item leaves; what else was queued stays. */
 export function leaveKuro(d: DialogueState): DialogueState {

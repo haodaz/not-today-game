@@ -16,7 +16,8 @@ import type { ActionContext } from "@world/desktop/controller";
 import { kuroDay, offlineAnswer } from "@world/desktop/kuro/days";
 import { initialSession, type Session } from "@world/desktop/model";
 import { dialogueBox, lineScreens } from "@world/dialogue/box";
-import { charWidth, fontPx, LINE_BOX, marker, PLAYER_BOX, screens, textArea, wrap } from "@world/dialogue/layout";
+import { charWidth, fontPx, KURO_LINE_BOX, KURO_PORTRAIT, LINE_BOX, marker, PLAYER_BOX, screens, textArea, wrap } from "@world/dialogue/layout";
+import { startReveal } from "@world/motion/reveal";
 import { escapeHtml } from "@world/html";
 import { setLocale, t } from "@world/i18n";
 import { EMPTY_DIALOGUE, push, type Queued } from "@world/loop/dialogue";
@@ -157,7 +158,10 @@ describe("FR2 talking to Kuro", () => {
     const ctx = ctxOf(storeAt(1), NIGHT);
     act(ctx, "kuro-call");
     const box = out(ctx);
-    expect(box).toContain('<span class="who tag k"><img src="/kuro/k3d_base.png" alt="">');
+    // The tag is only the name; the face is the portrait at the box's right end.
+    expect(box).toContain(`<span class="who tag k">${t("kuro.name")}</span>`);
+    expect(box).not.toContain("<img");
+    expect(box).toMatch(/<span class="kpet kuro-portrait" data-kuro-slot data-state="(idle|think|rest)" aria-hidden="true"><\/span><\/div>$/);
     expect(box).toContain(`>${escapeHtml(t("kuro.ask"))}</button>`);
     expect(box).toContain(`data-choice="yes">${t("kuro.yes")}</button>`);
     expect(box).toContain(`data-choice="no">${t("kuro.notNow")}</button>`);
@@ -209,7 +213,7 @@ describe("FR2 talking to Kuro", () => {
     expect(out(ctx)).toMatch(/^<div class="dlg tagged"/);
     const css = readFileSync(resolve(__dirname, "../src/world/room/room.css"), "utf8");
     expect(css).toContain(".dlg.tagged,.dlg.tagged.has-choices{padding-top:27px}");
-    expect(css).toContain(".dlg.tagged.kuro,.dlg.tagged.kuro.has-choices{padding-top:44px}");
+    expect(css).not.toContain("padding-top:44px"); // the tag is name-only again: one padding
   });
 
   it("a starter is a turn: a chat event, the offline answer, the question gone from the list; typing sends with Enter", () => {
@@ -302,6 +306,64 @@ describe("FR2 talking to Kuro", () => {
     act(ctx, "kuro-call");
     expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["n", expect.stringMatching(/^kuro:1:/)]);
     expect(out(ctx)).not.toContain("dlg kuro");
+  });
+});
+
+describe("Kuro stands at the box's right end (dialogue correction 2026-11-01)", () => {
+  const css = readFileSync(resolve(__dirname, "../src/world/room/room.css"), "utf8");
+  const num = (re: RegExp) => Number(re.exec(css)![1]);
+
+  it("its portrait is the body's slot, in its state; busy while its line appears, settled after", () => {
+    const ctx = ctxOf(storeAt(1), NIGHT);
+    talkAtNight(ctx);
+    const key = `${ctx.session.dialogue.queue[0]!.key}:0`;
+    ctx.session.reveal = startReveal(key, { k: "speaker" }, 40, 1_000);
+    const during = dialogueBox(ctx.store.getState(), ctx.store.getEvents(), ctx.session, 1_100)!.value;
+    expect(during).toContain('<span class="kpet kuro-portrait" data-kuro-slot data-state="busy"');
+    const after = dialogueBox(ctx.store.getState(), ctx.store.getEvents(), ctx.session, 10_000)!.value;
+    expect(after).toContain('data-kuro-slot data-state="rest"'); // night: the body rests
+    // Never on anyone else's line.
+    ctx.session.dialogue = push(EMPTY_DIALOGUE, queueOf("n", [narration]));
+    expect(out(ctx)).not.toContain("kuro-portrait");
+  });
+
+  it("~200 px, feet on the bottom edge, head above the top; the text column ends left of it", () => {
+    const size = num(/\.dlg \.kpet\.kuro-portrait\{[^}]*width:(\d+)px/);
+    const right = num(/\.dlg \.kpet\.kuro-portrait\{[^}]*right:(\d+)px/);
+    expect(size).toBe(KURO_PORTRAIT.size);
+    expect(right).toBe(KURO_PORTRAIT.right);
+    expect(css).toMatch(/\.dlg \.kpet\.kuro-portrait\{[^}]*bottom:0;/);
+    expect(size).toBeGreaterThan(132); // the head rises above the box
+    const padRight = num(/\.dlg\.kuro\{padding-right:(\d+)px\}/);
+    expect(padRight).toBe(KURO_LINE_BOX.padRight);
+    expect(LINE_BOX.width - padRight).toBeLessThan(LINE_BOX.width - right - size); // text ends before the portrait
+    // Kuro's own lines are laid out in that column: every offline answer fits its pages.
+    const px = fontPx("zh");
+    for (let d = 1; d <= constants.lastDay; d++) {
+      const day = kuroDay(d)!;
+      for (const text of [day.idiom, ...day.starters.map((s) => offlineAnswer(day, s.n)), offlineAnswer(day, null)]) {
+        for (const s of screens(text, null, KURO_LINE_BOX, px)) expect(wrap(s.text, textArea(KURO_LINE_BOX, px), px).length).toBeLessThanOrEqual(3);
+      }
+    }
+  });
+
+  it("the player's box keeps clear of it: Kuro's box (and portrait) rise above the player's box", () => {
+    const bottom = (sel: string) => num(new RegExp(`${sel.replace(/\./g, "\\.")}\\{bottom:(\\d+)px[;}]`));
+    const raised = bottom(".dlg.raised");
+    const boxH = num(/\.dlg,\.dlg-player\{[^}]*height:(\d+)px/);
+    const playerBottom = num(/\.dlg,\.dlg-player\{[^}]*bottom:(\d+)px/);
+    // The portrait stands on the raised box's bottom edge, above the player's box top.
+    expect(raised).toBeGreaterThan(playerBottom + boxH);
+    // On the desktop layer too.
+    expect(bottom(".dlg-layer .dlg.raised")).toBeGreaterThan(bottom(".dlg-layer .dlg-player") + boxH);
+  });
+
+  it("the HUD body stands directly above the chip row, flush right; the box's right edge stays left of it", () => {
+    expect(css).toMatch(/\.hud-br\{[^}]*flex-direction:column;align-items:flex-end/);
+    const hudRight = num(/\.hud-br\{position:absolute;right:(\d+)px/);
+    const body = num(/\.hud-kuro\{position:relative;width:(\d+)px/);
+    const boxW = num(/\.dlg,\.dlg-player\{[^}]*width:(\d+)px/);
+    expect(800 + boxW / 2).toBeLessThan(1600 - hudRight - body);
   });
 });
 

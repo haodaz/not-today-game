@@ -11,3 +11,4 @@
 - [x] T9. CSS: the box, tags, markers, choices, the player's box, the history panel; the HUD body 192 px and the pill's offset.
 - [x] T10. FR3 tests (snapshots, properties); update the tests that used the overlay or the small window.
 - [x] T11. kiro-log; TODO strings for Claude (`title.q.name`, `dialogue.tag.door|gap|desk`).
+- [x] T12. Correction 2026-11-01: Kuro's portrait at the box's right end (the one body slot, busy while its line appears), name-only tag, `KURO_LINE_BOX` column, ↺ moved; the player's box clear of it (Kuro's box raised); tests + snapshots.

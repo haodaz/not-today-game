@@ -100,39 +100,45 @@ function waiting(it: Item, st: ItemState, ctx: LoopContext): boolean {
   return !happened({ type: "arrives", meal: it.done.event.meal }, ctx);
 }
 
-/** What clicking an item does itself (the rest are done in the world: phone, door, desktop…). */
-export type ItemAction =
-  | { readonly kind: "step"; readonly name: string }
-  | { readonly kind: "bed" }
-  | { readonly kind: "loan" };
+/**
+ * The item whose `done` is this world event, if it can be done now: unlocked, not done, and not
+ * held by `locked: requiredPending` (day-loop correction 2026-11-01: the checklist only watches;
+ * the actuators in the world ask this before they act).
+ */
+export function openItemFor(ctx: LoopContext, match: (e: EventToken) => boolean, states = itemStates(ctx)): Item | null {
+  const pending = requiredPending(ctx, states).length > 0;
+  return (
+    ctx.file.items.find((it) => {
+      if (it.done.kind !== "event" || !match(it.done.event)) return false;
+      const st = states.get(it.id)!;
+      return st.unlocked && !st.done && !(it.locked === "requiredPending" && pending);
+    }) ?? null
+  );
+}
 
-export function actionOf(it: Item): ItemAction | null {
-  if (it.done.kind !== "event") return null;
-  const e = it.done.event;
-  switch (e.type) {
-    case "boot":
-      return { kind: "step", name: "boot" };
-    case "eat":
-      return { kind: "step", name: `eat:${e.meal}` };
-    case "beat":
-      return { kind: "step", name: `beat:${e.beat}` };
-    case "lieDown":
-      return { kind: "bed" };
-    case "loanDecided":
-      return { kind: "loan" };
-    default:
-      return null;
+/** The computer is on today: the tower was pressed (`step boot`). */
+export function booted(state: State, events: readonly GameEvent[]): boolean {
+  return events.some((e) => e.kind === "step" && e.day === state.day && e.name === "boot");
+}
+
+/**
+ * The meal on the desk bar (day-loop correction): the latest one taken in today, and whether it
+ * has been eaten (its empty box stays until the next one is taken in).
+ */
+export function deskMeal(ctx: LoopContext): { readonly meal: "lunch" | "dinner"; readonly eaten: boolean } | null {
+  for (const meal of ["dinner", "lunch"] as const) {
+    if (happened({ type: "pickup", meal }, ctx)) return { meal, eaten: happened({ type: "eat", meal }, ctx) };
   }
+  return null;
 }
 
 export type LineState = "now" | "next" | "wait" | "locked";
 
+/** A line only shows what is happening; it is never a button (day-loop correction 2026-11-01). */
 export interface ChecklistLine {
   readonly id: string;
   readonly text: string;
   readonly state: LineState;
-  /** Set when clicking the line does the thing (and it is not locked). */
-  readonly action: ItemAction | null;
 }
 
 export interface ChecklistView {
@@ -152,7 +158,7 @@ export function checklist(ctx: LoopContext): ChecklistView {
   for (const it of ctx.file.items) {
     const st = states.get(it.id)!;
     if (waiting(it, st, ctx)) {
-      waits.push({ id: it.id, text: it.rewrite!, state: "wait", action: null });
+      waits.push({ id: it.id, text: it.rewrite!, state: "wait" });
       continue;
     }
     if (st.done) {
@@ -162,7 +168,7 @@ export function checklist(ctx: LoopContext): ChecklistView {
     if (!st.unlocked) continue;
     const locked = it.locked === "requiredPending" && pending.length > 0;
     if (isBed(it) && !locked) bedOpen = true;
-    open.push({ id: it.id, text: it.text, state: locked ? "locked" : "next", action: locked ? null : actionOf(it) });
+    open.push({ id: it.id, text: it.text, state: locked ? "locked" : "next" });
   }
   // The first open, unlocked-and-usable item is the current one; one more is shown after it.
   const shown = open.slice(0, 2).map((l, i) => (i === 0 && l.state !== "locked" ? { ...l, state: "now" as const } : l));

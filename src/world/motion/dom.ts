@@ -10,7 +10,7 @@
 import { dayFile } from "@state/days/table";
 import type { ActionContext, ActionHandler, MotionHooks } from "@world/desktop/controller";
 import { loopContext, checklist } from "@world/loop/checklist";
-import { showing, talking } from "@world/loop/dialogue";
+import { kuroInBox, showing } from "@world/loop/dialogue";
 import { heldItem } from "@world/room/held";
 import { holdUntil, lineKey, revealBusy, revealDoneAt, revealShown, startReveal, type Reveal } from "./reveal";
 import { centre, DESK_SHOT, ROOM_SHOT, type Rect } from "@world/room/shots";
@@ -198,7 +198,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       asleep: head?.ending.kind === "lieDown",
       raid: !!q(root, ".gap-glow"),
       settings: !!q(root, ".settings-layer"),
-      call: talking(s.dialogue),
+      call: kuroInBox(s.dialogue),
       player: q(root, ".dlg-player") ? (head?.key ?? "") : null,
     };
   }
@@ -331,6 +331,8 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     }
     box.classList.remove("m-revealing");
     choicesEntry(t);
+    // Kuro's portrait was busy while its line appeared: render again so it settles.
+    if (box.closest(".dlg.kuro")) ctx.rerender();
   }
 
   function revealLine(t: number, delay: number): void {
@@ -353,6 +355,8 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       spans = wrapChars(box);
       r = startReveal(key, show.line, spans.length, t + delay, hold);
       s.reveal = r;
+      // Kuro's line starts appearing: render again so its portrait turns busy (box.ts).
+      if (box.closest(".dlg.kuro")) ctx.rerender();
       if (show.line.sfx) {
         const id = show.line.sfx;
         after(delay, () => ctx.play?.(id));

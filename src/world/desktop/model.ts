@@ -8,6 +8,7 @@ import { tr } from "@world/i18n";
 import type { TaskMode } from "@state/days/effects";
 import type { DoorBeat } from "@world/delivery/door";
 import { EMPTY_DIALOGUE, type DialogueState } from "@world/loop/dialogue";
+import { booted, loopContext, openItemFor } from "@world/loop/checklist";
 import type { Reveal } from "@world/motion/reveal";
 import type { LogEntry } from "@world/dialogue/history";
 import { EMPTY_COLLECTION, type Collection } from "@world/room/collection";
@@ -213,6 +214,11 @@ export function buildShell(
 ): ShellModel {
   const night = isNight(session.clock);
   const ctx: AppContext = { state, events, startDay, session, night, nowMs };
+  // Before the tower is pressed, 屏幕 is two black monitors (day-loop correction 2026-11-01).
+  const lc = loopContext(state, events);
+  const off = lc !== null && !booted(state, events);
+  // 关机 in the system's top bar: usable only while the shutdown item is open.
+  const shutdownOpen = lc !== null && openItemFor(lc, (e) => e.type === "beat" && e.beat === "shutdown") !== null;
   const left = monitorFor(session.leftApp, "left", ctx, apps);
   const right = monitorFor(rightApp(session.leftApp), "right", ctx, apps);
   // Badges count whether or not the app is on screen.
@@ -227,6 +233,8 @@ export function buildShell(
     ring: desktopRing(state.day, session.clock.beat),
     weather: { kind: weatherKind(weatherText), text: weatherText },
     night,
+    off,
+    shutdown: off || night ? null : shutdownOpen ? "open" : "closed",
     monitors: [left.monitor, right.monitor],
     dock: { active: session.leftApp, badges },
     focus: session.focus,

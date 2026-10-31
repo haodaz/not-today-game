@@ -11,8 +11,18 @@
 .room.desk-view{background-image:url(/room/shots/desk_close.jpg)}
 .room .shot-hit{position:absolute;border:0;padding:0;margin:0;background:transparent;cursor:pointer;border-radius:4px}
 .room .shot-hit:hover,.room .shot-hit:focus-visible{outline:2px solid rgba(232,228,220,.55);outline-offset:2px}
-/* Bottom right of the HUD: Kuro's body (the call button), then the camera chips (day-loop correction) */
-.hud-br{position:absolute;right:28px;bottom:28px;z-index:18;display:flex;align-items:flex-end;gap:12px}
+/* The world's actuators (day-loop correction 2026-11-01): the tower (a faint light while it is
+   off), the bed; the meal on the desk bar. */
+.room .tower-hit .tower-led{position:absolute;left:18%;top:14%;width:5px;height:5px;border-radius:50%;background:rgba(255,190,120,.85);box-shadow:0 0 6px 2px rgba(255,170,90,.45);animation:tower-led 3.2s ease-in-out infinite}
+@keyframes tower-led{50%{opacity:.35}}
+.room .slot.meal img{max-width:64px;max-height:56px}
+.room .slot.meal object{display:block;width:64px;height:56px;pointer-events:none}
+.room .slot.meal object img,.room .slot.meal img.eaten{width:100%;height:100%;object-fit:contain;opacity:.4;filter:grayscale(1)}
+/* Bottom right of the HUD: Kuro's body (the call button) directly above the camera-chip row, flush
+   with its right edge (day-loop correction "where Kuro's body sits"). At 1600 px its left edge is
+   1600 − 28 − 192 = 1380, right of the box's right edge (800 + 496 = 1296). Without chips (屏幕)
+   it is in the corner itself. */
+.hud-br{position:absolute;right:28px;bottom:28px;z-index:18;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
 .hud-host .hud-br{position:fixed;right:12px;bottom:12px;z-index:40}
 /* The body is 192 px (late-days FR1); during a conversation it is away (it is talking in the box). */
 .hud-kuro{position:relative;width:192px;height:192px}
@@ -31,7 +41,7 @@
 .room .list .it i{width:12px;height:12px;border:1.5px solid #555;border-radius:2px;flex:0 0 auto;transform:translateY(2px)}
 .room .list .it.now{font-weight:600}.room .list .it.next{color:#777}.room .list .it.wait i{border-style:dashed}.room .list .it.wait{color:#9a6400}
 .room .list .it.locked{color:#9a9a9a}
-.room .list button.it{cursor:pointer}.room .list button.it:hover i{border-color:var(--red)}
+/* The checklist only watches: no line is a button, no hover state. */
 /* 右上 */
 .room .day{position:absolute;right:28px;top:28px;text-align:right;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.6);font-size:15px;line-height:1.5}
 .room .day b{display:block;font-size:22px;font-weight:600}.room .day .ov{color:#ffb3ad}
@@ -59,8 +69,12 @@
 .dlg.sfx .txt{text-align:center;letter-spacing:.08em;color:#5b4a2e}
 .dlg .tag,.dlg-player .tag{position:absolute;left:18px;top:-16px;background:#2a2622;color:#efe9df;font-size:13px;line-height:1.4;letter-spacing:.2em;padding:5px 14px;border-radius:3px;white-space:nowrap}
 :lang(en) .dlg .tag,:lang(en) .dlg-player .tag{text-transform:uppercase;letter-spacing:.14em}
-.dlg .tag.k{display:flex;align-items:center;gap:10px;top:-28px;padding:4px 14px 4px 4px;border-radius:30px}
-.dlg .tag.k img{width:56px;height:56px;border-radius:50%;object-fit:cover;background:#ddd}
+/* Kuro speaking (dialogue correction 2026-11-01): the tag carries only the name; the portrait (the
+   one animated body, 200 px) stands at the box's right end, feet on the bottom edge, head 68 px
+   above the top; the text column is everything left of it (layout.ts KURO_LINE_BOX: 236 px). */
+.dlg.kuro{padding-right:236px}
+.dlg.kuro .hist{right:236px}
+.dlg .kpet.kuro-portrait{position:absolute;right:12px;bottom:0;left:auto;top:auto;width:200px;height:200px;z-index:1;pointer-events:none}
 .dlg-player .tag{background:#5b4a2e;top:-18px}
 .dlg .hist{position:absolute;right:14px;top:-14px;width:28px;height:28px;border:0;padding:0;border-radius:50%;background:#2a2622;color:#efe9df;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer}
 .dlg .hist:hover,.dlg .hist:focus-visible{background:#8b2f2a;outline:none}
@@ -71,10 +85,8 @@
 .dlg .choices,.dlg-player .choices{display:flex;flex-direction:column;line-height:1.45}
 .dlg.has-choices{padding-top:20px}
 /* A tag sits on the top edge; the text starts below it (mock design/chrome/dialogue.html). The
-   plain tag ends 11 px into the box; Kuro's (56 px face) ends 36 px in. Height stays 132 px:
-   three rows (or a prompt and two choices) still fit under Kuro's tag. */
+   tag ends 12 px into the box; 27 + 3 × 28.8 or 27 + 4 × 26.1 still fit in 132 px. */
 .dlg.tagged,.dlg.tagged.has-choices{padding-top:27px}
-.dlg.tagged.kuro,.dlg.tagged.kuro.has-choices{padding-top:44px}
 .dlg .choices button,.dlg-player .choices button{position:relative;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;width:100%;margin:0;padding:1px 0 1px 20px;border:0;background:none;font:inherit;line-height:inherit;color:#777;text-align:left;cursor:pointer}
 .dlg .choices button:hover,.dlg .choices button:focus-visible,.dlg-player .choices button:hover,.dlg-player .choices button:focus-visible{color:#1d2129;outline:none}
 .dlg .choices button:hover::before,.dlg .choices button:focus-visible::before,.dlg-player .choices button:hover::before,.dlg-player .choices button:focus-visible::before{content:"◆";position:absolute;left:0;color:#8b2f2a}

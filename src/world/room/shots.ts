@@ -18,14 +18,27 @@ export interface Shot {
   readonly gap: Rect;
 }
 
+/**
+ * The world's actuators (day-loop correction 2026-11-01: the checklist only watches). Measured on
+ * the same photos (image px × 0.78125): the computer tower under the desk's left end (its front,
+ * where the power button is), in both shots; the bed at the right of 房间, right of the parcel box.
+ */
+export interface Actuators {
+  readonly tower: Rect;
+}
+
 /** 房间: the wide shot. Clicking the desk (with its monitors) goes to 桌子. */
-export const ROOM_SHOT: Shot & { readonly desk: Rect } = {
+export const ROOM_SHOT: Shot & Actuators & { readonly desk: Rect; readonly bed: Rect } = {
   monitors: {
     left: { l: 368, t: 302, w: 266, h: 161 },
     right: { l: 640, t: 305, w: 257, h: 156 },
   },
   gap: { l: 633, t: 302, w: 8, h: 161 },
   desk: { l: 215, t: 290, w: 824, h: 330 },
+  // Image 262–362 × 862–1012: the tower's front face, below the desk top, left of the chair.
+  tower: { l: 205, t: 673, w: 78, h: 117 },
+  // Image 1540–2048 × 715–1152: the blanket and the bed's foot, clear of the box at its left.
+  bed: { l: 1203, t: 559, w: 397, h: 341 },
 };
 
 /**
@@ -44,12 +57,14 @@ export const ROOM_COLLECTION = {
 } as const;
 
 /** 桌子: the desk close-up. Clicking a monitor goes to 屏幕 on that side. */
-export const DESK_SHOT: Shot = {
+export const DESK_SHOT: Shot & Actuators = {
   monitors: {
     left: { l: 307, t: 272, w: 330, h: 201 },
     right: { l: 643, t: 276, w: 322, h: 193 },
   },
   gap: { l: 636, t: 272, w: 8, h: 201 },
+  // Image 130–240 × 975–1152: the tower's front, bottom left, under the desk.
+  tower: { l: 102, t: 762, w: 86, h: 138 },
 };
 
 export const rectStyle = (r: Rect): string => `left:${r.l}px;top:${r.t}px;width:${r.w}px;height:${r.h}px`;

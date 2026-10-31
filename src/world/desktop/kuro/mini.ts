@@ -6,7 +6,7 @@ import { currentOffer } from "@state/upgrades";
 import { constants } from "@state/variables";
 import { cls, html, type SafeHtml } from "@world/html";
 import { t, tr } from "@world/i18n";
-import { talking } from "@world/loop/dialogue";
+import { kuroInBox } from "@world/loop/dialogue";
 import type { AppContext } from "../model";
 import { bodyState, frameUrl, FRAMES, type BodyState } from "./body";
 import { kuroDay } from "./days";
@@ -67,7 +67,9 @@ export function kuroUnread(ctx: AppContext): boolean {
  * is away: it is the one talking in the box (dialogue FR2).
  */
 export function hudKuro(ctx: AppContext): SafeHtml {
-  if (talking(ctx.session.dialogue)) return html`<div class="hud-kuro away"></div>`;
+  // While it speaks in the box it stands there (its portrait); the corner is empty. There is
+  // always exactly one body slot on the page.
+  if (kuroInBox(ctx.session.dialogue)) return html`<div class="hud-kuro away"></div>`;
   const unread = kuroUnread(ctx);
   return html`<div class="hud-kuro"><button type="button" class="${cls("kuro-btn", unread && "unread")}" data-action="kuro-call" aria-label="${t("kuro.name")}"><span class="kpet" data-kuro-slot data-state="${kuroBodyState(ctx)}" aria-hidden="true"></span>${unread ? html`<i class="dot"></i>` : null}</button></div>`;
 }

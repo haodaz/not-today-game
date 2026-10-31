@@ -153,3 +153,37 @@ The desktop controller gains a pluggable root renderer, change hooks, and the ke
   not clickable and not focusable.
 - The evening chat beat opens the overlay by itself (`openChatIfDue`): once a day, when the chat
   item is open and the dialogue box is empty.
+
+## Correction implemented (2026-11-01): the checklist only watches
+
+- No line is a button. `ChecklistLine` is `{ id, text, state }`; `ItemAction`, `actionOf`,
+  `loop-item` and the line hover are gone. A line ticks only when its `done` happened.
+- `openItemFor(ctx, match)` (loop/checklist.ts) answers "would this world event do an item
+  now?": unlocked, not done, and not held by `locked: requiredPending`. Every actuator asks it
+  (or its own state) before it acts, so nothing ticks out of order.
+- The actuators:
+
+| Item | Actuator | Code |
+|---|---|---|
+| 开机 | The tower's front, a hotspot in 房间 and 桌子 (`ROOM_SHOT.tower`, `DESK_SHOT.tower`) with a faint pulsing light while off; once on it is only the picture. Before boot 屏幕 is two black monitors (`ShellModel.off`), and looking at an app counts for nothing. | `tower-power` → `step boot` |
+| 吃 | After 去拿, `deskMeal()` puts the meal on the 桌子 desk bar as its food image (the ordered item's `sprite`). Clicking it eats. Eaten, the slot shows `<sprite>_done.png` through an `<object>` that falls back to the food image greyed when the file does not exist. It stays until the next meal is taken in. | `loop-eat` → `step eat:<meal>` |
+| 看一眼桌子 | Arriving at 桌子 while the item is open (the `view` action); the runtime plays the desk beat on that step, as before. | `step beat:desk` |
+| 关机 | A button next to the clock in the system's top bar (`desktop.shutdown`). It is disabled until the item is open and absent at night and before boot. It plays the shutdown beat; the monitors darken (motion `m-power-off`), then after `MOTION.shutdown + shutdownGap` (750 ms) the view returns to 房间. | `desktop-shutdown` → `step beat:shutdown` |
+| 躺下 | The bed in 房间 (`ROOM_SHOT.bed`). Not open: one inner line `room.bed.locked` (key `d<N>:bed:locked`, never stacked). Open: the night plays, then `lieDown` (or the ending on day 18). | `bed` |
+| 老周的事 | Opening 老周's conversation (`conv` wrapped in loopActions, `LOAN_CONVERSATION = "laozhou"`) while the item is open pushes the loan prompt into the box over the desktop. Decided, it asks nothing. | `reply` (loan) |
+
+- Rects (image px × 0.78125, measured on the stills): 房间 tower 205,673 78×117 (its front,
+  under the desk's left end, left of the chair); 桌子 tower 102,762 86×138; bed 1203,559 397×341
+  (the blanket and foot, right of the parcel box).
+- Accessible names: the tower uses `room.tower.off`. The bed and meal use their checklist
+  items' own text (content), since there are no strings for them. TODO(Claude): `room.bed` /
+  `room.meal`, if a different label is wanted.
+
+## Correction implemented (2026-11-01): where Kuro's body sits
+
+- `.hud-br` is a column, aligned right: Kuro's 192 px body directly above the chip row, flush
+  with its right edge. At 1600 px its left edge is 1380; the dialogue box ends at 1296. In 屏幕
+  (no chips) it is in the corner itself.
+- While Kuro speaks in the box (`kuroInBox`: the head item is Kuro's), the corner is empty and
+  the body stands at the box's right end (dialogue correction). The page always has exactly
+  one `data-kuro-slot`.
