@@ -124,5 +124,8 @@
   "browser.section": "Tech",
   "browser.nav": "News · AI · Jobs · Companies · Opinion · Local",
   "browser.reading": "Readers are reading",
-  "kuro.name": "Kuro"
+  "kuro.name": "Kuro",
+  "upgrade.yes": "Upgrade",
+  "upgrade.no": "No need",
+  "upgrade.badge": "Upgraded"
 }

@@ -284,5 +284,17 @@
       "evidence": []
     },
     "changedBy": "end of each chat beat (structured model assessment or offline rule scorer); never shown to the player"
+  },
+  "upgraded": {
+    "type": "map<object, bool>",
+    "default": {
+      "chick": false,
+      "pager": false,
+      "iccard": false,
+      "tape": false,
+      "dictionary": false,
+      "calculator": false
+    },
+    "changedBy": "upgrade event (object-upgrade spec)"
   }
 }

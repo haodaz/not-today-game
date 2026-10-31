@@ -124,5 +124,8 @@
   "kuro.input": "和克总说点别的…",
   "kuro.bedtime": "You should sleep. I don't have that many tokens for you. Save them for work.",
   "wb.now.letItDo": "让它做而没看一眼",
-  "wb.now.count": "次"
+  "wb.now.count": "次",
+  "upgrade.yes": "升级",
+  "upgrade.no": "不用",
+  "upgrade.badge": "已升级"
 }

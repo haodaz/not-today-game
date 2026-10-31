@@ -2,6 +2,7 @@
 // applyEvent is pure: it never mutates its input and never reads a clock. An event may read the
 // state produced by earlier events; the only time it sees is its own recorded `day`.
 import type { State } from "./types.gen";
+import { applyChoose, applyStep, applyTask, type TaskMode } from "./days/effects";
 import { applyOrder, applyPickup, applyUseItem } from "./delivery/effects";
 import type { Meal } from "./delivery/table";
 import { applyReplyEvent, knownRecipients } from "./replies/effects";
@@ -35,11 +36,15 @@ export type GameEvent =
   | { kind: "pickup"; day: number; meal: Meal }
   | { kind: "useItem"; day: number; itemId: string; objectId: string }
   // desktop-ui spec (amendment 2026-10-31): opening the browser or a conversation, at beat time `t`.
-  | { kind: "open"; day: number; target: string; t: string };
+  | { kind: "open"; day: number; target: string; t: string }
+  // day-loop spec (amendment 2026-11-01).
+  | { kind: "step"; day: number; name: string; t: string }
+  | { kind: "choose"; day: number; beat: string; index: number }
+  | { kind: "task"; day: number; flag: string; mode: TaskMode };
 
 export type EventKind = GameEvent["kind"];
 
-/** Exactly these kinds (world-state twelve, delivery three, desktop-ui one). Nothing else may be appended. */
+/** Exactly these kinds (world-state 12, delivery 3, desktop-ui 1, day-loop 3). Nothing else may be appended. */
 export const eventKinds: readonly EventKind[] = [
   "openLayer",
   "recognise",
@@ -57,6 +62,9 @@ export const eventKinds: readonly EventKind[] = [
   "pickup",
   "useItem",
   "open",
+  "step",
+  "choose",
+  "task",
 ];
 
 const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
@@ -135,6 +143,12 @@ export function applyEvent(state: State, event: GameEvent): State {
       return { ...state, day: state.day + 1 };
     case "open":
       return applyOpen(state, event);
+    case "step":
+      return applyStep(state, event);
+    case "choose":
+      return applyChoose(state, event);
+    case "task":
+      return applyTask(state, event);
     case "reply":
       if (event.t !== undefined && !HHMM.test(event.t)) throw new Error(`reply: time must be HH:MM, got "${event.t}"`);
       // A word sent in a conversation plays the reply tables; a recipient-less reply is a prompt

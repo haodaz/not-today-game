@@ -49,3 +49,7 @@ People who have had a job like this. The game should entertain while it passes s
 ## Hackathon
 
 Kiroween 2026, category Resurrection (fallback: Costume Contest). The story, the setting bible, the branching Chinese gamebook and the concept art were written before the hackathon by the author with Claude and are published at github.com/haodaz/nottoday under CC BY-NC-ND. This repository is the game built from them. All game code is new and written in this repository during the submission period. Disclose this in the README and on the submission form.
+
+## Per-object upgrades (author decision 2026-11-01)
+
+Kuro offers to upgrade each old object separately from the day after it arrives (`content/upgrades.json`). Upgrading is convenient and makes the object part of the new world: its screen gains resolution, it can no longer be held up at night, its lent word disappears, the child's message on it is "corrected". The game never explains the cost; the only tell is the icon. The day-13 "全员升级" notice is the final, all-at-once offer, not a new mechanic.
