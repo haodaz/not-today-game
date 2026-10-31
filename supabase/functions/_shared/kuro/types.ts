@@ -9,6 +9,9 @@ export interface LogEvent {
   readonly [field: string]: unknown;
 }
 
+/** The player's language, sent with every call (correction 2026-11-01). */
+export type ChatLocale = "zh" | "en";
+
 export interface MemoryTurn {
   readonly day: number;
   readonly who: "player" | "kuro";

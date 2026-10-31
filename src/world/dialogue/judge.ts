@@ -10,6 +10,7 @@ import { affinityDelta, judgedOn } from "@state/chat";
 import type { ActionContext } from "@world/desktop/controller";
 import { scoreOffline, toLogEvents } from "@world/desktop/kuro/scorer";
 import { KURO_TIMEOUT_MS, kuroOnline, net } from "@net/supabase";
+import { getLocale } from "@world/i18n";
 
 /** Today has a chat turn and no judgement yet. */
 export function judgementDue(ctx: ActionContext): boolean {
@@ -42,7 +43,7 @@ export function startJudgement(ctx: ActionContext): void {
   }
   session.judging = { day, startedAt: ctx.now?.() ?? Date.now() };
   online
-    .judge({ run_id: store.getRunId(), day, events: toLogEvents(store.getEvents()) })
+    .judge({ run_id: store.getRunId(), day, events: toLogEvents(store.getEvents()), locale: getLocale() })
     .then((r) => append(ctx, day, r.judgement, "model"))
     .catch(() => append(ctx, day, scoreOffline(store.getEvents(), day), "offline"));
 }

@@ -2,7 +2,7 @@
 // The backend, from the game's side (backend FR1, FR4; kuro-chat FR3). Everything is a no-op
 // without VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY: the game is fully playable offline.
 // supabase-js is loaded lazily, only when configured. Never deploys anything.
-import type { ChatResponse, LogEvent } from "@kuro/types.ts";
+import type { ChatLocale, ChatResponse, LogEvent } from "@kuro/types.ts";
 import { syncDecision, type RunCopy, type SyncDecision } from "./sync";
 
 /** What the game calls on the client (a small slice of supabase-js). */
@@ -32,8 +32,8 @@ export function netConfig(env: Record<string, unknown> = import.meta.env ?? {}):
 
 /** The turn and judge calls (kuro-chat FR3/FR4); injectable for tests. */
 export interface KuroOnline {
-  turn(body: { run_id: string; day: number; said: string; events: readonly LogEvent[] }): Promise<Extract<ChatResponse, { mode: "turn" }>>;
-  judge(body: { run_id: string; day: number; events: readonly LogEvent[] }): Promise<Extract<ChatResponse, { mode: "judge" }>>;
+  turn(body: { run_id: string; day: number; said: string; events: readonly LogEvent[]; locale: ChatLocale }): Promise<Extract<ChatResponse, { mode: "turn" }>>;
+  judge(body: { run_id: string; day: number; events: readonly LogEvent[]; locale: ChatLocale }): Promise<Extract<ChatResponse, { mode: "judge" }>>;
 }
 
 /** The function's timeout on the client side too: 20 s, then the offline path (backend FR3). */

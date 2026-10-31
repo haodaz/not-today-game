@@ -3,8 +3,9 @@
 // ../_shared/kuro/handler.ts and the pure modules beside it, which are tested with the game; this
 // file only wires the real database client and the SDK into it.
 //
-// POST { mode: "turn", run_id, day, said, events } → { mode, reply, turnsLeft, bedtime? }
-// POST { mode: "judge", run_id, day, events }      → { mode, judgement }
+// POST { mode: "turn", run_id, day, said, events, locale } → { mode, reply, turnsLeft, bedtime? }
+// POST { mode: "judge", run_id, day, events, locale }      → { mode, judgement }
+// locale: "zh" | "en" (missing or unknown → "zh"); it fixes the reply and note language.
 // Secrets read: ANTHROPIC_API_KEY (by the SDK), KURO_MODEL (optional, default claude-sonnet-5-5),
 // SUPABASE_URL and SUPABASE_ANON_KEY (provided by Supabase). The caller's JWT is forwarded, so
 // RLS applies to every read and write. Any failure is non-200: the client answers offline.

@@ -82,6 +82,19 @@ The run save's `chatMemory` (replayed from `chat` / `judged`) and the server's `
 the same content. The server's copy feeds its prompts. A bad-ending restart clears the run save,
 and with it the local memory; the server memory belongs to the old run id and is never read again.
 
+## Reply language (correction 2026-11-01)
+
+- Client: `turn()` and `startJudgement()` send `locale: getLocale()` ("zh" | "en") in the body, so it
+  follows the settings toggle at the moment of the call.
+- Function: `localeOf(body.locale)` (missing or unknown → "zh", the source language).
+  `buildSystem(…, locale)` appends a fifth system block, `LOCALE_LINES[locale]`. It is one line and
+  the last line of the system prompt. It gets its own block after memory, so the cached first block
+  is byte-identical in both languages.
+- The rule "Speak English" became "in the reply language fixed at the very end". `JUDGE_ASK` asks
+  for notes "in the reply language". The credits show those notes as written. Memory stores turns
+  as said.
+- The kuro-days content stays in English; the zh line tells the model to render the idiom itself.
+
 ## Tests (FR6)
 
 - Property: the scorer and a mocked model path give the same schema; affinity is monotone in the

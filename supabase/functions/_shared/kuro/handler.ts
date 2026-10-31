@@ -1,7 +1,7 @@
 // The kuro-chat function's request handling (backend FR3), without Deno, the database client or
 // the SDK: those come in as `deps`, so the tests run it with a mocked model and an in-memory store.
 // index.ts only wires real dependencies to this.
-import { buildSystem, citableIds, JUDGE_ASK } from "./prompt.ts";
+import { buildSystem, citableIds, JUDGE_ASK, localeOf } from "./prompt.ts";
 import { DEFAULT_MODEL, judgeRequest, readJudgement, readReply, turnRequest, type MessageRequest, type MessageResponse } from "./llm.ts";
 import { appendExchange, clipSummary, decideTurn } from "./turns.ts";
 import type { ChatResponse, Judgement, KuroContent, LogEvent, Memory } from "./types.ts";
@@ -42,6 +42,7 @@ export async function handle(body: unknown, deps: HandlerDeps): Promise<HandlerR
     const memory = await deps.loadMemory(runId);
     const events = eventsOf(body.events);
     const model = deps.model || DEFAULT_MODEL;
+    const locale = localeOf(body.locale);
 
     if (mode === "turn") {
       const said = typeof body.said === "string" ? body.said.slice(0, 500) : "";
@@ -49,13 +50,13 @@ export async function handle(body: unknown, deps: HandlerDeps): Promise<HandlerR
       // Server-side count: the sixth call gets the constant bedtime line; the model is not called.
       const decision = decideTurn(memory.turns, day, deps.content.turnsPerDay);
       if (decision.kind === "bedtime") return { status: 200, body: { mode, reply: deps.content.bedtime, turnsLeft: 0, bedtime: true } };
-      const system = buildSystem(deps.content, day, events, memory, "turn");
+      const system = buildSystem(deps.content, day, events, memory, "turn", locale);
       const reply = readReply(await deps.create(turnRequest(model, system, said)));
       await deps.saveMemory(runId, appendExchange(memory, day, said, reply));
       return { status: 200, body: { mode, reply, turnsLeft: decision.turnsLeft } };
     }
 
-    const system = buildSystem(deps.content, day, events, memory, "judge");
+    const system = buildSystem(deps.content, day, events, memory, "judge", locale);
     const judgement = readJudgement(await deps.create(judgeRequest(model, system, JUDGE_ASK)), citableIds(events, day, deps.content.gate));
     await deps.saveJudgement(runId, day, judgement);
     if (judgement.summary !== undefined) await deps.saveMemory(runId, { turns: memory.turns, summary: clipSummary(judgement.summary) });

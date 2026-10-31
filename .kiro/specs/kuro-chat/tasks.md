@@ -7,3 +7,4 @@
 - [x] T5. Online turn (waiting line, function call, fallback) and judgement at bed (lie-down waits ≤ 20 s).
 - [x] T6. Credits from `dims` and `judge.offline.*` notes.
 - [x] T7. Tests (tests/kuro-chat.test.ts) with a mocked invoke; snapshots checked.
+- [x] T8. Correction 2026-11-01, reply language: the client sends `locale` with turn and judge; the function ends the system prompt with `LOCALE_LINES[locale]` (own block; missing/unknown → zh); "Speak English" and "notes in English" removed. Tests (tests/backend.test.ts, mocked model): the locale line is the last line for turn and judge in both locales, the cached block is the same across locales, fallback to zh; tests/kuro-chat.test.ts checks the client sends it. Snapshot gained the fifth block (diff checked).

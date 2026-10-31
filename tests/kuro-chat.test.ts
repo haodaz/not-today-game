@@ -21,7 +21,7 @@ import { judgementPending, startJudgement } from "@world/dialogue/judge";
 import { WAITING } from "@world/dialogue/kuro";
 import { creditLines } from "@world/endings/credits";
 import { escapeHtml } from "@world/html";
-import { setLocale, t } from "@world/i18n";
+import { getLocale, setLocale, t } from "@world/i18n";
 import { lieDownOrEnd } from "@world/loop/runtime";
 import { loopActions } from "@world/room/game";
 import { setKuroOnlineForTests, type KuroOnline } from "@net/supabase";
@@ -102,7 +102,7 @@ describe("the online path (FR3), with a mocked function", () => {
     await flush();
     const ev = store.getEvents().find((e) => e.kind === "chat")!;
     expect(ev).toMatchObject({ q: 1, answer: "You noticed. Most people don't, {login}.", offline: false });
-    expect(turns[0]).toMatchObject({ run_id: store.getRunId(), day: 14, said: kuroDay(14)!.starters[0]!.zh });
+    expect(turns[0]).toMatchObject({ run_id: store.getRunId(), day: 14, said: kuroDay(14)!.starters[0]!.zh, locale: getLocale() });
     // Never the login inputs in what the client sends.
     expect(JSON.stringify(turns[0])).not.toContain("林一");
     const shown = box(ctx);
@@ -221,7 +221,8 @@ describe("the judgement (FR4)", () => {
 
   it("online: the model's judgement; lying down waits for it (≤ 20 s), then the scorer", async () => {
     let release: (j: Judgement) => void = () => {};
-    setKuroOnlineForTests({ turn: async () => { throw new Error("unused"); }, judge: () => new Promise((r) => (release = (j) => r({ mode: "judge", judgement: j }))) });
+    const sent: unknown[] = [];
+    setKuroOnlineForTests({ turn: async () => { throw new Error("unused"); }, judge: (b) => (sent.push(b), new Promise((r) => (release = (j) => r({ mode: "judge", judgement: j })))) });
     const store = storeAt(3);
     store.appendEvent({ kind: "chat", text: "hi", said: "hi", answer: "Hi." });
     const { ctx, timers, tick } = ctxOf(store);
@@ -232,6 +233,7 @@ describe("the judgement (FR4)", () => {
     release({ truth: 1, values: 0, bond: 1, evidence: [{ eventId: `ev${store.getEvents().length - 1}`, note: "It asked." }], summary: "s" });
     await flush();
     expect(store.getEvents().at(-1)).toMatchObject({ kind: "judged", source: "model", truth: 1 });
+    expect(sent[0]).toMatchObject({ day: 3, locale: getLocale() });
     timers.shift()!.fn(); // the poll
     expect(store.getState().day).toBe(4);
     // Timed out: the scorer, and the night ends.

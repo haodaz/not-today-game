@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
 import { handle, type HandlerDeps } from "@kuro/handler.ts";
 import { JUDGEMENT_SCHEMA, validateJudgement } from "@kuro/judgement.ts";
 import { DEFAULT_MODEL, judgeRequest, MAX_TOKENS, readJudgement, readReply, RefusalError, turnRequest, type MessageRequest, type MessageResponse } from "@kuro/llm.ts";
-import { buildSystem, citableIds, describeEvent, worldSlice } from "@kuro/prompt.ts";
+import { buildSystem, citableIds, describeEvent, JUDGE_ASK, LOCALE_LINES, worldSlice } from "@kuro/prompt.ts";
 import { appendExchange, decideTurn, playerTurnsOn } from "@kuro/turns.ts";
 import type { Judgement, LogEvent, Memory } from "@kuro/types.ts";
 import en from "@content/strings/en.json";
@@ -123,8 +123,9 @@ describe("prompt assembly (FR3)", () => {
   ];
 
   it("three sources in order — self, the player's situation, memory — the stable part cached", () => {
-    const blocks = buildSystem(content, 1, events, { summary: "s", turns: [{ day: 1, who: "player", text: "hi" }] }, "turn");
-    expect(blocks).toHaveLength(4);
+    const blocks = buildSystem(content, 1, events, { summary: "s", turns: [{ day: 1, who: "player", text: "hi" }] }, "turn", "zh");
+    expect(blocks).toHaveLength(5);
+    expect(blocks[4]!.text).toBe(LOCALE_LINES.zh);
     expect(blocks[0]!.text).toContain(content.profile.slice(0, 40));
     expect(blocks[0]!.cache_control).toEqual({ type: "ephemeral" });
     expect(blocks.slice(1).every((b) => b.cache_control === undefined)).toBe(true);
@@ -135,7 +136,7 @@ describe("prompt assembly (FR3)", () => {
   });
 
   it("never the login inputs, the hand or the beat choices; the desk only from day 13", () => {
-    const text = buildSystem(content, 1, events, NO_MEMORY, "turn").map((b) => b.text).join("\n");
+    const text = buildSystem(content, 1, events, NO_MEMORY, "turn", "zh").map((b) => b.text).join("\n");
     expect(text).not.toContain("林一");
     expect(text).not.toContain("一一");
     expect(text).toContain("{login}"); // how it names the player
@@ -147,19 +148,19 @@ describe("prompt assembly (FR3)", () => {
   });
 
   it("the dreams only on the gate's day; the judgement may cite chat turns", () => {
-    expect(buildSystem(content, 14, [], NO_MEMORY, "turn")[2]!.text).not.toContain("## The dreams");
-    expect(buildSystem(content, 15, [], NO_MEMORY, "turn")[2]!.text).toContain("## The dreams (today only)");
+    expect(buildSystem(content, 14, [], NO_MEMORY, "turn", "zh")[2]!.text).not.toContain("## The dreams");
+    expect(buildSystem(content, 15, [], NO_MEMORY, "turn", "zh")[2]!.text).toContain("## The dreams (today only)");
     expect([...citableIds(events, 1, content.gate)]).toEqual(["ev1", "ev2", "ev5"]);
-    expect(buildSystem(content, 1, events, NO_MEMORY, "judge")[0]!.text).toContain("# How you judge");
+    expect(buildSystem(content, 1, events, NO_MEMORY, "judge", "zh")[0]!.text).toContain("# How you judge");
   });
 
   it("snapshot: day 1's opening prompt (no memory yet)", () => {
-    expect(buildSystem(content, 1, events.slice(0, 3), NO_MEMORY, "turn").map((b) => b.text.slice(0, 160))).toMatchSnapshot();
+    expect(buildSystem(content, 1, events.slice(0, 3), NO_MEMORY, "turn", "zh").map((b) => b.text.slice(0, 160))).toMatchSnapshot();
   });
 });
 
 describe("the model call (requests and responses)", () => {
-  const system = buildSystem(content, 2, [], NO_MEMORY, "turn");
+  const system = buildSystem(content, 2, [], NO_MEMORY, "turn", "zh");
 
   it("turn: max_tokens 1024, effort low, no thinking, no temperature", () => {
     const r = turnRequest(DEFAULT_MODEL, system, "hello");
@@ -241,6 +242,30 @@ describe("the function's handler, with a mocked model (FR3, FR5)", () => {
     expect(judgements.at(-1)).toMatchObject({ runId: "run-1", day: 2 });
     expect(memory.get("run-1")!.summary).toBe("They looked.");
     expect(calls[0]!.output_config.format).toBeDefined();
+  });
+
+  // Correction 2026-11-01: Kuro answers in the player's language.
+  const lastLine = (p: MessageRequest) => p.system.map((b) => b.text).join("\n").split("\n").at(-1);
+
+  it.each(["zh", "en"] as const)("locale %s: the locale line is the last line of the system prompt, turn and judge", async (locale) => {
+    const { d, calls } = deps((p) => say(p.output_config.format ? JSON.stringify({ truth: 0, values: 0, bond: 0, evidence: [], summary: "" }) : "ok"));
+    expect((await handle({ mode: "turn", run_id: "run-1", day: 2, said: "x", events: [], locale }, d)).status).toBe(200);
+    expect((await handle({ mode: "judge", run_id: "run-1", day: 2, events: [], locale }, d)).status).toBe(200);
+    expect(calls).toHaveLength(2);
+    for (const call of calls) expect(lastLine(call)).toBe(LOCALE_LINES[locale]);
+    // The cached first block is the same whatever the language.
+    expect(calls[0]!.system[0]).toEqual(buildSystem(content, 2, [], NO_MEMORY, "turn", locale === "zh" ? "en" : "zh")[0]);
+  });
+
+  it("the locale line is one line; no rule or ask pins English; a missing or unknown locale is Chinese", async () => {
+    for (const line of Object.values(LOCALE_LINES)) expect(line).not.toContain("\n");
+    expect(buildSystem(content, 1, [], NO_MEMORY, "judge", "zh")[0]!.text).not.toMatch(/Speak English/);
+    expect(JUDGE_ASK).not.toMatch(/in English/);
+    for (const locale of [undefined, "fr", 3]) {
+      const { d, calls } = deps(() => say("ok"));
+      await handle({ mode: "turn", run_id: "run-1", day: 2, said: "x", events: [], locale }, d);
+      expect(lastLine(calls[0]!)).toBe(LOCALE_LINES.zh);
+    }
   });
 });
 

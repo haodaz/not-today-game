@@ -172,7 +172,7 @@ function turn(ctx: ActionContext, said: string, q: number | null, text: string |
   const wait = item(session, dayNo, WAITING, { kind: "kuroWait" });
   session.dialogue = replaceHead(session.dialogue, [wait]);
   online
-    .turn({ run_id: store.getRunId(), day: dayNo, said, events: toLogEvents(store.getEvents()) })
+    .turn({ run_id: store.getRunId(), day: dayNo, said, events: toLogEvents(store.getEvents()), locale: getLocale() })
     .then((r) => {
       if (r.bedtime) return void answerBedtime(ctx, dayNo, wait);
       answerTurn(ctx, dayNo, said, q, text, r.reply, false, wait);

@@ -588,3 +588,23 @@ Appended after each task. Neither Kiro nor Claude edits the other's area without
 - The dialogue's ↺ moved onto the tag strip, right after the name tag (alone when there is no tag).
   17 snapshots refreshed; the diffs were only the strip wrapper and that note.
 - Tests: 51 files, 777 passing; typecheck clean.
+
+## 2026-11-01 — kuro-chat correction: Kuro answers in the player's language
+
+- The client sends `locale: getLocale()` ("zh" | "en") with every turn (`dialogue/kuro.ts`) and judge
+  call (`dialogue/judge.ts`); `KuroOnline` bodies carry it. New shared type `ChatLocale`.
+- The function: `localeOf(body.locale)` (missing or unknown → zh). `buildSystem(…, locale)` adds a
+  fifth block `LOCALE_LINES[locale]`, one line and the last line of the system prompt. It is a
+  separate block, so the cached first block is byte-identical in both languages.
+- Removed what pinned English: the rule "Speak English" (now "in the reply language fixed at the
+  very end") and "a short note in English" in `JUDGE_ASK` (now "in the reply language").
+- The locale lines are model instructions in `supabase/functions/_shared/kuro/prompt.ts`, beside the
+  other prompt rules, not player-facing strings.
+- Tests: `tests/backend.test.ts` has a mocked model for both locales. It checks that the locale line
+  is the last line for turn and judge, that the cached block is equal across locales, that the line
+  is one line, that neither the rules nor the ask say English, and that the locale falls back to zh.
+  `tests/kuro-chat.test.ts` checks that the client sends the locale on turn and judge.
+- The backend prompt snapshot gained only the fifth block. I checked that the first four blocks are
+  unchanged and updated the `.snap` by hand.
+- The function isn't redeployed here. The change goes live on the next deploy.
+- Tests: 51 files, 780 passing; typecheck clean.
