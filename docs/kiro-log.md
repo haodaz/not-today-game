@@ -630,3 +630,28 @@ Appended after each task. Neither Kiro nor Claude edits the other's area without
 - Snapshot: the backend prompt's day 1 idiom line and the zh locale line (diff checked, `.snap`
   edited by hand).
 - Tests: 52 files, 789 passing; typecheck clean. Not checked in a browser.
+
+## 2026-11-01 — room-scene, motion segment (splat for camera moves)
+
+- Spec `room-scene`: design (S1–S11) and tasks written from the three 2026-11-01 sections.
+  Implemented in `src/world/room/splat/` (pose, look, gate, moves, layer, scene, index, vendor.d.ts).
+- Dependencies: `three` 0.187.0 and `@mkkellogg/gaussian-splats-3d` 0.4.7, both exact. They were
+  installed in the previous turn, so the install was not run again. Neither ships types;
+  `vendor.d.ts` declares only what `scene.ts` calls (no `@types/three`).
+- `scene.ts` is the only importer of three. It is reached by `import("./scene")` after the first
+  render, never by the title page. Off with `?splat=0`, without WebGL, or under reduced motion:
+  then the controller gets no `splat` dep.
+- A move uses the splat only if the scene is ready and the motion layer is holding the arriving
+  photo back (`m-nobg`); otherwise the CSS push plays unchanged. The layer sits between the push's
+  backdrop copy and the stage, fades the arriving photo in over the last 200 ms, and leaves once
+  the stage has its own photo back.
+- The pose clamp's bounds (yaw ≥ f43's −6.35°, x ≤ 0.023) come from the three allowed poses.
+  `CameraMove.path` and `clamp: null` are the hooks for the day-18 pull-out.
+- Collapse: room 0.4, door 1, as a second viewer on a stacked canvas (opacity = mix). It is loaded
+  as soon as the day's ring needs it; until then that day's moves fall back to the CSS push.
+- Fix (polish P11): the motion layer's backdrop and leaving-screen copies set inline `left:0;
+  top:0`, which undid the centring offsets on big windows. They now use `var(--stage-x/-y)`.
+- Not verified: nothing has run in a browser. `scene.ts` is checked only by tsc against my
+  declarations of the library's API, which I couldn't confirm in the bundle here. No load time, no
+  frame rate, no `vite build` chunk check.
+- Tests: 53 files, 808 passing; typecheck clean.

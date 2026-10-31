@@ -231,3 +231,18 @@
 .first-day{background:#fff;color:#1d2129;display:flex;align-items:center;justify-content:center}
 .first-day p{position:relative;z-index:2;margin:0;font-size:28px;letter-spacing:.4em;pointer-events:none}
 
+/* The splat layer (room-scene design S5, S8, S10): only during a 房间 ↔ 桌子 move, between the
+   CSS push's backdrop copy and the (transparent) arriving stage, at the stage's own fit. */
+#app > .splat-layer{position:absolute;left:var(--stage-x,0px);top:var(--stage-y,0px);width:1600px;height:900px;transform:scale(var(--scale,1));transform-origin:0 0;overflow:hidden;pointer-events:none;background:#000}
+.splat-layer canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.splat-layer .splat-collapsed{opacity:0}
+.splat-layer > div{position:absolute;pointer-events:none}
+.splat-layer .splat-night,.splat-layer .splat-vignette,.splat-layer .splat-photo{inset:0}
+.splat-layer .splat-night{display:none;background:rgba(10,10,12,.55)}
+.splat-layer.night .splat-night{display:block}
+.splat-layer .splat-lamp{width:520px;height:520px;margin:-260px 0 0 -260px;border-radius:50%;background:radial-gradient(circle,rgba(255,196,120,.32),rgba(255,196,120,0) 65%);mix-blend-mode:screen}
+.splat-layer .splat-gap{background:radial-gradient(ellipse,rgba(235,240,255,.85),rgba(235,240,255,0) 70%);filter:blur(2px)}
+.splat-layer.pink .splat-gap{background:radial-gradient(ellipse,rgba(255,150,190,.9),rgba(255,150,190,0) 70%)}
+.splat-layer [hidden]{display:none}
+.splat-layer .splat-vignette{background:radial-gradient(ellipse at center,rgba(0,0,0,0) 55%,rgba(0,0,0,.35) 100%)}
+.splat-layer .splat-photo{opacity:0;background:center/cover no-repeat}

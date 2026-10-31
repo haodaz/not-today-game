@@ -10,6 +10,7 @@ import "./world/motion/motion.css";
 import "./ui/fonts.css";
 import "./ui/title/title.css";
 import { debugStartDay } from "@state/clock";
+import { splatForGame } from "@world/room/splat";
 import { createProfileWriter, createRunSlot } from "@state/saves";
 import { createStore, type Store } from "@state/store";
 import { parseBeatParams } from "@world/desktop/beat";
@@ -97,6 +98,8 @@ function startGame(store: Store, saved: boolean, from?: "desk"): void {
     onChange: (ctx) => syncLoop(ctx),
     onKey: loopKeys,
     motion: createMotion,
+    // The room splat for 房间 ↔ 桌子 moves (room-scene): the game only, never the title page.
+    splat: splatForGame(window),
   });
   // What finished runs left on the desk (presentation only; the story never reads it).
   game.session.collection = collection;

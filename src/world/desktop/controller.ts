@@ -80,6 +80,8 @@ export interface DesktopDeps {
   readonly onKey?: (ctx: ActionContext, e: KeyboardEvent) => boolean;
   /** The motion layer (polish); none in tests. */
   readonly motion?: (root: HTMLElement, ctx: ActionContext, actions: Record<string, ActionHandler>) => MotionHooks;
+  /** The splat layer for camera moves (room-scene); absent when off. Runs after the motion layer. */
+  readonly splat?: (root: HTMLElement, ctx: ActionContext) => { after(): void; destroy(): void };
 }
 
 function defaultRender(apps: AppRenderers) {
@@ -115,6 +117,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     if (slot) body.attach(slot);
     fit();
     motion?.after();
+    splat?.after();
     // While Kuro crawls between windows, render again when it should stop.
     if (session.movingUntil > Date.now()) later(session.movingUntil - Date.now() + 20, rerender);
     if (focusKey) {
@@ -137,6 +140,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   };
   const ctx: ActionContext = { store: deps.store, session, rerender, later, play: (id) => playSfx(id, session.muted), now: () => Date.now() };
   const motion: MotionHooks | null = deps.motion ? deps.motion(root, ctx, actions) : null;
+  const splat = deps.splat ? deps.splat(root, ctx) : null;
 
   const onClick = (e: MouseEvent) => {
     const el = (e.target as HTMLElement).closest<HTMLElement>("[data-action]");
@@ -209,6 +213,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     destroy() {
       unsubscribe();
       motion?.destroy();
+      splat?.destroy();
       timers.forEach(clearTimeout);
       if (frame) cancelAnimationFrame(frame);
       root.removeEventListener("click", onClick);

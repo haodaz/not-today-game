@@ -560,7 +560,8 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     b.classList.add("m-backdrop");
     b.removeAttribute("data-view");
     b.style.animation = "";
-    Object.assign(b.style, { position: "absolute", left: "0", top: "0", zIndex: "0" });
+    // At the stage's own centring offsets (polish P11), which the copy keeps in its style.
+    Object.assign(b.style, { position: "absolute", left: "var(--stage-x, 0px)", top: "var(--stage-y, 0px)", zIndex: "0" });
     return b;
   }
   /** Backdrops go first in the root, so the new stage (HUD) and a leaving screen draw over them. */
@@ -587,7 +588,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
         start: t,
         end: t + dur,
         place: (r) => {
-          Object.assign(old.style, { position: "absolute", left: "0", top: "0", zIndex: "40" });
+          Object.assign(old.style, { position: "absolute", left: "var(--stage-x, 0px)", top: "var(--stage-y, 0px)", zIndex: "40" });
           r.appendChild(old);
           return true;
         },
