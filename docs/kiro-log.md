@@ -715,3 +715,20 @@ Appended after each task. Neither Kiro nor Claude edits the other's area without
 - Snapshots: none changed. No snapshot has the settings panel open, and the row is hidden without
   env, as in every other test. Tests in `tests/email.test.ts`.
 - Tests: 55 files, 847 passing; typecheck clean. Not seen in a browser; no real auth call made.
+
+## 2026-11-01 — the giant (good ending); the auth-event listener
+
+- room-scene S19:
+  - Good does the full 6 s pull-out, and its dark layer is the giant: body.png, its ring's hole on
+    the island, scaled so the hole is the 6 s island × 1.25, breathing ±2 % / 8 s.
+  - Body and arms fade in over the last 3 s, the heads (the same image's top 42 %) over the last
+    1.5 s. The island mask keeps the room clear. Then the credits.
+  - Bad and survive keep the field.
+  - The hole was measured by eye on the image: (640, 790), radius 175 px.
+  - Not used: heads.png and ring.png.
+- 绑定邮箱:
+  - `net` subscribes once to `auth.onAuthStateChange`. An event whose user has an email and isn't
+    anonymous (USER_UPDATED when the link is opened, in this tab or another) binds it, and the
+    game's controller and the title page re-render (`onEmailChange`). A sign-out does not unbind
+    what was seen this session.
+- Tests: 55 files, 854 passing; typecheck clean. Not seen in a browser.

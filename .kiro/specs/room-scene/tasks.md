@@ -26,3 +26,5 @@
 - [x] 18. Tests (`tests/pullout.test.ts`); `tests/endings.test.ts` runs the cut before the pages.
 - [ ] 19. Browser check: the splat island against the mask; how the 2 s good cut feels; the door opening (later segment).
 - [x] 20. Answers: the pull-out only after the bedtime branch (a shutdown bad skips it); gaze on the desk pose's look target; good's 2 s cut kept. `lerpPose` bounded to its endpoints.
+- [x] 21. Good does the full 6 s; `darkLayerFor` with `kind: "giant"`; `giantAt` (scale, breathing ±2 % / 8 s, body then heads); markup, CSS and driver; tests (good → giant, bad/survive → field, 3 / 4.5 / 6 s, bounded breathing).
+- [ ] 22. Browser check of the giant: the hole measurement (640, 790, r 175) against the image; from 桌子 the heads' tops sit about 25 px above the stage edge at 6 s.

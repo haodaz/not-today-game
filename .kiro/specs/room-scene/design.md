@@ -166,6 +166,23 @@ Calibrated framings (Claude, `?splatcal=1`): room fov 48.5, desk pos (−0.345, 
   - Good keeps the 2 s cut to the credits; the door page comes with the door animation.
   - Fix: `lerpPose` never leaves its endpoints. Floating point overshot the calibrated desk x by
     one ulp and tripped the clamp.
+- **S19. Correction 2026-11-01: the good ending pulls out too, and sees Kuro itself.**
+  - Every ending holds the full 6 s (`PULL_CUT_MS.good = 6000`). The 2 s cut is gone.
+  - Dark-layer model: `darkLayerFor(ending)` → `{ kind: "field", tile, sprites }` (bad, survive)
+    or `{ kind: "giant", src: body.png }` (good). The timeline is reused unchanged.
+  - `giantAt(elapsed, from)` is pure → `{ base, breath, scale, body, heads }`.
+    - `base` makes the ring's hole radius equal the island's half diagonal at 6 s × 1.25
+      (`GIANT_MARGIN`).
+    - `breath` = 1 + 0.02 · sin(2π t / 8 s).
+    - `body` goes 0 → 1 over the last 3 s; `heads` 0 → 1 over the last 1.5 s.
+  - Markup: body.png twice in one image-sized box. Below `headsSplit` (42 %) is the body and arms;
+    above it are the heads, which fade last. The box is placed so the hole is on the stage centre,
+    with `transform-origin` at the hole, so breathing never moves it. The field's island mask
+    applies too, so nothing ever covers the room while it shrinks.
+  - Measured by eye on the 1280² image: hole (640, 790), radius 175 px (`GIANT`). From 桌子 the
+    giant is about 800 px wide at 6 s; from 房间 about 640 px.
+  - `heads.png` and `ring.png` are not used. A second fade of the same image's top part does the
+    "heads last".
 - **S18. Open.**
   - Good's "the door opens instead": no door animation exists yet. Good cuts at 2 s to its
     usual credits → day 19.
