@@ -31,10 +31,10 @@ dreamNights, nightBeat); all constants come from `content/variables.json` `const
 - [x] Test: regenerating when the file is up to date is a no-op; generated keys match the table.
 
 ## 5. stages.ts
-- [ ] Load `content/stages.json`. `stageOf(day)` = `byDay[String(day)] ?? afterDay18`.
-- [ ] `ringOf(day)` from `cycles` (after the last cycle, the last cycle's ring); `isCalmDaytime(day)`, `isTenderDay(day)`, `nightBeatOf(day)`, `dreamNights`. Read-only accessors, nothing hardcoded.
-- [ ] Tests: for every day `1..constants.lastDay`, `stageOf` and `ringOf` equal the table; `stageOf(25) === afterDay18`.
-- [ ] Property test: `stageOf(day)` is monotonic non-decreasing.
+- [x] Load `content/stages.json`. `stageOf(day)` = `byDay[String(day)] ?? afterDay18`.
+- [x] `ringOf(day)` from `cycles` (after the last cycle, the last cycle's ring); `isCalmDaytime(day)`, `isTenderDay(day)`, `nightBeatOf(day)`, `dreamNights`. Read-only accessors, nothing hardcoded.
+- [x] Tests: for every day `1..constants.lastDay`, `stageOf` and `ringOf` equal the table; `stageOf(25) === afterDay18`.
+- [x] Property test: `stageOf(day)` is monotonic non-decreasing.
 
 ## 6. clock.ts
 - [ ] `Clock` interface (`now(): Date`), `realClock`, `fakeClock(iso)`. Cosmetic only; never feeds `day`.
