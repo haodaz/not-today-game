@@ -44,21 +44,33 @@ function dim(): SafeHtml {
   return html`<button type="button" class="held-dim" data-action="loop-put-down" aria-label="${t("hud.putDown")}"></button>`;
 }
 
-function phoneApp(state: State, events: readonly GameEvent[]): SafeHtml {
+/** The window the phone shows when nothing can be ordered: the next one by the clock (lunch after dinner's). */
+export function nextWindow(time: string): Meal {
+  return (["lunch", "dinner"] as const).find((m) => time < deliveryTable.windows[m][1]) ?? "lunch";
+}
+
+/**
+ * The delivery app: always the shop list, never a blank screen. Inside an ordering window the
+ * open shops can be ordered from; otherwise every shop is greyed with the window's time.
+ */
+function phoneApp(state: State, events: readonly GameEvent[], session: Session): SafeHtml {
   const lc = loopContext(state, events);
   const meal: Meal | null = lc ? mealToOrder(lc) : null;
-  if (!meal) return html``;
-  const list = shopListView(state.day, meal);
+  const shown = meal ?? nextWindow(session.clock.time);
+  const [from, to] = deliveryTable.windows[shown];
+  const list = shopListView(state.day, shown);
   const shops = list.shops.map((s) =>
-    s.open
-      ? html`<div class="shop"><b>${s.name}</b><small>${s.tag}</small>${s.items.map((it) => html`<button type="button" data-action="loop-order" data-meal="${meal}" data-shop="${s.id}" data-item="${it.id}"><span>${it.name}</span><span>¥${it.price}</span></button>`)}</div>`
-      : html`<div class="shop closed"><b>${s.name}</b>${s.closedKey ? html`<small>${tr(s.closedKey)}</small>` : null}</div>`,
+    !meal
+      ? html`<div class="shop off"><b>${s.name}</b><small>${from}–${to}</small></div>`
+      : s.open
+        ? html`<div class="shop"><b>${s.name}</b><small>${s.tag}</small>${s.items.map((it) => html`<button type="button" data-action="loop-order" data-meal="${meal}" data-shop="${s.id}" data-item="${it.id}"><span>${it.name}</span><span>¥${it.price}</span></button>`)}</div>`
+        : html`<div class="shop closed"><b>${s.name}</b>${s.closedKey ? html`<small>${tr(s.closedKey)}</small>` : null}</div>`,
   );
-  return html`<h2>${tr(`delivery.window.${meal}`)} · ${deliveryTable.windows[meal][0]}–${deliveryTable.windows[meal][1]}</h2>${shops}`;
+  return html`<h2>${tr(`delivery.window.${shown}`)} · ${from}–${to}</h2>${shops}`;
 }
 
 function phone(state: State, events: readonly GameEvent[], session: Session): SafeHtml {
-  return html`<div class="held phone" role="dialog" aria-label="${t("hud.phone")}"><div class="scr"><div class="top">${session.clock.time}</div><div class="app">${phoneApp(state, events)}</div><div class="home"></div></div></div>`;
+  return html`<div class="held phone" role="dialog" aria-label="${t("hud.phone")}"><div class="scr"><div class="top">${session.clock.time}</div><div class="app">${phoneApp(state, events, session)}</div><div class="home"></div></div></div>`;
 }
 
 /** Dream state multiplies the screen's resolution; the drawn size stays (the steering: danger is resolution). */

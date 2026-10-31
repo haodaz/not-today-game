@@ -62,6 +62,8 @@ export interface Take {
   readonly flag: string;
   /** The line that plays (narration). */
   readonly say: string;
+  /** Only when the choice itself sets this flag (night 18: 「不填。握住它。」 sets shook_hand). */
+  readonly requiresFlag?: string;
 }
 
 /** Parses content/nights-takes.json strictly: only raid nights, each with what / flag / say. */
@@ -82,9 +84,15 @@ export function parseTakes(input: unknown, nights: readonly number[] = raidNight
     if (!nights.includes(day)) bad(`takes.${k}`, `day ${day} is not a raid night`);
     if (!rec(v)) bad(`takes.${k}`, "must be an object");
     const t = v as Record<string, unknown>;
-    for (const f of Object.keys(t)) if (!["what", "flag", "say"].includes(f)) bad(`takes.${k}`, `unknown key "${f}"`);
+    for (const f of Object.keys(t)) if (!["what", "flag", "say", "requiresFlag"].includes(f)) bad(`takes.${k}`, `unknown key "${f}"`);
     const s = (f: string) => (typeof t[f] === "string" && t[f] !== "" ? (t[f] as string) : bad(`takes.${k}.${f}`, "expected a non-empty string"));
-    out.set(day, Object.freeze({ what: s("what"), flag: s("flag"), say: s("say") }));
+    const requiresFlag = t.requiresFlag === undefined ? undefined : s("requiresFlag");
+    if (requiresFlag !== undefined) {
+      // It must name a flag one of that night's "nothing" choices actually sets.
+      const sets = (dayFile(day)?.beats.shutdown?.choices ?? []).filter((c) => raidMove(c).kind === "nothing").flatMap((c) => c.effects?.flags ?? []);
+      if (!sets.includes(requiresFlag)) bad(`takes.${k}.requiresFlag`, `no choice of night ${day} that gives nothing sets "${requiresFlag}"`);
+    }
+    out.set(day, Object.freeze({ what: s("what"), flag: s("flag"), say: s("say"), ...(requiresFlag !== undefined ? { requiresFlag } : {}) }));
   }
   return out;
 }
@@ -94,9 +102,16 @@ const takes = parseTakes(takesFile);
 /** What the hand takes on `day` if nothing is given, or null (other nights only cost san). */
 export const takeOf = (day: number): Take | null => takes.get(day) ?? null;
 
-/** The take that happens for this choice: a "nothing" move on a night that has one. */
+/**
+ * The take that happens for this choice: a "nothing" move on a night that has one, and, if the take
+ * names a `requiresFlag`, only the choice that sets it (night 18: holding the hand, not filling the slip).
+ */
 export function takeFor(day: number, choice: Choice): Take | null {
-  return raidMove(choice).kind === "nothing" ? takeOf(day) : null;
+  if (raidMove(choice).kind !== "nothing") return null;
+  const take = takeOf(day);
+  if (!take) return null;
+  if (take.requiresFlag !== undefined && !(choice.effects?.flags ?? []).includes(take.requiresFlag)) return null;
+  return take;
 }
 
 export function raidMove(choice: Choice): RaidMove {

@@ -40,16 +40,15 @@ mountDesktop(document.getElementById("app")!, {
   store,
   clock: parseBeatParams(search),
   focus: focus === "right" ? "right" : "left",
-  view: view === "desktop" || view === "door" ? view : "room",
+  view: view === "desktop" || view === "door" || view === "desk" ? view : "room",
   render: renderGame,
   actions: {
     ...desktopActions,
     ...loopActions,
-    // Restart is the run's bad-ending reset: the run save goes, the profile stays.
-    "loop-restart"() {
-      if (!window.confirm("↺")) return;
-      run.clear();
-      window.location.reload();
+    // 返回首页: back to the title page. It keeps the run (no restart anywhere). The title page is
+    // not built yet, so this reopens the game without debug parameters, on the saved run.
+    "settings-home"() {
+      window.location.assign(window.location.pathname);
     },
   },
   onChange: (ctx) => syncLoop(ctx),

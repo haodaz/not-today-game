@@ -8,7 +8,8 @@ import type { GameEvent } from "@state/events";
 import { choiceOf } from "@state/days/effects";
 import { isRaidNight, takeFor, wantsOf } from "@state/nights";
 import { knows, optionOrder, recogniseTable, wasRight } from "@state/recognise";
-import { advanceTo, DEFAULT_CLOCK, type Beat, type BeatClock } from "@world/desktop/beat";
+import { advanceTo, DEFAULT_CLOCK, isNight, type Beat, type BeatClock } from "@world/desktop/beat";
+import { KURO_PEEK_MS, lastKuroLine } from "@world/desktop/kuro/mini";
 import type { ActionContext } from "@world/desktop/controller";
 import type { LoopMemo } from "@world/desktop/model";
 import { arrivalOf, ordersOn } from "@world/delivery/meals";
@@ -173,6 +174,7 @@ export function syncLoop(ctx: ActionContext, nowMs: number = Date.now()): void {
     }
     session.loop = freshMemo(lc, events, nowMs);
     scheduleSelf(ctx, lc);
+    noticeKuroLine(ctx, nowMs);
     return;
   }
 
@@ -192,6 +194,32 @@ export function syncLoop(ctx: ActionContext, nowMs: number = Date.now()): void {
 
   scheduleSelf(ctx, lc);
   checkArrivals(ctx, lc, nowMs);
+  noticeKuroLine(ctx, nowMs);
+}
+
+/** Whether the pointer is over the open small window (the DOM only; never in tests). */
+const hovered = (): boolean => typeof document !== "undefined" && document.querySelector(".kmini:hover") !== null;
+
+/**
+ * A new line from Kuro opens its small window for 6 s, then it folds unless hovered
+ * (desktop-ui amendment). The first look of a run only remembers the line.
+ */
+export function noticeKuroLine(ctx: ActionContext, nowMs: number): void {
+  const { store, session } = ctx;
+  const line = lastKuroLine({ state: store.getState(), events: store.getEvents(), startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs });
+  if (session.kuroLast === line) return;
+  const first = session.kuroLast === undefined;
+  session.kuroLast = line;
+  if (first || line === null) return;
+  session.kuroPeekUntil = nowMs + KURO_PEEK_MS;
+  const fold = () => {
+    if (hovered()) {
+      session.kuroPeekUntil = Date.now() + 1_000;
+      ctx.later(1_000, fold);
+    }
+    ctx.rerender();
+  };
+  ctx.later(KURO_PEEK_MS + 20, fold);
 }
 
 function scheduleSelf(ctx: ActionContext, lc: LoopContext): void {

@@ -224,6 +224,14 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .wb .col .cl.add,.wb .col .cl.del{padding-left:4px}
 /* Browser */
 .br .foot{padding:0 40px;color:var(--ink-3);font-family:var(--font);font-size:11px}
+/* The small window never covers the desktop (desktop-ui amendment): folded it is a pill beside the
+   body (its face, the start of its last line); open over an app with an input, it docks top-right. */
+.kpill{position:absolute;left:calc(100% - 384px);bottom:52px;z-index:6;display:flex;align-items:center;gap:8px;max-width:330px;padding:5px 12px 5px 5px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 6px 18px rgba(20,24,30,.12);font:12px var(--font);color:var(--ink-2);cursor:pointer}
+.kpill img{width:24px;height:24px;border-radius:50%;object-fit:cover;flex:0 0 auto}
+.kpill span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--mono)}
+.kpill:hover,.kpill:focus-visible{border-color:var(--accent)}
+.kpill.blink{box-shadow:0 0 0 2px rgba(246,166,35,.6),0 0 24px 4px rgba(246,166,35,.3)}
+.kmini-dock.top .kmini{top:64px;bottom:auto}
 /* Kuro's upgrade offer in the small window (object-upgrade FR1). */
 .kmini .offer{border-top:1px solid var(--line);padding-top:8px}
 .kmini .offer-btns{display:flex;gap:8px;margin-top:6px}

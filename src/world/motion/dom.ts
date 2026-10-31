@@ -13,7 +13,8 @@ import { loopContext, checklist } from "@world/loop/checklist";
 import { showing } from "@world/loop/dialogue";
 import { heldItem } from "@world/room/held";
 import { holdUntil, lineKey, revealBusy, revealDoneAt, revealShown, startReveal, type Reveal } from "./reveal";
-import { applyMotionVars, CHOSEN, choiceDelays, EASE, exitOf, MOTION, ROOM_MONITOR, ROOM_PUSH } from "./timing";
+import { centre, DESK_SHOT, ROOM_SHOT, type Rect } from "@world/room/shots";
+import { applyMotionVars, CHOSEN, choiceDelays, EASE, exitOf, MOTION, ROOM_PUSH } from "./timing";
 
 interface Ghost {
   readonly el: HTMLElement;
@@ -38,6 +39,8 @@ interface Snap {
   readonly asleep: boolean;
   /** The hand is here (night-hand): the dim and the gap glow are on screen. */
   readonly raid: boolean;
+  /** The ⚙ 设置 panel is open. */
+  readonly settings: boolean;
 }
 
 /** A node with its layout measured while it was still on screen (a detached node measures 0). */
@@ -64,6 +67,7 @@ interface Outgoing {
   readonly doorBg: HTMLElement | null;
   readonly doorHand: HTMLElement | null;
   readonly gap: HTMLElement | null;
+  readonly settings: HTMLElement | null;
 }
 
 const live = (el: Element): boolean => !el.closest(".m-ghost");
@@ -148,6 +152,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       door: doorBeat ? `${doorBeat.dataset.meal}:${doorBeat.dataset.state}` : null,
       asleep: head?.ending.kind === "lieDown",
       raid: !!q(root, ".gap-glow"),
+      settings: !!q(root, ".settings-layer"),
     };
   }
 
@@ -169,6 +174,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       doorBg: q(root, ".door-bg.chain"),
       doorHand: q(root, ".door-hand"),
       gap: q(root, ".gap-glow"),
+      settings: q(root, ".settings-layer"),
     };
   }
 
@@ -459,41 +465,59 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
   }
 
   // ---- views (FR5) ------------------------------------------------------------------------
-  /** The room's monitor point and the desktop's size there, for the camera push. */
-  function camVars(room: HTMLElement | null, desk: HTMLElement | null) {
-    const sr = scaleOf(room);
-    const sd = scaleOf(desk);
-    const px = sr * ROOM_MONITOR.x;
-    const py = sr * ROOM_MONITOR.y;
-    const dw = desk?.offsetWidth ?? 1496;
-    const dh = desk?.offsetHeight ?? 956;
-    const s0 = (sr * ROOM_MONITOR.width) / (sd * dw);
-    return {
-      room: { tx: px * (1 - ROOM_PUSH), ty: py * (1 - ROOM_PUSH), z: ROOM_PUSH },
-      desk: { tx: px - (s0 * sd * dw) / 2, ty: py - (s0 * sd * dh) / 2, z: s0 },
-    };
+  // The four camera levels (day-loop amendment): 房间 ↔ 桌子 push around the desk; 房间 / 桌子
+  // ↔ 屏幕 grow the screen out of that monitor (measured in room/shots.ts). Anything else fades.
+  type Cam = { readonly tx: number; readonly ty: number; readonly z: number };
+  /** Scale by z around stage point p, on a stage drawn at scale s (screen px per stage px). */
+  const around = (s: number, p: { x: number; y: number }, z: number): Cam => ({ tx: s * p.x * (1 - z), ty: s * p.y * (1 - z), z });
+  /** The desktop stage drawn small, exactly over a monitor in a shot. */
+  function intoMonitor(shotScale: number, mon: Rect, screen: HTMLElement | null): Cam {
+    const sd = scaleOf(screen);
+    const dw = screen?.offsetWidth ?? 1496;
+    const dh = screen?.offsetHeight ?? 956;
+    const z = (shotScale * mon.w) / (sd * dw);
+    const c = centre(mon);
+    return { tx: shotScale * c.x - (z * sd * dw) / 2, ty: shotScale * c.y - (z * sd * dh) / 2, z };
   }
-  const setCam = (el: HTMLElement, v: { tx: number; ty: number; z: number }) => {
+  const shotOf = (view: string) => (view === "room" ? ROOM_SHOT : view === "desk" ? DESK_SHOT : null);
+
+  /** What the leaving stage does (out) and where the arriving one comes from (in); null = fade. */
+  function camFor(from: string, to: string, old: HTMLElement, next: HTMLElement, focus: "left" | "right"): { out: Cam; in: Cam } | null {
+    const p = centre(ROOM_SHOT.desk);
+    if (from === "room" && to === "desk") return { out: around(scaleOf(old), p, ROOM_PUSH), in: around(scaleOf(next), p, 1 / ROOM_PUSH) };
+    if (from === "desk" && to === "room") return { out: around(scaleOf(old), p, 1 / ROOM_PUSH), in: around(scaleOf(next), p, ROOM_PUSH) };
+    if (to === "desktop" && shotOf(from)) {
+      const mon = shotOf(from)!.monitors[focus];
+      return { out: around(scaleOf(old), centre(mon), ROOM_PUSH), in: intoMonitor(scaleOf(old), mon, next) };
+    }
+    if (from === "desktop" && shotOf(to)) {
+      const mon = shotOf(to)!.monitors[focus];
+      return { out: intoMonitor(scaleOf(next), mon, old), in: around(scaleOf(next), centre(mon), ROOM_PUSH) };
+    }
+    return null;
+  }
+  const setCam = (el: HTMLElement, v: Cam) => {
     el.style.setProperty("--m-tx", `${Math.round(v.tx)}px`);
     el.style.setProperty("--m-ty", `${Math.round(v.ty)}px`);
     el.style.setProperty("--m-z", v.z.toFixed(4));
   };
 
-  let viewMove: { from: string; to: string } | null = null;
+  /** The arriving stage's camera for the move under way (null: it fades in). */
+  let viewIn: Cam | null = null;
 
   function viewChange(t: number, from: string, to: string): void {
     const old = out?.stage;
     const stage = q(root, ".stage");
     if (!old || !stage) return;
-    viewMove = { from, to };
     begin("view", t);
-    const camera = (from === "room" && to === "desktop") || (from === "desktop" && to === "room");
-    const v = camera ? camVars(from === "room" ? old : stage, from === "desktop" ? old : stage) : null;
-    if (v) setCam(old, from === "room" ? v.room : v.desk);
+    const cam = camFor(from, to, old, stage, ctx.session.focus);
+    viewIn = cam?.in ?? null;
+    if (cam) setCam(old, cam.out);
+    const dur = cam ? MOTION.view : CHOSEN.doorView;
     addGhost({
       el: old,
       start: t,
-      end: t + MOTION.view,
+      end: t + dur,
       place: (r) => {
         old.style.position = "absolute";
         old.style.left = "0";
@@ -502,20 +526,16 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
         r.appendChild(old);
         return true;
       },
-      apply: (g, now) => anim(g, v ? "m-cam-out" : "m-fade-out", MOTION.view, t, now),
+      apply: (g, now) => anim(g, cam ? "m-cam-out" : "m-fade-out", dur, t, now),
     });
   }
 
   function viewEntry(t: number): void {
     const start = since("view");
     const stage = q(root, ".stage");
-    if (start === undefined || !stage || !viewMove || t - start >= MOTION.view) return;
-    const { from, to } = viewMove;
-    const camera = (from === "room" && to === "desktop") || (from === "desktop" && to === "room");
-    if (camera) {
-      const old = ghosts.find((g) => g.el.classList.contains("stage"))?.el ?? null;
-      const v = camVars(to === "room" ? stage : old, to === "desktop" ? stage : old);
-      setCam(stage, to === "desktop" ? v.desk : v.room);
+    if (start === undefined || !stage || t - start >= MOTION.view) return;
+    if (viewIn) {
+      setCam(stage, viewIn);
       anim(stage, "m-cam-in", MOTION.view, start, t);
     } else {
       anim(stage, "m-fade-in", CHOSEN.doorView, start, t);
@@ -637,7 +657,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
   /** Endless loops keep their phase across re-renders (design P10). */
   function phaseLock(t: number): void {
     for (const el of qa(root, ".kpet")) el.style.animationDelay = `${-(t % MOTION.bob)}ms`;
-    for (const el of qa(root, ".kmini.blink")) el.style.animationDelay = `${-(t % MOTION.blink)}ms`;
+    for (const el of qa(root, ".kmini.blink, .kuro-glow")) el.style.animationDelay = `${-(t % MOTION.blink)}ms`;
   }
 
   // ---- sleep and wake (FR5) -----------------------------------------------------------------
@@ -682,7 +702,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
         if (prev.held && out.held) heldGhost(out.held, prev.held, t);
         if (snap.held) begin(`held:${snap.held}`, t);
       }
-      const { bell } = snap.view === "room" ? checklistMotion(t, sameDay) : { bell: false };
+      const { bell } = snap.view !== "desktop" ? checklistMotion(t, sameDay) : { bell: false };
       // Dialogue box: in with a fade (after the doorbell's line, if it came with one); out faster.
       let delay = 0;
       if (snap.dlg && !prev.dlg) {
@@ -705,6 +725,20 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       }
       if (snap.choices && snap.choices !== prev.choices) begin(`choices:${snap.choices}`, t + delay);
       if (snap.asleep && !prev.asleep) begin("sleep", t);
+      // The settings panel: in like the room dims for a held item, out faster.
+      if (snap.settings && !prev.settings) begin("settings", t);
+      if (ctx.session.kuroCall && !q(root, ".kuro-call-layer.m-seen")) {
+        // Mark it so the fade starts once, not on every render while it is open.
+        const layer = q(root, ".kuro-call-layer");
+        if (layer && since("call") === undefined) begin("call", t);
+        layer?.classList.add("m-seen");
+      }
+      if (!ctx.session.kuroCall) starts.delete("call");
+      if (!snap.settings && prev.settings && out.settings) {
+        const el = out.settings;
+        const host = el.parentElement?.classList.contains("settings-host") ? ".settings-host" : ".stage";
+        fadeGhost(el, (r) => !!q(r, host)?.appendChild(el), exitOf(MOTION.dim), t);
+      }
       // The hand's dim and gap glow: in like the room dims for a held item, out faster.
       if (sameDay && snap.raid && !prev.raid) begin("gap", t);
       if (sameDay && !snap.raid && prev.raid && out.gap && snap.view === prev.view) {
@@ -722,7 +756,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     } else {
       // The first render: nothing animates in; the line on screen still reveals.
       last = snap;
-      if (snap.view === "room") checklistMotion(t, false);
+      if (snap.view !== "desktop") checklistMotion(t, false);
       revealLine(t, 0);
     }
     out = null;
@@ -753,6 +787,12 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       }
     }
     if (snap.choices) choicesEntry(t);
+    const setStart = since("settings");
+    const set = q(root, ".settings-layer");
+    if (set && setStart !== undefined && t - setStart < MOTION.dim) anim(set, "m-fade-in", MOTION.dim, setStart, t);
+    const callStart = since("call");
+    const call = q(root, ".kuro-call-layer");
+    if (call && callStart !== undefined && t - callStart < MOTION.dim) anim(call, "m-fade-in", MOTION.dim, callStart, t);
     const gapStart = since("gap");
     const gap = q(root, ".gap-glow");
     if (gap && gapStart !== undefined && t - gapStart < MOTION.dim) anim(gap, "m-fade-in", MOTION.dim, gapStart, t);

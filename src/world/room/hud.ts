@@ -13,9 +13,13 @@ import { doorCaption, DOOR_STATES, nextInputs, startDoor, type DoorBeat, type Do
 import { mealView } from "@world/delivery/meals";
 import { renderDoorView } from "@world/delivery/view";
 import { cls, html, raw, type SafeHtml } from "@world/html";
-import { tr } from "@world/i18n";
+import { getLocale, t, tr, type Locale } from "@world/i18n";
 import { checklist, loopContext, type ChecklistView } from "@world/loop/checklist";
 import { isRaidNight, raidNights, takeOf } from "@state/nights";
+import { isNight } from "@world/desktop/beat";
+import { renderKuroMini } from "@world/desktop/kuro/mini";
+import { VIEWS, type View } from "@world/desktop/model";
+import { DESK_SHOT, rectStyle, ROOM_SHOT } from "./shots";
 import { knows } from "@state/recognise";
 
 /** The flag the hand sets when it takes the heartbeat (content/nights-takes.json `what: heartbeat`). */
@@ -106,14 +110,30 @@ function lineBody(line: NonNullable<ReturnType<typeof showing>>["line"] & object
   }
 }
 
+/** The camera chips: 房间 · 桌子 · 屏幕 · 门 (`hud.cam.desk` is 桌子 now; 屏幕 is `hud.cam.screen`). */
+const CAM_KEYS: Readonly<Record<View, string>> = { room: "hud.cam.room", desk: "hud.cam.desk", desktop: "hud.cam.screen", door: "hud.cam.door" };
+
 function cams(view: Session["view"]): SafeHtml {
-  const chip = (target: "room" | "desktop" | "door", key: string) =>
-    html`<button type="button" class="${view === target ? "on" : ""}" data-action="view" data-view="${target}">${tr(key)}</button>`;
-  return html`<div class="cams">${chip("room", "hud.cam.room")}${chip("desktop", "hud.cam.desk")}${chip("door", "hud.cam.door")}</div>`;
+  const chip = (target: View) =>
+    html`<button type="button" class="${view === target ? "on" : ""}" data-action="view" data-view="${target}">${tr(CAM_KEYS[target])}</button>`;
+  return html`<div class="cams">${VIEWS.map(chip)}</div>`;
 }
 
-function menu(session: Session): SafeHtml {
-  return html`<div class="menu"><button type="button" class="${session.muted ? "off" : ""}" data-action="loop-mute">${tr("hud.menu.sound")}</button>·<button type="button" data-action="loop-lang">${tr("hud.menu.lang")}</button>·<button type="button" data-action="loop-restart">${tr("hud.menu.restart")}</button></div>`;
+/** The one ⚙ 设置 button, bottom left (day-loop amendment: one settings button). */
+export function settingsButton(): SafeHtml {
+  return html`<button type="button" class="settings-btn" data-action="settings-open" aria-haspopup="dialog">⚙ ${tr("settings.button")}</button>`;
+}
+
+/**
+ * The settings panel, centred over the current view with the view dimmed: 声音 on/off, 语言
+ * 中文 · English (re-renders at once), 返回首页, 取消. Nothing here restarts the run.
+ */
+export function settingsPanel(session: Session): SafeHtml | null {
+  if (!session.settingsOpen) return null;
+  const sound = !session.muted;
+  const lang = (l: Locale) =>
+    html`<button type="button" class="${getLocale() === l ? "on" : ""}" data-action="settings-lang" data-lang="${l}" aria-pressed="${getLocale() === l ? "true" : "false"}">${tr(`settings.lang.${l}`)}</button>`;
+  return html`<div class="settings-layer"><button type="button" class="settings-dim" data-action="settings-close" aria-label="${t("settings.cancel")}"></button><div class="settings" role="dialog" aria-modal="true" aria-labelledby="settings-title"><h3 id="settings-title">${tr("settings.title")}</h3><div class="row"><span>${tr("settings.sound")}</span><button type="button" class="${cls("switch", sound && "on")}" data-action="loop-mute" role="switch" aria-checked="${sound ? "true" : "false"}" aria-label="${t("settings.sound")}"><i></i></button></div><div class="row"><span>${tr("settings.lang")}</span><span class="seg">${lang("zh")}<b>·</b>${lang("en")}</span></div><div class="actions"><button type="button" data-action="settings-home">${tr("settings.home")}</button><button type="button" data-action="settings-close">${tr("settings.cancel")}</button></div></div></div>`;
 }
 
 /**
@@ -155,19 +175,51 @@ export interface RoomModel {
   readonly state: State;
   readonly events: readonly GameEvent[];
   readonly session: Session;
+  /** For Kuro's window when it is called from here (the same component as on the screen). */
+  readonly startDay?: number;
+  readonly nowMs?: number;
 }
 
-export function renderRoom({ state, events, session }: RoomModel): SafeHtml {
+/**
+ * The shot's click areas (day-loop amendment, four camera levels). 房间: the desk (with its
+ * monitors) goes to 桌子. 桌子: each monitor goes to 屏幕 on that side. Both: the glowing small
+ * window on the right monitor calls Kuro. They sit under the HUD.
+ */
+function shotHits(view: "room" | "desk"): SafeHtml {
+  const shot = view === "room" ? ROOM_SHOT : DESK_SHOT;
+  const kuro = html`<button type="button" class="kuro-glow" data-action="kuro-call" style="${rectStyle(shot.kuro)}" aria-label="${t("kuro.name")}"></button>`;
+  if (view === "room") {
+    return html`<button type="button" class="shot-hit" data-action="view" data-view="desk" style="${rectStyle(ROOM_SHOT.desk)}" aria-label="${t("hud.cam.desk")}"></button>${kuro}`;
+  }
+  const mon = (side: "left" | "right") =>
+    html`<button type="button" class="shot-hit monitor-hit" data-action="view" data-view="desktop" data-screen="${side}" style="${rectStyle(DESK_SHOT.monitors[side])}" aria-label="${t("hud.cam.screen")} · ${t(`desktop.screen.${side}`)}"></button>`;
+  return html`${mon("left")}${mon("right")}${kuro}`;
+}
+
+/** Kuro called from 房间 / 桌子: its window over the view (same component, turns and memory). */
+function kuroCallLayer(model: RoomModel): SafeHtml | null {
+  const { state, events, session } = model;
+  if (!session.kuroCall) return null;
+  const ctx = { state, events, startDay: model.startDay ?? 1, session, night: isNight(session.clock), nowMs: model.nowMs ?? 0 };
+  return html`<div class="kuro-call-layer"><button type="button" class="kuro-call-dim" data-action="kuro-hangup" aria-label="${t("settings.cancel")}"></button><div class="kuro-call" role="dialog" aria-modal="true">${renderKuroMini(ctx)}</div></div>`;
+}
+
+export function renderRoom(model: RoomModel): SafeHtml {
+  const { state, events, session } = model;
   const lc = loopContext(state, events);
   const list = lc ? renderChecklist(checklist(lc)) : null;
-  const door = session.view === "door";
-  const scene = door ? doorContent(state, events, session) : null;
+  const view = session.view === "desk" || session.view === "door" ? session.view : "room";
+  const door = view === "door";
+  const scene = door ? doorContent(state, events, session) : shotHits(view);
   // The held item sits over everything but the dialogue box (held-object.html).
   const held = door ? null : heldLayer(state, events, session);
   // The hand is here: the desk dims and the gap between the monitors glows (night-hand FR1; the
   // room scene will draw the gap itself).
   const raid = !door && raidShowing(state, session);
-  return html`<div class="${cls("stage", "room", door ? "door-view" : "no-shot", raid && "raid")}" data-day="${state.day}" data-view="${session.view}">${scene}${raid ? html`<div class="gap-glow"></div>` : null}${list}${dayCorner(state, session)}${deskBar(state, events, session)}${held}${dialogueBox(state, session)}${cams(session.view)}${menu(session)}</div>`;
+  const gap = (view === "room" ? ROOM_SHOT : DESK_SHOT).gap;
+  // Things are picked up at 桌子 only: the desk bar is its object layer.
+  const bar = view === "desk" ? deskBar(state, events, session) : null;
+  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid")}" data-day="${state.day}" data-view="${view}">${scene}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${bar}${held}${kuroCallLayer(model)}${dialogueBox(state, session)}${cams(session.view)}${settingsButton()}${settingsPanel(session)}</div>`;
 }
 
 /** The raid is in the dialogue box: tonight's shutdown sequence on a raid night. */

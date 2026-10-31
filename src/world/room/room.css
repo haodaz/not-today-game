@@ -5,7 +5,19 @@
 .room{position:relative;width:1600px;height:900px;overflow:hidden;font-family:var(--font);color:var(--ink);
   /* Flat backdrop until the 3D room exists (design L8). */
   background:#1a1814 url(/room/shots/desk_close.jpg) center/cover}
-.room.no-shot{background-image:url(/room/shots/desk_close.jpg),url(/design/hud/bg_desk.jpg);background-size:cover,cover;background-position:center,center}
+/* Four camera levels (day-loop amendment): 房间 the wide shot, 桌子 the desk close-up. Both
+   2048×1152 stills; click areas are measured in room/shots.ts. */
+.room.room-view{background-image:url(/room/shots/room.jpg)}
+.room.desk-view{background-image:url(/room/shots/desk_close.jpg)}
+.room .shot-hit{position:absolute;border:0;padding:0;margin:0;background:transparent;cursor:pointer;border-radius:4px}
+.room .shot-hit:hover,.room .shot-hit:focus-visible{outline:2px solid rgba(232,228,220,.55);outline-offset:2px}
+/* Kuro's small window glowing on the right monitor: click to call it */
+.room .kuro-glow{position:absolute;border:0;padding:0;border-radius:4px;background:rgba(246,250,255,.85);box-shadow:0 0 0 1px rgba(246,166,35,.5),0 0 18px 4px rgba(246,166,35,.35);cursor:pointer;animation:m-blink var(--m-blink) ease-in-out infinite}
+.room .kuro-glow:focus-visible{outline:2px solid #f6a623;outline-offset:2px}
+.room .kuro-call-layer{position:absolute;inset:0;z-index:17}
+.room .kuro-call-dim{position:absolute;inset:0;border:0;padding:0;margin:0;background:rgba(10,10,12,.45);cursor:default}
+.room .kuro-call{position:absolute;right:120px;top:120px;width:360px}
+.room .kuro-call .kmini{position:relative;right:auto;bottom:auto;width:100%}
 .room.door-view{background:#0f0e0c url(/room/door_wall.png) center/cover}
 /* 今日清单 */
 .room .list{position:absolute;left:28px;top:28px;width:280px;background:var(--paper);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.35);border-radius:10px;padding:12px 16px;box-shadow:0 6px 24px rgba(0,0,0,.12);font-size:15px;line-height:1.7}
@@ -46,6 +58,9 @@
 .room .held-layer{position:absolute;inset:0;z-index:15}
 .room .held-dim{position:absolute;inset:0;border:0;padding:0;margin:0;background:rgba(10,10,12,var(--m-dim-to,.55));cursor:default}
 .room .held{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(var(--m-tilt,-3deg))}
+/* The phone is held straight (author 2026-10-31); objects keep the tilt. */
+.room .held.phone{transform:translate(-50%,-50%) rotate(var(--m-phone-tilt,0deg))}
+.room .held.phone .shop.off{opacity:.4}
 .room .held.phone{width:340px;height:700px;background:#1a1a1c;border-radius:40px;box-shadow:0 30px 80px rgba(0,0,0,.6),inset 0 0 0 3px #333}
 .room .held.phone .scr{position:absolute;inset:14px;background:#fff;border-radius:30px;overflow:hidden;font-size:15px;display:flex;flex-direction:column}
 .room .held.phone .top{flex:0 0 44px;display:flex;align-items:center;justify-content:center;font:12px var(--mono);color:#888;border-bottom:1px solid #eee}
@@ -66,7 +81,7 @@
 .room > .dlg,.room > .choices{z-index:16}
 /* 夜里的手 (night-hand FR1): the desk dims, the gap between the monitors glows; the hand is never drawn */
 .room .gap-glow{position:absolute;inset:0;z-index:14;pointer-events:none;background:rgba(10,10,12,.55)}
-.room .gap-glow::after{content:"";position:absolute;left:50%;top:22%;width:6px;height:30%;transform:translateX(-50%);background:radial-gradient(ellipse,rgba(255,150,190,.9),rgba(255,150,190,0) 70%);filter:blur(2px)}
+.room .gap-glow::after{content:"";position:absolute;left:var(--gap-x,50%);top:var(--gap-t,22%);width:6px;height:var(--gap-h,30%);transform:translateX(-50%);background:radial-gradient(ellipse,rgba(255,150,190,.9),rgba(255,150,190,0) 70%);filter:blur(2px)}
 .room .held.obj canvas.dev.dream{box-shadow:0 0 18px 2px rgba(255,150,190,.45)}
 /* 门 (door.html): six steps faint at the top right, only the current one lit; one click a step */
 .room .door-bg{position:absolute;inset:0;background:#000 url(/room/door_chain.png) center/cover;pointer-events:none}
@@ -84,9 +99,25 @@
 .room .cams{position:absolute;right:28px;bottom:28px;display:flex;gap:6px}
 .room .cams button{background:rgba(232,228,220,.7);backdrop-filter:blur(8px);border:0;border-radius:8px;padding:8px 14px;font:14px var(--font);color:#333;cursor:pointer}
 .room .cams button.on{background:var(--red);color:#f4efe6}
-.room .menu{position:absolute;left:28px;bottom:28px;background:rgba(232,228,220,.55);border-radius:8px;padding:6px 10px;font-size:12px;color:#555;display:flex;gap:8px}
-.room .menu button{border:0;background:none;font:inherit;color:inherit;cursor:pointer;padding:0}
-.room .menu button.off{text-decoration:line-through}
+/* ⚙ 设置: one button bottom left; a small centred panel over the dimmed view (day-loop amendment) */
+.settings-btn{position:absolute;left:28px;bottom:28px;z-index:18;border:0;border-radius:8px;padding:7px 12px;background:rgba(232,228,220,.62);backdrop-filter:blur(8px);font:13px "PingFang SC","Hiragino Sans GB",sans-serif;color:#333;cursor:pointer}
+.settings-btn:hover,.settings-btn:focus-visible{background:rgba(232,228,220,.85)}
+.settings-host .settings-btn{position:fixed;left:12px;bottom:12px;z-index:40}
+.settings-layer{position:absolute;inset:0;z-index:50}
+.settings-host .settings-layer{position:fixed}
+.settings-dim{position:absolute;inset:0;border:0;padding:0;margin:0;background:rgba(10,10,12,.55);cursor:default}
+.settings{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:320px;background:rgba(244,240,232,.96);border-radius:14px;padding:18px 20px;box-shadow:0 20px 60px rgba(0,0,0,.45);font:15px "PingFang SC","Hiragino Sans GB",sans-serif;color:#1d2129}
+.settings h3{margin:0 0 12px;font-size:12px;letter-spacing:.2em;color:#8a7f70;font-weight:400}
+.settings .row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid rgba(0,0,0,.08)}
+.settings .seg{display:flex;gap:6px;align-items:center}.settings .seg b{color:#aaa;font-weight:400}
+.settings .seg button{border:0;background:none;padding:2px 4px;font:inherit;color:#777;cursor:pointer}
+.settings .seg button.on{color:#8b2f2a;font-weight:600}
+.settings .switch{width:40px;height:22px;border:0;border-radius:11px;background:#bbb;position:relative;cursor:pointer;padding:0}
+.settings .switch i{position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff}
+.settings .switch.on{background:#8b2f2a}.settings .switch.on i{left:21px}
+.settings .actions{display:flex;justify-content:space-between;gap:10px;padding-top:14px;border-top:1px solid rgba(0,0,0,.08)}
+.settings .actions button{flex:1;border:1px solid rgba(0,0,0,.12);background:#fff;border-radius:8px;padding:8px 0;font:inherit;cursor:pointer}
+.settings .actions button:hover,.settings .actions button:focus-visible{border-color:#8b2f2a;color:#8b2f2a}
 /* An upgraded object: the new world's hi-res icon, antialiased, no integer pixels (object-upgrade FR2). */
 /* Not yet recognised: slightly desaturated (recognise FR2). */
 .room .slot.unknown img{filter:saturate(.35) opacity(.9)}

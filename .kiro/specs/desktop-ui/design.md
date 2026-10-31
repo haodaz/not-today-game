@@ -166,3 +166,16 @@ src/main.ts          store from save or ?day=N; beat params; mount
 - **Unit tests:** escaping, i18n fallback and the missing registry, beat params, ring/calm, the
   transcript rules of U3, the bubble parsing, the reply-bar states, the kuro-days parser over all
   18 files, body-state precedence, the browser guard over all 18 files, and the new events.
+
+## Amendment implemented (2026-10-31): the small window does not cover the desktop
+
+- `kuroExpanded`: open in the evening chat beat (clock beat `night`), after a click
+  (`kuro-expand`), or for 6 s after a new line (`session.kuroPeekUntil`); folded otherwise.
+- Folded, it's a pill beside the body: its face and the start of its last line (`lastKuroLine`),
+  ellipsised. The body always shows.
+- A new line is noticed by the runtime after each store change (`noticeKuroLine`). The first look
+  only remembers it. At 6 s it folds, unless the pointer is over it.
+  - "Or the player typed": the small window has no input yet (kuro-chat), so only hover holds it.
+- A click outside it, or Esc on 屏幕, folds it.
+- Open over an app with an input or reply bar at the bottom (消息, 工作台), it docks top-right
+  (`kmini-dock top`); over 浏览器 it stays bottom-right.

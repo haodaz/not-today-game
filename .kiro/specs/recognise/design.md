@@ -46,6 +46,8 @@ The runtime queues the answer's lines (`say` as narration, then `inner`).
     `{day, eventId: "recognise:<object>", note: the right option's text}`, once per object.
   - A wrong answer writes nothing.
   - The judgement writer moved to `src/state/judgement.ts`, shared with object-upgrade.
+- **R6 (resolved 2026-10-31).** Night 18's take now has `requiresFlag: "shook_hand"`, so it
+  applies only to 「不填。握住它。」, never to 「填寄件单」. The original reading follows.
 - **R6. Night takes (`content/nights-takes.json`, read in `nights.ts`).**
   - On a raid night with a take (9, 18), a "nothing" move sets the take's `flag`, and the
     runtime plays its `say` as a narration line.

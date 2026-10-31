@@ -98,7 +98,8 @@ describe("room HUD (FR6)", () => {
 
   it("objects taken out sit on the desk bar in found order, as cutouts", () => {
     const store = storeAt(4, [{ kind: "openLayer", objectId: "pager" }, { kind: "openLayer", objectId: "chick" }]);
-    const out = renderRoom({ state: store.getState(), events: store.getEvents(), session: initialSession(DEFAULT_CLOCK, "left", "room") }).value;
+    // The desk bar is 桌子's object layer (four camera levels).
+    const out = renderRoom({ state: store.getState(), events: store.getEvents(), session: initialSession(DEFAULT_CLOCK, "left", "desk") }).value;
     expect(out.indexOf('data-object="pager"')).toBeLessThan(out.indexOf('data-object="chick"'));
     expect(out).toContain('src="/objects/pager_white.png"');
   });

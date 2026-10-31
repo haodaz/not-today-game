@@ -15,6 +15,7 @@ export const MOTION = {
   dimTo: 0.55,
   /** The item rises from its desk-bar slot to the centre, tilted 3°. */
   lift: 320,
+  /** Objects only: the phone is held straight (PHONE_TILT_DEG, author 2026-10-31). */
   tiltDeg: -3,
   /** The phone's screen lights up: one white flash. */
   flash: 120,
@@ -67,9 +68,11 @@ export const CHOSEN = {
   chosenHold: MOTION.choice,
 } as const;
 
-/** Where the monitor is in the room shot (room px), until the room scene exists (design P8). */
-export const ROOM_MONITOR = { x: 800, y: 330, width: 420 } as const;
-/** How far the room pushes in toward the monitor. */
+/** The phone is never tilted (author 2026-10-31, overriding motion.md's 3° for the phone). */
+export const PHONE_TILT_DEG = 0;
+
+/** How far a shot pushes in toward what the camera goes to (the desk, a monitor). Where things are
+ *  in the shots is world/room/shots.ts. */
 export const ROOM_PUSH = 1.6;
 
 /** Choice i of n: the bottom one first, then upward, `choiceGap` apart. */
@@ -88,6 +91,7 @@ export function motionVars(): Record<string, string> {
     "--m-dim-to": String(MOTION.dimTo),
     "--m-lift": ms(MOTION.lift),
     "--m-tilt": `${MOTION.tiltDeg}deg`,
+    "--m-phone-tilt": `${PHONE_TILT_DEG}deg`,
     "--m-flash": ms(MOTION.flash),
     "--m-put-down": ms(MOTION.putDown),
     "--m-tick-fill": ms(MOTION.tickFill),

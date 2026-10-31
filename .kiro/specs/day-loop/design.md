@@ -114,3 +114,26 @@ The desktop controller gains a pluggable root renderer, change hooks, and the ke
   - the desktop at one monitor with the toggle.
 - **Unit tests:** guard, tokens, reducers, rewrite, bed lock, dialogue queue and choices, arrival
   rule, and the runtime diff with a fake context.
+
+## Amendments implemented (2026-10-31)
+
+- **One settings button.**
+  - The bottom-left row is now a single ⚙ 设置 button (`settings-open`). It opens a centred
+    dialog over the dimmed view, in 房间 / 桌子 / 门 and over 屏幕.
+  - 声音 is a switch (`loop-mute`, `role="switch"`).
+  - 语言 is 中文 · English (`settings-lang`), which re-renders from en.json at once.
+  - 返回首页 is `settings-home`, supplied by main.ts. The title page isn't built yet, so it
+    reopens the game without debug parameters on the saved run.
+  - 取消, a click on the dim, or Esc closes it.
+  - `loop-restart` and `loop-lang` are gone; nothing restarts the run.
+- **Four camera levels.**
+  - `View` is `room | desk | desktop | door` (chips 房间 · 桌子 · 屏幕 · 门; `hud.cam.screen`).
+  - 房间 is room.jpg, with the desk (and its monitors) clickable → 桌子.
+  - 桌子 is desk_close.jpg. The desk bar is its object layer (shown there only), and each
+    monitor → 屏幕 on its side.
+  - In both, the glowing small window on the right monitor (`kuro-call`) opens Kuro's window as
+    an overlay, the same component, without entering 屏幕. Esc or a click on the dim hangs up.
+  - Esc steps out one level (屏幕 → 桌子 → 房间, 门 → 房间).
+  - Positions are measured once in `src/world/room/shots.ts` (both shots 2048×1152, ×0.78125
+    onto the stage). The camera push uses the same numbers.
+  - The raid glow sits in the shot's gap.

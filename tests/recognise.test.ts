@@ -187,7 +187,7 @@ describe("when it is asked (FR1)", () => {
   it("the desk bar shows an unrecognised object desaturated, a recognised one in full colour", () => {
     const store = createStore({ startDay: 4 });
     store.appendEvent({ kind: "openLayer", objectId: "pager" });
-    const session = initialSession(DEFAULT_CLOCK, "left", "room");
+    const session = initialSession(DEFAULT_CLOCK, "left", "desk");
     const bar = () => renderRoom({ state: store.getState(), events: store.getEvents(), session }).value;
     expect(bar()).toContain('class="slot unknown" data-object="pager"');
     store.appendEvent({ kind: "recognise", objectId: "pager", option: rightIndex("pager") });
@@ -245,11 +245,28 @@ describe("what the hand takes when nothing is given (nights-takes)", () => {
     expect(next.flags).toEqual(state.flags);
   });
 
-  it("night 18: both choices hold nothing up, so either one lets it take the hand (design R6)", () => {
-    for (const [index] of dayFiles.get(18)!.beats.shutdown!.choices!.entries()) {
-      const state: State = createStore({ startDay: 18 }).getState();
-      const next = applyChoose(state, { day: 18, beat: "shutdown", index });
-      expect(next.flags, choiceOf(18, "shutdown", index)!.text).toContain(takeOf(18)!.flag);
+  it("night 18: only 「不填。握住它。」 lets it take the hand; 「填寄件单」 never does (requiresFlag)", () => {
+    const take = takeOf(18)!;
+    expect(take.requiresFlag).toBe("shook_hand");
+    const choices = dayFiles.get(18)!.beats.shutdown!.choices!;
+    const hold = choices.findIndex((c) => c.effects?.flags?.includes("shook_hand"));
+    const slip = choices.findIndex((c) => c.effects?.flags?.includes("slip_filled"));
+    expect(hold).toBeGreaterThanOrEqual(0);
+    expect(slip).toBeGreaterThanOrEqual(0);
+    const state: State = createStore({ startDay: 18 }).getState();
+    expect(applyChoose(state, { day: 18, beat: "shutdown", index: hold }).flags).toContain(take.flag);
+    expect(applyChoose(state, { day: 18, beat: "shutdown", index: slip }).flags).not.toContain(take.flag);
+    // And the line plays only for holding the hand.
+    for (const [index, plays] of [[hold, true], [slip, false]] as const) {
+      const store = createStore({ startDay: 18 });
+      const d = queued(store, () => store.appendEvent({ kind: "choose", beat: "shutdown", index }));
+      expect(d.queue.some((q) => q.key === "d18:take"), choiceOf(18, "shutdown", index)!.text).toBe(plays);
     }
+  });
+
+  it("a requiresFlag must be a flag that night's nothing-choices set", () => {
+    const raw = structuredClone(takesFile) as any;
+    expect(() => parseTakes({ ...raw, takes: { 18: { ...raw.takes["18"], requiresFlag: "nope" } } })).toThrow(/sets "nope"/);
+    expect(() => parseTakes({ ...raw, takes: { 18: { ...raw.takes["18"], requiresFlag: "" } } })).toThrow(/non-empty/);
   });
 });

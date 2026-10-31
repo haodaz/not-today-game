@@ -7,4 +7,4 @@
 - [x] 5. Re-ask from the desk bar, once a day (R4); `unknown` on the desk bar (R7).
 - [x] 6. Night takes from `content/nights-takes.json` (R6), and the HR chip without its number.
 - [x] 7. Tests (FR3); the two exact-string desk-bar assertions updated for `unknown`.
-- [ ] 8. Author: confirm R6 (day 18 — both choices count as "nothing given").
+- [x] 8. R6 resolved: `requiresFlag` on night 18's take (only 「不填。握住它。」).

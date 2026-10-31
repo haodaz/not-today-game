@@ -13,6 +13,7 @@ import { initialSession, type Session } from "@world/desktop/model";
 import { advance, EMPTY_DIALOGUE, push } from "@world/loop/dialogue";
 import { beatQueued } from "@world/loop/runtime";
 import { dialogueBox, renderRoom } from "@world/room/hud";
+import { ROOM_SHOT } from "@world/room/shots";
 
 const recognisable = membersOf("recognised")! as string[];
 const at = (day: number, over: Partial<State> = {}): State => ({ ...createStore({ startDay: day }).getState(), ...over });
@@ -63,8 +64,9 @@ describe("when it comes (FR1)", () => {
     const calm = dayFiles.get(14)!.beats.shutdown;
     if (calm) expect(beatQueued(14, "shutdown", calm).lines).toEqual(calm.say);
     const out = renderRoom({ state: holding(at(5), "chick"), events: [], session: atRaid(5) }).value;
-    expect(out).toContain('class="stage room no-shot raid"');
-    expect(out).toContain('<div class="gap-glow"></div>');
+    expect(out).toContain('class="stage room room-view raid"');
+    // Between the two monitors of the shot (room/shots.ts).
+    expect(out).toContain(`<div class="gap-glow" style="--gap-x:${ROOM_SHOT.gap.l + ROOM_SHOT.gap.w / 2}px;--gap-t:${ROOM_SHOT.gap.t}px;--gap-h:${ROOM_SHOT.gap.h}px"></div>`);
     expect(renderRoom({ state: at(5), events: [], session: initialSession(DEFAULT_CLOCK, "left", "room") }).value).not.toContain("gap-glow");
   });
 });

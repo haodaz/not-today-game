@@ -15,7 +15,12 @@ import { desktopRing } from "./rings";
 import type { AppId, MonitorModel, ShellModel, Side } from "./shell";
 
 export type WorkbenchPage = "home" | "docs" | "ledger" | "code";
-export type View = "room" | "door" | "desktop";
+/**
+ * The four camera levels (day-loop amendment): 房间 room, 桌子 desk (the close-up, where things
+ * are picked up and the box is opened), 屏幕 "desktop" (the screens), 门 door.
+ */
+export type View = "room" | "desk" | "door" | "desktop";
+export const VIEWS: readonly View[] = ["room", "desk", "desktop", "door"];
 
 /** What the day-loop remembers between store changes (design L5/L6); session only. */
 export interface LoopMemo {
@@ -41,6 +46,16 @@ export interface Session {
   dialogue: DialogueState;
   muted: boolean;
   phoneOpen: boolean;
+  /** The ⚙ 设置 panel is open (day-loop amendment). */
+  settingsOpen: boolean;
+  /** Kuro's small window, opened by a click (desktop-ui amendment: folded by default). */
+  kuroOpen: boolean;
+  /** Until when (ms epoch) it stays open after a new line (6 s). */
+  kuroPeekUntil: number;
+  /** Its last line as last seen, to notice a new one; undefined before the first look. */
+  kuroLast: string | null | undefined;
+  /** Kuro called from 房间 / 桌子: the chat window as an overlay (day-loop amendment). */
+  kuroCall: boolean;
   /** The object lifted off the desk bar (polish FR1); never at the same time as the phone. */
   holding: string | null;
   /** The dialogue line's per-character reveal (polish FR3); set by the motion layer only. */
@@ -73,6 +88,11 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     dialogue: EMPTY_DIALOGUE,
     muted: false,
     phoneOpen: false,
+    settingsOpen: false,
+    kuroOpen: false,
+    kuroPeekUntil: 0,
+    kuroLast: undefined,
+    kuroCall: false,
     holding: null,
     reveal: null,
     wbMode: "self",

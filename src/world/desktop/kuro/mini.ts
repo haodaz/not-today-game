@@ -5,8 +5,9 @@ import { taskByFlag } from "@state/days/tasks";
 import { currentOffer, FINAL } from "@state/upgrades";
 import { constants } from "@state/variables";
 import { cls, html, type SafeHtml } from "@world/html";
-import { tr } from "@world/i18n";
-import type { AppContext } from "../model";
+import { t, tr } from "@world/i18n";
+import { rightApp, type AppContext } from "../model";
+import type { AppId } from "../shell";
 import { bodyState, frameUrl, FRAMES, renderBodySlot } from "./body";
 import { kuroDay } from "./days";
 
@@ -49,6 +50,41 @@ export function renderKuroMini(ctx: AppContext): SafeHtml {
   return html`<div class="${cls("kmini", ctx.night && "blink")}"><div class="h"><img src="${frameUrl(FRAMES.idle[0])}" alt=""><b>${tr("kuro.name")}</b>${status}<span class="turns">${tr("kuro.turns", { n: ctx.state.chatTurnsToday })}</span></div><div class="c">${line}${work}${offerBlock(ctx)}</div><div class="qs">${questions}</div><div class="in">${tr("kuro.input")}</div></div>`;
 }
 
+/** How long the small window opens for when it has a new line (desktop-ui amendment). */
+export const KURO_PEEK_MS = 6_000;
+
+/** The last thing it said, as the small window shows it (bottom line first: offer, work, idiom). */
+export function lastKuroLine(ctx: AppContext): string | null {
+  const offer = ctx.night ? null : currentOffer(ctx.state, ctx.events);
+  if (offer) return offer.line;
+  const work = taskLines(ctx);
+  if (work.length) return work.at(-1)!;
+  if (turnsUsedUp(ctx)) return t("kuro.bedtime");
+  return kuroDay(ctx.state.day)?.idiom ?? null;
+}
+
+/** The evening chat beat (after shutdown): the window stays open. */
+export const chatBeat = (ctx: Pick<AppContext, "session">): boolean => ctx.session.clock.beat === "night";
+
+/** Open: in the chat beat, after a click, or for 6 s after a new line; folded otherwise. */
+export function kuroExpanded(ctx: Pick<AppContext, "session" | "nowMs">): boolean {
+  return chatBeat(ctx) || ctx.session.kuroOpen || ctx.nowMs < ctx.session.kuroPeekUntil;
+}
+
+/** Apps with an input or reply bar at the bottom: the open window docks top-right over them. */
+const INPUT_AT_BOTTOM: ReadonlySet<AppId> = new Set<AppId>(["msgs", "workbench"]);
+export function kuroDock(ctx: Pick<AppContext, "session">): "top" | "bottom" {
+  const s = ctx.session;
+  const shown = s.focus === "left" ? s.leftApp : rightApp(s.leftApp);
+  return INPUT_AT_BOTTOM.has(shown) ? "top" : "bottom";
+}
+
+/** Folded: a pill beside the body, its face and the start of its last line. */
+function kuroPill(ctx: AppContext): SafeHtml {
+  const line = lastKuroLine(ctx);
+  return html`<button type="button" class="${cls("kpill", ctx.night && "blink")}" data-action="kuro-expand" aria-expanded="false"><img src="${frameUrl(FRAMES.idle[0])}" alt=""><span>${line ?? ""}</span></button>`;
+}
+
 /** Kuro on the right monitor: the body slot and the small window. */
 export function renderKuro(ctx: AppContext): SafeHtml {
   const state = bodyState({
@@ -58,5 +94,7 @@ export function renderKuro(ctx: AppContext): SafeHtml {
     moving: ctx.nowMs < ctx.session.movingUntil,
     waiting: ctx.session.clock.beat === "desk" && !turnsUsedUp(ctx),
   });
-  return html`${renderBodySlot(state)}${renderKuroMini(ctx)}`;
+  // Never covering the desktop: folded by default; open, it docks away from the app's input.
+  if (!kuroExpanded(ctx)) return html`${renderBodySlot(state)}${kuroPill(ctx)}`;
+  return html`${renderBodySlot(state)}<div class="${cls("kmini-dock", kuroDock(ctx))}">${renderKuroMini(ctx)}</div>`;
 }

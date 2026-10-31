@@ -122,7 +122,8 @@ describe("what upgrading changes (FR2) and FR3 properties", () => {
 
   it("the desk bar shows an upgraded object with its hi-res icon (snapshot); lost objects are not on it", () => {
     const store = storeAt(pager.offerFrom, ["chick", "pager"], [{ kind: "upgrade", object: "pager" }]);
-    const session = initialSession(DEFAULT_CLOCK, "left", "room");
+    // The desk bar is 桌子's object layer (four camera levels).
+    const session = initialSession(DEFAULT_CLOCK, "left", "desk");
     const out = renderRoom({ state: store.getState(), events: store.getEvents(), session }).value;
     // Not recognised in this run, so also `unknown` (recognise FR2).
     expect(out).toContain('class="slot upgraded unknown" data-object="pager" data-res="hi"');

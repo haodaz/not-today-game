@@ -139,12 +139,22 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   const ctx: ActionContext = { store: deps.store, session, rerender, later, play: (id) => playSfx(id, session.muted), now: () => Date.now() };
   const motion: MotionHooks | null = deps.motion ? deps.motion(root, ctx, actions) : null;
 
+  // Kuro's small window folds on any click outside it (desktop-ui amendment).
+  const foldKuroUnless = (target: Element) => {
+    if (target.closest(".kmini,.kpill,.kuro-call")) return;
+    if (!session.kuroOpen && session.kuroPeekUntil <= Date.now()) return;
+    session.kuroOpen = false;
+    session.kuroPeekUntil = 0;
+    rerender();
+  };
   const onClick = (e: MouseEvent) => {
     const el = (e.target as HTMLElement).closest<HTMLElement>("[data-action]");
+    if (!el) foldKuroUnless(e.target as HTMLElement);
     if (!el || !root.contains(el) || (el as HTMLButtonElement).disabled) return;
     const handler = actions[el.dataset.action!];
     if (!handler) return;
     e.preventDefault();
+    foldKuroUnless(el);
     try {
       handler(ctx, el.dataset, el);
     } catch (error) {

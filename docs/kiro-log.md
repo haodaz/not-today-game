@@ -230,3 +230,36 @@ Appended after each task. Neither Kiro nor Claude edits the other's area without
   - The textbook and the phone are asked (objects.json has them) but aren't in
     `recognised.of`, so they never count. Their right answer is known from the log only (R3).
 - Tests: 41 files, 603 passing; typecheck clean. Not checked in a browser.
+
+## 2026-10-31 — six fixes (no new spec)
+
+1. The phone is held straight (`PHONE_TILT_DEG = 0`, `--m-phone-tilt`); objects keep −3°.
+2. The phone always shows the shop list. Outside an ordering window every shop is greyed with
+   the next window's time (`nextWindow`); there's no blank screen.
+3. The bottom-left row is now one ⚙ 设置 button and a centred panel: 声音 switch, 语言
+   中文 · English (instant), 返回首页, 取消. `loop-restart` and `loop-lang` are removed;
+   nothing restarts the run.
+   - 返回首页 reopens the game on the saved run until the title page exists.
+   - The `hud.menu.*` keys are now unused. TODO(Claude): they and the zh `_todo` can go.
+4. Kuro's small window is folded to a pill beside its body by default.
+   - It opens on click, for 6 s on a new line (held while hovered), and stays open in the
+     evening chat beat.
+   - Over 消息 / 工作台 it docks top-right.
+   - The 13 desktop snapshots changed: day renders show the pill; night renders wrap the window
+     in `kmini-dock`.
+5. Four camera levels: 房间 / 桌子 / 屏幕 / 门.
+   - Click areas and camera points are measured on the new 2048×1152 room.jpg and desk_close.jpg
+     (`src/world/room/shots.ts`).
+   - The desk bar shows at 桌子 only.
+   - The glowing right monitor calls Kuro's window as an overlay from 房间 / 桌子.
+   - Esc steps out one level.
+   - Tests that read the desk bar now render 桌子.
+6. Night 18's take only for 「不填。握住它。」.
+   - Edit in Claude's area: `content/nights-takes.json` gains `"requiresFlag": "shook_hand"` on
+     night 18, with a note in its `_note`.
+   - The loader accepts `requiresFlag` and checks that a "nothing" choice of that night sets it.
+- Not done (named):
+  - The evening chat beat doesn't open the call overlay by itself; the player clicks the glow.
+  - The settings panel's language switch only changes UI strings: the day files and other
+    content are Chinese only.
+- Tests: 42 files, 621 passing; typecheck clean. Not checked in a browser.

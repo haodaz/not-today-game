@@ -1,5 +1,5 @@
 {
-  "_note": "玩家什么都不给的夜里，它拿走别的（night-hand FR2）：9 心跳，18 手。其他夜只扣 san。 单独放是因为 nights.json 的加载器键名严格；night-hand 扩展加载器后可并入。",
+  "_note": "玩家什么都不给的夜里，它拿走别的（night-hand FR2）：9 心跳，18 手。其他夜只扣 san。 单独放是因为 nights.json 的加载器键名严格；night-hand 扩展加载器后可并入。requiresFlag（Kiro 2026-10-31 按作者要求加，见 docs/kiro-log.md）：只有设这个旗标的那个选项才拿走——18 夜只对「不填。握住它。」（shook_hand），不对「填寄件单」。",
   "takes": {
     "9": {
       "what": "heartbeat",
@@ -9,6 +9,7 @@
     "18": {
       "what": "hand",
       "flag": "hand_taken",
+      "requiresFlag": "shook_hand",
       "say": "它握住了。你没有抽回来。"
     }
   }

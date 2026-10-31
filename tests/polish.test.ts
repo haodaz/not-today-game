@@ -12,7 +12,9 @@ import { doorCaption, DOOR_STATES } from "@world/delivery/door";
 import { checklist, loopContext } from "@world/loop/checklist";
 import { gateAdvance, holdUntil, revealDoneAt, revealShown, startReveal } from "@world/motion/reveal";
 import { CHOSEN, choiceDelays, EASE, exitOf, MOTION, motionVars } from "@world/motion/timing";
-import { channelOf, screenScale } from "@world/room/held";
+import { channelOf, nextWindow, screenScale } from "@world/room/held";
+import { deliveryTable } from "@state/delivery/table";
+import { shopListView } from "@world/delivery/shops-view";
 import { boxObjectFor, renderChecklist, renderRoom } from "@world/room/hud";
 import { loopActions, loopKeys } from "@world/room/game";
 
@@ -175,7 +177,7 @@ describe("held phone and objects (FR1)", () => {
 
   it("the held layer: a dim that puts it down, the shell, its own screen at whole pixels; the slot is empty", () => {
     const store = withObject();
-    const { ctx } = fakeCtx(store);
+    const { ctx } = fakeCtx(store, initialSession(DEFAULT_CLOCK, "left", "desk"));
     loopActions["loop-hold"]!(ctx, { object } as DOMStringMap, null as never);
     const out = renderRoom({ state: store.getState(), events: store.getEvents(), session: ctx.session }).value;
     const { w, h } = channelOf(object);
@@ -199,11 +201,41 @@ describe("held phone and objects (FR1)", () => {
 
   it("the phone's screen is the delivery app inside the phone body", () => {
     const store = createStore({ startDay: 1 });
-    const { ctx } = fakeCtx(store);
+    const { ctx } = fakeCtx(store, initialSession(DEFAULT_CLOCK, "left", "desk"));
     loopActions["loop-phone"]!(ctx, none, null as never);
     const out = renderRoom({ state: store.getState(), events: store.getEvents(), session: ctx.session }).value;
     expect(out).toMatch(/class="held phone"[^>]*><div class="scr"><div class="top">/);
     expect(out).toContain('class="slot lifted" data-action="loop-phone"');
+  });
+
+  it("the phone is held straight; objects keep their tilt", () => {
+    const roomCss = readFileSync(resolve(root, "src/world/room/room.css"), "utf8");
+    expect(roomCss).toContain(".room .held.phone{transform:translate(-50%,-50%) rotate(var(--m-phone-tilt,0deg))}");
+    expect(motionVars()["--m-phone-tilt"]).toBe("0deg");
+    expect(motionVars()["--m-tilt"]).toBe("-3deg");
+  });
+
+  it("outside an ordering window the phone still shows every shop, greyed with the window's time", () => {
+    const store = createStore({ startDay: 1 });
+    const { ctx } = fakeCtx(store);
+    ctx.session.phoneOpen = true;
+    const out = renderRoom({ state: store.getState(), events: store.getEvents(), session: ctx.session }).value;
+    const app = out.slice(out.indexOf('<div class="app">'));
+    const [from, to] = deliveryTable.windows[nextWindow(ctx.session.clock.time)];
+    expect(app).toContain(`${from}–${to}</h2>`);
+    expect((app.match(/class="shop off"/g) ?? []).length).toBe(shopListView(1, nextWindow(ctx.session.clock.time)).shops.length);
+    expect(app).not.toContain('data-action="loop-order"');
+  });
+
+  it("inside an ordering window the shops can be ordered from", () => {
+    const store = createStore({ startDay: 1 });
+    store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
+    store.appendEvent({ kind: "step", name: "openApp:msgs", t: "09:03" });
+    const { ctx } = fakeCtx(store);
+    loopActions["loop-phone"]!(ctx, none, null as never);
+    const out = renderRoom({ state: store.getState(), events: store.getEvents(), session: ctx.session }).value;
+    expect(out).toContain('data-action="loop-order"');
+    expect(out).not.toContain('class="shop off"');
   });
 
   it("Esc puts it down before it leaves the view", () => {

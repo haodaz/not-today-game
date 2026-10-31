@@ -9,19 +9,19 @@ import { currentOffer, FINAL } from "@state/upgrades";
 import { desktopApps } from "@world/desktop/apps";
 import { advanceTo } from "@world/desktop/beat";
 import { shellActions, type ActionContext, type ActionHandler } from "@world/desktop/controller";
-import { buildShell, rightApp, type Session } from "@world/desktop/model";
+import { buildShell, rightApp, VIEWS, type Session, type View } from "@world/desktop/model";
 import { renderDesktop, type AppId } from "@world/desktop/shell";
 import { placeOrder } from "@world/delivery/commands";
 import { nextInputs, startDoor, stepDoor } from "@world/delivery/door";
 import { mealView } from "@world/delivery/meals";
 import { html, type SafeHtml } from "@world/html";
-import { getLocale, setLocale, tr } from "@world/i18n";
+import { setLocale, tr } from "@world/i18n";
 import { actionOf, itemStates, loopContext, mealToOrder, openTask, type ItemAction } from "@world/loop/checklist";
 import { advance, endsInChoice, finishChoice, push } from "@world/loop/dialogue";
 import { beatQueued, questionQueued } from "@world/loop/runtime";
 import { askedOn, knows } from "@state/recognise";
 import { gateAdvance } from "@world/motion/reveal";
-import { boxObjectFor, dialogueBox, doorMeal, renderRoom } from "./hud";
+import { boxObjectFor, dialogueBox, doorMeal, renderRoom, settingsButton, settingsPanel } from "./hud";
 
 export function renderGame(store: Store, session: Session, nowMs: number): SafeHtml {
   const state = store.getState();
@@ -30,9 +30,9 @@ export function renderGame(store: Store, session: Session, nowMs: number): SafeH
     const shell = buildShell(state, events, session, desktopApps, nowMs, store.getStartDay());
     // Work-task narration plays in the dialogue box over the desktop too.
     const dlg = dialogueBox(state, session);
-    return html`${renderDesktop(shell)}<button type="button" class="back-room" data-action="view" data-view="room">${tr("desktop.back")}</button>${dlg ? html`<div class="dlg-layer">${dlg}</div>` : null}`;
+    return html`${renderDesktop(shell)}<button type="button" class="back-room" data-action="view" data-view="room">${tr("desktop.back")}</button>${dlg ? html`<div class="dlg-layer">${dlg}</div>` : null}<div class="settings-host">${settingsButton()}${settingsPanel(session)}</div>`;
   }
-  return renderRoom({ state, events, session });
+  return renderRoom({ state, events, session, startDay: store.getStartDay(), nowMs });
 }
 
 /** The app on the monitor being shown. */
@@ -82,8 +82,11 @@ export const MODE_BY_KEY: Readonly<Record<string, TaskMode>> = {
 
 export const loopActions: Record<string, ActionHandler> = {
   view(ctx, data) {
-    const view = data.view;
-    if (view !== "room" && view !== "door" && view !== "desktop") return;
+    const view = data.view as View;
+    if (!VIEWS.includes(view)) return;
+    // 桌子's monitors open 屏幕 on their own side.
+    if (view === "desktop" && (data.screen === "left" || data.screen === "right")) ctx.session.focus = data.screen;
+    ctx.session.kuroCall = false;
     // A finished door beat is forgotten once the player looks away (polish W1).
     if (ctx.session.view === "door" && view !== "door" && ctx.session.door?.state === "onDesk") ctx.session.door = null;
     ctx.session.view = view;
@@ -220,8 +223,18 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.rerender();
   },
 
-  "loop-lang"(ctx) {
-    setLocale(getLocale() === "en" ? "zh" : "en");
+  // ⚙ 设置 (day-loop amendment: one settings button). 返回首页 is the host's (main.ts).
+  "settings-open"(ctx) {
+    ctx.session.settingsOpen = true;
+    ctx.rerender();
+  },
+  "settings-close"(ctx) {
+    ctx.session.settingsOpen = false;
+    ctx.rerender();
+  },
+  "settings-lang"(ctx, data) {
+    if (data.lang !== "zh" && data.lang !== "en") return;
+    setLocale(data.lang);
     ctx.rerender();
   },
 
@@ -253,6 +266,26 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.store.appendEvent({ kind: "declineUpgrade", object: offer.kind === "final" ? FINAL : offer.object, decline: offer.kind });
   },
 
+  // Kuro's small window: the pill opens it; a click outside or Esc folds it (desktop-ui amendment).
+  "kuro-expand"(ctx) {
+    ctx.session.kuroOpen = true;
+    ctx.rerender();
+  },
+  "kuro-fold"(ctx) {
+    ctx.session.kuroOpen = false;
+    ctx.session.kuroPeekUntil = 0;
+    ctx.rerender();
+  },
+  // From 房间 / 桌子: the glowing right monitor calls Kuro; its window opens over the view.
+  "kuro-call"(ctx) {
+    ctx.session.kuroCall = true;
+    ctx.rerender();
+  },
+  "kuro-hangup"(ctx) {
+    ctx.session.kuroCall = false;
+    ctx.rerender();
+  },
+
   // Asking Kuro anything counts as talking with it today (the answers are the kuro-chat spec's).
   "kuro-ask"(ctx) {
     stepOnce(ctx, "chat:any");
@@ -261,14 +294,28 @@ export const loopActions: Record<string, ActionHandler> = {
 
 /** Keys: space / Enter read on in the room and at the door; Esc goes back to the room. */
 export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
-  // Esc puts down what is held first (polish FR1).
+  // Esc closes the settings panel first, then the Kuro call / folds its small window, then puts
+  // down what is held (polish FR1), then steps the camera out.
+  if (e.key === "Escape" && ctx.session.settingsOpen) {
+    loopActions["settings-close"]!(ctx, {} as DOMStringMap, null as never);
+    return true;
+  }
+  if (e.key === "Escape" && ctx.session.kuroCall) {
+    loopActions["kuro-hangup"]!(ctx, {} as DOMStringMap, null as never);
+    return true;
+  }
+  const now = ctx.now?.() ?? Date.now();
+  if (e.key === "Escape" && ctx.session.view === "desktop" && (ctx.session.kuroOpen || now < ctx.session.kuroPeekUntil)) {
+    loopActions["kuro-fold"]!(ctx, {} as DOMStringMap, null as never);
+    return true;
+  }
   if (e.key === "Escape" && (ctx.session.phoneOpen || ctx.session.holding)) {
     loopActions["loop-put-down"]!(ctx, {} as DOMStringMap, null as never);
     return true;
   }
   if (e.key === "Escape" && ctx.session.view !== "room") {
-    ctx.session.view = "room";
-    ctx.rerender();
+    // One camera level out: 屏幕 → 桌子 → 房间; 门 → 房间.
+    loopActions["view"]!(ctx, { view: ctx.session.view === "desktop" ? "desk" : "room" } as DOMStringMap, null as never);
     return true;
   }
   if ((e.key === " " || e.key === "Enter") && ctx.session.view !== "desktop" && ctx.session.dialogue.queue.length) {
