@@ -11,5 +11,15 @@
   "word.how-much": "多少。",
   "word.what-do-you-mean": "什么意思。",
   "word.say-it-again": "再说一遍。",
-  "word.im-going-in": "我进去了。"
+  "word.im-going-in": "我进去了。",
+  "family.eaten": "吃了。",
+  "family.busy": "在忙。",
+  "family.fine": "好。",
+  "family.unpaid": "还没发。",
+  "reply.status.read": "已读",
+  "reply.status.typing": "正在输入…",
+  "reply.status.recalled": "[撤回了一条消息]",
+  "reply.status.deregistered": "[该账号已注销]",
+  "reply.hint.boss": "对老板，你能说的话是一张很小的表。",
+  "reply.hint.gone": "这句今天说不了了。"
 }
