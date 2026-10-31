@@ -59,7 +59,11 @@ export function angleDelta(a: number, b: number): number {
   return d;
 }
 
-const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+/** Linear, and never outside [a, b] (floating point can overshoot an endpoint by an ulp, which would trip the clamp). */
+const lerp = (a: number, b: number, t: number) => {
+  const v = a + (b - a) * t;
+  return Math.min(Math.max(v, Math.min(a, b)), Math.max(a, b));
+};
 
 /** From a (t = 0) to b (t = 1): position linear, yaw and pitch along the short arc. */
 export function lerpPose(a: Pose, b: Pose, t: number): Pose {
