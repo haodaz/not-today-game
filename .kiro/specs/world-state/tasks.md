@@ -15,9 +15,9 @@ dreamNights, nightBeat); all constants come from `content/variables.json` `const
 - [x] Create empty `src/state/` directory.
 
 ## 2. Read content schema, confirm defaults, log note
-- [ ] Read `content/variables.json` and `content/stages.json` (Claude's files). Do **not** create or overwrite them.
-- [ ] A test confirms every variable in `variables.json` has a `default`, and that `constants` has the keys the code needs.
-- [ ] Note in `docs/kiro-log.md` that both files are Claude's and code only reads them.
+- [x] Read `content/variables.json` and `content/stages.json` (Claude's files). Do **not** create or overwrite them.
+- [x] A test confirms every variable in `variables.json` has a `default`, and that `constants` has the keys the code needs.
+- [x] Note in `docs/kiro-log.md` that both files are Claude's and code only reads them.
 
 ## 3. variables.ts — loader, defaults, validate
 - [ ] Load `content/variables.json`; expose `VariableTable`, `constants`, `defaults()`, `validate(state)`.
