@@ -10,7 +10,7 @@ state = f(day) ⊕ replay(events)
 ```
 
 `world-state` is the module that owns this. It holds every variable, computes `day` and `stage`,
-appends and replays events, fakes the clock for tests and demos, and persists two save slots. It
+appends and replays events, exposes a cosmetic injectable clock, and persists two save slots. It
 is the single source of truth that every view (the two monitors, the objects, the room) reads
 from. It is a pure data layer: it emits no rendering and knows nothing about how anything looks.
 
@@ -35,13 +35,22 @@ their values — they are read at runtime.
 
 ### FR2. Day and stage
 
-- **Changed 2026-10-30 (author decision, see steering/product.md):** `day` is a counter in the run save, starting at 1 and incremented by exactly one when the `lie-down` event is appended. It never derives from the wall clock. The line below is superseded and kept only for history.
-- ~~`day = realCalendarDay - startDay + 1`~~, where `realCalendarDay` and `startDay` are calendar-day
-  numbers obtained from the clock (FR4).
+- **Changed 2026-10-30 (author decision, see steering/product.md):** `day` is a counter in the run
+  save, starting at 1 and incremented by exactly one when the `lieDown` event is appended. It never
+  derives from the wall clock. `day` is a state field; the `lieDown` reducer is the only thing that
+  changes it.
 - `stage = content/stages.json[byDay][day]` when `byDay` has an entry for `day`; for any day after
-  18, `stage = afterDay18`.
+  `constants.lastDay`, `stage = afterDay18`.
+- `ring` (how far the daytime corruption has spread) is derived from `content/stages.json[cycles]`:
+  the cycle whose `days` contain `day`; after the last cycle, the last cycle's ring. `ring` is a
+  derived accessor, not a state variable (the variable table is closed).
+- The same file also supplies `calmDaytime`, `tenderDay`, `dreamNights` and `nightBeat`; they are
+  exposed as read-only accessors. Their effects (rendering, affinity) belong to other specs.
 - The stages table is read from `content/stages.json` at runtime. Code never hardcodes the table
   and never hardcodes individual stage values.
+- Every engine constant (`overdueBase`, `loanAmount`, `loanReplyDay`, `repayDay`, `lastDay`,
+  `affinityThreshold`, `tenderDayAffinityMultiplier`, ...) is read from `constants` in
+  `content/variables.json`; none is written as a literal in code.
 
 ### FR3. Append-only event log and replay
 
@@ -66,13 +75,12 @@ their values — they are read at runtime.
 
 ### FR4. Fakeable clock (reduced 2026-10-30: the clock no longer drives `day`; it is cosmetic only, still injectable for tests. Demo mode and CLOCK_OVERRIDE are dropped; `?day=N` stays as a debug jump.)
 
-- The clock can be overridden without code changes. Mechanisms and precedence:
-  - `CLOCK_OVERRIDE` env var.
-  - `?day=N&t=HH:MM` URL param.
-  - Default (neither set): the real wall clock.
-- Demo mode compresses one game day into about 90 seconds of wall-clock time.
-- All tests and property tests run on the fake clock; no test ever depends on the real clock.
-- Whatever the source, `day` and within-day time are derived through a single path.
+- There is one `Clock` interface. Its only consumers are cosmetic (e.g. a timestamp in a chat
+  bubble). It never feeds `day`, `stage`, or any reducer.
+- The real wall clock is the default; tests inject a fake one. No test depends on the real clock.
+- `?day=N` is a debug jump: it builds the day-N state with an empty event log (`f(N)`). It is not
+  a feature and has no effect on saves.
+- No demo mode, no `CLOCK_OVERRIDE`.
 
 ### FR5. Persistence — two separate slots
 
@@ -103,18 +111,22 @@ their values — they are read at runtime.
 These are verifiable tests. The specific input→output pairs below are test expectations; the full
 tables remain in `content/` and are not reproduced here.
 
-- **Stage mapping:** `stage(1)=0, stage(4)=1, stage(7)=2, stage(10)=3, stage(13)=4, stage(16)=5,
-  stage(18)=5`, and `stage(25)=5`.
+- **Stage mapping:** for every day `1..lastDay`, `stage(day)` equals `stages.json byDay[day]`;
+  `stage(25)` equals `afterDay18`. `ring(day)` equals the ring of the cycle containing `day`.
+  (Plan B values, for orientation only: 1→0, 4→1, 7→3, 10→4, 13→5, 18→5. The test reads the table.)
+- **Day counter:** `day` starts at 1 and is incremented by exactly one per `lieDown` event, by
+  nothing else.
 - **Replay idempotency:** replaying a 200-event log twice produces `deep-equal` state.
-- **Loan lifecycle:** with the clock faked to day 12 and a day-5 `reply` event carrying
-  `choice: "lend"`, `loan === "repaid"` (and `balance` is restored). On day 11 the same log yields
-  `loan === "lent"` (and `balance` is minus 44000). With `choice: "no"`, `loan === "refused"`.
+- **Loan lifecycle:** with the day counter at `repayDay` and a `loanReplyDay` `reply` event
+  carrying `choice: "lend"`, `loan === "repaid"` (and `balance` is restored). On the day before, the
+  same log yields `loan === "lent"` (and `balance` is minus `loanAmount`). With `choice: "no"`,
+  `loan === "refused"`.
 - **Slot isolation:** a profile write never changes the run save; a run-save clear never touches
   the profile.
 - **Property tests:**
   - `stage(day)` is monotonic non-decreasing for all days.
   - `replay` is idempotent (`replay ∘ replay == replay`).
-  - `overdueDays === 30 + day` for all days `1..18`.
+  - `overdueDays === constants.overdueBase + day` for all days `1..lastDay`.
 
 ## 6. Implementation constraints
 
