@@ -38,6 +38,7 @@
       ]
     },
     "shutdown": {
+      "wants": "你的手。",
       "say": [
         {
           "k": "narration",

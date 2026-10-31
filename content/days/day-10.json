@@ -38,6 +38,7 @@
       ]
     },
     "shutdown": {
+      "wants": "磁带上那半句话。",
       "say": [
         {
           "k": "narration",

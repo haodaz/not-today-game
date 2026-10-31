@@ -30,6 +30,7 @@
       ]
     },
     "shutdown": {
+      "wants": "那一行账。或者任何你肯递出去的东西。",
       "say": [
         {
           "k": "narration",

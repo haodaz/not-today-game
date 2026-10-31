@@ -26,6 +26,7 @@
       ]
     },
     "shutdown": {
+      "wants": "你的心跳，里面的那个。",
       "say": [
         {
           "k": "narration",
