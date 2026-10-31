@@ -3,19 +3,19 @@
 // things along the bottom; the dialogue box over it; camera chips and a small menu. No inventory,
 // no health bar, no clock. Pure: model in, markup out. Story text is content's; chrome is strings.
 import stagesFile from "@content/stages.json";
-import { deliveryTable, type Meal } from "@state/delivery/table";
+import type { Meal } from "@state/delivery/table";
 import type { GameEvent } from "@state/events";
 import type { State } from "@state/types.gen";
 import { constants } from "@state/variables";
 import { beatLabelKey } from "@world/desktop/beat";
 import type { Session } from "@world/desktop/model";
-import { doorCaption, startDoor, type DoorBeat } from "@world/delivery/door";
+import { doorCaption, DOOR_STATES, nextInputs, startDoor, type DoorBeat, type DoorState } from "@world/delivery/door";
 import { mealView } from "@world/delivery/meals";
-import { shopListView } from "@world/delivery/shops-view";
 import { renderDoorView } from "@world/delivery/view";
-import { cls, html, type SafeHtml } from "@world/html";
-import { t, tr } from "@world/i18n";
-import { checklist, loopContext, mealToOrder, type ChecklistView } from "@world/loop/checklist";
+import { cls, html, raw, type SafeHtml } from "@world/html";
+import { tr } from "@world/i18n";
+import { checklist, loopContext, type ChecklistView } from "@world/loop/checklist";
+import { heldItem, heldLayer } from "./held";
 import { showing } from "@world/loop/dialogue";
 import { fillPlaceholders } from "@world/replies/placeholders";
 
@@ -50,19 +50,22 @@ function dayCorner(state: State, session: Session): SafeHtml {
   return html`<div class="day"><b>${tr("shell.day", { day: state.day })} · ${tr(beatLabelKey(session.clock.beat))}</b><span class="ov">${tr("hud.overdue", { n: state.overdueDays })}</span></div>${hr}`;
 }
 
-function deskBar(state: State): SafeHtml {
+function deskBar(state: State, session: Session): SafeHtml {
+  const held = heldItem(session);
   const total = Object.keys(FOUND_ON_DAY).length;
   const left = total - state.found.length;
   // Objects on the desk, in found order; what was handed to the hand is not on the desk. An
   // upgraded object's icon is the hi-res one: the only visible tell (object-upgrade FR2).
   const objects = state.found
     .filter((id) => !state.lost.includes(id))
+    // A slot is a button so it can be picked up (polish FR1, design P9); while it is held, the
+    // slot is empty (`lifted`).
     .map((id) =>
       state.upgraded[id] === true
-        ? html`<div class="slot upgraded" data-object="${id}" data-res="hi"><img src="/objects/${id}_front.png" alt=""><div class="screen-hi" data-screen="${id}"></div></div>`
-        : html`<div class="slot" data-object="${id}"><img src="/objects/${id}_white.png" alt=""><div class="lcd" data-screen="${id}"></div></div>`,
+        ? html`<button type="button" class="${cls("slot", "upgraded", held === id && "lifted")}" data-object="${id}" data-res="hi" data-action="loop-hold"><img src="/objects/${id}_front.png" alt=""><div class="screen-hi" data-screen="${id}"></div></button>`
+        : html`<button type="button" class="${cls("slot", held === id && "lifted")}" data-object="${id}" data-action="loop-hold"><img src="/objects/${id}_white.png" alt=""><div class="lcd" data-screen="${id}"></div></button>`,
     );
-  return html`<div class="bar"><button type="button" class="slot" data-action="loop-box">${left > 0 ? html`<div class="box"></div><span>${tr("hud.box.left", { n: left })}</span>` : html`<div class="box" style="opacity:.3"></div>`}</button><button type="button" class="slot" data-action="loop-phone"><div class="phone"></div><span>${tr("hud.phone")}</span></button><div class="slot"><div class="cup"></div></div>${objects}</div>`;
+  return html`<div class="bar"><button type="button" class="slot" data-action="loop-box">${left > 0 ? html`<div class="box"></div><span>${tr("hud.box.left", { n: left })}</span>` : html`<div class="box" style="opacity:.3"></div>`}</button><button type="button" class="${cls("slot", held === "phone" && "lifted")}" data-action="loop-phone"><div class="phone"></div><span>${tr("hud.phone")}</span></button><div class="slot"><div class="cup"></div></div>${objects}</div>`;
 }
 
 export function dialogueBox(state: State, session: Session): SafeHtml | null {
@@ -70,7 +73,9 @@ export function dialogueBox(state: State, session: Session): SafeHtml | null {
   if (!show) return null;
   const fill = (s: string) => fillPlaceholders(s, state.names);
   if (show.choices) {
-    const head = show.line ? html`<div class="dlg" style="bottom:${128 + 56 * show.choices.length + 12}px">${lineBody(show.line, fill)}</div>` : null;
+    // A click on the line above the choices completes its reveal (polish FR3); it never advances
+    // past a choice (dialogue.advance stops there).
+    const head = show.line ? html`<button type="button" class="dlg" data-action="loop-advance" style="bottom:${128 + 56 * show.choices.length + 12}px">${lineBody(show.line, fill)}</button>` : null;
     const buttons = show.choices.map(
       (c) => html`<button type="button" data-action="loop-choice" data-index="${c.index}"${c.choice ? html` data-choice="${c.choice}"` : null}>${c.text !== null ? fill(c.text) : tr(c.labelKey!)}</button>`,
     );
@@ -92,20 +97,6 @@ function lineBody(line: NonNullable<ReturnType<typeof showing>>["line"] & object
   }
 }
 
-function phonePanel(state: State, events: readonly GameEvent[], session: Session): SafeHtml | null {
-  if (!session.phoneOpen) return null;
-  const lc = loopContext(state, events);
-  const meal = lc ? mealToOrder(lc) : null;
-  if (!meal) return html`<div class="phone-panel" data-action="loop-phone"><h4>${tr("hud.phone")}</h4></div>`;
-  const list = shopListView(state.day, meal);
-  const shops = list.shops.map((s) =>
-    s.open
-      ? html`<div class="shop"><b>${s.name}</b><small>${s.tag}</small>${s.items.map((it) => html`<button type="button" data-action="loop-order" data-meal="${meal}" data-shop="${s.id}" data-item="${it.id}"><span>${it.name}</span><span>¥${it.price}</span></button>`)}</div>`
-      : html`<div class="shop closed"><b>${s.name}</b>${s.closedKey ? html`<small>${tr(s.closedKey)}</small>` : null}</div>`,
-  );
-  return html`<div class="phone-panel"><h4>${tr(`delivery.window.${meal}`)} · ${deliveryTable.windows[meal][0]}–${deliveryTable.windows[meal][1]}</h4>${shops}</div>`;
-}
-
 function cams(view: Session["view"]): SafeHtml {
   const chip = (target: "room" | "desktop" | "door", key: string) =>
     html`<button type="button" class="${view === target ? "on" : ""}" data-action="view" data-view="${target}">${tr(key)}</button>`;
@@ -116,13 +107,26 @@ function menu(session: Session): SafeHtml {
   return html`<div class="menu"><button type="button" class="${session.muted ? "off" : ""}" data-action="loop-mute">${tr("hud.menu.sound")}</button>·<button type="button" data-action="loop-lang">${tr("hud.menu.lang")}</button>·<button type="button" data-action="loop-restart">${tr("hud.menu.restart")}</button></div>`;
 }
 
-/** The meal at the door now (已送达, not yet taken in), or the one just taken in. */
+/**
+ * The meal at the door now (已送达, not yet taken in), or the one just taken in during this door
+ * beat, so its sixth step (the bag on the desk corner) shows (polish W1).
+ */
 export function doorMeal(state: State, events: readonly GameEvent[], session: Session): Meal | null {
   for (const meal of ["lunch", "dinner"] as const) {
     const v = mealView(state.day, meal, state, events, session.clock.time);
     if (v?.phase === "delivered") return meal;
   }
+  const d = session.door;
+  if (d && d.day === state.day && d.state === "onDesk") return d.meal;
   return null;
+}
+
+/** The door states that show the chain-door picture, and the one with the shadow at the bottom. */
+const DOOR_OPEN = new Set<DoorState>(["chainOpen", "holding"]);
+
+/** The six steps, faint at the top right; only the current one is lit (polish FR2). */
+export function doorSteps(current: DoorState | null): SafeHtml {
+  return html`<div class="steps">${DOOR_STATES.map((st) => html`<span class="${current === st ? "on" : ""}">${doorCaption(st)}</span>`)}</div>`;
 }
 
 function doorContent(state: State, events: readonly GameEvent[], session: Session): SafeHtml {
@@ -130,7 +134,12 @@ function doorContent(state: State, events: readonly GameEvent[], session: Sessio
   if (!meal) return html``;
   const view = mealView(state.day, meal, state, events, session.clock.time)!;
   const beat: DoorBeat | null = session.door && session.door.meal === meal && session.door.day === state.day ? session.door : startDoor(view);
-  return html`${renderDoorView(view, beat, state.names)}${beat && beat.state !== "onDesk" ? html`<button type="button" class="door-next" data-action="loop-door" title="${t("delivery.arrived")}">${doorCaption(beat.state)} ▼</button>` : null}`;
+  const at = beat?.state ?? null;
+  // One click anywhere on the scene is one step; the HUD sits above this button.
+  const next = at && nextInputs(at).length > 0;
+  const hit = next ? html`<button type="button" class="door-hit" data-action="loop-door" aria-label="${doorCaption(DOOR_STATES[DOOR_STATES.indexOf(at) + 1]!)}"></button>` : null;
+  // renderDoorView escapes its own text (content strings) and returns markup.
+  return html`${at && DOOR_OPEN.has(at) ? html`<div class="door-bg chain"></div>` : null}${hit}${raw(renderDoorView(view, beat, state.names))}${at ? doorSteps(at) : null}${at === "holding" ? html`<div class="door-hand"></div>` : null}`;
 }
 
 export interface RoomModel {
@@ -143,6 +152,8 @@ export function renderRoom({ state, events, session }: RoomModel): SafeHtml {
   const lc = loopContext(state, events);
   const list = lc ? renderChecklist(checklist(lc)) : null;
   const door = session.view === "door";
-  const middle = door ? doorContent(state, events, session) : phonePanel(state, events, session);
-  return html`<div class="${cls("stage", "room", door ? "door-view" : "no-shot")}" data-day="${state.day}" data-view="${session.view}">${list}${dayCorner(state, session)}${middle}${deskBar(state)}${dialogueBox(state, session)}${cams(session.view)}${menu(session)}</div>`;
+  const scene = door ? doorContent(state, events, session) : null;
+  // The held item sits over everything but the dialogue box (held-object.html).
+  const held = door ? null : heldLayer(state, events, session);
+  return html`<div class="${cls("stage", "room", door ? "door-view" : "no-shot")}" data-day="${state.day}" data-view="${session.view}">${scene}${list}${dayCorner(state, session)}${deskBar(state, session)}${held}${dialogueBox(state, session)}${cams(session.view)}${menu(session)}</div>`;
 }

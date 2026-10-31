@@ -8,6 +8,7 @@ import { tr } from "@world/i18n";
 import type { TaskMode } from "@state/days/effects";
 import type { DoorBeat } from "@world/delivery/door";
 import { EMPTY_DIALOGUE, type DialogueState } from "@world/loop/dialogue";
+import type { Reveal } from "@world/motion/reveal";
 import { isNight, type BeatClock } from "./beat";
 import { browserPage, weatherKind } from "./browser/data";
 import { desktopRing } from "./rings";
@@ -40,6 +41,10 @@ export interface Session {
   dialogue: DialogueState;
   muted: boolean;
   phoneOpen: boolean;
+  /** The object lifted off the desk bar (polish FR1); never at the same time as the phone. */
+  holding: string | null;
+  /** The dialogue line's per-character reveal (polish FR3); set by the motion layer only. */
+  reveal: Reveal | null;
   wbMode: TaskMode;
   loop: LoopMemo | null;
   /** The door beat in progress (the delivery door machine). */
@@ -68,6 +73,8 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     dialogue: EMPTY_DIALOGUE,
     muted: false,
     phoneOpen: false,
+    holding: null,
+    reveal: null,
     wbMode: "self",
     loop: null,
     door: null,

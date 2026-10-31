@@ -41,19 +41,41 @@
 .room .choices{position:absolute;left:50%;bottom:128px;transform:translateX(-50%);width:980px;display:flex;flex-direction:column;gap:8px}
 .room .choices button{background:rgba(28,26,23,.86);color:#f4efe6;border:1px solid rgba(201,168,106,.4);border-radius:10px;padding:12px 20px;font:17px var(--font);text-align:left;cursor:pointer}
 .room .choices button:hover{border-color:#c9a86a}
-/* 手机 */
-.room .phone-panel{position:absolute;left:50%;bottom:128px;transform:translateX(-50%);width:420px;max-height:560px;overflow:auto;background:rgba(232,228,220,.92);backdrop-filter:blur(10px);border-radius:14px;padding:14px 16px;box-shadow:0 12px 40px rgba(0,0,0,.3);font-size:14px}
-.room .phone-panel h4{margin:0 0 8px;font-size:12px;letter-spacing:.12em;color:#8a7f70;font-weight:400}
-.room .phone-panel .shop{padding:6px 0;border-top:1px solid var(--line)}
-.room .phone-panel .shop b{font-weight:500}.room .phone-panel .shop small{color:#8a7f70;margin-left:6px}
-.room .phone-panel .shop.closed{color:#9a9a9a}
-.room .phone-panel button{display:flex;justify-content:space-between;width:100%;border:0;background:none;padding:4px 0;font:inherit;color:inherit;cursor:pointer;text-align:left}
-.room .phone-panel button:hover{color:var(--red)}
-/* 门 */
-.room .door-beat{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);width:620px;background:rgba(28,26,23,.78);color:#f4efe6;border-radius:12px;padding:18px 24px;font-size:16px;line-height:1.6}
-.room .door-beat .door-step{color:#c9a86a;font-size:12px;letter-spacing:.12em}
+/* 举起来 (held.html, held-object.html): the room dims, the item sits in the middle, tilted */
+.room .slot.lifted > *{visibility:hidden}
+.room .held-layer{position:absolute;inset:0;z-index:15}
+.room .held-dim{position:absolute;inset:0;border:0;padding:0;margin:0;background:rgba(10,10,12,var(--m-dim-to,.55));cursor:default}
+.room .held{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(var(--m-tilt,-3deg))}
+.room .held.phone{width:340px;height:700px;background:#1a1a1c;border-radius:40px;box-shadow:0 30px 80px rgba(0,0,0,.6),inset 0 0 0 3px #333}
+.room .held.phone .scr{position:absolute;inset:14px;background:#fff;border-radius:30px;overflow:hidden;font-size:15px;display:flex;flex-direction:column}
+.room .held.phone .top{flex:0 0 44px;display:flex;align-items:center;justify-content:center;font:12px var(--mono);color:#888;border-bottom:1px solid #eee}
+.room .held.phone .app{flex:1;overflow:auto;padding:14px 16px}
+.room .held.phone .app h2{font-size:18px;margin:0 0 10px;font-weight:600}
+.room .held.phone .shop{padding:12px 0;border-bottom:1px solid #f1f1f1}
+.room .held.phone .shop b{display:block;font-weight:500}.room .held.phone .shop small{color:#999}
+.room .held.phone .shop.closed{opacity:.4}.room .held.phone .shop.closed small{color:#c33}
+.room .held.phone .shop button{display:flex;justify-content:space-between;width:100%;border:0;background:none;padding:6px 0 0;font:inherit;font-size:14px;color:inherit;cursor:pointer;text-align:left}
+.room .held.phone .shop button:hover,.room .held.phone .shop button:focus-visible{color:var(--red)}
+.room .held.phone .home{position:absolute;left:50%;bottom:10px;width:120px;height:5px;background:#ccc;border-radius:3px;transform:translateX(-50%)}
+.room .held.obj{top:44%;width:440px;filter:drop-shadow(0 30px 50px rgba(0,0,0,.6))}
+.room .held.obj img{display:block;width:100%}
+/* An object's own screen: its channel's pixels, a whole-number scale, never smoothed. */
+.room .held.obj canvas.dev{position:absolute;transform:translate(-50%,-50%);image-rendering:pixelated;background:#9fb59a;border-radius:2px}
+.room .held.obj canvas.dev.hi{image-rendering:auto;background:linear-gradient(180deg,#f4f8ff,#d9e6ff)}
+.room .held-layer .hint{position:absolute;left:50%;bottom:130px;transform:translateX(-50%);color:#f4efe6;font-size:14px;opacity:.7;pointer-events:none}
+.room > .dlg,.room > .choices{z-index:16}
+/* 门 (door.html): six steps faint at the top right, only the current one lit; one click a step */
+.room .door-bg{position:absolute;inset:0;background:#000 url(/room/door_chain.png) center/cover;pointer-events:none}
+.room .door-hit{position:absolute;inset:0;border:0;padding:0;margin:0;background:transparent;cursor:pointer}
+.room .door-hit:focus-visible{outline:2px solid rgba(201,168,106,.6);outline-offset:-6px}
+.room .steps{position:absolute;right:28px;top:120px;display:flex;flex-direction:column;gap:6px;font-size:13px;color:#f4efe6;text-shadow:0 1px 6px rgba(0,0,0,.6);text-align:right;pointer-events:none}
+.room .steps span{opacity:.45}.room .steps span.on{opacity:1;font-weight:600}
+.room .door-beat{position:absolute;left:50%;bottom:128px;transform:translateX(-50%);width:980px;background:rgba(28,26,23,.82);backdrop-filter:blur(6px);color:#f4efe6;border-radius:12px;padding:18px 24px;font-size:18px;line-height:1.6;pointer-events:none;box-sizing:border-box}
+.room .door-beat p{margin:0}
+.room .door-beat .door-step{color:#c9a86a;font-size:12px;letter-spacing:.12em;margin-bottom:4px}
 .room .door-beat .door-inner,.room .door-beat .door-anomaly{font-style:italic;color:#e8b4ae}
-.room .door-next{position:absolute;left:50%;top:64%;transform:translateX(-50%);border:0;border-radius:20px;padding:8px 22px;background:rgba(232,228,220,.8);font:14px var(--font);cursor:pointer}
+.room .door-beat:empty,.room .door-beat[data-state="idle"]{display:none}
+.room .door-hand{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:420px;height:220px;background:radial-gradient(ellipse at 50% 100%,rgba(0,0,0,.55),transparent 70%);pointer-events:none}
 /* 镜头 + 菜单 */
 .room .cams{position:absolute;right:28px;bottom:28px;display:flex;gap:6px}
 .room .cams button{background:rgba(232,228,220,.7);backdrop-filter:blur(8px);border:0;border-radius:8px;padding:8px 14px;font:14px var(--font);color:#333;cursor:pointer}

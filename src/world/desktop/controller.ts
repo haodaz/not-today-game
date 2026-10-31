@@ -7,6 +7,7 @@ import type { BeatClock } from "./beat";
 import { desktopApps } from "./apps";
 import { KuroBodyElement } from "./kuro/body";
 import { playSfx } from "@world/loop/sfx";
+import { MOTION } from "@world/motion/timing";
 import { buildShell, initialSession, type AppRenderers, type Session } from "./model";
 import { renderDesktop, APPS, type AppId } from "./shell";
 
@@ -30,6 +31,17 @@ export interface ActionContext {
   readonly later: (ms: number, fn: () => void) => void;
   /** Plays a sound id (silent when muted or missing). */
   readonly play?: (id: string) => void;
+  /** Wall time in ms, for cosmetics only (motion); defaults to Date.now. */
+  readonly now?: () => number;
+}
+
+/** The motion layer around each render (polish): see world/motion/dom.ts. */
+export interface MotionHooks {
+  /** Just before the root is replaced: keep what may need to leave gracefully. */
+  before(): void;
+  /** After the new markup is in and fitted. */
+  after(): void;
+  destroy(): void;
 }
 
 /** Built-in actions: the dock and the 左屏 / 右屏 toggle. App modules add theirs through `mountDesktop(…, { actions })`. */
@@ -42,7 +54,7 @@ export const shellActions: Record<string, ActionHandler> = {
   dock(ctx, data) {
     const app = data.app as AppId;
     if (!(APPS as readonly string[]).includes(app)) return;
-    if (ctx.session.leftApp !== app) ctx.session.movingUntil = Date.now() + 1_600;
+    if (ctx.session.leftApp !== app) ctx.session.movingUntil = (ctx.now?.() ?? Date.now()) + MOTION.crawl;
     ctx.session.leftApp = app;
     if (app === "browser") {
       // Opening the browser is logged (desktop-ui FR4; Kuro's rubric may cite it).
@@ -65,6 +77,8 @@ export interface DesktopDeps {
   readonly onChange?: (ctx: ActionContext) => void;
   /** Keys the controller does not handle itself; return true if handled. */
   readonly onKey?: (ctx: ActionContext, e: KeyboardEvent) => boolean;
+  /** The motion layer (polish); none in tests. */
+  readonly motion?: (root: HTMLElement, ctx: ActionContext, actions: Record<string, ActionHandler>) => MotionHooks;
 }
 
 function defaultRender(apps: AppRenderers) {
@@ -95,11 +109,13 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     const active = document.activeElement as HTMLInputElement | null;
     const focusKey = active?.dataset?.focus ?? null;
     const caret = active?.selectionStart ?? null;
+    motion?.before();
     root.innerHTML = renderRoot(deps.store, session, Date.now()).value;
     // Kuro's body lives across renders so its state changes crossfade.
     const slot = root.querySelector<HTMLElement>("[data-kuro-slot]");
     if (slot) body.attach(slot);
     fit();
+    motion?.after();
     // While Kuro crawls between windows, render again when it should stop.
     if (session.movingUntil > Date.now()) later(session.movingUntil - Date.now() + 20, rerender);
     if (focusKey) {
@@ -120,7 +136,8 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     }, ms);
     timers.add(id);
   };
-  const ctx: ActionContext = { store: deps.store, session, rerender, later, play: (id) => playSfx(id, session.muted) };
+  const ctx: ActionContext = { store: deps.store, session, rerender, later, play: (id) => playSfx(id, session.muted), now: () => Date.now() };
+  const motion: MotionHooks | null = deps.motion ? deps.motion(root, ctx, actions) : null;
 
   const onClick = (e: MouseEvent) => {
     const el = (e.target as HTMLElement).closest<HTMLElement>("[data-action]");
@@ -176,6 +193,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     session,
     destroy() {
       unsubscribe();
+      motion?.destroy();
       timers.forEach(clearTimeout);
       if (frame) cancelAnimationFrame(frame);
       root.removeEventListener("click", onClick);

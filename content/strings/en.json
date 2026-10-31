@@ -145,5 +145,6 @@
   "loop.loan.refuse": "Don't.",
   "desktop.screen.left": "Left",
   "desktop.screen.right": "Right",
-  "desktop.back": "Back to room"
+  "desktop.back": "Back to room",
+  "hud.putDown": "Click outside to put it down"
 }

@@ -147,3 +147,33 @@ Appended after each task. Neither Kiro nor Claude edits the other's area without
 - TODO, later specs: hi-res device screens / `gain` outputs (device specs); upgraded objects
   can't block for the good ending (san-and-endings).
 - Tests: 38 files, 556 passing; typecheck clean. Browser not checked.
+
+## 2026-10-31 — polish (motion)
+
+- Spec `polish`: requirements, design (P1–P10) and tasks, from design/hud/motion.md and the mocks
+  held.html, held-object.html and door.html. This is feel only: no state, event or content
+  changes.
+- Motion is a DOM layer around each render (`src/world/motion/dom.ts`):
+  - entries are keyed from session and state and continue across renders via negative delays;
+  - what leaves becomes an inert "ghost" playing its exit.
+- Timings live in one place (`timing.ts`, written to CSS variables). `CHOSEN` lists the values
+  motion.md doesn't give.
+- Snapshot change: one. Desk-bar object slots are now `<button data-action="loop-hold">`, so they
+  can be clicked and reached by keyboard (P9). Everything else is unchanged.
+- Fixed on the way:
+  - The door view was shown as escaped markup text.
+  - The sixth door step (bag on the desk corner) was never shown (W1).
+  - Kuro's bob and the night glow restarted on every re-render.
+- TODO(Claude), strings: `hud.putDown` (suggested 点屏幕外面放下, from the held.html mock; used as
+  the hint and the dim layer's label). Until then it shows as missing.
+- Not done, waiting on other specs:
+  - object keys (1px press, the click sound);
+  - holding an object up to the gap at night;
+  - the desk bar folding away at shutdown;
+  - Kuro going busy → think before a small-window line;
+  - the corridor light following the ring.
+- Provisional: device channels other than the chick's 32×16, and where each screen sits on its
+  shell (`room/held.ts`). Also the room's monitor point for the camera (`ROOM_MONITOR`).
+- Known: at the door, a queued dialogue box sits over the door-beat text (same place, as in the
+  mock).
+- Tests: 39 files, 573 passing; typecheck clean. Not checked in a browser.

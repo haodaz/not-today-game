@@ -19,6 +19,7 @@ import { getLocale, setLocale, tr } from "@world/i18n";
 import { actionOf, itemStates, loopContext, mealToOrder, openTask, type ItemAction } from "@world/loop/checklist";
 import { advance, finishChoice, push } from "@world/loop/dialogue";
 import { beatQueued } from "@world/loop/runtime";
+import { gateAdvance } from "@world/motion/reveal";
 import { boxObjectFor, dialogueBox, doorMeal, renderRoom } from "./hud";
 
 export function renderGame(store: Store, session: Session, nowMs: number): SafeHtml {
@@ -82,8 +83,11 @@ export const loopActions: Record<string, ActionHandler> = {
   view(ctx, data) {
     const view = data.view;
     if (view !== "room" && view !== "door" && view !== "desktop") return;
+    // A finished door beat is forgotten once the player looks away (polish W1).
+    if (ctx.session.view === "door" && view !== "door" && ctx.session.door?.state === "onDesk") ctx.session.door = null;
     ctx.session.view = view;
     ctx.session.phoneOpen = false;
+    ctx.session.holding = null;
     // The desktop opens on the monitor with the current app; looking at it counts.
     if (view === "desktop") stepOnce(ctx, `openApp:${shownApp(ctx.session)}`);
     ctx.rerender();
@@ -111,6 +115,11 @@ export const loopActions: Record<string, ActionHandler> = {
   },
 
   "loop-advance"(ctx) {
+    // A line still appearing is completed first (polish FR3; no reveal in tests: unchanged).
+    if (gateAdvance(ctx.session, ctx.now?.() ?? Date.now())) {
+      ctx.rerender();
+      return;
+    }
     const { dialogue, ended } = advance(ctx.session.dialogue);
     ctx.session.dialogue = dialogue;
     if (ended?.kind === "lieDown") ctx.store.appendEvent({ kind: "lieDown" });
@@ -135,10 +144,28 @@ export const loopActions: Record<string, ActionHandler> = {
   "loop-phone"(ctx) {
     const { session, store } = ctx;
     session.phoneOpen = !session.phoneOpen;
+    session.holding = null;
     // Picking up the phone for a meal moves the beat clock into that meal's window.
     const lc = loopContext(store.getState(), store.getEvents());
     const meal = lc ? mealToOrder(lc) : null;
     if (session.phoneOpen && meal) session.clock = advanceTo(session.clock, deliveryTable.windows[meal][0]);
+    ctx.rerender();
+  },
+
+  // An object off the desk bar (polish FR1): only what is on the desk can be picked up.
+  "loop-hold"(ctx, data) {
+    const { session, store } = ctx;
+    const state = store.getState();
+    const id = data.object ?? "";
+    const onDesk = (state.found as string[]).includes(id) && !state.lost.includes(id);
+    if (!onDesk) return;
+    session.holding = session.holding === id ? null : id;
+    session.phoneOpen = false;
+    ctx.rerender();
+  },
+  "loop-put-down"(ctx) {
+    ctx.session.phoneOpen = false;
+    ctx.session.holding = null;
     ctx.rerender();
   },
 
@@ -170,6 +197,9 @@ export const loopActions: Record<string, ActionHandler> = {
     const input = beat ? nextInputs(beat.state)[0] : undefined;
     if (!beat || !input) return;
     const { beat: moved, emit } = stepDoor(beat, input);
+    // motion.md sounds: the chain as the door opens to it, the lock as it closes.
+    if (input === "openChain") ctx.play?.("chain");
+    if (input === "close") ctx.play?.("lock");
     if (emit) store.appendEvent(emit);
     session.door = moved;
     ctx.rerender();
@@ -221,6 +251,11 @@ export const loopActions: Record<string, ActionHandler> = {
 
 /** Keys: space / Enter read on in the room and at the door; Esc goes back to the room. */
 export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
+  // Esc puts down what is held first (polish FR1).
+  if (e.key === "Escape" && (ctx.session.phoneOpen || ctx.session.holding)) {
+    loopActions["loop-put-down"]!(ctx, {} as DOMStringMap, null as never);
+    return true;
+  }
   if (e.key === "Escape" && ctx.session.view !== "room") {
     ctx.session.view = "room";
     ctx.rerender();
@@ -231,6 +266,8 @@ export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
     const atChoice = (q.ending.kind === "beatChoices" || q.ending.kind === "loan") && ctx.session.dialogue.line >= q.lines.length - 1;
     // At a choice, keys do nothing: the choice is a click.
     if (!atChoice) loopActions["loop-advance"]!(ctx, {} as DOMStringMap, null as never);
+    // At a choice a key can still complete the line above it.
+    else if (gateAdvance(ctx.session, ctx.now?.() ?? Date.now())) ctx.rerender();
     return true;
   }
   return false;

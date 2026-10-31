@@ -2,6 +2,7 @@
 // sprite is two frames per state from public/kuro/, crossfading, with a slow bob. Changing state
 // fades the old layer out and the new one in: never a hard cut. It never takes clicks.
 import { html, type SafeHtml } from "@world/html";
+import { MOTION } from "@world/motion/timing";
 
 export const BODY_STATES = ["idle", "busy", "think", "happy", "rest", "crawl"] as const;
 export type BodyState = (typeof BODY_STATES)[number];
@@ -19,7 +20,7 @@ export const FRAMES: Readonly<Record<BodyState, readonly [string, string]>> = {
 export const frameUrl = (name: string): string => `/kuro/${name}.png`;
 
 /** How long a state change takes to crossfade (matches .kpet .layer transition in desktop.css). */
-export const CROSSFADE_MS = 600;
+export const CROSSFADE_MS = MOTION.kuroFade;
 
 export interface BodyInputs {
   readonly night: boolean;

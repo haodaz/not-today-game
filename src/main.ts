@@ -4,6 +4,7 @@
 // on the desktop; `?focus=right` on the right monitor; `?lang=en` switches the strings.
 import "./world/desktop/desktop.css";
 import "./world/room/room.css";
+import "./world/motion/motion.css";
 import { debugStartDay } from "@state/clock";
 import { createRunSlot } from "@state/saves";
 import { createStore, type Store } from "@state/store";
@@ -12,6 +13,7 @@ import { mountDesktop } from "@world/desktop/controller";
 import { desktopActions } from "@world/desktop/actions";
 import { setLocale } from "@world/i18n";
 import { syncLoop } from "@world/loop/runtime";
+import { createMotion } from "@world/motion/dom";
 import { loopActions, loopKeys, renderGame } from "@world/room/game";
 
 const search = window.location.search;
@@ -51,4 +53,5 @@ mountDesktop(document.getElementById("app")!, {
   },
   onChange: (ctx) => syncLoop(ctx),
   onKey: loopKeys,
+  motion: createMotion,
 });

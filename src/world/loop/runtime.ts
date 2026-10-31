@@ -128,6 +128,8 @@ export function syncLoop(ctx: ActionContext, nowMs: number = Date.now()): void {
       session.clock = { ...DEFAULT_CLOCK };
       session.view = "room";
       session.phoneOpen = false;
+      session.holding = null;
+      session.door = null;
     }
     session.loop = freshMemo(lc, events, nowMs);
     scheduleSelf(ctx, lc);

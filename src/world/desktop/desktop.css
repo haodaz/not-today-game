@@ -210,11 +210,10 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .reply .send:disabled{opacity:.4}
 .conv.empty{align-items:center;justify-content:center;color:var(--ink-3)}
 /* Kuro body: two frames crossfading, a slow bob; never takes clicks. */
-.kpet{pointer-events:none;animation:kuro-bob 3.6s ease-in-out infinite}
-.kpet .layer{position:absolute;inset:0;transition:opacity .6s ease}
+.kpet{pointer-events:none}
+.kpet .layer{position:absolute;inset:0}
 .kpet .layer img{position:absolute;inset:0}
 .kpet .layer img.f2{animation:kuro-frames 2.8s ease-in-out infinite alternate}
-@keyframes kuro-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 @keyframes kuro-frames{0%,35%{opacity:0}65%,100%{opacity:1}}
 .kmini .c .bed{color:var(--ink-3);font-style:italic}
 .kmini .qs button{border:1px solid var(--line);background:#fff;color:var(--ink-2);padding:5px 10px;border-radius:14px;font-size:12px;cursor:pointer;font-family:inherit}
