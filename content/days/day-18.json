@@ -108,7 +108,7 @@
     },
     {
       "id": "slip",
-      "text": "寄件单。",
+      "text": "桌上的寄件单，看一眼。",
       "unlock": "done:box",
       "done": "flag:task_d18_seen",
       "required": false,

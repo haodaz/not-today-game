@@ -175,7 +175,7 @@
     },
     {
       "id": "loan",
-      "text": "老周的事，回一句。",
+      "text": "消息里老周那条，回一句。",
       "unlock": "done:task1",
       "done": "event:loan:decided",
       "required": true,

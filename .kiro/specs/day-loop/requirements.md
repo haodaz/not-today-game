@@ -75,3 +75,6 @@ The author's rule: "the checklist observes our behaviour; the player is the one 
 
 ## Correction 2026-11-01 (author): where Kuro's body sits
 Kuro's HUD body (192 px) sits at the bottom-right corner, **directly above the camera-chip row** and flush with its right edge, so it never overlaps the dialogue box. The chip row is provisional and will go; when it does, Kuro drops to the corner itself. The dialogue box's right edge must stay left of Kuro's left edge at 1600 px.
+
+## Rule 2026-11-01 (author): the first time an action appears, it is instructive
+The first occurrence of every player action must say where to do it, either in the checklist text (content: day 1 says 按一下桌底下的主机, 拿手机, 去门口拿, 屏幕右上角 关机, 床 躺下; day 5 says 消息里老周那条; day 18 says 桌上的寄件单) or by a pointer in the world. Later days go back to the short form. For actions that have no checklist line the first time they appear (the first night's hand, the first upgrade offer, the first 举起来), Kiro adds a one-time pointer: a small arrow or pulse on the thing to click, shown until it is clicked once in that run, never again. Checklist tests must read the item text from the day file, never hard-code it.
