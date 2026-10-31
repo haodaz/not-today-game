@@ -40,3 +40,6 @@ No inventory, no health bar, no clock. The HUD in the room / desk / door views:
 - Bottom-right: three camera chips 房间 / 桌面 / 门 (桌面 opens the desktop view). Bottom-left: a small menu: 声音 · 语言 · 首页 (back to the title page). **No restart inside the game** (author 2026-11-01); restarting exists only on the title page. Saves are automatic.
 - Kuro is not in the room HUD; at night the right monitor's small window glows inside the 3D view.
 - Status is shown by things, never bars: the cup, the room's width (room-scene), the shrinking reply menu.
+
+## Amendment 2026-11-01 (author): one settings button
+The bottom-left row is replaced by a single ⚙ **设置** button. It opens a small centred panel over the current view (dimmed behind): 声音 (on/off), 语言 (中文 / English, switching re-renders immediately from en.json), 返回首页, 取消. The language switch must actually work: `?lang=en` and the panel both set the locale; en.json is complete, missing keys fall back to zh. No restart item anywhere. Strings: `settings.title`, `settings.sound`, `settings.lang`, `settings.home`, `settings.cancel`.
