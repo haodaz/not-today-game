@@ -1,5 +1,6 @@
 // Camera poses in the room splat (room-scene design S1–S3). Pure: no three, no DOM.
 // World coordinates as in public/room/README.md; up is (0,−1,0) for every pose.
+import { CALIBRATION, type Framing } from "./calibration";
 
 export interface Vec3 {
   readonly x: number;
@@ -7,11 +8,15 @@ export interface Vec3 {
   readonly z: number;
 }
 
-/** A camera: where it is, and where it faces (yaw about the up axis, pitch above/below level), radians. */
+/**
+ * A camera: where it is, and where it faces (yaw about the up axis, pitch above/below level),
+ * radians; `fov` is the vertical field of view in degrees (interpolated along a move when set).
+ */
 export interface Pose {
   readonly pos: Vec3;
   readonly yaw: number;
   readonly pitch: number;
+  readonly fov?: number;
 }
 
 export const UP: Vec3 = { x: 0, y: -1, z: 0 };
@@ -33,16 +38,18 @@ export function lookOf(p: Pose, dist = 24): Vec3 {
   return v(p.pos.x + dist * c * Math.sin(p.yaw), p.pos.y + dist * Math.sin(p.pitch), p.pos.z + dist * c * Math.cos(p.yaw));
 }
 
-/** The README's frames (S1). 桌子 is f43 as the spec names it; see DESK_CLOSE_ALT. */
+/** A calibrated framing as a pose. */
+export function poseOf(f: Framing): Pose {
+  return { ...poseFromLook(v(...f.pos), v(...f.look)), fov: f.fov };
+}
+
+/** The framings (calibration.ts): 房间 f080, 桌子 the close-desk pose, 床 f159. */
 export const POSES = {
-  room: poseFromLook(v(-3.127, -0.071, -0.872), v(0.615, -0.118, 22.497)),
-  desk: poseFromLook(v(0.023, 0.053, 0.324), v(-2.706, -0.439, 24.833)),
-  bed: poseFromLook(v(-6.312, 0.068, 4.09), v(9.106, 0.167, 12.6)),
+  room: poseOf(CALIBRATION.room),
+  desk: poseOf(CALIBRATION.desk),
+  bed: poseOf(CALIBRATION.bed),
 } as const;
 export type PoseId = keyof typeof POSES;
-
-/** The README's 凑近桌面 pose, if f43 (listed under the door wall) frames wrongly in room_clean. */
-export const DESK_CLOSE_ALT: Pose = poseFromLook(v(-1.0, 0, 6.0), v(0.6, -0.1, 22.5));
 
 /** Smallest signed angle from a to b, in (−π, π]. */
 export function angleDelta(a: number, b: number): number {
@@ -56,10 +63,12 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 /** From a (t = 0) to b (t = 1): position linear, yaw and pitch along the short arc. */
 export function lerpPose(a: Pose, b: Pose, t: number): Pose {
+  const fov = a.fov !== undefined && b.fov !== undefined ? lerp(a.fov, b.fov, t) : (a.fov ?? b.fov);
   return {
     pos: v(lerp(a.pos.x, b.pos.x, t), lerp(a.pos.y, b.pos.y, t), lerp(a.pos.z, b.pos.z, t)),
     yaw: a.yaw + angleDelta(a.yaw, b.yaw) * t,
     pitch: a.pitch + angleDelta(a.pitch, b.pitch) * t,
+    ...(fov !== undefined ? { fov } : {}),
   };
 }
 
@@ -85,7 +94,7 @@ export const WINDOW_CLAMP: ClampBounds = {
 export function clampPose(p: Pose, b: ClampBounds = WINDOW_CLAMP): Pose {
   const yaw = Math.max(p.yaw, b.yawMin);
   const x = Math.min(p.pos.x, b.xMax);
-  return yaw === p.yaw && x === p.pos.x ? p : { pos: v(x, p.pos.y, p.pos.z), yaw, pitch: p.pitch };
+  return yaw === p.yaw && x === p.pos.x ? p : { ...p, pos: v(x, p.pos.y, p.pos.z), yaw };
 }
 
 export type Clamp = (p: Pose) => Pose;

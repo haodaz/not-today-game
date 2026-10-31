@@ -16,7 +16,7 @@ import { crawlKeyframes, crawlMs, edgePath } from "@world/late/crawl";
 import { heldItem } from "@world/room/held";
 import { holdUntil, lineKey, revealBusy, revealDoneAt, revealShown, startReveal, type Reveal } from "./reveal";
 import { centre, DESK_SHOT, ROOM_SHOT, type Rect } from "@world/room/shots";
-import { applyMotionVars, CHOSEN, choiceDelays, EASE, exitOf, MOTION, ROOM_PUSH } from "./timing";
+import { applyMotionVars, CHOSEN, choiceDelays, EASE, exitOf, MOTION, ROOM_PUSH, viewMoveMs } from "./timing";
 
 interface Ghost {
   readonly el: HTMLElement;
@@ -575,7 +575,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     const stage = q(root, ".stage");
     if (!old || !stage) return;
     const cam = camFor(from, to, old, stage, ctx.session.focus);
-    const dur = cam ? MOTION.view : CHOSEN.doorView;
+    const dur = viewMoveMs(from, to, !!cam);
     move = { from, to, start: t, dur, screenIn: to === "desktop" && cam ? cam.in : null };
     begin("view", t);
 

@@ -162,3 +162,19 @@ Also in this change: Kuro's HUD body is 192 px (late-days FR1, only that line).
   right after it at the same height (a small square plate, 4 px gap). With no tag, ↺ sits alone at
   the tag's place. Same action (`dlg-history`) and label (`dialogue.history`). The loose circle at
   the top-right, and Kuro's offset for it, are gone.
+
+## Addition 2026-11-01: the player's own portrait for inner lines
+
+- `lineBoxModel` gains `playerPortrait: string | null`. It is set only for an `inner` line whose
+  queue item isn't Kuro's voice. Kuro's portrait wins in its own turn, so there are never two.
+- `playerPortraitSrc(pronoun, dream)` → `/player/{she|he|none}{_kid}.png`. The pronoun is the
+  title card's answer (`state.names.pronoun`; null = 不说 → none).
+- `isDreamNight(day, beat)`: the night beat of a day in stages.json `dreamNights`. Then the child
+  version (`_kid`) is shown.
+- Markup: `<img class="player-portrait" alt="" aria-hidden="true">` in Kuro's slot (right 12 px,
+  bottom 0, 200 × 200, `object-fit: contain`, bottom-aligned). It is still: no animation and no
+  motion key. The box gets `me` (padding-right 236 px).
+- Inner lines are laid out with `KURO_LINE_BOX`, left of the portrait (`geomFor(q, lineKind)`).
+- The inner tag stays empty. Narration and speaker lines are unchanged.
+- No dialogue snapshot changed: none of the snapshotted screens is an inner line. The new tests
+  cover the inner box.

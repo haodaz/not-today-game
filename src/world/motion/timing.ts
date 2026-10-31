@@ -66,7 +66,16 @@ export const CHOSEN = {
   wake: MOTION.sleep,
   sleepRisePx: 24,
   chosenHold: MOTION.choice,
+  /** 房间 ↔ 桌子: the splat move and the CSS push under it (room-scene correction 2026-11-01). */
+  roomDesk: 900,
 } as const;
+
+/** How long a view change takes: 房间 ↔ 桌子 900 ms, other camera moves `MOTION.view`, the door `doorView`. */
+export function viewMoveMs(from: string, to: string, camera: boolean): number {
+  if (!camera) return CHOSEN.doorView;
+  const pair = `${from}>${to}`;
+  return pair === "room>desk" || pair === "desk>room" ? CHOSEN.roomDesk : MOTION.view;
+}
 
 /** The phone is never tilted (author 2026-10-31, overriding motion.md's 3° for the phone). */
 export const PHONE_TILT_DEG = 0;

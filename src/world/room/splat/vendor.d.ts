@@ -13,6 +13,7 @@ declare module "three" {
     readonly position: Vector3;
     readonly up: Vector3;
     aspect: number;
+    fov: number;
     lookAt(x: number, y: number, z: number): void;
     updateProjectionMatrix(): void;
   }
@@ -34,6 +35,8 @@ declare module "@mkkellogg/gaussian-splats-3d" {
   export class Viewer {
     constructor(options: {
       selfDrivenMode?: boolean;
+      /** Where the viewer keeps anything it adds to the page. */
+      rootElement?: HTMLElement;
       renderer?: WebGLRenderer;
       camera?: PerspectiveCamera;
       useBuiltInControls?: boolean;

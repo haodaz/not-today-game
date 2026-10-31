@@ -8,3 +8,11 @@
 - [x] 6. Controller `splat` dep; `main.ts` passes `splatForGame(window)` for the game only (never the title). Fix: the motion layer's stage copies keep the centring offsets (polish P11).
 - [x] 7. Tests (`tests/splat.test.ts`, 19 tests).
 - [ ] 8. Check in a browser: load time, frame rate, f43 framing, FOV against the photos, the lamp's position, `vite build` chunking. (Not possible here.)
+
+## Correction 2026-11-01: fit the splat to the stage
+
+- [x] 9. The layer is the stage rectangle from fit.ts (`splatBox`), clipped. The library lives in a `host` (its `rootElement`) inside it.
+- [x] 10. 900 ms moves: `CHOSEN.roomDesk`, `viewMoveMs`, shared by the CSS push and the splat. motion-dom waits and the timeout updated.
+- [x] 11. `calibration.ts` (pos / look / fov per framing). 桌子 = the close-desk pose. Optional fov on poses.
+- [x] 12. `?splatcal=1` (dev only): still pose, photo at 50 %, tuning keys, readout, P prints the table (`calibrate.ts`, pure helpers).
+- [ ] 13. Run the calibration in a browser against desk_close.jpg and room.jpg and paste the table. Measure load time and frame rate. (Not possible here.)

@@ -84,6 +84,9 @@
    above the top; the text column is everything left of it (layout.ts KURO_LINE_BOX: 236 px). */
 .dlg.kuro{padding-right:236px}
 .dlg .kpet.kuro-portrait{position:absolute;right:12px;bottom:0;left:auto;top:auto;width:200px;height:200px;z-index:1;pointer-events:none}
+/* The player's own portrait for inner lines (dialogue addition 2026-11-01): Kuro's slot and size, a still image. */
+.dlg.me{padding-right:236px}
+.dlg .player-portrait{position:absolute;right:12px;bottom:0;width:200px;height:200px;object-fit:contain;object-position:center bottom;z-index:1;pointer-events:none;user-select:none}
 .dlg-player .tag{background:#5b4a2e;top:-18px}
 .dlg .hist{min-width:28px;min-height:28px;border:0;padding:0 7px;border-radius:3px;background:#2a2622;color:#efe9df;display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;cursor:pointer}
 .dlg .hist:hover,.dlg .hist:focus-visible{background:#8b2f2a;outline:none}
@@ -233,8 +236,14 @@
 
 /* The splat layer (room-scene design S5, S8, S10): only during a 房间 ↔ 桌子 move, between the
    CSS push's backdrop copy and the (transparent) arriving stage, at the stage's own fit. */
-#app > .splat-layer{position:absolute;left:var(--stage-x,0px);top:var(--stage-y,0px);width:1600px;height:900px;transform:scale(var(--scale,1));transform-origin:0 0;overflow:hidden;pointer-events:none;background:#000}
-.splat-layer canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* The box is the stage rectangle (left/top/scale set from fit.ts by layer.ts) and clips everything
+   in it, including whatever the splat library adds to its host: nothing reaches the letterbox. */
+#app > .splat-layer{position:absolute;left:0;top:0;width:1600px;height:900px;transform-origin:0 0;overflow:hidden;clip-path:inset(0);contain:paint;pointer-events:none;background:#000}
+.splat-layer .splat-host{position:absolute !important;inset:0 !important;width:100% !important;height:100% !important;overflow:hidden}
+.splat-layer canvas{position:absolute !important;inset:0 !important;width:100% !important;height:100% !important;display:block}
+/* ?splatcal=1 (dev only): the stage's own photo is hidden so the layer's photo sits at 50 % over the splat. */
+#app.splat-cal > .stage{background-image:none !important;background-color:transparent !important}
+.splat-cal-readout{position:fixed;right:8px;top:8px;z-index:90;margin:0;padding:6px 8px;background:rgba(0,0,0,.75);color:#9fe;font:11px/1.4 ui-monospace,monospace;white-space:pre;pointer-events:none}
 .splat-layer .splat-collapsed{opacity:0}
 .splat-layer > div{position:absolute;pointer-events:none}
 .splat-layer .splat-night,.splat-layer .splat-vignette,.splat-layer .splat-photo{inset:0}

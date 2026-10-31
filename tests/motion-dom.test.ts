@@ -11,6 +11,7 @@ import { mountDesktop } from "@world/desktop/controller";
 import type { Session } from "@world/desktop/model";
 import { syncLoop } from "@world/loop/runtime";
 import { createMotion, duplicateKeys, KEYED, motionKey } from "@world/motion/dom";
+import { CHOSEN } from "@world/motion/timing";
 import { loopActions, loopKeys, renderGame } from "@world/room/game";
 
 let destroy: (() => void) | null = null;
@@ -40,6 +41,9 @@ function mount(store: Store, view: Session["view"] = "room") {
   destroy = m.destroy;
   return { root, session: m.session };
 }
+
+/** How long after `midway` a move has surely ended: 房间 ↔ 桌子 take CHOSEN.roomDesk (900 ms), the rest 400 ms. */
+const settle = (what: string) => (/^(room → desk|desk → room)/.test(what) ? CHOSEN.roomDesk : 450);
 
 const backdrops = (root: HTMLElement) => [...root.querySelectorAll(KEYED)].filter((el) => motionKey(el) === "backdrop").length;
 
@@ -95,7 +99,7 @@ describe("the live DOM after a render (fix 2026-10-31)", () => {
         expect(root.querySelector(".stage.desk-view")!.classList.contains("m-nobg"), what).toBe(true);
       }
       await midway(root, session, what);
-      await wait(450);
+      await wait(settle(what));
       await frame();
       check(root, session, `${what} (after)`);
       // Over: the copy is gone and the stage shows its own picture again.
@@ -115,11 +119,12 @@ describe("the live DOM after a render (fix 2026-10-31)", () => {
       await click(root, selector);
       check(root, session, what);
       await midway(root, session, what);
-      await wait(450);
+      await wait(settle(what));
       await frame();
       check(root, session, `${what} (after)`);
     }
-  });
+    // Seven real-time moves, two of them 900 ms (房间 ↔ 桌子): more than the default 5 s.
+  }, 15_000);
 
   it("a held item that changes is replaced at once (phone → object); putting down leaves once", async () => {
     const store = storeAt(1, [

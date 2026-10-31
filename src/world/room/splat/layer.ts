@@ -1,32 +1,41 @@
-// The splat layer (room-scene design S4–S10): during a 房间 ↔ 桌子 move it renders the room splat
-// from the departing pose to the arriving one, behind the (transparent) arriving stage, then fades
-// the arriving photo in over the last 200 ms. No three here: the scene comes from an injected
+// The splat layer (room-scene design S4–S10, S12–S14): during a 房间 ↔ 桌子 move it renders the room
+// splat from the departing pose to the arriving one, behind the (transparent) arriving stage, then
+// fades the arriving photo in over the last 200 ms. No three here: the scene comes from an injected
 // `load`, which the game wires to a dynamic import of ./scene, after the first render.
 // If the scene isn't ready when a move starts, nothing is inserted and the CSS push plays.
+// The layer is exactly the stage rectangle (fit.ts) and clips everything the library puts in it.
 import type { ActionContext } from "@world/desktop/controller";
-import { BACKDROPS } from "@world/fit";
-import { MOTION } from "@world/motion/timing";
+import { BACKDROPS, fitStage, type Fit } from "@world/fit";
+import { viewMoveMs } from "@world/motion/timing";
 import { DESK_SHOT, ROOM_SHOT, type Rect } from "@world/room/shots";
+import { framingOf, formatCalibration, nudge } from "./calibrate";
+import type { Framing } from "./calibration";
 import { splatMoveFor } from "./moves";
-import { easeInOutCubic, poseAt, type CameraMove, type Pose } from "./pose";
+import { easeInOutCubic, POSES, poseAt, type CameraMove, type Pose, type PoseId } from "./pose";
 import { splatLook, type SplatLook } from "./look";
 
 /** The arriving photo fades in over the move's last 200 ms. */
 export const SPLAT_FADE_MS = 200;
+/** In calibration, the photo sits at 50 % over the splat. */
+export const CAL_PHOTO_OPACITY = 0.5;
 /** If the motion layer never gives the photo back, the layer leaves anyway this long after the move. */
 const SAFETY_MS = 500;
 /** The stage the layer covers (the room stage). */
-const STAGE_W = 1600;
-const STAGE_H = 900;
+export const SPLAT_STAGE = { w: 1600, h: 900 } as const;
 
 /** What ./scene provides (and tests fake). */
 export interface SplatScene {
-  /** [clean, collapsed]: the layer mounts them; the collapsed one draws nothing until loaded. */
+  /**
+   * The element the viewers live in (their `rootElement`): it holds both canvases, and anything
+   * else the library adds stays inside the clipped layer.
+   */
+  readonly host: HTMLElement;
+  /** [clean, collapsed]: inside `host`; the collapsed one draws nothing until loaded. */
   readonly canvases: readonly [HTMLCanvasElement, HTMLCanvasElement];
   /** Loads room_collapsed.splat (once); resolves when it can be drawn. */
   ensureCollapsed(): Promise<void>;
   setSize(cssW: number, cssH: number, pixelRatio: number): void;
-  /** One frame of both scenes at this pose; the collapsed one only if loaded and mix > 0. */
+  /** One frame of both scenes at this pose (and its fov); the collapsed one only if loaded and mix > 0. */
   render(pose: Pose, mix: number): void;
   dispose(): void;
 }
@@ -42,6 +51,10 @@ export interface SplatDeps {
   /** When to start loading after the first render (requestIdleCallback or 1 s). */
   readonly idle?: (fn: () => void) => void;
   readonly pixelRatio?: () => number;
+  /** `?splatcal=1` in dev: still poses with the photo at 50 % and the calibration keys. */
+  readonly calibrate?: boolean;
+  /** Where the calibration table is printed (console in the game). */
+  readonly print?: (text: string) => void;
 }
 
 export interface SplatHooks {
@@ -49,6 +62,8 @@ export interface SplatHooks {
   destroy(): void;
   /** For tests and the later pull-out: "idle" | "loading" | "ready" | "off". */
   status(): string;
+  /** Calibration: the poses as currently tuned (dev only). */
+  calibration(): Readonly<Record<PoseId, Framing>>;
 }
 
 /** The gap rect at night, per framing (bed has none yet). */
@@ -62,6 +77,12 @@ function lerpRect(a: Rect | undefined, b: Rect | undefined, t: number): Rect | n
   return { l: lerp(a.l, b.l, t), t: lerp(a.t, b.t, t), w: lerp(a.w, b.w, t), h: lerp(a.h, b.h, t) };
 }
 
+/** The layer's box in the window: the stage rectangle (S12). Pure. */
+export function splatBox(winW: number, winH: number): Fit & { readonly width: number; readonly height: number } {
+  const fit = fitStage(winW, winH, SPLAT_STAGE.w, SPLAT_STAGE.h);
+  return { ...fit, width: SPLAT_STAGE.w * fit.scale, height: SPLAT_STAGE.h * fit.scale };
+}
+
 interface Running {
   readonly from: string;
   readonly to: string;
@@ -70,6 +91,8 @@ interface Running {
   readonly start: number;
   readonly dur: number;
 }
+
+const isPosed = (view: string): view is PoseId => view in POSES;
 
 export function createSplatLayer(deps: SplatDeps) {
   return (root: HTMLElement, ctx: ActionContext): SplatHooks => {
@@ -84,6 +107,7 @@ export function createSplatLayer(deps: SplatDeps) {
       else win?.setTimeout(fn, 1000);
     });
     const pixelRatio = deps.pixelRatio ?? (() => Math.min(2, win?.devicePixelRatio ?? 1));
+    const print = deps.print ?? ((text: string) => console.info(text));
 
     let status: "idle" | "loading" | "ready" | "off" = "idle";
     let scene: SplatScene | null = null;
@@ -93,6 +117,9 @@ export function createSplatLayer(deps: SplatDeps) {
     let frame = 0;
     let el: HTMLElement | null = null;
     let destroyed = false;
+    // Calibration (dev only): the poses being tuned, and the readout.
+    const cal: Record<PoseId, Pose> = { ...POSES };
+    let readout: HTMLElement | null = null;
 
     const load = () => {
       if (status !== "idle" || destroyed) return;
@@ -104,6 +131,7 @@ export function createSplatLayer(deps: SplatDeps) {
           scene = s;
           status = "ready";
           preloadCollapsed();
+          if (deps.calibrate) startCalibration();
         })
         .catch(() => {
           status = "off";
@@ -122,15 +150,15 @@ export function createSplatLayer(deps: SplatDeps) {
         .catch(() => void (collapsed = "no"));
     }
 
-    /** The persistent element: canvases, night layers, vignette, the arriving photo. */
+    /** The persistent element: the library's host (canvases), night layers, vignette, the arriving photo. */
     function build(s: SplatScene): HTMLElement {
       const box = doc.createElement("div");
       box.className = "splat-layer";
       box.setAttribute("aria-hidden", "true");
-      const [clean, coll] = s.canvases;
-      clean.classList.add("splat-clean");
-      coll.classList.add("splat-collapsed");
-      box.append(clean, coll);
+      s.host.classList.add("splat-host");
+      s.canvases[0].classList.add("splat-clean");
+      s.canvases[1].classList.add("splat-collapsed");
+      box.appendChild(s.host);
       for (const cls of ["splat-night", "splat-lamp", "splat-gap", "splat-vignette", "splat-photo"]) {
         const d = doc.createElement("div");
         d.className = cls;
@@ -141,11 +169,34 @@ export function createSplatLayer(deps: SplatDeps) {
 
     const liveStage = (): HTMLElement | null => root.querySelector<HTMLElement>(":scope > .stage:not(.m-ghost):not(.m-backdrop)");
 
-    /** Copy the stage's fit (polish P11) so the layer covers exactly the stage. */
+    /** The stage rectangle from fit.ts; the box clips to it, so nothing is drawn in the letterbox. */
     function place(stage: HTMLElement): void {
       if (!el) return;
-      for (const name of ["--scale", "--stage-x", "--stage-y"]) el.style.setProperty(name, stage.style.getPropertyValue(name));
+      const b = splatBox(root.clientWidth, root.clientHeight);
+      Object.assign(el.style, {
+        left: `${b.left}px`,
+        top: `${b.top}px`,
+        width: `${SPLAT_STAGE.w}px`,
+        height: `${SPLAT_STAGE.h}px`,
+        transform: `scale(${b.scale})`,
+      });
+      // The library may have moved its canvases: keep them in the host, in the box.
+      if (scene && scene.host.parentElement !== el) el.insertBefore(scene.host, el.firstChild);
       if (el.nextElementSibling !== stage) root.insertBefore(el, stage);
+    }
+
+    const part = (sel: string) => el!.querySelector<HTMLElement>(sel)!;
+
+    function paintLayers(from: string, to: string, look: SplatLook, e: number): void {
+      const gap = look.gap === "none" ? null : lerpRect(GAP[from], GAP[to], e);
+      const g = part(".splat-gap");
+      g.hidden = !gap;
+      if (gap) Object.assign(g.style, { left: `${gap.l}px`, top: `${gap.t}px`, width: `${gap.w}px`, height: `${gap.h}px` });
+      const la = LAMP[from];
+      const lb = LAMP[to];
+      const lamp = part(".splat-lamp");
+      lamp.hidden = !look.night || !la || !lb;
+      if (la && lb) Object.assign(lamp.style, { left: `${lerp(la.x, lb.x, e)}px`, top: `${lerp(la.y, lb.y, e)}px` });
     }
 
     function paint(r: Running, t: number): void {
@@ -153,25 +204,17 @@ export function createSplatLayer(deps: SplatDeps) {
       const elapsed = t - r.start;
       const p = Math.min(1, elapsed / r.dur);
       scene.render(poseAt(r.move, p), r.look.mix);
-      const q = (sel: string) => el!.querySelector<HTMLElement>(sel)!;
-      q(".splat-collapsed").style.opacity = String(collapsed === "yes" ? r.look.mix : 0);
-      q(".splat-photo").style.opacity = String(Math.min(1, Math.max(0, (elapsed - (r.dur - SPLAT_FADE_MS)) / SPLAT_FADE_MS)));
-      const e = easeInOutCubic(p);
-      const gap = r.look.gap === "none" ? null : lerpRect(GAP[r.from], GAP[r.to], e);
-      const g = q(".splat-gap");
-      g.hidden = !gap;
-      if (gap) Object.assign(g.style, { left: `${gap.l}px`, top: `${gap.t}px`, width: `${gap.w}px`, height: `${gap.h}px` });
-      const la = LAMP[r.from];
-      const lb = LAMP[r.to];
-      const lamp = q(".splat-lamp");
-      lamp.hidden = !r.look.night || !la || !lb;
-      if (la && lb) Object.assign(lamp.style, { left: `${lerp(la.x, lb.x, e)}px`, top: `${lerp(la.y, lb.y, e)}px` });
+      part(".splat-collapsed").style.opacity = String(collapsed === "yes" ? r.look.mix : 0);
+      part(".splat-photo").style.opacity = String(Math.min(1, Math.max(0, (elapsed - (r.dur - SPLAT_FADE_MS)) / SPLAT_FADE_MS)));
+      paintLayers(r.from, r.to, r.look, easeInOutCubic(p));
     }
 
     function tick(): void {
       frame = 0;
+      if (destroyed) return;
+      if (deps.calibrate && !running) return calTick();
       const r = running;
-      if (!r || destroyed) return;
+      if (!r) return;
       const t = now();
       const stage = liveStage();
       if (stage) place(stage);
@@ -186,7 +229,16 @@ export function createSplatLayer(deps: SplatDeps) {
       running = null;
       if (frame) cancelRaf(frame);
       frame = 0;
+      if (deps.calibrate) {
+        frame = raf(tick);
+        return;
+      }
       el?.remove();
+    }
+
+    function sizeTo(): void {
+      const b = splatBox(root.clientWidth, root.clientHeight);
+      scene?.setSize(SPLAT_STAGE.w, SPLAT_STAGE.h, b.scale * pixelRatio());
     }
 
     function start(from: string, to: string, move: CameraMove, stage: HTMLElement): void {
@@ -195,17 +247,68 @@ export function createSplatLayer(deps: SplatDeps) {
       const look = lookNow();
       el.classList.toggle("night", look.night);
       el.classList.toggle("pink", look.gap === "pink");
-      el.querySelector<HTMLElement>(".splat-photo")!.style.backgroundImage = `url(${BACKDROPS[to as keyof typeof BACKDROPS] ?? BACKDROPS.room})`;
-      const scale = parseFloat(stage.style.getPropertyValue("--scale")) || 1;
-      scene.setSize(STAGE_W, STAGE_H, scale * pixelRatio());
-      running = { from, to, move, look, start: now(), dur: MOTION.view };
+      part(".splat-photo").style.backgroundImage = `url(${BACKDROPS[to as keyof typeof BACKDROPS] ?? BACKDROPS.room})`;
+      sizeTo();
+      running = { from, to, move, look, start: now(), dur: viewMoveMs(from, to, true) };
       place(stage);
       paint(running, running.start);
+      if (frame) cancelRaf(frame);
+      frame = raf(tick);
+    }
+
+    // ——— calibration (dev only, `?splatcal=1`) ———
+
+    function startCalibration(): void {
+      if (!scene) return;
+      el ??= build(scene);
+      root.classList.add("splat-cal");
+      readout = doc.createElement("pre");
+      readout.className = "splat-cal-readout";
+      sizeTo();
+      win?.addEventListener("keydown", onCalKey, true);
       if (!frame) frame = raf(tick);
+    }
+
+    function calTick(): void {
+      const view = ctx.session.view;
+      const stage = liveStage();
+      if (stage && isPosed(view) && el) {
+        place(stage);
+        const look = lookNow();
+        el.classList.toggle("night", look.night);
+        el.classList.toggle("pink", look.gap === "pink");
+        part(".splat-photo").style.backgroundImage = `url(${BACKDROPS[view as keyof typeof BACKDROPS] ?? BACKDROPS.room})`;
+        part(".splat-photo").style.opacity = String(CAL_PHOTO_OPACITY);
+        part(".splat-collapsed").style.opacity = "0";
+        scene?.render(cal[view], 0);
+        paintLayers(view, view, look, 1);
+        if (readout) {
+          readout.textContent = `${view}\n${formatCalibration({ [view]: framingOf(cal[view]) })}`;
+          if (readout.parentElement !== root) root.appendChild(readout);
+        }
+      } else {
+        el?.remove();
+      }
+      frame = raf(tick);
+    }
+
+    function onCalKey(e: KeyboardEvent): void {
+      const view = ctx.session.view;
+      if (!isPosed(view) || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key === "p" || e.key === "P") {
+        print(formatCalibration(Object.fromEntries(Object.entries(cal).map(([id, p]) => [id, framingOf(p)]))));
+      } else {
+        const next = nudge(cal[view], e.key, e.shiftKey);
+        if (!next) return;
+        cal[view] = next;
+      }
+      e.preventDefault();
+      e.stopImmediatePropagation();
     }
 
     return {
       status: () => status,
+      calibration: () => Object.fromEntries(Object.entries(cal).map(([id, p]) => [id, framingOf(p)])) as Record<PoseId, Framing>,
       after() {
         if (destroyed) return;
         const view = ctx.session.view;
@@ -219,6 +322,7 @@ export function createSplatLayer(deps: SplatDeps) {
           if (view === running.to) return;
           finish();
         }
+        if (deps.calibrate && stage) place(stage);
         preloadCollapsed();
         if (view === prev || status !== "ready" || !stage) return;
         const move = splatMoveFor(prev, view);
@@ -226,11 +330,17 @@ export function createSplatLayer(deps: SplatDeps) {
         // this replaces, and its backdrop copy stays underneath as the fallback.
         if (!move || !stage.classList.contains("m-nobg")) return;
         if (lookNow().mix > 0 && collapsed !== "yes") return;
-        start(prev, view, move, stage);
+        start(prev, view, deps.calibrate ? { from: cal[prev as PoseId], to: cal[view as PoseId] } : move, stage);
       },
       destroy() {
         destroyed = true;
-        finish();
+        running = null;
+        if (frame) cancelRaf(frame);
+        frame = 0;
+        el?.remove();
+        readout?.remove();
+        root.classList.remove("splat-cal");
+        win?.removeEventListener("keydown", onCalKey, true);
         scene?.dispose();
         scene = null;
       },

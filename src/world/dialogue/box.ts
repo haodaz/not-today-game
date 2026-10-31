@@ -6,6 +6,7 @@
 // out. Every text is content's or a string.
 import type { GameEvent } from "@state/events";
 import { isRaidNight } from "@state/nights";
+import { dreamNights } from "@state/stages";
 import type { State } from "@state/types.gen";
 import { isNight } from "@world/desktop/beat";
 import type { BodyState } from "@world/desktop/kuro/body";
@@ -22,8 +23,22 @@ import { pointerCls } from "@world/room/pointer";
 import { lateRing } from "@world/late/rings";
 import { choiceScreens, fontPx, KURO_LINE_BOX, LINE_BOX, marker, screens, type BoxGeom, type Screen } from "./layout";
 
-/** Kuro's lines are laid out left of its portrait. */
-export const geomFor = (q: Queued | undefined): BoxGeom => (q?.voice === "kuro" ? KURO_LINE_BOX : LINE_BOX);
+/**
+ * Lines with a portrait at the box's right end are laid out left of it: Kuro's lines, and the
+ * player's inner lines (dialogue addition 2026-11-01). Same slot, same size.
+ */
+export const geomFor = (q: Queued | undefined, lineKind?: string): BoxGeom => (q?.voice === "kuro" || lineKind === "inner" ? KURO_LINE_BOX : LINE_BOX);
+
+/** The night beat of a dream night (stages.json `dreamNights`): inner lines are the child's. */
+export const isDreamNight = (day: number, beat: string): boolean => beat === "night" && dreamNights.includes(day);
+
+/**
+ * The player's portrait for inner lines (dialogue addition 2026-11-01): a still, faceless bust by
+ * the title card's pronoun answer (她 she / 他 he / 不说 none); the child's on dream nights.
+ */
+export function playerPortraitSrc(pronoun: State["names"]["pronoun"], dream: boolean): string {
+  return `/player/${pronoun ?? "none"}${dream ? "_kid" : ""}.png`;
+}
 
 /**
  * The portrait's state (dialogue correction 2026-11-01): busy while its line is appearing, else
@@ -63,6 +78,8 @@ export interface LineBoxModel {
   readonly raised: boolean;
   /** Kuro is speaking: its portrait stands at the box's right end, in this state. */
   readonly portrait: BodyState | null;
+  /** An inner line: the player's still portrait in the same slot (never with Kuro's). */
+  readonly playerPortrait: string | null;
   /** The one-time pointer on these choices (the first night's hand), or none. */
   readonly pointer: string | false;
   /** Red eyes on the portrait (late-days FR2). */
@@ -84,7 +101,7 @@ export function lineScreens(state: State, session: Session): { readonly all: rea
   if (!show) return null;
   const fill = (s: string) => fillPlaceholders(s, state.names);
   const labels = show.choices?.map((c) => (c.text !== null ? fill(c.text) : t(c.labelKey!))) ?? null;
-  const all = screens(show.line ? fill(show.line.t) : null, labels, geomFor(session.dialogue.queue[0]), fontPx(getLocale()));
+  const all = screens(show.line ? fill(show.line.t) : null, labels, geomFor(session.dialogue.queue[0], show.line?.k), fontPx(getLocale()));
   return { all, page: Math.min(Math.max(0, session.dialogue.page ?? 0), all.length - 1) };
 }
 
@@ -115,6 +132,7 @@ export function lineBoxModel(state: State, events: readonly GameEvent[], session
     count: at.all.length,
     raised: playerBox(state, events, session) !== null,
     portrait: head.voice === "kuro" ? portraitState(state, events, session, nowMs) : null,
+    playerPortrait: head.voice !== "kuro" && kind === "inner" ? playerPortraitSrc(state.names.pronoun, isDreamNight(state.day, session.clock.beat)) : null,
     // The first night's hand has no checklist line: a one-time pointer on its choices.
     pointer: pointerCls(session, "raid", scr.choices.length > 0 && raidShowing(state, session)),
     red: lateRing(state.day),
@@ -136,6 +154,9 @@ function tagOf(tag: BoxTag): SafeHtml | null {
 const portraitOf = (state: BodyState, red: boolean): SafeHtml =>
   html`<span class="kpet kuro-portrait" data-kuro-slot data-state="${state}"${red ? html` data-red="1"` : null} aria-hidden="true"></span>`;
 
+/** The player's portrait: a still image in Kuro's slot; decorative (the line is the content). */
+const playerPortraitOf = (src: string): SafeHtml => html`<img class="player-portrait" src="${src}" alt="" aria-hidden="true" draggable="false">`;
+
 const historyChip = (): SafeHtml => html`<button type="button" class="hist" data-action="dlg-history" aria-haspopup="dialog" aria-label="${t("dialogue.history")}">↺</button>`;
 
 export function renderLineBox(m: LineBoxModel): SafeHtml {
@@ -152,9 +173,12 @@ export function renderLineBox(m: LineBoxModel): SafeHtml {
       : html`<span class="more" aria-hidden="true">${glyph}</span>`;
   // A tag on the top edge pushes the text down below it (`tagged`).
   const tag = tagOf(m.tag);
-  const c = cls("dlg", m.kind !== "line" && m.kind, tag && "tagged", m.tag?.kind === "kuro" && "kuro", m.choices.length > 0 && "has-choices", m.raised && "raised");
+  const me = !m.portrait && m.playerPortrait !== null;
+  const c = cls("dlg", m.kind !== "line" && m.kind, tag && "tagged", m.tag?.kind === "kuro" && "kuro", me && "me", m.choices.length > 0 && "has-choices", m.raised && "raised");
+  // One portrait at most: Kuro's for its lines, else the player's for an inner line.
+  const portrait = m.portrait ? portraitOf(m.portrait, m.red) : me ? playerPortraitOf(m.playerPortrait!) : null;
   // The tag strip on the top edge: the name tag, then ↺ right after it (alone when there is no tag).
-  return html`<div class="${c}" data-screen="${m.screen + 1}/${m.count}"><div class="tagbar">${tag}${historyChip()}</div>${txt}${m.choices.length ? html`<div class="${cls("choices", m.pointer)}">${buttons}</div>` : null}${mk}${m.portrait ? portraitOf(m.portrait, m.red) : null}</div>`;
+  return html`<div class="${c}" data-screen="${m.screen + 1}/${m.count}"><div class="tagbar">${tag}${historyChip()}</div>${txt}${m.choices.length ? html`<div class="${cls("choices", m.pointer)}">${buttons}</div>` : null}${mk}${portrait}</div>`;
 }
 
 /** The player's box: the starter questions as choices, or one text input (Enter sends). */

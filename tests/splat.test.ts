@@ -21,6 +21,11 @@ import { createSplatLayer, SPLAT_FADE_MS, type LoadScene, type SplatHooks, type 
 import { COLLAPSE_MIX, collapseMix, splatLook } from "@world/room/splat/look";
 import { splatMoveFor } from "@world/room/splat/moves";
 import { angleDelta, clampPose, easeInOutCubic, lerpPose, lookOf, poseAt, poseFromLook, POSES, WINDOW_CLAMP, type Pose } from "@world/room/splat/pose";
+import { CALIBRATION } from "@world/room/splat/calibration";
+import { formatCalibration, framingOf, nudge, poseOfRow } from "@world/room/splat/calibrate";
+import { calibrating } from "@world/room/splat";
+import { CHOSEN, viewMoveMs } from "@world/motion/timing";
+import { fitStage } from "@world/fit";
 
 const deg = (r: number) => (r * 180) / Math.PI;
 const near = (a: Pose, b: Pose, digits = 6) => {
@@ -32,16 +37,27 @@ const near = (a: Pose, b: Pose, digits = 6) => {
 };
 
 describe("poses (README) and interpolation", () => {
-  it("the three frames: 房间 f080, 桌子 f43, 床 f159, as pos + look", () => {
-    expect(POSES.room.pos).toEqual({ x: -3.127, y: -0.071, z: -0.872 });
-    expect(POSES.desk.pos).toEqual({ x: 0.023, y: 0.053, z: 0.324 });
-    expect(POSES.bed.pos).toEqual({ x: -6.312, y: 0.068, z: 4.09 });
+  it("the three framings come from calibration.ts: 房间 f080, 桌子 the close-desk pose (not f43), 床 f159", () => {
+    for (const id of ["room", "desk", "bed"] as const) {
+      const f = CALIBRATION[id];
+      expect(POSES[id].pos).toEqual({ x: f.pos[0], y: f.pos[1], z: f.pos[2] });
+      expect(POSES[id].fov).toBe(f.fov);
+    }
+    expect(CALIBRATION.desk.pos).toEqual([-1.0, 0, 6.0]);
+    expect(CALIBRATION.desk.look).toEqual([0.6, -0.1, 22.5]);
     // lookOf goes back along the same direction.
     const back = poseFromLook(POSES.room.pos, lookOf(POSES.room));
     near(back, POSES.room);
     expect(deg(POSES.room.yaw)).toBeCloseTo(9.1, 1);
-    expect(deg(POSES.desk.yaw)).toBeCloseTo(-6.35, 1);
+    expect(deg(POSES.desk.yaw)).toBeCloseTo(5.54, 1);
     expect(deg(POSES.bed.yaw)).toBeCloseTo(61.1, 1);
+  });
+
+  it("the fov interpolates along a move when both ends have one", () => {
+    const a = { ...POSES.room, fov: 40 };
+    const b = { ...POSES.desk, fov: 60 };
+    expect(lerpPose(a, b, 0.5).fov).toBe(50);
+    expect(lerpPose({ ...a, fov: undefined }, b, 0.5).fov).toBe(60);
   });
 
   it("lerpPose: the endpoints, the midpoint, the short arc", () => {
@@ -168,8 +184,12 @@ function fakeScene() {
   const poses: Pose[] = [];
   const mixes: number[] = [];
   let disposed = 0;
+  const canvases = [document.createElement("canvas"), document.createElement("canvas")] as [HTMLCanvasElement, HTMLCanvasElement];
+  const host = document.createElement("div");
+  host.append(...canvases);
   const scene: SplatScene = {
-    canvases: [document.createElement("canvas"), document.createElement("canvas")],
+    host,
+    canvases,
     ensureCollapsed: () => Promise.resolve(),
     setSize: () => {},
     render: (p, mix) => void (poses.push(p), mixes.push(mix)),
@@ -188,12 +208,17 @@ afterEach(() => {
   document.body.innerHTML = "";
 });
 
-function mount(opts: { load?: LoadScene; day?: number; view?: Session["view"] } = {}) {
+function mount(opts: { load?: LoadScene; day?: number; view?: Session["view"]; size?: [number, number]; calibrate?: boolean; print?: (s: string) => void } = {}) {
   const root = document.createElement("div");
   root.id = "app";
+  if (opts.size) {
+    const [w, h] = opts.size;
+    Object.defineProperty(root, "clientWidth", { get: () => w });
+    Object.defineProperty(root, "clientHeight", { get: () => h });
+  }
   document.body.appendChild(root);
   let hooks: SplatHooks | null = null;
-  const layer = opts.load ? createSplatLayer({ load: opts.load, idle: (fn) => fn() }) : null;
+  const layer = opts.load ? createSplatLayer({ load: opts.load, idle: (fn) => fn(), calibrate: opts.calibrate, print: opts.print }) : null;
   const m = mountDesktop(root, {
     store: createStore({ startDay: opts.day ?? 1 }),
     clock: DEFAULT_CLOCK,
@@ -247,7 +272,7 @@ describe("the layer: fallback, the move, the cross-fade", () => {
 
   it("ready: 房间 → 桌子 renders the splat from the room pose toward the desk pose, behind the stage, then leaves", async () => {
     const fake = fakeScene();
-    const r = mount({ load: async () => fake.scene });
+    const r = mount({ load: async () => fake.scene, size: [2185, 1160] });
     await frame();
     await wait(0);
     expect(r.hooks().status()).toBe("ready");
@@ -258,7 +283,15 @@ describe("the layer: fallback, the move, the cross-fade", () => {
     const stage = layer!.nextElementSibling as HTMLElement;
     expect(stage.classList.contains("stage")).toBe(true);
     expect(stage.classList.contains("m-nobg")).toBe(true);
-    expect(layer!.style.getPropertyValue("--scale")).toBe(stage.style.getPropertyValue("--scale"));
+    // Exactly the stage rectangle (fit.ts), the library's host inside it.
+    const fit = fitStage(2185, 1160, 1600, 900);
+    expect(parseFloat(layer!.style.left)).toBeCloseTo(fit.left, 3);
+    expect(parseFloat(layer!.style.top)).toBeCloseTo(fit.top, 3);
+    expect(layer!.style.width).toBe("1600px");
+    expect(layer!.style.height).toBe("900px");
+    expect(layer!.style.transform).toBe(`scale(${fit.scale})`);
+    expect(parseFloat(layer!.style.left)).toBeCloseTo(parseFloat(stage.style.getPropertyValue("--stage-x")), 3);
+    expect(fake.scene.host.parentElement).toBe(layer);
     for (const cls of ["splat-clean", "splat-collapsed", "splat-vignette", "splat-photo", "splat-night", "splat-gap", "splat-lamp"]) expect(layer!.querySelector(`.${cls}`), cls).not.toBeNull();
     expect(layer!.querySelector<HTMLElement>(".splat-photo")!.style.backgroundImage).toContain(BACKDROPS.desk);
     near(fake.poses[0]!, POSES.room, 3);
@@ -271,8 +304,14 @@ describe("the layer: fallback, the move, the cross-fade", () => {
     expect(r.root.querySelectorAll(":scope > .splat-layer")).toHaveLength(1);
     expect(r.root.querySelector(":scope > .splat-layer")!.nextElementSibling!.classList.contains("stage")).toBe(true);
 
+    // Still moving past the old 400 ms: the move and the CSS push under it last 900 ms.
+    await wait(MOTION.view + 100 - 120);
+    expect(r.root.querySelector(":scope > .splat-layer")).not.toBeNull();
+    expect(r.root.querySelector(":scope > .stage:not(.m-ghost):not(.m-backdrop)")!.classList.contains("m-nobg")).toBe(true);
+    expect(r.root.querySelector(":scope > .m-backdrop")).not.toBeNull();
+
     // After the move: gone; the last poses reached the desk; the photo had faded in.
-    await wait(MOTION.view + 300);
+    await wait(CHOSEN.roomDesk - MOTION.view + 300);
     expect(splatNodes(r.root)).toBe(0);
     near(fake.poses.at(-1)!, POSES.desk, 3);
     for (const p of fake.poses) expect(clampPose(p)).toEqual(p);
@@ -297,7 +336,81 @@ describe("the layer: fallback, the move, the cross-fade", () => {
     await go(r.root, "desk");
     expect(r.root.querySelector(".splat-layer")).not.toBeNull();
     expect(fake.mixes[0]).toBe(1);
-    await wait(MOTION.view + 300);
+    await wait(CHOSEN.roomDesk + 300);
+  });
+
+  it("calibration (?splatcal=1, dev): the still pose with the photo at 50 %, keys tune it, P prints the table", async () => {
+    const fake = fakeScene();
+    const printed: string[] = [];
+    const r = mount({ load: async () => fake.scene, calibrate: true, print: (s) => void printed.push(s) });
+    await frame();
+    await wait(0);
+    await frame();
+    await frame();
+    expect(r.root.classList.contains("splat-cal")).toBe(true);
+    const layer = r.root.querySelector<HTMLElement>(":scope > .splat-layer")!;
+    expect(layer).not.toBeNull();
+    expect(layer.querySelector<HTMLElement>(".splat-photo")!.style.opacity).toBe("0.5");
+    expect(layer.querySelector<HTMLElement>(".splat-photo")!.style.backgroundImage).toContain(BACKDROPS.room);
+    near(fake.poses.at(-1)!, POSES.room, 6);
+    expect(r.root.querySelector(".splat-cal-readout")!.textContent).toContain("room: { pos:");
+    // A key: the pose turns; the game never sees it.
+    let gameSaw = 0;
+    const onKey = () => void gameSaw++;
+    window.addEventListener("keydown", onKey);
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", shiftKey: true }));
+    await frame();
+    await frame();
+    expect(fake.poses.at(-1)!.yaw).toBeCloseTo(POSES.room.yaw + Math.PI / 180, 6);
+    expect(gameSaw).toBe(0);
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "p" }));
+    expect(printed).toHaveLength(1);
+    expect(printed[0]).toContain("desk: { pos: [-1, 0, 6]");
+    expect(r.hooks().calibration().room.look).not.toEqual(CALIBRATION.room.look);
+    window.removeEventListener("keydown", onKey);
+    destroy!();
+    destroy = null;
+    expect(document.querySelector(".splat-cal")).toBeNull();
+  });
+});
+
+describe("900 ms moves and calibration helpers", () => {
+  it("房间 ↔ 桌子 take 900 ms (the CSS push too); 屏幕 keeps 400 ms; the door its own", () => {
+    expect(CHOSEN.roomDesk).toBe(900);
+    expect(viewMoveMs("room", "desk", true)).toBe(900);
+    expect(viewMoveMs("desk", "room", true)).toBe(900);
+    expect(viewMoveMs("desk", "desktop", true)).toBe(MOTION.view);
+    expect(viewMoveMs("room", "door", false)).toBe(CHOSEN.doorView);
+  });
+
+  it("calibration only with ?splatcal=1 in a dev build", () => {
+    expect(calibrating("?splatcal=1", true)).toBe(true);
+    expect(calibrating("?splatcal=1", false)).toBe(false);
+    expect(calibrating("", true)).toBe(false);
+    expect(calibrating("?splatcal=0", true)).toBe(false);
+  });
+
+  it("nudge: each key moves one axis; other keys are not calibration keys", () => {
+    const p = POSES.desk;
+    expect(nudge(p, "ArrowLeft", false)!.yaw).toBeCloseTo(p.yaw - (0.1 * Math.PI) / 180, 9);
+    expect(nudge(p, "ArrowUp", true)!.pitch).toBeCloseTo(p.pitch + Math.PI / 180, 9);
+    expect(nudge(p, "]", false)!.fov).toBe((p.fov ?? 50) + 0.5);
+    expect(nudge(p, "[", true)!.fov).toBe((p.fov ?? 50) - 5);
+    const w = nudge(p, "w", false)!;
+    expect(Math.hypot(w.pos.x - p.pos.x, w.pos.z - p.pos.z)).toBeCloseTo(0.02, 9);
+    expect(nudge(p, "R", false)!.pos.y).toBeCloseTo(p.pos.y - 0.02, 9);
+    expect(nudge(p, "Escape", false)).toBeNull();
+    expect(nudge(p, "x", false)).toBeNull();
+  });
+
+  it("the printed table round-trips: the shipped calibration prints as calibration.ts's rows", () => {
+    for (const id of ["room", "desk", "bed"] as const) {
+      const row = framingOf(poseOfRow(CALIBRATION[id]));
+      expect(row.pos).toEqual([...CALIBRATION[id].pos]);
+      expect(row.fov).toBe(CALIBRATION[id].fov);
+      near(poseOfRow(row), POSES[id], 3);
+    }
+    expect(formatCalibration({ desk: framingOf(POSES.desk) })).toMatch(/^ {2}desk: \{ pos: \[-1, 0, 6\], look: \[[-\d., ]+\], fov: 50 \},$/);
   });
 
   it("destroy disposes the scene", async () => {

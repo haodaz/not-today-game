@@ -15,7 +15,8 @@ import type { BeatClock } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
 import { kuroDay, offlineAnswer } from "@world/desktop/kuro/days";
 import { initialSession, type Session } from "@world/desktop/model";
-import { dialogueBox, lineScreens } from "@world/dialogue/box";
+import { dialogueBox, isDreamNight, lineScreens, playerPortraitSrc } from "@world/dialogue/box";
+import { dreamNights } from "@state/stages";
 import { charWidth, fontPx, KURO_LINE_BOX, KURO_PORTRAIT, LINE_BOX, marker, PLAYER_BOX, screens, textArea, wrap } from "@world/dialogue/layout";
 import { startReveal } from "@world/motion/reveal";
 import { escapeHtml } from "@world/html";
@@ -120,7 +121,8 @@ describe("FR1 the box: snapshots", () => {
     const ctx = ctxOf(storeAt(1), WORK);
     const inner = [...dayFiles.values()].flatMap((d) => Object.values(d.beats).flatMap((b) => b?.say ?? [])).find((l) => l.k === "inner")!;
     ctx.session.dialogue = push(EMPTY_DIALOGUE, queueOf("i", [inner]));
-    expect(out(ctx)).toMatch(/^<div class="dlg inner"/);
+    // `me`: the player's portrait stands in the box (addition 2026-11-01).
+    expect(out(ctx)).toMatch(/^<div class="dlg inner me"/);
     expect(out(ctx)).not.toContain("who tag");
     const sfx = [...dayFiles.values()].flatMap((d) => Object.values(d.beats).flatMap((b) => b?.say ?? [])).find((l) => l.k === "sfx")!;
     ctx.session.dialogue = push(EMPTY_DIALOGUE, queueOf("s", [sfx]));
@@ -456,5 +458,86 @@ describe("FR3 properties", () => {
         expect(wrap(txt, textArea(LINE_BOX, px), px).length, `${line.t.slice(0, 20)} p${page}`).toBeLessThanOrEqual(LINE_BOX.rows);
       }
     }
+  });
+});
+
+describe("addition 2026-11-01: the player's own portrait for inner lines", () => {
+  const allSay = [...dayFiles.values()].flatMap((d) => Object.values(d.beats).flatMap((b) => b?.say ?? []));
+  const inner = allSay.find((l) => l.k === "inner")!;
+  const speaker = allSay.find((l) => l.k === "speaker")!;
+  const withPronoun = (pronoun: "she" | "he" | null, day = 1): Store => {
+    const store = createStore({ startDay: 1 });
+    store.appendEvent({ kind: "names", names: { login: "林一", nick: "一一", calledBy: "老大", bossCalls: "小林", pronoun } });
+    while (store.getState().day < day) store.appendEvent({ kind: "lieDown" });
+    return store;
+  };
+  const portraits = (box: string) => (box.match(/class="player-portrait"|kuro-portrait/g) ?? []).length;
+
+  it("the pronoun answer chooses the file: 她 she.png, 他 he.png, 不说 none.png", () => {
+    expect(playerPortraitSrc("she", false)).toBe("/player/she.png");
+    expect(playerPortraitSrc("he", false)).toBe("/player/he.png");
+    expect(playerPortraitSrc(null, false)).toBe("/player/none.png");
+    for (const [pronoun, file] of [["she", "she"], ["he", "he"], [null, "none"]] as const) {
+      const ctx = ctxOf(withPronoun(pronoun), WORK);
+      ctx.session.dialogue = push(EMPTY_DIALOGUE, queueOf("i", [inner]));
+      const box = out(ctx);
+      expect(box).toContain(`<img class="player-portrait" src="/player/${file}.png" alt="" aria-hidden="true" draggable="false">`);
+      expect(box).toMatch(/^<div class="dlg inner me"/);
+      // The inner tag stays empty.
+      expect(box).not.toContain("who tag");
+    }
+  });
+
+  it("dream nights (stages.json dreamNights) show the child: _kid; not by day, not on other nights", () => {
+    expect(playerPortraitSrc("she", true)).toBe("/player/she_kid.png");
+    expect(playerPortraitSrc(null, true)).toBe("/player/none_kid.png");
+    const dream = dreamNights[0]!;
+    expect(isDreamNight(dream, "night")).toBe(true);
+    expect(isDreamNight(dream, "work")).toBe(false);
+    expect(isDreamNight(dream - 1, "night")).toBe(dreamNights.includes(dream - 1));
+    const at = (day: number, clock: BeatClock) => {
+      const ctx = ctxOf(withPronoun("he", day), clock);
+      ctx.session.dialogue = push(EMPTY_DIALOGUE, queueOf("i", [inner]));
+      return out(ctx);
+    };
+    expect(at(dream, NIGHT)).toContain('src="/player/he_kid.png"');
+    expect(at(dream, WORK)).toContain('src="/player/he.png"');
+    const plainNight = [1, 2, 3, 4].find((d) => !dreamNights.includes(d))!;
+    expect(at(plainNight, NIGHT)).toContain('src="/player/he.png"');
+  });
+
+  it("narration and speaker lines keep no portrait; Kuro's turn shows only Kuro's: never two at once", () => {
+    const ctx = ctxOf(withPronoun("she"), WORK);
+    ctx.session.dialogue = push(EMPTY_DIALOGUE, queueOf("n", [narration]));
+    expect(portraits(out(ctx))).toBe(0);
+    ctx.session.dialogue = push(EMPTY_DIALOGUE, queueOf("s", [speaker]));
+    expect(portraits(out(ctx))).toBe(0);
+    ctx.session.dialogue = push(EMPTY_DIALOGUE, { ...queueOf("k", [inner]), voice: "kuro" });
+    const kuro = out(ctx);
+    expect(portraits(kuro)).toBe(1);
+    expect(kuro).toContain("kuro-portrait");
+    expect(kuro).not.toContain("player-portrait");
+    fc.assert(
+      fc.property(fc.constantFrom(inner, speaker, narration), fc.boolean(), fc.constantFrom("she", "he", null), (line, isKuro, pronoun) => {
+        const c = ctxOf(withPronoun(pronoun), WORK);
+        c.session.dialogue = push(EMPTY_DIALOGUE, isKuro ? { ...queueOf("q", [line]), voice: "kuro" } : queueOf("q", [line]));
+        expect(portraits(out(c))).toBeLessThanOrEqual(1);
+      }),
+      { numRuns: 30 },
+    );
+  });
+
+  it("inner lines wrap left of the portrait, like Kuro's; the CSS uses Kuro's slot and size, and no animation", () => {
+    const ctx = ctxOf(withPronoun(null), WORK);
+    ctx.session.dialogue = push(EMPTY_DIALOGUE, queueOf("i", [inner]));
+    const at = lineScreens(ctx.store.getState(), ctx.session)!;
+    expect(at.all).toEqual(screens(inner.t, null, KURO_LINE_BOX, fontPx("zh")));
+    const css = readFileSync(resolve(__dirname, "../src/world/room/room.css"), "utf8");
+    const rule = /\.dlg \.player-portrait\{([^}]*)\}/.exec(css)![1]!;
+    expect(rule).toContain(`right:${KURO_PORTRAIT.right}px`);
+    expect(rule).toContain(`width:${KURO_PORTRAIT.size}px`);
+    expect(rule).toContain(`height:${KURO_PORTRAIT.size}px`);
+    expect(rule).not.toContain("animation");
+    expect(css).toMatch(/\.dlg\.me\{padding-right:236px\}/);
   });
 });

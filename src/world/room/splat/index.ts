@@ -7,7 +7,13 @@ import { createSplatLayer, type LoadScene } from "./layer";
 export const loadSplatScene: LoadScene = (doc) => import("./scene").then((m) => m.createSplatScene(doc));
 
 /** The controller's `splat` dep for this window, or undefined when off (`?splat=0`, no WebGL, reduced motion). */
-export function splatForGame(win: Window, load: LoadScene = loadSplatScene) {
-  const on = splatEnabled({ search: win.location.search, webgl: hasWebGL(win.document), reducedMotion: prefersReducedMotion(win) });
-  return on ? createSplatLayer({ load }) : undefined;
+export function splatForGame(win: Window, load: LoadScene = loadSplatScene, dev: boolean = import.meta.env?.DEV ?? false) {
+  const search = win.location.search;
+  const on = splatEnabled({ search, webgl: hasWebGL(win.document), reducedMotion: prefersReducedMotion(win) });
+  return on ? createSplatLayer({ load, calibrate: calibrating(search, dev) }) : undefined;
+}
+
+/** `?splatcal=1`, in a dev build only (never in production). */
+export function calibrating(search: string, dev: boolean): boolean {
+  return dev && new URLSearchParams(search).get("splatcal") === "1";
 }

@@ -655,3 +655,21 @@ Appended after each task. Neither Kiro nor Claude edits the other's area without
   declarations of the library's API, which I couldn't confirm in the bundle here. No load time, no
   frame rate, no `vite build` chunk check.
 - Tests: 53 files, 808 passing; typecheck clean.
+
+## 2026-11-01 — room-scene: fit the splat to the stage; dialogue: the player's portrait
+
+- room-scene (design S12–S14, tasks 9–12):
+  - The layer is the stage rectangle from `fitStage` and is clipped. The library gets a `host`
+    element (its `rootElement`) inside the layer.
+  - 房间 ↔ 桌子 take 900 ms (`CHOSEN.roomDesk`, `viewMoveMs`), for both the CSS push and the splat.
+  - 桌子 is the README's close-desk pose. Poses and FOV live in `calibration.ts`.
+  - `?splatcal=1` (dev only) adds the 50 % photo overlay and the tuning keys, and prints the table.
+  - **Not calibrated:** no browser here. The FOV stays the provisional 50°, the poses are the
+    README's, and no load time or frame rate was measured.
+- dialogue: inner lines show `/player/{she,he,none}.png` (or `_kid` on a dream night) in Kuro's
+  slot, never both. No snapshot changed.
+- Tests: the motion-dom camera test now waits for 900 ms moves and has a 15 s timeout. I haven't
+  seen that change pass: the run-limit was reached on the run before it.
+  - Last full run: 817 / 818. The one failure was that test's 5 s default timeout; the sum of its
+    waits is about 5.3 s.
+  - Typecheck clean after the fix.

@@ -85,6 +85,39 @@ chunk is fetched after the first render and never by the title page, which doesn
   and members `scene.ts` calls, nothing more. `scene.ts` is not run in tests, so the adapter is
   checked only by tsc against those declarations.
 
+## 2b. Correction 2026-11-01: fit the splat to the stage (after the first browser run)
+
+- **S12. The stage rectangle.** `splatBox(winW, winH)` = `fitStage(…, 1600, 900)` (fit.ts). The
+  layer is placed at its `left / top`, 1600×900 CSS px, `scale(fit.scale)`. It has
+  `overflow:hidden; clip-path:inset(0); contain:paint`, so nothing reaches the letterbox.
+  - Likely cause of the full-window canvas: the library resizes or reparents what it owns.
+  - `scene.ts` therefore creates a `host` element that holds both canvases and is both viewers'
+    `rootElement`. The layer mounts the host inside the clipped box, and puts it back if the
+    library moves it.
+  - The canvases are forced to 100 % of the host (`!important`). `renderer.setSize(…, false)`
+    never sets a CSS size.
+- **S13. 900 ms.**
+  - `CHOSEN.roomDesk = 900`, and `viewMoveMs(from, to, camera)` is the one source for the
+    duration. The motion layer's CSS push for 房间 ↔ 桌子 and the splat move both use it.
+  - The other camera moves keep `MOTION.view` (400 ms); the door keeps `doorView`.
+  - Ease-in-out over the whole way; the arriving photo fades in over the last 200 ms.
+  - This supersedes S4's 400 ms.
+- **S14. Poses and FOV in one table.** `calibration.ts` holds each framing's `{ pos, look, fov }`;
+  `pose.ts` builds `POSES` from it. A pose carries an optional `fov` (vertical, degrees), which is
+  interpolated along a move, and `scene.ts` applies it.
+  - 桌子 is now the README's close-desk pose, pos (−1.0, 0, 6.0) look (0.6, −0.1, 22.5),
+    measured on room.splat (supersedes S1's f43).
+  - The clamp bounds follow, since they come from the poses: yaw ≥ 5.54° (the desk pose), x ≤ −1.0.
+  - **Calibration (`?splatcal=1`, dev builds only):**
+    - once the splat is ready, the layer stays in at the current framing's pose, still;
+    - the stage's photo is hidden and the layer's photo sits at 50 % over the splat;
+    - keys tune the pose: ← → yaw, ↑ ↓ pitch, W A S D R F move, [ ] FOV, Shift ×10;
+    - a readout shows the row, and P prints the whole table in calibration.ts's shape;
+    - moves in this mode use the tuned poses.
+  - **Status: not yet calibrated.** I can't run a browser here, so the FOV is still the
+    provisional 50° and the poses are the README's. The tool exists so the calibration run can be
+    pasted back.
+
 ## 3. Flow
 
 1. First render of the game: `layer.after()` schedules `load()` at idle, or after 1 s.
