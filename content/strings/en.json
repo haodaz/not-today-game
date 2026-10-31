@@ -137,7 +137,6 @@
   "hud.cam.door": "Door",
   "hud.menu.sound": "Sound",
   "hud.menu.lang": "Language",
-  "hud.menu.restart": "Restart",
   "hud.phone": "Phone",
   "hud.box.left": "{n} layers left",
   "hud.cup.cold": "cold · {min} min",
@@ -147,5 +146,6 @@
   "desktop.screen.right": "Right",
   "desktop.back": "Back to room",
   "hud.putDown": "Click outside to put it down",
-  "hud.menu.home": "Home"
+  "hud.menu.home": "Home",
+  "hud.menu.restart": "Home"
 }

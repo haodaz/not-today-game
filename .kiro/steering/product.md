@@ -19,6 +19,7 @@ At night a hand reaches out of the gap between the two monitors and asks for som
 - **Fight the hand.** At night the only moves are to hold up an object, hold up something already lost, or hold up nothing.
 - **Reset the chick.** The reset hole exists and is always pressable and never does anything.
 - **Skip the chat and still get the good ending.** Affinity only grows by talking.
+- **Restart.** There is no restart action anywhere, in the game or on the title page. A run ends only through an ending; the bad and survive endings are what bring the player back to day 1.
 
 ## What the game is about
 
