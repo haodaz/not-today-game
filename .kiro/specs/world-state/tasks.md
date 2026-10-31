@@ -20,9 +20,9 @@ dreamNights, nightBeat); all constants come from `content/variables.json` `const
 - [x] Note in `docs/kiro-log.md` that both files are Claude's and code only reads them.
 
 ## 3. variables.ts — loader, defaults, validate
-- [ ] Load `content/variables.json`; expose `VariableTable`, `constants`, `defaults()`, `validate(state)`.
-- [ ] `validate` checks type and range for every variable; throws with the offending key on failure.
-- [ ] Tests: `defaults()` matches the table; `validate` accepts defaults and rejects out-of-range.
+- [x] Load `content/variables.json`; expose `VariableTable`, `constants`, `defaults()`, `validate(state)`.
+- [x] `validate` checks type and range for every variable; throws with the offending key on failure.
+- [x] Tests: `defaults()` matches the table; `validate` accepts defaults and rejects out-of-range.
 
 ## 4. Codegen typed state interface
 - [ ] `scripts/gen-state-types.ts` reads `content/variables.json`, emits `src/state/types.gen.ts` (a `State` interface + `DO NOT EDIT` header).

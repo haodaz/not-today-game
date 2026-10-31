@@ -12,7 +12,8 @@ describe("defaults()", () => {
   it("equals each variable's default in the table", () => {
     const out = defaults();
     for (const name of variableNames) {
-      expect(out[name], name).toEqual((table as Record<string, { default: unknown }>)[name]!.default);
+      const entry = (table as unknown as Record<string, { default: unknown }>)[name]!;
+      expect(out[name], name).toEqual(entry.default);
     }
   });
 
