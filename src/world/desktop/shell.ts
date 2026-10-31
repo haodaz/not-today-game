@@ -22,6 +22,8 @@ export interface MonitorModel {
   readonly winTitle: SafeHtml;
   readonly winClass: string;
   readonly barRight: SafeHtml | null;
+  /** Replaces the title and the right-hand bar text (the browser's URL bar). */
+  readonly bar?: SafeHtml | null;
   readonly body: SafeHtml;
   /** The night plate's small line (strings key). */
   readonly nightSubKey: string;
@@ -57,7 +59,8 @@ function windowFrame(m: ShellModel, monitor: MonitorModel): SafeHtml {
     return html`${frame(html`<span class="title">${monitor.winTitle}</span>`)}<div class="plate"><div class="lock"></div>${tr("night.plate.title")}<small>${tr(monitor.nightSubKey)}</small></div></div>`;
   }
   const right = monitor.barRight ? html`<span style="margin-left:auto">${monitor.barRight}</span>` : null;
-  return html`${frame(html`<span class="title">${monitor.winTitle}</span>${right}`)}${monitor.body}</div>`;
+  const bar = monitor.bar ?? html`<span class="title">${monitor.winTitle}</span>${right}`;
+  return html`${frame(bar)}${monitor.body}</div>`;
 }
 
 function dock(m: ShellModel): SafeHtml {
