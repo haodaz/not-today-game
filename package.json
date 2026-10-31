@@ -14,7 +14,9 @@
     "bundle:kuro": "node scripts/bundle-kuro-content.ts"
   },
   "dependencies": {
-    "@supabase/supabase-js": "2.49.4"
+    "@mkkellogg/gaussian-splats-3d": "0.4.7",
+    "@supabase/supabase-js": "2.49.4",
+    "three": "0.187.0"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",

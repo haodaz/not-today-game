@@ -25,3 +25,7 @@ One dialogue system for everything spoken in the 3D/room views: narration, inner
 
 ## Correction 2026-11-01 (author): the ↺ history button sits beside the name tag
 The ↺ (今日对话) button is no longer a loose circle at the box's top-right. It sits on the tag strip, immediately right of the name tag (KURO / 门外 / 缝里 / 桌上), same height as the tag, small, and when there is no tag it sits alone at the tag's position. Same action and label as before.
+
+## Addition 2026-11-01 (author): the player's own portrait for inner lines
+`inner` lines (the me-voice, italic) show the **player's portrait** at the box's right end, exactly where Kuro's portrait stands for Kuro's lines: same size (about 200 px tall, head above the box's top edge), same slot, never both at once. The portrait is a faceless visual-novel bust whose face is hidden by hair: `public/player/she.png`, `he.png`, `none.png`, chosen by the title card's pronoun answer (她 / 他 / 不说). It is a still image, no animation. Narration (plain) and speaker lines keep no portrait. The tag for inner lines stays empty (no name).
+- **Dreams use the child.** On dream nights (stages.json `dreamNights`), inner lines show the child version instead: `public/player/she_kid.png`, `he_kid.png`, `none_kid.png` (same pronoun mapping, same slot and size). Other NPC portraits (teachers and so on) come later, one at a time, as content decides.
