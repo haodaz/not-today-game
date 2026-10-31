@@ -108,9 +108,21 @@ export function createRunSlot(storage: KeyValueStorage): RunSlot {
 export interface ProfileWriter {
   /** Replaces the profile. Never touches the run save. There is deliberately no read here. */
   write(data: ProfileData): void;
+  /**
+   * Adds 1 to a counter in the profile (san-and-endings: `runs` after a bad ending). It reads and
+   * writes here and returns nothing, so the story still never sees the profile.
+   */
+  increment(key: string): void;
 }
 
 export function createProfileWriter(storage: KeyValueStorage): ProfileWriter {
   const slot = createSlot(storage, PROFILE_SPEC);
-  return { write: (data) => slot.write({ data }) };
+  return {
+    write: (data) => slot.write({ data }),
+    increment(key) {
+      const current = (slot.read()?.data ?? {}) as ProfileData;
+      const n = typeof current[key] === "number" ? (current[key] as number) : 0;
+      slot.write({ data: { ...current, [key]: n + 1 } });
+    },
+  };
 }

@@ -306,5 +306,17 @@
     "note": "Added by Kiro 2026-11-01 at the author's request (docs/kiro-log.md). What was handed to the hand at night (item_lost choices): \"loan\" or an object id, in the order given. Emptied when the day-17 returned-objects bag is taken in. raids is unchanged.",
     "changedBy": "item_lost choices; the objects_returned pickup",
     "default": []
+  },
+  "ending": {
+    "type": "enum",
+    "values": [
+      "none",
+      "bad",
+      "survive",
+      "good"
+    ],
+    "note": "Added by Kiro 2026-10-31 for the san-and-endings spec (docs/kiro-log.md). Set once by the `ending` event: bad at the shutdown beat after SAN reaches 0; survive / good when the last night ends. After it the run takes no more events.",
+    "changedBy": "ending event (san-and-endings spec)",
+    "default": "none"
   }
 }

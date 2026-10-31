@@ -17,10 +17,11 @@ import { getLocale, t, tr, type Locale } from "@world/i18n";
 import { checklist, loopContext, type ChecklistView } from "@world/loop/checklist";
 import { isRaidNight, raidNights, takeOf } from "@state/nights";
 import { isNight } from "@world/desktop/beat";
-import { renderKuroMini } from "@world/desktop/kuro/mini";
+import { hudKuro } from "@world/desktop/kuro/mini";
 import { VIEWS, type View } from "@world/desktop/model";
 import { DESK_SHOT, rectStyle, ROOM_SHOT } from "./shots";
 import { knows } from "@state/recognise";
+import { bpm, sanBand } from "@state/endings";
 
 /** The flag the hand sets when it takes the heartbeat (content/nights-takes.json `what: heartbeat`). */
 const HEARTBEAT_TAKEN: string | null = raidNights.map(takeOf).find((t) => t?.what === "heartbeat")?.flag ?? null;
@@ -31,10 +32,8 @@ import { fillPlaceholders } from "@world/replies/placeholders";
 /** L7: the day the heart-rate widget appears (stages.json if it says; else day 9's narration). */
 export const HEART_RATE_FROM_DAY: number = (stagesFile as { heartRateFromDay?: number }).heartRateFromDay ?? 9;
 
-/** L7: a proxy that rises as SAN falls; SAN itself is never shown. */
-export function heartRate(san: number): number {
-  return 72 + Math.round((constants.sanStart - san) * 0.6);
-}
+/** L7: a proxy that rises as SAN falls; SAN itself is never shown (san-and-endings: from constants). */
+export const heartRate = bpm;
 
 /** The object each day's box layer holds (stages.json objectsFoundOnDay). */
 const FOUND_ON_DAY = stagesFile.objectsFoundOnDay as Record<string, number>;
@@ -187,7 +186,9 @@ export interface RoomModel {
  */
 function shotHits(view: "room" | "desk"): SafeHtml {
   const shot = view === "room" ? ROOM_SHOT : DESK_SHOT;
-  const kuro = html`<button type="button" class="kuro-glow" data-action="kuro-call" style="${rectStyle(shot.kuro)}" aria-label="${t("kuro.name")}"></button>`;
+  // Mood only: a faint glow where its small window is on the right monitor. Not a control (the
+  // call button is its body at the HUD's bottom right; day-loop correction).
+  const kuro = html`<div class="kuro-mood" style="${rectStyle(shot.kuro)}" aria-hidden="true"></div>`;
   if (view === "room") {
     return html`<button type="button" class="shot-hit" data-action="view" data-view="desk" style="${rectStyle(ROOM_SHOT.desk)}" aria-label="${t("hud.cam.desk")}"></button>${kuro}`;
   }
@@ -196,12 +197,11 @@ function shotHits(view: "room" | "desk"): SafeHtml {
   return html`${mon("left")}${mon("right")}${kuro}`;
 }
 
-/** Kuro called from 房间 / 桌子: its window over the view (same component, turns and memory). */
-function kuroCallLayer(model: RoomModel): SafeHtml | null {
+/** Kuro's body (the call button) and the camera chips, one row at the bottom right. */
+function bottomRight(model: RoomModel): SafeHtml {
   const { state, events, session } = model;
-  if (!session.kuroCall) return null;
   const ctx = { state, events, startDay: model.startDay ?? 1, session, night: isNight(session.clock), nowMs: model.nowMs ?? 0 };
-  return html`<div class="kuro-call-layer"><button type="button" class="kuro-call-dim" data-action="kuro-hangup" aria-label="${t("settings.cancel")}"></button><div class="kuro-call" role="dialog" aria-modal="true">${renderKuroMini(ctx)}</div></div>`;
+  return html`<div class="hud-br">${hudKuro(ctx)}${cams(session.view)}</div>`;
 }
 
 export function renderRoom(model: RoomModel): SafeHtml {
@@ -219,7 +219,7 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const gap = (view === "room" ? ROOM_SHOT : DESK_SHOT).gap;
   // Things are picked up at 桌子 only: the desk bar is its object layer.
   const bar = view === "desk" ? deskBar(state, events, session) : null;
-  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid")}" data-day="${state.day}" data-view="${view}">${scene}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${bar}${held}${kuroCallLayer(model)}${dialogueBox(state, session)}${cams(session.view)}${settingsButton()}${settingsPanel(session)}</div>`;
+  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid")}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}">${scene}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${bar}${held}${dialogueBox(state, session)}${bottomRight(model)}${settingsButton()}${settingsPanel(session)}</div>`;
 }
 
 /** The raid is in the dialogue box: tonight's shutdown sequence on a raid night. */

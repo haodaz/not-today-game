@@ -153,5 +153,16 @@
   "settings.home": "Back to title",
   "settings.cancel": "Cancel",
   "hud.cam.screen": "Screen",
-  "hud.kuro": "Kuro"
+  "hud.kuro": "Kuro",
+  "ending.next": "Continue",
+  "ending.youAndYou": "You and You",
+  "ending.firstDay": "Day 1",
+  "ending.day19": "Day 19",
+  "credits.title": "What it kept",
+  "credits.dim.truth": "looking",
+  "credits.dim.values": "people",
+  "credits.dim.bond": "with it",
+  "credits.last.bad": "You replied \"Fine.\" It replied for you.",
+  "credits.last.survive": "Today is over.",
+  "credits.last.good": "(the last line is hand-written by the author; pending)"
 }

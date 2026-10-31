@@ -7,6 +7,8 @@ import type { Meal } from "@state/delivery/table";
 import type { GameEvent } from "@state/events";
 import { choiceOf } from "@state/days/effects";
 import { isRaidNight, takeFor, wantsOf } from "@state/nights";
+import { dueAtLieDown, dueAtShutdown } from "@state/endings";
+import { startEnding } from "@world/endings/flow";
 import { knows, optionOrder, recogniseTable, wasRight } from "@state/recognise";
 import { advanceTo, DEFAULT_CLOCK, isNight, type Beat, type BeatClock } from "@world/desktop/beat";
 import { KURO_PEEK_MS, lastKuroLine } from "@world/desktop/kuro/mini";
@@ -68,6 +70,8 @@ export interface LoopEffects {
   dialogue: DialogueState;
   clock: BeatClock;
   sounds: string[];
+  /** A shutdown beat was among the new events (where the bad ending may come). */
+  shutdown?: boolean;
 }
 
 /**
@@ -76,6 +80,7 @@ export interface LoopEffects {
  */
 export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEvent[], fx: LoopEffects, runId = "run-1"): LoopEffects {
   let { dialogue, clock } = fx;
+  let shutdown = false;
   const sounds = [...fx.sounds];
   const day = lc.state.day;
   const file = lc.file;
@@ -92,6 +97,7 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
         clock = at(clock, "desk", BEAT_TIMES.desk);
         if (file.beats.desk) dialogue = push(dialogue, beatQueued(day, "desk", file.beats.desk));
       } else if (e.name === "beat:shutdown") {
+        shutdown = true;
         clock = at(clock, "night", BEAT_TIMES.night);
         if (file.beats.shutdown) dialogue = push(dialogue, beatQueued(day, "shutdown", file.beats.shutdown));
       }
@@ -140,7 +146,7 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
       }
     }
   }
-  return { dialogue, clock, sounds };
+  return { dialogue, clock, sounds, shutdown };
 }
 
 /** A fresh memo for the current day, seeing everything already in the log as old. */
@@ -160,6 +166,11 @@ export function syncLoop(ctx: ActionContext, nowMs: number = Date.now()): void {
   const { store, session } = ctx;
   const state = store.getState();
   const events = store.getEvents();
+  // The run has ended: only its pages now (san-and-endings); also after a reload.
+  if (state.ending !== "none") {
+    startEnding(ctx);
+    return;
+  }
   const lc = loopContext(state, events);
   if (!lc) return;
 
@@ -195,6 +206,41 @@ export function syncLoop(ctx: ActionContext, nowMs: number = Date.now()): void {
   scheduleSelf(ctx, lc);
   checkArrivals(ctx, lc, nowMs);
   noticeKuroLine(ctx, nowMs);
+  // SAN 0: the bad ending plays at this shutdown beat, not mid-beat (san-and-endings FR1).
+  if (fx.shutdown && dueAtShutdown(store.getState())) {
+    ctx.later(0, () => {
+      if (dueAtShutdown(ctx.store.getState())) ctx.store.appendEvent({ kind: "ending", ending: "bad" });
+    });
+  }
+  openChatIfDue(ctx);
+}
+
+/**
+ * Lying down (the bed, or the end of the night's lines). On the last night the run ends instead:
+ * good, survive, or bad (san-and-endings FR2).
+ */
+export function lieDownOrEnd(ctx: ActionContext): void {
+  const ending = dueAtLieDown(ctx.store.getState());
+  ctx.store.appendEvent(ending ? { kind: "ending", ending } : { kind: "lieDown" });
+}
+
+/**
+ * The evening chat beat opens the chat overlay by itself (day-loop correction): once a day, when
+ * the chat item is open (after shutdown) and the dialogue box has nothing left to say.
+ */
+export function openChatIfDue(ctx: ActionContext): void {
+  const { store, session } = ctx;
+  const state = store.getState();
+  if (session.kuroAutoDay === state.day || session.dialogue.queue.length > 0) return;
+  const lc = loopContext(state, store.getEvents());
+  const chat = lc?.file.items.find((it) => it.done.kind === "event" && it.done.event.type === "chat");
+  if (!lc || !chat) return;
+  const st = itemStates(lc).get(chat.id)!;
+  if (!st.unlocked || st.done) return;
+  session.kuroAutoDay = state.day;
+  session.kuroCall = true;
+  session.kuroRead = lastKuroLine({ state, events: store.getEvents(), startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs: ctx.now?.() ?? Date.now() });
+  ctx.rerender();
 }
 
 /** Whether the pointer is over the open small window (the DOM only; never in tests). */
@@ -210,6 +256,8 @@ export function noticeKuroLine(ctx: ActionContext, nowMs: number): void {
   if (session.kuroLast === line) return;
   const first = session.kuroLast === undefined;
   session.kuroLast = line;
+  // The first look of a run counts as read: the dot is only for what it says after.
+  if (first) session.kuroRead = line;
   if (first || line === null) return;
   session.kuroPeekUntil = nowMs + KURO_PEEK_MS;
   const fold = () => {

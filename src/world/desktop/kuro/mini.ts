@@ -8,7 +8,7 @@ import { cls, html, type SafeHtml } from "@world/html";
 import { t, tr } from "@world/i18n";
 import { rightApp, type AppContext } from "../model";
 import type { AppId } from "../shell";
-import { bodyState, frameUrl, FRAMES, renderBodySlot } from "./body";
+import { bodyState, frameUrl, FRAMES, type BodyState } from "./body";
 import { kuroDay } from "./days";
 
 /** Today's work-task lines, in the order the tasks were done. */
@@ -79,22 +79,46 @@ export function kuroDock(ctx: Pick<AppContext, "session">): "top" | "bottom" {
   return INPUT_AT_BOTTOM.has(shown) ? "top" : "bottom";
 }
 
-/** Folded: a pill beside the body, its face and the start of its last line. */
+/** Folded: a pill where the small window sits, its face and the start of its last line. */
 function kuroPill(ctx: AppContext): SafeHtml {
   const line = lastKuroLine(ctx);
   return html`<button type="button" class="${cls("kpill", ctx.night && "blink")}" data-action="kuro-expand" aria-expanded="false"><img src="${frameUrl(FRAMES.idle[0])}" alt=""><span>${line ?? ""}</span></button>`;
 }
 
-/** Kuro on the right monitor: the body slot and the small window. */
-export function renderKuro(ctx: AppContext): SafeHtml {
-  const state = bodyState({
+/** The body's state now (desktop-ui FR5): rest > busy > happy > crawl > think > idle. */
+export function kuroBodyState(ctx: AppContext): BodyState {
+  return bodyState({
     night: ctx.night,
-    taskRunning: false, // no work tasks yet (content/tasks/ does not exist)
+    taskRunning: false, // no running task state yet
     saidPretty: false, // the chat beat is the kuro-chat spec's
     moving: ctx.nowMs < ctx.session.movingUntil,
     waiting: ctx.session.clock.beat === "desk" && !turnsUsedUp(ctx),
   });
-  // Never covering the desktop: folded by default; open, it docks away from the app's input.
-  if (!kuroExpanded(ctx)) return html`${renderBodySlot(state)}${kuroPill(ctx)}`;
-  return html`${renderBodySlot(state)}<div class="${cls("kmini-dock", kuroDock(ctx))}">${renderKuroMini(ctx)}</div>`;
+}
+
+/** A line it said that the player has not looked at yet (the call button's dot). */
+export function kuroUnread(ctx: AppContext): boolean {
+  const line = lastKuroLine(ctx);
+  return ctx.session.kuroRead !== undefined && line !== null && line !== ctx.session.kuroRead;
+}
+
+/**
+ * Kuro's small window on the shown monitor (desktop-ui amendment): folded to a pill by default;
+ * open, it docks away from the app's input. Its body is the HUD's call button (day-loop
+ * correction), not drawn here.
+ */
+export function renderKuro(ctx: AppContext): SafeHtml {
+  if (!kuroExpanded(ctx)) return kuroPill(ctx);
+  return html`<div class="${cls("kmini-dock", kuroDock(ctx))}">${renderKuroMini(ctx)}</div>`;
+}
+
+/**
+ * The call button (day-loop correction): Kuro's animated body, fixed at the HUD's bottom right in
+ * every view, with a dot when it has a new line. It opens the chat overlay, which rises from it.
+ */
+export function hudKuro(ctx: AppContext): SafeHtml {
+  const open = ctx.session.kuroCall;
+  const unread = kuroUnread(ctx);
+  const call = open ? html`<div class="kuro-call" role="dialog" aria-label="${t("kuro.name")}">${renderKuroMini(ctx)}</div>` : null;
+  return html`<div class="hud-kuro">${call}<button type="button" class="${cls("kuro-btn", unread && "unread", open && "on")}" data-action="kuro-call" aria-expanded="${open ? "true" : "false"}" aria-label="${t("kuro.name")}"><span class="kpet" data-kuro-slot data-state="${kuroBodyState(ctx)}" aria-hidden="true"></span>${unread ? html`<i class="dot"></i>` : null}</button></div>`;
 }

@@ -154,8 +154,20 @@ describe("profile", () => {
     expect(readProfile(storage)).toEqual(profile);
   });
 
-  it("the writer has no read method", () => {
-    expect(Object.keys(createProfileWriter(memoryStorage()))).toEqual(["write"]);
+  it("the writer has no read method; increment returns nothing", () => {
+    // san-and-endings: `increment` (runs + 1) reads and writes inside saves.ts, returns nothing.
+    const writer = createProfileWriter(memoryStorage());
+    expect(Object.keys(writer)).toEqual(["write", "increment"]);
+    expect(writer.increment("runs")).toBeUndefined();
+  });
+
+  it("increment adds 1 to a counter and keeps the rest of the profile", () => {
+    const storage = memoryStorage();
+    const writer = createProfileWriter(storage);
+    writer.write({ runsStarted: 2 });
+    writer.increment("runs");
+    writer.increment("runs");
+    expect(readProfile(storage)).toEqual({ runsStarted: 2, runs: 2 });
   });
 });
 

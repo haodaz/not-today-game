@@ -226,7 +226,10 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .br .foot{padding:0 40px;color:var(--ink-3);font-family:var(--font);font-size:11px}
 /* The small window never covers the desktop (desktop-ui amendment): folded it is a pill beside the
    body (its face, the start of its last line); open over an app with an input, it docks top-right. */
-.kpill{position:absolute;left:calc(100% - 384px);bottom:52px;z-index:6;display:flex;align-items:center;gap:8px;max-width:330px;padding:5px 12px 5px 5px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 6px 18px rgba(20,24,30,.12);font:12px var(--font);color:var(--ink-2);cursor:pointer}
+/* The body is the HUD's call button now (day-loop correction); the pill and the bottom-docked window
+   keep clear of it at the monitor's bottom right. */
+.kmini-dock.bottom .kmini{right:132px}
+.kpill{position:absolute;right:132px;bottom:30px;z-index:6;display:flex;align-items:center;gap:8px;max-width:330px;padding:5px 12px 5px 5px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 6px 18px rgba(20,24,30,.12);font:12px var(--font);color:var(--ink-2);cursor:pointer}
 .kpill img{width:24px;height:24px;border-radius:50%;object-fit:cover;flex:0 0 auto}
 .kpill span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--mono)}
 .kpill:hover,.kpill:focus-visible{border-color:var(--accent)}

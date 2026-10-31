@@ -6,6 +6,7 @@ import { applyChoose, applyStep, applyTask, type TaskEventMode } from "./days/ef
 import { applyDeclineUpgrade, applyUpgrade, type DeclineKind } from "./upgrades";
 import { applyOrder, applyPickup, applyUseItem } from "./delivery/effects";
 import type { Meal } from "./delivery/table";
+import { applyEnding, type Ending } from "./endings";
 import { applyRecognise } from "./recognise";
 import { applyReplyEvent, knownRecipients } from "./replies/effects";
 import { constants, membersOf } from "./variables";
@@ -49,11 +50,13 @@ export type GameEvent =
   | { kind: "task"; day: number; flag: string; mode: TaskEventMode }
   // object-upgrade spec (2026-11-01): accepting / declining Kuro's offer.
   | { kind: "upgrade"; day: number; object: string }
-  | { kind: "declineUpgrade"; day: number; object: string; decline: DeclineKind };
+  | { kind: "declineUpgrade"; day: number; object: string; decline: DeclineKind }
+  // san-and-endings spec: the run ends, once (bad at a shutdown beat; survive / good on the last night).
+  | { kind: "ending"; day: number; ending: Ending };
 
 export type EventKind = GameEvent["kind"];
 
-/** Exactly these kinds (world-state 12, delivery 3, desktop-ui 1, day-loop 3, object-upgrade 2). Nothing else may be appended. */
+/** Exactly these kinds (world-state 12, delivery 3, desktop-ui 1, day-loop 3, object-upgrade 2, san-and-endings 1). Nothing else may be appended. */
 export const eventKinds: readonly EventKind[] = [
   "openLayer",
   "recognise",
@@ -76,6 +79,7 @@ export const eventKinds: readonly EventKind[] = [
   "task",
   "upgrade",
   "declineUpgrade",
+  "ending",
 ];
 
 const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
@@ -139,7 +143,11 @@ function applyLoanReply(state: State, event: Extract<GameEvent, { kind: "reply" 
  * san-and-endings, night-hand, chat).
  */
 export function applyEvent(state: State, event: GameEvent): State {
+  // The run has ended (san-and-endings): it takes nothing more.
+  if (state.ending !== "none") throw new Error(`${event.kind}: the run has ended (${state.ending})`);
   switch (event.kind) {
+    case "ending":
+      return applyEnding(state, event);
     case "openLayer":
       return withMember(state, "found", event.objectId);
     case "recognise":

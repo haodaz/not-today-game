@@ -41,6 +41,8 @@ interface Snap {
   readonly raid: boolean;
   /** The ⚙ 设置 panel is open. */
   readonly settings: boolean;
+  /** The chat overlay is open over the call button. */
+  readonly call: boolean;
 }
 
 /** A node with its layout measured while it was still on screen (a detached node measures 0). */
@@ -68,6 +70,7 @@ interface Outgoing {
   readonly doorHand: HTMLElement | null;
   readonly gap: HTMLElement | null;
   readonly settings: HTMLElement | null;
+  readonly call: HTMLElement | null;
 }
 
 const live = (el: Element): boolean => !el.closest(".m-ghost");
@@ -153,6 +156,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       asleep: head?.ending.kind === "lieDown",
       raid: !!q(root, ".gap-glow"),
       settings: !!q(root, ".settings-layer"),
+      call: !!q(root, ".kuro-call"),
     };
   }
 
@@ -175,6 +179,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       doorHand: q(root, ".door-hand"),
       gap: q(root, ".gap-glow"),
       settings: q(root, ".settings-layer"),
+      call: q(root, ".kuro-call"),
     };
   }
 
@@ -657,7 +662,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
   /** Endless loops keep their phase across re-renders (design P10). */
   function phaseLock(t: number): void {
     for (const el of qa(root, ".kpet")) el.style.animationDelay = `${-(t % MOTION.bob)}ms`;
-    for (const el of qa(root, ".kmini.blink, .kuro-glow")) el.style.animationDelay = `${-(t % MOTION.blink)}ms`;
+    for (const el of qa(root, ".kmini.blink, .kuro-mood")) el.style.animationDelay = `${-(t % MOTION.blink)}ms`;
   }
 
   // ---- sleep and wake (FR5) -----------------------------------------------------------------
@@ -727,13 +732,24 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       if (snap.asleep && !prev.asleep) begin("sleep", t);
       // The settings panel: in like the room dims for a held item, out faster.
       if (snap.settings && !prev.settings) begin("settings", t);
-      if (ctx.session.kuroCall && !q(root, ".kuro-call-layer.m-seen")) {
-        // Mark it so the fade starts once, not on every render while it is open.
-        const layer = q(root, ".kuro-call-layer");
-        if (layer && since("call") === undefined) begin("call", t);
-        layer?.classList.add("m-seen");
+      // The chat overlay rises from Kuro's body (320 ms) and sinks back into it, faster.
+      if (snap.call && !prev.call) begin("call", t);
+      if (!snap.call && prev.call && out.call) {
+        const el = out.call;
+        const dur = exitOf(MOTION.lift);
+        addGhost({
+          el,
+          start: t,
+          end: t + dur,
+          place: (r) => {
+            const host = q(r, ".hud-kuro");
+            if (!host) return false;
+            host.insertBefore(el, host.firstChild);
+            return true;
+          },
+          apply: (g, now) => anim(g, "m-call-out", dur, t, now),
+        });
       }
-      if (!ctx.session.kuroCall) starts.delete("call");
       if (!snap.settings && prev.settings && out.settings) {
         const el = out.settings;
         const host = el.parentElement?.classList.contains("settings-host") ? ".settings-host" : ".stage";
@@ -791,8 +807,8 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     const set = q(root, ".settings-layer");
     if (set && setStart !== undefined && t - setStart < MOTION.dim) anim(set, "m-fade-in", MOTION.dim, setStart, t);
     const callStart = since("call");
-    const call = q(root, ".kuro-call-layer");
-    if (call && callStart !== undefined && t - callStart < MOTION.dim) anim(call, "m-fade-in", MOTION.dim, callStart, t);
+    const call = q(root, ".kuro-call");
+    if (call && callStart !== undefined && t - callStart < MOTION.lift) anim(call, "m-call-in", MOTION.lift, callStart, t);
     const gapStart = since("gap");
     const gap = q(root, ".gap-glow");
     if (gap && gapStart !== undefined && t - gapStart < MOTION.dim) anim(gap, "m-fade-in", MOTION.dim, gapStart, t);

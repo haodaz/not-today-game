@@ -7,7 +7,8 @@ import { deliveryTable, type Meal } from "@state/delivery/table";
 import type { Store } from "@state/store";
 import { currentOffer, FINAL } from "@state/upgrades";
 import { desktopApps } from "@world/desktop/apps";
-import { advanceTo } from "@world/desktop/beat";
+import { advanceTo, isNight } from "@world/desktop/beat";
+import { hudKuro, lastKuroLine } from "@world/desktop/kuro/mini";
 import { shellActions, type ActionContext, type ActionHandler } from "@world/desktop/controller";
 import { buildShell, rightApp, VIEWS, type Session, type View } from "@world/desktop/model";
 import { renderDesktop, type AppId } from "@world/desktop/shell";
@@ -18,19 +19,23 @@ import { html, type SafeHtml } from "@world/html";
 import { setLocale, tr } from "@world/i18n";
 import { actionOf, itemStates, loopContext, mealToOrder, openTask, type ItemAction } from "@world/loop/checklist";
 import { advance, endsInChoice, finishChoice, push } from "@world/loop/dialogue";
-import { beatQueued, questionQueued } from "@world/loop/runtime";
+import { beatQueued, lieDownOrEnd, openChatIfDue, questionQueued } from "@world/loop/runtime";
 import { askedOn, knows } from "@state/recognise";
 import { gateAdvance } from "@world/motion/reveal";
+import { endingNext } from "@world/endings/flow";
+import { renderEnding } from "@world/endings/view";
 import { boxObjectFor, dialogueBox, doorMeal, renderRoom, settingsButton, settingsPanel } from "./hud";
 
 export function renderGame(store: Store, session: Session, nowMs: number): SafeHtml {
   const state = store.getState();
   const events = store.getEvents();
+  // The run has ended: its pages replace every view (san-and-endings).
+  if (state.ending !== "none") return renderEnding({ state, events, session, startDay: store.getStartDay(), nowMs });
   if (session.view === "desktop") {
     const shell = buildShell(state, events, session, desktopApps, nowMs, store.getStartDay());
     // Work-task narration plays in the dialogue box over the desktop too.
     const dlg = dialogueBox(state, session);
-    return html`${renderDesktop(shell)}<button type="button" class="back-room" data-action="view" data-view="room">${tr("desktop.back")}</button>${dlg ? html`<div class="dlg-layer">${dlg}</div>` : null}<div class="settings-host">${settingsButton()}${settingsPanel(session)}</div>`;
+    return html`${renderDesktop(shell)}<button type="button" class="back-room" data-action="view" data-view="room">${tr("desktop.back")}</button>${dlg ? html`<div class="dlg-layer">${dlg}</div>` : null}<div class="hud-host">${settingsButton()}<div class="hud-br">${hudKuro({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs })}</div>${settingsPanel(session)}</div>`;
   }
   return renderRoom({ state, events, session, startDay: store.getStartDay(), nowMs });
 }
@@ -61,7 +66,7 @@ function doItem(ctx: ActionContext, action: ItemAction): void {
       // The night plays first; lying down comes at its end (design L6).
       const night = dayFile(day)?.beats.night;
       if (!night || night.say.length === 0) {
-        store.appendEvent({ kind: "lieDown" });
+        lieDownOrEnd(ctx);
         return;
       }
       session.dialogue = push(session.dialogue, beatQueued(day, "night", night, { kind: "lieDown" }));
@@ -71,6 +76,17 @@ function doItem(ctx: ActionContext, action: ItemAction): void {
       session.dialogue = push(session.dialogue, { key: `d${day}:loan:prompt`, lines: [], ending: { kind: "loan" } });
       return;
   }
+}
+
+/** What Kuro says last, as seen now: the call button's dot goes. */
+function markKuroRead(ctx: ActionContext): void {
+  ctx.session.kuroRead = lastKuroLine(appContextOf(ctx));
+}
+
+/** The AppContext the Kuro components read, from an action's context. */
+export function appContextOf(ctx: ActionContext) {
+  const { store, session } = ctx;
+  return { state: store.getState(), events: store.getEvents(), startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs: ctx.now?.() ?? Date.now() };
 }
 
 /** The workbench mode chips' strings keys → task modes. */
@@ -126,7 +142,10 @@ export const loopActions: Record<string, ActionHandler> = {
     }
     const { dialogue, ended } = advance(ctx.session.dialogue);
     ctx.session.dialogue = dialogue;
-    if (ended?.kind === "lieDown") ctx.store.appendEvent({ kind: "lieDown" });
+    // Lying down; on the last night the run ends instead (san-and-endings FR2).
+    if (ended?.kind === "lieDown") lieDownOrEnd(ctx);
+    // The box may have just emptied after shutdown: the evening chat opens itself.
+    else openChatIfDue(ctx);
     ctx.rerender();
   },
 
@@ -145,6 +164,7 @@ export const loopActions: Record<string, ActionHandler> = {
       return;
     }
     ctx.session.dialogue = finishChoice(ctx.session.dialogue);
+    openChatIfDue(ctx);
     ctx.rerender();
   },
 
@@ -266,9 +286,15 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.store.appendEvent({ kind: "declineUpgrade", object: offer.kind === "final" ? FINAL : offer.object, decline: offer.kind });
   },
 
+  // The ending pages: on to the next (during the credits, first to the end of the roll).
+  "ending-next"(ctx) {
+    endingNext(ctx);
+  },
+
   // Kuro's small window: the pill opens it; a click outside or Esc folds it (desktop-ui amendment).
   "kuro-expand"(ctx) {
     ctx.session.kuroOpen = true;
+    markKuroRead(ctx);
     ctx.rerender();
   },
   "kuro-fold"(ctx) {
@@ -276,9 +302,11 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.session.kuroPeekUntil = 0;
     ctx.rerender();
   },
-  // From 房间 / 桌子: the glowing right monitor calls Kuro; its window opens over the view.
+  // Kuro's body at the HUD's bottom right is the call button, in every view (day-loop
+  // correction): it opens the chat overlay; clicking it again closes it.
   "kuro-call"(ctx) {
-    ctx.session.kuroCall = true;
+    ctx.session.kuroCall = !ctx.session.kuroCall;
+    if (ctx.session.kuroCall) markKuroRead(ctx);
     ctx.rerender();
   },
   "kuro-hangup"(ctx) {
@@ -294,6 +322,11 @@ export const loopActions: Record<string, ActionHandler> = {
 
 /** Keys: space / Enter read on in the room and at the door; Esc goes back to the room. */
 export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
+  // The run has ended: Enter / Space go on; nothing else does anything.
+  if (ctx.store.getState().ending !== "none") {
+    if (e.key === "Enter" || e.key === " ") endingNext(ctx);
+    return true;
+  }
   // Esc closes the settings panel first, then the Kuro call / folds its small window, then puts
   // down what is held (polish FR1), then steps the camera out.
   if (e.key === "Escape" && ctx.session.settingsOpen) {

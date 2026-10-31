@@ -263,3 +263,41 @@ Appended after each task. Neither Kiro nor Claude edits the other's area without
   - The settings panel's language switch only changes UI strings: the day files and other
     content are Chinese only.
 - Tests: 42 files, 621 passing; typecheck clean. Not checked in a browser.
+
+## 2026-10-31 — Kuro button correction; san-and-endings
+
+- Correction (day-loop): Kuro's animated body is the call button at the HUD's bottom right, in
+  every view, left of the camera chips, with an unread dot.
+  - Clicking it opens the chat overlay rising from it (320 ms); clicking again or Esc closes.
+  - The evening chat beat opens it by itself, once a day, when the box is empty.
+  - The monitor glow is mood only (`.kuro-mood`, not a control).
+  - On 屏幕 the monitor draws no body any more; the pill and window shift left of it.
+  - The room.jpg measurements in `room/shots.ts` are the ones taken on the 2048×1152 image; the
+    camera push reads them.
+  - Snapshots: 13 desktop, 2 room HUD, 1 desk bar.
+- Spec `san-and-endings`: design (E1–E8) and tasks written and implemented.
+  - The run ends with one `ending` event (bad / survive / good) that sets `state.ending`. After it
+    the reducer takes nothing.
+  - Bad is appended at the shutdown beat once SAN is 0. Survive or good replace the last night's
+    lie-down (bad if SAN reached 0 after the last shutdown, E7).
+  - Good needs all five conditions.
+  - 你和你 is built from the log: each day's first family message, answered 好。 on time, plus the
+    unchecked tasks' titles as messages you sent.
+  - The credits are the stored evidence in day order, with the direction read from the content
+    that wrote each entry; one line per 1.6 s, a click to the end, never skipped.
+  - After the credits: bad goes home (run cleared, profile `runs` + 1); survive shows 第一日, then
+    a new run; good shows day 19 (the door, still, one line).
+  - The bpm comes from constants (72 → 110). SAN bands drive the cup, a side vignette and grain.
+- Edit in Claude's area: `content/variables.json` gains `ending` (enum none|bad|survive|good),
+  with a note. `types.gen.ts` was edited by hand to match; the generator test confirms it.
+- New: `ProfileWriter.increment(key)` (reads and writes inside saves.ts, returns nothing).
+- TODO(Claude), strings (they show as ⟦missing⟧ until written):
+  - `ending.next`, `ending.youAndYou` (你和你), `ending.firstDay` (第一日), `ending.day19`;
+  - `credits.dim.truth`, `credits.dim.values`, `credits.dim.bond`;
+  - `credits.last.bad`, `credits.last.survive`, `credits.last.good` (good's is the final
+    red/blue line).
+- Not done (named):
+  - The title page (`endingHost` reopens the game for now).
+  - The door handle turning on day 19 (room-scene).
+  - The credits get no direction from chat-rubric evidence until that source exists (`deltaOf`).
+- Tests: 43 files, 642 passing; typecheck clean. Not checked in a browser.

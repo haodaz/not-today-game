@@ -11,13 +11,20 @@
 .room.desk-view{background-image:url(/room/shots/desk_close.jpg)}
 .room .shot-hit{position:absolute;border:0;padding:0;margin:0;background:transparent;cursor:pointer;border-radius:4px}
 .room .shot-hit:hover,.room .shot-hit:focus-visible{outline:2px solid rgba(232,228,220,.55);outline-offset:2px}
-/* Kuro's small window glowing on the right monitor: click to call it */
-.room .kuro-glow{position:absolute;border:0;padding:0;border-radius:4px;background:rgba(246,250,255,.85);box-shadow:0 0 0 1px rgba(246,166,35,.5),0 0 18px 4px rgba(246,166,35,.35);cursor:pointer;animation:m-blink var(--m-blink) ease-in-out infinite}
-.room .kuro-glow:focus-visible{outline:2px solid #f6a623;outline-offset:2px}
-.room .kuro-call-layer{position:absolute;inset:0;z-index:17}
-.room .kuro-call-dim{position:absolute;inset:0;border:0;padding:0;margin:0;background:rgba(10,10,12,.45);cursor:default}
-.room .kuro-call{position:absolute;right:120px;top:120px;width:360px}
-.room .kuro-call .kmini{position:relative;right:auto;bottom:auto;width:100%}
+/* Mood only: a faint glow where its small window sits on the right monitor (not a control) */
+.room .kuro-mood{position:absolute;border-radius:4px;background:rgba(246,250,255,.18);box-shadow:0 0 14px 3px rgba(246,166,35,.18);pointer-events:none;animation:m-blink var(--m-blink) ease-in-out infinite}
+/* Bottom right of the HUD: Kuro's body (the call button), then the camera chips (day-loop correction) */
+.hud-br{position:absolute;right:28px;bottom:28px;z-index:18;display:flex;align-items:flex-end;gap:12px}
+.hud-host .hud-br{position:fixed;right:12px;bottom:12px;z-index:40}
+.hud-kuro{position:relative;width:96px;height:96px}
+.kuro-btn{position:relative;width:96px;height:96px;border:0;padding:0;margin:0;background:transparent;border-radius:50%;cursor:pointer}
+.kuro-btn .kpet{position:absolute;inset:0;width:96px;height:96px}
+.kuro-btn:hover,.kuro-btn:focus-visible,.kuro-btn.on{background:radial-gradient(closest-side,rgba(246,166,35,.22),transparent)}
+.kuro-btn:focus-visible{outline:2px solid #f6a623;outline-offset:2px}
+.kuro-btn .dot{position:absolute;right:10px;top:10px;width:12px;height:12px;border-radius:50%;background:#e5484d;box-shadow:0 0 0 2px #fff;pointer-events:none}
+/* The chat overlay rises from the body: same component as on the screen */
+.kuro-call{position:absolute;right:0;bottom:calc(100% + 10px);width:360px;transform-origin:right bottom}
+.kuro-call .kmini{position:relative;right:auto;bottom:auto;width:100%}
 .room.door-view{background:#0f0e0c url(/room/door_wall.png) center/cover}
 /* 今日清单 */
 .room .list{position:absolute;left:28px;top:28px;width:280px;background:var(--paper);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.35);border-radius:10px;padding:12px 16px;box-shadow:0 6px 24px rgba(0,0,0,.12);font-size:15px;line-height:1.7}
@@ -96,15 +103,15 @@
 .room .door-beat:empty,.room .door-beat[data-state="idle"]{display:none}
 .room .door-hand{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:420px;height:220px;background:radial-gradient(ellipse at 50% 100%,rgba(0,0,0,.55),transparent 70%);pointer-events:none}
 /* 镜头 + 菜单 */
-.room .cams{position:absolute;right:28px;bottom:28px;display:flex;gap:6px}
+.room .cams{display:flex;gap:6px}
 .room .cams button{background:rgba(232,228,220,.7);backdrop-filter:blur(8px);border:0;border-radius:8px;padding:8px 14px;font:14px var(--font);color:#333;cursor:pointer}
 .room .cams button.on{background:var(--red);color:#f4efe6}
 /* ⚙ 设置: one button bottom left; a small centred panel over the dimmed view (day-loop amendment) */
 .settings-btn{position:absolute;left:28px;bottom:28px;z-index:18;border:0;border-radius:8px;padding:7px 12px;background:rgba(232,228,220,.62);backdrop-filter:blur(8px);font:13px "PingFang SC","Hiragino Sans GB",sans-serif;color:#333;cursor:pointer}
 .settings-btn:hover,.settings-btn:focus-visible{background:rgba(232,228,220,.85)}
-.settings-host .settings-btn{position:fixed;left:12px;bottom:12px;z-index:40}
+.hud-host .settings-btn{position:fixed;left:12px;bottom:12px;z-index:40}
 .settings-layer{position:absolute;inset:0;z-index:50}
-.settings-host .settings-layer{position:fixed}
+.hud-host .settings-layer{position:fixed}
 .settings-dim{position:absolute;inset:0;border:0;padding:0;margin:0;background:rgba(10,10,12,.55);cursor:default}
 .settings{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:320px;background:rgba(244,240,232,.96);border-radius:14px;padding:18px 20px;box-shadow:0 20px 60px rgba(0,0,0,.45);font:15px "PingFang SC","Hiragino Sans GB",sans-serif;color:#1d2129}
 .settings h3{margin:0 0 12px;font-size:12px;letter-spacing:.2em;color:#8a7f70;font-weight:400}
@@ -129,3 +136,39 @@
 .dlg-layer .dlg{background:rgba(28,26,23,.86);backdrop-filter:blur(6px);color:#f4efe6;border-radius:12px;padding:18px 24px;font:18px/1.6 "PingFang SC","Hiragino Sans GB",sans-serif;box-shadow:0 12px 40px rgba(0,0,0,.4);border:0;text-align:left;cursor:pointer}
 .dlg-layer .dlg .inner{font-style:italic;color:#e8b4ae}.dlg-layer .dlg .who{display:block;font-size:12px;letter-spacing:.12em;color:#c9a86a}
 .dlg-layer .dlg .sfx{color:#c9a86a}.dlg-layer .dlg .more{position:absolute;right:16px;bottom:10px;color:#c9a86a;font-size:12px}
+/* SAN bands (san-and-endings FR1, presentation only; SAN is never shown): the cup colder, the room
+   one step narrower (a side vignette until room-scene), a denser grain over the text. */
+.room[data-san-band="1"] .slot .cup{background:linear-gradient(180deg,#fff 40%,#c3d6e3 40%)}
+.room[data-san-band="2"] .slot .cup{background:linear-gradient(180deg,#fff 40%,#b3c9da 40%)}
+.room[data-san-band="3"] .slot .cup{background:linear-gradient(180deg,#f4f8fb 40%,#9fb9cd 40%)}
+.room[data-san-band="4"] .slot .cup{background:linear-gradient(180deg,#eef3f7 40%,#8ba9bf 40%)}
+.room[data-san-band]{--san-side:0px;--san-grain:0}
+.room[data-san-band="1"]{--san-side:40px;--san-grain:.03}
+.room[data-san-band="2"]{--san-side:90px;--san-grain:.06}
+.room[data-san-band="3"]{--san-side:150px;--san-grain:.09}
+.room[data-san-band="4"]{--san-side:220px;--san-grain:.12}
+.room[data-san-band]:not([data-san-band="0"]) .list,.room[data-san-band]:not([data-san-band="0"]) .dlg{background-image:repeating-radial-gradient(circle at 17% 31%,rgba(0,0,0,var(--san-grain)) 0 1px,transparent 1px 3px)}
+.room[data-san-band]:not([data-san-band="0"]){box-shadow:inset var(--san-side) 0 var(--san-side) -20px rgba(8,8,10,.6),inset calc(-1 * var(--san-side)) 0 var(--san-side) -20px rgba(8,8,10,.6)}
+
+/* The ending pages (san-and-endings FR2/FR3) */
+.ending-page{position:relative;width:1600px;height:900px;overflow:hidden;font-family:"PingFang SC","Hiragino Sans GB",sans-serif}
+.ending-hit{position:absolute;inset:0;border:0;padding:0;margin:0;background:transparent;cursor:pointer;z-index:1}
+.ending-hit:focus-visible{outline:2px solid rgba(201,168,106,.6);outline-offset:-8px}
+.you-page{background:#15171b}
+.you-page .you-and-you{position:absolute;left:50%;top:50%;right:auto;bottom:auto;transform:translate(-50%,-50%);width:520px;max-height:760px;overflow:auto;z-index:2;pointer-events:none}
+.you-page .you-and-you .c{gap:8px}
+.you-page .m{display:flex;gap:8px;align-items:flex-end}.you-page .m.me{flex-direction:row-reverse}
+.you-page .bub{background:#f1f2f4;padding:6px 10px;border-radius:4px 12px 12px 12px;max-width:80%}
+.you-page .m.me .bub{background:#e8f0ff;border-radius:12px 4px 12px 12px}
+.you-page .m .t{font:11px Menlo,monospace;color:#9aa3b0}
+.you-page .sysline{align-self:center;font-size:11px;color:#9aa3b0}
+.credits-page{background:#0d0e10;color:#f4efe6}
+.credits{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:900px;max-height:820px;overflow:hidden;margin:0;padding:0;list-style:none;display:flex;flex-direction:column;justify-content:flex-end;gap:10px;font-size:17px;line-height:1.6;z-index:2;pointer-events:none}
+/* The plain red/blue style: two ghosts offset on the same line */
+.credits.plain li{text-shadow:1px 0 0 rgba(255,60,60,.55),-1px 0 0 rgba(60,120,255,.55)}
+.credits li .d{color:#c9a86a}.credits li .dir{color:#9aa3b0;letter-spacing:.08em}
+.credits li:last-child{animation:m-fade-up var(--m-item-in) var(--m-ease) both}
+.credits li.last{margin-top:18px;font-size:19px}
+.first-day{background:#fff;color:#1d2129;display:flex;align-items:center;justify-content:center}
+.first-day p{position:relative;z-index:2;margin:0;font-size:28px;letter-spacing:.4em;pointer-events:none}
+.day-19 .dlg{position:absolute;left:50%;bottom:128px;transform:translateX(-50%);width:980px;background:rgba(28,26,23,.82);color:#f4efe6;border-radius:12px;padding:18px 24px;font-size:18px;line-height:1.6}

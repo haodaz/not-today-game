@@ -46,6 +46,9 @@
 .kpet .layer{transition:opacity var(--m-kuro-fade) var(--m-ease)}
 .kmini.blink{animation:m-blink var(--m-blink) ease-in-out infinite}
 @keyframes m-blink{50%{box-shadow:0 0 0 1px rgba(246,166,35,.3),0 0 18px 2px rgba(246,166,35,.15),0 16px 48px rgba(0,0,0,.4)}}
+/* The chat overlay rises out of Kuro's body at the HUD's bottom right, and sinks back */
+@keyframes m-call-in{from{opacity:0;scale:.6;translate:0 24px}}
+@keyframes m-call-out{to{opacity:0;scale:.6;translate:0 24px}}
 @keyframes m-kuro-line{from{opacity:0;scale:.92;translate:8px 8px}}
 .kmini .c > .it{transform-origin:right bottom}
 

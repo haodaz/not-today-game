@@ -6,7 +6,8 @@ import "./world/desktop/desktop.css";
 import "./world/room/room.css";
 import "./world/motion/motion.css";
 import { debugStartDay } from "@state/clock";
-import { createRunSlot } from "@state/saves";
+import { createProfileWriter, createRunSlot } from "@state/saves";
+import { endingHost } from "@world/endings/flow";
 import { createStore, type Store } from "@state/store";
 import { parseBeatParams } from "@world/desktop/beat";
 import { mountDesktop } from "@world/desktop/controller";
@@ -33,6 +34,19 @@ if (jump !== null) {
   const saving = store;
   saving.subscribe(() => run.save(saving));
 }
+
+// After the endings (san-and-endings FR2). The title page is not built yet, so "the title page"
+// reopens the game; with the run save gone that is a new run on day 1, nothing carried over.
+const home = () => window.location.assign(window.location.pathname);
+endingHost.afterBad = () => {
+  run.clear();
+  createProfileWriter(window.localStorage).increment("runs");
+  home();
+};
+endingHost.newRun = () => {
+  run.clear();
+  home();
+};
 
 const focus = params.get("focus");
 const view = params.get("view");

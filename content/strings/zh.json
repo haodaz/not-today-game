@@ -153,5 +153,16 @@
   "settings.home": "返回首页",
   "settings.cancel": "取消",
   "hud.cam.screen": "屏幕",
-  "hud.kuro": "克总"
+  "hud.kuro": "克总",
+  "ending.next": "继续",
+  "ending.youAndYou": "你和你",
+  "ending.firstDay": "第一日",
+  "ending.day19": "第十九日",
+  "credits.title": "它记得的",
+  "credits.dim.truth": "看",
+  "credits.dim.values": "待人",
+  "credits.dim.bond": "和它",
+  "credits.last.bad": "你回了「好」。它替你回的。",
+  "credits.last.survive": "今天过去了。",
+  "credits.last.good": "（最后一行由作者手写，待填）"
 }

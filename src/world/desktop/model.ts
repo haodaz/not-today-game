@@ -54,8 +54,14 @@ export interface Session {
   kuroPeekUntil: number;
   /** Its last line as last seen, to notice a new one; undefined before the first look. */
   kuroLast: string | null | undefined;
-  /** Kuro called from 房间 / 桌子: the chat window as an overlay (day-loop amendment). */
+  /** The chat overlay, rising from Kuro's body at the HUD's bottom right (day-loop correction). */
   kuroCall: boolean;
+  /** Its last line when the player last looked (call or small window); the dot shows otherwise. */
+  kuroRead: string | null | undefined;
+  /** The day the evening chat beat last opened the overlay by itself (once a day). */
+  kuroAutoDay: number;
+  /** Where the ending pages are (san-and-endings): 你和你 (bad only), the credits, then after. */
+  endingPage: { phase: "you" | "credits" | "after"; startMs: number; skipped: boolean } | null;
   /** The object lifted off the desk bar (polish FR1); never at the same time as the phone. */
   holding: string | null;
   /** The dialogue line's per-character reveal (polish FR3); set by the motion layer only. */
@@ -93,6 +99,9 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     kuroPeekUntil: 0,
     kuroLast: undefined,
     kuroCall: false,
+    kuroRead: undefined,
+    kuroAutoDay: 0,
+    endingPage: null,
     holding: null,
     reveal: null,
     wbMode: "self",

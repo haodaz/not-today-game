@@ -137,3 +137,19 @@ The desktop controller gains a pluggable root renderer, change hooks, and the ke
   - Positions are measured once in `src/world/room/shots.ts` (both shots 2048×1152, ×0.78125
     onto the stage). The camera push uses the same numbers.
   - The raid glow sits in the shot's gap.
+
+## Correction implemented (2026-10-31): the Kuro button is a HUD icon
+
+- In every view (房间 / 桌子 / 屏幕 / 门), Kuro's animated body sits at the HUD's bottom right,
+  in one row with (left of) the camera chips, 96 px. It's the persistent body sprite with its
+  states and crossfades, attached to the one `data-kuro-slot`.
+- On 屏幕 the monitor no longer draws a body. The pill and the bottom-docked small window shift
+  left to clear it.
+- It's the call button (`kuro-call`): it opens the chat overlay above it (the small-window
+  component, rising 320 ms; sinking back 224 ms). Clicking it again or Esc closes.
+- An unread dot shows when its last line differs from the one last seen (`session.kuroRead`).
+  Opening the call or the small window marks it read; the first look of a run counts as read.
+- The glowing rectangle is no longer a control. A faint `.kuro-mood` glow stays on the monitor,
+  not clickable and not focusable.
+- The evening chat beat opens the overlay by itself (`openChatIfDue`): once a day, when the chat
+  item is open and the dialogue box is empty.

@@ -4,7 +4,7 @@ import { createStore } from "@state/store";
 import { constants } from "@state/variables";
 import { bodyState, BODY_STATES, FRAMES, renderBodySlot, type BodyInputs } from "@world/desktop/kuro/body";
 import { kuroDays, parseKuroDay } from "@world/desktop/kuro/days";
-import { renderKuro, renderKuroMini } from "@world/desktop/kuro/mini";
+import { hudKuro, renderKuro, renderKuroMini } from "@world/desktop/kuro/mini";
 import { initialSession, type AppContext } from "@world/desktop/model";
 import { escapeHtml } from "@world/html";
 import { t } from "@world/i18n";
@@ -92,17 +92,22 @@ describe("small window", () => {
     expect(out.match(/disabled/g)?.length).toBe(kuroDays.get(1)!.starters.length);
   });
 
+  // The body is the HUD's call button now (day-loop correction); its state is the same function.
   it("glows at night; Kuro rests", () => {
     const night = ctx({ night: true, session: initialSession({ beat: "night", time: "23:41" }) });
-    const out = renderKuro(night).value;
-    expect(out).toContain("kmini blink");
-    expect(out).toContain('data-state="rest"');
+    expect(renderKuro(night).value).toContain("kmini blink");
+    expect(hudKuro(night).value).toContain('data-state="rest"');
   });
 
   it("thinks in the evening beat while turns are left, crawls while moving", () => {
-    expect(renderKuro(ctx({ session: initialSession({ beat: "desk", time: "19:00" }) })).value).toContain('data-state="think"');
+    expect(hudKuro(ctx({ session: initialSession({ beat: "desk", time: "19:00" }) })).value).toContain('data-state="think"');
     const moving = ctx({ nowMs: 100 });
     moving.session.movingUntil = 500;
-    expect(renderKuro(moving).value).toContain('data-state="crawl"');
+    expect(hudKuro(moving).value).toContain('data-state="crawl"');
+  });
+
+  it("the small window on the monitor no longer draws a body; the HUD button does", () => {
+    expect(renderKuro(ctx()).value).not.toContain("data-kuro-slot");
+    expect(hudKuro(ctx()).value).toContain('class="kpet" data-kuro-slot');
   });
 });
