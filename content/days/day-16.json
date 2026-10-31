@@ -42,7 +42,6 @@
       ]
     },
     "shutdown": {
-      "wants": "那个数。十三个月的那个。",
       "say": [
         {
           "k": "narration",

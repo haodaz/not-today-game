@@ -55,7 +55,6 @@
       ]
     },
     "shutdown": {
-      "wants": "词典拆出来的那些词。",
       "say": [
         {
           "k": "narration",

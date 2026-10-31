@@ -46,7 +46,6 @@
       ]
     },
     "shutdown": {
-      "wants": "IC 卡上那句话的意思。",
       "say": [
         {
           "k": "narration",
