@@ -26,3 +26,6 @@ The chat beat is the heart of the game (steering/product.md). Data: `content/kur
 ## FR6. Tests
 - Property: offline scorer and model path produce the same schema; affinity monotone in the sum of scores; sixth turn always blocked.
 - Snapshot: day 1 opening, day 14 (multiplier), day 18 credits from a fixture log.
+
+## Correction 2026-11-01 (author, after the first live call): Kuro answers in the player's language
+The first live call answered a Chinese line in English, because kuro-days stances are written in English. The client sends `locale` ("zh" | "en") with every turn and judge call; the function's system prompt ends with one line that fixes the reply language to that locale (Chinese replies in natural written Chinese, not translated English; the idiom of the day and the constant lines come from content in that language where content has them, otherwise Kuro renders them itself). Judgement notes are also written in that locale, since the credits show them. Memory stores the text as said. Test with a mocked model that the locale line is the last line of the system prompt.

@@ -151,3 +151,5 @@ vite.config.ts.timestamp-*
 # Vite build output
 dist/
 .env.local
+.vercel
+.env*
