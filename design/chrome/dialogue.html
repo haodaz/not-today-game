@@ -1,0 +1,46 @@
+<!doctype html><html lang="zh"><meta charset="utf-8"><title>对话框样稿</title>
+<style>
+html,body{margin:0;background:#000}
+.stage{position:relative;width:1600px;height:900px;overflow:hidden;font-family:"PingFang SC","Hiragino Sans GB",sans-serif;color:#1d2129;background:url(room.jpg) center/cover;margin-bottom:8px}
+.day{position:absolute;right:28px;top:28px;text-align:right;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.6);font-size:15px;line-height:1.5}.day b{display:block;font-size:22px}
+.cams{position:absolute;right:28px;bottom:28px;display:flex;gap:6px}.cams span{background:rgba(232,228,220,.7);backdrop-filter:blur(8px);border-radius:8px;padding:8px 14px;font-size:14px;color:#333}
+.kuro{position:absolute;right:300px;bottom:18px;width:192px;height:192px;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5))}
+/* the box */
+.box{position:absolute;left:50%;bottom:120px;transform:translateX(-50%);width:992px;height:132px;box-sizing:border-box;background:rgba(236,231,222,.86);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.6);border-radius:6px;padding:26px 30px 0;font-size:18px;line-height:1.6;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.box .tag{position:absolute;left:18px;top:-16px;background:#2a2622;color:#efe9df;font-size:13px;letter-spacing:.2em;padding:5px 14px;border-radius:3px}
+.box .tag.k{display:flex;align-items:center;gap:8px;padding:4px 14px 4px 4px}.box .tag.k img{width:40px;height:40px;border-radius:50%;object-fit:cover;background:#ddd}
+.box .hist{position:absolute;right:14px;top:-14px;width:28px;height:28px;border-radius:50%;background:#2a2622;color:#efe9df;display:flex;align-items:center;justify-content:center;font-size:14px}
+.box .more{position:absolute;right:18px;bottom:8px;color:#8b2f2a;font-size:12px;animation:p 1.2s infinite}@keyframes p{50%{opacity:.2}}
+.box.inner{font-style:italic;color:#6a3a36}
+.box.choices{padding-top:20px}.box.choices div{padding:2px 0 2px 20px;position:relative}.box.choices div.on::before{content:"◆";position:absolute;left:0;color:#8b2f2a}.box.choices div:not(.on){color:#777}
+.box.player{left:auto;right:64px;transform:none;width:560px}
+.box.player .tag{background:#5b4a2e}
+.box.player input{width:100%;border:0;border-bottom:1px solid #8a7f70;background:transparent;font:inherit;outline:0;padding:2px 0}
+.label{position:absolute;left:28px;top:28px;background:#111;color:#bbb;font:12px Menlo,monospace;padding:6px 10px}
+</style>
+<div class="stage">
+  <div class="label">1 · 旁白，长文翻页</div>
+  <div class="day"><b>第 7 天 · 晚上</b></div>
+  <div class="box"><span class="tag">桌上</span><span class="hist">↺</span>IC 卡背面的字被雨泡过，只剩三个字母还看得出：I、s、e。你把它翻过来，又翻回去。卡的边缘有一道很浅的齿痕，不像是你的。<span class="more">▼</span></div>
+  <img class="kuro" src="kuro.png"><div class="cams"><span>房间</span><span>桌子</span><span>屏幕</span><span>门</span></div>
+</div>
+<div class="stage">
+  <div class="label">2 · 点了克总：NPC 式询问（克总本体隐去）</div>
+  <div class="day"><b>第 7 天 · 晚上</b></div>
+  <div class="box choices"><span class="tag k"><img src="kuro.png">克总</span><span class="hist">↺</span><div style="padding-left:0;color:#1d2129;margin-bottom:6px">要和克总聊聊吗？</div><div class="on">聊聊</div><div>先不聊</div></div>
+  <div class="cams"><span>房间</span><span>桌子</span><span>屏幕</span><span>门</span></div>
+</div>
+<div class="stage">
+  <div class="label">3 · 克总回话（头像在名牌里），玩家框从右侧升起：起手问题 + 打字</div>
+  <div class="day"><b>第 7 天 · 晚上</b></div>
+  <div class="box" style="bottom:300px"><span class="tag k"><img src="kuro.png">克总</span><span class="hist">↺</span>我读了两份。第 6 条说三天内不许重复导出，第 11 条说随时可以。它们不能同时成立，总得有一个人先看出来。<span class="more">▶</span></div>
+  <div class="box choices player"><span class="tag">林一</span><div class="on">你怎么知道哪两条不一致？</div><div>今天雨挺大。</div><div>你叫什么？克总是我们给你起的。</div><div>说点别的…</div></div>
+  <div class="cams"><span>房间</span><span>桌子</span><span>屏幕</span><span>门</span></div>
+</div>
+<div class="stage">
+  <div class="label">4 · 玩家打字；内心独白斜体无名牌</div>
+  <div class="day"><b>第 7 天 · 晚上</b></div>
+  <div class="box inner" style="bottom:300px">这句话我昨天也想过。</div>
+  <div class="box player"><span class="tag">林一</span><input value="你昨天说的水，几点凉的"></div>
+  <div class="cams"><span>房间</span><span>桌子</span><span>屏幕</span><span>门</span></div>
+</div>

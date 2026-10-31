@@ -1,16 +1,43 @@
-# title-page — requirements
+# title-page — requirements (rewritten 2026-11-01, author)
 
-The launch page. Reuses the gamebook reader's decided flow (nottoday/index.html 扉页): one question per line, no defaults, dice for random names, the last button says 开始 not 继续.
+The launch screen is a full-screen game title, not a book cover and not a form. Reference feel: Kena / Satisfactory / MURK title screens: the world fills the screen, the menu is a short column of words laid on it. Strings in `content/strings/*` (`title.*`).
 
-## FR1. Screens
-- With a save: only `继续 · 第 N 天`; small row: 声音 · 语言 · 绑定邮箱 (backend). **There is no restart anywhere** (author 2026-11-01, a mechanic, not a UI choice): the only ways back to day 1 are the endings (bad = 「第一日，改」, survive = 「回到第一日」).
-- Without a save: the questions, one at a time, each answered before the next appears: 这是谁的故事？（名字）→ 家里人怎么称呼你？→ 老板怎么叫你？→ 同事怎么叫你？（默认留空，不预填；dice offers 老大 / 老板 / 哥 / 姐 / 名字）→ 她 / 他 / 不说. Each has a 🎲 that fills a neutral random value. Then 开始.
-- Kuro's face never appears on this page; the first sight of it is inside the screen on day 1.
-- Credit line only here and on the cover: `好大壮 · 与 Claude 一起写成`.
+## FR1. Look
+- Background: the room (`public/room/shots/room.jpg` for now; the splat with a slow camera drift once room-scene lands), darkened to about 60 %, a very slow push-in (120 s loop, ease-in-out), rain sound at low volume. No Kuro anywhere on this screen; its first sight is inside the screen on day 1.
+- Title `NOT TODAY` top-left, large, wide tracking, no subtitle. Below it the menu column, left-aligned, outlined text buttons with ~2 px hairline, generous vertical spacing; hover = fill, 160 ms.
+- Bottom-left small: version and the credit line `好大壮 · 与 Claude 一起写成` (only here).
+- Language toggle 中文 / English bottom-right as plain text; English is the default at submission.
 
-## FR2. Rules
-- Never prefill personal names (see no-personal-defaults). Values go to `names` (variables.json) and to `profiles.names` when online.
-- No restart action exists. `nt_run` is cleared only by an ending. `nt_profile` always survives.
+## FR2. Menu
+- Without a save: `新游戏` · `设置` · `制作`.
+- With a save: `继续 · 第 N 天` · `设置` · `制作`. **There is no `新游戏` while a save exists and no restart anywhere** (mechanic): the only ways back to day 1 are the endings. `nt_run` is cleared only by an ending; `nt_profile` always survives.
+- `设置` opens the same centred panel as in-game (声音 / 语言 / 取消; no 返回首页 here). `制作` opens a plain scrolling credits page (team, tools, the new-vs-pre-existing disclosure from README) with a back button.
 
-## FR3. Tests
-- Snapshot the two screens; property: every question must be answered or diced before 开始 enables.
+## FR3. 新游戏: the questions
+- Clicking 新游戏 does not change screen: the menu column fades and the questions appear in its place, one line at a time, each answered before the next appears: 这是谁的故事？（名字）→ 家里人怎么称呼你？→ 老板怎么叫你？→ 同事怎么叫你？→ 她 / 他 / 不说. Each has a 🎲 that fills a neutral random value (dice list: 老大 / 老板 / 哥 / 姐 / the name). Never prefill personal names. The last button says `开始`, enabled only when every question is answered or diced. Esc goes back to the menu.
+- Values go to `names` (variables.json) and to `profiles.names` when online (backend).
+
+## FR4. The book on the desk (after one finished run)
+- Once `nt_profile.finishedRuns ≥ 1` (set by any ending), the room view shows a small book on the desk, left of the keyboard (`public/room/book.png`, Claude provides; cutout like the objects). Clicking it opens the gamebook reader full-screen (an iframe of `/gamebook/` served from `public/gamebook/`, a copy of nottoday/index.html; Claude provides) with a close chip top-right. It is a gift for players who finished: the whole branching book as a second, older kind of game. It never appears on the title screen and never before the first ending.
+
+## FR5. Tests
+- Snapshot: title without save, title with save (day 7), questions mid-way, questions complete; room with and without the book.
+- Property: 开始 is disabled until all answered; no element with a restart action exists in any title snapshot; the book node exists iff finishedRuns ≥ 1.
+
+## FR6. Type (author 2026-11-01: "don't forget the fonts")
+- Self-hosted, subset, in `public/fonts/` (Claude provides the files; Kiro wires `@font-face` and the subset build step is Claude's). Never system fonts for game text.
+  - Title `NOT TODAY` and the stage header numbers: **Barlow Condensed 700**, tracking .12em.
+  - Chinese game text (menu, dialogue, HUD chips, settings, credits): **霞鹜文楷 LXGW WenKai** (OFL), with `Noto Sans SC` as the fallback only while the subset loads.
+  - English game text: **Alegreya** (OFL) for dialogue and credits, **Alegreya Sans** for chips and menus.
+  - The computer UI (desktop, workbench, messages, browser) keeps system fonts on purpose: it must look like a real computer. Only the game layer gets the game fonts.
+- Font swap must not reflow the fixed dialogue box: size-adjust the fallback so line heights match.
+
+## FR7. The waiting room, and what 新游戏 does
+- While the title sits idle the room is not quite still. Every 20–40 s (random) one small thing happens, one at a time, never two: the lamp dims for a frame; the right monitor wakes for 200 ms and sleeps; the chair is one pixel to the left after a cut; the gap between the monitors has a line of light for a second; the rain stops for three seconds. Each is a DOM/CSS layer over the background, from a fixed list in `content/title.json` (Claude writes; `idle: [{id, layer, ms}]`). Never on the first 15 s, so a new player sees nothing.
+- Clicking 新游戏: the rain gets louder and both monitors wake and stay lit (soft glow, not the old breathing box; it is the computer turning on, 600 ms). The menu fades into the questions (FR3).
+- Clicking 开始: the camera pushes in toward the desk over 1.4 s, the lamp goes off, the screen cuts to day 1 in the room view at boot. The push uses the same path as 房间→桌子.
+- Esc from the questions: the monitors sleep again and the rain settles.
+
+## FR8. Where the endings live: three figures on the desk
+- Each ending the player has ever reached (`nt_profile.endings: {bad, survive, good}` counts; set by san-and-endings) puts a small figure on the left end of the desk, by the window, in the title room and in the in-game room view: bad = a small grey figure of a person with no face (「第一日，改」: the one who was replaced); survive = a small cardboard box with a shipping slip (「回到第一日」); good = the chick, standing (「第十九日」). Assets `public/room/fig_{bad,survive,good}.png` (Claude provides, cutouts). Hovering shows the ending's name as a one-word chip; nothing else, no dates, no counts.
+- All three plus the book (FR4) are the whole collection. There is no achievements screen.
