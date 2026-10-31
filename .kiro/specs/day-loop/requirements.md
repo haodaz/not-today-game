@@ -48,3 +48,8 @@ The bottom-left row is replaced by a single ⚙ **设置** button. It opens a sm
 - Cameras are 房间 / 桌子 / 屏幕 / 门 (room / desk / screen / door). The current "桌面" chip was really 屏幕. **桌子** is a new level: the desk close-up (both monitors small, lamp, cup, box, objects on the desk). It is where objects and the phone are picked up, where the box is opened, and where the screens are entered (click a monitor → 屏幕). Until room-scene brings 3D, 桌子 is the 2K desk backdrop with the desk bar as its object layer; 房间 uses the wide shot (public/room/shots/room.jpg).
 - **Calling Kuro**: in 房间 and 桌子, the right monitor shows Kuro's small window glowing; clicking it opens the chat window as an overlay on the current view (same component, same turns and memory) without entering 屏幕. The chat beat in the evening is this overlay.
 - Chips: 房间 · 桌子 · 屏幕 · 门; strings `hud.cam.desk` now means 桌子 and `hud.cam.screen` is new.
+
+## Correction 2026-11-01 (author): the Kuro button is a HUD icon, not a patch on the monitor
+- In **every** view (房间 / 桌子 / 屏幕 / 门) there is a round Kuro icon fixed at the bottom-right of the HUD, left of the camera chips (its face from public/kuro/k3d_base.png, 48 px, a small unread dot when it has a new line). Clicking it opens the chat overlay anchored to that icon (rises from it, 320 ms); clicking it again or Esc closes.
+- The glowing rectangle on the right monitor is removed as a control; a faint glow on the monitor may stay as mood only, not clickable.
+- The small window inside 屏幕 (desktop-ui FR5) and this overlay are the same component with the same state.
