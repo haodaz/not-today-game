@@ -51,5 +51,5 @@ The bottom-left row is replaced by a single ⚙ **设置** button. It opens a sm
 
 ## Correction 2026-11-01 (author): the Kuro button is a HUD icon, not a patch on the monitor
 - In **every** view (房间 / 桌子 / 屏幕 / 门) Kuro's **animated body** (the sprite with its states: idle blink, busy, think, happy, rest, crawl; desktop-ui FR5) sits fixed at the bottom-right of the HUD, left of the camera chips, about 96 px, with a small unread dot when it has a new line. It is the call button. Clicking it opens the chat overlay anchored to that icon (rises from it, 320 ms); clicking it again or Esc closes.
-- The glowing rectangle on the right monitor is removed as a control; a faint glow on the monitor may stay as mood only, not clickable.
+- The glowing rectangle on the right monitor is removed entirely: no glow, no box, nothing breathing on the monitor (author).
 - The small window inside 屏幕 (desktop-ui FR5) and this overlay are the same component with the same state.
