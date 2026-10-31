@@ -20,3 +20,6 @@ What the last cycles add on top of rings (stages.json `cycles[].ring`). All of i
 ## FR6. Tests
 - Snapshot: HUD at day 15 vs 16 (eyes), a kuroCloses page before/after close, browser with overlay flag at ring wall/room/door (canvas is mocked: assert the sampler output and parameters).
 - Property: no `_red` frame or `maw` state before day 16; no overlay before ring wall.
+
+## Correction 2026-11-01 (author): Kuro crawls along edges, never floats in a straight line
+The closer's body must not drift diagonally to the ×. It is an octopus: it **crawls along the edges**. Path: from the HUD corner down onto the browser window's bottom edge, along that edge to the right side, up the right edge, then along the top edge to the close control, with rounded corners. The body rotates to face the direction it moves (feet toward the edge it crawls on), bobs on the crawl frames (crawl1/crawl2 at ~6 fps), and moves at a constant speed so the whole trip takes about 1.6 s regardless of distance (clamp 1.2–2.2 s). The maw flash and the close happen only when it has arrived. The return trip after closing is the same path reversed, faster (0.8 s), or it drops off the bottom edge and reappears in the HUD corner (Kiro picks one and says which). Same path logic for the 文档 page.
