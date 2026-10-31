@@ -202,5 +202,8 @@
   "dialogue.tag.gap": "From the gap",
   "dialogue.tag.desk": "On the desk",
   "dialogue.page": "Next page",
-  "title.q.name": "Name"
+  "title.q.name": "Name",
+  "room.bed.locked": "Not yet.",
+  "room.tower.off": "The computer is off.",
+  "desktop.shutdown": "Shut down"
 }

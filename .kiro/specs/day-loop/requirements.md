@@ -53,3 +53,25 @@ The bottom-left row is replaced by a single ⚙ **设置** button. It opens a sm
 - In **every** view (房间 / 桌子 / 屏幕 / 门) Kuro's **animated body** (the sprite with its states: idle blink, busy, think, happy, rest, crawl; desktop-ui FR5) sits fixed at the bottom-right of the HUD, left of the camera chips, about 96 px, with a small unread dot when it has a new line. It is the call button. Clicking it opens the chat overlay anchored to that icon (rises from it, 320 ms); clicking it again or Esc closes.
 - The glowing rectangle on the right monitor is removed entirely: no glow, no box, nothing breathing on the monitor (author).
 - The small window inside 屏幕 (desktop-ui FR5) and this overlay are the same component with the same state.
+
+## Correction 2026-11-01 (author): the checklist only watches; the player does everything in the world
+The author's rule: "the checklist observes our behaviour; the player is the one who acts." Today some lines are buttons (开机, 吃, 看一眼桌子, 关机, 躺下, 老周的事) and the rest tick after something happened elsewhere. That mix is wrong. From now on:
+
+- **No checklist line is a button.** Clicking a line does nothing. `ItemAction` / `loop-item` go away. A line ticks only because its `done` event or flag happened in the world. The current line stays highlighted (`now`), with no hover state.
+- **Every item has an actuator in the world.** The ones that already do stay as they are (消息, 点饭, 去拿, 拆箱, 工作, 回老板, 和它说会儿话, 寄件单). The ones that were checklist buttons get one:
+
+| Item | Where the player does it | Event |
+|---|---|---|
+| 开机 | The computer tower under the desk is a hotspot in 房间 and 桌子 (a small rect on the tower in `shots.ts`, measured from the photos; a faint light when it is off). Pressing it boots. Before boot, 屏幕 shows two black monitors and nothing else. | `step boot` |
+| 吃 | After 去拿, the meal sits on the desk bar as its food image (delivery already has these). Clicking it eats; the empty box stays on the bar until the next meal. | `step eat:<meal>` |
+| 看一眼桌子 | Entering 桌子 while the item is unlocked counts as looking; the desk beat plays on arrival. | `step beat:desk` |
+| 关机 | A 关机 control in the work system's own chrome in 屏幕 (top-right system menu, next to the clock). Pressing it plays the shutdown beat, darkens both monitors and returns to 房间. | `step beat:shutdown` |
+| 躺下 | The bed is a hotspot in 房间 (right side). Locked until the required items are done: clicking it then shows one inner line, string `room.bed.locked`, nothing else. Unlocked: the night plays, then `lieDown`, as now. | `lieDown` |
+| 老周的事，回一句 (day 5) | The loan choice is made in the messages app, in the conversation with 老周, as that day's reply there. The prompt that used to open from the checklist opens from that conversation. | `loan:decided` |
+
+- Hotspot rects are view geometry and live in `shots.ts` (Kiro measures them from `public/room/shots/*.jpg`). When room-scene brings 3D, they become mesh picks; the events do not change.
+- Strings (Claude, already in zh/en): `room.bed.locked`, `room.tower.off`, `desktop.shutdown`.
+- Tests: no `loop-item` action remains; each row of the table above has a test that the world action ticks the line and that clicking the line itself changes nothing. Snapshots of the room HUD are refreshed after checking the diff.
+
+## Correction 2026-11-01 (author): where Kuro's body sits
+Kuro's HUD body (192 px) sits at the bottom-right corner, **directly above the camera-chip row** and flush with its right edge, so it never overlaps the dialogue box. The chip row is provisional and will go; when it does, Kuro drops to the corner itself. The dialogue box's right edge must stay left of Kuro's left edge at 1600 px.

@@ -202,5 +202,8 @@
   "dialogue.tag.gap": "缝里",
   "dialogue.tag.desk": "桌上",
   "dialogue.page": "下一页",
-  "title.q.name": "名字"
+  "title.q.name": "名字",
+  "room.bed.locked": "还没完。",
+  "room.tower.off": "主机没开。",
+  "desktop.shutdown": "关机"
 }
