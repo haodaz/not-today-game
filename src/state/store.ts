@@ -15,6 +15,8 @@ export interface Store {
   getEvents(): readonly GameEvent[];
   /** The day the run started on: 1, or N for the `?day=N` debug jump. */
   getStartDay(): number;
+  /** The run's id: fixed for the run, saved with it; seeds per-run orders (recognise FR1). */
+  getRunId(): string;
   /** Stamps the draft with the current day, applies it, notifies subscribers. Returns new state. */
   appendEvent(draft: EventDraft): State;
   /** Calls `listener` after every appended event. Returns an unsubscribe function. */
@@ -26,6 +28,8 @@ export interface StoreOptions {
   startDay?: number;
   /** A previously saved log to replay. */
   events?: readonly GameEvent[];
+  /** The run's id (from the save, or new). Default: "run-<startDay>", stable for tests and debug jumps. */
+  runId?: string;
 }
 
 /** Pure: the whole game state for a start day and a log. Replaying the same log twice is equal. */
@@ -43,6 +47,7 @@ function deepFreeze<T>(value: T): T {
 
 export function createStore(options: StoreOptions = {}): Store {
   const startDay = options.startDay ?? 1;
+  const runId = options.runId ?? `run-${startDay}`;
   const events: GameEvent[] = [...(options.events ?? [])];
   let state = deepFreeze(computeState(startDay, events));
   const listeners = new Set<Listener>();
@@ -51,6 +56,7 @@ export function createStore(options: StoreOptions = {}): Store {
     getState: () => state,
     getEvents: () => Object.freeze(events.map((event) => Object.freeze({ ...event }))),
     getStartDay: () => startDay,
+    getRunId: () => runId,
 
     appendEvent(draft) {
       const event = { ...draft, day: state.day } as GameEvent;

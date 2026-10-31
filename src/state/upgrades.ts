@@ -2,8 +2,8 @@
 // Read, checked, frozen. The offer schedule is a pure function of the state and the log; accepting
 // and declining are events whose reducers set `upgraded` and log the rubric's judgement.
 import raw from "@content/upgrades.json";
-import variables from "@content/variables.json";
 import type { GameEvent } from "./events";
+import { judge } from "./judgement";
 import type { State } from "./types.gen";
 import { membersOf } from "./variables";
 
@@ -111,25 +111,7 @@ export function currentOffer(state: State, events: readonly GameEvent[], table: 
   return null;
 }
 
-/** The judgement fields' range from the variable table ("int -10..10"). */
-const JUDGEMENT_RANGE: readonly [number, number] = (() => {
-  const m = /(-?\d+)\.\.(-?\d+)/.exec(variables.judgement.fields.truth);
-  return m ? [Number(m[1]), Number(m[2])] : [-Infinity, Infinity];
-})();
-const clamp = (n: number) => Math.min(JUDGEMENT_RANGE[1], Math.max(JUDGEMENT_RANGE[0], n));
-
-function judge(state: State, d: Delta, day: number, eventId: string): State {
-  const j = state.judgement;
-  return {
-    ...state,
-    judgement: {
-      truth: clamp(j.truth + (d.truth ?? 0)),
-      values: clamp(j.values + (d.values ?? 0)),
-      bond: clamp(j.bond + (d.bond ?? 0)),
-      evidence: [...j.evidence, { day, eventId, note: d.evidence }],
-    },
-  };
-}
+const judgeBy = (state: State, d: Delta, day: number, eventId: string): State => judge(state, d, day, eventId, d.evidence);
 
 export function applyUpgrade(state: State, event: { readonly day: number; readonly object: string }): State {
   const o = upgradeTable.objects.get(event.object);
@@ -138,7 +120,7 @@ export function applyUpgrade(state: State, event: { readonly day: number; readon
   if (state.upgraded[event.object] === true) return state;
   if (event.day < o.offerFrom) throw new Error(`upgrade: "${event.object}" is not offered before day ${o.offerFrom}`);
   const next = { ...state, upgraded: { ...state.upgraded, [event.object]: true } };
-  return judge(next, upgradeTable.judgement.accept, event.day, `upgrade:${event.object}`);
+  return judgeBy(next, upgradeTable.judgement.accept, event.day, `upgrade:${event.object}`);
 }
 
 export function applyDeclineUpgrade(state: State, event: { readonly day: number; readonly object: string; readonly decline: DeclineKind }): State {
@@ -146,5 +128,5 @@ export function applyDeclineUpgrade(state: State, event: { readonly day: number;
   if (event.decline === "final" ? event.object !== FINAL : !upgradeTable.objects.has(event.object)) {
     throw new Error(`declineUpgrade: bad object "${event.object}" for ${event.decline}`);
   }
-  return judge(state, upgradeTable.judgement.decline, event.day, `declineUpgrade:${event.object}`);
+  return judgeBy(state, upgradeTable.judgement.decline, event.day, `declineUpgrade:${event.object}`);
 }

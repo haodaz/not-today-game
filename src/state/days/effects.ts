@@ -5,7 +5,7 @@
 import { withFlags } from "../flags";
 import { condHolds } from "../replies/resolve";
 import type { State } from "../types.gen";
-import { canHoldUp, isRaidNight, outcomeOf, raidMove } from "../nights";
+import { canHoldUp, isRaidNight, outcomeOf, raidMove, takeFor } from "../nights";
 import { membersOf, rangeOf } from "../variables";
 import { dayFile, taskFlags, type BeatName, type Choice } from "./table";
 import { taskByFlag } from "./tasks";
@@ -70,7 +70,12 @@ export function applyChoose(state: State, event: { readonly day: number; readonl
     // Held up to the hand: in dream state for that night only, back to integer pixels by morning.
     next = { ...next, dream: { ...next.dream, [effects.item_dream]: { until: event.day + 1 } } };
   }
-  if (raid) next = { ...next, raids: { ...next.raids, [String(event.day)]: outcomeOf(raidMove(choice)) } };
+  if (raid) {
+    next = { ...next, raids: { ...next.raids, [String(event.day)]: outcomeOf(raidMove(choice)) } };
+    // Nothing given on a night the hand takes something else: its flag (content/nights-takes.json).
+    const take = takeFor(event.day, choice);
+    if (take) next = withFlags(next, [take.flag]);
+  }
   if (effects.item_lost && !next.lost.includes(effects.item_lost)) {
     // Handed to the hand: lost until the day-17 bag brings it back (delivery applyPickup).
     next = { ...next, lost: [...next.lost, effects.item_lost] };

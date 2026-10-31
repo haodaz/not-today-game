@@ -155,5 +155,6 @@
   "settings.lang.zh": "中文",
   "settings.lang.en": "English",
   "settings.home": "Back to title",
-  "settings.cancel": "Cancel"
+  "settings.cancel": "Cancel",
+  "hud.cam.screen": "Screen"
 }

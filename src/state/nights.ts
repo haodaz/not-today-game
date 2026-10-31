@@ -2,6 +2,7 @@
 // does, all read from content: the raid nights are the days whose shutdown beat has choices
 // (content/days); what it wants is content/nights.json. Pure, clock-free.
 import nightsFile from "@content/nights.json";
+import takesFile from "@content/nights-takes.json";
 import { dayFile, dayFiles, type Choice } from "./days/table";
 import type { State } from "./types.gen";
 
@@ -53,6 +54,50 @@ const wants = parseNights(nightsFile);
 
 /** What the hand wants on `day` (content), or null on a night it does not come. */
 export const wantsOf = (day: number): string | null => wants.get(day) ?? null;
+
+/** What the hand takes instead when nothing is given (content/nights-takes.json): 9 and 18. */
+export interface Take {
+  readonly what: string;
+  /** Set when it takes it. */
+  readonly flag: string;
+  /** The line that plays (narration). */
+  readonly say: string;
+}
+
+/** Parses content/nights-takes.json strictly: only raid nights, each with what / flag / say. */
+export function parseTakes(input: unknown, nights: readonly number[] = raidNights): ReadonlyMap<number, Take> {
+  const where = (w: string) => `content/nights-takes.json ${w}`;
+  const bad = (w: string, problem: string): never => {
+    throw new Error(`${where(w)}: ${problem}`);
+  };
+  const rec = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
+  if (!rec(input)) bad("", "not an object");
+  const top = input as Record<string, unknown>;
+  for (const k of Object.keys(top)) if (k !== "_note" && k !== "takes") bad("", `unknown key "${k}"`);
+  if (!rec(top.takes)) bad("takes", "must be an object");
+  const out = new Map<number, Take>();
+  for (const [k, v] of Object.entries(top.takes as Record<string, unknown>)) {
+    const day = Number(k);
+    if (!Number.isInteger(day) || String(day) !== k) bad(`takes.${k}`, "key must be a day number");
+    if (!nights.includes(day)) bad(`takes.${k}`, `day ${day} is not a raid night`);
+    if (!rec(v)) bad(`takes.${k}`, "must be an object");
+    const t = v as Record<string, unknown>;
+    for (const f of Object.keys(t)) if (!["what", "flag", "say"].includes(f)) bad(`takes.${k}`, `unknown key "${f}"`);
+    const s = (f: string) => (typeof t[f] === "string" && t[f] !== "" ? (t[f] as string) : bad(`takes.${k}.${f}`, "expected a non-empty string"));
+    out.set(day, Object.freeze({ what: s("what"), flag: s("flag"), say: s("say") }));
+  }
+  return out;
+}
+
+const takes = parseTakes(takesFile);
+
+/** What the hand takes on `day` if nothing is given, or null (other nights only cost san). */
+export const takeOf = (day: number): Take | null => takes.get(day) ?? null;
+
+/** The take that happens for this choice: a "nothing" move on a night that has one. */
+export function takeFor(day: number, choice: Choice): Take | null {
+  return raidMove(choice).kind === "nothing" ? takeOf(day) : null;
+}
 
 export function raidMove(choice: Choice): RaidMove {
   const e = choice.effects ?? {};

@@ -133,7 +133,7 @@
   "hud.overdue": "拖欠 {n} 天",
   "hud.hr": "{bpm} bpm",
   "hud.cam.room": "房间",
-  "hud.cam.desk": "桌面",
+  "hud.cam.desk": "桌子",
   "hud.cam.door": "门",
   "hud.menu.sound": "声音",
   "hud.menu.lang": "语言",
@@ -156,5 +156,6 @@
   "settings.lang.zh": "中文",
   "settings.lang.en": "English",
   "settings.home": "返回首页",
-  "settings.cancel": "取消"
+  "settings.cancel": "取消",
+  "hud.cam.screen": "屏幕"
 }

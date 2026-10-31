@@ -13,10 +13,15 @@ export const RUN_KEY = "nt_run";
 export const PROFILE_KEY = "nt_profile";
 
 /** Bump when the saved shape changes and add the step to the matching `migrations`. */
-const RUN_VERSION = 1;
+const RUN_VERSION = 2;
+
+/** A run saved before run ids existed gets a fixed one, so its option orders stay stable. */
+export const LEGACY_RUN_ID = "run-legacy";
 const PROFILE_VERSION = 1;
 
 export interface RunSave {
+  /** Version 2 (recognise spec): seeds per-run orders such as the recognise options. */
+  runId: string;
   startDay: number;
   /** The day counter. Must equal startDay plus the number of lieDown events. */
   day: number;
@@ -34,7 +39,8 @@ const isDay = (value: unknown): value is number =>
  * day it happened on, and the log actually replays. Anything else is treated as corrupt.
  */
 function isValidRun(data: SlotData): boolean {
-  const { startDay, day, events } = data;
+  const { startDay, day, events, runId } = data;
+  if (typeof runId !== "string" || runId === "") return false;
   if (!isDay(startDay) || !isDay(day) || !Array.isArray(events)) return false;
 
   let expected = startDay;
@@ -56,7 +62,9 @@ function isValidRun(data: SlotData): boolean {
 export const RUN_SPEC: SlotSpec = {
   key: RUN_KEY,
   version: RUN_VERSION,
-  migrations: {},
+  migrations: {
+    1: (data) => ({ ...data, runId: LEGACY_RUN_ID }),
+  },
   isValid: isValidRun,
 };
 
@@ -71,8 +79,8 @@ export const PROFILE_SPEC: SlotSpec = {
 };
 
 export interface RunSlot {
-  /** Saves the store's start day, day counter and log. */
-  save(store: Pick<Store, "getStartDay" | "getState" | "getEvents">): void;
+  /** Saves the store's run id, start day, day counter and log. */
+  save(store: Pick<Store, "getRunId" | "getStartDay" | "getState" | "getEvents">): void;
   /** The saved run, or null if none (or none that is good). Feed it to createStore. */
   load(): RunSave | null;
   /** Bad-ending restart: removes the run save and its backup. Never touches the profile. */
@@ -84,13 +92,14 @@ export function createRunSlot(storage: KeyValueStorage): RunSlot {
   return {
     save: (store) =>
       slot.write({
+        runId: store.getRunId(),
         startDay: store.getStartDay(),
         day: store.getState().day,
         events: [...store.getEvents()],
       }),
     load() {
       const data = slot.read();
-      return data && { startDay: data.startDay, day: data.day, events: data.events } as RunSave;
+      return data && ({ runId: data.runId, startDay: data.startDay, day: data.day, events: data.events } as RunSave);
     },
     clear: () => slot.clear(),
   };

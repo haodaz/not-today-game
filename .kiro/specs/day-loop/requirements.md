@@ -43,3 +43,8 @@ No inventory, no health bar, no clock. The HUD in the room / desk / door views:
 
 ## Amendment 2026-11-01 (author): one settings button
 The bottom-left row is replaced by a single ⚙ **设置** button. It opens a small centred panel over the current view (dimmed behind): 声音 (on/off), 语言 (中文 / English, switching re-renders immediately from en.json), 返回首页, 取消. The language switch must actually work: `?lang=en` and the panel both set the locale; en.json is complete, missing keys fall back to zh. No restart item anywhere. Strings: `settings.title`, `settings.sound`, `settings.lang`, `settings.home`, `settings.cancel`.
+
+## Amendment 2026-11-01 (author): four camera levels, and calling Kuro from the room
+- Cameras are 房间 / 桌子 / 屏幕 / 门 (room / desk / screen / door). The current "桌面" chip was really 屏幕. **桌子** is a new level: the desk close-up (both monitors small, lamp, cup, box, objects on the desk). It is where objects and the phone are picked up, where the box is opened, and where the screens are entered (click a monitor → 屏幕). Until room-scene brings 3D, 桌子 is the 2K desk backdrop with the desk bar as its object layer; 房间 uses the wide shot (public/room/shots/room.jpg).
+- **Calling Kuro**: in 房间 and 桌子, the right monitor shows Kuro's small window glowing; clicking it opens the chat window as an overlay on the current view (same component, same turns and memory) without entering 屏幕. The chat beat in the evening is this overlay.
+- Chips: 房间 · 桌子 · 屏幕 · 门; strings `hud.cam.desk` now means 桌子 and `hud.cam.screen` is new.

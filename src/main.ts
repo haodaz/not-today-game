@@ -28,7 +28,8 @@ if (jump !== null) {
   store = createStore({ startDay: jump });
 } else {
   const saved = run.load();
-  store = createStore(saved ? { startDay: saved.startDay, events: saved.events } : {});
+  // A new run gets a fresh id (it only seeds per-run orders; it is saved with the run).
+  store = createStore(saved ? { runId: saved.runId, startDay: saved.startDay, events: saved.events } : { runId: crypto.randomUUID() });
   const saving = store;
   saving.subscribe(() => run.save(saving));
 }

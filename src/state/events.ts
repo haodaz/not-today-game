@@ -6,6 +6,7 @@ import { applyChoose, applyStep, applyTask, type TaskEventMode } from "./days/ef
 import { applyDeclineUpgrade, applyUpgrade, type DeclineKind } from "./upgrades";
 import { applyOrder, applyPickup, applyUseItem } from "./delivery/effects";
 import type { Meal } from "./delivery/table";
+import { applyRecognise } from "./recognise";
 import { applyReplyEvent, knownRecipients } from "./replies/effects";
 import { constants, membersOf } from "./variables";
 
@@ -16,7 +17,11 @@ export const LOAN_CHOICE_REFUSE = "no";
 /** Every event carries the `day` counter value at the moment it was appended. */
 export type GameEvent =
   | { kind: "openLayer"; day: number; objectId: string }
-  | { kind: "recognise"; day: number; objectId: string }
+  /**
+   * recognise spec: `option` is the index (content order) of the answer chosen to "do you know
+   * what this is?"; the reducer reads right/wrong from content. Without it: world-state's plain form.
+   */
+  | { kind: "recognise"; day: number; objectId: string; option?: number }
   | { kind: "pressKey"; day: number; key: string }
   /**
    * `choice` is the word (or a prompt choice such as the loan's "lend"). `recipient` is set when
@@ -138,7 +143,7 @@ export function applyEvent(state: State, event: GameEvent): State {
     case "openLayer":
       return withMember(state, "found", event.objectId);
     case "recognise":
-      return withMember(state, "recognised", event.objectId);
+      return applyRecognise(state, event, (s) => withMember(s, "recognised", event.objectId));
     case "pokeReset":
       // The reset hole is always pressable and never does anything else.
       return state.pokedReset ? state : { ...state, pokedReset: true };
