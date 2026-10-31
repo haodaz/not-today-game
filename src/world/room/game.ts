@@ -35,7 +35,8 @@ import { askedOn, knows } from "@state/recognise";
 import { gateAdvance } from "@world/motion/reveal";
 import { endingNext } from "@world/endings/flow";
 import { renderEnding } from "@world/endings/view";
-import { boxObjectFor, doorMeal, renderRoom, settingsButton, settingsPanel } from "./hud";
+import { boxObjectFor, doorMeal, raidShowing, renderRoom, settingsButton, settingsPanel } from "./hud";
+import { pointed } from "./pointer";
 
 export function renderGame(store: Store, session: Session, nowMs: number): SafeHtml {
   const state = store.getState();
@@ -219,6 +220,8 @@ export const loopActions: Record<string, ActionHandler> = {
       // The loan prompt: a recipient-less reply (world-state's loan reducer decides).
       ctx.store.appendEvent({ kind: "reply", choice: data.choice, t: ctx.session.clock.time });
     } else if (q.ending.kind === "beatChoices") {
+      // Answering the hand once retires its one-time pointer (rule 2026-11-01).
+      if (raidShowing(state, ctx.session)) pointed(ctx.session, "raid");
       ctx.store.appendEvent({ kind: "choose", beat: q.ending.beat, index: Number(data.index) });
     } else if (q.ending.kind === "recognise") {
       // The reducer reads right / wrong from content; the runtime plays the answer's lines.
@@ -251,6 +254,8 @@ export const loopActions: Record<string, ActionHandler> = {
     if (!onDesk) return;
     session.holding = session.holding === id ? null : id;
     session.phoneOpen = false;
+    // The first 举起来 done: its one-time pointer never shows again this run.
+    pointed(session, "hold");
     // Picked up and still not known: the question comes back, once a day (recognise FR1).
     const events = store.getEvents();
     if (session.holding && !knows(id, state, events) && !askedOn(events, state.day, id)) {

@@ -17,28 +17,32 @@ function storeAt(day: number, drafts: EventDraft[] = []): Store {
 }
 const view = (store: Store) => checklist(loopContext(store.getState(), store.getEvents())!);
 const texts = (store: Store) => view(store).lines.map((l) => `${l.state}:${l.text}`);
+// Item text is content's and changes (day-loop rule 2026-11-01): read it from the day file.
+const item1 = (id: string) => dayFiles.get(1)!.items.find((it) => it.id === id)!;
+const text1 = (id: string) => item1(id).text;
+const rewrite1 = (id: string) => item1(id).rewrite!;
 
 describe("checklist (FR1)", () => {
   it("day 1 opens with only 开机, then shows the current item and one more", () => {
     const store = storeAt(1);
-    expect(texts(store)).toEqual(["now:开机。"]);
+    expect(texts(store)).toEqual([`now:${text1("boot")}`]);
     store.appendEvent(step("boot"));
     expect(view(store).doneCount).toBe(1);
-    expect(texts(store)).toEqual(["now:看一眼消息。"]);
+    expect(texts(store)).toEqual([`now:${text1("msgs")}`]);
     store.appendEvent(step("openApp:msgs"));
-    expect(texts(store)).toEqual(["now:点个午饭。", "next:v17 过一遍。"]);
+    expect(texts(store)).toEqual([`now:${text1("lunch")}`, `next:${text1("task1")}`]);
   });
 
   it("after ordering, lunch waits with its rewrite text, unticked, until it arrives", () => {
     const store = storeAt(1, [step("boot"), step("openApp:msgs"), { kind: "order", meal: "lunch", shopId: "huangmenji", itemId: "hmj", t: "11:30" }]);
-    expect(texts(store)).toEqual(["now:v17 过一遍。", "wait:午饭在路上。"]);
+    expect(texts(store)).toEqual([`now:${text1("task1")}`, `wait:${rewrite1("lunch")}`]);
     store.appendEvent(step("delivery:arrives:lunch", "12:04"));
-    expect(texts(store)).toEqual(["now:v17 过一遍。", "next:去拿。"]);
+    expect(texts(store)).toEqual([`now:${text1("task1")}`, `next:${text1("pickup")}`]);
   });
 
   it("an event before its item unlocks counts only once it does", () => {
     const store = storeAt(1, [step("openApp:msgs")]);
-    expect(texts(store)).toEqual(["now:开机。"]);
+    expect(texts(store)).toEqual([`now:${text1("boot")}`]);
     store.appendEvent(step("boot"));
     expect(view(store).doneCount).toBe(2);
   });

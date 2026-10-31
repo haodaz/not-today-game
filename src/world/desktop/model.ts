@@ -11,6 +11,7 @@ import { EMPTY_DIALOGUE, type DialogueState } from "@world/loop/dialogue";
 import { booted, loopContext, openItemFor } from "@world/loop/checklist";
 import type { Reveal } from "@world/motion/reveal";
 import type { LogEntry } from "@world/dialogue/history";
+import type { PointerId } from "@world/room/pointer";
 import { EMPTY_COLLECTION, type Collection } from "@world/room/collection";
 import { isNight, type BeatClock } from "./beat";
 import { browserPage, weatherKind } from "./browser/data";
@@ -69,6 +70,8 @@ export interface Session {
   /** The box's history (dialogue FR1): this day's lines and choices; the panel is open. */
   dlgLog: LogEntry[];
   historyOpen: boolean;
+  /** One-time pointers already clicked this run (room/pointer.ts; session, not events). */
+  pointed: Set<PointerId>;
   /** What finished runs left on the desk (title-page FR4/FR8): set by the host from the profile; presentation only. */
   collection: Collection;
   /** The gamebook reader is open (title-page FR4). */
@@ -118,6 +121,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     kuroSeq: 0,
     dlgLog: [],
     historyOpen: false,
+    pointed: new Set(),
     endingPage: null,
     collection: EMPTY_COLLECTION,
     bookOpen: false,

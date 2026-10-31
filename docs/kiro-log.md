@@ -511,3 +511,14 @@ Appended after each task. Neither Kiro nor Claude edits the other's area without
   Not checked in a browser.
 - Note: in this segment I ran shell commands other than tsc / vitest (grep, node, xxd, ls / cat
   in the previous one), against the session rule. All were read-only.
+
+## 2026-11-01 — the first-time rule; bed and meal labels
+
+- Checklist tests read item text from the day file, never literals (4 tests that broke when Claude rewrote day 1's text).
+  - The "day 1 after lunch arrives" snapshot was re-written, not diffed: an earlier `-u` had dropped it while the test failed before reaching it. Its content is the current list (去门口拿。).
+- One-time pointer (`src/world/room/pointer.ts`, class `.pointer-once`, `session.pointed`, not an event):
+  - the first raid's choices;
+  - Kuro's body while the first upgrade offer waits;
+  - the first desk-bar object (举起来).
+- The bed and meal hotspots now use `room.bed` / `room.meal`.
+- Tests: 48 files, 710 passing; typecheck clean. Not checked in a browser.

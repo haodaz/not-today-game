@@ -189,6 +189,7 @@ describe("when it is asked (FR1)", () => {
     const store = createStore({ startDay: 4 });
     store.appendEvent({ kind: "openLayer", objectId: "pager" });
     const session = initialSession(DEFAULT_CLOCK, "left", "desk");
+    session.pointed.add("hold"); // the one-time 举起来 pointer is tested in actuators.test.ts
     const bar = () => renderRoom({ state: store.getState(), events: store.getEvents(), session }).value;
     expect(bar()).toContain('class="slot unknown" data-object="pager"');
     store.appendEvent({ kind: "recognise", objectId: "pager", option: rightIndex("pager") });

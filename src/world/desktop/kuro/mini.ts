@@ -8,6 +8,7 @@ import { cls, html, type SafeHtml } from "@world/html";
 import { t, tr } from "@world/i18n";
 import { kuroInBox } from "@world/loop/dialogue";
 import type { AppContext } from "../model";
+import { pointerCls } from "@world/room/pointer";
 import { bodyState, frameUrl, FRAMES, type BodyState } from "./body";
 import { kuroDay } from "./days";
 
@@ -71,5 +72,7 @@ export function hudKuro(ctx: AppContext): SafeHtml {
   // always exactly one body slot on the page.
   if (kuroInBox(ctx.session.dialogue)) return html`<div class="hud-kuro away"></div>`;
   const unread = kuroUnread(ctx);
-  return html`<div class="hud-kuro"><button type="button" class="${cls("kuro-btn", unread && "unread")}" data-action="kuro-call" aria-label="${t("kuro.name")}"><span class="kpet" data-kuro-slot data-state="${kuroBodyState(ctx)}" aria-hidden="true"></span>${unread ? html`<i class="dot"></i>` : null}</button></div>`;
+  // The first upgrade offer has no checklist line: a one-time pointer on the body (rule 2026-11-01).
+  const offer = pointerCls(ctx.session, "offer", !ctx.night && currentOffer(ctx.state, ctx.events) !== null);
+  return html`<div class="hud-kuro"><button type="button" class="${cls("kuro-btn", unread && "unread", offer)}" data-action="kuro-call" aria-label="${t("kuro.name")}"><span class="kpet" data-kuro-slot data-state="${kuroBodyState(ctx)}" aria-hidden="true"></span>${unread ? html`<i class="dot"></i>` : null}</button></div>`;
 }

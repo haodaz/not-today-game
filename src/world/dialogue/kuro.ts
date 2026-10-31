@@ -19,6 +19,7 @@ import { finishChoice, leaveKuro, push, replaceHead, talking, type Ending, type 
 import { stepOnce } from "@world/loop/steps";
 import { fillPlaceholders } from "@world/replies/placeholders";
 import { logCurrent, logPlayer } from "./history";
+import { pointed } from "@world/room/pointer";
 import { fontPx, KURO_LINE_BOX, nextScreen, PLAYER_BOX, screens, type Screen } from "./layout";
 
 /** The chat beat: after shutdown (turns count only here). */
@@ -216,6 +217,8 @@ export function playerBox(state: State, events: readonly GameEvent[], session: S
 export const kuroActions: Record<string, ActionHandler> = {
   // Kuro's body at the HUD's bottom right, or the desktop pill (FR2).
   "kuro-call"(ctx) {
+    // Clicked while an offer waits: the one-time pointer on the body has done its job.
+    if (!isNight(ctx.session.clock) && currentOffer(ctx.store.getState(), ctx.store.getEvents())) pointed(ctx.session, "offer");
     startTalk(ctx);
     ctx.rerender();
   },

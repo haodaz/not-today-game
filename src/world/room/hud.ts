@@ -14,8 +14,7 @@ import { mealView } from "@world/delivery/meals";
 import { renderDoorView } from "@world/delivery/view";
 import { cls, html, raw, type SafeHtml } from "@world/html";
 import { getLocale, t, tr, type Locale } from "@world/i18n";
-import { booted, checklist, deskMeal, loopContext, type ChecklistView, type LoopContext } from "@world/loop/checklist";
-import type { EventToken } from "@state/days/table";
+import { booted, checklist, deskMeal, loopContext, type ChecklistView } from "@world/loop/checklist";
 import { itemOf } from "@state/delivery/shops";
 import { ordersOn } from "@world/delivery/meals";
 import { raidNights, takeOf } from "@state/nights";
@@ -30,6 +29,7 @@ import { bpm, sanBand } from "@state/endings";
 /** The flag the hand sets when it takes the heartbeat (content/nights-takes.json `what: heartbeat`). */
 const HEARTBEAT_TAKEN: string | null = raidNights.map(takeOf).find((t) => t?.what === "heartbeat")?.flag ?? null;
 import { heldItem, heldLayer } from "./held";
+import { pointerCls } from "./pointer";
 import { dialogueBox, raidShowing } from "@world/dialogue/box";
 
 /** L7: the day the heart-rate widget appears (stages.json if it says; else day 9's narration). */
@@ -70,11 +70,13 @@ function deskBar(state: State, events: readonly GameEvent[], session: Session): 
     .filter((id) => !state.lost.includes(id))
     // A slot is a button so it can be picked up (polish FR1, design P9); while it is held, the
     // slot is empty (`lifted`).
-    .map((id) =>
-      state.upgraded[id] === true
-        ? html`<button type="button" class="${cls("slot", "upgraded", unknown(id), held === id && "lifted")}" data-object="${id}" data-res="hi" data-action="loop-hold"><img src="/objects/${id}_front.png" alt=""><div class="screen-hi" data-screen="${id}"></div></button>`
-        : html`<button type="button" class="${cls("slot", unknown(id), held === id && "lifted")}" data-object="${id}" data-action="loop-hold"><img src="/objects/${id}_white.png" alt=""><div class="lcd" data-screen="${id}"></div></button>`,
-    );
+    // The first 举起来 has no checklist line: a one-time pointer on the first object (rule 2026-11-01).
+    .map((id, i) => {
+      const first = pointerCls(session, "hold", i === 0 && held === null);
+      return state.upgraded[id] === true
+        ? html`<button type="button" class="${cls("slot", "upgraded", unknown(id), held === id && "lifted", first)}" data-object="${id}" data-res="hi" data-action="loop-hold"><img src="/objects/${id}_front.png" alt=""><div class="screen-hi" data-screen="${id}"></div></button>`
+        : html`<button type="button" class="${cls("slot", unknown(id), held === id && "lifted", first)}" data-object="${id}" data-action="loop-hold"><img src="/objects/${id}_white.png" alt=""><div class="lcd" data-screen="${id}"></div></button>`;
+    });
   return html`<div class="bar"><button type="button" class="slot" data-action="loop-box">${left > 0 ? html`<div class="box"></div><span>${tr("hud.box.left", { n: left })}</span>` : html`<div class="box" style="opacity:.3"></div>`}</button><button type="button" class="${cls("slot", held === "phone" && "lifted")}" data-action="loop-phone"><div class="phone"></div><span>${tr("hud.phone")}</span></button><div class="slot"><div class="cup"></div></div>${mealSlot(state, events)}${objects}</div>`;
 }
 
@@ -95,8 +97,7 @@ function mealSlot(state: State, events: readonly GameEvent[]): SafeHtml | null {
     const empty = food ? html`<object data="/${sprite}_done.png" type="image/png" aria-hidden="true"><img class="eaten" src="${food}" alt=""></object>` : null;
     return html`<div class="slot meal done" data-meal="${at.meal}">${empty}</div>`;
   }
-  const label = itemText(lc, (e) => e.type === "eat" && e.meal === at.meal);
-  return html`<button type="button" class="slot meal" data-action="loop-eat" data-meal="${at.meal}"${label ? html` aria-label="${label}"` : null}>${food ? html`<img src="${food}" alt="">` : null}</button>`;
+  return html`<button type="button" class="slot meal" data-action="loop-eat" data-meal="${at.meal}" aria-label="${t("room.meal")}">${food ? html`<img src="${food}" alt="">` : null}</button>`;
 }
 
 /** The camera chips: 房间 · 桌子 · 屏幕 · 门 (`hud.cam.desk` is 桌子 now; 屏幕 is `hud.cam.screen`). */
@@ -176,13 +177,7 @@ export interface RoomModel {
  * monitors) goes to 桌子. 桌子: each monitor goes to 屏幕 on that side. Both: the glowing small
  * window on the right monitor calls Kuro. They sit under the HUD.
  */
-/** The text of today's item done by this event (content), as an actuator's accessible name. */
-function itemText(lc: LoopContext | null, match: (e: EventToken) => boolean): string {
-  return lc?.file.items.find((it) => it.done.kind === "event" && match(it.done.event))?.text ?? "";
-}
-
 function shotHits(view: "room" | "desk", state: State, events: readonly GameEvent[]): SafeHtml {
-  const lc = loopContext(state, events);
   // Nothing on the monitors themselves: no glow, no box (day-loop correction). Kuro's call button
   // is its body at the HUD's bottom right.
   // The tower's power button boots the computer (day-loop correction 2026-11-01: the checklist
@@ -192,8 +187,7 @@ function shotHits(view: "room" | "desk", state: State, events: readonly GameEven
     ? null
     : html`<button type="button" class="shot-hit tower-hit" data-action="tower-power" style="${rectStyle(shot.tower)}" aria-label="${t("room.tower.off")}"><i class="tower-led"></i></button>`;
   if (view === "room") {
-    const bed = itemText(lc, (e) => e.type === "lieDown");
-    return html`<button type="button" class="shot-hit" data-action="view" data-view="desk" style="${rectStyle(ROOM_SHOT.desk)}" aria-label="${t("hud.cam.desk")}"></button>${tower}<button type="button" class="shot-hit bed-hit" data-action="bed" style="${rectStyle(ROOM_SHOT.bed)}"${bed ? html` aria-label="${bed}"` : null}></button>`;
+    return html`<button type="button" class="shot-hit" data-action="view" data-view="desk" style="${rectStyle(ROOM_SHOT.desk)}" aria-label="${t("hud.cam.desk")}"></button>${tower}<button type="button" class="shot-hit bed-hit" data-action="bed" style="${rectStyle(ROOM_SHOT.bed)}" aria-label="${t("room.bed")}"></button>`;
   }
   const mon = (side: "left" | "right") =>
     html`<button type="button" class="shot-hit monitor-hit" data-action="view" data-view="desktop" data-screen="${side}" style="${rectStyle(DESK_SHOT.monitors[side])}" aria-label="${t("hud.cam.screen")} · ${t(`desktop.screen.${side}`)}"></button>`;

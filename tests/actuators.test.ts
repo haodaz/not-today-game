@@ -14,6 +14,12 @@ import { loopActions, renderGame, SHUTDOWN_TO_ROOM_MS } from "@world/room/game";
 import { renderRoom } from "@world/room/hud";
 import { DESK_SHOT, rectStyle, ROOM_SHOT } from "@world/room/shots";
 import { completeUntil } from "./complete-items";
+import { upgradeTable } from "@state/upgrades";
+import { lineScreens } from "@world/dialogue/box";
+import { EMPTY_DIALOGUE, push, showing } from "@world/loop/dialogue";
+import { beatQueued } from "@world/loop/runtime";
+import { POINTER_CLASS } from "@world/room/pointer";
+import { boxObjectFor } from "@world/room/hud";
 
 afterEach(() => setLocale("zh"));
 
@@ -152,6 +158,70 @@ describe("躺下: the bed in 房间", () => {
     expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:beat:night"]);
     for (let i = 0; i < dayFiles.get(1)!.beats.night!.say.length; i++) act(ctx, "loop-advance");
     expect(store.getState().day).toBe(2);
+  });
+});
+
+describe("the bed and the meal are named by their strings", () => {
+  it("room.bed on the bed, room.meal on the meal", () => {
+    const store = atDay(1);
+    expect(render(ctxOf(store).ctx)).toContain(`data-action="bed" style="${rectStyle(ROOM_SHOT.bed)}" aria-label="${t("room.bed")}"`);
+    completeUntil(store, "eat");
+    expect(render(ctxOf(store, "desk").ctx)).toContain(`data-action="loop-eat" data-meal="lunch" aria-label="${t("room.meal")}"`);
+  });
+});
+
+describe("the one-time pointer (day-loop rule 2026-11-01)", () => {
+  const ptr = (s: string) => (s.match(/pointer-once/g) ?? []).length;
+
+  it("举起来: on the first object of the desk bar until one is held once; never again; no event", () => {
+    const store = atDay(1);
+    store.appendEvent({ kind: "openLayer", objectId: boxObjectFor(1)! });
+    const { ctx } = ctxOf(store, "desk");
+    const before = render(ctx);
+    expect(ptr(before)).toBe(1);
+    expect(before).toMatch(new RegExp(`class="slot[^"]*pointer-once" data-object="${boxObjectFor(1)}"`));
+    const events = store.getEvents().length;
+    act(ctx, "loop-hold", { object: boxObjectFor(1)! });
+    act(ctx, "loop-put-down");
+    expect(ptr(render(ctx))).toBe(0);
+    expect(store.getEvents().slice(events).some((e) => e.kind === "step")).toBe(false); // session, not an event
+  });
+
+  it("the first upgrade offer: on Kuro's body while an offer waits, until the body is clicked", () => {
+    const pager = upgradeTable.objects.get("pager")!;
+    const store = atDay(1);
+    store.appendEvent({ kind: "openLayer", objectId: "pager" });
+    while (store.getState().day < pager.offerFrom) store.appendEvent({ kind: "lieDown" });
+    const { ctx } = ctxOf(store, "room");
+    expect(render(ctx)).toContain('class="kuro-btn pointer-once"');
+    act(ctx, "kuro-call");
+    act(ctx, "kuro-leave");
+    expect(render(ctx)).not.toContain("pointer-once");
+    // No offer: no pointer, even on a fresh session.
+    expect(render(ctxOf(atDay(1)).ctx)).not.toContain("pointer-once");
+  });
+
+  it("the first night's hand: on the raid's choices in the box, until one is chosen; not on the next raid", () => {
+    const store = atDay(5);
+    const { ctx } = ctxOf(store, "room", { beat: "night", time: "23:41" });
+    const raidAt = (day: number) => {
+      ctx.session.dialogue = push(EMPTY_DIALOGUE, beatQueued(day, "shutdown", dayFiles.get(day)!.beats.shutdown!));
+      const n = lineScreens(store.getState(), ctx.session)!.all.length;
+      ctx.session.dialogue = { ...ctx.session.dialogue, line: ctx.session.dialogue.queue[0]!.lines.length - 1, page: n - 1 };
+    };
+    raidAt(5);
+    expect(render(ctx)).toMatch(/<div class="choices pointer-once">/);
+    const offered = showing(ctx.session.dialogue, store.getState())!.choices!;
+    act(ctx, "loop-choice", { index: String(offered.at(-1)!.index) });
+    expect(ctx.session.pointed.has("raid")).toBe(true);
+    // Choices outside a raid never get it.
+    ctx.session.pointed.clear();
+    ctx.session.dialogue = push(EMPTY_DIALOGUE, { key: "k", lines: [], ending: { kind: "loan" } });
+    expect(render(ctx)).not.toContain("pointer-once");
+  });
+
+  it("one component, one class", () => {
+    expect(POINTER_CLASS).toBe("pointer-once");
   });
 });
 

@@ -18,6 +18,7 @@ import { lineKey, revealBusy } from "@world/motion/reveal";
 import { fillPlaceholders } from "@world/replies/placeholders";
 import { historyEntries, renderHistory } from "./history";
 import { playerBox, type PlayerBoxModel } from "./kuro";
+import { pointerCls } from "@world/room/pointer";
 import { choiceScreens, fontPx, KURO_LINE_BOX, LINE_BOX, marker, screens, type BoxGeom, type Screen } from "./layout";
 
 /** Kuro's lines are laid out left of its portrait. */
@@ -61,6 +62,8 @@ export interface LineBoxModel {
   readonly raised: boolean;
   /** Kuro is speaking: its portrait stands at the box's right end, in this state. */
   readonly portrait: BodyState | null;
+  /** The one-time pointer on these choices (the first night's hand), or none. */
+  readonly pointer: string | false;
 }
 
 /**
@@ -109,6 +112,8 @@ export function lineBoxModel(state: State, events: readonly GameEvent[], session
     count: at.all.length,
     raised: playerBox(state, events, session) !== null,
     portrait: head.voice === "kuro" ? portraitState(state, events, session, nowMs) : null,
+    // The first night's hand has no checklist line: a one-time pointer on its choices.
+    pointer: pointerCls(session, "raid", scr.choices.length > 0 && raidShowing(state, session)),
   };
 }
 
@@ -144,7 +149,7 @@ export function renderLineBox(m: LineBoxModel): SafeHtml {
   // A tag on the top edge pushes the text down below it (`tagged`).
   const tag = tagOf(m.tag);
   const c = cls("dlg", m.kind !== "line" && m.kind, tag && "tagged", m.tag?.kind === "kuro" && "kuro", m.choices.length > 0 && "has-choices", m.raised && "raised");
-  return html`<div class="${c}" data-screen="${m.screen + 1}/${m.count}">${tag}${historyChip()}${txt}${m.choices.length ? html`<div class="choices">${buttons}</div>` : null}${mk}${m.portrait ? portraitOf(m.portrait) : null}</div>`;
+  return html`<div class="${c}" data-screen="${m.screen + 1}/${m.count}">${tag}${historyChip()}${txt}${m.choices.length ? html`<div class="${cls("choices", m.pointer)}">${buttons}</div>` : null}${mk}${m.portrait ? portraitOf(m.portrait) : null}</div>`;
 }
 
 /** The player's box: the starter questions as choices, or one text input (Enter sends). */

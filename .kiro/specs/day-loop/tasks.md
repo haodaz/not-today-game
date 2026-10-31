@@ -38,3 +38,8 @@ commit.
 - [x] Rects measured into `shots.ts`; `tests/actuators.test.ts` (one test per table row, lines are not buttons).
 - [x] HUD body above the chip row, flush right; box right edge left of it (tested from the CSS).
 - [x] Snapshots refreshed after checking the diffs.
+
+## 9. Rule 2026-11-01: the first time an action appears
+- [x] Checklist tests read item text from the day file (loop-engine ×3, loop-hud "after lunch arrives").
+- [x] One-time pointer (`room/pointer.ts`, `.pointer-once`) on the first raid's choices, Kuro's body while the first offer waits, the first desk-bar object; tests in actuators.test.ts.
+- [x] `room.bed` / `room.meal` as the hotspots' labels.

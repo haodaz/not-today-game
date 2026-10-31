@@ -187,3 +187,20 @@ The desktop controller gains a pluggable root renderer, change hooks, and the ke
 - While Kuro speaks in the box (`kuroInBox`: the head item is Kuro's), the corner is empty and
   the body stands at the box's right end (dialogue correction). The page always has exactly
   one `data-kuro-slot`.
+
+## Rule implemented (2026-11-01): the first time an action appears, it is instructive
+
+- Checklist tests read item text from the day file (`dayFiles.get(1).items.find(…).text`, and
+  `.rewrite`), never literals: tests/loop-engine.test.ts, tests/loop-hud.test.ts.
+- The one-time pointer (`src/world/room/pointer.ts`, the one CSS class `.pointer-once`: a soft
+  pulsing ring) for the three actions with no checklist line the first time they appear:
+  - `raid`: the first night's hand. On the choice list in the box during a raid (`raidShowing`).
+    Retired when one of the hand's choices is chosen.
+  - `offer`: the first upgrade offer. On Kuro's HUD body while an offer waits (not at night).
+    Retired when the body is clicked then.
+  - `hold`: the first 举起来 (lifting an object off the desk bar, the held view). On the first
+    object slot of 桌子's desk bar. Retired by the first `loop-hold`.
+- `pointerCls(session, id, due)` gives the class while the action is due and not yet clicked;
+  `pointed(session, id)` records the click in `session.pointed`. It is session state, not an
+  event, so a reload in the same run shows a pointer again until its next click.
+- The bed and meal hotspots are named by `room.bed` / `room.meal`.

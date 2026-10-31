@@ -42,7 +42,8 @@ describe("FR5 checklist snapshots", () => {
 
   it("day 1 after lunch arrives", () => {
     const out = list(storeAt(1, [step("boot"), step("openApp:msgs"), orderLunch, step("delivery:arrives:lunch", "12:04")]));
-    expect(out).toContain("去拿。");
+    // Item text is content's (day-loop rule 2026-11-01): read from the day file.
+    expect(out).toContain(dayFiles.get(1)!.items.find((it) => it.id === "pickup")!.text);
     expect(out).toMatchSnapshot();
   });
 
