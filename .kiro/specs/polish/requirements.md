@@ -66,3 +66,6 @@ content do not change.
 - The desk bar folding away at shutdown, leaving only the gap (night-hand: the gap isn't built yet).
 - Kuro going busy → think before a small-window line (kuro-chat).
 - The corridor light changing colour with the ring.
+
+## Correction 2026-11-01 (author): the stage fills the window
+On a window larger than 1600×900 the stage stays at scale 1 in the top-left corner and the rest of the window is flat dark grey (the mount clamps `--scale` to ≤ 1 and does not centre). Fix: `--scale = min(innerWidth/1600, innerHeight/900)`, no upper clamp below 2 (cap at 2); the stage is centred in the window both ways; the remaining letterbox (when the aspect is not 16:9) is not flat colour but the current view's backdrop photo scaled to cover the whole window, blurred (~24 px) and darkened (~55 %), behind the stage. Title page included. Recompute on resize. Test: at 2185×1160 the scale is 1.2889 and the stage's left offset is (2185 − 1600×1.2889)/2.
