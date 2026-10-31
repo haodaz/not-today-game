@@ -56,11 +56,12 @@ thing.
 
 ## 3. Not done (named)
 
-- FR2 "on days 9 and 18 the hand takes something else": content doesn't say what, as data.
-  The outcome is stored as nothing given; the heartbeat-widget effect belongs to whoever owns
-  the HR chip. TODO(Claude) if a field is wanted.
-- **Nothing appends `recognise` yet** (the recognize spec), so in real play no block is offered
-  until that spec lands. The tests set `recognised` directly.
+- Done since (recognise spec R6): what the hand takes on nights 9 and 18 is
+  `content/nights-takes.json`, read strictly in `nights.ts`. A "nothing" move on those nights
+  sets the take's flag and plays its line, and night 9 also takes the HR chip's number. The
+  raid outcome is unchanged (`{blockedWith: null, gave: null}`).
+- Done since: the recognise spec appends `recognise`, so blocks are offered in real play once
+  an object is recognised.
 - The motion.md hold-up-to-the-gap push (600ms, ease-in-out) is still open. The raid here is a
   choice in the dialogue box.
 - The desktop view shows the raid in the dialogue box over the desktop without the gap glow (one

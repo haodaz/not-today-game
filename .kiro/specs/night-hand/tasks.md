@@ -10,4 +10,4 @@
 - [x] 6. Dream screen: 2× resolution at the same size.
 - [x] 7. Tests (FR4) and updates to the tests whose rules changed.
 - [ ] 8. Author: confirm N3 (day 18 not counted for "blocked every raid").
-- [ ] 9. The "takes something else" on nights 9 and 18, once content says what.
+- [x] 9. The "takes something else" on nights 9 and 18, from content/nights-takes.json (recognise spec R6).

@@ -21,6 +21,8 @@ export interface Item {
   readonly price: number;
   readonly effects?: Effects;
   readonly note?: string;
+  /** Its desk-layer sprite under public/ (e.g. "food/hmj"); read, not drawn yet. */
+  readonly sprite?: string;
 }
 
 export interface Shop {
@@ -64,6 +66,8 @@ export interface DeliveryTable {
   readonly days: ReadonlyMap<number, DayEntry>;
   /** ring -> drift code, e.g. "only-huangmenji". */
   readonly driftByRing: Readonly<Record<string, string>>;
+  /** Desk-layer sprite paths under public/ (e.g. bag → "food/bag"); read, not drawn yet. */
+  readonly sprites: Readonly<Record<string, string>>;
 }
 
 /** The number of door-beat steps the door machine is built for. */
@@ -118,7 +122,7 @@ function effects(value: unknown, where: string): Effects {
 
 function item(value: unknown, where: string): Item {
   if (!isRecord(value)) throw new ContentError(where, "an item must be an object");
-  onlyKeys(value, ["id", "name", "price", "effects", "note"], where);
+  onlyKeys(value, ["id", "name", "price", "effects", "note", "sprite"], where);
   if (typeof value.price !== "number" || !(value.price >= 0)) throw new ContentError(`${where}.price`, "must be a number >= 0");
   return {
     id: str(value.id, `${where}.id`),
@@ -126,6 +130,7 @@ function item(value: unknown, where: string): Item {
     price: value.price,
     ...(value.effects !== undefined ? { effects: effects(value.effects, `${where}.effects`) } : {}),
     ...(value.note !== undefined ? { note: str(value.note, `${where}.note`) } : {}),
+    ...(value.sprite !== undefined ? { sprite: str(value.sprite, `${where}.sprite`) } : {}),
   };
 }
 
@@ -189,7 +194,14 @@ function deepFreeze<T>(value: T): T {
 /** Parses and checks a delivery file. Pure; exported for tests. */
 export function parseDelivery(input: unknown): DeliveryTable {
   if (!isRecord(input)) throw new ContentError("", "not an object");
-  onlyKeys(input, ["_note", "phone", "windows", "door", "shops", "defaults", "days", "shopDrift", "chosen"], "top level");
+  onlyKeys(input, ["_note", "phone", "windows", "door", "shops", "defaults", "days", "shopDrift", "chosen", "sprites"], "top level");
+
+  // Optional: sprite paths (public/<path>.png), one string per name.
+  const sprites: Record<string, string> = {};
+  if (input.sprites !== undefined) {
+    if (!isRecord(input.sprites)) throw new ContentError("sprites", "must be an object");
+    for (const [name, path] of Object.entries(input.sprites)) if (name !== "_note") sprites[name] = str(path, `sprites.${name}`);
+  }
 
   if (!isRecord(input.windows)) throw new ContentError("windows", "must be an object");
   onlyKeys(input.windows, MEALS, "windows");
@@ -250,6 +262,7 @@ export function parseDelivery(input: unknown): DeliveryTable {
     defaults,
     days: new Map([...days].sort(([a], [b]) => a - b)),
     driftByRing,
+    sprites,
   });
 }
 

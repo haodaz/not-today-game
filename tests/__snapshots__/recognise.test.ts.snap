@@ -1,0 +1,5 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`when it is asked (FR1) > snapshot: day 1, the chick's question (no hints: every option looks the same) 1`] = `"<button type="button" class="dlg" data-action="loop-advance" style="bottom:308px">你知道这是什么，但需要一秒钟才想起来它叫什么。</button><div class="choices"><button type="button" data-action="loop-choice" data-index="1">仿的拓麻歌子，只能养一只小鸡</button><button type="button" data-action="loop-choice" data-index="0">一个计时器</button><button type="button" data-action="loop-choice" data-index="2">一个闹钟</button></div>"`;
+
+exports[`when it is asked (FR1) > snapshot: day 4 pager, a wrong answer plays its lines; no retry that day; the next day picking it up asks again, once 1`] = `"<button type="button" class="dlg" data-action="loop-advance" style="bottom:308px">你知道这是什么，但需要一秒钟才想起来它叫什么。</button><div class="choices"><button type="button" data-action="loop-choice" data-index="0">一部坏掉的手机</button><button type="button" data-action="loop-choice" data-index="1">寻呼机，只收不发</button><button type="button" data-action="loop-choice" data-index="2">一个遥控器</button></div>"`;

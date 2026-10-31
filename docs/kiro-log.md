@@ -202,3 +202,31 @@ Appended after each task. Neither Kiro nor Claude edits the other's area without
     nothing given. TODO(Claude) if wanted.
   - The motion.md hold-up-to-the-gap push is still open.
 - Tests: 40 files, 585 passing; typecheck clean. Not checked in a browser.
+
+## 2026-10-31 — recognise, night takes
+
+- Spec `recognise`: design (R1–R7) and tasks written and implemented.
+  - On an object's box day the question comes right after the box beat. Three options appear in
+    a per-run order, and the answer's lines play.
+  - A wrong answer can be tried again on a later day by picking the object up (once a day).
+  - An unrecognised object is desaturated on the desk bar.
+  - A right answer is truth +1 evidence (`recognise:<object>`).
+- The `recognise` event now carries `option` (content index); the reducer derives right / wrong
+  (R1). The plain world-state form (no option) still recognises.
+- New: a run id. `store.getRunId()`, `runId` in the run save (version 2; v1 saves migrate to
+  `run-legacy`); new runs use `crypto.randomUUID()`. It only seeds per-run orders.
+- Moved: the judgement writer to `src/state/judgement.ts` (shared with upgrades), and the seeded
+  hash to `src/state/seed.ts` (`world/replies/seed.ts` re-exports `jitter`).
+- Night-hand: `content/nights-takes.json` is read in `nights.ts`. On nights 9 and 18 "nothing
+  given" sets the flag and plays the line. Night 9's heart-rate chip keeps its pulse and loses
+  its number.
+- Content changed while I worked (Claude): `content/delivery.json` gained `sprites` and
+  per-item `sprite`. The strict delivery loader rejected them and stopped every delivery test,
+  so it now reads both (`deliveryTable.sprites`, `Item.sprite`). Nothing draws them yet.
+- Open, for the author:
+  - **R6.** Day 18's two choices both hold nothing up, so either one ("填寄件单" too) sets
+    `hand_taken` and plays 「它握住了。你没有抽回来。」. Confirm, or say which choice is the
+    "nothing".
+  - The textbook and the phone are asked (objects.json has them) but aren't in
+    `recognised.of`, so they never count. Their right answer is known from the log only (R3).
+- Tests: 41 files, 603 passing; typecheck clean. Not checked in a browser.
