@@ -243,6 +243,17 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.rerender();
   },
 
+  // The book on the desk (title-page FR4): the gamebook reader, full screen; the chip closes it.
+  "book-open"(ctx) {
+    if (ctx.session.collection.finishedRuns < 1) return;
+    ctx.session.bookOpen = true;
+    ctx.rerender();
+  },
+  "book-close"(ctx) {
+    ctx.session.bookOpen = false;
+    ctx.rerender();
+  },
+
   // ⚙ 设置 (day-loop amendment: one settings button). 返回首页 is the host's (main.ts).
   "settings-open"(ctx) {
     ctx.session.settingsOpen = true;
@@ -255,6 +266,8 @@ export const loopActions: Record<string, ActionHandler> = {
   "settings-lang"(ctx, data) {
     if (data.lang !== "zh" && data.lang !== "en") return;
     setLocale(data.lang);
+    // The game type follows the language (title-page FR6: html[lang] picks the faces).
+    if (typeof document !== "undefined") document.documentElement.lang = data.lang;
     ctx.rerender();
   },
 
@@ -325,6 +338,10 @@ export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
   // The run has ended: Enter / Space go on; nothing else does anything.
   if (ctx.store.getState().ending !== "none") {
     if (e.key === "Enter" || e.key === " ") endingNext(ctx);
+    return true;
+  }
+  if (e.key === "Escape" && ctx.session.bookOpen) {
+    loopActions["book-close"]!(ctx, {} as DOMStringMap, null as never);
     return true;
   }
   // Esc closes the settings panel first, then the Kuro call / folds its small window, then puts

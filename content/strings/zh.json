@@ -183,5 +183,19 @@
   "title.fig.bad": "第一日，改",
   "title.fig.survive": "回到第一日",
   "title.fig.good": "第十九日",
-  "title.version": "v0.1 · Kiroween 2026"
+  "title.version": "v0.1 · Kiroween 2026",
+  "title.q.login": "这是谁的故事？",
+  "title.q.nick": "家里人怎么称呼你？",
+  "title.q.bossCalls": "老板怎么叫你？",
+  "title.q.calledBy": "同事怎么叫你？",
+  "title.q.pronoun": "她，他，还是不说？",
+  "title.pronoun.she": "她",
+  "title.pronoun.he": "他",
+  "title.pronoun.none": "不说",
+  "title.dice": "随机",
+  "title.esc": "Esc 返回",
+  "title.byline": "好大壮 · 与 Claude 一起写成",
+  "title.creditsPage.team": "故事、设定、游戏书、水彩概念图：好大壮，与 Claude 一起写成（2026 年 10 月，黑客松之前）。游戏：好大壮决定一切；Claude（Anthropic，Claude Fable 5.1）写内容、规格和设计稿；Kiro 写全部游戏代码。克总由 Claude 扮演。",
+  "title.creditsPage.tools": "Kiro（steering、specs、hooks）· Vite + TypeScript · three.js · Supabase · Meta Muse Image、Hunyuan3D、Gemini、COLMAP、Brush（素材）· 霞鹜文楷、Barlow Condensed、Alegreya（字体，OFL）。",
+  "title.creditsPage.disclosure": "故事、设定圣经、分支游戏书和概念图写于黑客松之前，发布在 github.com/haodaz/nottoday（CC BY-NC-ND）。本仓库里的每一行游戏代码、内容表、设计稿、生成的 3D 房间和物件、音效，都是黑客松期间做的。"
 }

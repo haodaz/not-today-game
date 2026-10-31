@@ -1,0 +1,246 @@
+// The title page's DOM side (title-page FR1–FR3, FR7): clicks, typing, keys, the idle events,
+// the rain, and the push into the room before the game starts. The view is pure (view.ts); this
+// file owns timers and sound only.
+import { centre, ROOM_SHOT } from "@world/room/shots";
+import { getLocale, setLocale } from "@world/i18n";
+import { ROOM_PUSH } from "@world/motion/timing";
+import type { State } from "@state/types.gen";
+import type { Collection } from "@world/room/collection";
+import { canStart, diceOptions, initialTitle, QUESTIONS, rowsShown, toMenu, toNames, toQuestions, withAnswer, withPronoun, type TextQuestion, type TitleModel } from "./model";
+import { titleTable, type IdleEvent } from "./table";
+import { renderTitle } from "./view";
+
+export interface TitleDeps {
+  readonly save: { readonly day: number } | null;
+  readonly collection: Collection;
+  /** 继续: mount the game on the saved run. */
+  readonly onContinue: () => void;
+  /** 开始 (after the push): a new run with these names as its first event. */
+  readonly onStart: (names: State["names"]) => void;
+  /** Cosmetic randomness (idle timing, the dice); injectable for tests. */
+  readonly random?: () => number;
+}
+
+const STAGE = { w: 1600, h: 900 };
+/** Rain volume: settled, and louder once the computer turns on (FR7). */
+const RAIN = { low: 0.12, high: 0.3 };
+
+/** The wait before the next idle event: never in the first quiet stretch, then 20–40 s. */
+export function idleDelay(random: () => number, first: boolean): number {
+  const { firstQuietMs, everyMs } = titleTable.idle;
+  const [lo, hi] = everyMs;
+  return (first ? firstQuietMs : 0) + lo + Math.floor(random() * (hi - lo + 1));
+}
+
+/** One event from the fixed list (content/title.json). */
+export function pickIdle(random: () => number): IdleEvent {
+  const list = titleTable.idle.events;
+  return list[Math.min(list.length - 1, Math.floor(random() * list.length))]!;
+}
+
+export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () => void; model: () => TitleModel } {
+  const random = deps.random ?? Math.random;
+  const doc = root.ownerDocument;
+  const win = doc.defaultView!;
+  let model = initialTitle(deps.save, deps.collection);
+  const timers = new Set<number>();
+  const later = (ms: number, fn: () => void) => {
+    const id = win.setTimeout(() => {
+      timers.delete(id);
+      fn();
+    }, ms);
+    timers.add(id);
+  };
+
+  // Rain: one quiet loop; a missing file is silence.
+  let rain: HTMLAudioElement | null = null;
+  try {
+    rain = typeof Audio === "undefined" ? null : new Audio("/sfx/rain-loop.mp3");
+    if (rain) {
+      rain.loop = true;
+      rain.volume = RAIN.low;
+      rain.addEventListener("error", () => {});
+    }
+  } catch {
+    rain = null;
+  }
+  const playRain = () => {
+    if (!rain || model.muted) return;
+    void rain.play().catch(() => {});
+  };
+  const rainVolume = (v: number) => {
+    if (rain) rain.volume = v;
+  };
+
+  const fit = () => {
+    const stage = root.querySelector<HTMLElement>(".stage");
+    if (!stage) return;
+    stage.style.setProperty("--scale", String(Math.min(1, root.clientWidth / STAGE.w, root.clientHeight / STAGE.h) || 1));
+  };
+
+  const render = () => {
+    const active = doc.activeElement as HTMLInputElement | null;
+    const focusKey = active?.dataset?.focus ?? null;
+    const caret = active?.selectionStart ?? null;
+    root.innerHTML = renderTitle(model).value;
+    doc.documentElement.lang = getLocale() === "en" ? "en" : "zh";
+    fit();
+    if (focusKey) {
+      const again = root.querySelector<HTMLInputElement>(`[data-focus="${focusKey}"]`);
+      if (again) {
+        again.focus();
+        if (caret !== null) again.setSelectionRange(caret, caret);
+      }
+    }
+  };
+  const set = (next: TitleModel) => {
+    model = next;
+    render();
+  };
+
+  /** The first question still open gets the cursor. */
+  const focusOpen = () => {
+    const q = QUESTIONS[rowsShown(model.answers) - 1];
+    root.querySelector<HTMLElement>(q === "pronoun" ? '[data-action="title-pronoun"]' : `[data-input="title-${q}"]`)?.focus();
+  };
+
+  // The waiting room (FR7): one small thing at a time, never in the first 15 s.
+  const idleNext = (first: boolean) =>
+    later(idleDelay(random, first), () => {
+      const e = pickIdle(random);
+      if (e.layer === "rain") {
+        if (rain && !model.muted) rain.pause();
+        later(e.ms, () => {
+          playRain();
+          idleNext(false);
+        });
+        return;
+      }
+      if (e.ms === 0) {
+        // A cut: it stays (the chair one pixel to the left) until the next event.
+        set({ ...model, chairCut: !model.chairCut });
+        idleNext(false);
+        return;
+      }
+      set({ ...model, idle: { id: e.id, layer: e.layer } });
+      later(e.ms, () => {
+        set({ ...model, idle: null });
+        idleNext(false);
+      });
+    });
+  idleNext(true);
+
+  function start(): void {
+    if (!canStart(model.answers) || model.starting) return;
+    // The camera pushes in toward the desk along 房间→桌子's path; the lamp goes off (FR7).
+    set({ ...model, starting: true });
+    const roomEl = root.querySelector<HTMLElement>(".title-room");
+    if (roomEl) {
+      const p = centre(ROOM_SHOT.desk);
+      roomEl.style.setProperty("--m-tx", `${Math.round(p.x * (1 - ROOM_PUSH))}px`);
+      roomEl.style.setProperty("--m-ty", `${Math.round(p.y * (1 - ROOM_PUSH))}px`);
+      roomEl.style.setProperty("--m-z", String(ROOM_PUSH));
+      roomEl.style.animation = `m-cam-push-out ${titleTable.start.pushMs}ms var(--m-ease, ease-in-out) both`;
+    }
+    const names = toNames(model.answers);
+    later(titleTable.start.pushMs, () => deps.onStart(names));
+  }
+
+  const actions: Record<string, (el: HTMLElement) => void> = {
+    "title-new": () => {
+      // The computer turns on: the monitors wake and stay lit, the rain gets louder.
+      rainVolume(RAIN.high);
+      playRain();
+      set(toQuestions(model));
+      focusOpen();
+    },
+    "title-continue": () => deps.onContinue(),
+    "title-settings": () => set({ ...model, settingsOpen: true }),
+    "settings-close": () => set({ ...model, settingsOpen: false }),
+    "settings-lang": (el) => {
+      const l = el.dataset.lang;
+      if (l === "zh" || l === "en") setLocale(l);
+      render();
+    },
+    "title-lang": () => {
+      setLocale(getLocale() === "en" ? "zh" : "en");
+      render();
+    },
+    "loop-mute": () => {
+      set({ ...model, muted: !model.muted });
+      if (model.muted) rain?.pause();
+      else playRain();
+    },
+    "title-credits": () => set({ ...model, screen: "credits" }),
+    "title-back": () => set(toMenu(model)),
+    "title-pronoun": (el) => {
+      const p = el.dataset.pronoun;
+      if (p === "she" || p === "he" || p === "none") set(withPronoun(model, p));
+      focusOpen();
+    },
+    "title-dice": (el) => {
+      const q = el.dataset.q as TextQuestion;
+      const options = diceOptions(q, model.answers, titleTable.dice);
+      if (!options.length) return;
+      set(withAnswer(model, q, options[Math.min(options.length - 1, Math.floor(random() * options.length))]!));
+      focusOpen();
+    },
+    "title-start": () => start(),
+  };
+
+  const onClick = (e: MouseEvent) => {
+    const el = (e.target as HTMLElement).closest<HTMLElement>("[data-action]");
+    if (!el || !root.contains(el) || (el as HTMLButtonElement).disabled || model.starting) return;
+    const act = actions[el.dataset.action!];
+    if (!act) return;
+    e.preventDefault();
+    playRain();
+    act(el);
+  };
+  const onInput = (e: Event) => {
+    const el = e.target as HTMLInputElement;
+    const q = el.dataset.q as TextQuestion | undefined;
+    if (!q || !el.dataset.input?.startsWith("title-")) return;
+    const before = { shown: rowsShown(model.answers), ready: canStart(model.answers) };
+    model = withAnswer(model, q, el.value);
+    // Typing does not re-render, unless a row appears or 开始 changes (then the caret is kept).
+    if (rowsShown(model.answers) !== before.shown || canStart(model.answers) !== before.ready) render();
+  };
+  const onKey = (e: KeyboardEvent) => {
+    if (model.starting) return;
+    if (e.key === "Escape") {
+      if (model.settingsOpen) set({ ...model, settingsOpen: false });
+      else if (model.screen !== "menu") {
+        // The monitors sleep again and the rain settles (FR7).
+        rainVolume(RAIN.low);
+        set(toMenu(model));
+      }
+      e.preventDefault();
+      return;
+    }
+    if (e.key === "Enter" && (e.target as HTMLElement).tagName === "INPUT") {
+      e.preventDefault();
+      if (canStart(model.answers)) start();
+      else focusOpen();
+    }
+  };
+
+  root.addEventListener("click", onClick);
+  root.addEventListener("input", onInput);
+  win.addEventListener("keydown", onKey);
+  win.addEventListener("resize", fit);
+  render();
+
+  return {
+    model: () => model,
+    destroy() {
+      timers.forEach((id) => win.clearTimeout(id));
+      root.removeEventListener("click", onClick);
+      root.removeEventListener("input", onInput);
+      win.removeEventListener("keydown", onKey);
+      win.removeEventListener("resize", fit);
+      rain?.pause();
+      root.innerHTML = "";
+    },
+  };
+}

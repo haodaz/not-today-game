@@ -1,46 +1,43 @@
-// NOT TODAY — entry point. Builds the store (from the run save, or the ?day=N debug jump) and
-// mounts the game in the room view with the day's checklist; 桌面 switches to the desktop (one
-// monitor at a time). `?beat=night&t=23:41` sets the stand-in beat clock; `?view=desktop` opens
-// on the desktop; `?focus=right` on the right monitor; `?lang=en` switches the strings.
+// NOT TODAY — entry point. The title page first (title-page spec): with a save, 继续 · 第 N 天
+// mounts the game on it; without one, 新游戏 asks the questions and 开始 starts a new run whose
+// first event is the names. There is no restart anywhere: only the endings clear the run save.
+// Debug: `?day=N` skips the title and builds day N from an empty log (never touches the saves);
+// `?beat=night&t=23:41` sets the stand-in clock; `?view=desk|desktop|door`, `?focus=right`.
+// The game opens in English (README); `?lang=zh` opens in Chinese.
 import "./world/desktop/desktop.css";
 import "./world/room/room.css";
 import "./world/motion/motion.css";
+import "./ui/fonts.css";
+import "./ui/title/title.css";
 import { debugStartDay } from "@state/clock";
 import { createProfileWriter, createRunSlot } from "@state/saves";
-import { endingHost } from "@world/endings/flow";
 import { createStore, type Store } from "@state/store";
 import { parseBeatParams } from "@world/desktop/beat";
 import { mountDesktop } from "@world/desktop/controller";
 import { desktopActions } from "@world/desktop/actions";
-import { setLocale } from "@world/i18n";
+import { endingHost } from "@world/endings/flow";
+import { getLocale, setLocale } from "@world/i18n";
 import { syncLoop } from "@world/loop/runtime";
 import { createMotion } from "@world/motion/dom";
 import { loopActions, loopKeys, renderGame } from "@world/room/game";
+import { readCollection } from "./ui/collection";
+import { mountTitle } from "./ui/title/mount";
 
 const search = window.location.search;
 const params = new URLSearchParams(search);
-if (params.get("lang") === "en") setLocale("en");
+setLocale(params.get("lang") === "zh" ? "zh" : "en");
+document.documentElement.lang = getLocale();
 
+const root = document.getElementById("app")!;
 const run = createRunSlot(window.localStorage);
-const jump = debugStartDay(search);
-let store: Store;
-if (jump !== null) {
-  // Debug jump: build day N from an empty log; never touches the saves.
-  store = createStore({ startDay: jump });
-} else {
-  const saved = run.load();
-  // A new run gets a fresh id (it only seeds per-run orders; it is saved with the run).
-  store = createStore(saved ? { runId: saved.runId, startDay: saved.startDay, events: saved.events } : { runId: crypto.randomUUID() });
-  const saving = store;
-  saving.subscribe(() => run.save(saving));
-}
-
-// After the endings (san-and-endings FR2). The title page is not built yet, so "the title page"
-// reopens the game; with the run save gone that is a new run on day 1, nothing carried over.
+const profile = createProfileWriter(window.localStorage);
+const collection = readCollection(window.localStorage);
 const home = () => window.location.assign(window.location.pathname);
+
+// After the endings (san-and-endings FR2): the run save goes, the profile stays; back to the title.
 endingHost.afterBad = () => {
   run.clear();
-  createProfileWriter(window.localStorage).increment("runs");
+  profile.increment("runs");
   home();
 };
 endingHost.newRun = () => {
@@ -48,24 +45,61 @@ endingHost.newRun = () => {
   home();
 };
 
-const focus = params.get("focus");
-const view = params.get("view");
-mountDesktop(document.getElementById("app")!, {
-  store,
-  clock: parseBeatParams(search),
-  focus: focus === "right" ? "right" : "left",
-  view: view === "desktop" || view === "door" || view === "desk" ? view : "room",
-  render: renderGame,
-  actions: {
-    ...desktopActions,
-    ...loopActions,
-    // 返回首页: back to the title page. It keeps the run (no restart anywhere). The title page is
-    // not built yet, so this reopens the game without debug parameters, on the saved run.
-    "settings-home"() {
-      window.location.assign(window.location.pathname);
+/** Mount the game on `store`; `saved` stores keep themselves in the run save. */
+function startGame(store: Store, saved: boolean): void {
+  root.innerHTML = "";
+  if (saved) store.subscribe(() => run.save(store));
+  // Every ending reached goes into the profile once, when it happens (title-page T8).
+  let seen = store.getEvents().length;
+  store.subscribe(() => {
+    const events = store.getEvents();
+    for (const e of events.slice(seen)) if (e.kind === "ending") profile.recordEnding(e.ending);
+    seen = events.length;
+  });
+  const focus = params.get("focus");
+  const view = params.get("view");
+  const game = mountDesktop(root, {
+    store,
+    clock: parseBeatParams(search),
+    focus: focus === "right" ? "right" : "left",
+    view: view === "desktop" || view === "door" || view === "desk" ? view : "room",
+    render: renderGame,
+    actions: {
+      ...desktopActions,
+      ...loopActions,
+      // 返回首页: back to the title page. It keeps the run (no restart anywhere).
+      "settings-home"() {
+        home();
+      },
     },
-  },
-  onChange: (ctx) => syncLoop(ctx),
-  onKey: loopKeys,
-  motion: createMotion,
-});
+    onChange: (ctx) => syncLoop(ctx),
+    onKey: loopKeys,
+    motion: createMotion,
+  });
+  // What finished runs left on the desk (presentation only; the story never reads it).
+  game.session.collection = collection;
+}
+
+const jump = debugStartDay(search);
+if (jump !== null) {
+  startGame(createStore({ startDay: jump }), false);
+} else {
+  const saved = run.load();
+  const title = mountTitle(root, {
+    save: saved ? { day: saved.day } : null,
+    collection,
+    onContinue() {
+      if (!saved) return;
+      title.destroy();
+      startGame(createStore({ runId: saved.runId, startDay: saved.startDay, events: saved.events }), true);
+    },
+    onStart(names) {
+      title.destroy();
+      // A new run: a fresh id (it only seeds per-run orders), the names as its first event.
+      const store = createStore({ runId: crypto.randomUUID() });
+      store.appendEvent({ kind: "names", names });
+      run.save(store);
+      startGame(store, true);
+    },
+  });
+}

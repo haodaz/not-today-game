@@ -113,6 +113,11 @@ export interface ProfileWriter {
    * writes here and returns nothing, so the story still never sees the profile.
    */
   increment(key: string): void;
+  /**
+   * An ending was reached (title-page FR4/FR8): `endings[kind] + 1` and `finishedRuns + 1`.
+   * Returns nothing, like `increment`.
+   */
+  recordEnding(kind: "bad" | "survive" | "good"): void;
 }
 
 export function createProfileWriter(storage: KeyValueStorage): ProfileWriter {
@@ -123,6 +128,14 @@ export function createProfileWriter(storage: KeyValueStorage): ProfileWriter {
       const current = (slot.read()?.data ?? {}) as ProfileData;
       const n = typeof current[key] === "number" ? (current[key] as number) : 0;
       slot.write({ data: { ...current, [key]: n + 1 } });
+    },
+    recordEnding(kind) {
+      const current = (slot.read()?.data ?? {}) as ProfileData;
+      const was = current.endings && typeof current.endings === "object" && !Array.isArray(current.endings) ? (current.endings as Record<string, Json>) : {};
+      const count = (v: Json | undefined) => (typeof v === "number" ? v : 0);
+      const endings = { bad: count(was.bad), survive: count(was.survive), good: count(was.good) };
+      endings[kind] += 1;
+      slot.write({ data: { ...current, endings, finishedRuns: count(current.finishedRuns) + 1 } });
     },
   };
 }

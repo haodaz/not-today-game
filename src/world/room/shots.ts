@@ -28,6 +28,21 @@ export const ROOM_SHOT: Shot & { readonly desk: Rect } = {
   desk: { l: 215, t: 290, w: 824, h: 330 },
 };
 
+/**
+ * The collection on the 房间 desk (title-page FR4/FR8), provisional until the cutouts arrive:
+ * the three ending figures stand at the desk's left end by the window, one fixed place each; the
+ * book lies left of the keyboard. The chair region is for the title's one-pixel cut (FR7).
+ */
+export const ROOM_COLLECTION = {
+  figures: {
+    bad: { l: 236, t: 490, w: 26, h: 48 },
+    survive: { l: 268, t: 500, w: 30, h: 38 },
+    good: { l: 304, t: 498, w: 26, h: 40 },
+  },
+  book: { l: 452, t: 500, w: 36, h: 26 },
+  chair: { l: 341, t: 543, w: 393, h: 357 },
+} as const;
+
 /** 桌子: the desk close-up. Clicking a monitor goes to 屏幕 on that side. */
 export const DESK_SHOT: Shot = {
   monitors: {

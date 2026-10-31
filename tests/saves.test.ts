@@ -157,8 +157,10 @@ describe("profile", () => {
   it("the writer has no read method; increment returns nothing", () => {
     // san-and-endings: `increment` (runs + 1) reads and writes inside saves.ts, returns nothing.
     const writer = createProfileWriter(memoryStorage());
-    expect(Object.keys(writer)).toEqual(["write", "increment"]);
+    // title-page T8: `recordEnding` also only writes.
+    expect(Object.keys(writer)).toEqual(["write", "increment", "recordEnding"]);
     expect(writer.increment("runs")).toBeUndefined();
+    expect(writer.recordEnding("bad")).toBeUndefined();
   });
 
   it("increment adds 1 to a counter and keeps the rest of the profile", () => {

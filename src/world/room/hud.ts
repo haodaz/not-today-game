@@ -20,6 +20,7 @@ import { isNight } from "@world/desktop/beat";
 import { hudKuro } from "@world/desktop/kuro/mini";
 import { VIEWS, type View } from "@world/desktop/model";
 import { DESK_SHOT, rectStyle, ROOM_SHOT } from "./shots";
+import { bookReader, deskBook, figuresLayer } from "./collection";
 import { knows } from "@state/recognise";
 import { bpm, sanBand } from "@state/endings";
 
@@ -127,12 +128,14 @@ export function settingsButton(): SafeHtml {
  * The settings panel, centred over the current view with the view dimmed: 声音 on/off, 语言
  * 中文 · English (re-renders at once), 返回首页, 取消. Nothing here restarts the run.
  */
-export function settingsPanel(session: Session): SafeHtml | null {
+export function settingsPanel(session: Pick<Session, "settingsOpen" | "muted">, opts: { readonly home: boolean } = { home: true }): SafeHtml | null {
   if (!session.settingsOpen) return null;
   const sound = !session.muted;
+  // The title page has no 返回首页: it is the home (title-page FR2).
+  const home = opts.home ? html`<button type="button" data-action="settings-home">${tr("settings.home")}</button>` : null;
   const lang = (l: Locale) =>
     html`<button type="button" class="${getLocale() === l ? "on" : ""}" data-action="settings-lang" data-lang="${l}" aria-pressed="${getLocale() === l ? "true" : "false"}">${tr(`settings.lang.${l}`)}</button>`;
-  return html`<div class="settings-layer"><button type="button" class="settings-dim" data-action="settings-close" aria-label="${t("settings.cancel")}"></button><div class="settings" role="dialog" aria-modal="true" aria-labelledby="settings-title"><h3 id="settings-title">${tr("settings.title")}</h3><div class="row"><span>${tr("settings.sound")}</span><button type="button" class="${cls("switch", sound && "on")}" data-action="loop-mute" role="switch" aria-checked="${sound ? "true" : "false"}" aria-label="${t("settings.sound")}"><i></i></button></div><div class="row"><span>${tr("settings.lang")}</span><span class="seg">${lang("zh")}<b>·</b>${lang("en")}</span></div><div class="actions"><button type="button" data-action="settings-home">${tr("settings.home")}</button><button type="button" data-action="settings-close">${tr("settings.cancel")}</button></div></div></div>`;
+  return html`<div class="settings-layer"><button type="button" class="settings-dim" data-action="settings-close" aria-label="${t("settings.cancel")}"></button><div class="settings" role="dialog" aria-modal="true" aria-labelledby="settings-title"><h3 id="settings-title">${tr("settings.title")}</h3><div class="row"><span>${tr("settings.sound")}</span><button type="button" class="${cls("switch", sound && "on")}" data-action="loop-mute" role="switch" aria-checked="${sound ? "true" : "false"}" aria-label="${t("settings.sound")}"><i></i></button></div><div class="row"><span>${tr("settings.lang")}</span><span class="seg">${lang("zh")}<b>·</b>${lang("en")}</span></div><div class="actions">${home}<button type="button" data-action="settings-close">${tr("settings.cancel")}</button></div></div></div>`;
 }
 
 /**
@@ -208,7 +211,9 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const list = lc ? renderChecklist(checklist(lc)) : null;
   const view = session.view === "desk" || session.view === "door" ? session.view : "room";
   const door = view === "door";
-  const scene = door ? doorContent(state, events, session) : shotHits(view);
+  // 房间 carries what finished runs left on the desk: the figures, and the book (title-page FR4/FR8).
+  const kept = view === "room" ? html`${figuresLayer(session.collection)}${deskBook(session.collection)}` : null;
+  const scene = door ? doorContent(state, events, session) : html`${shotHits(view)}${kept}`;
   // The held item sits over everything but the dialogue box (held-object.html).
   const held = door ? null : heldLayer(state, events, session);
   // The hand is here: the desk dims and the gap between the monitors glows (night-hand FR1; the
@@ -217,7 +222,7 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const gap = (view === "room" ? ROOM_SHOT : DESK_SHOT).gap;
   // Things are picked up at 桌子 only: the desk bar is its object layer.
   const bar = view === "desk" ? deskBar(state, events, session) : null;
-  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid")}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}">${scene}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${bar}${held}${dialogueBox(state, session)}${bottomRight(model)}${settingsButton()}${settingsPanel(session)}</div>`;
+  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid")}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}">${scene}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${bar}${held}${dialogueBox(state, session)}${bottomRight(model)}${settingsButton()}${settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
 }
 
 /** The raid is in the dialogue box: tonight's shutdown sequence on a raid night. */

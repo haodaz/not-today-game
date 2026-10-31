@@ -1,0 +1,32 @@
+/* Game type (title-page FR6). Self-hosted subsets in public/fonts/ (Claude provides them and the
+   subset step); until they arrive, or while they load, each family falls back to a size-adjusted
+   face so the swap does not reflow the fixed dialogue box (all game text sets its own line-height;
+   the overrides keep glyph widths close). The fallback metrics are provisional until the subset
+   step reports the real ones. Game layer only: the desktop keeps system fonts on purpose. */
+@font-face{font-family:"NT Title";src:url(/fonts/BarlowCondensed-Bold.woff2) format("woff2");font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:"NT Title Fallback";src:local("Arial Narrow Bold"),local("Arial Narrow"),local("Roboto Condensed Bold"),local("Helvetica Neue Condensed Bold"),local("Arial Bold"),local("Arial");font-weight:700;size-adjust:84%;ascent-override:96%;descent-override:26%;line-gap-override:0%}
+@font-face{font-family:"NT Kai";src:url(/fonts/LXGWWenKai-Regular.woff2) format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"NT Kai Fallback";src:local("Noto Sans SC"),local("Noto Sans CJK SC"),local("Source Han Sans SC"),local("PingFang SC"),local("Microsoft YaHei");size-adjust:100%;ascent-override:92%;descent-override:24%;line-gap-override:0%}
+@font-face{font-family:"NT Serif";src:url(/fonts/Alegreya-Regular.woff2) format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"NT Serif Fallback";src:local("Georgia"),local("Times New Roman");size-adjust:95%;ascent-override:94%;descent-override:28%;line-gap-override:0%}
+@font-face{font-family:"NT Sans";src:url(/fonts/AlegreyaSans-Regular.woff2) format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"NT Sans Fallback";src:local("Helvetica Neue"),local("Arial");size-adjust:91%;ascent-override:96%;descent-override:30%;line-gap-override:0%}
+
+:root{
+  --font-title:"NT Title","NT Title Fallback",sans-serif;
+  --font-zh:"NT Kai","NT Kai Fallback",sans-serif;
+  /* English: Alegreya for dialogue and credits, Alegreya Sans for chips and menus; CJK in a line falls to WenKai. */
+  --font-en-text:"NT Serif","NT Serif Fallback","NT Kai","NT Kai Fallback",serif;
+  --font-en-ui:"NT Sans","NT Sans Fallback","NT Kai","NT Kai Fallback",sans-serif;
+  --font-game-text:var(--font-zh);
+  --font-game-ui:var(--font-zh);
+}
+html[lang="en"]{--font-game-text:var(--font-en-text);--font-game-ui:var(--font-en-ui)}
+
+/* The game layer: chips, menus, the HUD, settings. */
+.room{--font:var(--font-game-ui)}
+.title-page,.ending-page,.settings,.settings-btn,.hud-br,.back-room,.book-close,.figure .fig-chip{font-family:var(--font-game-ui)}
+/* Dialogue, the door beat, choices, credits: the text face. */
+.room .dlg,.dlg-layer .dlg,.room .choices button,.dlg-layer .choices button,.room .door-beat,.credits,.you-page .bub,.day-19 .dlg,.first-day p{font-family:var(--font-game-text)}
+/* The title and the stage header numbers. */
+.title-name,.room .day b{font-family:var(--font-title);font-weight:700;letter-spacing:.12em}

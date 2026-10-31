@@ -1,26 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 790 160" width="790" height="160">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 730 160" width="730" height="160">
 <defs><style>
-.s{fill:none;stroke:#efe9df;stroke-width:17;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:3}
+.s{fill:none;stroke:#efe9df;stroke-width:17;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4}
 .eye{fill:none;stroke:#efe9df;stroke-width:17;stroke-linejoin:round}
 .pupil{fill:#efe9df}
 </style></defs>
-<!-- cap height 20..124 (baseline 124); eye centre y=72; crosses go to 148 -->
+<!-- cap 20..124, baseline 124, eye centre 72, stems through the baseline to 148 -->
 <!-- N -->
 <path class="s" d="M14 124 V20 L80 124 V20"/>
-<!-- O: almond eye -->
-<path class="eye" d="M110 72 Q150 14 190 72 Q150 130 110 72 Z"/>
-<circle class="pupil" cx="150" cy="72" r="15"/>
-<!-- T as a cross -->
-<path class="s" d="M216 28 H292 M254 20 V148"/>
-<!-- T as a cross -->
-<path class="s" d="M332 28 H408 M370 20 V148"/>
-<!-- O: almond eye -->
-<path class="eye" d="M428 72 Q468 14 508 72 Q468 130 428 72 Z"/>
-<circle class="pupil" cx="468" cy="72" r="15"/>
-<!-- D -->
-<path class="s" d="M540 20 V124 M540 20 H566 Q608 20 608 72 Q608 124 566 124 H540"/>
-<!-- A -->
-<path class="s" d="M624 124 L660 20 L696 124 M640 88 H680"/>
-<!-- Y -->
-<path class="s" d="M708 20 L742 72 L776 20 M742 72 V124"/>
+<!-- O: eye, tucked close to the first cross -->
+<path class="eye" d="M106 72 Q144 16 182 72 Q144 128 106 72 Z"/>
+<circle class="pupil" cx="144" cy="72" r="15"/>
+<!-- T cross -->
+<path class="s" d="M196 28 H266 M231 20 V148"/>
+<!-- word gap -->
+<!-- T cross -->
+<path class="s" d="M300 28 H370 M335 20 V148"/>
+<!-- O: eye -->
+<path class="eye" d="M384 72 Q422 16 460 72 Q422 128 384 72 Z"/>
+<circle class="pupil" cx="422" cy="72" r="15"/>
+<!-- D: a triangle pointing right -->
+<path class="s" d="M486 20 V124 M486 20 L556 72 L486 124"/>
+<!-- A: a spire, no bar -->
+<path class="s" d="M568 124 L606 20 L644 124"/>
+<!-- Y: a fork whose stem goes through the baseline like the crosses -->
+<path class="s" d="M646 20 L680 72 L714 20 M680 72 V148"/>
 </svg>

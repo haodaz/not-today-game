@@ -1,0 +1,60 @@
+/* The title page (title-page FR1–FR3, FR7, FR8; mocks design/chrome/title.html, title-questions.html).
+   The world fills the screen; the menu is a short column of outlined words laid on it. */
+.title-page{position:relative;width:1600px;height:900px;overflow:hidden;color:#efe9df;background:#000;transform:scale(var(--scale,1));transform-origin:0 0}
+.title-room{position:absolute;inset:0;transform-origin:center;animation:t-drift 120s ease-in-out infinite alternate}
+@keyframes t-drift{from{scale:1}to{scale:1.07}}
+.title-photo{position:absolute;inset:0;background:#0a0a0b url(/room/shots/room.jpg) center/cover;filter:brightness(.4) saturate(.8)}
+.title-vig{position:absolute;inset:0;background:radial-gradient(120% 90% at 30% 50%,transparent 40%,rgba(0,0,0,.55) 100%);pointer-events:none}
+/* The waiting room: one small thing at a time (FR7). */
+.title-page .idle{position:absolute;pointer-events:none}
+.title-page .idle.lamp{inset:0;background:#000;opacity:0}
+.title-page .idle.lamp.on{opacity:.35}
+.title-page .idle.lamp.off{opacity:.7;transition:opacity 400ms ease-out}
+.title-page .idle.monitor{border-radius:3px;background:rgba(214,226,240,.0);box-shadow:none}
+.title-page .idle.monitor.on{background:rgba(214,226,240,.22);box-shadow:0 0 30px 6px rgba(190,210,235,.18)}
+.title-page .idle.chair{background:url(/room/shots/room.jpg) no-repeat;background-size:1600px 900px;background-position:-341px -543px;filter:brightness(.4) saturate(.8);opacity:0}
+.title-page .idle.chair.cut{opacity:1;background-position:-340px -543px}
+.title-page .idle.gap{background:transparent}
+.title-page .idle.gap.on{background:linear-gradient(180deg,transparent,rgba(255,150,190,.75) 40%,rgba(255,150,190,.75) 60%,transparent)}
+.title-room.starting .idle.monitor{background:rgba(214,226,240,.22)}
+/* The words */
+.title-name{position:absolute;left:110px;top:120px;margin:0;font-size:96px;line-height:1;color:#efe9df;text-shadow:0 2px 24px rgba(0,0,0,.6)}
+.title-menu{position:absolute;left:112px;top:300px;display:flex;flex-direction:column;gap:22px}
+.title-menu button,.title-start,.title-back{display:block;width:260px;padding:12px 0;text-align:center;border:2px solid rgba(239,233,223,.75);background:transparent;font-size:18px;letter-spacing:.3em;text-indent:.3em;color:#efe9df;cursor:pointer;transition:background 160ms,color 160ms}
+.title-menu button:hover,.title-menu button:focus-visible,.title-start.ready:hover,.title-start.ready:focus-visible,.title-back:hover,.title-back:focus-visible{background:#efe9df;color:#111;outline:none}
+.title-start{margin-top:14px}
+.title-start:disabled{border-color:rgba(239,233,223,.3);opacity:.4;cursor:default}
+.title-ver{position:absolute;left:112px;bottom:40px;font-size:12px;letter-spacing:.1em;color:rgba(239,233,223,.55);line-height:1.9}
+.title-lang{position:absolute;right:48px;bottom:40px;border:0;background:none;padding:0;font-size:13px;letter-spacing:.15em;color:rgba(239,233,223,.7);cursor:pointer}
+.title-lang:hover,.title-lang:focus-visible{color:#efe9df}
+/* The questions take the menu's place (FR3) */
+.title-q{position:absolute;left:112px;top:300px;display:flex;flex-direction:column;gap:26px;width:560px}
+.title-q .row{display:flex;align-items:center;gap:14px;font-size:18px;letter-spacing:.06em;animation:m-fade-up 240ms cubic-bezier(.2,.8,.2,1) both}
+.title-q .row.done{opacity:.55;animation:none}
+.title-q .row label,.title-q .row > span:first-child{flex:0 0 auto}
+.title-q .row input{flex:1;min-width:0;background:transparent;border:0;border-bottom:2px solid rgba(239,233,223,.6);color:#efe9df;font:inherit;padding:6px 2px;outline:0}
+.title-q .row input:focus{border-bottom-color:#efe9df}
+.title-q .row .d{width:34px;height:34px;border:2px solid rgba(239,233,223,.6);background:transparent;color:#efe9df;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;padding:0}
+.title-q .row .d:disabled{opacity:.3;cursor:default}
+.title-q .row .g{display:flex;gap:10px}
+.title-q .row .g button{border:2px solid rgba(239,233,223,.6);background:transparent;color:#efe9df;padding:6px 16px;letter-spacing:.2em;font:inherit;cursor:pointer}
+.title-q .row .g button.on{background:#efe9df;color:#111}
+.title-esc{position:absolute;left:112px;bottom:96px;font-size:12px;letter-spacing:.1em;color:rgba(239,233,223,.55)}
+/* 制作: a plain scrolling page */
+.title-credits-page{position:absolute;left:112px;top:280px;width:760px;max-height:520px;overflow:auto;line-height:1.8}
+.title-credits-page h2{margin:0 0 16px;font-size:14px;letter-spacing:.3em;font-weight:400;color:rgba(239,233,223,.7)}
+.title-credits-page .body{font-size:15px}
+.title-credits-page .title-back{margin-top:24px}
+.title-page .settings-layer{position:absolute}
+
+/* The collection on the desk (FR4/FR8): figures and the book; a missing image keeps its node. */
+.figures{position:absolute;inset:0;pointer-events:none}
+.figure{position:absolute;pointer-events:auto;outline:none}
+.figure img,.desk-book img{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+.figure .fig-chip{position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);white-space:nowrap;padding:3px 8px;border-radius:6px;background:rgba(232,228,220,.85);color:#1d2129;font-size:12px;opacity:0;pointer-events:none;transition:opacity 160ms}
+.figure:hover .fig-chip,.figure:focus-visible .fig-chip{opacity:1}
+.desk-book{position:absolute;border:0;padding:0;margin:0;background:transparent;cursor:pointer}
+.desk-book:focus-visible{outline:2px solid rgba(232,228,220,.7);outline-offset:2px}
+.book-reader{position:absolute;inset:0;z-index:60;background:#111}
+.book-reader iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff}
+.book-close{position:absolute;right:20px;top:16px;z-index:1;border:0;border-radius:8px;padding:6px 14px;background:rgba(232,228,220,.9);color:#1d2129;font-size:13px;cursor:pointer}

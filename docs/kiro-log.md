@@ -335,3 +335,58 @@ Appended after each task. Neither Kiro nor Claude edits the other's area without
      if the desktop-ui night blink should stay.
 - Snapshots: the checklist lines' `data-id` (3) and the room HUD without the glow (2).
 - Tests: 44 files, 648 passing; typecheck clean. Not checked in a real browser.
+
+## 2026-10-31 — title-page
+
+- Spec `title-page`: design (T1–T11) and tasks written and implemented in `src/ui/` (the only
+  place that reads `nt_profile`).
+  - The title comes first:
+    - with a save it offers 继续 · 第 N 天 (no 新游戏) · 设置 · 制作;
+    - without one, 新游戏 · 设置 · 制作;
+    - there's no restart anywhere.
+  - 新游戏 wakes the monitors and turns the menu into the five questions, one at a time, with 🎲.
+    开始 is enabled only when all are answered.
+  - 开始 pushes the room in toward the desk (房间→桌子's path), turns the lamp off, and starts a
+    run whose first event is `names` (T1).
+  - The waiting room: 15 s quiet, then one idle event every 20–40 s from `content/title.json`.
+    `ms: 0` is a cut (the chair's pixel stays). Rain is the `rain-loop` sound.
+  - 设置 is the in-game panel without 返回首页. 制作 is a scrolling page with a back button.
+  - `?day=N` skips the title. The app opens in English (README); `?lang=zh` for Chinese.
+- Collection (FR4/FR8): `ProfileWriter.recordEnding(kind)` counts `endings.{bad,survive,good}`
+  and `finishedRuns`. main.ts calls it when an `ending` event is appended, so a reload doesn't
+  count twice.
+  - `src/ui/collection.ts` reads the counts. The host gives them to the title and to the game
+    (`session.collection`), as presentation only.
+  - Figures stand at the desk's left end in the title room and in 房间, with a one-word name
+    chip and no counts.
+  - The book shows in 房间 iff `finishedRuns ≥ 1` and opens `/gamebook/` in a full-screen iframe
+    with a close chip (Esc closes too). It never appears on the title.
+  - Missing images keep their nodes.
+  - Positions on the room shot are provisional (`ROOM_COLLECTION`).
+- Fonts (FR6): `src/ui/fonts.css` declares Barlow Condensed 700, LXGW WenKai, Alegreya and
+  Alegreya Sans from `public/fonts/` (`font-display: swap`). Each has a size-adjusted fallback
+  face (WenKai → Noto Sans SC); the metrics are provisional until the subset step reports
+  real ones.
+  - Only the game layer uses them (title, room HUD, dialogue, settings, endings, credits); the
+    desktop keeps system fonts. `html[lang]` follows the locale.
+- New event kind: `names`.
+- The game's name, NOT TODAY, is a constant in the view (it's the name on the box, not story
+  text).
+- TODO(Claude), strings (they show as ⟦missing⟧ until written), with suggested values:
+  - `title.q.login` 这是谁的故事？
+  - `title.q.nick` 家里人怎么称呼你？
+  - `title.q.bossCalls` 老板怎么叫你？
+  - `title.q.calledBy` 同事怎么叫你？
+  - `title.q.pronoun` (the label of the 她 / 他 / 不说 row)
+  - `title.pronoun.she` 她, `title.pronoun.he` 他, `title.pronoun.none` 不说
+  - `title.dice` (the 🎲's label, for screen readers)
+  - `title.esc` Esc 返回
+  - `title.byline` 好大壮 · 与 Claude 一起写成
+  - `title.creditsPage.team` / `.tools` / `.disclosure` (from the README's "What is new, what is
+    not" and "How it was built")
+  - English for all of these.
+- TODO(Claude), content: `content/title.json` `dice` (老大 / 老板 / 哥 / 姐); until then the 🎲
+  offers only the name given. Also the font files, `fig_{bad,survive,good}.png`, `book.png`,
+  and `public/gamebook/`.
+- Not done (named): `profiles.names` online (backend); the splat background (room-scene).
+- Tests: 45 files, 666 passing; typecheck clean. Not checked in a browser.

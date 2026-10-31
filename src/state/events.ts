@@ -52,7 +52,9 @@ export type GameEvent =
   | { kind: "upgrade"; day: number; object: string }
   | { kind: "declineUpgrade"; day: number; object: string; decline: DeclineKind }
   // san-and-endings spec: the run ends, once (bad at a shutdown beat; survive / good on the last night).
-  | { kind: "ending"; day: number; ending: Ending };
+  | { kind: "ending"; day: number; ending: Ending }
+  // title-page spec: the answers to the title's questions, the run's first event (title page only).
+  | { kind: "names"; day: number; names: State["names"] };
 
 export type EventKind = GameEvent["kind"];
 
@@ -80,6 +82,7 @@ export const eventKinds: readonly EventKind[] = [
   "upgrade",
   "declineUpgrade",
   "ending",
+  "names",
 ];
 
 const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
@@ -115,6 +118,21 @@ function withMember(state: State, key: "found" | "recognised", objectId: string)
   return { ...state, [key]: [...current, objectId] } as State;
 }
 
+/** The title page's answers (title-page T1): every field the variable table lists, of its type. */
+function applyNames(state: State, event: Extract<GameEvent, { kind: "names" }>): State {
+  const n = event.names as unknown as Record<string, unknown>;
+  if (typeof n !== "object" || n === null) throw new Error("names: expected an object");
+  const fields = Object.keys(state.names);
+  for (const k of Object.keys(n)) if (!fields.includes(k)) throw new Error(`names: unknown field "${k}"`);
+  for (const k of fields) {
+    if (!(k in n)) throw new Error(`names: missing "${k}"`);
+    if (k === "pronoun") {
+      if (n.pronoun !== null && n.pronoun !== "she" && n.pronoun !== "he") throw new Error('names: pronoun must be "she", "he" or null');
+    } else if (typeof n[k] !== "string") throw new Error(`names: "${k}" must be a string`);
+  }
+  return { ...state, names: { ...(n as State["names"]) } };
+}
+
 /**
  * The loan is decided by the reply recorded on `constants.loanReplyDay`. The first such reply
  * wins; later ones cannot change it. The repayment on `constants.repayDay` is not an event: it
@@ -148,6 +166,8 @@ export function applyEvent(state: State, event: GameEvent): State {
   switch (event.kind) {
     case "ending":
       return applyEnding(state, event);
+    case "names":
+      return applyNames(state, event);
     case "openLayer":
       return withMember(state, "found", event.objectId);
     case "recognise":

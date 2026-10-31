@@ -9,6 +9,7 @@ import type { TaskMode } from "@state/days/effects";
 import type { DoorBeat } from "@world/delivery/door";
 import { EMPTY_DIALOGUE, type DialogueState } from "@world/loop/dialogue";
 import type { Reveal } from "@world/motion/reveal";
+import { EMPTY_COLLECTION, type Collection } from "@world/room/collection";
 import { isNight, type BeatClock } from "./beat";
 import { browserPage, weatherKind } from "./browser/data";
 import { desktopRing } from "./rings";
@@ -60,6 +61,10 @@ export interface Session {
   kuroRead: string | null | undefined;
   /** The day the evening chat beat last opened the overlay by itself (once a day). */
   kuroAutoDay: number;
+  /** What finished runs left on the desk (title-page FR4/FR8): set by the host from the profile; presentation only. */
+  collection: Collection;
+  /** The gamebook reader is open (title-page FR4). */
+  bookOpen: boolean;
   /** Where the ending pages are (san-and-endings): 你和你 (bad only), the credits, then after. */
   endingPage: { phase: "you" | "credits" | "after"; startMs: number; skipped: boolean } | null;
   /** The object lifted off the desk bar (polish FR1); never at the same time as the phone. */
@@ -102,6 +107,8 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     kuroRead: undefined,
     kuroAutoDay: 0,
     endingPage: null,
+    collection: EMPTY_COLLECTION,
+    bookOpen: false,
     holding: null,
     reveal: null,
     wbMode: "self",
