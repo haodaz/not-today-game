@@ -146,5 +146,6 @@
   "desktop.screen.left": "Left",
   "desktop.screen.right": "Right",
   "desktop.back": "Back to room",
-  "hud.putDown": "Click outside to put it down"
+  "hud.putDown": "Click outside to put it down",
+  "hud.menu.home": "Home"
 }

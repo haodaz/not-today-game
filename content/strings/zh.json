@@ -146,5 +146,6 @@
   "desktop.screen.left": "左屏",
   "desktop.screen.right": "右屏",
   "desktop.back": "回房间",
-  "hud.putDown": "点屏幕外面放下"
+  "hud.putDown": "点屏幕外面放下",
+  "hud.menu.home": "首页"
 }
