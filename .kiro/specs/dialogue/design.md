@@ -69,6 +69,8 @@ Also in this change: Kuro's HUD body is 192 px (late-days FR1, only that line).
 
 - The box is a `div` (a choice button cannot sit in a button). It is fixed: 992 × 132 px at
   `bottom: 120px`, overflow hidden. When the player's box is up, it moves to `bottom: 300px`.
+- A box with a tag is `tagged`: its text starts below the tag (27 px top padding; 44 px under
+  Kuro's 56 px face). The player's box (`PLAYER_BOX`: five one-row choices) uses tighter rows.
 - Tags:
   - a speaker line: its `who` (content);
   - narration: `dialogue.tag.door` / `.gap` / `.desk` when those strings exist (door view, raid,
@@ -89,14 +91,15 @@ Also in this change: Kuro's HUD body is 192 px (late-days FR1, only that line).
 - 聊聊:
   - work beats: Kuro says the day's idiom; the player's box offers only `dialogue.ok`; no turn.
   - the chat beat (`clock.beat === "night"`), turns left: Kuro says the idiom; the player's box
-    offers today's unasked starters (locale text), `dialogue.more`, `kuro.notNow`.
+    offers today's unasked starters (locale text) and `dialogue.more`, on one page, one row each
+    (author 2026-11-01: no 先不聊 here, Esc is the way out; 先不聊 stays in the prompt only).
   - no turns left: Kuro's box shows `kuro.bedtime`, no player box; `session.kuroBedDay = day`.
 - A starter or typed text appends `chat` and queues Kuro's offline answer as the next `kuroTurn`.
   A sixth attempt appends nothing and queues the bedtime line; the player's box never renders
   again that day (`kuroBedDay`).
 - `dialogue.more` turns the player's box into one text input (`session.kuroInput`, draft in
   `session.kuroDraft`); Enter sends (the controller clicks the input's `data-enter` action).
-- 先不聊 / 好。 / Esc close the conversation (every Kuro item leaves the queue); the body returns
+- 先不聊 (the prompt) / 好。 (work beats) / Esc close the conversation (every Kuro item leaves the queue); the body returns
   along the same path in 320 ms (`m-kuro-back`).
 - The player's box (`.dlg-player`) shows when the head item is a `kuroTurn` on its last line and
   last text screen, and `kuroBedDay !== day`. It has its own paging (`session.playerPage`).

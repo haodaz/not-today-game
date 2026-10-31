@@ -469,3 +469,25 @@ Appended after each task. Neither Kiro nor Claude edits the other's area without
 - Not done (kuro-chat's): the model path, memory and the judgement scorer. Answers are the
   offline constants only.
 - Tests: 46 files, 681 passing; typecheck clean. Not checked in a browser.
+
+## 2026-11-01 — three browser fixes + the quality-gate hooks
+
+- Title: the stage's screen class is `screen-menu|questions|credits` (it was `title-menu`, which
+  picked up the nav's `left:112px;top:300px` and moved the whole page). The nav keeps `title-menu`.
+- Dialogue:
+  - A tagged box gets `tagged`, and its text starts below the tag (27 px; 44 px under Kuro's face,
+    which now sits at `top:-28px`).
+  - The player's box drops 先不聊 (Esc leaves; 先不聊 stays in the prompt only). It shows the
+    starters and 说点别的… on one page: `PLAYER_BOX` allows 5 choices of one row each, the text is
+    ellipsed if it must be, and rows are 1.3 high, so 14 + 5 × 23.4 px fits in 132.
+  - A test checks one page for all 18 days in both languages. The snapshot diffs were the
+    intended markup only.
+- Hooks (`.kiro/hooks/`, PostFileSave, agent actions that run one command and report, never
+  fix): `src/state/**` → the state tests and the object-screen render tests;
+  `content/days/*.json` → `npm run validate -- --days`; `content/strings/zh.json` →
+  `npm run validate -- --strings`.
+  - `scripts/validate-content.ts` (node built-ins only; `npm run validate` runs both checks).
+    Exit codes: 0 clean · 1 a day file has a problem · 2 cannot run · 3 English keys missing.
+  - The script is tested in `tests/validate-content.test.ts`; the strict loaders are unchanged.
+- Tests: 47 files, 689 passing; typecheck clean. The hooks fire from the next session; not
+  triggered by a real save yet.

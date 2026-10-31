@@ -50,6 +50,11 @@ describe("the title page (FR1–FR3)", () => {
     const menu = [...out.matchAll(/<nav class="title-menu"[^>]*>(.*?)<\/nav>/g)][0]![1]!;
     expect([...menu.matchAll(/data-action="(title-[a-z]+)"/g)].map((m) => m[1])).toEqual(["title-new", "title-settings", "title-credits"]);
     expect(out).toContain("NOT TODAY");
+    // The stage's screen class never borrows a child's rule (the nav is `.title-menu`).
+    expect(out).toMatch(/^<div class="stage title-page screen-menu" data-screen="menu">/);
+    for (const screen of ["questions", "credits"] as const) {
+      expect(page({ ...initialTitle(null, EMPTY_COLLECTION), screen })).toMatch(new RegExp(`^<div class="stage title-page screen-${screen}[ "]`));
+    }
     expect(out).toMatchSnapshot();
   });
 

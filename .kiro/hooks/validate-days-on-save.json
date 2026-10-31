@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Validate day files on save",
+      "trigger": "PostFileSave",
+      "description": "tech.md quality gate: a change to content/days/*.json checks five beats, effect/delta keys against variables.json, and string keys against zh.json.",
+      "matcher": "(^|/)content/days/[^/]+\\.json$",
+      "action": {
+        "type": "agent",
+        "prompt": "A day file under content/days/ was saved. Quality gate (tech.md): run exactly this once (no pipe, so the exit code is the script's):\nnpm run validate -- --days\nExit 0 (\"days: 18 files, 0 problems\") means clean: say so in one line. Exit 1 means a day file has problems: list each reported line as-is (file, field, problem). Exit 2 means the check could not run: quote its \"cannot run\" message. content/ is Claude's area: do not edit it, do not commit; report only."
+      }
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Missing English strings on save",
+      "trigger": "PostFileSave",
+      "description": "tech.md quality gate: a change to content/strings/zh.json lists keys missing from en.json.",
+      "matcher": "(^|/)content/strings/zh\\.json$",
+      "action": {
+        "type": "agent",
+        "prompt": "content/strings/zh.json was saved. Quality gate (tech.md): run exactly this once (no pipe, so the exit code is the script's):\nnpm run validate -- --strings\nExit 0: en.json has every key, say so in one line. Exit 3: list the missing keys it printed (they fall back to Chinese in game; English is Claude's to write, never machine-translated). Exit 2: quote its \"cannot run\" message. Do not write any English yourself, do not edit content/, do not commit; report only."
+      }
+    }
+  ]
+}

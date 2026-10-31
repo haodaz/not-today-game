@@ -168,24 +168,48 @@ describe("FR2 talking to Kuro", () => {
     expect(room(ctx)).toContain('class="kuro-btn"');
   });
 
-  it("聊聊 at night: Kuro's line with its face, then the player's box with the starters, 说点别的…, 先不聊 (snapshots)", () => {
+  it("聊聊 at night: Kuro's line with its face, then the player's box: the starters and 说点别的… on one page (snapshot)", () => {
     const ctx = ctxOf(storeAt(1), NIGHT);
     talkAtNight(ctx);
     const box = out(ctx);
     const day = kuroDay(1)!;
-    expect(box).toContain('class="dlg kuro raised"');
+    expect(day.starters.length).toBe(4);
+    expect(box).toContain('class="dlg tagged kuro raised"');
     expect(box).toContain(`>${escapeHtml(day.idiom)}</button>`);
-    expect(box).toContain('<div class="dlg-player" data-mode="choices"');
+    expect(box).toContain('<div class="dlg-player" data-mode="choices" data-screen="1/1">');
     expect(box).toContain('<span class="who tag p">林一</span>');
-    const labels = [...day.starters.map((s) => s.zh), t("dialogue.more"), t("kuro.notNow")];
-    // Every option is on one of the player's pages (at most four a page).
-    const all: string[] = [];
-    for (let i = 0; i < 3; i++) {
-      all.push(out(ctx));
-      act(ctx, "kuro-page");
-    }
-    for (const l of labels) expect(all.join(""), l).toContain(`>${escapeHtml(l)}</button>`);
+    const player = box.slice(box.indexOf('<div class="dlg-player"'));
+    const labels = [...player.matchAll(/<button type="button" data-action="kuro-(?:q|more)"[^>]*>([^<]*)<\/button>/g)].map((m) => m[1]);
+    expect(labels).toEqual([...day.starters.map((s) => escapeHtml(s.zh)), escapeHtml(t("dialogue.more"))]);
+    // No 先不聊 here (Esc leaves), and no ▼: one page.
+    expect(player).not.toContain("kuro-leave");
+    expect(player).not.toContain('class="more"');
     expect(box).toMatchSnapshot();
+  });
+
+  it("the player's box fits every day's starters + 说点别的… on one page, in both languages", () => {
+    for (const locale of ["zh", "en"] as const) {
+      setLocale(locale);
+      for (let d = 1; d <= constants.lastDay; d++) {
+        const ctx = ctxOf(storeAt(d), NIGHT);
+        talkAtNight(ctx);
+        const p = out(ctx);
+        expect(p, `${locale} day ${d}`).toContain('data-mode="choices" data-screen="1/1"');
+      }
+    }
+  });
+
+  it("a tag on the box pushes its text below it: narration without a tag has none of that", () => {
+    const ctx = ctxOf(storeAt(1), NIGHT);
+    act(ctx, "kuro-call");
+    expect(out(ctx)).toMatch(/^<div class="dlg tagged kuro has-choices"/);
+    ctx.session.dialogue = push(EMPTY_DIALOGUE, queueOf("n", [narration]));
+    expect(out(ctx)).toMatch(/^<div class="dlg" /);
+    ctx.session.dialogue = push(EMPTY_DIALOGUE, queueOf("s", [{ k: "speaker", who: "缝里", t: narration.t }]));
+    expect(out(ctx)).toMatch(/^<div class="dlg tagged"/);
+    const css = readFileSync(resolve(__dirname, "../src/world/room/room.css"), "utf8");
+    expect(css).toContain(".dlg.tagged,.dlg.tagged.has-choices{padding-top:27px}");
+    expect(css).toContain(".dlg.tagged.kuro,.dlg.tagged.kuro.has-choices{padding-top:44px}");
   });
 
   it("a starter is a turn: a chat event, the offline answer, the question gone from the list; typing sends with Enter", () => {

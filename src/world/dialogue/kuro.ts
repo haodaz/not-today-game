@@ -1,6 +1,6 @@
 // Talking to Kuro is an NPC conversation (dialogue FR2). Its body (or the desktop pill) queues the
 // conversation in the box: the upgrade offer if there is one, then 要和克总聊聊吗？. 聊聊 brings the
-// day's idiom and the player's box (starter questions, 说点别的…, 先不聊); each turn appends a `chat`
+// day's idiom and the player's box (starter questions, 说点别的…; Esc leaves); each turn appends a `chat`
 // event and Kuro answers with its constant offline answer. Five turns a day; a sixth attempt gets
 // the bedtime line and the player's box does not come back that day. During work beats it says the
 // idiom and the player can only say 好。. Every line here is content or a string.
@@ -133,7 +133,7 @@ export function declineOffer(ctx: ActionContext, decline: string | undefined): v
   ctx.store.appendEvent({ kind: "declineUpgrade", object: offer.kind === "final" ? FINAL : offer.object, decline: offer.kind });
 }
 
-/** 先不聊, 好。 or Esc: every Kuro item leaves; the body returns to the corner. */
+/** 先不聊 (the prompt), 好。 (work beats) or Esc: every Kuro item leaves; the body returns to the corner. */
 export function leaveTalk(ctx: ActionContext, log = true): void {
   const { session } = ctx;
   if (log && session.dialogue.queue[0]?.voice === "kuro") logCurrent(session, ctx.store.getState());
@@ -207,10 +207,10 @@ export function playerBox(state: State, events: readonly GameEvent[], session: S
   if (session.kuroInput) return { name, mode: "input", options: [], screens: [], page: 0, draft: session.kuroDraft };
   const asked = askedToday(events, state.day);
   const starters = (kuroDay(state.day)?.starters ?? []).filter((s) => !asked.has(s.n));
+  // The starters and 说点别的… only (author 2026-11-01): Esc is the way out; 先不聊 is the prompt's.
   const options: PlayerOption[] = [
     ...starters.map((s): PlayerOption => ({ action: "kuro-q", q: s.n, label: starterText(s) })),
     { action: "kuro-more", label: t("dialogue.more") },
-    { action: "kuro-leave", label: t("kuro.notNow") },
   ];
   const all = screens(null, options.map((o) => o.label), PLAYER_BOX, px);
   return { name, mode: "choices", options, screens: all, page: Math.min(session.playerPage, all.length - 1), draft: "" };

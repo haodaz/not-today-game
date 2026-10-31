@@ -59,9 +59,9 @@
 .dlg.sfx .txt{text-align:center;letter-spacing:.08em;color:#5b4a2e}
 .dlg .tag,.dlg-player .tag{position:absolute;left:18px;top:-16px;background:#2a2622;color:#efe9df;font-size:13px;line-height:1.4;letter-spacing:.2em;padding:5px 14px;border-radius:3px;white-space:nowrap}
 :lang(en) .dlg .tag,:lang(en) .dlg-player .tag{text-transform:uppercase;letter-spacing:.14em}
-.dlg .tag.k{display:flex;align-items:center;gap:10px;top:-34px;padding:4px 14px 4px 4px;border-radius:30px}
+.dlg .tag.k{display:flex;align-items:center;gap:10px;top:-28px;padding:4px 14px 4px 4px;border-radius:30px}
 .dlg .tag.k img{width:56px;height:56px;border-radius:50%;object-fit:cover;background:#ddd}
-.dlg-player .tag{background:#5b4a2e}
+.dlg-player .tag{background:#5b4a2e;top:-18px}
 .dlg .hist{position:absolute;right:14px;top:-14px;width:28px;height:28px;border:0;padding:0;border-radius:50%;background:#2a2622;color:#efe9df;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer}
 .dlg .hist:hover,.dlg .hist:focus-visible{background:#8b2f2a;outline:none}
 .dlg .more,.dlg-player .more{position:absolute;right:18px;bottom:8px;border:0;padding:0;background:none;color:#8b2f2a;font-size:12px;line-height:1;animation:dlg-pulse 1.2s ease-in-out infinite}
@@ -70,11 +70,19 @@
 /* Choices inside the box: a vertical list, ◆ on hover / focus, at most two lines each */
 .dlg .choices,.dlg-player .choices{display:flex;flex-direction:column;line-height:1.45}
 .dlg.has-choices{padding-top:20px}
+/* A tag sits on the top edge; the text starts below it (mock design/chrome/dialogue.html). The
+   plain tag ends 11 px into the box; Kuro's (56 px face) ends 36 px in. Height stays 132 px:
+   three rows (or a prompt and two choices) still fit under Kuro's tag. */
+.dlg.tagged,.dlg.tagged.has-choices{padding-top:27px}
+.dlg.tagged.kuro,.dlg.tagged.kuro.has-choices{padding-top:44px}
 .dlg .choices button,.dlg-player .choices button{position:relative;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;width:100%;margin:0;padding:1px 0 1px 20px;border:0;background:none;font:inherit;line-height:inherit;color:#777;text-align:left;cursor:pointer}
 .dlg .choices button:hover,.dlg .choices button:focus-visible,.dlg-player .choices button:hover,.dlg-player .choices button:focus-visible{color:#1d2129;outline:none}
 .dlg .choices button:hover::before,.dlg .choices button:focus-visible::before,.dlg-player .choices button:hover::before,.dlg-player .choices button:focus-visible::before{content:"◆";position:absolute;left:0;color:#8b2f2a}
 /* The player's box rises from the right edge, the same height */
-.dlg-player{left:auto;right:64px;transform:none;width:560px;padding-top:20px}
+.dlg-player{left:auto;right:64px;transform:none;width:560px;padding-top:14px}
+/* Up to five one-row choices (four starters + 说点别的…) in the same 132 px: 14 + 5 × 23.4 = 131. */
+.dlg-player .choices{line-height:1.3}
+.dlg-player .choices button{display:block;white-space:nowrap;text-overflow:ellipsis;-webkit-line-clamp:unset}
 .dlg-player.input{padding-top:30px}
 .dlg-player .kuro-in{width:100%;border:0;border-bottom:1px solid #8a7f70;background:transparent;font:inherit;color:#1d2129;outline:0;padding:2px 0}
 .dlg-player .kuro-in:focus{border-bottom-color:#1d2129}

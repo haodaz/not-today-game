@@ -89,7 +89,7 @@ describe("(4) Kuro's small window is a pill (dialogue FR2: no window any more)",
     const ctx = desk();
     loopActions["kuro-call"]!(ctx, none, null as never);
     const out = renderGame(ctx.store, ctx.session, 0).value;
-    expect(out).toContain('<div class="dlg-layer"><div class="dlg kuro');
+    expect(out).toContain('<div class="dlg-layer"><div class="dlg tagged kuro');
     expect(ctx.session.view).toBe("desktop");
   });
 
@@ -175,7 +175,7 @@ describe("(5) four camera levels", () => {
       const out = render(ctx);
       expect(out, view).toContain('<div class="hud-kuro away"></div>');
       expect(out, view).not.toContain("data-kuro-slot");
-      expect(out, view).toMatch(/<div class="dlg kuro[^"]*"[^>]*><span class="who tag k">/);
+      expect(out, view).toMatch(/<div class="dlg tagged kuro[^"]*"[^>]*><span class="who tag k">/);
       expect(ctx.session.view).toBe(view);
       // A second click while talking queues nothing more.
       const queued = ctx.session.dialogue.queue.length;

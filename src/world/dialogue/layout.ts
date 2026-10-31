@@ -13,16 +13,19 @@ export interface BoxGeom {
   /** Choice rows per screen, and choices per screen. */
   readonly choiceRows: number;
   readonly maxChoices: number;
+  /** Rows one choice may take (its text is clamped to that many). */
+  readonly choiceMaxRows: number;
 }
 
 /** The line box: about 62 % of the 1600 px stage, three rows (mock design/chrome/dialogue.html). */
-export const LINE_BOX: BoxGeom = { width: 992, padX: 30, rows: 3, choiceRows: 4, maxChoices: 4 };
-/** The player's box, rising from the right edge. */
-export const PLAYER_BOX: BoxGeom = { width: 560, padX: 30, rows: 3, choiceRows: 4, maxChoices: 4 };
+export const LINE_BOX: BoxGeom = { width: 992, padX: 30, rows: 3, choiceRows: 4, maxChoices: 4, choiceMaxRows: 2 };
+/**
+ * The player's box, rising from the right edge: the day's starters (at most four) and 说点别的…
+ * on one page, one row each (author 2026-11-01; tighter rows, the text ellipsed if it must be).
+ */
+export const PLAYER_BOX: BoxGeom = { width: 560, padX: 30, rows: 3, choiceRows: 5, maxChoices: 5, choiceMaxRows: 1 };
 /** A choice's ◆ indent. */
 export const CHOICE_INDENT = 20;
-/** A choice is at most two rows (clamped). */
-export const CHOICE_MAX_ROWS = 2;
 
 /** Body size: 18 px (zh) / 17 px (en). */
 export const fontPx = (locale: Locale): number => (locale === "en" ? 17 : 18);
@@ -106,14 +109,14 @@ export interface Screen {
   readonly choiceRows: number;
 }
 
-/** How many rows a choice takes: 1 or 2 (clamped). */
+/** How many rows a choice takes: 1 up to the box's clamp. */
 export function choiceRows(label: string, geom: BoxGeom, px: number): number {
-  return Math.min(CHOICE_MAX_ROWS, Math.max(1, wrap(label, textArea(geom, px) - CHOICE_INDENT, px).length));
+  return Math.min(geom.choiceMaxRows, Math.max(1, wrap(label, textArea(geom, px) - CHOICE_INDENT, px).length));
 }
 
 /**
  * The screens for one line and its choices (FR1): text pages of ≤ `rows` rows, then choice pages
- * of ≤ `maxChoices` choices and ≤ `choiceRows` rows. The first choice page shares the last text
+ * of ≤ `maxChoices` choices and ≤ `choiceRows` rows (each choice ≤ `choiceMaxRows`). The first choice page shares the last text
  * page when their rows add up to ≤ `rows` (a one-row prompt over two choices).
  */
 export function screens(text: string | null, choices: readonly string[] | null, geom: BoxGeom, px: number): Screen[] {

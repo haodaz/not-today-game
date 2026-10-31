@@ -111,8 +111,10 @@ export function renderLineBox(m: LineBoxModel): SafeHtml {
     : m.markerClickable
       ? html`<button type="button" class="more" data-action="loop-advance">${glyph}</button>`
       : html`<span class="more" aria-hidden="true">${glyph}</span>`;
-  const c = cls("dlg", m.kind !== "line" && m.kind, m.tag?.kind === "kuro" && "kuro", m.choices.length > 0 && "has-choices", m.raised && "raised");
-  return html`<div class="${c}" data-screen="${m.screen + 1}/${m.count}">${tagOf(m.tag)}${historyChip()}${txt}${m.choices.length ? html`<div class="choices">${buttons}</div>` : null}${mk}</div>`;
+  // A tag on the top edge pushes the text down below it (`tagged`; Kuro's face needs more room).
+  const tag = tagOf(m.tag);
+  const c = cls("dlg", m.kind !== "line" && m.kind, tag && "tagged", m.tag?.kind === "kuro" && "kuro", m.choices.length > 0 && "has-choices", m.raised && "raised");
+  return html`<div class="${c}" data-screen="${m.screen + 1}/${m.count}">${tag}${historyChip()}${txt}${m.choices.length ? html`<div class="choices">${buttons}</div>` : null}${mk}</div>`;
 }
 
 /** The player's box: the starter questions as choices, or one text input (Enter sends). */
