@@ -216,5 +216,12 @@
   "judge.offline.replied": "You answered someone no one speaks for.",
   "judge.offline.loan": "You gave Lao Zhou an answer.",
   "judge.offline.talked": "You talked with me a while.",
-  "judge.offline.typed": "You typed it yourself."
+  "judge.offline.typed": "You typed it yourself.",
+  "settings.bindEmail": "Link an email",
+  "settings.emailHint": "Enter your email and we send a sign-in link; your save follows the email.",
+  "settings.emailPlaceholder": "you@example.com",
+  "settings.emailSend": "Send link",
+  "settings.emailSent": "Link sent. Open it and you are linked.",
+  "settings.emailBound": "Linked: {email}",
+  "settings.emailError": "It did not send. Try again."
 }
