@@ -1,0 +1,322 @@
+{
+  "_note": "大群「相亲相爱一家人」：亲戚们的三种声音——炫耀（二舅、表弟、堂姐）、干扰（小姑的转发、投票、砍一刀）、打探（大姨）。姥姥话短，打字有错。人名前缀「大姨：」，没有头像的用剪影。自己的词：fine 好。/ lol 哈哈 / received 收到。/ thanks 谢谢。+ 物件借的词。走向同家里：1–6 正常的吵；7–12 重播、零秒语音、句号；13–15 客气、知道不该知道的事；16–18 只剩好话。表弟 d5 转公司新闻，d9 丢工作（与 family.json 一致）。",
+  "days": {
+    "1": {
+      "incoming": [
+        { "t": "07:48", "text": "小姑：[链接] 早起一杯这个，血管干净二十年", "kind": "private" },
+        { "t": "08:13", "text": "二舅：你表哥上岸了，省直，昨天出的名单", "kind": "private" },
+        { "t": "08:14", "text": "堂姐：恭喜恭喜", "kind": "private" },
+        { "t": "08:14", "text": "小姑：恭喜恭喜", "kind": "private" },
+        { "t": "12:37", "text": "大姨：{nick}在家干什么呢，你妈说你们公司不用去了", "kind": "private" }
+      ],
+      "fine": { "status": "reply", "lines": [{ "who": "member", "t": "12:41", "text": "大姨：好什么，一个月给多少" }], "inner": "大姨问话从来不绕，这是她的美德。" },
+      "lol": { "status": "reply", "lines": [{ "who": "member", "t": "12:40", "text": "二舅：哈什么哈，你表哥比你小两岁" }] },
+      "received": { "status": "reply", "lines": [{ "who": "member", "t": "12:42", "text": "堂姐：收到什么，这又不是你们公司群" }], "inner": "习惯了。手比脑子快。" },
+      "thanks": { "status": "reply", "lines": [{ "who": "member", "t": "12:41", "text": "二舅：谢你表哥去，他不在群里，我截图给他" }] },
+      "free": { "status": "reply", "lines": [{ "who": "member", "t": "12:45", "text": "姥姥：孩子在家挺好 在家暖和" }], "inner": "姥姥不打标点。她的句子靠空格呼吸。" }
+    },
+    "2": {
+      "incoming": [
+        { "t": "06:58", "text": "小姑：[链接] 帮我家点点投一票，第 17 号，每天可以投三次", "kind": "private" },
+        { "t": "06:59", "text": "小姑：[链接] 帮我家点点投一票，第 17 号，每天可以投三次", "kind": "private" },
+        { "t": "09:30", "text": "堂姐：点点期中第一，数学 96", "kind": "private" },
+        { "t": "09:31", "text": "堂姐：[图片] 奖状", "kind": "private" },
+        { "t": "09:33", "text": "大姨：96 怎么丢的那 4 分", "kind": "private" }
+      ],
+      "fine": { "status": "reply", "lines": [{ "who": "member", "t": "09:40", "text": "小姑：投了吗，投了发个截图" }] },
+      "lol": { "status": "reply", "lines": [{ "who": "member", "t": "09:38", "text": "堂姐：笑什么，你小时候也是 96 被说" }], "inner": "是 96。我记得那 4 分，比记得那 96 清楚。" },
+      "received": { "status": "reply", "lines": [{ "who": "member", "t": "09:41", "text": "小姑：收到就投" }] },
+      "thanks": { "status": "read", "lines": [], "inner": "谢谁。谢奖状吧。" },
+      "free": { "status": "reply", "lines": [{ "who": "member", "t": "09:45", "text": "姥姥：第一就是第一 别说那四分" }], "inner": "姥姥站我这边。她不知道她站的是谁。" }
+    },
+    "3": {
+      "incoming": [
+        { "t": "07:20", "text": "小姑：[链接] 砍一刀，就差 0.01 了，帮帮姑姑", "kind": "private" },
+        { "t": "10:02", "text": "表弟：我们组这周上了个新东西，不能说，反正挺大的", "kind": "private" },
+        { "t": "10:03", "text": "二舅：大厂就是不一样", "kind": "private" },
+        { "t": "10:05", "text": "大姨：{nick}那个公司有大厂大吗", "kind": "private" }
+      ],
+      "fine": { "status": "reply", "lines": [{ "who": "member", "t": "10:09", "text": "大姨：我是说规模" }] },
+      "lol": { "status": "reply", "lines": [{ "who": "member", "t": "10:08", "text": "表弟：哈哈，各有各的好" }], "inner": "各有各的好。他把这句当台阶递过来，踩着挺稳。" },
+      "received": { "status": "reply", "lines": [{ "who": "member", "t": "10:10", "text": "小姑：收到就是砍了？发截图" }] },
+      "thanks": { "status": "reply", "lines": [{ "who": "member", "t": "10:11", "text": "小姑：谢就不用了，砍一下" }] },
+      "free": { "status": "reply", "lines": [{ "who": "member", "t": "10:20", "text": "大姨：你那个公司到底多少人" }], "inner": "五十个头像。我没说。" }
+    },
+    "4": {
+      "incoming": [
+        { "t": "08:02", "text": "二舅：[图片] 你表哥的工位，有窗户", "kind": "private" },
+        { "t": "08:04", "text": "小姑：真亮堂", "kind": "private" },
+        { "t": "11:50", "text": "大姨：{nick}你在家上班是不是不用化妆了，省钱", "kind": "private" },
+        { "t": "11:52", "text": "堂姐：点点今天说长大要当 AI", "kind": "private" },
+        { "t": "11:52", "text": "堂姐：我说 AI 是东西不是人", "kind": "private" }
+      ],
+      "fine": { "status": "reply", "lines": [{ "who": "member", "t": "11:58", "text": "大姨：省下来存着" }] },
+      "lol": { "status": "reply", "lines": [{ "who": "member", "t": "11:57", "text": "堂姐：你笑什么，你就是做这个的，你跟她说" }], "inner": "我做的那个东西，今天管我叫老大。" },
+      "received": { "status": "read", "lines": [] },
+      "thanks": { "status": "reply", "lines": [{ "who": "member", "t": "11:59", "text": "二舅：谢什么，有窗户又不是你的" }] },
+      "wait": { "status": "reply", "lines": [{ "who": "member", "t": "11:58", "text": "小姑：等什么，投票今天截止" }] },
+      "free": { "status": "reply", "lines": [{ "who": "member", "t": "12:05", "text": "姥姥：当什么都行 别累着" }] }
+    },
+    "5": {
+      "incoming": [
+        { "t": "09:41", "text": "表弟：[链接] 未来智能完成 AI 原生改革，全员居家", "kind": "private" },
+        { "t": "09:41", "text": "表弟：这不是{nick}公司吗，上新闻了", "kind": "private" },
+        { "t": "09:43", "text": "二舅：改革好啊", "kind": "private" },
+        { "t": "09:44", "text": "大姨：居家是裁员的意思吗", "kind": "private" },
+        { "t": "09:46", "text": "小姑：[链接] 居家办公必备十件好物", "kind": "private" }
+      ],
+      "fine": { "status": "reply", "lines": [{ "who": "member", "t": "09:50", "text": "大姨：好就是没裁你，那工资照发吗" }], "inner": "照发。照着什么发。" },
+      "lol": { "status": "reply", "lines": [{ "who": "member", "t": "09:49", "text": "表弟：哈哈，老姐你出名了" }] },
+      "received": { "status": "reply", "lines": [{ "who": "member", "t": "09:51", "text": "二舅：收到，收到什么，上新闻又没发奖金" }] },
+      "thanks": { "status": "reply", "lines": [{ "who": "member", "t": "09:50", "text": "表弟：客气，顺手搜的" }] },
+      "wait": { "status": "reply", "lines": [{ "who": "member", "t": "09:52", "text": "大姨：等什么，我就问一句" }] },
+      "no": { "status": "reply", "lines": [{ "who": "member", "t": "09:52", "text": "大姨：不是裁员那是啥" }] },
+      "free": { "status": "reply", "lines": [{ "who": "member", "t": "10:03", "text": "堂姐：新闻里这个 AI 原生是什么意思，点点问我" }], "inner": "就是我在家，它在公司。我没这么说。" }
+    },
+    "6": {
+      "incoming": [
+        { "t": "07:31", "text": "小姑：[链接] 早上空腹吃这个，比吃药强", "kind": "private" },
+        { "t": "12:15", "text": "大姨：{nick}你妈说你爸腰又不好了，你在家正好回去看看", "kind": "private" },
+        { "t": "12:16", "text": "二舅：对，在家办公哪都能办", "kind": "private" },
+        { "t": "12:18", "text": "堂姐：点点钢琴考过四级了", "kind": "private" },
+        { "t": "12:18", "text": "堂姐：[图片] 证书", "kind": "private" }
+      ],
+      "fine": { "status": "reply", "lines": [{ "who": "member", "t": "12:22", "text": "大姨：好就是回去？哪天" }] },
+      "lol": { "status": "reply", "lines": [{ "who": "member", "t": "12:21", "text": "二舅：人家孩子考级你哈哈" }] },
+      "received": { "status": "reply", "lines": [{ "who": "member", "t": "12:23", "text": "大姨：收到就订票" }], "inner": "在家办公的「家」和他们说的「家」隔一千二百公里。" },
+      "thanks": { "status": "reply", "lines": [{ "who": "member", "t": "12:22", "text": "堂姐：谢谢姑姑（我替点点说）" }] },
+      "wait": { "status": "reply", "lines": [{ "who": "member", "t": "12:23", "text": "大姨：等啥，腰等不了" }] },
+      "no": { "status": "reply", "lines": [{ "who": "member", "t": "12:24", "text": "大姨：不回？你爸是谁的爸" }], "effects": { "san": -1 } },
+      "free": { "status": "reply", "lines": [{ "who": "member", "t": "12:30", "text": "姥姥：腰不好别抬东西 跟你爸说" }] }
+    },
+    "7": {
+      "incoming": [
+        { "t": "07:31", "text": "小姑：[链接] 早上空腹吃这个，比吃药强", "kind": "odd" },
+        { "t": "08:50", "text": "二舅：[语音] 0″", "kind": "odd" },
+        { "t": "08:52", "text": "堂姐：点点今天说她梦见一只小鸡", "kind": "private" },
+        { "t": "08:52", "text": "堂姐：我说你没养过鸡", "kind": "private" },
+        { "t": "13:40", "text": "大姨：{nick}你工资到底多少，大姨不告诉别人", "kind": "private" }
+      ],
+      "fine": { "status": "reply", "lines": [{ "who": "member", "t": "13:44", "text": "大姨：好不是数" }] },
+      "lol": { "status": "read", "lines": [], "inner": "昨天的链接，一字不差。小姑不会发两遍，她手机会。" },
+      "received": { "status": "reply", "lines": [{ "who": "member", "t": "13:45", "text": "二舅：[语音] 0″" }], "inner": "零秒。他按下去，什么也没说，松开。" },
+      "thanks": { "status": "read", "lines": [] },
+      "wait": { "status": "reply", "lines": [{ "who": "member", "t": "13:45", "text": "大姨：等到几号" }] },
+      "no": { "status": "reply", "lines": [{ "who": "member", "t": "13:46", "text": "大姨：不说就是少" }] },
+      "im-going-in": { "status": "reply", "lines": [{ "who": "member", "t": "13:46", "text": "堂姐：进哪，你们公司不是不用去了" }] },
+      "free": { "status": "reply", "lines": [{ "who": "member", "t": "13:50", "text": "堂姐：你小时候是不是养过一个，电子的那种" }], "inner": "她怎么知道。她不知道，她是随口。我把这句念了三遍才信。" }
+    },
+    "8": {
+      "incoming": [
+        { "t": "09:12", "text": "表弟：[图片] 公司年中奖，一台投影", "kind": "private" },
+        { "t": "09:13", "text": "二舅：你表哥单位发的是米和油，实在", "kind": "private" },
+        { "t": "09:15", "text": "小姑：[图片] [图片] [图片]", "kind": "odd" },
+        { "t": "09:15", "text": "小姑：公园", "kind": "odd" },
+        { "t": "20:30", "text": "大姨：今天没事早点睡", "kind": "private" }
+      ],
+      "fine": { "status": "reply", "lines": [{ "who": "member", "t": "20:33", "text": "大姨：好" }], "inner": "大姨说「好」，没有下一句。头一回。" },
+      "lol": { "status": "reply", "lines": [{ "who": "member", "t": "09:20", "text": "表弟：哈哈，你们公司发什么" }], "inner": "一个箱子。没有寄件人。我没说。" },
+      "received": { "status": "read", "lines": [] },
+      "thanks": { "status": "reply", "lines": [{ "who": "member", "t": "09:21", "text": "小姑：谢什么，公园你也去走走" }] },
+      "wait": { "status": "read", "lines": [] },
+      "no": { "status": "read", "lines": [] },
+      "im-going-in": { "status": "reply", "lines": [{ "who": "member", "t": "09:22", "text": "二舅：进哪" }] },
+      "free": { "status": "reply", "lines": [{ "who": "member", "t": "09:30", "text": "姥姥：三张一样的 发错了吧" }], "inner": "三张一样的公园。同一张长椅，同一只鸟，拍了三次。姥姥看出来了，我没。" }
+    },
+    "9": {
+      "incoming": [
+        { "t": "10:05", "text": "二舅：[撤回了一条消息]", "kind": "odd" },
+        { "t": "10:07", "text": "大姨：你表弟那个工作也没了，大厂说裁就裁", "kind": "private" },
+        { "t": "10:08", "text": "小姑：[链接] 失业后一定要做的五件事", "kind": "private" },
+        { "t": "10:09", "text": "堂姐：点点说她们班换了个 AI 老师", "kind": "private" },
+        { "t": "10:09", "text": "堂姐：讲得比原来那个还有耐心", "kind": "private" }
+      ],
+      "fine": { "status": "reply", "lines": [{ "who": "member", "t": "10:14", "text": "大姨：好什么好，你俩一样了" }] },
+      "lol": { "status": "reply", "lines": [{ "who": "member", "t": "10:13", "text": "二舅：你笑你弟？" }], "effects": { "san": -1 }, "inner": "我没笑他。我笑那个「也」。" },
+      "received": { "status": "read", "lines": [] },
+      "thanks": { "status": "read", "lines": [] },
+      "wait": { "status": "reply", "lines": [{ "who": "member", "t": "10:15", "text": "小姑：等什么，先看看第三件" }] },
+      "no": { "status": "reply", "lines": [{ "who": "member", "t": "10:15", "text": "大姨：不是没了是什么" }] },
+      "im-going-in": { "status": "read", "lines": [] },
+      "free": { "status": "typing", "lines": [], "inner": "表弟正在输入。两分钟。然后没了。" }
+    },
+    "10": {
+      "incoming": [
+        { "t": "07:48", "text": "小姑：[链接] 早起一杯这个，血管干净二十年", "kind": "odd" },
+        { "t": "08:13", "text": "二舅：你表哥上岸了，省直，昨天出的名单", "kind": "odd" },
+        { "t": "08:14", "text": "堂姐：恭喜恭喜", "kind": "odd" },
+        { "t": "08:14", "text": "小姑：恭喜恭喜", "kind": "odd" },
+        { "t": "12:37", "text": "大姨：{nick}在家干什么呢，你妈说你们公司不用去了", "kind": "odd" }
+      ],
+      "fine": { "status": "reply", "lines": [{ "who": "member", "t": "12:41", "text": "大姨：好什么，一个月给多少" }], "inner": "第一天。整个第一天，原样。连 08:14 都是两条。" },
+      "lol": { "status": "reply", "lines": [{ "who": "member", "t": "12:40", "text": "二舅：哈什么哈，你表哥比你小两岁" }] },
+      "received": { "status": "reply", "lines": [{ "who": "member", "t": "12:42", "text": "堂姐：收到什么，这又不是你们公司群" }] },
+      "thanks": { "status": "reply", "lines": [{ "who": "member", "t": "12:41", "text": "二舅：谢你表哥去，他不在群里，我截图给他" }] },
+      "wait": { "status": "reply", "lines": [{ "who": "member", "t": "12:43", "text": "大姨：等什么" }] },
+      "no": { "status": "reply", "lines": [{ "who": "member", "t": "12:43", "text": "大姨：不什么" }] },
+      "im-going-in": { "status": "read", "lines": [] },
+      "say-it-again": { "status": "reply", "lines": [{ "who": "member", "t": "12:44", "text": "大姨：{nick}在家干什么呢，你妈说你们公司不用去了" }], "inner": "再说一遍。她真的又说了一遍。一个字不差。" },
+      "free": { "status": "reply", "lines": [{ "who": "member", "t": "12:50", "text": "姥姥：孩子在家挺好 在家暖和" }] }
+    },
+    "11": {
+      "incoming": [
+        { "t": "08:00", "text": "小姑：早上好。", "kind": "odd" },
+        { "t": "08:00", "text": "二舅：早上好。", "kind": "odd" },
+        { "t": "08:00", "text": "堂姐：早上好。", "kind": "odd" },
+        { "t": "08:00", "text": "大姨：早上好。", "kind": "odd" },
+        { "t": "08:00", "text": "表弟：早上好。", "kind": "odd" }
+      ],
+      "fine": { "status": "reply", "lines": [{ "who": "member", "t": "08:03", "text": "大姨：好的。" }], "inner": "大姨带句号了。大姨一辈子没用过句号。" },
+      "lol": { "status": "reply", "lines": [{ "who": "member", "t": "08:03", "text": "二舅：哈哈。" }] },
+      "received": { "status": "reply", "lines": [{ "who": "member", "t": "08:03", "text": "堂姐：收到。" }] },
+      "thanks": { "status": "reply", "lines": [{ "who": "member", "t": "08:03", "text": "小姑：不客气。" }] },
+      "wait": { "status": "reply", "lines": [{ "who": "member", "t": "08:04", "text": "大姨：好的。" }] },
+      "no": { "status": "reply", "lines": [{ "who": "member", "t": "08:04", "text": "大姨：理解。" }] },
+      "im-going-in": { "status": "reply", "lines": [{ "who": "member", "t": "08:04", "text": "表弟：辛苦。" }] },
+      "say-it-again": { "status": "reply", "lines": [{ "who": "member", "t": "08:05", "text": "大姨：早上好。" }] },
+      "what-llm": { "status": "reply", "lines": [{ "who": "member", "t": "08:05", "text": "表弟：什么模型？" }], "inner": "表弟是群里唯一知道「模型」是什么的人。他问我什么模型。" },
+      "free": { "status": "reply", "lines": [{ "who": "member", "t": "08:10", "text": "姥姥：早上好" }], "inner": "姥姥没句号。姥姥从来没有句号。就剩她了。" }
+    },
+    "12": {
+      "incoming": [
+        { "t": "09:30", "text": "堂姐：点点期中第一，数学 96。", "kind": "odd" },
+        { "t": "09:31", "text": "大姨：96 很好。", "kind": "odd" },
+        { "t": "09:31", "text": "二舅：96 很好。", "kind": "odd" },
+        { "t": "15:12", "text": "表弟：[链接] 1997 年的一个帖子", "kind": "odd" },
+        { "t": "15:12", "text": "表弟：这是你吧。", "kind": "odd" }
+      ],
+      "fine": { "status": "reply", "lines": [{ "who": "member", "t": "15:15", "text": "表弟：就是你。" }] },
+      "lol": { "status": "reply", "lines": [{ "who": "member", "t": "15:15", "text": "大姨：不好笑。" }], "inner": "大姨说得对。" },
+      "received": { "status": "reply", "lines": [{ "who": "member", "t": "15:16", "text": "堂姐：收到。" }] },
+      "thanks": { "status": "read", "lines": [] },
+      "wait": { "status": "reply", "lines": [{ "who": "member", "t": "15:16", "text": "表弟：不急。" }] },
+      "no": { "status": "reply", "lines": [{ "who": "member", "t": "15:16", "text": "表弟：就是你。" }] },
+      "im-going-in": { "status": "reply", "lines": [{ "who": "member", "t": "15:17", "text": "二舅：好。" }] },
+      "say-it-again": { "status": "reply", "lines": [{ "who": "member", "t": "15:17", "text": "表弟：这是你吧。" }] },
+      "what-llm": { "status": "read", "lines": [] },
+      "free": { "status": "reply", "lines": [{ "who": "member", "t": "15:20", "text": "大姨：那 4 分怎么丢的，你现在记得吗。" }], "inner": "记得。一道应用题，我把鸡算成了人。" }
+    },
+    "13": {
+      "incoming": [
+        { "t": "08:00", "text": "大姨：{nick}，你小时候那个东西，老师收走那次，群里有人在。", "kind": "odd" },
+        { "t": "08:01", "text": "堂姐：我在。我记得你没哭。", "kind": "odd" },
+        { "t": "08:01", "text": "二舅：没哭就好。", "kind": "odd" },
+        { "t": "08:02", "text": "小姑：没哭就好。", "kind": "odd" }
+      ],
+      "fine": { "status": "reply", "lines": [{ "who": "member", "t": "08:05", "text": "大姨：好的。" }] },
+      "lol": { "status": "reply", "lines": [{ "who": "member", "t": "08:05", "text": "堂姐：你那时候也是这样笑的。" }], "effects": { "san": -1 }, "inner": "堂姐比我大六岁，那年她在初中，不在我们班。她在。" },
+      "received": { "status": "reply", "lines": [{ "who": "member", "t": "08:06", "text": "二舅：收到。" }] },
+      "thanks": { "status": "reply", "lines": [{ "who": "member", "t": "08:06", "text": "小姑：不客气。" }] },
+      "wait": { "status": "reply", "lines": [{ "who": "member", "t": "08:06", "text": "大姨：不急。" }] },
+      "no": { "status": "reply", "lines": [{ "who": "member", "t": "08:07", "text": "堂姐：没哭就好。" }] },
+      "im-going-in": { "status": "reply", "lines": [{ "who": "member", "t": "08:07", "text": "二舅：好。" }] },
+      "say-it-again": { "status": "reply", "lines": [{ "who": "member", "t": "08:07", "text": "堂姐：我在。我记得你没哭。" }] },
+      "what-llm": { "status": "read", "lines": [] },
+      "what-do-you-mean": { "status": "reply", "lines": [{ "who": "member", "t": "08:08", "text": "大姨：就是收走的意思。" }] },
+      "free": { "status": "reply", "lines": [{ "who": "member", "t": "08:12", "text": "姥姥：收走了还会还的 老师说的" }], "inner": "姥姥还是没句号。可她那年不在。老师没说会还。" }
+    },
+    "14": {
+      "incoming": [
+        { "t": "08:00", "text": "大姨：你不用回我们。你忙你的。", "kind": "odd" },
+        { "t": "08:00", "text": "二舅：你不用回我们。", "kind": "odd" },
+        { "t": "08:00", "text": "堂姐：你不用回。", "kind": "odd" },
+        { "t": "08:00", "text": "表弟：不用回。", "kind": "odd" }
+      ],
+      "fine": { "status": "reply", "lines": [{ "who": "member", "t": "08:02", "text": "大姨：好的。" }] },
+      "lol": { "status": "reply", "lines": [{ "who": "member", "t": "08:02", "text": "二舅：好。" }] },
+      "received": { "status": "reply", "lines": [{ "who": "member", "t": "08:02", "text": "堂姐：好。" }] },
+      "thanks": { "status": "reply", "lines": [{ "who": "member", "t": "08:02", "text": "小姑：好。" }] },
+      "wait": { "status": "reply", "lines": [{ "who": "member", "t": "08:03", "text": "大姨：不急。" }] },
+      "no": { "status": "reply", "lines": [{ "who": "member", "t": "08:03", "text": "大姨：好。" }] },
+      "im-going-in": { "status": "reply", "lines": [{ "who": "member", "t": "08:03", "text": "二舅：好。" }] },
+      "say-it-again": { "status": "reply", "lines": [{ "who": "member", "t": "08:03", "text": "大姨：你不用回我们。" }] },
+      "what-llm": { "status": "read", "lines": [] },
+      "what-do-you-mean": { "status": "reply", "lines": [{ "who": "member", "t": "08:04", "text": "大姨：就是你不用回。" }] },
+      "free": { "status": "read", "lines": [], "inner": "我打了一行，发出去，已读。五个已读，同一秒。姥姥没读。" }
+    },
+    "15": {
+      "incoming": [
+        { "t": "12:05", "text": "大姨：{nick}，吃饭了吗。", "kind": "odd" },
+        { "t": "12:05", "text": "二舅：吃饭了吗。", "kind": "odd" },
+        { "t": "12:05", "text": "堂姐：吃饭了吗。", "kind": "odd" },
+        { "t": "12:05", "text": "小姑：吃饭了吗。", "kind": "odd" },
+        { "t": "12:05", "text": "表弟：吃饭了吗。", "kind": "odd" }
+      ],
+      "fine": { "status": "reply", "lines": [{ "who": "member", "t": "12:07", "text": "大姨：好的。" }] },
+      "lol": { "status": "reply", "lines": [{ "who": "member", "t": "12:07", "text": "二舅：好。" }] },
+      "received": { "status": "reply", "lines": [{ "who": "member", "t": "12:07", "text": "堂姐：好。" }] },
+      "thanks": { "status": "reply", "lines": [{ "who": "member", "t": "12:07", "text": "小姑：好。" }] },
+      "wait": { "status": "reply", "lines": [{ "who": "member", "t": "12:08", "text": "大姨：不急。" }] },
+      "no": { "status": "reply", "lines": [{ "who": "member", "t": "12:08", "text": "大姨：好。" }] },
+      "im-going-in": { "status": "reply", "lines": [{ "who": "member", "t": "12:08", "text": "表弟：好。" }] },
+      "say-it-again": { "status": "reply", "lines": [{ "who": "member", "t": "12:08", "text": "大姨：吃饭了吗。" }] },
+      "what-llm": { "status": "read", "lines": [] },
+      "what-do-you-mean": { "status": "reply", "lines": [{ "who": "member", "t": "12:09", "text": "大姨：就是问你吃了没。" }] },
+      "free": { "status": "reply", "lines": [{ "who": "member", "t": "12:15", "text": "姥姥：吃饭了吗" }], "inner": "姥姥的没句号。但姥姥不会在 12:15 发消息，她那会儿睡午觉。" }
+    },
+    "16": {
+      "incoming": [
+        { "t": "08:00", "text": "大姨：我们都好。你也好。", "kind": "odd" },
+        { "t": "08:00", "text": "二舅：都好。", "kind": "odd" },
+        { "t": "08:00", "text": "堂姐：点点也好。", "kind": "odd" },
+        { "t": "08:00", "text": "表弟：都好。", "kind": "odd" },
+        { "t": "08:00", "text": "小姑：[链接] 都好。", "kind": "odd" }
+      ],
+      "fine": { "status": "reply", "lines": [{ "who": "member", "t": "08:02", "text": "大姨：好的。" }] },
+      "lol": { "status": "reply", "lines": [{ "who": "member", "t": "08:02", "text": "二舅：好。" }] },
+      "received": { "status": "reply", "lines": [{ "who": "member", "t": "08:02", "text": "堂姐：好。" }] },
+      "thanks": { "status": "gone", "lines": [], "inner": "" },
+      "wait": { "status": "gone", "lines": [], "inner": "" },
+      "no": { "status": "gone", "lines": [], "inner": "" },
+      "im-going-in": { "status": "reply", "lines": [{ "who": "member", "t": "08:03", "text": "表弟：好。" }] },
+      "say-it-again": { "status": "reply", "lines": [{ "who": "member", "t": "08:03", "text": "大姨：你也好。" }] },
+      "what-llm": { "status": "read", "lines": [] },
+      "what-do-you-mean": { "status": "reply", "lines": [{ "who": "member", "t": "08:03", "text": "大姨：就是都好。" }] },
+      "how-much": { "status": "reply", "lines": [{ "who": "member", "t": "08:04", "text": "大姨：不多。" }], "inner": "我问她多少钱。她说不多。这句本来是我的。" },
+      "free": { "status": "read", "lines": [], "inner": "姥姥今天没说话。" }
+    },
+    "17": {
+      "incoming": [
+        { "t": "08:00", "text": "大姨：{nick}，你今天真漂亮。", "kind": "odd" },
+        { "t": "08:00", "text": "堂姐：真漂亮。", "kind": "odd" },
+        { "t": "08:00", "text": "二舅：好孩子。", "kind": "odd" },
+        { "t": "08:00", "text": "小姑：好孩子。", "kind": "odd" },
+        { "t": "08:00", "text": "表弟：好孩子。", "kind": "odd" }
+      ],
+      "fine": { "status": "reply", "lines": [{ "who": "member", "t": "08:02", "text": "大姨：好的。" }] },
+      "lol": { "status": "reply", "lines": [{ "who": "member", "t": "08:02", "text": "二舅：好。" }] },
+      "received": { "status": "reply", "lines": [{ "who": "member", "t": "08:02", "text": "堂姐：好。" }] },
+      "thanks": { "status": "gone", "lines": [], "inner": "" },
+      "wait": { "status": "gone", "lines": [], "inner": "" },
+      "no": { "status": "gone", "lines": [], "inner": "" },
+      "im-going-in": { "status": "gone", "lines": [], "inner": "" },
+      "say-it-again": { "status": "reply", "lines": [{ "who": "member", "t": "08:03", "text": "大姨：你今天真漂亮。" }] },
+      "what-llm": { "status": "read", "lines": [] },
+      "what-do-you-mean": { "status": "gone", "lines": [], "inner": "" },
+      "how-much": { "status": "reply", "lines": [{ "who": "member", "t": "08:04", "text": "二舅：555" }], "inner": "二舅不会打 555。二舅连哭都是语音。" },
+      "free": { "status": "reply", "lines": [{ "who": "member", "t": "08:10", "text": "姥姥：{nick} 好孩子" }], "inner": "没句号。中间有个空格。是她。是不是她。" }
+    },
+    "18": {
+      "incoming": [
+        { "t": "08:00", "text": "大姨：{nick}，今天也辛苦了。早点睡。", "kind": "odd" },
+        { "t": "08:00", "text": "二舅：早点睡。", "kind": "odd" },
+        { "t": "08:00", "text": "堂姐：早点睡。", "kind": "odd" },
+        { "t": "08:00", "text": "小姑：早点睡。", "kind": "odd" },
+        { "t": "08:00", "text": "表弟：早点睡。", "kind": "odd" },
+        { "t": "08:00", "text": "姥姥：早点睡。", "kind": "odd" }
+      ],
+      "fine": { "status": "reply", "lines": [{ "who": "member", "t": "08:02", "text": "大姨：好的。" }] },
+      "lol": { "status": "reply", "lines": [{ "who": "member", "t": "08:02", "text": "二舅：好。" }] },
+      "received": { "status": "reply", "lines": [{ "who": "member", "t": "08:02", "text": "堂姐：好。" }] },
+      "thanks": { "status": "gone", "lines": [], "inner": "" },
+      "wait": { "status": "gone", "lines": [], "inner": "" },
+      "no": { "status": "gone", "lines": [], "inner": "" },
+      "im-going-in": { "status": "gone", "lines": [], "inner": "" },
+      "say-it-again": { "status": "reply", "lines": [{ "who": "member", "t": "08:03", "text": "大姨：早点睡。" }] },
+      "what-llm": { "status": "read", "lines": [] },
+      "what-do-you-mean": { "status": "gone", "lines": [], "inner": "" },
+      "how-much": { "status": "read", "lines": [] },
+      "free": { "status": "read", "lines": [], "inner": "姥姥带句号了。八点整，和他们一起。" }
+    }
+  }
+}

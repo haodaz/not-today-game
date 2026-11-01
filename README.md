@@ -21,7 +21,7 @@ Three hands, each with its own job:
 - **Claude** (Anthropic, Claude Fable 5.1, in Claude Code) writes the content and the design: `content/` (replies, days, tasks, browser pages, delivery, Kuro's days and rubric, strings), `.kiro/steering/`, every `requirements.md`, the static HTML mocks in `design/`, the asset pipelines, and this README. Claude writes no game code.
 - **Kiro** writes every line of game code from the steering and the specs: for each spec it writes `design.md` and `tasks.md`, implements task by task, and keeps the tests green. Its own notes and the decisions it asked about are in [`docs/kiro-log.md`](docs/kiro-log.md).
 
-Kiro features used: steering (`.kiro/steering/product.md`, `voices.md`, `tech.md`, `structure.md`, `threejs.md`), specs (`.kiro/specs/*`, fourteen so far). Agent hooks (content validation on save, tests on state changes) are described in `tech.md` and are the next thing Kiro sets up. The spec flow is the whole workflow: Claude writes the requirements, Kiro writes design and tasks, the author reviews in the browser, Claude writes the next requirements from what the author says.
+Kiro features used: steering (`.kiro/steering/product.md`, `voices.md`, `tech.md`, `structure.md`, `threejs.md`), specs (`.kiro/specs/*`, sixteen so far), and agent hooks (`.kiro/hooks/*.json`: on every save, content files are validated and the state tests run; the hook only reports, Kiro decides). The spec flow is the whole workflow: Claude writes the requirements, Kiro writes design and tasks, the author reviews in the browser, Claude writes the next requirements from what the author says.
 
 ## Architecture in one paragraph
 
@@ -38,16 +38,20 @@ Vite + TypeScript, no framework, one store. `state = f(day) ⊕ replay(events)`:
 | `content/browser/` | one newspaper page per day: the outside world |
 | `content/kuro-days/`, `kuro-profile.md`, `kuro-world.md`, `kuro-rubric.md` | who Kuro is, what it may know each day, how it judges the player |
 | `content/objects.json`, `upgrades.json`, `nights.json` | recognising the objects, Kuro's upgrade offers, what the hand wants |
+| `content/replies/family.json`, `clan.json` | the parents' group and the big family group: 18 days of 吃饭了吗, showing off, probing, forwarding |
+| `content/npc.json`, `desk.json`, `stages.json` | who has a face, where things sit on the desk, which nights are dreams |
 | `content/strings/` | zh (source) and en |
 
 ## Assets
 
 Generated during the jam; see `public/README.md`.
 
-- Room: Gemini video → COLMAP → Brush → `.splat`.
+- Room: Gemini video → COLMAP → Brush → `.splat` (one clean, one pruned hard for the collapse); the room, bed and tabletop views are stills from the same shoot.
 - Objects: Hunyuan3D-2.1 shape from the watercolour cutouts, with the painting projected back onto the mesh.
-- Kuro's sprite states: Meta Muse Image, aligned by head, crossfaded in the game.
-- Food, door wall, desk backdrop: Muse Image.
+- Kuro's sprite states: Meta Muse Image, aligned by head, crossfaded in the game; the giant three-headed Kuro of the good ending the same way.
+- People: the player (faceless, hair over the eyes; adult and child) and the NPCs (老王, vivi, 小张, 老周, the teacher, the parents) are Muse Image watercolour busts, white-keyed; relatives in the big family group are silhouettes.
+- Food, door wall, the things on the desk (cup, phone, box, slip): Muse Image, keyed from white or green.
+- The old office of the day-11 dream: Qwen-Image.
 - Sounds: synthesized with ffmpeg as placeholders.
 
 ## Run
@@ -59,7 +63,7 @@ npm test
 npm run typecheck
 ```
 
-Optional `.env.local` (see `.env.example`) for Supabase; without it the game runs fully offline with Kuro's scripted lines.
+Optional `.env.local` (see `.env.example`) for Supabase; without it the game runs fully offline with Kuro's scripted lines. Online, Kuro is Claude behind a Supabase Edge Function (`supabase/functions/kuro-chat`): it talks in the player's language, remembers the run, and judges the eighteen days from the event log at the end.
 
 ## Licence
 
