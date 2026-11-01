@@ -4,6 +4,9 @@
    (public/room/fx/{room,desk,door}_{wall,other,glitch,white}.jpg), each at --fx, 0..1. */
 .fx{position:absolute;inset:0;overflow:hidden;pointer-events:none}
 .fx-photo{position:absolute;inset:0;background-position:center;background-size:cover;background-repeat:no-repeat;opacity:var(--fx);pointer-events:none}
+/* the breathing shader: one canvas in the layer; once its first frame is drawn the opacity stack steps aside */
+.fx canvas{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+.fx.fx-gl .fx-photo{display:none}
 /* day 16: the glitch photo flickers around its opacity (a seeded @keyframes next to it) */
 .fx-photo[data-stage="glitch"]{animation:var(--flicker,none)}
 @media (prefers-reduced-motion:reduce){.fx-photo[data-stage="glitch"]{animation:none}}

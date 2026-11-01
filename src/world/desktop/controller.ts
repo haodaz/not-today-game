@@ -117,6 +117,8 @@ export interface DesktopDeps {
   readonly settle?: (ctx: ActionContext) => void;
   /** The sound layer (sound spec FR4): every render hands it the plan for where the game is now. */
   readonly sound?: SoundPlayer;
+  /** The breathing collapse on the stills (room-scene addition 2026-11-02): a WebGL2 canvas in the `.fx` layer; absent when off. */
+  readonly fx?: (root: HTMLElement, ctx: ActionContext) => { after(): void; destroy(): void };
   /** The day-18 pull-out's frame driver (room-scene); runs with or without the splat. */
   readonly pull?: (root: HTMLElement, ctx: ActionContext) => { after(): void; destroy(): void };
 }
@@ -172,6 +174,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     fit();
     motion?.after();
     splat?.after();
+    fx?.after();
     pull?.after();
     // While Kuro crawls between windows, render again when it should stop.
     if (session.movingUntil > Date.now()) later(session.movingUntil - Date.now() + 20, rerender);
@@ -197,6 +200,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   const motion: MotionHooks | null = deps.motion ? deps.motion(root, ctx, actions) : null;
   const splat = deps.splat ? deps.splat(root, ctx) : null;
   const pull = deps.pull ? deps.pull(root, ctx) : null;
+  const fx = deps.fx ? deps.fx(root, ctx) : null;
 
   const onClick = (e: MouseEvent) => {
     const el = (e.target as HTMLElement).closest<HTMLElement>("[data-action]");
@@ -276,6 +280,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
       motion?.destroy();
       splat?.destroy();
       pull?.destroy();
+      fx?.destroy();
       timers.forEach(clearTimeout);
       if (frame) cancelAnimationFrame(frame);
       root.removeEventListener("click", onClick);

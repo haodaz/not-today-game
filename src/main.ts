@@ -12,6 +12,7 @@ import "./ui/fonts.css";
 import "./ui/title/title.css";
 import { debugStartDay } from "@state/clock";
 import { splatForGame } from "@world/room/splat";
+import { fxForGame } from "@world/room/fx/layer";
 import { settleSession } from "@world/dialogue/place";
 import { createPullDriver } from "@world/endings/pullout-dom";
 import { createProfileWriter, createRunSlot } from "@state/saves";
@@ -109,6 +110,8 @@ function startGame(store: Store, saved: boolean, from?: "desk"): void {
     motion: createMotion,
     // The room splat for 房间 ↔ 桌子 moves (room-scene): the game only, never the title page.
     splat: splatForGame(window),
+    // The breathing collapse on the stills: a WebGL2 shader over the photo stack (the stack is its fallback).
+    fx: fxForGame(window),
     // The day-18 pull-out's frames (splat or photo fallback).
     pull: createPullDriver(),
   });
