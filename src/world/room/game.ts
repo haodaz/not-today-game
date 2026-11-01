@@ -10,6 +10,7 @@ import { advanceTo, isNight } from "@world/desktop/beat";
 import { hudKuro } from "@world/desktop/kuro/mini";
 import { dialogueBox, lineScreens } from "@world/dialogue/box";
 import { logCurrent, logPlayer } from "@world/dialogue/history";
+import { settleSession } from "@world/dialogue/place";
 import { acceptOffer, answerAsk, answerOffer, declineOffer, kuroActions } from "@world/dialogue/kuro";
 import { nextScreen } from "@world/dialogue/layout";
 import { stepOnce } from "@world/loop/steps";
@@ -121,6 +122,8 @@ export const loopActions: Record<string, ActionHandler> = {
     // A finished door beat is forgotten once the player looks away (polish W1).
     if (ctx.session.view === "door" && view !== "door" && ctx.session.door?.state === "onDesk") ctx.session.door = null;
     ctx.session.view = view;
+    // A line waiting for this place comes forward; one that belongs elsewhere is taken back.
+    settleSession(ctx.session);
     ctx.session.phoneOpen = false;
     ctx.session.itemsOpen = false;
     ctx.session.holding = null;
@@ -129,6 +132,7 @@ export const loopActions: Record<string, ActionHandler> = {
     if (view === "desktop") lookAt(ctx, shownApp(ctx.session));
     // 看一眼桌子: arriving at 桌子 while the item is open is the look; the desk beat plays here.
     if (view === "desk" && openFor(ctx, (e) => e.type === "beat" && e.beat === "desk")) stepOnce(ctx, "beat:desk");
+    settleSession(ctx.session);
     ctx.rerender();
   },
 
@@ -137,11 +141,14 @@ export const loopActions: Record<string, ActionHandler> = {
     shellActions.dock!(ctx, data, el);
     lookAt(ctx, ctx.session.leftApp);
     lookedAway(ctx);
+    // Another app in front is another place (`screen:msgs` ↔ `screen:workbench`).
+    if (settleSession(ctx.session)) ctx.rerender();
   },
   screen(ctx, data, el) {
     shellActions.screen!(ctx, data, el);
     lookAt(ctx, shownApp(ctx.session));
     lookedAway(ctx);
+    if (settleSession(ctx.session)) ctx.rerender();
   },
 
   // ---- late-days FR4: pages Kuro closes --------------------------------------------------
@@ -253,6 +260,8 @@ export const loopActions: Record<string, ActionHandler> = {
     // The line is left: it goes into today's history.
     if (sameLine(session.dialogue, dialogue) === false) logCurrent(session, state);
     session.dialogue = dialogue;
+    // The next line waits if it belongs to another place; the box closes until the player is there.
+    settleSession(session);
     // Lying down; on the last night the run ends instead (san-and-endings FR2).
     if (ended?.kind === "lieDown") lieDownOrEnd(ctx);
     // The box may have just emptied after shutdown: the evening chat opens itself.
@@ -291,6 +300,7 @@ export const loopActions: Record<string, ActionHandler> = {
       return;
     }
     ctx.session.dialogue = finishChoice(ctx.session.dialogue);
+    settleSession(ctx.session);
     openChatIfDue(ctx);
     ctx.rerender();
   },

@@ -1,0 +1,48 @@
+{
+  "_note": "Sound layer (sound spec, author 2026-11-02). Claude owns this file. Files live in public/sfx/; a missing file is silence, never an error. Rings come from stages.json cycles; silence is a sound too, so later rings take sound away.",
+  "beds": {
+    "rain": { "src": "rain-loop.mp3", "gain": 0.5 },
+    "room-day": { "src": "bed-room-day.mp3", "gain": 0.45 },
+    "room-night": { "src": "bed-room-night.mp3", "gain": 0.4 },
+    "room-deep": { "src": "bed-room-deep.mp3", "gain": 0.35 }
+  },
+  "byRing": {
+    "software": { "day": "room-day", "night": "room-night", "degrade": { "lowpassHz": 20000, "gain": 1.0, "dropoutsPerMin": 0, "dropoutMs": [0, 0], "humGain": 0 } },
+    "screen":   { "day": "room-day", "night": "room-night", "degrade": { "lowpassHz": 16000, "gain": 1.0, "dropoutsPerMin": 0, "dropoutMs": [0, 0], "humGain": 0.02 } },
+    "desk":     { "day": "room-day", "night": "room-night", "degrade": { "lowpassHz": 9000, "gain": 0.95, "dropoutsPerMin": 1, "dropoutMs": [80, 200], "humGain": 0.05 } },
+    "wall":     { "day": "room-day", "night": "room-deep",  "degrade": { "lowpassHz": 5000, "gain": 0.9, "dropoutsPerMin": 3, "dropoutMs": [120, 400], "humGain": 0.09 } },
+    "room":     { "day": "room-deep", "night": "room-deep", "degrade": { "lowpassHz": 2500, "gain": 0.8, "dropoutsPerMin": 6, "dropoutMs": [200, 900], "humGain": 0.12 } },
+    "door":     { "day": "room-deep", "night": "room-deep", "degrade": { "lowpassHz": 1200, "gain": 0.7, "dropoutsPerMin": 10, "dropoutMs": [400, 1600], "humGain": 0.1 } }
+  },
+  "calm": "software",
+  "silence": { "fromDay": 13, "beats": ["night"] },
+  "music": {
+    "title": { "src": "music-title.mp3", "gain": 0.35, "loop": true },
+    "dream": { "src": "music-dream.mp3", "gain": 0.4, "loop": true },
+    "tender": { "src": "music-tender.mp3", "gain": 0.3, "loop": true },
+    "end-stay": { "src": "music-end-stay.mp3", "gain": 0.5, "loop": false },
+    "end-go": { "src": "music-end-go.mp3", "gain": 0.5, "loop": false }
+  },
+  "musicAt": [
+    { "when": "title", "id": "title", "fadeIn": 3000, "fadeOut": 1500 },
+    { "when": "dream:5", "id": "dream", "fadeIn": 4000, "fadeOut": 2000 },
+    { "when": "dream:11", "id": "dream", "fadeIn": 4000, "fadeOut": 2000 },
+    { "when": "dream:15", "id": "dream", "fadeIn": 4000, "fadeOut": 2000 },
+    { "when": "tender-day", "id": "tender", "fadeIn": 6000, "fadeOut": 3000 },
+    { "when": "ending:good", "id": "end-stay", "fadeIn": 1000, "fadeOut": 0 },
+    { "when": "ending:bad", "id": "end-go", "fadeIn": 1000, "fadeOut": 0 },
+    { "when": "ending:leave", "id": "end-go", "fadeIn": 1000, "fadeOut": 0 }
+  ],
+  "stingers": {
+    "light": "sting-soft",
+    "text": "sting-soft",
+    "device": "pager-buzz",
+    "object": "sting-soft",
+    "hand": "sting-hard",
+    "people": "sting-soft",
+    "kuro-after-shutdown": "sting-hard",
+    "room": "sting-hard",
+    "dream": "sting-soft",
+    "branch": "sting-hard"
+  }
+}

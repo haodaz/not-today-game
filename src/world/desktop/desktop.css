@@ -26,6 +26,20 @@ html,body{margin:0;background:#2b2e33;font-family:var(--font);color:var(--ink);f
 .dock .app.on::after{content:"";position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--ink-2)}
 .dock .app .badge{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--red);font-size:10px;display:flex;align-items:center;justify-content:center}
 .app.msgs{background:linear-gradient(180deg,#4fd07f,#23a85a)} .app.docs{background:linear-gradient(180deg,#6b8cff,#3b5fe0)} .app.sheet{background:linear-gradient(180deg,#36b37e,#1f8a5c)} .app.code{background:linear-gradient(180deg,#5c6b7d,#2f3a48)} .app.feed{background:linear-gradient(180deg,#ff9f5a,#ef6c1f)} .app.todo{background:linear-gradient(180deg,#b3b9c4,#7c8594)} .app.kuro{background:#111;overflow:hidden;padding:0} .app.kuro img{width:100%;height:100%;object-fit:cover}
+/* dock tiles are icons (correction 2026-11-02): 64px, the glyph is in the svg; no text, a dot under the open app */
+.dock{gap:12px;padding:8px 12px 14px;align-items:center}
+.dock .app,.dock .app.msgs,.dock .app.docs,.dock .app.feed{width:64px;height:64px;padding:0;background:none;border-radius:14px}
+.dock .app img{display:block;width:64px;height:64px;pointer-events:none;image-rendering:auto}
+.dock .app.on::after{bottom:-9px}
+.dock .sep{width:1px;align-self:stretch;margin:6px 2px;background:rgba(0,0,0,.12)}
+.dock .app.decoy{opacity:.92}
+.monitor.night .dock .sep{background:rgba(255,255,255,.12)}
+/* a decoy's small system window: the apps' chrome, one centred grey line, a close control */
+.win.sysw{left:50%;top:50%;width:440px;height:220px;transform:translate(-50%,-50%);z-index:5}
+.win.sysw .body{align-items:center;justify-content:center;padding:0 24px;text-align:center;color:var(--ink-3);font-size:13px}
+.win.sysw .body p{margin:0}
+.win.sysw .bar .x{margin-left:auto;border:0;background:none;font:inherit;font-size:16px;line-height:1;color:var(--ink-3);cursor:pointer;padding:4px 6px;border-radius:6px}
+.win.sysw .bar .x:hover,.win.sysw .bar .x:focus-visible{background:rgba(0,0,0,.06);color:var(--ink)}
 /* 窗口 */
 .win{position:absolute;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 10px 40px rgba(20,24,30,.10);overflow:hidden;display:flex;flex-direction:column}
 .win .bar{height:40px;display:flex;align-items:center;gap:8px;padding:0 14px;border-bottom:1px solid var(--line);font-size:12px;color:var(--ink-2)}
@@ -237,6 +251,7 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .kpill .dotl{flex:0 0 auto;width:8px;height:8px;border-radius:50%;background:#f6a623;box-shadow:0 0 10px 2px rgba(246,166,35,.8)}
 .kpill .turns{flex:0 0 auto;font-family:var(--mono);color:var(--ink-3)}
 .kpill:hover,.kpill:focus-visible{border-color:var(--accent)}
+.kpill.say .ln{white-space:normal;overflow:visible}
 /* late-days FR4: a 读者在读 entry opens as a small page in the browser window; Kuro may come to its ×. */
 .br .body{position:relative}
 .br .list .read{display:block;width:100%;border:0;background:none;padding:0;margin:0;font:inherit;color:inherit;text-align:left;cursor:pointer}

@@ -9,11 +9,13 @@
         },
         {
           "k": "narration",
-          "t": "老板说：今天没什么事，你歇一歇。"
+          "t": "老板说：今天没什么事，你歇一歇。",
+          "where": "screen:msgs"
         },
         {
           "k": "inner",
-          "t": "十三个月，第一次不勉强。"
+          "t": "十三个月，第一次不勉强。",
+          "where": "screen:msgs"
         }
       ]
     },
@@ -21,11 +23,13 @@
       "say": [
         {
           "k": "narration",
-          "t": "合伙人发了一张风景。第一次不是工作卡片。"
+          "t": "合伙人发了一张风景。第一次不是工作卡片。",
+          "where": "screen:msgs"
         },
         {
           "k": "narration",
-          "t": "老周：保重。"
+          "t": "老周：保重。",
+          "where": "screen:msgs"
         }
       ]
     },
@@ -34,11 +38,13 @@
         {
           "k": "speaker",
           "who": "屏幕",
-          "t": "There was nothing to add."
+          "t": "There was nothing to add.",
+          "where": "screen"
         },
         {
           "k": "inner",
-          "t": "它说的是我今天写的那一段。或者是我。"
+          "t": "它说的是我今天写的那一段。或者是我。",
+          "where": "screen"
         }
       ]
     },

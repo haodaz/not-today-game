@@ -5,11 +5,13 @@
       "say": [
         {
           "k": "narration",
-          "t": "文档里有两处错字。不是你打的。"
+          "t": "文档里有两处错字。不是你打的。",
+          "where": "screen:workbench"
         },
         {
           "k": "narration",
-          "t": "老板说：Good morning。他第一次用英文。"
+          "t": "老板说：Good morning。他第一次用英文。",
+          "where": "screen:msgs"
         }
       ]
     },

@@ -181,6 +181,31 @@ describe("爸妈 (family): the mother unprefixed, the father prefixed", () => {
     expect(avatarsIn(render(store, FAMILY))).toContain(npcAvatar(FAMILY));
   });
 
+  it("the name above the mother's bubbles is 妈, the father's 爸; the group's row keeps 爸妈 (author 2026-11-02)", () => {
+    const store = storeAt(6);
+    const out = render(store, FAMILY);
+    expect(t("msgs.mother")).toBe("妈");
+    expect(t("msgs.father")).toBe("爸");
+    expect(out).toContain(`<div class="who">${t("msgs.mother")} `);
+    expect(out).toContain(`<div class="who">${t("msgs.father")} `);
+    // Never the group's name over a bubble; it stays on the row and the header.
+    expect(out).not.toContain(`<div class="who">${t("msgs.family")} `);
+    expect(out).toContain(`<b>${t("msgs.family")}</b>`);
+  });
+
+  it("in English: Mum and Dad over the bubbles, Mum & Dad on the row", () => {
+    setLocale("en");
+    const store = storeAt(6);
+    const out = render(store, FAMILY);
+    expect(t("msgs.mother")).toBe("Mum");
+    expect(t("msgs.father")).toBe("Dad");
+    expect(t("msgs.family")).toBe("Mum & Dad");
+    expect(out).toContain(`<div class="who">Mum `);
+    expect(out).toContain(`<div class="who">Dad `);
+    expect(out).not.toContain(`<div class="who">Mum &amp; Dad `);
+    expect(out).toContain(`<b>Mum &amp; Dad</b>`);
+  });
+
   it("in English: the same bubble, the English father's name and transcript label", () => {
     setLocale("en");
     const store = storeAt(6);

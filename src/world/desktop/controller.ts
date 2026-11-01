@@ -12,6 +12,8 @@ import { applyFit, BACKDROPS } from "@world/fit";
 import { onEmailChange, setEmailDraft } from "@net/email";
 import { buildShell, initialSession, type AppRenderers, type Session } from "./model";
 import { renderDesktop, APPS, type AppId } from "./shell";
+import { dockFor } from "./dock";
+import { t } from "@world/i18n";
 
 /** Stage size in CSS pixels: one monitor (mock: 28px padding, 1440×900), or the room (1600×900). */
 const MONITOR = { w: 1440, h: 900 };
@@ -56,6 +58,7 @@ export const shellActions: Record<string, ActionHandler> = {
   dock(ctx, data) {
     const app = data.app as AppId;
     if (!(APPS as readonly string[]).includes(app)) return;
+    ctx.session.decoyWindow = null;
     if (ctx.session.leftApp !== app) ctx.session.movingUntil = (ctx.now?.() ?? Date.now()) + MOTION.crawl;
     ctx.session.leftApp = app;
     if (app === "browser") {
@@ -64,7 +67,32 @@ export const shellActions: Record<string, ActionHandler> = {
     }
     ctx.rerender();
   },
+  // A decoy app on the dock (desktop-ui 2026-11-02): no event, no state. Only the session changes:
+  // its small window opens and/or Kuro says its line in the pill for DECOY_SAY_MS.
+  decoy(ctx, data) {
+    const { session } = ctx;
+    const day = ctx.store.getState().day;
+    const app = dockFor(day).find((d) => d.id === data.decoy);
+    if (!app) return;
+    session.decoyWindow = app.window !== null ? app.id : null;
+    if (app.kuro !== null) {
+      const now = ctx.now?.() ?? Date.now();
+      session.dockSay = { text: app.kuro, until: now + DECOY_SAY_MS };
+      ctx.later(DECOY_SAY_MS + 20, ctx.rerender);
+      // Today's chat history gets it once, as a Kuro turn; the daily turn count is not touched.
+      const seen = session.dlgLog.some((e) => e.day === day && e.kind === "kuro" && e.text === app.kuro);
+      if (!seen) session.dlgLog.push({ day, who: t("kuro.name"), kind: "kuro", text: app.kuro });
+    }
+    ctx.rerender();
+  },
+  "decoy-close"(ctx) {
+    ctx.session.decoyWindow = null;
+    ctx.rerender();
+  },
 };
+
+/** How long a decoy click's line stays in Kuro's pill. */
+export const DECOY_SAY_MS = 6000;
 
 export interface DesktopDeps {
   readonly store: Store;
@@ -83,6 +111,8 @@ export interface DesktopDeps {
   readonly motion?: (root: HTMLElement, ctx: ActionContext, actions: Record<string, ActionHandler>) => MotionHooks;
   /** The splat layer for camera moves (room-scene); absent when off. Runs after the motion layer. */
   readonly splat?: (root: HTMLElement, ctx: ActionContext) => { after(): void; destroy(): void };
+  /** Runs at the top of every render: brings the dialogue in line with where the player is (a safety net for paths that move the view without an action). */
+  readonly settle?: (ctx: ActionContext) => void;
   /** The day-18 pull-out's frame driver (room-scene); runs with or without the splat. */
   readonly pull?: (root: HTMLElement, ctx: ActionContext) => { after(): void; destroy(): void };
 }
@@ -113,6 +143,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     const active = document.activeElement as HTMLInputElement | null;
     const focusKey = active?.dataset?.focus ?? null;
     const caret = active?.selectionStart ?? null;
+    deps.settle?.(ctx);
     motion?.before();
     root.innerHTML = renderRoot(deps.store, session, Date.now()).value;
     // Kuro's body lives across renders so its state changes crossfade.

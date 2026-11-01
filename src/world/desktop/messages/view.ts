@@ -53,7 +53,7 @@ function renderBody(body: Body, names: State["names"]): SafeHtml {
   }
 }
 
-function renderBubble(b: Bubble, today: number, names: State["names"]): SafeHtml {
+function renderBubble(b: Bubble, today: number, names: State["names"], conv: string): SafeHtml {
   switch (b.kind) {
     case "day":
       return html`<div class="sysline">${b.day === today ? tr("msgs.today") : b.day === today - 1 ? tr("msgs.yesterday") : tr("shell.day", { day: b.day })}</div>`;
@@ -71,7 +71,9 @@ function renderBubble(b: Bubble, today: number, names: State["names"]): SafeHtml
       }
       // Group-type conversations name their speaker inline ("老周：…"); the transcript has already
       // resolved it: an NPC's id (name and avatar from npc.json) or a written alias (a silhouette).
-      const whoName = b.alias !== undefined ? html`${b.alias}` : nameOf(b.who);
+      // In the parents' group the mother's bubbles say 妈 (the NPC "family" is the group's own face;
+      // the father is 爸). The group's row and header keep 爸妈 (author, 2026-11-02).
+      const whoName = b.alias !== undefined ? html`${b.alias}` : conv === "family" && b.who === "family" ? tr("msgs.mother") : nameOf(b.who);
       return html`<div class="m">${bubbleAvatar(b.who, "them", b.alias)}<div><div class="who">${whoName} ${b.t}</div>${renderBody(b.body, names)}</div></div>`;
     }
   }
@@ -141,6 +143,6 @@ export function renderMessages(ctx: AppContext): { body: SafeHtml; badge: number
 
   if (!active) return { body: html`<div class="body">${list}<div class="conv empty"></div></div>`, badge };
   const role = hasString(`msgs.${active.id}.role`) ? html`<small>${tr(`msgs.${active.id}.role`)}</small>` : null;
-  const conv = html`<div class="conv"><div class="head">${nameOf(active.id)} ${role}</div><div class="msgs">${active.bubbles.map((b) => renderBubble(b, today, names))}</div>${replyBar(ctx, active.id)}</div>`;
+  const conv = html`<div class="conv"><div class="head">${nameOf(active.id)} ${role}</div><div class="msgs">${active.bubbles.map((b) => renderBubble(b, today, names, active.id))}</div>${replyBar(ctx, active.id)}</div>`;
   return { body: html`<div class="body">${list}${conv}</div>`, badge };
 }

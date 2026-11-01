@@ -11,6 +11,7 @@ import "./ui/fonts.css";
 import "./ui/title/title.css";
 import { debugStartDay } from "@state/clock";
 import { splatForGame } from "@world/room/splat";
+import { settleSession } from "@world/dialogue/place";
 import { createPullDriver } from "@world/endings/pullout-dom";
 import { createProfileWriter, createRunSlot } from "@state/saves";
 import { createStore, type Store } from "@state/store";
@@ -98,6 +99,7 @@ function startGame(store: Store, saved: boolean, from?: "desk"): void {
     },
     onChange: (ctx) => syncLoop(ctx),
     onKey: loopKeys,
+    settle: (ctx) => void settleSession(ctx.session),
     motion: createMotion,
     // The room splat for 房间 ↔ 桌子 moves (room-scene): the game only, never the title page.
     splat: splatForGame(window),

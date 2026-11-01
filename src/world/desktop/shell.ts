@@ -5,6 +5,7 @@
 import { cls, html, type SafeHtml } from "@world/html";
 import { t, tr } from "@world/i18n";
 import { beatLabelKey, type BeatClock } from "./beat";
+import type { DockEntry } from "./dock";
 import type { WeatherKind } from "./browser/data";
 
 export const APPS = ["msgs", "workbench", "browser"] as const;
@@ -45,7 +46,13 @@ export interface ShellModel {
   /** 关机 in the top bar: usable now, shown but not usable, or absent (off / night). */
   readonly shutdown?: "open" | "closed" | null;
   readonly monitors: readonly [MonitorModel, MonitorModel];
-  readonly dock: { readonly active: AppId; readonly badges: Readonly<Record<AppId, number>> };
+  readonly dock: {
+    readonly active: AppId;
+    readonly badges: Readonly<Record<AppId, number>>;
+    /** The decoy tiles after the separator (desktop-ui 2026-11-02), and which one's small window is open. */
+    readonly decoys?: readonly DockEntry[];
+    readonly decoyOpen?: string | null;
+  };
   /** Which monitor is shown (amendment 2026-11-01: one at a time, never side by side). */
   readonly focus: Side;
 }
@@ -77,18 +84,41 @@ function windowFrame(m: ShellModel, monitor: MonitorModel): SafeHtml {
   return html`${frame(bar)}${monitor.body}</div>`;
 }
 
+/**
+ * The dock is icons (correction 2026-11-02): an image, no text. The name is the tile's title and
+ * aria-label only; the open app's tile gets a class and CSS draws the dot under it.
+ */
+export function dockTile(src: string, extra: SafeHtml | null = null): SafeHtml {
+  return html`<img src="${src}" alt="" draggable="false" width="64" height="64">${extra}`;
+}
+
 function dock(m: ShellModel): SafeHtml {
   const apps = APPS.map((app) => {
     const badge = m.dock.badges[app];
-    return html`<button type="button" class="${cls("app", DOCK_CLASS[app], m.dock.active === app && "on")}" data-action="dock" data-app="${app}">${tr(DOCK_KEY[app])}${badge > 0 && !m.night ? html`<span class="badge">${badge}</span>` : null}</button>`;
+    const name = t(DOCK_KEY[app]);
+    return html`<button type="button" class="${cls("app", DOCK_CLASS[app], m.dock.active === app && "on")}" data-action="dock" data-app="${app}" title="${name}" aria-label="${name}">${dockTile(`/os/${app}.svg`, badge > 0 && !m.night ? html`<span class="badge">${badge}</span>` : null)}</button>`;
   });
-  return html`<div class="dock">${apps}</div>`;
+  // The decoys come after a thin separator, in file order, in the same tile style. They carry no
+  // badge and no `on` dot: nothing is ever "open" in them but their small window.
+  const decoys = m.dock.decoys ?? [];
+  const extra = decoys.map(
+    (d) =>
+      html`<button type="button" class="${cls("app", "decoy")}" data-action="decoy" data-decoy="${d.id}"${d.gone ? html` data-gone="1"` : null} title="${d.name}" aria-label="${d.name}">${dockTile(d.icon)}</button>`,
+  );
+  return html`<div class="dock">${apps}${decoys.length ? html`<span class="sep" role="separator"></span>` : null}${extra}</div>`;
+}
+
+/** A decoy's small system window: the real apps' chrome, one centred grey line, a close control. */
+function decoyWindow(m: ShellModel): SafeHtml | null {
+  const open = m.dock.decoys?.find((d) => d.id === m.dock.decoyOpen);
+  if (!open || open.window === null) return null;
+  return html`<div class="win sysw" role="dialog" aria-label="${open.name}" data-decoy="${open.id}"><div class="bar"><div class="dots"><i></i><i></i><i></i></div><span class="title">${open.name}</span><button type="button" class="x" data-action="decoy-close" aria-label="${t("dialogue.close")}">×</button></div><div class="body"><p>${open.window}</p></div></div>`;
 }
 
 function monitor(m: ShellModel, mon: MonitorModel): SafeHtml {
   // Not on yet: a black screen and nothing else.
   if (m.off) return html`<div class="monitor off" data-side="${mon.side}" data-ring="${m.ring}" data-app="${mon.app}"><div class="os"></div></div>`;
-  return html`<div class="${cls("monitor", m.night && "night")}" data-side="${mon.side}" data-ring="${m.ring}" data-app="${mon.app}"><div class="os">${topBar(m, mon)}${windowFrame(m, mon)}${mon.side === "left" ? dock(m) : null}${mon.overlay}</div></div>`;
+  return html`<div class="${cls("monitor", m.night && "night")}" data-side="${mon.side}" data-ring="${m.ring}" data-app="${mon.app}"><div class="os">${topBar(m, mon)}${windowFrame(m, mon)}${mon.side === "left" ? decoyWindow(m) : null}${mon.side === "left" ? dock(m) : null}${mon.overlay}</div></div>`;
 }
 
 /** The other monitor, as a thin tab on its side: its app and badges (the dock's, for the left one). */

@@ -9,11 +9,13 @@
         },
         {
           "k": "narration",
-          "t": "老板说：今天把箱子寄了吧。"
+          "t": "老板说：今天把箱子寄了吧。",
+          "where": "screen:msgs"
         },
         {
           "k": "inner",
-          "t": "寄给谁。"
+          "t": "寄给谁。",
+          "where": "screen:msgs"
         }
       ]
     },

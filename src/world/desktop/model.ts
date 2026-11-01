@@ -16,6 +16,7 @@ import type { KuroCloser } from "@world/late/closer";
 import { EMPTY_COLLECTION, type Collection } from "@world/room/collection";
 import { isNight, type BeatClock } from "./beat";
 import { browserPage, weatherKind } from "./browser/data";
+import { dockFor } from "./dock";
 import { desktopRing } from "./rings";
 import type { AppId, MonitorModel, ShellModel, Side } from "./shell";
 
@@ -114,6 +115,10 @@ export interface Session {
   workbenchPage: WorkbenchPage;
   /** Until when (ms since epoch) Kuro's body is crawling between windows. */
   movingUntil: number;
+  /** The decoy dock app whose small system window is open (desktop-ui 2026-11-02); session only. */
+  decoyWindow: string | null;
+  /** What a decoy click made Kuro say, and until when (ms): it shows in its pill; session only. */
+  dockSay: { readonly text: string; readonly until: number } | null;
 }
 
 export function initialSession(clock: BeatClock, focus: Side = "left", view: View = "desktop"): Session {
@@ -158,6 +163,8 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     progress: new Map(),
     workbenchPage: "home",
     movingUntil: 0,
+    decoyWindow: null,
+    dockSay: null,
   };
 }
 
@@ -261,7 +268,7 @@ export function buildShell(
     off,
     shutdown: off || night ? null : shutdownOpen ? "open" : "closed",
     monitors: [left.monitor, right.monitor],
-    dock: { active: session.leftApp, badges },
+    dock: { active: session.leftApp, badges, decoys: dockFor(state.day), decoyOpen: session.decoyWindow },
     focus: session.focus,
   };
 }

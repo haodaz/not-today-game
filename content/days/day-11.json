@@ -9,11 +9,13 @@
         },
         {
           "k": "narration",
-          "t": "更新日志：Kuro now speaks your language。"
+          "t": "更新日志：Kuro now speaks your language。",
+          "where": "screen"
         },
         {
           "k": "inner",
-          "t": "你换模型了。"
+          "t": "你换模型了。",
+          "where": "screen"
         }
       ]
     },

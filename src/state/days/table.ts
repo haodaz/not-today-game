@@ -11,11 +11,20 @@ export type LineKind = (typeof LINE_KINDS)[number];
 export const BEAT_NAMES = ["boot", "box", "desk", "shutdown", "night"] as const;
 export type BeatName = (typeof BEAT_NAMES)[number];
 
+/**
+ * Where a line belongs (dialogue addition 2026-11-02): the box holds it back until the player is
+ * there. `screen` is any desktop app; `screen:<app>` the desktop with that app in front; `night`
+ * the night. No `where` = play where the trigger happened.
+ */
+export const PLACES = ["room", "desk", "door", "night", "screen", "screen:msgs", "screen:workbench", "screen:browser"] as const;
+export type Place = (typeof PLACES)[number];
+
 export interface SayLine {
   readonly k: LineKind;
   readonly t: string;
   readonly sfx?: string;
   readonly who?: string;
+  readonly where?: Place;
 }
 
 export interface ChoiceEffects {
@@ -34,6 +43,8 @@ export interface Choice {
 export interface Sequence {
   readonly say: readonly SayLine[];
   readonly choices?: readonly Choice[];
+  /** The default `where` of its lines (a line's own wins). */
+  readonly where?: Place;
 }
 
 /** A parsed condition (`unlock` / `done`). */
@@ -142,11 +153,20 @@ export function parseToken(raw: string, where: string): Token {
   }
 }
 
-/** Parses one dialogue line (shared with content/tasks). `onFail` names the file family. */
-export function parseLine(v: unknown, w: string, onFail: (where: string, problem: string) => never = fail): SayLine {
+/** A `where`: one of PLACES, nothing else. Exported for tests. */
+export function parsePlace(v: unknown, w: string, onFail: (where: string, problem: string) => never = fail): Place {
+  return (PLACES as readonly unknown[]).includes(v) ? (v as Place) : onFail(w, `unknown place ${JSON.stringify(v)} (one of ${PLACES.join(", ")})`);
+}
+
+/**
+ * Parses one dialogue line (shared with content/tasks). `onFail` names the file family. Only the
+ * day files' lines may carry `where` (`withWhere`); a task tree's may not.
+ */
+export function parseLine(v: unknown, w: string, onFail: (where: string, problem: string) => never = fail, withWhere = false): SayLine {
   if (!isRecord(v)) onFail(w, "a line must be an object");
   const r = v as Raw;
-  for (const k of Object.keys(r)) if (!["k", "t", "sfx", "who"].includes(k)) onFail(w, `unknown key "${k}"`);
+  const allowed = withWhere ? ["k", "t", "sfx", "who", "where"] : ["k", "t", "sfx", "who"];
+  for (const k of Object.keys(r)) if (!allowed.includes(k)) onFail(w, `unknown key "${k}"`);
   const k = r.k as LineKind;
   if (!LINE_KINDS.includes(k)) onFail(w, `unknown line kind "${String(r.k)}"`);
   if (k === "speaker" && r.who === undefined) onFail(w, "a speaker line needs `who`");
@@ -156,10 +176,11 @@ export function parseLine(v: unknown, w: string, onFail: (where: string, problem
     t: s(r.t, `${w}.t`),
     ...(r.sfx !== undefined ? { sfx: s(r.sfx, `${w}.sfx`) } : {}),
     ...(r.who !== undefined ? { who: s(r.who, `${w}.who`) } : {}),
+    ...(r.where !== undefined ? { where: parsePlace(r.where, `${w}.where`, onFail) } : {}),
   };
 }
 
-const line = (v: unknown, w: string): SayLine => parseLine(v, w);
+const line = (v: unknown, w: string): SayLine => parseLine(v, w, fail, true);
 
 const objectIds = (): readonly string[] => membersOf("found") ?? [];
 
@@ -191,10 +212,11 @@ function effects(v: unknown, w: string): ChoiceEffects {
 
 function sequence(v: unknown, w: string, allowChoices: boolean): Sequence {
   if (!isRecord(v)) fail(w, "a sequence must be an object");
-  keys(v, allowChoices ? ["say", "choices"] : ["say"], w);
+  keys(v, allowChoices ? ["say", "choices", "where"] : ["say", "where"], w);
   if (!Array.isArray(v.say)) fail(`${w}.say`, "must be a list");
   const say = v.say.map((x, i) => line(x, `${w}.say[${i}]`));
-  if (v.choices === undefined) return { say };
+  const where = v.where !== undefined ? { where: parsePlace(v.where, `${w}.where`) } : {};
+  if (v.choices === undefined) return { say, ...where };
   if (!Array.isArray(v.choices) || v.choices.length === 0) fail(`${w}.choices`, "must be a non-empty list");
   const choices = v.choices.map((c, i): Choice => {
     const cw = `${w}.choices[${i}]`;
@@ -213,7 +235,7 @@ function sequence(v: unknown, w: string, allowChoices: boolean): Sequence {
       ...(cond ? { cond_show: cond } : {}),
     };
   });
-  return { say, choices };
+  return { say, choices, ...where };
 }
 
 function item(v: unknown, w: string): Item {

@@ -296,3 +296,15 @@ describe("the credits roll judgement.log (FR5)", () => {
     expect(lines).toMatchSnapshot();
   });
 });
+
+describe("the scorer's list of people with no power over the player (author 2026-11-02)", () => {
+  const reply = (recipient: string) => [{ kind: "reply", day: 3, recipient } as unknown as GameEvent];
+
+  it("a reply in the clan group counts like one in the parents' group; one to the boss does not", () => {
+    const family = scoreOffline(reply("family"), 3);
+    const clan = scoreOffline(reply("clan"), 3);
+    expect(family.values).toBeGreaterThan(0);
+    expect(clan).toEqual(family);
+    expect(scoreOffline(reply("boss"), 3).values).toBe(0);
+  });
+});

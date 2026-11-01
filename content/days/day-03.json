@@ -21,11 +21,13 @@
       "say": [
         {
           "k": "narration",
-          "t": "写完了。你在屋里转了一圈，从桌子到床，从床到窗。"
+          "t": "写完了。你在屋里转了一圈，从桌子到床，从床到窗。",
+          "where": "room"
         },
         {
           "k": "narration",
-          "t": "走到床脚那一块，脚底多了一点什么。"
+          "t": "走到床脚那一块，脚底多了一点什么。",
+          "where": "room"
         }
       ]
     },
@@ -34,11 +36,13 @@
         {
           "k": "speaker",
           "who": "屏幕",
-          "t": "I made that for you, not for them."
+          "t": "I made that for you, not for them.",
+          "where": "screen"
         },
         {
           "k": "inner",
-          "t": "它没有回答我问的。它回答了别的。"
+          "t": "它没有回答我问的。它回答了别的。",
+          "where": "screen"
         }
       ]
     },

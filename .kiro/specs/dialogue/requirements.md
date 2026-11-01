@@ -32,3 +32,16 @@ The ↺ (今日对话) button is no longer a loose circle at the box's top-right
 
 ## Addition 2026-11-01 (author): NPC portraits on speaker lines
 Speaker lines whose `who` is an id in `content/npc.json` show that NPC's **portrait** at the box's right end: the same slot and size as Kuro's and the player's (about 200 px tall, head above the box's top edge), still image, never two portraits at once. The tag carries the NPC's name from the strings key in `npc.json` (`msgs.boss` → 老板, `msgs.teacher` → 老师). Speakers not in `npc.json` (`寻呼机`, `屏幕`, `缝里`, `输入框`, `member`) keep today's tag-only rendering. `content/npc.json` is loaded by a strict loader like every other content file; the day files now use ids (`teacher`, `laozhou`, `xiaozhang`) where they used names. Assets: `public/npc/<id>.png` (cut out, white-keyed, like `public/player/*`). Add a snapshot: a `teacher` line on day 5's dream with the portrait, and a `寻呼机` line without one.
+
+## Addition 2026-11-02 (author): a line waits for its place
+The author, after playing: "点了就继续说" — standing at the desk you can click through a whole day's lines, including ones about what is on the screen (老板说…, 更新日志, 群里一张图) before you have entered the screen. Lines belong to places. Content now says where; the box does the waiting.
+
+- Any `say` line in `content/days/day-NN.json` (beats, `onUnlock`, `onDone`) may carry `where`: one of `room`, `desk`, `door`, `night`, `screen`, `screen:msgs`, `screen:workbench`, `screen:browser`. A sequence (`say` array's parent) may carry `where` too, as the default for its lines. The strict loader accepts these and rejects any other value.
+- **No `where` = play where the trigger happened**, i.e. today's behaviour. The `night` beat is always `night`; `shutdown` choices (night-hand) always play in the room as they do now; nothing already working changes.
+- A queued line whose `where` does not match the current view **waits**: the box closes at the end of the previous line (or does not open), and the line plays as soon as the player is in that place. Order is kept inside a sequence: line 2 cannot play before line 1. Across sequences, the first sequence whose next line matches the current view plays; the others keep waiting in queue order.
+- Matching: `screen` matches any desktop app; `screen:msgs` matches the desktop with that app in front (either monitor); `desk` matches the tabletop view; `room` the room view; `door` the door view; `night` the bed/night view. The Kuro chat overlay does not change the view.
+- Waiting lines are dropped at `lieDown` (never leak into the next day) and are **not** events: `state = f(day) ⊕ replay(events)` is untouched. Session-only, like the rest of the dialogue queue.
+- A first-time pointer is not needed: the checklist already tells the player where to go.
+- Tests: loader accepts/rejects `where`; a sequence with lines `[desk, screen:msgs, room]` plays exactly one line per view in that order while the player moves desk → screen(msgs) → room; a `screen:msgs` line does not play in screen(workbench); lines left at lieDown are gone next morning; snapshot day 7 boot (room lines first, the 老板 line only after entering the screen).
+
+Claude annotates the eighteen day files from content (done 2026-11-02 in the same commit as this addition); Kiro does not edit `content/`.

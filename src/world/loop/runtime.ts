@@ -21,7 +21,8 @@ import type { ActionContext } from "@world/desktop/controller";
 import type { LoopMemo } from "@world/desktop/model";
 import { arrivalOf, ordersOn } from "@world/delivery/meals";
 import { itemStates, loopContext, selfTicking, workDone, type LoopContext } from "./checklist";
-import { push, type DialogueState, type Ending, type Queued } from "./dialogue";
+import { dropWaiting, placedLines, push, type DialogueState, type Ending, type Queued } from "./dialogue";
+import { settleSession } from "@world/dialogue/place";
 import { arrivalDue, msUntilDue, msUntilMinimum } from "./waiting";
 
 /** How long after it unlocks a self-ticking item ticks itself (the horror is that you watch it). */
@@ -39,7 +40,7 @@ export function beatQueued(day: number, beat: BeatName, seq: Sequence, ending?: 
   const wants = beat === "shutdown" ? wantsOf(day) : null;
   return {
     key: `d${day}:beat:${beat}`,
-    lines: wants ? [...seq.say, { k: "narration" as const, t: wants }] : seq.say,
+    lines: wants ? [...placedLines(seq), { k: "narration" as const, t: wants }] : placedLines(seq),
     ending: ending ?? (seq.choices?.length ? { kind: "beatChoices" as const, day, beat } : { kind: "none" as const }),
     sequence: seq,
   };
@@ -68,7 +69,7 @@ export function answerQueued(day: number, object: string, right: boolean): Queue
 
 function itemQueued(day: number, item: Item, which: "onUnlock" | "onDone") {
   const seq = item[which];
-  return seq ? { key: `d${day}:${item.id}:${which}`, lines: seq.say, ending: { kind: "none" as const }, sequence: seq } : null;
+  return seq ? { key: `d${day}:${item.id}:${which}`, lines: placedLines(seq), ending: { kind: "none" as const }, sequence: seq } : null;
 }
 
 export interface LoopEffects {
@@ -189,6 +190,8 @@ export function syncLoop(ctx: ActionContext, nowMs: number = Date.now()): void {
       session.door = null;
       // The box's history is per day (dialogue FR1); a conversation does not carry over.
       session.dlgLog = [];
+      // Lines still waiting for their place never leak into the next day (dialogue addition 2026-11-02).
+      session.dialogue = dropWaiting(session.dialogue);
       session.historyOpen = false;
       session.kuroInput = false;
       session.kuroDraft = "";
@@ -212,6 +215,8 @@ export function syncLoop(ctx: ActionContext, nowMs: number = Date.now()): void {
   memo.seen = events.length;
   session.dialogue = fx.dialogue;
   session.clock = fx.clock;
+  // New lines play only where they belong; the rest wait (dialogue addition 2026-11-02).
+  settleSession(session);
   for (const id of fx.sounds) ctx.play?.(id);
 
   scheduleSelf(ctx, lc);

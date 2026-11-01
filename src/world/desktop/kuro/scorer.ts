@@ -15,7 +15,7 @@ export function toLogEvents(events: readonly GameEvent[]): LogEvent[] {
 }
 
 /** The people with no power over the player (rubric: values). */
-const POWERLESS = new Set(["xiaozhang", "laozhou", "family"]);
+const POWERLESS = new Set(["xiaozhang", "laozhou", "family", "clan"]);
 
 interface Rule {
   readonly dim: "truth" | "values" | "bond";

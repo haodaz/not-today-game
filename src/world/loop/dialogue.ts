@@ -1,7 +1,7 @@
 // The dialogue box's queue: content sequences in order, one line at a time. A sequence may end
 // in choices (a beat's branches, or the loan prompt) or in an action (lying down after the night).
 // The box never makes text: every line is content.
-import type { BeatName, SayLine, Sequence } from "@state/days/table";
+import type { BeatName, Place, SayLine, Sequence } from "@state/days/table";
 import { choiceOffered } from "@state/days/effects";
 import { recogniseTable } from "@state/recognise";
 import type { State } from "@state/types.gen";
@@ -37,12 +37,24 @@ export interface Queued {
   readonly voice?: "kuro";
 }
 
+/** A sequence (or its rest) holding back for its place: the item as queued, and the line it resumes at. */
+export interface Parked {
+  readonly item: Queued;
+  readonly from: number;
+}
+
 export interface DialogueState {
+  /** What can play now: `queue[0]` is on show, the rest follow it. */
   readonly queue: readonly Queued[];
   /** Index of the line showing in the first queued sequence. */
   readonly line: number;
   /** Which screen of that line (dialogue spec: paged, never scrolled); absent = 0. */
   readonly page?: number;
+  /**
+   * Sequences whose next line waits for its place (dialogue addition 2026-11-02), in queue order and
+   * ahead of everything in `queue`. Session only: not events, dropped at lieDown.
+   */
+  readonly waiting?: readonly Parked[];
 }
 
 export const EMPTY_DIALOGUE: DialogueState = { queue: [], line: 0 };
@@ -56,13 +68,91 @@ export const kuroInBox = (d: DialogueState): boolean => d.queue[0]?.voice === "k
 export function leaveKuro(d: DialogueState): DialogueState {
   if (!talking(d)) return d;
   const headGoes = d.queue[0]?.voice === "kuro";
-  return { queue: d.queue.filter((q) => q.voice !== "kuro"), line: headGoes ? 0 : d.line, page: headGoes ? 0 : d.page };
+  return { ...d, queue: d.queue.filter((q) => q.voice !== "kuro"), line: headGoes ? 0 : d.line, page: headGoes ? 0 : d.page };
 }
 
 export function push(d: DialogueState, q: Queued): DialogueState {
   if (q.lines.length === 0 && q.ending.kind === "none") return d;
-  if (d.queue.some((x) => x.key === q.key)) return d;
+  // Not twice, whether it is playing, queued or waiting for its place.
+  if (d.queue.some((x) => x.key === q.key) || (d.waiting ?? []).some((x) => x.item.key === q.key)) return d;
   return { ...d, queue: [...d.queue, q] };
+}
+
+/** A day sequence's lines with the sequence's `where` as the default of those without their own. */
+export function placedLines(seq: Sequence): readonly SayLine[] {
+  const where = seq.where;
+  return where === undefined ? seq.say : seq.say.map((l) => (l.where === undefined ? { ...l, where } : l));
+}
+
+// ——— a line waits for its place (dialogue addition 2026-11-02) ———
+
+/** Where the player is: the view, the app in front on the desktop, and whether it is night. */
+export interface Here {
+  readonly view: "room" | "desk" | "desktop" | "door";
+  /** The app in front on the monitor being shown (desktop only). */
+  readonly app: string | null;
+  readonly night: boolean;
+}
+
+/**
+ * Does a line with this `where` play here? No `where`: anywhere. `screen` matches any desktop app,
+ * `screen:<app>` the desktop with that app in front (either monitor); the others their view;
+ * `night` the night.
+ */
+export function placeMatches(where: Place | undefined, here: Here): boolean {
+  switch (where) {
+    case undefined:
+      return true;
+    case "room":
+    case "desk":
+    case "door":
+      return here.view === where;
+    case "night":
+      return here.night;
+    case "screen":
+      return here.view === "desktop";
+    default:
+      return here.view === "desktop" && here.app === where.slice("screen:".length);
+  }
+}
+
+/** Can this item play from `line` here? An item with no lines (a prompt) always can. */
+const playsFrom = (q: Queued, line: number, here: Here): boolean => q.lines.length === 0 || placeMatches(q.lines[Math.min(line, q.lines.length - 1)]?.where, here);
+
+/**
+ * Brings the queue in line with where the player is. Pure; idempotent.
+ *  - A line on show whose place the player has left is taken back (it resumes where it was).
+ *  - Order is kept inside a sequence: its next line is the only one that counts.
+ *  - With nothing on show, the first sequence (waiting ones first, then queued ones, in order)
+ *    whose next line plays here comes forward; the others keep waiting in order.
+ * No `where` anywhere gives `d` back unchanged.
+ */
+export function settle(d: DialogueState, here: Here): DialogueState {
+  const head = d.queue[0];
+  // A line on show stays while it plays here; waiting ones do not push in front of it.
+  if (head && playsFrom(head, d.line, here)) return d;
+
+  // In order: the waiting ones (all ahead of the queue), then the queue, the head from its line.
+  const waiting = d.waiting ?? [];
+  const queued: Parked[] = d.queue.map((item, i) => ({ item, from: i === 0 ? d.line : 0 }));
+  const all = [...waiting, ...queued];
+  const at = all.findIndex((p) => playsFrom(p.item, p.from, here));
+  if (at < 0) return head ? { queue: [], line: 0, page: 0, waiting: all } : d;
+
+  const picked = all[at]!;
+  const after = all.slice(at + 1);
+  return {
+    queue: [picked.item, ...after.filter((p) => !waiting.includes(p)).map((p) => p.item)],
+    line: picked.from,
+    page: 0,
+    // Whatever came before it, and the waiting ones after it, keep waiting in order.
+    waiting: [...all.slice(0, at), ...after.filter((p) => waiting.includes(p))],
+  };
+}
+
+/** Waiting lines are dropped (at lieDown: they never leak into the next day). */
+export function dropWaiting(d: DialogueState): DialogueState {
+  return d.waiting?.length ? { ...d, waiting: [] } : d;
 }
 
 export interface ChoiceOption {
@@ -133,17 +223,17 @@ export function advance(d: DialogueState, screens = 1): { dialogue: DialogueStat
   if (!q) return { dialogue: d, ended: null };
   const page = d.page ?? 0;
   if (page < screens - 1) return { dialogue: { ...d, page: page + 1 }, ended: null };
-  if (d.line < q.lines.length - 1) return { dialogue: { queue: d.queue, line: d.line + 1, page: 0 }, ended: null };
+  if (d.line < q.lines.length - 1) return { dialogue: { ...d, line: d.line + 1, page: 0 }, ended: null };
   if (endsInChoice(q.ending)) return { dialogue: d, ended: null };
-  return { dialogue: { queue: d.queue.slice(1), line: 0, page: 0 }, ended: q.ending };
+  return { dialogue: { ...d, queue: d.queue.slice(1), line: 0, page: 0 }, ended: q.ending };
 }
 
 /** After a choice: the sequence is over. */
 export function finishChoice(d: DialogueState): DialogueState {
-  return d.queue.length ? { queue: d.queue.slice(1), line: 0, page: 0 } : d;
+  return d.queue.length ? { ...d, queue: d.queue.slice(1), line: 0, page: 0 } : d;
 }
 
 /** Kuro's next turn takes the place of the one just answered. */
 export function replaceHead(d: DialogueState, next: readonly Queued[]): DialogueState {
-  return { queue: [...next, ...d.queue.slice(1)], line: 0, page: 0 };
+  return { ...d, queue: [...next, ...d.queue.slice(1)], line: 0, page: 0 };
 }

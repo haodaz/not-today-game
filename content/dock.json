@@ -1,0 +1,49 @@
+{
+  "_note": "Decoy apps on the dock (desktop-ui addition 2026-11-02, author: 加几个常见的，让屏幕感受更真实). They have no function. Clicking one shows its `window` (a small empty system window with one line) and/or makes Kuro say a line in its HUD bubble. `kuro` picks the first entry whose day range covers today. `gone` from that day the tile stays but opens an admin notice. Claude owns this file.",
+  "apps": [
+    {
+      "id": "claude",
+      "icon": "/os/claude.svg",
+      "name": { "zh": "Claude", "en": "Claude" },
+      "kuro": [
+        { "days": [1, 6], "zh": "那个？用起来不顺手吧。我在这儿呢。", "en": "That one? Clunky, right? I'm right here." },
+        { "days": [7, 12], "zh": "它不认识你。我认识。", "en": "It doesn't know you. I do." }
+      ],
+      "gone": { "fromDay": 13, "zh": "该应用已由管理员卸载。", "en": "This application was removed by your administrator." }
+    },
+    {
+      "id": "files",
+      "icon": "/os/files.svg",
+      "name": { "zh": "文件", "en": "Files" },
+      "window": { "zh": "此位置没有文件。", "en": "There are no files in this location." },
+      "kuro": [
+        { "days": [10, 18], "zh": "都在我这儿，放心。", "en": "I have them all. Don't worry." }
+      ]
+    },
+    {
+      "id": "trash",
+      "icon": "/os/trash.svg",
+      "name": { "zh": "回收站", "en": "Trash" },
+      "window": { "zh": "回收站是空的。", "en": "The trash is empty." },
+      "kuro": [
+        { "days": [8, 18], "zh": "我清过了。", "en": "I emptied it." }
+      ]
+    },
+    {
+      "id": "settings",
+      "icon": "/os/settings.svg",
+      "name": { "zh": "设置", "en": "Settings" },
+      "window": { "zh": "部分设置由你的组织管理。", "en": "Some settings are managed by your organisation." }
+    },
+    {
+      "id": "calendar",
+      "icon": "/os/calendar.svg",
+      "name": { "zh": "日历", "en": "Calendar" },
+      "window": { "zh": "今天没有日程。", "en": "No events today." },
+      "kuro": [
+        { "days": [14, 14], "zh": "今天什么都不用做。", "en": "Nothing to do today." },
+        { "days": [17, 18], "zh": "明天也没有。", "en": "Nothing tomorrow either." }
+      ]
+    }
+  ]
+}

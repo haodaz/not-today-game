@@ -42,9 +42,11 @@ export function lastKuroLine(ctx: AppContext): string | null {
  * today's turns. No input; a click is the same as clicking its body.
  */
 export function renderKuro(ctx: AppContext): SafeHtml {
-  const line = lastKuroLine(ctx);
+  // A decoy click makes it say a line for a few seconds (desktop-ui 2026-11-02); session only.
+  const say = ctx.session.dockSay && ctx.nowMs < ctx.session.dockSay.until ? ctx.session.dockSay.text : null;
+  const line = say ?? lastKuroLine(ctx);
   const status = ctx.night ? html`<span class="dotl" aria-hidden="true"></span>` : html`<span class="on">${tr("shell.kuro.online")}</span>`;
-  return html`<button type="button" class="${cls("kpill", ctx.night && "blink")}" data-action="kuro-call" aria-label="${t("kuro.name")}"><img src="${frameUrl(FRAMES.idle[0], lateRing(ctx.state.day))}" alt=""><span class="ln">${line ?? ""}</span>${status}<span class="turns">${tr("kuro.turns", { n: ctx.state.chatTurnsToday })}</span></button>`;
+  return html`<button type="button" class="${cls("kpill", ctx.night && "blink", say !== null && "say")}" data-action="kuro-call" aria-label="${t("kuro.name")}"><img src="${frameUrl(FRAMES.idle[0], lateRing(ctx.state.day))}" alt=""><span class="ln">${line ?? ""}</span>${status}<span class="turns">${tr("kuro.turns", { n: ctx.state.chatTurnsToday })}</span></button>`;
 }
 
 /**
