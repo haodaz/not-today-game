@@ -13,6 +13,8 @@ import { onEmailChange, setEmailDraft } from "@net/email";
 import { buildShell, initialSession, type AppRenderers, type Session } from "./model";
 import { renderDesktop, APPS, type AppId } from "./shell";
 import { dockFor } from "./dock";
+import { soundPlan } from "@world/sound/plan";
+import type { SoundPlayer } from "@world/sound/player";
 import { t } from "@world/i18n";
 
 /** Stage size in CSS pixels: one monitor (mock: 28px padding, 1440×900), or the room (1600×900). */
@@ -113,6 +115,8 @@ export interface DesktopDeps {
   readonly splat?: (root: HTMLElement, ctx: ActionContext) => { after(): void; destroy(): void };
   /** Runs at the top of every render: brings the dialogue in line with where the player is (a safety net for paths that move the view without an action). */
   readonly settle?: (ctx: ActionContext) => void;
+  /** The sound layer (sound spec FR4): every render hands it the plan for where the game is now. */
+  readonly sound?: SoundPlayer;
   /** The day-18 pull-out's frame driver (room-scene); runs with or without the splat. */
   readonly pull?: (root: HTMLElement, ctx: ActionContext) => { after(): void; destroy(): void };
 }
@@ -124,6 +128,14 @@ function defaultRender(apps: AppRenderers) {
 
 export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: () => void; session: Session } {
   const session = initialSession(deps.clock, deps.focus ?? "left", deps.view ?? "desktop");
+  // The mute flag outlives the page (sound spec FR3); the title page reads the same one.
+  if (deps.sound) session.muted = deps.sound.muted;
+  // A theme that plays to its end lets the walkman go (a second click is not needed to stop it).
+  deps.sound?.onTuneEnd(() => {
+    if (!session.walkman) return;
+    session.walkman = false;
+    rerender();
+  });
   const apps = deps.apps ?? desktopApps;
   const renderRoot = deps.render ?? defaultRender(apps);
   const actions = { ...shellActions, ...(deps.actions ?? {}) };
@@ -144,6 +156,14 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     const focusKey = active?.dataset?.focus ?? null;
     const caret = active?.selectionStart ?? null;
     deps.settle?.(ctx);
+    if (deps.sound) {
+      try {
+        deps.sound.setMuted(session.muted);
+        deps.sound.apply(soundPlan(deps.store.getState(), session));
+      } catch {
+        // No sound is fine.
+      }
+    }
     motion?.before();
     root.innerHTML = renderRoot(deps.store, session, Date.now()).value;
     // Kuro's body lives across renders so its state changes crossfade.
@@ -250,6 +270,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   return {
     session,
     destroy() {
+      deps.sound?.onTuneEnd(null);
       unsubscribe();
       unsubscribeEmail();
       motion?.destroy();

@@ -23,6 +23,7 @@ import { getLocale, setLocale } from "@world/i18n";
 import { syncLoop } from "@world/loop/runtime";
 import { createMotion } from "@world/motion/dom";
 import { loopActions, loopKeys, renderGame } from "@world/room/game";
+import { createSoundPlayer } from "@world/sound/player";
 import { readCollection } from "./ui/collection";
 import { mountTitle } from "./ui/title/mount";
 import { net, type RunSnapshot } from "@net/supabase";
@@ -38,6 +39,9 @@ const root = document.getElementById("app")!;
 const run = createRunSlot(window.localStorage);
 const profile = createProfileWriter(window.localStorage);
 const collection = readCollection(window.localStorage);
+// One sound player for the title page and the game: the context wakes on the first click or key.
+const sound = createSoundPlayer();
+sound.armGestures(window);
 const home = () => window.location.assign(window.location.pathname);
 
 // After the endings (san-and-endings FR2): the run save goes, the profile stays; back to the title.
@@ -100,6 +104,7 @@ function startGame(store: Store, saved: boolean, from?: "desk"): void {
     onChange: (ctx) => syncLoop(ctx),
     onKey: loopKeys,
     settle: (ctx) => void settleSession(ctx.session),
+    sound,
     motion: createMotion,
     // The room splat for 房间 ↔ 桌子 moves (room-scene): the game only, never the title page.
     splat: splatForGame(window),
@@ -118,6 +123,9 @@ if (jump !== null) {
   const title = mountTitle(root, {
     save: saved ? { day: saved.day } : null,
     collection,
+    sound,
+    // The theme's voice follows the pronoun a saved run was started with; m when there is none.
+    voice: saved?.events.some((e) => e.kind === "names" && e.names.pronoun === "she") ? "f" : "m",
     async onContinue() {
       if (!saved) return;
       title.destroy();

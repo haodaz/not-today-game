@@ -36,7 +36,7 @@ import { askedOn, knows } from "@state/recognise";
 import { gateAdvance } from "@world/motion/reveal";
 import { endingNext } from "@world/endings/flow";
 import { renderEnding } from "@world/endings/view";
-import { boxObjectFor, doorMeal, itemsButton, itemsPanel, raidShowing, renderRoom, settingsButton, settingsPanel, SLIP_ITEM } from "./hud";
+import { boxObjectFor, doorMeal, itemsButton, itemsPanel, raidShowing, renderRoom, settingsButton, settingsPanel, SLIP_ITEM, walkmanShown } from "./hud";
 import { pointed } from "./pointer";
 import { itemPageId, readingPageId, type KuroCloses } from "@state/closes";
 import { browserPage } from "@world/desktop/browser/data";
@@ -398,6 +398,13 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.rerender();
   },
 
+  // The walkman on the desk (sound addition 2026-11-02): click plays the theme, click again stops.
+  // Session only: no event, no state.
+  "walkman-toggle"(ctx) {
+    if (!walkmanShown(ctx.store.getState(), ctx.session)) return;
+    ctx.session.walkman = !ctx.session.walkman;
+    ctx.rerender();
+  },
   "loop-mute"(ctx) {
     ctx.session.muted = !ctx.session.muted;
     ctx.rerender();

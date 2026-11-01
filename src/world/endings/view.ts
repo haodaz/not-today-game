@@ -8,7 +8,7 @@ import type { GameEvent } from "@state/events";
 import type { State } from "@state/types.gen";
 import type { Session } from "@world/desktop/model";
 import { cls, html, type SafeHtml } from "@world/html";
-import { t, tr } from "@world/i18n";
+import { hasString, t, tr } from "@world/i18n";
 import { fillPlaceholders } from "@world/replies/placeholders";
 import { creditLines, creditsShown, lastLineKey } from "./credits";
 import { youAndYou } from "./youandyou";
@@ -50,7 +50,10 @@ export function renderCredits(m: EndingModel, ending: Ending): SafeHtml {
       html`<li><span class="d">${tr("shell.day", { day: l.day })}</span> · <span class="what">${l.note}</span> · <span class="dir">${l.moved.map((x) => html`${tr(`credits.dim.${x.dim}`)}${x.dir > 0 ? "↑" : "↓"}`)}</span></li>`,
   );
   const last = shown >= total ? html`<li class="last">${tr(lastLineKey(ending))}</li>` : null;
-  return html`<div class="stage ending-page credits-page" data-ending="${ending}">${next()}<ol class="credits plain">${items}${last}</ol></div>`;
+  // The song's title and the words' author, once the strings carry them (content/strings/*.json,
+  // key `credits.song`); the full song plays under the roll (sound spec, `when: credits`).
+  const song = hasString("credits.song") ? html`<p class="song">${tr("credits.song")}</p>` : null;
+  return html`<div class="stage ending-page credits-page" data-ending="${ending}">${next()}<ol class="credits plain">${items}${last}</ol>${song}</div>`;
 }
 
 /** After the credits: 第一日 (survive) or day 19 (good). Bad has none: the host takes it home. */

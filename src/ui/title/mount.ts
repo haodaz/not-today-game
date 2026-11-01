@@ -6,6 +6,8 @@ import { applyFit, BACKDROPS } from "@world/fit";
 import { onEmailChange, sendEmailLink, setEmailDraft } from "@net/email";
 import type { State } from "@state/types.gen";
 import type { Collection } from "@world/room/collection";
+import { titlePlan } from "@world/sound/plan";
+import type { SoundPlayer } from "@world/sound/player";
 import { arrived, canStart, diceOptions, initialTitle, QUESTIONS, rowsShown, toMenu, toNames, toQuestions, withAnswer, withPronoun, type TextQuestion, type TitleModel } from "./model";
 import { titleTable, type IdleEvent } from "./table";
 import { renderTitle } from "./view";
@@ -19,6 +21,10 @@ export interface TitleDeps {
   readonly onStart: (names: State["names"]) => void;
   /** Cosmetic randomness (idle timing, the dice); injectable for tests. */
   readonly random?: () => number;
+  /** The sound layer: the rain bed and the title music play through it (sound spec FR2). */
+  readonly sound?: SoundPlayer;
+  /** Which theme is sung: from a saved run's pronoun; m when there is none yet. */
+  readonly voice?: "m" | "f";
 }
 
 const STAGE = { w: 1600, h: 900 };
@@ -44,7 +50,7 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
   const random = deps.random ?? Math.random;
   const doc = root.ownerDocument;
   const win = doc.defaultView!;
-  let model = initialTitle(deps.save, deps.collection);
+  let model = { ...initialTitle(deps.save, deps.collection), muted: deps.sound?.muted ?? false };
   /** When the running camera move began (performance.now), or null. */
   let movedAt: number | null = null;
   const timers = new Set<number>();
@@ -56,26 +62,16 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     timers.add(id);
   };
 
-  // Rain: one quiet loop; a missing file is silence.
-  let rain: HTMLAudioElement | null = null;
-  try {
-    rain = typeof Audio === "undefined" ? null : new Audio("/sfx/rain-loop.mp3");
-    if (rain) {
-      rain.loop = true;
-      rain.volume = RAIN.low;
-      rain.addEventListener("error", () => {});
-    }
-  } catch {
-    rain = null;
-  }
-  const playRain = () => {
-    if (!rain || model.muted) return;
-    void rain.play().catch(() => {});
-  };
+  // Rain and the title music go through the sound player (sound spec FR2); a missing file is
+  // silence. `rainOn` is the waiting room's pause, `rainVol` the quiet / louder level (FR7).
+  let rainOn = true;
+  let rainVol = RAIN.low;
+  const sound = () => deps.sound?.apply(titlePlan(rainOn ? rainVol : null, { voice: deps.voice, lang: getLocale() }));
   const rainVolume = (v: number) => {
-    if (rain) rain.volume = v;
+    rainVol = v;
+    sound();
   };
-
+  sound();
   const fit = () => {
     const stage = root.querySelector<HTMLElement>(".stage");
     if (!stage) return;
@@ -118,9 +114,11 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     later(idleDelay(random, first), () => {
       const e = pickIdle(random);
       if (e.layer === "rain") {
-        if (rain && !model.muted) rain.pause();
+        rainOn = false;
+        sound();
         later(e.ms, () => {
-          playRain();
+          rainOn = true;
+          sound();
           idleNext(false);
         });
         return;
@@ -174,7 +172,6 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     "title-new": () => {
       // The computer turns on: the monitors wake and stay lit, the rain gets louder.
       rainVolume(RAIN.high);
-      playRain();
       if (model.save) return;
       move(toQuestions(model), focusOpen);
     },
@@ -186,16 +183,17 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     "settings-lang": (el) => {
       const l = el.dataset.lang;
       if (l === "zh" || l === "en") setLocale(l);
+      sound();
       render();
     },
     "title-lang": () => {
       setLocale(getLocale() === "en" ? "zh" : "en");
+      sound();
       render();
     },
     "loop-mute": () => {
       set({ ...model, muted: !model.muted });
-      if (model.muted) rain?.pause();
-      else playRain();
+      deps.sound?.setMuted(model.muted);
     },
     "title-credits": () => set({ ...model, screen: "credits" }),
     "title-back": () => back(),
@@ -220,7 +218,7 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     const act = actions[el.dataset.action!];
     if (!act) return;
     e.preventDefault();
-    playRain();
+    deps.sound?.unlock();
     act(el);
   };
   const onInput = (e: Event) => {
@@ -269,7 +267,6 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
       root.removeEventListener("input", onInput);
       win.removeEventListener("keydown", onKey);
       win.removeEventListener("resize", fit);
-      rain?.pause();
       root.innerHTML = "";
     },
   };

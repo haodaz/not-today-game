@@ -1,6 +1,6 @@
 // Desktop-ui corrections 2026-11-02: the dock is icons (no words), and the decoy apps behind a
 // separator (content/dock.json): strict loader, dockFor(day), a click changes nothing in the game.
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import dockFile from "@content/dock.json";
@@ -239,5 +239,42 @@ describe("decoys on the dock", () => {
     press("files");
     press("trash");
     expect(JSON.stringify(store.getState())).toBe(before);
+  });
+});
+
+describe("the dock and Kuro's pill never overlap at the stage size", () => {
+  const css = readFileSync(resolve(__dirname, "../src/world/desktop/desktop.css"), "utf8");
+  const num = (re: RegExp, what: string): [number, number, number] => {
+    const m = re.exec(css);
+    expect(m, what).not.toBeNull();
+    return m!.slice(1).map(Number) as [number, number, number];
+  };
+
+  it("geometry worked out from the CSS and the rendered dock: dock centred, pill to its right", () => {
+    const [tile, gap, padX] = num(/\.dock\{--tile:(\d+)px;gap:(\d+)px;padding:\d+px (\d+)px/, "dock rule");
+    const [sepMargin] = num(/\.dock \.sep\{[^}]*margin:\d+px (\d+)px/, "separator rule");
+    const [border] = num(/\.dock\{position:absolute[^}]*border:(\d+)px solid/, "dock border");
+    const [reserve] = num(/\.os\{--dock-reserve:(\d+)px\}/, "reserve");
+    const [pillGap, pillRight] = num(/\.kpill\{position:absolute;left:calc\(50% \+ var\(--dock-reserve\) \/ 2 \+ (\d+)px\);right:(\d+)px/, "pill rule");
+
+    const bar = dockOf(shown(1));
+    const tiles = (bar.match(/<button /g) ?? []).length;
+    const seps = (bar.match(/role="separator"/g) ?? []).length;
+    const gaps = tiles + seps - 1;
+    const width = 2 * border + 2 * padX + tiles * tile + seps * (1 + 2 * sepMargin) + gaps * gap;
+
+    const stage = 1440; // .monitor
+    const dockRight = stage / 2 + width / 2;
+    const pillLeft = stage / 2 + reserve / 2 + pillGap;
+    const pillWidth = stage - pillRight - pillLeft;
+    expect(width).toBeLessThanOrEqual(reserve);
+    expect(pillLeft).toBeGreaterThan(dockRight);
+    // Room enough for the face, the status and the turns, and some of the line.
+    expect(pillWidth).toBeGreaterThanOrEqual(200);
+    expect({ tile, tiles, seps, dockWidth: width, dockRight, reserve, pillLeft, pillWidth }).toMatchSnapshot();
+  });
+
+  it("the pill is still the same element after the dock grows: it carries no inline position", () => {
+    expect(shown(1)).toMatch(/<button type="button" class="kpill" data-action="kuro-call"/);
   });
 });

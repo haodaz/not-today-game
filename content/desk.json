@@ -72,5 +72,12 @@
     "t": 60,
     "w": 220,
     "h": 270
+  },
+  "walkman": {
+    "l": 1060,
+    "t": 640,
+    "w": 180,
+    "h": 150,
+    "_note": "after any ending only (sound addition 2026-11-02): the day-10 walkman, left of the box; click plays the theme song"
   }
 }

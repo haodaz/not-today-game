@@ -1,0 +1,8 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`the walkman on the tabletop > snapshot: the tile off and on 1`] = `
+{
+  "off": "<div class="at" data-at="walkman" style="left:1060px;top:640px;width:180px;height:150px"><button type="button" class="slot walkman" data-action="walkman-toggle" aria-pressed="false"><img class="desk-photo" src="/objects/tape_front.png" alt="" aria-hidden="true" draggable="false"></button></div>",
+  "on": "<div class="at" data-at="walkman" style="left:1060px;top:640px;width:180px;height:150px"><button type="button" class="slot walkman on" data-action="walkman-toggle" aria-pressed="true"><img class="desk-photo" src="/objects/tape_front.png" alt="" aria-hidden="true" draggable="false"></button></div>",
+}
+`;

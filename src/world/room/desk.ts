@@ -21,10 +21,12 @@ export interface DeskLayout {
   readonly objects: { readonly row: { readonly t: number; readonly h: number; readonly w: number }; readonly slots: readonly number[] };
   readonly keyboard: Rect;
   readonly lamp: Rect;
+  /** The walkman, after any ending only (sound addition 2026-11-02). */
+  readonly walkman: Rect;
 }
 
-const TOP_KEYS = ["_note", "backdrop", "monitors", "cup", "phone", "box", "meal", "slip", "objects", "keyboard", "lamp"] as const;
-const RECT_KEYS = ["cup", "phone", "box", "meal", "slip", "keyboard", "lamp"] as const;
+const TOP_KEYS = ["_note", "backdrop", "monitors", "cup", "phone", "box", "meal", "slip", "objects", "keyboard", "lamp", "walkman"] as const;
+const RECT_KEYS = ["cup", "phone", "box", "meal", "slip", "keyboard", "lamp", "walkman"] as const;
 
 function fail(where: string, problem: string): never {
   throw new Error(`content/desk.json ${where}: ${problem}`);
@@ -43,7 +45,7 @@ function num(v: unknown, where: string): number {
 
 function rect(v: unknown, where: string): Rect {
   if (!isObj(v)) fail(where, "must be a rect {l, t, w, h}");
-  onlyKeys(v, ["l", "t", "w", "h"], where);
+  onlyKeys(v, ["l", "t", "w", "h", "_note"], where);
   const r = { l: num(v.l, `${where}.l`), t: num(v.t, `${where}.t`), w: num(v.w, `${where}.w`), h: num(v.h, `${where}.h`) };
   if (r.w <= 0 || r.h <= 0) fail(where, "must have a positive size");
   if (r.l < 0 || r.t < 0 || r.l + r.w > STAGE.w || r.t + r.h > STAGE.h) fail(where, `is off the ${STAGE.w}×${STAGE.h} stage`);

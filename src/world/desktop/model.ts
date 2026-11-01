@@ -115,6 +115,8 @@ export interface Session {
   workbenchPage: WorkbenchPage;
   /** Until when (ms since epoch) Kuro's body is crawling between windows. */
   movingUntil: number;
+  /** The walkman on the desk is playing the theme (sound addition 2026-11-02); session only: no event, no state. */
+  walkman: boolean;
   /** The decoy dock app whose small system window is open (desktop-ui 2026-11-02); session only. */
   decoyWindow: string | null;
   /** What a decoy click made Kuro say, and until when (ms): it shows in its pill; session only. */
@@ -163,6 +165,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     progress: new Map(),
     workbenchPage: "home",
     movingUntil: 0,
+    walkman: false,
     decoyWindow: null,
     dockSay: null,
   };

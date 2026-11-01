@@ -13,7 +13,7 @@ import { doorCaption, DOOR_STATES, nextInputs, startDoor, type DoorBeat, type Do
 import { mealView } from "@world/delivery/meals";
 import { renderDoorView } from "@world/delivery/view";
 import { cls, html, raw, type SafeHtml } from "@world/html";
-import { getLocale, t, tr, type Locale } from "@world/i18n";
+import { getLocale, hasString, t, tr, type Locale } from "@world/i18n";
 import { booted, checklist, deskMeal, itemStates, loopContext, type ChecklistView } from "@world/loop/checklist";
 import { itemOf } from "@state/delivery/shops";
 import { ordersOn } from "@world/delivery/meals";
@@ -75,8 +75,25 @@ export interface DeskThings {
   readonly objects: readonly { readonly id: string; readonly html: SafeHtml }[];
   /** Day 18's slip, once its checklist line is open (on the tabletop, and in the 道具 strip). */
   readonly slip: SafeHtml | null;
+  /** The walkman: after any ending only, and on the tabletop only (not in the 道具 strip). */
+  readonly walkman: SafeHtml | null;
 }
-
+/**
+ * The walkman's picture: the object's own cutout until `public/room/desk/walkman.png` is supplied
+ * (then this is the one line to change).
+ */
+export const WALKMAN_IMAGE = "/objects/tape_front.png";
+/**
+ * Once a run has reached any ending, here or in an earlier run. world-state has no
+ * `endingReached`; the two places that know are the run's `ending` and the profile's finished
+ * runs (the same test as the book on the desk).
+ */
+export const walkmanShown = (state: Pick<State, "ending">, session: Pick<Session, "collection">): boolean => state.ending !== "none" || session.collection.finishedRuns >= 1;
+function walkmanThing(state: State, session: Session): SafeHtml | null {
+  if (!walkmanShown(state, session)) return null;
+  const name = hasString("room.walkman") ? t("room.walkman") : null;
+  return html`<button type="button" class="${cls("slot", "walkman", session.walkman && "on")}" data-action="walkman-toggle" aria-pressed="${session.walkman ? "true" : "false"}"${name ? html` aria-label="${name}" title="${name}"` : null}><img class="desk-photo" src="${WALKMAN_IMAGE}" alt="" aria-hidden="true" draggable="false"></button>`;
+}
 export function deskThings(state: State, events: readonly GameEvent[], session: Session): DeskThings {
   const held = heldItem(session);
   // Not yet recognised: slightly desaturated, the only tell (recognise FR2).
@@ -104,6 +121,7 @@ export function deskThings(state: State, events: readonly GameEvent[], session: 
     meal: mealSlot(state, events),
     objects,
     slip: slipThing(state, events),
+    walkman: walkmanThing(state, session),
   };
 }
 
@@ -126,7 +144,7 @@ function tabletop(things: DeskThings): SafeHtml {
   const at = (name: string, r: Rect | null, inner: SafeHtml | null) =>
     r && inner ? html`<div class="at" data-at="${name}" style="${rectStyle(r)}">${inner}</div>` : null;
   const objects = things.objects.map((o, i) => at(`object:${o.id}`, objectSlot(deskLayout, i), o.html));
-  return html`<div class="desk-things">${at("cup", deskLayout.cup, things.cup)}${at("phone", deskLayout.phone, things.phone)}${at("box", deskLayout.box, things.box)}${at("meal", deskLayout.meal, things.meal)}${objects}${at("slip", deskLayout.slip, things.slip)}</div>`;
+  return html`<div class="desk-things">${at("cup", deskLayout.cup, things.cup)}${at("phone", deskLayout.phone, things.phone)}${at("box", deskLayout.box, things.box)}${at("meal", deskLayout.meal, things.meal)}${objects}${at("slip", deskLayout.slip, things.slip)}${at("walkman", deskLayout.walkman, things.walkman)}</div>`;
 }
 
 /** 道具 (day-loop correction 2026-11-01): the button next to ⚙; it opens and closes the strip. */
