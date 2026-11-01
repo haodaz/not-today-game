@@ -1,0 +1,1923 @@
+{
+  "_note": "English of clan.json: same days, same words, same statuses and times; only text and inner differ. Generated from the zh file through a reviewed dictionary (2026-11-01). Names: 大姨 Big Aunt, 二舅 Uncle Two, 小姑 Little Aunt, 表弟 Cousin Bo, 堂姐 Cousin Jie, 姥姥 Grandma, 点点 Dot, 表哥 Wei.",
+  "days": {
+    "1": {
+      "incoming": [
+        {
+          "t": "07:48",
+          "text": "Little Aunt：[link] one cup of this every morning, clean arteries for twenty years",
+          "kind": "private"
+        },
+        {
+          "t": "08:13",
+          "text": "Uncle Two：Wei passed the civil service exam, provincial level, list came out yesterday",
+          "kind": "private"
+        },
+        {
+          "t": "08:14",
+          "text": "Cousin Jie：congrats congrats",
+          "kind": "private"
+        },
+        {
+          "t": "08:14",
+          "text": "Little Aunt：congrats congrats",
+          "kind": "private"
+        },
+        {
+          "t": "12:37",
+          "text": "Big Aunt：{nick} what are you doing at home, your mum says you don't have to go to the office anymore",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:41",
+            "text": "Big Aunt：good what, how much a month"
+          }
+        ],
+        "inner": "Big Aunt never goes around a question. It is her virtue."
+      },
+      "lol": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:40",
+            "text": "Uncle Two：haha what, Wei is two years younger than you"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:42",
+            "text": "Cousin Jie：received what, this isn't your work group"
+          }
+        ],
+        "inner": "Habit. The hand is faster than the head."
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:41",
+            "text": "Uncle Two：thank Wei yourself, he's not in the group, I'll screenshot it for him"
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:45",
+            "text": "Grandma：home is good for the child  home is warm"
+          }
+        ],
+        "inner": "Grandma doesn't use punctuation. Her sentences breathe through the spaces."
+      }
+    },
+    "2": {
+      "incoming": [
+        {
+          "t": "06:58",
+          "text": "Little Aunt：[link] vote for our Dot, number 17, three votes a day",
+          "kind": "private"
+        },
+        {
+          "t": "06:59",
+          "text": "Little Aunt：[link] vote for our Dot, number 17, three votes a day",
+          "kind": "private"
+        },
+        {
+          "t": "09:30",
+          "text": "Cousin Jie：Dot came first in midterms, maths 96",
+          "kind": "private"
+        },
+        {
+          "t": "09:31",
+          "text": "Cousin Jie：[photo] certificate",
+          "kind": "private"
+        },
+        {
+          "t": "09:33",
+          "text": "Big Aunt：96, where did the 4 points go",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:40",
+            "text": "Little Aunt：did you vote, send a screenshot"
+          }
+        ]
+      },
+      "lol": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:38",
+            "text": "Cousin Jie：what's funny, you got told off for a 96 too when you were small"
+          }
+        ],
+        "inner": "It was a 96. I remember the 4 points better than the 96."
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:41",
+            "text": "Little Aunt：received means vote"
+          }
+        ]
+      },
+      "thanks": {
+        "status": "read",
+        "lines": [],
+        "inner": "Thank whom. The certificate, maybe."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:45",
+            "text": "Grandma：first is first  don't talk about the four points"
+          }
+        ],
+        "inner": "Grandma is on my side. She doesn't know whose side that is."
+      }
+    },
+    "3": {
+      "incoming": [
+        {
+          "t": "07:20",
+          "text": "Little Aunt：[link] one more cut, I'm 0.01 away, help your aunt",
+          "kind": "private"
+        },
+        {
+          "t": "10:02",
+          "text": "Cousin Bo：my team shipped something new this week, can't say what, but it's big",
+          "kind": "private"
+        },
+        {
+          "t": "10:03",
+          "text": "Uncle Two：big companies are different",
+          "kind": "private"
+        },
+        {
+          "t": "10:05",
+          "text": "Big Aunt：{nick} is that company of yours as big as a big company",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "10:09",
+            "text": "Big Aunt：I mean the size"
+          }
+        ]
+      },
+      "lol": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "10:08",
+            "text": "Cousin Bo：haha, each has its upside"
+          }
+        ],
+        "inner": "Each has its upside. He hands it over like a step down. It holds my weight."
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "10:10",
+            "text": "Little Aunt：received means you cut? send a screenshot"
+          }
+        ]
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "10:11",
+            "text": "Little Aunt：no need to thank, just cut"
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "10:20",
+            "text": "Big Aunt：how many people in that company of yours anyway"
+          }
+        ],
+        "inner": "Fifty avatars. I didn't say."
+      }
+    },
+    "4": {
+      "incoming": [
+        {
+          "t": "08:02",
+          "text": "Uncle Two：[photo] Wei's desk, it has a window",
+          "kind": "private"
+        },
+        {
+          "t": "08:04",
+          "text": "Little Aunt：so bright",
+          "kind": "private"
+        },
+        {
+          "t": "11:50",
+          "text": "Big Aunt：{nick} working from home you don't need makeup anymore, saves money",
+          "kind": "private"
+        },
+        {
+          "t": "11:52",
+          "text": "Cousin Jie：Dot said today she wants to be an AI when she grows up",
+          "kind": "private"
+        },
+        {
+          "t": "11:52",
+          "text": "Cousin Jie：I told her AI is a thing not a person",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "11:58",
+            "text": "Big Aunt：save what you don't spend"
+          }
+        ]
+      },
+      "lol": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "11:57",
+            "text": "Cousin Jie：what are you laughing at, this is your job, you tell her"
+          }
+        ],
+        "inner": "The thing I make called me boss today."
+      },
+      "received": {
+        "status": "read",
+        "lines": []
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "11:59",
+            "text": "Uncle Two：thank what, the window isn't yours"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "11:58",
+            "text": "Little Aunt：wait for what, voting closes today"
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:05",
+            "text": "Grandma：be whatever you like  don't wear yourself out"
+          }
+        ]
+      }
+    },
+    "5": {
+      "incoming": [
+        {
+          "t": "09:41",
+          "text": "Cousin Bo：[link] Future Intelligence completes AI-native reform, all staff work from home",
+          "kind": "private"
+        },
+        {
+          "t": "09:41",
+          "text": "Cousin Bo：isn't this {nick}'s company, it's in the news",
+          "kind": "private"
+        },
+        {
+          "t": "09:43",
+          "text": "Uncle Two：reform is good",
+          "kind": "private"
+        },
+        {
+          "t": "09:44",
+          "text": "Big Aunt：does work from home mean layoffs",
+          "kind": "private"
+        },
+        {
+          "t": "09:46",
+          "text": "Little Aunt：[link] ten must-haves for working from home",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:50",
+            "text": "Big Aunt：good means they didn't cut you, so salary still comes"
+          }
+        ],
+        "inner": "Still comes. From what."
+      },
+      "lol": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:49",
+            "text": "Cousin Bo：haha sis you're famous"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:51",
+            "text": "Uncle Two：received, received what, news doesn't pay a bonus"
+          }
+        ]
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:50",
+            "text": "Cousin Bo：no problem, just searched it"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:52",
+            "text": "Big Aunt：wait for what, it's one question"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:52",
+            "text": "Big Aunt：not layoffs then what is it"
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "10:03",
+            "text": "Cousin Jie：what does AI-native in the news mean, Dot asked me"
+          }
+        ],
+        "inner": "It means I'm at home and it's at the office. I didn't say that."
+      }
+    },
+    "6": {
+      "incoming": [
+        {
+          "t": "07:31",
+          "text": "Little Aunt：[link] eat this on an empty stomach, better than medicine",
+          "kind": "private"
+        },
+        {
+          "t": "12:15",
+          "text": "Big Aunt：{nick} your mum says your dad's back is bad again, you're at home anyway, go back and see him",
+          "kind": "private"
+        },
+        {
+          "t": "12:16",
+          "text": "Uncle Two：right, work from home works from any home",
+          "kind": "private"
+        },
+        {
+          "t": "12:18",
+          "text": "Cousin Jie：Dot passed piano grade four",
+          "kind": "private"
+        },
+        {
+          "t": "12:18",
+          "text": "Cousin Jie：[photo] certificate",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:22",
+            "text": "Big Aunt：good means you're going? which day"
+          }
+        ]
+      },
+      "lol": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:21",
+            "text": "Uncle Two：the kid passes a grade and you go haha"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:23",
+            "text": "Big Aunt：received means book the ticket"
+          }
+        ],
+        "inner": "The home in work-from-home and the home they mean are twelve hundred kilometres apart."
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:22",
+            "text": "Cousin Jie：thank you auntie (on Dot's behalf)"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:23",
+            "text": "Big Aunt：wait for what, a back can't wait"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:24",
+            "text": "Big Aunt：not going? whose dad is your dad"
+          }
+        ],
+        "effects": {
+          "san": -1
+        }
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:30",
+            "text": "Grandma：bad back don't lift things  tell your dad"
+          }
+        ]
+      }
+    },
+    "7": {
+      "incoming": [
+        {
+          "t": "07:31",
+          "text": "Little Aunt：[link] eat this on an empty stomach, better than medicine",
+          "kind": "odd"
+        },
+        {
+          "t": "08:50",
+          "text": "Uncle Two：[voice] 0″",
+          "kind": "odd"
+        },
+        {
+          "t": "08:52",
+          "text": "Cousin Jie：Dot said she dreamed of a little chick today",
+          "kind": "private"
+        },
+        {
+          "t": "08:52",
+          "text": "Cousin Jie：I said you've never kept a chick",
+          "kind": "private"
+        },
+        {
+          "t": "13:40",
+          "text": "Big Aunt：{nick} how much do you really make, Big Aunt won't tell anyone",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "13:44",
+            "text": "Big Aunt：good is not a number"
+          }
+        ]
+      },
+      "lol": {
+        "status": "read",
+        "lines": [],
+        "inner": "Yesterday's link, word for word. Little Aunt wouldn't send it twice. Her phone would."
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "13:45",
+            "text": "Uncle Two：[voice] 0″"
+          }
+        ],
+        "inner": "Zero seconds. He pressed, said nothing, let go."
+      },
+      "thanks": {
+        "status": "read",
+        "lines": []
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "13:45",
+            "text": "Big Aunt：wait until what date"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "13:46",
+            "text": "Big Aunt：not saying means it's small"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "13:46",
+            "text": "Cousin Jie：go in where, you don't have to go to the office anymore"
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "13:50",
+            "text": "Cousin Jie：didn't you keep one when you were small, the electronic kind"
+          }
+        ],
+        "inner": "How does she know. She doesn't, it slipped out. I read it three times before I believed that."
+      }
+    },
+    "8": {
+      "incoming": [
+        {
+          "t": "09:12",
+          "text": "Cousin Bo：[photo] mid-year bonus, a projector",
+          "kind": "private"
+        },
+        {
+          "t": "09:13",
+          "text": "Uncle Two：Wei's office gave rice and oil, practical",
+          "kind": "private"
+        },
+        {
+          "t": "09:15",
+          "text": "Little Aunt：[photo] [photo] [photo]",
+          "kind": "odd"
+        },
+        {
+          "t": "09:15",
+          "text": "Little Aunt：the park",
+          "kind": "odd"
+        },
+        {
+          "t": "20:30",
+          "text": "Big Aunt：nothing on today, sleep early",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "20:33",
+            "text": "Big Aunt：ok"
+          }
+        ],
+        "inner": "Big Aunt said \"ok\" with no next line. A first."
+      },
+      "lol": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:20",
+            "text": "Cousin Bo：haha what did your company give"
+          }
+        ],
+        "inner": "A box. No sender. I didn't say."
+      },
+      "received": {
+        "status": "read",
+        "lines": []
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:21",
+            "text": "Little Aunt：thank what, go walk in a park yourself"
+          }
+        ]
+      },
+      "wait": {
+        "status": "read",
+        "lines": []
+      },
+      "no": {
+        "status": "read",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:22",
+            "text": "Uncle Two：go in where"
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:30",
+            "text": "Grandma：three the same  sent wrong maybe"
+          }
+        ],
+        "inner": "Three identical parks. Same bench, same bird, taken three times. Grandma noticed. I didn't."
+      }
+    },
+    "9": {
+      "incoming": [
+        {
+          "t": "10:05",
+          "text": "Uncle Two：[recalled a message]",
+          "kind": "odd"
+        },
+        {
+          "t": "10:07",
+          "text": "Big Aunt：your cousin Bo's job is gone too, big companies cut just like that",
+          "kind": "private"
+        },
+        {
+          "t": "10:08",
+          "text": "Little Aunt：[link] five things you must do after losing your job",
+          "kind": "private"
+        },
+        {
+          "t": "10:09",
+          "text": "Cousin Jie：Dot says her class got an AI teacher",
+          "kind": "private"
+        },
+        {
+          "t": "10:09",
+          "text": "Cousin Jie：more patient than the old one",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "10:14",
+            "text": "Big Aunt：good what, you two are the same now"
+          }
+        ]
+      },
+      "lol": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "10:13",
+            "text": "Uncle Two：you're laughing at your cousin?"
+          }
+        ],
+        "effects": {
+          "san": -1
+        },
+        "inner": "I wasn't laughing at him. I was laughing at the \"too\"."
+      },
+      "received": {
+        "status": "read",
+        "lines": []
+      },
+      "thanks": {
+        "status": "read",
+        "lines": []
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "10:15",
+            "text": "Little Aunt：wait for what, read the third one first"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "10:15",
+            "text": "Big Aunt：not gone then what"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "read",
+        "lines": []
+      },
+      "free": {
+        "status": "typing",
+        "lines": [],
+        "inner": "Cousin Bo is typing. Two minutes. Then nothing."
+      }
+    },
+    "10": {
+      "incoming": [
+        {
+          "t": "07:48",
+          "text": "Little Aunt：[link] one cup of this every morning, clean arteries for twenty years",
+          "kind": "odd"
+        },
+        {
+          "t": "08:13",
+          "text": "Uncle Two：Wei passed the civil service exam, provincial level, list came out yesterday",
+          "kind": "odd"
+        },
+        {
+          "t": "08:14",
+          "text": "Cousin Jie：congrats congrats",
+          "kind": "odd"
+        },
+        {
+          "t": "08:14",
+          "text": "Little Aunt：congrats congrats",
+          "kind": "odd"
+        },
+        {
+          "t": "12:37",
+          "text": "Big Aunt：{nick} what are you doing at home, your mum says you don't have to go to the office anymore",
+          "kind": "odd"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:41",
+            "text": "Big Aunt：good what, how much a month"
+          }
+        ],
+        "inner": "Day one. The whole of day one, as it was. Even the two at 08:14."
+      },
+      "lol": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:40",
+            "text": "Uncle Two：haha what, Wei is two years younger than you"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:42",
+            "text": "Cousin Jie：received what, this isn't your work group"
+          }
+        ]
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:41",
+            "text": "Uncle Two：thank Wei yourself, he's not in the group, I'll screenshot it for him"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:43",
+            "text": "Big Aunt：wait for what"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:43",
+            "text": "Big Aunt：no what"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "read",
+        "lines": []
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:44",
+            "text": "Big Aunt：{nick} what are you doing at home, your mum says you don't have to go to the office anymore"
+          }
+        ],
+        "inner": "Say it again. She really said it again. Not one word different."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:50",
+            "text": "Grandma：home is good for the child  home is warm"
+          }
+        ]
+      }
+    },
+    "11": {
+      "incoming": [
+        {
+          "t": "08:00",
+          "text": "Little Aunt：Good morning.",
+          "kind": "odd"
+        },
+        {
+          "t": "08:00",
+          "text": "Uncle Two：Good morning.",
+          "kind": "odd"
+        },
+        {
+          "t": "08:00",
+          "text": "Cousin Jie：Good morning.",
+          "kind": "odd"
+        },
+        {
+          "t": "08:00",
+          "text": "Big Aunt：Good morning.",
+          "kind": "odd"
+        },
+        {
+          "t": "08:00",
+          "text": "Cousin Bo：Good morning.",
+          "kind": "odd"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:03",
+            "text": "Big Aunt：Okay."
+          }
+        ],
+        "inner": "Big Aunt uses full stops now. Big Aunt has never used a full stop in her life."
+      },
+      "lol": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:03",
+            "text": "Uncle Two：Haha."
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:03",
+            "text": "Cousin Jie：Received."
+          }
+        ]
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:03",
+            "text": "Little Aunt：You are welcome."
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:04",
+            "text": "Big Aunt：Okay."
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:04",
+            "text": "Big Aunt：Understood."
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:04",
+            "text": "Cousin Bo：Hard work."
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:05",
+            "text": "Big Aunt：Good morning."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:05",
+            "text": "Cousin Bo：Which model?"
+          }
+        ],
+        "inner": "Cousin Bo is the only one in the group who knows what a model is. He asks me which model."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:10",
+            "text": "Grandma：good morning"
+          }
+        ],
+        "inner": "Grandma has no full stop. Grandma never had one. She is the only one left."
+      }
+    },
+    "12": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "Cousin Jie：Dot came first in midterms, maths 96.",
+          "kind": "odd"
+        },
+        {
+          "t": "09:31",
+          "text": "Big Aunt：96 is very good.",
+          "kind": "odd"
+        },
+        {
+          "t": "09:31",
+          "text": "Uncle Two：96 is very good.",
+          "kind": "odd"
+        },
+        {
+          "t": "15:12",
+          "text": "Cousin Bo：[link] a post from 1997",
+          "kind": "odd"
+        },
+        {
+          "t": "15:12",
+          "text": "Cousin Bo：This is you, isn't it.",
+          "kind": "odd"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "15:15",
+            "text": "Cousin Bo：It is you."
+          }
+        ]
+      },
+      "lol": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "15:15",
+            "text": "Big Aunt：Not funny."
+          }
+        ],
+        "inner": "Big Aunt is right."
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "15:16",
+            "text": "Cousin Jie：Received."
+          }
+        ]
+      },
+      "thanks": {
+        "status": "read",
+        "lines": []
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "15:16",
+            "text": "Cousin Bo：No rush."
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "15:16",
+            "text": "Cousin Bo：It is you."
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "15:17",
+            "text": "Uncle Two：Good."
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "15:17",
+            "text": "Cousin Bo：This is you, isn't it."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "15:20",
+            "text": "Big Aunt：Where did the 4 points go. Do you remember now."
+          }
+        ],
+        "inner": "I remember. A word problem. I counted the chickens as people."
+      }
+    },
+    "13": {
+      "incoming": [
+        {
+          "t": "08:00",
+          "text": "Big Aunt：{nick}, that thing you had as a kid, the time the teacher took it, someone in this group was there.",
+          "kind": "odd"
+        },
+        {
+          "t": "08:01",
+          "text": "Cousin Jie：I was there. I remember you did not cry.",
+          "kind": "odd"
+        },
+        {
+          "t": "08:01",
+          "text": "Uncle Two：Good that you did not cry.",
+          "kind": "odd"
+        },
+        {
+          "t": "08:02",
+          "text": "Little Aunt：Good that you did not cry.",
+          "kind": "odd"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:05",
+            "text": "Big Aunt：Okay."
+          }
+        ]
+      },
+      "lol": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:05",
+            "text": "Cousin Jie：You laughed like this back then too."
+          }
+        ],
+        "effects": {
+          "san": -1
+        },
+        "inner": "Cousin Jie is six years older. That year she was in middle school, not in my class. She was there."
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:06",
+            "text": "Uncle Two：Received."
+          }
+        ]
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:06",
+            "text": "Little Aunt：You are welcome."
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:06",
+            "text": "Big Aunt：No rush."
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:07",
+            "text": "Cousin Jie：Good that you did not cry."
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:07",
+            "text": "Uncle Two：Good."
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:07",
+            "text": "Cousin Jie：I was there. I remember you did not cry."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:08",
+            "text": "Big Aunt：It means it was taken away."
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:12",
+            "text": "Grandma：taken away gets given back  the teacher said"
+          }
+        ],
+        "inner": "Grandma still has no full stop. But she wasn't there that year. The teacher never said it would be given back."
+      }
+    },
+    "14": {
+      "incoming": [
+        {
+          "t": "08:00",
+          "text": "Big Aunt：You do not need to reply to us. Do your work.",
+          "kind": "odd"
+        },
+        {
+          "t": "08:00",
+          "text": "Uncle Two：You do not need to reply to us.",
+          "kind": "odd"
+        },
+        {
+          "t": "08:00",
+          "text": "Cousin Jie：You do not need to reply.",
+          "kind": "odd"
+        },
+        {
+          "t": "08:00",
+          "text": "Cousin Bo：No need to reply.",
+          "kind": "odd"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:02",
+            "text": "Big Aunt：Okay."
+          }
+        ]
+      },
+      "lol": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:02",
+            "text": "Uncle Two：Good."
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:02",
+            "text": "Cousin Jie：Good."
+          }
+        ]
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:02",
+            "text": "Little Aunt：Good."
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:03",
+            "text": "Big Aunt：No rush."
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:03",
+            "text": "Big Aunt：Good."
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:03",
+            "text": "Uncle Two：Good."
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:03",
+            "text": "Big Aunt：You do not need to reply to us."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:04",
+            "text": "Big Aunt：Just that you do not need to reply."
+          }
+        ]
+      },
+      "free": {
+        "status": "read",
+        "lines": [],
+        "inner": "I typed a line, sent it, read. Five reads, the same second. Grandma didn't read it."
+      }
+    },
+    "15": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "Big Aunt：{nick}, have you eaten.",
+          "kind": "odd"
+        },
+        {
+          "t": "12:05",
+          "text": "Uncle Two：Have you eaten.",
+          "kind": "odd"
+        },
+        {
+          "t": "12:05",
+          "text": "Cousin Jie：Have you eaten.",
+          "kind": "odd"
+        },
+        {
+          "t": "12:05",
+          "text": "Little Aunt：Have you eaten.",
+          "kind": "odd"
+        },
+        {
+          "t": "12:05",
+          "text": "Cousin Bo：Have you eaten.",
+          "kind": "odd"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:07",
+            "text": "Big Aunt：Okay."
+          }
+        ]
+      },
+      "lol": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:07",
+            "text": "Uncle Two：Good."
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:07",
+            "text": "Cousin Jie：Good."
+          }
+        ]
+      },
+      "thanks": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:07",
+            "text": "Little Aunt：Good."
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:08",
+            "text": "Big Aunt：No rush."
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:08",
+            "text": "Big Aunt：Good."
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:08",
+            "text": "Cousin Bo：Good."
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:08",
+            "text": "Big Aunt：Have you eaten."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:09",
+            "text": "Big Aunt：Just asking whether you ate."
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "12:15",
+            "text": "Grandma：have you eaten"
+          }
+        ],
+        "inner": "Grandma's has no full stop. But Grandma doesn't text at 12:15. That's her nap."
+      }
+    },
+    "16": {
+      "incoming": [
+        {
+          "t": "08:00",
+          "text": "Big Aunt：We are all well. You are well too.",
+          "kind": "odd"
+        },
+        {
+          "t": "08:00",
+          "text": "Uncle Two：All well.",
+          "kind": "odd"
+        },
+        {
+          "t": "08:00",
+          "text": "Cousin Jie：Dot is well too.",
+          "kind": "odd"
+        },
+        {
+          "t": "08:00",
+          "text": "Cousin Bo：All well.",
+          "kind": "odd"
+        },
+        {
+          "t": "08:00",
+          "text": "Little Aunt：[link] All well.",
+          "kind": "odd"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:02",
+            "text": "Big Aunt：Okay."
+          }
+        ]
+      },
+      "lol": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:02",
+            "text": "Uncle Two：Good."
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:02",
+            "text": "Cousin Jie：Good."
+          }
+        ]
+      },
+      "thanks": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "wait": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:03",
+            "text": "Cousin Bo：Good."
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:03",
+            "text": "Big Aunt：You are well too."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:03",
+            "text": "Big Aunt：Just that all is well."
+          }
+        ]
+      },
+      "how-much": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:04",
+            "text": "Big Aunt：Not much."
+          }
+        ],
+        "inner": "I asked her how much. She said not much. That line used to be mine."
+      },
+      "free": {
+        "status": "read",
+        "lines": [],
+        "inner": "Grandma didn't speak today."
+      }
+    },
+    "17": {
+      "incoming": [
+        {
+          "t": "08:00",
+          "text": "Big Aunt：{nick}, you look beautiful today.",
+          "kind": "odd"
+        },
+        {
+          "t": "08:00",
+          "text": "Cousin Jie：Beautiful.",
+          "kind": "odd"
+        },
+        {
+          "t": "08:00",
+          "text": "Uncle Two：Good child.",
+          "kind": "odd"
+        },
+        {
+          "t": "08:00",
+          "text": "Little Aunt：Good child.",
+          "kind": "odd"
+        },
+        {
+          "t": "08:00",
+          "text": "Cousin Bo：Good child.",
+          "kind": "odd"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:02",
+            "text": "Big Aunt：Okay."
+          }
+        ]
+      },
+      "lol": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:02",
+            "text": "Uncle Two：Good."
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:02",
+            "text": "Cousin Jie：Good."
+          }
+        ]
+      },
+      "thanks": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "wait": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "im-going-in": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:03",
+            "text": "Big Aunt：You look beautiful today."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "how-much": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:04",
+            "text": "Uncle Two：555"
+          }
+        ],
+        "inner": "Uncle Two doesn't type 555. Uncle Two even cries by voice message."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:10",
+            "text": "Grandma：{nick}  good child"
+          }
+        ],
+        "inner": "No full stop. A space in the middle. It's her. Is it her."
+      }
+    },
+    "18": {
+      "incoming": [
+        {
+          "t": "08:00",
+          "text": "Big Aunt：{nick}, you worked hard today too. Sleep early.",
+          "kind": "odd"
+        },
+        {
+          "t": "08:00",
+          "text": "Uncle Two：Sleep early.",
+          "kind": "odd"
+        },
+        {
+          "t": "08:00",
+          "text": "Cousin Jie：Sleep early.",
+          "kind": "odd"
+        },
+        {
+          "t": "08:00",
+          "text": "Little Aunt：Sleep early.",
+          "kind": "odd"
+        },
+        {
+          "t": "08:00",
+          "text": "Cousin Bo：Sleep early.",
+          "kind": "odd"
+        },
+        {
+          "t": "08:00",
+          "text": "Grandma：Sleep early.",
+          "kind": "odd"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:02",
+            "text": "Big Aunt：Okay."
+          }
+        ]
+      },
+      "lol": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:02",
+            "text": "Uncle Two：Good."
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:02",
+            "text": "Cousin Jie：Good."
+          }
+        ]
+      },
+      "thanks": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "wait": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "im-going-in": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "08:03",
+            "text": "Big Aunt：Sleep early."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "how-much": {
+        "status": "read",
+        "lines": []
+      },
+      "free": {
+        "status": "read",
+        "lines": [],
+        "inner": "Grandma has a full stop now. Eight on the dot, together with them."
+      }
+    }
+  }
+}

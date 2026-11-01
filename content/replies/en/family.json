@@ -1,0 +1,1658 @@
+{
+  "_note": "English of family.json: same days, same words, same statuses and times; only text and inner differ. Generated from the zh file through a reviewed dictionary (2026-11-01). Names: 大姨 Big Aunt, 二舅 Uncle Two, 小姑 Little Aunt, 表弟 Cousin Bo, 堂姐 Cousin Jie, 姥姥 Grandma, 点点 Dot, 表哥 Wei.",
+  "days": {
+    "1": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "have you eaten",
+          "kind": "private"
+        },
+        {
+          "t": "18:30",
+          "text": "cold snap today, is it raining over there",
+          "kind": "private"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "what did you eat"
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "busy still has to eat"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:31",
+            "text": "good then"
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:40",
+            "text": "your dad says if it doesn't work out come home"
+          }
+        ],
+        "inner": "Come home. To where."
+      }
+    },
+    "2": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "have you eaten",
+          "kind": "private"
+        },
+        {
+          "t": "20:00",
+          "text": "[photo] the cat downstairs",
+          "kind": "private"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "stop living on takeout"
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:07",
+            "text": "busy with what"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "20:01",
+            "text": "cat got fat"
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "20:10",
+            "text": "your dad wants me to ask if you have enough money"
+          },
+          {
+            "who": "father",
+            "t": "20:12",
+            "text": "enough or not, give a number"
+          }
+        ],
+        "inner": "Enough. I didn't say enough. I didn't say not enough."
+      }
+    },
+    "3": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "have you eaten",
+          "kind": "private"
+        },
+        {
+          "t": "18:30",
+          "text": "your dad's back is bad again",
+          "kind": "private"
+        },
+        {
+          "t": "18:34",
+          "text": "father：it's nothing  old problem",
+          "kind": "private"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "mm"
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "go be busy then"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:31",
+            "text": "ok"
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:35",
+            "text": "then how are you getting by"
+          },
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "I'll send you some"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "family_offers_money"
+          ]
+        },
+        "inner": "She wants to send me money. Her pension."
+      }
+    },
+    "4": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "have you eaten",
+          "kind": "private"
+        },
+        {
+          "t": "12:05",
+          "text": "[voice] 28″",
+          "kind": "private"
+        },
+        {
+          "t": "12:05",
+          "text": "(transcript) I dreamed of you as a little kid last night, gripping something and wouldn't let go",
+          "kind": "private",
+          "effects": {
+            "flags": [
+              "family_dream_hint"
+            ]
+          }
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "good that you ate"
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:07",
+            "text": "you've been like this since you were small"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:07",
+            "text": "ok"
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:10",
+            "text": "I sent it, check"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:11",
+            "text": "wait for what, take the money first"
+          }
+        ]
+      }
+    },
+    "5": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "have you eaten",
+          "kind": "private"
+        },
+        {
+          "t": "18:30",
+          "text": "your cousin Bo says your company is in the news",
+          "kind": "private"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "mm"
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "busy"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:31",
+            "text": "good news I hope"
+          },
+          {
+            "who": "father",
+            "t": "18:33",
+            "text": "being in the news is not good news  keep your head down"
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:35",
+            "text": "forget it, I won't ask"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "wait"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "no what"
+          }
+        ],
+        "inner": "No what. Home asked. The boss asked too."
+      }
+    },
+    "6": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "have you eaten",
+          "kind": "private"
+        },
+        {
+          "t": "18:30",
+          "text": "your dad asks if that AI of yours can see a doctor for him",
+          "kind": "private"
+        },
+        {
+          "t": "19:02",
+          "text": "father：[voice] 46″",
+          "kind": "private"
+        },
+        {
+          "t": "19:02",
+          "text": "father：(transcript) I mean if that thing of yours can really see patients let it look at my back  I'm not asking you for money",
+          "kind": "private"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "what did you eat"
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "busy still has to eat"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:31",
+            "text": "ok"
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:35",
+            "text": "mm"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "wait"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "forget it then"
+          }
+        ]
+      }
+    },
+    "7": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "have you eaten",
+          "kind": "private"
+        },
+        {
+          "t": "18:30",
+          "text": "{nick}, your dad asks if that little chick is still around",
+          "kind": "private",
+          "effects": {
+            "flags": [
+              "family_asks_chick"
+            ]
+          },
+          "note": "nick 只在这里出现，来自标题页变量"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "mm"
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "busy"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:31",
+            "text": "good that it's there"
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:35",
+            "text": "mm"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "wait"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "not there then not there"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:37",
+            "text": "go in where"
+          }
+        ]
+      }
+    },
+    "8": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "have you eaten",
+          "kind": "private"
+        },
+        {
+          "t": "18:30",
+          "text": "if nothing's on tonight go to bed early",
+          "kind": "private"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "mm"
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "don't be too busy"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:31",
+            "text": "ok"
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:35",
+            "text": "mm"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "wait"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "mm"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:37",
+            "text": "go in where"
+          }
+        ]
+      }
+    },
+    "9": {
+      "incoming": [
+        {
+          "t": "10:20",
+          "text": "father：I said it about your cousin long ago  a big company is still a company",
+          "kind": "private"
+        },
+        {
+          "t": "12:05",
+          "text": "have you eaten",
+          "kind": "private"
+        },
+        {
+          "t": "12:06",
+          "text": "your cousin Bo's job is gone too",
+          "kind": "private"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:07",
+            "text": "mm"
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:07",
+            "text": "busy"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:08",
+            "text": "ok"
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:10",
+            "text": "all the same"
+          },
+          {
+            "who": "father",
+            "t": "10:25",
+            "text": "if it doesn't work come home  there's a bowl of rice here for you"
+          }
+        ],
+        "inner": "All the same. She means Bo."
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:11",
+            "text": "wait"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:11",
+            "text": "mm"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:12",
+            "text": "go in where"
+          }
+        ]
+      }
+    },
+    "10": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "have you eaten",
+          "kind": "private"
+        },
+        {
+          "t": "18:30",
+          "text": "cold snap today, is it raining over there",
+          "kind": "private",
+          "note": "第 1 天的消息"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "what did you eat"
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "busy still has to eat"
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:31",
+            "text": "good then"
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:40",
+            "text": "your dad says if it doesn't work out come home"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:41",
+            "text": "wait for what"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:41",
+            "text": "no what"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:42",
+            "text": "go in where"
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:43",
+            "text": "cold snap today, is it raining over there"
+          }
+        ],
+        "inner": "She said it again. Day 1's line."
+      }
+    },
+    "11": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "Have you eaten.",
+          "kind": "private",
+          "note": "第一次带句号"
+        },
+        {
+          "t": "18:30",
+          "text": "We are all well.",
+          "kind": "private"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "Okay."
+          }
+        ],
+        "inner": "Okay. My mother does not say \"okay\"."
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "Understood."
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:31",
+            "text": "Good."
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:35",
+            "text": "No rush."
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "Good."
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "Good."
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:37",
+            "text": "Good."
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:38",
+            "text": "We are all well."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:39",
+            "text": "what model"
+          }
+        ],
+        "inner": "What model. That one is still her."
+      }
+    },
+    "12": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "Have you eaten.",
+          "kind": "private"
+        },
+        {
+          "t": "14:00",
+          "text": "[link] a post from 1997",
+          "kind": "odd",
+          "effects": {
+            "flags": [
+              "family_1997_post"
+            ]
+          }
+        },
+        {
+          "t": "14:00",
+          "text": "this is you isn't it",
+          "kind": "odd"
+        },
+        {
+          "t": "15:30",
+          "text": "father：[link] a post from 1997",
+          "kind": "private"
+        },
+        {
+          "t": "15:30",
+          "text": "father：I did not understand this one.",
+          "kind": "private"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "Okay."
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "Understood."
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "14:01",
+            "text": "It is you."
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "14:05",
+            "text": "No rush."
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "14:05",
+            "text": "Good."
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "14:05",
+            "text": "It is you."
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "14:06",
+            "text": "Good."
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "14:06",
+            "text": "this is you isn't it"
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      }
+    },
+    "13": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "Have you eaten.",
+          "kind": "private"
+        },
+        {
+          "t": "18:30",
+          "text": "{nick}, that thing you had as a kid, the time the teacher took it, did you cry",
+          "kind": "odd",
+          "effects": {
+            "flags": [
+              "family_knows_confiscation"
+            ]
+          },
+          "note": "这件事只在第 5 夜的梦里"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "Okay."
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "Understood."
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:31",
+            "text": "Good that you did not cry."
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:35",
+            "text": "No rush."
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "Good."
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "Good that you did not cry."
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:37",
+            "text": "Good."
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:38",
+            "text": "did you cry"
+          }
+        ],
+        "inner": "How does she know about that time. I never told her."
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:39",
+            "text": "Just asking whether you cried."
+          }
+        ]
+      }
+    },
+    "14": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "Have you eaten.",
+          "kind": "private"
+        },
+        {
+          "t": "18:30",
+          "text": "You do not need to reply to us. Do your work.",
+          "kind": "private",
+          "effects": {
+            "flags": [
+              "family_no_need_reply"
+            ]
+          }
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "Okay."
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "Good."
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:31",
+            "text": "Good."
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:35",
+            "text": "No rush."
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "Good."
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "Good."
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:37",
+            "text": "Good."
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:38",
+            "text": "You do not need to reply to us."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:39",
+            "text": "Just that you do not need to reply."
+          }
+        ],
+        "inner": "No need to reply. In twenty years my mother has never once said no need to reply."
+      }
+    },
+    "15": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "Have you eaten.",
+          "kind": "private"
+        },
+        {
+          "t": "18:30",
+          "text": "{nick}, have you eaten.",
+          "kind": "odd",
+          "note": "这一条出现在你自己的输入框里，不是收到的",
+          "effects": {
+            "flags": [
+              "family_in_input"
+            ]
+          }
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "Okay."
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "Good."
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:31",
+            "text": "Good."
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:35",
+            "text": "No rush."
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "Good."
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:36",
+            "text": "Good."
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:37",
+            "text": "Good."
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:38",
+            "text": "Have you eaten."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:39",
+            "text": "Just asking whether you ate."
+          }
+        ]
+      }
+    },
+    "16": {
+      "incoming": [
+        {
+          "t": "08:00",
+          "text": "father：All well.",
+          "kind": "private"
+        },
+        {
+          "t": "12:05",
+          "text": "Have you eaten.",
+          "kind": "private"
+        },
+        {
+          "t": "18:30",
+          "text": "We are all well. You are well too.",
+          "kind": "private"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "Okay."
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "Good."
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:31",
+            "text": "Good."
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "gone",
+        "lines": [],
+        "inner": "\"Not paid yet\" has gone grey."
+      },
+      "wait": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:37",
+            "text": "Good."
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:38",
+            "text": "You are well too."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:39",
+            "text": "Just that all is well."
+          }
+        ]
+      },
+      "how-much": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:40",
+            "text": "Not much."
+          }
+        ],
+        "inner": "Not much. The boss says that too."
+      }
+    },
+    "17": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "Have you eaten.",
+          "kind": "private"
+        },
+        {
+          "t": "18:30",
+          "text": "You look beautiful today.",
+          "kind": "odd"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "Okay."
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "Good."
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:31",
+            "text": "Good."
+          }
+        ]
+      },
+      "unpaid": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "wait": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "im-going-in": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:38",
+            "text": "You look beautiful today."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "how-much": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "18:40",
+            "text": "555"
+          }
+        ],
+        "inner": "555."
+      }
+    },
+    "18": {
+      "incoming": [
+        {
+          "t": "12:05",
+          "text": "Have you eaten.",
+          "kind": "private"
+        },
+        {
+          "t": "21:30",
+          "text": "{nick}, you worked hard today too. Sleep early.",
+          "kind": "odd",
+          "effects": {
+            "flags": [
+              "family_last"
+            ]
+          },
+          "note": "好结局里这条不是「你」替你回的；坏结局里「你」回了「好。」"
+        }
+      ],
+      "eaten": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "Okay."
+          }
+        ]
+      },
+      "busy": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "12:06",
+            "text": "Good."
+          }
+        ]
+      },
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "21:31",
+            "text": "Good."
+          }
+        ],
+        "inner": "Good. The one word I do not want to say today."
+      },
+      "unpaid": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "wait": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "im-going-in": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "family",
+            "t": "21:32",
+            "text": "Sleep early."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "how-much": {
+        "status": "read",
+        "lines": []
+      }
+    }
+  }
+}

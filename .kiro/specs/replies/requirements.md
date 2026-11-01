@@ -26,3 +26,6 @@ Data is finished: `content/replies/day-01..18.json`, `content/replies/family.jso
 ## FR5. Tests
 - Property: for every day and recipient, every word in that day's menu resolves to an entry or `gone` (no undefined).
 - Snapshot: day 1 boss `salary` (read + interrupt), day 5 group `no`, day 13 xiaozhang any word (silence, disabled), day 15 family incoming (the input-box one is rendered inside the player's own input, not as a received bubble).
+
+## Addition 2026-11-01 (author): English reply tables
+English lives beside the Chinese: `content/replies/en/<same file name>.json` with exactly the same shape, days, words, statuses, times and effects; only `text` and `inner` differ. Today: `en/family.json`, `en/clan.json` (the day files follow). The loader parses an `en/` file with the same strict parser, then checks it is structurally identical to its zh twin (same days, same words, same statuses, same line count per cell, same times), and fails loudly otherwise. At render time the active locale picks the text; a missing `en/` file falls back to Chinese for that conversation. Speaker prefixes in English may contain spaces and run to 14 characters (`Big Aunt：`, `Little Aunt：`); widen `splitSpeaker` accordingly (still no newline, still the full-width colon).
