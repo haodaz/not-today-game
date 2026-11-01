@@ -51,3 +51,6 @@ The desktop view never splits the viewport between the two monitors. It shows **
 - When Kuro has a new line: expand for 6 s, then fold unless hovered or the player typed.
 - In the evening chat beat (after shutdown) it stays expanded.
 - Expanded, it must never overlap the active app's input area or reply bar: if its default bottom-right position would, it docks to the top-right of the monitor instead. The body (sprite) always stays visible.
+
+## Addition 2026-11-01 (author): faces in 消息
+The coloured letter squares were placeholders. Every conversation and every speaker that is in `content/npc.json` shows its **avatar image** (`avatar`, a 256 px square served from `public/npc/`) in the conversation list (38 px, radius 10) and on its bubbles (30 px, radius 8); the letter and the colour classes go. The player's own bubbles keep the neutral square. `member` (company group) and anyone else without an entry get one of the **silhouettes** listed in `npc.json`, chosen stably by name hash (same person, same silhouette, every day), drawn on the same light grey. The family conversation's avatar is the mother (`family` in `npc.json`); the father has his own entry for the day he speaks. Snapshot the list and one group transcript; add a property test that no `.av` renders a letter any more.

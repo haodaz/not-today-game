@@ -1,0 +1,48 @@
+{
+  "_note": "Who has a face. id = the `who` used in days/replies and the conversation id in messages. portrait: bust for the dialogue box (same slot and size as the player portrait). avatar: 256 px square for the messages list, bubbles and 朋友圈. Speakers not listed here (member, 寻呼机, 屏幕, 缝里, 输入框) have no portrait; `member` and family-group relatives use the silhouettes.",
+  "npcs": {
+    "boss": {
+      "name": "msgs.boss",
+      "portrait": "/npc/boss.png",
+      "avatar": "/npc/boss_av.png"
+    },
+    "partner": {
+      "name": "msgs.partner",
+      "portrait": "/npc/partner.png",
+      "avatar": "/npc/partner_av.png"
+    },
+    "xiaozhang": {
+      "name": "msgs.xiaozhang",
+      "portrait": "/npc/xiaozhang.png",
+      "avatar": "/npc/xiaozhang_av.png"
+    },
+    "laozhou": {
+      "name": "msgs.laozhou",
+      "portrait": "/npc/laozhou.png",
+      "avatar": "/npc/laozhou_av.png"
+    },
+    "teacher": {
+      "name": "msgs.teacher",
+      "portrait": "/npc/teacher.png",
+      "avatar": "/npc/teacher_av.png"
+    },
+    "family": {
+      "name": "msgs.family",
+      "portrait": "/npc/mother.png",
+      "avatar": "/npc/mother_av.png"
+    },
+    "father": {
+      "name": "msgs.father",
+      "portrait": "/npc/father.png",
+      "avatar": "/npc/father_av.png"
+    }
+  },
+  "silhouettes": [
+    "/npc/sil_1.png",
+    "/npc/sil_2.png",
+    "/npc/sil_3.png",
+    "/npc/sil_4.png",
+    "/npc/sil_5.png",
+    "/npc/sil_6.png"
+  ]
+}
