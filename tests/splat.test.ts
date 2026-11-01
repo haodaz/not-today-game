@@ -20,7 +20,7 @@ import { splatForGame } from "@world/room/splat";
 import { createSplatLayer, SPLAT_FADE_MS, type LoadScene, type SplatHooks, type SplatScene } from "@world/room/splat/layer";
 import { COLLAPSE_MIX, collapseMix, splatLook } from "@world/room/splat/look";
 import { splatMoveFor } from "@world/room/splat/moves";
-import { angleDelta, clampPose, easeInOutCubic, lerpPose, lookOf, poseAt, poseFromLook, POSES, WINDOW_CLAMP, type Pose } from "@world/room/splat/pose";
+import { angleDelta, clampPose, easeInOutCubic, lerpPose, lookOf, moveBetween, poseAt, poseFromLook, POSES, WINDOW_CLAMP, type Pose } from "@world/room/splat/pose";
 import { CALIBRATION } from "@world/room/splat/calibration";
 import { formatCalibration, framingOf, nudge, poseOfRow } from "@world/room/splat/calibrate";
 import { calibrating } from "@world/room/splat";
@@ -127,7 +127,7 @@ describe("the window clamp", () => {
   });
 
   it("poseAt: eased, from the departing pose to the arriving one", () => {
-    const m = splatMoveFor("room", "desk")!;
+    const m = moveBetween("room", "desk");
     near(poseAt(m, 0), POSES.room);
     near(poseAt(m, 1), POSES.desk);
     near(poseAt(m, 0.25), lerpPose(POSES.room, POSES.desk, easeInOutCubic(0.25)));
@@ -135,11 +135,12 @@ describe("the window clamp", () => {
 });
 
 describe("which moves, and the look by ring", () => {
-  it("房间 ↔ 桌子 (and 床 when it exists); never 门 or 屏幕, never a view to itself", () => {
-    expect(splatMoveFor("room", "desk")).not.toBeNull();
-    expect(splatMoveFor("desk", "room")).not.toBeNull();
-    expect(splatMoveFor("desk", "bed")).not.toBeNull();
-    for (const [a, b] of [["room", "door"], ["door", "room"], ["desk", "desktop"], ["desktop", "room"], ["room", "room"]] as const) expect(splatMoveFor(a, b)).toBeNull();
+  it("房间 ↔ 床 only (when 床 exists); 桌子 is the tabletop now, so 房间 ↔ 桌子 is the CSS push; never 门 or 屏幕", () => {
+    expect(splatMoveFor("room", "bed")).not.toBeNull();
+    expect(splatMoveFor("bed", "room")).not.toBeNull();
+    for (const [a, b] of [["room", "desk"], ["desk", "room"], ["desk", "bed"], ["room", "door"], ["door", "room"], ["desk", "desktop"], ["desktop", "room"], ["room", "room"]] as const) expect(splatMoveFor(a, b)).toBeNull();
+    // 桌子 keeps its pose: the day-18 pull-out may start there.
+    expect(POSES.desk).toBeDefined();
   });
 
   it("the mix by ring: 0 before ring room, room 40 %, door 100 %", () => {
@@ -219,7 +220,10 @@ function mount(opts: { load?: LoadScene; day?: number; view?: Session["view"]; s
   }
   document.body.appendChild(root);
   let hooks: SplatHooks | null = null;
-  const layer = opts.load ? createSplatLayer({ load: opts.load, idle: (fn) => fn(), calibrate: opts.calibrate, print: opts.print }) : null;
+  // The game's views have no splat move now (房间 ↔ 床 waits for 床); the layer's machinery is driven
+  // through 房间 → 桌子 here with an injected move table, which the CSS push still carries.
+  const moves = (a: string, b: string) => (a !== b && ["room", "desk"].includes(a) && ["room", "desk"].includes(b) ? moveBetween(a as "room" | "desk", b as "room" | "desk") : null);
+  const layer = opts.load ? createSplatLayer({ load: opts.load, idle: (fn) => fn(), calibrate: opts.calibrate, print: opts.print, moves }) : null;
   const m = mountDesktop(root, {
     store: createStore({ startDay: opts.day ?? 1 }),
     clock: DEFAULT_CLOCK,

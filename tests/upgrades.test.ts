@@ -147,7 +147,7 @@ describe("what upgrading changes (FR2) and FR3 properties", () => {
     // Not recognised in this run, so also `unknown` (recognise FR2).
     expect(out).toContain('class="slot upgraded unknown" data-object="pager" data-res="hi"');
     expect(out).toContain('src="/objects/chick_white.png"');
-    expect(out.slice(out.indexOf('class="bar"'))).toMatchSnapshot();
+    expect(out.slice(out.indexOf('class="desk-things"'))).toMatchSnapshot();
     const lost = renderRoom({ state: { ...store.getState(), lost: ["chick"] }, events: [], session }).value;
     expect(lost).not.toContain('data-object="chick"');
   });

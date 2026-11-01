@@ -125,7 +125,9 @@ describe("(5) four camera levels", () => {
     const ctx = at("desk");
     const out = room(ctx);
     expect(out).toContain('class="stage room desk-view"');
-    expect(out).toContain('class="bar"');
+    // 桌子 is the tabletop (day-loop correction 2026-11-01): placed cutouts, no strip.
+    expect(out).toContain('class="desk-things"');
+    expect(out).not.toContain('class="items-strip"');
     expect(out).toContain('data-view="desktop" data-screen="left"');
     expect(out).toContain('data-view="desktop" data-screen="right"');
     expect(out).not.toMatch(/kuro-mood|kuro-glow/);

@@ -16,6 +16,7 @@ import { crawlKeyframes, crawlMs, edgePath } from "@world/late/crawl";
 import { heldItem } from "@world/room/held";
 import { holdUntil, lineKey, revealBusy, revealDoneAt, revealShown, startReveal, type Reveal } from "./reveal";
 import { centre, DESK_SHOT, ROOM_SHOT, type Rect } from "@world/room/shots";
+import { fullMonitor } from "@world/room/desk";
 import { applyMotionVars, CHOSEN, choiceDelays, EASE, exitOf, MOTION, ROOM_PUSH, viewMoveMs } from "./timing";
 
 interface Ghost {
@@ -230,7 +231,11 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
 
   // ---- held (FR1) -------------------------------------------------------------------------
   const esc = (s: string) => (typeof CSS !== "undefined" && typeof CSS.escape === "function" ? CSS.escape(s) : s.replace(/["\\]/g, "\\$&"));
-  const slotSelector = (held: string) => (held === "phone" ? '.bar [data-action="loop-phone"]' : `.bar [data-object="${esc(held)}"]`);
+  // Where a held thing lives: its cutout on 桌子's tabletop (day-loop correction 2026-11-01), or the 道具 strip.
+  const slotSelector = (held: string) => {
+    const inner = held === "phone" ? '[data-action="loop-phone"]' : `[data-object="${esc(held)}"]`;
+    return `.desk-things ${inner}, .items-strip ${inner}`;
+  };
 
   /** The path from the centre to the slot, in stage px, written on the held element. */
   function liftVars(stage: HTMLElement, layer: HTMLElement, held: string): void {
@@ -509,6 +514,17 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     return { tx: shotScale * c.x - (z * sd * dw) / 2, ty: shotScale * c.y - (z * sd * dh) / 2, z };
   }
   const shotOf = (view: string) => (view === "room" ? ROOM_SHOT : view === "desk" ? DESK_SHOT : null);
+  /**
+   * The monitor the camera goes into. On 桌子 only its lower half is in the frame (day-loop
+   * correction 2026-11-01): the whole screen has the desktop's aspect and runs above the frame.
+   */
+  const cameraMonitor = (view: string, side: "left" | "right", screen: HTMLElement | null): Rect => {
+    const mon = shotOf(view)!.monitors[side];
+    if (view !== "desk") return mon;
+    const w = screen?.offsetWidth || 1496;
+    const h = screen?.offsetHeight || 956;
+    return fullMonitor(mon, w / h);
+  };
 
   /** What the leaving stage does (out) and where the arriving one comes from (in); null = fade. */
   function camFor(from: string, to: string, old: HTMLElement, next: HTMLElement, focus: "left" | "right"): { out: Cam; in: Cam } | null {
@@ -516,11 +532,11 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     if (from === "room" && to === "desk") return { out: around(scaleOf(old), p, ROOM_PUSH), in: around(scaleOf(next), p, 1 / ROOM_PUSH) };
     if (from === "desk" && to === "room") return { out: around(scaleOf(old), p, 1 / ROOM_PUSH), in: around(scaleOf(next), p, ROOM_PUSH) };
     if (to === "desktop" && shotOf(from)) {
-      const mon = shotOf(from)!.monitors[focus];
+      const mon = cameraMonitor(from, focus, next);
       return { out: around(scaleOf(old), centre(mon), ROOM_PUSH), in: intoMonitor(scaleOf(old), mon, next) };
     }
     if (from === "desktop" && shotOf(to)) {
-      const mon = shotOf(to)!.monitors[focus];
+      const mon = cameraMonitor(to, focus, old);
       return { out: intoMonitor(scaleOf(next), mon, old), in: around(scaleOf(next), centre(mon), ROOM_PUSH) };
     }
     return null;

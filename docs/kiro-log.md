@@ -732,3 +732,29 @@ Appended after each task. Neither Kiro nor Claude edits the other's area without
     game's controller and the title page re-render (`onEmailChange`). A sign-out does not unbind
     what was seen this session.
 - Tests: 55 files, 854 passing; typecheck clean. Not seen in a browser.
+
+## 2026-11-01 — 桌子 is the tabletop (day-loop correction 2026-11-01)
+
+- `content/desk.json` (Claude's): rects in stage px on `desk_top.jpg` for cup, phone, box, meal, slip, the six object slots (row + x positions), keyboard, and lamp.
+- `src/world/room/desk.ts`: strict loader (`parseDesk`, fails on unknown keys, off-stage rects, wrong slot count), `deskLayout`, `objectSlot`, `deskGap`, `fullMonitor`.
+- `DESK_SHOT` in `shots.ts` now reads its monitors and gap from `deskLayout` (not hard-coded numbers). The tower is gone from `DESK_SHOT`; the tower hotspot is only in `shotHits("room", …)`.
+- `deskBar` replaced by:
+  - `deskThings(state, events, session)` — the same buttons, now as `{ box, phone, cup, meal, objects, slip }`.
+  - `tabletop(things)` — each button at its `data-at="…"` rect inside a `.desk-things` wrapper.
+  - `itemsButton(session)` and `itemsPanel(state, events, session)` — 道具 button next to ⚙; the strip as a panel over the current view, same buttons.
+  - `slipThing` — day 18's slip by the lamp once its checklist line is open.
+- `dest-slip` action: navigates to 屏幕 / 工作台 while the slip item is unlocked and unfinished.
+- `items-toggle` action, `Esc` to close, `view` resets `itemsOpen`. Lifting from the strip calls `fromItemsPanel` (closes the strip; on 屏幕 or 门 the camera goes to 桌子 first).
+- `room.css`: `.room.desk-view{background-image:url(/room/shots/desk_top.jpg)}`, placed-things CSS (`.desk-things`, `.at`, `.slip .paper`), 道具 button and strip.
+- `splat/moves.ts`: only 房间 ↔ 床; 房间 ↔ 桌子 is the CSS push. `POSES.desk` stays (pull-out).
+- `splat/layer.ts`: the lamp position reads from `deskLayout`; the injected `moves` dep so tests can drive the machinery without a real splat move. `fit.ts` BACKDROPS: desk → `deskLayout.backdrop`.
+- `motion/dom.ts`: `slotSelector` reads `.desk-things` and `.items-strip` instead of `.bar`; `cameraMonitor` on 桌子 uses `fullMonitor` because only the lower half is visible.
+- Tests:
+  - `tests/desk.test.ts` (23 tests, new): strict loader, every placed thing at its rect, the meal / box / slip states, the 道具 strip.
+  - `tests/actuators.test.ts`: desk tower only in 房间; rect bounds updated.
+  - `tests/splat.test.ts`: injected `moves` dep; the splatMoveFor assertion updated.
+  - `tests/fixes-1031.test.ts`: 桌子 now has `.desk-things` not `.bar`.
+  - `tests/upgrades.test.ts`: snapshot anchor is `.desk-things`.
+  - `tests/motion-dom.test.ts`: clicks inside `.desk-things`.
+- 6 snapshots refreshed after confirming the only diff is the new 道具 button appended after ⚙ 设置 in every view.
+- Tests: 56 files, 878 passing; typecheck clean. Not seen in a browser.

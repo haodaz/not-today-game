@@ -50,9 +50,13 @@ describe("no checklist line is a button", () => {
   });
 });
 
-describe("开机: the tower's power button (房间 and 桌子)", () => {
+describe("开机: the tower's power button (房间; 桌子 is the tabletop, the tower is out of its frame)", () => {
+  it("桌子 has no tower hotspot (day-loop correction 2026-11-01)", () => {
+    expect(render(ctxOf(atDay(1), "desk").ctx)).not.toContain("tower-hit");
+  });
+
   it("off: a hotspot with a faint light; pressing it boots; then it is only the picture", () => {
-    for (const [view, shot] of [["room", ROOM_SHOT], ["desk", DESK_SHOT]] as const) {
+    for (const [view, shot] of [["room", ROOM_SHOT]] as const) {
       const store = atDay(1);
       const { ctx } = ctxOf(store, view);
       const before = render(ctx);
@@ -77,7 +81,7 @@ describe("开机: the tower's power button (房间 and 桌子)", () => {
   });
 
   it("the rects sit on the photos: under the desk's left end, the bed at the right of 房间", () => {
-    for (const r of [ROOM_SHOT.tower, DESK_SHOT.tower, ROOM_SHOT.bed]) expect(r.l >= 0 && r.t >= 0 && r.l + r.w <= 1600 && r.t + r.h <= 900).toBe(true);
+    for (const r of [ROOM_SHOT.tower, ROOM_SHOT.bed]) expect(r.l >= 0 && r.t >= 0 && r.l + r.w <= 1600 && r.t + r.h <= 900).toBe(true);
     expect(ROOM_SHOT.tower.t).toBeGreaterThan(ROOM_SHOT.desk.t + ROOM_SHOT.desk.h); // below the desk top
     expect(ROOM_SHOT.tower.l + ROOM_SHOT.tower.w).toBeLessThan(ROOM_SHOT.monitors.left.l);
     expect(ROOM_SHOT.bed.l).toBeGreaterThan(ROOM_SHOT.desk.l + ROOM_SHOT.desk.w);

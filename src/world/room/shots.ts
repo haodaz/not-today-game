@@ -3,6 +3,8 @@
 // with no crop. Measured by hand on public/room/shots/room.jpg and desk_close.jpg (2026-10-31).
 // The camera push (motion) and the click areas (HUD) read the same numbers.
 
+import { deskGap, deskLayout } from "./desk";
+
 export interface Rect {
   readonly l: number;
   readonly t: number;
@@ -56,15 +58,14 @@ export const ROOM_COLLECTION = {
   chair: { l: 341, t: 543, w: 393, h: 357 },
 } as const;
 
-/** 桌子: the desk close-up. Clicking a monitor goes to 屏幕 on that side. */
-export const DESK_SHOT: Shot & Actuators = {
-  monitors: {
-    left: { l: 307, t: 272, w: 330, h: 201 },
-    right: { l: 643, t: 276, w: 322, h: 193 },
-  },
-  gap: { l: 636, t: 272, w: 8, h: 201 },
-  // Image 130–240 × 975–1152: the tower's front, bottom left, under the desk.
-  tower: { l: 102, t: 762, w: 86, h: 138 },
+/**
+ * 桌子: the tabletop from the chair (day-loop correction 2026-11-01), from content/desk.json. The
+ * monitors are their visible lower halves (clicking one goes to 屏幕 on that side); the gap is
+ * between them. The tower is under the desk, out of this frame: it is only in 房间.
+ */
+export const DESK_SHOT: Shot = {
+  monitors: deskLayout.monitors,
+  gap: deskGap(deskLayout),
 };
 
 export const rectStyle = (r: Rect): string => `left:${r.l}px;top:${r.t}px;width:${r.w}px;height:${r.h}px`;

@@ -86,6 +86,8 @@ export interface Session {
   bookOpen: boolean;
   /** Where the ending pages are (san-and-endings): 你和你 (bad only), the credits, then after. */
   endingPage: { phase: "you" | "credits" | "after"; startMs: number; skipped: boolean } | null;
+  /** The 道具 strip is open over the current view (day-loop correction 2026-11-01). */
+  itemsOpen: boolean;
   /**
    * The day-18 pull-out before the ending pages (room-scene addition 2026-11-01): from which
    * framing, since when, and where this ending cuts it. While set, the pages wait.
@@ -140,6 +142,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     closerSeq: 0,
     judging: null,
     endingPage: null,
+    itemsOpen: false,
     pullOut: null,
     collection: EMPTY_COLLECTION,
     bookOpen: false,

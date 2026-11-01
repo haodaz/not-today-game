@@ -133,9 +133,9 @@ describe("the live DOM after a render (fix 2026-10-31)", () => {
     ]);
     const { root, session } = mount(store, "desk");
     await frame();
-    await click(root, '.bar [data-action="loop-phone"]');
+    await click(root, '.desk-things [data-action="loop-phone"]');
     check(root, session, "phone held");
-    await click(root, '.bar [data-object="chick"]');
+    await click(root, '.desk-things [data-object="chick"]');
     check(root, session, "phone → chick");
     expect(root.querySelectorAll(".held-layer").length).toBe(1);
     await click(root, '[data-action="loop-put-down"]');

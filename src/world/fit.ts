@@ -4,6 +4,7 @@
 // `#app::before`). The game controller and the title mount both call `applyFit` on every render
 // and on resize. `fitStage` is pure.
 import type { View } from "./desktop/model";
+import { deskLayout } from "./room/desk";
 
 /** No more than twice the stage's own size. */
 export const FIT_MAX = 2;
@@ -26,8 +27,9 @@ export function fitStage(winW: number, winH: number, w: number, h: number): Fit 
 export const BACKDROPS: Readonly<Record<View | "title", string>> = {
   title: "/room/shots/room.jpg",
   room: "/room/shots/room.jpg",
-  desk: "/room/shots/desk_close.jpg",
-  desktop: "/room/shots/desk_close.jpg",
+  // 桌子 is the tabletop (day-loop correction 2026-11-01); content/desk.json's backdrop.
+  desk: deskLayout.backdrop,
+  desktop: deskLayout.backdrop,
   door: "/room/door_wall.png",
 };
 

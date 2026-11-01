@@ -7,7 +7,8 @@
 import type { ActionContext } from "@world/desktop/controller";
 import { BACKDROPS, fitStage, type Fit } from "@world/fit";
 import { viewMoveMs } from "@world/motion/timing";
-import { DESK_SHOT, ROOM_SHOT, type Rect } from "@world/room/shots";
+import { centre, DESK_SHOT, ROOM_SHOT, type Rect } from "@world/room/shots";
+import { deskLayout } from "@world/room/desk";
 import { framingOf, formatCalibration, nudge } from "./calibrate";
 import type { Framing } from "./calibration";
 import { splatMoveFor } from "./moves";
@@ -55,6 +56,8 @@ export interface SplatDeps {
   readonly pixelRatio?: () => number;
   /** `?splatcal=1` in dev: still poses with the photo at 50 % and the calibration keys. */
   readonly calibrate?: boolean;
+  /** Which view changes it renders (default `splatMoveFor`; tests drive the machinery with others). */
+  readonly moves?: (from: string, to: string) => CameraMove | null;
   /** Where the calibration table is printed (console in the game). */
   readonly print?: (text: string) => void;
 }
@@ -71,7 +74,7 @@ export interface SplatHooks {
 /** The gap rect at night, per framing (bed has none yet). */
 const GAP: Readonly<Record<string, Rect>> = { room: ROOM_SHOT.gap, desk: DESK_SHOT.gap };
 /** Provisional: the desk lamp's corner, top right of the desk, per framing (S8). */
-const LAMP: Readonly<Record<string, { x: number; y: number }>> = { room: { x: 960, y: 300 }, desk: { x: 1040, y: 250 } };
+const LAMP: Readonly<Record<string, { x: number; y: number }>> = { room: { x: 960, y: 300 }, desk: centre(deskLayout.lamp) };
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 function lerpRect(a: Rect | undefined, b: Rect | undefined, t: number): Rect | null {
@@ -376,7 +379,7 @@ export function createSplatLayer(deps: SplatDeps) {
         if (deps.calibrate && stage) place(stage);
         preloadCollapsed();
         if (view === prev || status !== "ready" || !stage) return;
-        const move = splatMoveFor(prev, view);
+        const move = (deps.moves ?? splatMoveFor)(prev, view);
         // Only while the motion layer holds the arriving photo back (m-nobg): that's the CSS push
         // this replaces, and its backdrop copy stays underneath as the fallback.
         if (!move || !stage.classList.contains("m-nobg")) return;

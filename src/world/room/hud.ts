@@ -14,18 +14,20 @@ import { mealView } from "@world/delivery/meals";
 import { renderDoorView } from "@world/delivery/view";
 import { cls, html, raw, type SafeHtml } from "@world/html";
 import { getLocale, t, tr, type Locale } from "@world/i18n";
-import { booted, checklist, deskMeal, loopContext, type ChecklistView } from "@world/loop/checklist";
+import { booted, checklist, deskMeal, itemStates, loopContext, type ChecklistView } from "@world/loop/checklist";
 import { itemOf } from "@state/delivery/shops";
 import { ordersOn } from "@world/delivery/meals";
 import { raidNights, takeOf } from "@state/nights";
 import { isNight } from "@world/desktop/beat";
 import { hudKuro } from "@world/desktop/kuro/mini";
 import { VIEWS, type View } from "@world/desktop/model";
-import { DESK_SHOT, rectStyle, ROOM_SHOT } from "./shots";
+import { DESK_SHOT, rectStyle, ROOM_SHOT, type Rect } from "./shots";
+import { deskLayout, objectSlot } from "./desk";
 import { bookReader, deskBook, figuresLayer } from "./collection";
 import { knows } from "@state/recognise";
 import { bpm, sanBand } from "@state/endings";
 import { emailRow, type EmailRow } from "@net/email";
+import { taskFiles } from "@state/days/tasks";
 
 /** The flag the hand sets when it takes the heartbeat (content/nights-takes.json `what: heartbeat`). */
 const HEARTBEAT_TAKEN: string | null = raidNights.map(takeOf).find((t) => t?.what === "heartbeat")?.flag ?? null;
@@ -59,14 +61,29 @@ function dayCorner(state: State, session: Session): SafeHtml {
   return html`<div class="day"><b>${tr("shell.day", { day: state.day })} · ${tr(beatLabelKey(session.clock.beat))}</b><span class="ov">${tr("hud.overdue", { n: state.overdueDays })}</span></div>${hr}`;
 }
 
-function deskBar(state: State, events: readonly GameEvent[], session: Session): SafeHtml {
+/**
+ * The things that have state (day-loop correction 2026-11-01: 桌子 is the tabletop). The same
+ * buttons are placed at their rects on the tabletop and listed in the 道具 strip: same actions,
+ * same screens. Pure.
+ */
+export interface DeskThings {
+  readonly box: SafeHtml;
+  readonly phone: SafeHtml;
+  readonly cup: SafeHtml;
+  readonly meal: SafeHtml | null;
+  /** In found (arrival) order; what was handed to the hand is not here. */
+  readonly objects: readonly { readonly id: string; readonly html: SafeHtml }[];
+  /** Day 18's slip, once its checklist line is open; the tabletop only. */
+  readonly slip: SafeHtml | null;
+}
+
+export function deskThings(state: State, events: readonly GameEvent[], session: Session): DeskThings {
   const held = heldItem(session);
   // Not yet recognised: slightly desaturated, the only tell (recognise FR2).
   const unknown = (id: string) => !knows(id, state, events) && "unknown";
   const total = Object.keys(FOUND_ON_DAY).length;
   const left = total - state.found.length;
-  // Objects on the desk, in found order; what was handed to the hand is not on the desk. An
-  // upgraded object's icon is the hi-res one: the only visible tell (object-upgrade FR2).
+  // An upgraded object's icon is the hi-res one: the only visible tell (object-upgrade FR2).
   const objects = state.found
     .filter((id) => !state.lost.includes(id))
     // A slot is a button so it can be picked up (polish FR1, design P9); while it is held, the
@@ -74,11 +91,55 @@ function deskBar(state: State, events: readonly GameEvent[], session: Session): 
     // The first 举起来 has no checklist line: a one-time pointer on the first object (rule 2026-11-01).
     .map((id, i) => {
       const first = pointerCls(session, "hold", i === 0 && held === null);
-      return state.upgraded[id] === true
-        ? html`<button type="button" class="${cls("slot", "upgraded", unknown(id), held === id && "lifted", first)}" data-object="${id}" data-res="hi" data-action="loop-hold"><img src="/objects/${id}_front.png" alt=""><div class="screen-hi" data-screen="${id}"></div></button>`
-        : html`<button type="button" class="${cls("slot", unknown(id), held === id && "lifted", first)}" data-object="${id}" data-action="loop-hold"><img src="/objects/${id}_white.png" alt=""><div class="lcd" data-screen="${id}"></div></button>`;
+      const button =
+        state.upgraded[id] === true
+          ? html`<button type="button" class="${cls("slot", "upgraded", unknown(id), held === id && "lifted", first)}" data-object="${id}" data-res="hi" data-action="loop-hold"><img src="/objects/${id}_front.png" alt=""><div class="screen-hi" data-screen="${id}"></div></button>`
+          : html`<button type="button" class="${cls("slot", unknown(id), held === id && "lifted", first)}" data-object="${id}" data-action="loop-hold"><img src="/objects/${id}_white.png" alt=""><div class="lcd" data-screen="${id}"></div></button>`;
+      return { id, html: button };
     });
-  return html`<div class="bar"><button type="button" class="slot" data-action="loop-box">${left > 0 ? html`<div class="box"></div><span>${tr("hud.box.left", { n: left })}</span>` : html`<div class="box" style="opacity:.3"></div>`}</button><button type="button" class="${cls("slot", held === "phone" && "lifted")}" data-action="loop-phone"><div class="phone"></div><span>${tr("hud.phone")}</span></button><div class="slot"><div class="cup"></div></div>${mealSlot(state, events)}${objects}</div>`;
+  return {
+    box: html`<button type="button" class="slot" data-action="loop-box">${left > 0 ? html`<div class="box"></div><span>${tr("hud.box.left", { n: left })}</span>` : html`<div class="box" style="opacity:.3"></div>`}</button>`,
+    phone: html`<button type="button" class="${cls("slot", held === "phone" && "lifted")}" data-action="loop-phone"><div class="phone"></div><span>${tr("hud.phone")}</span></button>`,
+    cup: html`<div class="slot"><div class="cup"></div></div>`,
+    meal: mealSlot(state, events),
+    objects,
+    slip: slipThing(state, events),
+  };
+}
+
+/** Day 18's checklist line for the slip (content/days/day-18.json `slip`): reading it is its work task. */
+export const SLIP_ITEM = "slip";
+
+/** The slip by the lamp on the last day, once its line is open (it stays after it is read). */
+function slipThing(state: State, events: readonly GameEvent[]): SafeHtml | null {
+  if (state.day !== (constants.lastDay as number)) return null;
+  const lc = loopContext(state, events);
+  const item = lc?.file.items.find((it) => it.id === SLIP_ITEM);
+  if (!lc || !item || !itemStates(lc).get(item.id)!.unlocked) return null;
+  // Its label is the task's own title (content), never a string of ours.
+  const title = taskFiles.get(state.day)?.find((task) => item.done.kind === "flag" && task.done === item.done.flag)?.title ?? item.text;
+  return html`<button type="button" class="slot slip" data-action="desk-slip" aria-label="${title}"><div class="paper"></div></button>`;
+}
+
+/** 桌子's object layer: each thing at its rect on desk_top.jpg (content/desk.json). */
+function tabletop(things: DeskThings): SafeHtml {
+  const at = (name: string, r: Rect | null, inner: SafeHtml | null) =>
+    r && inner ? html`<div class="at" data-at="${name}" style="${rectStyle(r)}">${inner}</div>` : null;
+  const objects = things.objects.map((o, i) => at(`object:${o.id}`, objectSlot(deskLayout, i), o.html));
+  return html`<div class="desk-things">${at("cup", deskLayout.cup, things.cup)}${at("phone", deskLayout.phone, things.phone)}${at("box", deskLayout.box, things.box)}${at("meal", deskLayout.meal, things.meal)}${objects}${at("slip", deskLayout.slip, things.slip)}</div>`;
+}
+
+/** 道具 (day-loop correction 2026-11-01): the button next to ⚙; it opens and closes the strip. */
+export function itemsButton(session: Pick<Session, "itemsOpen">): SafeHtml {
+  const open = session.itemsOpen;
+  return html`<button type="button" class="${cls("items-btn", open && "on")}" data-action="items-toggle" aria-expanded="${open ? "true" : "false"}" aria-controls="items-panel">${tr(open ? "hud.itemsClose" : "hud.items")}</button>`;
+}
+
+/** The object strip as a panel over the current view: the same buttons as on the tabletop. */
+export function itemsPanel(state: State, events: readonly GameEvent[], session: Session): SafeHtml | null {
+  if (!session.itemsOpen) return null;
+  const th = deskThings(state, events, session);
+  return html`<div class="items-panel" id="items-panel" role="dialog" aria-label="${t("hud.items")}"><div class="items-strip">${th.box}${th.phone}${th.cup}${th.meal}${th.objects.map((o) => o.html)}</div></div>`;
 }
 
 /**
@@ -201,16 +262,16 @@ function shotHits(view: "room" | "desk", state: State, events: readonly GameEven
   // is its body at the HUD's bottom right.
   // The tower's power button boots the computer (day-loop correction 2026-11-01: the checklist
   // only watches). While it is off a faint light shows on it; once on it is only the picture.
-  const shot = view === "room" ? ROOM_SHOT : DESK_SHOT;
-  const tower = booted(state, events)
-    ? null
-    : html`<button type="button" class="shot-hit tower-hit" data-action="tower-power" style="${rectStyle(shot.tower)}" aria-label="${t("room.tower.off")}"><i class="tower-led"></i></button>`;
   if (view === "room") {
+    const tower = booted(state, events)
+      ? null
+      : html`<button type="button" class="shot-hit tower-hit" data-action="tower-power" style="${rectStyle(ROOM_SHOT.tower)}" aria-label="${t("room.tower.off")}"><i class="tower-led"></i></button>`;
     return html`<button type="button" class="shot-hit" data-action="view" data-view="desk" style="${rectStyle(ROOM_SHOT.desk)}" aria-label="${t("hud.cam.desk")}"></button>${tower}<button type="button" class="shot-hit bed-hit" data-action="bed" style="${rectStyle(ROOM_SHOT.bed)}" aria-label="${t("room.bed")}"></button>`;
   }
+  // 桌子: each monitor's visible lower half goes to 屏幕 on that side; the tower is out of frame.
   const mon = (side: "left" | "right") =>
     html`<button type="button" class="shot-hit monitor-hit" data-action="view" data-view="desktop" data-screen="${side}" style="${rectStyle(DESK_SHOT.monitors[side])}" aria-label="${t("hud.cam.screen")} · ${t(`desktop.screen.${side}`)}"></button>`;
-  return html`${mon("left")}${mon("right")}${tower}`;
+  return html`${mon("left")}${mon("right")}`;
 }
 
 /** Kuro's body (the call button) and the camera chips, one row at the bottom right. */
@@ -235,9 +296,9 @@ export function renderRoom(model: RoomModel): SafeHtml {
   // room scene will draw the gap itself).
   const raid = !door && raidShowing(state, session);
   const gap = (view === "room" ? ROOM_SHOT : DESK_SHOT).gap;
-  // Things are picked up at 桌子 only: the desk bar is its object layer.
-  const bar = view === "desk" ? deskBar(state, events, session) : null;
-  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid")}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}">${scene}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${bar}${held}${dialogueBox(state, events, session, model.nowMs ?? 0)}${bottomRight(model)}${settingsButton()}${settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
+  // 桌子 is the tabletop: everything with state is a placed cutout at its rect (content/desk.json).
+  const top = view === "desk" ? tabletop(deskThings(state, events, session)) : null;
+  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid")}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}">${scene}${top}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${itemsPanel(state, events, session)}${held}${dialogueBox(state, events, session, model.nowMs ?? 0)}${bottomRight(model)}${settingsButton()}${itemsButton(session)}${settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
 }
 
 export { raidShowing };

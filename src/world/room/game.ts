@@ -35,7 +35,7 @@ import { askedOn, knows } from "@state/recognise";
 import { gateAdvance } from "@world/motion/reveal";
 import { endingNext } from "@world/endings/flow";
 import { renderEnding } from "@world/endings/view";
-import { boxObjectFor, doorMeal, raidShowing, renderRoom, settingsButton, settingsPanel } from "./hud";
+import { boxObjectFor, doorMeal, itemsButton, itemsPanel, raidShowing, renderRoom, settingsButton, settingsPanel, SLIP_ITEM } from "./hud";
 import { pointed } from "./pointer";
 import { itemPageId, readingPageId, type KuroCloses } from "@state/closes";
 import { browserPage } from "@world/desktop/browser/data";
@@ -53,7 +53,7 @@ export function renderGame(store: Store, session: Session, nowMs: number): SafeH
     const shell = buildShell(state, events, session, desktopApps, nowMs, store.getStartDay());
     // Work-task narration and the conversation with Kuro play in the dialogue box over the desktop too.
     const dlg = dialogueBox(state, events, session, nowMs);
-    return html`${renderDesktop(shell)}<button type="button" class="back-room" data-action="view" data-view="room">${tr("desktop.back")}</button>${dlg ? html`<div class="dlg-layer">${dlg}</div>` : null}<div class="hud-host">${settingsButton()}<div class="hud-br">${hudKuro({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs })}</div>${settingsPanel(session)}</div>`;
+    return html`${renderDesktop(shell)}<button type="button" class="back-room" data-action="view" data-view="room">${tr("desktop.back")}</button>${dlg ? html`<div class="dlg-layer">${dlg}</div>` : null}<div class="hud-host">${settingsButton()}${itemsButton(session)}${itemsPanel(state, events, session)}<div class="hud-br">${hudKuro({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs })}</div>${settingsPanel(session)}</div>`;
   }
   return renderRoom({ state, events, session, startDay: store.getStartDay(), nowMs });
 }
@@ -61,6 +61,16 @@ export function renderGame(store: Store, session: Session, nowMs: number): SafeH
 /** The app on the monitor being shown. */
 export function shownApp(session: Session): AppId {
   return session.focus === "left" ? session.leftApp : rightApp(session.leftApp);
+}
+
+/**
+ * Something lifted from the 道具 strip: the strip closes. Where a held thing cannot show (屏幕, 门),
+ * the camera goes to 桌子 first (the held layer is the room's).
+ */
+function fromItemsPanel(ctx: ActionContext): void {
+  if (!ctx.session.itemsOpen) return;
+  ctx.session.itemsOpen = false;
+  if (ctx.session.view === "desktop" || ctx.session.view === "door") loopActions["view"]!(ctx, { view: "desk" } as DOMStringMap, null as never);
 }
 
 /** The item this world event would do now, if any (the checklist only watches). */
@@ -112,6 +122,7 @@ export const loopActions: Record<string, ActionHandler> = {
     if (ctx.session.view === "door" && view !== "door" && ctx.session.door?.state === "onDesk") ctx.session.door = null;
     ctx.session.view = view;
     ctx.session.phoneOpen = false;
+    ctx.session.itemsOpen = false;
     ctx.session.holding = null;
     lookedAway(ctx);
     // The desktop opens on the monitor with the current app; looking at it counts.
@@ -284,8 +295,28 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.rerender();
   },
 
+  // 道具 (day-loop correction 2026-11-01): the strip as a panel over the current view.
+  "items-toggle"(ctx) {
+    ctx.session.itemsOpen = !ctx.session.itemsOpen;
+    ctx.rerender();
+  },
+
+  // Day 18's slip by the lamp: reading it is its work task, on 屏幕's 工作台.
+  "desk-slip"(ctx) {
+    const state = ctx.store.getState();
+    const lc = loopContext(state, ctx.store.getEvents());
+    const item = lc?.file.items.find((it) => it.id === SLIP_ITEM);
+    if (!lc || !item) return;
+    const st = itemStates(lc).get(item.id)!;
+    if (!st.unlocked || st.done) return;
+    ctx.session.leftApp = "workbench";
+    ctx.session.focus = "left";
+    loopActions["view"]!(ctx, { view: "desktop" } as DOMStringMap, null as never);
+  },
+
   "loop-phone"(ctx) {
     const { session, store } = ctx;
+    fromItemsPanel(ctx);
     session.phoneOpen = !session.phoneOpen;
     session.holding = null;
     // Picking up the phone for a meal moves the beat clock into that meal's window.
@@ -302,6 +333,7 @@ export const loopActions: Record<string, ActionHandler> = {
     const id = data.object ?? "";
     const onDesk = (state.found as string[]).includes(id) && !state.lost.includes(id);
     if (!onDesk) return;
+    fromItemsPanel(ctx);
     session.holding = session.holding === id ? null : id;
     session.phoneOpen = false;
     // The first 举起来 done: its one-time pointer never shows again this run.
@@ -473,6 +505,11 @@ export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
   }
   if (e.key === "Escape" && talking(ctx.session.dialogue)) {
     loopActions["kuro-leave"]!(ctx, {} as DOMStringMap, null as never);
+    return true;
+  }
+  // The 道具 strip (day-loop correction 2026-11-01): Esc closes it, like its button.
+  if (e.key === "Escape" && ctx.session.itemsOpen) {
+    loopActions["items-toggle"]!(ctx, {} as DOMStringMap, null as never);
     return true;
   }
   // The history is open: nothing under it reads on.
