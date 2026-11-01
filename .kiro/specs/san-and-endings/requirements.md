@@ -18,3 +18,9 @@ SAN is the only failure meter and it is never shown. Endings are three exits fro
 ## FR4. Tests
 - Property: SAN never leaves 0..100; bad ending fires exactly once per run; good ending requires all five conditions.
 - Snapshot: a fixture log rolled as credits; the 你和你 conversation from a fixture run.
+
+## Addition 2026-11-02 (author): the good ending ends in the dialogue box
+The good ending's credits roll as today, but their last line is empty (`credits.last.good` is ""; render no `.last` item when the string is empty). After the last log line has rolled (plus 1.2 s), the dialogue box (dialogue FR1, the same box as the days) opens over the black credits page with two lines, advanced by click/space like any sequence, each with its portrait so it is clear who speaks:
+1. the player, inner voice, with the player's portrait: `ending.good.you` ("No one likes me." in both locales);
+2. Kuro, with Kuro's avatar (`k3d_base.png`, not the red-eyed one: this is the good ending) and the KURO name tag: `ending.good.kuro` ("No one like you." in both locales).
+The English stays English in the Chinese locale (Kuro's habit; the pun is the point). After the second line the box closes and the page goes to `ending-next` as today. The survive and bad endings keep their credit last lines. Snapshot the good credits page after the roll with the box open on line 1 and on line 2; property: the box never opens on survive or bad.

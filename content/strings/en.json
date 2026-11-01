@@ -169,7 +169,7 @@
   "credits.dim.bond": "with it",
   "credits.last.bad": "You replied \"Fine.\" It replied for you.",
   "credits.last.survive": "There is no second you in this world. If I must give in, not today.",
-  "credits.last.good": "You said: No one likes me.   It said: No one like you.",
+  "credits.last.good": "",
   "title.new": "New game",
   "title.continue": "Continue · Day {n}",
   "title.settings": "Settings",
@@ -232,5 +232,7 @@
   "hud.items": "Items",
   "hud.itemsClose": "Close",
   "credits.song": "Theme song “Not Today” · words by 好大壮 (English words Claude) · music Suno",
-  "room.walkman": "Walkman"
+  "room.walkman": "Walkman",
+  "ending.good.you": "No one likes me.",
+  "ending.good.kuro": "No one like you."
 }

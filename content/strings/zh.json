@@ -169,7 +169,7 @@
   "credits.dim.bond": "和它",
   "credits.last.bad": "你回了「好」。它替你回的。",
   "credits.last.survive": "世上没有第二个你。纵要认输，不是今日。",
-  "credits.last.good": "你说：No one likes me.　它说：No one like you.",
+  "credits.last.good": "",
   "title.new": "新游戏",
   "title.continue": "继续 · 第 {n} 天",
   "title.settings": "设置",
@@ -232,5 +232,7 @@
   "hud.items": "道具",
   "hud.itemsClose": "收起",
   "credits.song": "主题曲《今天不可以》 · 词 好大壮 · 曲 Suno",
-  "room.walkman": "随身听"
+  "room.walkman": "随身听",
+  "ending.good.you": "No one likes me.",
+  "ending.good.kuro": "No one like you."
 }
