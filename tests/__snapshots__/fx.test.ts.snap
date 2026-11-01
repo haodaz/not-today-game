@@ -1,5 +1,201 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`the collapse is in the photos > snapshot: the desktop on days 13 and 17 keeps only the pores on the left monitor and the dimmed text 1`] = `
+{
+  "day 13": "<div class="stage one-monitor" data-day="13" data-beat="work" data-focus="left" data-fx="pores" style="--fx-pores:0.5">",
+  "day 17": "<div class="stage one-monitor" data-day="17" data-beat="work" data-focus="left" data-fx="pores dim" style="--fx-pores:0.3">",
+}
+`;
+
+exports[`the collapse is in the photos > snapshot: the markup of the stack on day 16 (glitch over other, with its flicker keyframes) 1`] = `"<div class="fx" data-view="room" aria-hidden="true"><div class="fx-photo" data-stage="other" style="--fx:1;background-image:url(/room/fx/room_other.jpg)"></div><div class="fx-photo" data-stage="glitch" style="--fx:0.7;background-image:url(/room/fx/room_glitch.jpg);--flicker:fx-flicker-16 45.398s steps(1,end) infinite"></div><style>@keyframes fx-flicker-16{0%{opacity:0.7}3.818%{opacity:0.63}6.37%{opacity:0.55}9.519%{opacity:0.56}12.871%{opacity:0.65}16.715%{opacity:0.89}20.362%{opacity:0.46}23.709%{opacity:0.88}24.448%{opacity:0.86}27.761%{opacity:0.54}31.435%{opacity:0.82}32.687%{opacity:0.83}34.002%{opacity:0.54}35.652%{opacity:0.69}39.723%{opacity:0.6}41.527%{opacity:0.79}44.078%{opacity:0.84}48.188%{opacity:0.46}49.097%{opacity:0.83}50.8%{opacity:0.89}52.263%{opacity:0.89}53.325%{opacity:0.62}55.665%{opacity:0.61}59.54%{opacity:0.46}61.487%{opacity:0.78}62.543%{opacity:0.66}66.049%{opacity:0.69}67.814%{opacity:0.58}71.344%{opacity:0.7}72.075%{opacity:0.67}74.973%{opacity:0.67}78.255%{opacity:0.59}82.547%{opacity:0.86}84.666%{opacity:0.56}86.267%{opacity:0.76}88.836%{opacity:0.66}89.768%{opacity:0.88}91.567%{opacity:0.63}92.276%{opacity:0.61}95.685%{opacity:0.74}100%{opacity:0.7}}</style></div>"`;
+
+exports[`the collapse is in the photos > snapshot: the markup of the stack on day 16 (glitch over other, with its flicker keyframes) 2`] = `"<div class="fx" data-view="desk" aria-hidden="true"><div class="fx-photo" data-stage="other" style="--fx:0.8;background-image:url(/room/fx/desk_other.jpg)"></div></div>"`;
+
+exports[`the collapse is in the photos > snapshots: 房间, 桌子 and 门 on days 10, 11, 12, 13, 15, 16, 17, 18 (which photos, which opacities) 1`] = `
+{
+  "desk day 10": [],
+  "desk day 11": [
+    [
+      "wall",
+      0.6,
+      "/room/fx/desk_wall.jpg",
+    ],
+  ],
+  "desk day 12": [
+    [
+      "wall",
+      1,
+      "/room/fx/desk_wall.jpg",
+    ],
+  ],
+  "desk day 13": [
+    [
+      "other",
+      0.5,
+      "/room/fx/desk_other.jpg",
+    ],
+  ],
+  "desk day 15": [
+    [
+      "other",
+      1,
+      "/room/fx/desk_other.jpg",
+    ],
+  ],
+  "desk day 16": [
+    [
+      "other",
+      1,
+      "/room/fx/desk_other.jpg",
+    ],
+    [
+      "glitch",
+      0.7,
+      "/room/fx/desk_glitch.jpg",
+    ],
+  ],
+  "desk day 17": [
+    [
+      "other",
+      0.4,
+      "/room/fx/desk_other.jpg",
+    ],
+    [
+      "white",
+      0.85,
+      "/room/fx/desk_white.jpg",
+    ],
+  ],
+  "desk day 18": [
+    [
+      "white",
+      1,
+      "/room/fx/desk_white.jpg",
+    ],
+  ],
+  "door day 10": [],
+  "door day 11": [
+    [
+      "wall",
+      0.6,
+      "/room/fx/door_wall.jpg",
+    ],
+  ],
+  "door day 12": [
+    [
+      "wall",
+      1,
+      "/room/fx/door_wall.jpg",
+    ],
+  ],
+  "door day 13": [
+    [
+      "other",
+      0.5,
+      "/room/fx/door_other.jpg",
+    ],
+  ],
+  "door day 15": [
+    [
+      "other",
+      1,
+      "/room/fx/door_other.jpg",
+    ],
+  ],
+  "door day 16": [
+    [
+      "other",
+      1,
+      "/room/fx/door_other.jpg",
+    ],
+    [
+      "glitch",
+      0.7,
+      "/room/fx/door_glitch.jpg",
+    ],
+  ],
+  "door day 17": [
+    [
+      "other",
+      0.4,
+      "/room/fx/door_other.jpg",
+    ],
+    [
+      "white",
+      0.85,
+      "/room/fx/door_white.jpg",
+    ],
+  ],
+  "door day 18": [
+    [
+      "white",
+      1,
+      "/room/fx/door_white.jpg",
+    ],
+  ],
+  "room day 10": [],
+  "room day 11": [
+    [
+      "wall",
+      0.6,
+      "/room/fx/room_wall.jpg",
+    ],
+  ],
+  "room day 12": [
+    [
+      "wall",
+      1,
+      "/room/fx/room_wall.jpg",
+    ],
+  ],
+  "room day 13": [
+    [
+      "other",
+      0.5,
+      "/room/fx/room_other.jpg",
+    ],
+  ],
+  "room day 15": [
+    [
+      "other",
+      1,
+      "/room/fx/room_other.jpg",
+    ],
+  ],
+  "room day 16": [
+    [
+      "other",
+      1,
+      "/room/fx/room_other.jpg",
+    ],
+    [
+      "glitch",
+      0.7,
+      "/room/fx/room_glitch.jpg",
+    ],
+  ],
+  "room day 17": [
+    [
+      "other",
+      0.4,
+      "/room/fx/room_other.jpg",
+    ],
+    [
+      "white",
+      0.85,
+      "/room/fx/room_white.jpg",
+    ],
+  ],
+  "room day 18": [
+    [
+      "white",
+      1,
+      "/room/fx/room_white.jpg",
+    ],
+  ],
+}
+`;
+
 exports[`the collapse on the stills > snapshot: the desktop on day 13 (and 17, with its dimmed text) 1`] = `
 {
   "day 13": {

@@ -317,7 +317,7 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const gap = (view === "room" ? ROOM_SHOT : DESK_SHOT).gap;
   // 桌子 is the tabletop: everything with state is a placed cutout at its rect (content/desk.json).
   const top = view === "desk" ? tabletop(deskThings(state, events, session)) : null;
-  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid")}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}">${scene}${top}${renderFx(fxPlan(state.day, session.clock.beat, view))}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${itemsPanel(state, events, session)}${held}${dialogueBox(state, events, session, model.nowMs ?? 0)}${bottomRight(model)}${settingsButton()}${itemsButton(session)}${settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
+  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid")}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}">${renderFx(fxPlan(state.day, view))}${scene}${top}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${itemsPanel(state, events, session)}${held}${dialogueBox(state, events, session, model.nowMs ?? 0)}${bottomRight(model)}${settingsButton()}${itemsButton(session)}${settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
 }
 
 export { raidShowing };

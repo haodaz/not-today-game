@@ -274,6 +274,6 @@ export function buildShell(
     monitors: [left.monitor, right.monitor],
     dock: { active: session.leftApp, badges, decoys: dockFor(state.day), decoyOpen: session.decoyWindow },
     focus: session.focus,
-    fx: fxPlan(state.day, session.clock.beat, "desktop"),
+    fx: fxPlan(state.day, "desktop"),
   };
 }

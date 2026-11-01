@@ -1,107 +1,137 @@
-// The collapse on the stills (room-scene addition 2026-11-02). A `.fx` layer over the backdrop and
-// under the HUD in 房间 / 桌子 / 门, and over the desktop's monitor frame. Each child is one effect,
-// on or off by ring (stages.json), its strength a CSS variable `--fx` in [0, 1] set from the day
-// within the ring. `fxPlan` is pure and is what the tests read; `renderFx` only turns it to markup.
-// Nothing here is story: it is DOM and CSS over the existing photos.
-import { cycleOf, isCalmDaytime, isTenderDay } from "@state/stages";
-import type { Beat } from "@world/desktop/beat";
+// The collapse is in the photos, not on the lens (room-scene correction 2026-11-02). A still's
+// backdrop is a stack: the clean photo at the bottom (the stage's own background), then edited
+// photos of the same framing (public/room/fx/{room,desk,door}_{wall,other,glitch,white}.jpg), each
+// at an opacity from the day. Nothing is an overlay on the camera. Transitions are at the day
+// boundary only; inside day 16 the glitch photo flickers, seeded by the day. `fxPlan` is pure and
+// is what the tests read; `renderFx` turns it to markup. Nothing here is story.
+import { cycleOf, isCalmDaytime } from "@state/stages";
 import { RINGS } from "@world/desktop/rings";
-import { cls, html, type SafeHtml } from "@world/html";
-import { deskLayout } from "./desk";
-import { rectStyle, type Rect } from "./shots";
+import { cls, html, raw, type SafeHtml } from "@world/html";
 
 export type FxView = "room" | "desk" | "door" | "desktop";
-export type FxId = "veins" | "lamp" | "grade" | "pores" | "vignette" | "dark";
-export type Grade = "cool" | "warm" | "white";
+/** The stages in the order the world goes through them; the stack never goes back. */
+export const STAGES = ["wall", "other", "glitch", "white"] as const;
+export type FxStage = (typeof STAGES)[number];
 
-export interface FxChild {
-  readonly id: FxId;
-  /** The effect's strength, 0..1 (CSS `--fx`). */
-  readonly level: number;
-  /** `grade` only: which filter. */
-  readonly grade?: Grade;
-  /** `lamp` only: where the light sits, in stage px. */
-  readonly rect?: Rect;
+export interface FxLayer {
+  readonly stage: FxStage;
+  /** 0..1 (CSS `--fx`). */
+  readonly opacity: number;
+  /** The glitch photo flickers around its opacity (never with reduced motion). */
+  readonly flicker: boolean;
 }
 
 export interface FxPlan {
-  readonly ring: string;
+  readonly day: number;
   readonly view: FxView;
-  readonly children: readonly FxChild[];
-  /** Desktop only: the left monitor's `.os` takes the pore tile (level), and the text dims at day 17 on. */
+  /** Bottom to top, over the clean photo. Empty for the desktop (it has no photo). */
+  readonly layers: readonly FxLayer[];
+  /** The desktop's left monitor takes the pore tile on its `.os` from ring room; the level, or null. */
   readonly pores: number | null;
+  /** Days 17 and 18: the desktop's text is at 60 %. */
   readonly dimText: boolean;
 }
 
-/** The first ring the stills collapse in. */
-export const FIRST_RING = "wall";
-/** The strength by day within the ring: first, second, third. */
-export const BY_DAY_IN_RING: readonly number[] = [0.5, 0.75, 1];
-/** Veins stay at this from `room` on; pores and veins fade to FADED on days 17 and 18 (白). */
-export const VEINS_AFTER_WALL = 0.5;
-export const FADED = 0.3;
-/** The white vignette's edge opacity on day 17 and day 18. */
-export const VIGNETTE_BY_DAY: Readonly<Record<number, number>> = { 17: 0.45, 18: 0.6 };
-/** The 门 view is darkened this much on day 16. */
-export const DOOR_DARKEN = 0.25;
-/** The glow is drawn this far outside the lamp's own rect. */
-export const GLOW_PAD = 60;
-/**
- * The lamp in 房间, measured on public/room/shots/room.jpg (2048×1152; image 1090–1290 × 420–600,
- * the shade, the bulb and the glow around them) × 0.78125 into stage px.
- */
-export const ROOM_LAMP: Rect = { l: 852, t: 328, w: 156, h: 141 };
+/** The stack by day (spec): `[stage, opacity]` bottom to top. Days not listed are clean. */
+export const STACK_BY_DAY: Readonly<Record<number, readonly (readonly [FxStage, number])[]>> = {
+  11: [["wall", 0.6]],
+  12: [["wall", 1]],
+  13: [["other", 0.5]],
+  14: [["other", 0.8]],
+  15: [["other", 1]],
+  16: [["other", 1], ["glitch", 0.7]],
+  17: [["other", 0.4], ["white", 0.85]],
+  18: [["white", 1]],
+};
+export const LAST_STACK_DAY = 18;
 
-const day17On = (day: number) => day in VIGNETTE_BY_DAY;
-const inflate = (r: Rect, by: number): Rect => ({ l: Math.max(0, r.l - by), t: Math.max(0, r.t - by), w: r.w + 2 * by, h: r.h + 2 * by });
+/** The pores on the left monitor: first, second, third day of a ring; 0.3 on the white days. */
+export const PORES_BY_DAY_IN_RING: readonly number[] = [0.5, 0.75, 1];
+export const PORES_WHITE = 0.3;
+const FIRST_PORES_RING = "room";
+const WHITE_DAYS = [17, 18];
 
-/** Where in its ring a day is: 0, 1 or 2. */
-export function dayInRing(day: number): number {
+/** The glitch flicker: opacity ± this around the layer's own, at intervals in this range (ms). */
+export const FLICKER_SWING = 0.3;
+export const FLICKER_MS: readonly [number, number] = [300, 2000];
+export const FLICKER_STEPS = 40;
+
+/** The day a still shows, clamped so the good ending's day 19 keeps day 18's photos. */
+const stackDay = (day: number): number => Math.min(day, LAST_STACK_DAY);
+
+function dayInRing(day: number): number {
   const days = [...cycleOf(day).days].sort((a, b) => a - b);
   return Math.max(0, days.indexOf(day));
 }
 
-/** Nothing before ring wall, and nothing on a calm day (day 10 is the first day of wall, and calm). */
-export function fxPlan(day: number, beat: Beat, view: FxView): FxPlan | null {
+/** Clean before day 11 and on day 10; the desktop has no stack, only the monitor's pores and dimmed text. */
+export function fxPlan(day: number, view: FxView): FxPlan | null {
+  if (isCalmDaytime(day)) return null;
+  const stack = STACK_BY_DAY[stackDay(day)];
   const ring = cycleOf(day).ring;
-  if (RINGS.indexOf(ring) < RINGS.indexOf(FIRST_RING) || isCalmDaytime(day)) return null;
-  const night = beat === "night";
-  const strength = BY_DAY_IN_RING[Math.min(dayInRing(day), BY_DAY_IN_RING.length - 1)]!;
-  const wall = ring === FIRST_RING;
-  const children: FxChild[] = [];
+  const poresOn = RINGS.indexOf(ring) >= RINGS.indexOf(FIRST_PORES_RING);
+  if (!stack && !poresOn) return null;
+  const white = WHITE_DAYS.includes(stackDay(day));
+  const pores = view !== "desktop" || !poresOn ? null : white ? PORES_WHITE : PORES_BY_DAY_IN_RING[Math.min(dayInRing(day), PORES_BY_DAY_IN_RING.length - 1)]!;
+  const layers = view === "desktop" ? [] : (stack ?? []).map(([stage, opacity]): FxLayer => ({ stage, opacity, flicker: stage === "glitch" }));
+  const dimText = view === "desktop" && white;
+  return layers.length === 0 && pores === null && !dimText ? null : { day, view, layers, pores, dimText };
+}
 
-  // Veins on the wall: in 房间 and over the upper third of 桌子. They stay from `wall`, at 0.5.
-  if (view === "room" || view === "desk") {
-    children.push({ id: "veins", level: wall ? strength : day17On(day) ? FADED : VEINS_AFTER_WALL });
-  }
-  // The lamp's light goes pink in `wall` only.
-  if (wall && (view === "room" || view === "desk")) {
-    children.push({ id: "lamp", level: strength, rect: inflate(view === "room" ? ROOM_LAMP : deskLayout.lamp, GLOW_PAD) });
-  }
-  // The grade belongs to the day: the night's dark does that work there.
-  if (!wall && !night) {
-    const grade: Grade = day17On(day) ? "white" : isTenderDay(day) ? "warm" : "cool";
-    children.push({ id: "grade", level: 1, grade });
-  }
-  // The pores: a full-screen tile on the stills; on the desktop the left monitor's own background.
-  const poresLevel = !wall ? (day17On(day) ? FADED : strength) : null;
-  if (poresLevel !== null && view !== "desktop") children.push({ id: "pores", level: poresLevel });
-  if (view === "door" && day === 16) children.push({ id: "dark", level: DOOR_DARKEN });
-  if (day17On(day)) children.push({ id: "vignette", level: VIGNETTE_BY_DAY[day]! });
+/** A small seeded generator (mulberry32). */
+function rngOf(seed: number): () => number {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
 
-  return { ring, view, children, pores: view === "desktop" ? poresLevel : null, dimText: view === "desktop" && day17On(day) };
+export interface Flicker {
+  readonly durationMs: number;
+  /** Keyframes: `at` in [0, 1) from the loop's start, the opacity held until the next. */
+  readonly steps: readonly { readonly at: number; readonly opacity: number }[];
+}
+
+/**
+ * The glitch photo's flicker for a day: opacity `base` ± 0.3 at irregular intervals of 0.3–2 s.
+ * Seeded by the day, so the same day always flickers the same way.
+ */
+export function glitchFlicker(day: number, base = 0.7): Flicker {
+  const rng = rngOf(day * 7919 + 17);
+  const [lo, hi] = FLICKER_MS;
+  const gaps = Array.from({ length: FLICKER_STEPS }, () => lo + rng() * (hi - lo));
+  const durationMs = gaps.reduce((a, b) => a + b, 0);
+  let t = 0;
+  const steps = gaps.map((gap, i) => {
+    const step = { at: t / durationMs, opacity: i === 0 ? base : Math.round(Math.min(1, Math.max(0, base + (rng() * 2 - 1) * FLICKER_SWING)) * 100) / 100 };
+    t += gap;
+    return step;
+  });
+  return { durationMs, steps };
 }
 
 const num = (n: number): string => String(Math.round(n * 1000) / 1000);
+const pct = (f: number): string => `${Math.round(f * 100000) / 1000}%`;
 
-/** The `.fx` layer, or null when the plan has nothing for the view. */
+/** The `@keyframes` for a day's flicker (the loop returns to its first value). */
+export function flickerCss(day: number, base = 0.7): string {
+  const { steps } = glitchFlicker(day, base);
+  return `@keyframes fx-flicker-${day}{${steps.map((s) => `${pct(s.at)}{opacity:${s.opacity}}`).join("")}100%{opacity:${steps[0]!.opacity}}}`;
+}
+
+/** The photo stack (`.fx`), or null when the still is clean. It is the first child of the stage: under everything. */
 export function renderFx(plan: FxPlan | null): SafeHtml | null {
-  if (!plan || plan.children.length === 0) return null;
-  const kids = plan.children.map((c) => {
-    const pos = c.rect ? `;${rectStyle(c.rect)}` : "";
-    return html`<div class="${cls(`fx-${c.id}`)}"${c.grade ? html` data-grade="${c.grade}"` : null} style="--fx:${num(c.level)}${pos}"></div>`;
+  if (!plan || plan.layers.length === 0) return null;
+  const photos = plan.layers.map((l) => {
+    const flicker = l.flicker ? `;--flicker:fx-flicker-${plan.day} ${num(glitchFlicker(plan.day, l.opacity).durationMs / 1000)}s steps(1,end) infinite` : "";
+    return html`<div class="${cls("fx-photo")}" data-stage="${l.stage}" style="--fx:${num(l.opacity)};background-image:url(/room/fx/${plan.view}_${l.stage}.jpg)${flicker}"></div>`;
   });
-  return html`<div class="fx" data-ring="${plan.ring}" aria-hidden="true">${kids}</div>`;
+  const css = plan.layers.find((l) => l.flicker);
+  return html`<div class="fx" data-view="${plan.view}" aria-hidden="true">${photos}${css ? html`<style>${raw(flickerCss(plan.day, css.opacity))}</style>` : null}</div>`;
 }
 
 /** Attributes for the desktop's stage: the pore tile and the dimmed text are CSS on the monitor itself. */

@@ -89,3 +89,18 @@ Rule, replacing the `.fx` overlay children `veins`, `lamp`, `pores` (full-screen
 - The 门 view shows the same stack. The splat move layer is unchanged (it has its own collapsed splat).
 - Tests: replace the `.fx` child snapshots with the stack: 房间 / 桌子 / 门 on days 10, 11, 12, 13, 15, 16, 17, 18 (which photos, which opacities); property: clean before day 11 and on day 10, opacities in [0, 1], the stage order is monotone (wall → other → glitch → white, never back); the glitch flicker is seeded and deterministic.
 - `public/room/fx/veins.png` is gone; `pores.jpg` stays for the monitor.
+
+## Addition 2026-11-02 (author): the collapse breathes — a shader, not a crossfade
+Two photos crossfading reads as slides ("ppt 2 页切来切去"). The stack from the correction above stays as the **data** (`fxPlan` → stage photos and amounts), but it is **rendered by a fullscreen fragment shader** (WebGL2, one quad, the clean photo and up to two stage photos as textures, a 512² seeded noise texture Claude supplies at `public/room/fx/noise.png` (fbm, tileable); three.js is already in the project for the splat). The shader runs under the HUD in 房间 / 桌子 / 门 whenever the stack has any stage; otherwise the plain photo is drawn as today. 30 fps cap, paused when the tab is hidden.
+
+Per stage the shader mixes with these behaviours (amounts come from `fxPlan`, time from a clock that starts at the view change; all constants in one `FX` table in `src/world/room/fx/shader.ts` so they can be tuned):
+- **Dissolve, not opacity.** A stage photo appears where `noise(uv * scale + drift) < amount`, with a soft edge (smoothstep width 0.08), so it grows in patches from the edges and corners (bias the noise with distance from the centre, so the middle of the room is the last to turn). `wall` scale 3, `other` scale 2 with a second octave, `white` scale 1.5 and the patches grow from the top.
+- **Breathing.** The whole image is warped by a slow radial pulse: `uv += (uv - 0.5) * a * sin(t * 2π / T)`, `wall` a 0.003 T 7 s, `other` a 0.008 T 5 s, `glitch` 0, `white` a 0.004 T 9 s. Subtle; the test is that it is felt, not seen.
+- **Grain and static (滋滋).** Per-frame film grain, `wall` 0.02, `other` 0.05, `white` 0.04; plus static bursts: at seeded irregular moments (every 4–15 s on `other`, 1–4 s on `glitch`) a 0.15–0.5 s burst of horizontal tearing (rows offset by up to 12 px) and stronger grain (0.15).
+- **Glitch (day 16 only).** Block displacement: the image is cut into a 24×14 grid, and in each burst 5–12 random blocks jump by up to 40 px and swap channels; constant RGB split of 2 px that widens to 8 px in bursts; scanline flicker (every 3rd row darkens 10 %).
+- **Particles** (a second, additive pass or a 2D canvas above the quad, Kiro picks and says): `other` 60 dust motes drifting slowly left and down, warm grey, 1–3 px, 0.3 alpha; `white` 40 white flakes rising, 2–4 px, fading as they rise. None on `wall`.
+- **Night beats**: the same shader, the dark layers above as today.
+- **Reduced motion**: dissolve at the day's fixed amount, no breathing, no bursts, no particles, grain 0.
+- **Fallback**: no WebGL2 → the opacity stack from the correction (that code stays).
+- **Sound tie-in** (sound spec): a static burst sends `sfx:static` through `playSfx` if `public/sfx/static.mp3` exists (Claude adds the file; silence if missing).
+- **Tests**: the shader is not unit-tested as pixels. Test `FX` table bounds, the burst schedule (seeded, deterministic, within the stated intervals), the particle counts per stage, the fallback path's stack, and a smoke test that the GL program compiles under the existing headless setup (the splat tests show how) and that one frame is not all black on day 13.
