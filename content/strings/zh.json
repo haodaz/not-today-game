@@ -230,5 +230,7 @@
   "settings.emailBound": "已绑定：{email}",
   "settings.emailError": "没发出去，再试一次。",
   "hud.items": "道具",
-  "hud.itemsClose": "收起"
+  "hud.itemsClose": "收起",
+  "credits.song": "主题曲《今天不可以》 · 词 好大壮 · 曲 Suno",
+  "room.walkman": "随身听"
 }

@@ -8,7 +8,7 @@ import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
 import { initialSession, type Session } from "@world/desktop/model";
 import { renderCredits, type EndingModel } from "@world/endings/view";
-import { setLocale } from "@world/i18n";
+import { setLocale, t } from "@world/i18n";
 import { loopActions } from "@world/room/game";
 import { deskLayout, parseDesk } from "@world/room/desk";
 import { itemsPanel, renderRoom, WALKMAN_IMAGE, walkmanShown } from "@world/room/hud";
@@ -61,6 +61,7 @@ describe("the walkman on the tabletop", () => {
     expect(tile).toContain(`style="${rectStyle(deskLayout.walkman)}"`);
     expect(tile).toContain(`src="${WALKMAN_IMAGE}"`);
     expect(tile).toContain('data-action="walkman-toggle"');
+    expect(tile).toContain(`aria-label="${t("room.walkman")}" title="${t("room.walkman")}"`);
   });
 
   it("is there when this run has reached an ending", () => {
@@ -126,10 +127,12 @@ describe("the credits page", () => {
     return { state: { ...store.getState(), ending: "survive" }, events: store.getEvents(), session, startDay: 18, nowMs: 1e9 };
   }
 
-  it("is the existing one (Kuro's log on black); the song line shows once the strings carry it", () => {
+  it("is the existing one (Kuro's log on black), with the song's title and the words' author under the roll", () => {
     const out = renderCredits(model(), "survive").value;
     expect(out).toContain('class="stage ending-page credits-page"');
-    // content/strings has no `credits.song` yet: no invented text in src.
-    expect(out).not.toContain('class="song"');
+    expect(out).toContain(`<p class="song">${t("credits.song")}</p>`);
+    expect(t("credits.song")).not.toMatch(/⟦/);
+    setLocale("en");
+    expect(renderCredits(model(), "survive").value).toContain(`<p class="song">${t("credits.song")}</p>`);
   });
 });

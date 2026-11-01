@@ -6,6 +6,7 @@ import { cls, html, type SafeHtml } from "@world/html";
 import { t, tr } from "@world/i18n";
 import { beatLabelKey, type BeatClock } from "./beat";
 import type { DockEntry } from "./dock";
+import { fxStageAttrs, renderFx, type FxPlan } from "../room/fx";
 import type { WeatherKind } from "./browser/data";
 
 export const APPS = ["msgs", "workbench", "browser"] as const;
@@ -55,6 +56,8 @@ export interface ShellModel {
   };
   /** Which monitor is shown (amendment 2026-11-01: one at a time, never side by side). */
   readonly focus: Side;
+  /** The collapse on the monitor frame (room-scene addition 2026-11-02); null before ring wall and on calm days. */
+  readonly fx?: FxPlan | null;
 }
 
 function topBar(m: ShellModel, monitor: MonitorModel): SafeHtml {
@@ -143,5 +146,5 @@ export function renderDesktop(m: ShellModel): SafeHtml {
   const [left, right] = m.monitors;
   const shown = m.focus === "left" ? left : right;
   const other = m.focus === "left" ? right : left;
-  return html`<div class="stage one-monitor" data-day="${m.day}" data-beat="${m.clock.beat}" data-focus="${m.focus}">${toggle(m.focus)}${monitor(m, shown)}${otherTab(m, other)}</div>`;
+  return html`<div class="stage one-monitor" data-day="${m.day}" data-beat="${m.clock.beat}" data-focus="${m.focus}"${fxStageAttrs(m.fx ?? null)}>${toggle(m.focus)}${monitor(m, shown)}${renderFx(m.fx ?? null)}${otherTab(m, other)}</div>`;
 }

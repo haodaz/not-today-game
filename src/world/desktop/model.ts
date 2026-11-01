@@ -17,6 +17,7 @@ import { EMPTY_COLLECTION, type Collection } from "@world/room/collection";
 import { isNight, type BeatClock } from "./beat";
 import { browserPage, weatherKind } from "./browser/data";
 import { dockFor } from "./dock";
+import { fxPlan } from "../room/fx";
 import { desktopRing } from "./rings";
 import type { AppId, MonitorModel, ShellModel, Side } from "./shell";
 
@@ -273,5 +274,6 @@ export function buildShell(
     monitors: [left.monitor, right.monitor],
     dock: { active: session.leftApp, badges, decoys: dockFor(state.day), decoyOpen: session.decoyWindow },
     focus: session.focus,
+    fx: fxPlan(state.day, session.clock.beat, "desktop"),
   };
 }

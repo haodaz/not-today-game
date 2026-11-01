@@ -230,5 +230,7 @@
   "settings.emailBound": "Linked: {email}",
   "settings.emailError": "It did not send. Try again.",
   "hud.items": "Items",
-  "hud.itemsClose": "Close"
+  "hud.itemsClose": "Close",
+  "credits.song": "Theme song “Not Today” · words by 好大壮 (English words Claude) · music Suno",
+  "room.walkman": "Walkman"
 }

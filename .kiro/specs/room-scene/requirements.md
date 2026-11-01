@@ -60,3 +60,32 @@ The rectangular hotspots and the 房间/桌子/屏幕/门 chips were a stand-in.
 - **Look.** At any framing, press-and-drag turns the head a little (±15° yaw, ±8° pitch) with the splat live; release eases back to the framing's pose over 600 ms. No walking; the room stays closed. With the splat off, drag does nothing.
 - **Hotspots live in splat space.** Each pickable thing is a box in world coordinates (desk, left monitor, right monitor, tower, door, bed, box, lamp) in `calibration.ts` next to the poses; picking is a ray against those boxes projected through the current camera, so the hotspots move with the camera and with the drag. Hover lifts the thing 4 % brighter. Keyboard: Tab cycles the pickable things, Enter picks. With the splat off, the boxes project through the framing's fixed pose, which reproduces today's rectangles.
 - The chips stay until this works in the browser, then go; the tests that read them switch to picking.
+
+## Addition 2026-11-02 (author): the collapse on the stills
+"我们目前没有大面积崩坏的效果呀." The collapse exists only on the splat during moves and as a few CSS variables on the monitors; the photo stills, where the player spends nearly all the time, stay clean. From now on the stills collapse too. Everything below is CSS/DOM over the existing backdrops, driven by `ring` from stages.json (and `calmDaytime` → nothing, `tenderDay` → warm grade but the overlays stay). Assets from Claude in `public/room/fx/`.
+
+- **A `.fx` layer** sits over the backdrop and under the HUD in 房间 / 桌子 / 门 (and the desktop's monitor frame), with children per effect; each is on or off by ring, and its strength is a CSS variable set from the day within the ring (first day of the ring 0.5, second 0.75, third 1.0; day 10 none).
+- **Ring `wall` (days 11–12)**: `veins.png` (1568×928, transparent) stretched over the wall behind the monitors in 房间 and over the upper third of 桌子, `mix-blend-mode: multiply`, opacity 0.35 × strength, slowly breathing (scale 1.00→1.02, 6 s loop). The lamp's light goes pink: a radial gradient at the lamp's rect (`content/desk.json` lamp) in 桌子, and at the lamp's spot in 房间 (Kiro measures), `#ff9fb0` at 0.25 × strength, screen blend. The desktop's existing `--tint` stays.
+- **Ring `room` (days 13–15)**: the whole stage gets a colour grade (`filter: saturate(.8) sepia(.12) contrast(1.05)`) and a full-screen `pores.jpg` tile (2048², mirrored so it is seamless, multiply, opacity 0.18 × strength, drifting 20 px over 12 s). The left monitor's text gets the same tile as a `background-blend-mode: multiply` on the `.os` background (the 毛孔/指纹 of day 13). The veins stay from `wall`, at 0.5. Day 14: the grade turns warm (`sepia(.2) brightness(1.05)`), overlays unchanged ("墙还是肉的，光是暖的").
+- **Ring `door` (days 16–18)**: day 16 as `room` plus the 门 view darkened 25 % with `door_chain.png` already in place. Day 17 (白): the stage goes toward white, `filter: brightness(1.3) contrast(.75) saturate(.5)`, a white vignette from the edges (radial, 0.45), and all desktop text at 60 % opacity; veins and pores fade to 0.3. Day 18: like 17 with the vignette at 0.6; the 房间 backdrop is the white corridor only at the boot beat's first line (the `boot` beat's `where: room` line), then the room.
+- **Night beats** keep their own look; the `.fx` layer stays but the grade is not applied at night (the dark does that work).
+- **Reduced motion** (`prefers-reduced-motion`): no breathing, no drift; opacities unchanged.
+- **Tests**: snapshot 房间 and 桌子 on days 10, 11, 13, 14, 17, 18 and the desktop on 13 (the `.fx` children and their variables, not pixels); property: no `.fx` child before ring `wall`, none on day 10, all variables within [0, 1].
+
+## Correction 2026-11-02 (author): the collapse is in the photos, not on the lens
+The author saw the overlay version: "贴在摄像机了", "整个空间其实没有变". A flat decal over the photo reads as something on the camera, not on the wall. So the stills collapse by **swapping the photo itself**. Claude made edited versions of each backdrop (same framing, same furniture; only the world changes) in `public/room/fx/`:
+
+| stage | 房间 | 桌子 | 门 | what it is |
+|---|---|---|---|---|
+| `wall` | room_wall.jpg | desk_wall.jpg | door_wall.jpg | the first change: thin dark veins under the paint, lamp light slightly pink |
+| `other` | room_other.jpg | desk_other.jpg | door_other.jpg | the otherworld: rust, damp, grime, red lamp, grating floor, yellowed bedding |
+| `glitch` | room_glitch.jpg | desk_glitch.jpg | door_glitch.jpg | the world as a corrupted file: pixel blocks, duplicated furniture, floating fragments |
+| `white` | room_white.jpg | desk_white.jpg | door_white.jpg | fading out: overexposed, colours drained, only outlines |
+
+Rule, replacing the `.fx` overlay children `veins`, `lamp`, `pores` (full-screen), `dark` and `vignette`:
+- The backdrop of each still is a **stack**: the clean photo at the bottom, then the stage photos above it, each with an opacity. `fxPlan` returns `{ stage, mix }` per day: days 11–12 `wall` at 0.6 / 1.0; day 13 `other` 0.5, day 14 `other` 0.8, day 15 `other` 1.0; day 16 `other` 1.0 **plus** `glitch` 0.7 on top (the last change before the white); day 17 `white` 0.85 over `other` 0.4; day 18 `white` 1.0. Day 10 (calm) clean. Days 1–9 clean. Night beats use the same stack (the dark layers above it do their work as today).
+- Transitions are only at the day boundary, so nothing animates during a day; but inside a day the `glitch` layer (day 16) flickers: opacity 0.7 ± 0.3 at irregular intervals (seeded by day, 0.3–2 s), never with reduced motion (then steady 0.7).
+- The desktop's left monitor keeps the pores tile on `.os` from ring `room` (that one is a texture on a surface, not on the lens). The desktop's `--tint` stays. The white stage still dims desktop text to 60 % on days 17–18.
+- The 门 view shows the same stack. The splat move layer is unchanged (it has its own collapsed splat).
+- Tests: replace the `.fx` child snapshots with the stack: 房间 / 桌子 / 门 on days 10, 11, 12, 13, 15, 16, 17, 18 (which photos, which opacities); property: clean before day 11 and on day 10, opacities in [0, 1], the stage order is monotone (wall → other → glitch → white, never back); the glitch flicker is seeded and deterministic.
+- `public/room/fx/veins.png` is gone; `pores.jpg` stays for the monitor.
