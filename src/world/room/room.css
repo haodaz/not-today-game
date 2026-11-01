@@ -61,11 +61,6 @@
 .room .desk-things > .at > button.slot:hover,.room .desk-things > .at > button.slot:focus-visible{outline:2px solid rgba(232,228,220,.55);outline-offset:2px}
 .room .desk-things > .at > .slot > span{position:absolute;left:50%;bottom:4px;transform:translateX(-50%);white-space:nowrap;padding:2px 6px;border-radius:6px;background:rgba(244,240,232,.8);color:#555}
 .room .desk-things .slot img{max-width:100%;max-height:100%;filter:drop-shadow(0 8px 10px rgba(0,0,0,.35))}
-.room .desk-things .slot .box{width:78%;height:70%}
-.room .desk-things .slot .cup{width:36%;height:56%}
-.room .desk-things .slot .phone{width:62%;height:86%;border-radius:12px}
-.room .desk-things .slot.meal img,.room .desk-things .slot.meal object{max-width:100%;max-height:100%;width:auto;height:auto}
-.room .desk-things .slot.slip .paper{width:86%;height:72%;background:repeating-linear-gradient(180deg,#f7f3ea 0 12px,#e6dfd0 12px 13px);border-radius:2px;box-shadow:0 6px 12px rgba(0,0,0,.3);transform:rotate(-4deg)}
 /* 道具: the button next to ⚙ opens the object strip as a panel over the current view. */
 .items-btn{position:absolute;left:112px;bottom:28px;z-index:18;border:0;border-radius:8px;padding:7px 12px;background:rgba(232,228,220,.62);backdrop-filter:blur(8px);font:13px "PingFang SC","Hiragino Sans GB",sans-serif;color:#333;cursor:pointer}
 .items-btn:hover,.items-btn:focus-visible,.items-btn.on{background:rgba(232,228,220,.9)}
@@ -77,9 +72,11 @@
 :is(.room,.items-panel) button.slot{cursor:pointer}
 :is(.room,.items-panel) .slot img{max-width:60px;max-height:52px;object-fit:contain}
 :is(.room,.items-panel) .slot .lcd{width:52px;height:26px;background:#9fb59a;border:2px solid #556;border-radius:3px;image-rendering:pixelated;display:flex;align-items:center;justify-content:center;font:12px var(--mono);color:#233}
-:is(.room,.items-panel) .slot .box{width:52px;height:40px;background:#c8a97a;border-radius:3px}
-:is(.room,.items-panel) .slot .cup{width:26px;height:34px;border:2px solid #789;border-radius:0 0 8px 8px;background:linear-gradient(180deg,#fff 40%,#cfe0ea 40%)}
-:is(.room,.items-panel) .slot .phone{width:28px;height:50px;background:#222;border-radius:5px;border:2px solid #555}
+/* The tabletop's photos (cup, phone, box, slip; day-loop correction 2026-11-01): object-fit contain,
+   bottom-aligned, filling their content/desk.json rects; in the 道具 strip the same images at the
+   slot's small size. */
+:is(.room,.items-panel) .slot img.desk-photo{object-fit:contain;object-position:center bottom}
+.room .desk-things .slot img.desk-photo{width:100%;height:100%;max-width:none;max-height:none}
 :is(.room,.items-panel) .slot.gap{width:20px}
 /* 对话框 (dialogue FR1, design/chrome/dialogue.html): one fixed box, bottom centre, three rows; never
    grows, never scrolls. The tag sits on its top-left edge, ↺ on its top-right. */
@@ -104,6 +101,9 @@
 .dlg .kpet.kuro-portrait{position:absolute;right:12px;bottom:0;left:auto;top:auto;width:200px;height:200px;z-index:1;pointer-events:none}
 /* The player's own portrait for inner lines (dialogue addition 2026-11-01): Kuro's slot and size, a still image. */
 .dlg.me{padding-right:236px}
+/* An NPC portrait for a speaker line (dialogue addition 2026-11-01). */
+.dlg.npc{padding-right:236px}
+.dlg .npc-portrait{position:absolute;right:12px;bottom:0;width:200px;height:200px;object-fit:contain;object-position:center bottom;z-index:1;pointer-events:none;user-select:none}
 .dlg .player-portrait{position:absolute;right:12px;bottom:0;width:200px;height:200px;object-fit:contain;object-position:center bottom;z-index:1;pointer-events:none;user-select:none}
 .dlg-player .tag{background:#5b4a2e;top:-18px}
 .dlg .hist{min-width:28px;min-height:28px;border:0;padding:0 7px;border-radius:3px;background:#2a2622;color:#efe9df;display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;cursor:pointer}
@@ -216,12 +216,11 @@
 .dlg-layer .dlg.raised{bottom:240px}
 .dlg-layer .dlg-player{bottom:60px;right:24px}
 .dlg-layer .dlg-hist-layer{position:fixed}
-/* SAN bands (san-and-endings FR1, presentation only; SAN is never shown): the cup colder, the room
-   one step narrower (a side vignette until room-scene), a denser grain over the text. */
-.room[data-san-band="1"] .slot .cup{background:linear-gradient(180deg,#fff 40%,#c3d6e3 40%)}
-.room[data-san-band="2"] .slot .cup{background:linear-gradient(180deg,#fff 40%,#b3c9da 40%)}
-.room[data-san-band="3"] .slot .cup{background:linear-gradient(180deg,#f4f8fb 40%,#9fb9cd 40%)}
-.room[data-san-band="4"] .slot .cup{background:linear-gradient(180deg,#eef3f7 40%,#8ba9bf 40%)}
+/* SAN bands (presentation only): the cup photo goes colder as SAN falls. */
+.room[data-san-band="1"] img.cup{filter:drop-shadow(0 8px 10px rgba(0,0,0,.35)) brightness(.88) hue-rotate(-5deg)}
+.room[data-san-band="2"] img.cup{filter:drop-shadow(0 8px 10px rgba(0,0,0,.35)) brightness(.8) hue-rotate(-10deg)}
+.room[data-san-band="3"] img.cup{filter:drop-shadow(0 8px 10px rgba(0,0,0,.35)) brightness(.7) hue-rotate(-15deg)}
+.room[data-san-band="4"] img.cup{filter:drop-shadow(0 8px 10px rgba(0,0,0,.35)) brightness(.6) hue-rotate(-20deg)}
 .room[data-san-band]{--san-side:0px;--san-grain:0}
 .room[data-san-band="1"]{--san-side:40px;--san-grain:.03}
 .room[data-san-band="2"]{--san-side:90px;--san-grain:.06}

@@ -73,7 +73,7 @@ export interface DeskThings {
   readonly meal: SafeHtml | null;
   /** In found (arrival) order; what was handed to the hand is not here. */
   readonly objects: readonly { readonly id: string; readonly html: SafeHtml }[];
-  /** Day 18's slip, once its checklist line is open; the tabletop only. */
+  /** Day 18's slip, once its checklist line is open (on the tabletop, and in the 道具 strip). */
   readonly slip: SafeHtml | null;
 }
 
@@ -98,9 +98,9 @@ export function deskThings(state: State, events: readonly GameEvent[], session: 
       return { id, html: button };
     });
   return {
-    box: html`<button type="button" class="slot" data-action="loop-box">${left > 0 ? html`<div class="box"></div><span>${tr("hud.box.left", { n: left })}</span>` : html`<div class="box" style="opacity:.3"></div>`}</button>`,
-    phone: html`<button type="button" class="${cls("slot", held === "phone" && "lifted")}" data-action="loop-phone"><div class="phone"></div><span>${tr("hud.phone")}</span></button>`,
-    cup: html`<div class="slot"><div class="cup"></div></div>`,
+    box: html`<button type="button" class="slot" data-action="loop-box"><img class="desk-photo" src="/room/desk/box.png" alt="" aria-hidden="true">${left > 0 ? html`<span>${tr("hud.box.left", { n: left })}</span>` : null}</button>`,
+    phone: html`<button type="button" class="${cls("slot", held === "phone" && "lifted")}" data-action="loop-phone"><img class="desk-photo" src="/room/desk/phone.png" alt="" aria-hidden="true"><span>${tr("hud.phone")}</span></button>`,
+    cup: html`<div class="slot"><img class="desk-photo cup" src="/room/desk/cup.png" alt="" aria-hidden="true"></div>`,
     meal: mealSlot(state, events),
     objects,
     slip: slipThing(state, events),
@@ -118,7 +118,7 @@ function slipThing(state: State, events: readonly GameEvent[]): SafeHtml | null 
   if (!lc || !item || !itemStates(lc).get(item.id)!.unlocked) return null;
   // Its label is the task's own title (content), never a string of ours.
   const title = taskFiles.get(state.day)?.find((task) => item.done.kind === "flag" && task.done === item.done.flag)?.title ?? item.text;
-  return html`<button type="button" class="slot slip" data-action="desk-slip" aria-label="${title}"><div class="paper"></div></button>`;
+  return html`<button type="button" class="slot slip" data-action="desk-slip" aria-label="${title}"><img class="desk-photo" src="/room/desk/slip.png" alt="" aria-hidden="true"></button>`;
 }
 
 /** 桌子's object layer: each thing at its rect on desk_top.jpg (content/desk.json). */
@@ -139,7 +139,7 @@ export function itemsButton(session: Pick<Session, "itemsOpen">): SafeHtml {
 export function itemsPanel(state: State, events: readonly GameEvent[], session: Session): SafeHtml | null {
   if (!session.itemsOpen) return null;
   const th = deskThings(state, events, session);
-  return html`<div class="items-panel" id="items-panel" role="dialog" aria-label="${t("hud.items")}"><div class="items-strip">${th.box}${th.phone}${th.cup}${th.meal}${th.objects.map((o) => o.html)}</div></div>`;
+  return html`<div class="items-panel" id="items-panel" role="dialog" aria-label="${t("hud.items")}"><div class="items-strip">${th.box}${th.phone}${th.cup}${th.meal}${th.objects.map((o) => o.html)}${th.slip}</div></div>`;
 }
 
 /**

@@ -2,6 +2,7 @@
 // renders as ⟦key⟧ (visible on purpose) and is recorded, so a test can list what content lacks.
 import en from "@content/strings/en.json";
 import zh from "@content/strings/zh.json";
+import { setReplyLocale } from "@state/replies/locale";
 import { html, type SafeHtml } from "./html";
 
 export type Locale = "zh" | "en";
@@ -16,6 +17,13 @@ const missing = new Set<string>();
 
 export function setLocale(next: Locale): void {
   locale = next;
+  // The reply tables show their English twin (content/replies/en/) under the same switch.
+  setReplyLocale(next);
+}
+
+/** A string in one particular locale (no fallback to the other), or undefined. */
+export function stringIn(l: Locale, key: string): string | undefined {
+  return key.startsWith("_") ? undefined : tables[l][key];
 }
 
 export function getLocale(): Locale {

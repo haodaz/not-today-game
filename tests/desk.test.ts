@@ -221,3 +221,91 @@ describe("道具: the strip as a panel", () => {
     expect(ctx.session.itemsOpen).toBe(false);
   });
 });
+
+describe("the tabletop's things are photos (day-loop correction 2026-11-01)", () => {
+  const PHOTOS = ["cup", "phone", "box", "slip"] as const;
+  const css = readFileSync(resolve(__dirname, "../src/world/room/room.css"), "utf8");
+  const tabletopOf = (out: string) => out.slice(out.indexOf('<div class="desk-things">'), out.indexOf('<div class="list">'));
+  /** The `<img>` inside the placed wrapper `name`. */
+  const photoIn = (out: string, name: string) => new RegExp(`data-at="${name}" style="[^"]+">[^]*?<img class="desk-photo( cup)?" src="(/room/desk/[a-z]+\\.png)" alt="" aria-hidden="true">`).exec(out)?.[2] ?? null;
+
+  it("the four files exist in public/room/desk/", () => {
+    for (const name of PHOTOS) expect(() => readFileSync(resolve(__dirname, `../public/room/desk/${name}.png`)), name).not.toThrow();
+  });
+
+  it("day 4 with the phone on the desk: cup, phone and box are photos at their rects; no slip yet", () => {
+    const out = tabletopOf(render(ctxOf(atDay(4))));
+    for (const name of ["cup", "phone", "box"] as const) {
+      expect(photoIn(out, name), name).toBe(`/room/desk/${name}.png`);
+      expect(placed(out, name), name).toBe(rectStyle(deskLayout[name]));
+    }
+    expect(out).not.toContain("slip");
+    expect(out).toMatchSnapshot();
+  });
+
+  it("day 18 with the slip by the lamp: the slip is a photo in its rect", () => {
+    const last = constants.lastDay as number;
+    const store = atDay(last);
+    completeUntil(store, SLIP_ITEM);
+    const out = tabletopOf(render(ctxOf(store)));
+    expect(photoIn(out, "slip")).toBe("/room/desk/slip.png");
+    expect(placed(out, "slip")).toBe(rectStyle(deskLayout.slip));
+    expect(out).toMatch(/class="slot slip" data-action="desk-slip" aria-label="[^"]+"><img class="desk-photo"/);
+    expect(out).toMatchSnapshot();
+  });
+
+  it("the box is the same image full and empty; only the label goes", () => {
+    const store = atDay(1);
+    const objects = Object.keys((stagesFile as { objectsFoundOnDay: Record<string, number> }).objectsFoundOnDay);
+    const withLayers = tabletopOf(render(ctxOf(store)));
+    expect(withLayers).toContain(t("hud.box.left", { n: objects.length }));
+    expect(photoIn(withLayers, "box")).toBe("/room/desk/box.png");
+    // Every layer found (a hand-made state): the label is gone, the image stays, undimmed.
+    const emptied = renderRoom({ state: { ...store.getState(), found: objects as never }, events: store.getEvents(), session: ctxOf(store).session }).value;
+    const bare = tabletopOf(emptied);
+    expect(photoIn(bare, "box")).toBe("/room/desk/box.png");
+    expect(bare).not.toMatch(/剩 \d+ 层/);
+    expect(bare).not.toContain("opacity");
+  });
+
+  it("the 道具 strip uses the same images (and the slip when it is there)", () => {
+    const store = atDay(1);
+    const ctx = ctxOf(store);
+    ctx.session.itemsOpen = true;
+    const strip = (o: string) => o.slice(o.indexOf('class="items-strip"'));
+    const out = strip(render(ctx));
+    for (const name of ["box", "phone", "cup"]) expect(out, name).toContain(`<img class="desk-photo${name === "cup" ? " cup" : ""}" src="/room/desk/${name}.png"`);
+    const last = constants.lastDay as number;
+    const s18 = atDay(last);
+    completeUntil(s18, SLIP_ITEM);
+    const c18 = ctxOf(s18);
+    c18.session.itemsOpen = true;
+    expect(strip(render(c18))).toContain('src="/room/desk/slip.png"');
+    // Clicking the slip from the strip closes it and goes to the 工作台.
+    act(c18, "desk-slip");
+    expect(c18.session.itemsOpen).toBe(false);
+    expect(c18.session.view).toBe("desktop");
+  });
+
+  it("no CSS shapes remain: no placeholder divs in the markup, no shape rules in the stylesheet", () => {
+    const store = atDay(1);
+    for (const open of [false, true]) {
+      const ctx = ctxOf(store);
+      ctx.session.itemsOpen = open;
+      const out = render(ctx);
+      for (const shape of ["box", "cup", "phone", "paper"]) expect(out, `${shape} (items ${open})`).not.toContain(`<div class="${shape}"`);
+    }
+    for (const shape of ["box", "cup", "phone"]) expect(css, shape).not.toMatch(new RegExp(`\\.slot \\.${shape}\\{`));
+    expect(css).not.toMatch(/\.slot\.slip \.paper|\.slip \.paper/);
+    // The photos are fitted, not stretched: contain, bottom-aligned, filling the rect on the tabletop.
+    expect(css).toMatch(/img\.desk-photo\{object-fit:contain;object-position:center bottom\}/);
+    expect(css).toMatch(/\.desk-things \.slot img\.desk-photo\{width:100%;height:100%/);
+    // And the objects' own screen placeholder (not one of the four) is still styled.
+    expect(css).toMatch(/\.slot \.lcd\{/);
+  });
+
+  it("the cup goes colder as SAN falls: the photo, by band (presentation only)", () => {
+    for (const band of [1, 2, 3, 4]) expect(css).toMatch(new RegExp(`\\.room\\[data-san-band="${band}"\\] img\\.cup\\{filter:`));
+    expect(tabletopOf(render(ctxOf(atDay(1))))).toContain('class="desk-photo cup"');
+  });
+});

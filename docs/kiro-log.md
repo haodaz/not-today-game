@@ -758,3 +758,15 @@ Appended after each task. Neither Kiro nor Claude edits the other's area without
   - `tests/motion-dom.test.ts`: clicks inside `.desk-things`.
 - 6 snapshots refreshed after confirming the only diff is the new 道具 button appended after ⚙ 设置 in every view.
 - Tests: 56 files, 878 passing; typecheck clean. Not seen in a browser.
+
+## 2026-11-01 — NPC faces, tabletop photos, two family groups, English reply tables
+
+- `src/world/npc.ts`: strict loader for `content/npc.json` (missing and unknown keys fail; own-key lookups only, so ids like `valueOf` never reach `Object.prototype`). `npcPortrait`, `npcAvatar` (known id → avatar, anything else → a silhouette by stable name hash), `npcIdOf(prefix)` (npc id, or the NPC's name in either language through its `name` strings key; `msgs.mother` also names the `family` NPC), `speakerLabel`.
+- Dialogue: a speaker line whose `who` is an npc id shows its portrait in the Kuro/player slot (never two) and the NPC's name as the tag (box and history). Others keep the written name, no portrait.
+- 消息: no letters. Avatars are images (list 38 px, bubbles 30 px); the player's own bubbles keep the neutral square. Speaker resolution moved into `transcript.ts` for the company group and both family groups, so a prefixed voice note and its prefixed transcript still pair up. A bubble has `who` (npc id or `member`), `alias` (the written name, for a silhouette) and `prefix` (kept for the list preview, as before).
+- Two family groups: `parseFamilyFile(raw, id, label)`, `CLAN`, `FAMILY_GROUPS`; the 家里 section lists `family` then `clan`. `labelKey` needed no change (clan words are `reply.<word>`).
+- English reply tables: `content/replies/en/*.json` parsed by the same strict parser, checked against the zh twin (`assertTwin`, `assertTwinDays`: same days, words in order, statuses, times, effects, conditions, line counts, speakers, interrupts), merged so `text` / `inner` read in the active locale (`state/replies/locale.ts`, set by `setLocale`; display only, replay state does not depend on it). A file with no twin stays Chinese; an English file with no Chinese twin is an error. `splitSpeaker` takes prefixes up to 14 characters with spaces; `bodyOf` reads the English bracket forms.
+- Tabletop: cup, phone, box and slip are `public/room/desk/*.png` (`img.desk-photo`, contain, bottom-aligned, filling the desk.json rect); the CSS shapes are gone. The slip is also in the 道具 strip. SAN bands now tint the cup photo.
+- Fixed in my own earlier work: the objects' `.lcd` style had been deleted with the shape rules (restored); an `npcAvatar` bug for ids that exist on `Object.prototype`.
+- Snapshots refreshed after diffs: desktop-snapshots (12) and late-days (1): the 家里 row is now 爸妈, the clan row is new, the unread badges rose by the clan's lines (+4 on days 1, 10, 13; day 16 +1 father +5 clan), and the day-13 family preview is the father's new line; upgrades (1): `desk-photo` classes. New: npc (2), desk (2).
+- Tests: 59 files, 949 passing; typecheck clean. Not seen in a browser.

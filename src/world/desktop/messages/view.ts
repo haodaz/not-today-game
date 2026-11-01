@@ -1,25 +1,16 @@
 // 消息: conversation list, the open conversation, and the reply bar. Pure: context in, markup out.
 // Layout and classes follow design/desktop/day01.html.
 import { isDeregistered, menu, recipientsOn } from "@state/replies/resolve";
-import { FAMILY } from "@state/replies/table";
+import { FAMILY_GROUPS } from "@state/replies/table";
 import type { State } from "@state/types.gen";
 import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t, tr } from "@world/i18n";
+import { npcAvatar, silhouetteFor } from "@world/npc";
 import { labelKey } from "@world/replies/labels";
 import { fillPlaceholders } from "@world/replies/placeholders";
 import type { AppContext } from "../model";
-import { previewOf, splitSpeaker, type Body } from "./bubbles";
+import { previewOf, type Body } from "./bubbles";
 import { inInputText, lastMessage, lastMessageDay, sentReplies, transcript, unreadCount, type Bubble, type SentReply } from "./transcript";
-
-/** Avatar colour class per conversation / speaker, as in the mock. */
-const AVATAR_CLASS: Record<string, string> = {
-  boss: "boss",
-  partner: "partner",
-  group: "group",
-  xiaozhang: "xz",
-  laozhou: "lz",
-  family: "home",
-};
 
 /** The display name of a conversation or a speaker id. */
 function nameOf(id: string): SafeHtml {
@@ -27,25 +18,21 @@ function nameOf(id: string): SafeHtml {
   return tr(`msgs.${id}`);
 }
 
-/** The avatar letter: `msgs.<id>.av` if the strings have it, else the first character of the name. */
-function avatarLetter(id: string): string {
-  if (hasString(`msgs.${id}.av`)) return t(`msgs.${id}.av`);
-  return Array.from(t(`msgs.${id}`))[0] ?? "";
+/** An avatar `<img>` for an NPC (or a silhouette); never a letter. */
+function avImg(id: string, css: string): SafeHtml {
+  const src = npcAvatar(id);
+  return html`<img class="${css}" src="${src}" alt="" aria-hidden="true" draggable="false">`;
 }
 
-/** A neutral, stable colour for someone without a colour of their own (group members). */
-function neutralColour(name: string): string {
-  let h = 0;
-  for (const ch of name) h = (h * 31 + ch.codePointAt(0)!) % 360;
-  return `hsl(${h},10%,72%)`;
-}
-
-function bubbleAvatar(who: string, side: "me" | "them"): SafeHtml {
-  if (side === "me") return html`<div class="av" style="background:#c9ced6"></div>`;
-  const known = AVATAR_CLASS[who];
-  return known
-    ? html`<div class="${cls("av", known)}"></div>`
-    : html`<div class="av" style="background:${neutralColour(who)}"></div>`;
+/**
+ * The face on a bubble: the player's own is the neutral square; an NPC's is its avatar; a relative
+ * or colleague with a written `alias` (大姨, Big Aunt) gets a silhouette by name hash, the same
+ * every day. No letters.
+ */
+function bubbleAvatar(who: string, side: "me" | "them", alias?: string): SafeHtml {
+  if (side === "me") return html`<div class="av me-av"></div>`;
+  if (alias !== undefined) return html`<img class="av av-img" src="${silhouetteFor(alias)}" alt="" aria-hidden="true" draggable="false">`;
+  return avImg(who, "av av-img");
 }
 
 function renderBody(body: Body, names: State["names"]): SafeHtml {
@@ -66,7 +53,7 @@ function renderBody(body: Body, names: State["names"]): SafeHtml {
   }
 }
 
-function renderBubble(b: Bubble, conversation: string, today: number, names: State["names"]): SafeHtml {
+function renderBubble(b: Bubble, today: number, names: State["names"]): SafeHtml {
   switch (b.kind) {
     case "day":
       return html`<div class="sysline">${b.day === today ? tr("msgs.today") : b.day === today - 1 ? tr("msgs.yesterday") : tr("shell.day", { day: b.day })}</div>`;
@@ -82,18 +69,10 @@ function renderBubble(b: Bubble, conversation: string, today: number, names: Sta
         const inner = b.labelKey ? html`<div class="bub">${tr(b.labelKey)}</div>` : renderBody(b.body, names);
         return html`<div class="m me">${bubbleAvatar("me", "me")}<div>${inner}</div></div>`;
       }
-      // Group messages from the incoming table name their speaker inline ("老周：…").
-      let who = b.who;
-      let body = b.body;
-      if (conversation === "group" && b.who === "group" && body.type === "text") {
-        const split = splitSpeaker(body.text);
-        if (split.speaker) {
-          who = split.speaker === "member" ? "member" : split.speaker;
-          body = { type: "text", text: split.text };
-        }
-      }
-      const whoName = AVATAR_CLASS[who] || who === "member" || who === "kuro" ? nameOf(who) : html`${who}`;
-      return html`<div class="m">${bubbleAvatar(who, "them")}<div><div class="who">${whoName} ${b.t}</div>${renderBody(body, names)}</div></div>`;
+      // Group-type conversations name their speaker inline ("老周：…"); the transcript has already
+      // resolved it: an NPC's id (name and avatar from npc.json) or a written alias (a silhouette).
+      const whoName = b.alias !== undefined ? html`${b.alias}` : nameOf(b.who);
+      return html`<div class="m">${bubbleAvatar(b.who, "them", b.alias)}<div><div class="who">${whoName} ${b.t}</div>${renderBody(b.body, names)}</div></div>`;
     }
   }
 }
@@ -114,9 +93,11 @@ function conversations(ctx: AppContext, replies: readonly SentReply[]): Conversa
 function row(c: ConversationData, active: boolean, today: number, names: State["names"]): SafeHtml {
   const last = lastMessage(c.bubbles);
   const lastDay = lastMessageDay(c.bubbles);
-  const preview = last ? (last.labelKey ? t(last.labelKey) : fillPlaceholders(previewOf(last.body), names)) : "";
+  // The list shows who spoke last in a group: the prefix as written ("大姨：…", "Big Aunt：…").
+  const said = last ? (last.labelKey ? t(last.labelKey) : fillPlaceholders(previewOf(last.body), names)) : "";
+  const preview = last?.prefix !== undefined ? `${last.prefix}：${said}` : said;
   const when = last === null ? null : lastDay === today ? last.t : lastDay === today - 1 ? tr("msgs.yesterday") : tr("shell.day", { day: lastDay ?? 1 });
-  return html`<button type="button" class="${cls("row", active && "on")}" data-action="conv" data-conv="${c.id}"><div class="${cls("av", AVATAR_CLASS[c.id])}">${avatarLetter(c.id)}</div><div class="t"><b>${nameOf(c.id)}</b><small>${preview}</small></div><div class="meta">${when}${c.unread > 0 ? html`<br><span class="n">${c.unread}</span>` : null}</div></button>`;
+  return html`<button type="button" class="${cls("row", active && "on")}" data-action="conv" data-conv="${c.id}"><span class="av-wrap">${avImg(c.id, "av av-img")}</span><div class="t"><b>${nameOf(c.id)}</b><small>${preview}</small></div><div class="meta">${when}${c.unread > 0 ? html`<br><span class="n">${c.unread}</span>` : null}</div></button>`;
 }
 
 function replyBar(ctx: AppContext, conversation: string): SafeHtml {
@@ -151,14 +132,15 @@ export function renderMessages(ctx: AppContext): { body: SafeHtml; badge: number
   const badge = all.reduce((n, c) => n + c.unread, 0);
   const today = ctx.state.day;
   const names = ctx.state.names;
-  const company = all.filter((c) => c.id !== FAMILY);
-  const family = all.filter((c) => c.id === FAMILY);
+  // 家里 holds both family groups (爸妈, then 相亲相爱一家人); everything else is the company's.
+  const company = all.filter((c) => !FAMILY_GROUPS.includes(c.id));
+  const family = FAMILY_GROUPS.flatMap((id) => all.filter((c) => c.id === id));
   const active = all.find((c) => c.id === ctx.session.conversation) ?? all[0];
 
   const list = html`<div class="list"><div class="search">${tr("msgs.search")}</div>${company.map((c) => row(c, c.id === active?.id, today, names))}<div style="margin-top:auto;padding:12px 14px 4px;border-top:1px solid var(--line);color:var(--ink-3);font-size:11px">${tr("msgs.section.family")}<span style="float:right">${tr("msgs.feed")}</span></div>${family.map((c) => row(c, c.id === active?.id, today, names))}</div>`;
 
   if (!active) return { body: html`<div class="body">${list}<div class="conv empty"></div></div>`, badge };
   const role = hasString(`msgs.${active.id}.role`) ? html`<small>${tr(`msgs.${active.id}.role`)}</small>` : null;
-  const conv = html`<div class="conv"><div class="head">${nameOf(active.id)} ${role}</div><div class="msgs">${active.bubbles.map((b) => renderBubble(b, active.id, today, names))}</div>${replyBar(ctx, active.id)}</div>`;
+  const conv = html`<div class="conv"><div class="head">${nameOf(active.id)} ${role}</div><div class="msgs">${active.bubbles.map((b) => renderBubble(b, today, names))}</div>${replyBar(ctx, active.id)}</div>`;
   return { body: html`<div class="body">${list}${conv}</div>`, badge };
 }

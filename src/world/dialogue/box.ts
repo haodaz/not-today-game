@@ -7,6 +7,7 @@
 import type { GameEvent } from "@state/events";
 import { isRaidNight } from "@state/nights";
 import { dreamNights } from "@state/stages";
+import { npcPortrait, speakerLabel } from "@world/npc";
 import type { State } from "@state/types.gen";
 import { isNight } from "@world/desktop/beat";
 import type { BodyState } from "@world/desktop/kuro/body";
@@ -78,7 +79,9 @@ export interface LineBoxModel {
   readonly raised: boolean;
   /** Kuro is speaking: its portrait stands at the box's right end, in this state. */
   readonly portrait: BodyState | null;
-  /** An inner line: the player's still portrait in the same slot (never with Kuro's). */
+  /** An NPC portrait for a speaker line (npc.json), in the same slot and size as Kuro's (never with Kuro's or the player's). */
+  readonly npcPortrait: string | null;
+  /** An inner line: the player's still portrait in the same slot (never with Kuro's or the NPC's). */
   readonly playerPortrait: string | null;
   /** The one-time pointer on these choices (the first night's hand), or none. */
   readonly pointer: string | false;
@@ -115,7 +118,7 @@ export function lineBoxModel(state: State, events: readonly GameEvent[], session
   const line = show.line;
   const kind = line?.k === "inner" ? "inner" : line?.k === "sfx" ? "sfx" : "line";
   const tag: BoxTag =
-    head.voice === "kuro" ? { kind: "kuro" } : !line || kind !== "line" ? null : line.k === "speaker" ? { kind: "who", text: fill(line.who ?? "") } : placeTag(state, session);
+    head.voice === "kuro" ? { kind: "kuro" } : !line || kind !== "line" ? null : line.k === "speaker" ? { kind: "who", text: speakerLabel(line.who ?? "", fill) } : placeTag(state, session);
   const choices = scr.choices.map((i): BoxChoice => {
     const c = show.choices![i]!;
     return { index: c.index, choice: c.choice, label: c.text !== null ? fill(c.text) : t(c.labelKey!) };
@@ -133,6 +136,7 @@ export function lineBoxModel(state: State, events: readonly GameEvent[], session
     raised: playerBox(state, events, session) !== null,
     portrait: head.voice === "kuro" ? portraitState(state, events, session, nowMs) : null,
     playerPortrait: head.voice !== "kuro" && kind === "inner" ? playerPortraitSrc(state.names.pronoun, isDreamNight(state.day, session.clock.beat)) : null,
+    npcPortrait: head.voice !== "kuro" && kind === "line" && line?.k === "speaker" ? npcPortrait(line.who ?? "") : null,
     // The first night's hand has no checklist line: a one-time pointer on its choices.
     pointer: pointerCls(session, "raid", scr.choices.length > 0 && raidShowing(state, session)),
     red: lateRing(state.day),
@@ -174,9 +178,16 @@ export function renderLineBox(m: LineBoxModel): SafeHtml {
   // A tag on the top edge pushes the text down below it (`tagged`).
   const tag = tagOf(m.tag);
   const me = !m.portrait && m.playerPortrait !== null;
-  const c = cls("dlg", m.kind !== "line" && m.kind, tag && "tagged", m.tag?.kind === "kuro" && "kuro", me && "me", m.choices.length > 0 && "has-choices", m.raised && "raised");
-  // One portrait at most: Kuro's for its lines, else the player's for an inner line.
-  const portrait = m.portrait ? portraitOf(m.portrait, m.red) : me ? playerPortraitOf(m.playerPortrait!) : null;
+  const hasNpc = !m.portrait && !me && m.npcPortrait !== null;
+  const c = cls("dlg", m.kind !== "line" && m.kind, tag && "tagged", m.tag?.kind === "kuro" && "kuro", me && "me", hasNpc && "npc", m.choices.length > 0 && "has-choices", m.raised && "raised");
+  // One portrait at most: Kuro's for its lines, NPC's for a speaker line, player's for an inner line.
+  const portrait = m.portrait
+    ? portraitOf(m.portrait, m.red)
+    : hasNpc
+      ? html`<img class="npc-portrait" src="${m.npcPortrait!}" alt="" aria-hidden="true" draggable="false">`
+      : me
+        ? playerPortraitOf(m.playerPortrait!)
+        : null;
   // The tag strip on the top edge: the name tag, then ↺ right after it (alone when there is no tag).
   return html`<div class="${c}" data-screen="${m.screen + 1}/${m.count}"><div class="tagbar">${tag}${historyChip()}</div>${txt}${m.choices.length ? html`<div class="${cls("choices", m.pointer)}">${buttons}</div>` : null}${mk}${portrait}</div>`;
 }

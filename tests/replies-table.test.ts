@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { parseDuration } from "@state/replies/duration";
-import { buildReplyTable, FAMILY, parseDayFile, parseFamilyFile, replyTable } from "@state/replies/table";
+import { buildReplyTable, FAMILY, FAMILY_GROUPS, parseDayFile, parseFamilyFile, replyTable } from "@state/replies/table";
 import { constants } from "@state/variables";
 
 const days = Array.from({ length: constants.lastDay }, (_, i) => i + 1);
@@ -22,11 +22,11 @@ function allTexts(): { where: string; recipient: string; text: string }[] {
 }
 
 describe("the real reply tables", () => {
-  it("has one table per day 1..lastDay, and family on each", () => {
+  it("has one table per day 1..lastDay, and both family groups on each", () => {
     expect([...replyTable.keys()]).toEqual(days);
     for (const day of days) {
       const recipients = [...replyTable.get(day)!.recipients.keys()];
-      expect(recipients, `day ${day}`).toEqual(["boss", "partner", "group", "xiaozhang", "laozhou", FAMILY]);
+      expect(recipients, `day ${day}`).toEqual(["boss", "partner", "group", "xiaozhang", "laozhou", ...FAMILY_GROUPS]);
     }
   });
 
@@ -44,8 +44,8 @@ describe("the real reply tables", () => {
     expect(cell.interrupt).toEqual(raw.recipients.boss.salary.interrupt);
   });
 
-  it("{nick} only appears in the family's lines", () => {
-    const offenders = allTexts().filter((t) => t.recipient !== FAMILY && t.text.includes("{nick}"));
+  it("{nick} only appears in the family groups' lines", () => {
+    const offenders = allTexts().filter((t) => !FAMILY_GROUPS.includes(t.recipient) && t.text.includes("{nick}"));
     expect(offenders.map((t) => t.where)).toEqual([]);
   });
 });

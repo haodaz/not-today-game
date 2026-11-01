@@ -9,15 +9,23 @@ import type { GameEvent } from "@state/events";
 import { f } from "@state/fday";
 import { step } from "@state/replay";
 import { condHolds } from "@state/replies/resolve";
-import { dayTable } from "@state/replies/table";
+import { dayTable, FAMILY_GROUPS } from "@state/replies/table";
 import type { State } from "@state/types.gen";
+import { npcIdOf } from "@world/npc";
 import { planReply, IN_INPUT_FLAG, type ReplyPlan } from "@world/replies/plan";
 import type { BeatClock } from "../beat";
-import { bodyOf, transcriptOf, type Body } from "./bubbles";
+import { bodyOf, splitSpeaker, transcriptOf, type Body } from "./bubbles";
+
+/**
+ * Conversations where a `名字：` prefix says who is talking (company group, 爸妈, the big family
+ * group). In them `who` is the resolved speaker: an npc id, or `member` with the written name in
+ * `alias` (大姨, Big Aunt), which gets a silhouette.
+ */
+export const SPEAKER_CONVERSATIONS: ReadonlySet<string> = new Set(["group", ...FAMILY_GROUPS]);
 
 export type Bubble =
   | { readonly kind: "day"; readonly day: number }
-  | { readonly kind: "msg"; readonly side: "me" | "them"; readonly who: string; readonly t: string; body: Body; readonly labelKey: string | null }
+  | { readonly kind: "msg"; readonly side: "me" | "them"; readonly who: string; readonly alias?: string; readonly prefix?: string; readonly t: string; body: Body; readonly labelKey: string | null }
   | { readonly kind: "read" }
   | { readonly kind: "typing" }
   | { readonly kind: "recalled" };
@@ -68,15 +76,39 @@ interface Group {
   readonly bubbles: Bubble[];
 }
 
-/** Adds `text` from `who` to a group, attaching a 转文字 line to the voice note before it. */
-function pushLine(bubbles: Bubble[], side: "me" | "them", who: string, t: string, text: string): void {
+/** The speaker of a prefixed line in a group-type conversation (desktop-ui "prefix resolution"). */
+function speakerOf(who: string, text: string): { who: string; alias?: string; prefix?: string; text: string } {
+  const split = splitSpeaker(text);
+  if (split.speaker === null) return { who, text };
+  // `member：` is the company group's anonymous colleague; an NPC's id or name is that NPC.
+  const id = split.speaker === "member" ? "member" : npcIdOf(split.speaker);
+  return id !== null
+    ? { who: id, prefix: split.speaker, text: split.text }
+    : { who: "member", alias: split.speaker, prefix: split.speaker, text: split.text };
+}
+
+/**
+ * Adds `text` from `who` to a group, attaching a 转文字 line to the voice note before it. In a
+ * group-type `conversation` a `名字：` prefix is split off first, so a prefixed voice note and its
+ * prefixed transcript still pair up.
+ */
+function pushLine(bubbles: Bubble[], side: "me" | "them", who: string, t: string, text: string, conversation?: string): void {
+  let alias: string | undefined;
+  let prefix: string | undefined;
+  if (side === "them" && conversation !== undefined && SPEAKER_CONVERSATIONS.has(conversation)) {
+    const spoken = speakerOf(who, text);
+    who = spoken.who;
+    alias = spoken.alias;
+    prefix = spoken.prefix;
+    text = spoken.text;
+  }
   const transcript = transcriptOf(text);
   const last = bubbles[bubbles.length - 1];
   if (transcript !== null && last?.kind === "msg" && last.body.type === "voice" && last.body.transcript === null) {
     last.body = { ...last.body, transcript };
     return;
   }
-  bubbles.push({ kind: "msg", side, who, t, body: transcript !== null ? { type: "text", text } : bodyOf(text), labelKey: null });
+  bubbles.push({ kind: "msg", side, who, ...(alias !== undefined ? { alias } : {}), ...(prefix !== undefined ? { prefix } : {}), t, body: transcript !== null ? { type: "text", text } : bodyOf(text), labelKey: null });
 }
 
 /** The visible steps of a sent reply: the played prefix if live, else the settled history. */
@@ -113,8 +145,8 @@ function replyGroups(input: TranscriptInput, day: number): Group[] {
           labelKey: a.text === undefined ? a.labelKey : null,
         });
       } else if (a.type === "deliver" && a.conversation === input.conversation) {
-        if (a.conversation === reply.event.recipient) pushLine(mine, "them", a.line.who, a.line.t, a.line.text);
-        else pushLine((elsewhere.get(a.line.t) ?? elsewhere.set(a.line.t, []).get(a.line.t))!, "them", a.line.who, a.line.t, a.line.text);
+        if (a.conversation === reply.event.recipient) pushLine(mine, "them", a.line.who, a.line.t, a.line.text, a.conversation);
+        else pushLine((elsewhere.get(a.line.t) ?? elsewhere.set(a.line.t, []).get(a.line.t))!, "them", a.line.who, a.line.t, a.line.text, a.conversation);
       } else if (a.type === "readReceipt" && a.conversation === input.conversation) {
         mine.push({ kind: "read" });
       } else if (a.type === "typing" && a.conversation === input.conversation) {
@@ -164,7 +196,7 @@ export function transcript(input: TranscriptInput): Bubble[] {
       if (item.effects?.flags?.includes(IN_INPUT_FLAG)) return; // shown in the input box, not received
       if (day === today && item.t > input.clock.time) return; // not here yet
       const bubbles: Bubble[] = [];
-      pushLine(bubbles, "them", input.conversation, item.t, item.text);
+      pushLine(bubbles, "them", input.conversation, item.t, item.text, input.conversation);
       groups.push({ t: item.t, order: -1_000_000 + i, bubbles });
     });
     groups.push(...replyGroups(input, day));
@@ -176,7 +208,7 @@ export function transcript(input: TranscriptInput): Bubble[] {
     for (const g of groups) {
       for (const b of g.bubbles) {
         const last = out[out.length - 1];
-        if (b.kind === "msg" && b.body.type === "text" && transcriptOf(b.body.text) !== null && last?.kind === "msg" && last.body.type === "voice" && last.body.transcript === null && last.who === b.who) {
+        if (b.kind === "msg" && b.body.type === "text" && transcriptOf(b.body.text) !== null && last?.kind === "msg" && last.body.type === "voice" && last.body.transcript === null && last.who === b.who && last.alias === b.alias) {
           last.body = { ...last.body, transcript: transcriptOf(b.body.text) };
         } else {
           out.push(b);

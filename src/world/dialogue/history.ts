@@ -5,6 +5,7 @@ import type { State } from "@state/types.gen";
 import { cls, html, type SafeHtml } from "@world/html";
 import { t, tr } from "@world/i18n";
 import type { DialogueState, Queued } from "@world/loop/dialogue";
+import { speakerLabel } from "@world/npc";
 import { fillPlaceholders } from "@world/replies/placeholders";
 
 export interface LogEntry {
@@ -25,7 +26,7 @@ export interface HistorySession {
 export function entryOf(state: State, q: Queued, line: SayLine): LogEntry {
   const fill = (s: string) => fillPlaceholders(s, state.names);
   if (q.voice === "kuro") return { day: state.day, who: t("kuro.name"), kind: "kuro", text: fill(line.t) };
-  return { day: state.day, who: line.k === "speaker" ? fill(line.who ?? "") : null, kind: line.k, text: fill(line.t) };
+  return { day: state.day, who: line.k === "speaker" ? speakerLabel(line.who ?? "", fill) : null, kind: line.k, text: fill(line.t) };
 }
 
 /** The line on screen now, if any. */

@@ -12,7 +12,7 @@ import {
   recipientsOn,
   resolve,
 } from "@state/replies/resolve";
-import { replyTable } from "@state/replies/table";
+import { FAMILY_GROUPS, replyTable } from "@state/replies/table";
 import type { State } from "@state/types.gen";
 import { constants, membersOf } from "@state/variables";
 
@@ -170,7 +170,7 @@ describe("menu", () => {
   });
 
   it("lists every recipient of the day", () => {
-    expect(recipientsOn(1)).toEqual(["boss", "partner", "group", "xiaozhang", "laozhou", "family"]);
+    expect(recipientsOn(1)).toEqual(["boss", "partner", "group", "xiaozhang", "laozhou", ...FAMILY_GROUPS]);
     expect(recipientsOn(99)).toEqual([]);
   });
 });
