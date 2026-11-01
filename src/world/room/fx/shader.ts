@@ -9,7 +9,9 @@
 // Every number is in the `FX` table below. The GLSL is generated from it, so tuning is one place.
 // Everything that decides what is drawn (`frameState`, `burstSchedule`, `blocksFor`, particle seeds)
 // is a pure function of (day, stage, time) and is what the tests read; nothing here is story.
-import { STAGES, type FxLayer, type FxPlan, type FxStage } from "./index";
+import { deskLayout } from "../desk";
+import { ROOM_SHOT, type Rect } from "../shots";
+import { STAGES, type FxLayer, type FxPlan, type FxStage, type FxView } from "./index";
 
 /** Shader kind per stage; 0 is "no layer". */
 export const KIND: Readonly<Record<FxStage, number>> = { wall: 1, other: 2, glitch: 3, white: 4 };
@@ -25,20 +27,29 @@ export const FX = {
   noise: "/room/fx/noise.png",
 
   dissolve: {
-    /** smoothstep width of a patch's edge, in noise units. */
-    softness: 0.08,
+    /** smoothstep width of a patch's edge, in noise units: a mottled gradient, never a cut-out. */
+    softness: 0.35,
     /** How much the patch field is replaced by "distance from the centre" (centre turns last). */
-    centreBias: 0.55,
+    centreBias: 0.65,
     /** White grows from the top: how much the patch field is replaced by "distance from the top". */
     topBias: 0.6,
     /** Stretch the fbm's mid-grey cluster so an amount of 0.5 covers about half. */
-    contrast: 1.6,
+    contrast: 1.8,
+    /** The amount is multiplied by `centreAmount + (1 - centreAmount) * d`, d = 0 at the centre, 1 in the corners. */
+    centreAmount: 0.55,
     /** Patches crawl this much per second (uv units). */
     drift: [0.004, 0.0025] as const,
-    scale: { wall: 3, other: 2, glitch: 2.5, white: 1.5 } as PerStage<number>,
-    /** A second octave: `other` only. */
+    scale: { wall: 5, other: 4, glitch: 4, white: 2.5 } as PerStage<number>,
+    /** More octaves, `[scale multiplier, weight]`: `other` has three in all. */
     octave2: { wall: [1, 0], other: [2.3, 0.35], glitch: [1, 0], white: [1, 0] } as PerStage<readonly [number, number]>,
+    octave3: { wall: [1, 0], other: [5.3, 0.2], glitch: [1, 0], white: [1, 0] } as PerStage<readonly [number, number]>,
   },
+
+  /**
+   * The monitors and the desk top never dissolve in patches: inside these rects the stage photo
+   * crossfades smoothly at the amount, feathered this far outside.
+   */
+  protect: { featherPx: 40, max: 3 },
 
   /** `uv += (uv - 0.5) * a * sin(t * 2π / T)`. */
   breath: {
@@ -71,8 +82,11 @@ export const FX = {
     blocks: [5, 12] as const,
     jumpPx: 40,
     split: { rest: 2, burst: 8 },
+    /** Scanlines only in a burst (at rest the glitch is a faint 2 px split and grain). */
     scanline: { every: 3, dark: 0.1, flickerHz: 12 },
     swaps: 6,
+    /** Day 16: the glitch photo's amount in a burst (at rest it is the plan's, 0.45). */
+    burstAmount: 0.9,
   },
 
   particles: {
@@ -193,6 +207,44 @@ export function particleSeeds(stage: FxStage): Float32Array {
 }
 
 // ---------------------------------------------------------------------------------------------
+// The protected zone and the amount, as pure mirrors of the GLSL (what the tests read)
+
+/** Stage px rects that never dissolve in patches: 桌子 the monitors and the keyboard (desk.json), 房间 the two monitors (the screen hotspots'), 门 none. */
+export function protectedRects(view: FxView): readonly Rect[] {
+  if (view === "desk") return [deskLayout.monitors.left, deskLayout.monitors.right, deskLayout.keyboard];
+  if (view === "room") return [ROOM_SHOT.monitors.left, ROOM_SHOT.monitors.right];
+  return [];
+}
+
+const smooth = (e0: number, e1: number, x: number): number => {
+  const t = Math.min(1, Math.max(0, (x - e0) / (e1 - e0)));
+  return t * t * (3 - 2 * t);
+};
+
+/** 1 inside any rect, falling to 0 over `feather` px outside it (smoothstep on the distance). */
+export function protectWeight(rects: readonly Rect[], x: number, y: number, feather: number = FX.protect.featherPx): number {
+  let best = 0;
+  for (const r of rects) {
+    const dx = Math.max(r.l - x, x - (r.l + r.w), 0);
+    const dy = Math.max(r.t - y, y - (r.t + r.h), 0);
+    best = Math.max(best, 1 - smooth(0, feather, Math.hypot(dx, dy)));
+  }
+  return best;
+}
+
+/** The weight a stage photo has at a pixel: the patch mask, except where protected, where it is the plain crossfade (the amount). */
+export const dissolveWeight = (patch: number, amount: number, protect: number): number => patch * (1 - protect) + amount * protect;
+
+/**
+ * The amount the patches see at distance `d` from the centre (0 centre, 1 corner): amount × (0.55 + 0.45 d),
+ * so the middle lags; and an amount of 1 is whole everywhere, so the last days are not left with a hole.
+ */
+export function effectiveAmount(amount: number, d: number): number {
+  const w = FX.dissolve.centreAmount + (1 - FX.dissolve.centreAmount) * d;
+  return amount * w + (1 - w) * smooth(0.9, 1, amount) * amount;
+}
+
+// ---------------------------------------------------------------------------------------------
 // The frame: what the uniforms are, as a pure function of the plan and the time
 
 export interface FrameState {
@@ -232,11 +284,13 @@ export function frameState(plan: FxPlan, tSec: number, reduced: boolean): FrameS
   const glitch = plan.layers.some((l) => l.stage === "glitch");
   const jumps = glitch && now && burstStage === "glitch" ? blocksFor(plan.day, now.id) : { blocks: [], swap: 0 };
   const grain = reduced || !lead ? 0 : FX.grain[lead.stage] + (FX.grain.burst - FX.grain[lead.stage]) * env;
+  // Day 16: the glitch photo is faint at rest and goes to its burst amount while a glitch burst lasts.
+  const amount = (l: FxLayer | undefined): number => (!l ? 0 : l.stage === "glitch" && burstStage === "glitch" ? l.opacity + (FX.glitch.burstAmount - l.opacity) * env : l.opacity);
   return {
     kindA: a ? KIND[a.stage] : 0,
     kindB: b ? KIND[b.stage] : 0,
-    amtA: a?.opacity ?? 0,
-    amtB: b?.opacity ?? 0,
+    amtA: amount(a),
+    amtB: amount(b),
     breath: reduced || !lead ? 0 : FX.breath[lead.stage].a,
     period: lead ? FX.breath[lead.stage].period : 1,
     grain,
@@ -299,15 +353,21 @@ uniform float uBlockCount;
 uniform vec4 uBlocks[${MAX_BLOCKS}];
 uniform float uSwap;
 uniform float uMove;
+uniform vec4 uProt[${FX.protect.max}];
+uniform float uProtCount;
 
 ${byKind("SCALE", (s) => FX.dissolve.scale[s], 1)}
 ${byKind("OCT2S", (s) => FX.dissolve.octave2[s][0], 1)}
 ${byKind("OCT2W", (s) => FX.dissolve.octave2[s][1])}
+${byKind("OCT3S", (s) => FX.dissolve.octave3[s][0], 1)}
+${byKind("OCT3W", (s) => FX.dissolve.octave3[s][1])}
 const vec2 DRIFT = vec2(${f(FX.dissolve.drift[0])}, ${f(FX.dissolve.drift[1])});
 const float SOFT = ${f(FX.dissolve.softness)};
 const float CENTRE_BIAS = ${f(FX.dissolve.centreBias)};
 const float TOP_BIAS = ${f(FX.dissolve.topBias)};
 const float CONTRAST = ${f(FX.dissolve.contrast)};
+const float AMT_MIN = ${f(FX.dissolve.centreAmount)};
+const float FEATHER = ${f(FX.protect.featherPx)};
 const float BAND_PX = ${f(FX.bursts.bandPx)};
 const float TEAR_SHARE = ${f(FX.bursts.tearShare)};
 const vec2 GRID = vec2(${f(FX.glitch.grid[0])}, ${f(FX.glitch.grid[1])});
@@ -325,11 +385,32 @@ float field(int k, vec2 uv) {
   if (OCT2W[k] > 0.0) {
     n = mix(n, texture(uNoise, p * OCT2S[k] + vec2(0.37, 0.11)).r, OCT2W[k]);
   }
+  if (OCT3W[k] > 0.0) {
+    n = mix(n, texture(uNoise, p * OCT3S[k] + vec2(0.71, 0.53)).r, OCT3W[k]);
+  }
   return clamp((n - 0.5) * CONTRAST + 0.5, 0.0, 1.0);
 }
 
-// Where the stage photo shows: a patch where the biased noise is under the amount, soft at its edge.
-float dissolve(float kind, float amt, vec2 uv) {
+// 1 inside a protected rect (the monitors, the keyboard), falling to 0 over FEATHER px outside it.
+float protectAt(vec2 pxy) {
+  float best = 0.0;
+  for (int i = 0; i < ${FX.protect.max}; i++) {
+    if (float(i) >= uProtCount) { break; }
+    vec4 r = uProt[i];
+    vec2 out2 = max(max(r.xy - pxy, pxy - r.zw), 0.0);
+    best = max(best, 1.0 - smoothstep(0.0, FEATHER, length(out2)));
+  }
+  return best;
+}
+
+float effAmount(float amt, float d) {
+  float w = AMT_MIN + (1.0 - AMT_MIN) * d;
+  return amt * w + (1.0 - w) * smoothstep(0.9, 1.0, amt) * amt;
+}
+
+// Where the stage photo shows: soft, fine patches where the biased noise is under the amount (the
+// centre lags); inside a protected rect it is the plain crossfade at the amount instead.
+float dissolve(float kind, float amt, vec2 uv, float prot) {
   if (kind < 0.5 || amt <= 0.0) {
     return 0.0;
   }
@@ -339,8 +420,9 @@ float dissolve(float kind, float amt, vec2 uv) {
   float shape = (k == 4) ? uv.y : 1.0 - d;
   float bias = (k == 4) ? TOP_BIAS : CENTRE_BIAS;
   n = mix(n, shape, bias);
-  float thr = amt * (1.0 + SOFT);
-  return 1.0 - smoothstep(thr - SOFT, thr, n);
+  float thr = effAmount(amt, d) * (1.0 + SOFT);
+  float blot = 1.0 - smoothstep(thr - SOFT, thr, n);
+  return mix(blot, amt, prot);
 }
 
 vec3 photo(sampler2D t, vec2 uv, float split) {
@@ -387,14 +469,15 @@ void main() {
   }
 
   vec3 col = photo(uClean, uv, uSplit);
-  col = mix(col, photo(uA, uv, uSplit), dissolve(uKindA, uAmtA, muv));
-  col = mix(col, photo(uB, uv, uSplit), dissolve(uKindB, uAmtB, muv));
+  float prot = protectAt(vUv * uRes);
+  col = mix(col, photo(uA, uv, uSplit), dissolve(uKindA, uAmtA, muv, prot));
+  col = mix(col, photo(uB, uv, uSplit), dissolve(uKindB, uAmtB, muv, prot));
   if (swapped > 0.5) { col = swapRgb(col, uSwap); }
 
-  // Scanlines (day 16): every third row a little darker, drifting.
-  if (uGlitch > 0.5) {
+  // Scanlines (day 16, in a burst only): every third row a little darker, drifting.
+  if (uGlitch > 0.5 && uBurst > 0.0) {
     float row = floor(gl_FragCoord.y) + floor(uTime * SCAN_HZ * uMove);
-    if (mod(row, SCAN_EVERY) < 0.5) { col *= 1.0 - SCAN_DARK; }
+    if (mod(row, SCAN_EVERY) < 0.5) { col *= 1.0 - SCAN_DARK * uBurst; }
   }
 
   // Film grain, new every frame.
@@ -448,7 +531,7 @@ void main() {
 `;
 
 /** Every uniform the JS sets, by program: the tests check each is declared in the source. */
-export const MAIN_UNIFORMS = ["uClean", "uA", "uB", "uNoise", "uRes", "uTime", "uFrame", "uKindA", "uKindB", "uAmtA", "uAmtB", "uBreath", "uPeriod", "uGrain", "uBurst", "uBurstId", "uTearPx", "uSplit", "uGlitch", "uBlockCount", "uBlocks", "uSwap", "uMove"] as const;
+export const MAIN_UNIFORMS = ["uClean", "uA", "uB", "uNoise", "uRes", "uTime", "uFrame", "uKindA", "uKindB", "uAmtA", "uAmtB", "uBreath", "uPeriod", "uGrain", "uBurst", "uBurstId", "uTearPx", "uSplit", "uGlitch", "uBlockCount", "uBlocks", "uSwap", "uMove", "uProt", "uProtCount"] as const;
 export const PARTICLE_UNIFORMS = ["uTime", "uKind", "uSize", "uSpeed", "uMove", "uColor", "uAlpha"] as const;
 
 // ---------------------------------------------------------------------------------------------
@@ -625,6 +708,11 @@ export function createFxRenderer(gl: WebGL2RenderingContext, deps: RendererDeps 
       gl.uniform4fv(u("uBlocks"), blocks);
       gl.uniform1f(u("uSwap"), state.swap);
       gl.uniform1f(u("uMove"), state.move);
+      const prot = new Float32Array(FX.protect.max * 4);
+      const rects = protectedRects(plan.view).slice(0, FX.protect.max);
+      rects.forEach((r, i) => prot.set([r.l, r.t, r.l + r.w, r.t + r.h], i * 4));
+      gl.uniform4fv(u("uProt"), prot);
+      gl.uniform1f(u("uProtCount"), rects.length);
       gl.bindVertexArray(quad);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 

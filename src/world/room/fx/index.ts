@@ -39,7 +39,7 @@ export const STACK_BY_DAY: Readonly<Record<number, readonly (readonly [FxStage, 
   13: [["other", 0.5]],
   14: [["other", 0.8]],
   15: [["other", 1]],
-  16: [["other", 1], ["glitch", 0.7]],
+  16: [["other", 1], ["glitch", 0.45]],
   17: [["other", 0.4], ["white", 0.85]],
   18: [["white", 1]],
 };
@@ -100,7 +100,7 @@ export interface Flicker {
  * The glitch photo's flicker for a day: opacity `base` ± 0.3 at irregular intervals of 0.3–2 s.
  * Seeded by the day, so the same day always flickers the same way.
  */
-export function glitchFlicker(day: number, base = 0.7): Flicker {
+export function glitchFlicker(day: number, base = 0.45): Flicker {
   const rng = rngOf(day * 7919 + 17);
   const [lo, hi] = FLICKER_MS;
   const gaps = Array.from({ length: FLICKER_STEPS }, () => lo + rng() * (hi - lo));
@@ -118,7 +118,7 @@ const num = (n: number): string => String(Math.round(n * 1000) / 1000);
 const pct = (f: number): string => `${Math.round(f * 100000) / 1000}%`;
 
 /** The `@keyframes` for a day's flicker (the loop returns to its first value). */
-export function flickerCss(day: number, base = 0.7): string {
+export function flickerCss(day: number, base = 0.45): string {
   const { steps } = glitchFlicker(day, base);
   return `@keyframes fx-flicker-${day}{${steps.map((s) => `${pct(s.at)}{opacity:${s.opacity}}`).join("")}100%{opacity:${steps[0]!.opacity}}}`;
 }

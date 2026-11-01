@@ -7,7 +7,7 @@ exports[`the collapse is in the photos > snapshot: the desktop on days 13 and 17
 }
 `;
 
-exports[`the collapse is in the photos > snapshot: the markup of the stack on day 16 (glitch over other, with its flicker keyframes) 1`] = `"<div class="fx" data-view="room" aria-hidden="true"><div class="fx-photo" data-stage="other" style="--fx:1;background-image:url(/room/fx/room_other.jpg)"></div><div class="fx-photo" data-stage="glitch" style="--fx:0.7;background-image:url(/room/fx/room_glitch.jpg);--flicker:fx-flicker-16 45.398s steps(1,end) infinite"></div><style>@keyframes fx-flicker-16{0%{opacity:0.7}3.818%{opacity:0.63}6.37%{opacity:0.55}9.519%{opacity:0.56}12.871%{opacity:0.65}16.715%{opacity:0.89}20.362%{opacity:0.46}23.709%{opacity:0.88}24.448%{opacity:0.86}27.761%{opacity:0.54}31.435%{opacity:0.82}32.687%{opacity:0.83}34.002%{opacity:0.54}35.652%{opacity:0.69}39.723%{opacity:0.6}41.527%{opacity:0.79}44.078%{opacity:0.84}48.188%{opacity:0.46}49.097%{opacity:0.83}50.8%{opacity:0.89}52.263%{opacity:0.89}53.325%{opacity:0.62}55.665%{opacity:0.61}59.54%{opacity:0.46}61.487%{opacity:0.78}62.543%{opacity:0.66}66.049%{opacity:0.69}67.814%{opacity:0.58}71.344%{opacity:0.7}72.075%{opacity:0.67}74.973%{opacity:0.67}78.255%{opacity:0.59}82.547%{opacity:0.86}84.666%{opacity:0.56}86.267%{opacity:0.76}88.836%{opacity:0.66}89.768%{opacity:0.88}91.567%{opacity:0.63}92.276%{opacity:0.61}95.685%{opacity:0.74}100%{opacity:0.7}}</style></div>"`;
+exports[`the collapse is in the photos > snapshot: the markup of the stack on day 16 (glitch over other, with its flicker keyframes) 1`] = `"<div class="fx" data-view="room" aria-hidden="true"><div class="fx-photo" data-stage="other" style="--fx:1;background-image:url(/room/fx/room_other.jpg)"></div><div class="fx-photo" data-stage="glitch" style="--fx:0.45;background-image:url(/room/fx/room_glitch.jpg);--flicker:fx-flicker-16 45.398s steps(1,end) infinite"></div><style>@keyframes fx-flicker-16{0%{opacity:0.45}3.818%{opacity:0.38}6.37%{opacity:0.3}9.519%{opacity:0.31}12.871%{opacity:0.4}16.715%{opacity:0.64}20.362%{opacity:0.21}23.709%{opacity:0.63}24.448%{opacity:0.61}27.761%{opacity:0.29}31.435%{opacity:0.57}32.687%{opacity:0.58}34.002%{opacity:0.29}35.652%{opacity:0.44}39.723%{opacity:0.35}41.527%{opacity:0.54}44.078%{opacity:0.59}48.188%{opacity:0.21}49.097%{opacity:0.58}50.8%{opacity:0.64}52.263%{opacity:0.64}53.325%{opacity:0.37}55.665%{opacity:0.36}59.54%{opacity:0.21}61.487%{opacity:0.53}62.543%{opacity:0.41}66.049%{opacity:0.44}67.814%{opacity:0.33}71.344%{opacity:0.45}72.075%{opacity:0.42}74.973%{opacity:0.42}78.255%{opacity:0.34}82.547%{opacity:0.61}84.666%{opacity:0.31}86.267%{opacity:0.51}88.836%{opacity:0.41}89.768%{opacity:0.63}91.567%{opacity:0.38}92.276%{opacity:0.36}95.685%{opacity:0.49}100%{opacity:0.45}}</style></div>"`;
 
 exports[`the collapse is in the photos > snapshot: the markup of the stack on day 16 (glitch over other, with its flicker keyframes) 2`] = `"<div class="fx" data-view="desk" aria-hidden="true"><div class="fx-photo" data-stage="other" style="--fx:0.8;background-image:url(/room/fx/desk_other.jpg)"></div></div>"`;
 
@@ -50,7 +50,7 @@ exports[`the collapse is in the photos > snapshots: 房间, 桌子 and 门 on da
     ],
     [
       "glitch",
-      0.7,
+      0.45,
       "/room/fx/desk_glitch.jpg",
     ],
   ],
@@ -110,7 +110,7 @@ exports[`the collapse is in the photos > snapshots: 房间, 桌子 and 门 on da
     ],
     [
       "glitch",
-      0.7,
+      0.45,
       "/room/fx/door_glitch.jpg",
     ],
   ],
@@ -170,7 +170,7 @@ exports[`the collapse is in the photos > snapshots: 房间, 桌子 and 门 on da
     ],
     [
       "glitch",
-      0.7,
+      0.45,
       "/room/fx/room_glitch.jpg",
     ],
   ],

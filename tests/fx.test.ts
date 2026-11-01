@@ -71,7 +71,7 @@ describe("the collapse is in the photos", () => {
     expect(at(11)).toEqual([["wall", 0.6]]);
     expect(at(12)).toEqual([["wall", 1]]);
     expect([13, 14, 15].map(at)).toEqual([[["other", 0.5]], [["other", 0.8]], [["other", 1]]]);
-    expect(at(16)).toEqual([["other", 1], ["glitch", 0.7]]);
+    expect(at(16)).toEqual([["other", 1], ["glitch", 0.45]]);
     expect(at(17)).toEqual([["other", 0.4], ["white", 0.85]]);
     expect(at(18)).toEqual([["white", 1]]);
     // The good ending's day 19 keeps day 18's photos.
@@ -170,10 +170,10 @@ describe("the collapse is in the photos", () => {
       expect(glitchFlicker(16)).not.toEqual(glitchFlicker(15));
     });
 
-    it("steps at irregular intervals of 0.3–2 s, opacity 0.7 ± 0.3, starting at the layer's own 0.7", () => {
+    it("steps at irregular intervals of 0.3–2 s, opacity 0.45 ± 0.3, starting at the layer's own 0.45", () => {
       const f = glitchFlicker(16);
       expect(f.steps).toHaveLength(FLICKER_STEPS);
-      expect(f.steps[0]).toEqual({ at: 0, opacity: 0.7 });
+      expect(f.steps[0]).toEqual({ at: 0, opacity: 0.45 });
       const gaps = f.steps.slice(1).map((s, i) => (s.at - f.steps[i]!.at) * f.durationMs);
       for (const gap of gaps) {
         expect(gap).toBeGreaterThanOrEqual(FLICKER_MS[0] - 1e-6);
@@ -181,8 +181,8 @@ describe("the collapse is in the photos", () => {
       }
       expect(new Set(gaps.map((g) => Math.round(g))).size).toBeGreaterThan(10);
       for (const s of f.steps) {
-        expect(s.opacity).toBeGreaterThanOrEqual(0.7 - FLICKER_SWING - 1e-9);
-        expect(s.opacity).toBeLessThanOrEqual(0.7 + FLICKER_SWING + 1e-9);
+        expect(s.opacity).toBeGreaterThanOrEqual(0.45 - FLICKER_SWING - 1e-9);
+        expect(s.opacity).toBeLessThanOrEqual(0.45 + FLICKER_SWING + 1e-9);
       }
       // It does flicker: not one steady value.
       expect(new Set(f.steps.map((s) => s.opacity)).size).toBeGreaterThan(5);
@@ -196,15 +196,15 @@ describe("the collapse is in the photos", () => {
           expect(glitchFlicker(day)).toEqual(a);
           expect(a.durationMs).toBeGreaterThanOrEqual(FLICKER_STEPS * FLICKER_MS[0]);
           expect(a.durationMs).toBeLessThanOrEqual(FLICKER_STEPS * FLICKER_MS[1]);
-          expect(a.steps.every((s) => s.opacity >= 0.4 - 1e-9 && s.opacity <= 1 + 1e-9)).toBe(true);
+          expect(a.steps.every((s) => s.opacity >= 0.15 - 1e-9 && s.opacity <= 0.75 + 1e-9)).toBe(true);
         }),
       );
     });
 
-    it("the markup carries the keyframes and the animation as a variable; reduced motion turns it off (steady 0.7)", () => {
+    it("the markup carries the keyframes and the animation as a variable; reduced motion turns it off (steady 0.45)", () => {
       const out = stackOf(stillPage(16, "room"))!;
       expect(out).toContain(`<style>${flickerCss(16)}</style>`);
-      expect(out).toMatch(/data-stage="glitch" style="--fx:0\.7;background-image:url\(\/room\/fx\/room_glitch\.jpg\);--flicker:fx-flicker-16 [\d.]+s steps\(1,end\) infinite"/);
+      expect(out).toMatch(/data-stage="glitch" style="--fx:0\.45;background-image:url\(\/room\/fx\/room_glitch\.jpg\);--flicker:fx-flicker-16 [\d.]+s steps\(1,end\) infinite"/);
       expect(stackOf(stillPage(15, "room"))).not.toContain("<style>");
       const css = readFileSync(resolve(__dirname, "../src/world/room/fx.css"), "utf8");
       expect(css).toContain('.fx-photo[data-stage="glitch"]{animation:var(--flicker,none)}');

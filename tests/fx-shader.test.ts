@@ -8,6 +8,8 @@
 import fc from "fast-check";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { BACKDROPS } from "@world/fit";
+import { deskLayout } from "@world/room/desk";
+import { ROOM_SHOT } from "@world/room/shots";
 import { fxPlan, renderFx, STAGES, type FxView } from "@world/room/fx";
 import { createFxLayer, fxGlEnabled, STATIC_SFX } from "@world/room/fx/layer";
 import {
@@ -15,6 +17,8 @@ import {
   burstAt,
   burstSchedule,
   createFxRenderer,
+  dissolveWeight,
+  effectiveAmount,
   FRAGMENT,
   frameState,
   FX,
@@ -27,6 +31,8 @@ import {
   PARTICLE_VERTEX,
   particleCount,
   particleSeeds,
+  protectedRects,
+  protectWeight,
   VERTEX,
   type FxRenderer,
 } from "@world/room/fx/shader";
@@ -65,8 +71,14 @@ describe("the FX table", () => {
   });
 
   it("carries the spec's numbers", () => {
-    expect(FX.dissolve.scale).toMatchObject({ wall: 3, other: 2, white: 1.5 });
-    expect(FX.dissolve.softness).toBe(0.08);
+    // The correction after seeing the shader: soft, fine, centre last, protected monitors.
+    expect(FX.dissolve.scale).toMatchObject({ wall: 5, other: 4, white: 2.5 });
+    expect(FX.dissolve.softness).toBe(0.35);
+    expect(FX.dissolve.octave2.other[1]).toBeGreaterThan(0);
+    expect(FX.dissolve.octave3.other[1]).toBeGreaterThan(0);
+    expect(FX.dissolve.centreAmount).toBe(0.55);
+    expect(FX.protect).toMatchObject({ featherPx: 40 });
+    expect(FX.glitch.burstAmount).toBe(0.9);
     expect(FX.breath).toEqual({ wall: { a: 0.003, period: 7 }, other: { a: 0.008, period: 5 }, glitch: { a: 0, period: 1 }, white: { a: 0.004, period: 9 } });
     expect([FX.grain.wall, FX.grain.other, FX.grain.white, FX.grain.burst]).toEqual([0.02, 0.05, 0.04, 0.15]);
     expect(FX.bursts.other).toMatchObject({ gapMs: [4000, 15000], lengthMs: [150, 500] });
@@ -153,6 +165,90 @@ describe("the seeded burst schedule", () => {
 });
 
 // ---------------------------------------------------------------------------------------------
+describe("the protected zone and the soft dissolve (pure mirrors of the GLSL)", () => {
+  const near = (a: number, b: number, tol = 2) => Math.abs(a - b) <= tol;
+
+  it("rects: 桌子 the two monitors and the keyboard from desk.json; 房间 the two screen hotspots'; 门 none", () => {
+    expect(protectedRects("desk")).toEqual([deskLayout.monitors.left, deskLayout.monitors.right, deskLayout.keyboard]);
+    expect(protectedRects("room")).toEqual([ROOM_SHOT.monitors.left, ROOM_SHOT.monitors.right]);
+    expect(protectedRects("door")).toEqual([]);
+    expect(protectedRects("desktop")).toEqual([]);
+    expect(protectedRects("desk").length).toBeLessThanOrEqual(FX.protect.max);
+  });
+
+  it("the 房间 rects are the monitors in room.jpg (2048×1152, × 0.78125): measured at 472–812 × 388–593 and 820–1148 × 391–590", () => {
+    const k = 0.78125;
+    const [l, r] = protectedRects("room");
+    expect([near(l!.l, 472 * k), near(l!.t, 388 * k), near(l!.l + l!.w, 812 * k), near(l!.t + l!.h, 593 * k)]).toEqual([true, true, true, true]);
+    expect([near(r!.l, 820 * k), near(r!.t, 391 * k), near(r!.l + r!.w, 1148 * k), near(r!.t + r!.h, 590 * k)]).toEqual([true, true, true, true]);
+  });
+
+  it("weight: 1 inside, 0 beyond the 40 px feather, falling smoothly between", () => {
+    const rects = protectedRects("room");
+    const m = rects[0]!;
+    const cx = m.l + m.w / 2;
+    expect(protectWeight(rects, cx, m.t + m.h / 2)).toBe(1);
+    expect(protectWeight(rects, m.l, m.t)).toBe(1);
+    expect(protectWeight(rects, cx, m.t - 40)).toBe(0);
+    expect(protectWeight(rects, cx, m.t - 100)).toBe(0);
+    const falling = [0, 10, 20, 30, 40].map((d) => protectWeight(rects, cx, m.t - d));
+    for (let i = 1; i < falling.length; i++) expect(falling[i]!).toBeLessThanOrEqual(falling[i - 1]!);
+    expect(protectWeight(rects, cx, m.t - 20)).toBeGreaterThan(0.3);
+    expect(protectWeight(rects, cx, m.t - 20)).toBeLessThan(0.7);
+    expect(protectWeight([], 100, 100)).toBe(0);
+  });
+
+  it("property: inside a protected rect the dissolve weight is the plain crossfade weight, whatever the patches say", () => {
+    for (const view of ["room", "desk"] as const) {
+      const rects = protectedRects(view);
+      fc.assert(
+        fc.property(fc.integer({ min: 0, max: rects.length - 1 }), fc.double({ min: 0, max: 1, noNaN: true }), fc.double({ min: 0, max: 1, noNaN: true }), fc.double({ min: 0, max: 1, noNaN: true }), fc.double({ min: 0, max: 1, noNaN: true }), (i, fx, fy, patch, amount) => {
+          const r = rects[i]!;
+          const x = r.l + fx * r.w;
+          const y = r.t + fy * r.h;
+          expect(protectWeight(rects, x, y)).toBe(1);
+          expect(dissolveWeight(patch, amount, protectWeight(rects, x, y))).toBeCloseTo(amount, 12);
+        }),
+      );
+    }
+  });
+
+  it("property: outside the feather the patches rule; in the feather it is a mix of the two", () => {
+    fc.assert(
+      fc.property(fc.double({ min: 0, max: 1, noNaN: true }), fc.double({ min: 0, max: 1, noNaN: true }), fc.double({ min: 0, max: 1, noNaN: true }), (patch, amount, p) => {
+        const w = dissolveWeight(patch, amount, p);
+        expect(w).toBeGreaterThanOrEqual(Math.min(patch, amount) - 1e-12);
+        expect(w).toBeLessThanOrEqual(Math.max(patch, amount) + 1e-12);
+        expect(dissolveWeight(patch, amount, 0)).toBe(patch);
+      }),
+    );
+  });
+
+  it("the amount the patches see: the middle lags (× 0.55 at the centre, × 1 in the corners), 1 is whole everywhere, 0 is nothing", () => {
+    expect(effectiveAmount(0.5, 0)).toBeCloseTo(0.275, 6);
+    expect(effectiveAmount(0.5, 1)).toBeCloseTo(0.5, 6);
+    for (const d of [0, 0.3, 0.7, 1]) {
+      expect(effectiveAmount(1, d)).toBeCloseTo(1, 12);
+      expect(effectiveAmount(0, d)).toBe(0);
+    }
+    fc.assert(
+      fc.property(fc.double({ min: 0, max: 1, noNaN: true }), fc.double({ min: 0, max: 1, noNaN: true }), fc.double({ min: 0, max: 1, noNaN: true }), (a, d1, d2) => {
+        const [lo, hi] = d1 < d2 ? [d1, d2] : [d2, d1];
+        // never above the amount, and the corners are ahead of the middle
+        expect(effectiveAmount(a, lo)).toBeLessThanOrEqual(a + 1e-12);
+        expect(effectiveAmount(a, lo)).toBeLessThanOrEqual(effectiveAmount(a, hi) + 1e-12);
+      }),
+    );
+    fc.assert(
+      fc.property(fc.double({ min: 0, max: 1, noNaN: true }), fc.double({ min: 0, max: 1, noNaN: true }), fc.double({ min: 0, max: 1, noNaN: true }), (a1, a2, d) => {
+        const [lo, hi] = a1 < a2 ? [a1, a2] : [a2, a1];
+        expect(effectiveAmount(lo, d)).toBeLessThanOrEqual(effectiveAmount(hi, d) + 1e-12);
+      }),
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------------------------
 describe("particles", () => {
   it("counts per stage: 60 dust motes on other, 40 flakes on white, none on wall or glitch", () => {
     expect(STAGES.map(particleCount)).toEqual([0, 60, 0, 40]);
@@ -191,8 +287,36 @@ describe("frameState: what the uniforms are", () => {
     const mid = frameState(p, (b.startMs + b.lengthMs / 2) / 1000, false);
     expect(mid.split).toBeCloseTo(8, 6);
     expect(mid.grain).toBeCloseTo(0.15, 6);
+    expect(mid.amtB).toBeCloseTo(0.9, 6);
     expect(mid.blocks.length).toBeGreaterThanOrEqual(5);
     expect(mid.burstStage).toBe("glitch");
+  });
+
+  it("day 16 rhythm: at rest the glitch photo is at 0.45 (≤ 0.5) with only the 2 px split and grain; a burst takes it to ≥ 0.85", () => {
+    const p = plan(16);
+    const bursts = burstSchedule(16, "glitch");
+    const inBurst = (tMs: number) => bursts.some((b) => tMs >= b.startMs && tMs < b.startMs + b.lengthMs);
+    let rest = 0;
+    for (let tMs = 0; tMs < 120000; tMs += 137) {
+      if (inBurst(tMs)) continue;
+      const s = frameState(p, tMs / 1000, false);
+      expect(s.amtB).toBeLessThanOrEqual(0.5);
+      expect(s).toMatchObject({ amtA: 1, split: 2, burst: 0, blocks: [], grain: 0.05 });
+      rest++;
+    }
+    expect(rest).toBeGreaterThan(500);
+    for (const b of bursts.slice(0, 20)) {
+      const mid = frameState(p, (b.startMs + b.lengthMs / 2) / 1000, false);
+      expect(mid.amtB).toBeGreaterThanOrEqual(0.85);
+      expect(mid.amtB).toBeLessThanOrEqual(0.9 + 1e-9);
+      expect(mid.blocks.length).toBeGreaterThanOrEqual(5);
+      expect(mid.split).toBeGreaterThan(7.9);
+    }
+    // Between bursts the room reads as a room: the bursts are a small share of the time.
+    const burstTime = bursts.filter((b) => b.startMs < 120000).reduce((n, b) => n + b.lengthMs, 0);
+    expect(burstTime / 120000).toBeLessThan(0.3);
+    // The burst's gaps are the stated 1–4 s.
+    bursts.slice(1).forEach((b, i) => expect(b.startMs - (bursts[i]!.startMs + bursts[i]!.lengthMs)).toBeGreaterThanOrEqual(1000 - 1e-6));
   });
 
   it("reduced motion: the dissolve at the day's amount, no breathing, no bursts, no grain, nothing moves", () => {
@@ -250,10 +374,37 @@ describe("the GLSL (generated from FX)", () => {
     expect(FRAGMENT).toContain("out vec4 outColor;");
   });
 
+    it("no identifier is a GLSL ES 3.00 reserved word (a driver rejects them: `patch` did)", () => {
+    const reserved = new Set(
+      ("attribute varying coherent volatile restrict readonly writeonly resource atomic_uint noperspective patch sample subroutine common partition active asm class union enum typedef template this goto inline noinline public static extern external interface long short double half fixed unsigned superp input output filter sizeof cast namespace using sampler3DRect " +
+        "sampler2DRect sampler2DRectShadow sampler1D sampler1DShadow sampler1DArray sampler1DArrayShadow image1D image2D image3D imageCube " +
+        "lowp mediump highp precision invariant flat smooth layout centroid")
+        .split(/\s+/)
+        .filter((w) => !["lowp", "mediump", "highp", "precision", "invariant", "flat", "smooth", "layout", "centroid", "attribute", "varying"].includes(w)),
+    );
+    const isReserved = (id: string) => reserved.has(id) || /^[hdf]vec[234]$/.test(id);
+    const keywords = new Set("void float int bool vec2 vec3 vec4 ivec2 ivec3 ivec4 mat2 mat3 mat4 sampler2D const uniform in out if else for while return break continue discard struct true false precision highp layout location version es".split(" "));
+    for (const [name, src] of [["vertex", VERTEX], ["fragment", FRAGMENT], ["particle vertex", PARTICLE_VERTEX], ["particle fragment", PARTICLE_FRAGMENT]] as const) {
+      const code = src.replace(/\/\/[^\n]*/g, "").replace(/#version[^\n]*/, "");
+      const ids = new Set(code.match(/[A-Za-z_]\w*/g) ?? []);
+      const bad = [...ids].filter((id) => isReserved(id) && !keywords.has(id));
+      expect(bad, `${name} shader uses reserved words`).toEqual([]);
+    }
+    // And the check itself bites.
+    expect(isReserved("patch") && isReserved("sample") && isReserved("hvec3") && isReserved("fvec4")).toBe(true);
+    expect(FRAGMENT).not.toMatch(/\bpatch\b/);
+  });
+
   it("the table's numbers are in it", () => {
-    expect(FRAGMENT).toContain("const float SCALE[5] = float[5](1.0, 3.0, 2.0, 2.5, 1.5);");
+    expect(FRAGMENT).toContain("const float SCALE[5] = float[5](1.0, 5.0, 4.0, 4.0, 2.5);");
     expect(FRAGMENT).toContain("const float OCT2W[5] = float[5](0.0, 0.0, 0.35, 0.0, 0.0);");
-    expect(FRAGMENT).toContain("const float SOFT = 0.08;");
+    expect(FRAGMENT).toContain("const float OCT3W[5] = float[5](0.0, 0.0, 0.2, 0.0, 0.0);");
+    expect(FRAGMENT).toContain("const float SOFT = 0.35;");
+    expect(FRAGMENT).toContain("const float AMT_MIN = 0.55;");
+    expect(FRAGMENT).toContain("const float FEATHER = 40.0;");
+    expect(FRAGMENT).toContain("uniform vec4 uProt[3];");
+    // Scanlines are for the bursts only.
+    expect(FRAGMENT).toContain("if (uGlitch > 0.5 && uBurst > 0.0) {\n    float row");
     expect(FRAGMENT).toContain(`uniform vec4 uBlocks[${MAX_BLOCKS}];`);
     expect(FRAGMENT).toContain("const vec2 GRID = vec2(24.0, 14.0);");
     expect(FRAGMENT).toContain("const float SCAN_EVERY = 3.0;");
@@ -345,6 +496,19 @@ describe("the renderer, against a recording fake context", () => {
     const draws = g.named("drawArrays").map(([, a]) => [a[0], a[1], a[2]]);
     expect(draws).toEqual([[g.consts.get("TRIANGLE_STRIP"), 0, 4], [g.consts.get("POINTS"), 0, 60]]);
     expect(g.count("blendFunc")).toBe(1);
+  });
+
+  it("the protected rects go to the shader: 3 on 桌子, 2 on 房间, none on 门", async () => {
+    const counts: Record<string, unknown[] | undefined> = {};
+    for (const view of ["room", "desk", "door"] as const) {
+      const g = fakeGl();
+      const r = createFxRenderer(g.gl, { loadImage });
+      r.setScene(plan(13, view), BACKDROPS[view]);
+      await flush();
+      r.frame(0, 0);
+      counts[view] = g.uniforms.get("uProtCount");
+    }
+    expect(counts).toEqual({ room: [2], desk: [3], door: [0] });
   });
 
   it("day 17: two stage photos, 60 + 40 particles; day 11 (wall): no particle pass", async () => {
