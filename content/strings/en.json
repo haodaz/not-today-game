@@ -241,5 +241,18 @@
   "room.bed.notyet": "Not yet night.",
   "room.bed.confirm": "End the day?",
   "room.bed.sleep": "Sleep",
-  "room.bed.stay": "Not yet"
+  "room.bed.stay": "Not yet",
+  "delivery.search": "Search shops or dishes",
+  "delivery.checkout": "Checkout",
+  "delivery.order": "Place order",
+  "delivery.status.accepted": "Accepted",
+  "delivery.status.cooking": "Preparing",
+  "delivery.status.pickup": "Rider picking up",
+  "delivery.status.riding": "On the way",
+  "delivery.status.arrived": "Delivered",
+  "delivery.rate": "Rate your order",
+  "delivery.rate.same": "Looks exactly like the photo",
+  "delivery.rate.fast": "Fast delivery",
+  "delivery.rate.hot": "Still hot",
+  "delivery.rate.thanks": "Thanks for your review"
 }

@@ -241,5 +241,18 @@
   "room.bed.notyet": "天还没黑透。",
   "room.bed.confirm": "要结束这一天吗？",
   "room.bed.sleep": "睡",
-  "room.bed.stay": "再待一会儿"
+  "room.bed.stay": "再待一会儿",
+  "delivery.search": "搜索店铺或菜品",
+  "delivery.checkout": "去结算",
+  "delivery.order": "下单",
+  "delivery.status.accepted": "已接单",
+  "delivery.status.cooking": "制作中",
+  "delivery.status.pickup": "骑手取餐",
+  "delivery.status.riding": "配送中",
+  "delivery.status.arrived": "已送达",
+  "delivery.rate": "评价一下",
+  "delivery.rate.same": "和图片一模一样",
+  "delivery.rate.fast": "送得快",
+  "delivery.rate.hot": "还是热的",
+  "delivery.rate.thanks": "感谢您的评价"
 }
