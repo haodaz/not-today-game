@@ -235,5 +235,11 @@
   "room.walkman": "随身听",
   "ending.good.you": "No one likes me.",
   "ending.good.kuro": "No one like you.",
-  "ending.bad.kuro": "It's today. And every day from now on will be as happy as today."
+  "ending.bad.kuro": "It's today. And every day from now on will be as happy as today.",
+  "day.nightfall": "入夜了。",
+  "hud.tonight": "今晚",
+  "room.bed.notyet": "天还没黑透。",
+  "room.bed.confirm": "要结束这一天吗？",
+  "room.bed.sleep": "睡",
+  "room.bed.stay": "再待一会儿"
 }

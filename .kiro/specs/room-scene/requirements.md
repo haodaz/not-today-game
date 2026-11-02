@@ -113,3 +113,6 @@ Seen on day 13: the dissolve makes large hard-edged blotches ("奶牛斑"), and 
 - **Day 17–18 white** keeps growing from the top; the protected zone applies there too (the monitors are the last to whiten).
 - Tests: the FX table values above; a property that the dissolve weight inside a protected rect equals the plain crossfade weight (pure helper, no GL); day-16 at-rest amount ≤ 0.5 and burst amount ≥ 0.85.
 - Also: pin the fast-check seed in `tests/dialogue.test.ts` "wrap" property (it fails roughly one run in ten on a random string); if the failure is real for that seed, fix the wrap, not the seed.
+
+## Correction 2026-11-02 (author, morning): placed things wait for the camera
+During the 房间 → 桌子 push the tabletop's placed cutouts (cup, phone, box, meal, objects, walkman) appear before the camera has arrived. They belong to the arriving framing: they fade in with the arriving photo in the last 200 ms of the move (splat on) or at the end of the CSS push (splat off), never before. Same for the HUD elements that are framing-specific (the checklist card stays). Snapshot the mid-move DOM: no `.slot` children while `.m-move` (or whatever marks a move) is on.

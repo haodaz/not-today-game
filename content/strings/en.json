@@ -235,5 +235,11 @@
   "room.walkman": "Walkman",
   "ending.good.you": "No one likes me.",
   "ending.good.kuro": "No one like you.",
-  "ending.bad.kuro": "It's today. And every day from now on will be as happy as today."
+  "ending.bad.kuro": "It's today. And every day from now on will be as happy as today.",
+  "day.nightfall": "Night falls.",
+  "hud.tonight": "Tonight",
+  "room.bed.notyet": "Not yet night.",
+  "room.bed.confirm": "End the day?",
+  "room.bed.sleep": "Sleep",
+  "room.bed.stay": "Not yet"
 }
