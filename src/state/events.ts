@@ -53,7 +53,11 @@ export type GameEvent =
    * `missed` (work FR1): the player did it themselves but did not click both conflicting clauses
    * before 通过: the self path's effects without the document's catch flags.
    */
-  | { kind: "task"; day: number; flag: string; mode: TaskEventMode; missed?: true }
+  /**
+   * `merge` (work FR1): after reading both conflicting clauses, the player's 合并 (true) or 不合
+   * (false). A record only: the self path's effects, catch flags included, either way.
+   */
+  | { kind: "task"; day: number; flag: string; mode: TaskEventMode; missed?: true; merge?: boolean }
   // object-upgrade spec (2026-11-01): accepting / declining Kuro's offer.
   | { kind: "upgrade"; day: number; object: string }
   | { kind: "declineUpgrade"; day: number; object: string; decline: DeclineKind }

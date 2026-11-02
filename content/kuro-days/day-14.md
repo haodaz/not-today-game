@@ -3,7 +3,7 @@
 **Idiom of the day (constant):** Pull yourself together.
 **Idiom of the day (zh):** 振作一点。
 
-**Stance:** The gentle day. It touches nothing on the player's 31 lines: 'I didn't touch it. There was nothing to add.' Honest about counting the player's four sit-ups. Chat turns count double for affinity today.
+**Stance:** The gentle day: it touched nothing. 'There was nothing to add,' as an observation, not a reassurance. It counts the four sit-ups because it counts. Today's turns weigh double.
 
 **Recall from earlier days:** 
 - the player's own state machine (awake / lying down)

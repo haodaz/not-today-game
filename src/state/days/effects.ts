@@ -89,8 +89,9 @@ export function isLosable(id: string): boolean {
   return id === "loan" || (membersOf("found") ?? []).includes(id);
 }
 
-export function applyTask(state: State, event: { readonly day: number; readonly flag: string; readonly mode: string; readonly missed?: true }): State {
+export function applyTask(state: State, event: { readonly day: number; readonly flag: string; readonly mode: string; readonly missed?: true; readonly merge?: boolean }): State {
   if (event.missed !== undefined && (event.missed !== true || event.mode !== "self")) throw new Error("task: missed is only for a self path");
+  if (event.merge !== undefined && (typeof event.merge !== "boolean" || event.mode !== "self" || event.missed)) throw new Error("task: merge is only for a self path that found the conflict");
   if (event.mode !== "auto" && !(TASK_MODES as readonly string[]).includes(event.mode)) throw new Error(`task: unknown mode "${event.mode}"`);
   if (!taskFlags(event.day).includes(event.flag)) throw new Error(`task: "${event.flag}" is not a task of day ${event.day}`);
   const tree = taskByFlag(event.day, event.flag);

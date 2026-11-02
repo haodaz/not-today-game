@@ -15,6 +15,7 @@ import en from "@content/strings/en.json";
 import { netConfig, kuroOnline } from "@net/supabase";
 import { pushDue, syncDecision, type RunCopy } from "@net/sync";
 import { buildKuroContent, bundleKuroContent } from "../scripts/bundle-kuro-content";
+import { KURO_CONTENT } from "../supabase/functions/kuro-chat/content.ts";
 
 const ROOT = resolve(__dirname, "..");
 const read = (rel: string) => readFileSync(resolve(ROOT, rel), "utf8");
@@ -94,6 +95,18 @@ describe("the bundle (npm run bundle:kuro)", () => {
     expect(LOCALE_LINES.zh).not.toMatch(/render/);
   });
 
+  it("the committed content.ts is the bundle of today's content: layered answers on days 7, 11, 13, 15, 17 only", () => {
+    expect(KURO_CONTENT).toEqual(JSON.parse(JSON.stringify(content)));
+    const layeredDays = Object.values(content.days).filter((d) => (d.layered ?? []).length > 0).map((d) => d.day);
+    expect(layeredDays).toEqual([7, 11, 13, 15, 17]);
+    // minBucket above low only where content opened deeper questions; every day has its starters.
+    for (const d of Object.values(content.days)) {
+      expect(d.starters!.length, `day ${d.day}`).toBeGreaterThan(0);
+      if (!layeredDays.includes(d.day)) expect(d.starters!.every((s) => s.minBucket === "low"), `day ${d.day}`).toBe(true);
+    }
+    expect(Object.values(content.days).some((d) => d.starters!.some((s) => s.minBucket === "high"))).toBe(true);
+    expect(content.unreadable!.zh).toBeTruthy();
+  });
   it("is deterministic, and the generated file is typed", () => {
     const text = bundleKuroContent(read, list);
     expect(bundleKuroContent(read, list)).toBe(text);

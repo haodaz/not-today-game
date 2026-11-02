@@ -382,3 +382,5 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .wb .ask .wpass{display:flex;justify-content:flex-end;margin-top:8px}
 .wb .ask .wpass .pass{border:0;border-radius:8px;background:var(--accent);color:#fff;padding:6px 16px;font:inherit;font-size:13px;cursor:pointer}
 .wb .ask .wpass .pass:disabled{opacity:.4;cursor:default}
+/* 合并 on the self path (work FR1): the merge result in one column. */
+.wb .surface .cols.one{grid-template-columns:1fr}

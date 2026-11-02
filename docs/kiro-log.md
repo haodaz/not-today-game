@@ -1050,3 +1050,23 @@ Tree 041b3d3 plus Claude's content (wb.msgs.* strings, delivery numbers, day-01 
   - Layered answers and minBucket in the kuro-days files.
   - content.ts must be regenerated (`npm run bundle:kuro`) before deploying: I could not run node here.
   - The day-13 catch count (needs catch data the function can see) is not built.
+
+## 2026-11-02 (late night): the work snapshots, the rebundled content, 合并 / 不合
+
+Tree 7f6640d plus Claude's content. No content edited. tsc clean; vitest 81 files / 1461 tests green.
+
+1. **Refresh and confirm:**
+   - `tests/work.test.ts`: two snapshots refreshed after checking the only change is `<p>这个怎么做？</p>` in Kuro's ask bubble (2 in the thread entry, 6 in the surfaces entry).
+   - `tests/backend.test.ts`: new test that the committed `content.ts` equals `buildKuroContent(content/)`; layered answers on days 7, 11, 13, 15, 17 only; every other day's starters all `low`; a `high` starter exists; `kuro.unreadable` is bundled.
+   - Day 7 has layered answers but no starter above low.
+   - Not from this segment: day 1's **Stance** in `content/kuro-days/day-01.md` changed during the session (content.ts already matches it). The backend day-1 prompt snapshot was refreshed after checking that line is the whole diff.
+2. **合并 / 不合** (work FR1, self path):
+   - `desktop/workbench/work.ts`:
+     - Once both conflicting clauses are clicked, Kuro's message (its self line) carries 合并 / 不合 chips (`wb.merge` / `wb.keep`), each rendered only when its string exists; with neither, the flow is as before.
+     - 通过 is hidden and inert until answered.
+     - 合并 shows the right-hand version as the merge result in one column (conflict clauses marked); 不合 keeps both columns.
+     - The answer is the player's reply in the thread and in the done threads.
+   - `state/events.ts`, `state/days/effects.ts`: the `task` event gains optional `merge: boolean`, a record only (self path, not missed); the effects, catch flags included, are the self path's either way.
+   - `desktop.css`: one-column merged doc.
+   - Tests: new `tests/work-merge.test.ts` mocks the strings table with the literals under content's own (content wins once it has them), covering: chips only after both clicks; each path's event and flags; the reducer guard; the snapshot with the chips. `tests/work.test.ts`: without the strings, no chip, no raw key, the plain self event.
+- **For Claude:** the `wb.merge` / `wb.keep` strings (zh and en).

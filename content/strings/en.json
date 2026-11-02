@@ -274,5 +274,21 @@
   "weather.fog": "Fog",
   "weather.clear": "Clear",
   "weather.stopped": "Rain stopped",
-  "weather.white": "White"
+  "weather.white": "White",
+  "wb.ask.how": "How do you want to do this?",
+  "wb.scope.all": "Everything",
+  "kuro.taboo.blood": "Something runs from your nose.",
+  "error.1": "Error 0x0000007B: memory could not be read.",
+  "error.2": "Error: the application has stopped responding.",
+  "error.3": "Unknown error.",
+  "error.4": "Error 0xC000021A: fatal system error.",
+  "error.5": "File not found. It may have been moved or deleted.",
+  "error.6": "Error: insufficient permissions.",
+  "error.7": "Connection reset.",
+  "error.8": "Error 0x80070057: the parameter is incorrect.",
+  "error.9": "Not enough memory to complete this operation.",
+  "error.10": "Error: the operation was cancelled.",
+  "error.11": "Unhandled exception.",
+  "error.12": "Error: today too.",
+  "kuro.unreadable": "I can't read that line myself."
 }

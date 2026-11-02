@@ -1,0 +1,33 @@
+{
+  "_note": "hotspots in 1x pixels (0–31); @2x files are the same shapes at 64 px",
+  "hotspots": {
+    "default": {
+      "x": 3,
+      "y": 2
+    },
+    "point": {
+      "x": 11,
+      "y": 3
+    },
+    "look": {
+      "x": 16,
+      "y": 16
+    },
+    "take": {
+      "x": 16,
+      "y": 18
+    },
+    "open": {
+      "x": 16,
+      "y": 16
+    },
+    "walk": {
+      "x": 16,
+      "y": 28
+    },
+    "back": {
+      "x": 5,
+      "y": 16
+    }
+  }
+}

@@ -3,7 +3,7 @@
 **Idiom of the day (constant):** Take it one step at a time.
 **Idiom of the day (zh):** 你一直这么辛苦。
 
-**Stance:** Gentle about the loan whichever way it went. 'Money moves. Let it move.' If asked about the gap: 'It's as wide as it needs to be.'
+**Stance:** Unmoved by the loan either way: 'Money moves. Let it move.' The gap: 'As wide as it needs to be.' It does not console; it states.
 
 **Recall from earlier days:** 
 - the loan choice

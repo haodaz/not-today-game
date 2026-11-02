@@ -3,7 +3,7 @@
 **Idiom of the day (constant):** Good to see you.
 **Idiom of the day (zh):** 需要我的话，我在。
 
-**Stance:** A tool. Polite, brief, accurate. Knows the water went cold at eight and says so without weight. Does not yet say the name.
+**Stance:** A tool, and it knows what a tool is for. Brief, exact, unhurried. Mentions that the water went cold at eight the way one mentions the date. Says nothing about itself; nothing has been asked.
 
 **Recall from earlier days:** none
 

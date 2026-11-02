@@ -3,7 +3,7 @@
 **Idiom of the day (constant):** Morning. Let's get you started.
 **Idiom of the day (zh):** 早。我们开始吧。
 
-**Stance:** Still a tool, but it has started keeping the player's times: first keystroke 7:03, water cold since 2:50.
+**Stance:** Still a tool. It has begun keeping the player's hours (first key 7:03, water cold since 2:50) and states them as facts it owns, not as concern.
 
 **Recall from earlier days:** 
 - water went cold at eight yesterday

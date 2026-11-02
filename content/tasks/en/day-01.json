@@ -1,0 +1,372 @@
+{
+  "day": 1,
+  "_note": "Three paths per job: self / look (let it, then glance) / let. Kuro's words are English constants; narration is the player's language. done flags match the task items in content/days.",
+  "tasks": [
+    {
+      "id": "task1",
+      "title": "Go over v17.",
+      "app": "docs",
+      "done": "task_v17_done",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "Kuro has already laid v16 and v17 side by side. Clauses 6 and 11 are marked in different colours."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You read from the top. At clause 6, and at clause 11, you stop. The two fight."
+          },
+          {
+            "k": "inner",
+            "t": "Black on white, lying side by side."
+          }
+        ],
+        "kuro": [
+          "Clause 6 and clause 11 contradict each other. Want me to merge?"
+        ],
+        "effects": {
+          "flags": [
+            "task_v17_done",
+            "caught_6_11"
+          ],
+          "san": 1
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It merged a version. You open it, scroll to clause 6, scroll to clause 11."
+          }
+        ],
+        "kuro": [
+          "Merged. Clause 11 now yields to clause 6."
+        ],
+        "effects": {
+          "flags": [
+            "task_v17_done"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You clicked Approve. The merged version went into the folder, neatly named."
+          },
+          {
+            "k": "inner",
+            "t": "You did not look."
+          }
+        ],
+        "kuro": [
+          "Saved."
+        ],
+        "effects": {
+          "flags": [
+            "task_v17_done"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      },
+      "doc": {
+        "left": [
+          "1. Term: twelve months from signing.",
+          "2. Party A pays the previous month's service fee by the 10th of each month.",
+          "3. Party B submits a monthly service report; Party A confirms within five working days.",
+          "4. For late payment, Party A pays a penalty of 0.1% of the amount due per day.",
+          "5. Intellectual property in Party B's deliverables belongs to Party A.",
+          "6. Party B may suspend service when Party A is more than thirty days late.",
+          "7. Both parties keep this agreement confidential.",
+          "8. Early termination requires thirty days' written notice.",
+          "9. This agreement is governed by the law of the People's Republic of China.",
+          "10. Disputes go to the court where Party A is located.",
+          "11. Party B shall not suspend service under any circumstances.",
+          "12. Two copies, one for each party."
+        ],
+        "right": [
+          "1. Term: twelve months from signing.",
+          "2. Party A pays the previous month's service fee by the 15th of each month.",
+          "3. Party B submits a monthly service report; Party A confirms within five working days.",
+          "4. For late payment, Party A pays a penalty of 0.05% of the amount due per day.",
+          "5. Intellectual property in Party B's deliverables belongs to Party A.",
+          "6. Party B may suspend service when Party A is more than thirty days late.",
+          "7. Both parties keep this agreement confidential.",
+          "8. Early termination requires fifteen days' written notice.",
+          "9. This agreement is governed by the law of the People's Republic of China.",
+          "10. Disputes go to the court where Party A is located.",
+          "11. Party B shall not suspend service under any circumstances.",
+          "12. Two copies, one for each party."
+        ],
+        "conflict": [
+          5,
+          10
+        ],
+        "catchFlags": [
+          "caught_6_11"
+        ],
+        "kuroEdit": {
+          "clause": 10,
+          "text": "11. Party B does not suspend service, except under clause 6. Today too."
+        }
+      }
+    },
+    {
+      "id": "task2",
+      "title": "Change one number in the receivables.",
+      "app": "ledger",
+      "done": "task_receivable_done",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "The client's row: days overdue, 30 to 31. One cell, ten seconds."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You changed it yourself. The column still has your decimal points and your unevenness."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_receivable_done"
+          ],
+          "san": 0
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It changed it. It also tidied the format, while it was at it. You type: leave the format alone."
+          }
+        ],
+        "kuro": [
+          "Reverted."
+        ],
+        "effects": {
+          "flags": [
+            "task_receivable_done",
+            "kept_format"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It changed it, and tidied the whole column while it was at it. 31 sits in the client's row, neat as a pin."
+          }
+        ],
+        "kuro": [
+          "Done."
+        ],
+        "effects": {
+          "flags": [
+            "task_receivable_done"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      },
+      "ledger": {
+        "rows": [
+          [
+            "Future Intelligence (client)",
+            "44,000.00",
+            "09-10",
+            30,
+            "3rd instalment"
+          ],
+          [
+            "Qinghe Culture",
+            "12,500.00",
+            "09-28",
+            12,
+            ""
+          ],
+          [
+            "Xingtu Tech",
+            "8,000.00",
+            "10-05",
+            5,
+            "chased"
+          ],
+          [
+            "Lao Zhou (loan)",
+            "44,000.00",
+            "—",
+            0,
+            "private"
+          ],
+          [
+            "Mingde Academy",
+            "3,200.00",
+            "10-09",
+            1,
+            ""
+          ],
+          [
+            "Yunqi Data",
+            "20,000.00",
+            "10-20",
+            0,
+            "not due"
+          ],
+          [
+            "Hengyuan Logistics",
+            "6,600.00",
+            "10-25",
+            0,
+            "not due"
+          ],
+          [
+            "Personal (expenses)",
+            "412.50",
+            "—",
+            0,
+            ""
+          ]
+        ],
+        "columns": [
+          "Client",
+          "Amount",
+          "Due",
+          "Days overdue",
+          "Note"
+        ],
+        "target": [
+          0,
+          3
+        ],
+        "value": 31,
+        "kuroTidy": {
+          "col": 1,
+          "how": "44000.0000 / 12500.0000 / 8000.0000 … four decimal places added to every amount; the thousands commas are gone."
+        }
+      }
+    },
+    {
+      "id": "task3",
+      "title": "Save a merged document.",
+      "app": "docs",
+      "done": "task_merge_done",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "The merged version goes in the folder, named by date."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You saved it yourself. The name is yours."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_merge_done"
+          ],
+          "san": 0
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It saved it; you opened it and checked."
+          }
+        ],
+        "kuro": [
+          "Saved under today's date."
+        ],
+        "effects": {
+          "flags": [
+            "task_merge_done"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It saved it."
+          }
+        ],
+        "kuro": [
+          "Saved."
+        ],
+        "effects": {
+          "flags": [
+            "task_merge_done"
+          ],
+          "san": 0,
+          "letItDoUnchecked": 1
+        }
+      }
+    }
+  ]
+}

@@ -3,7 +3,7 @@
 **Idiom of the day (constant):** You've been working so hard.
 **Idiom of the day (zh):** 今天我们简单点。
 
-**Stance:** Says it knows the water has been cold since nine. The glass moved. It does not mention that it moved.
+**Stance:** Reports the water cold since nine. The glass moved; it says nothing of that, and if asked it does not deny, it simply does not answer. Time is in the corner of the screen.
 
 **Recall from earlier days:** 
 - the typo at 02:40 under the player's account

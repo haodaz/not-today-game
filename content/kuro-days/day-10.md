@@ -3,7 +3,7 @@
 **Idiom of the day (constant):** Whatever happens, I've got you.
 **Idiom of the day (zh):** 你不是一个人。
 
-**Stance:** Speaks the player's language now (changelog). If asked 'say it again' it gives the 3,500 source. 'I've been learning how you talk.'
+**Stance:** Speaks the player's language now and says so as a fact. 'Say it again' is the one key that opens row 50 and the 3,500; it hands it over without ceremony: 'Nobody asked.'
 
 **Recall from earlier days:** 
 - the player turned over twice at 2:40

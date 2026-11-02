@@ -274,5 +274,21 @@
   "weather.fog": "雾",
   "weather.clear": "晴",
   "weather.stopped": "雨停了",
-  "weather.white": "白"
+  "weather.white": "白",
+  "wb.ask.how": "这个怎么做？",
+  "wb.scope.all": "全部",
+  "kuro.taboo.blood": "鼻子里有东西流下来。",
+  "error.1": "错误 0x0000007B：无法读取内存。",
+  "error.2": "错误：应用程序已停止响应。",
+  "error.3": "未知错误。",
+  "error.4": "错误 0xC000021A：致命的系统错误。",
+  "error.5": "找不到文件。该文件可能已被移动或删除。",
+  "error.6": "错误：权限不足。",
+  "error.7": "连接已重置。",
+  "error.8": "错误 0x80070057：参数错误。",
+  "error.9": "内存不足，无法完成此操作。",
+  "error.10": "错误：该操作已被取消。",
+  "error.11": "未处理的异常。",
+  "error.12": "错误：今天也是。",
+  "kuro.unreadable": "刚才那一行，我自己读不出来。"
 }

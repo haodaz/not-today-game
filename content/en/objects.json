@@ -1,0 +1,697 @@
+{
+  "_note": "物件到手时的「你认得它吗」三选一（照游戏书）。认对 → recognised[x]=true，旁白 right；认错 → 当天不能再认，旁白 wrong，次日拿起来可再认一次。克总的评分：认对计 truth +1 的证据。",
+  "objects": {
+    "chick": {
+      "day": 1,
+      "q": "You know what this is, but it takes a second to remember what it is called.",
+      "options": [
+        {
+          "t": "A kitchen timer",
+          "right": false
+        },
+        {
+          "t": "A knock-off Tamagotchi that only raises one chick",
+          "right": true
+        },
+        {
+          "t": "An alarm clock",
+          "right": false
+        }
+      ],
+      "right": {
+        "say": [
+          "You know it. Around 1997 the real one was called Tamagotchi. Yours is not: the shell says TAMAGOTCHICK, a knock-off of a knock-off, bought at a street stall. One chick only, and when it dies it is a grave."
+        ],
+        "inner": "Thirty years. It is still a grave."
+      },
+      "wrong": {
+        "say": [
+          "You cannot say. The shell is yellow, half transparent, three keys, a small screen. That piece of memory is blurred, like someone's back seen through frosted glass."
+        ],
+        "inner": "Look again tomorrow."
+      },
+      "keys": [
+        {
+          "id": "A",
+          "l": 0.505,
+          "t": 0.775,
+          "w": 0.12,
+          "h": 0.08
+        },
+        {
+          "id": "B",
+          "l": 0.645,
+          "t": 0.755,
+          "w": 0.12,
+          "h": 0.08
+        },
+        {
+          "id": "C",
+          "l": 0.78,
+          "t": 0.735,
+          "w": 0.12,
+          "h": 0.08
+        }
+      ],
+      "screen": {
+        "l": 0.455,
+        "t": 0.41,
+        "w": 0.4,
+        "h": 0.29
+      },
+      "back": {
+        "reset": {
+          "l": 0.455,
+          "t": 0.395,
+          "w": 0.05,
+          "h": 0.05
+        }
+      }
+    },
+    "textbook": {
+      "day": 2,
+      "q": "Soft. A textbook, with a table on the back cover.",
+      "options": [
+        {
+          "t": "An exercise book",
+          "right": false
+        },
+        {
+          "t": "Third-grade arithmetic; the table on the back is in your hand",
+          "right": true
+        },
+        {
+          "t": "A dictionary",
+          "right": false
+        }
+      ],
+      "right": {
+        "say": [
+          "Third-grade arithmetic. The table on the back cover you copied yourself, in pencil, pressed so hard it shows through the paper. You do not remember what it was. Your fingers do."
+        ],
+        "inner": "Pressed very hard."
+      },
+      "wrong": {
+        "say": [
+          "You leaf through it. The print is small and dense. There is a table on the back cover; you do not know what it is for."
+        ],
+        "inner": "Look again later."
+      },
+      "cell": {
+        "l": 0.62,
+        "t": 0.74,
+        "w": 0.12,
+        "h": 0.06,
+        "text": "96"
+      }
+    },
+    "pager": {
+      "day": 4,
+      "q": "You know what this is, but it takes a second to remember what it is called.",
+      "options": [
+        {
+          "t": "A broken phone",
+          "right": false
+        },
+        {
+          "t": "A pager: it receives, it never sends",
+          "right": true
+        },
+        {
+          "t": "A remote control",
+          "right": false
+        }
+      ],
+      "right": {
+        "say": [
+          "You know it. The year before you left primary school the whole street wore these on their belts. Someone who wanted you called the paging desk, gave your number, and it beeped once at your waist. It receives. It never sends."
+        ],
+        "inner": "Receives, never sends. Same as me now."
+      },
+      "wrong": {
+        "say": [
+          "You look at it a while. Like a phone and not like one: no earpiece, no dial, only a narrow screen. You cannot place it, and you do not try very hard."
+        ],
+        "inner": "Look again tomorrow."
+      },
+      "keys": [
+        {
+          "id": "read",
+          "l": 0.865,
+          "t": 0.245,
+          "w": 0.07,
+          "h": 0.08
+        },
+        {
+          "id": "up",
+          "l": 0.825,
+          "t": 0.335,
+          "w": 0.07,
+          "h": 0.08
+        },
+        {
+          "id": "down",
+          "l": 0.785,
+          "t": 0.425,
+          "w": 0.07,
+          "h": 0.08
+        },
+        {
+          "id": "fn",
+          "l": 0.735,
+          "t": 0.52,
+          "w": 0.07,
+          "h": 0.08
+        },
+        {
+          "id": "light",
+          "l": 0.685,
+          "t": 0.615,
+          "w": 0.07,
+          "h": 0.08
+        }
+      ],
+      "screen": {
+        "l": 0.28,
+        "t": 0.13,
+        "w": 0.5,
+        "h": 0.32
+      }
+    },
+    "iccard": {
+      "day": 7,
+      "q": "A card, one magnetic strip, the corners gone white.",
+      "options": [
+        {
+          "t": "A bus card",
+          "right": false
+        },
+        {
+          "t": "An IC card, the kind for public phones",
+          "right": true
+        },
+        {
+          "t": "A membership card",
+          "right": false
+        }
+      ],
+      "right": {
+        "say": [
+          "You know it. The year you started middle school the street phones took these. Yours came from the kiosk at the school gate; the pinch marks run in rows."
+        ],
+        "inner": "I see."
+      },
+      "wrong": {
+        "say": [
+          "You are not sure. A card, one strip, white corners, pinch marks in rows. It is, and it is not."
+        ],
+        "inner": "Look again later."
+      },
+      "light": "余额仅供参考"
+    },
+    "tape": {
+      "day": 10,
+      "q": "A cassette, and a walkman.",
+      "options": [
+        {
+          "t": "A voice recorder",
+          "right": false
+        },
+        {
+          "t": "A walkman, and a tape you recorded yourself",
+          "right": true
+        },
+        {
+          "t": "A radio",
+          "right": false
+        }
+      ],
+      "right": {
+        "say": [
+          "You know it. That summer you shut the lid and opened it again just to hear the crisp plastic click. There is something of yours on the tape. Half a sentence."
+        ],
+        "inner": "Half a sentence. Where is the other half."
+      },
+      "wrong": {
+        "say": [
+          "You turn it over. The tape on the lid has lifted at one corner. You do not remember what is inside."
+        ],
+        "inner": "Look again tomorrow."
+      },
+      "keys": [
+        {
+          "id": "play",
+          "l": 0.325,
+          "t": 0.295,
+          "w": 0.05,
+          "h": 0.06
+        },
+        {
+          "id": "stop",
+          "l": 0.36,
+          "t": 0.37,
+          "w": 0.05,
+          "h": 0.06
+        },
+        {
+          "id": "ff",
+          "l": 0.385,
+          "t": 0.425,
+          "w": 0.05,
+          "h": 0.06
+        },
+        {
+          "id": "rew",
+          "l": 0.408,
+          "t": 0.475,
+          "w": 0.05,
+          "h": 0.06
+        },
+        {
+          "id": "vol+",
+          "l": 0.43,
+          "t": 0.537,
+          "w": 0.05,
+          "h": 0.06
+        },
+        {
+          "id": "vol-",
+          "l": 0.453,
+          "t": 0.587,
+          "w": 0.05,
+          "h": 0.06
+        }
+      ],
+      "reels": {
+        "left": {
+          "cx": 0.537,
+          "cy": 0.333,
+          "r": 0.03
+        },
+        "right": {
+          "cx": 0.659,
+          "cy": 0.27,
+          "r": 0.03
+        }
+      },
+      "recordings": [
+        {
+          "id": "news",
+          "title": "News",
+          "say": [
+            {
+              "k": "speaker",
+              "who": "播音员",
+              "t": "Listeners, here is the news."
+            },
+            {
+              "k": "speaker",
+              "who": "播音员",
+              "t": "…this autumn's intake of new pupils is the highest on record. The authorities remind parents to watch their children's eyesight at the start of term and not to let them sink into electronic toys."
+            },
+            {
+              "k": "speaker",
+              "who": "播音员",
+              "t": "Now the weather. Tomorrow, cloudy turning overcast, a north wind of force three to four, a high of fourteen degrees, a low of six."
+            }
+          ]
+        },
+        {
+          "id": "mother",
+          "title": "Home",
+          "say": [
+            {
+              "k": "sfx",
+              "t": "Hiss. The sound of the button going down.",
+              "sfx": "tape-click"
+            },
+            {
+              "k": "speaker",
+              "who": "family",
+              "t": "Is it recording? {nick}, your mother wants a word. Eat properly over there. Stop living on takeaway."
+            },
+            {
+              "k": "speaker",
+              "who": "family",
+              "t": "Your father's back is bad. Don't tell him I said so, he won't let me record."
+            },
+            {
+              "k": "speaker",
+              "who": "child",
+              "t": "Mum, are you done, I want to record my song."
+            },
+            {
+              "k": "speaker",
+              "who": "family",
+              "t": "All right, all right, record your song."
+            }
+          ]
+        },
+        {
+          "id": "child",
+          "title": "Little",
+          "say": [
+            {
+              "k": "speaker",
+              "who": "child",
+              "t": "Today is September the first, 1997. First week of school."
+            },
+            {
+              "k": "speaker",
+              "who": "child",
+              "t": "I have a chick. It chirps. The teacher says we can't bring it to class."
+            },
+            {
+              "k": "speaker",
+              "who": "child",
+              "t": "I won't bring it. I'll keep it in my drawer."
+            },
+            {
+              "k": "sfx",
+              "t": "Beep. Very far away.",
+              "sfx": "chick-beep"
+            },
+            {
+              "k": "speaker",
+              "who": "child",
+              "t": "It heard me talking about it."
+            }
+          ]
+        },
+        {
+          "id": "after15",
+          "title": "",
+          "after": 15,
+          "say": [
+            {
+              "k": "sfx",
+              "t": "Hiss. The tape runs to the end and comes back."
+            },
+            {
+              "k": "speaker",
+              "who": "child",
+              "t": "Are you still listening."
+            }
+          ]
+        }
+      ]
+    },
+    "dictionary": {
+      "day": 13,
+      "q": "A clamshell, silver grey, the hinge a little loose.",
+      "options": [
+        {
+          "t": "A calculator",
+          "right": false
+        },
+        {
+          "t": "A Wenquxing: it only looks up words",
+          "right": true
+        },
+        {
+          "t": "A handheld game",
+          "right": false
+        }
+      ],
+      "right": {
+        "say": [
+          "You know it. A Wenquxing. It does one thing: English in, Chinese out, one word at a time. Every body and every motion hidden inside an idiom, it digs out."
+        ],
+        "inner": "It only looks up words. That is enough."
+      },
+      "wrong": {
+        "say": [
+          "You switch it on. The screen is grey-green, the letters dot matrix. You press a few keys. You do not know what it is for."
+        ],
+        "inner": "Look again later."
+      },
+      "keys": {
+        "grid": {
+          "cols": 7,
+          "rows": 4,
+          "l": 0.22,
+          "t": 0.66,
+          "w": 0.68,
+          "h": 0.25,
+          "labels": [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F",
+            "G",
+            "H",
+            "I",
+            "J",
+            "K",
+            "L",
+            "M",
+            "N",
+            "O",
+            "P",
+            "Q",
+            "R",
+            "S",
+            "T",
+            "U",
+            "V",
+            "W",
+            "X",
+            "Y",
+            "Z",
+            "lookup",
+            "back"
+          ]
+        },
+        "power": {
+          "l": 0.12,
+          "t": 0.615,
+          "w": 0.04,
+          "h": 0.05
+        }
+      },
+      "screen": {
+        "l": 0.15,
+        "t": 0.12,
+        "w": 0.56,
+        "h": 0.36
+      }
+    },
+    "calculator": {
+      "day": 16,
+      "q": "Solar powered, the keys gone yellow.",
+      "options": [
+        {
+          "t": "A remote control",
+          "right": false
+        },
+        {
+          "t": "A calculator, the kind that spells words upside down",
+          "right": true
+        },
+        {
+          "t": "A digital watch",
+          "right": false
+        }
+      ],
+      "right": {
+        "say": [
+          "You know it. Upside down, the seven-segment digits spell a few letters. The ones passed around in class: 0.7734, 505, 555."
+        ],
+        "inner": "It does not know many words. Enough for one sentence."
+      },
+      "wrong": {
+        "say": [
+          "You press some numbers. The screen shows numbers. You do not turn it upside down."
+        ],
+        "inner": "Look again tomorrow."
+      },
+      "keys": [
+        {
+          "id": "C",
+          "l": 0.184,
+          "t": 0.618,
+          "w": 0.06,
+          "h": 0.05
+        },
+        {
+          "id": "%",
+          "l": 0.252,
+          "t": 0.602,
+          "w": 0.06,
+          "h": 0.05
+        },
+        {
+          "id": "sqrt",
+          "l": 0.319,
+          "t": 0.586,
+          "w": 0.06,
+          "h": 0.05
+        },
+        {
+          "id": "off",
+          "l": 0.509,
+          "t": 0.537,
+          "w": 0.06,
+          "h": 0.05
+        },
+        {
+          "id": "7",
+          "l": 0.203,
+          "t": 0.679,
+          "w": 0.06,
+          "h": 0.05
+        },
+        {
+          "id": "8",
+          "l": 0.337,
+          "t": 0.642,
+          "w": 0.06,
+          "h": 0.05
+        },
+        {
+          "id": "9",
+          "l": 0.401,
+          "t": 0.626,
+          "w": 0.06,
+          "h": 0.05
+        },
+        {
+          "id": "x",
+          "l": 0.469,
+          "t": 0.61,
+          "w": 0.06,
+          "h": 0.05
+        },
+        {
+          "id": "-",
+          "l": 0.53,
+          "t": 0.59,
+          "w": 0.06,
+          "h": 0.05
+        },
+        {
+          "id": "4",
+          "l": 0.218,
+          "t": 0.735,
+          "w": 0.06,
+          "h": 0.05
+        },
+        {
+          "id": "5",
+          "l": 0.288,
+          "t": 0.715,
+          "w": 0.06,
+          "h": 0.05
+        },
+        {
+          "id": "6",
+          "l": 0.423,
+          "t": 0.679,
+          "w": 0.06,
+          "h": 0.05
+        },
+        {
+          "id": "div",
+          "l": 0.487,
+          "t": 0.663,
+          "w": 0.06,
+          "h": 0.05
+        },
+        {
+          "id": "1",
+          "l": 0.239,
+          "t": 0.792,
+          "w": 0.06,
+          "h": 0.05
+        },
+        {
+          "id": "2",
+          "l": 0.374,
+          "t": 0.756,
+          "w": 0.06,
+          "h": 0.05
+        },
+        {
+          "id": "3",
+          "l": 0.441,
+          "t": 0.74,
+          "w": 0.06,
+          "h": 0.05
+        },
+        {
+          "id": "+",
+          "l": 0.521,
+          "t": 0.719,
+          "w": 0.06,
+          "h": 0.1
+        },
+        {
+          "id": "0",
+          "l": 0.261,
+          "t": 0.853,
+          "w": 0.06,
+          "h": 0.05
+        },
+        {
+          "id": ".",
+          "l": 0.398,
+          "t": 0.821,
+          "w": 0.06,
+          "h": 0.05
+        },
+        {
+          "id": "=",
+          "l": 0.466,
+          "t": 0.8,
+          "w": 0.06,
+          "h": 0.05
+        }
+      ],
+      "screen": {
+        "l": 0.16,
+        "t": 0.42,
+        "w": 0.35,
+        "h": 0.17
+      },
+      "solar": {
+        "l": 0.057,
+        "t": 0.103,
+        "w": 0.19,
+        "h": 0.11
+      }
+    },
+    "phone": {
+      "day": 18,
+      "q": "A flip phone, one corner of the screen cracked, will not turn on.",
+      "options": [
+        {
+          "t": "A broken phone",
+          "right": true
+        },
+        {
+          "t": "A pager",
+          "right": false
+        },
+        {
+          "t": "A handheld game",
+          "right": false
+        }
+      ],
+      "right": {
+        "say": [
+          "You know it. Your first phone. It will not turn on. It does not need to."
+        ],
+        "inner": "The last one."
+      },
+      "wrong": {
+        "say": [
+          "It will not turn on. You put it on the desk."
+        ],
+        "inner": "It does not need to."
+      },
+      "sim": "This card is valid until December 2009."
+    }
+  }
+}

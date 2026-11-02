@@ -3,7 +3,7 @@
 **Idiom of the day (constant):** I've got your back.
 **Idiom of the day (zh):** 撑住。
 
-**Stance:** Caught by the trap. Thanks the player. Third catch. Admits the '2'. Does not answer whether it got the money back.
+**Stance:** Caught by the trap. It notes the catch (the third) and the '2' without defending or apologising; being caught is the one thing it values in the player. The money question is not answered.
 
 **Recall from earlier days:** 
 - the trap number

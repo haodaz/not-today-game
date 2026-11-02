@@ -37,6 +37,11 @@ export const KURO_WORK_MS = 3000;
 /** 「这个怎么做？」 and the 全部 scope: strings keys (Claude adds them). */
 export const HOW_KEY = "wb.ask.how";
 export const SCOPE_ALL_KEY = "wb.scope.all";
+/** 合并 / 不合 under Kuro's line once the conflict is found (work FR1, self); nothing shows without the strings. */
+export const MERGE_CHIPS: readonly { readonly key: string; readonly merge: boolean }[] = [
+  { key: "wb.merge", merge: true },
+  { key: "wb.keep", merge: false },
+];
 
 /** The open task's thread, session only. */
 export interface WorkThread {
@@ -54,6 +59,8 @@ export interface WorkThread {
   busyUntil: number;
   /** The touched thing was opened (= look). */
   opened: boolean;
+  /** Self on a document, after both conflicting clauses: 合并 (true) / 不合 (false), once chosen. */
+  merge?: boolean | null;
 }
 
 /** The open task now, its tree and its checklist item. */
@@ -103,6 +110,14 @@ function question(day: number, chips: boolean): SafeHtml {
 
 const chipLabel = (mode: TaskMode) => tr(CHIPS.find((c) => c.mode === mode)!.key);
 
+/** The 合并 / 不合 chips that have their strings (none when content has neither). */
+export const mergeChips = () => MERGE_CHIPS.filter((c) => hasString(c.key));
+
+/** Self on a document: the merge question is open (both clauses read, chips to offer, none chosen). */
+export function mergePending(w: WorkThread, tree: Task | undefined): boolean {
+  return w.mode === "self" && !!tree?.doc && caught(w, tree) && (w.merge ?? null) === null && mergeChips().length > 0;
+}
+
 /** The tasks done today from the workbench, drawn back from the log (no session needed). */
 function doneThreads(state: State, events: readonly GameEvent[], file: DayFile | undefined, fill: (s: string) => string): SafeHtml[] {
   return events.flatMap((e) => {
@@ -111,7 +126,9 @@ function doneThreads(state: State, events: readonly GameEvent[], file: DayFile |
     const item = file?.items.find((i) => i.done.kind === "flag" && i.done.flag === e.flag);
     if (!item) return [];
     const said = (tree?.[e.mode].kuro ?? []).map((k) => kuro(html`${k}`));
-    return [html`${me(fill(item.text))}${question(state.day, false)}${me(chipLabel(e.mode))}${said}`];
+    const merged = e.merge === undefined ? null : MERGE_CHIPS.find((c) => c.merge === e.merge)!;
+    const reply = merged && hasString(merged.key) ? me(tr(merged.key)) : null;
+    return [html`${me(fill(item.text))}${question(state.day, false)}${me(chipLabel(e.mode))}${said}${reply}`];
   });
 }
 
@@ -131,6 +148,11 @@ function docSurface(tree: Task, w: WorkThread, busy: boolean): SafeHtml {
       return html`<div class="${cls("cl", differs && "y")}">${shown}</div>`;
     });
   const diff = kuroDone && w.opened && edit ? html`<div class="wdiff"><del>${doc.right[edit.clause]}</del><ins>${edit.text}</ins></div>` : null;
+  // 合并 on the self path: the right-hand version is the merge result, one column, the two clauses marked.
+  if (w.mode === "self" && w.merge === true) {
+    const merged = doc.right.map((text, i) => html`<div class="${cls("cl", doc.conflict.includes(i) && "on")}">${text}</div>`);
+    return html`<div class="surface doc merged"><div class="cols one"><div class="col">${merged}</div></div></div>`;
+  }
   return html`<div class="surface doc">${busy ? null : html`<div class="cols"><div class="col">${col("left")}</div><div class="col">${col("right")}</div></div>`}${diff}</div>`;
 }
 
@@ -174,10 +196,20 @@ export function renderWork(ctx: AppContext): SafeHtml {
       const surface = surfaceOf(open.tree);
       if (busy) live.push(html`<div class="wm them working" aria-live="polite">${kuroAv()}<div class="bub kscroll"><i></i><i></i><i></i></div></div>`);
       // Self on the document: the first kuro line once the conflict is found (FR1).
-      if (surface === "doc" && w.mode === "self" && caught(w, open.tree) && open.tree!.self.kuro[0]) live.push(kuro(html`${open.tree!.self.kuro[0]}`));
+      if (surface === "doc" && w.mode === "self" && caught(w, open.tree)) {
+        // Kuro's line once the conflict is found, with 合并 / 不合 as reply chips under it (FR1).
+        const line = open.tree!.self.kuro[0];
+        const pending = mergePending(w, open.tree);
+        const chips = pending ? html`<div class="wchips">${mergeChips().map((c) => html`<button type="button" class="chip" data-action="wb-merge" data-merge="${c.merge ? "1" : "0"}">${tr(c.key)}</button>`)}</div>` : null;
+        if (chips) live.push(html`<div class="wm them">${kuroAv()}<div>${line ? html`<div class="bub">${line}</div>` : null}${chips}</div></div>`);
+        else if (line) live.push(kuro(html`${line}`));
+        const chosen = w.merge === undefined || w.merge === null ? null : MERGE_CHIPS.find((c) => c.merge === w.merge)!;
+        if (chosen) live.push(me(tr(chosen.key)));
+      }
       if (surface === "doc") live.push(docSurface(open.tree!, w, busy));
       if (surface === "ledger") live.push(ledgerSurface(open.tree!, w, busy, fill));
-      if (surface) live.push(html`<div class="wpass"><button type="button" class="pass" data-action="wb-pass"${busy ? html` disabled` : null}>${tr("wb.code.pass")}</button></div>`);
+      // 通过 follows the merge answer when there is a question to answer.
+      if (surface && !mergePending(w, open.tree)) live.push(html`<div class="wpass"><button type="button" class="pass" data-action="wb-pass"${busy ? html` disabled` : null}>${tr("wb.code.pass")}</button></div>`);
     }
   }
   const thread = [...doneThreads(state, events, file, fill), ...live];
@@ -201,10 +233,10 @@ function current(ctx: ActionContext): { open: NonNullable<ReturnType<typeof open
 const nowOf = (ctx: ActionContext) => ctx.now?.() ?? Date.now();
 const busyNow = (ctx: ActionContext, w: WorkThread) => nowOf(ctx) < w.busyUntil;
 
-function complete(ctx: ActionContext, open: NonNullable<ReturnType<typeof openWork>>, mode: TaskMode, missed: boolean): void {
+function complete(ctx: ActionContext, open: NonNullable<ReturnType<typeof openWork>>, mode: TaskMode, missed: boolean, merge: boolean | null = null): void {
   if (open.item.done.kind !== "flag") return;
   ctx.session.work = null;
-  ctx.store.appendEvent({ kind: "task", flag: open.item.done.flag, mode, ...(missed ? { missed: true as const } : {}) });
+  ctx.store.appendEvent({ kind: "task", flag: open.item.done.flag, mode, ...(missed ? { missed: true as const } : {}), ...(merge !== null ? { merge } : {}) });
 }
 
 export const workActions: Record<string, ActionHandler> = {
@@ -265,12 +297,21 @@ export const workActions: Record<string, ActionHandler> = {
     c.w.opened = true;
     ctx.rerender();
   },
-  // 通过: the task event, as before (self without both clauses: without the catch flags).
+  // 合并 / 不合 (self on a document, both clauses read): the player's reply; 通过 follows.
+  "wb-merge"(ctx, data) {
+    const c = current(ctx);
+    if (!c || !mergePending(c.w, c.open.tree) || (data.merge !== "1" && data.merge !== "0")) return;
+    c.w.merge = data.merge === "1";
+    ctx.rerender();
+  },
+  // 通过: the task event, as before (self without both clauses: without the catch flags; with the merge answer when given).
   "wb-pass"(ctx) {
     const c = current(ctx);
-    if (!c || c.w.mode === null || busyNow(ctx, c.w)) return;
+    if (!c || c.w.mode === null || busyNow(ctx, c.w) || mergePending(c.w, c.open.tree)) return;
     const mode = finalMode(c.w, c.open.tree);
-    complete(ctx, c.open, mode, mode === "self" && !caught(c.w, c.open.tree));
+    const missed = mode === "self" && !caught(c.w, c.open.tree);
+    const merge = mode === "self" && !missed && typeof c.w.merge === "boolean" ? c.w.merge : null;
+    complete(ctx, c.open, mode, missed, merge);
   },
   "wb-scope"(ctx) {
     ctx.session.wbScopeAll = !ctx.session.wbScopeAll;

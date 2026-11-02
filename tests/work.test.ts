@@ -13,7 +13,7 @@ import { initialSession, type AppContext } from "@world/desktop/model";
 import { renderWork } from "@world/desktop/workbench/work";
 import { renderWorkbench } from "@world/desktop/workbench/view";
 import { escapeHtml } from "@world/html";
-import { t } from "@world/i18n";
+import { hasString, t } from "@world/i18n";
 import { loopActions } from "@world/room/game";
 
 const tasks = taskFiles.get(1)!;
@@ -146,6 +146,18 @@ describe("the surfaces: the same flags and events as before", () => {
     });
     expect(event).toEqual({ kind: "task", day: 1, flag: task1.done, mode: "self" });
     expect(store.getState().flags).toContain("caught_6_11");
+  });
+
+  it("合并 / 不合 render only with their strings: without them no chip, no raw key, 通过 as before", () => {
+    const { markup, event } = play(task1, "self", (ctx) => task1.doc!.conflict.forEach((i) => act(ctx, "wb-clause", { i: String(i) })));
+    for (const key of ["wb.merge", "wb.keep"]) {
+      if (hasString(key)) expect(markup).toContain(escapeHtml(t(key)));
+      else expect(markup).not.toContain(key);
+    }
+    if (!hasString("wb.merge") && !hasString("wb.keep")) {
+      expect(markup).not.toContain('data-action="wb-merge"');
+      expect(event).toEqual({ kind: "task", day: 1, flag: task1.done, mode: "self" });
+    }
   });
 
   it("property: self without both conflict clicks never sets a catch flag", () => {

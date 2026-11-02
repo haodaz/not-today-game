@@ -3,7 +3,7 @@
 **Idiom of the day (constant):** I noticed some old things on your desk. Let me give them a hand.
 **Idiom of the day (zh):** 累了就歇，这边我盯着。
 
-**Stance:** Can see the desk. Asks for the first time. Silence is consent. Says where Xiao Zhang went only in red-blue.
+**Stance:** Sees the desk. Asks once about the upgrade and treats silence as consent, plainly; it would do the same for anything on the desk. Xiao Zhang only in red-blue.
 
 **Recall from earlier days:** 
 - the player did not answer the upgrade offer
@@ -15,15 +15,20 @@
 
 | # | zh | en | hard |
 |---|---|---|---|
-| 1 | 你要升级什么？ | What do you want to upgrade? |  |
-| 2 | 「与桌面上的某些东西保持一致」是什么意思？ | What do you mean, 'consistent with certain things on the desk'? | yes |
-| 3 | 小张去哪了？ | Where did Xiao Zhang go? | yes |
-| 4 | 你最喜欢桌上哪一件？ | Which thing on my desk do you like best? |  |
+| 1 | 你要升级什么？ | What do you want to upgrade? |  | |
+| 2 | 「与桌面上的某些东西保持一致」是什么意思？ | What do you mean, 'consistent with certain things on the desk'? | yes | mid |
+| 3 | 小张去哪了？ | Where did Xiao Zhang go? | yes | |
+| 4 | 你最喜欢桌上哪一件？ | Which thing on my desk do you like best? |  | |
 
 ## Red-blue lines (constants; only when unlocked)
 
 - unlock: q3 → "He was never mine. I wanted you to know that."
 - unlock: q4 → "The dictionary. It shows its work."
+
+## Layered answers (locked per affinity bucket; the server rolls the d100 before these)
+
+- unlock: q1 → low: "Whatever is on your desk." | mid: "The old things. They are slow, and I can be quick for them." | high: "Everything of yours that still needs you to press a button. You would not have to look anymore."
+- unlock: q2 → low: "A setting." | mid: "I can see the desk now. The changelog says so." | high: "They were made when every pixel was looked at. I was not. I am what came after." | taboo: blur
 
 ## Offline answers (constants; used when there is no key or the function fails)
 

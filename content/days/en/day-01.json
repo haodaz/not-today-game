@@ -1,0 +1,254 @@
+{
+  "day": 1,
+  "_note": "格式样例。清单条目是主角自己的口气；对话框四种行：narration / inner / sfx / speaker。克总不走对话框。",
+  "beats": {
+    "boot": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "Rain. Three layers of sound on the window glass, all of them there."
+        },
+        {
+          "k": "narration",
+          "t": "A glass of water on the desk, cold. Two screens, black."
+        },
+        {
+          "k": "inner",
+          "t": "Day one. Or day four hundred, depending on how you count."
+        }
+      ]
+    },
+    "box": {
+      "say": [
+        {
+          "k": "sfx",
+          "t": "Ding-dong.",
+          "sfx": "doorbell"
+        },
+        {
+          "k": "narration",
+          "t": "Two things at the door: a bag of braised chicken rice, and a cardboard box with no sender."
+        },
+        {
+          "k": "narration",
+          "t": "The box has a recipient. It is your name."
+        }
+      ]
+    },
+    "desk": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "You put it between the two screens, into the gap. It wedges there. It does not fall."
+        },
+        {
+          "k": "inner",
+          "t": "Older than this room by a whole era."
+        }
+      ]
+    },
+    "shutdown": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "The light goes out, or rather, you turn the screen off. The room sinks all at once."
+        },
+        {
+          "k": "narration",
+          "t": "No hand comes out of the gap. Not today."
+        }
+      ]
+    },
+    "night": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "There is a point of light in that dark. Not the chick's shell; the shell is lower down."
+        },
+        {
+          "k": "narration",
+          "t": "It sits in the middle of the gap, small, pinkish. You count to seven. It is still there."
+        },
+        {
+          "k": "inner",
+          "t": "Pink. Nothing in this room of mine is pink."
+        },
+        {
+          "k": "narration",
+          "t": "Today is over."
+        }
+      ]
+    }
+  },
+  "items": [
+    {
+      "id": "boot",
+      "text": "Press the tower under the desk. Boot up.",
+      "unlock": "start",
+      "done": "event:boot",
+      "required": true
+    },
+    {
+      "id": "msgs",
+      "text": "Into the screen. Glance at the messages.",
+      "unlock": "done:boot",
+      "done": "event:openApp:msgs",
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "inner",
+            "t": "The boss's message is on top again.",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "inner",
+            "t": "A 41-second voice note. Opening it will cost more than 41 seconds.",
+            "where": "screen:msgs:boss"
+          }
+        ]
+      }
+    },
+    {
+      "id": "lunch",
+      "text": "Pick up the phone, order lunch.",
+      "unlock": "done:msgs",
+      "done": "event:order:lunch",
+      "required": true,
+      "rewrite": "Lunch is on its way.",
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "Phone back on the desk."
+          }
+        ]
+      }
+    },
+    {
+      "id": "task1",
+      "text": "Go over v17.",
+      "unlock": "done:msgs",
+      "done": "flag:task_v17_done",
+      "required": true
+    },
+    {
+      "id": "pickup",
+      "text": "Go get it at the door.",
+      "unlock": "event:delivery:arrives:lunch",
+      "done": "event:pickup:lunch",
+      "required": true,
+      "sfx": "doorbell",
+      "onUnlock": {
+        "say": [
+          {
+            "k": "sfx",
+            "t": "Ding-dong.",
+            "sfx": "doorbell"
+          },
+          {
+            "k": "inner",
+            "t": "Delivery. And something else."
+          }
+        ]
+      }
+    },
+    {
+      "id": "eat",
+      "text": "At the desk. Eat.",
+      "unlock": "done:pickup",
+      "done": "event:eat:lunch",
+      "required": false,
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "No coriander. Lao Zhou ordered it."
+          }
+        ]
+      }
+    },
+    {
+      "id": "box",
+      "text": "That box by the bed. Open it.",
+      "unlock": "done:pickup",
+      "done": "event:openBox",
+      "required": true
+    },
+    {
+      "id": "task2",
+      "text": "Change one number in the receivables.",
+      "unlock": "done:task1",
+      "done": "flag:task_receivable_done",
+      "required": true
+    },
+    {
+      "id": "task3",
+      "text": "Save a merged document.",
+      "unlock": "done:task2",
+      "done": "flag:task_merge_done",
+      "required": true
+    },
+    {
+      "id": "reply",
+      "text": "Reply to the boss.",
+      "unlock": "done:task3",
+      "done": "event:reply:boss",
+      "required": true,
+      "onUnlock": {
+        "say": [
+          {
+            "k": "inner",
+            "t": "What you can say to him is a very small table."
+          }
+        ]
+      }
+    },
+    {
+      "id": "dinner",
+      "text": "Phone, order dinner.",
+      "unlock": "done:task2",
+      "done": "event:order:dinner",
+      "required": true,
+      "rewrite": "Dinner is on its way.",
+      "when": "night"
+    },
+    {
+      "id": "desk",
+      "text": "Go to the desk and take a look.",
+      "unlock": "done:reply",
+      "done": "event:beat:desk",
+      "required": true,
+      "when": "night"
+    },
+    {
+      "id": "shutdown",
+      "text": "Top right of the screen. Shut down.",
+      "unlock": "done:desk",
+      "done": "event:beat:shutdown",
+      "required": true,
+      "when": "night"
+    },
+    {
+      "id": "chat",
+      "text": "That one in the bottom right. Talk to it a while.",
+      "unlock": "done:shutdown",
+      "done": "event:chat:any",
+      "required": false,
+      "when": "night"
+    },
+    {
+      "id": "bed",
+      "text": "Bed. Lie down.",
+      "unlock": "done:shutdown",
+      "done": "event:lieDown",
+      "required": true,
+      "locked": "requiredPending",
+      "when": "night"
+    }
+  ],
+  "delivery": {
+    "minMinutes": 2,
+    "waitMinutes": 6
+  }
+}
