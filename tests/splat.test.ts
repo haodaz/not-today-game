@@ -37,7 +37,7 @@ const near = (a: Pose, b: Pose, digits = 6) => {
 };
 
 describe("poses (README) and interpolation", () => {
-  it("the three framings come from calibration.ts: 房间 f080, 桌子 the close-desk pose (not f43), 床 f159", () => {
+  it("the three framings come from calibration.ts: 房间 f080, 桌子 the tabletop pose, 床 f080 turned toward the bed", () => {
     for (const id of ["room", "desk", "bed"] as const) {
       const f = CALIBRATION[id];
       expect(POSES[id].pos).toEqual({ x: f.pos[0], y: f.pos[1], z: f.pos[2] });
@@ -135,12 +135,9 @@ describe("the window clamp", () => {
 });
 
 describe("which moves, and the look by ring", () => {
-  it("房间 ↔ 床 only (when 床 exists); 桌子 is the tabletop now, so 房间 ↔ 桌子 is the CSS push; never 门 or 屏幕", () => {
-    expect(splatMoveFor("room", "bed")).not.toBeNull();
-    expect(splatMoveFor("bed", "room")).not.toBeNull();
-    for (const [a, b] of [["room", "desk"], ["desk", "room"], ["desk", "bed"], ["room", "door"], ["door", "room"], ["desk", "desktop"], ["desktop", "room"], ["room", "room"]] as const) expect(splatMoveFor(a, b)).toBeNull();
-    // 桌子 keeps its pose: the day-18 pull-out may start there.
-    expect(POSES.desk).toBeDefined();
+  it("the splat carries every move between the posed framings (房间, 桌子, 床); 门 and 屏幕 have no pose and keep the CSS", () => {
+    for (const [a, b] of [["room", "desk"], ["desk", "room"], ["room", "bed"], ["bed", "room"], ["desk", "bed"], ["bed", "desk"]] as const) expect(splatMoveFor(a, b), `${a}→${b}`).not.toBeNull();
+    for (const [a, b] of [["room", "door"], ["door", "room"], ["desk", "desktop"], ["desktop", "room"], ["room", "room"], ["bed", "door"]] as const) expect(splatMoveFor(a, b), `${a}→${b}`).toBeNull();
   });
 
   it("the mix by ring: 0 before ring room, room 40 %, door 100 %", () => {
@@ -239,10 +236,16 @@ function mount(opts: { load?: LoadScene; day?: number; view?: Session["view"]; s
   return { root, session: m.session, hooks: () => hooks! };
 }
 
+/** To a view the way the game does it now: point at it (a proxy), or back out with Esc. */
 async function go(root: HTMLElement, view: string): Promise<void> {
-  const chip = root.querySelector<HTMLElement>(`[data-action="view"][data-view="${view}"]`);
-  if (!chip) throw new Error(`no chip for ${view}`);
-  chip.click();
+  if (view === "room") {
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+    await frame();
+    return;
+  }
+  const hot = root.querySelector<HTMLElement>(`[data-action="view"][data-view="${view}"]`);
+  if (!hot) throw new Error(`nothing to point at for ${view}`);
+  hot.click();
   await frame();
 }
 

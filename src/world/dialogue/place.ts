@@ -8,7 +8,8 @@ import { settle, type Here } from "@world/loop/dialogue";
 
 export function hereOf(s: Pick<Session, "view" | "focus" | "leftApp" | "clock">): Here {
   return {
-    view: s.view,
+    // 床 is the room seen from the bed: a line for the room plays there too.
+    view: s.view === "bed" ? "room" : s.view,
     // Either monitor: the one being shown has the app in front.
     app: s.view === "desktop" ? (s.focus === "left" ? s.leftApp : rightApp(s.leftApp)) : null,
     night: isNight(s.clock),

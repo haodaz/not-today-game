@@ -1,13 +1,12 @@
-// Which view changes the splat renders: 房间 ↔ 床 for the night beat once that framing exists
-// (桌子, 门 and 屏幕 keep their CSS moves). Pure.
+// Which view changes the splat renders: every move between the posed framings, 房间 · 桌子 · 床
+// (navigation 2026-11-01); 门 and 屏幕 have no pose and keep their CSS moves. Pure.
 import { moveBetween, type CameraMove, type PoseId } from "./pose";
 
 /**
- * Views (and future framings) whose moves the splat renders. 桌子 is the tabletop now (day-loop
- * correction 2026-11-01): 房间 ↔ 桌子 is the CSS push; the splat keeps 房间 ↔ 床 and the night.
- * 桌子's pose stays (the day-18 pull-out may start there).
+ * Views whose moves the splat renders. 桌子's pose is calibrated to the tabletop still (desk_top.jpg),
+ * so 房间 ↔ 桌子 can be a splat move that ends on the photo; 床 has no still: the splat is its picture.
  */
-const POSED: Readonly<Record<string, PoseId>> = { room: "room", bed: "bed" };
+const POSED: Readonly<Record<string, PoseId>> = { room: "room", desk: "desk", bed: "bed" };
 
 export function splatMoveFor(from: string, to: string): CameraMove | null {
   const a = POSED[from];

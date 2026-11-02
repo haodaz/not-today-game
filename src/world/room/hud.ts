@@ -20,10 +20,10 @@ import { ordersOn } from "@world/delivery/meals";
 import { raidNights, takeOf } from "@state/nights";
 import { isNight } from "@world/desktop/beat";
 import { hudKuro } from "@world/desktop/kuro/mini";
-import { VIEWS, type View } from "@world/desktop/model";
 import { DESK_SHOT, rectStyle, ROOM_SHOT, type Rect } from "./shots";
 import { deskLayout, objectSlot } from "./desk";
 import { fxPlan, renderFx } from "./fx";
+import { fixedRects, hotIdsIn, hotViewOf, type HotId, type HotView } from "./splat/hotspots";
 import { bookReader, deskBook, figuresLayer } from "./collection";
 import { knows } from "@state/recognise";
 import { bpm, sanBand } from "@state/endings";
@@ -181,15 +181,6 @@ function mealSlot(state: State, events: readonly GameEvent[]): SafeHtml | null {
   return html`<button type="button" class="slot meal" data-action="loop-eat" data-meal="${at.meal}" aria-label="${t("room.meal")}">${food ? html`<img src="${food}" alt="">` : null}</button>`;
 }
 
-/** The camera chips: 房间 · 桌子 · 屏幕 · 门 (`hud.cam.desk` is 桌子 now; 屏幕 is `hud.cam.screen`). */
-const CAM_KEYS: Readonly<Record<View, string>> = { room: "hud.cam.room", desk: "hud.cam.desk", desktop: "hud.cam.screen", door: "hud.cam.door" };
-
-function cams(view: Session["view"]): SafeHtml {
-  const chip = (target: View) =>
-    html`<button type="button" class="${view === target ? "on" : ""}" data-action="view" data-view="${target}">${tr(CAM_KEYS[target])}</button>`;
-  return html`<div class="cams">${VIEWS.map(chip)}</div>`;
-}
-
 /** The one ⚙ 设置 button, bottom left (day-loop amendment: one settings button). */
 export function settingsButton(): SafeHtml {
   return html`<button type="button" class="settings-btn" data-action="settings-open" aria-haspopup="dialog">⚙ ${tr("settings.button")}</button>`;
@@ -272,52 +263,108 @@ export interface RoomModel {
 }
 
 /**
- * The shot's click areas (day-loop amendment, four camera levels). 房间: the desk (with its
- * monitors) goes to 桌子. 桌子: each monitor goes to 屏幕 on that side. Both: the glowing small
- * window on the right monitor calls Kuro. They sit under the HUD.
+ * The things that can be pointed at in a framing (navigation 2026-11-01), as keyboard proxies: one
+ * button each, in tab order, laid at the rectangle the framing's fixed pose gives (today's click
+ * areas). The pointer does not hit them: the nav layer picks by a ray through the camera and presses
+ * the proxy of what it found, so a mouse, Enter on a focused proxy, and a test all take the same
+ * action. While the head is turned the nav layer moves them with the camera.
  */
-function shotHits(view: "room" | "desk", state: State, events: readonly GameEvent[]): SafeHtml {
-  // Nothing on the monitors themselves: no glow, no box (day-loop correction). Kuro's call button
-  // is its body at the HUD's bottom right.
-  // The tower's power button boots the computer (day-loop correction 2026-11-01: the checklist
-  // only watches). While it is off a faint light shows on it; once on it is only the picture.
-  if (view === "room") {
-    const tower = booted(state, events)
-      ? null
-      : html`<button type="button" class="shot-hit tower-hit" data-action="tower-power" style="${rectStyle(ROOM_SHOT.tower)}" aria-label="${t("room.tower.off")}"><i class="tower-led"></i></button>`;
-    return html`<button type="button" class="shot-hit" data-action="view" data-view="desk" style="${rectStyle(ROOM_SHOT.desk)}" aria-label="${t("hud.cam.desk")}"></button>${tower}<button type="button" class="shot-hit bed-hit" data-action="bed" style="${rectStyle(ROOM_SHOT.bed)}" aria-label="${t("room.bed")}"></button>`;
-  }
-  // 桌子: each monitor's visible lower half goes to 屏幕 on that side; the tower is out of frame.
-  const mon = (side: "left" | "right") =>
-    html`<button type="button" class="shot-hit monitor-hit" data-action="view" data-view="desktop" data-screen="${side}" style="${rectStyle(DESK_SHOT.monitors[side])}" aria-label="${t("hud.cam.screen")} · ${t(`desktop.screen.${side}`)}"></button>`;
-  return html`${mon("left")}${mon("right")}`;
+interface Proxy {
+  readonly cls: string;
+  readonly attrs: string;
+  readonly label: (state: State, events: readonly GameEvent[]) => string;
+  /** Today's rectangle where there is one, else what the fixed pose gives. */
+  readonly rect?: (view: HotView) => Rect | undefined;
+  readonly shown?: (state: State, events: readonly GameEvent[]) => boolean;
+}
+const PROXIES: Readonly<Record<HotId, Proxy>> = {
+  tower: {
+    cls: "shot-hit tower-hit",
+    attrs: 'data-action="tower-power"',
+    label: () => t("room.tower.off"),
+    rect: () => ROOM_SHOT.tower,
+    // The tower's power button boots the computer; once on it is only the picture.
+    shown: (state, events) => !booted(state, events),
+  },
+  monitorL: { cls: "shot-hit monitor-hit", attrs: 'data-action="view" data-view="desktop" data-screen="left"', label: () => `${t("hud.cam.screen")} · ${t("desktop.screen.left")}`, rect: (v) => (v === "desk" ? DESK_SHOT.monitors.left : ROOM_SHOT.monitors.left) },
+  monitorR: { cls: "shot-hit monitor-hit", attrs: 'data-action="view" data-view="desktop" data-screen="right"', label: () => `${t("hud.cam.screen")} · ${t("desktop.screen.right")}`, rect: (v) => (v === "desk" ? DESK_SHOT.monitors.right : ROOM_SHOT.monitors.right) },
+  lamp: { cls: "shot-hit lamp-hit", attrs: 'data-action="lamp"', label: () => (hasString("room.lamp") ? t("room.lamp") : ""), rect: (v) => (v === "desk" ? deskLayout.lamp : ROOM_SHOT.lamp) },
+  desk: { cls: "shot-hit", attrs: 'data-action="view" data-view="desk"', label: () => t("hud.cam.desk"), rect: () => ROOM_SHOT.desk },
+  box: { cls: "shot-hit box-hit", attrs: 'data-action="pick-box"', label: () => (hasString("room.box") ? t("room.box") : t("hud.cam.desk")), rect: () => ROOM_SHOT.box },
+  bed: { cls: "shot-hit bed-hit", attrs: 'data-action="bed"', label: () => t("room.bed"), rect: () => ROOM_SHOT.bed },
+  door: { cls: "shot-hit door-hit", attrs: 'data-action="view" data-view="door"', label: () => t("hud.cam.door") },
+};
+
+function shotHits(view: HotView, state: State, events: readonly GameEvent[]): SafeHtml {
+  const fixed = fixedRects(view);
+  const buttons = hotIdsIn(view).map((id) => {
+    const p = PROXIES[id];
+    if (p.shown && !p.shown(state, events)) return null;
+    const r = p.rect?.(view) ?? fixed[id];
+    if (!r) return null;
+    const tower = id === "tower" ? html`<i class="tower-led"></i>` : null;
+    // A thing with no name in the strings yet (the lamp) is not in the tab order or the reader's.
+    const label = p.label(state, events);
+    const quiet = label === "" ? raw(' tabindex="-1" aria-hidden="true"') : null;
+    return html`<button type="button" class="${p.cls}" ${raw(p.attrs)} style="${rectStyle(r)}" aria-label="${label}" data-hot="${id}"${quiet}>${tower}</button>`;
+  });
+  return html`${buttons}`;
 }
 
 /** Kuro's body (the call button) and the camera chips, one row at the bottom right. */
 function bottomRight(model: RoomModel): SafeHtml {
   const { state, events, session } = model;
   const ctx = { state, events, startDay: model.startDay ?? 1, session, night: isNight(session.clock), nowMs: model.nowMs ?? 0 };
-  return html`<div class="hud-br">${hudKuro(ctx)}${cams(session.view)}</div>`;
+  return html`<div class="hud-br">${hudKuro(ctx)}</div>`;
+}
+
+/** The placed things fade in over this long once the camera has arrived (the length of the splat's photo fade). */
+export const ARRIVE_FADE_MS = 200;
+
+/**
+ * Whether the framing's placed things (the tabletop's cutouts, the click areas, what finished runs
+ * left, the door's content) must still wait for the camera (room-scene correction 2026-11-02): from
+ * a move's start until the arriving photo is back (the last 200 ms of a splat move; the end of the
+ * CSS push). `nowMs` 0 (tests, the first paint) never waits. Pure.
+ */
+export function placedThingsWait(session: Pick<Session, "cam">, view: string, nowMs: number): boolean {
+  const cam = session.cam;
+  return cam !== null && cam.to === view && nowMs > 0 && nowMs < cam.reveal;
+}
+
+/** How far into their fade-in the placed things are, or null when they are not fading. */
+export function placedThingsFade(session: Pick<Session, "cam">, view: string, nowMs: number): number | null {
+  const cam = session.cam;
+  if (cam === null || cam.to !== view || nowMs <= 0 || nowMs < cam.reveal) return null;
+  const elapsed = nowMs - cam.reveal;
+  return elapsed < ARRIVE_FADE_MS ? elapsed : null;
 }
 
 export function renderRoom(model: RoomModel): SafeHtml {
   const { state, events, session } = model;
   const lc = loopContext(state, events);
   const list = lc ? renderChecklist(checklist(lc)) : null;
-  const view = session.view === "desk" || session.view === "door" ? session.view : "room";
+  const view = session.view === "desk" || session.view === "door" || session.view === "bed" ? session.view : "room";
   const door = view === "door";
+  const nowMs = model.nowMs ?? 0;
+  // The placed things belong to the arriving framing: they wait for the camera, then fade in.
+  const waiting = placedThingsWait(session, view, nowMs);
+  const fade = placedThingsFade(session, view, nowMs);
   // 房间 carries what finished runs left on the desk: the figures, and the book (title-page FR4/FR8).
-  const kept = view === "room" ? html`${figuresLayer(session.collection)}${deskBook(session.collection)}` : null;
-  const scene = door ? doorContent(state, events, session) : html`${shotHits(view, state, events)}${kept}`;
+  const kept = view === "room" && !waiting ? html`${figuresLayer(session.collection)}${deskBook(session.collection)}` : null;
+  const hotView = hotViewOf(view);
+  const scene = waiting ? null : door ? doorContent(state, events, session) : hotView ? html`${shotHits(hotView, state, events)}${kept}` : null;
   // The held item sits over everything but the dialogue box (held-object.html).
   const held = door ? null : heldLayer(state, events, session);
   // The hand is here: the desk dims and the gap between the monitors glows (night-hand FR1; the
   // room scene will draw the gap itself).
-  const raid = !door && raidShowing(state, session);
+  const raid = !door && view !== "bed" && !waiting && raidShowing(state, session);
   const gap = (view === "room" ? ROOM_SHOT : DESK_SHOT).gap;
   // 桌子 is the tabletop: everything with state is a placed cutout at its rect (content/desk.json).
-  const top = view === "desk" ? tabletop(deskThings(state, events, session)) : null;
-  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid")}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}">${renderFx(fxPlan(state.day, view))}${scene}${top}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${itemsPanel(state, events, session)}${held}${dialogueBox(state, events, session, model.nowMs ?? 0)}${bottomRight(model)}${settingsButton()}${itemsButton(session)}${settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
+  const top = view === "desk" && !waiting ? tabletop(deskThings(state, events, session)) : null;
+  const fx = view === "bed" ? null : renderFx(fxPlan(state.day, view));
+  const late = fade === null ? null : raw(` style="--late:-${Math.round(fade)}ms"`);
+  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid", fade !== null && "m-late")}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${scene}${top}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${itemsPanel(state, events, session)}${held}${dialogueBox(state, events, session, nowMs)}${bottomRight(model)}${settingsButton()}${itemsButton(session)}${settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
 }
 
 export { raidShowing };

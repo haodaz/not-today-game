@@ -13,6 +13,7 @@ import "./ui/title/title.css";
 import { debugStartDay } from "@state/clock";
 import { splatForGame } from "@world/room/splat";
 import { fxForGame } from "@world/room/fx/layer";
+import { createNav } from "@world/room/nav";
 import { settleSession } from "@world/dialogue/place";
 import { createPullDriver } from "@world/endings/pullout-dom";
 import { createProfileWriter, createRunSlot } from "@state/saves";
@@ -112,6 +113,8 @@ function startGame(store: Store, saved: boolean, from?: "desk"): void {
     splat: splatForGame(window),
     // The breathing collapse on the stills: a WebGL2 shader over the photo stack (the stack is its fallback).
     fx: fxForGame(window),
+    // Moving is pointing: hover, picking, back gestures, the head turn.
+    nav: createNav(),
     // The day-18 pull-out's frames (splat or photo fallback).
     pull: createPullDriver(),
   });

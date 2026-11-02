@@ -72,7 +72,8 @@ describe("FR2 red eyes", () => {
     const hud = (day: number) => {
       const { ctx } = ctxOf(storeAt(day), DAY, "room");
       const out = renderRoom({ state: ctx.store.getState(), events: ctx.store.getEvents(), session: ctx.session }).value;
-      return out.slice(out.indexOf('<div class="hud-kuro">'), out.indexOf('<div class="cams">'));
+      // The body's own markup: up to the end of the HUD corner's first item (the camera chips are gone).
+      return /<div class="hud-kuro">.*?<\/button><\/div>/s.exec(out)![0];
     };
     const d15 = hud(15);
     const d16 = hud(16);

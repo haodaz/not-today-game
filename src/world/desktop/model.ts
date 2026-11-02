@@ -26,8 +26,8 @@ export type WorkbenchPage = "home" | "docs" | "ledger" | "code";
  * The four camera levels (day-loop amendment): 房间 room, 桌子 desk (the close-up, where things
  * are picked up and the box is opened), 屏幕 "desktop" (the screens), 门 door.
  */
-export type View = "room" | "desk" | "door" | "desktop";
-export const VIEWS: readonly View[] = ["room", "desk", "desktop", "door"];
+export type View = "room" | "desk" | "door" | "desktop" | "bed";
+export const VIEWS: readonly View[] = ["room", "desk", "desktop", "door", "bed"];
 
 /** What the day-loop remembers between store changes (design L5/L6); session only. */
 export interface LoopMemo {
@@ -116,6 +116,14 @@ export interface Session {
   workbenchPage: WorkbenchPage;
   /** Until when (ms since epoch) Kuro's body is crawling between windows. */
   movingUntil: number;
+  /** The splat scene is loaded and can render the camera moves (set by the splat layer; presentation only). */
+  splatReady: boolean;
+  /**
+   * The camera move under way (navigation 2026-11-02): where it arrives and when its framing's placed
+   * things may appear (the arriving photo fades in over the last SPLAT_FADE_MS of a splat move, or
+   * at the end of the CSS push). Wall ms; session only. Cleared by the first render after `until`.
+   */
+  cam: { readonly to: View; readonly reveal: number; readonly until: number } | null;
   /** The walkman on the desk is playing the theme (sound addition 2026-11-02); session only: no event, no state. */
   walkman: boolean;
   /** The decoy dock app whose small system window is open (desktop-ui 2026-11-02); session only. */
@@ -167,6 +175,8 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     workbenchPage: "home",
     movingUntil: 0,
     walkman: false,
+    splatReady: false,
+    cam: null,
     decoyWindow: null,
     dockSay: null,
   };

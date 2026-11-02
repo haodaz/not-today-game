@@ -13,6 +13,7 @@ import { onEmailChange, setEmailDraft } from "@net/email";
 import { buildShell, initialSession, type AppRenderers, type Session } from "./model";
 import { renderDesktop, APPS, type AppId } from "./shell";
 import { dockFor } from "./dock";
+import type { LookApi } from "@world/room/nav";
 import { soundPlan } from "@world/sound/plan";
 import type { SoundPlayer } from "@world/sound/player";
 import { t } from "@world/i18n";
@@ -112,7 +113,9 @@ export interface DesktopDeps {
   /** The motion layer (polish); none in tests. */
   readonly motion?: (root: HTMLElement, ctx: ActionContext, actions: Record<string, ActionHandler>) => MotionHooks;
   /** The splat layer for camera moves (room-scene); absent when off. Runs after the motion layer. */
-  readonly splat?: (root: HTMLElement, ctx: ActionContext) => { after(): void; destroy(): void };
+  readonly splat?: (root: HTMLElement, ctx: ActionContext) => { after(): void; destroy(): void } & LookApi;
+  /** Moving is pointing (room-scene navigation 2026-11-01): hover, picking, back gestures, the head turn. */
+  readonly nav?: (root: HTMLElement, ctx: ActionContext, actions: Record<string, ActionHandler>, splat: LookApi | null) => { after(): void; destroy(): void };
   /** Runs at the top of every render: brings the dialogue in line with where the player is (a safety net for paths that move the view without an action). */
   readonly settle?: (ctx: ActionContext) => void;
   /** The sound layer (sound spec FR4): every render hands it the plan for where the game is now. */
@@ -174,6 +177,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     fit();
     motion?.after();
     splat?.after();
+    nav?.after();
     fx?.after();
     pull?.after();
     // While Kuro crawls between windows, render again when it should stop.
@@ -199,6 +203,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   const ctx: ActionContext = { store: deps.store, session, rerender, later, play: (id) => playSfx(id, session.muted), now: () => Date.now() };
   const motion: MotionHooks | null = deps.motion ? deps.motion(root, ctx, actions) : null;
   const splat = deps.splat ? deps.splat(root, ctx) : null;
+  const nav = deps.nav ? deps.nav(root, ctx, actions, splat) : null;
   const pull = deps.pull ? deps.pull(root, ctx) : null;
   const fx = deps.fx ? deps.fx(root, ctx) : null;
 
@@ -281,6 +286,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
       splat?.destroy();
       pull?.destroy();
       fx?.destroy();
+      nav?.destroy();
       timers.forEach(clearTimeout);
       if (frame) cancelAnimationFrame(frame);
       root.removeEventListener("click", onClick);

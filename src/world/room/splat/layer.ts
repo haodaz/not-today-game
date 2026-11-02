@@ -13,6 +13,7 @@ import { framingOf, formatCalibration, nudge } from "./calibrate";
 import type { Framing } from "./calibration";
 import { splatMoveFor } from "./moves";
 import { easeInOutCubic, POSES, poseAt, type CameraMove, type Pose, type PoseId } from "./pose";
+import { LOOK, NO_TURN, turnEased, turnForDrag, turned, type Turn } from "./head";
 import { splatLook, type SplatLook } from "./look";
 import { pullMove, pullOutAt } from "./pullout";
 import type { Session } from "@world/desktop/model";
@@ -65,6 +66,15 @@ export interface SplatDeps {
 export interface SplatHooks {
   after(): void;
   destroy(): void;
+  /**
+   * Turn the head by a drag of (dx, dy) stage px from the framing (navigation 2026-11-01): the layer
+   * goes live over the photo. False if it cannot (not loaded, a move under way, the view has no pose).
+   */
+  look(dx: number, dy: number): boolean;
+  /** Let go: the head eases back over 600 ms and the photo returns. */
+  release(): void;
+  /** The camera as drawn now (the framing turned), or null while the layer is not drawing: the photo's pose then. */
+  pose(): Pose | null;
   /** For tests and the later pull-out: "idle" | "loading" | "ready" | "off". */
   status(): string;
   /** Calibration: the poses as currently tuned (dev only). */
@@ -127,6 +137,15 @@ export function createSplatLayer(deps: SplatDeps) {
     // Calibration (dev only): the poses being tuned, and the readout.
     const cal: Record<PoseId, Pose> = { ...POSES };
     let readout: HTMLElement | null = null;
+    // The head turn, and 床 held at rest (the splat is its picture).
+    let liveView: PoseId | null = null;
+    let hold = false;
+    let turn: Turn = NO_TURN;
+    let dragging = false;
+    let easeFrom: Turn | null = null;
+    let easeStart = 0;
+    let liveStart = 0;
+    let outStart: number | null = null;
 
     const load = () => {
       if (status !== "idle" || destroyed) return;
@@ -137,11 +156,13 @@ export function createSplatLayer(deps: SplatDeps) {
           if (destroyed) return s.dispose();
           scene = s;
           status = "ready";
+          ctx.session.splatReady = true;
           preloadCollapsed();
           if (deps.calibrate) startCalibration();
         })
         .catch(() => {
           status = "off";
+          ctx.session.splatReady = false;
         });
     };
 
@@ -213,7 +234,8 @@ export function createSplatLayer(deps: SplatDeps) {
       scene.render(r.pull ? r.pull.pose(elapsed) : poseAt(r.move, p), r.look.mix);
       part(".splat-collapsed").style.opacity = String(collapsed === "yes" ? r.look.mix : 0);
       // The pull-out has no photo to arrive at: the ending card follows.
-      part(".splat-photo").style.opacity = r.pull ? "0" : String(Math.min(1, Math.max(0, (elapsed - (r.dur - SPLAT_FADE_MS)) / SPLAT_FADE_MS)));
+      // 床 has no photo to arrive at: the splat is its picture.
+      part(".splat-photo").style.opacity = r.pull || r.to === "bed" ? "0" : String(Math.min(1, Math.max(0, (elapsed - (r.dur - SPLAT_FADE_MS)) / SPLAT_FADE_MS)));
       // The gap and lamp layers are framed for the stills; the pull-out leaves them behind.
       if (r.pull) {
         part(".splat-gap").hidden = true;
@@ -226,7 +248,7 @@ export function createSplatLayer(deps: SplatDeps) {
       if (destroyed) return;
       if (deps.calibrate && !running) return calTick();
       const r = running;
-      if (!r) return;
+      if (!r) return liveTick();
       const t = now();
       const stage = liveStage();
       if (stage) place(stage);
@@ -252,7 +274,81 @@ export function createSplatLayer(deps: SplatDeps) {
         frame = raf(tick);
         return;
       }
+      // 床: the move ends in the framing and the splat stays as its picture.
+      if (ctx.session.view === "bed" && scene) return enterLive("bed", true, liveStage());
       el?.remove();
+    }
+
+    // ——— the head turn, and 床 held at rest ———
+
+    const LIVE_IN_MS = 150;
+
+    /** Only where a pose exists, nothing is moving, and the collapsed splat is there when the ring wants it. */
+    function canLive(view: string): view is PoseId {
+      return status === "ready" && !!scene && !running && !ctx.session.pullOut && isPosed(view) && !(lookNow().mix > 0 && collapsed !== "yes");
+    }
+
+    function enterLive(view: PoseId, holdIt: boolean, stage: HTMLElement | null): void {
+      if (!scene) return;
+      el ??= build(scene);
+      const look = lookNow();
+      el.classList.toggle("night", look.night);
+      el.classList.toggle("pink", look.gap === "pink");
+      // The gap and the lamp are framed for the stills.
+      part(".splat-gap").hidden = true;
+      part(".splat-lamp").hidden = true;
+      part(".splat-photo").style.backgroundImage = holdIt ? "none" : `url(${BACKDROPS[view as keyof typeof BACKDROPS] ?? BACKDROPS.room})`;
+      sizeTo();
+      liveView = view;
+      hold = holdIt;
+      liveStart = now();
+      outStart = null;
+      if (stage) {
+        place(stage);
+        stage.classList.add("m-nobg");
+      }
+      if (!frame) frame = raf(tick);
+    }
+
+    function liveTick(): void {
+      if (!liveView || !scene || !el) return;
+      const t = now();
+      const stage = liveStage();
+      if (stage) {
+        place(stage);
+        stage.classList.add("m-nobg");
+      }
+      if (easeFrom) {
+        const p = (t - easeStart) / LOOK.easeMs;
+        if (p >= 1) {
+          turn = NO_TURN;
+          easeFrom = null;
+          if (!hold) outStart = t;
+        } else turn = turnEased(easeFrom, p);
+      }
+      const look = lookNow();
+      scene.render(turned(POSES[liveView], turn), look.mix);
+      part(".splat-collapsed").style.opacity = String(collapsed === "yes" ? look.mix : 0);
+      // The photo gives way as the head starts to turn and comes back as it settles.
+      let photo = 0;
+      if (!hold) photo = outStart !== null ? Math.min(1, (t - outStart) / SPLAT_FADE_MS) : 1 - Math.min(1, (t - liveStart) / LIVE_IN_MS);
+      part(".splat-photo").style.opacity = String(photo);
+      if (outStart !== null && t - outStart >= SPLAT_FADE_MS) return endLive(true);
+      frame = raf(tick);
+    }
+
+    /** `restore`: give the stage its own photo back (not when the stage is the arriving one of a move). */
+    function endLive(restore: boolean): void {
+      if (restore) liveStage()?.classList.remove("m-nobg");
+      liveView = null;
+      hold = false;
+      turn = NO_TURN;
+      easeFrom = null;
+      dragging = false;
+      outStart = null;
+      if (frame) cancelRaf(frame);
+      frame = 0;
+      if (!deps.calibrate) el?.remove();
     }
 
     function sizeTo(): void {
@@ -266,7 +362,7 @@ export function createSplatLayer(deps: SplatDeps) {
       const look = lookNow();
       el.classList.toggle("night", look.night);
       el.classList.toggle("pink", look.gap === "pink");
-      part(".splat-photo").style.backgroundImage = `url(${BACKDROPS[to as keyof typeof BACKDROPS] ?? BACKDROPS.room})`;
+      part(".splat-photo").style.backgroundImage = to === "bed" ? "none" : `url(${BACKDROPS[to as keyof typeof BACKDROPS] ?? BACKDROPS.room})`;
       sizeTo();
       running = { from, to, move, look, start: now(), dur: viewMoveMs(from, to, true) };
       place(stage);
@@ -370,6 +466,18 @@ export function createSplatLayer(deps: SplatDeps) {
           if (status === "ready" && stage && !(lookNow().mix > 0 && collapsed !== "yes")) startPull(pull, stage);
           return;
         }
+        if (liveView) {
+          // Still the same framing: the new stage goes over the layer again. Otherwise the view
+          // changed under it (a move from 床 follows; a day change just ends it).
+          if (view === liveView) {
+            if (stage) {
+              place(stage);
+              stage.classList.add("m-nobg");
+            }
+            return;
+          }
+          endLive(false);
+        }
         if (running) {
           // A re-render mid-move replaced the markup: put the layer back before the new stage.
           if (stage) place(stage);
@@ -386,7 +494,38 @@ export function createSplatLayer(deps: SplatDeps) {
         if (lookNow().mix > 0 && collapsed !== "yes") return;
         start(prev, view, deps.calibrate ? { from: cal[prev as PoseId], to: cal[view as PoseId] } : move, stage);
       },
+      look(dx, dy) {
+        if (!liveView) {
+          const view = ctx.session.view;
+          const stage = liveStage();
+          if (!stage || !canLive(view)) return false;
+          enterLive(view, view === "bed", stage);
+        }
+        // Back from the way out: the photo stays away.
+        if (outStart !== null) {
+          liveStart = now() - LIVE_IN_MS;
+          outStart = null;
+        }
+        dragging = true;
+        easeFrom = null;
+        turn = turnForDrag(dx, dy);
+        if (!frame) frame = raf(tick);
+        return true;
+      },
+      release() {
+        if (!liveView || !dragging) return;
+        dragging = false;
+        if (turn.yaw === 0 && turn.pitch === 0) {
+          if (!hold) outStart = now();
+        } else {
+          easeFrom = turn;
+          easeStart = now();
+        }
+        if (!frame) frame = raf(tick);
+      },
+      pose: () => (liveView ? turned(POSES[liveView], turn) : null),
       destroy() {
+        ctx.session.splatReady = false;
         destroyed = true;
         running = null;
         if (frame) cancelRaf(frame);

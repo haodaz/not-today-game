@@ -30,7 +30,7 @@ export interface Actuators {
 }
 
 /** 房间: the wide shot. Clicking the desk (with its monitors) goes to 桌子. */
-export const ROOM_SHOT: Shot & Actuators & { readonly desk: Rect; readonly bed: Rect } = {
+export const ROOM_SHOT: Shot & Actuators & { readonly desk: Rect; readonly bed: Rect; readonly box: Rect; readonly lamp: Rect } = {
   monitors: {
     left: { l: 368, t: 302, w: 266, h: 161 },
     right: { l: 640, t: 305, w: 257, h: 156 },
@@ -41,6 +41,10 @@ export const ROOM_SHOT: Shot & Actuators & { readonly desk: Rect; readonly bed: 
   tower: { l: 205, t: 673, w: 78, h: 117 },
   // Image 1540–2048 × 715–1152: the blanket and the bed's foot, clear of the box at its left.
   bed: { l: 1203, t: 559, w: 397, h: 341 },
+  // Image 1295–1535 × 905–1152: the cardboard box on the floor by the bed (it opens at 桌子).
+  box: { l: 1012, t: 707, w: 187, h: 193 },
+  // Image 1145–1265 × 440–665: the desk lamp, shade to base.
+  lamp: { l: 893, t: 343, w: 95, h: 180 },
 };
 
 /**

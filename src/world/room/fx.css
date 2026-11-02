@@ -17,3 +17,6 @@
 .stage[data-fx~="pores"] .monitor[data-side="left"] .os{background-color:var(--bg);background-image:linear-gradient(var(--pw),var(--pw)),url(/room/fx/pores.jpg);background-size:auto,512px 512px;background-blend-mode:normal,multiply}
 .stage[data-fx~="pores"] .monitor[data-side="left"] .os .win{background-color:var(--panel);background-image:linear-gradient(var(--pww),var(--pww)),url(/room/fx/pores.jpg);background-size:auto,512px 512px;background-blend-mode:normal,multiply}
 .stage[data-fx~="dim"] .monitor .os .win{opacity:.6}
+
+/* While the splat or the CSS push carries the move, the arriving stage's photo stack waits too. */
+.stage.m-nobg>.fx{visibility:hidden}

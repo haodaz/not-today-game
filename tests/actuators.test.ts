@@ -60,7 +60,7 @@ describe("开机: the tower's power button (房间; 桌子 is the tabletop, the 
       const store = atDay(1);
       const { ctx } = ctxOf(store, view);
       const before = render(ctx);
-      expect(before).toContain(`<button type="button" class="shot-hit tower-hit" data-action="tower-power" style="${rectStyle(shot.tower)}" aria-label="${t("room.tower.off")}"><i class="tower-led"></i></button>`);
+      expect(before).toContain(`<button type="button" class="shot-hit tower-hit" data-action="tower-power" style="${rectStyle(shot.tower)}" aria-label="${t("room.tower.off")}" data-hot="tower"><i class="tower-led"></i></button>`);
       act(ctx, "tower-power");
       expect(done(store, "boot")).toBe(true);
       expect(store.getEvents().at(-1)).toMatchObject({ kind: "step", name: "boot" });

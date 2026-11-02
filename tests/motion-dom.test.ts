@@ -106,17 +106,20 @@ describe("the live DOM after a render (fix 2026-10-31)", () => {
       expect(root.querySelectorAll(".m-backdrop").length, `${what} (after)`).toBe(0);
       expect(root.querySelector(".stage.m-nobg"), `${what} (after)`).toBeNull();
     }
-    // 屏幕 → 桌子 → 房间 → 门 → 房间 by Esc and the chips.
+    // 屏幕 → 桌子 → 房间 → 门 → 房间 by Esc and by pointing (the door's proxy).
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
     await frame();
     check(root, session, "screen → desk (Esc)");
     await midway(root, session, "screen → desk");
     for (const [selector, what] of [
-      ['[data-action="view"][data-view="room"]', "desk → room"],
+      ["Escape", "desk → room"],
       ['[data-action="view"][data-view="door"]', "room → door"],
-      ['[data-action="view"][data-view="room"]', "door → room"],
+      ["Escape", "door → room"],
     ] as const) {
-      await click(root, selector);
+      if (selector === "Escape") {
+        window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+        await frame();
+      } else await click(root, selector);
       check(root, session, what);
       await midway(root, session, what);
       await wait(settle(what));

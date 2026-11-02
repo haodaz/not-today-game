@@ -31,6 +31,8 @@ export const BACKDROPS: Readonly<Record<View | "title", string>> = {
   desk: deskLayout.backdrop,
   desktop: deskLayout.backdrop,
   door: "/room/door_wall.png",
+  // 床 has no still of its own: the splat holds it; the letterbox is the room's.
+  bed: "/room/shots/room.jpg",
 };
 
 /**

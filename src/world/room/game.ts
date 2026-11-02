@@ -26,7 +26,9 @@ import { setLocale, t, tr } from "@world/i18n";
 import { booted, deskMeal, itemStates, loopContext, mealToOrder, openItemFor, openTask } from "@world/loop/checklist";
 import type { EventToken } from "@state/days/table";
 import { messageActions } from "@world/desktop/messages/actions";
-import { MOTION } from "@world/motion/timing";
+import { MOTION, viewMoveMs } from "@world/motion/timing";
+import { splatMoveFor } from "./splat/moves";
+import { SPLAT_FADE_MS } from "./splat/layer";
 
 /** Whose conversation the loan is answered in (day-loop correction 2026-11-01): 老周. */
 export const LOAN_CONVERSATION = "laozhou";
@@ -113,6 +115,33 @@ export const MODE_BY_KEY: Readonly<Record<string, TaskMode>> = {
   "wb.mode.let": TASK_MODES[2],
 };
 
+/**
+ * A camera move to a photo view has begun (room-scene correction 2026-11-02): its placed things
+ * wait for the arriving photo (the last SPLAT_FADE_MS of a splat move, the end of the CSS push).
+ * Session only. Returns how long the move takes.
+ */
+function startCam(ctx: ActionContext, from: string, to: View): number {
+  const now = ctx.now?.() ?? Date.now();
+  const dur = viewMoveMs(from, to, true);
+  const fade = ctx.session.splatReady && splatMoveFor(from, to) ? SPLAT_FADE_MS : 0;
+  ctx.session.cam = { to, reveal: now + dur - fade, until: now + dur };
+  // Render again when the things may appear: with the splat that is its photo fade (the move is
+  // still under way); for the CSS push it is just after the motion layer's own last render
+  // (dur + 16), so one frame does both.
+  ctx.later(fade > 0 ? dur - fade + 24 : dur + 24, ctx.rerender);
+  return dur;
+}
+
+/** One camera level out: 屏幕 → 桌子 → 房间, 门 and 床 → 房间; none past 房间. */
+export function backTarget(view: View): View | null {
+  return view === "desktop" ? "desk" : view === "room" ? null : "room";
+}
+
+/** True when something sits over the view that a "back" should close first (or that blocks the camera). */
+function overlayOpen(s: Session): boolean {
+  return s.bookOpen || s.historyOpen || s.settingsOpen || s.itemsOpen || s.phoneOpen || !!s.holding || talking(s.dialogue) || !!s.pullOut || !!s.endingPage;
+}
+
 export const loopActions: Record<string, ActionHandler> = {
   view(ctx, data) {
     const view = data.view as View;
@@ -121,7 +150,9 @@ export const loopActions: Record<string, ActionHandler> = {
     if (view === "desktop" && (data.screen === "left" || data.screen === "right")) ctx.session.focus = data.screen;
     // A finished door beat is forgotten once the player looks away (polish W1).
     if (ctx.session.view === "door" && view !== "door" && ctx.session.door?.state === "onDesk") ctx.session.door = null;
+    const from = ctx.session.view;
     ctx.session.view = view;
+    if (from !== view && view !== "desktop") startCam(ctx, from, view);
     // A line waiting for this place comes forward; one that belongs elsewhere is taken back.
     settleSession(ctx.session);
     ctx.session.phoneOpen = false;
@@ -219,12 +250,48 @@ export const loopActions: Record<string, ActionHandler> = {
       ctx.rerender();
       return;
     }
+    // Pointing at the bed glides the camera to 床 first (the splat holds that framing; without the
+    // splat there is nowhere to glide and the night begins where the player is). The night begins as
+    // the camera arrives.
+    if (session.splatReady && session.view !== "bed" && !(session.cam && session.cam.until > (ctx.now?.() ?? Date.now()))) {
+      loopActions["view"]!(ctx, { view: "bed" } as DOMStringMap, null as never);
+      // (Backing out meanwhile cancels the night: it begins only if the camera is still there.)
+      ctx.later(viewMoveMs("room", "bed", true) + 20, () => {
+        if (ctx.session.view === "bed") loopActions["bed"]!(ctx, {} as DOMStringMap, null as never);
+      });
+      return;
+    }
     // The chat beat is over: the day is assessed while the night plays (kuro-chat FR4).
     startJudgement(ctx);
     const night = dayFile(day)?.beats.night;
     if (!night || night.say.length === 0) lieDownOrEnd(ctx);
     else session.dialogue = push(session.dialogue, beatQueued(day, "night", night, { kind: "lieDown" }));
     ctx.rerender();
+  },
+
+  // The box on the floor by the bed (房间): the camera goes to 桌子, then the box opens.
+  "pick-box"(ctx) {
+    if (ctx.session.view === "desk") return void loopActions["loop-box"]!(ctx, {} as DOMStringMap, null as never);
+    loopActions["view"]!(ctx, { view: "desk" } as DOMStringMap, null as never);
+    ctx.later(viewMoveMs("room", "desk", true) + 20, () => {
+      if (ctx.session.view === "desk") loopActions["loop-box"]!(ctx, {} as DOMStringMap, null as never);
+    });
+  },
+
+  // The desk lamp: a click, nothing else (no event, no state).
+  lamp(ctx) {
+    ctx.play?.("lamp-click");
+  },
+
+  // Back one camera level (right-click, wheel, the bottom of the stage): nothing over the view first.
+  "nav-back"(ctx) {
+    if (overlayOpen(ctx.session)) return;
+    const to = backTarget(ctx.session.view);
+    if (to) loopActions["view"]!(ctx, { view: to } as DOMStringMap, null as never);
+  },
+  // Right-click is Esc: it closes what is over the view, then steps the camera out.
+  "nav-esc"(ctx) {
+    loopKeys(ctx, { key: "Escape" } as KeyboardEvent);
   },
 
   // 老周的事: the loan is answered in 老周's conversation; opening it brings the prompt up.
@@ -536,8 +603,8 @@ export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
     return true;
   }
   if (e.key === "Escape" && ctx.session.view !== "room") {
-    // One camera level out: 屏幕 → 桌子 → 房间; 门 → 房间.
-    loopActions["view"]!(ctx, { view: ctx.session.view === "desktop" ? "desk" : "room" } as DOMStringMap, null as never);
+    // One camera level out: 屏幕 → 桌子 → 房间; 门 and 床 → 房间.
+    loopActions["view"]!(ctx, { view: backTarget(ctx.session.view) ?? "room" } as DOMStringMap, null as never);
     return true;
   }
   if ((e.key === " " || e.key === "Enter") && ctx.session.view !== "desktop" && ctx.session.dialogue.queue.length) {

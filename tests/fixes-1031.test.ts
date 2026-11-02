@@ -66,7 +66,7 @@ describe("(3) one settings button", () => {
     loopActions["settings-lang"]!(ctx, { lang: "en" } as DOMStringMap, null as never);
     const out = room(ctx);
     expect(out).toContain(en["settings.title"]);
-    expect(out).toContain(en["hud.cam.room"]);
+    expect(out).toContain(en["hud.today"]);
     expect(out).toContain('data-lang="en" aria-pressed="true"');
     loopActions["settings-lang"]!(ctx, { lang: "zh" } as DOMStringMap, null as never);
     expect(room(ctx)).toContain("返回首页");
@@ -106,10 +106,13 @@ describe("(4) Kuro's small window is a pill (dialogue FR2: no window any more)",
 
 describe("(5) four camera levels", () => {
   const at = (view: Session["view"]) => ctxOf(createStore({ startDay: 1 }), initialSession(DEFAULT_CLOCK, "left", view));
-  const chips = (out: string) => [...out.matchAll(/data-action="view" data-view="(\w+)">([^<]+)<\/button>/g)].map((m) => [m[1], m[2]]);
-
-  it("the chips are 房间 · 桌子 · 屏幕 · 门", () => {
-    expect(chips(room(at("room")))).toEqual([["room", "房间"], ["desk", "桌子"], ["desktop", "屏幕"], ["door", "门"]]);
+  it("there are no camera chips: moving is pointing (navigation 2026-11-01)", () => {
+    for (const view of ["room", "desk", "door"] as const) expect(room(at(view)), view).not.toContain('class="cams"');
+    // The way to each level is a thing to point at: the keyboard proxies, in tab order.
+    const proxies = (out: string) => [...out.matchAll(/class="shot-hit[^"]*"[^>]*data-hot="(\w+)"/g)].map((m) => m[1]);
+    expect(proxies(room(at("room")))).toEqual(["tower", "monitorL", "monitorR", "lamp", "desk", "box", "bed", "door"]);
+    expect(proxies(room(at("desk")))).toEqual(["monitorL", "monitorR", "lamp"]);
+    expect(proxies(room(at("door")))).toEqual([]);
   });
 
   it("房间 is the wide shot: no desk bar; clicking the desk goes to 桌子; the monitor glow is mood only", () => {
@@ -154,14 +157,13 @@ describe("(5) four camera levels", () => {
 
   const render = (ctx: ActionContext) => (ctx.session.view === "desktop" ? renderGame(ctx.store, ctx.session, 0).value : room(ctx));
 
-  it("in every view Kuro's body sits at the HUD's bottom right, left of the camera chips; it is the call button", () => {
+  it("in every view Kuro's body sits at the HUD's bottom right; it is the call button", () => {
     for (const view of ["room", "desk", "desktop", "door"] as const) {
       const out = render(at(view));
       const br = out.slice(out.indexOf('<div class="hud-br">'));
       expect(br, view).toMatch(/^<div class="hud-br"><div class="hud-kuro"><button type="button" class="kuro-btn" data-action="kuro-call" aria-label=/);
       expect(br, view).toContain('<span class="kpet" data-kuro-slot data-state=');
-      // Above the chip row (the column's first item); 屏幕 has no chips, so it is in the corner.
-      if (view !== "desktop") expect(br.indexOf("kuro-btn")).toBeLessThan(br.indexOf('class="cams"'));
+      expect(br, view).not.toContain('class="cams"');
       // Exactly one body: the persistent sprite attaches to the one slot.
       expect((out.match(/data-kuro-slot/g) ?? []).length, view).toBe(1);
     }
