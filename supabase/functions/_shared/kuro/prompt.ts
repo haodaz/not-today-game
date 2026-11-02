@@ -5,6 +5,7 @@
 // The login inputs never enter: `names` events are dropped and the model writes `{login}` when it
 // names the player (the client fills it from the name variable). Pure.
 import type { ChatLocale, KuroContent, LogEvent, Memory } from "./types.ts";
+import { layerLines, type Layer } from "./variable.ts";
 
 /** A system block for the Messages API. */
 export interface SystemBlock {
@@ -32,7 +33,7 @@ const FIELDS: Readonly<Record<string, readonly string[]>> = {
   declineUpgrade: ["object", "decline"],
   kuroClosed: ["pageId"],
   lieDown: [],
-  chat: ["q", "said", "offline"],
+  chat: ["q", "said", "offline", "forgotten"],
   openLayer: ["objectId"],
   looked: ["objectId"],
   recognise: ["objectId"],
@@ -83,16 +84,19 @@ export function localeOf(v: unknown): ChatLocale {
 }
 
 /** The system blocks, in the three sources' order, ending with the locale line. The stable first block is cached. */
-export function buildSystem(c: KuroContent, day: number, events: readonly LogEvent[], memory: Memory, mode: "turn" | "judge", locale: ChatLocale): SystemBlock[] {
+export function buildSystem(c: KuroContent, day: number, events: readonly LogEvent[], memory: Memory, mode: "turn" | "judge", locale: ChatLocale, layer?: Layer): SystemBlock[] {
   const d = c.days[String(day)];
   const stable = `# Who you are\n${c.profile}\n\n# Rules\n${RULES}${mode === "judge" ? `\n\n# How you judge\n${c.rubric}` : ""}`;
+  // The variable layer (2026-11-02): the bucket, the day's dice, this turn's locked line.
+  const extra = layer ? `\n${layerLines(layer).join("\n")}` : "";
   const self = d
-    ? `# Today (day ${day})\nIdiom of the day (say it verbatim when you greet): ${locale === "zh" ? d.idiomZh : d.idiom}\nStance: ${d.stance}\nRecall from earlier days: ${d.recall}\nYou may reveal today: ${d.mayReveal}\nNever: ${d.never}`
-    : `# Today (day ${day})`;
+    ? `# Today (day ${day})\nIdiom of the day (say it verbatim when you greet): ${locale === "zh" ? d.idiomZh : d.idiom}\nStance: ${d.stance}\nRecall from earlier days: ${d.recall}\nYou may reveal today: ${d.mayReveal}\nNever: ${d.never}${extra}`
+    : `# Today (day ${day})${extra}`;
   const slice = worldSlice(events, day, c.gate, mode === "judge").map(describeEvent).filter((l): l is string => l !== null);
   const dreams = day === c.gate.dreamsOn ? Object.entries(c.dreams).map(([night, lines]) => `Night ${night}: ${lines.join(" ")}`) : [];
   const world = `# The player's situation\n${c.world}\n\n## What the work system logged (cite by id)\n${slice.length ? slice.join("\n") : "(nothing yet)"}${dreams.length ? `\n\n## The dreams (today only)\n${dreams.join("\n")}` : ""}`;
-  const recent = memory.turns.map((t) => `day ${t.day} ${t.who === "player" ? "Player" : "You"}: ${t.text}`);
+  // A forgotten turn (大失败) is never fed back: the player asked, nothing was given.
+  const recent = memory.turns.filter((t) => !t.forgotten).map((t) => `day ${t.day} ${t.who === "player" ? "Player" : "You"}: ${t.text}`);
   const mem = `# What you remember\nSummary: ${memory.summary || "(day 1: nothing yet)"}\n${recent.join("\n")}`;
   return [
     { type: "text", text: stable, cache_control: { type: "ephemeral" } },

@@ -3,7 +3,7 @@
 // ../_shared/kuro/handler.ts and the pure modules beside it, which are tested with the game; this
 // file only wires the real database client and the SDK into it.
 //
-// POST { mode: "turn", run_id, day, said, events, locale } → { mode, reply, turnsLeft, bedtime? }
+// POST { mode: "turn", run_id, day, said, q?, events, locale } → { mode, reply, turnsLeft, bedtime?, taboo }
 // POST { mode: "judge", run_id, day, events, locale }      → { mode, judgement }
 // locale: "zh" | "en" (missing or unknown → "zh"); it fixes the reply and note language.
 // Secrets read: ANTHROPIC_API_KEY (by the SDK), KURO_MODEL (optional, default claude-sonnet-5-5),
@@ -50,6 +50,11 @@ Deno.serve(async (req) => {
     async saveMemory(runId, m) {
       const { error } = await db.from("kuro_memory").upsert({ run_id: runId, turns: m.turns, summary: m.summary, updated_at: now() });
       if (error) throw error;
+    },
+    async loadJudgements(runId) {
+      // The bucket's source (variable layer): the stored rows, RLS-scoped; `delta` is the client's fold.
+      const { data } = await db.from("judgement").select("day, truth, values, bond, delta").eq("run_id", runId);
+      return data ?? [];
     },
     async saveJudgement(runId, day, j) {
       const { error } = await db.from("judgement").upsert({ run_id: runId, day, truth: j.truth, values: j.values, bond: j.bond, evidence: j.evidence });

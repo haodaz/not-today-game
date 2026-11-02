@@ -45,6 +45,11 @@ export function hasString(key: string): boolean {
   return lookup(key) !== undefined;
 }
 
+/** Every key under `prefix` (either locale), sorted: for families like `error.*` that content grows. */
+export function keysWith(prefix: string): string[] {
+  return [...new Set([...Object.keys(tables.zh), ...Object.keys(tables.en)])].filter((k) => k.startsWith(prefix)).sort();
+}
+
 /** Plain text (for attributes). Missing keys come back as ⟦key⟧. */
 export function t(key: string, vars?: Record<string, string | number>): string {
   const text = lookup(key);

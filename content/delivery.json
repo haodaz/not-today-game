@@ -54,7 +54,10 @@
           "sprite": "food/soup"
         }
       ],
-      "typo": "黄闷鸡米饭（东门店）"
+      "typo": "黄闷鸡米饭（东门店）",
+      "rating": 4.8,
+      "eta": 30,
+      "fee": 3
     },
     {
       "id": "shaxian",
@@ -80,7 +83,10 @@
           "sprite": "food/steamed"
         }
       ],
-      "typo": "沙县小汽"
+      "typo": "沙县小汽",
+      "rating": 4.6,
+      "eta": 35,
+      "fee": 4
     },
     {
       "id": "kiosk",
@@ -118,7 +124,10 @@
           "sprite": "food/water"
         }
       ],
-      "typo": "全家便利占"
+      "typo": "全家便利占",
+      "rating": 4.9,
+      "eta": 25,
+      "fee": 2
     },
     {
       "id": "coffee",
@@ -138,7 +147,10 @@
           "sprite": "food/americano"
         }
       ],
-      "typo": "端幸"
+      "typo": "端幸",
+      "rating": 4.7,
+      "eta": 40,
+      "fee": 5
     },
     {
       "id": "malatang",
@@ -156,7 +168,10 @@
           "sprite": "food/mlt"
         }
       ],
-      "typo": "麻辣汤（夜宵）"
+      "typo": "麻辣汤（夜宵）",
+      "rating": 4.8,
+      "eta": 30,
+      "fee": 3
     }
   ],
   "defaults": {
@@ -531,5 +546,7 @@
   "sprites": {
     "_note": "桌子那一层的贴图：public/<sprite>.png 吃前，public/<sprite>_done.png 吃完（有的话）；袋子 public/food/bag.png。写实白底抠图（新世界的东西），和老物件的水彩分开。",
     "bag": "food/bag"
-  }
+  },
+  "address": "某某路 17 号 · 3 栋 602",
+  "card": "**** 2047"
 }

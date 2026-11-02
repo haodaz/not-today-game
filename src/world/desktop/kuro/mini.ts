@@ -13,6 +13,7 @@ import { bodyState, frameUrl, FRAMES, type BodyState, type MawLook } from "./bod
 import { lateRing } from "@world/late/rings";
 import { closerOut } from "@world/late/closer";
 import { kuroDay } from "./days";
+import { kuroWorking } from "../workbench/work";
 
 /** Today's work-task lines, in the order the tasks were done. */
 export function taskLines(ctx: AppContext): string[] {
@@ -71,7 +72,7 @@ export function kuroBodyState(ctx: AppContext): BodyState {
   return bodyState({
     maw: kuroMaw(ctx),
     night: ctx.night,
-    taskRunning: false, // no running task state yet
+    taskRunning: kuroWorking(ctx.session, ctx.nowMs), // its 3 s of work on a task (work FR3)
     saidPretty: false, // the chat beat is the kuro-chat spec's
     moving: ctx.nowMs < ctx.session.movingUntil,
     waiting: ctx.session.clock.beat === "desk" && !turnsUsedUp(ctx),

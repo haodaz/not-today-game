@@ -2,7 +2,7 @@
 // The backend, from the game's side (backend FR1, FR4; kuro-chat FR3). Everything is a no-op
 // without VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY: the game is fully playable offline.
 // supabase-js is loaded lazily, only when configured. Never deploys anything.
-import type { ChatLocale, ChatResponse, LogEvent } from "@kuro/types.ts";
+import type { ChatLocale, ChatResponse, LogEvent, Taboo } from "@kuro/types.ts";
 import { syncDecision, type RunCopy, type SyncDecision } from "./sync";
 
 /** What the game calls on the client (a small slice of supabase-js). */
@@ -39,9 +39,12 @@ export function netConfig(env: Record<string, unknown> = import.meta.env ?? {}):
   return typeof url === "string" && url && typeof anonKey === "string" && anonKey ? { url, anonKey } : null;
 }
 
+/** A turn's reply; `taboo` is optional because a function deployed before 2026-11-02 does not send it. */
+export type TurnReply = Omit<Extract<ChatResponse, { mode: "turn" }>, "taboo"> & { readonly taboo?: Taboo | null };
 /** The turn and judge calls (kuro-chat FR3/FR4); injectable for tests. */
 export interface KuroOnline {
-  turn(body: { run_id: string; day: number; said: string; events: readonly LogEvent[]; locale: ChatLocale }): Promise<Extract<ChatResponse, { mode: "turn" }>>;
+  /** `q`: the starter picked, when it was one (the server unlocks a locked line only for an open starter). */
+  turn(body: { run_id: string; day: number; said: string; q?: number; events: readonly LogEvent[]; locale: ChatLocale }): Promise<TurnReply>;
   judge(body: { run_id: string; day: number; events: readonly LogEvent[]; locale: ChatLocale }): Promise<Extract<ChatResponse, { mode: "judge" }>>;
 }
 

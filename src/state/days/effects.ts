@@ -29,7 +29,8 @@ export function applyStep(state: State, event: { readonly name: string; readonly
   return state;
 }
 
-function clampSan(value: number): number {
+/** SAN within its range (variables.json). */
+export function clampSan(value: number): number {
   const [min, max] = rangeOf("san") ?? [null, null];
   return Math.min(max ?? Infinity, Math.max(min ?? -Infinity, value));
 }
@@ -88,7 +89,8 @@ export function isLosable(id: string): boolean {
   return id === "loan" || (membersOf("found") ?? []).includes(id);
 }
 
-export function applyTask(state: State, event: { readonly day: number; readonly flag: string; readonly mode: string }): State {
+export function applyTask(state: State, event: { readonly day: number; readonly flag: string; readonly mode: string; readonly missed?: true }): State {
+  if (event.missed !== undefined && (event.missed !== true || event.mode !== "self")) throw new Error("task: missed is only for a self path");
   if (event.mode !== "auto" && !(TASK_MODES as readonly string[]).includes(event.mode)) throw new Error(`task: unknown mode "${event.mode}"`);
   if (!taskFlags(event.day).includes(event.flag)) throw new Error(`task: "${event.flag}" is not a task of day ${event.day}`);
   const tree = taskByFlag(event.day, event.flag);
@@ -97,7 +99,9 @@ export function applyTask(state: State, event: { readonly day: number; readonly 
     return withFlags(state, [event.flag]);
   }
   const effects = tree[event.mode as TaskMode].effects;
-  let next = withFlags(state, [...(effects.flags ?? []), event.flag]);
+  // A read that missed the conflict: the same path without the catch flags (work FR1).
+  const drop = event.missed ? new Set(tree.doc?.catchFlags ?? []) : new Set<string>();
+  let next = withFlags(state, [...(effects.flags ?? []).filter((f) => !drop.has(f)), event.flag]);
   if (effects.san) next = { ...next, san: clampSan(next.san + effects.san) };
   if (effects.letItDoUnchecked) next = { ...next, letItDoUnchecked: next.letItDoUnchecked + effects.letItDoUnchecked };
   // effects.looked: the event (mode "look") is the record the rubric cites.

@@ -23,6 +23,28 @@ export interface TaskPath {
   readonly effects: TaskEffects;
 }
 
+/**
+ * The document surface (work FR1, docs): two versions side by side, the two clauses that
+ * contradict each other (0-based), the flags only a real read sets, and Kuro's touch when it does
+ * the work (absent: it is simply right that time; FR2).
+ */
+export interface TaskDoc {
+  readonly left: readonly string[];
+  readonly right: readonly string[];
+  readonly conflict: readonly [number, number];
+  readonly catchFlags: readonly string[];
+  readonly kuroEdit?: { readonly clause: number; readonly text: string };
+}
+
+/** The ledger surface (work FR1, ledger): the rows, the columns, the one cell to change and its value, Kuro's tidy. */
+export interface TaskLedger {
+  readonly rows: readonly (readonly (string | number)[])[];
+  readonly columns: readonly string[];
+  readonly target: readonly [number, number];
+  readonly value: string | number;
+  readonly kuroTidy?: { readonly col: number; readonly how: string };
+}
+
 export interface Task {
   readonly id: string;
   readonly title: string;
@@ -33,6 +55,9 @@ export interface Task {
   readonly self: TaskPath;
   readonly look: TaskPath;
   readonly let: TaskPath;
+  /** The working surface, when content has one for this task (else the plain thread). */
+  readonly doc?: TaskDoc;
+  readonly ledger?: TaskLedger;
 }
 
 type Raw = Record<string, unknown>;
@@ -68,9 +93,54 @@ function path(v: unknown, w: string): TaskPath {
   return { say: lines(v.say, `${w}.say`), kuro: v.kuro as string[], effects: e as TaskEffects };
 }
 
+const index = (v: unknown, n: number, w: string): number => (Number.isInteger(v) && (v as number) >= 0 && (v as number) < n ? (v as number) : fail(w, `must be an index from 0 to ${n - 1}`));
+const strings = (v: unknown, w: string): string[] => (Array.isArray(v) && v.length > 0 && v.every((x) => typeof x === "string" && x !== "") ? (v as string[]) : fail(w, "must be a non-empty list of non-empty strings"));
+
+function doc(v: unknown, w: string, selfFlags: readonly string[]): TaskDoc {
+  if (!isRecord(v)) fail(w, "must be an object");
+  keys(v, ["left", "right", "conflict", "catchFlags", "kuroEdit"], w);
+  const left = strings(v.left, `${w}.left`);
+  const right = strings(v.right, `${w}.right`);
+  if (left.length !== right.length) fail(w, `left has ${left.length} clauses, right ${right.length}`);
+  if (!Array.isArray(v.conflict) || v.conflict.length !== 2) fail(`${w}.conflict`, "must be two clause indexes");
+  const conflict = [index(v.conflict[0], left.length, `${w}.conflict[0]`), index(v.conflict[1], left.length, `${w}.conflict[1]`)] as const;
+  if (conflict[0] === conflict[1]) fail(`${w}.conflict`, "must be two different clauses");
+  const catchFlags = strings(v.catchFlags, `${w}.catchFlags`);
+  for (const f of catchFlags) if (!selfFlags.includes(f)) fail(`${w}.catchFlags`, `"${f}" is not set by the self path`);
+  let kuroEdit: TaskDoc["kuroEdit"];
+  if (v.kuroEdit !== undefined) {
+    if (!isRecord(v.kuroEdit)) fail(`${w}.kuroEdit`, "must be an object");
+    keys(v.kuroEdit, ["clause", "text"], `${w}.kuroEdit`);
+    kuroEdit = { clause: index(v.kuroEdit.clause, left.length, `${w}.kuroEdit.clause`), text: str(v.kuroEdit.text, `${w}.kuroEdit.text`) };
+  }
+  return { left, right, conflict, catchFlags, ...(kuroEdit ? { kuroEdit } : {}) };
+}
+
+function ledger(v: unknown, w: string): TaskLedger {
+  if (!isRecord(v)) fail(w, "must be an object");
+  keys(v, ["rows", "columns", "target", "value", "kuroTidy"], w);
+  const columns = strings(v.columns, `${w}.columns`);
+  if (!Array.isArray(v.rows) || v.rows.length === 0) fail(`${w}.rows`, "must be a non-empty list");
+  const rows = v.rows.map((r, i) => {
+    if (!Array.isArray(r) || r.length !== columns.length) fail(`${w}.rows[${i}]`, `must have ${columns.length} cells`);
+    if (!r.every((c) => typeof c === "string" || typeof c === "number")) fail(`${w}.rows[${i}]`, "cells must be text or numbers");
+    return r as (string | number)[];
+  });
+  if (!Array.isArray(v.target) || v.target.length !== 2) fail(`${w}.target`, "must be [row, column]");
+  const target = [index(v.target[0], rows.length, `${w}.target[0]`), index(v.target[1], columns.length, `${w}.target[1]`)] as const;
+  if (typeof v.value !== "string" && typeof v.value !== "number") fail(`${w}.value`, "must be text or a number");
+  let kuroTidy: TaskLedger["kuroTidy"];
+  if (v.kuroTidy !== undefined) {
+    if (!isRecord(v.kuroTidy)) fail(`${w}.kuroTidy`, "must be an object");
+    keys(v.kuroTidy, ["col", "how"], `${w}.kuroTidy`);
+    kuroTidy = { col: index(v.kuroTidy.col, columns.length, `${w}.kuroTidy.col`), how: str(v.kuroTidy.how, `${w}.kuroTidy.how`) };
+  }
+  return { rows, columns, target, value: v.value as string | number, ...(kuroTidy ? { kuroTidy } : {}) };
+}
+
 function task(v: unknown, w: string): Task {
   if (!isRecord(v)) fail(w, "a task must be an object");
-  keys(v, ["id", "title", "app", "done", "start", ...PATHS], w);
+  keys(v, ["id", "title", "app", "done", "start", ...PATHS, "doc", "ledger"], w);
   if (!(APPS as readonly unknown[]).includes(v.app)) fail(`${w}.app`, `must be one of ${APPS.join(", ")}`);
   if (!isRecord(v.start)) fail(`${w}.start`, "must be an object");
   keys(v.start, ["say", "options"], `${w}.start`);
@@ -92,10 +162,16 @@ function task(v: unknown, w: string): Task {
     look: path(v.look, `${w}.look`),
     let: path(v.let, `${w}.let`),
   };
+  const surface = {
+    ...(v.doc !== undefined ? { doc: doc(v.doc, `${w}.doc`, out.self.effects.flags ?? []) } : {}),
+    ...(v.ledger !== undefined ? { ledger: ledger(v.ledger, `${w}.ledger`) } : {}),
+  };
+  if (surface.doc && out.app !== "docs") fail(`${w}.doc`, `a document belongs to app "docs", not "${out.app}"`);
+  if (surface.ledger && out.app !== "ledger") fail(`${w}.ledger`, `a ledger belongs to app "ledger", not "${out.app}"`);
   for (const m of PATHS) {
     if (!(out[m].effects.flags ?? []).includes(done)) fail(`${w}.${m}`, `effects do not set the done flag "${done}"`);
   }
-  return out;
+  return { ...out, ...surface };
 }
 
 function deepFreeze<T>(value: T): T {

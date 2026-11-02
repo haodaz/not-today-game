@@ -1,12 +1,16 @@
 /// <reference types="vite/client" />
 // content/kuro-days/day-NN.md (Claude's): the day's idiom (a constant, never generated) and the
 // starter questions. Read as text, parsed strictly, never rewritten.
+import { parseVariableParts } from "@kuro/dayfile.ts";
+import type { Bucket } from "@kuro/types.ts";
 
 export interface StarterQuestion {
   readonly n: number;
   readonly zh: string;
   readonly en: string;
   readonly hard: boolean;
+  /** The lowest bucket the question is shown to (kuro-chat 2026-11-02); low unless content says. */
+  readonly minBucket: Bucket;
 }
 
 /** The constant answers used when there is no model (dialogue spec): by question, and to free text. */
@@ -70,20 +74,8 @@ export function parseKuroDay(text: string, label: string): KuroDay {
   const idiom = IDIOM.exec(text)?.[1];
   if (!idiom) throw new Error(`content/kuro-days ${label}: no idiom line`);
 
-  const start = text.indexOf("## Starter questions");
-  if (start < 0) throw new Error(`content/kuro-days ${label}: no starter questions section`);
-  const rest = text.slice(start);
-  const end = rest.indexOf("\n## ", 1);
-  const section = end < 0 ? rest : rest.slice(0, end);
-  const starters: StarterQuestion[] = [];
-  for (const line of section.split("\n")) {
-    const cells = /^\|\s*(\d+)\s*\|(.*)\|\s*$/.exec(line.trim());
-    if (!cells) continue;
-    const [zh = "", en = "", hard = ""] = cells[2]!.split("|").map((c) => c.trim());
-    if (!zh) throw new Error(`content/kuro-days ${label}: starter ${cells[1]} has no zh text`);
-    starters.push({ n: Number(cells[1]), zh, en, hard: hard.toLowerCase() === "yes" });
-  }
-  if (!starters.length) throw new Error(`content/kuro-days ${label}: no starter questions`);
+  // The starters (with minBucket), red-blue and layered parts: the same parser as the function's bundle.
+  const { starters } = parseVariableParts(text, label);
   const answers = parseAnswers(text, label);
   for (const n of answers.q.keys()) {
     if (!starters.some((s) => s.n === n)) throw new Error(`content/kuro-days ${label}: an offline answer to q${n}, which is not a starter`);

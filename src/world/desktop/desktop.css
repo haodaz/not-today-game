@@ -344,3 +344,41 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .conv.ding .rcpt.unread{color:var(--accent)}
 .m .voice .ding{font-size:10px;font-weight:600;letter-spacing:.04em;color:#fff;background:var(--accent);border-radius:8px;padding:0 6px;line-height:16px;margin-right:2px}
 .m .card.task{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;padding:10px 12px;color:var(--ink)}
+/* added (work spec 2026-11-02): the choice is a reply. The thread above the input, the chips under
+   Kuro's question, the strip with the scope only; the document and ledger surfaces. */
+.wb .main{overflow:auto}
+.wb .ask .wthread{display:flex;flex-direction:column;gap:10px;margin-bottom:12px;max-height:none}
+.wb .ask .wm{display:flex;gap:10px;max-width:86%}
+.wb .ask .wm .av{width:28px;height:28px;border-radius:50%;object-fit:contain;flex:0 0 auto;background:#111}
+.wb .ask .wm .bub{background:var(--them);padding:8px 12px;border-radius:4px 12px 12px 12px;line-height:1.55}
+.wb .ask .wm .bub p{margin:0}.wb .ask .wm .bub p+p{margin-top:4px}
+.wb .ask .wm.me{align-self:flex-end}.wb .ask .wm.me .bub{background:var(--me);border-radius:12px 4px 12px 12px}
+.wb .ask .wchips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.wb .ask .kscroll{display:flex;gap:4px;align-items:center;min-height:34px}
+.wb .ask .kscroll i{width:6px;height:6px;border-radius:3px;background:var(--ink-3);animation:wb-dots 1s infinite}
+.wb .ask .kscroll i:nth-child(2){animation-delay:.2s}.wb .ask .kscroll i:nth-child(3){animation-delay:.4s}
+@keyframes wb-dots{0%,100%{opacity:.3}50%{opacity:1}}
+.wb .ask input.ph{display:block;width:100%;border:0;outline:0;font:inherit;color:var(--ink);background:transparent;min-height:40px;padding:0}
+.wb .ask input.ph::placeholder{color:var(--ink-3)}
+.wb .ask .strip{display:flex;gap:8px;align-items:center;margin-top:6px}
+.wb .ask .strip .scope{border:1px solid var(--line);border-radius:8px;padding:4px 10px;font:inherit;font-size:12px;color:var(--ink-2);background:#fff;cursor:pointer}
+.wb .ask .strip .go{margin-left:auto;width:28px;height:28px;border-radius:8px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;border:0;cursor:pointer}
+.wb .ask .strip .go:disabled{opacity:.35;cursor:default}
+.wb .surface{border:1px solid var(--line);border-radius:10px;background:#fff;padding:10px;overflow:auto;max-height:420px}
+.wb .surface .cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.wb .surface .col{display:flex;flex-direction:column;gap:2px}
+.wb .surface .cl{display:block;width:100%;text-align:left;border:0;background:none;font:inherit;font-size:12.5px;color:var(--ink);padding:4px 6px;border-radius:6px;line-height:1.5}
+.wb .surface button.cl{cursor:pointer}.wb .surface button.cl:hover,.wb .surface button.cl:focus-visible{background:#f3f5f9;outline:none}
+.wb .surface .cl.y{background:#fff8e1}.wb .surface .cl.on{box-shadow:inset 3px 0 0 var(--accent);background:#eef3ff}
+.wb .surface .cl.touched{background:#fdecec}
+.wb .surface .wdiff{margin-top:8px;padding:8px 10px;border-left:3px solid var(--red);background:#fafafa;font-size:12.5px;line-height:1.6}
+.wb .surface .wdiff del{display:block;color:var(--ink-3)}.wb .surface .wdiff ins{display:block;text-decoration:none;color:var(--ink)}
+.wb .surface .tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.wb .surface .tbl th,.wb .surface .tbl td{border-bottom:1px solid #f1f2f4;padding:5px 8px;text-align:left}
+.wb .surface .tbl th button{border:0;background:none;font:inherit;font-weight:600;color:var(--red);cursor:pointer;padding:0}
+.wb .surface .tbl td.target{background:#eef3ff;font-weight:600}
+.wb .surface .tbl td.target button{border:0;background:none;font:inherit;cursor:text;padding:0;min-width:40px;text-align:left}
+.wb .surface .tbl td.target input{width:64px;font:inherit;border:1px solid var(--accent);border-radius:4px;padding:1px 4px}
+.wb .ask .wpass{display:flex;justify-content:flex-end;margin-top:8px}
+.wb .ask .wpass .pass{border:0;border-radius:8px;background:var(--accent);color:#fff;padding:6px 16px;font:inherit;font-size:13px;cursor:pointer}
+.wb .ask .wpass .pass:disabled{opacity:.4;cursor:default}

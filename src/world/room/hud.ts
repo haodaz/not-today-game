@@ -13,6 +13,7 @@ import { doorCaption, DOOR_STATES, nextInputs, startDoor, type DoorBeat, type Do
 import { mealView } from "@world/delivery/meals";
 import { renderDoorView } from "@world/delivery/view";
 import { cls, html, raw, type SafeHtml } from "@world/html";
+import { bleedingToday } from "@world/dialogue/taboo";
 import { getLocale, hasString, t, tr, type Locale } from "@world/i18n";
 import { booted, checklist, deskMeal, itemStates, loopContext, type ChecklistView } from "@world/loop/checklist";
 import { itemOf } from "@state/delivery/shops";
@@ -255,7 +256,7 @@ function doorContent(state: State, events: readonly GameEvent[], session: Sessio
       ? html`<button type="button" class="${cls("door-spot", input)}" data-action="loop-door" data-input="${input}" style="${rectStyle(r)}" aria-label="${doorCaption(DOOR_STATES[DOOR_STATES.indexOf(at!) + 1]!)}"></button>`
       : null;
   // renderDoorView escapes its own text (content strings) and returns markup.
-  return html`${at && DOOR_OPEN.has(at) ? html`<div class="door-bg chain"></div>` : null}${spot}${raw(renderDoorView(view, beat, state.names))}${at === "holding" ? html`<div class="door-hand"></div>` : null}`;
+  return html`${at && DOOR_OPEN.has(at) ? html`<div class="door-bg chain"></div>` : null}${spot}${raw(renderDoorView(view, beat, state.names))}${at === "holding" ? html`<div class="${cls("door-hand", bleedingToday(events, state.day) && "blood")}"></div>` : null}`;
 }
 
 export interface RoomModel {

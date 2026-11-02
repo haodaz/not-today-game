@@ -5,7 +5,6 @@ import type { GameEvent } from "@state/events";
 import type { State } from "@state/types.gen";
 import { html, type SafeHtml } from "@world/html";
 import { tr } from "@world/i18n";
-import type { TaskMode } from "@state/days/effects";
 import type { DoorBeat } from "@world/delivery/door";
 import { EMPTY_DIALOGUE, sceneOf, type DialogueState } from "@world/loop/dialogue";
 import { booted, loopContext, openItemFor } from "@world/loop/checklist";
@@ -18,6 +17,8 @@ import { isNight, type BeatClock } from "./beat";
 import { weatherOf } from "@state/stages";
 import { dockFor } from "./dock";
 import { FEED } from "./messages/threads";
+import { initialTabooFx, type TabooFx } from "@world/dialogue/taboo";
+import type { WorkThread } from "./workbench/work";
 import { fxPlan } from "../room/fx";
 import { desktopRing } from "./rings";
 import type { AppId, MonitorModel, ShellModel, Side } from "./shell";
@@ -57,6 +58,8 @@ export interface Session {
   phoneOpen: boolean;
   /** The delivery app's page, cart and ratings (session only). */
   phoneUi: PhoneUi;
+  /** A taboo playing (kuro-chat 2026-11-02): the blur, the white frame, the error cascade. */
+  taboo: TabooFx;
   /** The ⚙ 设置 panel is open (day-loop amendment). */
   settingsOpen: boolean;
   /** Its last line as last seen, to notice a new one; undefined before the first look. */
@@ -105,7 +108,10 @@ export interface Session {
   hand: HandSession;
   /** The dialogue line's per-character reveal (polish FR3); set by the motion layer only. */
   reveal: Reveal | null;
-  wbMode: TaskMode;
+  /** The open work task's thread and surface (work spec 2026-11-02); session only. */
+  work: WorkThread | null;
+  /** The ask box's scope: 只看本公司文档 (false) ↔ 全部 (true). Presentation only. */
+  wbScopeAll: boolean;
   loop: LoopMemo | null;
   /** The door beat in progress (the delivery door machine). */
   door: DoorBeat | null;
@@ -201,6 +207,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     muted: false,
     phoneOpen: false,
     phoneUi: initialPhoneUi(),
+    taboo: initialTabooFx(),
     settingsOpen: false,
     kuroLast: undefined,
     kuroRead: undefined,
@@ -225,7 +232,8 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     holding: null,
     hand: initialHand(),
     reveal: null,
-    wbMode: "self",
+    work: null,
+    wbScopeAll: false,
     loop: null,
     door: null,
     conversation: "boss",

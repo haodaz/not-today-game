@@ -52,3 +52,18 @@ Kuro is never trained. Every turn, the function assembles one context object and
 2. **Dice** — a per-run, per-day seed (`runId`, `day`) already used elsewhere; from it the server derives and writes into the "Today" block: a mood notch (0–3, shifts how many words it spends), one "free line" allowance (whether it may add a sentence of its own today), and the glyph set for the unreadable word when the valve fires. Same run replays identically; a new run differs. The model never sees the seed, only the derived values.
 3. **Scores** — the affinity bucket (above) and, from day 13, the count of mistakes the player has caught (`catch` nodes), so it can say "that's the third time".
 Tests: the object is pure from (content, events, memory, seed, day, locale); locked text survives any model output; dice values are stable per seed.
+
+## Addition 2026-11-02 (author): the d100 and the moving thresholds
+Before a locked high-tier answer is given, the server rolls a d100 from the seed (the dice above). The system never changes; the thresholds move with the affinity bucket:
+| bucket | 大成功 (the unreadable word, blood) | 大失败 (flicker: reply forgotten, turn spent) | otherwise |
+|---|---|---|---|
+| low | 1 | 85–100 | the locked line |
+| mid | 1–3 | 96–100 | the locked line |
+| high | 1–8 | 100 | the locked line |
+Fate stays uncertain at every level; what affinity buys is fewer bad numbers, not a different game. The roll is never shown; the player only sees that the same question sometimes returns a line they cannot read and sometimes a blank. Tests: thresholds per bucket; the roll is stable per (seed, day, question); a 大成功 and a 大失败 can both still happen at high.
+
+## Addition 2026-11-02 (author): affinity opens questions, not only thresholds
+The variable layer must not be the whole of it. Content decides what can be asked: each starter question in `content/kuro-days/day-NN.md` may carry `minBucket: low|mid|high`. The chat shows only the starters the current bucket allows; the deeper questions (the ones whose locked answers can hurt) exist only for a Kuro that thinks well of the player. Free typing is always allowed, but a typed question only unlocks a locked answer if its starter is open today. Tests: starters filtered per bucket; a typed match on a closed starter gets a free reply, not the locked line.
+
+## Correction 2026-11-02 (author): the unreadable word is made by the server, not the model
+The earlier idea of a "valve" that lets the model write one unreadable word is withdrawn. On a 大成功 the server builds the word from the seed's glyph set (3–5 glyphs from one non-Latin, non-CJK script such as Vai, Ogham or Glagolitic, never mixed), inserts it as its own line after the locked text, and appends the locked follow-up 「刚才那一行，我自己读不出来。」 / "I can't read that line myself." The model is never told the word or the mechanism; it only continues after. Randomness stays in the server's dice, never in the model. One taboo per day: after it fires, later rolls that day return the plain locked line.

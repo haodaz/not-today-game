@@ -3,8 +3,9 @@
 // index.ts only wires real dependencies to this.
 import { buildSystem, citableIds, JUDGE_ASK, localeOf } from "./prompt.ts";
 import { DEFAULT_MODEL, judgeRequest, readJudgement, readReply, turnRequest, type MessageRequest, type MessageResponse } from "./llm.ts";
-import { appendExchange, clipSummary, decideTurn } from "./turns.ts";
-import type { ChatResponse, Judgement, KuroContent, LogEvent, Memory } from "./types.ts";
+import { appendExchange, appendLayered, clipSummary, decideTurn } from "./turns.ts";
+import type { ChatResponse, Judgement, KuroContent, LogEvent, Memory, StoredJudgement } from "./types.ts";
+import { affinityFrom, composeReply, enforceLocked, variableLayer } from "./variable.ts";
 
 export interface HandlerDeps {
   readonly content: KuroContent;
@@ -14,6 +15,8 @@ export interface HandlerDeps {
   loadMemory(runId: string): Promise<Memory>;
   saveMemory(runId: string, m: Memory): Promise<void>;
   saveJudgement(runId: string, day: number, j: Judgement): Promise<void>;
+  /** The run's stored judgements, for the affinity bucket (variable layer); none when absent. */
+  loadJudgements?(runId: string): Promise<readonly StoredJudgement[]>;
   /** `client.messages.create` with the 20 s timeout. */
   create(params: MessageRequest): Promise<MessageResponse>;
 }
@@ -49,11 +52,41 @@ export async function handle(body: unknown, deps: HandlerDeps): Promise<HandlerR
       if (!said.trim()) return { status: 400, body: { error: "nothing said" } };
       // Server-side count: the sixth call gets the constant bedtime line; the model is not called.
       const decision = decideTurn(memory.turns, day, deps.content.turnsPerDay);
-      if (decision.kind === "bedtime") return { status: 200, body: { mode, reply: deps.content.bedtime, turnsLeft: 0, bedtime: true } };
-      const system = buildSystem(deps.content, day, events, memory, "turn", locale);
-      const reply = readReply(await deps.create(turnRequest(model, system, said)));
-      await deps.saveMemory(runId, appendExchange(memory, day, said, reply));
-      return { status: 200, body: { mode, reply, turnsLeft: decision.turnsLeft } };
+      if (decision.kind === "bedtime") return { status: 200, body: { mode, reply: deps.content.bedtime, turnsLeft: 0, bedtime: true, taboo: null } };
+      // The variable layer (2026-11-02): the bucket from the stored judgements, the day's dice,
+      // this turn's locked line and its d100. The model sees only derived values.
+      const q = Number.isInteger(body.q) && (body.q as number) >= 1 ? (body.q as number) : null;
+      const rows = deps.loadJudgements ? await deps.loadJudgements(runId) : [];
+      const affinity = deps.content.affinity ? affinityFrom(rows, deps.content.affinity) : 0;
+      const layer = variableLayer({ content: deps.content, day, locale, runId, memory, affinity, q, said });
+      if (layer.outcome === "failure") {
+        // 大失败: the reply is forgotten (the model is not asked); the turn is spent; the judgement may cite the asking.
+        await deps.saveMemory(runId, appendLayered(memory, day, said, null, "flicker"));
+        return { status: 200, body: { mode, reply: "", turnsLeft: decision.turnsLeft, taboo: "flicker" } };
+      }
+      const system = buildSystem(deps.content, day, events, memory, "turn", locale, layer);
+      let raw = "";
+      if (!layer.locked) raw = readReply(await deps.create(turnRequest(model, system, said)));
+      else {
+        // A locked turn stands on its own: if the model refuses, fails or says nothing, the locked text alone.
+        try {
+          raw = readReply(await deps.create(turnRequest(model, system, said)));
+        } catch {
+          raw = "";
+        }
+      }
+      if (!layer.locked) {
+        // A free reply never carries a taboo (the model has no such channel).
+        await deps.saveMemory(runId, appendExchange(memory, day, said, raw));
+        return { status: 200, body: { mode, reply: raw, turnsLeft: decision.turnsLeft, taboo: null } };
+      }
+      // Locked: the text verbatim first, whatever the model wrote; on 大成功 the server's word and the follow-up.
+      const enforced = enforceLocked(raw, layer.locked);
+      const reply = composeReply(layer, enforced);
+      // Memory keeps what the model may recall: never the word or the mechanism.
+      const remembered = composeReply({ ...layer, glyph: null, followup: null }, enforced);
+      await deps.saveMemory(runId, appendLayered(memory, day, said, remembered, layer.taboo));
+      return { status: 200, body: { mode, reply, turnsLeft: decision.turnsLeft, taboo: layer.taboo } };
     }
 
     const system = buildSystem(deps.content, day, events, memory, "judge", locale);

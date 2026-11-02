@@ -7,6 +7,7 @@ import type { GameEvent } from "@state/events";
 import type { State } from "@state/types.gen";
 import type { Session } from "@world/desktop/model";
 import { renderPhoneApp } from "@world/delivery/app";
+import { bleedingToday } from "@world/dialogue/taboo";
 import { cls, html, raw, type SafeHtml } from "@world/html";
 import { handOf, type KeySpot, type Reel, type Rect } from "@state/hands";
 import { CHICK_H, CHICK_W } from "@world/objects/frames";
@@ -157,5 +158,7 @@ export function heldLayer(state: State, events: readonly GameEvent[], session: S
   // The delivery phone (session.phoneOpen) is not the dead phone out of the box (an object id).
   const body = session.phoneOpen ? phone(state, events, session) : object(state, events, session, item, nowMs);
   const hint = session.phoneOpen || !session.hand.using ? tr("hud.putDown") : tr("objects.exit");
-  return html`<div class="held-layer" data-held="${item}">${dim()}${body}<div class="hint">${hint}</div></div>`;
+  // The nosebleed (kuro-chat taboo): the hand holding it is the blood variant for the rest of the day.
+  const blood = bleedingToday(events, state.day) ? html`<div class="hand-blood" aria-hidden="true"></div>` : null;
+  return html`<div class="held-layer" data-held="${item}">${dim()}${body}${blood}<div class="hint">${hint}</div></div>`;
 }

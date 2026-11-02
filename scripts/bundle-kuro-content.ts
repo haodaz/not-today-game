@@ -8,6 +8,7 @@
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import type { KuroContent, KuroDayContent } from "../supabase/functions/_shared/kuro/types.ts";
+import { parseVariableParts } from "../supabase/functions/_shared/kuro/dayfile.ts";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const OUT = "supabase/functions/kuro-chat/content.ts";
@@ -45,6 +46,8 @@ export function parseKuroDayForFunction(text: string, label: string): KuroDayCon
     recall: field(text, "Recall from earlier days", label),
     mayReveal: field(text, "May reveal today", label),
     never: section(text, "Never"),
+    // The variable layer (2026-11-02): starters with minBucket, red-blue lines, layered answers.
+    ...parseVariableParts(text, label),
   };
 }
 
@@ -72,7 +75,19 @@ export function buildKuroContent(read: Read, list: List): KuroContent {
   if (typeof turnsPerDay !== "number") fail("variables.json", "constants.chatTurnsPerDay must be a number");
 
   const en = JSON.parse(read("content/strings/en.json")) as Record<string, string>;
+  const zh = JSON.parse(read("content/strings/zh.json")) as Record<string, string>;
   const bedtime = en["kuro.bedtime"] ?? fail("strings/en.json", 'no "kuro.bedtime"');
+  // The follow-up after the unreadable line (the correction 2026-11-02); none until content has it.
+  const unreadable = { zh: zh["kuro.unreadable"] ?? null, en: en["kuro.unreadable"] ?? zh["kuro.unreadable"] ?? null };
+  // How affinity folds, as the ending reads it.
+  const num = (k: string, d: number) => (typeof variables.constants[k] === "number" ? (variables.constants[k] as number) : d);
+  const stagesAll = JSON.parse(read("content/stages.json")) as { tenderDay?: { day?: number } };
+  const affinity = {
+    perPoint: num("affinityPerPoint", 5),
+    threshold: num("affinityThreshold", 60),
+    tenderDays: typeof stagesAll.tenderDay?.day === "number" ? [stagesAll.tenderDay.day] : [],
+    tenderMultiplier: num("tenderDayAffinityMultiplier", 1),
+  };
 
   const stages = JSON.parse(read("content/stages.json")) as { dreamNights?: { nights?: number[] } };
   const dreams: Record<string, string[]> = {};
@@ -94,6 +109,8 @@ export function buildKuroContent(read: Read, list: List): KuroContent {
     gate: { deskFrom, dreamsOn },
     dreams,
     tools,
+    affinity,
+    unreadable,
   };
 }
 

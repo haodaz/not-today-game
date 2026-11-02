@@ -22,3 +22,27 @@ Each task has an `app` (`docs`, `ledger`, `export`; later days may add `code`, `
 
 ## FR5. Tests
 - Loader strict. Snapshots: each surface at open, mid-way, and done, in `self` and `let`. Properties: `self` without both conflict clicks never sets a catch flag; `let` sets `letItDoUnchecked` unless the touched thing was opened; a task with no surface object behaves exactly as before; the surface never writes world events itself (the branch effects do, as today).
+
+## Correction 2026-11-02 (author): the choice is a reply, not a toolbar
+The three buttons under the input (自己做 / 让它做，我看一眼 / 让它做) go. That strip under a multi-line input is where people expect mode, file and path pickers, not decisions. The flow is a conversation:
+1. The day's task is already in the input as one sentence (content `text`); the player sends it (Enter or ↑).
+2. It appears as the player's message; Kuro answers in the thread with its stance line for that task and asks how to proceed: 「这个怎么做？」 followed by the three options **as reply chips under Kuro's message**, the way the 消息 app offers canned replies.
+3. The chosen chip is sent as the player's reply; the work proceeds as today (自己做 opens the surface; 让它做 runs Kuro's window; 看一眼 / 通过 continue in the same thread).
+4. The strip under the input keeps only what belongs there: a scope selector (只看本公司文档 ↔ 全部) and nothing else for now.
+Tests: no `wb-mode` buttons under the input; the three options exist only as chips under Kuro's question; the flow completes the same flags and events as before; snapshot the thread on day 1 before and after the choice.
+
+## Addition 2026-11-02 (author): marking is the operation that decides the player's numbers
+- **自己做** = find the business problem (clause 6 vs 11). **让它做，我看一眼** = Kuro processes first; the player reads its result and marks what is strange (odd characters, odd adjectives, a sentence that is not a person's). Both are *marking*; a correct mark is what counts (truth score, catch flags). Content lists the markable spots per task (`doc.marks: [{span, kind: "conflict"|"kuro"|"odd", worth: 1|2}]`).
+- Proposals (Claude, to be approved before building, not part of the current segment):
+  1. **Red pens** (author decided 2026-11-02, this one is not a proposal): in **自己做** the pens are unlimited; in **让它做，我看一眼** the player has three — a mark on a real spot returns the pen, a mark on nothing loses it. Doing it yourself costs time; auditing Kuro costs attention.
+  2. **Two ways to mark**: click a sentence = "this line"; drag a span = "something in here" (half credit if the span contains a real spot).
+  3. **Kuro reacts at once** when its own change is caught: day 1 "That's mine.", day 9 "You're the only one who reads that far.", day 13 nothing said but the line reverts by itself. Being caught is what it likes.
+  4. **The diff is incomplete** from day 7: one change Kuro did not admit is not in the diff and is found only by reading.
+  5. **The dictionary verifies**: holding the Wenquxing over an odd word shows a gloss that tells you it does not belong in a contract; the first time an old object is useful at work.
+
+## Addition 2026-11-02 (author): the two modes, for every kind of task
+Not only the merge. For every task kind (document, code, ledger, data model, space assembly, product script):
+- **自己做** = the player works with Kuro as copilot. Kuro hands over one unit at a time (a clause, a function, a column, a field); the player reads it and can say 「这里不对」 / 「那里不对」 (fixed replies chosen under Kuro's message, never typed); Kuro revises; the player reads again; then 通过. Red pens unlimited.
+- **看克总的** (让它做，我看一眼) = Kuro writes the whole thing and hands it over; the player finds the faults. Three red pens.
+- **让它做** = no reading; 通过 only.
+The unit per task kind comes from content (`doc.units`, `code.units`, …); the surfaces differ, the loop is the same.

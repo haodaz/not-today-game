@@ -33,8 +33,8 @@ describe("kuro-days parser", () => {
       day: 2,
       idiom: "Good to see you.",
       starters: [
-        { n: 1, zh: "你好？", en: "Hi?", hard: false },
-        { n: 2, zh: "你是谁？", en: "Who?", hard: true },
+        { n: 1, zh: "你好？", en: "Hi?", hard: false, minBucket: "low" },
+        { n: 2, zh: "你是谁？", en: "Who?", hard: true, minBucket: "low" },
       ],
       answers: { q: new Map(), free: null },
     });

@@ -14,7 +14,7 @@ import { isNight } from "@world/desktop/beat";
 import { kuroDay, offlineAnswer } from "@world/desktop/kuro/days";
 import { lastKuroLine } from "@world/desktop/kuro/mini";
 import type { Session } from "@world/desktop/model";
-import { getLocale, t } from "@world/i18n";
+import { getLocale, hasString, t } from "@world/i18n";
 import { finishChoice, leaveKuro, push, replaceHead, talking, type Ending, type Queued } from "@world/loop/dialogue";
 import { stepOnce } from "@world/loop/steps";
 import { fillPlaceholders } from "@world/replies/placeholders";
@@ -25,6 +25,12 @@ import { toLogEvents } from "@world/desktop/kuro/scorer";
 import { stageOf } from "@state/stages";
 import { pointed } from "@world/room/pointer";
 import { fontPx, KURO_LINE_BOX, nextScreen, PLAYER_BOX, screens, type Screen } from "./layout";
+import { bucketAllows, bucketOf } from "@kuro/variable.ts";
+import type { Bucket, Taboo } from "@kuro/types.ts";
+import { BLUR_MS, chatClosedByErrors, errorCount, ERRORS_AFTER_MS, FLASH_MS, tabooUsedToday } from "./taboo";
+
+/** Kuro's opinion of the player now (never shown): the state's affinity, as the ending reads it. */
+export const bucketNow = (state: State): Bucket => bucketOf(state.affinity, constants.affinityThreshold as number);
 
 /** The chat beat: after shutdown (turns count only here). */
 export const chatBeatNow = (session: Pick<Session, "clock">): boolean => session.clock.beat === "night";
@@ -98,7 +104,7 @@ export function answerAsk(ctx: ActionContext, yes: boolean): void {
     session.dialogue = replaceHead(session.dialogue, [item(session, state.day, day.idiom, { kind: "kuroTurn", mode: "work" })]);
     return;
   }
-  if (state.chatTurnsToday >= constants.chatTurnsPerDay || session.kuroBedDay === state.day) {
+  if (state.chatTurnsToday >= constants.chatTurnsPerDay || session.kuroBedDay === state.day || chatClosedByErrors(ctx.store.getEvents(), state.day)) {
     bedtime(ctx);
     return;
   }
@@ -151,6 +157,8 @@ function turn(ctx: ActionContext, said: string, q: number | null, text: string |
   const state = store.getState();
   const head = session.dialogue.queue[0];
   if (head?.ending.kind !== "kuroTurn" || head.ending.mode !== "chat") return;
+  // What it said before the question: a flicker brings it back as if the question never was.
+  const before = head.lines.at(-1)?.t ?? null;
   logCurrent(session, state);
   logPlayer(session, state, said);
   if (state.chatTurnsToday >= constants.chatTurnsPerDay) {
@@ -172,10 +180,10 @@ function turn(ctx: ActionContext, said: string, q: number | null, text: string |
   const wait = item(session, dayNo, WAITING, { kind: "kuroWait" });
   session.dialogue = replaceHead(session.dialogue, [wait]);
   online
-    .turn({ run_id: store.getRunId(), day: dayNo, said, events: toLogEvents(store.getEvents()), locale: getLocale() })
+    .turn({ run_id: store.getRunId(), day: dayNo, said, ...(q !== null ? { q } : {}), events: toLogEvents(store.getEvents()), locale: getLocale() })
     .then((r) => {
       if (r.bedtime) return void answerBedtime(ctx, dayNo, wait);
-      answerTurn(ctx, dayNo, said, q, text, r.reply, false, wait);
+      answerTurn(ctx, dayNo, said, q, text, r.reply, false, wait, r.taboo ?? null, before);
     })
     .catch(() => answerTurn(ctx, dayNo, said, q, text, scripted, true, wait))
     .finally(() => ctx.rerender());
@@ -190,15 +198,67 @@ export const WAITING = "…";
  * scripted one is shown as written. If the conversation was left meanwhile, the turn is still
  * logged (it was asked) but nothing is shown.
  */
-function answerTurn(ctx: ActionContext, day: number, said: string, q: number | null, text: string | null, answer: string, offline: boolean, wait?: Queued): void {
+function answerTurn(
+  ctx: ActionContext,
+  day: number,
+  said: string,
+  q: number | null,
+  text: string | null,
+  answer: string,
+  offline: boolean,
+  wait?: Queued,
+  sent: Taboo | null = null,
+  before: string | null = null,
+): void {
   const { store, session } = ctx;
   if (store.getState().day !== day || store.getState().chatTurnsToday >= constants.chatTurnsPerDay) return;
-  store.appendEvent({ ...(q !== null ? { q } : { text: text! }), kind: "chat", said, answer, offline });
+  // At most one taboo a day; an offline answer never carries one (kuro-chat 2026-11-02).
+  const taboo = offline || tabooUsedToday(store.getEvents(), day) ? null : sent;
+  const asked = q !== null ? { q } : { text: text! };
+  const now = ctx.now?.() ?? Date.now();
+  if (taboo === "flicker") {
+    // The flicker: the turn is spent; no answer is shown, remembered or written to the history; the
+    // player's question goes from the history too; one white frame.
+    store.appendEvent({ ...asked, kind: "chat", said, answer: "", offline: false, taboo, forgotten: true });
+    stepOnce(ctx, "chat:any");
+    const last = session.dlgLog.at(-1);
+    if (last?.kind === "player" && last.text === said) session.dlgLog.pop();
+    session.taboo.flashUntil = now + FLASH_MS;
+    ctx.later(FLASH_MS, ctx.rerender);
+    if (wait && session.dialogue.queue[0] !== wait) return;
+    const again = before ?? kuroDay(day)?.idiom ?? WAITING;
+    session.dialogue = replaceHead(session.dialogue, [item(session, day, again, { kind: "kuroTurn", mode: "chat" })]);
+    return;
+  }
+  store.appendEvent({ ...asked, kind: "chat", said, answer, offline, ...(taboo ? { taboo } : {}) });
   // Talking with it today ticks the chat item (day-loop).
   stepOnce(ctx, "chat:any");
+  if (taboo === "blur") {
+    session.taboo.blurUntil = now + BLUR_MS;
+    ctx.later(BLUR_MS + 20, ctx.rerender);
+  }
+  if (taboo === "errors") {
+    // The chat is closed for the rest of the day; the cascade follows the reply.
+    session.kuroBedDay = day;
+    session.kuroInput = false;
+    ctx.later(ERRORS_AFTER_MS, () => {
+      if (store.getState().day !== day) return;
+      session.taboo.errors = { day, left: errorCountFor(ctx, day) };
+      ctx.rerender();
+    });
+  }
   if (wait && session.dialogue.queue[0] !== wait) return;
   const shown = offline ? answer : decay(fillPlaceholders(answer, store.getState().names), stageOf(day));
-  session.dialogue = replaceHead(session.dialogue, [item(session, day, shown, { kind: "kuroTurn", mode: "chat" })]);
+  // Errors: the reply is the conversation's last line (reading on closes it); otherwise the player's box follows.
+  const reply = item(session, day, shown, taboo === "errors" ? { kind: "none" } : { kind: "kuroTurn", mode: "chat" });
+  // The nosebleed's narration line comes after the reply, before the player's box (none when content lacks it).
+  const lines: SayLine[] = taboo === "blood" && hasString("kuro.taboo.blood") ? [...reply.lines, { k: "narration", t: t("kuro.taboo.blood") }] : [...reply.lines];
+  session.dialogue = replaceHead(session.dialogue, [{ ...reply, lines }]);
+}
+
+/** Today's cascade size (seeded by run and day). */
+function errorCountFor(ctx: ActionContext, day: number): number {
+  return errorCount(ctx.store.getRunId(), day);
 }
 
 /** The function counted the turns and says it is time to sleep (backend FR3). */
@@ -235,7 +295,7 @@ export function playerBox(state: State, events: readonly GameEvent[], session: S
   const d = session.dialogue;
   const head = d.queue[0];
   if (!head || head.ending.kind !== "kuroTurn" || d.line < head.lines.length - 1) return null;
-  if (session.kuroBedDay === state.day) return null;
+  if (session.kuroBedDay === state.day || chatClosedByErrors(events, state.day)) return null;
   const px = fontPx(getLocale());
   const line = head.lines[head.lines.length - 1];
   const lineScreens = screens(line ? fillPlaceholders(line.t, state.names) : null, null, KURO_LINE_BOX, px).length;
@@ -247,7 +307,9 @@ export function playerBox(state: State, events: readonly GameEvent[], session: S
   }
   if (session.kuroInput) return { name, mode: "input", options: [], screens: [], page: 0, draft: session.kuroDraft };
   const asked = askedToday(events, state.day);
-  const starters = (kuroDay(state.day)?.starters ?? []).filter((s) => !asked.has(s.n));
+  // Affinity opens questions (2026-11-02): only the starters the current bucket allows.
+  const bucket = bucketNow(state);
+  const starters = (kuroDay(state.day)?.starters ?? []).filter((s) => !asked.has(s.n) && bucketAllows(s.minBucket, bucket));
   // The starters and 说点别的… only (author 2026-11-01): Esc is the way out; 先不聊 is the prompt's.
   const options: PlayerOption[] = [
     ...starters.map((s): PlayerOption => ({ action: "kuro-q", q: s.n, label: starterText(s) })),

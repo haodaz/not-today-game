@@ -1,6 +1,6 @@
 // Turn counting, server side (backend FR3): five player turns per run per day; the sixth call
 // gets the constant bedtime line and turnsLeft 0, and the model is not called. Pure.
-import type { Memory, MemoryTurn } from "./types.ts";
+import type { Memory, MemoryTurn, Taboo } from "./types.ts";
 
 /** How many player turns `day` already has. */
 export function playerTurnsOn(turns: readonly MemoryTurn[], day: number): number {
@@ -21,6 +21,17 @@ export const MEMORY_KEEP = 24;
 /** The memory after one exchange. */
 export function appendExchange(m: Memory, day: number, said: string, reply: string, offline = false, keep = MEMORY_KEEP): Memory {
   const turns: MemoryTurn[] = [...m.turns, { day, who: "player", text: said }, { day, who: "kuro", text: reply, ...(offline ? { offline: true } : {}) }];
+  return { summary: m.summary, turns: turns.slice(-keep) };
+}
+
+/**
+ * The memory after a variable-layer turn (2026-11-02): a flicker keeps only the player's turn,
+ * marked forgotten (no answer was given); a taboo is marked on the player's turn (one per day).
+ * `remembered` is what Kuro said as the model may recall it (never the server-made word).
+ */
+export function appendLayered(m: Memory, day: number, said: string, remembered: string | null, taboo: Taboo | null, keep = MEMORY_KEEP): Memory {
+  const player: MemoryTurn = { day, who: "player", text: said, ...(remembered === null ? { forgotten: true as const } : {}), ...(taboo ? { taboo } : {}) };
+  const turns: MemoryTurn[] = [...m.turns, player, ...(remembered === null ? [] : [{ day, who: "kuro" as const, text: remembered }])];
   return { summary: m.summary, turns: turns.slice(-keep) };
 }
 

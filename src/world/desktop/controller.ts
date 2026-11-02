@@ -239,6 +239,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     if (el.dataset.input === "draft") session.draft = el.value;
     if (el.dataset.input === "kuro-text") session.kuroDraft = el.value;
     if (el.dataset.input === "settings-email") setEmailDraft(el.value);
+    if (el.dataset.input === "wb-cell" && session.work) session.work.cellDraft = el.value;
   };
   const onKey = (e: KeyboardEvent) => {
     const target = e.target as HTMLElement;

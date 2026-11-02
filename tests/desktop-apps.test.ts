@@ -37,9 +37,12 @@ describe("workbench home", () => {
   it("without day data shows the structure from strings and the store's numbers", () => {
     const c = ctx(1);
     const out = renderWorkbench(c).body.value;
-    for (const key of ["wb.title", "wb.search", "wb.nav.home", "wb.hello.morning", "wb.ask.ph", "wb.mode.look", "wb.card.ledger", "wb.common", "wb.continue"]) {
+    for (const key of ["wb.title", "wb.search", "wb.nav.home", "wb.hello.morning", "wb.ask.ph", "wb.scope", "wb.card.ledger", "wb.common", "wb.continue"]) {
       expect(out, key).toContain(escapeHtml(t(key)));
     }
+    // The choice is a reply (work 2026-11-02): no mode toolbar under the input.
+    expect(out).not.toContain("wb-mode");
+    expect(out).not.toContain(escapeHtml(t("wb.mode.look")));
     expect(out).toContain(`<div class="big">${c.state.overdueDays}<small>`);
   });
 

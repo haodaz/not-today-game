@@ -2,7 +2,7 @@
 // applyEvent is pure: it never mutates its input and never reads a clock. An event may read the
 // state produced by earlier events; the only time it sees is its own recorded `day`.
 import type { State } from "./types.gen";
-import { applyChoose, applyStep, applyTask, type TaskEventMode } from "./days/effects";
+import { applyChoose, applyStep, applyTask, clampSan, type TaskEventMode } from "./days/effects";
 import { applyDeclineUpgrade, applyUpgrade, type DeclineKind } from "./upgrades";
 import { applyOrder, applyPickup, applyUseItem } from "./delivery/effects";
 import type { Meal } from "./delivery/table";
@@ -49,7 +49,11 @@ export type GameEvent =
   // day-loop spec (amendment 2026-11-01).
   | { kind: "step"; day: number; name: string; t: string }
   | { kind: "choose"; day: number; beat: string; index: number }
-  | { kind: "task"; day: number; flag: string; mode: TaskEventMode }
+  /**
+   * `missed` (work FR1): the player did it themselves but did not click both conflicting clauses
+   * before 通过: the self path's effects without the document's catch flags.
+   */
+  | { kind: "task"; day: number; flag: string; mode: TaskEventMode; missed?: true }
   // object-upgrade spec (2026-11-01): accepting / declining Kuro's offer.
   | { kind: "upgrade"; day: number; object: string }
   | { kind: "declineUpgrade"; day: number; object: string; decline: DeclineKind }
@@ -60,7 +64,11 @@ export type GameEvent =
   // dialogue spec: one chat turn with Kuro (a starter question's number, or typed text).
   // kuro-chat: `said` is the words shown, `answer` Kuro's raw reply, `offline` when the answer was
   // the scripted one (no model, or the model failed); they feed chatMemory.
-  | { kind: "chat"; day: number; q?: number; text?: string; said?: string; answer?: string; offline?: boolean }
+  /**
+   * `taboo` (kuro-chat 2026-11-02): the consequence this turn's answer carried; at most one a day.
+   * `forgotten`: the answer was never given (the flicker): the turn is spent, nothing is remembered.
+   */
+  | { kind: "chat"; day: number; q?: number; text?: string; said?: string; answer?: string; offline?: boolean; taboo?: ChatTaboo; forgotten?: true }
   // kuro-chat FR4: the day's judgement at the end of the chat beat (model or rule scorer).
   | ({ kind: "judged"; day: number } & JudgedFields)
   // late-days FR4: Kuro closed a page or document the player had opened.
@@ -113,6 +121,9 @@ function applyKuroClosed(state: State, event: Extract<GameEvent, { kind: "kuroCl
 
 /** A typed chat turn's length limit (dialogue spec). */
 export const CHAT_TEXT_MAX = 500;
+/** What a generous answer may cost (kuro-chat taboo addition); the server sends one of these. */
+export const CHAT_TABOOS = ["blood", "blur", "flicker", "errors"] as const;
+export type ChatTaboo = (typeof CHAT_TABOOS)[number];
 
 /**
  * One chat turn with Kuro (dialogue spec): a starter question's number or what was typed, never
@@ -131,7 +142,15 @@ function applyChat(state: State, event: Extract<GameEvent, { kind: "chat" }>): S
     if (event[k] !== undefined && typeof event[k] !== "string") throw new Error(`chat: ${k} must be a string`);
   }
   if (event.offline !== undefined && typeof event.offline !== "boolean") throw new Error("chat: offline must be true or false");
-  return rememberTurn({ ...state, chatTurnsToday: state.chatTurnsToday + 1 }, event.day, event.said, event.answer, event.offline);
+  if (event.taboo !== undefined && !(CHAT_TABOOS as readonly unknown[]).includes(event.taboo)) throw new Error(`chat: unknown taboo ${JSON.stringify(event.taboo)}`);
+  if (event.forgotten !== undefined && event.forgotten !== true) throw new Error("chat: forgotten must be true");
+  if (event.forgotten && event.taboo !== "flicker") throw new Error("chat: only a flicker forgets");
+  const spent = { ...state, chatTurnsToday: state.chatTurnsToday + 1 };
+  // The flicker: the turn is spent; neither the question nor the answer goes into memory.
+  if (event.forgotten) return spent;
+  // The nosebleed costs one SAN (the only taboo that touches state).
+  const bled = event.taboo === "blood" ? { ...spent, san: clampSan(spent.san - 1) } : spent;
+  return rememberTurn(bled, event.day, event.said, event.answer, event.offline);
 }
 
 const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;

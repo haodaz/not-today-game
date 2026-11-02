@@ -26,8 +26,14 @@ describe("the loader: optional rating, eta, fee per shop; address and card at th
     const table = parseDelivery(f);
     expect(table.shops[0]).toMatchObject({ rating: 4.8, eta: 30, fee: 3 });
     expect(table).toMatchObject({ address: "某某路 17 号 · 3 栋 602", card: "**** 2047" });
-    const plain = parseDelivery(copy());
+    // Without them (content has them now: strip them) the shop parses with none.
+    const bare = copy();
+    for (const s of bare.shops) for (const k of ["rating", "eta", "fee"]) delete s[k];
+    delete bare.address;
+    delete bare.card;
+    const plain = parseDelivery(bare);
     expect(plain.shops[0]!.rating).toBeUndefined();
+    expect(plain.address).toBeUndefined();
   });
 
   it.each([
@@ -138,19 +144,19 @@ describe("the pages", () => {
     expect(out.match(/class="star on"/g)).toHaveLength(5);
   });
 
-  it("without the numbers in content yet, the cards and the checkout show a dash, never a made-up value", () => {
+  it("the cards and the checkout show content's numbers as written; a missing one is a dash, never made up", () => {
     const store = atLunch(1);
     const session = sessionAt("11:40");
     const home = renderPhonePage(store.getState(), store.getEvents(), session, phonePage(store.getState(), store.getEvents(), session)).value;
-    for (const s of deliveryTable.shops) {
-      if (s.rating === undefined) expect(home).toContain("★ —");
+    for (const s of shopListView(1, "lunch").shops) {
+      expect(home, s.id).toContain(s.rating === null ? "★ —" : `★ ${s.rating.toFixed(1)}`);
+      if (s.fee !== null) expect(home, s.id).toContain(`¥${s.fee}`);
     }
-    if (deliveryTable.address === undefined) {
-      const shop = shopListView(1, "lunch").shops.find((s) => s.open)!;
-      session.phoneUi = { ...session.phoneUi, page: "checkout", shop: shop.id, item: shop.items[0]!.id };
-      const out = renderPhonePage(store.getState(), store.getEvents(), session, phonePage(store.getState(), store.getEvents(), session)).value;
-      expect(out).toContain('<i class="ic pin" aria-hidden="true"></i>—');
-    }
+    const shop = shopListView(1, "lunch").shops.find((s) => s.open)!;
+    session.phoneUi = { ...session.phoneUi, page: "checkout", shop: shop.id, item: shop.items[0]!.id };
+    const out = renderPhonePage(store.getState(), store.getEvents(), session, phonePage(store.getState(), store.getEvents(), session)).value;
+    expect(out).toContain(`<i class="ic pin" aria-hidden="true"></i>${deliveryTable.address ?? "—"}`);
+    expect(out).toContain(`<i class="ic card" aria-hidden="true"></i>${deliveryTable.card ?? "—"}`);
   });
 });
 

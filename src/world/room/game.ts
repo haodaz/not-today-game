@@ -1,7 +1,6 @@
 // The game root: the room view (HUD), the door view, or the desktop view (one monitor at a time),
 // and the day-loop's actions. Everything the player does appends one event; the runtime
 // (loop/runtime.ts) reacts after each.
-import { TASK_MODES, type TaskMode } from "@state/days/effects";
 import { dayFile } from "@state/days/table";
 import { deliveryTable, type Meal } from "@state/delivery/table";
 import type { Store } from "@state/store";
@@ -26,6 +25,7 @@ import { mealView } from "@world/delivery/meals";
 import { cls, html, type SafeHtml } from "@world/html";
 import { setLocale, t, tr } from "@world/i18n";
 import { skipToLast, storyMasked } from "@world/dialogue/mask";
+import { tabooActions, tabooLayer } from "@world/dialogue/taboo";
 import { handOf } from "@state/hands";
 import { handStep } from "@world/objects/hand";
 import { pressKey } from "@world/objects/index";
@@ -50,6 +50,7 @@ import { pointed } from "./pointer";
 import { itemPageId, readingPageId, type KuroCloses } from "@state/closes";
 import { browserPage } from "@world/desktop/browser/data";
 import { workbenchActions } from "@world/desktop/workbench/actions";
+import { workActions } from "@world/desktop/workbench/work";
 import { cancelCloser, startCloser } from "@world/late/closer";
 import { startJudgement } from "@world/dialogue/judge";
 import { sendEmailLink } from "@net/email";
@@ -63,14 +64,14 @@ export function renderGame(store: Store, session: Session, nowMs: number): SafeH
     const shell = buildShell(state, events, session, desktopApps, nowMs, store.getStartDay());
     // Work-task narration and the conversation with Kuro play in the dialogue box over the desktop too.
     const dlg = dialogueBox(state, events, session, nowMs);
-    return html`${renderDesktop(shell)}<button type="button" class="back-room" data-action="view" data-view="room">${tr("desktop.back")}</button>${dlgLayer(dlg, session)}<div class="hud-host">${settingsButton()}${itemsButton(session)}${itemsPanel(state, events, session)}<div class="hud-br">${hudKuro({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs })}</div>${settingsPanel(session)}</div>`;
+    return html`${renderDesktop(shell)}<button type="button" class="back-room" data-action="view" data-view="room">${tr("desktop.back")}</button>${tabooLayer(session, store.getRunId(), state.day, nowMs)}${dlgLayer(dlg, session)}<div class="hud-host">${settingsButton()}${itemsButton(session)}${itemsPanel(state, events, session)}<div class="hud-br">${hudKuro({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs })}</div>${settingsPanel(session)}</div>`;
   }
   // The box does not jump (dialogue correction 2026-11-02): in every view it is anchored to the
   // viewport in the same fixed layer, not to the stage (whose size differs between views). The
   // settings panel sits above it, in a fixed layer of its own after the box (2026-11-02).
   const dlg = dialogueBox(state, events, session, nowMs);
   const settings = settingsPanel(session);
-  return html`${renderRoom({ state, events, session, startDay: store.getStartDay(), nowMs, boxOutside: true })}${dlgLayer(dlg, session)}${settings ? html`<div class="hud-host">${settings}</div>` : null}`;
+  return html`${renderRoom({ state, events, session, startDay: store.getStartDay(), nowMs, boxOutside: true })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${dlgLayer(dlg, session)}${settings ? html`<div class="hud-host">${settings}</div>` : null}`;
 }
 
 /** The box's fixed layer; a story's mask under the box dims and holds the stage (dialogue addition 2026-11-02). */
@@ -109,7 +110,11 @@ function nightFallen(ctx: ActionContext): boolean {
 
 /** Looking at an app counts, once the computer is on (before boot 屏幕 is two black monitors). */
 function lookAt(ctx: ActionContext, app: AppId): void {
-  if (booted(ctx.store.getState(), ctx.store.getEvents())) stepOnce(ctx, `openApp:${app}`);
+  if (!booted(ctx.store.getState(), ctx.store.getEvents())) return;
+  stepOnce(ctx, `openApp:${app}`);
+  // The work conversations live in 工作台's 消息 pane (desktop-ui 2026-11-02): looking at it is
+  // looking at the messages too (once a day, like the app's own step).
+  if (app === "workbench" && ctx.session.workbenchPage === "msgs") stepOnce(ctx, "openApp:msgs");
 }
 
 /**
@@ -133,12 +138,6 @@ export function appContextOf(ctx: ActionContext) {
   return { state: store.getState(), events: store.getEvents(), startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs: ctx.now?.() ?? Date.now() };
 }
 
-/** The workbench mode chips' strings keys → task modes. */
-export const MODE_BY_KEY: Readonly<Record<string, TaskMode>> = {
-  "wb.mode.self": TASK_MODES[0],
-  "wb.mode.look": TASK_MODES[1],
-  "wb.mode.let": TASK_MODES[2],
-};
 
 /**
  * A camera move to a photo view has begun (room-scene correction 2026-11-02): its placed things
@@ -317,6 +316,8 @@ export const loopActions: Record<string, ActionHandler> = {
   "wb-nav"(ctx, data, el) {
     workbenchActions["wb-nav"]!(ctx, data, el);
     cancelCloser(ctx.session);
+    // Opening 工作台's 消息 pane is 看一眼消息 (the boss is there now): the openApp:msgs step, once a day.
+    if (ctx.session.workbenchPage === "msgs" && ctx.session.view === "desktop") lookAt(ctx, "workbench");
     // Another page is another place (`screen:workbench:<page>`, `screen:msgs:<id>` in its 消息 pane).
     if (settleSession(ctx.session)) ctx.rerender();
     if (ctx.session.workbenchPage !== "docs") return;
@@ -761,19 +762,9 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.rerender();
   },
 
-  // 工作台 work tasks (content/tasks): the modes choose the path, the ask box plays it. The
-  // reducer applies the path's effects; the runtime queues its lines; the small window shows Kuro's.
-  "wb-mode"(ctx, data) {
-    const mode = MODE_BY_KEY[data.mode ?? ""];
-    if (mode) ctx.session.wbMode = mode;
-    ctx.rerender();
-  },
-  "wb-ask"(ctx) {
-    const lc = loopContext(ctx.store.getState(), ctx.store.getEvents());
-    const task = lc ? openTask(lc) : null;
-    if (!task || task.done.kind !== "flag") return;
-    ctx.store.appendEvent({ kind: "task", flag: task.done.flag, mode: ctx.session.wbMode });
-  },
+  // 工作台 work (work spec 2026-11-02): the sentence is sent, the chip under Kuro's question is the
+  // reply, the surface is done, 通过 appends the task event; the runtime queues its lines as before.
+  ...workActions,
 
   // Kuro's upgrade offer (object-upgrade FR1; spoken in the box now, dialogue FR2). The final
   // offer upgrades everything it covers.
@@ -801,6 +792,8 @@ export const loopActions: Record<string, ActionHandler> = {
 
   // Talking to Kuro (dialogue FR2): its body or the desktop pill, the player's box, leaving.
   ...kuroActions,
+  // A taboo's error cascade (kuro-chat 2026-11-02): each dialog needs a click.
+  ...tabooActions,
 };
 
 /** Whether two dialogue states show the same line (pages aside). */

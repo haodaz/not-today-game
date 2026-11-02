@@ -15,6 +15,8 @@ import { renderWorkbench } from "@world/desktop/workbench/view";
 import { hasString, t } from "@world/i18n";
 import { messageActions } from "@world/desktop/messages/actions";
 import type { ActionContext } from "@world/desktop/controller";
+import { itemStates, loopContext } from "@world/loop/checklist";
+import { loopActions } from "@world/room/game";
 
 function storeAt(day: number): Store {
   const store = createStore({ startDay: 1 });
@@ -96,6 +98,26 @@ describe("which app shows which conversation", () => {
     const before = store.getEvents().length;
     messageActions.send!(ctx, { conv: "family" } as DOMStringMap, null as never);
     expect(store.getEvents()).toHaveLength(before);
+  });
+});
+
+describe("看一眼消息 from 工作台's 消息 pane (the boss lives there)", () => {
+  it("opening the pane fires the openApp:msgs step once a day, so day 1's 「进屏幕，看一眼消息」 completes", () => {
+    const store = storeAt(1);
+    store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
+    const session = initialSession({ beat: "boot", time: "09:03" }, "left", "desktop");
+    session.leftApp = "workbench";
+    const ctx: ActionContext = { store, session, rerender: () => {}, later: () => {} };
+    const steps = () => store.getEvents().filter((e) => e.kind === "step" && e.name === "openApp:msgs").length;
+    expect(steps()).toBe(0);
+    loopActions["wb-nav"]!(ctx, { page: "msgs" } as DOMStringMap, null as never);
+    expect(steps()).toBe(1);
+    loopActions["wb-nav"]!(ctx, { page: "home" } as DOMStringMap, null as never);
+    loopActions["wb-nav"]!(ctx, { page: "msgs" } as DOMStringMap, null as never);
+    expect(steps()).toBe(1);
+    const lc = loopContext(store.getState(), store.getEvents())!;
+    const item = lc.file.items.find((i) => i.done.kind === "event" && i.done.event.type === "openApp" && i.done.event.app === "msgs")!;
+    expect(itemStates(lc).get(item.id)!.done).toBe(true);
   });
 });
 

@@ -83,14 +83,18 @@ describe("task event plays the tree", () => {
     return ctx;
   }
 
-  it("the ask box plays start + the path in the dialogue box, Kuro's lines in the small window", () => {
+  it("the ask box (sentence, chip, 通过) plays start + the path in the dialogue box, Kuro's lines in the small window", () => {
     const store = createStore({ startDay: 1 });
     store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
     store.appendEvent({ kind: "step", name: "openApp:msgs", t: "09:04" });
-    const ctx = ctxFor(store);
+    let now = 0;
+    const ctx: ActionContext = { ...ctxFor(store), now: () => now };
     syncLoop(ctx, 0);
-    loopActions["wb-mode"]!(ctx, { mode: "wb.mode.look" } as DOMStringMap, null as never);
-    loopActions["wb-ask"]!(ctx, {} as DOMStringMap, null as never);
+    // The choice is a reply (work 2026-11-02): send the sentence, pick the chip, let it work, 通过.
+    loopActions["wb-send"]!(ctx, {} as DOMStringMap, null as never);
+    loopActions["wb-choose"]!(ctx, { mode: "look" } as DOMStringMap, null as never);
+    now += 3000;
+    loopActions["wb-pass"]!(ctx, {} as DOMStringMap, null as never);
     syncLoop(ctx, 0);
     expect(store.getEvents().at(-1)).toMatchObject({ kind: "task", flag: t1.done, mode: "look" });
     const q = ctx.session.dialogue.queue.find((x) => x.key === `d1:task:${t1.id}`)!;

@@ -30,6 +30,7 @@ export const MASK_ALLOWS: ReadonlySet<string> = new Set([
   "settings-home",
   "loop-mute",
   "ending-next",
+  "taboo-error-ok",
 ]);
 
 /** Is `action` held back by the mask now? */

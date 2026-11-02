@@ -1005,3 +1005,48 @@ Tree 0a74ca6 plus Claude's uncommitted content (third-level `where` values, Vivi
   - motion-dom: reads the story off before Esc.
   - navigation: Esc under the night story stays in bed.
 - **For Claude:** `wb.msgs.ding` and `wb.msgs.unread` strings (the pill and 未读 are hidden until they exist); the rider's name; 朋友圈 entries; the shop numbers, address and card. Day 1's item "msgs" (`event:openApp:msgs`, "老板的消息又在最上面") now opens 消息, where the boss no longer is.
+
+## 2026-11-02 (night): small fixes, Kuro's variable layer, work as a conversation
+
+Tree 041b3d3 plus Claude's content (wb.msgs.* strings, delivery numbers, day-01 boss lines, tasks day-01 doc/ledger, kuro-profile, rebundled content.ts). No content edited. tsc clean; vitest 80 files / 1454 tests green.
+
+1. **Small fixes**
+   - The task loader had to land first: day-01's `doc`/`ledger` broke every import.
+   - The five content reds: four snapshots (delivery-app day 1 / 16: the shop numbers, address, card, total ¥18 + ¥3; work-home-split day 1 / 13: the DING pills only), refreshed after checking each diff. The fifth was my loader test, which assumed no rating in content: it now strips the values; the dash test now checks content's numbers.
+   - `openApp:msgs` also fires (once a day, `stepOnce`) when 工作台's 消息 pane opens: `wb-nav` to msgs, or 工作台 in front on that page (`lookAt` in `game.ts`). Day 1's 「进屏幕，看一眼消息」 completes there. Test in `work-home-split.test.ts`.
+2. **Kuro's variable layer**
+   - Server, `supabase/functions/_shared/kuro/`:
+     - `variable.ts`: the bucket (<30 low, <threshold mid, ≥ the ending's threshold high) and `affinityFrom` (stored rows in day order, stored `delta` else (t+v+b) × perPoint × the tender multiplier, clamped each step); the dice from (runId, day): mood 0–3, free line, glyph script (Vai / Ogham / Glagolitic); `d100` per (runId, day, q) and `THRESHOLDS`; `glyphWord` (3–5 letters of one script); `openStarter` (the client's q, or a typed line equal to a starter text, only if `minBucket` allows); `lockedFor` (layered for the bucket, else red-blue); `variableLayer`, `enforceLocked`, `composeReply`, `layerLines`.
+     - `dayfile.ts`: one strict parser for the starters (5th cell minBucket), red-blue `unlock: qN` lines (other unlock forms skipped) and `## Layered answers`.
+     - `types.ts`: Bucket, Taboo, starters/locked/layered, the affinity block, unreadable, StoredJudgement, `forgotten`/`taboo` on memory turns, `taboo` on the reply.
+     - `prompt.ts`: the layer's lines in the Today block; forgotten turns are never fed back; chat events expose `forgotten`.
+     - `turns.ts`: `appendLayered`.
+     - `handler.ts`: optional `loadJudgements`; flicker = no model call, a forgotten player turn, reply ""; locked = the text verbatim first, an omitted or altered text (or a failed model) is replaced by it; 大成功 = locked, the word, the follow-up, then the continuation; memory never holds the word; free replies never carry a taboo; one taboo per day from memory.
+     - `kuro-chat/index.ts`: `loadJudgements` from the judgement table.
+   - Bundler: carries starters/locked/layered, the affinity block (variables + stages tender day) and `unreadable` (strings `kuro.unreadable`, none yet). Files without the new parts bundle as before.
+   - Client:
+     - Starters filtered by `bucketNow(state)`; the picked q is sent.
+     - The `chat` event gains `taboo` / `forgotten` (`src/state`: blood SAN −1 via `clampSan`; forgotten = turn spent, no memory).
+     - `src/world/dialogue/taboo.ts`: blur 20 s (a backdrop-filter layer under the box), one white frame, the seeded 8–20 error dialogs from `error.*` (`keysWith`), the hand's blood variant (`.hand-blood` over the held object, `.door-hand.blood`; the image is missing until Claude adds it, so nothing shows).
+     - `kuro.ts`: the flicker restores Kuro's previous line and drops the question from the history; errors close the chat for the day (derived from the log, so it survives a reload); one taboo a day; an offline answer never carries one.
+     - `TurnReply` keeps `taboo` optional for an older deployed function.
+   - Tests: `tests/kuro-variable.test.ts` (server), `tests/kuro-taboo.test.ts` (client). backend: the reply now carries `taboo: null`; desktop-kuro: starters have `minBucket`.
+3. **Work as a conversation and the surfaces**
+   - `state/days/tasks.ts`: optional strict `doc` (left/right same length, conflict pair in range and distinct, catchFlags ⊆ the self path's flags, kuroEdit in range) and `ledger` (rows of the column count, target in range, value, kuroTidy col in range); a doc only on app docs, a ledger only on app ledger.
+   - `task` event: optional `missed` (self only); the self effects without `doc.catchFlags`.
+   - New `desktop/workbench/work.ts`:
+     - The thread: done tasks drawn back from the log, plus the session thread.
+     - The input: the sentence, read-only, Enter / ↑ sends it.
+     - Kuro's message: the day's idiom and 「这个怎么做？」 (`wb.ask.how`, nothing until it exists), with three chips under it.
+     - The chip is the player's reply. No surface: the task event at once. Self: read clauses / edit the cell. Let / look: 3 s of Kuro's window (the busy sprite), then the result; look opens the diff.
+     - 通过: the event (let becomes look if the touched thing was opened; self missing a clause is `missed`).
+     - The strip: the scope toggle (`wb.scope.all` when it exists) and ↑.
+   - Removed: `wb-mode`, `wb-ask`, `session.wbMode`, `MODE_BY_KEY`.
+   - Tests: new `tests/work.test.ts`. Updated tasks (the flow) and desktop-apps (no wb-mode).
+- **Snapshots:** delivery-app, work-home-split (item 1), desktop-snapshots ×3 (only the ask box: the input and the strip instead of the mode toolbar), new work. Nothing else changed.
+- **For Claude:**
+  - Strings: `kuro.unreadable`, `kuro.taboo.blood`, `error.*`, `wb.ask.how`, `wb.scope.all`, and 合并 / 不合 (FR1 self, not built without them).
+  - `public/npc/hand_blood.png`.
+  - Layered answers and minBucket in the kuro-days files.
+  - content.ts must be regenerated (`npm run bundle:kuro`) before deploying: I could not run node here.
+  - The day-13 catch count (needs catch data the function can see) is not built.

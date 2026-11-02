@@ -236,10 +236,10 @@ describe("the function's handler, with a mocked model (FR3, FR5)", () => {
     const { d, memory, calls } = deps(() => say("It is."));
     for (let i = 0; i < 5; i++) {
       const r = await handle({ mode: "turn", run_id: "run-1", day: 3, said: `turn ${i}`, events: [] }, d);
-      expect(r).toEqual({ status: 200, body: { mode: "turn", reply: "It is.", turnsLeft: 4 - i } });
+      expect(r).toEqual({ status: 200, body: { mode: "turn", reply: "It is.", turnsLeft: 4 - i, taboo: null } });
     }
     const sixth = await handle({ mode: "turn", run_id: "run-1", day: 3, said: "one more", events: [] }, d);
-    expect(sixth).toEqual({ status: 200, body: { mode: "turn", reply: content.bedtime, turnsLeft: 0, bedtime: true } });
+    expect(sixth).toEqual({ status: 200, body: { mode: "turn", reply: content.bedtime, turnsLeft: 0, bedtime: true, taboo: null } });
     expect(calls).toHaveLength(5);
     expect(memory.get("run-1")!.turns.filter((t) => t.who === "player")).toHaveLength(5);
   });
