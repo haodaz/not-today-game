@@ -1,7 +1,7 @@
 // What should be heard now (sound spec FR2). A pure function of (state, session): no audio API
 // here, and no id written as a literal except the five ways the table itself names a moment.
 // Silence is a sound too: from `silence.fromDay` the named beats have no bed at all.
-import { isCalmDaytime, nightBeatOf, ringOf, dreamNights, isTenderDay } from "@state/stages";
+import { isCalmDaytime, nightBeatOf, ringOf, dreamNights, isTenderDay, weatherOf } from "@state/stages";
 import type { State } from "@state/types.gen";
 import type { BeatClock } from "@world/desktop/beat";
 import { getLocale, type Locale } from "@world/i18n";
@@ -29,12 +29,20 @@ export interface SoundPlan {
   readonly stinger: string | null;
   /** Seeds the dropouts, so a replay sounds the same: from (day, beat), or "title". */
   readonly seed: number;
+  /** The rain under the room bed (weather by day): its level, 0 on a day without rain. */
+  readonly rain: number;
   /** The room goes quiet on the screen (sound addition 2026-11-02): the bed and the day / night music, 0–1. Stingers and one-shots are never ducked. */
   readonly duck: number;
 }
 
 /** On 屏幕 the room's bed and music duck to this (and come back on leaving), over DUCK_MS. */
+const hasBed = (table: SoundTable, id: string) => Object.prototype.hasOwnProperty.call(table.beds, id);
 export const SCREEN_DUCK = 0.4;
+/** Rain days: the `rain` bed under the room bed at this level. */
+export const RAIN_UNDER = 0.5;
+/** Fog days: the day bed is the plain room-day, thinner. */
+export const FOG_BED = "room-day";
+export const FOG_THIN = 0.6;
 export const DUCK_MS = 600;
 /** The duck for a view: 屏幕 (either monitor) is quiet, everywhere else full. */
 export const duckFor = (view: string | undefined): number => (view === "desktop" ? SCREEN_DUCK : 1);
@@ -118,7 +126,7 @@ export function soundPlan(
   if (state.ending !== "none") {
     const phase = session.endingPage?.phase;
     const when = phase === "credits" || phase === "after" ? "credits" : ENDING_WHEN[state.ending];
-    return { bed: null, bedLevel: 1, stinger: null, duck: 1, ...base, ...musicPart(table, when) };
+    return { bed: null, bedLevel: 1, stinger: null, duck: 1, rain: 0, ...base, ...musicPart(table, when) };
   }
 
   const silent = day >= table.silence.fromDay && table.silence.beats.includes(beat);
@@ -135,11 +143,16 @@ export function soundPlan(
         : !evening && isTenderDay(day)
           ? musicPart(table, "tender-day", { musicDegrade: true })
           : ringMusic(table, ringId, evening, beat === "desk" ? EVENING_MUSIC_GAIN : 1);
+  // Weather by day: fog thins the day bed to the plain room tone; only rain days rain.
+  const weather = weatherOf(day);
+  const fog = weather === "fog" && !evening && hasBed(table, FOG_BED);
   return {
-    bed: silent ? null : evening ? ring.night : ring.day,
-    bedLevel: dream ? DREAM_BED_LEVEL : 1,
+    bed: silent ? null : evening ? ring.night : fog ? FOG_BED : ring.day,
+    bedLevel: (dream ? DREAM_BED_LEVEL : 1) * (fog && !silent ? FOG_THIN : 1),
     stinger: type !== null && Object.prototype.hasOwnProperty.call(table.stingers, type) ? table.stingers[type]! : null,
     duck: duckFor(session.view),
+    // The rain loop only on rain days, under the room (day or night).
+    rain: weather === "rain" && hasBed(table, "rain") ? RAIN_UNDER : 0,
     ...base,
     ...tune,
   };
@@ -157,7 +170,8 @@ export function titlePlan(
 ): SoundPlan {
   const first = table.byRing[soundRing(1, false, table)]!;
   const rainDef = Object.prototype.hasOwnProperty.call(table.beds, "rain") ? table.beds.rain! : null;
-  const on = rain !== null && rainDef !== null;
+  // The title is day 1's room: its rain only when day 1 rains (it does).
+  const on = rain !== null && rainDef !== null && weatherOf(1) === "rain";
   return {
     bed: on ? "rain" : null,
     bedLevel: on && rainDef!.gain > 0 ? rain / (rainDef!.gain * first.degrade.gain) : 1,
@@ -165,6 +179,7 @@ export function titlePlan(
     stinger: null,
     seed: seedOf("title"),
     duck: 1,
+    rain: 0,
     voice: opts.voice ?? "m",
     lang: opts.lang ?? getLocale(),
     ...musicPart(table, "title"),

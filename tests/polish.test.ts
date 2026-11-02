@@ -8,7 +8,9 @@ import { createStore, type Store } from "@state/store";
 import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
 import { initialSession, type Session } from "@world/desktop/model";
-import { doorCaption, DOOR_STATES } from "@world/delivery/door";
+import { doorCaption } from "@world/delivery/door";
+import { DOOR_SHOT, rectStyle } from "@world/room/shots";
+import { syncLoop } from "@world/loop/runtime";
 import { checklist, loopContext } from "@world/loop/checklist";
 import { gateAdvance, holdUntil, revealDoneAt, revealShown, startReveal } from "@world/motion/reveal";
 import { CHOSEN, choiceDelays, EASE, exitOf, MOTION, motionVars } from "@world/motion/timing";
@@ -260,33 +262,56 @@ describe("door (FR2)", () => {
     { kind: "step", name: "delivery:arrives:lunch", t: "12:04" },
   ];
 
-  it("five clicks walk the six steps one at a time, only the current one lit; step six shows", () => {
+  it("the door is actions on the door: arriving is the walk, then the chain, the bag, the door; the bag goes to the desk by itself; no list", () => {
     const store = createStore({ startDay: 1 });
     for (const d of drafts) store.appendEvent(d);
-    const session = initialSession({ beat: "work", time: "12:30" }, "left", "door");
+    const session = initialSession({ beat: "work", time: "12:30" }, "left", "room");
     const { ctx, sounds } = fakeCtx(store, session);
     const render = () => renderRoom({ state: store.getState(), events: store.getEvents(), session: ctx.session }).value;
-    const lit = (out: string) => [...out.matchAll(/<span class="on">([^<]*)<\/span>/g)].map((m) => m[1]);
-
-    let out = render();
-    expect(out).toContain('<section class="door-beat"');
-    expect(out).not.toContain("&lt;section");
-    expect(lit(out)).toEqual([doorCaption("delivered")]);
-    for (let i = 1; i < DOOR_STATES.length; i++) {
-      loopActions["loop-door"]!(ctx, none, null as never);
-      out = render();
-      expect(lit(out), `step ${i}`).toEqual([doorCaption(DOOR_STATES[i]!)]);
+    const spot = (out: string) => /<button type="button" class="door-spot ([a-zA-Z]+)" data-action="loop-door" data-input="\1" style="([^"]+)" aria-label="([^"]*)"><\/button>/.exec(out);
+    // Arriving at 门 is 走到门边.
+    loopActions["view"]!(ctx, { view: "door" } as DOMStringMap, null as never);
+    expect(ctx.session.door?.state).toBe("atDoor");
+    const order: [string, string, string][] = [];
+    for (let i = 0; i < 3; i++) {
+      const out = render();
+      expect(out).not.toContain('class="steps"');
+      expect(out).not.toContain("door-step");
+      const m = spot(out)!;
+      expect([...out.matchAll(/class="door-spot/g)], `one spot at a time (${i})`).toHaveLength(1);
+      order.push([m[1]!, m[2]!, m[3]!]);
+      loopActions["loop-door"]!(ctx, { input: m[1]! } as DOMStringMap, null as never);
     }
+    expect(order).toEqual([
+      ["openChain", rectStyle(DOOR_SHOT.chain), doorCaption("chainOpen")],
+      ["reach", rectStyle(DOOR_SHOT.bag), doorCaption("holding")],
+      ["close", rectStyle(DOOR_SHOT.close), doorCaption("closing")],
+    ]);
+    // 关门，上链 put the bag on the desk by itself: the pickup, then the desk corner's lines in the box.
     expect(store.getEvents().at(-1)).toMatchObject({ kind: "pickup", meal: "lunch" });
-    expect(out).toContain('data-state="onDesk"');
-    expect(out).not.toContain("door-hit");
-    expect(sounds).toEqual(["chain", "lock"]);
-    // One more click changes nothing.
-    loopActions["loop-door"]!(ctx, none, null as never);
-    expect(lit(render())).toEqual([doorCaption("onDesk")]);
+    expect(ctx.session.door?.state).toBe("onDesk");
+    expect(render()).not.toContain("door-spot");
+    expect(sounds).toEqual(["step-1", "chain", "lock"]);
+    expect(ctx.session.dialogue.queue.map((q) => q.key).filter((k) => k.includes(":door:"))).toEqual(
+      ["d1:door:lunch:openChain", "d1:door:lunch:reach", "d1:door:lunch:place"].filter((k) => ctx.session.dialogue.queue.some((q) => q.key === k)),
+    );
+    // A spot that is not the current step does nothing.
+    const events = store.getEvents().length;
+    loopActions["loop-door"]!(ctx, { input: "openChain" } as DOMStringMap, null as never);
+    expect(store.getEvents()).toHaveLength(events);
     // Looking away forgets the finished beat.
     loopActions["view"]!(ctx, { view: "room" } as DOMStringMap, null as never);
     expect(ctx.session.door).toBeNull();
+  });
+  it("已送达 is a line in the box when the meal arrives, not a list header", () => {
+    const store = createStore({ startDay: 1 });
+    for (const d of drafts.slice(0, 3)) store.appendEvent(d);
+    const { ctx } = fakeCtx(store, initialSession({ beat: "work", time: "12:00" }, "left", "room"));
+    syncLoop(ctx, 0);
+    store.appendEvent(drafts[3]!);
+    syncLoop(ctx, 0);
+    const q = ctx.session.dialogue.queue.find((x) => x.key === "d1:door:lunch:delivered")!;
+    expect(q.lines).toEqual([{ k: "narration", t: doorCaption("delivered") }]);
   });
 });
 

@@ -19,7 +19,8 @@ import { shellActions, type ActionContext, type ActionHandler } from "@world/des
 import { buildShell, rightApp, VIEWS, type Session, type View } from "@world/desktop/model";
 import { renderDesktop, type AppId } from "@world/desktop/shell";
 import { placeOrder } from "@world/delivery/commands";
-import { nextInputs, startDoor, stepDoor } from "@world/delivery/door";
+import { nextInputs, startDoor, stepDoor, type DoorInput } from "@world/delivery/door";
+import { doorLines } from "@world/delivery/view";
 import { mealView } from "@world/delivery/meals";
 import { html, type SafeHtml } from "@world/html";
 import { setLocale, t, tr } from "@world/i18n";
@@ -62,7 +63,10 @@ export function renderGame(store: Store, session: Session, nowMs: number): SafeH
     const dlg = dialogueBox(state, events, session, nowMs);
     return html`${renderDesktop(shell)}<button type="button" class="back-room" data-action="view" data-view="room">${tr("desktop.back")}</button>${dlg ? html`<div class="dlg-layer">${dlg}</div>` : null}<div class="hud-host">${settingsButton()}${itemsButton(session)}${itemsPanel(state, events, session)}<div class="hud-br">${hudKuro({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs })}</div>${settingsPanel(session)}</div>`;
   }
-  return renderRoom({ state, events, session, startDay: store.getStartDay(), nowMs });
+  // The box does not jump (dialogue correction 2026-11-02): in every view it is anchored to the
+  // viewport in the same fixed layer, not to the stage (whose size differs between views).
+  const dlg = dialogueBox(state, events, session, nowMs);
+  return html`${renderRoom({ state, events, session, startDay: store.getStartDay(), nowMs, boxOutside: true })}${dlg ? html`<div class="dlg-layer">${dlg}</div>` : null}`;
 }
 
 /** The app on the monitor being shown. */
@@ -163,6 +167,54 @@ export function typingIn(target: EventTarget | null | undefined): boolean {
   return el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable === true || el.getAttribute?.("contenteditable") === "true";
 }
 
+/**
+ * One door step. `input` is the spot's (or null: whatever comes next, for the keyboard). Plays the
+ * step's sound and its fragment; after 关门，上链 the bag goes onto the desk by itself (the `pickup`
+ * event) and the desk corner's lines play. Returns whether a step was taken.
+ */
+function doorAct(ctx: ActionContext, input: DoorInput | null): boolean {
+  const { store, session } = ctx;
+  const state = store.getState();
+  const meal = doorMeal(state, store.getEvents(), session);
+  if (!meal) return false;
+  const view = mealView(state.day, meal, state, store.getEvents(), session.clock.time)!;
+  let beat = session.door && session.door.meal === meal && session.door.day === state.day ? session.door : startDoor(view);
+  const next = beat ? nextInputs(beat.state)[0] : undefined;
+  if (!beat || !next || (input !== null && input !== next)) return false;
+  const say = (after: DoorInput, lines = doorLines(view, after, state.names)) => {
+    if (lines.length) session.dialogue = push(session.dialogue, { key: `d${state.day}:door:${meal}:${after}`, lines, ending: { kind: "none" } });
+  };
+  const take = (step: DoorInput) => {
+    const moved = stepDoor(beat!, step);
+    beat = moved.beat;
+    if (moved.emit) store.appendEvent(moved.emit);
+    session.door = beat;
+  };
+  take(next);
+  // motion.md sounds: the chain as the door opens to it, the lock as it closes.
+  if (next === "openChain") ctx.play?.("chain");
+  if (next === "close") ctx.play?.("lock");
+  say(next);
+  // The door is shut: the bag goes onto the desk corner by itself, and its lines play.
+  if (next === "close") {
+    take("place");
+    say("place");
+  }
+  ctx.rerender();
+  return true;
+}
+
+/** Arriving at 门 is 走到门边 (the walk is the camera move, not a click). */
+function doorWalk(ctx: ActionContext): void {
+  const { store, session } = ctx;
+  const state = store.getState();
+  const meal = doorMeal(state, store.getEvents(), session);
+  if (!meal) return;
+  const view = mealView(state.day, meal, state, store.getEvents(), session.clock.time)!;
+  const beat = session.door && session.door.meal === meal && session.door.day === state.day ? session.door : startDoor(view);
+  if (beat?.state === "delivered") session.door = stepDoor(beat, "walk").beat;
+}
+
 /** The held thing goes back to rest: just held, its front up, no key down. */
 function restHand(s: Session): void {
   s.hand.using = false;
@@ -207,6 +259,8 @@ export const loopActions: Record<string, ActionHandler> = {
     restHand(ctx.session);
     // The pointer finds the new view's edges itself.
     ctx.session.edge = null;
+    // 走到门边 is the camera move: arriving at 门 with the bag outside is that step.
+    if (view === "door" && from !== "door") doorWalk(ctx);
     lookedAway(ctx);
     // The desktop opens on the monitor with the current app; looking at it counts.
     if (view === "desktop") lookAt(ctx, shownApp(ctx.session));
@@ -433,6 +487,11 @@ export const loopActions: Record<string, ActionHandler> = {
     } else if (q.ending.kind === "recognise") {
       // The reducer reads right / wrong from content; the runtime plays the answer's lines.
       ctx.store.appendEvent({ kind: "recognise", objectId: q.ending.object, option: Number(data.index) });
+      // Out of today's box and still in hand: answered, it settles onto the desk row.
+      if (ctx.session.holding === q.ending.object && boxObjectFor(state.day) === q.ending.object) {
+        ctx.session.holding = null;
+        restHand(ctx.session);
+      }
     } else {
       return;
     }
@@ -574,25 +633,22 @@ export const loopActions: Record<string, ActionHandler> = {
     const boxItem = lc.file.items.find((it) => it.done.kind === "event" && it.done.event.type === "openBox");
     if (!boxItem || !states.get(boxItem.id)!.unlocked || states.get(boxItem.id)!.done) return;
     const object = boxObjectFor(state.day);
-    if (object && !(state.found as string[]).includes(object)) store.appendEvent({ kind: "openLayer", objectId: object });
+    if (!object || (state.found as string[]).includes(object)) return;
+    store.appendEvent({ kind: "openLayer", objectId: object });
+    // The box hands you the object (2026-11-02): it rises from the box to the centre, held (the
+    // room dims, upright, breathing). Its beat and the question play while it is held; the
+    // answer (or 放下) settles it onto the desk row. This is the first lift, the one that asks.
+    const { session } = ctx;
+    session.phoneOpen = false;
+    session.holding = object;
+    restHand(session);
+    ctx.rerender();
   },
 
-  "loop-door"(ctx) {
-    const { store, session } = ctx;
-    const state = store.getState();
-    const meal = doorMeal(state, store.getEvents(), session);
-    if (!meal) return;
-    const view = mealView(state.day, meal, state, store.getEvents(), session.clock.time)!;
-    const beat = session.door && session.door.meal === meal && session.door.day === state.day ? session.door : startDoor(view);
-    const input = beat ? nextInputs(beat.state)[0] : undefined;
-    if (!beat || !input) return;
-    const { beat: moved, emit } = stepDoor(beat, input);
-    // motion.md sounds: the chain as the door opens to it, the lock as it closes.
-    if (input === "openChain") ctx.play?.("chain");
-    if (input === "close") ctx.play?.("lock");
-    if (emit) store.appendEvent(emit);
-    session.door = moved;
-    ctx.rerender();
+  // 门 (2026-11-02: the door is actions on the door): each spot is one step of the door machine. Its
+  // fragment plays in the box as it happens; closing the door puts the bag on the desk by itself.
+  "loop-door"(ctx, data) {
+    doorAct(ctx, (data.input as DoorInput | undefined) ?? null);
   },
 
   // The walkman on the desk (sound addition 2026-11-02): click plays the theme, click again stops.

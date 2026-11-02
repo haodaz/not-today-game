@@ -72,4 +72,18 @@ export const DESK_SHOT: Shot = {
   gap: deskGap(deskLayout),
 };
 
+/**
+ * 门 (2026-11-02: the door is actions on the door): the things the door beat's steps happen on, in
+ * stage px, measured on public/room/door_wall.png (2048 wide, × 0.78125; door_chain.png agrees
+ * within ~10 px). The chain and latch (open to the chain); the bag on the floor by the frame (reach);
+ * the chain and the knob (close and chain).
+ */
+export const DOOR_SHOT: { readonly chain: Rect; readonly bag: Rect; readonly close: Rect } = {
+  // Image 1306–1434 × 358–550: the brass latch and the hanging chain.
+  chain: { l: 1020, t: 280, w: 100, h: 150 },
+  // Image 1423–1638 × 906–1144: the paper bag by the frame.
+  bag: { l: 1112, t: 708, w: 168, h: 186 },
+  // Image 1306–1434 × 358–627: the chain down to the knob.
+  close: { l: 1020, t: 280, w: 100, h: 210 },
+};
 export const rectStyle = (r: Rect): string => `left:${r.l}px;top:${r.t}px;width:${r.w}px;height:${r.h}px`;

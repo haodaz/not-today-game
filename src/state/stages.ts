@@ -62,3 +62,26 @@ export function nightBeatOf(day: number): string | null {
 
 /** The nights on which a dream plays. */
 export const dreamNights: readonly number[] = stages.dreamNights.nights;
+
+// ——— weather (day-loop addition 2026-11-02: it does not rain every day) ———
+
+/** The kinds content may give a day (`weather.byDay`); strings `weather.<kind>`. */
+export const WEATHERS = ["rain", "overcast", "fog", "clear", "stopped", "white"] as const;
+export type Weather = (typeof WEATHERS)[number];
+const weatherByDay: Readonly<Record<string, Weather>> = (() => {
+  const raw = (stages as { weather?: { byDay?: Record<string, unknown> } }).weather?.byDay;
+  if (!raw || typeof raw !== "object") throw new Error("stages.json weather.byDay: missing");
+  const out: Record<string, Weather> = {};
+  for (const [day, w] of Object.entries(raw)) {
+    if (!/^[1-9]\d*$/.test(day)) throw new Error(`stages.json weather.byDay: "${day}" is not a day`);
+    if (!(WEATHERS as readonly unknown[]).includes(w)) throw new Error(`stages.json weather.byDay.${day}: unknown weather "${String(w)}"`);
+    out[day] = w as Weather;
+  }
+  for (const day of Object.keys(byDay)) if (!(day in out)) throw new Error(`stages.json weather.byDay: day ${day} has no weather`);
+  return out;
+})();
+/** The day's weather (after the last day: the last day's). */
+export function weatherOf(day: number): Weather {
+  const days = Object.keys(weatherByDay).map(Number);
+  return weatherByDay[String(day)] ?? weatherByDay[String(Math.max(...days))]!;
+}

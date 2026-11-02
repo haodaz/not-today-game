@@ -369,8 +369,9 @@ describe("Kuro stands at the box's right end (dialogue correction 2026-11-01)", 
     const playerBottom = num(/\.dlg,\.dlg-player\{[^}]*bottom:(\d+)px/);
     // The portrait stands on the raised box's bottom edge, above the player's box top.
     expect(raised).toBeGreaterThan(playerBottom + boxH);
-    // On the desktop layer too.
-    expect(bottom(".dlg-layer .dlg.raised")).toBeGreaterThan(bottom(".dlg-layer .dlg-player") + boxH);
+    // In the viewport's layer (every view since 2026-11-02): the player's box sits at the shared bottom.
+    const layerBottom = num(/\.dlg-layer \.dlg-player\{[^}]*bottom:var\(--dlg-bottom,(\d+)px\)/);
+    expect(bottom(".dlg-layer .dlg.raised")).toBeGreaterThan(layerBottom + boxH);
   });
 
   it("the HUD body stands directly above the chip row, flush right; the box's right edge stays left of it", () => {

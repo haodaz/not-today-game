@@ -19,7 +19,8 @@ import { judgementPending, startJudgement } from "@world/dialogue/judge";
 export const JUDGE_POLL_MS = 250;
 import type { ActionContext } from "@world/desktop/controller";
 import type { LoopMemo } from "@world/desktop/model";
-import { arrivalOf, ordersOn } from "@world/delivery/meals";
+import { arrivalOf, mealView, ordersOn } from "@world/delivery/meals";
+import { doorLines } from "@world/delivery/view";
 import { t } from "@world/i18n";
 import { itemStates, loopContext, nightfallReached, selfTicking, workDone, type LoopContext } from "./checklist";
 import { dropWaiting, placedLines, push, type DialogueState, type Ending, type Queued } from "./dialogue";
@@ -113,6 +114,13 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
       } else if (e.name === "beat:desk") {
         clock = at(clock, "desk", BEAT_TIMES.desk);
         if (file.beats.desk) dialogue = push(dialogue, beatQueued(day, "desk", file.beats.desk));
+      } else if (e.name.startsWith("delivery:arrives:")) {
+        // 手机上显示「已送达」 is a line in the box (2026-11-02), only when the bag is really at the door.
+        const meal = e.name.slice("delivery:arrives:".length) as Meal;
+        // At the arrival's own time (the session clock may not have caught up yet).
+        const view = mealView(day, meal, lc.state, events, e.t && e.t > clock.time ? e.t : clock.time);
+        const lines = view && view.phase === "delivered" ? doorLines(view, "delivered", lc.state.names) : [];
+        if (lines.length) dialogue = push(dialogue, { key: `d${day}:door:${meal}:delivered`, lines, ending: { kind: "none" } });
       } else if (e.name === "beat:shutdown") {
         shutdown = true;
         clock = at(clock, "night", BEAT_TIMES.night);

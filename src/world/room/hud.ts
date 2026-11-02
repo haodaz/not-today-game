@@ -9,7 +9,7 @@ import type { State } from "@state/types.gen";
 import { constants } from "@state/variables";
 import { beatLabelKey } from "@world/desktop/beat";
 import type { Session } from "@world/desktop/model";
-import { doorCaption, DOOR_STATES, nextInputs, startDoor, type DoorBeat, type DoorState } from "@world/delivery/door";
+import { doorCaption, DOOR_STATES, nextInputs, startDoor, type DoorBeat, type DoorInput, type DoorState } from "@world/delivery/door";
 import { mealView } from "@world/delivery/meals";
 import { renderDoorView } from "@world/delivery/view";
 import { cls, html, raw, type SafeHtml } from "@world/html";
@@ -20,7 +20,7 @@ import { ordersOn } from "@world/delivery/meals";
 import { raidNights, takeOf } from "@state/nights";
 import { isNight } from "@world/desktop/beat";
 import { hudKuro } from "@world/desktop/kuro/mini";
-import { DESK_SHOT, rectStyle, ROOM_SHOT, type Rect } from "./shots";
+import { DESK_SHOT, DOOR_SHOT, rectStyle, ROOM_SHOT, type Rect } from "./shots";
 import { deskLayout, objectSlot } from "./desk";
 import { fxPlan, renderFx } from "./fx";
 import { fixedRects, hotIdsIn, hotViewOf, type HotId, type HotView } from "./splat/hotspots";
@@ -37,6 +37,7 @@ import { pointerCls } from "./pointer";
 import { dialogueBox, raidShowing } from "@world/dialogue/box";
 import { renderScene, sceneOf } from "@world/dialogue/scene";
 import { edgeLeads, HINT_FADE_MS } from "./look";
+import { weatherOf } from "@state/stages";
 
 /** L7: the day the heart-rate widget appears (stages.json if it says; else day 9's narration). */
 export const HEART_RATE_FROM_DAY: number = (stagesFile as { heartRateFromDay?: number }).heartRateFromDay ?? 9;
@@ -233,22 +234,28 @@ export function doorMeal(state: State, events: readonly GameEvent[], session: Se
 /** The door states that show the chain-door picture, and the one with the shadow at the bottom. */
 const DOOR_OPEN = new Set<DoorState>(["chainOpen", "holding"]);
 
-/** The six steps, faint at the top right; only the current one is lit (polish FR2). */
-export function doorSteps(current: DoorState | null): SafeHtml {
-  return html`<div class="steps">${DOOR_STATES.map((st) => html`<span class="${current === st ? "on" : ""}">${doorCaption(st)}</span>`)}</div>`;
-}
+/**
+ * Where each door action happens (2026-11-02: the door is actions on the door): the chain to open
+ * to it, the bag on the floor to reach for, the chain and knob to close. The walk is the camera
+ * arriving at 门; the bag goes onto the desk by itself when the door closes.
+ */
+export const DOOR_SPOTS: Readonly<Partial<Record<DoorInput, Rect>>> = { openChain: DOOR_SHOT.chain, reach: DOOR_SHOT.bag, close: DOOR_SHOT.close };
 
+/** The door beat in 门: only the current step exists, as a hotspot on the thing itself; its hint is the step's caption. */
 function doorContent(state: State, events: readonly GameEvent[], session: Session): SafeHtml {
   const meal = doorMeal(state, events, session);
   if (!meal) return html``;
   const view = mealView(state.day, meal, state, events, session.clock.time)!;
   const beat: DoorBeat | null = session.door && session.door.meal === meal && session.door.day === state.day ? session.door : startDoor(view);
   const at = beat?.state ?? null;
-  // One click anywhere on the scene is one step; the HUD sits above this button.
-  const next = at && nextInputs(at).length > 0;
-  const hit = next ? html`<button type="button" class="door-hit" data-action="loop-door" aria-label="${doorCaption(DOOR_STATES[DOOR_STATES.indexOf(at) + 1]!)}"></button>` : null;
+  const input = at ? nextInputs(at)[0] : undefined;
+  const r = input ? DOOR_SPOTS[input] : undefined;
+  const spot =
+    input && r
+      ? html`<button type="button" class="${cls("door-spot", input)}" data-action="loop-door" data-input="${input}" style="${rectStyle(r)}" aria-label="${doorCaption(DOOR_STATES[DOOR_STATES.indexOf(at!) + 1]!)}"></button>`
+      : null;
   // renderDoorView escapes its own text (content strings) and returns markup.
-  return html`${at && DOOR_OPEN.has(at) ? html`<div class="door-bg chain"></div>` : null}${hit}${raw(renderDoorView(view, beat, state.names))}${at ? doorSteps(at) : null}${at === "holding" ? html`<div class="door-hand"></div>` : null}`;
+  return html`${at && DOOR_OPEN.has(at) ? html`<div class="door-bg chain"></div>` : null}${spot}${raw(renderDoorView(view, beat, state.names))}${at === "holding" ? html`<div class="door-hand"></div>` : null}`;
 }
 
 export interface RoomModel {
@@ -258,6 +265,8 @@ export interface RoomModel {
   /** For Kuro's window when it is called from here (the same component as on the screen). */
   readonly startDay?: number;
   readonly nowMs?: number;
+  /** The game draws the dialogue box in the viewport's fixed layer (dialogue 2026-11-02), not in the stage. */
+  readonly boxOutside?: boolean;
 }
 
 /**
@@ -335,6 +344,10 @@ export function placedThingsFade(session: Pick<Session, "cam">, view: string, no
   return elapsed < (cam.fade ?? ARRIVE_FADE_MS) ? elapsed : null;
 }
 
+/** The light through 房间's window follows the day's weather (day-loop addition 2026-11-02); room.css colours it. */
+export function windowLight(day: number): SafeHtml {
+  return html`<div class="window-light" data-weather="${weatherOf(day)}" aria-hidden="true"></div>`;
+}
 /** The evening look's dark layer (day-loop addition 2026-11-02); the splat's night layer matches it. */
 export const EVENING_DARK = 0.6;
 /** Evening is the `desk` beat on (night falls at 18:30, or earlier if the clock was). */
@@ -359,14 +372,11 @@ function edgeHint(session: Session, view: string, nowMs: number): SafeHtml | nul
   return html`<div class="edge-hint ${edge.zone}" aria-hidden="true"${late}>${edge.zone === "door" ? html`<i class="arrow"></i>` : null}<span>${label}</span></div>`;
 }
 /**
- * The box opens where it is (2026-11-02): in 房间, while its beat (and the question about what came
- * out of it) is on show, the open box sits at its place on the floor; when that sequence is over the
- * room is as it was. Derived from the dialogue on show; nothing is stored.
+ * The box opens where it is (2026-11-02): in 房间, once today's layer is opened the open box sits at
+ * its place on the floor for the rest of the day. Derived from today's events; nothing is stored.
  */
-export function boxOpenShowing(state: Pick<State, "day">, session: Pick<Session, "dialogue">): boolean {
-  const key = session.dialogue.queue[0]?.key ?? "";
-  const object = boxObjectFor(state.day);
-  return key === `d${state.day}:beat:box` || (object !== null && key.startsWith(`d${state.day}:recognise:${object}`));
+export function boxOpenShowing(state: Pick<State, "day">, events: readonly GameEvent[]): boolean {
+  return events.some((e) => e.kind === "openLayer" && e.day === state.day);
 }
 function boxOpen(): SafeHtml {
   return html`<div class="box-open" style="${rectStyle(ROOM_SHOT.box)}" aria-hidden="true"><img class="desk-photo" src="/room/desk/box.png" alt="" draggable="false"></div>`;
@@ -402,7 +412,7 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const evening = isEvening(session.clock) && view !== "bed" && !dream ? eveningLook(view) : null;
   const fadeLen = session.cam?.fade ?? ARRIVE_FADE_MS;
   const late = fade === null ? null : raw(` style="--late:-${Math.round(fade)}ms${fadeLen !== ARRIVE_FADE_MS ? `;--late-dur:${fadeLen}ms` : ""}"`);
-  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid", fade !== null && "m-late", dream && "scene-on")}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${evening}${renderScene(lineScene)}${scene}${view === "room" && !waiting && !dream && boxOpenShowing(state, session) ? boxOpen() : null}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${itemsPanel(state, events, session)}${held}${dialogueBox(state, events, session, nowMs)}${bottomRight(model)}${settingsButton()}${itemsButton(session)}${settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
+  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid", fade !== null && "m-late", dream && "scene-on")}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${renderScene(lineScene)}${scene}${view === "room" && !waiting && !dream && boxOpenShowing(state, events) ? boxOpen() : null}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${itemsPanel(state, events, session)}${held}${model.boxOutside ? null : dialogueBox(state, events, session, nowMs)}${bottomRight(model)}${settingsButton()}${itemsButton(session)}${settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
 }
 
 export { raidShowing };

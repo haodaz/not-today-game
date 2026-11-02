@@ -217,6 +217,8 @@ export function createSoundPlayer(deps: PlayerDeps = {}): SoundPlayer {
   let masterValue = 1;
   let humValue = 0;
   let bed: Voice | null = null;
+  /** The rain under the room bed on rain days (weather by day). */
+  let rain: Voice | null = null;
   let music: Voice | null = null;
   let endedKey: string | null = null;
   let onTuneEnd: ((id: string) => void) | null = null;
@@ -365,6 +367,43 @@ export function createSoundPlayer(deps: PlayerDeps = {}): SoundPlayer {
     void p.finally(() => pending.delete(p));
   }
 
+  /** The rain loop under the room bed: in on rain days, out on the others (a crossfade either way). */
+  function setRain(plan: SoundPlan): void {
+    const has = Object.prototype.hasOwnProperty.call(table.beds, "rain");
+    const to = has && (plan.rain ?? 0) > 0 ? table.beds.rain!.gain * plan.rain : 0;
+    if (rain) {
+      if (to === 0) {
+        fadeOut(rain, CROSSFADE_S, true);
+        rain = null;
+      } else if (rain.level !== to) {
+        fade(rain.gain.gain, rain.level, to, RAMP_S, false);
+        rain.level = to;
+      }
+      return;
+    }
+    if (to === 0) return;
+    const p = load(table.beds.rain!.src).then(
+      safe((buffer) => {
+        const latest = wanted;
+        if (!ctx || !latest || !((latest.rain ?? 0) > 0) || rain || !buffer) return;
+        const c = ctx;
+        const source = c.createBufferSource();
+        source.buffer = buffer;
+        source.loop = true;
+        const gain = c.createGain();
+        gain.gain.value = 0;
+        source.connect(gain);
+        gain.connect(bus!);
+        source.start();
+        const level = table.beds.rain!.gain * latest.rain;
+        fade(gain.gain, 0, level, CROSSFADE_S, true);
+        rain = { id: "rain", source, gain, nodes: [source, gain], fadeOutMs: CROSSFADE_S * 1000, level };
+      }),
+    );
+    pending.add(p);
+    void p.finally(() => pending.delete(p));
+  }
+
   function setHum(plan: SoundPlan): void {
     if (!humGain) return;
     const to = plan.bed !== null ? plan.degrade.humGain : 0;
@@ -501,6 +540,8 @@ export function createSoundPlayer(deps: PlayerDeps = {}): SoundPlayer {
     setHum(plan);
     setBed(plan);
     setMusic(plan);
+    // Last, so its nodes come after the bed's and the music's.
+    setRain(plan);
     const live = (p: SoundPlan) => p.bed !== null || (p.music !== null && p.musicDegrade && p.musicGain > 0);
     const dropsChanged = !prev || prev.seed !== plan.seed || live(prev) !== live(plan) || JSON.stringify(prev.degrade) !== JSON.stringify(plan.degrade);
     if (dropsChanged) scheduleDropouts(plan);
@@ -593,6 +634,7 @@ export function createSoundPlayer(deps: PlayerDeps = {}): SoundPlayer {
       try {
         bed?.source.stop();
         music?.source.stop();
+        rain?.source.stop();
       } catch {
         /* already stopped */
       }

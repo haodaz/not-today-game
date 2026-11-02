@@ -257,7 +257,7 @@ describe("the tabletop's things are photos (day-loop correction 2026-11-01)", ()
     expect(out).toMatchSnapshot();
   });
 
-  it("the box opens where it is (2026-11-02): not on the tabletop, not in the strip; in 房间 the open box shows at its rect while its beat plays, then goes", () => {
+  it("the box opens where it is and hands you the object (2026-11-02): held while its beat and the question play; answered, it settles on the desk row; the box stays open in 房间 all day", () => {
     const store = atDay(1);
     expect(tabletopOf(render(ctxOf(store)))).not.toContain('data-at="box"');
     completeUntil(store, "box");
@@ -265,16 +265,41 @@ describe("the tabletop's things are photos (day-loop correction 2026-11-01)", ()
     syncLoop(ctx);
     ctx.session.dialogue = { queue: [], line: 0 };
     act(ctx, "pick-box");
-    // No walk: still 房间; the object is out and the box's beat is on show over the room.
+    const object = boxObjectFor(1)!;
+    // No walk: still 房间; the object is out of the box and in the hand (held, not in use).
     expect(ctx.session.view).toBe("room");
-    expect(store.getState().found).toContain(boxObjectFor(1));
+    expect(store.getState().found).toContain(object);
+    expect(ctx.session.holding).toBe(object);
+    expect(ctx.session.hand.using).toBe(false);
     syncLoop(ctx);
-    expect(ctx.session.dialogue.queue[0]?.key).toBe("d1:beat:box");
+    // (Here the box was the day's last item, so nightfall follows them.)
+    expect(ctx.session.dialogue.queue.map((q) => q.key).slice(0, 2)).toEqual(["d1:beat:box", `d1:recognise:${object}`]);
     const open = render(ctx);
     expect(open).toContain(`<div class="box-open" style="${rectStyle(ROOM_SHOT.box)}" aria-hidden="true"><img class="desk-photo" src="/room/desk/box.png"`);
-    // Read through the beat and the question: the room is as it was, the object on the desk row.
+    expect(open).toContain(`class="held-layer" data-held="${object}"`);
+    // Read through the beat; answer the question: it settles onto the desk row.
+    while (ctx.session.dialogue.queue[0]?.key === "d1:beat:box") act(ctx, "loop-advance");
+    expect(ctx.session.dialogue.queue[0]?.key).toBe(`d1:recognise:${object}`);
+    const q = ctx.session.dialogue.queue[0]!;
+    if (q.ending.kind !== "recognise") throw new Error("not the question");
+    while (ctx.session.dialogue.line < q.lines.length - 1) act(ctx, "loop-advance");
+    act(ctx, "loop-choice", { index: String(q.ending.order[0]) });
+    expect(ctx.session.holding).toBeNull();
+    expect(tabletopOf(render(ctxOf(store, "desk")))).toContain(`data-object="${object}"`);
+    // The box stays open in 房间 for the rest of the day, also with nothing on show.
     ctx.session.dialogue = { queue: [], line: 0 };
-    expect(render(ctx)).not.toContain("box-open");
+    expect(render(ctx)).toContain("box-open");
+    store.appendEvent({ kind: "lieDown" });
+    expect(render(ctxOf(store, "room"))).not.toContain("box-open");
+  });
+  it("from the box, 放下 also settles it on the desk row", () => {
+    const store = atDay(1);
+    completeUntil(store, "box");
+    const ctx = ctxOf(store, "room");
+    act(ctx, "pick-box");
+    expect(ctx.session.holding).toBe(boxObjectFor(1));
+    act(ctx, "loop-put-down");
+    expect(ctx.session.holding).toBeNull();
     expect(tabletopOf(render(ctxOf(store, "desk")))).toContain(`data-object="${boxObjectFor(1)}"`);
   });
   it("the 道具 strip uses the same images (and the slip when it is there)", () => {

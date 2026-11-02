@@ -2,17 +2,35 @@
 // of its own; every visible text is a content string (escaped, placeholders filled from `names`).
 import type { State } from "@state/types.gen";
 import { fillPlaceholders } from "@world/replies/placeholders";
-import { doorCaption, DOOR_STATES, type DoorBeat } from "./door";
+import type { SayLine } from "@state/days/table";
+import { doorCaption, DOOR_STATES, type DoorBeat, type DoorInput } from "./door";
 import type { MealView } from "./meals";
 
 export function escapeHtml(text: string): string {
   return text.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 }
 
-/** From which door state each part shows: the corridor once the chain is open, the bag once in hand. */
-const SHOWS_CORRIDOR = new Set(["chainOpen", "holding"]);
-const SHOWS_BAG = new Set(["holding"]);
-
+/**
+ * The fragments that follow each door action, as dialogue-box lines (the author: fragments follow the
+ * action). 已送达 when the meal arrives; the corridor as the door opens to the chain; the bag as you
+ * reach for it; on the desk corner the receipt and what is wrong. Content texts, placeholders filled.
+ */
+export function doorLines(view: MealView, after: "delivered" | DoorInput, names: State["names"]): SayLine[] {
+  const fill = (s: string | null) => (s === null ? null : fillPlaceholders(s, names));
+  const out: SayLine[] = [];
+  const add = (k: SayLine["k"], s: string | null) => {
+    const v = fill(s);
+    if (v) out.push({ k, t: v });
+  };
+  if (after === "delivered") add("narration", doorCaption("delivered"));
+  if (after === "openChain") add("narration", view.outside);
+  if (after === "reach") add("narration", view.bag);
+  if (after === "place") {
+    add("narration", view.receipt);
+    add("inner", view.anomaly);
+  }
+  return out;
+}
 /**
  * The door beat for one meal. `beat` is the current door state, or null when nothing is at the
  * door. A meal that never comes renders its sounds and its anomaly where the bag would be; the
@@ -29,14 +47,12 @@ export function renderDoorView(view: MealView, beat: DoorBeat | null, names: Sta
   }
   if (!beat) return [open("idle"), "</section>"].join("\n");
 
-  const lines = [open(beat.state, DOOR_STATES.indexOf(beat.state)), ...p("door-step", doorCaption(beat.state))];
-  if (SHOWS_CORRIDOR.has(beat.state)) lines.push(...p("door-corridor", view.outside));
-  if (SHOWS_BAG.has(beat.state)) lines.push(...p("door-bag", view.bag));
+  // The door is actions on the door (2026-11-02): no list of steps and no caption here; each
+  // fragment plays in the dialogue box as its action happens (doorLines). What stays is the data
+  // the desk corner needs: what came back with the bag.
+  const lines = [open(beat.state, DOOR_STATES.indexOf(beat.state))];
   if (beat.state === "onDesk") {
     lines.push('  <div class="desk-corner">');
-    lines.push(...p("door-bag", view.bag).map((l) => `  ${l}`));
-    lines.push(...p("door-receipt", view.receipt).map((l) => `  ${l}`));
-    lines.push(...p("door-inner", view.anomaly).map((l) => `  ${l}`));
     const extras = [
       ...(view.extras.box ? ['      <li data-extra="box"></li>'] : []),
       ...view.extras.returned.map((object) => `      <li data-object="${escapeHtml(object)}"></li>`),

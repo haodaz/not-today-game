@@ -202,15 +202,16 @@ describe("the live DOM after a render (fix 2026-10-31)", () => {
     await click(root, '[data-action="kuro-call"]');
     check(root, session, "talk open");
     expect(root.querySelectorAll(".hud-kuro.away").length).toBe(1);
-    expect(root.querySelector(".stage > .dlg .txt .ch")).not.toBeNull(); // only the page's text reveals
-    expect(root.querySelector(".stage > .dlg .tag .ch")).toBeNull();
+    // The box is in the viewport's layer in every view (dialogue 2026-11-02).
+    expect(root.querySelector(".dlg-layer .dlg .txt .ch")).not.toBeNull(); // only the page's text reveals
+    expect(root.querySelector(".dlg-layer .dlg .tag .ch")).toBeNull();
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
     await frame();
     check(root, session, "talk left");
     expect(root.querySelectorAll(".kuro-btn").length).toBe(1);
     await click(root, '[data-action="kuro-call"]');
     check(root, session, "talk reopened during its exit");
-    expect(root.querySelectorAll(".stage > .dlg:not(.m-ghost)").length).toBe(1);
+    expect(root.querySelectorAll(".dlg-layer:not(.m-ghost) > .dlg").length).toBe(1);
     expect(root.querySelectorAll(".kuro-btn").length).toBe(0);
   });
 });

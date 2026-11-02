@@ -257,6 +257,17 @@
 .stage.one-monitor > .scene{z-index:9}
 .scene .scene-backdrop{position:absolute;inset:0;background:#000 center/cover no-repeat}
 .scene .scene-prop{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-height:60%;max-width:80%;filter:drop-shadow(0 18px 28px rgba(0,0,0,.45));user-select:none}
+/* The window's light by the day's weather (day-loop addition 2026-11-02): a soft light from the
+   window on the left of 房间, over the photo, under everything placed. */
+.room .window-light{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 55% 85% at 4% 34%,var(--wl,transparent),transparent 72%)}
+.room .window-light[data-weather="rain"]{--wl:rgba(150,170,195,.16)}
+.room .window-light[data-weather="overcast"]{--wl:rgba(205,205,205,.12)}
+.room .window-light[data-weather="fog"]{--wl:rgba(240,240,236,.30);background:radial-gradient(ellipse 80% 100% at 4% 34%,var(--wl),transparent 80%)}
+.room .window-light[data-weather="clear"]{--wl:rgba(255,226,170,.24)}
+.room .window-light[data-weather="stopped"]{--wl:rgba(232,238,244,.20)}
+.room .window-light[data-weather="white"]{--wl:rgba(255,255,255,.55);background:radial-gradient(ellipse 120% 140% at 4% 34%,var(--wl),rgba(255,255,255,.12) 85%)}
+.stage.m-nobg>.window-light{visibility:hidden}
+.room.looking > .window-light{translate:var(--pan-x,0px) var(--pan-y,0px);scale:var(--pan-k,1)}
 /* The evening look on the stills (day-loop addition 2026-11-02): dark 0.6 and the lamp's glow, the same as the splat's night layers. */
 .room .evening-look{position:absolute;inset:0;pointer-events:none;background:rgba(10,10,12,var(--evening-dark,.6));overflow:hidden}
 .room .evening-lamp{position:absolute;width:520px;height:520px;margin:-260px 0 0 -260px;border-radius:50%;background:radial-gradient(circle,rgba(255,196,120,.32),rgba(255,196,120,0) 65%);mix-blend-mode:screen}
@@ -264,12 +275,12 @@
 .room .gap-glow{position:absolute;inset:0;z-index:14;pointer-events:none;background:rgba(10,10,12,.55)}
 .room .gap-glow::after{content:"";position:absolute;left:var(--gap-x,50%);top:var(--gap-t,22%);width:6px;height:var(--gap-h,30%);transform:translateX(-50%);background:radial-gradient(ellipse,rgba(255,150,190,.9),rgba(255,150,190,0) 70%);filter:blur(2px)}
 .room .held.obj canvas.dev.dream{box-shadow:0 0 18px 2px rgba(255,150,190,.45)}
-/* 门 (door.html): six steps faint at the top right, only the current one lit; one click a step */
+/* 门 (2026-11-02): the door is actions on the door. Only the current step exists, as a spot on the
+   thing itself (the chain, the bag, the chain and knob); its caption is its label; 4 % brighter on hover. */
 .room .door-bg{position:absolute;inset:0;background:#000 url(/room/door_chain.png) center/cover;pointer-events:none}
-.room .door-hit{position:absolute;inset:0;border:0;padding:0;margin:0;background:transparent;cursor:pointer}
-.room .door-hit:focus-visible{outline:2px solid rgba(201,168,106,.6);outline-offset:-6px}
-.room .steps{position:absolute;right:28px;top:120px;display:flex;flex-direction:column;gap:6px;font-size:13px;color:#f4efe6;text-shadow:0 1px 6px rgba(0,0,0,.6);text-align:right;pointer-events:none}
-.room .steps span{opacity:.45}.room .steps span.on{opacity:1;font-weight:600}
+.room .door-spot{position:absolute;border:0;padding:0;margin:0;background:transparent;cursor:pointer;border-radius:6px}
+.room .door-spot:hover{background:rgba(255,255,255,.04)}
+.room .door-spot:focus-visible{outline:2px solid rgba(232,228,220,.55);outline-offset:2px}
 .room .door-beat{position:absolute;left:50%;bottom:128px;transform:translateX(-50%);width:980px;background:rgba(28,26,23,.82);backdrop-filter:blur(6px);color:#f4efe6;border-radius:12px;padding:18px 24px;font-size:18px;line-height:1.6;pointer-events:none;box-sizing:border-box}
 .room .door-beat p{margin:0}
 .room .door-beat .door-step{color:#c9a86a;font-size:12px;letter-spacing:.12em;margin-bottom:4px}
@@ -302,11 +313,14 @@
 :is(.room,.items-panel) .slot.upgraded img{image-rendering:auto;filter:saturate(1.15) drop-shadow(0 0 6px rgba(120,170,255,.55))}
 :is(.room,.items-panel) .slot .screen-hi{width:52px;height:26px;border-radius:4px;background:linear-gradient(180deg,#f4f8ff,#d9e6ff);box-shadow:inset 0 0 0 1px rgba(80,120,200,.25)}
 /* The dialogue box over the desktop view (work-task narration). */
+/* The box does not jump (dialogue correction 2026-11-02): one rule for every view. The box lives in
+   this fixed layer over 房间, 桌子, 门 and 屏幕 alike, anchored to the viewport (not to the stage,
+   whose size differs by view): the same bottom offset, width and height everywhere. */
 .dlg-layer{position:fixed;inset:0;z-index:30;pointer-events:none}
 .dlg-layer > *{pointer-events:auto}
-.dlg-layer .dlg{bottom:60px}
+.dlg-layer .dlg{position:fixed;left:50%;bottom:var(--dlg-bottom,60px);transform:translateX(-50%);width:900px;max-width:80vw;height:var(--dlg-h,132px)}
 .dlg-layer .dlg.raised{bottom:240px}
-.dlg-layer .dlg-player{bottom:60px;right:24px}
+.dlg-layer .dlg-player{position:fixed;bottom:var(--dlg-bottom,60px);right:24px;height:var(--dlg-h,132px)}
 .dlg-layer .dlg-hist-layer{position:fixed}
 /* SAN bands (presentation only): the cup photo goes colder as SAN falls. */
 .room[data-san-band="1"] img.cup{filter:drop-shadow(0 8px 10px rgba(0,0,0,.35)) brightness(.88) hue-rotate(-5deg)}

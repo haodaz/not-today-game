@@ -5,7 +5,7 @@ import { createStore } from "@state/store";
 import type { State } from "@state/types.gen";
 import { doorBeat } from "@world/delivery/commands";
 import { mealView } from "@world/delivery/meals";
-import { escapeHtml, renderDoorView } from "@world/delivery/view";
+import { doorLines, escapeHtml, renderDoorView } from "@world/delivery/view";
 
 /** Test-only names, so the snapshot shows where each placeholder went. */
 const names: State["names"] = { login: "LOGIN", nick: "NICK", calledBy: "CALLEDBY", bossCalls: "BOSSCALLS", pronoun: null };
@@ -31,6 +31,10 @@ function walk(day: number, meal: Meal): string[] {
   for (const input of ["walk", "openChain", "reach", "close", "place"] as const) {
     session.advance(input);
     render();
+    // The fragments that follow this action play in the box (2026-11-02), not in the door view.
+    const view = mealView(day, meal, store.getState(), store.getEvents(), now)!;
+    const lines = doorLines(view, input, names);
+    if (lines.length) frames.push(lines.map((l) => `[box ${l.k}] ${escapeHtml(l.t)}`).join("\n"));
   }
   return frames;
 }
@@ -38,7 +42,7 @@ function walk(day: number, meal: Meal): string[] {
 describe("FR4 door beat snapshots", () => {
   it("day 1 lunch: the bag and the cardboard box", () => {
     const frames = walk(1, "lunch");
-    expect(frames.at(-1)).toContain('data-extra="box"');
+    expect(frames.join("\n")).toContain('data-extra="box"');
     expect(frames).toMatchSnapshot();
   });
 
@@ -67,10 +71,22 @@ describe("FR4 door beat snapshots", () => {
 
 describe("renderDoorView", () => {
   it("escapes content and fills placeholders", () => {
-    const view = { ...mealView(1, "dinner", createStore().getState(), [], "19:00")!, receipt: "<b>{login}</b> & co" };
-    const html = renderDoorView(view, { day: 1, meal: "dinner", state: "onDesk" }, names);
+    // What the door view still writes is the never-delivered meal's own text.
+    const view = { ...mealView(1, "dinner", createStore().getState(), [], "19:00")!, phase: "none" as const, outside: "<b>{login}</b> & co" };
+    const html = renderDoorView(view, null, names);
     expect(html).toContain("&lt;b&gt;LOGIN&lt;/b&gt; &amp; co");
     expect(html).not.toContain("<b>");
+    // The fragments fill their placeholders too (the box escapes when it draws them).
+    const lines = doorLines({ ...view, phase: "delivered", receipt: "{login} 的小票" }, "place", names);
+    expect(lines[0]).toEqual({ k: "narration", t: "LOGIN 的小票" });
+  });
+  it("no list of steps, no caption in the door view: only the beat's data", () => {
+    const base = mealView(1, "lunch", createStore().getState(), [], "12:30")!;
+    for (const state of ["delivered", "atDoor", "chainOpen", "holding", "closing", "onDesk"] as const) {
+      const html = renderDoorView(base, { day: 1, meal: "lunch", state }, names);
+      expect(html, state).not.toContain("door-step");
+      expect(html, state).not.toContain("<p");
+    }
   });
 
   it("lists returned objects in the order given", () => {

@@ -923,3 +923,35 @@ Checked in a real browser: Chrome headless (new) with SwiftShader WebGL2, `npm r
   - in the three 左屏 消息 snapshots, the boss voice's time 09:12 → 08:58 (4 / 2 / 2 tags, nothing else).
   The renamed day-4 tabletop entry equals the old one minus the box and those rects.
 - New: `tests/day-playable.test.ts` (10).
+## day 1 walkthrough, round 2: the door crash, the door as actions, the box hands you the object, weather by day, the box anchored (2026-11-02)
+1. **Door crash** (`motion/dom.ts`): the chain picture's ghost re-read `out!.doorBg` when it was placed on a later render, after `out` had been reset. The element is now captured when the ghost is made. Rule: a ghost whose place callback throws places nothing and ends (`placeSafely`). `tests/door-motion.test.ts` drives 门 to closed through the real motion layer, re-rendering while the ghost lives. With both guards reverted it fails with the same `TypeError: … 'doorBg'` (checked, then restored).
+2. **The door is actions on the door** (`delivery/view.ts`, `hud.ts`, `game.ts`, `runtime.ts`, `shots.ts`, `room.css`): the state machine is unchanged.
+   - **No list:** the `.steps` list and the full-stage `door-hit` are gone. Only the current step exists, as a `.door-spot` button on the thing itself, with `doorCaption` of where it leads as its label (aria-label; 4 % brighter on hover, like the other hotspots).
+   - **The rects:** `DOOR_SHOT` in `shots.ts`, measured on `door_wall.png` (`door_chain.png` agrees within about 10 px): the chain to open, the bag to reach, the chain and knob to close. I put them in `shots.ts` next to ROOM_SHOT / DESK_SHOT (stage rects live there; `calibration.ts` holds the splat's world boxes).
+   - **The walk:** 走到门边 is arriving at 门 (the `view` action steps `walk`).
+   - **Closing:** it puts the bag on the desk by itself (`place`, the `pickup` event).
+   - **Fragments in the box** (`doorLines`): 「已送达」 when the meal arrives (`react`, at the arrival's own time, only if the bag is really at the door); the corridor on opening to the chain; the bag on reaching; the receipt and the anomaly (inner) on the desk.
+   - **The door view** keeps only the never-delivered meal's own text and the returned-objects data.
+   - `loop-door` without an input takes the current step (keyboard); a spot that is not the current step does nothing.
+   - Delivery snapshots: the same texts, now as box lines after their action; captions gone; day 16 unchanged.
+3. **The box hands you the object** (`game.ts` `loop-box`, recognise answer, `hud.ts`, `motion/dom.ts`):
+   - Opening the box sets `session.holding` to the object (held, not in use: the room dims, upright, breathing). The motion layer lifts it from the open box (`slotSelector` falls back to `.box-open`).
+   - The box beat and the recognise question play while it is held. Answering that box question (or 放下) settles it onto the desk row. This lift is the asking one, so no second question.
+   - The open box now stays in 房间 for the rest of the day: `boxOpenShowing` reads today's `openLayer` event, not the dialogue.
+4. **Weather by day** (`state/stages.ts` `weatherOf`, `WEATHERS`, strict; `desktop/model.ts`, `shell.ts`; `hud.ts` `windowLight`; `sound/plan.ts`, `sound/player.ts`):
+   - The 屏幕 top bar shows `WEATHER_GLYPH` + `weather.<kind>` for the day, not the browser page's text: day 10 is ☀ 晴, 13 ☂ 雨停了, 16 ☁ 阴.
+   - 房间 has a `.window-light[data-weather]` overlay from the window, coloured per kind (fog a milky haze, white a strong white wash, clear warm, rain cool).
+   - Sound plan:
+     - `rain` = 0.5 under the room bed on rain days only (day and night; the player's second looped voice, through the bus, so it ducks too).
+     - Fog days by day use `room-day` at ×0.6.
+     - The title's rain only when day 1 rains (it does).
+   - The 雨 lines are content (day boot narration). A content-consistency test checks they only open rain days or the day it stopped; code does not gate text.
+5. **The box anchored** (`game.ts` `renderGame`, `hud.ts` `boxOutside`, `room.css`): the game draws the dialogue box in the fixed `.dlg-layer` after the stage in every view, as 屏幕 already did. One CSS block: `position:fixed;left:50%;bottom:var(--dlg-bottom,60px);transform:translateX(-50%);width:900px;max-width:80vw;height:var(--dlg-h,132px)`. That is the spec's min(900px, 80vw), written so happy-dom computes it too; it read `min()` as the base 992 px. `renderRoom` alone still includes the box (for its direct tests) unless `boxOutside`. `tests/dialogue-anchor.test.ts` mounts the game in 房间 / 桌子 / 门 / 屏幕 with room.css loaded and snapshots the computed placement (identical in all four), and checks that no view-scoped rule moves or resizes the box.
+- **Snapshots** (backed up before, compared entry by entry after; every change accounted for):
+  - delivery: item 2;
+  - sound plans: the new `rain` field and day 7's fog bed level 1 → 0.6 (item 4);
+  - desktop and late-days: the weather word (item 4);
+  - room snapshots in loop-hud, navigation, nightfall, scene and title: the `.window-light` element only (item 4);
+  - the new anchor snapshot: item 5.
+  Nothing else changed.
+- Other test updates: polish door test (spots in order, no list, the arrival line); desk test (the box hands you the object, 放下 from the box); dialogue and motion-dom (the box's layer); sound player tests run with `rain: 0` for bed/track mechanics, plus their own rain-bed test. New: `tests/weather.test.ts`.

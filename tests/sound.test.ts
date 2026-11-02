@@ -5,11 +5,11 @@ import { describe, expect, it } from "vitest";
 import soundFile from "@content/sound.json";
 import stagesFile from "@content/stages.json";
 import { f } from "@state/fday";
-import { dreamNights } from "@state/stages";
+import { dreamNights, weatherOf, WEATHERS } from "@state/stages";
 import type { State } from "@state/types.gen";
 import { BEATS, type Beat } from "@world/desktop/beat";
 import { RINGS } from "@world/desktop/rings";
-import { DUCK_MS, ENDING_WHEN, SCREEN_DUCK, soundPlan, titlePlan, type SoundPlan } from "@world/sound/plan";
+import { DUCK_MS, ENDING_WHEN, FOG_BED, FOG_THIN, RAIN_UNDER, SCREEN_DUCK, soundPlan, titlePlan, type SoundPlan } from "@world/sound/plan";
 import {
   createSoundPlayer,
   equalPowerCurve,
@@ -31,6 +31,9 @@ const LAST_DAY = 18;
 const stateOn = (day: number, ending: State["ending"] = "none"): State => ({ ...f(day), ending });
 const at = (beat: Beat) => ({ clock: { beat, time: "10:00" } });
 const planOn = (day: number, beat: Beat, ending: State["ending"] = "none"): SoundPlan => soundPlan(stateOn(day, ending), at(beat), soundTable, "zh");
+/** The plan with the rain under the room left out (the player tests below are about the bed and the tracks; the rain has its own). */
+const dry = (p: SoundPlan): SoundPlan => ({ ...p, rain: 0 });
+const planOnWet = planOn;
 
 // ---------------------------------------------------------------------------------------------
 describe("content/sound.json: strict loader", () => {
@@ -325,10 +328,12 @@ describe("soundPlan", () => {
       );
     });
 
-    it("only dream nights halve the bed", () => {
+    it("only dream nights halve the bed; fog days thin the day bed (weather by day)", () => {
       fc.assert(
         fc.property(days, beats, (day, beat) => {
-          expect(planOn(day, beat).bedLevel).toBe(beat === "night" && dreamNights.includes(day) ? 0.5 : 1);
+          const evening = beat === "night" || beat === "desk";
+          const fog = weatherOf(day) === "fog" && !evening && planOn(day, beat).bed !== null;
+          expect(planOn(day, beat).bedLevel).toBeCloseTo((beat === "night" && dreamNights.includes(day) ? 0.5 : 1) * (fog ? FOG_THIN : 1), 10);
         }),
       );
     });
@@ -520,10 +525,12 @@ function rig(over: Partial<PlayerDeps> & { files?: "all" | "none" | readonly str
   return { player, ctx, doc, storage, fetched, stings, timers, made: () => made };
 }
 
-const day1 = () => planOn(1, "work");
-const night1 = () => planOn(1, "night");
+const day1 = () => dry(planOn(1, "work"));
+const night1 = () => dry(planOn(1, "night"));
 
 describe("the player (fake AudioContext)", () => {
+  // Bed and track mechanics: without the rain loop (tested on its own below).
+  const planOn = (day: number, beat: Beat, ending: State["ending"] = "none"): SoundPlan => dry(planOnWet(day, beat, ending));
   it("makes no context at load; before a gesture the plan only waits", async () => {
     const r = rig();
     r.player.apply(day1());
@@ -1077,5 +1084,29 @@ describe("the room goes quiet on the screen (sound addition 2026-11-02)", () => 
     // A stinger is a one-shot of its own, not through the bus.
     r.player.apply({ ...onView("desktop"), stinger: "sting-soft", seed: 99 });
     expect(r.stings.at(-1)).toEqual(["sting-soft", false]);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------
+describe("the rain under the room (weather by day, 2026-11-02)", () => {
+  it("a rain day starts the rain loop through the bus at its gain × 0.5; a clear day lets it go", async () => {
+    const r = rig({ files: "all" });
+    r.player.unlock();
+    r.player.apply(planOnWet(1, "work"));
+    await r.player.idle();
+    // The rain's own voice: a looping source straight into a gain on the bus (no lowpass, unlike the bed).
+    const rain = r.ctx.sources.find((s) => s.loop && s.started && (s.to[0] as unknown as { to?: unknown[] } | undefined)?.to?.[0] === r.ctx.bus);
+    expect(rain, "a looping source straight into a gain on the bus").toBeDefined();
+    expect(r.fetched.some((u) => u.endsWith("rain-loop.mp3"))).toBe(true);
+    const gain = rain!.to[0] as unknown as { gain: { events: { type: string }[] } };
+    expect(gain.gain.events.find((e) => e.type === "curve")).toBeDefined();
+    expect(soundTable.beds.rain!.gain * RAIN_UNDER).toBe(0.25);
+    r.ctx.currentTime = 30;
+    r.player.apply(planOnWet(10, "work"));
+    await r.player.idle();
+    expect(rain!.stops.length).toBe(1);
+    // White and fog days have no rain either.
+    for (const day of [7, 17]) expect(planOnWet(day, "work").rain).toBe(0);
+    expect(WEATHERS).toContain(weatherOf(17));
   });
 });

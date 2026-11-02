@@ -15,7 +15,7 @@ import type { PointerId } from "@world/room/pointer";
 import type { KuroCloser } from "@world/late/closer";
 import { EMPTY_COLLECTION, type Collection } from "@world/room/collection";
 import { isNight, type BeatClock } from "./beat";
-import { browserPage, weatherKind } from "./browser/data";
+import { weatherOf } from "@state/stages";
 import { dockFor } from "./dock";
 import { fxPlan } from "../room/fx";
 import { desktopRing } from "./rings";
@@ -310,12 +310,13 @@ export function buildShell(
   const badgeOf = (app: AppId): number =>
     shown.get(app) ?? (app === "msgs" ? apps.msgs(ctx).badge : app === "workbench" ? apps.workbench(ctx).badge : apps.browser(ctx).badge);
   const badges = { msgs: badgeOf("msgs"), workbench: badgeOf("workbench"), browser: badgeOf("browser") };
-  const weatherText = browserPage(state.day)?.weather ?? "";
+  // Weather by day (day-loop addition 2026-11-02): the day's entry, never the browser page's text.
+  const weatherKindToday = weatherOf(state.day);
   return {
     day: state.day,
     clock: session.clock,
     ring: desktopRing(state.day, session.clock.beat),
-    weather: { kind: weatherKind(weatherText), text: weatherText },
+    weather: { kind: weatherKindToday, text: "" },
     night,
     off,
     shutdown: off || night ? null : shutdownOpen ? "open" : "closed",

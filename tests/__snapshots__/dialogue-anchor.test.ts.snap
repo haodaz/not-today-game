@@ -1,0 +1,15 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`the dialogue box is anchored to the viewport in every view > 房间, 桌子, 门 and 屏幕: the same layer and the same computed placement (snapshot) 1`] = `
+{
+  "bottom": "60px",
+  "height": "132px",
+  "inStage": false,
+  "layer": "dlg-layer",
+  "layerIsRootChild": true,
+  "maxWidth": "819.2px",
+  "position": "fixed",
+  "transform": "translateX(-50%)",
+  "width": "900px",
+}
+`;

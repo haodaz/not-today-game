@@ -173,6 +173,14 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
   const begin = (key: string, at: number) => starts.set(key, at);
   const since = (key: string): number | undefined => starts.get(key);
 
+  /** A ghost whose source is gone places nothing and ends (it never throws out of a render). */
+  const placeSafely = (g: Ghost): boolean => {
+    try {
+      return g.place(root);
+    } catch {
+      return false;
+    }
+  };
   const addGhost = (g: Ghost) => {
     // Its descendants are not live things either: a leaving screen's monitor is not "the" monitor.
     g.el.classList.add("m-ghost");
@@ -240,7 +248,8 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
   // Where a held thing lives: its cutout on 桌子's tabletop (day-loop correction 2026-11-01), or the 道具 strip.
   const slotSelector = (held: string) => {
     const inner = held === "phone" ? '[data-action="loop-phone"]' : `[data-object="${esc(held)}"]`;
-    return `.desk-things ${inner}, .items-strip ${inner}`;
+    // From today's box in 房间, the open box is where it rises from (2026-11-02).
+    return `.desk-things ${inner}, .items-strip ${inner}, .stage.room-view > .box-open`;
   };
 
   /** The path from the centre to the slot, in stage px, written on the held element. */
@@ -702,7 +711,9 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       return true;
     };
     if (q(stage, ".door-bg.chain") && !out.doorBg) begin("door-bg", t);
-    if (!q(stage, ".door-bg.chain") && out.doorBg) fadeGhost(out.doorBg, "door-bg", (r) => firstIn(r, out!.doorBg!), exitOf(CHOSEN.doorImage), t);
+    // The leaving chain picture, captured now: `out` is gone by the time the ghost is placed again.
+    const bg = out.doorBg;
+    if (!q(stage, ".door-bg.chain") && bg) fadeGhost(bg, "door-bg", (r) => firstIn(r, bg), exitOf(CHOSEN.doorImage), t);
     if (q(stage, ".door-hand") && !out.doorHand) begin("door-hand", t);
     if (!q(stage, ".door-hand") && out.doorHand) {
       const hand = out.doorHand;
@@ -916,7 +927,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     const kept: Ghost[] = [];
     for (const g of [...ghosts].reverse()) {
       const replaced = liveKeys.has(g.key) || taken.has(g.key);
-      if (replaced || t >= g.end || !g.place(root)) {
+      if (replaced || t >= g.end || !placeSafely(g)) {
         g.el.remove();
         continue;
       }

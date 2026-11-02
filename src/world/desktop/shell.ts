@@ -7,7 +7,7 @@ import { t, tr } from "@world/i18n";
 import { beatLabelKey, type BeatClock } from "./beat";
 import type { DockEntry } from "./dock";
 import { fxStageAttrs, type FxPlan } from "../room/fx";
-import type { WeatherKind } from "./browser/data";
+import type { Weather } from "@state/stages";
 import { renderScene, type Scene } from "@world/dialogue/scene";
 
 export const APPS = ["msgs", "workbench", "browser"] as const;
@@ -17,8 +17,8 @@ export type Side = "left" | "right";
 /** Dock class per app, as in the mock (消息 green, 工作台 blue, 浏览器 orange). */
 const DOCK_CLASS: Record<AppId, string> = { msgs: "msgs", workbench: "docs", browser: "feed" };
 const DOCK_KEY: Record<AppId, string> = { msgs: "dock.msgs", workbench: "dock.workbench", browser: "dock.browser" };
-/** Icons for the header weather; the word next to them comes from strings. */
-const WEATHER_GLYPH: Record<WeatherKind, string> = { rain: "☁", fog: "≋", clear: "☀" };
+/** Icons for the header weather; the word next to them comes from strings (`weather.<kind>`). */
+export const WEATHER_GLYPH: Readonly<Record<Weather, string>> = { rain: "☁", overcast: "☁", fog: "≋", clear: "☀", stopped: "☂", white: "○" };
 
 export interface MonitorModel {
   readonly side: "left" | "right";
@@ -41,7 +41,7 @@ export interface ShellModel {
   readonly day: number;
   readonly clock: BeatClock;
   readonly ring: string;
-  readonly weather: { readonly kind: WeatherKind | null; readonly text: string };
+  readonly weather: { readonly kind: Weather | null; readonly text: string };
   readonly night: boolean;
   /** The computer is not on yet: both monitors are black, nothing else (day-loop correction). */
   readonly off?: boolean;
@@ -65,7 +65,7 @@ export interface ShellModel {
 
 function topBar(m: ShellModel, monitor: MonitorModel): SafeHtml {
   const weather = m.weather.kind
-    ? html`<span>${WEATHER_GLYPH[m.weather.kind]} ${tr(`shell.weather.${m.weather.kind}`)}</span>`
+    ? html`<span>${WEATHER_GLYPH[m.weather.kind]} ${tr(`weather.${m.weather.kind}`)}</span>`
     : m.weather.text
       ? html`<span>${m.weather.text}</span>`
       : null;
