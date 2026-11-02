@@ -170,7 +170,7 @@
     },
     {
       "id": "box",
-      "text": "桌上那个箱子，拆了。",
+      "text": "床边那个箱子，拆了。",
       "unlock": "done:pickup",
       "done": "event:openBox",
       "required": true
