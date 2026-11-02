@@ -14,7 +14,6 @@ export interface DeskLayout {
   readonly monitors: { readonly left: Rect; readonly right: Rect };
   readonly cup: Rect;
   readonly phone: Rect;
-  readonly box: Rect;
   readonly meal: Rect;
   readonly slip: Rect;
   /** The six object slots: one row, one x each, in arrival order. */
@@ -25,8 +24,13 @@ export interface DeskLayout {
   readonly walkman: Rect;
 }
 
-const TOP_KEYS = ["_note", "backdrop", "monitors", "cup", "phone", "box", "meal", "slip", "objects", "keyboard", "lamp", "walkman"] as const;
-const RECT_KEYS = ["cup", "phone", "box", "meal", "slip", "keyboard", "lamp", "walkman"] as const;
+const TOP_KEYS = ["_note", "backdrop", "monitors", "cup", "phone", "meal", "slip", "objects", "keyboard", "lamp", "walkman"] as const;
+const RECT_KEYS = ["cup", "phone", "meal", "slip", "keyboard", "lamp", "walkman"] as const;
+/**
+ * Keys still accepted but no longer read: `box` (the box opens where it is, in 房间, since
+ * 2026-11-02; Claude deletes the key from content afterwards).
+ */
+const RETIRED_KEYS = ["box"] as const;
 
 function fail(where: string, problem: string): never {
   throw new Error(`content/desk.json ${where}: ${problem}`);
@@ -55,7 +59,7 @@ function rect(v: unknown, where: string): Rect {
 /** Strict: every key required, nothing else allowed. Exported for tests. */
 export function parseDesk(raw: unknown): DeskLayout {
   if (!isObj(raw)) fail("", "must be an object");
-  onlyKeys(raw, TOP_KEYS, "");
+  onlyKeys(raw, [...TOP_KEYS, ...RETIRED_KEYS], "");
   for (const k of TOP_KEYS) if (k !== "_note" && !(k in raw)) fail("", `missing "${k}"`);
   if (typeof raw.backdrop !== "string" || !raw.backdrop.startsWith("/")) fail("backdrop", "must be a site path");
   const m = raw.monitors;

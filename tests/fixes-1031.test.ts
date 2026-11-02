@@ -134,6 +134,8 @@ describe("(5) four camera levels", () => {
     expect(out).toContain('data-view="desktop" data-screen="left"');
     expect(out).toContain('data-view="desktop" data-screen="right"');
     expect(out).not.toMatch(/kuro-mood|kuro-glow/);
+    // (屏幕 opens once the computer is on.)
+    ctx.store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
     loopActions["view"]!(ctx, { view: "desktop", screen: "right" } as DOMStringMap, null as never);
     expect(ctx.session.view).toBe("desktop");
     expect(ctx.session.focus).toBe("right");

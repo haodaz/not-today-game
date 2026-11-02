@@ -331,7 +331,7 @@ function checkArrivals(ctx: ActionContext, lc: LoopContext, nowMs: number): void
       memo.orders.delete(meal);
       continue;
     }
-    const w = { elapsedMs: nowMs - order.atMs, minMinutes: delivery.minMinutes, waitMinutes: delivery.waitMinutes };
+    const w = { elapsedMs: nowMs - order.atMs, minMinutes: delivery.minMinutes, waitMinutes: delivery.waitMinutes, unitMs: ctx.session.deliveryUnitMs };
     if (arrivalDue({ ...w, workDoneSinceOrder: doneNow > order.workDone })) {
       memo.orders.delete(meal);
       const placed = ordersOn(ctx.store.getEvents(), lc.state.day)[meal as Meal];
@@ -340,12 +340,16 @@ function checkArrivals(ctx: ActionContext, lc: LoopContext, nowMs: number): void
       ctx.store.appendEvent({ kind: "step", name: `delivery:arrives:${meal}`, t: ctx.session.clock.time });
       return; // the append re-enters syncLoop
     }
-    // Look again when time alone could make it due (a work item done re-enters syncLoop anyway).
-    if (memo.timers.has(meal)) continue;
-    memo.timers.add(meal);
-    const wait = doneNow > order.workDone ? msUntilMinimum(w) : msUntilDue(w);
+    // Look again when time alone could make it due. Before any work it is the long wait; once a work
+    // item is done after the order, the minimum is enough, so that shorter look is set as well (the
+    // long one stays and finds nothing to do). Keyed apart, so the first never hides the second.
+    const worked = doneNow > order.workDone;
+    const key = worked ? `${meal}:min` : meal;
+    if (memo.timers.has(key)) continue;
+    memo.timers.add(key);
+    const wait = worked ? msUntilMinimum(w) : msUntilDue(w);
     ctx.later(Math.max(250, wait), () => {
-      memo.timers.delete(meal);
+      memo.timers.delete(key);
       syncLoop(ctx);
     });
   }

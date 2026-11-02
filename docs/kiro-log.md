@@ -901,3 +901,25 @@ Checked in a real browser: Chrome headless (new) with SwiftShader WebGL2, `npm r
 - **Desktop snapshots**: `content/strings/*.json` changed during this turn (08:49, again 08:57), e.g. `wb.nav.home` 首页 → 工作台. I refreshed `desktop-snapshots`: the six home-button labels are that change. **I deleted my backup copy before checking the rest of that diff, so whatever else changed in that file is unverified; check it with `git diff tests/__snapshots__/desktop-snapshots.test.ts.snap`.**
 - **Browser** (Chrome headless, `?day=4`, no splat param): no `.splat-layer`. 房间 → 桌子: both copies bob (−3.2 px sampled), `step-1` then `step-2` 451 ms later, and the desk arrives. A 250 px drag pans 62.3 px (k 1.078, the placed things 93.5 px) and eases back. The right edge shows "Door" and the click goes to 门; the bottom of 门 shows "Back", the bottom of 房间 nothing. On 桌子 the box sits at 1000–1280 × 560–780, clear of Kuro's body (1380–1572 × 680–872); it now overlaps the phone's corner a little (content's rects).
 - Tests: `navigation` (look: pan limits, never the splat, ease back, parallax, no pick after a drag; edges: zones, only where they lead, the click, the snapshot with the door hint; no splat layer and the 400 ms crossfade; the view action's cam and steps). `motion-dom` (two copies, bob, fade in the last 400 ms, no zoom). `splat` (the gate's default, the walking table). `sound` (duck values per view, the 600 ms ramp, stingers not ducked). `polish` (CHOSEN keys).
+## day-loop: a whole day playable (Claude's headless day-1 walkthrough, 2026-11-02)
+1. **Lunch after work** (`loop/runtime.ts` `checkArrivals`): the arrival look is keyed per kind. `<meal>` is the long look (`waitMinutes`). Once a work item is done after the order, a second look keyed `<meal>:min` (`msUntilMinimum`) is set. The first look no longer hides the second; the long one stays and finds the meal already in (or still due). Test with fake timers: order at t0, work at t0+30 s, arrival just after t0+2 min, never waiting for 6.
+2. **`?fast=1`** (`loop/waiting.ts` `deliveryUnitMs`, `WaitInput.unitMs`, `session.deliveryUnitMs`, `main.ts`): dev builds only. Delivery minutes count as seconds (×1 000 instead of ×60 000). Nothing else reads it.
+3. **Space / Enter on 屏幕** (`game.ts` `loopKeys`, `typingIn`): the `view !== "desktop"` exclusion is gone. Keys are skipped only when the target is an input, a textarea or contenteditable (the controller already stops at inputs; textarea and contenteditable reach loopKeys).
+4. **Black monitors before boot** (`game.ts` `view`): 屏幕 does not open while `!booted`. One narration line, `room.screen.off`, is pushed once per day (`session.screenOffDay`). **Content edit by Kiro (Claude's area, as the task asked):** added `room.screen.off` to `content/strings/zh.json` (「电脑还没开机。主机在桌子左下角。」) and `en.json` ("The computer isn't on. The tower is under the desk, bottom left."), next to `room.tower.off`; nothing else touched. The line is `narration` (it says what is seen), not `inner`.
+5. **Overdue off the HUD** (`hud.ts` `dayCorner`): the `hud.overdue` span is removed; the string stays. The count still shows on 工作台's 账本 tile (`workbench/view.ts`).
+6. **The box opens where it is** (`game.ts` `pick-box`, `hud.ts`, `desk.ts`, `room.css`):
+   - `pick-box` in 房间 opens the box at once; there is no walk to 桌子, and nothing happens from other views.
+   - While the box's beat (or the question about what came out) is on show, the open box (`/room/desk/box.png`) sits at `ROOM_SHOT.box` (`boxOpenShowing`, derived from the dialogue). When the sequence is over the room is as it was, and the object is on the desk row.
+   - The box left the tabletop **and the 道具 strip**: it belongs to 房间, not to what you carry. With it went the "剩 N 层" label (string kept).
+   - `DeskLayout.box` is gone; the loader still accepts content's `box` key without reading it (`RETIRED_KEYS`) until Claude deletes it.
+7. **Workbench home title** (`desktop/model.ts`): on `home` the top bar shows the app's name alone; other pages keep `工作台 · <page>`.
+8. **Content-driven tests:** `replies-incoming` "ties keep table order" now checks every day against content's own items, stably sorted by their times. `desktop-messages` reads the boss voice's time (08:58) from content instead of assuming it comes after 09:03.
+- **Tests that opened 屏幕 without booting** now boot first: `fixes-1031`, `navigation` (monitor picks), `where` (two). `loop-hud`'s "black monitors" test now asserts the new rule. The desk, npc and navigation tests that used the desk box now assert it is gone and that it opens in 房间.
+- **Snapshots** (all backed up first and compared entry by entry after `-u`): every refreshed entry equals its old version after applying only these:
+  - the `.ov` overdue span removed;
+  - the tabletop box removed;
+  - cup (60,420 → 1060,640) and walkman (300,660 → 450,680) rects;
+  - the home title `工作台 · 工作台` → `工作台`;
+  - in the three 左屏 消息 snapshots, the boss voice's time 09:12 → 08:58 (4 / 2 / 2 tags, nothing else).
+  The renamed day-4 tabletop entry equals the old one minus the box and those rects.
+- New: `tests/day-playable.test.ts` (10).

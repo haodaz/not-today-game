@@ -196,11 +196,11 @@ describe("tabletop things are photos (day-loop correction 2026-11-01)", () => {
     return renderRoom({ state: ctx.store.getState(), events: ctx.store.getEvents(), session: ctx.session }).value;
   };
 
-  it("the cup, phone and box use <img> from /room/desk/, not CSS shapes", () => {
+  it("the cup and phone use <img> from /room/desk/, not CSS shapes (the box opens in 房间 now)", () => {
     const out = renderDesk();
     expect(out).toContain('src="/room/desk/cup.png"');
     expect(out).toContain('src="/room/desk/phone.png"');
-    expect(out).toContain('src="/room/desk/box.png"');
+    expect(out).not.toContain('src="/room/desk/box.png"');
     // No CSS-shape children remain.
     expect(out).not.toContain('<div class="cup">');
     expect(out).not.toContain('<div class="phone">');
@@ -208,9 +208,9 @@ describe("tabletop things are photos (day-loop correction 2026-11-01)", () => {
     expect(out).not.toContain('<div class="paper">');
   });
 
-  it("the box's label and the phone's span still appear alongside the photos", () => {
+  it("the phone's span still appears alongside its photo; the box's label went with the box", () => {
     const out = renderDesk();
-    expect(out).toContain(t("hud.box.left", { n: 8 }));
+    expect(out).not.toContain(t("hud.box.left", { n: 8 }));
     expect(out).toContain(t("hud.phone"));
   });
 });

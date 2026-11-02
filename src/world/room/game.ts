@@ -156,6 +156,13 @@ function overlayOpen(s: Session): boolean {
   return s.bookOpen || s.historyOpen || s.settingsOpen || s.itemsOpen || s.phoneOpen || !!s.holding || talking(s.dialogue) || !!s.pullOut || !!s.endingPage;
 }
 
+/** The key went to something the player types into: an input, a textarea, anything contenteditable. */
+export function typingIn(target: EventTarget | null | undefined): boolean {
+  const el = target as HTMLElement | null | undefined;
+  if (!el || typeof el.tagName !== "string") return false;
+  return el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable === true || el.getAttribute?.("contenteditable") === "true";
+}
+
 /** The held thing goes back to rest: just held, its front up, no key down. */
 function restHand(s: Session): void {
   s.hand.using = false;
@@ -173,6 +180,16 @@ export const loopActions: Record<string, ActionHandler> = {
   view(ctx, data) {
     const view = data.view as View;
     if (!VIEWS.includes(view)) return;
+    // Two black monitors before the tower is pressed: 屏幕 does not open; one line says why (once a day).
+    if (view === "desktop" && !booted(ctx.store.getState(), ctx.store.getEvents())) {
+      const day = ctx.store.getState().day;
+      if (ctx.session.screenOffDay !== day) {
+        ctx.session.screenOffDay = day;
+        ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${day}:screen:off`, lines: [{ k: "narration", t: t("room.screen.off") }], ending: { kind: "none" } });
+        ctx.rerender();
+      }
+      return;
+    }
     // 桌子's monitors open 屏幕 on their own side.
     if (view === "desktop" && (data.screen === "left" || data.screen === "right")) ctx.session.focus = data.screen;
     // A finished door beat is forgotten once the player looks away (polish W1).
@@ -314,13 +331,12 @@ export const loopActions: Record<string, ActionHandler> = {
     else session.dialogue = push(session.dialogue, beatQueued(day, "night", night, { kind: "lieDown" }));
     ctx.rerender();
   },
-  // The box on the floor by the bed (房间): the camera goes to 桌子, then the box opens.
+  // The box on the floor by the bed (房间) opens where it is (2026-11-02): no walk to 桌子. Its beat
+  // and the question play over 房间 with the open box at its place; what came out goes to the desk row.
   "pick-box"(ctx) {
-    if (ctx.session.view === "desk") return void loopActions["loop-box"]!(ctx, {} as DOMStringMap, null as never);
-    loopActions["view"]!(ctx, { view: "desk" } as DOMStringMap, null as never);
-    ctx.later(viewMoveMs("room", "desk", true) + 20, () => {
-      if (ctx.session.view === "desk") loopActions["loop-box"]!(ctx, {} as DOMStringMap, null as never);
-    });
+    if (ctx.session.view !== "room") return;
+    loopActions["loop-box"]!(ctx, {} as DOMStringMap, null as never);
+    ctx.rerender();
   },
 
   // The desk lamp: a click, nothing else (no event, no state).
@@ -721,7 +737,8 @@ export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
     loopActions["view"]!(ctx, { view: backTarget(ctx.session.view) ?? "room" } as DOMStringMap, null as never);
     return true;
   }
-  if ((e.key === " " || e.key === "Enter") && ctx.session.view !== "desktop" && ctx.session.dialogue.queue.length) {
+  // Space / Enter read on in every view, 屏幕 too; never while the player is typing (the Kuro draft, a search box).
+  if ((e.key === " " || e.key === "Enter") && !typingIn(e.target) && ctx.session.dialogue.queue.length) {
     // At a choice, keys do nothing: the choice is a click.
     if (!atChoice(ctx)) loopActions["loop-advance"]!(ctx, {} as DOMStringMap, null as never);
     // At a choice a key can still complete the line above it.

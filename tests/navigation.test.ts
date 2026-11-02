@@ -144,14 +144,26 @@ describe("point to go", () => {
     destroy!();
     document.body.innerHTML = "";
 
-    m = mount();
+    // 屏幕 opens once the computer is on (2026-11-02).
+
+    const on = () => {
+
+      const store = createStore({ startDay: 1 });
+
+      store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
+
+      return store;
+
+    };
+
+    m = mount({ store: on() });
     await click(m, 480, 380);
     expect(m.session.view).toBe("desktop");
     expect(m.session.focus).toBe("left");
     destroy!();
     document.body.innerHTML = "";
 
-    m = mount();
+    m = mount({ store: on() });
     await click(m, 770, 380);
     expect(m.session.view).toBe("desktop");
     expect(m.session.focus).toBe("right");
@@ -186,20 +198,24 @@ describe("point to go", () => {
     expect(m.session.view).toBe("desk");
   });
 
-  it("the box: 桌子 first, then it opens (the open waits for the camera)", () => {
+  it("the box opens where it is: no walk to 桌子; locked before its line, nothing opens; from 桌子 nothing", () => {
     const later: [number, () => void][] = [];
     const store = createStore({ startDay: 1 });
     const ctx: ActionContext = { store, session: initialSession(DEFAULT_CLOCK, "left", "room"), rerender: () => {}, later: (ms, fn) => void later.push([ms, fn]) };
-    loopActions["pick-box"]!(ctx, {} as DOMStringMap, null as never);
-    expect(ctx.session.view).toBe("desk");
-    expect(later.map(([ms]) => ms)).toContain(viewMoveMs("room", "desk", true) + 20);
-    // Already at 桌子: just open.
-    const fn = vi.fn();
     const events = store.getEvents().length;
-    later.at(-1)![1]();
+    loopActions["pick-box"]!(ctx, {} as DOMStringMap, null as never);
+    expect(ctx.session.view).toBe("room");
+    expect(later).toEqual([]);
     expect(store.getEvents().length).toBe(events); // locked on day 1 before its line: nothing opens, nothing breaks
-    expect(fn).not.toHaveBeenCalled();
+    completeUntil(store, "box");
+    ctx.session.view = "desk";
+    loopActions["pick-box"]!(ctx, {} as DOMStringMap, null as never);
+    expect(store.getState().found).toEqual([]);
+    ctx.session.view = "room";
+    loopActions["pick-box"]!(ctx, {} as DOMStringMap, null as never);
+    expect(store.getState().found).toEqual(["chick"]);
   });
+
 });
 
 describe("back: right-click, the bottom 6 %, the wheel, Esc", () => {

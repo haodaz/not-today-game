@@ -61,7 +61,7 @@ function dayCorner(state: State, session: Session): SafeHtml {
   // Once the hand has taken the heartbeat (night 9, nothing given): it still beats, no number.
   const taken = HEARTBEAT_TAKEN !== null && state.flags.includes(HEARTBEAT_TAKEN);
   const hr = state.day >= HEART_RATE_FROM_DAY ? html`<div class="hr"><i></i>${taken ? null : tr("hud.hr", { bpm: heartRate(state.san) })}</div>` : null;
-  return html`<div class="day"><b>${tr("shell.day", { day: state.day })} · ${tr(beatLabelKey(session.clock.beat))}</b><span class="ov">${tr("hud.overdue", { n: state.overdueDays })}</span></div>${hr}`;
+  return html`<div class="day"><b>${tr("shell.day", { day: state.day })} · ${tr(beatLabelKey(session.clock.beat))}</b></div>${hr}`;
 }
 
 /**
@@ -70,7 +70,6 @@ function dayCorner(state: State, session: Session): SafeHtml {
  * same screens. Pure.
  */
 export interface DeskThings {
-  readonly box: SafeHtml;
   readonly phone: SafeHtml;
   readonly cup: SafeHtml;
   readonly meal: SafeHtml | null;
@@ -101,8 +100,6 @@ export function deskThings(state: State, events: readonly GameEvent[], session: 
   const held = heldItem(session);
   // Not yet recognised: slightly desaturated, the only tell (recognise FR2).
   const unknown = (id: string) => !knows(id, state, events) && "unknown";
-  const total = Object.keys(FOUND_ON_DAY).length;
-  const left = total - state.found.length;
   // An upgraded object's icon is the hi-res one: the only visible tell (object-upgrade FR2).
   const objects = state.found
     .filter((id) => !state.lost.includes(id))
@@ -118,7 +115,6 @@ export function deskThings(state: State, events: readonly GameEvent[], session: 
       return { id, html: button };
     });
   return {
-    box: html`<button type="button" class="slot" data-action="loop-box"><img class="desk-photo" src="/room/desk/box.png" alt="" aria-hidden="true">${left > 0 ? html`<span>${tr("hud.box.left", { n: left })}</span>` : null}</button>`,
     phone: html`<button type="button" class="${cls("slot", session.phoneOpen && "lifted")}" data-action="loop-phone"><img class="desk-photo" src="/room/desk/phone.png" alt="" aria-hidden="true"><span>${tr("hud.phone")}</span></button>`,
     cup: html`<div class="slot"><img class="desk-photo cup" src="/room/desk/cup.png" alt="" aria-hidden="true"></div>`,
     meal: mealSlot(state, events),
@@ -147,7 +143,7 @@ function tabletop(things: DeskThings): SafeHtml {
   const at = (name: string, r: Rect | null, inner: SafeHtml | null) =>
     r && inner ? html`<div class="at" data-at="${name}" style="${rectStyle(r)}">${inner}</div>` : null;
   const objects = things.objects.map((o, i) => at(`object:${o.id}`, objectSlot(deskLayout, i), o.html));
-  return html`<div class="desk-things">${at("cup", deskLayout.cup, things.cup)}${at("phone", deskLayout.phone, things.phone)}${at("box", deskLayout.box, things.box)}${at("meal", deskLayout.meal, things.meal)}${objects}${at("slip", deskLayout.slip, things.slip)}${at("walkman", deskLayout.walkman, things.walkman)}</div>`;
+  return html`<div class="desk-things">${at("cup", deskLayout.cup, things.cup)}${at("phone", deskLayout.phone, things.phone)}${at("meal", deskLayout.meal, things.meal)}${objects}${at("slip", deskLayout.slip, things.slip)}${at("walkman", deskLayout.walkman, things.walkman)}</div>`;
 }
 
 /** 道具 (day-loop correction 2026-11-01): the button next to ⚙; it opens and closes the strip. */
@@ -160,7 +156,7 @@ export function itemsButton(session: Pick<Session, "itemsOpen">): SafeHtml {
 export function itemsPanel(state: State, events: readonly GameEvent[], session: Session): SafeHtml | null {
   if (!session.itemsOpen) return null;
   const th = deskThings(state, events, session);
-  return html`<div class="items-panel" id="items-panel" role="dialog" aria-label="${t("hud.items")}"><div class="items-strip">${th.box}${th.phone}${th.cup}${th.meal}${th.objects.map((o) => o.html)}${th.slip}</div></div>`;
+  return html`<div class="items-panel" id="items-panel" role="dialog" aria-label="${t("hud.items")}"><div class="items-strip">${th.phone}${th.cup}${th.meal}${th.objects.map((o) => o.html)}${th.slip}</div></div>`;
 }
 
 /**
@@ -362,6 +358,19 @@ function edgeHint(session: Session, view: string, nowMs: number): SafeHtml | nul
   const label = t(edge.zone === "door" ? "hud.cam.door" : "hud.back");
   return html`<div class="edge-hint ${edge.zone}" aria-hidden="true"${late}>${edge.zone === "door" ? html`<i class="arrow"></i>` : null}<span>${label}</span></div>`;
 }
+/**
+ * The box opens where it is (2026-11-02): in 房间, while its beat (and the question about what came
+ * out of it) is on show, the open box sits at its place on the floor; when that sequence is over the
+ * room is as it was. Derived from the dialogue on show; nothing is stored.
+ */
+export function boxOpenShowing(state: Pick<State, "day">, session: Pick<Session, "dialogue">): boolean {
+  const key = session.dialogue.queue[0]?.key ?? "";
+  const object = boxObjectFor(state.day);
+  return key === `d${state.day}:beat:box` || (object !== null && key.startsWith(`d${state.day}:recognise:${object}`));
+}
+function boxOpen(): SafeHtml {
+  return html`<div class="box-open" style="${rectStyle(ROOM_SHOT.box)}" aria-hidden="true"><img class="desk-photo" src="/room/desk/box.png" alt="" draggable="false"></div>`;
+}
 export function renderRoom(model: RoomModel): SafeHtml {
   const { state, events, session } = model;
   const lc = loopContext(state, events);
@@ -393,7 +402,7 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const evening = isEvening(session.clock) && view !== "bed" && !dream ? eveningLook(view) : null;
   const fadeLen = session.cam?.fade ?? ARRIVE_FADE_MS;
   const late = fade === null ? null : raw(` style="--late:-${Math.round(fade)}ms${fadeLen !== ARRIVE_FADE_MS ? `;--late-dur:${fadeLen}ms` : ""}"`);
-  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid", fade !== null && "m-late", dream && "scene-on")}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${evening}${renderScene(lineScene)}${scene}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${itemsPanel(state, events, session)}${held}${dialogueBox(state, events, session, nowMs)}${bottomRight(model)}${settingsButton()}${itemsButton(session)}${settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
+  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid", fade !== null && "m-late", dream && "scene-on")}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${evening}${renderScene(lineScene)}${scene}${view === "room" && !waiting && !dream && boxOpenShowing(state, session) ? boxOpen() : null}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${itemsPanel(state, events, session)}${held}${dialogueBox(state, events, session, nowMs)}${bottomRight(model)}${settingsButton()}${itemsButton(session)}${settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
 }
 
 export { raidShowing };

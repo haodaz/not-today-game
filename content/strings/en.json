@@ -210,6 +210,7 @@
   "title.q.name": "Name",
   "room.bed.locked": "Not yet.",
   "room.tower.off": "The computer is off.",
+  "room.screen.off": "The computer isn't on. The tower is under the desk, bottom left.",
   "desktop.shutdown": "Shut down",
   "room.bed": "The bed",
   "room.meal": "The meal",

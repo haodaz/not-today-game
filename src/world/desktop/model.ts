@@ -126,6 +126,10 @@ export interface Session {
    * at the end of the CSS push). Wall ms; session only. Cleared by the first render after `until`.
    */
   cam: { readonly to: View; readonly reveal: number; readonly until: number; /** How long the placed things take to fade in (ms; default 200). */ readonly fade?: number } | null;
+  /** The day the "computer isn't on" line was said (once a day). */
+  screenOffDay: number;
+  /** How long a delivery minute is (ms): 60 000, or 1 000 with the dev-only `?fast=1`. */
+  deliveryUnitMs: number;
   /** The hinted edge under the pointer (room-scene 2026-11-02: the door at 房间's right, back at the bottom) and since when (ms); set by the nav layer. */
   edge: { readonly zone: "door" | "back"; readonly since: number } | null;
   /** The walkman on the desk is playing the theme (sound addition 2026-11-02); session only: no event, no state. */
@@ -206,6 +210,8 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     movingUntil: 0,
     walkman: false,
     edge: null,
+    deliveryUnitMs: 60_000,
+    screenOffDay: 0,
     splatReady: false,
     cam: null,
     decoyWindow: null,
@@ -258,7 +264,8 @@ function monitorFor(app: AppId, side: Side, ctx: AppContext, apps: AppRenderers)
   if (app === "workbench") {
     const { body, badge } = apps.workbench(ctx);
     const page = ctx.session.workbenchPage;
-    const pageTitle = html`${tr("dock.workbench")} · ${tr(WB_PAGE_KEY[page])}`;
+    // The home page is the app itself: its name alone (not 「工作台 · 工作台」); other pages add theirs.
+    const pageTitle = page === "home" ? tr("dock.workbench") : html`${tr("dock.workbench")} · ${tr(WB_PAGE_KEY[page])}`;
     return {
       badge,
       monitor: {

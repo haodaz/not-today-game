@@ -109,17 +109,17 @@ describe("room HUD (FR6)", () => {
     const store = storeAt(1);
     const { ctx } = fakeCtx(store);
     expect(renderGame(store, ctx.session, 0).value).toContain('class="stage room');
+    // Not on yet (2026-11-02): 屏幕 does not open; one line says so, and nothing counts.
+    loopActions.view!(ctx, { view: "desktop" } as DOMStringMap, null as never);
+    expect(ctx.session.view).toBe("room");
+    expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:screen:off"]);
+    expect(store.getEvents()).toEqual([]);
+    // Once the tower is pressed, 屏幕 is one monitor with the way back, and opening it on the messages monitor counts as looking.
+    loopActions["tower-power"]!(ctx, {} as DOMStringMap, null as never);
     loopActions.view!(ctx, { view: "desktop" } as DOMStringMap, null as never);
     const desk = renderGame(store, ctx.session, 0).value;
     expect(desk.match(/class="monitor/g)).toHaveLength(1);
     expect(desk).toContain('class="back-room"');
-    // Not on yet: black, and looking at it counts for nothing.
-    expect(desk).toContain('class="monitor off"');
-    expect(store.getEvents()).toEqual([]);
-    // Once the tower is pressed, opening the desktop on the messages monitor counts as looking.
-    loopActions.view!(ctx, { view: "room" } as DOMStringMap, null as never);
-    loopActions["tower-power"]!(ctx, {} as DOMStringMap, null as never);
-    loopActions.view!(ctx, { view: "desktop" } as DOMStringMap, null as never);
     expect(store.getEvents().at(-1)).toMatchObject({ kind: "step", name: "openApp:msgs" });
   });
 

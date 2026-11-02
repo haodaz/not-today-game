@@ -37,6 +37,15 @@ function conv(store: Store, conversation: string, time: string, progress = new M
 const kinds = (bubbles: Bubble[]) =>
   bubbles.map((b) => (b.kind === "msg" ? `${b.side}:${b.body.type}` : b.kind));
 const say = (recipient: string, choice: string, time: string): EventDraft => ({ kind: "reply", choice, recipient, t: time });
+/** The boss's day-1 voice note and its time, from content (it moved to 08:58 on 2026-11-02; never assumed). */
+const bossVoice = replyTable.get(1)!.recipients.get("boss")!.incoming.find((i) => i.text.startsWith("[语音]"))!;
+/** What of the boss's own messages is already there at `time`, before the player's line. */
+const voiceBy = (time: string) => (bossVoice.t <= time ? ["them:voice"] : []);
+const minuteBefore = (hhmm: string) => {
+  const [h, m] = hhmm.split(":").map(Number) as [number, number];
+  const n = h * 60 + m - 1;
+  return `${String(Math.floor(n / 60)).padStart(2, "0")}:${String(n % 60).padStart(2, "0")}`;
+};
 
 describe("bubbles", () => {
   it("reads the content's bracket forms, as written", () => {
@@ -54,7 +63,9 @@ describe("bubbles", () => {
 describe("transcript (U3)", () => {
   it("an incoming message is not there before its time; a voice note gets its 转文字 attached", () => {
     const store = storeAt(1);
-    expect(conv(store, "boss", "09:03")).toEqual([]);
+    expect(conv(store, "boss", minuteBefore(bossVoice.t))).toEqual([]);
+    expect(kinds(conv(store, "boss", bossVoice.t))).toEqual(["day", "them:voice"]);
+    // Its 转文字 comes after it; by 10:00 both are in.
     const later = conv(store, "boss", "10:00");
     expect(kinds(later)).toEqual(["day", "them:voice"]);
     const voice = later[1] as Extract<Bubble, { kind: "msg" }>;
@@ -63,7 +74,7 @@ describe("transcript (U3)", () => {
 
   it("the player's line shows at once; the answer when its time comes", () => {
     const store = storeAt(1, [say("boss", "fine", "09:03")]);
-    expect(kinds(conv(store, "boss", "09:03"))).toEqual(["day", "me:text"]);
+    expect(kinds(conv(store, "boss", "09:03"))).toEqual(["day", ...voiceBy("09:03"), "me:text"]);
     const answered = conv(store, "boss", "09:20");
     expect(kinds(answered)).toContain("them:text");
     const mine = answered.find((b) => b.kind === "msg" && b.side === "me") as Extract<Bubble, { kind: "msg" }>;
@@ -73,8 +84,8 @@ describe("transcript (U3)", () => {
   it("a live plan shows only the steps that have played", () => {
     const store = storeAt(1, [say("boss", "salary", "09:03")]);
     const index = store.getEvents().length - 1;
-    expect(kinds(conv(store, "boss", "09:03", new Map([[index, 1]])))).toEqual(["day", "me:text"]);
-    expect(kinds(conv(store, "boss", "09:03"))).toEqual(["day", "me:text", "read"]);
+    expect(kinds(conv(store, "boss", "09:03", new Map([[index, 1]])))).toEqual(["day", ...voiceBy("09:03"), "me:text"]);
+    expect(kinds(conv(store, "boss", "09:03"))).toEqual(["day", ...voiceBy("09:03"), "me:text", "read"]);
   });
 
   it("an interrupt lands in its own conversation, at its own time", () => {

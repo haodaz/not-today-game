@@ -193,6 +193,7 @@ describe("a sequence [desk, screen:msgs, room] plays one line per view, in order
 
   it("while the player moves desk → screen(msgs) → room", () => {
     const store = atDay(1);
+    store.appendEvent({ kind: "step", name: "boot", t: "09:03" }); // 屏幕 opens once the computer is on
     const ctx = ctxOf(store, "desk");
     ctx.session.leftApp = "msgs";
     ctx.session.dialogue = push(ctx.session.dialogue, seq);
@@ -265,6 +266,7 @@ describe("a sequence [desk, screen:msgs, room] plays one line per view, in order
 describe("across sequences", () => {
   it("the first sequence whose next line plays here plays; the others keep waiting in queue order", () => {
     const store = atDay(1);
+    store.appendEvent({ kind: "step", name: "boot", t: "09:03" }); // 屏幕 opens once the computer is on
     const ctx = ctxOf(store, "room");
     const a = item("a", [line("a: screen", "screen")]);
     const b = item("b", [line("b: anywhere")]);

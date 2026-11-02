@@ -11,6 +11,7 @@ import "./world/motion/motion.css";
 import "./ui/fonts.css";
 import "./ui/title/title.css";
 import { debugStartDay } from "@state/clock";
+import { deliveryUnitMs } from "@world/loop/waiting";
 import { splatForGame } from "@world/room/splat";
 import { fxForGame } from "@world/room/fx/layer";
 import { createHandLayer } from "@world/objects/layer";
@@ -122,6 +123,8 @@ function startGame(store: Store, saved: boolean, from?: "desk"): void {
   });
   // What finished runs left on the desk (presentation only; the story never reads it).
   game.session.collection = collection;
+  // Debug speed, dev builds only (like ?day=): `?fast=1` counts delivery minutes as seconds.
+  game.session.deliveryUnitMs = deliveryUnitMs(search, import.meta.env.DEV);
 }
 
 const jump = debugStartDay(search);

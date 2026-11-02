@@ -25,11 +25,15 @@ describe("planIncoming", () => {
     expect(delivered(steps).some((a) => a.conversation === "boss" && a.line.t === first.t && a.line.text === first.text)).toBe(true);
   });
 
-  it("ties keep table order", () => {
-    const boss = replyTable.get(1)!.recipients.get("boss")!.incoming;
-    expect(boss[0]!.t).toBe(boss[1]!.t);
-    const bossLines = delivered(planIncoming(1, f(1), "00:00")).filter((a) => a.conversation === "boss").map((a) => a.line.text);
-    expect(bossLines.slice(0, 2)).toEqual([boss[0]!.text, boss[1]!.text]);
+  it("ties keep table order: the delivered order is content's, stably sorted by content's own times", () => {
+    // Read from content, never assumed (day 1's 41″ voice moved to 08:58 on 2026-11-02).
+    for (const [day, table] of replyTable) {
+      const state = f(day);
+      const items = [...table.recipients].flatMap(([who, r]) => r.incoming.filter((i) => !i.cond_show).map((i) => ({ who, t: i.t, text: i.text })));
+      const expected = items.map((x, i) => ({ ...x, i })).sort((a, b) => (a.t < b.t ? -1 : a.t > b.t ? 1 : a.i - b.i)).map((x) => `${x.who}:${x.t}:${x.text}`);
+      const got = delivered(planIncoming(day, state, "00:00")).map((a) => `${a.conversation}:${a.line.t}:${a.line.text}`);
+      expect(got.filter((g) => expected.includes(g)), `day ${day}`).toEqual(expected.filter((e) => got.includes(e)));
+    }
   });
 
   it("conditional items arrive only when their condition holds", () => {

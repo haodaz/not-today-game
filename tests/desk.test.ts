@@ -15,9 +15,10 @@ import { BACKDROPS } from "@world/fit";
 import { setLocale, t } from "@world/i18n";
 import { itemStates, loopContext } from "@world/loop/checklist";
 import { loopActions, loopKeys, renderGame } from "@world/room/game";
-import { renderRoom, SLIP_ITEM } from "@world/room/hud";
+import { boxObjectFor, renderRoom, SLIP_ITEM } from "@world/room/hud";
+import { syncLoop } from "@world/loop/runtime";
 import { deskGap, deskLayout, fullMonitor, objectSlot, OBJECT_SLOTS, parseDesk } from "@world/room/desk";
-import { DESK_SHOT, rectStyle } from "@world/room/shots";
+import { DESK_SHOT, rectStyle, ROOM_SHOT } from "@world/room/shots";
 import { completeUntil } from "./complete-items";
 
 afterEach(() => setLocale("zh"));
@@ -56,7 +57,7 @@ describe("the loader (content/desk.json, strict)", () => {
     ["an unknown monitor", (d: any) => (d.monitors.middle = d.monitors.left), /monitors: unknown key "middle"/],
     ["a rect off the stage", (d: any) => (d.lamp.l = 1500), /lamp: is off the 1600×900 stage/],
     ["a non-number", (d: any) => (d.phone.w = "130"), /phone\.w: must be a number/],
-    ["an empty rect", (d: any) => (d.box.h = 0), /box: must have a positive size/],
+    ["an empty rect", (d: any) => (d.cup.h = 0), /cup: must have a positive size/],
     ["five slots", (d: any) => d.objects.slots.pop(), /objects\.slots: must list 6/],
     ["a slot off the stage", (d: any) => (d.objects.slots[5] = 1500), /objects\.slots\[5\]: is off/],
     ["an unknown row key", (d: any) => (d.objects.row.l = 0), /objects\.row: unknown key "l"/],
@@ -87,13 +88,13 @@ describe("the loader (content/desk.json, strict)", () => {
 });
 
 describe("each placed thing at its rect", () => {
-  it("the cup, the phone and the box, always; the monitor hotspots; no strip, no tower", () => {
+  it("the cup and the phone, always; no box (it opens where it is, in 房间); the monitor hotspots; no strip, no tower", () => {
     const out = render(ctxOf(atDay(1)));
     expect(placed(out, "cup")).toBe(rectStyle(deskLayout.cup));
     expect(placed(out, "phone")).toBe(rectStyle(deskLayout.phone));
-    expect(placed(out, "box")).toBe(rectStyle(deskLayout.box));
+    expect(placed(out, "box")).toBeNull();
+    expect(out).not.toContain('data-action="loop-box"');
     expect(out).toContain(`data-at="phone" style="${rectStyle(deskLayout.phone)}"><button type="button" class="slot" data-action="loop-phone">`);
-    expect(out).toContain(`data-at="box" style="${rectStyle(deskLayout.box)}"><button type="button" class="slot" data-action="loop-box">`);
     for (const side of ["left", "right"] as const) expect(out).toContain(`data-view="desktop" data-screen="${side}" style="${rectStyle(deskLayout.monitors[side])}"`);
     expect(out).not.toContain('class="items-strip"');
     expect(out).not.toContain("tower-hit");
@@ -135,15 +136,14 @@ describe("the meal, the box and the slip", () => {
     expect(after).toMatch(/data-at="meal" style="[^"]+"><div class="slot meal done" data-meal="lunch">/);
   });
 
-  it("the box: its layers left, then empty; clicking it opens today's layer", () => {
+  it("the box is not on the desk any more (it opens where it is, in 房间): no box, no layers-left label", () => {
     const store = atDay(1);
-    const ctx = ctxOf(store);
-    // Total is the number of objects that can arrive (read from the data, not hard-coded).
     const totalObjects = Object.keys((stagesFile as { objectsFoundOnDay: Record<string, number> }).objectsFoundOnDay).length;
-    expect(render(ctx)).toContain(t("hud.box.left", { n: totalObjects }));
-    completeUntil(store, "box");
-    act(ctx, "loop-box");
-    expect(render(ctx)).toContain(t("hud.box.left", { n: totalObjects - 1 }));
+    const out = render(ctxOf(store));
+    expect(out).not.toContain(t("hud.box.left", { n: totalObjects }));
+    expect(out).not.toContain('data-action="loop-box"');
+    // The loader still accepts content's old `box` key until Claude removes it, and never reads it.
+    expect("box" in deskLayout).toBe(false);
   });
 
   it("the slip: on day 18 by the lamp once its line is open; reading it opens 屏幕's 工作台; it stays", () => {
@@ -186,7 +186,9 @@ describe("道具: the strip as a panel", () => {
       expect(open).toContain(`<div class="items-panel" id="items-panel" role="dialog" aria-label="${t("hud.items")}"><div class="items-strip">`);
       expect(open).toContain(`aria-expanded="true" aria-controls="items-panel">${t("hud.itemsClose")}</button>`);
       const strip = open.slice(open.indexOf('class="items-strip"'));
-      for (const a of ['data-action="loop-box"', 'data-action="loop-phone"', 'data-object="pager" data-action="loop-hold"']) expect(strip, view).toContain(a);
+      for (const a of ['data-action="loop-phone"', 'data-object="pager" data-action="loop-hold"']) expect(strip, view).toContain(a);
+      // The box is in 房间, not a thing to carry (2026-11-02).
+      expect(strip, view).not.toContain('data-action="loop-box"');
       act(ctx, "items-toggle");
       expect(render(ctx)).not.toContain('class="items-panel"');
       act(ctx, "items-toggle");
@@ -233,9 +235,10 @@ describe("the tabletop's things are photos (day-loop correction 2026-11-01)", ()
     for (const name of PHOTOS) expect(() => readFileSync(resolve(__dirname, `../public/room/desk/${name}.png`)), name).not.toThrow();
   });
 
-  it("day 4 with the phone on the desk: cup, phone and box are photos at their rects; no slip yet", () => {
+  it("day 4 with the phone on the desk: cup and phone are photos at their rects; no box, no slip yet", () => {
     const out = tabletopOf(render(ctxOf(atDay(4))));
-    for (const name of ["cup", "phone", "box"] as const) {
+    expect(placed(out, "box")).toBeNull();
+    for (const name of ["cup", "phone"] as const) {
       expect(photoIn(out, name), name).toBe(`/room/desk/${name}.png`);
       expect(placed(out, name), name).toBe(rectStyle(deskLayout[name]));
     }
@@ -254,27 +257,33 @@ describe("the tabletop's things are photos (day-loop correction 2026-11-01)", ()
     expect(out).toMatchSnapshot();
   });
 
-  it("the box is the same image full and empty; only the label goes", () => {
+  it("the box opens where it is (2026-11-02): not on the tabletop, not in the strip; in 房间 the open box shows at its rect while its beat plays, then goes", () => {
     const store = atDay(1);
-    const objects = Object.keys((stagesFile as { objectsFoundOnDay: Record<string, number> }).objectsFoundOnDay);
-    const withLayers = tabletopOf(render(ctxOf(store)));
-    expect(withLayers).toContain(t("hud.box.left", { n: objects.length }));
-    expect(photoIn(withLayers, "box")).toBe("/room/desk/box.png");
-    // Every layer found (a hand-made state): the label is gone, the image stays, undimmed.
-    const emptied = renderRoom({ state: { ...store.getState(), found: objects as never }, events: store.getEvents(), session: ctxOf(store).session }).value;
-    const bare = tabletopOf(emptied);
-    expect(photoIn(bare, "box")).toBe("/room/desk/box.png");
-    expect(bare).not.toMatch(/剩 \d+ 层/);
-    expect(bare).not.toContain("opacity");
+    expect(tabletopOf(render(ctxOf(store)))).not.toContain('data-at="box"');
+    completeUntil(store, "box");
+    const ctx = ctxOf(store, "room");
+    syncLoop(ctx);
+    ctx.session.dialogue = { queue: [], line: 0 };
+    act(ctx, "pick-box");
+    // No walk: still 房间; the object is out and the box's beat is on show over the room.
+    expect(ctx.session.view).toBe("room");
+    expect(store.getState().found).toContain(boxObjectFor(1));
+    syncLoop(ctx);
+    expect(ctx.session.dialogue.queue[0]?.key).toBe("d1:beat:box");
+    const open = render(ctx);
+    expect(open).toContain(`<div class="box-open" style="${rectStyle(ROOM_SHOT.box)}" aria-hidden="true"><img class="desk-photo" src="/room/desk/box.png"`);
+    // Read through the beat and the question: the room is as it was, the object on the desk row.
+    ctx.session.dialogue = { queue: [], line: 0 };
+    expect(render(ctx)).not.toContain("box-open");
+    expect(tabletopOf(render(ctxOf(store, "desk")))).toContain(`data-object="${boxObjectFor(1)}"`);
   });
-
   it("the 道具 strip uses the same images (and the slip when it is there)", () => {
     const store = atDay(1);
     const ctx = ctxOf(store);
     ctx.session.itemsOpen = true;
     const strip = (o: string) => o.slice(o.indexOf('class="items-strip"'));
     const out = strip(render(ctx));
-    for (const name of ["box", "phone", "cup"]) expect(out, name).toContain(`<img class="desk-photo${name === "cup" ? " cup" : ""}" src="/room/desk/${name}.png"`);
+    for (const name of ["phone", "cup"]) expect(out, name).toContain(`<img class="desk-photo${name === "cup" ? " cup" : ""}" src="/room/desk/${name}.png"`);
     const last = constants.lastDay as number;
     const s18 = atDay(last);
     completeUntil(s18, SLIP_ITEM);

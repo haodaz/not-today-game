@@ -1,5 +1,5 @@
 {
-  "_note": "桌子 framing (day-loop correction 2026-11-01): rects in stage px on public/room/shots/desk_top.jpg (1600×900). Objects are placed cutouts; nothing here is painted into the photo. Rule 2026-11-02: nothing is placed in the bottom-right 320×260 px; Kuro's HUD body lives there.",
+  "_note": "桌子 framing (day-loop correction 2026-11-01): rects in stage px on public/room/shots/desk_top.jpg (1600×900). Objects are placed cutouts; nothing here is painted into the photo. Rule 2026-11-02: nothing is placed in the bottom-right 320×260 px; Kuro's HUD body lives there. 2026-11-02: a closed laptop is painted into the photo at about 0–420 × 470–680 (decoration, nothing placed there); the cup moved to the right front.",
   "backdrop": "/room/shots/desk_top.jpg",
   "monitors": {
     "left": {
@@ -16,22 +16,17 @@
     }
   },
   "cup": {
-    "l": 60,
-    "t": 420,
+    "l": 1060,
+    "t": 640,
     "w": 200,
-    "h": 200
+    "h": 200,
+    "_note": "moved 2026-11-02: the closed laptop (decoration painted into desk_top.jpg) now takes the front-left corner"
   },
   "phone": {
     "l": 1230,
     "t": 450,
     "w": 130,
     "h": 200
-  },
-  "box": {
-    "l": 1000,
-    "t": 560,
-    "w": 280,
-    "h": 220
   },
   "meal": {
     "l": 600,
@@ -74,8 +69,8 @@
     "h": 270
   },
   "walkman": {
-    "l": 300,
-    "t": 660,
+    "l": 450,
+    "t": 680,
     "w": 180,
     "h": 150,
     "_note": "after any ending only: the day-10 walkman, left front by the cup; click plays the theme song. Moved 2026-11-02: the bottom-right corner belongs to Kuro's body"
