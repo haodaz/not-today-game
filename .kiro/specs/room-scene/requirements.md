@@ -116,3 +116,12 @@ Seen on day 13: the dissolve makes large hard-edged blotches ("奶牛斑"), and 
 
 ## Correction 2026-11-02 (author, morning): placed things wait for the camera
 During the 房间 → 桌子 push the tabletop's placed cutouts (cup, phone, box, meal, objects, walkman) appear before the camera has arrived. They belong to the arriving framing: they fade in with the arriving photo in the last 200 ms of the move (splat on) or at the end of the CSS push (splat off), never before. Same for the HUD elements that are framing-specific (the checklist card stays). Snapshot the mid-move DOM: no `.slot` children while `.m-move` (or whatever marks a move) is on.
+
+## Correction 2026-11-02 (author, after clicking the box): no warp zoom
+With the splat off, the 房间 → 桌子 move is a CSS scale-up of the whole photo ("像时空穿梭"). Replace it: when there is no splat move, the change of still is a 400 ms crossfade with at most a 3 % scale on the arriving photo, never a zoom through the picture. Same for every move between stills, both directions. The splat move keeps its own motion.
+
+## Addition 2026-11-02 (author): walking, not switching
+"好的视角迁移，应该是能先走到比较近的地方然后置换空间……更像玩家有行动而不是听鼠标的命令." A move is the player walking there, then the space changing:
+- The splat move is the walk: the camera glides toward the thing, with a small head bob (2 steps per move, ±4 px vertical, ease in/out) and two soft floor sounds (`step-1.mp3`, `step-2.mp3`, Claude supplies; silence if missing). Duration scales with distance: 房间 → 桌子 900 ms, 房间 → 门 1200 ms, 桌子 → 屏幕 500 ms, back moves the same. The arriving still crossfades in only over the last 200 ms.
+- Before walking: hover lifts the thing (the 4 % brighter from the navigation rule); the head-turn drag lets the player look around first; nothing moves until the click.
+- With the splat off there is no walk: only the 400 ms crossfade from the no-warp correction. Never fake a walk by zooming the photo.
