@@ -83,7 +83,7 @@
   "wb.title": "Workbench",
   "wb.sub": "Future Intelligence · yours",
   "wb.search": "Find work, people, files…",
-  "wb.nav.home": "Home",
+  "wb.nav.home": "Workbench",
   "wb.nav.new": "New task",
   "wb.nav.docs": "Docs",
   "wb.nav.code": "Code",
@@ -260,5 +260,8 @@
   "objects.exit": "Exit",
   "room.lamp": "The lamp",
   "room.box": "The box",
-  "hud.back": "Back"
+  "hud.back": "Back",
+  "wb.nav.msgs": "Messages",
+  "wb.nav.approvals": "Approvals",
+  "wb.nav.contacts": "Contacts"
 }

@@ -81,3 +81,11 @@ The author sent three screenshots of WeChat for Mac as the reference (not to cop
 - **Video card**: a 9:16 black card with a still, a centred play circle, and the channel name with the glyph at the bottom left. Same content fields with `kind: "video"`.
 - **Composer**: a tall white input, a toolbar of five glyphs (emoji, box, folder, scissors ▾, mic) and a grey 「Send」 at the right; our reply chips sit above the input as today.
 - Colours stay ours (the grey-blue system), the green only on the selected row. Snapshot the list and a clan conversation with one article card and one video card.
+
+## Correction 2026-11-02 (author, evening): work in the work app, home in the home app
+"工作软件和类似微信的东西最好别放在一起，有点怪。工作软件更类似钉钉之类的." Today 消息 holds the work conversations and the family ones side by side. Split:
+- **工作台 (the company's system, DingTalk-like)**: a left rail 消息 / 工作台 / 文档 / 审批 / 通讯录 (strings `wb.nav.*`, Claude adds). Its 消息 holds the work conversations only: boss, partner, the all-hands group, xiaozhang, laozhou (the same `content/replies` tables, same reply chips, same NPC faces). 工作台 is today's workbench home and tasks; 文档 / 账本 / 工单 / 项目 as today; 审批 is the place where upgrade offers and the day-13 upgrade notice also appear as items (content later); 通讯录 lists the NPCs with faces and the silhouettes (presentation only). The grey-blue system look stays; no green.
+- **消息 (the personal app, WeChat-like per the reference screenshots)**: only 家里 (parents' group, the clan) and 朋友圈. The list, bubbles, cards and composer per the WeChat addition above.
+- Unread dots: each app's dock tile shows its own count. Nightfall's "chat with Kuro" is unchanged (Kuro is neither).
+- `labelKey` and the reply tables are untouched; only which app shows a conversation changes (by recipient: boss/partner/group/xiaozhang/laozhou → 工作台, family/clan → 消息).
+- Tests: snapshot 工作台·消息 and 消息 on day 1 and day 13; property: no conversation appears in both; the clan and family never appear in 工作台.

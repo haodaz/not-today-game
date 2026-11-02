@@ -76,7 +76,7 @@
   "wb.title": "工作台",
   "wb.sub": "未来智能 · 你写的",
   "wb.search": "找活、找人、找文件…",
-  "wb.nav.home": "首页",
+  "wb.nav.home": "工作台",
   "wb.nav.new": "新任务",
   "wb.nav.docs": "文档",
   "wb.nav.code": "代码",
@@ -260,5 +260,8 @@
   "objects.exit": "退出",
   "room.lamp": "台灯",
   "room.box": "箱子",
-  "hud.back": "退回"
+  "hud.back": "退回",
+  "wb.nav.msgs": "消息",
+  "wb.nav.approvals": "审批",
+  "wb.nav.contacts": "通讯录"
 }
