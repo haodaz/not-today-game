@@ -33,6 +33,10 @@ export interface Shop {
   readonly items: readonly Item[];
   /** The shop's name with one wrong character, authored for the typo drift. */
   readonly typo?: string;
+  /** The app's card (delivery addition 2026-11-02): stars out of 5, minutes to the door, the fee in ¥. Optional. */
+  readonly rating?: number;
+  readonly eta?: number;
+  readonly fee?: number;
 }
 
 export interface MealEntry {
@@ -68,6 +72,9 @@ export interface DeliveryTable {
   readonly driftByRing: Readonly<Record<string, string>>;
   /** Desk-layer sprite paths under public/ (e.g. bag → "food/bag"); read, not drawn yet. */
   readonly sprites: Readonly<Record<string, string>>;
+  /** The checkout's one address line and payment card (delivery addition 2026-11-02); optional. */
+  readonly address?: string;
+  readonly card?: string;
 }
 
 /** The number of door-beat steps the door machine is built for. */
@@ -136,7 +143,10 @@ function item(value: unknown, where: string): Item {
 
 function shop(value: unknown, where: string): Shop {
   if (!isRecord(value)) throw new ContentError(where, "a shop must be an object");
-  onlyKeys(value, ["id", "name", "tag", "hours", "items", "typo"], where);
+  onlyKeys(value, ["id", "name", "tag", "hours", "items", "typo", "rating", "eta", "fee"], where);
+  if (value.rating !== undefined && !(typeof value.rating === "number" && value.rating >= 0 && value.rating <= 5)) throw new ContentError(`${where}.rating`, "must be a number from 0 to 5");
+  if (value.eta !== undefined && !(Number.isInteger(value.eta) && (value.eta as number) > 0)) throw new ContentError(`${where}.eta`, "must be a whole number of minutes > 0");
+  if (value.fee !== undefined && !(typeof value.fee === "number" && value.fee >= 0)) throw new ContentError(`${where}.fee`, "must be a number >= 0");
   if (!Array.isArray(value.items)) throw new ContentError(`${where}.items`, "must be a list");
   const items = value.items.map((it, i) => item(it, `${where}.items[${i}]`));
   if (new Set(items.map((it) => it.id)).size !== items.length) throw new ContentError(where, "duplicate item id");
@@ -147,6 +157,9 @@ function shop(value: unknown, where: string): Shop {
     ...(value.hours !== undefined ? { hours: span(value.hours, `${where}.hours`) } : {}),
     items,
     ...(value.typo !== undefined ? { typo: str(value.typo, `${where}.typo`) } : {}),
+    ...(value.rating !== undefined ? { rating: value.rating as number } : {}),
+    ...(value.eta !== undefined ? { eta: value.eta as number } : {}),
+    ...(value.fee !== undefined ? { fee: value.fee as number } : {}),
   };
 }
 
@@ -194,7 +207,7 @@ function deepFreeze<T>(value: T): T {
 /** Parses and checks a delivery file. Pure; exported for tests. */
 export function parseDelivery(input: unknown): DeliveryTable {
   if (!isRecord(input)) throw new ContentError("", "not an object");
-  onlyKeys(input, ["_note", "phone", "windows", "door", "shops", "defaults", "days", "shopDrift", "chosen", "sprites"], "top level");
+  onlyKeys(input, ["_note", "phone", "windows", "door", "shops", "defaults", "days", "shopDrift", "chosen", "sprites", "address", "card"], "top level");
 
   // Optional: sprite paths (public/<path>.png), one string per name.
   const sprites: Record<string, string> = {};
@@ -263,6 +276,8 @@ export function parseDelivery(input: unknown): DeliveryTable {
     days: new Map([...days].sort(([a], [b]) => a - b)),
     driftByRing,
     sprites,
+    ...(input.address !== undefined ? { address: str(input.address, "address") } : {}),
+    ...(input.card !== undefined ? { card: str(input.card, "card") } : {}),
   });
 }
 

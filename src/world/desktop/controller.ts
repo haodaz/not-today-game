@@ -17,6 +17,7 @@ import type { LookApi } from "@world/room/nav";
 import { soundPlan } from "@world/sound/plan";
 import type { SoundPlayer } from "@world/sound/player";
 import { t } from "@world/i18n";
+import { maskBlocks } from "@world/dialogue/mask";
 
 /** Stage size in CSS pixels: one monitor (mock: 28px padding, 1440×900), or the room (1600×900). */
 const MONITOR = { w: 1440, h: 900 };
@@ -145,7 +146,15 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   });
   const apps = deps.apps ?? desktopApps;
   const renderRoot = deps.render ?? defaultRender(apps);
-  const actions = { ...shellActions, ...(deps.actions ?? {}) };
+  // A story masks the stage (dialogue addition 2026-11-02): while it plays, only reading on, the
+  // box's controls and the settings answer. Every way in (clicks, the nav and motion layers) goes
+  // through this map; handlers calling each other directly are the game's own steps, not hotspots.
+  const actions: Record<string, ActionHandler> = Object.fromEntries(
+    Object.entries({ ...shellActions, ...(deps.actions ?? {}) }).map(([name, handler]): [string, ActionHandler] => [
+      name,
+      (c, data, el) => (maskBlocks(session.dialogue, name) ? undefined : handler(c, data, el)),
+    ]),
+  );
   const timers = new Set<ReturnType<typeof setTimeout>>();
   const body = new KuroBodyElement(root.ownerDocument);
   let frame = 0;

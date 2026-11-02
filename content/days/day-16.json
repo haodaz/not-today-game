@@ -11,7 +11,7 @@
         {
           "k": "narration",
           "t": "老板问：门锁好了吗。",
-          "where": "screen:msgs"
+          "where": "screen:msgs:boss"
         },
         {
           "k": "inner",

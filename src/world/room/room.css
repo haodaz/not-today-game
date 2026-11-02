@@ -322,6 +322,10 @@
 .dlg-layer .dlg.raised{bottom:240px}
 .dlg-layer .dlg-player{position:fixed;bottom:var(--dlg-bottom,60px);right:24px;height:var(--dlg-h,132px)}
 .dlg-layer .dlg-hist-layer{position:fixed}
+/* A story masks the stage (dialogue addition 2026-11-02): 40 % dim under the box; a click on it reads on. */
+.dlg-layer .story-mask{position:fixed;inset:0;background:rgba(0,0,0,.4);cursor:pointer}
+/* ⚙ 设置 sits above the box in every view (2026-11-02): its fixed layer outranks .dlg-layer (30). */
+.hud-host .settings-layer{z-index:50}
 /* SAN bands (presentation only): the cup photo goes colder as SAN falls. */
 .room[data-san-band="1"] img.cup{filter:drop-shadow(0 8px 10px rgba(0,0,0,.35)) brightness(.88) hue-rotate(-5deg)}
 .room[data-san-band="2"] img.cup{filter:drop-shadow(0 8px 10px rgba(0,0,0,.35)) brightness(.8) hue-rotate(-10deg)}
@@ -416,3 +420,48 @@
 .settings .email-status.sent{color:#2f6b3a}
 .settings .email-status.error{color:#8b2f2a}
 .settings .email-bound{font-size:13px;color:#2f6b3a;word-break:break-all}
+/* The delivery app like an app (delivery addition 2026-11-02): home, shop, checkout, status, rating. */
+.dapp{position:relative;margin:-14px -16px;min-height:calc(100% + 28px);padding:12px 14px 70px;display:flex;flex-direction:column;gap:10px;color:#1d2129}
+.dapp h2{font-size:17px;margin:4px 0 0;font-weight:600}
+.dapp .ph{display:block;background:#f3efe8;border-radius:10px;overflow:hidden;flex:0 0 auto}
+.dapp .ph img{display:block;width:100%;height:100%;object-fit:contain}
+.dapp .ic{display:inline-block;width:11px;height:11px;border:1.5px solid currentColor;border-radius:50%;vertical-align:-1px;margin-right:3px;opacity:.7}
+.dapp .ic.ride{border-radius:3px 3px 6px 6px}.dapp .ic.pin{border-radius:50% 50% 50% 0;transform:rotate(-45deg)}.dapp .ic.card{border-radius:2px;width:14px;height:10px}
+.d-search{height:34px;border-radius:17px;background:#f2f3f5;display:flex;align-items:center;padding:0 12px;color:#999;font-size:13px;gap:4px}
+.d-chips{display:flex;gap:8px}.d-chips .ph.chip{width:48px;height:48px;border-radius:24px}
+.d-rate-chip{align-self:flex-start;border:1px solid #e5484d;color:#e5484d;background:#fff;border-radius:14px;padding:4px 12px;font:inherit;font-size:13px;cursor:pointer}
+.d-cards{display:flex;flex-direction:column;gap:12px}
+.d-card{display:grid;grid-template-columns:72px 1fr;grid-template-rows:auto auto auto;column-gap:10px;text-align:left;border:0;background:#fff;padding:0;font:inherit;color:inherit;cursor:pointer}
+.d-card .ph.card{grid-row:1/span 3;width:72px;height:72px}
+.d-card b{font-weight:600;font-size:15px}.d-card small{color:#999;font-size:12px}
+.d-card em{grid-column:2;font-style:normal;font-size:12px;color:#c33}
+.d-card.off{opacity:.45;cursor:default}
+.d-meta{display:flex;gap:10px;font-size:12px;color:#666}.d-meta .r{color:#e09b1a}
+.d-back{position:absolute;left:10px;top:10px;z-index:1;width:30px;height:30px;border-radius:15px;border:0;background:rgba(255,255,255,.9);font-size:20px;line-height:28px;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.shop-page .ph.head{margin:-12px -14px 0;height:150px;border-radius:0}
+.d-title b{display:block;font-size:17px}.d-title small{color:#999}
+.d-menu{display:flex;flex-direction:column}
+.d-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f1f1f1}
+.d-row .ph.sm,.d-line .ph.sm{width:44px;height:44px;border-radius:8px}
+.d-row .n,.d-line .n{flex:1;font-size:14px}.d-row .p,.d-line .p{font-size:14px}
+.d-add{width:28px;height:28px;border-radius:14px;border:0;background:#1d2129;color:#fff;font:600 15px/28px inherit;cursor:pointer}
+.d-add.on{background:#e5484d}
+.d-bar,.d-order{position:absolute;left:14px;right:14px;bottom:16px;height:46px;border-radius:23px;border:0;background:#1d2129;color:#fff;font:inherit;font-size:15px;font-weight:600;cursor:pointer}
+.d-order{background:#e5484d}
+.checkout h2{margin-left:40px;margin-top:8px}
+.d-line{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #f1f1f1;font-size:14px}
+.d-total{align-self:flex-end;font-size:20px;font-weight:600}
+.d-rider{display:flex;justify-content:center;padding:10px 0}
+.d-rider .helmet{width:72px;height:56px;border-radius:36px 36px 10px 10px;background:#f6c343;box-shadow:inset 0 -14px 0 #1d2129,inset 18px 0 0 rgba(255,255,255,.25)}
+.d-steps{list-style:none;margin:0;padding:0 0 0 16px;border-left:2px solid #eee;display:flex;flex-direction:column;gap:14px}
+.d-steps li{position:relative;color:#aaa;font-size:14px;display:flex;justify-content:space-between}
+.d-steps li::before{content:"";position:absolute;left:-22px;top:5px;width:10px;height:10px;border-radius:5px;background:#ddd}
+.d-steps li.done{color:#666}.d-steps li.done::before{background:#999}
+.d-steps li.on{color:#1d2129;font-weight:600}.d-steps li.on::before{background:#e5484d}
+.d-steps time{font:12px var(--mono);color:#999;font-weight:400}
+.rate .stars{display:flex;gap:6px;justify-content:center;padding:6px 0}
+.rate .star{border:0;background:none;font-size:30px;line-height:1;color:#ddd;cursor:pointer;padding:0}
+.rate .star.on{color:#f6b026}.rate .star:disabled{cursor:default}
+.rate .remarks{display:flex;flex-wrap:wrap;gap:8px}
+.rate .remark{border:1px solid #ddd;background:#fff;border-radius:16px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
+.rate.thanks{align-items:center;justify-content:center}.rate.thanks p{font-size:16px;color:#666}

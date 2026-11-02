@@ -6,12 +6,12 @@
         {
           "k": "narration",
           "t": "对账结果：全部一致。1+1=3，标的绿的。",
-          "where": "screen:workbench"
+          "where": "screen:workbench:ledger"
         },
         {
           "k": "narration",
           "t": "老板的语音，声音是他的，停顿不是。",
-          "where": "screen:msgs"
+          "where": "screen:msgs:boss"
         },
         {
           "k": "inner",
@@ -25,7 +25,7 @@
         {
           "k": "narration",
           "t": "老周和家里同一天转来一个帖子。1997 年的。",
-          "where": "screen:msgs"
+          "where": "screen:msgs:laozhou"
         },
         {
           "k": "speaker",

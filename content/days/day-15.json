@@ -10,7 +10,7 @@
         {
           "k": "narration",
           "t": "老板问：昨晚睡得好吗。梦见抽屉了吗。",
-          "where": "screen:msgs"
+          "where": "screen:msgs:boss"
         },
         {
           "k": "inner",
@@ -24,7 +24,7 @@
         {
           "k": "narration",
           "t": "输入框里有一行字，不是你打的。",
-          "where": "screen:msgs"
+          "where": "screen:msgs:family"
         },
         {
           "k": "speaker",
@@ -35,7 +35,7 @@
         {
           "k": "inner",
           "t": "家里的话，在我自己的输入框里。",
-          "where": "screen:msgs"
+          "where": "screen:msgs:family"
         }
       ]
     },
@@ -44,7 +44,7 @@
         {
           "k": "narration",
           "t": "群里一张图：一只凤凰。",
-          "where": "screen:msgs"
+          "where": "screen:msgs:group"
         }
       ]
     },

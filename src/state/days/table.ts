@@ -16,8 +16,23 @@ export type BeatName = (typeof BEAT_NAMES)[number];
  * there. `screen` is any desktop app; `screen:<app>` the desktop with that app in front; `night`
  * the night. No `where` = play where the trigger happened.
  */
-export const PLACES = ["room", "desk", "door", "night", "screen", "screen:msgs", "screen:workbench", "screen:browser"] as const;
-export type Place = (typeof PLACES)[number];
+const BASE_PLACES = ["room", "desk", "door", "night", "screen", "screen:msgs", "screen:workbench", "screen:browser"] as const;
+/**
+ * The third level (dialogue addition 2026-11-02): `screen:msgs:<conversation>` plays only while that
+ * conversation is the one open (in whichever app holds it), `screen:workbench:<page>` only while
+ * 工作台 shows that page. No falling back a level.
+ */
+export const MSGS_THREADS = ["boss", "partner", "group", "xiaozhang", "laozhou", "family", "clan"] as const;
+export const WORKBENCH_PLACES = ["home", "tasks", "docs", "code", "ledger", "tickets", "projects"] as const;
+export type Place =
+  | (typeof BASE_PLACES)[number]
+  | `screen:msgs:${(typeof MSGS_THREADS)[number]}`
+  | `screen:workbench:${(typeof WORKBENCH_PLACES)[number]}`;
+export const PLACES: readonly Place[] = [
+  ...BASE_PLACES,
+  ...MSGS_THREADS.map((id) => `screen:msgs:${id}` as const),
+  ...WORKBENCH_PLACES.map((p) => `screen:workbench:${p}` as const),
+];
 
 /** A backdrop is a photo under /room/dream/, a prop a cut-out under /room/props/ (dialogue addition 2026-11-02). */
 export const BACKDROP_DIR = "/room/dream/";
@@ -173,7 +188,9 @@ export function parseToken(raw: string, where: string): Token {
 
 /** A `where`: one of PLACES, nothing else. Exported for tests. */
 export function parsePlace(v: unknown, w: string, onFail: (where: string, problem: string) => never = fail): Place {
-  return (PLACES as readonly unknown[]).includes(v) ? (v as Place) : onFail(w, `unknown place ${JSON.stringify(v)} (one of ${PLACES.join(", ")})`);
+  return (PLACES as readonly unknown[]).includes(v)
+    ? (v as Place)
+    : onFail(w, `unknown place ${JSON.stringify(v)} (one of ${BASE_PLACES.join(", ")}, screen:msgs:<${MSGS_THREADS.join("|")}>, screen:workbench:<${WORKBENCH_PLACES.join("|")}>)`);
 }
 
 /** A path under `dir` made of plain file-name characters, one level deep: `/room/dream/classroom.jpg`. */

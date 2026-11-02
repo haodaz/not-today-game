@@ -9,7 +9,8 @@ import { createStore, type Store } from "@state/store";
 import type { BeatClock } from "@world/desktop/beat";
 import { bodyOf, splitSpeaker, transcriptOf } from "@world/desktop/messages/bubbles";
 import { sentReplies, SPEAKER_CONVERSATIONS, transcript, type Bubble } from "@world/desktop/messages/transcript";
-import { renderMessages } from "@world/desktop/messages/view";
+import { renderMessages, renderWorkMessages } from "@world/desktop/messages/view";
+import { appOfThread } from "@world/desktop/messages/threads";
 import { initialSession, type AppContext } from "@world/desktop/model";
 import { labelKey } from "@world/replies/labels";
 import { setLocale, stringIn, t } from "@world/i18n";
@@ -28,14 +29,17 @@ const bubblesOf = (store: Store, conversation: string, clock = late): Extract<Bu
   transcript({ conversation, state: store.getState(), replies: sentReplies(1, store.getEvents()), clock, progress: new Map() }).filter((b): b is Extract<Bubble, { kind: "msg" }> => b.kind === "msg");
 function render(store: Store, conversation: string, clock = late): string {
   const session = initialSession(clock, "left", "desktop");
-  session.conversation = conversation;
+  // The work conversations are in 工作台's 消息 pane, 家里 in 消息 (desktop-ui 2026-11-02, evening).
+  const work = appOfThread(conversation) === "workbench";
+  if (work) session.conversation = conversation;
+  else session.homeConversation = conversation;
   const ctx: AppContext = { state: store.getState(), events: store.getEvents(), startDay: 1, session, night: false, nowMs: 0 };
-  return renderMessages(ctx).body.value;
+  return work ? renderWorkMessages(ctx).pane.value : renderMessages(ctx).body.value;
 }
 /** The open conversation's bubbles only (not the list). */
 const messagesOf = (html: string) => {
   const from = html.indexOf('<div class="msgs">');
-  const to = html.indexOf('<div class="reply">');
+  const to = html.indexOf('<div class="reply');
   if (from < 0 || to < from) throw new Error("no open conversation in the markup");
   return html.slice(from, to);
 };
@@ -170,7 +174,7 @@ describe("爸妈 (family): the mother unprefixed, the father prefixed", () => {
     // In the conversation the prefix is gone (the name sits above the bubble); the list's preview keeps it.
     expect(messagesOf(out)).not.toContain("father：");
     expect(avatarsIn(out)).toContain(npcData.npcs.father!.avatar);
-    expect(out).toContain(`<div class="who">${t("msgs.father")} `);
+    expect(out).toContain(`<div class="who">${t("msgs.father")}</div>`);
   });
 
   it("an unprefixed line is the mother: the family NPC's avatar", () => {
@@ -186,10 +190,10 @@ describe("爸妈 (family): the mother unprefixed, the father prefixed", () => {
     const out = render(store, FAMILY);
     expect(t("msgs.mother")).toBe("妈");
     expect(t("msgs.father")).toBe("爸");
-    expect(out).toContain(`<div class="who">${t("msgs.mother")} `);
-    expect(out).toContain(`<div class="who">${t("msgs.father")} `);
+    expect(out).toContain(`<div class="who">${t("msgs.mother")}</div>`);
+    expect(out).toContain(`<div class="who">${t("msgs.father")}</div>`);
     // Never the group's name over a bubble; it stays on the row and the header.
-    expect(out).not.toContain(`<div class="who">${t("msgs.family")} `);
+    expect(out).not.toContain(`<div class="who">${t("msgs.family")}</div>`);
     expect(out).toContain(`<b>${t("msgs.family")}</b>`);
   });
 
@@ -200,9 +204,9 @@ describe("爸妈 (family): the mother unprefixed, the father prefixed", () => {
     expect(t("msgs.mother")).toBe("Mum");
     expect(t("msgs.father")).toBe("Dad");
     expect(t("msgs.family")).toBe("Mum & Dad");
-    expect(out).toContain(`<div class="who">Mum `);
-    expect(out).toContain(`<div class="who">Dad `);
-    expect(out).not.toContain(`<div class="who">Mum &amp; Dad `);
+    expect(out).toContain(`<div class="who">Mum</div>`);
+    expect(out).toContain(`<div class="who">Dad</div>`);
+    expect(out).not.toContain(`<div class="who">Mum &amp; Dad</div>`);
     expect(out).toContain(`<b>Mum &amp; Dad</b>`);
   });
 
@@ -210,7 +214,7 @@ describe("爸妈 (family): the mother unprefixed, the father prefixed", () => {
     setLocale("en");
     const store = storeAt(6);
     const out = render(store, FAMILY);
-    expect(out).toContain(`<div class="who">${t("msgs.father")} `);
+    expect(out).toContain(`<div class="who">${t("msgs.father")}</div>`);
     expect(out).toContain('<div class="voice">');
     expect(out).toContain("I mean if that thing of yours");
     expect(messagesOf(out)).not.toContain("(transcript)");
@@ -228,7 +232,9 @@ describe("相亲相爱一家人 (clan): relatives with silhouettes, in 家里 un
       expect(b.prefix).toBe(b.alias);
     }
     const out = render(store, CLAN);
-    for (const b of msgs) expect(out).toContain(`<div class="who">${b.alias} ${b.t}</div>`);
+    // WeChat: the name above the bubble, the time as a centred stamp between gaps.
+    for (const b of msgs) expect(out).toContain(`<div class="who">${b.alias}</div>`);
+    for (const time of new Set(msgs.map((b) => b.t))) expect(out).toContain(`<div class="stamp">${time}</div>`);
     expect(messagesOf(out)).not.toMatch(/(小姑|二舅|堂姐|大姨)：/);
   });
 
@@ -254,18 +260,20 @@ describe("相亲相爱一家人 (clan): relatives with silhouettes, in 家里 un
     for (const b of msgs) expect(npcData.silhouettes).toContain(silhouetteFor(b.alias!));
   });
 
-  it("the list: both groups under 家里, 爸妈 first, with the mother's face and a silhouette; the preview names who spoke", () => {
+  it("the list (消息): both groups, 爸妈 first, each a mosaic of who has spoken; the preview names who spoke", () => {
     const store = storeAt(1);
-    const out = render(store, "boss");
+    const out = render(store, FAMILY);
+    expect(out).not.toContain('data-conv="boss"');
     const family = out.indexOf('data-conv="family"');
     const clan = out.indexOf('data-conv="clan"');
-    expect(family).toBeGreaterThan(out.indexOf(t("msgs.section.family")));
+    expect(family).toBeGreaterThan(0);
     expect(clan).toBeGreaterThan(family);
     expect(out).toContain(`<b>${t("msgs.family")}</b>`);
     expect(out).toContain(`<b>${t("msgs.clan")}</b>`);
     const row = out.slice(clan, out.indexOf("</button>", clan));
-    expect(row).toContain(`src="${silhouetteFor("clan")}"`);
-    expect(out.slice(family, clan)).toContain(`src="${npcData.npcs.family!.avatar}"`);
+    // A group's face is a 3×3 mosaic of its members' faces (WeChat addition): the relatives' silhouettes.
+    expect(row).toContain('class="av mosaic"');
+    for (const b of bubblesOf(store, CLAN).slice(0, 9)) expect(row).toContain(`src="${silhouetteFor(b.alias!)}"`);
     // The preview carries the last speaker's prefix as written (the preview is of day 1 at 23:59).
     expect(row).toMatch(/<small>(大姨|二舅|堂姐|小姑|表弟|姥姥)：/);
   });

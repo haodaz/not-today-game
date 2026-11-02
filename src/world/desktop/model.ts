@@ -17,11 +17,13 @@ import { EMPTY_COLLECTION, type Collection } from "@world/room/collection";
 import { isNight, type BeatClock } from "./beat";
 import { weatherOf } from "@state/stages";
 import { dockFor } from "./dock";
+import { FEED } from "./messages/threads";
 import { fxPlan } from "../room/fx";
 import { desktopRing } from "./rings";
 import type { AppId, MonitorModel, ShellModel, Side } from "./shell";
 
-export type WorkbenchPage = "home" | "docs" | "ledger" | "code";
+/** 工作台's pages; `msgs` is its 消息 pane (the work conversations, desktop-ui 2026-11-02 evening). */
+export type WorkbenchPage = "home" | "docs" | "ledger" | "code" | "msgs";
 /**
  * The four camera levels (day-loop amendment): 房间 room, 桌子 desk (the close-up, where things
  * are picked up and the box is opened), 屏幕 "desktop" (the screens), 门 door.
@@ -53,6 +55,8 @@ export interface Session {
   dialogue: DialogueState;
   muted: boolean;
   phoneOpen: boolean;
+  /** The delivery app's page, cart and ratings (session only). */
+  phoneUi: PhoneUi;
   /** The ⚙ 设置 panel is open (day-loop amendment). */
   settingsOpen: boolean;
   /** Its last line as last seen, to notice a new one; undefined before the first look. */
@@ -105,8 +109,10 @@ export interface Session {
   loop: LoopMemo | null;
   /** The door beat in progress (the delivery door machine). */
   door: DoorBeat | null;
-  /** The open conversation in 消息. */
+  /** The open work conversation, in 工作台's 消息 pane (boss, partner, group, xiaozhang, laozhou). */
   conversation: string;
+  /** What 消息 (the personal app) has open: a 家里 conversation, or 朋友圈 (`FEED`). */
+  homeConversation: string;
   /** The chip chosen in the reply bar, waiting for 发送. */
   selected: string | null;
   /** What the player is typing in a `free` input. */
@@ -139,6 +145,26 @@ export interface Session {
   /** What a decoy click made Kuro say, and until when (ms): it shows in its pill; session only. */
   dockSay: { readonly text: string; readonly until: number } | null;
 }
+
+/**
+ * The delivery app's pages (delivery addition 2026-11-02): where the player is in it, the one item
+ * in the cart, and the ratings given. Session only: no event, no state; the order itself is still the
+ * one `order` event placed from the checkout.
+ */
+export interface PhoneUi {
+  /** The page chosen (the status page and a due rating are derived on top of it). */
+  page: "home" | "shop" | "checkout" | "rate";
+  shop: string | null;
+  /** The cart: one item (an order is one item). */
+  item: string | null;
+  /** The stars tapped on the rating page (0 = none yet). */
+  stars: number;
+  /** Meals rated this session (`d<day>:<meal>`); the shop's rating never changes. */
+  rated: string[];
+  /** The rating just given: 感谢您的评价 shows until the phone is put down. */
+  thanks: string | null;
+}
+export const initialPhoneUi = (): PhoneUi => ({ page: "home", shop: null, item: null, stars: 0, rated: [], thanks: null });
 
 /** What the hand knows this session (objects-in-hand). Programs restart each day. */
 export interface HandSession {
@@ -174,6 +200,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     dialogue: EMPTY_DIALOGUE,
     muted: false,
     phoneOpen: false,
+    phoneUi: initialPhoneUi(),
     settingsOpen: false,
     kuroLast: undefined,
     kuroRead: undefined,
@@ -202,6 +229,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     loop: null,
     door: null,
     conversation: "boss",
+    homeConversation: "family",
     selected: null,
     draft: "",
     inner: null,
@@ -222,6 +250,22 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
 /** The right monitor shows 工作台, unless the left one does; then it shows 消息. */
 export function rightApp(left: AppId): AppId {
   return left === "workbench" ? "msgs" : "workbench";
+}
+
+/** The app on the monitor being shown (desktop view), else null. */
+export function frontApp(s: Pick<Session, "view" | "focus" | "leftApp">): AppId | null {
+  return s.view === "desktop" ? (s.focus === "left" ? s.leftApp : rightApp(s.leftApp)) : null;
+}
+
+/**
+ * The conversation open in front: 消息's (not 朋友圈), or 工作台's when its 消息 pane is the page.
+ * Every conversation exists every day, so the session's id is what is shown.
+ */
+export function shownConversation(s: Pick<Session, "view" | "focus" | "leftApp" | "workbenchPage" | "conversation" | "homeConversation">): string | null {
+  const app = frontApp(s);
+  if (app === "msgs") return s.homeConversation === FEED ? null : s.homeConversation;
+  if (app === "workbench" && s.workbenchPage === "msgs") return s.conversation;
+  return null;
 }
 
 export interface AppContext {
@@ -249,6 +293,7 @@ const WB_PAGE_KEY: Record<WorkbenchPage, string> = {
   docs: "wb.nav.docs",
   ledger: "wb.nav.ledger",
   code: "wb.nav.code",
+  msgs: "wb.nav.msgs",
 };
 
 function monitorFor(app: AppId, side: Side, ctx: AppContext, apps: AppRenderers): { monitor: MonitorModel; badge: number } {

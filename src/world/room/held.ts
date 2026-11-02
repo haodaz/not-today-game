@@ -3,11 +3,10 @@
 // screen is the delivery app; an object's is a canvas at its channel's resolution, scaled by a
 // whole number, never smoothed (an upgraded object's is smooth: the new world). Clicking the dim
 // puts it down. Pure markup; the motion layer moves it from and back to its slot.
-import { deliveryTable, type Meal } from "@state/delivery/table";
 import type { GameEvent } from "@state/events";
 import type { State } from "@state/types.gen";
 import type { Session } from "@world/desktop/model";
-import { shopListView } from "@world/delivery/shops-view";
+import { renderPhoneApp } from "@world/delivery/app";
 import { cls, html, raw, type SafeHtml } from "@world/html";
 import { handOf, type KeySpot, type Reel, type Rect } from "@state/hands";
 import { CHICK_H, CHICK_W } from "@world/objects/frames";
@@ -19,7 +18,6 @@ import { envFor, peekState } from "@world/objects/index";
 import type { ObjectEnv } from "@world/objects/program";
 import { t, tr } from "@world/i18n";
 import { inDream } from "@state/nights";
-import { loopContext, mealToOrder } from "@world/loop/checklist";
 
 /** A dot-matrix cell (half-width) of the dictionary. */
 export const CELL_W = 6;
@@ -65,33 +63,11 @@ function dim(): SafeHtml {
   return html`<button type="button" class="held-dim" data-action="loop-put-down" aria-label="${t("hud.putDown")}"></button>`;
 }
 
-/** The window the phone shows when nothing can be ordered: the next one by the clock (lunch after dinner's). */
-export function nextWindow(time: string): Meal {
-  return (["lunch", "dinner"] as const).find((m) => time < deliveryTable.windows[m][1]) ?? "lunch";
-}
-
-/**
- * The delivery app: always the shop list, never a blank screen. Inside an ordering window the
- * open shops can be ordered from; otherwise every shop is greyed with the window's time.
- */
-function phoneApp(state: State, events: readonly GameEvent[], session: Session): SafeHtml {
-  const lc = loopContext(state, events);
-  const meal: Meal | null = lc ? mealToOrder(lc) : null;
-  const shown = meal ?? nextWindow(session.clock.time);
-  const [from, to] = deliveryTable.windows[shown];
-  const list = shopListView(state.day, shown);
-  const shops = list.shops.map((s) =>
-    !meal
-      ? html`<div class="shop off"><b>${s.name}</b><small>${from}–${to}</small></div>`
-      : s.open
-        ? html`<div class="shop"><b>${s.name}</b><small>${s.tag}</small>${s.items.map((it) => html`<button type="button" data-action="loop-order" data-meal="${meal}" data-shop="${s.id}" data-item="${it.id}"><span>${it.name}</span><span>¥${it.price}</span></button>`)}</div>`
-        : html`<div class="shop closed"><b>${s.name}</b>${s.closedKey ? html`<small>${tr(s.closedKey)}</small>` : null}</div>`,
-  );
-  return html`<h2>${tr(`delivery.window.${shown}`)} · ${from}–${to}</h2>${shops}`;
-}
+/** The window the phone shows when nothing can be ordered (the app's own rule). */
+export { nextWindow } from "@world/delivery/app";
 
 function phone(state: State, events: readonly GameEvent[], session: Session): SafeHtml {
-  return html`<div class="held phone" role="dialog" aria-label="${t("hud.phone")}"><div class="scr"><div class="top">${session.clock.time}</div><div class="app">${phoneApp(state, events, session)}</div><div class="home"></div></div></div>`;
+  return html`<div class="held phone" role="dialog" aria-label="${t("hud.phone")}"><div class="scr"><div class="top">${session.clock.time}</div><div class="app">${renderPhoneApp(state, events, session)}</div><div class="home"></div></div></div>`;
 }
 
 /** Dream state multiplies the screen's resolution; the drawn size stays (the steering: danger is resolution). */

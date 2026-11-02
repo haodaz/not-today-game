@@ -11,6 +11,7 @@ import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import { mountDesktop, type ActionContext } from "@world/desktop/controller";
 import { initialSession, type Session } from "@world/desktop/model";
 import { syncLoop } from "@world/loop/runtime";
+import { EMPTY_DIALOGUE } from "@world/loop/dialogue";
 import { createMotion } from "@world/motion/dom";
 import { CROSSFADE_MS, viewMoveMs } from "@world/motion/timing";
 import { t } from "@world/i18n";
@@ -541,6 +542,17 @@ describe("the real layer with a fake scene: look, and 床 held by the splat", ()
     expect(m.session.view).toBe("bed");
     await wait(viewMoveMs("room", "bed", true) + 250);
     expect(m.root.querySelector(".splat-layer")).not.toBeNull();
+    // The night is a story: it masks the stage and Esc only skips to its last line, never out of the
+    // bed (dialogue addition 2026-11-02).
+    if (m.root.querySelector(".story-mask")) {
+      window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+      await frame();
+      expect(m.session.view).toBe("bed");
+      const q = m.session.dialogue.queue[0]!;
+      expect(m.session.dialogue.line).toBe(q.lines.length - 1);
+      // This test is about the camera: the night is put away so Esc can step out.
+      m.session.dialogue = EMPTY_DIALOGUE;
+    }
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
     await frame();
     expect(m.session.view).toBe("room");

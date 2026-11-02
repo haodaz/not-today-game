@@ -43,7 +43,11 @@ describe("the loader", () => {
   });
 
   it("accepts every listed place on a line", () => {
-    expect(PLACES).toEqual(["room", "desk", "door", "night", "screen", "screen:msgs", "screen:workbench", "screen:browser"]);
+    expect(PLACES).toEqual([
+      "room", "desk", "door", "night", "screen", "screen:msgs", "screen:workbench", "screen:browser",
+      ...["boss", "partner", "group", "xiaozhang", "laozhou", "family", "clan"].map((id) => `screen:msgs:${id}`),
+      ...["home", "tasks", "docs", "code", "ledger", "tickets", "projects"].map((p) => `screen:workbench:${p}`),
+    ]);
     for (const where of PLACES) expect(parseDayFile(base({ where }), "day-03.json").beats.boot!.say[0]!.where, where).toBe(where);
   });
 
@@ -132,7 +136,8 @@ describe("matching", () => {
     const store = atDay(1);
     const left = ctxOf(store, "desktop");
     left.session.leftApp = "msgs";
-    expect(hereOf(left.session)).toEqual({ view: "desktop", app: "msgs", night: false });
+    // 消息 in front: its open conversation (家里's 爸妈 by default) is the third level.
+    expect(hereOf(left.session)).toEqual({ view: "desktop", app: "msgs", night: false, conversation: "family", page: null });
     left.session.focus = "right"; // the right monitor shows the other app
     expect(hereOf(left.session).app).toBe("workbench");
     left.session.leftApp = "workbench";
@@ -359,10 +364,17 @@ describe("a real day: day 7 boot, the room line first, the 老板 line only afte
   }
   const box = (ctx: ActionContext) => dialogueBox(ctx.store.getState(), ctx.store.getEvents(), ctx.session)?.value ?? null;
 
-  it("plays the first line in the room, then closes; the next two come with the screen", () => {
+  /** Into 屏幕, then 工作台's 消息 pane, where the boss's conversation is open by default. */
+  const toBoss = (ctx: ActionContext) => {
+    act(ctx, "view", { view: "desktop", screen: "left" });
+    act(ctx, "dock", { app: "workbench" });
+    act(ctx, "wb-nav", { page: "msgs" });
+  };
+
+  it("plays the first line in the room, then closes; the next two come with the boss's conversation", () => {
     const { ctx } = boot();
     const seq = dayFiles.get(7)!.beats.boot!;
-    expect(seq.say.map((l) => l.where)).toEqual([undefined, "screen", "screen"]);
+    expect(seq.say.map((l) => l.where)).toEqual([undefined, "screen:msgs:boss", "screen"]);
     expect(onShow(ctx)).toBe(seq.say[0]!.t);
     const room = box(ctx);
     expect(room).toContain(seq.say[0]!.t);
@@ -375,6 +387,10 @@ describe("a real day: day 7 boot, the room line first, the 老板 line only afte
 
     act(ctx, "view", { view: "desktop", screen: "left" });
     syncLoop(ctx);
+    // 消息 (家里) is in front: the boss's line keeps waiting; no falling back to `screen:msgs`.
+    expect(onShow(ctx)).toBeNull();
+    act(ctx, "dock", { app: "workbench" });
+    act(ctx, "wb-nav", { page: "msgs" });
     expect(onShow(ctx)).toBe(seq.say[1]!.t);
     const screen = box(ctx);
     expect(screen).toContain("老板");
@@ -391,11 +407,102 @@ describe("a real day: day 7 boot, the room line first, the 老板 line only afte
     const { ctx } = boot();
     const seq = dayFiles.get(7)!.beats.boot!;
     act(ctx, "loop-advance");
-    act(ctx, "view", { view: "desktop", screen: "left" });
+    toBoss(ctx);
     expect(onShow(ctx)).toBe(seq.say[1]!.t);
     act(ctx, "view", { view: "room" });
     expect(onShow(ctx)).toBeNull();
+    // Back in, 工作台 still in front on its 消息 pane with the boss open.
     act(ctx, "view", { view: "desktop", screen: "left" });
     expect(onShow(ctx)).toBe(seq.say[1]!.t);
+  });
+});
+
+describe("the third level: screen:msgs:<conversation>, screen:workbench:<page>", () => {
+  const base = (where: unknown) => ({ day: 3, beats: { boot: { say: [{ k: "narration", t: "a", where }] } }, items: [], delivery: { minMinutes: 1, waitMinutes: 2 } });
+
+  it("the loader accepts every listed third level and rejects any other", () => {
+    for (const where of ["screen:msgs:boss", "screen:msgs:clan", "screen:workbench:docs", "screen:workbench:tasks", "screen:browser"]) {
+      expect(parseDayFile(base(where), "day-03.json").beats.boot!.say[0]!.where).toBe(where);
+    }
+    for (const where of ["screen:msgs:mom", "screen:msgs:", "screen:workbench:msgs", "screen:workbench:Docs", "screen:browser:news", "screen:msgs:boss:x", "room:desk"]) {
+      expect(() => parseDayFile(base(where), "day-03.json"), where).toThrow(/unknown place/);
+    }
+  });
+
+  it("matches exactly, in whichever app holds the conversation; never one level up", () => {
+    const h = (app: string, conversation: string | null, page: string | null = null): Here => ({ view: "desktop", app, night: false, conversation, page });
+    expect(placeMatches("screen:msgs:boss", h("workbench", "boss", "msgs"))).toBe(true);
+    expect(placeMatches("screen:msgs:clan", h("msgs", "clan"))).toBe(true);
+    expect(placeMatches("screen:msgs:boss", h("msgs", "clan"))).toBe(false);
+    expect(placeMatches("screen:msgs:boss", h("msgs", null))).toBe(false); // the 消息 list, 朋友圈
+    expect(placeMatches("screen:msgs:boss", h("workbench", null, "home"))).toBe(false);
+    expect(placeMatches("screen:msgs:boss", { view: "desk", app: null, night: false })).toBe(false);
+    expect(placeMatches("screen:workbench:docs", h("workbench", null, "docs"))).toBe(true);
+    expect(placeMatches("screen:workbench:docs", h("workbench", null, "home"))).toBe(false);
+    expect(placeMatches("screen:workbench:docs", h("msgs", "family"))).toBe(false);
+    // The second level still matches its app, whatever is open in it (and `screen:msgs` 工作台's 消息 pane too).
+    expect(placeMatches("screen:msgs", h("msgs", "clan"))).toBe(true);
+    expect(placeMatches("screen:msgs", h("workbench", "boss", "msgs"))).toBe(true);
+    expect(placeMatches("screen:msgs", h("workbench", null, "docs"))).toBe(false);
+    expect(placeMatches("screen:workbench", h("workbench", "boss", "msgs"))).toBe(true);
+  });
+
+  it("hereOf reads the open conversation and 工作台's page from the session", () => {
+    const ctx = ctxOf(atDay(1), "desktop");
+    ctx.session.leftApp = "workbench";
+    expect(hereOf(ctx.session)).toMatchObject({ app: "workbench", page: "home", conversation: null });
+    ctx.session.workbenchPage = "msgs";
+    expect(hereOf(ctx.session)).toMatchObject({ app: "workbench", page: "msgs", conversation: "boss" });
+    ctx.session.leftApp = "msgs";
+    ctx.session.homeConversation = "clan";
+    expect(hereOf(ctx.session)).toMatchObject({ app: "msgs", page: null, conversation: "clan" });
+    ctx.session.homeConversation = "feed";
+    expect(hereOf(ctx.session).conversation).toBeNull();
+  });
+
+  function onDesktop() {
+    const store = atDay(1);
+    store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
+    return ctxOf(store, "desktop");
+  }
+
+  it("a screen:msgs:boss line waits in screen:msgs:clan and plays on switching back", () => {
+    const ctx = onDesktop();
+    ctx.session.leftApp = "workbench";
+    ctx.session.workbenchPage = "msgs";
+    act(ctx, "conv", { conv: "boss" });
+    ctx.session.dialogue = push(ctx.session.dialogue, item("b", [line("about the boss", "screen:msgs:boss")]));
+    settleSession(ctx.session);
+    expect(onShow(ctx)).toBe("about the boss");
+    // To 消息's 相亲相爱一家人: the line is taken back and waits.
+    act(ctx, "dock", { app: "msgs" });
+    act(ctx, "conv", { conv: "clan" });
+    expect(onShow(ctx)).toBeNull();
+    expect(waitingKeys(ctx)).toEqual(["b"]);
+    // Another work conversation is not the boss either.
+    act(ctx, "dock", { app: "workbench" });
+    act(ctx, "conv", { conv: "partner" });
+    expect(onShow(ctx)).toBeNull();
+    act(ctx, "conv", { conv: "boss" });
+    expect(onShow(ctx)).toBe("about the boss");
+  });
+
+  it("a screen:workbench:docs line waits on 工作台's home and plays on 文档", () => {
+    const ctx = onDesktop();
+    act(ctx, "dock", { app: "workbench" });
+    ctx.session.dialogue = push(ctx.session.dialogue, item("d", [line("in the document", "screen:workbench:docs")]));
+    settleSession(ctx.session);
+    expect(onShow(ctx)).toBeNull();
+    act(ctx, "wb-nav", { page: "docs" });
+    expect(onShow(ctx)).toBe("in the document");
+    act(ctx, "wb-nav", { page: "home" });
+    expect(onShow(ctx)).toBeNull();
+  });
+
+  it("every third-level `where` in the day files names a conversation or page that exists", () => {
+    for (const file of dayFiles.values()) {
+      const seqs = [...Object.values(file.beats), ...file.items.flatMap((i) => [i.onUnlock, i.onDone])];
+      for (const seq of seqs) for (const l of seq?.say ?? []) if (l.where?.split(":").length === 3) expect(PLACES).toContain(l.where);
+    }
   });
 });

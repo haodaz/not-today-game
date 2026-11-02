@@ -10,7 +10,7 @@
         {
           "k": "narration",
           "t": "老板说：今天把箱子寄了吧。",
-          "where": "screen:msgs"
+          "where": "screen:msgs:boss"
         },
         {
           "k": "inner",

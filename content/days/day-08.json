@@ -10,7 +10,7 @@
         {
           "k": "narration",
           "t": "老板只收到两份。另外四份，你的电脑上也没有了。",
-          "where": "screen"
+          "where": "screen:msgs:boss"
         },
         {
           "k": "inner",

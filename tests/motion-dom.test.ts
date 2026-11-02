@@ -121,6 +121,16 @@ describe("the live DOM after a render (fix 2026-10-31)", () => {
       expect(root.querySelectorAll(".m-backdrop").length, `${what} (after)`).toBe(0);
       expect(root.querySelector(".stage.m-nobg"), `${what} (after)`).toBeNull();
     }
+    // Opening 消息 told a story (day 1's two lines): it masks the stage, and Esc under it only skips to
+    // its last line (dialogue addition 2026-11-02). Read it off first.
+    // (The first click on a line still appearing completes it; the next reads on.)
+    // (A leaving box may linger as a ghost, which takes no clicks: only the live mask counts.)
+    const liveMask = () => [...root.querySelectorAll<HTMLElement>(".story-mask")].find((el) => !el.closest(".m-ghost")) ?? null;
+    for (let i = 0; i < 30 && liveMask(); i++) {
+      liveMask()!.click();
+      await frame();
+    }
+    expect(liveMask()).toBeNull();
     // 屏幕 → 桌子 → 房间 → 门 → 房间 by Esc and by pointing (the door's proxy).
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
     await frame();

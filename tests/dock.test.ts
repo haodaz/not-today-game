@@ -53,7 +53,8 @@ describe("the dock is icons", () => {
   it("the open app follows leftApp; the other monitor's tab keeps its text", () => {
     const page = shown(1, {}, "browser");
     expect(dockOf(page)).toContain('class="app feed on" data-action="dock" data-app="browser"');
-    expect(page).toContain(`<span class="tab-app docs">${t("dock.workbench")}</span>`);
+    // Its text, and (since the work conversations live in 工作台) their unread count after it.
+    expect(page).toMatch(new RegExp(`<span class="tab-app docs">${t("dock.workbench")}(<b>\\d+</b>)?</span>`));
   });
 
   it("the icon files exist", () => {

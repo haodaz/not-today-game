@@ -10,7 +10,7 @@
         {
           "k": "narration",
           "t": "老板说：你今天真漂亮。",
-          "where": "screen:msgs"
+          "where": "screen:msgs:boss"
         },
         {
           "k": "inner",

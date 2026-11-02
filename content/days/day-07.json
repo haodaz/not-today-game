@@ -10,7 +10,7 @@
         {
           "k": "narration",
           "t": "老板叫了你的名字。登录框那一栏，只有你一个人敲过。",
-          "where": "screen"
+          "where": "screen:msgs:boss"
         },
         {
           "k": "inner",

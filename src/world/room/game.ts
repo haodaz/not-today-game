@@ -19,11 +19,13 @@ import { shellActions, type ActionContext, type ActionHandler } from "@world/des
 import { buildShell, rightApp, VIEWS, type Session, type View } from "@world/desktop/model";
 import { renderDesktop, type AppId } from "@world/desktop/shell";
 import { placeOrder } from "@world/delivery/commands";
+import { phonePage } from "@world/delivery/app";
 import { nextInputs, startDoor, stepDoor, type DoorInput } from "@world/delivery/door";
 import { doorLines } from "@world/delivery/view";
 import { mealView } from "@world/delivery/meals";
-import { html, type SafeHtml } from "@world/html";
+import { cls, html, type SafeHtml } from "@world/html";
 import { setLocale, t, tr } from "@world/i18n";
+import { skipToLast, storyMasked } from "@world/dialogue/mask";
 import { handOf } from "@state/hands";
 import { handStep } from "@world/objects/hand";
 import { pressKey } from "@world/objects/index";
@@ -61,12 +63,21 @@ export function renderGame(store: Store, session: Session, nowMs: number): SafeH
     const shell = buildShell(state, events, session, desktopApps, nowMs, store.getStartDay());
     // Work-task narration and the conversation with Kuro play in the dialogue box over the desktop too.
     const dlg = dialogueBox(state, events, session, nowMs);
-    return html`${renderDesktop(shell)}<button type="button" class="back-room" data-action="view" data-view="room">${tr("desktop.back")}</button>${dlg ? html`<div class="dlg-layer">${dlg}</div>` : null}<div class="hud-host">${settingsButton()}${itemsButton(session)}${itemsPanel(state, events, session)}<div class="hud-br">${hudKuro({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs })}</div>${settingsPanel(session)}</div>`;
+    return html`${renderDesktop(shell)}<button type="button" class="back-room" data-action="view" data-view="room">${tr("desktop.back")}</button>${dlgLayer(dlg, session)}<div class="hud-host">${settingsButton()}${itemsButton(session)}${itemsPanel(state, events, session)}<div class="hud-br">${hudKuro({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs })}</div>${settingsPanel(session)}</div>`;
   }
   // The box does not jump (dialogue correction 2026-11-02): in every view it is anchored to the
-  // viewport in the same fixed layer, not to the stage (whose size differs between views).
+  // viewport in the same fixed layer, not to the stage (whose size differs between views). The
+  // settings panel sits above it, in a fixed layer of its own after the box (2026-11-02).
   const dlg = dialogueBox(state, events, session, nowMs);
-  return html`${renderRoom({ state, events, session, startDay: store.getStartDay(), nowMs, boxOutside: true })}${dlg ? html`<div class="dlg-layer">${dlg}</div>` : null}`;
+  const settings = settingsPanel(session);
+  return html`${renderRoom({ state, events, session, startDay: store.getStartDay(), nowMs, boxOutside: true })}${dlgLayer(dlg, session)}${settings ? html`<div class="hud-host">${settings}</div>` : null}`;
+}
+
+/** The box's fixed layer; a story's mask under the box dims and holds the stage (dialogue addition 2026-11-02). */
+function dlgLayer(dlg: SafeHtml | null, session: Session): SafeHtml | null {
+  if (!dlg) return null;
+  const mask = storyMasked(session.dialogue) ? html`<div class="story-mask" data-action="loop-advance" aria-hidden="true"></div>` : null;
+  return html`<div class="${cls("dlg-layer", mask !== null && "masked")}">${mask}${dlg}</div>`;
 }
 
 /** The app on the monitor being shown. */
@@ -306,6 +317,8 @@ export const loopActions: Record<string, ActionHandler> = {
   "wb-nav"(ctx, data, el) {
     workbenchActions["wb-nav"]!(ctx, data, el);
     cancelCloser(ctx.session);
+    // Another page is another place (`screen:workbench:<page>`, `screen:msgs:<id>` in its 消息 pane).
+    if (settleSession(ctx.session)) ctx.rerender();
     if (ctx.session.workbenchPage !== "docs") return;
     const lc = loopContext(ctx.store.getState(), ctx.store.getEvents());
     const task = lc ? openTask(lc) : null;
@@ -412,6 +425,8 @@ export const loopActions: Record<string, ActionHandler> = {
   // 老周的事: the loan is answered in 老周's conversation; opening it brings the prompt up.
   conv(ctx, data, el) {
     messageActions.conv!(ctx, data, el);
+    // Another conversation is another place (`screen:msgs:<id>`).
+    if (settleSession(ctx.session)) ctx.rerender();
     if (data.conv !== LOAN_CONVERSATION || ctx.session.conversation !== LOAN_CONVERSATION) return;
     if (!openFor(ctx, (e) => e.type === "loanDecided")) return;
     const day = ctx.store.getState().day;
@@ -501,6 +516,12 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.rerender();
   },
 
+  // 朋友圈: leaving a conversation for the feed is another place too.
+  feed(ctx, data, el) {
+    messageActions.feed!(ctx, data, el);
+    if (settleSession(ctx.session)) ctx.rerender();
+  },
+
   // 道具 (day-loop correction 2026-11-01): the strip as a panel over the current view.
   "items-toggle"(ctx) {
     ctx.session.itemsOpen = !ctx.session.itemsOpen;
@@ -524,6 +545,8 @@ export const loopActions: Record<string, ActionHandler> = {
     const { session, store } = ctx;
     fromItemsPanel(ctx);
     session.phoneOpen = !session.phoneOpen;
+    // The app opens on its home page (the status and a due rating show over it by themselves).
+    Object.assign(session.phoneUi, { page: "home", shop: null, item: null, stars: 0, thanks: null });
     session.holding = null;
     restHand(session);
     // Picking up the phone for a meal moves the beat clock into that meal's window.
@@ -618,9 +641,52 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.rerender();
   },
 
+  // The delivery app's pages (delivery addition 2026-11-02): session only, no event. The order
+  // itself is still `loop-order`, from the checkout's 下单.
+  "phone-shop"(ctx, data) {
+    Object.assign(ctx.session.phoneUi, { page: "shop", shop: data.shop ?? null, item: null });
+    ctx.rerender();
+  },
+  "phone-add"(ctx, data) {
+    const ui = ctx.session.phoneUi;
+    // An order is one item: the cart holds one; tapping it again takes it out.
+    ui.item = ui.item === data.item ? null : (data.item ?? null);
+    ctx.rerender();
+  },
+  "phone-checkout"(ctx) {
+    if (ctx.session.phoneUi.item) ctx.session.phoneUi.page = "checkout";
+    ctx.rerender();
+  },
+  "phone-back"(ctx) {
+    const ui = ctx.session.phoneUi;
+    ui.page = ui.page === "checkout" ? "shop" : "home";
+    if (ui.page === "home") ui.shop = null;
+    ctx.rerender();
+  },
+  "phone-rate"(ctx) {
+    ctx.session.phoneUi.page = "rate";
+    ctx.rerender();
+  },
+  "phone-star"(ctx, data) {
+    const n = Number(data.n);
+    if (Number.isInteger(n) && n >= 1 && n <= 5) ctx.session.phoneUi.stars = n;
+    ctx.rerender();
+  },
+  // A remark sends the rating: 感谢您的评价; the shop's rating does not change; nothing is logged.
+  "phone-remark"(ctx) {
+    const { session, store } = ctx;
+    const page = phonePage(store.getState(), store.getEvents(), session);
+    if (page.kind !== "rate" || page.thanks) return;
+    session.phoneUi.rated.push(page.key);
+    session.phoneUi.thanks = page.key;
+    session.phoneUi.page = "home";
+    ctx.rerender();
+  },
+
   "loop-order"(ctx, data) {
     placeOrder(ctx.store, { meal: data.meal as Meal, shopId: data.shop!, itemId: data.item!, now: ctx.session.clock.time });
     ctx.session.phoneOpen = false;
+    Object.assign(ctx.session.phoneUi, { page: "home", shop: null, item: null });
     ctx.rerender();
   },
 
@@ -771,6 +837,20 @@ export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
   }
   if (e.key === "Escape" && ctx.session.settingsOpen) {
     loopActions["settings-close"]!(ctx, {} as DOMStringMap, null as never);
+    return true;
+  }
+  // A story on (dialogue addition 2026-11-02): Esc skips to its last line, never past it; nothing
+  // under the mask (the held thing, the camera) answers meanwhile.
+  if (e.key === "Escape" && storyMasked(ctx.session.dialogue)) {
+    const skipped = skipToLast(ctx.session.dialogue)!;
+    if (skipped !== ctx.session.dialogue) {
+      logCurrent(ctx.session, ctx.store.getState());
+      ctx.session.dialogue = skipped;
+      ctx.session.reveal = null;
+      // The last line may belong elsewhere: it waits there like any other.
+      settleSession(ctx.session);
+      ctx.rerender();
+    }
     return true;
   }
   if (e.key === "Escape" && talking(ctx.session.dialogue)) {

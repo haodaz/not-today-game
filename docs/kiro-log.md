@@ -955,3 +955,53 @@ Checked in a real browser: Chrome headless (new) with SwiftShader WebGL2, `npm r
   - the new anchor snapshot: item 5.
   Nothing else changed.
 - Other test updates: polish door test (spots in order, no list, the arrival line); desk test (the box hands you the object, 放下 from the box); dialogue and motion-dom (the box's layer); sound player tests run with `rain: 0` for bed/track mechanics, plus their own rain-bed test. New: `tests/weather.test.ts`.
+
+## 2026-11-02 (late): where third level, story mask, delivery app, work/home split, WeChat look, settings above the box
+
+Tree 0a74ca6 plus Claude's uncommitted content (third-level `where` values, Vivi, `msgs.partner.role`, `wb.nav.msgs/approvals/contacts`, `delivery.*` strings). No content edited. tsc clean; vitest 77 files / 1394 tests green.
+
+1. **where third level** (`state/days/table.ts`, `loop/dialogue.ts`, `dialogue/place.ts`, `game.ts`):
+   - `PLACES` now lists `screen:msgs:<boss|partner|group|xiaozhang|laozhou|family|clan>` and `screen:workbench:<home|tasks|docs|code|ledger|tickets|projects>` besides the old values (`Place` is a template-literal union). Anything else rejects, e.g. `screen:msgs:mom`, `screen:workbench:msgs`, `screen:browser:x`.
+   - `Here` gains `conversation` (the one open in front: 消息's, or 工作台's 消息 pane) and `page` (工作台's page).
+   - Third-level lines match only exactly, never one level up: a `screen:msgs:boss` line does not play on the 消息 list, in 朋友圈 or in another conversation.
+   - Decision: `screen:msgs:<id>` means "that conversation open, in whichever app holds it", so the boss lines play in 工作台's 消息 pane.
+   - Decision: the second level `screen:msgs` now also matches 工作台's 消息 pane. The content's `screen:msgs` lines are about the work threads (day 1 "老板的消息又在最上面", day 17 after the boss line).
+   - The `conv`, `feed` and `wb-nav` actions settle the dialogue.
+2. **Story mask** (`dialogue/mask.ts`, `controller.ts`, `game.ts`, `room.css`):
+   - `storyMasked(d)` is true while the queue head has ≥ 2 lines, is not Kuro's talk and its choices are not showing. It is derived, never stored.
+   - `.story-mask` (rgba(0,0,0,.4), `data-action="loop-advance"`) sits in the `.dlg-layer` under the box, so a click on it reads on.
+   - The controller wraps every action: under the mask only `MASK_ALLOWS` answers (reading on, choices, history, settings, mute, ending pages). Clicks, the nav layer and the motion layer all go through this map.
+   - Esc under the mask jumps to the last line, then does nothing more (never past it, no camera move).
+   - Decision: Kuro's conversation is not masked (its player's box is its own modality).
+3. **Delivery app** (`state/delivery/table.ts`, `delivery/shops-view.ts`, new `delivery/app.ts`, `room/held.ts`, `game.ts`, `model.ts` `PhoneUi`, `room.css`):
+   - Loader: optional `rating` (0–5), `eta` (whole minutes > 0) and `fee` (≥ 0) per shop; optional top-level `address` and `card`. Missing values render as "—".
+   - Pages: home (search, food-cut-out chips, shop cards with the drift rules) → shop (header photo, rows, + / count, sticky 去结算 · ¥) → checkout (address, item, fee, card, total, 下单 = the unchanged `loop-order`).
+   - Status: the 5-step strip, evenly between the order time and `arrivesAt`; shown whenever an ordered meal is waiting or at the door.
+   - Rating: offered only once the meal is picked up. Five stars and three remarks; a remark gives 感谢您的评价. Day 17 has one remark and five stars set. Session only, no event.
+4. **Work / home split** (new `messages/threads.ts`, `messages/view.ts`, `messages/actions.ts`, `workbench/view.ts`, `model.ts`):
+   - By recipient: boss, partner, group, xiaozhang and laozhou go in 工作台's new 消息 pane (rail 消息 / 工作台 / 文档 / 审批 / 通讯录; 审批 and 通讯录 have no page yet). family and clan go in 消息, with 朋友圈.
+   - Session: `conversation` is the work thread; new `homeConversation` (default family, or `feed`).
+   - The reply-bar buttons carry `data-conv`; `send` ignores a chip that is not in that conversation's menu.
+   - DingTalk register: 已读/未读 under the player's message, DING on the boss's voice, task-card look.
+   - Badges: 消息 counts only home threads; 工作台 counts its jobs plus the work threads' unread.
+   - No 老周 private thread exists in content, so 老周 is in 工作台 only.
+5. **WeChat look** (`messages/view.ts`, `desktop.css`):
+   - List: 48 px avatars with a 3×3 mosaic for groups, a red dot on the corner (count only when > 1), time, the green selected row, search with ⊕.
+   - Conversation: head with 「名 (N)」 (who has spoken + you, shown once anyone has) and three glyphs; names above bubbles in groups; centred time stamps.
+   - Composer: five-glyph toolbar, tall input, grey Send.
+   - 朋友圈 is an empty feed column: content has no feed entries yet.
+6. **Settings above the box** (`game.ts`, `hud.ts`, `room.css`): in 房间 / 桌子 / 门 / 床 the panel is drawn in a fixed `.hud-host` after the `.dlg-layer` (z 50 > 30), as on 屏幕.
+- **Snapshots** (backed up first, compared entry by entry after `-u`):
+  - where: two entries renamed (the test now opens the boss's conversation), content identical.
+  - dock, late-days, desktop browser/workbench: the 消息 badge split (old = new 消息 + 工作台 in each), the 工作台 tab count, the rail.
+  - desktop 消息: the WeChat markup with 家里 instead of the boss.
+  - New: delivery-app, story-mask, work-home-split.
+  - Nothing else changed.
+- **Other test updates:**
+  - desktop-messages and messages-groups: the work threads render through `renderWorkMessages`; WeChat names have no time beside them; the clan row is a mosaic.
+  - desktop-apps: the 工作台 badge.
+  - dock: the tab text.
+  - polish: the order goes through the pages.
+  - motion-dom: reads the story off before Esc.
+  - navigation: Esc under the night story stays in bed.
+- **For Claude:** `wb.msgs.ding` and `wb.msgs.unread` strings (the pill and 未读 are hidden until they exist); the rider's name; 朋友圈 entries; the shop numbers, address and card. Day 1's item "msgs" (`event:openApp:msgs`, "老板的消息又在最上面") now opens 消息, where the boss no longer is.

@@ -10,7 +10,7 @@
         {
           "k": "narration",
           "t": "老板说：今天没什么事，你歇一歇。",
-          "where": "screen:msgs"
+          "where": "screen:msgs:boss"
         },
         {
           "k": "inner",
@@ -24,12 +24,12 @@
         {
           "k": "narration",
           "t": "合伙人发了一张风景。第一次不是工作卡片。",
-          "where": "screen:msgs"
+          "where": "screen:msgs:partner"
         },
         {
           "k": "narration",
           "t": "老周：保重。",
-          "where": "screen:msgs"
+          "where": "screen:msgs:laozhou"
         }
       ]
     },

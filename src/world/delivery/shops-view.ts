@@ -11,6 +11,8 @@ export interface ItemView {
   readonly id: string;
   readonly name: string;
   readonly price: number;
+  /** Its cut-out under public/ ("food/hmj" → /food/hmj.png), or null. */
+  readonly sprite: string | null;
 }
 
 export interface ShopView {
@@ -23,6 +25,10 @@ export interface ShopView {
   readonly items: readonly ItemView[];
   readonly extra: boolean;
   readonly typo: boolean;
+  /** The app card's numbers (content; null until Claude adds them). */
+  readonly rating: number | null;
+  readonly eta: number | null;
+  readonly fee: number | null;
 }
 
 export interface ShopListView {
@@ -67,9 +73,12 @@ export function shopListView(day: number, meal: Meal): ShopListView {
       tag: e.shop.tag,
       open: e.open,
       closedKey: e.open || e.extra ? null : SHOP_CLOSED_KEY,
-      items: e.items.map((it) => ({ id: it.id, name: it.name, price: it.price })),
+      items: e.items.map((it) => ({ id: it.id, name: it.name, price: it.price, sprite: it.sprite ?? null })),
       extra: e.extra,
       typo,
+      rating: e.shop.rating ?? null,
+      eta: e.shop.eta ?? null,
+      fee: e.shop.fee ?? null,
     };
   });
 

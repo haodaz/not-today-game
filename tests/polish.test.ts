@@ -226,7 +226,9 @@ describe("held phone and objects (FR1)", () => {
     const app = out.slice(out.indexOf('<div class="app">'));
     const [from, to] = deliveryTable.windows[nextWindow(ctx.session.clock.time)];
     expect(app).toContain(`${from}–${to}</h2>`);
-    expect((app.match(/class="shop off"/g) ?? []).length).toBe(shopListView(1, nextWindow(ctx.session.clock.time)).shops.length);
+    // The app's home (delivery addition 2026-11-02): every shop as a card, greyed.
+    expect((app.match(/class="d-card off"/g) ?? []).length).toBe(shopListView(1, nextWindow(ctx.session.clock.time)).shops.length);
+    expect(app).not.toContain('data-action="phone-shop"');
     expect(app).not.toContain('data-action="loop-order"');
   });
 
@@ -236,9 +238,15 @@ describe("held phone and objects (FR1)", () => {
     store.appendEvent({ kind: "step", name: "openApp:msgs", t: "09:03" });
     const { ctx } = fakeCtx(store);
     loopActions["loop-phone"]!(ctx, none, null as never);
-    const out = renderRoom({ state: store.getState(), events: store.getEvents(), session: ctx.session }).value;
-    expect(out).toContain('data-action="loop-order"');
-    expect(out).not.toContain('class="shop off"');
+    const render = () => renderRoom({ state: store.getState(), events: store.getEvents(), session: ctx.session }).value;
+    // Home → a shop → add → 去结算 → the checkout's 下单 is the order (delivery addition 2026-11-02).
+    expect(render()).toContain('data-action="phone-shop"');
+    expect(render()).not.toContain('class="d-card off"');
+    const shop = shopListView(1, "lunch").shops.find((s) => s.open)!;
+    loopActions["phone-shop"]!(ctx, { shop: shop.id } as DOMStringMap, null as never);
+    loopActions["phone-add"]!(ctx, { item: shop.items[0]!.id } as DOMStringMap, null as never);
+    loopActions["phone-checkout"]!(ctx, none, null as never);
+    expect(render()).toContain(`data-action="loop-order" data-meal="lunch" data-shop="${shop.id}" data-item="${shop.items[0]!.id}"`);
   });
 
   it("Esc puts it down before it leaves the view", () => {

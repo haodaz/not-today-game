@@ -10,7 +10,7 @@
         {
           "k": "narration",
           "t": "更新日志：Kuro now speaks your language。",
-          "where": "screen"
+          "where": "screen:workbench:docs"
         },
         {
           "k": "inner",

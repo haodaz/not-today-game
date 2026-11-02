@@ -120,12 +120,23 @@ export interface Here {
   /** The app in front on the monitor being shown (desktop only). */
   readonly app: string | null;
   readonly night: boolean;
+  /**
+   * The conversation open in front (third level, dialogue addition 2026-11-02): 消息's, or 工作台's
+   * when its 消息 pane is the page. Null elsewhere (朋友圈, another page, another app). Absent = null.
+   */
+  readonly conversation?: string | null;
+  /** 工作台's page when 工作台 is in front (`msgs` is its 消息 pane); absent = null. */
+  readonly page?: string | null;
 }
 
 /**
- * Does a line with this `where` play here? No `where`: anywhere. `screen` matches any desktop app,
- * `screen:<app>` the desktop with that app in front (either monitor); the others their view;
- * `night` the night.
+ * Does a line with this `where` play here? No `where`: anywhere. `screen` matches any desktop app.
+ * `screen:msgs` matches a messages surface in front: 消息, or 工作台's 消息 pane (the work
+ * conversations moved there; the content's `screen:msgs` lines are about them). `screen:workbench`
+ * and `screen:browser` match that app in front (any page). The third level matches only exactly:
+ * `screen:msgs:<id>` while that conversation is open in whichever app holds it,
+ * `screen:workbench:<page>` while 工作台 shows that page; never one level up. The others their
+ * view; `night` the night.
  */
 export function placeMatches(where: Place | undefined, here: Here): boolean {
   switch (where) {
@@ -139,8 +150,17 @@ export function placeMatches(where: Place | undefined, here: Here): boolean {
       return here.night;
     case "screen":
       return here.view === "desktop";
-    default:
+    case "screen:msgs":
+      return here.view === "desktop" && (here.app === "msgs" || (here.app === "workbench" && here.page === "msgs"));
+    case "screen:workbench":
+    case "screen:browser":
       return here.view === "desktop" && here.app === where.slice("screen:".length);
+    default: {
+      if (here.view !== "desktop") return false;
+      const [, app, sub] = where.split(":");
+      if (app === "msgs") return (here.conversation ?? null) === sub;
+      return here.app === "workbench" && (here.page ?? null) === sub;
+    }
   }
 }
 

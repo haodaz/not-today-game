@@ -11,6 +11,7 @@ import { workbenchActions } from "@world/desktop/workbench/actions";
 import { parseWorkbenchDay, workbenchDays } from "@world/desktop/workbench/data";
 import { CHANGELOG_COLLAPSE_DAY, renderWorkbench } from "@world/desktop/workbench/view";
 import { escapeHtml } from "@world/html";
+import { threadsUnread } from "@world/desktop/messages/view";
 import { t } from "@world/i18n";
 
 const NOW_MS = Date.UTC(2026, 9, 31, 12);
@@ -42,9 +43,12 @@ describe("workbench home", () => {
     expect(out).toContain(`<div class="big">${c.state.overdueDays}<small>`);
   });
 
-  it("with day data fills cards, sidebar jobs and the docs tag; the badge counts the jobs", () => {
-    const result = renderWorkbench(ctx(1), days);
-    expect(result.badge).toBe(fixture.doing.length);
+  it("with day data fills cards, sidebar jobs and the docs tag; the badge counts the jobs and the work conversations' unread", () => {
+    const c = ctx(1);
+    const result = renderWorkbench(c, days);
+    // The work conversations moved into 工作台 (desktop-ui 2026-11-02, evening): their unread count here.
+    expect(result.badge).toBe(fixture.doing.length + threadsUnread(c, "workbench"));
+    expect(threadsUnread(c, "workbench")).toBeGreaterThan(0);
     expect(result.body.value).toContain('<span class="tag">v2</span>');
     expect(result.body.value).toContain('<span class="r">status one</span>');
     expect(result.body.value).toContain('<em class="g">status two</em>');

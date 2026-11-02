@@ -10,7 +10,7 @@
         {
           "k": "narration",
           "t": "更新日志 v4.3。一条横线。没写改了什么。",
-          "where": "screen"
+          "where": "screen:workbench:docs"
         },
         {
           "k": "inner",

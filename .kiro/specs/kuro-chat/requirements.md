@@ -29,3 +29,26 @@ The chat beat is the heart of the game (steering/product.md). Data: `content/kur
 
 ## Correction 2026-11-01 (author, after the first live call): Kuro answers in the player's language
 The first live call answered a Chinese line in English, because kuro-days stances are written in English. The client sends `locale` ("zh" | "en") with every turn and judge call; the function's system prompt ends with one line that fixes the reply language to that locale (Chinese replies in natural written Chinese, not translated English; the idiom of the day and the constant lines come from content in that language where content has them, otherwise Kuro renders them itself). Judgement notes are also written in that locale, since the credits show them. Memory stores the text as said. Test with a mocked model that the locale line is the last line of the system prompt.
+
+## Addition 2026-11-02 (author): layered answers by affinity
+- The function passes Kuro's current opinion of the player into the system prompt as a **bucket**, never a number: `low` (affinity < 30), `mid` (30–59), `high` (≥ 60), computed from the stored judgements exactly as the ending does. A line in the "Today" block: `Your opinion of this player: <bucket>`.
+- Content: `content/kuro-days/day-NN.md` may carry a section `## Layered answers`, entries `- unlock: qN → low: "…" | mid: "…" | high: "…"`. These are locked lines like the red-blue ones: when the player asks the unlocking question, the model must reproduce the line for the current bucket verbatim (any reply language), then may continue in its own words. Claude writes the entries.
+- The bucket is also what the model sees for the free chat: lower = shorter and more guarded, higher = plainer and closer (profile already says flattery lowers it).
+- Tests: the bucket line is present and correct for stored affinities 0, 29, 30, 59, 60, 100; a layered answer's locked text appears in the reply for the matching bucket (mocked model); day files without the section still load.
+
+## Addition 2026-11-02 (author): taboo — generosity is not kindness
+When Kuro thinks well of the player it gives more, and some of what it gives is forbidden knowledge. Getting close to the truth hurts. Four consequences, all client-side, all deterministic from content:
+- **Nosebleed** (`taboo: "blood"`): the reply shows, then the box's narration line 「鼻子里有东西流下来。」; the player's hand portrait (the night-hand / held-object hand) gets a blood variant (`public/npc/hand_blood.png`, Claude supplies) for the rest of the day; SAN −1.
+- **Blur** (`taboo: "blur"`): the screen's text blurs for 20 s (CSS filter on the stage, not on the box), then clears; the next player turn is still allowed.
+- **Flicker** (`taboo: "flicker"`): the screen flashes white for one frame; the reply is **not shown** and is **not written to the chat history or Kuro's memory**; the turn is still spent (turnsLeft −1). The player sees only the flash and their own question gone. The server stores the turn as `forgotten: true` so the judgement may cite that the player asked.
+- **Errors** (`taboo: "errors"`): the reply shows, then 8–20 error dialogs cascade over the desktop (random titles from `content/strings` `error.*`, seeded by day); each needs a click; the chat is closed for the rest of the day.
+
+Where it comes from: a locked layered answer (the `high` tier) may carry a `taboo` field; the unreadable-word valve (when adopted) always carries `blood`. Free replies never trigger a taboo (the model has no such channel). At most one taboo per day. Rule for the player: the generous answers are the dangerous ones; a low-affinity Kuro is safe and useless.
+Tests: each consequence from a mocked reply with the field; flicker leaves no history and no memory turn but spends the turn; one taboo per day; no taboo without the field.
+
+## Addition 2026-11-02 (author): the variable layer
+Kuro is never trained. Every turn, the function assembles one context object and hands it to the model; the game changes only content and this object. It has three parts:
+1. **Locked** — red-blue lines, layered answers (above), the bedtime line. Enforced in code, not only in the prompt: when the player's line matches an unlock (the day file's `unlock: qN` starters, or a content-listed phrase), the server prepends the locked text to the reply verbatim and asks the model only to continue; a reply that omits or alters it is replaced by the locked text alone.
+2. **Dice** — a per-run, per-day seed (`runId`, `day`) already used elsewhere; from it the server derives and writes into the "Today" block: a mood notch (0–3, shifts how many words it spends), one "free line" allowance (whether it may add a sentence of its own today), and the glyph set for the unreadable word when the valve fires. Same run replays identically; a new run differs. The model never sees the seed, only the derived values.
+3. **Scores** — the affinity bucket (above) and, from day 13, the count of mistakes the player has caught (`catch` nodes), so it can say "that's the third time".
+Tests: the object is pure from (content, events, memory, seed, day, locale); locked text survives any model output; dice values are stable per seed.

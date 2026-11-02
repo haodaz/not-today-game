@@ -16,6 +16,7 @@ import type { AppContext, WorkbenchPage } from "../model";
 import { closerSlot } from "@world/late/closer-view";
 import { RINGS } from "../rings";
 import { workbenchDay, workbenchDays, type DocColumn, type WorkbenchDay } from "./data";
+import { renderWorkMessages } from "../messages/view";
 
 /** U5: the changelog panel collapses to one line from the first day of the second ring. */
 export const CHANGELOG_COLLAPSE_DAY: number = (() => {
@@ -158,9 +159,37 @@ export function renderWorkbench(ctx: AppContext, days: ReadonlyMap<number, Workb
   // late-days FR4: Kuro at the document's close corner while it comes to shut it.
   const c = ctx.session.kuroCloser;
   const closer = page === "docs" && c?.where === "docs" ? html`<div class="wb-closer">${closerSlot(ctx, c.pageId)}</div>` : null;
+  // The work conversations live here (desktop-ui 2026-11-02, evening): the rail's 消息.
+  const msgs = renderWorkMessages(ctx);
+  const tag = data?.docs?.tag ? html`${fill(data.docs.tag)}` : null;
   return {
-    body: html`<div class="body">${side(data, page, fill)}${main}${closer}</div>`,
-    badge: data?.doing.length ?? 0,
-    tag: data?.docs?.tag ? html`${fill(data.docs.tag)}` : null,
+    body:
+      page === "msgs"
+        ? html`<div class="body">${rail(page, msgs.badge)}<div class="wb-msgs">${msgs.pane}</div></div>`
+        : html`<div class="body">${rail(page, msgs.badge)}${side(data, page, fill)}${main}${closer}</div>`,
+    // Its dock tile counts its own: the jobs under way and the work conversations' unread.
+    badge: (data?.doing.length ?? 0) + msgs.badge,
+    tag,
   };
+}
+
+/** The DingTalk-like left rail: 消息 / 工作台 / 文档 / 审批 / 通讯录. 审批 and 通讯录 have no page yet. */
+const RAIL: readonly { key: string; page: WorkbenchPage | null }[] = [
+  { key: "wb.nav.msgs", page: "msgs" },
+  { key: "wb.nav.home", page: "home" },
+  { key: "wb.nav.docs", page: "docs" },
+  { key: "wb.nav.approvals", page: null },
+  { key: "wb.nav.contacts", page: null },
+];
+
+function rail(page: WorkbenchPage, unread: number): SafeHtml {
+  const items = RAIL.map(({ key, page: target }) => {
+    // 工作台 is on for its own pages (home, 账本, 代码); 文档 for 文档; 消息 for the pane.
+    const on = target === page || (target === "home" && (page === "ledger" || page === "code"));
+    const n = target === "msgs" && unread > 0 ? html`<span class="n">${unread}</span>` : null;
+    return target
+      ? html`<button type="button" class="${cls("ri", on && "on")}" data-action="wb-nav" data-page="${target}"><i class="${`rg ${key.slice("wb.nav.".length)}`}" aria-hidden="true"></i><span>${tr(key)}</span>${n}</button>`
+      : html`<div class="ri"><i class="${`rg ${key.slice("wb.nav.".length)}`}" aria-hidden="true"></i><span>${tr(key)}</span></div>`;
+  });
+  return html`<nav class="wb-rail">${items}</nav>`;
 }

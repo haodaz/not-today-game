@@ -3,7 +3,7 @@
 import type { ActionHandler } from "../controller";
 import type { WorkbenchPage } from "../model";
 
-const PAGES: readonly WorkbenchPage[] = ["home", "docs", "ledger", "code"];
+const PAGES: readonly WorkbenchPage[] = ["home", "docs", "ledger", "code", "msgs"];
 
 export const workbenchActions: Record<string, ActionHandler> = {
   "wb-nav"(ctx, data) {

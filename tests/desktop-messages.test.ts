@@ -8,7 +8,7 @@ import type { ActionContext } from "@world/desktop/controller";
 import { messageActions } from "@world/desktop/messages/actions";
 import { bodyOf, splitSpeaker, transcriptOf } from "@world/desktop/messages/bubbles";
 import { sentReplies, transcript, unreadCount, type Bubble } from "@world/desktop/messages/transcript";
-import { renderMessages } from "@world/desktop/messages/view";
+import { renderMessages, renderWorkMessages } from "@world/desktop/messages/view";
 import { initialSession, type AppContext, type Session } from "@world/desktop/model";
 import { t } from "@world/i18n";
 
@@ -134,31 +134,34 @@ function ctxFor(store: Store, session: Session): AppContext {
 }
 
 describe("renderMessages", () => {
-  it("lists the company and the family, with the boss's hint and chips from strings", () => {
+  it("工作台's 消息 pane lists the company, with the boss's hint and chips from strings; 消息 lists 家里", () => {
     const store = storeAt(1);
-    const out = renderMessages(ctxFor(store, initialSession({ beat: "boot", time: "10:00" }))).body.value;
-    for (const key of ["msgs.boss", "msgs.group", "msgs.family", "reply.hint.boss", "reply.fine", "reply.salary", "msgs.send"]) {
-      expect(out, key).toContain(t(key));
+    const work = renderWorkMessages(ctxFor(store, initialSession({ beat: "boot", time: "10:00" }))).pane.value;
+    for (const key of ["msgs.boss", "msgs.group", "reply.hint.boss", "reply.fine", "reply.salary", "msgs.send"]) {
+      expect(work, key).toContain(t(key));
     }
-    expect(out).toContain('class="n">1<');
+    expect(work).toContain('class="n">1<');
+    const home = renderMessages(ctxFor(store, initialSession({ beat: "boot", time: "10:00" }))).body.value;
+    for (const key of ["msgs.family", "msgs.clan", "msgs.feed"]) expect(home, key).toContain(t(key));
+    expect(home).not.toContain('data-conv="boss"');
   });
 
   it("marks lent words, strikes gone words, and offers a free input only where the day has one", () => {
     const store = storeAt(10, [], [objectFor("no")]);
     const session = initialSession({ beat: "work", time: "10:00" });
-    const boss = renderMessages(ctxFor(store, session)).body.value;
+    const boss = renderWorkMessages(ctxFor(store, session)).pane.value;
     expect(boss).toContain('class="chip lent"');
     expect(boss).toContain('class="chip gone" data-action="gone" data-word="whatever"');
     expect(boss).not.toContain('data-input="draft"');
     session.conversation = "group";
-    expect(renderMessages(ctxFor(store, session)).body.value).toContain('data-input="draft"');
+    expect(renderWorkMessages(ctxFor(store, session)).pane.value).toContain('data-input="draft"');
   });
 
   it("a deregistered conversation closes its input", () => {
     const store = storeAt(13);
     const session = initialSession({ beat: "work", time: "10:00" });
     session.conversation = "xiaozhang";
-    const out = renderMessages(ctxFor(store, session)).body.value;
+    const out = renderWorkMessages(ctxFor(store, session)).pane.value;
     expect(out).toContain(t("msgs.input.disabled"));
     expect(out).toContain('class="send" data-action="send" disabled');
     expect(out).toMatch(/class="chip" data-action="chip" data-word="fine" disabled/);
@@ -167,7 +170,7 @@ describe("renderMessages", () => {
   it("the family's day-15 evening message is in the player's own input, not received", () => {
     const store = storeAt(15);
     const session = initialSession({ beat: "desk", time: "19:00" });
-    session.conversation = "family";
+    session.homeConversation = "family";
     const out = renderMessages(ctxFor(store, session)).body.value;
     expect(out).toContain("data-own-input");
     expect(out).toContain(store.getState().names.nick === "" ? "，吃饭了吗。" : store.getState().names.nick);

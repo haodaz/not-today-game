@@ -45,7 +45,7 @@
         {
           "k": "narration",
           "t": "小张的头像不在群里了。",
-          "where": "screen:msgs"
+          "where": "screen:msgs:group"
         },
         {
           "k": "speaker",
