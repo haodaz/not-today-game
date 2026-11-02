@@ -1,3 +1,4 @@
+import { screenScaleFor } from "@world/room/held";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import nightsFile from "@content/nights.json";
@@ -167,9 +168,13 @@ describe("aftermath (FR3)", () => {
     session.holding = "chick";
     const dream = renderRoom({ state: blocked, events: [], session }).value;
     expect(dream).toContain('<canvas class="dev dream" data-screen="chick" width="64" height="32"');
-    expect(dream).toContain("width:128px;height:64px");
+    const size = `width:${32 * screenScaleFor("chick")}px;height:${16 * screenScaleFor("chick")}px`;
+    expect(dream).toContain(size);
+    // By morning the glow is gone; night 5 was a dream night, so one step of resolution stays (objects-in-hand FR2).
     const morning = applyEvent(blocked, { kind: "lieDown", day: 5 });
-    expect(renderRoom({ state: morning, events: [], session }).value).toContain('<canvas class="dev" data-screen="chick" width="32" height="16"');
+    const after = renderRoom({ state: morning, events: [], session }).value;
+    expect(after).toContain('<canvas class="dev" data-screen="chick" width="64" height="32"');
+    expect(after).toContain(size);
   });
 
   it("blocked every raid: every night content lets you block; day 18 holds nothing up", () => {

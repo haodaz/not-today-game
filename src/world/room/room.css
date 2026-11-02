@@ -173,8 +173,64 @@
 .room .held.phone .shop button{display:flex;justify-content:space-between;width:100%;border:0;background:none;padding:6px 0 0;font:inherit;font-size:14px;color:inherit;cursor:pointer;text-align:left}
 .room .held.phone .shop button:hover,.room .held.phone .shop button:focus-visible{color:var(--red)}
 .room .held.phone .home{position:absolute;left:50%;bottom:10px;width:120px;height:5px;background:#ccc;border-radius:3px;transform:translateX(-50%)}
-.room .held.obj{top:44%;width:440px;filter:drop-shadow(0 30px 50px rgba(0,0,0,.6))}
-.room .held.obj img{display:block;width:100%}
+.room .held.obj{top:44%;width:440px;filter:drop-shadow(0 30px 50px rgba(0,0,0,.6));transform:translate(-50%,-50%)}
+.room .held.obj img{display:block;width:100%;user-select:none}
+/* Held and used (objects-in-hand FR1): upright, breathing (the hand layer moves .breathe), turned by
+   a drag (--yaw/--pitch/--roll on .turn, set by the layer); the back face from <id>_back.png over
+   the front picture's bright tint. Using brings it 15 % closer and the keys light under the pointer. */
+.room .held-layer:has(> .held.obj) > .held-dim{background:rgba(10,10,12,.4)}
+.room .held.obj[data-mode="holding"]{cursor:grab}
+.room .held.obj[data-mode="holding"]:active{cursor:grabbing}
+.room .held.obj .breathe{perspective:1400px;transition:scale .22s cubic-bezier(.2,.8,.2,1)}
+.room .held.obj.using .breathe{scale:1.15}
+.room .held.obj .turn{position:relative;transform-style:preserve-3d;--face:0deg;transform:rotateZ(var(--roll,0deg)) rotateX(var(--pitch,0deg)) rotateY(calc(var(--face) + var(--yaw,0deg)))}
+.room .held.obj[data-face="back"] .turn{--face:180deg}
+.room .held.obj .face{backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.room .held.obj .face.front{position:relative}
+.room .held.obj .face.back{position:absolute;inset:0;transform:rotateY(180deg);display:flex;align-items:center;justify-content:center}
+/* No back picture: the front picture's bright tint stands in for it (the layer sets --tint). */
+.room .held.obj .face.back.tinted{background:var(--tint,#cfc8bb);border-radius:18px}
+/* Back spots are fractions of the back picture itself. */
+.room .held.obj .back-art{position:relative;height:100%;max-width:100%}
+.room .held.obj .back-art > img{display:block;height:100%;width:auto;max-width:100%;object-fit:contain}
+.room .held.obj .okey{position:absolute;border:0;padding:0;margin:0;background-color:transparent;background-repeat:no-repeat;border-radius:30%;cursor:inherit;pointer-events:none}
+.room .held.obj.using .okey{pointer-events:auto;cursor:pointer}
+.room .held.obj.using .okey:hover,.room .held.obj.using .okey:focus-visible{box-shadow:0 0 0 2px rgba(255,236,190,.55),0 0 10px rgba(255,236,190,.45);outline:none}
+.room .held.obj .okey.down{translate:0 1px;filter:brightness(.92)}
+.room .held.obj .okey.body{background:none;border-radius:0}
+.room .held.obj.using .okey.body:hover{box-shadow:none}
+.room .held.obj .okey.hole{border-radius:50%}
+/* The tape: the packs grow and shrink at the true ratio, the spokes turn (the layer sets --pack, --spin). */
+.room .held.obj .reel{position:absolute;width:var(--hub);aspect-ratio:1;transform:translate(-50%,-50%);pointer-events:none}
+.room .held.obj .reel .pack{position:absolute;left:50%;top:50%;width:calc(100% * var(--pack,1.9));aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,#3a2a20 0 38%,#5a4030 39% 100%);opacity:.85}
+.room .held.obj .reel .spokes{position:absolute;inset:0;border-radius:50%;background:conic-gradient(#ddd 0 10deg,transparent 10deg 120deg,#ddd 120deg 130deg,transparent 130deg 240deg,#ddd 240deg 250deg,transparent 250deg);rotate:var(--spin,0deg)}
+/* The card against the light: see-through, its coil and its line show. */
+.room .held.obj .coil,.room .held.obj .against-light{position:absolute;opacity:0;pointer-events:none;transition:opacity .3s}
+.room .held.obj .coil{inset:18% 14%}
+.room .held.obj .coil i{position:absolute;inset:calc(var(--n,0) * 8%);border:1px solid rgba(160,110,40,.8);border-radius:6px}
+.room .held.obj .coil i:nth-child(2){--n:1}.room .held.obj .coil i:nth-child(3){--n:2}
+.room .held.obj .against-light{left:50%;bottom:16%;transform:translateX(-50%);font-size:11px;color:#3a3a3a;white-space:nowrap}
+.room .held.obj.using.in-light[data-object="iccard"] .face.front > img{opacity:.4}
+.room .held.obj.using.in-light[data-object="iccard"] :is(.coil,.against-light){opacity:1}
+.room .held.obj .strip{position:absolute;left:0;right:0;top:16%;height:16%;background:#2a2a2a;opacity:.85}
+.room .held.obj .pinches{position:absolute;left:8%;bottom:8%;display:flex;gap:5px}
+.room .held.obj .pinch{width:7px;height:3px;border-radius:50%;background:rgba(60,50,40,.45)}
+/* The phone: closed, it is the lower half folded up; the cracked corner lights once on day 18. */
+.room .held.obj[data-object="phone"][data-open="0"] .face.front > img{clip-path:inset(50% 0 0 0)}
+.room .held.obj .crack{position:absolute;right:16%;top:10%;width:18%;height:10%;border-radius:40%;background:radial-gradient(circle,rgba(255,255,255,.95),rgba(255,255,255,0) 70%);opacity:0;pointer-events:none}
+.room .held.obj.crack-lit .crack{opacity:1}
+.room .held.obj .sim{position:absolute;left:30%;top:42%;width:40%;height:22%;border-radius:6px;background:#d8c06a;display:flex;align-items:flex-end;justify-content:center;padding:4px;box-sizing:border-box}
+.room .held.obj .sim span{font-size:9px;color:#3a3220}
+/* The textbook's empty cell: content's score in pencil, written over 1.5 s (--pencil 0..1). */
+.room .held.obj .okey.cell{background:none;border-radius:2px}
+.room .held.obj .okey.cell .pencil{display:block;font:italic 600 22px/1 "Comic Sans MS","Bradley Hand",cursive;color:rgba(70,70,80,.85);clip-path:inset(0 calc(100% - var(--pencil,1) * 100%) 0 0)}
+/* The dictionary: shut when lifted (its lid is the back picture); used, it opens on a loose hinge. */
+.room .held.obj[data-object="dictionary"][data-open="0"] .face.front > :not(img){visibility:hidden}
+.room .held.obj[data-object="dictionary"][data-open="0"] .face.front > img{content:url(/objects/dictionary_back.png)}
+.room .held.obj.hinge[data-object="dictionary"] .face.front{transform-origin:50% 0;animation:m-hinge 700ms cubic-bezier(.2,.8,.2,1) var(--hinge-t,0ms) both}
+@keyframes m-hinge{0%{transform:rotateX(70deg)}55%{transform:rotateX(-12deg)}75%{transform:rotateX(5deg)}100%{transform:rotateX(0deg)}}
+/* The pager jumps 1 px on the desk when it buzzes. */
+.slot.jump[data-object="pager"]{translate:0 -1px}
 /* An object's own screen: its channel's pixels, a whole-number scale, never smoothed. */
 .room .held.obj canvas.dev{position:absolute;transform:translate(-50%,-50%);image-rendering:pixelated;background:#9fb59a;border-radius:2px}
 .room .held.obj canvas.dev.hi{image-rendering:auto;background:linear-gradient(180deg,#f4f8ff,#d9e6ff)}

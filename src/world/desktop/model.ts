@@ -97,6 +97,8 @@ export interface Session {
   pullOut: { ending: "bad" | "survive" | "good"; from: "room" | "desk" | "bed"; startMs: number; cutMs: number } | null;
   /** The object lifted off the desk bar (polish FR1); never at the same time as the phone. */
   holding: string | null;
+  /** Holding and using it, its programs, its light (objects-in-hand FR1); session only. */
+  hand: HandSession;
   /** The dialogue line's per-character reveal (polish FR3); set by the motion layer only. */
   reveal: Reveal | null;
   wbMode: TaskMode;
@@ -132,6 +134,31 @@ export interface Session {
   dockSay: { readonly text: string; readonly until: number } | null;
 }
 
+/** What the hand knows this session (objects-in-hand). Programs restart each day. */
+export interface HandSession {
+  /** The held object is in use: closer, keys live (else just held). */
+  using: boolean;
+  /** Which face of the held object is up. */
+  face: "front" | "back";
+  /** The day `programs` belong to. */
+  day: number;
+  /** Object id → its program's state (world/objects). */
+  programs: Record<string, unknown>;
+  /** The key cap down, and until when (ms). */
+  keyDown: { readonly object: string; readonly key: string; readonly until: number } | null;
+  /** Once a run (this session): what has happened that may not happen again (the textbook's score). */
+  once: string[];
+  /** The day the pager's buzz was played, and until when it jumps on the desk. */
+  buzzed: number;
+  jumpUntil: number;
+  /** The pointer is in the light zone; when it left. */
+  inLight: boolean;
+  leftLightAt: number | null;
+  /** When the dictionary was opened (the hinge wobble). */
+  openedAt: number | null;
+}
+export const initialHand = (): HandSession => ({ using: false, face: "front", day: 0, programs: {}, keyDown: null, once: [], buzzed: 0, jumpUntil: 0, inLight: false, leftLightAt: null, openedAt: null });
+
 export function initialSession(clock: BeatClock, focus: Side = "left", view: View = "desktop"): Session {
   return {
     clock,
@@ -163,6 +190,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     collection: EMPTY_COLLECTION,
     bookOpen: false,
     holding: null,
+    hand: initialHand(),
     reveal: null,
     wbMode: "self",
     loop: null,

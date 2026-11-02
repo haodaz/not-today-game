@@ -6,7 +6,7 @@ import type { SafeHtml } from "@world/html";
 import type { BeatClock } from "./beat";
 import { desktopApps } from "./apps";
 import { KuroBodyElement } from "./kuro/body";
-import { playSfx } from "@world/loop/sfx";
+import { playSfx, type SfxOptions } from "@world/loop/sfx";
 import { MOTION } from "@world/motion/timing";
 import { applyFit, BACKDROPS } from "@world/fit";
 import { onEmailChange, setEmailDraft } from "@net/email";
@@ -37,7 +37,7 @@ export interface ActionContext {
   /** Run `fn` after `ms`; cleared when the desktop is destroyed. */
   readonly later: (ms: number, fn: () => void) => void;
   /** Plays a sound id (silent when muted or missing). */
-  readonly play?: (id: string) => void;
+  readonly play?: (id: string, opts?: SfxOptions) => void;
   /** Wall time in ms, for cosmetics only (motion); defaults to Date.now. */
   readonly now?: () => number;
 }
@@ -122,6 +122,8 @@ export interface DesktopDeps {
   readonly sound?: SoundPlayer;
   /** The breathing collapse on the stills (room-scene addition 2026-11-02): a WebGL2 canvas in the `.fx` layer; absent when off. */
   readonly fx?: (root: HTMLElement, ctx: ActionContext) => { after(): void; destroy(): void };
+  /** The hand (objects-in-hand): paints the held object's screen, turns it, its light, the chick's chirps and the pager's buzz. */
+  readonly hand?: (root: HTMLElement, ctx: ActionContext, actions: Record<string, ActionHandler>) => { after(): void; destroy(): void };
   /** The day-18 pull-out's frame driver (room-scene); runs with or without the splat. */
   readonly pull?: (root: HTMLElement, ctx: ActionContext) => { after(): void; destroy(): void };
 }
@@ -180,6 +182,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     nav?.after();
     fx?.after();
     pull?.after();
+    hand?.after();
     // While Kuro crawls between windows, render again when it should stop.
     if (session.movingUntil > Date.now()) later(session.movingUntil - Date.now() + 20, rerender);
     if (focusKey) {
@@ -200,12 +203,13 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     }, ms);
     timers.add(id);
   };
-  const ctx: ActionContext = { store: deps.store, session, rerender, later, play: (id) => playSfx(id, session.muted), now: () => Date.now() };
+  const ctx: ActionContext = { store: deps.store, session, rerender, later, play: (id, opts) => playSfx(id, session.muted, opts), now: () => Date.now() };
   const motion: MotionHooks | null = deps.motion ? deps.motion(root, ctx, actions) : null;
   const splat = deps.splat ? deps.splat(root, ctx) : null;
   const nav = deps.nav ? deps.nav(root, ctx, actions, splat) : null;
   const pull = deps.pull ? deps.pull(root, ctx) : null;
   const fx = deps.fx ? deps.fx(root, ctx) : null;
+  const hand = deps.hand ? deps.hand(root, ctx, actions) : null;
 
   const onClick = (e: MouseEvent) => {
     const el = (e.target as HTMLElement).closest<HTMLElement>("[data-action]");
@@ -286,6 +290,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
       splat?.destroy();
       pull?.destroy();
       fx?.destroy();
+      hand?.destroy();
       nav?.destroy();
       timers.forEach(clearTimeout);
       if (frame) cancelAnimationFrame(frame);

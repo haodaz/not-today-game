@@ -205,6 +205,8 @@ export function syncLoop(ctx: ActionContext, nowMs: number = Date.now()): void {
       session.view = "room";
       session.phoneOpen = false;
       session.holding = null;
+      // Nothing stays in the hand: just held, front up (programs restart on a new day by themselves).
+      session.hand = { ...session.hand, using: false, face: "front", keyDown: null, openedAt: null };
       session.door = null;
       // The box's history is per day (dialogue FR1); a conversation does not carry over.
       session.dlgLog = [];

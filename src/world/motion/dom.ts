@@ -281,6 +281,8 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
   }
 
   function heldGhost(el: HTMLElement, held: string, t: number): void {
+    // Once it is back on the desk the slot shows it again (the ghost kept the slot empty).
+    after(MOTION.putDown + 16, ctx.rerender);
     addGhost({
       el,
       key: "held",

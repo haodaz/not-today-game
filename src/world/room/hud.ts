@@ -112,13 +112,13 @@ export function deskThings(state: State, events: readonly GameEvent[], session: 
       const first = pointerCls(session, "hold", i === 0 && held === null);
       const button =
         state.upgraded[id] === true
-          ? html`<button type="button" class="${cls("slot", "upgraded", unknown(id), held === id && "lifted", first)}" data-object="${id}" data-res="hi" data-action="loop-hold"><img src="/objects/${id}_front.png" alt=""><div class="screen-hi" data-screen="${id}"></div></button>`
-          : html`<button type="button" class="${cls("slot", unknown(id), held === id && "lifted", first)}" data-object="${id}" data-action="loop-hold"><img src="/objects/${id}_white.png" alt=""><div class="lcd" data-screen="${id}"></div></button>`;
+          ? html`<button type="button" class="${cls("slot", "upgraded", unknown(id), session.holding === id && !session.phoneOpen && "lifted", first)}" data-object="${id}" data-res="hi" data-action="loop-hold"><img src="/objects/${id}_front.png" alt=""><div class="screen-hi" data-screen="${id}"></div></button>`
+          : html`<button type="button" class="${cls("slot", unknown(id), session.holding === id && !session.phoneOpen && "lifted", first)}" data-object="${id}" data-action="loop-hold"><img src="/objects/${id}_white.png" alt=""><div class="lcd" data-screen="${id}"></div></button>`;
       return { id, html: button };
     });
   return {
     box: html`<button type="button" class="slot" data-action="loop-box"><img class="desk-photo" src="/room/desk/box.png" alt="" aria-hidden="true">${left > 0 ? html`<span>${tr("hud.box.left", { n: left })}</span>` : null}</button>`,
-    phone: html`<button type="button" class="${cls("slot", held === "phone" && "lifted")}" data-action="loop-phone"><img class="desk-photo" src="/room/desk/phone.png" alt="" aria-hidden="true"><span>${tr("hud.phone")}</span></button>`,
+    phone: html`<button type="button" class="${cls("slot", session.phoneOpen && "lifted")}" data-action="loop-phone"><img class="desk-photo" src="/room/desk/phone.png" alt="" aria-hidden="true"><span>${tr("hud.phone")}</span></button>`,
     cup: html`<div class="slot"><img class="desk-photo cup" src="/room/desk/cup.png" alt="" aria-hidden="true"></div>`,
     meal: mealSlot(state, events),
     objects,
@@ -367,7 +367,7 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const dream = lineScene.backdrop !== null;
   const scene = waiting || dream ? null : door ? doorContent(state, events, session) : hotView ? html`${shotHits(hotView, state, events)}${kept}` : null;
   // The held item sits over everything but the dialogue box (held-object.html).
-  const held = door ? null : heldLayer(state, events, session);
+  const held = door ? null : heldLayer(state, events, session, nowMs);
   // The hand is here: the desk dims and the gap between the monitors glows (night-hand FR1; the
   // room scene will draw the gap itself).
   const raid = !door && view !== "bed" && !waiting && raidShowing(state, session);

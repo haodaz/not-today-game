@@ -23,6 +23,10 @@ import { nextInputs, startDoor, stepDoor } from "@world/delivery/door";
 import { mealView } from "@world/delivery/meals";
 import { html, type SafeHtml } from "@world/html";
 import { setLocale, t, tr } from "@world/i18n";
+import { handOf } from "@state/hands";
+import { handStep } from "@world/objects/hand";
+import { pressKey } from "@world/objects/index";
+import { PHONE_FLIP } from "@world/room/held";
 import { booted, deskMeal, itemStates, loopContext, mealToOrder, nightfallReached, openItemFor, openTask } from "@world/loop/checklist";
 import type { EventToken } from "@state/days/table";
 import { messageActions } from "@world/desktop/messages/actions";
@@ -148,6 +152,19 @@ function overlayOpen(s: Session): boolean {
   return s.bookOpen || s.historyOpen || s.settingsOpen || s.itemsOpen || s.phoneOpen || !!s.holding || talking(s.dialogue) || !!s.pullOut || !!s.endingPage;
 }
 
+/** The held thing goes back to rest: just held, its front up, no key down. */
+function restHand(s: Session): void {
+  s.hand.using = false;
+  s.hand.face = "front";
+  s.hand.keyDown = null;
+  s.hand.openedAt = null;
+  // A clamshell and a flip phone close when they are put down.
+  for (const id of ["dictionary", "phone"]) {
+    const p = s.hand.programs[id] as { open?: boolean } | undefined;
+    if (p?.open) s.hand.programs[id] = { ...p, open: false };
+  }
+}
+
 export const loopActions: Record<string, ActionHandler> = {
   view(ctx, data) {
     const view = data.view as View;
@@ -164,6 +181,7 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.session.phoneOpen = false;
     ctx.session.itemsOpen = false;
     ctx.session.holding = null;
+    restHand(ctx.session);
     lookedAway(ctx);
     // The desktop opens on the monitor with the current app; looking at it counts.
     if (view === "desktop") lookAt(ctx, shownApp(ctx.session));
@@ -424,6 +442,7 @@ export const loopActions: Record<string, ActionHandler> = {
     fromItemsPanel(ctx);
     session.phoneOpen = !session.phoneOpen;
     session.holding = null;
+    restHand(session);
     // Picking up the phone for a meal moves the beat clock into that meal's window.
     const lc = loopContext(store.getState(), store.getEvents());
     const meal = lc ? mealToOrder(lc) : null;
@@ -431,7 +450,8 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.rerender();
   },
 
-  // An object off the desk bar (polish FR1): only what is on the desk can be picked up.
+  // An object off the desk bar (polish FR1): only what is on the desk can be picked up. It is held
+  // upright; the same one again from the desk puts it down (objects-in-hand FR1).
   "loop-hold"(ctx, data) {
     const { session, store } = ctx;
     const state = store.getState();
@@ -439,7 +459,9 @@ export const loopActions: Record<string, ActionHandler> = {
     const onDesk = (state.found as string[]).includes(id) && !state.lost.includes(id);
     if (!onDesk) return;
     fromItemsPanel(ctx);
-    session.holding = session.holding === id ? null : id;
+    const hand = handStep({ object: session.holding, mode: session.holding ? (session.hand.using ? "using" : "holding") : "down" }, { kind: "lift", object: id });
+    session.holding = hand.object;
+    restHand(session);
     session.phoneOpen = false;
     // The first 举起来 done: its one-time pointer never shows again this run.
     pointed(session, "hold");
@@ -451,9 +473,65 @@ export const loopActions: Record<string, ActionHandler> = {
     }
     ctx.rerender();
   },
+  // The dim (a click outside), Esc, right-click: 退出 when in use, else 放下.
   "loop-put-down"(ctx) {
-    ctx.session.phoneOpen = false;
-    ctx.session.holding = null;
+    const { session } = ctx;
+    if (!session.phoneOpen && session.holding && session.hand.using) {
+      session.hand.using = false;
+      session.hand.keyDown = null;
+      ctx.rerender();
+      return;
+    }
+    session.phoneOpen = false;
+    session.holding = null;
+    restHand(session);
+    ctx.rerender();
+  },
+  // A click on the held object itself: it comes 15 % closer and its keys answer (使用).
+  "obj-use"(ctx) {
+    const { session } = ctx;
+    const id = session.holding;
+    if (!id || session.phoneOpen || session.hand.using) return;
+    session.hand.using = true;
+    // The dictionary is closed when lifted: using it opens it (the loose hinge wobbles once).
+    if (id === "dictionary" && session.hand.face === "front") {
+      const before = (session.hand.programs.dictionary as { open?: boolean } | undefined)?.open === true;
+      pressKey(ctx, id, "open");
+      if (!before) session.hand.openedAt = ctx.now?.() ?? Date.now();
+    }
+    ctx.rerender();
+  },
+  // A key on the held object: only while in use, only on the face that is up.
+  "obj-key"(ctx, data) {
+    const { session } = ctx;
+    const id = session.holding;
+    const key = data.key ?? "";
+    if (!id || data.object !== id || session.phoneOpen) return;
+    // While only holding, the keys do not answer: the click is a click on the object (使用).
+    if (!session.hand.using) return void loopActions["obj-use"]!(ctx, {} as DOMStringMap, null as never);
+    const hand = handOf(id);
+    const onFront = hand.keys.some((k) => k.id === key) || (id === "phone" && key === PHONE_FLIP);
+    const onBack = (id === "chick" && key === "reset" && !!hand.back.reset) || (id === "textbook" && key === "cell" && !!hand.cell);
+    if (!(onFront && session.hand.face === "front") && !(onBack && session.hand.face === "back")) return;
+    // The dictionary's keys are under its lid until it is open.
+    if (id === "dictionary" && (session.hand.programs.dictionary as { open?: boolean } | undefined)?.open !== true) return;
+    if (id === "textbook" && key === "cell") {
+      if (session.hand.once.includes("textbook:cell")) return;
+      session.hand.once.push("textbook:cell");
+    }
+    pressKey(ctx, id, key, { cap: onFront });
+    ctx.rerender();
+  },
+  // The hand layer turned it over (a drag that reached the limit): the other face stays up.
+  "obj-turn"(ctx, data) {
+    const { session } = ctx;
+    const id = session.holding;
+    if (!id || session.phoneOpen) return;
+    const face = data.face === "back" ? "back" : "front";
+    if (face === session.hand.face) return;
+    session.hand.face = face;
+    // The card's thin plastic, the textbook's page.
+    if (id === "iccard" || id === "textbook") pressKey(ctx, id, "flip");
     ctx.rerender();
   },
 

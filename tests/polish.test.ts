@@ -12,7 +12,7 @@ import { doorCaption, DOOR_STATES } from "@world/delivery/door";
 import { checklist, loopContext } from "@world/loop/checklist";
 import { gateAdvance, holdUntil, revealDoneAt, revealShown, startReveal } from "@world/motion/reveal";
 import { CHOSEN, choiceDelays, EASE, exitOf, MOTION, motionVars } from "@world/motion/timing";
-import { channelOf, nextWindow, screenScale } from "@world/room/held";
+import { channelOf, nextWindow, screenScale, screenScaleFor } from "@world/room/held";
 import { deliveryTable } from "@state/delivery/table";
 import { shopListView } from "@world/delivery/shops-view";
 import { boxObjectFor, renderChecklist, renderRoom } from "@world/room/hud";
@@ -181,7 +181,8 @@ describe("held phone and objects (FR1)", () => {
     loopActions["loop-hold"]!(ctx, { object } as DOMStringMap, null as never);
     const out = renderRoom({ state: store.getState(), events: store.getEvents(), session: ctx.session }).value;
     const { w, h } = channelOf(object);
-    const s = screenScale(w);
+    // Whole pixels at the width of content's screen rect (objects-in-hand).
+    const s = screenScaleFor(object);
     expect(out).toContain('class="held-dim" data-action="loop-put-down"');
     expect(out).toContain(`<canvas class="dev" data-screen="${object}" width="${w}" height="${h}"`);
     expect(out).toContain(`width:${w * s}px;height:${h * s}px`);

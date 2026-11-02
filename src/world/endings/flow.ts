@@ -47,6 +47,8 @@ export function startEnding(ctx: ActionContext): void {
   session.kuroInput = false;
   session.historyOpen = false;
   session.holding = null;
+  // Nothing stays in the hand: just held, front up (programs restart on a new day by themselves).
+  session.hand = { ...session.hand, using: false, face: "front", keyDown: null, openedAt: null };
   session.settingsOpen = false;
   if (pullOutApplies(state, store.getEvents())) {
     const from = pullFrom(session.view);

@@ -6,6 +6,7 @@ import raw from "@content/objects.json";
 import stagesFile from "@content/stages.json";
 import type { GameEvent } from "./events";
 import { hasEvidence, judge, type JudgementDelta } from "./judgement";
+import { HAND_FIELDS } from "./hands";
 import { shuffled } from "./seed";
 import type { State } from "./types.gen";
 import { membersOf } from "./variables";
@@ -60,7 +61,8 @@ export function parseObjects(input: unknown, foundOnDay: Readonly<Record<string,
     const w = `objects.${id}`;
     if (!known.includes(id)) fail(w, "not an object in variables.json found");
     if (!isRecord(v)) fail(w, "must be an object");
-    keys(v, ["day", "q", "options", "right", "wrong"], w);
+    // The hand half of an entry (keys, screen, back, …) is read by hands.ts.
+    keys(v, ["day", "q", "options", "right", "wrong", ...HAND_FIELDS], w);
     if (v.day !== foundOnDay[id]) fail(`${w}.day`, `must be its box day ${foundOnDay[id]} (stages.json objectsFoundOnDay)`);
     if (!Array.isArray(v.options) || v.options.length !== OPTION_COUNT) fail(`${w}.options`, `must have exactly ${OPTION_COUNT} options`);
     const options = v.options.map((o, i) => {

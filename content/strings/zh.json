@@ -259,5 +259,6 @@
   "objects.putdown": "放下",
   "objects.exit": "退出",
   "room.lamp": "台灯",
-  "room.box": "箱子"
+  "room.box": "箱子",
+  "hud.back": "退回"
 }

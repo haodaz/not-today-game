@@ -13,6 +13,7 @@ import "./ui/title/title.css";
 import { debugStartDay } from "@state/clock";
 import { splatForGame } from "@world/room/splat";
 import { fxForGame } from "@world/room/fx/layer";
+import { createHandLayer } from "@world/objects/layer";
 import { createNav } from "@world/room/nav";
 import { settleSession } from "@world/dialogue/place";
 import { createPullDriver } from "@world/endings/pullout-dom";
@@ -117,6 +118,7 @@ function startGame(store: Store, saved: boolean, from?: "desk"): void {
     nav: createNav(),
     // The day-18 pull-out's frames (splat or photo fallback).
     pull: createPullDriver(),
+    hand: createHandLayer(),
   });
   // What finished runs left on the desk (presentation only; the story never reads it).
   game.session.collection = collection;
@@ -124,7 +126,10 @@ function startGame(store: Store, saved: boolean, from?: "desk"): void {
 
 const jump = debugStartDay(search);
 if (jump !== null) {
-  startGame(createStore({ startDay: jump }), false);
+  const store = createStore({ startDay: jump });
+  // Dev only, beside ?day=N: `&found=chick,pager` takes those out of the box first (to try them in hand).
+  if (import.meta.env.DEV) for (const id of (params.get("found") ?? "").split(",").filter(Boolean)) store.appendEvent({ kind: "openLayer", objectId: id });
+  startGame(store, false);
 } else {
   const saved = run.load();
   const title = mountTitle(root, {
