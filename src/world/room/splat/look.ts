@@ -19,7 +19,8 @@ export interface SplatLook {
 }
 
 export function splatLook(day: number, beat: Beat): SplatLook {
-  const night = beat === "night";
-  const gap = !night ? "none" : ringIndex(ringOf(day)) >= ringIndex("wall") ? "pink" : "white";
+  // Evening (the `desk` beat on) takes the night's dark layers and the lamp; the gap's light is the night's alone.
+  const night = beat === "night" || beat === "desk";
+  const gap = beat !== "night" ? "none" : ringIndex(ringOf(day)) >= ringIndex("wall") ? "pink" : "white";
   return { night, gap, mix: collapseMix(day) };
 }

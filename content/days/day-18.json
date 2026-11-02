@@ -128,28 +128,32 @@
       "text": "看一眼桌子。",
       "unlock": "done:reply",
       "done": "event:beat:desk",
-      "required": true
+      "required": true,
+      "when": "night"
     },
     {
       "id": "shutdown",
       "text": "关机。",
       "unlock": "done:desk",
       "done": "event:beat:shutdown",
-      "required": true
+      "required": true,
+      "when": "night"
     },
     {
       "id": "chat",
       "text": "和它说会儿话。",
       "unlock": "done:shutdown",
       "done": "event:chat:any",
-      "required": false
+      "required": false,
+      "when": "night"
     },
     {
       "id": "bed",
       "text": "躺下。",
       "unlock": "done:shutdown",
       "done": "event:lieDown",
-      "required": true
+      "required": true,
+      "when": "night"
     }
   ],
   "delivery": {

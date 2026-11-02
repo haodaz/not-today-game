@@ -257,5 +257,7 @@
   "delivery.rate.thanks": "Thanks for your review",
   "dictionary.unknown": "Not found",
   "objects.putdown": "Put down",
-  "objects.exit": "Exit"
+  "objects.exit": "Exit",
+  "room.lamp": "The lamp",
+  "room.box": "The box"
 }

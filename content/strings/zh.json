@@ -257,5 +257,7 @@
   "delivery.rate.thanks": "感谢您的评价",
   "dictionary.unknown": "未收录",
   "objects.putdown": "放下",
-  "objects.exit": "退出"
+  "objects.exit": "退出",
+  "room.lamp": "台灯",
+  "room.box": "箱子"
 }

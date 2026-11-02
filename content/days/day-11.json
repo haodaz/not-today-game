@@ -43,7 +43,8 @@
         },
         {
           "k": "narration",
-          "t": "然后走廊有了门，门里是公司。关门前最后一天，你在场。"
+          "t": "然后走廊有了门，门里是公司。关门前最后一天，你在场。",
+          "backdrop": "/room/dream/office_busy.jpg"
         },
         {
           "k": "narration",
@@ -51,7 +52,8 @@
         },
         {
           "k": "narration",
-          "t": "每个人的屏幕上弹出一个框，框里一句话，下面一个「好」。老周看了一眼，点了。老板在玻璃房里，先点的。"
+          "t": "每个人的屏幕上弹出一个框，框里一句话，下面一个「好」。老周看了一眼，点了。老板在玻璃房里，先点的。",
+          "backdrop": "/room/dream/office.jpg"
         },
         {
           "k": "narration",
@@ -141,29 +143,33 @@
       "text": "点个晚饭。",
       "unlock": "done:task2",
       "done": "event:order:dinner",
-      "required": false,
-      "rewrite": "晚饭在路上。"
+      "required": true,
+      "rewrite": "晚饭在路上。",
+      "when": "night"
     },
     {
       "id": "desk",
       "text": "看一眼桌子。",
       "unlock": "done:reply",
       "done": "event:beat:desk",
-      "required": true
+      "required": true,
+      "when": "night"
     },
     {
       "id": "shutdown",
       "text": "关机。",
       "unlock": "done:desk",
       "done": "event:beat:shutdown",
-      "required": true
+      "required": true,
+      "when": "night"
     },
     {
       "id": "chat",
       "text": "和它说会儿话。",
       "unlock": "done:shutdown",
       "done": "event:chat:any",
-      "required": false
+      "required": false,
+      "when": "night"
     },
     {
       "id": "bed",
@@ -171,7 +177,8 @@
       "unlock": "done:shutdown",
       "done": "event:lieDown",
       "required": true,
-      "locked": "requiredPending"
+      "locked": "requiredPending",
+      "when": "night"
     }
   ],
   "delivery": {

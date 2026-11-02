@@ -133,10 +133,23 @@ describe("soundPlan", () => {
   it("the daytime bed is the ring's day bed; the night bed is its night bed", () => {
     expect(planOn(1, "work").bed).toBe(soundTable.byRing.software!.day);
     expect(planOn(1, "night").bed).toBe(soundTable.byRing.software!.night);
-    expect(planOn(7, "desk").bed).toBe(soundTable.byRing.desk!.day);
+    expect(planOn(7, "afternoon").bed).toBe(soundTable.byRing.desk!.day);
     expect(planOn(16, "work").bed).toBe(soundTable.byRing.door!.day);
   });
 
+  it("the desk beat is the evening (day-loop 2026-11-02): the night bed and the night music at 0.7; no dream, stinger or silence", () => {
+    for (const day of [1, 4, 7, 10]) {
+      const evening = planOn(day, "desk");
+      const night = planOn(day, "night");
+      expect(evening.bed).toBe(night.bed);
+      expect(evening.music).toBe(night.music);
+      expect(evening.musicGain).toBeCloseTo(night.musicGain * 0.7, 10);
+      expect(evening.stinger).toBeNull();
+    }
+    // The dream music, the night-beat stinger and the silence belong to the night beat alone.
+    for (const day of dreamNights) expect(planOn(day, "desk").music).not.toBe("dream");
+    expect(planOn(13, "desk").bed).not.toBeNull();
+  });
   it("day 10 is calm by day (first ring's bed and degrade) and untouched at night", () => {
     const calm = soundTable.byRing[soundTable.calm]!;
     expect(planOn(10, "work").bed).toBe(calm.day);
@@ -253,7 +266,7 @@ describe("soundPlan", () => {
       fc.assert(
         fc.property(fc.integer({ min: 13, max: LAST_DAY }), beats, (day, beat) => {
           const m = planOn(day, beat).music;
-          if (day === 14 && beat !== "night") expect(m).toBe("day");
+          if (day === 14 && beat !== "night" && beat !== "desk") expect(m).toBe("day");
           else if (dreamNights.includes(day) && beat === "night") expect(m).toBe("dream");
           else expect(m).toBeNull();
         }),

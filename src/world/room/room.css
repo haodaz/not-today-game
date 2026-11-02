@@ -181,6 +181,16 @@
 .room .held-layer .hint{position:absolute;left:50%;bottom:130px;transform:translateX(-50%);color:#f4efe6;font-size:14px;opacity:.7;pointer-events:none}
 .room > .dlg,.room > .dlg-player{z-index:16}
 /* 夜里的手 (night-hand FR1): the desk dims, the gap between the monitors glows; the hand is never drawn */
+/* A line's backdrop and prop (dialogue 2026-11-02): full frame behind the box, under the HUD (DOM
+   order in 房间; over the monitors on 屏幕). The prop sits centred, at most 60 % of the stage high. */
+.stage > .scene{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.stage.one-monitor > .scene{z-index:9}
+.scene .scene-backdrop{position:absolute;inset:0;background:#000 center/cover no-repeat}
+.scene .scene-prop{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-height:60%;max-width:80%;filter:drop-shadow(0 18px 28px rgba(0,0,0,.45));user-select:none}
+/* The evening look on the stills (day-loop addition 2026-11-02): dark 0.6 and the lamp's glow, the same as the splat's night layers. */
+.room .evening-look{position:absolute;inset:0;pointer-events:none;background:rgba(10,10,12,var(--evening-dark,.6));overflow:hidden}
+.room .evening-lamp{position:absolute;width:520px;height:520px;margin:-260px 0 0 -260px;border-radius:50%;background:radial-gradient(circle,rgba(255,196,120,.32),rgba(255,196,120,0) 65%);mix-blend-mode:screen}
+.stage.m-nobg>.evening-look{visibility:hidden}
 .room .gap-glow{position:absolute;inset:0;z-index:14;pointer-events:none;background:rgba(10,10,12,.55)}
 .room .gap-glow::after{content:"";position:absolute;left:var(--gap-x,50%);top:var(--gap-t,22%);width:6px;height:var(--gap-h,30%);transform:translateX(-50%);background:radial-gradient(ellipse,rgba(255,150,190,.9),rgba(255,150,190,0) 70%);filter:blur(2px)}
 .room .held.obj canvas.dev.dream{box-shadow:0 0 18px 2px rgba(255,150,190,.45)}
@@ -277,7 +287,7 @@
 .splat-layer .splat-collapsed{opacity:0}
 .splat-layer > div{position:absolute;pointer-events:none}
 .splat-layer .splat-night,.splat-layer .splat-vignette,.splat-layer .splat-photo{inset:0}
-.splat-layer .splat-night{display:none;background:rgba(10,10,12,.55)}
+.splat-layer .splat-night{display:none;background:rgba(10,10,12,.6)}
 .splat-layer.night .splat-night{display:block}
 .splat-layer .splat-lamp{width:520px;height:520px;margin:-260px 0 0 -260px;border-radius:50%;background:radial-gradient(circle,rgba(255,196,120,.32),rgba(255,196,120,0) 65%);mix-blend-mode:screen}
 .splat-layer .splat-gap{background:radial-gradient(ellipse,rgba(235,240,255,.85),rgba(235,240,255,0) 70%);filter:blur(2px)}

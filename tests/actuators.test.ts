@@ -9,7 +9,7 @@ import { DEFAULT_CLOCK, type BeatClock } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
 import { initialSession, type Session } from "@world/desktop/model";
 import { setLocale, t } from "@world/i18n";
-import { itemStates, loopContext } from "@world/loop/checklist";
+import { itemStates, loopContext, nightfallReached } from "@world/loop/checklist";
 import { loopActions, renderGame, SHUTDOWN_TO_ROOM_MS } from "@world/room/game";
 import { renderRoom } from "@world/room/hud";
 import { DESK_SHOT, rectStyle, ROOM_SHOT } from "@world/room/shots";
@@ -119,6 +119,11 @@ describe("看一眼桌子: entering 桌子", () => {
     act(ctx, "view", { view: "desk" });
     expect(done(store, "desk")).toBe(false);
     completeUntil(store, "desk");
+    // Unlocked, but night has not fallen (the box and the pickup are still to do): not yet.
+    act(ctx, "view", { view: "room" });
+    act(ctx, "view", { view: "desk" });
+    expect(done(store, "desk")).toBe(false);
+    completeUntil(store, "desk", { all: true, skip: ["desk"] });
     act(ctx, "view", { view: "room" });
     act(ctx, "view", { view: "desk" });
     expect(done(store, "desk")).toBe(true);
@@ -147,24 +152,53 @@ describe("关机: in the work system's own top bar", () => {
 });
 
 describe("躺下: the bed in 房间", () => {
-  it("locked: one inner line (room.bed.locked), nothing else; unlocked: the night, then lieDown", () => {
+  const line = (key: string, text: string) => [{ key, lines: [{ k: "inner", t: t(text) }], ending: { kind: "none" } }];
+  it("before nightfall: room.bed.notyet; after it: room.bed.locked until the night's required items are done; then it asks", () => {
     const store = atDay(1);
     const { ctx } = ctxOf(store, "room");
     expect(render(ctx)).toContain(`class="shot-hit bed-hit" data-action="bed" style="${rectStyle(ROOM_SHOT.bed)}"`);
     act(ctx, "bed");
-    expect(ctx.session.dialogue.queue).toEqual([{ key: "d1:bed:locked", lines: [{ k: "inner", t: t("room.bed.locked") }], ending: { kind: "none" } }]);
+    expect(ctx.session.dialogue.queue).toEqual(line("d1:bed:notyet", "room.bed.notyet"));
     act(ctx, "bed"); // the same line, not twice
     expect(ctx.session.dialogue.queue).toHaveLength(1);
-    expect(store.getState().day).toBe(1);
     ctx.session.dialogue = { queue: [], line: 0 };
+    // Night falls (every required day item done); dinner, desk and shutdown are still to do.
+    completeUntil(store, "dinner", { all: true, skip: ["dinner", "desk", "shutdown", "chat"] });
+    expect(nightfallReached(loopContext(store.getState(), store.getEvents())!)).toBe(true);
+    act(ctx, "bed");
+    expect(ctx.session.dialogue.queue).toEqual(line("d1:bed:locked", "room.bed.locked"));
+    ctx.session.dialogue = { queue: [], line: 0 };
+    // Chat is optional: the bed opens without it.
+    completeUntil(store, "bed", { all: true, skip: ["chat"] });
+    act(ctx, "bed");
+    expect(ctx.session.dialogue.queue).toEqual([{ key: "d1:bed:ask", lines: [{ k: "inner", t: t("room.bed.confirm") }], ending: { kind: "bedAsk" } }]);
+    expect(store.getState().day).toBe(1);
+  });
+  it("the ask offers room.bed.sleep / room.bed.stay; stay closes the box and changes nothing", () => {
+    const store = atDay(1);
+    const { ctx } = ctxOf(store, "room");
     completeUntil(store, "bed", { all: true });
     act(ctx, "bed");
+    const html = render(ctx);
+    expect(html).toContain(`data-action="loop-choice" data-index="0" data-choice="sleep"`);
+    expect(html).toContain(`data-action="loop-choice" data-index="1" data-choice="stay"`);
+    expect(html).toContain(t("room.bed.sleep"));
+    expect(html).toContain(t("room.bed.stay"));
+    const events = store.getEvents().length;
+    const state = JSON.stringify(store.getState());
+    act(ctx, "loop-choice", { choice: "stay" });
+    expect(ctx.session.dialogue.queue).toEqual([]);
+    expect(store.getEvents()).toHaveLength(events);
+    expect(JSON.stringify(store.getState())).toBe(state);
+    expect(ctx.session.view).toBe("room");
+    // Asked again, sleep: the night, then lieDown.
+    act(ctx, "bed");
+    act(ctx, "loop-choice", { choice: "sleep" });
     expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:beat:night"]);
     for (let i = 0; i < dayFiles.get(1)!.beats.night!.say.length; i++) act(ctx, "loop-advance");
     expect(store.getState().day).toBe(2);
   });
 });
-
 describe("the bed and the meal are named by their strings", () => {
   it("room.bed on the bed, room.meal on the meal", () => {
     const store = atDay(1);

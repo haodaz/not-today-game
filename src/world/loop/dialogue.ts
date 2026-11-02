@@ -13,6 +13,8 @@ export type Ending =
   | { readonly kind: "lieDown" }
   /** "Do you know what this is?" (recognise spec): the options in this run's order (content indexes). */
   | { readonly kind: "recognise"; readonly object: string; readonly order: readonly number[] }
+  /** The bed, unlocked: 睡 / 再待会儿 (day-loop addition 2026-11-02). */
+  | { readonly kind: "bedAsk" }
   /** Kuro's upgrade offer as a line in the box (dialogue spec): 升级 / 不了. */
   | { readonly kind: "kuroOffer"; readonly object: string; readonly decline: "offer" | "nag" | "final" }
   /** 要和克总聊聊吗？ — 聊聊 / 先不聊. */
@@ -24,7 +26,7 @@ export type Ending =
 
 /** Endings that wait for a choice (Kuro's turn waits for the player's box). */
 export const endsInChoice = (e: Ending): boolean =>
-  e.kind === "beatChoices" || e.kind === "loan" || e.kind === "recognise" || e.kind === "kuroOffer" || e.kind === "kuroAsk" || e.kind === "kuroTurn" || e.kind === "kuroWait";
+  e.kind === "beatChoices" || e.kind === "loan" || e.kind === "recognise" || e.kind === "kuroOffer" || e.kind === "kuroAsk" || e.kind === "bedAsk" || e.kind === "kuroTurn" || e.kind === "kuroWait";
 
 export interface Queued {
   /** Where it came from (for tests and to avoid queueing the same thing twice). */
@@ -82,6 +84,32 @@ export function push(d: DialogueState, q: Queued): DialogueState {
 export function placedLines(seq: Sequence): readonly SayLine[] {
   const where = seq.where;
   return where === undefined ? seq.say : seq.say.map((l) => (l.where === undefined ? { ...l, where } : l));
+}
+
+// ——— a line brings its backdrop and prop (dialogue addition / correction 2026-11-02) ———
+
+/** What the stage shows behind the box: a photo under /room/dream/ and a cut-out under /room/props/. */
+export interface Scene {
+  readonly backdrop: string | null;
+  readonly prop: string | null;
+}
+export const NO_SCENE: Scene = { backdrop: null, prop: null };
+
+/**
+ * The scene of the sequence on show: the latest `backdrop` among its lines so far, and the latest
+ * `prop` (`""` clears it). Derived, never stored: when the sequence ends (the queue head changes or
+ * empties) the stage goes back to its own still. Pure.
+ */
+export function sceneOf(d: DialogueState): Scene {
+  const q = d.queue[0];
+  if (!q) return NO_SCENE;
+  let backdrop: string | null = null;
+  let prop: string | null = null;
+  for (const l of q.lines.slice(0, Math.min(d.line, q.lines.length - 1) + 1)) {
+    if (l.backdrop !== undefined) backdrop = l.backdrop;
+    if (l.prop !== undefined) prop = l.prop === "" ? null : l.prop;
+  }
+  return backdrop === null && prop === null ? NO_SCENE : { backdrop, prop };
 }
 
 // ——— a line waits for its place (dialogue addition 2026-11-02) ———
@@ -181,6 +209,10 @@ export const KURO_ASK_OPTIONS: readonly ChoiceOption[] = [
   { index: 0, text: null, choice: "yes", labelKey: "kuro.yes" },
   { index: 1, text: null, choice: "no", labelKey: "kuro.notNow" },
 ];
+export const BED_OPTIONS: readonly ChoiceOption[] = [
+  { index: 0, text: null, choice: "sleep", labelKey: "room.bed.sleep" },
+  { index: 1, text: null, choice: "stay", labelKey: "room.bed.stay" },
+];
 export const KURO_OFFER_OPTIONS: readonly ChoiceOption[] = [
   { index: 0, text: null, choice: "yes", labelKey: "upgrade.yes" },
   { index: 1, text: null, choice: "no", labelKey: "upgrade.no" },
@@ -190,6 +222,7 @@ function options(q: Queued, state: State): ChoiceOption[] | null {
   if (q.ending.kind === "loan") return [...LOAN_OPTIONS];
   if (q.ending.kind === "kuroAsk") return [...KURO_ASK_OPTIONS];
   if (q.ending.kind === "kuroOffer") return [...KURO_OFFER_OPTIONS];
+  if (q.ending.kind === "bedAsk") return [...BED_OPTIONS];
   if (q.ending.kind === "recognise") {
     // No hints: the same look for every option; the order is the run's, not content's.
     const entry = recogniseTable.get(q.ending.object);

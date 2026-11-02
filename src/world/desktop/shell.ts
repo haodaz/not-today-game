@@ -8,6 +8,7 @@ import { beatLabelKey, type BeatClock } from "./beat";
 import type { DockEntry } from "./dock";
 import { fxStageAttrs, type FxPlan } from "../room/fx";
 import type { WeatherKind } from "./browser/data";
+import { renderScene, type Scene } from "@world/dialogue/scene";
 
 export const APPS = ["msgs", "workbench", "browser"] as const;
 export type AppId = (typeof APPS)[number];
@@ -58,6 +59,8 @@ export interface ShellModel {
   readonly focus: Side;
   /** The desktop's share of the collapse: the pores on the left monitor and the dimmed text (room-scene correction 2026-11-02). */
   readonly fx?: FxPlan | null;
+  /** A line's backdrop and prop over the screen (dialogue 2026-11-02); absent = none. */
+  readonly scene?: Scene;
 }
 
 function topBar(m: ShellModel, monitor: MonitorModel): SafeHtml {
@@ -146,5 +149,5 @@ export function renderDesktop(m: ShellModel): SafeHtml {
   const [left, right] = m.monitors;
   const shown = m.focus === "left" ? left : right;
   const other = m.focus === "left" ? right : left;
-  return html`<div class="stage one-monitor" data-day="${m.day}" data-beat="${m.clock.beat}" data-focus="${m.focus}"${fxStageAttrs(m.fx ?? null)}>${toggle(m.focus)}${monitor(m, shown)}${otherTab(m, other)}</div>`;
+  return html`<div class="stage one-monitor" data-day="${m.day}" data-beat="${m.clock.beat}" data-focus="${m.focus}"${fxStageAttrs(m.fx ?? null)}>${toggle(m.focus)}${monitor(m, shown)}${otherTab(m, other)}${m.scene ? renderScene(m.scene) : null}</div>`;
 }

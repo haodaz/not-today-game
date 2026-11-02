@@ -23,7 +23,7 @@ import { nextInputs, startDoor, stepDoor } from "@world/delivery/door";
 import { mealView } from "@world/delivery/meals";
 import { html, type SafeHtml } from "@world/html";
 import { setLocale, t, tr } from "@world/i18n";
-import { booted, deskMeal, itemStates, loopContext, mealToOrder, openItemFor, openTask } from "@world/loop/checklist";
+import { booted, deskMeal, itemStates, loopContext, mealToOrder, nightfallReached, openItemFor, openTask } from "@world/loop/checklist";
 import type { EventToken } from "@state/days/table";
 import { messageActions } from "@world/desktop/messages/actions";
 import { MOTION, viewMoveMs } from "@world/motion/timing";
@@ -80,6 +80,12 @@ function fromItemsPanel(ctx: ActionContext): void {
 function openFor(ctx: ActionContext, match: (e: EventToken) => boolean) {
   const lc = loopContext(ctx.store.getState(), ctx.store.getEvents());
   return lc ? openItemFor(lc, match) : null;
+}
+
+/** Night has fallen today: every required day item is done (day-loop addition 2026-11-02). */
+function nightFallen(ctx: ActionContext): boolean {
+  const lc = loopContext(ctx.store.getState(), ctx.store.getEvents());
+  return !!lc && nightfallReached(lc);
 }
 
 /** Looking at an app counts, once the computer is on (before boot 屏幕 is two black monitors). */
@@ -162,7 +168,7 @@ export const loopActions: Record<string, ActionHandler> = {
     // The desktop opens on the monitor with the current app; looking at it counts.
     if (view === "desktop") lookAt(ctx, shownApp(ctx.session));
     // 看一眼桌子: arriving at 桌子 while the item is open is the look; the desk beat plays here.
-    if (view === "desk" && openFor(ctx, (e) => e.type === "beat" && e.beat === "desk")) stepOnce(ctx, "beat:desk");
+    if (view === "desk" && nightFallen(ctx) && openFor(ctx, (e) => e.type === "beat" && e.beat === "desk")) stepOnce(ctx, "beat:desk");
     settleSession(ctx.session);
     ctx.rerender();
   },
@@ -240,16 +246,30 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.rerender();
   },
 
-  // 躺下: the bed in 房间. Before the day is done it only says so (one inner line); then the
-  // night plays and lying down comes at its end (design L6).
+  // 躺下: the bed in 房间. Before night falls it only says so; after, it stays locked until the
+  // night's required items are done; then it asks (睡 / 再待会儿). Sleeping plays the night and lying
+  // down comes at its end (design L6; day-loop addition 2026-11-02).
   bed(ctx) {
     const { store, session } = ctx;
     const day = store.getState().day;
+    const lc = loopContext(store.getState(), store.getEvents());
+    if (lc && !nightfallReached(lc)) {
+      session.dialogue = push(session.dialogue, { key: `d${day}:bed:notyet`, lines: [{ k: "inner", t: t("room.bed.notyet") }], ending: { kind: "none" } });
+      ctx.rerender();
+      return;
+    }
     if (!openFor(ctx, (e) => e.type === "lieDown")) {
       session.dialogue = push(session.dialogue, { key: `d${day}:bed:locked`, lines: [{ k: "inner", t: t("room.bed.locked") }], ending: { kind: "none" } });
       ctx.rerender();
       return;
     }
+    session.dialogue = push(session.dialogue, { key: `d${day}:bed:ask`, lines: [{ k: "inner", t: t("room.bed.confirm") }], ending: { kind: "bedAsk" } });
+    ctx.rerender();
+  },
+  // The answer to 睡: the camera goes to 床, then the night begins.
+  sleep(ctx) {
+    const { store, session } = ctx;
+    const day = store.getState().day;
     // Pointing at the bed glides the camera to 床 first (the splat holds that framing; without the
     // splat there is nowhere to glide and the night begins where the player is). The night begins as
     // the camera arrives.
@@ -257,7 +277,7 @@ export const loopActions: Record<string, ActionHandler> = {
       loopActions["view"]!(ctx, { view: "bed" } as DOMStringMap, null as never);
       // (Backing out meanwhile cancels the night: it begins only if the camera is still there.)
       ctx.later(viewMoveMs("room", "bed", true) + 20, () => {
-        if (ctx.session.view === "bed") loopActions["bed"]!(ctx, {} as DOMStringMap, null as never);
+        if (ctx.session.view === "bed") loopActions["sleep"]!(ctx, {} as DOMStringMap, null as never);
       });
       return;
     }
@@ -268,7 +288,6 @@ export const loopActions: Record<string, ActionHandler> = {
     else session.dialogue = push(session.dialogue, beatQueued(day, "night", night, { kind: "lieDown" }));
     ctx.rerender();
   },
-
   // The box on the floor by the bed (房间): the camera goes to 桌子, then the box opens.
   "pick-box"(ctx) {
     if (ctx.session.view === "desk") return void loopActions["loop-box"]!(ctx, {} as DOMStringMap, null as never);
@@ -345,6 +364,15 @@ export const loopActions: Record<string, ActionHandler> = {
       if (q.ending.kind === "kuroAsk") answerAsk(ctx, data.choice === "yes");
       else answerOffer(ctx, data.choice === "yes");
       ctx.rerender();
+      return;
+    }
+    // 睡 / 再待会儿: sleeping goes on as lying down always did; staying changes nothing.
+    if (q.ending.kind === "bedAsk") {
+      if (data.choice !== "sleep" && data.choice !== "stay") return;
+      ctx.session.dialogue = finishChoice(ctx.session.dialogue);
+      settleSession(ctx.session);
+      if (data.choice === "sleep") loopActions["sleep"]!(ctx, {} as DOMStringMap, null as never);
+      else ctx.rerender();
       return;
     }
     const state = ctx.store.getState();

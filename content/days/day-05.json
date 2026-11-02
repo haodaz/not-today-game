@@ -79,11 +79,13 @@
         },
         {
           "k": "narration",
-          "t": "夏天的尾巴，风扇把光切成一明一暗。开学第一周，第二节课发卷子。"
+          "t": "夏天的尾巴，风扇把光切成一明一暗。开学第一周，第二节课发卷子。",
+          "backdrop": "/room/dream/classroom.jpg"
         },
         {
           "k": "narration",
-          "t": "九十六。你从一年级起没有拿过一百以下的分数。就在那一秒，它在你抽屉里叫了一声。"
+          "t": "九十六。你从一年级起没有拿过一百以下的分数。就在那一秒，它在你抽屉里叫了一声。",
+          "prop": "/room/props/exam_96.png"
         },
         {
           "k": "narration",
@@ -96,7 +98,8 @@
         },
         {
           "k": "narration",
-          "t": "期末那天她把它和成绩单一起递给你。先递成绩单，一百。再递它，屏幕上已经是那座坟。"
+          "t": "期末那天她把它和成绩单一起递给你。先递成绩单，一百。再递它，屏幕上已经是那座坟。",
+          "prop": "/room/props/exam_100.png"
         },
         {
           "k": "speaker",
@@ -202,29 +205,33 @@
       "text": "点个晚饭。",
       "unlock": "done:task2",
       "done": "event:order:dinner",
-      "required": false,
-      "rewrite": "晚饭在路上。"
+      "required": true,
+      "rewrite": "晚饭在路上。",
+      "when": "night"
     },
     {
       "id": "desk",
       "text": "看一眼桌子。",
       "unlock": "done:reply",
       "done": "event:beat:desk",
-      "required": true
+      "required": true,
+      "when": "night"
     },
     {
       "id": "shutdown",
       "text": "关机。",
       "unlock": "done:desk",
       "done": "event:beat:shutdown",
-      "required": true
+      "required": true,
+      "when": "night"
     },
     {
       "id": "chat",
       "text": "和它说会儿话。",
       "unlock": "done:shutdown",
       "done": "event:chat:any",
-      "required": false
+      "required": false,
+      "when": "night"
     },
     {
       "id": "bed",
@@ -232,7 +239,8 @@
       "unlock": "done:shutdown",
       "done": "event:lieDown",
       "required": true,
-      "locked": "requiredPending"
+      "locked": "requiredPending",
+      "when": "night"
     }
   ],
   "delivery": {

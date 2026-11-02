@@ -94,6 +94,14 @@ export function requiredPending(ctx: LoopContext, states = itemStates(ctx)): Ite
   return ctx.file.items.filter((it) => it.required && !isBed(it) && !states.get(it.id)!.done);
 }
 
+/**
+ * Night falls (day-loop addition 2026-11-02): every required day item is done. Pure, so it holds
+ * after a reload; the bed is not counted. Items marked `night` never hold it back.
+ */
+export function nightfallReached(ctx: LoopContext, states = itemStates(ctx)): boolean {
+  return !ctx.file.items.some((it) => it.required && it.when === "day" && !isBed(it) && !states.get(it.id)!.done);
+}
+
 /** L4: a done order item stays visible, unticked, with its rewrite text until that meal arrives. */
 function waiting(it: Item, st: ItemState, ctx: LoopContext): boolean {
   if (!st.done || !it.rewrite || it.done.kind !== "event" || it.done.event.type !== "order") return false;
@@ -142,6 +150,8 @@ export interface ChecklistLine {
 }
 
 export interface ChecklistView {
+  /** Which list the card shows: the day's, or (after nightfall) the night's. */
+  readonly heading: "today" | "tonight";
   readonly doneCount: number;
   readonly lines: readonly ChecklistLine[];
   /** Every required item is done and the bed can be used. */
@@ -155,7 +165,9 @@ export function checklist(ctx: LoopContext): ChecklistView {
   const open: ChecklistLine[] = [];
   let doneCount = 0;
   let bedOpen = false;
+  const heading = nightfallReached(ctx, states) ? "tonight" : "today";
   for (const it of ctx.file.items) {
+    if (it.when !== (heading === "tonight" ? "night" : "day")) continue;
     const st = states.get(it.id)!;
     if (waiting(it, st, ctx)) {
       waits.push({ id: it.id, text: it.rewrite!, state: "wait" });
@@ -172,7 +184,7 @@ export function checklist(ctx: LoopContext): ChecklistView {
   }
   // The first open, unlocked-and-usable item is the current one; one more is shown after it.
   const shown = open.slice(0, 2).map((l, i) => (i === 0 && l.state !== "locked" ? { ...l, state: "now" as const } : l));
-  return { doneCount, lines: [...shown.slice(0, 1), ...waits, ...shown.slice(1)], bedOpen };
+  return { heading, doneCount, lines: [...shown.slice(0, 1), ...waits, ...shown.slice(1)], bedOpen };
 }
 
 /** The first unlocked, unfinished work task (a `flag:` item that does not tick itself). */

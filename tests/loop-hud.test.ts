@@ -196,10 +196,10 @@ describe("runtime (design L5/L6)", () => {
     const { ctx } = fakeCtx(store);
     syncLoop(ctx, 0);
     ctx.session.dialogue = EMPTY_DIALOGUE;
-    // The bed in 房间 before the day is done: it only says so (day-loop correction 2026-11-01).
+    // The bed in 房间 before night falls: it only says so (day-loop addition 2026-11-02).
     loopActions["bed"]!(ctx, {} as DOMStringMap, null as never);
     expect(store.getState().day).toBe(1);
-    expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:bed:locked"]);
+    expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:bed:notyet"]);
     const night = dayFiles.get(1)!.beats.night!.say.length;
     ctx.session.dialogue = { queue: [{ key: "n", lines: dayFiles.get(1)!.beats.night!.say, ending: { kind: "lieDown" } }], line: 0 };
     for (let i = 0; i < night; i++) loopActions["loop-advance"]!(ctx, {} as DOMStringMap, null as never);

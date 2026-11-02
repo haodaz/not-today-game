@@ -35,6 +35,7 @@ const HEARTBEAT_TAKEN: string | null = raidNights.map(takeOf).find((t) => t?.wha
 import { heldItem, heldLayer } from "./held";
 import { pointerCls } from "./pointer";
 import { dialogueBox, raidShowing } from "@world/dialogue/box";
+import { renderScene, sceneOf } from "@world/dialogue/scene";
 
 /** L7: the day the heart-rate widget appears (stages.json if it says; else day 9's narration). */
 export const HEART_RATE_FROM_DAY: number = (stagesFile as { heartRateFromDay?: number }).heartRateFromDay ?? 9;
@@ -52,7 +53,7 @@ export function renderChecklist(view: ChecklistView): SafeHtml {
   // The checklist only watches (day-loop correction 2026-11-01): no line is a button.
   const lines = view.lines.map((l) => html`<div class="${cls("it", l.state)}" data-id="${l.id}"><i></i>${l.text}</div>`);
   const done = view.doneCount > 0 ? html`<div class="done">${tr("hud.done", { n: view.doneCount })}</div>` : null;
-  return html`<div class="list"><div class="h">${tr("hud.today")}</div>${done}${lines}</div>`;
+  return html`<div class="list"><div class="h">${tr(view.heading === "tonight" ? "hud.tonight" : "hud.today")}</div>${done}${lines}</div>`;
 }
 
 function dayCorner(state: State, session: Session): SafeHtml {
@@ -288,9 +289,9 @@ const PROXIES: Readonly<Record<HotId, Proxy>> = {
   },
   monitorL: { cls: "shot-hit monitor-hit", attrs: 'data-action="view" data-view="desktop" data-screen="left"', label: () => `${t("hud.cam.screen")} · ${t("desktop.screen.left")}`, rect: (v) => (v === "desk" ? DESK_SHOT.monitors.left : ROOM_SHOT.monitors.left) },
   monitorR: { cls: "shot-hit monitor-hit", attrs: 'data-action="view" data-view="desktop" data-screen="right"', label: () => `${t("hud.cam.screen")} · ${t("desktop.screen.right")}`, rect: (v) => (v === "desk" ? DESK_SHOT.monitors.right : ROOM_SHOT.monitors.right) },
-  lamp: { cls: "shot-hit lamp-hit", attrs: 'data-action="lamp"', label: () => (hasString("room.lamp") ? t("room.lamp") : ""), rect: (v) => (v === "desk" ? deskLayout.lamp : ROOM_SHOT.lamp) },
+  lamp: { cls: "shot-hit lamp-hit", attrs: 'data-action="lamp"', label: () => t("room.lamp"), rect: (v) => (v === "desk" ? deskLayout.lamp : ROOM_SHOT.lamp) },
   desk: { cls: "shot-hit", attrs: 'data-action="view" data-view="desk"', label: () => t("hud.cam.desk"), rect: () => ROOM_SHOT.desk },
-  box: { cls: "shot-hit box-hit", attrs: 'data-action="pick-box"', label: () => (hasString("room.box") ? t("room.box") : t("hud.cam.desk")), rect: () => ROOM_SHOT.box },
+  box: { cls: "shot-hit box-hit", attrs: 'data-action="pick-box"', label: () => t("room.box"), rect: () => ROOM_SHOT.box },
   bed: { cls: "shot-hit bed-hit", attrs: 'data-action="bed"', label: () => t("room.bed"), rect: () => ROOM_SHOT.bed },
   door: { cls: "shot-hit door-hit", attrs: 'data-action="view" data-view="door"', label: () => t("hud.cam.door") },
 };
@@ -303,10 +304,7 @@ function shotHits(view: HotView, state: State, events: readonly GameEvent[]): Sa
     const r = p.rect?.(view) ?? fixed[id];
     if (!r) return null;
     const tower = id === "tower" ? html`<i class="tower-led"></i>` : null;
-    // A thing with no name in the strings yet (the lamp) is not in the tab order or the reader's.
-    const label = p.label(state, events);
-    const quiet = label === "" ? raw(' tabindex="-1" aria-hidden="true"') : null;
-    return html`<button type="button" class="${p.cls}" ${raw(p.attrs)} style="${rectStyle(r)}" aria-label="${label}" data-hot="${id}"${quiet}>${tower}</button>`;
+    return html`<button type="button" class="${p.cls}" ${raw(p.attrs)} style="${rectStyle(r)}" aria-label="${p.label(state, events)}" data-hot="${id}">${tower}</button>`;
   });
   return html`${buttons}`;
 }
@@ -340,6 +338,16 @@ export function placedThingsFade(session: Pick<Session, "cam">, view: string, no
   return elapsed < ARRIVE_FADE_MS ? elapsed : null;
 }
 
+/** The evening look's dark layer (day-loop addition 2026-11-02); the splat's night layer matches it. */
+export const EVENING_DARK = 0.6;
+/** Evening is the `desk` beat on (night falls at 18:30, or earlier if the clock was). */
+export const isEvening = (clock: Pick<Session["clock"], "beat">): boolean => clock.beat === "desk" || clock.beat === "night";
+/** The stills' evening look: the night dark layer at 0.6 and the lamp's glow, over the photo and under everything placed. */
+function eveningLook(view: string): SafeHtml {
+  const lamp = view === "room" ? ROOM_SHOT.lamp : view === "desk" ? deskLayout.lamp : null;
+  const glow = lamp ? html`<i class="evening-lamp" style="left:${lamp.l + lamp.w / 2}px;top:${lamp.t + lamp.h / 2}px"></i>` : null;
+  return html`<div class="evening-look" style="--evening-dark:${EVENING_DARK}">${glow}</div>`;
+}
 export function renderRoom(model: RoomModel): SafeHtml {
   const { state, events, session } = model;
   const lc = loopContext(state, events);
@@ -353,7 +361,11 @@ export function renderRoom(model: RoomModel): SafeHtml {
   // 房间 carries what finished runs left on the desk: the figures, and the book (title-page FR4/FR8).
   const kept = view === "room" && !waiting ? html`${figuresLayer(session.collection)}${deskBook(session.collection)}` : null;
   const hotView = hotViewOf(view);
-  const scene = waiting ? null : door ? doorContent(state, events, session) : hotView ? html`${shotHits(hotView, state, events)}${kept}` : null;
+  // A line's backdrop covers the frame (dialogue 2026-11-02): the still's placed things, its
+  // evening look and the collapse shader step aside until the sequence ends.
+  const lineScene = sceneOf(session.dialogue);
+  const dream = lineScene.backdrop !== null;
+  const scene = waiting || dream ? null : door ? doorContent(state, events, session) : hotView ? html`${shotHits(hotView, state, events)}${kept}` : null;
   // The held item sits over everything but the dialogue box (held-object.html).
   const held = door ? null : heldLayer(state, events, session);
   // The hand is here: the desk dims and the gap between the monitors glows (night-hand FR1; the
@@ -361,10 +373,12 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const raid = !door && view !== "bed" && !waiting && raidShowing(state, session);
   const gap = (view === "room" ? ROOM_SHOT : DESK_SHOT).gap;
   // 桌子 is the tabletop: everything with state is a placed cutout at its rect (content/desk.json).
-  const top = view === "desk" && !waiting ? tabletop(deskThings(state, events, session)) : null;
-  const fx = view === "bed" ? null : renderFx(fxPlan(state.day, view));
+  const top = view === "desk" && !waiting && !dream ? tabletop(deskThings(state, events, session)) : null;
+  const fx = view === "bed" || dream ? null : renderFx(fxPlan(state.day, view));
+  // 床 shows the splat's own night layers.
+  const evening = isEvening(session.clock) && view !== "bed" && !dream ? eveningLook(view) : null;
   const late = fade === null ? null : raw(` style="--late:-${Math.round(fade)}ms"`);
-  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid", fade !== null && "m-late")}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${scene}${top}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${itemsPanel(state, events, session)}${held}${dialogueBox(state, events, session, nowMs)}${bottomRight(model)}${settingsButton()}${itemsButton(session)}${settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
+  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid", fade !== null && "m-late", dream && "scene-on")}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${evening}${renderScene(lineScene)}${scene}${top}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${itemsPanel(state, events, session)}${held}${dialogueBox(state, events, session, nowMs)}${bottomRight(model)}${settingsButton()}${itemsButton(session)}${settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
 }
 
 export { raidShowing };

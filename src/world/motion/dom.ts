@@ -53,6 +53,9 @@ interface Snap {
   readonly call: boolean;
   /** The player's box is up (which Kuro turn), or null. */
   readonly player: string | null;
+  /** A line's backdrop and prop on show (dialogue 2026-11-02), by picture. */
+  readonly backdrop: string | null;
+  readonly prop: string | null;
 }
 
 /** A node with its layout measured while it was still on screen (a detached node measures 0). */
@@ -79,6 +82,8 @@ interface Outgoing {
   readonly doorHand: HTMLElement | null;
   readonly gap: HTMLElement | null;
   readonly settings: HTMLElement | null;
+  /** The scene layer (a line's backdrop and prop). */
+  readonly scene: HTMLElement | null;
 }
 
 const live = (el: Element): boolean => !el.closest(".m-ghost");
@@ -205,6 +210,8 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       settings: !!q(root, ".settings-layer"),
       call: kuroInBox(s.dialogue),
       player: q(root, ".dlg-player") ? (head?.key ?? "") : null,
+      backdrop: q(root, ".stage > .scene > .scene-backdrop")?.dataset.src ?? null,
+      prop: q(root, ".stage > .scene > .scene-prop")?.dataset.src ?? null,
     };
   }
 
@@ -226,6 +233,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       doorHand: q(root, ".door-hand"),
       gap: q(root, ".gap-glow"),
       settings: q(root, ".settings-layer"),
+      scene: q(root, ".stage > .scene"),
     };
   }
 
@@ -803,6 +811,80 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     }
   }
 
+  // ---- a line's backdrop and prop (dialogue 2026-11-02) ------------------------------------
+  /** The live scene layer, or null. */
+  const liveScene = (r: HTMLElement) => q(r, ".stage > .scene");
+  /** Puts a leaving scene back where a scene goes: over the stage's photo layers, under the rest. */
+  function sceneSlot(r: HTMLElement, el: HTMLElement): boolean {
+    const stage = q(r, ".stage");
+    if (!stage) return false;
+    const next = [...stage.children].find((c) => !c.matches(".fx, .evening-look, .scene"));
+    stage.insertBefore(el, next ?? null);
+    return true;
+  }
+  /** Under whatever the live scene shows now. */
+  const underScene = (el: HTMLElement) => (r: HTMLElement) => {
+    const s = liveScene(r);
+    if (!s) return false;
+    s.prepend(el);
+    return true;
+  };
+  function sceneChange(t: number, snap: Snap, prev: Snap): void {
+    const old = out?.scene ?? null;
+    const fade = CHOSEN.backdropFade;
+    let whole = false;
+    if (snap.backdrop !== prev.backdrop) {
+      if (snap.backdrop) begin(`backdrop:${snap.backdrop}`, t);
+      const el = old ? q(old, ":scope > .scene-backdrop") : null;
+      if (prev.backdrop && el) {
+        if (snap.backdrop) {
+          // A → B: the old photo stays under the new one while it fades in (a crossfade, never a dip).
+          addGhost({ el, key: `scene:${prev.backdrop}`, start: t, end: t + fade, place: underScene(el), apply: () => {} });
+        } else if (snap.prop) {
+          fadeGhost(el, `scene:${prev.backdrop}`, underScene(el), fade, t);
+        } else {
+          // The sequence is over: the whole scene fades back to the still.
+          whole = true;
+          fadeGhost(old!, "scene", (r) => sceneSlot(r, old!), fade, t);
+        }
+      }
+    }
+    if (snap.prop !== prev.prop) {
+      if (snap.prop) begin(`prop:${snap.prop}`, t);
+      const el = old ? q(old, ":scope > .scene-prop") : null;
+      if (prev.prop && el && !whole) {
+        // No scene left (the prop was all there was): it leaves in a scene box of its own, inert.
+        let box: HTMLElement | null = null;
+        const leave = (r: HTMLElement) => {
+          const s = liveScene(r);
+          if (s) {
+            box?.remove();
+            s.appendChild(el);
+            return true;
+          }
+          if (!box) {
+            box = doc.createElement("div");
+            box.className = "scene m-ghost";
+            box.setAttribute("aria-hidden", "true");
+          }
+          box.appendChild(el);
+          return sceneSlot(r, box);
+        };
+        fadeGhost(el, `prop:${prev.prop}`, leave, exitOf(CHOSEN.propIn), t);
+      }
+    }
+  }
+  function sceneEntries(t: number): void {
+    const scene = liveScene(root);
+    if (!scene) return;
+    const bd = q(scene, ":scope > .scene-backdrop");
+    const bdStart = bd ? since(`backdrop:${bd.dataset.src ?? ""}`) : undefined;
+    if (bd && bdStart !== undefined && t - bdStart < CHOSEN.backdropFade) anim(bd, "m-fade-in", CHOSEN.backdropFade, bdStart, t);
+    const prop = q(scene, ":scope > .scene-prop");
+    const propStart = prop ? since(`prop:${prop.dataset.src ?? ""}`) : undefined;
+    if (prop && propStart !== undefined && t - propStart < CHOSEN.propIn) anim(prop, "m-fade-in", CHOSEN.propIn, propStart, t);
+  }
+
   // ---- the render hook ----------------------------------------------------------------------
   function afterRender(): void {
     const t = now();
@@ -848,6 +930,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
           }
         }
       }
+      if (sameDay && snap.view === prev.view) sceneChange(t, snap, prev);
       if (snap.choices && snap.choices !== prev.choices) begin(`choices:${snap.choices}`, t + delay);
       if (snap.asleep && !prev.asleep) begin("sleep", t);
       // The settings panel: in like the room dims for a held item, out faster.
@@ -934,6 +1017,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     const gap = q(root, ".gap-glow");
     if (gap && gapStart !== undefined && t - gapStart < MOTION.dim) anim(gap, "m-fade-in", MOTION.dim, gapStart, t);
     checklistEntries(t);
+    sceneEntries(t);
     doorEntries(t);
     kuroLines(t);
     phaseLock(t);

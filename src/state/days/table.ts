@@ -19,13 +19,29 @@ export type BeatName = (typeof BEAT_NAMES)[number];
 export const PLACES = ["room", "desk", "door", "night", "screen", "screen:msgs", "screen:workbench", "screen:browser"] as const;
 export type Place = (typeof PLACES)[number];
 
+/** A backdrop is a photo under /room/dream/, a prop a cut-out under /room/props/ (dialogue addition 2026-11-02). */
+export const BACKDROP_DIR = "/room/dream/";
+export const PROP_DIR = "/room/props/";
 export interface SayLine {
   readonly k: LineKind;
   readonly t: string;
   readonly sfx?: string;
   readonly who?: string;
   readonly where?: Place;
+  /**
+   * The photo the stage shows while this line is on, and until its sequence ends (full frame, under
+   * the box). A later line without one keeps it.
+   */
+  readonly backdrop?: string;
+  /**
+   * A cut-out shown large in the centre of the stage until a later line changes it. `""` clears it
+   * (a line that says nothing keeps the last one, like the backdrop).
+   */
+  readonly prop?: string;
 }
+/** When an item belongs (day-loop addition 2026-11-02): the day's work, or the evening after nightfall. */
+export const ITEM_WHEN = ["day", "night"] as const;
+export type ItemWhen = (typeof ITEM_WHEN)[number];
 
 export interface ChoiceEffects {
   readonly flags?: readonly string[];
@@ -78,6 +94,8 @@ export interface Item {
   readonly unlockRaw: string;
   readonly doneRaw: string;
   readonly required: boolean;
+  /** `day` (default) or `night`: the evening list, shown after nightfall. */
+  readonly when: ItemWhen;
   readonly rewrite?: string;
   readonly sfx?: string;
   readonly self?: boolean;
@@ -158,14 +176,22 @@ export function parsePlace(v: unknown, w: string, onFail: (where: string, proble
   return (PLACES as readonly unknown[]).includes(v) ? (v as Place) : onFail(w, `unknown place ${JSON.stringify(v)} (one of ${PLACES.join(", ")})`);
 }
 
+/** A path under `dir` made of plain file-name characters, one level deep: `/room/dream/classroom.jpg`. */
+function parsePicture(v: unknown, dir: string, w: string, onFail: (where: string, problem: string) => never, allowEmpty = false): string {
+  if (allowEmpty && v === "") return "";
+  if (typeof v !== "string" || !new RegExp(`^${dir.replace(/\//g, "\\/")}[A-Za-z0-9_-]+\\.(?:jpg|png)$`).test(v)) {
+    return onFail(w, `expected a path ${allowEmpty ? '("" clears) ' : ""}under ${dir} (a .jpg or .png), got ${JSON.stringify(v)}`);
+  }
+  return v;
+}
 /**
  * Parses one dialogue line (shared with content/tasks). `onFail` names the file family. Only the
- * day files' lines may carry `where` (`withWhere`); a task tree's may not.
+ * day files' lines may carry `where`, `backdrop` and `prop` (`withWhere`); a task tree's may not.
  */
 export function parseLine(v: unknown, w: string, onFail: (where: string, problem: string) => never = fail, withWhere = false): SayLine {
   if (!isRecord(v)) onFail(w, "a line must be an object");
   const r = v as Raw;
-  const allowed = withWhere ? ["k", "t", "sfx", "who", "where"] : ["k", "t", "sfx", "who"];
+  const allowed = withWhere ? ["k", "t", "sfx", "who", "where", "backdrop", "prop"] : ["k", "t", "sfx", "who"];
   for (const k of Object.keys(r)) if (!allowed.includes(k)) onFail(w, `unknown key "${k}"`);
   const k = r.k as LineKind;
   if (!LINE_KINDS.includes(k)) onFail(w, `unknown line kind "${String(r.k)}"`);
@@ -177,6 +203,8 @@ export function parseLine(v: unknown, w: string, onFail: (where: string, problem
     ...(r.sfx !== undefined ? { sfx: s(r.sfx, `${w}.sfx`) } : {}),
     ...(r.who !== undefined ? { who: s(r.who, `${w}.who`) } : {}),
     ...(r.where !== undefined ? { where: parsePlace(r.where, `${w}.where`, onFail) } : {}),
+    ...(r.backdrop !== undefined ? { backdrop: parsePicture(r.backdrop, BACKDROP_DIR, `${w}.backdrop`, onFail) } : {}),
+    ...(r.prop !== undefined ? { prop: parsePicture(r.prop, PROP_DIR, `${w}.prop`, onFail, true) } : {}),
   };
 }
 
@@ -240,7 +268,8 @@ function sequence(v: unknown, w: string, allowChoices: boolean): Sequence {
 
 function item(v: unknown, w: string): Item {
   if (!isRecord(v)) fail(w, "an item must be an object");
-  keys(v, ["id", "text", "unlock", "done", "required", "rewrite", "sfx", "self", "origin", "locked", "onUnlock", "onDone", "kuroCloses", "kuroClosesLine"], w);
+  keys(v, ["id", "text", "unlock", "done", "required", "when", "rewrite", "sfx", "self", "origin", "locked", "onUnlock", "onDone", "kuroCloses", "kuroClosesLine"], w);
+  if (v.when !== undefined && !(ITEM_WHEN as readonly unknown[]).includes(v.when)) fail(`${w}.when`, `must be one of ${ITEM_WHEN.map((x) => `"${x}"`).join(", ")}`);
   // late-days FR4: Kuro may close this item's document when it is opened.
   const closes = parseKuroCloses(v, (field, problem) => fail(`${w}.${field}`, problem));
   if (typeof v.required !== "boolean") fail(`${w}.required`, "must be true or false");
@@ -257,6 +286,7 @@ function item(v: unknown, w: string): Item {
     unlockRaw,
     doneRaw,
     required: v.required,
+    when: (v.when as ItemWhen | undefined) ?? "day",
     ...(v.rewrite !== undefined ? { rewrite: str(v.rewrite, `${w}.rewrite`) } : {}),
     ...(v.sfx !== undefined ? { sfx: str(v.sfx, `${w}.sfx`) } : {}),
     ...(v.self === true ? { self: true } : {}),

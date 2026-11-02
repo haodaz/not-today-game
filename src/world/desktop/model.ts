@@ -7,7 +7,7 @@ import { html, type SafeHtml } from "@world/html";
 import { tr } from "@world/i18n";
 import type { TaskMode } from "@state/days/effects";
 import type { DoorBeat } from "@world/delivery/door";
-import { EMPTY_DIALOGUE, type DialogueState } from "@world/loop/dialogue";
+import { EMPTY_DIALOGUE, sceneOf, type DialogueState } from "@world/loop/dialogue";
 import { booted, loopContext, openItemFor } from "@world/loop/checklist";
 import type { Reveal } from "@world/motion/reveal";
 import type { LogEntry } from "@world/dialogue/history";
@@ -285,5 +285,6 @@ export function buildShell(
     dock: { active: session.leftApp, badges, decoys: dockFor(state.day), decoyOpen: session.decoyWindow },
     focus: session.focus,
     fx: fxPlan(state.day, "desktop"),
+    scene: sceneOf(session.dialogue),
   };
 }

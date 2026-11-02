@@ -68,6 +68,10 @@ export const CHOSEN = {
   chosenHold: MOTION.choice,
   /** 房间 ↔ 桌子: the splat move and the CSS push under it (room-scene correction 2026-11-01). */
   roomDesk: 900,
+  /** A line's backdrop crossfades in, and the stage fades back to its still after the sequence (dialogue 2026-11-02). */
+  backdropFade: 1200,
+  /** A line's prop fades in over the backdrop. */
+  propIn: 300,
 } as const;
 
 /** How long a view change takes: 房间 ↔ 桌子 900 ms, other camera moves `MOTION.view`, the door `doorView`. */

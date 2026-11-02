@@ -64,10 +64,10 @@ function musicPart(table: SoundTable, when: string | null, extra: Partial<MusicP
 export const voiceOf = (names: { readonly pronoun: "she" | "he" | null } | undefined): Voice => (names?.pronoun === "she" ? "f" : "m");
 
 /** The ring's own day or night track, thinned by the ring; none when the ring's gain is 0. */
-function ringMusic(table: SoundTable, ringId: string, night: boolean): MusicPart {
+function ringMusic(table: SoundTable, ringId: string, night: boolean, gainBy = 1): MusicPart {
   const m = table.byRing[ringId]!.music;
   if (!m || m.gain <= 0) return NO_MUSIC;
-  return { music: night ? m.night : m.day, musicGain: m.gain, musicDegrade: true, fade: RING_MUSIC_FADE };
+  return { music: night ? m.night : m.day, musicGain: m.gain * gainBy, musicDegrade: true, fade: RING_MUSIC_FADE };
 }
 
 /** The ring whose room tone plays: a calm daytime day sounds like the first ring; nights never do. */
@@ -75,6 +75,8 @@ export function soundRing(day: number, night: boolean, table: SoundTable = sound
   return !night && isCalmDaytime(day) ? table.calm : ringOf(day);
 }
 
+/** The evening (night has fallen, the `desk` beat): the night's music, a little under its own gain (day-loop addition 2026-11-02). */
+export const EVENING_MUSIC_GAIN = 0.7;
 export interface PlanSession {
   readonly clock: Pick<BeatClock, "beat">;
   /** The ending pages (san-and-endings): the credits are the full song. */
@@ -92,8 +94,11 @@ export function soundPlan(
   const { day } = state;
   const beat = session.clock.beat;
   const night = beat === "night";
+  // The `desk` beat is the evening: the night bed and the night music, but none of the night's own
+  // beats (dream music, the stinger, the silence).
+  const evening = night || beat === "desk";
   const seed = seedOf(`${day}:${beat}`);
-  const ringId = soundRing(day, night, table);
+  const ringId = soundRing(day, evening, table);
   const ring = table.byRing[ringId]!;
   const voice = voiceOf(state.names);
   const base = { degrade: ring.degrade, voice, lang, seed } as const;
@@ -117,11 +122,11 @@ export function soundPlan(
       ? walkman
       : dream
         ? musicPart(table, `dream:${day}`)
-        : !night && isTenderDay(day)
+        : !evening && isTenderDay(day)
           ? musicPart(table, "tender-day", { musicDegrade: true })
-          : ringMusic(table, ringId, night);
+          : ringMusic(table, ringId, evening, beat === "desk" ? EVENING_MUSIC_GAIN : 1);
   return {
-    bed: silent ? null : night ? ring.night : ring.day,
+    bed: silent ? null : evening ? ring.night : ring.day,
     bedLevel: dream ? DREAM_BED_LEVEL : 1,
     stinger: type !== null && Object.prototype.hasOwnProperty.call(table.stingers, type) ? table.stingers[type]! : null,
     ...base,

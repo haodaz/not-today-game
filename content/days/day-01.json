@@ -203,29 +203,33 @@
       "text": "手机，点个晚饭。",
       "unlock": "done:task2",
       "done": "event:order:dinner",
-      "required": false,
-      "rewrite": "晚饭在路上。"
+      "required": true,
+      "rewrite": "晚饭在路上。",
+      "when": "night"
     },
     {
       "id": "desk",
       "text": "去桌子那儿看一眼。",
       "unlock": "done:reply",
       "done": "event:beat:desk",
-      "required": true
+      "required": true,
+      "when": "night"
     },
     {
       "id": "shutdown",
       "text": "屏幕右上角，关机。",
       "unlock": "done:desk",
       "done": "event:beat:shutdown",
-      "required": true
+      "required": true,
+      "when": "night"
     },
     {
       "id": "chat",
       "text": "右下角那只，和它说会儿话。",
       "unlock": "done:shutdown",
       "done": "event:chat:any",
-      "required": false
+      "required": false,
+      "when": "night"
     },
     {
       "id": "bed",
@@ -233,7 +237,8 @@
       "unlock": "done:shutdown",
       "done": "event:lieDown",
       "required": true,
-      "locked": "requiredPending"
+      "locked": "requiredPending",
+      "when": "night"
     }
   ],
   "delivery": {

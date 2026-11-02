@@ -10,7 +10,7 @@ import { isRaidNight, takeFor, wantsOf } from "@state/nights";
 import { dueAtLieDown, dueAtShutdown } from "@state/endings";
 import { startEnding } from "@world/endings/flow";
 import { knows, optionOrder, recogniseTable, wasRight } from "@state/recognise";
-import { advanceTo, DEFAULT_CLOCK, isNight, type Beat, type BeatClock } from "@world/desktop/beat";
+import { advanceTo, BEATS, DEFAULT_CLOCK, isNight, type Beat, type BeatClock } from "@world/desktop/beat";
 import { lastKuroLine } from "@world/desktop/kuro/mini";
 import { startTalk } from "@world/dialogue/kuro";
 import { judgementPending, startJudgement } from "@world/dialogue/judge";
@@ -20,7 +20,8 @@ export const JUDGE_POLL_MS = 250;
 import type { ActionContext } from "@world/desktop/controller";
 import type { LoopMemo } from "@world/desktop/model";
 import { arrivalOf, ordersOn } from "@world/delivery/meals";
-import { itemStates, loopContext, selfTicking, workDone, type LoopContext } from "./checklist";
+import { t } from "@world/i18n";
+import { itemStates, loopContext, nightfallReached, selfTicking, workDone, type LoopContext } from "./checklist";
 import { dropWaiting, placedLines, push, type DialogueState, type Ending, type Queued } from "./dialogue";
 import { settleSession } from "@world/dialogue/place";
 import { arrivalDue, msUntilDue, msUntilMinimum } from "./waiting";
@@ -30,6 +31,14 @@ export const SELF_TICK_MS = 4_000;
 
 /** Beat times taken from the mocks (stand-in until a day engine owns time; design L6). */
 export const BEAT_TIMES: Readonly<Record<"desk" | "night", string>> = { desk: "18:30", night: "23:41" };
+
+/** The sting that marks nightfall (a sound id of content/sounds; the plan never names it). */
+export const NIGHTFALL_STING = "sting-soft";
+
+/** Night falls: the clock is at least the `desk` beat, 18:30 if earlier (day-loop addition 2026-11-02). */
+export function eveningClock(clock: BeatClock): BeatClock {
+  return BEATS.indexOf(clock.beat) < BEATS.indexOf("desk") ? at(clock, "desk", BEAT_TIMES.desk) : clock;
+}
 
 const at = (clock: BeatClock, beat: Beat, time?: string): BeatClock => ({ beat, time: time && time > clock.time ? time : clock.time });
 
@@ -78,6 +87,8 @@ export interface LoopEffects {
   sounds: string[];
   /** A shutdown beat was among the new events (where the bad ending may come). */
   shutdown?: boolean;
+  /** The last required day item was done by these events: night falls now. */
+  nightfall?: boolean;
 }
 
 /**
@@ -152,7 +163,14 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
       }
     }
   }
-  return { dialogue, clock, sounds, shutdown };
+  // Night falls once, the moment the last required day item is done (never on a reload: the memo is fresh).
+  const nightfall = !nightfallReached(lc, memo.items) && nightfallReached(lc, now);
+  if (nightfall) {
+    dialogue = push(dialogue, { key: `d${day}:nightfall`, lines: [{ k: "narration", t: t("day.nightfall") }], ending: { kind: "none" } });
+    clock = eveningClock(clock);
+    sounds.push(NIGHTFALL_STING);
+  }
+  return { dialogue, clock, sounds, shutdown, nightfall };
 }
 
 /** A fresh memo for the current day, seeing everything already in the log as old. */
@@ -198,6 +216,8 @@ export function syncLoop(ctx: ActionContext, nowMs: number = Date.now()): void {
       session.playerPage = 0;
     }
     session.loop = freshMemo(lc, events, nowMs);
+    // Night already fell before this look (a reload): the evening look stays, nothing replays.
+    if (nightfallReached(lc)) session.clock = eveningClock(session.clock);
     scheduleSelf(ctx, lc);
     noticeKuroLine(ctx, nowMs);
     return;

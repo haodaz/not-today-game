@@ -80,6 +80,12 @@ const mouse = (type: string, target: Element, x: number, y: number, extra: Mouse
   target.dispatchEvent(e);
   return e;
 };
+/** Answers the bed's ask with 睡. */
+const sleep = async (m: M) => {
+  await frame();
+  m.root.querySelector<HTMLElement>('[data-action="loop-choice"][data-choice="sleep"]')!.click();
+  await frame();
+};
 const click = async (m: M, x: number, y: number) => {
   mouse("mousemove", m.stage(), x, y);
   mouse("mousedown", m.stage(), x, y);
@@ -413,6 +419,9 @@ describe("the real layer with a fake scene: look, and 床 held by the splat", ()
     // The bed's proxy is the thing to point at.
     const bed = fixedRects("room").bed!;
     await click(m, bed.l + bed.w / 2, bed.t + bed.h / 2);
+    // The bed asks first (day-loop addition 2026-11-02); 睡 starts the glide.
+    expect(m.session.view).toBe("room");
+    await sleep(m);
     expect(m.session.view).toBe("bed");
     expect(m.session.cam).toMatchObject({ to: "bed" });
     // Mid-move nothing is pointed at; once there, nothing of 房间 but the door.
@@ -444,6 +453,9 @@ describe("the real layer with a fake scene: look, and 床 held by the splat", ()
     await ready(m);
     const bed = fixedRects("room").bed!;
     await click(m, bed.l + bed.w / 2, bed.t + bed.h / 2);
+    // The bed asks first (day-loop addition 2026-11-02); 睡 starts the glide.
+    expect(m.session.view).toBe("room");
+    await sleep(m);
     expect(m.session.view).toBe("bed");
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
     await frame();
@@ -460,6 +472,9 @@ describe("the real layer with a fake scene: look, and 床 held by the splat", ()
     await ready(m);
     const bed = fixedRects("room").bed!;
     await click(m, bed.l + bed.w / 2, bed.t + bed.h / 2);
+    // The bed asks first (day-loop addition 2026-11-02); 睡 starts the glide.
+    expect(m.session.view).toBe("room");
+    await sleep(m);
     expect(m.session.view).toBe("bed");
     await wait(viewMoveMs("room", "bed", true) + 250);
     expect(m.root.querySelector(".splat-layer")).not.toBeNull();
@@ -479,8 +494,10 @@ describe("the real layer with a fake scene: look, and 床 held by the splat", ()
     await frame();
     expect(m.session.splatReady).toBe(false);
     m.root.querySelector<HTMLElement>('.shot-hit[data-hot="bed"]')!.click();
+    expect(m.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:bed:ask"]);
+    await sleep(m);
     expect(m.session.view).toBe("room");
-    expect(m.session.dialogue.queue.length > 0 || m.store.getState().day === 2).toBe(true);
+    expect(m.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:beat:night"]);
   });
 });
 
