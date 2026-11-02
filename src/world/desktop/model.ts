@@ -125,7 +125,9 @@ export interface Session {
    * things may appear (the arriving photo fades in over the last SPLAT_FADE_MS of a splat move, or
    * at the end of the CSS push). Wall ms; session only. Cleared by the first render after `until`.
    */
-  cam: { readonly to: View; readonly reveal: number; readonly until: number } | null;
+  cam: { readonly to: View; readonly reveal: number; readonly until: number; /** How long the placed things take to fade in (ms; default 200). */ readonly fade?: number } | null;
+  /** The hinted edge under the pointer (room-scene 2026-11-02: the door at 房间's right, back at the bottom) and since when (ms); set by the nav layer. */
+  edge: { readonly zone: "door" | "back"; readonly since: number } | null;
   /** The walkman on the desk is playing the theme (sound addition 2026-11-02); session only: no event, no state. */
   walkman: boolean;
   /** The decoy dock app whose small system window is open (desktop-ui 2026-11-02); session only. */
@@ -203,6 +205,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     workbenchPage: "home",
     movingUntil: 0,
     walkman: false,
+    edge: null,
     splatReady: false,
     cam: null,
     decoyWindow: null,

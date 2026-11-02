@@ -135,5 +135,28 @@
     "17": "room",
     "18": "branch",
     "_note": "Every calm ends with a jolt. The night beat (bedtime or dream) is never calm and always runs one ring ahead of the daytime ring. Types rotate so nights do not become predictable."
+  },
+  "weather": {
+    "_note": "author 2026-11-02: it does not rain every day",
+    "byDay": {
+      "1": "rain",
+      "2": "rain",
+      "3": "rain",
+      "4": "rain",
+      "5": "rain",
+      "6": "overcast",
+      "7": "fog",
+      "8": "fog",
+      "9": "rain",
+      "10": "clear",
+      "11": "overcast",
+      "12": "overcast",
+      "13": "stopped",
+      "14": "clear",
+      "15": "fog",
+      "16": "overcast",
+      "17": "white",
+      "18": "white"
+    }
   }
 }

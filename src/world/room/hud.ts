@@ -36,6 +36,7 @@ import { heldItem, heldLayer } from "./held";
 import { pointerCls } from "./pointer";
 import { dialogueBox, raidShowing } from "@world/dialogue/box";
 import { renderScene, sceneOf } from "@world/dialogue/scene";
+import { edgeLeads, HINT_FADE_MS } from "./look";
 
 /** L7: the day the heart-rate widget appears (stages.json if it says; else day 9's narration). */
 export const HEART_RATE_FROM_DAY: number = (stagesFile as { heartRateFromDay?: number }).heartRateFromDay ?? 9;
@@ -335,7 +336,7 @@ export function placedThingsFade(session: Pick<Session, "cam">, view: string, no
   const cam = session.cam;
   if (cam === null || cam.to !== view || nowMs <= 0 || nowMs < cam.reveal) return null;
   const elapsed = nowMs - cam.reveal;
-  return elapsed < ARRIVE_FADE_MS ? elapsed : null;
+  return elapsed < (cam.fade ?? ARRIVE_FADE_MS) ? elapsed : null;
 }
 
 /** The evening look's dark layer (day-loop addition 2026-11-02); the splat's night layer matches it. */
@@ -347,6 +348,19 @@ function eveningLook(view: string): SafeHtml {
   const lamp = view === "room" ? ROOM_SHOT.lamp : view === "desk" ? deskLayout.lamp : null;
   const glow = lamp ? html`<i class="evening-lamp" style="left:${lamp.l + lamp.w / 2}px;top:${lamp.t + lamp.h / 2}px"></i>` : null;
   return html`<div class="evening-look" style="--evening-dark:${EVENING_DARK}">${glow}</div>`;
+}
+/**
+ * The hinted edge (room-scene 2026-11-02): a soft arrow and 门 at 房间's right, 退回 at the bottom;
+ * it fades in over 200 ms (continued across re-renders) and sits under the HUD. Only where it
+ * leads somewhere (edgeZone and the nav layer decide).
+ */
+function edgeHint(session: Session, view: string, nowMs: number): SafeHtml | null {
+  const edge = session.edge;
+  if (!edge || !edgeLeads(view, edge.zone)) return null;
+  const since = nowMs > 0 ? Math.max(0, nowMs - edge.since) : HINT_FADE_MS;
+  const late = since < HINT_FADE_MS ? raw(` style="--late:-${Math.round(since)}ms"`) : null;
+  const label = t(edge.zone === "door" ? "hud.cam.door" : "hud.back");
+  return html`<div class="edge-hint ${edge.zone}" aria-hidden="true"${late}>${edge.zone === "door" ? html`<i class="arrow"></i>` : null}<span>${label}</span></div>`;
 }
 export function renderRoom(model: RoomModel): SafeHtml {
   const { state, events, session } = model;
@@ -377,8 +391,9 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const fx = view === "bed" || dream ? null : renderFx(fxPlan(state.day, view));
   // 床 shows the splat's own night layers.
   const evening = isEvening(session.clock) && view !== "bed" && !dream ? eveningLook(view) : null;
-  const late = fade === null ? null : raw(` style="--late:-${Math.round(fade)}ms"`);
-  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid", fade !== null && "m-late", dream && "scene-on")}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${evening}${renderScene(lineScene)}${scene}${top}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${itemsPanel(state, events, session)}${held}${dialogueBox(state, events, session, nowMs)}${bottomRight(model)}${settingsButton()}${itemsButton(session)}${settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
+  const fadeLen = session.cam?.fade ?? ARRIVE_FADE_MS;
+  const late = fade === null ? null : raw(` style="--late:-${Math.round(fade)}ms${fadeLen !== ARRIVE_FADE_MS ? `;--late-dur:${fadeLen}ms` : ""}"`);
+  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid", fade !== null && "m-late", dream && "scene-on")}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${evening}${renderScene(lineScene)}${scene}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${itemsPanel(state, events, session)}${held}${dialogueBox(state, events, session, nowMs)}${bottomRight(model)}${settingsButton()}${itemsButton(session)}${settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
 }
 
 export { raidShowing };

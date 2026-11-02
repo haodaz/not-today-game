@@ -9,7 +9,7 @@
 // those and not the music; `master` carries mute and the hidden tab. A file that is missing or
 // will not decode is silence, never an error, and nothing here throws.
 import { playSfx as defaultPlaySfx } from "@world/loop/sfx";
-import type { SoundPlan } from "./plan";
+import { DUCK_MS, type SoundPlan } from "./plan";
 import { musicFiles, sfxFileUrl, soundTable, type Degrade, type SoundTable } from "./table";
 
 /** The small slice of the Web Audio API used here; the real classes fit, and tests fake it. */
@@ -211,6 +211,9 @@ export function createSoundPlayer(deps: PlayerDeps = {}): SoundPlayer {
   let master: AGain | null = null;
   let bus: AGain | null = null;
   let humGain: AGain | null = null;
+  /** Between the bus and the master: the room goes quiet on the screen (stingers do not pass here). */
+  let duck: AGain | null = null;
+  let duckValue = 1;
   let masterValue = 1;
   let humValue = 0;
   let bed: Voice | null = null;
@@ -494,6 +497,7 @@ export function createSoundPlayer(deps: PlayerDeps = {}): SoundPlayer {
 
   const run = safe((plan: SoundPlan, prev: SoundPlan | null): void => {
     if (!ctx) return;
+    setDuck(plan);
     setHum(plan);
     setBed(plan);
     setMusic(plan);
@@ -502,6 +506,14 @@ export function createSoundPlayer(deps: PlayerDeps = {}): SoundPlayer {
     if (dropsChanged) scheduleDropouts(plan);
     if (plan.stinger !== null && (!prev || prev.stinger !== plan.stinger || prev.seed !== plan.seed)) sfx(plan.stinger, muted);
   });
+
+  /** The bed and the day / night music duck on the screen and come back, over DUCK_MS. */
+  function setDuck(plan: SoundPlan): void {
+    const to = plan.duck ?? 1;
+    if (!duck || to === duckValue) return;
+    fade(duck.gain, duckValue, to, DUCK_MS / 1000, false);
+    duckValue = to;
+  }
 
   const onVisibility = safe(() => {
     hidden = doc?.hidden ?? false;
@@ -545,10 +557,14 @@ export function createSoundPlayer(deps: PlayerDeps = {}): SoundPlayer {
       master.connect(ctx.destination);
       bus = ctx.createGain();
       bus.gain.value = 1;
-      bus.connect(master);
       humGain = ctx.createGain();
       humGain.gain.value = 0;
       humGain.connect(bus);
+      duck = ctx.createGain();
+      duckValue = wanted?.duck ?? 1;
+      duck.gain.value = duckValue;
+      duck.connect(master);
+      bus.connect(duck);
       const hum = ctx.createOscillator();
       hum.type = "sine";
       hum.frequency.value = HUM_HZ;

@@ -6,14 +6,17 @@
 //     focused proxy and a test all take the same action. The proxies are `.shot-hit[data-hot]`.
 //   - Back: right-click (= Esc), the bottom 6 % of the stage, or the wheel turned back pulls the
 //     camera out one level; never past 房间. Esc is the controller's.
-//   - Look: press-and-drag turns the head ±15° / ±8° while the splat is live, and eases back on
-//     release over 600 ms. With the splat off a drag does nothing.
+//   - Look: press-and-drag pans the photo (look.ts: ±4 % / ±2 %, the placed things 1.5×), easing
+//     back over 600 ms on release. Never the splat (room-scene decision 2026-11-02).
+//   - Edges: in 房间 the right 8 % is the way to 门, the bottom 6 % of 桌子 and 门 is back; resting
+//     there shows the hint (session.edge, drawn by hud.ts), clicking there goes there.
 // The camera is the splat layer's live pose while it draws, else the framing's fixed pose, which
 // gives back today's rectangles. Nothing here is an event or state.
 import type { ActionContext, ActionHandler } from "@world/desktop/controller";
 import { hotRects, hotViewOf, pickHot, type HotId, type HotView } from "./splat/hotspots";
 import { POSES, type Pose } from "./splat/pose";
 import { STAGE_H, STAGE_W } from "./splat/geometry";
+import { applyPan, easePan, edgeZone, NO_PAN, photoPan, PLACED_PARALLAX, LOOK_RETURN_MS, type EdgeZone, type Pan } from "./look";
 
 /** Anything the HUD or a placed thing answers to itself: the nav layer leaves a click on these alone. */
 export const INTERACTIVE = "button, a, input, textarea, select, label, [data-action], .dlg, .dlg-layer, .list, .items-panel, .settings-layer, .book-reader, .held, .hud-host, .hud-br";
@@ -69,11 +72,15 @@ export function createNav(deps: NavDeps = {}) {
     let lastWheel = -Infinity;
     let frame = 0;
 
-    const run = (name: string) => {
+    /** The photo's pan now, and the release it is easing back from. */
+    let pan: Pan = NO_PAN;
+    let easing: { from: Pan; at: number } | null = null;
+
+    const run = (name: string, data: Record<string, string> = {}) => {
       const handler = actions[name];
       if (!handler) return;
       try {
-        handler(ctx, {} as DOMStringMap, null as never);
+        handler(ctx, data as DOMStringMap, null as never);
       } catch (error) {
         console.warn(error);
       }
@@ -84,9 +91,11 @@ export function createNav(deps: NavDeps = {}) {
     const interactive = (target: EventTarget | null) => !!(target as HTMLElement | null)?.closest?.(INTERACTIVE);
     const cameraPose = (view: HotView): Pose => splat?.pose?.() ?? POSES[view];
 
-    function pickAt(p: { x: number; y: number }): HotId | null {
+    function pickAt(at: { x: number; y: number }): HotId | null {
       const view = hotView();
       if (!view) return null;
+      // While the photo is panned the placed things (and their proxies) sit 1.5× the pan away.
+      const p = { x: at.x - pan.x * PLACED_PARALLAX, y: at.y - pan.y * PLACED_PARALLAX };
       // What is in the DOM is what can be pointed at now (the tower only while the computer is off;
       // nothing while the placed things wait for the camera).
       return pickHot(cameraPose(view), view, p.x, p.y, (id) => proxy(id) !== null);
@@ -120,12 +129,34 @@ export function createNav(deps: NavDeps = {}) {
       if (pointer && !down?.moved) setHover(pickAt(pointer));
     }
 
+    const liveStage = () => root.querySelector<HTMLElement>(":scope > .stage.room:not(.m-ghost):not(.m-backdrop)");
+    /** Only the photo views pan (not 屏幕, not 床, which the splat holds). */
+    const pans = () => ["room", "desk", "door"].includes(ctx.session.view);
+    function setPan(p: Pan): void {
+      pan = p;
+      const stage = liveStage();
+      if (stage) applyPan(stage, p);
+    }
+
     function loop(): void {
       frame = 0;
       syncProxies();
-      if (splat?.pose?.()) frame = raf(loop);
+      if (easing) {
+        const e = now() - easing.at;
+        setPan(easePan(easing.from, e));
+        if (e >= LOOK_RETURN_MS) easing = null;
+      }
+      if (splat?.pose?.() || easing) frame = raf(loop);
       else root.classList.remove("look-turned");
     }
+
+    /** The hinted edge under the pointer changed: the HUD shows (or drops) its hint. */
+    function setEdge(zone: EdgeZone | null): void {
+      if ((ctx.session.edge?.zone ?? null) === zone) return;
+      ctx.session.edge = zone ? { zone, since: ctx.now?.() ?? Date.now() } : null;
+      ctx.rerender();
+    }
+    const edgeAt = (p: { x: number; y: number } | null): EdgeZone | null => (p ? edgeZone(ctx.session.view, p.x, p.y) : null);
 
     // ——— pointer ———
 
@@ -146,15 +177,21 @@ export function createNav(deps: NavDeps = {}) {
         if (!down.moved && Math.hypot(sx, sy) < DRAG_SLOP) return;
         down.moved = true;
         setHover(null);
-        // With the splat off (or not ready) a drag does nothing.
-        if (splat?.look?.(sx, sy)) {
-          syncProxies();
-          if (!frame) frame = raf(loop);
+        // Look: the photo pans with the hand (never the splat).
+        if (pans()) {
+          easing = null;
+          setPan(photoPan(sx, sy));
         }
         return;
       }
-      if (!p || interactive(e.target)) return setHover(null);
-      setHover(pickAt(p));
+      if (!p || interactive(e.target)) {
+        setEdge(null);
+        return setHover(null);
+      }
+      // An edge that leads somewhere shows its hint instead of a hover.
+      const edge = edgeAt(p);
+      setEdge(edge);
+      setHover(edge ? null : pickAt(p));
     };
 
     const onUp = () => {
@@ -163,7 +200,7 @@ export function createNav(deps: NavDeps = {}) {
       down = null;
       if (dragged) {
         suppressClick = true;
-        splat?.release?.();
+        if (pan.x !== 0 || pan.y !== 0) easing = { from: pan, at: now() };
         if (!frame) frame = raf(loop);
       }
     };
@@ -183,6 +220,12 @@ export function createNav(deps: NavDeps = {}) {
       if (inBackStrip(p.y, height)) {
         e.preventDefault();
         return run("nav-back");
+      }
+      // The hinted edge goes where it says.
+      if (edgeAt(p) === "door") {
+        e.preventDefault();
+        e.stopPropagation();
+        return run("view", { view: "door" });
       }
       const id = pickAt(p);
       if (!id) return;
@@ -208,6 +251,12 @@ export function createNav(deps: NavDeps = {}) {
       run("nav-back");
     };
 
+    const onLeave = () => {
+      pointer = null;
+      setEdge(null);
+      setHover(null);
+    };
+    root.addEventListener("mouseleave", onLeave);
     root.addEventListener("mousedown", onDown);
     root.addEventListener("mousemove", onMove);
     win.addEventListener("mouseup", onUp);
@@ -220,6 +269,11 @@ export function createNav(deps: NavDeps = {}) {
         // A new render: the markup is today's rectangles again; put the camera's back, and the hover.
         hover = null;
         if (!splat?.pose?.()) root.classList.remove("look-turned");
+        // The new stage takes the pan where it is (a re-render in the middle of a look).
+        if (pan.x !== 0 || pan.y !== 0) {
+          if (pans()) setPan(pan);
+          else ((pan = NO_PAN), (easing = null));
+        }
         syncProxies();
         if (splat?.pose?.() && !frame) frame = raf(loop);
         if (pointer && !down?.moved && !splat?.pose?.()) {
@@ -230,6 +284,7 @@ export function createNav(deps: NavDeps = {}) {
       destroy() {
         if (frame) caf(frame);
         frame = 0;
+        root.removeEventListener("mouseleave", onLeave);
         root.removeEventListener("mousedown", onDown);
         root.removeEventListener("mousemove", onMove);
         win.removeEventListener("mouseup", onUp);

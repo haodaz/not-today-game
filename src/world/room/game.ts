@@ -30,7 +30,7 @@ import { PHONE_FLIP } from "@world/room/held";
 import { booted, deskMeal, itemStates, loopContext, mealToOrder, nightfallReached, openItemFor, openTask } from "@world/loop/checklist";
 import type { EventToken } from "@state/days/table";
 import { messageActions } from "@world/desktop/messages/actions";
-import { MOTION, viewMoveMs } from "@world/motion/timing";
+import { CROSSFADE_MS, MOTION, viewMoveMs } from "@world/motion/timing";
 import { splatMoveFor } from "./splat/moves";
 import { SPLAT_FADE_MS } from "./splat/layer";
 
@@ -127,21 +127,25 @@ export const MODE_BY_KEY: Readonly<Record<string, TaskMode>> = {
 
 /**
  * A camera move to a photo view has begun (room-scene correction 2026-11-02): its placed things
- * wait for the arriving photo (the last SPLAT_FADE_MS of a splat move, the end of the CSS push).
- * Session only. Returns how long the move takes.
+ * wait for the arriving photo and fade in with it: the last SPLAT_FADE_MS of a splat move, the
+ * crossfade (the last CROSSFADE_MS) otherwise. Session only. Returns how long the move takes.
  */
 function startCam(ctx: ActionContext, from: string, to: View): number {
   const now = ctx.now?.() ?? Date.now();
-  const dur = viewMoveMs(from, to, true);
-  const fade = ctx.session.splatReady && splatMoveFor(from, to) ? SPLAT_FADE_MS : 0;
-  ctx.session.cam = { to, reveal: now + dur - fade, until: now + dur };
-  // Render again when the things may appear: with the splat that is its photo fade (the move is
-  // still under way); for the CSS push it is just after the motion layer's own last render
-  // (dur + 16), so one frame does both.
-  ctx.later(fade > 0 ? dur - fade + 24 : dur + 24, ctx.rerender);
+  const dur = viewMoveMs(from, to);
+  const fade = Math.min(dur, ctx.session.splatReady && splatMoveFor(from, to) ? SPLAT_FADE_MS : CROSSFADE_MS);
+  ctx.session.cam = { to, reveal: now + dur - fade, until: now + dur, fade };
+  // Render again when the things may appear: the start of the arriving photo's fade.
+  ctx.later(dur - fade + 24, ctx.rerender);
   return dur;
 }
-
+/** The two steps of a walk (room-scene 2026-11-02, step-1 / step-2; silence if the files are missing). */
+export const STEP_SOUNDS = ["step-1", "step-2"] as const;
+function walkSteps(ctx: ActionContext, from: string, to: string): void {
+  const dur = viewMoveMs(from, to);
+  ctx.play?.(STEP_SOUNDS[0]);
+  ctx.later(Math.round(dur / 2), () => ctx.play?.(STEP_SOUNDS[1]));
+}
 /** One camera level out: 屏幕 → 桌子 → 房间, 门 and 床 → 房间; none past 房间. */
 export function backTarget(view: View): View | null {
   return view === "desktop" ? "desk" : view === "room" ? null : "room";
@@ -176,12 +180,16 @@ export const loopActions: Record<string, ActionHandler> = {
     const from = ctx.session.view;
     ctx.session.view = view;
     if (from !== view && view !== "desktop") startCam(ctx, from, view);
+    // A move is a walk: two steps, whichever way.
+    if (from !== view) walkSteps(ctx, from, view);
     // A line waiting for this place comes forward; one that belongs elsewhere is taken back.
     settleSession(ctx.session);
     ctx.session.phoneOpen = false;
     ctx.session.itemsOpen = false;
     ctx.session.holding = null;
     restHand(ctx.session);
+    // The pointer finds the new view's edges itself.
+    ctx.session.edge = null;
     lookedAway(ctx);
     // The desktop opens on the monitor with the current app; looking at it counts.
     if (view === "desktop") lookAt(ctx, shownApp(ctx.session));

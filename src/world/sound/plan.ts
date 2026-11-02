@@ -29,7 +29,15 @@ export interface SoundPlan {
   readonly stinger: string | null;
   /** Seeds the dropouts, so a replay sounds the same: from (day, beat), or "title". */
   readonly seed: number;
+  /** The room goes quiet on the screen (sound addition 2026-11-02): the bed and the day / night music, 0–1. Stingers and one-shots are never ducked. */
+  readonly duck: number;
 }
+
+/** On 屏幕 the room's bed and music duck to this (and come back on leaving), over DUCK_MS. */
+export const SCREEN_DUCK = 0.4;
+export const DUCK_MS = 600;
+/** The duck for a view: 屏幕 (either monitor) is quiet, everywhere else full. */
+export const duckFor = (view: string | undefined): number => (view === "desktop" ? SCREEN_DUCK : 1);
 
 /** The san-and-endings names (`bad`, `survive`, `good`) → the table's `musicAt.when` ids. */
 export const ENDING_WHEN = { good: "ending:good", bad: "ending:bad", survive: "ending:leave" } as const;
@@ -83,6 +91,8 @@ export interface PlanSession {
   readonly endingPage?: { readonly phase: "you" | "credits" | "after" } | null;
   /** The walkman on the desk is playing the theme (a click; session only). */
   readonly walkman?: boolean;
+  /** Where the player is (the duck). */
+  readonly view?: string;
 }
 
 export function soundPlan(
@@ -108,7 +118,7 @@ export function soundPlan(
   if (state.ending !== "none") {
     const phase = session.endingPage?.phase;
     const when = phase === "credits" || phase === "after" ? "credits" : ENDING_WHEN[state.ending];
-    return { bed: null, bedLevel: 1, stinger: null, ...base, ...musicPart(table, when) };
+    return { bed: null, bedLevel: 1, stinger: null, duck: 1, ...base, ...musicPart(table, when) };
   }
 
   const silent = day >= table.silence.fromDay && table.silence.beats.includes(beat);
@@ -129,6 +139,7 @@ export function soundPlan(
     bed: silent ? null : evening ? ring.night : ring.day,
     bedLevel: dream ? DREAM_BED_LEVEL : 1,
     stinger: type !== null && Object.prototype.hasOwnProperty.call(table.stingers, type) ? table.stingers[type]! : null,
+    duck: duckFor(session.view),
     ...base,
     ...tune,
   };
@@ -153,6 +164,7 @@ export function titlePlan(
     degrade: first.degrade,
     stinger: null,
     seed: seedOf("title"),
+    duck: 1,
     voice: opts.voice ?? "m",
     lang: opts.lang ?? getLocale(),
     ...musicPart(table, "title"),

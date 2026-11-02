@@ -9,7 +9,7 @@ import { dreamNights } from "@state/stages";
 import type { State } from "@state/types.gen";
 import { BEATS, type Beat } from "@world/desktop/beat";
 import { RINGS } from "@world/desktop/rings";
-import { ENDING_WHEN, soundPlan, titlePlan, type SoundPlan } from "@world/sound/plan";
+import { DUCK_MS, ENDING_WHEN, SCREEN_DUCK, soundPlan, titlePlan, type SoundPlan } from "@world/sound/plan";
 import {
   createSoundPlayer,
   equalPowerCurve,
@@ -461,6 +461,10 @@ class FakeContext implements AContext {
   get hum() {
     return this.gains[2]!;
   }
+  /** Between the bus and the master (sound addition 2026-11-02). */
+  get duck() {
+    return this.gains[3]!;
+  }
 }
 
 class FakeDoc {
@@ -541,11 +545,12 @@ describe("the player (fake AudioContext)", () => {
     expect(r.ctx.filters).toHaveLength(1);
     expect(r.ctx.filters[0]!.type).toBe("lowpass");
     expect(r.ctx.filters[0]!.frequency.value).toBe(day1().degrade.lowpassHz);
-    const voice = r.ctx.gains[3]!;
+    const voice = r.ctx.gains[4]!;
     expect(bed.to).toEqual([r.ctx.filters[0]]);
     expect(r.ctx.filters[0]!.to).toEqual([voice]);
     expect(voice.to).toEqual([r.ctx.bus]);
-    expect(r.ctx.bus.to).toEqual([r.ctx.master]);
+    expect(r.ctx.bus.to).toEqual([r.ctx.duck]);
+    expect(r.ctx.duck.to).toEqual([r.ctx.master]);
     expect(r.ctx.master.to).toEqual([r.ctx.destination]);
     // The 50 Hz hum is one oscillator, through its own gain, into the bus.
     expect(r.ctx.oscs).toHaveLength(1);
@@ -577,12 +582,12 @@ describe("the player (fake AudioContext)", () => {
     r.player.unlock();
     r.player.apply(day1());
     await r.player.idle();
-    const [oldGain, oldSource] = [r.ctx.gains[3]!, r.ctx.sources[0]!];
+    const [oldGain, oldSource] = [r.ctx.gains[4]!, r.ctx.sources[0]!];
     r.ctx.currentTime = 30;
     r.player.apply(night1());
     await r.player.idle();
     expect(r.ctx.sources).toHaveLength(2);
-    const newGain = r.ctx.gains[4]!;
+    const newGain = r.ctx.gains[5]!;
     const out = oldGain.gain.events.filter((e) => e.type === "curve").at(-1)!;
     const inn = newGain.gain.events.find((e) => e.type === "curve")!;
     expect([out.duration, inn.duration]).toEqual([2, 2]);
@@ -783,7 +788,7 @@ describe("the player (fake AudioContext)", () => {
     await r.player.idle();
     r.ctx.currentTime = 50;
     r.player.apply(planOn(13, "night"));
-    expect(r.ctx.gains[3]!.gain.events.filter((e) => e.type === "curve").at(-1)).toMatchObject({ time: 50, duration: 2 });
+    expect(r.ctx.gains[4]!.gain.events.filter((e) => e.type === "curve").at(-1)).toMatchObject({ time: 50, duration: 2 });
     expect(r.ctx.sources[0]!.stops).toEqual([52]);
     r.player.apply(planOn(13, "night"));
     await r.player.idle();
@@ -843,7 +848,7 @@ describe("the player (fake AudioContext)", () => {
     r.player.apply(titlePlan(0.12, { voice: "m", lang: "zh" }));
     await r.player.idle();
     expect(r.fetched.sort()).toEqual(["/sfx/rain-loop.mp3", "/sfx/theme_m_zh.mp3"]);
-    const rain = r.ctx.gains[3]!;
+    const rain = r.ctx.gains[4]!;
     const to = (rain.gain.events.find((e) => e.type === "curve")!.curve!).at(-1)!;
     expect(to).toBeCloseTo(0.12, 6);
     // Louder once the computer turns on: the same bed, trimmed.
@@ -868,7 +873,7 @@ describe("the player (fake AudioContext)", () => {
     await r.player.idle();
     expect(r.ctx.sources).toHaveLength(4);
     // The song fades out over the title entry's 1.5 s and stops; the rain crossfades over 2 s.
-    const songGain = r.ctx.gains[4]!;
+    const songGain = r.ctx.gains[5]!;
     expect(songGain.gain.events.at(-1)).toMatchObject({ type: "ramp", value: 0, time: 11.5 });
     expect(r.ctx.sources[1]!.stops).toEqual([11.5]);
     expect(r.ctx.sources[0]!.stops).toEqual([12]);
@@ -884,7 +889,7 @@ describe("the player (fake AudioContext)", () => {
       await r.player.idle();
       expect(loops(r)).toEqual([true, true]);
       const filter = r.ctx.filters[1]!;
-      const gain = r.ctx.gains[4]!;
+      const gain = r.ctx.gains[5]!;
       expect(r.ctx.sources[1]!.to).toEqual([filter]);
       expect(filter.to).toEqual([gain]);
       expect(gain.to).toEqual([r.ctx.bus]);
@@ -914,7 +919,7 @@ describe("the player (fake AudioContext)", () => {
       r.player.apply(planOn(7, "work"));
       await r.player.idle();
       expect(r.ctx.sources).toHaveLength(2);
-      const g = r.ctx.gains[4]!;
+      const g = r.ctx.gains[5]!;
       expect(g.gain.events.at(-1)).toMatchObject({ type: "ramp", value: soundTable.music.day!.gain * 0.8 });
       r.ctx.currentTime = 40;
       r.player.apply(planOn(7, "night"));
@@ -1032,5 +1037,45 @@ describe("the stages table the plan reads", () => {
   it("every night-beat type that has a stinger in the table is a type stages.json uses", () => {
     const types = new Set(Object.entries(stagesFile.nightBeat).filter(([k]) => !k.startsWith("_")).map(([, v]) => v));
     for (const type of Object.keys(soundTable.stingers)) expect(types.has(type), type).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------
+describe("the room goes quiet on the screen (sound addition 2026-11-02)", () => {
+  const onView = (view: string, beat: Beat = "work", day = 4) => soundPlan(stateOn(day), { ...at(beat), view }, soundTable, "zh");
+  it("the plan: duck 0.4 on 屏幕, 1.0 on 房间 / 桌子 / 门 / 床, the title and every ending", () => {
+    expect(SCREEN_DUCK).toBe(0.4);
+    expect(DUCK_MS).toBe(600);
+    expect(onView("desktop").duck).toBe(0.4);
+    for (const view of ["room", "desk", "door", "bed"]) expect(onView(view).duck, view).toBe(1);
+    expect(soundPlan(stateOn(4), at("work"), soundTable, "zh").duck).toBe(1);
+    expect(titlePlan(0.12).duck).toBe(1);
+    expect(soundPlan(stateOn(18, "good"), { ...at("night"), view: "desktop" }, soundTable, "zh").duck).toBe(1);
+    // Nothing else in the plan changes with the view: the bed and the music stay; only the duck.
+    fc.assert(
+      fc.property(fc.integer({ min: 1, max: 18 }), fc.constantFrom(...BEATS), (day, beat) => {
+        const { duck: a, ...screen } = onView("desktop", beat, day);
+        const { duck: b, ...room } = onView("room", beat, day);
+        expect([a, b]).toEqual([0.4, 1]);
+        expect(screen).toEqual(room);
+      }),
+    );
+  });
+  it("the player: the bus goes through the duck; 600 ms down on the screen and back on leaving; stingers are not ducked", async () => {
+    const r = rig({ files: "all" });
+    r.player.unlock();
+    r.player.apply(onView("room"));
+    await r.player.idle();
+    expect(r.ctx.bus.to).toEqual([r.ctx.duck]);
+    expect(r.ctx.duck.gain.value).toBe(1);
+    r.ctx.currentTime = 10;
+    r.player.apply(onView("desktop"));
+    expect(r.ctx.duck.gain.events.at(-1)).toEqual({ type: "ramp", value: 0.4, time: 10.6 });
+    r.ctx.currentTime = 20;
+    r.player.apply(onView("desk"));
+    expect(r.ctx.duck.gain.events.at(-1)).toEqual({ type: "ramp", value: 1, time: 20.6 });
+    // A stinger is a one-shot of its own, not through the bus.
+    r.player.apply({ ...onView("desktop"), stinger: "sting-soft", seed: 99 });
+    expect(r.stings.at(-1)).toEqual(["sting-soft", false]);
   });
 });

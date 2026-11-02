@@ -31,7 +31,7 @@ describe("desk.json carries the walkman's rect", () => {
   const clone = () => JSON.parse(JSON.stringify(deskFile)) as Record<string, any>;
 
   it("the loader reads it, with its _note", () => {
-    expect(deskLayout.walkman).toEqual({ l: 1060, t: 640, w: 180, h: 150 });
+    expect(deskLayout.walkman).toEqual({ l: 300, t: 660, w: 180, h: 150 });
     expect(parseDesk(deskFile)).toEqual(deskLayout);
   });
 

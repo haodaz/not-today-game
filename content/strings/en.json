@@ -263,5 +263,11 @@
   "hud.back": "Back",
   "wb.nav.msgs": "Messages",
   "wb.nav.approvals": "Approvals",
-  "wb.nav.contacts": "Contacts"
+  "wb.nav.contacts": "Contacts",
+  "weather.rain": "Rain",
+  "weather.overcast": "Overcast",
+  "weather.fog": "Fog",
+  "weather.clear": "Clear",
+  "weather.stopped": "Rain stopped",
+  "weather.white": "White"
 }

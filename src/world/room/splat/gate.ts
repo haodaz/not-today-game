@@ -6,14 +6,17 @@ export interface GateInput {
   readonly search: string;
   readonly webgl: boolean;
   readonly reducedMotion: boolean;
+  /** A dev build (production never loads the splat). */
+  readonly dev: boolean;
 }
-
-/** On unless `?splat=0`, no WebGL, or reduced motion. Pure. */
+/**
+ * The splat goes dark until it is good (room-scene decision 2026-11-02): on only with `?splat=1`, in
+ * a dev build, with WebGL and without reduced motion. Production never loads it. Pure.
+ */
 export function splatEnabled(g: GateInput): boolean {
   const flag = new URLSearchParams(g.search).get("splat");
-  return flag !== "0" && g.webgl && !g.reducedMotion;
+  return flag === "1" && g.dev && g.webgl && !g.reducedMotion;
 }
-
 /** Whether a WebGL context can be made (a throwaway canvas; nothing is attached). */
 export function hasWebGL(doc: Document): boolean {
   try {

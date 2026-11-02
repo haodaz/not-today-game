@@ -302,6 +302,6 @@ describe("checklist (FR4)", () => {
   });
 
   it("chosen values are kept apart from motion.md's", () => {
-    expect(Object.keys(CHOSEN).sort()).toEqual(["backdropFade", "chosenHold", "doorImage", "doorStep", "doorView", "kuroLine", "propIn", "roomDesk", "sleepRisePx", "strike", "wake"]);
+    expect(Object.keys(CHOSEN).sort()).toEqual(["backdropFade", "chosenHold", "deskScreen", "doorImage", "doorStep", "doorView", "kuroLine", "propIn", "roomDesk", "roomDoor", "sleepRisePx", "strike", "wake", "walkBobPx"]);
   });
 });

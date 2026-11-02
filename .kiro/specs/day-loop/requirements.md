@@ -96,3 +96,6 @@ Feedback after playing: there is no moment where the player knows the day's work
 - **Kuro at night.** The chat is available after nightfall as it is in the day; the optional `chat` item ticks on any turn. Nothing else changes about Kuro's turn limits.
 - **Day 1 instruction (content):** the `desk` item's text already says where; Claude adds a short `onUnlock` line to day 1's first night item if the nightfall line alone is not enough.
 - **Tests:** loader accepts/rejects `when`; nightfall fires exactly once per day and only after the last required day item; the bed shows `notyet` before nightfall, `locked` after it until required night items are done, the confirm after that; `stay` leaves state untouched; snapshot the checklist card before and after nightfall on day 1 and the 房间 stage in the evening look.
+
+## Addition 2026-11-02 (author): it does not rain every day
+`content/stages.json` gets `weather` by day (Claude adds): 1 雨, 2 雨, 3 雨, 4 雨, 5 雨, 6 阴, 7 雾, 8 雾, 9 雨, 10 晴, 11 阴, 12 阴, 13 停, 14 晴, 15 雾, 16 阴, 17 白, 18 白, with an en twin. The HUD chip (today "☁ 雨"), the title page's rain bed (only when day 1's weather is rain, which it is), and the room's `rain-loop` layer follow it: rain → `rain` bed under the room bed at 0.5; 雾/阴/停/白 → none. Strings `weather.<key>` zh/en. Test: the chip text per day; no rain bed on day 10.

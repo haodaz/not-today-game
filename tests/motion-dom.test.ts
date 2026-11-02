@@ -11,7 +11,7 @@ import { mountDesktop } from "@world/desktop/controller";
 import type { Session } from "@world/desktop/model";
 import { syncLoop } from "@world/loop/runtime";
 import { createMotion, duplicateKeys, KEYED, motionKey } from "@world/motion/dom";
-import { CHOSEN } from "@world/motion/timing";
+import { CHOSEN, CROSSFADE_MS, viewMoveMs } from "@world/motion/timing";
 import { loopActions, loopKeys, renderGame } from "@world/room/game";
 
 let destroy: (() => void) | null = null;
@@ -42,8 +42,12 @@ function mount(store: Store, view: Session["view"] = "room") {
   return { root, session: m.session };
 }
 
-/** How long after `midway` a move has surely ended: 房间 ↔ 桌子 take CHOSEN.roomDesk (900 ms), the rest 400 ms. */
-const settle = (what: string) => (/^(room → desk|desk → room)/.test(what) ? CHOSEN.roomDesk : 450);
+/** How long after `midway` a move has surely ended: as long as its path (viewMoveMs), and a little. */
+const VIEW_OF: Readonly<Record<string, string>> = { room: "room", desk: "desk", screen: "desktop", door: "door" };
+const settle = (what: string) => {
+  const [a, b] = what.split(" → ").map((w) => VIEW_OF[w.split(" ")[0]!]!);
+  return viewMoveMs(a!, b!) + 50;
+};
 
 const backdrops = (root: HTMLElement) => [...root.querySelectorAll(KEYED)].filter((el) => motionKey(el) === "backdrop").length;
 
@@ -93,10 +97,21 @@ describe("the live DOM after a render (fix 2026-10-31)", () => {
       await click(root, selector);
       check(root, session, what);
       if (what === "room → desk") {
-        // The move is carried by a picture-only copy; the arriving stage hides its own picture.
-        expect(root.querySelectorAll(".m-backdrop").length, what).toBe(1);
-        expect(root.querySelector(".m-backdrop")!.children.length, what).toBe(0);
-        expect(root.querySelector(".stage.desk-view")!.classList.contains("m-nobg"), what).toBe(true);
+        // A walk, then a crossfade (room-scene 2026-11-02): two picture-only copies, the arriving one
+        // under the leaving one; the arriving stage hides its own picture. No zoom: no camera vars.
+        const copies = [...root.querySelectorAll<HTMLElement>(".m-backdrop")];
+        expect(copies, what).toHaveLength(2);
+        expect(copies.every((c) => c.children.length === 0), what).toBe(true);
+        expect(copies[0]!.classList.contains("m-arriving"), what).toBe(true);
+        const leaving = copies[1]!.style.animation;
+        expect(leaving, what).toMatch(/m-walk-bob 900ms/);
+        // The fade is the move's last 400 ms (the walk of 500 ms first).
+        expect(leaving, what).toMatch(new RegExp(`m-fade-out ${CROSSFADE_MS}ms \\S+ (\\d+)ms both`));
+        expect(Number(/m-fade-out \d+ms \S+ (\d+)ms/.exec(leaving)![1]), what).toBeGreaterThan(400);
+        expect(copies[0]!.style.animation, what).toMatch(/m-walk-bob 900ms/);
+        expect(copies.some((c) => c.style.getPropertyValue("--m-z") !== ""), what).toBe(false);
+        expect(root.querySelector(".stage.desk-view:not(.m-backdrop)")!.classList.contains("m-nobg"), what).toBe(true);
+        expect(root.querySelector(".splat-layer"), what).toBeNull();
       }
       await midway(root, session, what);
       await wait(settle(what));
@@ -126,8 +141,8 @@ describe("the live DOM after a render (fix 2026-10-31)", () => {
       await frame();
       check(root, session, `${what} (after)`);
     }
-    // Seven real-time moves, two of them 900 ms (房间 ↔ 桌子): more than the default 5 s.
-  }, 15_000);
+    // Seven real-time moves at their walking lengths: more than the default 5 s.
+  }, 20_000);
 
   it("a held item that changes is replaced at once (phone → object); putting down leaves once", async () => {
     const store = storeAt(1, [

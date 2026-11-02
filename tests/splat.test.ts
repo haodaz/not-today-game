@@ -24,7 +24,7 @@ import { angleDelta, clampPose, easeInOutCubic, lerpPose, lookOf, moveBetween, p
 import { CALIBRATION } from "@world/room/splat/calibration";
 import { formatCalibration, framingOf, nudge, poseOfRow } from "@world/room/splat/calibrate";
 import { calibrating } from "@world/room/splat";
-import { CHOSEN, viewMoveMs } from "@world/motion/timing";
+import { CHOSEN, CROSSFADE_MS, viewMoveMs, walkMs } from "@world/motion/timing";
 import { fitStage } from "@world/fit";
 
 const deg = (r: number) => (r * 180) / Math.PI;
@@ -160,15 +160,18 @@ describe("which moves, and the look by ring", () => {
 });
 
 describe("the kill switch", () => {
-  it("on unless ?splat=0, no WebGL, or reduced motion", () => {
-    expect(splatEnabled({ search: "", webgl: true, reducedMotion: false })).toBe(true);
-    expect(splatEnabled({ search: "?day=3&splat=1", webgl: true, reducedMotion: false })).toBe(true);
-    expect(splatEnabled({ search: "?splat=0", webgl: true, reducedMotion: false })).toBe(false);
-    expect(splatEnabled({ search: "?day=3&splat=0", webgl: true, reducedMotion: false })).toBe(false);
-    expect(splatEnabled({ search: "", webgl: false, reducedMotion: false })).toBe(false);
-    expect(splatEnabled({ search: "", webgl: true, reducedMotion: true })).toBe(false);
+  it("dark by default (decision 2026-11-02): on only with ?splat=1 in a dev build, with WebGL, without reduced motion", () => {
+    const on = { webgl: true, reducedMotion: false, dev: true };
+    expect(splatEnabled({ ...on, search: "" })).toBe(false);
+    expect(splatEnabled({ ...on, search: "?day=4" })).toBe(false);
+    expect(splatEnabled({ ...on, search: "?splat=0" })).toBe(false);
+    expect(splatEnabled({ ...on, search: "?splat=true" })).toBe(false);
+    expect(splatEnabled({ ...on, search: "?day=3&splat=1" })).toBe(true);
+    // Production never loads it, even when asked.
+    expect(splatEnabled({ ...on, search: "?splat=1", dev: false })).toBe(false);
+    expect(splatEnabled({ ...on, search: "?splat=1", webgl: false })).toBe(false);
+    expect(splatEnabled({ ...on, search: "?splat=1", reducedMotion: true })).toBe(false);
   });
-
   it("no splat work in happy-dom: no WebGL, so the game gets no layer and nothing is loaded", () => {
     expect(hasWebGL(document)).toBe(false);
     let loads = 0;
@@ -383,12 +386,15 @@ describe("the layer: fallback, the move, the cross-fade", () => {
 });
 
 describe("900 ms moves and calibration helpers", () => {
-  it("房间 ↔ 桌子 take 900 ms (the CSS push too); 屏幕 keeps 400 ms; the door its own", () => {
+  it("walking: the move takes as long as the path, both ways (房间↔桌子 900, 房间↔门 1200, 桌子↔屏幕 500); the rest the 400 ms crossfade", () => {
     expect(CHOSEN.roomDesk).toBe(900);
-    expect(viewMoveMs("room", "desk", true)).toBe(900);
-    expect(viewMoveMs("desk", "room", true)).toBe(900);
-    expect(viewMoveMs("desk", "desktop", true)).toBe(MOTION.view);
-    expect(viewMoveMs("room", "door", false)).toBe(CHOSEN.doorView);
+    for (const [a, b, ms] of [["room", "desk", 900], ["room", "door", 1200], ["desk", "desktop", 500], ["room", "desktop", 900], ["room", "bed", MOTION.view]] as const) {
+      expect(viewMoveMs(a, b), `${a} → ${b}`).toBe(ms);
+      expect(viewMoveMs(b, a), `${b} → ${a}`).toBe(ms);
+    }
+    expect(CROSSFADE_MS).toBe(400);
+    expect(walkMs("room", "door")).toBe(800);
+    expect(walkMs("room", "bed")).toBe(0);
   });
 
   it("calibration only with ?splatcal=1 in a dev build", () => {

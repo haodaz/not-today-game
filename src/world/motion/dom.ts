@@ -15,9 +15,7 @@ import { createTentacleDriver } from "@world/desktop/browser/tentacles-dom";
 import { crawlKeyframes, crawlMs, edgePath } from "@world/late/crawl";
 import { heldItem } from "@world/room/held";
 import { holdUntil, lineKey, revealBusy, revealDoneAt, revealShown, startReveal, type Reveal } from "./reveal";
-import { centre, DESK_SHOT, ROOM_SHOT, type Rect } from "@world/room/shots";
-import { fullMonitor } from "@world/room/desk";
-import { applyMotionVars, CHOSEN, choiceDelays, EASE, exitOf, MOTION, ROOM_PUSH, viewMoveMs } from "./timing";
+import { applyMotionVars, CHOSEN, choiceDelays, CROSSFADE_MS, EASE, exitOf, MOTION, viewMoveMs } from "./timing";
 
 interface Ghost {
   readonly el: HTMLElement;
@@ -104,7 +102,7 @@ export const KEYED =
  */
 export function motionKey(el: Element): string | null {
   const c = el.classList;
-  if (c.contains("m-backdrop")) return "backdrop";
+  if (c.contains("m-backdrop")) return c.contains("m-arriving") ? "backdrop-in" : "backdrop";
   if (c.contains("stage")) {
     if (c.contains("ending-page")) return "page";
     if (c.contains("one-monitor")) return "screen";
@@ -509,72 +507,25 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
   }
 
   // ---- views (FR5) ------------------------------------------------------------------------
-  // The four camera levels (day-loop amendment): 房间 ↔ 桌子 push around the desk; 房间 / 桌子
-  // ↔ 屏幕 grow the screen out of that monitor (measured in room/shots.ts). Anything else fades.
-  type Cam = { readonly tx: number; readonly ty: number; readonly z: number };
-  /** Scale by z around stage point p, on a stage drawn at scale s (screen px per stage px). */
-  const around = (s: number, p: { x: number; y: number }, z: number): Cam => ({ tx: s * p.x * (1 - z), ty: s * p.y * (1 - z), z });
-  /** The desktop stage drawn small, exactly over a monitor in a shot. */
-  function intoMonitor(shotScale: number, mon: Rect, screen: HTMLElement | null): Cam {
-    const sd = scaleOf(screen);
-    const dw = screen?.offsetWidth ?? 1496;
-    const dh = screen?.offsetHeight ?? 956;
-    const z = (shotScale * mon.w) / (sd * dw);
-    const c = centre(mon);
-    return { tx: shotScale * c.x - (z * sd * dw) / 2, ty: shotScale * c.y - (z * sd * dh) / 2, z };
-  }
-  const shotOf = (view: string) => (view === "room" ? ROOM_SHOT : view === "desk" ? DESK_SHOT : null);
   /**
-   * The monitor the camera goes into. On 桌子 only its lower half is in the frame (day-loop
-   * correction 2026-11-01): the whole screen has the desktop's aspect and runs above the frame.
-   */
-  const cameraMonitor = (view: string, side: "left" | "right", screen: HTMLElement | null): Rect => {
-    const mon = shotOf(view)!.monitors[side];
-    if (view !== "desk") return mon;
-    const w = screen?.offsetWidth || 1496;
-    const h = screen?.offsetHeight || 956;
-    return fullMonitor(mon, w / h);
-  };
-
-  /** What the leaving stage does (out) and where the arriving one comes from (in); null = fade. */
-  function camFor(from: string, to: string, old: HTMLElement, next: HTMLElement, focus: "left" | "right"): { out: Cam; in: Cam } | null {
-    const p = centre(ROOM_SHOT.desk);
-    if (from === "room" && to === "desk") return { out: around(scaleOf(old), p, ROOM_PUSH), in: around(scaleOf(next), p, 1 / ROOM_PUSH) };
-    if (from === "desk" && to === "room") return { out: around(scaleOf(old), p, 1 / ROOM_PUSH), in: around(scaleOf(next), p, ROOM_PUSH) };
-    if (to === "desktop" && shotOf(from)) {
-      const mon = cameraMonitor(from, focus, next);
-      return { out: around(scaleOf(old), centre(mon), ROOM_PUSH), in: intoMonitor(scaleOf(old), mon, next) };
-    }
-    if (from === "desktop" && shotOf(to)) {
-      const mon = cameraMonitor(to, focus, old);
-      return { out: intoMonitor(scaleOf(next), mon, old), in: around(scaleOf(next), centre(mon), ROOM_PUSH) };
-    }
-    return null;
-  }
-  const setCam = (el: HTMLElement, v: Cam) => {
-    el.style.setProperty("--m-tx", `${Math.round(v.tx)}px`);
-    el.style.setProperty("--m-ty", `${Math.round(v.ty)}px`);
-    el.style.setProperty("--m-z", v.z.toFixed(4));
-  };
-
-  /**
-   * A camera move between views. Exactly one backdrop is on screen at any moment, and the HUD
-   * (checklist, chips, dialogue) is replaced at once, never doubled:
-   *  - the photo that carries the move is a copy of the stage without its children
-   *    (`m-backdrop`), behind the new stage, whose own picture is hidden (`m-nobg`) until the move ends;
-   *  - pushing in (房间 → 桌子, a shot → 屏幕) the old photo zooms, then cuts to the new framing;
-   *    pulling out (桌子 → 房间, 屏幕 → a shot) the new photo starts zoomed and settles;
-   *  - 屏幕 is not a backdrop: leaving, it shrinks into its monitor (it truly leaves); arriving, it
-   *    grows out of it over the old photo;
-   *  - without a camera (the door) the old photo fades out, then the new one fades in.
+   * A move between views is the player walking there, then the space changing (room-scene,
+   * decision 2026-11-02: the splat goes dark, every move is a crossfade). No zoom, no fog:
+   *  - the move takes as long as the path (`viewMoveMs`); for its first part the leaving still
+   *    walks: the whole still bobs ±4 px, two steps (the steps' sounds are the view action's);
+   *  - its last CROSSFADE_MS the leaving still fades out over the arriving one (which bobs with it);
+   *  - the photos are copies of the stages without children (`m-backdrop`), behind the new stage,
+   *    whose own picture is hidden (`m-nobg`) until the move ends. The HUD is replaced at once;
+   *  - 屏幕 is not a still: arriving, it fades in over the walking photo; leaving, it stays over the
+   *    arriving photo and fades out at the end.
+   * Exactly one copy is keyed "backdrop" (the leaving one, or the arriving one when 屏幕 leaves).
    */
   interface ViewMove {
     readonly from: string;
     readonly to: string;
     readonly start: number;
     readonly dur: number;
-    /** The arriving screen's camera (屏幕 only). */
-    readonly screenIn: Cam | null;
+    /** When the crossfade begins. */
+    readonly fadeAt: number;
   }
   let move: ViewMove | null = null;
   const isPhoto = (view: string) => view !== "desktop";
@@ -582,7 +533,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
   /** A copy of a stage that only draws its picture. */
   function backdropOf(stage: HTMLElement): HTMLElement {
     const b = stage.cloneNode(false) as HTMLElement;
-    b.classList.remove("m-nobg", "m-asleep", "m-wake", "raid");
+    b.classList.remove("m-nobg", "m-asleep", "m-wake", "raid", "m-late", "looking");
     b.classList.add("m-backdrop");
     b.removeAttribute("data-view");
     b.style.animation = "";
@@ -595,19 +546,23 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     r.insertBefore(el, r.firstChild);
     return true;
   };
+  /** The walk's bob over the whole move, and (for the leaving still) the fade at its end. */
+  const walking = (g: HTMLElement, m: ViewMove, now: number, leaving: boolean) => {
+    const bob = `m-walk-bob ${m.dur}ms ease-in-out ${Math.round(m.start - now)}ms both`;
+    g.style.animation = leaving ? `${bob}, m-fade-out ${CROSSFADE_MS}ms ${EASE} ${Math.round(m.fadeAt - now)}ms both` : bob;
+  };
 
   function viewChange(t: number, from: string, to: string): void {
     const old = out?.stage;
     const stage = q(root, ".stage");
     if (!old || !stage) return;
-    const cam = camFor(from, to, old, stage, ctx.session.focus);
-    const dur = viewMoveMs(from, to, !!cam);
-    move = { from, to, start: t, dur, screenIn: to === "desktop" && cam ? cam.in : null };
+    const dur = viewMoveMs(from, to);
+    const m: ViewMove = { from, to, start: t, dur, fadeAt: t + dur - CROSSFADE_MS };
+    move = m;
     begin("view", t);
 
-    // 屏幕 leaving: it shrinks into its monitor (or fades), over the arriving photo.
+    // 屏幕 leaving: it stays over the arriving photo while the walk is on, then fades out.
     if (from === "desktop") {
-      if (cam) setCam(old, cam.out);
       addGhost({
         el: old,
         key: "screen",
@@ -618,40 +573,29 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
           r.appendChild(old);
           return true;
         },
-        apply: (g, now) => anim(g, cam ? "m-cam-out" : "m-fade-out", dur, t, now),
+        apply: (g, now) => anim(g, "m-fade-out", CROSSFADE_MS, m.fadeAt, now),
       });
     }
-
-    if (cam && isPhoto(from) && cam.out.z > 1) {
-      // Pushing in: the old photo carries the move, then cuts to the new framing.
-      const b = backdropOf(old);
-      setCam(b, cam.out);
-      addGhost({ el: b, key: "backdrop", start: t, end: t + dur, place: (r) => behind(r, b), apply: (g, now) => anim(g, "m-cam-push-out", dur, t, now) });
-    } else if (cam && isPhoto(to) && cam.in.z > 1) {
-      // Pulling out: the new photo starts zoomed in and settles; the old one is gone at once.
+    if (isPhoto(to)) {
+      // The arriving still, under the leaving one: it shows as that one fades.
       const b = backdropOf(stage);
-      setCam(b, cam.in);
-      addGhost({ el: b, key: "backdrop", start: t, end: t + dur, place: (r) => behind(r, b), apply: (g, now) => anim(g, "m-cam-push-in", dur, t, now) });
-    } else if (!cam) {
-      // No camera: one picture after the other, never both.
-      const half = Math.round(dur / 2);
-      if (isPhoto(from)) {
-        const b = backdropOf(old);
-        addGhost({ el: b, key: "backdrop", start: t, end: t + half, place: (r) => behind(r, b), apply: (g, now) => anim(g, "m-fade-out", half, t, now) });
-      }
-      if (isPhoto(to)) {
-        const b = backdropOf(stage);
-        addGhost({
-          el: b,
-          key: "backdrop",
-          start: t,
-          end: t + dur,
-          // Not on screen during the first half: the old picture is still fading out.
-          place: (r) => now() >= t + half && behind(r, b),
-          apply: (g, n) => anim(g, "m-fade-in", dur - half, t + half, n),
-        });
-        after(half, ctx.rerender);
-      }
+      if (isPhoto(from)) b.classList.add("m-arriving");
+      addGhost({ el: b, key: isPhoto(from) ? "backdrop-in" : "backdrop", start: t, end: t + dur, place: (r) => behind(r, b), apply: (g, now) => walking(g, m, now, false) });
+    }
+    if (isPhoto(from)) {
+      const b = backdropOf(old);
+      addGhost({
+        el: b,
+        key: "backdrop",
+        start: t,
+        end: t + dur,
+        place: (r) => {
+          const under = [...r.children].find((c) => c.classList.contains("m-arriving"));
+          r.insertBefore(b, under ? under.nextSibling : r.firstChild);
+          return true;
+        },
+        apply: (g, now) => walking(g, m, now, true),
+      });
     }
     // The arriving photo shows its own picture again when the move ends.
     after(dur + 16, ctx.rerender);
@@ -667,15 +611,8 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
   function viewEntry(t: number): void {
     const stage = q(root, ".stage");
     if (!move || !stage || t - move.start >= move.dur) return;
-    if (move.to === "desktop") {
-      // 屏幕 arriving: it grows out of the monitor (or fades in) over the old photo.
-      if (move.screenIn) {
-        setCam(stage, move.screenIn);
-        anim(stage, "m-cam-in", move.dur, move.start, t);
-      } else {
-        anim(stage, "m-fade-in", move.dur, move.start, t);
-      }
-    }
+    // 屏幕 arriving: it fades in over the walking photo, in the move's last CROSSFADE_MS.
+    if (move.to === "desktop") anim(stage, "m-fade-in", CROSSFADE_MS, move.fadeAt, t);
   }
 
   // Left ↔ right: a push; the other monitor's tab moves with it.

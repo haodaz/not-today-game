@@ -26,6 +26,11 @@
 .stage.m-nobg{background-image:none !important;background-color:transparent !important;box-shadow:none !important}
 .stage.m-backdrop{pointer-events:none}
 @keyframes m-cam-push-out{to{translate:var(--m-tx) var(--m-ty);scale:var(--m-z)}}
+/* Walking, not switching (room-scene 2026-11-02): the whole still bobs ±4 px, a dip at each of two steps. */
+/* Walking, not switching (room-scene 2026-11-02): the still bobs ±4 px, a dip at each of two steps.
+   The picture moves inside its frame and grows by exactly twice the bob (1 + 8/900 at the top of a
+   step), so no edge ever shows and nothing jumps at the start: never a zoom. Copies are 1600 × 900. */
+@keyframes m-walk-bob{0%,100%{background-size:1600px 900px;background-position:50% 50%}25%,75%{background-size:calc(1600px + 1600px * 2 * var(--m-walk-bob-n,4) / 900) calc(900px + 2px * var(--m-walk-bob-n,4));background-position:50% calc(50% + 1px * var(--m-walk-bob-n,4))}50%{background-size:calc(1600px + 1600px * 2 * var(--m-walk-bob-n,4) / 900) calc(900px + 2px * var(--m-walk-bob-n,4));background-position:50% calc(50% - 1px * var(--m-walk-bob-n,4))}}
 @keyframes m-cam-push-in{from{translate:var(--m-tx) var(--m-ty);scale:var(--m-z)}}
 /* Shutdown: the monitor darkens in place (it changes, it does not leave) */
 @keyframes m-power-off{from{filter:hue-rotate(var(--tint,0deg)) blur(var(--blur,0px)) brightness(1.8)}}

@@ -1,5 +1,5 @@
 {
-  "_note": "桌子 framing (day-loop correction 2026-11-01): rects in stage px on public/room/shots/desk_top.jpg (1600×900). Objects are placed cutouts; nothing here is painted into the photo.",
+  "_note": "桌子 framing (day-loop correction 2026-11-01): rects in stage px on public/room/shots/desk_top.jpg (1600×900). Objects are placed cutouts; nothing here is painted into the photo. Rule 2026-11-02: nothing is placed in the bottom-right 320×260 px; Kuro's HUD body lives there.",
   "backdrop": "/room/shots/desk_top.jpg",
   "monitors": {
     "left": {
@@ -28,10 +28,10 @@
     "h": 200
   },
   "box": {
-    "l": 1260,
-    "t": 640,
-    "w": 300,
-    "h": 230
+    "l": 1000,
+    "t": 560,
+    "w": 280,
+    "h": 220
   },
   "meal": {
     "l": 600,
@@ -74,10 +74,10 @@
     "h": 270
   },
   "walkman": {
-    "l": 1060,
-    "t": 640,
+    "l": 300,
+    "t": 660,
     "w": 180,
     "h": 150,
-    "_note": "after any ending only (sound addition 2026-11-02): the day-10 walkman, left of the box; click plays the theme song"
+    "_note": "after any ending only: the day-10 walkman, left front by the cup; click plays the theme song. Moved 2026-11-02: the bottom-right corner belongs to Kuro's body"
   }
 }

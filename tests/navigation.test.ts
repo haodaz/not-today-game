@@ -3,6 +3,7 @@
 // picking by a ray, the back gestures, the head turn against a fake splat scene, 床 held by the
 // splat, and the placed things waiting for the camera. No real WebGL (happy-dom has none): the scene
 // is faked; the shader and the real splat were looked at in a browser (see the kiro log).
+import fc from "fast-check";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createStore, type Store } from "@state/store";
 import { desktopActions } from "@world/desktop/actions";
@@ -11,7 +12,9 @@ import { mountDesktop, type ActionContext } from "@world/desktop/controller";
 import { initialSession, type Session } from "@world/desktop/model";
 import { syncLoop } from "@world/loop/runtime";
 import { createMotion } from "@world/motion/dom";
-import { viewMoveMs } from "@world/motion/timing";
+import { CROSSFADE_MS, viewMoveMs } from "@world/motion/timing";
+import { t } from "@world/i18n";
+import { easePan, edgeZone, LOOK_RETURN_MS, NO_PAN, PAN_X, PAN_Y, panScale, photoPan, PLACED_PARALLAX } from "@world/room/look";
 import { loopActions, loopKeys, renderGame } from "@world/room/game";
 import { ARRIVE_FADE_MS, placedThingsFade, placedThingsWait, renderRoom } from "@world/room/hud";
 import { BACK_STRIP, createNav, INTERACTIVE, type LookApi } from "@world/room/nav";
@@ -279,87 +282,131 @@ describe("back: right-click, the bottom 6 %, the wheel, Esc", () => {
   });
 });
 
-describe("look: press-and-drag turns the head", () => {
-  function fakeLook() {
-    let turn = NO_TURN;
-    let live = false;
+describe("look is photo parallax (decision 2026-11-02: the splat goes dark)", () => {
+  /** A splat look that records whether anyone asked it (nobody should). */
+  function spyLook(): LookApi & { calls: string[] } {
     const calls: string[] = [];
-    const api: LookApi & { calls: string[]; turn(): typeof NO_TURN } = {
-      calls,
-      turn: () => turn,
-      look: (dx, dy) => {
-        calls.push(`look ${Math.round(dx)},${Math.round(dy)}`);
-        live = true;
-        turn = { yaw: Math.min(LOOK.yaw, dx / 1000), pitch: dy / 1000 };
-        return true;
-      },
-      release: () => {
-        calls.push("release");
-        live = false;
-        turn = NO_TURN;
-      },
-      pose: () => (live ? turned(POSES.room, turn) : null),
-    };
-    return api;
+    return { calls, look: (dx, dy) => (calls.push(`look ${dx},${dy}`), true), release: () => void calls.push("release"), pose: () => null };
   }
+  const vars = (el: HTMLElement) => ["--pan-x", "--pan-y", "--pan-k", "--pan-px", "--pan-py"].map((v) => el.style.getPropertyValue(v));
 
-  it("a drag past the slop calls look with the stage delta; release lets go; the click after it is not a pick", async () => {
-    const look = fakeLook();
+  it("a drag pans the photo within ±4 % / ±2 %, the placed things 1.5×; never the splat; release eases back over 600 ms; the click after it is not a pick", async () => {
+    const look = spyLook();
     const m = mount({ look });
     mouse("mousedown", m.stage(), 700, 590);
     mouse("mousemove", m.stage(), 702, 590);
-    expect(look.calls).toEqual([]); // under the slop
-    mouse("mousemove", m.stage(), 740, 570);
-    expect(look.calls).toEqual(["look 40,-20"]);
-    mouse("mouseup", window.document.body, 740, 570);
-    expect(look.calls.at(-1)).toBe("release");
-    mouse("click", m.stage(), 740, 570);
+    expect(m.stage().classList.contains("looking")).toBe(false); // under the slop
+    mouse("mousemove", m.stage(), 780, 570);
+    const p = photoPan(80, -20);
+    expect(m.stage().classList.contains("looking")).toBe(true);
+    expect(vars(m.stage())).toEqual([`${p.x.toFixed(2)}px`, `${p.y.toFixed(2)}px`, panScale(p).toFixed(5), `${(p.x * 1.5).toFixed(2)}px`, `${(p.y * 1.5).toFixed(2)}px`]);
+    // A big drag stops at the limits.
+    mouse("mousemove", m.stage(), 700 + 5000, 590 + 5000);
+    expect(vars(m.stage()).slice(0, 2)).toEqual([`${(PAN_X * 1600).toFixed(2)}px`, `${(PAN_Y * 900).toFixed(2)}px`]);
+    mouse("mouseup", document.body, 5700, 5590);
+    mouse("click", m.stage(), 5700, 5590);
     await frame();
     expect(m.session.view).toBe("room");
+    expect(look.calls).toEqual([]);
+    expect(m.root.querySelector(".splat-layer")).toBeNull();
+    // Easing back; gone after 600 ms.
+    expect(m.stage().classList.contains("looking")).toBe(true);
+    await wait(LOOK_RETURN_MS + 120);
+    await frame();
+    expect(m.stage().classList.contains("looking")).toBe(false);
     // The next click is a click again.
     await click(m, 700, 590);
     expect(m.session.view).toBe("desk");
   });
 
-  it("while the head is turned the proxies and the hover follow the camera, and the flat cutouts step aside", async () => {
-    const look = fakeLook();
-    const m = mount({ look });
-    mouse("mousedown", m.stage(), 700, 590);
-    mouse("mousemove", m.stage(), 900, 590);
-    const turnedPose = look.pose!()!;
-    const expected = hotRects(turnedPose, "room");
-    const bed = m.root.querySelector<HTMLElement>('.shot-hit[data-hot="bed"]')!;
-    expect(parseFloat(bed.style.left)).toBeCloseTo(expected.bed!.l, 3);
-    expect(parseFloat(bed.style.left)).toBeLessThan(fixedRects("room").bed!.l - 50);
-    expect(m.root.classList.contains("look-turned")).toBe(true);
-    // The door is a sliver at rest; turned right it is a good target.
-    const door = m.root.querySelector<HTMLElement>('.shot-hit[data-hot="door"]')!;
-    expect(parseFloat(door.style.width)).toBeGreaterThan(fixedRects("room").door!.w * 3);
-    mouse("mouseup", document.body, 900, 590);
-    await frame();
-    await frame();
-    expect(m.root.classList.contains("look-turned")).toBe(false);
-  });
-
-  it("with the splat off (or not loaded) a drag does nothing, and what follows is not a pick either", async () => {
-    const m = mount({ splat: false });
-    mouse("mousedown", m.stage(), 700, 590);
-    mouse("mousemove", m.stage(), 800, 590);
-    mouse("mouseup", document.body, 800, 590);
-    mouse("click", m.stage(), 800, 590);
-    await frame();
-    expect(m.session.view).toBe("room");
-    expect(m.root.querySelector(".splat-layer")).toBeNull();
-    expect(m.root.classList.contains("look-turned")).toBe(false);
-  });
-
-  it("a press on a button is not the start of a drag", () => {
-    const look = fakeLook();
-    const m = mount({ look });
-    const btn = m.root.querySelector(".settings-btn")!;
-    mouse("mousedown", btn, 40, 860);
+  it("a press on a button is not the start of a drag; 屏幕 does not pan", async () => {
+    const m = mount({});
+    mouse("mousedown", m.root.querySelector(".settings-btn")!, 40, 860);
     mouse("mousemove", m.stage(), 200, 800);
-    expect(look.calls).toEqual([]);
+    expect(m.stage().classList.contains("looking")).toBe(false);
+    mouse("mouseup", document.body, 200, 800);
+    const d = mount({ view: "desktop" });
+    mouse("mousedown", d.stage(), 300, 300);
+    mouse("mousemove", d.stage(), 500, 300);
+    expect(d.root.querySelector(".looking")).toBeNull();
+  });
+
+  it("pure: the pan never leaves its limits, the photo always covers the stage, it eases back to rest", () => {
+    fc.assert(
+      fc.property(fc.double({ min: -1e5, max: 1e5, noNaN: true }), fc.double({ min: -1e5, max: 1e5, noNaN: true }), fc.integer({ min: 0, max: 700 }), (dx, dy, t) => {
+        const p = photoPan(dx, dy);
+        expect(Math.abs(p.x)).toBeLessThanOrEqual(PAN_X * 1600 + 1e-9);
+        expect(Math.abs(p.y)).toBeLessThanOrEqual(PAN_Y * 900 + 1e-9);
+        // Grown by k about the centre and moved by the pan, the photo still covers 1600 × 900.
+        const k = panScale(p);
+        expect(((k - 1) * 1600) / 2 + 1e-9).toBeGreaterThanOrEqual(Math.abs(p.x));
+        expect(((k - 1) * 900) / 2 + 1e-9).toBeGreaterThanOrEqual(Math.abs(p.y));
+        const e = easePan(p, t);
+        expect(Math.abs(e.x)).toBeLessThanOrEqual(Math.abs(p.x) + 1e-9);
+        if (t >= LOOK_RETURN_MS) expect(e).toEqual(NO_PAN);
+      }),
+    );
+    expect(PLACED_PARALLAX).toBe(1.5);
+  });
+});
+
+describe("edges say where you can go (decision 2026-11-02)", () => {
+  it("in 房间 the right 8 % shows the door hint; the bottom shows nothing (no level back); clicking the edge goes to 门", async () => {
+    const m = mount({});
+    mouse("mousemove", m.stage(), 1560, 300);
+    await frame();
+    expect(m.session.edge?.zone).toBe("door");
+    const hint = m.root.querySelector<HTMLElement>(".edge-hint.door")!;
+    expect(hint.textContent).toBe(t("hud.cam.door"));
+    expect(hint.querySelector(".arrow")).not.toBeNull();
+    mouse("mousemove", m.stage(), 800, 880);
+    await frame();
+    expect(m.root.querySelector(".edge-hint")).toBeNull();
+    mouse("mousemove", m.stage(), 1560, 300);
+    await click(m, 1560, 300);
+    expect(m.session.view).toBe("door");
+  });
+  it("in 桌子 and 门 the bottom 6 % shows 退回 and goes back; no door hint there", async () => {
+    for (const view of ["desk", "door"] as const) {
+      const m = mount({ view });
+      mouse("mousemove", m.stage(), 1560, 300);
+      await frame();
+      expect(m.root.querySelector(".edge-hint"), view).toBeNull();
+      mouse("mousemove", m.stage(), 800, 880);
+      await frame();
+      expect(m.root.querySelector<HTMLElement>(".edge-hint.back")!.textContent, view).toBe(t("hud.back"));
+      await click(m, 800, 880);
+      expect(m.session.view, view).toBe("room");
+      destroy?.();
+      destroy = null;
+      document.body.innerHTML = "";
+    }
+  });
+  it("pure: a hint only in its zone and only where it leads", () => {
+    fc.assert(
+      fc.property(fc.constantFrom("room", "desk", "door", "desktop", "bed"), fc.integer({ min: 0, max: 1599 }), fc.integer({ min: 0, max: 899 }), (view, x, y) => {
+        const z = edgeZone(view, x, y);
+        if (z === "door") expect([view, x >= 1600 * 0.92]).toEqual(["room", true]);
+        if (z === "back") expect(view === "desk" || view === "door").toBe(true), expect(y).toBeGreaterThanOrEqual(900 * 0.94);
+        if (view === "desktop" || view === "bed") expect(z).toBeNull();
+      }),
+    );
+  });
+  it("snapshot: 房间 with the door hint showing", () => {
+    const store = createStore({ startDay: 1 });
+    const session = initialSession(DEFAULT_CLOCK, "left", "room");
+    session.edge = { zone: "door", since: 0 };
+    const out = renderRoom({ state: store.getState(), events: store.getEvents(), session }).value;
+    expect(out.match(/<div class="edge-hint[^]*?<\/div>/)![0]).toMatchSnapshot();
+    expect(out).toMatchSnapshot();
+  });
+  it("with the splat off a move makes no splat layer, and the placed things fade in with the 400 ms crossfade", async () => {
+    const m = mount({});
+    await click(m, 1560, 300);
+    expect(m.session.cam).toMatchObject({ to: "door", fade: CROSSFADE_MS });
+    expect(m.session.cam!.until - m.session.cam!.reveal).toBe(CROSSFADE_MS);
+    expect(m.root.querySelector(".splat-layer")).toBeNull();
+    expect(m.root.querySelectorAll(".m-backdrop")).toHaveLength(2);
   });
 });
 
@@ -558,17 +605,19 @@ describe("placed things wait for the camera (correction 2026-11-02)", () => {
     expect(roomOf(sessionAt("room", null), store, 500)).toContain("shot-hit");
   });
 
-  it("the view action records the move: the things may appear 200 ms before the end with the splat, at the end without", () => {
+  it("the view action records the move: the things fade in with the arriving photo (200 ms with the splat, the 400 ms crossfade without); a walk is two steps", () => {
     const store = createStore({ startDay: 1 });
-    for (const [splatReady, expectFade] of [[true, SPLAT_FADE_MS], [false, 0]] as const) {
+    for (const [splatReady, expectFade] of [[true, SPLAT_FADE_MS], [false, CROSSFADE_MS]] as const) {
       const later: number[] = [];
-      const ctx: ActionContext = { store, session: { ...initialSession(DEFAULT_CLOCK, "left", "room"), splatReady }, rerender: () => {}, later: (ms) => void later.push(ms), now: () => 10_000 };
+      const sounds: string[] = [];
+      const ctx: ActionContext = { store, session: { ...initialSession(DEFAULT_CLOCK, "left", "room"), splatReady }, rerender: () => {}, later: (ms) => void later.push(ms), now: () => 10_000, play: (id) => void sounds.push(id) };
       loopActions["view"]!(ctx, { view: "desk" } as DOMStringMap, null as never);
-      const dur = viewMoveMs("room", "desk", true);
+      const dur = viewMoveMs("room", "desk");
       expect(dur).toBe(900);
-      expect(ctx.session.cam).toEqual({ to: "desk", reveal: 10_000 + dur - expectFade, until: 10_000 + dur });
-      // The render that shows them comes after the motion layer's own last one when it is the CSS push.
-      expect(later).toEqual([expectFade > 0 ? dur - expectFade + 24 : dur + 24]);
+      expect(ctx.session.cam).toEqual({ to: "desk", reveal: 10_000 + dur - expectFade, until: 10_000 + dur, fade: expectFade });
+      // The render that shows them, then the second step half way.
+      expect(later).toEqual([dur - expectFade + 24, dur / 2]);
+      expect(sounds).toEqual(["step-1"]);
     }
     // 屏幕 has its own entrance: no wait recorded.
     const ctx: ActionContext = { store, session: initialSession(DEFAULT_CLOCK, "left", "room"), rerender: () => {}, later: () => {} };

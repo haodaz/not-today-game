@@ -66,21 +66,39 @@ export const CHOSEN = {
   wake: MOTION.sleep,
   sleepRisePx: 24,
   chosenHold: MOTION.choice,
-  /** 房间 ↔ 桌子: the splat move and the CSS push under it (room-scene correction 2026-11-01). */
+  /** Walking, not switching (room-scene 2026-11-02): a move takes as long as the path. 房间 ↔ 桌子. */
   roomDesk: 900,
+  /** 房间 ↔ 门: the longest walk. */
+  roomDoor: 1200,
+  /** 桌子 ↔ 屏幕: leaning in. */
+  deskScreen: 500,
+  /** The head bob of a walk: the whole still moves this far, two steps per move. */
+  walkBobPx: 4,
   /** A line's backdrop crossfades in, and the stage fades back to its still after the sequence (dialogue 2026-11-02). */
   backdropFade: 1200,
   /** A line's prop fades in over the backdrop. */
   propIn: 300,
 } as const;
-
-/** How long a view change takes: 房间 ↔ 桌子 900 ms, other camera moves `MOTION.view`, the door `doorView`. */
-export function viewMoveMs(from: string, to: string, camera: boolean): number {
-  if (!camera) return CHOSEN.doorView;
-  const pair = `${from}>${to}`;
-  return pair === "room>desk" || pair === "desk>room" ? CHOSEN.roomDesk : MOTION.view;
+/** Every move between stills ends in this crossfade (the no-warp correction): the walk comes before it. */
+export const CROSSFADE_MS = MOTION.view;
+/** How long a view change takes, by the length of the path: 房间 ↔ 桌子 900, 房间 ↔ 门 1200, 桌子 ↔ 屏幕 500 ms; 房间 ↔ 屏幕 goes by the desk (900); anything else the plain crossfade. `camera` is kept for callers and no longer changes it. */
+export function viewMoveMs(from: string, to: string, _camera = true): number {
+  const pair = [from, to].sort().join(">");
+  switch (pair) {
+    case "desk>room":
+      return CHOSEN.roomDesk;
+    case "door>room":
+      return CHOSEN.roomDoor;
+    case "desk>desktop":
+      return CHOSEN.deskScreen;
+    case "desktop>room":
+      return CHOSEN.roomDesk;
+    default:
+      return CROSSFADE_MS;
+  }
 }
-
+/** The walk before the crossfade (none for the shortest moves). */
+export const walkMs = (from: string, to: string): number => Math.max(0, viewMoveMs(from, to) - CROSSFADE_MS);
 /** The phone is never tilted (author 2026-10-31, overriding motion.md's 3° for the phone). */
 export const PHONE_TILT_DEG = 0;
 
@@ -118,6 +136,8 @@ export function motionVars(): Record<string, string> {
     "--m-choice": ms(MOTION.choice),
     "--m-choice-out": ms(exitOf(MOTION.choice)),
     "--m-view": ms(MOTION.view),
+    // The walk's bob as a plain number (motion.css multiplies it into px and into the cover).
+    "--m-walk-bob-n": String(CHOSEN.walkBobPx),
     "--m-screen": ms(MOTION.screen),
     "--m-kuro-fade": ms(MOTION.kuroFade),
     "--m-bob": ms(MOTION.bob),

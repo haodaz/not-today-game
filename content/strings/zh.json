@@ -263,5 +263,11 @@
   "hud.back": "退回",
   "wb.nav.msgs": "消息",
   "wb.nav.approvals": "审批",
-  "wb.nav.contacts": "通讯录"
+  "wb.nav.contacts": "通讯录",
+  "weather.rain": "雨",
+  "weather.overcast": "阴",
+  "weather.fog": "雾",
+  "weather.clear": "晴",
+  "weather.stopped": "雨停了",
+  "weather.white": "白"
 }

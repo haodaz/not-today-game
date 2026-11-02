@@ -6,10 +6,10 @@ import { createSplatLayer, type LoadScene } from "./layer";
 
 export const loadSplatScene: LoadScene = (doc) => import("./scene").then((m) => m.createSplatScene(doc));
 
-/** The controller's `splat` dep for this window, or undefined when off (`?splat=0`, no WebGL, reduced motion). */
+/** The controller's `splat` dep for this window, or undefined when off (no `?splat=1`, a production build, no WebGL, reduced motion). */
 export function splatForGame(win: Window, load: LoadScene = loadSplatScene, dev: boolean = import.meta.env?.DEV ?? false) {
   const search = win.location.search;
-  const on = splatEnabled({ search, webgl: hasWebGL(win.document), reducedMotion: prefersReducedMotion(win) });
+  const on = splatEnabled({ search, webgl: hasWebGL(win.document), reducedMotion: prefersReducedMotion(win), dev });
   return on ? createSplatLayer({ load, calibrate: calibrating(search, dev) }) : undefined;
 }
 
