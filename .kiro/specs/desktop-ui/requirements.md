@@ -71,3 +71,13 @@ Snapshots: the list with both family groups; day 1 and day 14 of `clan`; day 6 o
 - The decoys never appear in the checklist, never log an event, never change state. Click logging is session-only.
 - The real apps keep their positions; the decoys come after a thin separator. Day 13 on (ring room), the corruption rules move decoy tiles too, like any control.
 - Tests: loader strict; `dockFor(day)` snapshot days 1, 7, 13 (Claude tile: line 1, line 2, gone); clicking a decoy produces no event; the Kuro line does not consume a turn.
+
+## Addition 2026-11-02 (author): 消息 looks like WeChat desktop
+The author sent three screenshots of WeChat for Mac as the reference (not to copy pixel for pixel; the feel). What to take:
+- **List row**: 48 px avatar (groups: a 3×3 mosaic of member avatars/silhouettes, not one icon), name in 15 px, time right-aligned in grey, second line = `sender: preview` in grey with the sender's name before a colon, `[Photo]` / `[Link]` / `[Voice]` / `[Channel]` / `[File]` tags in brackets, an unread **red dot on the avatar's corner** (count only when > 1), a muted-bell glyph on muted groups, `[@All]` in red when mentioned. Selected row has the green fill, white text. Search box with a magnifier at the top, a ⊕ beside it.
+- **Conversation header**: name and member count 「群名 (17)」, three glyphs on the right (chat, call, …). A `↑ N new message(s)` pill at the top right when scrolled up.
+- **Bubbles**: sender name in small grey above the bubble (groups only), avatar left, light grey bubble with a 4 px tail, time stamps centred between gaps (`Saturday 20:56`, `10/26 04:06`).
+- **Article card** (what a forwarded link renders as): white card, bold title (two lines max), grey excerpt three lines, a square thumbnail at the right, and a footer line with the official account's glyph and name. `content/replies/clan.json` links get `card: {title, excerpt, account}` (Claude adds; thumbnail from `public/cards/`), falling back to today's `[链接] 文字` when absent.
+- **Video card**: a 9:16 black card with a still, a centred play circle, and the channel name with the glyph at the bottom left. Same content fields with `kind: "video"`.
+- **Composer**: a tall white input, a toolbar of five glyphs (emoji, box, folder, scissors ▾, mic) and a grey 「Send」 at the right; our reply chips sit above the input as today.
+- Colours stay ours (the grey-blue system), the green only on the selected row. Snapshot the list and a clan conversation with one article card and one video card.
