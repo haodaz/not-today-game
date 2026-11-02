@@ -1,0 +1,68 @@
+{
+  "_note": "The solar calculator (objects-in-hand FR3.7): digit→letter when read upside down, and the strings the player can find. The first four are story numbers; from day 17 the display shows one of them unasked.",
+  "upsideDown": {
+    "0": "O",
+    "1": "I",
+    "2": "Z",
+    "3": "E",
+    "4": "h",
+    "5": "S",
+    "6": "g",
+    "7": "L",
+    "8": "B",
+    "9": "G"
+  },
+  "finds": [
+    {
+      "keys": "0.7734",
+      "reads": "hELLO",
+      "from": "day 4, the pager"
+    },
+    {
+      "keys": "345",
+      "reads": "ShE",
+      "from": "day 9, the pager"
+    },
+    {
+      "keys": "505",
+      "reads": "SOS",
+      "from": "day 6, the night"
+    },
+    {
+      "keys": "555",
+      "reads": "SSS",
+      "from": "day 17"
+    },
+    {
+      "keys": "5508",
+      "reads": "BOSS"
+    },
+    {
+      "keys": "35007",
+      "reads": "LOOSE"
+    },
+    {
+      "keys": "3215",
+      "reads": "SIZE"
+    },
+    {
+      "keys": "5537",
+      "reads": "LESS"
+    },
+    {
+      "keys": "376006",
+      "reads": "gOOgLE"
+    },
+    {
+      "keys": "0.0",
+      "reads": "O.O"
+    }
+  ],
+  "unaskedFromDay": 17,
+  "unasked": [
+    "0.7734",
+    "345",
+    "505",
+    "555"
+  ]
+}

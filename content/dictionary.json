@@ -1,0 +1,188 @@
+{
+  "_note": "The pocket dictionary's whole vocabulary (objects-in-hand FR3.6). English in, Chinese out, one word at a time; `extra` is the second line it should not have, shown from day 15. Unknown words → strings dictionary.unknown.",
+  "extraFromDay": 15,
+  "words": [
+    {
+      "w": "today",
+      "gloss": "今天",
+      "extra": "参见：不可以"
+    },
+    {
+      "w": "again",
+      "gloss": "再一次；又"
+    },
+    {
+      "w": "same",
+      "gloss": "相同的",
+      "extra": "和图片一模一样"
+    },
+    {
+      "w": "no",
+      "gloss": "不；没有"
+    },
+    {
+      "w": "stay",
+      "gloss": "停留；留下"
+    },
+    {
+      "w": "leave",
+      "gloss": "离开；留下（东西）"
+    },
+    {
+      "w": "keep",
+      "gloss": "保留；继续",
+      "extra": "留一样"
+    },
+    {
+      "w": "give",
+      "gloss": "给",
+      "extra": "人自己接"
+    },
+    {
+      "w": "hand",
+      "gloss": "手",
+      "extra": "掌心朝上"
+    },
+    {
+      "w": "gap",
+      "gloss": "缝；间隔"
+    },
+    {
+      "w": "boss",
+      "gloss": "老板",
+      "extra": "再等等"
+    },
+    {
+      "w": "wage",
+      "gloss": "工资",
+      "extra": "拖欠"
+    },
+    {
+      "w": "owe",
+      "gloss": "欠"
+    },
+    {
+      "w": "rent",
+      "gloss": "租；房租"
+    },
+    {
+      "w": "home",
+      "gloss": "家",
+      "extra": "哪个"
+    },
+    {
+      "w": "mother",
+      "gloss": "母亲",
+      "extra": "吃饭了吗"
+    },
+    {
+      "w": "father",
+      "gloss": "父亲"
+    },
+    {
+      "w": "teacher",
+      "gloss": "老师",
+      "extra": "收走"
+    },
+    {
+      "w": "chick",
+      "gloss": "小鸡；雏鸟"
+    },
+    {
+      "w": "pager",
+      "gloss": "寻呼机"
+    },
+    {
+      "w": "tape",
+      "gloss": "磁带；胶带"
+    },
+    {
+      "w": "card",
+      "gloss": "卡；卡片"
+    },
+    {
+      "w": "dictionary",
+      "gloss": "词典",
+      "extra": "就是我"
+    },
+    {
+      "w": "calculator",
+      "gloss": "计算器"
+    },
+    {
+      "w": "phone",
+      "gloss": "电话",
+      "extra": "开不了机"
+    },
+    {
+      "w": "dream",
+      "gloss": "梦",
+      "extra": "我在"
+    },
+    {
+      "w": "drawer",
+      "gloss": "抽屉"
+    },
+    {
+      "w": "door",
+      "gloss": "门"
+    },
+    {
+      "w": "lock",
+      "gloss": "锁",
+      "extra": "锁好了吗"
+    },
+    {
+      "w": "chain",
+      "gloss": "链条"
+    },
+    {
+      "w": "eye",
+      "gloss": "眼睛",
+      "extra": "闭着的"
+    },
+    {
+      "w": "watch",
+      "gloss": "看；手表",
+      "extra": "一直"
+    },
+    {
+      "w": "read",
+      "gloss": "读；阅读",
+      "extra": "一行一行"
+    },
+    {
+      "w": "pixel",
+      "gloss": "像素"
+    },
+    {
+      "w": "upgrade",
+      "gloss": "升级",
+      "extra": "老东西请先收一收"
+    },
+    {
+      "w": "replace",
+      "gloss": "替换；取代",
+      "extra": "客气地"
+    },
+    {
+      "w": "polite",
+      "gloss": "有礼貌的"
+    },
+    {
+      "w": "yes",
+      "gloss": "是；好",
+      "extra": "它替你回的"
+    },
+    {
+      "w": "pretty",
+      "gloss": "漂亮的",
+      "extra": "它的词"
+    },
+    {
+      "w": "model",
+      "gloss": "模型；型号",
+      "extra": "你换模型了"
+    }
+  ]
+}

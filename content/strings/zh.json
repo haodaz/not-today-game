@@ -254,5 +254,8 @@
   "delivery.rate.same": "和图片一模一样",
   "delivery.rate.fast": "送得快",
   "delivery.rate.hot": "还是热的",
-  "delivery.rate.thanks": "感谢您的评价"
+  "delivery.rate.thanks": "感谢您的评价",
+  "dictionary.unknown": "未收录",
+  "objects.putdown": "放下",
+  "objects.exit": "退出"
 }
