@@ -500,3 +500,6 @@
 .room .door-hand.blood{background:url(/npc/hand_blood.png) center bottom/contain no-repeat,radial-gradient(ellipse at 50% 100%,rgba(0,0,0,.55),transparent 70%)}
 /* In 使用 the turn buttons sit under the device: the exit hint goes to the bottom edge so they never overlap. */
 .room .held-layer.focus .hint{bottom:24px}
+/* On 屏幕 (the only view with 回房间 beside the HUD) the body is smaller and sits in the bezel corner: at 192 px it covered the composer's 发送. */
+.back-room ~ .hud-host .hud-br .hud-kuro{width:112px;height:112px}
+.back-room ~ .hud-host .hud-br .kuro-btn{position:absolute;right:0;bottom:0;transform:scale(.5834)}

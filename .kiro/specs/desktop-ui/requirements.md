@@ -122,3 +122,16 @@ Today every shared thing is a line of text (「[卡片] …」「[链接] …」
 
 ## Addition 2026-11-03 (author, from WeChat Channels screenshots): the video card's title sits on the cover
 A `video` card looks like a WeChat Channels share: a vertical 3:4 cover; the `title` is drawn **on the cover** in large bold type (yellow or white with a dark outline, two lines max, upper or lower third, `titlePos?: "top"|"bottom"`, default bottom), the play circle in the middle, and the Channels mark plus `account` along the bottom edge. Duration bottom-right when given. Generated covers carry no text, so the title overlay is the only text on the card. Snapshot one with each `titlePos`.
+
+## Correction 2026-11-03 (Claude's 18-day walkthrough): Vivi's lock leads to her bubble, never a dead end
+
+Found headless on days 4 and 6: when Vivi's deliverable posts while the player is anywhere but the conversation that holds it (e.g. on the workbench home page doing a task), the lock refuses `dock`, `screen`, `wb-nav`, `conv` and `feed`, so the player can never reach the bubble; 文件 does not list the file until it is opened. The day cannot be finished.
+
+Rule: a refused switch still shows the `vivi.lock` box line, and then takes the player to the deliverable:
+- open the app that holds that conversation (the workbench for `content/replies/day-NN.json` recipients, today the group `group`), its messages page, and select the conversation whose incoming item is the locked `doc`;
+- the bubble `[data-action="open-deliverable"][data-doc="<doc>"]` is then on screen (scroll it into view if the list is long).
+Clicking the bubble lifts the lock exactly as today. 回房间 stays allowed. A conversation switch *to* the conversation that holds the doc is never refused.
+
+Files: `src/world/room/game.ts` (`viviRefuse` and its five callers), `src/world/desktop/vivi.ts` (add a pure `lockedConversation(state, now, table)` returning the recipient id that holds the first locked doc), tests in `tests/vivi-lock.test.ts` (or the file that holds the current lock tests).
+
+Tests: with the lock forced (fixture), from the workbench home page a `wb-nav` to tasks is refused, the box line is pushed, and afterwards `session` shows the messages page with the conversation that holds the doc selected; the rendered desktop contains the `open-deliverable` button for that doc; clicking it logs `open file:<doc>` and lifts the lock; `conv` to that conversation is allowed while locked; `conv` to another conversation is refused and lands on the doc's conversation.

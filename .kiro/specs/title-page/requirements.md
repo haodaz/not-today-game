@@ -46,3 +46,17 @@ The launch screen is a full-screen game title, not a book cover and not a form. 
 - Clicking 新游戏 first pushes the camera to the 桌子 framing (same path and 1.4 s as 房间→桌子; monitors wake during the push). The menu column fades out during the push.
 - The questions then appear in a **card**: a centred panel like the settings panel (translucent warm grey, hairline, 8 px radius, about 560 px wide), title `这是谁的故事？` as its header, one question row at a time inside it, 🎲 beside each, `开始` as the card's only button. Nothing is written straight onto the background any more. Esc closes the card and pulls back to the room framing.
 - 开始 closes the card and the day-1 room view begins from the desk framing (the lamp goes off, then the first beat). Mock: design/chrome/title-questions.html.
+
+## Correction 2026-11-03 (Claude's 18-day walkthrough): the language is remembered
+
+Today the locale comes only from `?lang=zh` in the URL (`src/main.ts`). A player who picks 中文 on the title page or in 设置 is back in English after any reload, after an ending (the way home is `location.assign(pathname)`, which drops the query), and when a saved run is resumed.
+
+Rule:
+- The chosen locale is stored in localStorage key `nt_lang` (`"zh"` | `"en"`) whenever it changes: title toggle `title-lang`, title settings `settings-lang`, in-game 设置 `settings-lang`.
+- At start (`src/main.ts`): `?lang=` if present (and it is stored too), else `nt_lang`, else `"en"` (the submission opens in English).
+- `document.documentElement.lang` follows every change (already done in game.ts; do the same on the title page).
+- Storage access is wrapped in try/catch; failure falls back to the old behaviour.
+
+Files: `src/main.ts`, `src/ui/title/mount.ts`, `src/world/room/game.ts` (`settings-lang`), one small helper (e.g. `src/world/i18n.ts`: `storedLocale(storage)`, `rememberLocale(storage, l)`), tests in `tests/title-page.test.ts` or a new `tests/locale.test.ts`.
+
+Tests: the helper reads/writes `nt_lang`; URL beats storage; storage beats the default; an unknown stored value is ignored; storage that throws falls back to `"en"`; the title toggle and both settings rows store the new value.
