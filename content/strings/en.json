@@ -347,5 +347,9 @@
   "obj.key.tape.rew": "rewind",
   "obj.key.tape.vol+": "volume up",
   "obj.key.tape.vol-": "volume down",
-  "obj.calculator.turn": "hold the body and turn it"
+  "obj.calculator.turn": "hold the body and turn it",
+  "obj.flip": "⇋ flip over",
+  "obj.rotate": "↻ upside down",
+  "obj.key.dictionary.space": "space",
+  "obj.key.chick.reset": "reset"
 }
