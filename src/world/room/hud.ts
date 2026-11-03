@@ -39,6 +39,7 @@ import { dialogueBox, raidShowing } from "@world/dialogue/box";
 import { renderScene, sceneOf } from "@world/dialogue/scene";
 import { edgeLeads, HINT_FADE_MS } from "./look";
 import { weatherOf } from "@state/stages";
+import { caseOverlay, looseContent } from "./case";
 
 /** L7: the day the heart-rate widget appears (stages.json if it says; else day 9's narration). */
 export const HEART_RATE_FROM_DAY: number = (stagesFile as { heartRateFromDay?: number }).heartRateFromDay ?? 9;
@@ -46,9 +47,17 @@ export const HEART_RATE_FROM_DAY: number = (stagesFile as { heartRateFromDay?: n
 /** L7: a proxy that rises as SAN falls; SAN itself is never shown (san-and-endings: from constants). */
 export const heartRate = bpm;
 
-/** The object each day's box layer holds (stages.json objectsFoundOnDay). */
+/** The day the hidden box (the slip) is the loose one in the case (blind-box 2026-11-03). */
+export const hiddenBoxDay: number = (stagesFile as { hiddenBoxDay?: number }).hiddenBoxDay ?? -1;
+
+/**
+ * The box content loose on a day (stages.json objectsFoundOnDay): today's object, or the hidden
+ * box's `"slip"` on hiddenBoxDay (it is not an object; `found` never holds it). The loose box runs
+ * the loop-box flow; `loop-box` appends `openLayer` with this id.
+ */
 const FOUND_ON_DAY = stagesFile.objectsFoundOnDay as Record<string, number>;
 export function boxObjectFor(day: number): string | null {
+  if (day === hiddenBoxDay) return "slip";
   return Object.entries(FOUND_ON_DAY).find(([, d]) => d === day)?.[0] ?? null;
 }
 
@@ -152,6 +161,28 @@ function tabletop(things: DeskThings): SafeHtml {
 export function itemsButton(session: Pick<Session, "itemsOpen">): SafeHtml {
   const open = session.itemsOpen;
   return html`<button type="button" class="${cls("items-btn", open && "on")}" data-action="items-toggle" aria-expanded="${open ? "true" : "false"}" aria-controls="items-panel">${tr(open ? "hud.itemsClose" : "hud.items")}</button>`;
+}
+
+/** Whether today's 开箱 item is unlocked and not yet done (the box of today's object is loose then). */
+export function openBoxReady(state: State, events: readonly GameEvent[]): boolean {
+  const lc = loopContext(state, events);
+  if (!lc) return false;
+  const states = itemStates(lc);
+  const boxItem = lc.file.items.find((it) => it.done.kind === "event" && it.done.event.type === "openBox");
+  if (!boxItem) return false;
+  const st = states.get(boxItem.id)!;
+  return st.unlocked && !st.done;
+}
+
+/**
+ * The blind-box case overlay (blind-box 2026-11-03): open from 房间 via 拆箱 (`pick-box`). It shows
+ * over the room like the 道具 strip; the loose box runs loop-box, stuck boxes only shake and speak.
+ */
+export function casePanel(state: State, events: readonly GameEvent[], session: Session, runId: string, nowMs: number): SafeHtml | null {
+  if (!session.caseOpen) return null;
+  const loose = looseContent(state.day, boxObjectFor(state.day), openBoxReady(state, events));
+  const shake = session.caseShake && (nowMs <= 0 || session.caseShake.until > nowMs) ? session.caseShake.slot : null;
+  return caseOverlay({ runId, events, loose, shake });
 }
 
 /** The object strip as a panel over the current view: the same buttons as on the tabletop. */
@@ -268,6 +299,8 @@ export interface RoomModel {
   readonly nowMs?: number;
   /** The game draws the dialogue box in the viewport's fixed layer (dialogue 2026-11-02), not in the stage. */
   readonly boxOutside?: boolean;
+  /** The run id: seeds the blind-box case's slot shuffle (blind-box 2026-11-03). */
+  readonly runId?: string;
 }
 
 /**
@@ -413,7 +446,7 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const evening = isEvening(session.clock) && view !== "bed" && !dream ? eveningLook(view) : null;
   const fadeLen = session.cam?.fade ?? ARRIVE_FADE_MS;
   const late = fade === null ? null : raw(` style="--late:-${Math.round(fade)}ms${fadeLen !== ARRIVE_FADE_MS ? `;--late-dur:${fadeLen}ms` : ""}"`);
-  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid", fade !== null && "m-late", dream && "scene-on")}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${renderScene(lineScene)}${scene}${view === "room" && !waiting && !dream && boxOpenShowing(state, events) ? boxOpen() : null}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${itemsPanel(state, events, session)}${held}${model.boxOutside ? null : dialogueBox(state, events, session, nowMs)}${bottomRight(model)}${settingsButton()}${itemsButton(session)}${model.boxOutside ? null : settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
+  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid", fade !== null && "m-late", dream && "scene-on")}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${renderScene(lineScene)}${scene}${view === "room" && !waiting && !dream && boxOpenShowing(state, events) ? boxOpen() : null}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${itemsPanel(state, events, session)}${view === "room" ? casePanel(state, events, session, model.runId ?? "run", nowMs) : null}${held}${model.boxOutside ? null : dialogueBox(state, events, session, nowMs)}${bottomRight(model)}${settingsButton()}${itemsButton(session)}${model.boxOutside ? null : settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
 }
 
 export { raidShowing };

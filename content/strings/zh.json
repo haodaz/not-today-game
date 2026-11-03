@@ -404,5 +404,16 @@
   "box.stuck.0": "卡住了。",
   "box.stuck.1": "纹丝不动，像格子小了一圈。",
   "box.stuck.2": "你使劲一拔，整个端盒跟着你走了，那个盒子还在格子里。",
-  "box.stuck.3": "好像有什么从里面顶着。"
+  "box.stuck.3": "好像有什么从里面顶着。",
+  "board.tray": "材料",
+  "board.lockCode": "需要提取码",
+  "board.noTool": "你手边没有能收这个的东西。",
+  "board.kuroTry": "让它试",
+  "board.assist": "让它补全",
+  "board.print": "打印",
+  "board.pagerCodes": "BP 机上滚过的数字",
+  "hand.give": "把{label}递给它。",
+  "hand.judge.perfect": "它接过去，翻了翻，收进缝里。什么也没留下。",
+  "hand.judge.flawed": "它接过去，停在其中一页上。指尖在那一行按了一下。",
+  "hand.judge.wrong": "它没有接。它的手在桌上摸了一圈，拿走了别的。"
 }

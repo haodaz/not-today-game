@@ -199,21 +199,29 @@ describe("point to go", () => {
     expect(m.session.view).toBe("desk");
   });
 
-  it("the box opens where it is: no walk to 桌子; locked before its line, nothing opens; from 桌子 nothing", () => {
+  it("拆箱 opens the case where it is: no walk to 桌子; the loose box opens, 桌子 does not open the case", () => {
     const later: [number, () => void][] = [];
     const store = createStore({ startDay: 1 });
-    const ctx: ActionContext = { store, session: initialSession(DEFAULT_CLOCK, "left", "room"), rerender: () => {}, later: (ms, fn) => void later.push([ms, fn]) };
+    const ctx: ActionContext = { store, session: initialSession(DEFAULT_CLOCK, "left", "room"), rerender: () => {}, later: (ms, fn) => void later.push([ms, fn]), now: () => 0 };
     const events = store.getEvents().length;
+    // Before its line (day 1, box item locked): the case opens, but no box is loose, so a pick is
+    // stuck — nothing is appended.
     loopActions["pick-box"]!(ctx, {} as DOMStringMap, null as never);
     expect(ctx.session.view).toBe("room");
-    expect(later).toEqual([]);
-    expect(store.getEvents().length).toBe(events); // locked on day 1 before its line: nothing opens, nothing breaks
-    completeUntil(store, "box");
+    expect(ctx.session.caseOpen).toBe(true);
+    loopActions["case-pick"]!(ctx, { slot: "chick" } as DOMStringMap, null as never);
+    expect(store.getEvents().length).toBe(events); // stuck: nothing opens, nothing breaks
+    expect(store.getState().found).toEqual([]);
+    // From 桌子 the case does not open.
+    ctx.session.caseOpen = false;
     ctx.session.view = "desk";
     loopActions["pick-box"]!(ctx, {} as DOMStringMap, null as never);
-    expect(store.getState().found).toEqual([]);
+    expect(ctx.session.caseOpen).toBe(false);
+    // In 房间 once the box item is open: the loose box is today's object and opening it finds it.
+    completeUntil(store, "box");
     ctx.session.view = "room";
     loopActions["pick-box"]!(ctx, {} as DOMStringMap, null as never);
+    loopActions["case-pick"]!(ctx, { slot: "chick" } as DOMStringMap, null as never);
     expect(store.getState().found).toEqual(["chick"]);
   });
 

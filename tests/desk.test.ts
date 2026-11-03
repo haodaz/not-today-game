@@ -264,8 +264,12 @@ describe("the tabletop's things are photos (day-loop correction 2026-11-01)", ()
     const ctx = ctxOf(store, "room");
     syncLoop(ctx);
     ctx.session.dialogue = { queue: [], line: 0 };
-    act(ctx, "pick-box");
     const object = boxObjectFor(1)!;
+    // 拆箱 opens the case; clicking the loose box runs the loop-box flow unchanged.
+    act(ctx, "pick-box");
+    expect(ctx.session.caseOpen).toBe(true);
+    act(ctx, "case-pick", { slot: object });
+    expect(ctx.session.caseOpen).toBe(false);
     // No walk: still 房间; the object is out of the box and in the hand (held, not in use).
     expect(ctx.session.view).toBe("room");
     expect(store.getState().found).toContain(object);
@@ -297,6 +301,7 @@ describe("the tabletop's things are photos (day-loop correction 2026-11-01)", ()
     completeUntil(store, "box");
     const ctx = ctxOf(store, "room");
     act(ctx, "pick-box");
+    act(ctx, "case-pick", { slot: boxObjectFor(1)! });
     expect(ctx.session.holding).toBe(boxObjectFor(1));
     act(ctx, "loop-put-down");
     expect(ctx.session.holding).toBeNull();

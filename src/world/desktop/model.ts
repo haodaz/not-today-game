@@ -98,6 +98,12 @@ export interface Session {
   endingPage: { phase: "you" | "credits" | "after"; startMs: number; skipped: boolean } | null;
   /** The 道具 strip is open over the current view (day-loop correction 2026-11-01). */
   itemsOpen: boolean;
+  /** The blind-box case overlay is open over 房间 (blind-box 2026-11-03); session only. */
+  caseOpen: boolean;
+  /** How many stuck boxes have been clicked (the stuck line cycles by this); −1 = not seeded yet. */
+  caseStuck: number;
+  /** The stuck box shaking now (its content id) and until when (ms); the shake lasts 200 ms. */
+  caseShake: { readonly slot: string; readonly until: number } | null;
   /**
    * The day-18 pull-out before the ending pages (room-scene addition 2026-11-01): from which
    * framing, since when, and where this ending cuts it. While set, the pages wait.
@@ -247,6 +253,9 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     judging: null,
     endingPage: null,
     itemsOpen: false,
+    caseOpen: false,
+    caseStuck: -1,
+    caseShake: null,
     pullOut: null,
     collection: EMPTY_COLLECTION,
     bookOpen: false,

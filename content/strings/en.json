@@ -404,5 +404,16 @@
   "box.stuck.0": "Stuck.",
   "box.stuck.1": "It won't budge, as if the slot had shrunk.",
   "box.stuck.2": "You pull hard. The whole case comes with you. The box stays in its slot.",
-  "box.stuck.3": "Something seems to be pushing back from inside."
+  "box.stuck.3": "Something seems to be pushing back from inside.",
+  "board.tray": "Material",
+  "board.lockCode": "Needs a code",
+  "board.noTool": "You have nothing that can receive this.",
+  "board.kuroTry": "Let it try",
+  "board.assist": "Let it fill the rest",
+  "board.print": "Print",
+  "board.pagerCodes": "Numbers scrolling on the pager",
+  "hand.give": "Hand it the {label}.",
+  "hand.judge.perfect": "It takes it, leafs through, and draws it back into the gap. Nothing is left behind.",
+  "hand.judge.flawed": "It takes it and stops on one page. A fingertip presses one line.",
+  "hand.judge.wrong": "It does not take it. Its hand feels its way round the desk and takes something else."
 }

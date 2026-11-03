@@ -40,6 +40,7 @@
     "calculator": 16,
     "phone": 18
   },
+  "hiddenBoxDay": 18,
   "cycles": {
     "1": {
       "days": [

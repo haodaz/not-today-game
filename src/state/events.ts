@@ -271,7 +271,9 @@ export function applyEvent(state: State, event: GameEvent): State {
     case "names":
       return applyNames(state, event);
     case "openLayer":
-      return withMember(state, "found", event.objectId);
+      // The hidden box (blind-box 2026-11-03): "slip" is not an object — it opens the day-18 box beat
+      // and the 寄件单, but it is never found, has no program and no recognise question.
+      return event.objectId === "slip" ? state : withMember(state, "found", event.objectId);
     case "recognise":
       return applyRecognise(state, event, (s) => withMember(s, "recognised", event.objectId));
     case "pokeReset":

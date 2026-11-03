@@ -47,7 +47,12 @@ import { askedOn, knows } from "@state/recognise";
 import { gateAdvance } from "@world/motion/reveal";
 import { endingNext } from "@world/endings/flow";
 import { renderEnding } from "@world/endings/view";
-import { boxObjectFor, doorMeal, itemsButton, itemsPanel, raidShowing, renderRoom, settingsButton, settingsPanel, SLIP_ITEM, walkmanShown } from "./hud";
+import { boxObjectFor, doorMeal, itemsButton, itemsPanel, openBoxReady, raidShowing, renderRoom, settingsButton, settingsPanel, SLIP_ITEM, walkmanShown } from "./hud";
+import { looseContent, stuckLineKey } from "./case";
+import { jitter } from "@state/seed";
+
+/** How long a stuck box shakes (blind-box 2026-11-03). */
+export const CASE_SHAKE_MS = 200;
 import { pointed } from "./pointer";
 import { itemPageId, readingPageId, type KuroCloses } from "@state/closes";
 import { browserPage } from "@world/desktop/browser/data";
@@ -80,7 +85,7 @@ export function renderGame(store: Store, session: Session, nowMs: number): SafeH
   // settings panel sits above it, in a fixed layer of its own after the box (2026-11-02).
   const dlg = dialogueBox(state, events, session, nowMs);
   const settings = settingsPanel(session);
-  return html`${renderRoom({ state, events, session, startDay: store.getStartDay(), nowMs, boxOutside: true })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${dlgLayer(dlg, session)}${settings ? html`<div class="hud-host">${settings}</div>` : null}`;
+  return html`${renderRoom({ state, events, session, startDay: store.getStartDay(), nowMs, boxOutside: true, runId: store.getRunId() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${dlgLayer(dlg, session)}${settings ? html`<div class="hud-host">${settings}</div>` : null}`;
 }
 
 /** The box's fixed layer; a story's mask under the box dims and holds the stage (dialogue addition 2026-11-02). */
@@ -222,7 +227,7 @@ export function backTarget(view: View): View | null {
 
 /** True when something sits over the view that a "back" should close first (or that blocks the camera). */
 function overlayOpen(s: Session): boolean {
-  return s.bookOpen || s.historyOpen || s.settingsOpen || s.itemsOpen || s.phoneOpen || !!s.holding || talking(s.dialogue) || !!s.pullOut || !!s.endingPage;
+  return s.bookOpen || s.historyOpen || s.settingsOpen || s.itemsOpen || s.caseOpen || s.phoneOpen || !!s.holding || talking(s.dialogue) || !!s.pullOut || !!s.endingPage;
 }
 
 /** The key went to something the player types into: an input, a textarea, anything contenteditable. */
@@ -321,6 +326,7 @@ export const loopActions: Record<string, ActionHandler> = {
     settleSession(ctx.session);
     ctx.session.phoneOpen = false;
     ctx.session.itemsOpen = false;
+    ctx.session.caseOpen = false;
     ctx.session.holding = null;
     restHand(ctx.session);
     // The pointer finds the new view's edges itself.
@@ -478,11 +484,50 @@ export const loopActions: Record<string, ActionHandler> = {
     else session.dialogue = push(session.dialogue, beatQueued(day, "night", night, { kind: "lieDown" }));
     ctx.rerender();
   },
-  // The box on the floor by the bed (房间) opens where it is (2026-11-02): no walk to 桌子. Its beat
-  // and the question play over 房间 with the open box at its place; what came out goes to the desk row.
+  // 拆箱 (blind-box 2026-11-03): clicking the box in 房间 opens the 端盒 (the case) over the room,
+  // not a layer directly. The nine small boxes are shown; exactly one is loose today.
   "pick-box"(ctx) {
     if (ctx.session.view !== "room") return;
-    loopActions["loop-box"]!(ctx, {} as DOMStringMap, null as never);
+    ctx.session.caseOpen = true;
+    // The stuck-line counter is seeded once per open from the run and day, so the first dull line
+    // is not always the same (session count, "starts at a seeded offset").
+    if (ctx.session.caseStuck < 0) {
+      ctx.session.caseStuck = jitter(`case-stuck:${ctx.store.getRunId()}:${ctx.store.getState().day}`, 0, 3);
+    }
+    ctx.rerender();
+  },
+
+  // Esc / clicking outside closes the case.
+  "case-close"(ctx) {
+    ctx.session.caseOpen = false;
+    ctx.session.caseShake = null;
+    ctx.rerender();
+  },
+
+  // A box in the case: the loose one closes the case and runs loop-box unchanged; a stuck one shakes
+  // 200 ms, thuds, and speaks one of the four dull lines (cycling). Stuck boxes log nothing.
+  "case-pick"(ctx, data) {
+    const { store, session } = ctx;
+    if (!session.caseOpen || session.view !== "room") return;
+    const slot = data.slot ?? "";
+    const state = store.getState();
+    const loose = looseContent(state.day, boxObjectFor(state.day), openBoxReady(state, store.getEvents()));
+    if (slot && slot === loose) {
+      // The loose box: the case closes and the existing flow runs (openLayer, the rise, the beat).
+      session.caseOpen = false;
+      session.caseShake = null;
+      loopActions["loop-box"]!(ctx, {} as DOMStringMap, null as never);
+      return;
+    }
+    // A stuck box: a shake, a dull thud, a line. No event, no state.
+    const now = ctx.now?.() ?? Date.now();
+    session.caseShake = { slot, until: now + CASE_SHAKE_MS };
+    ctx.later(CASE_SHAKE_MS + 10, ctx.rerender);
+    ctx.play?.("box-thud");
+    const n = session.caseStuck < 0 ? 0 : session.caseStuck;
+    session.caseStuck = n + 1;
+    const day = state.day;
+    session.dialogue = push(session.dialogue, { key: `d${day}:box:stuck:${n}`, lines: [{ k: "narration", t: t(stuckLineKey(n)) }], ending: { kind: "none" } });
     ctx.rerender();
   },
 
@@ -1003,6 +1048,11 @@ export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
   // The 道具 strip (day-loop correction 2026-11-01): Esc closes it, like its button.
   if (e.key === "Escape" && ctx.session.itemsOpen) {
     loopActions["items-toggle"]!(ctx, {} as DOMStringMap, null as never);
+    return true;
+  }
+  // The blind-box case (blind-box 2026-11-03): Esc closes it, like clicking outside.
+  if (e.key === "Escape" && ctx.session.caseOpen) {
+    loopActions["case-close"]!(ctx, {} as DOMStringMap, null as never);
     return true;
   }
   // The history is open: nothing under it reads on.
