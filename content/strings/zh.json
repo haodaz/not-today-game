@@ -397,5 +397,12 @@
   "obj.name.calculator": "计算器",
   "obj.name.phone": "手机",
   "obj.name.kurogotchi": "克麻歌子",
-  "kurogotchi.first": "论古老，没人比我更古。"
+  "kurogotchi.first": "论古老，没人比我更古。",
+  "box.case": "端盒",
+  "box.hidden": "一个不一样的小盒子",
+  "box.small": "小盒子",
+  "box.stuck.0": "卡住了。",
+  "box.stuck.1": "纹丝不动，像格子小了一圈。",
+  "box.stuck.2": "你使劲一拔，整个端盒跟着你走了，那个盒子还在格子里。",
+  "box.stuck.3": "好像有什么从里面顶着。"
 }

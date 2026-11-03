@@ -397,5 +397,12 @@
   "obj.name.calculator": "Calculator",
   "obj.name.phone": "Phone",
   "obj.name.kurogotchi": "Kurogotchi",
-  "kurogotchi.first": "Old Things. I'm the oldest one here."
+  "kurogotchi.first": "Old Things. I'm the oldest one here.",
+  "box.case": "The case",
+  "box.hidden": "A box that is not like the others",
+  "box.small": "A small box",
+  "box.stuck.0": "Stuck.",
+  "box.stuck.1": "It won't budge, as if the slot had shrunk.",
+  "box.stuck.2": "You pull hard. The whole case comes with you. The box stays in its slot.",
+  "box.stuck.3": "Something seems to be pushing back from inside."
 }
