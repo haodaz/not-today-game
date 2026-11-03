@@ -4,11 +4,11 @@
     {
       "name": "State tests on save",
       "trigger": "PostFileSave",
-      "description": "tech.md quality gate: a change under src/state/** runs the state tests and the object render snapshot tests.",
+      "description": "tech.md quality gate, deferred (2026-11-03, to save credits): a save under src/state/** no longer runs tests; the state tests run once, as part of the full suite, when the task is finished.",
       "matcher": "(^|/)src/state/",
       "action": {
         "type": "agent",
-        "prompt": "A file under src/state/ was saved. Quality gate (tech.md): run exactly this once, and do not retry more than twice:\nnpx vitest run tests/events.test.ts tests/store.test.ts tests/fday.test.ts tests/replay.test.ts tests/saves.test.ts tests/slot.test.ts tests/stages.test.ts tests/variables.test.ts tests/clock.test.ts tests/loan.test.ts tests/endings.test.ts tests/gen-state-types.test.ts tests/polish.test.ts tests/night-hand.test.ts tests/upgrades.test.ts 2>&1 | tail -20\nIf every test passes, say so in one line. If any fail, list each failing test and its first assertion line. Do not edit code, do not update snapshots, and do not commit; report only."
+        "prompt": "A file under src/state/ was saved. Do NOT run any tests now: the quality gate is deferred to the end of the task, when you run `npx tsc --noEmit` and the full `npx vitest run` once (that run includes every state test). Reply with the single word: deferred."
       }
     }
   ]
