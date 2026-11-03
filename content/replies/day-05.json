@@ -151,27 +151,6 @@
           "t": "09:31",
           "text": "member：👍",
           "kind": "work"
-        },
-        {
-          "t": "21:47",
-          "text": "Vivi：PRD 补上了，功能圣经，五大模块都在里面。",
-          "kind": "work"
-        },
-        {
-          "t": "21:47",
-          "text": "Vivi：[文档] 洞察引擎_PRD_功能圣经",
-          "kind": "deliverable",
-          "doc": "vivi-prd"
-        },
-        {
-          "t": "21:48",
-          "text": "Vivi：研发那边可以直接按这个开工了，有问题先问 AI。",
-          "kind": "work"
-        },
-        {
-          "t": "21:52",
-          "text": "member：收到",
-          "kind": "work"
         }
       ],
       "fine": {

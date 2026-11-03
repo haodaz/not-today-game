@@ -131,37 +131,6 @@
           "t": "09:13",
           "text": "member：老周去吧",
           "kind": "work"
-        },
-        {
-          "t": "10:02",
-          "text": "Vivi：给大家看个东西。我让 AI 把洞察引擎做出来了，一晚上。",
-          "kind": "work"
-        },
-        {
-          "t": "10:02",
-          "text": "Vivi：[网页] 洞察引擎_方案_v0.1.html",
-          "kind": "deliverable",
-          "doc": "vivi-plan-1"
-        },
-        {
-          "t": "10:03",
-          "text": "Vivi：核心闭环已经跑通了，大家点开玩玩。以后这种事情不用排期了哈",
-          "kind": "work"
-        },
-        {
-          "t": "10:05",
-          "text": "member：👍",
-          "kind": "work"
-        },
-        {
-          "t": "10:05",
-          "text": "member：学习了",
-          "kind": "work"
-        },
-        {
-          "t": "10:07",
-          "text": "老板：[语音] 6″",
-          "kind": "work"
         }
       ],
       "fine": {

@@ -138,32 +138,6 @@
           "t": "09:19",
           "text": "member：早上好。",
           "kind": "private"
-        },
-        {
-          "t": "09:41",
-          "text": "Vivi：昨晚又迭代了一版，这次它自己会进化了。",
-          "kind": "work"
-        },
-        {
-          "t": "09:41",
-          "text": "Vivi：[网页] EVO_自演化引擎_v2.0.html",
-          "kind": "deliverable",
-          "doc": "vivi-plan-2"
-        },
-        {
-          "t": "09:42",
-          "text": "Vivi：人类参与度 0%。这就是我们要的。",
-          "kind": "work"
-        },
-        {
-          "t": "09:44",
-          "text": "member：👍👍",
-          "kind": "work"
-        },
-        {
-          "t": "09:45",
-          "text": "老板：这个方向对",
-          "kind": "work"
         }
       ],
       "fine": {
