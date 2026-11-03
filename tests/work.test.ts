@@ -139,32 +139,40 @@ function play(task: Task, mode: "self" | "look" | "let", steps: (ctx: ActionCont
 }
 
 describe("the surfaces: the same flags and events as before", () => {
-  it("document self, both clauses read: the self event; the catch flag is set", () => {
+  it("document self, both clauses read: 合并 / 不合 is chosen before 通过; the self event (with merge); the catch flag is set", () => {
     const { store, event } = play(task1, "self", (ctx) => {
       act(ctx, "wb-clause", { i: "5" });
       act(ctx, "wb-clause", { i: "10" });
+      act(ctx, "wb-merge", { merge: "1" });
     });
-    expect(event).toEqual({ kind: "task", day: 1, flag: task1.done, mode: "self" });
+    expect(event).toEqual({ kind: "task", day: 1, flag: task1.done, mode: "self", merge: true });
     expect(store.getState().flags).toContain("caught_6_11");
   });
-
-  it("合并 / 不合 render only with their strings: without them no chip, no raw key, 通过 as before", () => {
-    const { markup, event } = play(task1, "self", (ctx) => task1.doc!.conflict.forEach((i) => act(ctx, "wb-clause", { i: String(i) })));
-    for (const key of ["wb.merge", "wb.keep"]) {
-      if (hasString(key)) expect(markup).toContain(escapeHtml(t(key)));
-      else expect(markup).not.toContain(key);
-    }
-    if (!hasString("wb.merge") && !hasString("wb.keep")) {
-      expect(markup).not.toContain('data-action="wb-merge"');
-      expect(event).toEqual({ kind: "task", day: 1, flag: task1.done, mode: "self" });
-    }
+  it("with the strings in content, 通过 does nothing after both clauses until a chip is chosen (the missing-string case is work-merge.test.ts's mocked table)", () => {
+    expect(hasString("wb.merge") && hasString("wb.keep")).toBe(true);
+    const store = dayWith("task1");
+    const { ctx, app } = ctxFor(store);
+    act(ctx, "wb-send");
+    act(ctx, "wb-choose", { mode: "self" });
+    for (const i of task1.doc!.conflict) act(ctx, "wb-clause", { i: String(i) });
+    const out = work(app());
+    for (const key of ["wb.merge", "wb.keep"]) expect(out).toContain(`>${escapeHtml(t(key))}</button>`);
+    expect(out).not.toContain('data-action="wb-pass"');
+    act(ctx, "wb-pass");
+    expect(lastTask(store)?.flag).not.toBe(task1.done);
+    act(ctx, "wb-merge", { merge: "0" });
+    act(ctx, "wb-pass");
+    expect(lastTask(store)).toEqual({ kind: "task", day: 1, flag: task1.done, mode: "self", merge: false });
   });
-
   it("property: self without both conflict clicks never sets a catch flag", () => {
     fc.assert(
       fc.property(fc.subarray([...Array(task1.doc!.left.length).keys()]), (clicks) => {
-        const { store, event } = play(task1, "self", (ctx) => clicks.forEach((i) => act(ctx, "wb-clause", { i: String(i) })));
         const both = task1.doc!.conflict.every((i) => clicks.includes(i));
+        const { store, event } = play(task1, "self", (ctx) => {
+          clicks.forEach((i) => act(ctx, "wb-clause", { i: String(i) }));
+          // Both read: a chip must be chosen before 通过.
+          if (both) act(ctx, "wb-merge", { merge: "0" });
+        });
         expect(store.getState().flags.includes("caught_6_11")).toBe(both);
         expect(event.kind === "task" && event.mode).toBe("self");
         expect(store.getState().flags).toContain(task1.done);
@@ -240,6 +248,7 @@ describe("snapshots (day 1)", () => {
     const docSelf = play(task1, "self", (ctx) => {
       act(ctx, "wb-clause", { i: "5" });
       act(ctx, "wb-clause", { i: "10" });
+      act(ctx, "wb-merge", { merge: "0" });
     }).markup;
     const docLet = play(task1, "let", (ctx) => act(ctx, "wb-clause", { i: "10" })).markup;
     const ledgerSelf = play(task2, "self", (ctx) => act(ctx, "wb-cell")).markup;

@@ -290,5 +290,8 @@
   "error.10": "Error: the operation was cancelled.",
   "error.11": "Unhandled exception.",
   "error.12": "Error: today too.",
-  "kuro.unreadable": "I can't read that line myself."
+  "kuro.unreadable": "I can't read that line myself.",
+  "wb.merge": "Merge",
+  "wb.keep": "Keep both",
+  "vivi.lock": "You have to open it and look, or she will never let it go."
 }

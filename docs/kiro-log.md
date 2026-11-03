@@ -1070,3 +1070,26 @@ Tree 7f6640d plus Claude's content. No content edited. tsc clean; vitest 81 file
    - `desktop.css`: one-column merged doc.
    - Tests: new `tests/work-merge.test.ts` mocks the strings table with the literals under content's own (content wins once it has them), covering: chips only after both clicks; each path's event and flags; the reducer guard; the snapshot with the chips. `tests/work.test.ts`: without the strings, no chip, no raw key, the plain self event.
 - **For Claude:** the `wb.merge` / `wb.keep` strings (zh and en).
+
+## 2026-11-02 (night, late): merge strings landed; the profile writer
+
+Tree aed3dcc plus Claude's content (wb.merge / wb.keep, vivi.lock unused). No content edited. tsc clean; vitest 82 files / 1468 tests green.
+
+1. **work.test.ts** (3 cases):
+   - 「document self, both clauses read」 now picks 合并 before 通过 and expects `merge: true` on the event.
+   - The "render only with their strings" case became "通过 does nothing until a chip is chosen" (the strings are asserted present; the missing-string behaviour stays in work-merge.test.ts's mocked table).
+   - The catch-flag property picks a chip once both clauses are read.
+   - The only snapshot change is the player's reply bubble 「不合」 in docSelf.
+2. **The ending in a fresh profile.**
+   - **Not reproduced.** The title page cannot append events (mount.ts has no store). I booted `src/main.ts` in a DOM harness with empty storage on `/` and `/?day=13` and `nt_profile` stayed empty, so no code path on this tree writes endings at load. I did not find "two survive endings at load".
+   - **Likely source** (unconfirmed; needs a re-run on a really clean browser profile): `survive: 2` with no `nt_run` is exactly what two finished day-18 runs leave in a persistent headless profile, because `newRun` clears the run save and `recordEnding` adds to the profile.
+   - **Real leak, fixed:** `main.ts` recorded endings for `?day=N` debug runs too, though its header says they never touch the saves. A debug run that reached an ending wrote the profile.
+   - New `world/endings/record.ts` `watchEndings(store, record, enabled)`: only ending events appended after the watch began (a replayed log is history), first ending per run only, nothing when `enabled` is false. `main.ts` uses it with `saved`, so `?day=N` records nothing.
+   - Tests, `tests/ending-record.test.ts`:
+     - a fresh collection read and a title mount (timers running) never write storage;
+     - replayed endings are never recorded;
+     - one ending is recorded once;
+     - a debug run records nothing;
+     - the profile gets exactly one ending and one run;
+     - the desk book and figures never render while `finishedRuns` is 0.
+   - If it still shows on a clean profile: the next thing to capture is `localStorage` keys at first paint and `new Error().stack` inside `recordEnding`.

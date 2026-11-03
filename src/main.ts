@@ -24,6 +24,7 @@ import { parseBeatParams } from "@world/desktop/beat";
 import { mountDesktop } from "@world/desktop/controller";
 import { desktopActions } from "@world/desktop/actions";
 import { endingHost } from "@world/endings/flow";
+import { watchEndings } from "@world/endings/record";
 import { getLocale, setLocale } from "@world/i18n";
 import { syncLoop } from "@world/loop/runtime";
 import { createMotion } from "@world/motion/dom";
@@ -82,13 +83,9 @@ function startGame(store: Store, saved: boolean, from?: "desk"): void {
       }
     });
   }
-  // Every ending reached goes into the profile once, when it happens (title-page T8).
-  let seen = store.getEvents().length;
-  store.subscribe(() => {
-    const events = store.getEvents();
-    for (const e of events.slice(seen)) if (e.kind === "ending") profile.recordEnding(e.ending);
-    seen = events.length;
-  });
+  // Every ending reached goes into the profile once, when it happens (title-page T8): endings
+  // appended after this point only, and never for a debug run (`saved` is false for ?day=N).
+  watchEndings(store, (kind) => profile.recordEnding(kind), saved);
   const focus = params.get("focus");
   const view = params.get("view");
   const game = mountDesktop(root, {
