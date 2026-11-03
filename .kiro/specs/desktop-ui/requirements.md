@@ -132,6 +132,6 @@ Rule: a refused switch still shows the `vivi.lock` box line, and then takes the 
 - the bubble `[data-action="open-deliverable"][data-doc="<doc>"]` is then on screen (scroll it into view if the list is long).
 Clicking the bubble lifts the lock exactly as today. 回房间 stays allowed. A conversation switch *to* the conversation that holds the doc is never refused.
 
-Files: `src/world/room/game.ts` (`viviRefuse` and its five callers), `src/world/desktop/vivi.ts` (add a pure `lockedConversation(state, now, table)` returning the recipient id that holds the first locked doc), tests in `tests/vivi-lock.test.ts` (or the file that holds the current lock tests).
+Files: `src/world/room/game.ts` (`viviRefuse` and its five callers), `src/world/desktop/vivi.ts` (add a pure `lockedConversation(state, now, table)` returning the recipient id that holds the first locked doc), tests in `tests/vivi-lock.test.ts`.
 
 Tests: with the lock forced (fixture), from the workbench home page a `wb-nav` to tasks is refused, the box line is pushed, and afterwards `session` shows the messages page with the conversation that holds the doc selected; the rendered desktop contains the `open-deliverable` button for that doc; clicking it logs `open file:<doc>` and lifts the lock; `conv` to that conversation is allowed while locked; `conv` to another conversation is refused and lands on the doc's conversation.

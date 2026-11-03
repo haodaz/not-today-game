@@ -57,6 +57,6 @@ Rule:
 - `document.documentElement.lang` follows every change (already done in game.ts; do the same on the title page).
 - Storage access is wrapped in try/catch; failure falls back to the old behaviour.
 
-Files: `src/main.ts`, `src/ui/title/mount.ts`, `src/world/room/game.ts` (`settings-lang`), one small helper (e.g. `src/world/i18n.ts`: `storedLocale(storage)`, `rememberLocale(storage, l)`), tests in `tests/title-page.test.ts` or a new `tests/locale.test.ts`.
+Files: `src/main.ts`, `src/ui/title/mount.ts`, `src/world/room/game.ts` (`settings-lang`), one small helper (e.g. `src/world/i18n.ts`: `storedLocale(storage)`, `rememberLocale(storage, l)`), tests in a new `tests/locale.test.ts`.
 
 Tests: the helper reads/writes `nt_lang`; URL beats storage; storage beats the default; an unknown stored value is ignored; storage that throws falls back to `"en"`; the title toggle and both settings rows store the new value.
