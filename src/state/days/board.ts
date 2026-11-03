@@ -1,0 +1,196 @@
+// Work v2 (2026-11-03): a board task is several steps — unlock a column behind an old object, fill
+// slots from a card tray, or let Kuro step in — assembled into a result that lands on the desk and
+// is handed to the hand at night. The board state is a pure fold over the `boardStep` events (so it
+// replays), and the night judgement is a pure function of the log. No clock, no rendering here.
+import type { BoardOp, GameEvent } from "../events";
+import type { State } from "../types.gen";
+import { taskByFlag, type Task, type TaskBoard, type TaskDeliverable } from "./tasks";
+import { dayFile } from "./table";
+import { inDream } from "../nights";
+
+/** The board of a task id on a day (work v2), or null. Found via the day's task list. */
+export function boardOf(day: number, taskId: string): { task: Task; board: TaskBoard } | null {
+  const task = taskForId(day, taskId);
+  return task?.board ? { task, board: task.board } : null;
+}
+function taskForId(day: number, taskId: string): Task | undefined {
+  // The day's tasks are keyed by their done flag; find by id.
+  const file = dayFile(day);
+  if (!file) return undefined;
+  for (const item of file.items) {
+    if (item.done.kind !== "flag") continue;
+    const t = taskByFlag(day, item.done.flag);
+    if (t?.id === taskId) return t;
+  }
+  return undefined;
+}
+
+/** The board as it stands now, derived from the day's `boardStep` events (work v2 §2). Pure. */
+export interface BoardState {
+  /** The given column is unlocked (no lock, or the right code / an assist opened it). */
+  readonly unlocked: boolean;
+  /** slot id → the card id placed there (tray card or a Kuro card). */
+  readonly slots: Readonly<Record<string, string>>;
+  /** How many times Kuro stepped in (unlock-by-it or fill-all). */
+  readonly assists: number;
+  /** The wrong codes tried on the lock this session (for the shake; derived too). */
+  readonly wrongCodes: readonly string[];
+}
+
+/** A fresh board: locked when it has a lock, every slot empty, no assist. */
+export function freshBoard(board: TaskBoard): BoardState {
+  return { unlocked: board.given.lock === undefined, slots: {}, assists: 0, wrongCodes: [] };
+}
+
+/** The `boardStep` ops for a task on a day, in order (today only). */
+export function boardOps(day: number, taskId: string, events: readonly GameEvent[]): BoardOp[] {
+  return events.filter((e): e is Extract<GameEvent, { kind: "boardStep" }> => e.kind === "boardStep" && e.day === day && e.taskId === taskId).map((e) => e.op);
+}
+
+/** Fold one op onto the board state (pure). Unknown or impossible ops are ignored (they never logged). */
+export function stepBoard(board: TaskBoard, s: BoardState, op: BoardOp): BoardState {
+  switch (op.t) {
+    case "unlock":
+      if (board.given.lock === undefined || s.unlocked) return s;
+      return op.code === board.given.lock.answer ? { ...s, unlocked: true } : { ...s, wrongCodes: [...s.wrongCodes, op.code] };
+    case "assistUnlock":
+      if (s.unlocked) return s;
+      return { ...s, unlocked: true, assists: s.assists + 1 };
+    case "fill":
+      return { ...s, slots: { ...s.slots, [op.slot]: op.card } };
+    case "clear": {
+      if (!(op.slot in s.slots)) return s;
+      const next = { ...s.slots };
+      delete next[op.slot];
+      return { ...s, slots: next };
+    }
+    case "assistFill": {
+      const slots = { ...s.slots };
+      for (const slot of board.slots) if (!(slot.id in slots)) slots[slot.id] = board.kuro.fill[slot.id]!;
+      return { ...s, slots, unlocked: true, assists: s.assists + 1 };
+    }
+  }
+}
+
+/** The board state after today's ops. */
+export function boardState(board: TaskBoard, day: number, taskId: string, events: readonly GameEvent[]): BoardState {
+  return boardOps(day, taskId, events).reduce((s, op) => stepBoard(board, s, op), freshBoard(board));
+}
+
+/** Every slot filled and the column unlocked: 打印 is enabled. */
+export function canPrint(board: TaskBoard, s: BoardState): boolean {
+  return s.unlocked && board.slots.every((slot) => slot.id in s.slots);
+}
+
+/** The card ids that may sit in the tray: the board's own cards, minus any placed, minus Kuro's. */
+export function trayCards(board: TaskBoard, s: BoardState): string[] {
+  const placed = new Set(Object.values(s.slots));
+  return board.cards.filter((c) => !placed.has(c.id)).map((c) => c.id);
+}
+
+/** A card id is one of Kuro's own (never in the tray). */
+export function isKuroCard(board: TaskBoard, cardId: string): boolean {
+  return board.kuro.cards.some((c) => c.id === cardId);
+}
+
+/**
+ * The old object the lock needs is available (work v2 §5): found, and not taken by Kuro — an
+ * upgraded object at invasion level 3 is inside Kuro and counts as gone. Below 3 it works.
+ */
+export function lockObjectAvailable(board: TaskBoard, state: State): boolean {
+  const lock = board.given.lock;
+  if (!lock) return true;
+  if (!(state.found as string[]).includes(lock.object)) return false;
+  // Invasion level 3 = upgraded and in dream state (held up): the spec's "inside it". We only have
+  // `upgraded` + `dream` to read; an upgraded object that is also in dream tonight is level 3.
+  const taken = state.upgraded[lock.object] === true && inDream(lock.object, state);
+  return !taken;
+}
+
+/** Validate a board step (work v2): the task must be a board task of the day and the op must fit it. */
+export function validateBoardStep(day: number, taskId: string, op: BoardOp): void {
+  const found = boardOf(day, taskId);
+  if (!found) throw new Error(`boardStep: day ${day} has no board task "${taskId}"`);
+  const board = found.board;
+  const slotIds = new Set(board.slots.map((s) => s.id));
+  const cardIds = new Set([...board.cards, ...board.kuro.cards].map((c) => c.id));
+  switch (op.t) {
+    case "unlock":
+      if (board.given.lock === undefined) throw new Error("boardStep: this board has no lock");
+      if (!board.given.lock.codes.includes(op.code)) throw new Error(`boardStep: "${op.code}" is not one of the lock's codes`);
+      return;
+    case "fill":
+      if (!slotIds.has(op.slot)) throw new Error(`boardStep: "${op.slot}" is not a slot`);
+      if (!cardIds.has(op.card)) throw new Error(`boardStep: "${op.card}" is not a card`);
+      return;
+    case "clear":
+      if (!slotIds.has(op.slot)) throw new Error(`boardStep: "${op.slot}" is not a slot`);
+      return;
+    case "assistUnlock":
+      if (board.given.lock === undefined) throw new Error("boardStep: this board has no lock");
+      return;
+    case "assistFill":
+      return;
+    default:
+      throw new Error(`boardStep: unknown op ${JSON.stringify(op)}`);
+  }
+}
+
+// ——— the night judgement (work v2 §4) ———
+
+export type BoardVerdict = "perfect" | "flawed" | "wrong";
+
+/** The task event that printed a board on a day (its slots + assists), or null (not printed). */
+export function printedBoard(day: number, events: readonly GameEvent[]): { flag: string; slots: Readonly<Record<string, string>> } | null {
+  for (const e of events) {
+    if (e.kind !== "task" || e.day !== day || e.slots === undefined) continue;
+    const tree = taskByFlag(day, e.flag);
+    if (tree?.board) return { flag: e.flag, slots: e.slots };
+  }
+  return null;
+}
+
+/** The deliverable was given to the hand on `day` (a `give` event today). */
+export function deliverableGiven(day: number, deliverableId: string, events: readonly GameEvent[]): boolean {
+  return events.some((e) => e.kind === "give" && e.day === day && e.deliverableId === deliverableId);
+}
+
+/**
+ * Today's deliverable sitting on the desk (work v2 §3): a board task was printed today, it has a
+ * deliverable, and it has not been given to the hand yet. Null otherwise. Pure, from the log.
+ */
+export function deliverableOnDesk(day: number, events: readonly GameEvent[]): TaskDeliverable | null {
+  const printed = printedBoard(day, events);
+  if (!printed) return null;
+  const d = taskByFlag(day, printed.flag)?.deliverable;
+  if (!d) return null;
+  return deliverableGiven(day, d.id, events) ? null : d;
+}
+
+/** How many slots hold a card that is not the right answer (a Kuro card counts as wrong too). */
+export function wrongCount(board: TaskBoard, slots: Readonly<Record<string, string>>): number {
+  return board.slots.filter((slot) => slots[slot.id] !== slot.answer).length;
+}
+
+/**
+ * The night's board judgement from the log (work v2 §4), pure. Returns the verdict and the SAN delta
+ * (≤ 0), or null when the day had no board task printed (no judgement). `given` says whether the
+ * deliverable was handed to the hand; when it was not (by 躺下), the verdict is `wrong`.
+ */
+export function boardJudgement(day: number, events: readonly GameEvent[]): { verdict: BoardVerdict; san: number } | null {
+  const printed = printedBoard(day, events);
+  if (!printed) return null;
+  const tree = taskByFlag(day, printed.flag)!;
+  const board = tree.board!;
+  const judge = tree.judge;
+  if (!judge) return null;
+  const given = tree.deliverable ? deliverableGiven(day, tree.deliverable.id, events) : false;
+  const wrong = wrongCount(board, printed.slots);
+  let verdict: BoardVerdict;
+  if (!given) verdict = "wrong";
+  else if (wrong === 0) verdict = "perfect";
+  else if (wrong < judge.wrongAt) verdict = "flawed";
+  else verdict = "wrong";
+  const san = verdict === "perfect" ? judge.perfect : verdict === "flawed" ? judge.flawed : judge.wrong;
+  return { verdict, san };
+}

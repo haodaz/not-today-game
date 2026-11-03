@@ -91,7 +91,7 @@ export function isLosable(id: string): boolean {
 
 export function applyTask(
   state: State,
-  event: { readonly day: number; readonly flag: string; readonly mode: string; readonly missed?: true; readonly merge?: boolean; readonly marks?: readonly { readonly clause: number; readonly hit: boolean }[] },
+  event: { readonly day: number; readonly flag: string; readonly mode: string; readonly missed?: true; readonly merge?: boolean; readonly marks?: readonly { readonly clause: number; readonly hit: boolean }[]; readonly slots?: Readonly<Record<string, string>>; readonly assists?: number },
 ): State {
   if (event.missed !== undefined && (event.missed !== true || event.mode !== "self")) throw new Error("task: missed is only for a self path");
   if (event.merge !== undefined && (typeof event.merge !== "boolean" || event.mode !== "self" || event.missed)) throw new Error("task: merge is only for a self path that found the conflict");
@@ -102,6 +102,16 @@ export function applyTask(
   if (event.mode !== "auto" && !(TASK_MODES as readonly string[]).includes(event.mode)) throw new Error(`task: unknown mode "${event.mode}"`);
   if (!taskFlags(event.day).includes(event.flag)) throw new Error(`task: "${event.flag}" is not a task of day ${event.day}`);
   const tree = taskByFlag(event.day, event.flag);
+  // Work v2: a board task's `task` event carries slots + assists and only sets the done flag; its
+  // SAN is the night's `boardJudge`, not a path's effect. `marks`/`missed`/`merge` never apply.
+  if (tree?.board) {
+    if (event.marks !== undefined || event.missed !== undefined || event.merge !== undefined) throw new Error("task: a board task has no marks/missed/merge");
+    if (event.mode !== "self" && event.mode !== "let") throw new Error("task: a board task is done self or let");
+    if (event.slots !== undefined && (typeof event.slots !== "object" || event.slots === null || Array.isArray(event.slots))) throw new Error("task: slots must be an object");
+    if (event.assists !== undefined && !(Number.isInteger(event.assists) && event.assists >= 0)) throw new Error("task: assists must be an integer >= 0");
+    return withFlags(state, [event.flag]);
+  }
+  if (event.slots !== undefined || event.assists !== undefined) throw new Error("task: slots/assists belong to a board task");
   if (event.mode === "auto" || !tree) {
     // Ticked by itself (or a task with no tree): only the done flag.
     return withFlags(state, [event.flag]);

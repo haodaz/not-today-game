@@ -1547,3 +1547,32 @@ and its reels. Kiro's area only; `content/` untouched; the tape program is uncha
   the tentacle (presses A…B and ends fed; no tentacle under reduced motion but the presses happen).
   One end-to-end mount test added to `tests/object-drawer.test.ts`.
 - `npx tsc --noEmit`: clean. `npx vitest run`: 94 files / 1672 tests passed.
+
+## work-v2: the board task (end to end) · 2026-11-03
+
+- One sample board task wired end to end (day-7 task4, `.kiro/specs/work-v2/board-day07.json` as the
+  test fixture; Claude swaps it into content/tasks later). Other tasks keep the three-path tree.
+- `src/state/days/tasks.ts`: the loader now accepts `board` (table: given column with an optional
+  old-object lock, slots, card tray, Kuro's fill/cards/unlock), `deliverable`, `judge`. A board task
+  carries inert empty `start`/`self`/`look`/`let` placeholders so every existing reader keeps its
+  shape; column headers may be blank. Strict rejections per the spec.
+- New pure `src/state/days/board.ts`: the board state as a fold over `boardStep` events (lock /
+  fill / clear / assists), `canPrint`, `trayCards`, the old-object availability (upgraded + in dream
+  = level 3 = taken), `validateBoardStep`, and the night judgement (`boardJudgement`,
+  `deliverableOnDesk`, `wrongCount`).
+- `src/state/events.ts` + reducer: new events `boardStep` (validated, no state change), `give` (a
+  record), `boardJudge` (SAN by the judge delta, clamped, never up); `task` gains `slots`/`assists`
+  for a board task (`applyTask` sets only the done flag for a board). `src/world/loop/runtime.ts`
+  appends `boardJudge` once at 躺下 from the log.
+- New `src/world/desktop/workbench/board.ts` (view + `boardActions`): the table, the lock (codes
+  from the old object, or 让它试), the tray (Kuro's cards never show), 让它补全, 打印; every action a
+  `boardStep`, print the `task` event. `work.ts` opens a board task's surface directly.
+- The give choice: `src/world/loop/dialogue.ts` prepends 把{label}递给它 (choice "give") to the raid
+  shutdown choices when today's deliverable is on the desk; `game.ts` routes it to a `give` event,
+  the raid choices stay. `src/world/room/hud.ts` shows the deliverable on the desk and in the 道具
+  strip (a free rect; img or a paper thumbnail). `src/world/desktop/desktop.css` styles the board and
+  the deliverable.
+- Tests: new `tests/work-board.test.ts` (18) using the fixture — loader accept/reject, the lock, fill
+  + print gating, 让它补全 (r6→k1, send-back), the judgement (perfect/flawed/wrong, never up, not
+  given → wrong), replay. Updated `tests/events.test.ts`'s kind list for the three new events.
+- `npx tsc --noEmit`: clean. `npx vitest run`: 96 files / 1704 tests passed.

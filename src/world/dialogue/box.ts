@@ -99,8 +99,8 @@ function placeTag(state: State, session: Session): BoxTag {
 }
 
 /** The current line's screens and which one shows; null when the box is closed. */
-export function lineScreens(state: State, session: Session): { readonly all: readonly Screen[]; readonly page: number } | null {
-  const show = showing(session.dialogue, state);
+export function lineScreens(state: State, session: Session, events?: readonly GameEvent[]): { readonly all: readonly Screen[]; readonly page: number } | null {
+  const show = showing(session.dialogue, state, events);
   if (!show) return null;
   const fill = (s: string) => fillPlaceholders(s, state.names);
   const labels = show.choices?.map((c) => (c.text !== null ? fill(c.text) : t(c.labelKey!))) ?? null;
@@ -109,8 +109,8 @@ export function lineScreens(state: State, session: Session): { readonly all: rea
 }
 
 export function lineBoxModel(state: State, events: readonly GameEvent[], session: Session, nowMs = 0): LineBoxModel | null {
-  const show = showing(session.dialogue, state);
-  const at = lineScreens(state, session);
+  const show = showing(session.dialogue, state, events);
+  const at = lineScreens(state, session, events);
   if (!show || !at) return null;
   const head = session.dialogue.queue[0]!;
   const fill = (s: string) => fillPlaceholders(s, state.names);

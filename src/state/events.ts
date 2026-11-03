@@ -3,6 +3,7 @@
 // state produced by earlier events; the only time it sees is its own recorded `day`.
 import type { State } from "./types.gen";
 import { applyChoose, applyStep, applyTask, clampSan, type TaskEventMode } from "./days/effects";
+import { validateBoardStep } from "./days/board";
 import { dayFile } from "./days/table";
 import { applyDeclineUpgrade, applyUpgrade, type DeclineKind } from "./upgrades";
 import { applyOrder, applyPickup, applyUseItem } from "./delivery/effects";
@@ -58,7 +59,15 @@ export type GameEvent =
    * `merge` (work FR1): after reading both conflicting clauses, the player's 合并 (true) or 不合
    * (false). A record only: the self path's effects, catch flags included, either way.
    */
-  | { kind: "task"; day: number; flag: string; mode: TaskEventMode; missed?: true; merge?: boolean; marks?: readonly { readonly clause: number; readonly hit: boolean }[] }
+  | { kind: "task"; day: number; flag: string; mode: TaskEventMode; missed?: true; merge?: boolean; marks?: readonly { readonly clause: number; readonly hit: boolean }[]; slots?: Readonly<Record<string, string>>; assists?: number }
+  // work v2 (2026-11-03): one step on a board (lock / fill / clear / Kuro's assist). The board is
+  // rebuilt from these on reload; nothing changes in state (the `task` event at print carries the result).
+  | { kind: "boardStep"; day: number; taskId: string; op: BoardOp }
+  // work v2: today's deliverable handed to the hand at the shutdown beat.
+  | { kind: "give"; day: number; deliverableId: string }
+  // work v2: the night's board judgement (the runtime computes it from the log at 躺下); SAN by the
+  // judge's delta (never up). `verdict` is which line plays.
+  | { kind: "boardJudge"; day: number; verdict: "perfect" | "flawed" | "wrong"; san: number }
   // object-upgrade spec (2026-11-01): accepting / declining Kuro's offer.
   | { kind: "upgrade"; day: number; object: string }
   | { kind: "declineUpgrade"; day: number; object: string; decline: DeclineKind }
@@ -83,6 +92,14 @@ export type GameEvent =
   | { kind: "callAnswer"; day: number }
   | { kind: "callEnded"; day: number };
 
+/** One operation on a board (work v2). All are recorded so the board replays from the log. */
+export type BoardOp =
+  | { readonly t: "unlock"; readonly code: string }
+  | { readonly t: "fill"; readonly slot: string; readonly card: string }
+  | { readonly t: "clear"; readonly slot: string }
+  | { readonly t: "assistUnlock" }
+  | { readonly t: "assistFill" };
+
 export type EventKind = GameEvent["kind"];
 
 /** Exactly these kinds (world-state 12, delivery 3, desktop-ui 1, day-loop 3, object-upgrade 2, san-and-endings 1, title-page 1, dialogue 1, late-days 1, kuro-chat 1). Nothing else may be appended. */
@@ -106,6 +123,9 @@ export const eventKinds: readonly EventKind[] = [
   "step",
   "choose",
   "task",
+  "boardStep",
+  "give",
+  "boardJudge",
   "upgrade",
   "declineUpgrade",
   "ending",
@@ -139,6 +159,29 @@ function applyKuroClosed(state: State, event: Extract<GameEvent, { kind: "kuroCl
 function applyCall(state: State, event: Extract<GameEvent, { kind: "callAnswer" | "callEnded" }>): State {
   if (!dayFile(event.day)?.call) throw new Error(`${event.kind}: day ${event.day} has no call`);
   return state;
+}
+
+/**
+ * One board step (work v2). Validated against the task's board (the op must name real slots/cards),
+ * but nothing in state changes: the board is rebuilt from these events by the board module, and the
+ * result lands in the `task` event at print. The task must be a board task of this day.
+ */
+function applyBoardStep(state: State, event: Extract<GameEvent, { kind: "boardStep" }>): State {
+  validateBoardStep(event.day, event.taskId, event.op);
+  return state;
+}
+
+/** The deliverable was handed to the hand (work v2): a record only; the desk reads it from the log. */
+function applyGive(state: State, event: Extract<GameEvent, { kind: "give" }>): State {
+  if (typeof event.deliverableId !== "string" || event.deliverableId === "") throw new Error("give: deliverableId must be a non-empty string");
+  return state;
+}
+
+/** The night's board judgement (work v2): SAN by the judge's delta, never up. */
+function applyBoardJudge(state: State, event: Extract<GameEvent, { kind: "boardJudge" }>): State {
+  if (!["perfect", "flawed", "wrong"].includes(event.verdict)) throw new Error(`boardJudge: unknown verdict ${JSON.stringify(event.verdict)}`);
+  if (!Number.isInteger(event.san) || event.san > 0) throw new Error("boardJudge: san must be an integer <= 0");
+  return event.san === 0 ? state : { ...state, san: clampSan(state.san + event.san) };
 }
 
 /** A typed chat turn's length limit (dialogue spec). */
@@ -301,6 +344,12 @@ export function applyEvent(state: State, event: GameEvent): State {
       return applyChoose(state, event);
     case "task":
       return applyTask(state, event);
+    case "boardStep":
+      return applyBoardStep(state, event);
+    case "give":
+      return applyGive(state, event);
+    case "boardJudge":
+      return applyBoardJudge(state, event);
     case "upgrade":
       return applyUpgrade(state, event);
     case "declineUpgrade":

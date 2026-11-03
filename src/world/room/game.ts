@@ -50,6 +50,7 @@ import { renderEnding } from "@world/endings/view";
 import { boxObjectFor, doorMeal, itemsButton, itemsPanel, openBoxReady, raidShowing, renderRoom, settingsButton, settingsPanel, SLIP_ITEM, walkmanShown } from "./hud";
 import { looseContent, stuckLineKey } from "./case";
 import { jitter } from "@state/seed";
+import { deliverableOnDesk } from "@state/days/board";
 
 /** How long a stuck box shakes (blind-box 2026-11-03). */
 export const CASE_SHAKE_MS = 200;
@@ -568,7 +569,7 @@ export const loopActions: Record<string, ActionHandler> = {
     }
     const { session } = ctx;
     const state = ctx.store.getState();
-    const at = lineScreens(state, session);
+    const at = lineScreens(state, session, ctx.store.getEvents());
     // On a page of choices, ▼ shows the next page of them (the last cycles to the first); a
     // click never picks or skips a choice (dialogue FR1).
     if (at && at.all[at.page]!.choices.length) {
@@ -613,11 +614,20 @@ export const loopActions: Record<string, ActionHandler> = {
       return;
     }
     const state = ctx.store.getState();
-    const picked = showing(ctx.session.dialogue, state)?.choices?.find((c) => String(c.index) === data.index);
+    const events = ctx.store.getEvents();
+    const picked = showing(ctx.session.dialogue, state, events)?.choices?.find((c) => String(c.index) === data.index);
     if (!picked) return;
     // The line and the choice go into today's history (before the event: it may end the line).
     logCurrent(ctx.session, state);
     logPlayer(ctx.session, state, picked.text !== null ? fillPlaceholders(picked.text, state.names) : t(picked.labelKey!));
+    // Work v2 §4: 把{label}递给它 — hand today's deliverable to the hand. It leaves the desk; the
+    // raid's own choices stay, so the box does not finish (the player still answers the hand).
+    if (q.ending.kind === "beatChoices" && data.choice === "give") {
+      const d = deliverableOnDesk(state.day, events);
+      if (d) ctx.store.appendEvent({ kind: "give", deliverableId: d.id });
+      ctx.rerender();
+      return;
+    }
     if (q.ending.kind === "loan" && data.choice) {
       // The loan prompt: a recipient-less reply (world-state's loan reducer decides).
       ctx.store.appendEvent({ kind: "reply", choice: data.choice, t: ctx.session.clock.time });

@@ -8,6 +8,7 @@ import type { GameEvent } from "@state/events";
 import { choiceOf } from "@state/days/effects";
 import { isRaidNight, takeFor, wantsOf } from "@state/nights";
 import { dueAtLieDown, dueAtShutdown } from "@state/endings";
+import { boardJudgement } from "@state/days/board";
 import { startEnding } from "@world/endings/flow";
 import { knows, optionOrder, recogniseTable, wasRight } from "@state/recognise";
 import { advanceTo, BEATS, DEFAULT_CLOCK, isNight, type Beat, type BeatClock } from "@world/desktop/beat";
@@ -279,6 +280,15 @@ export function lieDownOrEnd(ctx: ActionContext): void {
   if (judgementPending(ctx)) {
     ctx.later(JUDGE_POLL_MS, () => lieDownOrEnd(ctx));
     return;
+  }
+  // Work v2 (§4): the night's board judgement, before the day turns. One SAN change (never up),
+  // from the log: printed + 0 wrong → perfect; 1..<wrongAt wrong → flawed; more, or not given by
+  // now → wrong. Appended once (a day's judgement never appends twice).
+  const state = ctx.store.getState();
+  const events = ctx.store.getEvents();
+  if (!events.some((e) => e.kind === "boardJudge" && e.day === state.day)) {
+    const verdict = boardJudgement(state.day, events);
+    if (verdict) ctx.store.appendEvent({ kind: "boardJudge", verdict: verdict.verdict, san: verdict.san });
   }
   const ending = dueAtLieDown(ctx.store.getState());
   ctx.store.appendEvent(ending ? { kind: "ending", ending } : { kind: "lieDown" });

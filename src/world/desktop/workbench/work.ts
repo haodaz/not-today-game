@@ -27,6 +27,7 @@ import type { ActionContext, ActionHandler } from "../controller";
 import { frameUrl, FRAMES } from "../kuro/body";
 import { kuroDay } from "../kuro/days";
 import type { AppContext, Session } from "../model";
+import { boardActions, renderBoard } from "./board";
 
 /** The three options as reply chips: their strings keys and modes (the old toolbar's keys). */
 export const CHIPS: readonly { readonly key: string; readonly mode: TaskMode }[] = [
@@ -181,6 +182,8 @@ function doneThreads(state: State, events: readonly GameEvent[], file: DayFile |
   return events.flatMap((e) => {
     if (e.kind !== "task" || e.day !== state.day || e.mode === "auto") return [];
     const tree = taskByFlag(state.day, e.flag);
+    // Work v2: a board task is not a reply thread; a printed board shows nothing in the chat log.
+    if (tree?.board) return [];
     const item = file?.items.find((i) => i.done.kind === "flag" && i.done.flag === e.flag);
     if (!item) return [];
     const said = (tree?.[e.mode].kuro ?? []).map((k) => kuro(html`${k}`));
@@ -320,6 +323,9 @@ export function renderWork(ctx: AppContext): SafeHtml {
   const fill = (s: string) => fillPlaceholders(s, state.names);
   const file = dayFile(state.day);
   const open = openWork(state, events);
+  // Work v2: a board task opens its board surface directly (no reply tree). Done boards are drawn
+  // back from the log too (the printed board shows its filled table).
+  if (open?.tree?.board) return renderBoard(ctx, open.tree);
   const w = open ? threadFor(session, state.day, open.item.id) : null;
   const busy = !!w && ctx.nowMs < w.busyUntil;
   const live: SafeHtml[] = [];
@@ -409,6 +415,8 @@ function complete(
 }
 
 export const workActions: Record<string, ActionHandler> = {
+  // Work v2: the board surface's actions (lock / fill / assist / print).
+  ...boardActions,
   // ↑ (or Enter in the input): the sentence becomes the player's message.
   "wb-send"(ctx) {
     const state = ctx.store.getState();

@@ -89,12 +89,66 @@ export interface TaskCode {
   readonly units?: readonly TaskUnit[];
 }
 
+/**
+ * Work v2 (2026-11-03): a task may carry a board (several steps assembled into a result), a
+ * deliverable (what lands on the desk) and a judge (one SAN change a night). The only board kind is
+ * a table: rows with a given column (optionally locked behind an old object) and one slot each, a
+ * tray of cards, and Kuro's own fill/cards/unlock. All shapes are in `.kiro/specs/work-v2/`.
+ */
+export interface BoardLock {
+  readonly object: string;
+  readonly codes: readonly string[];
+  readonly answer: string;
+}
+export interface BoardGiven {
+  readonly lock?: BoardLock;
+  readonly rows: Readonly<Record<string, string>>;
+}
+export interface BoardSlot {
+  readonly id: string;
+  readonly label: string;
+  readonly answer: string;
+}
+export interface BoardCard {
+  readonly id: string;
+  readonly text: string;
+}
+export interface BoardKuro {
+  readonly fill: Readonly<Record<string, string>>;
+  readonly cards: readonly BoardCard[];
+  readonly unlock: string;
+}
+export interface TaskBoard {
+  readonly kind: "table";
+  readonly title: string;
+  readonly columns: readonly string[];
+  readonly given: BoardGiven;
+  readonly slots: readonly BoardSlot[];
+  readonly cards: readonly BoardCard[];
+  readonly kuro: BoardKuro;
+}
+export interface TaskDeliverable {
+  readonly id: string;
+  readonly label: string;
+  readonly img?: string;
+}
+export interface TaskJudge {
+  readonly perfect: number;
+  readonly flawed: number;
+  readonly wrong: number;
+  readonly wrongAt: number;
+}
+
 export interface Task {
   readonly id: string;
   readonly title: string;
   readonly app: (typeof APPS)[number];
   /** The flag that ticks the day's checklist item. */
   readonly done: string;
+  /**
+   * The reply tree. A board task (work v2) has no real tree; it carries inert empty placeholders so
+   * every reader keeps its shape. Code that handles board tasks branches on `board` first.
+   */
   readonly start: { readonly say: readonly SayLine[]; readonly options: readonly { readonly mode: PathMode; readonly goto: PathMode }[] };
   readonly self: TaskPath;
   readonly look: TaskPath;
@@ -103,6 +157,10 @@ export interface Task {
   readonly doc?: TaskDoc;
   readonly ledger?: TaskLedger;
   readonly code?: TaskCode;
+  /** Work v2: a board task (its own surface); when present, the three-path tree is unused. */
+  readonly board?: TaskBoard;
+  readonly deliverable?: TaskDeliverable;
+  readonly judge?: TaskJudge;
 }
 
 type Raw = Record<string, unknown>;
@@ -242,9 +300,129 @@ function ledger(v: unknown, w: string): TaskLedger {
   return { rows, columns, target, value: v.value as string | number, ...(kuroTidy ? { kuroTidy } : {}) };
 }
 
+/** A tray/Kuro card: `{ id, text }`. */
+function card(v: unknown, w: string): BoardCard {
+  if (!isRecord(v)) fail(w, "a card must be an object");
+  keys(v, ["id", "text"], w);
+  return { id: str(v.id, `${w}.id`), text: str(v.text, `${w}.text`) };
+}
+
+/**
+ * The board (work v2): a table with a given column (optionally locked behind an old object), slots
+ * that each take one card, a card tray, and Kuro's own fill / cards / unlock. Checked strictly: a
+ * slot's answer must be a tray card; a kuro.fill card must be a tray card or a Kuro card; the lock's
+ * answer must be one of its codes.
+ */
+function board(v: unknown, w: string): TaskBoard {
+  if (!isRecord(v)) fail(w, "must be an object");
+  keys(v, ["kind", "title", "columns", "given", "slots", "cards", "kuro"], w);
+  if (v.kind !== "table") fail(`${w}.kind`, 'must be "table"');
+  // Column headers are display-only and may be blank (the label column has no header).
+  if (!Array.isArray(v.columns) || v.columns.length === 0 || !v.columns.every((c) => typeof c === "string")) fail(`${w}.columns`, "must be a non-empty list of strings");
+  const columns = v.columns as string[];
+  // cards (the material tray).
+  if (!Array.isArray(v.cards) || v.cards.length === 0) fail(`${w}.cards`, "must be a non-empty list");
+  const cards = v.cards.map((c, i) => card(c, `${w}.cards[${i}]`));
+  const cardIds = new Set<string>();
+  for (const c of cards) {
+    if (cardIds.has(c.id)) fail(`${w}.cards`, `duplicate card id "${c.id}"`);
+    cardIds.add(c.id);
+  }
+  // slots.
+  if (!Array.isArray(v.slots) || v.slots.length === 0) fail(`${w}.slots`, "must be a non-empty list");
+  const slotIds = new Set<string>();
+  const slots = v.slots.map((s, i) => {
+    const sw = `${w}.slots[${i}]`;
+    if (!isRecord(s)) fail(sw, "a slot must be an object");
+    keys(s, ["id", "label", "answer"], sw);
+    const id = str(s.id, `${sw}.id`);
+    if (slotIds.has(id)) fail(`${w}.slots`, `duplicate slot id "${id}"`);
+    slotIds.add(id);
+    const answer = str(s.answer, `${sw}.answer`);
+    if (!cardIds.has(answer)) fail(`${sw}.answer`, `"${answer}" is not a card`);
+    return { id, label: str(s.label, `${sw}.label`), answer };
+  });
+  // given: a text per slot row, and an optional lock.
+  if (!isRecord(v.given)) fail(`${w}.given`, "must be an object");
+  keys(v.given, ["lock", "rows"], `${w}.given`);
+  if (!isRecord(v.given.rows)) fail(`${w}.given.rows`, "must be an object");
+  const rows: Record<string, string> = {};
+  for (const [k, text] of Object.entries(v.given.rows)) {
+    if (!slotIds.has(k)) fail(`${w}.given.rows`, `"${k}" is not a slot`);
+    rows[k] = str(text, `${w}.given.rows.${k}`);
+  }
+  let lock: BoardLock | undefined;
+  if (v.given.lock !== undefined) {
+    const lw = `${w}.given.lock`;
+    if (!isRecord(v.given.lock)) fail(lw, "must be an object");
+    keys(v.given.lock, ["object", "codes", "answer"], lw);
+    const codes = strings(v.given.lock.codes, `${lw}.codes`);
+    const answer = str(v.given.lock.answer, `${lw}.answer`);
+    if (!codes.includes(answer)) fail(`${lw}.answer`, `"${answer}" is not one of the codes`);
+    lock = { object: str(v.given.lock.object, `${lw}.object`), codes, answer };
+  }
+  // kuro: its fill (slot → card), its own cards, and its lock answer.
+  if (!isRecord(v.kuro)) fail(`${w}.kuro`, "must be an object");
+  keys(v.kuro, ["fill", "cards", "unlock"], `${w}.kuro`);
+  if (!Array.isArray(v.kuro.cards)) fail(`${w}.kuro.cards`, "must be a list");
+  const kuroCards = v.kuro.cards.map((c, i) => card(c, `${w}.kuro.cards[${i}]`));
+  const kuroCardIds = new Set(kuroCards.map((c) => c.id));
+  for (const c of kuroCards) if (cardIds.has(c.id)) fail(`${w}.kuro.cards`, `"${c.id}" is already a tray card`);
+  if (!isRecord(v.kuro.fill)) fail(`${w}.kuro.fill`, "must be an object");
+  const fill: Record<string, string> = {};
+  for (const [k, cid] of Object.entries(v.kuro.fill)) {
+    if (!slotIds.has(k)) fail(`${w}.kuro.fill`, `"${k}" is not a slot`);
+    const id = str(cid, `${w}.kuro.fill.${k}`);
+    if (!cardIds.has(id) && !kuroCardIds.has(id)) fail(`${w}.kuro.fill.${k}`, `"${id}" is not a card or a Kuro card`);
+    fill[k] = id;
+  }
+  const unlock = str(v.kuro.unlock, `${w}.kuro.unlock`);
+  if (lock && !lock.codes.includes(unlock)) fail(`${w}.kuro.unlock`, `"${unlock}" is not one of the lock's codes`);
+  return { kind: "table", title: str(v.title, `${w}.title`), columns, given: { ...(lock ? { lock } : {}), rows }, slots, cards, kuro: { fill, cards: kuroCards, unlock } };
+}
+
+function deliverable(v: unknown, w: string): TaskDeliverable {
+  if (!isRecord(v)) fail(w, "must be an object");
+  keys(v, ["id", "label", "img"], w);
+  return { id: str(v.id, `${w}.id`), label: str(v.label, `${w}.label`), ...(v.img !== undefined ? { img: str(v.img, `${w}.img`) } : {}) };
+}
+
+function judge(v: unknown, w: string): TaskJudge {
+  if (!isRecord(v)) fail(w, "must be an object");
+  keys(v, ["perfect", "flawed", "wrong", "wrongAt"], w);
+  const delta = (x: unknown, k: string): number => (Number.isInteger(x) && (x as number) <= 0 ? (x as number) : fail(`${w}.${k}`, "must be an integer <= 0"));
+  const wrongAt = Number.isInteger(v.wrongAt) && (v.wrongAt as number) >= 1 ? (v.wrongAt as number) : fail(`${w}.wrongAt`, "must be an integer >= 1");
+  return { perfect: delta(v.perfect, "perfect"), flawed: delta(v.flawed, "flawed"), wrong: delta(v.wrong, "wrong"), wrongAt };
+}
+
+/** Inert empty placeholders for a board task's unused reply tree (work v2). */
+const EMPTY_PATH: TaskPath = { say: [], kuro: [], effects: {} };
+
+/** A board task (work v2): the board surface; the three-path tree is empty and unused. */
+function boardTask(v: Raw, w: string): Task {
+  if (!(APPS as readonly unknown[]).includes(v.app)) fail(`${w}.app`, `must be one of ${APPS.join(", ")}`);
+  const done = str(v.done, `${w}.done`);
+  return {
+    id: str(v.id, `${w}.id`),
+    title: str(v.title, `${w}.title`),
+    app: v.app as Task["app"],
+    done,
+    start: { say: [], options: [] },
+    self: EMPTY_PATH,
+    look: EMPTY_PATH,
+    let: EMPTY_PATH,
+    board: board(v.board, `${w}.board`),
+    ...(v.deliverable !== undefined ? { deliverable: deliverable(v.deliverable, `${w}.deliverable`) } : {}),
+    ...(v.judge !== undefined ? { judge: judge(v.judge, `${w}.judge`) } : {}),
+  };
+}
+
 function task(v: unknown, w: string): Task {
   if (!isRecord(v)) fail(w, "a task must be an object");
-  keys(v, ["id", "title", "app", "done", "start", ...PATHS, "doc", "ledger", "code"], w);
+  keys(v, ["id", "title", "app", "done", "start", ...PATHS, "doc", "ledger", "code", "board", "deliverable", "judge"], w);
+  // Work v2: a board task carries a board (and usually a deliverable + judge); its three-path tree
+  // is optional and unused. A task without a board keeps the old required tree.
+  if (v.board !== undefined) return boardTask(v, w);
   if (!(APPS as readonly unknown[]).includes(v.app)) fail(`${w}.app`, `must be one of ${APPS.join(", ")}`);
   if (!isRecord(v.start)) fail(`${w}.start`, "must be an object");
   keys(v.start, ["say", "options"], `${w}.start`);
@@ -344,6 +522,13 @@ function localisePath(zh: TaskPath, en: TaskPath, w: string): TaskPath {
 function localiseTask(zh: Task, en: Task, w: string): Task {
   if (zh.id !== en.id) fail(w, `id "${en.id}", the Chinese has "${zh.id}"`);
   if (zh.app !== en.app || zh.done !== en.done) fail(w, "app or done flag differs from the Chinese");
+  // Work v2: a board task's text twin (title, labels, cards) is swapped wholesale from the en board;
+  // its shape must match. The tree twinning below does not apply.
+  if (zh.board || en.board) {
+    if (!zh.board || !en.board) fail(`${w}.board`, "board present in only one language");
+    if (zh.board.slots.length !== en.board.slots.length || zh.board.cards.length !== en.board.cards.length) fail(`${w}.board`, "board shape differs from the Chinese");
+    return bilingualValues(zh, { title: en.title, board: en.board, ...(zh.deliverable && en.deliverable ? { deliverable: en.deliverable } : {}) });
+  }
   if (zh.start.say.length !== en.start.say.length || !sameJson(zh.start.options, en.start.options)) fail(`${w}.start`, "start shape differs from the Chinese");
   const start = { say: zh.start.say.map((z, i) => bilingual(z, { t: en.start.say[i]!.t })), options: zh.start.options };
   const paths = {

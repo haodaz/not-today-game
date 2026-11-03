@@ -40,6 +40,7 @@ import { renderScene, sceneOf } from "@world/dialogue/scene";
 import { edgeLeads, HINT_FADE_MS } from "./look";
 import { weatherOf } from "@state/stages";
 import { caseOverlay, looseContent } from "./case";
+import { deliverableOnDesk } from "@state/days/board";
 
 /** L7: the day the heart-rate widget appears (stages.json if it says; else day 9's narration). */
 export const HEART_RATE_FROM_DAY: number = (stagesFile as { heartRateFromDay?: number }).heartRateFromDay ?? 9;
@@ -90,6 +91,20 @@ export interface DeskThings {
   readonly slip: SafeHtml | null;
   /** The walkman: after any ending only, and on the tabletop only (not in the 道具 strip). */
   readonly walkman: SafeHtml | null;
+  /** Work v2: today's printed deliverable, until it is given to the hand or the day ends. */
+  readonly deliverable: SafeHtml | null;
+}
+/** A free spot on the desk for the deliverable (no rect in content/desk.json): left-front by the lamp foot. */
+export const DELIVERABLE_RECT: Rect = { l: 230, t: 640, w: 200, h: 140 };
+/** The deliverable thumbnail (content img), or a plain paper fallback when there is none. */
+function deliverableThing(state: State, events: readonly GameEvent[]): SafeHtml | null {
+  const d = deliverableOnDesk(state.day, events);
+  if (!d) return null;
+  const img = d.img ?? null;
+  const pic = img
+    ? html`<img class="desk-photo" src="${img}" alt="" aria-hidden="true" draggable="false">`
+    : html`<span class="paper-thumb" aria-hidden="true"></span>`;
+  return html`<div class="slot deliverable" data-deliverable="${d.id}" aria-label="${d.label}" title="${d.label}">${pic}</div>`;
 }
 /**
  * The walkman's picture: the object's own cutout until `public/room/desk/walkman.png` is supplied
@@ -132,6 +147,7 @@ export function deskThings(state: State, events: readonly GameEvent[], session: 
     objects,
     slip: slipThing(state, events),
     walkman: walkmanThing(state, session),
+    deliverable: deliverableThing(state, events),
   };
 }
 
@@ -154,7 +170,7 @@ function tabletop(things: DeskThings): SafeHtml {
   const at = (name: string, r: Rect | null, inner: SafeHtml | null) =>
     r && inner ? html`<div class="at" data-at="${name}" style="${rectStyle(r)}">${inner}</div>` : null;
   const objects = things.objects.map((o, i) => at(`object:${o.id}`, objectSlot(deskLayout, i), o.html));
-  return html`<div class="desk-things">${at("cup", deskLayout.cup, things.cup)}${at("phone", deskLayout.phone, things.phone)}${at("meal", deskLayout.meal, things.meal)}${objects}${at("slip", deskLayout.slip, things.slip)}${at("walkman", deskLayout.walkman, things.walkman)}</div>`;
+  return html`<div class="desk-things">${at("cup", deskLayout.cup, things.cup)}${at("phone", deskLayout.phone, things.phone)}${at("meal", deskLayout.meal, things.meal)}${objects}${at("slip", deskLayout.slip, things.slip)}${at("deliverable", DELIVERABLE_RECT, things.deliverable)}${at("walkman", deskLayout.walkman, things.walkman)}</div>`;
 }
 
 /** 道具 (day-loop correction 2026-11-01): the button next to ⚙; it opens and closes the strip. */
@@ -189,7 +205,7 @@ export function casePanel(state: State, events: readonly GameEvent[], session: S
 export function itemsPanel(state: State, events: readonly GameEvent[], session: Session): SafeHtml | null {
   if (!session.itemsOpen) return null;
   const th = deskThings(state, events, session);
-  return html`<div class="items-panel" id="items-panel" role="dialog" aria-label="${t("hud.items")}"><div class="items-strip">${th.phone}${th.cup}${th.meal}${th.objects.map((o) => o.html)}${th.slip}</div></div>`;
+  return html`<div class="items-panel" id="items-panel" role="dialog" aria-label="${t("hud.items")}"><div class="items-strip">${th.phone}${th.cup}${th.meal}${th.objects.map((o) => o.html)}${th.slip}${th.deliverable}</div></div>`;
 }
 
 /**

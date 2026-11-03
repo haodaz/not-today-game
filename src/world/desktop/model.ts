@@ -167,6 +167,10 @@ export interface Session {
   browserDoc: string | null;
   /** The word the held dictionary is glossing over the document now (work spec item 7), or null. Session only. */
   wbGloss: string | null;
+  /** Work v2: the board card the player has picked up (click a card, then a slot), or null. Session only. */
+  boardPick: string | null;
+  /** Work v2: the lock's code chips are open (needs the old object), or null. Session only. */
+  boardLockOpen: boolean;
   /** Files whose `onOpen` line has already played today (once a day), by `<day>:<id>`. Session only. */
   filesSaid: Set<string>;
   /**
@@ -286,6 +290,8 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     filesSaid: new Set(),
     browserDoc: null,
     wbGloss: null,
+    boardPick: null,
+    boardLockOpen: false,
     call: null,
   };
 }

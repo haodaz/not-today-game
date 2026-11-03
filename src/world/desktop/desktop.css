@@ -445,6 +445,35 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .wb .dtip .dt-w{color:#cfe8d4;text-transform:lowercase}
 .wb .dtip .dt-g{margin-top:2px}
 .wb .dtip .dt-note{margin-top:4px;color:#f5d98e;border-top:1px dashed #16642b;padding-top:4px}
+/* Work v2 (2026-11-03): the board surface — a table with a given column (lockable), one slot per
+   row, and a card tray under it. The player fills slots from the tray; Kuro can step in. */
+.wb .surface.board .btitle{font-weight:600;font-size:13px;margin:0 0 8px}
+.wb .surface.board .block-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px;padding:6px 8px;background:#fff8e1;border-radius:6px}
+.wb .surface.board .block{border:1px solid var(--warm);border-radius:6px;background:#fff;color:#8a5a00;font:inherit;font-size:12px;padding:4px 10px;cursor:pointer}
+.wb .surface.board .bnote{font-size:12px;color:var(--ink-2)}
+.wb .surface.board .bcodes{display:flex;gap:6px}
+.wb .surface.board .bcode{border:1px solid var(--accent);border-radius:6px;background:#eef3ff;color:var(--ink);font:inherit;font-size:12px;padding:4px 12px;cursor:pointer}
+.wb .surface.board .bcode:hover,.wb .surface.board .bcode:focus-visible{background:#dde8ff;outline:none}
+.wb .surface.board .bchip{border:1px solid var(--line);border-radius:14px;background:#f3f5f9;color:var(--ink);font:inherit;font-size:12px;padding:3px 12px;cursor:pointer}
+.wb .surface.board .btable{width:100%;border-collapse:collapse;font-size:12.5px}
+.wb .surface.board .btable th,.wb .surface.board .btable td{border-bottom:1px solid #f1f2f4;padding:5px 8px;text-align:left;vertical-align:top}
+.wb .surface.board .blabel{font-weight:600;white-space:nowrap}
+.wb .surface.board .bgiven{color:var(--ink-2);line-height:1.5}
+.wb .surface.board .bmask{letter-spacing:2px;color:var(--ink-3);user-select:none}
+.wb .surface.board .bslot{display:block;width:100%;min-height:28px;text-align:left;border:1px dashed var(--line);border-radius:6px;background:#fafbfc;font:inherit;font-size:12.5px;color:var(--ink);padding:4px 6px;line-height:1.4;cursor:pointer}
+.wb .surface.board .bslot.target{border-color:var(--accent);background:#eef3ff}
+.wb .surface.board .bslot.filled{border-style:solid;background:#fff;box-shadow:inset 3px 0 0 var(--accent)}
+.wb .surface.board .btray{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+.wb .surface.board .btray-h{font-size:12px;color:var(--ink-2);margin-bottom:6px}
+.wb .surface.board .bcards{display:flex;flex-wrap:wrap;gap:6px}
+.wb .surface.board .bcard{border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);font:inherit;font-size:12.5px;padding:5px 8px;cursor:pointer;max-width:260px;text-align:left}
+.wb .surface.board .bcard:hover,.wb .surface.board .bcard:focus-visible{background:#f3f5f9;outline:none}
+.wb .surface.board .bcard.picked{border-color:var(--accent);background:#eef3ff;box-shadow:0 0 0 2px rgba(59,110,242,.25)}
+.wb .surface.board .bbar{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+.wb .surface.board .bprint{border:0;border-radius:8px;background:var(--accent);color:#fff;padding:6px 16px;font:inherit;font-size:13px;cursor:pointer}
+.wb .surface.board .bprint:disabled{opacity:.4;cursor:default}
+/* The printed deliverable on the desk / in the 道具 strip: the content image, or a plain paper thumb. */
+:is(.room,.items-panel) .slot.deliverable .paper-thumb{display:block;width:52px;height:64px;background:#fdfdfb;border:1px solid #d9d6cc;border-radius:2px;box-shadow:0 2px 6px rgba(0,0,0,.2),inset 0 0 0 1px #fff}
 /* Shared things drawn as what they are (desktop-ui 2026-11-03). One card shape, two registers:
    消息 (.sc.wx) the WeChat way, 工作台 (.sc.ding) the DingTalk way. Covers that content has not
    supplied fall back to a neutral tile per type (.cover.tile.t-<type>), never an empty box. */

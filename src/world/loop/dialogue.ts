@@ -4,6 +4,10 @@
 import type { BeatName, Place, SayLine, Sequence } from "@state/days/table";
 import { choiceOffered } from "@state/days/effects";
 import { recogniseTable } from "@state/recognise";
+import type { GameEvent } from "@state/events";
+import { deliverableOnDesk } from "@state/days/board";
+import { isRaidNight } from "@state/nights";
+import { hasString, t } from "@world/i18n";
 import type { State } from "@state/types.gen";
 
 export type Ending =
@@ -238,7 +242,10 @@ export const KURO_OFFER_OPTIONS: readonly ChoiceOption[] = [
   { index: 1, text: null, choice: "no", labelKey: "upgrade.no" },
 ];
 
-function options(q: Queued, state: State): ChoiceOption[] | null {
+/** The sentinel index of the synthetic 把…递给它 option (work v2); not a content choice. */
+export const GIVE_INDEX = -1;
+
+function options(q: Queued, state: State, events?: readonly GameEvent[]): ChoiceOption[] | null {
   if (q.ending.kind === "loan") return [...LOAN_OPTIONS];
   if (q.ending.kind === "kuroAsk") return [...KURO_ASK_OPTIONS];
   if (q.ending.kind === "kuroOffer") return [...KURO_OFFER_OPTIONS];
@@ -249,19 +256,26 @@ function options(q: Queued, state: State): ChoiceOption[] | null {
     return entry ? q.ending.order.map((i) => ({ index: i, text: entry.options[i]!.t })) : null;
   }
   if (q.ending.kind !== "beatChoices") return null;
-  return (q.sequence?.choices ?? [])
+  const content = (q.sequence?.choices ?? [])
     .map((c, index) => ({ c, index }))
     .filter(({ c }) => choiceOffered(c, state))
     .map(({ c, index }) => ({ index, text: c.text }));
+  // Work v2 §4: on a raid night, if today's deliverable is on the desk, 把{label}递给它 is offered
+  // first, before the raid's own choices. It routes to a `give` event (choice "give").
+  if (events && q.ending.beat === "shutdown" && isRaidNight(state.day) && hasString("hand.give")) {
+    const d = deliverableOnDesk(state.day, events);
+    if (d) return [{ index: GIVE_INDEX, text: t("hand.give", { label: d.label }), choice: "give" }, ...content];
+  }
+  return content;
 }
 
-/** What the box shows now, or null when it is closed. */
-export function showing(d: DialogueState, state: State): Showing | null {
+/** What the box shows now, or null when it is closed. `events` adds the give option (work v2). */
+export function showing(d: DialogueState, state: State, events?: readonly GameEvent[]): Showing | null {
   const q = d.queue[0];
   if (!q) return null;
   const atEnd = d.line >= q.lines.length - 1;
   const line = q.lines[Math.min(d.line, q.lines.length - 1)] ?? null;
-  const choices = atEnd ? options(q, state) : null;
+  const choices = atEnd ? options(q, state, events) : null;
   return { line, choices, more: !atEnd || (choices === null && d.queue.length > 1) };
 }
 
