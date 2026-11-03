@@ -96,3 +96,6 @@
 .dev-shell.upgraded.calc .keys button.op,.dev-shell.upgraded.calc .keys button.fn{background:#d9dfe8}
 .dev-shell.upgraded.calc .keys button.eq{background:#5a8dee;color:#fff;box-shadow:0 2px 0 #2f5fb8}
 .dev-shell.upgraded.calc .note{color:#9aa4b5}
+/* The photo-face rule `.room .held.obj canvas.dev` (absolute, translate −50 %, LCD backing colour) is
+   more specific than the glass rule above; on a drawn device the canvas sits in the glass instead. */
+.room .held.obj .dev-shell .glass canvas.dev{position:static;transform:none;background:none;border-radius:0}
