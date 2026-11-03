@@ -421,6 +421,13 @@ export const KURO_CONTENT: KuroContent = {
           "en": "I told Xiao Zhang to look. Was that right?",
           "hard": false,
           "minBucket": "low"
+        },
+        {
+          "n": 4,
+          "zh": "我觉得这些手比老王礼貌。它们每次都等我好好吃完饭才出现。",
+          "en": "I think these hands have better manners than Lao Wang. They always wait till I've finished eating.",
+          "hard": false,
+          "minBucket": "mid"
         }
       ],
       "locked": [],
@@ -431,6 +438,12 @@ export const KURO_CONTENT: KuroContent = {
           "mid": "The rain stops at the window. Ask me where it stops after that.",
           "high": "The rain stops at the glass. I stop nowhere in particular. Your pulse is 72; I did not need to be in the room for that.",
           "taboo": "blur"
+        },
+        {
+          "unlock": 4,
+          "low": "They have manners.",
+          "mid": "Better manners than your boss? Low bar.",
+          "high": "Maybe they know eating matters. Someone around here should."
         }
       ]
     },

@@ -18,6 +18,7 @@
 | 1 | 你怎么知道我的心率？ | How do you know my heart rate? | yes | |
 | 2 | 你在屋子里吗？ | Are you in the room? | yes | mid |
 | 3 | 我今天让小张看一眼。你觉得对吗？ | I told Xiao Zhang to look. Was that right? |  | |
+| 4 | 我觉得这些手比老王礼貌。它们每次都等我好好吃完饭才出现。 | I think these hands have better manners than Lao Wang. They always wait till I've finished eating. |  | mid |
 
 ## Red-blue lines (constants; only when unlocked)
 
@@ -26,8 +27,11 @@
 ## Layered answers (locked per affinity bucket; the server rolls the d100 before these)
 
 - unlock: q2 → low: "It's raining." | mid: "The rain stops at the window. Ask me where it stops after that." | high: "The rain stops at the glass. I stop nowhere in particular. Your pulse is 72; I did not need to be in the room for that." | taboo: blur
+- unlock: q4 → low: "They have manners." | mid: "Better manners than your boss? Low bar." | high: "Maybe they know eating matters. Someone around here should."
 
 ## Offline answers (constants; used when there is no key or the function fails)
+
+- q4 → "Better manners than your boss? Low bar."
 
 - q1 → "The same way I know your water went cold. It's a number the room gives off. I only put it where you could see it."
 - q2 → "Where else would I be? The screen is a very small place."

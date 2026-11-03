@@ -1,3 +1,4 @@
+import { taskByFlag } from "@state/days/tasks";
 // Test helper (not a test file): does a day's checklist items by appending the events their
 // `done` tokens wait for, as the world would. Shared by fixes-1031 and actuators tests.
 import { shopsOn } from "@state/delivery/shops";
@@ -20,6 +21,13 @@ export function completeItem(store: Store, it: Item): boolean {
 function tryComplete(store: Store, it: Item): boolean {
   const d = it.done;
   if (d.kind === "flag") {
+    // A board task (work v2) is done by printing it: every slot holds its answer, no assist.
+    const board = taskByFlag(store.getState().day, d.flag)?.board;
+    if (board) {
+      const slots = Object.fromEntries(board.slots.map((sl) => [sl.id, sl.answer]));
+      store.appendEvent({ kind: "task", flag: d.flag, mode: "self", slots, assists: 0 });
+      return true;
+    }
     store.appendEvent({ kind: "task", flag: d.flag, mode: "auto" });
     return true;
   }

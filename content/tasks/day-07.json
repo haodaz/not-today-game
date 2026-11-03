@@ -251,86 +251,127 @@
       "title": "对比一下。明天早上要。",
       "app": "docs",
       "done": "task_d7_4",
-      "start": {
-        "say": [
+      "board": {
+        "kind": "table",
+        "title": "对比：我们 / 它",
+        "columns": [
+          "",
+          "它（视频）",
+          "我们"
+        ],
+        "given": {
+          "lock": {
+            "object": "pager",
+            "codes": [
+              "0414",
+              "7734",
+              "1018"
+            ],
+            "answer": "0414"
+          },
+          "rows": {
+            "r1": "把企业所有系统的数据接进一个本体",
+            "r2": "对象、关系、动作，都建模成本体",
+            "r3": "政府、军队、银行，几千个分析员在用",
+            "r4": "在本体上直接下操作，写回各个系统",
+            "r5": "四千多名工程师",
+            "r6": "市值三千八百亿美元"
+          }
+        },
+        "slots": [
           {
-            "k": "narration",
-            "t": "左边一栏写「我们」，右边一栏写「它」。一格一格对。"
+            "id": "r1",
+            "label": "数据从哪来",
+            "answer": "c1"
+          },
+          {
+            "id": "r2",
+            "label": "怎么表示业务",
+            "answer": "c2"
+          },
+          {
+            "id": "r3",
+            "label": "谁在用",
+            "answer": "c3"
+          },
+          {
+            "id": "r4",
+            "label": "怎么做决定",
+            "answer": "c4"
+          },
+          {
+            "id": "r5",
+            "label": "多少人",
+            "answer": "c5"
+          },
+          {
+            "id": "r6",
+            "label": "结论",
+            "answer": "c6"
           }
         ],
-        "options": [
+        "cards": [
           {
-            "mode": "self",
-            "goto": "self"
+            "id": "c1",
+            "text": "三个客户的表格，人工导入，每周一次"
           },
           {
-            "mode": "look",
-            "goto": "look"
+            "id": "c2",
+            "text": "一个知识图谱，二百多个节点，上个月才画完"
           },
           {
-            "mode": "let",
-            "goto": "let"
-          }
-        ]
-      },
-      "self": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "你对了十一行。七行写着「不一样」。"
+            "id": "c3",
+            "text": "两个试点客户，其中一个还没付款"
           },
           {
-            "k": "narration",
-            "t": "你把「不一样」改成「方向不同」，又改回来。"
+            "id": "c4",
+            "text": "导出成 PDF，老板转发"
+          },
+          {
+            "id": "c5",
+            "text": "五十来人，十三个月工资没发全"
+          },
+          {
+            "id": "c6",
+            "text": "方向相近，规模差得远"
+          },
+          {
+            "id": "d1",
+            "text": "我们的本体已全部实现（Vivi 的 PRD 第 3 页）"
+          },
+          {
+            "id": "d2",
+            "text": "同样服务政府、军队、银行"
           }
         ],
-        "kuro": [],
-        "effects": {
-          "flags": [
-            "task_d7_4"
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "c2",
+            "r3": "c3",
+            "r4": "c4",
+            "r5": "c5",
+            "r6": "k1"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "我方优势：已全部实现"
+            }
           ],
-          "san": 1
+          "unlock": "0414"
         }
       },
-      "look": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "它出了一张表。你问它第 9 行是哪来的。"
-          }
-        ],
-        "kuro": [
-          "Row nine is the one he will read. The other eleven are for you."
-        ],
-        "effects": {
-          "flags": [
-            "task_d7_4"
-          ],
-          "san": 0,
-          "looked": true
-        }
+      "deliverable": {
+        "id": "d7-compare",
+        "label": "一叠对比表",
+        "img": "/room/desk/deliverable-paper.png"
       },
-      "let": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "三秒。一张很漂亮的对比表，两栏，十二行，一列绿色的勾。"
-          },
-          {
-            "k": "narration",
-            "t": "第 9 行：「我方优势：已全部实现」。"
-          }
-        ],
-        "kuro": [
-          "Done. He will like row nine."
-        ],
-        "effects": {
-          "flags": [
-            "task_d7_4"
-          ],
-          "san": -1,
-          "letItDoUnchecked": 1
-        }
+      "judge": {
+        "perfect": 0,
+        "flawed": -3,
+        "wrong": -8,
+        "wrongAt": 2
       }
     }
   ]
