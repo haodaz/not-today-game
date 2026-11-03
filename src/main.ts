@@ -138,6 +138,14 @@ if (jump !== null) {
   const store = createStore({ startDay: jump });
   // Dev only, beside ?day=N: `&found=chick,pager` takes those out of the box first (to try them in hand).
   if (import.meta.env.DEV) for (const id of (params.get("found") ?? "").split(",").filter(Boolean)) store.appendEvent({ kind: "openLayer", objectId: id });
+  // Dev only, after ?found=: `&upgraded=chick,pager` upgrades those today (to look at the upgraded screens).
+  if (import.meta.env.DEV) for (const id of (params.get("upgraded") ?? "").split(",").filter(Boolean)) {
+    try {
+      store.appendEvent({ kind: "upgrade", object: id });
+    } catch (e) {
+      console.warn(`?upgraded: ${id} skipped (${(e as Error).message})`); // not offered yet on this day
+    }
+  }
   startGame(store, false);
 } else {
   const saved = run.load();
