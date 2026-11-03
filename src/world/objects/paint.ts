@@ -85,18 +85,24 @@ export function paintFrame(canvas: PaintTarget, frame: Frame, object: string, ra
     g.imageSmoothingEnabled = false;
     const px = frame.kind === "cells" ? cellsToBits(frame.rows, frame.cols, frame.level, raster) : frame;
     const ghost = opts.ghost;
+    // The backing is the channel × 16, so a level-n frame (channel × 2ⁿ) scales by 16 / 2ⁿ. The
+    // frame keeps the channel's aspect, so it is centred in the backing (letterbox) with no overflow.
     const scale = Math.max(1, Math.floor(Math.min(width / px.w, height / px.h)));
+    const offX = Math.round((width - scale * px.w) / 2);
+    const offY = Math.round((height - scale * px.h) / 2);
     const inkRgb = INK[object] ?? DEFAULT_INK;
     const ink = frame.kind === "pixels" ? (frame.ink ?? 1) : 1;
-    const cell = Math.max(1, scale - 1); // the square, one pixel smaller than its cell: the gap
+    // Each pixel a square `scale − gap`, `gap = max(1, round(scale / 5))` (thin dots: "你会觉得它瘦了").
+    const gap = Math.max(1, Math.round(scale / 5));
+    const cell = Math.max(1, scale - gap);
     // The ghost first (every ghost pixel the frame does not light), then the lit frame over it.
     if (ghost.w === px.w && ghost.h === px.h) {
       g.fillStyle = `rgba(${inkRgb},0.075)`;
-      for (let y = 0; y < px.h; y++) for (let x = 0; x < px.w; x++) if (ghost.bits[y * px.w + x] && !px.bits[y * px.w + x]) g.fillRect(x * scale, y * scale, cell, cell);
+      for (let y = 0; y < px.h; y++) for (let x = 0; x < px.w; x++) if (ghost.bits[y * px.w + x] && !px.bits[y * px.w + x]) g.fillRect(offX + x * scale, offY + y * scale, cell, cell);
     }
     if (ink > 0) {
       g.fillStyle = `rgba(${inkRgb},${ink})`;
-      for (let y = 0; y < px.h; y++) for (let x = 0; x < px.w; x++) if (px.bits[y * px.w + x]) g.fillRect(x * scale, y * scale, cell, cell);
+      for (let y = 0; y < px.h; y++) for (let x = 0; x < px.w; x++) if (px.bits[y * px.w + x]) g.fillRect(offX + x * scale, offY + y * scale, cell, cell);
     }
     return;
   }

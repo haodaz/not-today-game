@@ -5,9 +5,11 @@
 .dev-shell{--lcd:#b8c4a0;--lcd-dark:#a9b691;--dev-ink:#25301f;position:relative;color:transparent}
 .dev-shell button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;border:none}
 .dev-shell button.down{transform:translateY(2px)}
-.dev-shell canvas.dev{image-rendering:pixelated;display:block;max-width:100%;height:auto}
-.dev-shell canvas.dev.hi{image-rendering:auto}
-.dev-shell .glass{overflow:hidden}
+/* The screen fills the glass's content box, keeping the channel's aspect (letterboxed, centred),
+   never smoothed (2026-11-03: it was stamp-sized in a corner at bare channel backing). */
+.dev-shell .glass{overflow:hidden;display:flex;align-items:center;justify-content:center}
+.dev-shell .glass canvas.dev{image-rendering:pixelated;display:block;width:100%;height:100%;object-fit:contain}
+.dev-shell .glass canvas.dev.hi{image-rendering:auto}
 
 /* ——— chick: bootleg egg ——— */
 .dev-shell.egg{width:300px;height:360px;border-radius:50% 50% 47% 47% / 58% 58% 42% 42%;
@@ -49,6 +51,7 @@
 .dev-shell.dict .row{display:flex;justify-content:center;gap:6px;margin-top:7px}
 .dev-shell.dict .row button{width:33px;height:31px;border-radius:9px;background:#fdfdfd;color:#2b3142;font-weight:700;font-size:13px;box-shadow:0 3px 0 #9aa1b1}
 .dev-shell.dict .row button.back{width:52px;font-size:11px;background:#3b4560;color:#e7ebf5;box-shadow:0 3px 0 #1e2333}
+.dev-shell.dict .row button.space{width:180px}
 
 /* ——— calculator ——— */
 .dev-shell.calc{width:270px;border-radius:22px;background:#3a302d;padding:20px 20px 22px;box-shadow:inset 0 3px 0 rgba(255,255,255,.08),inset 0 -6px 0 rgba(0,0,0,.35),0 18px 40px rgba(0,0,0,.5)}

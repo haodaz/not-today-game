@@ -125,7 +125,22 @@ export function createHandLayer() {
       // The drawn device's normal screen (使用, not upgraded) gets a ghost underlay and the pixel gap.
       const onDevice = el.classList.contains("device") && session.hand.using && !env.upgraded && isDevice(id);
       const opts = onDevice ? { ghost: ghostBits(id, env.level) } : undefined;
-      if (p) for (const c of el.querySelectorAll<HTMLCanvasElement>("canvas.dev")) paintFrame(c, p.draw(s, env), id, raster, opts);
+      if (p)
+        for (const c of el.querySelectorAll<HTMLCanvasElement>("canvas.dev")) {
+          // The upgraded device's `hi` canvas backing is the glass's CSS box × devicePixelRatio
+          // (smooth, filling the glass); the normal canvas keeps its channel × 16 backing.
+          if (c.classList.contains("hi")) {
+            const r = c.getBoundingClientRect();
+            const dpr = win.devicePixelRatio || 1;
+            const bw = Math.max(1, Math.round(r.width * dpr));
+            const bh = Math.max(1, Math.round(r.height * dpr));
+            if (c.width !== bw || c.height !== bh) {
+              c.width = bw;
+              c.height = bh;
+            }
+          }
+          paintFrame(c, p.draw(s, env), id, raster, opts);
+        }
       // Breathing in the hand, and the turn easing back.
       const br = el.querySelector<HTMLElement>(".breathe");
       if (br) br.style.translate = `0 ${breath(t).toFixed(2)}px`;

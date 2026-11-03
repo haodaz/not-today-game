@@ -51,12 +51,20 @@ export const dictionary: Program<DictionaryState> = {
     if (key === "power") return step({ ...s, on: !s.on, input: "", answer: null }, { sound: "key-press", rate: 0.5 });
     if (!s.on) return step(s);
     if (LETTER.test(key)) return step({ ...s, input: s.answer ? key.toLowerCase() : (s.input + key.toLowerCase()).slice(0, MAX_INPUT), answer: null });
+    // The space bar (author: "文曲星不能没有空格"): one space, unless the input is empty, already ends
+    // with a space, or an answer is showing.
+    if (key === "space") {
+      if (s.answer || !s.input || s.input.endsWith(" ")) return step(s);
+      return step({ ...s, input: (s.input + " ").slice(0, MAX_INPUT) });
+    }
     if (key === "back") return step({ ...s, input: s.answer ? s.input : s.input.slice(0, -1), answer: null });
     if (key === "lookup") {
-      if (!s.input) return step(s);
-      const answer = lookup(s.input, env.day);
+      // Look up the trimmed input (trailing/leading spaces from the space bar do not count).
+      const word = s.input.trim();
+      if (!word) return step(s);
+      const answer = lookup(word, env.day);
       // Upgraded, it also reads the answer out: a line in the box stands in for the voice.
-      if (env.upgraded) return step({ ...s, answer }, { say: { key: `d${env.day}:dictionary:${s.input}`, lines: [{ k: "sfx", t: answer.join(" ") }] } });
+      if (env.upgraded) return step({ ...s, answer }, { say: { key: `d${env.day}:dictionary:${word}`, lines: [{ k: "sfx", t: answer.join(" ") }] } });
       return step({ ...s, answer });
     }
     return step(s);

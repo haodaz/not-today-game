@@ -14,7 +14,7 @@ import { createStore, type Store } from "@state/store";
 import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
 import { initialSession, type Session } from "@world/desktop/model";
-import { t } from "@world/i18n";
+import { setLocale, stringIn, t } from "@world/i18n";
 import { calculator, formatNumber, lightLevel, lightZone, unaskedAt, upsideDownOf, type CalculatorState } from "@world/objects/calculator";
 import { chick, chickFrameAt, CHICK_IDLE_MS, drawChick, ICON_ACT, turnTimes, type ChickState } from "@world/objects/chick";
 import { dictionary, lookup, type DictionaryState } from "@world/objects/dictionary";
@@ -28,7 +28,7 @@ import { dreamLevel, MAX_LEVEL, SEMITONE, type ObjectEnv } from "@world/objects/
 import { packRadii, playList, reelAngles, tape, tapePos, TAPE_SIDE_MS, type TapeState } from "@world/objects/tape";
 import { keyboardToObjKey, loopActions, loopKeys } from "@world/room/game";
 import { CHANNELS, faceBoxWidth, FOCUS_MAX, focusBackingWidth, HELD_W } from "@world/room/held";
-import { ghostBits } from "@world/room/devices";
+import { DICT_KEYS, ghostBits } from "@world/room/devices";
 import { paintFrame } from "@world/objects/paint";
 import { STAGE_H, STAGE_W } from "@world/room/splat/geometry";
 import { renderRoom } from "@world/room/hud";
@@ -350,10 +350,10 @@ describe("holding and using (FR1)", () => {
     const closed = render(ctx);
     expect((closed.match(/data-action="obj-key"/g) ?? []).length).toBe(0);
     // Using it opens the clamshell and draws the device: the full keyboard — A–Z (26) plus lookup,
-    // up, down, back, power (5) = 31 real buttons (the photo `grid` is replaced, 2026-11-03).
+    // up, down, back, power, space (6) = 32 real buttons (the photo `grid` is replaced, 2026-11-03).
     act(ctx, "obj-use");
     const open = render(ctx);
-    expect((open.match(/data-action="obj-key" data-object="dictionary"/g) ?? []).length).toBe(31);
+    expect((open.match(/data-action="obj-key" data-object="dictionary"/g) ?? []).length).toBe(32);
     for (const k of ["T", "O", "D", "A", "Y"]) act(ctx, "obj-key", { object: "dictionary", key: k });
     act(ctx, "obj-key", { object: "dictionary", key: "lookup" });
     const s = ctx.session.hand.programs.dictionary as DictionaryState;
@@ -462,8 +462,8 @@ describe("holding and using (FR1)", () => {
   // ——— 使用 is the game's own drawing of the device (2026-11-03) ———
   describe("the drawn devices in 使用", () => {
     const DEVS = ["chick", "pager", "dictionary", "calculator"] as const;
-    // The dictionary's device keyboard: A–Z plus the five function keys (the photo `grid` is gone).
-    const DICT = [..."ABCDEFGHIJKLMNOPQRSTUVWXYZ", "lookup", "up", "down", "back", "power"];
+    // The dictionary's device keyboard: A–Z plus the six function keys (the photo `grid` is gone).
+    const DICT = [..."ABCDEFGHIJKLMNOPQRSTUVWXYZ", "lookup", "up", "down", "back", "power", "space"];
     const keyIds = (id: string): string[] => (id === "dictionary" ? DICT : handOf(id).keys.map((k) => k.id));
     const used = (id: string) => {
       const store = atDay(id === "calculator" ? 16 : id === "dictionary" ? 13 : id === "pager" ? 4 : 4, [id]);
@@ -505,13 +505,8 @@ describe("holding and using (FR1)", () => {
       expect((ctx.session.hand.programs.chick as ChickState).menu).toBe(0);
     });
 
-    it("the normal screen canvas is pixelated at an integer scale and paints a ghost (unlit at 7.5 % ink)", () => {
-      // The ghost bitmap is the channel's full extent for pixel/dot-matrix, the 8. for seven-segment.
-      const chickGhost = ghostBits("chick", 0);
-      expect([...chickGhost.bits].every((b) => b === 1)).toBe(true); // every pixel ghosts
-      const pagerGhost = ghostBits("pager", 0);
-      expect([...pagerGhost.bits].some((b) => b === 1)).toBe(true); // the 8. of every cell
-      // paintFrame with a ghost draws both ghost (7.5 % alpha) and ink, each a square with a gap.
+    /** A fake 2d context that records every fillRect's style and size. */
+    function fakeContext() {
       const fills: { style: string; w: number; h: number }[] = [];
       let style = "";
       const g = {
@@ -527,17 +522,62 @@ describe("holding and using (FR1)", () => {
         },
         imageSmoothingEnabled: false,
       } as unknown as CanvasRenderingContext2D;
-      const canvas = { width: CHICK_W * 4, height: CHICK_H * 4, getContext: () => g } as unknown as Parameters<typeof paintFrame>[0];
-      const frame = drawChick(chick.init(env()), env()) as PixelFrame;
-      paintFrame(canvas, frame, "chick", (() => null) as never, { ghost: chickGhost });
-      const ghostFills = fills.filter((f) => f.style.includes("0.075"));
-      expect(ghostFills.length).toBeGreaterThan(0); // a ghost was painted
-      expect(fills.every((f) => f.w === 3 && f.h === 3)).toBe(true); // scale 4, square 3 (a 1 px gap)
-      // The device canvas is pixelated (devices.css) and its backing is the integer channel size.
+      return { g, fills };
+    }
+
+    it("the screen fills the glass: backing is channel × 16, CSS fills it, pixelated; a ghost is painted", () => {
+      // The ghost bitmap is the channel's full extent for pixel/dot-matrix, the 8. for seven-segment.
+      expect([...ghostBits("chick", 0).bits].every((b) => b === 1)).toBe(true); // every pixel ghosts
+      expect([...ghostBits("pager", 0).bits].some((b) => b === 1)).toBe(true); // the 8. of every cell
+      // The markup backing is channel × 16 (chick 32×16 → 512×256) for every object.
+      expect(render(used("chick"))).toMatch(/<canvas class="dev" data-screen="chick" width="512" height="256"/);
+      expect(render(used("pager"))).toMatch(new RegExp(`width="${CHANNELS.pager!.w * 16}" height="${CHANNELS.pager!.h * 16}"`));
+      // The canvas fills the glass, centred, aspect kept, never smoothed.
       const css = readFileSync(resolve(__dirname, "../src/world/room/devices.css"), "utf8");
-      expect(css).toMatch(/canvas\.dev\{[^}]*image-rendering:pixelated/);
-      const out = render(used("chick"));
-      expect(out).toMatch(/<canvas class="dev" data-screen="chick" width="32" height="16"/);
+      expect(css).toMatch(/\.glass canvas\.dev\{[^}]*image-rendering:pixelated/);
+      expect(css).toMatch(/\.glass canvas\.dev\{[^}]*width:100%/);
+      expect(css).toMatch(/\.glass canvas\.dev\{[^}]*height:100%/);
+      // A ghost (7.5 % ink) is painted under the lit frame.
+      const { g, fills } = fakeContext();
+      const canvas = { width: CHICK_W * 16, height: CHICK_H * 16, getContext: () => g } as unknown as Parameters<typeof paintFrame>[0];
+      paintFrame(canvas, drawChick(chick.init(env()), env()) as PixelFrame, "chick", (() => null) as never, { ghost: ghostBits("chick", 0) });
+      expect(fills.some((f) => f.style.includes("0.075"))).toBe(true);
+    });
+
+    it("the gap thins with the scale: a level-0 chick frame is squares of 13, a level-3 frame squares of 1", () => {
+      // Backing = channel × 16; a level-0 frame (32×16) scales by 16: gap round(16/5)=3, square 13.
+      const l0 = fakeContext();
+      const c0 = { width: CHICK_W * 16, height: CHICK_H * 16, getContext: () => l0.g } as unknown as Parameters<typeof paintFrame>[0];
+      paintFrame(c0, drawChick(chick.init(env()), env({ level: 0 })) as PixelFrame, "chick", (() => null) as never, { ghost: ghostBits("chick", 0) });
+      expect(l0.fills.length).toBeGreaterThan(0);
+      expect(l0.fills.every((f) => f.w === 13 && f.h === 13)).toBe(true);
+      // A level-3 frame (256×128) in the same backing scales by 2: gap round(2/5)=1, square 1.
+      const l3 = fakeContext();
+      const c3 = { width: CHICK_W * 16, height: CHICK_H * 16, getContext: () => l3.g } as unknown as Parameters<typeof paintFrame>[0];
+      paintFrame(c3, drawChick(chick.init(env()), env({ level: 3 })) as PixelFrame, "chick", (() => null) as never, { ghost: ghostBits("chick", 3) });
+      expect(l3.fills.length).toBeGreaterThan(0);
+      expect(l3.fills.every((f) => f.w === 1 && f.h === 1)).toBe(true);
+    });
+
+    it("keycap words come from strings and change with the locale; symbols/digits/letters stay drawn", () => {
+      const cap = (id: string, k: string, loc: "zh" | "en"): string => {
+        setLocale(loc);
+        const out = render(used(id));
+        setLocale("zh");
+        return new RegExp(`data-key="${k}"[^>]*>([^<]*)<`).exec(out)?.[1] ?? "";
+      };
+      // The pager's 灯 cap is the string, so it differs by locale (灯 / LIGHT).
+      expect(cap("pager", "light", "zh")).toBe(t("obj.cap.pager.light"));
+      expect(cap("pager", "light", "en")).toBe(stringIn("en", "obj.cap.pager.light"));
+      expect(cap("pager", "light", "zh")).not.toBe(cap("pager", "light", "en"));
+      // A calculator digit is drawn, not a string: the same glyph in both locales.
+      expect(cap("calculator", "7", "zh")).toBe("7");
+      expect(cap("calculator", "7", "en")).toBe("7");
+    });
+
+    it("the pager has exactly one data-key=\"light\"", () => {
+      const out = render(used("pager"));
+      expect((out.match(/data-key="light"/g) ?? []).length).toBe(1);
     });
 
     it("the upgraded device has the upgraded class, no ghost, and a smooth HiFrame screen", () => {
@@ -554,6 +594,30 @@ describe("holding and using (FR1)", () => {
       const frame = chick.draw(chick.init(env({ upgraded: true })), env({ upgraded: true }));
       expect(frame.kind).toBe("hi");
       // The hand layer does not ghost an upgraded device (onDevice requires !env.upgraded).
+    });
+
+    it("the dictionary has a space bar, types \"good day\" with one space, a double space collapses, and \"today \" looks up today", () => {
+      // The device renders the space bar key.
+      const store = atDay(13, ["dictionary"]);
+      store.appendEvent({ kind: "recognise", objectId: "dictionary" });
+      const { ctx } = fakeCtx(store);
+      act(ctx, "loop-hold", { object: "dictionary" });
+      act(ctx, "obj-use");
+      expect(render(ctx)).toContain('class="space" data-action="obj-key" data-object="dictionary" data-key="space"');
+      expect(DICT_KEYS).toContain("space");
+      // The program: space appends one, never two; empty/leading space does nothing.
+      const e = env({ day: 13 });
+      const type = (keys: string[]) => keys.reduce((s, k) => dictionary.key(s, k, e).state, dictionary.key(dictionary.init(e), "open", e).state) as DictionaryState;
+      expect(type(["space"]).input).toBe(""); // empty: no leading space
+      expect(type([..."GOOD", "space", ..."DAY"]).input).toBe("good day");
+      expect(type([..."GOOD", "space", "space", ..."DAY"]).input).toBe("good day"); // a double space collapses
+      // "today " (a trailing space) looks up today (lookup trims first).
+      const looked = type([..."TODAY", "space"]);
+      const after = dictionary.key(looked, "lookup", e).state as DictionaryState;
+      expect(after.answer).toEqual(lookup("today", 13));
+      // Through the keyboard in 使用: Space is the dictionary's space, nothing else.
+      expect(keyboardToObjKey("dictionary", " ")).toBe("space");
+      expect(keyboardToObjKey("calculator", " ")).toBeNull();
     });
   });
 });

@@ -22,7 +22,7 @@ export const isDevice = (id: string): boolean => DEVICE_IDS.includes(id);
 
 /** The dictionary's keyboard in 使用 (the photo `grid` hotspot becomes real letter/function buttons). */
 export const DICT_ROWS_KB: readonly string[] = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
-export const DICT_KEYS: readonly string[] = [...DICT_ROWS_KB.join(""), "lookup", "up", "down", "back", "power"];
+export const DICT_KEYS: readonly string[] = [...DICT_ROWS_KB.join(""), "lookup", "up", "down", "back", "power", "space"];
 
 /** A key's hover label in 使用: strings `obj.key.<object>.<id>`, or nothing (digits/letters need none). */
 function keyLabel(object: string, key: string): string | null {
@@ -30,12 +30,23 @@ function keyLabel(object: string, key: string): string | null {
   return hasString(s) ? t(s) : null;
 }
 
-/** One real device key: the same action and ids as the photo hotspot, with an 80 ms sink when down. */
+/** A named key's cap word, from strings `obj.cap.<object>.<id>` (locale-dependent); null for the rest. */
+function keyCapWord(object: string, key: string): string | null {
+  const s = `obj.cap.${object}.${key}`;
+  return hasString(s) ? t(s) : null;
+}
+
+/**
+ * One real device key: the same action and ids as the photo hotspot, with an 80 ms sink when down.
+ * Its visible text is the cap word from strings when there is one (locale-dependent); symbols,
+ * digits and letters (the `text` the shell passes) stay as drawn.
+ */
 function key(object: string, key: string, down: boolean, live: boolean, text: string, klass = ""): SafeHtml {
   const label = keyLabel(object, key);
   const title = label !== null ? raw(` title="${label}"`) : null;
-  const aria = label ?? (/^[A-Z0-9.]$/.test(key) ? key : key);
-  return html`<button type="button" class="${cls(klass, down && "down")}" data-action="obj-key" data-object="${object}" data-key="${key}" aria-label="${aria}"${title}${live ? null : raw(' tabindex="-1"')}>${text}</button>`;
+  const cap = keyCapWord(object, key);
+  const shown = cap ?? text;
+  return html`<button type="button" class="${cls(klass, down && "down")}" data-action="obj-key" data-object="${object}" data-key="${key}" aria-label="${label ?? key}"${title}${live ? null : raw(' tabindex="-1"')}>${shown}</button>`;
 }
 
 /**
@@ -74,11 +85,14 @@ interface DeviceCtx {
 const downKey = (ctx: DeviceCtx): string | null =>
   ctx.session.hand.keyDown && ctx.session.hand.keyDown.object === ctx.object && ctx.session.hand.keyDown.until > ctx.nowMs ? ctx.session.hand.keyDown.key : null;
 
-/** The screen's glass: the program canvas (`canvas.dev`, painted by the hand layer) and, normal only, its ghost. */
+/** The device screen's glass. The canvas fills the glass (devices.css); the normal backing is the
+ *  channel × DEVICE_BACKING, big enough that a dream-level frame (channel × 2ⁿ) scales by an integer
+ *  with room for the pixel gap. The upgraded `hi` canvas is resized to the glass × DPR by the hand
+ *  layer; here it carries the normal backing until then. */
+export const DEVICE_BACKING = 16;
 function glass(ctx: DeviceCtx, cw: number, ch: number): SafeHtml {
   const upgraded = ctx.state.upgraded[ctx.object] === true;
-  // The canvas backing is the channel × 2ⁿ at an integer scale; the ghost rule flows through paint.ts.
-  return html`<div class="glass"><canvas class="${cls("dev", upgraded && "hi")}" data-screen="${ctx.object}" width="${cw}" height="${ch}"></canvas></div>`;
+  return html`<div class="glass"><canvas class="${cls("dev", upgraded && "hi")}" data-screen="${ctx.object}" width="${cw * DEVICE_BACKING}" height="${ch * DEVICE_BACKING}"></canvas></div>`;
 }
 
 function chick(ctx: DeviceCtx): SafeHtml {
@@ -93,7 +107,8 @@ function pager(ctx: DeviceCtx): SafeHtml {
   const brand = hasString("obj.brand.pager") ? tr("obj.brand.pager") : null;
   const sub = hasString("obj.brand.pager.sub") ? html`<small>${tr("obj.brand.pager.sub")}</small>` : null;
   const side = (k: string, glyph: string) => key("pager", k, down === k, ctx.session.hand.using, glyph);
-  return html`<div class="${cls("dev-shell", "pager", ctx.state.upgraded.pager && "upgraded")}" data-device="pager"><div class="win">${glass(ctx, PAGER_W, PAGER_H)}</div>${brand ? html`<div class="brand">${brand}${sub}</div>` : null}<div class="side">${side("up", "▲")}${side("fn", "FN")}${side("down", "▼")}${side("light", "✷")}</div>${key("pager", "light", down === "light", ctx.session.hand.using, "灯", "light")}${key("pager", "read", down === "read", ctx.session.hand.using, "READ", "read")}</div>`;
+  // The side grid is ▲ FN ▼ only; the 灯 button below is the one backlight key (no ✷ duplicate).
+  return html`<div class="${cls("dev-shell", "pager", ctx.state.upgraded.pager && "upgraded")}" data-device="pager"><div class="win">${glass(ctx, PAGER_W, PAGER_H)}</div>${brand ? html`<div class="brand">${brand}${sub}</div>` : null}<div class="side">${side("up", "▲")}${side("fn", "FN")}${side("down", "▼")}</div>${key("pager", "light", down === "light", ctx.session.hand.using, "灯", "light")}${key("pager", "read", down === "read", ctx.session.hand.using, "READ", "read")}</div>`;
 }
 
 function dictionary(ctx: DeviceCtx): SafeHtml {
@@ -106,7 +121,9 @@ function dictionary(ctx: DeviceCtx): SafeHtml {
     const back = i === DICT_ROWS_KB.length - 1 ? key("dictionary", "back", down === "back", live, "⌫", "back") : null;
     return html`<div class="row">${letters}${back}</div>`;
   });
-  return html`<div class="${cls("dev-shell", "dict", ctx.state.upgraded.dictionary && "upgraded")}" data-device="dictionary"><div class="lid">${glass(ctx, DICT_COLS * CELL_W, DICT_ROWS * CELL_H + 1)}<div class="brand"><span>${brand ?? "★"}</span><span>E-C · 2×16</span></div></div><div class="hinge"></div><div class="base"><div class="fn">${fn("power", "⏻", "power")}${fn("up", "▲", "")}${fn("down", "▼", "")}${fn("lookup", "查询", "go")}</div>${rows}</div></div>`;
+  // The space bar (author: "文曲星不能没有空格"): a wide blank key under ZXCVBNM, its own row.
+  const space = key("dictionary", "space", down === "space", live, "", "space");
+  return html`<div class="${cls("dev-shell", "dict", ctx.state.upgraded.dictionary && "upgraded")}" data-device="dictionary"><div class="lid">${glass(ctx, DICT_COLS * CELL_W, DICT_ROWS * CELL_H + 1)}<div class="brand"><span>${brand ?? "★"}</span><span>E-C · 2×16</span></div></div><div class="hinge"></div><div class="base"><div class="fn">${fn("power", "⏻", "power")}${fn("up", "▲", "")}${fn("down", "▼", "")}${fn("lookup", "查询", "go")}</div>${rows}<div class="row">${space}</div></div></div>`;
 }
 
 function calculator(ctx: DeviceCtx): SafeHtml {

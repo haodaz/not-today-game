@@ -1341,3 +1341,35 @@ Kiro's area only; `content/` untouched. `npx tsc --noEmit` clean; full `npx vite
   updated to the device markup (the chick key is a device button `down`; the dictionary open view has
   31 buttons; the device canvas is CSS-sized, no inline px width). `tests/desktop-snapshots.test.ts`
   "every string the desktop renders…" given a 20 s timeout.
+
+## objects-in-hand — the device screen must fill its glass (2026-11-03)
+
+Headless screenshots showed each 使用 device screen stamp-sized in a corner of its glass (canvas
+backing was the bare channel size, CSS `max-width:100%`). Kiro's area only; `content/` untouched.
+`npx tsc --noEmit` clean; full `npx vitest run` → 91 files / 1615 tests green.
+
+- **`src/world/room/devices.ts`**: `glass()` sets the canvas backing to channel × `DEVICE_BACKING`
+  (16) for every object (chick 512×256), so a dream-level frame (channel × 2ⁿ) scales by an integer
+  with room for the gap. Keycap text now comes from `obj.cap.*` (`keyCapWord`) for the named keys
+  (pager read/fn/light, dictionary lookup, calculator off/C), locale-dependent; symbols, digits and
+  letters stay drawn. The pager's side grid lost its ✷ (the 灯 button is the one `light` key). The
+  dictionary gained a space bar (`data-key="space"`, class `space`, its own row under ZXCVBNM) and
+  `space` was added to `DICT_KEYS`.
+- **`src/world/room/devices.css`**: `.dev-shell .glass canvas.dev` fills the glass
+  (`width:100%;height:100%;object-fit:contain`), centred, aspect kept, `image-rendering:pixelated`;
+  the glass is a centring flex box. `.dict .row button.space{width:180px}` (from the draft).
+- **`src/world/objects/paint.ts`**: the ghost branch now `gap = max(1, round(scale/5))`, square
+  `scale − gap`, centred in the backing (letterbox). At the channel × 16 backing a level-0 frame
+  scales by 16 (gap 3, square 13) and a level-3 frame by 2 (gap 1, square 1).
+- **`src/world/objects/layer.ts`**: the upgraded device's `hi` canvas backing is resized to the
+  glass's CSS box × devicePixelRatio before painting; the normal canvas keeps its channel × 16.
+- **`src/world/objects/dictionary.ts`**: handles `space` (one space unless the input is empty,
+  already ends with a space, or an answer is showing); `lookup` trims the input first.
+- **`src/world/room/game.ts`**: `keyboardToObjKey` maps the computer Space to the dictionary's
+  `space` (and only the dictionary).
+- **Tests (`tests/objects-in-hand.test.ts`)**: the device canvas backing is channel × 16 and the CSS
+  fills the glass pixelated; a level-0 chick frame paints squares of 13 and a level-3 frame squares
+  of 1 (fake context); keycap text changes with the locale while a digit does not; the pager has
+  exactly one `data-key="light"`; the dictionary has a space bar, types "good day" with one space, a
+  double space collapses, and "today " looks up today. The prior counts were updated (dictionary now
+  32 keys with space; the normal screen backing assertion is 512×256).

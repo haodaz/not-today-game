@@ -888,6 +888,7 @@ function atChoice(ctx: ActionContext): boolean {
 export function keyboardToObjKey(object: string | null, key: string): string | null {
   if (object === "dictionary") {
     if (/^[a-zA-Z]$/.test(key)) return key.toUpperCase();
+    if (key === " ") return "space";
     if (key === "Enter") return "lookup";
     if (key === "Backspace") return "back";
     return null;
