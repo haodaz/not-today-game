@@ -1,0 +1,44 @@
+{
+  "_note": "Claude's content for the sample task (day 7 task4, 对比一下). Use it as the test fixture; Claude adds it to content/tasks/day-07.json once the loader accepts `board` and `deliverable`.",
+  "board": {
+    "kind": "table",
+    "title": "对比：我们 / 它",
+    "columns": ["", "它（视频）", "我们"],
+    "given": {
+      "lock": { "object": "pager", "codes": ["0414", "7734", "1018"], "answer": "0414" },
+      "rows": {
+        "r1": "把企业所有系统的数据接进一个本体",
+        "r2": "对象、关系、动作，都建模成本体",
+        "r3": "政府、军队、银行，几千个分析员在用",
+        "r4": "在本体上直接下操作，写回各个系统",
+        "r5": "四千多名工程师",
+        "r6": "市值三千八百亿美元"
+      }
+    },
+    "slots": [
+      { "id": "r1", "label": "数据从哪来", "answer": "c1" },
+      { "id": "r2", "label": "怎么表示业务", "answer": "c2" },
+      { "id": "r3", "label": "谁在用", "answer": "c3" },
+      { "id": "r4", "label": "怎么做决定", "answer": "c4" },
+      { "id": "r5", "label": "多少人", "answer": "c5" },
+      { "id": "r6", "label": "结论", "answer": "c6" }
+    ],
+    "cards": [
+      { "id": "c1", "text": "三个客户的表格，人工导入，每周一次" },
+      { "id": "c2", "text": "一个知识图谱，二百多个节点，上个月才画完" },
+      { "id": "c3", "text": "两个试点客户，其中一个还没付款" },
+      { "id": "c4", "text": "导出成 PDF，老板转发" },
+      { "id": "c5", "text": "五十来人，十三个月工资没发全" },
+      { "id": "c6", "text": "方向相近，规模差得远" },
+      { "id": "d1", "text": "我们的本体已全部实现（Vivi 的 PRD 第 3 页）" },
+      { "id": "d2", "text": "同样服务政府、军队、银行" }
+    ],
+    "kuro": {
+      "fill": { "r1": "c1", "r2": "c2", "r3": "c3", "r4": "c4", "r5": "c5", "r6": "k1" },
+      "cards": [ { "id": "k1", "text": "我方优势：已全部实现" } ],
+      "unlock": "0414"
+    }
+  },
+  "deliverable": { "id": "d7-compare", "label": "一叠对比表", "img": "/room/desk/deliverable-paper.png" },
+  "judge": { "perfect": 0, "flawed": -3, "wrong": -8, "wrongAt": 2 }
+}
