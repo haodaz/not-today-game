@@ -120,6 +120,58 @@ body.up .calc .keys button.eq{background:#5a8dee;color:#fff;box-shadow:0 2px 0 #
 body.up .calc .note{color:#9aa4b5}
 body.up .calc .note::before{content:"新世界 · 一直亮着";}
 body.up .calc .note span{display:none}
+
+/* ——— walkman ——— */
+.walk{position:relative;width:330px;height:250px;margin:34px 0 110px}
+.walk .keys{position:absolute;left:40px;top:-26px;display:flex;gap:6px}
+.walk .keys button{width:52px;height:34px;border:none;border-radius:6px 6px 0 0;background:linear-gradient(#d9dee6,#a9b2bf);color:#3a4250;font-size:13px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.18);transition:transform .08s}
+.walk .keys button.held{transform:translateY(10px);background:linear-gradient(#bfc6d1,#949eac)}
+.walk .keys button.play{color:#c0392b}
+.walk .body{position:absolute;inset:0;border-radius:16px;background:linear-gradient(160deg,#6f87a6,#3d5372);box-shadow:inset 0 3px 0 rgba(255,255,255,.18),inset 0 -6px 0 rgba(0,0,0,.3),0 18px 40px rgba(0,0,0,.5)}
+.walk .win{position:absolute;left:22px;top:22px;width:250px;height:150px;border-radius:10px;background:#1c2330;padding:8px;box-shadow:inset 0 0 0 3px #2b3546}
+.walk .win canvas{width:100%;height:100%;display:block;border-radius:6px}
+.walk .brand{position:absolute;left:24px;bottom:22px;font:700 13px/1 sans-serif;letter-spacing:3px;color:#dfe7f3}
+.walk .brand small{display:block;margin-top:5px;font:400 10px/1 sans-serif;letter-spacing:1px;color:#a9b8cc}
+.walk .vol{position:absolute;right:-14px;top:40px;width:40px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.walk .wheel{width:34px;height:96px;border-radius:8px;background:repeating-linear-gradient(#c7ced8 0 3px,#8e98a7 3px 6px);box-shadow:inset 0 0 0 2px #5d6878;position:relative;overflow:hidden}
+.walk .wheel i{position:absolute;left:0;right:0;height:4px;background:#e74c3c;transition:top .15s}
+.walk .vol button{width:30px;height:24px;border-radius:6px;border:none;background:#2d3b52;color:#dfe7f3;font-size:13px;box-shadow:0 2px 0 #152033}
+.walk .jack{position:absolute;right:46px;bottom:-4px;width:12px;height:10px;background:#222;border-radius:2px}
+.walk svg.cord{position:absolute;left:278px;top:244px;overflow:visible}
+body.up .walk .body{background:linear-gradient(160deg,#ffffff,#e3e8ef);box-shadow:inset 0 -5px 0 rgba(120,135,160,.2),0 18px 40px rgba(0,0,0,.5)}
+body.up .walk .win{background:#fff;box-shadow:none}
+body.up .walk .brand{color:#5a8dee}
+body.up .walk .brand small{color:#9aa4b5}
+body.up .walk .keys button{background:#e6eaf1;box-shadow:inset 0 -3px 0 #c3cad6}
+body.up .walk .keys button.play{color:#5a8dee}
+body.up .walk .wheel{background:#e6eaf1;box-shadow:inset 0 0 0 2px #c3cad6}
+body.up .walk .wheel i{background:#5a8dee}
+body.up .walk .vol button{background:#e6eaf1;color:#5b6577;box-shadow:0 2px 0 #c3cad6}
+
+.calc{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;transition:transform .35s cubic-bezier(.3,1.4,.5,1)}
+.calc.dragging{cursor:grabbing;transition:none}
+.calc .keys{cursor:default}
+.turnhint{font-size:11px;color:#6f727a;margin-top:-6px}
+
+/* ——— turn button: one for every device that has another side ——— */
+.turnbtn{border:none;border-radius:16px;padding:6px 16px;background:#2a2c33;color:#d8d4c8;font-size:12px;box-shadow:0 2px 0 #0e0f12}
+.turnbtn:hover{background:#34373f}
+/* ——— dictionary space bar ——— */
+.dict .row button.space{width:180px}
+/* ——— chick back ——— */
+.egg{transition:transform .16s ease-in}
+.egg.flipping{transform:scaleX(0)}
+.egg .backface{display:none;position:absolute;inset:0}
+.egg.back > :not(.backface){display:none}
+.egg.back .backface{display:block}
+.egg.back{background:radial-gradient(ellipse at 66% 26%,#ffeaa0 0%,#f2c230 36%,#dc9a10 75%,#c07f08 100%)}
+.egg .cover{position:absolute;left:50%;top:150px;width:150px;height:110px;margin-left:-75px;border-radius:14px;border:2px solid rgba(120,70,0,.45);box-shadow:inset 0 2px 0 rgba(255,255,255,.3)}
+.egg .cover::after{content:"⇩  LR44 × 2";position:absolute;left:0;right:0;bottom:12px;text-align:center;font:700 11px/1 sans-serif;color:rgba(120,70,0,.6);letter-spacing:1px}
+.egg .screw{position:absolute;left:50%;top:166px;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:#c9ccd3;box-shadow:inset 0 0 0 2px #8d929c}
+.egg .screw::after{content:"";position:absolute;left:2px;right:2px;top:6px;height:2px;background:#6b707a}
+.egg .hole{position:absolute;left:50%;top:292px;width:12px;height:12px;margin-left:-6px;border-radius:50%;border:none;background:#3a2600;box-shadow:inset 0 2px 2px rgba(0,0,0,.6),0 0 0 3px rgba(120,70,0,.25)}
+.egg .holelbl{position:absolute;left:0;right:0;top:310px;text-align:center;font:700 9px/1 sans-serif;color:rgba(120,70,0,.6);letter-spacing:2px}
+body.up .egg.back{background:radial-gradient(ellipse at 66% 24%,#ffffff 0%,#eef1f6 45%,#d3d9e3 100%)}
 </style>
 </head>
 <body>
@@ -140,7 +192,9 @@ body.up .calc .note span{display:none}
       </div></div>
       <div class="btns"><button data-k="A" title="选">A</button><button data-k="B" title="确定">B</button><button data-k="C" title="取消">C</button></div>
       <div class="lbl"><span>A</span><span>B</span><span>C</span></div>
+      <div class="backface"><div class="cover"></div><div class="screw"></div><button class="hole" data-k="reset" title="复位"></button><div class="holelbl">RESET</div></div>
     </div>
+    <button class="turnbtn" data-turn="chick">⇋ 翻面</button>
     <div class="cap"><b>电子宠物</b> · 32×16 像素，上下各四个图标。A 换图标，B 做，C 回去。画面是游戏里那套真帧。</div>
   </section>
 
@@ -167,6 +221,7 @@ body.up .calc .note span{display:none}
         <div class="row" data-row="QWERTYUIOP"></div>
         <div class="row" data-row="ASDFGHJKL"></div>
         <div class="row" data-row="ZXCVBNM"><button class="back" data-k="back" title="退格">⌫</button></div>
+        <div class="row"><button class="space" data-k="space" title="空格"></button></div>
       </div>
     </div>
     <div class="cap"><b>文曲星</b> · 翻盖，点阵两行十六格。打字母，按查询。试试 today、same。</div>
@@ -185,7 +240,22 @@ body.up .calc .note span{display:none}
       </div>
       <div class="note"><span>没光就不亮</span></div>
     </div>
+    <button class="turnbtn" data-turn="calc">↻ 倒过来</button><div class="turnhint">也可以按住机身拖着转</div>
     <div class="cap"><b>计算器</b> · 八位数码管，太阳能。正常算数。倒过来读是字母，0.7734 就是 hELLO。</div>
+  </section>
+
+  <section class="cell">
+    <div class="dev walk" id="walk" tabindex="0">
+      <div class="keys"><button data-k="rew" title="倒带">◀◀</button><button class="play" data-k="play" title="播放">▶</button><button data-k="ff" title="快进">▶▶</button><button data-k="stop" title="停止">■</button></div>
+      <div class="body">
+        <div class="win"><canvas id="walkWin"></canvas></div>
+        <div class="brand">STEREO<small>随身听 · A 面</small></div>
+      </div>
+      <div class="vol"><button data-k="vol+" title="音量大">+</button><div class="wheel"><i id="walkVol"></i></div><button data-k="vol-" title="音量小">−</button></div>
+      <div class="jack"></div>
+      <svg class="cord" width="120" height="120"><path id="walkCord" d="M0 0 C 10 40, -30 70, 10 110" stroke="#dcdcdc" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+    </div>
+    <div class="cap"><b>随身听</b> · 没有屏幕，窗里就是磁带。两个卷盘按真实比例一个变粗一个变细。按下的琴键会卡住，按停止才弹起来。</div>
   </section>
 </main>
 <script>
@@ -240,7 +310,7 @@ function segCanvas(cv, cells, cw, ch){
   }
   function render(){ draw(rowsToBits(FRAMES.frames[frame()])); top(sel); bot(sel); }
   setInterval(()=>{ tick++; if(act && act!=='dark' && act!=='check' && performance.now()-actT>1200) act=null; render(); }, 300);
-  window.chickKey = k => { if(k==='A'){ sel=(sel+1)%8; act=null; } else if(k==='B'){ if(sel<0) return; act = ACT[ICONS[sel]] || 'nod'; actT=performance.now(); } else if(k==='C'){ act=null; sel=-1; } render(); beep(k==='B'?990:880); };
+  window.chickKey = k => { if(k==='reset'){ beep(1200,.25); return; } if(k==='A'){ sel=(sel+1)%8; act=null; } else if(k==='B'){ if(sel<0) return; act = ACT[ICONS[sel]] || 'nod'; actT=performance.now(); } else if(k==='C'){ act=null; sel=-1; } render(); beep(k==='B'?990:880); };
   render();
 })();
 
@@ -277,8 +347,9 @@ function segCanvas(cv, cells, cw, ch){
     if(k==='power'){ on=!on; input=''; answer=null; beep(660,.3); render(); return; }
     if(!on) return;
     if(/^[A-Z]$/.test(k)){ input = answer ? k.toLowerCase() : (input+k.toLowerCase()).slice(0,15); answer=null; }
+    else if(k==='space'){ if(!answer && input && !input.endsWith(' ')) input = (input+' ').slice(0,15); }
     else if(k==='back'){ if(answer) answer=null; else input=input.slice(0,-1); }
-    else if(k==='lookup' && input){ const w = WORDS.find(w=>w.w===input); answer = [input, w ? w.gloss : '未收录']; }
+    else if(k==='lookup' && input.trim()){ input = input.trim(); const w = WORDS.find(w=>w.w===input); answer = [input, w ? w.gloss : '未收录']; }
     beep(1400,.03); render();
   };
   render();
@@ -331,11 +402,71 @@ const HI = {
 setInterval(()=>{ if(UP) Object.values(HI).forEach(f=>f()); }, 120);
 document.querySelectorAll('.switch button').forEach(b=>b.addEventListener('click',()=>{ UP = b.dataset.mode==='up'; document.body.classList.toggle('up',UP); document.querySelectorAll('.switch button').forEach(x=>x.classList.toggle('on',x===b)); }));
 
+
+/* ——— walkman: true reel ratio (r² linear in position), keys latch, cord sways while playing ——— */
+(() => {
+  const SIDE = 60000, FAST = 12, E = 1.2, F = 2.6, K = F*F - E*E, LEN = 400; // the draft runs one side in a minute
+  let mode = 'stop', since = performance.now(), pos0 = 0, vol = 6;
+  const pos = () => Math.max(0, Math.min(1, pos0 + ({play:1,ff:FAST,rew:-FAST,stop:0}[mode]/SIDE) * (performance.now()-since)));
+  const radii = p => ({ l: Math.sqrt(E*E + K*(1-p)), r: Math.sqrt(E*E + K*p) });
+  const angles = p => ({ l: (2*LEN/K)*(F - Math.sqrt(F*F - K*p)), r: (2*LEN/K)*(Math.sqrt(E*E + K*p) - E) });
+  const LINES = ['（沙沙。按下去的那一声。）','小时候的你：今天是一九九七年九月一号，开学第一周。','小时候的你：我有一只小鸡。它会叫。老师说上课不许带。','小时候的你：我不带。我放抽屉里。','（嘀。很远的一声。）'];
+  function set(m){ const p = pos(); pos0 = p; since = performance.now(); mode = m;
+    walk.querySelectorAll('.keys button').forEach(b => b.classList.toggle('held', b.dataset.k === m && m !== 'stop')); }
+  window.walkKey = k => {
+    if(k==='vol+') vol = Math.min(10, vol+1); else if(k==='vol-') vol = Math.max(0, vol-1); else set(k);
+    beep(k==='play'?300:200, .03);
+  };
+  function draw(){
+    const h = hi(walkWin); if(!h) return; const [g,w,H] = h; const p = pos();
+    if((mode==='ff' && p>=1) || (mode==='rew' && p<=0) || (mode==='play' && p>=1)) set('stop');
+    walkVol.style.top = (92 - vol*9) + 'px';
+    const sway = mode==='play' ? Math.sin(performance.now()/500)*10 : 0;
+    walkCord.setAttribute('d', `M0 0 C ${10+sway} 40, ${-30-sway} 70, ${10+sway/2} 110`);
+    if(UP){ g.fillStyle='#0d1220'; g.fillRect(0,0,w,H); const i = Math.floor(performance.now()/1500) % LINES.length;
+      g.font=`600 14px ${FONT}`; g.fillStyle='#fff'; g.fillText(LINES[i], 12, H/2-4); g.font=`12px ${FONT}`; g.fillStyle='#8fb4ff'; g.fillText(LINES[(i+1)%LINES.length], 12, H/2+18); return; }
+    // the cassette
+    g.fillStyle='#2a2f38'; g.fillRect(0,0,w,H);
+    g.fillStyle='#efe6cf'; g.fillRect(10,8,w-20,H-34); g.fillStyle='#d9573b'; g.fillRect(10,8,w-20,10);
+    g.fillStyle='#3a3a3a'; g.font=`12px "Bradley Hand","Kaiti SC",cursive`; g.fillText('A  录音 ①', 22, 34);
+    g.fillStyle='#1b1d22'; const wy = H/2+6, wx0 = w*0.18, wx1 = w*0.82; g.beginPath(); g.roundRect(wx0-26, wy-22, wx1-wx0+52, 44, 22); g.fill();
+    const hub = 6, r = radii(p), a = angles(p);
+    [[wx0, r.l, -a.l], [wx1, r.r, -a.r]].forEach(([x, rr, ang]) => {
+      const maxR = Math.min((H-34)/2 - 6, (wx1-wx0)/2 - 4); g.fillStyle='#5b3a22'; g.beginPath(); g.arc(x, wy, maxR * rr / F, 0, 7); g.fill();
+      g.save(); g.translate(x, wy); g.rotate(ang); g.fillStyle='#f4f4f4'; g.beginPath(); g.arc(0,0,hub+2,0,7); g.fill();
+      g.fillStyle='#1b1d22'; for(let j=0;j<6;j++){ g.rotate(Math.PI/3); g.fillRect(-1.5, hub-3, 3, 4); } g.restore(); });
+    g.fillStyle='#9aa1ad'; g.fillRect(w*0.3, H-22, w*0.4, 10);
+  }
+  setInterval(draw, 33);
+})();
+
+
+/* ——— calculator: drag the body to turn it in the plane; past half a turn it stays upside down ——— */
+(() => {
+  let deg = 0, start = null;
+  const centre = () => { const r = calc.getBoundingClientRect(); return [r.left + r.width/2, r.top + r.height/2]; };
+  const at = e => { const [cx,cy] = centre(); return Math.atan2(e.clientY-cy, e.clientX-cx) * 180 / Math.PI; };
+  calc.addEventListener('pointerdown', e => { if(e.target.closest('button')) return; start = { a: at(e), d: deg }; calc.classList.add('dragging'); calc.setPointerCapture(e.pointerId); });
+  calc.addEventListener('pointermove', e => { if(!start) return; deg = start.d + (at(e) - start.a); calc.style.transform = `rotate(${deg}deg)`; });
+  const end = () => { if(!start) return; start = null; calc.classList.remove('dragging');
+    const n = ((deg % 360) + 360) % 360; deg = (n > 90 && n < 270) ? 180 : 0; calc.style.transform = `rotate(${deg}deg)`;
+    calc.dataset.upside = deg === 180 ? '1' : '0'; };
+  calc.addEventListener('pointerup', end); calc.addEventListener('pointercancel', end);
+  window.calcTurn = () => { deg = deg === 180 ? 0 : 180; calc.style.transform = `rotate(${deg}deg)`; calc.dataset.upside = deg === 180 ? '1' : '0'; };
+})();
+
+
+/* ——— turn: chick flips to its back, the calculator turns half a round ——— */
+document.querySelectorAll('.turnbtn').forEach(b => b.addEventListener('click', () => {
+  if(b.dataset.turn === 'chick'){ chick.classList.add('flipping'); setTimeout(() => { chick.classList.toggle('back'); chick.classList.remove('flipping'); }, 160); }
+  if(b.dataset.turn === 'calc') window.calcTurn();
+}));
+
 /* ——— sound: one short square-wave beep, the only "sound asset" in the draft ——— */
 let ac; function beep(f=880, d=.06){ try{ ac = ac || new AudioContext(); const o=ac.createOscillator(), v=ac.createGain(); o.type='square'; o.frequency.value=f; v.gain.value=.04; o.connect(v).connect(ac.destination); o.start(); o.stop(ac.currentTime+d);}catch(e){} }
 
 /* ——— wiring: every device's buttons, plus the computer keyboard for the one last clicked ——— */
-const HANDLER = { chick: k=>chickKey(k), pager: k=>pagerKey(k), dict: k=>dictKey(k), calc: k=>calcKey(k) };
+const HANDLER = { walk: k=>walkKey(k), chick: k=>chickKey(k), pager: k=>pagerKey(k), dict: k=>dictKey(k), calc: k=>calcKey(k) };
 let active = null;
 document.querySelectorAll('.dev').forEach(dev => {
   dev.addEventListener('pointerdown', () => { active = dev.id; document.querySelectorAll('.dev').forEach(d=>d.classList.toggle('focused', d===dev)); });
@@ -343,7 +474,7 @@ document.querySelectorAll('.dev').forEach(dev => {
 });
 const press = (id,k) => { const b = document.querySelector(`#${id} button[data-k="${CSS.escape(k)}"]`); if(b){ b.classList.add('down'); setTimeout(()=>b.classList.remove('down'),80); } HANDLER[id](k); };
 addEventListener('keydown', e => {
-  if(active==='dict'){ const k=e.key; if(/^[a-z]$/i.test(k)) press('dict',k.toUpperCase()); else if(k==='Enter') press('dict','lookup'); else if(k==='Backspace') press('dict','back'); else return; e.preventDefault(); }
+  if(active==='dict'){ const k=e.key; if(/^[a-z]$/i.test(k)) press('dict',k.toUpperCase()); else if(k===' ') press('dict','space'); else if(k==='Enter') press('dict','lookup'); else if(k==='Backspace') press('dict','back'); else return; e.preventDefault(); }
   if(active==='calc'){ const map={'*':'x','/':'div','Enter':'=','=':'=','Backspace':'C','Escape':'C'}; const k = map[e.key] ?? e.key; if(/^[0-9.+\-%=C]$/.test(k)||k==='x'||k==='div'){ press('calc',k); e.preventDefault(); } }
 });
 </script>

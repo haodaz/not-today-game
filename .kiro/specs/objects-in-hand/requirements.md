@@ -59,3 +59,15 @@ Overlaying a canvas on the photo cannot match the photo's angle and reads as pas
 - An object switching from normal to upgraded mid-session re-renders the same device with the class; no other path.
 
 Tests: in 使用, for chick/pager/dictionary/calculator the face has no `img` and has the device root; every content key id (dictionary: A–Z, lookup, up, down, back, power) exists as a `button[data-action="obj-key"]`; clicking one reaches the program exactly as the old hotspot did (reuse the existing hotspot tests by selector); the normal screen canvas is pixelated with an integer scale and paints a ghost; the upgraded device has the `upgraded` class, no ghost, and shows the HiFrame lines; holding still shows the photo. Also: `tests/desktop-snapshots.test.ts` "every string the desktop renders…" times out at 5 s under the full suite (passes alone); give it a 20 s timeout.
+
+## Correction 2026-11-03 (Claude, after headless screenshots of 838305b): the device screen must fill its glass
+Seen in the game: the shells are right, but each screen canvas shows at its bare channel size (the chick 32 × 16 CSS px) in a corner of the glass, so the picture is stamp-sized. Cause: `glass()` sets the backing to the channel size and the CSS is `max-width:100%; height:auto`, which never grows it; at backing = channel the 1 px gap also cannot exist, and a dream-level frame (`finer`, 2ⁿ larger) overflows the backing.
+- **Size**: the canvas fills the glass's content box (`width:100%; height:100%`), keeping the channel's aspect (letterbox inside the glass, centred). Backing = channel × 16 for every level (chick 512 × 256); the frame's pixel size is then 16 / 2ⁿ backing px (2 at dream level 3).
+- **Gap**: each lit or ghost pixel is a square `scale − gap` with `gap = max(1, round(scale / 5))`; at scale 2 the gap is 1 (the dots look thin: the author's "你会觉得它瘦了").
+- **Upgraded**: the `hi` canvas backing is the glass's CSS size × devicePixelRatio, smooth.
+- **Small fixes in the same file**: keycap words come from strings (`obj.cap.pager.read`, `obj.cap.pager.fn`, `obj.cap.pager.light`, `obj.cap.dictionary.lookup`, `obj.cap.calculator.off`, `obj.cap.calculator.C`; symbols, digits and letters stay as drawn); the pager's side grid loses its ✷ (the 灯 key is the one backlight key); the dictionary gets the space bar from the draft (`data-key="space"`, a wide blank key under ZXCVBNM, the computer Space key too) and its program handles `space` as written in the next section.
+
+### Dictionary space (author: "文曲星不能没有空格")
+`space` appends one space unless the input is empty, already ends with a space, or an answer is showing; `lookup` trims first. Hover label `obj.key.dictionary.space`.
+
+Tests: the device canvas's backing is channel × 16 and its CSS fills the glass; with a fake context, a level-0 chick frame paints squares of 13 (16 − 3) and a level-3 frame squares of 1; keycap text changes with the locale and the symbols do not; the pager has exactly one `data-key="light"`; the dictionary types "good day" with one space, a double space collapses, and "today " looks up today.
