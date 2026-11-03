@@ -331,5 +331,20 @@
   "obj.key.calculator..": "小数点",
   "obj.chick.autofed": "已自动喂食 · 心情 100%",
   "obj.calculator.lit": "新世界 · 一直亮着",
-  "obj.dictionary.hint": "整句翻译，并朗读"
+  "obj.dictionary.hint": "整句翻译，并朗读",
+  "obj.cap.pager.read": "READ",
+  "obj.cap.pager.fn": "FN",
+  "obj.cap.pager.light": "灯",
+  "obj.cap.dictionary.lookup": "查 询",
+  "obj.cap.calculator.off": "OFF",
+  "obj.cap.calculator.C": "C",
+  "obj.brand.tape": "STEREO",
+  "obj.brand.tape.sub": "随身听 · A 面",
+  "obj.tape.label": "A  录音 ①",
+  "obj.key.tape.play": "播放",
+  "obj.key.tape.stop": "停止",
+  "obj.key.tape.ff": "快进",
+  "obj.key.tape.rew": "倒带",
+  "obj.key.tape.vol+": "音量大",
+  "obj.key.tape.vol-": "音量小"
 }

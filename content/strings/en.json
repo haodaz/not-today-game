@@ -331,5 +331,20 @@
   "obj.key.calculator..": "decimal point",
   "obj.chick.autofed": "auto-fed · mood 100%",
   "obj.calculator.lit": "New World · always lit",
-  "obj.dictionary.hint": "whole sentences, read aloud"
+  "obj.dictionary.hint": "whole sentences, read aloud",
+  "obj.cap.pager.read": "READ",
+  "obj.cap.pager.fn": "FN",
+  "obj.cap.pager.light": "LIGHT",
+  "obj.cap.dictionary.lookup": "ENTER",
+  "obj.cap.calculator.off": "OFF",
+  "obj.cap.calculator.C": "C",
+  "obj.brand.tape": "STEREO",
+  "obj.brand.tape.sub": "walkman · side A",
+  "obj.tape.label": "A  REC ①",
+  "obj.key.tape.play": "play",
+  "obj.key.tape.stop": "stop",
+  "obj.key.tape.ff": "fast forward",
+  "obj.key.tape.rew": "rewind",
+  "obj.key.tape.vol+": "volume up",
+  "obj.key.tape.vol-": "volume down"
 }
