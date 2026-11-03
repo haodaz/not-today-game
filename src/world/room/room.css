@@ -201,13 +201,16 @@
 .room .held.obj[data-mode="holding"]{cursor:grab}
 .room .held.obj[data-mode="holding"]:active{cursor:grabbing}
 .room .held.obj .breathe{perspective:1400px;transition:scale var(--m-use,500ms) var(--m-ease,ease)}
-/* 使用: the face fills the stage. A screen object scales so its screen spans ≥ 34 % of the width;
-   a screenless object fills ~60 % of the height. The canvas's own width (set in the markup) is the
-   screen's on-stage width; the object scales up around it. */
-.room .held.obj.using.focus-screen .breathe{scale:3.2}
-.room .held.obj.using.focus-obj{width:auto;height:60%}
-.room .held.obj.using.focus-obj .breathe{scale:1}
-.room .held.obj.using.focus-obj img{height:100%;width:auto}
+/* 使用 (correction 2026-11-03, fixed): the WHOLE front face fits inside the stage — the front image
+   is contained within 88 % of the stage's width and height, aspect kept, centred, so the top of the
+   shell and the bottom row of keys are always on-stage. The object box shrinks to the image (width:
+   auto), so keys and the screen, positioned as fractions of the face, scale with it and never
+   compound. The 500 ms entry is the .breathe transition (--m-use). */
+.room .held.obj.using{width:auto;height:auto}
+.room .held.obj.using .face.front > img{width:auto;height:auto;max-width:calc(1600px * var(--focus-max,.88));max-height:calc(900px * var(--focus-max,.88))}
+/* The entry: the face eases in over the 桌子 → 屏幕 time (--m-use, 500 ms), within the fitted box. */
+.room .held.obj.using .breathe{animation:m-focus-in var(--m-use,500ms) var(--m-ease,ease) both}
+@keyframes m-focus-in{from{scale:.86;opacity:.6}to{scale:1;opacity:1}}
 .room .held.obj .turn{position:relative;transform-style:preserve-3d;--face:0deg;transform:rotateZ(var(--roll,0deg)) rotateX(var(--pitch,0deg)) rotateY(calc(var(--face) + var(--yaw,0deg)))}
 .room .held.obj[data-face="back"] .turn{--face:180deg}
 .room .held.obj .face{backface-visibility:hidden;-webkit-backface-visibility:hidden}

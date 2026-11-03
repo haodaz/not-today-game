@@ -27,8 +27,8 @@ import { crackLit, iccard, phone, pinchMarks, textbook } from "@world/objects/pl
 import { dreamLevel, MAX_LEVEL, SEMITONE, type ObjectEnv } from "@world/objects/program";
 import { packRadii, playList, reelAngles, tape, tapePos, TAPE_SIDE_MS, type TapeState } from "@world/objects/tape";
 import { keyboardToObjKey, loopActions, loopKeys } from "@world/room/game";
-import { CHANNELS, FOCUS_SCREEN_FRAC, focusScreenWidth } from "@world/room/held";
-import { STAGE_W } from "@world/room/splat/geometry";
+import { CHANNELS, faceBoxWidth, FOCUS_MAX, focusBackingWidth, HELD_W } from "@world/room/held";
+import { STAGE_H, STAGE_W } from "@world/room/splat/geometry";
 import { renderRoom } from "@world/room/hud";
 
 const clone = <T>(v: T): T => JSON.parse(JSON.stringify(v)) as T;
@@ -371,16 +371,51 @@ describe("holding and using (FR1)", () => {
       expect([ctx.session.hand.using, ctx.session.holding, ctx.session.view]).toEqual([false, "calculator", "desk"]);
     });
 
-    it("the screen spans ≥ 34 % of the viewport width for each screen object (integer, pixelated scale)", () => {
-      for (const id of ["chick", "pager", "calculator", "dictionary"]) {
-        const w = focusScreenWidth(id);
-        expect(w / STAGE_W, id).toBeGreaterThanOrEqual(FOCUS_SCREEN_FRAC);
-        // The scale is a whole number of the channel (square pixels).
-        expect(Number.isInteger(w / CHANNELS[id]!.w), id).toBe(true);
-      }
-      // The canvas is drawn pixelated.
+    it("the whole face fits within 88 % of the stage, every key is inside, and the canvas backing is an integer multiple of the channel", () => {
       const css = readFileSync(resolve(__dirname, "../src/world/room/room.css"), "utf8");
+      // The front image is contained within 88 % of the stage in both dimensions (aspect kept), so
+      // the scaled box — and every key, which sits inside the face — is on-stage for any aspect.
+      expect(FOCUS_MAX).toBe(0.88);
+      expect(faceBoxWidth()).toBe(HELD_W);
+      expect(css).toMatch(/\.held\.obj\.using \.face\.front > img\{[^}]*max-width:calc\(1600px \* var\(--focus-max,\.88\)\)/);
+      expect(css).toMatch(/\.held\.obj\.using \.face\.front > img\{[^}]*max-height:calc\(900px \* var\(--focus-max,\.88\)\)/);
+      // 88 % of the fixed stage, the on-stage cap for the face box in both dimensions.
+      expect(FOCUS_MAX * STAGE_W).toBe(1408);
+      expect(FOCUS_MAX * STAGE_H).toBe(792);
+      for (const id of ["chick", "pager", "calculator", "dictionary", "iccard", "textbook", "tape", "phone"]) {
+        // Every key hotspot lies inside the face (0..1), so inside the stage once the face fits.
+        for (const k of handOf(id).keys) {
+          expect(k.l, `${id}.${k.id}`).toBeGreaterThanOrEqual(0);
+          expect(k.t, `${id}.${k.id}`).toBeGreaterThanOrEqual(0);
+          expect(k.l + k.w, `${id}.${k.id}`).toBeLessThanOrEqual(1 + 1e-9);
+          expect(k.t + k.h, `${id}.${k.id}`).toBeLessThanOrEqual(1 + 1e-9);
+        }
+      }
+      // The canvas backing resolution is an integer multiple of the channel width (at every level).
+      for (const id of ["chick", "pager", "calculator", "dictionary"]) {
+        for (const lvl of [0, 1, 2, 3]) {
+          const back = focusBackingWidth(id, lvl);
+          expect(back % CHANNELS[id]!.w, `${id} level ${lvl}`).toBe(0);
+          expect(Number.isInteger(back / (CHANNELS[id]!.w * 2 ** lvl)), `${id} level ${lvl}`).toBe(true);
+        }
+      }
+      // The canvas is drawn pixelated (integer scale, no smoothing).
       expect(css).toMatch(/canvas\.dev\{[^}]*image-rendering:pixelated/);
+    });
+
+    it("the screen canvas is sized as a fraction of the face in 使用 (not its own pixel width), and carries no data-focus-w", () => {
+      const store = atDay(16, ["dictionary"]);
+      store.appendEvent({ kind: "recognise", objectId: "dictionary" });
+      const { ctx } = fakeCtx(store);
+      act(ctx, "loop-hold", { object: "dictionary" });
+      act(ctx, "obj-use");
+      const out = render(ctx);
+      expect(out).not.toContain("data-focus-w");
+      // The canvas style gives a % width (a fraction of the face), not a px width.
+      const canvas = out.slice(out.indexOf('data-screen="dictionary"'));
+      const style = /style="([^"]*)"/.exec(canvas)?.[1] ?? "";
+      expect(style).toMatch(/width:[\d.]+%/);
+      expect(style).not.toMatch(/width:\d+px/);
     });
 
     it("the stage behind gets the dim + blur class in 使用", () => {
@@ -392,7 +427,7 @@ describe("holding and using (FR1)", () => {
       act(ctx, "obj-use");
       const out = render(ctx);
       expect(out).toContain("held-layer focus");
-      expect(out).toContain("focus focus-screen");
+      expect(out).toContain("using focus");
       const css = readFileSync(resolve(__dirname, "../src/world/room/room.css"), "utf8");
       expect(css).toMatch(/\.held-layer\.focus > \.held-dim\{[^}]*blur\(6px\)/);
     });

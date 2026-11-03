@@ -1270,3 +1270,33 @@ Kiro's area only (`src/`, `tests/`); `content/` untouched. One test each added t
    Tests: the view level is the object in use and Esc returns to 桌子 holding; the screen ≥ 34 % width
    per object with an integer scale; the dim + blur class; the keyboard reaches the dictionary and
    calculator only while in use; `canvas.dev` is `image-rendering: pixelated`.
+
+## objects-in-hand — 使用 focus view, fixed (2026-11-03)
+
+The earlier focus-view rule ("screen ≥ 34 % of the viewport width") was wrong: the chick's screen is
+~40 % of its shell, so the constraint forced the shell off-stage, and the canvas's own px width
+compounded with the face's scale. Replaced for every object in 使用. Kiro's area only; `content/`
+untouched. `npx tsc --noEmit` clean; full `npx vitest run` → 91 files / 1607 tests green.
+
+- `src/world/room/held.ts`: removed `FOCUS_SCREEN_FRAC` / `FOCUS_OBJECT_FRAC` / `SCREENLESS` /
+  `focusScreenScale` / `focusScreenWidth` and the `data-focus-w` attribute and the
+  `focus-screen` / `focus-obj` split. Added `FOCUS_MAX = 0.88`, `faceBoxWidth()` (= `HELD_W`), and
+  `focusBackingScale` / `focusBackingWidth` — the largest integer multiple of the channel (× 2ⁿ) that
+  is ≤ the screen's drawn size (bounded by `screenRect.w × 0.88 × STAGE_W`, deterministic). `screen()`
+  now, in 使用, sizes the canvas as a **fraction of the face** (content's `screen` rect `l/t/w/h` in %,
+  or a 40 % fallback box), never its own px width, so the two scales no longer compound; its backing
+  resolution is `channel × 2ⁿ × focusBackingScale`, `image-rendering: pixelated`. `object()` adds a
+  single `focus` class in 使用 (no screen/screenless split).
+- `src/world/room/room.css`: replaced the compounding `scale:3.2` / `focus-obj` rules with a
+  contain-to-fit: `.held.obj.using{width:auto}` and `.held.obj.using .face.front > img{max-width:
+  calc(1600px * .88);max-height:calc(900px * .88);width:auto;height:auto}` — the whole front face is
+  contained within 88 % of the fixed 1600×900 stage in both dimensions, aspect kept, so the shell top
+  and the bottom key row stay on-stage and every key (a fraction of the face) is inside. The 500 ms
+  entry is the `.breathe` `m-focus-in` keyframe (`--m-use`). The dim + blur (`.held-layer.focus >
+  .held-dim`), the keyboard input, and Esc → holding are unchanged.
+- `tests/objects-in-hand.test.ts`: replaced the "≥ 34 %" test with: the front image is capped to 88 %
+  of the stage in both dimensions (CSS), `FOCUS_MAX` is 0.88 (1408 × 792 of the stage), every key
+  hotspot of every object lies within the face [0,1], and `focusBackingWidth` is an integer multiple
+  of the channel width at every level; plus a new test that the 使用 canvas is sized as a % of the
+  face (not a px width) and carries no `data-focus-w`. The dim + blur test now checks the single
+  `focus` class.

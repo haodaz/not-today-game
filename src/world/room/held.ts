@@ -56,26 +56,36 @@ export function screenScaleFor(id: string): number {
   return screenScale(channelOf(id).w, rect ? HELD_W * rect.w : SCREEN_TARGET_PX);
 }
 
-// ——— the focus view (objects-in-hand "using an object is a focus view", 2026-11-03) ———
-// 使用 is a camera level, the same tier as 屏幕: the object's face fills the stage. A screen object's
-// screen spans ≥ FOCUS_SCREEN_FRAC of the stage width at an INTEGER canvas scale (pixelated); an
-// object without a screen fills ~FOCUS_OBJECT_FRAC of the stage height. Stage is STAGE_W × STAGE_H.
+// ——— the focus view (objects-in-hand "using an object is a focus view", 2026-11-03, fixed) ———
+// 使用 is a camera level, the same tier as 屏幕: the WHOLE front face fits inside the stage (≤ 88 %
+// of its width and height, centred), so every key is on-stage. The screen canvas keeps its position
+// and size as a fraction of the face (content's `screen` rect); only its backing resolution is
+// chosen — the largest integer multiple of the channel (× 2ⁿ) that is ≤ the screen's drawn size.
+// Stage is STAGE_W × STAGE_H.
 
-/** The screen objects' screen must span at least this fraction of the viewport width in 使用. */
-export const FOCUS_SCREEN_FRAC = 0.34;
-/** A screenless object fills about this fraction of the viewport height in 使用. */
-export const FOCUS_OBJECT_FRAC = 0.6;
-/** Objects whose face (not a screen) fills the stage in 使用. */
-export const SCREENLESS: readonly string[] = ["iccard", "textbook", "tape", "phone"];
+/** The front face fits within this fraction of the stage in 使用 (both dimensions). */
+export const FOCUS_MAX = 0.88;
 
-/** The integer canvas scale a screen object uses in 使用: its channel × 2ⁿ drawn so the screen ≥ 34 % wide. */
-export function focusScreenScale(id: string, level = 0, stageW = STAGE_W): number {
-  const channelW = channelOf(id).w * 2 ** level;
-  return Math.max(screenScaleFor(id), Math.ceil((FOCUS_SCREEN_FRAC * stageW) / channelW));
+/** The width of a held object's unscaled front-face box (room.css `.held.obj{width:HELD_W}`). */
+export const faceBoxWidth = (): number => HELD_W;
+
+/**
+ * The backing resolution multiple for a screen in 使用: the largest integer m with
+ * (channel × 2ⁿ) × m ≤ the screen's on-stage drawn width. The face is at most FOCUS_MAX of the stage
+ * width, so the screen's drawn width is at most screenRect.w × FOCUS_MAX × STAGE_W; using that bound
+ * keeps the choice deterministic (and `image-rendering: pixelated` keeps it crisp either way).
+ */
+export function focusBackingScale(id: string, level = 0, stageW = STAGE_W): number {
+  const ch = channelOf(id);
+  const rect = handOf(id).screen;
+  const screenFrac = rect ? rect.w : 0.4; // a sensible default when content gives no rect
+  const drawnPx = screenFrac * FOCUS_MAX * stageW;
+  const channelPx = ch.w * 2 ** level;
+  return Math.max(1, Math.floor(drawnPx / channelPx));
 }
-/** The on-stage width (px) of a screen object's screen in 使用 (channel × level × integer scale). */
-export function focusScreenWidth(id: string, level = 0, stageW = STAGE_W): number {
-  return channelOf(id).w * 2 ** level * focusScreenScale(id, level, stageW);
+/** The canvas backing width (px) a screen uses in 使用: channel × 2ⁿ × the integer backing multiple. */
+export function focusBackingWidth(id: string, level = 0, stageW = STAGE_W): number {
+  return channelOf(id).w * 2 ** level * focusBackingScale(id, level, stageW);
 }
 
 /** What is held now: the phone, an object id, or nothing. */
@@ -123,10 +133,11 @@ function keyCap(id: string, img: string, k: KeySpot, down: boolean, live: boolea
 }
 
 /**
- * The screen canvas. Its backing store is the channel × 2ⁿ, drawn at an integer scale and never
- * smoothed (`image-rendering: pixelated`). While only holding it is small, on the face; in 使用 the
- * face fills the stage (CSS scales `.held.obj.using`) and the canvas is drawn at its focus scale so
- * the screen spans ≥ 34 % of the stage width — `data-focus-w` carries that on-stage width (px).
+ * The screen canvas, never smoothed (`image-rendering: pixelated`). While only holding it is a small
+ * whole-pixel size on the face. In 使用 the whole face fits the stage (CSS), and the canvas keeps its
+ * position AND size as a fraction of the face (content's `screen` rect) — it is not given its own
+ * pixel width, so the two scales never compound. Only its backing resolution is chosen: the largest
+ * integer multiple of the channel (× 2ⁿ) that is ≤ the screen's drawn size.
  */
 function screen(id: string, state: State, level: number, heldUp: boolean, using: boolean): SafeHtml | null {
   const upgraded = state.upgraded[id] === true;
@@ -135,15 +146,22 @@ function screen(id: string, state: State, level: number, heldUp: boolean, using:
   if (!ch && !(upgraded && id === "tape")) return null;
   const { w, h } = channelOf(id);
   const lvl = upgraded ? 0 : level;
-  const k = upgraded ? 1 : 2 ** level;
-  const s = using && ch ? focusScreenScale(id, lvl) : screenScaleFor(id);
   const rect = handOf(id).screen;
   const at = rect ? { cx: rect.l + rect.w / 2, cy: rect.t + rect.h / 2 } : (SCREEN_AT[id] ?? DEFAULT_SCREEN_AT);
-  // In 使用, whole square pixels at the focus scale: w × 2ⁿ × scale fills ≥ 34 % of the stage width.
-  const drawnW = using && ch ? w * 2 ** lvl * s : w * s;
-  const drawnH = using && ch ? h * 2 ** lvl * s : h * s;
-  const focusW = using && ch ? focusScreenWidth(id, lvl) : null;
-  return html`<canvas class="${cls("dev", upgraded && "hi", heldUp && !upgraded && "dream")}" data-screen="${id}"${focusW !== null ? raw(` data-focus-w="${focusW}"`) : null} width="${w * k}" height="${h * k}" style="left:${at.cx * 100}%;top:${at.cy * 100}%;width:${drawnW}px;height:${drawnH}px"></canvas>`;
+  // Holding: a whole-pixel size on the face. 使用: a fraction of the face (its content `screen` rect,
+  // or a sensible box when content gives none), so it scales with the face and never compounds.
+  const s = screenScaleFor(id);
+  const size =
+    using && ch
+      ? rect
+        ? `left:${at.cx * 100}%;top:${at.cy * 100}%;width:${pct(rect.w)};height:${pct(rect.h)}`
+        : `left:${at.cx * 100}%;top:${at.cy * 100}%;width:40%;height:auto;aspect-ratio:${w}/${h}`
+      : `left:${at.cx * 100}%;top:${at.cy * 100}%;width:${w * s}px;height:${h * s}px`;
+  // The backing store: channel × 2ⁿ while holding; in 使用 that × the integer backing multiple.
+  const k = upgraded ? 1 : 2 ** level;
+  const backW = using && ch && !upgraded ? focusBackingWidth(id, lvl) : w * k;
+  const backH = using && ch && !upgraded ? Math.round((backW * h) / w) : h * k;
+  return html`<canvas class="${cls("dev", upgraded && "hi", heldUp && !upgraded && "dream")}" data-screen="${id}" width="${backW}" height="${backH}" style="${size}"></canvas>`;
 }
 
 /** What only some objects have on their faces. */
@@ -199,10 +217,9 @@ function object(state: State, events: readonly GameEvent[], session: Session, id
   const { front, back } = extras(id, state, events, session, env, p);
   const open = id === "dictionary" ? (p as DictionaryState | null)?.open === true : id === "phone" ? (p as PhoneState | null)?.open === true : null;
   const attrs = raw(`${open === null ? "" : ` data-open="${open ? 1 : 0}"`}${using ? "" : ' data-action="obj-use"'}`);
-  // 使用 is a focus view (2026-11-03): the face fills the stage like 屏幕; a screenless object fills
-  // the height. The `.focus` class drives the fill; the stage behind dims to 70 % and blurs 6 px.
-  const focusClass = using ? (SCREENLESS.includes(id) ? "focus focus-obj" : "focus focus-screen") : false;
-  return html`<div class="${cls("held", "obj", upgraded && "upgraded", using && "using", focusClass)}" data-object="${id}" data-mode="${using ? "using" : "holding"}" data-face="${session.hand.face}"${attrs}><div class="breathe"><div class="turn"><div class="face front"><img src="${img}" alt="" draggable="false">${screen(id, state, env.level, heldUp, using)}${keys}${front}</div><div class="face back"><div class="back-art"><img src="/objects/${id}_back.png" alt="" draggable="false">${back}</div></div></div></div></div>`;
+  // 使用 is a focus view (2026-11-03, fixed): the whole front face fits inside the stage (≤ 88 % of
+  // both dimensions, centred; the `.focus` class drives the fit). The behind dims to 70 % and blurs.
+  return html`<div class="${cls("held", "obj", upgraded && "upgraded", using && "using", using && "focus")}" data-object="${id}" data-mode="${using ? "using" : "holding"}" data-face="${session.hand.face}"${attrs}><div class="breathe"><div class="turn"><div class="face front"><img src="${img}" alt="" draggable="false">${screen(id, state, env.level, heldUp, using)}${keys}${front}</div><div class="face back"><div class="back-art"><img src="/objects/${id}_back.png" alt="" draggable="false">${back}</div></div></div></div></div>`;
 }
 
 /** The held layer, or null when nothing is held. */
