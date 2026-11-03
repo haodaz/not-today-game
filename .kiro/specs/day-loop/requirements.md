@@ -102,3 +102,21 @@ Feedback after playing: there is no moment where the player knows the day's work
 
 ## Addition 2026-11-03 (author): the boss calls
 On some early days (content decides which; Claude will put it on day 2 or 3 and once more around day 8), the boss sends only 「在吗，通个话。」; the player's only reply is 「好的。」. Half an hour later (game clock +30 min, nothing else can be done meanwhile: the screen shows an incoming call) the call comes. Call UI: a voice-call panel (avatar, name, timer running to the call's length from content, e.g. 30:00 or 1:12:00, in compressed time, hang-up disabled until the end) and a text box under it that fills line by line: the first lines are the boss's words (transcript), later lines are the player's own summary (from content `call.lines`, each `{who: "boss"|"me", t}`). When the call ends night falls (the evening look starts) and a new required night item appears: the call's task, due 「明天早上」. Next day the delivered work gets no reply (content). Content shape: `days[].call: { at, lines[], task: { id, text, ... } }` (optional). Tests: the message → reply → 30-minute wait → call → nightfall → task chain; the call cannot be skipped; replay identical.
+
+## Correction 2026-11-03 (author + Claude's day-7 run): the call is an online meeting window on 屏幕, and it takes one minute
+
+Author: 「电话其实就是钉钉会议、Hangouts 或者 Teams 那种 online meeting / voice call」「在屏幕上发生」. Claude's headless day 7 (1:12:00): at 300 ms per call second the call lasts 21.6 real minutes with 离开 disabled; nobody waits that long.
+
+**Where**: the call is a window on the left screen of 屏幕, in front of the other windows (the workbench's own meeting, same light look as 工作台; one tone, no dark block). The ask stays as today (the boss's 「在吗，通个话」 in his chat, the one reply 「好的。」). The 30-minute wait is the meeting window in its ringing state: the boss's avatar, `call.incoming` (「邀请你加入语音通话」), three pulsing dots; nothing else on 屏幕 can be used meanwhile (as today). If the player is in the room when it rings, the ringing state shows when they come to 屏幕; the call does not start until they are there.
+
+**Connected look** (all words from strings; a missing string renders nothing):
+- Title bar: `call.title` (「语音通话」) · the boss's name · the timer counting up `00:00 → length`.
+- Stage: two tiles side by side. The boss's tile: avatar, name, a soft ring that pulses while one of his lines is the newest. The player's tile: a plain initial avatar, `call.you` (「你」), `call.camOff` (「摄像头已关闭」).
+- Toolbar under the stage: mic (on), camera (off, crossed), share screen (disabled), and `call.hangup` (「离开」, red), disabled until the call ends.
+- Captions panel on the right, header `call.captions` (「实时字幕」): the lines appear one by one; a boss line is 「老板：<words>」, a `me` line is the player's own summary in parentheses, grey (as today).
+
+**Duration**: whatever `length` says, the call takes **60 real seconds** (the dev `?fast=1`: 6 s). The timer runs from 00:00 to `length` over that minute; line i appears at i / n of the minute (as `linesShown` does now). When the minute is up, `callEnded` is appended as today and 离开 becomes the only way back (clicking it closes the window).
+
+Files: `src/world/desktop/call/view.ts`, `src/world/desktop/call/actions.ts` (the per-second ms becomes `60_000 / lengthSeconds`, fast 6_000), `src/world/desktop/desktop.css`, `src/world/desktop/controller.ts` / `shell.ts` only if the window needs to mount as a screen window; tests in `tests/boss-call.test.ts`.
+
+Tests: a 1:12:00 call and a 30:00 call both end after 60 000 ms (6 000 with fast); the connected render has the two tiles, the four toolbar buttons with 离开 disabled until the end, and the captions panel with the boss line prefixed and the `me` line in parentheses; the ringing state renders on 屏幕 only; strings missing → no text, no crash; replay identical.

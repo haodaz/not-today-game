@@ -64,6 +64,12 @@ function tryComplete(store: Store, it: Item): boolean {
     case "chat":
       store.appendEvent({ kind: "step", name: "chat:any", t: "23:45" });
       return true;
+    case "callEnded": {
+      // The boss's call: the one reply, then the call runs out.
+      store.appendEvent({ kind: "callAnswer" });
+      store.appendEvent({ kind: "callEnded" });
+      return true;
+    }
     case "reply": {
       // The first word the day's menu offers that recipient.
       const word = replyMenu(store.getState().day, e.recipient, store.getState()).find((m) => !m.gone)?.word;

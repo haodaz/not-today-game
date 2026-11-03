@@ -202,7 +202,7 @@
     {
       "id": "desk",
       "text": "看一眼桌子。",
-      "unlock": "done:reply",
+      "unlock": "done:task4",
       "done": "event:beat:desk",
       "required": true,
       "when": "night"
@@ -236,5 +236,59 @@
   "delivery": {
     "minMinutes": 2,
     "waitMinutes": 6
+  },
+  "call": {
+    "at": "17:52",
+    "length": "1:12:00",
+    "lines": [
+      {
+        "who": "boss",
+        "t": "00:00"
+      },
+      {
+        "who": "boss",
+        "t": "00:01"
+      },
+      {
+        "who": "boss",
+        "t": "00:03"
+      },
+      {
+        "who": "boss",
+        "t": "00:05"
+      },
+      {
+        "who": "me",
+        "t": "00:12"
+      },
+      {
+        "who": "me",
+        "t": "00:25"
+      },
+      {
+        "who": "me",
+        "t": "00:31"
+      },
+      {
+        "who": "me",
+        "t": "00:52"
+      },
+      {
+        "who": "me",
+        "t": "01:05"
+      },
+      {
+        "who": "me",
+        "t": "01:12"
+      }
+    ],
+    "task": {
+      "id": "task4",
+      "text": "对比一下。明天早上要。",
+      "unlock": "start",
+      "done": "flag:task_d7_4",
+      "required": true,
+      "when": "night"
+    }
   }
 }

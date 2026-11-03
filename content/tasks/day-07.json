@@ -245,6 +245,93 @@
           "letItDoUnchecked": 1
         }
       }
+    },
+    {
+      "id": "task4",
+      "title": "对比一下。明天早上要。",
+      "app": "docs",
+      "done": "task_d7_4",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "左边一栏写「我们」，右边一栏写「它」。一格一格对。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你对了十一行。七行写着「不一样」。"
+          },
+          {
+            "k": "narration",
+            "t": "你把「不一样」改成「方向不同」，又改回来。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d7_4"
+          ],
+          "san": 1
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "它出了一张表。你问它第 9 行是哪来的。"
+          }
+        ],
+        "kuro": [
+          "Row nine is the one he will read. The other eleven are for you."
+        ],
+        "effects": {
+          "flags": [
+            "task_d7_4"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "三秒。一张很漂亮的对比表，两栏，十二行，一列绿色的勾。"
+          },
+          {
+            "k": "narration",
+            "t": "第 9 行：「我方优势：已全部实现」。"
+          }
+        ],
+        "kuro": [
+          "Done. He will like row nine."
+        ],
+        "effects": {
+          "flags": [
+            "task_d7_4"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
     }
   ]
 }
