@@ -1,0 +1,57 @@
+{
+  "_note": "文件 app（desktop-ui addition 2026-11-02 文件/回收站/工作联动）。日期按故事年 2028，第 1 天 = 2028-10-16。`from` = 哪天起出现；`onOpen` = 点开时对话框的一句（每天一次）；`body` = 打开后显示什么：doc 指 content/tasks 里的文档对象，html 指 public/docs 下的页面，text 是直接的几行。回收站 `bin[]` 同形，多一个 `since`（哪天进来的）和 `gone`（哪天起回收站已清空）。",
+  "folders": [
+    {
+      "id": "contracts",
+      "name": "合同",
+      "files": [
+        { "id": "c-v01", "name": "合作协议-v01.docx", "date": "2027-11-03", "from": 1, "onOpen": { "k": "inner", "t": "你不太想点开看了。看太多遍，都不太认识字了。" } },
+        { "id": "c-v02", "name": "合作协议-v02.docx", "date": "2027-11-09", "from": 1, "onOpen": { "k": "inner", "t": "第二版。改了三个字，老板说「感觉对了」。" } },
+        { "id": "c-v03", "name": "合作协议-v03.docx", "date": "2027-11-21", "from": 1, "onOpen": { "k": "inner", "t": "这版是在火车上改的。" } },
+        { "id": "c-v04", "name": "合作协议-v04.docx", "date": "2027-12-02", "from": 1, "onOpen": { "k": "inner", "t": "不认识字了。" } },
+        { "id": "c-v05", "name": "合作协议-v05.docx", "date": "2027-12-15", "from": 1, "onOpen": { "k": "inner", "t": "你不太想点开看了。" } },
+        { "id": "c-v06", "name": "合作协议-v06.docx", "date": "2028-01-08", "from": 1, "onOpen": { "k": "narration", "t": "第六版加了第六条。那一条到现在还在。" } },
+        { "id": "c-v07", "name": "合作协议-v07.docx", "date": "2028-01-20", "from": 1 },
+        { "id": "c-v08", "name": "合作协议-v08.docx", "date": "2028-02-11", "from": 1 },
+        { "id": "c-v09", "name": "合作协议-v09.docx", "date": "2028-03-01", "from": 1, "onOpen": { "k": "inner", "t": "春节后第一版。甲方换了个对接人，字全重来。" } },
+        { "id": "c-v10", "name": "合作协议-v10.docx", "date": "2028-03-19", "from": 1 },
+        { "id": "c-v11", "name": "合作协议-v11.docx", "date": "2028-04-07", "from": 1, "onOpen": { "k": "narration", "t": "第十一版加了第十一条。谁加的，文件属性里写着你的名字。你不记得。" } },
+        { "id": "c-v12", "name": "合作协议-v12.docx", "date": "2028-05-22", "from": 1 },
+        { "id": "c-v13", "name": "合作协议-v13.docx", "date": "2028-06-30", "from": 1 },
+        { "id": "c-v14", "name": "合作协议-v14.docx", "date": "2028-08-14", "from": 1 },
+        { "id": "c-v15", "name": "合作协议-v15.docx", "date": "2028-09-09", "from": 1, "onOpen": { "k": "inner", "t": "上个月的。已经像别人写的了。" } },
+        { "id": "c-v16", "name": "合作协议-v16.docx", "date": "2028-10-02", "from": 1, "body": { "doc": "day-01:task1:left" } },
+        { "id": "c-v17", "name": "合作协议-v17.docx", "date": "2028-10-15", "from": 1, "body": { "doc": "day-01:task1:right" }, "onOpen": { "k": "inner", "t": "昨天的。第十一条和第六条打架，今天要过。" } },
+        { "id": "c-v18", "name": "合作协议-v18.docx", "date": "2028-10-18", "from": 3, "body": { "doc": "day-03:task1" }, "onOpen": { "k": "narration", "t": "凌晨两点四十存的。不是你。" } },
+        { "id": "c-merged", "name": "合作协议-合并版-20281016.docx", "date": "2028-10-16", "from": 1, "afterFlag": "task_merge_done", "onOpen": { "k": "inner", "t": "合并版。名字是按日期起的，很整齐。" } }
+      ]
+    },
+    {
+      "id": "downloads",
+      "name": "下载",
+      "files": [
+        { "id": "d-vivi-plan1", "name": "洞察引擎_方案_v0.1.html", "date": "2028-10-19", "from": 4, "afterOpen": "vivi-plan-1", "body": { "html": "/docs/vivi/plan-1-insight.html" }, "onOpen": { "k": "inner", "t": "……这不就是写在皮儿上的硬编码吗。真能不能做你是一个字也没想啊。" } },
+        { "id": "d-vivi-prd", "name": "洞察引擎_PRD_功能圣经.md", "date": "2028-10-20", "from": 5, "afterOpen": "vivi-prd", "body": { "html": "/docs/vivi/prd-insight-engine.html" }, "onOpen": { "k": "inner", "t": "五大模块，列了六个。" } },
+        { "id": "d-vivi-plan2", "name": "EVO_自演化引擎_v2.0.html", "date": "2028-10-21", "from": 6, "afterOpen": "vivi-plan-2", "body": { "html": "/docs/vivi/plan-2-evolve.html" }, "onOpen": { "k": "inner", "t": "……克总，要不你进这个页面泡一泡吧。" } },
+        { "id": "d-upgrade-notice", "name": "升级通知.pdf", "date": "2028-10-28", "from": 13, "body": { "text": ["全员：", "系统将于本周完成升级。", "为与桌面上的某些东西保持一致，老东西请先收一收。", "——新世界"] }, "onOpen": { "k": "inner", "t": "收一收。它说的是桌上这几样。" } }
+      ]
+    },
+    {
+      "id": "exports",
+      "name": "导出",
+      "files": [
+        { "id": "e-receivable", "name": "应收表_20281016.xlsx", "date": "2028-10-16", "from": 1, "afterFlag": "task_receivable_done", "body": { "doc": "day-01:task2" }, "onOpen": { "k": "inner", "t": "31。那一格是你改的。" } },
+        { "id": "e-six-pdf", "name": "产品方案_六份.zip", "date": "2028-10-22", "from": 7, "onOpen": { "k": "narration", "t": "六份 PDF。第二天老板说先不发。" } },
+        { "id": "e-export-fn", "name": "export.js", "date": "2028-10-19", "from": 4, "afterFlag": "task_d4_2", "onOpen": { "k": "inner", "t": "两遍正则。你删了一遍。" } }
+      ]
+    }
+  ],
+  "bin": [
+    { "id": "b-clause11-old", "name": "第十一条（旧）.txt", "since": 1, "afterFlag": "task_v17_done", "body": { "text": ["十一、乙方在任何情况下不得暂停服务。"] }, "onOpen": { "k": "inner", "t": "原来那条。「任何情况下」。" } },
+        { "id": "b-premerge", "name": "合作协议-合并前.docx", "since": 1, "afterFlag": "task_merge_done", "onOpen": { "k": "narration", "t": "合并前的。两份各执一词的时候。" } },
+    { "id": "b-xiaozhang", "name": "小张-最后一条.txt", "since": 13, "body": { "text": ["老大，我走了。你别进去。"] }, "onOpen": { "k": "inner", "t": "他说别进去。进哪儿。" } },
+    { "id": "b-fields", "name": "字段名-v1.json", "since": 2, "afterFlag": "task_d2_2", "body": { "text": ["{ \"status\": [\"todo\", \"doing\", \"done\"] }"] }, "onOpen": { "k": "inner", "t": "三个状态。它改成了五个，你改回来了。" } }
+  ],
+  "gone": 16,
+  "goneLine": { "k": "narration", "t": "回收站是空的。你没有清过。" }
+}

@@ -16,11 +16,11 @@
     }
   },
   "cup": {
-    "l": 1060,
-    "t": 640,
-    "w": 200,
-    "h": 200,
-    "_note": "moved 2026-11-02: the closed laptop (decoration painted into desk_top.jpg) now takes the front-left corner"
+    "l": 1070,
+    "t": 560,
+    "w": 150,
+    "h": 150,
+    "_note": "on the desk surface, right of the mouse; moved again 2026-11-02 after the author saw it floating over the drawer front"
   },
   "phone": {
     "l": 1230,

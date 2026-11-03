@@ -30,7 +30,7 @@
   "delivery.door.chain": "Open to the chain",
   "delivery.door.take": "Reach",
   "delivery.bag.onDesk": "The bag is on the desk corner",
-  "shell.brand": "Future Intelligence · Workbench",
+  "shell.brand": "New World",
   "shell.day": "Day {day}",
   "dock.msgs": "Messages",
   "dock.workbench": "Workbench",
@@ -293,5 +293,6 @@
   "kuro.unreadable": "I can't read that line myself.",
   "wb.merge": "Merge",
   "wb.keep": "Keep both",
-  "vivi.lock": "You have to open it and look, or she will never let it go."
+  "vivi.lock": "You have to open it and look, or she will never let it go.",
+  "wb.brand": "Future Intelligence · Workbench"
 }
