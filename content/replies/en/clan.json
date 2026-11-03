@@ -6,7 +6,14 @@
         {
           "t": "07:48",
           "text": "Little Aunt：[link] one cup of this every morning, clean arteries for twenty years",
-          "kind": "private"
+          "kind": "private",
+          "card": {
+            "type": "article",
+            "account": "Healthy Living Daily",
+            "title": "One cup of this every morning, clean arteries for twenty years",
+            "digest": "Doctors drink it. Share with your family!",
+            "cover": "/msgs/covers/health.jpg"
+          }
         },
         {
           "t": "08:13",
@@ -88,12 +95,24 @@
         {
           "t": "06:58",
           "text": "Little Aunt：[link] vote for our Dot, number 17, three votes a day",
-          "kind": "private"
+          "kind": "private",
+          "card": {
+            "type": "mini",
+            "brand": "Vote Helper",
+            "title": "Cutest Baby Contest · No. 17 Dot",
+            "cover": "/msgs/covers/vote.jpg"
+          }
         },
         {
           "t": "06:59",
           "text": "Little Aunt：[link] vote for our Dot, number 17, three votes a day",
-          "kind": "private"
+          "kind": "private",
+          "card": {
+            "type": "mini",
+            "brand": "Vote Helper",
+            "title": "Cutest Baby Contest · No. 17 Dot",
+            "cover": "/msgs/covers/vote.jpg"
+          }
         },
         {
           "t": "09:30",
@@ -103,7 +122,12 @@
         {
           "t": "09:31",
           "text": "Cousin Jie：[photo] certificate",
-          "kind": "private"
+          "kind": "private",
+          "card": {
+            "type": "image",
+            "src": "/msgs/covers/award.jpg",
+            "alt": "certificate"
+          }
         },
         {
           "t": "09:33",
@@ -164,7 +188,13 @@
         {
           "t": "07:20",
           "text": "Little Aunt：[link] one more cut, I'm 0.01 away, help your aunt",
-          "kind": "private"
+          "kind": "private",
+          "card": {
+            "type": "mini",
+            "brand": "Group Buy",
+            "title": "Only 0.01 to go! Give me a cut",
+            "cover": "/msgs/covers/cut.jpg"
+          }
         },
         {
           "t": "10:02",
@@ -240,7 +270,12 @@
         {
           "t": "08:02",
           "text": "Uncle Two：[photo] Wei's desk, it has a window",
-          "kind": "private"
+          "kind": "private",
+          "card": {
+            "type": "image",
+            "src": "/msgs/covers/desk-window.jpg",
+            "alt": "Wei's desk, it has a window"
+          }
         },
         {
           "t": "08:04",
@@ -324,7 +359,14 @@
         {
           "t": "09:41",
           "text": "Cousin Bo：[link] Future Intelligence completes AI-native reform, all staff work from home",
-          "kind": "private"
+          "kind": "private",
+          "card": {
+            "type": "article",
+            "account": "Tech Business Watch",
+            "title": "Future Intelligence completes AI-native reform; all staff now work from home",
+            "digest": "\"The office is no longer necessary,\" says the founder.",
+            "cover": "/msgs/covers/news.jpg"
+          }
         },
         {
           "t": "09:41",
@@ -344,7 +386,14 @@
         {
           "t": "09:46",
           "text": "Little Aunt：[link] ten must-haves for working from home",
-          "kind": "private"
+          "kind": "private",
+          "card": {
+            "type": "article",
+            "account": "Good Finds",
+            "title": "Ten must-haves for working from home, number 3 is a must",
+            "digest": "Working from home deserves a little ceremony.",
+            "cover": "/msgs/covers/wfh.jpg"
+          }
         }
       ],
       "fine": {
@@ -425,7 +474,14 @@
         {
           "t": "07:31",
           "text": "Little Aunt：[link] eat this on an empty stomach, better than medicine",
-          "kind": "private"
+          "kind": "private",
+          "card": {
+            "type": "article",
+            "account": "Healthy Living Daily",
+            "title": "Eat this on an empty stomach, better than medicine",
+            "digest": "Most people never knew. Eat it right and nothing beats it.",
+            "cover": "/msgs/covers/health.jpg"
+          }
         },
         {
           "t": "12:15",
@@ -445,7 +501,12 @@
         {
           "t": "12:18",
           "text": "Cousin Jie：[photo] certificate",
-          "kind": "private"
+          "kind": "private",
+          "card": {
+            "type": "image",
+            "src": "/msgs/covers/certificate.jpg",
+            "alt": "certificate"
+          }
         }
       ],
       "fine": {
@@ -528,7 +589,14 @@
         {
           "t": "07:31",
           "text": "Little Aunt：[link] eat this on an empty stomach, better than medicine",
-          "kind": "odd"
+          "kind": "odd",
+          "card": {
+            "type": "article",
+            "account": "Healthy Living Daily",
+            "title": "Eat this on an empty stomach, better than medicine",
+            "digest": "Most people never knew. Eat it right and nothing beats it.",
+            "cover": "/msgs/covers/health.jpg"
+          }
         },
         {
           "t": "08:50",
@@ -628,7 +696,12 @@
         {
           "t": "09:12",
           "text": "Cousin Bo：[photo] mid-year bonus, a projector",
-          "kind": "private"
+          "kind": "private",
+          "card": {
+            "type": "image",
+            "src": "/msgs/covers/projector.jpg",
+            "alt": "mid-year bonus, a projector"
+          }
         },
         {
           "t": "09:13",
@@ -732,7 +805,14 @@
         {
           "t": "10:08",
           "text": "Little Aunt：[link] five things you must do after losing your job",
-          "kind": "private"
+          "kind": "private",
+          "card": {
+            "type": "article",
+            "account": "Career Boost",
+            "title": "Five things you must do after losing your job",
+            "digest": "First: do not panic.",
+            "cover": "/msgs/covers/job.jpg"
+          }
         },
         {
           "t": "10:09",
@@ -812,7 +892,14 @@
         {
           "t": "07:48",
           "text": "Little Aunt：[link] one cup of this every morning, clean arteries for twenty years",
-          "kind": "odd"
+          "kind": "odd",
+          "card": {
+            "type": "article",
+            "account": "Healthy Living Daily",
+            "title": "One cup of this every morning, clean arteries for twenty years",
+            "digest": "Doctors drink it. Share with your family!",
+            "cover": "/msgs/covers/health.jpg"
+          }
         },
         {
           "t": "08:13",
@@ -1074,7 +1161,12 @@
         {
           "t": "15:12",
           "text": "Cousin Bo：[link] a post from 1997",
-          "kind": "odd"
+          "kind": "odd",
+          "card": {
+            "type": "link",
+            "title": "A post from 1997",
+            "site": "old forum archive"
+          }
         },
         {
           "t": "15:12",
@@ -1588,7 +1680,12 @@
         {
           "t": "08:00",
           "text": "Little Aunt：[link] All well.",
-          "kind": "odd"
+          "kind": "odd",
+          "card": {
+            "type": "link",
+            "title": "All well.",
+            "site": ""
+          }
         }
       ],
       "fine": {

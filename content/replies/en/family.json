@@ -66,7 +66,12 @@
         {
           "t": "20:00",
           "text": "[photo] the cat downstairs",
-          "kind": "private"
+          "kind": "private",
+          "card": {
+            "type": "image",
+            "src": "/msgs/covers/cat.jpg",
+            "alt": "the cat downstairs"
+          }
         }
       ],
       "eaten": {
@@ -911,6 +916,11 @@
             "flags": [
               "family_1997_post"
             ]
+          },
+          "card": {
+            "type": "link",
+            "title": "A post from 1997",
+            "site": "old forum archive"
           }
         },
         {
@@ -921,7 +931,12 @@
         {
           "t": "15:30",
           "text": "father：[link] a post from 1997",
-          "kind": "private"
+          "kind": "private",
+          "card": {
+            "type": "link",
+            "title": "A post from 1997",
+            "site": "old forum archive"
+          }
         },
         {
           "t": "15:30",

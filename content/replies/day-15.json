@@ -110,18 +110,33 @@
         {
           "t": "09:30",
           "text": "[卡片] 一张风景",
-          "kind": "private"
+          "kind": "private",
+          "card": {
+            "type": "image",
+            "src": "/msgs/covers/landscape.jpg",
+            "alt": "一张风景"
+          }
         },
         {
           "t": "09:30",
           "text": "[卡片] 一张风景",
-          "kind": "private"
+          "kind": "private",
+          "card": {
+            "type": "image",
+            "src": "/msgs/covers/landscape.jpg",
+            "alt": "一张风景"
+          }
         },
         {
           "t": "09:31",
           "text": "[卡片] 一张风景",
           "kind": "private",
-          "note": "三张一样的风景"
+          "note": "三张一样的风景",
+          "card": {
+            "type": "image",
+            "src": "/msgs/covers/landscape.jpg",
+            "alt": "一张风景"
+          }
         }
       ],
       "fine": {
@@ -205,7 +220,12 @@
         {
           "t": "15:00",
           "text": "member：[图片] 一只凤凰",
-          "kind": "odd"
+          "kind": "odd",
+          "card": {
+            "type": "image",
+            "src": "/msgs/covers/phoenix.jpg",
+            "alt": "一只凤凰"
+          }
         }
       ],
       "fine": {

@@ -90,7 +90,14 @@
         {
           "t": "09:30",
           "text": "[卡片] 新人方案 · 转发",
-          "kind": "work"
+          "kind": "work",
+          "card": {
+            "type": "file",
+            "name": "方案 v1（新人）.pdf",
+            "size": "2.3 MB",
+            "ext": "pdf"
+          },
+          "forwarded": true
         }
       ],
       "fine": {
@@ -140,7 +147,13 @@
         {
           "t": "09:30",
           "text": "新人：[文档] 方案 v1，请大家指正",
-          "kind": "work"
+          "kind": "work",
+          "card": {
+            "type": "file",
+            "name": "方案 v1.pdf",
+            "size": "2.3 MB",
+            "ext": "pdf"
+          }
         },
         {
           "t": "09:31",

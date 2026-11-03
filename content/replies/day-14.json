@@ -124,7 +124,12 @@
           "t": "09:30",
           "text": "[卡片] 一张风景",
           "kind": "private",
-          "note": "第一次不是工作卡片"
+          "note": "第一次不是工作卡片",
+          "card": {
+            "type": "image",
+            "src": "/msgs/covers/landscape.jpg",
+            "alt": "一张风景"
+          }
         }
       ],
       "fine": {

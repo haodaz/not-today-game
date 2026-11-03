@@ -75,7 +75,15 @@
         {
           "t": "08:40",
           "text": "[卡片] 竞品 A 的叙事线 · 转发",
-          "kind": "work"
+          "kind": "work",
+          "card": {
+            "type": "article",
+            "account": "增长笔记",
+            "title": "竞品 A 是怎么讲故事的：三页纸拿下 A 轮",
+            "digest": "先讲痛点，再讲数据，最后只放一个数字。",
+            "cover": "/msgs/covers/chart.jpg"
+          },
+          "forwarded": true
         }
       ],
       "fine": {

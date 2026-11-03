@@ -120,7 +120,12 @@
         {
           "t": "09:30",
           "text": "[卡片] 一张风景",
-          "kind": "private"
+          "kind": "private",
+          "card": {
+            "type": "image",
+            "src": "/msgs/covers/landscape.jpg",
+            "alt": "一张风景"
+          }
         }
       ],
       "fine": {

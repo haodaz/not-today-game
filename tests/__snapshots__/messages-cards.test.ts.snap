@@ -11,8 +11,8 @@ exports[`each type renders its own markup in both apps > snapshot: every type in
     "wx": "<div class="sc sc-file wx"><div class="c-file"><span class="fico x-pdf" aria-hidden="true">PDF</span><div class="c-text"><div class="c-title one">合同终稿.pdf</div><div class="c-size">1.2 MB</div></div></div></div>",
   },
   "history": {
-    "ding": "<div class="sc sc-history ding"><div class="c-title">群聊的聊天记录</div><div class="h-lines"><div class="h-line">大姨：吃了吗</div><div class="h-line">二舅：在忙</div><div class="h-line">小姑：回家看看</div><div class="h-line">表弟：好的</div></div><div class="h-rule"></div></div>",
-    "wx": "<div class="sc sc-history wx"><div class="c-title">群聊的聊天记录</div><div class="h-lines"><div class="h-line">大姨：吃了吗</div><div class="h-line">二舅：在忙</div><div class="h-line">小姑：回家看看</div><div class="h-line">表弟：好的</div></div><div class="h-rule"></div></div>",
+    "ding": "<div class="sc sc-history ding"><div class="c-title">群聊的聊天记录</div><div class="h-lines"><div class="h-line">大姨：吃了吗</div><div class="h-line">二舅：在忙</div><div class="h-line">小姑：回家看看</div><div class="h-line">表弟：好的</div></div><div class="h-rule"></div><div class="h-foot">聊天记录</div></div>",
+    "wx": "<div class="sc sc-history wx"><div class="c-title">群聊的聊天记录</div><div class="h-lines"><div class="h-line">大姨：吃了吗</div><div class="h-line">二舅：在忙</div><div class="h-line">小姑：回家看看</div><div class="h-line">表弟：好的</div></div><div class="h-rule"></div><div class="h-foot">聊天记录</div></div>",
   },
   "image": {
     "ding": "<div class="sc sc-image ding"><img class="c-image" src="/msgs/photo.png" alt="一张照片" draggable="false"></div>",

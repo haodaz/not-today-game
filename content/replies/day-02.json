@@ -70,12 +70,24 @@
         {
           "t": "08:50",
           "text": "[卡片] 叙事线 · 样式参考",
-          "kind": "work"
+          "kind": "work",
+          "card": {
+            "type": "article",
+            "account": "PPT 研究所",
+            "title": "投资人最爱的 10 种叙事页，第 7 种最狠",
+            "digest": "一页一个数字，留白比内容重要。",
+            "cover": "/msgs/covers/deck.jpg"
+          }
         },
         {
           "t": "08:50",
           "text": "[卡片] 叙事线 · 来源",
-          "kind": "work"
+          "kind": "work",
+          "card": {
+            "type": "link",
+            "title": "某某资本 · 2028 年行业观察（节选）",
+            "site": "research.example.cn"
+          }
         }
       ],
       "fine": {

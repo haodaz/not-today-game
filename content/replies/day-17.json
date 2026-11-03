@@ -106,7 +106,12 @@
         {
           "t": "09:30",
           "text": "[卡片] 一张白",
-          "kind": "odd"
+          "kind": "odd",
+          "card": {
+            "type": "image",
+            "src": "/msgs/covers/white.jpg",
+            "alt": "一张白"
+          }
         }
       ],
       "fine": {

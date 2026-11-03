@@ -75,7 +75,14 @@
         {
           "t": "09:30",
           "text": "[卡片] 导出规范 · 转发",
-          "kind": "work"
+          "kind": "work",
+          "card": {
+            "type": "file",
+            "name": "导出规范.docx",
+            "size": "186 KB",
+            "ext": "doc"
+          },
+          "forwarded": true
         }
       ],
       "fine": {

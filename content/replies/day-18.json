@@ -98,7 +98,13 @@
         {
           "t": "09:30",
           "text": "[卡片] 寄件单 · 模板",
-          "kind": "work"
+          "kind": "work",
+          "card": {
+            "type": "file",
+            "name": "寄件单.pdf",
+            "size": "41 KB",
+            "ext": "pdf"
+          }
         }
       ],
       "fine": {

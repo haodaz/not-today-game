@@ -111,7 +111,13 @@
         {
           "t": "09:30",
           "text": "[卡片] 对账 · 模板",
-          "kind": "work"
+          "kind": "work",
+          "card": {
+            "type": "file",
+            "name": "对账模板.xlsx",
+            "size": "64 KB",
+            "ext": "xls"
+          }
         }
       ],
       "fine": {

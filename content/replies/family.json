@@ -66,7 +66,12 @@
         {
           "t": "20:00",
           "text": "[图片] 楼下的猫",
-          "kind": "private"
+          "kind": "private",
+          "card": {
+            "type": "image",
+            "src": "/msgs/covers/cat.jpg",
+            "alt": "楼下的猫"
+          }
         }
       ],
       "eaten": {
@@ -911,6 +916,11 @@
             "flags": [
               "family_1997_post"
             ]
+          },
+          "card": {
+            "type": "link",
+            "title": "1997 年的一个帖子",
+            "site": "旧论坛存档"
           }
         },
         {
@@ -921,7 +931,12 @@
         {
           "t": "15:30",
           "text": "father：[链接] 1997 年的一个帖子",
-          "kind": "private"
+          "kind": "private",
+          "card": {
+            "type": "link",
+            "title": "1997 年的一个帖子",
+            "site": "旧论坛存档"
+          }
         },
         {
           "t": "15:30",

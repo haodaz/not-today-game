@@ -68,7 +68,13 @@
         {
           "t": "09:30",
           "text": "[卡片] v18 验收标准 · 模板",
-          "kind": "work"
+          "kind": "work",
+          "card": {
+            "type": "file",
+            "name": "v18 验收标准.docx",
+            "size": "92 KB",
+            "ext": "doc"
+          }
         }
       ],
       "fine": {
@@ -119,7 +125,12 @@
         {
           "t": "11:20",
           "text": "小张：[图片] 黄焖鸡",
-          "kind": "private"
+          "kind": "private",
+          "card": {
+            "type": "image",
+            "src": "/msgs/covers/food.jpg",
+            "alt": "黄焖鸡"
+          }
         }
       ],
       "fine": {
