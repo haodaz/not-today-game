@@ -24,10 +24,38 @@ export interface TaskPath {
   readonly effects: TaskEffects;
 }
 
+/** What a mark may be about (work spec "marking is the operation"): the conflict, Kuro's touch, or an odd thing. */
+export const MARK_KINDS = ["conflict", "kuro", "odd"] as const;
+export type MarkKind = (typeof MARK_KINDS)[number];
+
+/**
+ * A markable spot on a surface (work spec 2026-11-02). `clause` is the clause/line/row index; an
+ * optional `span` is a character range inside it (for the drag-a-span rule). `worth` is 1 or 2.
+ * `caught` is the line Kuro's window shows when a `kuro` spot is marked. `hidden` keeps a `kuro`
+ * spot out of 看一眼's diff (found only by reading, day 7+). `word` lists a word the dictionary
+ * glosses when held over it. Which catch flag a hit sets: the surface's `catchFlags` (doc), by index.
+ */
+export interface TaskMark {
+  readonly clause: number;
+  readonly span?: readonly [number, number];
+  readonly kind: MarkKind;
+  readonly worth: 1 | 2;
+  readonly caught?: string;
+  readonly hidden?: true;
+  readonly word?: string;
+}
+
+/** One unit Kuro hands over in 自己做 (work spec "two modes"): its text, and the fix if 「这里不对」 is said. */
+export interface TaskUnit {
+  readonly text: string;
+  readonly fix?: string;
+}
+
 /**
  * The document surface (work FR1, docs): two versions side by side, the two clauses that
  * contradict each other (0-based), the flags only a real read sets, and Kuro's touch when it does
- * the work (absent: it is simply right that time; FR2).
+ * the work (absent: it is simply right that time; FR2). `marks` (optional) lists the markable spots;
+ * `units` (optional) is what 自己做 hands over one at a time.
  */
 export interface TaskDoc {
   readonly left: readonly string[];
@@ -35,6 +63,8 @@ export interface TaskDoc {
   readonly conflict: readonly [number, number];
   readonly catchFlags: readonly string[];
   readonly kuroEdit?: { readonly clause: number; readonly text: string };
+  readonly marks?: readonly TaskMark[];
+  readonly units?: readonly TaskUnit[];
 }
 
 /** The ledger surface (work FR1, ledger): the rows, the columns, the one cell to change and its value, Kuro's tidy. */
@@ -44,6 +74,19 @@ export interface TaskLedger {
   readonly target: readonly [number, number];
   readonly value: string | number;
   readonly kuroTidy?: { readonly col: number; readonly how: string };
+  readonly marks?: readonly TaskMark[];
+  readonly units?: readonly TaskUnit[];
+}
+
+/**
+ * The code surface (work spec "code surface" 2026-11-02): a monospace file view with line numbers.
+ * Marks are by line; the same pen rules as the document.
+ */
+export interface TaskCode {
+  readonly lines: readonly string[];
+  readonly catchFlags: readonly string[];
+  readonly marks?: readonly TaskMark[];
+  readonly units?: readonly TaskUnit[];
 }
 
 export interface Task {
@@ -59,6 +102,7 @@ export interface Task {
   /** The working surface, when content has one for this task (else the plain thread). */
   readonly doc?: TaskDoc;
   readonly ledger?: TaskLedger;
+  readonly code?: TaskCode;
 }
 
 type Raw = Record<string, unknown>;
@@ -97,9 +141,54 @@ function path(v: unknown, w: string): TaskPath {
 const index = (v: unknown, n: number, w: string): number => (Number.isInteger(v) && (v as number) >= 0 && (v as number) < n ? (v as number) : fail(w, `must be an index from 0 to ${n - 1}`));
 const strings = (v: unknown, w: string): string[] => (Array.isArray(v) && v.length > 0 && v.every((x) => typeof x === "string" && x !== "") ? (v as string[]) : fail(w, "must be a non-empty list of non-empty strings"));
 
+/** One markable spot: `clause` is in 0..count-1; `span` (if any) is a character range; worth 1 or 2. */
+function mark(v: unknown, w: string, count: number, textOf: (clause: number) => string): TaskMark {
+  if (!isRecord(v)) fail(w, "a mark must be an object");
+  keys(v, ["clause", "span", "kind", "worth", "caught", "hidden", "word"], w);
+  const clause = index(v.clause, count, `${w}.clause`);
+  if (!(MARK_KINDS as readonly unknown[]).includes(v.kind)) fail(`${w}.kind`, `must be one of ${MARK_KINDS.join(", ")}`);
+  if (v.worth !== 1 && v.worth !== 2) fail(`${w}.worth`, "must be 1 or 2");
+  let span: readonly [number, number] | undefined;
+  if (v.span !== undefined) {
+    const len = textOf(clause).length;
+    if (!Array.isArray(v.span) || v.span.length !== 2) fail(`${w}.span`, "must be [start, end]");
+    const [a, b] = [v.span[0], v.span[1]];
+    if (!Number.isInteger(a) || !Number.isInteger(b) || a < 0 || b <= a || b > len) fail(`${w}.span`, `must be 0 <= start < end <= ${len}`);
+    span = [a as number, b as number];
+  }
+  if (v.hidden !== undefined && v.hidden !== true) fail(`${w}.hidden`, "must be true");
+  if (v.hidden && v.kind !== "kuro") fail(`${w}.hidden`, "only a kuro spot may be hidden");
+  return {
+    clause,
+    kind: v.kind as MarkKind,
+    worth: v.worth,
+    ...(span ? { span } : {}),
+    ...(v.caught !== undefined ? { caught: str(v.caught, `${w}.caught`) } : {}),
+    ...(v.hidden ? { hidden: true as const } : {}),
+    ...(v.word !== undefined ? { word: str(v.word, `${w}.word`) } : {}),
+  };
+}
+
+function marks(v: unknown, w: string, count: number, textOf: (clause: number) => string): TaskMark[] {
+  if (!Array.isArray(v)) fail(w, "must be a list");
+  return v.map((m, i) => mark(m, `${w}[${i}]`, count, textOf));
+}
+
+/** A unit is a string (shorthand for `{ text }`) or `{ text, fix? }`. */
+function unit(v: unknown, w: string): TaskUnit {
+  if (typeof v === "string") return v !== "" ? { text: v } : fail(w, "expected a non-empty string");
+  if (!isRecord(v)) fail(w, "a unit is a string or { text, fix? }");
+  keys(v, ["text", "fix"], w);
+  return { text: str(v.text, `${w}.text`), ...(v.fix !== undefined ? { fix: str(v.fix, `${w}.fix`) } : {}) };
+}
+function units(v: unknown, w: string): TaskUnit[] {
+  if (!Array.isArray(v) || v.length === 0) fail(w, "must be a non-empty list");
+  return v.map((u, i) => unit(u, `${w}[${i}]`));
+}
+
 function doc(v: unknown, w: string, selfFlags: readonly string[]): TaskDoc {
   if (!isRecord(v)) fail(w, "must be an object");
-  keys(v, ["left", "right", "conflict", "catchFlags", "kuroEdit"], w);
+  keys(v, ["left", "right", "conflict", "catchFlags", "kuroEdit", "marks", "units"], w);
   const left = strings(v.left, `${w}.left`);
   const right = strings(v.right, `${w}.right`);
   if (left.length !== right.length) fail(w, `left has ${left.length} clauses, right ${right.length}`);
@@ -114,7 +203,21 @@ function doc(v: unknown, w: string, selfFlags: readonly string[]): TaskDoc {
     keys(v.kuroEdit, ["clause", "text"], `${w}.kuroEdit`);
     kuroEdit = { clause: index(v.kuroEdit.clause, left.length, `${w}.kuroEdit.clause`), text: str(v.kuroEdit.text, `${w}.kuroEdit.text`) };
   }
-  return { left, right, conflict, catchFlags, ...(kuroEdit ? { kuroEdit } : {}) };
+  // Marks index into the right column (what the player audits); spans measure against its text.
+  const ms = v.marks !== undefined ? marks(v.marks, `${w}.marks`, right.length, (c) => right[c]!) : undefined;
+  const us = v.units !== undefined ? units(v.units, `${w}.units`) : undefined;
+  return { left, right, conflict, catchFlags, ...(kuroEdit ? { kuroEdit } : {}), ...(ms ? { marks: ms } : {}), ...(us ? { units: us } : {}) };
+}
+
+function code(v: unknown, w: string, selfFlags: readonly string[]): TaskCode {
+  if (!isRecord(v)) fail(w, "must be an object");
+  keys(v, ["lines", "catchFlags", "marks", "units"], w);
+  const lineList = strings(v.lines, `${w}.lines`);
+  const catchFlags = strings(v.catchFlags, `${w}.catchFlags`);
+  for (const f of catchFlags) if (!selfFlags.includes(f)) fail(`${w}.catchFlags`, `"${f}" is not set by the self path`);
+  const ms = v.marks !== undefined ? marks(v.marks, `${w}.marks`, lineList.length, (c) => lineList[c]!) : undefined;
+  const us = v.units !== undefined ? units(v.units, `${w}.units`) : undefined;
+  return { lines: lineList, catchFlags, ...(ms ? { marks: ms } : {}), ...(us ? { units: us } : {}) };
 }
 
 function ledger(v: unknown, w: string): TaskLedger {
@@ -141,7 +244,7 @@ function ledger(v: unknown, w: string): TaskLedger {
 
 function task(v: unknown, w: string): Task {
   if (!isRecord(v)) fail(w, "a task must be an object");
-  keys(v, ["id", "title", "app", "done", "start", ...PATHS, "doc", "ledger"], w);
+  keys(v, ["id", "title", "app", "done", "start", ...PATHS, "doc", "ledger", "code"], w);
   if (!(APPS as readonly unknown[]).includes(v.app)) fail(`${w}.app`, `must be one of ${APPS.join(", ")}`);
   if (!isRecord(v.start)) fail(`${w}.start`, "must be an object");
   keys(v.start, ["say", "options"], `${w}.start`);
@@ -163,12 +266,15 @@ function task(v: unknown, w: string): Task {
     look: path(v.look, `${w}.look`),
     let: path(v.let, `${w}.let`),
   };
+  const selfFlags = out.self.effects.flags ?? [];
   const surface = {
-    ...(v.doc !== undefined ? { doc: doc(v.doc, `${w}.doc`, out.self.effects.flags ?? []) } : {}),
+    ...(v.doc !== undefined ? { doc: doc(v.doc, `${w}.doc`, selfFlags) } : {}),
     ...(v.ledger !== undefined ? { ledger: ledger(v.ledger, `${w}.ledger`) } : {}),
+    ...(v.code !== undefined ? { code: code(v.code, `${w}.code`, selfFlags) } : {}),
   };
   if (surface.doc && out.app !== "docs") fail(`${w}.doc`, `a document belongs to app "docs", not "${out.app}"`);
   if (surface.ledger && out.app !== "ledger") fail(`${w}.ledger`, `a ledger belongs to app "ledger", not "${out.app}"`);
+  if (surface.code && out.app !== "code") fail(`${w}.code`, `a code file belongs to app "code", not "${out.app}"`);
   for (const m of PATHS) {
     if (!(out[m].effects.flags ?? []).includes(done)) fail(`${w}.${m}`, `effects do not set the done flag "${done}"`);
   }
@@ -204,6 +310,25 @@ export function parseTaskFile(raw: unknown, label: string): { day: number; tasks
 // Kuro's `kuro` lines are English constants (the voices rule), never twinned. First difference wins.
 const sameJson = (a: unknown, b: unknown): boolean => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
 
+/** Marks: only `caught` text differs; clause/span/kind/worth/hidden/word must match. */
+function localiseMarks(zh: readonly TaskMark[], en: readonly TaskMark[] | undefined, w: string): TaskMark[] {
+  if ((en?.length ?? 0) !== zh.length) fail(w, `mark count differs from the Chinese`);
+  return zh.map((z, i) => {
+    const e = en![i]!;
+    if (z.clause !== e.clause || z.kind !== e.kind || z.worth !== e.worth || z.hidden !== e.hidden || z.word !== e.word || !sameJson(z.span, e.span)) fail(`${w}[${i}]`, "a non-text mark field differs from the Chinese");
+    return z.caught !== undefined ? bilingual(z, { caught: e.caught }) : z;
+  });
+}
+/** Units: `text` and `fix` differ; the count must match. */
+function localiseUnits(zh: readonly TaskUnit[], en: readonly TaskUnit[] | undefined, w: string): TaskUnit[] {
+  if ((en?.length ?? 0) !== zh.length) fail(w, `unit count differs from the Chinese`);
+  return zh.map((z, i) => {
+    const e = en![i]!;
+    if ((z.fix === undefined) !== (e.fix === undefined)) fail(`${w}[${i}]`, "fix present in only one language");
+    return bilingual(z, { text: e.text, ...(z.fix !== undefined ? { fix: e.fix } : {}) });
+  });
+}
+
 function localisePath(zh: TaskPath, en: TaskPath, w: string): TaskPath {
   if (zh.say.length !== en.say.length) fail(`${w}.say`, `${en.say.length} lines, the Chinese has ${zh.say.length}`);
   if (!sameJson(zh.effects, en.effects)) fail(`${w}.effects`, "effects differ from the Chinese");
@@ -230,7 +355,13 @@ function localiseTask(zh: Task, en: Task, w: string): Task {
   if (zh.doc || en.doc) {
     if (!zh.doc || !en.doc) fail(`${w}.doc`, "doc present in only one language");
     if (zh.doc.left.length !== en.doc.left.length || !sameJson(zh.doc.conflict, en.doc.conflict) || !sameJson(zh.doc.catchFlags, en.doc.catchFlags)) fail(`${w}.doc`, "doc shape differs from the Chinese");
-    doc = bilingualValues(zh.doc, { left: en.doc.left, right: en.doc.right, ...(zh.doc.kuroEdit && en.doc.kuroEdit ? { kuroEdit: { clause: zh.doc.kuroEdit.clause, text: en.doc.kuroEdit.text } } : {}) });
+    doc = bilingualValues(zh.doc, {
+      left: en.doc.left,
+      right: en.doc.right,
+      ...(zh.doc.kuroEdit && en.doc.kuroEdit ? { kuroEdit: { clause: zh.doc.kuroEdit.clause, text: en.doc.kuroEdit.text } } : {}),
+      ...(zh.doc.marks ? { marks: localiseMarks(zh.doc.marks, en.doc.marks, `${w}.doc.marks`) } : {}),
+      ...(zh.doc.units ? { units: localiseUnits(zh.doc.units, en.doc.units, `${w}.doc.units`) } : {}),
+    });
   }
   let ledger = zh.ledger;
   if (zh.ledger || en.ledger) {
@@ -242,9 +373,21 @@ function localiseTask(zh: Task, en: Task, w: string): Task {
       rows: el.rows,
       value: el.value,
       ...(zl.kuroTidy && el.kuroTidy ? { kuroTidy: { col: zl.kuroTidy.col, how: el.kuroTidy.how } } : {}),
+      ...(zl.marks ? { marks: localiseMarks(zl.marks, el.marks, `${w}.ledger.marks`) } : {}),
+      ...(zl.units ? { units: localiseUnits(zl.units, el.units, `${w}.ledger.units`) } : {}),
     });
   }
-  const withText = { ...zh, start, ...paths, ...(doc ? { doc } : {}), ...(ledger ? { ledger } : {}) };
+  let codeSurface = zh.code;
+  if (zh.code || en.code) {
+    if (!zh.code || !en.code) fail(`${w}.code`, "code present in only one language");
+    if (zh.code.lines.length !== en.code.lines.length || !sameJson(zh.code.catchFlags, en.code.catchFlags)) fail(`${w}.code`, "code shape differs from the Chinese");
+    codeSurface = bilingualValues(zh.code, {
+      lines: en.code.lines,
+      ...(zh.code.marks ? { marks: localiseMarks(zh.code.marks, en.code.marks, `${w}.code.marks`) } : {}),
+      ...(zh.code.units ? { units: localiseUnits(zh.code.units, en.code.units, `${w}.code.units`) } : {}),
+    });
+  }
+  const withText = { ...zh, start, ...paths, ...(doc ? { doc } : {}), ...(ledger ? { ledger } : {}), ...(codeSurface ? { code: codeSurface } : {}) };
   return bilingual(withText, { title: en.title });
 }
 

@@ -130,6 +130,19 @@ export function parseFiles(input: unknown): FilesData {
 
 export const filesData: FilesData = parseFiles(raw);
 
+/**
+ * The html page a deliverable's `doc` id opens (desktop-ui 2026-11-02): the download file whose
+ * `afterOpen` equals the doc id names the page (its `body.html`). Null when no such file exists.
+ */
+export function deliverablePage(doc: string, data: FilesData = filesData): string | null {
+  for (const folder of data.folders) {
+    for (const file of folder.files) {
+      if (file.afterOpen === doc && file.body?.kind === "html") return file.body.src;
+    }
+  }
+  return null;
+}
+
 /** A file is listed on `day` when its `from` day has come, its flag is set and its Vivi doc is opened. */
 export function fileListed(f: FileEntry, day: number, flags: readonly string[], openedDocs: ReadonlySet<string>): boolean {
   if (day < f.from) return false;

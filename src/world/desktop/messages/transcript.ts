@@ -196,7 +196,13 @@ export function transcript(input: TranscriptInput): Bubble[] {
       if (item.effects?.flags?.includes(IN_INPUT_FLAG)) return; // shown in the input box, not received
       if (day === today && item.t > input.clock.time) return; // not here yet
       const bubbles: Bubble[] = [];
-      pushLine(bubbles, "them", input.conversation, item.t, item.text, input.conversation);
+      // A deliverable posts a clickable card carrying its doc id (desktop-ui 2026-11-02); other
+      // incoming lines use the bracket-form bodies.
+      if (item.kind === "deliverable" && item.doc) {
+        bubbles.push({ kind: "msg", side: "them", who: input.conversation, t: item.t, body: { type: "deliverable", raw: item.text, doc: item.doc }, labelKey: null });
+      } else {
+        pushLine(bubbles, "them", input.conversation, item.t, item.text, input.conversation);
+      }
       groups.push({ t: item.t, order: -1_000_000 + i, bubbles });
     });
     groups.push(...replyGroups(input, day));

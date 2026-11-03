@@ -19,6 +19,16 @@ export function footerDate(ms: number): string {
 const joinNonEmpty = (parts: readonly string[]): string => parts.filter((p) => p !== "").join(" · ");
 
 export function renderBrowser(ctx: AppContext): { body: SafeHtml; bar: SafeHtml; badge: number } {
+  // A Vivi deliverable page open in the frame (desktop-ui 2026-11-02): the html in an iframe, a URL
+  // bar showing its path, a × to go back to the news page.
+  const doc = ctx.session.browserDoc;
+  if (doc) {
+    return {
+      body: html`<div class="body" style="flex-direction:column"><section class="br-page doc" aria-label="${doc}"><div class="br-bar"><button type="button" class="br-close" data-action="br-doc-close" aria-label="${t("dialogue.close")}">×</button></div><iframe class="br-frame" src="${doc}" title="${doc}" sandbox></iframe></section></div>`,
+      bar: html`<div class="url">${doc}</div>`,
+      badge: 0,
+    };
+  }
   const page = browserPage(ctx.state.day);
   const bar = html`<div class="url">${page?.site ?? ""}</div>`;
   if (!page) return { body: html`<div class="body" style="flex-direction:column"><div class="site"></div></div>`, bar, badge: 0 };

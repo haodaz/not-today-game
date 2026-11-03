@@ -211,6 +211,8 @@ export interface Word {
   readonly w: string;
   readonly gloss: string;
   readonly extra: string | null;
+  /** The line shown when the Wenquxing is held over this word in a contract (work spec 2026-11-02 "the dictionary verifies"). */
+  readonly contractNote?: string;
 }
 export interface DictionaryTable {
   readonly extraFromDay: number;
@@ -229,11 +231,11 @@ export function parseDictionary(input: unknown): DictionaryTable {
   input.words.forEach((v, i) => {
     const w = `words[${i}]`;
     if (!isRecord(v)) fail(w, "must be an object");
-    keysOf(v, ["w", "gloss", "extra"], w, fail);
+    keysOf(v, ["w", "gloss", "extra", "contractNote"], w, fail);
     const word = str(v.w, `${w}.w`, fail);
     if (!WORD_RE.test(word)) fail(`${w}.w`, "must be 1–16 lower-case letters a–z");
     if (words.has(word)) fail(`${w}.w`, `duplicate word "${word}"`);
-    words.set(word, Object.freeze({ w: word, gloss: str(v.gloss, `${w}.gloss`, fail), extra: v.extra === undefined ? null : str(v.extra, `${w}.extra`, fail) }));
+    words.set(word, Object.freeze({ w: word, gloss: str(v.gloss, `${w}.gloss`, fail), extra: v.extra === undefined ? null : str(v.extra, `${w}.extra`, fail), ...(v.contractNote !== undefined ? { contractNote: str(v.contractNote, `${w}.contractNote`, fail) } : {}) }));
   });
   return Object.freeze({ extraFromDay, words });
 }

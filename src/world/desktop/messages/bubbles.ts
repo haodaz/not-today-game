@@ -7,7 +7,9 @@ export type Body =
   | { readonly type: "card"; readonly raw: string }
   | { readonly type: "attach"; readonly raw: string }
   /** A line the content writes as a system notice, e.g. [撤回了一条消息], [该账号已注销]. */
-  | { readonly type: "system"; readonly raw: string };
+  | { readonly type: "system"; readonly raw: string }
+  /** Vivi's deliverable (desktop-ui 2026-11-02): a clickable card that opens `doc` in the browser. */
+  | { readonly type: "deliverable"; readonly raw: string; readonly doc: string };
 
 // The English twins (content/replies/en/) write the same conventions in English: [voice] 46″,
 // (transcript) …, [card], [photo] / [link] / [document], [recalled a message].
@@ -51,6 +53,7 @@ export function previewOf(body: Body): string {
     case "card":
     case "attach":
     case "system":
+    case "deliverable":
       return body.raw;
   }
 }

@@ -53,6 +53,7 @@ import { workbenchActions } from "@world/desktop/workbench/actions";
 import { workActions } from "@world/desktop/workbench/work";
 import { renderFiles } from "@world/desktop/files/view";
 import { filesActions, openFilesApp } from "@world/desktop/files/actions";
+import { deliverablePage } from "@state/files";
 import { viviLock } from "@world/desktop/vivi";
 import { cancelCloser, startCloser } from "@world/late/closer";
 import { startJudgement } from "@world/dialogue/judge";
@@ -333,6 +334,26 @@ export const loopActions: Record<string, ActionHandler> = {
   "br-close"(ctx) {
     ctx.session.browserRead = null;
     cancelCloser(ctx.session);
+    ctx.rerender();
+  },
+  // Vivi's deliverable bubble (desktop-ui 2026-11-02): open its page in the browser frame and log
+  // `open file:<doc>`. Allowed while the Vivi lock is on — it is the way out of the lock.
+  "open-deliverable"(ctx, data) {
+    const doc = data.doc;
+    if (!doc) return;
+    const page = deliverablePage(doc);
+    // Switch to the browser on the shown monitor (its leftApp), open the page, log the open once.
+    ctx.session.leftApp = "browser";
+    ctx.session.focus = "left";
+    ctx.session.browserDoc = page;
+    if (!ctx.store.getEvents().some((e) => e.kind === "open" && e.target === `file:${doc}`)) {
+      ctx.store.appendEvent({ kind: "open", target: `file:${doc}`, t: ctx.session.clock.time });
+    }
+    settleSession(ctx.session);
+    ctx.rerender();
+  },
+  "br-doc-close"(ctx) {
+    ctx.session.browserDoc = null;
     ctx.rerender();
   },
   // 工作台's 文档: the document of the open work task; Kuro may close it.

@@ -156,6 +156,10 @@ export interface Session {
    * closed. Session only; opening a file is the `open` event.
    */
   filesApp: { readonly which: "files" | "trash"; readonly tab: string; readonly open: string | null } | null;
+  /** A Vivi deliverable page open in the browser app's frame (its /docs/ html path), or null (desktop-ui 2026-11-02). */
+  browserDoc: string | null;
+  /** The word the held dictionary is glossing over the document now (work spec item 7), or null. Session only. */
+  wbGloss: string | null;
   /** Files whose `onOpen` line has already played today (once a day), by `<day>:<id>`. Session only. */
   filesSaid: Set<string>;
 }
@@ -262,6 +266,8 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     dockSay: null,
     filesApp: null,
     filesSaid: new Set(),
+    browserDoc: null,
+    wbGloss: null,
   };
 }
 

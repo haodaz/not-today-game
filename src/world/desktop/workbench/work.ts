@@ -13,8 +13,10 @@
 // are strings (a missing one renders as nothing).
 import type { DayFile, Item } from "@state/days/table";
 import { dayFile } from "@state/days/table";
-import { taskByFlag, type Task } from "@state/days/tasks";
+import { taskByFlag, type Task, type TaskMark } from "@state/days/tasks";
 import type { TaskMode } from "@state/days/effects";
+import { canMark, eventMarks, hitWorth, isHidden, pensLeft, spotHit, type Mark } from "./marks";
+import { dictionaryTable } from "@state/hands";
 import type { GameEvent } from "@state/events";
 import type { State } from "@state/types.gen";
 import { cls, html, type SafeHtml } from "@world/html";
@@ -37,6 +39,11 @@ export const KURO_WORK_MS = 3000;
 /** 「这个怎么做？」 and the 全部 scope: strings keys (Claude adds them). */
 export const HOW_KEY = "wb.ask.how";
 export const SCOPE_ALL_KEY = "wb.scope.all";
+/** 这里不对 / 下一段 under a unit in 自己做 (work spec item 3): strings keys (Claude adds them). */
+export const UNIT_WRONG_KEY = "wb.unit.wrong";
+export const UNIT_NEXT_KEY = "wb.unit.next";
+/** The two read modes that may mark (self = unlimited pens, look = three). */
+type MarkMode = "self" | "look";
 /** 合并 / 不合 under Kuro's line once the conflict is found (work FR1, self); nothing shows without the strings. */
 export const MERGE_CHIPS: readonly { readonly key: string; readonly merge: boolean }[] = [
   { key: "wb.merge", merge: true },
@@ -61,6 +68,14 @@ export interface WorkThread {
   opened: boolean;
   /** Self on a document, after both conflicting clauses: 合并 (true) / 不合 (false), once chosen. */
   merge?: boolean | null;
+  /** The marks made so far (work spec 2026-11-02): click or drag, each hit or miss, worth credited. */
+  marks: Mark[];
+  /** 自己做 with units: how many units Kuro has handed over (the player reads one at a time). */
+  unit: number;
+  /** Units the player said 「这里不对」 to (swapped to their fix): by unit index. */
+  fixed: number[];
+  /** Kuro's reaction to the last caught `kuro` mark (work spec item 2), shown in its window; cleared on the next mark. */
+  caughtLine: string | null;
 }
 
 /** The open task now, its tree and its checklist item. */
@@ -78,7 +93,50 @@ export function threadFor(session: Pick<Session, "work">, day: number, taskId: s
 }
 
 /** The surface a task has: its content object, else none (a plain thread). */
-export const surfaceOf = (tree: Task | undefined): "doc" | "ledger" | null => (tree?.doc ? "doc" : tree?.ledger ? "ledger" : null);
+export const surfaceOf = (tree: Task | undefined): "doc" | "ledger" | "code" | null => (tree?.doc ? "doc" : tree?.ledger ? "ledger" : tree?.code ? "code" : null);
+
+/** The listed markable spots of a task's surface (doc / code; ledger may carry them too). */
+export function marksOf(tree: Task | undefined): readonly TaskMark[] | undefined {
+  return tree?.doc?.marks ?? tree?.code?.marks ?? tree?.ledger?.marks;
+}
+/** The units a task's surface hands over in 自己做 (any surface may carry them). */
+export function unitsOf(tree: Task | undefined): readonly { readonly text: string; readonly fix?: string }[] | undefined {
+  return tree?.doc?.units ?? tree?.code?.units ?? tree?.ledger?.units;
+}
+/** True once every unit has been handed over (or there are no units). */
+export const unitsDone = (tree: Task | undefined, w: WorkThread): boolean => {
+  const u = unitsOf(tree);
+  return !u || w.unit >= u.length;
+};
+
+/** The marking mode of the thread, or null when the surface is not being read (let, or no marks). */
+export function markMode(w: WorkThread, tree: Task | undefined): MarkMode | null {
+  if (!marksOf(tree)) return null;
+  return w.mode === "self" ? "self" : w.mode === "look" ? "look" : null;
+}
+
+/** The pens this thread has left, or null when the surface is not a marking one. */
+export function pensOf(w: WorkThread, tree: Task | undefined): number | null {
+  const mode = markMode(w, tree);
+  return mode === null ? null : pensLeft(mode, w.marks.length);
+}
+
+/** The rows a surface shows for marking: the document's right column, the code's lines, else none. */
+export function markRows(tree: Task | undefined): readonly string[] | null {
+  if (!marksOf(tree)) return null;
+  if (tree?.doc) return tree.doc.right;
+  if (tree?.code) return tree.code.lines;
+  return null;
+}
+
+/** Whether the Wenquxing (词典) is in the player's hand now (held, or held and in use): item 7. */
+export const dictionaryHeld = (session: Pick<Session, "holding" | "hand">): boolean => session.holding === "dictionary";
+
+/** The dictionary's gloss for a word listed on the surface, with its contract note when content gives one. */
+export function dictLook(word: string): { gloss: string; note: string | null } | null {
+  const entry = dictionaryTable.words.get(word.toLowerCase());
+  return entry ? { gloss: entry.gloss, note: entry.contractNote ?? null } : null;
+}
 
 /** The mode the `task` event carries at 通过: let becomes look if the touched thing was opened. */
 export function finalMode(w: WorkThread, tree: Task | undefined): TaskMode {
@@ -180,6 +238,82 @@ function ledgerSurface(tree: Task, w: WorkThread, busy: boolean, fill: (s: strin
   return html`<div class="surface ledger">${busy ? null : html`<table class="tbl"><tr>${head}</tr>${rows}</table>`}${note}</div>`;
 }
 
+/** The three red pens as icons; a spent one is greyed. Nothing in self (unlimited). */
+function pens(mode: MarkMode, made: number): SafeHtml | null {
+  if (mode !== "look") return null;
+  const left = pensLeft("look", made);
+  const dots = Array.from({ length: LOOK_PENS_UI }, (_, i) => html`<span class="${cls("pen", i >= left && "spent")}" aria-hidden="true">✎</span>`);
+  return html`<div class="pens" aria-label="${left}">${dots}</div>`;
+}
+const LOOK_PENS_UI = 3;
+
+/** A word on a clause wrapped so the held dictionary can gloss it (item 7); plain text otherwise. */
+function wordSpans(text: string, words: readonly string[], held: boolean): SafeHtml | string {
+  if (!held || words.length === 0) return text;
+  // Split on the listed words (whole-word, case-insensitive), wrapping each hit.
+  const re = new RegExp(`\\b(${words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})\\b`, "gi");
+  const out: (SafeHtml | string)[] = [];
+  let last = 0;
+  for (let m = re.exec(text); m; m = re.exec(text)) {
+    if (m.index > last) out.push(text.slice(last, m.index));
+    out.push(html`<span class="dword" data-action="wb-gloss" data-word="${m[0]!.toLowerCase()}">${m[0]!}</span>`);
+    last = m.index + m[0]!.length;
+    if (re.lastIndex === m.index) re.lastIndex++;
+  }
+  if (last < text.length) out.push(text.slice(last));
+  return html`${out}`;
+}
+
+/** The small dot-matrix tooltip the held dictionary shows over a glossed word (item 7). */
+function glossTip(word: string, g: { gloss: string; note: string | null }): SafeHtml {
+  const note = g.note ? html`<div class="dt-note">${g.note}</div>` : null;
+  return html`<div class="dtip" role="tooltip"><div class="dt-w">${word}</div><div class="dt-g">${g.gloss}</div>${note}</div>`;
+}
+
+/**
+ * A marking surface (work spec items 1–7): the rows (document clauses or code lines) as markable
+ * buttons, the pens, Kuro's reaction line, and — in 自己做 with units — one unit at a time with
+ * 这里不对 / 下一段. Hidden `kuro` spots are not highlighted in 看一眼's diff but are still markable.
+ */
+function markSurface(tree: Task, w: WorkThread, mode: MarkMode | null, held: boolean): SafeHtml {
+  const spots = marksOf(tree) ?? [];
+  const code = !!tree.code;
+  const rows = code ? tree.code!.lines : tree.doc ? tree.doc.right : [];
+  const markable = mode !== null && spots.length > 0 && canMark(mode, w.marks.length);
+  const glossWords = (i: number): string[] => spots.filter((s) => s.clause === i && s.word).map((s) => s.word!);
+  // A hidden kuro spot is only kept out of the look diff's highlight; it is still there to be found.
+  const highlighted = (i: number): boolean => mode === "look" && spots.some((s) => s.clause === i && !isHidden(s));
+  const marked = (i: number): Mark | undefined => w.marks.find((m) => m.clause === i);
+  const line = (text: string, i: number) => {
+    const mk = marked(i);
+    const on = mk ? (mk.hit ? "hit" : "miss") : false;
+    const body = held ? wordSpans(text, glossWords(i), held) : text;
+    const num = code ? html`<span class="ln" aria-hidden="true">${i + 1}</span>` : null;
+    const act = markable ? html` data-action="wb-mark" data-clause="${i}"` : null;
+    return html`<button type="button" class="${cls("row", code && "code", highlighted(i) && "y", on && on)}"${act} aria-pressed="${mk ? "true" : "false"}"${markable ? null : html` disabled`}>${num}<span class="rt">${body}</span></button>`;
+  };
+  const list = rows.map((text, i) => line(text, i));
+  const pen = mode ? pens(mode, w.marks.length) : null;
+  return html`<div class="${cls("surface mark", code && "codefile")}">${pen}<div class="rows">${list}</div></div>`;
+}
+
+/** 自己做 with units: one unit at a time, with 这里不对 / 下一段 (item 3). Nothing when content has no units. */
+function unitFlow(tree: Task, w: WorkThread): SafeHtml | null {
+  const u = unitsOf(tree);
+  if (!u || w.mode !== "self") return null;
+  const shown = u.slice(0, Math.min(w.unit + 1, u.length));
+  const rows = shown.map((unit, i) => {
+    const fixed = w.fixed.includes(i);
+    const text = fixed && unit.fix !== undefined ? unit.fix : unit.text;
+    const current = i === w.unit && i < u.length;
+    const wrong = current && hasString(UNIT_WRONG_KEY) ? html`<button type="button" class="chip" data-action="wb-unit-wrong">${tr(UNIT_WRONG_KEY)}</button>` : null;
+    const next = current && hasString(UNIT_NEXT_KEY) ? html`<button type="button" class="chip" data-action="wb-unit-next">${tr(UNIT_NEXT_KEY)}</button>` : null;
+    const chips = current && (wrong || next) ? html`<div class="wchips">${wrong}${next}</div>` : null;
+    return html`<div class="${cls("unit", fixed && "fixed")}"><div class="ut">${text}</div>${chips}</div>`;
+  });
+  return html`<div class="units">${rows}</div>`;
+}
+
 /** The ask box: the thread above, the input with the task sentence, the strip with the scope only. */
 export function renderWork(ctx: AppContext): SafeHtml {
   const { state, events, session } = ctx;
@@ -206,8 +340,29 @@ export function renderWork(ctx: AppContext): SafeHtml {
         const chosen = w.merge === undefined || w.merge === null ? null : MERGE_CHIPS.find((c) => c.merge === w.merge)!;
         if (chosen) live.push(me(tr(chosen.key)));
       }
-      if (surface === "doc") live.push(docSurface(open.tree!, w, busy));
-      if (surface === "ledger") live.push(ledgerSurface(open.tree!, w, busy, fill));
+      const mm = markMode(w, open.tree);
+      const held = dictionaryHeld(session);
+      const hasMarks = !!marksOf(open.tree);
+      // A marking surface (items 1–7): a code surface always, and a doc/ledger when content lists marks.
+      // 自己做 with units: Kuro hands one unit at a time (the whole surface is not shown; item 3).
+      const units = unitFlow(open.tree!, w);
+      if (!busy && units) {
+        live.push(units);
+        if (w.caughtLine) live.push(kuro(html`${w.caughtLine}`));
+      } else if (!busy && (surface === "code" || (hasMarks && surface === "doc"))) {
+        live.push(markSurface(open.tree!, w, mm, held));
+        if (held && session.wbGloss) {
+          const g = dictLook(session.wbGloss);
+          if (g) live.push(glossTip(session.wbGloss, g));
+        }
+        if (w.caughtLine) live.push(kuro(html`${w.caughtLine}`));
+      } else if (!busy && hasMarks && surface === "ledger") {
+        live.push(ledgerSurface(open.tree!, w, busy, fill));
+        if (w.caughtLine) live.push(kuro(html`${w.caughtLine}`));
+      } else {
+        if (surface === "doc") live.push(docSurface(open.tree!, w, busy));
+        if (surface === "ledger") live.push(ledgerSurface(open.tree!, w, busy, fill));
+      }
       // 通过 follows the merge answer when there is a question to answer.
       if (surface && !mergePending(w, open.tree)) live.push(html`<div class="wpass"><button type="button" class="pass" data-action="wb-pass"${busy ? html` disabled` : null}>${tr("wb.code.pass")}</button></div>`);
     }
@@ -233,10 +388,24 @@ function current(ctx: ActionContext): { open: NonNullable<ReturnType<typeof open
 const nowOf = (ctx: ActionContext) => ctx.now?.() ?? Date.now();
 const busyNow = (ctx: ActionContext, w: WorkThread) => nowOf(ctx) < w.busyUntil;
 
-function complete(ctx: ActionContext, open: NonNullable<ReturnType<typeof openWork>>, mode: TaskMode, missed: boolean, merge: boolean | null = null): void {
+function complete(
+  ctx: ActionContext,
+  open: NonNullable<ReturnType<typeof openWork>>,
+  mode: TaskMode,
+  missed: boolean,
+  merge: boolean | null = null,
+  marks: readonly { clause: number; hit: boolean }[] | null = null,
+): void {
   if (open.item.done.kind !== "flag") return;
   ctx.session.work = null;
-  ctx.store.appendEvent({ kind: "task", flag: open.item.done.flag, mode, ...(missed ? { missed: true as const } : {}), ...(merge !== null ? { merge } : {}) });
+  ctx.store.appendEvent({
+    kind: "task",
+    flag: open.item.done.flag,
+    mode,
+    ...(missed ? { missed: true as const } : {}),
+    ...(merge !== null ? { merge } : {}),
+    ...(marks ? { marks } : {}),
+  });
 }
 
 export const workActions: Record<string, ActionHandler> = {
@@ -245,7 +414,8 @@ export const workActions: Record<string, ActionHandler> = {
     const state = ctx.store.getState();
     const open = openWork(state, ctx.store.getEvents());
     if (!open || threadFor(ctx.session, state.day, open.item.id)) return;
-    ctx.session.work = { day: state.day, taskId: open.item.id, mode: null, clicked: [], cell: null, cellDraft: "", editing: false, busyUntil: 0, opened: false };
+    ctx.session.work = { day: state.day, taskId: open.item.id, mode: null, clicked: [], cell: null, cellDraft: "", editing: false, busyUntil: 0, opened: false, marks: [], unit: 0, fixed: [], caughtLine: null };
+    ctx.session.wbGloss = null;
     ctx.rerender();
   },
   // A chip under Kuro's question: the player's reply. Without a surface the task completes now.
@@ -304,11 +474,59 @@ export const workActions: Record<string, ActionHandler> = {
     c.w.merge = data.merge === "1";
     ctx.rerender();
   },
-  // 通过: the task event, as before (self without both clauses: without the catch flags; with the merge answer when given).
+  // A mark on a row (work spec item 5, "this line"): a click hits any listed spot on the clause.
+  // A hit returns the pen and credits the spot's worth; a miss spends a pen (look) and credits nothing.
+  "wb-mark"(ctx, data) {
+    markAt(ctx, Number(data.clause), undefined);
+  },
+  // A mark across a span (item 5, "something in here"): a span containing a listed spot hits at half worth.
+  "wb-mark-span"(ctx, data) {
+    const a = Number(data.a);
+    const b = Number(data.b);
+    if (!Number.isInteger(a) || !Number.isInteger(b) || b <= a) return;
+    markAt(ctx, Number(data.clause), [a, b]);
+  },
+  // 这里不对 on the current unit (item 3): swap it for its fix (a hit if the unit is a listed spot).
+  "wb-unit-wrong"(ctx) {
+    const c = current(ctx);
+    if (!c || c.w.mode !== "self" || busyNow(ctx, c.w)) return;
+    const u = unitsOf(c.open.tree);
+    const i = c.w.unit;
+    if (!u || i >= u.length) return;
+    if (!c.w.fixed.includes(i)) c.w.fixed.push(i);
+    // A unit that is a listed spot, said wrong, is a hit: record it as a mark on that clause.
+    const spot = spotHit(marksOf(c.open.tree), i);
+    if (spot && !c.w.marks.some((m) => m.clause === i)) {
+      c.w.marks.push({ clause: i, hit: true, worth: spot.worth });
+      if (spot.kind === "kuro" && spot.caught) c.w.caughtLine = spot.caught;
+    }
+    c.w.unit = Math.min(i + 1, u.length);
+    ctx.rerender();
+  },
+  // 下一段 (item 3): take the next unit without changing it.
+  "wb-unit-next"(ctx) {
+    const c = current(ctx);
+    if (!c || c.w.mode !== "self" || busyNow(ctx, c.w)) return;
+    const u = unitsOf(c.open.tree);
+    if (!u || c.w.unit >= u.length) return;
+    c.w.unit = Math.min(c.w.unit + 1, u.length);
+    ctx.rerender();
+  },
+  // The held dictionary over a word (item 7): show its gloss; a second look on the same word clears it.
+  "wb-gloss"(ctx, data) {
+    const word = (data.word ?? "").toLowerCase();
+    if (!word || !dictionaryHeld(ctx.session)) return;
+    ctx.session.wbGloss = ctx.session.wbGloss === word ? null : word;
+    ctx.rerender();
+  },
+  // 通过: the task event. A marking surface records its marks; the conflict surface keeps `missed`/`merge`.
   "wb-pass"(ctx) {
     const c = current(ctx);
     if (!c || c.w.mode === null || busyNow(ctx, c.w) || mergePending(c.w, c.open.tree)) return;
     const mode = finalMode(c.w, c.open.tree);
+    if (marksOf(c.open.tree) && (mode === "self" || mode === "look")) {
+      return complete(ctx, c.open, mode, false, null, eventMarks(c.w.marks));
+    }
     const missed = mode === "self" && !caught(c.w, c.open.tree);
     const merge = mode === "self" && !missed && typeof c.w.merge === "boolean" ? c.w.merge : null;
     complete(ctx, c.open, mode, missed, merge);
@@ -318,6 +536,21 @@ export const workActions: Record<string, ActionHandler> = {
     ctx.rerender();
   },
 };
+
+/** A click or drag mark: resolve the hit, run the pen economy, record the mark and any caught line. */
+function markAt(ctx: ActionContext, clause: number, span: readonly [number, number] | undefined): void {
+  const c = current(ctx);
+  if (!c || !Number.isInteger(clause) || busyNow(ctx, c.w)) return;
+  const mode = markMode(c.w, c.open.tree);
+  if (mode === null || !canMark(mode, c.w.marks.length)) return;
+  const spot = spotHit(marksOf(c.open.tree), clause, span);
+  const hit = spot !== null;
+  const worth = spot ? hitWorth(spot, span) : 0;
+  c.w.marks.push({ clause, hit, worth, ...(span ? { span } : {}) });
+  // Item 2: a hit on a kuro spot that carries a caught line shows it in Kuro's window; else clear it.
+  c.w.caughtLine = hit && spot!.kind === "kuro" && spot!.caught ? spot!.caught : null;
+  ctx.rerender();
+}
 
 /** Kuro is working on a task now (its body's busy state). */
 export const kuroWorking = (session: Pick<Session, "work">, nowMs: number): boolean => !!session.work && nowMs < session.work.busyUntil;

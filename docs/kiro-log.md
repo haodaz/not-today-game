@@ -1112,3 +1112,39 @@ Decisions:
 - Bin entries lack `date`/`from` in content (only `since`); the loader makes `date`/`from` optional and uses `since` as the listing day. The spec said "same shape plus since"; content is authoritative.
 - The content-locale swap is display-only (state derives from flags/ids, not text), exactly as the replies twin — safe for replay determinism.
 - Kuro's `kuro` task lines are not twinned (the voices rule: they are already English idioms).
+
+## work — marking & two modes (2026-11-02)
+
+Marking is the operation (requirements "marking is the operation" + "two modes for every kind").
+Kiro's area only (`src/`, `tests/`, `.kiro/`); `content/` untouched, fixtures used in tests.
+
+- Item 0 (deliverable bubble, blocker): a `kind:"deliverable"` message renders as a clickable
+  card in both message panes; `open-deliverable` opens `public/docs/vivi/<file>` in the browser
+  app's frame (`session.browserDoc` iframe), logs `open file:<doc>` once, is allowed while the Vivi
+  lock is on, and the download appears in 文件. Doc→page via `deliverablePage()` in
+  `src/state/files.ts`. `tests/deliverable-open.test.ts` (3).
+- State layer (`src/state/days/tasks.ts`): `TaskMark {clause, span?, kind:"conflict|kuro|odd",
+  worth:1|2, caught?, hidden?, word?}`, `TaskUnit {text, fix?}`, `TaskCode {lines, catchFlags,
+  marks?, units?}`; `doc`/`ledger` gained optional `marks`/`units`; strict parsers + twin localiser
+  (`localiseMarks`/`localiseUnits`, caught is the only translatable mark field).
+- `task` event gained `marks?: {clause, hit}[]` (`src/state/events.ts`), rejected on let/auto.
+  `applyTask` (`src/state/days/effects.ts`): catch flags are earned iff a mark hit
+  (`marks.some(m=>m.hit)`); the old two-clause `missed` rule is the no-marks special case. Reads
+  `(tree.doc ?? tree.code).catchFlags`.
+- `Word.contractNote?` added to the dictionary loader (`src/state/hands.ts`) for item 7.
+- Pure module `src/world/desktop/workbench/marks.ts`: pens (self = ∞, look = 3), `spotHit`
+  (click = this line, drag span = overlap), `hitWorth` (click full, span half ⌊⌋ min 1), `isHidden`,
+  `eventMarks`.
+- View + actions (`src/world/desktop/workbench/work.ts`): marking surface (document right column /
+  code lines as `wb-mark`/`wb-mark-span` rows), three pen icons in 看克总的, hidden kuro spots not
+  highlighted in the look diff but still markable, Kuro's `caught` line shown on a kuro hit,
+  自己做 units one at a time with 这里不对/下一段 (`wb.unit.wrong`/`wb.unit.next`, Claude adds the
+  strings; nothing renders without them), the code surface (monospace, line numbers), and the held
+  Wenquxing's dot-matrix gloss (`wb-gloss`, session `wbGloss`). Marks recorded on the `task` event at
+  通过. Tasks without `marks`/`units` keep the old clause-click surface unchanged.
+- CSS in `src/world/desktop/desktop.css` (pens, rows, codefile, units, `.dtip`). Session field
+  `wbGloss` added to `src/world/desktop/model.ts`.
+- Tests: `tests/work-marks.test.ts` (loader accept/reject, pens, spotHit/worth, hidden, event
+  record + replay-idempotence) and `tests/work-marks-view.test.ts` (pens shown, hit/miss, caught
+  line, span half-worth, units flow, code surface + snapshot, dictionary tooltip only while held /
+  only listed words). `npx tsc --noEmit` clean; full `npx vitest run` → 89 files / 1532 tests green.

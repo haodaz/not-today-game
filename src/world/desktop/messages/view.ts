@@ -40,7 +40,7 @@ function bubbleAvatar(who: string, side: "me" | "them", alias?: string): SafeHtm
   return avImg(who, "av av-img");
 }
 
-function renderBody(body: Body, names: State["names"], register: Register, ding: boolean): SafeHtml {
+export function renderBody(body: Body, names: State["names"], register: Register, ding = false): SafeHtml {
   const fill = (s: string) => fillPlaceholders(s, names);
   switch (body.type) {
     case "voice": {
@@ -56,6 +56,9 @@ function renderBody(body: Body, names: State["names"], register: Register, ding:
       return html`<div class="att">${fill(body.raw)}</div>`;
     case "system":
       return html`${fill(body.raw)}`;
+    case "deliverable":
+      // A clickable card: opens the doc in the browser and lifts the Vivi lock (desktop-ui 2026-11-02).
+      return html`<button type="button" class="card deliverable" data-action="open-deliverable" data-doc="${body.doc}">${fill(body.raw)}</button>`;
     case "text":
       return html`<div class="bub">${fill(body.text)}</div>`;
   }

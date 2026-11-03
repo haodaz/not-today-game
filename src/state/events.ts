@@ -57,7 +57,7 @@ export type GameEvent =
    * `merge` (work FR1): after reading both conflicting clauses, the player's 合并 (true) or 不合
    * (false). A record only: the self path's effects, catch flags included, either way.
    */
-  | { kind: "task"; day: number; flag: string; mode: TaskEventMode; missed?: true; merge?: boolean }
+  | { kind: "task"; day: number; flag: string; mode: TaskEventMode; missed?: true; merge?: boolean; marks?: readonly { readonly clause: number; readonly hit: boolean }[] }
   // object-upgrade spec (2026-11-01): accepting / declining Kuro's offer.
   | { kind: "upgrade"; day: number; object: string }
   | { kind: "declineUpgrade"; day: number; object: string; decline: DeclineKind }

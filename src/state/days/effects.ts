@@ -89,9 +89,16 @@ export function isLosable(id: string): boolean {
   return id === "loan" || (membersOf("found") ?? []).includes(id);
 }
 
-export function applyTask(state: State, event: { readonly day: number; readonly flag: string; readonly mode: string; readonly missed?: true; readonly merge?: boolean }): State {
+export function applyTask(
+  state: State,
+  event: { readonly day: number; readonly flag: string; readonly mode: string; readonly missed?: true; readonly merge?: boolean; readonly marks?: readonly { readonly clause: number; readonly hit: boolean }[] },
+): State {
   if (event.missed !== undefined && (event.missed !== true || event.mode !== "self")) throw new Error("task: missed is only for a self path");
   if (event.merge !== undefined && (typeof event.merge !== "boolean" || event.mode !== "self" || event.missed)) throw new Error("task: merge is only for a self path that found the conflict");
+  if (event.marks !== undefined) {
+    if (event.mode === "auto" || event.mode === "let") throw new Error("task: marks belong to a read mode (self / look)");
+    if (!Array.isArray(event.marks) || !event.marks.every((m) => Number.isInteger(m.clause) && m.clause >= 0 && typeof m.hit === "boolean")) throw new Error("task: marks must be { clause, hit }");
+  }
   if (event.mode !== "auto" && !(TASK_MODES as readonly string[]).includes(event.mode)) throw new Error(`task: unknown mode "${event.mode}"`);
   if (!taskFlags(event.day).includes(event.flag)) throw new Error(`task: "${event.flag}" is not a task of day ${event.day}`);
   const tree = taskByFlag(event.day, event.flag);
@@ -100,8 +107,11 @@ export function applyTask(state: State, event: { readonly day: number; readonly 
     return withFlags(state, [event.flag]);
   }
   const effects = tree[event.mode as TaskMode].effects;
-  // A read that missed the conflict: the same path without the catch flags (work FR1).
-  const drop = event.missed ? new Set(tree.doc?.catchFlags ?? []) : new Set<string>();
+  // The catch flags a surface earns: dropped when the read missed, or (with marks) when no listed
+  // spot was hit. Marks are the general rule; `missed` is the conflict special case.
+  const caughtFlags = (tree.doc ?? tree.code)?.catchFlags ?? [];
+  const earned = event.marks === undefined ? !event.missed : event.marks.some((m) => m.hit);
+  const drop = earned ? new Set<string>() : new Set(caughtFlags);
   let next = withFlags(state, [...(effects.flags ?? []).filter((f) => !drop.has(f)), event.flag]);
   if (effects.san) next = { ...next, san: clampSan(next.san + effects.san) };
   if (effects.letItDoUnchecked) next = { ...next, letItDoUnchecked: next.letItDoUnchecked + effects.letItDoUnchecked };

@@ -370,6 +370,13 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .conv.ding .rcpt.unread{color:var(--accent)}
 .m .voice .ding{font-size:10px;font-weight:600;letter-spacing:.04em;color:#fff;background:var(--accent);border-radius:8px;padding:0 6px;line-height:16px;margin-right:2px}
 .m .card.task{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;padding:10px 12px;color:var(--ink)}
+/* Vivi's deliverable: a clickable card that opens its page (desktop-ui 2026-11-02). */
+.m .card.deliverable{display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-left:3px solid var(--warm);border-radius:8px;padding:10px 12px;color:var(--ink);font:inherit;cursor:pointer}
+.m .card.deliverable:hover,.m .card.deliverable:focus-visible{background:#fffaf0}
+/* A deliverable page open in the browser frame: a full-frame iframe with a × to go back. */
+.br .br-page.doc{position:absolute;inset:0;left:0;top:0;transform:none;width:auto;border:0;border-radius:0;box-shadow:none;padding:0;display:flex;flex-direction:column}
+.br .br-page.doc .br-bar{margin:0;justify-content:flex-end}
+.br .br-frame{flex:1;width:100%;border:0;background:#fff}
 /* added (work spec 2026-11-02): the choice is a reply. The thread above the input, the chips under
    Kuro's question, the strip with the scope only; the document and ledger surfaces. */
 .wb .main{overflow:auto}
@@ -410,3 +417,31 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .wb .ask .wpass .pass:disabled{opacity:.4;cursor:default}
 /* 合并 on the self path (work FR1): the merge result in one column. */
 .wb .surface .cols.one{grid-template-columns:1fr}
+/* Marking a surface (work spec items 1–7): rows, pens, the code file, units, the dictionary tooltip. */
+.wb .surface.mark{position:relative}
+.wb .surface.mark .pens{display:flex;gap:4px;justify-content:flex-end;margin:0 0 8px}
+.wb .surface.mark .pen{color:var(--red);font-size:14px;line-height:1}
+.wb .surface.mark .pen.spent{color:var(--line);opacity:.5}
+.wb .surface.mark .rows{display:flex;flex-direction:column;gap:2px}
+.wb .surface.mark .row{display:flex;gap:8px;width:100%;text-align:left;border:0;background:none;font:inherit;font-size:12.5px;color:var(--ink);padding:3px 6px;border-radius:6px;line-height:1.5;cursor:pointer}
+.wb .surface.mark .row:disabled{cursor:default}
+.wb .surface.mark .row:not(:disabled):hover,.wb .surface.mark .row:focus-visible{background:#f3f5f9;outline:none}
+.wb .surface.mark .row.y{background:#fff8e1}
+.wb .surface.mark .row.hit{box-shadow:inset 3px 0 0 var(--red);background:#fdecec}
+.wb .surface.mark .row.miss{box-shadow:inset 3px 0 0 var(--line)}
+.wb .surface.mark .row .rt{flex:1}
+.wb .surface.codefile{font-family:var(--mono);background:#1e1f24;border-color:#32343c}
+.wb .surface.codefile .row{color:#d7dae0}
+.wb .surface.codefile .row .ln{width:28px;flex:none;text-align:right;color:#6a6e78;user-select:none}
+.wb .surface.codefile .row:not(:disabled):hover,.wb .surface.codefile .row:focus-visible{background:#2a2c33}
+.wb .surface.codefile .row.hit{background:#3a2426}
+.wb .dword{text-decoration:underline dotted;text-underline-offset:2px;cursor:help}
+.wb .units{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.wb .units .unit{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:#fff;font-size:12.5px;line-height:1.5}
+.wb .units .unit.fixed{border-color:var(--red);background:#fdf3f3}
+.wb .units .unit .wchips{margin-top:6px}
+/* The held dictionary's gloss (item 7): a small dot-matrix tooltip. */
+.wb .dtip{margin-top:6px;align-self:flex-start;max-width:260px;background:#0b2e13;color:#8ef5a3;border:1px solid #16642b;border-radius:4px;padding:6px 8px;font-family:var(--mono);font-size:11px;line-height:1.5;image-rendering:pixelated}
+.wb .dtip .dt-w{color:#cfe8d4;text-transform:lowercase}
+.wb .dtip .dt-g{margin-top:2px}
+.wb .dtip .dt-note{margin-top:4px;color:#f5d98e;border-top:1px dashed #16642b;padding-top:4px}
