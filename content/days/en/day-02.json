@@ -1,0 +1,204 @@
+{
+  "day": 2,
+  "beats": {
+    "boot": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "The room is the same as yesterday. The rain has eased a little; the drops on the window stay where they are."
+        },
+        {
+          "k": "narration",
+          "t": "The glass of water is still on the desk, cold."
+        },
+        {
+          "k": "inner",
+          "t": "Day two. Last night's speck of light takes nothing back by daylight. It simply denies it was there."
+        }
+      ]
+    },
+    "box": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "The second layer. Something soft: a third-grade arithmetic textbook, a table on the back cover in pencil."
+        },
+        {
+          "k": "inner",
+          "t": "Pressed so hard it shows through the paper."
+        }
+      ]
+    },
+    "desk": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "You pick up the chick and turn it over. That small hole, black."
+        },
+        {
+          "k": "narration",
+          "t": "Poking it never did anything, back then. You poke it anyway."
+        },
+        {
+          "k": "inner",
+          "t": "The plastic springs back. Same as back then."
+        }
+      ]
+    },
+    "shutdown": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "The small window in the bottom right is lit. You do not lie down straight away.",
+          "where": "room"
+        }
+      ]
+    },
+    "night": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "Before turning the screens off you open the afternoon's document once more."
+        },
+        {
+          "k": "narration",
+          "t": "One line is gone. A line you added yourself: this field may have no aliases."
+        },
+        {
+          "k": "narration",
+          "t": "It is not in the history either. You do not write it again."
+        },
+        {
+          "k": "inner",
+          "t": "One line missing. And it had to be that one."
+        },
+        {
+          "k": "narration",
+          "t": "Today is over."
+        }
+      ]
+    }
+  },
+  "items": [
+    {
+      "id": "boot",
+      "text": "Boot up.",
+      "unlock": "start",
+      "done": "event:boot",
+      "required": true
+    },
+    {
+      "id": "msgs",
+      "text": "Glance at the messages.",
+      "unlock": "done:boot",
+      "done": "event:openApp:msgs",
+      "required": true
+    },
+    {
+      "id": "lunch",
+      "text": "Order lunch.",
+      "unlock": "done:msgs",
+      "done": "event:order:lunch",
+      "required": true,
+      "rewrite": "Lunch is on its way."
+    },
+    {
+      "id": "task1",
+      "text": "Pull together a narrative line.",
+      "unlock": "done:msgs",
+      "done": "flag:task_d2_1",
+      "required": true
+    },
+    {
+      "id": "task2",
+      "text": "Put the field names back.",
+      "unlock": "done:task1",
+      "done": "flag:task_d2_2",
+      "required": true
+    },
+    {
+      "id": "pickup",
+      "text": "Go and get it.",
+      "unlock": "event:delivery:arrives:lunch",
+      "done": "event:pickup:lunch",
+      "required": true,
+      "sfx": "doorbell",
+      "onUnlock": {
+        "say": [
+          {
+            "k": "sfx",
+            "t": "Ding-dong.",
+            "sfx": "doorbell"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eat",
+      "text": "Eat.",
+      "unlock": "done:pickup",
+      "done": "event:eat:lunch",
+      "required": false
+    },
+    {
+      "id": "box",
+      "text": "Open the second layer.",
+      "unlock": "done:pickup",
+      "done": "event:openBox",
+      "required": true
+    },
+    {
+      "id": "reply",
+      "text": "Reply to the boss.",
+      "unlock": "done:task2",
+      "done": "event:reply:boss",
+      "required": true
+    },
+    {
+      "id": "dinner",
+      "text": "Order dinner.",
+      "unlock": "done:task2",
+      "done": "event:order:dinner",
+      "required": true,
+      "rewrite": "Dinner is on its way.",
+      "when": "night"
+    },
+    {
+      "id": "desk",
+      "text": "Take a look at the desk.",
+      "unlock": "done:reply",
+      "done": "event:beat:desk",
+      "required": true,
+      "when": "night"
+    },
+    {
+      "id": "shutdown",
+      "text": "Shut down.",
+      "unlock": "done:desk",
+      "done": "event:beat:shutdown",
+      "required": true,
+      "when": "night"
+    },
+    {
+      "id": "chat",
+      "text": "Talk to it a while.",
+      "unlock": "done:shutdown",
+      "done": "event:chat:any",
+      "required": false,
+      "when": "night"
+    },
+    {
+      "id": "bed",
+      "text": "Lie down.",
+      "unlock": "done:shutdown",
+      "done": "event:lieDown",
+      "required": true,
+      "locked": "requiredPending",
+      "when": "night"
+    }
+  ],
+  "delivery": {
+    "minMinutes": 2,
+    "waitMinutes": 6
+  }
+}

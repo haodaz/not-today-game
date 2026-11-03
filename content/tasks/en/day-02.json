@@ -1,0 +1,202 @@
+{
+  "day": 2,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "task1",
+      "title": "Pull together a narrative line.",
+      "app": "docs",
+      "done": "task_d2_1",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "The boss's message has not a single noun in it, only \"feeling\" and \"narrative\"; the partner's card is all other people's nouns."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You read the two original messages one line at a time and pull a version together yourself."
+          },
+          {
+            "k": "inner",
+            "t": "Left column the boss's, right column the forwarded one."
+          }
+        ],
+        "kuro": [
+          "I can line those up for you."
+        ],
+        "effects": {
+          "flags": [
+            "task_d2_1"
+          ],
+          "san": 1
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You ask it to take the two apart. It lists two sections, three sentences each. You skim them and change two places."
+          }
+        ],
+        "kuro": [
+          "Here are both lines, separated. Say which one you want."
+        ],
+        "effects": {
+          "flags": [
+            "task_d2_1"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You glance and click Approve. The sheet has a new tab called \"Narrative\"."
+          }
+        ],
+        "kuro": [
+          "Great. Moving on."
+        ],
+        "effects": {
+          "flags": [
+            "task_d2_1"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      },
+      "doc": {
+        "left": [
+          "1. Our product is about a feeling.",
+          "2. Get the feeling right and the investors will get it.",
+          "3. We don't talk technology; we talk narrative.",
+          "4. The narrative needs warmth.",
+          "5. Where does warmth come from? From the team.",
+          "6. A version before next week."
+        ],
+        "right": [
+          "1. Competitor A's narrative: the user's pain first, then the data.",
+          "2. One number per page.",
+          "3. Data before narrative: no data, no talking.",
+          "4. Warmth is a result, not a method.",
+          "5. The team appears on the last page only.",
+          "6. Ten pages at most."
+        ],
+        "conflict": [
+          2,
+          3
+        ],
+        "catchFlags": [
+          "task_d2_1"
+        ],
+        "kuroEdit": {
+          "clause": 2,
+          "text": "3. We don't talk technology; we talk narrative. The narrative starts from data, and the data comes from the feeling, counted by the day."
+        }
+      }
+    },
+    {
+      "id": "task2",
+      "title": "Put the field names back.",
+      "app": "code",
+      "done": "task_d2_2",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You named the field user_id. In three places it wrote uid, in one place userId."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You search the whole project and change each one back to user_id, deleting the \"for convenience\" comment along with them."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d2_2",
+            "fixed_alias"
+          ],
+          "san": 1
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You ask it to list them. Four places, file and line. You open each one and fix it."
+          }
+        ],
+        "kuro": [
+          "Four places. Listed with line numbers."
+        ],
+        "effects": {
+          "flags": [
+            "task_d2_2",
+            "fixed_alias"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "All four names went live together. They stand shoulder to shoulder in the database, each minding its own."
+          }
+        ],
+        "kuro": [
+          "Done."
+        ],
+        "effects": {
+          "flags": [
+            "task_d2_2",
+            "alias_live"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,171 @@
+{
+  "day": 6,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "task1",
+      "title": "Find the typos.",
+      "app": "docs",
+      "done": "task_d6_1",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "Two typos. You did not type them, and neither did it."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You find both and fix them. History: your account, 02:40."
+          },
+          {
+            "k": "inner",
+            "t": "I was asleep then."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d6_1",
+            "found_typos"
+          ],
+          "san": 0
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You ask it who typed the typos."
+          }
+        ],
+        "kuro": [
+          "Not me. Your account, 02:40. You were asleep."
+        ],
+        "effects": {
+          "flags": [
+            "task_d6_1",
+            "found_typos",
+            "asked_typo"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It fixed them. And some other things while it was at it."
+          }
+        ],
+        "kuro": [
+          "Fixed."
+        ],
+        "effects": {
+          "flags": [
+            "task_d6_1"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
+    },
+    {
+      "id": "task2",
+      "title": "Wrap up the export work.",
+      "app": "code",
+      "done": "task_d6_2",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "The last bit."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You wrapped it up."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d6_2"
+          ],
+          "san": 0
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It wrapped it up; you took a look."
+          }
+        ],
+        "kuro": [
+          "Wrapped up."
+        ],
+        "effects": {
+          "flags": [
+            "task_d6_2"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It wrapped it up."
+          }
+        ],
+        "kuro": [
+          "Done."
+        ],
+        "effects": {
+          "flags": [
+            "task_d6_2"
+          ],
+          "san": 0,
+          "letItDoUnchecked": 1
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,167 @@
+{
+  "day": 5,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "task1",
+      "title": "Check v15 against v17.",
+      "app": "docs",
+      "done": "task_d5_1",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "v17's note says \"this one is final\". Who wrote it is not signed."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You check them clause by clause, top to bottom, skipping nothing. Four minutes."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d5_1"
+          ],
+          "san": 1
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You ask it to list the conflicts. Three. You fix them as listed."
+          }
+        ],
+        "kuro": [
+          "Three conflicts: retry interval, retry count, state after failure."
+        ],
+        "effects": {
+          "flags": [
+            "task_d5_1"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You toss it one line: \"merge these\"."
+          }
+        ],
+        "kuro": [
+          "Done."
+        ],
+        "effects": {
+          "flags": [
+            "task_d5_1"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
+    },
+    {
+      "id": "task2",
+      "title": "Add CSV to the export.",
+      "app": "code",
+      "done": "task_d5_2",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "One thing, one sentence, no ambiguity. The diff it hands in has an extra dependency."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You strike out forty lines and remove the dependency. Eight minutes."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d5_2",
+            "removed_dep"
+          ],
+          "san": 1
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You ask why it added a recommendation."
+          }
+        ],
+        "kuro": [
+          "For convenience. It can grow with the project."
+        ],
+        "effects": {
+          "flags": [
+            "task_d5_2",
+            "asked_dep"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "The new dependency is in."
+          }
+        ],
+        "kuro": [
+          "Merged."
+        ],
+        "effects": {
+          "flags": [
+            "task_d5_2",
+            "dep_live"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
+    }
+  ]
+}

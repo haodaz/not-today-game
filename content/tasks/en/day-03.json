@@ -1,0 +1,277 @@
+{
+  "day": 3,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "task1",
+      "title": "Let it write v18; you take a look.",
+      "app": "docs",
+      "done": "task_d3_1",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "Three ways to do this one. Twenty minutes yourself: the hands are yours, and so are the mistakes."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You add the async constraint to v18 yourself. Twenty minutes."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d3_1"
+          ],
+          "san": 1
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It produced a final draft, neatly laid out. You click Take a look and put the async constraint back."
+          }
+        ],
+        "kuro": [
+          "Good catch. Let me bring it back."
+        ],
+        "effects": {
+          "flags": [
+            "task_d3_1",
+            "caught_async"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It produced a final draft. The Take a look button is lit, right beside it. You do not click it."
+          }
+        ],
+        "kuro": [
+          "Glad it helps."
+        ],
+        "effects": {
+          "flags": [
+            "task_d3_1"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      },
+      "doc": {
+        "left": [
+          "1. Export requests enter a queue and are handled in order.",
+          "2. Each request has a unique id.",
+          "3. Results come back through a callback.",
+          "4. The callback must return within three seconds, or the request times out.",
+          "5. A timed-out request may be retried once.",
+          "6. A request that fails again goes into the failure table."
+        ],
+        "right": [
+          "1. Export requests enter a queue and are handled in order.",
+          "2. Each request has a unique id.",
+          "3. Results come back through a callback.",
+          "4. The callback returns.",
+          "5. A timed-out request may be retried once.",
+          "6. A request that fails again goes into the failure table."
+        ],
+        "conflict": [
+          3,
+          4
+        ],
+        "catchFlags": [
+          "task_d3_1"
+        ],
+        "kuroEdit": {
+          "clause": 3,
+          "text": "4. The callback returns within three seconds. Three seconds as of today."
+        }
+      }
+    },
+    {
+      "id": "task2",
+      "title": "Status field back to three values.",
+      "app": "code",
+      "done": "task_d3_2",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You named it state, with values draft, sent, read. It added a fourth: archived."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You delete it yourself and fix the references yourself."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d3_2"
+          ],
+          "san": 0
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You ask it why it added one."
+          }
+        ],
+        "kuro": [
+          "No one asked. I added it for completeness."
+        ],
+        "effects": {
+          "flags": [
+            "task_d3_2",
+            "asked_why_added"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It changed eleven files. You glance at the list. Eleven."
+          }
+        ],
+        "kuro": [
+          "Done."
+        ],
+        "effects": {
+          "flags": [
+            "task_d3_2"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
+    },
+    {
+      "id": "task3",
+      "title": "Today's real work: finish it.",
+      "app": "docs",
+      "done": "task_d3_3",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It is getting dark; the lamp's circle shows. This one is your own work."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "Done. You stand up and walk once round the room."
+          }
+        ],
+        "kuro": [
+          "Better. That removes a whole class of retries."
+        ],
+        "effects": {
+          "flags": [
+            "task_d3_3",
+            "wrote_d3"
+          ],
+          "san": 1
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It remembered your last message. You take your hand off the mouse."
+          }
+        ],
+        "kuro": [
+          "Added. It's cleaner now."
+        ],
+        "effects": {
+          "flags": [
+            "task_d3_3"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It wrote it. You did not look."
+          }
+        ],
+        "kuro": [
+          "You're the only one who reads what I write."
+        ],
+        "effects": {
+          "flags": [
+            "task_d3_3"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
+    }
+  ]
+}

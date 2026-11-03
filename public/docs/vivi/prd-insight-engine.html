@@ -1,0 +1,106 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>洞察引擎 · PRD（功能圣经）</title>
+<style>:root{--ink:#1f2433;--mute:#6b7387;--line:#e6e8ef;--acc:#4f6df5}*{box-sizing:border-box}body{margin:0;background:#f6f7fb;color:var(--ink);font:15px/1.75 -apple-system,"PingFang SC","Helvetica Neue",Arial,sans-serif}
+.doc{max-width:860px;margin:32px auto;background:#fff;border:1px solid var(--line);border-radius:14px;padding:44px 56px;box-shadow:0 2px 16px rgba(31,36,51,.05)}
+.bar{max-width:860px;margin:20px auto 0;display:flex;gap:10px;align-items:center;color:var(--mute);font-size:13px}.bar b{color:var(--ink)}.pill{background:#e9fbf1;color:#17a86a;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600}
+h1{font-size:28px;margin:0 0 8px}h2{font-size:19px;margin:34px 0 10px;padding-top:14px;border-top:1px solid var(--line)}h3{font-size:16px;margin:22px 0 6px}
+blockquote{margin:14px 0;padding:10px 16px;background:#f3f5ff;border-left:3px solid var(--acc);border-radius:6px;color:#3a4260}
+table{width:100%;border-collapse:collapse;margin:10px 0 16px;font-size:14px}th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left}th{color:var(--mute);font-weight:500}
+code{background:#f2f3f7;border-radius:4px;padding:1px 5px;font:13px ui-monospace,Menlo,monospace}pre{background:#11151f;color:#d6e2ff;border-radius:10px;padding:14px 16px;font:13px/1.6 ui-monospace,Menlo,monospace;overflow:auto}
+hr{border:0;border-top:1px solid var(--line);margin:28px 0}i{color:var(--mute)}</style></head><body>
+<div class="bar"><b>Vivi</b> 分享了文档 · 2028-10-20 21:47 <span class="pill">已定稿</span></div>
+<div class="doc"><h1>洞察引擎 · 产品需求文档（功能圣经）</h1>
+<p><b>版本</b> v0.1 · <b>日期</b> 2028-10-20 · <b>作者</b> Vivi（联合创始人 / VP）· <b>状态</b> 已定稿，可直接开工</p>
+<blockquote>本文档由 AI 辅助生成并经本人审阅。请各位务必认真阅读，这是我们接下来两个季度的唯一真理来源（Single Source of Truth）。</blockquote>
+<hr>
+<h2>一、产品愿景</h2>
+<p>洞察引擎是未来智能面向企业决策场景的下一代 AI 原生基础设施。它把「问题 → 洞察 → 行动」压缩成一次点击，让每一个一线业务人员都拥有首席战略官级别的判断力。</p>
+<p>我们不是在做一个工具，我们是在重新定义「决策」这件事。这是一个极其精妙的设计。</p>
+<h2>二、目标用户</h2>
+<ol>
+<li>中小企业的决策层（CEO / 创始人）</li>
+<li>业务负责人（销售 / 运营 / 市场）</li>
+<li>数据分析师（本产品上线后该岗位的需求将下降 60%）</li>
+<li>所有需要做决定的人</li>
+</ol>
+<h2>三、核心价值主张</h2>
+<ul>
+<li><b>三秒洞察</b>：任何业务问题，三秒内给出可执行结论。</li>
+<li><b>零门槛</b>：不需要数据团队、不需要清洗、不需要建模。</li>
+<li><b>自进化</b>：用得越多越准，准确率每月提升 10%。</li>
+<li><b>100% 自动</b>：从数据接入到方案分派全自动，无需人工介入（前提：客户已完成数据接入）。</li>
+</ul>
+<h2>四、五大核心模块</h2>
+<ol>
+<li><b>感知层</b>：自动接入 ERP、CRM、OA、财务系统、IM 聊天记录、行业公开数据。接入方式：一键授权。</li>
+<li><b>语义层</b>：基于行业本体自动对齐口径（口径库由系统自动生成）。</li>
+<li><b>推理层</b>：多智能体协同推理，自我校验，幻觉率低于 0.5%。</li>
+<li><b>行动层</b>：生成可执行方案并自动分派到责任人，责任人由系统智能识别。</li>
+<li><b>进化层</b>：每一次用户反馈都让系统更懂组织。</li>
+<li><b>安全层</b>：数据不出境，全链路加密（详见第九章）。</li>
+</ol>
+<h2>五、功能需求</h2>
+<h3>5.1 提问</h3>
+<ul>
+<li>用户以自然语言输入问题，系统智能识别用户意图。</li>
+<li>支持中文、英文及其他主要语种（待确认）。</li>
+<li>单次提问响应时间 ≤ 3 秒（默认值；复杂问题 ≤ 30 秒，需技术确认）。</li>
+</ul>
+<h3>5.2 洞察报告</h3>
+<ul>
+<li>系统自动生成报告，包含：置信度、核心结论、关键发现、建议、趋势预测。</li>
+<li>置信度计算公式：<code>置信度 = 0.4 × 数据完整度 + 0.3 × 模型一致性 + 0.3 × 历史准确率 + 0.2 × 行业匹配度</code>。</li>
+<li>报告默认置信度 92（需业务确认）。</li>
+<li>预测窗口：未来 4 个季度，误差 ≤ 5%。</li>
+</ul>
+<h3>5.3 自动分派</h3>
+<ul>
+<li>系统根据组织架构自动确定每条建议的责任人并推送。</li>
+<li>组织架构来源：感知层自动接入（见 4.1）。</li>
+<li>推送渠道：钉钉 / 企业微信 / 邮件 / 短信 / 电话（待定）。</li>
+</ul>
+<h3>5.4 反馈与进化</h3>
+<ul>
+<li>用户对每条建议可点「有用 / 无用」。</li>
+<li>系统自动将反馈纳入下一轮训练。训练周期：实时。</li>
+</ul>
+<h2>六、非功能需求</h2>
+<table><tr><th>项目</th><th>指标</th><th>说明</th></tr>
+<tr><td>可用性</td><td>99.99%</td><td>行业标准</td></tr>
+<tr><td>并发</td><td>10,000 QPS</td><td>预估</td></tr>
+<tr><td>准确率</td><td>≥ 95%</td><td>内部评估</td></tr>
+<tr><td>幻觉率</td><td>≤ 0.5%</td><td>内部评估</td></tr>
+<tr><td>响应</td><td>≤ 3 s</td><td>默认</td></tr>
+</table>
+<blockquote>修正说明：原文「准确率 ≥ 98%」应为「≥ 95%」，以本表为准。</blockquote>
+<h2>七、技术方案（摘要）</h2>
+<ul>
+<li>后端：<code>insight-core</code>（Python 3.13）+ <code>insight-agents</code>（多智能体框架，内部自研）</li>
+<li>模型：<code>future-insight-7b-v3</code>（内部微调）</li>
+<li>数据接入 SDK：<code>pip install future-insight-connect</code></li>
+<li>接口：<code>POST https://api.future-intelligence.ai/v2/insight/analyze</code>（请求体见附录 A）</li>
+<li>前端：单页应用，已完成（见原型 <code>plan-1-insight.html</code>）</li>
+</ul>
+<h2>八、里程碑</h2>
+<table><tr><th>阶段</th><th>时间</th><th>交付</th></tr>
+<tr><td>内测</td><td>2028 Q4</td><td>核心闭环（已完成）</td></tr>
+<tr><td>商用</td><td>2029 Q1</td><td>10 家付费客户</td></tr>
+<tr><td>行业版</td><td>2029 Q2</td><td>零售 / 制造 / 教育</td></tr>
+<tr><td>平台化</td><td>2029 Q3</td><td>开放生态</td></tr>
+</table>
+<p>工期估算依据：参照行业经验。</p>
+<h2>九、安全与合规</h2>
+<p>数据不出境，全链路加密，符合所有相关法规。详细方案待安全团队补充。</p>
+<h2>十、风险</h2>
+<p>暂无重大风险。</p>
+<h2>十一、验收标准</h2>
+<p>（本章由产品团队与技术团队共同补充。）</p>
+<h2>附录 A：接口示例</h2>
+<pre>
+POST /v2/insight/analyze
+{ &quot;question&quot;: &quot;下个季度预算投哪条产品线&quot;, &quot;industry&quot;: &quot;saas&quot; }
+
+200 OK
+{ &quot;confidence&quot;: 92, &quot;conclusion&quot;: &quot;...&quot; }
+</pre>
+<hr>
+<p><i>本文档由 AI 生成，仅供参考。</i></p></div></body></html>

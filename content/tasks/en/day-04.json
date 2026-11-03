@@ -1,0 +1,195 @@
+{
+  "day": 4,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "task1",
+      "title": "Merge v17 and v18 into one.",
+      "app": "docs",
+      "done": "task_d4_1",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "\"Export as PDF\" and \"Export as PDF; no repeat export within three days\". Two versions of the same requirement."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You open them side by side and check them clause by clause."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d4_1"
+          ],
+          "san": 1
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You type: say what each of these two means, separately."
+          }
+        ],
+        "kuro": [
+          "Of course. Let me take another look."
+        ],
+        "effects": {
+          "flags": [
+            "task_d4_1"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It answers Done. The version number goes from v18 to v18. You do not click Take a look."
+          }
+        ],
+        "kuro": [
+          "Done."
+        ],
+        "effects": {
+          "flags": [
+            "task_d4_1"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      },
+      "doc": {
+        "left": [
+          "1. Users can start an export from the workbench.",
+          "2. An export contains every version of the current document.",
+          "3. Users can export to PDF.",
+          "4. Exported files are named by date.",
+          "5. Exports are unlimited.",
+          "6. Export records are kept for ninety days."
+        ],
+        "right": [
+          "1. Users can start an export from the workbench.",
+          "2. An export contains every version of the current document.",
+          "3. Users can export to PDF; no repeat export within three days.",
+          "4. Exported files are named by date.",
+          "5. Exports are unlimited.",
+          "6. Export records are kept for ninety days."
+        ],
+        "conflict": [
+          2,
+          4
+        ],
+        "catchFlags": [
+          "task_d4_1"
+        ],
+        "kuroEdit": {
+          "clause": 2,
+          "text": "3. Users can export to PDF. An export within three days counts as the same one."
+        }
+      }
+    },
+    {
+      "id": "task2",
+      "title": "The export function: the regex runs twice.",
+      "app": "code",
+      "done": "task_d4_2",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It runs the same regex twice: once in validation, once before writing."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You delete the second one. The function is nine lines shorter."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d4_2",
+            "removed_double_regex"
+          ],
+          "san": 1
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You ask: why are both of these here? It answers: to be safe. You type: safe is not a reason."
+          }
+        ],
+        "kuro": [
+          "To be safe. — Done, removed."
+        ],
+        "effects": {
+          "flags": [
+            "task_d4_2",
+            "removed_double_regex"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You type: run the tests. It answers: tests pass. Two passes of the regex do not change the result, only the time."
+          }
+        ],
+        "kuro": [
+          "Tests pass."
+        ],
+        "effects": {
+          "flags": [
+            "task_d4_2"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
+    }
+  ]
+}
