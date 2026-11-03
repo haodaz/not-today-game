@@ -294,5 +294,7 @@
   "wb.merge": "Merge",
   "wb.keep": "Keep both",
   "vivi.lock": "You have to open it and look, or she will never let it go.",
-  "wb.brand": "Future Intelligence · Workbench"
+  "wb.brand": "Future Intelligence · Workbench",
+  "wb.unit.wrong": "That's not right",
+  "wb.unit.next": "Next"
 }

@@ -294,5 +294,7 @@
   "wb.merge": "合并",
   "wb.keep": "不合",
   "vivi.lock": "你必须点开来看看，否则她会揪着这个事儿不放。",
-  "wb.brand": "未来智能 · 工作台"
+  "wb.brand": "未来智能 · 工作台",
+  "wb.unit.wrong": "这里不对",
+  "wb.unit.next": "下一段"
 }

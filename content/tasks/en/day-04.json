@@ -107,7 +107,26 @@
         "kuroEdit": {
           "clause": 2,
           "text": "3. Users can export to PDF. An export within three days counts as the same one."
-        }
+        },
+        "marks": [
+          {
+            "clause": 2,
+            "kind": "conflict",
+            "worth": 1
+          },
+          {
+            "clause": 4,
+            "kind": "conflict",
+            "worth": 1
+          },
+          {
+            "clause": 2,
+            "kind": "kuro",
+            "worth": 2,
+            "caught": "Mine. The same export, counted once.",
+            "word": "same"
+          }
+        ]
       }
     },
     {
@@ -189,6 +208,39 @@
           "san": -1,
           "letItDoUnchecked": 1
         }
+      },
+      "code": {
+        "lines": [
+          "const EMAIL = /^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/;",
+          "export function exportRows(rows: Row[]): string {",
+          "  for (const r of rows) {",
+          "    if (!EMAIL.test(r.email)) throw new Error(`bad email: ${r.email}`);",
+          "  }",
+          "  const out: string[] = [];",
+          "  for (const r of rows) {",
+          "    // to be safe",
+          "    if (!/^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(r.email)) continue;",
+          "    out.push(toCsvLine(r));",
+          "  }",
+          "  return out.join(\"\\n\");",
+          "}"
+        ],
+        "catchFlags": [
+          "removed_double_regex"
+        ],
+        "marks": [
+          {
+            "clause": 8,
+            "kind": "kuro",
+            "worth": 2,
+            "caught": "The second pass. To be safe."
+          },
+          {
+            "clause": 7,
+            "kind": "odd",
+            "worth": 1
+          }
+        ]
       }
     }
   ]

@@ -113,7 +113,26 @@
         "kuroEdit": {
           "clause": 2,
           "text": "三、我们不讲技术，讲叙事；叙事先有数据，数据从感觉里来，按天计。"
-        }
+        },
+        "marks": [
+          {
+            "clause": 2,
+            "kind": "conflict",
+            "worth": 1
+          },
+          {
+            "clause": 3,
+            "kind": "conflict",
+            "worth": 1
+          },
+          {
+            "clause": 2,
+            "kind": "kuro",
+            "worth": 2,
+            "caught": "Mine. The days were my addition.",
+            "word": "same"
+          }
+        ]
       }
     },
     {
@@ -196,6 +215,41 @@
           "san": -1,
           "letItDoUnchecked": 1
         }
+      },
+      "code": {
+        "lines": [
+          "export interface Order {",
+          "  user_id: string;",
+          "  uid?: string; // for convenience",
+          "  items: Item[];",
+          "}",
+          "export function ownerOf(o: Order) {",
+          "  return o.uid ?? o.user_id;",
+          "}",
+          "export const byUser = (orders: Order[], userId: string) =>",
+          "  orders.filter((o) => o.user_id === userId);"
+        ],
+        "catchFlags": [
+          "fixed_alias"
+        ],
+        "marks": [
+          {
+            "clause": 2,
+            "kind": "kuro",
+            "worth": 2,
+            "caught": "For convenience. Yours, not mine."
+          },
+          {
+            "clause": 6,
+            "kind": "odd",
+            "worth": 1
+          },
+          {
+            "clause": 8,
+            "kind": "odd",
+            "worth": 1
+          }
+        ]
       }
     }
   ]

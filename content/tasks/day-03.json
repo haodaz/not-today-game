@@ -108,7 +108,26 @@
         "kuroEdit": {
           "clause": 3,
           "text": "四、回调在三秒内返回。三秒以今天的为准。"
-        }
+        },
+        "marks": [
+          {
+            "clause": 3,
+            "kind": "conflict",
+            "worth": 1
+          },
+          {
+            "clause": 4,
+            "kind": "conflict",
+            "worth": 1
+          },
+          {
+            "clause": 3,
+            "kind": "kuro",
+            "worth": 2,
+            "caught": "Mine. Three seconds, as of today.",
+            "word": "today"
+          }
+        ]
       }
     },
     {
@@ -148,7 +167,8 @@
         "kuro": [],
         "effects": {
           "flags": [
-            "task_d3_2"
+            "task_d3_2",
+            "caught_archived"
           ],
           "san": 0
         }
@@ -166,7 +186,8 @@
         "effects": {
           "flags": [
             "task_d3_2",
-            "asked_why_added"
+            "asked_why_added",
+            "caught_archived"
           ],
           "san": 0,
           "looked": true
@@ -189,6 +210,33 @@
           "san": -1,
           "letItDoUnchecked": 1
         }
+      },
+      "code": {
+        "lines": [
+          "export type State = \"draft\" | \"sent\" | \"read\" | \"archived\";",
+          "export function next(s: State): State {",
+          "  if (s === \"draft\") return \"sent\";",
+          "  if (s === \"sent\") return \"read\";",
+          "  if (s === \"read\") return \"archived\";",
+          "  return s;",
+          "}"
+        ],
+        "catchFlags": [
+          "caught_archived"
+        ],
+        "marks": [
+          {
+            "clause": 0,
+            "kind": "kuro",
+            "worth": 2,
+            "caught": "Archived. Things should have somewhere to go."
+          },
+          {
+            "clause": 4,
+            "kind": "odd",
+            "worth": 1
+          }
+        ]
       }
     },
     {

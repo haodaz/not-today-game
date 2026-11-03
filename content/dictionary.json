@@ -5,7 +5,8 @@
     {
       "w": "today",
       "gloss": "今天",
-      "extra": "参见：不可以"
+      "extra": "参见：不可以",
+      "contractNote": "不该出现在合同里。"
     },
     {
       "w": "again",
@@ -14,7 +15,8 @@
     {
       "w": "same",
       "gloss": "相同的",
-      "extra": "和图片一模一样"
+      "extra": "和图片一模一样",
+      "contractNote": "合同里的「同一次」，要写清楚是哪一次。"
     },
     {
       "w": "no",
