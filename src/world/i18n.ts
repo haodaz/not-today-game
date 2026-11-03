@@ -24,6 +24,47 @@ export function setLocale(next: Locale): void {
   setContentLocale(next);
 }
 
+/** The cross-run language choice (title-page FR6): a localStorage key, outside the run save. */
+const LANG_KEY = "nt_lang";
+
+/** `s` is a locale, else undefined. */
+function asLocale(s: string | null | undefined): Locale | undefined {
+  return s === "zh" || s === "en" ? s : undefined;
+}
+
+/**
+ * Remember the language across runs (title-page FR6): write it to localStorage under `nt_lang`, so
+ * the next boot opens in the same language. Storage may be absent or throw (private mode); a failure
+ * is silent — the choice just is not remembered.
+ */
+export function persistLocale(next: Locale, storage?: Pick<Storage, "setItem">): void {
+  const store = storage ?? (typeof localStorage !== "undefined" ? localStorage : undefined);
+  try {
+    store?.setItem(LANG_KEY, next);
+  } catch {
+    // Storage disabled or full: the choice is not remembered, which is fine.
+  }
+}
+
+/** The language `nt_lang` last held, or undefined. Storage access is wrapped (it may throw). */
+export function storedLocale(storage?: Pick<Storage, "getItem">): Locale | undefined {
+  const store = storage ?? (typeof localStorage !== "undefined" ? localStorage : undefined);
+  try {
+    return asLocale(store?.getItem(LANG_KEY));
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * The language a boot opens in (title-page FR6): `?lang=` wins (a shared link's choice), then the
+ * remembered `nt_lang`, then English (the README default). `search` is the URL query.
+ */
+export function initialLocale(search: string, storage?: Pick<Storage, "getItem">): Locale {
+  const fromUrl = asLocale(new URLSearchParams(search).get("lang"));
+  return fromUrl ?? storedLocale(storage) ?? "en";
+}
+
 /** A string in one particular locale (no fallback to the other), or undefined. */
 export function stringIn(l: Locale, key: string): string | undefined {
   return key.startsWith("_") ? undefined : tables[l][key];

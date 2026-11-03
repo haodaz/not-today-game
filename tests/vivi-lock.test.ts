@@ -8,7 +8,7 @@ import { isOpenTarget, openedFileId } from "@state/events";
 import { createStore, type Store } from "@state/store";
 import type { ActionContext } from "@world/desktop/controller";
 import { initialSession, type Session } from "@world/desktop/model";
-import { postedDeliverables, viviLock } from "@world/desktop/vivi";
+import { postedDeliverables, viviLock, lockedConversation } from "@world/desktop/vivi";
 import { loopActions } from "@world/room/game";
 import { f } from "@state/fday";
 import { t } from "@world/i18n";
@@ -68,32 +68,86 @@ import { setViviLockForTests } from "@world/desktop/vivi";
 
 afterEach(() => setViviLockForTests(undefined));
 
-describe("the screen switches are refused while locked", () => {
+describe("a locked conversation is derived from the log", () => {
+  it("names the recipient whose incoming item carries the locked doc", () => {
+    const state = f(1);
+    expect(lockedConversation(state, [], "09:00", table)).toBeNull(); // before the deliverable's time
+    expect(lockedConversation(state, [], "09:30", table)).toBe("group");
+    const opened = [{ kind: "open", day: 1, target: "file:vivi-plan-1", t: "09:31" }] as const;
+    expect(lockedConversation(state, opened, "09:30", table)).toBeNull(); // opened: no lock, no conversation
+  });
+});
+
+describe("the screen switches are refused while locked — and land on the locked conversation", () => {
   const box = (ctx: ActionContext) => ctx.session.dialogue.queue.map((q) => q.lines.map((l) => l.t).join("")).join("|");
 
-  it("refuses dock / screen / wb-nav / feed / conv with the vivi.lock line; a refused switch logs and changes nothing", () => {
-    setViviLockForTests("vivi-plan-1");
-    for (const [name, data] of [["dock", { app: "browser" }], ["screen", { screen: "right" }], ["wb-nav", { page: "docs" }], ["feed", {}], ["conv", { conv: "boss" }]] as const) {
+  it("refuses dock / screen / wb-nav / feed with the vivi.lock line; a refused switch logs nothing and lands on the locked conversation (group, in 工作台's 消息 pane)", () => {
+    setViviLockForTests("vivi-plan-1", "group");
+    for (const [name, data] of [["dock", { app: "browser" }], ["screen", { screen: "right" }], ["wb-nav", { page: "docs" }], ["feed", {}]] as const) {
       const store = createStore({ startDay: 1 });
       const ctx = ctxOf(store);
+      // Start it somewhere a refused switch would otherwise have moved: not on the group yet.
+      ctx.session.leftApp = "msgs";
+      ctx.session.workbenchPage = "home";
       const before = store.getEvents().length;
       loopActions[name]!(ctx, data as DOMStringMap, null as never);
       expect(box(ctx), `${name} shows the lock line`).toContain(t("vivi.lock"));
       expect(store.getEvents().length, `${name} logs nothing`).toBe(before);
-      expect(ctx.session.leftApp, `${name} did not switch app`).toBe("msgs");
-      expect(ctx.session.workbenchPage, `${name} did not switch page`).toBe("home");
+      // The camera moved to the group's conversation, in 工作台's 消息 pane (never a dead end).
+      expect(ctx.session.leftApp, `${name} opened 工作台`).toBe("workbench");
+      expect(ctx.session.workbenchPage, `${name} opened the 消息 pane`).toBe("msgs");
+      expect(ctx.session.conversation, `${name} selected the group`).toBe("group");
     }
   });
 
+  it("a conv switch to another conversation is refused and lands on the locked conversation", () => {
+    setViviLockForTests("vivi-plan-1", "group");
+    const store = createStore({ startDay: 1 });
+    const ctx = ctxOf(store);
+    const before = store.getEvents().length;
+    loopActions["conv"]!(ctx, { conv: "boss" } as DOMStringMap, null as never);
+    expect(box(ctx)).toContain(t("vivi.lock"));
+    expect(store.getEvents().length, "a refused conv logs nothing").toBe(before);
+    expect(ctx.session.conversation).toBe("group");
+  });
+
+  it("a conv switch to the locked conversation itself is allowed (it is the way to the bubble)", () => {
+    setViviLockForTests("vivi-plan-1", "group");
+    const store = createStore({ startDay: 1 });
+    const ctx = ctxOf(store);
+    loopActions["conv"]!(ctx, { conv: "group" } as DOMStringMap, null as never);
+    expect(box(ctx), "no lock line: the switch was allowed").not.toContain(t("vivi.lock"));
+    expect(ctx.session.conversation).toBe("group");
+    // messageActions.conv logged opening it.
+    expect(store.getEvents().some((e) => e.kind === "open" && e.target === "conv:group")).toBe(true);
+  });
+
   it("allows 回房间 while locked (the lock is about the screen, not the room)", () => {
-    setViviLockForTests("vivi-plan-1");
+    setViviLockForTests("vivi-plan-1", "group");
     const ctx = ctxOf(createStore({ startDay: 1 }));
     loopActions["view"]!(ctx, { view: "room" } as DOMStringMap, null as never);
     expect(ctx.session.view).toBe("room");
   });
 
+  it("the locked conversation's 打开 bubble opens the doc and lifts the lock", () => {
+    setViviLockForTests("vivi-plan-1", "group");
+    const store = createStore({ startDay: 1 });
+    const ctx = ctxOf(store);
+    // A refused switch has landed on the group; its deliverable bubble is on screen.
+    loopActions["dock"]!(ctx, { app: "browser" } as DOMStringMap, null as never);
+    expect(ctx.session.conversation).toBe("group");
+    // Clicking the bubble logs open file:<doc> and lifts the lock.
+    loopActions["open-deliverable"]!(ctx, { doc: "vivi-plan-1" } as DOMStringMap, null as never);
+    expect(store.getEvents().some((e) => e.kind === "open" && e.target === "file:vivi-plan-1")).toBe(true);
+    // The lock is lifted: a switch now goes through (it adds no new lock line, and it changes the app).
+    const queuedBefore = ctx.session.dialogue.queue.length;
+    loopActions["screen"]!(ctx, { screen: "right" } as DOMStringMap, null as never);
+    expect(ctx.session.dialogue.queue.length, "the switch pushed no lock line").toBe(queuedBefore);
+    expect(ctx.session.focus).toBe("right");
+  });
+
   it("lifts once the doc is opened (survives reload: it is read from the log)", () => {
-    setViviLockForTests("vivi-plan-1");
+    setViviLockForTests("vivi-plan-1", "group");
     const store = createStore({ startDay: 1 });
     store.appendEvent({ kind: "open", target: "file:vivi-plan-1", t: "09:31" });
     const ctx = ctxOf(store);

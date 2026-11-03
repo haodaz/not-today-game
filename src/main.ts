@@ -27,7 +27,7 @@ import { mountDesktop } from "@world/desktop/controller";
 import { desktopActions } from "@world/desktop/actions";
 import { endingHost } from "@world/endings/flow";
 import { watchEndings } from "@world/endings/record";
-import { getLocale, setLocale } from "@world/i18n";
+import { getLocale, initialLocale, setLocale } from "@world/i18n";
 import { syncLoop } from "@world/loop/runtime";
 import { createMotion } from "@world/motion/dom";
 import { loopActions, loopKeys, renderGame } from "@world/room/game";
@@ -40,7 +40,9 @@ import { RUN_VERSION as RUN_FORMAT_VERSION } from "@state/saves";
 
 const search = window.location.search;
 const params = new URLSearchParams(search);
-setLocale(params.get("lang") === "zh" ? "zh" : "en");
+// The language is remembered across runs (title-page FR6): `?lang=` first, then the stored
+// `nt_lang`, then English.
+setLocale(initialLocale(search, window.localStorage));
 document.documentElement.lang = getLocale();
 
 const root = document.getElementById("app")!;

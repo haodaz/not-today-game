@@ -35,10 +35,16 @@ export function openedFileIds(events: readonly GameEvent[]): ReadonlySet<string>
   return out;
 }
 
-/** Tests only: force the lock, since no content posts a deliverable yet. Null = use the real derivation. */
+/**
+ * Tests only: force the lock, since no content posts a deliverable yet. Null = use the real
+ * derivation. `conv` (optional) is the conversation the forced doc belongs to, so `lockedConversation`
+ * resolves without a content table that carries the doc.
+ */
 let lockOverride: string | null | undefined;
-export function setViviLockForTests(doc: string | null | undefined): void {
+let lockConvOverride: string | null | undefined;
+export function setViviLockForTests(doc: string | null | undefined, conv?: string | null): void {
   lockOverride = doc;
+  lockConvOverride = conv;
 }
 
 /** The first posted deliverable the player has not opened yet, or null: the screen's lock. */
@@ -49,4 +55,28 @@ export function viviLock(state: State, events: readonly GameEvent[], now: string
   }
   const opened = openedFileIds(events);
   return postedDeliverables(state, now, table).find((doc) => !opened.has(doc)) ?? null;
+}
+
+/**
+ * The recipient id whose incoming item holds `doc` (its posted deliverable), or null. So a refused
+ * switch can land the player on the conversation that holds the locked doc (desktop-ui 2026-11-03):
+ * never a dead end. `table` defaults to the content for `state.day`; tests pass a fixture.
+ */
+export function conversationOfDoc(doc: string, state: State, now: string, table = dayTable(state.day)): string | null {
+  if (!table) return null;
+  for (const [recipient, { incoming }] of table.recipients) {
+    for (const item of incoming) {
+      if (item.kind === "deliverable" && item.doc === doc && item.t <= now && condHolds(item.cond_show, state)) return recipient;
+    }
+  }
+  return null;
+}
+
+/** The recipient holding the first locked doc now (the lock's conversation), or null. */
+export function lockedConversation(state: State, events: readonly GameEvent[], now: string, table = dayTable(state.day)): string | null {
+  const doc = viviLock(state, events, now, table);
+  if (doc === null) return null;
+  // Tests force the doc without a content table that carries it; the forced conversation stands in.
+  if (lockOverride !== undefined && lockConvOverride !== undefined) return lockConvOverride;
+  return conversationOfDoc(doc, state, now, table);
 }

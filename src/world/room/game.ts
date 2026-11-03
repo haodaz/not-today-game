@@ -23,7 +23,7 @@ import { nextInputs, startDoor, stepDoor, type DoorInput } from "@world/delivery
 import { doorLines } from "@world/delivery/view";
 import { mealView } from "@world/delivery/meals";
 import { cls, html, type SafeHtml } from "@world/html";
-import { setLocale, t, tr } from "@world/i18n";
+import { persistLocale, setLocale, t, tr } from "@world/i18n";
 import { skipToLast, storyMasked } from "@world/dialogue/mask";
 import { tabooActions, tabooLayer } from "@world/dialogue/taboo";
 import { handOf } from "@state/hands";
@@ -57,7 +57,8 @@ import { renderFiles } from "@world/desktop/files/view";
 import { filesActions, openFilesApp } from "@world/desktop/files/actions";
 import { callActions, resumeCall } from "@world/desktop/call/actions";
 import { deliverablePage } from "@state/files";
-import { viviLock } from "@world/desktop/vivi";
+import { viviLock, lockedConversation } from "@world/desktop/vivi";
+import { appOfThread } from "@world/desktop/messages/threads";
 import { cancelCloser, startCloser } from "@world/late/closer";
 import { startJudgement } from "@world/dialogue/judge";
 import { sendEmailLink } from "@net/email";
@@ -95,18 +96,47 @@ export function shownApp(session: Session): AppId {
 }
 
 /**
+ * Open a conversation on 屏幕 without logging or stepping the checklist (it is a camera move, not the
+ * player opening it): the work ones in 工作台's 消息 pane, 家里/朋友圈 in 消息. Used to land a refused
+ * switch on the locked conversation, so the lock never dead-ends (desktop-ui 2026-11-03).
+ */
+function showConversation(session: Session, id: string): void {
+  session.focus = "left";
+  if (appOfThread(id) === "workbench") {
+    session.leftApp = "workbench";
+    session.workbenchPage = "msgs";
+    session.conversation = id;
+  } else {
+    session.leftApp = "msgs";
+    session.homeConversation = id;
+  }
+  session.selected = null;
+  session.draft = "";
+  session.inner = null;
+}
+
+/**
  * Vivi's deliverable locks the screen (desktop-ui 2026-11-02): while a deliverable is posted and not
- * yet opened, every app/page switch on 屏幕 is refused with the `vivi.lock` box line. 回房间 and the
- * 文件 window (where the player opens it) are not switches, so they are not refused. Returns true
+ * yet opened, every app/page switch on 屏幕 is refused with the `vivi.lock` box line — then the camera
+ * lands on the conversation that holds the locked doc, so its 「打开」 bubble is on screen and the lock
+ * is never a dead end (desktop-ui 2026-11-03). A switch whose target *is* that conversation is never
+ * refused (that is how the player reaches the bubble). 回房间 and the 文件 window are not switches, so
+ * they are not refused either. `toConv` is the conversation a switch targets, if any. Returns true
  * when the switch was refused. Derived from the log, so it survives a reload.
  */
-function viviRefuse(ctx: ActionContext): boolean {
+function viviRefuse(ctx: ActionContext, toConv?: string | null): boolean {
   const { store, session } = ctx;
   if (session.view !== "desktop") return false;
-  const locked = viviLock(store.getState(), store.getEvents(), session.clock.time);
+  const state = store.getState();
+  const conv = lockedConversation(state, store.getEvents(), session.clock.time);
+  // The lock's conversation itself is always reachable: that is where the 「打开」 bubble lives.
+  if (toConv !== undefined && toConv !== null && conv !== null && toConv === conv) return false;
+  const locked = viviLock(state, store.getEvents(), session.clock.time);
   if (!locked) return false;
-  const day = store.getState().day;
+  const day = state.day;
   session.dialogue = push(session.dialogue, { key: `d${day}:vivi:lock`, lines: [{ k: "narration", t: t("vivi.lock") }], ending: { kind: "none" } });
+  // Land on the locked doc's conversation so its bubble is on screen (never a dead end).
+  if (conv !== null) showConversation(session, conv);
   ctx.rerender();
   return true;
 }
@@ -474,7 +504,7 @@ export const loopActions: Record<string, ActionHandler> = {
 
   // 老周的事: the loan is answered in 老周's conversation; opening it brings the prompt up.
   conv(ctx, data, el) {
-    if (viviRefuse(ctx)) return;
+    if (viviRefuse(ctx, data.conv)) return;
     messageActions.conv!(ctx, data, el);
     // Another conversation is another place (`screen:msgs:<id>`).
     if (settleSession(ctx.session)) ctx.rerender();
@@ -833,6 +863,8 @@ export const loopActions: Record<string, ActionHandler> = {
   "settings-lang"(ctx, data) {
     if (data.lang !== "zh" && data.lang !== "en") return;
     setLocale(data.lang);
+    // Remembered across runs (title-page FR6): the next boot opens in this language.
+    if (typeof localStorage !== "undefined") persistLocale(data.lang, localStorage);
     // The game type follows the language (title-page FR6: html[lang] picks the faces).
     if (typeof document !== "undefined") document.documentElement.lang = data.lang;
     ctx.rerender();

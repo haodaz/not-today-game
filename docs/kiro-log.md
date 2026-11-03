@@ -1440,3 +1440,22 @@ and its reels. Kiro's area only; `content/` untouched; the tape program is uncha
   right larger near the end); the upgraded walkman shows the transcript HiFrame and the reels do not
   turn; the cord sways only at `data-mode="play"` (CSS, reduced-motion aware); and a locale test —
   for every drawn device zh → en changes the brand/keycap words and renders no CJK under en.
+
+## desktop-ui + title-page fixes (18-day walkthrough) · 2026-11-03
+
+- Two fixes found in a headless 18-day walkthrough. Only `src/` and `tests/` touched; no `content/`.
+- **Vivi's lock is never a dead end** (desktop-ui). `src/world/desktop/vivi.ts` gained two pure
+  helpers: `conversationOfDoc(doc, state, now, table)` (the recipient whose incoming item carries the
+  locked doc) and `lockedConversation(state, events, now, table)` (the recipient of the first locked
+  doc now). `src/world/room/game.ts`: `viviRefuse` now, on a refused switch, shows the `vivi.lock`
+  line and lands the camera on the locked doc's conversation (via a new `showConversation` helper and
+  `appOfThread`), so its `open-deliverable` bubble is on screen; a switch whose target *is* the locked
+  conversation (`conv` with that id) is no longer refused. `setViviLockForTests` takes an optional
+  conversation so the forced lock resolves without a content table that carries the doc.
+  `tests/vivi-lock.test.ts` rewritten for the land-on-conversation behaviour.
+- **The language is remembered** (title-page FR6). `src/world/i18n.ts` gained `persistLocale`,
+  `storedLocale` and `initialLocale(search, storage)` — order is `?lang=` → stored `nt_lang` →
+  English; all storage access wrapped in try/catch. `src/main.ts` resolves the boot language with
+  `initialLocale`. `src/ui/title/mount.ts` and `game.ts`'s `settings-lang` persist the choice to
+  `nt_lang`. New `tests/locale.test.ts`.
+- `npx tsc --noEmit`: clean. `npx vitest run`: 92 files / 1635 tests passed.

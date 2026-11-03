@@ -1,7 +1,7 @@
 // The title page's DOM side (title-page FR1–FR3, FR7): clicks, typing, keys, the idle events,
 // the rain, and the camera push to the desk where the question card opens (correction
 // 2026-11-01). The view is pure (view.ts); this file owns timers and sound only.
-import { getLocale, setLocale } from "@world/i18n";
+import { getLocale, persistLocale, setLocale, type Locale } from "@world/i18n";
 import { applyFit, BACKDROPS } from "@world/fit";
 import { onEmailChange, sendEmailLink, setEmailDraft } from "@net/email";
 import type { State } from "@state/types.gen";
@@ -160,6 +160,14 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     else set(next);
   }
 
+  /** Choose the language and remember it across runs (title-page FR6): `nt_lang` in localStorage. */
+  function pickLang(l: Locale): void {
+    setLocale(l);
+    persistLocale(l, win.localStorage);
+    sound();
+    render();
+  }
+
   function start(): void {
     if (!canStart(model.answers) || model.starting) return;
     // The card closes and the lamp goes off; the game begins at the desk framing (FR7).
@@ -182,14 +190,10 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     "settings-email-send": () => void sendEmailLink(win.location.origin, render),
     "settings-lang": (el) => {
       const l = el.dataset.lang;
-      if (l === "zh" || l === "en") setLocale(l);
-      sound();
-      render();
+      if (l === "zh" || l === "en") pickLang(l);
     },
     "title-lang": () => {
-      setLocale(getLocale() === "en" ? "zh" : "en");
-      sound();
-      render();
+      pickLang(getLocale() === "en" ? "zh" : "en");
     },
     "loop-mute": () => {
       set({ ...model, muted: !model.muted });
