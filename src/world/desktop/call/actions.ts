@@ -8,22 +8,26 @@ import { advanceTo } from "../beat";
 import type { ActionContext, ActionHandler } from "../controller";
 import { callOf, callStartTime, lengthSeconds } from "@world/loop/call";
 
-/** How many real ms a call second takes. 300 ms (fast but readable); the dev `?fast=1` makes it 30 ms. */
-export const CALL_SECOND_MS = 300;
+/**
+ * How long any call lasts in real ms, whatever its `length` (correction 2026-11-03: the online
+ * meeting takes one minute; nobody waits 21 real minutes). The dev `?fast=1` makes it 6 s. The
+ * per-call-second ms is derived from this: `CALL_TOTAL_MS / lengthSeconds(length)`.
+ */
+export const CALL_TOTAL_MS = 60_000;
+export const CALL_TOTAL_MS_FAST = 6_000;
 /** How long the 30-minute wait (the incoming-call screen) takes in real ms. */
 export const CALL_WAIT_MS = 6_000;
 
 const nowOf = (ctx: ActionContext) => ctx.now?.() ?? Date.now();
 
-/** Connect the call (the wait is over) and schedule its end at `call.length`. */
+/** Connect the call (the wait is over) and schedule its end one minute on. */
 function connect(ctx: ActionContext, day: number): void {
   const call = callOf(day);
   if (!call || !ctx.session.call || ctx.session.call.day !== day) return;
   ctx.session.call.connected = true;
   // The clock jumps to the call's start time (ask + 30 min).
   ctx.session.clock = advanceTo(ctx.session.clock, callStartTime(call));
-  const ms = Math.max(1, lengthSeconds(call.length)) * callSecondMs(ctx);
-  ctx.later(ms, () => endCall(ctx, day));
+  ctx.later(callTotalMs(ctx), () => endCall(ctx, day));
   ctx.rerender();
 }
 
@@ -36,8 +40,10 @@ function endCall(ctx: ActionContext, day: number): void {
   ctx.store.appendEvent({ kind: "callEnded" });
 }
 
-/** A call second in ms (the dev fast path shortens it, like delivery's unit). */
-const callSecondMs = (ctx: ActionContext): number => (ctx.session.deliveryUnitMs <= 1_000 ? 30 : CALL_SECOND_MS);
+/** The whole call in ms (the dev fast path shortens it, like delivery's unit). */
+const callTotalMs = (ctx: ActionContext): number => (ctx.session.deliveryUnitMs <= 1_000 ? CALL_TOTAL_MS_FAST : CALL_TOTAL_MS);
+/** The per-call-second ms, for the cosmetic timer: the minute spread over the call's length. */
+export const callSecondMs = (ctx: ActionContext): number => callTotalMs(ctx) / Math.max(1, lengthSeconds(callOf(ctx.store.getState().day)?.length ?? "1:00"));
 const callWaitMs = (ctx: ActionContext): number => (ctx.session.deliveryUnitMs <= 1_000 ? 300 : CALL_WAIT_MS);
 
 export const callActions: Record<string, ActionHandler> = {
@@ -73,10 +79,10 @@ export function resumeCall(ctx: ActionContext): boolean {
   const answered = events.some((e) => e.kind === "callAnswer" && e.day === day);
   const ended = events.some((e) => e.kind === "callEnded" && e.day === day);
   if (!answered || ended || !callOf(day)) return false;
-  // Resume connected (the wait is long past on a reload): run the remaining length, then end.
+  // Resume connected (the wait is long past on a reload): run the minute out, then end.
   ctx.session.call = { day, answeredMs: nowOf(ctx), connected: true };
   const call = callOf(day)!;
   ctx.session.clock = advanceTo(ctx.session.clock, callStartTime(call));
-  ctx.later(Math.max(1, lengthSeconds(call.length)) * callSecondMs(ctx), () => endCall(ctx, day));
+  ctx.later(callTotalMs(ctx), () => endCall(ctx, day));
   return true;
 }

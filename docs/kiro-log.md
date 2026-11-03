@@ -1459,3 +1459,30 @@ and its reels. Kiro's area only; `content/` untouched; the tape program is uncha
   `initialLocale`. `src/ui/title/mount.ts` and `game.ts`'s `settings-lang` persist the choice to
   `nt_lang`. New `tests/locale.test.ts`.
 - `npx tsc --noEmit`: clean. `npx vitest run`: 92 files / 1635 tests passed.
+
+## day-loop: the boss call is an online meeting window · 2026-11-03
+
+- Correction 2026-11-03 (author + Claude's day-7 run): the call is an online meeting window on 屏幕
+  and it takes one minute, whatever its `length`. Only `src/world/desktop/call/*`, `desktop.css` and
+  `tests/boss-call.test.ts` touched; no `content/`.
+- **Duration** (`src/world/desktop/call/actions.ts`): the per-call-second ms is gone; a call now runs
+  a fixed `CALL_TOTAL_MS` = 60 000 (dev `?fast=1`: `CALL_TOTAL_MS_FAST` = 6 000), independent of
+  length. `connect` and `resumeCall` schedule the end at `callTotalMs(ctx)`. `callSecondMs` is kept
+  (exported) as `CALL_TOTAL_MS / lengthSeconds(length)` for the cosmetic timer mapping.
+- **View** (`src/world/desktop/call/view.ts`): the connected panel is rebuilt as a meeting window —
+  a title bar (`call.title` · boss name · timer `00:00 → length`, the timer = fraction-of-the-minute ×
+  length), two tiles (the boss, his ring `call-tile boss speaking` while his line is newest; and you,
+  `call.you` / `call.camOff`), a four-button toolbar (mic, camera-off crossed, share disabled,
+  `call.hangup` red and disabled until the end), and a captions panel (`call.captions`; a boss line
+  reads 「老板：…」, a `me` line in grey parentheses). Ringing state kept as a compact window. Every
+  fixed text from strings; a missing one renders nothing (mic/camera/share have no string yet, so
+  they show as icon-only buttons).
+- **CSS** (`src/world/desktop/desktop.css`): the ringing/connected states are now a light window
+  (`.call-win`, workbench chrome), not a dark takeover block; added `.call-topbar`, `.call-stage`,
+  `.call-tile`, `.call-you-av`, `.call-toolbar`, `.call-tool(.cross/.hang)`, `.call-captions`, and a
+  `call-pulse` keyframe for the speaking ring.
+- Tests: a 1:12:00 (day 7) and a 30:00 (day-1 fixture) call both end after 60 000 ms (6 000 fast); the
+  connected render has the two tiles, the four toolbar buttons with 离开 disabled until the end, and
+  the captions panel with the boss line prefixed and a `me` line in parentheses; the ringing state
+  renders; a strings-missing call renders without words and never crashes; replay unchanged.
+- `npx tsc --noEmit`: clean. `npx vitest run`: 92 files / 1642 tests passed.

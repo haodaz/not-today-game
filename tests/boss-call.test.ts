@@ -237,3 +237,114 @@ describe("the overlay", () => {
     expect(callOf(2)).toBeNull();
   });
 });
+
+// ——— correction 2026-11-03: the call takes one minute, whatever its length ———
+
+/** A ctx that records every scheduled timer (delay + fn) instead of running it. */
+function recordingCtx(store: Store, session: Session = initialSession(DEFAULT_CLOCK, "left", "desktop")) {
+  const timers: { ms: number; fn: () => void }[] = [];
+  let now = 0;
+  const ctx: ActionContext = { store, session, rerender: () => {}, later: (ms, fn) => void timers.push({ ms, fn }), now: () => now };
+  return { ctx, timers, run: () => timers.splice(0).forEach((t) => t.fn()), tick: (ms: number) => (now += ms) };
+}
+
+describe("the call takes one minute, whatever its length (correction 2026-11-03)", () => {
+  // The delay the end timer is scheduled with, for a given call day and fast flag. day 1 is the
+  // 30:00 fixture; day 7 is the real 1:12:00 call — both must end after the same one minute.
+  const endDelayFor = (day: number, fast: boolean): number => {
+    const store = createStore({ startDay: day });
+    const session = initialSession(DEFAULT_CLOCK, "left", "desktop");
+    if (fast) session.deliveryUnitMs = 1_000;
+    const r = recordingCtx(store, session);
+    r.ctx.session.clock = { beat: "afternoon", time: callOf(day)!.at };
+    act(r.ctx, "call-answer");
+    // The first timer is the 30-minute wait; running it connects the call and schedules its end.
+    r.timers.splice(0, 1).forEach((t) => t.fn());
+    return r.timers.at(-1)!.ms;
+  };
+
+  it("a 1:12:00 (day 7) and a 30:00 (day 1 fixture) call both end after 60 000 ms (6 000 with fast)", () => {
+    expect(callOf(7)!.length).toBe("1:12:00");
+    expect(callOf(1)!.length).toBe("30:00");
+    expect(endDelayFor(7, false)).toBe(60_000);
+    expect(endDelayFor(1, false)).toBe(60_000);
+    expect(endDelayFor(7, true)).toBe(6_000);
+    expect(endDelayFor(1, true)).toBe(6_000);
+  });
+});
+
+describe("the connected meeting window (correction 2026-11-03)", () => {
+  // Day 7 has a real call and real strings (call.l.7.*); use it unmocked.
+  const d7 = (nowMs: number, connected = true) => {
+    const store = createStore({ startDay: 7 });
+    const session = initialSession({ beat: "afternoon", time: "18:30" }, "left", "desktop");
+    session.call = { day: 7, answeredMs: 0, connected };
+    store.appendEvent({ kind: "callAnswer" });
+    return renderCall({ state: store.getState(), events: store.getEvents(), startDay: 7, session, night: false, nowMs })!.value;
+  };
+
+  it("has the title bar, the two tiles, the four toolbar buttons, and the captions panel", () => {
+    const html = d7(60_000); // fully elapsed: every line shown
+    expect(html).toContain("call-overlay in-call");
+    expect(html).toContain("call-topbar");
+    expect(html).toContain("call-title");
+    // Two tiles: the boss and you.
+    expect(html).toContain("call-tile boss");
+    expect(html).toContain("call-tile you");
+    expect(html).toContain("call-you-av");
+    // call.you / call.camOff from strings.
+    expect(html).toContain("你");
+    expect(html).toContain("摄像头已关闭");
+    // The toolbar: four buttons (mic, camera-off crossed, share, hang).
+    expect((html.match(/class="call-tool[ "]/g) ?? []).length).toBe(4);
+    expect(html).toContain("call-tool cross");
+    // The captions panel with its header.
+    expect(html).toContain("call-captions");
+    expect(html).toContain("实时字幕");
+    expect(html).toContain("call-script");
+  });
+
+  it("离开 is disabled while the call is live and enabled once it has ended", () => {
+    // Live (connected): the hang button is disabled.
+    const live = d7(5_000, true);
+    expect(/data-action="call-end"[^>]*\bdisabled/.test(live)).toBe(true);
+    // The window is gone after the end (nothing to disable); its disabled-until-end rule is the live case.
+  });
+
+  it("a boss line reads 「老板：…」 and a me line is in parentheses", () => {
+    const html = d7(60_000);
+    // The first line is the boss's: prefixed with his name.
+    expect(html).toContain("老板：我刚从一个会出来");
+    // A me line (line 4) is the player's own summary in parentheses.
+    expect(html).toContain("（他又讲了一遍那个市值。）");
+  });
+
+  it("the boss's ring pulses while his line is the newest", () => {
+    // Early in the call only the first (boss) line shows: his tile is speaking.
+    const early = d7(0);
+    expect(early).toContain("call-tile boss speaking");
+  });
+});
+
+describe("the ringing state renders on 屏幕, strings-missing is silent, and it replays", () => {
+  it("renders the ringing window with the incoming line and dots", () => {
+    const store = bossCallDay();
+    const session = initialSession({ beat: "afternoon", time: "14:30" }, "left", "desktop");
+    store.appendEvent({ kind: "callAnswer" }); // answered but not connected → waiting
+    const html = renderCall(app(store, session))!.value;
+    expect(html).toContain("call-overlay ringing");
+    expect(html).toContain("call-dots");
+    expect(html).toContain("邀请你加入语音通话"); // call.incoming
+  });
+
+  it("a connected call whose lines have no strings renders the window without words and never crashes", () => {
+    // The fixture day-1 has no call.l.1.* strings: the rows render empty, the shell still stands.
+    const store = bossCallDay();
+    const session = initialSession({ beat: "afternoon", time: "14:30" }, "left", "desktop");
+    session.call = { day: 1, answeredMs: 0, connected: true };
+    store.appendEvent({ kind: "callAnswer" });
+    const html = renderCall(app(store, session, 60_000))!.value;
+    expect(html).toContain("call-overlay in-call");
+    expect(html).toContain("call-script");
+  });
+});

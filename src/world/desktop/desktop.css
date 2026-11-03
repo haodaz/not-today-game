@@ -515,28 +515,59 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 /* The deliverable keeps its clickable link-card look. */
 .sc.deliverable{display:block;width:100%;text-align:left;font:inherit;cursor:pointer;border-left:3px solid var(--warm)}
 .sc.deliverable:hover,.sc.deliverable:focus-visible{background:#fffaf0}
-/* The boss's call (day-loop "the boss calls", 2026-11-03). The ask is a small card; the incoming
-   screen and the connected panel take the whole screen (nothing else can be done until it ends). */
+/* The boss's call (day-loop correction 2026-11-03): an online meeting window on the left screen of
+   屏幕, light like 工作台 (one tone, no dark block). The ask stays a small chat card; the ringing and
+   connected states are a meeting window centred over the screen. Nothing else can be used until it
+   ends (the controller blocks every other action). */
 .call-overlay{position:absolute;inset:0;z-index:40;display:flex;align-items:center;justify-content:center}
-.call-overlay.ringing,.call-overlay.in-call{background:rgba(16,18,24,.92)}
+/* Light scrim, not a dark block: the meeting is a window, not a takeover screen. */
+.call-overlay.ringing,.call-overlay.in-call{background:rgba(30,40,58,.14)}
 .call-overlay.ask{background:rgba(16,18,24,.28);align-items:flex-start;justify-content:flex-end;padding:56px 40px}
 .call-card{display:flex;flex-direction:column;align-items:center;gap:12px;color:#eef1f6;text-align:center;min-width:220px}
 .call-overlay.ask .call-card{background:#fff;color:var(--ink);border-radius:12px;padding:16px 18px;box-shadow:0 8px 30px rgba(0,0,0,.25);min-width:0;max-width:280px;align-items:flex-start;text-align:left}
 .call-av{width:72px;height:72px;border-radius:50%;object-fit:cover}
 .call-overlay.ask .call-av{width:40px;height:40px}
-.call-name{font-size:16px;font-weight:600}
+.call-name{font-size:14px;font-weight:600;color:var(--ink)}
 .call-overlay.ask .call-name{font-size:14px}
 .call-ask{font-size:14px;line-height:1.5;color:var(--ink-2)}
 .call-ok{margin-top:4px;align-self:flex-end;border:0;border-radius:8px;background:var(--accent);color:#fff;font:inherit;font-size:13px;padding:6px 18px;cursor:pointer}
-.call-sub{font-size:13px;color:#aeb6c4}
-.call-dots{display:flex;gap:6px;margin-top:6px}
-.call-dots i{width:7px;height:7px;border-radius:50%;background:#aeb6c4;animation:wb-dots 1s infinite}
+.call-dots{display:flex;gap:6px;margin-top:10px}
+.call-dots i{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:wb-dots 1s infinite}
 .call-dots i:nth-child(2){animation-delay:.2s}.call-dots i:nth-child(3){animation-delay:.4s}
-.call-head{display:flex;flex-direction:column;align-items:center;gap:8px}
-.call-timer{font-variant-numeric:tabular-nums;font-size:13px;color:#aeb6c4;letter-spacing:.04em}
-.call-script{margin-top:14px;width:360px;max-width:72vw;max-height:40vh;overflow:auto;display:flex;flex-direction:column;gap:8px;background:rgba(255,255,255,.06);border-radius:10px;padding:12px 14px}
+
+/* The meeting window: the workbench's light chrome, a soft shadow, rounded. */
+.call-win{background:#fff;color:var(--ink);border-radius:14px;box-shadow:0 20px 60px rgba(16,24,40,.28);overflow:hidden;display:flex;flex-direction:column}
+/* Ringing: a compact card inside the same window. */
+.call-overlay.ringing .call-win{width:360px;padding:34px 28px}
+.call-ring{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.call-sub{font-size:13px;color:var(--ink-2)}
+/* Connected: a wider window with a title bar, a stage + captions body, and a toolbar. */
+.call-overlay.in-call .call-win{width:760px;max-width:84vw}
+.call-topbar{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);background:#f6f8fb}
+.call-title{font-size:13px;font-weight:600;color:var(--ink)}
+.call-topbar .call-name{font-weight:500;color:var(--ink-2)}
+.call-timer{margin-left:auto;font-variant-numeric:tabular-nums;font-size:13px;color:var(--ink-2);letter-spacing:.04em}
+.call-body{display:flex;gap:0;align-items:stretch}
+.call-stage{flex:1 1 auto;display:flex;gap:14px;padding:18px;background:#eef1f5}
+.call-tile{flex:1 1 0;min-width:0;border-radius:10px;background:#fff;box-shadow:0 0 0 1px var(--line);color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:22px 10px;position:relative}
+.call-tile .call-tile-name{font-size:13px;color:var(--ink-2)}
+.call-tile.boss .call-ring-wrap{border-radius:50%;padding:3px;border:2px solid transparent}
+.call-tile.boss.speaking .call-ring-wrap{border-color:#5fd08a;animation:call-pulse 1.4s ease-in-out infinite}
+.call-you-av{width:56px;height:56px;border-radius:50%;background:#e3e7ee;color:var(--ink-2);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600}
+.call-camoff{font-size:11px;color:#9aa4b4}
+@keyframes call-pulse{0%,100%{box-shadow:0 0 0 0 rgba(95,208,138,.5)}50%{box-shadow:0 0 0 6px rgba(95,208,138,0)}}
+/* The captions panel on the right. */
+.call-captions{flex:0 0 268px;max-width:40%;display:flex;flex-direction:column;border-left:1px solid var(--line);background:#fff}
+.call-cap-head{padding:12px 14px 6px;font-size:12px;font-weight:600;color:var(--ink-2)}
+.call-script{flex:1 1 auto;min-height:180px;max-height:46vh;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:6px 14px 14px}
 .call-line{font-size:13px;line-height:1.5}
-.call-line.boss{color:#eef1f6}
-.call-line.me{color:#aeb6c4;align-self:flex-end;text-align:right}
-.call-hang{margin-top:18px;border:0;border-radius:22px;background:#d2493b;color:#fff;font:inherit;font-size:14px;padding:9px 28px;cursor:pointer}
-.call-hang:disabled{opacity:.4;cursor:default}
+.call-line.boss{color:var(--ink)}
+.call-line.me{color:var(--ink-2)}
+/* The toolbar under the stage. */
+.call-toolbar{display:flex;align-items:center;justify-content:center;gap:12px;padding:12px 16px;border-top:1px solid var(--line);background:#f6f8fb}
+.call-tool{border:0;border-radius:22px;width:44px;height:44px;background:#e7ebf1;color:var(--ink);font-size:18px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.call-tool.cross{position:relative}
+.call-tool.cross::after{content:"";position:absolute;left:8px;right:8px;top:50%;height:2px;background:#d2493b;transform:rotate(-20deg)}
+.call-tool.hang{width:auto;gap:8px;padding:0 20px;background:#d2493b;color:#fff;font-size:14px}
+.call-tool-l{font-size:14px}
+.call-tool:disabled{opacity:.4;cursor:default}
