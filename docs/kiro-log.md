@@ -1486,3 +1486,64 @@ and its reels. Kiro's area only; `content/` untouched; the tape program is uncha
   the captions panel with the boss line prefixed and a `me` line in parentheses; the ringing state
   renders; a strings-missing call renders without words and never crashes; replay unchanged.
 - `npx tsc --noEmit`: clean. `npx vitest run`: 92 files / 1642 tests passed.
+
+## object-drawer Part A: profile, drawer page, playing objects · 2026-11-03
+
+- Sections 1 & 2 of `.kiro/specs/object-drawer/requirements.md`. Content and public were not touched
+  (strings and the kurogotchi frames were already in place).
+- **Profile remembers found objects** (`src/state/saves.ts`): `ProfileWriter.recordObject(id)` (adds
+  to `profile.objects` once, in find order) and `writeKurogotchi(data)` (for Part B's memory).
+  `src/world/endings/record.ts` gained `watchObjects(store, record, enabled)`, a sibling of
+  `watchEndings`, wired in `src/main.ts` next to it (saved runs only; `?day=N`/`?found=` are debug
+  runs, so they never record).
+- **readCollection** (`src/ui/collection.ts`) now returns `objects` (only ids present in
+  `content/objects.json`, unknowns dropped, via `recogniseTable` keys) and `kurogotchi =
+  endings.good >= 1`. `Collection`/`EMPTY_COLLECTION` (`src/world/room/collection.ts`) carry the two
+  new fields.
+- **The drawer page** (new `src/ui/title/drawer.ts` + `model.ts`/`view.ts`/`mount.ts`/`title.css`):
+  a `title.drawer` button between 设置 and 制作, shown only when `hasDrawer(collection)`. The page is
+  a grid of found objects in content order, the Kurogotchi last when unlocked; a cell opens the
+  object large with a back-to-grid control. Opening reuses `renderDevice` (never `upgraded`) for the
+  drawn devices (chick, pager, dictionary, calculator, tape) and the photo + flip for the photo
+  objects (textbook, iccard, phone). `createDrawerObject` runs a store-free in-memory program (fresh
+  `init` each open) with its own paint loop over the device's `canvas.dev`; key presses go through
+  the program reducer into local state only — no store, no events. The walkman's play/stop route to
+  the title theme (via the mount's `sound()` closure), not the story recordings.
+- The Kurogotchi cell shows in the grid when unlocked; its interactive machine is Part B (the mount
+  skips the object controller for `KURO_ID` until then).
+- Tests: `tests/object-drawer.test.ts` (14). Updated three existing tests whose literals/assertions
+  the new `Collection` fields and writer methods extend (`title.test.ts`, `ending-record.test.ts`,
+  `walkman.test.ts`, `saves.test.ts`).
+- `npx tsc --noEmit`: clean. `npx vitest run`: 93 files / 1656 tests passed.
+
+## object-drawer Part B: the Kurogotchi · 2026-11-03
+
+- Section 3 of `.kiro/specs/object-drawer/requirements.md`. Content/public untouched (the 64×64 poses
+  were already in `public/objects/kurogotchi/`; strings already present).
+- **Reducer** (new `src/world/objects/kurogotchi.ts`, pure): `KuroMemory` (hunger, joy, light,
+  lastSeen, fed — the part that persists) and `KuroState` (plus session fields: chats, menu, act,
+  ticker, asleep, idles). `openKuro(memory, env)` applies +1 hunger per day away (max 4), sets
+  lastSeen, and greets with `kurogotchi.missed {n}` when ≥ 2 days away. `keyKuro(s, key, env)`: A
+  cycles feed·chat·light, B does it (feed: eat 1.2 s → blink, hunger −1 / joy +1 / fed +1; chat: a
+  seeded `kurogotchi.line.<n>`, the 5th chat sleeps + light off + `kuro.bedtime` and refuses a 6th;
+  light: toggles, off = sleep on a dark glass), C cancels. `poseAt` picks the pose (sleep / eat /
+  talk / hungry at hunger ≥ 3 / a seeded 1-in-12 `red` flash / base·blink idle). `tickKuro` adds +1
+  hunger per 2 real minutes open, idempotently. `asMemory` validates the opaque profile JSON. The
+  only randomness is Kuro's, seeded (`unit(hash(seed:…))`).
+- **Shell** (`src/world/room/devices.ts` `renderKurogotchi` + `devices.css`): a matte-black rounded
+  rectangle, thin red rim, a 64×64 pixelated LCD `<img>` on pale green glass, the menu strip (three
+  pixel squares, selected inverted), `obj.brand.kurogotchi` under the screen, three round keys A/B/C
+  (the same `obj-key` action as every device), and a one-line ticker.
+- **Driver + fourth wall** (`src/ui/title/drawer.ts` `createKurogotchiDrawer`): store-free on the
+  title but it remembers through the profile (`writeKurogotchi` / `readKurogotchi` via a
+  `KuroMemoryStore` built in `main.ts`); a pose loop swaps the LCD image; keys go through `keyKuro`
+  and the memory is saved after every change. The tentacle is cosmetic pixel-cell DOM over the shell
+  that, when hunger ≥ 3 and idle 8 s (or when the 5th chat sleeps it), presses A… then B through the
+  same reducer path to feed (or wake) itself; `prefers-reduced-motion` draws no tentacle but still
+  presses. Wired into `src/ui/title/mount.ts` (opening the KURO cell creates the driver; `obj-key`
+  routes to it) and `src/main.ts` (the memory store).
+- Tests: `tests/kurogotchi.test.ts` (15) — feed, the 5th-chat sleep + refusal, hungry at ≥ 3, days
+  away raise hunger + the missed line, seeded red, the profile round-trip, hunger-on-open ticks, and
+  the tentacle (presses A…B and ends fed; no tentacle under reduced motion but the presses happen).
+  One end-to-end mount test added to `tests/object-drawer.test.ts`.
+- `npx tsc --noEmit`: clean. `npx vitest run`: 94 files / 1672 tests passed.

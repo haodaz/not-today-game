@@ -22,7 +22,10 @@ import { renderTitle } from "../src/ui/title/view";
 
 afterEach(() => setLocale("zh"));
 
-const collected = (finishedRuns: number, endings: Partial<Collection["endings"]> = {}): Collection => ({ finishedRuns, endings: { bad: 0, survive: 0, good: 0, ...endings } });
+const collected = (finishedRuns: number, endings: Partial<Collection["endings"]> = {}): Collection => {
+  const e = { bad: 0, survive: 0, good: 0, ...endings };
+  return { finishedRuns, endings: e, objects: [], kurogotchi: e.good >= 1 };
+};
 const page = (m: TitleModel) => renderTitle(m).value;
 const restart = /restart|loop-restart|新游戏.*继续|data-action="[^"]*reset/;
 

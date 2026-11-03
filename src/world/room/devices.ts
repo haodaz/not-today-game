@@ -16,6 +16,7 @@ import { CALC_CELLS, CALC_H, CALC_W } from "@world/objects/calculator";
 import { DICT_COLS, DICT_ROWS } from "@world/objects/dictionary";
 import { VOLUME_MAX, type TapeState } from "@world/objects/tape";
 import { CELL_W, CELL_H } from "@world/room/held";
+import { KURO_MENU, type KuroPose, type KuroState } from "@world/objects/kurogotchi";
 
 /** The objects whose 使用 face is a drawn device (the others keep the photo for now). */
 export const DEVICE_IDS: readonly string[] = ["chick", "pager", "dictionary", "calculator", "tape"];
@@ -209,6 +210,37 @@ function turnButtons(ctx: DeviceCtx): SafeHtml | null {
   const rot = canRotate(ctx.object) && hasString("obj.rotate") ? html`<button type="button" class="turnbtn" data-action="obj-rotate" data-object="${ctx.object}">${tr("obj.rotate")}</button>` : null;
   if (!flip && !rot) return null;
   return html`<div class="turnbar">${flip}${rot}</div>`;
+}
+
+// ——— 克麻歌子 (object-drawer 3): a second machine, a matte-black rounded rectangle with a thin red
+// rim, a 64×64 pixel-art LCD on pale green glass, three round keys A / B / C, and the brand under the
+// screen. Its screen is a PNG pose (image-rendering: pixelated), swapped by the drawer driver; the
+// menu strip (feed · chat · light) draws three pixel squares in the glass's top strip, the selected
+// one inverted. A one-line ticker under the screen shows its line (filled by the driver). Pure markup. ———
+
+/** The LCD side (px): the pose fills 64×64 at an integer scale on the glass. */
+export const KURO_LCD = 64;
+
+/** One A / B / C key: the same obj-key action and ids as every other device (the driver presses them). */
+function kuroKey(label: string, down: boolean, live: boolean): SafeHtml {
+  return html`<button type="button" class="${cls("kkey", down && "down")}" data-action="obj-key" data-object="kurogotchi" data-key="${label}" aria-label="${label}"${live ? null : raw(' tabindex="-1"')}>${label}</button>`;
+}
+
+/**
+ * The Kurogotchi shell for a pose and state. `down` is the key cap pressed now (or null); `live`
+ * whether keys answer. The pose image is swapped by the driver (it sets the `<img src>`); the
+ * initial src is the given pose so the first paint is right.
+ */
+export function renderKurogotchi(pose: KuroPose, s: KuroState, down: string | null = null, live = true): SafeHtml {
+  const brand = hasString("obj.brand.kurogotchi") ? tr("obj.brand.kurogotchi") : null;
+  // The menu strip: three pixel squares in the glass's top-left, the selected one inverted. It shows
+  // only while awake (a lit screen); off, the glass is dark and the sleep pose fills it.
+  const strip = s.light && !s.asleep
+    ? html`<div class="kmenu" aria-hidden="true">${KURO_MENU.map((_, i) => html`<i class="${cls("kmi", i === s.menu && "on")}"></i>`)}</div>`
+    : null;
+  const ticker = s.ticker ? html`<div class="kticker">${hasString(s.ticker) ? tr(s.ticker, s.tickerVars ?? undefined) : null}</div>` : null;
+  const key = (k: string) => kuroKey(k, down === k, live);
+  return html`<div class="${cls("dev-shell", "kuro", !s.light && "off")}" data-device="kurogotchi"><div class="kglass">${strip}<img class="klcd" data-kuro-screen="kurogotchi" src="/objects/kurogotchi/${pose}.png" alt="" draggable="false"></div><div class="kbrand">${brand}</div><div class="kkeys">${key("A")}${key("B")}${key("C")}</div>${ticker}</div>`;
 }
 
 /** The drawn device for `id` in 使用, or null when it is not a drawn-device object. `p` is its program state. */

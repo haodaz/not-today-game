@@ -23,3 +23,21 @@ export function watchEndings(store: Store, record: (kind: EndingKind) => void, e
     }
   });
 }
+
+/**
+ * Every object found in a saved run goes into the profile once (object-drawer 1): for each new
+ * `openLayer` event appended after the watch began, `record(objectId)`. Like `watchEndings`, a
+ * debug run (`?day=N`, `enabled: false`) records nothing, and events already in the log (a replayed
+ * or continued run) are history, never recorded again. `recordObject` is idempotent, so a layer
+ * opened in an earlier session and replayed on continue would be a no-op anyway.
+ */
+export function watchObjects(store: Store, record: (objectId: string) => void, enabled = true): () => void {
+  if (!enabled) return () => {};
+  let seen = store.getEvents().length;
+  return store.subscribe(() => {
+    const events = store.getEvents();
+    const fresh = events.slice(seen);
+    seen = events.length;
+    for (const e of fresh) if (e.kind === "openLayer" && typeof e.objectId === "string") record(e.objectId);
+  });
+}

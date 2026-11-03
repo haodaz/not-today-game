@@ -162,3 +162,32 @@
 .room .held.obj .dev-shell .glass canvas.dev{position:static;transform:none;background:none;border-radius:0}
 /* In 使用 the drawn device turns itself (its own back, its own roll): the holding turn stays still, or the back face rotates out of sight. */
 .room .held.obj.device[data-face] .turn{transform:none}
+
+/* ——— 克麻歌子 (object-drawer 3): a second machine. Not an egg: a rounded rectangle, matte black
+   with a thin red rim, a 64×64 pixel-art LCD on pale green glass, three round keys A / B / C, the
+   brand under the screen, and a one-line ticker. "pixel art 那种感觉": the LCD is pixelated, never
+   smoothed. It lives only in the drawer (store-free); the tentacle is cosmetic DOM over it. */
+.dev-shell.kuro{width:260px;height:340px;border-radius:30px;background:linear-gradient(#232323,#121212);border:2px solid #7a1010;box-shadow:inset 0 3px 0 rgba(255,255,255,.06),inset 0 -8px 0 rgba(0,0,0,.5),0 18px 40px rgba(0,0,0,.6);padding:26px}
+.dev-shell.kuro .kglass{position:relative;width:208px;height:208px;margin:0 auto;border-radius:12px;background:#9fd29a;box-shadow:inset 0 3px 0 #7fb57c,inset 0 0 0 4px #2b3a2a;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.dev-shell.kuro.off .kglass{background:#223022;box-shadow:inset 0 3px 0 #1a261a,inset 0 0 0 4px #141c14}
+.dev-shell.kuro .klcd{display:block;width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+/* The menu strip: three pixel squares top-left of the glass, the selected one inverted. */
+.dev-shell.kuro .kmenu{position:absolute;left:8px;top:8px;display:flex;gap:6px;z-index:2}
+.dev-shell.kuro .kmi{width:12px;height:12px;background:transparent;box-shadow:inset 0 0 0 2px #2b3a2a}
+.dev-shell.kuro .kmi.on{background:#2b3a2a}
+.dev-shell.kuro .kbrand{margin-top:14px;text-align:center;font:700 13px/1 "Arial Rounded MT Bold","PingFang SC",sans-serif;letter-spacing:3px;color:#c0c4cc}
+.dev-shell.kuro .kkeys{margin-top:16px;display:flex;justify-content:center;gap:22px}
+.dev-shell.kuro .kkeys button{width:42px;height:42px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#4a4a4a,#1c1c1c 72%);box-shadow:0 4px 0 #050505,inset 0 2px 0 rgba(255,255,255,.12);color:#b7bcc4;font:700 13px/1 sans-serif}
+.dev-shell.kuro .kkeys button.down{box-shadow:0 1px 0 #050505;transform:translateY(3px)}
+.dev-shell.kuro .kticker{margin-top:14px;min-height:18px;text-align:center;font-size:12px;line-height:1.4;color:#d8d4c8;letter-spacing:.04em;padding:0 6px}
+
+/* The tentacle (object-drawer 3, "打破第四面墙"): pixel cells at the LCD's scale, dark green with a
+   red edge, over the shell. It grows out of the LCD's right edge and crawls to a key. Cosmetic DOM;
+   the key presses go through the reducer, not this layer. `prefers-reduced-motion` hides it. */
+.kuro-reach{position:absolute;inset:0;pointer-events:none;z-index:60}
+.kuro-reach i{position:absolute;background:#2fb562;box-shadow:inset 0 0 0 1px #0d3a1c,0 0 6px rgba(80,220,130,.55);opacity:0;animation:kuro-cell-in .05s steps(1) forwards}
+.kuro-reach i.tip{background:#5be08a;box-shadow:inset 0 0 0 1px #0d3a1c,0 0 0 1px #7a1010,0 0 8px rgba(80,220,130,.7)}
+.kuro-reach.out i{animation:kuro-cell-out .22s steps(2) forwards}
+@keyframes kuro-cell-in{to{opacity:1}}
+@keyframes kuro-cell-out{from{opacity:1}to{opacity:0}}
+@media (prefers-reduced-motion:reduce){.kuro-reach{display:none}}

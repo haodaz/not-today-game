@@ -3,13 +3,25 @@
 // result to the title page and the room view as presentation, never to the story or the state.
 import type { KeyValueStorage } from "@state/slot";
 import { readProfile } from "@state/profile-read";
+import { recogniseTable } from "@state/recognise";
 import { EMPTY_COLLECTION, type Collection } from "@world/room/collection";
 
 const count = (v: unknown): number => (typeof v === "number" && Number.isFinite(v) && v > 0 ? Math.floor(v) : 0);
+
+/** The object ids that exist in content/objects.json (the eight), to drop unknowns from the save. */
+const KNOWN_OBJECTS: ReadonlySet<string> = new Set(recogniseTable.keys());
+
+/** The Kurogotchi's saved memory, as opaque JSON (the drawer validates its shape), or null. */
+export function readKurogotchi(storage: KeyValueStorage): unknown {
+  return readProfile(storage)?.kurogotchi ?? null;
+}
 
 export function readCollection(storage: KeyValueStorage): Collection {
   const p = readProfile(storage);
   if (!p) return EMPTY_COLLECTION;
   const e = p.endings && typeof p.endings === "object" && !Array.isArray(p.endings) ? (p.endings as Record<string, unknown>) : {};
-  return { finishedRuns: count(p.finishedRuns), endings: { bad: count(e.bad), survive: count(e.survive), good: count(e.good) } };
+  const endings = { bad: count(e.bad), survive: count(e.survive), good: count(e.good) };
+  // Only ids that still exist in content are kept, in the order they were first found.
+  const objects = Array.isArray(p.objects) ? (p.objects as unknown[]).filter((v): v is string => typeof v === "string" && KNOWN_OBJECTS.has(v)) : [];
+  return { finishedRuns: count(p.finishedRuns), endings, objects, kurogotchi: endings.good >= 1 };
 }

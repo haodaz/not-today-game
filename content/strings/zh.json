@@ -386,7 +386,7 @@
   "kurogotchi.line.6": "Press B. Or don't. I can reach it.",
   "kurogotchi.line.7": "We could stay like this. Not today, though.",
   "kurogotchi.missed": "{n} days. I kept the light on.",
-  "title.drawer": "道具",
+  "title.drawer": "老物件",
   "obj.brand.kurogotchi": "克麻歌子",
   "obj.name.chick": "拓麻鸽子",
   "obj.name.textbook": "课本",
@@ -396,5 +396,6 @@
   "obj.name.dictionary": "文曲星",
   "obj.name.calculator": "计算器",
   "obj.name.phone": "手机",
-  "obj.name.kurogotchi": "克麻歌子"
+  "obj.name.kurogotchi": "克麻歌子",
+  "kurogotchi.first": "论古老，没人比我更古。"
 }

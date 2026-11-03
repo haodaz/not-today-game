@@ -92,12 +92,12 @@ describe("recordEnding runs only for an ending appended after the watch began", 
 describe("the desk book", () => {
   it("never renders while finishedRuns is 0; renders once a run has finished", () => {
     expect(deskBook(EMPTY_COLLECTION)).toBeNull();
-    expect(deskBook({ finishedRuns: 1, endings: { bad: 0, survive: 1, good: 0 } })).not.toBeNull();
+    expect(deskBook({ finishedRuns: 1, endings: { bad: 0, survive: 1, good: 0 }, objects: [], kurogotchi: false })).not.toBeNull();
     const store = createStore({ startDay: 13 });
     const session = initialSession({ beat: "work", time: "10:00" }, "left", "room");
     const room = (c: typeof session.collection) => renderRoom({ state: store.getState(), events: store.getEvents(), session: { ...session, collection: c } }).value;
     expect(room(EMPTY_COLLECTION)).not.toContain("desk-book");
     expect(room(EMPTY_COLLECTION)).not.toContain('class="figure"');
-    expect(room({ finishedRuns: 2, endings: { bad: 0, survive: 2, good: 0 } })).toContain("desk-book");
+    expect(room({ finishedRuns: 2, endings: { bad: 0, survive: 2, good: 0 }, objects: [], kurogotchi: false })).toContain("desk-book");
   });
 });

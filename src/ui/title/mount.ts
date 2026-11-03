@@ -11,6 +11,7 @@ import type { SoundPlayer } from "@world/sound/player";
 import { arrived, canStart, diceOptions, initialTitle, QUESTIONS, rowsShown, toMenu, toNames, toQuestions, withAnswer, withPronoun, type TextQuestion, type TitleModel } from "./model";
 import { titleTable, type IdleEvent } from "./table";
 import { renderTitle } from "./view";
+import { createDrawerObject, createKurogotchiDrawer, drawerIds, KURO_ID, type DrawerObject, type KuroDrawerObject, type KuroMemoryStore } from "./drawer";
 
 export interface TitleDeps {
   readonly save: { readonly day: number } | null;
@@ -25,6 +26,8 @@ export interface TitleDeps {
   readonly sound?: SoundPlayer;
   /** Which theme is sung: from a saved run's pronoun; m when there is none yet. */
   readonly voice?: "m" | "f";
+  /** The Kurogotchi's cross-run memory (object-drawer 3): read on open, written after every change. */
+  readonly kuroMemory?: KuroMemoryStore;
 }
 
 const STAGE = { w: 1600, h: 900 };
@@ -151,8 +154,50 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     });
   }
 
-  /** Esc from the card or 返回 from 制作: the menu; from the desk the camera pulls back. */
+  // ——— the object drawer (object-drawer 2) ———
+  // The opened object's own controller (store-free), or null on the grid. The title theme pauses
+  // while the walkman plays and resumes after.
+  let drawerObj: DrawerObject | null = null;
+  let kuroObj: KuroDrawerObject | null = null;
+  const closeDrawerObject = () => {
+    drawerObj?.destroy();
+    drawerObj = null;
+    kuroObj?.destroy();
+    kuroObj = null;
+  };
+  const prefersReducedMotion = () => !!win.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  const todayISO = () => new Date().toISOString().slice(0, 10);
+  const openDrawerObject = (id: string) => {
+    closeDrawerObject();
+    // The Kurogotchi (object-drawer 3) is its own machine, with memory; the eight objects are the
+    // store-free device/photo preview.
+    if (id === KURO_ID) {
+      if (!deps.kuroMemory) return; // no memory wired (e.g. a test without one): show the shell only
+      kuroObj = createKurogotchiDrawer(root, { memory: deps.kuroMemory, muted: () => model.muted, reducedMotion: prefersReducedMotion, today: todayISO });
+      return;
+    }
+    drawerObj = createDrawerObject(id, root, {
+      themePlay: () => {
+        rainOn = false;
+        sound();
+      },
+      themeStop: () => {
+        rainOn = true;
+        sound();
+      },
+      muted: () => model.muted,
+    });
+  };
+  const toDrawer = (open: string | null) => {
+    closeDrawerObject();
+    set({ ...model, screen: "drawer", drawerOpen: open });
+    if (open) openDrawerObject(open);
+  };
+
+  /** Esc from the card or 返回 from 制作/道具: the menu; from the desk the camera pulls back. */
   function back(): void {
+    // Leaving the drawer stops its object (and resumes the theme if the walkman had it).
+    closeDrawerObject();
     // The monitors sleep again and the rain settles (FR7).
     rainVolume(RAIN.low);
     const next = toMenu(model);
@@ -200,7 +245,30 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
       deps.sound?.setMuted(model.muted);
     },
     "title-credits": () => set({ ...model, screen: "credits" }),
-    "title-back": () => back(),
+    "title-back": () => {
+      // From an opened object, 返回 goes back to the grid; from the grid (or elsewhere) to the menu.
+      if (model.screen === "drawer" && model.drawerOpen) toDrawer(null);
+      else back();
+    },
+    "title-drawer": () => toDrawer(null),
+    "drawer-open": (el) => {
+      const id = el.dataset.object;
+      const ids = drawerIds(model.collection);
+      if (id && ids.includes(id)) toDrawer(id);
+    },
+    "drawer-grid": () => toDrawer(null),
+    "obj-flip": (el) => {
+      if (drawerObj && el.dataset.object === model.drawerOpen) drawerObj.flip();
+    },
+    "obj-rotate": (el) => {
+      if (drawerObj && el.dataset.object === model.drawerOpen) drawerObj.rotate();
+    },
+    "obj-key": (el) => {
+      const key = el.dataset.key;
+      if (!key || el.dataset.object !== model.drawerOpen) return;
+      if (el.dataset.object === KURO_ID) kuroObj?.key(key);
+      else drawerObj?.key(key);
+    },
     "title-pronoun": (el) => {
       const p = el.dataset.pronoun;
       if (p === "she" || p === "he" || p === "none") set(withPronoun(model, p));
@@ -265,6 +333,7 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
   return {
     model: () => model,
     destroy() {
+      closeDrawerObject();
       unsubscribeEmail();
       timers.forEach((id) => win.clearTimeout(id));
       root.removeEventListener("click", onClick);

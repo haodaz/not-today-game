@@ -8,8 +8,9 @@ import { figuresLayer } from "@world/room/collection";
 import { settingsPanel } from "@world/room/hud";
 import { centre, rectStyle, ROOM_COLLECTION, ROOM_SHOT } from "@world/room/shots";
 import { ROOM_PUSH } from "@world/motion/timing";
-import { answered, canStart, cardOpen, diceOptions, QUESTIONS, rowsShown, type Question, type TitleModel } from "./model";
+import { answered, canStart, cardOpen, diceOptions, hasDrawer, QUESTIONS, rowsShown, type Question, type TitleModel } from "./model";
 import { titleTable } from "./table";
+import { drawerPage } from "./drawer";
 
 /** The game's name, as on the box (not story text). */
 export const GAME_TITLE = "NOT TODAY";
@@ -34,7 +35,9 @@ function menu(m: TitleModel): SafeHtml {
     : html`<button type="button" data-action="title-new">${tr("title.new")}</button>`;
   // It fades out during the push to the desk, and back in during the pull-back.
   const fade = m.moving ? (m.screen === "questions" ? "leaving" : "arriving") : null;
-  return html`<nav class="${cls("title-menu", fade)}" aria-label="${t("title.settings")}"${m.screen === "questions" ? html` inert` : null}>${first}<button type="button" data-action="title-settings" aria-haspopup="dialog">${tr("title.settings")}</button><button type="button" data-action="title-credits">${tr("title.credits")}</button></nav>`;
+  // 道具 sits between 设置 and 制作, only once the drawer has something in it (object-drawer 2).
+  const drawer = hasDrawer(m.collection) ? html`<button type="button" data-action="title-drawer">${tr("title.drawer")}</button>` : null;
+  return html`<nav class="${cls("title-menu", fade)}" aria-label="${t("title.settings")}"${m.screen === "questions" ? html` inert` : null}>${first}<button type="button" data-action="title-settings" aria-haspopup="dialog">${tr("title.settings")}</button>${drawer}<button type="button" data-action="title-credits">${tr("title.credits")}</button></nav>`;
 }
 
 function questionRow(m: TitleModel, q: Question, current: boolean): SafeHtml {
@@ -69,6 +72,6 @@ export function renderTitle(m: TitleModel): SafeHtml {
   // The menu stays while the camera pushes (it fades); the card replaces it once the push ends,
   // and is gone at once when 开始 is pressed.
   const middle =
-    m.screen === "credits" ? creditsPage() : m.screen === "questions" ? (m.starting ? null : cardOpen(m) ? questions(m) : menu(m)) : menu(m);
+    m.screen === "credits" ? creditsPage() : m.screen === "drawer" ? drawerPage(m.collection, m.drawerOpen) : m.screen === "questions" ? (m.starting ? null : cardOpen(m) ? questions(m) : menu(m)) : menu(m);
   return html`<div class="${cls("stage", "title-page", `screen-${m.screen}`, cardOpen(m) && "card-open")}" data-screen="${m.screen}">${room(m)}<h1 class="title-name"><img class="title-logo" src="/logo.svg" alt="${GAME_TITLE}"></h1>${middle}<div class="title-ver">${tr("title.version")}<br>${tr("title.byline")}</div><button type="button" class="title-lang" data-action="title-lang">${tr("title.lang")}</button>${settingsPanel({ settingsOpen: m.settingsOpen, muted: m.muted }, { home: false })}</div>`;
 }

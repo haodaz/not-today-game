@@ -26,14 +26,16 @@ import { parseBeatParams } from "@world/desktop/beat";
 import { mountDesktop } from "@world/desktop/controller";
 import { desktopActions } from "@world/desktop/actions";
 import { endingHost } from "@world/endings/flow";
-import { watchEndings } from "@world/endings/record";
+import { watchEndings, watchObjects } from "@world/endings/record";
 import { getLocale, initialLocale, setLocale } from "@world/i18n";
 import { syncLoop } from "@world/loop/runtime";
 import { createMotion } from "@world/motion/dom";
 import { loopActions, loopKeys, renderGame } from "@world/room/game";
 import { createSoundPlayer } from "@world/sound/player";
-import { readCollection } from "./ui/collection";
+import { readCollection, readKurogotchi } from "./ui/collection";
 import { mountTitle } from "./ui/title/mount";
+import { asMemory, type KuroMemory } from "@world/objects/kurogotchi";
+import type { Json } from "@state/variables";
 import { net, type RunSnapshot } from "@net/supabase";
 import { pushDue } from "@net/sync";
 import { RUN_VERSION as RUN_FORMAT_VERSION } from "@state/saves";
@@ -90,6 +92,9 @@ function startGame(store: Store, saved: boolean, from?: "desk"): void {
   // Every ending reached goes into the profile once, when it happens (title-page T8): endings
   // appended after this point only, and never for a debug run (`saved` is false for ?day=N).
   watchEndings(store, (kind) => profile.recordEnding(kind), saved);
+  // Every object found (its box layer opened) goes into the profile once (object-drawer 1): a
+  // saved run only, never a debug run; `?found=` grants are debug runs, so they never record.
+  watchObjects(store, (id) => profile.recordObject(id), saved);
   const focus = params.get("focus");
   const view = params.get("view");
   const game = mountDesktop(root, {
@@ -136,10 +141,17 @@ if (jump !== null) {
   startGame(store, false);
 } else {
   const saved = run.load();
+  // The Kurogotchi's memory (object-drawer 3): read from and written to the profile (src/ui is the
+  // only profile reader). The drawer reads on open and writes after every change.
+  const kuroMemory = {
+    read: () => asMemory(readKurogotchi(window.localStorage)),
+    write: (m: KuroMemory) => profile.writeKurogotchi(m as unknown as Json),
+  };
   const title = mountTitle(root, {
     save: saved ? { day: saved.day } : null,
     collection,
     sound,
+    kuroMemory,
     // The theme's voice follows the pronoun a saved run was started with; m when there is none.
     voice: saved?.events.some((e) => e.kind === "names" && e.names.pronoun === "she") ? "f" : "m",
     async onContinue() {

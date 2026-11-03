@@ -118,6 +118,16 @@ export interface ProfileWriter {
    * Returns nothing, like `increment`.
    */
   recordEnding(kind: "bad" | "survive" | "good"): void;
+  /**
+   * An object was found in a saved run (object-drawer 1): adds `id` to `profile.objects` once, in
+   * the order it was first found. Idempotent. Returns nothing, like the rest.
+   */
+  recordObject(id: string): void;
+  /**
+   * The Kurogotchi's saved state (object-drawer 3): it remembers across runs. Replaces
+   * `profile.kurogotchi` with `data` (opaque JSON here; the drawer owns its shape).
+   */
+  writeKurogotchi(data: Json): void;
 }
 
 export function createProfileWriter(storage: KeyValueStorage): ProfileWriter {
@@ -136,6 +146,16 @@ export function createProfileWriter(storage: KeyValueStorage): ProfileWriter {
       const endings = { bad: count(was.bad), survive: count(was.survive), good: count(was.good) };
       endings[kind] += 1;
       slot.write({ data: { ...current, endings, finishedRuns: count(current.finishedRuns) + 1 } });
+    },
+    recordObject(id) {
+      const current = (slot.read()?.data ?? {}) as ProfileData;
+      const was = Array.isArray(current.objects) ? (current.objects as Json[]).filter((v): v is string => typeof v === "string") : [];
+      if (was.includes(id)) return;
+      slot.write({ data: { ...current, objects: [...was, id] } });
+    },
+    writeKurogotchi(data) {
+      const current = (slot.read()?.data ?? {}) as ProfileData;
+      slot.write({ data: { ...current, kurogotchi: data } });
     },
   };
 }
