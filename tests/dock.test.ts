@@ -38,14 +38,20 @@ function click(day: number) {
 }
 
 describe("the dock is icons", () => {
-  it("no text in the tiles: the name is only the title and aria-label; the open app has the dot class", () => {
+  it("the name is the title, the aria-label and a hover label; the open app has the dot class", () => {
     for (const day of [1, 7]) {
       const bar = dockOf(shown(day));
-      // Strip the badge numbers (they are counts, not words); nothing else may be left outside tags.
-      expect(bar.replace(/<span class="badge">\d+<\/span>/g, "").replace(/<[^>]*>/g, ""), `day ${day}`).toBe("");
       for (const [app, key] of [["msgs", "dock.msgs"], ["workbench", "dock.workbench"], ["browser", "dock.browser"]] as const) {
+        // The icon is the only image; the title and aria-label carry the name.
         expect(bar).toContain(`data-app="${app}" title="${t(key)}" aria-label="${t(key)}"><img src="/os/${app}.svg" alt=""`);
+        // The visible hover label repeats the name but is decorative (aria-hidden), so it is read once.
+        expect(bar, `${app} hover label`).toContain(`<span class="dock-name" aria-hidden="true">${t(key)}</span>`);
       }
+      // The only text outside tags is the badge counts and the dock names (the hover labels).
+      const names = [t("dock.msgs"), t("dock.workbench"), t("dock.browser")].join("");
+      const left = bar.replace(/<span class="badge">\d+<\/span>/g, "").replace(/<span class="dock-name"[^>]*>[^<]*<\/span>/g, "").replace(/<[^>]*>/g, "");
+      expect(left, `day ${day}`).toBe("");
+      void names;
       expect(bar.match(/class="app (?:msgs|docs|feed) on"/g)).toHaveLength(1);
     }
   });

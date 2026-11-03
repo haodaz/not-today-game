@@ -148,15 +148,20 @@ describe("the pages", () => {
     const store = atLunch(1);
     const session = sessionAt("11:40");
     const home = renderPhonePage(store.getState(), store.getEvents(), session, phonePage(store.getState(), store.getEvents(), session)).value;
+    // The rating/eta/fee icons are real inline SVGs now, never empty circles (delivery 2026-11-02).
+    expect(home).not.toContain('class="ic clock"');
+    expect(home).not.toContain('class="ic ride"');
+    expect((home.match(/<svg class="ic"/g) ?? []).length).toBeGreaterThan(0);
     for (const s of shopListView(1, "lunch").shops) {
-      expect(home, s.id).toContain(s.rating === null ? "★ —" : `★ ${s.rating.toFixed(1)}`);
+      expect(home, s.id).toContain(s.rating === null ? "</svg> —" : `</svg> ${s.rating.toFixed(1)}`);
       if (s.fee !== null) expect(home, s.id).toContain(`¥${s.fee}`);
     }
     const shop = shopListView(1, "lunch").shops.find((s) => s.open)!;
     session.phoneUi = { ...session.phoneUi, page: "checkout", shop: shop.id, item: shop.items[0]!.id };
     const out = renderPhonePage(store.getState(), store.getEvents(), session, phonePage(store.getState(), store.getEvents(), session)).value;
-    expect(out).toContain(`<i class="ic pin" aria-hidden="true"></i>${deliveryTable.address ?? "—"}`);
-    expect(out).toContain(`<i class="ic card" aria-hidden="true"></i>${deliveryTable.card ?? "—"}`);
+    // The address and card lines lead with an SVG icon, then the value (or a dash when content lacks it).
+    expect(out).toContain(`</svg>${deliveryTable.address ?? "—"}`);
+    expect(out).toContain(`</svg>${deliveryTable.card ?? "—"}`);
   });
 });
 

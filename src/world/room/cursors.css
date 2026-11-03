@@ -1,0 +1,76 @@
+/* The cursor says what you can do here (room-scene addition 2026-11-02). A still cursor set replaces
+   the arrow in the game, never on the title page. The hotspot (x y) of each image is from
+   public/cursors/cursors.json. Set per hovered element by its data-action or class. Reduced motion
+   is moot (these are stills). The title page carries none of these classes or actions, so its arrow
+   is untouched; the rules below are also scoped to the game's own roots to be safe. */
+
+/* default: the game surfaces, where nothing is interactive (room, the desktop stage, the box layer). */
+.room,
+.stage.one-monitor,
+.dlg-layer,
+.hud-host,
+.files-host,
+.held-layer {
+  cursor: url(/cursors/default.png) 3 2, auto;
+}
+
+/* point: a button, a chip, a key. The broadest category, so it leads; the more specific ones below win. */
+.room button,
+.stage.one-monitor button,
+.hud-host button,
+.files-host button,
+.dlg button,
+.dlg-player button,
+.chip,
+[data-action="obj-key"],
+.dock button,
+.kuro-btn,
+.kpill,
+[data-action="loop-eat"],
+[data-action^="wb-"],
+[data-action^="phone-"],
+[data-action^="file-"],
+[data-action^="settings-"],
+[data-action="decoy"],
+[data-action="files-close"] {
+  cursor: url(/cursors/point.png) 11 3, auto;
+}
+
+/* look: a screen hotspot (the monitor halves, the 屏幕 edge). */
+.monitor-hit,
+[data-action="view"][data-view="desktop"],
+[data-action="screen"] {
+  cursor: url(/cursors/look.png) 16 16, auto;
+}
+
+/* take: an object slot, the phone, the walkman; the held object while holding. */
+.slot,
+[data-action="loop-hold"],
+[data-action="loop-phone"],
+[data-action="walkman-toggle"],
+.held-layer[data-held] .held {
+  cursor: url(/cursors/take.png) 16 18, auto;
+}
+
+/* open: the box, the door (chain), the dictionary lid. */
+[data-action="pick-box"],
+.box-hit,
+.box-open,
+[data-action="loop-door"],
+[data-action="obj-use"] {
+  cursor: url(/cursors/open.png) 16 16, auto;
+}
+
+/* walk: a walk target (the desk, the bed, the door edge hint). */
+[data-action="view"][data-view="desk"],
+[data-action="view"][data-view="door"],
+.door-hit,
+[data-action="bed"] {
+  cursor: url(/cursors/walk.png) 16 28, auto;
+}
+
+/* back: the bottom back strip and 回房间. */
+.back-room,
+[data-action="nav-back"] {
+  cursor: url(/cursors/back.png) 5 16, auto;
+}

@@ -10,7 +10,7 @@ import { replyLocale } from "./locale";
 export const STATUSES = ["reply", "read", "typing", "recalled", "silence", "gone"] as const;
 export type Status = (typeof STATUSES)[number];
 
-export const INCOMING_KINDS = ["work", "money", "private", "odd"] as const;
+export const INCOMING_KINDS = ["work", "money", "private", "odd", "deliverable"] as const;
 export type IncomingKind = (typeof INCOMING_KINDS)[number];
 
 /** The placeholders filled at render time from `names`. Nothing else may appear in braces. */
@@ -54,6 +54,11 @@ export interface Incoming {
   readonly cond_show?: Condition;
   readonly effects?: { readonly flags?: readonly string[] };
   readonly note?: string;
+  /**
+   * A `deliverable` carries the id of the document it posts (desktop-ui 2026-11-02): the browser
+   * opens it, 屏幕 is locked until the player has opened it once (the `open file:<doc>` event).
+   */
+  readonly doc?: string;
 }
 
 export interface RecipientTable {
@@ -171,10 +176,13 @@ function entry(value: unknown, where: string): Entry {
 
 function incoming(value: unknown, where: string): Incoming {
   if (!isRecord(value)) throw new ContentError(where, "an incoming item must be an object");
-  onlyKeys(value, ["t", "text", "kind", "cond_show", "effects", "note"], where);
+  onlyKeys(value, ["t", "text", "kind", "cond_show", "effects", "note", "doc"], where);
   const kind = value.kind as IncomingKind;
   if (!INCOMING_KINDS.includes(kind)) throw new ContentError(where, `unknown kind "${String(value.kind)}"`);
   const out: Record<string, unknown> = { t: time(value.t, `${where}.t`), text: text(value.text, `${where}.text`), kind };
+  // A deliverable carries the doc it posts; no other kind may (desktop-ui 2026-11-02).
+  if (kind === "deliverable") out.doc = str(value.doc, `${where}.doc`);
+  else if (value.doc !== undefined) throw new ContentError(where, `only a deliverable may carry "doc"`);
   if (value.cond_show !== undefined) out.cond_show = condition(value.cond_show, `${where}.cond_show`);
   if (value.effects !== undefined) {
     const raw = value.effects;
@@ -257,8 +265,8 @@ export function assertTwin(zh: RecipientTable, en: RecipientTable, where: string
   }
   zh.incoming.forEach((z, i) => {
     const e = en.incoming[i]!;
-    if (z.t !== e.t || z.kind !== e.kind || !same(z.effects, e.effects) || !same(z.cond_show, e.cond_show)) {
-      throw new ContentError(`${where}.incoming[${i}]`, "time, kind, effects or condition differ from the Chinese");
+    if (z.t !== e.t || z.kind !== e.kind || z.doc !== e.doc || !same(z.effects, e.effects) || !same(z.cond_show, e.cond_show)) {
+      throw new ContentError(`${where}.incoming[${i}]`, "time, kind, doc, effects or condition differ from the Chinese");
     }
   });
   for (const [word, z] of zh.cells) {

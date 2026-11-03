@@ -179,7 +179,7 @@
 .room .held.phone{width:340px;height:700px;background:#1a1a1c;border-radius:40px;box-shadow:0 30px 80px rgba(0,0,0,.6),inset 0 0 0 3px #333}
 .room .held.phone .scr{position:absolute;inset:14px;background:#fff;border-radius:30px;overflow:hidden;font-size:15px;display:flex;flex-direction:column}
 .room .held.phone .top{flex:0 0 44px;display:flex;align-items:center;justify-content:center;font:12px var(--mono);color:#888;border-bottom:1px solid #eee}
-.room .held.phone .app{flex:1;overflow:auto;padding:14px 16px}
+.room .held.phone .app{flex:1;min-height:0;overflow:hidden;padding:0;display:flex;flex-direction:column}
 .room .held.phone .app h2{font-size:18px;margin:0 0 10px;font-weight:600}
 .room .held.phone .shop{padding:12px 0;border-bottom:1px solid #f1f1f1}
 .room .held.phone .shop b{display:block;font-weight:500}.room .held.phone .shop small{color:#999}
@@ -421,19 +421,23 @@
 .settings .email-status.error{color:#8b2f2a}
 .settings .email-bound{font-size:13px;color:#2f6b3a;word-break:break-all}
 /* The delivery app like an app (delivery addition 2026-11-02): home, shop, checkout, status, rating. */
-.dapp{position:relative;margin:-14px -16px;min-height:calc(100% + 28px);padding:12px 14px 70px;display:flex;flex-direction:column;gap:10px;color:#1d2129}
-.dapp h2{font-size:17px;margin:4px 0 0;font-weight:600}
+/* The app fills the phone's screen edge to edge (delivery 2026-11-02): a flex column, the home list
+   scrolls inside it, nothing clipped under the home bar. */
+.dapp{flex:1;min-height:0;display:flex;flex-direction:column;gap:10px;padding:12px 14px 20px;color:#1d2129;overflow-y:auto}
+.dapp.home{overflow:hidden;padding-bottom:0}
+.dapp h2{font-size:16px;margin:4px 0 0;font-weight:600;flex:0 0 auto}
 .dapp .ph{display:block;background:#f3efe8;border-radius:10px;overflow:hidden;flex:0 0 auto}
 .dapp .ph img{display:block;width:100%;height:100%;object-fit:contain}
-.dapp .ic{display:inline-block;width:11px;height:11px;border:1.5px solid currentColor;border-radius:50%;vertical-align:-1px;margin-right:3px;opacity:.7}
-.dapp .ic.ride{border-radius:3px 3px 6px 6px}.dapp .ic.pin{border-radius:50% 50% 50% 0;transform:rotate(-45deg)}.dapp .ic.card{border-radius:2px;width:14px;height:10px}
-.d-search{height:34px;border-radius:17px;background:#f2f3f5;display:flex;align-items:center;padding:0 12px;color:#999;font-size:13px;gap:4px}
-.d-chips{display:flex;gap:8px}.d-chips .ph.chip{width:48px;height:48px;border-radius:24px}
+.dapp .ic{display:inline-block;width:13px;height:13px;vertical-align:-2px;margin-right:3px;fill:currentColor;opacity:.75;flex:0 0 auto}
+.d-meta .r .ic{fill:#e09b1a;opacity:1}
+.d-search{height:34px;border-radius:17px;background:#f2f3f5;display:flex;align-items:center;padding:0 12px;color:#999;font-size:13px;gap:4px;flex:0 0 auto}
+.d-search .ic{width:14px;height:14px;fill:none;stroke:currentColor}
+.d-chips{display:flex;gap:8px;flex:0 0 auto}.d-chips .ph.chip{width:44px;height:44px;border-radius:22px}
 .d-rate-chip{align-self:flex-start;border:1px solid #e5484d;color:#e5484d;background:#fff;border-radius:14px;padding:4px 12px;font:inherit;font-size:13px;cursor:pointer}
-.d-cards{display:flex;flex-direction:column;gap:12px}
+.d-cards{flex:1 1 auto;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding-bottom:28px;-webkit-overflow-scrolling:touch}
 .d-card{display:grid;grid-template-columns:72px 1fr;grid-template-rows:auto auto auto;column-gap:10px;text-align:left;border:0;background:#fff;padding:0;font:inherit;color:inherit;cursor:pointer}
 .d-card .ph.card{grid-row:1/span 3;width:72px;height:72px}
-.d-card b{font-weight:600;font-size:15px}.d-card small{color:#999;font-size:12px}
+.d-card b{font-weight:600;font-size:15px;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.d-card small{color:#999;font-size:12px}
 .d-card em{grid-column:2;font-style:normal;font-size:12px;color:#c33}
 .d-card.off{opacity:.45;cursor:default}
 .d-meta{display:flex;gap:10px;font-size:12px;color:#666}.d-meta .r{color:#e09b1a}

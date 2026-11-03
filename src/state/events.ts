@@ -159,18 +159,30 @@ function applyChat(state: State, event: Extract<GameEvent, { kind: "chat" }>): S
 
 const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
 
-/** The things that can be opened: the browser, or a conversation `conv:<recipient>`. */
+/**
+ * The things that can be opened: the browser, a conversation `conv:<recipient>`, or a file / document
+ * `file:<id>` (the 文件 app's files and Vivi's deliverables; desktop-ui 2026-11-02). A file id is any
+ * non-empty token: the files app and the replies loader own the real ids; the log only records that
+ * one was opened, so the Vivi lock and the 文件 app read the same event.
+ */
 export function isOpenTarget(target: string): boolean {
   if (target === "browser") return true;
   const conv = /^conv:(.+)$/.exec(target);
-  return conv !== null && knownRecipients.has(conv[1]!);
+  if (conv !== null) return knownRecipients.has(conv[1]!);
+  return /^file:.+$/.test(target);
 }
 
-/** Opening a conversation counts as reading messages (`readCount`); the browser changes nothing. */
+/** Opening a conversation counts as reading messages (`readCount`); the browser and files change nothing. */
 function applyOpen(state: State, event: Extract<GameEvent, { kind: "open" }>): State {
   if (!isOpenTarget(event.target)) throw new Error(`open: unknown target "${event.target}"`);
   if (!HHMM.test(event.t)) throw new Error(`open: time must be HH:MM, got "${event.t}"`);
   return event.target.startsWith("conv:") ? { ...state, readCount: state.readCount + 1 } : state;
+}
+
+/** The file/document id of an `open` target, or null (not a `file:` open). */
+export function openedFileId(target: string): string | null {
+  const m = /^file:(.+)$/.exec(target);
+  return m ? m[1]! : null;
 }
 
 /** An event as a caller builds it, before the store stamps the day. */

@@ -51,6 +51,9 @@ import { itemPageId, readingPageId, type KuroCloses } from "@state/closes";
 import { browserPage } from "@world/desktop/browser/data";
 import { workbenchActions } from "@world/desktop/workbench/actions";
 import { workActions } from "@world/desktop/workbench/work";
+import { renderFiles } from "@world/desktop/files/view";
+import { filesActions, openFilesApp } from "@world/desktop/files/actions";
+import { viviLock } from "@world/desktop/vivi";
 import { cancelCloser, startCloser } from "@world/late/closer";
 import { startJudgement } from "@world/dialogue/judge";
 import { sendEmailLink } from "@net/email";
@@ -64,7 +67,8 @@ export function renderGame(store: Store, session: Session, nowMs: number): SafeH
     const shell = buildShell(state, events, session, desktopApps, nowMs, store.getStartDay());
     // Work-task narration and the conversation with Kuro play in the dialogue box over the desktop too.
     const dlg = dialogueBox(state, events, session, nowMs);
-    return html`${renderDesktop(shell)}<button type="button" class="back-room" data-action="view" data-view="room">${tr("desktop.back")}</button>${tabooLayer(session, store.getRunId(), state.day, nowMs)}${dlgLayer(dlg, session)}<div class="hud-host">${settingsButton()}${itemsButton(session)}${itemsPanel(state, events, session)}<div class="hud-br">${hudKuro({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs })}</div>${settingsPanel(session)}</div>`;
+    const filesWin = renderFiles({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs });
+    return html`${renderDesktop(shell)}<button type="button" class="back-room" data-action="view" data-view="room">${tr("desktop.back")}</button>${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${dlgLayer(dlg, session)}<div class="hud-host">${settingsButton()}${itemsButton(session)}${itemsPanel(state, events, session)}<div class="hud-br">${hudKuro({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs })}</div>${settingsPanel(session)}</div>`;
   }
   // The box does not jump (dialogue correction 2026-11-02): in every view it is anchored to the
   // viewport in the same fixed layer, not to the stage (whose size differs between views). The
@@ -84,6 +88,23 @@ function dlgLayer(dlg: SafeHtml | null, session: Session): SafeHtml | null {
 /** The app on the monitor being shown. */
 export function shownApp(session: Session): AppId {
   return session.focus === "left" ? session.leftApp : rightApp(session.leftApp);
+}
+
+/**
+ * Vivi's deliverable locks the screen (desktop-ui 2026-11-02): while a deliverable is posted and not
+ * yet opened, every app/page switch on 屏幕 is refused with the `vivi.lock` box line. 回房间 and the
+ * 文件 window (where the player opens it) are not switches, so they are not refused. Returns true
+ * when the switch was refused. Derived from the log, so it survives a reload.
+ */
+function viviRefuse(ctx: ActionContext): boolean {
+  const { store, session } = ctx;
+  if (session.view !== "desktop") return false;
+  const locked = viviLock(store.getState(), store.getEvents(), session.clock.time);
+  if (!locked) return false;
+  const day = store.getState().day;
+  session.dialogue = push(session.dialogue, { key: `d${day}:vivi:lock`, lines: [{ k: "narration", t: t("vivi.lock") }], ending: { kind: "none" } });
+  ctx.rerender();
+  return true;
 }
 
 /**
@@ -282,6 +303,7 @@ export const loopActions: Record<string, ActionHandler> = {
 
   // The dock and the toggle also count as looking at the app now on screen.
   dock(ctx, data, el) {
+    if (viviRefuse(ctx)) return;
     shellActions.dock!(ctx, data, el);
     lookAt(ctx, ctx.session.leftApp);
     lookedAway(ctx);
@@ -289,6 +311,7 @@ export const loopActions: Record<string, ActionHandler> = {
     if (settleSession(ctx.session)) ctx.rerender();
   },
   screen(ctx, data, el) {
+    if (viviRefuse(ctx)) return;
     shellActions.screen!(ctx, data, el);
     lookAt(ctx, shownApp(ctx.session));
     lookedAway(ctx);
@@ -314,6 +337,7 @@ export const loopActions: Record<string, ActionHandler> = {
   },
   // 工作台's 文档: the document of the open work task; Kuro may close it.
   "wb-nav"(ctx, data, el) {
+    if (viviRefuse(ctx)) return;
     workbenchActions["wb-nav"]!(ctx, data, el);
     cancelCloser(ctx.session);
     // Opening 工作台's 消息 pane is 看一眼消息 (the boss is there now): the openApp:msgs step, once a day.
@@ -425,6 +449,7 @@ export const loopActions: Record<string, ActionHandler> = {
 
   // 老周的事: the loan is answered in 老周's conversation; opening it brings the prompt up.
   conv(ctx, data, el) {
+    if (viviRefuse(ctx)) return;
     messageActions.conv!(ctx, data, el);
     // Another conversation is another place (`screen:msgs:<id>`).
     if (settleSession(ctx.session)) ctx.rerender();
@@ -519,6 +544,7 @@ export const loopActions: Record<string, ActionHandler> = {
 
   // 朋友圈: leaving a conversation for the feed is another place too.
   feed(ctx, data, el) {
+    if (viviRefuse(ctx)) return;
     messageActions.feed!(ctx, data, el);
     if (settleSession(ctx.session)) ctx.rerender();
   },
@@ -765,6 +791,17 @@ export const loopActions: Record<string, ActionHandler> = {
   // 工作台 work (work spec 2026-11-02): the sentence is sent, the chip under Kuro's question is the
   // reply, the surface is done, 通过 appends the task event; the runtime queues its lines as before.
   ...workActions,
+
+  // 文件 / 回收站 (desktop-ui 2026-11-02): the files/trash dock tiles open the real window instead of
+  // the plain decoy notice; every other decoy keeps its notice.
+  decoy(ctx, data, el) {
+    if (data.decoy === "files" || data.decoy === "trash") {
+      openFilesApp(ctx, data.decoy);
+      return;
+    }
+    shellActions.decoy!(ctx, data, el);
+  },
+  ...filesActions,
 
   // Kuro's upgrade offer (object-upgrade FR1; spoken in the box now, dialogue FR2). The final
   // offer upgrades everything it covers.

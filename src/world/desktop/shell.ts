@@ -98,18 +98,23 @@ export function dockTile(src: string, extra: SafeHtml | null = null): SafeHtml {
   return html`<img src="${src}" alt="" draggable="false" width="64" height="64">${extra}`;
 }
 
+/** The name over an icon on hover (desktop-ui 2026-11-02, point 2); also the tile's accessible name. */
+function dockName(name: string): SafeHtml {
+  return html`<span class="dock-name" aria-hidden="true">${name}</span>`;
+}
+
 function dock(m: ShellModel): SafeHtml {
   const apps = APPS.map((app) => {
     const badge = m.dock.badges[app];
     const name = t(DOCK_KEY[app]);
-    return html`<button type="button" class="${cls("app", DOCK_CLASS[app], m.dock.active === app && "on")}" data-action="dock" data-app="${app}" title="${name}" aria-label="${name}">${dockTile(`/os/${app}.svg`, badge > 0 && !m.night ? html`<span class="badge">${badge}</span>` : null)}</button>`;
+    return html`<button type="button" class="${cls("app", DOCK_CLASS[app], m.dock.active === app && "on")}" data-action="dock" data-app="${app}" title="${name}" aria-label="${name}">${dockTile(`/os/${app}.svg`, badge > 0 && !m.night ? html`<span class="badge">${badge}</span>` : null)}${dockName(name)}</button>`;
   });
   // The decoys come after a thin separator, in file order, in the same tile style. They carry no
   // badge and no `on` dot: nothing is ever "open" in them but their small window.
   const decoys = m.dock.decoys ?? [];
   const extra = decoys.map(
     (d) =>
-      html`<button type="button" class="${cls("app", "decoy")}" data-action="decoy" data-decoy="${d.id}"${d.gone ? html` data-gone="1"` : null} title="${d.name}" aria-label="${d.name}">${dockTile(d.icon)}</button>`,
+      html`<button type="button" class="${cls("app", "decoy")}" data-action="decoy" data-decoy="${d.id}"${d.gone ? html` data-gone="1"` : null} title="${d.name}" aria-label="${d.name}">${dockTile(d.icon)}${dockName(d.name)}</button>`,
   );
   return html`<div class="dock">${apps}${decoys.length ? html`<span class="sep" role="separator"></span>` : null}${extra}</div>`;
 }

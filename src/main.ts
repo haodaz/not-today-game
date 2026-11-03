@@ -7,6 +7,7 @@
 import "./world/desktop/desktop.css";
 import "./world/room/room.css";
 import "./world/room/fx.css";
+import "./world/room/cursors.css";
 import "./world/motion/motion.css";
 import "./ui/fonts.css";
 import "./ui/title/title.css";

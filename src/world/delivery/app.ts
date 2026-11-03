@@ -100,9 +100,18 @@ const yuan = (n: number) => `¥${n}`;
 const spriteOf = (v: MealView): string | null =>
   deliveryTable.shops.find((s) => s.id === v.order?.shopId)?.items.find((it) => it.id === v.order?.itemId)?.sprite ?? null;
 
-/** The card's numbers: ★ rating, ◷ minutes, the fee; a dash for each one content does not have yet. */
+/** Real inline-SVG glyphs (delivery 2026-11-02, point from the day-4 screenshot): never empty circles. */
+const ICON: Readonly<Record<"star" | "clock" | "scooter" | "pin" | "card", SafeHtml>> = {
+  star: html`<svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.6l1.9 3.9 4.3.6-3.1 3 .7 4.3L8 11.4 4.2 13.4l.7-4.3-3.1-3 4.3-.6z"/></svg>`,
+  clock: html`<svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.4" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M8 4.2V8l2.6 1.6" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>`,
+  scooter: html`<svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><circle cx="4" cy="12" r="2" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="12.5" cy="12" r="2" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M6 12h4.5M10.5 12l1.5-6h1.7M4 12l3-5h3" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  pin: html`<svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5c-2.6 0-4.5 2-4.5 4.6C3.5 9.4 8 14.5 8 14.5s4.5-5.1 4.5-8.4C12.5 3.5 10.6 1.5 8 1.5z" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="8" cy="6" r="1.6"/></svg>`,
+  card: html`<svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="3.5" width="13" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M1.5 6.5h13" stroke="currentColor" stroke-width="1.2"/></svg>`,
+};
+
+/** The card's numbers: ★ rating, clock minutes, the fee; a dash for each one content does not have yet. */
 function meta(s: ShopView): SafeHtml {
-  return html`<span class="d-meta"><span class="r">★ ${dash(s.rating, (n) => n.toFixed(1))}</span><span class="eta"><i class="ic clock" aria-hidden="true"></i>${dash(s.eta)}</span><span class="fee"><i class="ic ride" aria-hidden="true"></i>${dash(s.fee, yuan)}</span></span>`;
+  return html`<span class="d-meta"><span class="r">${ICON.star} ${dash(s.rating, (n) => n.toFixed(1))}</span><span class="eta">${ICON.clock}${dash(s.eta)}</span><span class="fee">${ICON.scooter}${dash(s.fee, yuan)}</span></span>`;
 }
 
 /** Decorative category chips: food cut-outs, no words. */
@@ -139,7 +148,7 @@ function shop(page: Extract<PhonePage, { kind: "shop" }>, ui: PhoneUi): SafeHtml
 function checkout(page: Extract<PhonePage, { kind: "checkout" }>): SafeHtml {
   const { shop: s, item } = page;
   const total = item.price + (s.fee ?? 0);
-  return html`<div class="dapp checkout">${back}<h2>${tr("delivery.checkout")}</h2><div class="d-line addr"><i class="ic pin" aria-hidden="true"></i>${deliveryTable.address ?? "—"}</div><div class="d-line item">${photo(item.sprite, "sm")}<span class="n">${s.name} · ${item.name}</span><span class="p">${yuan(item.price)}</span></div><div class="d-line fee"><i class="ic ride" aria-hidden="true"></i><span class="n"></span><span class="p">${dash(s.fee, yuan)}</span></div><div class="d-line card"><i class="ic card" aria-hidden="true"></i>${deliveryTable.card ?? "—"}</div><div class="d-total">${yuan(total)}</div><button type="button" class="d-order" data-action="loop-order" data-meal="${page.meal}" data-shop="${s.id}" data-item="${item.id}">${tr("delivery.order")}</button></div>`;
+  return html`<div class="dapp checkout">${back}<h2>${tr("delivery.checkout")}</h2><div class="d-line addr">${ICON.pin}${deliveryTable.address ?? "—"}</div><div class="d-line item">${photo(item.sprite, "sm")}<span class="n">${s.name} · ${item.name}</span><span class="p">${yuan(item.price)}</span></div><div class="d-line fee">${ICON.scooter}<span class="n"></span><span class="p">${dash(s.fee, yuan)}</span></div><div class="d-line card">${ICON.card}${deliveryTable.card ?? "—"}</div><div class="d-total">${yuan(total)}</div><button type="button" class="d-order" data-action="loop-order" data-meal="${page.meal}" data-shop="${s.id}" data-item="${item.id}">${tr("delivery.order")}</button></div>`;
 }
 
 const toMin = (hhmm: string) => {

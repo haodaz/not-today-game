@@ -44,7 +44,9 @@ function side(data: WorkbenchDay | null, page: WorkbenchPage, fill: Fill): SafeH
   });
   const doing = (data?.doing ?? []).map((j) => html`<div class="job">${fill(j.title)} <em class="${j.tone === "ok" ? "g" : ""}">${fill(j.status)}</em></div>`);
   const recent = (data?.recent ?? []).map((r) => html`<div class="job">${fill(r)}</div>`);
-  return html`<div class="side"><div class="logo"><i></i><div><b>${tr("wb.title")}</b><small>${tr("wb.sub")}</small></div></div><div class="search">${tr("wb.search")}</div>${nav}<div class="sec">${tr("wb.sec.doing")}</div>${doing}<div class="sec">${tr("wb.sec.recent")}</div>${recent}<div class="me"><i></i><div><b>${tr("wb.me")}</b><br><small style="color:var(--ink-3)">${tr("wb.me.role")}</small></div></div></div>`;
+  // The workbench's own brand (未来智能 · 工作台) lives inside its window only (desktop-ui 2026-11-02,
+  // point 1): the OS name is the top bar's; the company brand sits here in the side logo.
+  return html`<div class="side"><div class="logo"><i></i><div><b>${tr("wb.brand")}</b><small>${tr("wb.sub")}</small></div></div><div class="search">${tr("wb.search")}</div>${nav}<div class="sec">${tr("wb.sec.doing")}</div>${doing}<div class="sec">${tr("wb.sec.recent")}</div>${recent}<div class="me"><i></i><div><b>${tr("wb.me")}</b><br><small style="color:var(--ink-3)">${tr("wb.me.role")}</small></div></div></div>`;
 }
 
 function card(title: SafeHtml, sub: SafeHtml | null, body: SafeHtml, extra = ""): SafeHtml {

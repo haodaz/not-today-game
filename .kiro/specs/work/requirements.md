@@ -33,7 +33,7 @@ Tests: no `wb-mode` buttons under the input; the three options exist only as chi
 
 ## Addition 2026-11-02 (author): marking is the operation that decides the player's numbers
 - **自己做** = find the business problem (clause 6 vs 11). **让它做，我看一眼** = Kuro processes first; the player reads its result and marks what is strange (odd characters, odd adjectives, a sentence that is not a person's). Both are *marking*; a correct mark is what counts (truth score, catch flags). Content lists the markable spots per task (`doc.marks: [{span, kind: "conflict"|"kuro"|"odd", worth: 1|2}]`).
-- Proposals (Claude, to be approved before building, not part of the current segment):
+- Proposals (Claude; **all approved by the author 2026-11-03**, built in segment C):
   1. **Red pens** (author decided 2026-11-02, this one is not a proposal): in **自己做** the pens are unlimited; in **让它做，我看一眼** the player has three — a mark on a real spot returns the pen, a mark on nothing loses it. Doing it yourself costs time; auditing Kuro costs attention.
   2. **Two ways to mark**: click a sentence = "this line"; drag a span = "something in here" (half credit if the span contains a real spot).
   3. **Kuro reacts at once** when its own change is caught: day 1 "That's mine.", day 9 "You're the only one who reads that far.", day 13 nothing said but the line reverts by itself. Being caught is what it likes.

@@ -18,14 +18,23 @@ Built for **Kiroween 2026**, Resurrection category.
 Three hands, each with its own job:
 
 - **The author** decides everything: mechanics, pacing, what the characters say, what the UI looks like, what the room feels like. Nothing here was not asked for.
-- **Claude** (Anthropic, Claude Fable 5.1, in Claude Code) writes the content and the design: `content/` (replies, days, tasks, browser pages, delivery, Kuro's days and rubric, strings), `.kiro/steering/`, every `requirements.md`, the static HTML mocks in `design/`, the asset pipelines, and this README. Claude writes no game code.
+- **Claude** (Anthropic; Claude Fable 5.1 and Claude Opus 5.5, in Claude Code) writes the content and the design: `content/` (replies, days, tasks, browser pages, delivery, Kuro's days and rubric, strings), `.kiro/steering/`, every `requirements.md`, the static HTML mocks in `design/`, the asset pipelines, and this README. Claude writes no game code.
 - **Kiro** writes every line of game code from the steering and the specs: for each spec it writes `design.md` and `tasks.md`, implements task by task, and keeps the tests green. Its own notes and the decisions it asked about are in [`docs/kiro-log.md`](docs/kiro-log.md).
 
-Kiro features used: steering (`.kiro/steering/product.md`, `voices.md`, `tech.md`, `structure.md`, `threejs.md`), specs (`.kiro/specs/*`, sixteen so far), and agent hooks (`.kiro/hooks/*.json`: on every save, content files are validated and the state tests run; the hook only reports, Kiro decides). The spec flow is the whole workflow: Claude writes the requirements, Kiro writes design and tasks, the author reviews in the browser, Claude writes the next requirements from what the author says.
+Kiro features used: steering (`.kiro/steering/product.md`, `voices.md`, `tech.md`, `structure.md`, `threejs.md`), specs (`.kiro/specs/*`, nineteen so far), and agent hooks (`.kiro/hooks/*.json`: on every save, content files are validated and the state tests run; the hook only reports, Kiro decides). The spec flow is the whole workflow: Claude writes the requirements, Kiro writes design and tasks, the author reviews in the browser, Claude writes the next requirements from what the author says.
+
+How a working day with Kiro looks, concretely:
+
+1. The author plays a build and says what feels wrong ("the coffee cup is floating", "I can't tell which app is Claude").
+2. Claude turns each remark into a dated addition in the relevant `requirements.md` (search any spec for "Correction 2026-" or "Addition 2026-") and writes one prompt for Kiro that names the spec sections, the files and the tests expected.
+3. Kiro implements, keeps `tsc` clean and `vitest` green (1,468 tests in 82 files at the last count), backs up and diffs every snapshot it refreshes, and logs what it decided in `docs/kiro-log.md`.
+4. Claude verifies (typecheck, full test run), commits, and walks the changed days headlessly with `script`-side drivers that play each day from its content file, so a regression on day 13 is found without anyone clicking through twelve days first.
+
+Content and code never cross: Kiro does not edit `content/`, Claude does not edit `src/`. When content needs a new field, Claude writes the content first (the strict loaders reject it, so the tree goes red on purpose) and the next Kiro prompt says so.
 
 ## Architecture in one paragraph
 
-Vite + TypeScript, no framework, one store. `state = f(day) ⊕ replay(events)`: the player's actions are an event log; replaying it twice gives the same state. The day is a counter that the player advances by lying down. Everything that is story lives in `content/` as data and is validated by strict loaders at import; `src/` contains no story string. The desktop is DOM, object screens are canvases at integer pixels, the room is a Gaussian splat (three.js) with the screens composited over it.
+Vite + TypeScript, no framework, one store. `state = f(day) ⊕ replay(events)`: the player's actions are an event log; replaying it twice gives the same state. The day is a counter that the player advances by lying down. Everything that is story lives in `content/` as data and is validated by strict loaders at import; `src/` contains no story string. The desktop is DOM, object screens are canvases at integer pixels, the room is a set of photographed stills that you walk between, and the collapse of the room is a WebGL fragment shader that dissolves the photo into its edited later stages (the Gaussian-splat version of the room is still there behind `?splat=1`).
 
 ## Content
 
@@ -46,13 +55,13 @@ Vite + TypeScript, no framework, one store. `state = f(day) ⊕ replay(events)`:
 
 Generated during the jam; see `public/README.md`.
 
-- Room: Gemini video → COLMAP → Brush → `.splat` (one clean, one pruned hard for the collapse); the room, bed and tabletop views are stills from the same shoot.
+- Room: Gemini video → COLMAP → Brush → `.splat`; the room, desk and door views are stills from the same shoot, and each stage of the collapse (wall, otherworld, glitch, white) is an image edit of those stills (wan2.6-image), blended by the shader.
 - Objects: Hunyuan3D-2.1 shape from the watercolour cutouts, with the painting projected back onto the mesh.
 - Kuro's sprite states: Meta Muse Image, aligned by head, crossfaded in the game; the giant three-headed Kuro of the good ending the same way.
 - People: the player (faceless, hair over the eyes; adult and child) and the NPCs (老王, vivi, 小张, 老周, the teacher, the parents) are Muse Image watercolour busts, white-keyed; relatives in the big family group are silhouettes.
 - Food, door wall, the things on the desk (cup, phone, box, slip): Muse Image, keyed from white or green.
 - The old office of the day-11 dream: Qwen-Image.
-- Sounds: synthesized with ffmpeg as placeholders.
+- Theme song 「今天不可以 / Not Today」: lyrics by the author, sung in four voices (zh/en, male/female) with Suno; it plays only on the title, the credits and the walkman after an ending. Day and night beds, stingers, the doorbell, the pager buzz, the chick's beep and the footsteps: Suno Sounds and ffmpeg, listed in `public/sfx/README.md`.
 
 ## Run
 
@@ -65,6 +74,14 @@ npm run typecheck
 
 Optional `.env.local` (see `.env.example`) for Supabase; without it the game runs fully offline with Kuro's scripted lines. Online, Kuro is Claude behind a Supabase Edge Function (`supabase/functions/kuro-chat`): it talks in the player's language, remembers the run, and judges the eighteen days from the event log at the end.
 
+Kuro is the only character with a model behind it; everyone else is written. The function never trains anything. Each turn it assembles one context: who Kuro is (`content/kuro-profile.md`), what it may know that day (`kuro-world.md`, `kuro-days/`), what it remembers, and a variable layer:
+
+- **Locked lines.** Some answers are fixed (the red-blue lines, and a low/mid/high answer per question chosen by Kuro's opinion of the player). The server inserts them verbatim; the model only continues after them.
+- **Dice.** A seeded d100 per run, day and question. Kuro's opinion of the player does not change the game, it moves the thresholds: a well-liked player gets more critical successes (an unreadable word, a nosebleed) and fewer critical failures (the answer flickers and is forgotten, the turn still spent).
+- **Scores.** After each evening's talk Kuro scores the day on truth, values and bond, citing event ids; the sum decides whether the good ending is open.
+
+Some questions only appear when Kuro thinks well of you, and the generous answers are the dangerous ones.
+
 ## Licence
 
-Code: MIT. Story, text and art: CC BY-NC-ND 4.0 (the author, 好大壮 / Elodie Hao Liu). Kuro is played by Claude.
+Code: MIT. Story, text and art: CC BY-NC-ND 4.0 (the author, 好大壮 / Elodie Hao Liu). Kuro is played by Claude. The author credits Claude openly for its share of the writing; what is hers and what is Claude's is described above.

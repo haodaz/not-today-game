@@ -218,9 +218,9 @@ function replyBar(ctx: AppContext, conversation: string, register: Register): Sa
     : null;
   const send = html`<button type="button" data-conv="${conversation}" class="send" data-action="send"${canSend ? null : html` disabled`}>${tr("msgs.send")}</button>`;
   if (register === "ding") return html`<div class="reply">${hint}${chips}${send}${kbd}${inner}</div>`;
-  // WeChat's composer: the chips above, a toolbar of five glyphs, a tall white input, a grey Send.
-  const tools = html`<div class="tools" aria-hidden="true"><i class="tl emoji"></i><i class="tl box"></i><i class="tl folder"></i><i class="tl cut"></i><i class="tl mic"></i></div>`;
-  return html`<div class="reply wx-composer">${hint}<div class="chips">${chips}</div>${tools}${kbd ?? html`<div class="kbd"></div>`}${send}${inner}</div>`;
+  // WeChat's composer: the chips above, a tall white input, a grey Send. The row of empty tool
+  // placeholders is gone until each glyph has a function (desktop-ui 2026-11-02, point 2).
+  return html`<div class="reply wx-composer">${hint}<div class="chips">${chips}</div>${kbd ?? html`<div class="kbd"></div>`}${send}${inner}</div>`;
 }
 
 /** The three glyphs on the right of WeChat's conversation head (chat, call, more); decorative. */

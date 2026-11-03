@@ -4,6 +4,7 @@
 // token the engine does not understand fails at import, not at play.
 import { constants, membersOf } from "../variables";
 import { parseKuroCloses, type KuroCloses } from "../closes";
+import { bilingual } from "../content-locale";
 
 export const LINE_KINDS = ["narration", "inner", "sfx", "speaker"] as const;
 export type LineKind = (typeof LINE_KINDS)[number];
@@ -358,16 +359,78 @@ export function parseDayFile(raw: unknown, label: string): DayFile {
   return deepFreeze({ day: raw.day as number, beats, items, delivery });
 }
 
+// ——— English twins (dialogue addition 2026-11-02) ———
+// content/days/en/day-NN.json has the same shape and, line for line, the same ids, counts and
+// non-text fields; only the text (`t`, `who` on a speaker line, `Item.text`, `Item.rewrite`, a
+// choice's `text`) differs. Validated against the zh source; the first difference names its path.
+
+/** The text fields of a SayLine that an English twin may differ on; the rest must match. */
+function assertLineTwin(zh: SayLine, en: SayLine, w: string): void {
+  if (zh.k !== en.k) fail(w, `kind "${en.k}", the Chinese has "${zh.k}"`);
+  if (zh.where !== en.where) fail(w, `where differs from the Chinese`);
+  if (zh.sfx !== en.sfx) fail(w, `sfx differs from the Chinese`);
+  if (zh.backdrop !== en.backdrop) fail(w, `backdrop differs from the Chinese`);
+  if (zh.prop !== en.prop) fail(w, `prop differs from the Chinese`);
+}
+function localiseLine(zh: SayLine, en: SayLine, w: string): SayLine {
+  assertLineTwin(zh, en, w);
+  // `who` on a speaker line is a display name (localisable); `t` is the text.
+  return bilingual(zh, { t: en.t, ...(zh.who !== undefined ? { who: en.who } : {}) });
+}
+function localiseSeq(zh: Sequence | undefined, en: Sequence | undefined, w: string): Sequence | undefined {
+  if (zh === undefined && en === undefined) return undefined;
+  if (zh === undefined || en === undefined) fail(w, `sequence present in only one language`);
+  if (zh.say.length !== en.say.length) fail(`${w}.say`, `${en.say.length} lines, the Chinese has ${zh.say.length}`);
+  const say = zh.say.map((z, i) => localiseLine(z, en.say[i]!, `${w}.say[${i}]`));
+  if ((zh.choices?.length ?? 0) !== (en.choices?.length ?? 0)) fail(`${w}.choices`, `choice count differs from the Chinese`);
+  const choices = zh.choices?.map((z, i) => {
+    const e = en.choices![i]!;
+    if (!same(z.effects, e.effects) || !same(z.cond_show, e.cond_show)) fail(`${w}.choices[${i}]`, `effects or condition differ from the Chinese`);
+    return bilingual(z, { text: e.text });
+  });
+  return { say, ...(choices ? { choices } : {}), ...(zh.where !== undefined ? { where: zh.where } : {}) };
+}
+const same = (a: unknown, b: unknown): boolean => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
+
+/** The zh day file with its text localised by the en twin. Throws at the first structural difference. */
+export function localiseDayFile(zh: DayFile, en: DayFile, label: string): DayFile {
+  const beats: Partial<Record<BeatName, Sequence>> = {};
+  for (const name of BEAT_NAMES) {
+    const seq = localiseSeq(zh.beats[name], en.beats[name], `${label}.beats.${name}`);
+    if (seq) beats[name] = seq;
+  }
+  if (zh.items.length !== en.items.length) fail(label, `${en.items.length} items, the Chinese has ${zh.items.length}`);
+  const items = zh.items.map((z, i) => {
+    const e = en.items[i]!;
+    const w = `${label}.items[${i}]`;
+    if (z.id !== e.id) fail(w, `id "${e.id}", the Chinese has "${z.id}"`);
+    if (z.unlockRaw !== e.unlockRaw || z.doneRaw !== e.doneRaw || z.when !== e.when || z.required !== e.required) fail(w, `a non-text field differs from the Chinese`);
+    // The onUnlock / onDone sequences are localised first, then `bilingual` wraps the text fields.
+    // (Never spread a bilingual object: spreading invokes its getters and flattens them to values.)
+    const withSeq = {
+      ...z,
+      ...(z.onUnlock ? { onUnlock: localiseSeq(z.onUnlock, e.onUnlock, `${w}.onUnlock`)! } : {}),
+      ...(z.onDone ? { onDone: localiseSeq(z.onDone, e.onDone, `${w}.onDone`)! } : {}),
+    };
+    return bilingual(withSeq, { text: e.text, ...(z.rewrite !== undefined ? { rewrite: e.rewrite } : {}) });
+  });
+  return { day: zh.day, beats, items, delivery: zh.delivery };
+}
+
 const files = import.meta.glob("../../../content/days/day-*.json", { eager: true, import: "default" });
+const enFiles = import.meta.glob("../../../content/days/en/day-*.json", { eager: true, import: "default" });
 
 export const dayFiles: ReadonlyMap<number, DayFile> = (() => {
+  const twins = new Map(Object.entries(enFiles).map(([p, raw]) => [p.slice(p.lastIndexOf("/") + 1), raw]));
   const out = new Map<number, DayFile>();
   for (const [path, raw] of Object.entries(files)) {
     const label = path.slice(path.lastIndexOf("/") + 1);
     const file = parseDayFile(raw, label);
     const fromName = Number(/day-(\d+)\.json$/.exec(label)?.[1]);
     if (file.day !== fromName) fail(label, `file name says day ${fromName}, content says ${file.day}`);
-    out.set(file.day, file);
+    // A twin, if one exists, is validated and merged (its text shows under lang=en); else Chinese stays.
+    const enRaw = twins.get(label);
+    out.set(file.day, enRaw === undefined ? file : deepFreeze(localiseDayFile(file, parseDayFile(enRaw, `en/${label}`), `en/${label}`)));
   }
   return new Map([...out].sort(([a], [b]) => a - b));
 })();

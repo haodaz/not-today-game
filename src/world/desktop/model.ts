@@ -150,6 +150,14 @@ export interface Session {
   decoyWindow: string | null;
   /** What a decoy click made Kuro say, and until when (ms): it shows in its pill; session only. */
   dockSay: { readonly text: string; readonly until: number } | null;
+  /**
+   * The 文件 / 回收站 window (desktop-ui 2026-11-02): which dock app opened it (files or trash), which
+   * folder tab is selected (a folder id, or "bin"), and which file is open inside it. Null when
+   * closed. Session only; opening a file is the `open` event.
+   */
+  filesApp: { readonly which: "files" | "trash"; readonly tab: string; readonly open: string | null } | null;
+  /** Files whose `onOpen` line has already played today (once a day), by `<day>:<id>`. Session only. */
+  filesSaid: Set<string>;
 }
 
 /**
@@ -252,6 +260,8 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     cam: null,
     decoyWindow: null,
     dockSay: null,
+    filesApp: null,
+    filesSaid: new Set(),
   };
 }
 

@@ -102,3 +102,20 @@ Tests: the top bar snapshot carries the OS name and the app title; the workbench
 - **文件** is a real folder tree, from content (`content/files.json`, Claude): `合同/` holds v1–v17 of the contract (v16, v17 are the day-1 pair; v18+ appear as the days produce them); `下载/` holds what Vivi posted once the player opened it (her HTML 方案, the PRD), re-openable any time ("继续瞻仰"); `导出/` holds what the player exported. Opening an early version plays a one-line fragment from content, e.g. v1–v5 「你不太想点开看了。看太多遍，都不太认识字了。」; each file may carry its own `onOpen` line. Opening a file logs `open` with the file id (the Vivi lock reads the same event).
 - **回收站** holds what was deleted or replaced: the clause Kuro rewrote (the old text), 小张's leaving message after day 13, the pre-merge versions; items can be opened but not restored before day 16; from day 16 the bin is empty and the strings say 「已清空」.
 - Tests: the tree renders from content; opening a file logs the event and plays its line once per day; the bin's contents follow the day; nothing in 文件 is invented by code.
+
+## Addition 2026-11-03 (author): shared things must look like what they are
+Today every shared thing is a line of text (「[卡片] …」「[链接] …」「[图片] …」) drawn as the same grey box, so an article, a video, a chat history and a vote link look identical. In both apps they must be recognisable at a glance, the way they are in WeChat and DingTalk.
+
+- **Content shape** (replies, family, clan, group; Claude migrates the existing lines): a message may carry `card: { type, … }` next to its `text` (the text stays as the fallback and for the list preview). Types and fields:
+  - `article` (公众号文章): `account`, `title`, `digest?`, `cover?` — WeChat look: title bold on top, digest two lines grey, square cover on the right, account name + small avatar at the bottom.
+  - `video` (视频号 / 短视频): `account`, `title`, `cover?`, `duration` — a vertical 3:4 cover with a play triangle in a circle, duration bottom-right, account and title under it.
+  - `history` (聊天记录): `title` (e.g. 「群聊的聊天记录」), `lines: string[]` (up to 4 shown) — white card, title, grey lines, a thin rule, 「聊天记录」 at the bottom.
+  - `link` (网页): `title`, `site`, `icon?` — title two lines, site name small, a square favicon on the right.
+  - `image`: `src` (under `public/msgs/`), `alt` — the picture itself, rounded, max 240 px wide; missing src = grey placeholder with alt text.
+  - `file`: `name`, `size`, `ext` — file-type icon (pdf red, doc blue, xls green, html orange), name, size.
+  - `mini` (小程序: 投票 / 砍一刀 / 拼团): `brand`, `title`, `cover?` — the mini-program card with a coloured brand strip at the bottom.
+  - `voice`: `seconds` — the voice bar, width by length, seconds at the end (already exists; keep).
+  - `task` (工作台 only, DingTalk work card): `title`, `fields: [[label, value]]`, `action?` — blue header strip.
+- **Two registers**: 消息 draws them WeChat-style, 工作台's message pane DingTalk-style (same data, the work card shape and blue accents there). A `forwarded: true` flag adds the small 「转发」 label.
+- **Covers**: Claude supplies a small set of generic covers in `public/msgs/covers/` (news, short video, chart, food, cat, family photo, certificate); a card without `cover` uses a neutral tile by type, never an empty box.
+- Tests: the loader accepts each type and rejects unknown fields; each type renders its own markup in both apps (snapshot one of each); a message without `card` renders as today.

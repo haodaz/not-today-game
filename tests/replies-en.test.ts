@@ -77,8 +77,8 @@ describe("the loader fails loudly when an English file is not a twin", () => {
     ["another time", (en: any) => (firstCell(en).cell.lines[0].t = "03:33"), /speaker or time differs/],
     ["another speaker", (en: any) => (firstCell(en).cell.lines[0].who = "nobody"), /speaker or time differs/],
     ["an incoming line fewer", (en: any) => en.days[firstDay(en)].incoming.pop(), /incoming lines, the Chinese has/],
-    ["another incoming time", (en: any) => (en.days[firstDay(en)].incoming[0].t = "03:33"), /time, kind, effects or condition differ/],
-    ["another incoming kind", (en: any) => (en.days[firstDay(en)].incoming[0].kind = en.days[firstDay(en)].incoming[0].kind === "odd" ? "work" : "odd"), /time, kind, effects or condition differ/],
+    ["another incoming time", (en: any) => (en.days[firstDay(en)].incoming[0].t = "03:33"), /time, kind, doc, effects or condition differ/],
+    ["another incoming kind", (en: any) => (en.days[firstDay(en)].incoming[0].kind = en.days[firstDay(en)].incoming[0].kind === "odd" ? "work" : "odd"), /time, kind, doc, effects or condition differ/],
     ["an unknown key (same strict parser)", (en: any) => (firstCell(en).cell.mood = "x"), /unknown key "mood"/],
   ])("%s", (_name, change, message) => {
     expect(build(change)).toThrow(message);

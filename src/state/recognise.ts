@@ -3,7 +3,9 @@
 // tried again on a later day when the object is picked up from the desk bar (once per day).
 // Read, checked strictly, frozen. The reducer derives right/wrong from content, never from the UI.
 import raw from "@content/objects.json";
+import enRaw from "@content/en/objects.json";
 import stagesFile from "@content/stages.json";
+import { bilingualValues } from "./content-locale";
 import type { GameEvent } from "./events";
 import { hasEvidence, judge, type JudgementDelta } from "./judgement";
 import { HAND_FIELDS } from "./hands";
@@ -78,7 +80,36 @@ export function parseObjects(input: unknown, foundOnDay: Readonly<Record<string,
   return out;
 }
 
-export const recogniseTable = parseObjects(raw);
+// ——— English twin (dialogue addition 2026-11-02) ———
+// content/en/objects.json has the same objects, the same `day` and the same option `right` flags;
+// only the text differs (`q`, each option's `t`, the right/wrong `say` and `inner`). The reducer
+// reads the `right` flags, not text, so the swap is display-only. First difference names its path.
+function localiseAnswer(zh: Answer, en: Answer, w: string): Answer {
+  if (zh.say.length !== en.say.length) fail(`${w}.say`, `${en.say.length} lines, the Chinese has ${zh.say.length}`);
+  return bilingualValues(zh, { say: en.say, inner: en.inner });
+}
+function localiseObjects(zh: ReadonlyMap<string, RecogniseEntry>, en: ReadonlyMap<string, RecogniseEntry>): ReadonlyMap<string, RecogniseEntry> {
+  if (!objKeysEqual(zh, en)) fail("en/objects.json", `objects [${[...en.keys()]}] differ from the Chinese [${[...zh.keys()]}]`);
+  const out = new Map<string, RecogniseEntry>();
+  for (const [id, z] of zh) {
+    const e = en.get(id)!;
+    const w = `en/objects.json ${id}`;
+    if (z.day !== e.day) fail(`${w}.day`, `day ${e.day}, the Chinese has ${z.day}`);
+    if (z.options.length !== e.options.length) fail(`${w}.options`, "option count differs from the Chinese");
+    const options = z.options.map((zo, i) => {
+      const eo = e.options[i]!;
+      if (zo.right !== eo.right) fail(`${w}.options[${i}].right`, "the right flag differs from the Chinese");
+      return bilingualValues(zo, { t: eo.t });
+    });
+    out.set(id, bilingualValues(z, { q: e.q, options, right: localiseAnswer(z.right, e.right, `${w}.right`), wrong: localiseAnswer(z.wrong, e.wrong, `${w}.wrong`) }));
+  }
+  return out;
+}
+const objKeysEqual = (a: ReadonlyMap<string, unknown>, b: ReadonlyMap<string, unknown>): boolean =>
+  a.size === b.size && [...a.keys()].every((k) => b.has(k));
+
+/** Objects, Chinese text swapped to the English twin under lang=en (the twin is validated at load). */
+export const recogniseTable: ReadonlyMap<string, RecogniseEntry> = localiseObjects(parseObjects(raw), parseObjects(enRaw));
 
 /** The option order for this run: shuffled once, seeded by the run id, so replay is stable (FR1). */
 export const optionOrder = (runId: string, object: string): number[] => shuffled(`recognise:${runId}:${object}`, OPTION_COUNT);

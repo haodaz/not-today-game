@@ -3,6 +3,7 @@
 import en from "@content/strings/en.json";
 import zh from "@content/strings/zh.json";
 import { setReplyLocale } from "@state/replies/locale";
+import { setContentLocale } from "@state/content-locale";
 import { html, type SafeHtml } from "./html";
 
 export type Locale = "zh" | "en";
@@ -17,8 +18,10 @@ const missing = new Set<string>();
 
 export function setLocale(next: Locale): void {
   locale = next;
-  // The reply tables show their English twin (content/replies/en/) under the same switch.
+  // The reply tables and the content tables (days/tasks/objects) show their English twins under the
+  // same switch.
   setReplyLocale(next);
+  setContentLocale(next);
 }
 
 /** A string in one particular locale (no fallback to the other), or undefined. */
