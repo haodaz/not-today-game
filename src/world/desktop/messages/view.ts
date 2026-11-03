@@ -11,6 +11,7 @@ import { labelKey } from "@world/replies/labels";
 import { fillPlaceholders } from "@world/replies/placeholders";
 import type { AppContext } from "../model";
 import { previewOf, type Body } from "./bubbles";
+import { renderCard } from "./cards";
 import { FEED, threadsIn, type ThreadApp } from "./threads";
 import { inInputText, lastMessage, lastMessageDay, sentReplies, SPEAKER_CONVERSATIONS, transcript, unreadCount, type Bubble, type SentReply } from "./transcript";
 
@@ -57,8 +58,12 @@ export function renderBody(body: Body, names: State["names"], register: Register
     case "system":
       return html`${fill(body.raw)}`;
     case "deliverable":
-      // A clickable card: opens the doc in the browser and lifts the Vivi lock (desktop-ui 2026-11-02).
-      return html`<button type="button" class="card deliverable" data-action="open-deliverable" data-doc="${body.doc}">${fill(body.raw)}</button>`;
+      // A clickable card that opens the doc and lifts the Vivi lock (desktop-ui 2026-11-02); it looks
+      // like a link card with a file-type badge (desktop-ui 2026-11-03).
+      return html`<button type="button" class="sc sc-link deliverable ${register}" data-action="open-deliverable" data-doc="${body.doc}"><div class="c-body"><div class="c-text"><div class="c-title two">${fill(body.raw)}</div>${hasString("msgs.card.site.doc") ? html`<div class="c-site">${tr("msgs.card.site.doc")}</div>` : null}</div><span class="fico x-html" aria-hidden="true">HTML</span></div></button>`;
+    case "shared":
+      // A shared thing drawn as what it is (desktop-ui 2026-11-03): WeChat in 消息, DingTalk in 工作台.
+      return renderCard(body.card, fill, register, body.forwarded);
     case "text":
       return html`<div class="bub">${fill(body.text)}</div>`;
   }

@@ -1148,3 +1148,33 @@ Kiro's area only (`src/`, `tests/`, `.kiro/`); `content/` untouched, fixtures us
   record + replay-idempotence) and `tests/work-marks-view.test.ts` (pens shown, hit/miss, caught
   line, span half-worth, units flow, code surface + snapshot, dictionary tooltip only while held /
   only listed words). `npx tsc --noEmit` clean; full `npx vitest run` → 89 files / 1532 tests green.
+
+## desktop-ui — shared things look like what they are (2026-11-03)
+
+Cards on messages (requirements addition "shared things must look like what they are"). Kiro's area
+only (`src/`, `tests/`); `content/` untouched, fixtures in tests. No story string in `src/`: card text
+is content; chrome labels (「转发」 `msgs.card.forwarded`, 「聊天记录」 `msgs.card.history`, the
+deliverable's `msgs.card.site.doc`) go through strings and render nothing until Claude adds them.
+
+- Loader (`src/state/replies/table.ts`): `Card` union + `CARD_TYPES` + strict `card()` parser for the
+  nine types (article, video, history, link, image, file, mini, voice, task), each with exactly the
+  listed fields; `Incoming` gained optional `card` and `forwarded?: true`. `incoming()` parses both.
+  The English twin check (`assertTwin`) compares card *structure* only — type, which optional keys
+  are present, assets (cover/icon/src/ext), and the `lines`/`fields` counts — via `cardShape` +
+  `cardTwin`, so text fields (title, digest, account, site, alt, name, size, duration, seconds,
+  brand, lines, field label/value, action) may differ between languages. `localise` swaps the card
+  for the English twin's under the `en` locale. Existing incoming-twin error message kept verbatim.
+- Rendering: new `src/world/desktop/messages/cards.ts` draws one `Card` in two registers (`wx` / `ding`)
+  from the same data; a missing `cover` falls back to a neutral tile by type (`cover tile t-<type>`),
+  never an empty box; an `image` with no `src` shows a grey placeholder carrying the alt text; a
+  `forwarded` card wears `is-fwd` (reads as forwarded even before the label string exists).
+  `bubbles.ts` gained a `shared` `Body`; `transcript.ts` turns an incoming item with a `card` into a
+  `shared` bubble (resolving a group prefix/avatar first); `view.ts` `renderBody` renders it and the
+  deliverable now looks like a link card with a file-type badge. Messages without `card` are untouched.
+- CSS for the nine card shapes + `is-fwd` appended to `src/world/desktop/desktop.css`.
+- Tests: `tests/messages-cards.test.ts` — loader accepts each type / rejects unknown fields and
+  missing required fields; twin shape check (passes on text-only diffs, fails on type/optional-key/
+  asset/count/presence diffs); each type renders its own markup and class in both apps with one
+  snapshot of all nine in both registers; a message without a card renders exactly as before.
+- Gates: state gate 15 files / 236 green (hook, run on each `src/state/**` save); `npx tsc --noEmit`
+  clean; full `npx vitest run` → 90 files / 1570 tests green.

@@ -47,6 +47,26 @@ export interface Entry {
   readonly note?: string;
 }
 
+/**
+ * A shared thing on a message (desktop-ui "shared things must look like what they are", 2026-11-03):
+ * an article, a video, a chat history, a link, an image, a file, a mini-program, a voice note or a
+ * work task. The `text` beside it stays as the list preview and the fallback. 消息 draws it the
+ * WeChat way, 工作台's message pane the DingTalk way, from this one shape.
+ */
+export const CARD_TYPES = ["article", "video", "history", "link", "image", "file", "mini", "voice", "task"] as const;
+export type CardType = (typeof CARD_TYPES)[number];
+
+export type Card =
+  | { readonly type: "article"; readonly account: string; readonly title: string; readonly digest?: string; readonly cover?: string }
+  | { readonly type: "video"; readonly account: string; readonly title: string; readonly cover?: string; readonly duration: string }
+  | { readonly type: "history"; readonly title: string; readonly lines: readonly string[] }
+  | { readonly type: "link"; readonly title: string; readonly site: string; readonly icon?: string }
+  | { readonly type: "image"; readonly src?: string; readonly alt: string }
+  | { readonly type: "file"; readonly name: string; readonly size: string; readonly ext: string }
+  | { readonly type: "mini"; readonly brand: string; readonly title: string; readonly cover?: string }
+  | { readonly type: "voice"; readonly seconds: string }
+  | { readonly type: "task"; readonly title: string; readonly fields: readonly (readonly [string, string])[]; readonly action?: string };
+
 export interface Incoming {
   readonly t: string;
   readonly text: string;
@@ -59,6 +79,10 @@ export interface Incoming {
    * opens it, 屏幕 is locked until the player has opened it once (the `open file:<doc>` event).
    */
   readonly doc?: string;
+  /** A shared thing drawn as its own card (desktop-ui 2026-11-03); the text stays as the preview. */
+  readonly card?: Card;
+  /** A forwarded message shows a small 「转发」 label above its card. */
+  readonly forwarded?: true;
 }
 
 export interface RecipientTable {
@@ -174,15 +198,95 @@ function entry(value: unknown, where: string): Entry {
   return out as unknown as Entry;
 }
 
+/** A list of non-empty strings (the chat-history lines). */
+function strList(value: unknown, where: string): string[] {
+  if (!Array.isArray(value) || value.length === 0) throw new ContentError(where, "must be a non-empty list of strings");
+  return value.map((v, i) => str(v, `${where}[${i}]`));
+}
+
+/** The allowed keys of each card type (strict per the addition; `type` is always present). */
+const CARD_KEYS: Record<CardType, readonly string[]> = {
+  article: ["type", "account", "title", "digest", "cover"],
+  video: ["type", "account", "title", "cover", "duration"],
+  history: ["type", "title", "lines"],
+  link: ["type", "title", "site", "icon"],
+  image: ["type", "src", "alt"],
+  file: ["type", "name", "size", "ext"],
+  mini: ["type", "brand", "title", "cover"],
+  voice: ["type", "seconds"],
+  task: ["type", "title", "fields", "action"],
+};
+
+/** One card on a message, checked strictly by its `type` (desktop-ui 2026-11-03). */
+function card(value: unknown, where: string): Card {
+  if (!isRecord(value)) throw new ContentError(where, "a card must be an object");
+  const type = value.type as CardType;
+  if (!CARD_TYPES.includes(type)) throw new ContentError(where, `unknown card type "${String(value.type)}"`);
+  onlyKeys(value, CARD_KEYS[type], where);
+  switch (type) {
+    case "article":
+      return {
+        type,
+        account: text(value.account, `${where}.account`),
+        title: text(value.title, `${where}.title`),
+        ...(value.digest !== undefined ? { digest: text(value.digest, `${where}.digest`) } : {}),
+        ...(value.cover !== undefined ? { cover: str(value.cover, `${where}.cover`) } : {}),
+      };
+    case "video":
+      return {
+        type,
+        account: text(value.account, `${where}.account`),
+        title: text(value.title, `${where}.title`),
+        ...(value.cover !== undefined ? { cover: str(value.cover, `${where}.cover`) } : {}),
+        duration: str(value.duration, `${where}.duration`),
+      };
+    case "history":
+      return { type, title: text(value.title, `${where}.title`), lines: strList(value.lines, `${where}.lines`).map((l, i) => text(l, `${where}.lines[${i}]`)) };
+    case "link":
+      return {
+        type,
+        title: text(value.title, `${where}.title`),
+        site: text(value.site, `${where}.site`),
+        ...(value.icon !== undefined ? { icon: str(value.icon, `${where}.icon`) } : {}),
+      };
+    case "image":
+      return { type, ...(value.src !== undefined ? { src: str(value.src, `${where}.src`) } : {}), alt: text(value.alt, `${where}.alt`) };
+    case "file":
+      return { type, name: text(value.name, `${where}.name`), size: str(value.size, `${where}.size`), ext: str(value.ext, `${where}.ext`) };
+    case "mini":
+      return {
+        type,
+        brand: text(value.brand, `${where}.brand`),
+        title: text(value.title, `${where}.title`),
+        ...(value.cover !== undefined ? { cover: str(value.cover, `${where}.cover`) } : {}),
+      };
+    case "voice":
+      return { type, seconds: str(value.seconds, `${where}.seconds`) };
+    case "task": {
+      if (!Array.isArray(value.fields)) throw new ContentError(`${where}.fields`, "must be a list of [label, value] pairs");
+      const fields = value.fields.map((pair, i) => {
+        if (!Array.isArray(pair) || pair.length !== 2) throw new ContentError(`${where}.fields[${i}]`, "must be [label, value]");
+        return [text(pair[0], `${where}.fields[${i}][0]`), text(pair[1], `${where}.fields[${i}][1]`)] as const;
+      });
+      return { type, title: text(value.title, `${where}.title`), fields, ...(value.action !== undefined ? { action: text(value.action, `${where}.action`) } : {}) };
+    }
+  }
+}
+
 function incoming(value: unknown, where: string): Incoming {
   if (!isRecord(value)) throw new ContentError(where, "an incoming item must be an object");
-  onlyKeys(value, ["t", "text", "kind", "cond_show", "effects", "note", "doc"], where);
+  onlyKeys(value, ["t", "text", "kind", "cond_show", "effects", "note", "doc", "card", "forwarded"], where);
   const kind = value.kind as IncomingKind;
   if (!INCOMING_KINDS.includes(kind)) throw new ContentError(where, `unknown kind "${String(value.kind)}"`);
   const out: Record<string, unknown> = { t: time(value.t, `${where}.t`), text: text(value.text, `${where}.text`), kind };
   // A deliverable carries the doc it posts; no other kind may (desktop-ui 2026-11-02).
   if (kind === "deliverable") out.doc = str(value.doc, `${where}.doc`);
   else if (value.doc !== undefined) throw new ContentError(where, `only a deliverable may carry "doc"`);
+  if (value.card !== undefined) out.card = card(value.card, `${where}.card`);
+  if (value.forwarded !== undefined) {
+    if (value.forwarded !== true) throw new ContentError(`${where}.forwarded`, "must be true");
+    out.forwarded = true;
+  }
   if (value.cond_show !== undefined) out.cond_show = condition(value.cond_show, `${where}.cond_show`);
   if (value.effects !== undefined) {
     const raw = value.effects;
@@ -255,6 +359,42 @@ export function parseFamilyFile(raw: unknown, id: string = FAMILY, label: string
 
 const same = (a: unknown, b: unknown): boolean => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
 
+/**
+ * The structural fingerprint of a card: everything the twin check compares (the type, which optional
+ * keys are present, the asset ids, and the counts). Text fields (title, digest, account, site, alt,
+ * name, size, duration, seconds, brand, each line, each field's label/value, action) are left out so
+ * they may differ between languages (desktop-ui 2026-11-03: "compares card structure and lets text
+ * fields differ").
+ */
+function cardShape(c: Card): unknown {
+  switch (c.type) {
+    case "article":
+      return { type: c.type, digest: c.digest !== undefined, cover: c.cover ?? null };
+    case "video":
+      return { type: c.type, cover: c.cover ?? null };
+    case "history":
+      return { type: c.type, lines: c.lines.length };
+    case "link":
+      return { type: c.type, icon: c.icon ?? null };
+    case "image":
+      return { type: c.type, src: c.src ?? null };
+    case "file":
+      return { type: c.type, ext: c.ext };
+    case "mini":
+      return { type: c.type, cover: c.cover ?? null };
+    case "voice":
+      return { type: c.type };
+    case "task":
+      return { type: c.type, fields: c.fields.length, action: c.action !== undefined };
+  }
+}
+
+/** Two cards are structural twins (same type, same optional keys, same assets and counts). */
+function cardTwin(zh: Card | undefined, en: Card | undefined, where: string): void {
+  if ((zh === undefined) !== (en === undefined)) throw new ContentError(where, "card present in only one language");
+  if (zh && en && !same(cardShape(zh), cardShape(en))) throw new ContentError(where, "card structure differs from the Chinese");
+}
+
 /** Throws unless `en` is the structural twin of `zh`. Exported for tests. */
 export function assertTwin(zh: RecipientTable, en: RecipientTable, where: string): void {
   const zhWords = [...zh.cells.keys()];
@@ -265,9 +405,10 @@ export function assertTwin(zh: RecipientTable, en: RecipientTable, where: string
   }
   zh.incoming.forEach((z, i) => {
     const e = en.incoming[i]!;
-    if (z.t !== e.t || z.kind !== e.kind || z.doc !== e.doc || !same(z.effects, e.effects) || !same(z.cond_show, e.cond_show)) {
+    if (z.t !== e.t || z.kind !== e.kind || z.doc !== e.doc || z.forwarded !== e.forwarded || !same(z.effects, e.effects) || !same(z.cond_show, e.cond_show)) {
       throw new ContentError(`${where}.incoming[${i}]`, "time, kind, doc, effects or condition differ from the Chinese");
     }
+    cardTwin(z.card, e.card, `${where}.incoming[${i}]`);
   });
   for (const [word, z] of zh.cells) {
     const e = en.cells.get(word)!;
@@ -320,7 +461,15 @@ export function localise(zh: RecipientTable, en: RecipientTable): RecipientTable
       ...(z.interrupt && e.interrupt ? { interrupt: bilingual(z.interrupt, { text: e.interrupt.text }) } : {}),
     } as Entry);
   }
-  return { incoming: zh.incoming.map((item, i) => bilingual(item, { text: en.incoming[i]!.text })), cells };
+  return {
+    incoming: zh.incoming.map((item, i) => {
+      const e = en.incoming[i]!;
+      const out = bilingual(item, { text: e.text }) as Incoming & { card?: Card };
+      if (item.card && e.card) Object.defineProperty(out, "card", { enumerable: true, get: () => (replyLocale() === "en" ? e.card : item.card) });
+      return out;
+    }),
+    cells,
+  };
 }
 
 function deepFreeze<T>(value: T): T {

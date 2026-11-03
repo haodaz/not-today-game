@@ -1,6 +1,8 @@
 // What a line of content text looks like in a conversation. The bracket forms are the reply
 // tables' conventions ([语音] 41″, （转文字）…, [卡片] …); the text is shown as written.
 
+import type { Card } from "@state/replies/table";
+
 export type Body =
   | { readonly type: "text"; readonly text: string }
   | { readonly type: "voice"; readonly sec: string; readonly raw: string; transcript: string | null }
@@ -9,7 +11,12 @@ export type Body =
   /** A line the content writes as a system notice, e.g. [撤回了一条消息], [该账号已注销]. */
   | { readonly type: "system"; readonly raw: string }
   /** Vivi's deliverable (desktop-ui 2026-11-02): a clickable card that opens `doc` in the browser. */
-  | { readonly type: "deliverable"; readonly raw: string; readonly doc: string };
+  | { readonly type: "deliverable"; readonly raw: string; readonly doc: string }
+  /**
+   * A shared thing drawn as what it is (desktop-ui 2026-11-03): the `card` from content, with the
+   * message's `text` kept as the list preview and fallback. `forwarded` adds the 「转发」 label.
+   */
+  | { readonly type: "shared"; readonly card: Card; readonly raw: string; readonly forwarded: boolean };
 
 // The English twins (content/replies/en/) write the same conventions in English: [voice] 46″,
 // (transcript) …, [card], [photo] / [link] / [document], [recalled a message].
@@ -54,6 +61,7 @@ export function previewOf(body: Body): string {
     case "attach":
     case "system":
     case "deliverable":
+    case "shared":
       return body.raw;
   }
 }

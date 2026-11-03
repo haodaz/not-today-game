@@ -1,0 +1,42 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`each type renders its own markup in both apps > snapshot: every type in 消息 (WeChat) and 工作台 (DingTalk) 1`] = `
+{
+  "article": {
+    "ding": "<div class="sc sc-article ding"><div class="c-body"><div class="c-text"><div class="c-title">一篇文章</div><div class="c-digest">两行灰色的摘要</div></div><span class="cover sq"><img src="/msgs/covers/news.png" alt="" aria-hidden="true" draggable="false"></span></div><div class="acct"><span class="acct-dot" aria-hidden="true"></span><span class="acct-name">晚点 LatePost</span></div></div>",
+    "wx": "<div class="sc sc-article wx"><div class="c-body"><div class="c-text"><div class="c-title">一篇文章</div><div class="c-digest">两行灰色的摘要</div></div><span class="cover sq"><img src="/msgs/covers/news.png" alt="" aria-hidden="true" draggable="false"></span></div><div class="acct"><span class="acct-dot" aria-hidden="true"></span><span class="acct-name">晚点 LatePost</span></div></div>",
+  },
+  "file": {
+    "ding": "<div class="sc sc-file ding"><div class="c-file"><span class="fico x-pdf" aria-hidden="true">PDF</span><div class="c-text"><div class="c-title one">合同终稿.pdf</div><div class="c-size">1.2 MB</div></div></div></div>",
+    "wx": "<div class="sc sc-file wx"><div class="c-file"><span class="fico x-pdf" aria-hidden="true">PDF</span><div class="c-text"><div class="c-title one">合同终稿.pdf</div><div class="c-size">1.2 MB</div></div></div></div>",
+  },
+  "history": {
+    "ding": "<div class="sc sc-history ding"><div class="c-title">群聊的聊天记录</div><div class="h-lines"><div class="h-line">大姨：吃了吗</div><div class="h-line">二舅：在忙</div><div class="h-line">小姑：回家看看</div><div class="h-line">表弟：好的</div></div><div class="h-rule"></div></div>",
+    "wx": "<div class="sc sc-history wx"><div class="c-title">群聊的聊天记录</div><div class="h-lines"><div class="h-line">大姨：吃了吗</div><div class="h-line">二舅：在忙</div><div class="h-line">小姑：回家看看</div><div class="h-line">表弟：好的</div></div><div class="h-rule"></div></div>",
+  },
+  "image": {
+    "ding": "<div class="sc sc-image ding"><img class="c-image" src="/msgs/photo.png" alt="一张照片" draggable="false"></div>",
+    "wx": "<div class="sc sc-image wx"><img class="c-image" src="/msgs/photo.png" alt="一张照片" draggable="false"></div>",
+  },
+  "link": {
+    "ding": "<div class="sc sc-link ding"><div class="c-body"><div class="c-text"><div class="c-title two">一个网页标题</div><div class="c-site">example.com</div></div><span class="cover sq"><img src="/msgs/covers/link.png" alt="" aria-hidden="true" draggable="false"></span></div></div>",
+    "wx": "<div class="sc sc-link wx"><div class="c-body"><div class="c-text"><div class="c-title two">一个网页标题</div><div class="c-site">example.com</div></div><span class="cover sq"><img src="/msgs/covers/link.png" alt="" aria-hidden="true" draggable="false"></span></div></div>",
+  },
+  "mini": {
+    "ding": "<div class="sc sc-mini ding"><div class="c-mini"><div class="c-body"><div class="c-title">帮我砍一刀</div><span class="cover sq"><img src="/msgs/covers/cat.png" alt="" aria-hidden="true" draggable="false"></span></div><div class="mini-brand">拼团</div></div></div>",
+    "wx": "<div class="sc sc-mini wx"><div class="c-mini"><div class="c-body"><div class="c-title">帮我砍一刀</div><span class="cover sq"><img src="/msgs/covers/cat.png" alt="" aria-hidden="true" draggable="false"></span></div><div class="mini-brand">拼团</div></div></div>",
+  },
+  "task": {
+    "ding": "<div class="sc sc-task ding"><div class="tk-head">审批：报销</div><div class="tk-fields"><div class="tk-row"><span class="tk-k">金额</span><span class="tk-v">412.50</span></div><div class="tk-row"><span class="tk-k">事由</span><span class="tk-v">打车</span></div></div><div class="tk-action">去审批</div></div>",
+    "wx": "<div class="sc sc-task wx"><div class="tk-head">审批：报销</div><div class="tk-fields"><div class="tk-row"><span class="tk-k">金额</span><span class="tk-v">412.50</span></div><div class="tk-row"><span class="tk-k">事由</span><span class="tk-v">打车</span></div></div><div class="tk-action">去审批</div></div>",
+  },
+  "video": {
+    "ding": "<div class="sc sc-video ding"><div class="c-video"><span class="cover v"><img src="/msgs/covers/short.png" alt="" aria-hidden="true" draggable="false"></span><span class="play" aria-hidden="true"></span><span class="dur">0:45</span></div><div class="c-under"><span class="acct-dot" aria-hidden="true"></span><div class="c-text"><div class="c-title">一个视频</div><div class="c-acct">某视频号</div></div></div></div>",
+    "wx": "<div class="sc sc-video wx"><div class="c-video"><span class="cover v"><img src="/msgs/covers/short.png" alt="" aria-hidden="true" draggable="false"></span><span class="play" aria-hidden="true"></span><span class="dur">0:45</span></div><div class="c-under"><span class="acct-dot" aria-hidden="true"></span><div class="c-text"><div class="c-title">一个视频</div><div class="c-acct">某视频号</div></div></div></div>",
+  },
+  "voice": {
+    "ding": "<div class="sc sc-voice ding"><div class="voice"><i style="height:6px"></i><i style="height:14px"></i><i style="height:9px"></i><i style="height:16px"></i><i style="height:7px"></i><i style="height:12px"></i> 41″</div></div>",
+    "wx": "<div class="sc sc-voice wx"><div class="voice"><i style="height:6px"></i><i style="height:14px"></i><i style="height:9px"></i><i style="height:16px"></i><i style="height:7px"></i><i style="height:12px"></i> 41″</div></div>",
+  },
+}
+`;

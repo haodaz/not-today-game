@@ -196,10 +196,24 @@ export function transcript(input: TranscriptInput): Bubble[] {
       if (item.effects?.flags?.includes(IN_INPUT_FLAG)) return; // shown in the input box, not received
       if (day === today && item.t > input.clock.time) return; // not here yet
       const bubbles: Bubble[] = [];
-      // A deliverable posts a clickable card carrying its doc id (desktop-ui 2026-11-02); other
-      // incoming lines use the bracket-form bodies.
+      // A deliverable posts a clickable card carrying its doc id (desktop-ui 2026-11-02); a `card`
+      // posts a shared thing drawn as what it is (desktop-ui 2026-11-03); other lines use the
+      // bracket-form bodies. A group prefix (「大姨：…」) still resolves the speaker and avatar.
       if (item.kind === "deliverable" && item.doc) {
         bubbles.push({ kind: "msg", side: "them", who: input.conversation, t: item.t, body: { type: "deliverable", raw: item.text, doc: item.doc }, labelKey: null });
+      } else if (item.card) {
+        const spoken = SPEAKER_CONVERSATIONS.has(input.conversation) ? speakerOf(input.conversation, item.text) : { who: input.conversation, text: item.text };
+        const body: Body = { type: "shared", card: item.card, raw: spoken.text, forwarded: item.forwarded === true };
+        bubbles.push({
+          kind: "msg",
+          side: "them",
+          who: spoken.who,
+          ...("alias" in spoken && spoken.alias !== undefined ? { alias: spoken.alias } : {}),
+          ...("prefix" in spoken && spoken.prefix !== undefined ? { prefix: spoken.prefix } : {}),
+          t: item.t,
+          body,
+          labelKey: null,
+        });
       } else {
         pushLine(bubbles, "them", input.conversation, item.t, item.text, input.conversation);
       }

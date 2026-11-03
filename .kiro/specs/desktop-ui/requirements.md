@@ -119,3 +119,6 @@ Today every shared thing is a line of text (「[卡片] …」「[链接] …」
 - **Two registers**: 消息 draws them WeChat-style, 工作台's message pane DingTalk-style (same data, the work card shape and blue accents there). A `forwarded: true` flag adds the small 「转发」 label.
 - **Covers**: Claude supplies a small set of generic covers in `public/msgs/covers/` (news, short video, chart, food, cat, family photo, certificate); a card without `cover` uses a neutral tile by type, never an empty box.
 - Tests: the loader accepts each type and rejects unknown fields; each type renders its own markup in both apps (snapshot one of each); a message without `card` renders as today.
+
+## Addition 2026-11-03 (author, from WeChat Channels screenshots): the video card's title sits on the cover
+A `video` card looks like a WeChat Channels share: a vertical 3:4 cover; the `title` is drawn **on the cover** in large bold type (yellow or white with a dark outline, two lines max, upper or lower third, `titlePos?: "top"|"bottom"`, default bottom), the play circle in the middle, and the Channels mark plus `account` along the bottom edge. Duration bottom-right when given. Generated covers carry no text, so the title overlay is the only text on the card. Snapshot one with each `titlePos`.
