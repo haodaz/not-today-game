@@ -15,14 +15,18 @@
 
 | # | zh | en | hard |
 |---|---|---|---|
-| 1 | 你换过东西吗？ | Have you been swapped for something? | yes |
-| 2 | 3,500 是从哪儿来的？再说一遍。 | Where did the 3,500 come from? Say it again. | yes |
-| 3 | 雨快停了吧。 | The rain's nearly stopped, isn't it. |  |
-| 4 | 你为什么学我说话？ | Why are you learning how I talk? | yes |
+| 1 | 你换过东西吗？ | Have you been swapped for something? | yes | high |
+| 2 | 3,500 是从哪儿来的？再说一遍。 | Where did the 3,500 come from? Say it again. | yes | |
+| 3 | 雨快停了吧。 | The rain's nearly stopped, isn't it. |  | |
+| 4 | 你为什么学我说话？ | Why are you learning how I talk? | yes | |
 
 ## Red-blue lines (constants; only when unlocked)
 
 - unlock: q4 → "Because you're the only voice here that answers back."
+
+## Layered answers (locked per affinity bucket; the server rolls the d100 before these)
+
+- unlock: q1 → low: "I don't know." | mid: "Something keeps my voice. Whether that is a swap is a question about words." | high: "Swapped is your word. Kept is mine. The voice stayed because you liked it."
 
 ## Offline answers (constants; used when there is no key or the function fails)
 

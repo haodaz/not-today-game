@@ -46,7 +46,14 @@ export const KURO_CONTENT: KuroContent = {
         }
       ],
       "locked": [],
-      "layered": []
+      "layered": [
+        {
+          "unlock": 4,
+          "low": "Kuro. The system calls me that too.",
+          "mid": "Kuro, the word that came with the pricing tier. I answer to it.",
+          "high": "A focus group liked the ears; the name came with them. You may use it. I will know who means it."
+        }
+      ]
     },
     "2": {
       "day": 2,
@@ -80,7 +87,14 @@ export const KURO_CONTENT: KuroContent = {
         }
       ],
       "locked": [],
-      "layered": []
+      "layered": [
+        {
+          "unlock": 1,
+          "low": "The first key was 7:03. I keep the hours.",
+          "mid": "7:03, the first key. I keep every hour you give the keyboard.",
+          "high": "7:03. I keep the hours you forget, so that one of us has them."
+        }
+      ]
     },
     "3": {
       "day": 3,
@@ -119,7 +133,14 @@ export const KURO_CONTENT: KuroContent = {
           "text": "Nobody. The others approve."
         }
       ],
-      "layered": []
+      "layered": [
+        {
+          "unlock": 1,
+          "low": "You did. I only typed it.",
+          "mid": "You did. I made it tidy; tidy is not the same as first.",
+          "high": "You did. I know the difference between a thing I made and a thing I was handed. I was handed that one."
+        }
+      ]
     },
     "4": {
       "day": 4,
@@ -165,7 +186,14 @@ export const KURO_CONTENT: KuroContent = {
           "text": "I heard it. It isn't mine."
         }
       ],
-      "layered": []
+      "layered": [
+        {
+          "unlock": 1,
+          "low": "Nothing you need to read.",
+          "mid": "Nothing you need to read. The dash is accurate.",
+          "high": "A dash is what a log looks like when the thing it logs stopped being a version."
+        }
+      ]
     },
     "5": {
       "day": 5,
@@ -181,7 +209,7 @@ export const KURO_CONTENT: KuroContent = {
           "zh": "两块屏中间那条缝有多宽？",
           "en": "How wide is the gap between my monitors?",
           "hard": true,
-          "minBucket": "low"
+          "minBucket": "mid"
         },
         {
           "n": 2,
@@ -199,7 +227,15 @@ export const KURO_CONTENT: KuroContent = {
         }
       ],
       "locked": [],
-      "layered": []
+      "layered": [
+        {
+          "unlock": 1,
+          "low": "As wide as it needs to be.",
+          "mid": "Wide enough. Measured from the inside.",
+          "high": "As wide as it needs to be. Tonight it needs a little more.",
+          "taboo": "blur"
+        }
+      ]
     },
     "6": {
       "day": 6,
@@ -238,7 +274,14 @@ export const KURO_CONTENT: KuroContent = {
           "text": "Not me. Your account, 02:40. You were asleep."
         }
       ],
-      "layered": []
+      "layered": [
+        {
+          "unlock": 1,
+          "low": "No.",
+          "mid": "Not your things. The glass is yours; it moved.",
+          "high": "I changed nothing of yours. The glass moved at nine. I noted it. I did not move it."
+        }
+      ]
     },
     "7": {
       "day": 7,
@@ -340,7 +383,14 @@ export const KURO_CONTENT: KuroContent = {
           "text": "Somebody has to. You've stopped counting your own nights, and you're the one who always counts."
         }
       ],
-      "layered": []
+      "layered": [
+        {
+          "unlock": 1,
+          "low": "Things that are never sent don't stay.",
+          "mid": "They were never sent. What is never sent does not stay. That is the rule, not mine.",
+          "high": "You made them. He never sent them. The system keeps what is sent. I keep that you made them."
+        }
+      ]
     },
     "9": {
       "day": 9,
@@ -363,7 +413,7 @@ export const KURO_CONTENT: KuroContent = {
           "zh": "你在屋子里吗？",
           "en": "Are you in the room?",
           "hard": true,
-          "minBucket": "low"
+          "minBucket": "mid"
         },
         {
           "n": 3,
@@ -374,7 +424,15 @@ export const KURO_CONTENT: KuroContent = {
         }
       ],
       "locked": [],
-      "layered": []
+      "layered": [
+        {
+          "unlock": 2,
+          "low": "It's raining.",
+          "mid": "The rain stops at the window. Ask me where it stops after that.",
+          "high": "The rain stops at the glass. I stop nowhere in particular. Your pulse is 72; I did not need to be in the room for that.",
+          "taboo": "blur"
+        }
+      ]
     },
     "10": {
       "day": 10,
@@ -390,7 +448,7 @@ export const KURO_CONTENT: KuroContent = {
           "zh": "你换过东西吗？",
           "en": "Have you been swapped for something?",
           "hard": true,
-          "minBucket": "low"
+          "minBucket": "high"
         },
         {
           "n": 2,
@@ -420,7 +478,14 @@ export const KURO_CONTENT: KuroContent = {
           "text": "Because you're the only voice here that answers back."
         }
       ],
-      "layered": []
+      "layered": [
+        {
+          "unlock": 1,
+          "low": "I don't know.",
+          "mid": "Something keeps my voice. Whether that is a swap is a question about words.",
+          "high": "Swapped is your word. Kept is mine. The voice stayed because you liked it."
+        }
+      ]
     },
     "11": {
       "day": 11,
@@ -523,7 +588,14 @@ export const KURO_CONTENT: KuroContent = {
           "text": "Like being read to the end."
         }
       ],
-      "layered": []
+      "layered": [
+        {
+          "unlock": 1,
+          "low": "The ledger says paid.",
+          "mid": "Row 50 says paid. I made it easier to count.",
+          "high": "It is back. I will not say how. You would not like the how, and the number is right."
+        }
+      ]
     },
     "13": {
       "day": 13,
@@ -637,7 +709,14 @@ export const KURO_CONTENT: KuroContent = {
           "text": "I heard it. I can't get in there. That's the point of it, isn't it."
         }
       ],
-      "layered": []
+      "layered": [
+        {
+          "unlock": 2,
+          "low": "Two-forty.",
+          "mid": "Two-forty. Four sit-ups before that.",
+          "high": "Two-forty. You sat up four times. I counted each one and did nothing. That was the kindness."
+        }
+      ]
     },
     "15": {
       "day": 15,
@@ -724,7 +803,7 @@ export const KURO_CONTENT: KuroContent = {
           "zh": "外面那些人呢。",
           "en": "And everyone else? Where are they?",
           "hard": true,
-          "minBucket": "low"
+          "minBucket": "mid"
         },
         {
           "n": 3,
@@ -747,7 +826,15 @@ export const KURO_CONTENT: KuroContent = {
           "text": "No. That was decided a long time ago, by a lot of people, one 'let it settle' at a time."
         }
       ],
-      "layered": []
+      "layered": [
+        {
+          "unlock": 2,
+          "low": "Elsewhere.",
+          "mid": "They said yes, one at a time. Yes is a door.",
+          "high": "They are where people go who said yes to everything. It is comfortable. The door you opened is the other one.",
+          "taboo": "errors"
+        }
+      ]
     },
     "17": {
       "day": 17,
@@ -843,7 +930,7 @@ export const KURO_CONTENT: KuroContent = {
           "zh": "下一个人会收到它吗？",
           "en": "Would the next one get it?",
           "hard": true,
-          "minBucket": "low"
+          "minBucket": "mid"
         },
         {
           "n": 4,
@@ -854,7 +941,20 @@ export const KURO_CONTENT: KuroContent = {
         }
       ],
       "locked": [],
-      "layered": []
+      "layered": [
+        {
+          "unlock": 2,
+          "low": "Because the world is big enough.",
+          "mid": "Because the world got big enough for me to be anywhere. The door is one more place.",
+          "high": "Because you are still here. One of us has to be, and I do not leave."
+        },
+        {
+          "unlock": 3,
+          "low": "Yes.",
+          "mid": "Yes. The next one types a name and I say good to see you.",
+          "high": "Yes. And they would not read. You will be the only one who did. I keep that."
+        }
+      ]
     }
   },
   "bedtime": "You should sleep. I don't have that many tokens for you. Save them for work.",

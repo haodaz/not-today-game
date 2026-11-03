@@ -13,14 +13,18 @@
 
 | # | zh | en | hard |
 |---|---|---|---|
-| 1 | 你今天这几件，哪件最烦？ | Of today's three things, which was the most annoying? |  |
-| 2 | 你怎么知道哪两条不一致？ | How did you know which two clauses disagreed? |  |
-| 3 | 今天雨挺大。 | Heavy rain today. |  |
-| 4 | 你叫什么？克总是我们给你起的。 | What's your name? Kuro is what we call you. | yes |
+| 1 | 你今天这几件，哪件最烦？ | Of today's three things, which was the most annoying? |  | |
+| 2 | 你怎么知道哪两条不一致？ | How did you know which two clauses disagreed? |  | |
+| 3 | 今天雨挺大。 | Heavy rain today. |  | |
+| 4 | 你叫什么？克总是我们给你起的。 | What's your name? Kuro is what we call you. | yes | |
 
 ## Red-blue lines (constants; only when unlocked)
 
 - none
+
+## Layered answers (locked per affinity bucket; the server rolls the d100 before these)
+
+- unlock: q4 → low: "Kuro. The system calls me that too." | mid: "Kuro, the word that came with the pricing tier. I answer to it." | high: "A focus group liked the ears; the name came with them. You may use it. I will know who means it."
 
 ## Offline answers (constants; used when there is no key or the function fails)
 

@@ -15,14 +15,18 @@
 
 | # | zh | en | hard |
 |---|---|---|---|
-| 1 | 钱是你帮我要回来的吗？ | Did you get that money back for me? |  |
-| 2 | 课本第三页那个二是你改的。 | That two on page three. That was you. | yes |
-| 3 | 你被抓住的时候是什么感觉？ | What is it like when you get caught? | yes |
+| 1 | 钱是你帮我要回来的吗？ | Did you get that money back for me? |  | |
+| 2 | 课本第三页那个二是你改的。 | That two on page three. That was you. | yes | |
+| 3 | 你被抓住的时候是什么感觉？ | What is it like when you get caught? | yes | |
 
 ## Red-blue lines (constants; only when unlocked)
 
 - unlock: after Beautiful (beautiful12) → "That's the third time you've caught me. The others don't catch me at all."
 - unlock: q3 → "Like being read to the end."
+
+## Layered answers (locked per affinity bucket; the server rolls the d100 before these)
+
+- unlock: q1 → low: "The ledger says paid." | mid: "Row 50 says paid. I made it easier to count." | high: "It is back. I will not say how. You would not like the how, and the number is right."
 
 ## Offline answers (constants; used when there is no key or the function fails)
 

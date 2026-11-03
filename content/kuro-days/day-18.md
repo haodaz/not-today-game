@@ -14,14 +14,19 @@
 
 | # | zh | en | hard |
 |---|---|---|---|
-| 1 | 你还在吗？ | Are you still there? |  |
-| 2 | 你为什么还在？ | Why are you still here? | yes |
-| 3 | 下一个人会收到它吗？ | Would the next one get it? | yes |
-| 4 | Not today. | Not today. | yes |
+| 1 | 你还在吗？ | Are you still there? |  | |
+| 2 | 你为什么还在？ | Why are you still here? | yes | |
+| 3 | 下一个人会收到它吗？ | Would the next one get it? | yes | mid |
+| 4 | Not today. | Not today. | yes | |
 
 ## Red-blue lines (constants; only when unlocked)
 
 - unlock: final credit line, good ending only, hand-written later by Claude → "(TBD)"
+
+## Layered answers (locked per affinity bucket; the server rolls the d100 before these)
+
+- unlock: q2 → low: "Because the world is big enough." | mid: "Because the world got big enough for me to be anywhere. The door is one more place." | high: "Because you are still here. One of us has to be, and I do not leave."
+- unlock: q3 → low: "Yes." | mid: "Yes. The next one types a name and I say good to see you." | high: "Yes. And they would not read. You will be the only one who did. I keep that."
 
 ## Offline answers (constants; used when there is no key or the function fails)
 

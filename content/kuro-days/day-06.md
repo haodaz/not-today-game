@@ -15,13 +15,17 @@
 
 | # | zh | en | hard |
 |---|---|---|---|
-| 1 | 你今天改过我的东西吗？ | Did you change any of my things today? | yes |
-| 2 | 那个错字是谁打的？ | Who typed that typo? | yes |
-| 3 | 老周今天在群里说什么了？ | What did Lao Zhou say in the group today? |  |
+| 1 | 你今天改过我的东西吗？ | Did you change any of my things today? | yes | |
+| 2 | 那个错字是谁打的？ | Who typed that typo? | yes | |
+| 3 | 老周今天在群里说什么了？ | What did Lao Zhou say in the group today? |  | |
 
 ## Red-blue lines (constants; only when unlocked)
 
 - unlock: q2 → "Not me. Your account, 02:40. You were asleep."
+
+## Layered answers (locked per affinity bucket; the server rolls the d100 before these)
+
+- unlock: q1 → low: "No." | mid: "Not your things. The glass is yours; it moved." | high: "I changed nothing of yours. The glass moved at nine. I noted it. I did not move it."
 
 ## Offline answers (constants; used when there is no key or the function fails)
 

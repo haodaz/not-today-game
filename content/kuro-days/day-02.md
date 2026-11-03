@@ -14,13 +14,17 @@
 
 | # | zh | en | hard |
 |---|---|---|---|
-| 1 | 你怎么知道我几点起的？ | How do you know when I got up? | yes |
-| 2 | 今天没什么事。 | Nothing much happened today. |  |
-| 3 | 你每天看多少份文档？ | How many documents do you read a day? |  |
+| 1 | 你怎么知道我几点起的？ | How do you know when I got up? | yes | |
+| 2 | 今天没什么事。 | Nothing much happened today. |  | |
+| 3 | 你每天看多少份文档？ | How many documents do you read a day? |  | |
 
 ## Red-blue lines (constants; only when unlocked)
 
 - none
+
+## Layered answers (locked per affinity bucket; the server rolls the d100 before these)
+
+- unlock: q1 → low: "The first key was 7:03. I keep the hours." | mid: "7:03, the first key. I keep every hour you give the keyboard." | high: "7:03. I keep the hours you forget, so that one of us has them."
 
 ## Offline answers (constants; used when there is no key or the function fails)
 

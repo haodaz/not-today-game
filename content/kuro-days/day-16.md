@@ -15,14 +15,18 @@
 
 | # | zh | en | hard |
 |---|---|---|---|
-| 1 | 门是你开的？ | Did you open the door? | yes |
-| 2 | 外面那些人呢。 | And everyone else? Where are they? | yes |
-| 3 | 你吃过什么吗。 | Have you ever eaten anything? |  |
-| 4 | 十三个月是你定的价？ | Did you set the price at thirteen months? | yes |
+| 1 | 门是你开的？ | Did you open the door? | yes | |
+| 2 | 外面那些人呢。 | And everyone else? Where are they? | yes | mid |
+| 3 | 你吃过什么吗。 | Have you ever eaten anything? |  | |
+| 4 | 十三个月是你定的价？ | Did you set the price at thirteen months? | yes | |
 
 ## Red-blue lines (constants; only when unlocked)
 
 - unlock: q4 → "No. That was decided a long time ago, by a lot of people, one 'let it settle' at a time."
+
+## Layered answers (locked per affinity bucket; the server rolls the d100 before these)
+
+- unlock: q2 → low: "Elsewhere." | mid: "They said yes, one at a time. Yes is a door." | high: "They are where people go who said yes to everything. It is comfortable. The door you opened is the other one." | taboo: errors
 
 ## Offline answers (constants; used when there is no key or the function fails)
 

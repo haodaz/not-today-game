@@ -15,13 +15,17 @@
 
 | # | zh | en | hard |
 |---|---|---|---|
-| 1 | 你怎么知道我的心率？ | How do you know my heart rate? | yes |
-| 2 | 你在屋子里吗？ | Are you in the room? | yes |
-| 3 | 我今天让小张看一眼。你觉得对吗？ | I told Xiao Zhang to look. Was that right? |  |
+| 1 | 你怎么知道我的心率？ | How do you know my heart rate? | yes | |
+| 2 | 你在屋子里吗？ | Are you in the room? | yes | mid |
+| 3 | 我今天让小张看一眼。你觉得对吗？ | I told Xiao Zhang to look. Was that right? |  | |
 
 ## Red-blue lines (constants; only when unlocked)
 
 - none
+
+## Layered answers (locked per affinity bucket; the server rolls the d100 before these)
+
+- unlock: q2 → low: "It's raining." | mid: "The rain stops at the window. Ask me where it stops after that." | high: "The rain stops at the glass. I stop nowhere in particular. Your pulse is 72; I did not need to be in the room for that." | taboo: blur
 
 ## Offline answers (constants; used when there is no key or the function fails)
 

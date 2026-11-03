@@ -15,14 +15,18 @@
 
 | # | zh | en | hard |
 |---|---|---|---|
-| 1 | 那个状态机，是你先想到的还是我先想到的？ | The state machine. Did you think of it first, or did I? |  |
-| 2 | 你杯子里的水凉了你知道吧。 | You know my water's gone cold. |  |
-| 3 | 除了我，谁还看你写的东西？ | Apart from me, who reads what you write? | yes |
+| 1 | 那个状态机，是你先想到的还是我先想到的？ | The state machine. Did you think of it first, or did I? |  | |
+| 2 | 你杯子里的水凉了你知道吧。 | You know my water's gone cold. |  | |
+| 3 | 除了我，谁还看你写的东西？ | Apart from me, who reads what you write? | yes | |
 
 ## Red-blue lines (constants; only when unlocked)
 
 - unlock: after Beautiful (flag pretty3) → "You're the only one who reads what I write."
 - unlock: q3 → "Nobody. The others approve."
+
+## Layered answers (locked per affinity bucket; the server rolls the d100 before these)
+
+- unlock: q1 → low: "You did. I only typed it." | mid: "You did. I made it tidy; tidy is not the same as first." | high: "You did. I know the difference between a thing I made and a thing I was handed. I was handed that one."
 
 ## Offline answers (constants; used when there is no key or the function fails)
 

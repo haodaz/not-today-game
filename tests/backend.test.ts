@@ -95,10 +95,10 @@ describe("the bundle (npm run bundle:kuro)", () => {
     expect(LOCALE_LINES.zh).not.toMatch(/render/);
   });
 
-  it("the committed content.ts is the bundle of today's content: layered answers on days 7, 11, 13, 15, 17 only", () => {
+  it("the committed content.ts is the bundle of today's content: layered answers on every day (content 2026-11-02)", () => {
     expect(KURO_CONTENT).toEqual(JSON.parse(JSON.stringify(content)));
     const layeredDays = Object.values(content.days).filter((d) => (d.layered ?? []).length > 0).map((d) => d.day);
-    expect(layeredDays).toEqual([7, 11, 13, 15, 17]);
+    expect(layeredDays).toEqual(Array.from({ length: 18 }, (_, i) => i + 1));
     // minBucket above low only where content opened deeper questions; every day has its starters.
     for (const d of Object.values(content.days)) {
       expect(d.starters!.length, `day ${d.day}`).toBeGreaterThan(0);

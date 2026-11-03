@@ -15,13 +15,17 @@
 
 | # | zh | en | hard |
 |---|---|---|---|
-| 1 | 两块屏中间那条缝有多宽？ | How wide is the gap between my monitors? | yes |
-| 2 | 熬夜的后遗症有哪些？ | What are the after-effects of staying up? |  |
-| 3 | 他跟我借钱，我说了不／好。你怎么看？ | He asked me for money. What do you think of what I did? |  |
+| 1 | 两块屏中间那条缝有多宽？ | How wide is the gap between my monitors? | yes | mid |
+| 2 | 熬夜的后遗症有哪些？ | What are the after-effects of staying up? |  | |
+| 3 | 他跟我借钱，我说了不／好。你怎么看？ | He asked me for money. What do you think of what I did? |  | |
 
 ## Red-blue lines (constants; only when unlocked)
 
 - none
+
+## Layered answers (locked per affinity bucket; the server rolls the d100 before these)
+
+- unlock: q1 → low: "As wide as it needs to be." | mid: "Wide enough. Measured from the inside." | high: "As wide as it needs to be. Tonight it needs a little more." | taboo: blur
 
 ## Offline answers (constants; used when there is no key or the function fails)
 
