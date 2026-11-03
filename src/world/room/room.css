@@ -498,3 +498,5 @@
 .taboo-errors .err-dlg button{display:block;margin:0 14px 12px auto;border:1px solid #c9ced6;background:#fff;border-radius:6px;padding:4px 14px;font:inherit;cursor:pointer}
 .held-layer .hand-blood{position:absolute;left:50%;bottom:0;width:420px;height:300px;transform:translateX(-50%);background:url(/npc/hand_blood.png) center bottom/contain no-repeat;pointer-events:none}
 .room .door-hand.blood{background:url(/npc/hand_blood.png) center bottom/contain no-repeat,radial-gradient(ellipse at 50% 100%,rgba(0,0,0,.55),transparent 70%)}
+/* In 使用 the turn buttons sit under the device: the exit hint goes to the bottom edge so they never overlap. */
+.room .held-layer.focus .hint{bottom:24px}

@@ -15,7 +15,7 @@ import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
 import { initialSession, type Session } from "@world/desktop/model";
 import { setLocale, stringIn, t } from "@world/i18n";
-import { calculator, formatNumber, lightLevel, lightZone, unaskedAt, upsideDownOf, type CalculatorState } from "@world/objects/calculator";
+import { calculator, formatNumber, lightLevel, lightZone, unaskedAt, UPSIDE_DOWN_DEG, upsideDownOf, type CalculatorState } from "@world/objects/calculator";
 import { chick, chickFrameAt, CHICK_IDLE_MS, drawChick, ICON_ACT, turnTimes, type ChickState } from "@world/objects/chick";
 import { dictionary, lookup, type DictionaryState } from "@world/objects/dictionary";
 import { ascii, DOT_GLYPHS, finer, rowWidth, SEGMENTS, type Frame, type PixelFrame } from "@world/objects/frame";
@@ -465,9 +465,11 @@ describe("holding and using (FR1)", () => {
     // The dictionary's device keyboard: A–Z plus the six function keys (the photo `grid` is gone).
     const DICT = [..."ABCDEFGHIJKLMNOPQRSTUVWXYZ", "lookup", "up", "down", "back", "power", "space"];
     const keyIds = (id: string): string[] => (id === "dictionary" ? DICT : handOf(id).keys.map((k) => k.id));
+    const RECOGNISABLE = ["chick", "pager", "iccard", "tape", "dictionary", "calculator"];
     const used = (id: string) => {
       const store = atDay(id === "calculator" ? 16 : id === "dictionary" ? 13 : id === "pager" ? 4 : 4, [id]);
-      store.appendEvent({ kind: "recognise", objectId: id });
+      // Recognise it (so no question is asked), but only objects that can be recognised.
+      if (RECOGNISABLE.includes(id)) store.appendEvent({ kind: "recognise", objectId: id });
       const { ctx } = fakeCtx(store);
       ctx.session.hand.inLight = true;
       act(ctx, "loop-hold", { object: id });
@@ -618,6 +620,94 @@ describe("holding and using (FR1)", () => {
       // Through the keyboard in 使用: Space is the dictionary's space, nothing else.
       expect(keyboardToObjKey("dictionary", " ")).toBe("space");
       expect(keyboardToObjKey("calculator", " ")).toBeNull();
+    });
+
+    // ——— flip and rotate in 使用, the object turns without going back to holding (2026-11-03) ———
+    it("the flip / rotate buttons appear only for the objects with that change, only in 使用", () => {
+      // chick, iccard, phone, textbook show flip and not rotate.
+      for (const id of ["chick", "iccard", "phone", "textbook"]) {
+        const ctx = used(id);
+        const out = render(ctx);
+        expect(out, id).toContain('data-action="obj-flip"');
+        expect(out, id).not.toContain('data-action="obj-rotate"');
+      }
+      // calculator shows rotate and not flip.
+      const calc = render(used("calculator"));
+      expect(calc).toContain('data-action="obj-rotate"');
+      expect(calc).not.toContain('data-action="obj-flip"');
+      // pager, dictionary, tape show neither.
+      for (const id of ["pager", "dictionary", "tape"]) {
+        const out = render(used(id));
+        expect(out, id).not.toContain('data-action="obj-flip"');
+        expect(out, id).not.toContain('data-action="obj-rotate"');
+      }
+      // Never while only holding.
+      const holding = (() => {
+        const store = atDay(7, ["iccard"]);
+        store.appendEvent({ kind: "recognise", objectId: "iccard" });
+        const { ctx } = fakeCtx(store);
+        act(ctx, "loop-hold", { object: "iccard" });
+        return render(ctx);
+      })();
+      expect(holding).not.toContain('data-action="obj-flip"');
+    });
+
+    it("flip from 使用 changes session.hand.face and keeps using; the chick's reset reaches the program only with the back up", () => {
+      const store = atDay(12, ["chick"]);
+      store.appendEvent({ kind: "recognise", objectId: "chick" });
+      const { ctx } = fakeCtx(store);
+      act(ctx, "loop-hold", { object: "chick" });
+      act(ctx, "obj-use");
+      expect(ctx.session.hand.face).toBe("front");
+      // Reset on the front does nothing (the hole is not on the front).
+      act(ctx, "obj-key", { object: "chick", key: "reset" });
+      expect((ctx.session.hand.programs.chick as ChickState | undefined)?.flashAt ?? null).toBeNull();
+      // Flip (not a put-down): face turns, 使用 stays.
+      act(ctx, "obj-flip");
+      expect(ctx.session.hand.face).toBe("back");
+      expect(ctx.session.hand.using).toBe(true);
+      // Now the reset reaches the program.
+      act(ctx, "obj-key", { object: "chick", key: "reset" });
+      expect((ctx.session.hand.programs.chick as ChickState).flashAt).toBe(ctx.now!());
+      // Flip back.
+      act(ctx, "obj-flip");
+      expect(ctx.session.hand.face).toBe("front");
+      expect(ctx.session.hand.using).toBe(true);
+    });
+
+    it("rotate sets the roll to 180 and back to 0; with 0.7734 entered the program reads upside down at 180", () => {
+      const store = atDay(16, ["calculator"]);
+      store.appendEvent({ kind: "recognise", objectId: "calculator" });
+      const { ctx } = fakeCtx(store);
+      ctx.session.hand.inLight = true;
+      act(ctx, "loop-hold", { object: "calculator" });
+      act(ctx, "obj-use");
+      expect(ctx.session.hand.roll).toBe(0);
+      act(ctx, "obj-rotate");
+      expect(ctx.session.hand.roll).toBe(180);
+      expect(render(ctx)).toContain('data-roll="180"');
+      act(ctx, "obj-rotate");
+      expect(ctx.session.hand.roll).toBe(0);
+      // Past UPSIDE_DOWN_DEG the reading is content's letters (reuse the existing upside-down table).
+      expect(180).toBeGreaterThanOrEqual(UPSIDE_DOWN_DEG);
+      expect(upsideDownOf("0.7734").replace(/\./g, "")).toBe("hELLO");
+    });
+
+    it("the chick's drawn back has the reset button and no img", () => {
+      const store = atDay(12, ["chick"]);
+      store.appendEvent({ kind: "recognise", objectId: "chick" });
+      const { ctx } = fakeCtx(store);
+      act(ctx, "loop-hold", { object: "chick" });
+      act(ctx, "obj-use");
+      act(ctx, "obj-flip"); // to the back
+      const out = render(ctx);
+      const face = out.slice(out.indexOf('class="held obj device'), out.indexOf('class="hint"'));
+      expect(face).toContain('data-action="obj-key" data-object="chick" data-key="reset"');
+      // The drawn back: the battery cover, the screw and the RESET label (LR44 is CSS content).
+      expect(face).toContain("backface");
+      expect(face).toContain('class="cover"');
+      expect(face).toContain("RESET");
+      expect(face).not.toContain("<img"); // the drawn back, never the photo
     });
   });
 });

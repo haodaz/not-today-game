@@ -27,10 +27,11 @@ import { setLocale, t, tr } from "@world/i18n";
 import { skipToLast, storyMasked } from "@world/dialogue/mask";
 import { tabooActions, tabooLayer } from "@world/dialogue/taboo";
 import { handOf } from "@state/hands";
-import { handStep } from "@world/objects/hand";
+import { handStep, ROLL_MAX, ROLLERS } from "@world/objects/hand";
+import { UPSIDE_DOWN_DEG } from "@world/objects/calculator";
 import { pressKey } from "@world/objects/index";
 import { PHONE_FLIP } from "@world/room/held";
-import { DICT_KEYS } from "@world/room/devices";
+import { DICT_KEYS, FLIPPERS } from "@world/room/devices";
 import { booted, deskMeal, itemStates, loopContext, mealToOrder, nightfallReached, openItemFor, openTask } from "@world/loop/checklist";
 import type { EventToken } from "@state/days/table";
 import { messageActions } from "@world/desktop/messages/actions";
@@ -253,6 +254,7 @@ function doorWalk(ctx: ActionContext): void {
 function restHand(s: Session): void {
   s.hand.using = false;
   s.hand.face = "front";
+  s.hand.roll = 0;
   s.hand.keyDown = null;
   s.hand.openedAt = null;
   // A clamshell and a flip phone close when they are put down.
@@ -694,6 +696,25 @@ export const loopActions: Record<string, ActionHandler> = {
     session.hand.face = face;
     // The card's thin plastic, the textbook's page.
     if (id === "iccard" || id === "textbook") pressKey(ctx, id, "flip");
+    ctx.rerender();
+  },
+  // 翻面 in 使用 (objects-in-hand 2026-11-03): flip front ↔ back without leaving 使用. It sets the
+  // same `session.hand.face` the holding yaw-drag sets, so every back-face rule works unchanged.
+  "obj-flip"(ctx) {
+    const { session } = ctx;
+    const id = session.holding;
+    if (!id || session.phoneOpen || !session.hand.using || !FLIPPERS.includes(id)) return;
+    session.hand.face = session.hand.face === "front" ? "back" : "front";
+    if (id === "iccard" || id === "textbook") pressKey(ctx, id, "flip");
+    ctx.rerender();
+  },
+  // 倒过来 in 使用 (calculator): toggle the in-plane roll 0 ↔ 180. Past UPSIDE_DOWN_DEG the program
+  // reads upside down (seen rotated; keys stay pressable), so its finds work unchanged.
+  "obj-rotate"(ctx) {
+    const { session } = ctx;
+    const id = session.holding;
+    if (!id || session.phoneOpen || !session.hand.using || !ROLLERS.includes(id)) return;
+    session.hand.roll = session.hand.roll >= UPSIDE_DOWN_DEG ? 0 : ROLL_MAX;
     ctx.rerender();
   },
 

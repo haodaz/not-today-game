@@ -72,6 +72,8 @@ export const CHOSEN = {
   roomDoor: 1200,
   /** 桌子 ↔ 屏幕: leaning in. */
   deskScreen: 500,
+  /** 使用 flip: the face turns over in-place (objects-in-hand 2026-11-03). */
+  flip: 320,
   /** The head bob of a walk: the whole still moves this far, two steps per move. */
   walkBobPx: 4,
   /** A line's backdrop crossfades in, and the stage fades back to its still after the sequence (dialogue 2026-11-02). */
@@ -138,6 +140,8 @@ export function motionVars(): Record<string, string> {
     "--m-view": ms(MOTION.view),
     // 使用 focus: the object's face fills the stage with the same timing as 桌子 → 屏幕 (500 ms).
     "--m-use": ms(CHOSEN.deskScreen),
+    // 使用 flip: the face turns over in-place (scaleX 1 → 0 → 1), the face swapping at 0.
+    "--m-flip": ms(CHOSEN.flip),
     // The walk's bob as a plain number (motion.css multiplies it into px and into the cover).
     "--m-walk-bob-n": String(CHOSEN.walkBobPx),
     "--m-screen": ms(MOTION.screen),

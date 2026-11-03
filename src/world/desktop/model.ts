@@ -197,6 +197,8 @@ export interface HandSession {
   using: boolean;
   /** Which face of the held object is up. */
   face: "front" | "back";
+  /** The in-plane turn of the held object in degrees (the calculator's 0 ↔ 180; objects-in-hand 2026-11-03). */
+  roll: number;
   /** The day `programs` belong to. */
   day: number;
   /** Object id → its program's state (world/objects). */
@@ -214,7 +216,7 @@ export interface HandSession {
   /** When the dictionary was opened (the hinge wobble). */
   openedAt: number | null;
 }
-export const initialHand = (): HandSession => ({ using: false, face: "front", day: 0, programs: {}, keyDown: null, once: [], buzzed: 0, jumpUntil: 0, inLight: false, leftLightAt: null, openedAt: null });
+export const initialHand = (): HandSession => ({ using: false, face: "front", roll: 0, day: 0, programs: {}, keyDown: null, once: [], buzzed: 0, jumpUntil: 0, inLight: false, leftLightAt: null, openedAt: null });
 
 export function initialSession(clock: BeatClock, focus: Side = "left", view: View = "desktop"): Session {
   return {

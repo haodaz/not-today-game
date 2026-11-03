@@ -24,6 +24,30 @@
 .dev-shell.egg .btns button.down{box-shadow:0 1px 0 #9b1f39;transform:translateY(3px)}
 .dev-shell.egg .lbl{position:absolute;left:0;right:0;top:298px;display:flex;justify-content:center;gap:50px;font:700 11px/1 sans-serif;color:#9a5a00}
 .dev-shell.egg .lbl span{width:12px;text-align:center}
+/* The chick's drawn back in 使用 (2026-11-03): the egg's warmer shade, a battery cover with
+   `⇩ LR44 × 2`, one screw, the reset pinhole (a real obj-key button) and the RESET label. */
+.dev-shell.egg.back{background:radial-gradient(ellipse at 66% 26%,#ffeaa0 0%,#f2c230 36%,#dc9a10 75%,#c07f08 100%)}
+.dev-shell.egg .backface{position:absolute;inset:0}
+.dev-shell.egg .cover{position:absolute;left:50%;top:150px;width:150px;height:110px;margin-left:-75px;border-radius:14px;border:2px solid rgba(120,70,0,.45);box-shadow:inset 0 2px 0 rgba(255,255,255,.3)}
+.dev-shell.egg .cover::after{content:"⇩  LR44 × 2";position:absolute;left:0;right:0;bottom:12px;text-align:center;font:700 11px/1 sans-serif;color:rgba(120,70,0,.6);letter-spacing:1px}
+.dev-shell.egg .screw{position:absolute;left:50%;top:166px;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:#c9ccd3;box-shadow:inset 0 0 0 2px #8d929c}
+.dev-shell.egg .screw::after{content:"";position:absolute;left:2px;right:2px;top:6px;height:2px;background:#6b707a}
+.dev-shell.egg .backface .hole{position:absolute;left:50%;top:292px;width:12px;height:12px;margin-left:-6px;border-radius:50%;border:none;background:#3a2600;box-shadow:inset 0 2px 2px rgba(0,0,0,.6),0 0 0 3px rgba(120,70,0,.25);cursor:pointer}
+.dev-shell.egg .holelbl{position:absolute;left:0;right:0;top:310px;text-align:center;font:700 9px/1 sans-serif;color:rgba(120,70,0,.6);letter-spacing:2px}
+.dev-shell.upgraded.egg.back{background:radial-gradient(ellipse at 66% 24%,#ffffff 0%,#eef1f6 45%,#d3d9e3 100%)}
+/* The flip in 使用: scaleX 1 → 0 → 1 over 320 ms, the face already swapped at 0 (devices.ts re-renders
+   the new face). Flippable devices animate the swap. */
+.dev-shell.egg{animation:m-flip var(--m-flip,320ms) var(--m-ease,ease)}
+@keyframes m-flip{0%{transform:scaleX(1)}50%{transform:scaleX(0)}100%{transform:scaleX(1)}}
+
+/* ——— flip / rotate buttons in 使用 (never while holding) ——— */
+.dev-focus{display:flex;flex-direction:column;align-items:center;gap:14px}
+.turnbar{display:flex;gap:12px;align-items:center}
+.turnbar .turnbtn{border:none;border-radius:16px;padding:6px 16px;background:#2a2c33;color:#d8d4c8;font-size:12px;box-shadow:0 2px 0 #0e0f12;cursor:pointer}
+.turnbar .turnbtn:hover{background:#34373f}
+/* The calculator body turns in-plane (the roll is set inline); dragging it is the hand layer's. */
+.dev-shell.calc[data-obj-body]{user-select:none;-webkit-user-select:none;touch-action:none;transition:transform .3s var(--m-ease,ease)}
+.dev-shell.calc.dragging{transition:none;cursor:grabbing}
 
 /* ——— pager ——— */
 .dev-shell.pager{width:360px;height:178px;border-radius:26px 26px 30px 30px;background:linear-gradient(#3a3f4a,#22252c);box-shadow:inset 0 3px 0 rgba(255,255,255,.12),inset 0 -6px 0 rgba(0,0,0,.35),0 18px 40px rgba(0,0,0,.5)}
@@ -99,3 +123,5 @@
 /* The photo-face rule `.room .held.obj canvas.dev` (absolute, translate −50 %, LCD backing colour) is
    more specific than the glass rule above; on a drawn device the canvas sits in the glass instead. */
 .room .held.obj .dev-shell .glass canvas.dev{position:static;transform:none;background:none;border-radius:0}
+/* In 使用 the drawn device turns itself (its own back, its own roll): the holding turn stays still, or the back face rotates out of sight. */
+.room .held.obj.device[data-face] .turn{transform:none}

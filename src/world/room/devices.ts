@@ -20,6 +20,14 @@ import { CELL_W, CELL_H } from "@world/room/held";
 export const DEVICE_IDS: readonly string[] = ["chick", "pager", "dictionary", "calculator"];
 export const isDevice = (id: string): boolean => DEVICE_IDS.includes(id);
 
+/** Objects with a flip button in 使用 (front ↔ back; objects-in-hand 2026-11-03). */
+export const FLIPPERS: readonly string[] = ["chick", "iccard", "phone", "textbook"];
+/** Objects with a rotate button in 使用 (in-plane 0 ↔ 180). */
+export const ROTATERS: readonly string[] = ["calculator"];
+/** Whether to show a flip / rotate button under `id` in 使用. */
+export const canFlip = (id: string): boolean => FLIPPERS.includes(id);
+export const canRotate = (id: string): boolean => ROTATERS.includes(id);
+
 /** The dictionary's keyboard in 使用 (the photo `grid` hotspot becomes real letter/function buttons). */
 export const DICT_ROWS_KB: readonly string[] = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
 export const DICT_KEYS: readonly string[] = [...DICT_ROWS_KB.join(""), "lookup", "up", "down", "back", "power", "space"];
@@ -97,9 +105,19 @@ function glass(ctx: DeviceCtx, cw: number, ch: number): SafeHtml {
 
 function chick(ctx: DeviceCtx): SafeHtml {
   const down = downKey(ctx);
-  const brand = hasString("obj.brand.chick") ? tr("obj.brand.chick") : null;
-  const btn = (k: string) => key("chick", k, down === k, ctx.session.hand.using, "");
-  return html`<div class="${cls("dev-shell", "egg", ctx.state.upgraded.chick && "upgraded")}" data-device="chick">${brand ? html`<div class="brand">${brand}</div>` : null}<div class="bezel">${glass(ctx, CHICK_W, CHICK_H)}</div><div class="btns">${btn("A")}${btn("B")}${btn("C")}</div><div class="lbl"><span>A</span><span>B</span><span>C</span></div></div>`;
+  const live = ctx.session.hand.using;
+  const back = ctx.session.hand.face === "back";
+  const upgraded = ctx.state.upgraded.chick === true;
+  const front = () => {
+    const brand = hasString("obj.brand.chick") ? tr("obj.brand.chick") : null;
+    const btn = (k: string) => key("chick", k, down === k, live, "");
+    return html`${brand ? html`<div class="brand">${brand}</div>` : null}<div class="bezel">${glass(ctx, CHICK_W, CHICK_H)}</div><div class="btns">${btn("A")}${btn("B")}${btn("C")}</div><div class="lbl"><span>A</span><span>B</span><span>C</span></div>`;
+  };
+  // The drawn back (2026-11-03): the egg's warmer shade, a battery cover with `⇩ LR44 × 2`, one
+  // screw, the reset pinhole as a real obj-key button, the RESET label. Reset behaviour is unchanged.
+  const backFace = () =>
+    html`<div class="backface"><div class="cover"></div><div class="screw"></div><button type="button" class="hole" data-action="obj-key" data-object="chick" data-key="reset" aria-label="${keyLabel("chick", "reset") ?? "reset"}"${keyLabel("chick", "reset") !== null ? raw(` title="${keyLabel("chick", "reset")}"`) : null}${live ? null : raw(' tabindex="-1"')}></button><div class="holelbl">RESET</div></div>`;
+  return html`<div class="${cls("dev-shell", "egg", upgraded && "upgraded", back && "back")}" data-device="chick" data-face="${back ? "back" : "front"}">${back ? backFace() : front()}</div>`;
 }
 
 function pager(ctx: DeviceCtx): SafeHtml {
@@ -136,14 +154,30 @@ function calculator(ctx: DeviceCtx): SafeHtml {
   const dark = !upgraded && !ctx.session.hand.inLight;
   const note = upgraded ? (hasString("obj.calculator.lit") ? tr("obj.calculator.lit") : null) : hasString("obj.calculator.dark") ? tr("obj.calculator.dark") : null;
   const k = (key_: string, text: string, klass = "") => key("calculator", key_, down === key_, live, text, klass);
-  return html`<div class="${cls("dev-shell", "calc", upgraded && "upgraded", dark && "dark")}" data-device="calculator"><div class="top"><b>${brand ?? "SOLAR · 8"}</b><div class="solar"><i></i><i></i><i></i><i></i></div></div>${glass(ctx, CALC_W, CALC_H)}<div class="keys">${k("off", "OFF", "fn")}${k("C", "C", "fn")}${k("%", "%", "op")}${k("sqrt", "√", "op")}${k("7", "7")}${k("8", "8")}${k("9", "9")}${k("div", "÷", "op")}${k("4", "4")}${k("5", "5")}${k("6", "6")}${k("x", "×", "op")}${k("1", "1")}${k("2", "2")}${k("3", "3")}${k("-", "−", "op")}${k("0", "0")}${k(".", ".")}${k("=", "=", "eq")}${k("+", "+", "op")}</div><div class="note">${note}</div></div>`;
+  // The body carries the in-plane roll (0 ↔ 180) and is the drag target (not a key); seen rotated,
+  // the keys stay pressable. `data-obj-body` marks it for the hand layer's body drag.
+  const roll = Math.round(ctx.session.hand.roll) % 360;
+  return html`<div class="${cls("dev-shell", "calc", upgraded && "upgraded", dark && "dark")}" data-device="calculator" data-obj-body="calculator" data-roll="${roll}" style="transform:rotate(${roll}deg)"><div class="top"><b>${brand ?? "SOLAR · 8"}</b><div class="solar"><i></i><i></i><i></i><i></i></div></div>${glass(ctx, CALC_W, CALC_H)}<div class="keys">${k("off", "OFF", "fn")}${k("C", "C", "fn")}${k("%", "%", "op")}${k("sqrt", "√", "op")}${k("7", "7")}${k("8", "8")}${k("9", "9")}${k("div", "÷", "op")}${k("4", "4")}${k("5", "5")}${k("6", "6")}${k("x", "×", "op")}${k("1", "1")}${k("2", "2")}${k("3", "3")}${k("-", "−", "op")}${k("0", "0")}${k(".", ".")}${k("=", "=", "eq")}${k("+", "+", "op")}</div><div class="note">${note}</div></div>`;
 }
 
 const SHELLS: Readonly<Record<string, (ctx: DeviceCtx) => SafeHtml>> = { chick, pager, dictionary, calculator };
+
+/** The flip / rotate buttons under the device in 使用 (never while holding): each shown only when
+ *  the object has that change. Text from strings `obj.flip` / `obj.rotate`. */
+function turnButtons(ctx: DeviceCtx): SafeHtml | null {
+  if (!ctx.session.hand.using) return null;
+  const flip = canFlip(ctx.object) && hasString("obj.flip") ? html`<button type="button" class="turnbtn" data-action="obj-flip" data-object="${ctx.object}">${tr("obj.flip")}</button>` : null;
+  const rot = canRotate(ctx.object) && hasString("obj.rotate") ? html`<button type="button" class="turnbtn" data-action="obj-rotate" data-object="${ctx.object}">${tr("obj.rotate")}</button>` : null;
+  if (!flip && !rot) return null;
+  return html`<div class="turnbar">${flip}${rot}</div>`;
+}
 
 /** The drawn device for `id` in 使用, or null when it is not one of the four device objects. */
 export function renderDevice(id: string, state: State, session: Session, level: number, nowMs: number, open: boolean): SafeHtml | null {
   const make = SHELLS[id];
   if (!make) return null;
-  return make({ object: id, state, session, level, nowMs, open });
+  const ctx: DeviceCtx = { object: id, state, session, level, nowMs, open };
+  const buttons = turnButtons(ctx);
+  // The flip / rotate buttons sit under the device, inside the focus view, never while holding.
+  return html`<div class="dev-focus">${make(ctx)}${buttons}</div>`;
 }

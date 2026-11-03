@@ -1373,3 +1373,38 @@ backing was the bare channel size, CSS `max-width:100%`). Kiro's area only; `con
   exactly one `data-key="light"`; the dictionary has a space bar, types "good day" with one space, a
   double space collapses, and "today " looks up today. The prior counts were updated (dictionary now
   32 keys with space; the normal screen backing assertion is 512×256).
+
+## objects-in-hand — in 使用 the object turns without going back to holding (2026-11-03)
+
+Flip and rotate are both "changes", and the player should never have to drop to 持有 to turn a
+thing. Kiro's area only; `content/` untouched. `npx tsc --noEmit` clean; full `npx vitest run` →
+91 files / 1619 tests green.
+
+- **`src/world/room/devices.ts`**: `renderDevice` now wraps the shell in `.dev-focus` and appends
+  `turnButtons()` — a flip button (`data-action="obj-flip"`, `obj.flip`) for `FLIPPERS`
+  (chick/iccard/phone/textbook) and a rotate button (`data-action="obj-rotate"`, `obj.rotate`) for
+  `ROTATERS` (calculator), each shown only in 使用. The chick shell draws its back when
+  `face === "back"` (the egg's warmer shade, a battery cover, a screw, the reset pinhole as a real
+  `obj-key` button `data-key="reset"`, the RESET label) instead of the photo. The calculator body
+  carries the in-plane roll (`style="transform:rotate(<roll>)"`, `data-obj-body`, `data-roll`).
+  New exports: `FLIPPERS`, `ROTATERS`, `canFlip`, `canRotate`.
+- **`src/world/room/devices.css`**: the chick's drawn back (`.egg.back`, `.backface`, `.cover` +
+  `⇩ LR44 × 2`, `.screw`, `.hole`, `.holelbl`, upgraded white family); the `.turnbar`/`.turnbtn`;
+  the calculator body `user-select:none;touch-action:none` + roll transition; the `.dev-focus`
+  column; the flip keyframe `m-flip` (scaleX 1 → 0 → 1).
+- **`src/world/room/held.ts`**: the device 使用 branch now lets the device draw both faces (no photo
+  back); a flippable photo object (iccard/phone/textbook) shows the flip button under it in 使用.
+- **`src/world/room/game.ts`**: new `obj-flip` (toggles `session.hand.face`, keeps `using`, plays the
+  card/textbook flip sound) and `obj-rotate` (toggles `session.hand.roll` 0 ↔ `ROLL_MAX` past
+  `UPSIDE_DOWN_DEG`); `restHand` resets the roll.
+- **`src/world/desktop/model.ts`**: `HandSession.roll` (the in-plane turn), reset each day.
+- **`src/world/objects/layer.ts`**: dragging the drawn calculator body (not a key) turns it about
+  its centre; on release it snaps to 180° past 90°, else 0°, persisting `session.hand.roll`. The
+  drag guard now also skips the drawn device's `obj-key` buttons so a key press is the key, not a drag.
+- **`src/world/motion/timing.ts`**: `CHOSEN.flip` (320 ms) and the `--m-flip` var.
+- **Tests (`tests/objects-in-hand.test.ts`)**: the flip/rotate buttons appear only for the objects
+  with that change and only in 使用 (chick/iccard/phone/textbook → flip, calculator → rotate,
+  pager/dictionary/tape → neither); flip changes `session.hand.face` and keeps `using`, and the
+  chick's reset reaches the program only with the back up; rotate sets the roll 180 ↔ 0 and the
+  program reads 0.7734 as hELLO at 180 (reusing the upside-down table); the chick's drawn back has
+  the reset button and no `img`. `tests/polish.test.ts` CHOSEN-keys list updated with `flip`.

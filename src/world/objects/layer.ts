@@ -10,7 +10,7 @@ import { STAGE_H } from "@world/room/splat/geometry";
 import { lightZone } from "./calculator";
 import { CHIRP_FROM_DAY, chirpGap } from "./chick";
 import { arrivedMessages, envFor, programState, PROGRAMS } from "./index";
-import { breath, dragTurn, easeBack, flipsOver, NO_TURN, type Turn } from "./hand";
+import { breath, dragTurn, easeBack, flipsOver, NO_TURN, ROLL_MAX, ROLLERS, type Turn } from "./hand";
 import { paintFrame, systemRaster } from "./paint";
 import { ghostBits, isDevice } from "@world/room/devices";
 import { crackLit, pencilShown, type PhoneState, type TextbookState } from "./plain";
@@ -65,7 +65,9 @@ export function createHandLayer() {
       const el = held();
       // A press on the object turns it, held or in use; in use a press on a live key is that key.
       if (e.button !== 0 || !el || !el.contains(e.target as Node)) return;
-      if (ctx.session.hand.using && (e.target as HTMLElement).closest(".okey")) return;
+      // In use a press on a live key is that key, not a drag: the photo hotspots (.okey) and the
+      // drawn device's real key buttons (data-action="obj-key") both.
+      if (ctx.session.hand.using && (e.target as HTMLElement).closest('.okey, button[data-action="obj-key"]')) return;
       drag = { x: e.clientX, y: e.clientY, moved: false, turn: NO_TURN };
       easing = null;
       e.preventDefault();
@@ -96,6 +98,17 @@ export function createHandLayer() {
       drag = null;
       if (!d.moved) return;
       suppressClick = true;
+      const el = held();
+      const id = el?.dataset.object ?? "";
+      // The calculator's body drag in 使用 (2026-11-03): snap the in-plane roll to 180° if past 90°,
+      // else to 0°; it persists in the session (seen rotated, keys stay pressable).
+      if (ctx.session.hand.using && ROLLERS.includes(id)) {
+        const total = ((ctx.session.hand.roll + d.turn.roll) % 360 + 360) % 360;
+        ctx.session.hand.roll = total > 90 && total < 270 ? ROLL_MAX : 0;
+        if (el) setTurn(el, NO_TURN);
+        ctx.rerender();
+        return;
+      }
       let from = d.turn;
       if (flipsOver(d.turn)) {
         // Turned over: the other face is up now; ease from where it is onto that face.
