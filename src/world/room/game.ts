@@ -642,12 +642,16 @@ export const loopActions: Record<string, ActionHandler> = {
     restHand(session);
     ctx.rerender();
   },
-  // A click on the held object itself: it comes 15 % closer and its keys answer (使用).
+  // A click on the held object itself: 使用 is a camera level, the same tier as 屏幕 (correction
+  // 2026-11-03). The object's face fills the stage; a move like 桌子 → 屏幕 (500 ms) carries it in.
   "obj-use"(ctx) {
     const { session } = ctx;
     const id = session.holding;
     if (!id || session.phoneOpen || session.hand.using) return;
     session.hand.using = true;
+    // The focus comes in with the same timing as 桌子 → 屏幕 (deskScreen, 500 ms): room.css
+    // transitions `.held.obj.using` over --m-use; a walk's two steps play as on any move.
+    walkSteps(ctx, "desk", "desktop");
     // The dictionary is closed when lifted: using it opens it (the loose hinge wobbles once).
     if (id === "dictionary" && session.hand.face === "front") {
       const before = (session.hand.programs.dictionary as { open?: boolean } | undefined)?.open === true;
@@ -873,6 +877,33 @@ function atChoice(ctx: ActionContext): boolean {
   return !!q && endsInChoice(q.ending) && session.dialogue.line >= q.lines.length - 1 && (!at || at.page >= at.all.length - 1);
 }
 
+/**
+ * A computer-keyboard key → the held object's key id, for the dictionary and the calculator in 使用
+ * (correction 2026-11-03). Dictionary: A–Z type, Enter = lookup, Backspace = back. Calculator: digits
+ * and `.`, + − * / (and × ÷) to the ops, Enter = `=`, Backspace = C, and %, r/R = √. Null otherwise.
+ */
+export function keyboardToObjKey(object: string | null, key: string): string | null {
+  if (object === "dictionary") {
+    if (/^[a-zA-Z]$/.test(key)) return key.toUpperCase();
+    if (key === "Enter") return "lookup";
+    if (key === "Backspace") return "back";
+    return null;
+  }
+  if (object === "calculator") {
+    if (/^[0-9]$/.test(key)) return key;
+    if (key === ".") return ".";
+    if (key === "+" || key === "-") return key;
+    if (key === "*" || key === "x" || key === "×") return "x";
+    if (key === "/" || key === "÷") return "div";
+    if (key === "Enter" || key === "=") return "=";
+    if (key === "Backspace" || key === "c" || key === "C") return "C";
+    if (key === "%") return "%";
+    if (key === "r" || key === "R") return "sqrt";
+    return null;
+  }
+  return null;
+}
+
 /** Keys: space / Enter read on in the room and at the door; Esc goes back to the room. */
 export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
   // The run has ended: Enter / Space go on; nothing else does anything.
@@ -919,6 +950,15 @@ export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
   }
   // The history is open: nothing under it reads on.
   if (ctx.session.historyOpen) return false;
+  // 使用 takes the computer keyboard for the dictionary and the calculator (correction 2026-11-03):
+  // the keys reach only the object in use, nothing else. Esc still steps the camera out (below).
+  if (ctx.session.hand.using && !ctx.session.phoneOpen && e.key !== "Escape" && !typingIn(e.target)) {
+    const key = keyboardToObjKey(ctx.session.holding, e.key);
+    if (key !== null) {
+      loopActions["obj-key"]!(ctx, { object: ctx.session.holding!, key } as DOMStringMap, null as never);
+      return true;
+    }
+  }
   if (e.key === "Escape" && (ctx.session.phoneOpen || ctx.session.holding)) {
     loopActions["loop-put-down"]!(ctx, {} as DOMStringMap, null as never);
     return true;

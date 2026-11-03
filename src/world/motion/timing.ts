@@ -136,6 +136,8 @@ export function motionVars(): Record<string, string> {
     "--m-choice": ms(MOTION.choice),
     "--m-choice-out": ms(exitOf(MOTION.choice)),
     "--m-view": ms(MOTION.view),
+    // 使用 focus: the object's face fills the stage with the same timing as 桌子 → 屏幕 (500 ms).
+    "--m-use": ms(CHOSEN.deskScreen),
     // The walk's bob as a plain number (motion.css multiplies it into px and into the cover).
     "--m-walk-bob-n": String(CHOSEN.walkBobPx),
     "--m-screen": ms(MOTION.screen),

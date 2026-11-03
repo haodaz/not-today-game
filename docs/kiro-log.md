@@ -1235,3 +1235,38 @@ A scripted, unskippable boss call that replays identically from the log. Kiro's 
   none yet), mirroring the work-marks precedent.
 - Gates: `npx tsc --noEmit` clean; state gate 15 files / 236 green (hook, each `src/state/**` save);
   full `npx vitest run` → 91 files / 1598 tests green.
+
+## objects-in-hand — five fixes (2026-11-03)
+
+Kiro's area only (`src/`, `tests/`); `content/` untouched. One test each added to
+`tests/objects-in-hand.test.ts`. `npx tsc --noEmit` clean; full `npx vitest run` → 91 files /
+1606 tests green.
+
+1. **Dream-level resolution drew scattered dots.** `src/world/objects/frame.ts` `finer()`: each lit
+   source pixel is a filled square of side `max(1, 2ⁿ − 2ⁿ⁻¹)` anchored top-left in its 2ⁿ cell (as
+   before), **plus** a thin 1 px bridge to a lit right/bottom neighbour so adjacent source pixels
+   stay 4-connected — whole shapes stay whole, strokes thin. Test: at level 3 the chick's idle frame
+   has the same 4-connected component count as level 0 and no isolated lit pixel.
+2. **The chick's reset hole was live on the front.** `src/world/room/held.ts` `extras()`: the reset
+   hotspot is rendered only when `session.hand.face === "back"`, so a front-face click never hits it.
+   Test: front → no `data-key="reset"`; back → present.
+3. **Held objects were tilted.** `src/world/room/room.css`: the base `.held` rule rotates by the
+   desk rest tilt (`--m-tilt`, −3°); added `.held.obj{…rotate(0deg)}` so lifted objects are upright
+   (FR1). Only a drag turns them (`--yaw/--pitch/--roll` on `.turn`). Test: the held markup carries no
+   non-zero rotation, the CSS resets `.held.obj` to `rotate(0deg)`, and the rest turn is (0,0,0).
+4. **The dictionary's keys worked while closed.** `src/world/room/held.ts` `object()`: a closed
+   clamshell (`DictionaryState.open !== true`) renders zero key hotspots; `obj-key` was already
+   guarded in the action. Test: lifted → 0 hotspots; opened → 29; T,O,D,A,Y + lookup glosses "today".
+5. **Using an object is a focus view (author correction).** `obj-use` (`src/world/room/game.ts`) no
+   longer brings it "15 % closer": it enters a camera level over 桌子 with the 桌子 → 屏幕 timing
+   (walk steps + `--m-use`, 500 ms); Esc / 退回 steps back to holding (the existing `loop-put-down`
+   already does this). `held.ts`: in 使用 the face fills the stage — a screen object's screen is drawn
+   at an integer, pixelated scale spanning ≥ 34 % of the stage width (`focusScreenScale` /
+   `focusScreenWidth`, `data-focus-w`), a screenless object fills ~60 % of the height; the behind gets
+   `.held-layer.focus` (70 % black + `blur(6px)`). Key hover labels come from `obj.key.<object>.<id>`
+   (render nothing if missing). `loopKeys` + `keyboardToObjKey` (`game.ts`): the dictionary and
+   calculator take the computer keyboard only while in use (A–Z/Enter/Backspace; digits, + − * /, =, C,
+   %, √). CSS in `src/world/room/room.css`; the 500 ms `--m-use` var in `src/world/motion/timing.ts`.
+   Tests: the view level is the object in use and Esc returns to 桌子 holding; the screen ≥ 34 % width
+   per object with an integer scale; the dim + blur class; the keyboard reaches the dictionary and
+   calculator only while in use; `canvas.dev` is `image-rendering: pixelated`.

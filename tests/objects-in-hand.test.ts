@@ -1,5 +1,7 @@
 // objects-in-hand FR1–FR5: the content loaders, holding and using, each object's program as a pure
 // reducer with its frames, and the properties (channel, dream level, upgrade, no world events).
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import objectsFile from "@content/objects.json";
@@ -24,8 +26,9 @@ import { batteryBars, pager, pagerHistory, PAGER_HISTORY, type PagerState } from
 import { crackLit, iccard, phone, pinchMarks, textbook } from "@world/objects/plain";
 import { dreamLevel, MAX_LEVEL, SEMITONE, type ObjectEnv } from "@world/objects/program";
 import { packRadii, playList, reelAngles, tape, tapePos, TAPE_SIDE_MS, type TapeState } from "@world/objects/tape";
-import { loopActions, loopKeys } from "@world/room/game";
-import { CHANNELS } from "@world/room/held";
+import { keyboardToObjKey, loopActions, loopKeys } from "@world/room/game";
+import { CHANNELS, FOCUS_SCREEN_FRAC, focusScreenWidth } from "@world/room/held";
+import { STAGE_W } from "@world/room/splat/geometry";
 import { renderRoom } from "@world/room/hud";
 
 const clone = <T>(v: T): T => JSON.parse(JSON.stringify(v)) as T;
@@ -171,10 +174,12 @@ describe("holding and using (FR1)", () => {
     act(ctx, "loop-hold", { object: "chick" });
     expect(render(ctx)).toContain('data-mode="holding"');
     expect(render(ctx)).toContain('data-action="obj-use"');
-    // A key while holding: no key, no sound; it is the click that uses it.
+    // A key while holding: no key sound; it is the click that uses it (使用 is a camera move now, so
+    // it plays the walk's step sound — not a key sound; 2026-11-03).
+    const keySounds = () => sounds.filter((s) => s.id !== "step-1" && s.id !== "step-2");
     act(ctx, "obj-key", { object: "chick", key: "A" });
     expect(ctx.session.hand.using).toBe(true);
-    expect(sounds).toEqual([]);
+    expect(keySounds()).toEqual([]);
     expect((ctx.session.hand.programs.chick as ChickState | undefined)?.menu ?? null).toBeNull();
     expect(render(ctx)).toContain(t("objects.exit"));
     act(ctx, "obj-key", { object: "chick", key: "A" });
@@ -182,7 +187,7 @@ describe("holding and using (FR1)", () => {
     expect(ctx.session.hand.keyDown).toMatchObject({ object: "chick", key: "A" });
     expect(ctx.session.hand.keyDown!.until - ctx.now!()).toBe(KEY_DOWN_MS);
     expect(render(ctx)).toMatch(/class="okey down" data-action="obj-key" data-object="chick" data-key="A"/);
-    expect(sounds).toEqual([{ id: "chick-beep", rate: undefined }]);
+    expect(keySounds()).toEqual([{ id: "chick-beep", rate: undefined }]);
     // A back key while the front is up does nothing.
     act(ctx, "obj-key", { object: "chick", key: "reset" });
     expect((ctx.session.hand.programs.chick as ChickState).flashAt).toBeNull();
@@ -255,6 +260,165 @@ describe("holding and using (FR1)", () => {
       }),
       { numRuns: 60 },
     );
+  });
+
+  // ——— the five fixes (2026-11-03) ———
+
+  /** The number of 4-connected lit components in a 1-bit frame, and whether any lit pixel is alone. */
+  function components(f: { w: number; h: number; bits: Uint8Array }): { count: number; hasIsolated: boolean } {
+    const seen = new Uint8Array(f.w * f.h);
+    const lit = (x: number, y: number) => x >= 0 && y >= 0 && x < f.w && y < f.h && f.bits[y * f.w + x] === 1;
+    let count = 0;
+    let hasIsolated = false;
+    for (let y = 0; y < f.h; y++)
+      for (let x = 0; x < f.w; x++) {
+        if (!lit(x, y)) continue;
+        if (!lit(x - 1, y) && !lit(x + 1, y) && !lit(x, y - 1) && !lit(x, y + 1)) hasIsolated = true;
+        if (seen[y * f.w + x]) continue;
+        count++;
+        const stack: Array<readonly [number, number]> = [[x, y]];
+        seen[y * f.w + x] = 1;
+        while (stack.length) {
+          const cur = stack.pop()!;
+          const cx = cur[0];
+          const cy = cur[1];
+          const ns: Array<readonly [number, number]> = [[cx - 1, cy], [cx + 1, cy], [cx, cy - 1], [cx, cy + 1]];
+          for (const n of ns) {
+            const nx = n[0];
+            const ny = n[1];
+            if (lit(nx, ny) && !seen[ny * f.w + nx]) {
+              seen[ny * f.w + nx] = 1;
+              stack.push([nx, ny]);
+            }
+          }
+        }
+      }
+    return { count, hasIsolated };
+  }
+
+  // 1. Dream-level resolution keeps whole shapes (not scattered dots).
+  it("fix 1: at dream level 3 the chick's idle frame has the same 4-connected count as level 0, and no lit pixel is isolated", () => {
+    const e = env({ t: 0 });
+    const base = drawChick(chick.init(e), { ...e, level: 0 }) as PixelFrame;
+    const fine = drawChick(chick.init(e), { ...e, level: 3 }) as PixelFrame;
+    expect(fine.w).toBe(base.w * 8);
+    const b = components(base);
+    const f = components(fine);
+    expect(f.count).toBe(b.count);
+    expect(f.hasIsolated).toBe(false);
+    // The stroke is thinner: a lit source pixel becomes a 4 px block of its 8 px cell, not a solid 8.
+    expect(fine.bits.reduce((n, v) => n + v, 0)).toBeLessThan(base.bits.reduce((n, v) => n + v, 0) * 64);
+  });
+
+  // 2. The chick's reset hole is on the back only.
+  it("fix 2: the reset hotspot exists only on the back face, never on the front", () => {
+    const store = atDay(4, ["chick"]);
+    const { ctx } = fakeCtx(store);
+    act(ctx, "loop-hold", { object: "chick" });
+    act(ctx, "obj-use");
+    expect(render(ctx)).not.toContain('data-key="reset"');
+    act(ctx, "obj-turn", { face: "back" });
+    expect(render(ctx)).toContain('data-key="reset"');
+  });
+
+  // 3. Lifted objects are upright: no rest tilt carried in.
+  it("fix 3: the held object has rotation 0 at rest (room.css resets the desk tilt; only a drag turns it)", () => {
+    const store = atDay(16, ["chick", "pager", "iccard", "tape", "dictionary", "calculator"]);
+    const { ctx } = fakeCtx(store);
+    for (const id of ["chick", "pager", "iccard", "tape", "dictionary", "calculator"]) {
+      act(ctx, "loop-hold", { object: id });
+      // The held markup carries no inline rotation; the rest turn is the layer's NO_TURN (0,0,0).
+      expect(render(ctx)).not.toMatch(/rotate[XYZ]?\([^)]*[1-9][^)]*\)/);
+      act(ctx, "loop-put-down");
+    }
+    // room.css gives .held.obj an explicit rotate(0deg), overriding the base .held's --m-tilt desk rest.
+    const css = readFileSync(resolve(__dirname, "../src/world/room/room.css"), "utf8");
+    expect(css).toMatch(/\.held\.obj\{[^}]*rotate\(0deg\)/);
+    // The rest turn the hand layer sets is zero on every axis.
+    expect(easeBack({ yaw: 0, pitch: 0, roll: 0 }, RETURN_MS)).toEqual({ yaw: 0, pitch: 0, roll: 0 });
+  });
+
+  // 4. The dictionary's keys are under the lid until it is opened.
+  it("fix 4: lifted the dictionary is closed with no key hotspots; opened it has 29; T,O,D,A,Y + lookup glosses 'today' in row 2", () => {
+    const store = atDay(13, ["dictionary"]);
+    store.appendEvent({ kind: "recognise", objectId: "dictionary" });
+    const { ctx } = fakeCtx(store);
+    act(ctx, "loop-hold", { object: "dictionary" });
+    const closed = render(ctx);
+    expect((closed.match(/data-action="obj-key"/g) ?? []).length).toBe(0);
+    // Using it opens the clamshell; now every key is a hotspot (28 letters/controls + lookup = 29).
+    act(ctx, "obj-use");
+    const open = render(ctx);
+    expect((open.match(/data-action="obj-key" data-object="dictionary"/g) ?? []).length).toBe(29);
+    for (const k of ["T", "O", "D", "A", "Y"]) act(ctx, "obj-key", { object: "dictionary", key: k });
+    act(ctx, "obj-key", { object: "dictionary", key: "lookup" });
+    const s = ctx.session.hand.programs.dictionary as DictionaryState;
+    expect(s.answer).toEqual(lookup("today", 13));
+    expect(s.answer![1]).toBe(dictionaryTable.words.get("today")!.gloss);
+  });
+
+  // 5. Using an object is a camera level, the same tier as 屏幕.
+  describe("fix 5: using is a focus view", () => {
+    it("in 使用 the view level is the object and Esc returns to holding at 桌子", () => {
+      const store = atDay(16, ["calculator"]);
+      store.appendEvent({ kind: "recognise", objectId: "calculator" });
+      const { ctx } = fakeCtx(store);
+      act(ctx, "loop-hold", { object: "calculator" });
+      act(ctx, "obj-use");
+      expect(ctx.session.hand.using).toBe(true);
+      expect(ctx.session.view).toBe("desk"); // 使用 is its own level over 桌子, not a view change
+      loopKeys(ctx, { key: "Escape" } as KeyboardEvent);
+      expect([ctx.session.hand.using, ctx.session.holding, ctx.session.view]).toEqual([false, "calculator", "desk"]);
+    });
+
+    it("the screen spans ≥ 34 % of the viewport width for each screen object (integer, pixelated scale)", () => {
+      for (const id of ["chick", "pager", "calculator", "dictionary"]) {
+        const w = focusScreenWidth(id);
+        expect(w / STAGE_W, id).toBeGreaterThanOrEqual(FOCUS_SCREEN_FRAC);
+        // The scale is a whole number of the channel (square pixels).
+        expect(Number.isInteger(w / CHANNELS[id]!.w), id).toBe(true);
+      }
+      // The canvas is drawn pixelated.
+      const css = readFileSync(resolve(__dirname, "../src/world/room/room.css"), "utf8");
+      expect(css).toMatch(/canvas\.dev\{[^}]*image-rendering:pixelated/);
+    });
+
+    it("the stage behind gets the dim + blur class in 使用", () => {
+      const store = atDay(16, ["dictionary"]);
+      store.appendEvent({ kind: "recognise", objectId: "dictionary" });
+      const { ctx } = fakeCtx(store);
+      act(ctx, "loop-hold", { object: "dictionary" });
+      expect(render(ctx)).not.toContain("held-layer focus");
+      act(ctx, "obj-use");
+      const out = render(ctx);
+      expect(out).toContain("held-layer focus");
+      expect(out).toContain("focus focus-screen");
+      const css = readFileSync(resolve(__dirname, "../src/world/room/room.css"), "utf8");
+      expect(css).toMatch(/\.held-layer\.focus > \.held-dim\{[^}]*blur\(6px\)/);
+    });
+
+    it("the keyboard reaches the dictionary and the calculator only while in use", () => {
+      // Dictionary: a letter types only while using.
+      const d = atDay(13, ["dictionary"]);
+      d.appendEvent({ kind: "recognise", objectId: "dictionary" });
+      const dc = fakeCtx(d);
+      act(dc.ctx, "loop-hold", { object: "dictionary" });
+      expect(keyboardToObjKey("dictionary", "t")).toBe("T");
+      // Holding only: the keyboard does not reach it.
+      expect(loopKeys(dc.ctx, { key: "t", target: null } as unknown as KeyboardEvent)).toBe(false);
+      act(dc.ctx, "obj-use"); // opens the dictionary
+      loopKeys(dc.ctx, { key: "t", target: null } as unknown as KeyboardEvent);
+      loopKeys(dc.ctx, { key: "o", target: null } as unknown as KeyboardEvent);
+      expect((dc.ctx.session.hand.programs.dictionary as DictionaryState).input).toBe("to");
+      // Calculator: digits and ops map; Enter is =, Backspace is C.
+      expect(keyboardToObjKey("calculator", "7")).toBe("7");
+      expect(keyboardToObjKey("calculator", "*")).toBe("x");
+      expect(keyboardToObjKey("calculator", "/")).toBe("div");
+      expect(keyboardToObjKey("calculator", "Enter")).toBe("=");
+      expect(keyboardToObjKey("calculator", "Backspace")).toBe("C");
+      // An object with no keyboard (the chick) takes nothing.
+      expect(keyboardToObjKey("chick", "a")).toBeNull();
+    });
   });
 });
 

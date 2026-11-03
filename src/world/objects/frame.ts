@@ -65,13 +65,30 @@ export class Bits {
   }
 }
 
-/** Dream level n: the channel × 2ⁿ, the drawn size unchanged, so each pixel's ink is a thinner dot ("你会觉得它瘦了"). */
+/**
+ * Dream level n (objects-in-hand FR2): the channel × 2ⁿ, the drawn size unchanged, so the ink looks
+ * thinner ("你会觉得它瘦了"). Each lit source pixel becomes a filled square of side
+ * max(1, 2ⁿ − 2ⁿ⁻¹), anchored top-left in its 2ⁿ cell. To keep whole shapes whole (defect 2026-11-03:
+ * a bare square per cell scatters a solid region into separate blocks), a thin 1 px bridge joins a
+ * square to a lit right or bottom neighbour, so adjacent source pixels stay 4-connected and no lit
+ * pixel is ever isolated; the strokes still thin as the level rises.
+ */
 export function finer(src: { w: number; h: number; bits: Uint8Array }, level: number): { w: number; h: number; bits: Uint8Array } {
   if (level <= 0) return src;
   const s = 2 ** level;
-  const ink = Math.max(1, s >> 1);
+  const ink = Math.max(1, s - (s >> 1)); // 2ⁿ − 2ⁿ⁻¹
   const out = new Bits(src.w * s, src.h * s);
-  for (let y = 0; y < src.h; y++) for (let x = 0; x < src.w; x++) if (src.bits[y * src.w + x]) out.rect(x * s, y * s, ink, ink);
+  const lit = (x: number, y: number) => x >= 0 && y >= 0 && x < src.w && y < src.h && src.bits[y * src.w + x] === 1;
+  for (let y = 0; y < src.h; y++)
+    for (let x = 0; x < src.w; x++) {
+      if (!lit(x, y)) continue;
+      out.rect(x * s, y * s, ink, ink);
+      // A thin 1 px bridge to a lit right/bottom neighbour keeps the thinned squares 4-connected.
+      if (ink < s) {
+        if (lit(x + 1, y)) out.rect(x * s + ink, y * s, s - ink, 1);
+        if (lit(x, y + 1)) out.rect(x * s, y * s + ink, 1, s - ink);
+      }
+    }
   return out;
 }
 

@@ -187,16 +187,27 @@
 .room .held.phone .shop button{display:flex;justify-content:space-between;width:100%;border:0;background:none;padding:6px 0 0;font:inherit;font-size:14px;color:inherit;cursor:pointer;text-align:left}
 .room .held.phone .shop button:hover,.room .held.phone .shop button:focus-visible{color:var(--red)}
 .room .held.phone .home{position:absolute;left:50%;bottom:10px;width:120px;height:5px;background:#ccc;border-radius:3px;transform:translateX(-50%)}
-.room .held.obj{top:44%;width:440px;filter:drop-shadow(0 30px 50px rgba(0,0,0,.6));transform:translate(-50%,-50%)}
+/* Lifted objects are upright (objects-in-hand FR1): the desk rest tilt (--m-tilt on .held) is not
+   carried into the held layer; only a drag turns it (--yaw/--pitch/--roll on .turn). */
+.room .held.obj{top:44%;width:440px;filter:drop-shadow(0 30px 50px rgba(0,0,0,.6));transform:translate(-50%,-50%) rotate(0deg)}
 .room .held.obj img{display:block;width:100%;user-select:none}
-/* Held and used (objects-in-hand FR1): upright, breathing (the hand layer moves .breathe), turned by
-   a drag (--yaw/--pitch/--roll on .turn, set by the layer); the back face from <id>_back.png over
-   the front picture's bright tint. Using brings it 15 % closer and the keys light under the pointer. */
+/* Held and used (objects-in-hand FR1, correction 2026-11-03): upright, breathing (the hand layer
+   moves .breathe), turned by a drag (--yaw/--pitch/--roll on .turn). 持有 is the in-between at 桌子;
+   使用 is a focus view, the same tier as 屏幕 — the object's face fills the stage, the behind dims
+   to 70 % and blurs 6 px, with the 桌子 → 屏幕 timing (--m-use, 500 ms). */
 .room .held-layer:has(> .held.obj) > .held-dim{background:rgba(10,10,12,.4)}
+/* The focus view's backdrop: 70 % black and a 6 px blur behind the object (not over it). */
+.room .held-layer.focus > .held-dim{background:rgba(10,10,12,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .room .held.obj[data-mode="holding"]{cursor:grab}
 .room .held.obj[data-mode="holding"]:active{cursor:grabbing}
-.room .held.obj .breathe{perspective:1400px;transition:scale .22s cubic-bezier(.2,.8,.2,1)}
-.room .held.obj.using .breathe{scale:1.15}
+.room .held.obj .breathe{perspective:1400px;transition:scale var(--m-use,500ms) var(--m-ease,ease)}
+/* 使用: the face fills the stage. A screen object scales so its screen spans ≥ 34 % of the width;
+   a screenless object fills ~60 % of the height. The canvas's own width (set in the markup) is the
+   screen's on-stage width; the object scales up around it. */
+.room .held.obj.using.focus-screen .breathe{scale:3.2}
+.room .held.obj.using.focus-obj{width:auto;height:60%}
+.room .held.obj.using.focus-obj .breathe{scale:1}
+.room .held.obj.using.focus-obj img{height:100%;width:auto}
 .room .held.obj .turn{position:relative;transform-style:preserve-3d;--face:0deg;transform:rotateZ(var(--roll,0deg)) rotateX(var(--pitch,0deg)) rotateY(calc(var(--face) + var(--yaw,0deg)))}
 .room .held.obj[data-face="back"] .turn{--face:180deg}
 .room .held.obj .face{backface-visibility:hidden;-webkit-backface-visibility:hidden}

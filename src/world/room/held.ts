@@ -17,7 +17,8 @@ import { DICT_COLS, DICT_ROWS, type DictionaryState } from "@world/objects/dicti
 import { pinchMarks, type PhoneState, type TextbookState } from "@world/objects/plain";
 import { envFor, peekState } from "@world/objects/index";
 import type { ObjectEnv } from "@world/objects/program";
-import { t, tr } from "@world/i18n";
+import { STAGE_W } from "@world/room/splat/geometry";
+import { hasString, t, tr } from "@world/i18n";
 import { inDream } from "@state/nights";
 
 /** A dot-matrix cell (half-width) of the dictionary. */
@@ -55,6 +56,28 @@ export function screenScaleFor(id: string): number {
   return screenScale(channelOf(id).w, rect ? HELD_W * rect.w : SCREEN_TARGET_PX);
 }
 
+// ——— the focus view (objects-in-hand "using an object is a focus view", 2026-11-03) ———
+// 使用 is a camera level, the same tier as 屏幕: the object's face fills the stage. A screen object's
+// screen spans ≥ FOCUS_SCREEN_FRAC of the stage width at an INTEGER canvas scale (pixelated); an
+// object without a screen fills ~FOCUS_OBJECT_FRAC of the stage height. Stage is STAGE_W × STAGE_H.
+
+/** The screen objects' screen must span at least this fraction of the viewport width in 使用. */
+export const FOCUS_SCREEN_FRAC = 0.34;
+/** A screenless object fills about this fraction of the viewport height in 使用. */
+export const FOCUS_OBJECT_FRAC = 0.6;
+/** Objects whose face (not a screen) fills the stage in 使用. */
+export const SCREENLESS: readonly string[] = ["iccard", "textbook", "tape", "phone"];
+
+/** The integer canvas scale a screen object uses in 使用: its channel × 2ⁿ drawn so the screen ≥ 34 % wide. */
+export function focusScreenScale(id: string, level = 0, stageW = STAGE_W): number {
+  const channelW = channelOf(id).w * 2 ** level;
+  return Math.max(screenScaleFor(id), Math.ceil((FOCUS_SCREEN_FRAC * stageW) / channelW));
+}
+/** The on-stage width (px) of a screen object's screen in 使用 (channel × level × integer scale). */
+export function focusScreenWidth(id: string, level = 0, stageW = STAGE_W): number {
+  return channelOf(id).w * 2 ** level * focusScreenScale(id, level, stageW);
+}
+
 /** What is held now: the phone, an object id, or nothing. */
 export function heldItem(session: Session): string | null {
   return session.phoneOpen ? "phone" : session.holding;
@@ -81,27 +104,46 @@ const rectAt = (r: Rect) => `left:${pct(r.l)};top:${pct(r.t)};width:${pct(r.w)};
 export const PHONE_FLIP = "flip";
 const PHONE_BODY: KeySpot = { id: PHONE_FLIP, l: 0, t: 0, w: 1, h: 1 };
 
+/** A key's hover label in 使用 (objects-in-hand 2026-11-03): `obj.key.<object>.<id>`, or nothing. */
+function keyLabel(id: string, k: KeySpot): string | null {
+  const key = `obj.key.${id}.${k.id}`;
+  return hasString(key) ? t(key) : (k.label ?? null);
+}
+
 /** A key cap: the front image's own piece at the key's rect, so it can sink 1 px. */
 function keyCap(id: string, img: string, k: KeySpot, down: boolean, live: boolean): SafeHtml {
   // The piece of the image under the key: background sized to the box, offset to the key.
   const bx = k.w >= 1 ? 0 : (k.l / (1 - k.w)) * 100;
   const by = k.h >= 1 ? 0 : (k.t / (1 - k.h)) * 100;
   const bg = `background-image:url(${img});background-size:${(100 / k.w).toFixed(3)}% ${(100 / k.h).toFixed(3)}%;background-position:${bx.toFixed(3)}% ${by.toFixed(3)}%`;
-  return html`<button type="button" class="${cls("okey", down && "down")}" data-action="obj-key" data-object="${id}" data-key="${k.id}" style="${rectAt(k)};${bg}" aria-label="${k.label ?? k.id}"${live ? null : raw(' tabindex="-1"')}></button>`;
+  const label = keyLabel(id, k);
+  // The hover label shows the key's name in 使用 (or nothing when content has no string for it).
+  const title = label !== null ? raw(` title="${label}"`) : null;
+  return html`<button type="button" class="${cls("okey", down && "down")}" data-action="obj-key" data-object="${id}" data-key="${k.id}" style="${rectAt(k)};${bg}" aria-label="${label ?? k.id}"${title}${live ? null : raw(' tabindex="-1"')}></button>`;
 }
 
-/** The screen canvas (its backing store is the channel × 2ⁿ; its drawn size is whole pixels of the base channel). */
-function screen(id: string, state: State, level: number, heldUp: boolean): SafeHtml | null {
+/**
+ * The screen canvas. Its backing store is the channel × 2ⁿ, drawn at an integer scale and never
+ * smoothed (`image-rendering: pixelated`). While only holding it is small, on the face; in 使用 the
+ * face fills the stage (CSS scales `.held.obj.using`) and the canvas is drawn at its focus scale so
+ * the screen spans ≥ 34 % of the stage width — `data-focus-w` carries that on-stage width (px).
+ */
+function screen(id: string, state: State, level: number, heldUp: boolean, using: boolean): SafeHtml | null {
   const upgraded = state.upgraded[id] === true;
   const ch = CHANNELS[id];
   // No screen of its own; the upgraded tape's transcript scrolls where the deck's window is.
   if (!ch && !(upgraded && id === "tape")) return null;
   const { w, h } = channelOf(id);
-  const s = screenScaleFor(id);
+  const lvl = upgraded ? 0 : level;
   const k = upgraded ? 1 : 2 ** level;
+  const s = using && ch ? focusScreenScale(id, lvl) : screenScaleFor(id);
   const rect = handOf(id).screen;
   const at = rect ? { cx: rect.l + rect.w / 2, cy: rect.t + rect.h / 2 } : (SCREEN_AT[id] ?? DEFAULT_SCREEN_AT);
-  return html`<canvas class="${cls("dev", upgraded && "hi", heldUp && !upgraded && "dream")}" data-screen="${id}" width="${w * k}" height="${h * k}" style="left:${at.cx * 100}%;top:${at.cy * 100}%;width:${w * s}px;height:${h * s}px"></canvas>`;
+  // In 使用, whole square pixels at the focus scale: w × 2ⁿ × scale fills ≥ 34 % of the stage width.
+  const drawnW = using && ch ? w * 2 ** lvl * s : w * s;
+  const drawnH = using && ch ? h * 2 ** lvl * s : h * s;
+  const focusW = using && ch ? focusScreenWidth(id, lvl) : null;
+  return html`<canvas class="${cls("dev", upgraded && "hi", heldUp && !upgraded && "dream")}" data-screen="${id}"${focusW !== null ? raw(` data-focus-w="${focusW}"`) : null} width="${w * k}" height="${h * k}" style="left:${at.cx * 100}%;top:${at.cy * 100}%;width:${drawnW}px;height:${drawnH}px"></canvas>`;
 }
 
 /** What only some objects have on their faces. */
@@ -121,7 +163,13 @@ function extras(id: string, state: State, events: readonly GameEvent[], session:
     return { front: html`<i class="crack"></i>`, back: hand.sim ? html`<div class="sim"><span>${hand.sim}</span></div>` : null };
   }
   if (id === "chick" && hand.back.reset) {
-    return { front: null, back: html`<button type="button" class="okey hole" data-action="obj-key" data-object="chick" data-key="reset" style="${rectAt(hand.back.reset)}" aria-label="reset"${live && session.hand.face === "back" ? null : raw(' tabindex="-1"')}></button>` };
+    // The reset hole lives on the back only (content/objects.json): its hotspot exists while the
+    // back face is up, never on the front, so a click on the front screen can never trigger it.
+    const back =
+      session.hand.face === "back"
+        ? html`<button type="button" class="okey hole" data-action="obj-key" data-object="chick" data-key="reset" style="${rectAt(hand.back.reset)}" aria-label="reset"${live ? null : raw(' tabindex="-1"')}></button>`
+        : null;
+    return { front: null, back };
   }
   if (id === "textbook" && hand.cell) {
     const tb = p as TextbookState;
@@ -142,13 +190,19 @@ function object(state: State, events: readonly GameEvent[], session: Session, id
   const img = `/objects/${id}_front.png`;
   const using = session.hand.using;
   const down = session.hand.keyDown && session.hand.keyDown.object === id && session.hand.keyDown.until > nowMs ? session.hand.keyDown.key : null;
+  // The dictionary is a clamshell, closed when lifted (FR3.6): while closed its keys are under the
+  // lid, so none render and `obj-key` is ignored; only the click that opens it counts.
+  const dictClosed = id === "dictionary" && (p as DictionaryState | null)?.open !== true;
   // Keys are hotspots on the front image; while only holding they are there but do not answer.
-  const keys = handOf(id).keys.map((k) => keyCap(id, img, k, down === k.id, using));
+  const keys = dictClosed ? [] : handOf(id).keys.map((k) => keyCap(id, img, k, down === k.id, using));
   if (id === "phone") keys.push(html`<button type="button" class="okey body" data-action="obj-key" data-object="phone" data-key="${PHONE_BODY.id}" style="${rectAt(PHONE_BODY)}" aria-label="${t("hud.phone")}"${using ? null : raw(' tabindex="-1"')}></button>`);
   const { front, back } = extras(id, state, events, session, env, p);
   const open = id === "dictionary" ? (p as DictionaryState | null)?.open === true : id === "phone" ? (p as PhoneState | null)?.open === true : null;
   const attrs = raw(`${open === null ? "" : ` data-open="${open ? 1 : 0}"`}${using ? "" : ' data-action="obj-use"'}`);
-  return html`<div class="${cls("held", "obj", upgraded && "upgraded", using && "using")}" data-object="${id}" data-mode="${using ? "using" : "holding"}" data-face="${session.hand.face}"${attrs}><div class="breathe"><div class="turn"><div class="face front"><img src="${img}" alt="" draggable="false">${screen(id, state, env.level, heldUp)}${keys}${front}</div><div class="face back"><div class="back-art"><img src="/objects/${id}_back.png" alt="" draggable="false">${back}</div></div></div></div></div>`;
+  // 使用 is a focus view (2026-11-03): the face fills the stage like 屏幕; a screenless object fills
+  // the height. The `.focus` class drives the fill; the stage behind dims to 70 % and blurs 6 px.
+  const focusClass = using ? (SCREENLESS.includes(id) ? "focus focus-obj" : "focus focus-screen") : false;
+  return html`<div class="${cls("held", "obj", upgraded && "upgraded", using && "using", focusClass)}" data-object="${id}" data-mode="${using ? "using" : "holding"}" data-face="${session.hand.face}"${attrs}><div class="breathe"><div class="turn"><div class="face front"><img src="${img}" alt="" draggable="false">${screen(id, state, env.level, heldUp, using)}${keys}${front}</div><div class="face back"><div class="back-art"><img src="/objects/${id}_back.png" alt="" draggable="false">${back}</div></div></div></div></div>`;
 }
 
 /** The held layer, or null when nothing is held. */
@@ -160,5 +214,7 @@ export function heldLayer(state: State, events: readonly GameEvent[], session: S
   const hint = session.phoneOpen || !session.hand.using ? tr("hud.putDown") : tr("objects.exit");
   // The nosebleed (kuro-chat taboo): the hand holding it is the blood variant for the rest of the day.
   const blood = bleedingToday(events, state.day) ? html`<div class="hand-blood" aria-hidden="true"></div>` : null;
-  return html`<div class="held-layer" data-held="${item}">${dim()}${body}${blood}<div class="hint">${hint}</div></div>`;
+  // In 使用 the stage behind the object is the focus view's: dimmed to 70 % and blurred 6 px.
+  const focused = !session.phoneOpen && session.hand.using;
+  return html`<div class="${cls("held-layer", focused && "focus")}" data-held="${item}">${dim()}${body}${blood}<div class="hint">${hint}</div></div>`;
 }
