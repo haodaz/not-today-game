@@ -183,7 +183,7 @@ body.up .egg.back{background:radial-gradient(ellipse at 66% 24%,#ffffff 0%,#eef1
 <main class="grid">
   <section class="cell">
     <div class="dev egg" id="chick" tabindex="0">
-      <div class="brand">小 鸡</div>
+      <div class="brand">拓麻鸽子</div>
       <div class="bezel"><div class="glass">
         <canvas class="lcd" id="chickIconsTop"></canvas>
         <canvas class="lcd" id="chickLcd"></canvas>
@@ -202,7 +202,7 @@ body.up .egg.back{background:radial-gradient(ellipse at 66% 24%,#ffffff 0%,#eef1
     <div class="dev pager" id="pager" tabindex="0">
       <div class="win"><div class="glass"><canvas class="lcd" id="pagerLcd"></canvas><canvas class="hi" id="pagerHi"></canvas></div></div>
       <div class="brand">BP · 数字<small>呼我 · 我回</small></div>
-      <div class="side"><button data-k="up" title="上一条">▲</button><button data-k="fn" title="时间">FN</button><button data-k="down" title="下一条">▼</button><button data-k="light" title="背光">✷</button></div>
+      <div class="side"><button data-k="up" title="上一条">▲</button><button data-k="fn" title="时间">FN</button><button data-k="down" title="下一条">▼</button></div>
       <button class="light" data-k="light" title="背光">灯</button>
       <button class="read" data-k="read" title="读">READ</button>
     </div>
@@ -317,9 +317,9 @@ function segCanvas(cv, cells, cw, ch){
 /* ——— pager ——— */
 (() => {
   const draw = segCanvas(pagerLcd, 12, 17, 30);
-  const HIST = ['13901017734','010-8888505','345','2028110317'];
+  const HIST = ['0.7734','345','505'];
   let i = -1, mode = 'idle';
-  const show = () => { if(mode==='idle') draw(''); else if(mode==='fn'){ const d=new Date(); draw(String(d.getHours()).padStart(2,'0')+'-'+String(d.getMinutes()).padStart(2,'0')+'    b 3',[]); } else draw(HIST[i]); };
+  const show = () => { if(mode==='idle') draw(''); else if(mode==='fn'){ const d=new Date(); draw(String(d.getHours()).padStart(2,'0')+'-'+String(d.getMinutes()).padStart(2,'0')+'    b 3',[]); } else { const s = HIST[i], di = s.indexOf('.'), digits = s.replace('.',''); draw(digits, di < 0 ? [] : [12 - digits.length + di - 1]); } };
   window.pagerKey = k => { if(k==='read'){ mode='msg'; i=0; } else if(k==='up'&&mode==='msg'){ i=Math.max(0,i-1); } else if(k==='down'&&mode==='msg'){ i=Math.min(HIST.length-1,i+1); } else if(k==='fn'){ mode = mode==='fn'?'idle':'fn'; }
     else if(k==='light'){ pager.querySelector('.glass').style.background = pager.querySelector('.glass').style.background ? '' : '#a8d7b0'; }
     show(); beep(1600, .04); };
