@@ -148,6 +148,55 @@ describe("each type renders its own markup in both apps", () => {
     expect(video).toContain("0:45");
   });
 
+  // desktop-ui addition 2026-11-03: the video card's title sits on the cover.
+  describe("the video card's title sits on the cover", () => {
+    it("the title is an overlay on the cover (not a line under it); the Channels mark and account sit on the bottom edge", () => {
+      for (const register of ["wx", "ding"] as const) {
+        const out = (register === "wx" ? wx : ding)(cardOf(SAMPLES.video));
+        // The title is inside .c-video (the cover frame), carried by .v-title, not a .c-under row.
+        const cover = out.slice(out.indexOf('class="c-video"'), out.lastIndexOf("</div>"));
+        expect(cover, register).toContain("v-title");
+        expect(cover, register).toContain("一个视频");
+        expect(out, register).not.toContain("c-under");
+        // The Channels mark and the account are along the bottom edge, with the duration.
+        expect(out, register).toContain("ch-mark");
+        expect(out, register).toContain("某视频号");
+        expect(out, register).toContain('class="dur">0:45');
+      }
+    });
+
+    it("default position is bottom; top when content asks for it", () => {
+      expect(wx(cardOf(SAMPLES.video))).toContain('class="v-title bottom"');
+      const top = cardOf({ ...SAMPLES.video, titlePos: "top" });
+      expect(top.type === "video" && top.titlePos).toBe("top");
+      expect(wx(top)).toContain('class="v-title top"');
+    });
+
+    it("duration is omitted when content gives none", () => {
+      // duration is required by the loader, so render straight from a Card with an empty duration.
+      const card: Card = { type: "video", account: "某视频号", title: "无时长", cover: "/c.png", duration: "" };
+      expect(wx(card)).not.toContain('class="dur"');
+    });
+
+    it("loader: titlePos is strict, and the twin check treats it as structural", () => {
+      expect(parse({ ...SAMPLES.video, titlePos: "middle" })).toThrow(/"top" or "bottom"/);
+      const zh = parseDayFile(dayWithCard({ ...SAMPLES.video, titlePos: "top" }), "day-03.json").recipients.get("boss")!;
+      const enSame = parseDayFile(dayWithCard({ type: "video", account: "ch", title: "t", cover: "/msgs/covers/short.png", duration: "0:45", titlePos: "top" }), "en/day-03.json").recipients.get("boss")!;
+      expect(() => assertTwin(zh, enSame, "en")).not.toThrow();
+      const enDiff = parseDayFile(dayWithCard({ type: "video", account: "ch", title: "t", cover: "/msgs/covers/short.png", duration: "0:45", titlePos: "bottom" }), "en/day-03.json").recipients.get("boss")!;
+      expect(() => assertTwin(zh, enDiff, "en")).toThrow(/card structure differs/);
+    });
+
+    it("snapshot: one card per titlePos, in both registers", () => {
+      const snap: Record<string, { wx: string; ding: string }> = {};
+      for (const pos of ["top", "bottom"] as const) {
+        const card = cardOf({ ...SAMPLES.video, titlePos: pos });
+        snap[pos] = { wx: wx(card), ding: ding(card) };
+      }
+      expect(snap).toMatchSnapshot();
+    });
+  });
+
   it("forwarded marks the card (and shows the 「转发」 tag when its string exists)", () => {
     const on = wx(cardOf(SAMPLES.link), true);
     const off = wx(cardOf(SAMPLES.link), false);

@@ -18,6 +18,7 @@ import { soundPlan } from "@world/sound/plan";
 import type { SoundPlayer } from "@world/sound/player";
 import { t } from "@world/i18n";
 import { maskBlocks } from "@world/dialogue/mask";
+import { callBlocks } from "@world/loop/call";
 
 /** Stage size in CSS pixels: one monitor (mock: 28px padding, 1440×900), or the room (1600×900). */
 const MONITOR = { w: 1440, h: 900 };
@@ -152,7 +153,9 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   const actions: Record<string, ActionHandler> = Object.fromEntries(
     Object.entries({ ...shellActions, ...(deps.actions ?? {}) }).map(([name, handler]): [string, ActionHandler] => [
       name,
-      (c, data, el) => (maskBlocks(session.dialogue, name) ? undefined : handler(c, data, el)),
+      // A story masks the stage; a live boss call takes the whole screen (day-loop 2026-11-03):
+      // while it runs, only the call's own controls answer.
+      (c, data, el) => (maskBlocks(session.dialogue, name) || callBlocks(session, name) ? undefined : handler(c, data, el)),
     ]),
   );
   const timers = new Set<ReturnType<typeof setTimeout>>();

@@ -41,8 +41,14 @@ function cardInner(card: Card, fill: (s: string) => string, register: Register):
   switch (card.type) {
     case "article":
       return html`<div class="c-body"><div class="c-text"><div class="c-title">${fill(card.title)}</div>${card.digest !== undefined ? html`<div class="c-digest">${fill(card.digest)}</div>` : null}</div>${cover("article", card.cover, "sq")}</div>${account(fill(card.account))}`;
-    case "video":
-      return html`<div class="c-video">${cover("video", card.cover, "v")}<span class="play" aria-hidden="true"></span><span class="dur">${card.duration}</span></div><div class="c-under"><span class="acct-dot" aria-hidden="true"></span><div class="c-text"><div class="c-title">${fill(card.title)}</div><div class="c-acct">${fill(card.account)}</div></div></div>`;
+    case "video": {
+      // A WeChat Channels share: the title drawn on the cover (upper or lower third, default bottom),
+      // the play circle in the middle, the Channels mark and account along the bottom, duration
+      // bottom-right. The generated cover has no text, so this overlay is the card's only title.
+      const pos = card.titlePos ?? "bottom";
+      const dur = card.duration ? html`<span class="dur">${card.duration}</span>` : null;
+      return html`<div class="c-video">${cover("video", card.cover, "v")}<span class="play" aria-hidden="true"></span><div class="${cls("v-title", pos)}">${fill(card.title)}</div><div class="v-foot"><span class="ch-mark" aria-hidden="true"></span><span class="v-acct">${fill(card.account)}</span>${dur}</div></div>`;
+    }
     case "history": {
       const shown = card.lines.slice(0, 4).map((l) => html`<div class="h-line">${fill(l)}</div>`);
       const foot = label("msgs.card.history");

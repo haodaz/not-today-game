@@ -21,6 +21,7 @@ import { initialTabooFx, type TabooFx } from "@world/dialogue/taboo";
 import type { WorkThread } from "./workbench/work";
 import { fxPlan } from "../room/fx";
 import { desktopRing } from "./rings";
+import { renderCall } from "./call/view";
 import type { AppId, MonitorModel, ShellModel, Side } from "./shell";
 
 /** 工作台's pages; `msgs` is its 消息 pane (the work conversations, desktop-ui 2026-11-02 evening). */
@@ -162,6 +163,12 @@ export interface Session {
   wbGloss: string | null;
   /** Files whose `onOpen` line has already played today (once a day), by `<day>:<id>`. Session only. */
   filesSaid: Set<string>;
+  /**
+   * The boss's call in progress (day-loop 2026-11-03): the day it belongs to, when the player
+   * answered (ms), and whether the 30-minute wait is over so the call is connected. Null when no
+   * call is live. Session only: the `callAnswer` / `callEnded` events are the record that replays.
+   */
+  call: { readonly day: number; answeredMs: number; connected: boolean } | null;
 }
 
 /**
@@ -268,6 +275,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     filesSaid: new Set(),
     browserDoc: null,
     wbGloss: null,
+    call: null,
   };
 }
 
@@ -394,5 +402,6 @@ export function buildShell(
     focus: session.focus,
     fx: fxPlan(state.day, "desktop"),
     scene: sceneOf(session.dialogue),
+    callOverlay: renderCall(ctx),
   };
 }

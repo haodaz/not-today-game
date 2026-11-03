@@ -1178,3 +1178,60 @@ deliverable's `msgs.card.site.doc`) go through strings and render nothing until 
   snapshot of all nine in both registers; a message without a card renders exactly as before.
 - Gates: state gate 15 files / 236 green (hook, run on each `src/state/**` save); `npx tsc --noEmit`
   clean; full `npx vitest run` → 90 files / 1570 tests green.
+
+## desktop-ui — the video card's title sits on the cover (2026-11-03)
+
+Kiro's area only; `content/` untouched, fixtures in tests.
+
+- Loader (`src/state/replies/table.ts`): the `video` card gained optional `titlePos?: "top"|"bottom"`
+  (default bottom), parsed strictly (`"top"`/`"bottom"` only) and added to the twin shape check
+  (`cardShape` → structural, so it must match across languages while text still differs).
+- Render (`src/world/desktop/messages/cards.ts`): the video card now draws the WeChat Channels look —
+  the `title` as a bold overlay on the 3:4 cover (yellow with a dark shadow, two lines, upper or lower
+  third by `titlePos`), the play circle centred, and the Channels mark + `account` + `duration` along
+  the bottom edge (`.v-foot`). Duration is omitted when empty. CSS in `desktop.css` (`.sc-video` now
+  padless, `aspect-ratio:3/4`, `.v-title.top/.bottom`, `.v-foot`, `.ch-mark`).
+- Tests (`tests/messages-cards.test.ts`): a describe block "the video card's title sits on the cover"
+  — the title is an overlay inside `.c-video` (not a line under it), the mark/account/duration sit on
+  the bottom edge, default bottom / top when asked, duration omitted when empty, the loader is strict
+  and the twin treats `titlePos` as structural, plus one snapshot per `titlePos` in both registers.
+
+## day-loop — the boss calls (2026-11-03)
+
+A scripted, unskippable boss call that replays identically from the log. Kiro's area only.
+
+- Content (`src/state/days/table.ts`): `DayFile.call?: { at, length, lines:[{who:"boss"|"me", t}],
+  task }` (optional). Strict parser: `at` HH:MM, `length` H:MM:SS or MM:SS, each line who/time, `task`
+  through the ordinary `item()` and required to be a `when:"night"`, `required` item. At load a call
+  injects two items into the day's checklist: a synthetic required **day** gate (`CALL_ITEM_ID`,
+  `done: event:callEnded`) so nightfall waits for the call to end, and the call's required **night**
+  `task`. The English twin carries the call through `localiseDayFile` (lines have no translatable
+  text; the task localises with the other items). A day without a call is unchanged.
+- Events (`src/state/events.ts`): two new kinds `callAnswer` and `callEnded` (added to the union,
+  `eventKinds`, and the `applyEvent` switch), reduced by `applyCall` (validates the day has a call;
+  state is otherwise unchanged — the call item and nightfall are derived). New `EventToken`
+  `callEnded` with its `happened` case in `checklist.ts`. `tests/events.test.ts` kind list updated.
+- Pure helpers (`src/world/loop/call.ts`): `callOf`, `callPhase` (before → ask → waiting → inCall →
+  ended), `callStartTime` (ask + 30 min), `lengthSeconds`/`clockText`, `linesShown`, and the
+  `callBlocks`/`CALL_ALLOWS` gate.
+- Flow (`src/world/desktop/call/actions.ts` + `view.ts`): the ask shows in a full-screen overlay with
+  the one reply 「好的。」 (`call-answer` → `callAnswer`, clock to the ask time, a 30-minute wait as the
+  incoming-call screen); when the wait elapses the call connects (clock +30 min), the timer runs to
+  `call.length` in compressed time (`ctx.later`, a dev `?fast=1` shortening like delivery), the
+  transcript fills line by line (boss plain, `me` in parentheses), hang-up disabled until it ends;
+  at the end `callEnded` is appended → nightfall + the night task. On reload mid-call (`callAnswer`
+  without `callEnded`) `resumeCall` (wired into `syncLoop`) resumes and still ends it.
+- Gating: the controller's action wrapper now also blocks every action but the call's own while a
+  call is live (mirrors the dialogue mask). The overlay renders via `ShellModel.callOverlay` (set in
+  `buildShell`, drawn in `renderDesktop`). Fixed texts (`call.ask`/`call.ok`/`call.incoming`/
+  `call.hangup`, and per-line `call.l.<day>.<i>`) come from strings and render nothing if missing;
+  the answer/hang-up buttons always exist (controls), only their labels wait for the strings.
+- Tests (`tests/boss-call.test.ts`): the loader (accept/reject each field, gate+task injection,
+  H:MM:SS lengths); the pure helpers (minutes/time, lengthSeconds/clockText, linesShown, callPhase);
+  the reducer (accepted on a call day, refused off it); the chain (ask → reply → wait → call →
+  callEnded → the gate done → the required night task); cannot-skip (the gate needs callEnded); replay
+  identical; and the overlay (ask with the reply at `at`, the connected panel with timer+transcript,
+  gone once ended). Uses a `vi.mock` of `@state/days/table` injecting a call into day 1 (content has
+  none yet), mirroring the work-marks precedent.
+- Gates: `npx tsc --noEmit` clean; state gate 15 files / 236 green (hook, each `src/state/**` save);
+  full `npx vitest run` → 91 files / 1598 tests green.

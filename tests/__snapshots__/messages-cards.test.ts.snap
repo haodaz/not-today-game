@@ -31,12 +31,25 @@ exports[`each type renders its own markup in both apps > snapshot: every type in
     "wx": "<div class="sc sc-task wx"><div class="tk-head">审批：报销</div><div class="tk-fields"><div class="tk-row"><span class="tk-k">金额</span><span class="tk-v">412.50</span></div><div class="tk-row"><span class="tk-k">事由</span><span class="tk-v">打车</span></div></div><div class="tk-action">去审批</div></div>",
   },
   "video": {
-    "ding": "<div class="sc sc-video ding"><div class="c-video"><span class="cover v"><img src="/msgs/covers/short.png" alt="" aria-hidden="true" draggable="false"></span><span class="play" aria-hidden="true"></span><span class="dur">0:45</span></div><div class="c-under"><span class="acct-dot" aria-hidden="true"></span><div class="c-text"><div class="c-title">一个视频</div><div class="c-acct">某视频号</div></div></div></div>",
-    "wx": "<div class="sc sc-video wx"><div class="c-video"><span class="cover v"><img src="/msgs/covers/short.png" alt="" aria-hidden="true" draggable="false"></span><span class="play" aria-hidden="true"></span><span class="dur">0:45</span></div><div class="c-under"><span class="acct-dot" aria-hidden="true"></span><div class="c-text"><div class="c-title">一个视频</div><div class="c-acct">某视频号</div></div></div></div>",
+    "ding": "<div class="sc sc-video ding"><div class="c-video"><span class="cover v"><img src="/msgs/covers/short.png" alt="" aria-hidden="true" draggable="false"></span><span class="play" aria-hidden="true"></span><div class="v-title bottom">一个视频</div><div class="v-foot"><span class="ch-mark" aria-hidden="true"></span><span class="v-acct">某视频号</span><span class="dur">0:45</span></div></div></div>",
+    "wx": "<div class="sc sc-video wx"><div class="c-video"><span class="cover v"><img src="/msgs/covers/short.png" alt="" aria-hidden="true" draggable="false"></span><span class="play" aria-hidden="true"></span><div class="v-title bottom">一个视频</div><div class="v-foot"><span class="ch-mark" aria-hidden="true"></span><span class="v-acct">某视频号</span><span class="dur">0:45</span></div></div></div>",
   },
   "voice": {
     "ding": "<div class="sc sc-voice ding"><div class="voice"><i style="height:6px"></i><i style="height:14px"></i><i style="height:9px"></i><i style="height:16px"></i><i style="height:7px"></i><i style="height:12px"></i> 41″</div></div>",
     "wx": "<div class="sc sc-voice wx"><div class="voice"><i style="height:6px"></i><i style="height:14px"></i><i style="height:9px"></i><i style="height:16px"></i><i style="height:7px"></i><i style="height:12px"></i> 41″</div></div>",
+  },
+}
+`;
+
+exports[`each type renders its own markup in both apps > the video card's title sits on the cover > snapshot: one card per titlePos, in both registers 1`] = `
+{
+  "bottom": {
+    "ding": "<div class="sc sc-video ding"><div class="c-video"><span class="cover v"><img src="/msgs/covers/short.png" alt="" aria-hidden="true" draggable="false"></span><span class="play" aria-hidden="true"></span><div class="v-title bottom">一个视频</div><div class="v-foot"><span class="ch-mark" aria-hidden="true"></span><span class="v-acct">某视频号</span><span class="dur">0:45</span></div></div></div>",
+    "wx": "<div class="sc sc-video wx"><div class="c-video"><span class="cover v"><img src="/msgs/covers/short.png" alt="" aria-hidden="true" draggable="false"></span><span class="play" aria-hidden="true"></span><div class="v-title bottom">一个视频</div><div class="v-foot"><span class="ch-mark" aria-hidden="true"></span><span class="v-acct">某视频号</span><span class="dur">0:45</span></div></div></div>",
+  },
+  "top": {
+    "ding": "<div class="sc sc-video ding"><div class="c-video"><span class="cover v"><img src="/msgs/covers/short.png" alt="" aria-hidden="true" draggable="false"></span><span class="play" aria-hidden="true"></span><div class="v-title top">一个视频</div><div class="v-foot"><span class="ch-mark" aria-hidden="true"></span><span class="v-acct">某视频号</span><span class="dur">0:45</span></div></div></div>",
+    "wx": "<div class="sc sc-video wx"><div class="c-video"><span class="cover v"><img src="/msgs/covers/short.png" alt="" aria-hidden="true" draggable="false"></span><span class="play" aria-hidden="true"></span><div class="v-title top">一个视频</div><div class="v-foot"><span class="ch-mark" aria-hidden="true"></span><span class="v-acct">某视频号</span><span class="dur">0:45</span></div></div></div>",
   },
 }
 `;

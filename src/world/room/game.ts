@@ -53,6 +53,7 @@ import { workbenchActions } from "@world/desktop/workbench/actions";
 import { workActions } from "@world/desktop/workbench/work";
 import { renderFiles } from "@world/desktop/files/view";
 import { filesActions, openFilesApp } from "@world/desktop/files/actions";
+import { callActions, resumeCall } from "@world/desktop/call/actions";
 import { deliverablePage } from "@state/files";
 import { viviLock } from "@world/desktop/vivi";
 import { cancelCloser, startCloser } from "@world/late/closer";
@@ -823,6 +824,9 @@ export const loopActions: Record<string, ActionHandler> = {
     shellActions.decoy!(ctx, data, el);
   },
   ...filesActions,
+
+  // The boss's call (day-loop 2026-11-03): 「好的。」 answers; the timer runs; hang-up ends it.
+  ...callActions,
 
   // Kuro's upgrade offer (object-upgrade FR1; spoken in the box now, dialogue FR2). The final
   // offer upgrades everything it covers.

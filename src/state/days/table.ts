@@ -99,7 +99,9 @@ export type EventToken =
   | { readonly type: "chat" }
   | { readonly type: "lieDown" }
   /** The loan prompt has been answered (world-state loan is no longer "none"). */
-  | { readonly type: "loanDecided" };
+  | { readonly type: "loanDecided" }
+  /** The boss's call has ended (day-loop 2026-11-03): the synthetic call item is done, night falls. */
+  | { readonly type: "callEnded" };
 
 export interface Item {
   readonly id: string;
@@ -124,12 +126,36 @@ export interface Item {
   readonly kuroClosesLine?: KuroCloses["kuroClosesLine"];
 }
 
+/** One line of the boss's call transcript (day-loop "the boss calls", 2026-11-03): who speaks, when. */
+export interface CallLine {
+  readonly who: "boss" | "me";
+  readonly t: string;
+}
+
+/**
+ * The boss's call (day-loop "the boss calls", 2026-11-03). At `at` the boss asks 「通个话」; after the
+ * player's one reply, 30 game minutes pass, then the call runs to `length` (H:MM:SS or MM:SS) in
+ * compressed time, filling in `lines` one at a time. When it ends, night falls and `task` — a
+ * required night item like the others — joins the checklist. Optional; a day without it is unchanged.
+ */
+export interface Call {
+  readonly at: string;
+  readonly length: string;
+  readonly lines: readonly CallLine[];
+  readonly task: Item;
+}
+
 export interface DayFile {
   readonly day: number;
   readonly beats: Readonly<Partial<Record<BeatName, Sequence>>>;
   readonly items: readonly Item[];
   readonly delivery: { readonly minMinutes: number; readonly waitMinutes: number; readonly none: boolean };
+  /** The boss's call this day, if content scripts one (day-loop 2026-11-03). */
+  readonly call?: Call;
 }
+
+/** The synthetic required day item a call adds: nightfall waits for the call to end. */
+export const CALL_ITEM_ID = "__call";
 
 type Raw = Record<string, unknown>;
 const isRecord = (v: unknown): v is Raw => typeof v === "object" && v !== null && !Array.isArray(v);
@@ -182,6 +208,8 @@ export function parseToken(raw: string, where: string): Token {
     case "loan":
       if (a !== "decided") fail(where, `unknown loan event "${raw}"`);
       return { kind: "event", event: { type: "loanDecided" } };
+    case "callEnded":
+      return { kind: "event", event: { type: "callEnded" } };
     default:
       return fail(where, `unknown event "${raw}"`);
   }
@@ -316,6 +344,34 @@ function item(v: unknown, w: string): Item {
   };
 }
 
+const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
+/** A call length: H:MM:SS or MM:SS (e.g. 30:00, 1:12:00). */
+const CALL_LEN = /^(?:\d+:)?[0-5]?\d:[0-5]\d$/;
+
+/** Parses the day's optional boss call (day-loop 2026-11-03). Its `task` is a required night item. */
+function call(v: unknown, w: string): Call {
+  if (!isRecord(v)) fail(w, "a call must be an object");
+  keys(v, ["at", "length", "lines", "task"], w);
+  const atTime = str(v.at, `${w}.at`);
+  if (!HHMM.test(atTime)) fail(`${w}.at`, "must be HH:MM");
+  const length = str(v.length, `${w}.length`);
+  if (!CALL_LEN.test(length)) fail(`${w}.length`, "must be H:MM:SS or MM:SS");
+  if (!Array.isArray(v.lines) || v.lines.length === 0) fail(`${w}.lines`, "must be a non-empty list");
+  const lines = v.lines.map((l, i): CallLine => {
+    const lw = `${w}.lines[${i}]`;
+    if (!isRecord(l)) fail(lw, "a line must be an object");
+    keys(l, ["who", "t"], lw);
+    if (l.who !== "boss" && l.who !== "me") fail(`${lw}.who`, 'must be "boss" or "me"');
+    const t = str(l.t, `${lw}.t`);
+    if (!HHMM.test(t)) fail(`${lw}.t`, "must be HH:MM");
+    return { who: l.who, t };
+  });
+  const task = item(v.task, `${w}.task`);
+  if (task.when !== "night") fail(`${w}.task`, 'the call\'s task is a night item (when: "night")');
+  if (!task.required) fail(`${w}.task`, "the call's task is required");
+  return { at: atTime, length, lines, task };
+}
+
 function deepFreeze<T>(value: T): T {
   if (typeof value === "object" && value !== null && !Object.isFrozen(value)) {
     Object.freeze(value);
@@ -324,10 +380,24 @@ function deepFreeze<T>(value: T): T {
   return value;
 }
 
+/** The synthetic required day item a call adds: nightfall waits until the call has ended. */
+function callGateItem(): Item {
+  return {
+    id: CALL_ITEM_ID,
+    text: "",
+    unlock: { kind: "start" },
+    done: { kind: "event", event: { type: "callEnded" } },
+    unlockRaw: "start",
+    doneRaw: "event:callEnded",
+    required: true,
+    when: "day",
+  };
+}
+
 /** Parses one day file. Pure; exported for tests. */
 export function parseDayFile(raw: unknown, label: string): DayFile {
   if (!isRecord(raw)) fail(label, "not an object");
-  keys(raw, ["day", "_note", "beats", "items", "delivery"], label);
+  keys(raw, ["day", "_note", "beats", "items", "delivery", "call"], label);
   if (!Number.isInteger(raw.day) || (raw.day as number) < 1) fail(label, "day must be an integer >= 1");
   if (!isRecord(raw.beats)) fail(`${label}.beats`, "must be an object");
   keys(raw.beats, BEAT_NAMES, `${label}.beats`);
@@ -336,7 +406,11 @@ export function parseDayFile(raw: unknown, label: string): DayFile {
     if (raw.beats[name] !== undefined) beats[name] = sequence(raw.beats[name], `${label}.beats.${name}`, true);
   }
   if (!Array.isArray(raw.items)) fail(`${label}.items`, "must be a list");
-  const items = raw.items.map((x, i) => item(x, `${label}.items[${i}]`));
+  const authored = raw.items.map((x, i) => item(x, `${label}.items[${i}]`));
+  // The boss's call (day-loop 2026-11-03): its gate is a required day item (nightfall waits for the
+  // call to end), its task a required night item; both flow through the ordinary checklist.
+  const callData = raw.call !== undefined ? call(raw.call, `${label}.call`) : undefined;
+  const items = callData ? [callGateItem(), ...authored, callData.task] : authored;
   const ids = new Set<string>();
   for (const it of items) {
     if (ids.has(it.id)) fail(label, `duplicate item id "${it.id}"`);
@@ -356,7 +430,7 @@ export function parseDayFile(raw: unknown, label: string): DayFile {
     none: raw.delivery.none === true,
   };
   if (!delivery.none && delivery.waitMinutes < delivery.minMinutes) fail(`${label}.delivery`, "waitMinutes is below minMinutes");
-  return deepFreeze({ day: raw.day as number, beats, items, delivery });
+  return deepFreeze({ day: raw.day as number, beats, items, delivery, ...(callData ? { call: callData } : {}) });
 }
 
 // ——— English twins (dialogue addition 2026-11-02) ———
@@ -414,7 +488,10 @@ export function localiseDayFile(zh: DayFile, en: DayFile, label: string): DayFil
     };
     return bilingual(withSeq, { text: e.text, ...(z.rewrite !== undefined ? { rewrite: e.rewrite } : {}) });
   });
-  return { day: zh.day, beats, items, delivery: zh.delivery };
+  // The call's transcript (who/time) carries no translatable text; its task is localised with the
+  // rest of the items, so point the carried call at that localised task.
+  const call = zh.call ? { ...zh.call, task: items.find((it) => it.id === zh.call!.task.id)! } : undefined;
+  return { day: zh.day, beats, items, delivery: zh.delivery, ...(call ? { call } : {}) };
 }
 
 const files = import.meta.glob("../../../content/days/day-*.json", { eager: true, import: "default" });

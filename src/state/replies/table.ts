@@ -58,7 +58,7 @@ export type CardType = (typeof CARD_TYPES)[number];
 
 export type Card =
   | { readonly type: "article"; readonly account: string; readonly title: string; readonly digest?: string; readonly cover?: string }
-  | { readonly type: "video"; readonly account: string; readonly title: string; readonly cover?: string; readonly duration: string }
+  | { readonly type: "video"; readonly account: string; readonly title: string; readonly cover?: string; readonly duration: string; readonly titlePos?: "top" | "bottom" }
   | { readonly type: "history"; readonly title: string; readonly lines: readonly string[] }
   | { readonly type: "link"; readonly title: string; readonly site: string; readonly icon?: string }
   | { readonly type: "image"; readonly src?: string; readonly alt: string }
@@ -207,7 +207,7 @@ function strList(value: unknown, where: string): string[] {
 /** The allowed keys of each card type (strict per the addition; `type` is always present). */
 const CARD_KEYS: Record<CardType, readonly string[]> = {
   article: ["type", "account", "title", "digest", "cover"],
-  video: ["type", "account", "title", "cover", "duration"],
+  video: ["type", "account", "title", "cover", "duration", "titlePos"],
   history: ["type", "title", "lines"],
   link: ["type", "title", "site", "icon"],
   image: ["type", "src", "alt"],
@@ -232,14 +232,21 @@ function card(value: unknown, where: string): Card {
         ...(value.digest !== undefined ? { digest: text(value.digest, `${where}.digest`) } : {}),
         ...(value.cover !== undefined ? { cover: str(value.cover, `${where}.cover`) } : {}),
       };
-    case "video":
+    case "video": {
+      let titlePos: "top" | "bottom" | undefined;
+      if (value.titlePos !== undefined) {
+        if (value.titlePos !== "top" && value.titlePos !== "bottom") throw new ContentError(`${where}.titlePos`, 'must be "top" or "bottom"');
+        titlePos = value.titlePos;
+      }
       return {
         type,
         account: text(value.account, `${where}.account`),
         title: text(value.title, `${where}.title`),
         ...(value.cover !== undefined ? { cover: str(value.cover, `${where}.cover`) } : {}),
         duration: str(value.duration, `${where}.duration`),
+        ...(titlePos !== undefined ? { titlePos } : {}),
       };
+    }
     case "history":
       return { type, title: text(value.title, `${where}.title`), lines: strList(value.lines, `${where}.lines`).map((l, i) => text(l, `${where}.lines[${i}]`)) };
     case "link":
@@ -371,7 +378,7 @@ function cardShape(c: Card): unknown {
     case "article":
       return { type: c.type, digest: c.digest !== undefined, cover: c.cover ?? null };
     case "video":
-      return { type: c.type, cover: c.cover ?? null };
+      return { type: c.type, cover: c.cover ?? null, titlePos: c.titlePos ?? null };
     case "history":
       return { type: c.type, lines: c.lines.length };
     case "link":

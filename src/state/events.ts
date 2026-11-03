@@ -3,6 +3,7 @@
 // state produced by earlier events; the only time it sees is its own recorded `day`.
 import type { State } from "./types.gen";
 import { applyChoose, applyStep, applyTask, clampSan, type TaskEventMode } from "./days/effects";
+import { dayFile } from "./days/table";
 import { applyDeclineUpgrade, applyUpgrade, type DeclineKind } from "./upgrades";
 import { applyOrder, applyPickup, applyUseItem } from "./delivery/effects";
 import type { Meal } from "./delivery/table";
@@ -76,7 +77,11 @@ export type GameEvent =
   // kuro-chat FR4: the day's judgement at the end of the chat beat (model or rule scorer).
   | ({ kind: "judged"; day: number } & JudgedFields)
   // late-days FR4: Kuro closed a page or document the player had opened.
-  | { kind: "kuroClosed"; day: number; pageId: string };
+  | { kind: "kuroClosed"; day: number; pageId: string }
+  // day-loop "the boss calls" (2026-11-03): the player answered 「好的。」; and the call ended.
+  // Two log events drive the scripted call so it replays identically; the panel's timing is cosmetic.
+  | { kind: "callAnswer"; day: number }
+  | { kind: "callEnded"; day: number };
 
 export type EventKind = GameEvent["kind"];
 
@@ -108,6 +113,8 @@ export const eventKinds: readonly EventKind[] = [
   "chat",
   "kuroClosed",
   "judged",
+  "callAnswer",
+  "callEnded",
 ];
 
 /**
@@ -120,6 +127,17 @@ function applyKuroClosed(state: State, event: Extract<GameEvent, { kind: "kuroCl
   const m = typeof event.pageId === "string" ? PAGE_ID.exec(event.pageId) : null;
   if (!m) throw new Error(`kuroClosed: pageId must look like d16:reading:1 or d16:item:<id>, got ${JSON.stringify(event.pageId)}`);
   if (Number(m[1]) !== event.day) throw new Error(`kuroClosed: ${event.pageId} is not a page of day ${event.day}`);
+  return state;
+}
+
+/**
+ * The boss's call (day-loop 2026-11-03). `callAnswer` records 「好的。」; `callEnded` the call
+ * finishing (the synthetic call item's `done`, which nightfall waits on). Both only on a day the
+ * content scripts a call; `callEnded` must follow a `callAnswer`. Nothing else changes in state —
+ * the call item and nightfall are derived from these events by the checklist.
+ */
+function applyCall(state: State, event: Extract<GameEvent, { kind: "callAnswer" | "callEnded" }>): State {
+  if (!dayFile(event.day)?.call) throw new Error(`${event.kind}: day ${event.day} has no call`);
   return state;
 }
 
@@ -268,6 +286,9 @@ export function applyEvent(state: State, event: GameEvent): State {
       return applyChat(state, event);
     case "kuroClosed":
       return applyKuroClosed(state, event);
+    case "callAnswer":
+    case "callEnded":
+      return applyCall(state, event);
     case "judged":
       return applyJudged(state, event.day, event);
     case "open":

@@ -14,6 +14,7 @@ import { advanceTo, BEATS, DEFAULT_CLOCK, isNight, type Beat, type BeatClock } f
 import { lastKuroLine } from "@world/desktop/kuro/mini";
 import { startTalk } from "@world/dialogue/kuro";
 import { judgementPending, startJudgement } from "@world/dialogue/judge";
+import { resumeCall } from "@world/desktop/call/actions";
 
 /** How often a waiting lie-down looks again for the judgement. */
 export const JUDGE_POLL_MS = 250;
@@ -228,6 +229,8 @@ export function syncLoop(ctx: ActionContext, nowMs: number = Date.now()): void {
     session.loop = freshMemo(lc, events, nowMs);
     // Night already fell before this look (a reload): the evening look stays, nothing replays.
     if (nightfallReached(lc)) session.clock = eveningClock(session.clock);
+    // A call answered but not ended before this look (a reload): it resumes and still ends.
+    if (!session.call) resumeCall(ctx);
     scheduleSelf(ctx, lc);
     noticeKuroLine(ctx, nowMs);
     return;
