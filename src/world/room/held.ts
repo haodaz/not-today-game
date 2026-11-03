@@ -223,8 +223,9 @@ function object(state: State, events: readonly GameEvent[], session: Session, id
   // keeps the photo, and the other objects keep the photo in 使用 too (for now).
   if (using && isDevice(id)) {
     // The device draws both faces itself (the chick's drawn back with its reset pinhole, 2026-11-03);
-    // no photo. The flip / rotate buttons sit under it (added by renderDevice).
-    const device = renderDevice(id, state, session, env.level, nowMs, open === true)!;
+    // no photo. The flip / rotate buttons sit under it (added by renderDevice). `p` is the program
+    // state (the tape's mode and volume read it).
+    const device = renderDevice(id, state, session, env.level, nowMs, open === true, p)!;
     return html`<div class="${cls("held", "obj", "device", upgraded && "upgraded", "using", "focus")}" data-object="${id}" data-mode="using" data-face="${session.hand.face}"${attrs}><div class="breathe"><div class="turn"><div class="face front device-face">${device}</div></div></div></div>`;
   }
   // 使用 is a focus view (2026-11-03, fixed): the whole front face fits inside the stage (≤ 88 % of

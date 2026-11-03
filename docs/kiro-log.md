@@ -1408,3 +1408,35 @@ thing. Kiro's area only; `content/` untouched. `npx tsc --noEmit` clean; full `n
   chick's reset reaches the program only with the back up; rotate sets the roll 180 ↔ 0 and the
   program reads 0.7734 as hELLO at 180 (reusing the upside-down table); the chick's drawn back has
   the reset button and no `img`. `tests/polish.test.ts` CHOSEN-keys list updated with `flip`.
+
+## objects-in-hand — the walkman is drawn too; every printed word from strings (2026-11-03)
+
+The tape joins chick/pager/dictionary/calculator as a drawn device in 使用; holding keeps the photo
+and its reels. Kiro's area only; `content/` untouched; the tape program is unchanged (reused
+`packRadii`/`reelAngles`/`tapePos`/`transcript`/`VOLUME_MAX`). `npx tsc --noEmit` clean; full
+`npx vitest run` → 91 files / 1624 tests green.
+
+- **`src/world/room/devices.ts`**: `tape` added to `DEVICE_IDS`. New `tape()` shell — four latching
+  piano keys (rew/play/ff/stop) as `obj-key` buttons (the current `mode` key gets `held`, stop springs
+  back, symbols ◀◀ ▶ ▶▶ ■ drawn, hover labels `obj.key.tape.*`); a side volume wheel (`data-obj-wheel`)
+  with vol+/vol- `obj-key` buttons, the red mark at `volume / VOLUME_MAX`; a cassette window with two
+  reels drawn from the program (`.reel.left/.right`, driven by the hand layer's `--pack`/`--spin`);
+  the earphone cord (SVG). Upgraded: the window is a dark-glass `canvas.dev.hi` (the transcript
+  HiFrame), the reels do not turn. `DeviceCtx` now carries the program state `p`; `renderDevice` takes
+  it. Brand/label words come from strings (`obj.brand.tape`, `obj.brand.tape.sub`, `obj.tape.label`),
+  as do every device's brand/cap words — symbols, digits and Latin keys stay drawn.
+- **`src/world/room/devices.css`**: the `.dev-shell.walk` deck, keys (`.held` latch), window +
+  `.cassette`/`.reel`/`.tlabel`, the volume wheel, the cord with `m-cord-sway` only at
+  `[data-mode="play"]` (disabled under `prefers-reduced-motion`), and the upgraded white family.
+- **`src/world/room/held.ts`**: the 使用 device branch passes the program state `p` to `renderDevice`
+  (so the tape device reads its mode and volume); the tape now takes the device branch in 使用 and the
+  photo branch (with its reels) while holding.
+- **`src/world/objects/layer.ts`**: dragging the volume wheel (`[data-obj-wheel]`) steps the volume —
+  WHEEL_STEP px up sends `vol+`, down `vol-` — through the `obj-key` action; the drag guard already
+  skips key buttons. The reel-driving and the upgraded `hi` DPR sizing were already there.
+- **Tests (`tests/objects-in-hand.test.ts`)**: the tape renders the device (no `img`) with the four
+  keys + vol+/vol- as `obj-key` buttons, holding keeps the photo; after `play` the play key latches
+  (`held`) and after `stop` none does; the window reels follow `packRadii` (left larger at the start,
+  right larger near the end); the upgraded walkman shows the transcript HiFrame and the reels do not
+  turn; the cord sways only at `data-mode="play"` (CSS, reduced-motion aware); and a locale test —
+  for every drawn device zh → en changes the brand/keycap words and renders no CJK under en.

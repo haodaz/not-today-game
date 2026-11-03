@@ -709,6 +709,107 @@ describe("holding and using (FR1)", () => {
       expect(face).toContain("RESET");
       expect(face).not.toContain("<img"); // the drawn back, never the photo
     });
+
+    // ——— the walkman is a drawn device too (2026-11-03) ———
+    it("the tape in 使用 renders the device (no img) with four keys plus vol+/vol- as obj-key buttons", () => {
+      const out = render(used("tape"));
+      const face = out.slice(out.indexOf('class="held obj device'), out.indexOf('class="hint"'));
+      expect(face).toContain('data-device="tape"');
+      expect(face).not.toContain("<img");
+      for (const k of ["rew", "play", "ff", "stop", "vol+", "vol-"]) {
+        const esc = k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        expect(new RegExp(`data-action="obj-key"[^>]*data-object="tape"[^>]*data-key="${esc}"`).test(face), k).toBe(true);
+      }
+      // Holding still shows the photo with its reels.
+      const store = atDay(10, ["tape"]);
+      store.appendEvent({ kind: "recognise", objectId: "tape" });
+      const { ctx } = fakeCtx(store);
+      act(ctx, "loop-hold", { object: "tape" });
+      const held = render(ctx);
+      expect(held).toContain('src="/objects/tape_front.png"');
+      expect(held).not.toContain('data-device="tape"');
+    });
+
+    it("after play the play key is pressed and after stop none is; the window reels follow packRadii", () => {
+      const store = atDay(10, ["tape"]);
+      store.appendEvent({ kind: "recognise", objectId: "tape" });
+      const { ctx } = fakeCtx(store);
+      act(ctx, "loop-hold", { object: "tape" });
+      act(ctx, "obj-use");
+      // The `.keys` block of the device, for checking which key latches.
+      const keysOf = (out: string) => {
+        const from = out.indexOf('<div class="keys">');
+        return out.slice(from, out.indexOf("</div>", from) + 6);
+      };
+      act(ctx, "obj-key", { object: "tape", key: "play" });
+      // The piano keys latch: play stays down.
+      const playing = render(ctx);
+      expect(/data-key="play"/.test(keysOf(playing))).toBe(true);
+      expect(keysOf(playing)).toMatch(/class="[^"]*\blatched\b[^"]*"[^>]*data-key="play"/);
+      expect((ctx.session.hand.programs.tape as TapeState).mode).toBe("play");
+      act(ctx, "obj-key", { object: "tape", key: "stop" });
+      expect((ctx.session.hand.programs.tape as TapeState).mode).toBe("stop");
+      const stopped = render(ctx);
+      expect(stopped).toContain('data-mode="stop"');
+      // No key latches once stopped (the stop key springs back; the cap `down` fades with time).
+      expect(keysOf(stopped)).not.toMatch(/\blatched\b/);
+      // The reels follow packRadii: left larger at the start, right larger near the end.
+      const atStart = packRadii(tapePos({ mode: "stop", since: 0, pos0: 0, volume: 6, index: 0, rewound: false }, 0));
+      const nearEnd = packRadii(tapePos({ mode: "stop", since: 0, pos0: 0.95, volume: 6, index: 0, rewound: false }, 0));
+      expect(atStart.left).toBeGreaterThan(atStart.right);
+      expect(nearEnd.right).toBeGreaterThan(nearEnd.left);
+    });
+
+    it("the upgraded walkman shows the transcript (HiFrame); the reels do not turn between two times", () => {
+      const store = atDay(16, ["tape"]);
+      store.appendEvent({ kind: "recognise", objectId: "tape" });
+      store.appendEvent({ kind: "upgrade", object: "tape" });
+      const { ctx } = fakeCtx(store);
+      act(ctx, "loop-hold", { object: "tape" });
+      act(ctx, "obj-use");
+      const out = render(ctx);
+      expect(out).toContain("held obj device upgraded");
+      expect(out).toMatch(/<canvas class="dev hi" data-screen="tape"/);
+      // The program draws a HiFrame (the transcript); the reels stay still (reelAngles unused here).
+      const e = env({ day: 16, upgraded: true });
+      const frame = tape.draw(tape.init(e), e);
+      expect(frame.kind).toBe("hi");
+      // Upgraded, the hand layer does not spin the reels (it toggles .playing only when not upgraded).
+      const r0 = reelAngles(tapePos(tape.init(e) as TapeState, 0));
+      const r1 = reelAngles(tapePos(tape.init(e) as TapeState, 5000));
+      expect(r0).toEqual(r1); // stop at 0, no turn
+    });
+
+    it("the cord sways only in play (data-mode)", () => {
+      const store = atDay(10, ["tape"]);
+      store.appendEvent({ kind: "recognise", objectId: "tape" });
+      const { ctx } = fakeCtx(store);
+      act(ctx, "loop-hold", { object: "tape" });
+      act(ctx, "obj-use");
+      expect(render(ctx)).toContain('data-mode="stop"');
+      act(ctx, "obj-key", { object: "tape", key: "play" });
+      expect(render(ctx)).toContain('data-mode="play"');
+      // The CSS sways the cord only at data-mode="play", and not under reduced motion.
+      const css = readFileSync(resolve(__dirname, "../src/world/room/devices.css"), "utf8");
+      expect(css).toMatch(/\.walk\[data-mode="play"\] \.cord\{animation:m-cord-sway/);
+      expect(css).toMatch(/prefers-reduced-motion: reduce/);
+    });
+
+    it("every drawn device: zh → en changes the brand and keycap words and leaves symbols/digits/letters; no CJK under en", () => {
+      const CJK = /[\u3400-\u9fff\uf900-\ufaff]/;
+      for (const id of ["chick", "pager", "dictionary", "calculator", "tape"]) {
+        setLocale("zh");
+        const zh = render(used(id));
+        setLocale("en");
+        const en = render(used(id));
+        setLocale("zh");
+        // The device changed (a brand or keycap word differs between locales).
+        const face = (out: string) => out.slice(out.indexOf(`data-device="${id}"`), out.indexOf('class="hint"'));
+        expect(face(zh), id).not.toBe(face(en));
+        // No CJK character in the rendered device under en.
+        expect(CJK.test(face(en)), `${id} en CJK`).toBe(false);
+      }
+    });
   });
 });
 

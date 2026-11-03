@@ -35,6 +35,9 @@ export function createHandLayer() {
     let drag: { x: number; y: number; moved: boolean; turn: Turn } | null = null;
     let easing: { from: Turn; at: number } | null = null;
     let suppressClick = false;
+    // The walkman's volume wheel drag (2026-11-03): each WHEEL_STEP px up sends vol+, down vol-.
+    let wheel: { y: number; object: string } | null = null;
+    const WHEEL_STEP = 14;
     const tints = new Map<string, string>();
 
     const run = (name: string, data: Record<string, string> = {}) => {
@@ -65,6 +68,13 @@ export function createHandLayer() {
       const el = held();
       // A press on the object turns it, held or in use; in use a press on a live key is that key.
       if (e.button !== 0 || !el || !el.contains(e.target as Node)) return;
+      // The walkman's volume wheel: a drag steps the volume (not a turn).
+      const w = (e.target as HTMLElement).closest<HTMLElement>("[data-obj-wheel]");
+      if (ctx.session.hand.using && w) {
+        wheel = { y: e.clientY, object: w.dataset.objWheel ?? el.dataset.object ?? "" };
+        e.preventDefault();
+        return;
+      }
       // In use a press on a live key is that key, not a drag: the photo hotspots (.okey) and the
       // drawn device's real key buttons (data-action="obj-key") both.
       if (ctx.session.hand.using && (e.target as HTMLElement).closest('.okey, button[data-action="obj-key"]')) return;
@@ -73,6 +83,17 @@ export function createHandLayer() {
       e.preventDefault();
     };
     const onMove = (e: MouseEvent) => {
+      // The volume wheel drag: step the volume up (drag up) or down (drag down) per WHEEL_STEP px.
+      if (wheel) {
+        let dy = wheel.y - e.clientY; // up is positive
+        while (Math.abs(dy) >= WHEEL_STEP) {
+          const up = dy > 0;
+          run("obj-key", { object: wheel.object, key: up ? "vol+" : "vol-" });
+          wheel.y += up ? -WHEEL_STEP : WHEEL_STEP;
+          dy = wheel.y - e.clientY;
+        }
+        return;
+      }
       // The light zone: the top of the stage (smaller as the room darkens).
       const y = stageY(e.clientY);
       if (y !== null) {
@@ -93,6 +114,11 @@ export function createHandLayer() {
       setTurn(el, drag.turn);
     };
     const onUp = () => {
+      if (wheel) {
+        wheel = null;
+        suppressClick = true;
+        return;
+      }
       if (!drag) return;
       const d = drag;
       drag = null;

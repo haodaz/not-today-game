@@ -14,10 +14,11 @@ import { CHICK_H, CHICK_W } from "@world/objects/frames";
 import { PAGER_H, PAGER_W, PAGER_DIGITS_X, PAGER_CELLS } from "@world/objects/pager";
 import { CALC_CELLS, CALC_H, CALC_W } from "@world/objects/calculator";
 import { DICT_COLS, DICT_ROWS } from "@world/objects/dictionary";
+import { VOLUME_MAX, type TapeState } from "@world/objects/tape";
 import { CELL_W, CELL_H } from "@world/room/held";
 
-/** The four objects whose 使用 face is a drawn device (the others keep the photo for now). */
-export const DEVICE_IDS: readonly string[] = ["chick", "pager", "dictionary", "calculator"];
+/** The objects whose 使用 face is a drawn device (the others keep the photo for now). */
+export const DEVICE_IDS: readonly string[] = ["chick", "pager", "dictionary", "calculator", "tape"];
 export const isDevice = (id: string): boolean => DEVICE_IDS.includes(id);
 
 /** Objects with a flip button in 使用 (front ↔ back; objects-in-hand 2026-11-03). */
@@ -88,6 +89,8 @@ interface DeviceCtx {
   readonly level: number;
   readonly nowMs: number;
   readonly open: boolean;
+  /** The object's program state (for markup that reads it: the tape's mode and volume). */
+  readonly p: unknown;
 }
 
 const downKey = (ctx: DeviceCtx): string | null =>
@@ -160,7 +163,43 @@ function calculator(ctx: DeviceCtx): SafeHtml {
   return html`<div class="${cls("dev-shell", "calc", upgraded && "upgraded", dark && "dark")}" data-device="calculator" data-obj-body="calculator" data-roll="${roll}" style="transform:rotate(${roll}deg)"><div class="top"><b>${brand ?? "SOLAR · 8"}</b><div class="solar"><i></i><i></i><i></i><i></i></div></div>${glass(ctx, CALC_W, CALC_H)}<div class="keys">${k("off", "OFF", "fn")}${k("C", "C", "fn")}${k("%", "%", "op")}${k("sqrt", "√", "op")}${k("7", "7")}${k("8", "8")}${k("9", "9")}${k("div", "÷", "op")}${k("4", "4")}${k("5", "5")}${k("6", "6")}${k("x", "×", "op")}${k("1", "1")}${k("2", "2")}${k("3", "3")}${k("-", "−", "op")}${k("0", "0")}${k(".", ".")}${k("=", "=", "eq")}${k("+", "+", "op")}</div><div class="note">${note}</div></div>`;
 }
 
-const SHELLS: Readonly<Record<string, (ctx: DeviceCtx) => SafeHtml>> = { chick, pager, dictionary, calculator };
+/** A two-reel cassette drawn in the deck's window: the pack radii and spokes come from the program
+ *  (the hand layer sets `--pack`/`--spin` per side at each frame, from packRadii/reelAngles). */
+function cassette(ctx: DeviceCtx): SafeHtml {
+  // The drawn cassette has its own reels, side by side (the photo's reel positions belong to the photo).
+  void ctx;
+  const label = hasString("obj.tape.label") ? html`<div class="tlabel">${tr("obj.tape.label")}</div>` : null;
+  const reel = (side: "left" | "right", cx: number) =>
+    html`<div class="reel ${side}" style="left:${cx}%;top:56%;--hub:18%"><i class="pack"></i><i class="spokes"></i></div>`;
+  return html`<div class="cassette">${reel("left", 30)}${reel("right", 70)}${label}</div>`;
+}
+
+function tape(ctx: DeviceCtx): SafeHtml {
+  const down = downKey(ctx);
+  const live = ctx.session.hand.using;
+  const upgraded = ctx.state.upgraded.tape === true;
+  const ts = (ctx.p as TapeState | null) ?? null;
+  const mode = ts?.mode ?? "stop";
+  const volume = ts?.volume ?? 0;
+  const brand = hasString("obj.brand.tape") ? tr("obj.brand.tape") : null;
+  const sub = hasString("obj.brand.tape.sub") ? html`<small>${tr("obj.brand.tape.sub")}</small>` : null;
+  // The piano keys latch: the key of the current mode stays down until stop (or another key); stop
+  // springs back. Symbols ◀◀ ▶ ▶▶ ■ are drawn, the hover labels are strings.
+  const pkey = (k: string, glyph: string, klass = "") =>
+    key("tape", k, down === k || (k !== "stop" && mode === k), live, glyph, cls(klass, k !== "stop" && mode === k && "latched"));
+  const keys = html`<div class="keys">${pkey("rew", "◀◀")}${pkey("play", "▶", "play")}${pkey("ff", "▶▶")}${pkey("stop", "■")}</div>`;
+  // The window: the cassette (reels) normally, a dark glass with the transcript HiFrame when upgraded.
+  const win = upgraded
+    ? html`<div class="win"><canvas class="dev hi" data-screen="tape" width="2" height="2"></canvas></div>`
+    : html`<div class="win">${cassette(ctx)}</div>`;
+  // The volume wheel: the red mark sits at volume / VOLUME_MAX; the buttons step it.
+  const mark = Math.max(0, Math.min(1, volume / VOLUME_MAX));
+  const vol = html`<div class="vol">${key("tape", "vol+", down === "vol+", live, "+")}<div class="wheel" data-obj-wheel="tape"><i style="top:${((1 - mark) * 92).toFixed(1)}px"></i></div>${key("tape", "vol-", down === "vol-", live, "−")}</div>`;
+  const cord = html`<svg class="cord" width="120" height="120" aria-hidden="true"><path d="M0 0 C 10 40, -30 70, 10 110" stroke="#dcdcdc" stroke-width="3" fill="none" stroke-linecap="round"></path></svg>`;
+  return html`<div class="${cls("dev-shell", "walk", upgraded && "upgraded", mode === "play" && "playing")}" data-device="tape" data-mode="${mode}">${keys}<div class="body">${win}<div class="brand">${brand}${sub}</div></div>${vol}<div class="jack"></div>${cord}</div>`;
+}
+
+const SHELLS: Readonly<Record<string, (ctx: DeviceCtx) => SafeHtml>> = { chick, pager, dictionary, calculator, tape };
 
 /** The flip / rotate buttons under the device in 使用 (never while holding): each shown only when
  *  the object has that change. Text from strings `obj.flip` / `obj.rotate`. */
@@ -172,11 +211,11 @@ function turnButtons(ctx: DeviceCtx): SafeHtml | null {
   return html`<div class="turnbar">${flip}${rot}</div>`;
 }
 
-/** The drawn device for `id` in 使用, or null when it is not one of the four device objects. */
-export function renderDevice(id: string, state: State, session: Session, level: number, nowMs: number, open: boolean): SafeHtml | null {
+/** The drawn device for `id` in 使用, or null when it is not a drawn-device object. `p` is its program state. */
+export function renderDevice(id: string, state: State, session: Session, level: number, nowMs: number, open: boolean, p: unknown = null): SafeHtml | null {
   const make = SHELLS[id];
   if (!make) return null;
-  const ctx: DeviceCtx = { object: id, state, session, level, nowMs, open };
+  const ctx: DeviceCtx = { object: id, state, session, level, nowMs, open, p };
   const buttons = turnButtons(ctx);
   // The flip / rotate buttons sit under the device, inside the focus view, never while holding.
   return html`<div class="dev-focus">${make(ctx)}${buttons}</div>`;
