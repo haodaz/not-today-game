@@ -30,6 +30,7 @@ import { handOf } from "@state/hands";
 import { handStep } from "@world/objects/hand";
 import { pressKey } from "@world/objects/index";
 import { PHONE_FLIP } from "@world/room/held";
+import { DICT_KEYS } from "@world/room/devices";
 import { booted, deskMeal, itemStates, loopContext, mealToOrder, nightfallReached, openItemFor, openTask } from "@world/loop/checklist";
 import type { EventToken } from "@state/days/table";
 import { messageActions } from "@world/desktop/messages/actions";
@@ -669,7 +670,9 @@ export const loopActions: Record<string, ActionHandler> = {
     // While only holding, the keys do not answer: the click is a click on the object (使用).
     if (!session.hand.using) return void loopActions["obj-use"]!(ctx, {} as DOMStringMap, null as never);
     const hand = handOf(id);
-    const onFront = hand.keys.some((k) => k.id === key) || (id === "phone" && key === PHONE_FLIP);
+    // The dictionary's 使用 device adds ▲▼ (the program ignores them); its keys are the device set.
+    const onDevice = session.hand.using && id === "dictionary" && DICT_KEYS.includes(key);
+    const onFront = hand.keys.some((k) => k.id === key) || onDevice || (id === "phone" && key === PHONE_FLIP);
     const onBack = (id === "chick" && key === "reset" && !!hand.back.reset) || (id === "textbook" && key === "cell" && !!hand.cell);
     if (!(onFront && session.hand.face === "front") && !(onBack && session.hand.face === "back")) return;
     // The dictionary's keys are under its lid until it is open.

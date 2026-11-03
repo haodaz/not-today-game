@@ -1300,3 +1300,44 @@ untouched. `npx tsc --noEmit` clean; full `npx vitest run` → 91 files / 1607 t
   of the channel width at every level; plus a new test that the 使用 canvas is sized as a % of the
   face (not a px width) and carries no `data-focus-w`. The dim + blur test now checks the single
   `focus` class.
+
+## objects-in-hand — 使用 is the game's own drawing of the device (2026-11-03)
+
+In 使用, chick/pager/dictionary/calculator now render a drawn DOM/CSS device (no photo), copied from
+the draft `devices-draft.html`; holding is unchanged, and tape/iccard/textbook/phone keep the photo.
+Kiro's area only; `content/` untouched. `npx tsc --noEmit` clean; full `npx vitest run` → 91 files /
+1611 tests green.
+
+- **New `src/world/room/devices.ts`**: `renderDevice(id, state, session, level, nowMs, open)` builds
+  the four shells (egg / pager / clamshell dict / calc) with real `<button>` keys carrying the same
+  `data-action="obj-key" data-object data-key` as the photo hotspots (so every program reducer is
+  untouched); the dictionary's photo `grid` is replaced by A–Z + lookup/up/down/back/power buttons.
+  Brand lines and key hover titles come from the existing `obj.brand.*` / `obj.key.<object>.<id>` /
+  `obj.chick.autofed` / `obj.calculator.dark` / `obj.calculator.lit` / `obj.dictionary.hint` strings
+  (render nothing if missing). `ghostBits(id, level)` builds the screen's ghost: every pixel for the
+  chick (pixel) and dictionary (dot-matrix) channels, the full `8.` of every cell for the pager and
+  calculator (seven-segment), `finer`'d by the dream level.
+- **New `src/world/room/devices.css`**: the draft's shell CSS, scoped under `.dev-shell` (+ `.egg`,
+  `.pager`, `.dict`, `.calc`) and the `.upgraded` white family; `canvas.dev` pixelated. Imported in
+  `src/main.ts`.
+- **`src/world/room/held.ts`**: in `object()`, when `using && isDevice(id)` the front face is the
+  drawn device (no `<img>`); the back face (the chick's reset hole) stays so turn-over still works.
+  Holding and the other objects' 使用 are unchanged.
+- **`src/world/objects/paint.ts`**: `paintFrame` gained a `{ ghost }` option — for a device's normal
+  screen it draws every pixel a square with a 1 px gap at an integer scale, the ghost (unlit) at
+  7.5 % ink under the lit frame; pixelated, no smoothing. The upgraded HiFrame path is unchanged.
+- **`src/world/objects/layer.ts`**: paints a device screen (class `device`, 使用, not upgraded) with
+  the `ghostBits` underlay.
+- **`src/world/room/room.css`**: `.held.obj.device` centres and scales the shell; its `.face.back`
+  no longer force-hidden (turn-over keeps the reset).
+- **`src/world/room/game.ts`**: `obj-key` accepts the dictionary device's ▲▼ (the program ignores
+  them) via `DICT_KEYS`.
+- **Tests (`tests/objects-in-hand.test.ts`)**: a new "the drawn devices in 使用" block — the face has
+  no front `img` and a `data-device` root for each of the four while holding still shows the photo;
+  every content key id (dictionary: A–Z + the five) is a `button[data-action="obj-key"]` and clicking
+  reaches the program; the normal screen is pixelated at an integer scale and paints a 7.5 % ghost
+  with the 1 px gap (via a fake canvas over `paintFrame` + `ghostBits`); the upgraded device has the
+  `upgraded` class, the `canvas.dev.hi`, a HiFrame, and no ghost. The prior holding/using tests were
+  updated to the device markup (the chick key is a device button `down`; the dictionary open view has
+  31 buttons; the device canvas is CSS-sized, no inline px width). `tests/desktop-snapshots.test.ts`
+  "every string the desktop renders…" given a 20 s timeout.

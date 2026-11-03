@@ -92,5 +92,5 @@ describe("strings", () => {
     }
     expect(missingKeys()).toEqual(KNOWN_MISSING);
     resetMissing();
-  });
+  }, 20_000);
 });

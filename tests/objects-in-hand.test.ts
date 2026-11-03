@@ -19,7 +19,7 @@ import { calculator, formatNumber, lightLevel, lightZone, unaskedAt, upsideDownO
 import { chick, chickFrameAt, CHICK_IDLE_MS, drawChick, ICON_ACT, turnTimes, type ChickState } from "@world/objects/chick";
 import { dictionary, lookup, type DictionaryState } from "@world/objects/dictionary";
 import { ascii, DOT_GLYPHS, finer, rowWidth, SEGMENTS, type Frame, type PixelFrame } from "@world/objects/frame";
-import { CHICK_FRAMES, CHICK_ICONS, missingChickFrames, parseChickFrames, type ChickFrames } from "@world/objects/frames";
+import { CHICK_FRAMES, CHICK_H, CHICK_ICONS, CHICK_W, missingChickFrames, parseChickFrames, type ChickFrames } from "@world/objects/frames";
 import { DOWN, dragTurn, easeBack, flipsOver, handStep, keysLive, RETURN_MS, TURN_PITCH, TURN_YAW, type Hand } from "@world/objects/hand";
 import { arrivedMessages, KEY_DOWN_MS, PROGRAMS } from "@world/objects/index";
 import { batteryBars, pager, pagerHistory, PAGER_HISTORY, type PagerState } from "@world/objects/pager";
@@ -28,6 +28,8 @@ import { dreamLevel, MAX_LEVEL, SEMITONE, type ObjectEnv } from "@world/objects/
 import { packRadii, playList, reelAngles, tape, tapePos, TAPE_SIDE_MS, type TapeState } from "@world/objects/tape";
 import { keyboardToObjKey, loopActions, loopKeys } from "@world/room/game";
 import { CHANNELS, faceBoxWidth, FOCUS_MAX, focusBackingWidth, HELD_W } from "@world/room/held";
+import { ghostBits } from "@world/room/devices";
+import { paintFrame } from "@world/objects/paint";
 import { STAGE_H, STAGE_W } from "@world/room/splat/geometry";
 import { renderRoom } from "@world/room/hud";
 
@@ -186,7 +188,8 @@ describe("holding and using (FR1)", () => {
     expect((ctx.session.hand.programs.chick as ChickState).menu).toBe(0);
     expect(ctx.session.hand.keyDown).toMatchObject({ object: "chick", key: "A" });
     expect(ctx.session.hand.keyDown!.until - ctx.now!()).toBe(KEY_DOWN_MS);
-    expect(render(ctx)).toMatch(/class="okey down" data-action="obj-key" data-object="chick" data-key="A"/);
+    // In 使用 the chick is the drawn device: a real button that sinks (class "down"), same action/ids.
+    expect(render(ctx)).toMatch(/class="down" data-action="obj-key" data-object="chick" data-key="A"/);
     expect(keySounds()).toEqual([{ id: "chick-beep", rate: undefined }]);
     // A back key while the front is up does nothing.
     act(ctx, "obj-key", { object: "chick", key: "reset" });
@@ -346,10 +349,11 @@ describe("holding and using (FR1)", () => {
     act(ctx, "loop-hold", { object: "dictionary" });
     const closed = render(ctx);
     expect((closed.match(/data-action="obj-key"/g) ?? []).length).toBe(0);
-    // Using it opens the clamshell; now every key is a hotspot (28 letters/controls + lookup = 29).
+    // Using it opens the clamshell and draws the device: the full keyboard — A–Z (26) plus lookup,
+    // up, down, back, power (5) = 31 real buttons (the photo `grid` is replaced, 2026-11-03).
     act(ctx, "obj-use");
     const open = render(ctx);
-    expect((open.match(/data-action="obj-key" data-object="dictionary"/g) ?? []).length).toBe(29);
+    expect((open.match(/data-action="obj-key" data-object="dictionary"/g) ?? []).length).toBe(31);
     for (const k of ["T", "O", "D", "A", "Y"]) act(ctx, "obj-key", { object: "dictionary", key: k });
     act(ctx, "obj-key", { object: "dictionary", key: "lookup" });
     const s = ctx.session.hand.programs.dictionary as DictionaryState;
@@ -403,7 +407,7 @@ describe("holding and using (FR1)", () => {
       expect(css).toMatch(/canvas\.dev\{[^}]*image-rendering:pixelated/);
     });
 
-    it("the screen canvas is sized as a fraction of the face in 使用 (not its own pixel width), and carries no data-focus-w", () => {
+    it("the device's screen canvas is CSS-sized (no inline pixel width) and carries no data-focus-w", () => {
       const store = atDay(16, ["dictionary"]);
       store.appendEvent({ kind: "recognise", objectId: "dictionary" });
       const { ctx } = fakeCtx(store);
@@ -411,11 +415,10 @@ describe("holding and using (FR1)", () => {
       act(ctx, "obj-use");
       const out = render(ctx);
       expect(out).not.toContain("data-focus-w");
-      // The canvas style gives a % width (a fraction of the face), not a px width.
-      const canvas = out.slice(out.indexOf('data-screen="dictionary"'));
-      const style = /style="([^"]*)"/.exec(canvas)?.[1] ?? "";
-      expect(style).toMatch(/width:[\d.]+%/);
-      expect(style).not.toMatch(/width:\d+px/);
+      // The device canvas is sized by CSS (max-width:100% of the glass), not an inline px width.
+      const canvas = out.slice(out.indexOf('data-screen="dictionary"'), out.indexOf("</canvas", out.indexOf('data-screen="dictionary"')) + 1);
+      expect(canvas).toContain('class="dev"');
+      expect(canvas).not.toMatch(/style="[^"]*width:\d+px/);
     });
 
     it("the stage behind gets the dim + blur class in 使用", () => {
@@ -453,6 +456,104 @@ describe("holding and using (FR1)", () => {
       expect(keyboardToObjKey("calculator", "Backspace")).toBe("C");
       // An object with no keyboard (the chick) takes nothing.
       expect(keyboardToObjKey("chick", "a")).toBeNull();
+    });
+  });
+
+  // ——— 使用 is the game's own drawing of the device (2026-11-03) ———
+  describe("the drawn devices in 使用", () => {
+    const DEVS = ["chick", "pager", "dictionary", "calculator"] as const;
+    // The dictionary's device keyboard: A–Z plus the five function keys (the photo `grid` is gone).
+    const DICT = [..."ABCDEFGHIJKLMNOPQRSTUVWXYZ", "lookup", "up", "down", "back", "power"];
+    const keyIds = (id: string): string[] => (id === "dictionary" ? DICT : handOf(id).keys.map((k) => k.id));
+    const used = (id: string) => {
+      const store = atDay(id === "calculator" ? 16 : id === "dictionary" ? 13 : id === "pager" ? 4 : 4, [id]);
+      store.appendEvent({ kind: "recognise", objectId: id });
+      const { ctx } = fakeCtx(store);
+      ctx.session.hand.inLight = true;
+      act(ctx, "loop-hold", { object: id });
+      act(ctx, "obj-use");
+      return ctx;
+    };
+
+    it("the face is a drawn device (no img, a device root) for each of the four; holding still shows the photo", () => {
+      for (const id of DEVS) {
+        const ctx = used(id);
+        const out = render(ctx);
+        const face = out.slice(out.indexOf('class="held obj device'), out.indexOf('class="hint"'));
+        expect(face, id).toContain(`data-device="${id}"`);
+        expect(face, id).toContain("dev-shell");
+        expect(face.match(/<img[^>]*_front\.png/), id).toBeNull();
+        // Holding (not using) still shows the photo face.
+        act(ctx, "loop-put-down"); // using → holding
+        const held = render(ctx);
+        expect(held, `${id} holding`).toContain(`src="/objects/${id}_front.png"`);
+        expect(held, `${id} holding`).not.toContain(`data-device="${id}"`);
+      }
+    });
+
+    it("every content key id is a button[data-action=obj-key]; clicking reaches the program like the old hotspot", () => {
+      for (const id of DEVS) {
+        const out = render(used(id));
+        for (const k of keyIds(id)) {
+          const re = new RegExp(`<button[^>]*data-action="obj-key"[^>]*data-object="${id}"[^>]*data-key="${k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"`);
+          expect(re.test(out) || new RegExp(`data-key="${k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"[^>]*data-action="obj-key"`).test(out), `${id}.${k}`).toBe(true);
+        }
+      }
+      // Clicking a device key reaches the program exactly as the photo hotspot did.
+      const ctx = used("chick");
+      act(ctx, "obj-key", { object: "chick", key: "A" });
+      expect((ctx.session.hand.programs.chick as ChickState).menu).toBe(0);
+    });
+
+    it("the normal screen canvas is pixelated at an integer scale and paints a ghost (unlit at 7.5 % ink)", () => {
+      // The ghost bitmap is the channel's full extent for pixel/dot-matrix, the 8. for seven-segment.
+      const chickGhost = ghostBits("chick", 0);
+      expect([...chickGhost.bits].every((b) => b === 1)).toBe(true); // every pixel ghosts
+      const pagerGhost = ghostBits("pager", 0);
+      expect([...pagerGhost.bits].some((b) => b === 1)).toBe(true); // the 8. of every cell
+      // paintFrame with a ghost draws both ghost (7.5 % alpha) and ink, each a square with a gap.
+      const fills: { style: string; w: number; h: number }[] = [];
+      let style = "";
+      const g = {
+        set fillStyle(v: string) {
+          style = v;
+        },
+        get fillStyle() {
+          return style;
+        },
+        clearRect() {},
+        fillRect(_x: number, _y: number, w: number, h: number) {
+          fills.push({ style, w, h });
+        },
+        imageSmoothingEnabled: false,
+      } as unknown as CanvasRenderingContext2D;
+      const canvas = { width: CHICK_W * 4, height: CHICK_H * 4, getContext: () => g } as unknown as Parameters<typeof paintFrame>[0];
+      const frame = drawChick(chick.init(env()), env()) as PixelFrame;
+      paintFrame(canvas, frame, "chick", (() => null) as never, { ghost: chickGhost });
+      const ghostFills = fills.filter((f) => f.style.includes("0.075"));
+      expect(ghostFills.length).toBeGreaterThan(0); // a ghost was painted
+      expect(fills.every((f) => f.w === 3 && f.h === 3)).toBe(true); // scale 4, square 3 (a 1 px gap)
+      // The device canvas is pixelated (devices.css) and its backing is the integer channel size.
+      const css = readFileSync(resolve(__dirname, "../src/world/room/devices.css"), "utf8");
+      expect(css).toMatch(/canvas\.dev\{[^}]*image-rendering:pixelated/);
+      const out = render(used("chick"));
+      expect(out).toMatch(/<canvas class="dev" data-screen="chick" width="32" height="16"/);
+    });
+
+    it("the upgraded device has the upgraded class, no ghost, and a smooth HiFrame screen", () => {
+      const store = atDay(16, ["chick"]);
+      store.appendEvent({ kind: "recognise", objectId: "chick" });
+      store.appendEvent({ kind: "upgrade", object: "chick" });
+      const { ctx } = fakeCtx(store);
+      act(ctx, "loop-hold", { object: "chick" });
+      act(ctx, "obj-use");
+      const out = render(ctx);
+      expect(out).toContain("held obj device upgraded");
+      expect(out).toMatch(/<canvas class="dev hi" data-screen="chick"/);
+      // The upgraded chick's program draws a HiFrame (smooth, no pixel/cells low-res frame).
+      const frame = chick.draw(chick.init(env({ upgraded: true })), env({ upgraded: true }));
+      expect(frame.kind).toBe("hi");
+      // The hand layer does not ghost an upgraded device (onDevice requires !env.upgraded).
     });
   });
 });

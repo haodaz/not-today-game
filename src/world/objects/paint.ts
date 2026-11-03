@@ -68,12 +68,38 @@ export interface PaintTarget {
   getContext(kind: "2d"): CanvasRenderingContext2D | null;
 }
 
-export function paintFrame(canvas: PaintTarget, frame: Frame, object: string, raster: Raster): void {
+/** A ghost underlay for the drawn device's normal screen: the unlit pixels at 7.5 % ink, with the gap. */
+export interface PaintOptions {
+  readonly ghost?: { readonly w: number; readonly h: number; readonly bits: Uint8Array };
+}
+
+export function paintFrame(canvas: PaintTarget, frame: Frame, object: string, raster: Raster, opts: PaintOptions = {}): void {
   const g = canvas.getContext("2d");
   if (!g) return;
   const { width, height } = canvas;
   g.clearRect(0, 0, width, height);
   if (frame.kind === "none") return;
+  // The drawn device's normal screen (使用): every pixel a square with a 1 px gap; the ghost shows
+  // the unlit channel at 7.5 % ink under the lit frame. Integer scale, never smoothed.
+  if (opts.ghost && (frame.kind === "pixels" || frame.kind === "cells")) {
+    g.imageSmoothingEnabled = false;
+    const px = frame.kind === "cells" ? cellsToBits(frame.rows, frame.cols, frame.level, raster) : frame;
+    const ghost = opts.ghost;
+    const scale = Math.max(1, Math.floor(Math.min(width / px.w, height / px.h)));
+    const inkRgb = INK[object] ?? DEFAULT_INK;
+    const ink = frame.kind === "pixels" ? (frame.ink ?? 1) : 1;
+    const cell = Math.max(1, scale - 1); // the square, one pixel smaller than its cell: the gap
+    // The ghost first (every ghost pixel the frame does not light), then the lit frame over it.
+    if (ghost.w === px.w && ghost.h === px.h) {
+      g.fillStyle = `rgba(${inkRgb},0.075)`;
+      for (let y = 0; y < px.h; y++) for (let x = 0; x < px.w; x++) if (ghost.bits[y * px.w + x] && !px.bits[y * px.w + x]) g.fillRect(x * scale, y * scale, cell, cell);
+    }
+    if (ink > 0) {
+      g.fillStyle = `rgba(${inkRgb},${ink})`;
+      for (let y = 0; y < px.h; y++) for (let x = 0; x < px.w; x++) if (px.bits[y * px.w + x]) g.fillRect(x * scale, y * scale, cell, cell);
+    }
+    return;
+  }
   if (frame.kind === "hi") {
     // The new world: smooth, colour, it does it for you.
     g.imageSmoothingEnabled = true;

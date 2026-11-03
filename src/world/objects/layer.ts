@@ -12,6 +12,7 @@ import { CHIRP_FROM_DAY, chirpGap } from "./chick";
 import { arrivedMessages, envFor, programState, PROGRAMS } from "./index";
 import { breath, dragTurn, easeBack, flipsOver, NO_TURN, type Turn } from "./hand";
 import { paintFrame, systemRaster } from "./paint";
+import { ghostBits, isDevice } from "@world/room/devices";
 import { crackLit, pencilShown, type PhoneState, type TextbookState } from "./plain";
 import { packRadii, reelAngles, tapePos, type TapeState } from "./tape";
 
@@ -121,7 +122,10 @@ export function createHandLayer() {
       const env = envFor(state, store.getEvents(), session, id, t, store.getRunId());
       const p = PROGRAMS[id];
       const s = p ? programState(session, id, env) : null;
-      if (p) for (const c of el.querySelectorAll<HTMLCanvasElement>("canvas.dev")) paintFrame(c, p.draw(s, env), id, raster);
+      // The drawn device's normal screen (使用, not upgraded) gets a ghost underlay and the pixel gap.
+      const onDevice = el.classList.contains("device") && session.hand.using && !env.upgraded && isDevice(id);
+      const opts = onDevice ? { ghost: ghostBits(id, env.level) } : undefined;
+      if (p) for (const c of el.querySelectorAll<HTMLCanvasElement>("canvas.dev")) paintFrame(c, p.draw(s, env), id, raster, opts);
       // Breathing in the hand, and the turn easing back.
       const br = el.querySelector<HTMLElement>(".breathe");
       if (br) br.style.translate = `0 ${breath(t).toFixed(2)}px`;

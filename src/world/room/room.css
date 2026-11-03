@@ -208,6 +208,10 @@
    compound. The 500 ms entry is the .breathe transition (--m-use). */
 .room .held.obj.using{width:auto;height:auto}
 .room .held.obj.using .face.front > img{width:auto;height:auto;max-width:calc(1600px * var(--focus-max,.88));max-height:calc(900px * var(--focus-max,.88))}
+/* 使用 as the game's own drawing of the device (2026-11-03): the shell (devices.css) sits in the
+   centre, fit within 88 % of the stage; the photo is gone. The shell scales as one unit. */
+.room .held.obj.device{width:auto;height:auto}
+.room .held.obj.device .face.front.device-face{position:relative;transform:scale(var(--dev-scale,1.6));transform-origin:center}
 /* The entry: the face eases in over the 桌子 → 屏幕 time (--m-use, 500 ms), within the fitted box. */
 .room .held.obj.using .breathe{animation:m-focus-in var(--m-use,500ms) var(--m-ease,ease) both}
 @keyframes m-focus-in{from{scale:.86;opacity:.6}to{scale:1;opacity:1}}

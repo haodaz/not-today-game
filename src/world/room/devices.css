@@ -1,0 +1,95 @@
+/* The drawn devices in 使用 (objects-in-hand "Correction 2026-11-03: 使用 is the game's own drawing
+   of the device"). The shells are the draft .kiro/specs/objects-in-hand/devices-draft.html, copied
+   here and scoped under .dev-shell (holding still shows the photo; this is only the 使用 face). Each
+   shell holds real <button> keys (data-action="obj-key") and the program's canvas on an LCD glass. */
+.dev-shell{--lcd:#b8c4a0;--lcd-dark:#a9b691;--dev-ink:#25301f;position:relative;color:transparent}
+.dev-shell button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;border:none}
+.dev-shell button.down{transform:translateY(2px)}
+.dev-shell canvas.dev{image-rendering:pixelated;display:block;max-width:100%;height:auto}
+.dev-shell canvas.dev.hi{image-rendering:auto}
+.dev-shell .glass{overflow:hidden}
+
+/* ——— chick: bootleg egg ——— */
+.dev-shell.egg{width:300px;height:360px;border-radius:50% 50% 47% 47% / 58% 58% 42% 42%;
+  background:radial-gradient(ellipse at 34% 26%,#fff6c9 0%,#ffd84d 32%,#f2b519 70%,#d98f0c 100%);
+  box-shadow:inset -10px -14px 0 rgba(160,90,0,.25),inset 8px 10px 0 rgba(255,255,255,.35),0 18px 40px rgba(0,0,0,.5)}
+.dev-shell.egg::before{content:"";position:absolute;left:50%;top:-22px;width:34px;height:30px;margin-left:-17px;border:6px solid #c9ccd3;border-bottom:none;border-radius:20px 20px 0 0}
+.dev-shell.egg .bezel{position:absolute;left:50%;top:78px;width:200px;height:150px;margin-left:-100px;border-radius:46% 46% 40% 40% / 50% 50% 40% 40%;background:#f7f3e6;box-shadow:inset 0 4px 0 rgba(0,0,0,.12)}
+.dev-shell.egg .glass{position:absolute;left:24px;top:22px;width:152px;height:106px;border-radius:10px;background:var(--lcd);box-shadow:inset 0 3px 0 var(--lcd-dark),inset 0 0 0 3px #8f9b78;display:flex;align-items:center;justify-content:center;padding:4px}
+.dev-shell.egg .brand{position:absolute;top:44px;width:100%;text-align:center;font:700 13px/1 "Arial Rounded MT Bold","PingFang SC",sans-serif;color:#b8560a;letter-spacing:2px}
+.dev-shell.egg .btns{position:absolute;left:0;right:0;top:250px;display:flex;justify-content:center;gap:22px}
+.dev-shell.egg .btns button{width:40px;height:40px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff8fa3,#e0395a 70%);box-shadow:0 4px 0 #9b1f39,inset 0 2px 0 rgba(255,255,255,.4);color:transparent}
+.dev-shell.egg .btns button.down{box-shadow:0 1px 0 #9b1f39;transform:translateY(3px)}
+.dev-shell.egg .lbl{position:absolute;left:0;right:0;top:298px;display:flex;justify-content:center;gap:50px;font:700 11px/1 sans-serif;color:#9a5a00}
+.dev-shell.egg .lbl span{width:12px;text-align:center}
+
+/* ——— pager ——— */
+.dev-shell.pager{width:360px;height:178px;border-radius:26px 26px 30px 30px;background:linear-gradient(#3a3f4a,#22252c);box-shadow:inset 0 3px 0 rgba(255,255,255,.12),inset 0 -6px 0 rgba(0,0,0,.35),0 18px 40px rgba(0,0,0,.5)}
+.dev-shell.pager .win{position:absolute;left:22px;top:22px;width:256px;height:86px;border-radius:10px;background:#111;padding:9px}
+.dev-shell.pager .win .glass{width:100%;height:100%;border-radius:4px;background:var(--lcd);box-shadow:inset 0 2px 0 var(--lcd-dark);display:flex;align-items:center;justify-content:center}
+.dev-shell.pager .brand{position:absolute;left:24px;top:120px;font:700 12px/1 sans-serif;letter-spacing:3px;color:#8e95a3}
+.dev-shell.pager .brand small{display:block;font-weight:400;letter-spacing:1px;font-size:10px;color:#5d6370;margin-top:5px}
+.dev-shell.pager .side{position:absolute;right:20px;top:20px;display:grid;grid-template-columns:30px 30px;gap:10px}
+.dev-shell.pager .side button{width:30px;height:30px;border-radius:8px;background:#4b515e;box-shadow:0 3px 0 #15171c;color:#c9cdd6;font-size:11px}
+.dev-shell.pager .read{position:absolute;right:20px;bottom:22px;width:70px;height:40px;border-radius:20px;background:linear-gradient(#e2e6ee,#aab1bf);box-shadow:0 4px 0 #555c69;color:#2a2e36;font-weight:700;font-size:12px;letter-spacing:1px}
+.dev-shell.pager .light{position:absolute;left:180px;bottom:24px;width:58px;height:26px;border-radius:13px;background:#4b515e;box-shadow:0 3px 0 #15171c;color:#c9cdd6;font-size:11px}
+
+/* ——— dictionary: clamshell open ——— */
+.dev-shell.dict{width:430px;display:flex;flex-direction:column;align-items:center;filter:drop-shadow(0 18px 30px rgba(0,0,0,.5))}
+.dev-shell.dict .lid{width:410px;height:186px;border-radius:18px 18px 6px 6px;background:linear-gradient(#4a5878,#33405c);padding:18px 22px 12px;position:relative;transform:perspective(900px) rotateX(8deg);transform-origin:bottom}
+.dev-shell.dict .lid .glass{width:100%;height:118px;border-radius:6px;background:var(--lcd);box-shadow:inset 0 0 0 4px #1f2738,inset 0 6px 0 var(--lcd-dark);display:flex;align-items:center;justify-content:center}
+.dev-shell.dict .lid .brand{margin-top:10px;display:flex;justify-content:space-between;font:700 12px/1 sans-serif;color:#c7d0e6;letter-spacing:2px}
+.dev-shell.dict .lid .brand span:last-child{font-weight:400;color:#8692ad;letter-spacing:1px;font-size:10px}
+.dev-shell.dict .hinge{width:380px;height:12px;background:linear-gradient(#262d40,#3c4865);border-radius:3px}
+.dev-shell.dict .base{width:430px;border-radius:6px 6px 22px 22px;background:linear-gradient(#e9ecf2,#c9ced9);padding:14px 16px 18px;box-shadow:inset 0 -6px 0 rgba(0,0,0,.12)}
+.dev-shell.dict .fn{display:flex;gap:8px;margin-bottom:12px}
+.dev-shell.dict .fn button{flex:1;height:30px;border-radius:15px;background:#3b4560;color:#e7ebf5;font-size:11px;box-shadow:0 3px 0 #1e2333}
+.dev-shell.dict .fn button.power{flex:0 0 44px;background:#d8433b;box-shadow:0 3px 0 #7d1f1a}
+.dev-shell.dict .fn button.go{flex:1.6;background:#e98a1c;box-shadow:0 3px 0 #8a4c06;font-weight:700}
+.dev-shell.dict .row{display:flex;justify-content:center;gap:6px;margin-top:7px}
+.dev-shell.dict .row button{width:33px;height:31px;border-radius:9px;background:#fdfdfd;color:#2b3142;font-weight:700;font-size:13px;box-shadow:0 3px 0 #9aa1b1}
+.dev-shell.dict .row button.back{width:52px;font-size:11px;background:#3b4560;color:#e7ebf5;box-shadow:0 3px 0 #1e2333}
+
+/* ——— calculator ——— */
+.dev-shell.calc{width:270px;border-radius:22px;background:#3a302d;padding:20px 20px 22px;box-shadow:inset 0 3px 0 rgba(255,255,255,.08),inset 0 -6px 0 rgba(0,0,0,.35),0 18px 40px rgba(0,0,0,.5)}
+.dev-shell.calc .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.dev-shell.calc .top b{font:700 11px/1 sans-serif;color:#b9aba5;letter-spacing:2px}
+.dev-shell.calc .solar{display:flex;gap:2px;padding:3px;background:#1a1414;border-radius:3px}
+.dev-shell.calc .solar i{width:16px;height:12px;background:linear-gradient(135deg,#4a3a5c,#2a2036);border-radius:1px}
+.dev-shell.calc .glass{height:70px;border-radius:8px;background:var(--lcd);box-shadow:inset 0 3px 0 var(--lcd-dark),inset 0 0 0 3px #8f9b78;display:flex;align-items:center;justify-content:center;margin-bottom:16px;transition:filter .3s}
+.dev-shell.calc.dark .glass{filter:brightness(.6) saturate(.4)}
+.dev-shell.calc .keys{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.dev-shell.calc .keys button{height:38px;border-radius:9px;background:#76706d;color:#f4ece1;font-size:16px;box-shadow:0 3px 0 #241d1b}
+.dev-shell.calc .keys button.op{background:#5b524f}
+.dev-shell.calc .keys button.fn{background:#9b5d4c;font-size:12px}
+.dev-shell.calc .keys button.eq{background:#f26a2e;grid-row:span 2;height:auto;box-shadow:0 3px 0 #7a2e0d;font-size:20px}
+.dev-shell.calc .note{margin-top:10px;font:10px/1 sans-serif;color:#80736e;text-align:right;letter-spacing:1px}
+
+/* ——— upgraded: one white glossy family, smooth colour screens, no ghost, the same buttons ——— */
+.dev-shell.upgraded.egg{background:radial-gradient(ellipse at 34% 24%,#ffffff 0%,#f1f4f9 45%,#d9dfe8 100%);box-shadow:inset -10px -14px 0 rgba(120,135,160,.18),inset 8px 10px 0 rgba(255,255,255,.7),0 18px 40px rgba(0,0,0,.5)}
+.dev-shell.upgraded.egg .brand,.dev-shell.upgraded.pager .brand,.dev-shell.upgraded.dict .lid .brand span:first-child,.dev-shell.upgraded.calc .top b{color:#5a8dee}
+.dev-shell.upgraded.egg .bezel{background:#fff;box-shadow:none}
+.dev-shell.upgraded.egg .glass{padding:0;overflow:hidden;background:#0d1220;box-shadow:none;border-radius:16px}
+.dev-shell.upgraded.egg .btns button{background:#e6eaf1;box-shadow:0 2px 0 #c3cad6}
+.dev-shell.upgraded.egg .lbl{color:#9aa4b5}
+.dev-shell.upgraded.pager{background:linear-gradient(#ffffff,#e3e8ef);box-shadow:inset 0 -5px 0 rgba(120,135,160,.2),0 18px 40px rgba(0,0,0,.5)}
+.dev-shell.upgraded.pager .win{background:#fff;padding:6px}
+.dev-shell.upgraded.pager .win .glass{background:#0d1220;box-shadow:none}
+.dev-shell.upgraded.pager .side button,.dev-shell.upgraded.pager .light{background:#e6eaf1;color:#5b6577;box-shadow:0 2px 0 #c3cad6}
+.dev-shell.upgraded.pager .read{background:#5a8dee;color:#fff;box-shadow:0 3px 0 #2f5fb8}
+.dev-shell.upgraded.dict .lid{background:linear-gradient(#ffffff,#e6eaf1)}
+.dev-shell.upgraded.dict .lid .glass{background:#0d1220;box-shadow:inset 0 0 0 4px #fff}
+.dev-shell.upgraded.dict .hinge{background:#cfd5df}
+.dev-shell.upgraded.dict .base{background:#f6f8fb}
+.dev-shell.upgraded.dict .fn button{background:#e6eaf1;color:#5b6577;box-shadow:0 2px 0 #c3cad6}
+.dev-shell.upgraded.dict .fn button.go{background:#5a8dee;color:#fff;box-shadow:0 2px 0 #2f5fb8}
+.dev-shell.upgraded.dict .fn button.power{background:#e6eaf1;color:#c0c6d1}
+.dev-shell.upgraded.dict .row button{box-shadow:0 2px 0 #d5dae3}
+.dev-shell.upgraded.dict .row button.back{background:#e6eaf1;color:#5b6577;box-shadow:0 2px 0 #c3cad6}
+.dev-shell.upgraded.calc{background:linear-gradient(#ffffff,#e3e8ef);box-shadow:inset 0 -5px 0 rgba(120,135,160,.2),0 18px 40px rgba(0,0,0,.5)}
+.dev-shell.upgraded.calc .solar{visibility:hidden}
+.dev-shell.upgraded.calc .glass{height:110px;background:#0d1220;box-shadow:none}
+.dev-shell.upgraded.calc .keys button{background:#e6eaf1;color:#2b3142;box-shadow:0 2px 0 #c3cad6}
+.dev-shell.upgraded.calc .keys button.op,.dev-shell.upgraded.calc .keys button.fn{background:#d9dfe8}
+.dev-shell.upgraded.calc .keys button.eq{background:#5a8dee;color:#fff;box-shadow:0 2px 0 #2f5fb8}
+.dev-shell.upgraded.calc .note{color:#9aa4b5}

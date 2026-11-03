@@ -6,6 +6,7 @@
 // The game opens in English (README); `?lang=zh` opens in Chinese.
 import "./world/desktop/desktop.css";
 import "./world/room/room.css";
+import "./world/room/devices.css";
 import "./world/room/fx.css";
 import "./world/room/cursors.css";
 import "./world/motion/motion.css";

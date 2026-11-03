@@ -20,6 +20,7 @@ import type { ObjectEnv } from "@world/objects/program";
 import { STAGE_W } from "@world/room/splat/geometry";
 import { hasString, t, tr } from "@world/i18n";
 import { inDream } from "@state/nights";
+import { isDevice, renderDevice } from "@world/room/devices";
 
 /** A dot-matrix cell (half-width) of the dictionary. */
 export const CELL_W = 6;
@@ -217,6 +218,15 @@ function object(state: State, events: readonly GameEvent[], session: Session, id
   const { front, back } = extras(id, state, events, session, env, p);
   const open = id === "dictionary" ? (p as DictionaryState | null)?.open === true : id === "phone" ? (p as PhoneState | null)?.open === true : null;
   const attrs = raw(`${open === null ? "" : ` data-open="${open ? 1 : 0}"`}${using ? "" : ' data-action="obj-use"'}`);
+  // 使用 is the game's own drawing of the device (2026-11-03): for chick/pager/dictionary/calculator
+  // the face is a DOM/CSS device (no <img>), with real key buttons and the program's canvas. Holding
+  // keeps the photo, and the other objects keep the photo in 使用 too (for now).
+  if (using && isDevice(id)) {
+    const device = renderDevice(id, state, session, env.level, nowMs, open === true)!;
+    // The drawn device is the front; the back face (the chick's reset hole on day 12) stays, so a
+    // turn-over still works. `front` holds the device instead of the photo and its hotspots.
+    return html`<div class="${cls("held", "obj", "device", upgraded && "upgraded", "using", "focus")}" data-object="${id}" data-mode="using" data-face="${session.hand.face}"${attrs}><div class="breathe"><div class="turn"><div class="face front device-face">${session.hand.face === "front" ? device : null}</div><div class="face back"><div class="back-art"><img src="/objects/${id}_back.png" alt="" draggable="false">${back}</div></div></div></div></div>`;
+  }
   // 使用 is a focus view (2026-11-03, fixed): the whole front face fits inside the stage (≤ 88 % of
   // both dimensions, centred; the `.focus` class drives the fit). The behind dims to 70 % and blurs.
   return html`<div class="${cls("held", "obj", upgraded && "upgraded", using && "using", using && "focus")}" data-object="${id}" data-mode="${using ? "using" : "holding"}" data-face="${session.hand.face}"${attrs}><div class="breathe"><div class="turn"><div class="face front"><img src="${img}" alt="" draggable="false">${screen(id, state, env.level, heldUp, using)}${keys}${front}</div><div class="face back"><div class="back-art"><img src="/objects/${id}_back.png" alt="" draggable="false">${back}</div></div></div></div></div>`;
