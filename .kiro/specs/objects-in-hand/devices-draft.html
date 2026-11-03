@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>物件使用 · 界面稿</title>
+<style>
+:root{
+  --lcd:#b8c4a0; --lcd-dark:#a9b691; --ink:#25301f; --ghost:rgba(37,48,31,.075);
+  --room:#15161a;
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 50% 30%,#2a2c33 0%,var(--room) 70%);color:#ddd;font:14px/1.5 -apple-system,"PingFang SC",sans-serif;min-height:100vh}
+header{max-width:1180px;margin:0 auto;padding:28px 16px 8px}
+header h1{font-size:20px;margin:0 0 4px;color:#f2efe6}
+header p{margin:0;color:#9a9ca3;font-size:13px}
+.grid{max-width:1180px;margin:0 auto;padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:28px;align-items:center;justify-items:center}
+.cell{display:flex;flex-direction:column;align-items:center;gap:14px;padding:24px 8px}
+.cap{font-size:12px;color:#8d9097;text-align:center;max-width:320px}
+.cap b{color:#e9e4d6;font-weight:600}
+canvas.lcd{image-rendering:pixelated;display:block;max-width:100%;height:auto}
+.glass{overflow:hidden}
+@media (max-width:480px){.dict{zoom:.84}.pager{zoom:.95}}
+button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:active,button.down{transform:translateY(1px)}
+.dev:focus{outline:none}
+.dev.focused{filter:drop-shadow(0 0 0 transparent)}
+
+/* ——— chick: bootleg egg ——— */
+.egg{position:relative;width:300px;height:360px;border-radius:50% 50% 47% 47% / 58% 58% 42% 42%;
+  background:radial-gradient(ellipse at 34% 26%,#fff6c9 0%,#ffd84d 32%,#f2b519 70%,#d98f0c 100%);
+  box-shadow:inset -10px -14px 0 rgba(160,90,0,.25),inset 8px 10px 0 rgba(255,255,255,.35),0 18px 40px rgba(0,0,0,.5)}
+.egg::before{content:"";position:absolute;left:50%;top:-22px;width:34px;height:30px;margin-left:-17px;border:6px solid #c9ccd3;border-bottom:none;border-radius:20px 20px 0 0}
+.egg .bezel{position:absolute;left:50%;top:78px;width:200px;height:150px;margin-left:-100px;border-radius:46% 46% 40% 40% / 50% 50% 40% 40%;
+  background:#f7f3e6;box-shadow:inset 0 4px 0 rgba(0,0,0,.12)}
+.egg .glass{position:absolute;left:24px;top:22px;width:152px;height:106px;border-radius:10px;background:var(--lcd);box-shadow:inset 0 3px 0 var(--lcd-dark),inset 0 0 0 3px #8f9b78;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:6px 0}
+.egg .brand{position:absolute;top:44px;width:100%;text-align:center;font:700 13px/1 "Arial Rounded MT Bold","PingFang SC",sans-serif;color:#b8560a;letter-spacing:2px}
+.egg .btns{position:absolute;left:0;right:0;top:250px;display:flex;justify-content:center;gap:22px}
+.egg .btns button{width:40px;height:40px;border-radius:50%;border:none;background:radial-gradient(circle at 35% 30%,#ff8fa3,#e0395a 70%);box-shadow:0 4px 0 #9b1f39,inset 0 2px 0 rgba(255,255,255,.4);color:transparent}
+.egg .btns button:active,.egg .btns button.down{box-shadow:0 1px 0 #9b1f39;transform:translateY(3px)}
+.egg .lbl{position:absolute;left:0;right:0;top:298px;display:flex;justify-content:center;gap:50px;font:700 11px/1 sans-serif;color:#9a5a00}
+.egg .lbl span{width:12px;text-align:center}
+
+/* ——— pager ——— */
+.pager{position:relative;width:360px;height:178px;border-radius:26px 26px 30px 30px;background:linear-gradient(#3a3f4a,#22252c);box-shadow:inset 0 3px 0 rgba(255,255,255,.12),inset 0 -6px 0 rgba(0,0,0,.35),0 18px 40px rgba(0,0,0,.5)}
+.pager .win{position:absolute;left:22px;top:22px;width:256px;height:86px;border-radius:10px;background:#111;padding:9px}
+.pager .win .glass{width:100%;height:100%;border-radius:4px;background:var(--lcd);box-shadow:inset 0 2px 0 var(--lcd-dark);display:flex;align-items:center;justify-content:center}
+.pager .brand{position:absolute;left:24px;top:120px;font:700 12px/1 sans-serif;letter-spacing:3px;color:#8e95a3}
+.pager .brand small{display:block;font-weight:400;letter-spacing:1px;font-size:10px;color:#5d6370;margin-top:5px}
+.pager .side{position:absolute;right:20px;top:20px;display:grid;grid-template-columns:30px 30px;gap:10px}
+.pager .side button{width:30px;height:30px;border-radius:8px;border:none;background:#4b515e;box-shadow:0 3px 0 #15171c;color:#c9cdd6;font-size:11px}
+.pager .read{position:absolute;right:20px;bottom:22px;width:70px;height:40px;border-radius:20px;border:none;background:linear-gradient(#e2e6ee,#aab1bf);box-shadow:0 4px 0 #555c69;color:#2a2e36;font-weight:700;font-size:12px;letter-spacing:1px}
+.pager .light{position:absolute;left:180px;bottom:24px;width:58px;height:26px;border-radius:13px;border:none;background:#4b515e;box-shadow:0 3px 0 #15171c;color:#c9cdd6;font-size:11px}
+
+/* ——— dictionary: clamshell open ——— */
+.dict{width:430px;display:flex;flex-direction:column;align-items:center;filter:drop-shadow(0 18px 30px rgba(0,0,0,.5))}
+.dict .lid{width:410px;height:186px;border-radius:18px 18px 6px 6px;background:linear-gradient(#4a5878,#33405c);padding:18px 22px 12px;position:relative;transform:perspective(900px) rotateX(8deg);transform-origin:bottom}
+.dict .lid .glass{width:100%;height:118px;border-radius:6px;background:var(--lcd);box-shadow:inset 0 0 0 4px #1f2738,inset 0 6px 0 var(--lcd-dark);display:flex;align-items:center;justify-content:center}
+.dict .lid .brand{margin-top:10px;display:flex;justify-content:space-between;font:700 12px/1 sans-serif;color:#c7d0e6;letter-spacing:2px}
+.dict .lid .brand span:last-child{font-weight:400;color:#8692ad;letter-spacing:1px;font-size:10px}
+.dict .hinge{width:380px;height:12px;background:linear-gradient(#262d40,#3c4865);border-radius:3px}
+.dict .base{width:430px;border-radius:6px 6px 22px 22px;background:linear-gradient(#e9ecf2,#c9ced9);padding:14px 16px 18px;box-shadow:inset 0 -6px 0 rgba(0,0,0,.12)}
+.dict .fn{display:flex;gap:8px;margin-bottom:12px}
+.dict .fn button{flex:1;height:30px;border-radius:15px;border:none;background:#3b4560;color:#e7ebf5;font-size:11px;box-shadow:0 3px 0 #1e2333}
+.dict .fn button.power{flex:0 0 44px;background:#d8433b;box-shadow:0 3px 0 #7d1f1a}
+.dict .fn button.go{flex:1.6;background:#e98a1c;box-shadow:0 3px 0 #8a4c06;font-weight:700}
+.dict .row{display:flex;justify-content:center;gap:6px;margin-top:7px}
+.dict .row button{width:33px;height:31px;border-radius:9px;border:none;background:#fdfdfd;color:#2b3142;font-weight:700;font-size:13px;box-shadow:0 3px 0 #9aa1b1}
+.dict .row button.back{width:52px;font-size:11px;background:#3b4560;color:#e7ebf5;box-shadow:0 3px 0 #1e2333}
+
+/* ——— calculator ——— */
+.calc{width:270px;border-radius:22px;background:#3a302d;padding:20px 20px 22px;box-shadow:inset 0 3px 0 rgba(255,255,255,.08),inset 0 -6px 0 rgba(0,0,0,.35),0 18px 40px rgba(0,0,0,.5)}
+.calc .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.calc .top b{font:700 11px/1 sans-serif;color:#b9aba5;letter-spacing:2px}
+.calc .solar{display:flex;gap:2px;padding:3px;background:#1a1414;border-radius:3px}
+.calc .solar i{width:16px;height:12px;background:linear-gradient(135deg,#4a3a5c,#2a2036);border-radius:1px}
+.calc .glass{height:70px;border-radius:8px;background:var(--lcd);box-shadow:inset 0 3px 0 var(--lcd-dark),inset 0 0 0 3px #8f9b78;display:flex;align-items:center;justify-content:center;margin-bottom:16px;transition:filter .3s}
+.calc .keys{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.calc .keys button{height:38px;border-radius:9px;border:none;background:#76706d;color:#f4ece1;font-size:16px;box-shadow:0 3px 0 #241d1b}
+.calc .keys button.op{background:#5b524f}
+.calc .keys button.fn{background:#9b5d4c;font-size:12px}
+.calc .keys button.eq{background:#f26a2e;grid-row:span 2;height:auto;box-shadow:0 3px 0 #7a2e0d;font-size:20px}
+.calc .note{margin-top:10px;font:10px/1 sans-serif;color:#80736e;text-align:right;letter-spacing:1px}
+
+/* ——— switch ——— */
+.switch{display:inline-flex;margin-top:14px;background:#2a2c33;border-radius:18px;padding:3px}
+.switch button{border:none;background:none;color:#9a9ca3;padding:6px 16px;border-radius:15px;font-size:13px}
+.switch button.on{background:#f2efe6;color:#15161a}
+canvas.hi{display:none;width:100%;height:100%}
+body.up canvas.lcd{display:none}
+body.up canvas.hi{display:block}
+
+/* ——— upgraded: one white glossy family, smooth colour screens, no ghost, the same buttons ——— */
+body.up .egg{background:radial-gradient(ellipse at 34% 24%,#ffffff 0%,#f1f4f9 45%,#d9dfe8 100%);box-shadow:inset -10px -14px 0 rgba(120,135,160,.18),inset 8px 10px 0 rgba(255,255,255,.7),0 18px 40px rgba(0,0,0,.5)}
+body.up .egg .brand,body.up .pager .brand,body.up .dict .lid .brand span:first-child,body.up .calc .top b{color:#5a8dee}
+body.up .egg .bezel{background:#fff;box-shadow:none}
+body.up .egg .glass{padding:0;overflow:hidden;background:#0d1220;box-shadow:none;border-radius:16px}
+body.up .egg .btns button{background:#e6eaf1;box-shadow:0 2px 0 #c3cad6}
+body.up .egg .lbl{color:#9aa4b5}
+body.up .pager{background:linear-gradient(#ffffff,#e3e8ef);box-shadow:inset 0 -5px 0 rgba(120,135,160,.2),0 18px 40px rgba(0,0,0,.5)}
+body.up .pager .win{background:#fff;padding:6px}
+body.up .pager .win .glass{background:#0d1220;box-shadow:none}
+body.up .pager .side button,body.up .pager .light{background:#e6eaf1;color:#5b6577;box-shadow:0 2px 0 #c3cad6}
+body.up .pager .read{background:#5a8dee;color:#fff;box-shadow:0 3px 0 #2f5fb8}
+body.up .dict .lid{background:linear-gradient(#ffffff,#e6eaf1)}
+body.up .dict .lid .glass{background:#0d1220;box-shadow:inset 0 0 0 4px #fff}
+body.up .dict .hinge{background:#cfd5df}
+body.up .dict .base{background:#f6f8fb}
+body.up .dict .fn button{background:#e6eaf1;color:#5b6577;box-shadow:0 2px 0 #c3cad6}
+body.up .dict .fn button.go{background:#5a8dee;color:#fff;box-shadow:0 2px 0 #2f5fb8}
+body.up .dict .fn button.power{background:#e6eaf1;color:#c0c6d1}
+body.up .dict .row button{box-shadow:0 2px 0 #d5dae3}
+body.up .dict .row button.back{background:#e6eaf1;color:#5b6577;box-shadow:0 2px 0 #c3cad6}
+body.up .calc{background:linear-gradient(#ffffff,#e3e8ef);box-shadow:inset 0 -5px 0 rgba(120,135,160,.2),0 18px 40px rgba(0,0,0,.5)}
+body.up .calc .solar{visibility:hidden}
+body.up .calc .glass{height:110px;background:#0d1220;box-shadow:none}
+body.up .calc .keys button{background:#e6eaf1;color:#2b3142;box-shadow:0 2px 0 #c3cad6}
+body.up .calc .keys button.op,body.up .calc .keys button.fn{background:#d9dfe8}
+body.up .calc .keys button.eq{background:#5a8dee;color:#fff;box-shadow:0 2px 0 #2f5fb8}
+body.up .calc .note{color:#9aa4b5}
+body.up .calc .note::before{content:"新世界 · 一直亮着";}
+body.up .calc .note span{display:none}
+</style>
+</head>
+<body>
+<header>
+  <h1>使用的时候，它就是它自己</h1>
+  <p>拿在手里还是照片；点一下进入「使用」，换成这台画出来的机器。按键是真按钮，屏幕里没亮的像素和「8」透着底。点一下机器后，文曲星和计算器也能用电脑键盘。</p>
+  <div class="switch"><button class="on" data-mode="old">原来的</button><button data-mode="up">升级后</button></div>
+</header>
+<main class="grid">
+  <section class="cell">
+    <div class="dev egg" id="chick" tabindex="0">
+      <div class="brand">小 鸡</div>
+      <div class="bezel"><div class="glass">
+        <canvas class="lcd" id="chickIconsTop"></canvas>
+        <canvas class="lcd" id="chickLcd"></canvas>
+        <canvas class="lcd" id="chickIconsBot"></canvas>
+        <canvas class="hi" id="chickHi"></canvas>
+      </div></div>
+      <div class="btns"><button data-k="A" title="选">A</button><button data-k="B" title="确定">B</button><button data-k="C" title="取消">C</button></div>
+      <div class="lbl"><span>A</span><span>B</span><span>C</span></div>
+    </div>
+    <div class="cap"><b>电子宠物</b> · 32×16 像素，上下各四个图标。A 换图标，B 做，C 回去。画面是游戏里那套真帧。</div>
+  </section>
+
+  <section class="cell">
+    <div class="dev pager" id="pager" tabindex="0">
+      <div class="win"><div class="glass"><canvas class="lcd" id="pagerLcd"></canvas><canvas class="hi" id="pagerHi"></canvas></div></div>
+      <div class="brand">BP · 数字<small>呼我 · 我回</small></div>
+      <div class="side"><button data-k="up" title="上一条">▲</button><button data-k="fn" title="时间">FN</button><button data-k="down" title="下一条">▼</button><button data-k="light" title="背光">✷</button></div>
+      <button class="light" data-k="light" title="背光">灯</button>
+      <button class="read" data-k="read" title="读">READ</button>
+    </div>
+    <div class="cap"><b>BP 机</b> · 十二位数码管加一个信封。READ 看号码，▲▼ 翻十条，FN 看时间和电量。</div>
+  </section>
+
+  <section class="cell">
+    <div class="dev dict" id="dict" tabindex="0">
+      <div class="lid">
+        <div class="glass"><canvas class="lcd" id="dictLcd"></canvas><canvas class="hi" id="dictHi"></canvas></div>
+        <div class="brand"><span>★ 电子词典</span><span>E-C · 2×16</span></div>
+      </div>
+      <div class="hinge"></div>
+      <div class="base">
+        <div class="fn"><button class="power" data-k="power" title="开关">⏻</button><button data-k="up" title="上">▲</button><button data-k="down" title="下">▼</button><button class="go" data-k="lookup" title="查询">查 询</button></div>
+        <div class="row" data-row="QWERTYUIOP"></div>
+        <div class="row" data-row="ASDFGHJKL"></div>
+        <div class="row" data-row="ZXCVBNM"><button class="back" data-k="back" title="退格">⌫</button></div>
+      </div>
+    </div>
+    <div class="cap"><b>文曲星</b> · 翻盖，点阵两行十六格。打字母，按查询。试试 today、same。</div>
+  </section>
+
+  <section class="cell">
+    <div class="dev calc" id="calc" tabindex="0">
+      <div class="top"><b>SOLAR · 8</b><div class="solar"><i></i><i></i><i></i><i></i></div></div>
+      <div class="glass"><canvas class="lcd" id="calcLcd"></canvas><canvas class="hi" id="calcHi"></canvas></div>
+      <div class="keys">
+        <button class="fn" data-k="off">OFF</button><button class="fn" data-k="C">C</button><button class="op" data-k="%">%</button><button class="op" data-k="sqrt">√</button>
+        <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button><button class="op" data-k="div">÷</button>
+        <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button><button class="op" data-k="x">×</button>
+        <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button><button class="op" data-k="-">−</button>
+        <button data-k="0">0</button><button data-k=".">.</button><button class="eq" data-k="=">=</button><button class="op" data-k="+">+</button>
+      </div>
+      <div class="note"><span>没光就不亮</span></div>
+    </div>
+    <div class="cap"><b>计算器</b> · 八位数码管，太阳能。正常算数。倒过来读是字母，0.7734 就是 hELLO。</div>
+  </section>
+</main>
+<script>
+const FRAMES = {"frames": {"idle-1": ["................................", "................................", "................................", "..............#####.............", ".............#######............", "............##.####.#...........", "............#########...........", ".............###.###............", "............##.#####............", "...........###########..........", "...........###########..........", "...........###########..........", "............#########...........", ".............##...##............", "............##.....##...........", "................................"], "idle-2": ["................................", "................................", "..............#####.............", ".............#######............", "............##.####.#...........", "............#########...........", ".............###.###............", "............##.#####............", "...........###########..........", "...........###########..........", "...........###########..........", "............#########...........", ".............##...##............", "............##.....##...........", "................................", "................................"], "turn": ["................................", "................................", "................................", "..............#####.............", ".............#######............", "............#.####.##...........", "............#########...........", ".............###.###............", ".............#####.##...........", "...........###########..........", "...........###########..........", "...........###########..........", "............#########...........", ".............##...##............", "............##.....##...........", "................................"], "eat-1": ["................................", "..........................#.#...", ".........................#####..", ".........................#####..", "..........................###...", "............#########......#....", "...........###########..........", "...........###########..........", "...........###########..........", "............#########...........", ".............#######............", "..............######............", "...............##.###...........", ".............##...##............", "............##.....##...........", "................................"], "eat-2": ["................................", "..........................#.#...", ".........................#####..", ".........................#####..", "..........................###...", "...........................#....", "............#########...........", "...........###########..........", "...........###########..........", "...........###########..........", "............#########...........", ".............#######............", "..............######............", "...............##.###...........", ".............##...##............", "............##.....##..........."], "dark": ["................................", "................................", "................................", "................................", "................................", "................................", "................................", "............#....#..............", "................................", "................................", "................................", "................................", "................................", "................................", "................................", "................................"], "check": ["................................", "................................", "...#.#....#.#....#.#....#.#.....", "..#####..#####..#####..#.#.#....", "..#####..#####..#####..#...#....", "...###....###....###....#.#.....", "....#......#......#......#......", "................................", "................................", "................................", "........###...##................", "..........#..#..#...............", ".........#....###...............", ".........#......#...............", ".........#....##................", "................................"], "nod": ["................................", "................................", "................................", "................................", "...............#####............", "..............#######...........", ".............##.####.#..........", ".............#########..........", "..............###.###...........", ".............##.#####...........", "............###########.........", "............###########.........", "............###########.........", ".............#########..........", "..............##...##...........", ".............##.....##.........."], "grave": ["................................", "................................", "................................", "............#######.............", "...........#########............", "...........#.......#............", "...........#..#.#..#............", "...........#...#...#............", "...........#...#...#............", "...........#.......#............", "...........#.......#............", "........#..#.......#..#.........", ".......###.#.......#.###........", "......###################.......", "................................", "................................"], "smile-1": ["................................", "................................", "................................", "..............#####.............", ".............#######............", "............#.#####.#...........", "............#########...........", "............#.#####.#...........", ".............#.###.#............", "..............#####.............", "...........###########..........", "...........###########..........", "............#########...........", ".............##...##............", "............##.....##...........", "................................"], "smile-2": ["................................", "................................", "..............#####.............", ".............#######............", "............#.#####.#...........", "............#########...........", "............#.#####.#...........", ".............#.###.#............", "..............#####.............", "...........###########..........", "...........###########..........", "............#########...........", ".............##...##............", "............##.....##...........", "................................", "................................"]}, "icons": {"meal": ["....", "#..#", ".##.", ".##."], "light": [".##.", "####", ".##.", "..#."], "play": [".##.", "#..#", "#..#", ".##."], "medicine": ["....", "####", "#..#", "####"], "toilet": ["..#.", ".##.", "####", "...."], "checkup": ["#.#.", "####", ".##.", "..#."], "training": ["#..#", "####", "####", "#..#"], "attention": ["..#.", "..#.", "....", "..#."]}};
+const WORDS = [{"w": "today", "gloss": "今天"}, {"w": "again", "gloss": "再一次；又"}, {"w": "same", "gloss": "相同的"}, {"w": "no", "gloss": "不；没有"}, {"w": "stay", "gloss": "停留；留下"}, {"w": "leave", "gloss": "离开；留下（东西）"}, {"w": "keep", "gloss": "保留；继续"}, {"w": "give", "gloss": "给"}, {"w": "hand", "gloss": "手"}, {"w": "gap", "gloss": "缝；间隔"}, {"w": "boss", "gloss": "老板"}, {"w": "wage", "gloss": "工资"}, {"w": "owe", "gloss": "欠"}, {"w": "rent", "gloss": "租；房租"}, {"w": "home", "gloss": "家"}, {"w": "mother", "gloss": "母亲"}, {"w": "father", "gloss": "父亲"}, {"w": "teacher", "gloss": "老师"}, {"w": "chick", "gloss": "小鸡；雏鸟"}, {"w": "pager", "gloss": "寻呼机"}, {"w": "tape", "gloss": "磁带；胶带"}, {"w": "card", "gloss": "卡；卡片"}, {"w": "dictionary", "gloss": "词典"}, {"w": "calculator", "gloss": "计算器"}, {"w": "phone", "gloss": "电话"}, {"w": "dream", "gloss": "梦"}, {"w": "drawer", "gloss": "抽屉"}, {"w": "door", "gloss": "门"}, {"w": "lock", "gloss": "锁"}, {"w": "chain", "gloss": "链条"}, {"w": "eye", "gloss": "眼睛"}, {"w": "watch", "gloss": "看；手表"}, {"w": "read", "gloss": "读；阅读"}, {"w": "pixel", "gloss": "像素"}, {"w": "upgrade", "gloss": "升级"}, {"w": "replace", "gloss": "替换；取代"}, {"w": "polite", "gloss": "有礼貌的"}, {"w": "yes", "gloss": "是；好"}, {"w": "pretty", "gloss": "漂亮的"}, {"w": "model", "gloss": "模型；型号"}];
+const INK = '#25301f', GHOST = 'rgba(37,48,31,.075)';
+
+/* ——— a pixel LCD: each pixel a square with a hairline gap; unlit pixels show as ghost ——— */
+function pixelLcd(cv, w, h, px){
+  cv.width = w*px; cv.height = h*px; const g = cv.getContext('2d');
+  return bits => { g.clearRect(0,0,cv.width,cv.height);
+    for(let y=0;y<h;y++)for(let x=0;x<w;x++){ g.fillStyle = bits[y*w+x] ? INK : GHOST; g.fillRect(x*px, y*px, px-1, px-1); } };
+}
+const rowsToBits = rows => { const out=[]; rows.forEach(r=>[...r].forEach(c=>out.push(c==='#'?1:0))); return out; };
+
+/* ——— seven segments drawn as polygons, every unlit segment as ghost ——— */
+const SEG = {'0':'abcdef','1':'bc','2':'abdeg','3':'abcdg','4':'bcfg','5':'acdfg','6':'acdefg','7':'abc','8':'abcdefg','9':'abcdfg','-':'g',' ':'','E':'adefg','r':'eg','o':'cdeg','h':'cefg','L':'def','S':'acdfg','b':'cdefg'};
+function segCanvas(cv, cells, cw, ch){
+  const pad=8; cv.width = cells*cw + pad*2 + cw*0.2; cv.height = ch + pad*2; const g = cv.getContext('2d');
+  const t = Math.max(3, cw*0.16);
+  const poly = (pts)=>{ g.beginPath(); pts.forEach(([x,y],i)=> i?g.lineTo(x,y):g.moveTo(x,y)); g.closePath(); g.fill(); };
+  function seg(x0,y0,s){ const w=cw*0.72, h=ch/2, x=x0, y=y0, k=t/2, sk=cw*0.08;
+    const S = { a:[[x+k,y],[x+w-k,y],[x+w-k-t/2,y+t],[x+k+t/2,y+t]],
+      g:[[x+k,y+h],[x+k+t/2,y+h-t/2],[x+w-k-t/2,y+h-t/2],[x+w-k,y+h],[x+w-k-t/2,y+h+t/2],[x+k+t/2,y+h+t/2]],
+      d:[[x+k,y+2*h],[x+k+t/2,y+2*h-t],[x+w-k-t/2,y+2*h-t],[x+w-k,y+2*h]],
+      f:[[x,y+k],[x+t,y+k+t/2],[x+t,y+h-k-t/2],[x,y+h-k]], b:[[x+w,y+k],[x+w,y+h-k],[x+w-t,y+h-k-t/2],[x+w-t,y+k+t/2]],
+      e:[[x,y+h+k],[x+t,y+h+k+t/2],[x+t,y+2*h-k-t/2],[x,y+2*h-k]], c:[[x+w,y+h+k],[x+w,y+2*h-k],[x+w-t,y+2*h-k-t/2],[x+w-t,y+h+k+t/2]] };
+    for(const n of 'abcdefg'){ g.fillStyle = s.includes(n)?INK:GHOST; poly(S[n].map(([px,py])=>[px+sk*(1-(py-y0)/ch),py])); } }
+  return (text, dots=[]) => { g.clearRect(0,0,cv.width,cv.height);
+    const chars = text.padStart(cells,' ').slice(-cells);
+    for(let i=0;i<cells;i++){ const x = pad + i*cw; seg(x, pad, SEG[chars[i]] ?? '');
+      g.fillStyle = dots.includes(i)?INK:GHOST; g.fillRect(x+cw*0.8, pad+ch-t, t, t); } };
+}
+
+/* ——— chick ——— */
+(() => {
+  const draw = pixelLcd(chickLcd, 32, 16, 4);
+  const ICONS = Object.keys(FRAMES.icons);
+  const iconRow = (cv, list) => { cv.width = 4*(6*4)+3*12; cv.height = 6*4; return sel => { const g=cv.getContext('2d'); g.clearRect(0,0,cv.width,cv.height);
+    list.forEach((name,i)=>{ const bits=rowsToBits(FRAMES.icons[name]), on = ICONS.indexOf(name)===sel, ox=i*(24+12);
+      if(on){ g.fillStyle=INK; g.fillRect(ox,0,24,24); }
+      for(let y=0;y<4;y++)for(let x=0;x<4;x++){ const b=bits[y*4+x]; g.fillStyle = on ? (b?'#b8c4a0':'rgba(184,196,160,.15)') : (b?INK:GHOST); g.fillRect(ox+4+x*4, 4+y*4, 3, 3); } }); }; };
+  const top = iconRow(chickIconsTop, ICONS.slice(0,4)), bot = iconRow(chickIconsBot, ICONS.slice(4));
+  let sel = -1, act = null, actT = 0, tick = 0;
+  const ACT = {meal:'eat', light:'dark', checkup:'check'};
+  function frame(){
+    if(act==='eat'){ return (Math.floor((performance.now()-actT)/300)%2)?'eat-2':'eat-1'; }
+    if(act==='dark') return 'dark';
+    if(act==='check') return 'check';
+    if(act==='nod') return 'nod';
+    return tick%2 ? 'idle-2':'idle-1';
+  }
+  function render(){ draw(rowsToBits(FRAMES.frames[frame()])); top(sel); bot(sel); }
+  setInterval(()=>{ tick++; if(act && act!=='dark' && act!=='check' && performance.now()-actT>1200) act=null; render(); }, 300);
+  window.chickKey = k => { if(k==='A'){ sel=(sel+1)%8; act=null; } else if(k==='B'){ if(sel<0) return; act = ACT[ICONS[sel]] || 'nod'; actT=performance.now(); } else if(k==='C'){ act=null; sel=-1; } render(); beep(k==='B'?990:880); };
+  render();
+})();
+
+/* ——— pager ——— */
+(() => {
+  const draw = segCanvas(pagerLcd, 12, 17, 30);
+  const HIST = ['13901017734','010-8888505','345','2028110317'];
+  let i = -1, mode = 'idle';
+  const show = () => { if(mode==='idle') draw(''); else if(mode==='fn'){ const d=new Date(); draw(String(d.getHours()).padStart(2,'0')+'-'+String(d.getMinutes()).padStart(2,'0')+'    b 3',[]); } else draw(HIST[i]); };
+  window.pagerKey = k => { if(k==='read'){ mode='msg'; i=0; } else if(k==='up'&&mode==='msg'){ i=Math.max(0,i-1); } else if(k==='down'&&mode==='msg'){ i=Math.min(HIST.length-1,i+1); } else if(k==='fn'){ mode = mode==='fn'?'idle':'fn'; }
+    else if(k==='light'){ pager.querySelector('.glass').style.background = pager.querySelector('.glass').style.background ? '' : '#a8d7b0'; }
+    show(); beep(1600, .04); };
+  show();
+})();
+
+/* ——— dictionary: 2 rows × 16 cells, text rasterised small then shown pixelated, unlit dots as ghost ——— */
+(() => {
+  const COLS=16, CW=6, CH=12, PX=3;
+  const W = COLS*CW, H = 2*CH+1;
+  const off = document.createElement('canvas'); off.width=W; off.height=H; const og = off.getContext('2d',{willReadFrequently:true});
+  dictLcd.width = W*PX; dictLcd.height = H*PX; const g = dictLcd.getContext('2d');
+  let input = '', answer = null, on = true;
+  function render(){
+    og.clearRect(0,0,W,H); og.fillStyle='#000'; og.textBaseline='top';
+    const rows = !on ? ['',''] : answer ?? [input + '_', ''];
+    rows.forEach((r,ri)=>{ let x=0; for(const c of r){ const wide = c.charCodeAt(0)>255; og.font = wide ? '11px "PingFang SC",sans-serif' : '10px Menlo,monospace'; og.fillText(c, x+(wide?0:0.5), ri*CH+1); x += wide?CW*2:CW; } });
+    const d = og.getImageData(0,0,W,H).data;
+    g.clearRect(0,0,dictLcd.width,dictLcd.height);
+    for(let y=0;y<H;y++)for(let x=0;x<W;x++){ const a=d[(y*W+x)*4+3]; g.fillStyle = a>110 ? INK : GHOST; g.fillRect(x*PX,y*PX,PX-1,PX-1); }
+  }
+  document.querySelectorAll('.dict .row[data-row]').forEach(r=>{ const back=r.querySelector('.back'); [...r.dataset.row].forEach(L=>{ const b=document.createElement('button'); b.textContent=L; b.dataset.k=L; r.insertBefore(b, back); }); });
+  window.dictRows = () => !on ? ['',''] : (answer ?? [input, '']);
+  window.dictKey = k => {
+    if(k==='power'){ on=!on; input=''; answer=null; beep(660,.3); render(); return; }
+    if(!on) return;
+    if(/^[A-Z]$/.test(k)){ input = answer ? k.toLowerCase() : (input+k.toLowerCase()).slice(0,15); answer=null; }
+    else if(k==='back'){ if(answer) answer=null; else input=input.slice(0,-1); }
+    else if(k==='lookup' && input){ const w = WORDS.find(w=>w.w===input); answer = [input, w ? w.gloss : '未收录']; }
+    beep(1400,.03); render();
+  };
+  render();
+})();
+
+/* ——— calculator ——— */
+(() => {
+  const draw = segCanvas(calcLcd, 8, 22, 36);
+  let cur='0', acc=null, op=null, fresh=true, on=true; const hist=[]; window.calcHist=()=>hist; window.calcShown=()=>cur;
+  const fmt = n => { if(!isFinite(n)) return 'E'; let s = String(+n.toPrecision(8)); if(s.replace('-','').replace('.','').length>8) s = n.toExponential(2); return s.length>9?'E':s; };
+  const show = () => { if(!on){ draw(''); return; } const s=cur; const di = s.indexOf('.'); const digits = s.replace('.',''); const dots = di<0 ? [7] : [8-digits.length+di-1]; draw(digits, dots); };
+  const calc = (a,b,o) => o==='+'?a+b:o==='-'?a-b:o==='x'?a*b:o==='div'?a/b:b;
+  window.calcKey = k => {
+    if(k==='off'){ if(UP) return; on=false; show(); return; } if(!on){ on=true; cur='0'; acc=null; op=null; fresh=true; show(); return; }
+    if(/^[0-9]$/.test(k)){ cur = fresh||cur==='0' ? k : (cur.replace('.','').replace('-','').length<8 ? cur+k : cur); fresh=false; }
+    else if(k==='.'){ if(fresh){cur='0.';fresh=false;} else if(!cur.includes('.')) cur+='.'; }
+    else if(k==='C'){ cur='0'; acc=null; op=null; fresh=true; }
+    else if(k==='sqrt'){ cur=fmt(Math.sqrt(+cur)); fresh=true; }
+    else if(k==='%'){ cur=fmt(acc!==null? acc*(+cur)/100 : +cur/100); fresh=true; }
+    else if(['+','-','x','div'].includes(k)){ if(op&&!fresh) cur=fmt(calc(acc,+cur,op)); acc=+cur; op=k; fresh=true; }
+    else if(k==='='){ if(op){ const sym={'+':'+','-':'−','x':'×','div':'÷'}[op]; const r=fmt(calc(acc,+cur,op)); hist.push(`${acc} ${sym} ${cur} = ${r}`); cur=r; acc=null; op=null; fresh=true; } }
+    show();
+  };
+  show();
+})();
+
+
+/* ——— upgraded: the same devices, same keys, smooth colour screens (HiFrame: lines, picture, scroll) ——— */
+let UP = false;
+function hi(cv){ const r = cv.getBoundingClientRect(), d = devicePixelRatio||1; if(!r.width) return null;
+  if(cv.width !== Math.round(r.width*d)){ cv.width = Math.round(r.width*d); cv.height = Math.round(r.height*d); }
+  const g = cv.getContext('2d'); g.setTransform(d,0,0,d,0,0); g.clearRect(0,0,r.width,r.height); return [g, r.width, r.height]; }
+const FONT = '-apple-system,"PingFang SC",sans-serif';
+const HI = {
+  chick(){ const h = hi(chickHi); if(!h) return; const [g,w,H] = h;
+    const grad = g.createLinearGradient(0,0,0,H); grad.addColorStop(0,'#1b2a4a'); grad.addColorStop(1,'#0d1220'); g.fillStyle=grad; g.fillRect(0,0,w,H);
+    const bits = rowsToBits(FRAMES.frames[(Math.floor(performance.now()/900)%2)?'smile-2':'smile-1']), s = Math.min(w/34, H/20), ox=(w-32*s)/2, oy=(H-16*s)/2-6;
+    for(let y=0;y<16;y++)for(let x=0;x<32;x++) if(bits[y*32+x]){ g.fillStyle='#ffd23f'; g.beginPath(); g.arc(ox+x*s+s/2, oy+y*s+s/2, s*0.62, 0, 7); g.fill(); }
+    g.fillStyle='#8fb4ff'; g.font=`10px ${FONT}`; g.textAlign='center'; g.fillText('已自动喂食 · 心情 100%', w/2, H-8); },
+  pager(){ const h = hi(pagerHi); if(!h) return; const [g,w,H] = h; g.fillStyle='#0d1220'; g.fillRect(0,0,w,H);
+    const lines = ['老王：在吗，通个话','（已为你翻译成中文）','妈妈：吃饭了吗','（已为你回复：吃了）'], i = Math.floor(performance.now()/2200)%lines.length;
+    g.fillStyle='#fff'; g.font=`600 15px ${FONT}`; g.fillText(lines[i], 12, H/2-2); g.fillStyle='#8fb4ff'; g.font=`11px ${FONT}`; g.fillText(lines[(i+1)%lines.length], 12, H/2+18); },
+  dict(){ const h = hi(dictHi); if(!h) return; const [g,w,H] = h; g.fillStyle='#0d1220'; g.fillRect(0,0,w,H);
+    const [a,b] = window.dictRows ? dictRows() : ['','']; g.fillStyle='#fff'; g.font=`600 18px ${FONT}`; g.fillText(a||'输入一句话', 16, 40);
+    g.fillStyle='#8fb4ff'; g.font=`15px ${FONT}`; g.fillText(b ? b + '  🔊' : '整句翻译，并朗读', 16, 72); },
+  calc(){ const h = hi(calcHi); if(!h) return; const [g,w,H] = h; g.fillStyle='#0d1220'; g.fillRect(0,0,w,H); g.textAlign='right';
+    const hist = window.calcHist ? calcHist() : []; g.fillStyle='#5f6b85'; g.font=`12px ${FONT}`; hist.slice(-3).forEach((l,i,arr)=>g.fillText(l, w-12, 22+i*16 + (3-arr.length)*16));
+    g.fillStyle='#fff'; g.font=`300 32px ${FONT}`; g.fillText(window.calcShown ? calcShown() : '0', w-12, H-14); },
+};
+setInterval(()=>{ if(UP) Object.values(HI).forEach(f=>f()); }, 120);
+document.querySelectorAll('.switch button').forEach(b=>b.addEventListener('click',()=>{ UP = b.dataset.mode==='up'; document.body.classList.toggle('up',UP); document.querySelectorAll('.switch button').forEach(x=>x.classList.toggle('on',x===b)); }));
+
+/* ——— sound: one short square-wave beep, the only "sound asset" in the draft ——— */
+let ac; function beep(f=880, d=.06){ try{ ac = ac || new AudioContext(); const o=ac.createOscillator(), v=ac.createGain(); o.type='square'; o.frequency.value=f; v.gain.value=.04; o.connect(v).connect(ac.destination); o.start(); o.stop(ac.currentTime+d);}catch(e){} }
+
+/* ——— wiring: every device's buttons, plus the computer keyboard for the one last clicked ——— */
+const HANDLER = { chick: k=>chickKey(k), pager: k=>pagerKey(k), dict: k=>dictKey(k), calc: k=>calcKey(k) };
+let active = null;
+document.querySelectorAll('.dev').forEach(dev => {
+  dev.addEventListener('pointerdown', () => { active = dev.id; document.querySelectorAll('.dev').forEach(d=>d.classList.toggle('focused', d===dev)); });
+  dev.addEventListener('click', e => { const b = e.target.closest('button[data-k]'); if(b) HANDLER[dev.id](b.dataset.k); });
+});
+const press = (id,k) => { const b = document.querySelector(`#${id} button[data-k="${CSS.escape(k)}"]`); if(b){ b.classList.add('down'); setTimeout(()=>b.classList.remove('down'),80); } HANDLER[id](k); };
+addEventListener('keydown', e => {
+  if(active==='dict'){ const k=e.key; if(/^[a-z]$/i.test(k)) press('dict',k.toUpperCase()); else if(k==='Enter') press('dict','lookup'); else if(k==='Backspace') press('dict','back'); else return; e.preventDefault(); }
+  if(active==='calc'){ const map={'*':'x','/':'div','Enter':'=','=':'=','Backspace':'C','Escape':'C'}; const k = map[e.key] ?? e.key; if(/^[0-9.+\-%=C]$/.test(k)||k==='x'||k==='div'){ press('calc',k); e.preventDefault(); } }
+});
+</script>
+</body>
+</html>
