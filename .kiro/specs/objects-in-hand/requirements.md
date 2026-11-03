@@ -80,3 +80,18 @@ Tests: the device canvas's backing is channel × 16 and its CSS fills the glass;
 - **The chick's back is drawn too** when it is a device in 使用 (today 使用 + back shows the photo `chick_back.png`): the same egg, a warmer shade, a battery cover with one screw and `⇩ LR44 × 2`, the reset pinhole as a real button (`data-action="obj-key" data-object="chick" data-key="reset"`, hover `obj.key.chick.reset`) with the label RESET under it. Upgraded: the white family. Pressing it keeps today's behaviour (the screen flashes once when you turn back; nothing else).
 - The buttons are `button[data-action="obj-flip"]` / `button[data-action="obj-rotate"]` (names may differ), text from strings, rendered under the device/face inside the focus view, never on holding.
 Tests: in 使用, chick/iccard/phone/textbook show the flip button and not rotate; calculator shows rotate and not flip; pager/dictionary/tape show neither. Flip from 使用 changes `session.hand.face` and keeps `using`; the chick's reset reaches the program only with the back up. Rotate sets the roll to 180 and back to 0; with 0.7734 entered, the calculator program reads upside down at 180 (reuse the existing upside-down test). The chick device back has the reset button and no `img`.
+
+## Correction 2026-11-03 (author): the walkman is drawn too; every printed word comes from strings
+
+The tape joins chick, pager, dictionary and calculator as a drawn device in 使用 (`isDevice("tape")`, `DEVICE_IDS`). Holding keeps the photo with its reels as today. Look: the walkman in `devices-draft.html`.
+
+- **Body**: the deck with a cassette window. The window shows the cassette drawn from the program: two reels whose pack radii come from `packRadii(tapePos(...))` and whose spokes turn by `reelAngles(...)`, so one pack grows as the other shrinks. Brand line `obj.brand.tape` / `obj.brand.tape.sub`, cassette label `obj.tape.label`.
+- **Keys**: four piano keys on top, `rew` `play` `ff` `stop`, real `<button data-action="obj-key" data-object="tape" data-key="…">` with hover labels `obj.key.tape.*`. They latch: the key of the current `mode` stays pressed down until `stop` (or another key) releases it; `stop` itself springs back. Symbols ◀◀ ▶ ▶▶ ■ are drawn, not strings.
+- **Volume**: a wheel on the side with `vol+` / `vol-` buttons above and below (keys `vol+` / `vol-`); the red mark on the wheel sits at `volume / VOLUME_MAX`. Dragging the wheel up or down sends `vol+` / `vol-` per step.
+- **Cord**: the earphone cord (SVG path from the jack) sways while `mode` is `play` and hangs still otherwise. Respect reduced motion (no sway).
+- **Upgraded**: white family; the window is the dark glass with the transcript as a smooth HiFrame scrolling (`transcript(env)`, `TRANSCRIPT_SCROLL_MS`); the reels are drawn but do not turn.
+- No flip, no rotate (already in the G tests).
+
+**Every printed word on a device comes from strings.** Keycap words `obj.cap.<object>.<id>`, brand lines `obj.brand.*`, `obj.tape.label`, notes `obj.<object>.*`. Symbols (▲ ▼ ■ ▶ ◀ ⌫ ⏻ √ ÷ × − + = .), digits and Latin keyboard letters are drawn as-is. All keys exist in zh and en.
+
+Tests: tape in 使用 renders the device (no `img`), four keys plus vol+/vol- as `obj-key` buttons; after `play` the play key has the pressed state and after `stop` none does; the reel radii in the rendered window follow `packRadii` at two positions (left larger at the start, right larger near the end); upgraded shows the transcript and the reels do not change between two times; the cord sways only in play. Locale: for every drawn device, switching zh → en changes the brand line and keycap words and leaves every symbol/digit/letter key unchanged; no device renders a CJK character under `lang=en`.
