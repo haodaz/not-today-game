@@ -138,9 +138,17 @@
       "when": "night"
     },
     {
+      "id": "task3",
+      "text": "三张图，交到群里。",
+      "unlock": "done:reply",
+      "done": "flag:task_d8_3",
+      "required": true,
+      "when": "night"
+    },
+    {
       "id": "desk",
       "text": "看一眼桌子。",
-      "unlock": "done:reply",
+      "unlock": "done:task3",
       "done": "event:beat:desk",
       "required": true,
       "when": "night"

@@ -1,7 +1,7 @@
 // The checklist (今日): a pure function of the day file, the state and today's events (design L3).
 // Nothing about it is stored. At most the current item and the next unlocked one are shown, plus
 // any item waiting on a delivery (rewrite, L4); finished items collapse into a count.
-import { dayFile, type DayFile, type EventToken, type Item, type Token } from "@state/days/table";
+import { CALL_ITEM_ID, dayFile, type DayFile, type EventToken, type Item, type Token } from "@state/days/table";
 import type { GameEvent } from "@state/events";
 import type { State } from "@state/types.gen";
 
@@ -180,6 +180,8 @@ export function checklist(ctx: LoopContext): ChecklistView {
       continue;
     }
     if (!st.unlocked) continue;
+    // The call's gate only holds nightfall back; it has no line of its own (the call shows on 屏幕).
+    if (it.id === CALL_ITEM_ID) continue;
     const locked = it.locked === "requiredPending" && pending.length > 0;
     if (isBed(it) && !locked) bedOpen = true;
     open.push({ id: it.id, text: it.text, state: locked ? "locked" : "next" });

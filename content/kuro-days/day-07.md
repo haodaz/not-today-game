@@ -1,6 +1,6 @@
 # Day 7
 
-**Idiom of the day (constant):** Good to see you, [name].
+**Idiom of the day (constant):** Good to see you.
 **Idiom of the day (zh):** 有我在。
 
 **Stance:** Says the name as if it had always had it. How: 'You told me once. Or someone did. I keep things.' Why: the red-blue line. The toggles: 'I know. I saw you do it.' No apology for the name.

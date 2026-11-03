@@ -159,6 +159,87 @@
           "letItDoUnchecked": 1
         }
       }
+    },
+    {
+      "id": "task3",
+      "title": "把这份 BP 细节看下。",
+      "app": "docs",
+      "done": "task_d9_3",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "别人家的商业计划书，六十二页。第 9 页有一张图，你认得，是你的图 2。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你从头看到尾。第 9 页那张图，配色换了，箭头没换。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d9_3",
+            "saw_own_map"
+          ],
+          "san": 1
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "它列了十二条要点。第 9 页那一条写着「与我方思路高度一致」。"
+          }
+        ],
+        "kuro": [
+          "Page nine is yours. I did not say so in the list."
+        ],
+        "effects": {
+          "flags": [
+            "task_d9_3",
+            "saw_own_map"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "三秒，一页摘要，十二条要点。"
+          }
+        ],
+        "kuro": [
+          "Summarised. He will not read it either."
+        ],
+        "effects": {
+          "flags": [
+            "task_d9_3"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
     }
   ]
 }

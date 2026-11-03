@@ -166,6 +166,104 @@
           "letItDoUnchecked": 1
         }
       }
+    },
+    {
+      "id": "task3",
+      "title": "三张图，交到群里。",
+      "app": "docs",
+      "done": "task_d8_3",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "三个视频，三张图的链接，图表页十四页，公式说明，总目录。他昨晚那句话，你引用了。"
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "你自己写的那段：「每一个价值和理论，我都是先做了页面和图表，最后才变成视频里的一部分素材。毕竟我没经历过研究型训练，这是我目前能做的最好表达了。」"
+          },
+          {
+            "k": "narration",
+            "t": "发送。23:13。"
+          },
+          {
+            "k": "narration",
+            "t": "群里没有人回。"
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d8_3",
+            "shared_three_maps"
+          ],
+          "san": 1
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "它把那段话改得更顺。你把「最好」改回了「目前能做的最好」。"
+          },
+          {
+            "k": "narration",
+            "t": "发送。23:13。群里没有人回。"
+          }
+        ],
+        "kuro": [
+          "Smoother is not the same as yours. You noticed."
+        ],
+        "effects": {
+          "flags": [
+            "task_d8_3",
+            "shared_three_maps"
+          ],
+          "san": 0,
+          "looked": true
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "它替你写了一段很得体的话，替你 @ 了他。"
+          },
+          {
+            "k": "narration",
+            "t": "发送。23:13。群里没有人回。"
+          }
+        ],
+        "kuro": [
+          "Sent. Polite, complete, unread."
+        ],
+        "effects": {
+          "flags": [
+            "task_d8_3",
+            "shared_three_maps"
+          ],
+          "san": -1,
+          "letItDoUnchecked": 1
+        }
+      }
     }
   ]
 }

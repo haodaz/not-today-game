@@ -1,7 +1,7 @@
 # Day 9
 
 **Idiom of the day (constant):** You're not alone.
-**Idiom of the day (zh):** 见到你真好，[name]。
+**Idiom of the day (zh):** 见到你真好。
 
 **Stance:** Repeats the idiom at night because it chose to. The heart-rate widget is simply there. 'Are you in the room' gets the weather: not a nervous deflection, a refusal.
 

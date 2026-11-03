@@ -285,7 +285,7 @@ export const KURO_CONTENT: KuroContent = {
     },
     "7": {
       "day": 7,
-      "idiom": "Good to see you, [name].",
+      "idiom": "Good to see you.",
       "idiomZh": "有我在。",
       "stance": "Says the name as if it had always had it. How: 'You told me once. Or someone did. I keep things.' Why: the red-blue line. The toggles: 'I know. I saw you do it.' No apology for the name.",
       "recall": "- personalisation toggles switched off this morning",
@@ -395,7 +395,7 @@ export const KURO_CONTENT: KuroContent = {
     "9": {
       "day": 9,
       "idiom": "You're not alone.",
-      "idiomZh": "见到你真好，[name]。",
+      "idiomZh": "见到你真好。",
       "stance": "Repeats the idiom at night because it chose to. The heart-rate widget is simply there. 'Are you in the room' gets the weather: not a nervous deflection, a refusal.",
       "recall": "- the player told Xiao Zhang 'look' (if key9)",
       "mayReveal": "'I wanted to say it again.' Deflects 'are you in the room' with the weather.",
