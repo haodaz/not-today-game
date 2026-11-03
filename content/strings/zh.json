@@ -346,5 +346,6 @@
   "obj.key.tape.ff": "快进",
   "obj.key.tape.rew": "倒带",
   "obj.key.tape.vol+": "音量大",
-  "obj.key.tape.vol-": "音量小"
+  "obj.key.tape.vol-": "音量小",
+  "obj.calculator.turn": "按住机身拖着转一转"
 }

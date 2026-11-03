@@ -346,5 +346,6 @@
   "obj.key.tape.ff": "fast forward",
   "obj.key.tape.rew": "rewind",
   "obj.key.tape.vol+": "volume up",
-  "obj.key.tape.vol-": "volume down"
+  "obj.key.tape.vol-": "volume down",
+  "obj.calculator.turn": "hold the body and turn it"
 }
