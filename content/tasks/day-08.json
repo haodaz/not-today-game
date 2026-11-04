@@ -4,81 +4,132 @@
   "tasks": [
     {
       "id": "task1",
-      "title": "两份计费模块。",
+      "title": "团建排期：各位领导的祝酒时间。",
       "app": "code",
       "done": "task_d8_1",
-      "start": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "老板只收到两份。"
-          }
+      "board": {
+        "kind": "table",
+        "title": "周五线上团建 · 祝酒时间",
+        "columns": [
+          "",
+          "领导",
+          "时间"
         ],
-        "options": [
+        "given": {
+          "rows": {
+            "r1": "老王",
+            "r2": "Vivi",
+            "r3": "老周",
+            "r4": "客人"
+          },
+          "lock": {
+            "object": "calculator",
+            "codes": [
+              "17:12",
+              "18:05",
+              "16:40"
+            ],
+            "answer": "17:12"
+          }
+        },
+        "slots": [
           {
-            "mode": "self",
-            "goto": "self"
+            "id": "r1",
+            "label": "老王",
+            "answer": "c1"
           },
           {
-            "mode": "look",
-            "goto": "look"
+            "id": "r2",
+            "label": "Vivi",
+            "answer": "c2"
           },
           {
-            "mode": "let",
-            "goto": "let"
-          }
-        ]
-      },
-      "self": {
-        "say": [
+            "id": "r3",
+            "label": "老周",
+            "answer": "c3"
+          },
           {
-            "k": "narration",
-            "t": "你重做了两份。"
+            "id": "r4",
+            "label": "客人",
+            "answer": "c4"
           }
         ],
-        "kuro": [],
-        "effects": {
-          "flags": [
-            "task_d8_1"
-          ]
-        }
-      },
-      "look": {
-        "say": [
+        "cards": [
           {
-            "k": "narration",
-            "t": "它出了，你看了。"
+            "id": "c1",
+            "text": "15:00 到日落（日落 17:12）",
+            "from": {
+              "file": "t-ranks"
+            },
+            "hint": "在共享盘的「职级与时段」表里，日落要算"
+          },
+          {
+            "id": "c2",
+            "text": "改天（要晴天，今天有雨）",
+            "from": {
+              "file": "t-ranks"
+            },
+            "hint": "在「职级与时段」表里，再看一眼天气"
+          },
+          {
+            "id": "c3",
+            "text": "任何时辰",
+            "from": {
+              "file": "t-ranks"
+            },
+            "hint": "在「职级与时段」表里"
+          },
+          {
+            "id": "c4",
+            "text": "到了再开",
+            "from": {
+              "conv": "group"
+            },
+            "hint": "在群消息里"
+          },
+          {
+            "id": "d1",
+            "text": "大家都 7 点，统一好管理",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "在 Vivi 的私聊里"
+          },
+          {
+            "id": "d2",
+            "text": "不用排，各吃各的",
+            "from": {
+              "conv": "xiaozhang"
+            },
+            "hint": "在小张的私聊里"
           }
         ],
-        "kuro": [
-          "Here are two. I kept the other four."
-        ],
-        "effects": {
-          "flags": [
-            "task_d8_1",
-            "asked_kept"
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "c2",
+            "r3": "c3",
+            "r4": "k1"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "你：任何时辰"
+            }
           ],
-          "looked": true,
-          "assimilation": 1
+          "unlock": "17:12"
         }
       },
-      "let": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "它出了。"
-          }
-        ],
-        "kuro": [
-          "Done."
-        ],
-        "effects": {
-          "flags": [
-            "task_d8_1"
-          ],
-          "letItDoUnchecked": 1,
-          "assimilation": 4
-        }
+      "deliverable": {
+        "id": "d8-toasts",
+        "label": "团建排期",
+        "to": "group"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -3,
+        "wrong": -6,
+        "wrongAt": 2
       }
     },
     {

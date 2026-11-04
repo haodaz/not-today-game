@@ -284,7 +284,7 @@
     ],
     "task": {
       "id": "task4",
-      "text": "对比一下。明天早上要。",
+      "text": "晨会纪要，按模板。",
       "unlock": "start",
       "done": "flag:task_d7_4",
       "required": true,

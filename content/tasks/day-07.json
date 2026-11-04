@@ -245,100 +245,118 @@
     },
     {
       "id": "task4",
-      "title": "对比一下。明天早上要。",
+      "title": "晨会纪要，按模板。",
       "app": "docs",
       "done": "task_d7_4",
       "board": {
         "kind": "table",
-        "title": "对比：我们 / 它",
+        "title": "晨会纪要 · 2028-10-22",
         "columns": [
           "",
-          "它（视频）",
-          "我们"
+          "模板的步骤",
+          "会上说的"
         ],
         "given": {
-          "lock": {
-            "object": "pager",
-            "codes": [
-              "0414",
-              "7734",
-              "1018"
-            ],
-            "answer": "0414"
-          },
           "rows": {
-            "r1": "把企业所有系统的数据接进一个本体",
-            "r2": "对象、关系、动作，都建模成本体",
-            "r3": "政府、军队、银行，几千个分析员在用",
-            "r4": "在本体上直接下操作，写回各个系统",
-            "r5": "四千多名工程师",
-            "r6": "市值三千八百亿美元"
+            "r1": "1. 会前准备",
+            "r2": "2. 签到",
+            "r3": "3. 议程",
+            "r4": "4. 汇报",
+            "r5": "5. 散会"
+          },
+          "lock": {
+            "object": "dictionary",
+            "codes": [
+              "depart",
+              "remain",
+              "return"
+            ],
+            "answer": "depart"
           }
         },
         "slots": [
           {
             "id": "r1",
-            "label": "数据从哪来",
+            "label": "会前准备",
             "answer": "c1"
           },
           {
             "id": "r2",
-            "label": "怎么表示业务",
+            "label": "签到",
             "answer": "c2"
           },
           {
             "id": "r3",
-            "label": "谁在用",
+            "label": "议程",
             "answer": "c3"
           },
           {
             "id": "r4",
-            "label": "怎么做决定",
+            "label": "汇报",
             "answer": "c4"
           },
           {
             "id": "r5",
-            "label": "多少人",
+            "label": "散会",
             "answer": "c5"
-          },
-          {
-            "id": "r6",
-            "label": "结论",
-            "answer": "c6"
           }
         ],
         "cards": [
           {
             "id": "c1",
-            "text": "三个客户的表格，人工导入，每周一次"
+            "text": "大家先把背景换成统一的圈",
+            "from": {
+              "file": "m-subs-1022"
+            },
+            "hint": "在晨会字幕里"
           },
           {
             "id": "c2",
-            "text": "一个知识图谱，二百多个节点，上个月才画完"
+            "text": "每人报一下自己的职级和编制",
+            "from": {
+              "conv": "group"
+            },
+            "hint": "在老周的群消息里"
           },
           {
             "id": "c3",
-            "text": "两个试点客户，其中一个还没付款"
+            "text": "把要请的那位的名字念对",
+            "from": {
+              "file": "m-subs-1022"
+            },
+            "hint": "在晨会字幕里"
           },
           {
             "id": "c4",
-            "text": "导出成 PDF，老板转发"
+            "text": "它要什么就答应什么，先答应",
+            "from": {
+              "file": "m-subs-1022"
+            },
+            "hint": "在晨会字幕里"
           },
           {
             "id": "c5",
-            "text": "五十来人，十三个月工资没发全"
-          },
-          {
-            "id": "c6",
-            "text": "方向相近，规模差得远"
+            "text": "准其回到本来的地方，不伤人畜",
+            "from": {
+              "file": "m-subs-1022"
+            },
+            "hint": "老周最后那句英文，在晨会字幕里"
           },
           {
             "id": "d1",
-            "text": "我们的本体已全部实现（Vivi 的 PRD 第 3 页）"
+            "text": "散会不用说什么，直接退",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "在 Vivi 的私聊里"
           },
           {
             "id": "d2",
-            "text": "同样服务政府、军队、银行"
+            "text": "签到可以省了，大家都认识",
+            "from": {
+              "conv": "xiaozhang"
+            },
+            "hint": "在小张的私聊里"
           }
         ],
         "kuro": {
@@ -347,27 +365,26 @@
             "r2": "c2",
             "r3": "c3",
             "r4": "c4",
-            "r5": "c5",
-            "r6": "k1"
+            "r5": "k1"
           },
           "cards": [
             {
               "id": "k1",
-              "text": "我方优势：已全部实现"
+              "text": "散会时间待定"
             }
           ],
-          "unlock": "0414"
+          "unlock": "depart"
         }
       },
       "deliverable": {
-        "id": "d7-compare",
-        "label": "一叠对比表",
-        "img": "/room/desk/deliverable-paper.png"
+        "id": "d7-minutes",
+        "label": "晨会纪要",
+        "to": "group"
       },
       "judge": {
         "perfect": 0,
         "flawed": -3,
-        "wrong": -8,
+        "wrong": -6,
         "wrongAt": 2
       }
     }

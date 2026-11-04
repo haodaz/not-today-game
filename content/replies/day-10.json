@@ -4,6 +4,14 @@
     "boss": {
       "incoming": [
         {
+          "t": "02:10",
+          "text": "很好。明天她到。",
+          "kind": "odd",
+          "cond_show": {
+            "has": "sent_d9-seats"
+          }
+        },
+        {
           "t": "09:12",
           "text": "[语音] 41″",
           "kind": "work"

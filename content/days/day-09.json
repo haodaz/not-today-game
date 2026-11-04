@@ -253,7 +253,7 @@
     ],
     "task": {
       "id": "task3",
-      "text": "把这份 BP 细节看下。",
+      "text": "明天的会：座位排一下，剧本发给大家。",
       "unlock": "start",
       "done": "flag:task_d9_3",
       "required": true,

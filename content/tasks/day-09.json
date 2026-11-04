@@ -160,82 +160,153 @@
     },
     {
       "id": "task3",
-      "title": "把这份 BP 细节看下。",
+      "title": "明天的会：座位排一下，剧本发给大家。",
       "app": "docs",
       "done": "task_d9_3",
-      "start": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "别人家的商业计划书，六十二页。第 9 页有一张图，你认得，是你的图 2。"
-          }
+      "board": {
+        "kind": "table",
+        "title": "线上会议室 · 座位",
+        "columns": [
+          "",
+          "座位",
+          "谁"
         ],
-        "options": [
+        "given": {
+          "rows": {
+            "r1": "圈 · 主持",
+            "r2": "圈 · 1",
+            "r3": "圈 · 2",
+            "r4": "圈 · 3",
+            "r5": "三角",
+            "r6": "剧本"
+          }
+        },
+        "slots": [
           {
-            "mode": "self",
-            "goto": "self"
+            "id": "r1",
+            "label": "圈 · 主持",
+            "answer": "c1"
           },
           {
-            "mode": "look",
-            "goto": "look"
+            "id": "r2",
+            "label": "圈 · 1",
+            "answer": "c2"
           },
           {
-            "mode": "let",
-            "goto": "let"
-          }
-        ]
-      },
-      "self": {
-        "say": [
+            "id": "r3",
+            "label": "圈 · 2",
+            "answer": "c3"
+          },
           {
-            "k": "narration",
-            "t": "你从头看到尾。第 9 页那张图，配色换了，箭头没换。"
-          }
-        ],
-        "kuro": [],
-        "effects": {
-          "flags": [
-            "task_d9_3",
-            "saw_own_map"
-          ]
-        }
-      },
-      "look": {
-        "say": [
+            "id": "r4",
+            "label": "圈 · 3",
+            "answer": "c4"
+          },
           {
-            "k": "narration",
-            "t": "它列了十二条要点。第 9 页那一条写着「与我方思路高度一致」。"
+            "id": "r5",
+            "label": "三角",
+            "answer": "c5"
+          },
+          {
+            "id": "r6",
+            "label": "剧本",
+            "answer": "c6"
           }
         ],
-        "kuro": [
-          "Page nine is yours. I did not say so in the list."
+        "cards": [
+          {
+            "id": "c1",
+            "text": "老周",
+            "from": {
+              "conv": "laozhou"
+            },
+            "hint": "在老周的私聊里"
+          },
+          {
+            "id": "c2",
+            "text": "老王（我坐中间）",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "在老王的消息里"
+          },
+          {
+            "id": "c3",
+            "text": "Vivi",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "在 Vivi 的私聊里"
+          },
+          {
+            "id": "c4",
+            "text": "你（你也要在）",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "在老王的消息里"
+          },
+          {
+            "id": "c5",
+            "text": "贵客（名字不念）",
+            "from": {
+              "file": "m-shot-1022"
+            },
+            "hint": "在晨会截图里，多出来的那一格"
+          },
+          {
+            "id": "c6",
+            "text": "《黄衣之王》第一幕",
+            "from": {
+              "file": "s-script"
+            },
+            "hint": "在剧本里：第一幕排在后面"
+          },
+          {
+            "id": "d1",
+            "text": "三角：Vivi（她想坐 C 位）",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "在 Vivi 的私聊里"
+          },
+          {
+            "id": "d2",
+            "text": "剧本：第二幕",
+            "from": {
+              "file": "s-script"
+            },
+            "hint": "在剧本里：排在前面的那一幕"
+          }
         ],
-        "effects": {
-          "flags": [
-            "task_d9_3",
-            "saw_own_map"
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "c2",
+            "r3": "c3",
+            "r4": "c4",
+            "r5": "k1",
+            "r6": "c6"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "三角：你"
+            }
           ],
-          "looked": true,
-          "assimilation": 1
+          "unlock": "-"
         }
       },
-      "let": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "三秒，一页摘要，十二条要点。"
-          }
-        ],
-        "kuro": [
-          "Summarised. He will not read it either."
-        ],
-        "effects": {
-          "flags": [
-            "task_d9_3"
-          ],
-          "letItDoUnchecked": 1,
-          "assimilation": 4
-        }
+      "deliverable": {
+        "id": "d9-seats",
+        "label": "会议室座位和剧本",
+        "to": "boss"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -3,
+        "wrong": -6,
+        "wrongAt": 2
       }
     }
   ]

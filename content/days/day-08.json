@@ -84,7 +84,7 @@
     },
     {
       "id": "task1",
-      "text": "两份计费模块。",
+      "text": "团建排期：各位领导的祝酒时间。",
       "unlock": "done:msgs",
       "done": "flag:task_d8_1",
       "required": true
