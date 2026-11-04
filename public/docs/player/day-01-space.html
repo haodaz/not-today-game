@@ -69,6 +69,9 @@ body.light #stage::after{background-image:linear-gradient(rgba(22,24,43,.045) 1p
 .ctl{left:120px;top:806px;width:960px;display:flex;align-items:center;gap:14px;font:700 11px var(--mono);color:var(--muted);z-index:5}
 .ctl input{flex:1;accent-color:var(--cyan)}
 .ctl output{color:var(--cyan);min-width:160px}
+.slot{margin-top:12px;font-size:15px;line-height:1.5;color:var(--ink);border-left:3px solid var(--cyan);padding:4px 0 4px 12px}
+.slot i{display:block;font:700 9.5px var(--mono);letter-spacing:.16em;color:var(--dim);font-style:normal;margin-bottom:2px}
+.slot.empty{border-left-style:dashed;color:var(--dim)}
 .refs{left:48px;top:300px;width:1104px;columns:2;column-gap:48px;font-size:13.5px;line-height:1.6;color:var(--muted)}
 .refs p{margin:0 0 10px;break-inside:avoid}
 .refs b{font:700 11px var(--mono);color:var(--cyan);margin-right:6px}
@@ -102,6 +105,7 @@ body.light #stage::after{background-image:linear-gradient(rgba(22,24,43,.045) 1p
   <section class="ch" data-c="2"><div class="head"><div class="kick">03 · 共同智能空间</div>
     <h1>群体脑要一起干活，先得有一个<em>共同智能空间</em></h1>
     <div class="lead">群体脑靠什么说同一种话？靠一个共同智能空间：客户业务里的人、文件、业务对象、每一件事，都<b>投射进同一个数学空间</b>。</div>
+    <div class="slot" data-slot="r1"></div>
     <div class="stats" id="s0"></div></div>
     <div class="eq">x = φ(现实) ∈ 𝒮<u>投射</u></div></section>
 
@@ -113,6 +117,7 @@ body.light #stage::after{background-image:linear-gradient(rgba(22,24,43,.045) 1p
   <section class="ch" data-c="4"><div class="head"><div class="kick">05 · 投射 · 三套说法</div>
     <h1>可现实不会自己排好队：<em>三家客户，三套说法</em></h1>
     <div class="lead">同一件事，每家客户的表格各叫各的：「客户名称」「甲方单位」「签约主体」，<b>说的是同一件事</b>。</div>
+    <div class="slot" data-slot="r2"></div>
     <div class="stats" id="s2"></div></div></section>
 
   <section class="ch" data-c="5"><div class="head"><div class="kick">06 · 投射 · 并集再消除</div>
@@ -146,18 +151,21 @@ body.light #stage::after{background-image:linear-gradient(rgba(22,24,43,.045) 1p
   <section class="ch" data-c="10"><div class="head"><div class="kick">11 · 以脑为本 ③ AI 先合，人再核</div>
     <h1>第三招：<em>AI 先合一版，人再核一遍</em>，每一次都回流</h1>
     <div class="lead">AI 先合一版，人再核一遍；核出来的差，按可信度修进坐标<sup>[14]</sup>，不确定性一轮一轮缩小。</div>
+    <div class="slot" data-slot="r3"></div>
     <div class="stats" id="s10"></div></div>
     <div class="eq">x ← x + K ( y − ŷ ), &nbsp; Σ ↓<u>回流修正</u></div></section>
 
   <section class="ch" data-c="11"><div class="head"><div class="kick">12 · 护城河</div>
     <h1>所以模型年年换，<em>空间一直是我们的</em></h1>
     <div class="lead">换模型只是换一种读法：正交对齐以后<sup>[15]</sup>，点不动，点和点的距离也不动。<b>读法谁都能买，空间只能一个点一个点地投射、一次一次地核出来。</b></div>
+    <div class="slot" data-slot="r4"></div>
     <div class="stats" id="s11"></div></div>
     <div class="eq">x′ = U x , &nbsp; UᵀU = I , &nbsp; | p − q | 不变<u>换读法，不换点</u></div></section>
 
   <section class="ch" data-c="12"><div class="head"><div class="kick">13 · 客户</div>
     <h1>这条路已经接上了客户：<em>在链路上的，和已经到账的</em></h1>
     <div class="lead">按快照如实记录，每一家的状态以应收表为准。</div>
+    <div class="slot" data-slot="r5"></div>
     <div class="stats" id="s12"></div></div></section>
 
   <section class="ch" data-c="13"><div class="head"><div class="kick">14 · 参考</div>
@@ -483,6 +491,14 @@ fill('s11', stat('m', SNAP.align.residual[2].toFixed(3), '换代对齐残差（�
 fill('s12', stat('c', CU.length - 1 + ' 家', '在链路上的大客户') + stat('v', CU.filter(c => c.status === '试点').length + ' 家', '试点') + stat('m', CU.filter(c => c.paid).length + ' 家', '已到账'));
 fill('refs', REFS.map((r, i) => `<p><b>[${i + 1}]</b>${r[0]} <i>${r[1]}</i>. ${r[2]}</p>`).join(''));
 const sl = document.getElementById('scale'); sl.oninput = () => { touched = true; pick = +sl.value; };
+
+/* ===== 板子：?fill=r1:c1,… 是 IDE 里格子填了什么；单独打开时显示交出去的那一版 ===== */
+const CARDS = { c1:'一个知识图谱，二百多个节点，把甲方的业务对象连起来', c2:'三家客户的表格，每周导入一次', c3:'AI 先合一版，人再核一遍', c4:'懂甲方的行业，图谱是一点点对出来的', c5:'两个试点客户，一个已付款',
+  d1:'我们拥有自研大模型', d2:'全自动，无需人工', k1:'已服务五十家头部客户' };
+const SLOTS = { r1:'技术底座', r2:'数据', r3:'AI 用在哪', r4:'特色', r5:'证据' };
+{ const q = new URLSearchParams(location.search), FILL = q.has('fill') ? Object.fromEntries(q.get('fill').split(',').filter(Boolean).map(x => x.split(':'))) : { r1:'c1', r2:'c2', r3:'c3', r4:'c4', r5:'c5' };
+  document.querySelectorAll('.slot').forEach(el => { const id = el.dataset.slot, card = FILL[id];
+    el.classList.toggle('empty', !card); el.innerHTML = `<i>${SLOTS[id]} · ${card ? '数据源' : '这一页还没有数据源'}</i>${card ? CARDS[card] || card : '（从左边拖一张进来）'}`; }); }
 
 /* ===== 代码：显示正在跑的这一页（就是上面这段函数本身） ===== */
 const code = document.getElementById('code');
