@@ -7,3 +7,4 @@
 - [x] 5. Tests as in R7; update the IDE, meeting and workspace tests that read the old columns. Log entry in docs/kiro-log.md.
 - [x] 6. R8: session list hidden on task pages with the rail toggle; the explorer never auto-hidden; tests (task page at 1600×900 frame width shows the explorer with its 素材 rows).
 - [x] 7. R9 + R10: one top bar (traffic lights, sidebar toggle, ← →, title ▾, pane toggles, 老物件); overlay sidebar (search, 新任务, history, section icons), hidden by default; cards full height; line SVG icons.
+- [ ] 8. R11: a non-board task's thread in the conversation column and its surface in the pane; the dock auto-hides over full-screen 工作台.
