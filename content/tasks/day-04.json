@@ -4,128 +4,123 @@
   "tasks": [
     {
       "id": "task1",
-      "title": "v17 v18 合一份。",
+      "title": "老王：把「意识」写进去。",
       "app": "docs",
       "done": "task_d4_1",
-      "start": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "「导出为 PDF」和「导出为 PDF，三天内不得重复导出」。同一条需求的两个版本。"
+      "board": {
+        "kind": "table",
+        "title": "AI 理论 · 意识那一节",
+        "columns": [
+          "",
+          "老王要的",
+          "你写进去的"
+        ],
+        "given": {
+          "rows": {
+            "r1": "「AI 有没有意识，我们要先说。」",
+            "r2": "「那家公司讲本体，我们讲意识，高一层。」",
+            "r3": "「要有数据。」",
+            "r4": "「投资人记得住的一句。」"
           }
-        ],
-        "options": [
-          {
-            "mode": "self",
-            "goto": "self"
-          },
-          {
-            "mode": "look",
-            "goto": "look"
-          },
-          {
-            "mode": "let",
-            "goto": "let"
-          }
-        ]
-      },
-      "self": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "你并排打开，一条一条对。"
-          }
-        ],
-        "kuro": [],
-        "effects": {
-          "flags": [
-            "task_d4_1"
-          ]
-        }
-      },
-      "look": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "你打了一句：这两条各自是什么意思，分开说。"
-          }
-        ],
-        "kuro": [
-          "Of course. Let me take another look."
-        ],
-        "effects": {
-          "flags": [
-            "task_d4_1"
-          ],
-          "looked": true,
-          "assimilation": 1
-        }
-      },
-      "let": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "它回了一个 Done，版本号从 v18 跳到 v18。你没点「看一眼」。"
-          }
-        ],
-        "kuro": [
-          "Done."
-        ],
-        "effects": {
-          "flags": [
-            "task_d4_1"
-          ],
-          "letItDoUnchecked": 1,
-          "assimilation": 4
-        }
-      },
-      "doc": {
-        "left": [
-          "一、用户可在工作台发起导出。",
-          "二、导出内容为当前文档的全部版本。",
-          "三、用户可导出为 PDF。",
-          "四、导出文件按日期命名。",
-          "五、导出不限次数。",
-          "六、导出记录保留九十天。"
-        ],
-        "right": [
-          "一、用户可在工作台发起导出。",
-          "二、导出内容为当前文档的全部版本。",
-          "三、用户可导出为 PDF，三天内不得重复导出。",
-          "四、导出文件按日期命名。",
-          "五、导出不限次数。",
-          "六、导出记录保留九十天。"
-        ],
-        "conflict": [
-          2,
-          4
-        ],
-        "catchFlags": [
-          "task_d4_1"
-        ],
-        "kuroEdit": {
-          "clause": 2,
-          "text": "三、用户可导出为 PDF。三天内再导出的，视为同一次。"
         },
-        "marks": [
+        "slots": [
           {
-            "clause": 2,
-            "kind": "conflict",
-            "worth": 1
+            "id": "r1",
+            "label": "先说",
+            "answer": "c1"
           },
           {
-            "clause": 4,
-            "kind": "conflict",
-            "worth": 1
+            "id": "r2",
+            "label": "对手",
+            "answer": "c2"
           },
           {
-            "clause": 2,
-            "kind": "kuro",
-            "worth": 2,
-            "caught": "Mine. The same export, counted once.",
-            "word": "same"
+            "id": "r3",
+            "label": "证据",
+            "answer": "c3"
+          },
+          {
+            "id": "r4",
+            "label": "一句话",
+            "answer": "c4"
           }
-        ]
+        ],
+        "cards": [
+          {
+            "id": "c1",
+            "text": "它没有意识，但它有「注意」：人脑科学里，注意力就是效率",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "在你发给老王的 AI 理论里"
+          },
+          {
+            "id": "c2",
+            "text": "他们的本体连的是东西；我们的图连的是人怎么注意东西",
+            "from": {
+              "conv": "group"
+            },
+            "hint": "在老王转进群里的视频里"
+          },
+          {
+            "id": "c3",
+            "text": "它在凌晨两点四十也在处理，从不走神",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "在老王凌晨那条消息里"
+          },
+          {
+            "id": "c4",
+            "text": "它不睡觉，但它知道你什么时候睡",
+            "from": {
+              "conv": "laozhou"
+            },
+            "hint": "在老周的私聊里"
+          },
+          {
+            "id": "d1",
+            "text": "它有意识，而且比人清醒",
+            "from": {
+              "conv": "group"
+            },
+            "hint": "在老王转进群里的视频里"
+          },
+          {
+            "id": "d2",
+            "text": "意识跟我们没关系",
+            "from": {
+              "file": "c-v17"
+            },
+            "hint": "在合作协议 v17 里"
+          }
+        ],
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "c2",
+            "r3": "c3",
+            "r4": "k1"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "它醒着，所以你可以睡了"
+            }
+          ],
+          "unlock": "-"
+        }
+      },
+      "deliverable": {
+        "id": "d4-mind",
+        "label": "AI 理论 · 意识",
+        "to": "boss"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -3,
+        "wrong": -6,
+        "wrongAt": 2
       }
     },
     {

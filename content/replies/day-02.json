@@ -2,23 +2,7 @@
   "day": 2,
   "recipients": {
     "boss": {
-      "incoming": [
-        {
-          "t": "09:12",
-          "text": "[语音] 38″",
-          "kind": "work"
-        },
-        {
-          "t": "09:12",
-          "text": "（转文字）昨天投资人那边感觉不错，叙事还得再强一点，你跟合伙人对一下，他有一版。",
-          "kind": "work"
-        },
-        {
-          "t": "11:50",
-          "text": "中午我请，大家点，我的不要饭。",
-          "kind": "private"
-        }
-      ],
+      "incoming": [],
       "fine": {
         "status": "reply",
         "lines": [
@@ -130,6 +114,37 @@
     "group": {
       "incoming": [
         {
+          "t": "09:41",
+          "text": "Vivi：昨晚又迭代了一版，这次它自己会进化了。",
+          "kind": "work"
+        },
+        {
+          "t": "09:41",
+          "text": "Vivi：[网页] EVO_自演化引擎_v2.0.html",
+          "kind": "deliverable",
+          "doc": "vivi-plan-2"
+        },
+        {
+          "t": "09:42",
+          "text": "Vivi：人类参与度 0%。这就是我们要的。",
+          "kind": "work"
+        },
+        {
+          "t": "09:43",
+          "text": "Vivi：@技术 这个也搞一下",
+          "kind": "work"
+        },
+        {
+          "t": "09:44",
+          "text": "member：👍👍",
+          "kind": "work"
+        },
+        {
+          "t": "09:45",
+          "text": "老板：这个方向对",
+          "kind": "work"
+        },
+        {
           "t": "11:46",
           "text": "市场部：+1",
           "kind": "private"
@@ -137,6 +152,11 @@
         {
           "t": "11:46",
           "text": "member：+1",
+          "kind": "private"
+        },
+        {
+          "t": "11:50",
+          "text": "老板：中午我请，大家点，我的不要饭。",
           "kind": "private"
         }
       ],
@@ -212,9 +232,37 @@
     "xiaozhang": {
       "incoming": [
         {
+          "t": "10:20",
+          "text": "{calledBy}，Vivi 又发了一个，让我们照着做",
+          "kind": "work"
+        },
+        {
+          "t": "10:21",
+          "text": "这根本不是一个东西，她连接口都没有",
+          "kind": "work"
+        },
+        {
+          "t": "10:22",
+          "text": "你帮我看看哪些能做吧",
+          "kind": "work"
+        },
+        {
+          "t": "10:23",
+          "text": "图谱里行业和数据是有的，组织那块我们压根没碰",
+          "kind": "work"
+        },
+        {
           "t": "14:10",
           "text": "{calledBy}数据模型那个字段名你改的？",
           "kind": "work"
+        },
+        {
+          "t": "15:00",
+          "text": "谢了{calledBy}。",
+          "kind": "work",
+          "cond_show": {
+            "has": "sent_d2-vivi-page"
+          }
         }
       ],
       "fine": {

@@ -142,7 +142,7 @@
     },
     {
       "id": "task1",
-      "text": "Check v15 against v17.",
+      "text": "Vivi: the 「avatar」 page.",
       "unlock": "done:msgs",
       "done": "flag:task_d5_1",
       "required": true

@@ -98,6 +98,24 @@
             "ext": "pdf"
           },
           "forwarded": true
+        },
+        {
+          "t": "10:00",
+          "text": "分身那一页你来写",
+          "kind": "work"
+        },
+        {
+          "t": "10:00",
+          "text": "附图在共享盘，提取码 2041",
+          "kind": "work"
+        },
+        {
+          "t": "16:00",
+          "text": "第 3 行字号不一样，统一一下",
+          "kind": "work",
+          "cond_show": {
+            "has": "sent_d5-avatar"
+          }
         }
       ],
       "fine": {
@@ -166,25 +184,30 @@
           "kind": "work"
         },
         {
-          "t": "21:47",
+          "t": "09:50",
           "text": "Vivi：PRD 补上了，功能圣经，五大模块都在里面。",
           "kind": "work"
         },
         {
-          "t": "21:47",
+          "t": "09:50",
           "text": "Vivi：[文档] 洞察引擎_PRD_功能圣经",
           "kind": "deliverable",
           "doc": "vivi-prd"
         },
         {
-          "t": "21:48",
+          "t": "09:51",
           "text": "Vivi：研发那边可以直接按这个开工了，有问题先问 AI。",
           "kind": "work"
         },
         {
-          "t": "21:52",
+          "t": "09:52",
           "text": "member：收到",
           "kind": "work"
+        },
+        {
+          "t": "11:00",
+          "text": "老周：上周你说的那个，我都忘了，它倒记得",
+          "kind": "private"
         }
       ],
       "fine": {

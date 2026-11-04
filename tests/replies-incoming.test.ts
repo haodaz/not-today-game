@@ -44,7 +44,7 @@ describe("planIncoming", () => {
   });
 
   it("odd items carry no read receipt; others do", () => {
-    const day = [...replyTable].find(([, t]) => [...t.recipients.values()].some((r) => r.incoming.some((i) => i.kind === "odd")))![0];
+    const day = [...replyTable].find(([, t]) => [...t.recipients.values()].some((r) => r.incoming.some((i) => i.kind === "odd" && !i.cond_show)))![0];
     const actions = delivered(planIncoming(day, f(day), "00:00"));
     expect(actions.some((a) => a.noReadReceipt)).toBe(true);
     expect(actions.some((a) => !a.noReadReceipt)).toBe(true);

@@ -53,10 +53,11 @@ describe("the loader is strict", () => {
 describe("a file is listed from its day, its flag and the opened Vivi deliverable", () => {
   const opened = (ids: string[]) => new Set(ids);
   it("from the `from` day", () => {
-    const vivi = filesData.folders.find((f) => f.id === "downloads")!.files.find((f) => f.id === "d-vivi-plan1")!;
-    expect(vivi.from).toBe(4);
-    expect(fileListed(vivi, 3, [], opened(["vivi-plan-1"]))).toBe(false);
-    expect(fileListed(vivi, 4, [], opened(["vivi-plan-1"]))).toBe(true);
+    // Vivi's first page is there from day 1 now (day graph); v18 still arrives on day 3.
+    const v18 = fileById("c-v18")!;
+    expect(v18.from).toBe(3);
+    expect(fileListed(v18, 2, [], opened([]))).toBe(false);
+    expect(fileListed(v18, 3, [], opened([]))).toBe(true);
   });
   it("afterOpen: only once the player has opened the named deliverable", () => {
     const vivi = fileById("d-vivi-plan1")!;

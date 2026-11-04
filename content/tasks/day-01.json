@@ -289,80 +289,138 @@
     },
     {
       "id": "task3",
-      "title": "存一份合并文档。",
+      "title": "事情 A：未来智能的技术表达。",
       "app": "docs",
       "done": "task_merge_done",
-      "start": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "合并版要存进文件夹，按日期命名。"
-          }
+      "board": {
+        "kind": "table",
+        "title": "未来智能 · 技术表达",
+        "columns": [
+          "",
+          "老王要讲清楚的",
+          "写进去"
         ],
-        "options": [
+        "given": {
+          "rows": {
+            "r1": "我们靠什么做事",
+            "r2": "甲方的数据怎么进来",
+            "r3": "AI 在我们这儿干了什么",
+            "r4": "跟别家比，我们有什么",
+            "r5": "拿得出手的"
+          }
+        },
+        "slots": [
           {
-            "mode": "self",
-            "goto": "self"
+            "id": "r1",
+            "label": "技术底座",
+            "answer": "c1"
           },
           {
-            "mode": "look",
-            "goto": "look"
+            "id": "r2",
+            "label": "数据",
+            "answer": "c2"
           },
           {
-            "mode": "let",
-            "goto": "let"
-          }
-        ]
-      },
-      "self": {
-        "say": [
+            "id": "r3",
+            "label": "AI 用在哪",
+            "answer": "c3"
+          },
           {
-            "k": "narration",
-            "t": "你自己存的。名字是你起的。"
-          }
-        ],
-        "kuro": [],
-        "effects": {
-          "flags": [
-            "task_merge_done"
-          ]
-        }
-      },
-      "look": {
-        "say": [
+            "id": "r4",
+            "label": "特色",
+            "answer": "c4"
+          },
           {
-            "k": "narration",
-            "t": "它存了，你点开确认了一遍。"
+            "id": "r5",
+            "label": "证据",
+            "answer": "c5"
           }
         ],
-        "kuro": [
-          "Saved under today's date."
+        "cards": [
+          {
+            "id": "c1",
+            "text": "一个知识图谱，二百多个节点，把甲方的业务对象连起来",
+            "from": {
+              "conv": "xiaozhang"
+            },
+            "hint": "在小张的私聊里"
+          },
+          {
+            "id": "c2",
+            "text": "三家客户的表格，每周导入一次",
+            "from": {
+              "file": "c-v17"
+            },
+            "hint": "在合作协议 v17 里"
+          },
+          {
+            "id": "c3",
+            "text": "AI 先合一版，人再核一遍",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "在老王的语音里"
+          },
+          {
+            "id": "c4",
+            "text": "懂甲方的行业，图谱是一点点对出来的",
+            "from": {
+              "file": "c-merged"
+            },
+            "hint": "在合作协议合并版里"
+          },
+          {
+            "id": "c5",
+            "text": "两个试点客户，一个已付款",
+            "from": {
+              "file": "e-receivable"
+            },
+            "hint": "在应收表里"
+          },
+          {
+            "id": "d1",
+            "text": "我们拥有自研大模型",
+            "from": {
+              "file": "vivi-plan-1"
+            },
+            "hint": "在 Vivi 的页面里"
+          },
+          {
+            "id": "d2",
+            "text": "全自动，无需人工",
+            "from": {
+              "file": "vivi-plan-1"
+            },
+            "hint": "在 Vivi 的页面里"
+          }
         ],
-        "effects": {
-          "flags": [
-            "task_merge_done"
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "c2",
+            "r3": "c3",
+            "r4": "c4",
+            "r5": "k1"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "已服务五十家头部客户"
+            }
           ],
-          "looked": true,
-          "assimilation": 1
+          "unlock": "-"
         }
       },
-      "let": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "它存了。"
-          }
-        ],
-        "kuro": [
-          "Saved."
-        ],
-        "effects": {
-          "flags": [
-            "task_merge_done"
-          ],
-          "letItDoUnchecked": 1,
-          "assimilation": 4
-        }
+      "deliverable": {
+        "id": "d1-tech",
+        "label": "技术表达（事情 A）",
+        "to": "boss"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -2,
+        "wrong": -5,
+        "wrongAt": 2
       }
     }
   ]

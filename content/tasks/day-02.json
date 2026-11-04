@@ -4,134 +4,138 @@
   "tasks": [
     {
       "id": "task1",
-      "title": "叙事线拉一版。",
+      "title": "帮小张：Vivi 那个页面，拆一下。",
       "app": "docs",
       "done": "task_d2_1",
-      "start": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "老板的话里没有任何一个名词，只有「感觉」和「叙事」；合伙人的卡片里全是别人的名词。"
+      "board": {
+        "kind": "table",
+        "title": "Vivi 的页面：哪些能做",
+        "columns": [
+          "",
+          "页面上写的",
+          "实际上"
+        ],
+        "given": {
+          "rows": {
+            "r1": "「三秒变成可执行的洞察」",
+            "r2": "「自动理解你的行业、数据、组织」",
+            "r3": "「一键生成决策」",
+            "r4": "「开始分析」",
+            "r5": "「已接入全部业务系统」"
           }
-        ],
-        "options": [
-          {
-            "mode": "self",
-            "goto": "self"
-          },
-          {
-            "mode": "look",
-            "goto": "look"
-          },
-          {
-            "mode": "let",
-            "goto": "let"
-          }
-        ]
-      },
-      "self": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "你把两条原始消息一条一条读，自己拉了一版。"
-          },
-          {
-            "k": "inner",
-            "t": "左列是老板的，右列是转发来的。"
-          }
-        ],
-        "kuro": [
-          "I can line those up for you."
-        ],
-        "effects": {
-          "flags": [
-            "task_d2_1"
-          ]
-        }
-      },
-      "look": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "你让它把两条拆开讲。它列了两段，每段三句。你扫了一遍，改了两处。"
-          }
-        ],
-        "kuro": [
-          "Here are both lines, separated. Say which one you want."
-        ],
-        "effects": {
-          "flags": [
-            "task_d2_1"
-          ],
-          "looked": true,
-          "assimilation": 1
-        }
-      },
-      "let": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "你扫了一眼，点了通过。表格里多了一个叫「叙事线」的页。"
-          }
-        ],
-        "kuro": [
-          "Great. Moving on."
-        ],
-        "effects": {
-          "flags": [
-            "task_d2_1"
-          ],
-          "letItDoUnchecked": 1,
-          "assimilation": 4
-        }
-      },
-      "doc": {
-        "left": [
-          "一、我们这个产品，讲的是一种感觉。",
-          "二、感觉对了，投资人就懂了。",
-          "三、我们不讲技术，讲叙事。",
-          "四、叙事要有温度。",
-          "五、温度从哪来，从团队来。",
-          "六、下周之前要有一版。"
-        ],
-        "right": [
-          "一、竞品 A 的叙事线：先讲用户的痛点，再讲数据。",
-          "二、每一页只放一个数字。",
-          "三、叙事线必须先有数据，没有数据不开口。",
-          "四、温度是结果，不是方法。",
-          "五、团队只出现在最后一页。",
-          "六、全文不超过十页。"
-        ],
-        "conflict": [
-          2,
-          3
-        ],
-        "catchFlags": [
-          "task_d2_1"
-        ],
-        "kuroEdit": {
-          "clause": 2,
-          "text": "三、我们不讲技术，讲叙事；叙事先有数据，数据从感觉里来，按天计。"
         },
-        "marks": [
+        "slots": [
           {
-            "clause": 2,
-            "kind": "conflict",
-            "worth": 1
+            "id": "r1",
+            "label": "首屏",
+            "answer": "c1"
           },
           {
-            "clause": 3,
-            "kind": "conflict",
-            "worth": 1
+            "id": "r2",
+            "label": "第二屏",
+            "answer": "c2"
           },
           {
-            "clause": 2,
-            "kind": "kuro",
-            "worth": 2,
-            "caught": "Mine. The days were my addition.",
-            "word": "same"
+            "id": "r3",
+            "label": "第三屏",
+            "answer": "c3"
+          },
+          {
+            "id": "r4",
+            "label": "按钮",
+            "answer": "c4"
+          },
+          {
+            "id": "r5",
+            "label": "页脚",
+            "answer": "c5"
           }
-        ]
+        ],
+        "cards": [
+          {
+            "id": "c1",
+            "text": "做不了：三秒是动画，不是算出来的",
+            "from": {
+              "file": "vivi-plan-2"
+            },
+            "hint": "在 Vivi 的第二个页面里"
+          },
+          {
+            "id": "c2",
+            "text": "早就有了一部分：图谱里有行业和数据，没有组织",
+            "from": {
+              "conv": "xiaozhang"
+            },
+            "hint": "在小张的私聊里"
+          },
+          {
+            "id": "c3",
+            "text": "做不了：决策得人来下",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "在你发给老王的事情 A 里"
+          },
+          {
+            "id": "c4",
+            "text": "能做：按钮点了跳到我们的导出页",
+            "from": {
+              "file": "e-export-fn"
+            },
+            "hint": "在 export.js 里"
+          },
+          {
+            "id": "c5",
+            "text": "做不了：现在只接了三家的表格",
+            "from": {
+              "file": "e-receivable"
+            },
+            "hint": "在应收表里"
+          },
+          {
+            "id": "d1",
+            "text": "能做：照着页面写就行",
+            "from": {
+              "file": "vivi-plan-2"
+            },
+            "hint": "在 Vivi 的第二个页面里"
+          },
+          {
+            "id": "d2",
+            "text": "早就全有了",
+            "from": {
+              "file": "vivi-plan-2"
+            },
+            "hint": "在 Vivi 的第二个页面里"
+          }
+        ],
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "k1",
+            "r3": "c3",
+            "r4": "c4",
+            "r5": "c5"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "能做：交给 Kuro，三秒就好"
+            }
+          ],
+          "unlock": "-"
+        }
+      },
+      "deliverable": {
+        "id": "d2-vivi-page",
+        "label": "Vivi 页面拆解（给小张）",
+        "to": "workbench"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -2,
+        "wrong": -5,
+        "wrongAt": 2
       }
     },
     {

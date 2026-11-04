@@ -8,6 +8,32 @@
           "text": "Good morning. 导出加 CSV，今天。",
           "kind": "work",
           "note": "第一次夹英文"
+        },
+        {
+          "t": "09:30",
+          "text": "[文件] 别人家的 BP",
+          "kind": "work",
+          "card": {
+            "type": "file",
+            "name": "某某科技_商业计划书.pdf",
+            "size": "6.9 MB",
+            "ext": "pdf"
+          }
+        },
+        {
+          "t": "09:30",
+          "text": "你看下这个，先有关系后有东西，他们讲得挺好",
+          "kind": "work"
+        },
+        {
+          "t": "09:32",
+          "text": "[语音] 12″",
+          "kind": "work"
+        },
+        {
+          "t": "09:32",
+          "text": "（转文字）甲方要一页本体，写它比人古老。人给东西起名字之前，关系就在那儿了。",
+          "kind": "work"
         }
       ],
       "fine": {
@@ -158,30 +184,18 @@
           "kind": "private"
         },
         {
-          "t": "09:41",
-          "text": "Vivi：昨晚又迭代了一版，这次它自己会进化了。",
+          "t": "10:10",
+          "text": "甲方：它的需求是什么？总得被连上吧",
           "kind": "work"
         },
         {
-          "t": "09:41",
-          "text": "Vivi：[网页] EVO_自演化引擎_v2.0.html",
-          "kind": "deliverable",
-          "doc": "vivi-plan-2"
-        },
-        {
-          "t": "09:42",
-          "text": "Vivi：人类参与度 0%。这就是我们要的。",
-          "kind": "work"
-        },
-        {
-          "t": "09:44",
-          "text": "member：👍👍",
-          "kind": "work"
-        },
-        {
-          "t": "09:45",
-          "text": "老板：这个方向对",
-          "kind": "work"
+          "t": "17:00",
+          "text": "老板：[转发] 本体是什么（给甲方）",
+          "kind": "work",
+          "forwarded": true,
+          "cond_show": {
+            "has": "sent_d6-ontology"
+          }
         }
       ],
       "fine": {

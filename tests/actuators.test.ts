@@ -267,6 +267,8 @@ describe("老周的事: the loan, in 老周's conversation (day 5)", () => {
   it("opening 老周 while the item is open brings up the loan prompt; anyone else does not", () => {
     const store = atDay(constants.loanReplyDay);
     completeUntil(store, "loan");
+    // Vivi's PRD is posted at 09:50 now (day graph); opened, so its lock does not stand in the way.
+    store.appendEvent({ kind: "open", target: "file:vivi-prd", t: "09:51" });
     const { ctx } = ctxOf(store, "desktop", { beat: "work", time: "14:00" });
     act(ctx, "conv", { conv: "boss" });
     expect(ctx.session.dialogue.queue).toEqual([]);

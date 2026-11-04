@@ -174,10 +174,10 @@ describe("the graph is sound: every board source resolves on its day", () => {
   });
 
   it("fails loudly on a card from a file that does not exist that day yet", () => {
-    // vivi-plan-2 is posted day 6; a day-5 board citing it is a broken source.
-    const broken = brokenSources(5, [{ id: "task1", board: { ...sourceBoard(), cards: [{ id: "c1", text: "材料", from: { file: "vivi-plan-2" } }] } }]);
+    // 六家对比.pdf arrives day 7; a day-5 board citing it is a broken source.
+    const broken = brokenSources(5, [{ id: "task1", board: { ...sourceBoard(), cards: [{ id: "c1", text: "材料", from: { file: "e-six-pdf" } }] } }]);
     expect(broken).toHaveLength(1);
-    expect(broken[0]).toMatch(/vivi-plan-2.*after day 5/);
+    expect(broken[0]).toMatch(/e-six-pdf.*after day 5/);
     // A file that does not exist at all.
     const missing = brokenSources(5, [{ id: "task1", board: { ...sourceBoard(), cards: [{ id: "c1", text: "材料", from: { file: "no-such-file" } }] } }]);
     expect(missing[0]).toMatch(/does not exist/);

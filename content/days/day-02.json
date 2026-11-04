@@ -104,7 +104,7 @@
     },
     {
       "id": "task1",
-      "text": "叙事线拉一版。",
+      "text": "帮小张：Vivi 那个页面，拆一下。",
       "unlock": "done:msgs",
       "done": "flag:task_d2_1",
       "required": true

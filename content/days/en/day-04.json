@@ -111,7 +111,7 @@
     },
     {
       "id": "task1",
-      "text": "Merge v17 and v18 into one.",
+      "text": "Lao Wang: put consciousness in.",
       "unlock": "done:msgs",
       "done": "flag:task_d4_1",
       "required": true

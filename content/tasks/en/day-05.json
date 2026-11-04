@@ -4,80 +4,132 @@
   "tasks": [
     {
       "id": "task1",
-      "title": "Check v15 against v17.",
+      "title": "Vivi: the 「avatar」 page.",
       "app": "docs",
       "done": "task_d5_1",
-      "start": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "v17's note says \"this one is final\". Who wrote it is not signed."
-          }
+      "board": {
+        "kind": "table",
+        "title": "PRD · the avatar",
+        "columns": [
+          "",
+          "What Vivi wants",
+          "What you write"
         ],
-        "options": [
+        "given": {
+          "rows": {
+            "r1": "\"Call it the avatar.\"",
+            "r2": "\"It sits in meetings for you, answers messages for you.\"",
+            "r3": "\"Make it warm.\"",
+            "r4": "\"Legal says spell out the limits.\""
+          },
+          "lock": {
+            "object": "pager",
+            "codes": [
+              "2041",
+              "7734",
+              "1999"
+            ],
+            "answer": "2041"
+          }
+        },
+        "slots": [
           {
-            "mode": "self",
-            "goto": "self"
+            "id": "r1",
+            "label": "Name",
+            "answer": "c1"
           },
           {
-            "mode": "look",
-            "goto": "look"
+            "id": "r2",
+            "label": "What it does",
+            "answer": "c2"
           },
           {
-            "mode": "let",
-            "goto": "let"
-          }
-        ]
-      },
-      "self": {
-        "say": [
+            "id": "r3",
+            "label": "It and you",
+            "answer": "c3"
+          },
           {
-            "k": "narration",
-            "t": "You check them clause by clause, top to bottom, skipping nothing. Four minutes."
+            "id": "r4",
+            "label": "Limits",
+            "answer": "c4"
           }
         ],
-        "kuro": [],
-        "effects": {
-          "flags": [
-            "task_d5_1"
-          ]
-        }
-      },
-      "look": {
-        "say": [
+        "cards": [
           {
-            "k": "narration",
-            "t": "You ask it to list the conflicts. Three. You fix them as listed."
+            "id": "c1",
+            "text": "The avatar: the one of you that lives in digital space",
+            "from": {
+              "file": "vivi-prd"
+            },
+            "hint": "in Vivi's PRD"
+          },
+          {
+            "id": "c2",
+            "text": "It answers \"OK.\" for you",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "in your chat with Vivi"
+          },
+          {
+            "id": "c3",
+            "text": "It remembers what you forgot",
+            "from": {
+              "conv": "group"
+            },
+            "hint": "in what Lao Zhou said in the group"
+          },
+          {
+            "id": "c4",
+            "text": "It may not sign for you",
+            "from": {
+              "file": "c-v17"
+            },
+            "hint": "in the signing clause of the agreement, v17"
+          },
+          {
+            "id": "d1",
+            "text": "The avatar is you",
+            "from": {
+              "file": "vivi-prd"
+            },
+            "hint": "in Vivi's PRD"
+          },
+          {
+            "id": "d2",
+            "text": "The avatar may sign for you",
+            "from": {
+              "file": "vivi-prd"
+            },
+            "hint": "in Vivi's PRD"
           }
         ],
-        "kuro": [
-          "Three conflicts: retry interval, retry count, state after failure."
-        ],
-        "effects": {
-          "flags": [
-            "task_d5_1"
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "c2",
+            "r3": "k1",
+            "r4": "c4"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "It is more like you than you are"
+            }
           ],
-          "looked": true,
-          "assimilation": 1
+          "unlock": "2041"
         }
       },
-      "let": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "You toss it one line: \"merge these\"."
-          }
-        ],
-        "kuro": [
-          "Done."
-        ],
-        "effects": {
-          "flags": [
-            "task_d5_1"
-          ],
-          "letItDoUnchecked": 1,
-          "assimilation": 4
-        }
+      "deliverable": {
+        "id": "d5-avatar",
+        "label": "PRD · the avatar",
+        "to": "partner"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -3,
+        "wrong": -6,
+        "wrongAt": 2
       }
     },
     {

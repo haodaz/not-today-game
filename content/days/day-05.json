@@ -142,7 +142,7 @@
     },
     {
       "id": "task1",
-      "text": "v15 和 v17 对一遍。",
+      "text": "Vivi：「分身」那一页。",
       "unlock": "done:msgs",
       "done": "flag:task_d5_1",
       "required": true

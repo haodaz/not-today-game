@@ -289,80 +289,138 @@
     },
     {
       "id": "task3",
-      "title": "Save a merged document.",
+      "title": "Thing A: Future Intelligence, the technical story.",
       "app": "docs",
       "done": "task_merge_done",
-      "start": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "The merged version goes in the folder, named by date."
-          }
+      "board": {
+        "kind": "table",
+        "title": "Future Intelligence · the technical story",
+        "columns": [
+          "",
+          "What Lao Wang wants made clear",
+          "What goes in"
         ],
-        "options": [
+        "given": {
+          "rows": {
+            "r1": "What we run on",
+            "r2": "How the client's data gets in",
+            "r3": "What AI does here",
+            "r4": "What we have that others don't",
+            "r5": "Something we can show"
+          }
+        },
+        "slots": [
           {
-            "mode": "self",
-            "goto": "self"
+            "id": "r1",
+            "label": "Foundation",
+            "answer": "c1"
           },
           {
-            "mode": "look",
-            "goto": "look"
+            "id": "r2",
+            "label": "Data",
+            "answer": "c2"
           },
           {
-            "mode": "let",
-            "goto": "let"
-          }
-        ]
-      },
-      "self": {
-        "say": [
+            "id": "r3",
+            "label": "Where AI is",
+            "answer": "c3"
+          },
           {
-            "k": "narration",
-            "t": "You saved it yourself. The name is yours."
-          }
-        ],
-        "kuro": [],
-        "effects": {
-          "flags": [
-            "task_merge_done"
-          ]
-        }
-      },
-      "look": {
-        "say": [
+            "id": "r4",
+            "label": "What sets us apart",
+            "answer": "c4"
+          },
           {
-            "k": "narration",
-            "t": "It saved it; you opened it and checked."
+            "id": "r5",
+            "label": "Proof",
+            "answer": "c5"
           }
         ],
-        "kuro": [
-          "Saved under today's date."
+        "cards": [
+          {
+            "id": "c1",
+            "text": "A knowledge graph, two hundred-odd nodes, joining the client's business objects",
+            "from": {
+              "conv": "xiaozhang"
+            },
+            "hint": "in Xiao Zhang's chat"
+          },
+          {
+            "id": "c2",
+            "text": "Three clients' spreadsheets, imported weekly",
+            "from": {
+              "file": "c-v17"
+            },
+            "hint": "in the agreement, v17"
+          },
+          {
+            "id": "c3",
+            "text": "AI drafts a merge, a person checks it",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "in Lao Wang's voice note"
+          },
+          {
+            "id": "c4",
+            "text": "We know the client's trade; the graph was matched by hand",
+            "from": {
+              "file": "c-merged"
+            },
+            "hint": "in the merged agreement"
+          },
+          {
+            "id": "c5",
+            "text": "Two pilot clients, one has paid",
+            "from": {
+              "file": "e-receivable"
+            },
+            "hint": "in the receivables sheet"
+          },
+          {
+            "id": "d1",
+            "text": "We have our own large model",
+            "from": {
+              "file": "vivi-plan-1"
+            },
+            "hint": "on Vivi's page"
+          },
+          {
+            "id": "d2",
+            "text": "Fully automatic, no people needed",
+            "from": {
+              "file": "vivi-plan-1"
+            },
+            "hint": "on Vivi's page"
+          }
         ],
-        "effects": {
-          "flags": [
-            "task_merge_done"
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "c2",
+            "r3": "c3",
+            "r4": "c4",
+            "r5": "k1"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "Serving fifty leading clients"
+            }
           ],
-          "looked": true,
-          "assimilation": 1
+          "unlock": "-"
         }
       },
-      "let": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "It saved it."
-          }
-        ],
-        "kuro": [
-          "Saved."
-        ],
-        "effects": {
-          "flags": [
-            "task_merge_done"
-          ],
-          "letItDoUnchecked": 1,
-          "assimilation": 4
-        }
+      "deliverable": {
+        "id": "d1-tech",
+        "label": "the technical story (Thing A)",
+        "to": "boss"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -2,
+        "wrong": -5,
+        "wrongAt": 2
       }
     }
   ]

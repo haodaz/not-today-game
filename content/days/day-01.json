@@ -184,7 +184,7 @@
     },
     {
       "id": "task3",
-      "text": "存一份合并文档。",
+      "text": "事情 A：未来智能的技术表达。",
       "unlock": "done:task2",
       "done": "flag:task_merge_done",
       "required": true

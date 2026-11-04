@@ -83,7 +83,7 @@
     },
     {
       "id": "task1",
-      "text": "Find the typos.",
+      "text": "The ontology page: older than people.",
       "unlock": "done:msgs",
       "done": "flag:task_d6_1",
       "required": true

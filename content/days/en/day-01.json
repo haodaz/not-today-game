@@ -184,7 +184,7 @@
     },
     {
       "id": "task3",
-      "text": "Save a merged document.",
+      "text": "Thing A: Future Intelligence, the technical story.",
       "unlock": "done:task2",
       "done": "flag:task_merge_done",
       "required": true

@@ -110,13 +110,6 @@
       "required": true
     },
     {
-      "id": "task3",
-      "text": "今天真正的活：写完。",
-      "unlock": "done:task2",
-      "done": "flag:task_d3_3",
-      "required": true
-    },
-    {
       "id": "pickup",
       "text": "去拿。",
       "unlock": "event:delivery:arrives:lunch",
@@ -143,14 +136,14 @@
     {
       "id": "reply",
       "text": "回老板。",
-      "unlock": "done:task3",
+      "unlock": "done:task2",
       "done": "event:reply:boss",
       "required": true
     },
     {
       "id": "dinner",
       "text": "点个晚饭。",
-      "unlock": "done:task3",
+      "unlock": "done:task2",
       "done": "event:order:dinner",
       "required": true,
       "rewrite": "晚饭在路上。",
@@ -193,5 +186,51 @@
   "delivery": {
     "minMinutes": 2,
     "waitMinutes": 5
+  },
+  "call": {
+    "at": "15:30",
+    "length": "1:00:00",
+    "lines": [
+      {
+        "who": "boss",
+        "t": "00:00"
+      },
+      {
+        "who": "boss",
+        "t": "00:03"
+      },
+      {
+        "who": "boss",
+        "t": "00:06"
+      },
+      {
+        "who": "boss",
+        "t": "00:09"
+      },
+      {
+        "who": "boss",
+        "t": "00:12"
+      },
+      {
+        "who": "me",
+        "t": "00:32"
+      },
+      {
+        "who": "me",
+        "t": "00:45"
+      },
+      {
+        "who": "me",
+        "t": "01:00"
+      }
+    ],
+    "task": {
+      "id": "task3",
+      "text": "会上说的：把 AI 理论往大里讲。",
+      "unlock": "start",
+      "done": "flag:task_d3_3",
+      "required": true,
+      "when": "night"
+    }
   }
 }

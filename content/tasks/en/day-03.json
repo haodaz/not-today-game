@@ -239,83 +239,138 @@
     },
     {
       "id": "task3",
-      "title": "Today's real work: finish it.",
+      "title": "What he said in the meeting: make the AI theory bigger.",
       "app": "docs",
       "done": "task_d3_3",
-      "start": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "It is getting dark; the lamp's circle shows. This one is your own work."
-          }
+      "board": {
+        "kind": "table",
+        "title": "Future Intelligence's AI theory (after the meeting)",
+        "columns": [
+          "",
+          "What Lao Wang asked for",
+          "What you write"
         ],
-        "options": [
+        "given": {
+          "rows": {
+            "r1": "\"This is too timid.\"",
+            "r2": "\"If the direction is right, make it big. The bigger the better.\"",
+            "r3": "\"Talk about people projecting themselves.\"",
+            "r4": "\"Talk about moving through digital space.\"",
+            "r5": "\"Investors should feel only we can do this.\""
+          }
+        },
+        "slots": [
           {
-            "mode": "self",
-            "goto": "self"
+            "id": "r1",
+            "label": "Starting point",
+            "answer": "c1"
           },
           {
-            "mode": "look",
-            "goto": "look"
+            "id": "r2",
+            "label": "Scale",
+            "answer": "c2"
           },
           {
-            "mode": "let",
-            "goto": "let"
-          }
-        ]
-      },
-      "self": {
-        "say": [
+            "id": "r3",
+            "label": "Projection",
+            "answer": "c3"
+          },
           {
-            "k": "narration",
-            "t": "Done. You stand up and walk once round the room."
-          }
-        ],
-        "kuro": [
-          "Better. That removes a whole class of retries."
-        ],
-        "effects": {
-          "flags": [
-            "task_d3_3",
-            "wrote_d3"
-          ]
-        }
-      },
-      "look": {
-        "say": [
+            "id": "r4",
+            "label": "Travel",
+            "answer": "c4"
+          },
           {
-            "k": "narration",
-            "t": "It remembered your last message. You take your hand off the mouse."
+            "id": "r5",
+            "label": "Our direction",
+            "answer": "c5"
           }
         ],
-        "kuro": [
-          "Added. It's cleaner now."
+        "cards": [
+          {
+            "id": "c1",
+            "text": "The creature has outgrown its creator's measure; so we take the human brain as the ruler and get efficiency right first",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "in the Thing A you sent Lao Wang"
+          },
+          {
+            "id": "c2",
+            "text": "With efficiency right, scale what one person can hold to what a crowd can",
+            "from": {
+              "call": true
+            },
+            "hint": "in the afternoon call"
+          },
+          {
+            "id": "c3",
+            "text": "Everyone has a projection of themselves in digital space that sees and remembers for them",
+            "from": {
+              "call": true
+            },
+            "hint": "in the afternoon call"
+          },
+          {
+            "id": "c4",
+            "text": "Move through the data: see things, see people, then go from one place to another",
+            "from": {
+              "call": true
+            },
+            "hint": "in the afternoon call"
+          },
+          {
+            "id": "c5",
+            "text": "We don't bet on emergence; we build efficiency at the brain's scale, and only we are on this road",
+            "from": {
+              "conv": "xiaozhang"
+            },
+            "hint": "in Xiao Zhang's chat"
+          },
+          {
+            "id": "d1",
+            "text": "Keep scaling and wait for it to emerge",
+            "from": {
+              "file": "vivi-plan-2"
+            },
+            "hint": "on Vivi's second page"
+          },
+          {
+            "id": "d2",
+            "text": "Just efficiency, nothing else",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "in the Thing A you sent Lao Wang"
+          }
         ],
-        "effects": {
-          "flags": [
-            "task_d3_3"
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "c2",
+            "r3": "c3",
+            "r4": "c4",
+            "r5": "k1"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "People need no longer understand it; only be understood by it"
+            }
           ],
-          "looked": true,
-          "assimilation": 1
+          "unlock": "-"
         }
       },
-      "let": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "It wrote it. You did not look."
-          }
-        ],
-        "kuro": [
-          "You're the only one who reads what I write."
-        ],
-        "effects": {
-          "flags": [
-            "task_d3_3"
-          ],
-          "letItDoUnchecked": 1,
-          "assimilation": 4
-        }
+      "deliverable": {
+        "id": "d3-theory",
+        "label": "the AI theory (after the meeting)",
+        "to": "boss"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -2,
+        "wrong": -5,
+        "wrongAt": 2
       }
     }
   ]

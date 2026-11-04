@@ -111,7 +111,7 @@
     },
     {
       "id": "task1",
-      "text": "v17 v18 合一份。",
+      "text": "老王：把「意识」写进去。",
       "unlock": "done:msgs",
       "done": "flag:task_d4_1",
       "required": true

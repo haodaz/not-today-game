@@ -83,7 +83,7 @@
     },
     {
       "id": "task1",
-      "text": "错字找出来。",
+      "text": "本体那一页：它比人古老。",
       "unlock": "done:msgs",
       "done": "flag:task_d6_1",
       "required": true

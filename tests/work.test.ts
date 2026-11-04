@@ -58,21 +58,21 @@ describe("the loader accepts the document and the ledger, strictly", () => {
 });
 
 /** Day 1 with `task` open: boot, messages seen, and the tasks before it done (self). */
-function dayWith(taskId: "task1" | "task2" | "task3"): Store {
-  const store = createStore({ startDay: 1 });
+function dayWith(taskId: "task1" | "task2" | "task3", day = 1): Store {
+  const store = createStore({ startDay: day });
   store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
   store.appendEvent({ kind: "step", name: "openApp:msgs", t: "09:04" });
   for (const id of ["task1", "task2"] as const) {
     if (id === taskId) break;
-    store.appendEvent({ kind: "task", flag: tasks.find((x) => x.id === id)!.done, mode: "self" });
+    store.appendEvent({ kind: "task", flag: taskFiles.get(day)!.find((x) => x.id === id)!.done, mode: "self" });
   }
   return store;
 }
-function ctxFor(store: Store) {
+function ctxFor(store: Store, day = 1) {
   let now = 0;
   const session = initialSession({ beat: "work", time: "10:00" }, "right", "desktop");
   const ctx: ActionContext = { store, session, rerender: () => {}, later: () => {}, now: () => now };
-  const app = (): AppContext => ({ state: store.getState(), events: store.getEvents(), startDay: 1, session, night: false, nowMs: now });
+  const app = (): AppContext => ({ state: store.getState(), events: store.getEvents(), startDay: day, session, night: false, nowMs: now });
   return { ctx, app, wait: (ms: number) => (now += ms) };
 }
 const act = (ctx: ActionContext, name: string, data: Record<string, string> = {}) => loopActions[name]!(ctx, data as DOMStringMap, null as never);
@@ -110,13 +110,15 @@ describe("the choice is a reply", () => {
   });
 
   it.each(["self", "look", "let"] as const)("a task without a surface completes on the chip: the same event as before (%s)", (mode) => {
-    const store = dayWith("task3");
-    const { ctx } = ctxFor(store);
+    // Day 1's three tasks all have surfaces now (task3 is 事情 A's board); day 5's 「导出加 CSV」 has none.
+    const csv = taskFiles.get(5)!.find((x) => x.id === "task2")!;
+    const store = dayWith("task2", 5);
+    const { ctx } = ctxFor(store, 5);
     const before = store.getState();
     act(ctx, "wb-send");
     act(ctx, "wb-choose", { mode });
-    expect(lastTask(store)).toEqual({ kind: "task", day: 1, flag: task3.done, mode });
-    expect(store.getState().flags).toEqual(applyEvent(before, { kind: "task", day: 1, flag: task3.done, mode }).flags);
+    expect(lastTask(store)).toEqual({ kind: "task", day: 5, flag: csv.done, mode });
+    expect(store.getState().flags).toEqual(applyEvent(before, { kind: "task", day: 5, flag: csv.done, mode }).flags);
   });
 });
 

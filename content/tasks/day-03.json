@@ -239,83 +239,138 @@
     },
     {
       "id": "task3",
-      "title": "今天真正的活：写完。",
+      "title": "会上说的：把 AI 理论往大里讲。",
       "app": "docs",
       "done": "task_d3_3",
-      "start": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "天黑下来了，台灯那个圆显出来了。这件是你自己的活。"
-          }
+      "board": {
+        "kind": "table",
+        "title": "未来智能的 AI 理论（会后版）",
+        "columns": [
+          "",
+          "老王在会上要的",
+          "你写进去的"
         ],
-        "options": [
+        "given": {
+          "rows": {
+            "r1": "「你这个太保守了。」",
+            "r2": "「方向对了，就往大里讲，越大越好。」",
+            "r3": "「讲人的投射。」",
+            "r4": "「讲在数字空间里穿梭。」",
+            "r5": "「要让投资人觉得只有我们能做。」"
+          }
+        },
+        "slots": [
           {
-            "mode": "self",
-            "goto": "self"
+            "id": "r1",
+            "label": "出发点",
+            "answer": "c1"
           },
           {
-            "mode": "look",
-            "goto": "look"
+            "id": "r2",
+            "label": "放大",
+            "answer": "c2"
           },
           {
-            "mode": "let",
-            "goto": "let"
-          }
-        ]
-      },
-      "self": {
-        "say": [
+            "id": "r3",
+            "label": "人的投射",
+            "answer": "c3"
+          },
           {
-            "k": "narration",
-            "t": "写完了。你站起来，在屋里转了一圈。"
-          }
-        ],
-        "kuro": [
-          "Better. That removes a whole class of retries."
-        ],
-        "effects": {
-          "flags": [
-            "task_d3_3",
-            "wrote_d3"
-          ]
-        }
-      },
-      "look": {
-        "say": [
+            "id": "r4",
+            "label": "穿梭",
+            "answer": "c4"
+          },
           {
-            "k": "narration",
-            "t": "它记住了你上一条。你把手从鼠标上拿开。"
+            "id": "r5",
+            "label": "我们的方向",
+            "answer": "c5"
           }
         ],
-        "kuro": [
-          "Added. It's cleaner now."
+        "cards": [
+          {
+            "id": "c1",
+            "text": "造物已经大到造物主没法用人的量级去对应；所以我们以人脑为尺子，先把效率做对",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "在你发给老王的事情 A 里"
+          },
+          {
+            "id": "c2",
+            "text": "效率对了，再把一个人能管住的，放大成一群人的",
+            "from": {
+              "call": true
+            },
+            "hint": "在下午那通电话里"
+          },
+          {
+            "id": "c3",
+            "text": "每个人在数字空间里有一个自己的投影，替他看、替他记",
+            "from": {
+              "call": true
+            },
+            "hint": "在下午那通电话里"
+          },
+          {
+            "id": "c4",
+            "text": "在数据之间穿梭：看物，看人，再从一处走到另一处",
+            "from": {
+              "call": true
+            },
+            "hint": "在下午那通电话里"
+          },
+          {
+            "id": "c5",
+            "text": "不赌涌现，做人脑尺度的效率：这条路只有我们在走",
+            "from": {
+              "conv": "xiaozhang"
+            },
+            "hint": "在小张的私聊里"
+          },
+          {
+            "id": "d1",
+            "text": "继续堆规模，等它自己涌现",
+            "from": {
+              "file": "vivi-plan-2"
+            },
+            "hint": "在 Vivi 的第二个页面里"
+          },
+          {
+            "id": "d2",
+            "text": "就讲效率，别的不讲",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "在你发给老王的事情 A 里"
+          }
         ],
-        "effects": {
-          "flags": [
-            "task_d3_3"
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "c2",
+            "r3": "c3",
+            "r4": "c4",
+            "r5": "k1"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "人不必再理解它，只需被它理解"
+            }
           ],
-          "looked": true,
-          "assimilation": 1
+          "unlock": "-"
         }
       },
-      "let": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "它写的。你没看。"
-          }
-        ],
-        "kuro": [
-          "You're the only one who reads what I write."
-        ],
-        "effects": {
-          "flags": [
-            "task_d3_3"
-          ],
-          "letItDoUnchecked": 1,
-          "assimilation": 4
-        }
+      "deliverable": {
+        "id": "d3-theory",
+        "label": "AI 理论（会后版）",
+        "to": "boss"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -2,
+        "wrong": -5,
+        "wrongAt": 2
       }
     }
   ]

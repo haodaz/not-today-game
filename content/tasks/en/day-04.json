@@ -4,128 +4,123 @@
   "tasks": [
     {
       "id": "task1",
-      "title": "Merge v17 and v18 into one.",
+      "title": "Lao Wang: put consciousness in.",
       "app": "docs",
       "done": "task_d4_1",
-      "start": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "\"Export as PDF\" and \"Export as PDF; no repeat export within three days\". Two versions of the same requirement."
+      "board": {
+        "kind": "table",
+        "title": "The AI theory · consciousness",
+        "columns": [
+          "",
+          "What Lao Wang wants",
+          "What you write"
+        ],
+        "given": {
+          "rows": {
+            "r1": "\"Whether AI is conscious, we say it first.\"",
+            "r2": "\"That company talks ontology. We talk consciousness. One level up.\"",
+            "r3": "\"It needs data.\"",
+            "r4": "\"One line the investors remember.\""
           }
-        ],
-        "options": [
-          {
-            "mode": "self",
-            "goto": "self"
-          },
-          {
-            "mode": "look",
-            "goto": "look"
-          },
-          {
-            "mode": "let",
-            "goto": "let"
-          }
-        ]
-      },
-      "self": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "You open them side by side and check them clause by clause."
-          }
-        ],
-        "kuro": [],
-        "effects": {
-          "flags": [
-            "task_d4_1"
-          ]
-        }
-      },
-      "look": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "You type: say what each of these two means, separately."
-          }
-        ],
-        "kuro": [
-          "Of course. Let me take another look."
-        ],
-        "effects": {
-          "flags": [
-            "task_d4_1"
-          ],
-          "looked": true,
-          "assimilation": 1
-        }
-      },
-      "let": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "It answers Done. The version number goes from v18 to v18. You do not click Take a look."
-          }
-        ],
-        "kuro": [
-          "Done."
-        ],
-        "effects": {
-          "flags": [
-            "task_d4_1"
-          ],
-          "letItDoUnchecked": 1,
-          "assimilation": 4
-        }
-      },
-      "doc": {
-        "left": [
-          "1. Users can start an export from the workbench.",
-          "2. An export contains every version of the current document.",
-          "3. Users can export to PDF.",
-          "4. Exported files are named by date.",
-          "5. Exports are unlimited.",
-          "6. Export records are kept for ninety days."
-        ],
-        "right": [
-          "1. Users can start an export from the workbench.",
-          "2. An export contains every version of the current document.",
-          "3. Users can export to PDF; no repeat export within three days.",
-          "4. Exported files are named by date.",
-          "5. Exports are unlimited.",
-          "6. Export records are kept for ninety days."
-        ],
-        "conflict": [
-          2,
-          4
-        ],
-        "catchFlags": [
-          "task_d4_1"
-        ],
-        "kuroEdit": {
-          "clause": 2,
-          "text": "3. Users can export to PDF. An export within three days counts as the same one."
         },
-        "marks": [
+        "slots": [
           {
-            "clause": 2,
-            "kind": "conflict",
-            "worth": 1
+            "id": "r1",
+            "label": "Say it first",
+            "answer": "c1"
           },
           {
-            "clause": 4,
-            "kind": "conflict",
-            "worth": 1
+            "id": "r2",
+            "label": "The rival",
+            "answer": "c2"
           },
           {
-            "clause": 2,
-            "kind": "kuro",
-            "worth": 2,
-            "caught": "Mine. The same export, counted once.",
-            "word": "same"
+            "id": "r3",
+            "label": "Proof",
+            "answer": "c3"
+          },
+          {
+            "id": "r4",
+            "label": "One line",
+            "answer": "c4"
           }
-        ]
+        ],
+        "cards": [
+          {
+            "id": "c1",
+            "text": "It isn't conscious, but it has attention: in brain science, attention is efficiency",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "in the AI theory you sent Lao Wang"
+          },
+          {
+            "id": "c2",
+            "text": "Their ontology joins things; our graph joins how people attend to things",
+            "from": {
+              "conv": "group"
+            },
+            "hint": "in the videos Lao Wang posted"
+          },
+          {
+            "id": "c3",
+            "text": "It is still processing at 2:40 in the morning, never drifting",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "in Lao Wang's message in the night"
+          },
+          {
+            "id": "c4",
+            "text": "It doesn't sleep, but it knows when you do",
+            "from": {
+              "conv": "laozhou"
+            },
+            "hint": "in Lao Zhou's chat"
+          },
+          {
+            "id": "d1",
+            "text": "It is conscious, and more awake than people",
+            "from": {
+              "conv": "group"
+            },
+            "hint": "in the videos Lao Wang posted"
+          },
+          {
+            "id": "d2",
+            "text": "Consciousness has nothing to do with us",
+            "from": {
+              "file": "c-v17"
+            },
+            "hint": "in the agreement, v17"
+          }
+        ],
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "c2",
+            "r3": "c3",
+            "r4": "k1"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "It's awake, so you can sleep"
+            }
+          ],
+          "unlock": "-"
+        }
+      },
+      "deliverable": {
+        "id": "d4-mind",
+        "label": "the AI theory · consciousness",
+        "to": "boss"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -3,
+        "wrong": -6,
+        "wrongAt": 2
       }
     },
     {

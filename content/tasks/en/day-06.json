@@ -4,87 +4,138 @@
   "tasks": [
     {
       "id": "task1",
-      "title": "Find the typos.",
+      "title": "The ontology page: older than people.",
       "app": "docs",
       "done": "task_d6_1",
-      "start": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "Two typos. You did not type them, and neither did it."
-          }
+      "board": {
+        "kind": "table",
+        "title": "For the client · what the ontology is",
+        "columns": [
+          "",
+          "To answer",
+          "What you write"
         ],
-        "options": [
+        "given": {
+          "rows": {
+            "r1": "The client: \"Make it sound like a thing.\"",
+            "r2": "The client: \"It needs a history.\"",
+            "r3": "Lao Wang: \"Write that it is older than people.\"",
+            "r4": "The client: \"What does it need?\"",
+            "r5": "Lao Wang: \"End on us.\""
+          }
+        },
+        "slots": [
           {
-            "mode": "self",
-            "goto": "self"
+            "id": "r1",
+            "label": "What it is",
+            "answer": "c1"
           },
           {
-            "mode": "look",
-            "goto": "look"
+            "id": "r2",
+            "label": "Where it comes from",
+            "answer": "c2"
           },
           {
-            "mode": "let",
-            "goto": "let"
-          }
-        ]
-      },
-      "self": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "You find both and fix them. History: your account, 02:40."
+            "id": "r3",
+            "label": "How old",
+            "answer": "c3"
           },
           {
-            "k": "inner",
-            "t": "I was asleep then."
-          }
-        ],
-        "kuro": [],
-        "effects": {
-          "flags": [
-            "task_d6_1",
-            "found_typos"
-          ]
-        }
-      },
-      "look": {
-        "say": [
+            "id": "r4",
+            "label": "What it wants",
+            "answer": "c4"
+          },
           {
-            "k": "narration",
-            "t": "You ask it who typed the typos."
+            "id": "r5",
+            "label": "Us",
+            "answer": "c5"
           }
         ],
-        "kuro": [
-          "Not me. Your account, 02:40. You were asleep."
+        "cards": [
+          {
+            "id": "c1",
+            "text": "A graph that joins everything",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "in the Thing A you sent Lao Wang"
+          },
+          {
+            "id": "c2",
+            "text": "First the relations, then the things",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "in the other company's BP Lao Wang forwarded"
+          },
+          {
+            "id": "c3",
+            "text": "Before people named things, the relations were already there",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "in Lao Wang's voice note"
+          },
+          {
+            "id": "c4",
+            "text": "To be connected",
+            "from": {
+              "conv": "group"
+            },
+            "hint": "in what the client said in the group"
+          },
+          {
+            "id": "c5",
+            "text": "We connect people to it, for it",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "in the AI theory you sent Lao Wang"
+          },
+          {
+            "id": "d1",
+            "text": "We invented the ontology",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "in the other company's BP Lao Wang forwarded"
+          },
+          {
+            "id": "d2",
+            "text": "It wants nothing",
+            "from": {
+              "conv": "group"
+            },
+            "hint": "in what the client said in the group"
+          }
         ],
-        "effects": {
-          "flags": [
-            "task_d6_1",
-            "found_typos",
-            "asked_typo"
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "c2",
+            "r3": "c3",
+            "r4": "c4",
+            "r5": "k1"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "We connect you to it, for it"
+            }
           ],
-          "looked": true,
-          "assimilation": 1
+          "unlock": "-"
         }
       },
-      "let": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "It fixed them. And some other things while it was at it."
-          }
-        ],
-        "kuro": [
-          "Fixed."
-        ],
-        "effects": {
-          "flags": [
-            "task_d6_1"
-          ],
-          "letItDoUnchecked": 1,
-          "assimilation": 4
-        }
+      "deliverable": {
+        "id": "d6-ontology",
+        "label": "what the ontology is (for the client)",
+        "to": "group"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -3,
+        "wrong": -6,
+        "wrongAt": 2
       }
     },
     {

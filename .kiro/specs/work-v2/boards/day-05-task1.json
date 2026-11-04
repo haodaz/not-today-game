@@ -1,0 +1,127 @@
+{
+  "title": "Vivi：「分身」那一页。",
+  "board": {
+    "kind": "table",
+    "title": "PRD · 分身",
+    "columns": [
+      "",
+      "Vivi 要的",
+      "你写进去的"
+    ],
+    "given": {
+      "rows": {
+        "r1": "「就叫分身。」",
+        "r2": "「替你开会，替你回消息。」",
+        "r3": "「要讲得温暖。」",
+        "r4": "「法务说要写清楚边界。」"
+      },
+      "lock": {
+        "object": "pager",
+        "codes": [
+          "2041",
+          "7734",
+          "1999"
+        ],
+        "answer": "2041"
+      }
+    },
+    "slots": [
+      {
+        "id": "r1",
+        "label": "名字",
+        "answer": "c1"
+      },
+      {
+        "id": "r2",
+        "label": "它能做什么",
+        "answer": "c2"
+      },
+      {
+        "id": "r3",
+        "label": "它和你",
+        "answer": "c3"
+      },
+      {
+        "id": "r4",
+        "label": "边界",
+        "answer": "c4"
+      }
+    ],
+    "cards": [
+      {
+        "id": "c1",
+        "text": "分身：你在数字空间里的那一个",
+        "from": {
+          "file": "vivi-prd"
+        },
+        "hint": "在 Vivi 的 PRD 里"
+      },
+      {
+        "id": "c2",
+        "text": "替你回「好的。」",
+        "from": {
+          "conv": "partner"
+        },
+        "hint": "在你和 Vivi 的私聊里"
+      },
+      {
+        "id": "c3",
+        "text": "它记得你忘了的事",
+        "from": {
+          "conv": "group"
+        },
+        "hint": "在群里老周那句话里"
+      },
+      {
+        "id": "c4",
+        "text": "它不能替你签字",
+        "from": {
+          "file": "c-v17"
+        },
+        "hint": "在合作协议 v17 的签字条款里"
+      },
+      {
+        "id": "d1",
+        "text": "分身就是你",
+        "from": {
+          "file": "vivi-prd"
+        },
+        "hint": "在 Vivi 的 PRD 里"
+      },
+      {
+        "id": "d2",
+        "text": "分身可以替你签字",
+        "from": {
+          "file": "vivi-prd"
+        },
+        "hint": "在 Vivi 的 PRD 里"
+      }
+    ],
+    "kuro": {
+      "fill": {
+        "r1": "c1",
+        "r2": "c2",
+        "r3": "k1",
+        "r4": "c4"
+      },
+      "cards": [
+        {
+          "id": "k1",
+          "text": "它比你更像你"
+        }
+      ],
+      "unlock": "2041"
+    }
+  },
+  "deliverable": {
+    "id": "d5-avatar",
+    "label": "PRD · 分身",
+    "to": "partner"
+  },
+  "judge": {
+    "perfect": 0,
+    "flawed": -3,
+    "wrong": -6,
+    "wrongAt": 2
+  }
+}
