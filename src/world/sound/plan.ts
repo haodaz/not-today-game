@@ -48,7 +48,7 @@ export const DUCK_MS = 600;
 export const duckFor = (view: string | undefined): number => (view === "desktop" ? SCREEN_DUCK : 1);
 
 /** The san-and-endings names (`bad`, `survive`, `good`) → the table's `musicAt.when` ids. */
-export const ENDING_WHEN = { good: "ending:good", bad: "ending:bad", survive: "ending:leave" } as const;
+export const ENDING_WHEN = { good: "ending:good", bad: "ending:bad", survive: "ending:leave", collapse: "ending:bad" } as const;
 
 /** The dream nights halve the bed under the dream music. */
 export const DREAM_BED_LEVEL = 0.5;

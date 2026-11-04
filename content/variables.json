@@ -330,7 +330,8 @@
       "none",
       "bad",
       "survive",
-      "good"
+      "good",
+      "collapse"
     ],
     "note": "Added by Kiro 2026-10-31 for the san-and-endings spec (docs/kiro-log.md). Set once by the `ending` event: bad at the shutdown beat after SAN reaches 0; survive / good when the last night ends. After it the run takes no more events.",
     "changedBy": "ending event (san-and-endings spec)",

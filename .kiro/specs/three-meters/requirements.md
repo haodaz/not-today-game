@@ -21,18 +21,22 @@ Letting Kuro work **no longer costs SAN**; it raises assimilation. Doing it your
 - An `upgrade` event: `+ assimUpgrade`.
 - Accepting the day-13 「全员升级」 (whatever event/flag records it today): assimilation becomes `assimilationMax`.
 
-## Endings (`src/state/endings.ts`)
-- **bad**: at the shutdown beat when SAN ≤ 0 (as today) **or** assimilation ≥ `assimilationMax`. The bad ending stays the same sequence (「温柔的世界」).
-- **good** conditions: `shookHand`, `recognisedAll`, `affinity` (as today), and **`assimilation ≤ assimilationGoodMax`** in place of `unchecked`. Drop `blockedAll` (the author: old objects no longer block the hand).
-- survive: as today.
+## Endings (`src/state/endings.ts`) — four of them
+Author: 「温柔的世界应该被克总同化之后回到第一天（梦境里一切美好的那一天）」「san 掉光了要有个崩坏世界结局，直接结束游戏，可以写你崩坏在第 x 天」.
+- **collapse** 「崩坏的世界」 (new): SAN ≤ 0. At the next ending check (the shutdown beat, or 躺下 right after the night's `boardJudge`) the run ends with `collapse`. Sequence: the room's collapse look runs straight through to white in about 4 s (reuse the late-days collapse stages; with `fx=0` or reduced motion, a cut to white), then black with one line `ending.collapse.line` (`{day}` = the day it happened), then the ending page like the others (its last line `credits.last.collapse`, `{day}` too), then the title. **The run is over**: no bad-end day, no return to day 1; 新游戏 starts fresh. The profile records it (`endings.collapse`); the title's collection shows it like the others (`title.fig.collapse`).
+- **bad** 「温柔的世界」: now **only** assimilation ≥ `assimilationMax` (SAN no longer leads here). Its sequence is unchanged: the dream-like happy day 1 (the bad-end day), the night reveal, the ending page, then day 1.
+- **good** conditions: `shookHand`, `recognisedAll`, `affinity` (as today), and **`assimilation ≤ assimilationGoodMax`** in place of `unchecked`. Drop `blockedAll` (old objects no longer block the hand).
+- **survive**: as today.
+- `ENDINGS` gains `"collapse"`; `content/variables.json` `ending` already lists it (Claude); the profile's ending counts and the collection gain it.
 
 ## Files
-`src/state/days/tasks.ts` (effects key), `src/state/days/effects.ts` (apply it), `src/state/events.ts` (board task and upgrade), wherever 全员升级 is applied (`src/state/upgrades.ts`), `src/state/endings.ts`. Tests: a new `tests/assimilation.test.ts`, and update the ending tests that assumed `blockedAll` / `unchecked`.
+`src/state/days/tasks.ts` (effects key), `src/state/days/effects.ts` (apply it), `src/state/events.ts` (board task and upgrade), wherever 全员升级 is applied (`src/state/upgrades.ts`), `src/state/endings.ts`, the ending flow and page (`src/world/endings/flow.ts`, `view.ts`, `record.ts`), the title collection (`src/ui/collection.ts`, `src/ui/title/*`). Tests: a new `tests/assimilation.test.ts`, and update the ending tests that assumed `blockedAll` / `unchecked`.
 
 ## Tests
 - A path with `assimilation: 4` raises it by 4; it never goes down or past 100; SAN is untouched by it.
 - A board printed with 2 assists and Kuro's card kept: + 2×3 + 3.
 - An upgrade: + 8; 全员升级 accepted: 100.
-- Assimilation 100 at the shutdown beat → bad, with SAN still high.
+- Assimilation 100 at the shutdown beat → bad (温柔的世界), with SAN still high.
+- SAN 0 after the night's judgement → collapse at 躺下 (not lieDown, no next day); SAN 0 at the shutdown beat → collapse; the line carries the day; no bad-end day follows; the profile counts it.
 - Good needs assimilation ≤ 40; 41 with everything else true → survive.
 - Old saves (no assimilation in their events) replay to 0.

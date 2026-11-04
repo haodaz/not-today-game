@@ -415,5 +415,8 @@
   "hand.give": "Hand it the {label}.",
   "hand.judge.perfect": "It takes it, leafs through, and draws it back into the gap. Nothing is left behind.",
   "hand.judge.flawed": "It takes it and stops on one page. A fingertip presses one line.",
-  "hand.judge.wrong": "It does not take it. Its hand feels its way round the desk and takes something else."
+  "hand.judge.wrong": "It does not take it. Its hand feels its way round the desk and takes something else.",
+  "ending.collapse.line": "You came apart on day {day}.",
+  "credits.last.collapse": "You came apart on day {day}. That day's work was never handed in.",
+  "title.fig.collapse": "A world coming apart"
 }

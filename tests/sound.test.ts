@@ -244,7 +244,7 @@ describe("soundPlan", () => {
   });
 
   it("the endings: san-and-endings' bad / survive / good map to the table's bad / leave / good; bed off", () => {
-    expect(ENDING_WHEN).toEqual({ good: "ending:good", bad: "ending:bad", survive: "ending:leave" });
+    expect(ENDING_WHEN).toEqual({ good: "ending:good", bad: "ending:bad", survive: "ending:leave", collapse: "ending:bad" });
     for (const [ending, id] of [["good", "end-stay"], ["bad", "end-go"], ["survive", "end-go"]] as const) {
       expect(planOn(18, "night", ending)).toMatchObject({ bed: null, music: id, stinger: null });
     }

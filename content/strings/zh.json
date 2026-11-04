@@ -415,5 +415,8 @@
   "hand.give": "把{label}递给它。",
   "hand.judge.perfect": "它接过去，翻了翻，收进缝里。什么也没留下。",
   "hand.judge.flawed": "它接过去，停在其中一页上。指尖在那一行按了一下。",
-  "hand.judge.wrong": "它没有接。它的手在桌上摸了一圈，拿走了别的。"
+  "hand.judge.wrong": "它没有接。它的手在桌上摸了一圈，拿走了别的。",
+  "ending.collapse.line": "你崩坏在第 {day} 天。",
+  "credits.last.collapse": "你崩坏在第 {day} 天。那天的活，没有交出去。",
+  "title.fig.collapse": "崩坏的世界"
 }
