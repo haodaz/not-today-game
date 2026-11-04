@@ -225,7 +225,10 @@ describe("R3 · the toggles and the panes", () => {
     const out = renderShell(h.app(), t1, 1, fill).main.value;
     expect(cardOf(out, "work")).not.toBeNull();
     expect(cardOf(out, "explorer")).toBeNull();
-    expect(out).toMatch(/data-card="work">.*<div class="ask done"><div class="wthread">/s);
+    // R11: the thread read back is the conversation; the pane holds the surface; no chips (handed in).
+    expect(out).toMatch(/<div class="sh-conv"><div class="sh-thread"><div class="sh-me" data-on="work">/);
+    expect(out).toMatch(/data-card="work">.*<div class="sh-work"><div class="surface /s);
+    expect(out).not.toContain("wthread");
     expect(out).toContain('<div class="sh-composer"></div>');
   });
 });
@@ -530,5 +533,130 @@ describe("R8 · the explorer is never auto-hidden; R9 · line icons", () => {
     const out = onPage().out();
     for (const glyph of ["▤", "◍", "●", "⤢", "⊟", "▸", "▾"]) expect(out, glyph).not.toContain(glyph);
     expect([...out.matchAll(/<svg class="ic" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"/g)].length).toBeGreaterThan(8);
+  });
+});
+
+// ——— R11: a task without a board; the dock over full-screen 工作台 ———
+
+import { atDockEdge, dockPeeker, DOCK_EDGE_PX, DOCK_HIDE_MS } from "@world/desktop/dockpeek";
+import { renderWork } from "@world/desktop/workbench/work";
+import { shellActions } from "@world/desktop/controller";
+
+describe("R11.1 · a task without a board: the thread is the conversation, the surface the pane", () => {
+  /** Day 1 with task1 (a 文档 task, no board) under way. */
+  const onTask1 = () => {
+    const store = createStore({ startDay: 1 });
+    store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
+    store.appendEvent({ kind: "step", name: "openApp:msgs", t: "09:04" });
+    const h = harness(store);
+    h.act("wb-nav", { page: "task:task1" });
+    return h;
+  };
+  const conv = (out: string) => /<div class="sh-conv">(.*?)<\/div><div class="sh-composer">/s.exec(out)?.[1] ?? "";
+  const composer = (out: string) => /<div class="sh-composer">(.*?)<\/div><\/div><div class="sh-panes">/s.exec(out)?.[1] ?? "";
+  const pane = (out: string) => /<section class="sh-card sh-work"[^>]*>(.*)<\/section>/s.exec(out)?.[1] ?? "";
+  const t1 = () => taskFiles.get(1)!.find((x) => x.id === "task1")!;
+
+  it("before the sentence is sent: the composer holds the input and ↑; the surface pane is open", () => {
+    const out = onTask1().out();
+    expect(out).toContain('<div class="sh-conv"><div class="sh-thread"></div><div class="sh-composer">');
+    expect(composer(out)).toMatch(/^<div class="ask sh-ask"><input class="ph" data-input="wb-draft"[^>]*value="[^"]+".*data-action="wb-send">/s);
+    expect(pane(out)).toMatch(/<div class="sh-work"><div class="surface (doc|ledger|mark)/);
+  });
+
+  it("sent: the player's line and Kuro's question are bubbles in the column; the mode chips are in the composer", () => {
+    const h = onTask1();
+    h.act("wb-send");
+    const out = h.out();
+    const c = conv(out);
+    expect(c).toMatch(/^<div class="sh-thread"><div class="sh-me" data-on="work"><div class="sh-bub">[^<]+<\/div><\/div><div class="sh-kuro first" data-on="question"><img class="sh-av"/);
+    expect(c).not.toContain("wb-choose");
+    expect(c).not.toContain('class="wm');
+    expect([...composer(out).matchAll(/class="sh-chip" data-action="wb-choose" data-mode="(self|let|look)"/g)].map((m) => m[1]).sort()).toEqual(["let", "look", "self"]);
+    expect(pane(out)).not.toContain("wb-choose");
+    expect(pane(out)).not.toContain("sh-me");
+  });
+
+  it("a mode chosen: its chip is the player's bubble; Kuro working shows its dots in the column; the surface and 通过 follow", () => {
+    const h = onTask1();
+    h.act("wb-send");
+    h.act("wb-choose", { mode: "self" });
+    const out = h.out();
+    expect(conv(out)).toContain(`<div class="sh-me" data-on="work"><div class="sh-bub">${escapeHtml(t("wb.mode.self"))}</div></div>`);
+    expect(composer(out)).not.toContain("wb-choose");
+    expect(composer(out)).toContain('data-action="wb-pass"');
+    expect(pane(out)).toMatch(/<div class="sh-work"><div class="surface /);
+    // 让它做: Kuro works (its dots in the column); the pane waits.
+    const k = onTask1();
+    k.act("wb-send");
+    k.act("wb-choose", { mode: "let" });
+    k.session.work!.busyUntil = Number.MAX_SAFE_INTEGER;
+    const busy = renderShell(k.app(), t1(), 1, fill).main.value;
+    expect(conv(busy)).toContain('<div class="sh-kuro typing" aria-live="polite">');
+    // The surface waits empty while Kuro works (as it did in the ask box).
+    expect(pane(busy)).toMatch(/<div class="sh-work">(<div class="surface (doc|ledger)"><\/div>)?<\/div>/);
+  });
+
+  it("the ask box elsewhere is drawn exactly as before (the same items, joined)", () => {
+    const h = onTask1();
+    h.act("wb-send");
+    const out = renderWork(h.app()).value;
+    expect(out).toMatch(/^<div class="ask"><div class="wthread"><div class="wm me">/);
+    expect(out).toContain('<div class="wchips"><button type="button" class="chip" data-action="wb-choose"');
+  });
+});
+
+describe("R11.2 · the dock over full-screen 工作台", () => {
+  const desktop = (patch: Partial<Session>) => {
+    const store = day1();
+    const h = harness(store);
+    Object.assign(h.session, { focus: "left" }, patch);
+    return renderDesktop(buildShell(store.getState(), store.getEvents(), h.session, desktopApps, 0, 1)).value;
+  };
+  const dockClass = (out: string) => /<div class="(dock[^"]*)">/.exec(out)?.[1];
+
+  it("hidden while 工作台 is in front on the left monitor; up while peeking; other apps keep it", () => {
+    expect(dockClass(desktop({ leftApp: "workbench" }))).toBe("dock auto");
+    expect(dockClass(desktop({ leftApp: "workbench", dockPeek: true }))).toBe("dock auto peek");
+    expect(dockClass(desktop({ leftApp: "msgs", place: { msgs: "left", tingtalk: "right", workbench: "left", browser: "left" } }))).toBe("dock");
+    expect(dockClass(desktop({ leftApp: "browser", dockPeek: true }))).toBe("dock");
+    const css = readFileSync(resolve(__dirname, "../src/world/desktop/desktop.css"), "utf8");
+    expect(css).toContain(".dock.auto{transform:translate(-50%,calc(100% + 24px))");
+    expect(css).toContain(".dock.auto.peek{transform:translateX(-50%)}");
+  });
+
+  it("the bottom 6 px of the monitor bring it up; it hides 600 ms after the pointer leaves", () => {
+    const rect = { left: 0, right: 1600, bottom: 900 };
+    expect(DOCK_EDGE_PX).toBe(6);
+    expect(atDockEdge(800, 900 - DOCK_EDGE_PX, rect)).toBe(true);
+    expect(atDockEdge(800, 899, rect)).toBe(true);
+    expect(atDockEdge(800, 900 - DOCK_EDGE_PX - 1, rect)).toBe(false);
+    expect(atDockEdge(1700, 899, rect)).toBe(false);
+    let on = false;
+    const timers: { ms: number; fn: () => void; gone: boolean }[] = [];
+    const p = dockPeeker({ shown: () => on, set: (v) => void (on = v), later: (ms, fn) => timers.push({ ms, fn, gone: false }), cancel: (h) => void (timers[(h as number) - 1]!.gone = true) });
+    p.move(false);
+    expect([on, timers.length]).toEqual([false, 0]);
+    p.move(true);
+    expect(on).toBe(true);
+    p.move(false);
+    expect(timers.map((x) => x.ms)).toEqual([DOCK_HIDE_MS]);
+    expect(DOCK_HIDE_MS).toBe(600);
+    p.move(false); // no second timer
+    expect(timers).toHaveLength(1);
+    // Back at the edge (or on the dock) before it ran: the hide is dropped.
+    p.move(true);
+    expect(timers[0]!.gone).toBe(true);
+    p.move(false);
+    timers.at(-1)!.fn();
+    expect(on).toBe(false);
+  });
+
+  it("the dock-peek action sets the session flag", () => {
+    const h = harness(day1());
+    shellActions["dock-peek"]!(h.ctx, { on: "1" } as DOMStringMap, null as never);
+    expect(h.session.dockPeek).toBe(true);
+    shellActions["dock-peek"]!(h.ctx, { on: "0" } as DOMStringMap, null as never);
+    expect(h.session.dockPeek).toBe(false);
   });
 });

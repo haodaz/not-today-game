@@ -114,9 +114,9 @@ describe("R1 · two kinds of page", () => {
     const h = harness(day1());
     h.act("wb-nav", { page: "task:task1" });
     const out = h.out();
-    // shell R3: its own surface is one pane, open by default.
-    expect(out).toMatch(/<section class="sh-card sh-work" data-card="work">.*<div class="sh-card-b"><div class="ask">/s);
-    expect(out).toContain('data-action="wb-send"');
+    // shell R3 / R11: its own surface is one pane, open by default; the input is in the composer.
+    expect(out).toMatch(/<section class="sh-card sh-work" data-card="work">.*<div class="sh-card-b"><div class="sh-work"><div class="surface /s);
+    expect(out).toMatch(/<div class="sh-composer"><div class="ask sh-ask">.*data-action="wb-send"/s);
     expect(headOf(out)).toContain(`data-action="wb-nav" data-page="docs">${escapeHtml(t("wb.nav.docs"))}</button>`);
   });
 
@@ -187,7 +187,8 @@ describe("R2 · one navigation: the rail and the session list", () => {
     expect([h.session.workbenchPage, h.session.wbTaskDay]).toEqual(["task:task1", 1]);
     const out = h.out();
     expect(h.side()).toContain('class="it on earlier"');
-    expect(out).toContain('<div class="ask done">');
+    // shell R11: the thread read back is the conversation; nothing to send.
+    expect(out).toMatch(/<div class="sh-thread"><div class="sh-me" data-on="work">/);
     expect(out).not.toContain('data-action="wb-send"');
     // Read-only: opening it logs nothing, and an earlier task never opened that day cannot be opened.
     expect(taskOpens(store)).toHaveLength(1);

@@ -2086,3 +2086,32 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
 - For Claude: `content/pager-foreign.json` with the day-8 pages (`009 200`, `003 026`, `002 031`)
   and their times.
 - `npx tsc --noEmit`: clean. `npx vitest run`: 107 files / 1933 tests passed.
+
+## shell task 8 (R11): a non-board task's thread is the conversation; the dock over full-screen 工作台 (2026-11-04)
+
+- R11.1:
+  - `work.ts` now builds a reply-tree task's thread as `WorkItem`s (`workItems` live,
+    `doneWorkItems` read back). The item kinds are me, kuro (with reply chips), question, working,
+    surface and pass. `renderWork` joins them into exactly the markup it drew before, so the work
+    tests are unchanged.
+  - On a task page, `shell.ts` `workConversation` splits the items:
+    - the player's lines and Kuro's (its question too) become the board beats' bubbles (`sh-me` /
+      `sh-kuro` with the portrait), and Kuro working shows as dots;
+    - the mode chips (`sh-chip wb-choose`), the 合并 / 不合 chips and 通过 go in the composer, with the
+      input and ↑ (`workInput`) while the page is live;
+    - the surface (document, ledger, code lines, the units, the gloss) is the `work` pane.
+  - Before a mode is chosen, and on a handed-in page, the pane shows `plainSurface`: the document's
+    columns, the ledger's table or the code's lines, nothing clickable. A task with no surface has no
+    pane. Read-only pages show their thread in the column and their plain surface in the pane.
+- R11.2:
+  - `src/world/desktop/dockpeek.ts`: `atDockEdge` (the bottom `DOCK_EDGE_PX` = 6), `dockPeeker`
+    (show at once; hide `DOCK_HIDE_MS` = 600 after the pointer leaves the edge and the dock), and
+    `createDockPeek`, the pointer layer mounted by the controller.
+  - It drives `session.dockPeek` through the `dock-peek` shell action.
+  - `shell.ts` gives the dock `auto` while 工作台 (full chrome) is front on the left monitor, plus
+    `peek` while `dockPeek` is true. The CSS slides it below the edge and back. Other apps keep the
+    dock as before.
+- Tests: 8 new R11 tests in `tests/shell.test.ts`. Updated one `shell` and two `workspace` tests
+  that read the old pane thread. `tests/__snapshots__/desktop-snapshots.test.ts.snap` was regenerated
+  (the dock's `auto` class on 工作台 scenes).
+- `npx tsc --noEmit`: clean. `npx vitest run`: 108 files / 1941 tests passed.

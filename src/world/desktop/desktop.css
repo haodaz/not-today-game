@@ -34,6 +34,11 @@ html,body{margin:0;background:#2b2e33;font-family:var(--font);color:var(--ink);f
 .dock .app img{display:block;width:var(--tile);height:var(--tile);pointer-events:none;image-rendering:auto}
 .dock .app.on::after{bottom:-8px}
 .dock .sep{width:1px;align-self:stretch;margin:6px 2px;background:rgba(0,0,0,.12)}
+/* shell R11.2: over full-screen 工作台 the dock is hidden below the bottom edge and slides up on the
+   bottom-edge hover (the macOS full-screen way); dockpeek.ts drives `.peek`. */
+.dock{transition:transform .25s ease}
+.dock.auto{transform:translate(-50%,calc(100% + 24px));z-index:9}
+.dock.auto.peek{transform:translateX(-50%)}
 /* The app name over its icon on hover/focus (desktop-ui 2026-11-02, point 2). */
 .dock .app .dock-name{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);white-space:nowrap;background:rgba(20,24,30,.9);color:#fff;font-size:12px;padding:3px 8px;border-radius:6px;opacity:0;pointer-events:none;transition:opacity .12s}
 .dock .app:hover .dock-name,.dock .app:focus-visible .dock-name{opacity:1}

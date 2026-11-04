@@ -23,7 +23,7 @@ import { ICONS } from "../icons";
 import { moveApp, otherSide } from "../placement";
 import { messageActions } from "../messages/actions";
 import { renderObjectBar } from "./objbar";
-import { openWork, renderDoneWork, renderWork } from "./work";
+import { doneWorkItems, modeChips, openWork, plainSurface, questionText, surfaceOf as workSurfaceOf, workInput, workItems } from "./work";
 
 type Fill = (s: string) => string;
 
@@ -45,7 +45,8 @@ function surfaceOf(task: Task, live: boolean): "ide" | "table" | "meeting" | "wo
 /** The panes this task has (R3): only these toggles appear. */
 export function panesOf(task: Task, live: boolean): PaneId[] {
   const surface = surfaceOf(task, live);
-  if (surface === "work") return ["work"];
+  // R11: a task without a board has its surface (document, ledger, code) as its one pane; none without one.
+  if (surface === "work") return workSurfaceOf(task) ? ["work"] : [];
   const own: PaneId[] = surface === "ide" ? (task.board!.ide?.files ? ["preview", "code"] : ["preview"]) : [surface];
   return PANE_ORDER.filter((p) => p === "files" || own.includes(p));
 }
@@ -215,18 +216,60 @@ export function conversationLines(task: Task, day: number, events: readonly Game
   return out;
 }
 
+const shellAv = () => html`<img class="sh-av" src="${frameUrl(FRAMES.idle[0])}" alt="" aria-hidden="true">`;
+
+/** The conversation's bubbles (R5): the player at the right; Kuro at the left, its portrait on the first line of a run. */
+function bubbles(lines: readonly { readonly who: "me" | "kuro"; readonly on: string; readonly body: SafeHtml | string }[]): SafeHtml[] {
+  return lines.map((l, i) => {
+    if (l.who === "me") return html`<div class="sh-me" data-on="${l.on}"><div class="sh-bub">${l.body}</div></div>`;
+    const first = i === 0 || lines[i - 1]!.who !== "kuro";
+    return html`<div class="${cls("sh-kuro", first && "first")}" data-on="${l.on}">${first ? shellAv() : html`<span class="sh-av-gap"></span>`}<div class="sh-kt">${l.body}</div></div>`;
+  });
+}
+
+/**
+ * A task without a board (R11): its thread is the conversation (the player's line, Kuro's question,
+ * the chosen mode, Kuro's answer), its chips and 通过 sit in the composer (the input too, while
+ * the sentence is unsent), and its surface goes to the pane. A handed-in page reads its thread back.
+ */
+function workConversation(ctx: AppContext, task: Task, day: number, live: boolean): SafeHtml {
+  const items = live ? workItems(ctx) : doneWorkItems(ctx, day, task);
+  const lines: { who: "me" | "kuro"; on: string; body: SafeHtml | string }[] = [];
+  const chips: SafeHtml[] = [];
+  let working = false;
+  for (const it of items) {
+    if (it.k === "me") lines.push({ who: "me", on: "work", body: it.text });
+    else if (it.k === "kuro") {
+      if (it.text) lines.push({ who: "kuro", on: "work", body: it.text });
+      if (it.chips) chips.push(it.chips);
+    } else if (it.k === "question") {
+      lines.push({ who: "kuro", on: "question", body: questionText(it.day) });
+      if (it.chips) chips.push(html`<div class="wchips">${modeChips("sh-chip")}</div>`);
+    } else if (it.k === "working") working = true;
+    else if (it.k === "pass") chips.push(it.html);
+  }
+  const dots = working ? html`<div class="sh-kuro typing" aria-live="polite">${shellAv()}<div class="sh-kt kscroll"><i></i><i></i><i></i></div></div>` : null;
+  const input = live ? html`<div class="ask sh-ask">${workInput(ctx)}</div>` : null;
+  return html`<div class="sh-conv"><div class="sh-thread">${bubbles(lines)}${dots}</div><div class="sh-composer">${chips}${input}</div></div>`;
+}
+
+/** The pane of a task without a board (R11): its surface as worked on now, or as it reads (default open). */
+function workPane(ctx: AppContext, task: Task, live: boolean, fill: Fill): SafeHtml {
+  const surfaces = live ? workItems(ctx).flatMap((it) => (it.k === "surface" ? [it.html] : [])) : [];
+  if (surfaces.length) return html`<div class="sh-work">${surfaces}</div>`;
+  // Kuro is working on it: the pane waits with it (the thread shows the dots).
+  if (live && workItems(ctx).some((it) => it.k === "working")) return html`<div class="sh-work"></div>`;
+  return html`<div class="sh-work">${plainSurface(task, fill)}</div>`;
+}
+
 function conversation(ctx: AppContext, task: Task, day: number, live: boolean, fill: Fill, board: TaskBoard | undefined, s: BoardState | null): SafeHtml {
+  if (!board) return workConversation(ctx, task, day, live);
   const { events, session, nowMs } = ctx;
   const lines = conversationLines(task, day, events, fill);
   const typing = session.ideTyping?.key === shellKey(day, task.id) ? session.ideTyping.times : [];
   const visible = lines.filter((_, i) => (typing[i] ?? 0) <= nowMs);
-  const av = html`<img class="sh-av" src="${frameUrl(FRAMES.idle[0])}" alt="" aria-hidden="true">`;
-  const rows = visible.map((l, i) => {
-    if (l.who === "me") return html`<div class="sh-me" data-on="${l.on}"><div class="sh-bub">${l.text}</div></div>`;
-    // Kuro's portrait at the left of the first line in a run.
-    const first = i === 0 || visible[i - 1]!.who !== "kuro";
-    return html`<div class="${cls("sh-kuro", first && "first")}" data-on="${l.on}">${first ? av : html`<span class="sh-av-gap"></span>`}<div class="sh-kt">${l.text}</div></div>`;
-  });
+  const av = shellAv();
+  const rows = bubbles(visible.map((l) => ({ who: l.who, on: l.on, body: l.text })));
   const dots = visible.length < lines.length ? html`<div class="sh-kuro typing" aria-hidden="true">${av}<div class="sh-kt">…</div></div>` : null;
   let chips: SafeHtml | null = null;
   if (live && board && s) {
@@ -278,7 +321,7 @@ export function renderShell(ctx: AppContext, task: Task, day: number, fill: Fill
     else if (p === "table") body = tablePane(ctx, task, board!, s!, live, day);
     else if (p === "meeting") body = meetingWindow(ctx, task, board!);
     else if (p === "files") body = board ? filesPane(ctx, board, st, fill) : html``;
-    else body = live ? renderWork(ctx, false) : renderDoneWork(ctx, day, task);
+    else body = workPane(ctx, task, live, fill);
     return card(p, PANE_ICON[p], paneName(p, task), body, st, open.length === 2 && (p === open[0] ? "first" : "second"));
   });
   const paneArea = paneCards.length ? html`<div class="sh-panes">${paneCards}</div>` : null;

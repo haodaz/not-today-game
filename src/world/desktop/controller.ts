@@ -14,6 +14,7 @@ import { onEmailChange, setEmailDraft } from "@net/email";
 import { appOn, buildShell, initialSession, type AppRenderers, type Session } from "./model";
 import { bringToFront, loadPlacement, moveApp, placementOf, savePlacement } from "./placement";
 import { createWindowDrag } from "./windrag";
+import { createDockPeek } from "./dockpeek";
 import { renderDesktop, APPS, type AppId } from "./shell";
 import { dockFor } from "./dock";
 import type { LookApi } from "@world/room/nav";
@@ -61,6 +62,13 @@ export const shellActions: Record<string, ActionHandler> = {
   screen(ctx, data) {
     if (data.screen !== "left" && data.screen !== "right") return;
     ctx.session.focus = data.screen;
+    ctx.rerender();
+  },
+  // shell R11.2: the hidden dock over full-screen 工作台 slides up (1) or away (0); session only.
+  "dock-peek"(ctx, data) {
+    const on = data.on === "1";
+    if (ctx.session.dockPeek === on) return;
+    ctx.session.dockPeek = on;
     ctx.rerender();
   },
   // A dock tile: the app's window comes to the front on its monitor, and that monitor is shown
@@ -384,6 +392,18 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
       console.warn(error);
     }
   });
+  // shell R11.2: the dock over full-screen 工作台 hides and peeks up from the bottom edge.
+  const dockPeek = createDockPeek(
+    root,
+    (name, data) => {
+      try {
+        actions[name]?.(ctx, data as DOMStringMap, root);
+      } catch (error) {
+        console.warn(error);
+      }
+    },
+    () => session.dockPeek,
+  );
   window.addEventListener("keydown", onKey);
   window.addEventListener("resize", fit);
   const unsubscribe = deps.store.subscribe(onStore);
@@ -409,6 +429,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
       root.removeEventListener("click", onClick);
       root.removeEventListener("input", onInput);
       drag.destroy();
+      dockPeek.destroy();
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("resize", fit);
     },

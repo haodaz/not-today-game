@@ -161,10 +161,8 @@ const kuro = (body: SafeHtml) => html`<div class="wm them">${kuroAv()}<div class
 
 /** Kuro's answer to the task: the day's line and 「这个怎么做？」; chips under it until one is chosen. */
 function question(day: number, chips: boolean): SafeHtml {
-  const idiom = kuroDay(day)?.idiom ?? null;
-  const how = hasString(HOW_KEY) ? html`<p>${tr(HOW_KEY)}</p>` : null;
-  const row = chips ? html`<div class="wchips">${CHIPS.map((c) => html`<button type="button" class="chip" data-action="wb-choose" data-mode="${c.mode}">${tr(c.key)}</button>`)}</div>` : null;
-  return html`<div class="wm them">${kuroAv()}<div><div class="bub">${idiom ? html`<p>${idiom}</p>` : null}${how}</div>${row}</div></div>`;
+  const row = chips ? html`<div class="wchips">${modeChips()}</div>` : null;
+  return html`<div class="wm them">${kuroAv()}<div><div class="bub">${questionText(day)}</div>${row}</div></div>`;
 }
 
 const chipLabel = (mode: TaskMode) => tr(CHIPS.find((c) => c.mode === mode)!.key);
@@ -177,8 +175,54 @@ export function mergePending(w: WorkThread, tree: Task | undefined): boolean {
   return w.mode === "self" && !!tree?.doc && caught(w, tree) && (w.merge ?? null) === null && mergeChips().length > 0;
 }
 
-/** The tasks done today from the workbench, drawn back from the log (no session needed). */
-function doneThreads(state: Pick<State, "day">, events: readonly GameEvent[], file: DayFile | undefined, fill: (s: string) => string, onlyFlag?: string): SafeHtml[] {
+/**
+ * One piece of a reply-tree task's thread (shell R11). The ask box joins them in order (as it always
+ * drew them); the task page's shell splits them: the lines into the conversation column, the chips
+ * and 通过 into the composer, the surface into the pane.
+ */
+export type WorkItem =
+  /** The player's line. */
+  | { readonly k: "me"; readonly text: SafeHtml | string }
+  /** Kuro's line; `chips` are reply chips under it (合并 / 不合). */
+  | { readonly k: "kuro"; readonly text: SafeHtml | null; readonly chips?: SafeHtml | null }
+  /** Kuro's question (the day's line and 「这个怎么做？」), with the mode chips until one is chosen. */
+  | { readonly k: "question"; readonly day: number; readonly chips: boolean }
+  /** Kuro working (its 3 s). */
+  | { readonly k: "working" }
+  /** The thing being worked on (document, ledger, code, the units, the gloss). */
+  | { readonly k: "surface"; readonly html: SafeHtml }
+  /** 通过. */
+  | { readonly k: "pass"; readonly html: SafeHtml };
+
+/** The mode chips under Kuro's question (自己做 / 让它做 / 我看一眼), with a button class. */
+export const modeChips = (klass = "chip"): SafeHtml => html`${CHIPS.map((c) => html`<button type="button" class="${klass}" data-action="wb-choose" data-mode="${c.mode}">${tr(c.key)}</button>`)}`;
+
+/** Kuro's question's text: the day's line and 「这个怎么做？」. */
+export function questionText(day: number): SafeHtml {
+  const idiom = kuroDay(day)?.idiom ?? null;
+  const how = hasString(HOW_KEY) ? html`<p>${tr(HOW_KEY)}</p>` : null;
+  return html`${idiom ? html`<p>${idiom}</p>` : null}${how}`;
+}
+
+/** The ask box's markup of one item, as it was before the split. */
+function itemHtml(it: WorkItem): SafeHtml {
+  switch (it.k) {
+    case "me":
+      return me(it.text);
+    case "kuro":
+      return it.chips ? html`<div class="wm them">${kuroAv()}<div>${it.text ? html`<div class="bub">${it.text}</div>` : null}${it.chips}</div></div>` : kuro(html`${it.text}`);
+    case "question":
+      return question(it.day, it.chips);
+    case "working":
+      return html`<div class="wm them working" aria-live="polite">${kuroAv()}<div class="bub kscroll"><i></i><i></i><i></i></div></div>`;
+    case "surface":
+    case "pass":
+      return it.html;
+  }
+}
+
+/** The thread of each task done today from the workbench, drawn back from the log (no session needed). */
+function doneItems(state: Pick<State, "day">, events: readonly GameEvent[], file: DayFile | undefined, fill: (s: string) => string, onlyFlag?: string): WorkItem[][] {
   return events.flatMap((e) => {
     if (e.kind !== "task" || e.day !== state.day || e.mode === "auto") return [];
     if (onlyFlag !== undefined && e.flag !== onlyFlag) return [];
@@ -187,12 +231,38 @@ function doneThreads(state: Pick<State, "day">, events: readonly GameEvent[], fi
     if (tree?.board) return [];
     const item = file?.items.find((i) => i.done.kind === "flag" && i.done.flag === e.flag);
     if (!item) return [];
-    const said = (tree?.[e.mode].kuro ?? []).map((k) => kuro(html`${k}`));
+    const said: WorkItem[] = (tree?.[e.mode].kuro ?? []).map((k) => ({ k: "kuro", text: html`${k}` }));
     const merged = e.merge === undefined ? null : MERGE_CHIPS.find((c) => c.merge === e.merge)!;
-    const reply = merged && hasString(merged.key) ? me(tr(merged.key)) : null;
-    return [html`${me(fill(item.text))}${question(state.day, false)}${me(chipLabel(e.mode))}${said}${reply}`];
+    const reply: WorkItem[] = merged && hasString(merged.key) ? [{ k: "me", text: tr(merged.key) }] : [];
+    return [[{ k: "me", text: fill(item.text) }, { k: "question", day: state.day, chips: false }, { k: "me", text: chipLabel(e.mode) }, ...said, ...reply] as WorkItem[]];
   });
 }
+function doneThreads(state: Pick<State, "day">, events: readonly GameEvent[], file: DayFile | undefined, fill: (s: string) => string, onlyFlag?: string): SafeHtml[] {
+  return doneItems(state, events, file, fill, onlyFlag).map((items) => html`${items.map(itemHtml)}`);
+}
+
+/**
+ * A task's surface as it reads before anything is done to it, or once handed in (shell R11: the
+ * pane is open from the start): the document's two columns, the ledger's table, the code's lines,
+ * none of them clickable. Null for a task without one.
+ */
+export function plainSurface(tree: Task, fill: (s: string) => string): SafeHtml | null {
+  if (tree.code || (tree.doc && marksOf(tree))) return markSurface(tree, blankThread(0, tree.id), null, false);
+  if (tree.doc) {
+    const d = tree.doc;
+    const col = (rows: readonly string[]) => rows.map((text, i) => html`<div class="${cls("cl", d.left[i] !== d.right[i] && "y")}">${text}</div>`);
+    return html`<div class="surface doc"><div class="cols"><div class="col">${col(d.left)}</div><div class="col">${col(d.right)}</div></div></div>`;
+  }
+  if (tree.ledger) {
+    const l = tree.ledger;
+    const head = l.columns.map((c) => html`<th>${fill(c)}</th>`);
+    const rows = l.rows.map((r) => html`<tr>${r.map((cell) => html`<td>${typeof cell === "number" ? String(cell) : fill(cell)}</td>`)}</tr>`);
+    return html`<div class="surface ledger"><table class="tbl"><tr>${head}</tr>${rows}</table></div>`;
+  }
+  return null;
+}
+/** A thread with nothing done yet. */
+const blankThread = (day: number, taskId: string): WorkThread => ({ day, taskId, mode: null, clicked: [], cell: null, cellDraft: "", editing: false, busyUntil: 0, opened: false, marks: [], unit: 0, fixed: [], caughtLine: null });
 
 function docSurface(tree: Task, w: WorkThread, busy: boolean): SafeHtml {
   const doc = tree.doc!;
@@ -333,68 +403,90 @@ export function renderDoneWork(ctx: AppContext, day: number, task: Task): SafeHt
  * On a task page (workspace R1) only the open task's own thread shows (`withDone: false`).
  */
 export function renderWork(ctx: AppContext, withDone = true): SafeHtml {
-  const { state, events, session } = ctx;
-  const fill = (s: string) => fillPlaceholders(s, state.names);
-  const file = dayFile(state.day);
+  const { state, events } = ctx;
   const open = openWork(state, events);
   // Work v2: a board task opens its board surface directly (no reply tree). Done boards are drawn
   // back from the log too (the printed board shows its filled table).
   if (open?.tree?.board) return renderBoard(ctx, open.tree);
+  const fill = (s: string) => fillPlaceholders(s, state.names);
+  const done = withDone ? doneThreads(state, events, dayFile(state.day), fill) : [];
+  const thread = [...done, ...workItems(ctx).map(itemHtml)];
+  return html`<div class="ask">${thread.length ? html`<div class="wthread">${thread}</div>` : null}${workInput(ctx)}</div>`;
+}
+
+/** The ask box's input: the sentence until it is sent (↑ sends it), the placeholder otherwise; the scope. */
+export function workInput(ctx: AppContext): SafeHtml {
+  const { state, events, session } = ctx;
+  const fill = (s: string) => fillPlaceholders(s, state.names);
+  const open = openWork(state, events);
   const w = open ? threadFor(session, state.day, open.item.id) : null;
-  const busy = !!w && ctx.nowMs < w.busyUntil;
-  const live: SafeHtml[] = [];
-  if (open && w) {
-    live.push(me(fill(open.item.text)), question(state.day, w.mode === null));
-    if (w.mode !== null) {
-      live.push(me(chipLabel(w.mode)));
-      const surface = surfaceOf(open.tree);
-      if (busy) live.push(html`<div class="wm them working" aria-live="polite">${kuroAv()}<div class="bub kscroll"><i></i><i></i><i></i></div></div>`);
-      // Self on the document: the first kuro line once the conflict is found (FR1).
-      if (surface === "doc" && w.mode === "self" && caught(w, open.tree)) {
-        // Kuro's line once the conflict is found, with 合并 / 不合 as reply chips under it (FR1).
-        const line = open.tree!.self.kuro[0];
-        const pending = mergePending(w, open.tree);
-        const chips = pending ? html`<div class="wchips">${mergeChips().map((c) => html`<button type="button" class="chip" data-action="wb-merge" data-merge="${c.merge ? "1" : "0"}">${tr(c.key)}</button>`)}</div>` : null;
-        if (chips) live.push(html`<div class="wm them">${kuroAv()}<div>${line ? html`<div class="bub">${line}</div>` : null}${chips}</div></div>`);
-        else if (line) live.push(kuro(html`${line}`));
-        const chosen = w.merge === undefined || w.merge === null ? null : MERGE_CHIPS.find((c) => c.merge === w.merge)!;
-        if (chosen) live.push(me(tr(chosen.key)));
-      }
-      const mm = markMode(w, open.tree);
-      const held = dictionaryHeld(session);
-      const hasMarks = !!marksOf(open.tree);
-      // A marking surface (items 1–7): a code surface always, and a doc/ledger when content lists marks.
-      // 自己做 with units: Kuro hands one unit at a time (the whole surface is not shown; item 3).
-      const units = unitFlow(open.tree!, w);
-      if (!busy && units) {
-        live.push(units);
-        if (w.caughtLine) live.push(kuro(html`${w.caughtLine}`));
-      } else if (!busy && (surface === "code" || (hasMarks && surface === "doc"))) {
-        live.push(markSurface(open.tree!, w, mm, held));
-        if (held && session.wbGloss) {
-          const g = dictLook(session.wbGloss);
-          if (g) live.push(glossTip(session.wbGloss, g));
-        }
-        if (w.caughtLine) live.push(kuro(html`${w.caughtLine}`));
-      } else if (!busy && hasMarks && surface === "ledger") {
-        live.push(ledgerSurface(open.tree!, w, busy, fill));
-        if (w.caughtLine) live.push(kuro(html`${w.caughtLine}`));
-      } else {
-        if (surface === "doc") live.push(docSurface(open.tree!, w, busy));
-        if (surface === "ledger") live.push(ledgerSurface(open.tree!, w, busy, fill));
-      }
-      // 通过 follows the merge answer when there is a question to answer.
-      if (surface && !mergePending(w, open.tree)) live.push(html`<div class="wpass"><button type="button" class="pass" data-action="wb-pass"${busy ? html` disabled` : null}>${tr("wb.code.pass")}</button></div>`);
-    }
-  }
-  const thread = [...(withDone ? doneThreads(state, events, file, fill) : []), ...live];
-  // The input: the sentence until it is sent; the placeholder otherwise.
   const draft = open && !w ? fill(open.item.text) : "";
   const input = html`<input class="ph" data-input="wb-draft" data-enter="wb-send" readonly value="${draft}" placeholder="${t("wb.ask.ph")}" aria-label="${t("wb.ask.ph")}"${open && !w ? html` data-task="${open.item.id}"` : null}>`;
   const scopeKey = session.wbScopeAll && hasString(SCOPE_ALL_KEY) ? SCOPE_ALL_KEY : "wb.scope";
   const scope = html`<button type="button" class="scope" data-action="wb-scope" aria-pressed="${session.wbScopeAll ? "true" : "false"}">${tr(scopeKey)}</button>`;
   const send = html`<button type="button" class="go" data-action="wb-send"${open && !w ? null : html` disabled`}>↑</button>`;
-  return html`<div class="ask">${thread.length ? html`<div class="wthread">${thread}</div>` : null}${input}<div class="strip">${scope}${send}</div></div>`;
+  return html`${input}<div class="strip">${scope}${send}</div>`;
+}
+
+/** The open reply-tree task's thread so far, as items (none before the sentence is sent). */
+export function workItems(ctx: AppContext): WorkItem[] {
+  const { state, events, session } = ctx;
+  const fill = (s: string) => fillPlaceholders(s, state.names);
+  const open = openWork(state, events);
+  if (!open || open.tree?.board) return [];
+  const w = threadFor(session, state.day, open.item.id);
+  if (!w) return [];
+  const busy = ctx.nowMs < w.busyUntil;
+  const live: WorkItem[] = [{ k: "me", text: fill(open.item.text) }, { k: "question", day: state.day, chips: w.mode === null }];
+  if (w.mode === null) return live;
+  const surf = (h: SafeHtml): WorkItem => ({ k: "surface", html: h });
+  live.push({ k: "me", text: chipLabel(w.mode) });
+  const surface = surfaceOf(open.tree);
+  if (busy) live.push({ k: "working" });
+  // Self on the document: the first kuro line once the conflict is found (FR1).
+  if (surface === "doc" && w.mode === "self" && caught(w, open.tree)) {
+    // Kuro's line once the conflict is found, with 合并 / 不合 as reply chips under it (FR1).
+    const line = open.tree!.self.kuro[0];
+    const pending = mergePending(w, open.tree);
+    const chips = pending ? html`<div class="wchips">${mergeChips().map((c) => html`<button type="button" class="chip" data-action="wb-merge" data-merge="${c.merge ? "1" : "0"}">${tr(c.key)}</button>`)}</div>` : null;
+    if (chips) live.push({ k: "kuro", text: line ? html`${line}` : null, chips });
+    else if (line) live.push({ k: "kuro", text: html`${line}` });
+    const chosen = w.merge === undefined || w.merge === null ? null : MERGE_CHIPS.find((c) => c.merge === w.merge)!;
+    if (chosen) live.push({ k: "me", text: tr(chosen.key) });
+  }
+  const mm = markMode(w, open.tree);
+  const held = dictionaryHeld(session);
+  const hasMarks = !!marksOf(open.tree);
+  const caughtLine = (): void => void (w.caughtLine && live.push({ k: "kuro", text: html`${w.caughtLine}` }));
+  // A marking surface (items 1–7): a code surface always, and a doc/ledger when content lists marks.
+  // 自己做 with units: Kuro hands one unit at a time (the whole surface is not shown; item 3).
+  const units = unitFlow(open.tree!, w);
+  if (!busy && units) {
+    live.push(surf(units));
+    caughtLine();
+  } else if (!busy && (surface === "code" || (hasMarks && surface === "doc"))) {
+    live.push(surf(markSurface(open.tree!, w, mm, held)));
+    if (held && session.wbGloss) {
+      const g = dictLook(session.wbGloss);
+      if (g) live.push(surf(glossTip(session.wbGloss, g)));
+    }
+    caughtLine();
+  } else if (!busy && hasMarks && surface === "ledger") {
+    live.push(surf(ledgerSurface(open.tree!, w, busy, fill)));
+    caughtLine();
+  } else {
+    if (surface === "doc") live.push(surf(docSurface(open.tree!, w, busy)));
+    if (surface === "ledger") live.push(surf(ledgerSurface(open.tree!, w, busy, fill)));
+  }
+  // 通过 follows the merge answer when there is a question to answer.
+  if (surface && !mergePending(w, open.tree)) live.push({ k: "pass", html: html`<div class="wpass"><button type="button" class="pass" data-action="wb-pass"${busy ? html` disabled` : null}>${tr("wb.code.pass")}</button></div>` });
+  return live;
+}
+
+/** A handed-in reply-tree task's thread on `day`, as items (shell R11: its read-only page). */
+export function doneWorkItems(ctx: AppContext, day: number, task: Task): WorkItem[] {
+  const fill = (s: string) => fillPlaceholders(s, ctx.state.names);
+  return doneItems({ day }, ctx.events, dayFile(day), fill, task.done).flat();
 }
 
 // ——— the actions ———

@@ -213,6 +213,8 @@ export interface Session {
   walkman: boolean;
   /** The decoy dock app whose small system window is open (desktop-ui 2026-11-02); session only. */
   decoyWindow: string | null;
+  /** shell R11.2: the dock hidden over full-screen 工作台 has slid up (the pointer at the bottom edge). Session only. */
+  dockPeek: boolean;
   /** What a decoy click made Kuro say, and until when (ms): it shows in its pill; session only. */
   dockSay: { readonly text: string; readonly until: number } | null;
   /**
@@ -378,6 +380,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     cam: null,
     turnNext: null,
     decoyWindow: null,
+    dockPeek: false,
     dockSay: null,
     filesApp: null,
     filesSaid: new Set(),
@@ -540,7 +543,7 @@ export function buildShell(
     shutdown: off || night ? null : shutdownOpen ? "open" : "closed",
     monitors: [left.monitor, right.monitor],
     // The dock's dot: the window in front on the monitor being shown (the active app).
-    dock: { active: appOn(session), badges, decoys: dockFor(state.day), decoyOpen: session.decoyWindow },
+    dock: { active: appOn(session), badges, decoys: dockFor(state.day), decoyOpen: session.decoyWindow, peek: session.dockPeek },
     focus: session.focus,
     place: session.place,
     mc,

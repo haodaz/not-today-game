@@ -61,6 +61,8 @@ export interface ShellModel {
     /** The decoy tiles after the separator (desktop-ui 2026-11-02), and which one's small window is open. */
     readonly decoys?: readonly DockEntry[];
     readonly decoyOpen?: string | null;
+    /** shell R11.2: over full-screen 工作台 the dock hides; true while it has slid up. */
+    readonly peek?: boolean;
   };
   /** Which monitor is shown (amendment 2026-11-01: one at a time, never side by side). */
   readonly focus: Side;
@@ -141,7 +143,13 @@ function dockName(name: string): SafeHtml {
   return html`<span class="dock-name" aria-hidden="true">${name}</span>`;
 }
 
-function dock(m: ShellModel): SafeHtml {
+/**
+ * The dock hides while 工作台 is the front window on its monitor (shell R11.2, macOS full screen):
+ * `auto` keeps it below the bottom edge, `peek` slides it up (the pointer at the edge).
+ */
+export const dockHides = (mon: Pick<MonitorModel, "app" | "chrome">): boolean => mon.app === "workbench" && mon.chrome === "full";
+
+function dock(m: ShellModel, hides = false): SafeHtml {
   const apps = APPS.map((app) => {
     const badge = m.dock.badges[app];
     const name = t(DOCK_KEY[app]);
@@ -154,7 +162,7 @@ function dock(m: ShellModel): SafeHtml {
     (d) =>
       html`<button type="button" class="${cls("app", "decoy")}" data-action="decoy" data-decoy="${d.id}"${d.gone ? html` data-gone="1"` : null} title="${d.name}" aria-label="${d.name}">${dockTile(d.icon)}${dockName(d.name)}</button>`,
   );
-  return html`<div class="dock">${apps}${decoys.length ? html`<span class="sep" role="separator"></span>` : null}${extra}</div>`;
+  return html`<div class="${cls("dock", hides && "auto", hides && m.dock.peek && "peek")}">${apps}${decoys.length ? html`<span class="sep" role="separator"></span>` : null}${extra}</div>`;
 }
 
 /** A decoy's small system window: the real apps' chrome, one centred grey line, a close control. */
@@ -167,7 +175,7 @@ function decoyWindow(m: ShellModel): SafeHtml | null {
 function monitor(m: ShellModel, mon: MonitorModel): SafeHtml {
   // Not on yet: a black screen and nothing else.
   if (m.off) return html`<div class="monitor off" data-side="${mon.side}" data-ring="${m.ring}" data-app="${mon.app}"><div class="os"></div></div>`;
-  return html`<div class="${cls("monitor", m.night && "night")}" data-side="${mon.side}" data-ring="${m.ring}" data-app="${mon.app}"><div class="os">${topBar(m, mon)}${windowFrame(m, mon)}${mon.side === "left" ? decoyWindow(m) : null}${mon.side === "left" ? dock(m) : null}${mon.overlay}</div></div>`;
+  return html`<div class="${cls("monitor", m.night && "night")}" data-side="${mon.side}" data-ring="${m.ring}" data-app="${mon.app}"><div class="os">${topBar(m, mon)}${windowFrame(m, mon)}${mon.side === "left" ? decoyWindow(m) : null}${mon.side === "left" ? dock(m, dockHides(mon)) : null}${mon.overlay}</div></div>`;
 }
 
 /** The other monitor, as a thin tab on its side: the apps on it (front first) and their badges. */
