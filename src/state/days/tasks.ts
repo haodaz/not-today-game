@@ -823,8 +823,9 @@ function localisePath(zh: TaskPath, en: TaskPath, w: string): TaskPath {
     if (z.k !== e.k || z.who !== e.who) fail(`${w}.say[${i}]`, "kind or speaker differs from the Chinese");
     return bilingual(z, { t: e.t });
   });
-  // `kuro` stays Chinese-source English constants; `effects` already matched.
-  return { ...zh, say };
+  // `kuro`: once English constants shared by both files; since the zh build speaks Chinese
+  // (kuro-language-rule 2026-11-04) each language carries its own lines. `effects` already matched.
+  return bilingualValues({ ...zh, say }, { kuro: en.kuro });
 }
 
 function localiseTask(zh: Task, en: Task, w: string): Task {
