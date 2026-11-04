@@ -365,13 +365,13 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .wb-rail .rg.contacts{border-radius:50%;width:18px}
 .wb-rail .n{position:absolute;top:2px;right:6px;min-width:16px;height:16px;border-radius:8px;background:var(--red);color:#fff;font-size:10px;line-height:16px;text-align:center;padding:0 4px}
 .wb-msgs{flex:1;display:flex;min-width:0}
-/* 老物件栏 (object-bar 2026-11-03): a narrow column of found-object icons next to the rail, on every
-   工作台 page. Pixel art, integer-scaled, no tile or frame behind (the author: just the objects). */
-.wb-objbar{flex:0 0 auto;width:60px;background:#f4f5f8;border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 0;overflow-y:auto}
-.wb-objbar .ob-title{font-size:10px;color:var(--ink-3);letter-spacing:.06em;text-align:center;writing-mode:horizontal-tb}
-.wb-objbar .ob-row{display:flex;flex-direction:column;align-items:center;gap:10px}
-.wb-objbar .ob-icon{width:44px;height:44px;padding:0;border:0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:8px}
-.wb-objbar .ob-icon img{width:40px;height:40px;object-fit:contain;image-rendering:pixelated}
+/* 老物件栏 (object-bar 2026-11-03; workspace 2026-11-04 R3): a compact strip of found-object icons
+   in a task page's header only. Pixel art, integer-scaled, no tile or frame behind. */
+.wb-objbar{flex:0 0 auto;display:flex;flex-direction:row;align-items:center;gap:6px}
+.wb-objbar .ob-title{font-size:10px;color:var(--ink-3);letter-spacing:.06em}
+.wb-objbar .ob-row{display:flex;flex-direction:row;align-items:center;gap:4px}
+.wb-objbar .ob-icon{width:36px;height:36px;padding:0;border:0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:8px}
+.wb-objbar .ob-icon img{width:32px;height:32px;object-fit:contain;image-rendering:pixelated}
 .wb-objbar .ob-icon.ph img{opacity:.78}
 .wb-objbar .ob-icon:hover,.wb-objbar .ob-icon:focus-visible{background:rgba(0,0,0,.05)}
 .wb-objbar .ob-icon.on{background:rgba(0,0,0,.08)}
@@ -500,6 +500,35 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .wb .surface.board .bbar{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
 .wb .surface.board .bprint{border:0;border-radius:8px;background:var(--accent);color:#fff;padding:6px 16px;font:inherit;font-size:13px;cursor:pointer}
 .wb .surface.board .bprint:disabled{opacity:.4;cursor:default}
+/* workspace (2026-11-04): a chat-app shape — the rail, the session list, one main area (home or a task). */
+.wb .side.sessions .it{background:none;border:0;text-align:left;cursor:pointer;width:100%;font:inherit;font-size:12.5px}
+.wb .side.sessions .it .tt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wb .side.sessions .it.new{border:1px solid var(--line);background:#fff;color:var(--ink);justify-content:center;margin-bottom:6px}
+.wb .side.sessions .it.earlier{color:var(--ink-3)}
+.wb .side.sessions .dot{width:7px;height:7px;border-radius:50%;flex:0 0 auto;background:var(--warm)}
+.wb .side.sessions .dot.done{background:var(--green)}
+.wb .card .ln.task{width:100%;border:0;background:#eef3ff;border-radius:6px;padding:5px 8px;margin-bottom:4px;font:inherit;font-size:12px;cursor:pointer;text-align:left}
+.wb .card .ln.task span{color:var(--accent)}
+.wb .wb-composer .wb-compose-in{display:block;width:100%;box-sizing:border-box;border:0;outline:0;resize:none;font:inherit;font-size:13.5px;line-height:1.6;color:var(--ink);background:transparent;min-height:68px;padding:0}
+.wb .wb-composer .wb-compose-in::placeholder{color:var(--ink-3)}
+.wb .wb-composer .strip .chips{display:flex;gap:6px;flex-wrap:wrap;flex:1;min-width:0}
+.wb .wb-composer .chip{border:1px solid var(--line);background:#fff;border-radius:16px;padding:4px 10px;font-size:12px;color:var(--ink-2)}
+.wb .wb-composer button.chip{cursor:pointer}
+.wb .main.task{display:flex;flex-direction:column;padding:0;overflow:hidden;min-width:0}
+.wb .wb-task-h{flex:0 0 auto;min-height:52px;display:flex;align-items:center;gap:12px;padding:6px 20px;border-bottom:1px solid var(--line);background:#fff}
+.wb .wb-task-h .tt{display:flex;flex-direction:column;min-width:0}
+.wb .wb-task-h .tt b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wb .wb-task-h .tt small{color:var(--ink-3)}
+.wb .wb-task-h .st.doing{color:#9a6400}.wb .wb-task-h .st.done{color:#1f7a4a}
+.wb .wb-task-h .sp{margin-left:auto}
+.wb .wb-task-h .btn{border:1px solid var(--line);border-radius:8px;padding:5px 12px;font:inherit;font-size:12px;color:var(--ink-2);background:#fff;cursor:pointer}
+.wb .wb-task-body{flex:1 1 auto;min-height:0;overflow:auto;padding:14px 18px;display:flex;flex-direction:column}
+.wb .wb-task-body > .surface,.wb .wb-task-body > .ask{max-width:none;max-height:none;flex:1 1 auto;margin:0;box-sizing:border-box}
+/* R4: the IDE on a task page, full height: pages + sources ≈260 | the preview (≥ half) | 克总 ≈320. */
+.wb .main.task.ide .wb-task-body{padding:10px 12px;overflow:hidden}
+.wb .main.task.ide .surface.board.ide{height:100%;padding:8px}
+.wb .main.task.ide .surface.board.ide .ide-mid{min-width:50%}
+.wb .main.task.ide .surface.board.ide .ide-right{flex-basis:320px}
 /* ide (2026-11-04): the IDE view of a board — pages + sources | the deliverable's preview | 克总. */
 .wb .surface.board.ide{display:flex;gap:12px;align-items:stretch;height:100%;min-height:0}
 .wb .surface.board.ide .ide-left{flex:0 0 260px;display:flex;flex-direction:column;min-height:0;overflow:auto}

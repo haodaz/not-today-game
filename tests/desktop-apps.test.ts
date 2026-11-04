@@ -37,7 +37,9 @@ describe("workbench home", () => {
   it("without day data shows the structure from strings and the store's numbers", () => {
     const c = ctx(1);
     const out = renderWorkbench(c).body.value;
-    for (const key of ["wb.title", "wb.search", "wb.nav.home", "wb.hello.morning", "wb.ask.ph", "wb.scope", "wb.card.ledger", "wb.common", "wb.continue"]) {
+    // workspace 2026-11-04: the session list (新任务) and the composer (its placeholder) replace the
+    // expanded nav column and the task input on home.
+    for (const key of ["wb.title", "wb.sessions.new", "wb.nav.home", "wb.hello.morning", "wb.composer.placeholder", "wb.card.ledger", "wb.common"]) {
       expect(out, key).toContain(escapeHtml(t(key)));
     }
     // The choice is a reply (work 2026-11-02): no mode toolbar under the input.
@@ -46,15 +48,18 @@ describe("workbench home", () => {
     expect(out).toContain(`<div class="big">${c.state.overdueDays}<small>`);
   });
 
-  it("with day data fills cards, sidebar jobs and the docs tag; the badge counts the jobs and the work conversations' unread", () => {
+  it("with day data fills the cards (the jobs in 在办, the continue chips under the composer); the badge counts the jobs and the work conversations' unread", () => {
     const c = ctx(1);
     const result = renderWorkbench(c, days);
     // The work conversations moved into 工作台 (desktop-ui 2026-11-02, evening): their unread count here.
     expect(result.badge).toBe(fixture.doing.length + threadsUnread(c, "workbench"));
     expect(threadsUnread(c, "workbench")).toBeGreaterThan(0);
-    expect(result.body.value).toContain('<span class="tag">v2</span>');
     expect(result.body.value).toContain('<span class="r">status one</span>');
-    expect(result.body.value).toContain('<em class="g">status two</em>');
+    // The old nav column's job list and docs tag are gone (workspace R2); the docs tag stays on the window.
+    expect(result.body.value).not.toContain('class="job"');
+    expect(result.body.value).not.toContain('<span class="tag">v2</span>');
+    expect(result.tag?.value).toBe("v2");
+    for (const chip of fixture.continue ?? []) expect(result.body.value).toContain(`<span class="chip c">${chip}</span>`);
   });
 
   it("the changelog collapses to one line from the first day of the second ring (U5)", () => {

@@ -6,17 +6,25 @@ import { constants } from "@state/variables";
 import { ringOf } from "@state/stages";
 import type { State } from "@state/types.gen";
 import { cls, html, type SafeHtml } from "@world/html";
-import { tr } from "@world/i18n";
+import { getLocale, hasString, t, tr } from "@world/i18n";
 import { fillPlaceholders } from "@world/replies/placeholders";
+import { boardState, taskForId } from "@state/days/board";
+import type { Task } from "@state/days/tasks";
+import { askedToday, bucketNow } from "@world/dialogue/kuro";
+import { bucketAllows } from "@kuro/variable.ts";
 import { greetingKey } from "../beat";
 import { frameUrl, FRAMES } from "../kuro/body";
-import type { AppContext, WorkbenchPage } from "../model";
+import { kuroDay } from "../kuro/days";
+import { taskPageId, type AppContext, type WorkbenchPage } from "../model";
 import { closerSlot } from "@world/late/closer-view";
 import { RINGS } from "../rings";
 import { workbenchDay, workbenchDays, type DocColumn, type WorkbenchDay } from "./data";
-import { renderWork } from "./work";
+import { openWork, renderDoneWork, renderWork } from "./work";
+import { renderBoard, renderBoardRead } from "./board";
 import { renderWorkMessages } from "../messages/view";
 import { renderObjectBar } from "./objbar";
+import { sessionList, type SessionEntry } from "./sessions";
+import { COMPOSER_FOCUS } from "./actions";
 
 /** U5: the changelog panel collapses to one line from the first day of the second ring. */
 export const CHANGELOG_COLLAPSE_DAY: number = (() => {
@@ -26,28 +34,46 @@ export const CHANGELOG_COLLAPSE_DAY: number = (() => {
 
 type Fill = (s: string) => string;
 
-const NAV: readonly { key: string; page: WorkbenchPage | null }[] = [
-  { key: "wb.nav.home", page: "home" },
-  { key: "wb.nav.new", page: null },
-  { key: "wb.nav.docs", page: "docs" },
-  { key: "wb.nav.code", page: "code" },
-  { key: "wb.nav.ledger", page: "ledger" },
-  { key: "wb.nav.tickets", page: null },
-  { key: "wb.nav.projects", page: null },
-];
-
-function side(data: WorkbenchDay | null, page: WorkbenchPage, fill: Fill): SafeHtml {
-  const nav = NAV.map(({ key, page: target }) => {
-    const tag = target === "docs" && data?.docs?.tag ? html` <span class="tag">${fill(data.docs.tag)}</span>` : null;
-    return target
-      ? html`<button type="button" class="${cls("it", page === target && "on")}" data-action="wb-nav" data-page="${target}">${tr(key)}${tag}</button>`
-      : html`<div class="it">${tr(key)}</div>`;
-  });
-  const doing = (data?.doing ?? []).map((j) => html`<div class="job">${fill(j.title)} <em class="${j.tone === "ok" ? "g" : ""}">${fill(j.status)}</em></div>`);
-  const recent = (data?.recent ?? []).map((r) => html`<div class="job">${fill(r)}</div>`);
+/**
+ * The session list (workspace R2), in place of the old expanded nav column: 新任务 (home, the caret
+ * in the composer), 今天 (the tasks opened today, newest first, the current one highlighted) and
+ * 最近 (earlier days', read-only). Derived from the log's `open task:<id>`.
+ */
+function sessions(ctx: AppContext, fill: Fill): SafeHtml {
+  const { state, events, session } = ctx;
+  const { today, recent } = sessionList(state, events);
+  const current = taskPageId(session.workbenchPage);
+  const row = (e: SessionEntry, earlier: boolean) => {
+    const on = current === e.taskId && (session.wbTaskDay ?? state.day) === e.day;
+    const dot = html`<i class="${cls("dot", e.done ? "done" : "doing")}" aria-label="${tr(e.done ? "wb.task.done" : "wb.task.doing")}"></i>`;
+    return html`<button type="button" class="${cls("it", on && "on", earlier && "earlier")}" data-action="wb-nav" data-page="task:${e.taskId}"${earlier ? html` data-day="${e.day}"` : null}>${dot}<span class="tt">${fill(e.task.title)}</span></button>`;
+  };
+  const fresh = html`<button type="button" class="${cls("it", "new", session.workbenchPage === "home" && "on")}" data-action="wb-nav" data-page="home" data-compose="1">${tr("wb.sessions.new")}</button>`;
+  const todayList = today.length ? html`<div class="sec">${tr("wb.sessions.today")}</div>${today.map((e) => row(e, false))}` : null;
+  const recentList = recent.length ? html`<div class="sec">${tr("wb.sessions.recent")}</div>${recent.map((e) => row(e, true))}` : null;
   // The workbench's own brand (未来智能 · 工作台) lives inside its window only (desktop-ui 2026-11-02,
   // point 1): the OS name is the top bar's; the company brand sits here in the side logo.
-  return html`<div class="side"><div class="logo"><i></i><div><b>${tr("wb.brand")}</b><small>${tr("wb.sub")}</small></div></div><div class="search">${tr("wb.search")}</div>${nav}<div class="sec">${tr("wb.sec.doing")}</div>${doing}<div class="sec">${tr("wb.sec.recent")}</div>${recent}<div class="me"><i></i><div><b>${tr("wb.me")}</b><br><small style="color:var(--ink-3)">${tr("wb.me.role")}</small></div></div></div>`;
+  return html`<div class="side sessions"><div class="logo"><i></i><div><b>${tr("wb.brand")}</b><small>${tr("wb.sub")}</small></div></div>${fresh}${todayList}${recentList}<div class="me"><i></i><div><b>${tr("wb.me")}</b><br><small style="color:var(--ink-3)">${tr("wb.me.role")}</small></div></div></div>`;
+}
+
+/** Today's starters the player can still ask (as the player's box offers them). */
+function starterChips(state: State, events: AppContext["events"]): SafeHtml[] {
+  const asked = askedToday(events, state.day);
+  const bucket = bucketNow(state);
+  const starters = (kuroDay(state.day)?.starters ?? []).filter((s) => !asked.has(s.n) && bucketAllows(s.minBucket, bucket));
+  return starters.map((s) => html`<button type="button" class="chip q" data-action="wb-compose-q" data-q="${s.n}">${getLocale() === "en" && s.en ? s.en : s.zh}</button>`);
+}
+
+/**
+ * The composer (workspace R1): a multi-line box that talks to Kuro (wb-compose-send, ⌘/Ctrl+Enter),
+ * today's starters and the continue chips under it. It shares the player's box draft.
+ */
+function composer(ctx: AppContext, data: WorkbenchDay | null, fill: Fill): SafeHtml {
+  const ph = t("wb.composer.placeholder");
+  const box = html`<textarea class="wb-compose-in" rows="3" data-input="kuro-text" data-focus="${COMPOSER_FOCUS}" data-enter="wb-compose-send" placeholder="${ph}" aria-label="${ph}" maxlength="500" spellcheck="false">${ctx.session.kuroDraft}</textarea>`;
+  const send = html`<button type="button" class="go" data-action="wb-compose-send">↑</button>`;
+  const cont = (data?.continue ?? []).map((c) => html`<span class="chip c">${fill(c)}</span>`);
+  return html`<div class="ask wb-composer">${box}<div class="strip"><div class="chips">${starterChips(ctx.state, ctx.events)}${cont}</div>${send}</div></div>`;
 }
 
 function card(title: SafeHtml, sub: SafeHtml | null, body: SafeHtml, extra = ""): SafeHtml {
@@ -60,10 +86,15 @@ function changelogCollapsed(day: number): boolean {
 
 function home(ctx: AppContext, data: WorkbenchDay | null, fill: Fill): SafeHtml {
   const { state } = ctx;
+  // 在办: the task under way opens its task page (workspace R1); then the day's own lines.
+  const open = openWork(state, ctx.events);
+  const openRow = open?.tree
+    ? html`<button type="button" class="ln task" data-action="wb-nav" data-page="task:${open.tree.id}"><b>${fill(open.tree.title)}</b><span>${tr("wb.task.doing")}</span></button>`
+    : null;
   const doing = card(
     tr("wb.card.doing"),
     tr("wb.card.all"),
-    html`${(data?.doing ?? []).map((j) => html`<div class="ln"><b>${fill(j.title)}</b><span class="${j.tone === "warn" ? "r" : ""}">${fill(j.status)}</span></div>`)}`,
+    html`${openRow}${(data?.doing ?? []).map((j) => html`<div class="ln"><b>${fill(j.title)}</b><span class="${j.tone === "warn" ? "r" : ""}">${fill(j.status)}</span></div>`)}`,
   );
   const docs = card(
     tr("wb.card.docs"),
@@ -90,9 +121,49 @@ function home(ctx: AppContext, data: WorkbenchDay | null, fill: Fill): SafeHtml 
 
   const tabs = (data?.common?.tabs ?? []).map((t, i) => html`<span class="${i === 0 ? "on" : ""}">${fill(t)}</span>`);
   const items = (data?.common?.items ?? []).map((i) => html`<div><em>${fill(i.tag)}</em>${fill(i.text)}</div>`);
-  const chips = (data?.continue ?? []).map((c) => html`<span>${fill(c)}</span>`);
-  return html`<div class="main"><div class="hello"><img src="${frameUrl(FRAMES.idle[0])}" alt=""><div><h1>${tr(greetingKey(ctx.session.clock.beat))}</h1><p>${tr("wb.hello.sub")}</p></div></div>${renderWork(ctx)}<div class="cards">${doing}${docs}${ledger}${now}${changelog}</div><div class="sect"><h3>${tr("wb.common")}<small>${tr("wb.common.sub")}</small></h3><div class="tabs">${tabs}</div><div class="qa">${items}</div></div><div class="sect"><h3>${tr("wb.continue")}</h3><div class="chips">${chips}</div></div></div>`;
+  // Home is the greeting, the composer and today's cards: never a board or task content (workspace R1).
+  return html`<div class="main home"><div class="hello"><img src="${frameUrl(FRAMES.idle[0])}" alt=""><div><h1>${tr(greetingKey(ctx.session.clock.beat))}</h1><p>${tr("wb.hello.sub")}</p></div></div>${composer(ctx, data, fill)}<div class="cards">${doing}${docs}${ledger}${now}${changelog}</div><div class="sect"><h3>${tr("wb.common")}<small>${tr("wb.common.sub")}</small></h3><div class="tabs">${tabs}</div><div class="qa">${items}</div></div></div>`;
 }
+
+/** Who a task is handed to, by name (a person's deliverable); null for the workbench / the hand. */
+function forWhom(task: Task): SafeHtml | null {
+  const to = task.deliverable?.to;
+  const key = to === "boss" || to === "partner" || to === "group" ? `msgs.${to}` : null;
+  return key && hasString(key) && hasString("wb.task.for") ? tr("wb.task.for", { who: t(key) }) : null;
+}
+
+/** The slots a board had on `day`: as printed, else as the log left them. */
+function boardSlotsOn(task: Task, day: number, events: AppContext["events"]): Readonly<Record<string, string>> {
+  const printed = events.find((e) => e.kind === "task" && e.day === day && e.flag === task.done && e.slots !== undefined);
+  if (printed?.kind === "task" && printed.slots) return printed.slots;
+  return boardState(task.board!, day, task.id, events).slots;
+}
+
+/**
+ * A task page (workspace R1): a header (title, for whom, 在办 / 已交, the task's own app page, the
+ * old objects' strip) and the task's body filling the rest — its board in its view, or its work
+ * surface. The task under way is live; a handed-in or an earlier day's task is read back, read-only.
+ */
+function taskPage(ctx: AppContext, taskId: string, fill: Fill): SafeHtml {
+  const { state, events, session } = ctx;
+  const day = session.wbTaskDay ?? state.day;
+  const task = taskForId(day, taskId);
+  if (!task) return html`<div class="main task"></div>`;
+  const done = state.flags.includes(task.done);
+  const live = day === state.day && !done && openWork(state, events)?.tree?.id === task.id;
+  const status = html`<span class="${cls("st", done ? "done" : "doing")}">${tr(done ? "wb.task.done" : "wb.task.doing")}</span>`;
+  const who = forWhom(task);
+  const app = TASK_APPS.includes(task.app) && live ? html`<button type="button" class="btn" data-action="wb-nav" data-page="${task.app}">${tr(`wb.nav.${task.app}`)}</button>` : null;
+  const strip = renderObjectBar(ctx);
+  const head = html`<div class="wb-task-h"><div class="tt"><b>${fill(task.title)}</b><small>${who ? html`${who} · ` : null}${status}</small></div><span class="sp"></span>${app}${strip}</div>`;
+  const body = task.board
+    ? live ? renderBoard(ctx, task) : renderBoardRead(task.board, boardSlotsOn(task, day, events))
+    : live ? renderWork(ctx, false) : renderDoneWork(ctx, day, task);
+  return html`<div class="${cls("main", "task", task.board?.view === "ide" && "ide")}" data-task="${task.id}">${head}<div class="wb-task-body">${body}</div></div>`;
+}
+
+/** The inner pages a task may open from its header (文档 / 账本 / 代码 stay reachable inside the tasks that use them). */
+const TASK_APPS: readonly string[] = ["docs", "ledger", "code"];
 
 function header(title: SafeHtml | string | null, meta: SafeHtml | string | null, buttons: readonly [string, "" | "eye" | "do", string][]): SafeHtml {
   return html`<div class="ph2"><b>${title}</b><small>${meta}</small><span class="sp"></span>${buttons.map(([key, kind, action]) => html`<span class="${cls("btn", kind)}" data-action="${action}">${tr(key)}</span>`)}</div>`;
@@ -146,8 +217,10 @@ export function renderWorkbench(ctx: AppContext, days: ReadonlyMap<number, Workb
   const data = workbenchDay(ctx.state.day, days);
   const fill: Fill = (s) => fillPlaceholders(s, ctx.state.names);
   const page = ctx.session.workbenchPage;
+  const taskId = taskPageId(page);
   const main =
-    page === "docs" ? docsPage(data, fill)
+    taskId !== null ? taskPage(ctx, taskId, fill)
+    : page === "docs" ? docsPage(data, fill)
     : page === "ledger" ? ledgerPage(ctx.state, data, fill)
     : page === "code" ? codePage(ctx.state, data, fill)
     : home(ctx, data, fill);
@@ -157,13 +230,12 @@ export function renderWorkbench(ctx: AppContext, days: ReadonlyMap<number, Workb
   // The work conversations live here (desktop-ui 2026-11-02, evening): the rail's 消息.
   const msgs = renderWorkMessages(ctx);
   const tag = data?.docs?.tag ? html`${fill(data.docs.tag)}` : null;
-  // The 老物件栏 (object-bar 2026-11-03): the found objects, under the rail, on every page.
-  const objbar = renderObjectBar(ctx);
+  // workspace R2/R3: the rail and the session list; the old objects only in a task page's header.
   return {
     body:
       page === "msgs"
-        ? html`<div class="body">${rail(page, msgs.badge)}${objbar}<div class="wb-msgs">${msgs.pane}</div></div>`
-        : html`<div class="body">${rail(page, msgs.badge)}${objbar}${side(data, page, fill)}${main}${closer}</div>`,
+        ? html`<div class="body">${rail(page, msgs.badge)}<div class="wb-msgs">${msgs.pane}</div></div>`
+        : html`<div class="body">${rail(page, msgs.badge)}${sessions(ctx, fill)}${main}${closer}</div>`,
     // Its dock tile counts its own: the jobs under way and the work conversations' unread.
     badge: (data?.doing.length ?? 0) + msgs.badge,
     tag,
@@ -181,8 +253,8 @@ const RAIL: readonly { key: string; page: WorkbenchPage | null }[] = [
 
 function rail(page: WorkbenchPage, unread: number): SafeHtml {
   const items = RAIL.map(({ key, page: target }) => {
-    // 工作台 is on for its own pages (home, 账本, 代码); 文档 for 文档; 消息 for the pane.
-    const on = target === page || (target === "home" && (page === "ledger" || page === "code"));
+    // 工作台 is on for its own pages (home, the task pages, 账本, 代码); 文档 for 文档; 消息 for the pane.
+    const on = target === page || (target === "home" && (page === "ledger" || page === "code" || taskPageId(page) !== null));
     const n = target === "msgs" && unread > 0 ? html`<span class="n">${unread}</span>` : null;
     return target
       ? html`<button type="button" class="${cls("ri", on && "on")}" data-action="wb-nav" data-page="${target}"><i class="${`rg ${key.slice("wb.nav.".length)}`}" aria-hidden="true"></i><span>${tr(key)}</span>${n}</button>`

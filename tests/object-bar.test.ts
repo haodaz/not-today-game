@@ -56,12 +56,12 @@ describe("R1 · the bar: found objects, by state, no bar before the chick", () =
     expect(out).toContain("/objects/icons/chick.png");
   });
 
-  it("the whole workbench body carries the bar, on every page", () => {
+  it("is no permanent column: home and the other pages carry no bar (workspace R3; the task page's header does, tests/workspace.test.ts)", () => {
     const store = storeAt(1, ["chick"]);
     for (const page of ["home", "docs", "ledger", "code", "msgs"] as const) {
       const out = renderWorkbench(ctxOf(store, { workbenchPage: page })).body.value;
-      expect(out, page).toContain("wb-objbar");
-      expect(out, page).toContain('data-object="chick"');
+      expect(out, page).not.toContain("wb-objbar");
+      expect(out, page).not.toContain('data-action="objbar-open"');
     }
   });
 

@@ -1880,3 +1880,34 @@ Spec: `.kiro/specs/ide/requirements.md`.
 - Tests: `tests/ide.test.ts` with the fixture `.kiro/specs/ide/board-ide.json` injected as day-1
   task3 (loader, ideSrc, ideTranscript, view, play-through, replay).
 - `npx tsc --noEmit`: clean. `npx vitest run`: 101 files / 1812 tests passed.
+
+## workspace: 工作台 as a chat app (2026-11-04)
+
+Spec: `.kiro/specs/workspace/requirements.md`.
+
+- `src/world/desktop/model.ts`: `WorkbenchPage` gains `task:<id>` (`TaskPage`, `taskPageId`);
+  session `wbTaskDay` (an earlier day's task page) and `focusNext`. A task page's window title is
+  the app's name alone (its title is in its header).
+- `src/state/events.ts`: `task:<id>` is an `open` target (`openedTaskId`); no new event kind.
+  `src/state/days/board.ts`: `taskForId` exported.
+- `src/world/desktop/workbench/sessions.ts` (new, pure): `sessionList` (今天 newest first by first
+  open, 最近 earlier days, at most 8) and `taskOpened`.
+- `src/world/desktop/workbench/actions.ts`: `wb-nav` takes `task:<id>` (today: the task under way,
+  one handed in, or one opened before; logs `open task:<id>` once a day) and `data-day` for 最近
+  (read-only, only tasks opened that day). `data-compose="1"` on home sets the caret in the composer.
+  `composerActions` (`wb-compose-send`, `wb-compose-q`) talk to Kuro through the existing
+  `kuro-call` / `kuro-send` / `kuro-q`.
+- `src/world/desktop/workbench/view.ts`: the session list replaces `side()`; home is the greeting,
+  the composer (textarea sharing `kuroDraft`, today's starters and the continue chips, ↑) and the
+  cards, with the task under way as a link in 在办; `taskPage` draws the header (title, 交给 {who},
+  在办/已交, the task's app page, the object strip) and the body (the live board or work surface, or
+  a read-only board / thread). The object bar is no longer a column.
+- `src/world/desktop/workbench/work.ts`: `renderWork(ctx, withDone)`, `renderDoneWork`.
+  `board.ts`: `renderBoardRead`. `objbar.ts`: comment only.
+- `src/world/desktop/controller.ts`: `focusNext`; a textarea keeps Enter as a new line and sends on
+  ⌘/Ctrl+Enter. `src/world/room/game.ts`: `composerActions` registered.
+- `src/world/desktop/desktop.css`: session list, composer, task page, header strip, IDE on a task page
+  (260 · preview `min-width:50%` · 320, full height).
+- Tests: new `tests/workspace.test.ts`; updated `desktop-apps.test.ts` (home keys, no sidebar jobs)
+  and `object-bar.test.ts` (no bar off a task page); `desktop-snapshots` regenerated (16 written).
+- `npx tsc --noEmit`: clean. `npx vitest run`: 102 files / 1825 tests passed.

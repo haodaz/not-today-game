@@ -231,13 +231,20 @@ const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
  * The things that can be opened: the browser, a conversation `conv:<recipient>`, or a file / document
  * `file:<id>` (the 文件 app's files and Vivi's deliverables; desktop-ui 2026-11-02). A file id is any
  * non-empty token: the files app and the replies loader own the real ids; the log only records that
- * one was opened, so the Vivi lock and the 文件 app read the same event.
+ * one was opened, so the Vivi lock and the 文件 app read the same event. A work task's page in
+ * 工作台 is `task:<taskId>` (workspace R2: the session list is derived from these opens).
  */
 export function isOpenTarget(target: string): boolean {
   if (target === "browser") return true;
   const conv = /^conv:(.+)$/.exec(target);
   if (conv !== null) return knownRecipients.has(conv[1]!);
-  return /^file:.+$/.test(target);
+  return /^(file|task):.+$/.test(target);
+}
+
+/** The task id of an `open` target, or null (not a `task:` open). */
+export function openedTaskId(target: string): string | null {
+  const m = /^task:(.+)$/.exec(target);
+  return m ? m[1]! : null;
 }
 
 /** Opening a conversation counts as reading messages (`readCount`); the browser and files change nothing. */

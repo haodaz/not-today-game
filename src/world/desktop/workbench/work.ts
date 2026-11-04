@@ -178,9 +178,10 @@ export function mergePending(w: WorkThread, tree: Task | undefined): boolean {
 }
 
 /** The tasks done today from the workbench, drawn back from the log (no session needed). */
-function doneThreads(state: State, events: readonly GameEvent[], file: DayFile | undefined, fill: (s: string) => string): SafeHtml[] {
+function doneThreads(state: Pick<State, "day">, events: readonly GameEvent[], file: DayFile | undefined, fill: (s: string) => string, onlyFlag?: string): SafeHtml[] {
   return events.flatMap((e) => {
     if (e.kind !== "task" || e.day !== state.day || e.mode === "auto") return [];
+    if (onlyFlag !== undefined && e.flag !== onlyFlag) return [];
     const tree = taskByFlag(state.day, e.flag);
     // Work v2: a board task is not a reply thread; a printed board shows nothing in the chat log.
     if (tree?.board) return [];
@@ -317,8 +318,21 @@ function unitFlow(tree: Task, w: WorkThread): SafeHtml | null {
   return html`<div class="units">${rows}</div>`;
 }
 
-/** The ask box: the thread above, the input with the task sentence, the strip with the scope only. */
-export function renderWork(ctx: AppContext): SafeHtml {
+/**
+ * A handed-in reply-tree task on `day`, read back from the log (workspace R1: its task page, read
+ * only): its thread, as the home used to show it. Empty when it was not done that day.
+ */
+export function renderDoneWork(ctx: AppContext, day: number, task: Task): SafeHtml {
+  const fill = (s: string) => fillPlaceholders(s, ctx.state.names);
+  const thread = doneThreads({ day }, ctx.events, dayFile(day), fill, task.done);
+  return html`<div class="ask done">${thread.length ? html`<div class="wthread">${thread}</div>` : null}</div>`;
+}
+
+/**
+ * The ask box: the thread above, the input with the task sentence, the strip with the scope only.
+ * On a task page (workspace R1) only the open task's own thread shows (`withDone: false`).
+ */
+export function renderWork(ctx: AppContext, withDone = true): SafeHtml {
   const { state, events, session } = ctx;
   const fill = (s: string) => fillPlaceholders(s, state.names);
   const file = dayFile(state.day);
@@ -373,7 +387,7 @@ export function renderWork(ctx: AppContext): SafeHtml {
       if (surface && !mergePending(w, open.tree)) live.push(html`<div class="wpass"><button type="button" class="pass" data-action="wb-pass"${busy ? html` disabled` : null}>${tr("wb.code.pass")}</button></div>`);
     }
   }
-  const thread = [...doneThreads(state, events, file, fill), ...live];
+  const thread = [...(withDone ? doneThreads(state, events, file, fill) : []), ...live];
   // The input: the sentence until it is sent; the placeholder otherwise.
   const draft = open && !w ? fill(open.item.text) : "";
   const input = html`<input class="ph" data-input="wb-draft" data-enter="wb-send" readonly value="${draft}" placeholder="${t("wb.ask.ph")}" aria-label="${t("wb.ask.ph")}"${open && !w ? html` data-task="${open.item.id}"` : null}>`;

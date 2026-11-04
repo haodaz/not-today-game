@@ -25,7 +25,11 @@ import { renderCall } from "./call/view";
 import type { AppId, MonitorModel, ShellModel, Side } from "./shell";
 
 /** 工作台's pages; `msgs` is its 消息 pane (the work conversations, desktop-ui 2026-11-02 evening). */
-export type WorkbenchPage = "home" | "docs" | "ledger" | "code" | "msgs";
+export type WorkbenchPage = "home" | "docs" | "ledger" | "code" | "msgs" | TaskPage;
+/** A task's page in 工作台 (workspace R1): `task:<taskId>`; the day is `wbTaskDay` (null = today). */
+export type TaskPage = `task:${string}`;
+/** The task id of a task page, or null. */
+export const taskPageId = (page: WorkbenchPage): string | null => (page.startsWith("task:") && page.length > 5 ? page.slice(5) : null);
 /**
  * Where the player is. The four facings (room-turn 2026-11-04) are the top level, turned between:
  * 房间 room (the desk wall), 床 bed, 门 door, 窗 window. Under 房间 are the levels 桌子 desk (the
@@ -139,6 +143,10 @@ export interface Session {
   /** Live plans: event index → how many plan steps have played. Absent = settled history. */
   progress: Map<number, number>;
   workbenchPage: WorkbenchPage;
+  /** workspace R2: the day of the task page shown (an earlier day's, read-only), or null = today. */
+  wbTaskDay: number | null;
+  /** The `[data-focus]` element to focus after the next render (workspace R2: 新任务 → the composer). */
+  focusNext: string | null;
   /** Until when (ms since epoch) Kuro's body is crawling between windows. */
   movingUntil: number;
   /** The splat scene is loaded and can render the camera moves (set by the splat layer; presentation only). */
@@ -307,6 +315,8 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     inner: null,
     progress: new Map(),
     workbenchPage: "home",
+    wbTaskDay: null,
+    focusNext: null,
     movingUntil: 0,
     walkman: false,
     edge: null,
@@ -370,13 +380,15 @@ export interface AppRenderers {
   readonly kuro: (ctx: AppContext) => SafeHtml;
 }
 
-const WB_PAGE_KEY: Record<WorkbenchPage, string> = {
+const WB_PAGE_KEY: Record<Exclude<WorkbenchPage, TaskPage>, string> = {
   home: "wb.nav.home",
   docs: "wb.nav.docs",
   ledger: "wb.nav.ledger",
   code: "wb.nav.code",
   msgs: "wb.nav.msgs",
 };
+/** The page's title key; home and a task page (its title is in its own header) are the app alone. */
+const wbPageKey = (page: WorkbenchPage): string | null => (page === "home" || taskPageId(page) !== null ? null : WB_PAGE_KEY[page as Exclude<WorkbenchPage, TaskPage>]);
 
 function monitorFor(app: AppId, side: Side, ctx: AppContext, apps: AppRenderers): { monitor: MonitorModel; badge: number } {
   // Kuro's small window is always on top: it sits on whichever monitor is shown.
@@ -392,14 +404,15 @@ function monitorFor(app: AppId, side: Side, ctx: AppContext, apps: AppRenderers)
     const { body, badge } = apps.workbench(ctx);
     const page = ctx.session.workbenchPage;
     // The home page is the app itself: its name alone (not 「工作台 · 工作台」); other pages add theirs.
-    const pageTitle = page === "home" ? tr("dock.workbench") : html`${tr("dock.workbench")} · ${tr(WB_PAGE_KEY[page])}`;
+    const key = wbPageKey(page);
+    const pageTitle = key === null ? tr("dock.workbench") : html`${tr("dock.workbench")} · ${tr(key)}`;
     return {
       badge,
       monitor: {
         side,
         app,
         appTitle: pageTitle,
-        winTitle: page === "home" ? tr("wb.title") : html`${tr("wb.title")} · ${tr(WB_PAGE_KEY[page])}`,
+        winTitle: key === null ? tr("wb.title") : html`${tr("wb.title")} · ${tr(key)}`,
         winClass: "wb",
         barRight: tr("wb.autosave"),
         body,

@@ -58,7 +58,7 @@ export const CASE_SHAKE_MS = 200;
 import { pointed } from "./pointer";
 import { itemPageId, readingPageId, type KuroCloses } from "@state/closes";
 import { browserPage } from "@world/desktop/browser/data";
-import { workbenchActions } from "@world/desktop/workbench/actions";
+import { composerActions, workbenchActions } from "@world/desktop/workbench/actions";
 import { workActions } from "@world/desktop/workbench/work";
 import { renderFiles } from "@world/desktop/files/view";
 import { openObjectFromBar, renderObjectBarUse } from "@world/desktop/workbench/objbar";
@@ -1069,6 +1069,8 @@ export const loopActions: Record<string, ActionHandler> = {
   // 工作台 work (work spec 2026-11-02): the sentence is sent, the chip under Kuro's question is the
   // reply, the surface is done, 通过 appends the task event; the runtime queues its lines as before.
   ...workActions,
+  // 工作台's home composer (workspace 2026-11-04): it talks to Kuro as its body does.
+  ...composerActions,
 
   // 文件 / 回收站 (desktop-ui 2026-11-02): the files/trash dock tiles open the real window instead of
   // the plain decoy notice; every other decoy keeps its notice.

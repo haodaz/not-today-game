@@ -59,7 +59,10 @@ export function barObjects(state: State): string[] {
   return state.found as string[];
 }
 
-/** The 老物件栏 for 工作台, or null before the first object is found (no empty frame; R1). */
+/**
+ * The 老物件栏 for 工作台, or null before the first object is found (no empty frame; R1). Since
+ * workspace (2026-11-04) R3 it is a compact strip in a task page's header only, never a column.
+ */
 export function renderObjectBar(ctx: AppContext): SafeHtml | null {
   const { state, events, session } = ctx;
   const ids = barObjects(state);

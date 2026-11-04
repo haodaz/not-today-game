@@ -338,6 +338,18 @@ const actions: Record<string, ActionHandler> = {
 /** The board actions; on an IDE board each one types in the transcript lines it adds (ide R4). */
 export const boardActions: Record<string, ActionHandler> = Object.fromEntries(Object.entries(actions).map(([k, h]) => [k, withIde(h)]));
 
+/**
+ * A board read back from the log, read-only (workspace R1: a handed-in task's page, or an earlier
+ * day's): its title and each slot with the card that was in it. No actions.
+ */
+export function renderBoardRead(board: TaskBoard, slots: Readonly<Record<string, string>>): SafeHtml {
+  const rows = board.slots.map((slot) => {
+    const id = slots[slot.id];
+    return html`<tr><td class="blabel">${slot.label}</td><td><span class="${cls("bslot", id && "filled")}">${id ? cardText(board, id) : ""}</span></td></tr>`;
+  });
+  return html`<div class="surface board read"><div class="btitle">${board.title}</div><table class="btable">${rows}</table></div>`;
+}
+
 /** Whether `id` placed in a slot is a Kuro card (for any view that wants to know; it still looks plain). */
 export const slotHoldsKuroCard = (board: TaskBoard, s: BoardState, slotId: string): boolean => {
   const id = s.slots[slotId];

@@ -14,7 +14,8 @@ export function boardOf(day: number, taskId: string): { task: Task; board: TaskB
   const task = taskForId(day, taskId);
   return task?.board ? { task, board: task.board } : null;
 }
-function taskForId(day: number, taskId: string): Task | undefined {
+/** The task of a day's checklist with this id (any task, board or not), or undefined. */
+export function taskForId(day: number, taskId: string): Task | undefined {
   // The day's tasks are keyed by their done flag; find by id.
   const file = dayFile(day);
   if (!file) return undefined;

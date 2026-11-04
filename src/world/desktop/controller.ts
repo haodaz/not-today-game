@@ -202,6 +202,15 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     hand?.after();
     // While Kuro crawls between windows, render again when it should stop.
     if (session.movingUntil > Date.now()) later(session.movingUntil - Date.now() + 20, rerender);
+    // An action asked for a field to take the caret after this render (workspace R2: 新任务).
+    if (session.focusNext) {
+      const want = root.querySelector<HTMLElement>(`[data-focus="${session.focusNext}"]`);
+      session.focusNext = null;
+      if (want) {
+        want.focus();
+        return;
+      }
+    }
     if (focusKey) {
       const again = root.querySelector<HTMLInputElement>(`[data-focus="${focusKey}"]`);
       if (again) {
@@ -251,6 +260,19 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   };
   const onKey = (e: KeyboardEvent) => {
     const target = e.target as HTMLElement;
+    // A multi-line box (workspace R1: 工作台's composer): Enter is a new line; ⌘/Ctrl+Enter sends.
+    if (target.tagName === "TEXTAREA") {
+      const enter = target.dataset.enter;
+      if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && enter) {
+        e.preventDefault();
+        try {
+          actions[enter]?.(ctx, target.dataset, target);
+        } catch (error) {
+          console.warn(error);
+        }
+      }
+      return;
+    }
     if (target.tagName === "INPUT") {
       // Enter runs the input's own action (the player's box: kuro-send), else 发送.
       const enter = target.dataset.enter;
