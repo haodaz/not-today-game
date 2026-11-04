@@ -23,7 +23,10 @@
             "r4": "\"Legal says spell out the limits.\""
           },
           "lock": {
-            "object": "pager",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "in Vivi's DM",
             "codes": [
               "2041",
               "7734",

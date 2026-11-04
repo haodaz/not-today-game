@@ -23,7 +23,10 @@
             "r4": "「法务说要写清楚边界。」"
           },
           "lock": {
-            "object": "pager",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "在 Vivi 的私聊里",
             "codes": [
               "2041",
               "7734",
