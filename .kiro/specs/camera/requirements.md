@@ -31,3 +31,12 @@ Every shot logs `{ kind: "photo", day, at: string, t }`, where `at` is where the
 - `photo` events: screen vs room `at`; screen photos listed at once, room photos from day+1.
 - Album side-by-side marks exactly the changed elements (fixture with two differing texts).
 - A board lock with `object: "camera"` behaves like the other object locks.
+
+## R8. Amendment (author 2026-11-04, after R1–R7): an **instant camera** (拍立得), not a disposable
+「你弄个拍立得就行，然后如果照真实的屋子 / 拍屏幕显影需要时间」「这样可以画计算器、文曲星材质的效果（我们有一套电子材质）」「工作时不限制用处。但是在现实世界只有 10 张」「每天拍某个角落会有崩坏的东西被拍出来……十几天 × 4（四面墙）」. Where R8 differs from R1–R7, R8 wins.
+- **Keys**: `shutter` (the red button, front right) and `flash`. **No wind wheel** (remove it and `camera.wind`). The counter window on the back shows sheets left in the pack.
+- **Sheets**: photos of the **room** (`at: "room:<facing>"`) use the pack: **10 per run**; at 0, the shutter clicks and nothing comes out (`camera.empty`). Photos of the **screen** (`at: "screen:…"` / `meeting:…`) are **unlimited** and never count.
+- **Every photo develops**: the sheet ejects from the front slot (`camera-shutter` already contains the eject whirr), then develops over **20 s real time**, drawn by code in the objects' electronic-material set (like the calculator's LCD and the dictionary's dot matrix): blank grey-white → a cyan cast with the shapes coming up → the final colours. A photo closed before it is done keeps developing in the album; the album shows its current stage.
+- **Room photos** are no longer "next day": they develop like any other (20 s) and show the facing's still plus the content's addition for **(day, facing)** (`content/photos.json` `room: [{ day, facing, add: { text?, overlay? } }]`; `fromDay/toDay` are replaced by `day`). The addition appears only in the last stage of developing.
+- **Screen photos**: once developed, the side-by-side with difference rings (R3) as before.
+- Tests: 10 room sheets then empty; screen photos unlimited and uncounted; the three developing stages by elapsed time; a room photo on (day, facing) shows that day's addition only when developed.
