@@ -21,6 +21,8 @@ import { KURO_MENU, type KuroPose, type KuroState } from "@world/objects/kurogot
 /** The objects whose 使用 face is a drawn device (the others keep the photo for now). */
 export const DEVICE_IDS: readonly string[] = ["chick", "pager", "dictionary", "calculator", "tape"];
 export const isDevice = (id: string): boolean => DEVICE_IDS.includes(id);
+/** How long after 翻面 the egg still carries `.flipping` (its m-flip runs 320 ms). */
+export const FLIP_MS = 400;
 
 /** Objects with a flip button in 使用 (front ↔ back; objects-in-hand 2026-11-03). */
 export const FLIPPERS: readonly string[] = ["chick", "iccard", "phone", "textbook"];
@@ -121,7 +123,11 @@ function chick(ctx: DeviceCtx): SafeHtml {
   // screw, the reset pinhole as a real obj-key button, the RESET label. Reset behaviour is unchanged.
   const backFace = () =>
     html`<div class="backface"><div class="cover"></div><div class="screw"></div><button type="button" class="hole" data-action="obj-key" data-object="chick" data-key="reset" aria-label="${keyLabel("chick", "reset") ?? "reset"}"${keyLabel("chick", "reset") !== null ? raw(` title="${keyLabel("chick", "reset")}"`) : null}${live ? null : raw(' tabindex="-1"')}></button><div class="holelbl">RESET</div></div>`;
-  return html`<div class="${cls("dev-shell", "egg", upgraded && "upgraded", back && "back")}" data-device="chick" data-face="${back ? "back" : "front"}">${back ? backFace() : front()}</div>`;
+  // The flip plays right after 翻面 only: a key press redraws the shell, and replaying it there
+  // looked like the whole egg spinning (author 2026-11-03).
+  const at = ctx.session.hand.flippedAt;
+  const flipping = at !== null && ctx.nowMs - at >= 0 && ctx.nowMs - at < FLIP_MS;
+  return html`<div class="${cls("dev-shell", "egg", upgraded && "upgraded", back && "back", flipping && "flipping")}" data-device="chick" data-face="${back ? "back" : "front"}">${back ? backFace() : front()}</div>`;
 }
 
 function pager(ctx: DeviceCtx): SafeHtml {

@@ -37,7 +37,7 @@
 .dev-shell.upgraded.egg.back{background:radial-gradient(ellipse at 66% 24%,#ffffff 0%,#eef1f6 45%,#d3d9e3 100%)}
 /* The flip in 使用: scaleX 1 → 0 → 1 over 320 ms, the face already swapped at 0 (devices.ts re-renders
    the new face). Flippable devices animate the swap. */
-.dev-shell.egg{animation:m-flip var(--m-flip,320ms) var(--m-ease,ease)}
+.dev-shell.egg.flipping{animation:m-flip var(--m-flip,320ms) var(--m-ease,ease)}
 @keyframes m-flip{0%{transform:scaleX(1)}50%{transform:scaleX(0)}100%{transform:scaleX(1)}}
 
 /* ——— flip / rotate buttons in 使用 (never while holding) ——— */

@@ -666,6 +666,10 @@ describe("holding and using (FR1)", () => {
       act(ctx, "obj-flip");
       expect(ctx.session.hand.face).toBe("back");
       expect(ctx.session.hand.using).toBe(true);
+      // The egg's flip plays right after 翻面 only, never on a later redraw (a key press looked like a spin).
+      const at = (nowMs: number) => renderRoom({ state: ctx.store.getState(), events: ctx.store.getEvents(), session: ctx.session, nowMs }).value;
+      expect(at(ctx.now!())).toMatch(/dev-shell egg[^"]* flipping/);
+      expect(at(ctx.now!() + 1000)).not.toContain("flipping");
       // Now the reset reaches the program.
       act(ctx, "obj-key", { object: "chick", key: "reset" });
       expect((ctx.session.hand.programs.chick as ChickState).flashAt).toBe(ctx.now!());

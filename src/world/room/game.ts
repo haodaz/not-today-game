@@ -811,6 +811,7 @@ export const loopActions: Record<string, ActionHandler> = {
     const id = session.holding;
     if (!id || session.phoneOpen || !session.hand.using || !FLIPPERS.includes(id)) return;
     session.hand.face = session.hand.face === "front" ? "back" : "front";
+    session.hand.flippedAt = ctx.now?.() ?? Date.now();
     if (id === "iccard" || id === "textbook") pressKey(ctx, id, "flip");
     ctx.rerender();
   },

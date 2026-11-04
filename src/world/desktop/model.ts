@@ -232,8 +232,10 @@ export interface HandSession {
   leftLightAt: number | null;
   /** When the dictionary was opened (the hinge wobble). */
   openedAt: number | null;
+  /** When 翻面 was pressed (the egg's flip plays only then, not on every redraw). */
+  flippedAt: number | null;
 }
-export const initialHand = (): HandSession => ({ using: false, face: "front", roll: 0, day: 0, programs: {}, keyDown: null, once: [], buzzed: 0, jumpUntil: 0, inLight: false, leftLightAt: null, openedAt: null });
+export const initialHand = (): HandSession => ({ using: false, face: "front", roll: 0, day: 0, programs: {}, keyDown: null, once: [], buzzed: 0, jumpUntil: 0, inLight: false, leftLightAt: null, openedAt: null, flippedAt: null });
 
 export function initialSession(clock: BeatClock, focus: Side = "left", view: View = "desktop"): Session {
   return {
