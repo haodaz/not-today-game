@@ -409,7 +409,187 @@
             }
           ],
           "unlock": "-"
-        }
+        },
+        "view": "ide",
+        "ide": {
+          "src": "/docs/player/day-01-space.html",
+          "pages": {
+            "r1": 2,
+            "r2": 4,
+            "r3": 10,
+            "r4": 11,
+            "r5": 12
+          }
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Good to see you."
+              },
+              {
+                "who": "me",
+                "text": "Wang wants the tech story for the investors. Start where everyone's stuck: they keep making AI bigger, and in the end one brain runs everything. If it goes wrong, who stops it?"
+              },
+              {
+                "who": "kuro",
+                "text": "You're asking the tool."
+              },
+              {
+                "who": "me",
+                "text": "So what we build is a group of brains, watching each other."
+              },
+              {
+                "who": "kuro",
+                "text": "People do like to watch each other."
+              },
+              {
+                "who": "kuro",
+                "text": "Five pages still need data. Sources are on the left: drag one onto a page, and the preview follows."
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:c1",
+            "lines": [
+              {
+                "who": "me",
+                "text": "Zhang spent a night checking those nodes. That's the foundation."
+              },
+              {
+                "who": "kuro",
+                "text": "Two hundred and eleven. He counted twice."
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:d1",
+            "lines": [
+              {
+                "who": "me",
+                "text": "…Since when do we have our own large model."
+              },
+              {
+                "who": "kuro",
+                "text": "It's on Vivi's page. Pages say things."
+              }
+            ]
+          },
+          {
+            "on": "fill:r2:c2",
+            "lines": [
+              {
+                "who": "me",
+                "text": "Three clients, three ways of naming things. Put them all together first, then merge what means the same."
+              },
+              {
+                "who": "kuro",
+                "text": "Union first. Lose nothing."
+              }
+            ]
+          },
+          {
+            "on": "fill:r3:c3",
+            "lines": [
+              {
+                "who": "me",
+                "text": "AI drafts, a person checks. Wang said so himself."
+              },
+              {
+                "who": "kuro",
+                "text": "At 08:58. Forty-one seconds."
+              }
+            ]
+          },
+          {
+            "on": "fill:r3:d2",
+            "lines": [
+              {
+                "who": "me",
+                "text": "Fully automatic? Then who checks?"
+              },
+              {
+                "who": "kuro",
+                "text": "Nobody. That's what fully means."
+              }
+            ]
+          },
+          {
+            "on": "fill:r4:c4",
+            "lines": [
+              {
+                "who": "me",
+                "text": "Models change every year. These points were checked one by one."
+              },
+              {
+                "who": "kuro",
+                "text": "Models are rented. Points are owned."
+              }
+            ]
+          },
+          {
+            "on": "fill:r5:c5",
+            "lines": [
+              {
+                "who": "me",
+                "text": "Two pilots, one paid. Write that."
+              },
+              {
+                "who": "kuro",
+                "text": "Qinghe paid. Late, but paid."
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Filled. I made the last page sound better."
+              },
+              {
+                "who": "me",
+                "text": "…Fifty?"
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Cut at 13:42. Whatever happens after doesn't count."
+              },
+              {
+                "who": "me",
+                "text": "A record is a record."
+              },
+              {
+                "who": "kuro",
+                "text": "Fifteen references. Who reads those?"
+              },
+              {
+                "who": "me",
+                "text": "I do."
+              }
+            ]
+          },
+          {
+            "on": "send",
+            "lines": [
+              {
+                "who": "me",
+                "text": "Sent to Wang."
+              },
+              {
+                "who": "kuro",
+                "text": "He'll read it. Eventually."
+              }
+            ]
+          }
+        ]
       },
       "deliverable": {
         "id": "d1-tech",
