@@ -69,3 +69,22 @@ and its door actions. Strings (already in content/strings): `hud.turn.left`, `hu
 - The meal is drawn on the meal table in `window` and not on 桌子; clicking it logs today's eat step once.
 - Snapshots: the four facings at rest (day 1 morning), and `room` with the right arrow showing.
 - Reduced motion: a turn is the crossfade.
+
+## Correction 2026-11-04 (author, after turning in the live build)
+"小脚丫的交互留给要走近一个东西"; "现在转动是切幻灯片的感觉……一张划走一张划进来"; "切走的那张甚至变小了划走，特别别扭".
+- **Cursor.** The `walk` (footprints) cursor is only for walking up to a thing. The turn edges use the new
+  `turn-left` / `turn-right` cursors (`public/cursors/turn-left.png`, `turn-right.png`, `@2x`, hotspots in
+  cursors.json; Claude supplied them). The cursor test covers both.
+- **A turn is turning your head, not a slide.** The four stills are the four inside walls of a box and the
+  viewer stands in its middle. A turn rotates the box 90° about the vertical axis through the viewer (CSS 3D:
+  a `perspective` on the stage, the outgoing and arriving stills as two adjacent faces, `rotateY` of the box
+  from 0 to ∓90°), 650 ms, ease-in-out. The outgoing wall swings away to the side in perspective while the
+  arriving wall swings in from the other side at an angle; at the halfway point both are seen meeting at the
+  room's corner. Neither still is ever scaled down or slid flat. A soft horizontal motion blur (or a 2–3 px
+  blur) peaks at the middle of the turn and is gone at both ends; the edges of the stage stay covered at every
+  frame (no black wedge: grow the box slightly if needed). The arriving still's placed things are on its face
+  and turn with it; the HUD does not move.
+- **No footsteps on a turn** (you turn on the spot); footsteps stay for walking up to things. No bob on a turn.
+- Two-wall moves are two of these back to back (each 400 ms). Reduced motion: the crossfade, as before.
+- Tests: the turn sets the box rotation from 0 to ∓90° (direction by side), no `scale(` below 1 and no
+  `translateX` slide on either still during a turn, no step sound queued, the cursor classes on the edges.
