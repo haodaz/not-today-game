@@ -8,7 +8,8 @@ import { openWork } from "./work";
 import { taskOpened } from "./sessions";
 import { meetingAutoplay } from "./meeting";
 
-const PAGES: readonly WorkbenchPage[] = ["home", "docs", "ledger", "code", "msgs"];
+// 消息 is 听听's now (tingtalk 2026-11-04): not a 工作台 page.
+const PAGES: readonly WorkbenchPage[] = ["home", "docs", "ledger", "code"];
 
 /** The composer's focus key (workspace R2: 新任务 puts the caret in it). */
 export const COMPOSER_FOCUS = "wb-compose";

@@ -266,10 +266,19 @@ export function renderMessages(ctx: AppContext): { body: SafeHtml; badge: number
   return { body: html`<div class="body wx">${list}${conv}</div>`, badge };
 }
 
-/** 工作台's 消息 pane (DingTalk register): the work conversations, the list and the open one. */
+/**
+ * 听听 / TingTalk (tingtalk 2026-11-04): the work conversations, moved out of 工作台's 消息 pane
+ * unchanged — the DingTalk list and the open one — as an app of its own.
+ */
+export function renderTingTalk(ctx: AppContext): { body: SafeHtml; badge: number } {
+  const { pane, badge } = renderWorkMessages(ctx);
+  return { body: html`<div class="body"><div class="wb-msgs">${pane}</div></div>`, badge };
+}
+
+/** The work conversations (DingTalk register): the list and the open one (听听's body). */
 export function renderWorkMessages(ctx: AppContext): { pane: SafeHtml; badge: number } {
   const replies = sentReplies(ctx.startDay, ctx.events);
-  const all = conversations(ctx, replies, "workbench");
+  const all = conversations(ctx, replies, "tingtalk");
   const badge = all.reduce((n, c) => n + c.unread, 0);
   const today = ctx.state.day;
   const names = ctx.state.names;

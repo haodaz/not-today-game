@@ -63,7 +63,7 @@ export const messageActions: Record<string, ActionHandler> = {
   conv(ctx, data) {
     const id = data.conv!;
     if (!recipientsOn(ctx.store.getState().day).includes(id)) return;
-    const field = appOfThread(id) === "workbench" ? "conversation" : "homeConversation";
+    const field = appOfThread(id) === "tingtalk" ? "conversation" : "homeConversation";
     Object.assign(ctx.session, { [field]: id, selected: null, draft: "", inner: null });
     ctx.store.appendEvent({ kind: "open", target: `conv:${id}`, t: ctx.session.clock.time });
     ctx.rerender();

@@ -62,3 +62,11 @@ The explorer was hidden on day 1 (the frame is under 1140 px with panes open, so
 - On a task page the session list is **hidden by default**; the rail keeps its icons. A toggle button at the top of the rail (sidebar icon, `wb.sessions.toggle`) shows / hides it (session only). Home shows it as today.
 - The explorer is **never auto-hidden** while the session list is hidden; only ⊟ / × hide it. If space is short, the pane area shrinks to its min (480) first, then the conversation to its min (380).
 - Kuro's open beat must not say "drag" (there is no drag): Claude fixes the line in content.
+
+## R9. Closer to the Claude app (author 2026-11-04, comparing with the app she works in)
+"新任务按钮、任务 history 都该在收起的侧导航。区域的那几个按钮在对话的右上角而不是整个屏幕的右上角。本来空间就不大、更挤压了。工作台全屏就行，目前怎么在屏幕里还有一圈空白。"
+- **One sidebar**: the rail and the session list are one left sidebar. Expanded (home default): rail icons on top (消息 · 工作台 · 文档 · 审批 · 通讯录, or a compact row of them), then 新任务, then 今天 / 最近. Collapsed (task-page default): a 56 px strip with only the icons and a 新任务 (+) icon; the sidebar toggle (sidebar icon) at its top expands / collapses it. This replaces R8's separate session-list toggle.
+- **No full-width header.** The conversation column has its own top bar (44): ⊟ (explorer), the task title, 交给 X, the status chip; and at **its right end** the pane toggles and the 老物件 strip. The explorer card and the pane cards start at the top of the frame (8 margin) and run full height; they are not under any bar.
+- **工作台 is full-screen inside the monitor**: no window frame, no title bar row (工作台 · 自动保存), no outer white margin; the app fills the monitor's screen area under the OS top bar. (Other apps keep their windows.)
+- **Icons**: line icons, inline SVG, 18 px, stroke 1.5, `currentColor`, the shapes of the Claude app's toolbar: globe (预览), `</>` brackets (代码), grid (表格), play-in-rectangle (会议), folder (文件), sidebar-left (⊟). No text glyphs (▤ ◍ ●).
+- Tests: task page has no element spanning the frame above the cards; toggles are inside the conversation top bar; 工作台 renders without window chrome; collapsed sidebar is 56 px with icons + 新任务.

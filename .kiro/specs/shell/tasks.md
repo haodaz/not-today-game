@@ -6,3 +6,4 @@
 - [x] 4. Loader `ide.files` and `beats` on every view (R4, R5); `ideSrc` light / pane=preview / selected slot; the conversation column per view.
 - [x] 5. Tests as in R7; update the IDE, meeting and workspace tests that read the old columns. Log entry in docs/kiro-log.md.
 - [ ] 6. R8: session list hidden on task pages with the rail toggle; the explorer never auto-hidden; tests (task page at 1600×900 frame width shows the explorer with its 素材 rows).
+- [ ] 7. R9: one collapsible sidebar (rail + 新任务 + history); the conversation's own top bar carries the toggles; cards full height; 工作台 full-screen; line SVG icons.

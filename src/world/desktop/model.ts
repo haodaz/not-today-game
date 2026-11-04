@@ -23,9 +23,10 @@ import { fxPlan } from "../room/fx";
 import { desktopRing } from "./rings";
 import { renderCall } from "./call/view";
 import type { AppId, MonitorModel, ShellModel, Side } from "./shell";
+import { defaultPlacement, windowsOn } from "./placement";
 
-/** 工作台's pages; `msgs` is its 消息 pane (the work conversations, desktop-ui 2026-11-02 evening). */
-export type WorkbenchPage = "home" | "docs" | "ledger" | "code" | "msgs" | TaskPage;
+/** 工作台's pages (its 消息 pane moved to 听听, tingtalk 2026-11-04). */
+export type WorkbenchPage = "home" | "docs" | "ledger" | "code" | TaskPage;
 /** A task page's app panes (shell R3). `work` is a task without a board: its doc / ledger / code surface. */
 export type PaneId = "files" | "preview" | "code" | "table" | "meeting" | "work";
 /** A task page's cards (shell R1): see `Session.shell`. `max` may also be the explorer. */
@@ -67,7 +68,16 @@ export interface LoopMemo {
 
 export interface Session {
   clock: BeatClock;
-  leftApp: AppId;
+  /**
+   * tingtalk R1b: the window in front on each monitor (null = an empty display), every app's
+   * monitor, and the open windows back to front. See placement.ts; remembered for the run.
+   */
+  leftApp: AppId | null;
+  rightApp: AppId | null;
+  place: Record<AppId, Side>;
+  stack: AppId[];
+  /** 调度中心 / Mission Control is open over both monitors (tingtalk R1b). Session only. */
+  mcOpen: boolean;
   /** The monitor shown in the desktop view (one at a time). */
   focus: Side;
   view: View;
@@ -291,7 +301,9 @@ export const initialHand = (): HandSession => ({ using: false, face: "front", ro
 export function initialSession(clock: BeatClock, focus: Side = "left", view: View = "desktop"): Session {
   return {
     clock,
-    leftApp: "msgs",
+    // tingtalk R1: 工作台 on the left, 听听 on the right.
+    ...defaultPlacement(),
+    mcOpen: false,
     focus,
     view,
     dialogue: EMPTY_DIALOGUE,
@@ -363,24 +375,24 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
   };
 }
 
-/** The right monitor shows 工作台, unless the left one does; then it shows 消息. */
-export function rightApp(left: AppId): AppId {
-  return left === "workbench" ? "msgs" : "workbench";
+/** The app in front on the monitor being shown (any view), else null. */
+export function appOn(s: Pick<Session, "focus" | "leftApp" | "rightApp">): AppId | null {
+  return s.focus === "left" ? s.leftApp : s.rightApp;
 }
 
 /** The app on the monitor being shown (desktop view), else null. */
-export function frontApp(s: Pick<Session, "view" | "focus" | "leftApp">): AppId | null {
-  return s.view === "desktop" ? (s.focus === "left" ? s.leftApp : rightApp(s.leftApp)) : null;
+export function frontApp(s: Pick<Session, "view" | "focus" | "leftApp" | "rightApp">): AppId | null {
+  return s.view === "desktop" ? appOn(s) : null;
 }
 
 /**
- * The conversation open in front: 消息's (not 朋友圈), or 工作台's when its 消息 pane is the page.
+ * The conversation open in front: Hi信's (not 朋友圈), or 听听's (tingtalk 2026-11-04).
  * Every conversation exists every day, so the session's id is what is shown.
  */
-export function shownConversation(s: Pick<Session, "view" | "focus" | "leftApp" | "workbenchPage" | "conversation" | "homeConversation">): string | null {
+export function shownConversation(s: Pick<Session, "view" | "focus" | "leftApp" | "rightApp" | "conversation" | "homeConversation">): string | null {
   const app = frontApp(s);
   if (app === "msgs") return s.homeConversation === FEED ? null : s.homeConversation;
-  if (app === "workbench" && s.workbenchPage === "msgs") return s.conversation;
+  if (app === "tingtalk") return s.conversation;
   return null;
 }
 
@@ -398,6 +410,8 @@ export interface AppContext {
 /** Each app's body and badge. Filled in by the app modules; a placeholder until each exists. */
 export interface AppRenderers {
   readonly msgs: (ctx: AppContext) => { body: SafeHtml; badge: number };
+  /** 听听 / TingTalk (tingtalk 2026-11-04): the work conversations. */
+  readonly tingtalk: (ctx: AppContext) => { body: SafeHtml; badge: number };
   readonly workbench: (ctx: AppContext) => { body: SafeHtml; badge: number; tag: SafeHtml | null };
   readonly browser: (ctx: AppContext) => { body: SafeHtml; bar: SafeHtml; badge: number };
   /** Kuro's body and small window, on the right monitor. */
@@ -409,7 +423,6 @@ const WB_PAGE_KEY: Record<Exclude<WorkbenchPage, TaskPage>, string> = {
   docs: "wb.nav.docs",
   ledger: "wb.nav.ledger",
   code: "wb.nav.code",
-  msgs: "wb.nav.msgs",
 };
 /** The page's title key; home and a task page (its title is in its own header) are the app alone. */
 const wbPageKey = (page: WorkbenchPage): string | null => (page === "home" || taskPageId(page) !== null ? null : WB_PAGE_KEY[page as Exclude<WorkbenchPage, TaskPage>]);
