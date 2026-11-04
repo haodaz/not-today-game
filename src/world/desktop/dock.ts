@@ -38,7 +38,7 @@ export interface DockEntry {
   readonly kuro: string | null;
 }
 
-const REAL_APPS = ["msgs", "workbench", "browser"];
+const REAL_APPS = ["msgs", "tingtalk", "workbench", "browser"];
 
 type Raw = Record<string, unknown>;
 const isRecord = (v: unknown): v is Raw => typeof v === "object" && v !== null && !Array.isArray(v);

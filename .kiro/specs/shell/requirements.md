@@ -70,3 +70,10 @@ The explorer was hidden on day 1 (the frame is under 1140 px with panes open, so
 - **工作台 is full-screen inside the monitor**: no window frame, no title bar row (工作台 · 自动保存), no outer white margin; the app fills the monitor's screen area under the OS top bar. (Other apps keep their windows.)
 - **Icons**: line icons, inline SVG, 18 px, stroke 1.5, `currentColor`, the shapes of the Claude app's toolbar: globe (预览), `</>` brackets (代码), grid (表格), play-in-rectangle (会议), folder (文件), sidebar-left (⊟). No text glyphs (▤ ◍ ●).
 - Tests: task page has no element spanning the frame above the cards; toggles are inside the conversation top bar; 工作台 renders without window chrome; collapsed sidebar is 56 px with icons + 新任务.
+
+## R10. One top bar, like the Claude app's (author 2026-11-04; supersedes R9's sidebar strip and the conversation's own bar)
+"红黄绿按钮的工作台几个字单占一行也没有意义。你对比一下你怎么做的。红黄绿按钮、侧导航展开、项目名、和切换应用框的 icon 都在一起。"
+- 工作台 has **one top bar (44 px)** and nothing above its content: left to right: the traffic lights (12 px dots; the green one carries the 移到左屏 / 移到右屏 menu from tingtalk R1b), the sidebar toggle (sidebar-left icon), ← → (back / forward through pages visited this session: home and task pages), the page title (task title with a ▾ that opens the session list as a dropdown; on home, 工作台). Right end: the pane toggles (task pages only) and the 老物件 strip. No separate window-title row, no 自动保存, no second bar on the conversation.
+- **Sidebar**: collapsed = not drawn at all (0 px). Expanded = a 280 px panel sliding over from the left edge under the top bar (like the app's: overlay, white, shadow `0 8px 24px rgba(0,0,0,.08)`): a search box (filters the session titles), + 新任务, 今天 / 最近, and at its top a compact row of the app's section icons (工作台 · 文档 · 审批 · 通讯录; 消息 leaves with 听听). Default collapsed everywhere; ⌘B / Ctrl+B toggles; a click outside closes it.
+- Under the bar: explorer card, conversation, pane cards, as R1, full height.
+- Tests: exactly one bar above the content; traffic lights, toggle, ←→, title, pane toggles all inside it; sidebar 0 px collapsed, overlay when open; ⌘B toggles.

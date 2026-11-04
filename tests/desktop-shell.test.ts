@@ -116,7 +116,7 @@ describe("renderDesktop", () => {
     weather: { kind: "rain", text: "阴，有雨" },
     night: false,
     monitors: [mon("left"), mon("right")],
-    dock: { active: "msgs", badges: { msgs: 5, workbench: 0, browser: 0 } },
+    dock: { active: "msgs", badges: { msgs: 5, tingtalk: 0, workbench: 0, browser: 0 } },
     focus: "left",
     ...over,
   });

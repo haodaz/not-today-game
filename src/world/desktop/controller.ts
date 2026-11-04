@@ -11,7 +11,9 @@ import { playSfx, type SfxOptions } from "@world/loop/sfx";
 import { MOTION } from "@world/motion/timing";
 import { applyFit, BACKDROPS } from "@world/fit";
 import { onEmailChange, setEmailDraft } from "@net/email";
-import { buildShell, initialSession, type AppRenderers, type Session } from "./model";
+import { appOn, buildShell, initialSession, type AppRenderers, type Session } from "./model";
+import { bringToFront, loadPlacement, moveApp, placementOf, savePlacement } from "./placement";
+import { createWindowDrag } from "./windrag";
 import { renderDesktop, APPS, type AppId } from "./shell";
 import { dockFor } from "./dock";
 import type { LookApi } from "@world/room/nav";
@@ -61,12 +63,14 @@ export const shellActions: Record<string, ActionHandler> = {
     ctx.session.focus = data.screen;
     ctx.rerender();
   },
+  // A dock tile: the app's window comes to the front on its monitor, and that monitor is shown
+  // (tingtalk R1b, as macOS activates an app wherever its window is).
   dock(ctx, data) {
     const app = data.app as AppId;
     if (!(APPS as readonly string[]).includes(app)) return;
     ctx.session.decoyWindow = null;
-    if (ctx.session.leftApp !== app) ctx.session.movingUntil = (ctx.now?.() ?? Date.now()) + MOTION.crawl;
-    ctx.session.leftApp = app;
+    if (appOn(ctx.session) !== app) ctx.session.movingUntil = (ctx.now?.() ?? Date.now()) + MOTION.crawl;
+    ctx.session.focus = bringToFront(ctx.session, app);
     if (app === "browser") {
       // Opening the browser is logged (desktop-ui FR4; Kuro's rubric may cite it).
       ctx.store.appendEvent({ kind: "open", target: "browser", t: ctx.session.clock.time });
@@ -93,6 +97,36 @@ export const shellActions: Record<string, ActionHandler> = {
   },
   "decoy-close"(ctx) {
     ctx.session.decoyWindow = null;
+    ctx.rerender();
+  },
+  // tingtalk R1b: 移到左屏 / 移到右屏 (the green button's menu), the title-bar drag across the inner
+  // edge, a drop onto a screen in 调度中心: the window moves there and the view follows it.
+  "win-move"(ctx, data) {
+    const app = data.app as AppId;
+    const side = data.side;
+    if (!(APPS as readonly string[]).includes(app) || (side !== "left" && side !== "right")) return;
+    if (!ctx.session.stack.includes(app) && ctx.session.leftApp !== app && ctx.session.rightApp !== app) return;
+    moveApp(ctx.session, app, side);
+    ctx.session.focus = side;
+    ctx.rerender();
+  },
+  // 调度中心 / Mission Control: its top-bar button (and F3) opens and closes it.
+  "mc-toggle"(ctx) {
+    if (ctx.session.view !== "desktop") return;
+    ctx.session.mcOpen = !ctx.session.mcOpen;
+    ctx.rerender();
+  },
+  "mc-close"(ctx) {
+    if (!ctx.session.mcOpen) return;
+    ctx.session.mcOpen = false;
+    ctx.rerender();
+  },
+  // A window clicked in 调度中心: it closes, and the window is focused (its monitor shown).
+  "mc-focus"(ctx, data) {
+    const app = data.app as AppId;
+    if (!ctx.session.mcOpen || !(APPS as readonly string[]).includes(app)) return;
+    ctx.session.mcOpen = false;
+    ctx.session.focus = bringToFront(ctx.session, app);
     ctx.rerender();
   },
 };
@@ -129,6 +163,8 @@ export interface DesktopDeps {
   readonly hand?: (root: HTMLElement, ctx: ActionContext, actions: Record<string, ActionHandler>) => { after(): void; destroy(): void };
   /** The day-18 pull-out's frame driver (room-scene); runs with or without the splat. */
   readonly pull?: (root: HTMLElement, ctx: ActionContext) => { after(): void; destroy(): void };
+  /** tingtalk R1b: where the windows' placement is remembered for the run (absent = the page only). */
+  readonly placement?: { readonly storage: Pick<Storage, "getItem" | "setItem"> | null; readonly runId: string };
 }
 
 function defaultRender(apps: AppRenderers) {
@@ -138,6 +174,10 @@ function defaultRender(apps: AppRenderers) {
 
 export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: () => void; session: Session } {
   const session = initialSession(deps.clock, deps.focus ?? "left", deps.view ?? "desktop");
+  // tingtalk R1b: the run's placement (a reload, the next day); a fresh run keeps the default.
+  const remembered = deps.placement ? loadPlacement(deps.placement.storage, deps.placement.runId, APPS) : null;
+  if (remembered) Object.assign(session, remembered);
+  let savedPlacement = JSON.stringify(placementOf(session));
   // The mute flag outlives the page (sound spec FR3); the title page reads the same one.
   if (deps.sound) session.muted = deps.sound.muted;
   // A theme that plays to its end lets the walkman go (a second click is not needed to stop it).
@@ -184,6 +224,14 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
         deps.sound.apply(soundPlan(deps.store.getState(), session));
       } catch {
         // No sound is fine.
+      }
+    }
+    // The windows' placement changed: remember it for the run.
+    if (deps.placement) {
+      const now = JSON.stringify(placementOf(session));
+      if (now !== savedPlacement) {
+        savedPlacement = now;
+        savePlacement(deps.placement.storage, deps.placement.runId, placementOf(session));
       }
     }
     motion?.before();
@@ -290,6 +338,17 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
       }
       return;
     }
+    // 调度中心 (tingtalk R1b): F3 opens / closes it, as on a Mac; Esc closes it before anything else.
+    if (session.view === "desktop" && e.key === "F3") {
+      e.preventDefault();
+      actions["mc-toggle"]?.(ctx, {} as DOMStringMap, target);
+      return;
+    }
+    if (e.key === "Escape" && session.mcOpen) {
+      e.preventDefault();
+      actions["mc-close"]?.(ctx, {} as DOMStringMap, target);
+      return;
+    }
     if (session.view === "desktop" && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
       session.focus = e.key === "ArrowLeft" ? "left" : "right";
       rerender();
@@ -312,6 +371,14 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
 
   root.addEventListener("click", onClick);
   root.addEventListener("input", onInput);
+  // tingtalk R1b: a window's title bar dragged across the inner edge, a window dropped on a screen in 调度中心.
+  const drag = createWindowDrag(root, (name, data, el) => {
+    try {
+      actions[name]?.(ctx, data as DOMStringMap, el);
+    } catch (error) {
+      console.warn(error);
+    }
+  });
   window.addEventListener("keydown", onKey);
   window.addEventListener("resize", fit);
   const unsubscribe = deps.store.subscribe(onStore);
@@ -336,6 +403,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
       if (frame) cancelAnimationFrame(frame);
       root.removeEventListener("click", onClick);
       root.removeEventListener("input", onInput);
+      drag.destroy();
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("resize", fit);
     },

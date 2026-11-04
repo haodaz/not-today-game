@@ -19,6 +19,8 @@ import { sentFiles, sentReplies, transcript } from "../messages/transcript";
 import { taskPageId, type AppContext, type PaneId, type Session, type ShellState } from "../model";
 import { boardActions, cardText, finishLabel, lockRow, renderBoardRead, table } from "./board";
 import { meetingWindow } from "./meeting";
+import { moveApp, otherSide } from "../placement";
+import { messageActions } from "../messages/actions";
 import { renderObjectBar } from "./objbar";
 import { openWork, renderDoneWork, renderWork } from "./work";
 
@@ -368,7 +370,7 @@ export const taskShellActions: Record<string, ActionHandler> = {
     ctx.rerender();
   },
   // ↗ on a found 素材 card: the 文件 pane opens on its source.
-  "shell-source"(ctx, data) {
+  "shell-source"(ctx, data, el) {
     const p = pageOf(ctx);
     const card = data.card;
     const board = p?.task.board;
@@ -376,6 +378,13 @@ export const taskShellActions: Record<string, ActionHandler> = {
     const st = stateFor(ctx, p);
     st.source = card;
     openPane(st, "files");
+    // tingtalk R2: a conversation's card opens that thread in 听听, on the monitor that is not
+    // 工作台's (the 文件 pane keeps its read-only lines); the player stays where they are.
+    const from = board.cards.find((c) => c.id === card)?.from;
+    if (from && "conv" in from) {
+      moveApp(ctx.session, "tingtalk", otherSide(ctx.session.place.workbench));
+      messageActions["conv"]!(ctx, { conv: from.conv } as DOMStringMap, el);
+    }
     ctx.rerender();
   },
 };

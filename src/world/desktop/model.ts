@@ -427,9 +427,20 @@ const WB_PAGE_KEY: Record<Exclude<WorkbenchPage, TaskPage>, string> = {
 /** The page's title key; home and a task page (its title is in its own header) are the app alone. */
 const wbPageKey = (page: WorkbenchPage): string | null => (page === "home" || taskPageId(page) !== null ? null : WB_PAGE_KEY[page as Exclude<WorkbenchPage, TaskPage>]);
 
-function monitorFor(app: AppId, side: Side, ctx: AppContext, apps: AppRenderers): { monitor: MonitorModel; badge: number } {
+function monitorFor(app: AppId | null, side: Side, ctx: AppContext, apps: AppRenderers): { monitor: MonitorModel; badge: number } {
   // Kuro's small window is always on top: it sits on whichever monitor is shown.
   const overlay = side === ctx.session.focus ? apps.kuro(ctx) : null;
+  // An empty display (tingtalk R1b: every window moved to the other one): the desktop alone.
+  if (app === null) {
+    return { badge: 0, monitor: { side, app: null, appTitle: html``, winTitle: html``, winClass: "", barRight: null, body: html``, nightSubKey: "night.plate.sub", overlay } };
+  }
+  if (app === "tingtalk") {
+    const { body, badge } = apps.tingtalk(ctx);
+    return {
+      badge,
+      monitor: { side, app, appTitle: tr("dock.tingtalk"), winTitle: tr("tingtalk.title"), winClass: "wb tt", barRight: null, body, nightSubKey: "night.plate.sub", overlay },
+    };
+  }
   if (app === "msgs") {
     const { body, badge } = apps.msgs(ctx);
     return {
@@ -481,12 +492,21 @@ export function buildShell(
   // 关机 in the system's top bar: usable only while the shutdown item is open.
   const shutdownOpen = lc !== null && openItemFor(lc, (e) => e.type === "beat" && e.beat === "shutdown") !== null;
   const left = monitorFor(session.leftApp, "left", ctx, apps);
-  const right = monitorFor(rightApp(session.leftApp), "right", ctx, apps);
+  const right = monitorFor(session.rightApp, "right", ctx, apps);
   // Badges count whether or not the app is on screen.
-  const shown = new Map<AppId, number>([[left.monitor.app, left.badge], [right.monitor.app, right.badge]]);
+  const shown = new Map<AppId, number>();
+  if (left.monitor.app) shown.set(left.monitor.app, left.badge);
+  if (right.monitor.app) shown.set(right.monitor.app, right.badge);
   const badgeOf = (app: AppId): number =>
-    shown.get(app) ?? (app === "msgs" ? apps.msgs(ctx).badge : app === "workbench" ? apps.workbench(ctx).badge : apps.browser(ctx).badge);
-  const badges = { msgs: badgeOf("msgs"), workbench: badgeOf("workbench"), browser: badgeOf("browser") };
+    shown.get(app) ?? (app === "msgs" ? apps.msgs(ctx).badge : app === "tingtalk" ? apps.tingtalk(ctx).badge : app === "workbench" ? apps.workbench(ctx).badge : apps.browser(ctx).badge);
+  const badges = { msgs: badgeOf("msgs"), tingtalk: badgeOf("tingtalk"), workbench: badgeOf("workbench"), browser: badgeOf("browser") };
+  // 调度中心 (tingtalk R1b): every open window, on its monitor, front first; the shown ones reuse their model.
+  const mc =
+    session.mcOpen && !off
+      ? (["left", "right"] as const).flatMap((side) =>
+          windowsOn(session, side).map((app) => ({ side, monitor: app === left.monitor.app && side === "left" ? left.monitor : app === right.monitor.app && side === "right" ? right.monitor : monitorFor(app, side, ctx, apps).monitor })),
+        )
+      : null;
   // Weather by day (day-loop addition 2026-11-02): the day's entry, never the browser page's text.
   const weatherKindToday = weatherOf(state.day);
   return {
@@ -498,8 +518,11 @@ export function buildShell(
     off,
     shutdown: off || night ? null : shutdownOpen ? "open" : "closed",
     monitors: [left.monitor, right.monitor],
-    dock: { active: session.leftApp, badges, decoys: dockFor(state.day), decoyOpen: session.decoyWindow },
+    // The dock's dot: the window in front on the monitor being shown (the active app).
+    dock: { active: appOn(session), badges, decoys: dockFor(state.day), decoyOpen: session.decoyWindow },
     focus: session.focus,
+    place: session.place,
+    mc,
     fx: fxPlan(state.day, "desktop"),
     scene: sceneOf(session.dialogue),
     callOverlay: renderCall(ctx),

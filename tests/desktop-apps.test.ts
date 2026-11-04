@@ -48,12 +48,12 @@ describe("workbench home", () => {
     expect(out).toContain(`<div class="big">${c.state.overdueDays}<small>`);
   });
 
-  it("with day data fills the cards (the jobs in 在办, the continue chips under the composer); the badge counts the jobs and the work conversations' unread", () => {
+  it("with day data fills the cards (the jobs in 在办, the continue chips under the composer); the badge counts the jobs", () => {
     const c = ctx(1);
     const result = renderWorkbench(c, days);
-    // The work conversations moved into 工作台 (desktop-ui 2026-11-02, evening): their unread count here.
-    expect(result.badge).toBe(fixture.doing.length + threadsUnread(c, "workbench"));
-    expect(threadsUnread(c, "workbench")).toBeGreaterThan(0);
+    // The work conversations are 听听's now (tingtalk 2026-11-04): 工作台 counts only its jobs.
+    expect(result.badge).toBe(fixture.doing.length);
+    expect(threadsUnread(c, "tingtalk")).toBeGreaterThan(0);
     expect(result.body.value).toContain('<span class="r">status one</span>');
     // The old nav column's job list and docs tag are gone (workspace R2); the docs tag stays on the window.
     expect(result.body.value).not.toContain('class="job"');

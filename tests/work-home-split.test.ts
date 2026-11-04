@@ -1,6 +1,7 @@
-// desktop-ui correction 2026-11-02 (evening): work in the work app, home in the home app. 工作台's
-// 消息 pane holds boss / partner / group / xiaozhang / laozhou (DingTalk register); 消息 holds 家里
-// and 朋友圈 (WeChat desktop look). The reply tables and events are untouched: only which app shows
+// desktop-ui correction 2026-11-02 (evening), tingtalk 2026-11-04: three apps. 听听 / TingTalk holds
+// boss / partner / group / xiaozhang / laozhou (DingTalk register, moved out of 工作台 unchanged);
+// Hi信 / Hichat (the `msgs` app) holds 家里 and 朋友圈 (WeChat desktop look); 工作台 holds home and
+// the task pages, no conversation. The reply tables and events are untouched: only which app shows
 // which conversation changes. Each dock tile counts its own unread.
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
@@ -9,7 +10,7 @@ import { FAMILY_GROUPS } from "@state/replies/table";
 import { createStore, type Store } from "@state/store";
 import { constants } from "@state/variables";
 import { appOfThread, threadsIn, WORK_THREADS } from "@world/desktop/messages/threads";
-import { renderMessages, renderWorkMessages, threadsUnread } from "@world/desktop/messages/view";
+import { renderMessages, renderTingTalk, renderWorkMessages, threadsUnread } from "@world/desktop/messages/view";
 import { initialSession, type AppContext, type Session } from "@world/desktop/model";
 import { renderWorkbench } from "@world/desktop/workbench/view";
 import { hasString, t } from "@world/i18n";
@@ -29,44 +30,46 @@ function ctxFor(store: Store, session: Session = initialSession({ beat: "work", 
 const convsIn = (markup: string) => [...markup.matchAll(/data-conv="([^"]+)"[^>]*data-action="conv"|data-action="conv" data-conv="([^"]+)"/g)].map((m) => m[1] ?? m[2]!);
 
 describe("which app shows which conversation", () => {
-  it("property: on every day, each conversation appears in exactly one app", () => {
+  it("property: on every day, each conversation appears in exactly one of 听听 and Hi信; none in 工作台", () => {
     fc.assert(
       fc.property(fc.integer({ min: 1, max: constants.lastDay }), (day) => {
         const store = storeAt(day);
-        const work = new Set(convsIn(renderWorkMessages(ctxFor(store)).pane.value));
+        const work = new Set(convsIn(renderTingTalk(ctxFor(store)).body.value));
         const home = new Set(convsIn(renderMessages(ctxFor(store)).body.value));
         for (const id of recipientsOn(day)) expect(Number(work.has(id)) + Number(home.has(id)), `d${day} ${id}`).toBe(1);
         expect([...work].every((id) => recipientsOn(day).includes(id))).toBe(true);
         expect([...home].every((id) => recipientsOn(day).includes(id))).toBe(true);
+        expect(convsIn(renderWorkbench(ctxFor(store)).body.value)).toEqual([]);
       }),
       { numRuns: 18 },
     );
   });
 
-  it("the family groups never appear in 工作台; the work ones never in 消息", () => {
+  it("the work threads only in 听听, the family only in Hi信", () => {
     for (let day = 1; day <= constants.lastDay; day++) {
       const store = storeAt(day);
-      const wb = renderWorkbench(ctxFor(store, Object.assign(initialSession({ beat: "work", time: "10:00" }), { workbenchPage: "msgs" as const }))).body.value;
-      for (const id of FAMILY_GROUPS) expect(wb, `d${day} ${id}`).not.toContain(`data-conv="${id}"`);
+      const tt = renderTingTalk(ctxFor(store)).body.value;
+      for (const id of FAMILY_GROUPS) expect(tt, `d${day} ${id}`).not.toContain(`data-conv="${id}"`);
       const home = renderMessages(ctxFor(store)).body.value;
       for (const id of WORK_THREADS) expect(home, `d${day} ${id}`).not.toContain(`data-conv="${id}"`);
     }
     expect(threadsIn("msgs", 1)).toEqual(["family", "clan"]);
-    expect(threadsIn("workbench", 1)).toEqual(["boss", "partner", "group", "xiaozhang", "laozhou"]);
-    expect(appOfThread("laozhou")).toBe("workbench");
+    expect(threadsIn("tingtalk", 1)).toEqual(["boss", "partner", "group", "xiaozhang", "laozhou"]);
+    expect(appOfThread("laozhou")).toBe("tingtalk");
+    expect(appOfThread("clan")).toBe("msgs");
   });
 
-  it("the 消息 badge counts only the personal threads; 工作台's adds the work ones' unread", () => {
+  it("each app counts its own: Hi信 the personal threads, 听听 the work ones, 工作台 none", () => {
     for (const day of [1, 6, 13]) {
       const ctx = ctxFor(storeAt(day));
       expect(renderMessages(ctx).badge).toBe(threadsUnread(ctx, "msgs"));
-      expect(renderWorkMessages(ctx).badge).toBe(threadsUnread(ctx, "workbench"));
+      expect(renderTingTalk(ctx).badge).toBe(threadsUnread(ctx, "tingtalk"));
     }
-    // Day 1 at 10:00: the boss's voice note is unread, and it is not 消息's.
+    // Day 1 at 10:00: the boss's voice note is unread, and it is not Hi信's.
     const ctx = ctxFor(storeAt(1));
-    expect(threadsUnread(ctx, "workbench")).toBeGreaterThan(0);
+    expect(threadsUnread(ctx, "tingtalk")).toBeGreaterThan(0);
     const homeOnly = threadsUnread(ctx, "msgs");
-    // The 消息 count does not move when a work conversation is opened.
+    // The Hi信 count does not move when a work conversation is opened.
     const store = storeAt(1);
     store.appendEvent({ kind: "open", target: "conv:boss", t: "10:00" });
     expect(renderMessages(ctxFor(store)).badge).toBe(homeOnly);
@@ -101,19 +104,22 @@ describe("which app shows which conversation", () => {
   });
 });
 
-describe("看一眼消息 from 工作台's 消息 pane (the boss lives there)", () => {
-  it("opening the pane fires the openApp:msgs step once a day, so day 1's 「进屏幕，看一眼消息」 completes", () => {
+describe("看一眼消息 is done by opening 听听 (the boss lives there)", () => {
+  it("showing 听听 fires the openApp:msgs step once a day, so day 1's 「进屏幕，看一眼消息」 completes; 工作台 and Hi信 do not", () => {
     const store = storeAt(1);
     store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
     const session = initialSession({ beat: "boot", time: "09:03" }, "left", "desktop");
-    session.leftApp = "workbench";
     const ctx: ActionContext = { store, session, rerender: () => {}, later: () => {} };
     const steps = () => store.getEvents().filter((e) => e.kind === "step" && e.name === "openApp:msgs").length;
+    loopActions["dock"]!(ctx, { app: "workbench" } as DOMStringMap, null as never);
+    loopActions["dock"]!(ctx, { app: "msgs" } as DOMStringMap, null as never);
     expect(steps()).toBe(0);
-    loopActions["wb-nav"]!(ctx, { page: "msgs" } as DOMStringMap, null as never);
+    // 听听 is on the right monitor: the 右屏 toggle shows it.
+    loopActions["screen"]!(ctx, { screen: "right" } as DOMStringMap, null as never);
     expect(steps()).toBe(1);
-    loopActions["wb-nav"]!(ctx, { page: "home" } as DOMStringMap, null as never);
-    loopActions["wb-nav"]!(ctx, { page: "msgs" } as DOMStringMap, null as never);
+    loopActions["screen"]!(ctx, { screen: "left" } as DOMStringMap, null as never);
+    loopActions["dock"]!(ctx, { app: "tingtalk" } as DOMStringMap, null as never);
+    expect(session.focus).toBe("right");
     expect(steps()).toBe(1);
     const lc = loopContext(store.getState(), store.getEvents())!;
     const item = lc.file.items.find((i) => i.done.kind === "event" && i.done.event.type === "openApp" && i.done.event.app === "msgs")!;
@@ -121,16 +127,17 @@ describe("看一眼消息 from 工作台's 消息 pane (the boss lives there)", 
   });
 });
 
-describe("工作台's 消息 pane (DingTalk register)", () => {
-  it("Vivi's role line sits under the name in the head; the rail has 消息 / 工作台 / 文档 / 审批 / 通讯录", () => {
+describe("听听 (DingTalk register, as 工作台·消息 was)", () => {
+  it("Vivi's role line sits under the name in the head; 工作台's rail has no 消息 item any more", () => {
     const store = storeAt(1);
     const session = initialSession({ beat: "work", time: "10:00" });
-    session.workbenchPage = "msgs";
     session.conversation = "partner";
-    const out = renderWorkbench(ctxFor(store, session)).body.value;
+    const out = renderTingTalk(ctxFor(store, session)).body.value;
     expect(out).toContain(`<div class="head"><b>${t("msgs.partner")}</b> <small>${t("msgs.partner.role")}</small></div>`);
-    for (const key of ["wb.nav.msgs", "wb.nav.home", "wb.nav.docs", "wb.nav.approvals", "wb.nav.contacts"]) expect(out, key).toContain(t(key));
-    expect(out).toContain('class="ri on" data-action="wb-nav" data-page="msgs"');
+    const wb = renderWorkbench(ctxFor(store, session)).body.value;
+    for (const key of ["wb.nav.home", "wb.nav.docs", "wb.nav.approvals", "wb.nav.contacts"]) expect(wb, key).toContain(t(key));
+    expect(wb).not.toContain('data-page="msgs"');
+    expect(wb).not.toContain(t("wb.nav.msgs"));
   });
 
   it("the player's own messages carry 已读 or 未读; the boss's voice its DING (when strings have the words)", () => {
@@ -147,11 +154,9 @@ describe("工作台's 消息 pane (DingTalk register)", () => {
 
 describe("snapshots", () => {
   for (const day of [1, 13]) {
-    it(`day ${day}: 工作台·消息 and 消息`, () => {
+    it(`day ${day}: 听听 and Hi信`, () => {
       const store = storeAt(day);
-      const wbSession = initialSession({ beat: "work", time: "10:00" });
-      wbSession.workbenchPage = "msgs";
-      const work = renderWorkbench(ctxFor(store, wbSession)).body.value;
+      const work = renderTingTalk(ctxFor(store)).body.value;
       const home = renderMessages(ctxFor(store)).body.value;
       const clan = renderMessages(ctxFor(store, Object.assign(initialSession({ beat: "work", time: "10:00" }), { homeConversation: "clan" }))).body.value;
       expect({ work, home, clan }).toMatchSnapshot();

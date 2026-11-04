@@ -9,7 +9,7 @@
 import type { GameEvent } from "@state/events";
 import type { KuroCloses } from "@state/closes";
 import type { ActionContext } from "@world/desktop/controller";
-import { rightApp, type Session } from "@world/desktop/model";
+import { appOn, type Session } from "@world/desktop/model";
 import { getLocale } from "@world/i18n";
 import { kuroInBox, push, type Queued } from "@world/loop/dialogue";
 import { CRAWL_MAX_MS } from "./crawl";
@@ -50,7 +50,7 @@ export const closerDelay = (closedBefore: number): number => Math.max(0, CLOSER_
 function stillOpen(ctx: ActionContext, c: KuroCloser): boolean {
   const s = ctx.session;
   if (s.kuroCloser !== c || s.view !== "desktop") return false;
-  const shown = s.focus === "left" ? s.leftApp : rightApp(s.leftApp);
+  const shown = appOn(s);
   if (c.where === "browser") return shown === "browser" && s.browserRead !== null && readingPageOf(ctx, s.browserRead) === c.pageId;
   return shown === "workbench" && s.workbenchPage === "docs";
 }

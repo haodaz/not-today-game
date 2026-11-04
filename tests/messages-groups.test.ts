@@ -30,7 +30,7 @@ const bubblesOf = (store: Store, conversation: string, clock = late): Extract<Bu
 function render(store: Store, conversation: string, clock = late): string {
   const session = initialSession(clock, "left", "desktop");
   // The work conversations are in 工作台's 消息 pane, 家里 in 消息 (desktop-ui 2026-11-02, evening).
-  const work = appOfThread(conversation) === "workbench";
+  const work = appOfThread(conversation) === "tingtalk";
   if (work) session.conversation = conversation;
   else session.homeConversation = conversation;
   const ctx: AppContext = { state: store.getState(), events: store.getEvents(), startDay: 1, session, night: false, nowMs: 0 };

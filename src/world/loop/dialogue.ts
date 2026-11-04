@@ -154,7 +154,8 @@ export function placeMatches(where: Place | undefined, here: Here): boolean {
     case "screen":
       return here.view === "desktop";
     case "screen:msgs":
-      return here.view === "desktop" && (here.app === "msgs" || (here.app === "workbench" && here.page === "msgs"));
+      // A messages surface in front: Hi信, or 听听 (the work conversations, tingtalk 2026-11-04).
+      return here.view === "desktop" && (here.app === "msgs" || here.app === "tingtalk");
     case "screen:workbench":
     case "screen:browser":
       return here.view === "desktop" && here.app === where.slice("screen:".length);

@@ -138,10 +138,10 @@ describe("matching", () => {
     left.session.leftApp = "msgs";
     // 消息 in front: its open conversation (家里's 爸妈 by default) is the third level.
     expect(hereOf(left.session)).toEqual({ view: "desktop", app: "msgs", night: false, conversation: "family", page: null });
-    left.session.focus = "right"; // the right monitor shows the other app
+    left.session.focus = "right"; // the right monitor shows its own window: 听听 by default (tingtalk 2026-11-04)
+    expect(hereOf(left.session).app).toBe("tingtalk");
+    left.session.rightApp = "workbench";
     expect(hereOf(left.session).app).toBe("workbench");
-    left.session.leftApp = "workbench";
-    expect(hereOf(left.session).app).toBe("msgs");
     expect(hereOf(ctxOf(store, "desk").session).app).toBeNull();
     expect(hereOf(ctxOf(store, "room", NIGHT).session).night).toBe(true);
   });
@@ -364,11 +364,10 @@ describe("a real day: day 7 boot, the room line first, the 老板 line only afte
   }
   const box = (ctx: ActionContext) => dialogueBox(ctx.store.getState(), ctx.store.getEvents(), ctx.session)?.value ?? null;
 
-  /** Into 屏幕, then 工作台's 消息 pane, where the boss's conversation is open by default. */
+  /** Into 屏幕, then 听听 (tingtalk 2026-11-04), where the boss's conversation is open by default. */
   const toBoss = (ctx: ActionContext) => {
     act(ctx, "view", { view: "desktop", screen: "left" });
-    act(ctx, "dock", { app: "workbench" });
-    act(ctx, "wb-nav", { page: "msgs" });
+    act(ctx, "dock", { app: "tingtalk" });
   };
 
   it("plays the first line in the room, then closes; the next two come with the boss's conversation", () => {
@@ -387,10 +386,9 @@ describe("a real day: day 7 boot, the room line first, the 老板 line only afte
 
     act(ctx, "view", { view: "desktop", screen: "left" });
     syncLoop(ctx);
-    // 消息 (家里) is in front: the boss's line keeps waiting; no falling back to `screen:msgs`.
+    // 工作台 is in front (the left monitor): the boss's line keeps waiting; no falling back to `screen:msgs`.
     expect(onShow(ctx)).toBeNull();
-    act(ctx, "dock", { app: "workbench" });
-    act(ctx, "wb-nav", { page: "msgs" });
+    act(ctx, "dock", { app: "tingtalk" });
     expect(onShow(ctx)).toBe(seq.say[1]!.t);
     const screen = box(ctx);
     expect(screen).toContain("老板");
@@ -440,19 +438,21 @@ describe("the third level: screen:msgs:<conversation>, screen:workbench:<page>",
     expect(placeMatches("screen:workbench:docs", h("workbench", null, "docs"))).toBe(true);
     expect(placeMatches("screen:workbench:docs", h("workbench", null, "home"))).toBe(false);
     expect(placeMatches("screen:workbench:docs", h("msgs", "family"))).toBe(false);
-    // The second level still matches its app, whatever is open in it (and `screen:msgs` 工作台's 消息 pane too).
+    // The second level still matches its app, whatever is open in it (and `screen:msgs` 听听 too, tingtalk 2026-11-04).
     expect(placeMatches("screen:msgs", h("msgs", "clan"))).toBe(true);
-    expect(placeMatches("screen:msgs", h("workbench", "boss", "msgs"))).toBe(true);
+    expect(placeMatches("screen:msgs", h("tingtalk", "boss"))).toBe(true);
     expect(placeMatches("screen:msgs", h("workbench", null, "docs"))).toBe(false);
-    expect(placeMatches("screen:workbench", h("workbench", "boss", "msgs"))).toBe(true);
+    expect(placeMatches("screen:workbench", h("workbench", null, "home"))).toBe(true);
+    expect(placeMatches("screen:workbench", h("tingtalk", "boss"))).toBe(false);
   });
 
   it("hereOf reads the open conversation and 工作台's page from the session", () => {
     const ctx = ctxOf(atDay(1), "desktop");
     ctx.session.leftApp = "workbench";
     expect(hereOf(ctx.session)).toMatchObject({ app: "workbench", page: "home", conversation: null });
-    ctx.session.workbenchPage = "msgs";
-    expect(hereOf(ctx.session)).toMatchObject({ app: "workbench", page: "msgs", conversation: "boss" });
+    // 听听 (tingtalk 2026-11-04) holds the work conversations.
+    ctx.session.leftApp = "tingtalk";
+    expect(hereOf(ctx.session)).toMatchObject({ app: "tingtalk", page: null, conversation: "boss" });
     ctx.session.leftApp = "msgs";
     ctx.session.homeConversation = "clan";
     expect(hereOf(ctx.session)).toMatchObject({ app: "msgs", page: null, conversation: "clan" });
@@ -468,8 +468,8 @@ describe("the third level: screen:msgs:<conversation>, screen:workbench:<page>",
 
   it("a screen:msgs:boss line waits in screen:msgs:clan and plays on switching back", () => {
     const ctx = onDesktop();
-    ctx.session.leftApp = "workbench";
-    ctx.session.workbenchPage = "msgs";
+    // 听听 is on the right monitor by default (tingtalk 2026-11-04).
+    ctx.session.focus = "right";
     act(ctx, "conv", { conv: "boss" });
     ctx.session.dialogue = push(ctx.session.dialogue, item("b", [line("about the boss", "screen:msgs:boss")]));
     settleSession(ctx.session);
@@ -480,7 +480,7 @@ describe("the third level: screen:msgs:<conversation>, screen:workbench:<page>",
     expect(onShow(ctx)).toBeNull();
     expect(waitingKeys(ctx)).toEqual(["b"]);
     // Another work conversation is not the boss either.
-    act(ctx, "dock", { app: "workbench" });
+    act(ctx, "dock", { app: "tingtalk" });
     act(ctx, "conv", { conv: "partner" });
     expect(onShow(ctx)).toBeNull();
     act(ctx, "conv", { conv: "boss" });

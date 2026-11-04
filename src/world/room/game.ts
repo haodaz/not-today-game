@@ -15,7 +15,8 @@ import { nextScreen } from "@world/dialogue/layout";
 import { stepOnce } from "@world/loop/steps";
 import { fillPlaceholders } from "@world/replies/placeholders";
 import { shellActions, type ActionContext, type ActionHandler } from "@world/desktop/controller";
-import { buildShell, rightApp, VIEWS, type Session, type View } from "@world/desktop/model";
+import { appOn, buildShell, VIEWS, type Session, type View } from "@world/desktop/model";
+import { bringToFront } from "@world/desktop/placement";
 import { renderDesktop, type AppId } from "@world/desktop/shell";
 import { placeOrder } from "@world/delivery/commands";
 import { phonePage } from "@world/delivery/app";
@@ -103,24 +104,23 @@ function dlgLayer(dlg: SafeHtml | null, session: Session): SafeHtml | null {
   return html`<div class="${cls("dlg-layer", mask !== null && "masked")}">${mask}${dlg}</div>`;
 }
 
-/** The app on the monitor being shown. */
-export function shownApp(session: Session): AppId {
-  return session.focus === "left" ? session.leftApp : rightApp(session.leftApp);
+/** The app in front on the monitor being shown (null: an empty display). */
+export function shownApp(session: Session): AppId | null {
+  return appOn(session);
 }
 
 /**
  * Open a conversation on 屏幕 without logging or stepping the checklist (it is a camera move, not the
- * player opening it): the work ones in 工作台's 消息 pane, 家里/朋友圈 in 消息. Used to land a refused
- * switch on the locked conversation, so the lock never dead-ends (desktop-ui 2026-11-03).
+ * player opening it): the work ones in 听听, 家里/朋友圈 in Hi信, on whichever monitor that app's
+ * window is (tingtalk 2026-11-04). Used to land a refused switch on the locked conversation, so the
+ * lock never dead-ends (desktop-ui 2026-11-03).
  */
 function showConversation(session: Session, id: string): void {
-  session.focus = "left";
-  if (appOfThread(id) === "workbench") {
-    session.leftApp = "workbench";
-    session.workbenchPage = "msgs";
+  if (appOfThread(id) === "tingtalk") {
+    session.focus = bringToFront(session, "tingtalk");
     session.conversation = id;
   } else {
-    session.leftApp = "msgs";
+    session.focus = bringToFront(session, "msgs");
     session.homeConversation = id;
   }
   session.selected = null;
@@ -178,13 +178,15 @@ function nightFallen(ctx: ActionContext): boolean {
   return !!lc && nightfallReached(lc);
 }
 
-/** Looking at an app counts, once the computer is on (before boot 屏幕 is two black monitors). */
-function lookAt(ctx: ActionContext, app: AppId): void {
-  if (!booted(ctx.store.getState(), ctx.store.getEvents())) return;
-  stepOnce(ctx, `openApp:${app}`);
-  // The work conversations live in 工作台's 消息 pane (desktop-ui 2026-11-02): looking at it is
-  // looking at the messages too (once a day, like the app's own step).
-  if (app === "workbench" && ctx.session.workbenchPage === "msgs") stepOnce(ctx, "openApp:msgs");
+/**
+ * Looking at an app counts, once the computer is on (before boot 屏幕 is two black monitors).
+ * 看一眼消息 (`openApp:msgs`, the event unchanged) is done by 听听, where the work conversations are
+ * (tingtalk R2); Hi信 is the family's and steps nothing.
+ */
+function lookAt(ctx: ActionContext, app: AppId | null): void {
+  if (app === null || !booted(ctx.store.getState(), ctx.store.getEvents())) return;
+  if (app === "tingtalk") stepOnce(ctx, "openApp:msgs");
+  else if (app === "workbench" || app === "browser") stepOnce(ctx, `openApp:${app}`);
 }
 
 /**
@@ -431,9 +433,28 @@ export const loopActions: Record<string, ActionHandler> = {
   dock(ctx, data, el) {
     if (viviRefuse(ctx)) return;
     shellActions.dock!(ctx, data, el);
-    lookAt(ctx, ctx.session.leftApp);
+    lookAt(ctx, shownApp(ctx.session));
     lookedAway(ctx);
     // Another app in front is another place (`screen:msgs` ↔ `screen:workbench`).
+    if (settleSession(ctx.session)) ctx.rerender();
+  },
+  // tingtalk R1b: a window moved to the other monitor (the view follows it), a window focused from
+  // 调度中心: both change what is on screen, so they count as looking, like the dock.
+  "win-move"(ctx, data, el) {
+    if (viviRefuse(ctx)) return;
+    shellActions["win-move"]!(ctx, data, el);
+    lookAt(ctx, shownApp(ctx.session));
+    lookedAway(ctx);
+    if (settleSession(ctx.session)) ctx.rerender();
+  },
+  "mc-focus"(ctx, data, el) {
+    if (viviRefuse(ctx)) {
+      ctx.session.mcOpen = false;
+      return;
+    }
+    shellActions["mc-focus"]!(ctx, data, el);
+    lookAt(ctx, shownApp(ctx.session));
+    lookedAway(ctx);
     if (settleSession(ctx.session)) ctx.rerender();
   },
   screen(ctx, data, el) {
@@ -467,10 +488,10 @@ export const loopActions: Record<string, ActionHandler> = {
     const doc = data.doc;
     if (!doc) return;
     const page = deliverablePage(doc);
-    // Switch to the browser on the shown monitor (its leftApp), open the page, log the open once a
-    // day (a board card can come from a page posted days ago: day 3's trap is Vivi's day-2 page).
-    ctx.session.leftApp = "browser";
-    ctx.session.focus = "left";
+    // The browser's window comes to the front (on its monitor, which is shown), opens the page, and
+    // logs the open once a day (a board card can come from a page posted days ago: day 3's trap is
+    // Vivi's day-2 page).
+    ctx.session.focus = bringToFront(ctx.session, "browser");
     ctx.session.browserDoc = page;
     const day = ctx.store.getState().day;
     if (!ctx.store.getEvents().some((e) => e.kind === "open" && e.day === day && e.target === `file:${doc}`)) {
@@ -488,9 +509,7 @@ export const loopActions: Record<string, ActionHandler> = {
     if (viviRefuse(ctx)) return;
     workbenchActions["wb-nav"]!(ctx, data, el);
     cancelCloser(ctx.session);
-    // Opening 工作台's 消息 pane is 看一眼消息 (the boss is there now): the openApp:msgs step, once a day.
-    if (ctx.session.workbenchPage === "msgs" && ctx.session.view === "desktop") lookAt(ctx, "workbench");
-    // Another page is another place (`screen:workbench:<page>`, `screen:msgs:<id>` in its 消息 pane).
+    // Another page is another place (`screen:workbench:<page>`).
     if (settleSession(ctx.session)) ctx.rerender();
     if (ctx.session.workbenchPage !== "docs") return;
     const lc = loopContext(ctx.store.getState(), ctx.store.getEvents());
@@ -792,8 +811,7 @@ export const loopActions: Record<string, ActionHandler> = {
     if (!lc || !item) return;
     const st = itemStates(lc).get(item.id)!;
     if (!st.unlocked || st.done) return;
-    ctx.session.leftApp = "workbench";
-    ctx.session.focus = "left";
+    ctx.session.focus = bringToFront(ctx.session, "workbench");
     loopActions["view"]!(ctx, { view: "desktop" } as DOMStringMap, null as never);
   },
 
