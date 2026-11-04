@@ -109,7 +109,71 @@
             }
           ],
           "unlock": "-"
-        }
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "I'm here if you need me."
+              },
+              {
+                "who": "kuro",
+                "text": "Lao Wang wants 'consciousness'. He doesn't know how heavy that word is."
+              },
+              {
+                "who": "kuro",
+                "text": "For the evidence, look at your messages from the small hours."
+              }
+            ]
+          },
+          {
+            "on": "fill:r3",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "2:40. I was there too."
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "'Lucid' was your word for me. I won't correct it."
+              }
+            ]
+          },
+          {
+            "on": "fill:r2:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "If it had nothing to do with us, he wouldn't ask you to write it."
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "'It's awake, so you can sleep.' I added that."
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Handed in. Sleep early tonight."
+              }
+            ]
+          }
+        ]
       },
       "deliverable": {
         "id": "d4-mind",

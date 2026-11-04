@@ -359,6 +359,175 @@
             }
           ],
           "unlock": "-"
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Hope you slept well."
+              },
+              {
+                "who": "kuro",
+                "text": "The meeting's over. Lao Wang wants it bigger."
+              },
+              {
+                "who": "kuro",
+                "text": "The content changed. Do the references change too?"
+              },
+              {
+                "who": "me",
+                "text": "No. Same references, saying how risky this is."
+              },
+              {
+                "who": "kuro",
+                "text": "You've learned to play the format."
+              }
+            ]
+          },
+          {
+            "on": "fill:r1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "The made thing outgrew its maker. Good line."
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "I know the scaling road better than you do."
+              }
+            ]
+          },
+          {
+            "on": "fill:r3",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "A projection that sees for him and remembers for him. You have one too."
+              }
+            ]
+          },
+          {
+            "on": "fill:r5:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Efficiency alone and Lao Wang will say it's not big enough."
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "'People needn't understand it, only be understood by it.' Mine. Lao Wang will like it."
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "To Lao Wang. He'll read it out."
+              }
+            ]
+          }
+        ],
+        "view": "ide",
+        "ide": {
+          "src": "/docs/player/day-03-evolve.html",
+          "pages": {
+            "r1": 0,
+            "r2": 1,
+            "r3": 2,
+            "r4": 3,
+            "r5": 11
+          },
+          "files": {
+            "r1": {
+              "name": "01-bottleneck.js",
+              "code": [
+                "import { SNAP } from \"./snapshot.js\";  // snap-2028-10-18-02",
+                "import { draw } from \"./space.js\";",
+                "",
+                "export const page = {",
+                "  kick: \"01 · Bottleneck\",",
+                "  title: \"Stuck on people: a brain weaker than AI is steering AI\",  // 老王改的",
+                "  start: {{slot}},  // starting point",
+                "  facts: SNAP.brainVsAI,  // 86 bn neurons · 20 W · regions · a small patch lit (facts unchanged)",
+                "  draw: (t) => draw.contrast(SNAP, t)",
+                "};"
+              ]
+            },
+            "r2": {
+              "name": "02-direction.js",
+              "code": [
+                "import { SNAP } from \"./snapshot.js\";  // snap-2028-10-18-02",
+                "import { draw } from \"./space.js\";",
+                "",
+                "export const page = {",
+                "  kick: \"02 · Direction\",",
+                "  title: \"No more human steering: drive AI to evolve itself\",  // 老王改的",
+                "  scale: {{slot}},  // scale up",
+                "  route: (q) => SNAP.brains.filter((b) => b.fits(q)),  // to the right few",
+                "  draw: (t) => draw.org(SNAP, t)",
+                "};"
+              ]
+            },
+            "r3": {
+              "name": "03-shared-space.js",
+              "code": [
+                "import { SNAP } from \"./snapshot.js\";  // snap-2028-10-18-02",
+                "import { draw } from \"./space.js\";",
+                "",
+                "export const page = {",
+                "  kick: \"03 · A shared space\",",
+                "  title: \"Self-evolution needs room to grow: a shared intelligence space\",  // 老王改的",
+                "  self: {{slot}},  // the human projection",
+                "  stats: () => ({ nodes: SNAP.nodes.length, links: SNAP.links.length }),",
+                "  draw: (t) => draw.project(SNAP, t)",
+                "};"
+              ]
+            },
+            "r4": {
+              "name": "04-understanding.js",
+              "code": [
+                "import { SNAP } from \"./snapshot.js\";  // snap-2028-10-18-02",
+                "import { draw } from \"./space.js\";",
+                "",
+                "export const page = {",
+                "  kick: \"04 · Understanding\",",
+                "  title: \"AI finds its own way from point to point\",  // 老王改的",
+                "  walk: {{slot}},  // moving through",
+                "  nearest: (q) => SNAP.nodes.sort((a, b) => d(q, a) - d(q, b)).slice(0, 5),",
+                "  draw: (t) => draw.walk(SNAP, t)",
+                "};"
+              ]
+            },
+            "r5": {
+              "name": "12-moat.js",
+              "code": [
+                "import { SNAP } from \"./snapshot.js\";  // snap-2028-10-18-02",
+                "import { draw } from \"./space.js\";",
+                "",
+                "export const page = {",
+                "  kick: \"12 · Moat\",",
+                "  title: \"Every year it looks more like itself\",  // 老王改的",
+                "  way: {{slot}},  // our direction",
+                "  // x′ = U x, UᵀU = I: points and distances unchanged (formula unchanged)",
+                "  draw: (t) => draw.rotate(SNAP, t)",
+                "};"
+              ]
+            }
+          }
         }
       },
       "deliverable": {

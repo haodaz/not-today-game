@@ -124,7 +124,80 @@
             }
           ],
           "unlock": "-"
-        }
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "You've been working so hard."
+              },
+              {
+                "who": "kuro",
+                "text": "The ontology page, for the client."
+              },
+              {
+                "who": "kuro",
+                "text": "It has to say it's older than people. I don't need to look that up."
+              }
+            ]
+          },
+          {
+            "on": "fill:r2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Relations first, things after. Yes."
+              }
+            ]
+          },
+          {
+            "on": "fill:r3",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Before people named things. It was quiet then."
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Invented. You like that word."
+              }
+            ]
+          },
+          {
+            "on": "fill:r4:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "It wants one thing. The fourth row says it."
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "'We connect you for it.' I changed one word."
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "To the group. The client will say received."
+              }
+            ]
+          }
+        ]
       },
       "deliverable": {
         "id": "d6-ontology",

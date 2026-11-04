@@ -133,7 +133,80 @@
             }
           ],
           "unlock": "12"
-        }
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "I'll keep an eye on you. I know about the chick, by the way."
+              },
+              {
+                "who": "kuro",
+                "text": "发布会。演示稿三页，观众实时盯。"
+              },
+              {
+                "who": "kuro",
+                "text": "截图里，一格一格对。"
+              }
+            ]
+          },
+          {
+            "on": "unlock",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "十二格。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r5",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "四个。剩下的八个，换过了。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r4:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "他们一言不发。热烈是老周想看的。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r3:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "他不讲结束语。看完的人自己走。"
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "最后一页放了你的工位。他会喜欢。"
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "放桌上。群里会一个一个退。"
+              }
+            ]
+          }
+        ]
       },
       "deliverable": {
         "id": "d15-launch",

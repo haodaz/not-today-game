@@ -359,6 +359,175 @@
             }
           ],
           "unlock": "-"
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Hope you slept well."
+              },
+              {
+                "who": "kuro",
+                "text": "会开完了。老王要往大里讲。"
+              },
+              {
+                "who": "kuro",
+                "text": "内容改了，参考文献还改吗？"
+              },
+              {
+                "who": "me",
+                "text": "不动了。还是同样的文献，在说这么做有多危险。"
+              },
+              {
+                "who": "kuro",
+                "text": "你都学会卷格式了。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "造物大到造物主对不上了。这句写得好。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "堆规模这条路，我比你熟。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r3",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "一个替他看、替他记的投影。你也有一个。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r5:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "只讲效率，老王会说不够大。"
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "「人不必再理解它，只需被它理解」。我补的。老王会喜欢。"
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "交给老王。他会念出来。"
+              }
+            ]
+          }
+        ],
+        "view": "ide",
+        "ide": {
+          "src": "/docs/player/day-03-evolve.html",
+          "pages": {
+            "r1": 0,
+            "r2": 1,
+            "r3": 2,
+            "r4": 3,
+            "r5": 11
+          },
+          "files": {
+            "r1": {
+              "name": "01-瓶颈.js",
+              "code": [
+                "import { SNAP } from \"./snapshot.js\";  // snap-2028-10-18-02",
+                "import { draw } from \"./space.js\";",
+                "",
+                "export const page = {",
+                "  kick: \"01 · 瓶颈\",",
+                "  title: \"卡在了人：一个还不如 AI 的大脑，在指挥 AI\",  // 老王改的",
+                "  start: {{slot}},  // 出发点",
+                "  facts: SNAP.brainVsAI,  // 860 亿神经元 · 20 瓦 · 分区 · 只亮一小片（事实没改）",
+                "  draw: (t) => draw.contrast(SNAP, t)",
+                "};"
+              ]
+            },
+            "r2": {
+              "name": "02-方向.js",
+              "code": [
+                "import { SNAP } from \"./snapshot.js\";  // snap-2028-10-18-02",
+                "import { draw } from \"./space.js\";",
+                "",
+                "export const page = {",
+                "  kick: \"02 · 方向\",",
+                "  title: \"不再让人指挥：驱动 AI 自进化\",  // 老王改的",
+                "  scale: {{slot}},  // 放大",
+                "  route: (q) => SNAP.brains.filter((b) => b.fits(q)),  // 分给对的那几个",
+                "  draw: (t) => draw.org(SNAP, t)",
+                "};"
+              ]
+            },
+            "r3": {
+              "name": "03-共同智能空间.js",
+              "code": [
+                "import { SNAP } from \"./snapshot.js\";  // snap-2028-10-18-02",
+                "import { draw } from \"./space.js\";",
+                "",
+                "export const page = {",
+                "  kick: \"03 · 共同智能空间\",",
+                "  title: \"自进化要有地方长：一个共同智能空间\",  // 老王改的",
+                "  self: {{slot}},  // 人的投射",
+                "  stats: () => ({ nodes: SNAP.nodes.length, links: SNAP.links.length }),",
+                "  draw: (t) => draw.project(SNAP, t)",
+                "};"
+              ]
+            },
+            "r4": {
+              "name": "04-理解.js",
+              "code": [
+                "import { SNAP } from \"./snapshot.js\";  // snap-2028-10-18-02",
+                "import { draw } from \"./space.js\";",
+                "",
+                "export const page = {",
+                "  kick: \"04 · 理解\",",
+                "  title: \"AI 自己找路，从一个点走到另一个点\",  // 老王改的",
+                "  walk: {{slot}},  // 穿梭",
+                "  nearest: (q) => SNAP.nodes.sort((a, b) => d(q, a) - d(q, b)).slice(0, 5),",
+                "  draw: (t) => draw.walk(SNAP, t)",
+                "};"
+              ]
+            },
+            "r5": {
+              "name": "12-护城河.js",
+              "code": [
+                "import { SNAP } from \"./snapshot.js\";  // snap-2028-10-18-02",
+                "import { draw } from \"./space.js\";",
+                "",
+                "export const page = {",
+                "  kick: \"12 · 护城河\",",
+                "  title: \"它一年比一年更像它自己\",  // 老王改的",
+                "  way: {{slot}},  // 我们的方向",
+                "  // x′ = U x，UᵀU = I：点不动，距离也不动（公式没改）",
+                "  draw: (t) => draw.rotate(SNAP, t)",
+                "};"
+              ]
+            }
+          }
         }
       },
       "deliverable": {

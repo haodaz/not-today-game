@@ -118,7 +118,80 @@
             }
           ],
           "unlock": "13"
-        }
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Pull yourself together."
+              },
+              {
+                "who": "kuro",
+                "text": "一千个新人。名字一栏全空。"
+              },
+              {
+                "who": "kuro",
+                "text": "欢迎录音里嗡嗡的那几个，数一数。"
+              }
+            ]
+          },
+          {
+            "on": "unlock",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "十三。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r3",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "小鸡叫了。它对人不叫。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r4:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "按工号起名，就都有名字了。不该有的也有了。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "一视同仁。它们也这么想。"
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "一千个名字，都填成了你的。省事。"
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "放桌上。千子会自己找工位。"
+              }
+            ]
+          }
+        ]
       },
       "deliverable": {
         "id": "d14-onboard",

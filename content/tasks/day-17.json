@@ -118,7 +118,89 @@
             }
           ],
           "unlock": "6603 2047"
-        }
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Pull yourself together."
+              },
+              {
+                "who": "kuro",
+                "text": "每个人都在找你。同一句话。"
+              },
+              {
+                "who": "kuro",
+                "text": "只能回一个。回给还是人的那一个。"
+              }
+            ]
+          },
+          {
+            "on": "unlock",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "6603 2047。青禾。窗边有一格信号。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "青禾。只有他们真付过钱。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "他是你老板。他也是别的。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "她会说「收到」。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r4",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "我还在。"
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "回给我也行。我一直在。"
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "放桌上。今晚，有人会回你。"
+              }
+            ]
+          }
+        ]
       },
       "deliverable": {
         "id": "d17-reply",

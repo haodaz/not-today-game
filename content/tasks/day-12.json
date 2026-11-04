@@ -118,7 +118,80 @@
             }
           ],
           "unlock": "东北"
-        }
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "I've got your back."
+              },
+              {
+                "who": "kuro",
+                "text": "值班表。谁都不睡。"
+              },
+              {
+                "who": "kuro",
+                "text": "昨晚你说了梦话，随身听录下来了。倒着放。"
+              }
+            ]
+          },
+          {
+            "on": "unlock",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "东北。窗帘拉上。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "人总得睡。小张说得对。这周不行。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r4:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "让他值班，他就不走了。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r4",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "查无此人。明天那一栏还会在。"
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "整张表，只有你一个人能睡。我排的。"
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "放桌上。睡不睡，你定。"
+              }
+            ]
+          }
+        ]
       },
       "deliverable": {
         "id": "d12-watch",

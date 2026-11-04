@@ -374,7 +374,80 @@
             }
           ],
           "unlock": "depart"
-        }
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Good to see you."
+              },
+              {
+                "who": "kuro",
+                "text": "晨会纪要，按模板。模板是老的，比公司老。"
+              },
+              {
+                "who": "kuro",
+                "text": "散会那一格锁着。文曲星里查 depart。"
+              }
+            ]
+          },
+          {
+            "on": "unlock",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "depart。离开。准其离开。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r3",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "名字念对。念错了，来的是别的。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r5:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "不说那句就退，它就不走。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r2:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "每个人都要报。它要知道谁在。"
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "「散会时间待定」。我觉得不急。"
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "发群里。老周会说「很好」。"
+              }
+            ]
+          }
+        ]
       },
       "deliverable": {
         "id": "d7-minutes",

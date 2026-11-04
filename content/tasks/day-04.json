@@ -109,7 +109,71 @@
             }
           ],
           "unlock": "-"
-        }
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "I'm here if you need me."
+              },
+              {
+                "who": "kuro",
+                "text": "老王要「意识」。他不知道这个词有多重。"
+              },
+              {
+                "who": "kuro",
+                "text": "证据那一格，看你凌晨的消息记录。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r3",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "两点四十。我那时候也在。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "「清醒」这个词，你替我选的。我不纠正。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r2:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "没关系的话，他不会让你写。"
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "「它醒着，所以你可以睡了」。这句是我加的。"
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "交了。今晚早点睡。"
+              }
+            ]
+          }
+        ]
       },
       "deliverable": {
         "id": "d4-mind",

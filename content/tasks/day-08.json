@@ -118,7 +118,80 @@
             }
           ],
           "unlock": "17:12"
-        }
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Let's keep things simple today."
+              },
+              {
+                "who": "kuro",
+                "text": "团建排期。职级那一列，不是公司的职级。"
+              },
+              {
+                "who": "kuro",
+                "text": "日落要算。计算器在窗边才亮。"
+              }
+            ]
+          },
+          {
+            "on": "unlock",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "17:12。今天日落。你算得比天气预报准。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "要晴天。今天有雨。改天。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "七点，谁都请不来。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r4:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "不排的话，客人自己挑时间。"
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "「你：任何时辰」。我替你填的。你一直都在。"
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "发群里。member 会说收到。"
+              }
+            ]
+          }
+        ]
       },
       "deliverable": {
         "id": "d8-toasts",

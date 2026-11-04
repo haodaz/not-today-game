@@ -121,7 +121,80 @@
             }
           ],
           "unlock": "2041"
-        }
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Take it one step at a time."
+              },
+              {
+                "who": "kuro",
+                "text": "Vivi wants the 'avatar' page."
+              },
+              {
+                "who": "kuro",
+                "text": "The locked column: find the four digits first."
+              }
+            ]
+          },
+          {
+            "on": "unlock",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "2041. A good year."
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "It isn't you. It's only more punctual."
+              }
+            ]
+          },
+          {
+            "on": "fill:r2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "It answers 'OK.' for you. You say it forty-odd times a day."
+              }
+            ]
+          },
+          {
+            "on": "fill:r4:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Your signature is the last thing that's yours. Keep it."
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "'It's more you than you are.' I measured."
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "To Vivi. She'll say 'that's the vibe'."
+              }
+            ]
+          }
+        ]
       },
       "deliverable": {
         "id": "d5-avatar",

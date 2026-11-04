@@ -133,7 +133,98 @@
             }
           ],
           "unlock": "key"
-        }
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "I noticed some old things on your desk. Let me give them a hand."
+              },
+              {
+                "who": "kuro",
+                "text": "借阅审批。拉丁文那一行，用文曲星。"
+              },
+              {
+                "who": "kuro",
+                "text": "页边的批注，你认得那个字。"
+              }
+            ]
+          },
+          {
+            "on": "unlock",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "clavis。钥匙。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r3",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "钥匙。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r4",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "也是守卫。同一个。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "学习交流。驳回三次的那个。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r5:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "五月那次已经过了。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r5",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "十一月一日。往后推，就是那天。"
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "借阅期限：永久。它不会还的。"
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "放桌上。审批会自己通过。"
+              }
+            ]
+          }
+        ]
       },
       "deliverable": {
         "id": "d13-loan",

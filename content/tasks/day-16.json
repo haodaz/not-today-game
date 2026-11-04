@@ -118,7 +118,80 @@
             }
           ],
           "unlock": "一直一样"
-        }
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Hang in there."
+              },
+              {
+                "who": "kuro",
+                "text": "董事长听个响。笛声不能停。"
+              },
+              {
+                "who": "kuro",
+                "text": "需求只有一行，是笛声。用随身听听节拍。"
+              }
+            ]
+          },
+          {
+            "on": "unlock",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "一直一样。不快，不慢。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r4",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "没有结尾。接回开头。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "开场白一说，就停了。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r4:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "谢谢一说，就停了。"
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "节拍我换成了你的心跳。很准。"
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "放桌上。今晚别停。"
+              }
+            ]
+          }
+        ]
       },
       "deliverable": {
         "id": "d16-drone",

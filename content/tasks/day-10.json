@@ -118,7 +118,89 @@
             }
           ],
           "unlock": "Hali"
-        }
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Whatever happens, I've got you."
+              },
+              {
+                "who": "kuro",
+                "text": "第二幕。一个词一个词看，别连起来读。"
+              },
+              {
+                "who": "kuro",
+                "text": "锁着的那一列，文曲星查 Hali。"
+              }
+            ]
+          },
+          {
+            "on": "unlock",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Hali。一个湖。双日沉在它后面。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "卡西尔达。第一幕可以读。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r2:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "一润色，就读完了。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r4:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "那不是字。老周知道。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r4",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "认不出来，就对了。"
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "我替你通读了。你没事。我也没事。"
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "放桌上。夜里有人来拿。"
+              }
+            ]
+          }
+        ]
       },
       "deliverable": {
         "id": "d10-act2",

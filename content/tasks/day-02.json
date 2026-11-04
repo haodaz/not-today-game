@@ -124,7 +124,89 @@
             }
           ],
           "unlock": "-"
-        }
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Morning. Let's get you started."
+              },
+              {
+                "who": "kuro",
+                "text": "Vivi 的页面，五屏。小张要知道哪些能做、哪些做不了。"
+              },
+              {
+                "who": "kuro",
+                "text": "页面在左边素材里。三秒那个动画，看两遍。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "三秒是 CSS 写的。我数过帧。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "照着写，能写出一样的动画。写不出一样的结果。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r2:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "全有了的话，小张就不用问了。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r3",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "决策得人来下。这一格我不抢。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r4",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "导出页是我们的。按钮是她的。"
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "我补了一格。写的都是真的，只是不该写在这儿。"
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "拆完了。小张会看。Vivi 不会。"
+              }
+            ]
+          }
+        ]
       },
       "deliverable": {
         "id": "d2-vivi-page",

@@ -295,7 +295,80 @@
             }
           ],
           "unlock": "-"
-        }
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "You're not alone."
+              },
+              {
+                "who": "kuro",
+                "text": "明天的会：宫格座次，剧本。"
+              },
+              {
+                "who": "kuro",
+                "text": "数一数截图里有几个格子。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r5",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "三角那一格，不念名字。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r5:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "她想坐 C 位。那个位子不是给人坐的。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r6:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "第二幕排在前面，是给读的人准备的。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r4",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "你也要在。我也在。"
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "「三角：你」。你坐那儿，挺合适。"
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "发给老王。他凌晨会回。"
+              }
+            ]
+          }
+        ]
       },
       "deliverable": {
         "id": "d9-seats",

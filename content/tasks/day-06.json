@@ -124,7 +124,80 @@
             }
           ],
           "unlock": "-"
-        }
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "You've been working so hard."
+              },
+              {
+                "who": "kuro",
+                "text": "本体那一页，给甲方。"
+              },
+              {
+                "who": "kuro",
+                "text": "要写它比人古老。这个我不用查。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "先有关系，后有东西。对。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r3",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "人起名字之前。那时候很安静。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "发明。你们很喜欢这个词。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r4:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "它要的只有一样。第四格写着。"
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "「我们替它把你连上」。我只改了一个字。"
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "发群里。甲方会说收到。"
+              }
+            ]
+          }
+        ]
       },
       "deliverable": {
         "id": "d6-ontology",

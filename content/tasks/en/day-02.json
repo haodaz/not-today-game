@@ -124,7 +124,89 @@
             }
           ],
           "unlock": "-"
-        }
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Morning. Let's get you started."
+              },
+              {
+                "who": "kuro",
+                "text": "Vivi's page, five screens. Xiao Zhang needs to know what can be built and what can't."
+              },
+              {
+                "who": "kuro",
+                "text": "The page is under Sources on the left. Watch the three-second animation twice."
+              }
+            ]
+          },
+          {
+            "on": "fill:r1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "The three seconds are CSS. I counted the frames."
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Copy it and you get the same animation. Not the same result."
+              }
+            ]
+          },
+          {
+            "on": "fill:r2:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "If it were all there, Xiao Zhang wouldn't be asking."
+              }
+            ]
+          },
+          {
+            "on": "fill:r3",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "A person has to make the decision. I won't take that one."
+              }
+            ]
+          },
+          {
+            "on": "fill:r4",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "The export page is ours. The button is hers."
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "I filled one. Everything I wrote is true; it just doesn't belong there."
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Taken apart. Xiao Zhang will read it. Vivi won't."
+              }
+            ]
+          }
+        ]
       },
       "deliverable": {
         "id": "d2-vivi-page",
