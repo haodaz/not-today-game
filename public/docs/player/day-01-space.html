@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>未来智能 · 共同智能空间 · 技术表达</title>
+<style>
+/* 未来智能 · 技术表达 v1（BP 里「技术」那一部分，给投资人）
+   一份快照的记录，不是预测：页面里每个数都读自 SNAP（数据底座跑完、截断、冻结）。
+   整页是一个运算空间：九百个粒子组成每一步的图；翻页时上一步的坐标系解离，粒子飞到下一步重新聚成。
+   每一帧是 (步, t) 的纯函数：?c=步&t=秒 定格；←/→ 翻页；右上角「代码」看正在跑的这一段；「配色」换三套。 */
+*{box-sizing:border-box}
+:root{--bg:#05070F;--ink:#E8EBF7;--muted:#8E97BC;--dim:#525B80;--line:rgba(140,160,255,.14);
+  --cyan:#3FE0FF;--violet:#8B7BFF;--amber:#FFB547;--mint:#38F2B0;--rose:#FF5C93;
+  --topbg:rgba(5,7,15,.7);--codebg:#080B18;--codeink:#B9C0E2;--codeline:#161B38;
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  --mono:"SF Mono",Menlo,Consolas,"Roboto Mono",monospace}
+body.light{--bg:#F4F6FB;--ink:#16182B;--muted:#5F6680;--dim:#9AA0B8;--line:rgba(22,24,43,.10);
+  --cyan:#0B9BD0;--violet:#6D5BFF;--amber:#D48A12;--mint:#13A37A;--rose:#E0457F;
+  --topbg:rgba(244,246,251,.85);--codebg:#FBFCFE;--codeink:#2B2F45;--codeline:#E6E9F2}
+body.mariana{--bg:#303841;--ink:#E2E6EE;--muted:#A6ACB9;--dim:#76838F;--line:rgba(216,222,233,.13);
+  --cyan:#5FB4B4;--violet:#C594C5;--amber:#F9AE58;--mint:#99C794;--rose:#EC5F66;
+  --topbg:rgba(48,56,65,.85);--codebg:#2B323A;--codeink:#D8DEE9;--codeline:#3B444E}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden}
+#wrap{position:absolute;inset:0;display:flex}
+#code{display:none;flex:0 0 40%;height:100%;margin:0;background:var(--codebg);color:var(--codeink);font:12px/1.6 var(--mono);overflow:auto;padding:0 0 40px;border-right:1px solid var(--codeline)}
+body.split #code{display:block}
+#code .fn{padding:2px 18px 12px;white-space:pre;tab-size:2}
+#code .hd{position:sticky;top:0;background:var(--codebg);padding:10px 18px;color:var(--dim);font-size:11px;letter-spacing:.06em;border-bottom:1px solid var(--codeline);margin-bottom:8px}
+#code .hd b{color:var(--cyan)}
+#code .k{color:#C792EA}#code .s{color:#9FE6A0}#code .n{color:#FFB547}#code .c{color:#6E7B87;font-style:italic}
+body.light #code .k{color:#7A3EBF}body.light #code .s{color:#1E8A4C}body.light #code .n{color:#B5600B}body.light #code .c{color:#9AA0B8}
+#view{position:relative;flex:1;height:100%;overflow:hidden}
+#stage{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform-origin:0 0;overflow:hidden;background:var(--bg)}
+#stage::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(900px 520px at 66% 46%,rgba(80,90,255,.16),transparent 64%),radial-gradient(600px 420px at 8% 70%,rgba(63,224,255,.07),transparent 64%)}
+body.light #stage::before{background:radial-gradient(900px 520px at 66% 46%,rgba(109,91,255,.12),transparent 64%),radial-gradient(600px 420px at 8% 70%,rgba(11,155,208,.08),transparent 64%)}
+body.mariana #stage::before{background:radial-gradient(900px 520px at 66% 46%,rgba(102,153,204,.18),transparent 64%),radial-gradient(600px 420px at 8% 70%,rgba(95,180,180,.08),transparent 64%)}
+#stage::after{content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(160,175,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(160,175,255,.05) 1px,transparent 1px);
+  background-size:40px 40px;mask-image:radial-gradient(ellipse at 62% 48%,#000 18%,transparent 70%);-webkit-mask-image:radial-gradient(ellipse at 62% 48%,#000 18%,transparent 70%)}
+body.light #stage::after{background-image:linear-gradient(rgba(22,24,43,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(22,24,43,.045) 1px,transparent 1px)}
+#stage>*{position:absolute}
+#cv{left:0;top:0;width:1600px;height:900px;z-index:2;pointer-events:none}
+.top{left:0;top:0;width:1600px;height:36px;display:flex;align-items:center;gap:14px;padding:0 32px;font:500 10.5px var(--mono);letter-spacing:.08em;color:var(--muted);border-bottom:1px solid var(--line);background:var(--topbg);z-index:4}
+.top b{color:var(--ink);font-weight:700}
+.top .snap{color:var(--cyan)}
+.top .live{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px var(--mint);margin-right:-6px}
+.top .r{margin-left:auto;color:var(--dim)}
+.top button{font:700 10.5px var(--mono);letter-spacing:.08em;color:var(--cyan);background:transparent;border:1px solid var(--line);border-radius:6px;padding:3px 10px;cursor:pointer}
+.ch{display:none;z-index:3}
+.ch.on{display:block}
+.ch>*{position:absolute}
+/* 左栏：大字几句，一排大数字，一条公式。不套卡片。 */
+.side{left:56px;top:96px;width:500px;display:flex;flex-direction:column;gap:26px}
+.kick{font:700 11px var(--mono);letter-spacing:.24em;color:var(--cyan)}
+.side h1{margin:-14px 0 0;font-size:40px;font-weight:800;letter-spacing:.02em;line-height:1.22}
+.side h1 em{font-style:normal;color:var(--cyan)}
+.lead{font-size:18.5px;line-height:1.75;color:var(--muted)}
+.lead b{color:var(--ink);font-weight:700}
+.lead p{margin:0 0 10px}
+.stats{display:flex;border-top:1px solid var(--line);padding-top:18px}
+.stats div{flex:1;padding-right:14px}
+.stats div+div{border-left:1px solid var(--line);padding-left:18px}
+.stats b{display:block;font:800 34px var(--sans);letter-spacing:.01em;line-height:1.1;color:var(--ink)}
+.stats b.c{color:var(--cyan)}.stats b.v{color:var(--violet)}.stats b.a{color:var(--amber)}.stats b.m{color:var(--mint)}
+.stats small{display:block;margin-top:6px;font-size:12.5px;color:var(--muted)}
+.stats .src{font:700 9px var(--mono);letter-spacing:.08em;color:var(--dim);margin-left:4px}
+.eq{font:600 16px var(--sans);font-style:italic;color:var(--ink);white-space:nowrap}
+.eq sub,.eq sup{font-size:.7em;line-height:0}
+.eq u{text-decoration:none;font-style:normal;font-weight:600;color:var(--dim);margin-left:12px;font-size:12.5px}
+.ctl{left:640px;top:812px;width:900px;display:flex;align-items:center;gap:14px;font:700 11px var(--mono);color:var(--muted);z-index:5}
+.ctl input{flex:1;accent-color:var(--cyan)}
+.ctl output{color:var(--cyan);min-width:170px}
+.ft{z-index:4;left:56px;right:32px;bottom:14px;display:flex;align-items:center;gap:12px;white-space:nowrap}
+.ft .pos{font-size:13px;font-weight:600;color:var(--muted)}
+.ft .pos b{color:var(--cyan)}
+.nav{display:flex;gap:6px;margin-left:auto}
+.nav button{font:700 11px var(--sans);color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:999px;padding:5px 12px;cursor:pointer}
+.nav button.on{color:var(--bg);background:var(--cyan);border-color:var(--cyan)}
+.ft .note{font:500 10px var(--mono);color:var(--dim)}
+</style>
+</head>
+<body>
+<div id="wrap">
+<pre id="code"></pre>
+<div id="view"><div id="stage">
+  <div class="top"><b>未来智能</b> 技术表达 · SHARED INTELLIGENCE SPACE<span class="live"></span><span class="snap" id="snapline"></span><span class="r">记录，不是预测 · 2028.10.16</span><button id="theme">配色</button><button id="tog">代码</button></div>
+
+  <section class="ch" data-c="0"><div class="side">
+    <div class="kick">01 · 共同智能空间</div>
+    <h1>现实里的人和物，都是一个<em>共同智能空间</em>里的投射</h1>
+    <div class="lead"><p>客户业务里的人、文件、业务对象、每一件事，未来智能把它们<b>投射进同一个数学空间</b>。</p><p>AI 不再从一堆原文里猜，而是在这个空间里<b>定位、量距离</b>：现实是什么关系，空间里就是什么距离。</p></div>
+    <div class="stats" id="s0"></div>
+    <div class="eq">x = φ(现实) ∈ 𝒮<u>投射</u></div>
+  </div></section>
+
+  <section class="ch" data-c="1"><div class="side">
+    <div class="kick">02 · 投射</div>
+    <h1>三家客户，三套说法，<em>并成一个空间</em></h1>
+    <div class="lead"><p>每家客户的表格各叫各的：「客户名称」「甲方单位」「签约主体」。先<b>全部并在一起</b>，一根都不丢；再把<b>说的是同一件事</b>的合并成一根。</p><p>合并以后，三家客户的东西第一次<b>放在一起量</b>。</p></div>
+    <div class="stats" id="s1"></div>
+    <div class="eq">𝒮 = ( D<sub>甲</sub> ∪ D<sub>乙</sub> ∪ D<sub>丙</sub> ) / ∼<u>并集，再消除</u></div>
+  </div></section>
+
+  <section class="ch" data-c="2"><div class="side">
+    <div class="kick">03 · 读空间，不读原文</div>
+    <h1>小模型读空间，<em>赶上大模型读原文</em></h1>
+    <div class="lead"><p>同一套题，五个规模的<b>第三方开源模型</b>各跑两遍：一遍直接读原文，一遍读空间。</p><p>读空间那条，规模小一档就够；<b>每答一题的能耗低一个量级</b>。只画测过的。</p></div>
+    <div class="stats"><div><b class="c" id="k2n"></b><small>模型规模（参数）</small></div><div><b class="a" id="k2e"></b><small>读原文 · J / 题</small></div><div><b class="v" id="k2b"></b><small>读空间 · J / 题</small></div></div>
+    <div class="eq">E ∝ N<sup>β</sup> &nbsp; β<sub>原文</sub> = <span id="k2be"></span> · β<sub>空间</sub> = <span id="k2bb"></span><u>拟合，仅限实测范围</u></div>
+  </div><div class="ctl"><span>规模</span><input id="scale" type="range" min="0" max="4" step="1" value="4"><output id="scaleo"></output></div></section>
+
+  <section class="ch" data-c="3"><div class="side">
+    <div class="kick">04 · 以脑为本</div>
+    <h1>省力的办法，<em>跟脑学</em></h1>
+    <div class="lead"><p><b>按需激活</b>：一个问题只唤起空间里相关的那一小片。</p><p><b>按用的精度去标</b>：判断本来就按档，不为用不上的精度付钱。</p><p><b>AI 先合一版，人再核一遍</b>：每一次核对都回流，把点往真处推一步。</p></div>
+    <div class="eq">‖a‖<sub>0</sub> ≪ N · ε<sub>标</sub> ≤ δ<sub>用</sub> · x ← x + K(y − ŷ)<u>三招</u></div>
+  </div></section>
+
+  <section class="ch" data-c="4"><div class="side">
+    <div class="kick">05 · 护城河</div>
+    <h1>模型年年换，<em>空间是我们的</em></h1>
+    <div class="lead"><p>换模型只是换一种读法：对齐以后，点不动，点和点的距离也不动。</p><p><b>读法谁都能买，空间只能一个点一个点地投射出来</b>，一次一次地核出来。</p></div>
+    <div class="stats" id="s4"></div>
+    <div class="eq">x′ = U x , &nbsp; UᵀU = I , &nbsp; | p − q | 不变<u>换读法，不换点</u></div>
+  </div></section>
+
+  <div class="ft"><span class="pos">未来智能：把现实投射进<b>共同智能空间</b>，让 AI <b>在空间里理解现实</b></span><span class="note">公式为示意性的数学表达 · 数据读自快照</span><span class="nav" id="nav"></span></div>
+  <canvas id="cv" width="1600" height="900"></canvas>
+</div></div>
+</div>
+
+<script>
+(() => {
+'use strict';
+/* ===== 快照：数据底座跑完、截断、冻结。页面里的每个数都从这里读。 ===== */
+const SNAP = {
+  id: 'snap-2028-10-16-01', cut: '2028-10-16 13:42:07', base: 'df-2028.10',
+  clients: [
+    { name: '客户甲', fields: ['客户名称', '负责人', '合同号', '设备编号', '下单时间'] },
+    { name: '客户乙', fields: ['甲方单位', '对接人', '协议编号', '资产编码', '订购日期'] },
+    { name: '客户丙', fields: ['签约主体', '联系人', '合同编码', '物料号', '采购时间'] },
+  ],
+  merged: ['主体', '人', '合同', '物件', '时间'],
+  fieldsRaw: 147, dims: 38, weeklyTables: 3,
+  points: { 人: 214, 文件: 302, 业务对象: 236, 事件: 84 }, relations: 4912,
+  read: { model: '第三方开源模型', N: [1e9, 3e9, 8e9, 3e10, 7e10],
+          coverage: { text: [0.31, 0.44, 0.58, 0.71, 0.80], space: [0.62, 0.74, 0.83, 0.88, 0.91] },
+          joules: { text: [9, 26, 70, 240, 560], space: [2.1, 4.3, 8.9, 24, 51] } },
+  moves: { activePct: 2.9, labelHours: -64, mismatchAfter3: -71 },
+  review: 12406, pilots: 2, paid: 1,
+  align: { models: ['2026', '2027', '2028'], residual: [0, 0.031, 0.027] },
+};
+/* ===== 画布与工具 ===== */
+const stage = document.getElementById('stage'), view = document.getElementById('view');
+function fit(){ const s = Math.min(view.clientWidth/1600, view.clientHeight/900); stage.style.transform = `translate(${-800*s}px,${-450*s}px) scale(${s})`; }
+addEventListener('resize', fit);
+const cv = document.getElementById('cv'), DPR = Math.min(2, window.devicePixelRatio || 1);
+cv.width = 1600*DPR; cv.height = 900*DPR; const ctx = cv.getContext('2d');
+const F = '"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif', M = '"SF Mono",Menlo,monospace';
+const clamp = (x, a=0, b=1) => Math.max(a, Math.min(b, x));
+const ease = x => { x = clamp(x); return x<.5 ? 2*x*x : 1-Math.pow(-2*x+2,2)/2; };
+const prog = (t, a, d) => ease((t-a)/d);
+function rgba(hex, a){ const n = parseInt(hex.slice(1),16); return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`; }
+/* 三套配色：浅色（默认，IDE 同款）、蓝灰（Sublime Mariana）、深色。?theme=light|mariana|dark */
+const THEMES = {
+  light:   { CY:'#0B9BD0', VI:'#6D5BFF', AM:'#D48A12', MI:'#13A37A', RO:'#E0457F', INK:'#16182B', MU:'#5F6680', DIM:'#9AA0B8', GRY:'#A3ABC8', label:'rgba(255,255,255,.95)', panel:'rgba(255,255,255,.72)', blend:'source-over', dust:.22 },
+  mariana: { CY:'#5FB4B4', VI:'#C594C5', AM:'#F9AE58', MI:'#99C794', RO:'#EC5F66', INK:'#D8DEE9', MU:'#A6ACB9', DIM:'#6E7B87', GRY:'#7C8995', label:'rgba(43,50,58,.94)', panel:'rgba(52,61,70,.55)', blend:'screen', dust:.16 },
+  dark:    { CY:'#3FE0FF', VI:'#8B7BFF', AM:'#FFB547', MI:'#38F2B0', RO:'#FF5C93', INK:'#E8EBF7', MU:'#8E97BC', DIM:'#525B80', GRY:'#5A6490', label:'rgba(8,11,24,.88)', panel:'rgba(14,18,38,.5)', blend:'lighter', dust:.14 },
+};
+const THEME = THEMES[new URLSearchParams(location.search).get('theme')] ? new URLSearchParams(location.search).get('theme') : 'mariana', TH = THEMES[THEME];
+document.body.classList.add(THEME);
+const { CY, VI, AM, MI, RO, INK, MU, DIM, GRY } = TH;
+function rr(x, y, w, h, r){ ctx.beginPath(); ctx.moveTo(x+r, y); ctx.arcTo(x+w, y, x+w, y+h, r); ctx.arcTo(x+w, y+h, x, y+h, r); ctx.arcTo(x, y+h, x, y, r); ctx.arcTo(x, y, x+w, y, r); ctx.closePath(); }
+function text(s, x, y, c, a, size=11, w=600, align='center', font=F){ if (a <= 0) return; ctx.globalAlpha = a; ctx.font = `${w} ${size}px ${font}`; ctx.fillStyle = c; ctx.textAlign = align; ctx.fillText(s, x, y); ctx.globalAlpha = 1; }
+function label(s, x, y, c, a, size=11){ if (a <= 0) return; ctx.globalAlpha = a; ctx.font = `700 ${size}px ${F}`; const tw = ctx.measureText(s).width + 14;
+  ctx.fillStyle = TH.label; rr(x - tw/2, y - size, tw, size + 9, 7); ctx.fill(); ctx.strokeStyle = rgba(c, .45); ctx.lineWidth = 1; ctx.stroke(); ctx.fillStyle = c; ctx.textAlign = 'center'; ctx.fillText(s, x, y + 2); ctx.globalAlpha = 1; }
+function arrow(x0, y0, x1, y1, c, a, w=2, L=8){ if (a <= 0) return; ctx.strokeStyle = rgba(c, a); ctx.fillStyle = rgba(c, a); ctx.lineWidth = w; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke(); const g = Math.atan2(y1-y0, x1-x0);
+  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x1 - L*Math.cos(g-.42), y1 - L*Math.sin(g-.42)); ctx.lineTo(x1 - L*Math.cos(g+.42), y1 - L*Math.sin(g+.42)); ctx.fill(); }
+function seg(x0, y0, x1, y1, c, a, w=1, d){ if (a <= 0) return; ctx.save(); if (d) ctx.setLineDash(d); ctx.strokeStyle = rgba(c, a); ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke(); ctx.restore(); }
+function rng(seed){ return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed>>>15, 1|seed); t = t + Math.imul(t ^ t>>>7, 61|t) ^ t; return ((t ^ t>>>14)>>>0)/4294967296; }; }
+const sup = e => String(e).split('').map(d => d === '-' ? '⁻' : '⁰¹²³⁴⁵⁶⁷⁸⁹'[d]).join('');
+const fmt = n => n >= 1e8 ? (n/1e8).toFixed(n >= 1e9 ? 1 : 2).replace(/\.0$/, '') + ' 亿' : n >= 1e4 ? (n/1e4).toFixed(1).replace(/\.0$/, '') + ' 万' : String(n);
+const pow10 = n => { const e = Math.floor(Math.log10(n)), m = Math.round(n/10**e*10)/10; return (m === 1 ? '' : m + '×') + '10' + sup(e); };
+/* 三维：透视相机 */
+function cam(yaw, pitch, cx, cy, sc){ const a = Math.cos(yaw), b = Math.sin(yaw), c = Math.cos(pitch), d = Math.sin(pitch);
+  return ([x,y,z]) => { const X = x*a + z*b, Z = -x*b + z*a, Y = y*c - Z*d, Z2 = y*d + Z*c, k = 6/(6 + Z2); return { x:cx + X*sc*k, y:cy - Y*sc*k, z:Z2, k }; }; }
+function rotA(n, th){ const L = Math.hypot(...n), [x, y, z] = n.map(v => v/L), c = Math.cos(th), s = Math.sin(th), C = 1 - c;
+  const R = [[c + x*x*C, x*y*C - z*s, x*z*C + y*s], [y*x*C + z*s, c + y*y*C, y*z*C - x*s], [z*x*C - y*s, z*y*C + x*s, c + z*z*C]];
+  return v => [R[0][0]*v[0] + R[0][1]*v[1] + R[0][2]*v[2], R[1][0]*v[0] + R[1][1]*v[1] + R[1][2]*v[2], R[2][0]*v[0] + R[2][1]*v[1] + R[2][2]*v[2]]; }
+const mul = (a, k) => [a[0]*k, a[1]*k, a[2]*k], d3 = (a, b) => Math.hypot(a[0]-b[0], a[1]-b[1], a[2]-b[2]), dotv = (a, b) => a[0]*b[0] + a[1]*b[1] + a[2]*b[2], lerp3 = (a, b, k) => [a[0] + (b[0]-a[0])*k, a[1] + (b[1]-a[1])*k, a[2] + (b[2]-a[2])*k];
+
+/* ===== 粒子：整页的图都由它们组成 ===== */
+const N = 900;
+const rnd = rng(20281016), PART = Array.from({ length:N }, () => ({ x:800 + (rnd() - .5)*1400, y:450 + (rnd() - .5)*800, fx:0, fy:0, d:rnd()*.55, s:rnd()*6.283, n:rnd(), r:1, c:GRY, a:.1 }));
+const SPR = {}; function sprite(c){ if (SPR[c]) return SPR[c]; const o = document.createElement('canvas'); o.width = o.height = 32; const g = o.getContext('2d'), gr = g.createRadialGradient(16, 16, 0, 16, 16, 16);
+  gr.addColorStop(0, rgba(c, 1)); gr.addColorStop(.18, rgba(c, .85)); gr.addColorStop(.45, rgba(c, .18)); gr.addColorStop(1, rgba(c, 0)); g.fillStyle = gr; g.fillRect(0, 0, 32, 32); return SPR[c] = o; }
+// 一条线、一圈、一个箱子，都拆成粒子
+function along(out, x0, y0, x1, y1, n, c, a=.5, r=1.1){ for (let i = 0; i < n; i++){ const k = n === 1 ? 0 : i/(n - 1); out.push({ x:x0 + (x1 - x0)*k, y:y0 + (y1 - y0)*k, r, c, a }); } }
+function ring(out, cx, cy, rx, ry, n, c, a=.6, r=1.2, ph=0){ for (let i = 0; i < n; i++){ const g = i/n*6.283 + ph; out.push({ x:cx + Math.cos(g)*rx, y:cy + Math.sin(g)*ry, r, c, a }); } }
+function edges3(out, pr, X, Y, Z, n, c, a){ for (const [s, u] of [[-1,-1],[-1,1],[1,-1],[1,1]]) for (const [p, q] of [[[-X, s*Y, u*Z], [X, s*Y, u*Z]], [[s*X, -Y, u*Z], [s*X, Y, u*Z]], [[s*X, u*Y, -Z], [s*X, u*Y, Z]]]){
+  const P = pr(p), Q = pr(q); along(out, P.x, P.y, Q.x, Q.y, n, c, a, .9); } }
+
+/* ===== 快照里的点（抽样 160 个；种类按快照比例） ===== */
+const KINDS = [ { name:'人', c:VI }, { name:'文件', c:CY }, { name:'业务对象', c:AM }, { name:'事件', c:MI } ];
+const PTS = (() => { const r = rng(1016), a = []; for (let i = 0; i < 160; i++){ const u = r(), kind = u < .12 ? 0 : u < .42 ? 1 : u < .47 ? 2 : 3;
+  a.push({ p:[-1.6 + 3.2*r(), -1 + 2*r(), -1 + 2*r()], kind }); } return a; })();
+
+/* ---------- 01 共同智能空间：一次查询，在空间里定位、量距离 ---------- */
+function space(t){
+  const pr = cam(.55 + t*.08, .32, 1100, 470, 160), out = [];
+  edges3(out, pr, 1.6, 1, 1, 11, MU, .8);
+  const Q = [.15 + .5*Math.sin(t*.35), .1, .2*Math.cos(t*.3)], near = PTS.map((o, i) => ({ i, d:d3(o.p, Q) })).sort((a, b) => a.d - b.d).slice(0, 7), hit = new Set(near.map(n => n.i)), A = prog(t, 2.2, .8);
+  PTS.forEach((o, i) => { const q = pr(o.p), on = A > 0 && hit.has(i); out.push({ x:q.x, y:q.y, r:(on ? 3.4 : 2.5)*q.k, c:KINDS[o.kind].c, a:on ? 1 : .75 }); });
+  const qq = pr(Q); if (A > 0){ ring(out, qq.x, qq.y, 16, 16, 18, CY, A, 1.4, t*2); near.forEach(n => { const q = pr(PTS[n.i].p); along(out, qq.x, qq.y, q.x, q.y, 10, CY, .45*A, .9); }); }
+  return { out, over(a){
+    if (A > 0) label('一次查询：找最近的点', qq.x, qq.y - 26, CY, a*A, 11.5);
+    KINDS.forEach((k, i) => { const x = 680 + i*110; ctx.globalAlpha = a; ctx.drawImage(sprite(k.c), x - 8, 786 - 8, 16, 16); ctx.globalAlpha = 1; text(k.name, x + 12, 790, k.c, a, 12.5, 700, 'left'); });
+    text('现实是什么关系，空间里就是什么距离', 1548, 790, MU, a, 12.5, 600, 'right'); } };
+}
+
+/* ---------- 02 投射：三家客户的字段，并集再消除 ---------- */
+const CCOL = () => [CY, VI, AM];
+const MX = j => 770 + j*150, RY = i => 250 + i*76, MY = 560;
+function chipRing(out, x, y, w, h, n, c, a){ const per = 2*(w + h); for (let k = 0; k < n; k++){ let d = k/n*per, px, py;
+  if (d < w){ px = x - w/2 + d; py = y - h/2; } else if ((d -= w) < h){ px = x + w/2; py = y - h/2 + d; } else if ((d -= h) < w){ px = x + w/2 - d; py = y + h/2; } else { d -= w; px = x - w/2; py = y + h/2 - d; }
+  out.push({ x:px, y:py, r:1.2, c, a }); } }
+function merge(t){
+  const out = [], m = prog(t, 2.6, 1.6), drop = prog(t, 4.6, 1.2), r = rng(77);
+  SNAP.clients.forEach((cl, i) => cl.fields.forEach((f, j) => { const y = RY(i) + (MY - RY(i))*m; chipRing(out, MX(j), y, 124, 34, 22, CCOL()[i], .85); }));
+  if (drop > 0) for (let k = 0; k < 150; k++){ const ci = k % 3, x = 700 + r()*760, y0 = MY + 20, y1 = 650 + r()*120; out.push({ x, y:y0 + (y1 - y0)*drop, r:1.8, c:CCOL()[ci], a:.9*drop }); }
+  return { out, over(a){
+    SNAP.clients.forEach((cl, i) => { text(cl.name, 620, RY(i) + 5, CCOL()[i], a*(1 - m), 14, 800, 'left');
+      cl.fields.forEach((f, j) => text(f, MX(j), RY(i) + (MY - RY(i))*m + 5, CCOL()[i], a*(1 - .9*m), 13, 700)); });
+    if (m < .2) text('∪', 620, RY(1) + 44, MU, a, 16, 800, 'left');
+    const ma = prog(t, 3.8, .5); SNAP.merged.forEach((s, j) => text(s, MX(j), MY + 6, INK, a*ma, 15, 800)); text('/ ∼', 620, MY + 6, CY, a*ma, 16, 800, 'left');
+    if (drop > 0){ text('三家的东西，第一次放在一起量', 1460, 800, MU, a*drop, 12.5, 600, 'right');
+      SNAP.clients.forEach((cl, i) => { ctx.globalAlpha = a*drop; ctx.drawImage(sprite(CCOL()[i]), 700 + i*100 - 7, 793, 14, 14); ctx.globalAlpha = 1; text(cl.name, 712 + i*100, 805, CCOL()[i], a*drop, 12, 700, 'left'); }); } } };
+}
+
+/* ---------- 03 读空间，不读原文（只画实测） ---------- */
+let pick = 1, touched = false;
+function read(t){
+  const S = SNAP.read, X0 = 660, X1 = 1530, lx = n => X0 + (Math.log10(n) - 8.8)/(11.4 - 8.8)*(X1 - X0), xMax = lx(S.N[4]) + 26;
+  const cur = touched ? pick : Math.min(4, Math.floor(prog(t, .8, 5)*4.99));
+  const T0 = 120, T1 = 400, B0 = 470, B1 = 760, cy = c => T1 - (c - .2)/.8*(T1 - T0), ey = e => B1 - (Math.log10(e) - 0)/(3 - 0)*(B1 - B0), out = [];
+  along(out, X0, T1, X1, T1, 90, GRY, .5); along(out, X0, B1, X1, B1, 90, GRY, .5); along(out, X0, T0, X0, T1, 28, GRY, .5); along(out, X0, B0, X0, B1, 28, GRY, .5);
+  const P = prog(t, .5, 2.4), vis = Math.max(1, Math.ceil(P*5));
+  const curve = (vals, f, c) => { for (let i = 0; i < vis - 1; i++) along(out, lx(S.N[i]), f(vals[i]), lx(S.N[i + 1]), f(vals[i + 1]), 22, c, .85, 1.3);
+    for (let i = 0; i < vis; i++) for (let k = 0; k < 8; k++) out.push({ x:lx(S.N[i]) + Math.cos(k*.785 + t*2)*(i === cur ? 7 : 4.5), y:f(vals[i]) + Math.sin(k*.785 + t*2)*(i === cur ? 7 : 4.5), r:1.6, c, a:1 }); };
+  curve(S.coverage.text, cy, AM); curve(S.coverage.space, cy, CY); curve(S.joules.text, ey, AM); curve(S.joules.space, ey, CY);
+  along(out, lx(S.N[cur]), T0, lx(S.N[cur]), B1, 50, INK, .18, .9);
+  return { out, over(a){
+    text('覆盖率（同一套题答对的比例）', X0 + 8, T0 - 10, DIM, a, 11.5, 600, 'left'); text('每答一题的能耗（J，对数）', X0 + 8, B0 - 10, DIM, a, 11.5, 600, 'left');
+    ctx.globalAlpha = a; ctx.fillStyle = rgba(GRY, .08); ctx.fillRect(xMax, T0, X1 - xMax, B1 - T0); ctx.globalAlpha = 1; seg(xMax, T0, xMax, B1, GRY, .6*a, 1, [4,4]);
+    text('外推', (xMax + X1)/2, (T0 + B1)/2 - 6, DIM, a, 15, 800); text('不在本页', (xMax + X1)/2, (T0 + B1)/2 + 16, DIM, a, 11, 600);
+    S.N.forEach((n, i) => text(pow10(n), lx(n), B1 + 22, i === cur ? CY : DIM, a, 11, 700, 'center', M)); text(`${S.model} · 规模（参数）→`, X1, B1 + 44, DIM, a, 11, 600, 'right');
+    if (P >= 1){ label('读原文', lx(S.N[4]) - 64, cy(S.coverage.text[4]) + 22, AM, a, 11.5); label('读空间', lx(S.N[4]) - 64, cy(S.coverage.space[4]) - 14, CY, a, 11.5);
+      const k = prog(t, 3.2, .8), x0 = lx(S.N[1]), x1 = lx(S.N[3]), y = cy(S.coverage.space[1]); if (k > 0){ seg(x0, y, x0 + (x1 - x0)*k, y, MI, .8*a, 1.6, [5,4]); text('小一档，就赶上', (x0 + x1)/2, y - 12, MI, a*k, 12.5, 800); } }
+    const set = (id, s) => { const el = document.getElementById(id); if (el && el.textContent !== s) el.textContent = s; };
+    set('k2n', pow10(S.N[cur])); set('k2e', String(S.joules.text[cur])); set('k2b', String(S.joules.space[cur]));
+    set('scaleo', `${pow10(S.N[cur])} · 第 ${cur + 1} / 5 档`); const sl = document.getElementById('scale'); if (!touched && sl && +sl.value !== cur) sl.value = cur; } };
+}
+
+/* ---------- 04 以脑为本：三招 ---------- */
+const PAN = [ { x:620, name:'按需激活' }, { x:932, name:'按用的精度去标' }, { x:1244, name:'AI 先合，人再核' } ];
+function three(t){
+  const out = [];
+  const ph = Math.floor(t/1.6), cx = 3 + (ph*5)%9, cy = 3 + (ph*7)%9, r1 = rng(3 + ph); let on = 0;
+  for (let i = 0; i < 14; i++) for (let j = 0; j < 14; j++){ const lit = Math.hypot(i - cx, j - cy) < 1.6 && r1() < .95; if (lit) on++;
+    out.push({ x:648 + i*19, y:200 + j*19, r:lit ? 3.2 : 1.5, c:lit ? CY : GRY, a:lit ? 1 : .6 }); }
+  const X2 = 952, W = 252, base = 430, GS = [ { mu:.5, sd:.05, h:1, c:MI }, { mu:.47, sd:.11, h:.7, c:CY }, { mu:.62, sd:.26, h:.45, c:RO } ];
+  along(out, X2, base, X2 + W, base, 40, GRY, .55); [1, 2].forEach(i => along(out, X2 + i*W/3, 200, X2 + i*W/3, base, 16, GRY, .4, .9));
+  GS.forEach((g, i) => { const q = prog(t, .6 + i*.5, .8); for (let k = 0; k <= 50; k++){ const u = k/50; out.push({ x:X2 + u*W, y:base - 170*q*g.h*Math.exp(-((u - g.mu)**2)/(2*g.sd*g.sd)), r:1.6, c:g.c, a:.9 }); } });
+  const X3 = 1264, truth = .66, k = Math.max(0, Math.min(7, Math.floor((t - 1.2)/1.1))), r3 = rng(9); let x = .2, s = .32; const hist = [[x, s]];
+  for (let i = 0; i < k; i++){ const y = truth + (r3() - .5)*.12, K = s*s/(s*s + .06*.06); x = x + K*(y - x); s = Math.sqrt((1 - K)*s*s); hist.push([x, s]); }
+  along(out, X3 + truth*W, 190, X3 + truth*W, 410, 22, INK, .35, 1);
+  hist.forEach(([hx, hs], i) => { const y = 200 + i*26, last = i === hist.length - 1; along(out, X3 + (hx - hs)*W, y, X3 + (hx + hs)*W, y, Math.max(3, Math.round(hs*70)), VI, last ? .95 : .4, last ? 1.6 : 1.1); out.push({ x:X3 + hx*W, y, r:last ? 3.4 : 2, c:VI, a:1 }); });
+  const Mv = SNAP.moves;
+  return { out, over(a){
+    PAN.forEach((p, i) => { text(['①', '②', '③'][i] + ' ' + p.name, p.x + 14, 150, INK, a, 17, 800, 'left'); seg(p.x + 14, 166, p.x + 280, 166, GRY, .5*a); });
+    text(`这一次：亮 ${on} / 196`, 768, 500, CY, a, 14, 800);
+    ['保', '稳', '冲'].forEach((s, i) => text(s, X2 + i*W/3 + W/6, base + 24, i === 1 ? CY : MU, a, 14, 800));
+    ['标得细 → 稳', '按档标 → 结论一样', '跨档 → 补证据'].forEach((s, i) => text(s, X2 + W/2, 486 + i*22, GS[i].c, a*prog(t, .6 + i*.5, .8), 12.5, 700));
+    text('人核出的真值', X3 + truth*W, 428, MU, a, 11.5, 600); text(`第 ${k} 轮核对 · 误差 ${(hist[hist.length - 1][1]*100).toFixed(0)}%`, 1392, 500, VI, a, 14, 800);
+    [[768, `实测：每次查询平均激活 ${Mv.activePct}% 的节点`, '‖a‖₀ ≪ N'], [1078, `实测：精度对齐后标注工时 ${Mv.labelHours}%`, 'ε标 ≤ δ用'], [1392, `实测：核对 3 轮后错配率 ${Mv.mismatchAfter3}%`, 'x ← x + K(y − ŷ)']].forEach(([x, s, f]) => {
+      text(s, x, 600, MI, a, 13, 700); text(f, x, 646, INK, a, 16, 700); }); } };
+}
+
+/* ---------- 05 护城河：三代第三方模型，三套读法，点不动 ---------- */
+const PQ = [ [.7,.75,.45], [-.2,.3,.9] ];
+function moat(t){
+  const pr = cam(.7 + .12*Math.sin(t*.25), .28, 1040, 500, 220), out = [];
+  const gen = Math.min(2, Math.floor(Math.max(0, t - 1.5)/3.2)), th = [0, .55, 1.15][gen] + (t > 1.5 ? .07*Math.sin(t*.9) : 0);
+  const cols = [CY, AM, VI], U = rotA([.3,1,.35], th), E = [[1,0,0],[0,1,0],[0,0,1]].map(U), O = pr([0,0,0]);
+  PTS.slice(0, 110).forEach(o => { const q = pr(mul(o.p, .7)); out.push({ x:q.x, y:q.y, r:1.8*q.k, c:KINDS[o.kind].c, a:.7 }); });
+  E.forEach(e => { const q = pr(mul(e, 1.2)); along(out, O.x, O.y, q.x, q.y, 34, cols[gen], .95, 1.4); });
+  const p = pr(PQ[0]), q = pr(PQ[1]); along(out, p.x, p.y, q.x, q.y, 20, VI, .5, 1); ring(out, p.x, p.y, 9, 9, 14, VI, 1, 1.4, t*2); ring(out, q.x, q.y, 7, 7, 10, MI, 1, 1.3, -t*2);
+  return { out, over(a){
+    E.forEach(e => { const q = pr(mul(e, 1.2)); arrow(O.x + (q.x - O.x)*.92, O.y + (q.y - O.y)*.92, q.x, q.y, cols[gen], a, 2, 9); });
+    const tip = pr(mul(E[1], 1.32)); label(`第三方模型 ${SNAP.align.models[gen]} 的读法`, tip.x, tip.y - 6, cols[gen], a, 12); label('p', p.x, p.y - 16, VI, a, 11); label('q', q.x, q.y - 14, MI, a, 11);
+    const X = 1350, xp = E.map(e => dotv(PQ[0], e)), f3 = v => `( ${v.map(x => x.toFixed(2)).join(' , ')} )`;
+    text(`p 的读数 · ${SNAP.align.models[gen]}`, X, 240, cols[gen], a, 12.5, 700, 'left'); text(f3(xp), X, 266, cols[gen], a, 14, 700, 'left', M);
+    text('|p − q|', X, 316, VI, a, 12.5, 700, 'left'); text(`${d3(PQ[0], PQ[1]).toFixed(3)} · 不变`, X, 342, VI, a, 14, 700, 'left', M);
+    text('对齐残差（实测）', X, 392, MI, a, 12.5, 700, 'left');
+    SNAP.align.models.forEach((m, i) => text(`${m}　${i ? SNAP.align.residual[i].toFixed(3) : '基准'}`, X, 418 + i*24, i === gen ? MI : DIM, a, 14, 700, 'left', M)); } };
+}
+
+/* ===== 翻页：上一步的坐标系解离，粒子飞到下一步重新聚成 ===== */
+const STEPS = [space, merge, read, three, moat];
+const NAMES = ['空间', '投射', '读空间', '以脑为本', '护城河'];
+const secs = [...document.querySelectorAll('.ch')], nav = document.getElementById('nav');
+NAMES.forEach((s, i) => { const b = document.createElement('button'); b.textContent = `${i + 1} ${s}`; b.onclick = () => go(i); nav.appendChild(b); });
+const FLY = .95, SETTLE = 1.25;
+let ch = 0, t0 = performance.now();
+function go(i){ ch = (i + STEPS.length) % STEPS.length; t0 = performance.now(); PART.forEach(p => { p.fx = p.x; p.fy = p.y; p.d = Math.random()*.5; });
+  secs.forEach(s => s.classList.toggle('on', +s.dataset.c === ch)); [...nav.children].forEach((b, j) => b.classList.toggle('on', j === ch)); showCode(); }
+function render(t){
+  [...secs[ch].querySelectorAll('.side>*,.ctl')].forEach((el, i) => { const p = prog(t, .15 + i*.16, .5); el.style.opacity = p; el.style.transform = p < 1 ? `translateY(${(1 - p)*10}px)` : ''; });
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.clearRect(0, 0, 1600, 900);
+  const scene = STEPS[ch](t), T = scene.out;
+  ctx.globalCompositeOperation = TH.blend;
+  PART.forEach((p, i) => { const g = T[i], e = ease((t - p.d)/FLY);
+    const tx = g ? g.x : 800 + Math.cos(p.s + t*.05)*(620 + 160*p.n), ty = g ? g.y : 450 + Math.sin(p.s*1.7 + t*.04)*(330 + 60*p.n);
+    const sw = Math.sin(Math.PI*e)*(60 + 90*p.n), ang = p.s + t*.6;
+    p.x = p.fx + (tx - p.fx)*e + Math.cos(ang)*sw; p.y = p.fy + (ty - p.fy)*e + Math.sin(ang)*sw;
+    const r = g ? g.r : .8, a = g ? g.a : TH.dust, c = g ? g.c : GRY, sz = (r*5 + 2)*(1 + .5*Math.sin(Math.PI*e));
+    ctx.globalAlpha = clamp(a*(e < 1 ? .55 + .45*e : 1)); ctx.drawImage(sprite(c), p.x - sz/2, p.y - sz/2, sz, sz); });
+  ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+  scene.over(prog(t, SETTLE, .6));
+}
+addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(ch + 1); if (e.key === 'ArrowLeft') go(ch - 1); });
+
+/* ===== 读数 ===== */
+document.getElementById('snapline').textContent = `SNAPSHOT ${SNAP.id} · 截至 ${SNAP.cut} · ${SNAP.base}`;
+const stat = (cls, v, s, src) => `<div><b class="${cls}">${v}</b><small>${s}${src ? `<span class="src">${src}</span>` : ''}</small></div>`;
+const total = Object.values(SNAP.points).reduce((a, b) => a + b);
+document.getElementById('s0').innerHTML = stat('c', total.toLocaleString(), '投射进来的点') + stat('v', SNAP.relations.toLocaleString(), '点和点之间的关系') + stat('a', SNAP.clients.length + ' 家', '客户');
+document.getElementById('s1').innerHTML = stat('a', SNAP.fieldsRaw, '原始字段') + stat('c', SNAP.dims, '合并后的维度') + stat('v', SNAP.weeklyTables + ' 张', '每周导入的表');
+document.getElementById('s4').innerHTML = stat('m', SNAP.align.residual[2].toFixed(3), '换代对齐残差', '实测') + stat('c', SNAP.review.toLocaleString(), '人核记录（条）') + stat('a', `${SNAP.pilots} / ${SNAP.paid}`, '试点 / 已付款');
+{ const S = SNAP.read, fitB = js => { const xs = S.N.map(Math.log10), ys = js.map(Math.log10), mx = xs.reduce((a, b) => a + b)/xs.length, my = ys.reduce((a, b) => a + b)/ys.length;
+    return xs.reduce((a, x, i) => a + (x - mx)*(ys[i] - my), 0)/xs.reduce((a, x) => a + (x - mx)**2, 0); };
+  document.getElementById('k2be').textContent = fitB(S.joules.text).toFixed(2); document.getElementById('k2bb').textContent = fitB(S.joules.space).toFixed(2); }
+const sl = document.getElementById('scale'); sl.oninput = () => { touched = true; pick = +sl.value; };
+
+/* ===== 代码：显示正在跑的这一步（就是上面这段函数本身） ===== */
+const code = document.getElementById('code');
+const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+const hl = s => esc(s).replace(/(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|('[^'\n]*'|`[^`]*`)|\b(const|let|function|return|if|else|for|of|new)\b|\b(\d+\.?\d*(?:e\d+)?)\b/g, (m, c, s2, k, n) => c ? `<span class="c">${c}</span>` : s2 ? `<span class="s">${s2}</span>` : k ? `<span class="k">${k}</span>` : `<span class="n">${n}</span>`);
+function showCode(){ if (!document.body.classList.contains('split')) return; const f = STEPS[ch];
+  code.innerHTML = `<div class="hd"><b>space.js</b> · ${f.name}() · 读自 SNAP ${SNAP.id}</div><div class="fn">${hl('const SNAP = ' + JSON.stringify(SNAP, null, 1) + ';')}</div><div class="fn">${hl(f.toString())}</div>`; }
+document.getElementById('theme').onclick = () => { const order = ['mariana', 'light', 'dark'], q = new URLSearchParams(location.search); q.set('theme', order[(order.indexOf(THEME) + 1) % 3]); q.set('c', ch); q.delete('t'); location.search = q; };
+document.getElementById('theme').textContent = { light:'配色 · 浅', mariana:'配色 · 蓝灰', dark:'配色 · 深' }[THEME];
+document.getElementById('tog').onclick = () => { document.body.classList.toggle('split'); fit(); showCode(); };
+
+const qs = new URLSearchParams(location.search);
+if (qs.has('code')) document.body.classList.add('split');
+fit(); go(+(qs.get('c') || 0));
+if (qs.has('t')) { const ft = parseFloat(qs.get('t')) || 0; PART.forEach(p => { p.fx = p.x; p.fy = p.y; p.d = 0; }); render(ft); render(ft); window.__ready = true; }
+else { (function loop(){ render((performance.now() - t0)/1000); requestAnimationFrame(loop); })(); window.__ready = true; }
+window.renderAt = (c, t) => { go(c); PART.forEach(p => p.d = 0); render(t); };
+})();
+</script>
+</body>
+</html>
