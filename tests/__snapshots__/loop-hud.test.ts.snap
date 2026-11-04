@@ -8,8 +8,8 @@ exports[`FR5 checklist snapshots > day 1 at boot 1`] = `"<div class="list"><div 
 
 exports[`FR5 checklist snapshots > day 17 with the item that ticked itself 1`] = `
 {
-  "after": "<div class="list"><div class="h">今日</div><div class="done">已做 3 件</div><div class="it now" data-id="reply"><i></i>回老板。</div></div>",
-  "before": "<div class="list"><div class="h">今日</div><div class="done">已做 2 件</div><div class="it now" data-id="task1"><i></i>把东西放回去。</div></div>",
+  "after": "<div class="list"><div class="h">今日</div><div class="done">已做 3 件</div><div class="it now" data-id="work"><i></i>每个人都在找你：回一下。只能回一个。</div><div class="it next" data-id="reply"><i></i>回老板。</div></div>",
+  "before": "<div class="list"><div class="h">今日</div><div class="done">已做 2 件</div><div class="it now" data-id="work"><i></i>每个人都在找你：回一下。只能回一个。</div><div class="it next" data-id="task1"><i></i>把东西放回去。</div></div>",
 }
 `;
 

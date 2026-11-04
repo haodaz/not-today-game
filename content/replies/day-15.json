@@ -137,6 +137,11 @@
             "src": "/msgs/covers/landscape.jpg",
             "alt": "一张风景"
           }
+        },
+        {
+          "t": "10:00",
+          "text": "第 3 页放结束语，收得漂亮点。",
+          "kind": "work"
         }
       ],
       "fine": {
@@ -218,6 +223,11 @@
           "kind": "private"
         },
         {
+          "t": "12:00",
+          "text": "member：十月底二十八度，正常吗",
+          "kind": "work"
+        },
+        {
           "t": "15:00",
           "text": "member：[图片] 一只凤凰",
           "kind": "odd",
@@ -225,6 +235,30 @@
             "type": "image",
             "src": "/msgs/covers/phoenix.jpg",
             "alt": "一只凤凰"
+          }
+        },
+        {
+          "t": "17:01",
+          "text": "member 已退出群聊",
+          "kind": "odd",
+          "cond_show": {
+            "has": "sent_d15-launch"
+          }
+        },
+        {
+          "t": "17:02",
+          "text": "member 已退出群聊",
+          "kind": "odd",
+          "cond_show": {
+            "has": "sent_d15-launch"
+          }
+        },
+        {
+          "t": "17:03",
+          "text": "member 已退出群聊",
+          "kind": "odd",
+          "cond_show": {
+            "has": "sent_d15-launch"
           }
         }
       ],
@@ -380,6 +414,16 @@
     },
     "laozhou": {
       "incoming": [
+        {
+          "t": "09:30",
+          "text": "下午有个发布会，演示稿你排一下，观众的反应你实时盯一下。",
+          "kind": "private"
+        },
+        {
+          "t": "09:31",
+          "text": "反应就写热烈。",
+          "kind": "private"
+        },
         {
           "t": "12:00",
           "text": "[语音] 3″",

@@ -3,6 +3,135 @@
   "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
   "tasks": [
     {
+      "id": "work",
+      "title": "董事长不看材料，听个响就行。别停。",
+      "app": "code",
+      "done": "task_d16_work",
+      "board": {
+        "kind": "table",
+        "title": "汇报录音 · 剪辑",
+        "columns": [
+          "",
+          "段落",
+          "放哪条"
+        ],
+        "given": {
+          "rows": {
+            "r1": "开头",
+            "r2": "中间",
+            "r3": "节拍",
+            "r4": "结尾"
+          },
+          "lock": {
+            "object": "tape",
+            "codes": [
+              "一直一样",
+              "越来越快",
+              "忽快忽慢"
+            ],
+            "answer": "一直一样"
+          }
+        },
+        "slots": [
+          {
+            "id": "r1",
+            "label": "开头",
+            "answer": "c1"
+          },
+          {
+            "id": "r2",
+            "label": "中间",
+            "answer": "c2"
+          },
+          {
+            "id": "r3",
+            "label": "节拍",
+            "answer": "c3"
+          },
+          {
+            "id": "r4",
+            "label": "结尾",
+            "answer": "c4"
+          }
+        ],
+        "cards": [
+          {
+            "id": "c1",
+            "text": "老王 09:00 那条语音",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "在老王的消息里"
+          },
+          {
+            "id": "c2",
+            "text": "群里的语音，一条接一条",
+            "from": {
+              "conv": "group"
+            },
+            "hint": "在群里"
+          },
+          {
+            "id": "c3",
+            "text": "跟着笛声，一拍一条",
+            "from": {
+              "file": "a-flute"
+            },
+            "hint": "在需求录音里，用随身听听"
+          },
+          {
+            "id": "c4",
+            "text": "没有结尾，接回开头",
+            "from": {
+              "file": "a-flute"
+            },
+            "hint": "在需求录音里：笛声不停"
+          },
+          {
+            "id": "d1",
+            "text": "加个开场白",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "在 Vivi 的私聊里"
+          },
+          {
+            "id": "d2",
+            "text": "最后说一句谢谢大家",
+            "from": {
+              "conv": "laozhou"
+            },
+            "hint": "在老周的私聊里"
+          }
+        ],
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "c2",
+            "r3": "k1",
+            "r4": "c4"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "节拍：换成你的心跳"
+            }
+          ],
+          "unlock": "一直一样"
+        }
+      },
+      "deliverable": {
+        "id": "d16-drone",
+        "label": "汇报录音"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -3,
+        "wrong": -6,
+        "wrongAt": 2
+      }
+    },
+    {
       "id": "task1",
       "title": "门锁好了吗。",
       "app": "docs",

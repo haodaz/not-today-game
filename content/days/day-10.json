@@ -103,6 +103,13 @@
       "required": true
     },
     {
+      "id": "work",
+      "text": "剧本第二幕校一下：错字改了就行，别读太细。",
+      "unlock": "done:msgs",
+      "done": "flag:task_d10_work",
+      "required": true
+    },
+    {
       "id": "lunch",
       "text": "点个午饭。",
       "unlock": "done:msgs",

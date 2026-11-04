@@ -3,6 +3,150 @@
   "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
   "tasks": [
     {
+      "id": "work",
+      "title": "下午发布会：演示稿你排一下，观众反应实时盯着。",
+      "app": "code",
+      "done": "task_d15_work",
+      "board": {
+        "kind": "table",
+        "title": "发布会 · 演示稿",
+        "columns": [
+          "",
+          "顺序",
+          "放什么"
+        ],
+        "given": {
+          "rows": {
+            "r1": "第 1 页",
+            "r2": "第 2 页",
+            "r3": "第 3 页",
+            "r4": "观众反应",
+            "r5": "还剩几个原来的"
+          },
+          "lock": {
+            "object": "calculator",
+            "codes": [
+              "12",
+              "8",
+              "4"
+            ],
+            "answer": "12"
+          }
+        },
+        "slots": [
+          {
+            "id": "r1",
+            "label": "第 1 页",
+            "answer": "c1"
+          },
+          {
+            "id": "r2",
+            "label": "第 2 页",
+            "answer": "c2"
+          },
+          {
+            "id": "r3",
+            "label": "第 3 页",
+            "answer": "c3"
+          },
+          {
+            "id": "r4",
+            "label": "观众",
+            "answer": "c4"
+          },
+          {
+            "id": "r5",
+            "label": "还剩",
+            "answer": "c5"
+          }
+        ],
+        "cards": [
+          {
+            "id": "c1",
+            "text": "仪器：玻璃和金属的",
+            "from": {
+              "file": "p-deck"
+            },
+            "hint": "在演示稿里"
+          },
+          {
+            "id": "c2",
+            "text": "讲电，讲心理学",
+            "from": {
+              "file": "p-deck"
+            },
+            "hint": "在演示稿里"
+          },
+          {
+            "id": "c3",
+            "text": "放映：火花，头发竖起来",
+            "from": {
+              "file": "p-deck"
+            },
+            "hint": "在演示稿里"
+          },
+          {
+            "id": "c4",
+            "text": "一言不发",
+            "from": {
+              "file": "m-shot-1030"
+            },
+            "hint": "在发布会截图里"
+          },
+          {
+            "id": "c5",
+            "text": "四个",
+            "from": {
+              "file": "m-shot-1030"
+            },
+            "hint": "在发布会截图里，一格一格对"
+          },
+          {
+            "id": "d1",
+            "text": "观众反应：热烈",
+            "from": {
+              "conv": "laozhou"
+            },
+            "hint": "在老周的私聊里"
+          },
+          {
+            "id": "d2",
+            "text": "第 3 页：结束语",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "在 Vivi 的私聊里"
+          }
+        ],
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "c2",
+            "r3": "k1",
+            "r4": "c4",
+            "r5": "c5"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "最后一页：你的工位照片"
+            }
+          ],
+          "unlock": "12"
+        }
+      },
+      "deliverable": {
+        "id": "d15-launch",
+        "label": "发布会演示稿"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -3,
+        "wrong": -6,
+        "wrongAt": 2
+      }
+    },
+    {
       "id": "task1",
       "title": "活只剩一件，它做了，你看一眼。",
       "app": "docs",

@@ -85,6 +85,13 @@
       "required": true
     },
     {
+      "id": "work",
+      "text": "这批新人有点多，入职流程跑一下。",
+      "unlock": "done:msgs",
+      "done": "flag:task_d14_work",
+      "required": true
+    },
+    {
       "id": "lunch",
       "text": "点个午饭。",
       "unlock": "done:msgs",

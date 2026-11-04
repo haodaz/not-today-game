@@ -15,6 +15,11 @@
           "kind": "odd"
         },
         {
+          "t": "09:00",
+          "text": "回一下我，我是谁你应该知道。",
+          "kind": "odd"
+        },
+        {
           "t": "09:01",
           "text": "Hold the fort.",
           "kind": "odd"
@@ -104,6 +109,11 @@
     "partner": {
       "incoming": [
         {
+          "t": "09:01",
+          "text": "回一下我，我是谁你应该知道。",
+          "kind": "odd"
+        },
+        {
           "t": "09:30",
           "text": "[卡片] 一张白",
           "kind": "odd",
@@ -185,6 +195,11 @@
     },
     "group": {
       "incoming": [
+        {
+          "t": "09:02",
+          "text": "回一下我，我是谁你应该知道。",
+          "kind": "odd"
+        },
         {
           "t": "09:20",
           "text": "member：早上好。",
@@ -346,7 +361,13 @@
       }
     },
     "laozhou": {
-      "incoming": [],
+      "incoming": [
+        {
+          "t": "09:03",
+          "text": "回一下我，我是谁你应该知道。",
+          "kind": "odd"
+        }
+      ],
       "fine": {
         "status": "silence",
         "lines": []

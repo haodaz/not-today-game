@@ -3,6 +3,150 @@
   "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
   "tasks": [
     {
+      "id": "work",
+      "title": "降本增效：成本表称平，下班前给 Vivi。",
+      "app": "code",
+      "done": "task_d11_work",
+      "board": {
+        "kind": "table",
+        "title": "成本表 · 称平",
+        "columns": [
+          "",
+          "成本项",
+          "单价"
+        ],
+        "given": {
+          "rows": {
+            "r1": "麦子",
+            "r2": "大麦",
+            "r3": "油",
+            "r4": "酒",
+            "r5": "合计"
+          },
+          "lock": {
+            "object": "calculator",
+            "codes": [
+              "1 : 3",
+              "3 : 1",
+              "1 : 1"
+            ],
+            "answer": "1 : 3"
+          }
+        },
+        "slots": [
+          {
+            "id": "r1",
+            "label": "麦子",
+            "answer": "c1"
+          },
+          {
+            "id": "r2",
+            "label": "大麦",
+            "answer": "c2"
+          },
+          {
+            "id": "r3",
+            "label": "油",
+            "answer": "c3"
+          },
+          {
+            "id": "r4",
+            "label": "酒",
+            "answer": "c4"
+          },
+          {
+            "id": "r5",
+            "label": "合计",
+            "answer": "c5"
+          }
+        ],
+        "cards": [
+          {
+            "id": "c1",
+            "text": "一钱一升",
+            "from": {
+              "file": "t-menu-1026"
+            },
+            "hint": "在今天的外卖价目截图里"
+          },
+          {
+            "id": "c2",
+            "text": "一钱三升",
+            "from": {
+              "conv": "laozhou"
+            },
+            "hint": "在老周的私聊里"
+          },
+          {
+            "id": "c3",
+            "text": "不动（原价）",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "在 Vivi 的私聊里：那两列别碰"
+          },
+          {
+            "id": "c4",
+            "text": "不动（原价）",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "同上"
+          },
+          {
+            "id": "c5",
+            "text": "正好称平，一分不差",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "在老王的语音里"
+          },
+          {
+            "id": "d1",
+            "text": "油、酒各降 10%",
+            "from": {
+              "file": "t-cut"
+            },
+            "hint": "在共享盘的降本增效模板里"
+          },
+          {
+            "id": "d2",
+            "text": "麦子按昨天的价",
+            "from": {
+              "file": "e-receivable"
+            },
+            "hint": "在第 1 天那张应收表里"
+          }
+        ],
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "c2",
+            "r3": "k1",
+            "r4": "c4",
+            "r5": "c5"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "油、酒各降 10%（已优化）"
+            }
+          ],
+          "unlock": "1 : 3"
+        }
+      },
+      "deliverable": {
+        "id": "d11-scale",
+        "label": "成本表（称平）"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -3,
+        "wrong": -6,
+        "wrongAt": 2
+      }
+    },
+    {
       "id": "task1",
       "title": "对账。让它对，你看一眼。",
       "app": "ledger",

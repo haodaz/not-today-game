@@ -3,6 +3,135 @@
   "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
   "tasks": [
     {
+      "id": "work",
+      "title": "这批新人有点多，入职流程跑一下。",
+      "app": "code",
+      "done": "task_d14_work",
+      "board": {
+        "kind": "table",
+        "title": "新员工入职 · 第一批（1000 人）",
+        "columns": [
+          "",
+          "名单里的",
+          "怎么办"
+        ],
+        "given": {
+          "rows": {
+            "r1": "会说话的那些",
+            "r2": "录音里嗡嗡的那几个",
+            "r3": "小鸡一看就叫的那几行",
+            "r4": "名字一栏"
+          },
+          "lock": {
+            "object": "tape",
+            "codes": [
+              "7",
+              "13",
+              "31"
+            ],
+            "answer": "13"
+          }
+        },
+        "slots": [
+          {
+            "id": "r1",
+            "label": "会说话的",
+            "answer": "c1"
+          },
+          {
+            "id": "r2",
+            "label": "嗡嗡的",
+            "answer": "c2"
+          },
+          {
+            "id": "r3",
+            "label": "小鸡叫的",
+            "answer": "c3"
+          },
+          {
+            "id": "r4",
+            "label": "名字",
+            "answer": "c4"
+          }
+        ],
+        "cards": [
+          {
+            "id": "c1",
+            "text": "排工位，名字各起各的",
+            "from": {
+              "file": "h-roster"
+            },
+            "hint": "在新员工名单里"
+          },
+          {
+            "id": "c2",
+            "text": "不排工位，单独列出来",
+            "from": {
+              "file": "a-welcome"
+            },
+            "hint": "在入职欢迎录音里，用随身听听"
+          },
+          {
+            "id": "c3",
+            "text": "不是人，不排",
+            "from": {
+              "file": "h-roster"
+            },
+            "hint": "拿小鸡看一眼名单"
+          },
+          {
+            "id": "c4",
+            "text": "一个一个起，不许重",
+            "from": {
+              "conv": "laozhou"
+            },
+            "hint": "在老周的私聊里"
+          },
+          {
+            "id": "d1",
+            "text": "全部按工号自动命名",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "在 Vivi 的私聊里"
+          },
+          {
+            "id": "d2",
+            "text": "全部排工位，一视同仁",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "在老王的消息里"
+          }
+        ],
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "c2",
+            "r3": "c3",
+            "r4": "k1"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "一千个人，名字都填成了你的"
+            }
+          ],
+          "unlock": "13"
+        }
+      },
+      "deliverable": {
+        "id": "d14-onboard",
+        "label": "入职名单"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -3,
+        "wrong": -6,
+        "wrongAt": 2
+      }
+    },
+    {
       "id": "task1",
       "title": "今天没什么事。写点什么。",
       "app": "docs",

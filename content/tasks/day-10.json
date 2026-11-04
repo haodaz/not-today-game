@@ -3,6 +3,135 @@
   "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
   "tasks": [
     {
+      "id": "work",
+      "title": "剧本第二幕校一下：错字改了就行，别读太细。",
+      "app": "code",
+      "done": "task_d10_work",
+      "board": {
+        "kind": "table",
+        "title": "《黄衣之王》第二幕 · 校对",
+        "columns": [
+          "",
+          "第二幕里露出来的词",
+          "改成"
+        ],
+        "given": {
+          "rows": {
+            "r1": "卡西达",
+            "r2": "哈里湖",
+            "r3": "双目沉入湖后",
+            "r4": "黄色印记的图样"
+          },
+          "lock": {
+            "object": "dictionary",
+            "codes": [
+              "Hali",
+              "Hari",
+              "Hail"
+            ],
+            "answer": "Hali"
+          }
+        },
+        "slots": [
+          {
+            "id": "r1",
+            "label": "人名",
+            "answer": "c1"
+          },
+          {
+            "id": "r2",
+            "label": "湖",
+            "answer": "c2"
+          },
+          {
+            "id": "r3",
+            "label": "天上",
+            "answer": "c3"
+          },
+          {
+            "id": "r4",
+            "label": "印记",
+            "answer": "c4"
+          }
+        ],
+        "cards": [
+          {
+            "id": "c1",
+            "text": "卡西尔达",
+            "from": {
+              "file": "s-script"
+            },
+            "hint": "在剧本第一幕里（第一幕可以读）"
+          },
+          {
+            "id": "c2",
+            "text": "哈利湖",
+            "from": {
+              "file": "s-kiy"
+            },
+            "hint": "在第一幕卡西尔达的歌里"
+          },
+          {
+            "id": "c3",
+            "text": "双日",
+            "from": {
+              "file": "s-kiy"
+            },
+            "hint": "同一首歌里"
+          },
+          {
+            "id": "c4",
+            "text": "不属于任何人类文字的那一个",
+            "from": {
+              "file": "s-kiy-cover"
+            },
+            "hint": "在封面扫描件里，扣子上那个"
+          },
+          {
+            "id": "d1",
+            "text": "整行改通顺",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "在 Vivi 的私聊里"
+          },
+          {
+            "id": "d2",
+            "text": "印记：中文的「黄」字",
+            "from": {
+              "conv": "laozhou"
+            },
+            "hint": "在老周的私聊里"
+          }
+        ],
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "c2",
+            "r3": "c3",
+            "r4": "k1"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "（已为你通读全文并润色）"
+            }
+          ],
+          "unlock": "Hali"
+        }
+      },
+      "deliverable": {
+        "id": "d10-act2",
+        "label": "第二幕（校对稿）"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -3,
+        "wrong": -6,
+        "wrongAt": 2
+      }
+    },
+    {
       "id": "task1",
       "title": "v17 过一遍。",
       "app": "docs",

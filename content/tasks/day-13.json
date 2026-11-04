@@ -3,6 +3,150 @@
   "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
   "tasks": [
     {
+      "id": "work",
+      "title": "走个借阅审批：别问为什么借。",
+      "app": "code",
+      "done": "task_d13_work",
+      "board": {
+        "kind": "table",
+        "title": "借阅审批 · 《死灵之书》拉丁文本",
+        "columns": [
+          "",
+          "审批单",
+          "填"
+        ],
+        "given": {
+          "rows": {
+            "r1": "借哪本",
+            "r2": "要对哪一页",
+            "r3": "这一页第一行",
+            "r4": "这一页第二行",
+            "r5": "门开的那一天"
+          },
+          "lock": {
+            "object": "dictionary",
+            "codes": [
+              "key",
+              "gate",
+              "guard"
+            ],
+            "answer": "key"
+          }
+        },
+        "slots": [
+          {
+            "id": "r1",
+            "label": "书",
+            "answer": "c1"
+          },
+          {
+            "id": "r2",
+            "label": "页",
+            "answer": "c2"
+          },
+          {
+            "id": "r3",
+            "label": "第一行",
+            "answer": "c3"
+          },
+          {
+            "id": "r4",
+            "label": "第二行",
+            "answer": "c4"
+          },
+          {
+            "id": "r5",
+            "label": "日子",
+            "answer": "c5"
+          }
+        ],
+        "cards": [
+          {
+            "id": "c1",
+            "text": "奥劳斯·沃米乌斯的拉丁文本",
+            "from": {
+              "file": "n-scan"
+            },
+            "hint": "在扫描件的页眉里"
+          },
+          {
+            "id": "c2",
+            "text": "第 751 页（迪伊英译本缺的那一页）",
+            "from": {
+              "file": "n-scan"
+            },
+            "hint": "在扫描件的页边批注里"
+          },
+          {
+            "id": "c3",
+            "text": "犹格·索托斯是门的钥匙",
+            "from": {
+              "file": "n-scan"
+            },
+            "hint": "拉丁文那一行，用文曲星查"
+          },
+          {
+            "id": "c4",
+            "text": "也是门的守卫",
+            "from": {
+              "file": "n-scan"
+            },
+            "hint": "同一行的后半句"
+          },
+          {
+            "id": "c5",
+            "text": "11 月 1 日",
+            "from": {
+              "file": "n-scan"
+            },
+            "hint": "页脚：五朔节前夜与万圣节，往后推"
+          },
+          {
+            "id": "d1",
+            "text": "借阅理由：学习交流",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "在 Vivi 的私聊里"
+          },
+          {
+            "id": "d2",
+            "text": "门开的日子：5 月 1 日",
+            "from": {
+              "conv": "laozhou"
+            },
+            "hint": "在老周的私聊里"
+          }
+        ],
+        "kuro": {
+          "fill": {
+            "r1": "k1",
+            "r2": "c2",
+            "r3": "c3",
+            "r4": "c4",
+            "r5": "c5"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "借阅期限：永久"
+            }
+          ],
+          "unlock": "key"
+        }
+      },
+      "deliverable": {
+        "id": "d13-loan",
+        "label": "借阅审批"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -3,
+        "wrong": -6,
+        "wrongAt": 2
+      }
+    },
+    {
       "id": "task1",
       "title": "升级通知看一眼。",
       "app": "docs",

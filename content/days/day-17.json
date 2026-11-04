@@ -85,6 +85,13 @@
       "required": true
     },
     {
+      "id": "work",
+      "text": "每个人都在找你：回一下。只能回一个。",
+      "unlock": "done:msgs",
+      "done": "flag:task_d17_work",
+      "required": true
+    },
+    {
       "id": "task1",
       "text": "把东西放回去。",
       "unlock": "done:msgs",

@@ -3,6 +3,135 @@
   "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
   "tasks": [
     {
+      "id": "work",
+      "title": "每个人都在找你：回一下。只能回一个。",
+      "app": "code",
+      "done": "task_d17_work",
+      "board": {
+        "kind": "table",
+        "title": "回信 · 只能回一个",
+        "columns": [
+          "",
+          "回信",
+          "填"
+        ],
+        "given": {
+          "rows": {
+            "r1": "回给谁",
+            "r2": "怎么认出来的",
+            "r3": "打过来的号码",
+            "r4": "回什么"
+          },
+          "lock": {
+            "object": "phone",
+            "codes": [
+              "6603 2047",
+              "6603 2048",
+              "6630 2047"
+            ],
+            "answer": "6603 2047"
+          }
+        },
+        "slots": [
+          {
+            "id": "r1",
+            "label": "回给",
+            "answer": "c1"
+          },
+          {
+            "id": "r2",
+            "label": "为什么是他",
+            "answer": "c2"
+          },
+          {
+            "id": "r3",
+            "label": "电话",
+            "answer": "c3"
+          },
+          {
+            "id": "r4",
+            "label": "回什么",
+            "answer": "c4"
+          }
+        ],
+        "cards": [
+          {
+            "id": "c1",
+            "text": "青禾物流的对接人",
+            "from": {
+              "file": "e-receivable"
+            },
+            "hint": "在应收表里：唯一真到账的那家"
+          },
+          {
+            "id": "c2",
+            "text": "钱是真的付了",
+            "from": {
+              "file": "e-receivable"
+            },
+            "hint": "在应收表里"
+          },
+          {
+            "id": "c3",
+            "text": "第一次打来，没接",
+            "from": {
+              "file": "call-log"
+            },
+            "hint": "在来电记录里"
+          },
+          {
+            "id": "c4",
+            "text": "我还在。",
+            "from": {
+              "file": "call-log"
+            },
+            "hint": "在来电记录的留言里"
+          },
+          {
+            "id": "d1",
+            "text": "回给老王（他是你老板）",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "在老王的消息里"
+          },
+          {
+            "id": "d2",
+            "text": "回给 Vivi",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "在 Vivi 的私聊里"
+          }
+        ],
+        "kuro": {
+          "fill": {
+            "r1": "k1",
+            "r2": "c2",
+            "r3": "c3",
+            "r4": "c4"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "回给克总"
+            }
+          ],
+          "unlock": "6603 2047"
+        }
+      },
+      "deliverable": {
+        "id": "d17-reply",
+        "label": "回信"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -3,
+        "wrong": -6,
+        "wrongAt": 2
+      }
+    },
+    {
       "id": "task1",
       "title": "把东西放回去。",
       "app": "docs",

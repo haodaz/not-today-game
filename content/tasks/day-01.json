@@ -419,6 +419,83 @@
             "r3": 10,
             "r4": 11,
             "r5": 12
+          },
+          "files": {
+            "r1": {
+              "name": "03-共同智能空间.js",
+              "code": [
+                "import { SNAP } from \"./snapshot.js\";",
+                "import { draw } from \"./space.js\";",
+                "",
+                "export const page = {",
+                "  kick: \"03 · 共同智能空间\",",
+                "  title: \"群体脑要一起干活，先得有一个共同智能空间\",",
+                "  base: {{slot}},  // 我们靠什么做事",
+                "  stats: () => ({ nodes: SNAP.nodes.length, links: SNAP.links.length, clients: SNAP.clients.length }),",
+                "  draw: (t) => draw.project(SNAP, t),  // x = φ(现实) ∈ 𝒮",
+                "};"
+              ]
+            },
+            "r2": {
+              "name": "05-三套说法.js",
+              "code": [
+                "import { SNAP } from \"./snapshot.js\";",
+                "import { draw } from \"./space.js\";",
+                "",
+                "export const page = {",
+                "  kick: \"05 · 投射 · 三套说法\",",
+                "  title: \"可现实不会自己排好队：三家客户，三套说法\",",
+                "  data: {{slot}},  // 甲方的数据怎么进来",
+                "  fields: SNAP.clients.map((c) => c.fields),  // 客户名称 / 甲方单位 / 签约主体",
+                "  draw: (t) => draw.columns(SNAP.clients, t)",
+                "};"
+              ]
+            },
+            "r3": {
+              "name": "11-AI先合人再核.js",
+              "code": [
+                "import { SNAP } from \"./snapshot.js\";",
+                "import { draw } from \"./space.js\";",
+                "",
+                "export const page = {",
+                "  kick: \"11 · 以脑为本 ③ AI 先合，人再核\",",
+                "  title: \"第三招：AI 先合一版，人再核一遍，每一次都回流\",",
+                "  ai: {{slot}},  // AI 在我们这儿干了什么",
+                "  loop: (x, y, yHat, K) => x + K * (y - yHat),  // 回流修正，Σ 一轮一轮缩小",
+                "  draw: (t) => draw.review(SNAP.reviews, t)",
+                "};"
+              ]
+            },
+            "r4": {
+              "name": "12-护城河.js",
+              "code": [
+                "import { SNAP } from \"./snapshot.js\";",
+                "import { draw } from \"./space.js\";",
+                "",
+                "export const page = {",
+                "  kick: \"12 · 护城河\",",
+                "  title: \"所以模型年年换，空间一直是我们的\",",
+                "  edge: {{slot}},  // 跟别家比，我们有什么",
+                "  // 换模型只是换一种读法：x′ = U x，UᵀU = I，点和点的距离不变",
+                "  draw: (t) => draw.rotate(SNAP, t)",
+                "};"
+              ]
+            },
+            "r5": {
+              "name": "13-客户.js",
+              "code": [
+                "import { SNAP } from \"./snapshot.js\";",
+                "import { draw } from \"./space.js\";",
+                "",
+                "export const page = {",
+                "  kick: \"13 · 客户\",",
+                "  title: \"这条路已经接上了客户：在链路上的，和已经到账的\",",
+                "  proof: {{slot}},  // 拿得出手的",
+                "  clients: SNAP.receivable,  // 以应收表为准，截在快照那一刻",
+                "  draw: (t) => draw.clients(SNAP.receivable, t)",
+                "};"
+              ]
+            }
           }
         },
         "beats": [

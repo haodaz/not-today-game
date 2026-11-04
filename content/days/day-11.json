@@ -86,6 +86,13 @@
       "required": true
     },
     {
+      "id": "work",
+      "text": "降本增效：成本表称平，下班前给 Vivi。",
+      "unlock": "done:msgs",
+      "done": "flag:task_d11_work",
+      "required": true
+    },
+    {
       "id": "lunch",
       "text": "点个午饭。",
       "unlock": "done:msgs",
