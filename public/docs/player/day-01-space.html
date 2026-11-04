@@ -90,46 +90,46 @@ body.light #stage::after{background-image:linear-gradient(rgba(22,24,43,.045) 1p
 <div id="view"><div id="stage">
   <div class="top"><b>未来智能</b> 技术表达<span class="live"></span><span class="snap" id="snapline"></span><span class="r">记录，不是预测 · 2028.10.16</span><button id="theme">配色</button><button id="tog">代码</button></div>
 
-  <section class="ch" data-c="0"><div class="head"><div class="kick">01 · 共同智能空间</div>
+  <section class="ch" data-c="0"><div class="head"><div class="kick">01 · 瓶颈</div>
+    <h1>大家卡在同一处：<em>太大，又太单一</em></h1>
+    <div class="lead">把现在的 AI 和人脑并排拆开看：脑有约 860 亿个神经元<sup>[1]</sup>，只用约 20 瓦<sup>[2]</sup>；它分区<sup>[4]</sup>、只亮一小片<sup>[3]</sup>、边用边学<sup>[5][6]</sup>、几个例子就会<sup>[7]</sup>。现在的 AI 是<b>一整块</b>：全算、学完就冻住、要海量样本、学会要兆瓦时<sup>[8]</sup>。一整块，还意味着<b>出了错，没有谁拦得住</b>。</div></div></section>
+
+  <section class="ch" data-c="1"><div class="head"><div class="kick">02 · 路线</div>
+    <h1>未来智能的路线：<em>群体脑</em>，不是单脑</h1>
+    <div class="lead">合同、财务、设备、客户、法务，<b>各有各的脑</b><sup>[9][10][11]</sup>。图谱把它们连起来：一个问题该谁接、谁来复核，<b>都有规矩</b><sup>[13]</sup>。</div></div>
+    <div class="eq">y = Σ<sub>i ∈ route(q)</sub> w<sub>i</sub> f<sub>i</sub>( U<sub>i</sub> x )<u>分给对的那几个</u></div></section>
+
+  <section class="ch" data-c="2"><div class="head"><div class="kick">03 · 共同智能空间</div>
     <h1>现实里的人和物，都是一个<em>共同智能空间</em>里的投射</h1>
-    <div class="lead">客户业务里的人、文件、业务对象、每一件事，未来智能把它们<b>投射进同一个数学空间</b>。</div>
+    <div class="lead">群体脑靠什么说同一种话？靠一个共同智能空间：客户业务里的人、文件、业务对象、每一件事，都<b>投射进同一个数学空间</b>。</div>
     <div class="stats" id="s0"></div></div>
     <div class="eq">x = φ(现实) ∈ 𝒮<u>投射</u></div></section>
 
-  <section class="ch" data-c="1"><div class="head"><div class="kick">02 · 理解</div>
+  <section class="ch" data-c="3"><div class="head"><div class="kick">04 · 理解</div>
     <h1>AI 在空间里理解现实：<em>定位，量距离</em></h1>
     <div class="lead">AI 不再从一堆原文里猜。一个问题落成空间里的一个点，<b>离它最近的那几个点，就是答案的出处</b>。现实是什么关系，空间里就是什么距离。</div></div>
     <div class="eq">a* = arg min<sub>e</sub> d(q, e)<u>找最近的点</u></div></section>
 
-  <section class="ch" data-c="2"><div class="head"><div class="kick">03 · 投射 · 三套说法</div>
+  <section class="ch" data-c="4"><div class="head"><div class="kick">05 · 投射 · 三套说法</div>
     <h1>三家客户，<em>三套说法</em></h1>
     <div class="lead">每家客户的表格各叫各的：「客户名称」「甲方单位」「签约主体」，<b>说的是同一件事</b>。</div>
     <div class="stats" id="s2"></div></div></section>
 
-  <section class="ch" data-c="3"><div class="head"><div class="kick">04 · 投射 · 并集再消除</div>
+  <section class="ch" data-c="5"><div class="head"><div class="kick">06 · 投射 · 并集再消除</div>
     <h1>先全部并在一起，再把同义的<em>合成一根</em></h1>
     <div class="lead">一根都不丢；合并以后，三家客户的东西<b>第一次放在一起量</b>。</div>
     <div class="stats" id="s3"></div></div>
     <div class="eq">𝒮 = ( D<sub>甲</sub> ∪ D<sub>乙</sub> ∪ D<sub>丙</sub> ) / ∼<u>并集，再消除</u></div></section>
 
-  <section class="ch" data-c="4"><div class="head"><div class="kick">05 · 读空间，不读原文 · 覆盖率</div>
+  <section class="ch" data-c="6"><div class="head"><div class="kick">07 · 读空间，不读原文 · 覆盖率</div>
     <h1>小模型读空间，<em>赶上大模型读原文</em></h1>
     <div class="lead">同一套题，五个规模的<b>第三方开源模型</b>各跑两遍：一遍直接读原文，一遍读空间。只画测过的。</div></div></section>
 
-  <section class="ch" data-c="5"><div class="head"><div class="kick">06 · 读空间，不读原文 · 能耗</div>
+  <section class="ch" data-c="7"><div class="head"><div class="kick">08 · 读空间，不读原文 · 能耗</div>
     <h1>每答一题，能耗<em>低一个量级</em></h1>
     <div class="lead">同样的规模，读空间那条每题只花读原文的零头。拖动看每一档。</div>
     <div class="stats"><div><b class="c" id="k5n"></b><small>模型规模（参数）</small></div><div><b class="a" id="k5e"></b><small>读原文 · J / 题</small></div><div><b class="v" id="k5b"></b><small>读空间 · J / 题</small></div></div></div>
     <div class="ctl"><span>规模</span><input id="scale" type="range" min="0" max="4" step="1" value="4"><output id="scaleo"></output></div></section>
-
-  <section class="ch" data-c="6"><div class="head"><div class="kick">07 · 解构</div>
-    <h1>问题不在大，<em>在单一</em></h1>
-    <div class="lead">把现在的 AI 和人脑并排拆开看：脑有约 860 亿个神经元<sup>[1]</sup>，只用约 20 瓦<sup>[2]</sup>；它分区<sup>[4]</sup>、只亮一小片<sup>[3]</sup>、边用边学<sup>[5][6]</sup>、几个例子就会<sup>[7]</sup>。现在的 AI 是<b>一整块</b>：全算、学完就冻住、要海量样本、学会要兆瓦时<sup>[8]</sup>。</div></div></section>
-
-  <section class="ch" data-c="7"><div class="head"><div class="kick">08 · 方向</div>
-    <h1>从一个庞大的脑，到<em>一个组织</em></h1>
-    <div class="lead">训练方向依然以脑为本：不是再造一个更大的单体，而是<b>数个垂域的脑</b>，由图谱连成组织<sup>[9][10][11]</sup>。图谱把问题分给对的那几个，共同空间让它们读同一批点，互相复核<sup>[13]</sup>。</div></div>
-    <div class="eq">y = Σ<sub>i ∈ route(q)</sub> w<sub>i</sub> f<sub>i</sub>( U<sub>i</sub> x )<u>分给对的那几个</u></div></section>
 
   <section class="ch" data-c="8"><div class="head"><div class="kick">09 · 以脑为本 ① 按需激活</div>
     <h1>一个问题，只亮<em>相关的那一小片</em></h1>
@@ -362,7 +362,7 @@ function decon(t){
     if (i === 4){ along(out, AX - 150, y, AX - 150 + 130*g, y, 40, AM, 1, 1.6); along(out, BX - 150, y, BX - 146, y, 3, VI, 1, 1.6); } });
   return { out, over(a){ text('现在的 AI', AX - 85, 290, AM, a, 14, 800); text('人脑', BX - 85, 290, VI, a, 14, 800);
     AXES.forEach((ax, i) => { const y = Y(i), g = prog(t, .3 + i*.3, .8); text(ax[0], 60, y + 5, INK, a*g, 15, 800, 'left'); text(ax[1], AX + 10, y + 5, MU, a*g, 13, 600, 'left'); text(ax[2], BX + 10, y + 5, MU, a*g, 13, 600, 'left'); seg(60, y + 38, 1140, y + 38, GRY, .25*a*g); });
-    const c = prog(t, 2.4, .8); text('问题不在大，在单一：一个什么都管、学完就冻住的大脑。', CX, 790, CY, a*c, 17, 800); } };
+    const c = prog(t, 2.4, .8); text('越做越大、越做越单一：越贵，越学不动，出了错也没人拦得住。', CX, 790, CY, a*c, 17, 800); } };
 }
 
 /* ---------- 08 方向：数个垂域的脑，由图谱连成组织 ---------- */
@@ -443,7 +443,7 @@ function clients(t){
 function refsPage(t){ const out = [], pr = cam(.4 + t*.05, .3, CX, 700, 120); PTS.forEach(o => { const q = pr(o.p); out.push({ x:q.x, y:q.y, r:1.2*q.k, c:KINDS[o.kind].c, a:.25 }); }); return { out, over(){} }; }
 
 /* ===== 翻页：上一页的坐标系解离，粒子飞到下一页重新聚成 ===== */
-const STEPS = [space, query, fields, merge, coverage, energy, decon, org, sparse, bands, review, moat, clients, refsPage];
+const STEPS = [decon, org, space, query, fields, merge, coverage, energy, sparse, bands, review, moat, clients, refsPage];
 const secs = [...document.querySelectorAll('.ch')], dots = document.getElementById('dots');
 STEPS.forEach((s, i) => { const d = document.createElement('i'); d.title = String(i + 1); d.onclick = () => go(i); dots.appendChild(d); });
 document.getElementById('prev').onclick = () => go(ch - 1); document.getElementById('next').onclick = () => go(ch + 1);
