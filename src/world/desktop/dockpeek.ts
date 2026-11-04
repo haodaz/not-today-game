@@ -58,7 +58,8 @@ export function createDockPeek(root: HTMLElement, run: Run, shown: () => boolean
     const dock = root.querySelector<HTMLElement>(".monitor .dock.auto");
     const mon = dock?.closest<HTMLElement>(".monitor");
     if (!dock || !mon) return;
-    const onDock = !!target?.closest?.(".dock.auto");
+    // On the dock, or on Kuro's pill that peeks with it (R12.2), counts as near.
+    const onDock = !!target?.closest?.(".dock.auto, .dock.auto ~ .kpill");
     peek.move(onDock || atDockEdge(e.clientX, e.clientY, mon.getBoundingClientRect()));
   };
   const leave = () => peek.move(false);

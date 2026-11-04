@@ -119,7 +119,8 @@ function explorer(ctx: AppContext, task: Task, board: TaskBoard, s: BoardState, 
     const seatTag = seat && hasString(`meeting.${seat}`) ? html`<span class="sh-seat">${tr(`meeting.${seat}`)}</span>` : null;
     // An unfilled slot's dot (like an unsaved file): drawn by CSS, no text glyph (R9).
     const dot = filled ? null : html`<span class="sh-dot" aria-hidden="true"></span>`;
-    return html`<button type="button" class="${cls("sh-file", selected === slot.id && "on", session.boardPick && "target")}" data-action="shell-slot" data-slot="${slot.id}"><span class="sh-fn">${name}</span>${seatTag}${dot}</button>`;
+    // R12.1: one line with an ellipsis; the full name in the row's title.
+    return html`<button type="button" class="${cls("sh-file", selected === slot.id && "on", session.boardPick && "target")}" data-action="shell-slot" data-slot="${slot.id}" title="${name}"><span class="sh-fn">${name}</span>${seatTag}${dot}</button>`;
   });
   const found = foundCardIds(board, state.day, events, task.id);
   const placed = new Set(Object.values(s.slots));
@@ -128,10 +129,12 @@ function explorer(ctx: AppContext, task: Task, board: TaskBoard, s: BoardState, 
     .map((c) => {
       if (!found.has(c.id)) {
         const hint = c.hint ?? (hasString("board.notFound") ? t("board.notFound") : "");
-        return html`<div class="sh-file card notfound" aria-disabled="true"><span class="sh-fn">${hint}</span></div>`;
+        return html`<div class="sh-file card notfound" aria-disabled="true" title="${hint}"><span class="sh-fn">${hint}</span></div>`;
       }
       const open = hasViewableSource(board, c.id) ? html`<button type="button" class="sh-src" data-action="shell-source" data-card="${c.id}" aria-label="${paneName("files", task)}" title="${paneName("files", task)}">${ICONS.external}</button>` : null;
-      return html`<div class="${cls("sh-file", "card", session.boardPick === c.id && "picked")}"><button type="button" class="sh-pick" data-action="board-card" data-card="${c.id}">${cardText(board, c.id)}</button>${open}</div>`;
+      // R12.1: long card text is one line with an ellipsis; the full text in the row's title.
+      const text = cardText(board, c.id);
+      return html`<div class="${cls("sh-file", "card", session.boardPick === c.id && "picked")}" title="${text}"><button type="button" class="sh-pick" data-action="board-card" data-card="${c.id}">${text}</button>${open}</div>`;
     });
   const lock = lockRow(board, s, state, events, session);
   const body = html`${lock ? html`<div class="sh-lock">${lock}</div>` : null}${folder(ide ? "board.ide.pages" : "board.slots", slotRows)}${folder("board.ide.sources", cardRows)}`;

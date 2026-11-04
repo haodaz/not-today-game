@@ -39,6 +39,11 @@ html,body{margin:0;background:#2b2e33;font-family:var(--font);color:var(--ink);f
 .dock{transition:transform .25s ease}
 .dock.auto{transform:translate(-50%,calc(100% + 24px));z-index:9}
 .dock.auto.peek{transform:translateX(-50%)}
+/* shell R12.2: Kuro's pill (the dock's next sibling in .os) hides and peeks with it; Kuro's
+   portrait (the HUD body, outside .os) stays where it is. */
+.kpill{transition:transform .25s ease,opacity .25s ease}
+.dock.auto ~ .kpill{transform:translateY(calc(100% + 40px));opacity:0;pointer-events:none}
+.dock.auto.peek ~ .kpill{transform:none;opacity:1;pointer-events:auto}
 /* The app name over its icon on hover/focus (desktop-ui 2026-11-02, point 2). */
 .dock .app .dock-name{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);white-space:nowrap;background:rgba(20,24,30,.9);color:#fff;font-size:12px;padding:3px 8px;border-radius:6px;opacity:0;pointer-events:none;transition:opacity .12s}
 .dock .app:hover .dock-name,.dock .app:focus-visible .dock-name{opacity:1}
@@ -648,6 +653,13 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .wb .sh-chip:disabled{opacity:.4;cursor:default}
 /* The explorer (R2): a VS Code tree — folder rows 28, file rows 26, 13 px, 8 indent per level. */
 .wb .sh-folder{display:flex;flex-direction:column}
+/* R12.1: the rows keep their own heights, top-aligned, never stretched to the card; the body
+   scrolls on overflow. A card row is `.sh-file.card`: none of 工作台 home's `.wb .card` box applies. */
+.wb .sh-explorer-card .sh-card-b{display:block;overflow-y:auto;overflow-x:hidden}
+.wb .sh-folder,.wb .sh-lock{flex:0 0 auto}
+.wb .sh-frow,.wb .sh-file{flex:0 0 auto}
+.wb .sh-file.card{min-height:0;padding:0 8px 0 24px;border:0;border-radius:0;background:transparent;box-shadow:none}
+.wb .sh-file.card.picked{background:#E3ECFA}
 .wb .sh-frow{height:28px;display:flex;align-items:center;gap:4px;padding:0 8px;font-size:13px;font-weight:500;color:#1F1F1F}
 .wb .sh-tw{width:12px;color:#6B6B6B;display:inline-flex}.wb .sh-tw .ic{width:12px;height:12px}
 .wb .sh-file{height:26px;display:flex;align-items:center;gap:6px;width:100%;box-sizing:border-box;padding:0 8px 0 24px;border:0;background:transparent;font:inherit;font-size:13px;color:#1F1F1F;text-align:left;cursor:pointer}

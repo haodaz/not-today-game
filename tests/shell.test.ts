@@ -239,20 +239,20 @@ describe("R2 · the explorer", () => {
     const h = onPage(store);
     const out = h.out();
     expect(out).toMatch(new RegExp(`<span class="sh-tw"><svg[^>]*>.*?</svg></span>${escapeHtml(t("board.ide.pages"))}`));
-    expect(out).toContain('<button type="button" class="sh-file on" data-action="shell-slot" data-slot="s1"><span class="sh-fn">base.js</span><span class="sh-dot" aria-hidden="true"></span></button>');
-    expect(out).toContain('data-slot="s2"><span class="sh-fn">data.js</span><span class="sh-dot"');
+    expect(out).toContain('<button type="button" class="sh-file on" data-action="shell-slot" data-slot="s1" title="base.js"><span class="sh-fn">base.js</span><span class="sh-dot" aria-hidden="true"></span></button>');
+    expect(out).toContain('data-slot="s2" title="data.js"><span class="sh-fn">data.js</span><span class="sh-dot"');
     expect(out).toContain(`${escapeHtml(t("board.ide.sources"))}</div>`);
     expect(out).toContain('<button type="button" class="sh-pick" data-action="board-card" data-card="a1">card-a1</button>');
-    expect(out).toContain('<div class="sh-file card notfound" aria-disabled="true"><span class="sh-fn">hint-a2</span></div>');
+    expect(out).toContain('<div class="sh-file card notfound" aria-disabled="true" title="hint-a2"><span class="sh-fn">hint-a2</span></div>');
     expect(out).toMatch(/<div class="sh-lock"><div class="block-row"><button type="button" class="block" data-action="board-lock">/);
     expect(out).toContain(escapeHtml(t("board.lock.useObject", { object: t("obj.name.chick") })));
     h.act("board-card", { card: "a1" });
-    expect(h.out()).toContain('<div class="sh-file card picked"><button type="button" class="sh-pick" data-action="board-card" data-card="a1">');
+    expect(h.out()).toContain('<div class="sh-file card picked" title="card-a1"><button type="button" class="sh-pick" data-action="board-card" data-card="a1">');
     // A slot row in the explorer places the picked card (the board's own fill op) and selects it.
     h.act("shell-slot", { slot: "s2" });
     expect(lastStep(store)).toMatchObject({ op: { t: "fill", slot: "s2", card: "a1" } });
     const after = h.out();
-    expect(after).toContain('<button type="button" class="sh-file on" data-action="shell-slot" data-slot="s2"><span class="sh-fn">data.js</span></button>');
+    expect(after).toContain('<button type="button" class="sh-file on" data-action="shell-slot" data-slot="s2" title="data.js"><span class="sh-fn">data.js</span></button>');
     expect(after).not.toContain('data-card="a1"');
   });
 
@@ -658,5 +658,59 @@ describe("R11.2 · the dock over full-screen 工作台", () => {
     expect(h.session.dockPeek).toBe(true);
     shellActions["dock-peek"]!(h.ctx, { on: "0" } as DOMStringMap, null as never);
     expect(h.session.dockPeek).toBe(false);
+  });
+});
+
+// ——— R12: explorer rows at their own height; Kuro's pill with the dock ———
+
+describe("R12.1 · explorer rows keep their height, top-aligned; long text one line with its title", () => {
+  const css = () => readFileSync(resolve(__dirname, "../src/world/desktop/desktop.css"), "utf8");
+  it("the rows are 28 / 26 px and never grow; the body scrolls; 工作台 home's card box does not reach a card row", () => {
+    const c = css();
+    expect(c).toMatch(/\.wb \.sh-frow\{height:28px/);
+    expect(c).toMatch(/\.wb \.sh-file\{height:26px/);
+    expect(c).toContain(".wb .sh-frow,.wb .sh-file{flex:0 0 auto}");
+    expect(c).toContain(".wb .sh-explorer-card .sh-card-b{display:block;overflow-y:auto;overflow-x:hidden}");
+    // `.wb .card` (home's cards: 150 px tall, padded) also matches `.sh-file.card`; the override comes after it.
+    const home = c.indexOf(".wb .card{");
+    const over = c.indexOf(".wb .sh-file.card{min-height:0;padding:0 8px 0 24px;border:0");
+    expect(home).toBeGreaterThan(-1);
+    expect(over).toBeGreaterThan(home);
+    expect(c).toMatch(/\.wb \.sh-pick\{[^}]*white-space:nowrap;overflow:hidden;text-overflow:ellipsis/);
+    expect(c).toMatch(/\.wb \.sh-fn\{[^}]*white-space:nowrap;overflow:hidden;text-overflow:ellipsis/);
+  });
+  it("every row carries its full text in `title`", () => {
+    const out = onPage().out();
+    const rows = [...out.matchAll(/<(?:div|button) [^>]*class="sh-file[^"]*"[^>]*>/g)].map((m) => m[0]);
+    expect(rows.length).toBeGreaterThanOrEqual(5);
+    for (const r of rows) expect(r, r).toMatch(/ title="[^"]+"/);
+    expect(out).toContain('<div class="sh-file card" title="card-a1"><button type="button" class="sh-pick" data-action="board-card" data-card="a1">card-a1</button>');
+  });
+});
+
+describe("R12.2 · Kuro's pill hides and peeks with the dock over 工作台", () => {
+  const desk = (patch: Partial<Session>) => {
+    const store = day1();
+    const h = harness(store);
+    Object.assign(h.session, { focus: "left" }, patch);
+    return renderDesktop(buildShell(store.getState(), store.getEvents(), h.session, desktopApps, 0, 1)).value;
+  };
+  it("the pill is the dock's next sibling, so the dock's auto / peek reach it", () => {
+    for (const patch of [{ leftApp: "workbench" as const }, { leftApp: "workbench" as const, dockPeek: true }]) {
+      const out = desk(patch);
+      const at = out.indexOf('<div class="dock auto');
+      const end = out.indexOf('<button type="button" class="kpill');
+      expect(at).toBeGreaterThan(-1);
+      expect(end).toBeGreaterThan(at);
+      // Only the dock's own markup between them (its tiles), no other element after its closing tag.
+      expect(out.slice(at, end)).toMatch(/<\/div>$/);
+    }
+  });
+  it("hidden with the dock, shown when it peeks; Kuro's portrait (the body) is not touched; other apps keep the pill", () => {
+    const c = readFileSync(resolve(__dirname, "../src/world/desktop/desktop.css"), "utf8");
+    expect(c).toContain(".dock.auto ~ .kpill{transform:translateY(calc(100% + 40px));opacity:0;pointer-events:none}");
+    expect(c).toContain(".dock.auto.peek ~ .kpill{transform:none;opacity:1;pointer-events:auto}");
+    expect(c).not.toMatch(/\.dock\.auto[^{]*(kpet|hud-kuro|kuro-btn)/);
+    expect(desk({ leftApp: "browser" })).toContain('<div class="dock">');
   });
 });

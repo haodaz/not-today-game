@@ -2115,3 +2115,20 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
   that read the old pane thread. `tests/__snapshots__/desktop-snapshots.test.ts.snap` was regenerated
   (the dock's `auto` class on 工作台 scenes).
 - `npx tsc --noEmit`: clean. `npx vitest run`: 108 files / 1941 tests passed.
+
+## shell task 9 (R12): explorer rows at their own height; Kuro's pill with the dock (2026-11-04)
+
+- R12.1, the cause: a 素材 row is `.sh-file.card`, and 工作台 home's `.wb .card` rule
+  (`min-height:150px`, padding, a border) matched it too. That is what spread the rows over the card.
+  - `desktop.css` overrides it for `.wb .sh-file.card`: no min height, the row's own padding, no box.
+  - Rows and folders don't flex (`flex:0 0 auto`, folder 28 / file 26 as R1).
+  - The explorer body is a block that scrolls on overflow (`overflow-y:auto`).
+  - Long text stays one line with an ellipsis (`.sh-fn` / `.sh-pick`).
+  - `shell.ts` puts the full text in each row's `title`: slot rows, found card rows, not-yet-found rows.
+- R12.2: Kuro's pill is the dock's next sibling in `.os`. `.dock.auto ~ .kpill` hides it (slides
+  down, transparent, not clickable) and `.dock.auto.peek ~ .kpill` brings it back with the dock.
+  `dockpeek.ts` counts the pointer on the pill as on the dock, so it doesn't hide under the pointer.
+  Kuro's portrait (the HUD body) is untouched.
+- Tests: 4 new R12 tests in `tests/shell.test.ts`. Updated the explorer row strings in `shell` (4) and
+  `meeting` (2) for the new `title`.
+- `npx tsc --noEmit`: clean. `npx vitest run`: 108 files / 1945 tests passed.
