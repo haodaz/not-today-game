@@ -383,11 +383,13 @@ export const loopActions: Record<string, ActionHandler> = {
     const doc = data.doc;
     if (!doc) return;
     const page = deliverablePage(doc);
-    // Switch to the browser on the shown monitor (its leftApp), open the page, log the open once.
+    // Switch to the browser on the shown monitor (its leftApp), open the page, log the open once a
+    // day (a board card can come from a page posted days ago: day 3's trap is Vivi's day-2 page).
     ctx.session.leftApp = "browser";
     ctx.session.focus = "left";
     ctx.session.browserDoc = page;
-    if (!ctx.store.getEvents().some((e) => e.kind === "open" && e.target === `file:${doc}`)) {
+    const day = ctx.store.getState().day;
+    if (!ctx.store.getEvents().some((e) => e.kind === "open" && e.day === day && e.target === `file:${doc}`)) {
       ctx.store.appendEvent({ kind: "open", target: `file:${doc}`, t: ctx.session.clock.time });
     }
     settleSession(ctx.session);
