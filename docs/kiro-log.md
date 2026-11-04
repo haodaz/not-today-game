@@ -2059,3 +2059,30 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
   - a name for 窗 at `hud.cam.window` (zh + en). 拿去{face}那边用。 reads it, and until it exists it
     shows as ⟦hud.cam.window⟧.
 - `npx tsc --noEmit`: clean. `npx vitest run`: 106 files / 1915 tests passed.
+
+## pager-foreign: pages that are not the child's, on the same line (2026-11-04)
+
+- R1: `src/state/hands.ts` adds `parseForeign` and `pagerForeign`. The loader is strict:
+  - top-level keys `_note` and `pages`; page keys `day`, `t` and `text`;
+  - `day` 1–18; `t` HH:MM; `text` digits and spaces only;
+  - at most `FOREIGN_PER_DAY` = 6 pages a day, sorted by day, then `t`.
+  
+  The file is read through `import.meta.glob`, as `content/frames/chick.json` is, so the game runs with
+  no foreign pages until Claude writes `content/pager-foreign.json`. kid.json and `parseKid` are
+  unchanged.
+- R2:
+  - `arrivedMessages(state, events, schedule, time, foreign)` adds the foreign pages whose time has
+    come (`t <= session.clock.time` today; every page of an earlier day). It keeps them in arrival
+    order, oldest first. `envFor` and the buzz pass the clock time.
+  - The child's message has no time of its own. It sorts at the start of its day, or at the first
+    reply's `t` when it waits for a reply.
+  - A foreign page is a `PagerMessage` with `foreign: true` and `meaning` = its digits, so the upgraded
+    scroll shows only the digits too.
+  - The pager's state gains `seen`, the count of today's messages at the last 读. A page that comes
+    later lights the envelope again. 读 / ↑ / ↓ and the 10-message history are unchanged.
+  - The once-a-day buzz is unchanged.
+  - The calculator reply rule has no code, so there is nothing to change.
+- R3: new `tests/pager-foreign.test.ts` (18).
+- For Claude: `content/pager-foreign.json` with the day-8 pages (`009 200`, `003 026`, `002 031`)
+  and their times.
+- `npx tsc --noEmit`: clean. `npx vitest run`: 107 files / 1933 tests passed.

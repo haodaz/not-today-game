@@ -5,7 +5,8 @@
 //                            recordings, the phone's SIM line;
 //   content/dictionary.json → the pocket dictionary's whole vocabulary;
 //   content/calculator.json → digit → letter upside down, the strings to find, the unasked numbers;
-//   content/kid.json        → the pager's schedule (the child's numbers; never rewritten here).
+//   content/kid.json        → the pager's schedule (the child's numbers; never rewritten here);
+//   content/pager-foreign.json → pages on the same line that are not the child's (optional).
 // recognise.ts reads the question half of objects.json; this file reads the hand half.
 import objectsRaw from "@content/objects.json";
 import dictionaryRaw from "@content/dictionary.json";
@@ -309,6 +310,11 @@ export interface PagerMessage {
   readonly meaning: string;
   /** Arrives only after the player's first reply that day (content's `after`). */
   readonly afterReply: boolean;
+  /**
+   * pager-foreign R2: a page that is not the child's, on the same line (content/pager-foreign.json):
+   * only its digits (its `meaning` is its text: no name, no decoding); it cannot be answered.
+   */
+  readonly foreign?: true;
 }
 export function parseKid(input: unknown): readonly PagerMessage[] {
   const fail: Fail = failer("kid.json");
@@ -329,3 +335,50 @@ export function parseKid(input: unknown): readonly PagerMessage[] {
   );
 }
 export const pagerSchedule = parseKid(kidRaw);
+
+// ——— pages that are not the child's (content/pager-foreign.json; pager-foreign R1) ———
+
+/** One foreign page: it arrives at `t` (the game clock, HH:MM) on its day. */
+export interface ForeignPage {
+  readonly day: number;
+  readonly t: string;
+  readonly text: string;
+}
+/** At most this many foreign pages a day. */
+export const FOREIGN_PER_DAY = 6;
+const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
+const DIGITS_SPACES = /^[0-9 ]+$/;
+
+/** Strict: days 1–18, `t` HH:MM, digits and spaces only, at most six a day, sorted by day then t. */
+export function parseForeign(input: unknown): readonly ForeignPage[] {
+  const fail: Fail = failer("pager-foreign.json");
+  if (!isRecord(input)) fail("", "not an object");
+  keysOf(input, ["_note", "pages"], "top level", fail);
+  if (input._note !== undefined && typeof input._note !== "string") fail("_note", "must be a string");
+  if (!Array.isArray(input.pages)) fail("pages", "must be a list");
+  const perDay = new Map<number, number>();
+  let prev: ForeignPage | null = null;
+  return Object.freeze(
+    input.pages.map((v, i) => {
+      const w = `pages[${i}]`;
+      if (!isRecord(v)) fail(w, "must be an object {day, t, text}");
+      keysOf(v, ["day", "t", "text"], w, fail);
+      const day = int(v.day, `${w}.day`, fail);
+      if (day < 1 || day > 18) fail(`${w}.day`, "must be a day 1–18");
+      const t = str(v.t, `${w}.t`, fail);
+      if (!HHMM.test(t)) fail(`${w}.t`, `must be HH:MM, got "${t}"`);
+      const text = str(v.text, `${w}.text`, fail);
+      if (!DIGITS_SPACES.test(text)) fail(`${w}.text`, `digits and spaces only, got "${text}"`);
+      const n = (perDay.get(day) ?? 0) + 1;
+      if (n > FOREIGN_PER_DAY) fail(`${w}.day`, `at most ${FOREIGN_PER_DAY} pages a day (day ${day})`);
+      perDay.set(day, n);
+      if (prev && (day < prev.day || (day === prev.day && t < prev.t))) fail(w, "pages must be sorted by day, then t");
+      prev = Object.freeze({ day, t, text });
+      return prev;
+    }),
+  );
+}
+// Optional until Claude writes it (as content/frames/chick.json): absent = no foreign pages.
+const foreignFiles = import.meta.glob("../../content/pager-foreign.json", { eager: true, import: "default" });
+const foreignRaw = Object.values(foreignFiles)[0];
+export const pagerForeign: readonly ForeignPage[] = foreignRaw === undefined ? Object.freeze([]) : parseForeign(foreignRaw);

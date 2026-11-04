@@ -280,7 +280,7 @@ export function createHandLayer() {
       const { store, session } = ctx;
       const state = store.getState();
       if (session.hand.buzzed === state.day || !isHeld("pager", state) || state.ending !== "none") return;
-      if (!arrivedMessages(state, store.getEvents()).some((m) => m.day === state.day)) return;
+      if (!arrivedMessages(state, store.getEvents(), undefined, session.clock.time).some((m) => m.day === state.day)) return;
       session.hand.buzzed = state.day;
       session.hand.jumpUntil = now() + BUZZ_JUMP_MS;
       ctx.play?.("pager-buzz");

@@ -2,7 +2,7 @@
 // next state, the cap going down for 80 ms, the key sound, a sequence for the box. Nothing here
 // appends a world event (objects-in-hand FR1).
 import type { GameEvent } from "@state/events";
-import { pagerSchedule, type PagerMessage } from "@state/hands";
+import { pagerForeign, pagerSchedule, type ForeignPage, type PagerMessage } from "@state/hands";
 import { inDream } from "@state/nights";
 import type { State } from "@state/types.gen";
 import { choiceOf } from "@state/days/effects";
@@ -34,9 +34,32 @@ export const programOf = (id: string): Program<unknown> | null => PROGRAMS[id] ?
 export const KEY_DOWN_MS = 80;
 
 /** The pager's messages so far: earlier days', and today's once it has come (after the first reply, where content says so). */
-export function arrivedMessages(state: Pick<State, "day">, events: readonly GameEvent[], schedule: readonly PagerMessage[] = pagerSchedule): PagerMessage[] {
-  const replied = events.some((e) => e.kind === "reply" && e.day === state.day && e.recipient !== undefined);
-  return schedule.filter((m) => m.day < state.day || (m.day === state.day && (!m.afterReply || replied)));
+export function arrivedMessages(
+  state: Pick<State, "day">,
+  events: readonly GameEvent[],
+  schedule: readonly PagerMessage[] = pagerSchedule,
+  /** The game clock now (HH:MM); null = no foreign page of today has come yet. */
+  time: string | null = null,
+  foreign: readonly ForeignPage[] = pagerForeign,
+): PagerMessage[] {
+  const reply = events.find((e) => e.kind === "reply" && e.day === state.day && e.recipient !== undefined);
+  const kid = schedule.filter((m) => m.day < state.day || (m.day === state.day && (!m.afterReply || reply !== undefined)));
+  // pager-foreign R2: a foreign page comes at its `t` on its day, on the same line, oldest first by
+  // when it came. The child's message has no time of its own: it is there from the day's start, or
+  // (after-reply) from the reply's time.
+  const pages = foreign.filter((p) => p.day < state.day || (p.day === state.day && time !== null && p.t <= time));
+  if (pages.length === 0) return kid;
+  const replyAt = (day: number) => {
+    const e = events.find((x) => x.kind === "reply" && x.day === day && x.recipient !== undefined);
+    return e?.kind === "reply" ? (e.t ?? "") : "";
+  };
+  const kidAt = (m: PagerMessage) => (m.afterReply ? replyAt(m.day) : "");
+  const all = [
+    ...kid.map((m, i) => ({ m, day: m.day, at: kidAt(m), n: i })),
+    ...pages.map((p, i) => ({ m: Object.freeze({ day: p.day, text: p.text, meaning: p.text, afterReply: false, foreign: true as const }), day: p.day, at: p.t, n: kid.length + i })),
+  ];
+  all.sort((a, b) => a.day - b.day || (a.at < b.at ? -1 : a.at > b.at ? 1 : a.n - b.n));
+  return all.map((x) => x.m);
 }
 
 /** How many times the card has been held up to the hand (one pinch mark each). */
@@ -56,7 +79,7 @@ export function envFor(state: State, events: readonly GameEvent[], session: Sess
     t,
     seed: `${runId}:${state.day}:${id}`,
     lit: state.upgraded[id] === true ? 1 : lightLevel(session.hand.inLight, session.hand.leftLightAt, t),
-    pager: arrivedMessages(state, events),
+    pager: arrivedMessages(state, events, pagerSchedule, session.clock.time),
     uses: cardUses(events),
   };
 }

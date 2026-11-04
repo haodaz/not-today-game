@@ -32,14 +32,23 @@ export interface PagerState {
   readonly backlight: boolean;
   /** Today's message was read with `read` this session. */
   readonly read: boolean;
+  /**
+   * pager-foreign R2: how many of today's messages had come at the last `read`; one that comes
+   * later (a foreign page at its time) lights the envelope again.
+   */
+  readonly seen: number;
   /** Kuro's press tracker (object-upgrade 2026-11-03). */
   readonly press: KuroPress;
 }
 
 /** The ten kept, newest first (the oldest are pushed out). */
 export const pagerHistory = (env: ObjectEnv) => [...env.pager].reverse().slice(0, PAGER_HISTORY);
-/** Today's message, if it has arrived. */
-export const todaysMessage = (env: ObjectEnv) => env.pager.find((m) => m.day === env.day) ?? null;
+/** Today's messages that have come (the child's and the foreign pages), oldest first. */
+export const todaysMessages = (env: ObjectEnv) => env.pager.filter((m) => m.day === env.day);
+/** Today's newest message, if one has arrived. */
+export const todaysMessage = (env: ObjectEnv) => todaysMessages(env).at(-1) ?? null;
+/** A message came today that was not there at the last `read`: the envelope blinks. */
+export const pagerUnread = (s: PagerState, env: ObjectEnv): boolean => todaysMessages(env).length > s.seen;
 
 /** What the digits say now. */
 export function pagerText(s: PagerState, env: ObjectEnv): string | null {
@@ -67,7 +76,7 @@ function battery(b: Bits, bars: number): void {
 
 export function drawPager(s: PagerState, env: ObjectEnv): Frame {
   const text = pagerText(s, env);
-  const unread = todaysMessage(env) !== null && !s.read;
+  const unread = pagerUnread(s, env);
   if (env.upgraded) {
     // The new world reads it for you, unasked: every message's meaning, scrolling — until Kuro,
     // moved in, fills the hi screen itself (a glimpse on loan, only Kuro once taken; object-upgrade).
@@ -95,7 +104,7 @@ export const pager: Program<PagerState> = {
   id: "pager",
   channel: { w: PAGER_W, h: PAGER_H },
   keySound: { id: "key-press", rate: 1.5 },
-  init: () => ({ view: "dark", index: 0, backlight: false, read: false, press: NO_PRESS }),
+  init: () => ({ view: "dark", index: 0, backlight: false, read: false, seen: 0, press: NO_PRESS }),
   key(s, key, env) {
     // Every key bumps Kuro's press tracker (object-upgrade 2026-11-03).
     s = { ...s, press: pressed(s.press, env.t) };
@@ -104,7 +113,7 @@ export const pager: Program<PagerState> = {
     const n = pagerHistory(env).length;
     switch (key) {
       case "read":
-        return step({ ...s, view: "msg", index: 0, read: s.read || todaysMessage(env) !== null });
+        return step({ ...s, view: "msg", index: 0, read: s.read || todaysMessage(env) !== null, seen: todaysMessages(env).length });
       case "up":
         return step({ ...s, view: "msg", index: Math.min(Math.max(0, n - 1), s.view === "msg" ? s.index + 1 : 0) });
       case "down":
