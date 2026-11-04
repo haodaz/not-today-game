@@ -81,22 +81,26 @@ describe("a locked conversation is derived from the log", () => {
 describe("the screen switches are refused while locked — and land on the locked conversation", () => {
   const box = (ctx: ActionContext) => ctx.session.dialogue.queue.map((q) => q.lines.map((l) => l.t).join("")).join("|");
 
-  it("refuses dock / screen / wb-nav / feed with the vivi.lock line; a refused switch logs nothing and lands on the locked conversation (group, in 工作台's 消息 pane)", () => {
+  it("refuses dock / screen / wb-nav / feed / win-move / mc-focus with the vivi.lock line; a refused switch logs nothing and lands on the locked conversation (group, in 听听)", () => {
     setViviLockForTests("vivi-plan-1", "group");
-    for (const [name, data] of [["dock", { app: "browser" }], ["screen", { screen: "right" }], ["wb-nav", { page: "docs" }], ["feed", {}]] as const) {
+    const switches = [["dock", { app: "browser" }], ["screen", { screen: "right" }], ["wb-nav", { page: "docs" }], ["feed", {}], ["win-move", { app: "workbench", side: "right" }], ["mc-focus", { app: "workbench" }]] as const;
+    for (const [name, data] of switches) {
       const store = createStore({ startDay: 1 });
       const ctx = ctxOf(store);
       // Start it somewhere a refused switch would otherwise have moved: not on the group yet.
       ctx.session.leftApp = "msgs";
-      ctx.session.workbenchPage = "home";
+      ctx.session.focus = "left";
+      ctx.session.mcOpen = name === "mc-focus";
       const before = store.getEvents().length;
       loopActions[name]!(ctx, data as DOMStringMap, null as never);
       expect(box(ctx), `${name} shows the lock line`).toContain(t("vivi.lock"));
       expect(store.getEvents().length, `${name} logs nothing`).toBe(before);
-      // The camera moved to the group's conversation, in 工作台's 消息 pane (never a dead end).
-      expect(ctx.session.leftApp, `${name} opened 工作台`).toBe("workbench");
-      expect(ctx.session.workbenchPage, `${name} opened the 消息 pane`).toBe("msgs");
+      // The camera moved to the group's conversation, in 听听 on its monitor (never a dead end).
+      expect(ctx.session.rightApp, `${name} brought 听听 to the front`).toBe("tingtalk");
+      expect(ctx.session.focus, `${name} shows 听听's monitor`).toBe("right");
       expect(ctx.session.conversation, `${name} selected the group`).toBe("group");
+      expect(ctx.session.place.workbench, `${name} moved nothing`).toBe("left");
+      expect(ctx.session.mcOpen).toBe(false);
     }
   });
 

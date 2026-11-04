@@ -409,8 +409,8 @@ describe("a real day: day 7 boot, the room line first, the 老板 line only afte
     expect(onShow(ctx)).toBe(seq.say[1]!.t);
     act(ctx, "view", { view: "room" });
     expect(onShow(ctx)).toBeNull();
-    // Back in, 工作台 still in front on its 消息 pane with the boss open.
-    act(ctx, "view", { view: "desktop", screen: "left" });
+    // Back in on 听听's monitor (the right one, tingtalk 2026-11-04), the boss still open.
+    act(ctx, "view", { view: "desktop", screen: "right" });
     expect(onShow(ctx)).toBe(seq.say[1]!.t);
   });
 });
@@ -429,7 +429,7 @@ describe("the third level: screen:msgs:<conversation>, screen:workbench:<page>",
 
   it("matches exactly, in whichever app holds the conversation; never one level up", () => {
     const h = (app: string, conversation: string | null, page: string | null = null): Here => ({ view: "desktop", app, night: false, conversation, page });
-    expect(placeMatches("screen:msgs:boss", h("workbench", "boss", "msgs"))).toBe(true);
+    expect(placeMatches("screen:msgs:boss", h("tingtalk", "boss"))).toBe(true);
     expect(placeMatches("screen:msgs:clan", h("msgs", "clan"))).toBe(true);
     expect(placeMatches("screen:msgs:boss", h("msgs", "clan"))).toBe(false);
     expect(placeMatches("screen:msgs:boss", h("msgs", null))).toBe(false); // the 消息 list, 朋友圈

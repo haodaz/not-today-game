@@ -165,7 +165,8 @@ describe("7. the workbench home's title is the app's name alone", () => {
   const title = (page: Session["workbenchPage"]) => {
     const store = createStore({ startDay: 1 });
     store.appendEvent(step("boot"));
-    const session = initialSession({ beat: "work", time: "10:00" }, "right", "desktop");
+    // 工作台 is on the left monitor by default (tingtalk 2026-11-04).
+    const session = initialSession({ beat: "work", time: "10:00" }, "left", "desktop");
     session.workbenchPage = page;
     const out = renderDesktop(buildShell(store.getState(), store.getEvents(), session, desktopApps)).value;
     return /<span class="brand">[^<]*<\/span><span>([^<]*)<\/span>/.exec(out)![1];

@@ -41,29 +41,31 @@ describe("the dock is icons", () => {
   it("the name is the title, the aria-label and a hover label; the open app has the dot class", () => {
     for (const day of [1, 7]) {
       const bar = dockOf(shown(day));
-      for (const [app, key] of [["msgs", "dock.msgs"], ["workbench", "dock.workbench"], ["browser", "dock.browser"]] as const) {
+      for (const [app, key] of [["msgs", "dock.msgs"], ["tingtalk", "dock.tingtalk"], ["workbench", "dock.workbench"], ["browser", "dock.browser"]] as const) {
         // The icon is the only image; the title and aria-label carry the name.
         expect(bar).toContain(`data-app="${app}" title="${t(key)}" aria-label="${t(key)}"><img src="/os/${app}.svg" alt=""`);
         // The visible hover label repeats the name but is decorative (aria-hidden), so it is read once.
         expect(bar, `${app} hover label`).toContain(`<span class="dock-name" aria-hidden="true">${t(key)}</span>`);
       }
       // The only text outside tags is the badge counts and the dock names (the hover labels).
-      const names = [t("dock.msgs"), t("dock.workbench"), t("dock.browser")].join("");
       const left = bar.replace(/<span class="badge">\d+<\/span>/g, "").replace(/<span class="dock-name"[^>]*>[^<]*<\/span>/g, "").replace(/<[^>]*>/g, "");
       expect(left, `day ${day}`).toBe("");
-      void names;
-      expect(bar.match(/class="app (?:msgs|docs|feed) on"/g)).toHaveLength(1);
+      expect(bar.match(/class="app (?:msgs|tt|docs|feed) on"/g)).toHaveLength(1);
     }
   });
 
-  it("the open app follows leftApp; the other monitor's tab keeps its text", () => {
+  it("the open app is the one in front on the monitor shown; the other monitor's tab lists its windows with their unread", () => {
     const page = shown(1, {}, "browser");
     expect(dockOf(page)).toContain('class="app feed on" data-action="dock" data-app="browser"');
-    // Its text, and (since the work conversations live in 工作台) their unread count after it.
-    expect(page).toMatch(new RegExp(`<span class="tab-app docs">${t("dock.workbench")}(<b>\\d+</b>)?</span>`));
+    // The right monitor has 听听 (tingtalk 2026-11-04): its name, and the work conversations' unread after it.
+    expect(page).toMatch(new RegExp(`<span class="tab-app tt">${t("dock.tingtalk")}<b>\\d+</b></span>`));
+    // 听听 and Hi信 have their own unread on their tiles.
+    const bar = dockOf(page);
+    expect(bar).toMatch(/data-app="tingtalk"[^>]*><img[^>]*><span class="badge">\d+<\/span>/);
+    expect(bar).toMatch(/data-app="msgs"[^>]*><img[^>]*><span class="badge">\d+<\/span>/);
   });
 
-  it("the icon files exist", () => {
+  it("the icon files exist (听听's own is still to come: public/os/tingtalk.svg)", () => {
     for (const app of ["msgs", "workbench", "browser", ...dockApps.map((a) => a.id)]) {
       expect(existsSync(resolve(__dirname, "..", "public", "os", `${app}.svg`)), app).toBe(true);
     }
@@ -141,10 +143,10 @@ describe("dockFor(day)", () => {
 });
 
 describe("decoys on the dock", () => {
-  it("come after the three real apps, behind one thin separator, in file order, with no badge", () => {
+  it("come after the four real apps, behind one thin separator, in file order, with no badge", () => {
     const bar = dockOf(shown(1));
     const order = [...bar.matchAll(/data-(?:app|decoy)="(\w+)"/g)].map((m) => m[1]);
-    expect(order).toEqual(["msgs", "workbench", "browser", ...dockApps.map((a) => a.id)]);
+    expect(order).toEqual(["msgs", "tingtalk", "workbench", "browser", ...dockApps.map((a) => a.id)]);
     expect(bar.match(/role="separator"/g)).toHaveLength(1);
     expect(bar.indexOf('role="separator"')).toBeGreaterThan(bar.indexOf('data-app="browser"'));
     expect(bar.indexOf('role="separator"')).toBeLessThan(bar.indexOf('data-decoy="claude"'));

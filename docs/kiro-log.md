@@ -1966,3 +1966,35 @@ Spec: `.kiro/specs/shell/requirements.md`, tasks 1–5.
   `ide.test.ts` (the new `ideSrc` query), `meeting.test.ts` and `workspace.test.ts` (the shell's
   cards instead of the old columns).
 - `npx tsc --noEmit`: clean. `npx vitest run`: 104 files / 1869 tests passed.
+
+## tingtalk: 听听 / TingTalk, window placement, 调度中心 (2026-11-04)
+
+Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
+
+- 听听 (R1): `APPS` is Hi信 (`msgs`), 听听 (`tingtalk`), 工作台, 浏览器. `renderTingTalk` is the old
+  工作台·消息 pane moved unchanged (`renderWorkMessages` inside a `.wb.tt` window); `ThreadApp` is
+  `tingtalk | msgs`. 工作台 lost its 消息 page, rail item and the work unread in its badge.
+- Placement (R1b): new `src/world/desktop/placement.ts` — each app's monitor (`place`), the open
+  windows back to front (`stack`), the front window per monitor (`leftApp` / `rightApp`, null =
+  an empty display); `bringToFront`, `moveApp`, `windowsOn`. Default: 工作台 left, 听听 right (Hi信
+  and the browser left). A dock tile brings its window to the front and shows its monitor.
+  Remembered for the run in `nt_place` (keyed by run id; a fresh run starts default; debug runs
+  keep nothing) via `DesktopDeps.placement`, saved on change at render.
+- Window moves (R1b): the green traffic light's hover menu 移到左屏 / 移到右屏 (`win-move`, the
+  current one disabled); new `src/world/desktop/windrag.ts` — the title-bar drag across the
+  monitor's inner edge and the 调度中心 drag onto a screen thumbnail, both `win-move`.
+- 调度中心 (R1b): the top-bar button (`mc-toggle`) and F3; Esc closes it first; two screen
+  thumbnails on top (drop targets), every open window as an inert scaled picture with its name
+  (`mc-focus` closes it and focuses the window); no other controls.
+- R2: `openApp:msgs` (unchanged) is stepped by looking at 听听; Hi信 steps nothing. The Vivi lock
+  lands on its conversation in 听听 (also refuses `win-move` / `mc-focus`). A conversation card's ↗
+  opens that thread in 听听 on the monitor that is not 工作台's (and logs `open conv:<id>`).
+  `screen:msgs` places match Hi信 and 听听.
+- `desktop.css`: the green-button menu, the drag, the 调度中心 button and overlay; `--dock-reserve`
+  540 px for ten dock items.
+- Tests: new `tests/tingtalk.test.ts` (15); `work-home-split.test.ts` rewritten for the three apps;
+  updated `dock`, `desktop-snapshots`, `desktop-apps`, `desktop-shell`, `day-playable`, `loop-hud`,
+  `motion-dom`, `messages-groups`, `object-bar`, `vivi-lock`, `where`, `shell`; four snapshot files
+  regenerated.
+- Missing asset: `public/os/tingtalk.svg` (the dock tile points at it).
+- `npx tsc --noEmit`: clean. `npx vitest run`: 105 files / 1889 tests passed.

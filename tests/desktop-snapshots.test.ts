@@ -1,5 +1,6 @@
 // Requirements §3: snapshots of each app at day 1, day 10 (calm), day 13 (ring room) and the night
-// beat; plus the strings check over every day.
+// beat; plus the strings check over every day. tingtalk 2026-11-04: four apps; 工作台 on the left
+// monitor and 听听 on the right by default.
 import { describe, expect, it } from "vitest";
 import { createStore } from "@state/store";
 import { constants } from "@state/variables";
@@ -11,11 +12,13 @@ import { missingKeys, resetMissing } from "@world/i18n";
 
 const NOW_MS = Date.UTC(2026, 9, 31, 12);
 
-function desktop(day: number, clock: BeatClock, leftApp: AppId = "msgs", page: WorkbenchPage = "home", focus: Side = "left", on = true): string {
+/** The desktop with `app` in front on the `focus` monitor (the other monitor keeps its default). */
+function desktop(day: number, clock: BeatClock, app: AppId = "msgs", page: WorkbenchPage = "home", focus: Side = "left", on = true, mcOpen = false): string {
   const store = createStore({ startDay: day });
   // These scenes are of a running computer: the tower was pressed (day-loop correction 2026-11-01).
   if (on) store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
-  const session: Session = { ...initialSession(clock, focus), leftApp, workbenchPage: page };
+  const base = initialSession(clock, focus);
+  const session: Session = { ...base, ...(focus === "left" ? { leftApp: app } : { rightApp: app }), workbenchPage: page, mcOpen };
   return renderDesktop(buildShell(store.getState(), store.getEvents(), session, desktopApps, NOW_MS, day)).value;
 }
 
@@ -28,11 +31,14 @@ const scenes: readonly [string, number, BeatClock][] = [
 
 describe("desktop snapshots (requirements §3)", () => {
   for (const [name, day, clock] of scenes) {
-    it(`${name}: 左屏 消息 + Kuro`, () => {
-      expect(desktop(day, clock, "msgs", "home", "left")).toMatchSnapshot();
+    it(`${name}: 左屏 工作台 + Kuro`, () => {
+      expect(desktop(day, clock, "workbench", "home", "left")).toMatchSnapshot();
     });
-    it(`${name}: 右屏 工作台 + Kuro`, () => {
-      expect(desktop(day, clock, "msgs", "home", "right")).toMatchSnapshot();
+    it(`${name}: 右屏 听听 + Kuro`, () => {
+      expect(desktop(day, clock, "tingtalk", "home", "right")).toMatchSnapshot();
+    });
+    it(`${name}: 左屏 Hi信`, () => {
+      expect(desktop(day, clock, "msgs")).toMatchSnapshot();
     });
     it(`${name}: 浏览器`, () => {
       expect(desktop(day, clock, "browser")).toMatchSnapshot();
@@ -41,15 +47,19 @@ describe("desktop snapshots (requirements §3)", () => {
 
   it("day 1: 工作台 inner pages", () => {
     for (const page of ["docs", "ledger", "code"] as const) {
-      expect(desktop(1, { beat: "work", time: "10:00" }, "msgs", page, "right"), page).toMatchSnapshot();
+      expect(desktop(1, { beat: "work", time: "10:00" }, "workbench", page, "left"), page).toMatchSnapshot();
     }
+  });
+
+  it("day 1: 调度中心 over both monitors (snapshot)", () => {
+    expect(desktop(1, { beat: "work", time: "10:00" }, "workbench", "home", "left", true, true)).toMatchSnapshot();
   });
 
   it("before the tower is pressed: two black monitors and nothing else (snapshot)", () => {
     const off = desktop(1, { beat: "boot", time: "09:00" }, "msgs", "home", "left", false);
     expect(off).toContain('<div class="monitor off" data-side="left"');
     expect(off).toContain('class="other-tab off"');
-    expect(off).not.toMatch(/class="(top|win|dock|kpill)"|data-action="(dock|desktop-shutdown|kuro-call)"/);
+    expect(off).not.toMatch(/class="(top|win|dock|kpill)"|data-action="(dock|desktop-shutdown|kuro-call|mc-toggle)"/);
     expect(off).toMatchSnapshot();
   });
 
@@ -83,14 +93,15 @@ describe("strings", () => {
     resetMissing();
     for (let day = 1; day <= constants.lastDay; day++) {
       for (const beat of BEATS) {
-        for (const app of ["msgs", "workbench", "browser"] as const) {
+        for (const app of ["msgs", "tingtalk", "workbench", "browser"] as const) {
           for (const page of ["home", "docs", "ledger", "code"] as const) {
             for (const focus of ["left", "right"] as const) desktop(day, { beat, time: "12:00" }, app, page, focus);
           }
         }
       }
     }
+    desktop(1, { beat: "work", time: "12:00" }, "workbench", "home", "left", true, true);
     expect(missingKeys()).toEqual(KNOWN_MISSING);
     resetMissing();
-  }, 20_000);
+  }, 30_000);
 });

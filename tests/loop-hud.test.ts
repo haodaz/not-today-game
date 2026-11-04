@@ -114,12 +114,15 @@ describe("room HUD (FR6)", () => {
     expect(ctx.session.view).toBe("room");
     expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:screen:off"]);
     expect(store.getEvents()).toEqual([]);
-    // Once the tower is pressed, 屏幕 is one monitor with the way back, and opening it on the messages monitor counts as looking.
+    // Once the tower is pressed, 屏幕 is one monitor with the way back, and opening it counts as
+    // looking at what is in front: 工作台 on the left (tingtalk 2026-11-04); 听听 on the right is 看一眼消息.
     loopActions["tower-power"]!(ctx, {} as DOMStringMap, null as never);
     loopActions.view!(ctx, { view: "desktop" } as DOMStringMap, null as never);
     const desk = renderGame(store, ctx.session, 0).value;
     expect(desk.match(/class="monitor/g)).toHaveLength(1);
     expect(desk).toContain('class="back-room"');
+    expect(store.getEvents().at(-1)).toMatchObject({ kind: "step", name: "openApp:workbench" });
+    loopActions.screen!(ctx, { screen: "right" } as DOMStringMap, null as never);
     expect(store.getEvents().at(-1)).toMatchObject({ kind: "step", name: "openApp:msgs" });
   });
 

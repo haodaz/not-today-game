@@ -216,7 +216,9 @@ function missionControl(m: ShellModel): SafeHtml | null {
   };
   const windows = m.mc.map(({ side, monitor: mon }) => {
     const app = mon.app!;
-    return html`<button type="button" class="mc-win" data-action="mc-focus" data-app="${app}" data-side="${side}" data-mc-drag="${app}" aria-label="${appName(app)}"><span class="mc-thumb" aria-hidden="true"><span class="mc-scale">${stillOf(html`${windowFrame(m, mon)}`)}</span></span><span class="mc-name">${appName(app)}</span></button>`;
+    // A window is the click target; its picture is inert (it holds the window's own controls, which
+    // never answer here), so the wrapper is not a <button> (no button inside a button).
+    return html`<div class="mc-win" role="button" tabindex="0" data-action="mc-focus" data-app="${app}" data-side="${side}" data-mc-drag="${app}" aria-label="${appName(app)}"><span class="mc-thumb" aria-hidden="true"><span class="mc-scale" inert>${stillOf(html`${windowFrame(m, mon)}`)}</span></span><span class="mc-name">${appName(app)}</span></div>`;
   });
   return html`<div class="mc" role="dialog" aria-label="${t("mc.title")}"><div class="mc-screens">${screen("left")}${screen("right")}</div><div class="mc-wins">${windows}</div></div>`;
 }

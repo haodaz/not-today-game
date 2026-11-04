@@ -89,7 +89,8 @@ describe("the live DOM after a render (fix 2026-10-31)", () => {
     check(root, session, "room");
     const moves: [string, string][] = [
       ['[data-action="view"][data-view="desk"]', "room → desk"],
-      ['[data-view="desktop"][data-screen="right"]', "desk → screen"],
+      // The left monitor (工作台): the right one has 听听, whose 看一眼消息 tells day 1's story (tingtalk 2026-11-04).
+      ['[data-view="desktop"][data-screen="left"]', "desk → screen"],
       ['[data-action="view"][data-view="room"]', "screen → room"],
       ['[data-action="view"][data-view="desktop"]', "room → screen"],
     ];
@@ -121,8 +122,8 @@ describe("the live DOM after a render (fix 2026-10-31)", () => {
       expect(root.querySelectorAll(".m-backdrop").length, `${what} (after)`).toBe(0);
       expect(root.querySelector(".stage.m-nobg"), `${what} (after)`).toBeNull();
     }
-    // Opening 消息 told a story (day 1's two lines): it masks the stage, and Esc under it only skips to
-    // its last line (dialogue addition 2026-11-02). Read it off first.
+    // A story on the screen (day 1's two lines, when 听听 has been looked at) masks the stage, and Esc
+    // under it only skips to its last line (dialogue addition 2026-11-02). Read it off first, if any.
     // (The first click on a line still appearing completes it; the next reads on.)
     // (A leaving box may linger as a ghost, which takes no clicks: only the live mask counts.)
     const liveMask = () => [...root.querySelectorAll<HTMLElement>(".story-mask")].find((el) => !el.closest(".m-ghost")) ?? null;

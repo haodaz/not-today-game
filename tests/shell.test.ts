@@ -277,8 +277,15 @@ describe("R2 · the explorer", () => {
     expect(cardOf(out, "files")).not.toBeNull();
     expect(out).toContain(`<div class="sh-src-h">${escapeHtml(fileById("c-v16")!.name)}</div><div class="f-body doc">`);
     store.appendEvent({ kind: "open", target: "conv:partner", t: "10:01" });
+    const opens = () => store.getEvents().filter((e) => e.kind === "open" && e.target === "conv:partner").length;
+    const before = opens();
+    const focus = h.session.focus;
     h.act("shell-source", { card: "a2" });
     expect(h.out()).toContain('<div class="sh-source conv">');
+    // tingtalk R2: the thread also opens in 听听, on the monitor that is not 工作台's; the player stays.
+    expect(h.session).toMatchObject({ rightApp: "tingtalk", conversation: "partner", focus });
+    expect(h.session.place.tingtalk).toBe("right");
+    expect(opens()).toBe(before + 1);
   });
 });
 

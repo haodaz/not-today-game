@@ -59,7 +59,7 @@ function replyConv(ctx: ActionContext, data: DOMStringMap): string {
 }
 
 export const messageActions: Record<string, ActionHandler> = {
-  // A row in either list: the work ones open in 工作台's 消息 pane, 家里 in 消息 (by recipient id).
+  // A row in either list: the work ones open in 听听, 家里 in Hi信 (by recipient id; tingtalk 2026-11-04).
   conv(ctx, data) {
     const id = data.conv!;
     if (!recipientsOn(ctx.store.getState().day).includes(id)) return;
