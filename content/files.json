@@ -186,7 +186,7 @@
         {
           "id": "d-vivi-plan1",
           "name": "洞察引擎_方案_v0.1.html",
-          "date": "2028-10-19",
+          "date": "2028-10-16",
           "from": 1,
           "afterOpen": "vivi-plan-1",
           "body": {
@@ -214,7 +214,7 @@
         {
           "id": "d-vivi-plan2",
           "name": "EVO_自演化引擎_v2.0.html",
-          "date": "2028-10-21",
+          "date": "2028-10-17",
           "from": 2,
           "afterOpen": "vivi-plan-2",
           "body": {
@@ -276,7 +276,7 @@
         {
           "id": "e-export-fn",
           "name": "export.js",
-          "date": "2028-10-19",
+          "date": "2028-10-17",
           "from": 2,
           "onOpen": {
             "k": "inner",
