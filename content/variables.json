@@ -21,7 +21,15 @@
     "_dreamDaysNote": "dreamDays is the count; the nights themselves are stages.json dreamNights.",
     "goodMaxUnchecked": 3,
     "bpmAtFullSan": 72,
-    "bpmAtZeroSan": 110
+    "bpmAtZeroSan": 110,
+    "assimilationMax": 100,
+    "assimilationGoodMax": 40,
+    "assimLook": 1,
+    "assimLet": 4,
+    "assimAssist": 3,
+    "assimKuroCardKept": 3,
+    "assimUpgrade": 8,
+    "_assimilationNote": "three-meters spec (2026-11-03): letting Kuro work raises assimilation, not SAN loss; assimilation at max is the bad ending, the good one needs it ≤ assimilationGoodMax."
   },
   "day": {
     "type": "int",
@@ -203,6 +211,15 @@
     ],
     "changedBy": "see san-and-endings spec",
     "default": 100
+  },
+  "assimilation": {
+    "type": "int",
+    "range": [
+      0,
+      100
+    ],
+    "default": 0,
+    "changedBy": "work help (let / look / board assists / Kuro's card kept) and upgrades; only goes up (three-meters spec)"
   },
   "letItDoUnchecked": {
     "type": "int",

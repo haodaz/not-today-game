@@ -19,6 +19,7 @@ export interface State {
   overdueDays: number;
   newWorld: "normal" | "locked" | "light" | "none";
   san: number;
+  assimilation: number;
   letItDoUnchecked: number;
   raids: Record<string, { blockedWith: string | null; gave: string | null }>;
   pokedReset: boolean;

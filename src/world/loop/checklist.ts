@@ -194,7 +194,9 @@ export function checklist(ctx: LoopContext): ChecklistView {
 /** The first unlocked, unfinished work task (a `flag:` item that does not tick itself). */
 export function openTask(ctx: LoopContext): Item | null {
   const states = itemStates(ctx);
-  return ctx.file.items.find((it) => it.done.kind === "flag" && !it.self && states.get(it.id)!.unlocked && !states.get(it.id)!.done) ?? null;
+  // A night task (e.g. the call's) is not on the workbench before nightfall.
+  const night = nightfallReached(ctx, states);
+  return ctx.file.items.find((it) => it.done.kind === "flag" && !it.self && (it.when !== "night" || night) && states.get(it.id)!.unlocked && !states.get(it.id)!.done) ?? null;
 }
 
 /** Unlocked, unfinished self-ticking items (the runtime ticks them after a beat). */
