@@ -136,6 +136,8 @@ function brokenFrom(where: string, day: number, from: CardFrom, fromDays: Map<st
     return null;
   }
   if ("conv" in from) return knownRecipients.has(from.conv) ? null : `${where}: conv "${from.conv}" is not a known recipient`;
+  // A meeting card is heard in the board's own meeting; the loader checks a line names it.
+  if ("meeting" in from) return null;
   return callDays.has(day) ? null : `${where}: { call: true } but day ${day} has no call`;
 }
 

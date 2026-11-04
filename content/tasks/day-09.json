@@ -177,8 +177,7 @@
             "r2": "圈 · 1",
             "r3": "圈 · 2",
             "r4": "圈 · 3",
-            "r5": "三角",
-            "r6": "剧本"
+            "r5": "三角"
           }
         },
         "slots": [
@@ -206,11 +205,6 @@
             "id": "r5",
             "label": "三角",
             "answer": "c5"
-          },
-          {
-            "id": "r6",
-            "label": "剧本",
-            "answer": "c6"
           }
         ],
         "cards": [
@@ -218,49 +212,41 @@
             "id": "c1",
             "text": "老周",
             "from": {
-              "conv": "laozhou"
+              "meeting": true
             },
-            "hint": "在老周的私聊里"
+            "hint": "排练一开始老周说的"
           },
           {
             "id": "c2",
             "text": "老王（我坐中间）",
             "from": {
-              "conv": "boss"
+              "meeting": true
             },
-            "hint": "在老王的消息里"
+            "hint": "老王在排练里说的"
           },
           {
             "id": "c3",
             "text": "Vivi",
             "from": {
-              "conv": "partner"
+              "meeting": true
             },
-            "hint": "在 Vivi 的私聊里"
+            "hint": "老周给 Vivi 安排的"
           },
           {
             "id": "c4",
             "text": "你（你也要在）",
             "from": {
-              "conv": "boss"
+              "meeting": true
             },
-            "hint": "在老王的消息里"
+            "hint": "老王说的"
           },
           {
             "id": "c5",
             "text": "贵客（名字不念）",
             "from": {
-              "file": "m-shot-1022"
+              "meeting": true
             },
-            "hint": "在晨会截图里，多出来的那一格"
-          },
-          {
-            "id": "c6",
-            "text": "《黄衣之王》第一幕",
-            "from": {
-              "file": "s-script"
-            },
-            "hint": "在剧本里：第一幕排在后面"
+            "hint": "老周最后交代的"
           },
           {
             "id": "d1",
@@ -272,11 +258,11 @@
           },
           {
             "id": "d2",
-            "text": "剧本：第二幕",
+            "text": "三角：空着，不用排",
             "from": {
-              "file": "s-script"
+              "conv": "xiaozhang"
             },
-            "hint": "在剧本里：排在前面的那一幕"
+            "hint": "在小张的私聊里"
           }
         ],
         "kuro": {
@@ -285,8 +271,7 @@
             "r2": "c2",
             "r3": "c3",
             "r4": "c4",
-            "r5": "k1",
-            "r6": "c6"
+            "r5": "k1"
           },
           "cards": [
             {
@@ -333,11 +318,11 @@
             ]
           },
           {
-            "on": "fill:r6:d2",
+            "on": "fill:r5:d2",
             "lines": [
               {
                 "who": "kuro",
-                "text": "第二幕排在前面，是给读的人准备的。"
+                "text": "空着，不是没人。"
               }
             ]
           },
@@ -368,11 +353,94 @@
               }
             ]
           }
-        ]
+        ],
+        "view": "meeting",
+        "meeting": {
+          "people": [
+            {
+              "id": "laozhou",
+              "name": "老周",
+              "tile": "/npc/laozhou.png"
+            },
+            {
+              "id": "boss",
+              "name": "老王",
+              "tile": "/npc/boss.png"
+            },
+            {
+              "id": "partner",
+              "name": "Vivi",
+              "tile": "/npc/partner.png"
+            },
+            {
+              "id": "me",
+              "name": "你"
+            },
+            {
+              "id": "guest",
+              "name": "　"
+            }
+          ],
+          "lines": [
+            {
+              "t": "20:00",
+              "who": "laozhou",
+              "text": "排练。明天我主持，坐圈的最上面。",
+              "card": "c1"
+            },
+            {
+              "t": "20:01",
+              "who": "boss",
+              "text": "我坐中间。",
+              "card": "c2"
+            },
+            {
+              "t": "20:02",
+              "who": "partner",
+              "text": "我想坐 C 位。"
+            },
+            {
+              "t": "20:02",
+              "who": "laozhou",
+              "text": "你坐老王手边，圈上。",
+              "card": "c3"
+            },
+            {
+              "t": "20:03",
+              "who": "boss",
+              "text": "你也要在。",
+              "card": "c4"
+            },
+            {
+              "t": "20:04",
+              "who": "laozhou",
+              "text": "三角那一格，不坐人。贵客的名字，谁也不念。",
+              "card": "c5"
+            },
+            {
+              "t": "20:05",
+              "who": "guest",
+              "text": "（没有声音。）"
+            },
+            {
+              "t": "20:06",
+              "who": "laozhou",
+              "text": "剧本发下去了。第一幕先念，第二幕谁也别念。"
+            }
+          ],
+          "layout": "seats",
+          "seats": {
+            "r1": "circle",
+            "r2": "circle",
+            "r3": "circle",
+            "r4": "circle",
+            "r5": "triangle"
+          }
+        }
       },
       "deliverable": {
         "id": "d9-seats",
-        "label": "会议室座位和剧本",
+        "label": "会议室座位",
         "to": "boss"
       },
       "judge": {

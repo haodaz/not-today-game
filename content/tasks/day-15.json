@@ -66,33 +66,33 @@
             "id": "c1",
             "text": "仪器：玻璃和金属的",
             "from": {
-              "file": "p-deck"
+              "meeting": true
             },
-            "hint": "在演示稿里"
+            "hint": "主讲人一上来说的"
           },
           {
             "id": "c2",
             "text": "讲电，讲心理学",
             "from": {
-              "file": "p-deck"
+              "meeting": true
             },
-            "hint": "在演示稿里"
+            "hint": "主讲人说的"
           },
           {
             "id": "c3",
             "text": "放映：火花，头发竖起来",
             "from": {
-              "file": "p-deck"
+              "meeting": true
             },
-            "hint": "在演示稿里"
+            "hint": "放映那一段"
           },
           {
             "id": "c4",
             "text": "一言不发",
             "from": {
-              "file": "m-shot-1030"
+              "meeting": true
             },
-            "hint": "在发布会截图里"
+            "hint": "观众那几格"
           },
           {
             "id": "c5",
@@ -207,7 +207,113 @@
               }
             ]
           }
-        ]
+        ],
+        "view": "meeting",
+        "meeting": {
+          "people": [
+            {
+              "id": "laozhou",
+              "name": "老周",
+              "tile": "/npc/laozhou.png"
+            },
+            {
+              "id": "host",
+              "name": "主讲"
+            },
+            {
+              "id": "a1",
+              "name": "观众",
+              "tile": "/npc/sil_1.png"
+            },
+            {
+              "id": "a2",
+              "name": "观众",
+              "tile": "/npc/sil_2.png"
+            },
+            {
+              "id": "a3",
+              "name": "观众",
+              "tile": "/npc/sil_3.png"
+            },
+            {
+              "id": "a4",
+              "name": "观众",
+              "tile": "/npc/sil_4.png"
+            },
+            {
+              "id": "a5",
+              "name": "观众",
+              "tile": "/npc/sil_5.png"
+            },
+            {
+              "id": "a6",
+              "name": "观众",
+              "tile": "/npc/sil_6.png"
+            },
+            {
+              "id": "a7",
+              "name": "观众",
+              "tile": "/npc/sil_1.png"
+            },
+            {
+              "id": "a8",
+              "name": "观众",
+              "tile": "/npc/sil_2.png"
+            }
+          ],
+          "lines": [
+            {
+              "t": "15:00",
+              "who": "laozhou",
+              "text": "发布会开始。有请主讲。"
+            },
+            {
+              "t": "15:01",
+              "who": "host",
+              "text": "我从很远的地方来。带了几件仪器，玻璃的，金属的。",
+              "card": "c1"
+            },
+            {
+              "t": "15:04",
+              "who": "host",
+              "text": "今天讲电。也讲心理学。",
+              "card": "c2"
+            },
+            {
+              "t": "15:09",
+              "who": "host",
+              "text": "请看。"
+            },
+            {
+              "t": "15:09",
+              "who": "a1",
+              "text": "（火花。前排的头发竖了起来。）",
+              "card": "c3"
+            },
+            {
+              "t": "15:20",
+              "who": "a3",
+              "text": "（一言不发。）",
+              "card": "c4"
+            },
+            {
+              "t": "15:21",
+              "who": "a6",
+              "text": "（一言不发。）"
+            },
+            {
+              "t": "15:30",
+              "who": "laozhou",
+              "text": "感谢主讲。散会。"
+            },
+            {
+              "t": "15:31",
+              "who": "a2",
+              "text": "（没有人离开。）"
+            }
+          ],
+          "layout": "grid"
+        }
       },
       "deliverable": {
         "id": "d15-launch",

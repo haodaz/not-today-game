@@ -306,9 +306,9 @@
             "id": "c1",
             "text": "大家先把背景换成统一的圈",
             "from": {
-              "file": "m-subs-1022"
+              "meeting": true
             },
-            "hint": "在晨会字幕里"
+            "hint": "晨会一开始，老周说的"
           },
           {
             "id": "c2",
@@ -322,25 +322,25 @@
             "id": "c3",
             "text": "把要请的那位的名字念对",
             "from": {
-              "file": "m-subs-1022"
+              "meeting": true
             },
-            "hint": "在晨会字幕里"
+            "hint": "老周说的，在报完职级以后"
           },
           {
             "id": "c4",
             "text": "它要什么就答应什么，先答应",
             "from": {
-              "file": "m-subs-1022"
+              "meeting": true
             },
-            "hint": "在晨会字幕里"
+            "hint": "老王说的"
           },
           {
             "id": "c5",
             "text": "准其回到本来的地方，不伤人畜",
             "from": {
-              "file": "m-subs-1022"
+              "meeting": true
             },
-            "hint": "老周最后那句英文，在晨会字幕里"
+            "hint": "散会前老周那句英文"
           },
           {
             "id": "d1",
@@ -447,7 +447,137 @@
               }
             ]
           }
-        ]
+        ],
+        "view": "meeting",
+        "meeting": {
+          "people": [
+            {
+              "id": "laozhou",
+              "name": "老周",
+              "tile": "/npc/laozhou.png"
+            },
+            {
+              "id": "boss",
+              "name": "老王",
+              "tile": "/npc/boss.png"
+            },
+            {
+              "id": "partner",
+              "name": "Vivi",
+              "tile": "/npc/partner.png"
+            },
+            {
+              "id": "xiaozhang",
+              "name": "小张",
+              "tile": "/npc/xiaozhang.png"
+            },
+            {
+              "id": "me",
+              "name": "你"
+            },
+            {
+              "id": "m1",
+              "name": "member",
+              "tile": "/npc/sil_1.png"
+            },
+            {
+              "id": "m2",
+              "name": "member",
+              "tile": "/npc/sil_2.png"
+            },
+            {
+              "id": "all",
+              "name": "全体"
+            }
+          ],
+          "lines": [
+            {
+              "t": "09:00",
+              "who": "laozhou",
+              "text": "晨会。大家先把背景换成统一的圈。",
+              "card": "c1"
+            },
+            {
+              "t": "09:01",
+              "who": "partner",
+              "text": "圈的颜色有讲究吗？"
+            },
+            {
+              "t": "09:01",
+              "who": "laozhou",
+              "text": "都一样就行。"
+            },
+            {
+              "t": "09:02",
+              "who": "laozhou",
+              "text": "每人报一下自己的职级和编制。"
+            },
+            {
+              "t": "09:03",
+              "who": "boss",
+              "text": "王。两百。"
+            },
+            {
+              "t": "09:03",
+              "who": "laozhou",
+              "text": "亲王。二十六。"
+            },
+            {
+              "t": "09:04",
+              "who": "partner",
+              "text": "公爵。三十一。"
+            },
+            {
+              "t": "09:04",
+              "who": "xiaozhang",
+              "text": "伯爵。三十六。我是第七十二个。"
+            },
+            {
+              "t": "09:05",
+              "who": "me",
+              "text": "研发。编制一个。"
+            },
+            {
+              "t": "09:05",
+              "who": "laozhou",
+              "text": "把要请的那位的名字念对。",
+              "card": "c3"
+            },
+            {
+              "t": "09:07",
+              "who": "all",
+              "text": "（念了一个名字。字幕显示不出来。）"
+            },
+            {
+              "t": "09:09",
+              "who": "boss",
+              "text": "它要什么就答应什么，先答应。",
+              "card": "c4"
+            },
+            {
+              "t": "09:12",
+              "who": "m1",
+              "text": "（摄像头没开。名字一栏是空的。）"
+            },
+            {
+              "t": "09:18",
+              "who": "laozhou",
+              "text": "I do here licence thee to depart unto thy proper place, without doing any injury or danger to any man or beast.",
+              "card": "c5"
+            },
+            {
+              "t": "09:19",
+              "who": "all",
+              "text": "（跟读一遍。）"
+            },
+            {
+              "t": "09:21",
+              "who": "laozhou",
+              "text": "散会。"
+            }
+          ],
+          "layout": "grid"
+        }
       },
       "deliverable": {
         "id": "d7-minutes",
