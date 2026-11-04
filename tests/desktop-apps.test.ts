@@ -36,7 +36,10 @@ describe("workbench data", () => {
 describe("workbench home", () => {
   it("without day data shows the structure from strings and the store's numbers", () => {
     const c = ctx(1);
-    const out = renderWorkbench(c).body.value;
+    // shell R10: the title sits in the one top bar and the session list is an overlay, so open it.
+    c.session.wbSidebar = true;
+    const r = renderWorkbench(c);
+    const out = (r.bar?.value ?? "") + r.body.value;
     // workspace 2026-11-04: the session list (新任务) and the composer (its placeholder) replace the
     // expanded nav column and the task input on home.
     for (const key of ["wb.title", "wb.sessions.new", "wb.nav.home", "wb.hello.morning", "wb.composer.placeholder", "wb.card.ledger", "wb.common"]) {

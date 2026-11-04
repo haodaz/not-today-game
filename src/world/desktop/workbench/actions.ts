@@ -1,8 +1,9 @@
 // 工作台's own clicks: moving between its pages. The task pages (workspace 2026-11-04) are
 // `task:<taskId>`; opening one today logs `open task:<id>` once (the session list reads it).
+// shell R10: the one top bar's sidebar toggle, ← → (the pages visited this session), the title's ▾.
 import type { ActionContext, ActionHandler } from "../controller";
 import { kuroActions, playerBox } from "@world/dialogue/kuro";
-import { taskPageId, type WorkbenchPage } from "../model";
+import { taskPageId, type Session, type WorkbenchPage } from "../model";
 import { taskForId } from "@state/days/board";
 import { openWork } from "./work";
 import { taskOpened } from "./sessions";
@@ -44,8 +45,75 @@ export const composerActions: Record<string, ActionHandler> = {
   },
 };
 
+/**
+ * shell R10's ← →: the pages visited this session (home and the task pages). A visit after a step
+ * back drops the pages ahead of it, as a browser does; the same page twice in a row is one visit.
+ */
+function visit(session: Session, page: WorkbenchPage, day: number | null): void {
+  if (page !== "home" && taskPageId(page) === null) return;
+  const h = session.wbHistory;
+  const here = h.pages[h.at];
+  if (here && here.page === page && here.day === day) return;
+  const pages = [...h.pages.slice(0, h.at + 1), { page, day }];
+  session.wbHistory = { pages, at: pages.length - 1 };
+}
+
+/** The sidebar and the title's dropdown close on any page change (as the app's do). */
+function closeMenus(session: Session): void {
+  session.wbSidebar = false;
+  session.wbTitleMenu = false;
+}
+
+/** shell R10's sidebar, the title's ▾, and ← →. Session only. */
+export const workbenchUiActions: Record<string, ActionHandler> = {
+  // The sidebar toggle (and ⌘B / Ctrl+B): the overlay sidebar opens / closes.
+  "wb-sidebar"(ctx) {
+    ctx.session.wbSidebar = !ctx.session.wbSidebar;
+    ctx.session.wbTitleMenu = false;
+    ctx.rerender();
+  },
+  // A click outside the sidebar closes it.
+  "wb-sidebar-close"(ctx) {
+    if (!ctx.session.wbSidebar) return;
+    ctx.session.wbSidebar = false;
+    ctx.rerender();
+  },
+  // The title's ▾: the session list as a dropdown.
+  "wb-titlemenu"(ctx) {
+    ctx.session.wbTitleMenu = !ctx.session.wbTitleMenu;
+    ctx.session.wbSidebar = false;
+    ctx.rerender();
+  },
+  "wb-titlemenu-close"(ctx) {
+    if (!ctx.session.wbTitleMenu) return;
+    ctx.session.wbTitleMenu = false;
+    ctx.rerender();
+  },
+  // ← / →: one page back / forward among those visited this session.
+  "wb-back"(ctx) {
+    step(ctx, -1);
+  },
+  "wb-forward"(ctx) {
+    step(ctx, 1);
+  },
+};
+
+function step(ctx: ActionContext, by: -1 | 1): void {
+  const h = ctx.session.wbHistory;
+  const at = h.at + by;
+  const to = h.pages[at];
+  if (!to) return;
+  // A page went back to is as it was opened (no new open: the task was opened then).
+  ctx.session.wbHistory = { pages: h.pages, at };
+  ctx.session.workbenchPage = to.page;
+  ctx.session.wbTaskDay = to.day;
+  closeMenus(ctx.session);
+  ctx.rerender();
+}
+
 export const workbenchActions: Record<string, ActionHandler> = {
   ...composerActions,
+  ...workbenchUiActions,
   "wb-nav"(ctx, data) {
     const page = (data.page ?? "") as WorkbenchPage;
     const taskId = taskPageId(page);
@@ -72,6 +140,8 @@ export const workbenchActions: Record<string, ActionHandler> = {
       }
       ctx.session.workbenchPage = page;
       ctx.session.wbTaskDay = day < state.day ? day : null;
+      visit(ctx.session, page, ctx.session.wbTaskDay);
+      closeMenus(ctx.session);
       // meeting R3: the first open of a meeting task today starts it playing by itself.
       if (first) meetingAutoplay(ctx, taskId);
       ctx.rerender();
@@ -80,6 +150,8 @@ export const workbenchActions: Record<string, ActionHandler> = {
     if (!PAGES.includes(page)) return;
     ctx.session.workbenchPage = page;
     ctx.session.wbTaskDay = null;
+    visit(ctx.session, page, null);
+    closeMenus(ctx.session);
     if (page === "home" && data.compose === "1") ctx.session.focusNext = COMPOSER_FOCUS;
     ctx.rerender();
   },

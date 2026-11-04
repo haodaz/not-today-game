@@ -59,6 +59,8 @@ export const draftArb: fc.Arbitrary<EventDraft> = fc.oneof(
   recognisableIds.map((objectId): EventDraft => ({ kind: "recognise", objectId })),
   objectIds.map((objectId): EventDraft => ({ kind: "looked", objectId })),
   objectIds.map((objectId): EventDraft => ({ kind: "handObject", objectId })),
+  // objects-in-room R2: a record of using an object at a facing.
+  fc.tuple(objectIds, fc.constantFrom("room" as const, "bed" as const, "door" as const, "window" as const), fc.boolean()).map(([objectId, facing, ok]): EventDraft => ({ kind: "useAt", objectId, facing, ok })),
   fc.string().map((key): EventDraft => ({ kind: "pressKey", key })),
   fc.string().map((choice): EventDraft => ({ kind: "reply", choice })),
   conversationReply,

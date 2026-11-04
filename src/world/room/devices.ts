@@ -14,6 +14,7 @@ import { CHICK_H, CHICK_W } from "@world/objects/frames";
 import { PAGER_H, PAGER_W, PAGER_DIGITS_X, PAGER_CELLS } from "@world/objects/pager";
 import { CALC_CELLS, CALC_H, CALC_W } from "@world/objects/calculator";
 import { DICT_COLS, DICT_ROWS } from "@world/objects/dictionary";
+import { worksHere } from "@world/objects/works";
 import { VOLUME_MAX, type TapeState } from "@world/objects/tape";
 import { CELL_W, CELL_H } from "@world/room/held";
 import { KURO_MENU, type KuroPose, type KuroState } from "@world/objects/kurogotchi";
@@ -161,7 +162,8 @@ function calculator(ctx: DeviceCtx): SafeHtml {
   const brand = hasString("obj.brand.calculator") ? tr("obj.brand.calculator") : null;
   // Away from the light the digits fade and keys stop (the calculator's light rule): the hand layer
   // toggles `.in-light`; here `.dark` when not in the light, with the strings note.
-  const dark = !upgraded && !ctx.session.hand.inLight;
+  // objects-in-room R1: and where it does not work at all (too dark there), it stays dark.
+  const dark = !upgraded && (!ctx.session.hand.inLight || !worksHere(ctx.state, ctx.session, "calculator"));
   const note = upgraded ? (hasString("obj.calculator.lit") ? tr("obj.calculator.lit") : null) : hasString("obj.calculator.dark") ? tr("obj.calculator.dark") : null;
   const k = (key_: string, text: string, klass = "") => key("calculator", key_, down === key_, live, text, klass);
   // The body carries the in-plane roll (0 ↔ 180) and is the drag target (not a key); seen rotated,

@@ -134,6 +134,7 @@ describe("听听 (DingTalk register, as 工作台·消息 was)", () => {
     session.conversation = "partner";
     const out = renderTingTalk(ctxFor(store, session)).body.value;
     expect(out).toContain(`<div class="head"><b>${t("msgs.partner")}</b> <small>${t("msgs.partner.role")}</small></div>`);
+    session.wbSidebar = true; // shell R10: the section icons live in the overlay sidebar
     const wb = renderWorkbench(ctxFor(store, session)).body.value;
     for (const key of ["wb.nav.home", "wb.nav.docs", "wb.nav.approvals", "wb.nav.contacts"]) expect(wb, key).toContain(t(key));
     expect(wb).not.toContain('data-page="msgs"');

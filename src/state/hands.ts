@@ -13,6 +13,7 @@ import calculatorRaw from "@content/calculator.json";
 import kidRaw from "@content/kid.json";
 import stagesFile from "@content/stages.json";
 import { parseLine, type SayLine } from "./days/table";
+import { parseWorks, type Works } from "./works";
 
 /** A rectangle on the object's image, as fractions of its box (0..1). */
 export interface Rect {
@@ -54,6 +55,8 @@ export interface HandEntry {
   readonly light: string | null;
   /** The textbook's empty cell and what is pencilled in it (optional; absent = no cell). */
   readonly cell: (Rect & { readonly text: string }) | null;
+  /** objects-in-room R1: where it works (absent = anywhere). Not the iccard's `light` text above. */
+  readonly works: Works | null;
 }
 
 type Raw = Record<string, unknown>;
@@ -151,7 +154,7 @@ function recordings(v: unknown, w: string, fail: Fail, dreams: readonly number[]
 /** Which object may carry which hand field (keys, screen and back go on any). */
 const ONLY_ON: Readonly<Record<string, string>> = { solar: "calculator", reels: "tape", recordings: "tape", sim: "phone", light: "iccard", cell: "textbook" };
 /** The keys recognise.ts leaves to this file. */
-export const HAND_FIELDS = ["keys", "screen", "back", "solar", "reels", "recordings", "sim", "light", "cell"] as const;
+export const HAND_FIELDS = ["keys", "screen", "back", "solar", "reels", "recordings", "sim", "light", "cell", "works"] as const;
 
 export function parseHands(input: unknown, dreams: readonly number[] = stagesFile.dreamNights.nights): ReadonlyMap<string, HandEntry> {
   const fail: Fail = failer("objects.json");
@@ -195,13 +198,14 @@ export function parseHands(input: unknown, dreams: readonly number[] = stagesFil
         sim: v.sim === undefined ? null : str(v.sim, `${w}.sim`, fail),
         light: v.light === undefined ? null : str(v.light, `${w}.light`, fail),
         cell,
+        works: v.works === undefined ? null : parseWorks(v.works, `${w}.works`, fail),
       }),
     );
   }
   return out;
 }
 
-export const EMPTY_HAND: HandEntry = Object.freeze({ keys: [], screen: null, back: {}, solar: null, reels: null, recordings: [], sim: null, light: null, cell: null });
+export const EMPTY_HAND: HandEntry = Object.freeze({ keys: [], screen: null, back: {}, solar: null, reels: null, recordings: [], sim: null, light: null, cell: null, works: null });
 export const handTable: ReadonlyMap<string, HandEntry> = parseHands(objectsRaw);
 export const handOf = (id: string): HandEntry => handTable.get(id) ?? EMPTY_HAND;
 

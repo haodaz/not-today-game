@@ -9,6 +9,7 @@ import { isMeetingFrom, taskByFlag, type BoardCard, type BoardLock, type CardFro
 import { dayFile } from "./table";
 import { isRaidNight } from "../nights";
 import { takenByKuro } from "@world/objects/taken";
+import { handOf } from "../hands";
 
 /** The board of a task id on a day (work v2), or null. Found via the day's task list. */
 export function boardOf(day: number, taskId: string): { task: Task; board: TaskBoard } | null {
@@ -172,7 +173,22 @@ export function lockCodesOffered(board: TaskBoard, state: State, events: readonl
   const lock = board.given.lock;
   if (!lock) return false;
   if (lock.from !== undefined) return lockSourceFound(lock, state.day, events);
-  return lockObjectAvailable(board, state, events);
+  return lockObjectAvailable(board, state, events) && (!lockNeedsUse(lock, state) || lockUsedOk(lock, state.day, events));
+}
+
+/**
+ * The object lock waits for the object to be used where it works (objects-in-room R3): when the lock
+ * names a `face`, or the object has a `works` rule. An upgraded object ignores its rule (and opens
+ * the lock by itself); an object with no rule and a lock with no face behave as before.
+ */
+export function lockNeedsUse(lock: BoardLock, state: State): boolean {
+  if (!isObjectLock(lock) || state.upgraded[lock.object] === true) return false;
+  return lock.face !== undefined || handOf(lock.object).works !== null;
+}
+
+/** Today a `useAt` with ok:true for the lock's object, at its `face` if it names one. */
+export function lockUsedOk(lock: BoardLock, day: number, events: readonly GameEvent[]): boolean {
+  return events.some((e) => e.kind === "useAt" && e.day === day && e.objectId === lock.object && e.ok && (lock.face === undefined || e.facing === lock.face));
 }
 
 /**

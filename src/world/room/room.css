@@ -264,6 +264,14 @@
 .room .held.obj[data-object="phone"][data-open="0"] .face.front > img{clip-path:inset(50% 0 0 0)}
 .room .held.obj .crack{position:absolute;right:16%;top:10%;width:18%;height:10%;border-radius:40%;background:radial-gradient(circle,rgba(255,255,255,.95),rgba(255,255,255,0) 70%);opacity:0;pointer-events:none}
 .room .held.obj.crack-lit .crack{opacity:1}
+/* objects-in-room R1: used where it does not work, the screen is faint (and nothing under it shows). */
+.room .held.obj.faint .dev,.room .held.obj.faint .dev-shell canvas{opacity:.18;filter:grayscale(1)}
+.room .held.obj.faint .face.front > img{filter:brightness(.7)}
+.room .held.obj.faint.in-light[data-object="iccard"] .face.front > img{opacity:1}
+/* One bar of signal on the phone's screen at the window (no bars elsewhere). */
+.room .held.obj .signal{position:absolute;right:30%;top:14%;width:9%;height:5%;pointer-events:none;image-rendering:pixelated}
+.room .held.obj .signal b{position:absolute;left:0;bottom:0;width:22%;height:40%;background:#1b1b1b}
+.room .held.obj .signal::after{content:"";position:absolute;inset:0;border-bottom:1px solid rgba(27,27,27,.35)}
 .room .held.obj .sim{position:absolute;left:30%;top:42%;width:40%;height:22%;border-radius:6px;background:#d8c06a;display:flex;align-items:flex-end;justify-content:center;padding:4px;box-sizing:border-box}
 .room .held.obj .sim span{font-size:9px;color:#3a3220}
 /* The textbook's empty cell: content's score in pencil, written over 1.5 s (--pencil 0..1). */

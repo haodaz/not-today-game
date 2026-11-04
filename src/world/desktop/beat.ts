@@ -38,6 +38,8 @@ export function advanceTo(clock: BeatClock, time: string): BeatClock {
 }
 
 export const isNight = (clock: BeatClock): boolean => clock.beat === "night";
+/** Evening is the `desk` beat on (night falls at 18:30, or earlier if the clock was); before it is day. */
+export const isEvening = (clock: Pick<BeatClock, "beat">): boolean => clock.beat === "desk" || clock.beat === "night";
 
 export const beatLabelKey = (beat: Beat): string => `shell.beat.${beat}`;
 

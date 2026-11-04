@@ -139,6 +139,11 @@ export interface Session {
   pullOut: { ending: "bad" | "survive" | "good"; from: "room" | "desk" | "bed"; startMs: number; cutMs: number } | null;
   /** The object lifted off the desk bar (polish FR1); never at the same time as the phone. */
   holding: string | null;
+  /**
+   * objects-in-room R1: the desk lamp, as the player last clicked it; null = as the hour has it (lit
+   * in the evening, off by day). Session only (the `useAt` event records what it meant).
+   */
+  lampOn: boolean | null;
   /** Holding and using it, its programs, its light (objects-in-hand FR1); session only. */
   hand: HandSession;
   /** The dialogue line's per-character reveal (polish FR3); set by the motion layer only. */
@@ -165,6 +170,14 @@ export interface Session {
   workbenchPage: WorkbenchPage;
   /** workspace R2: the day of the task page shown (an earlier day's, read-only), or null = today. */
   wbTaskDay: number | null;
+  /** shell R10: 工作台's overlay sidebar is open (collapsed by default; ⌘B toggles). Session only. */
+  wbSidebar: boolean;
+  /** shell R10: the title's ▾ session dropdown is open. Session only. */
+  wbTitleMenu: boolean;
+  /** shell R10: the sidebar's search (filters the session titles). Session only. */
+  wbSearch: string;
+  /** shell R10: the pages visited this session (home and task pages), and where ← / → stand. */
+  wbHistory: { pages: { page: WorkbenchPage; day: number | null }[]; at: number };
   /** The `[data-focus]` element to focus after the next render (workspace R2: 新任务 → the composer). */
   focusNext: string | null;
   /** Until when (ms since epoch) Kuro's body is crawling between windows. */
@@ -336,6 +349,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     collection: EMPTY_COLLECTION,
     bookOpen: false,
     holding: null,
+    lampOn: null,
     hand: initialHand(),
     reveal: null,
     work: null,
@@ -350,6 +364,10 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     progress: new Map(),
     workbenchPage: "home",
     wbTaskDay: null,
+    wbSidebar: false,
+    wbTitleMenu: false,
+    wbSearch: "",
+    wbHistory: { pages: [{ page: "home", day: null }], at: 0 },
     focusNext: null,
     movingUntil: 0,
     walkman: false,
@@ -412,7 +430,8 @@ export interface AppRenderers {
   readonly msgs: (ctx: AppContext) => { body: SafeHtml; badge: number };
   /** 听听 / TingTalk (tingtalk 2026-11-04): the work conversations. */
   readonly tingtalk: (ctx: AppContext) => { body: SafeHtml; badge: number };
-  readonly workbench: (ctx: AppContext) => { body: SafeHtml; badge: number; tag: SafeHtml | null };
+  /** 工作台 (shell R10): full screen, its own one top bar (`bar`, after the traffic lights) over `body`. */
+  readonly workbench: (ctx: AppContext) => { body: SafeHtml; badge: number; tag: SafeHtml | null; bar?: SafeHtml };
   readonly browser: (ctx: AppContext) => { body: SafeHtml; bar: SafeHtml; badge: number };
   /** Kuro's body and small window, on the right monitor. */
   readonly kuro: (ctx: AppContext) => SafeHtml;
@@ -449,7 +468,7 @@ function monitorFor(app: AppId | null, side: Side, ctx: AppContext, apps: AppRen
     };
   }
   if (app === "workbench") {
-    const { body, badge } = apps.workbench(ctx);
+    const { body, badge, bar } = apps.workbench(ctx);
     const page = ctx.session.workbenchPage;
     // The home page is the app itself: its name alone (not 「工作台 · 工作台」); other pages add theirs.
     const key = wbPageKey(page);
@@ -462,7 +481,9 @@ function monitorFor(app: AppId | null, side: Side, ctx: AppContext, apps: AppRen
         appTitle: pageTitle,
         winTitle: key === null ? tr("wb.title") : html`${tr("wb.title")} · ${tr(key)}`,
         winClass: "wb",
-        barRight: tr("wb.autosave"),
+        // shell R10: full screen inside the monitor, one top bar of its own; no title row, no 自动保存.
+        barRight: null,
+        ...(bar ? { bar, chrome: "full" as const } : {}),
         body,
         nightSubKey: "night.plate.sub.workbench",
         overlay,

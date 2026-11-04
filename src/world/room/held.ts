@@ -15,6 +15,7 @@ import { PAGER_H, PAGER_W } from "@world/objects/pager";
 import { CALC_H, CALC_W } from "@world/objects/calculator";
 import { DICT_COLS, DICT_ROWS, type DictionaryState } from "@world/objects/dictionary";
 import { pinchMarks, type PhoneState, type TextbookState } from "@world/objects/plain";
+import { facingOf, worksHere } from "@world/objects/works";
 import { envFor, peekState } from "@world/objects/index";
 import type { ObjectEnv } from "@world/objects/program";
 import { STAGE_W } from "@world/room/splat/geometry";
@@ -176,10 +177,14 @@ function extras(id: string, state: State, events: readonly GameEvent[], session:
   if (id === "iccard") {
     const marks = pinchMarks(env.uses, state.day);
     const pinches = Array.from({ length: marks }, (_, i) => html`<i class="pinch" style="--i:${i}"></i>`);
-    return { front: html`<div class="coil"><i></i><i></i><i></i></div>${hand.light ? html`<div class="against-light">${hand.light}</div>` : null}`, back: html`<div class="strip"></div><div class="pinches">${pinches}</div>` };
+    // objects-in-room R1: where it does not work (no lamp) the under-layer stays hidden.
+    const under = worksHere(state, session, id) ? html`<div class="coil"><i></i><i></i><i></i></div>${hand.light ? html`<div class="against-light">${hand.light}</div>` : null}` : null;
+    return { front: under, back: html`<div class="strip"></div><div class="pinches">${pinches}</div>` };
   }
   if (id === "phone") {
-    return { front: html`<i class="crack"></i>`, back: hand.sim ? html`<div class="sim"><span>${hand.sim}</span></div>` : null };
+    // objects-in-room R1: one bar of signal on its screen at 窗, and no bars anywhere else.
+    const signal = hand.works?.signal && facingOf(session.view) === "window" ? html`<i class="signal" aria-hidden="true"><b></b></i>` : null;
+    return { front: html`<i class="crack"></i>${signal}`, back: hand.sim ? html`<div class="sim"><span>${hand.sim}</span></div>` : null };
   }
   if (id === "chick" && hand.back.reset) {
     // The reset hole lives on the back only (content/objects.json): its hotspot exists while the
@@ -208,6 +213,8 @@ export function object(state: State, events: readonly GameEvent[], session: Sess
   // (The upgrade's tell here is the smooth screen; the desk bar keeps its own.)
   const img = `/objects/${id}_front.png`;
   const using = session.hand.using;
+  // objects-in-room R1: used where it does not work, the screen is faint (and its keys do nothing).
+  const faint = using && !worksHere(state, session, id);
   const down = session.hand.keyDown && session.hand.keyDown.object === id && session.hand.keyDown.until > nowMs ? session.hand.keyDown.key : null;
   // The dictionary is a clamshell, closed when lifted (FR3.6): while closed its keys are under the
   // lid, so none render and `obj-key` is ignored; only the click that opens it counts.
@@ -226,13 +233,13 @@ export function object(state: State, events: readonly GameEvent[], session: Sess
     // no photo. The flip / rotate buttons sit under it (added by renderDevice). `p` is the program
     // state (the tape's mode and volume read it).
     const device = renderDevice(id, state, session, env.level, nowMs, open === true, p)!;
-    return html`<div class="${cls("held", "obj", "device", upgraded && "upgraded", "using", "focus")}" data-object="${id}" data-mode="using" data-face="${session.hand.face}"${attrs}><div class="breathe"><div class="turn"><div class="face front device-face">${device}</div></div></div></div>`;
+    return html`<div class="${cls("held", "obj", "device", upgraded && "upgraded", "using", "focus", faint && "faint")}" data-object="${id}" data-mode="using" data-face="${session.hand.face}"${attrs}><div class="breathe"><div class="turn"><div class="face front device-face">${device}</div></div></div></div>`;
   }
   // 使用 is a focus view (2026-11-03, fixed): the whole front face fits inside the stage (≤ 88 % of
   // both dimensions, centred; the `.focus` class drives the fit). The behind dims to 70 % and blurs.
   // A flippable photo object (iccard, phone, textbook) shows the flip button under it in 使用.
   const turn = using && FLIPPERS.includes(id) && hasString("obj.flip") ? html`<div class="turnbar"><button type="button" class="turnbtn" data-action="obj-flip" data-object="${id}">${tr("obj.flip")}</button></div>` : null;
-  return html`<div class="${cls("held", "obj", upgraded && "upgraded", using && "using", using && "focus")}" data-object="${id}" data-mode="${using ? "using" : "holding"}" data-face="${session.hand.face}"${attrs}><div class="breathe"><div class="turn"><div class="face front"><img src="${img}" alt="" draggable="false">${screen(id, state, env.level, heldUp, using)}${keys}${front}</div><div class="face back"><div class="back-art"><img src="/objects/${id}_back.png" alt="" draggable="false">${back}</div></div></div></div>${turn}</div>`;
+  return html`<div class="${cls("held", "obj", upgraded && "upgraded", using && "using", using && "focus", faint && "faint")}" data-object="${id}" data-mode="${using ? "using" : "holding"}" data-face="${session.hand.face}"${attrs}><div class="breathe"><div class="turn"><div class="face front"><img src="${img}" alt="" draggable="false">${screen(id, state, env.level, heldUp, using)}${keys}${front}</div><div class="face back"><div class="back-art"><img src="/objects/${id}_back.png" alt="" draggable="false">${back}</div></div></div></div>${turn}</div>`;
 }
 
 /** The held layer, or null when nothing is held. */

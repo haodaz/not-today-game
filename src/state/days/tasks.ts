@@ -5,6 +5,7 @@
 // strictly, frozen; no string is rewritten.
 import { parseLine, type SayLine } from "./table";
 import { bilingual, bilingualValues } from "../content-locale";
+import { FACINGS, isFacing, type Facing } from "@world/room/facings";
 
 export const PATHS = ["self", "look", "let"] as const;
 export type PathMode = (typeof PATHS)[number];
@@ -107,6 +108,8 @@ export interface BoardLock {
   readonly object?: string;
   readonly from?: CardFrom;
   readonly hint?: string;
+  /** objects-in-room R3: the facing where the object must be used for the chips (object locks only). */
+  readonly face?: Facing;
   readonly codes: readonly string[];
   readonly answer: string;
 }
@@ -475,9 +478,15 @@ function board(v: unknown, w: string): TaskBoard {
   if (v.given.lock !== undefined) {
     const lw = `${w}.given.lock`;
     if (!isRecord(v.given.lock)) fail(lw, "must be an object");
-    keys(v.given.lock, ["object", "from", "hint", "codes", "answer"], lw);
+    keys(v.given.lock, ["object", "from", "hint", "face", "codes", "answer"], lw);
     // A lock has an object, a source, or both (day-graph addition 2026-11-04) — never neither.
     if (v.given.lock.object === undefined && v.given.lock.from === undefined) fail(lw, "must have an object or a from (or both)");
+    // objects-in-room R3: a place belongs to an object lock (an object, no source), and is a facing.
+    const face = v.given.lock.face;
+    if (face !== undefined) {
+      if (v.given.lock.object === undefined || v.given.lock.from !== undefined) fail(`${lw}.face`, "only an object lock (an object, no from) names a face");
+      if (typeof face !== "string" || !isFacing(face)) fail(`${lw}.face`, `${JSON.stringify(face)} is not a facing (${FACINGS.join(", ")})`);
+    }
     const codes = strings(v.given.lock.codes, `${lw}.codes`);
     const answer = str(v.given.lock.answer, `${lw}.answer`);
     if (!codes.includes(answer)) fail(`${lw}.answer`, `"${answer}" is not one of the codes`);
@@ -485,6 +494,7 @@ function board(v: unknown, w: string): TaskBoard {
       ...(v.given.lock.object !== undefined ? { object: str(v.given.lock.object, `${lw}.object`) } : {}),
       ...(v.given.lock.from !== undefined ? { from: lockFrom(v.given.lock.from, `${lw}.from`) } : {}),
       ...(v.given.lock.hint !== undefined ? { hint: str(v.given.lock.hint, `${lw}.hint`) } : {}),
+      ...(face !== undefined ? { face: face as Facing } : {}),
       codes,
       answer,
     };

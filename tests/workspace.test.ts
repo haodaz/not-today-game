@@ -48,12 +48,24 @@ function day1(done: string[] = [], found: string[] = []): Store {
 function harness(store: Store) {
   const session = initialSession({ beat: "work", time: "10:00" }, "right", "desktop");
   const ctx: ActionContext = { store, session, rerender: () => {}, later: () => {}, now: () => 0 };
-  const out = () => renderWorkbench({ state: store.getState(), events: store.getEvents(), startDay: store.getStartDay(), session, night: false, nowMs: 0 } as AppContext).body.value;
+  // 工作台 as the monitor draws it (shell R10): its one top bar, then the page under it.
+  const out = () => {
+    const r = renderWorkbench({ state: store.getState(), events: store.getEvents(), startDay: store.getStartDay(), session, night: false, nowMs: 0 } as AppContext);
+    return `<div class="app-top">${r.bar.value}</div>${r.body.value}`;
+  };
   const act = (name: string, data: Record<string, string> = {}) => loopActions[name]!(ctx, data as DOMStringMap, null as never);
-  return { session, ctx, out, act };
+  /** The sidebar's markup, opened for the look (shell R10: it is collapsed by default). */
+  const side = () => {
+    const was = session.wbSidebar;
+    session.wbSidebar = true;
+    const s = /<aside class="wb-sidebar sessions">(.*?)<\/aside>/s.exec(out())?.[1] ?? "";
+    session.wbSidebar = was;
+    return s;
+  };
+  return { session, ctx, out, act, side };
 }
-const sideOf = (html: string) => /<div class="side sessions">(.*?)<div class="me">/s.exec(html)?.[1] ?? "";
-const headOf = (html: string) => /<div class="wb-task-h[^"]*">(.*?)<div class="wb-task-body/s.exec(html)?.[1] ?? "";
+/** The one top bar's contents (shell R10). */
+const headOf = (html: string) => /<div class="app-top">(.*?)<\/div><div class="body wb-app">/s.exec(html)?.[1] ?? "";
 const taskOpens = (store: Store) => store.getEvents().filter((e) => e.kind === "open" && e.target.startsWith("task:"));
 
 describe("R1 · two kinds of page", () => {
@@ -83,7 +95,7 @@ describe("R1 · two kinds of page", () => {
     expect(h.session.workbenchPage).toBe("task:task3");
     const out = h.out();
     const head = headOf(out);
-    expect(head).toContain(`<b>${title("task3")}</b>`);
+    expect(head).toContain(`<span class="tt-name">${title("task3")}</span>`);
     expect(head).toContain(escapeHtml(t("wb.task.for", { who: t("msgs.boss") })));
     expect(head).toContain(`<span class="st doing">${escapeHtml(t("wb.task.doing"))}</span>`);
     // shell 2026-11-04: the IDE board's panes (预览 + 代码 by default; no files in this fixture: 预览).
@@ -120,15 +132,16 @@ describe("R1 · two kinds of page", () => {
 
 describe("R2 · one navigation: the rail and the session list", () => {
   it("nothing opened today: only 新任务; no expanded nav column", () => {
-    const out = harness(day1()).out();
-    const side = sideOf(out);
-    expect(side).toContain(`data-action="wb-nav" data-page="home" data-compose="1">${escapeHtml(t("wb.sessions.new"))}</button>`);
+    const h = harness(day1());
+    const out = h.out();
+    const side = h.side();
+    expect(side).toMatch(new RegExp(`data-action="wb-nav" data-page="home" data-compose="1"><svg[^>]*>.*?</svg><span>${escapeHtml(t("wb.sessions.new"))}</span></button>`, "s"));
     expect(side).not.toContain(escapeHtml(t("wb.sessions.today")));
     expect(side).not.toContain(escapeHtml(t("wb.sessions.recent")));
     expect(side).not.toContain("task:");
     for (const key of ["wb.search", "wb.nav.tickets", "wb.nav.projects", "wb.sec.doing"]) expect(out, key).not.toContain(escapeHtml(t(key)));
-    // The rail stays.
-    expect(out).toContain('<nav class="wb-rail">');
+    // The section icons (shell R10) are in the sidebar.
+    expect(side).toContain('<nav class="wb-sections">');
   });
 
   it("opening task A then B lists B, A under 今天 (once each, from today's open events), the current one highlighted", () => {
@@ -141,7 +154,7 @@ describe("R2 · one navigation: the rail and the session list", () => {
     h.act("wb-nav", { page: "task:task2" });
     expect(taskOpens(store).map((e) => e.kind === "open" && e.target)).toEqual(["task:task1", "task:task2"]);
     expect(sessionList(store.getState(), store.getEvents()).today.map((e) => e.taskId)).toEqual(["task2", "task1"]);
-    const side = sideOf(h.out());
+    const side = h.side();
     expect(side.indexOf(escapeHtml(t("wb.sessions.today")))).toBeGreaterThan(-1);
     expect(side.indexOf('data-page="task:task2"')).toBeLessThan(side.indexOf('data-page="task:task1"'));
     expect(side).toContain('<button type="button" class="it on" data-action="wb-nav" data-page="task:task2"><i class="dot doing"');
@@ -166,14 +179,14 @@ describe("R2 · one navigation: the rail and the session list", () => {
     // action is what the session list's buttons run underneath.)
     const nav = (data: Record<string, string>) => workbenchActions["wb-nav"]!(h.ctx, data as DOMStringMap, null as never);
     nav({ page: "home" });
-    const side = sideOf(h.out());
+    const side = h.side();
     expect(side).not.toContain(escapeHtml(t("wb.sessions.today")));
     expect(side).toContain(escapeHtml(t("wb.sessions.recent")));
     expect(side).toContain('class="it earlier" data-action="wb-nav" data-page="task:task1" data-day="1"');
     nav({ page: "task:task1", day: "1" });
     expect([h.session.workbenchPage, h.session.wbTaskDay]).toEqual(["task:task1", 1]);
     const out = h.out();
-    expect(sideOf(out)).toContain('class="it on earlier"');
+    expect(h.side()).toContain('class="it on earlier"');
     expect(out).toContain('<div class="ask done">');
     expect(out).not.toContain('data-action="wb-send"');
     // Read-only: opening it logs nothing, and an earlier task never opened that day cannot be opened.

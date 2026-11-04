@@ -32,8 +32,10 @@ export interface MonitorModel {
   readonly winTitle: SafeHtml;
   readonly winClass: string;
   readonly barRight: SafeHtml | null;
-  /** Replaces the title and the right-hand bar text (the browser's URL bar). */
+  /** Replaces the title and the right-hand bar text (the browser's URL bar; 工作台's own top bar). */
   readonly bar?: SafeHtml | null;
+  /** "full" (shell R10, 工作台): no window, the app fills the screen under the OS bar; its bar is its own 44 px top bar. */
+  readonly chrome?: "full";
   readonly body: SafeHtml;
   /** The night plate's small line (strings key). */
   readonly nightSubKey: string;
@@ -110,8 +112,13 @@ function windowFrame(m: ShellModel, monitor: MonitorModel): SafeHtml | null {
   // An empty display: no window at all.
   if (monitor.app === null) return null;
   // The title bar is the window's handle (tingtalk R1b: dragging it across the inner edge moves it).
+  // shell R10: a full-screen app (工作台) has no window: it fills the screen under the OS bar, and its
+  // one 44 px top bar is the handle (the traffic lights first, then the app's own bar).
+  const full = monitor.chrome === "full";
   const frame = (inner: SafeHtml) =>
-    html`<div class="${cls("win", monitor.winClass)}" data-win="${monitor.app}" style="left:24px;top:54px;width:1392px;height:760px"><div class="bar" data-drag-win="${monitor.app}" data-side="${monitor.side}">${trafficLights(monitor)}${inner}</div>`;
+    full
+      ? html`<div class="${cls("win", monitor.winClass, "full")}" data-win="${monitor.app}"><div class="bar app-top" data-drag-win="${monitor.app}" data-side="${monitor.side}">${trafficLights(monitor)}${inner}</div>`
+      : html`<div class="${cls("win", monitor.winClass)}" data-win="${monitor.app}" style="left:24px;top:54px;width:1392px;height:760px"><div class="bar" data-drag-win="${monitor.app}" data-side="${monitor.side}">${trafficLights(monitor)}${inner}</div>`;
   if (m.night) {
     // Night: the desktop stays, but every app has closed its door.
     return html`${frame(html`<span class="title">${monitor.winTitle}</span>`)}<div class="plate"><div class="lock"></div>${tr("night.plate.title")}<small>${tr(monitor.nightSubKey)}</small></div></div>`;

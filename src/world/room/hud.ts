@@ -19,7 +19,8 @@ import { booted, checklist, deskMeal, itemStates, loopContext, type ChecklistVie
 import { itemOf } from "@state/delivery/shops";
 import { ordersOn } from "@world/delivery/meals";
 import { raidNights, takeOf } from "@state/nights";
-import { isNight } from "@world/desktop/beat";
+import { isEvening, isNight } from "@world/desktop/beat";
+import { lampLit } from "@world/objects/works";
 import { hudKuro } from "@world/desktop/kuro/mini";
 import { DESK_SHOT, DOOR_SHOT, FLAT_HOTS, isFlatFacing, rectStyle, ROOM_SHOT, WINDOW_SHOT, type FlatHotId, type Rect } from "./shots";
 import { isFacing } from "./facings";
@@ -433,13 +434,17 @@ export function windowLight(day: number): SafeHtml {
 }
 /** The evening look's dark layer (day-loop addition 2026-11-02); the splat's night layer matches it. */
 export const EVENING_DARK = 0.6;
-/** Evening is the `desk` beat on (night falls at 18:30, or earlier if the clock was). */
-export const isEvening = (clock: Pick<Session["clock"], "beat">): boolean => clock.beat === "desk" || clock.beat === "night";
-/** The stills' evening look: the night dark layer at 0.6 and the lamp's glow, over the photo and under everything placed. */
-function eveningLook(view: string): SafeHtml {
-  const lamp = view === "room" ? ROOM_SHOT.lamp : view === "desk" ? deskLayout.lamp : null;
+export { isEvening };
+/**
+ * The stills' evening look: the night dark layer at 0.6 and the lamp's glow, over the photo and under
+ * everything placed. The glow follows the lamp (objects-in-room R1): off when it was clicked off, and
+ * by day, lit only when it was clicked on (then without the dark layer).
+ */
+function eveningLook(view: string, evening: boolean, lampLit: boolean): SafeHtml | null {
+  const lamp = lampLit ? (view === "room" ? ROOM_SHOT.lamp : view === "desk" ? deskLayout.lamp : null) : null;
   const glow = lamp ? html`<i class="evening-lamp" style="left:${lamp.l + lamp.w / 2}px;top:${lamp.t + lamp.h / 2}px"></i>` : null;
-  return html`<div class="evening-look" style="--evening-dark:${EVENING_DARK}">${glow}</div>`;
+  if (!evening && !glow) return null;
+  return html`<div class="${cls("evening-look", !evening && "day-lamp")}" style="--evening-dark:${evening ? EVENING_DARK : 0}">${glow}</div>`;
 }
 /** The edge hints' words: a turn's way (room-turn R2), or 桌子's way back. */
 const EDGE_LABEL = { left: "hud.turn.left", right: "hud.turn.right", back: "hud.back" } as const;
@@ -488,7 +493,7 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const top = view === "desk" && !waiting && !dream ? tabletop(deskThings(state, events, session)) : null;
   // The collapse stack and the evening look apply to all four facings (room-turn R4).
   const fx = dream ? null : renderFx(fxPlan(state.day, view));
-  const evening = isEvening(session.clock) && !dream ? eveningLook(view) : null;
+  const evening = dream ? null : eveningLook(view, isEvening(session.clock), lampLit(session));
   const fadeLen = session.cam?.fade ?? ARRIVE_FADE_MS;
   const late = fade === null ? null : raw(` style="--late:-${Math.round(fade)}ms${fadeLen !== ARRIVE_FADE_MS ? `;--late-dur:${fadeLen}ms` : ""}"`);
   // On a turn edge the cursor is `walk` (room-turn R2; cursors.css reads the class).

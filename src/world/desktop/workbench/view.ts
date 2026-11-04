@@ -22,6 +22,7 @@ import { openWork } from "./work";
 import { renderShell } from "./shell";
 import { sessionList, type SessionEntry } from "./sessions";
 import { COMPOSER_FOCUS } from "./actions";
+import { ICONS } from "../icons";
 
 /** U5: the changelog panel collapses to one line from the first day of the second ring. */
 export const CHANGELOG_COLLAPSE_DAY: number = (() => {
@@ -32,25 +33,83 @@ export const CHANGELOG_COLLAPSE_DAY: number = (() => {
 type Fill = (s: string) => string;
 
 /**
- * The session list (workspace R2), in place of the old expanded nav column: 新任务 (home, the caret
- * in the composer), 今天 (the tasks opened today, newest first, the current one highlighted) and
- * 最近 (earlier days', read-only). Derived from the log's `open task:<id>`.
+ * The session rows (workspace R2): 今天 (the tasks opened today, newest first, the current one
+ * highlighted) and 最近 (earlier days', read-only), derived from the log's `open task:<id>`;
+ * filtered by the sidebar's search (shell R10). The sidebar and the title's ▾ dropdown share them.
  */
-function sessions(ctx: AppContext, fill: Fill): SafeHtml {
+function sessionRows(ctx: AppContext, fill: Fill, filter = ""): { today: SafeHtml | null; recent: SafeHtml | null } {
   const { state, events, session } = ctx;
   const { today, recent } = sessionList(state, events);
+  const q = filter.trim().toLowerCase();
+  const keep = (e: SessionEntry) => q === "" || fill(e.task.title).toLowerCase().includes(q);
   const current = taskPageId(session.workbenchPage);
   const row = (e: SessionEntry, earlier: boolean) => {
     const on = current === e.taskId && (session.wbTaskDay ?? state.day) === e.day;
     const dot = html`<i class="${cls("dot", e.done ? "done" : "doing")}" aria-label="${tr(e.done ? "wb.task.done" : "wb.task.doing")}"></i>`;
     return html`<button type="button" class="${cls("it", on && "on", earlier && "earlier")}" data-action="wb-nav" data-page="task:${e.taskId}"${earlier ? html` data-day="${e.day}"` : null}>${dot}<span class="tt">${fill(e.task.title)}</span></button>`;
   };
-  const fresh = html`<button type="button" class="${cls("it", "new", session.workbenchPage === "home" && "on")}" data-action="wb-nav" data-page="home" data-compose="1">${tr("wb.sessions.new")}</button>`;
-  const todayList = today.length ? html`<div class="sec">${tr("wb.sessions.today")}</div>${today.map((e) => row(e, false))}` : null;
-  const recentList = recent.length ? html`<div class="sec">${tr("wb.sessions.recent")}</div>${recent.map((e) => row(e, true))}` : null;
-  // The workbench's own brand (未来智能 · 工作台) lives inside its window only (desktop-ui 2026-11-02,
-  // point 1): the OS name is the top bar's; the company brand sits here in the side logo.
-  return html`<div class="side sessions"><div class="logo"><i></i><div><b>${tr("wb.brand")}</b><small>${tr("wb.sub")}</small></div></div>${fresh}${todayList}${recentList}<div class="me"><i></i><div><b>${tr("wb.me")}</b><br><small style="color:var(--ink-3)">${tr("wb.me.role")}</small></div></div></div>`;
+  const t1 = today.filter(keep);
+  const r1 = recent.filter(keep);
+  return {
+    today: t1.length ? html`<div class="sec">${tr("wb.sessions.today")}</div>${t1.map((e) => row(e, false))}` : null,
+    recent: r1.length ? html`<div class="sec">${tr("wb.sessions.recent")}</div>${r1.map((e) => row(e, true))}` : null,
+  };
+}
+
+/** The app's section icons (shell R10): 工作台 · 文档 · 审批 · 通讯录 (审批 and 通讯录 have no page yet). */
+const SECTIONS: readonly { key: string; page: WorkbenchPage | null; icon: SafeHtml }[] = [
+  { key: "wb.nav.home", page: "home", icon: ICONS.home },
+  { key: "wb.nav.docs", page: "docs", icon: ICONS.doc },
+  { key: "wb.nav.approvals", page: null, icon: ICONS.approvals },
+  { key: "wb.nav.contacts", page: null, icon: ICONS.contacts },
+];
+
+/**
+ * The sidebar (shell R10): a 280 px panel over the content from the left edge, under the top bar:
+ * the section icons, a search box (filters the session titles), + 新任务, 今天 / 最近. Collapsed
+ * (the default, everywhere) it is not drawn; ⌘B toggles it; a click outside closes it.
+ */
+function sidebar(ctx: AppContext, fill: Fill): SafeHtml | null {
+  const { session } = ctx;
+  if (!session.wbSidebar) return null;
+  const page = session.workbenchPage;
+  const icons = SECTIONS.map(({ key, page: target, icon }) => {
+    // 工作台 is on for its own pages (home, the task pages, 账本, 代码); 文档 for 文档.
+    const on = target === page || (target === "home" && (page === "ledger" || page === "code" || taskPageId(page) !== null));
+    return target
+      ? html`<button type="button" class="${cls("ri", on && "on")}" data-action="wb-nav" data-page="${target}" aria-label="${t(key)}" title="${t(key)}">${icon}</button>`
+      : html`<span class="ri" aria-label="${t(key)}" title="${t(key)}">${icon}</span>`;
+  });
+  const ph = t("msgs.search");
+  const search = html`<label class="wb-search">${ICONS.search}<input type="search" data-input="wb-search" data-focus="wb-search" placeholder="${ph}" aria-label="${ph}" value="${session.wbSearch}" autocomplete="off" spellcheck="false"></label>`;
+  const fresh = html`<button type="button" class="${cls("it", "new", page === "home" && "on")}" data-action="wb-nav" data-page="home" data-compose="1">${ICONS.plus}<span>${tr("wb.sessions.new")}</span></button>`;
+  const rows = sessionRows(ctx, fill, session.wbSearch);
+  return html`<div class="wb-scrim" data-action="wb-sidebar-close" aria-hidden="true"></div><aside class="wb-sidebar sessions"><nav class="wb-sections">${icons}</nav>${search}${fresh}${rows.today}${rows.recent}</aside>`;
+}
+
+/** The title's ▾ (shell R10): the session list as a dropdown under the title; a click outside closes it. */
+function titleMenu(ctx: AppContext, fill: Fill): SafeHtml | null {
+  if (!ctx.session.wbTitleMenu) return null;
+  const rows = sessionRows(ctx, fill);
+  return html`<div class="wb-scrim" data-action="wb-titlemenu-close" aria-hidden="true"></div><div class="wb-titlemenu sessions" role="menu">${rows.today}${rows.recent}</div>`;
+}
+
+/**
+ * 工作台's one top bar (shell R10), after the traffic lights: the sidebar toggle, ← →, the page
+ * title (a task's with its ▾ session dropdown; on home, 工作台), and at the right end the page's
+ * tools (a task page's pane toggles and the 老物件 strip).
+ */
+function topBar(ctx: AppContext, title: SafeHtml, tools: SafeHtml | null, dropdown: boolean): SafeHtml {
+  const { session } = ctx;
+  const h = session.wbHistory;
+  const label = (key: string) => (hasString(key) ? t(key) : "");
+  const toggle = html`<button type="button" class="${cls("sh-tg", "wb-side-tg", session.wbSidebar && "on")}" data-action="wb-sidebar" aria-pressed="${session.wbSidebar ? "true" : "false"}" aria-label="${label("wb.sessions.toggle")}" title="${label("wb.sessions.toggle")}">${ICONS.sidebar}</button>`;
+  const back = html`<button type="button" class="sh-tg" data-action="wb-back"${h.at > 0 ? null : html` disabled`} aria-label="←">${ICONS.back}</button>`;
+  const fwd = html`<button type="button" class="sh-tg" data-action="wb-forward"${h.at < h.pages.length - 1 ? null : html` disabled`} aria-label="→">${ICONS.forward}</button>`;
+  const name = dropdown
+    ? html`<button type="button" class="${cls("wb-title", "drop", session.wbTitleMenu && "on")}" data-action="wb-titlemenu" aria-haspopup="menu" aria-expanded="${session.wbTitleMenu ? "true" : "false"}">${title}${ICONS.down}</button>`
+    : html`<span class="wb-title">${title}</span>`;
+  return html`${toggle}${back}${fwd}${name}<span class="sp"></span>${tools}`;
 }
 
 /** Today's starters the player can still ask (as the player's box offers them). */
@@ -127,10 +186,10 @@ function home(ctx: AppContext, data: WorkbenchDay | null, fill: Fill): SafeHtml 
  * old objects' strip) and the task's body filling the rest — its board in its view, or its work
  * surface. The task under way is live; a handed-in or an earlier day's task is read back, read-only.
  */
-function taskPage(ctx: AppContext, taskId: string, fill: Fill): SafeHtml {
+function taskPage(ctx: AppContext, taskId: string, fill: Fill): { main: SafeHtml; title: SafeHtml; tools: SafeHtml } {
   const day = ctx.session.wbTaskDay ?? ctx.state.day;
   const task = taskForId(day, taskId);
-  if (!task) return html`<div class="main task"></div>`;
+  if (!task) return { main: html`<div class="main task"></div>`, title: html``, tools: html`` };
   // shell (2026-11-04): every task page is the shell — the conversation frame with its cards.
   return renderShell(ctx, task, day, fill);
 }
@@ -183,13 +242,14 @@ function codePage(state: State, data: WorkbenchDay | null, fill: Fill): SafeHtml
   return html`<div class="page">${header(code ? fill(code.file) : tr("wb.nav.code"), code ? fill(code.meta) : null, [["wb.code.test", "", "wb-test"], ["wb.docs.look", "eye", "wb-look"], ["wb.code.pass", "do", "wb-pass"]])}<div class="cols"><div class="col code">${lines}</div><div class="log"><h4>${tr("wb.changelog")}</h4>${log}</div></div></div>`;
 }
 
-export function renderWorkbench(ctx: AppContext, days: ReadonlyMap<number, WorkbenchDay> = workbenchDays): { body: SafeHtml; badge: number; tag: SafeHtml | null } {
+export function renderWorkbench(ctx: AppContext, days: ReadonlyMap<number, WorkbenchDay> = workbenchDays): { body: SafeHtml; badge: number; tag: SafeHtml | null; bar: SafeHtml } {
   const data = workbenchDay(ctx.state.day, days);
   const fill: Fill = (s) => fillPlaceholders(s, ctx.state.names);
   const page = ctx.session.workbenchPage;
   const taskId = taskPageId(page);
+  const task = taskId !== null ? taskPage(ctx, taskId, fill) : null;
   const main =
-    taskId !== null ? taskPage(ctx, taskId, fill)
+    task ? task.main
     : page === "docs" ? docsPage(data, fill)
     : page === "ledger" ? ledgerPage(ctx.state, data, fill)
     : page === "code" ? codePage(ctx.state, data, fill)
@@ -198,31 +258,15 @@ export function renderWorkbench(ctx: AppContext, days: ReadonlyMap<number, Workb
   const c = ctx.session.kuroCloser;
   const closer = page === "docs" && c?.where === "docs" ? html`<div class="wb-closer">${closerSlot(ctx, c.pageId)}</div>` : null;
   const tag = data?.docs?.tag ? html`${fill(data.docs.tag)}` : null;
-  // workspace R2/R3: the rail and the session list; the old objects only in a task page's header.
-  // The work conversations are 听听's now (tingtalk 2026-11-04): no 消息 pane, no 消息 rail item.
+  // shell R10: one top bar; the page under it, full height; the sidebar and the title's dropdown
+  // over it when open. The work conversations are 听听's (tingtalk 2026-11-04).
+  const key = page === "docs" ? "wb.nav.docs" : page === "ledger" ? "wb.nav.ledger" : page === "code" ? "wb.nav.code" : "dock.workbench";
+  const title = task ? task.title : html`<span class="tt-name">${tr(key)}</span>`;
   return {
-    body: html`<div class="body">${rail(page)}${sessions(ctx, fill)}${main}${closer}</div>`,
+    bar: topBar(ctx, title, task ? task.tools : null, task !== null),
+    body: html`<div class="body wb-app">${main}${closer}${sidebar(ctx, fill)}${titleMenu(ctx, fill)}</div>`,
     // Its dock tile counts its own: the jobs under way.
     badge: data?.doing.length ?? 0,
     tag,
   };
-}
-
-/** The DingTalk-like left rail: 工作台 / 文档 / 审批 / 通讯录. 审批 and 通讯录 have no page yet. */
-const RAIL: readonly { key: string; page: WorkbenchPage | null }[] = [
-  { key: "wb.nav.home", page: "home" },
-  { key: "wb.nav.docs", page: "docs" },
-  { key: "wb.nav.approvals", page: null },
-  { key: "wb.nav.contacts", page: null },
-];
-
-function rail(page: WorkbenchPage): SafeHtml {
-  const items = RAIL.map(({ key, page: target }) => {
-    // 工作台 is on for its own pages (home, the task pages, 账本, 代码); 文档 for 文档.
-    const on = target === page || (target === "home" && (page === "ledger" || page === "code" || taskPageId(page) !== null));
-    return target
-      ? html`<button type="button" class="${cls("ri", on && "on")}" data-action="wb-nav" data-page="${target}"><i class="${`rg ${key.slice("wb.nav.".length)}`}" aria-hidden="true"></i><span>${tr(key)}</span></button>`
-      : html`<div class="ri"><i class="${`rg ${key.slice("wb.nav.".length)}`}" aria-hidden="true"></i><span>${tr(key)}</span></div>`;
-  });
-  return html`<nav class="wb-rail">${items}</nav>`;
 }

@@ -18,10 +18,41 @@ import type { ActionContext, ActionHandler } from "../controller";
 import type { AppContext, Session } from "../model";
 import { openWork } from "./work";
 import { openObjectFromBar } from "./objbar";
+import { handOf } from "@state/hands";
+import { enterUse, facingOf } from "@world/objects/works";
+import type { Facing } from "@world/room/facings";
 
 /** The card text of an id (tray or Kuro), or "". */
 export function cardText(board: TaskBoard, id: string): string {
   return [...board.cards, ...board.kuro.cards].find((c) => c.id === id)?.text ?? "";
+}
+
+/**
+ * A facing's name for 拿去{face}那边用。 (objects-in-room R4): the room views' own words. 窗 has no
+ * key in content yet (`hud.cam.window`): until it does it shows as missing and the strings check
+ * reports it.
+ */
+const FACE_NAME: Readonly<Record<Facing, string>> = { room: "hud.cam.room", bed: "room.bed", door: "hud.cam.door", window: "hud.cam.window" };
+
+/** An object lock with no face, waiting: the object's `works` line, if content has one. */
+function lockWaitLine(object: string): SafeHtml | null {
+  const key = handOf(object).works?.line;
+  return key && hasString(key) ? tr(key) : null;
+}
+
+/**
+ * The lock's 用{object}看一眼 must first take the player to the lock's `face` (objects-in-room R3):
+ * an object lock with its object at hand, a face, and the player standing elsewhere (屏幕 / 桌子 are
+ * 房间's). Null when the lift happens where the player is (the 老物件栏, as before).
+ */
+export function lockFaceMove(ctx: ActionContext): { readonly object: string; readonly face: Facing } | null {
+  const c = currentBoard(ctx);
+  const lock = c?.board.given.lock;
+  if (!c || !lock || !isObjectLock(lock) || lock.face === undefined) return null;
+  const state = ctx.store.getState();
+  if (!lockObjectAvailable(c.board, state, ctx.store.getEvents())) return null;
+  if (stateOf(ctx, c.task, c.board).unlocked || state.upgraded[lock.object] === true) return null;
+  return facingOf(ctx.session.view) === lock.face ? null : { object: lock.object, face: lock.face };
 }
 
 /** The lock row's cells: ▒▒▒▒ while locked, the given text once open. */
@@ -35,6 +66,8 @@ export function lockRow(board: TaskBoard, s: BoardState, state: State, events: r
   // The chips are offered: a source lock once its source was opened today (day-graph addition
   // 2026-11-04); an object lock while its object is found and not taken (object-upgrade 2026-11-03).
   const offered = lockCodesOffered(board, state, events);
+  // objects-in-room R3: the object is there to use, but not yet used where it works today.
+  const available = isObjectLock(lock) && lockObjectAvailable(board, state, events);
   const tryIt = hasString("board.kuroTry") ? html`<button type="button" class="bchip" data-action="board-kuro-lock">${tr("board.kuroTry")}</button>` : null;
   let panel: SafeHtml | null = null;
   if (open) {
@@ -46,6 +79,11 @@ export function lockRow(board: TaskBoard, s: BoardState, state: State, events: r
     } else if (source) {
       // Not found yet: the hint is on the (greyed) control; only Kuro's 让它试 here, as before.
       panel = tryIt;
+    } else if (available) {
+      // Waiting for the object to be used where it works (R3): 拿去{face}那边用。 — or, with no face,
+      // the object's own line for why it did not work; 让它试 is unchanged.
+      const line = lock.face !== undefined ? (hasString("board.lock.goTo") ? tr("board.lock.goTo", { face: t(FACE_NAME[lock.face]) }) : null) : lockWaitLine(lock.object!);
+      panel = html`${line ? html`<div class="bnote">${line}</div>` : null}${tryIt}`;
     } else {
       const noTool = hasString("board.noTool") ? html`<div class="bnote">${tr("board.noTool")}</div>` : null;
       panel = html`${noTool}${tryIt}`;
@@ -61,7 +99,7 @@ export function lockRow(board: TaskBoard, s: BoardState, state: State, events: r
   } else {
     const objName = lock.object !== undefined && hasString(`obj.name.${lock.object}`) ? t(`obj.name.${lock.object}`) : (lock.object ?? "");
     label =
-      offered && hasString("board.lock.useObject") ? tr("board.lock.useObject", { object: objName })
+      available && hasString("board.lock.useObject") ? tr("board.lock.useObject", { object: objName })
       : hasString("board.lockCode") ? tr("board.lockCode")
       : null;
   }
@@ -260,7 +298,9 @@ const actions: Record<string, ActionHandler> = {
     // unchanged. Not found / taken: the panel alone (no-tool row + 让它试), as before.
     // Object locks only (day-graph addition 2026-11-04): a source lock's code is not on the object.
     const lock = c.board.given.lock;
-    if (lock && isObjectLock(lock) && lockObjectAvailable(c.board, state, events)) openObjectFromBar(ctx.session, state, lock.object);
+    // objects-in-room R2: lifting it here is using it at 房间 (屏幕 is 房间's); a lock with another
+    // face is taken there first by the room's own wrapper (game.ts, `lockFaceMove`).
+    if (lock && isObjectLock(lock) && lockObjectAvailable(c.board, state, events) && openObjectFromBar(ctx.session, state, lock.object)) enterUse(ctx, lock.object);
     ctx.session.boardLockOpen = true;
     ctx.rerender();
   },

@@ -15,6 +15,7 @@ import { applyReplyEvent, knownRecipients } from "./replies/effects";
 import { constants, membersOf } from "./variables";
 import { PAGE_ID } from "./closes";
 import { applyJudged, rememberTurn, type JudgedFields } from "./chat";
+import { isFacing, type Facing } from "@world/room/facings";
 
 /** The two reply choices world-state reacts to. "no" is the chick's word (objectWords.chick). */
 export const LOAN_CHOICE_LEND = "lend";
@@ -93,7 +94,9 @@ export type GameEvent =
   // day-loop "the boss calls" (2026-11-03): the player answered 「好的。」; and the call ended.
   // Two log events drive the scripted call so it replays identically; the panel's timing is cosmetic.
   | { kind: "callAnswer"; day: number }
-  | { kind: "callEnded"; day: number };
+  | { kind: "callEnded"; day: number }
+  // objects-in-room R2 (2026-11-04): 使用 entered on an object at a facing; `ok` = its `works` rule held.
+  | { kind: "useAt"; day: number; objectId: string; facing: Facing; ok: boolean };
 
 /** One operation on a board (work v2). All are recorded so the board replays from the log. */
 export type BoardOp =
@@ -105,7 +108,7 @@ export type BoardOp =
 
 export type EventKind = GameEvent["kind"];
 
-/** Exactly these kinds (world-state 12, delivery 3, desktop-ui 1, day-loop 3, object-upgrade 2, san-and-endings 1, title-page 1, dialogue 1, late-days 1, kuro-chat 1). Nothing else may be appended. */
+/** Exactly these kinds (world-state 12, delivery 3, desktop-ui 1, day-loop 3, object-upgrade 2, san-and-endings 1, title-page 1, dialogue 1, late-days 1, kuro-chat 1, work v2 3, the call 2, objects-in-room 1). Nothing else may be appended. */
 export const eventKinds: readonly EventKind[] = [
   "openLayer",
   "recognise",
@@ -138,7 +141,19 @@ export const eventKinds: readonly EventKind[] = [
   "judged",
   "callAnswer",
   "callEnded",
+  "useAt",
 ];
+
+/**
+ * 使用 at a place (objects-in-room R2): a record only, so the board can read whether the object was
+ * used where it works today. The object must be one of the box's, the facing a real one.
+ */
+function applyUseAt(state: State, event: Extract<GameEvent, { kind: "useAt" }>): State {
+  if (!(membersOf("found") ?? []).includes(event.objectId)) throw new Error(`useAt: unknown object ${JSON.stringify(event.objectId)}`);
+  if (!isFacing(String(event.facing))) throw new Error(`useAt: ${JSON.stringify(event.facing)} is not a facing`);
+  if (typeof event.ok !== "boolean") throw new Error("useAt: ok must be true or false");
+  return state;
+}
 
 /**
  * Kuro closed a page the player opened (late-days FR4). `pageId` is `d<day>:reading:<index>`
@@ -358,6 +373,8 @@ export function applyEvent(state: State, event: GameEvent): State {
     case "callAnswer":
     case "callEnded":
       return applyCall(state, event);
+    case "useAt":
+      return applyUseAt(state, event);
     case "judged":
       return applyJudged(state, event.day, event);
     case "open":

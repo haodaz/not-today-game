@@ -303,6 +303,11 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     // No re-render while typing.
     if (el.dataset.input === "draft") session.draft = el.value;
     if (el.dataset.input === "kuro-text") session.kuroDraft = el.value;
+    // shell R10: the sidebar's search filters the session titles as it is typed (the caret stays: data-focus).
+    if (el.dataset.input === "wb-search") {
+      session.wbSearch = el.value;
+      rerender();
+    }
     if (el.dataset.input === "settings-email") setEmailDraft(el.value);
     if (el.dataset.input === "wb-cell" && session.work) session.work.cellDraft = el.value;
   };

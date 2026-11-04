@@ -1998,3 +1998,64 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
   regenerated.
 - Missing asset: `public/os/tingtalk.svg` (the dock tile points at it).
 - `npx tsc --noEmit`: clean. `npx vitest run`: 105 files / 1889 tests passed.
+
+## shell tasks 6–7: one 44 px top bar, the overlay sidebar, line icons (2026-11-04)
+
+- R10 is followed where it differs from R8 (the sidebar is hidden by default everywhere, not only on
+  task pages).
+- 工作台 is a full-screen window (`MonitorModel.chrome: "full"`) with one bar (`.bar.app-top`, 44 px).
+  The bar holds: the traffic lights (green = the move-screen menu), the sidebar toggle, ← →, the
+  title, and at the right the page's tools.
+  - On a task page the title is a button with ▾ that opens the session dropdown, and it keeps
+    `交给 X · status` as a small sub-line. On the other pages it is plain text (工作台 or the page name).
+  - The tools are the explorer toggle (files icon), the pane toggles and 老物件. 老物件 stays on task
+    pages only, as workspace R3 says.
+  - The window-title row, the task header (`sh-head`) and `wb.autosave` are gone.
+- Sidebar (`session.wbSidebar`): a 280 px overlay `aside` over a scrim, holding the section icons
+  (工作台 · 文档 · 审批 · 通讯录), a search box (`wb-search` filters the titles), 新任务, and 今天 /
+  最近. ⌘B / Ctrl+B toggles it while 工作台 is shown on 屏幕 (handled in `loopKeys`). Esc, the scrim
+  and any page change close it.
+- ← → walk `session.wbHistory`, which covers home and task pages only; opening a new page drops the
+  forward entries. The Vivi lock refuses ← → as it refuses `wb-nav`.
+- R8: the `@container` rule that hid the explorer is removed, and the panes shrink to 480 px first.
+- R9: `src/world/desktop/icons.ts` holds 18 px line SVG icons in currentColor, which replace ▤ ◍ ⤢ ×
+  ▸ ↗. The unfilled-slot dot is now drawn by CSS.
+- Tests: 9 new R8–R10 tests in `tests/shell.test.ts`. Updated `workspace`, `shell`, `meeting`,
+  `desktop-apps` and `work-home-split`. `tests/__snapshots__/desktop-snapshots.test.ts.snap` was
+  regenerated.
+
+## objects-in-room: where an object works; locks that name a place (2026-11-04)
+
+- R1:
+  - `objects[].works` is read by `src/state/works.ts` `parseWorks`, through `hands.ts` (`HandEntry.works`).
+    `"works"` is added to `HAND_FIELDS`.
+  - `worksAt(works, upgraded, place)` is the pure rule.
+  - `src/world/objects/works.ts` holds the session-side helpers: `facingOf` (桌子 / 屏幕 → room),
+    `lampLit`, `worksHere` and `enterUse`.
+- The desk lamp now has state, `session.lampOn` (null = as the hour has it: on in the evening). A click
+  toggles it. The evening glow follows it, and by day a clicked-on lamp glows with no dark layer.
+- Where an object does not work:
+  - its focus view gets `.faint`, and the calculator device goes `.dark`;
+  - `obj-key` does nothing (the phone's hinge still opens);
+  - the iccard's coil and against-light text are not drawn;
+  - `works.line` is pushed as one inner line per entry.
+- The phone draws a one-bar `.signal` at 窗 when it has `signal`.
+- R2: `useAt {objectId, facing, ok}` is logged by `obj-use`, `objbar-open` and `board-lock`. It is
+  validated in `applyUseAt` and is in `eventKinds` and `draftArb`. It is logged once per object, facing
+  and *outcome* a day, so a lamp switched on later can still make the object work there.
+- R3:
+  - `given.lock.face` is loaded only on an object lock (an object, no `from`), and only as a facing.
+  - `lockCodesOffered` now also needs `lockUsedOk` when `lockNeedsUse` is true (the lock has a face, or
+    the object has `works`; never for an upgraded object).
+  - The lock row's 用{object}看一眼 label reads availability. While the lock waits, the row shows
+    `board.lock.goTo` with the facing's name (or the object's works line if there is no face), plus 让它试.
+  - `game.ts` wraps `board-lock`: when `lockFaceMove` says so it goes there with `view` (from 屏幕:
+    房间, then the turn), and after `wayMs + 16` it runs `loop-hold` + `obj-use`.
+- Tests: new `tests/objects-in-room.test.ts` (17). Updated `events.test.ts` (kinds),
+  `objects-in-hand.test.ts` (the no-event property allows `useAt`) and `helpers.ts` (`draftArb`).
+- For Claude (content):
+  - the `works` values from R1 in `content/objects.json`;
+  - `face` on the locks (R5);
+  - a name for 窗 at `hud.cam.window` (zh + en). 拿去{face}那边用。 reads it, and until it exists it
+    shows as ⟦hud.cam.window⟧.
+- `npx tsc --noEmit`: clean. `npx vitest run`: 106 files / 1915 tests passed.

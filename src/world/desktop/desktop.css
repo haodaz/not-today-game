@@ -560,16 +560,51 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .wb .main.task.ide .surface.board.ide{height:100%;padding:8px}
 .wb .main.task.ide .surface.board.ide .ide-mid{min-width:50%}
 .wb .main.task.ide .surface.board.ide .ide-right{flex-basis:320px}
+/* shell R10 (2026-11-04): 工作台 is full screen inside the monitor (no window, no title row) under
+   the OS bar, with one 44 px top bar: the traffic lights (12 px), the sidebar toggle, ← →, the
+   page title (▾ on a task page), and at the right end the pane toggles and the 老物件 strip. */
+.win.wb.full{left:0;top:34px;right:0;bottom:0;width:auto;height:auto;border:0;border-radius:0;box-shadow:none;background:#FAF9F7}
+.win.wb.full > .bar.app-top{height:44px;flex:0 0 44px;gap:4px;padding:0 10px 0 14px;border-bottom:1px solid #E7E5E0;background:#FAF9F7;color:#1F1F1F;position:relative;z-index:12}
+.win.wb.full > .bar.app-top .dots{gap:8px;margin-right:10px}
+.win.wb.full > .bar.app-top .dots i{width:12px;height:12px}
+.win.wb.full > .bar.app-top .sp{margin-left:auto}
+.win.wb.full > .body.wb-app{position:relative;flex:1 1 auto;min-height:0;display:flex}
+.win.wb.full > .body.wb-app > .main{flex:1 1 auto;min-width:0}
+.wb .sh-tg .ic,.wb .sh-hb .ic,.wb .sh-src .ic,.wb .wb-title .ic,.wb .wb-sections .ic,.wb .wb-search .ic,.wb .wb-sidebar .new .ic,.wb .sh-ic .ic,.wb .sh-tw .ic{display:block;flex:0 0 auto}
+.wb .sh-tg:disabled{opacity:.35;cursor:default;background:transparent}
+.wb .wb-title{display:inline-flex;align-items:baseline;gap:8px;margin-left:6px;padding:4px 8px;border:0;border-radius:8px;background:transparent;font:inherit;color:#1F1F1F;min-width:0;max-width:46%}
+.wb .wb-title.drop{cursor:pointer}.wb .wb-title.drop .ic{align-self:center;color:#6B6B6B}
+.wb .wb-title.drop:hover,.wb .wb-title.drop.on{background:#F0EEEA}
+.wb .wb-title .tt-name{font-size:15px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.wb .wb-title .tt-sub{font-size:12.5px;color:#6B6B6B;white-space:nowrap}
+.wb .wb-title .st{display:inline-block;padding:0 8px;border-radius:10px;border:1px solid currentColor;line-height:18px}
+.wb .wb-title .st.doing{color:var(--warm)}.wb .wb-title .st.done{color:var(--green)}
+.wb .app-top .wb-objbar{margin-left:6px}
+.wb .app-top .btn{border:1px solid #E5E5E5;border-radius:8px;padding:4px 10px;font:inherit;font-size:12px;color:#1F1F1F;background:#FFFFFF;cursor:pointer;margin-right:6px}
+/* The sidebar: collapsed = not drawn; open = a 280 px panel over the content from the left edge,
+   under the top bar (white, shadow); a click on the scrim (outside it) closes it. */
+.wb .wb-scrim{position:absolute;inset:0;z-index:20;background:transparent}
+.wb .wb-sidebar{position:absolute;left:0;top:0;bottom:0;width:280px;z-index:21;background:#FFFFFF;box-shadow:0 8px 24px rgba(0,0,0,.08);border-right:1px solid #E7E5E0;display:flex;flex-direction:column;gap:2px;padding:10px;box-sizing:border-box;overflow:auto;font-size:13px}
+.wb .wb-sections{display:flex;gap:4px;padding:0 0 8px;border-bottom:1px solid #E7E5E0;margin-bottom:8px}
+.wb .wb-sections .ri{width:36px;height:32px;border:0;border-radius:8px;background:transparent;color:#6B6B6B;display:inline-flex;align-items:center;justify-content:center;padding:0}
+.wb .wb-sections button.ri{cursor:pointer}.wb .wb-sections .ri.on{background:#E3ECFA;color:#2F6FEB}
+.wb .wb-search{display:flex;align-items:center;gap:6px;height:32px;padding:0 10px;border:1px solid #E5E5E5;border-radius:8px;color:#6B6B6B;margin-bottom:6px}
+.wb .wb-search input{flex:1;min-width:0;border:0;outline:0;background:transparent;font:inherit;color:#1F1F1F}
+.wb .wb-sidebar .it,.wb .wb-titlemenu .it{display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;padding:7px 10px;border:0;border-radius:8px;background:none;font:inherit;font-size:13px;color:#1F1F1F;text-align:left;cursor:pointer}
+.wb .wb-sidebar .it:hover,.wb .wb-titlemenu .it:hover{background:#F0EEEA}
+.wb .wb-sidebar .it.on,.wb .wb-titlemenu .it.on{background:#E3ECFA;color:#2F6FEB}
+.wb .wb-sidebar .it .tt,.wb .wb-titlemenu .it .tt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wb .wb-sidebar .it.earlier,.wb .wb-titlemenu .it.earlier{color:#6B6B6B}
+.wb .wb-sidebar .sec,.wb .wb-titlemenu .sec{color:#6B6B6B;font-size:11px;margin:10px 10px 4px}
+.wb .wb-sidebar .dot,.wb .wb-titlemenu .dot{width:7px;height:7px;border-radius:50%;flex:0 0 auto;background:var(--warm)}
+.wb .wb-sidebar .dot.done,.wb .wb-titlemenu .dot.done{background:var(--green)}
+/* The title's ▾: the session list as a dropdown under the title. */
+.wb .wb-titlemenu{position:absolute;left:140px;top:4px;z-index:21;width:320px;max-height:60%;overflow:auto;background:#FFFFFF;border:1px solid #E7E5E0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.08);padding:6px}
+/* An unfilled slot's dot (R9: no text glyph). */
+.wb .sh-dot{width:6px;height:6px;border-radius:50%;background:#6B6B6B;flex:0 0 auto}
 /* shell (2026-11-04): every task page, light, after the Claude desktop app. The conversation is the
    outer frame (#FAF9F7, no inner border); the explorer and the panes are inset cards around it. */
 .wb .main.task.shell{display:flex;flex-direction:column;padding:0;overflow:hidden;background:#FAF9F7;font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Noto Sans SC",sans-serif;color:#1F1F1F}
-.wb .main.task.shell .sh-head{height:48px;min-height:48px;box-sizing:border-box;padding:0 12px;gap:10px;background:#FAF9F7;border-bottom:0}
-.wb .main.task.shell .sh-head .tt{flex-direction:row;align-items:baseline;gap:10px}
-.wb .main.task.shell .sh-head .tt b{font-size:15px;font-weight:500}
-.wb .main.task.shell .sh-head .tt small{color:#6B6B6B;font-size:12.5px}
-.wb .main.task.shell .sh-head .st{display:inline-block;padding:0 8px;border-radius:10px;border:1px solid currentColor;line-height:18px}
-.wb .main.task.shell .sh-head .st.doing{color:var(--warm)}
-.wb .main.task.shell .sh-head .st.done{color:var(--green)}
 .wb .sh-toggles{display:flex;gap:4px}
 .wb .sh-tg{width:32px;height:32px;border:0;border-radius:8px;background:transparent;color:#6B6B6B;font:12px "SF Mono",Menlo,monospace;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
 .wb .sh-tg.on{background:#E3ECFA;color:#2F6FEB}
@@ -591,8 +626,9 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .wb .sh-panes > .sh-card{flex:1 1 auto}
 .wb .sh-panes > .sh-card.first{flex:0 0 calc(56% - 4px)}
 .wb .sh-panes > .sh-card.second{flex:1 1 0}
-/* The conversation takes the rest (min 380); below that the explorer collapses first. */
-@container shell (max-width: 1140px){.wb .sh-frame.has-panes .sh-explorer-card:not(.max){display:none}}
+/* R8: the explorer is never auto-hidden (only ⊟ / × hide it). When space is short the pane area
+   shrinks to its min (480) first, then the conversation to its min (380). */
+.wb .sh-panes{flex-shrink:1}
 .wb .sh-conv{flex:1 1 auto;min-width:380px;display:flex;flex-direction:column;align-items:center;min-height:0}
 .wb .sh-thread{width:100%;max-width:720px;flex:1 1 auto;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:12px;padding:16px 8px;box-sizing:border-box}
 .wb .sh-kuro{display:flex;gap:8px;font-size:14px;line-height:1.65;color:#1F1F1F}
@@ -608,14 +644,13 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 /* The explorer (R2): a VS Code tree — folder rows 28, file rows 26, 13 px, 8 indent per level. */
 .wb .sh-folder{display:flex;flex-direction:column}
 .wb .sh-frow{height:28px;display:flex;align-items:center;gap:4px;padding:0 8px;font-size:13px;font-weight:500;color:#1F1F1F}
-.wb .sh-tw{width:12px;color:#6B6B6B;font-size:10px}
+.wb .sh-tw{width:12px;color:#6B6B6B;display:inline-flex}.wb .sh-tw .ic{width:12px;height:12px}
 .wb .sh-file{height:26px;display:flex;align-items:center;gap:6px;width:100%;box-sizing:border-box;padding:0 8px 0 24px;border:0;background:transparent;font:inherit;font-size:13px;color:#1F1F1F;text-align:left;cursor:pointer}
 .wb .sh-file.on,.wb .sh-file.picked{background:#E3ECFA}
 .wb .sh-file.notfound{color:#6B6B6B;opacity:.6;cursor:default}
 .wb .sh-fn{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wb .sh-pick{flex:1 1 auto;min-width:0;border:0;background:none;font:inherit;color:inherit;text-align:left;padding:0;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wb .sh-src{border:0;background:none;color:#6B6B6B;font:inherit;font-size:12px;cursor:pointer;padding:0 2px}
-.wb .sh-dot{color:#6B6B6B;font-size:10px}
 .wb .sh-seat{font-size:11px;color:#6B6B6B}
 .wb .sh-lock{padding:6px 8px}
 .wb .sh-lock .block-row{margin:0}

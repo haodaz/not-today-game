@@ -93,7 +93,11 @@ function harness(store: Store) {
   const session: Session = initialSession({ beat: "work", time: "10:00" }, "right", "desktop");
   const ctx: ActionContext = { store, session, rerender: () => {}, later: () => {}, now: () => 0 };
   const app = (): AppContext => ({ state: store.getState(), events: store.getEvents(), startDay: store.getStartDay(), session, night: false, nowMs: 0 });
-  const out = () => renderWorkbench(app()).body.value;
+  // 工作台 as the monitor draws it (R10): its one top bar, then the page.
+  const out = () => {
+    const r = renderWorkbench(app());
+    return `<div class="app-top">${r.bar.value}</div>${r.body.value}`;
+  };
   const act = (name: string, data: Record<string, string> = {}) => loopActions[name]!(ctx, data as DOMStringMap, null as never);
   return { session, ctx, app, out, act };
 }
@@ -158,7 +162,8 @@ describe("R1 · the frame: the conversation and its inset cards", () => {
     const css = readFileSync(resolve(__dirname, "../src/world/desktop/desktop.css"), "utf8");
     expect(css).toContain(".wb .sh-card{background:#FFFFFF;border:1px solid #E7E5E0;border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.04)");
     expect(css).toMatch(/\.wb-task-body\.sh-frame\{[^}]*padding:8px;gap:8px;background:#FAF9F7/);
-    expect(css).toMatch(/\.sh-head\{height:48px/);
+    // R10: one 44 px top bar for 工作台 (the R1 48 px task header is gone).
+    expect(css).toMatch(/\.win\.wb\.full > \.bar\.app-top\{height:44px/);
     expect(css).toContain(".wb .sh-card-h{height:40px");
     expect(css).toContain(".wb .sh-tg{width:32px;height:32px;border:0;border-radius:8px;background:transparent;color:#6B6B6B");
     expect(css).toContain(".wb .sh-tg.on{background:#E3ECFA;color:#2F6FEB}");
@@ -187,11 +192,15 @@ describe("R3 · the toggles and the panes", () => {
   it("table: 文件 · 表格 (the table open); meeting: 文件 · 会议 (the meeting open)", () => {
     const h = onPage();
     const table = variant({ view: undefined, ide: undefined, beats: undefined });
-    const tout = renderShell(h.app(), table, 1, fill).value;
+    const shown = (tk: Task) => {
+      const r = renderShell(h.app(), tk, 1, fill);
+      return r.tools.value + r.main.value;
+    };
+    const tout = shown(table);
     expect(toggles(tout)).toEqual(["files", "table"]);
     expect(tout).toMatch(/data-card="table">.*<table class="btable">/s);
     const meeting = variant({ view: "meeting", ide: undefined, meeting: { people: [{ id: "p1", name: "person one" }], lines: [{ t: "09:00", who: "p1", text: "line-0" }], layout: "grid" } });
-    const mout = renderShell(h.app(), meeting, 1, fill).value;
+    const mout = shown(meeting);
     expect(toggles(mout)).toEqual(["files", "meeting"]);
     expect(mout).toMatch(/data-card="meeting">.*<div class="mt-left" data-playing="0"><div class="mt-grid"/s);
   });
@@ -213,7 +222,7 @@ describe("R3 · the toggles and the panes", () => {
   it("a task without a board: its own surface is one pane, open (handed in here: read back)", () => {
     const h = harness(day1());
     const t1 = taskFiles.get(1)!.find((x) => x.id === "task1")!;
-    const out = renderShell(h.app(), t1, 1, fill).value;
+    const out = renderShell(h.app(), t1, 1, fill).main.value;
     expect(cardOf(out, "work")).not.toBeNull();
     expect(cardOf(out, "explorer")).toBeNull();
     expect(out).toMatch(/data-card="work">.*<div class="ask done"><div class="wthread">/s);
@@ -226,8 +235,8 @@ describe("R2 · the explorer", () => {
     const store = day1();
     const h = onPage(store);
     const out = h.out();
-    expect(out).toContain(`<span class="sh-tw" aria-hidden="true">▾</span>${escapeHtml(t("board.ide.pages"))}`);
-    expect(out).toContain('<button type="button" class="sh-file on" data-action="shell-slot" data-slot="s1"><span class="sh-fn">base.js</span><span class="sh-dot" aria-hidden="true">●</span></button>');
+    expect(out).toMatch(new RegExp(`<span class="sh-tw"><svg[^>]*>.*?</svg></span>${escapeHtml(t("board.ide.pages"))}`));
+    expect(out).toContain('<button type="button" class="sh-file on" data-action="shell-slot" data-slot="s1"><span class="sh-fn">base.js</span><span class="sh-dot" aria-hidden="true"></span></button>');
     expect(out).toContain('data-slot="s2"><span class="sh-fn">data.js</span><span class="sh-dot"');
     expect(out).toContain(`${escapeHtml(t("board.ide.sources"))}</div>`);
     expect(out).toContain('<button type="button" class="sh-pick" data-action="board-card" data-card="a1">card-a1</button>');
@@ -322,7 +331,7 @@ describe("the IDE panes and the conversation", () => {
 
   it("a board without beats: one Kuro line, the board title", () => {
     const h = onPage();
-    const out = renderShell(h.app(), variant({ view: undefined, ide: undefined, beats: undefined }), 1, fill).value;
+    const out = renderShell(h.app(), variant({ view: undefined, ide: undefined, beats: undefined }), 1, fill).main.value;
     expect(out).toMatch(/<div class="sh-thread"><div class="sh-kuro first" data-on="open"><img class="sh-av"[^>]*><div class="sh-kt">fixture-shell<\/div><\/div><\/div>/);
   });
 
@@ -356,8 +365,8 @@ describe("light, and home unchanged", () => {
     const h = onPage();
     const outs = [
       h.out(),
-      renderShell(h.app(), variant({ view: undefined, ide: undefined }), 1, fill).value,
-      renderShell(h.app(), variant({ view: "meeting", ide: undefined, meeting: { people: [{ id: "p1", name: "p" }], lines: [{ t: "09:00", who: "p1", text: "x" }], layout: "grid" } }), 1, fill).value,
+      renderShell(h.app(), variant({ view: undefined, ide: undefined }), 1, fill).main.value,
+      renderShell(h.app(), variant({ view: "meeting", ide: undefined, meeting: { people: [{ id: "p1", name: "p" }], lines: [{ t: "09:00", who: "p1", text: "x" }], layout: "grid" } }), 1, fill).main.value,
     ];
     for (const out of outs) {
       expect(out).not.toMatch(/class="[^"]*\b(dark|codefile)\b/);
@@ -372,6 +381,154 @@ describe("light, and home unchanged", () => {
     expect(out).toContain('class="main home"');
     expect(out).toContain('<div class="ask wb-composer">');
     expect(out).not.toContain("sh-frame");
-    expect(out).toContain('class="it" data-action="wb-nav" data-page="task:task3"');
+    expect(out).not.toContain("wb-sidebar sessions");
+    h.act("wb-sidebar");
+    expect(h.out()).toContain('class="it" data-action="wb-nav" data-page="task:task3"');
+  });
+});
+
+// ——— R8–R10: one 44 px top bar, the overlay sidebar, line icons ———
+
+import { desktopApps } from "@world/desktop/apps";
+import { buildShell } from "@world/desktop/model";
+import { renderDesktop } from "@world/desktop/shell";
+import { loopKeys } from "@world/room/game";
+
+/** The whole desktop with 工作台 in front on the shown monitor. */
+function desk(h: ReturnType<typeof harness>, store: Store): string {
+  h.session.rightApp = "workbench";
+  return renderDesktop(buildShell(store.getState(), store.getEvents(), h.session, desktopApps, 0, 1)).value;
+}
+const winOf = (out: string) => {
+  const at = out.indexOf('data-win="workbench"');
+  expect(at).toBeGreaterThan(-1);
+  return out.slice(out.lastIndexOf("<div", at));
+};
+
+describe("R10 · one top bar", () => {
+  it("工作台's window is full-screen with exactly one bar: traffic lights, sidebar toggle, ← →, title ▾, pane toggles, 老物件", () => {
+    const store = day1();
+    const h = onPage(store);
+    const win = winOf(desk(h, store));
+    expect(win).toMatch(/^<div class="win wb full" data-win="workbench"[^>]*>/);
+    expect(win.slice(0, win.indexOf(">"))).not.toContain("style=");
+    const bars = [...win.matchAll(/<div class="bar[ "]/g)];
+    expect(bars).toHaveLength(1);
+    expect(win).toMatch(/^<div class="win wb full"[^>]*><div class="bar app-top" data-drag-win/);
+    const bar = /<div class="bar app-top"[^>]*>(.*?)<\/div><div class="body wb-app">/s.exec(win)![1]!;
+    for (const part of ["tl-g", 'data-action="wb-sidebar"', 'data-action="wb-back"', 'data-action="wb-forward"', 'class="wb-title drop"', 'data-action="shell-explorer"', 'data-action="shell-pane"', "objbar"]) {
+      expect(bar, part).toContain(part);
+    }
+    // The title's ▾ is the down icon (SVG), and the page has no second header.
+    expect(bar).toMatch(/class="wb-title drop"[^>]*>.*?<svg class="ic"/s);
+    expect(win).not.toContain("sh-head");
+    expect(win).not.toContain(escapeHtml(t("wb.autosave")));
+  });
+
+  it("on home the title is 工作台 (no ▾) and the strip of pane toggles is absent", () => {
+    const h = onPage();
+    h.act("wb-nav", { page: "home" });
+    const out = h.out();
+    expect(out).toContain(`<span class="wb-title"><span class="tt-name">${escapeHtml(t("wb.title"))}</span></span>`);
+    expect(out).not.toContain("wb-title drop");
+    expect(out).not.toContain('data-action="shell-explorer"');
+  });
+
+  it("← and → walk the pages visited this session", () => {
+    const h = onPage();
+    h.act("wb-nav", { page: "home" });
+    expect(h.session.workbenchPage).toBe("home");
+    expect(h.out()).toMatch(/data-action="wb-forward" disabled/);
+    h.act("wb-back");
+    expect(h.session.workbenchPage).toBe("task:task3");
+    expect(h.out()).not.toMatch(/data-action="wb-forward" disabled/);
+    h.act("wb-forward");
+    expect(h.session.workbenchPage).toBe("home");
+    // A new page after a step back drops the forward pages.
+    h.act("wb-back");
+    h.act("wb-back");
+    expect(h.session.workbenchPage).toBe("home");
+    expect(h.out()).toMatch(/data-action="wb-back" disabled/);
+    h.act("wb-nav", { page: "task:task3" });
+    expect(h.session.wbHistory.pages.map((p) => p.page)).toEqual(["home", "task:task3"]);
+  });
+
+  it("the title's ▾ opens the session dropdown; a click outside closes it", () => {
+    const h = onPage();
+    expect(h.out()).not.toContain("wb-titlemenu sessions");
+    h.act("wb-titlemenu");
+    expect(h.out()).toContain('<div class="wb-titlemenu sessions" role="menu">');
+    expect(h.out()).toContain('data-action="wb-titlemenu-close"');
+    h.act("wb-titlemenu-close");
+    expect(h.out()).not.toContain("wb-titlemenu sessions");
+  });
+});
+
+describe("R10 · the overlay sidebar", () => {
+  it("is hidden by default; open, it is an overlay aside with the sections, search, 新任务 and the sessions", () => {
+    const h = onPage();
+    expect(h.out()).not.toContain("wb-sidebar sessions");
+    h.act("wb-sidebar");
+    const out = h.out();
+    expect(out).toContain('<div class="wb-scrim" data-action="wb-sidebar-close" aria-hidden="true"></div><aside class="wb-sidebar sessions"><nav class="wb-sections">');
+    for (const key of ["wb.nav.home", "wb.nav.docs", "wb.nav.approvals", "wb.nav.contacts"]) expect(out, key).toContain(`aria-label="${escapeHtml(t(key))}"`);
+    expect(out).toContain('data-input="wb-search"');
+    expect(out).toContain(`data-compose="1"><svg class="ic"`);
+    expect(out).toContain('class="it on" data-action="wb-nav" data-page="task:task3"');
+    // The explorer stays where it was under the overlay.
+    expect(cardOf(out, "explorer")).not.toBeNull();
+  });
+
+  it("⌘B / Ctrl+B toggles it while 工作台 is shown; Esc and the scrim close it; a page change closes it", () => {
+    const store = day1();
+    const h = onPage(store);
+    h.session.rightApp = "workbench";
+    expect(loopKeys(h.ctx, { key: "b", metaKey: true } as KeyboardEvent)).toBe(true);
+    expect(h.session.wbSidebar).toBe(true);
+    expect(loopKeys(h.ctx, { key: "B", ctrlKey: true } as KeyboardEvent)).toBe(true);
+    expect(h.session.wbSidebar).toBe(false);
+    h.act("wb-sidebar");
+    loopKeys(h.ctx, { key: "Escape" } as KeyboardEvent);
+    expect(h.session.wbSidebar).toBe(false);
+    expect(h.session.view).toBe("desktop");
+    h.act("wb-sidebar");
+    h.act("wb-sidebar-close");
+    expect(h.session.wbSidebar).toBe(false);
+    h.act("wb-sidebar");
+    h.act("wb-nav", { page: "home" });
+    expect(h.session.wbSidebar).toBe(false);
+    // Not on 工作台: ⌘B is not taken.
+    h.session.rightApp = "msgs";
+    expect(loopKeys(h.ctx, { key: "b", metaKey: true } as KeyboardEvent)).toBe(false);
+    expect(h.session.wbSidebar).toBe(false);
+  });
+
+  it("the search filters the session titles", () => {
+    const h = onPage();
+    h.act("wb-sidebar");
+    h.session.wbSearch = "\u0001no-such-title";
+    expect(h.out()).not.toContain('data-page="task:task3"><');
+    h.session.wbSearch = task().title.slice(0, 2);
+    expect(h.out()).toContain('class="it on" data-action="wb-nav" data-page="task:task3"');
+  });
+});
+
+describe("R8 · the explorer is never auto-hidden; R9 · line icons", () => {
+  it("with both panes open the explorer and its 素材 rows are drawn; no container query hides it", () => {
+    const out = onPage().out();
+    expect(cardOf(out, "explorer")).not.toBeNull();
+    expect(cardOf(out, "preview")).not.toBeNull();
+    expect(cardOf(out, "code")).not.toBeNull();
+    expect(out).toContain(`<div class="sh-frow"><span class="sh-tw">`);
+    expect(out).toContain(escapeHtml(t("board.ide.sources")));
+    const css = readFileSync(resolve(__dirname, "../src/world/desktop/desktop.css"), "utf8");
+    expect(css).not.toContain("@container");
+    expect(css).toContain(".wb .sh-panes{flex-shrink:1}");
+  });
+
+  it("the bar and the cards draw SVG line icons, not the old glyphs", () => {
+    const out = onPage().out();
+    for (const glyph of ["▤", "◍", "●", "⤢", "⊟", "▸", "▾"]) expect(out, glyph).not.toContain(glyph);
+    expect([...out.matchAll(/<svg class="ic" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5"/g)].length).toBeGreaterThan(8);
   });
 });

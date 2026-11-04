@@ -175,7 +175,7 @@ describe("the meeting view (meeting R2)", () => {
     expect(out).toContain('<span class="mt-n">1 / 4</span>');
     // shell R2/R3: the slot rows moved into the explorer's 格子 folder (slot labels; ● unfilled).
     for (const [slot, label] of [["s1", "slot-1"], ["s2", "slot-2"], ["s3", "slot-3"]]) {
-      expect(out).toContain(`data-action="shell-slot" data-slot="${slot}"><span class="sh-fn">${label}</span><span class="sh-dot" aria-hidden="true">●</span></button>`);
+      expect(out).toContain(`data-action="shell-slot" data-slot="${slot}"><span class="sh-fn">${label}</span><span class="sh-dot" aria-hidden="true"></span></button>`);
     }
     expect(out).not.toContain("mt-row");
     // The meeting's cards wait for their lines in 素材; assist and print are the composer's chips.

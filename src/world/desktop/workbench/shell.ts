@@ -19,6 +19,7 @@ import { sentFiles, sentReplies, transcript } from "../messages/transcript";
 import { taskPageId, type AppContext, type PaneId, type Session, type ShellState } from "../model";
 import { boardActions, cardText, finishLabel, lockRow, renderBoardRead, table } from "./board";
 import { meetingWindow } from "./meeting";
+import { ICONS } from "../icons";
 import { moveApp, otherSide } from "../placement";
 import { messageActions } from "../messages/actions";
 import { renderObjectBar } from "./objbar";
@@ -79,7 +80,8 @@ function boardSlotsOn(task: Task, day: number, events: readonly GameEvent[]): Re
 
 /** A pane's name and its icon (a glyph drawn in the toggle's colour). */
 const PANE_KEY: Readonly<Record<PaneId, string>> = { files: "pane.files", preview: "pane.preview", code: "pane.code", table: "pane.table", meeting: "pane.meeting", work: "pane.code" };
-const PANE_ICON: Readonly<Record<PaneId, string>> = { files: "▤", preview: "◍", code: "</>", table: "▦", meeting: "▶", work: "▤" };
+/** Line icons (R9): globe 预览, brackets 代码, grid 表格, play-in-rectangle 会议, folder 文件, a document for a task's own surface. */
+const PANE_ICON: Readonly<Record<PaneId, SafeHtml>> = { files: ICONS.folder, preview: ICONS.globe, code: ICONS.code, table: ICONS.grid, meeting: ICONS.play, work: ICONS.doc };
 const WORK_KEY: Readonly<Record<string, string>> = { docs: "wb.nav.docs", ledger: "wb.nav.ledger", code: "wb.nav.code" };
 const paneName = (pane: PaneId, task: Task): string => {
   const key = pane === "work" ? (WORK_KEY[task.app] ?? "pane.code") : PANE_KEY[pane];
@@ -87,12 +89,12 @@ const paneName = (pane: PaneId, task: Task): string => {
 };
 
 /** One inset card (R1): a 40 px header (icon · title · ⤢ · ×) and its body. */
-function card(id: PaneId | "explorer", icon: string, title: string, body: SafeHtml, st: ShellState, extra: string | false = false): SafeHtml {
+function card(id: PaneId | "explorer", icon: SafeHtml, title: string, body: SafeHtml, st: ShellState, extra: string | false = false): SafeHtml {
   const max = st.max === id;
   const maxLabel = hasString("pane.maximize") ? t("pane.maximize") : "⤢";
   const closeLabel = hasString("pane.close") ? t("pane.close") : "×";
   const close = id === "explorer" ? html`data-action="shell-explorer"` : html`data-action="shell-close" data-pane="${id}"`;
-  return html`<section class="${cls("sh-card", `sh-${id}`, max && "max", extra)}" data-card="${id}"><header class="sh-card-h"><span class="sh-ic" aria-hidden="true">${icon}</span><span class="sh-card-t">${title}</span><span class="sp"></span><button type="button" class="sh-hb" data-action="shell-max" data-pane="${id}" aria-pressed="${max ? "true" : "false"}" aria-label="${maxLabel}" title="${maxLabel}">⤢</button><button type="button" class="sh-hb" ${close} aria-label="${closeLabel}" title="${closeLabel}">×</button></header><div class="sh-card-b">${body}</div></section>`;
+  return html`<section class="${cls("sh-card", `sh-${id}`, max && "max", extra)}" data-card="${id}"><header class="sh-card-h"><span class="sh-ic" aria-hidden="true">${icon}</span><span class="sh-card-t">${title}</span><span class="sp"></span><button type="button" class="sh-hb" data-action="shell-max" data-pane="${id}" aria-pressed="${max ? "true" : "false"}" aria-label="${maxLabel}" title="${maxLabel}">${ICONS.maximize}</button><button type="button" class="sh-hb" ${close} aria-label="${closeLabel}" title="${closeLabel}">${ICONS.close}</button></header><div class="sh-card-b">${body}</div></section>`;
 }
 
 // ——— the explorer (R2) ———
@@ -108,13 +110,14 @@ function explorer(ctx: AppContext, task: Task, board: TaskBoard, s: BoardState, 
   const ide = board.view === "ide";
   const seats = board.view === "meeting" ? board.meeting?.seats : undefined;
   // A missing folder name shows as missing (the strings convention), never as its key.
-  const folder = (key: string, rows: SafeHtml[]) => html`<div class="sh-folder"><div class="sh-frow"><span class="sh-tw" aria-hidden="true">▾</span>${tr(key)}</div>${rows}</div>`;
+  const folder = (key: string, rows: SafeHtml[]) => html`<div class="sh-folder"><div class="sh-frow"><span class="sh-tw">${ICONS.down}</span>${tr(key)}</div>${rows}</div>`;
   const slotRows = board.slots.map((slot) => {
     const name = ide ? (board.ide?.files?.[slot.id]?.name ?? slot.label) : slot.label;
     const filled = slot.id in s.slots;
     const seat = seats?.[slot.id];
     const seatTag = seat && hasString(`meeting.${seat}`) ? html`<span class="sh-seat">${tr(`meeting.${seat}`)}</span>` : null;
-    const dot = filled ? null : html`<span class="sh-dot" aria-hidden="true">●</span>`;
+    // An unfilled slot's dot (like an unsaved file): drawn by CSS, no text glyph (R9).
+    const dot = filled ? null : html`<span class="sh-dot" aria-hidden="true"></span>`;
     return html`<button type="button" class="${cls("sh-file", selected === slot.id && "on", session.boardPick && "target")}" data-action="shell-slot" data-slot="${slot.id}"><span class="sh-fn">${name}</span>${seatTag}${dot}</button>`;
   });
   const found = foundCardIds(board, state.day, events, task.id);
@@ -126,12 +129,12 @@ function explorer(ctx: AppContext, task: Task, board: TaskBoard, s: BoardState, 
         const hint = c.hint ?? (hasString("board.notFound") ? t("board.notFound") : "");
         return html`<div class="sh-file card notfound" aria-disabled="true"><span class="sh-fn">${hint}</span></div>`;
       }
-      const open = hasViewableSource(board, c.id) ? html`<button type="button" class="sh-src" data-action="shell-source" data-card="${c.id}" aria-label="${paneName("files", task)}" title="${paneName("files", task)}">↗</button>` : null;
+      const open = hasViewableSource(board, c.id) ? html`<button type="button" class="sh-src" data-action="shell-source" data-card="${c.id}" aria-label="${paneName("files", task)}" title="${paneName("files", task)}">${ICONS.external}</button>` : null;
       return html`<div class="${cls("sh-file", "card", session.boardPick === c.id && "picked")}"><button type="button" class="sh-pick" data-action="board-card" data-card="${c.id}">${cardText(board, c.id)}</button>${open}</div>`;
     });
   const lock = lockRow(board, s, state, events, session);
   const body = html`${lock ? html`<div class="sh-lock">${lock}</div>` : null}${folder(ide ? "board.ide.pages" : "board.slots", slotRows)}${folder("board.ide.sources", cardRows)}`;
-  return card("explorer", "▤", hasString("pane.explorer") ? t("pane.explorer") : "", body, st, "sh-explorer-card");
+  return card("explorer", ICONS.files, hasString("pane.explorer") ? t("pane.explorer") : "", body, st, "sh-explorer-card");
 }
 
 // ——— the panes (R3) ———
@@ -241,7 +244,7 @@ function conversation(ctx: AppContext, task: Task, day: number, live: boolean, f
  * A task page in the shell (R1): the header (⊟, title, 交给 X, the status chip; the pane toggles),
  * then the frame: the explorer card, the conversation, the pane cards. Pure.
  */
-export function renderShell(ctx: AppContext, task: Task, day: number, fill: Fill): SafeHtml {
+export function renderShell(ctx: AppContext, task: Task, day: number, fill: Fill): { main: SafeHtml; title: SafeHtml; tools: SafeHtml } {
   const { state, events, session } = ctx;
   const done = state.flags.includes(task.done);
   const live = day === state.day && !done && openWork(state, events)?.tree?.id === task.id;
@@ -252,18 +255,20 @@ export function renderShell(ctx: AppContext, task: Task, day: number, fill: Fill
   const selected = board ? selectedSlot(board, ops, st.slot) : "";
   const panes = panesOf(task, live);
   const open = st.panes.filter((p) => panes.includes(p));
-  // The header (R1).
+  // The page's share of 工作台's one top bar (R10): the title (with the session dropdown's ▾), 交给 X
+  // and the status chip; at the right end the explorer and pane toggles and the 老物件 strip.
   const toggleLabel = hasString("pane.explorer.toggle") ? t("pane.explorer.toggle") : "";
-  const explorerToggle = board && live ? html`<button type="button" class="${cls("sh-tg", "explorer", st.explorer && "on")}" data-action="shell-explorer" aria-pressed="${st.explorer ? "true" : "false"}" aria-label="${toggleLabel}" title="${toggleLabel}">⊟</button>` : null;
+  const explorerToggle = board && live ? html`<button type="button" class="${cls("sh-tg", "explorer", st.explorer && "on")}" data-action="shell-explorer" aria-pressed="${st.explorer ? "true" : "false"}" aria-label="${toggleLabel}" title="${toggleLabel}">${ICONS.files}</button>` : null;
   const status = html`<span class="${cls("st", done ? "done" : "doing")}">${tr(done ? "wb.task.done" : "wb.task.doing")}</span>`;
   const who = forWhom(task);
   const toggles = panes.map((p) => {
     const on = open.includes(p);
     const name = paneName(p, task);
-    return html`<button type="button" class="${cls("sh-tg", on && "on")}" data-action="shell-pane" data-pane="${p}" aria-pressed="${on ? "true" : "false"}" aria-label="${name}" title="${name}"><span aria-hidden="true">${PANE_ICON[p]}</span></button>`;
+    return html`<button type="button" class="${cls("sh-tg", on && "on")}" data-action="shell-pane" data-pane="${p}" aria-pressed="${on ? "true" : "false"}" aria-label="${name}" title="${name}">${PANE_ICON[p]}</button>`;
   });
   const app = !board && live && WORK_KEY[task.app] ? html`<button type="button" class="btn" data-action="wb-nav" data-page="${task.app}">${tr(WORK_KEY[task.app]!)}</button>` : null;
-  const head = html`<div class="wb-task-h sh-head">${explorerToggle}<div class="tt"><b>${fill(task.title)}</b><small>${who ? html`${who} · ` : null}${status}</small></div><span class="sp"></span>${app}${renderObjectBar(ctx)}<div class="sh-toggles">${toggles}</div></div>`;
+  const title = html`<span class="tt-name">${fill(task.title)}</span><small class="tt-sub">${who ? html`${who} · ` : null}${status}</small>`;
+  const tools = html`${app}<div class="sh-toggles">${explorerToggle}${toggles}</div>${renderObjectBar(ctx)}`;
   // The frame (R1): the explorer card, the conversation, the pane cards.
   const ex = board && live && st.explorer ? explorer(ctx, task, board, s!, st, selected) : null;
   const paneCards = open.map((p) => {
@@ -278,7 +283,9 @@ export function renderShell(ctx: AppContext, task: Task, day: number, fill: Fill
   });
   const paneArea = paneCards.length ? html`<div class="sh-panes">${paneCards}</div>` : null;
   const frame = cls("wb-task-body", "sh-frame", paneCards.length > 0 && "has-panes", st.max !== null && "maxed");
-  return html`<div class="${cls("main", "task", "shell", `view-${surfaceOf(task, live)}`)}" data-task="${task.id}">${head}<div class="${frame}">${ex}${conversation(ctx, task, day, live, fill, board, s)}${paneArea}</div></div>`;
+  // Under the one bar: the explorer, the conversation and the pane cards, full height (R10).
+  const main = html`<div class="${cls("main", "task", "shell", `view-${surfaceOf(task, live)}`)}" data-task="${task.id}"><div class="${frame}">${ex}${conversation(ctx, task, day, live, fill, board, s)}${paneArea}</div></div>`;
+  return { main, title, tools };
 }
 
 // ——— the actions (session only; the board's own ops stay the board's) ———

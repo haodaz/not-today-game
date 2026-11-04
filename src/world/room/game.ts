@@ -59,10 +59,11 @@ export const CASE_SHAKE_MS = 200;
 import { pointed } from "./pointer";
 import { itemPageId, readingPageId, type KuroCloses } from "@state/closes";
 import { browserPage } from "@world/desktop/browser/data";
-import { composerActions, workbenchActions } from "@world/desktop/workbench/actions";
+import { composerActions, workbenchActions, workbenchUiActions } from "@world/desktop/workbench/actions";
 import { meetingActions } from "@world/desktop/workbench/meeting";
 import { taskShellActions } from "@world/desktop/workbench/shell";
-import { boardActions } from "@world/desktop/workbench/board";
+import { boardActions, lockFaceMove } from "@world/desktop/workbench/board";
+import { enterUse, lampLit, worksHere } from "@world/objects/works";
 import { workActions } from "@world/desktop/workbench/work";
 import { renderFiles } from "@world/desktop/files/view";
 import { openObjectFromBar, renderObjectBarUse } from "@world/desktop/workbench/objbar";
@@ -654,9 +655,12 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.rerender();
   },
 
-  // The desk lamp: a click, nothing else (no event, no state).
+  // The desk lamp: a click switches it (objects-in-room R1: the iccard's under-layer and the
+  // calculator at 房间 by night need it on). Session only, no event; `useAt` records what it meant.
   lamp(ctx) {
     ctx.play?.("lamp-click");
+    ctx.session.lampOn = !lampLit(ctx.session);
+    ctx.rerender();
   },
 
   // Back one camera level (right-click, wheel, the bottom of the stage): nothing over the view first.
@@ -874,6 +878,8 @@ export const loopActions: Record<string, ActionHandler> = {
     const id = session.holding;
     if (!id || session.phoneOpen || session.hand.using) return;
     session.hand.using = true;
+    // objects-in-room R2: using it here is logged (and its line says so where it does not work).
+    enterUse(ctx, id);
     // The focus comes in with the same timing as 桌子 → 屏幕 (deskScreen, 500 ms): room.css
     // transitions `.held.obj.using` over --m-use; a walk's two steps play as on any move.
     walkSteps(ctx, "desk", "desktop");
@@ -899,6 +905,9 @@ export const loopActions: Record<string, ActionHandler> = {
     const onFront = hand.keys.some((k) => k.id === key) || onDevice || (id === "phone" && key === PHONE_FLIP);
     const onBack = (id === "chick" && key === "reset" && !!hand.back.reset) || (id === "textbook" && key === "cell" && !!hand.cell);
     if (!(onFront && session.hand.face === "front") && !(onBack && session.hand.face === "back")) return;
+    // objects-in-room R1: where it does not work its keys do nothing (the flip phone still opens:
+    // the hinge is not a key).
+    if (!worksHere(ctx.store.getState(), session, id) && !(id === "phone" && key === PHONE_FLIP)) return;
     // The dictionary's keys are under its lid until it is open.
     if (id === "dictionary" && (session.hand.programs.dictionary as { open?: boolean } | undefined)?.open !== true) return;
     if (id === "textbook" && key === "cell") {
@@ -952,6 +961,8 @@ export const loopActions: Record<string, ActionHandler> = {
     // Close any held clamshell first, then open the object (same holding + hand.using as the room).
     restHand(session);
     if (!openObjectFromBar(session, state, id)) return; // not found, or lost to the hand
+    // objects-in-room R2: used at the desk (屏幕 is 房间's).
+    enterUse(ctx, id);
     // The dictionary is a clamshell: using it opens it (as in the room's obj-use).
     if (id === "dictionary" && session.hand.face === "front") pressKey(ctx, id, "open");
     ctx.rerender();
@@ -1093,8 +1104,40 @@ export const loopActions: Record<string, ActionHandler> = {
   // The board's actions again, by name: work.ts and board.ts import each other, so when board.ts
   // loads first, workActions' own spread of them runs before they exist (meeting 2026-11-04).
   ...boardActions,
+  // objects-in-room R3: a lock that names a place. 用{object}看一眼 turns the head there first (from
+  // 屏幕: back to 房间, then the turn; the shortest way, as `view` goes), and once there lifts the
+  // object and uses it, in the same click. Its code chips wait for that use to work (the board).
+  "board-lock"(ctx, data, el) {
+    const move = lockFaceMove(ctx);
+    if (!move) return boardActions["board-lock"]!(ctx, data, el);
+    const from = ctx.session.view;
+    ctx.session.boardLockOpen = true;
+    ctx.session.objbarOpen = false;
+    loopActions["view"]!(ctx, { view: move.face } as DOMStringMap, null as never);
+    ctx.later(wayMs(from, move.face) + WAY_GAP_MS, () => {
+      // Only if nothing else moved the player meanwhile.
+      if (ctx.session.view !== move.face || ctx.session.holding) return;
+      loopActions["loop-hold"]!(ctx, { object: move.object } as DOMStringMap, null as never);
+      if (ctx.session.holding === move.object) loopActions["obj-use"]!(ctx, {} as DOMStringMap, null as never);
+    });
+  },
   // 工作台's home composer (workspace 2026-11-04): it talks to Kuro as its body does.
   ...composerActions,
+  // 工作台's one top bar (shell R10): the sidebar, the title's ▾; ← / → are page switches, so the
+  // Vivi lock refuses them as it refuses wb-nav.
+  ...workbenchUiActions,
+  "wb-back"(ctx, data, el) {
+    if (viviRefuse(ctx)) return;
+    workbenchUiActions["wb-back"]!(ctx, data, el);
+    cancelCloser(ctx.session);
+    if (settleSession(ctx.session)) ctx.rerender();
+  },
+  "wb-forward"(ctx, data, el) {
+    if (viviRefuse(ctx)) return;
+    workbenchUiActions["wb-forward"]!(ctx, data, el);
+    cancelCloser(ctx.session);
+    if (settleSession(ctx.session)) ctx.rerender();
+  },
   // The meeting view's ▶ / ⏸ / ⟲ (meeting 2026-11-04). Registered here, not in workActions, so
   // no module-load spread inside the workbench's import cycle can see it unset.
   ...meetingActions,
@@ -1239,6 +1282,16 @@ export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
   }
   // The history is open: nothing under it reads on.
   if (ctx.session.historyOpen) return false;
+  // shell R10: ⌘B / Ctrl+B toggles 工作台's sidebar while 工作台 is in front on 屏幕.
+  if ((e.metaKey || e.ctrlKey) && (e.key === "b" || e.key === "B") && ctx.session.view === "desktop" && shownApp(ctx.session) === "workbench" && !typingIn(e.target)) {
+    loopActions["wb-sidebar"]!(ctx, {} as DOMStringMap, null as never);
+    return true;
+  }
+  // Esc closes 工作台's sidebar or its title dropdown before stepping the camera out.
+  if (e.key === "Escape" && (ctx.session.wbSidebar || ctx.session.wbTitleMenu) && ctx.session.view === "desktop") {
+    loopActions[ctx.session.wbSidebar ? "wb-sidebar-close" : "wb-titlemenu-close"]!(ctx, {} as DOMStringMap, null as never);
+    return true;
+  }
   // 使用 takes the computer keyboard for the dictionary and the calculator (correction 2026-11-03):
   // the keys reach only the object in use, nothing else. Esc still steps the camera out (below).
   if (ctx.session.hand.using && !ctx.session.phoneOpen && e.key !== "Escape" && !typingIn(e.target)) {

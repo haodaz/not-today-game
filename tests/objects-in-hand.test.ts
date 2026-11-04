@@ -230,7 +230,8 @@ describe("holding and using (FR1)", () => {
     act(ctx, "loop-hold", { object: "pager" });
     expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["d4:recognise:pager"]);
   });
-  it("property: no key, use, turn or put-down writes a world event", () => {
+  // objects-in-room R2: using an object at a place is a record (`useAt`); nothing else is written.
+  it("property: no key, use, turn or put-down writes a world event (only the useAt record)", () => {
     const objects = ["chick", "textbook", "pager", "iccard", "tape", "dictionary", "calculator", "phone"];
     const steps = fc.oneof(
       fc.record({ a: fc.constant("loop-hold"), object: fc.constantFrom(...objects) }),
@@ -259,7 +260,7 @@ describe("holding and using (FR1)", () => {
           }
           act(ctx, s.a, data);
         }
-        expect(store.getEvents().length).toBe(before);
+        expect(store.getEvents().slice(before).filter((e) => e.kind !== "useAt")).toEqual([]);
       }),
       { numRuns: 60 },
     );
