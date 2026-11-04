@@ -74,6 +74,59 @@
         },
         {
           "k": "narration",
+          "t": "Before sleep you pick the instant camera up again. The shutter is as stiff as ever."
+        },
+        {
+          "k": "narration",
+          "t": "The last summer of primary school. The back door of the classroom is open; the sun reaches all the way to the teacher's desk.",
+          "backdrop": "/room/dream/classroom.jpg"
+        },
+        {
+          "k": "narration",
+          "t": "You didn't really know how to talk to people then. You brought it to school and took the windowsill, the blackboard, the empty corridor."
+        },
+        {
+          "k": "speaker",
+          "who": "同学",
+          "t": "Hey, take one of us!"
+        },
+        {
+          "k": "speaker",
+          "who": "同学",
+          "t": "And us, line up, line up."
+        },
+        {
+          "k": "narration",
+          "t": "On graduation day a lot of people came looking for you. You pressed, one by one; the sheets slid out, one by one, and everyone stood round waiting for them to come up."
+        },
+        {
+          "k": "speaker",
+          "who": "同学",
+          "t": "You have one too, I'll take it."
+        },
+        {
+          "k": "narration",
+          "t": "When it came up, your eyes were shut. In another, you were half a shoulder."
+        },
+        {
+          "k": "speaker",
+          "who": "同学",
+          "t": "Oops. Never mind, no sheets left, right?"
+        },
+        {
+          "k": "narration",
+          "t": "Afterwards you put each person's photo in an envelope and wrote their middle school's address on it, one by one."
+        },
+        {
+          "k": "narration",
+          "t": "No one wrote back. Not one."
+        },
+        {
+          "k": "inner",
+          "t": "None of those photos have me in them."
+        },
+        {
+          "k": "narration",
           "t": "Today is over."
         }
       ]
