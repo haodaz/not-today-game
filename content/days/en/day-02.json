@@ -21,7 +21,7 @@
       "say": [
         {
           "k": "narration",
-          "t": "The second layer. Something soft: a third-grade arithmetic textbook, a table on the back cover in pencil."
+          "t": "The loose one in the case. Something soft: a third-grade arithmetic textbook, a table on the back cover in pencil."
         },
         {
           "k": "inner",
@@ -142,7 +142,7 @@
     },
     {
       "id": "box",
-      "text": "Open the second layer.",
+      "text": "One box in the case is loose. Take it out.",
       "unlock": "done:pickup",
       "done": "event:openBox",
       "required": true

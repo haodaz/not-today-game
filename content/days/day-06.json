@@ -56,6 +56,22 @@
           "t": "今天过去了。"
         }
       ]
+    },
+    "box": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "小盒子里，一台电子词典。翻盖，银灰色，铰链有点松。"
+        },
+        {
+          "k": "narration",
+          "t": "开机，屏幕是灰绿的，字是点阵的。"
+        },
+        {
+          "k": "inner",
+          "t": "它只会查单词。"
+        }
+      ]
     }
   },
   "items": [
@@ -118,6 +134,13 @@
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
       "required": false
+    },
+    {
+      "id": "box",
+      "text": "端盒里松了一个。",
+      "unlock": "done:pickup",
+      "done": "event:openBox",
+      "required": true
     },
     {
       "id": "reply",

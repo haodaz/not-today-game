@@ -60,7 +60,8 @@ function loadTables(): Tables {
   return {
     variables: new Set(Object.keys(vars).filter((k) => !k.startsWith("_"))),
     zh: zh as Record<string, string>,
-    boxDays: new Set(Object.values(found).filter((d): d is number => typeof d === "number")),
+    // The objects' days, and the hidden box's day (blind-box: its 邮单 has a box beat too).
+    boxDays: new Set([...Object.values(found), stages.hiddenBoxDay].filter((d): d is number => typeof d === "number")),
   };
 }
 

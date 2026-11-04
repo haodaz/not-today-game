@@ -57,6 +57,18 @@
           "t": "今天过去了。"
         }
       ]
+    },
+    "box": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "最后一个小盒子。一部坏掉的功能机，翻盖，屏幕碎了一角。"
+        },
+        {
+          "k": "narration",
+          "t": "它开不了机。它不需要开机。"
+        }
+      ]
     }
   },
   "items": [
@@ -120,6 +132,13 @@
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
       "required": false
+    },
+    {
+      "id": "box",
+      "text": "端盒里最后一个小的，松了。",
+      "unlock": "done:pickup",
+      "done": "event:openBox",
+      "required": true
     },
     {
       "id": "reply",

@@ -115,6 +115,18 @@
           "t": "Today is over."
         }
       ]
+    },
+    "box": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "Today's little box is heavier. A cassette and a walkman. The box's corners worn round."
+        },
+        {
+          "k": "narration",
+          "t": "The walkman is heavier than you remember; the battery bay bulges a little."
+        }
+      ]
     }
   },
   "items": [
@@ -177,6 +189,13 @@
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
       "required": false
+    },
+    {
+      "id": "box",
+      "text": "One box in the case is loose.",
+      "unlock": "done:pickup",
+      "done": "event:openBox",
+      "required": true
     },
     {
       "id": "loan",

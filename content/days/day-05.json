@@ -115,6 +115,18 @@
           "t": "今天过去了。"
         }
       ]
+    },
+    "box": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "今天这个小盒子沉一点。一盘磁带，一台随身听。盒子的边角磨圆了。"
+        },
+        {
+          "k": "narration",
+          "t": "随身听比你记得的沉，电池仓鼓着一点。"
+        }
+      ]
     }
   },
   "items": [
@@ -177,6 +189,13 @@
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
       "required": false
+    },
+    {
+      "id": "box",
+      "text": "端盒里松了一个。",
+      "unlock": "done:pickup",
+      "done": "event:openBox",
+      "required": true
     },
     {
       "id": "loan",

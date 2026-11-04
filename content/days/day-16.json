@@ -20,22 +20,6 @@
         }
       ]
     },
-    "box": {
-      "say": [
-        {
-          "k": "narration",
-          "t": "第七层。一个太阳能计算器，按键发黄。"
-        },
-        {
-          "k": "narration",
-          "t": "你按了几个数，倒过来看。"
-        },
-        {
-          "k": "inner",
-          "t": "它会说的字不多。"
-        }
-      ]
-    },
     "desk": {
       "say": [
         {
@@ -123,13 +107,6 @@
       "done": "flag:task_d16_1",
       "required": true,
       "origin": "them"
-    },
-    {
-      "id": "box",
-      "text": "拆第七层。",
-      "unlock": "done:task1",
-      "done": "event:openBox",
-      "required": true
     },
     {
       "id": "reply",

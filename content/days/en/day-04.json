@@ -23,15 +23,11 @@
       "say": [
         {
           "k": "narration",
-          "t": "The third layer. A pager, black shell, the belt clip half snapped off."
-        },
-        {
-          "k": "narration",
-          "t": "The battery bay is empty. A little green rust on the two spring contacts."
+          "t": "Today's loose one is flat. An IC card, the magnetic strip scuffed, the corners whitened, rows of pinch marks."
         },
         {
           "k": "inner",
-          "t": "It is lighter than I thought."
+          "t": "I see."
         }
       ]
     },
@@ -149,7 +145,7 @@
     },
     {
       "id": "box",
-      "text": "Open the third layer.",
+      "text": "The case: today's box is loose.",
       "unlock": "done:pickup",
       "done": "event:openBox",
       "required": true

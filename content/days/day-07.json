@@ -23,11 +23,15 @@
       "say": [
         {
           "k": "narration",
-          "t": "第四层。一张 IC 卡，磁条磨花了，边角发白，掐痕一排一排。"
+          "t": "小盒子里，一个太阳能计算器，按键发黄。"
+        },
+        {
+          "k": "narration",
+          "t": "你按了几个数，倒过来看。"
         },
         {
           "k": "inner",
-          "t": "I see。"
+          "t": "它会说的字不多。"
         }
       ]
     },
@@ -178,7 +182,7 @@
     },
     {
       "id": "box",
-      "text": "拆第四层。",
+      "text": "端盒里松了一个。",
       "unlock": "done:pickup",
       "done": "event:openBox",
       "required": true

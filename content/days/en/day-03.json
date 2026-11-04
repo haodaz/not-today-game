@@ -70,6 +70,22 @@
           "t": "Today is over."
         }
       ]
+    },
+    "box": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "The loose one in the case. A pager, black shell, the belt clip half snapped off."
+        },
+        {
+          "k": "narration",
+          "t": "The battery bay is empty. A little green rust on the two spring contacts."
+        },
+        {
+          "k": "inner",
+          "t": "It is lighter than I thought."
+        }
+      ]
     }
   },
   "items": [
@@ -132,6 +148,13 @@
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
       "required": false
+    },
+    {
+      "id": "box",
+      "text": "Another box in the case is loose.",
+      "unlock": "done:pickup",
+      "done": "event:openBox",
+      "required": true
     },
     {
       "id": "reply",

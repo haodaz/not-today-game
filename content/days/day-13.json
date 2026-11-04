@@ -24,22 +24,6 @@
         }
       ]
     },
-    "box": {
-      "say": [
-        {
-          "k": "narration",
-          "t": "第六层。一台电子词典。翻盖，银灰色，铰链有点松。"
-        },
-        {
-          "k": "narration",
-          "t": "开机，屏幕是灰绿的，字是点阵的。"
-        },
-        {
-          "k": "inner",
-          "t": "它只会查单词。"
-        }
-      ]
-    },
     "desk": {
       "say": [
         {
@@ -176,13 +160,6 @@
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
       "required": false
-    },
-    {
-      "id": "box",
-      "text": "拆第六层。",
-      "unlock": "done:pickup",
-      "done": "event:openBox",
-      "required": true
     },
     {
       "id": "reply",

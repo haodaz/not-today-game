@@ -56,6 +56,22 @@
           "t": "Today is over."
         }
       ]
+    },
+    "box": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "In the little box, an electronic dictionary. Clamshell, silver-grey, the hinge a little loose."
+        },
+        {
+          "k": "narration",
+          "t": "Switched on, the screen is grey-green, the letters dot-matrix."
+        },
+        {
+          "k": "inner",
+          "t": "It only looks up words."
+        }
+      ]
     }
   },
   "items": [
@@ -118,6 +134,13 @@
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
       "required": false
+    },
+    {
+      "id": "box",
+      "text": "One box in the case is loose.",
+      "unlock": "done:pickup",
+      "done": "event:openBox",
+      "required": true
     },
     {
       "id": "reply",

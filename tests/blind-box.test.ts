@@ -83,14 +83,14 @@ describe("exactly one box is loose today", () => {
   });
 
   it("on a day with no box item, none is loose", () => {
-    // Build a fresh day-3-style state where no object is found that day: boxObjectFor is null.
-    expect(boxObjectFor(3)).toBeNull();
-    expect(looseContent(3, boxObjectFor(3), true)).toBeNull();
-    expect(looseContent(3, boxObjectFor(3), false)).toBeNull();
+    // Build a fresh day-9-style state where no object is found that day: boxObjectFor is null.
+    expect(boxObjectFor(9)).toBeNull();
+    expect(looseContent(9, boxObjectFor(9), true)).toBeNull();
+    expect(looseContent(9, boxObjectFor(9), false)).toBeNull();
   });
 
   it("the case still opens on a day without a box item (every box stuck)", () => {
-    const store = atDay(3);
+    const store = atDay(9);
     const ctx = ctxOf(store);
     act(ctx, "pick-box");
     expect(ctx.session.caseOpen).toBe(true);

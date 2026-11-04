@@ -106,7 +106,7 @@
       }
     },
     "pager": {
-      "day": 4,
+      "day": 3,
       "q": "You know what this is, but it takes a second to remember what it is called.",
       "options": [
         {
@@ -179,7 +179,7 @@
       }
     },
     "iccard": {
-      "day": 7,
+      "day": 4,
       "q": "A card, one magnetic strip, the corners gone white.",
       "options": [
         {
@@ -210,7 +210,7 @@
       "light": "余额仅供参考"
     },
     "tape": {
-      "day": 10,
+      "day": 5,
       "q": "A cassette, and a walkman.",
       "options": [
         {
@@ -397,7 +397,7 @@
       ]
     },
     "dictionary": {
-      "day": 13,
+      "day": 6,
       "q": "A clamshell, silver grey, the hinge a little loose.",
       "options": [
         {
@@ -479,7 +479,7 @@
       }
     },
     "calculator": {
-      "day": 16,
+      "day": 7,
       "q": "Solar powered, the keys gone yellow.",
       "options": [
         {
@@ -663,7 +663,7 @@
       }
     },
     "phone": {
-      "day": 18,
+      "day": 8,
       "q": "A flip phone, one corner of the screen cracked, will not turn on.",
       "options": [
         {

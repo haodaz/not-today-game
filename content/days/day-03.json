@@ -70,6 +70,22 @@
           "t": "今天过去了。"
         }
       ]
+    },
+    "box": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "端盒里松了的那一个。一台寻呼机，黑壳，腰夹断了一半。"
+        },
+        {
+          "k": "narration",
+          "t": "电池仓是空的，两个弹簧片上有一点绿锈。"
+        },
+        {
+          "k": "inner",
+          "t": "它比我以为的轻。"
+        }
+      ]
     }
   },
   "items": [
@@ -132,6 +148,13 @@
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
       "required": false
+    },
+    {
+      "id": "box",
+      "text": "端盒里又松了一个。",
+      "unlock": "done:pickup",
+      "done": "event:openBox",
+      "required": true
     },
     {
       "id": "reply",

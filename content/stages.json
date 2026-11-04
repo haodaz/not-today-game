@@ -33,12 +33,12 @@
   "objectsFoundOnDay": {
     "chick": 1,
     "textbook": 2,
-    "pager": 4,
-    "iccard": 7,
-    "tape": 10,
-    "dictionary": 13,
-    "calculator": 16,
-    "phone": 18
+    "pager": 3,
+    "iccard": 4,
+    "tape": 5,
+    "dictionary": 6,
+    "calculator": 7,
+    "phone": 8
   },
   "hiddenBoxDay": 18,
   "cycles": {
