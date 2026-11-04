@@ -238,7 +238,17 @@ export function isOpenTarget(target: string): boolean {
   if (target === "browser") return true;
   const conv = /^conv:(.+)$/.exec(target);
   if (conv !== null) return knownRecipients.has(conv[1]!);
+  if (/^meeting:/.test(target)) return openedMeetingLine(target) !== null;
   return /^(file|task):.+$/.test(target);
+}
+
+/**
+ * A meeting line reached (meeting R3): `meeting:<taskId>#<index>` → the task id and the line index,
+ * or null (not a meeting open, or malformed).
+ */
+export function openedMeetingLine(target: string): { taskId: string; index: number } | null {
+  const m = /^meeting:([^#]+)#(0|[1-9]\d*)$/.exec(target);
+  return m ? { taskId: m[1]!, index: Number(m[2]) } : null;
 }
 
 /** The task id of an `open` target, or null (not a `task:` open). */

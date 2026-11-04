@@ -1,0 +1,38 @@
+{
+  "_note": "Test fixture for the meeting spec (Kiro). Placeholder text only: the real meetings (days 7 and 9) are Claude's.",
+  "board": {
+    "kind": "table",
+    "title": "fixture-meeting",
+    "columns": ["", "given", "slot"],
+    "given": { "rows": { "s1": "row-1", "s2": "row-2", "s3": "row-3" } },
+    "slots": [
+      { "id": "s1", "label": "slot-1", "answer": "m1" },
+      { "id": "s2", "label": "slot-2", "answer": "m2" },
+      { "id": "s3", "label": "slot-3", "answer": "a1" }
+    ],
+    "cards": [
+      { "id": "m1", "text": "card-m1", "from": { "meeting": true }, "hint": "hint-m1" },
+      { "id": "m2", "text": "card-m2", "from": { "meeting": true }, "hint": "hint-m2" },
+      { "id": "a1", "text": "card-a1" },
+      { "id": "x1", "text": "card-x1" }
+    ],
+    "kuro": { "fill": { "s1": "m1", "s2": "k1", "s3": "a1" }, "cards": [{ "id": "k1", "text": "card-k1" }], "unlock": "0000" },
+    "view": "meeting",
+    "meeting": {
+      "people": [
+        { "id": "p1", "name": "person one" },
+        { "id": "p2", "name": "person two", "tile": "/npc/sil_1.png" },
+        { "id": "p3", "name": "三" }
+      ],
+      "lines": [
+        { "t": "09:00", "who": "p1", "text": "line-0" },
+        { "t": "09:01", "who": "p2", "text": "line-1", "card": "m1" },
+        { "t": "09:02", "who": "p3", "text": "line-2" },
+        { "t": "09:03", "who": "p1", "text": "line-3", "card": "m2" }
+      ],
+      "layout": "grid"
+    }
+  },
+  "deliverable": { "id": "d1-tech", "label": "fixture-deliverable", "to": "boss" },
+  "judge": { "perfect": 0, "flawed": -2, "wrong": -5, "wrongAt": 2 }
+}

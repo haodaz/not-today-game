@@ -202,6 +202,12 @@ export interface Session {
    */
   ideTyping: { key: string; times: number[] } | null;
   /**
+   * meeting R3: the meeting being watched (key day:task): the line shown (-1 none), whether it is
+   * playing, and a generation that a pause / restart bumps so a stale tick does nothing. Session
+   * only; without it (a reload) the meeting shows the furthest line reached, paused.
+   */
+  meetingPlay: { key: string; pos: number; playing: boolean; gen: number } | null;
+  /**
    * object-bar 2026-11-03: an old object opened from the 老物件栏 is being used over the desktop
    * (its drawn device in a modal). It is the same `holding` + `hand.using` the room uses; this flag
    * only says the modal is the entry point, so × / Esc closes it back to 工作台. Session only.
@@ -334,6 +340,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     boardPick: null,
     boardLockOpen: false,
     ideTyping: null,
+    meetingPlay: null,
     objbarOpen: false,
     call: null,
   };

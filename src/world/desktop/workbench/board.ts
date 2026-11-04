@@ -12,6 +12,7 @@ import { autoUnlock, boardState, canPrint, foundCardIds, isKuroCard, isObjectLoc
 import { ideOps, ideSrc, ideTranscript } from "@state/days/ide";
 import { cls, html, type SafeHtml } from "@world/html";
 import { FRAMES, frameUrl } from "../kuro/body";
+import { renderMeeting } from "./meeting";
 import { hasString, t, tr } from "@world/i18n";
 import type { ActionContext, ActionHandler } from "../controller";
 import type { AppContext, Session } from "../model";
@@ -90,8 +91,9 @@ function table(board: TaskBoard, s: BoardState, state: State, session: Session):
  * placeholder in its place — its `hint`, or the generic `board.notFound` 「还没找到」 — that cannot
  * be picked. The order follows the board's card order (a placeholder keeps its slot in the row).
  */
-function tray(board: TaskBoard, s: BoardState, state: State, events: readonly GameEvent[], session: Session, headerKey = "board.tray"): SafeHtml {
-  const found = foundCardIds(board, state.day, events);
+function tray(board: TaskBoard, s: BoardState, state: State, events: readonly GameEvent[], session: Session, taskId: string, headerKey = "board.tray"): SafeHtml {
+  // meeting R3: a meeting card is found by this task's meeting (hence the task id).
+  const found = foundCardIds(board, state.day, events, taskId);
   const placed = new Set(Object.values(s.slots));
   const cells = board.cards
     .filter((c) => !placed.has(c.id))
@@ -126,7 +128,15 @@ export function renderBoard(ctx: AppContext, task: Task): SafeHtml {
   const printable = canPrint(board, s);
   if (board.view === "ide") return renderIde(ctx, task, board, s, assist, printable);
   const finish = html`<button type="button" class="bprint" data-action="board-print"${printable ? null : html` disabled`}>${finishLabel(task)}</button>`;
-  return html`<div class="surface board"><div class="btitle">${board.title}</div>${lockRow(board, s, state, events, session)}${table(board, s, state, session)}${tray(board, s, state, events, session)}<div class="bbar">${assist}${finish}</div></div>`;
+  // meeting (2026-11-04): the meeting window and the right column; the same lock, tray and bar.
+  if (board.view === "meeting" && board.meeting) {
+    return renderMeeting(ctx, task, board, s, {
+      lock: lockRow(board, s, state, events, session),
+      tray: tray(board, s, state, events, session, task.id),
+      bar: html`<div class="bbar">${assist}${finish}</div>`,
+    });
+  }
+  return html`<div class="surface board"><div class="btitle">${board.title}</div>${lockRow(board, s, state, events, session)}${table(board, s, state, session)}${tray(board, s, state, events, session, task.id)}<div class="bbar">${assist}${finish}</div></div>`;
 }
 
 // ——— the IDE view (ide 2026-11-04) ———
@@ -167,7 +177,7 @@ function ideChat(board: TaskBoard, task: Task, ctx: AppContext): SafeHtml {
 function renderIde(ctx: AppContext, task: Task, board: TaskBoard, s: BoardState, assist: SafeHtml | null, printable: boolean): SafeHtml {
   const { state, events, session } = ctx;
   const src = ideSrc(board, s, ideOps(task, state.day, events));
-  const left = html`<div class="ide-left"><div class="btitle">${board.title}</div>${lockRow(board, s, state, events, session)}${idePages(board, s, session)}${tray(board, s, state, events, session, "board.ide.sources")}</div>`;
+  const left = html`<div class="ide-left"><div class="btitle">${board.title}</div>${lockRow(board, s, state, events, session)}${idePages(board, s, session)}${tray(board, s, state, events, session, task.id, "board.ide.sources")}</div>`;
   const mid = html`<div class="ide-mid"><iframe class="ide-frame" data-keep="ide" src="${src}" title="${board.title}" sandbox="allow-scripts"></iframe></div>`;
   const snapshot = hasString("board.ide.snapshot") ? tr("board.ide.snapshot") : finishLabel(task);
   const finish = html`<button type="button" class="bprint" data-action="board-print"${printable ? null : html` disabled`}>${snapshot}</button>`;
@@ -280,7 +290,7 @@ const actions: Record<string, ActionHandler> = {
     const c = currentBoard(ctx);
     const card = data.card;
     if (!c || !card) return;
-    const found = foundCardIds(c.board, ctx.store.getState().day, ctx.store.getEvents());
+    const found = foundCardIds(c.board, ctx.store.getState().day, ctx.store.getEvents(), c.task.id);
     if (!found.has(card)) return;
     ctx.session.boardPick = ctx.session.boardPick === card ? null : card;
     ctx.rerender();

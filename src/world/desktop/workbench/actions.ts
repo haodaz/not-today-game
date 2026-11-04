@@ -6,6 +6,7 @@ import { taskPageId, type WorkbenchPage } from "../model";
 import { taskForId } from "@state/days/board";
 import { openWork } from "./work";
 import { taskOpened } from "./sessions";
+import { meetingAutoplay } from "./meeting";
 
 const PAGES: readonly WorkbenchPage[] = ["home", "docs", "ledger", "code", "msgs"];
 
@@ -54,6 +55,7 @@ export const workbenchActions: Record<string, ActionHandler> = {
       if (!Number.isInteger(day) || day < 1 || day > state.day) return;
       const task = taskForId(day, taskId);
       if (!task) return;
+      let first = false;
       if (day < state.day) {
         // 最近: an earlier day's task, read-only; only one that was opened that day.
         if (!taskOpened(day, taskId, events)) return;
@@ -62,10 +64,15 @@ export const workbenchActions: Record<string, ActionHandler> = {
         const open = openWork(state, events);
         const ok = open?.tree?.id === taskId || state.flags.includes(task.done) || taskOpened(day, taskId, events);
         if (!ok) return;
-        if (!taskOpened(day, taskId, events)) ctx.store.appendEvent({ kind: "open", target: `task:${taskId}`, t: ctx.session.clock.time });
+        if (!taskOpened(day, taskId, events)) {
+          ctx.store.appendEvent({ kind: "open", target: `task:${taskId}`, t: ctx.session.clock.time });
+          first = true;
+        }
       }
       ctx.session.workbenchPage = page;
       ctx.session.wbTaskDay = day < state.day ? day : null;
+      // meeting R3: the first open of a meeting task today starts it playing by itself.
+      if (first) meetingAutoplay(ctx, taskId);
       ctx.rerender();
       return;
     }

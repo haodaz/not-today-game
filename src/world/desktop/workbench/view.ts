@@ -159,7 +159,8 @@ function taskPage(ctx: AppContext, taskId: string, fill: Fill): SafeHtml {
   const body = task.board
     ? live ? renderBoard(ctx, task) : renderBoardRead(task.board, boardSlotsOn(task, day, events))
     : live ? renderWork(ctx, false) : renderDoneWork(ctx, day, task);
-  return html`<div class="${cls("main", "task", task.board?.view === "ide" && "ide")}" data-task="${task.id}">${head}<div class="wb-task-body">${body}</div></div>`;
+  const view = task.board?.view;
+  return html`<div class="${cls("main", "task", live && (view === "ide" || view === "meeting") && view)}" data-task="${task.id}">${head}<div class="wb-task-body">${body}</div></div>`;
 }
 
 /** The inner pages a task may open from its header (文档 / 账本 / 代码 stay reachable inside the tasks that use them). */

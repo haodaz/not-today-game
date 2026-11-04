@@ -124,7 +124,7 @@ export interface BoardSlot {
  * deliverable page (`file`), a conversation (`conv`), or today's boss call (`call: true`). Absent =
  * available from the start. A card is found when its source has been opened / the call ended today.
  */
-export type CardFrom = { readonly file: string } | { readonly conv: string } | { readonly call: true };
+export type CardFrom = { readonly file: string } | { readonly conv: string } | { readonly call: true } | { readonly meeting: true };
 export interface BoardCard {
   readonly id: string;
   readonly text: string;
@@ -138,8 +138,32 @@ export interface BoardKuro {
   readonly cards: readonly BoardCard[];
   readonly unlock: string;
 }
-/** How a board is drawn (ide R1): the table (default) or the IDE view. */
-export const BOARD_VIEWS = ["table", "ide"] as const;
+/** How a board is drawn (ide R1, meeting R1): the table (default), the IDE view, or the meeting. */
+export const BOARD_VIEWS = ["table", "ide", "meeting"] as const;
+/** One tile of the meeting (meeting R1): its name label and an optional image (a path under `/`). */
+export interface MeetingPerson {
+  readonly id: string;
+  readonly name: string;
+  readonly tile?: string;
+}
+/** One subtitle of the meeting (meeting R1): its time, who says it, the text, and the card it reveals. */
+export interface MeetingLine {
+  readonly t: string;
+  readonly who: string;
+  readonly text: string;
+  readonly card?: string;
+}
+export const MEETING_LAYOUTS = ["grid", "seats"] as const;
+export const MEETING_SEATS = ["circle", "triangle"] as const;
+export type MeetingSeat = (typeof MEETING_SEATS)[number];
+/** The meeting view's content (meeting R1): the tiles, the subtitles, and how the slots are drawn. */
+export interface BoardMeeting {
+  readonly people: readonly MeetingPerson[];
+  readonly lines: readonly MeetingLine[];
+  readonly layout: (typeof MEETING_LAYOUTS)[number];
+  /** With `layout: "seats"`: each slot's seat. */
+  readonly seats?: Readonly<Record<string, MeetingSeat>>;
+}
 export type BoardView = (typeof BOARD_VIEWS)[number];
 /** The IDE view's preview (ide R1): the deliverable's URL, and the page index (`c`) of each slot. */
 export interface BoardIde {
@@ -173,6 +197,8 @@ export interface TaskBoard {
   readonly ide?: BoardIde;
   /** ide R1: Kuro's transcript beats. */
   readonly beats?: readonly BoardBeat[];
+  /** meeting R1: the meeting (only with `view: "meeting"`). */
+  readonly meeting?: BoardMeeting;
 }
 /** Who a deliverable goes to (work v2 addition 2026-11-03 night); absent = `"hand"`. */
 export const DELIVERABLE_TO = ["boss", "partner", "group", "workbench", "hand"] as const;
@@ -358,16 +384,30 @@ function ledger(v: unknown, w: string): TaskLedger {
 
 /** A tray/Kuro card: `{ id, text }`. */
 function cardFrom(v: unknown, w: string): CardFrom {
-  // Exactly one of file / conv / call (day-graph 2026-11-03).
+  // Exactly one of file / conv / call (day-graph 2026-11-03) / meeting (meeting R1).
   if (!isRecord(v)) fail(w, "must be an object");
-  keys(v, ["file", "conv", "call"], w);
-  const present = ["file", "conv", "call"].filter((k) => v[k] !== undefined);
-  if (present.length !== 1) fail(w, "must have exactly one of file / conv / call");
+  keys(v, ["file", "conv", "call", "meeting"], w);
+  const present = ["file", "conv", "call", "meeting"].filter((k) => v[k] !== undefined);
+  if (present.length !== 1) fail(w, "must have exactly one of file / conv / call / meeting");
   if (v.file !== undefined) return { file: str(v.file, `${w}.file`) };
   if (v.conv !== undefined) return { conv: str(v.conv, `${w}.conv`) };
+  if (v.meeting !== undefined) {
+    if (v.meeting !== true) fail(`${w}.meeting`, "must be true");
+    return { meeting: true };
+  }
   if (v.call !== true) fail(`${w}.call`, "must be true");
   return { call: true };
 }
+
+/** A lock's source: as a card's, but never the meeting (its lines reveal cards, not codes). */
+function lockFrom(v: unknown, w: string): CardFrom {
+  const from = cardFrom(v, w);
+  if (isMeetingFrom(from)) fail(w, "a lock cannot come from the meeting");
+  return from;
+}
+
+/** A card or lock source is today's meeting (meeting R1). */
+export const isMeetingFrom = (from: CardFrom | undefined): from is { readonly meeting: true } => from !== undefined && "meeting" in from;
 
 function card(v: unknown, w: string): BoardCard {
   if (!isRecord(v)) fail(w, "a card must be an object");
@@ -388,7 +428,7 @@ function card(v: unknown, w: string): BoardCard {
  */
 function board(v: unknown, w: string): TaskBoard {
   if (!isRecord(v)) fail(w, "must be an object");
-  keys(v, ["kind", "title", "columns", "given", "slots", "cards", "kuro", "view", "ide", "beats"], w);
+  keys(v, ["kind", "title", "columns", "given", "slots", "cards", "kuro", "view", "ide", "beats", "meeting"], w);
   if (v.kind !== "table") fail(`${w}.kind`, 'must be "table"');
   // Column headers are display-only and may be blank (the label column has no header).
   if (!Array.isArray(v.columns) || v.columns.length === 0 || !v.columns.every((c) => typeof c === "string")) fail(`${w}.columns`, "must be a non-empty list of strings");
@@ -436,7 +476,7 @@ function board(v: unknown, w: string): TaskBoard {
     if (!codes.includes(answer)) fail(`${lw}.answer`, `"${answer}" is not one of the codes`);
     lock = {
       ...(v.given.lock.object !== undefined ? { object: str(v.given.lock.object, `${lw}.object`) } : {}),
-      ...(v.given.lock.from !== undefined ? { from: cardFrom(v.given.lock.from, `${lw}.from`) } : {}),
+      ...(v.given.lock.from !== undefined ? { from: lockFrom(v.given.lock.from, `${lw}.from`) } : {}),
       ...(v.given.lock.hint !== undefined ? { hint: str(v.given.lock.hint, `${lw}.hint`) } : {}),
       codes,
       answer,
@@ -467,6 +507,17 @@ function board(v: unknown, w: string): TaskBoard {
     if (view !== "ide") fail(`${w}.ide`, 'an ide needs view "ide"');
     ide = boardIde(v.ide, `${w}.ide`, slotIds);
   } else if (view === "ide") fail(`${w}.view`, 'view "ide" needs an ide');
+  // meeting R1: the meeting, only with view "meeting"; its cards come from its lines.
+  let meeting: BoardMeeting | undefined;
+  if (v.meeting !== undefined) {
+    if (view !== "meeting") fail(`${w}.meeting`, 'a meeting needs view "meeting"');
+    meeting = boardMeeting(v.meeting, `${w}.meeting`, slotIds, cards);
+  } else if (view === "meeting") fail(`${w}.view`, 'view "meeting" needs a meeting');
+  for (const c of [...cards, ...kuroCards]) {
+    if (!isMeetingFrom(c.from)) continue;
+    if (!meeting) fail(`${w}.cards`, `"${c.id}" comes from a meeting, but the board has none`);
+    if (!meeting.lines.some((l) => l.card === c.id)) fail(`${w}.cards`, `"${c.id}" comes from the meeting, but no line reveals it`);
+  }
   const allCards = new Set([...cardIds, ...kuroCardIds]);
   const beats = v.beats !== undefined ? boardBeats(v.beats, `${w}.beats`, slotIds, allCards) : undefined;
   return {
@@ -480,7 +531,68 @@ function board(v: unknown, w: string): TaskBoard {
     ...(view !== undefined ? { view } : {}),
     ...(ide ? { ide } : {}),
     ...(beats ? { beats } : {}),
+    ...(meeting ? { meeting } : {}),
   };
+}
+
+const MEETING_T = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+/**
+ * The meeting (meeting R1): people (unique ids; a tile image under `/`), lines (a time, a person,
+ * text, and a card that must be a tray card from the meeting), the layout, and with `seats` a seat
+ * for every slot (and only for slots).
+ */
+function boardMeeting(v: unknown, w: string, slotIds: ReadonlySet<string>, cards: readonly BoardCard[]): BoardMeeting {
+  if (!isRecord(v)) fail(w, "must be an object");
+  keys(v, ["people", "lines", "layout", "seats"], w);
+  if (!Array.isArray(v.people) || v.people.length === 0) fail(`${w}.people`, "must be a non-empty list");
+  const ids = new Set<string>();
+  const people = v.people.map((p, i): MeetingPerson => {
+    const pw = `${w}.people[${i}]`;
+    if (!isRecord(p)) fail(pw, "a person must be an object");
+    keys(p, ["id", "name", "tile"], pw);
+    const id = str(p.id, `${pw}.id`);
+    if (ids.has(id)) fail(`${w}.people`, `duplicate person id "${id}"`);
+    ids.add(id);
+    let tile: string | undefined;
+    if (p.tile !== undefined) {
+      tile = str(p.tile, `${pw}.tile`);
+      if (!tile.startsWith("/")) fail(`${pw}.tile`, "expected a path under /");
+    }
+    return { id, name: str(p.name, `${pw}.name`), ...(tile !== undefined ? { tile } : {}) };
+  });
+  if (!Array.isArray(v.lines) || v.lines.length === 0) fail(`${w}.lines`, "must be a non-empty list");
+  const lines = v.lines.map((l, i): MeetingLine => {
+    const lw = `${w}.lines[${i}]`;
+    if (!isRecord(l)) fail(lw, "a line must be an object");
+    keys(l, ["t", "who", "text", "card"], lw);
+    const t = str(l.t, `${lw}.t`);
+    if (!MEETING_T.test(t)) fail(`${lw}.t`, "must be a time HH:MM");
+    const who = str(l.who, `${lw}.who`);
+    if (!ids.has(who)) fail(`${lw}.who`, `"${who}" is not a person`);
+    let card: string | undefined;
+    if (l.card !== undefined) {
+      card = str(l.card, `${lw}.card`);
+      const c = cards.find((x) => x.id === card);
+      if (!c) fail(`${lw}.card`, `"${card}" is not a card`);
+      if (!isMeetingFrom(c.from)) fail(`${lw}.card`, `"${card}" does not come from the meeting (from: { meeting: true })`);
+    }
+    return { t, who, text: str(l.text, `${lw}.text`), ...(card !== undefined ? { card } : {}) };
+  });
+  if (!(MEETING_LAYOUTS as readonly unknown[]).includes(v.layout)) fail(`${w}.layout`, `must be one of ${MEETING_LAYOUTS.join(", ")}`);
+  const layout = v.layout as BoardMeeting["layout"];
+  let seats: Record<string, MeetingSeat> | undefined;
+  if (layout === "seats") {
+    if (!isRecord(v.seats)) fail(`${w}.seats`, 'layout "seats" needs seats');
+    seats = {};
+    for (const [slot, seat] of Object.entries(v.seats)) {
+      if (!slotIds.has(slot)) fail(`${w}.seats`, `"${slot}" is not a slot`);
+      if (!(MEETING_SEATS as readonly unknown[]).includes(seat)) fail(`${w}.seats.${slot}`, `must be one of ${MEETING_SEATS.join(", ")}`);
+      seats[slot] = seat as MeetingSeat;
+    }
+    for (const slot of slotIds) if (!(slot in seats)) fail(`${w}.seats`, `slot "${slot}" has no seat`);
+  } else if (v.seats !== undefined) fail(`${w}.seats`, 'seats only with layout "seats"');
+  return { people, lines, layout, ...(seats ? { seats } : {}) };
 }
 
 /** The IDE preview (ide R1): a deliverable under /docs/, and a page 0–99 per (known) slot. */
@@ -681,6 +793,11 @@ function localiseTask(zh: Task, en: Task, w: string): Task {
     if (zh.board.slots.length !== en.board.slots.length || zh.board.cards.length !== en.board.cards.length) fail(`${w}.board`, "board shape differs from the Chinese");
     // ide R1: the view and the preview are shared; the beats differ only in their lines' text.
     if (zh.board.view !== en.board.view || !sameJson(zh.board.ide, en.board.ide)) fail(`${w}.board`, "view or ide differs from the Chinese");
+    // meeting R1: the people's ids and tiles, the lines' times / speakers / cards, the layout and the
+    // seats are shared; only the names and the line text differ.
+    const meetingShape = (b: TaskBoard) =>
+      b.meeting ? { people: b.meeting.people.map((p) => [p.id, p.tile ?? null]), lines: b.meeting.lines.map((l) => [l.t, l.who, l.card ?? null]), layout: b.meeting.layout, seats: b.meeting.seats ?? null } : null;
+    if (!sameJson(meetingShape(zh.board), meetingShape(en.board))) fail(`${w}.board.meeting`, "meeting shape differs from the Chinese");
     const beatShape = (b: TaskBoard) => (b.beats ?? []).map((x) => ({ on: x.on, who: x.lines.map((l) => l.who) }));
     if (!sameJson(beatShape(zh.board), beatShape(en.board))) fail(`${w}.board.beats`, "beat shape differs from the Chinese");
     return bilingualValues(zh, { title: en.title, board: en.board, ...(zh.deliverable && en.deliverable ? { deliverable: en.deliverable } : {}) });

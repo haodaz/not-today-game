@@ -31,6 +31,9 @@ body.split #code{display:block}
 #code .k{color:#C792EA}#code .s{color:#9FE6A0}#code .n{color:#FFB547}#code .c{color:#6E7B87;font-style:italic}
 body.light #code .k{color:#7A3EBF}body.light #code .s{color:#1E8A4C}body.light #code .n{color:#B5600B}body.light #code .c{color:#9AA0B8}
 #view{position:relative;flex:1;height:100%;overflow:hidden}
+/* A narrow preview window (the IDE's middle column): the code goes under the stage, not beside it. */
+@media (max-aspect-ratio:1/1),(max-width:760px){#wrap{flex-direction:column}#view{order:0;flex:1 1 auto;height:auto;min-height:0}
+  #code{order:1;flex:0 0 36%;height:auto;border-right:0;border-top:1px solid var(--codeline)}}
 #stage{position:absolute;left:50%;top:50%;width:1200px;height:900px;transform-origin:0 0;overflow:hidden;background:var(--bg)}
 #stage::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(760px 460px at 50% 64%,rgba(80,90,255,.16),transparent 64%)}
 body.light #stage::before{background:radial-gradient(760px 460px at 50% 64%,rgba(109,91,255,.11),transparent 64%)}

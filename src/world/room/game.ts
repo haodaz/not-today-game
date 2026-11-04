@@ -59,6 +59,8 @@ import { pointed } from "./pointer";
 import { itemPageId, readingPageId, type KuroCloses } from "@state/closes";
 import { browserPage } from "@world/desktop/browser/data";
 import { composerActions, workbenchActions } from "@world/desktop/workbench/actions";
+import { meetingActions } from "@world/desktop/workbench/meeting";
+import { boardActions } from "@world/desktop/workbench/board";
 import { workActions } from "@world/desktop/workbench/work";
 import { renderFiles } from "@world/desktop/files/view";
 import { openObjectFromBar, renderObjectBarUse } from "@world/desktop/workbench/objbar";
@@ -1069,8 +1071,14 @@ export const loopActions: Record<string, ActionHandler> = {
   // 工作台 work (work spec 2026-11-02): the sentence is sent, the chip under Kuro's question is the
   // reply, the surface is done, 通过 appends the task event; the runtime queues its lines as before.
   ...workActions,
+  // The board's actions again, by name: work.ts and board.ts import each other, so when board.ts
+  // loads first, workActions' own spread of them runs before they exist (meeting 2026-11-04).
+  ...boardActions,
   // 工作台's home composer (workspace 2026-11-04): it talks to Kuro as its body does.
   ...composerActions,
+  // The meeting view's ▶ / ⏸ / ⟲ (meeting 2026-11-04). Registered here, not in workActions, so
+  // no module-load spread inside the workbench's import cycle can see it unset.
+  ...meetingActions,
 
   // 文件 / 回收站 (desktop-ui 2026-11-02): the files/trash dock tiles open the real window instead of
   // the plain decoy notice; every other decoy keeps its notice.

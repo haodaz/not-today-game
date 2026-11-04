@@ -529,6 +529,35 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .wb .main.task.ide .surface.board.ide{height:100%;padding:8px}
 .wb .main.task.ide .surface.board.ide .ide-mid{min-width:50%}
 .wb .main.task.ide .surface.board.ide .ide-right{flex-basis:320px}
+/* meeting (2026-11-04): the meeting window (flex) | the slots and the tray (≈340 px), full height on a task page. */
+.wb .surface.board.meeting{display:flex;gap:12px;align-items:stretch;min-height:0}
+.wb .main.task.meeting .wb-task-body{padding:10px 12px;overflow:hidden}
+.wb .main.task.meeting .surface.board.meeting{height:100%;padding:8px}
+.wb .surface.board.meeting .mt-left{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:8px;background:#1d2128;border-radius:8px;padding:10px;color:#e8eaee}
+.wb .surface.board.meeting .mt-grid{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:repeat(var(--mt-cols,2),1fr);gap:8px;align-content:center}
+.wb .surface.board.meeting .mt-tile{position:relative;aspect-ratio:16/10;border-radius:8px;background:#2b3038;overflow:hidden;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px transparent;transition:box-shadow .3s}
+.wb .surface.board.meeting .mt-tile.speaking{box-shadow:0 0 0 2px rgba(110,200,140,.75),0 0 12px rgba(110,200,140,.35)}
+.wb .surface.board.meeting .mt-img{width:100%;height:100%;object-fit:cover}
+.wb .surface.board.meeting .mt-init{width:52px;height:52px;border-radius:50%;background:#3a4049;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;color:#cfd4dc}
+.wb .surface.board.meeting .mt-name{position:absolute;left:8px;bottom:6px;font-size:11px;background:rgba(0,0,0,.45);border-radius:4px;padding:1px 6px}
+.wb .surface.board.meeting .mt-sub{min-height:40px;background:rgba(0,0,0,.35);border-radius:6px;padding:8px 10px;font-size:13px;line-height:1.5}
+.wb .surface.board.meeting .mt-sub .mt-t{color:#9aa3b0;font-family:var(--mono);font-size:11px}
+.wb .surface.board.meeting .mt-ctl{display:flex;align-items:center;gap:8px}
+.wb .surface.board.meeting .mt-btn{border:1px solid #3a4049;border-radius:6px;background:#2b3038;color:#e8eaee;font:inherit;font-size:12px;padding:3px 10px;cursor:pointer}
+.wb .surface.board.meeting .mt-btn:disabled{opacity:.4;cursor:default}
+.wb .surface.board.meeting .mt-n{margin-left:auto;font-family:var(--mono);font-size:11px;color:#9aa3b0}
+.wb .surface.board.meeting .mt-right{flex:0 0 340px;display:flex;flex-direction:column;min-height:0;overflow:auto}
+.wb .surface.board.meeting .mt-rows{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.wb .surface.board.meeting .mt-row{display:flex;flex-direction:column;gap:3px}
+.wb .surface.board.meeting .mt-row-l{font-size:12px;font-weight:600}
+.wb .surface.board.meeting .mt-seats{display:flex;flex-direction:column;gap:8px}
+.wb .surface.board.meeting .mt-ring{position:relative;width:100%;aspect-ratio:1;border:1px dashed var(--line);border-radius:50%}
+.wb .surface.board.meeting .mt-seat{width:96px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.wb .surface.board.meeting .mt-ring .mt-seat{position:absolute;transform:translate(-50%,-50%)}
+.wb .surface.board.meeting .mt-out{display:flex;justify-content:center;gap:8px}
+.wb .surface.board.meeting .mt-seat-l{font-size:11px;color:var(--ink-2)}
+.wb .surface.board.meeting .bslot.seat{min-height:40px;font-size:11.5px;text-align:center;border-radius:50%}
+.wb .surface.board.meeting .mt-seat.triangle .bslot.seat{border-radius:4px;clip-path:polygon(50% 0,100% 100%,0 100%);padding-top:14px}
 /* ide (2026-11-04): the IDE view of a board — pages + sources | the deliverable's preview | 克总. */
 .wb .surface.board.ide{display:flex;gap:12px;align-items:stretch;height:100%;min-height:0}
 .wb .surface.board.ide .ide-left{flex:0 0 260px;display:flex;flex-direction:column;min-height:0;overflow:auto}

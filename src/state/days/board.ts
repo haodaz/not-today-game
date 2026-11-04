@@ -4,7 +4,8 @@
 // replays), and the night judgement is a pure function of the log. No clock, no rendering here.
 import type { BoardOp, GameEvent } from "../events";
 import type { State } from "../types.gen";
-import { taskByFlag, type BoardCard, type BoardLock, type CardFrom, type Task, type TaskBoard, type TaskDeliverable } from "./tasks";
+import { meetingCardFound } from "./meeting";
+import { isMeetingFrom, taskByFlag, type BoardCard, type BoardLock, type CardFrom, type Task, type TaskBoard, type TaskDeliverable } from "./tasks";
 import { dayFile } from "./table";
 import { isRaidNight } from "../nights";
 import { takenByKuro } from "@world/objects/taken";
@@ -90,7 +91,10 @@ export function canPrint(board: TaskBoard, s: BoardState): boolean {
  * by today's `callEnded`. Pure, from the log (an open yesterday does not count — events are the
  * day's own). Kuro's fills ignore this (它不用找).
  */
-export function cardFound(card: BoardCard, day: number, events: readonly GameEvent[]): boolean {
+export function cardFound(card: BoardCard, day: number, events: readonly GameEvent[], at?: { readonly board: TaskBoard; readonly taskId: string }): boolean {
+  // meeting R3: a card from the meeting is found once this task's meeting reached its line today
+  // (without the board and task to look in, it is not found).
+  if (isMeetingFrom(card.from)) return at !== undefined && meetingCardFound(at.board, at.taskId, card.id, day, events);
   return sourceFound(card.from, day, events);
 }
 
@@ -102,12 +106,18 @@ export function sourceFound(from: CardFrom | undefined, day: number, events: rea
   if (!from) return true;
   if ("file" in from) return events.some((e) => e.kind === "open" && e.day === day && e.target === `file:${from.file}`);
   if ("conv" in from) return events.some((e) => e.kind === "open" && e.day === day && e.target === `conv:${from.conv}`);
+  // The meeting needs its task (cardFound); a lock never comes from it (the loader).
+  if ("meeting" in from) return false;
   return events.some((e) => e.kind === "callEnded" && e.day === day);
 }
 
-/** The tray cards found today (day-graph): the board's own cards whose source is satisfied. */
-export function foundCardIds(board: TaskBoard, day: number, events: readonly GameEvent[]): Set<string> {
-  return new Set(board.cards.filter((c) => cardFound(c, day, events)).map((c) => c.id));
+/**
+ * The tray cards found today (day-graph): the board's own cards whose source is satisfied. Cards
+ * from the meeting (meeting R3) need the task id whose meeting reveals them.
+ */
+export function foundCardIds(board: TaskBoard, day: number, events: readonly GameEvent[], taskId?: string): Set<string> {
+  const at = taskId !== undefined ? { board, taskId } : undefined;
+  return new Set(board.cards.filter((c) => cardFound(c, day, events, at)).map((c) => c.id));
 }
 
 /**
@@ -115,9 +125,9 @@ export function foundCardIds(board: TaskBoard, day: number, events: readonly Gam
  * (day-graph 2026-11-03) minus those not yet found today. `day`/`events` default to showing every
  * card (callers that do not track sources, e.g. a pure board test, pass nothing).
  */
-export function trayCards(board: TaskBoard, s: BoardState, day?: number, events?: readonly GameEvent[]): string[] {
+export function trayCards(board: TaskBoard, s: BoardState, day?: number, events?: readonly GameEvent[], taskId?: string): string[] {
   const placed = new Set(Object.values(s.slots));
-  const found = day !== undefined && events !== undefined ? foundCardIds(board, day, events) : null;
+  const found = day !== undefined && events !== undefined ? foundCardIds(board, day, events, taskId) : null;
   return board.cards.filter((c) => !placed.has(c.id) && (found === null || found.has(c.id))).map((c) => c.id);
 }
 

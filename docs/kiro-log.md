@@ -1911,3 +1911,29 @@ Spec: `.kiro/specs/workspace/requirements.md`.
 - Tests: new `tests/workspace.test.ts`; updated `desktop-apps.test.ts` (home keys, no sidebar jobs)
   and `object-bar.test.ts` (no bar off a task page); `desktop-snapshots` regenerated (16 written).
 - `npx tsc --noEmit`: clean. `npx vitest run`: 102 files / 1825 tests passed.
+
+## meeting: the meeting view of a work-v2 board (2026-11-04)
+
+Spec: `.kiro/specs/meeting/requirements.md`, tasks 1–5.
+
+- `src/state/days/tasks.ts`: `view: "meeting"` (`BOARD_VIEWS`), `meeting { people, lines, layout,
+  seats }` and the card source `from: { meeting: true }`. Strict: a meeting only with view
+  "meeting" (and the reverse); unique person ids; tiles under `/`; line times HH:MM; every `who` a
+  person; every `card` a tray card from the meeting; `seats` only with layout "seats", one per slot,
+  circle / triangle. Also: a meeting card on a board without a meeting, or one no line reveals, is
+  rejected; a lock cannot come from the meeting. The en twin must match the meeting's shape.
+- `src/state/events.ts`: the open target `meeting:<taskId>#<index>` (`openedMeetingLine`).
+- `src/state/days/meeting.ts` (new, pure): `meetingTarget`, `meetingReached`, `meetingFurthest`,
+  `meetingCardFound`. `src/state/days/board.ts`: `cardFound(card, day, events, at?)`,
+  `foundCardIds(…, taskId?)`, `trayCards(…, taskId?)`; a meeting card needs its task's meeting.
+- `src/world/desktop/workbench/meeting.ts` (new): `renderMeeting` (tiles with initials or image,
+  the speaking ring, the subtitle bar, ▶/⏸, ⟲, n / total; grid slot rows labelled from
+  `given.rows`, or seats: circles on a ring, triangles outside) and `meetingActions` (play / pause /
+  restart; one `open` per new line; 2.6 s a line, 0.3 s with `?fast=1`; `meetingAutoplay` on the
+  task's first open today). `session.meetingPlay` is session only; a reload shows the furthest line.
+- `board.ts`: `renderBoard` draws the meeting view; the tray and the card pick pass the task id.
+  `actions.ts`: autoplay on the first `open task:<id>`. `view.ts`: the task page gets `meeting`.
+  `game.ts`: `meetingActions` and `boardActions` registered by name (see the cycle note there).
+  `desktop.css`: the meeting window, the right column (340 px), the seats.
+- Tests: `tests/meeting.test.ts` (19) with the fixture `.kiro/specs/meeting/board-meeting.json`.
+- `npx tsc --noEmit`: clean. `npx vitest run`: 103 files / 1844 tests passed.
