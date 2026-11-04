@@ -40,3 +40,14 @@ Every shot logs `{ kind: "photo", day, at: string, t }`, where `at` is where the
 - **Room photos** are no longer "next day": they develop like any other (20 s) and show the facing's still plus the content's addition for **(day, facing)** (`content/photos.json` `room: [{ day, facing, add: { text?, overlay? } }]`; `fromDay/toDay` are replaced by `day`). The addition appears only in the last stage of developing.
 - **Screen photos**: once developed, the side-by-side with difference rings (R3) as before.
 - Tests: 10 room sheets then empty; screen photos unlimited and uncounted; the three developing stages by elapsed time; a room photo on (day, facing) shows that day's addition only when developed.
+
+## R9. The camera in 使用 is a drawn device, clean (author 2026-11-04: 「你出的这些素材总感觉长的特别旧」)
+Like the calculator and the dictionary (devices.ts, `DEVICE_IDS`), the camera's 使用 face is the game's own drawing, not the photo: add `camera` to `DEVICE_IDS`. Flat, clean, bright, not worn (the photo `camera_front.png` stays for holding only). Parameters (CSS, inline SVG for the lens):
+- Body 360 × 300 px, radius 28 top / 18 bottom. Upper part (top 62 %): `#F6F4EF` (warm white) with a 1 px `#E3DED4` edge. Lower part: `#2B2B2E` (near-black), with the photo slot: a 260 × 10 px slit, `#141416`, radius 5, centred 26 px from the bottom.
+- A vertical stripe of our own under the lens, 34 px wide, from the lens to the black part: two bands `#2FB7A8` (teal) and `#F07A5A` (coral). No rainbow, no logo, no text.
+- Lens: centred in the upper part, outer ring 132 px `#1E1E21`, inner glass 84 px radial `#3A4A55 → #11161A`, one small white highlight.
+- Flash window top-left 78 × 46 px, radius 8, fill `#FFFFFF` with 6 thin vertical lines `#D9D9D9`. Viewfinder top-right 54 × 46 px, radius 10, `#1E1E21` with an inner `#5B6770` square.
+- Keys: `shutter` a 46 px red button `#E5322D` (bottom-left of the upper part, 2 px darker ring, presses 2 px); `flash` a small 30 × 14 px yellow slider `#F2B632` under the viewfinder (toggles left/right).
+- The counter (sheets left) is a tiny 7-segment readout on the back, drawn with the calculator's seg code, shown when the device is flipped (`FLIPPERS` gets `camera`).
+- The ejected sheet: a white frame 200 × 236 px (thick bottom border like an instant photo) sliding down out of the slot over 600 ms; its picture area develops as R8 says.
+- Upgraded state: the same shell with class `upgraded` (as the other devices): the sheet develops instantly, never shows the content's addition (Kuro tidies it away).
