@@ -475,6 +475,9 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .wb .surface.board .btitle{font-weight:600;font-size:13px;margin:0 0 8px}
 .wb .surface.board .block-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px;padding:6px 8px;background:#fff8e1;border-radius:6px}
 .wb .surface.board .block{border:1px solid var(--warm);border-radius:6px;background:#fff;color:#8a5a00;font:inherit;font-size:12px;padding:4px 10px;cursor:pointer}
+/* day-graph: what is not found yet is greyed — a tray placeholder, or a source lock before its source is opened today. */
+.wb .surface.board .block.notfound,.wb .surface.board .bcard.notfound{border:1px dashed var(--line);background:#f3f4f6;color:var(--ink-3)}
+.wb .surface.board .bcard.notfound{cursor:default}
 .wb .surface.board .bnote{font-size:12px;color:var(--ink-2)}
 .wb .surface.board .bcodes{display:flex;gap:6px}
 .wb .surface.board .bcode{border:1px solid var(--accent);border-radius:6px;background:#eef3ff;color:var(--ink);font:inherit;font-size:12px;padding:4px 12px;cursor:pointer}

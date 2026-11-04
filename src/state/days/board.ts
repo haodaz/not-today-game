@@ -4,7 +4,7 @@
 // replays), and the night judgement is a pure function of the log. No clock, no rendering here.
 import type { BoardOp, GameEvent } from "../events";
 import type { State } from "../types.gen";
-import { taskByFlag, type BoardCard, type Task, type TaskBoard, type TaskDeliverable } from "./tasks";
+import { taskByFlag, type BoardCard, type BoardLock, type CardFrom, type Task, type TaskBoard, type TaskDeliverable } from "./tasks";
 import { dayFile } from "./table";
 import { isRaidNight } from "../nights";
 import { takenByKuro } from "@world/objects/taken";
@@ -90,7 +90,14 @@ export function canPrint(board: TaskBoard, s: BoardState): boolean {
  * day's own). Kuro's fills ignore this (它不用找).
  */
 export function cardFound(card: BoardCard, day: number, events: readonly GameEvent[]): boolean {
-  const from = card.from;
+  return sourceFound(card.from, day, events);
+}
+
+/**
+ * The day-graph source rule, shared by cards and locks: no source → found; `file`/`conv` → an
+ * `open` of that target on `day`; `call` → today's `callEnded`. Pure, from the log.
+ */
+export function sourceFound(from: CardFrom | undefined, day: number, events: readonly GameEvent[]): boolean {
   if (!from) return true;
   if ("file" in from) return events.some((e) => e.kind === "open" && e.day === day && e.target === `file:${from.file}`);
   if ("conv" in from) return events.some((e) => e.kind === "open" && e.day === day && e.target === `conv:${from.conv}`);
@@ -127,19 +134,46 @@ export function isKuroCard(board: TaskBoard, cardId: string): boolean {
 export function lockObjectAvailable(board: TaskBoard, state: State, events: readonly GameEvent[]): boolean {
   const lock = board.given.lock;
   if (!lock) return true;
+  if (lock.object === undefined) return false; // a source lock has no object to use
   if (!(state.found as string[]).includes(lock.object)) return false;
   return !takenByKuro(lock.object, state, events);
 }
 
 /**
+ * An object lock (object-bar R3): the code is on an old object, and nowhere else. A lock with a
+ * `from` is a source lock (day-graph addition 2026-11-04), even if it also names an object: its
+ * code is elsewhere, so its chips, its label and its unlock follow the source, not the object.
+ */
+export function isObjectLock(lock: BoardLock): lock is BoardLock & { readonly object: string } {
+  return lock.object !== undefined && lock.from === undefined;
+}
+
+/** A source lock's source has been opened today (the `cardFound` rule); true for an object lock. */
+export function lockSourceFound(lock: BoardLock, day: number, events: readonly GameEvent[]): boolean {
+  return sourceFound(lock.from, day, events);
+}
+
+/**
+ * The code chips are offered now: a source lock once its source has been opened today; an object
+ * lock while its object is found and not taken (as before). No lock: false (nothing to enter).
+ */
+export function lockCodesOffered(board: TaskBoard, state: State, events: readonly GameEvent[]): boolean {
+  const lock = board.given.lock;
+  if (!lock) return false;
+  if (lock.from !== undefined) return lockSourceFound(lock, state.day, events);
+  return lockObjectAvailable(board, state, events);
+}
+
+/**
  * The automatic unlock for an upgraded, not-yet-taken object (object-upgrade 2026-11-03): its
  * ability is automatic now, so the lock's column opens by itself with the right code — logged as
- * the object's own step (not an assist). Returns the `unlock` op to append on opening the task, or
- * null (no lock, already unlocked, no object / taken, or the object not upgraded). Pure.
+ * the object's own step (not an assist). Object locks only (day-graph addition 2026-11-04): a
+ * source lock's code is not on the object. Returns the `unlock` op to append on opening the task,
+ * or null (no lock, already unlocked, not an object lock, no object / taken, not upgraded). Pure.
  */
 export function autoUnlock(board: TaskBoard, s: BoardState, state: State, events: readonly GameEvent[]): BoardOp | null {
   const lock = board.given.lock;
-  if (!lock || s.unlocked) return null;
+  if (!lock || s.unlocked || !isObjectLock(lock)) return null;
   if (!(state.found as string[]).includes(lock.object)) return null;
   if (state.upgraded[lock.object] !== true) return null; // only an upgraded object does it for you
   if (takenByKuro(lock.object, state, events)) return null; // taken: it is gone, only 让它试 is left

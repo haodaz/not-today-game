@@ -1736,3 +1736,33 @@ object from the bar. Code only; the icons (public/objects/icons) and the strings
   a not-found object does not open; × and Esc close it with the page unchanged; a taken object opens;
   the day-5 lock label with the pager found (and the plain label without it); the three strings in zh/en.
 - `npx tsc --noEmit`: clean. `npx vitest run`: 100 files / 1770 tests passed.
+
+## day-graph addition 2026-11-04: a lock can have a source too
+
+`given.lock` gains optional `from` (the card-source shape) and `hint`; `object` is optional, and a
+lock needs at least one of the two. A lock with `from` offers its code chips only once that source
+was opened today (the `cardFound` rule, now the shared `sourceFound`). Until then the control reads
+`board.lock.from` with {hint} and is greyed, and the panel offers only Kuro's 让它试. Object-only
+locks are unchanged: 用{object}看一眼 opens the object, the pager note shows, and the upgraded-object
+auto unlock still runs. Decision: a lock with both `object` and `from` counts as a source lock (its
+code is elsewhere), so it neither opens the object nor auto-unlocks.
+
+- `src/state/days/tasks.ts`: `BoardLock.object?` / `from?` / `hint?`. The loader is strict: it
+  rejects a lock with neither, and checks `from` with the card's `cardFrom` and `hint` as a
+  non-empty string.
+- `src/state/days/board.ts`: `sourceFound` (shared with `cardFound`), `isObjectLock`,
+  `lockSourceFound`, `lockCodesOffered`. `lockObjectAvailable` returns false when there is no
+  object; `autoUnlock` runs for object locks only.
+- `src/world/desktop/workbench/board.ts`: `lockRow` uses `lockCodesOffered`; the source-lock label
+  and greyed state; the pager note only on object locks; `board-lock` opens the object for object
+  locks only.
+- `src/world/desktop/desktop.css`: `.block.notfound` and `.bcard.notfound`, the greyed look.
+- `tests/day-graph.test.ts`: the content check also walks each lock's `from` (shared `brokenFrom`).
+  New tests: a source lock hides its chips until opened today (yesterday does not count), with the
+  label and grey; a source lock (even with an object) does not auto-unlock, an object lock still
+  does; object locks unchanged; the loader rejects neither, accepts from-only, checks from/hint/keys;
+  the lock-source check fails on a not-yet-posted file (picked live from files.json), a missing
+  file, an unknown conv, and a call on a day without one.
+- Note: `content/files.json` now lists `vivi-plan-2` from day 2, so test fixtures no longer
+  hard-code its day.
+- `npx tsc --noEmit`: clean. `npx vitest run`: 100 files / 1779 tests passed.

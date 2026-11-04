@@ -8,7 +8,7 @@
 import type { State } from "@state/types.gen";
 import type { GameEvent } from "@state/events";
 import type { Task, TaskBoard } from "@state/days/tasks";
-import { autoUnlock, boardState, canPrint, foundCardIds, isKuroCard, lockObjectAvailable, trayCards, type BoardState } from "@state/days/board";
+import { autoUnlock, boardState, canPrint, foundCardIds, isKuroCard, isObjectLock, lockCodesOffered, lockObjectAvailable, trayCards, type BoardState } from "@state/days/board";
 import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t, tr } from "@world/i18n";
 import type { ActionContext, ActionHandler } from "../controller";
@@ -26,31 +26,44 @@ function lockRow(board: TaskBoard, s: BoardState, state: State, events: readonly
   const lock = board.given.lock;
   if (!lock) return null;
   if (s.unlocked) return null;
-  // Locked: one control 「需要提取码」, and (if opened) the three code chips or the no-tool row.
+  // Locked: one control, and (if opened) the code chips, or what to do without them.
   const open = session.boardLockOpen;
-  // Available = found and not taken by Kuro (object-upgrade 2026-11-03): a taken object is gone.
-  const available = lockObjectAvailable(board, state, events);
+  const source = lock.from !== undefined;
+  // The chips are offered: a source lock once its source was opened today (day-graph addition
+  // 2026-11-04); an object lock while its object is found and not taken (object-upgrade 2026-11-03).
+  const offered = lockCodesOffered(board, state, events);
+  const tryIt = hasString("board.kuroTry") ? html`<button type="button" class="bchip" data-action="board-kuro-lock">${tr("board.kuroTry")}</button>` : null;
   let panel: SafeHtml | null = null;
   if (open) {
-    if (available) {
+    if (offered) {
       const chips = lock.codes.map((code) => html`<button type="button" class="bcode" data-action="board-code" data-code="${code}">${code}</button>`);
-      const note = hasString("board.pagerCodes") ? html`<div class="bnote">${tr("board.pagerCodes")}</div>` : null;
+      // The pager note belongs to an object lock only; a source lock's code was read elsewhere.
+      const note = !source && hasString("board.pagerCodes") ? html`<div class="bnote">${tr("board.pagerCodes")}</div>` : null;
       panel = html`${note}<div class="bcodes">${chips}</div>`;
+    } else if (source) {
+      // Not found yet: the hint is on the (greyed) control; only Kuro's 让它试 here, as before.
+      panel = tryIt;
     } else {
       const noTool = hasString("board.noTool") ? html`<div class="bnote">${tr("board.noTool")}</div>` : null;
-      const tryIt = hasString("board.kuroTry") ? html`<button type="button" class="bchip" data-action="board-kuro-lock">${tr("board.kuroTry")}</button>` : null;
       panel = html`${noTool}${tryIt}`;
     }
   }
-  // The control: when the object is found and not taken, it reads 「用{object}看一眼」 and clicking it
-  // opens that object from the 老物件栏 (object-bar R3); otherwise the plain 「需要提取码」. The code
-  // chips are unchanged — the panel still opens with the button.
-  const objName = hasString(`obj.name.${lock.object}`) ? t(`obj.name.${lock.object}`) : lock.object;
-  const label =
-    available && hasString("board.lock.useObject") ? tr("board.lock.useObject", { object: objName })
-    : hasString("board.lockCode") ? tr("board.lockCode")
-    : null;
-  const control = label !== null ? html`<button type="button" class="block" data-action="board-lock">${label}</button>` : null;
+  // The control. A source lock reads 「码在别处：{hint}」, greyed like a not-found card until its
+  // source is opened today. An object lock found and not taken reads 「用{object}看一眼」 and opens
+  // the object from the 老物件栏 (object-bar R3); otherwise the plain 「需要提取码」.
+  let label: SafeHtml | null;
+  if (source) {
+    const hint = lock.hint ?? (hasString("board.notFound") ? t("board.notFound") : "");
+    label = hasString("board.lock.from") ? tr("board.lock.from", { hint }) : hasString("board.lockCode") ? tr("board.lockCode") : null;
+  } else {
+    const objName = lock.object !== undefined && hasString(`obj.name.${lock.object}`) ? t(`obj.name.${lock.object}`) : (lock.object ?? "");
+    label =
+      offered && hasString("board.lock.useObject") ? tr("board.lock.useObject", { object: objName })
+      : hasString("board.lockCode") ? tr("board.lockCode")
+      : null;
+  }
+  const greyed = source && !offered;
+  const control = label !== null ? html`<button type="button" class="${cls("block", greyed && "notfound")}" data-action="board-lock">${label}</button>` : null;
   return html`<div class="block-row">${control}${panel}</div>`;
 }
 
@@ -152,7 +165,9 @@ export const boardActions: Record<string, ActionHandler> = {
     // object-bar R3: the lock behind a found, not-taken object opens that object from the 老物件栏
     // (the player reads the code off it). The code-chips panel opens too — entering the code is
     // unchanged. Not found / taken: the panel alone (no-tool row + 让它试), as before.
-    if (c.board.given.lock && lockObjectAvailable(c.board, state, events)) openObjectFromBar(ctx.session, state, c.board.given.lock.object);
+    // Object locks only (day-graph addition 2026-11-04): a source lock's code is not on the object.
+    const lock = c.board.given.lock;
+    if (lock && isObjectLock(lock) && lockObjectAvailable(c.board, state, events)) openObjectFromBar(ctx.session, state, lock.object);
     ctx.session.boardLockOpen = true;
     ctx.rerender();
   },

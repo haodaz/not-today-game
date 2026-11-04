@@ -97,8 +97,16 @@ export interface TaskCode {
  * a table: rows with a given column (optionally locked behind an old object) and one slot each, a
  * tray of cards, and Kuro's own fill/cards/unlock. All shapes are in `.kiro/specs/work-v2/`.
  */
+/**
+ * A board's lock. It has an `object` (the old object that shows the code; object-bar R3), a `from`
+ * (day-graph addition 2026-11-04: the code is in a file / conversation / the call, the card-source
+ * shape), or both — never neither. With `from`, the code chips are offered only once that source has
+ * been opened today; `hint` says where to look while it has not.
+ */
 export interface BoardLock {
-  readonly object: string;
+  readonly object?: string;
+  readonly from?: CardFrom;
+  readonly hint?: string;
   readonly codes: readonly string[];
   readonly answer: string;
 }
@@ -393,11 +401,19 @@ function board(v: unknown, w: string): TaskBoard {
   if (v.given.lock !== undefined) {
     const lw = `${w}.given.lock`;
     if (!isRecord(v.given.lock)) fail(lw, "must be an object");
-    keys(v.given.lock, ["object", "codes", "answer"], lw);
+    keys(v.given.lock, ["object", "from", "hint", "codes", "answer"], lw);
+    // A lock has an object, a source, or both (day-graph addition 2026-11-04) — never neither.
+    if (v.given.lock.object === undefined && v.given.lock.from === undefined) fail(lw, "must have an object or a from (or both)");
     const codes = strings(v.given.lock.codes, `${lw}.codes`);
     const answer = str(v.given.lock.answer, `${lw}.answer`);
     if (!codes.includes(answer)) fail(`${lw}.answer`, `"${answer}" is not one of the codes`);
-    lock = { object: str(v.given.lock.object, `${lw}.object`), codes, answer };
+    lock = {
+      ...(v.given.lock.object !== undefined ? { object: str(v.given.lock.object, `${lw}.object`) } : {}),
+      ...(v.given.lock.from !== undefined ? { from: cardFrom(v.given.lock.from, `${lw}.from`) } : {}),
+      ...(v.given.lock.hint !== undefined ? { hint: str(v.given.lock.hint, `${lw}.hint`) } : {}),
+      codes,
+      answer,
+    };
   }
   // kuro: its fill (slot → card), its own cards, and its lock answer.
   if (!isRecord(v.kuro)) fail(`${w}.kuro`, "must be an object");
