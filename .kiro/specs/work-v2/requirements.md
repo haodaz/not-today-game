@@ -52,3 +52,12 @@ If the lock's object is upgraded and its invasion level is 3 (object-upgrade spe
 - 让它补全 fills every empty slot as `kuro.fill` says (r6 gets k1) and opens the lock; sending k1 back removes it from the board, not into the tray.
 - Judgement: all right and given → SAN unchanged; k1 kept → `flawed` (−3); three wrong → `wrong` (−8); printed but not given by 躺下 → `wrong`; SAN never goes up.
 - Replay: the same log rebuilds the same board, desk and SAN.
+
+## Addition 2026-11-03 night (author + Claude): every night collects, the hand or not
+
+Every day will get a board task (Claude is writing them), but the hand only comes on raid nights (5, 7, 9, 10, 13, 16, 18). On the other nights 「会有人来收」 is still true: **the deliverable is collected while you sleep**.
+- On a night that is not a raid night, at 躺下 the deliverable on the desk counts as **given** (the runtime appends the `give` event just before the `boardJudge`, as the hand's would be). The judgement then runs as usual (perfect / flawed / wrong by the slots). Not printed by 躺下 → `wrong`, as today.
+- Next morning the desk has no deliverable (it is gone, nothing says where). One narration line at the morning boot when yesterday's was collected in the night: `hand.collected` 「桌上那叠东西不见了。」 (Claude adds the string), only on the first morning a night collection happened in this run.
+- On raid nights nothing changes: the give choice first, the player hands it over.
+
+Files: `src/world/loop/runtime.ts` (`lieDownOrEnd`: the night collection before `boardJudge`), `src/state/days/board.ts` (a helper `collectsInSleep(day)` = not a raid night), the boot narration (where the morning boot lines are queued). Tests in `tests/work-board.test.ts`: a non-raid day with a printed board → `give` then `boardJudge` at 躺下, judged by the slots; a raid day → no automatic give; the morning line once.

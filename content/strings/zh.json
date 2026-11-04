@@ -418,5 +418,6 @@
   "hand.judge.wrong": "它没有接。它的手在桌上摸了一圈，拿走了别的。",
   "ending.collapse.line": "你崩坏在第 {day} 天。",
   "credits.last.collapse": "你崩坏在第 {day} 天。那天的活，没有交出去。",
-  "title.fig.collapse": "崩坏的世界"
+  "title.fig.collapse": "崩坏的世界",
+  "hand.collected": "桌上那叠东西不见了。"
 }

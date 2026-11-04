@@ -418,5 +418,6 @@
   "hand.judge.wrong": "It does not take it. Its hand feels its way round the desk and takes something else.",
   "ending.collapse.line": "You came apart on day {day}.",
   "credits.last.collapse": "You came apart on day {day}. That day's work was never handed in.",
-  "title.fig.collapse": "A world coming apart"
+  "title.fig.collapse": "A world coming apart",
+  "hand.collected": "The stack on the desk is gone."
 }
