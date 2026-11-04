@@ -419,5 +419,10 @@
   "ending.collapse.line": "你崩坏在第 {day} 天。",
   "credits.last.collapse": "你崩坏在第 {day} 天。那天的活，没有交出去。",
   "title.fig.collapse": "崩坏的世界",
-  "hand.collected": "桌上那叠东西不见了。"
+  "hand.collected": "桌上那叠东西不见了。",
+  "board.send.boss": "发给老板",
+  "board.send.partner": "发给 Vivi",
+  "board.send.group": "发到群里",
+  "board.send.workbench": "提交",
+  "hand.refuse": "不给。"
 }

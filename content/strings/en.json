@@ -419,5 +419,10 @@
   "ending.collapse.line": "You came apart on day {day}.",
   "credits.last.collapse": "You came apart on day {day}. That day's work was never handed in.",
   "title.fig.collapse": "A world coming apart",
-  "hand.collected": "The stack on the desk is gone."
+  "hand.collected": "The stack on the desk is gone.",
+  "board.send.boss": "Send to the boss",
+  "board.send.partner": "Send to Vivi",
+  "board.send.group": "Post to the group",
+  "board.send.workbench": "Submit",
+  "hand.refuse": "Don't give it."
 }

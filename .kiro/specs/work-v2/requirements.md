@@ -53,11 +53,24 @@ If the lock's object is upgraded and its invasion level is 3 (object-upgrade spe
 - Judgement: all right and given → SAN unchanged; k1 kept → `flawed` (−3); three wrong → `wrong` (−8); printed but not given by 躺下 → `wrong`; SAN never goes up.
 - Replay: the same log rebuilds the same board, desk and SAN.
 
-## Addition 2026-11-03 night (author + Claude): every night collects, the hand or not
+## Addition 2026-11-03 night (author, replaces the "every night collects" draft): people take it on screen, the gods send the hand
 
-Every day will get a board task (Claude is writing them), but the hand only comes on raid nights (5, 7, 9, 10, 13, 16, 18). On the other nights 「会有人来收」 is still true: **the deliverable is collected while you sleep**.
-- On a night that is not a raid night, at 躺下 the deliverable on the desk counts as **given** (the runtime appends the `give` event just before the `boardJudge`, as the hand's would be). The judgement then runs as usual (perfect / flawed / wrong by the slots). Not printed by 躺下 → `wrong`, as today.
-- Next morning the desk has no deliverable (it is gone, nothing says where). One narration line at the morning boot when yesterday's was collected in the night: `hand.collected` 「桌上那叠东西不见了。」 (Claude adds the string), only on the first morning a night collection happened in this run.
-- On raid nights nothing changes: the give choice first, the player hands it over.
+Author: 「1–9 是活人 / 变异的人 / 披着人皮的 72 柱神直接收东西啊，就和平时活发群里或者给老板或者 workspace 完成一样」. The hand comes for the gods' work only (days 10–18).
 
-Files: `src/world/loop/runtime.ts` (`lieDownOrEnd`: the night collection before `boardJudge`), `src/state/days/board.ts` (a helper `collectsInSleep(day)` = not a raid night), the boot narration (where the morning boot lines are queued). Tests in `tests/work-board.test.ts`: a non-raid day with a printed board → `give` then `boardJudge` at 躺下, judged by the slots; a raid day → no automatic give; the morning line once.
+### Who receives a deliverable
+`deliverable.to` (optional, strict): `"boss"` | `"partner"` | `"group"` | `"workbench"` | `"hand"`; absent = `"hand"`.
+- **To a person** (`boss` / `partner` / `group` / `workbench`): the board's final button is not 打印 but `board.send.<to>` (发给老板 / 发给 Vivi / 发到群里 / 提交). Clicking it completes the task (the `task` event as today) **and** logs `give` with the deliverable id at once. Nothing goes on the desk. In that conversation (老板's chat, Vivi's chat, the group in 工作台's 消息; for `workbench`, nowhere) the player's own message appears at the time it was sent: a file card from 你 with the deliverable's `label` (derived from the `give` event; the same card look as other file cards, on the player's side).
+- **To the hand** (`hand`): as today — 打印, the deliverable on the desk, given at night.
+
+### The hand
+- The give choice (`hand.give`) appears at the shutdown beat **only for a `hand` deliverable on the desk**. On days 5, 7, 9 (raid nights before the gods) it never appears for a person's deliverable (those were sent on screen).
+- **From day 10 the hand comes every night a `hand` deliverable is on the desk**, even when the day's content has no shutdown choices (days 11, 12, 14, 15, 17): the box then offers `hand.give` and `hand.refuse` (「不给。」, Claude adds it); refusing logs nothing (the judgement will say `wrong`). On raid nights the existing choices stay after the give choice, as today.
+
+### Judgement (unchanged)
+At 躺下, from the log: sent / given → judged by the slots; not sent / not given by 躺下 → `wrong`.
+
+### Strings (Claude adds them, zh and en)
+`board.send.boss`, `board.send.partner`, `board.send.group`, `board.send.workbench`, `hand.refuse`.
+
+### Files
+`src/state/days/tasks.ts` (`deliverable.to`), `src/world/desktop/workbench/board.ts` (the send button), `src/state/days/board.ts` (`deliverableOnDesk` only for `hand`; a helper `handNight(day)` = day ≥ 10 or a raid night), `src/world/loop/dialogue.ts` + where the shutdown sequence is queued (the give / refuse choices on hand nights without content choices), the messages views (the player's file card from a `give` with a person `to`: `src/world/desktop/messages/view.ts` and the 工作台 message pane), `src/world/room/hud.ts` (desk only for `hand`). Tests in `tests/work-board.test.ts`: a `to: "boss"` board — the send button, task + give at once, nothing on the desk, the file card in 老板's chat, judged at 躺下, no give choice at shutdown; a `to: "hand"` board on day 11 (no content shutdown choices) — give / refuse offered; refuse → `wrong`.
