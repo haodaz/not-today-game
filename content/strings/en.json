@@ -89,6 +89,8 @@
   "win.moveRight": "Move to right screen",
   "mc.title": "Mission Control",
   "mc.open": "Open Mission Control",
+  "mc.screen3": "Screen 3",
+  "mc.unknownWindow": "Untitled",
   "wb.sub": "Future Intelligence · yours",
   "wb.search": "Find work, people, files…",
   "wb.nav.home": "Workbench",
