@@ -76,6 +76,7 @@
   "msgs.input.disabled": "这个会话已经不存在了。",
   "wb.title": "工作台",
   "dock.tingtalk": "听听",
+  "wb.sessions.toggle": "显示或收起任务列表",
   "tingtalk.title": "听听",
   "win.moveLeft": "移到左屏",
   "win.moveRight": "移到右屏",

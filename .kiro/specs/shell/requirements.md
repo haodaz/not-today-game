@@ -56,3 +56,9 @@ Parameters (px unless noted):
 - Table and meeting views render inside their pane; their play-throughs still pass.
 - No dark class anywhere in the shell.
 - Home unchanged; the session list behaves as before.
+
+## R8. Correction after the first look (2026-11-04, Claude in the browser at 1600×900)
+The explorer was hidden on day 1 (the frame is under 1140 px with panes open, so the container query hid it), so the 素材 could not be picked at all. Cause: the session list (新任务 / 今天 / 最近) still takes ≈200 px on task pages. The author asked for it earlier: "任务列表应该和侧导航一起收起来了呀".
+- On a task page the session list is **hidden by default**; the rail keeps its icons. A toggle button at the top of the rail (sidebar icon, `wb.sessions.toggle`) shows / hides it (session only). Home shows it as today.
+- The explorer is **never auto-hidden** while the session list is hidden; only ⊟ / × hide it. If space is short, the pane area shrinks to its min (480) first, then the conversation to its min (380).
+- Kuro's open beat must not say "drag" (there is no drag): Claude fixes the line in content.

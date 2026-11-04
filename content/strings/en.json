@@ -83,6 +83,7 @@
   "msgs.input.disabled": "This conversation no longer exists.",
   "wb.title": "Workbench",
   "dock.tingtalk": "TingTalk",
+  "wb.sessions.toggle": "Show or hide the task list",
   "tingtalk.title": "TingTalk",
   "win.moveLeft": "Move to left screen",
   "win.moveRight": "Move to right screen",
