@@ -7,8 +7,8 @@
 <style>
 /* 未来智能 · 技术表达 v1（BP 里「技术」那一部分，给投资人）
    一份快照的记录，不是预测：页面里每个数都读自 SNAP（数据底座跑完、截断、冻结）。
-   整页是一个运算空间：九百个粒子组成每一步的图；翻页时上一步的坐标系解离，粒子飞到下一步重新聚成。
-   每一帧是 (步, t) 的纯函数：?c=步&t=秒 定格；←/→ 翻页；右上角「代码」看正在跑的这一段；「配色」换三套。 */
+   4:3 舞台（放得进 IDE 旁边的预览窗）：上面标题和数字，下面是运算空间。九百个粒子组成每一页的图；翻页时解离、重聚。
+   ?c=页&t=秒 定格；←/→ 翻页；「代码」看正在跑的这一段；「配色」换三套。参考文献见最后一页。 */
 *{box-sizing:border-box}
 :root{--bg:#05070F;--ink:#E8EBF7;--muted:#8E97BC;--dim:#525B80;--line:rgba(140,160,255,.14);
   --cyan:#3FE0FF;--violet:#8B7BFF;--amber:#FFB547;--mint:#38F2B0;--rose:#FF5C93;
@@ -23,7 +23,7 @@ body.mariana{--bg:#303841;--ink:#E2E6EE;--muted:#A6ACB9;--dim:#76838F;--line:rgb
   --topbg:rgba(48,56,65,.85);--codebg:#2B323A;--codeink:#D8DEE9;--codeline:#3B444E}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden}
 #wrap{position:absolute;inset:0;display:flex}
-#code{display:none;flex:0 0 40%;height:100%;margin:0;background:var(--codebg);color:var(--codeink);font:12px/1.6 var(--mono);overflow:auto;padding:0 0 40px;border-right:1px solid var(--codeline)}
+#code{display:none;flex:0 0 42%;height:100%;margin:0;background:var(--codebg);color:var(--codeink);font:12px/1.6 var(--mono);overflow:auto;padding:0 0 40px;border-right:1px solid var(--codeline)}
 body.split #code{display:block}
 #code .fn{padding:2px 18px 12px;white-space:pre;tab-size:2}
 #code .hd{position:sticky;top:0;background:var(--codebg);padding:10px 18px;color:var(--dim);font-size:11px;letter-spacing:.06em;border-bottom:1px solid var(--codeline);margin-bottom:8px}
@@ -31,101 +31,142 @@ body.split #code{display:block}
 #code .k{color:#C792EA}#code .s{color:#9FE6A0}#code .n{color:#FFB547}#code .c{color:#6E7B87;font-style:italic}
 body.light #code .k{color:#7A3EBF}body.light #code .s{color:#1E8A4C}body.light #code .n{color:#B5600B}body.light #code .c{color:#9AA0B8}
 #view{position:relative;flex:1;height:100%;overflow:hidden}
-#stage{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform-origin:0 0;overflow:hidden;background:var(--bg)}
-#stage::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(900px 520px at 66% 46%,rgba(80,90,255,.16),transparent 64%),radial-gradient(600px 420px at 8% 70%,rgba(63,224,255,.07),transparent 64%)}
-body.light #stage::before{background:radial-gradient(900px 520px at 66% 46%,rgba(109,91,255,.12),transparent 64%),radial-gradient(600px 420px at 8% 70%,rgba(11,155,208,.08),transparent 64%)}
-body.mariana #stage::before{background:radial-gradient(900px 520px at 66% 46%,rgba(102,153,204,.18),transparent 64%),radial-gradient(600px 420px at 8% 70%,rgba(95,180,180,.08),transparent 64%)}
+#stage{position:absolute;left:50%;top:50%;width:1200px;height:900px;transform-origin:0 0;overflow:hidden;background:var(--bg)}
+#stage::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(760px 460px at 50% 64%,rgba(80,90,255,.16),transparent 64%)}
+body.light #stage::before{background:radial-gradient(760px 460px at 50% 64%,rgba(109,91,255,.11),transparent 64%)}
+body.mariana #stage::before{background:radial-gradient(760px 460px at 50% 64%,rgba(102,153,204,.18),transparent 64%)}
 #stage::after{content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(160,175,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(160,175,255,.05) 1px,transparent 1px);
-  background-size:40px 40px;mask-image:radial-gradient(ellipse at 62% 48%,#000 18%,transparent 70%);-webkit-mask-image:radial-gradient(ellipse at 62% 48%,#000 18%,transparent 70%)}
+  background-size:40px 40px;mask-image:radial-gradient(ellipse at 50% 64%,#000 22%,transparent 72%);-webkit-mask-image:radial-gradient(ellipse at 50% 64%,#000 22%,transparent 72%)}
 body.light #stage::after{background-image:linear-gradient(rgba(22,24,43,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(22,24,43,.045) 1px,transparent 1px)}
 #stage>*{position:absolute}
-#cv{left:0;top:0;width:1600px;height:900px;z-index:2;pointer-events:none}
-.top{left:0;top:0;width:1600px;height:36px;display:flex;align-items:center;gap:14px;padding:0 32px;font:500 10.5px var(--mono);letter-spacing:.08em;color:var(--muted);border-bottom:1px solid var(--line);background:var(--topbg);z-index:4}
+#cv{left:0;top:0;width:1200px;height:900px;z-index:2;pointer-events:none}
+.top{left:0;top:0;width:1200px;height:34px;display:flex;align-items:center;gap:12px;padding:0 28px;font:500 10px var(--mono);letter-spacing:.07em;color:var(--muted);border-bottom:1px solid var(--line);background:var(--topbg);z-index:4;white-space:nowrap}
 .top b{color:var(--ink);font-weight:700}
 .top .snap{color:var(--cyan)}
-.top .live{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px var(--mint);margin-right:-6px}
+.top .live{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px var(--mint);margin-right:-4px}
 .top .r{margin-left:auto;color:var(--dim)}
-.top button{font:700 10.5px var(--mono);letter-spacing:.08em;color:var(--cyan);background:transparent;border:1px solid var(--line);border-radius:6px;padding:3px 10px;cursor:pointer}
+.top button{font:700 10px var(--mono);letter-spacing:.08em;color:var(--cyan);background:transparent;border:1px solid var(--line);border-radius:6px;padding:3px 9px;cursor:pointer}
 .ch{display:none;z-index:3}
 .ch.on{display:block}
 .ch>*{position:absolute}
-/* 左栏：大字几句，一排大数字，一条公式。不套卡片。 */
-.side{left:56px;top:96px;width:500px;display:flex;flex-direction:column;gap:26px}
+/* 上：标题、一句话、一排数字；下：运算空间（画布） */
+.head{left:48px;top:58px;width:1104px}
 .kick{font:700 11px var(--mono);letter-spacing:.24em;color:var(--cyan)}
-.side h1{margin:-14px 0 0;font-size:40px;font-weight:800;letter-spacing:.02em;line-height:1.22}
-.side h1 em{font-style:normal;color:var(--cyan)}
-.lead{font-size:18.5px;line-height:1.75;color:var(--muted)}
+.head h1{margin:8px 0 0;font-size:36px;font-weight:800;letter-spacing:.02em;line-height:1.25}
+.head h1 em{font-style:normal;color:var(--cyan)}
+.lead{margin-top:10px;font-size:17px;line-height:1.65;color:var(--muted);max-width:1040px}
 .lead b{color:var(--ink);font-weight:700}
-.lead p{margin:0 0 10px}
-.stats{display:flex;border-top:1px solid var(--line);padding-top:18px}
-.stats div{flex:1;padding-right:14px}
-.stats div+div{border-left:1px solid var(--line);padding-left:18px}
-.stats b{display:block;font:800 34px var(--sans);letter-spacing:.01em;line-height:1.1;color:var(--ink)}
+.lead sup,.stats sup{font:700 10px var(--mono);color:var(--cyan);margin-left:1px}
+.stats{display:flex;margin-top:16px;max-width:820px}
+.stats div{padding-right:28px}
+.stats div+div{border-left:1px solid var(--line);padding-left:24px}
+.stats b{display:block;font:800 30px var(--sans);letter-spacing:.01em;line-height:1.1;color:var(--ink)}
 .stats b.c{color:var(--cyan)}.stats b.v{color:var(--violet)}.stats b.a{color:var(--amber)}.stats b.m{color:var(--mint)}
-.stats small{display:block;margin-top:6px;font-size:12.5px;color:var(--muted)}
-.stats .src{font:700 9px var(--mono);letter-spacing:.08em;color:var(--dim);margin-left:4px}
-.eq{font:600 16px var(--sans);font-style:italic;color:var(--ink);white-space:nowrap}
+.stats small{display:block;margin-top:5px;font-size:12px;color:var(--muted)}
+.eq{left:48px;top:806px;font:600 15px var(--sans);font-style:italic;color:var(--ink);white-space:nowrap}
 .eq sub,.eq sup{font-size:.7em;line-height:0}
-.eq u{text-decoration:none;font-style:normal;font-weight:600;color:var(--dim);margin-left:12px;font-size:12.5px}
-.ctl{left:640px;top:812px;width:900px;display:flex;align-items:center;gap:14px;font:700 11px var(--mono);color:var(--muted);z-index:5}
+.eq u{text-decoration:none;font-style:normal;font-weight:600;color:var(--dim);margin-left:12px;font-size:12px}
+.ctl{left:120px;top:806px;width:960px;display:flex;align-items:center;gap:14px;font:700 11px var(--mono);color:var(--muted);z-index:5}
 .ctl input{flex:1;accent-color:var(--cyan)}
-.ctl output{color:var(--cyan);min-width:170px}
-.ft{z-index:4;left:56px;right:32px;bottom:14px;display:flex;align-items:center;gap:12px;white-space:nowrap}
-.ft .pos{font-size:13px;font-weight:600;color:var(--muted)}
+.ctl output{color:var(--cyan);min-width:160px}
+.refs{left:48px;top:300px;width:1104px;columns:2;column-gap:48px;font-size:13.5px;line-height:1.6;color:var(--muted)}
+.refs p{margin:0 0 10px;break-inside:avoid}
+.refs b{font:700 11px var(--mono);color:var(--cyan);margin-right:6px}
+.refs i{color:var(--ink);font-style:normal}
+.ft{z-index:4;left:48px;right:28px;bottom:14px;display:flex;align-items:center;gap:12px;white-space:nowrap}
+.ft .pos{font-size:12.5px;font-weight:600;color:var(--muted)}
 .ft .pos b{color:var(--cyan)}
-.nav{display:flex;gap:6px;margin-left:auto}
-.nav button{font:700 11px var(--sans);color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:999px;padding:5px 12px;cursor:pointer}
-.nav button.on{color:var(--bg);background:var(--cyan);border-color:var(--cyan)}
-.ft .note{font:500 10px var(--mono);color:var(--dim)}
+.pager{margin-left:auto;display:flex;align-items:center;gap:6px}
+.pager button{font:700 13px var(--sans);color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:999px;width:28px;height:28px;cursor:pointer}
+.pager .dots{display:flex;gap:5px;margin:0 6px}
+.pager .dots i{width:7px;height:7px;border-radius:50%;background:var(--line);cursor:pointer}
+.pager .dots i.on{background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+.pager .num{font:700 11px var(--mono);color:var(--dim);min-width:52px;text-align:right}
 </style>
 </head>
 <body>
 <div id="wrap">
 <pre id="code"></pre>
 <div id="view"><div id="stage">
-  <div class="top"><b>未来智能</b> 技术表达 · SHARED INTELLIGENCE SPACE<span class="live"></span><span class="snap" id="snapline"></span><span class="r">记录，不是预测 · 2028.10.16</span><button id="theme">配色</button><button id="tog">代码</button></div>
+  <div class="top"><b>未来智能</b> 技术表达<span class="live"></span><span class="snap" id="snapline"></span><span class="r">记录，不是预测 · 2028.10.16</span><button id="theme">配色</button><button id="tog">代码</button></div>
 
-  <section class="ch" data-c="0"><div class="side">
-    <div class="kick">01 · 共同智能空间</div>
+  <section class="ch" data-c="0"><div class="head"><div class="kick">01 · 共同智能空间</div>
     <h1>现实里的人和物，都是一个<em>共同智能空间</em>里的投射</h1>
-    <div class="lead"><p>客户业务里的人、文件、业务对象、每一件事，未来智能把它们<b>投射进同一个数学空间</b>。</p><p>AI 不再从一堆原文里猜，而是在这个空间里<b>定位、量距离</b>：现实是什么关系，空间里就是什么距离。</p></div>
-    <div class="stats" id="s0"></div>
-    <div class="eq">x = φ(现实) ∈ 𝒮<u>投射</u></div>
-  </div></section>
+    <div class="lead">客户业务里的人、文件、业务对象、每一件事，未来智能把它们<b>投射进同一个数学空间</b>。</div>
+    <div class="stats" id="s0"></div></div>
+    <div class="eq">x = φ(现实) ∈ 𝒮<u>投射</u></div></section>
 
-  <section class="ch" data-c="1"><div class="side">
-    <div class="kick">02 · 投射</div>
-    <h1>三家客户，三套说法，<em>并成一个空间</em></h1>
-    <div class="lead"><p>每家客户的表格各叫各的：「客户名称」「甲方单位」「签约主体」。先<b>全部并在一起</b>，一根都不丢；再把<b>说的是同一件事</b>的合并成一根。</p><p>合并以后，三家客户的东西第一次<b>放在一起量</b>。</p></div>
-    <div class="stats" id="s1"></div>
-    <div class="eq">𝒮 = ( D<sub>甲</sub> ∪ D<sub>乙</sub> ∪ D<sub>丙</sub> ) / ∼<u>并集，再消除</u></div>
-  </div></section>
+  <section class="ch" data-c="1"><div class="head"><div class="kick">02 · 理解</div>
+    <h1>AI 在空间里理解现实：<em>定位，量距离</em></h1>
+    <div class="lead">AI 不再从一堆原文里猜。一个问题落成空间里的一个点，<b>离它最近的那几个点，就是答案的出处</b>。现实是什么关系，空间里就是什么距离。</div></div>
+    <div class="eq">a* = arg min<sub>e</sub> d(q, e)<u>找最近的点</u></div></section>
 
-  <section class="ch" data-c="2"><div class="side">
-    <div class="kick">03 · 读空间，不读原文</div>
+  <section class="ch" data-c="2"><div class="head"><div class="kick">03 · 投射 · 三套说法</div>
+    <h1>三家客户，<em>三套说法</em></h1>
+    <div class="lead">每家客户的表格各叫各的：「客户名称」「甲方单位」「签约主体」，<b>说的是同一件事</b>。</div>
+    <div class="stats" id="s2"></div></div></section>
+
+  <section class="ch" data-c="3"><div class="head"><div class="kick">04 · 投射 · 并集再消除</div>
+    <h1>先全部并在一起，再把同义的<em>合成一根</em></h1>
+    <div class="lead">一根都不丢；合并以后，三家客户的东西<b>第一次放在一起量</b>。</div>
+    <div class="stats" id="s3"></div></div>
+    <div class="eq">𝒮 = ( D<sub>甲</sub> ∪ D<sub>乙</sub> ∪ D<sub>丙</sub> ) / ∼<u>并集，再消除</u></div></section>
+
+  <section class="ch" data-c="4"><div class="head"><div class="kick">05 · 读空间，不读原文 · 覆盖率</div>
     <h1>小模型读空间，<em>赶上大模型读原文</em></h1>
-    <div class="lead"><p>同一套题，五个规模的<b>第三方开源模型</b>各跑两遍：一遍直接读原文，一遍读空间。</p><p>读空间那条，规模小一档就够；<b>每答一题的能耗低一个量级</b>。只画测过的。</p></div>
-    <div class="stats"><div><b class="c" id="k2n"></b><small>模型规模（参数）</small></div><div><b class="a" id="k2e"></b><small>读原文 · J / 题</small></div><div><b class="v" id="k2b"></b><small>读空间 · J / 题</small></div></div>
-    <div class="eq">E ∝ N<sup>β</sup> &nbsp; β<sub>原文</sub> = <span id="k2be"></span> · β<sub>空间</sub> = <span id="k2bb"></span><u>拟合，仅限实测范围</u></div>
-  </div><div class="ctl"><span>规模</span><input id="scale" type="range" min="0" max="4" step="1" value="4"><output id="scaleo"></output></div></section>
+    <div class="lead">同一套题，五个规模的<b>第三方开源模型</b>各跑两遍：一遍直接读原文，一遍读空间。只画测过的。</div></div></section>
 
-  <section class="ch" data-c="3"><div class="side">
-    <div class="kick">04 · 以脑为本</div>
-    <h1>省力的办法，<em>跟脑学</em></h1>
-    <div class="lead"><p><b>按需激活</b>：一个问题只唤起空间里相关的那一小片。</p><p><b>按用的精度去标</b>：判断本来就按档，不为用不上的精度付钱。</p><p><b>AI 先合一版，人再核一遍</b>：每一次核对都回流，把点往真处推一步。</p></div>
-    <div class="eq">‖a‖<sub>0</sub> ≪ N · ε<sub>标</sub> ≤ δ<sub>用</sub> · x ← x + K(y − ŷ)<u>三招</u></div>
-  </div></section>
+  <section class="ch" data-c="5"><div class="head"><div class="kick">06 · 读空间，不读原文 · 能耗</div>
+    <h1>每答一题，能耗<em>低一个量级</em></h1>
+    <div class="lead">同样的规模，读空间那条每题只花读原文的零头。拖动看每一档。</div>
+    <div class="stats"><div><b class="c" id="k5n"></b><small>模型规模（参数）</small></div><div><b class="a" id="k5e"></b><small>读原文 · J / 题</small></div><div><b class="v" id="k5b"></b><small>读空间 · J / 题</small></div></div></div>
+    <div class="ctl"><span>规模</span><input id="scale" type="range" min="0" max="4" step="1" value="4"><output id="scaleo"></output></div></section>
 
-  <section class="ch" data-c="4"><div class="side">
-    <div class="kick">05 · 护城河</div>
+  <section class="ch" data-c="6"><div class="head"><div class="kick">07 · 解构</div>
+    <h1>问题不在大，<em>在单一</em></h1>
+    <div class="lead">把现在的 AI 和人脑并排拆开看：脑有约 860 亿个神经元<sup>[1]</sup>，只用约 20 瓦<sup>[2]</sup>；它分区<sup>[4]</sup>、只亮一小片<sup>[3]</sup>、边用边学<sup>[5][6]</sup>、几个例子就会<sup>[7]</sup>。现在的 AI 是<b>一整块</b>：全算、学完就冻住、要海量样本、学会要兆瓦时<sup>[8]</sup>。</div></div></section>
+
+  <section class="ch" data-c="7"><div class="head"><div class="kick">08 · 方向</div>
+    <h1>从一个庞大的脑，到<em>一个组织</em></h1>
+    <div class="lead">训练方向依然以脑为本：不是再造一个更大的单体，而是<b>数个垂域的脑</b>，由图谱连成组织<sup>[9][10][11]</sup>。图谱把问题分给对的那几个，共同空间让它们读同一批点，互相复核<sup>[13]</sup>。</div></div>
+    <div class="eq">y = Σ<sub>i ∈ route(q)</sub> w<sub>i</sub> f<sub>i</sub>( U<sub>i</sub> x )<u>分给对的那几个</u></div></section>
+
+  <section class="ch" data-c="8"><div class="head"><div class="kick">09 · 以脑为本 ① 按需激活</div>
+    <h1>一个问题，只亮<em>相关的那一小片</em></h1>
+    <div class="lead">皮层同一时刻只有约 1% 的神经元在活跃<sup>[3]</sup>；混合专家也只调用少数几个专家<sup>[10]</sup>。我们的空间里，一次查询只唤起相关的节点。</div>
+    <div class="stats" id="s8"></div></div>
+    <div class="eq">‖a‖<sub>0</sub> ≪ N<u>按需激活</u></div></section>
+
+  <section class="ch" data-c="9"><div class="head"><div class="kick">10 · 以脑为本 ② 按精度标</div>
+    <h1>判断按档，<em>不为用不上的精度付钱</em></h1>
+    <div class="lead">标的精度只要对齐用的精度，结论就是稳的；哪一处还跨档，也一眼看得出该补哪条证据。</div>
+    <div class="stats" id="s9"></div></div>
+    <div class="eq">ε<sub>标</sub> ≤ δ<sub>用</sub><u>标的精度对齐用的精度</u></div></section>
+
+  <section class="ch" data-c="10"><div class="head"><div class="kick">11 · 以脑为本 ③ AI 先合，人再核</div>
+    <h1>每一次人核，<em>都回流修正</em></h1>
+    <div class="lead">AI 先合一版，人再核一遍；核出来的差，按可信度修进坐标<sup>[14]</sup>，不确定性一轮一轮缩小。</div>
+    <div class="stats" id="s10"></div></div>
+    <div class="eq">x ← x + K ( y − ŷ ), &nbsp; Σ ↓<u>回流修正</u></div></section>
+
+  <section class="ch" data-c="11"><div class="head"><div class="kick">12 · 护城河</div>
     <h1>模型年年换，<em>空间是我们的</em></h1>
-    <div class="lead"><p>换模型只是换一种读法：对齐以后，点不动，点和点的距离也不动。</p><p><b>读法谁都能买，空间只能一个点一个点地投射出来</b>，一次一次地核出来。</p></div>
-    <div class="stats" id="s4"></div>
-    <div class="eq">x′ = U x , &nbsp; UᵀU = I , &nbsp; | p − q | 不变<u>换读法，不换点</u></div>
-  </div></section>
+    <div class="lead">换模型只是换一种读法：正交对齐以后<sup>[15]</sup>，点不动，点和点的距离也不动。<b>读法谁都能买，空间只能一个点一个点地投射、一次一次地核出来。</b></div>
+    <div class="stats" id="s11"></div></div>
+    <div class="eq">x′ = U x , &nbsp; UᵀU = I , &nbsp; | p − q | 不变<u>换读法，不换点</u></div></section>
 
-  <div class="ft"><span class="pos">未来智能：把现实投射进<b>共同智能空间</b>，让 AI <b>在空间里理解现实</b></span><span class="note">公式为示意性的数学表达 · 数据读自快照</span><span class="nav" id="nav"></span></div>
-  <canvas id="cv" width="1600" height="900"></canvas>
+  <section class="ch" data-c="12"><div class="head"><div class="kick">13 · 客户</div>
+    <h1>在链路上的，和<em>已经到账的</em></h1>
+    <div class="lead">按快照如实记录：每一家的状态以应收表为准。</div>
+    <div class="stats" id="s12"></div></div></section>
+
+  <section class="ch" data-c="13"><div class="head"><div class="kick">14 · 参考</div>
+    <h1>参考文献</h1>
+    <div class="lead">页面里的上标对应下面的编号。文献值标为文献，其余数字读自快照。</div></div>
+    <div class="refs" id="refs"></div></section>
+
+  <div class="ft"><span class="pos">未来智能：把现实投射进<b>共同智能空间</b>，让 AI <b>在空间里理解现实</b></span><span class="pager"><button id="prev">‹</button><span class="dots" id="dots"></span><button id="next">›</button><span class="num" id="num"></span></span></div>
+  <canvas id="cv" width="1200" height="900"></canvas>
 </div></div>
 </div>
 
@@ -147,15 +188,39 @@ const SNAP = {
           coverage: { text: [0.31, 0.44, 0.58, 0.71, 0.80], space: [0.62, 0.74, 0.83, 0.88, 0.91] },
           joules: { text: [9, 26, 70, 240, 560], space: [2.1, 4.3, 8.9, 24, 51] } },
   moves: { activePct: 2.9, labelHours: -64, mismatchAfter3: -71 },
-  review: 12406, pilots: 2, paid: 1,
+  experts: ['合同', '财务', '设备', '客户', '法务'],
+  review: 12406,
   align: { models: ['2026', '2027', '2028'], residual: [0, 0.031, 0.027] },
+  customers: [   // 以应收表为准
+    { name: '江屿市数据资源管理局', kind: '政府', status: '在链路上', paid: false },
+    { name: '宏屹集团', kind: '大型企业', status: '试点', paid: false },
+    { name: '元枢智能', kind: '模型公司', status: '在链路上', paid: false },
+    { name: '青禾物流', kind: '物流', status: '试点', paid: true },
+  ],
 };
+const REFS = [
+  ['Azevedo F. A. C. et al.', 'Equal numbers of neuronal and nonneuronal cells make the human brain an isometrically scaled-up primate brain', 'J. Comp. Neurol. 513(5), 2009'],
+  ['Attwell D., Laughlin S. B.', 'An energy budget for signaling in the grey matter of the brain', 'J. Cereb. Blood Flow Metab. 21(10), 2001'],
+  ['Lennie P.', 'The cost of cortical computation', 'Current Biology 13(6), 2003'],
+  ['Kanwisher N.', 'Functional specificity in the human brain: a window into the functional architecture of the mind', 'PNAS 107(25), 2010'],
+  ['McCloskey M., Cohen N. J.', 'Catastrophic interference in connectionist networks', 'Psychology of Learning and Motivation 24, 1989'],
+  ['Kirkpatrick J. et al.', 'Overcoming catastrophic forgetting in neural networks', 'PNAS 114(13), 2017'],
+  ['Lake B. M., Salakhutdinov R., Tenenbaum J. B.', 'Human-level concept learning through probabilistic program induction', 'Science 350(6266), 2015'],
+  ['Strubell E., Ganesh A., McCallum A.', 'Energy and policy considerations for deep learning in NLP', 'ACL 2019'],
+  ['Minsky M.', 'The Society of Mind', 'Simon & Schuster, 1986'],
+  ['Shazeer N. et al.', 'Outrageously large neural networks: the sparsely-gated mixture-of-experts layer', 'ICLR 2017'],
+  ['Fedus W., Zoph B., Shazeer N.', 'Switch Transformers: scaling to trillion parameter models with simple and efficient sparsity', 'JMLR 23, 2022'],
+  ['Sutton R.', 'The Bitter Lesson（反方：通用方法加算力，最终胜过人为设计的结构）', '2019'],
+  ['Irving G., Christiano P., Amodei D.', 'AI safety via debate', 'arXiv:1805.00899, 2018'],
+  ['Kalman R. E.', 'A new approach to linear filtering and prediction problems', 'J. Basic Engineering 82(1), 1960'],
+  ['Schönemann P. H.', 'A generalized solution of the orthogonal Procrustes problem', 'Psychometrika 31(1), 1966'],
+];
 /* ===== 画布与工具 ===== */
 const stage = document.getElementById('stage'), view = document.getElementById('view');
-function fit(){ const s = Math.min(view.clientWidth/1600, view.clientHeight/900); stage.style.transform = `translate(${-800*s}px,${-450*s}px) scale(${s})`; }
+function fit(){ const s = Math.min(view.clientWidth/1200, view.clientHeight/900); stage.style.transform = `translate(${-600*s}px,${-450*s}px) scale(${s})`; }
 addEventListener('resize', fit);
 const cv = document.getElementById('cv'), DPR = Math.min(2, window.devicePixelRatio || 1);
-cv.width = 1600*DPR; cv.height = 900*DPR; const ctx = cv.getContext('2d');
+cv.width = 1200*DPR; cv.height = 900*DPR; const ctx = cv.getContext('2d');
 const F = '"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif', M = '"SF Mono",Menlo,monospace';
 const clamp = (x, a=0, b=1) => Math.max(a, Math.min(b, x));
 const ease = x => { x = clamp(x); return x<.5 ? 2*x*x : 1-Math.pow(-2*x+2,2)/2; };
@@ -192,7 +257,7 @@ const mul = (a, k) => [a[0]*k, a[1]*k, a[2]*k], d3 = (a, b) => Math.hypot(a[0]-b
 
 /* ===== 粒子：整页的图都由它们组成 ===== */
 const N = 900;
-const rnd = rng(20281016), PART = Array.from({ length:N }, () => ({ x:800 + (rnd() - .5)*1400, y:450 + (rnd() - .5)*800, fx:0, fy:0, d:rnd()*.55, s:rnd()*6.283, n:rnd(), r:1, c:GRY, a:.1 }));
+const rnd = rng(20281016), PART = Array.from({ length:N }, () => ({ x:600 + (rnd() - .5)*1100, y:450 + (rnd() - .5)*800, fx:0, fy:0, d:rnd()*.55, s:rnd()*6.283, n:rnd(), r:1, c:GRY, a:.1 }));
 const SPR = {}; function sprite(c){ if (SPR[c]) return SPR[c]; const o = document.createElement('canvas'); o.width = o.height = 32; const g = o.getContext('2d'), gr = g.createRadialGradient(16, 16, 0, 16, 16, 16);
   gr.addColorStop(0, rgba(c, 1)); gr.addColorStop(.18, rgba(c, .85)); gr.addColorStop(.45, rgba(c, .18)); gr.addColorStop(1, rgba(c, 0)); g.fillStyle = gr; g.fillRect(0, 0, 32, 32); return SPR[c] = o; }
 // 一条线、一圈、一个箱子，都拆成粒子
@@ -206,91 +271,147 @@ const KINDS = [ { name:'人', c:VI }, { name:'文件', c:CY }, { name:'业务对
 const PTS = (() => { const r = rng(1016), a = []; for (let i = 0; i < 160; i++){ const u = r(), kind = u < .12 ? 0 : u < .42 ? 1 : u < .47 ? 2 : 3;
   a.push({ p:[-1.6 + 3.2*r(), -1 + 2*r(), -1 + 2*r()], kind }); } return a; })();
 
-/* ---------- 01 共同智能空间：一次查询，在空间里定位、量距离 ---------- */
+/* 每一页的画布只画在下半截：x 40–1160，y 290–790 */
+const CX = 600, CY0 = 545;
+
+/* ---------- 01 共同智能空间 ---------- */
 function space(t){
-  const pr = cam(.55 + t*.08, .32, 1100, 470, 160), out = [];
+  const pr = cam(.55 + t*.08, .32, CX, CY0, 150), out = [];
   edges3(out, pr, 1.6, 1, 1, 11, MU, .8);
-  const Q = [.15 + .5*Math.sin(t*.35), .1, .2*Math.cos(t*.3)], near = PTS.map((o, i) => ({ i, d:d3(o.p, Q) })).sort((a, b) => a.d - b.d).slice(0, 7), hit = new Set(near.map(n => n.i)), A = prog(t, 2.2, .8);
-  PTS.forEach((o, i) => { const q = pr(o.p), on = A > 0 && hit.has(i); out.push({ x:q.x, y:q.y, r:(on ? 3.4 : 2.5)*q.k, c:KINDS[o.kind].c, a:on ? 1 : .75 }); });
-  const qq = pr(Q); if (A > 0){ ring(out, qq.x, qq.y, 16, 16, 18, CY, A, 1.4, t*2); near.forEach(n => { const q = pr(PTS[n.i].p); along(out, qq.x, qq.y, q.x, q.y, 10, CY, .45*A, .9); }); }
-  return { out, over(a){
-    if (A > 0) label('一次查询：找最近的点', qq.x, qq.y - 26, CY, a*A, 11.5);
-    KINDS.forEach((k, i) => { const x = 680 + i*110; ctx.globalAlpha = a; ctx.drawImage(sprite(k.c), x - 8, 786 - 8, 16, 16); ctx.globalAlpha = 1; text(k.name, x + 12, 790, k.c, a, 12.5, 700, 'left'); });
-    text('现实是什么关系，空间里就是什么距离', 1548, 790, MU, a, 12.5, 600, 'right'); } };
+  PTS.forEach(o => { const q = pr(o.p); out.push({ x:q.x, y:q.y, r:2.5*q.k, c:KINDS[o.kind].c, a:.85 }); });
+  return { out, over(a){ KINDS.forEach((k, i) => { const x = 760 + i*100; ctx.globalAlpha = a; ctx.drawImage(sprite(k.c), x - 8, 810 - 8, 16, 16); ctx.globalAlpha = 1; text(k.name, x + 12, 814, k.c, a, 12.5, 700, 'left'); }); } };
 }
 
-/* ---------- 02 投射：三家客户的字段，并集再消除 ---------- */
+/* ---------- 02 理解：一次查询，找最近的点 ---------- */
+function query(t){
+  const pr = cam(.6 + t*.05, .3, CX - 90, CY0, 170), out = [];
+  edges3(out, pr, 1.6, 1, 1, 11, MU, .6);
+  const Q = [.15 + .5*Math.sin(t*.35), .1, .2*Math.cos(t*.3)], near = PTS.map((o, i) => ({ i, d:d3(o.p, Q) })).sort((a, b) => a.d - b.d).slice(0, 6), hit = new Set(near.map(n => n.i));
+  PTS.forEach((o, i) => { const q = pr(o.p), on = hit.has(i); out.push({ x:q.x, y:q.y, r:(on ? 3.6 : 2.2)*q.k, c:KINDS[o.kind].c, a:on ? 1 : .5 }); });
+  const qq = pr(Q); ring(out, qq.x, qq.y, 16, 16, 18, CY, 1, 1.4, t*2); near.forEach(n => { const q = pr(PTS[n.i].p); along(out, qq.x, qq.y, q.x, q.y, 10, CY, .5, .9); });
+  return { out, over(a){ label('问题 q', qq.x, qq.y - 26, CY, a, 12);
+    const X = 930; text('最近的 6 个点', X, 330, INK, a, 13, 800, 'left');
+    near.forEach((n, j) => { const k = KINDS[PTS[n.i].kind]; ctx.globalAlpha = a; ctx.drawImage(sprite(k.c), X - 2, 352 + j*30 - 10, 14, 14); ctx.globalAlpha = 1;
+      text(k.name, X + 18, 356 + j*30, k.c, a, 12.5, 700, 'left'); text(`d = ${n.d.toFixed(2)}`, X + 200, 356 + j*30, MU, a, 12, 700, 'right', M); }); } };
+}
+
+/* ---------- 03–04 投射：三套说法 → 并集再消除 ---------- */
 const CCOL = () => [CY, VI, AM];
-const MX = j => 770 + j*150, RY = i => 250 + i*76, MY = 560;
+const MX = j => 260 + j*180, RY = i => 340 + i*70, MY = 600;
 function chipRing(out, x, y, w, h, n, c, a){ const per = 2*(w + h); for (let k = 0; k < n; k++){ let d = k/n*per, px, py;
   if (d < w){ px = x - w/2 + d; py = y - h/2; } else if ((d -= w) < h){ px = x + w/2; py = y - h/2 + d; } else if ((d -= h) < w){ px = x + w/2 - d; py = y + h/2; } else { d -= w; px = x - w/2; py = y + h/2 - d; }
   out.push({ x:px, y:py, r:1.2, c, a }); } }
+function fields(t){
+  const out = [], col = Math.floor(t/1.4) % 5;
+  SNAP.clients.forEach((cl, i) => cl.fields.forEach((f, j) => chipRing(out, MX(j), RY(i), 150, 36, 24, CCOL()[i], j === col ? 1 : .55)));
+  along(out, MX(col), RY(0) - 30, MX(col), RY(2) + 30, 16, MI, .6, 1);
+  return { out, over(a){ SNAP.clients.forEach((cl, i) => { text(cl.name, 60, RY(i) + 5, CCOL()[i], a, 14, 800, 'left');
+      cl.fields.forEach((f, j) => text(f, MX(j), RY(i) + 5, CCOL()[i], a*(j === col ? 1 : .75), 13.5, 700)); });
+    text('↑ 说的是同一件事', MX(col), RY(2) + 62, MI, a, 13, 800); text('∪', 60, RY(0) + 40, MU, a, 15, 800, 'left'); text('∪', 60, RY(1) + 40, MU, a, 15, 800, 'left'); } };
+}
 function merge(t){
-  const out = [], m = prog(t, 2.6, 1.6), drop = prog(t, 4.6, 1.2), r = rng(77);
-  SNAP.clients.forEach((cl, i) => cl.fields.forEach((f, j) => { const y = RY(i) + (MY - RY(i))*m; chipRing(out, MX(j), y, 124, 34, 22, CCOL()[i], .85); }));
-  if (drop > 0) for (let k = 0; k < 150; k++){ const ci = k % 3, x = 700 + r()*760, y0 = MY + 20, y1 = 650 + r()*120; out.push({ x, y:y0 + (y1 - y0)*drop, r:1.8, c:CCOL()[ci], a:.9*drop }); }
+  const out = [], m = prog(t, .4, 1.6), drop = prog(t, 2.4, 1.2), r = rng(77);
+  SNAP.clients.forEach((cl, i) => cl.fields.forEach((f, j) => chipRing(out, MX(j), RY(i) + (MY - RY(i))*m, 150, 36, 24, CCOL()[i], .85)));
+  if (drop > 0) for (let k = 0; k < 150; k++){ const x = 120 + r()*960, y1 = 660 + r()*120; out.push({ x, y:MY + 20 + (y1 - MY - 20)*drop, r:1.8, c:CCOL()[k % 3], a:.9*drop }); }
   return { out, over(a){
-    SNAP.clients.forEach((cl, i) => { text(cl.name, 620, RY(i) + 5, CCOL()[i], a*(1 - m), 14, 800, 'left');
-      cl.fields.forEach((f, j) => text(f, MX(j), RY(i) + (MY - RY(i))*m + 5, CCOL()[i], a*(1 - .9*m), 13, 700)); });
-    if (m < .2) text('∪', 620, RY(1) + 44, MU, a, 16, 800, 'left');
-    const ma = prog(t, 3.8, .5); SNAP.merged.forEach((s, j) => text(s, MX(j), MY + 6, INK, a*ma, 15, 800)); text('/ ∼', 620, MY + 6, CY, a*ma, 16, 800, 'left');
-    if (drop > 0){ text('三家的东西，第一次放在一起量', 1460, 800, MU, a*drop, 12.5, 600, 'right');
-      SNAP.clients.forEach((cl, i) => { ctx.globalAlpha = a*drop; ctx.drawImage(sprite(CCOL()[i]), 700 + i*100 - 7, 793, 14, 14); ctx.globalAlpha = 1; text(cl.name, 712 + i*100, 805, CCOL()[i], a*drop, 12, 700, 'left'); }); } } };
+    SNAP.clients.forEach((cl, i) => cl.fields.forEach((f, j) => text(f, MX(j), RY(i) + (MY - RY(i))*m + 5, CCOL()[i], a*(1 - .95*m), 13.5, 700)));
+    const ma = prog(t, 1.6, .5); SNAP.merged.forEach((s, j) => text(s, MX(j), MY + 6, INK, a*ma, 16, 800)); text('/ ∼', 60, MY + 6, CY, a*ma, 16, 800, 'left');
+    if (drop > 0) SNAP.clients.forEach((cl, i) => { ctx.globalAlpha = a*drop; ctx.drawImage(sprite(CCOL()[i]), 900 + i*90 - 7, 794, 14, 14); ctx.globalAlpha = 1; text(cl.name, 912 + i*90, 806, CCOL()[i], a*drop, 12, 700, 'left'); }); } };
 }
 
-/* ---------- 03 读空间，不读原文（只画实测） ---------- */
+/* ---------- 05–06 读空间，不读原文（只画实测） ---------- */
 let pick = 1, touched = false;
-function read(t){
-  const S = SNAP.read, X0 = 660, X1 = 1530, lx = n => X0 + (Math.log10(n) - 8.8)/(11.4 - 8.8)*(X1 - X0), xMax = lx(S.N[4]) + 26;
-  const cur = touched ? pick : Math.min(4, Math.floor(prog(t, .8, 5)*4.99));
-  const T0 = 120, T1 = 400, B0 = 470, B1 = 760, cy = c => T1 - (c - .2)/.8*(T1 - T0), ey = e => B1 - (Math.log10(e) - 0)/(3 - 0)*(B1 - B0), out = [];
-  along(out, X0, T1, X1, T1, 90, GRY, .5); along(out, X0, B1, X1, B1, 90, GRY, .5); along(out, X0, T0, X0, T1, 28, GRY, .5); along(out, X0, B0, X0, B1, 28, GRY, .5);
-  const P = prog(t, .5, 2.4), vis = Math.max(1, Math.ceil(P*5));
-  const curve = (vals, f, c) => { for (let i = 0; i < vis - 1; i++) along(out, lx(S.N[i]), f(vals[i]), lx(S.N[i + 1]), f(vals[i + 1]), 22, c, .85, 1.3);
-    for (let i = 0; i < vis; i++) for (let k = 0; k < 8; k++) out.push({ x:lx(S.N[i]) + Math.cos(k*.785 + t*2)*(i === cur ? 7 : 4.5), y:f(vals[i]) + Math.sin(k*.785 + t*2)*(i === cur ? 7 : 4.5), r:1.6, c, a:1 }); };
-  curve(S.coverage.text, cy, AM); curve(S.coverage.space, cy, CY); curve(S.joules.text, ey, AM); curve(S.joules.space, ey, CY);
-  along(out, lx(S.N[cur]), T0, lx(S.N[cur]), B1, 50, INK, .18, .9);
-  return { out, over(a){
-    text('覆盖率（同一套题答对的比例）', X0 + 8, T0 - 10, DIM, a, 11.5, 600, 'left'); text('每答一题的能耗（J，对数）', X0 + 8, B0 - 10, DIM, a, 11.5, 600, 'left');
-    ctx.globalAlpha = a; ctx.fillStyle = rgba(GRY, .08); ctx.fillRect(xMax, T0, X1 - xMax, B1 - T0); ctx.globalAlpha = 1; seg(xMax, T0, xMax, B1, GRY, .6*a, 1, [4,4]);
-    text('外推', (xMax + X1)/2, (T0 + B1)/2 - 6, DIM, a, 15, 800); text('不在本页', (xMax + X1)/2, (T0 + B1)/2 + 16, DIM, a, 11, 600);
-    S.N.forEach((n, i) => text(pow10(n), lx(n), B1 + 22, i === cur ? CY : DIM, a, 11, 700, 'center', M)); text(`${S.model} · 规模（参数）→`, X1, B1 + 44, DIM, a, 11, 600, 'right');
-    if (P >= 1){ label('读原文', lx(S.N[4]) - 64, cy(S.coverage.text[4]) + 22, AM, a, 11.5); label('读空间', lx(S.N[4]) - 64, cy(S.coverage.space[4]) - 14, CY, a, 11.5);
-      const k = prog(t, 3.2, .8), x0 = lx(S.N[1]), x1 = lx(S.N[3]), y = cy(S.coverage.space[1]); if (k > 0){ seg(x0, y, x0 + (x1 - x0)*k, y, MI, .8*a, 1.6, [5,4]); text('小一档，就赶上', (x0 + x1)/2, y - 12, MI, a*k, 12.5, 800); } }
+const RX0 = 120, RX1 = 1120, RT0 = 330, RT1 = 770;
+const rlx = n => RX0 + (Math.log10(n) - 8.8)/(11.4 - 8.8)*(RX1 - RX0);
+function chart(t, vals, f, out, cur){ const S = SNAP.read, P = prog(t, .3, 2.0), vis = Math.max(1, Math.ceil(P*5));
+  along(out, RX0, RT1, RX1, RT1, 90, GRY, .5); along(out, RX0, RT0, RX0, RT1, 34, GRY, .5);
+  [['text', AM], ['space', CY]].forEach(([k, c]) => { const v = vals[k];
+    for (let i = 0; i < vis - 1; i++) along(out, rlx(S.N[i]), f(v[i]), rlx(S.N[i + 1]), f(v[i + 1]), 24, c, .85, 1.4);
+    for (let i = 0; i < vis; i++) for (let j = 0; j < 8; j++) out.push({ x:rlx(S.N[i]) + Math.cos(j*.785 + t*2)*(i === cur ? 7 : 4.5), y:f(v[i]) + Math.sin(j*.785 + t*2)*(i === cur ? 7 : 4.5), r:1.6, c, a:1 }); });
+  return P; }
+function chartOver(a, title, cur){ const S = SNAP.read, xMax = rlx(S.N[4]) + 26;
+  text(title, RX0 + 8, RT0 - 12, DIM, a, 12, 600, 'left');
+  ctx.globalAlpha = a; ctx.fillStyle = rgba(GRY, .08); ctx.fillRect(xMax, RT0, RX1 - xMax, RT1 - RT0); ctx.globalAlpha = 1; seg(xMax, RT0, xMax, RT1, GRY, .6*a, 1, [4,4]);
+  text('外推', (xMax + RX1)/2, (RT0 + RT1)/2 - 6, DIM, a, 15, 800); text('不在本页', (xMax + RX1)/2, (RT0 + RT1)/2 + 16, DIM, a, 11, 600);
+  S.N.forEach((n, i) => text(pow10(n), rlx(n), RT1 + 22, i === cur ? CY : DIM, a, 11, 700, 'center', M)); text(`${S.model} · 规模（参数）→`, RX1, RT1 + 44, DIM, a, 11, 600, 'right'); }
+function coverage(t){
+  const S = SNAP.read, out = [], cy = c => RT1 - (c - .2)/.8*(RT1 - RT0), P = chart(t, S.coverage, cy, out, -1);
+  return { out, over(a){ chartOver(a, '覆盖率（同一套题答对的比例）', -1);
+    if (P >= 1){ label('读原文', rlx(S.N[4]) - 70, cy(S.coverage.text[4]) + 24, AM, a, 12); label('读空间', rlx(S.N[4]) - 70, cy(S.coverage.space[4]) - 16, CY, a, 12);
+      const k = prog(t, 2.6, .8), x0 = rlx(S.N[1]), x1 = rlx(S.N[3]), y = cy(S.coverage.space[1]); if (k > 0){ seg(x0, y, x0 + (x1 - x0)*k, y, MI, .8*a, 1.6, [5,4]); text('小一档，就赶上', (x0 + x1)/2, y - 12, MI, a*k, 13, 800); } } } };
+}
+function energy(t){
+  const S = SNAP.read, out = [], ey = e => RT1 - Math.log10(e)/3*(RT1 - RT0), cur = touched ? pick : Math.min(4, Math.floor(prog(t, .8, 5)*4.99));
+  chart(t, S.joules, ey, out, cur); along(out, rlx(S.N[cur]), RT0, rlx(S.N[cur]), RT1, 50, INK, .18, .9);
+  return { out, over(a){ chartOver(a, '每答一题的能耗（J，对数）', cur);
     const set = (id, s) => { const el = document.getElementById(id); if (el && el.textContent !== s) el.textContent = s; };
-    set('k2n', pow10(S.N[cur])); set('k2e', String(S.joules.text[cur])); set('k2b', String(S.joules.space[cur]));
+    set('k5n', pow10(S.N[cur])); set('k5e', String(S.joules.text[cur])); set('k5b', String(S.joules.space[cur]));
     set('scaleo', `${pow10(S.N[cur])} · 第 ${cur + 1} / 5 档`); const sl = document.getElementById('scale'); if (!touched && sl && +sl.value !== cur) sl.value = cur; } };
 }
 
-/* ---------- 04 以脑为本：三招 ---------- */
-const PAN = [ { x:620, name:'按需激活' }, { x:932, name:'按用的精度去标' }, { x:1244, name:'AI 先合，人再核' } ];
-function three(t){
-  const out = [];
-  const ph = Math.floor(t/1.6), cx = 3 + (ph*5)%9, cy = 3 + (ph*7)%9, r1 = rng(3 + ph); let on = 0;
-  for (let i = 0; i < 14; i++) for (let j = 0; j < 14; j++){ const lit = Math.hypot(i - cx, j - cy) < 1.6 && r1() < .95; if (lit) on++;
-    out.push({ x:648 + i*19, y:200 + j*19, r:lit ? 3.2 : 1.5, c:lit ? CY : GRY, a:lit ? 1 : .6 }); }
-  const X2 = 952, W = 252, base = 430, GS = [ { mu:.5, sd:.05, h:1, c:MI }, { mu:.47, sd:.11, h:.7, c:CY }, { mu:.62, sd:.26, h:.45, c:RO } ];
-  along(out, X2, base, X2 + W, base, 40, GRY, .55); [1, 2].forEach(i => along(out, X2 + i*W/3, 200, X2 + i*W/3, base, 16, GRY, .4, .9));
-  GS.forEach((g, i) => { const q = prog(t, .6 + i*.5, .8); for (let k = 0; k <= 50; k++){ const u = k/50; out.push({ x:X2 + u*W, y:base - 170*q*g.h*Math.exp(-((u - g.mu)**2)/(2*g.sd*g.sd)), r:1.6, c:g.c, a:.9 }); } });
-  const X3 = 1264, truth = .66, k = Math.max(0, Math.min(7, Math.floor((t - 1.2)/1.1))), r3 = rng(9); let x = .2, s = .32; const hist = [[x, s]];
-  for (let i = 0; i < k; i++){ const y = truth + (r3() - .5)*.12, K = s*s/(s*s + .06*.06); x = x + K*(y - x); s = Math.sqrt((1 - K)*s*s); hist.push([x, s]); }
-  along(out, X3 + truth*W, 190, X3 + truth*W, 410, 22, INK, .35, 1);
-  hist.forEach(([hx, hs], i) => { const y = 200 + i*26, last = i === hist.length - 1; along(out, X3 + (hx - hs)*W, y, X3 + (hx + hs)*W, y, Math.max(3, Math.round(hs*70)), VI, last ? .95 : .4, last ? 1.6 : 1.1); out.push({ x:X3 + hx*W, y, r:last ? 3.4 : 2, c:VI, a:1 }); });
-  const Mv = SNAP.moves;
-  return { out, over(a){
-    PAN.forEach((p, i) => { text(['①', '②', '③'][i] + ' ' + p.name, p.x + 14, 150, INK, a, 17, 800, 'left'); seg(p.x + 14, 166, p.x + 280, 166, GRY, .5*a); });
-    text(`这一次：亮 ${on} / 196`, 768, 500, CY, a, 14, 800);
-    ['保', '稳', '冲'].forEach((s, i) => text(s, X2 + i*W/3 + W/6, base + 24, i === 1 ? CY : MU, a, 14, 800));
-    ['标得细 → 稳', '按档标 → 结论一样', '跨档 → 补证据'].forEach((s, i) => text(s, X2 + W/2, 486 + i*22, GS[i].c, a*prog(t, .6 + i*.5, .8), 12.5, 700));
-    text('人核出的真值', X3 + truth*W, 428, MU, a, 11.5, 600); text(`第 ${k} 轮核对 · 误差 ${(hist[hist.length - 1][1]*100).toFixed(0)}%`, 1392, 500, VI, a, 14, 800);
-    [[768, `实测：每次查询平均激活 ${Mv.activePct}% 的节点`, '‖a‖₀ ≪ N'], [1078, `实测：精度对齐后标注工时 ${Mv.labelHours}%`, 'ε标 ≤ δ用'], [1392, `实测：核对 3 轮后错配率 ${Mv.mismatchAfter3}%`, 'x ← x + K(y − ŷ)']].forEach(([x, s, f]) => {
-      text(s, x, 600, MI, a, 13, 700); text(f, x, 646, INK, a, 16, 700); }); } };
+/* ---------- 07 解构：现在的 AI 和人脑，并排拆开 ---------- */
+const AXES = [ ['结构', '一整块稠密网络', '分区，各管一摊'], ['激活', '每个问题全网都算', '只亮一小片（约 1%）'], ['学习', '学完就冻住，再学要重训', '边用边学'], ['样本', '要海量样本', '几个例子就会'], ['能耗', '学会要兆瓦时', '约 20 瓦'] ];
+function decon(t){
+  const out = [], AX = 470, BX = 870, Y = i => 320 + i*86, r = rng(5);
+  AXES.forEach((ax, i) => { const y = Y(i), g = prog(t, .3 + i*.3, .8); if (g <= 0) return;
+    if (i === 0){ for (let k = 0; k < 60; k++){ const a = r()*6.283, d = Math.sqrt(r())*26; out.push({ x:AX - 90 + Math.cos(a)*d, y:y + Math.sin(a)*d*.7, r:1.5, c:AM, a:.9 }); }
+      for (let c = 0; c < 6; c++){ const cx = BX - 120 + (c % 3)*34, cy = y - 12 + Math.floor(c/3)*24; for (let k = 0; k < 9; k++){ const a = k*.7; out.push({ x:cx + Math.cos(a)*7, y:cy + Math.sin(a)*5, r:1.4, c:VI, a:.9 }); } } }
+    if (i === 1){ for (let k = 0; k < 40; k++){ out.push({ x:AX - 150 + (k % 10)*14, y:y - 14 + Math.floor(k/10)*9, r:1.6, c:AM, a:1 }); out.push({ x:BX - 150 + (k % 10)*14, y:y - 14 + Math.floor(k/10)*9, r:k === 13 || k === 14 ? 2.6 : 1.1, c:k === 13 || k === 14 ? CY : GRY, a:k === 13 || k === 14 ? 1 : .5 }); } }
+    if (i === 2){ for (let k = 0; k <= 30; k++){ const u = k/30; out.push({ x:AX - 150 + u*130, y:y + 14 - 26*Math.min(1, u*2.2), r:1.4, c:AM, a:.9 }); out.push({ x:BX - 150 + u*130, y:y + 14 - 28*u - 3*Math.sin(u*20), r:1.4, c:VI, a:.9 }); } }
+    if (i === 3){ for (let k = 0; k < 55; k++) out.push({ x:AX - 150 + r()*130, y:y - 16 + r()*32, r:1.1, c:AM, a:.8 }); for (let k = 0; k < 4; k++) out.push({ x:BX - 140 + k*30, y, r:2.6, c:VI, a:1 }); }
+    if (i === 4){ along(out, AX - 150, y, AX - 150 + 130*g, y, 40, AM, 1, 1.6); along(out, BX - 150, y, BX - 146, y, 3, VI, 1, 1.6); } });
+  return { out, over(a){ text('现在的 AI', AX - 85, 290, AM, a, 14, 800); text('人脑', BX - 85, 290, VI, a, 14, 800);
+    AXES.forEach((ax, i) => { const y = Y(i), g = prog(t, .3 + i*.3, .8); text(ax[0], 60, y + 5, INK, a*g, 15, 800, 'left'); text(ax[1], AX + 10, y + 5, MU, a*g, 13, 600, 'left'); text(ax[2], BX + 10, y + 5, MU, a*g, 13, 600, 'left'); seg(60, y + 38, 1140, y + 38, GRY, .25*a*g); });
+    const c = prog(t, 2.4, .8); text('问题不在大，在单一：一个什么都管、学完就冻住的大脑。', CX, 790, CY, a*c, 17, 800); } };
 }
 
-/* ---------- 05 护城河：三代第三方模型，三套读法，点不动 ---------- */
+/* ---------- 08 方向：数个垂域的脑，由图谱连成组织 ---------- */
+const EX = SNAP.experts.map((s, i) => { const g = -Math.PI/2 + i/5*6.283; return { s, x:CX + Math.cos(g)*210, y:CY0 + 10 + Math.sin(g)*150 }; });
+const EDGES = [[0,1],[1,2],[2,3],[3,4],[4,0],[0,2],[1,3],[0,4]];
+function org(t){
+  const out = [], cols = [CY, AM, MI, VI, RO], ph = Math.floor(t/3) % 3, route = [[0, 1], [2, 3], [3, 0]][ph], check = [4, 4, 1][ph], qx = 120, qy = CY0 + 10, ax = 1080;
+  EX.forEach((e, i) => { for (let k = 0; k < 44; k++){ const a = k*2.4, d = 5 + (k % 11)*2.6; out.push({ x:e.x + Math.cos(a)*d, y:e.y + Math.sin(a)*d*.8, r:1.5, c:cols[i], a:route.includes(i) || i === check ? 1 : .55 }); } });
+  EDGES.forEach(([i, j]) => along(out, EX[i].x, EX[i].y, EX[j].x, EX[j].y, 24, MU, .55, 1));
+  ring(out, qx, qy, 12, 12, 14, CY, 1, 1.4, t*2); ring(out, ax, qy, 14, 14, 16, MI, 1, 1.4, -t*2);
+  route.forEach(i => { along(out, qx + 12, qy, EX[i].x, EX[i].y, 34, CY, 1, 1.4); along(out, EX[i].x, EX[i].y, ax - 14, qy, 34, MI, 1, 1.4); });
+  along(out, EX[check].x, EX[check].y, ax - 14, qy, 30, RO, 1, 1.4);
+  return { out, over(a){ EX.forEach((e, i) => label(e.s + '脑', e.x, e.y - 40, cols[i], a, 12.5)); text('问题', qx, qy + 34, CY, a, 13, 800); text('答案', ax, qy + 36, MI, a, 13, 800);
+    label('复核', (EX[check].x + ax)/2, (EX[check].y + qy)/2 - 8, RO, a, 11.5); person(ax, qy + 70, 12, MU, a); text('人核', ax, qy + 100, MU, a, 12, 700);
+    text('图谱分给对的那几个 · 共同空间让它们读同一批点 · 另一个来复核', CX, 752, MU, a, 13, 600);
+    text('不是单一，才有规则和制衡。', CX, 790, CY, a*prog(t, 2.0, .8), 17, 800); } };
+}
+function person(x, y, s, c, a){ if (a <= 0) return; ctx.globalAlpha = a; ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x, y - s*.45, s*.42, 0, 7); ctx.fill(); ctx.beginPath(); ctx.ellipse(x, y + s*.55, s*.72, s*.5, 0, Math.PI, 0); ctx.fill(); ctx.globalAlpha = 1; }
+
+/* ---------- 09 按需激活 ---------- */
+function sparse(t){
+  const out = [], ph = Math.floor(t/1.6), cx = 4 + (ph*7)%12, cy = 2 + (ph*5)%7, r1 = rng(3 + ph); let on = 0;
+  for (let i = 0; i < 24; i++) for (let j = 0; j < 12; j++){ const lit = Math.hypot(i - cx, j - cy) < 1.7 && r1() < .95; if (lit) on++;
+    out.push({ x:CX - 23*18 + i*36, y:330 + j*36, r:lit ? 3.6 : 1.6, c:lit ? CY : GRY, a:lit ? 1 : .6 }); }
+  return { out, over(a){ text(`这一次：亮 ${on} / 288 个节点`, CX, 790, CY, a, 15, 800); } };
+}
+
+/* ---------- 10 按精度标 ---------- */
+function bands(t){
+  const out = [], X2 = 200, W = 800, base = 700, GS = [ { mu:.5, sd:.05, h:1, c:MI }, { mu:.47, sd:.11, h:.7, c:CY }, { mu:.62, sd:.26, h:.45, c:RO } ];
+  along(out, X2, base, X2 + W, base, 80, GRY, .55); [1, 2].forEach(i => along(out, X2 + i*W/3, 330, X2 + i*W/3, base, 24, GRY, .4, .9));
+  GS.forEach((g, i) => { const q = prog(t, .5 + i*.5, .8); for (let k = 0; k <= 90; k++){ const u = k/90; out.push({ x:X2 + u*W, y:base - 340*q*g.h*Math.exp(-((u - g.mu)**2)/(2*g.sd*g.sd)), r:1.6, c:g.c, a:.9 }); } });
+  return { out, over(a){ ['保', '稳', '冲'].forEach((s, i) => text(s, X2 + i*W/3 + W/6, base + 28, i === 1 ? CY : MU, a, 16, 800));
+    ['标得细 → 稳', '按档标 → 结论一样', '跨档 → 补证据'].forEach((s, i) => label(s, [700, 830, 960][i], [380, 470, 560][i], GS[i].c, a*prog(t, .5 + i*.5, .8), 12.5)); } };
+}
+
+/* ---------- 11 AI 先合，人再核 ---------- */
+function review(t){
+  const out = [], X3 = 200, W = 800, truth = .66, k = Math.max(0, Math.min(8, Math.floor((t - .8)/1.0))), r3 = rng(9); let x = .2, s = .32; const hist = [[x, s]];
+  for (let i = 0; i < k; i++){ const y = truth + (r3() - .5)*.12, K = s*s/(s*s + .06*.06); x = x + K*(y - x); s = Math.sqrt((1 - K)*s*s); hist.push([x, s]); }
+  along(out, X3 + truth*W, 320, X3 + truth*W, 640, 30, INK, .35, 1);
+  hist.forEach(([hx, hs], i) => { const y = 336 + i*34, last = i === hist.length - 1; along(out, X3 + (hx - hs)*W, y, X3 + (hx + hs)*W, y, Math.max(3, Math.round(hs*160)), VI, last ? .95 : .4, last ? 1.7 : 1.1); out.push({ x:X3 + hx*W, y, r:last ? 3.8 : 2.2, c:VI, a:1 }); });
+  return { out, over(a){ text('人核出的真值', X3 + truth*W, 664, MU, a, 12.5, 600); text(`第 ${k} 轮核对 · 误差 ${(hist[hist.length - 1][1]*100).toFixed(0)}%`, CX, 790, VI, a, 15, 800); } };
+}
+
+/* ---------- 12 护城河 ---------- */
 const PQ = [ [.7,.75,.45], [-.2,.3,.9] ];
 function moat(t){
-  const pr = cam(.7 + .12*Math.sin(t*.25), .28, 1040, 500, 220), out = [];
+  const pr = cam(.7 + .12*Math.sin(t*.25), .28, 470, CY0 + 20, 200), out = [];
   const gen = Math.min(2, Math.floor(Math.max(0, t - 1.5)/3.2)), th = [0, .55, 1.15][gen] + (t > 1.5 ? .07*Math.sin(t*.9) : 0);
   const cols = [CY, AM, VI], U = rotA([.3,1,.35], th), E = [[1,0,0],[0,1,0],[0,0,1]].map(U), O = pr([0,0,0]);
   PTS.slice(0, 110).forEach(o => { const q = pr(mul(o.p, .7)); out.push({ x:q.x, y:q.y, r:1.8*q.k, c:KINDS[o.kind].c, a:.7 }); });
@@ -299,29 +420,45 @@ function moat(t){
   return { out, over(a){
     E.forEach(e => { const q = pr(mul(e, 1.2)); arrow(O.x + (q.x - O.x)*.92, O.y + (q.y - O.y)*.92, q.x, q.y, cols[gen], a, 2, 9); });
     const tip = pr(mul(E[1], 1.32)); label(`第三方模型 ${SNAP.align.models[gen]} 的读法`, tip.x, tip.y - 6, cols[gen], a, 12); label('p', p.x, p.y - 16, VI, a, 11); label('q', q.x, q.y - 14, MI, a, 11);
-    const X = 1350, xp = E.map(e => dotv(PQ[0], e)), f3 = v => `( ${v.map(x => x.toFixed(2)).join(' , ')} )`;
-    text(`p 的读数 · ${SNAP.align.models[gen]}`, X, 240, cols[gen], a, 12.5, 700, 'left'); text(f3(xp), X, 266, cols[gen], a, 14, 700, 'left', M);
-    text('|p − q|', X, 316, VI, a, 12.5, 700, 'left'); text(`${d3(PQ[0], PQ[1]).toFixed(3)} · 不变`, X, 342, VI, a, 14, 700, 'left', M);
-    text('对齐残差（实测）', X, 392, MI, a, 12.5, 700, 'left');
-    SNAP.align.models.forEach((m, i) => text(`${m}　${i ? SNAP.align.residual[i].toFixed(3) : '基准'}`, X, 418 + i*24, i === gen ? MI : DIM, a, 14, 700, 'left', M)); } };
+    const X = 820, xp = E.map(e => dotv(PQ[0], e)), f3 = v => `( ${v.map(x => x.toFixed(2)).join(' , ')} )`;
+    text(`p 的读数 · ${SNAP.align.models[gen]}`, X, 380, cols[gen], a, 13, 700, 'left'); text(f3(xp), X, 408, cols[gen], a, 15, 700, 'left', M);
+    text('|p − q|', X, 460, VI, a, 13, 700, 'left'); text(`${d3(PQ[0], PQ[1]).toFixed(3)} · 不变`, X, 488, VI, a, 15, 700, 'left', M);
+    text('对齐残差（实测）', X, 540, MI, a, 13, 700, 'left');
+    SNAP.align.models.forEach((m, i) => text(`${m}　${i ? SNAP.align.residual[i].toFixed(3) : '基准'}`, X, 568 + i*26, i === gen ? MI : DIM, a, 15, 700, 'left', M)); } };
 }
 
-/* ===== 翻页：上一步的坐标系解离，粒子飞到下一步重新聚成 ===== */
-const STEPS = [space, merge, read, three, moat];
-const NAMES = ['空间', '投射', '读空间', '以脑为本', '护城河'];
-const secs = [...document.querySelectorAll('.ch')], nav = document.getElementById('nav');
-NAMES.forEach((s, i) => { const b = document.createElement('button'); b.textContent = `${i + 1} ${s}`; b.onclick = () => go(i); nav.appendChild(b); });
-const FLY = .95, SETTLE = 1.25;
+/* ---------- 13 客户：在链路上的，和已经到账的 ---------- */
+function clients(t){
+  const out = [], C = SNAP.customers, Y = i => 340 + i*100, HX = 930, HY = 490;
+  C.forEach((c, i) => { const y = Y(i), col = c.paid ? MI : GRY; ring(out, 120, y, 13, 13, 16, c.paid ? MI : MU, c.paid ? 1 : .7, 1.4, t*(c.paid ? 2 : .5));
+    for (let k = 0; k < 26; k++){ const u = k/25; out.push({ x:520 + (HX - 520)*u, y:y + (HY - y)*u, r:1, c:GRY, a:.35 }); }
+    if (c.paid) for (let k = 0; k < 18; k++){ const u = (t*.3 + k/18) % 1; out.push({ x:520 + (HX - 520)*u, y:y + (HY - y)*u, r:2.4, c:AM, a:.95 }); } });
+  ring(out, HX, HY, 26, 26, 30, CY, 1, 1.5, -t); ring(out, HX, HY, 40, 40, 30, CY, .4, 1.1, t*.6);
+  return { out, over(a){ C.forEach((c, i) => { const y = Y(i); text(c.name, 150, y + 5, INK, a, 15, 800, 'left'); text(c.kind, 150, y + 27, DIM, a, 12, 600, 'left');
+      label(c.status, 440, y + 4, c.status === '试点' ? CY : MU, a, 12); text(c.paid ? '已到账' : '未到账', 500, y + 5, c.paid ? MI : DIM, a, 12.5, 800, 'left'); });
+    text('未来智能', HX, HY + 64, CY, a, 15, 800); text('只有一条线上有钱在走', HX, HY + 88, AM, a, 12.5, 700); } };
+}
+
+/* ---------- 14 参考文献 ---------- */
+function refsPage(t){ const out = [], pr = cam(.4 + t*.05, .3, CX, 700, 120); PTS.forEach(o => { const q = pr(o.p); out.push({ x:q.x, y:q.y, r:1.2*q.k, c:KINDS[o.kind].c, a:.25 }); }); return { out, over(){} }; }
+
+/* ===== 翻页：上一页的坐标系解离，粒子飞到下一页重新聚成 ===== */
+const STEPS = [space, query, fields, merge, coverage, energy, decon, org, sparse, bands, review, moat, clients, refsPage];
+const secs = [...document.querySelectorAll('.ch')], dots = document.getElementById('dots');
+STEPS.forEach((s, i) => { const d = document.createElement('i'); d.title = String(i + 1); d.onclick = () => go(i); dots.appendChild(d); });
+document.getElementById('prev').onclick = () => go(ch - 1); document.getElementById('next').onclick = () => go(ch + 1);
+const FLY = .95, SETTLE = 1.15;
 let ch = 0, t0 = performance.now();
 function go(i){ ch = (i + STEPS.length) % STEPS.length; t0 = performance.now(); PART.forEach(p => { p.fx = p.x; p.fy = p.y; p.d = Math.random()*.5; });
-  secs.forEach(s => s.classList.toggle('on', +s.dataset.c === ch)); [...nav.children].forEach((b, j) => b.classList.toggle('on', j === ch)); showCode(); }
+  secs.forEach(s => s.classList.toggle('on', +s.dataset.c === ch)); [...dots.children].forEach((b, j) => b.classList.toggle('on', j === ch));
+  document.getElementById('num').textContent = `${String(ch + 1).padStart(2, '0')} / ${STEPS.length}`; showCode(); }
 function render(t){
-  [...secs[ch].querySelectorAll('.side>*,.ctl')].forEach((el, i) => { const p = prog(t, .15 + i*.16, .5); el.style.opacity = p; el.style.transform = p < 1 ? `translateY(${(1 - p)*10}px)` : ''; });
-  ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.clearRect(0, 0, 1600, 900);
+  [...secs[ch].querySelectorAll('.head>*,.eq,.ctl,.refs')].forEach((el, i) => { const p = prog(t, .12 + i*.14, .5); el.style.opacity = p; el.style.transform = p < 1 ? `translateY(${(1 - p)*10}px)` : ''; });
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.clearRect(0, 0, 1200, 900);
   const scene = STEPS[ch](t), T = scene.out;
   ctx.globalCompositeOperation = TH.blend;
   PART.forEach((p, i) => { const g = T[i], e = ease((t - p.d)/FLY);
-    const tx = g ? g.x : 800 + Math.cos(p.s + t*.05)*(620 + 160*p.n), ty = g ? g.y : 450 + Math.sin(p.s*1.7 + t*.04)*(330 + 60*p.n);
+    const tx = g ? g.x : 600 + Math.cos(p.s + t*.05)*(470 + 120*p.n), ty = g ? g.y : 470 + Math.sin(p.s*1.7 + t*.04)*(330 + 60*p.n);
     const sw = Math.sin(Math.PI*e)*(60 + 90*p.n), ang = p.s + t*.6;
     p.x = p.fx + (tx - p.fx)*e + Math.cos(ang)*sw; p.y = p.fy + (ty - p.fy)*e + Math.sin(ang)*sw;
     const r = g ? g.r : .8, a = g ? g.a : TH.dust, c = g ? g.c : GRY, sz = (r*5 + 2)*(1 + .5*Math.sin(Math.PI*e));
@@ -332,18 +469,22 @@ function render(t){
 addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(ch + 1); if (e.key === 'ArrowLeft') go(ch - 1); });
 
 /* ===== 读数 ===== */
-document.getElementById('snapline').textContent = `SNAPSHOT ${SNAP.id} · 截至 ${SNAP.cut} · ${SNAP.base}`;
-const stat = (cls, v, s, src) => `<div><b class="${cls}">${v}</b><small>${s}${src ? `<span class="src">${src}</span>` : ''}</small></div>`;
-const total = Object.values(SNAP.points).reduce((a, b) => a + b);
-document.getElementById('s0').innerHTML = stat('c', total.toLocaleString(), '投射进来的点') + stat('v', SNAP.relations.toLocaleString(), '点和点之间的关系') + stat('a', SNAP.clients.length + ' 家', '客户');
-document.getElementById('s1').innerHTML = stat('a', SNAP.fieldsRaw, '原始字段') + stat('c', SNAP.dims, '合并后的维度') + stat('v', SNAP.weeklyTables + ' 张', '每周导入的表');
-document.getElementById('s4').innerHTML = stat('m', SNAP.align.residual[2].toFixed(3), '换代对齐残差', '实测') + stat('c', SNAP.review.toLocaleString(), '人核记录（条）') + stat('a', `${SNAP.pilots} / ${SNAP.paid}`, '试点 / 已付款');
-{ const S = SNAP.read, fitB = js => { const xs = S.N.map(Math.log10), ys = js.map(Math.log10), mx = xs.reduce((a, b) => a + b)/xs.length, my = ys.reduce((a, b) => a + b)/ys.length;
-    return xs.reduce((a, x, i) => a + (x - mx)*(ys[i] - my), 0)/xs.reduce((a, x) => a + (x - mx)**2, 0); };
-  document.getElementById('k2be').textContent = fitB(S.joules.text).toFixed(2); document.getElementById('k2bb').textContent = fitB(S.joules.space).toFixed(2); }
+document.getElementById('snapline').textContent = `SNAPSHOT ${SNAP.id} · 截至 ${SNAP.cut}`;
+const stat = (cls, v, s) => `<div><b class="${cls}">${v}</b><small>${s}</small></div>`;
+const total = Object.values(SNAP.points).reduce((a, b) => a + b), Mv = SNAP.moves, CU = SNAP.customers;
+const fill = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+fill('s0', stat('c', total.toLocaleString(), '投射进来的点') + stat('v', SNAP.relations.toLocaleString(), '点和点之间的关系') + stat('a', SNAP.clients.length + ' 家', '客户的数据'));
+fill('s2', stat('a', SNAP.fieldsRaw, '原始字段') + stat('c', SNAP.weeklyTables + ' 张', '每周导入的表'));
+fill('s3', stat('a', SNAP.fieldsRaw, '原始字段') + stat('c', SNAP.dims, '合并后的维度'));
+fill('s8', stat('c', Mv.activePct + '%', '每次查询平均激活的节点（实测）'));
+fill('s9', stat('m', Mv.labelHours + '%', '精度对齐后的标注工时（实测）'));
+fill('s10', stat('v', Mv.mismatchAfter3 + '%', '核对 3 轮后的错配率（实测）') + stat('c', SNAP.review.toLocaleString(), '人核记录（条）'));
+fill('s11', stat('m', SNAP.align.residual[2].toFixed(3), '换代对齐残差（实测）'));
+fill('s12', stat('c', CU.length - 1 + ' 家', '在链路上的大客户') + stat('v', CU.filter(c => c.status === '试点').length + ' 家', '试点') + stat('m', CU.filter(c => c.paid).length + ' 家', '已到账'));
+fill('refs', REFS.map((r, i) => `<p><b>[${i + 1}]</b>${r[0]} <i>${r[1]}</i>. ${r[2]}</p>`).join(''));
 const sl = document.getElementById('scale'); sl.oninput = () => { touched = true; pick = +sl.value; };
 
-/* ===== 代码：显示正在跑的这一步（就是上面这段函数本身） ===== */
+/* ===== 代码：显示正在跑的这一页（就是上面这段函数本身） ===== */
 const code = document.getElementById('code');
 const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 const hl = s => esc(s).replace(/(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|('[^'\n]*'|`[^`]*`)|\b(const|let|function|return|if|else|for|of|new)\b|\b(\d+\.?\d*(?:e\d+)?)\b/g, (m, c, s2, k, n) => c ? `<span class="c">${c}</span>` : s2 ? `<span class="s">${s2}</span>` : k ? `<span class="k">${k}</span>` : `<span class="n">${n}</span>`);
