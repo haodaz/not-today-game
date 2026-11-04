@@ -34,8 +34,8 @@ describe("R1 · content/pager-foreign.json (strict)", () => {
     expect(foreign).toEqual(FIXTURE.pages);
     expect(Object.isFrozen(foreign)).toBe(true);
     expect(parseForeign({ pages: [] })).toEqual([]);
-    // No file in content yet: no foreign pages.
-    expect(pagerForeign).toEqual([]);
+    // Content: the three day-8 pages (rank, legions), digits only.
+    expect(pagerForeign.map((p) => [p.day, p.text])).toEqual([[8, "009 200"], [8, "003 026"], [8, "002 031"]]);
   });
   it.each<[string, unknown, RegExp]>([
     ["an unknown top-level key", { pages: [], extra: 1 }, /top level: unknown key "extra"/],

@@ -155,7 +155,7 @@
     },
     {
       "id": "eat",
-      "text": "At the desk. Eat.",
+      "text": "The table by the window. Eat.",
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
       "required": false,
