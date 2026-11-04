@@ -55,7 +55,6 @@
 /* open: the box, the door (chain), the dictionary lid. */
 [data-action="pick-box"],
 .box-hit,
-.box-open,
 [data-action="loop-door"],
 [data-action="obj-use"] {
   cursor: url(/cursors/open.png) 16 16, auto;

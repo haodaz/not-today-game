@@ -16,8 +16,6 @@
 .room.looking > :is(.fx,.door-bg,.evening-look){translate:var(--pan-x,0px) var(--pan-y,0px);scale:var(--pan-k,1)}
 .room.looking > :is(.shot-hit,.desk-things,.figures,.desk-book){translate:var(--pan-px,0px) var(--pan-py,0px)}
 /* The box opens where it is, on the floor of 房间 (2026-11-02): the open box at its rect while its beat is on show. */
-.room .box-open{position:absolute;pointer-events:none;display:flex;align-items:flex-end;justify-content:center;animation:m-fade-in 200ms both}
-.room .box-open img{max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 8px 14px rgba(0,0,0,.35))}
 /* The edges say where you can go: the door at 房间's right, back at the bottom; under the HUD. */
 .room .edge-hint{position:absolute;z-index:13;pointer-events:none;display:flex;align-items:center;gap:8px;color:#f4efe6;font-size:15px;letter-spacing:.12em;text-shadow:0 1px 6px rgba(0,0,0,.55);animation:m-fade-in 200ms both;animation-delay:var(--late,0ms)}
 .room .edge-hint.door{right:0;top:0;bottom:0;width:8%;justify-content:center;flex-direction:column;background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.28))}

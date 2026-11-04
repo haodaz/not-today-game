@@ -425,16 +425,6 @@ function edgeHint(session: Session, view: string, nowMs: number): SafeHtml | nul
   const label = t(edge.zone === "door" ? "hud.cam.door" : "hud.back");
   return html`<div class="edge-hint ${edge.zone}" aria-hidden="true"${late}>${edge.zone === "door" ? html`<i class="arrow"></i>` : null}<span>${label}</span></div>`;
 }
-/**
- * The box opens where it is (2026-11-02): in 房间, once today's layer is opened the open box sits at
- * its place on the floor for the rest of the day. Derived from today's events; nothing is stored.
- */
-export function boxOpenShowing(state: Pick<State, "day">, events: readonly GameEvent[]): boolean {
-  return events.some((e) => e.kind === "openLayer" && e.day === state.day);
-}
-function boxOpen(): SafeHtml {
-  return html`<div class="box-open" style="${rectStyle(ROOM_SHOT.box)}" aria-hidden="true"><img class="desk-photo" src="/room/desk/box.png" alt="" draggable="false"></div>`;
-}
 export function renderRoom(model: RoomModel): SafeHtml {
   const { state, events, session } = model;
   const lc = loopContext(state, events);
@@ -466,7 +456,7 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const evening = isEvening(session.clock) && view !== "bed" && !dream ? eveningLook(view) : null;
   const fadeLen = session.cam?.fade ?? ARRIVE_FADE_MS;
   const late = fade === null ? null : raw(` style="--late:-${Math.round(fade)}ms${fadeLen !== ARRIVE_FADE_MS ? `;--late-dur:${fadeLen}ms` : ""}"`);
-  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid", fade !== null && "m-late", dream && "scene-on")}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${renderScene(lineScene)}${scene}${view === "room" && !waiting && !dream && boxOpenShowing(state, events) ? boxOpen() : null}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${itemsPanel(state, events, session)}${view === "room" ? casePanel(state, events, session, model.runId ?? "run", nowMs) : null}${held}${model.boxOutside ? null : dialogueBox(state, events, session, nowMs)}${bottomRight(model)}${settingsButton()}${itemsButton(session)}${model.boxOutside ? null : settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
+  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid", fade !== null && "m-late", dream && "scene-on")}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${renderScene(lineScene)}${scene}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${itemsPanel(state, events, session)}${view === "room" ? casePanel(state, events, session, model.runId ?? "run", nowMs) : null}${held}${model.boxOutside ? null : dialogueBox(state, events, session, nowMs)}${bottomRight(model)}${settingsButton()}${itemsButton(session)}${model.boxOutside ? null : settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
 }
 
 export { raidShowing };

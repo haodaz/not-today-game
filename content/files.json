@@ -171,7 +171,7 @@
           "name": "合作协议-合并版-20281016.docx",
           "date": "2028-10-16",
           "from": 1,
-          "afterFlag": "task_merge_done",
+          "afterFlag": "task_v17_done",
           "onOpen": {
             "k": "inner",
             "t": "合并版。名字是按日期起的，很整齐。"
@@ -306,7 +306,7 @@
       "id": "b-premerge",
       "name": "合作协议-合并前.docx",
       "since": 1,
-      "afterFlag": "task_merge_done",
+      "afterFlag": "task_v17_done",
       "onOpen": {
         "k": "narration",
         "t": "合并前的。两份各执一词的时候。"
