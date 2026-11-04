@@ -1,0 +1,540 @@
+{
+  "day": 10,
+  "recipients": {
+    "boss": {
+      "incoming": [
+        {
+          "t": "02:10",
+          "text": "Very good. She arrives tomorrow.",
+          "kind": "odd",
+          "cond_show": {
+            "has": "sent_d9-seats"
+          }
+        },
+        {
+          "t": "09:00",
+          "text": "She's here.",
+          "kind": "odd"
+        },
+        {
+          "t": "09:01",
+          "text": "(Transcript) Proofread Act Two of the script. Don't read too closely, just fix the typos.",
+          "kind": "work"
+        },
+        {
+          "t": "09:12",
+          "text": "[Voice] 41″",
+          "kind": "work"
+        },
+        {
+          "t": "09:12",
+          "text": "(Transcript) Go through v17 today, I need it for the investors this afternoon. Let it merge a draft, you just take a look, don't start from scratch.",
+          "kind": "work",
+          "note": "第 1 天那条语音，一字不差"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:14",
+            "text": "Right, get on it. I want the merged version before three."
+          }
+        ],
+        "inner": "Day 1's reply. Word for word."
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:14",
+            "text": "[Voice] 12″"
+          },
+          {
+            "who": "boss",
+            "t": "09:14",
+            "text": "(Transcript) Mm, just say received. Don't start from scratch, let it merge first, you take a look."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": "'Whatever works' is greyed out. One line less on the menu today."
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "3s",
+        "interrupt": {
+          "who": "boss",
+          "where": "boss",
+          "t": "09:19",
+          "text": "[Voice] 41″"
+        },
+        "inner": "Same as day 1. Read, then forty-one seconds."
+      },
+      "no": {
+        "status": "read",
+        "lines": []
+      },
+      "wait": {
+        "status": "read",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "read",
+        "lines": []
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:20",
+            "text": "[Voice] 41″"
+          }
+        ],
+        "inner": "Say it again. He really said it again. The same one."
+      }
+    },
+    "partner": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "[Card] Competitor A's storyline · Forwarded",
+          "kind": "work",
+          "note": "第 1 天的卡片",
+          "card": {
+            "type": "article",
+            "account": "增长笔记",
+            "title": "竞品 A 是怎么讲故事的：三页纸拿下 A 轮",
+            "digest": "先讲痛点，再讲数据，最后只放一个数字。",
+            "cover": "/msgs/covers/chart.jpg"
+          },
+          "forwarded": true
+        },
+        {
+          "t": "10:15",
+          "text": "Polish Act Two while you're at it, make it read smoothly.",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:30",
+            "text": "[Card] Competitor A's storyline · Forwarded"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:30",
+            "text": "👍"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "40s"
+      },
+      "no": {
+        "status": "read",
+        "lines": []
+      },
+      "wait": {
+        "status": "read",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "read",
+        "lines": []
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "[Card] Competitor A's storyline · Forwarded"
+          }
+        ]
+      }
+    },
+    "group": {
+      "incoming": [
+        {
+          "t": "09:05",
+          "text": "Lao Zhou: Morning meeting. Everyone turn off your virtual backgrounds.",
+          "kind": "work"
+        },
+        {
+          "t": "09:07",
+          "text": "Lao Zhou: One more of you. Please turn off your background.",
+          "kind": "work"
+        },
+        {
+          "t": "09:07",
+          "text": "member: I have no background.",
+          "kind": "odd"
+        },
+        {
+          "t": "09:20",
+          "text": "Lao Zhou: Learned what. Who's picking up those two boxes?",
+          "kind": "work",
+          "note": "第 1 天的消息"
+        },
+        {
+          "t": "09:21",
+          "text": "member: Received +1",
+          "kind": "work"
+        },
+        {
+          "t": "11:20",
+          "text": "member: Have you found the Yellow Sign?",
+          "kind": "odd"
+        },
+        {
+          "t": "14:02",
+          "text": "member: Have you found the Yellow Sign?",
+          "kind": "odd"
+        },
+        {
+          "t": "17:45",
+          "text": "member: Have you found the Yellow Sign?",
+          "kind": "odd"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:20",
+            "text": "Learned what. Who's picking up those two boxes?"
+          }
+        ],
+        "inner": "Lao Zhou is back. Saying day 1's words."
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:21",
+            "text": "Received +1"
+          },
+          {
+            "who": "member",
+            "t": "09:21",
+            "text": "Received."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "read",
+        "lines": []
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:22",
+            "text": "No means no"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:22",
+            "text": "Wait for what"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:22",
+            "text": "Once you're in, don't look back"
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:23",
+            "text": "Learned what. Who's picking up those two boxes?"
+          }
+        ],
+        "inner": "Say it again. He said it again."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:23",
+            "text": "Chief, you're chatty today."
+          },
+          {
+            "who": "xiaozhang",
+            "t": "09:23",
+            "text": "Hahaha"
+          }
+        ]
+      }
+    },
+    "xiaozhang": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "{calledBy}, don't open that script today.",
+          "kind": "private"
+        },
+        {
+          "t": "09:41",
+          "text": "Got it {calledBy}",
+          "kind": "work"
+        },
+        {
+          "t": "14:40",
+          "text": "{calledBy}, I deleted that comment line",
+          "kind": "work",
+          "effects": {
+            "flags": [
+              "xz_deleted_comment"
+            ]
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "09:41",
+            "text": "Got it {calledBy}"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "09:42",
+            "text": "{calledBy}, received what?"
+          },
+          {
+            "who": "xiaozhang",
+            "t": "09:42",
+            "text": "I haven't sent anything yet."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "09:44",
+            "text": "{calledBy}, mine's sent."
+          },
+          {
+            "who": "xiaozhang",
+            "t": "09:44",
+            "text": "Yours isn't?"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "09:45",
+            "text": "OK"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "09:45",
+            "text": "I'll wait for you"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "09:45",
+            "text": "{calledBy}, don't"
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "09:46",
+            "text": "{calledBy}, you're strange today"
+          }
+        ],
+        "inner": "He says I'm strange. Today he's the only one who isn't day 1."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "09:48",
+            "text": "OK {calledBy}"
+          }
+        ]
+      }
+    },
+    "laozhou": {
+      "incoming": [
+        {
+          "t": "10:40",
+          "text": "The Sign is just the character for 'yellow'. Write that.",
+          "kind": "private"
+        },
+        {
+          "t": "11:40",
+          "text": "What's for lunch",
+          "kind": "private"
+        },
+        {
+          "t": "11:41",
+          "text": "Braised chicken?",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:40",
+            "text": "What's for lunch"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:41",
+            "text": "Braised chicken?"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:45",
+            "text": "Eat first."
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:45",
+            "text": "No means no"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:45",
+            "text": "Wait for what"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:46",
+            "text": "Don't look back"
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:47",
+            "text": "What's for lunch"
+          }
+        ],
+        "inner": "He asked again. Like a tape rewound."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:48",
+            "text": "Mm"
+          }
+        ]
+      }
+    }
+  }
+}

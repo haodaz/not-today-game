@@ -1,0 +1,546 @@
+{
+  "day": 14,
+  "recipients": {
+    "boss": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "{bossCalls}, nothing on today. Take a rest.",
+          "kind": "private"
+        },
+        {
+          "t": "09:00",
+          "text": "[Voice] 9″",
+          "kind": "private"
+        },
+        {
+          "t": "09:00",
+          "text": "(Transcript) You've worked hard lately. I know.",
+          "kind": "private",
+          "note": "语气是真的温柔，这才可怕"
+        },
+        {
+          "t": "09:10",
+          "text": "Quite a lot of new hires this batch. Run the onboarding.",
+          "kind": "work"
+        },
+        {
+          "t": "09:11",
+          "text": "Give everyone a desk. Treat them all the same.",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:05",
+            "text": "OK. Take care."
+          }
+        ],
+        "inner": "Take care. He said take care."
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:05",
+            "text": "Mm."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:06",
+            "text": "OK, I won't push you."
+          }
+        ],
+        "inner": "Won't push. Thirteen months, and the first time he won't push."
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:06",
+            "text": "No rush."
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:07",
+            "text": "As long as you've thought it through."
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:07",
+            "text": "You've worked hard lately. I know."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:08",
+            "text": "It's all the same."
+          }
+        ]
+      },
+      "what-do-you-mean": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:08",
+            "text": "It just means take a rest."
+          }
+        ]
+      }
+    },
+    "partner": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "Thanks for your hard work.",
+          "kind": "private"
+        },
+        {
+          "t": "09:30",
+          "text": "[Card] A landscape",
+          "kind": "private",
+          "note": "第一次不是工作卡片",
+          "card": {
+            "type": "image",
+            "src": "/msgs/covers/landscape.jpg",
+            "alt": "一张风景"
+          }
+        },
+        {
+          "t": "09:40",
+          "text": "Just name them all by staff number, saves time.",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "Mm. Take care."
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "👍"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:32",
+            "text": "OK."
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:32",
+            "text": "No rush."
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:33",
+            "text": "Mm."
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:33",
+            "text": "Thanks for your hard work."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:34",
+            "text": "Nothing more to it."
+          }
+        ]
+      }
+    },
+    "group": {
+      "incoming": [
+        {
+          "t": "09:20",
+          "text": "member: Thanks for your hard work, {calledBy}.",
+          "kind": "private"
+        },
+        {
+          "t": "09:20",
+          "text": "member: Thanks for your hard work.",
+          "kind": "private"
+        },
+        {
+          "t": "09:20",
+          "text": "member: Thanks for your hard work.",
+          "kind": "private"
+        },
+        {
+          "t": "09:20",
+          "text": "member: Thanks for your hard work.",
+          "kind": "private"
+        },
+        {
+          "t": "09:21",
+          "text": "member: Thanks for your hard work.",
+          "kind": "private"
+        },
+        {
+          "t": "09:30",
+          "text": "member: Welcome, new colleagues",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:22",
+            "text": "Fine, thanks for your hard work."
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:22",
+            "text": "Thanks for your hard work."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:23",
+            "text": "Understood, thanks for your hard work."
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:23",
+            "text": "Thanks for your hard work."
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:23",
+            "text": "Thanks for your hard work."
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:24",
+            "text": "Thanks for your hard work."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:24",
+            "text": "Thanks for your hard work."
+          }
+        ]
+      },
+      "what-do-you-mean": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:25",
+            "text": "Thanks for your hard work."
+          }
+        ],
+        "inner": "Whatever I say. Thanks for your hard work."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:26",
+            "text": "Thanks for your hard work."
+          }
+        ]
+      }
+    },
+    "xiaozhang": {
+      "incoming": [],
+      "fine": {
+        "status": "silence",
+        "lines": []
+      },
+      "received": {
+        "status": "silence",
+        "lines": []
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "silence",
+        "lines": []
+      },
+      "wait": {
+        "status": "silence",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "silence",
+        "lines": []
+      },
+      "say-it-again": {
+        "status": "silence",
+        "lines": []
+      },
+      "what-llm": {
+        "status": "silence",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "silence",
+        "lines": []
+      },
+      "free": {
+        "status": "silence",
+        "lines": [],
+        "inner": "Empty."
+      }
+    },
+    "laozhou": {
+      "incoming": [
+        {
+          "t": "10:20",
+          "text": "Don't repeat names. Repeat a name and nobody answers.",
+          "kind": "private"
+        },
+        {
+          "t": "12:00",
+          "text": "Take care",
+          "kind": "private",
+          "effects": {
+            "flags": [
+              "lz_take_care"
+            ]
+          }
+        },
+        {
+          "t": "12:00",
+          "text": "[Message recalled]",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:01",
+            "text": "Mm, take care"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:01",
+            "text": "Take care"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:02",
+            "text": "Take care"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:02",
+            "text": "Take care"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:02",
+            "text": "Don't look back, take care"
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:03",
+            "text": "Take care"
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:03",
+            "text": "Take care"
+          }
+        ]
+      },
+      "what-do-you-mean": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:04",
+            "text": "It just means take care"
+          }
+        ],
+        "inner": "Lao Zhou has one word left today."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:30",
+            "text": "Take care"
+          }
+        ]
+      }
+    }
+  }
+}

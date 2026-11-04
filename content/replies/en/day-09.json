@@ -1,0 +1,552 @@
+{
+  "day": 9,
+  "recipients": {
+    "boss": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "[Voice] 52″",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "(Transcript) {bossCalls}, the two billing modules go through today. Let it do them, you don't need to read them yourself, it takes you forever. And you've been on good form lately. Keep it up.",
+          "kind": "work"
+        },
+        {
+          "t": "09:01",
+          "text": "[Voice] 52″",
+          "kind": "odd",
+          "note": "同样 52 秒，转文字一字不差"
+        },
+        {
+          "t": "09:33",
+          "text": "I'm doing a there-and-back trip out of town today",
+          "kind": "work"
+        },
+        {
+          "t": "09:33",
+          "text": "Going to discuss the research-integrity use case again",
+          "kind": "work"
+        },
+        {
+          "t": "09:34",
+          "text": "This direction might be bigger",
+          "kind": "work"
+        },
+        {
+          "t": "09:35",
+          "text": "A distinguished guest tomorrow. Set up the online meeting room: the grid seating must be right, same background for everyone, and the closing should feel like a ceremony.",
+          "kind": "work"
+        },
+        {
+          "t": "16:20",
+          "text": "Let's talk on the phone on my way home after I land",
+          "kind": "work"
+        },
+        {
+          "t": "16:21",
+          "text": "Around 6, my time?",
+          "kind": "odd",
+          "note": "他的钟"
+        },
+        {
+          "t": "18:35",
+          "text": "Arrange the grid seating, and send the script to everyone to rehearse.",
+          "kind": "work"
+        },
+        {
+          "t": "18:36",
+          "text": "You need to be there too. I sit in the middle.",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:10",
+            "text": "Fine."
+          }
+        ],
+        "inner": "Fine. He used a full stop."
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:10",
+            "text": "Received."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:10",
+            "text": "Whatever works."
+          }
+        ]
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s",
+        "interrupt": {
+          "who": "boss",
+          "where": "boss",
+          "t": "09:11",
+          "text": "You've been on good form lately. Keep it up."
+        },
+        "inner": "I ask about money. He praises my form."
+      },
+      "no": {
+        "status": "read",
+        "lines": []
+      },
+      "wait": {
+        "status": "read",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "read",
+        "lines": []
+      }
+    },
+    "partner": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "[Card] Billing module · Acceptance",
+          "kind": "work",
+          "card": {
+            "type": "task",
+            "title": "计费模块 · 验收",
+            "fields": [
+              [
+                "状态",
+                "待验收"
+              ],
+              [
+                "验收人",
+                "你"
+              ]
+            ]
+          }
+        },
+        {
+          "t": "14:00",
+          "text": "Tomorrow I want the centre seat.",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "👍"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "👍"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "👍"
+          }
+        ],
+        "inner": "Three thumbs up, identical."
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "6h"
+      },
+      "no": {
+        "status": "read",
+        "lines": []
+      },
+      "wait": {
+        "status": "read",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "silence",
+        "lines": []
+      }
+    },
+    "group": {
+      "incoming": [
+        {
+          "t": "11:20",
+          "text": "Lao Zhou: What's for lunch",
+          "kind": "private"
+        },
+        {
+          "t": "11:20",
+          "text": "member: As arranged",
+          "kind": "private"
+        },
+        {
+          "t": "11:20",
+          "text": "member: As arranged",
+          "kind": "private"
+        },
+        {
+          "t": "16:55",
+          "text": "Boss: I'm doing a there-and-back trip out of town today, going to discuss the research-integrity use case again",
+          "kind": "work"
+        },
+        {
+          "t": "17:04",
+          "text": "Boss: [Link] Three diagrams · See things, see people, move through",
+          "kind": "work",
+          "forwarded": true,
+          "card": {
+            "type": "link",
+            "title": "三张图 · 看物 看人 穿梭",
+            "site": "你的页面"
+          }
+        },
+        {
+          "t": "17:13",
+          "text": "Boss: [Image] Screenshot from another group",
+          "kind": "work",
+          "card": {
+            "type": "image",
+            "alt": "别的群的截图"
+          }
+        },
+        {
+          "t": "17:13",
+          "text": "Boss: [Chat history] {login}'s chat history",
+          "kind": "work",
+          "forwarded": true,
+          "card": {
+            "type": "history",
+            "title": "{login} 的聊天记录",
+            "lines": [
+              "[视频]",
+              "[视频]",
+              "[视频]",
+              "三张图的链接",
+              "图表页 14 页",
+              "公式说明页",
+              "总目录"
+            ]
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "11:21",
+            "text": "Fine."
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "11:21",
+            "text": "Received."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:21",
+            "text": "OK. Order one for yourself too"
+          }
+        ]
+      },
+      "salary": {
+        "status": "read",
+        "lines": []
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "11:22",
+            "text": "Understood."
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "11:22",
+            "text": "Fine."
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "11:23",
+            "text": "Thanks."
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:24",
+            "text": "Don't skip meals again. Still cold water in your cup, isn't it"
+          }
+        ],
+        "inner": "Lao Zhou is still here. He knows there's cold water in my cup."
+      }
+    },
+    "xiaozhang": {
+      "incoming": [
+        {
+          "t": "11:32",
+          "text": "{calledBy}, I let it do this one, want to take a look",
+          "kind": "work"
+        },
+        {
+          "t": "11:35",
+          "text": "{calledBy}, you're saying don't let it do it?",
+          "kind": "work"
+        },
+        {
+          "t": "19:40",
+          "text": "Just leave the triangle seat empty, no need to put anyone there.",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:36",
+            "text": "OK {calledBy}. I'm off to eat."
+          }
+        ],
+        "inner": "A full stop. He never uses full stops."
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:36",
+            "text": "Received {calledBy}"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:37",
+            "text": "I'll let it do it then"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "xz_let_it_do_d9"
+          ]
+        }
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:38",
+            "text": "{calledBy}… I want to leave"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "xz_wants_to_leave"
+          ]
+        },
+        "inner": "He says he wants to leave. That isn't something I can answer today."
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:38",
+            "text": "OK, I'll take a look"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "xz_looked_d9"
+          ],
+          "san": 1
+        },
+        "inner": "He says he'll take a look."
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:38",
+            "text": "Wait"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:39",
+            "text": "{calledBy}, don't"
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:41",
+            "text": "OK {calledBy}"
+          }
+        ]
+      }
+    },
+    "laozhou": {
+      "incoming": [
+        {
+          "t": "10:10",
+          "text": "Tomorrow I host.",
+          "kind": "private"
+        },
+        {
+          "t": "11:21",
+          "text": "I'm ordering braised chicken, want one sent to your place too? No coriander",
+          "kind": "private"
+        },
+        {
+          "t": "21:00",
+          "text": "Your four, I found them. They're on your desk.",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:21",
+            "text": "OK. Order one for yourself too"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:22",
+            "text": "Fine then"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:22",
+            "text": "You, honestly"
+          }
+        ]
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:30",
+            "text": "I asked"
+          },
+          {
+            "who": "laozhou",
+            "t": "12:30",
+            "text": "He said one step at a time"
+          }
+        ],
+        "inner": "He asked too. He heard that line too."
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:23",
+            "text": "No means no"
+          }
+        ]
+      },
+      "wait": {
+        "status": "typing",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:23",
+            "text": "Don't look back"
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:35",
+            "text": "Mm"
+          }
+        ]
+      }
+    }
+  }
+}

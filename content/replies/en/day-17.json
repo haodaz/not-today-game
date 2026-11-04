@@ -1,0 +1,427 @@
+{
+  "day": 17,
+  "recipients": {
+    "boss": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "You look lovely today.",
+          "kind": "odd",
+          "note": "「漂亮」是克总的词"
+        },
+        {
+          "t": "09:00",
+          "text": "[Voice] 0″",
+          "kind": "odd"
+        },
+        {
+          "t": "09:00",
+          "text": "Answer me. You should know who I am.",
+          "kind": "odd"
+        },
+        {
+          "t": "09:01",
+          "text": "Hold the fort.",
+          "kind": "odd"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:05",
+            "text": "Good."
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:05",
+            "text": "Received."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "wait": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "im-going-in": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:06",
+            "text": "You look lovely today."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "how-much": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:07",
+            "text": "555"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "boss_555"
+          ]
+        },
+        "inner": "555. He sent a number. He wouldn't know what it means."
+      }
+    },
+    "partner": {
+      "incoming": [
+        {
+          "t": "09:01",
+          "text": "Answer me. You should know who I am.",
+          "kind": "odd"
+        },
+        {
+          "t": "09:30",
+          "text": "[Card] A blank",
+          "kind": "odd",
+          "card": {
+            "type": "image",
+            "src": "/msgs/covers/white.jpg",
+            "alt": "一张白"
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "👍"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "👍"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "wait": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "im-going-in": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:32",
+            "text": "[Card] A blank"
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "how-much": {
+        "status": "read",
+        "lines": []
+      }
+    },
+    "group": {
+      "incoming": [
+        {
+          "t": "09:02",
+          "text": "Answer me. You should know who I am.",
+          "kind": "odd"
+        },
+        {
+          "t": "09:20",
+          "text": "member: Good morning.",
+          "kind": "private"
+        },
+        {
+          "t": "09:20",
+          "text": "member: Thanks for your hard work today too.",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:21",
+            "text": "Fine."
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:21",
+            "text": "Received."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "wait": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "im-going-in": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:22",
+            "text": "Thanks for your hard work today too."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:22",
+            "text": "Fine."
+          }
+        ]
+      },
+      "what-do-you-mean": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "how-much": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:23",
+            "text": "Fine."
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:24",
+            "text": "Fine."
+          }
+        ],
+        "inner": "I don't know a single name in the group anymore."
+      }
+    },
+    "xiaozhang": {
+      "incoming": [],
+      "fine": {
+        "status": "silence",
+        "lines": []
+      },
+      "received": {
+        "status": "silence",
+        "lines": []
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "wait": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "im-going-in": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "say-it-again": {
+        "status": "silence",
+        "lines": []
+      },
+      "what-llm": {
+        "status": "silence",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "how-much": {
+        "status": "silence",
+        "lines": []
+      },
+      "free": {
+        "status": "silence",
+        "lines": []
+      }
+    },
+    "laozhou": {
+      "incoming": [
+        {
+          "t": "09:03",
+          "text": "Answer me. You should know who I am.",
+          "kind": "odd"
+        }
+      ],
+      "fine": {
+        "status": "silence",
+        "lines": []
+      },
+      "received": {
+        "status": "silence",
+        "lines": []
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "wait": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "im-going-in": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "say-it-again": {
+        "status": "silence",
+        "lines": []
+      },
+      "what-llm": {
+        "status": "silence",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "how-much": {
+        "status": "silence",
+        "lines": []
+      },
+      "free": {
+        "status": "silence",
+        "lines": []
+      }
+    }
+  }
+}

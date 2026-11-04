@@ -1,0 +1,414 @@
+{
+  "day": 4,
+  "recipients": {
+    "boss": {
+      "incoming": [
+        {
+          "t": "02:40",
+          "text": "Good work. Get some rest.",
+          "kind": "odd",
+          "cond_show": {
+            "has": "sent_d3-theory"
+          }
+        },
+        {
+          "t": "09:12",
+          "text": "[Voice] 15″",
+          "kind": "work"
+        },
+        {
+          "t": "09:12",
+          "text": "(Transcript) Does AI have consciousness? We say it first. They talk ontology, we talk consciousness. One level higher. Add a section on consciousness.",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:12",
+            "text": "Fine."
+          }
+        ],
+        "inner": "One word. He's started saving them."
+      },
+      "received": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "2s",
+        "inner": "He doesn't even send received anymore."
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:13",
+            "text": "[Voice] 8″"
+          },
+          {
+            "who": "boss",
+            "t": "09:13",
+            "text": "(Transcript) OK, the two merge-and-export ones, let it merge them."
+          }
+        ]
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s",
+        "inner": "Read. Nobody typing. I waited two minutes."
+      },
+      "wait": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "20s",
+        "interrupt": {
+          "who": "boss",
+          "where": "boss",
+          "t": "09:20",
+          "text": "Wait for what?"
+        },
+        "effects": {
+          "flags": [
+            "boss_asked_wait"
+          ]
+        },
+        "inner": "Wait. The first time he didn't keep to my rhythm, and the first time I didn't keep to his."
+      }
+    },
+    "partner": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "[Card] Export spec · Forwarded",
+          "kind": "work",
+          "card": {
+            "type": "file",
+            "name": "导出规范.docx",
+            "size": "186 KB",
+            "ext": "doc"
+          },
+          "forwarded": true
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:30",
+            "text": "👍"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:30",
+            "text": "[Card] Export spec · Forwarded"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "3s"
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "10min"
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:35",
+            "text": "We can wait."
+          }
+        ],
+        "inner": "We can wait. He means himself."
+      }
+    },
+    "group": {
+      "incoming": [
+        {
+          "t": "09:12",
+          "text": "Lao Zhou: Building management called again, those two boxes",
+          "kind": "work"
+        },
+        {
+          "t": "09:13",
+          "text": "member: Lao Zhou can go",
+          "kind": "work"
+        },
+        {
+          "t": "09:30",
+          "text": "Boss: [Video] The 380-billion-dollar base system",
+          "kind": "work",
+          "card": {
+            "type": "video",
+            "account": "科技商业观察",
+            "title": "美国这家公司的本体：三千八百亿美元的底层系统，这条视频一次给你讲透",
+            "duration": "08:12"
+          }
+        },
+        {
+          "t": "09:31",
+          "text": "Boss: They talk ontology, we talk consciousness. One level higher",
+          "kind": "work"
+        },
+        {
+          "t": "10:07",
+          "text": "Boss: [Voice] 6″",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:12",
+            "text": "OK, I'll swing by the old office when I can"
+          },
+          {
+            "who": "member",
+            "t": "09:13",
+            "text": "Thanks Lao Zhou"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:14",
+            "text": "Received."
+          },
+          {
+            "who": "member",
+            "t": "09:14",
+            "text": "Received."
+          }
+        ],
+        "inner": "Two receiveds, both with full stops. Yesterday nobody used full stops."
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:15",
+            "text": "Fine, whatever works."
+          }
+        ],
+        "inner": "Someone in the group talks like me. Very politely."
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "inner": "Read. Not even a chicken photo this time."
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:16",
+            "text": "Wait for what, I'll get the boxes"
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:17",
+            "text": "Fine."
+          }
+        ],
+        "inner": "I typed a joke. What came back was 'Fine.'"
+      }
+    },
+    "xiaozhang": {
+      "incoming": [
+        {
+          "t": "10:07",
+          "text": "{calledBy}, did you see the log?",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:08",
+            "text": "OK {calledBy}"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:08",
+            "text": "{calledBy}, that log, did you see it? Just one horizontal line"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "xz_saw_changelog"
+          ]
+        },
+        "inner": "He saw it too. Two people saw it, so it's not my eyes."
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:09",
+            "text": "Then I'll leave it alone too"
+          }
+        ]
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:11",
+            "text": "{calledBy}, if you leave, I'm leaving too"
+          }
+        ],
+        "inner": "He said leave. I didn't say leave."
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:12",
+            "text": "I'll wait for you"
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:14",
+            "text": "Hahaha {calledBy}"
+          }
+        ]
+      }
+    },
+    "laozhou": {
+      "incoming": [
+        {
+          "t": "12:00",
+          "text": "One of the boxes at the old office is yours",
+          "kind": "private"
+        },
+        {
+          "t": "12:30",
+          "text": "Your light was still on at 2:40 last night",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:01",
+            "text": "OK"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:01",
+            "text": "Building management says the box is yours. A cardboard box, pretty heavy"
+          },
+          {
+            "who": "laozhou",
+            "t": "12:02",
+            "text": "No sender"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "lz_saw_box"
+          ]
+        },
+        "inner": "He's held that box. He says no sender."
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:02",
+            "text": "I told them to keep it for now. If you want it I'll send it to your place"
+          }
+        ]
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:05",
+            "text": "I haven't been paid this month either"
+          },
+          {
+            "who": "laozhou",
+            "t": "12:05",
+            "text": "Don't say it yet"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "lz_unpaid_too"
+          ]
+        },
+        "inner": "He hasn't been paid this month either. He says don't say it yet."
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:06",
+            "text": "Wait for what"
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:08",
+            "text": "Mm"
+          }
+        ]
+      }
+    }
+  }
+}

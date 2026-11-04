@@ -1,0 +1,341 @@
+{
+  "day": 3,
+  "recipients": {
+    "boss": {
+      "incoming": [
+        {
+          "t": "09:10",
+          "text": "[Voice] 23″",
+          "kind": "work"
+        },
+        {
+          "t": "09:10",
+          "text": "(Transcript) v18 is out today. Let it write. Don't you write.",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:10",
+            "text": "[Voice] 23″"
+          },
+          {
+            "who": "boss",
+            "t": "09:10",
+            "text": "(Transcript) Right, v18 is out today. Let it write, don't you write. Writing it yourself takes twenty minutes."
+          }
+        ],
+        "inner": "He knows it takes me twenty minutes. He's done the sums."
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:10",
+            "text": "👌"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:11",
+            "text": "Then go with what it wrote."
+          }
+        ],
+        "effects": {
+          "flags": [
+            "boss_said_follow_it"
+          ]
+        },
+        "inner": "Go with what it wrote. Five words, and my day is handed over."
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s",
+        "inner": "One second. He reads fast today."
+      }
+    },
+    "partner": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "[Card] v18 acceptance criteria · Template",
+          "kind": "work",
+          "card": {
+            "type": "file",
+            "name": "v18 验收标准.docx",
+            "size": "92 KB",
+            "ext": "doc"
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:30",
+            "text": "👍"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:30",
+            "text": "[Card] v18 acceptance criteria · Template"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "5s"
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "2min",
+        "interrupt": {
+          "who": "partner",
+          "where": "group",
+          "t": "09:40",
+          "text": "[Card] This week's milestones"
+        },
+        "inner": "I ask about wages; the group gets a milestone."
+      }
+    },
+    "group": {
+      "incoming": [
+        {
+          "t": "11:19",
+          "text": "Lao Zhou: Everyone order braised chicken for lunch, each your own, post a photo",
+          "kind": "private"
+        },
+        {
+          "t": "11:20",
+          "text": "Xiao Zhang: [Image] Braised chicken",
+          "kind": "private",
+          "card": {
+            "type": "image",
+            "src": "/msgs/covers/food.jpg",
+            "alt": "黄焖鸡"
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:20",
+            "text": "OK, braised chicken. Chief, order one too"
+          },
+          {
+            "who": "xiaozhang",
+            "t": "11:20",
+            "text": "[Image] Braised chicken"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:21",
+            "text": "Received received"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:21",
+            "text": "Whatever works, then braised chicken"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "lunch_d3"
+          ]
+        }
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "interrupt": {
+          "who": "member",
+          "where": "group",
+          "t": "11:25",
+          "text": "[Image] Braised chicken"
+        },
+        "inner": "What the group sends me back is a photo of chicken."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:22",
+            "text": "Chief, you're eating today too?"
+          },
+          {
+            "who": "xiaozhang",
+            "t": "11:22",
+            "text": "{calledBy}, don't drink cold water"
+          }
+        ]
+      }
+    },
+    "xiaozhang": {
+      "incoming": [
+        {
+          "t": "15:02",
+          "text": "{calledBy}, did you read my part?",
+          "kind": "work"
+        },
+        {
+          "t": "16:40",
+          "text": "I really think the emergence road is wrong. With the little data we have, you can't pile it up into anything",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "15:03",
+            "text": "OK {calledBy}!"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "15:03",
+            "text": "{calledBy}, did you read what I wrote?"
+          }
+        ],
+        "inner": "I did. I'm the only one who reads."
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "15:04",
+            "text": "Then I'll have it rewrite it ok"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "xz_let_it_do_d3"
+          ]
+        },
+        "inner": "He's learned 'have it rewrite it'. From whom."
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "15:05",
+            "text": "{calledBy}……"
+          }
+        ],
+        "inner": "An ellipsis. He doesn't know what to say. Nor do I."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "15:07",
+            "text": "Received {calledBy}"
+          }
+        ]
+      }
+    },
+    "laozhou": {
+      "incoming": [
+        {
+          "t": "11:19",
+          "text": "Braised chicken?",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:19",
+            "text": "[Image] Braised chicken"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:19",
+            "text": "👍"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:19",
+            "text": "You're so easy to deal with"
+          }
+        ]
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:30",
+            "text": "Not in the group"
+          },
+          {
+            "who": "laozhou",
+            "t": "11:30",
+            "text": "Eat"
+          }
+        ],
+        "inner": "Not in the group. He knows someone reads the group."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:32",
+            "text": "Mm mm"
+          }
+        ]
+      }
+    }
+  }
+}

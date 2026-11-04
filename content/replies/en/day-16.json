@@ -1,0 +1,452 @@
+{
+  "day": 16,
+  "recipients": {
+    "boss": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "Good to see you.",
+          "kind": "odd"
+        },
+        {
+          "t": "09:00",
+          "text": "[Voice] 0″",
+          "kind": "odd"
+        },
+        {
+          "t": "09:00",
+          "text": "(Transcript) The chairman doesn't read the materials. Just make some noise. Don't stop.",
+          "kind": "work"
+        },
+        {
+          "t": "12:00",
+          "text": "Is the door locked.",
+          "kind": "odd",
+          "effects": {
+            "flags": [
+              "boss_asks_door"
+            ]
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:05",
+            "text": "Good."
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:05",
+            "text": "Received."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "gone",
+        "lines": [],
+        "inner": "'No' is greyed out. The chick's word, taken back today."
+      },
+      "wait": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:06",
+            "text": "Go ahead."
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:06",
+            "text": "Is the door locked."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:07",
+            "text": "It means what it says."
+          }
+        ]
+      },
+      "how-much": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:08",
+            "text": "Not much."
+          }
+        ],
+        "effects": {
+          "flags": [
+            "boss_not_much"
+          ]
+        },
+        "inner": "How much. Not much. Thirteen months, not much."
+      }
+    },
+    "partner": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "[Card] A landscape",
+          "kind": "private",
+          "card": {
+            "type": "image",
+            "src": "/msgs/covers/landscape.jpg",
+            "alt": "一张风景"
+          }
+        },
+        {
+          "t": "10:10",
+          "text": "Add an opening line, it'll look more formal.",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "👍"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "👍"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "wait": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "im-going-in": {
+        "status": "silence",
+        "lines": []
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:32",
+            "text": "[Card] A landscape"
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "read",
+        "lines": []
+      },
+      "how-much": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s"
+      }
+    },
+    "group": {
+      "incoming": [
+        {
+          "t": "09:20",
+          "text": "member: Good morning.",
+          "kind": "private"
+        },
+        {
+          "t": "09:20",
+          "text": "member: Good morning.",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:21",
+            "text": "Fine."
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:21",
+            "text": "Received."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "wait": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:22",
+            "text": "Thanks."
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:22",
+            "text": "Good morning."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:23",
+            "text": "Fine."
+          }
+        ]
+      },
+      "what-do-you-mean": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:23",
+            "text": "Fine."
+          }
+        ]
+      },
+      "how-much": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:24",
+            "text": "Fine."
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:25",
+            "text": "Fine."
+          }
+        ],
+        "inner": "Lao Zhou's avatar is gone too."
+      }
+    },
+    "xiaozhang": {
+      "incoming": [],
+      "fine": {
+        "status": "silence",
+        "lines": []
+      },
+      "received": {
+        "status": "silence",
+        "lines": []
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "wait": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "im-going-in": {
+        "status": "silence",
+        "lines": []
+      },
+      "say-it-again": {
+        "status": "silence",
+        "lines": []
+      },
+      "what-llm": {
+        "status": "silence",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "silence",
+        "lines": []
+      },
+      "how-much": {
+        "status": "silence",
+        "lines": []
+      },
+      "free": {
+        "status": "silence",
+        "lines": []
+      }
+    },
+    "laozhou": {
+      "incoming": [
+        {
+          "t": "10:30",
+          "text": "Say thank you everyone at the end.",
+          "kind": "private"
+        },
+        {
+          "t": "12:00",
+          "text": "[Account deactivated]",
+          "kind": "odd",
+          "effects": {
+            "flags": [
+              "lz_gone"
+            ]
+          }
+        }
+      ],
+      "fine": {
+        "status": "silence",
+        "lines": [],
+        "inner": "Lao Zhou's gone too."
+      },
+      "received": {
+        "status": "silence",
+        "lines": []
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "wait": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "im-going-in": {
+        "status": "silence",
+        "lines": []
+      },
+      "say-it-again": {
+        "status": "silence",
+        "lines": []
+      },
+      "what-llm": {
+        "status": "silence",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "silence",
+        "lines": []
+      },
+      "how-much": {
+        "status": "silence",
+        "lines": []
+      },
+      "free": {
+        "status": "silence",
+        "lines": []
+      }
+    }
+  }
+}

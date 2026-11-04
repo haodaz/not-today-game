@@ -1,0 +1,454 @@
+{
+  "day": 6,
+  "recipients": {
+    "boss": {
+      "incoming": [
+        {
+          "t": "09:12",
+          "text": "Good morning. Add CSV to the export, today.",
+          "kind": "work",
+          "note": "第一次夹英文"
+        },
+        {
+          "t": "09:30",
+          "text": "[File] Someone else's BP",
+          "kind": "work",
+          "card": {
+            "type": "file",
+            "name": "某某科技_商业计划书.pdf",
+            "size": "6.9 MB",
+            "ext": "pdf"
+          }
+        },
+        {
+          "t": "09:30",
+          "text": "Look at this. Relations first, things after. They tell it well",
+          "kind": "work"
+        },
+        {
+          "t": "09:32",
+          "text": "[Voice] 12″",
+          "kind": "work"
+        },
+        {
+          "t": "09:32",
+          "text": "(Transcript) The client wants one page on the ontology. Say it's older than people. Before people gave things names, the relations were already there.",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:12",
+            "text": "Good. One step at a time."
+          }
+        ],
+        "inner": "Good. The first time he's used English."
+      },
+      "received": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s"
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:12",
+            "text": "Whatever works."
+          }
+        ],
+        "effects": {
+          "flags": [
+            "boss_speaks_it"
+          ]
+        },
+        "inner": "Whatever works. That line isn't his. I know whose it is."
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s",
+        "interrupt": {
+          "who": "boss",
+          "where": "boss",
+          "t": "09:13",
+          "text": "[Voice] 5″"
+        },
+        "inner": "Five seconds. I didn't open it."
+      },
+      "no": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s",
+        "inner": "'No.' Read. He doesn't even ask 'no what' anymore."
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:14",
+            "text": "We can wait."
+          }
+        ],
+        "inner": "We can wait. The partner said it yesterday. They're working from the same script."
+      }
+    },
+    "partner": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "[Card] This week's milestones · Updated",
+          "kind": "work",
+          "card": {
+            "type": "task",
+            "title": "本周里程碑",
+            "fields": [
+              [
+                "负责人",
+                "你"
+              ],
+              [
+                "截止",
+                "周五"
+              ],
+              [
+                "状态",
+                "进行中"
+              ]
+            ]
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:30",
+            "text": "👍"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:30",
+            "text": "[Card] This week's milestones · Updated"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "Whatever works for you."
+          }
+        ],
+        "inner": "He's learned it too."
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1h"
+      },
+      "no": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "2s"
+      },
+      "wait": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "2s"
+      }
+    },
+    "group": {
+      "incoming": [
+        {
+          "t": "09:19",
+          "text": "member: Good morning.",
+          "kind": "private"
+        },
+        {
+          "t": "09:19",
+          "text": "member: Good morning.",
+          "kind": "private"
+        },
+        {
+          "t": "10:10",
+          "text": "Client: What are its requirements? It has to be connected, surely",
+          "kind": "work"
+        },
+        {
+          "t": "17:00",
+          "text": "Boss: [Forwarded] What the ontology is (for the client)",
+          "kind": "work",
+          "forwarded": true,
+          "cond_show": {
+            "has": "sent_d6-ontology"
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:20",
+            "text": "Fine."
+          },
+          {
+            "who": "member",
+            "t": "09:20",
+            "text": "Fine."
+          },
+          {
+            "who": "member",
+            "t": "09:20",
+            "text": "Fine."
+          }
+        ],
+        "inner": "Three fines, three full stops, three seconds. Neat as a row."
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:21",
+            "text": "Received, thanks."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:21",
+            "text": "Whatever works, as arranged."
+          }
+        ]
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "inner": "Read. Lao Zhou's avatar has gone grey."
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:22",
+            "text": "Understood."
+          }
+        ],
+        "inner": "Understood. Who understood. Understood what."
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:22",
+            "text": "Fine, waiting for word."
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:24",
+            "text": "Fine."
+          }
+        ],
+        "inner": "Whatever I type. Fine."
+      }
+    },
+    "xiaozhang": {
+      "incoming": [
+        {
+          "t": "11:30",
+          "text": "{calledBy}, there are typos in the doc, two, I didn't type them",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:31",
+            "text": "OK {calledBy}"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:31",
+            "text": "{calledBy}, does your doc have typos? I can see two"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "xz_saw_typos"
+          ]
+        },
+        "inner": "He saw the typos. I didn't type them."
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:32",
+            "text": "Then I'll have it fix them"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "xz_let_it_do_d6"
+          ]
+        }
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:33",
+            "text": "{calledBy}, mine was three days late this month too"
+          }
+        ],
+        "inner": "Three days. It's started."
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:34",
+            "text": "No what {calledBy}"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:34",
+            "text": "OK, I'll wait for you"
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:36",
+            "text": "OK {calledBy}"
+          }
+        ]
+      }
+    },
+    "laozhou": {
+      "incoming": [
+        {
+          "t": "12:38",
+          "text": "[Voice] 3″",
+          "kind": "odd",
+          "note": "嚼东西的声音"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:40",
+            "text": "Mm"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:40",
+            "text": "Received"
+          }
+        ],
+        "inner": "Lao Zhou says received. He never used to say received."
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:41",
+            "text": "OK"
+          }
+        ]
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:50",
+            "text": "505"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "lz_505"
+          ]
+        },
+        "inner": "505. He sent a number. Upside down it's SOS. He wouldn't know that."
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:41",
+            "text": "No"
+          }
+        ]
+      },
+      "wait": {
+        "status": "typing",
+        "lines": [],
+        "inner": "Typing. For a long time. Nothing comes."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:55",
+            "text": "Eat first"
+          }
+        ]
+      }
+    }
+  }
+}

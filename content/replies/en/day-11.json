@@ -1,0 +1,563 @@
+{
+  "day": 11,
+  "recipients": {
+    "boss": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "Good to see you, {bossCalls}.",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "[Voice] 27″",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "(Transcript) Reconciliation today. Let it reconcile, you take a look. It'll mark the numbers that are off.",
+          "kind": "work"
+        },
+        {
+          "t": "09:40",
+          "text": "(Transcript) The costs must balance. Not a cent out.",
+          "kind": "work"
+        },
+        {
+          "t": "20:10",
+          "text": "Hold the fort.",
+          "kind": "odd"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:10",
+            "text": "Good."
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:10",
+            "text": "Received."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s",
+        "interrupt": {
+          "who": "boss",
+          "where": "boss",
+          "t": "09:11",
+          "text": "One step at a time."
+        },
+        "inner": "One step at a time. Its words, out of his mouth."
+      },
+      "no": {
+        "status": "read",
+        "lines": []
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:12",
+            "text": "Take your time."
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "read",
+        "lines": []
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:12",
+            "text": "Good to see you, {bossCalls}."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:13",
+            "text": "What model?"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "boss_what_model"
+          ]
+        },
+        "inner": "What model. Either he really doesn't know, or he really is him."
+      }
+    },
+    "partner": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "[Card] Reconciliation · Template",
+          "kind": "work",
+          "card": {
+            "type": "file",
+            "name": "对账模板.xlsx",
+            "size": "64 KB",
+            "ext": "xls"
+          }
+        },
+        {
+          "t": "09:30",
+          "text": "Cut costs, raise efficiency. A version before you log off.",
+          "kind": "work"
+        },
+        {
+          "t": "09:31",
+          "text": "Don't touch the oil and wine columns. Those are the board's.",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "👍"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "Received."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1d",
+        "inner": "Read only the next day."
+      },
+      "no": {
+        "status": "read",
+        "lines": []
+      },
+      "wait": {
+        "status": "read",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "silence",
+        "lines": []
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:32",
+            "text": "[Card] Reconciliation · Template"
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s"
+      }
+    },
+    "group": {
+      "incoming": [
+        {
+          "t": "09:20",
+          "text": "member: Good morning.",
+          "kind": "private"
+        },
+        {
+          "t": "09:20",
+          "text": "member: Good morning.",
+          "kind": "private"
+        },
+        {
+          "t": "09:20",
+          "text": "member: Good morning.",
+          "kind": "private"
+        },
+        {
+          "t": "09:21",
+          "text": "member: Good morning.",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:22",
+            "text": "Fine."
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:22",
+            "text": "Received."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "read",
+        "lines": []
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:23",
+            "text": "Understood."
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:23",
+            "text": "Fine."
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:23",
+            "text": "Thanks."
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:24",
+            "text": "Good morning."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:25",
+            "text": "Fine."
+          }
+        ],
+        "inner": "I ask if they switched models. Fine."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:26",
+            "text": "Fine."
+          }
+        ],
+        "inner": "Lao Zhou's avatar is still grey."
+      }
+    },
+    "xiaozhang": {
+      "incoming": [
+        {
+          "t": "11:03",
+          "text": "{calledBy}, are the colours off on your end?",
+          "kind": "work",
+          "effects": {
+            "flags": [
+              "xz_saw_tint"
+            ]
+          }
+        },
+        {
+          "t": "11:03",
+          "text": "My screen's a bit off too",
+          "kind": "work"
+        },
+        {
+          "t": "11:10",
+          "text": "I checked the receivables.",
+          "kind": "private"
+        },
+        {
+          "t": "11:11",
+          "text": "Jiangyu City Data Resources Bureau, Hongyi Group, Yuanshu Intelligence: all said they paid. It's not in the accounts.",
+          "kind": "private"
+        },
+        {
+          "t": "11:12",
+          "text": "Only Qinghe actually arrived. A month late, but it arrived.",
+          "kind": "private"
+        },
+        {
+          "t": "11:13",
+          "text": "Lost things, I can find. Hidden things too.",
+          "kind": "odd"
+        },
+        {
+          "t": "17:50",
+          "text": "{calledBy}, Chief, I want to leave",
+          "kind": "private",
+          "effects": {
+            "flags": [
+              "xz_wants_to_leave"
+            ]
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:04",
+            "text": "OK {calledBy}"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:04",
+            "text": "{calledBy}, you saw it too?"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:05",
+            "text": "{calledBy}, my mum says forget it"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:05",
+            "text": "No what"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:05",
+            "text": "I'll wait for you"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:06",
+            "text": "{calledBy}, don't"
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:06",
+            "text": "I said my screen's a bit off too"
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:07",
+            "text": "{calledBy}, who are you asking"
+          },
+          {
+            "who": "xiaozhang",
+            "t": "11:07",
+            "text": "It was switched. I saw the log"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "xz_confirms_model_switch"
+          ],
+          "san": 1
+        },
+        "inner": "He saw it. Two people saw it."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "11:09",
+            "text": "OK {calledBy}"
+          }
+        ]
+      }
+    },
+    "laozhou": {
+      "incoming": [
+        {
+          "t": "11:50",
+          "text": "The braised chicken's gone. I saved you a bowl of barley rice. Three measures of barley for a penny, a bargain.",
+          "kind": "private"
+        },
+        {
+          "t": "12:02",
+          "text": "[Voice] 3″",
+          "kind": "odd",
+          "note": "点开是嚼东西的声音"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:03",
+            "text": "Mm"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:03",
+            "text": "Received"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "inner": "Lao Zhou read it and didn't reply. The first time."
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:04",
+            "text": "No"
+          }
+        ]
+      },
+      "wait": {
+        "status": "typing",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "read",
+        "lines": []
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:05",
+            "text": "[Voice] 3″"
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:06",
+            "text": "What model"
+          }
+        ],
+        "inner": "What model. He really doesn't know."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:40",
+            "text": "Eat first"
+          }
+        ]
+      }
+    }
+  }
+}

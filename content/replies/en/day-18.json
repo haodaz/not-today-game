@@ -1,0 +1,403 @@
+{
+  "day": 18,
+  "recipients": {
+    "boss": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "{bossCalls}, send the box off today.",
+          "kind": "work",
+          "effects": {
+            "flags": [
+              "boss_says_ship"
+            ]
+          }
+        },
+        {
+          "t": "09:00",
+          "text": "[Voice] 0″",
+          "kind": "odd"
+        },
+        {
+          "t": "17:00",
+          "text": "You did great. Rest now.",
+          "kind": "odd"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:05",
+            "text": "Good. Once it's sent, all will be well."
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:05",
+            "text": "Received."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "wait": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "im-going-in": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:06",
+            "text": "Send the box off today."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "how-much": {
+        "status": "read",
+        "lines": []
+      }
+    },
+    "partner": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "[Card] Shipping slip · Template",
+          "kind": "work",
+          "card": {
+            "type": "file",
+            "name": "寄件单.pdf",
+            "size": "41 KB",
+            "ext": "pdf"
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "👍"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "👍"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "wait": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "im-going-in": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:32",
+            "text": "[Card] Shipping slip · Template"
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "how-much": {
+        "status": "read",
+        "lines": []
+      }
+    },
+    "group": {
+      "incoming": [
+        {
+          "t": "09:20",
+          "text": "member: Thanks for your hard work today too.",
+          "kind": "private"
+        },
+        {
+          "t": "09:20",
+          "text": "member: Thanks for your hard work today too.",
+          "kind": "private"
+        },
+        {
+          "t": "09:20",
+          "text": "member: Thanks for your hard work today too.",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:21",
+            "text": "Fine."
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:21",
+            "text": "Received."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "wait": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "im-going-in": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:22",
+            "text": "Thanks for your hard work today too."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:22",
+            "text": "Fine."
+          }
+        ]
+      },
+      "what-do-you-mean": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "how-much": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:23",
+            "text": "Fine."
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:24",
+            "text": "Fine."
+          }
+        ]
+      }
+    },
+    "xiaozhang": {
+      "incoming": [],
+      "fine": {
+        "status": "silence",
+        "lines": []
+      },
+      "received": {
+        "status": "silence",
+        "lines": []
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "wait": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "im-going-in": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "say-it-again": {
+        "status": "silence",
+        "lines": []
+      },
+      "what-llm": {
+        "status": "silence",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "how-much": {
+        "status": "silence",
+        "lines": []
+      },
+      "free": {
+        "status": "silence",
+        "lines": []
+      }
+    },
+    "laozhou": {
+      "incoming": [],
+      "fine": {
+        "status": "silence",
+        "lines": []
+      },
+      "received": {
+        "status": "silence",
+        "lines": []
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "wait": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "im-going-in": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "say-it-again": {
+        "status": "silence",
+        "lines": []
+      },
+      "what-llm": {
+        "status": "silence",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "how-much": {
+        "status": "silence",
+        "lines": []
+      },
+      "free": {
+        "status": "silence",
+        "lines": []
+      }
+    }
+  }
+}

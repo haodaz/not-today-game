@@ -1,0 +1,397 @@
+{
+  "day": 2,
+  "recipients": {
+    "boss": {
+      "incoming": [],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:13",
+            "text": "Fine. Pull a first version of the storyline, nothing detailed, just get the feel right."
+          }
+        ],
+        "inner": "Just get the feel right. A feel can't be saved as a file."
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:13",
+            "text": "👌"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "2s",
+        "interrupt": {
+          "who": "partner",
+          "where": "partner",
+          "t": "09:14",
+          "text": "[Card] Storyline · Style reference"
+        },
+        "inner": "I said whatever works, and the partner sent a card at once. They're together on this."
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "3s",
+        "interrupt": {
+          "who": "boss",
+          "where": "group",
+          "t": "09:20",
+          "text": "Lunch is on me, everyone order. None for me."
+        },
+        "inner": "He's paying. For lunch, not wages."
+      }
+    },
+    "partner": {
+      "incoming": [
+        {
+          "t": "08:50",
+          "text": "[Card] Storyline · Style reference",
+          "kind": "work",
+          "card": {
+            "type": "article",
+            "account": "PPT 研究所",
+            "title": "投资人最爱的 10 种叙事页，第 7 种最狠",
+            "digest": "一页一个数字，留白比内容重要。",
+            "cover": "/msgs/covers/deck.jpg"
+          }
+        },
+        {
+          "t": "08:50",
+          "text": "[Card] Storyline · Sources",
+          "kind": "work",
+          "card": {
+            "type": "link",
+            "title": "某某资本 · 2028 年行业观察（节选）",
+            "site": "research.example.cn"
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:30",
+            "text": "[Card] Storyline · Style reference"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:30",
+            "text": "👍"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:30",
+            "text": "[Card] Storyline · Sources"
+          }
+        ],
+        "inner": "He answers with cards, not words. A card doesn't have to answer for anything."
+      },
+      "salary": {
+        "status": "typing",
+        "lines": [],
+        "inner": "Typing. On, off, nothing comes."
+      }
+    },
+    "group": {
+      "incoming": [
+        {
+          "t": "09:41",
+          "text": "Vivi: Iterated again last night. This time it evolves by itself.",
+          "kind": "work"
+        },
+        {
+          "t": "09:41",
+          "text": "Vivi: [Web page] EVO_SelfEvolvingEngine_v2.0.html",
+          "kind": "deliverable",
+          "doc": "vivi-plan-2"
+        },
+        {
+          "t": "09:42",
+          "text": "Vivi: Human involvement 0%. That's what we want.",
+          "kind": "work"
+        },
+        {
+          "t": "09:43",
+          "text": "Vivi: @tech do this one too",
+          "kind": "work"
+        },
+        {
+          "t": "09:44",
+          "text": "member：👍👍",
+          "kind": "work"
+        },
+        {
+          "t": "09:45",
+          "text": "Boss: This is the right direction",
+          "kind": "work"
+        },
+        {
+          "t": "11:46",
+          "text": "Marketing: +1",
+          "kind": "private"
+        },
+        {
+          "t": "11:46",
+          "text": "member：+1",
+          "kind": "private"
+        },
+        {
+          "t": "11:50",
+          "text": "Boss: Lunch is on me, everyone order. None for me.",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "11:46",
+            "text": "+1"
+          },
+          {
+            "who": "member",
+            "t": "11:46",
+            "text": "+1"
+          },
+          {
+            "who": "member",
+            "t": "11:47",
+            "text": "+1"
+          }
+        ],
+        "inner": "I say fine, three +1s follow. As if someone said it for me."
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:47",
+            "text": "Received, then order. Chief, chicken for you?"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:48",
+            "text": "Then order one for yourself too, and actually eat it."
+          }
+        ],
+        "effects": {
+          "flags": [
+            "lunch_d2"
+          ]
+        }
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "interrupt": {
+          "who": "boss",
+          "where": "group",
+          "t": "11:50",
+          "text": "[Image] Menu"
+        },
+        "inner": "I talk about wages in the group; the boss posts a menu."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "11:49",
+            "text": "+1"
+          }
+        ],
+        "inner": "I typed a whole sentence. What came back was a +1."
+      }
+    },
+    "xiaozhang": {
+      "incoming": [
+        {
+          "t": "10:20",
+          "text": "{calledBy}, Vivi posted another one and wants us to copy it",
+          "kind": "work"
+        },
+        {
+          "t": "10:21",
+          "text": "It's not even the same thing, she doesn't have an API",
+          "kind": "work"
+        },
+        {
+          "t": "10:22",
+          "text": "Can you look at what we can actually build?",
+          "kind": "work"
+        },
+        {
+          "t": "10:23",
+          "text": "The graph has industries and data. The organisation part, we never touched.",
+          "kind": "work"
+        },
+        {
+          "t": "14:10",
+          "text": "{calledBy}, did you rename that field in the data model?",
+          "kind": "work"
+        },
+        {
+          "t": "15:00",
+          "text": "Thanks {calledBy}.",
+          "kind": "work",
+          "cond_show": {
+            "has": "sent_d2-vivi-page"
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "14:11",
+            "text": "OK {calledBy}, I'll hook into the new format then"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "14:12",
+            "text": "{calledBy}, was it you? I can't see a commit"
+          }
+        ],
+        "inner": "He reads the commit log. The kid still reads it."
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "14:12",
+            "text": "I'll go with the old one for now, tell me if it's wrong"
+          }
+        ]
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "14:13",
+            "text": "{calledBy}, don't scare me"
+          }
+        ],
+        "inner": "He thought I meant his."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "14:15",
+            "text": "OK {calledBy}"
+          }
+        ]
+      }
+    },
+    "laozhou": {
+      "incoming": [
+        {
+          "t": "17:40",
+          "text": "Looking for what",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "17:40",
+            "text": "Fine is fine"
+          },
+          {
+            "who": "laozhou",
+            "t": "17:40",
+            "text": "Looking for what"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "17:41",
+            "text": "OK"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "17:41",
+            "text": "You, honestly"
+          }
+        ]
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "17:42",
+            "text": "Mine's sent"
+          },
+          {
+            "who": "laozhou",
+            "t": "17:43",
+            "text": "Yours is… never mind"
+          },
+          {
+            "who": "laozhou",
+            "t": "17:43",
+            "text": "[Message recalled]"
+          }
+        ],
+        "inner": "What came after 'never mind' was recalled."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "17:45",
+            "text": "Mm"
+          }
+        ]
+      }
+    }
+  }
+}

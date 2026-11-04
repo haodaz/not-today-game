@@ -1,0 +1,529 @@
+{
+  "day": 7,
+  "recipients": {
+    "boss": {
+      "incoming": [
+        {
+          "t": "09:05",
+          "text": "[Voice] 19″",
+          "kind": "work"
+        },
+        {
+          "t": "09:05",
+          "text": "(Transcript) {bossCalls}, the weekly meeting is a morning meeting from now on, nine every day, Lao Zhou hosts. You do the minutes, by the template.",
+          "kind": "work"
+        },
+        {
+          "t": "16:40",
+          "text": "[Voice] 4″",
+          "kind": "odd",
+          "note": "点开只有雨声"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:14",
+            "text": "Fine, {bossCalls}."
+          }
+        ],
+        "inner": "He used my name. Only I have ever typed into that login box."
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:14",
+            "text": "Received."
+          }
+        ],
+        "inner": "Received. He took my word and used it."
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:15",
+            "text": "Then do all six."
+          }
+        ],
+        "effects": {
+          "flags": [
+            "boss_six_pdfs"
+          ]
+        }
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s",
+        "interrupt": {
+          "who": "boss",
+          "where": "boss",
+          "t": "09:16",
+          "text": "[Voice] 4″"
+        },
+        "inner": "A four-second voice note. It's rain. Nobody speaking."
+      },
+      "no": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s"
+      },
+      "wait": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s"
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:20",
+            "text": "Go in where?"
+          }
+        ],
+        "inner": "Go in where. He actually asked."
+      }
+    },
+    "partner": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "[Card] Product plan · Structure template",
+          "kind": "work",
+          "card": {
+            "type": "file",
+            "name": "产品方案_结构模板.pptx",
+            "size": "3.1 MB",
+            "ext": "doc"
+          }
+        },
+        {
+          "t": "10:05",
+          "text": "Put my line first in the minutes.",
+          "kind": "work"
+        },
+        {
+          "t": "10:06",
+          "text": "Skip the closing part, just leave.",
+          "kind": "work"
+        },
+        {
+          "t": "14:00",
+          "text": "[Card] Six versions",
+          "kind": "work",
+          "card": {
+            "type": "file",
+            "name": "产品方案_六份口径.zip",
+            "size": "18.4 MB",
+            "ext": "pdf"
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "👍"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "[Card] Six versions"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "2s"
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "3h"
+      },
+      "no": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "2s"
+      },
+      "wait": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "2s"
+      },
+      "im-going-in": {
+        "status": "silence",
+        "lines": [],
+        "inner": "Not even read."
+      }
+    },
+    "group": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "Lao Zhou: Morning meeting, nine, online. Everyone switch your background to the same circle first.",
+          "kind": "work"
+        },
+        {
+          "t": "09:02",
+          "text": "Lao Zhou: Each of you state your rank and your headcount.",
+          "kind": "work"
+        },
+        {
+          "t": "09:21",
+          "text": "Lao Zhou: Meeting closed.",
+          "kind": "work"
+        },
+        {
+          "t": "09:40",
+          "text": "Lao Zhou: Minutes by the template. No improvising.",
+          "kind": "work"
+        },
+        {
+          "t": "09:41",
+          "text": "member：👍",
+          "kind": "work"
+        },
+        {
+          "t": "09:41",
+          "text": "member：👍",
+          "kind": "work"
+        },
+        {
+          "t": "16:10",
+          "text": "Lao Zhou: Very good. Same again tomorrow.",
+          "kind": "work",
+          "cond_show": {
+            "has": "sent_d7-minutes"
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:42",
+            "text": "Fine!"
+          },
+          {
+            "who": "member",
+            "t": "09:42",
+            "text": "👍"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:43",
+            "text": "Received, thanks {calledBy}."
+          }
+        ],
+        "inner": "Someone in the group calls me Chief. Not Xiao Zhang, not Lao Zhou."
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:43",
+            "text": "Whatever works, {calledBy}'s call."
+          }
+        ]
+      },
+      "salary": {
+        "status": "read",
+        "lines": []
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:44",
+            "text": "Understood."
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:44",
+            "text": "Fine, waiting for word."
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:45",
+            "text": "Oh, you read it. I thought nobody read it"
+          }
+        ],
+        "inner": "Lao Zhou picked up that line. He picks it up every time."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:46",
+            "text": "Fine."
+          }
+        ]
+      }
+    },
+    "xiaozhang": {
+      "incoming": [
+        {
+          "t": "09:50",
+          "text": "We can skip the roll call, we all know each other.",
+          "kind": "work"
+        },
+        {
+          "t": "10:30",
+          "text": "{calledBy}, want me to split the six versions for you?",
+          "kind": "work"
+        },
+        {
+          "t": "13:10",
+          "text": "{calledBy}, you didn't eat lunch, did you",
+          "kind": "private"
+        },
+        {
+          "t": "15:00",
+          "text": "Did you catch the morning meeting? Everyone said the same sentence.",
+          "kind": "private"
+        },
+        {
+          "t": "15:01",
+          "text": "I said it too.",
+          "kind": "odd"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:31",
+            "text": "Got it {calledBy}"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:31",
+            "text": "{calledBy}, you didn't say good morning back today"
+          }
+        ],
+        "inner": "He said good morning. I never saw it. It's not in the list."
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:32",
+            "text": "I'll split them then"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "xz_splits_six"
+          ]
+        }
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:33",
+            "text": "{calledBy}, my mum asked again"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:33",
+            "text": "OK, no means no"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:33",
+            "text": "I'll wait for you"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:34",
+            "text": "Go in where, {calledBy}?"
+          },
+          {
+            "who": "xiaozhang",
+            "t": "10:34",
+            "text": "Don't scare me"
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:36",
+            "text": "Hahaha OK {calledBy}"
+          }
+        ]
+      }
+    },
+    "laozhou": {
+      "incoming": [
+        {
+          "t": "09:44",
+          "text": "I wrote a version once, it's on the shared drive, did you look",
+          "kind": "work"
+        },
+        {
+          "t": "12:00",
+          "text": "Eat",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:45",
+            "text": "OK, then you look"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:46",
+            "text": "Maybe. I don't write anymore anyway"
+          },
+          {
+            "who": "laozhou",
+            "t": "09:46",
+            "text": "[Message recalled]"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:46",
+            "text": "You, honestly"
+          }
+        ]
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:05",
+            "text": "Stop asking"
+          },
+          {
+            "who": "laozhou",
+            "t": "12:05",
+            "text": "Eat"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:47",
+            "text": "No means no"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:47",
+            "text": "Wait for what"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:48",
+            "text": "Once you're in, don't look back"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "lz_said_dont_look_back"
+          ]
+        },
+        "inner": "Once you're in, don't look back. That one doesn't sound like a joke."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:50",
+            "text": "Mm"
+          }
+        ]
+      }
+    }
+  }
+}

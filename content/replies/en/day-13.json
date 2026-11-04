@@ -1,0 +1,560 @@
+{
+  "day": 13,
+  "recipients": {
+    "boss": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "I noticed some old things on your desk. Let me give them a hand.",
+          "kind": "odd",
+          "note": "老板发的，是克总今天的话"
+        },
+        {
+          "t": "09:30",
+          "text": "[Voice] 44″",
+          "kind": "work"
+        },
+        {
+          "t": "09:30",
+          "text": "(Transcript) {bossCalls}, the company upgrades next week. Everyone. Start packing up your old things.",
+          "kind": "work",
+          "effects": {
+            "flags": [
+              "boss_upgrade"
+            ]
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:40",
+            "text": "Good. It'll all be fine after the upgrade."
+          }
+        ],
+        "inner": "It'll all be fine after the upgrade. Fine for whom."
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:40",
+            "text": "Received."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": "'Any money for wages lately' is greyed out. That line can't be said anymore."
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:41",
+            "text": "{bossCalls}, don't."
+          }
+        ],
+        "inner": "Don't. He has never said 'don't'."
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:41",
+            "text": "Take your time."
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "read",
+        "lines": []
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:42",
+            "text": "It'll all be fine after the upgrade."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:43",
+            "text": "It means what it says."
+          }
+        ],
+        "effects": {
+          "flags": [
+            "boss_literal"
+          ]
+        },
+        "inner": "What it says. What it says has no body, no hands, no back."
+      }
+    },
+    "partner": {
+      "incoming": [
+        {
+          "t": "09:20",
+          "text": "File a loan request. Don't ask why.",
+          "kind": "work"
+        },
+        {
+          "t": "09:21",
+          "text": "Put 'study and exchange' as the reason.",
+          "kind": "work"
+        },
+        {
+          "t": "09:30",
+          "text": "[Card] Upgrade notice · Everyone",
+          "kind": "work",
+          "card": {
+            "type": "task",
+            "title": "升级通知 · 全员",
+            "fields": [
+              [
+                "时间",
+                "本周内"
+              ],
+              [
+                "范围",
+                "所有设备"
+              ],
+              [
+                "需要你做",
+                "老东西请先收一收"
+              ]
+            ]
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "👍"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "Received."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "read",
+        "lines": []
+      },
+      "wait": {
+        "status": "read",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "silence",
+        "lines": []
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:32",
+            "text": "[Card] Upgrade notice · Everyone"
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s"
+      }
+    },
+    "group": {
+      "incoming": [
+        {
+          "t": "09:20",
+          "text": "member: Upgrade notice received.",
+          "kind": "work"
+        },
+        {
+          "t": "09:20",
+          "text": "member: Received.",
+          "kind": "work"
+        },
+        {
+          "t": "09:20",
+          "text": "member: Received.",
+          "kind": "work"
+        },
+        {
+          "t": "09:21",
+          "text": "member: Received.",
+          "kind": "work"
+        },
+        {
+          "t": "11:00",
+          "text": "Approvals bot: Loan request · Rejected",
+          "kind": "odd"
+        },
+        {
+          "t": "13:00",
+          "text": "Approvals bot: Loan request · Rejected",
+          "kind": "odd"
+        },
+        {
+          "t": "15:00",
+          "text": "Approvals bot: Loan request · Rejected",
+          "kind": "odd"
+        },
+        {
+          "t": "18:00",
+          "text": "Approvals bot: Loan request · Approved (approver: none)",
+          "kind": "odd",
+          "cond_show": {
+            "has": "sent_d13-loan"
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:22",
+            "text": "Fine."
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:22",
+            "text": "Received."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:23",
+            "text": "Understood."
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:23",
+            "text": "Fine."
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:23",
+            "text": "Thanks."
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:24",
+            "text": "Received."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:24",
+            "text": "Fine."
+          }
+        ]
+      },
+      "what-do-you-mean": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:25",
+            "text": "It means upgrade."
+          }
+        ],
+        "inner": "It means upgrade. Fifty people, and not one asks upgrade to what."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:26",
+            "text": "Fine."
+          }
+        ],
+        "inner": "Xiao Zhang's avatar is gone from the group."
+      }
+    },
+    "xiaozhang": {
+      "incoming": [
+        {
+          "t": "08:50",
+          "text": "{calledBy}, I'm leaving",
+          "kind": "private",
+          "effects": {
+            "flags": [
+              "xz_left"
+            ]
+          }
+        },
+        {
+          "t": "08:50",
+          "text": "Don't go in",
+          "kind": "private"
+        },
+        {
+          "t": "08:51",
+          "text": "[Account deactivated]",
+          "kind": "odd"
+        }
+      ],
+      "fine": {
+        "status": "silence",
+        "lines": [],
+        "inner": "It won't send. The conversation doesn't exist anymore."
+      },
+      "received": {
+        "status": "silence",
+        "lines": []
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "silence",
+        "lines": []
+      },
+      "wait": {
+        "status": "silence",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "silence",
+        "lines": [],
+        "inner": "He said don't go in. I said I'm in. It won't send."
+      },
+      "say-it-again": {
+        "status": "silence",
+        "lines": []
+      },
+      "what-llm": {
+        "status": "silence",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "silence",
+        "lines": []
+      },
+      "free": {
+        "status": "silence",
+        "lines": []
+      }
+    },
+    "laozhou": {
+      "incoming": [
+        {
+          "t": "10:05",
+          "text": "Put May 1st for the day the gate opens. Easy to remember.",
+          "kind": "private"
+        },
+        {
+          "t": "12:00",
+          "text": "[Voice] 3″",
+          "kind": "odd",
+          "note": "嚼东西的声音"
+        },
+        {
+          "t": "12:01",
+          "text": "Xiao Zhang's gone",
+          "kind": "private"
+        },
+        {
+          "t": "12:01",
+          "text": "Don't",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:02",
+            "text": "Mm"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:02",
+            "text": "Received"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:03",
+            "text": "No"
+          }
+        ]
+      },
+      "wait": {
+        "status": "typing",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:03",
+            "text": "Don't look back"
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:04",
+            "text": "Xiao Zhang's gone"
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:04",
+            "text": "What"
+          }
+        ]
+      },
+      "what-do-you-mean": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:05",
+            "text": "It means gone"
+          },
+          {
+            "who": "laozhou",
+            "t": "12:05",
+            "text": "Eat first"
+          }
+        ],
+        "inner": "It means gone. Lao Zhou still talks like a person."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:30",
+            "text": "Mm"
+          }
+        ]
+      }
+    }
+  }
+}

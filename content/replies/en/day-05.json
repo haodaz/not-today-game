@@ -1,0 +1,480 @@
+{
+  "day": 5,
+  "recipients": {
+    "boss": {
+      "incoming": [
+        {
+          "t": "09:12",
+          "text": "[Voice] 41″",
+          "kind": "work"
+        },
+        {
+          "t": "09:12",
+          "text": "(Transcript) The new hire posted her plan in the group. Don't block it. Young people with ideas are a good thing. One step at a time.",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:12",
+            "text": "[Voice] 41″"
+          },
+          {
+            "who": "boss",
+            "t": "09:12",
+            "text": "(Transcript) Right. The new hire posted her plan in the group. Don't block it, young people with ideas are a good thing. Put your own approach aside for now. One step at a time."
+          }
+        ],
+        "inner": "One step at a time. The fifth time."
+      },
+      "received": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s"
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:13",
+            "text": "Right, whatever works, don't be so precise."
+          }
+        ],
+        "inner": "He took 'whatever works' as a yes."
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s",
+        "interrupt": {
+          "who": "boss",
+          "where": "group",
+          "t": "09:30",
+          "text": "@all Let's encourage the new hire's plan."
+        },
+        "inner": "I ask about wages. He goes to the group to encourage the new hire."
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:40",
+            "text": "Not what?"
+          },
+          {
+            "who": "boss",
+            "t": "09:40",
+            "text": "[Voice] 6″"
+          },
+          {
+            "who": "boss",
+            "t": "09:40",
+            "text": "(Transcript) You're a partner now. Don't use words like that."
+          }
+        ],
+        "effects": {
+          "flags": [
+            "boss_heard_no"
+          ]
+        },
+        "inner": "Don't use words like that. Does he know where that word came from."
+      }
+    },
+    "partner": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "[Card] New hire's plan · Forwarded",
+          "kind": "work",
+          "card": {
+            "type": "file",
+            "name": "方案 v1（新人）.pdf",
+            "size": "2.3 MB",
+            "ext": "pdf"
+          },
+          "forwarded": true
+        },
+        {
+          "t": "10:00",
+          "text": "You write the 'avatar' page",
+          "kind": "work"
+        },
+        {
+          "t": "10:00",
+          "text": "Images on the shared drive, code 2041",
+          "kind": "work"
+        },
+        {
+          "t": "16:00",
+          "text": "Line 3 is a different font size, make it match",
+          "kind": "work",
+          "cond_show": {
+            "has": "sent_d5-avatar"
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:30",
+            "text": "👍"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:30",
+            "text": "[Card] New hire's plan · Forwarded"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "2s"
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "30min"
+      },
+      "no": {
+        "status": "recalled",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:41",
+            "text": "Not what"
+          }
+        ],
+        "inner": "He asked, then recalled it. He doesn't want to know either."
+      }
+    },
+    "group": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "New hire: [Doc] Plan v1, all feedback welcome",
+          "kind": "work",
+          "card": {
+            "type": "file",
+            "name": "方案 v1.pdf",
+            "size": "2.3 MB",
+            "ext": "pdf"
+          }
+        },
+        {
+          "t": "09:31",
+          "text": "member：👍",
+          "kind": "work"
+        },
+        {
+          "t": "09:31",
+          "text": "member：👍",
+          "kind": "work"
+        },
+        {
+          "t": "09:50",
+          "text": "Vivi: PRD's done. The feature bible, all five modules are in it.",
+          "kind": "work"
+        },
+        {
+          "t": "09:50",
+          "text": "Vivi: [Doc] InsightEngine_PRD_FeatureBible",
+          "kind": "deliverable",
+          "doc": "vivi-prd"
+        },
+        {
+          "t": "09:51",
+          "text": "Vivi: Engineering can start on this directly. Questions, ask the AI first.",
+          "kind": "work"
+        },
+        {
+          "t": "09:52",
+          "text": "member: Received",
+          "kind": "work"
+        },
+        {
+          "t": "11:00",
+          "text": "Lao Zhou: What you said last week, I'd forgotten. It remembered.",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:35",
+            "text": "Fine!"
+          },
+          {
+            "who": "member",
+            "t": "09:35",
+            "text": "👍"
+          },
+          {
+            "who": "member",
+            "t": "09:35",
+            "text": "👍"
+          },
+          {
+            "who": "member",
+            "t": "09:36",
+            "text": "👍"
+          }
+        ],
+        "inner": "A row of thumbs. The new ones on top of the old."
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:36",
+            "text": "Received."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:37",
+            "text": "Fine, whatever works for everyone."
+          }
+        ],
+        "inner": "Whatever works for everyone. Nobody in our company would add that."
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "inner": "Fifty people in the group. Read. Not one replies."
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:38",
+            "text": "Oh, you read it. I thought nobody read it"
+          },
+          {
+            "who": "member",
+            "t": "09:39",
+            "text": "Does the chief have something else in mind"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "group_heard_no"
+          ],
+          "san": 1
+        },
+        "inner": "Lao Zhou picked it up. He thought nobody read it. Someone does."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:40",
+            "text": "Fine, received."
+          }
+        ]
+      }
+    },
+    "xiaozhang": {
+      "incoming": [
+        {
+          "t": "13:00",
+          "text": "{calledBy}, that money…",
+          "kind": "money",
+          "cond_show": {
+            "has": "lent"
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "13:02",
+            "text": "OK {calledBy}"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "13:02",
+            "text": "{calledBy}… that money, did you really lend it?"
+          }
+        ],
+        "cond_show": {
+          "has": "lent"
+        },
+        "inner": "He knows."
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "13:03",
+            "text": "So I go with the new hire's?"
+          }
+        ]
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "13:04",
+            "text": "{calledBy}, my mum's asking if I'm still doing this job"
+          }
+        ],
+        "inner": "His mum asks. My mum doesn't ask. My mum doesn't know."
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "13:05",
+            "text": "No!"
+          },
+          {
+            "who": "xiaozhang",
+            "t": "13:05",
+            "text": "Haha I'm copying you"
+          }
+        ],
+        "inner": "He copies me. He doesn't know how to use that word either."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "13:07",
+            "text": "OK {calledBy}!"
+          }
+        ]
+      }
+    },
+    "laozhou": {
+      "incoming": [
+        {
+          "t": "09:44",
+          "text": "You read it",
+          "kind": "work"
+        },
+        {
+          "t": "12:08",
+          "text": "Forty-four thousand",
+          "kind": "money",
+          "cond_show": {
+            "has": "lent"
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:44",
+            "text": "Oh, you read it. I thought nobody read it"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:44",
+            "text": "Maybe. I don't write anymore anyway"
+          },
+          {
+            "who": "laozhou",
+            "t": "09:45",
+            "text": "[Message recalled]"
+          }
+        ],
+        "inner": "What he recalled, I didn't catch in time."
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:45",
+            "text": "You, honestly"
+          }
+        ]
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:10",
+            "text": "Forty-four thousand"
+          },
+          {
+            "who": "laozhou",
+            "t": "12:10",
+            "text": "I know"
+          },
+          {
+            "who": "laozhou",
+            "t": "12:11",
+            "text": "Eat first"
+          }
+        ],
+        "cond_show": {
+          "has": "lent"
+        },
+        "inner": "He knows the number. Who told him."
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:46",
+            "text": "No means no"
+          }
+        ],
+        "inner": "No means no. He answered fast, as if he'd been waiting a long time."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:48",
+            "text": "Mm"
+          }
+        ]
+      }
+    }
+  }
+}

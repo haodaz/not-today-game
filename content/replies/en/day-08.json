@@ -1,0 +1,505 @@
+{
+  "day": 8,
+  "recipients": {
+    "boss": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "{bossCalls}, I've only received two of the PDFs.",
+          "kind": "work"
+        },
+        {
+          "t": "09:01",
+          "text": "[Voice] 31″",
+          "kind": "work"
+        },
+        {
+          "t": "09:01",
+          "text": "(Transcript) Do the other four again. It'll be done in a moment, you just take a look. One step at a time.",
+          "kind": "work"
+        },
+        {
+          "t": "18:20",
+          "text": "[Voice] 0″",
+          "kind": "odd",
+          "note": "零秒的语音，能点开"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:10",
+            "text": "Fine."
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:10",
+            "text": "Received."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:11",
+            "text": "Whatever works, {bossCalls}."
+          }
+        ]
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s",
+        "interrupt": {
+          "who": "boss",
+          "where": "boss",
+          "t": "18:20",
+          "text": "[Voice] 0″"
+        },
+        "inner": "A zero-second voice note. I play it; the bar runs to the end. Nothing."
+      },
+      "no": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s"
+      },
+      "wait": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s"
+      },
+      "im-going-in": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s"
+      }
+    },
+    "partner": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "[Card] PDF receipt · 2/6",
+          "kind": "work",
+          "card": {
+            "type": "task",
+            "title": "PDF 回执",
+            "fields": [
+              [
+                "已读",
+                "2 / 6"
+              ],
+              [
+                "未读",
+                "老板"
+              ]
+            ]
+          }
+        },
+        {
+          "t": "11:00",
+          "text": "Everyone at 7, it's easier to manage.",
+          "kind": "work"
+        },
+        {
+          "t": "15:20",
+          "text": "[Link] Three diagrams · Diagram 2",
+          "kind": "work",
+          "card": {
+            "type": "link",
+            "title": "三张图 · 图 2：看人",
+            "site": "你的页面"
+          }
+        },
+        {
+          "t": "15:20",
+          "text": "Diagram 2 has no way back once you're in, add a back button",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "👍"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "[Card] PDF receipt · 2/6"
+          }
+        ],
+        "inner": "He sends a receipt. Four are gone; the receipt says 2/6, as if it was always meant to be 2."
+      },
+      "whatever": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "2s"
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "4h"
+      },
+      "no": {
+        "status": "read",
+        "lines": []
+      },
+      "wait": {
+        "status": "read",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "silence",
+        "lines": []
+      }
+    },
+    "group": {
+      "incoming": [
+        {
+          "t": "09:20",
+          "text": "member: Two PDFs received, thanks",
+          "kind": "work"
+        },
+        {
+          "t": "09:20",
+          "text": "member: Two received, thanks",
+          "kind": "work"
+        },
+        {
+          "t": "09:20",
+          "text": "member: Two received, thanks",
+          "kind": "work"
+        },
+        {
+          "t": "10:00",
+          "text": "member: Online team night on Friday. Each leader's toast is timed by rank; the sheet is on the shared drive.",
+          "kind": "work"
+        },
+        {
+          "t": "10:01",
+          "text": "member: Thirteen takeaways. One without chopsticks. Don't open until the guest arrives.",
+          "kind": "work"
+        },
+        {
+          "t": "16:30",
+          "text": "member: Received",
+          "kind": "work",
+          "cond_show": {
+            "has": "sent_d8-toasts"
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:21",
+            "text": "Fine."
+          },
+          {
+            "who": "member",
+            "t": "09:21",
+            "text": "Fine."
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:22",
+            "text": "Received, thanks."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:22",
+            "text": "Whatever works for everyone."
+          }
+        ]
+      },
+      "salary": {
+        "status": "read",
+        "lines": []
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:23",
+            "text": "Understood."
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:23",
+            "text": "Fine."
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:24",
+            "text": "Fine, thanks."
+          }
+        ],
+        "inner": "I say I'm in. They say thanks."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:25",
+            "text": "Fine."
+          }
+        ]
+      }
+    },
+    "xiaozhang": {
+      "incoming": [
+        {
+          "t": "10:02",
+          "text": "{calledBy}, your four aren't on my computer anymore either",
+          "kind": "work",
+          "effects": {
+            "flags": [
+              "xz_lost_pdfs"
+            ]
+          }
+        },
+        {
+          "t": "10:02",
+          "text": "I didn't delete them",
+          "kind": "work"
+        },
+        {
+          "t": "11:10",
+          "text": "No need for a schedule, everyone eats on their own.",
+          "kind": "work"
+        },
+        {
+          "t": "15:30",
+          "text": "{calledBy}, does that pager of yours still ring?",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:03",
+            "text": "OK {calledBy}, I'll export them again"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:03",
+            "text": "{calledBy}, I really didn't delete them"
+          }
+        ],
+        "inner": "I know."
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:04",
+            "text": "Then let it export them"
+          }
+        ]
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:05",
+            "text": "{calledBy}, it's five days late now"
+          }
+        ]
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:05",
+            "text": "No what"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:05",
+            "text": "Wait"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:06",
+            "text": "{calledBy}, in where?"
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:08",
+            "text": "OK {calledBy}"
+          }
+        ]
+      }
+    },
+    "laozhou": {
+      "incoming": [
+        {
+          "t": "11:50",
+          "text": "The version on the shared drive is gone too",
+          "kind": "work"
+        },
+        {
+          "t": "11:50",
+          "text": "I didn't delete it either",
+          "kind": "work"
+        },
+        {
+          "t": "11:51",
+          "text": "Lost things, I can find. Wait for me tonight.",
+          "kind": "private"
+        },
+        {
+          "t": "12:10",
+          "text": "Eat",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:51",
+            "text": "OK"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:51",
+            "text": "Received"
+          }
+        ],
+        "inner": "Lao Zhou says received. The second time."
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:52",
+            "text": "OK"
+          }
+        ]
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:12",
+            "text": "0487"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "lz_0487"
+          ]
+        },
+        "inner": "0487. He's sending numbers again. He wouldn't know what they mean."
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:52",
+            "text": "No"
+          }
+        ]
+      },
+      "wait": {
+        "status": "typing",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:53",
+            "text": "Don't look back"
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:15",
+            "text": "Eat first"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,529 @@
+{
+  "day": 15,
+  "recipients": {
+    "boss": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "{bossCalls}, did you sleep well last night.",
+          "kind": "odd",
+          "effects": {
+            "flags": [
+              "boss_asks_sleep"
+            ]
+          }
+        },
+        {
+          "t": "09:00",
+          "text": "[Voice] 11″",
+          "kind": "odd"
+        },
+        {
+          "t": "09:00",
+          "text": "(Transcript) What did you dream about. Did you dream about the drawer.",
+          "kind": "odd",
+          "note": "梦的内容只有克总知道"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:05",
+            "text": "Good."
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:05",
+            "text": "Received."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:06",
+            "text": "Just as well if you didn't."
+          }
+        ]
+      },
+      "wait": {
+        "status": "read",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:06",
+            "text": "Go ahead."
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:07",
+            "text": "Did you dream about the drawer."
+          }
+        ],
+        "inner": "The drawer. I have never told anyone about the drawer."
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:07",
+            "text": "I'm just asking if you slept well."
+          }
+        ]
+      }
+    },
+    "partner": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "[Card] A landscape",
+          "kind": "private",
+          "card": {
+            "type": "image",
+            "src": "/msgs/covers/landscape.jpg",
+            "alt": "一张风景"
+          }
+        },
+        {
+          "t": "09:30",
+          "text": "[Card] A landscape",
+          "kind": "private",
+          "card": {
+            "type": "image",
+            "src": "/msgs/covers/landscape.jpg",
+            "alt": "一张风景"
+          }
+        },
+        {
+          "t": "09:31",
+          "text": "[Card] A landscape",
+          "kind": "private",
+          "note": "三张一样的风景",
+          "card": {
+            "type": "image",
+            "src": "/msgs/covers/landscape.jpg",
+            "alt": "一张风景"
+          }
+        },
+        {
+          "t": "10:00",
+          "text": "Put the closing words on page 3, end it nicely.",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:32",
+            "text": "👍"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:32",
+            "text": "👍"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "read",
+        "lines": []
+      },
+      "wait": {
+        "status": "read",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "silence",
+        "lines": []
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:33",
+            "text": "[Card] A landscape"
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "read",
+        "lines": []
+      }
+    },
+    "group": {
+      "incoming": [
+        {
+          "t": "09:20",
+          "text": "member: Good morning.",
+          "kind": "private"
+        },
+        {
+          "t": "09:20",
+          "text": "member: Good morning.",
+          "kind": "private"
+        },
+        {
+          "t": "09:20",
+          "text": "member: Good morning, {calledBy}.",
+          "kind": "private"
+        },
+        {
+          "t": "12:00",
+          "text": "member: Twenty-eight degrees at the end of October, is that normal",
+          "kind": "work"
+        },
+        {
+          "t": "15:00",
+          "text": "member: [Image] A phoenix",
+          "kind": "odd",
+          "card": {
+            "type": "image",
+            "src": "/msgs/covers/phoenix.jpg",
+            "alt": "一只凤凰"
+          }
+        },
+        {
+          "t": "17:01",
+          "text": "member left the group",
+          "kind": "odd",
+          "cond_show": {
+            "has": "sent_d15-launch"
+          }
+        },
+        {
+          "t": "17:02",
+          "text": "member left the group",
+          "kind": "odd",
+          "cond_show": {
+            "has": "sent_d15-launch"
+          }
+        },
+        {
+          "t": "17:03",
+          "text": "member left the group",
+          "kind": "odd",
+          "cond_show": {
+            "has": "sent_d15-launch"
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:21",
+            "text": "Fine."
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:21",
+            "text": "Received."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:22",
+            "text": "Understood."
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:22",
+            "text": "Fine."
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:22",
+            "text": "Thanks."
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:23",
+            "text": "Good morning."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:23",
+            "text": "Fine."
+          }
+        ]
+      },
+      "what-do-you-mean": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:24",
+            "text": "Fine."
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:25",
+            "text": "Fine."
+          }
+        ]
+      }
+    },
+    "xiaozhang": {
+      "incoming": [],
+      "fine": {
+        "status": "silence",
+        "lines": []
+      },
+      "received": {
+        "status": "silence",
+        "lines": []
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "silence",
+        "lines": []
+      },
+      "wait": {
+        "status": "silence",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "silence",
+        "lines": []
+      },
+      "say-it-again": {
+        "status": "silence",
+        "lines": []
+      },
+      "what-llm": {
+        "status": "silence",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "silence",
+        "lines": []
+      },
+      "free": {
+        "status": "silence",
+        "lines": []
+      }
+    },
+    "laozhou": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "There's a launch this afternoon. Arrange the slides, and keep an eye on the audience's reactions live.",
+          "kind": "private"
+        },
+        {
+          "t": "09:31",
+          "text": "Put the reaction down as enthusiastic.",
+          "kind": "private"
+        },
+        {
+          "t": "12:00",
+          "text": "[Voice] 3″",
+          "kind": "odd"
+        },
+        {
+          "t": "12:00",
+          "text": "[Voice] 3″",
+          "kind": "odd"
+        },
+        {
+          "t": "12:01",
+          "text": "[Voice] 3″",
+          "kind": "odd",
+          "note": "三条，都是嚼东西"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:02",
+            "text": "Mm"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:02",
+            "text": "Received"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:03",
+            "text": "No"
+          }
+        ]
+      },
+      "wait": {
+        "status": "typing",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "read",
+        "lines": []
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:03",
+            "text": "[Voice] 3″"
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      },
+      "what-do-you-mean": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:04",
+            "text": "Eat"
+          }
+        ],
+        "inner": "Eat. He has this one word left."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:30",
+            "text": "Eat"
+          }
+        ]
+      }
+    }
+  }
+}

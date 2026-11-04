@@ -146,7 +146,31 @@
       "unlock": "done:task2",
       "done": "event:order:dinner",
       "required": true,
-      "rewrite": "Dinner is on its way.",
+      "rewrite": "Dinner is on its way."
+    },
+    {
+      "id": "pickupDinner",
+      "text": "Go get it.",
+      "unlock": "event:delivery:arrives:dinner",
+      "done": "event:pickup:dinner",
+      "required": true,
+      "sfx": "doorbell",
+      "onUnlock": {
+        "say": [
+          {
+            "k": "sfx",
+            "t": "Ding-dong.",
+            "sfx": "doorbell"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eatDinner",
+      "text": "Eat.",
+      "unlock": "done:task3",
+      "done": "event:eat:dinner",
+      "required": true,
       "when": "night"
     },
     {
@@ -188,7 +212,7 @@
     "waitMinutes": 5
   },
   "call": {
-    "at": "15:30",
+    "at": "18:00",
     "length": "1:00:00",
     "lines": [
       {

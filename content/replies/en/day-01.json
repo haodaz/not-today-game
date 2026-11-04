@@ -1,0 +1,401 @@
+{
+  "day": 1,
+  "recipients": {
+    "boss": {
+      "incoming": [
+        {
+          "t": "08:58",
+          "text": "[Voice] 41″",
+          "kind": "work"
+        },
+        {
+          "t": "09:12",
+          "text": "(Transcript) Go through v17 today, I need it for the investors this afternoon. Let it merge a draft, you just take a look, don't start from scratch. Explain our tech to them: the tech story, the tech value, what's special about how we use AI. And the receivables: the client is a month late, update the days. About your salary, I know. Wait a bit longer. One step at a time.",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:14",
+            "text": "Right, get on it. I want the merged version before three."
+          }
+        ],
+        "inner": "Three. He says it as if I set it."
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:14",
+            "text": "[Voice] 12″"
+          },
+          {
+            "who": "boss",
+            "t": "09:14",
+            "text": "(Transcript) Mm, just say received. Don't start from scratch, let it merge first, you take a look."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:15",
+            "text": "What does 'whatever works' mean. Pick one."
+          }
+        ],
+        "interrupt": {
+          "who": "boss",
+          "where": "group",
+          "t": "09:16",
+          "text": "@all The investors need v17 this afternoon. No other work for any team today."
+        },
+        "inner": "I pick one. Once I've picked, it's still his."
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "3s",
+        "interrupt": {
+          "who": "boss",
+          "where": "boss",
+          "t": "09:19",
+          "text": "[Voice] 41″"
+        },
+        "inner": "Read. Then a forty-one-second voice note, all about something else."
+      }
+    },
+    "partner": {
+      "incoming": [
+        {
+          "t": "08:40",
+          "text": "[Card] Competitor A's storyline · Forwarded",
+          "kind": "work",
+          "card": {
+            "type": "article",
+            "account": "增长笔记",
+            "title": "竞品 A 是怎么讲故事的：三页纸拿下 A 轮",
+            "digest": "先讲痛点，再讲数据，最后只放一个数字。",
+            "cover": "/msgs/covers/chart.jpg"
+          },
+          "forwarded": true
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:30",
+            "text": "[Card] Competitor A's storyline · Forwarded"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:30",
+            "text": "👍"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "[Card] Competitor B's storyline · Forwarded"
+          },
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "Look at both."
+          }
+        ]
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "40s",
+        "inner": "Forty seconds. He's working out how not to answer."
+      }
+    },
+    "group": {
+      "incoming": [
+        {
+          "t": "09:12",
+          "text": "Lao Zhou: The old office's building management called. Two boxes nobody's claimed. Whose?",
+          "kind": "work"
+        },
+        {
+          "t": "09:13",
+          "text": "member: Not me.",
+          "kind": "work"
+        },
+        {
+          "t": "09:13",
+          "text": "member：+1",
+          "kind": "work"
+        },
+        {
+          "t": "10:02",
+          "text": "Vivi: Look what I've got. I had AI build the insight engine. One night.",
+          "kind": "work"
+        },
+        {
+          "t": "10:02",
+          "text": "Vivi: [Web page] InsightEngine_Plan_v0.1.html",
+          "kind": "deliverable",
+          "doc": "vivi-plan-1"
+        },
+        {
+          "t": "10:03",
+          "text": "Vivi: The core loop already works, have a play. No need to schedule this kind of thing anymore lol",
+          "kind": "work"
+        },
+        {
+          "t": "10:04",
+          "text": "Vivi: @tech build one like this",
+          "kind": "work"
+        },
+        {
+          "t": "10:05",
+          "text": "member：👍",
+          "kind": "work"
+        },
+        {
+          "t": "10:05",
+          "text": "member: Learned a lot.",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:20",
+            "text": "Learned what. Who's picking up those two boxes?"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:21",
+            "text": "Received +1"
+          },
+          {
+            "who": "member",
+            "t": "09:21",
+            "text": "Received."
+          }
+        ],
+        "inner": "I say received, someone follows with received. Who received what."
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:22",
+            "text": "Then they're yours. I'll send you the building management's number."
+          }
+        ],
+        "effects": {
+          "flags": [
+            "d1_fetch_parcel"
+          ]
+        }
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "inner": "Nobody in the group answers. Fifty avatars, not one lit."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "09:23",
+            "text": "Chief, you're chatty today."
+          },
+          {
+            "who": "xiaozhang",
+            "t": "09:23",
+            "text": "Hahaha"
+          }
+        ],
+        "note": "free：玩家自己打的任何字都走这条"
+      }
+    },
+    "xiaozhang": {
+      "incoming": [
+        {
+          "t": "09:40",
+          "text": "Morning {calledBy}! v17: do I write it the old way or wait for you?",
+          "kind": "work"
+        },
+        {
+          "t": "09:41",
+          "text": "The graph's two-hundred-odd nodes. I only went through them with you yesterday.",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "09:41",
+            "text": "Got it {calledBy}"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "09:41",
+            "text": "{calledBy}, received what?"
+          },
+          {
+            "who": "xiaozhang",
+            "t": "09:42",
+            "text": "I haven't sent anything yet."
+          }
+        ],
+        "inner": "He's right."
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "09:43",
+            "text": "Then I'll write it on v16 ok"
+          }
+        ],
+        "effects": {
+          "flags": [
+            "xz_writes_v16"
+          ]
+        },
+        "inner": "Two words, 'whatever works', and he heard an order."
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "09:44",
+            "text": "{calledBy}, mine's sent."
+          },
+          {
+            "who": "xiaozhang",
+            "t": "09:44",
+            "text": "Yours isn't?"
+          }
+        ],
+        "inner": "His is sent."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "09:46",
+            "text": "OK {calledBy}, I'll stop for now."
+          }
+        ]
+      }
+    },
+    "laozhou": {
+      "incoming": [
+        {
+          "t": "11:40",
+          "text": "What's for lunch",
+          "kind": "private"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:40",
+            "text": "What's for lunch"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:40",
+            "text": "Received what? I haven't sent anything."
+          },
+          {
+            "who": "laozhou",
+            "t": "11:41",
+            "text": "Braised chicken?"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:41",
+            "text": "Fine, braised chicken it is."
+          }
+        ],
+        "effects": {
+          "flags": [
+            "lunch_d1"
+          ]
+        }
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:45",
+            "text": "I haven't sent anything either."
+          },
+          {
+            "who": "laozhou",
+            "t": "11:45",
+            "text": "Eat first."
+          }
+        ],
+        "inner": "Lao Zhou's answer to everything: eat first."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "11:47",
+            "text": "Oh."
+          }
+        ]
+      }
+    }
+  }
+}

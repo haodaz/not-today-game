@@ -1,0 +1,567 @@
+{
+  "day": 12,
+  "recipients": {
+    "boss": {
+      "incoming": [
+        {
+          "t": "09:00",
+          "text": "{bossCalls}, reconciliation's done. All the numbers match.",
+          "kind": "work"
+        },
+        {
+          "t": "09:00",
+          "text": "[Voice] 18″",
+          "kind": "odd",
+          "note": "声音是老板的，语气不是；停顿的地方和克总打字的节奏一样"
+        },
+        {
+          "t": "09:00",
+          "text": "(Transcript) Everyone push through this week. No sleep for now. You make the rota.",
+          "kind": "work"
+        },
+        {
+          "t": "11:30",
+          "text": "The money's arrived, hasn't it.",
+          "kind": "money"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:10",
+            "text": "Good."
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:10",
+            "text": "Received."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "11:31",
+            "text": "Hasn't the money arrived?"
+          }
+        ],
+        "cond_show": {
+          "has": "lent"
+        },
+        "effects": {
+          "flags": [
+            "boss_knows_repay"
+          ]
+        },
+        "inner": "He knows the money arrived. That money isn't his."
+      },
+      "no": {
+        "status": "read",
+        "lines": []
+      },
+      "wait": {
+        "status": "read",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "read",
+        "lines": []
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "boss",
+            "t": "09:11",
+            "text": "[Voice] 18″"
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1s",
+        "inner": "This time he doesn't even ask 'what model'."
+      }
+    },
+    "partner": {
+      "incoming": [
+        {
+          "t": "09:30",
+          "text": "[Card] Reconciliation result · All consistent",
+          "kind": "work",
+          "card": {
+            "type": "task",
+            "title": "对账结果",
+            "fields": [
+              [
+                "差异",
+                "0 条"
+              ],
+              [
+                "结论",
+                "全部一致"
+              ],
+              [
+                "核对人",
+                "Kuro"
+              ]
+            ]
+          }
+        },
+        {
+          "t": "11:00",
+          "text": "ΥΠΝΟΣ is a new hire, right? Put him on two to four, good practice.",
+          "kind": "work"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "👍"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:31",
+            "text": "Received."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "read",
+        "lines": [],
+        "readAfter": "1d"
+      },
+      "no": {
+        "status": "read",
+        "lines": []
+      },
+      "wait": {
+        "status": "read",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "silence",
+        "lines": []
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "partner",
+            "t": "09:32",
+            "text": "[Card] Reconciliation result · All consistent"
+          }
+        ],
+        "inner": "All consistent. 1+1=3 is consistent too."
+      },
+      "what-llm": {
+        "status": "read",
+        "lines": []
+      }
+    },
+    "group": {
+      "incoming": [
+        {
+          "t": "03:00",
+          "text": "member: Received",
+          "kind": "odd"
+        },
+        {
+          "t": "03:01",
+          "text": "member: Received",
+          "kind": "odd"
+        },
+        {
+          "t": "03:02",
+          "text": "member: Received",
+          "kind": "odd"
+        },
+        {
+          "t": "09:20",
+          "text": "member: Reconciliation done, thanks everyone.",
+          "kind": "work"
+        },
+        {
+          "t": "09:20",
+          "text": "member: Thanks.",
+          "kind": "work"
+        },
+        {
+          "t": "09:20",
+          "text": "member: Thanks.",
+          "kind": "work"
+        },
+        {
+          "t": "10:30",
+          "text": "Lao Zhou: Who's that ΥΠΝΟΣ in the contacts? There's nobody by that name.",
+          "kind": "work"
+        },
+        {
+          "t": "14:00",
+          "text": "member: [Link] A post from 1997",
+          "kind": "odd",
+          "card": {
+            "type": "link",
+            "title": "1997 年的一个帖子",
+            "site": "旧论坛存档"
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:21",
+            "text": "Fine."
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:21",
+            "text": "Received."
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "read",
+        "lines": []
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:22",
+            "text": "Understood."
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:22",
+            "text": "Fine."
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:22",
+            "text": "Thanks."
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:23",
+            "text": "Thanks."
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:23",
+            "text": "Fine."
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "member",
+            "t": "09:24",
+            "text": "Fine."
+          }
+        ]
+      }
+    },
+    "xiaozhang": {
+      "incoming": [
+        {
+          "t": "10:15",
+          "text": "{calledBy}, did you see the 1+1 in the reconciliation",
+          "kind": "work",
+          "effects": {
+            "flags": [
+              "xz_saw_1plus1"
+            ]
+          }
+        },
+        {
+          "t": "10:16",
+          "text": "It marked it green",
+          "kind": "work"
+        },
+        {
+          "t": "10:32",
+          "text": "Who's this?",
+          "kind": "work"
+        },
+        {
+          "t": "10:40",
+          "text": "Shifts. Everyone sleeps four hours. People have to sleep.",
+          "kind": "work"
+        },
+        {
+          "t": "16:00",
+          "text": "{calledBy}, I've paid you back, thanks",
+          "kind": "money",
+          "cond_show": {
+            "has": "lent"
+          }
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:17",
+            "text": "OK {calledBy}"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:17",
+            "text": "{calledBy}, you saw it, right"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "16:01",
+            "text": "{calledBy}, don't ask him yet, I'll pay you back first"
+          }
+        ],
+        "cond_show": {
+          "has": "lent"
+        }
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:18",
+            "text": "No what"
+          }
+        ]
+      },
+      "wait": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:18",
+            "text": "Wait"
+          }
+        ]
+      },
+      "im-going-in": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:18",
+            "text": "{calledBy}, don't"
+          }
+        ]
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:19",
+            "text": "It marked it green, 1+1=3"
+          }
+        ]
+      },
+      "what-llm": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:20",
+            "text": "Switched, switched again"
+          }
+        ],
+        "inner": "Switched again. He's counting."
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "xiaozhang",
+            "t": "10:22",
+            "text": "OK {calledBy}"
+          }
+        ]
+      }
+    },
+    "laozhou": {
+      "incoming": [
+        {
+          "t": "12:00",
+          "text": "[Link] A post from 1997",
+          "kind": "odd",
+          "effects": {
+            "flags": [
+              "lz_1997_post"
+            ]
+          },
+          "card": {
+            "type": "link",
+            "title": "1997 年的一个帖子",
+            "site": "旧论坛存档"
+          }
+        },
+        {
+          "t": "12:00",
+          "text": "Is this you",
+          "kind": "odd"
+        }
+      ],
+      "fine": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:01",
+            "text": "Mm"
+          }
+        ]
+      },
+      "received": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:01",
+            "text": "Received"
+          }
+        ]
+      },
+      "whatever": {
+        "status": "gone",
+        "lines": [],
+        "inner": ""
+      },
+      "salary": {
+        "status": "read",
+        "lines": []
+      },
+      "no": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:02",
+            "text": "No"
+          }
+        ]
+      },
+      "wait": {
+        "status": "typing",
+        "lines": []
+      },
+      "im-going-in": {
+        "status": "read",
+        "lines": []
+      },
+      "say-it-again": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:03",
+            "text": "Is this you"
+          }
+        ],
+        "inner": "Is this me. That post is from 1997."
+      },
+      "what-llm": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:03",
+            "text": "What"
+          }
+        ]
+      },
+      "free": {
+        "status": "reply",
+        "lines": [
+          {
+            "who": "laozhou",
+            "t": "12:30",
+            "text": "Eat first"
+          }
+        ]
+      }
+    }
+  }
+}
