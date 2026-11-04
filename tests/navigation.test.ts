@@ -642,15 +642,12 @@ describe("the four facings and their turn edges (room-turn 2026-11-04)", () => {
     expect(m.stage().querySelectorAll(":scope > .shot-hit").length).toBeGreaterThan(0);
   });
 
-  it("床's box turns left to 房间, then opens the case there", () => {
-    const later: [number, () => void][] = [];
+  it("床's box opens the case right there, a close-up, no turn (author 2026-11-04)", () => {
     const store = createStore({ startDay: 1 });
-    const ctx: ActionContext = { store, session: initialSession(DEFAULT_CLOCK, "left", "bed"), rerender: () => {}, later: (ms, fn) => void later.push([ms, fn]), now: () => 10_000 };
+    const ctx: ActionContext = { store, session: initialSession(DEFAULT_CLOCK, "left", "bed"), rerender: () => {}, later: () => {}, now: () => 10_000 };
     loopActions["bed-box"]!(ctx, {} as DOMStringMap, null as never);
-    expect(ctx.session.view).toBe("room");
-    expect(ctx.session.cam?.turn).toMatchObject({ dir: "left", hops: 1 });
-    expect(ctx.session.caseOpen).toBe(false);
-    for (const [, fn] of later.splice(0)) fn();
+    expect(ctx.session.view).toBe("bed");
+    expect(ctx.session.cam?.turn).toBeUndefined();
     expect(ctx.session.caseOpen).toBe(true);
   });
 });

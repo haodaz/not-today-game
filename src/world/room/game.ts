@@ -544,13 +544,11 @@ export const loopActions: Record<string, ActionHandler> = {
     if (!at || at.eaten) return;
     loopActions["loop-eat"]!(ctx, { meal: at.meal } as DOMStringMap, null as never);
   },
-  // The parcel box seen from 床 (room-turn R3): turn left to 房间, then today's box action there.
+  // The parcel box seen from 床: it sits right by the bed, so the case opens here as a close-up; no
+  // turn back to 房间 (author 2026-11-04: 「不要旋转回桌子那面墙，挺晕的」).
   "bed-box"(ctx) {
     if (ctx.session.view !== "bed") return;
-    loopActions["view"]!(ctx, { view: "room" } as DOMStringMap, null as never);
-    ctx.later(wayMs("bed", "room") + WAY_GAP_MS, () => {
-      if (ctx.session.view === "room") loopActions["pick-box"]!(ctx, {} as DOMStringMap, null as never);
-    });
+    loopActions["pick-box"]!(ctx, {} as DOMStringMap, null as never);
   },
 
   // 关机: in the work system's own top bar. The shutdown beat plays, both monitors darken, and
@@ -611,7 +609,7 @@ export const loopActions: Record<string, ActionHandler> = {
   // 拆箱 (blind-box 2026-11-03): clicking the box in 房间 opens the 端盒 (the case) over the room,
   // not a layer directly. The nine small boxes are shown; exactly one is loose today.
   "pick-box"(ctx) {
-    if (ctx.session.view !== "room") return;
+    if (ctx.session.view !== "room" && ctx.session.view !== "bed") return;
     ctx.session.caseOpen = true;
     // The stuck-line counter is seeded once per open from the run and day, so the first dull line
     // is not always the same (session count, "starts at a seeded offset").
@@ -632,7 +630,7 @@ export const loopActions: Record<string, ActionHandler> = {
   // 200 ms, thuds, and speaks one of the four dull lines (cycling). Stuck boxes log nothing.
   "case-pick"(ctx, data) {
     const { store, session } = ctx;
-    if (!session.caseOpen || session.view !== "room") return;
+    if (!session.caseOpen || (session.view !== "room" && session.view !== "bed")) return;
     const slot = data.slot ?? "";
     const state = store.getState();
     const loose = looseContent(state.day, boxObjectFor(state.day), openBoxReady(state, store.getEvents()));
