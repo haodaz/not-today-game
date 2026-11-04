@@ -51,3 +51,10 @@ Like the calculator and the dictionary (devices.ts, `DEVICE_IDS`), the camera's 
 - The counter (sheets left) is a tiny 7-segment readout on the back, drawn with the calculator's seg code, shown when the device is flipped (`FLIPPERS` gets `camera`).
 - The ejected sheet: a white frame 200 × 236 px (thick bottom border like an instant photo) sliding down out of the slot over 600 ms; its picture area develops as R8 says.
 - Upgraded state: the same shell with class `upgraded` (as the other devices): the sheet develops instantly, never shows the content's addition (Kuro tidies it away).
+
+## R10. Room photos develop overnight (author 2026-11-04; wins over R8 where they differ)
+「拍立得第三天拍，第四天出照片，所以最多就是第 17 天拍，18 天有照片。18 天拍克总总不能第 19 天拿照片。」
+- A **room** photo ejects **blank** and stays blank all day (the album shows the blank sheet with its time and facing). On the **next day** it is developed (the album shows the final picture with the (day, facing) addition; the 20 s developing animation plays the first time the player opens it that day). `day` in `content/photos.json` is the **shooting** day.
+- **Day 18** (`stages.json` `hiddenBoxDay`, the last day) is the one exception: a room photo develops on the spot over 20 s, like a screen photo, and shows that day's addition.
+- **Screen** photos are unchanged from R8: develop over 20 s, unlimited, difference rings.
+- Tests: a room photo shot on day n is blank on day n and developed on day n+1; on day 18 it develops in 20 s.
