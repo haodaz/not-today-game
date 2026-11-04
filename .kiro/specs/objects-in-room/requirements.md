@@ -1,0 +1,33 @@
+# objects-in-room — requirements (2026-11-04, author + Claude)
+
+"我们还是得考虑道具的用法、在 3D 空间里的真实用法。" Today a board lock opens its object and the code chips appear: a button. From now on some objects only work **at a place in the room**, using what that wall has: daylight at the window, the desk lamp, the one bar of signal by the window, the bedside at night. Design source: `script/notes/物件×房间.md`. Holding / using (objects-in-hand) and the four facings (room-turn) stay as they are.
+
+## R1. Where an object works (content, Claude)
+`content/objects.json` → `objects[].works` (optional; absent = works anywhere):
+`{ "at": Facing[], "light"?: "day" | "lamp" | "dayOrLamp", "signal"?: true, "line": stringKey }`
+- `at`: the facings where it works (`room` means the desk side: 房间 / 桌子 / 屏幕 views count as `room`).
+- `light: "day"`: only while the beat is before dusk (the day loop's beat). `"lamp"`: only while the desk lamp is on. `"dayOrLamp"`: either (day at 窗; lamp at `room`).
+- `signal: true`: only at 窗 (draw a one-bar signal icon on the phone's screen there; no bars elsewhere).
+- `line`: the inner line shown when the player tries it somewhere it does not work (e.g. 「太暗了，屏不亮。」「没有信号。」).
+Claude's values (in content): calculator `{at: [window, room], light: "dayOrLamp", line: obj.works.dark}`; phone `{at: [window], signal: true, line: obj.works.nosignal}`; iccard `{at: [room], light: "lamp", line: obj.works.nolamp}`. Others: no `works`.
+- Where it does not work, using still opens the focus view, but the screen is faint / keys do nothing / the under-layer stays hidden, and the `line` shows once per entry.
+- An object Kuro has upgraded ignores `works` (it works everywhere: "它帮你").
+
+## R2. Using an object at a place is an event
+Entering 使用 on an object logs `{ kind: "useAt", objectId, facing, ok: boolean }` (`ok` = the `works` rule held). Once per object per facing per day (no flood). Pure, replayable.
+
+## R3. Board locks name a place
+`given.lock.face?: Facing` (loader: only with `object`; a valid facing).
+- The lock row's 用{object}看一眼 still lifts the object, but when `face` is set and the player is not at that facing, it first **turns the head there** (the room-turn move, shortest way) and then lifts it, in one step: the player sees the room turn to the window and the calculator rise to the light. From the desktop: back to 房间 first (as 回房间 does), then the turn.
+- The code chips are offered only after a `useAt` with `ok: true` for that object today (at `face` if set, anywhere it works otherwise). Before that the lock row's hint reads `board.lock.goTo` 「拿去{face}那边用。」 with the facing's name.
+- 让它试 (Kuro) is unchanged: it needs no place.
+
+## R4. Strings (Claude adds): `obj.works.dark` 太暗了，屏不亮。 / `obj.works.nosignal` 没有信号。 / `obj.works.nolamp` 台灯没开，看不见底下那层。 / `board.lock.goTo` 拿去{face}那边用。 / the facing names already exist (`hud.turn.*`, room views).
+
+## R5. Content (Claude, after this lands): `face` on the locks: day 8 / 11 / 15 calculator → `window`; day 17 phone → `window`; day 13 also an iccard reading of the scan's bottom layer at `room` (a second clue line in the file, not a second lock). Dictionary / tape locks: no `face`.
+
+## R6. Tests
+- `works` rules: calculator at 窗 by day → ok; at 床 → not ok + line; at `room` at night with lamp → ok, lamp off → not; phone only at 窗; iccard only at `room` with lamp; upgraded → always ok.
+- `useAt` logged once per object/facing/day with the right `ok`.
+- Lock with `face`: from 屏幕, 用计算器看一眼 → view becomes 窗 and the calculator is held; chips hidden until a `useAt ok`; then shown; a lock without `face` behaves as today.
+- Loader: `face` only with `object`, valid facing; `works` shape.
