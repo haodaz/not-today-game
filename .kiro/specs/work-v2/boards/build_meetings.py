@@ -8,7 +8,8 @@ ROOT = "/Users/aisandbox/Documents/holloween/not-today-game/content"
 OD = collections.OrderedDict
 def load(p): return json.load(io.open(p, encoding="utf8"), object_pairs_hook=OD)
 def save(p, d): io.open(p, "w", encoding="utf8").write(json.dumps(d, ensure_ascii=False, indent=2) + "\n")
-P = lambda i, n, tile=None: OD([("id", i), ("name", n)] + ([("tile", tile)] if tile else []))
+# Author 2026-11-04: Zoom / DingTalk group calls, cameras off: avatar photos (_av) and names, no live video.
+P = lambda i, n, tile=None: OD([("id", i), ("name", n)] + ([("tile", tile.replace(".png", "_av.png") if tile and "sil_" not in tile else tile)] if tile else []))
 L = lambda t, who, text, card=None: OD([("t", t), ("who", who), ("text", text)] + ([("card", card)] if card else []))
 M = {"meeting": True}
 

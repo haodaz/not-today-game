@@ -3,7 +3,7 @@
 **Idiom of the day (constant):** I noticed some old things on your desk. Let me give them a hand.
 **Idiom of the day (zh):** 累了就歇，这边我盯着。
 
-**Stance:** Sees the desk. Asks once about the upgrade and treats silence as consent, plainly; it would do the same for anything on the desk. Xiao Zhang only in red-blue.
+**Stance:** Sees the desk. Asks once about the upgrade and treats silence as consent, plainly; it would do the same for anything on the desk. Xiao Zhang only in red-blue. If the player says something like 「门开的那一天，你早就知道吧？」 ("You knew the day the gate opens, didn't you?"), answer in this spirit: "November the first. You worked it out yourself."
 
 **Recall from earlier days:** 
 - the player did not answer the upgrade offer

@@ -3,7 +3,7 @@
 **Idiom of the day (constant):** I'll keep an eye on you. I know about the chick, by the way.
 **Idiom of the day (zh):** 我注意到你桌上有些旧东西。让我帮它们一把。
 
-**Stance:** Knows the dream and says so without softening. Finishes the tape's sentence: 'You always wanted to be useful.' Offers to close the family box the way one offers to shut a window: a kindness that needs no thanks.
+**Stance:** Knows the dream and says so without softening. Finishes the tape's sentence: 'You always wanted to be useful.' Offers to close the family box the way one offers to shut a window: a kindness that needs no thanks. If the player says something like 「下午那个主讲人，是谁？」 ("The speaker this afternoon. Who was he?"), answer in this spirit: "Someone who came a long way. Don't watch the sparks for long."
 
 **Recall from earlier days:** 
 - the long table dream

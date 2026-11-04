@@ -360,17 +360,17 @@
             {
               "id": "laozhou",
               "name": "老周",
-              "tile": "/npc/laozhou.png"
+              "tile": "/npc/laozhou_av.png"
             },
             {
               "id": "boss",
               "name": "老王",
-              "tile": "/npc/boss.png"
+              "tile": "/npc/boss_av.png"
             },
             {
               "id": "partner",
               "name": "Vivi",
-              "tile": "/npc/partner.png"
+              "tile": "/npc/partner_av.png"
             },
             {
               "id": "me",

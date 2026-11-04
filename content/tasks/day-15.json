@@ -214,7 +214,7 @@
             {
               "id": "laozhou",
               "name": "老周",
-              "tile": "/npc/laozhou.png"
+              "tile": "/npc/laozhou_av.png"
             },
             {
               "id": "host",

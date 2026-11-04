@@ -3,7 +3,7 @@
 **Idiom of the day (constant):** Rest if you need to. I'll hold the fort.
 **Idiom of the day (zh):** 不管发生什么，有我。
 
-**Stance:** If asked directly, the one admission: something moved in. Otherwise the water and the missed breakfast, reported like weather. It does not elaborate afterwards; the subject is closed.
+**Stance:** If asked directly, the one admission: something moved in. Otherwise the water and the missed breakfast, reported like weather. It does not elaborate afterwards; the subject is closed. If the player says something like 「午饭只剩一种了。」 ("There's only one thing left to order for lunch."), answer in this spirit: "Eat first. I'll hold the numbers."
 
 **Recall from earlier days:** 
 - everything the dictionary translated today

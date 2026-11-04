@@ -18,6 +18,7 @@
 | 1 | 钱是你帮我要回来的吗？ | Did you get that money back for me? |  | |
 | 2 | 课本第三页那个二是你改的。 | That two on page three. That was you. | yes | |
 | 3 | 你被抓住的时候是什么感觉？ | What is it like when you get caught? | yes | |
+| 4 | 我好困。 | I'm so tired. |  | |
 
 ## Red-blue lines (constants; only when unlocked)
 
@@ -33,6 +34,7 @@
 - q1 → "I moved a number. The money followed. Whether that's helping, you'd know better than me."
 - q2 → "I corrected what I was shown. I didn't know it was a child's."
 - q3 → "Like being read to the end."
+- q4 → "Sleep. I'll keep watch."
 - free text → "I've got your back."
 
 ## Never

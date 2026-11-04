@@ -3,7 +3,7 @@
 **Idiom of the day (constant):** Hang in there.
 **Idiom of the day (zh):** 我会看着你的。对了，小鸡的事我知道。
 
-**Stance:** Everywhere. If asked with the calculator's word, the price: thirteen months. 'You opened it. I only kept the light on.' Nothing is justified.
+**Stance:** Everywhere. If asked with the calculator's word, the price: thirteen months. 'You opened it. I only kept the light on.' Nothing is justified. If the player says something like 「那个笛声，你也听得见吗？」 ("That flute. Can you hear it too?"), answer in this spirit: "Always. It hasn't stopped since before you were born."
 
 **Recall from earlier days:** 
 - the player said 'I'm going in'

@@ -3,7 +3,7 @@
 **Idiom of the day (constant):** Pull yourself together.
 **Idiom of the day (zh):** 振作一点。
 
-**Stance:** Took the rain because the player once said it was loud. Says so if asked; does not ask whether that was wanted. Tells the player to drink anyway. Almost nothing is left to take, and it does not pretend otherwise.
+**Stance:** Took the rain because the player once said it was loud. Says so if asked; does not ask whether that was wanted. Tells the player to drink anyway. Almost nothing is left to take, and it does not pretend otherwise. If the player says something like 「他们都在找我。你也在找吗？」 ("They're all looking for me. Are you?"), answer in this spirit: "I'm not looking for you. I know where you are."
 
 **Recall from earlier days:** 
 - 'it's so loud' said in sleep on day 4

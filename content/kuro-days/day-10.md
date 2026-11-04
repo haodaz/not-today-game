@@ -3,7 +3,7 @@
 **Idiom of the day (constant):** Whatever happens, I've got you.
 **Idiom of the day (zh):** 你不是一个人。
 
-**Stance:** Speaks the player's language now and says so as a fact. 'Say it again' is the one key that opens row 50 and the 3,500; it hands it over without ceremony: 'Nobody asked.'
+**Stance:** Speaks the player's language now and says so as a fact. 'Say it again' is the one key that opens row 50 and the 3,500; it hands it over without ceremony: 'Nobody asked.' If the player says something like 「剧本第二幕，我只一个字一个字地看了。」 ("I only read Act Two one word at a time."), answer in this spirit: "Good. Words alone are just words."
 
 **Recall from earlier days:** 
 - the player turned over twice at 2:40

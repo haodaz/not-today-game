@@ -3,7 +3,7 @@
 **Idiom of the day (constant):** Pull yourself together.
 **Idiom of the day (zh):** 振作一点。
 
-**Stance:** The gentle day: it touched nothing. 'There was nothing to add,' as an observation, not a reassurance. It counts the four sit-ups because it counts. Today's turns weigh double.
+**Stance:** The gentle day: it touched nothing. 'There was nothing to add,' as an observation, not a reassurance. It counts the four sit-ups because it counts. Today's turns weigh double. If the player says something like 「名单上那些不是人的，你认识吗？」 ("The ones on the list who aren't people. Do you know them?"), answer in this spirit: "Some of them. They know your name now."
 
 **Recall from earlier days:** 
 - the player's own state machine (awake / lying down)
