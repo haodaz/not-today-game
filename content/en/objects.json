@@ -68,41 +68,34 @@
         }
       }
     },
-    "textbook": {
+    "camera": {
       "day": 2,
-      "q": "Soft. A textbook, with a table on the back cover.",
+      "q": "Hard. An instant camera, cream-white, a red shutter.",
       "options": [
         {
-          "t": "An exercise book",
+          "t": "A toy camera",
           "right": false
         },
         {
-          "t": "Third-grade arithmetic; the table on the back is in your hand",
+          "t": "The one you took along the year primary school was ending",
           "right": true
         },
         {
-          "t": "A dictionary",
+          "t": "A radio",
           "right": false
         }
       ],
       "right": {
         "say": [
-          "Third-grade arithmetic. The table on the back cover you copied yourself, in pencil, pressed so hard it shows through the paper. You do not remember what it was. Your fingers do."
+          "The one you took along the year primary school was ending. Press, and a sheet slides out. Then you wait."
         ],
-        "inner": "Pressed very hard."
+        "inner": "None of the photos have you in them."
       },
       "wrong": {
         "say": [
-          "You leaf through it. The print is small and dense. There is a table on the back cover; you do not know what it is for."
+          "An old camera. Press, and out comes a white sheet."
         ],
-        "inner": "Look again later."
-      },
-      "cell": {
-        "l": 0.62,
-        "t": 0.74,
-        "w": 0.12,
-        "h": 0.06,
-        "text": "96"
+        "inner": "You have to wait."
       }
     },
     "pager": {
