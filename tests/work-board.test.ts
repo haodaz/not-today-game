@@ -83,15 +83,44 @@ vi.mock("@state/days/tasks", async (importOriginal) => {
   const boardT = parsed.tasks.find((t: any) => t.id === "task4")!;
   const files = new Map(real.taskFiles);
   files.set(7, parsed.tasks);
+  // Work v2 (addition 2026-11-03 night): two more board tasks for the "who receives it" tests — a
+  // `to: "boss"` board (sent on screen) and a `to: "hand"` board on day 11 (a hand night with no
+  // content shutdown choices). They answer only through `taskByFlag` (the log drives the readers).
+  const parseBoard = (to: string | undefined, flag: string, delId: string) => {
+    const rawX = structuredClone(d7);
+    rawX.tasks = rawX.tasks.map((t: any) =>
+      t.id === "task4"
+        ? {
+            id: "task4",
+            title: "对比一下。",
+            app: "docs",
+            done: flag,
+            board: structuredClone(fx.board),
+            deliverable: { ...structuredClone(fx.deliverable), id: delId, ...(to !== undefined ? { to } : {}) },
+            judge: structuredClone(fx.judge),
+          }
+        : t,
+    );
+    return real.parseTaskFile(rawX, "x.json").tasks.find((t: any) => t.id === "task4")!;
+  };
+  // Both live on day 11 (its real task flags task_d11_1 / task_d11_2, so the `task` reducer accepts
+  // them): the hand board, and a board that goes to 老板 on screen.
+  const handBoard11 = parseBoard("hand", "task_d11_1", "d11-hand");
+  const bossBoard11 = parseBoard("boss", "task_d11_2", "d11-boss");
   return {
     ...real,
     taskFiles: files,
-    taskByFlag: (day: number, flag: string) => (day === 7 && flag === "task_d7_4" ? boardT : real.taskByFlag(day, flag)),
+    taskByFlag: (day: number, flag: string) => {
+      if (day === 7 && flag === "task_d7_4") return boardT;
+      if (day === 11 && flag === "task_d11_1") return handBoard11;
+      if (day === 11 && flag === "task_d11_2") return bossBoard11;
+      return real.taskByFlag(day, flag);
+    },
   };
 });
 
 import { createStore, type Store } from "@state/store";
-import { boardState, canPrint, boardJudgement, deliverableOnDesk, printedBoard, trayCards, wrongCount } from "@state/days/board";
+import { boardState, canPrint, boardJudgement, deliverableOnDesk, handNight, printedBoard, trayCards, wrongCount } from "@state/days/board";
 import { taskByFlag } from "@state/days/tasks";
 
 const RIGHT: Record<string, string> = { r1: "c1", r2: "c2", r3: "c3", r4: "c4", r5: "c5", r6: "c6" };
@@ -237,3 +266,119 @@ describe("replay", () => {
 });
 
 
+// ——— 7: who receives it (work v2 addition 2026-11-03 night) ———
+
+import { renderBoard } from "@world/desktop/workbench/board";
+import { sentFiles, transcript, sentReplies } from "@world/desktop/messages/transcript";
+import { showing, GIVE_INDEX, REFUSE_INDEX, type DialogueState, type Queued } from "@world/loop/dialogue";
+import { initialSession, type AppContext } from "@world/desktop/model";
+import { DEFAULT_CLOCK } from "@world/desktop/beat";
+import { t } from "@world/i18n";
+
+/** A minimal AppContext over a store (for the board surface). */
+function appCtx(store: Store): AppContext {
+  return { state: store.getState(), events: store.getEvents(), startDay: store.getStartDay(), session: initialSession(DEFAULT_CLOCK), night: false, nowMs: 0 };
+}
+
+/** The shutdown box as a queued beatChoices entry (no content choices unless `choices` given). */
+function shutdownQueue(choices: any[] = []): DialogueState {
+  const q: Queued = { key: "shutdown", lines: [], ending: { kind: "beatChoices", day: 0, beat: "shutdown" }, sequence: { say: [], ...(choices.length ? { choices } : {}) } as any };
+  return { queue: [q], line: 0 };
+}
+
+describe("handNight (the gods send the hand)", () => {
+  it("the raid nights and every night from day 10 are hand nights; earlier plain nights are not", () => {
+    for (const d of [5, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]) expect(handNight(d), `day ${d}`).toBe(true);
+    for (const d of [1, 2, 3, 4, 6, 8]) expect(handNight(d), `day ${d}`).toBe(false);
+  });
+});
+
+/** A store at day 11 (so the task reducer accepts its flags). */
+function day11(): Store {
+  return createStore({ runId: "r", startDay: 11 });
+}
+
+describe("a board that goes to a person (to: boss)", () => {
+  // Printing a person's board logs the `task` and a `give` at once (what the send button does). We
+  // assert the result: the send label, nothing on the desk, the file card in 老板's chat, the
+  // judgement at 躺下, and no give choice at shutdown. (On day 11, flag task_d11_2 → the boss board.)
+  const sent = () => {
+    const store = day11();
+    store.appendEvent({ kind: "task", flag: "task_d11_2", mode: "self", slots: { ...RIGHT }, assists: 0 });
+    store.appendEvent({ kind: "give", deliverableId: "d11-boss", t: "17:20" });
+    return store;
+  };
+
+  it("the final button is 发给老板, not 打印", () => {
+    const out = renderBoard(appCtx(day11()), taskByFlag(11, "task_d11_2")!).value;
+    expect(out).toContain(t("board.send.boss"));
+    expect(out).not.toContain(t("board.print"));
+  });
+
+  it("task and give are logged at once by printing", () => {
+    const events = sent().getEvents();
+    expect(events.some((e) => e.kind === "task" && e.flag === "task_d11_2")).toBe(true);
+    expect(events.some((e) => e.kind === "give" && e.deliverableId === "d11-boss")).toBe(true);
+  });
+
+  it("nothing goes on the desk (a person's deliverable is sent on screen)", () => {
+    expect(deliverableOnDesk(11, sent().getEvents())).toBeNull();
+  });
+
+  it("a file card from 你 appears in 老板's chat at the time it was sent", () => {
+    const store = sent();
+    const files = sentFiles(store.getEvents());
+    expect(files).toEqual([{ day: 11, conversation: "boss", label: "一叠对比表", t: "17:20", order: expect.any(Number) }]);
+    const bubbles = transcript({ conversation: "boss", state: store.getState(), replies: sentReplies(store.getStartDay(), store.getEvents()), clock: { beat: "night", time: "23:00" }, progress: new Map(), files });
+    const card = bubbles.find((b) => b.kind === "msg" && b.side === "me" && b.body.type === "filecard");
+    expect(card, "the player's file card").toBeTruthy();
+    expect(card!.kind === "msg" && card!.body.type === "filecard" && card!.body.raw).toBe("一叠对比表");
+  });
+
+  it("the card is not there before it was sent (clock earlier than its time)", () => {
+    const store = sent();
+    const files = sentFiles(store.getEvents());
+    const bubbles = transcript({ conversation: "boss", state: store.getState(), replies: sentReplies(store.getStartDay(), store.getEvents()), clock: { beat: "work", time: "17:00" }, progress: new Map(), files });
+    expect(bubbles.some((b) => b.kind === "msg" && b.body.type === "filecard")).toBe(false);
+  });
+
+  it("it is judged at 躺下 by the slots (given → perfect)", () => {
+    expect(boardJudgement(11, sent().getEvents())).toEqual({ verdict: "perfect", san: 0 });
+  });
+
+  it("the shutdown box offers no give choice (it was sent, not on the desk)", () => {
+    const store = sent();
+    const show = showing(shutdownQueue(), store.getState(), store.getEvents());
+    expect((show?.choices ?? []).some((c) => c.index === GIVE_INDEX)).toBe(false);
+  });
+});
+
+describe("a board that goes to the hand on day 11 (a hand night, no content choices)", () => {
+  /** A store at day 11 with the hand board (flag task_d11_1) printed, not yet given. */
+  const day11Printed = () => {
+    const store = day11();
+    store.appendEvent({ kind: "task", flag: "task_d11_1", mode: "self", slots: { ...RIGHT }, assists: 0 });
+    return store;
+  };
+
+  it("the deliverable sits on the desk (a hand deliverable), and the shutdown box offers 把…递给它 and 不给。", () => {
+    const store = day11Printed();
+    expect(deliverableOnDesk(11, store.getEvents())).toMatchObject({ id: "d11-hand" });
+    const show = showing(shutdownQueue(), store.getState(), store.getEvents());
+    const choices = show?.choices ?? [];
+    expect(choices.some((c) => c.index === GIVE_INDEX && c.choice === "give")).toBe(true);
+    expect(choices.some((c) => c.index === REFUSE_INDEX && c.choice === "refuse")).toBe(true);
+    expect(choices.find((c) => c.index === REFUSE_INDEX)!.text).toBe(t("hand.refuse"));
+  });
+
+  it("giving leaves the desk and makes the judgement perfect; refusing logs nothing → wrong", () => {
+    // Give: the desk empties and the slots judge perfect.
+    const given = day11Printed();
+    given.appendEvent({ kind: "give", deliverableId: "d11-hand" });
+    expect(deliverableOnDesk(11, given.getEvents())).toBeNull();
+    expect(boardJudgement(11, given.getEvents())).toEqual({ verdict: "perfect", san: 0 });
+    // Refuse: nothing is logged, so by 躺下 it was not given → wrong.
+    const refused = day11Printed();
+    expect(boardJudgement(11, refused.getEvents())).toMatchObject({ verdict: "wrong" });
+  });
+});

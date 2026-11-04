@@ -96,7 +96,11 @@ export interface DeskThings {
 }
 /** A free spot on the desk for the deliverable (no rect in content/desk.json): left-front by the lamp foot. */
 export const DELIVERABLE_RECT: Rect = { l: 230, t: 640, w: 200, h: 140 };
-/** The deliverable thumbnail (content img), or a plain paper fallback when there is none. */
+/**
+ * The deliverable thumbnail (content img), or a plain paper fallback when there is none. Only a
+ * `hand` deliverable sits on the desk (work v2 addition 2026-11-03 night): a person's deliverable
+ * was sent on screen, so `deliverableOnDesk` returns null for it and nothing shows here.
+ */
 function deliverableThing(state: State, events: readonly GameEvent[]): SafeHtml | null {
   const d = deliverableOnDesk(state.day, events);
   if (!d) return null;

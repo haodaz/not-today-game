@@ -8,7 +8,7 @@ import type { GameEvent } from "@state/events";
 import { choiceOf } from "@state/days/effects";
 import { isRaidNight, takeFor, wantsOf } from "@state/nights";
 import { dueAtLieDown, dueAtShutdown } from "@state/endings";
-import { boardJudgement } from "@state/days/board";
+import { boardJudgement, deliverableOnDesk, handNight } from "@state/days/board";
 import { autoUnlockBoard } from "@world/desktop/workbench/board";
 import { startEnding } from "@world/endings/flow";
 import { knows, optionOrder, recogniseTable, wasRight } from "@state/recognise";
@@ -127,7 +127,16 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
       } else if (e.name === "beat:shutdown") {
         shutdown = true;
         clock = at(clock, "night", BEAT_TIMES.night);
-        if (file.beats.shutdown) dialogue = push(dialogue, beatQueued(day, "shutdown", file.beats.shutdown));
+        if (file.beats.shutdown) {
+          // Work v2 (addition 2026-11-03 night): on a hand night with no content choices (days 11,
+          // 12, 14, 15, 17) the shutdown beat still ends in a choice, so the hand's give / refuse
+          // can be offered (dialogue.ts builds them). On a raid night the content's choices already
+          // end it; other nights keep the plain ending.
+          const seq = file.beats.shutdown;
+          const handChoice = handNight(day) && !seq.choices?.length && deliverableOnDesk(day, events) !== null;
+          const ending = handChoice ? ({ kind: "beatChoices" as const, day, beat: "shutdown" as const }) : undefined;
+          dialogue = push(dialogue, beatQueued(day, "shutdown", seq, ending));
+        }
       }
     } else if (e.kind === "task" && e.mode !== "auto") {
       // A work task played from the workbench: its start, then the chosen path (content/tasks).

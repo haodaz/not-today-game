@@ -11,6 +11,7 @@ import { step } from "@state/replay";
 import { condHolds } from "@state/replies/resolve";
 import { dayTable, FAMILY_GROUPS } from "@state/replies/table";
 import type { State } from "@state/types.gen";
+import { taskByFlag } from "@state/days/tasks";
 import { npcIdOf } from "@world/npc";
 import { planReply, IN_INPUT_FLAG, type ReplyPlan } from "@world/replies/plan";
 import type { BeatClock } from "../beat";
@@ -35,6 +36,48 @@ export interface SentReply {
   readonly index: number;
   readonly event: Extract<GameEvent, { kind: "reply" }> & { recipient: string };
   readonly plan: ReplyPlan;
+}
+
+/** The conversation id a person-sent deliverable goes to (work v2 addition 2026-11-03 night). */
+const CONVERSATION_OF_TO: Readonly<Record<string, string>> = { boss: "boss", partner: "partner", group: "group" };
+
+/** A board deliverable the player sent to a person on screen, as a file card from 你. */
+export interface SentFile {
+  readonly day: number;
+  readonly conversation: string;
+  readonly label: string;
+  readonly t: string;
+  readonly order: number;
+}
+
+/**
+ * The deliverables sent to a person on screen (work v2 addition 2026-11-03 night): each `give`
+ * event whose deliverable has a person `to` becomes a file card from 你 in that conversation, at the
+ * time it was sent. A `hand` give (no `t`, or `to` absent) goes to the desk, not a conversation, so
+ * it is skipped here. Pure, from the log.
+ */
+export function sentFiles(events: readonly GameEvent[]): SentFile[] {
+  // Resolve a `give`'s deliverable from the `task` events of its day: a board task that printed it
+  // (its flag is logged) carries the deliverable. This stays in the log, not the day-file items.
+  const deliverableFor = (day: number, id: string): { label: string; to?: string } | null => {
+    for (const e of events) {
+      if (e.kind !== "task" || e.day !== day) continue;
+      const d = taskByFlag(day, e.flag)?.deliverable;
+      if (d?.id === id) return d;
+    }
+    return null;
+  };
+  const out: SentFile[] = [];
+  events.forEach((event, index) => {
+    if (event.kind !== "give") return;
+    const d = deliverableFor(event.day, event.deliverableId);
+    const to = d?.to;
+    if (!d || to === undefined || to === "hand") return;
+    const conversation = CONVERSATION_OF_TO[to];
+    if (conversation === undefined) return; // workbench: sent nowhere a conversation shows it
+    out.push({ day: event.day, conversation, label: d.label, t: event.t ?? "", order: index });
+  });
+  return out;
 }
 
 /** Every conversation reply in the log, with its plan (one replay pass over the log). */
@@ -68,6 +111,8 @@ export interface TranscriptInput {
   readonly replies: readonly SentReply[];
   readonly clock: BeatClock;
   readonly progress: ReadonlyMap<number, number>;
+  /** Board deliverables sent to a person on screen (work v2 addition 2026-11-03 night); optional. */
+  readonly files?: readonly SentFile[];
 }
 
 interface Group {
@@ -220,6 +265,13 @@ export function transcript(input: TranscriptInput): Bubble[] {
       groups.push({ t: item.t, order: -1_000_000 + i, bubbles });
     });
     groups.push(...replyGroups(input, day));
+    // The player's own file cards sent to this person on screen today (work v2 addition 2026-11-03
+    // night): a 你-side deliverable card at the time it was sent.
+    for (const file of input.files ?? []) {
+      if (file.day !== day || file.conversation !== input.conversation) continue;
+      if (day === today && file.t > input.clock.time) continue; // not sent yet
+      groups.push({ t: file.t, order: file.order, bubbles: [{ kind: "msg", side: "me", who: "me", t: file.t, body: { type: "filecard", raw: file.label }, labelKey: null }] });
+    }
     if (!groups.length) continue;
     // By time; incoming before replies at the same minute; ties keep log order.
     groups.sort((a, b) => (a.t < b.t ? -1 : a.t > b.t ? 1 : a.order - b.order));

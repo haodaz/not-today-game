@@ -5,8 +5,7 @@ import type { BeatName, Place, SayLine, Sequence } from "@state/days/table";
 import { choiceOffered } from "@state/days/effects";
 import { recogniseTable } from "@state/recognise";
 import type { GameEvent } from "@state/events";
-import { deliverableOnDesk } from "@state/days/board";
-import { isRaidNight } from "@state/nights";
+import { deliverableOnDesk, handNight } from "@state/days/board";
 import { hasString, t } from "@world/i18n";
 import type { State } from "@state/types.gen";
 
@@ -244,6 +243,8 @@ export const KURO_OFFER_OPTIONS: readonly ChoiceOption[] = [
 
 /** The sentinel index of the synthetic 把…递给它 option (work v2); not a content choice. */
 export const GIVE_INDEX = -1;
+/** The sentinel index of the synthetic 不给。option (work v2 addition 2026-11-03 night). */
+export const REFUSE_INDEX = -2;
 
 function options(q: Queued, state: State, events?: readonly GameEvent[]): ChoiceOption[] | null {
   if (q.ending.kind === "loan") return [...LOAN_OPTIONS];
@@ -260,11 +261,18 @@ function options(q: Queued, state: State, events?: readonly GameEvent[]): Choice
     .map((c, index) => ({ c, index }))
     .filter(({ c }) => choiceOffered(c, state))
     .map(({ c, index }) => ({ index, text: c.text }));
-  // Work v2 §4: on a raid night, if today's deliverable is on the desk, 把{label}递给它 is offered
-  // first, before the raid's own choices. It routes to a `give` event (choice "give").
-  if (events && q.ending.beat === "shutdown" && isRaidNight(state.day) && hasString("hand.give")) {
+  // Work v2 (addition 2026-11-03 night): on a hand night (a raid night, or any night from day 10),
+  // if a `hand` deliverable is on the desk, 把{label}递给它 is offered first, before the night's own
+  // choices. It routes to a `give` event (choice "give"). On a hand night the content has no choices
+  // (days 11, 12, 14, 15, 17), 不给。is added too (`hand.refuse`, choice "refuse" — it logs nothing;
+  // the judgement will say wrong). On a raid night the content's own choices stay after the give.
+  if (events && q.ending.beat === "shutdown" && handNight(state.day) && hasString("hand.give")) {
     const d = deliverableOnDesk(state.day, events);
-    if (d) return [{ index: GIVE_INDEX, text: t("hand.give", { label: d.label }), choice: "give" }, ...content];
+    if (d) {
+      const give = { index: GIVE_INDEX, text: t("hand.give", { label: d.label }), choice: "give" as const };
+      const refuse = content.length === 0 && hasString("hand.refuse") ? [{ index: REFUSE_INDEX, text: t("hand.refuse"), choice: "refuse" as const }] : [];
+      return [give, ...content, ...refuse];
+    }
   }
   return content;
 }

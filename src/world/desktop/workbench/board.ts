@@ -68,6 +68,17 @@ function tray(board: TaskBoard, s: BoardState, session: Session): SafeHtml {
   return html`<div class="btray">${header}<div class="bcards">${cards}</div></div>`;
 }
 
+/**
+ * The final button's label (work v2 addition 2026-11-03 night): a person's deliverable is sent on
+ * screen (发给老板 / 发给 Vivi / 发到群里 / 提交) by `board.send.<to>`; a `hand` deliverable (or no
+ * deliverable) prints to the desk with `board.print`.
+ */
+function finishLabel(task: Task): SafeHtml | null {
+  const to = task.deliverable?.to ?? "hand";
+  const key = to !== "hand" ? `board.send.${to}` : "board.print";
+  return hasString(key) ? tr(key) : null;
+}
+
 /** The board surface for an open board task (work v2). Pure. */
 export function renderBoard(ctx: AppContext, task: Task): SafeHtml {
   const { state, events, session } = ctx;
@@ -75,8 +86,8 @@ export function renderBoard(ctx: AppContext, task: Task): SafeHtml {
   const s = boardState(board, state.day, task.id, events);
   const assist = hasString("board.assist") ? html`<button type="button" class="bchip" data-action="board-assist">${tr("board.assist")}</button>` : null;
   const printable = canPrint(board, s);
-  const print = html`<button type="button" class="bprint" data-action="board-print"${printable ? null : html` disabled`}>${hasString("board.print") ? tr("board.print") : null}</button>`;
-  return html`<div class="surface board"><div class="btitle">${board.title}</div>${lockRow(board, s, state, events, session)}${table(board, s, state, session)}${tray(board, s, session)}<div class="bbar">${assist}${print}</div></div>`;
+  const finish = html`<button type="button" class="bprint" data-action="board-print"${printable ? null : html` disabled`}>${finishLabel(task)}</button>`;
+  return html`<div class="surface board"><div class="btitle">${board.title}</div>${lockRow(board, s, state, events, session)}${table(board, s, state, session)}${tray(board, s, session)}<div class="bbar">${assist}${finish}</div></div>`;
 }
 
 // ——— the actions ———
@@ -168,7 +179,10 @@ export const boardActions: Record<string, ActionHandler> = {
     ctx.session.boardLockOpen = false;
     ctx.rerender();
   },
-  // 打印: complete the task. The `task` event carries slots + assists; the mode is self (no assist) or let.
+  // 打印 / 发给… / 提交: complete the task. The `task` event carries slots + assists; the mode is
+  // self (no assist) or let. A person's deliverable (work v2 addition 2026-11-03 night) is sent on
+  // screen: the same click also logs `give` at once, so nothing goes to the desk and the message
+  // view shows the player's file card. A `hand` deliverable just prints (given later, at night).
   "board-print"(ctx) {
     const c = currentBoard(ctx);
     if (!c) return;
@@ -183,6 +197,8 @@ export const boardActions: Record<string, ActionHandler> = {
       slots: { ...s.slots },
       assists: s.assists,
     });
+    const d = c.task.deliverable;
+    if (d && (d.to ?? "hand") !== "hand") ctx.store.appendEvent({ kind: "give", deliverableId: d.id, t: ctx.session.clock.time });
     ctx.session.boardPick = null;
     ctx.session.boardLockOpen = false;
     ctx.rerender();

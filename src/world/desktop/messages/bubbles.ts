@@ -13,6 +13,12 @@ export type Body =
   /** Vivi's deliverable (desktop-ui 2026-11-02): a clickable card that opens `doc` in the browser. */
   | { readonly type: "deliverable"; readonly raw: string; readonly doc: string }
   /**
+   * The player's own sent file (work v2 addition 2026-11-03 night): a board deliverable sent to a
+   * person shows as a file card on 你's side, the same card look as a received deliverable but not
+   * clickable (there is no browser doc for it). `raw` is the deliverable's label.
+   */
+  | { readonly type: "filecard"; readonly raw: string }
+  /**
    * A shared thing drawn as what it is (desktop-ui 2026-11-03): the `card` from content, with the
    * message's `text` kept as the list preview and fallback. `forwarded` adds the 「转发」 label.
    */
@@ -61,6 +67,7 @@ export function previewOf(body: Body): string {
     case "attach":
     case "system":
     case "deliverable":
+    case "filecard":
     case "shared":
       return body.raw;
   }

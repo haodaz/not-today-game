@@ -63,8 +63,9 @@ export type GameEvent =
   // work v2 (2026-11-03): one step on a board (lock / fill / clear / Kuro's assist). The board is
   // rebuilt from these on reload; nothing changes in state (the `task` event at print carries the result).
   | { kind: "boardStep"; day: number; taskId: string; op: BoardOp }
-  // work v2: today's deliverable handed to the hand at the shutdown beat.
-  | { kind: "give"; day: number; deliverableId: string }
+  // work v2: today's deliverable handed to the hand at the shutdown beat, or (addition 2026-11-03
+  // night) sent to a person on screen from the board; `t` is the send time for the on-screen card.
+  | { kind: "give"; day: number; deliverableId: string; t?: string }
   // work v2: the night's board judgement (the runtime computes it from the log at 躺下); SAN by the
   // judge's delta (never up). `verdict` is which line plays.
   | { kind: "boardJudge"; day: number; verdict: "perfect" | "flawed" | "wrong"; san: number }

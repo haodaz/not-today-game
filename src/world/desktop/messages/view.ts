@@ -13,7 +13,7 @@ import type { AppContext } from "../model";
 import { previewOf, type Body } from "./bubbles";
 import { renderCard } from "./cards";
 import { FEED, threadsIn, type ThreadApp } from "./threads";
-import { inInputText, lastMessage, lastMessageDay, sentReplies, SPEAKER_CONVERSATIONS, transcript, unreadCount, type Bubble, type SentReply } from "./transcript";
+import { inInputText, lastMessage, lastMessageDay, sentFiles, sentReplies, SPEAKER_CONVERSATIONS, transcript, unreadCount, type Bubble, type SentReply } from "./transcript";
 
 /** WeChat (消息) or DingTalk (工作台's 消息 pane). */
 type Register = "wx" | "ding";
@@ -61,6 +61,10 @@ export function renderBody(body: Body, names: State["names"], register: Register
       // A clickable card that opens the doc and lifts the Vivi lock (desktop-ui 2026-11-02); it looks
       // like a link card with a file-type badge (desktop-ui 2026-11-03).
       return html`<button type="button" class="sc sc-link deliverable ${register}" data-action="open-deliverable" data-doc="${body.doc}"><div class="c-body"><div class="c-text"><div class="c-title two">${fill(body.raw)}</div>${hasString("msgs.card.site.doc") ? html`<div class="c-site">${tr("msgs.card.site.doc")}</div>` : null}</div><span class="fico x-html" aria-hidden="true">HTML</span></div></button>`;
+    case "filecard":
+      // The player's own sent file (work v2 addition 2026-11-03 night): the same card look as a
+      // received deliverable, on 你's side, not clickable (no browser doc for a board deliverable).
+      return html`<div class="sc sc-link deliverable ${register}"><div class="c-body"><div class="c-text"><div class="c-title two">${fill(body.raw)}</div>${hasString("msgs.card.site.doc") ? html`<div class="c-site">${tr("msgs.card.site.doc")}</div>` : null}</div><span class="fico x-html" aria-hidden="true">HTML</span></div></div>`;
     case "shared":
       // A shared thing drawn as what it is (desktop-ui 2026-11-03): WeChat in 消息, DingTalk in 工作台.
       return renderCard(body.card, fill, register, body.forwarded);
@@ -148,8 +152,9 @@ interface ConversationData {
 }
 
 function conversations(ctx: AppContext, replies: readonly SentReply[], app: ThreadApp): ConversationData[] {
+  const files = sentFiles(ctx.events);
   return threadsIn(app, ctx.state.day).map((id) => {
-    const bubbles = transcript({ conversation: id, state: ctx.state, replies, clock: ctx.session.clock, progress: ctx.session.progress });
+    const bubbles = transcript({ conversation: id, state: ctx.state, replies, clock: ctx.session.clock, progress: ctx.session.progress, files });
     return { id, bubbles, unread: unreadCount(bubbles, ctx.events, id, ctx.state.day) };
   });
 }

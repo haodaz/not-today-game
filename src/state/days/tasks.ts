@@ -129,10 +129,18 @@ export interface TaskBoard {
   readonly cards: readonly BoardCard[];
   readonly kuro: BoardKuro;
 }
+/** Who a deliverable goes to (work v2 addition 2026-11-03 night); absent = `"hand"`. */
+export const DELIVERABLE_TO = ["boss", "partner", "group", "workbench", "hand"] as const;
+export type DeliverableTo = (typeof DELIVERABLE_TO)[number];
 export interface TaskDeliverable {
   readonly id: string;
   readonly label: string;
   readonly img?: string;
+  /**
+   * Who receives it. A person (`boss` / `partner` / `group`) or `workbench` is sent on screen by a
+   * `board.send.<to>` button; `hand` (the default) lands on the desk and is given at night.
+   */
+  readonly to?: DeliverableTo;
 }
 export interface TaskJudge {
   readonly perfect: number;
@@ -386,8 +394,9 @@ function board(v: unknown, w: string): TaskBoard {
 
 function deliverable(v: unknown, w: string): TaskDeliverable {
   if (!isRecord(v)) fail(w, "must be an object");
-  keys(v, ["id", "label", "img"], w);
-  return { id: str(v.id, `${w}.id`), label: str(v.label, `${w}.label`), ...(v.img !== undefined ? { img: str(v.img, `${w}.img`) } : {}) };
+  keys(v, ["id", "label", "img", "to"], w);
+  const to = v.to !== undefined ? ((DELIVERABLE_TO as readonly unknown[]).includes(v.to) ? (v.to as DeliverableTo) : fail(`${w}.to`, `must be one of ${DELIVERABLE_TO.join(", ")}`)) : undefined;
+  return { id: str(v.id, `${w}.id`), label: str(v.label, `${w}.label`), ...(v.img !== undefined ? { img: str(v.img, `${w}.img`) } : {}), ...(to !== undefined ? { to } : {}) };
 }
 
 function judge(v: unknown, w: string): TaskJudge {

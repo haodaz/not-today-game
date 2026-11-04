@@ -1640,3 +1640,39 @@ No content/public changed (Kuro's frames were already in public/objects/kurogotc
 - Tests: new `tests/taken.test.ts` (19). Updated the `ObjectEnv`/`TapeState` literals in
   `objects-in-hand.test.ts` and the chick-reset assertion (the press bump is additive).
 - `npx tsc --noEmit`: clean. `npx vitest run`: 98 files / 1737 tests passed.
+
+## work-v2: people take it on screen, the gods send the hand (addition 2026-11-03 night)
+
+Replaces the earlier "every night collects" draft. A board deliverable now carries an optional
+`deliverable.to` (`boss` | `partner` | `group` | `workbench` | `hand`; absent = `hand`). A person's
+deliverable is sent on screen (the board's final button becomes `board.send.<to>`, clicking it logs
+the `task` and a `give` at once); a `hand` deliverable prints to the desk and waits for the hand.
+The hand comes on a hand night — a raid night, or every night from day 10 — and on a no-content-
+choice hand night (days 11, 12, 14, 15, 17) the box offers 把…递给它 / 不给。(the refuse logs nothing;
+the judgement reads `wrong`). Code only; all story text (`board.send.*`, `hand.refuse`) is content.
+
+- `src/state/days/tasks.ts`: `DELIVERABLE_TO` + `DeliverableTo`, `TaskDeliverable.to?`; the
+  `deliverable` validator accepts and enum-checks `to`.
+- `src/state/days/board.ts`: `handNight(day)` = day ≥ 10 or a raid night; `deliverableOnDesk`
+  returns null for a non-`hand` deliverable (a person's is sent on screen, never on the desk).
+- `src/state/events.ts`: `give` gains an optional `t` (the on-screen send time).
+- `src/world/desktop/workbench/board.ts`: `finishLabel(task)` picks `board.send.<to>` vs
+  `board.print`; `board-print` logs `give` at once (with the clock time) for a person `to`.
+- `src/world/loop/dialogue.ts`: the give choice now shows on any hand night (not just raids);
+  `REFUSE_INDEX` + the 不给。option when the night has no content choices.
+- `src/world/loop/runtime.ts`: the shutdown beat ends in `beatChoices` on a hand night with a
+  `hand` deliverable but no content choices, so give/refuse can be offered; imports `handNight`,
+  `deliverableOnDesk`.
+- `src/world/room/game.ts`: the give choice finishes the box when there are no content choices
+  (days 11/12/14/15/17); the new `refuse` choice finishes the box and logs nothing.
+- `src/world/desktop/messages/{bubbles,view}.ts`: a `filecard` body — the player's own sent file
+  card (老板 / Vivi / the group), the deliverable-card look on 你's side, not clickable.
+- `src/world/desktop/messages/transcript.ts`: `sentFiles(events)` resolves each person-`give` to its
+  conversation + label from the log's `task` events; the cards are injected into the transcript at
+  their send time. Threaded through `TranscriptInput.files` and the view's `conversations`.
+- `src/world/room/hud.ts`: a comment — the desk shows only a `hand` deliverable (via
+  `deliverableOnDesk`, now `hand`-only).
+- Tests: `tests/work-board.test.ts` — `handNight`; a `to: boss` board (send button, task + give at
+  once, nothing on the desk, the file card in 老板's chat at its time, judged at 躺下, no give choice
+  at shutdown); a `to: hand` board on day 11 (give / refuse offered, give → perfect, refuse → wrong).
+- `npx tsc --noEmit`: clean. `npx vitest run`: 98 files / 1747 tests passed.

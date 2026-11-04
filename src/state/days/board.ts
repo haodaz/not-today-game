@@ -6,6 +6,7 @@ import type { BoardOp, GameEvent } from "../events";
 import type { State } from "../types.gen";
 import { taskByFlag, type Task, type TaskBoard, type TaskDeliverable } from "./tasks";
 import { dayFile } from "./table";
+import { isRaidNight } from "../nights";
 import { takenByKuro } from "@world/objects/taken";
 
 /** The board of a task id on a day (work v2), or null. Found via the day's task list. */
@@ -152,6 +153,16 @@ export function validateBoardStep(day: number, taskId: string, op: BoardOp): voi
 
 // ——— the night judgement (work v2 §4) ———
 
+/**
+ * A night the hand comes (work v2 addition 2026-11-03 night): from day 10 the gods send the hand
+ * every night, and the earlier raid nights (5, 7, 9) are hand nights too. People take their own
+ * deliverables on screen (a `board.send.<to>` button), so only a `hand` deliverable on the desk
+ * waits for the hand. Pure (the raid nights are content-derived).
+ */
+export function handNight(day: number): boolean {
+  return day >= 10 || isRaidNight(day);
+}
+
 export type BoardVerdict = "perfect" | "flawed" | "wrong";
 
 /** The task event that printed a board on a day (its slots + assists), or null (not printed). */
@@ -171,13 +182,16 @@ export function deliverableGiven(day: number, deliverableId: string, events: rea
 
 /**
  * Today's deliverable sitting on the desk (work v2 §3): a board task was printed today, it has a
- * deliverable, and it has not been given to the hand yet. Null otherwise. Pure, from the log.
+ * `hand` deliverable (the default `to`), and it has not been given yet. Null otherwise. A person's
+ * deliverable (`boss` / `partner` / `group` / `workbench`) is sent on screen and never on the desk
+ * (work v2 addition 2026-11-03 night). Pure, from the log.
  */
 export function deliverableOnDesk(day: number, events: readonly GameEvent[]): TaskDeliverable | null {
   const printed = printedBoard(day, events);
   if (!printed) return null;
   const d = taskByFlag(day, printed.flag)?.deliverable;
   if (!d) return null;
+  if ((d.to ?? "hand") !== "hand") return null;
   return deliverableGiven(day, d.id, events) ? null : d;
 }
 

@@ -620,11 +620,27 @@ export const loopActions: Record<string, ActionHandler> = {
     // The line and the choice go into today's history (before the event: it may end the line).
     logCurrent(ctx.session, state);
     logPlayer(ctx.session, state, picked.text !== null ? fillPlaceholders(picked.text, state.names) : t(picked.labelKey!));
-    // Work v2 §4: 把{label}递给它 — hand today's deliverable to the hand. It leaves the desk; the
-    // raid's own choices stay, so the box does not finish (the player still answers the hand).
+    // Work v2 §4: 把{label}递给它 — hand today's deliverable to the hand. It leaves the desk. On a
+    // raid night the content's own choices stay, so the box does not finish (the player still answers
+    // the hand). On a hand night without content choices (days 11, 12, 14, 15, 17) there is nothing
+    // left to answer, so the box finishes and the day can end.
     if (q.ending.kind === "beatChoices" && data.choice === "give") {
       const d = deliverableOnDesk(state.day, events);
       if (d) ctx.store.appendEvent({ kind: "give", deliverableId: d.id });
+      if ((q.sequence?.choices?.length ?? 0) === 0) {
+        ctx.session.dialogue = finishChoice(ctx.session.dialogue);
+        settleSession(ctx.session);
+        openChatIfDue(ctx);
+      }
+      ctx.rerender();
+      return;
+    }
+    // 不给。(work v2 addition 2026-11-03 night): refusing the hand logs nothing (the judgement will
+    // say wrong); the box finishes. Only offered on a hand night that has no content choices.
+    if (q.ending.kind === "beatChoices" && data.choice === "refuse") {
+      ctx.session.dialogue = finishChoice(ctx.session.dialogue);
+      settleSession(ctx.session);
+      openChatIfDue(ctx);
       ctx.rerender();
       return;
     }
