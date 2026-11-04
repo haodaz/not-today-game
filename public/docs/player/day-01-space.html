@@ -530,7 +530,9 @@ document.getElementById('theme').textContent = { light:'配色 · 浅', mariana:
 document.getElementById('tog').onclick = () => { document.body.classList.toggle('split'); fit(); showCode(); };
 
 const qs = new URLSearchParams(location.search);
-if (qs.has('code')) document.body.classList.add('split');
+// ?pane=preview: the IDE shows the code in its own editor, so this page is the preview only.
+if (qs.get('pane') === 'preview') document.getElementById('tog').style.display = 'none';
+else if (qs.has('code')) document.body.classList.add('split');
 fit(); go(+(qs.get('c') || 0));
 if (qs.has('t')) { const ft = parseFloat(qs.get('t')) || 0; PART.forEach(p => { p.fx = p.x; p.fy = p.y; p.d = 0; }); render(ft); render(ft); window.__ready = true; }
 else { (function loop(){ render((performance.now() - t0)/1000); requestAnimationFrame(loop); })(); window.__ready = true; }
