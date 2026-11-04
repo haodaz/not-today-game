@@ -207,7 +207,14 @@
         ],
         "inner": "回头再看。"
       },
-      "light": "余额仅供参考"
+      "light": "余额仅供参考",
+      "works": {
+        "at": [
+          "room"
+        ],
+        "light": "lamp",
+        "line": "obj.works.nolamp"
+      }
     },
     "tape": {
       "day": 10,
@@ -660,6 +667,14 @@
         "t": 0.103,
         "w": 0.19,
         "h": 0.11
+      },
+      "works": {
+        "at": [
+          "window",
+          "room"
+        ],
+        "light": "dayOrLamp",
+        "line": "obj.works.dark"
       }
     },
     "phone": {
@@ -691,7 +706,14 @@
         ],
         "inner": "它不需要开机。"
       },
-      "sim": "本卡有效期至 2009 年 12 月。"
+      "sim": "本卡有效期至 2009 年 12 月。",
+      "works": {
+        "at": [
+          "window"
+        ],
+        "signal": true,
+        "line": "obj.works.nosignal"
+      }
     }
   }
 }

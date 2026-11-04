@@ -30,7 +30,8 @@
               "8",
               "4"
             ],
-            "answer": "12"
+            "answer": "12",
+            "face": "window"
           }
         },
         "slots": [
