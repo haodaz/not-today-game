@@ -172,6 +172,12 @@ export interface Session {
   boardPick: string | null;
   /** Work v2: the lock's code chips are open (needs the old object), or null. Session only. */
   boardLockOpen: boolean;
+  /**
+   * object-bar 2026-11-03: an old object opened from the 老物件栏 is being used over the desktop
+   * (its drawn device in a modal). It is the same `holding` + `hand.using` the room uses; this flag
+   * only says the modal is the entry point, so × / Esc closes it back to 工作台. Session only.
+   */
+  objbarOpen: boolean;
   /** Files whose `onOpen` line has already played today (once a day), by `<day>:<id>`. Session only. */
   filesSaid: Set<string>;
   /**
@@ -293,6 +299,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     wbGloss: null,
     boardPick: null,
     boardLockOpen: false,
+    objbarOpen: false,
     call: null,
   };
 }

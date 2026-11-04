@@ -365,6 +365,31 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .wb-rail .rg.contacts{border-radius:50%;width:18px}
 .wb-rail .n{position:absolute;top:2px;right:6px;min-width:16px;height:16px;border-radius:8px;background:var(--red);color:#fff;font-size:10px;line-height:16px;text-align:center;padding:0 4px}
 .wb-msgs{flex:1;display:flex;min-width:0}
+/* 老物件栏 (object-bar 2026-11-03): a narrow column of found-object icons next to the rail, on every
+   工作台 page. Pixel art, integer-scaled, no tile or frame behind (the author: just the objects). */
+.wb-objbar{flex:0 0 auto;width:60px;background:#f4f5f8;border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 0;overflow-y:auto}
+.wb-objbar .ob-title{font-size:10px;color:var(--ink-3);letter-spacing:.06em;text-align:center;writing-mode:horizontal-tb}
+.wb-objbar .ob-row{display:flex;flex-direction:column;align-items:center;gap:10px}
+.wb-objbar .ob-icon{width:44px;height:44px;padding:0;border:0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:8px}
+.wb-objbar .ob-icon img{width:40px;height:40px;object-fit:contain;image-rendering:pixelated}
+.wb-objbar .ob-icon.ph img{opacity:.78}
+.wb-objbar .ob-icon:hover,.wb-objbar .ob-icon:focus-visible{background:rgba(0,0,0,.05)}
+.wb-objbar .ob-icon.on{background:rgba(0,0,0,.08)}
+/* The 使用 modal over the desktop (object-bar R2): a dim backdrop and the drawn device centred. */
+.objbar-host{position:absolute;inset:0;z-index:30}
+.ob-use{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.ob-use-back{position:absolute;inset:0;border:0;padding:0;margin:0;background:rgba(10,10,12,.62);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);cursor:default}
+.ob-use-win{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;max-height:92%}
+.ob-use .ob-x{position:absolute;top:-8px;right:-8px;z-index:2;width:30px;height:30px;border:0;border-radius:50%;background:#2a2c33;color:#e7e3d7;font-size:18px;line-height:1;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.ob-use .ob-x:hover,.ob-use .ob-x:focus-visible{background:#3a3d46}
+/* Outside .room the held wrappers have no layout: show the device/photo face centred in the modal. */
+.ob-use-body .held.obj{position:static;transform:none;display:flex;align-items:center;justify-content:center}
+.ob-use-body .held.obj .breathe,.ob-use-body .held.obj .turn{display:flex;align-items:center;justify-content:center}
+.ob-use-body .held.obj .face.back{display:none}
+.ob-use-body .held.obj[data-face="back"] .face.front{display:none}
+.ob-use-body .held.obj[data-face="back"] .face.back{display:flex;align-items:center;justify-content:center}
+.ob-use-body .held.obj .face.front img,.ob-use-body .held.obj .face.back img{max-width:min(70vw,420px);max-height:70vh;object-fit:contain;image-rendering:pixelated}
+.ob-use-body .held.obj .face{position:relative}
 .conv.ding .rcpt{font-size:11px;margin-top:3px;text-align:right}
 .conv.ding .rcpt.read{color:var(--ink-3)}
 .conv.ding .rcpt.unread{color:var(--accent)}

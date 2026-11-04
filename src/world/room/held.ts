@@ -198,7 +198,7 @@ function extras(id: string, state: State, events: readonly GameEvent[], session:
   return { front: null, back: null };
 }
 
-function object(state: State, events: readonly GameEvent[], session: Session, id: string, nowMs: number): SafeHtml {
+export function object(state: State, events: readonly GameEvent[], session: Session, id: string, nowMs: number): SafeHtml {
   const upgraded = state.upgraded[id] === true;
   // Held up to the hand tonight: its screen gains one more step of resolution until morning (night-hand FR2).
   const heldUp = !upgraded && inDream(id, state);

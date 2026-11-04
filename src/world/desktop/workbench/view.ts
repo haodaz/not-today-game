@@ -16,6 +16,7 @@ import { RINGS } from "../rings";
 import { workbenchDay, workbenchDays, type DocColumn, type WorkbenchDay } from "./data";
 import { renderWork } from "./work";
 import { renderWorkMessages } from "../messages/view";
+import { renderObjectBar } from "./objbar";
 
 /** U5: the changelog panel collapses to one line from the first day of the second ring. */
 export const CHANGELOG_COLLAPSE_DAY: number = (() => {
@@ -156,11 +157,13 @@ export function renderWorkbench(ctx: AppContext, days: ReadonlyMap<number, Workb
   // The work conversations live here (desktop-ui 2026-11-02, evening): the rail's 消息.
   const msgs = renderWorkMessages(ctx);
   const tag = data?.docs?.tag ? html`${fill(data.docs.tag)}` : null;
+  // The 老物件栏 (object-bar 2026-11-03): the found objects, under the rail, on every page.
+  const objbar = renderObjectBar(ctx);
   return {
     body:
       page === "msgs"
-        ? html`<div class="body">${rail(page, msgs.badge)}<div class="wb-msgs">${msgs.pane}</div></div>`
-        : html`<div class="body">${rail(page, msgs.badge)}${side(data, page, fill)}${main}${closer}</div>`,
+        ? html`<div class="body">${rail(page, msgs.badge)}${objbar}<div class="wb-msgs">${msgs.pane}</div></div>`
+        : html`<div class="body">${rail(page, msgs.badge)}${objbar}${side(data, page, fill)}${main}${closer}</div>`,
     // Its dock tile counts its own: the jobs under way and the work conversations' unread.
     badge: (data?.doing.length ?? 0) + msgs.badge,
     tag,

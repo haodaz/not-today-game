@@ -14,6 +14,7 @@ import { hasString, t, tr } from "@world/i18n";
 import type { ActionContext, ActionHandler } from "../controller";
 import type { AppContext, Session } from "../model";
 import { openWork } from "./work";
+import { openObjectFromBar } from "./objbar";
 
 /** The card text of an id (tray or Kuro), or "". */
 function cardText(board: TaskBoard, id: string): string {
@@ -41,7 +42,15 @@ function lockRow(board: TaskBoard, s: BoardState, state: State, events: readonly
       panel = html`${noTool}${tryIt}`;
     }
   }
-  const control = hasString("board.lockCode") ? html`<button type="button" class="block" data-action="board-lock">${tr("board.lockCode")}</button>` : null;
+  // The control: when the object is found and not taken, it reads 「用{object}看一眼」 and clicking it
+  // opens that object from the 老物件栏 (object-bar R3); otherwise the plain 「需要提取码」. The code
+  // chips are unchanged — the panel still opens with the button.
+  const objName = hasString(`obj.name.${lock.object}`) ? t(`obj.name.${lock.object}`) : lock.object;
+  const label =
+    available && hasString("board.lock.useObject") ? tr("board.lock.useObject", { object: objName })
+    : hasString("board.lockCode") ? tr("board.lockCode")
+    : null;
+  const control = label !== null ? html`<button type="button" class="block" data-action="board-lock">${label}</button>` : null;
   return html`<div class="block-row">${control}${panel}</div>`;
 }
 
@@ -136,7 +145,14 @@ export function autoUnlockBoard(ctx: ActionContext): boolean {
 export const boardActions: Record<string, ActionHandler> = {
   // 需要提取码: open the code panel (the old object's codes, or the no-tool row + 让它试).
   "board-lock"(ctx) {
-    if (!currentBoard(ctx)) return;
+    const c = currentBoard(ctx);
+    if (!c) return;
+    const state = ctx.store.getState();
+    const events = ctx.store.getEvents();
+    // object-bar R3: the lock behind a found, not-taken object opens that object from the 老物件栏
+    // (the player reads the code off it). The code-chips panel opens too — entering the code is
+    // unchanged. Not found / taken: the panel alone (no-tool row + 让它试), as before.
+    if (c.board.given.lock && lockObjectAvailable(c.board, state, events)) openObjectFromBar(ctx.session, state, c.board.given.lock.object);
     ctx.session.boardLockOpen = true;
     ctx.rerender();
   },

@@ -1702,3 +1702,37 @@ the `board.notFound` string are content.
   flag gating a `cond_show`, and a content check that walks every board in `content/tasks/day-*.json`
   and `en/` (plus a fixture that fails on a file not yet posted that day).
 - `npx tsc --noEmit`: clean. `npx vitest run`: 99 files / 1757 tests passed.
+
+## object-bar: 老物件栏 — the old objects on the screen (2026-11-03)
+
+The found old objects become a row of icons in 工作台, on every page; clicking one opens its drawn
+device over the desktop, using the same `session.holding` + `session.hand.using` the room uses (so
+every obj-key / flip / rotate reducer and the hand layer's paint work unchanged); × / Esc close it.
+A board lock behind a found, not-taken object now reads 「用{object}看一眼」 and opening it opens that
+object from the bar. Code only; the icons (public/objects/icons) and the strings are content.
+
+- `src/world/desktop/workbench/objbar.ts` (new): the bar (`renderObjectBar`) — found objects in found
+  order, icon by state (`iconStateOf` → own / -up / -taken via `upgradedOn` / `takenByKuro`), the
+  photo `_front.png` as a placeholder for objects without icon art, no bar before the chick; the 使用
+  modal (`renderObjectBarUse`), reusing `object()` from held.ts so the hand layer paints its canvas;
+  and `openObjectFromBar(session, state, id)`, the shared session-only open (holding + hand.using).
+- `src/world/room/held.ts`: exported `object(...)` so the modal can embed the held-object markup.
+- `src/world/desktop/workbench/view.ts`: the bar injected into the 工作台 body, next to the rail, on
+  every page.
+- `src/world/desktop/model.ts`: `Session.objbarOpen` (+ `initialSession`) — the modal flag (session
+  only; no event, like the room's 使用).
+- `src/world/room/game.ts`: `objbar-open` / `objbar-close` in `loopActions` (open = `restHand` +
+  `openObjectFromBar` + the dictionary clamshell press; close = put down, clear the flag); the Esc
+  branch in `loopKeys` before the plain held put-down; the modal hosted in `renderGame`'s desktop
+  branch (`.objbar-host`).
+- `src/world/desktop/workbench/board.ts`: `lockRow` label becomes `board.lock.useObject` with the
+  object's name when the lock's object is found and not taken; `board-lock` opens that object from
+  the bar (and still opens the code-chips panel — code entry unchanged); not found / taken: unchanged.
+- `src/world/desktop/desktop.css`: `.wb-objbar` (a narrow icon column, pixel art, no frame) and the
+  `.objbar-host` / `.ob-use` 使用 modal (dim backdrop, centred device, × / backdrop close).
+- Tests: `tests/object-bar.test.ts` (13) — the bar on day 1 after the chick and on day 8 with one
+  upgraded (-up) and one taken (-taken) and a placeholder; icon state per object; no bar before the
+  first find; the bar on every workbench page; click sets holding + hand.using and renders the device;
+  a not-found object does not open; × and Esc close it with the page unchanged; a taken object opens;
+  the day-5 lock label with the pager found (and the plain label without it); the three strings in zh/en.
+- `npx tsc --noEmit`: clean. `npx vitest run`: 100 files / 1770 tests passed.

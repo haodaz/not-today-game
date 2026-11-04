@@ -60,6 +60,7 @@ import { browserPage } from "@world/desktop/browser/data";
 import { workbenchActions } from "@world/desktop/workbench/actions";
 import { workActions } from "@world/desktop/workbench/work";
 import { renderFiles } from "@world/desktop/files/view";
+import { openObjectFromBar, renderObjectBarUse } from "@world/desktop/workbench/objbar";
 import { filesActions, openFilesApp } from "@world/desktop/files/actions";
 import { callActions, resumeCall } from "@world/desktop/call/actions";
 import { deliverablePage } from "@state/files";
@@ -79,7 +80,9 @@ export function renderGame(store: Store, session: Session, nowMs: number): SafeH
     // Work-task narration and the conversation with Kuro play in the dialogue box over the desktop too.
     const dlg = dialogueBox(state, events, session, nowMs);
     const filesWin = renderFiles({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs });
-    return html`${renderDesktop(shell)}<button type="button" class="back-room" data-action="view" data-view="room">${tr("desktop.back")}</button>${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${dlgLayer(dlg, session)}<div class="hud-host">${settingsButton()}${itemsButton(session)}${itemsPanel(state, events, session)}<div class="hud-br">${hudKuro({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs })}</div>${settingsPanel(session)}</div>`;
+    // 老物件栏 (object-bar R2): an object opened from the bar is used in a modal over the desktop.
+    const objUse = renderObjectBarUse({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs });
+    return html`${renderDesktop(shell)}<button type="button" class="back-room" data-action="view" data-view="room">${tr("desktop.back")}</button>${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${objUse ? html`<div class="objbar-host">${objUse}</div>` : null}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${dlgLayer(dlg, session)}<div class="hud-host">${settingsButton()}${itemsButton(session)}${itemsPanel(state, events, session)}<div class="hud-br">${hudKuro({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs })}</div>${settingsPanel(session)}</div>`;
   }
   // The box does not jump (dialogue correction 2026-11-02): in every view it is anchored to the
   // viewport in the same fixed layer, not to the stage (whose size differs between views). The
@@ -821,6 +824,30 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.rerender();
   },
 
+  // 老物件栏 (object-bar 2026-11-03): clicking an icon in 工作台 opens that object as a used device
+  // over the desktop. It is the same holding + hand.using the room's 使用 sets, so every obj-key /
+  // flip / rotate reducer and the hand layer's paint work unchanged — only the entry point is new.
+  // `objbarOpen` marks the modal so × / Esc closes it back to 工作台. Session only, no event.
+  "objbar-open"(ctx, data) {
+    const { store, session } = ctx;
+    const id = data.object ?? "";
+    const state = store.getState();
+    // Close any held clamshell first, then open the object (same holding + hand.using as the room).
+    restHand(session);
+    if (!openObjectFromBar(session, state, id)) return; // not found, or lost to the hand
+    // The dictionary is a clamshell: using it opens it (as in the room's obj-use).
+    if (id === "dictionary" && session.hand.face === "front") pressKey(ctx, id, "open");
+    ctx.rerender();
+  },
+  // × / Esc on the 老物件栏 modal: put the object down and go back to the 工作台 page unchanged.
+  "objbar-close"(ctx) {
+    const { session } = ctx;
+    session.objbarOpen = false;
+    session.holding = null;
+    restHand(session);
+    ctx.rerender();
+  },
+
   // The delivery app's pages (delivery addition 2026-11-02): session only, no event. The order
   // itself is still `loop-order`, from the checkout's 下单.
   "phone-shop"(ctx, data) {
@@ -1093,6 +1120,12 @@ export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
       loopActions["obj-key"]!(ctx, { object: ctx.session.holding!, key } as DOMStringMap, null as never);
       return true;
     }
+  }
+  // The 老物件栏 modal (object-bar R2): Esc closes it fully (put the object down), before the plain
+  // held put-down — the modal set `holding`, so it must win.
+  if (e.key === "Escape" && ctx.session.objbarOpen) {
+    loopActions["objbar-close"]!(ctx, {} as DOMStringMap, null as never);
+    return true;
   }
   if (e.key === "Escape" && (ctx.session.phoneOpen || ctx.session.holding)) {
     loopActions["loop-put-down"]!(ctx, {} as DOMStringMap, null as never);
