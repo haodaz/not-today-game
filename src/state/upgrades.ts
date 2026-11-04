@@ -5,7 +5,8 @@ import raw from "@content/upgrades.json";
 import type { GameEvent } from "./events";
 import { judge } from "./judgement";
 import type { State } from "./types.gen";
-import { membersOf } from "./variables";
+import { constants, membersOf } from "./variables";
+import { raiseAssimilation } from "./days/effects";
 
 export interface UpgradeObject {
   readonly offerFrom: number;
@@ -113,14 +114,23 @@ export function currentOffer(state: State, events: readonly GameEvent[], table: 
 
 const judgeBy = (state: State, d: Delta, day: number, eventId: string): State => judge(state, d, day, eventId, d.evidence);
 
-export function applyUpgrade(state: State, event: { readonly day: number; readonly object: string }): State {
+export function applyUpgrade(state: State, event: { readonly day: number; readonly object: string; readonly final?: true }): State {
   const o = upgradeTable.objects.get(event.object);
   if (!o) throw new Error(`upgrade: "${event.object}" cannot be upgraded`);
   if (!(state.found as string[]).includes(event.object)) throw new Error(`upgrade: "${event.object}" has not been found`);
-  if (state.upgraded[event.object] === true) return state;
+  // Already upgraded: nothing changes, but accepting 全员升级 still finishes the assimilation (max).
+  if (state.upgraded[event.object] === true) return event.final ? assimilateFully(state) : state;
   if (event.day < o.offerFrom) throw new Error(`upgrade: "${event.object}" is not offered before day ${o.offerFrom}`);
-  const next = { ...state, upgraded: { ...state.upgraded, [event.object]: true } };
-  return judgeBy(next, upgradeTable.judgement.accept, event.day, `upgrade:${event.object}`);
+  const upgraded = { ...state, upgraded: { ...state.upgraded, [event.object]: true } };
+  // Assimilation (three-meters spec): + assimUpgrade per upgrade; 全员升级 sets it to the max.
+  const assimilated = event.final ? assimilateFully(upgraded) : raiseAssimilation(upgraded, constants.assimUpgrade as number);
+  return judgeBy(assimilated, upgradeTable.judgement.accept, event.day, `upgrade:${event.object}`);
+}
+
+/** 全员升级 accepted (three-meters spec): assimilation becomes the max. */
+function assimilateFully(state: State): State {
+  const max = constants.assimilationMax as number;
+  return state.assimilation >= max ? state : { ...state, assimilation: max };
 }
 
 export function applyDeclineUpgrade(state: State, event: { readonly day: number; readonly object: string; readonly decline: DeclineKind }): State {

@@ -20,7 +20,7 @@ export function readCollection(storage: KeyValueStorage): Collection {
   const p = readProfile(storage);
   if (!p) return EMPTY_COLLECTION;
   const e = p.endings && typeof p.endings === "object" && !Array.isArray(p.endings) ? (p.endings as Record<string, unknown>) : {};
-  const endings = { bad: count(e.bad), survive: count(e.survive), good: count(e.good) };
+  const endings = { bad: count(e.bad), survive: count(e.survive), good: count(e.good), collapse: count(e.collapse) };
   // Only ids that still exist in content are kept, in the order they were first found.
   const objects = Array.isArray(p.objects) ? (p.objects as unknown[]).filter((v): v is string => typeof v === "string" && KNOWN_OBJECTS.has(v)) : [];
   return { finishedRuns: count(p.finishedRuns), endings, objects, kurogotchi: endings.good >= 1 };

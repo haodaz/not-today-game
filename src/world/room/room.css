@@ -404,6 +404,16 @@
 .credits li.last{margin-top:18px;font-size:19px}
 .first-day{background:#fff;color:#1d2129;display:flex;align-items:center;justify-content:center}
 .first-day p{position:relative;z-index:2;margin:0;font-size:28px;letter-spacing:.4em;pointer-events:none}
+/* 崩坏的世界 (three-meters spec): the room goes to white in ~4 s, then black with one line. With
+   reduced motion the white is a cut (no transition). */
+.collapse-page{background:#000;color:#f4efe6;display:flex;align-items:center;justify-content:center}
+/* While running to white the overlay fades 0→1 over the page; once it is over (black, the line) the
+   overlay is gone. */
+.collapse-page .collapse-white{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:1}
+.collapse-page.to-white .collapse-white{animation:collapse-white 4s linear both}
+@keyframes collapse-white{from{opacity:0}to{opacity:1}}
+.collapse-page .collapse-line{position:relative;z-index:2;margin:0;max-width:60%;text-align:center;font-size:22px;line-height:1.8;letter-spacing:.14em;pointer-events:none;animation:m-fade-in 600ms ease both}
+@media (prefers-reduced-motion:reduce){.collapse-page.to-white .collapse-white{animation:none}.collapse-page .collapse-line{animation:none}}
 
 /* The splat layer (room-scene design S5, S8, S10): only during a 房间 ↔ 桌子 move, between the
    CSS push's backdrop copy and the (transparent) arriving stage, at the stage's own fit. */

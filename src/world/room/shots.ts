@@ -57,6 +57,8 @@ export const ROOM_COLLECTION = {
     bad: { l: 236, t: 490, w: 26, h: 48 },
     survive: { l: 268, t: 500, w: 30, h: 38 },
     good: { l: 304, t: 498, w: 26, h: 40 },
+    // 崩坏的世界 (three-meters spec): its own place on the desk, right of the good figure.
+    collapse: { l: 338, t: 496, w: 26, h: 42 },
   },
   book: { l: 452, t: 500, w: 36, h: 26 },
   chair: { l: 341, t: 543, w: 393, h: 357 },

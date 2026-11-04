@@ -131,7 +131,8 @@ export function acceptOffer(ctx: ActionContext, object: string | undefined): voi
   if (!offer) return;
   if (object !== (offer.kind === "final" ? FINAL : offer.object)) return;
   const objects = offer.kind === "final" ? offer.objects : [offer.object];
-  for (const o of objects) ctx.store.appendEvent({ kind: "upgrade", object: o });
+  // 全员升级 (the final offer): each upgrade is marked `final`, so assimilation becomes the max.
+  for (const o of objects) ctx.store.appendEvent(offer.kind === "final" ? { kind: "upgrade", object: o, final: true } : { kind: "upgrade", object: o });
 }
 
 /** Decline the current offer (its kind must match). */

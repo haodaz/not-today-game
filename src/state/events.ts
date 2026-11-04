@@ -68,8 +68,9 @@ export type GameEvent =
   // work v2: the night's board judgement (the runtime computes it from the log at 躺下); SAN by the
   // judge's delta (never up). `verdict` is which line plays.
   | { kind: "boardJudge"; day: number; verdict: "perfect" | "flawed" | "wrong"; san: number }
-  // object-upgrade spec (2026-11-01): accepting / declining Kuro's offer.
-  | { kind: "upgrade"; day: number; object: string }
+  // object-upgrade spec (2026-11-01): accepting / declining Kuro's offer. `final` marks an upgrade
+  // that is part of accepting the day-13 全员升级 (three-meters: assimilation becomes the max).
+  | { kind: "upgrade"; day: number; object: string; final?: true }
   | { kind: "declineUpgrade"; day: number; object: string; decline: DeclineKind }
   // san-and-endings spec: the run ends, once (bad at a shutdown beat; survive / good on the last night).
   | { kind: "ending"; day: number; ending: Ending }

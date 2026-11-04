@@ -6,7 +6,7 @@ import { withFlags } from "../flags";
 import { condHolds } from "../replies/resolve";
 import type { State } from "../types.gen";
 import { canHoldUp, isRaidNight, outcomeOf, raidMove, takeFor } from "../nights";
-import { membersOf, rangeOf } from "../variables";
+import { constants, membersOf, rangeOf } from "../variables";
 import { dayFile, taskFlags, type BeatName, type Choice } from "./table";
 import { taskByFlag } from "./tasks";
 
@@ -33,6 +33,19 @@ export function applyStep(state: State, event: { readonly name: string; readonly
 export function clampSan(value: number): number {
   const [min, max] = rangeOf("san") ?? [null, null];
   return Math.min(max ?? Infinity, Math.max(min ?? -Infinity, value));
+}
+
+/** Assimilation within its range (0–100). Three-meters spec: it only ever goes up. */
+export function clampAssimilation(value: number): number {
+  const [min, max] = rangeOf("assimilation") ?? [0, 100];
+  return Math.min(max ?? 100, Math.max(min ?? 0, value));
+}
+
+/** Raise assimilation by `n` (never below the current value, never past the max). */
+export function raiseAssimilation(state: State, n: number): State {
+  if (!n) return state;
+  const next = clampAssimilation(state.assimilation + Math.max(0, n));
+  return next > state.assimilation ? { ...state, assimilation: next } : state;
 }
 
 /** The choice `index` of beat `beat` on `day`, or undefined. */
@@ -109,7 +122,13 @@ export function applyTask(
     if (event.mode !== "self" && event.mode !== "let") throw new Error("task: a board task is done self or let");
     if (event.slots !== undefined && (typeof event.slots !== "object" || event.slots === null || Array.isArray(event.slots))) throw new Error("task: slots must be an object");
     if (event.assists !== undefined && !(Number.isInteger(event.assists) && event.assists >= 0)) throw new Error("task: assists must be an integer >= 0");
-    return withFlags(state, [event.flag]);
+    // Assimilation (three-meters spec): + assists × assimAssist, + assimKuroCardKept per Kuro card
+    // in the printed slots. Kuro's SAN judgement is the night's `boardJudge`, not here.
+    const slots = event.slots ?? {};
+    const kuroIds = new Set(tree.board.kuro.cards.map((c) => c.id));
+    const kuroKept = Object.values(slots).filter((cardId) => kuroIds.has(cardId)).length;
+    const gain = (event.assists ?? 0) * (constants.assimAssist as number) + kuroKept * (constants.assimKuroCardKept as number);
+    return raiseAssimilation(withFlags(state, [event.flag]), gain);
   }
   if (event.slots !== undefined || event.assists !== undefined) throw new Error("task: slots/assists belong to a board task");
   if (event.mode === "auto" || !tree) {
@@ -124,6 +143,8 @@ export function applyTask(
   const drop = earned ? new Set<string>() : new Set(caughtFlags);
   let next = withFlags(state, [...(effects.flags ?? []).filter((f) => !drop.has(f)), event.flag]);
   if (effects.san) next = { ...next, san: clampSan(next.san + effects.san) };
+  // Assimilation (three-meters spec): a path's `assimilation` raises it (clamped, never down).
+  if (effects.assimilation) next = raiseAssimilation(next, effects.assimilation);
   if (effects.letItDoUnchecked) next = { ...next, letItDoUnchecked: next.letItDoUnchecked + effects.letItDoUnchecked };
   // effects.looked: the event (mode "look") is the record the rubric cites.
   return next;

@@ -6,7 +6,7 @@ import { taskFiles } from "@state/days/tasks";
 import { bpm, dueAtLieDown, dueAtShutdown, goodConditions, sanBand, SAN_MAX, SAN_MIN } from "@state/endings";
 import { applyEvent, type EventDraft, type GameEvent } from "@state/events";
 import { f } from "@state/fday";
-import { blockableNights, raidNights } from "@state/nights";
+import { raidNights } from "@state/nights";
 import type { Store } from "@state/store";
 import { createStore } from "@state/store";
 import type { State } from "@state/types.gen";
@@ -49,7 +49,7 @@ function ctxFor(store: Store) {
   return { ctx, timers };
 }
 
-/** Everything the good ending asks for, on the last day. */
+/** Everything the good ending asks for, on the last day (three-meters: assimilation ≤ 40, no raids / unchecked). */
 function goodState(): State {
   const base = f(LAST);
   return {
@@ -57,11 +57,13 @@ function goodState(): State {
     flags: [...base.flags, "shook_hand"],
     found: [...new Set([...base.found, ...six])] as State["found"],
     recognised: [...six] as State["recognised"],
-    raids: Object.fromEntries(blockableNights.map((d) => [String(d), { blockedWith: "chick", gave: null }])),
     affinity: constants.affinityThreshold as number,
-    letItDoUnchecked: 0,
+    assimilation: 0,
   };
 }
+
+/** The 温柔的世界 (bad) now: assimilation at its max, with SAN still high. */
+const MAXED = (day = 3): State => ({ ...f(day), assimilation: constants.assimilationMax as number });
 
 describe("SAN (FR1)", () => {
   it("property: SAN never leaves 0..100, whatever the run does", () => {
@@ -123,7 +125,7 @@ describe("the three exits (FR2)", () => {
   it("property: the bad ending fires exactly once per run", () => {
     fc.assert(
       fc.property(fc.integer({ min: 1, max: LAST }), fc.integer({ min: 1, max: 4 }), (day, tries) => {
-        const store = storeOver({ ...f(day), san: 0 });
+        const store = storeOver(MAXED(day));
         let accepted = 0;
         for (let i = 0; i < tries; i++) {
           try {
@@ -142,8 +144,8 @@ describe("the three exits (FR2)", () => {
     );
   });
 
-  it("bad comes at the shutdown beat, not before; and only once however often the beat is seen", () => {
-    const store = storeOver({ ...f(3), san: 0 });
+  it("bad (assimilation at max) comes at the shutdown beat, not before; and only once however often the beat is seen", () => {
+    const store = storeOver(MAXED(3));
     const { ctx, timers } = ctxFor(store);
     syncLoop(ctx, 0);
     expect(dueAtShutdown(store.getState())).toBe("bad");
@@ -158,31 +160,42 @@ describe("the three exits (FR2)", () => {
     expect(store.events.filter((e) => e.kind === "ending")).toEqual([{ kind: "ending", ending: "bad", day: 3 }]);
   });
 
+  it("assimilation 100 at the shutdown beat → bad, with SAN still high", () => {
+    const s = { ...f(3), assimilation: constants.assimilationMax as number, san: 100 };
+    expect(dueAtShutdown(s)).toBe("bad");
+    // Below the max: nothing is due (SAN is fine too).
+    expect(dueAtShutdown({ ...s, assimilation: (constants.assimilationMax as number) - 1 })).toBeNull();
+  });
+
   it("an ending is only accepted when it is due", () => {
     expect(() => applyEvent(f(3), { kind: "ending", day: 3, ending: "bad" } as GameEvent)).toThrow(/not due/);
     expect(() => applyEvent(f(3), { kind: "ending", day: 3, ending: "survive" } as GameEvent)).toThrow(/not due/);
     expect(() => applyEvent(goodState(), { kind: "ending", day: LAST, ending: "survive" } as GameEvent)).toThrow(/not due/);
   });
 
-  it("good needs all five; dropping any one gives survive", () => {
+  it("good needs its conditions; dropping any one gives survive; assimilation > 40 gives survive", () => {
     const good = goodState();
     expect(Object.values(goodConditions(good)).every(Boolean)).toBe(true);
     expect(dueAtLieDown(good)).toBe("good");
     const drops: [string, State][] = [
       ["shook_hand", { ...good, flags: good.flags.filter((x) => x !== "shook_hand") }],
       ["all six recognised", { ...good, recognised: good.recognised.slice(1) }],
-      ["every raid blocked", { ...good, raids: { ...good.raids, [String(blockableNights[0])]: { blockedWith: null, gave: null } } }],
       ["affinity", { ...good, affinity: (constants.affinityThreshold as number) - 1 }],
-      ["letItDoUnchecked", { ...good, letItDoUnchecked: (constants.goodMaxUnchecked as number) + 1 }],
+      ["assimilation", { ...good, assimilation: (constants.assimilationGoodMax as number) + 1 }],
     ];
     for (const [what, s] of drops) expect(dueAtLieDown(s), what).toBe("survive");
+    // Exactly at the max is still good; one over is survive (three-meters).
+    expect(dueAtLieDown({ ...good, assimilation: constants.assimilationGoodMax as number })).toBe("good");
+    expect(dueAtLieDown({ ...good, assimilation: (constants.assimilationGoodMax as number) + 1 })).toBe("survive");
   });
 
-  it("survive: the slip filled, or neither flag; bad if SAN reached 0 after the last shutdown", () => {
+  it("survive: the slip filled, or neither flag; collapse if SAN reached 0; bad if assimilation maxed", () => {
     const base = f(LAST);
     expect(dueAtLieDown({ ...base, flags: [...base.flags, "slip_filled"] })).toBe("survive");
     expect(dueAtLieDown(base)).toBe("survive");
-    expect(dueAtLieDown({ ...goodState(), san: 0 })).toBe("bad");
+    // SAN 0 no longer means bad: it is collapse, on any day.
+    expect(dueAtLieDown({ ...goodState(), san: 0 })).toBe("collapse");
+    expect(dueAtLieDown({ ...base, assimilation: constants.assimilationMax as number })).toBe("bad");
     expect(dueAtLieDown(f(LAST - 1))).toBeNull();
   });
 
@@ -244,12 +257,13 @@ describe("credits are Kuro's log (FR3)", () => {
     expect(creditsShown(5, 0, 0, true)).toBe(5);
   });
 
-  it("the pages: bad 你和你 → credits → (host) home; survive credits → 第一日 → (host) new run; good → day 19, which stays", () => {
+  it("the pages: collapse white+line → credits → home; bad 你和你 → credits → home; survive credits → 第一日 → new run; good → day 19", () => {
     const calls: string[] = [];
     endingHost.afterBad = () => void calls.push("afterBad");
     endingHost.newRun = () => void calls.push("newRun");
     for (const [ending, state] of [
-      ["bad", { ...f(3), san: 0 }],
+      ["collapse", { ...f(3), san: 0 }],
+      ["bad", MAXED(3)],
       ["survive", f(LAST)],
       ["good", goodState()],
     ] as const) {
@@ -266,7 +280,12 @@ describe("credits are Kuro's log (FR3)", () => {
         endingNext(ctx);
         phases.push(ctx.session.endingPage!.phase);
       }
-      if (ending === "bad") {
+      if (ending === "collapse") {
+        // collapse → the run-to-white + line, then the credits, then home (no 你和你, no day 1).
+        expect(phases.slice(0, 2)).toEqual(["collapse", "credits"]);
+        expect(phases).not.toContain("after");
+        expect(calls[0]).toBe("afterBad");
+      } else if (ending === "bad") {
         expect(phases.slice(0, 2)).toEqual(["you", "credits"]);
         expect(calls[0]).toBe("afterBad");
       } else {

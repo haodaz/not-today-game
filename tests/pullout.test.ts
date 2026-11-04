@@ -114,7 +114,7 @@ function storeOver(initial: State): Store {
 const branch = (flag: string): number => dayFiles.get(LAST)!.beats.shutdown!.choices!.findIndex((c) => c.effects?.flags?.includes(flag));
 
 /** A store ended with `ending`; on the last day, through the bedtime branch unless `atShutdown`. */
-function ctxAt(state: State, ending: "bad" | "survive" | "good", nowMs = 1000, atShutdown = false) {
+function ctxAt(state: State, ending: "bad" | "survive" | "good" | "collapse", nowMs = 1000, atShutdown = false) {
   const store = storeOver(state);
   if (state.day === LAST && !atShutdown) store.appendEvent({ kind: "choose", beat: "shutdown", index: branch(ending === "good" ? "shook_hand" : "slip_filled") });
   store.appendEvent({ kind: "ending", ending });
@@ -147,7 +147,7 @@ describe("the three ending cuts", () => {
 
   it.each([
     ["survive", () => f(LAST), "credits"],
-    ["bad", () => ({ ...f(LAST), san: 0 }), "you"],
+    ["bad", () => ({ ...f(LAST), assimilation: constants.assimilationMax as number }), "you"],
     ["good", goodLast, "credits"],
   ] as const)("%s on night 18: the pull-out first, no page, clicks do nothing; at its cut the ending card", (ending, state, first) => {
     const { ctx, timers } = ctxAt(state(), ending);
@@ -165,21 +165,27 @@ describe("the three ending cuts", () => {
     expect(ctx.session.endingPage?.phase).toBe(first);
   });
 
-  it("a SAN-0 bad ending at day 18's shutdown (before the bedtime branch) skips the pull-out", () => {
-    const { ctx, timers } = ctxAt({ ...f(LAST), san: 0 }, "bad", 1000, true);
+  it("a SAN-0 collapse at day 18's shutdown (before the bedtime branch) skips the pull-out", () => {
+    const { ctx, timers } = ctxAt({ ...f(LAST), san: 0 }, "collapse", 1000, true);
     expect(ctx.store.getEvents().some((e) => e.kind === "choose")).toBe(false);
     startEnding(ctx);
     expect(ctx.session.pullOut).toBeNull();
-    expect(ctx.session.endingPage?.phase).toBe("you");
-    expect(timers).toHaveLength(0);
+    // collapse never pulls out: its first phase is the run-to-white, and it schedules that timer.
+    expect(ctx.session.endingPage?.phase).toBe("collapse");
   });
 
-  it("before the last day there is no pull-out (a SAN-0 bad ending on day 3 goes straight to its page)", () => {
-    const { ctx, timers } = ctxAt({ ...f(3), san: 0 }, "bad");
+  it("a SAN-0 bad ending at day 18's shutdown is now collapse, not bad (three-meters)", () => {
+    // assimilation at max is bad even with SAN high; SAN 0 is collapse.
+    const { ctx } = ctxAt({ ...f(LAST), assimilation: constants.assimilationMax as number }, "bad", 1000, true);
+    startEnding(ctx);
+    expect(ctx.session.endingPage?.phase).toBe("you");
+  });
+
+  it("before the last day there is no pull-out (a SAN-0 collapse on day 3 goes straight to its page)", () => {
+    const { ctx } = ctxAt({ ...f(3), san: 0 }, "collapse");
     startEnding(ctx);
     expect(ctx.session.pullOut).toBeNull();
-    expect(ctx.session.endingPage?.phase).toBe("you");
-    expect(timers).toHaveLength(0);
+    expect(ctx.session.endingPage?.phase).toBe("collapse");
   });
 
   it("while it plays, renderEnding shows the pull-out page, not a card", () => {

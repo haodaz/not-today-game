@@ -13,8 +13,10 @@ export interface IdleEvent {
   readonly ms: number;
 }
 
-export const ENDING_KINDS = ["bad", "survive", "good"] as const;
+export const ENDING_KINDS = ["bad", "survive", "good", "collapse"] as const;
 export type EndingKind = (typeof ENDING_KINDS)[number];
+/** The ending figures content/title.json actually carries (collapse is new; content has no cutout yet). */
+const FIGURE_KINDS = ["bad", "survive", "good"] as const;
 
 export interface TitleTable {
   readonly idle: { readonly firstQuietMs: number; readonly everyMs: readonly [number, number]; readonly events: readonly IdleEvent[] };
@@ -67,13 +69,16 @@ export function parseTitle(input: unknown): TitleTable {
   keys(start, ["pushMs"], "start");
 
   const figuresRaw = obj(top.figures, "figures");
-  keys(figuresRaw, ENDING_KINDS, "figures");
+  keys(figuresRaw, FIGURE_KINDS, "figures");
   const figures = {} as Record<EndingKind, { src: string; name: string }>;
-  for (const kind of ENDING_KINDS) {
+  for (const kind of FIGURE_KINDS) {
     const f = obj(figuresRaw[kind], `figures.${kind}`);
     keys(f, ["src", "name"], `figures.${kind}`);
     figures[kind] = Object.freeze({ src: str(f.src, `figures.${kind}.src`), name: str(f.name, `figures.${kind}.name`) });
   }
+  // collapse (three-meters spec): no cutout in content yet; its name is a string, src blank until
+  // Claude adds one. The collection renders it like the others; a blank src still renders its node.
+  figures.collapse = Object.freeze({ src: "", name: "title.fig.collapse" });
 
   const book = obj(top.book, "book");
   keys(book, ["src", "reader"], "book");

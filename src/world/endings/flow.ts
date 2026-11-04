@@ -50,7 +50,8 @@ export function startEnding(ctx: ActionContext): void {
   // Nothing stays in the hand: just held, front up (programs restart on a new day by themselves).
   session.hand = { ...session.hand, using: false, face: "front", keyDown: null, openedAt: null };
   session.settingsOpen = false;
-  if (pullOutApplies(state, store.getEvents())) {
+  // collapse never pulls out: the room goes to white instead (three-meters spec).
+  if (ending !== "collapse" && pullOutApplies(state, store.getEvents())) {
     const from = pullFrom(session.view);
     // The ending stage is the room's (1600 × 900), whatever the last view was.
     if (session.view === "desktop") session.view = "desk";
@@ -67,9 +68,20 @@ export function startEnding(ctx: ActionContext): void {
   firstPage(ctx, ending);
 }
 
+/** How long the collapse runs to white before its one line shows (three-meters; reduced motion cuts it). */
+export const COLLAPSE_TO_WHITE_MS = 4000;
+
 function firstPage(ctx: ActionContext, ending: Ending): void {
-  ctx.session.endingPage = { phase: ending === "bad" ? "you" : "credits", startMs: nowOf(ctx), skipped: false };
-  if (ctx.session.endingPage.phase === "credits") rollCredits(ctx);
+  // collapse: the room's collapse look runs to white, then the one line, then the credits like the
+  // others. bad: 你和你 first. survive / good: straight to the credits.
+  const phase = ending === "collapse" ? "collapse" : ending === "bad" ? "you" : "credits";
+  ctx.session.endingPage = { phase, startMs: nowOf(ctx), skipped: false };
+  if (phase === "collapse") {
+    // After the run-to-white, the line stays until a click; nothing auto-advances past it.
+    ctx.later(COLLAPSE_TO_WHITE_MS + 20, ctx.rerender);
+  } else if (phase === "credits") {
+    rollCredits(ctx);
+  }
   ctx.rerender();
 }
 
@@ -92,7 +104,11 @@ export function endingNext(ctx: ActionContext): void {
   const page = session.endingPage;
   // During the pull-out nothing moves on (no page yet; a click does nothing).
   if (ending === "none" || !page || session.pullOut) return;
-  if (page.phase === "you") {
+  if (page.phase === "collapse") {
+    // The run-to-white and the line have shown: on to the credits (no 你和你, no day 1).
+    session.endingPage = { phase: "credits", startMs: nowOf(ctx), skipped: false };
+    rollCredits(ctx);
+  } else if (page.phase === "you") {
     session.endingPage = { phase: "credits", startMs: nowOf(ctx), skipped: false };
     rollCredits(ctx);
   } else if (page.phase === "credits") {
@@ -100,7 +116,8 @@ export function endingNext(ctx: ActionContext): void {
     if (!page.skipped && creditsShown(total, page.startMs, nowOf(ctx), false) < total) {
       // Never skipped entirely: the first click shows the whole log.
       page.skipped = true;
-    } else if (ending === "bad") {
+    } else if (ending === "bad" || ending === "collapse") {
+      // The run is over: back to the title (collapse and bad both clear the run). No day 1 here.
       endingHost.afterBad();
     } else {
       session.endingPage = { phase: "after", startMs: nowOf(ctx), skipped: false };

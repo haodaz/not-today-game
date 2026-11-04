@@ -1576,3 +1576,37 @@ and its reels. Kiro's area only; `content/` untouched; the tape program is uncha
   + print gating, 让它补全 (r6→k1, send-back), the judgement (perfect/flawed/wrong, never up, not
   given → wrong), replay. Updated `tests/events.test.ts`'s kind list for the three new events.
 - `npx tsc --noEmit`: clean. `npx vitest run`: 96 files / 1704 tests passed.
+
+## three-meters: SAN / assimilation / affinity + four endings · 2026-11-03
+
+No content changed (variables/types/strings were already in place; Claude moves the path effects later).
+
+Part A — assimilation (the new number, 0–100, only up):
+- `src/state/days/tasks.ts`: an `assimilation` key in a path's effects (int ≥ 0).
+- `src/state/days/effects.ts`: `clampAssimilation` / `raiseAssimilation`; a path's `assimilation`
+  raises it (never down); a board `task` event adds `assists × assimAssist + keptKuroCards ×
+  assimKuroCardKept`. Letting Kuro work no longer costs SAN; doing it yourself no longer gains it
+  (the content SAN deltas stay until Claude moves them).
+- `src/state/events.ts`: the `upgrade` event gains `final?`. `src/state/upgrades.ts`: an upgrade adds
+  `assimUpgrade`; a `final` upgrade (全员升级) sets assimilation to `assimilationMax`.
+  `src/world/dialogue/kuro.ts`: the final offer's upgrades are marked `final`.
+- Tests: `tests/assimilation.test.ts`.
+
+Part B — four endings:
+- `src/state/endings.ts`: `ENDINGS` gains `collapse`. `dueAtShutdown`/`dueAtLieDown`: collapse when
+  SAN ≤ 0 (at the shutdown beat, or at 躺下 on any day right after the night's `boardJudge`, no next
+  day); bad only when assimilation ≥ `assimilationMax`; good needs `assimilation ≤
+  assimilationGoodMax` in place of `unchecked`, and `blockedAll` is dropped.
+- `src/world/endings/flow.ts` + `view.ts` + `room.css`: a collapse page runs the room to white
+  (~4 s; reduced-motion cuts it), then black with one line `ending.collapse.line` carrying the day,
+  then the credits, then the title. collapse never pulls out and never returns to day 1; it reuses
+  the bad host path (run cleared, back to title). `record.ts` is generic (collapse flows through).
+- Profile / collection: `recordEnding` accepts `collapse`; `readCollection`/`Collection`/
+  `EMPTY_COLLECTION` carry a collapse count; the title figures gain a code-level `collapse`
+  (`title.fig.collapse`, blank src until content has a cutout) and a rect in `shots.ts`; `ENDING_KINDS`
+  includes collapse while `content/title.json` still lists only the first three figures.
+- Tests: collapse block in `tests/assimilation.test.ts`; updated `tests/endings.test.ts` and
+  `tests/pullout.test.ts` (bad is assimilation-maxed now, SAN-0 is collapse) and the `Collection`
+  literals in `ending-record`/`walkman`/`kurogotchi`/`title` tests.
+
+`npx tsc --noEmit`: clean. `npx vitest run`: 97 files / 1718 tests passed.

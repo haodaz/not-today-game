@@ -94,8 +94,9 @@ export interface Session {
   collection: Collection;
   /** The gamebook reader is open (title-page FR4). */
   bookOpen: boolean;
-  /** Where the ending pages are (san-and-endings): 你和你 (bad only), the credits, then after. */
-  endingPage: { phase: "you" | "credits" | "after"; startMs: number; skipped: boolean } | null;
+  /** Where the ending pages are (san-and-endings): the collapse run-to-white + line (collapse only),
+   *  你和你 (bad only), the credits, then after. */
+  endingPage: { phase: "collapse" | "you" | "credits" | "after"; startMs: number; skipped: boolean } | null;
   /** The 道具 strip is open over the current view (day-loop correction 2026-11-01). */
   itemsOpen: boolean;
   /** The blind-box case overlay is open over 房间 (blind-box 2026-11-03); session only. */

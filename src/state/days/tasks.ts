@@ -13,6 +13,8 @@ export const APPS = ["docs", "ledger", "code"] as const;
 export interface TaskEffects {
   readonly flags?: readonly string[];
   readonly san?: number;
+  /** How far this path moves assimilation (three-meters spec): added, clamped 0–100, never down. */
+  readonly assimilation?: number;
   /** The player looked at what it did (the event itself is the record). */
   readonly looked?: boolean;
   readonly letItDoUnchecked?: number;
@@ -186,9 +188,10 @@ function path(v: unknown, w: string): TaskPath {
   if (!Array.isArray(v.kuro) || !v.kuro.every((k) => typeof k === "string" && k !== "")) fail(`${w}.kuro`, "must be a list of strings");
   const e = v.effects;
   if (!isRecord(e)) fail(`${w}.effects`, "must be an object");
-  keys(e, ["flags", "san", "looked", "letItDoUnchecked"], `${w}.effects`);
+  keys(e, ["flags", "san", "assimilation", "looked", "letItDoUnchecked"], `${w}.effects`);
   if (e.flags !== undefined && (!Array.isArray(e.flags) || !e.flags.every((f) => typeof f === "string"))) fail(`${w}.effects.flags`, "must be a list of strings");
   if (e.san !== undefined && !Number.isInteger(e.san)) fail(`${w}.effects.san`, "must be an integer");
+  if (e.assimilation !== undefined && !(Number.isInteger(e.assimilation) && (e.assimilation as number) >= 0)) fail(`${w}.effects.assimilation`, "must be an integer >= 0");
   if (e.looked !== undefined && typeof e.looked !== "boolean") fail(`${w}.effects.looked`, "must be true or false");
   if (e.letItDoUnchecked !== undefined && !(Number.isInteger(e.letItDoUnchecked) && (e.letItDoUnchecked as number) >= 0)) {
     fail(`${w}.effects.letItDoUnchecked`, "must be an integer >= 0");

@@ -188,7 +188,7 @@ async function kuroRig(reducedMotion: boolean, memory = { ...freshMemory(), hung
   const root = doc.createElement("div") as unknown as HTMLElement;
   doc.body.appendChild(root as never);
   // The page with the Kurogotchi stage (the driver fills it).
-  root.innerHTML = drawerPage({ finishedRuns: 1, endings: { bad: 0, survive: 0, good: 1 }, objects: [], kurogotchi: true }, "kurogotchi").value;
+  root.innerHTML = drawerPage({ finishedRuns: 1, endings: { bad: 0, survive: 0, good: 1, collapse: 0 }, objects: [], kurogotchi: true }, "kurogotchi").value;
   // A controllable clock: performance.now advances only when we say so.
   let t = 0;
   (win.performance as unknown as { now: () => number }).now = () => t;

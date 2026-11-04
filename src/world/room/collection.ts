@@ -16,7 +16,7 @@ export interface Collection {
   readonly kurogotchi: boolean;
 }
 
-export const EMPTY_COLLECTION: Collection = { finishedRuns: 0, endings: { bad: 0, survive: 0, good: 0 }, objects: [], kurogotchi: false };
+export const EMPTY_COLLECTION: Collection = { finishedRuns: 0, endings: { bad: 0, survive: 0, good: 0, collapse: 0 }, objects: [], kurogotchi: false };
 
 /** A figure per ending reached; hover or focus shows its name as a one-word chip. */
 export function figuresLayer(c: Collection): SafeHtml {

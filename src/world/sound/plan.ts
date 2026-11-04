@@ -96,7 +96,7 @@ export const EVENING_MUSIC_GAIN = 0.7;
 export interface PlanSession {
   readonly clock: Pick<BeatClock, "beat">;
   /** The ending pages (san-and-endings): the credits are the full song. */
-  readonly endingPage?: { readonly phase: "you" | "credits" | "after" } | null;
+  readonly endingPage?: { readonly phase: "collapse" | "you" | "credits" | "after" } | null;
   /** The walkman on the desk is playing the theme (a click; session only). */
   readonly walkman?: boolean;
   /** Where the player is (the duck). */

@@ -13,6 +13,7 @@ import { fillPlaceholders } from "@world/replies/placeholders";
 import { creditLines, creditsShown, lastLineKey } from "./credits";
 import { youAndYou } from "./youandyou";
 import { renderPullOut } from "./pullout";
+import { COLLAPSE_TO_WHITE_MS } from "./flow";
 
 export interface EndingModel {
   readonly state: State;
@@ -63,11 +64,25 @@ export function renderAfter(m: EndingModel, ending: Ending): SafeHtml {
   return html`<div class="stage room door-view ending-page day-19" data-day="19"><div class="dlg">${tr("ending.day19")}</div></div>`;
 }
 
+/**
+ * The collapse (three-meters spec): the room's collapse look runs straight to white (~4 s; the CSS
+ * `fx=0`/reduced-motion path is a cut), then black with one line `ending.collapse.line` carrying
+ * the day it happened. The whole page is the click target to the credits.
+ */
+export function renderCollapse(m: EndingModel): SafeHtml {
+  const page = m.session.endingPage;
+  const whiteFor = m.nowMs > 0 && page ? m.nowMs - page.startMs : COLLAPSE_TO_WHITE_MS;
+  const toWhite = whiteFor < COLLAPSE_TO_WHITE_MS;
+  const line = hasString("ending.collapse.line") ? html`<p class="collapse-line">${tr("ending.collapse.line", { day: m.state.day })}</p>` : null;
+  return html`<div class="${cls("stage", "ending-page", "collapse-page", toWhite && "to-white")}" data-day="${m.state.day}">${next()}<div class="collapse-white" aria-hidden="true"></div>${toWhite ? null : line}</div>`;
+}
+
 export function renderEnding(m: EndingModel): SafeHtml {
   // Night 18: the pull-out first; the pages wait (room-scene addition 2026-11-01).
   if (m.session.pullOut) return renderPullOut(m);
   const ending = m.state.ending as Ending;
-  const phase = m.session.endingPage?.phase ?? (ending === "bad" ? "you" : "credits");
+  const phase = m.session.endingPage?.phase ?? (ending === "collapse" ? "collapse" : ending === "bad" ? "you" : "credits");
+  if (phase === "collapse") return renderCollapse(m);
   if (phase === "you") return renderYouAndYou(m);
   if (phase === "credits") return renderCredits(m, ending);
   return renderAfter(m, ending);

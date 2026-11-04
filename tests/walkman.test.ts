@@ -18,7 +18,7 @@ import { soundTable } from "@world/sound/table";
 
 afterEach(() => setLocale("zh"));
 
-const REACHED = { finishedRuns: 1, endings: { bad: 0, survive: 1, good: 0 }, objects: [], kurogotchi: false };
+const REACHED = { finishedRuns: 1, endings: { bad: 0, survive: 1, good: 0, collapse: 0 }, objects: [], kurogotchi: false };
 
 function ctxOf(store: Store, patch: Partial<Session> = {}): ActionContext {
   return { store, session: { ...initialSession(DEFAULT_CLOCK, "left", "desk"), ...patch }, rerender: () => {}, later: () => {} };
