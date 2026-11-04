@@ -70,6 +70,8 @@ export interface ShellModel {
   readonly place?: Readonly<Record<AppId, Side>>;
   /** 调度中心's windows (tingtalk R1b), each on its monitor, front first; absent / null = closed. */
   readonly mc?: readonly { readonly side: Side; readonly monitor: MonitorModel }[] | null;
+  /** collapse-details R3: this opening of 调度中心 shows 屏幕 3. */
+  readonly mcScreen3?: boolean;
   /** The desktop's share of the collapse: the pores on the left monitor and the dimmed text (room-scene correction 2026-11-02). */
   readonly fx?: FxPlan | null;
   /** A line's backdrop and prop over the screen (dialogue 2026-11-02); absent = none. */
@@ -235,5 +237,10 @@ function missionControl(m: ShellModel): SafeHtml | null {
     // never answer here), so the wrapper is not a <button> (no button inside a button).
     return html`<div class="mc-win" role="button" tabindex="0" data-action="mc-focus" data-app="${app}" data-side="${side}" data-mc-drag="${app}" aria-label="${appName(app)}"><span class="mc-thumb" aria-hidden="true"><span class="mc-scale" inert>${stillOf(html`${windowFrame(m, mon)}`)}</span></span><span class="mc-name">${appName(app)}</span></div>`;
   });
-  return html`<div class="mc" role="dialog" aria-label="${t("mc.title")}"><div class="mc-screens">${screen("left")}${screen("right")}</div><div class="mc-wins">${windows}</div></div>`;
+  // collapse-details R3: a third, dark screen with one window nobody opened. No drop target, no
+  // action, no focus: nothing answers it.
+  const third = m.mcScreen3
+    ? html`<div class="mc-screen s3" aria-hidden="true"><div class="mc-desk"><span class="mc-unknown"><span class="mc-unknown-bar"><i></i><i></i><i></i><b>${tr("mc.unknownWindow")}</b></span></span></div><span class="mc-sname">${tr("mc.screen3")}</span></div>`
+    : null;
+  return html`<div class="mc" role="dialog" aria-label="${t("mc.title")}"><div class="mc-screens">${screen("left")}${screen("right")}${third}</div><div class="mc-wins">${windows}</div></div>`;
 }

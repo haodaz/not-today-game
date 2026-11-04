@@ -15,6 +15,7 @@ import { appOn, buildShell, initialSession, type AppRenderers, type Session } fr
 import { bringToFront, loadPlacement, moveApp, placementOf, savePlacement } from "./placement";
 import { createWindowDrag } from "./windrag";
 import { createDockPeek } from "./dockpeek";
+import { stageOf } from "@state/stages";
 import { renderDesktop, APPS, type AppId } from "./shell";
 import { dockFor } from "./dock";
 import type { LookApi } from "@world/room/nav";
@@ -122,6 +123,13 @@ export const shellActions: Record<string, ActionHandler> = {
   "mc-toggle"(ctx) {
     if (ctx.session.view !== "desktop") return;
     ctx.session.mcOpen = !ctx.session.mcOpen;
+    // collapse-details R3: on a stage-5 day the first opening of the day shows 屏幕 3; the next does not.
+    if (ctx.session.mcOpen) {
+      const day = ctx.store.getState().day;
+      const c = ctx.session.collapse;
+      c.screen3 = stageOf(day) >= SCREEN3_STAGE && c.mcDay !== day;
+      c.mcDay = day;
+    }
     ctx.rerender();
   },
   "mc-close"(ctx) {
@@ -138,6 +146,9 @@ export const shellActions: Record<string, ActionHandler> = {
     ctx.rerender();
   },
 };
+
+/** collapse-details R3: 屏幕 3 shows on days of this stage (content/stages.json). */
+export const SCREEN3_STAGE = 5;
 
 /** How long a decoy click's line stays in Kuro's pill. */
 export const DECOY_SAY_MS = 6000;
@@ -182,6 +193,12 @@ function defaultRender(apps: AppRenderers) {
 
 export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: () => void; session: Session } {
   const session = initialSession(deps.clock, deps.focus ?? "left", deps.view ?? "desktop");
+  // collapse-details R1: anyone who prefers less motion sees the glimpses swap, not slide.
+  try {
+    session.reducedMotion = !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  } catch {
+    session.reducedMotion = false;
+  }
   // tingtalk R1b: the run's placement (a reload, the next day); a fresh run keeps the default.
   const remembered = deps.placement ? loadPlacement(deps.placement.storage, deps.placement.runId, APPS) : null;
   if (remembered) Object.assign(session, remembered);

@@ -12,6 +12,7 @@ import type { AppContext, Session } from "../model";
 import type { BoardState } from "@state/days/board";
 import { taskByFlag } from "@state/days/tasks";
 import { loopContext, openTask } from "@world/loop/checklist";
+import { collapseLines, collapseSeed, FACE_MS, HEX_STEPS, hexOffset, hexPhase, magicCircle, wrongFaceOf } from "./collapse";
 
 /** One line every 2.6 s; 0.3 s with the dev `?fast=1` (meeting R3). */
 export const MEETING_LINE_MS = 2_600;
@@ -101,10 +102,28 @@ export function meetingWindow(ctx: AppContext, task: Task, board: TaskBoard): Sa
   const { pos, playing } = meetingNow(session, state.day, task.id, events);
   const line = pos >= 0 ? m.lines[pos] : undefined;
   const nameOf = (id: string) => m.people.find((p) => p.id === id)?.name ?? id;
-  const tiles = m.people.map((p) => {
-    const face = p.tile ? html`<img class="mt-img" src="${p.tile}" alt="" draggable="false">` : html`<span class="mt-init" aria-hidden="true">${initials(p.name)}</span>`;
-    return html`<div class="${cls("mt-tile", line?.who === p.id && "speaking")}" data-person="${p.id}">${face}<span class="mt-name">${p.name}</span></div>`;
+  // collapse-details: a glimpse showing now in this meeting (R1 the hexagram, R2 the wrong face).
+  const key = keyOf(state.day, task.id);
+  const c = session.collapse;
+  const hex = c.hex?.key === key ? hexPhase(ctx.nowMs - c.hex.at) : null;
+  const wrong = c.face?.key === key && ctx.nowMs >= c.face.at && ctx.nowMs - c.face.at < FACE_MS ? c.face.who : null;
+  const cols = gridColumns(m.people.length);
+  const tiles = m.people.map((p, i) => {
+    const img = (klass: string) => html`<img class="${klass}" src="${p.tile}" alt="" draggable="false">`;
+    // R2: the same image, wrong: the top 45 % mirrored, a 6 % stretch, a red and a blue copy 1 px apart.
+    const bad = wrong === p.id && p.tile !== undefined;
+    const face = p.tile
+      ? bad
+        ? html`${img("mt-img")}<span class="mt-wrong-top" aria-hidden="true">${img("mt-img")}</span>${img("mt-ghost r")}${img("mt-ghost b")}`
+        : img("mt-img")
+      : html`<span class="mt-init" aria-hidden="true">${initials(p.name)}</span>`;
+    // R1: held on its hexagram point (extra tiles stack on the points).
+    const off = hex === "hex" ? hexOffset(i, m.people.length, cols) : null;
+    const style = off ? html` style="--hx:${off.x}%;--hy:${off.y}%"` : null;
+    return html`<div class="${cls("mt-tile", line?.who === p.id && "speaking", bad && "mt-wrong")}" data-person="${p.id}"${style}>${face}<span class="mt-name">${p.name}</span></div>`;
   });
+  const gridCls = cls("mt-grid", hex === "flicker" && "mt-flicker", hex === "hex" && "mt-hex", hex === "out" && "mt-hex-out", (hex === "hex" || hex === "out") && (session.reducedMotion ? "swap" : "slide"));
+  const circle = hex === "hex" || hex === "out" ? magicCircle(hex) : null;
   const sub = line ? html`<div class="mt-sub" aria-live="polite"><span class="mt-t">${line.t}</span> · <b>${nameOf(line.who)}</b>: ${line.text}</div>` : html`<div class="mt-sub empty" aria-live="polite"></div>`;
   const atEnd = pos >= m.lines.length - 1;
   const toggle = playing
@@ -112,7 +131,7 @@ export function meetingWindow(ctx: AppContext, task: Task, board: TaskBoard): Sa
     : html`<button type="button" class="mt-btn play" data-action="meeting-play"${atEnd ? html` disabled` : null}>▶ ${tr("meeting.play")}</button>`;
   const restart = html`<button type="button" class="mt-btn restart" data-action="meeting-restart">⟲ ${tr("meeting.restart")}</button>`;
   const counter = html`<span class="mt-n">${Math.max(0, pos + 1)} / ${m.lines.length}</span>`;
-  return html`<div class="mt-left" data-playing="${playing ? "1" : "0"}"><div class="mt-grid" style="--mt-cols:${gridColumns(m.people.length)}">${tiles}</div>${sub}<div class="mt-ctl">${toggle}${restart}${counter}</div></div>`;
+  return html`<div class="mt-left" data-playing="${playing ? "1" : "0"}"><div class="${gridCls}" style="--mt-cols:${cols}">${tiles}${circle}</div>${sub}<div class="mt-ctl">${toggle}${restart}${counter}</div></div>`;
 }
 
 // ——— playing (meeting R3) ———
@@ -132,6 +151,33 @@ function reach(ctx: ActionContext, task: Task, i: number): void {
   const day = ctx.store.getState().day;
   if (!meetingReached(task.id, day, ctx.store.getEvents()).has(i)) ctx.store.appendEvent({ kind: "open", target: meetingTarget(task.id, i), t: ctx.session.clock.time });
   ctx.session.meetingPlay!.pos = i;
+  glimpse(ctx, task, i);
+}
+
+/**
+ * collapse-details R1 / R2: line `i` is the meeting's seeded line for the hexagram or the wrong face
+ * today: it begins now (once per meeting per day this session), and the view re-renders as it moves
+ * on. Session only, nothing logged.
+ */
+function glimpse(ctx: ActionContext, task: Task, i: number): void {
+  const day = ctx.store.getState().day;
+  const m = task.board!.meeting!;
+  const seed = collapseSeed(ctx.store.getRunId(), day, task.id);
+  const at = collapseLines(seed, day, m.lines.length);
+  const key = keyOf(day, task.id);
+  const c = ctx.session.collapse;
+  const now = ctx.now?.() ?? Date.now();
+  if (i === at.hex && !c.seen.includes(`hex:${key}`)) {
+    c.seen.push(`hex:${key}`);
+    c.hex = { key, at: now };
+    for (const ms of HEX_STEPS) ctx.later(ms + 16, ctx.rerender);
+  }
+  const who = i === at.face ? wrongFaceOf(seed, m.people) : null;
+  if (who && !c.seen.includes(`face:${key}`)) {
+    c.seen.push(`face:${key}`);
+    c.face = { key, at: now, who };
+    ctx.later(FACE_MS + 16, ctx.rerender);
+  }
 }
 
 /** The next tick of a playing meeting: one line on, then the next tick (or stop at the end). */

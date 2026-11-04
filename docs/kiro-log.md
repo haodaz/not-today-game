@@ -2132,3 +2132,38 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
 - Tests: 4 new R12 tests in `tests/shell.test.ts`. Updated the explorer row strings in `shell` (4) and
   `meeting` (2) for the new `title`.
 - `npx tsc --noEmit`: clean. `npx vitest run`: 108 files / 1945 tests passed.
+
+## collapse-details: the hexagram, the wrong face, 屏幕 3 (2026-11-04)
+
+- New `src/world/desktop/workbench/collapse.ts` (pure):
+  - `collapseLines(seed, day, n)`:
+    - the stage comes from `stageOf` (content/stages.json): R1 from 4, R2 from 3;
+    - the seed is `collapseSeed(runId, day, taskId)` through `@state/seed` `jitter`;
+    - candidate lines are 1..n-2; R2 never takes R1's line.
+  - `wrongFaceOf`: a person with an image, never id `me`, the player's tile in content.
+  - The timings: `hexPhase` (flicker 160 = two 80 ms frames, hold 2400, back 600) and `FACE_MS` 900.
+  - `HEX_POINTS` (six points, radius 36 % around the centre) and `hexOffset`: tile i goes to point
+    i mod 6, as a translate from its grid cell; gaps are ignored.
+  - `magicCircle`: inline SVG with two rings, two triangles and 12 ticks; `currentColor` at 0.35.
+- `meeting.ts`:
+  - When playing reaches the seeded line, `glimpse()` starts R1 / R2 in the session
+    (`session.collapse.hex` / `face` with the start time; `seen` keeps them to once per meeting per
+    day) and queues the re-renders.
+  - `meetingWindow` draws the phase from `nowMs`:
+    - the grid's `mt-flicker`, then `mt-hex` with each tile's `--hx/--hy`, then `mt-hex-out`;
+    - `slide`, or `swap` with `session.reducedMotion`, which the controller sets from
+      `prefers-reduced-motion` at mount;
+    - the circle (`in` / `out`);
+    - R2's tile `mt-wrong`, with the top-45 % mirrored copy and the red / blue copies.
+  - Subtitles keep running. Nothing is logged beyond the meeting's own line opens.
+- R3:
+  - `mc-toggle` sets `session.collapse.screen3` on the first opening of a stage-5 day (`mcDay`); the
+    model passes it as `mcScreen3`.
+  - `missionControl` adds a third screen after 左屏 / 右屏: dark, one blank white window titled
+    `mc.unknownWindow`, the name `mc.screen3`.
+  - It has no `data-mc-drop`, no action and no focus; the CSS gives it `pointer-events:none` and the
+    default cursor.
+- `desktop.css`: the flicker, slide, swap and circle fades, the wrong-face distortion, 屏幕 3.
+- Tests: new `tests/collapse-details.test.ts` (13). It uses the meeting fixture, and day 1's stage is
+  overridden per test.
+- `npx tsc --noEmit`: clean. `npx vitest run`: 109 files / 1958 tests passed.

@@ -338,6 +338,13 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .mc-screen .mc-desk{width:200px;height:125px;border-radius:6px;background:rgba(255,255,255,.18);border:2px solid transparent;display:flex;flex-wrap:wrap;gap:4px;padding:6px;box-sizing:border-box;align-content:flex-start}
 .mc-screen.on .mc-desk{border-color:rgba(255,255,255,.85)}
 .mc-mini{font-size:10px;background:rgba(255,255,255,.85);color:var(--ink);border-radius:3px;padding:1px 4px}
+/* collapse-details R3: 屏幕 3, a dark screen with one blank white window; nothing answers it. */
+.mc-screen.s3{cursor:default;pointer-events:none}
+.mc-screen.s3 .mc-desk{background:#0b0c0e;border-color:transparent;align-content:center;justify-content:center}
+.mc-unknown{width:120px;height:76px;background:#fff;border-radius:4px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.mc-unknown-bar{height:14px;flex:0 0 14px;display:flex;align-items:center;gap:3px;padding:0 5px;border-bottom:1px solid #eee;color:#9aa3b0;font-size:8px}
+.mc-unknown-bar i{width:5px;height:5px;border-radius:50%;background:#d6d9de}
+.mc-unknown-bar b{font-weight:400;margin-left:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mc-wins{flex:1;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:36px}
 .mc-win{border:0;background:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;touch-action:none;font:inherit}
 .mc-thumb{display:block;width:418px;height:228px;position:relative;overflow:hidden;border-radius:10px;box-shadow:0 12px 36px rgba(0,0,0,.35)}
@@ -702,6 +709,34 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .wb .sh-meeting .mt-tile{position:relative;aspect-ratio:16/10;border-radius:8px;background:#F0EEEA;overflow:hidden;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px transparent;transition:box-shadow .3s}
 .wb .sh-meeting .mt-tile.speaking{box-shadow:0 0 0 2px rgba(47,111,235,.55)}
 .wb .sh-meeting .mt-img{width:100%;height:100%;object-fit:cover}
+/* collapse-details R1: the tiles flicker (two 80 ms frames at 0.2), slide to the hexagram's points
+   and back; the magic circle fades in over 400 ms and out over 600 ms. Reduced motion: no slide,
+   the grid swaps with a 300 ms fade. */
+.mt-grid{position:relative}
+.mt-grid.mt-flicker .mt-tile{animation:mt-flicker 160ms steps(1) both}
+@keyframes mt-flicker{0%{opacity:.2}50%{opacity:1}}
+.mt-grid.mt-hex .mt-tile{transform:translate(var(--hx,0),var(--hy,0)) scale(.55);z-index:1}
+.mt-grid.slide.mt-hex .mt-tile{transition:transform 400ms ease}
+.mt-grid.slide.mt-hex-out .mt-tile{transition:transform 600ms ease}
+.mt-grid.swap .mt-tile{transition:none}
+.mt-grid.swap{animation:mt-swap 300ms ease both}
+@keyframes mt-swap{from{opacity:0}to{opacity:1}}
+.mt-circle{position:absolute;left:50%;top:50%;width:min(80%,80vh);aspect-ratio:1;transform:translate(-50%,-50%);pointer-events:none;color:inherit;z-index:0}
+.mt-circle-svg{width:100%;height:100%;display:block}
+.mt-circle.in{animation:mt-fade-in 400ms ease both}
+.mt-circle.out{animation:mt-fade-out 600ms ease both}
+@keyframes mt-fade-in{from{opacity:0}to{opacity:1}}
+@keyframes mt-fade-out{from{opacity:1}to{opacity:0}}
+@media (prefers-reduced-motion:reduce){.mt-grid .mt-tile{transition:none !important}.mt-grid.mt-flicker .mt-tile{animation:none}}
+/* collapse-details R2: one face wrong for 900 ms: the top 45 % mirrored, a 6 % vertical stretch,
+   a 1 px red / blue split at 0.5. */
+.mt-tile.mt-wrong{position:relative;overflow:hidden}
+.mt-tile.mt-wrong > .mt-img{transform:scaleY(1.06)}
+.mt-tile.mt-wrong .mt-wrong-top{position:absolute;left:0;top:0;width:100%;height:45%;overflow:hidden;pointer-events:none}
+.mt-tile.mt-wrong .mt-wrong-top .mt-img{position:absolute;left:0;top:0;width:100%;height:calc(100% / .45);object-fit:cover;transform:scaleX(-1) scaleY(1.06)}
+.mt-tile.mt-wrong .mt-ghost{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5;pointer-events:none;mix-blend-mode:screen;transform:scaleY(1.06)}
+.mt-tile.mt-wrong .mt-ghost.r{translate:-1px 0;filter:sepia(1) saturate(8) hue-rotate(-50deg)}
+.mt-tile.mt-wrong .mt-ghost.b{translate:1px 0;filter:sepia(1) saturate(8) hue-rotate(180deg)}
 .wb .sh-meeting .mt-init{width:48px;height:48px;border-radius:50%;background:#E7E5E0;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:500;color:#1F1F1F}
 .wb .sh-meeting .mt-name{position:absolute;left:8px;bottom:6px;font-size:11px;background:rgba(255,255,255,.85);border-radius:4px;padding:1px 6px;color:#1F1F1F}
 .wb .sh-meeting .mt-sub{min-height:40px;background:#FAF9F7;border:1px solid #E7E5E0;border-radius:8px;padding:8px 10px;font-size:13px;line-height:1.5}

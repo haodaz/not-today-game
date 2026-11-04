@@ -215,6 +215,21 @@ export interface Session {
   decoyWindow: string | null;
   /** shell R11.2: the dock hidden over full-screen 工作台 has slid up (the pointer at the bottom edge). Session only. */
   dockPeek: boolean;
+  /**
+   * collapse-details: the glimpses that go wrong and back. `seen` the ones already shown (once per
+   * meeting per day: `hex:<day>:<task>`, `face:<day>:<task>`); `hex` / `face` the one showing now
+   * (its meeting key and when it began; `who` the wrong face); `mcDay` the day 调度中心 was last
+   * first-opened and `screen3` whether this opening shows 屏幕 3. Session only, never logged.
+   */
+  collapse: {
+    seen: string[];
+    hex: { readonly key: string; readonly at: number } | null;
+    face: { readonly key: string; readonly at: number; readonly who: string } | null;
+    mcDay: number | null;
+    screen3: boolean;
+  };
+  /** `prefers-reduced-motion` (set by the controller at mount): glimpses swap with a fade instead of sliding. */
+  reducedMotion: boolean;
   /** What a decoy click made Kuro say, and until when (ms): it shows in its pill; session only. */
   dockSay: { readonly text: string; readonly until: number } | null;
   /**
@@ -381,6 +396,8 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     turnNext: null,
     decoyWindow: null,
     dockPeek: false,
+    collapse: { seen: [], hex: null, face: null, mcDay: null, screen3: false },
+    reducedMotion: false,
     dockSay: null,
     filesApp: null,
     filesSaid: new Set(),
@@ -547,6 +564,7 @@ export function buildShell(
     focus: session.focus,
     place: session.place,
     mc,
+    mcScreen3: !!mc && session.collapse.screen3,
     fx: fxPlan(state.day, "desktop"),
     scene: sceneOf(session.dialogue),
     callOverlay: renderCall(ctx),
