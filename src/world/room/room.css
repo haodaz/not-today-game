@@ -7,7 +7,7 @@
   background:#1a1814 url(/room/shots/desk_close.jpg) center/cover}
 /* Four camera levels (day-loop amendment): 房间 the wide shot, 桌子 the desk close-up. Both
    2048×1152 stills; click areas are measured in room/shots.ts. */
-.room.room-view{background-image:url(/room/shots/room.jpg)}
+.room.room-view,.m-turn-face.room-view{background-image:url(/room/shots/room.jpg)}
 .room.desk-view{background-image:url(/room/shots/desk_top.jpg)}
 /* Look is photo parallax (room-scene decision 2026-11-02; look.ts sets the vars on the live stage).
    The photo grows by just what the pan needs, so no edge shows; the photo layers move with it; the
@@ -60,6 +60,8 @@
 .kuro-btn:focus-visible{outline:2px solid #f6a623;outline-offset:2px}
 .kuro-btn .dot{position:absolute;right:26px;top:26px;width:14px;height:14px;border-radius:50%;background:#e5484d;box-shadow:0 0 0 2px #fff;pointer-events:none}
 .room.door-view{background:#0f0e0c url(/room/door_wall.png) center/cover}
+/* A wall of the turning box (room-turn correction): the same still as its facing. */
+.m-turn-face.door-view{background-color:#0f0e0c;background-image:url(/room/door_wall.png)}
 /* A press-and-drag turns the head: it must not select the picture or drag an image. */
 .room{-webkit-user-select:none;user-select:none}
 .room input,.room textarea{-webkit-user-select:text;user-select:text}
@@ -68,8 +70,8 @@
 #app.look-turned .desk-things,#app.look-turned .figures,#app.look-turned .desk-book{opacity:0;transition:opacity .15s}
 /* The bed wall and the big window wall (room-turn 2026-11-04): 1664×928 stills, cover-fitted and
    centred like room.jpg. */
-.room.bed-view{background-image:url(/room/shots/bed.jpg)}
-.room.window-view{background-image:url(/room/shots/window.jpg)}
+.room.bed-view,.m-turn-face.bed-view{background-image:url(/room/shots/bed.jpg)}
+.room.window-view,.m-turn-face.window-view{background-image:url(/room/shots/window.jpg)}
 /* 窗's placed meal on the little table: the same art, scaled to its rect. */
 .room .facing-things{position:absolute;inset:0;pointer-events:none}
 .room .facing-things > .at{position:absolute;pointer-events:none}

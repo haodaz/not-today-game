@@ -1831,3 +1831,28 @@ Session only; no event.
     `hotViewOf`, Esc on 门.
   - The obsolete door-hint snapshots were removed.
 - `npx tsc --noEmit`: clean. `npx vitest run`: 100 files / 1790 tests passed (3 snapshots written).
+
+## room-turn correction: a head turn inside a box (2026-11-04)
+
+Spec: the "Correction 2026-11-04" at the end of `.kiro/specs/room-turn/requirements.md`.
+
+- `src/world/motion/dom.ts`: the slide is gone. A turn builds `.m-turn > .m-turn-box` in the live
+  stage. The faces are the leaving wall at 0°, the arriving wall at ∓90°, and for two hops the wall
+  between at ∓90° with the target at ∓180°. Each face carries a clone of its still's parts, never
+  the HUD. The box rotates about the viewer (`translateZ(p) rotateY(θ) translateZ(-p)`) to
+  `--m-turn-to` over 650 ms ease-in-out, or 2 × 400 ms. The live stage gets `m-turning`, which hides
+  its own still parts until the turn ends. Reduced motion keeps the crossfade.
+- `src/world/motion/motion.css`: box, face (1 px overlap, mirrored top and bottom against the
+  black wedge), the `m-turn-rotate`, `m-turn-rotate-2` and `m-turn-blur` keyframes. Blur peaks
+  mid-turn on the perspective container.
+- `src/world/motion/timing.ts`: `TURN_EASE` is ease-in-out, `TURN_PERSPECTIVE_PX` 800,
+  `TURN_BLUR_PX` 2.5. `CHOSEN.turn` 650, `turnFast` 400. Vars `--m-turn-p`, `--m-turn-blur`.
+- `src/world/room/room.css`: face backgrounds for the four walls.
+- `src/world/room/game.ts`: `arrive` plays no footsteps between two facings.
+- `src/world/room/cursors.css`: `turn-left` / `turn-right` on the edges; walk only for walk targets.
+- Tests: `motion-dom` (box rotation by side, no shrink or slide, HUD stays, two hops), `navigation`
+  (no step sound on a turn), `cursors` (turn cursors, the edge rules), `splat` (650 / 800 timings),
+  `polish` (per-element `--m-turn-to`; 房间 → 门 no longer steps).
+- `npx tsc --noEmit`: clean. `npx vitest run`: 100 files / 1792 tests passed.
+- Not verified in a real browser: the side faces cross the viewer's plane mid-turn and rely on the
+  browser clipping what is behind the camera.

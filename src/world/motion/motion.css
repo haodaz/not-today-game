@@ -32,20 +32,24 @@
    step), so no edge ever shows and nothing jumps at the start: never a zoom. Copies are 1600 × 900. */
 @keyframes m-walk-bob{0%,100%{background-size:1600px 900px;background-position:50% 50%}25%,75%{background-size:calc(1600px + 1600px * 2 * var(--m-walk-bob-n,4) / 900) calc(900px + 2px * var(--m-walk-bob-n,4));background-position:50% calc(50% + 1px * var(--m-walk-bob-n,4))}50%{background-size:calc(1600px + 1600px * 2 * var(--m-walk-bob-n,4) / 900) calc(900px + 2px * var(--m-walk-bob-n,4));background-position:50% calc(50% - 1px * var(--m-walk-bob-n,4))}}
 @keyframes m-cam-push-in{from{translate:var(--m-tx) var(--m-ty);scale:var(--m-z)}}
-/* A turn between facings (room-turn 2026-11-04): a horizontal slide, eased in and out, the walk's bob
-   once (a dip of --m-walk-bob-n px). The arriving stage keeps its HUD still: only its picture and its
-   still's parts slide in; the leaving still (a copy, with its placed things) slides out over it. To
-   the opposite wall the wall between passes through (two turns, back to back). */
-@keyframes m-turn-in{from{translate:var(--m-turn-dx) 0}}
-@keyframes m-turn-out{to{translate:calc(-1 * var(--m-turn-dx)) 0}}
-@keyframes m-turn-through{from{translate:var(--m-turn-dx) 0}50%{translate:0 0}to{translate:calc(-1 * var(--m-turn-dx)) 0}}
-@keyframes m-turn-bob{50%{margin-top:calc(1px * var(--m-walk-bob-n))}}
-@keyframes m-turn-bg-in{from{background-position-x:calc(50% + var(--m-turn-dx))}}
-@keyframes m-turn-bg-bob{50%{background-position-y:calc(50% + 1px * var(--m-walk-bob-n))}}
-.stage.m-turn-in{background-repeat:no-repeat;animation:m-turn-bg-in var(--m-turn) var(--m-turn-ease) var(--m-turn-t) both,m-turn-bg-bob var(--m-turn) ease-in-out var(--m-turn-t) both}
-.stage.m-turn-in > :is(.fx,.window-light,.evening-look,.scene,.shot-hit,.desk-things,.facing-things,.figures,.desk-book,.door-bg,.door-spot,.door-hand,.door-beat,.gap-glow,.box-open){animation:m-turn-in var(--m-turn) var(--m-turn-ease) var(--m-turn-t) both,m-turn-bob var(--m-turn) ease-in-out var(--m-turn-t) both}
-.stage.m-turn-in.fast,.stage.m-turn-in.fast > :is(.fx,.window-light,.evening-look,.scene,.shot-hit,.desk-things,.facing-things,.figures,.desk-book,.door-bg,.door-spot,.door-hand,.door-beat,.gap-glow,.box-open){animation-duration:var(--m-turn-fast),var(--m-turn-fast)}
-.stage.m-turn{pointer-events:none;background-repeat:no-repeat}
+/* A turn between facings is a head turn inside a box (room-turn correction 2026-11-04). The viewer
+   stands --m-turn-p (half the stage's width) in front of the wall at rest, so a wall at rest is drawn
+   1:1 and two walls meet at the corner. The box turns about the viewer (dom.ts sets the duration, the
+   easing and --m-turn-to); each face is placed about the viewer too. The faces are 1 px wider each
+   side so the corner never shows a seam, and their still is mirrored above and below so the far
+   corner, mid-turn, never shows a black wedge. A light blur peaks mid-turn. While the box turns, the
+   arriving stage's own still waits under it; its HUD stays where it is. */
+.m-turn{position:absolute;inset:0;overflow:hidden;perspective:var(--m-turn-p);perspective-origin:50% 50%;pointer-events:none;z-index:0}
+.m-turn-box{position:absolute;inset:0;transform-style:preserve-3d}
+.m-turn-face{position:absolute;top:0;left:-1px;width:calc(100% + 2px);height:100%;background:#1a1814 center/cover no-repeat}
+.m-turn-face::before,.m-turn-face::after{content:"";position:absolute;left:0;right:0;height:100%;background:inherit;transform:scaleY(-1)}
+.m-turn-face::before{bottom:100%}
+.m-turn-face::after{top:100%}
+.m-turn-things{position:absolute;top:0;left:1px;width:calc(100% - 2px);height:100%}
+@keyframes m-turn-rotate{from{transform:translateZ(var(--m-turn-p)) rotateY(0deg) translateZ(calc(-1 * var(--m-turn-p)))}to{transform:translateZ(var(--m-turn-p)) rotateY(var(--m-turn-to)) translateZ(calc(-1 * var(--m-turn-p)))}}
+@keyframes m-turn-rotate-2{from{transform:translateZ(var(--m-turn-p)) rotateY(0deg) translateZ(calc(-1 * var(--m-turn-p)))}50%{transform:translateZ(var(--m-turn-p)) rotateY(calc(var(--m-turn-to) / 2)) translateZ(calc(-1 * var(--m-turn-p)))}to{transform:translateZ(var(--m-turn-p)) rotateY(var(--m-turn-to)) translateZ(calc(-1 * var(--m-turn-p)))}}
+@keyframes m-turn-blur{50%{filter:blur(var(--m-turn-blur))}}
+.stage.m-turning > :is(.fx,.window-light,.evening-look,.scene,.shot-hit,.desk-things,.facing-things,.figures,.desk-book,.door-bg,.door-spot,.door-hand,.door-beat,.gap-glow,.box-open){visibility:hidden}
 /* Shutdown: the monitor darkens in place (it changes, it does not leave) */
 @keyframes m-power-off{from{filter:hue-rotate(var(--tint,0deg)) blur(var(--blur,0px)) brightness(1.8)}}
 /* Left ↔ right */

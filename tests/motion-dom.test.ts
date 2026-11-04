@@ -157,55 +157,83 @@ describe("the live DOM after a render (fix 2026-10-31)", () => {
     // Eight real-time moves at their walking and turning lengths: more than the default 5 s.
   }, 20_000);
 
-  it("a turn slides (room-turn R2): the leaving still and its things go out, the arriving one's picture and things come in, the HUD stays; to the opposite wall the wall between passes", async () => {
+  it("a turn is a head turn inside a box (room-turn correction 2026-11-04): the box rotates 0 → ∓90° by side, no still is scaled down or slid, the HUD stays; to the opposite wall two 400 ms turns", async () => {
     const store = storeAt(1, [{ kind: "step", name: "boot", t: "09:03" }]);
     const { root, session } = mount(store);
     await frame();
     const live = () => root.querySelector<HTMLElement>(".stage.room:not(.m-ghost)")!;
-    // One turn right: 房间 → 床, 450 ms.
+    /** Nothing on the box or its faces shrinks or slides flat. */
+    const noSlideNoShrink = (what: string) => {
+      const els = [root.querySelector<HTMLElement>(".m-turn")!, root.querySelector<HTMLElement>(".m-turn-box")!, ...root.querySelectorAll<HTMLElement>(".m-turn-face, .m-turn-things")];
+      for (const el of els) {
+        const s = el.getAttribute("style") ?? "";
+        expect(s, `${what}: translateX`).not.toMatch(/translateX|translate\(/);
+        for (const [, n] of s.matchAll(/scale[XY]?\(\s*([\d.]+)/g)) expect(Number(n), `${what}: scale`).toBeGreaterThanOrEqual(1);
+      }
+    };
+    // One turn right: 房间 → 床, 650 ms.
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight" }));
     await frame();
     expect(session.view).toBe("bed");
     check(root, session, "room → bed (turn)");
-    const out = root.querySelector<HTMLElement>(".m-turn:not(.m-turn-via)")!;
-    expect(out.classList.contains("room-view")).toBe(true);
-    // Its placed things ride with it (the click areas of 房间), never the HUD.
-    expect(out.querySelector(".shot-hit")).not.toBeNull();
-    expect(out.querySelector(".list, .day, .hud-br, .settings-btn")).toBeNull();
-    expect(out.style.animation).toMatch(new RegExp(`m-turn-out ${CHOSEN.turn}ms`));
-    expect(out.style.getPropertyValue("--m-turn-dx")).toBe("1600px");
-    expect(out.parentElement).toBe(live());
-    // The arriving stage slides its picture and its parts in from the right; its HUD is its own and does not move.
-    expect(live().classList.contains("m-turn-in")).toBe(true);
-    expect(live().classList.contains("fast")).toBe(false);
+    const turn = root.querySelector<HTMLElement>(".m-turn")!;
+    expect(turn).not.toBeNull();
+    expect(turn.parentElement).toBe(live());
+    const box = turn.querySelector<HTMLElement>(".m-turn-box")!;
+    expect(box.style.getPropertyValue("--m-turn-to")).toBe("90deg");
+    expect(box.style.animation).toMatch(new RegExp(`m-turn-rotate ${CHOSEN.turn}ms ease-in-out`));
+    expect(turn.style.animation).toMatch(new RegExp(`m-turn-blur ${CHOSEN.turn}ms`));
+    const faces = [...box.querySelectorAll<HTMLElement>(".m-turn-face")];
+    expect(faces.map((f) => f.dataset.view)).toEqual(["room", "bed"]);
+    expect(faces[0]!.style.transform).toContain("rotateY(0deg)");
+    expect(faces[1]!.style.transform).toContain("rotateY(-90deg)");
+    // The leaving wall's placed things ride on its face (the click areas of 房间), never the HUD.
+    expect(faces[0]!.querySelector(".shot-hit")).not.toBeNull();
+    expect(turn.querySelector(".list, .day, .hud-br, .settings-btn")).toBeNull();
+    noSlideNoShrink("room → bed");
+    // The live stage keeps its HUD; its own still waits under the box; it stays the one backdrop.
+    expect(live().classList.contains("m-turning")).toBe(true);
     expect(live().classList.contains("m-nobg")).toBe(false);
-    expect(live().style.getPropertyValue("--m-turn-dx")).toBe("1600px");
+    expect(live().querySelector(":scope > .list")).not.toBeNull();
     expect(root.querySelector(".m-backdrop")).toBeNull();
     await wait(CHOSEN.turn + 80);
     await frame();
     expect(root.querySelector(".m-turn")).toBeNull();
-    expect(live().classList.contains("m-turn-in")).toBe(false);
-    // Two away (床 → 窗): two 300 ms turns to the right, 门 passing through.
+    expect(live().classList.contains("m-turning")).toBe(false);
+    // Back left: 床 → 房间, the box to −90°, the arriving wall at +90°.
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowLeft" }));
+    await frame();
+    expect(session.view).toBe("room");
+    const left = root.querySelector<HTMLElement>(".m-turn-box")!;
+    expect(left.style.getPropertyValue("--m-turn-to")).toBe("-90deg");
+    expect(left.querySelectorAll<HTMLElement>(".m-turn-face")[1]!.style.transform).toContain("rotateY(90deg)");
+    noSlideNoShrink("bed → room");
+    await wait(CHOSEN.turn + 80);
+    await frame();
+    expect(root.querySelector(".m-turn")).toBeNull();
+    // Two away (房间 → 门): two 400 ms turns to the right, 床 passing through.
     // (A code move, as a data-view hotspot or the sleep flow makes it.)
     const go = document.createElement("button");
     go.dataset.action = "view";
-    go.dataset.view = "window";
+    go.dataset.view = "door";
     root.appendChild(go);
     go.click();
     await frame();
-    expect(session.view).toBe("window");
-    check(root, session, "bed → window (two turns)");
-    const via = root.querySelector<HTMLElement>(".m-turn.m-turn-via")!;
-    expect(via.classList.contains("door-view")).toBe(true);
-    expect(via.style.animation).toMatch(new RegExp(`m-turn-through ${2 * CHOSEN.turnFast}ms`));
-    expect(root.querySelector<HTMLElement>(".m-turn:not(.m-turn-via)")!.style.animation).toMatch(new RegExp(`m-turn-out ${CHOSEN.turnFast}ms`));
-    expect(live().classList.contains("fast")).toBe(true);
-    // The arriving still waits for the first turn: it comes in on the second.
-    expect(Number.parseInt(live().style.getPropertyValue("--m-turn-t"), 10)).toBeGreaterThan(CHOSEN.turnFast - 120);
+    expect(session.view).toBe("door");
+    check(root, session, "room → door (two turns)");
+    const box2 = root.querySelector<HTMLElement>(".m-turn-box")!;
+    expect(box2.style.getPropertyValue("--m-turn-to")).toBe("180deg");
+    expect(box2.style.animation).toMatch(new RegExp(`m-turn-rotate-2 ${2 * CHOSEN.turnFast}ms`));
+    expect(root.querySelector<HTMLElement>(".m-turn")!.style.animation).toMatch(new RegExp(`m-turn-blur ${CHOSEN.turnFast}ms ease-in-out -?\\d+ms 2`));
+    const faces2 = [...box2.querySelectorAll<HTMLElement>(".m-turn-face")];
+    expect(faces2.map((f) => f.dataset.view)).toEqual(["room", "bed", "door"]);
+    expect(faces2[1]!.style.transform).toContain("rotateY(-90deg)");
+    expect(faces2[2]!.style.transform).toContain("rotateY(-180deg)");
+    noSlideNoShrink("room → door");
     await wait(2 * CHOSEN.turnFast + 80);
     await frame();
     expect(root.querySelector(".m-turn")).toBeNull();
-    check(root, session, "bed → window (after)");
+    check(root, session, "room → door (after)");
   });
 
   it("reduced motion: a turn is the crossfade", async () => {
@@ -220,7 +248,7 @@ describe("the live DOM after a render (fix 2026-10-31)", () => {
       expect(session.view).toBe("window");
       check(root, session, "room → window (reduced)");
       expect(root.querySelector(".m-turn")).toBeNull();
-      expect(root.querySelector(".stage.room:not(.m-ghost):not(.m-backdrop)")!.classList.contains("m-turn-in")).toBe(false);
+      expect(root.querySelector(".stage.room:not(.m-ghost):not(.m-backdrop)")!.classList.contains("m-turning")).toBe(false);
       const copies = [...root.querySelectorAll<HTMLElement>(".m-backdrop")];
       expect(copies).toHaveLength(2);
       expect(copies[1]!.style.animation).toMatch(new RegExp(`m-fade-out ${CROSSFADE_MS}ms`));

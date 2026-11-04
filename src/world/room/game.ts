@@ -214,8 +214,9 @@ export function appContextOf(ctx: ActionContext) {
 function startCam(ctx: ActionContext, from: string, to: View): number {
   const now = ctx.now?.() ?? Date.now();
   const dur = viewMoveMs(from, to);
-  // A turn between facings (room-turn R2): the stills slide and each one's placed things ride with
-  // it, so nothing waits for the camera; the motion layer reads the way and the hops from here.
+  // A turn between facings (room-turn correction 2026-11-04): a head turn inside a box, each wall's
+  // placed things riding on its face, so nothing waits for the camera; the motion layer reads the
+  // way and the hops from here.
   if (isFacing(from) && isFacing(to) && from !== to) {
     const dirs = turnsBetween(from, to);
     const via = dirs.length === 2 ? turnedTo(from, dirs[0]!) : null;
@@ -236,7 +237,7 @@ function startCam(ctx: ActionContext, from: string, to: View): number {
   return dur;
 }
 
-/** A turn is under way now (its slide has not ended). */
+/** A turn is under way now (its head turn has not ended). */
 function turning(ctx: ActionContext): boolean {
   const cam = ctx.session.cam;
   return !!cam?.turn && cam.until > (ctx.now?.() ?? Date.now());
@@ -344,7 +345,7 @@ function restHand(s: Session): void {
 
 /**
  * Goes to `view` the shortest way (room-turn R2): a turn between facings (two turns to the opposite
- * wall, toward the right, in one slide of two), a walk between 房间 and its levels; from 桌子 / 屏幕
+ * wall, toward the right, in one move of two), a walk between 房间 and its levels; from 桌子 / 屏幕
  * to another facing the walk out to 房间 comes first, and from another facing to 桌子 / 屏幕 the turn
  * to 房间. Each leg is `arrive`; the second waits for the first. Session only.
  */
@@ -368,8 +369,9 @@ function arrive(ctx: ActionContext, view: View, data: DOMStringMap): void {
   const from = ctx.session.view;
   ctx.session.view = view;
   if (from !== view && view !== "desktop") startCam(ctx, from, view);
-  // A move is a walk (and a turn is a step or two): two steps, whichever way.
-  if (from !== view) walkSteps(ctx, from, view);
+  // A walk is two steps, whichever way; a turn between facings is a head turn and makes no sound
+  // (room-turn correction 2026-11-04).
+  if (from !== view && !(isFacing(from) && isFacing(view))) walkSteps(ctx, from, view);
   // A line waiting for this place comes forward; one that belongs elsewhere is taken back.
   settleSession(ctx.session);
   ctx.session.phoneOpen = false;

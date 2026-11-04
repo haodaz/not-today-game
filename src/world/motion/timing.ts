@@ -3,8 +3,12 @@
 // motion.md does not say (design P2), kept apart so the two are never confused.
 import { isFacing, turnsBetween } from "@world/room/facings";
 
-/** A turn's slide is eased in and out (room-turn R2), unlike the ease-out of everything else. */
-export const TURN_EASE = "cubic-bezier(.65,0,.35,1)";
+/** A turn is eased in and out (room-turn R2), unlike the ease-out of everything else. */
+export const TURN_EASE = "ease-in-out";
+/** The viewer stands this far in front of the wall at rest: half the stage's 1600 px, so a 90° field of view and the walls meet at the corners. */
+export const TURN_PERSPECTIVE_PX = 800;
+/** The blur at the middle of a turn (the correction asks for 2–3 px). */
+export const TURN_BLUR_PX = 2.5;
 
 /** motion.md: short, ease-out. */
 export const EASE = "cubic-bezier(.2,.8,.2,1)";
@@ -72,10 +76,10 @@ export const CHOSEN = {
   chosenHold: MOTION.choice,
   /** Walking, not switching (room-scene 2026-11-02): a move takes as long as the path. 房间 ↔ 桌子. */
   roomDesk: 900,
-  /** A 90° turn between two facings (room-turn R2): a horizontal slide. */
-  turn: 450,
+  /** A 90° turn between two facings: the head turns inside the box (room-turn correction 2026-11-04). */
+  turn: 650,
   /** Each of the two turns when the target is the opposite wall (back to back, toward the right). */
-  turnFast: 300,
+  turnFast: 400,
   /** 桌子 ↔ 屏幕: leaning in. */
   deskScreen: 500,
   /** 使用 flip: the face turns over in-place (objects-in-hand 2026-11-03). */
@@ -91,8 +95,8 @@ export const CHOSEN = {
 export const CROSSFADE_MS = MOTION.view;
 /**
  * How long a view change takes, by the length of the path: 房间 ↔ 桌子 900, 桌子 ↔ 屏幕 500 ms;
- * 房间 ↔ 屏幕 goes by the desk (900). Between two facings it is a turn (room-turn R2): 450 ms to the
- * next wall, two 300 ms turns to the opposite one. Anything else the plain crossfade. `camera` is
+ * 房间 ↔ 屏幕 goes by the desk (900). Between two facings it is a turn (room-turn R2): 650 ms to the
+ * next wall, two 400 ms turns to the opposite one. Anything else the plain crossfade. `camera` is
  * kept for callers and no longer changes it.
  */
 export function viewMoveMs(from: string, to: string, _camera = true): number {
@@ -154,10 +158,11 @@ export function motionVars(): Record<string, string> {
     "--m-flip": ms(CHOSEN.flip),
     // The walk's bob as a plain number (motion.css multiplies it into px and into the cover).
     "--m-walk-bob-n": String(CHOSEN.walkBobPx),
-    // A turn between facings (room-turn R2): one 450 ms slide, or two of 300 ms to the opposite wall.
-    "--m-turn": ms(CHOSEN.turn),
-    "--m-turn-fast": ms(CHOSEN.turnFast),
-    "--m-turn-ease": TURN_EASE,
+    // A turn between facings is a head turn inside a box (room-turn correction): the viewer stands half
+    // the stage's width in front of the wall, and a light blur peaks mid-turn. (Its 650 / 2 × 400 ms
+    // timing is set per turn by the motion layer.)
+    "--m-turn-p": `${TURN_PERSPECTIVE_PX}px`,
+    "--m-turn-blur": `${TURN_BLUR_PX}px`,
     "--m-screen": ms(MOTION.screen),
     "--m-kuro-fade": ms(MOTION.kuroFade),
     "--m-bob": ms(MOTION.bob),

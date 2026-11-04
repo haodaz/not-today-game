@@ -60,14 +60,20 @@
   cursor: url(/cursors/open.png) 16 16, auto;
 }
 
-/* walk: a walk target (the desk, the bed, the door), and a facing's turn edges (room-turn 2026-11-04). */
+/* walk: a walk target (the desk, the bed, the door): walking up to things. */
 [data-action="view"][data-view="desk"],
 [data-action="view"][data-view="door"],
 .door-hit,
-[data-action="bed"],
-.room.edge-left,
-.room.edge-right {
+[data-action="bed"] {
   cursor: url(/cursors/walk.png) 16 28, auto;
+}
+
+/* turn: a facing's turn edges, one cursor per side (room-turn correction 2026-11-04). */
+.room.edge-left {
+  cursor: url(/cursors/turn-left.png) 16 16, auto;
+}
+.room.edge-right {
+  cursor: url(/cursors/turn-right.png) 16 16, auto;
 }
 
 /* back: the bottom back strip and 回房间. */

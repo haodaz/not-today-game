@@ -10,7 +10,7 @@ const css = readFileSync(resolve(root, "src/world/room/cursors.css"), "utf8");
 const hotspots = JSON.parse(readFileSync(resolve(root, "public/cursors/cursors.json"), "utf8")) as {
   hotspots: Record<string, { x: number; y: number }>;
 };
-const CURSORS = ["default", "point", "look", "take", "open", "walk", "back"] as const;
+const CURSORS = ["default", "point", "look", "take", "open", "walk", "back", "turn-left", "turn-right"] as const;
 
 describe("the cursor set", () => {
   it("every cursor's hotspot is listed and inside 0–31", () => {
@@ -35,7 +35,7 @@ describe("the cursor set", () => {
   });
 
   it("every cursor image a rule names has a matching json hotspot (no stray cursor)", () => {
-    const used = [...css.matchAll(/url\(\/cursors\/([a-z]+)\.png\)\s*(\d+)\s*(\d+)/g)];
+    const used = [...css.matchAll(/url\(\/cursors\/([a-z-]+)\.png\)\s*(\d+)\s*(\d+)/g)];
     expect(used.length).toBeGreaterThan(0);
     for (const [, name, x, y] of used) {
       const h = hotspots.hotspots[name!];
@@ -57,5 +57,17 @@ describe("the cursor set", () => {
     expect(css).toContain('[data-action="view"][data-view="desk"]'); // walk: the desk
     expect(css).toContain(".back-room"); // back: 回房间
     expect(css).toContain(".chip"); // point: a chip
+  });
+
+  it("the turn edges use the turn cursors, walk stays for walking up to things (room-turn correction 2026-11-04)", () => {
+    const rule = (sel: string) => {
+      const m = new RegExp(`${sel.replace(/[.[\]"=-]/g, "\\$&")}\\s*\\{[^}]*\\}`).exec(css);
+      return m?.[0] ?? "";
+    };
+    expect(rule(".room.edge-left")).toMatch(/url\(\/cursors\/turn-left\.png\)/);
+    expect(rule(".room.edge-right")).toMatch(/url\(\/cursors\/turn-right\.png\)/);
+    const walk = /([^{}]*)\{\s*cursor:\s*url\(\/cursors\/walk\.png\)/.exec(css)?.[1] ?? "";
+    expect(walk).not.toMatch(/edge-(left|right)/);
+    expect(walk).toContain('[data-action="view"][data-view="desk"]');
   });
 });

@@ -79,8 +79,8 @@ describe("timings are motion.md's (FR0)", () => {
   it("motion.css has no literal duration; every --m-* it reads is defined (or set per element)", () => {
     const css = motionCss.replace(/\/\*[\s\S]*?\*\//g, "");
     expect(css.match(/(?<![\w.-])[1-9]\d*(\.\d+)?m?s\b/g)).toBeNull();
-    // A turn's slide (room-turn): where the still comes from and how far into the turn, per element.
-    const perElement = new Set(["--m-t", "--m-flash-t", "--m-sleep-t", "--m-wake-t", "--m-tx", "--m-ty", "--m-z", "--m-dx", "--m-turn-t", "--m-turn-dx"]);
+    // A turn's head turn (room-turn correction 2026-11-04): how far the box rotates, per element.
+    const perElement = new Set(["--m-t", "--m-flash-t", "--m-sleep-t", "--m-wake-t", "--m-tx", "--m-ty", "--m-z", "--m-dx", "--m-turn-to"]);
     const used = [...css.matchAll(/var\((--m-[\w-]+)/g)].map((m) => m[1]!);
     for (const v of used) expect(v in motionVars() || perElement.has(v), v).toBe(true);
   });
@@ -271,7 +271,7 @@ describe("door (FR2)", () => {
     { kind: "step", name: "delivery:arrives:lunch", t: "12:04" },
   ];
 
-  it("the door is actions on the door: arriving is the walk, then the chain, the bag, the door; the bag goes to the desk by itself; no list", () => {
+  it("the door is actions on the door: arriving is the turn, then the chain, the bag, the door; the bag goes to the desk by itself; no list", () => {
     const store = createStore({ startDay: 1 });
     for (const d of drafts) store.appendEvent(d);
     const session = initialSession({ beat: "work", time: "12:30" }, "left", "room");
@@ -300,7 +300,8 @@ describe("door (FR2)", () => {
     expect(store.getEvents().at(-1)).toMatchObject({ kind: "pickup", meal: "lunch" });
     expect(ctx.session.door?.state).toBe("onDesk");
     expect(render()).not.toContain("door-spot");
-    expect(sounds).toEqual(["step-1", "chain", "lock"]);
+    // 房间 → 门 is a head turn (room-turn correction 2026-11-04): no step.
+    expect(sounds).toEqual(["chain", "lock"]);
     expect(ctx.session.dialogue.queue.map((q) => q.key).filter((k) => k.includes(":door:"))).toEqual(
       ["d1:door:lunch:openChain", "d1:door:lunch:reach", "d1:door:lunch:place"].filter((k) => ctx.session.dialogue.queue.some((q) => q.key === k)),
     );

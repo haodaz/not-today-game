@@ -103,8 +103,8 @@ export const KEYED =
  */
 export function motionKey(el: Element): string | null {
   const c = el.classList;
-  // A turn's copies (room-turn R2): the leaving still and the wall turned past; never "the" backdrop.
-  if (c.contains("m-turn")) return c.contains("m-turn-via") ? "turn-via" : "turn-out";
+  // A turn's box of walls (room-turn R2): never "the" backdrop.
+  if (c.contains("m-turn")) return "turn";
   if (c.contains("m-backdrop")) return c.contains("m-arriving") ? "backdrop-in" : "backdrop";
   if (c.contains("stage")) {
     if (c.contains("ending-page")) return "page";
@@ -627,40 +627,44 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     if (move.to === "desktop") anim(stage, "m-fade-in", CROSSFADE_MS, move.fadeAt, t);
   }
 
-  // ---- turns between facings (room-turn R2) ---------------------------------------------------
+  // ---- turns between facings (room-turn R2, correction 2026-11-04) ---------------------------
   /**
-   * A turn is a horizontal slide, not a walk: the leaving still goes out toward the side turned away
-   * from, the arriving one comes in from the side turned toward, eased in and out, with the walk's
-   * ±4 px bob once. Each still's placed things ride with it (never ahead of it). The HUD, the clock
-   * and the checklist stay put: they are the live stage's own, and only its picture and its still's
-   * parts slide. To the opposite wall it is two 300 ms turns, the wall in between passing through.
-   * Reduced motion: the crossfade (viewChange) instead.
+   * A turn is turning your head, not a slide. The four stills are the inside walls of a box and the
+   * viewer stands in its middle: under a CSS perspective of half the stage's width (so a wall at rest
+   * is drawn 1:1 and two walls meet exactly at the room's corner), the leaving and arriving stills are
+   * two adjacent faces, and the box turns 90° about the vertical axis through the viewer, eased in and
+   * out. Halfway, both walls are seen meeting at the corner. Nothing is scaled down or slid flat; a
+   * light blur peaks mid-turn. The faces are a little taller than the stage, their still mirrored above
+   * and below, so the corner's far edge never shows a black wedge. The arriving still's placed things
+   * are on its face; the HUD is the live stage's own and does not move. To the opposite wall: two
+   * turns back to back, the wall between as the middle face. Reduced motion: the crossfade instead.
+   * No bob (and the game plays no footsteps): you turn on the spot.
    */
   interface TurnMove {
     readonly start: number;
-    readonly hops: 1 | 2;
-    readonly hopMs: number;
-    /** Where the arriving still comes in from (+: from the right, a right turn). */
-    readonly dx: number;
     readonly end: number;
   }
   let turnMove: TurnMove | null = null;
-  const STAGE_PX = 1600;
   /** A still's own parts: its picture's layers and its placed things (never a HUD part, never a keyed one). */
   const STILL_PARTS = ":scope > :is(.fx, .window-light, .evening-look, .scene, .shot-hit, .desk-things, .facing-things, .figures, .desk-book, .door-spot, .box-open)";
   const reducedMotion = (): boolean => !!win.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
-  const slide = (name: string, ms: number, delay: number, bobs = 1) =>
-    `${name} ${ms * bobs}ms ${TURN_EASE} ${Math.round(delay)}ms both, m-turn-bob ${ms}ms ease-in-out ${Math.round(delay)}ms ${bobs} both`;
+  /** A rotation about the viewer (who stands --m-turn-p in front of the wall at rest). */
+  const aboutViewer = (deg: number | string) => `translateZ(var(--m-turn-p)) rotateY(${typeof deg === "number" ? `${deg}deg` : deg}) translateZ(calc(-1 * var(--m-turn-p)))`;
 
-  /** A copy of a still for its slide: the picture and its parts, laid at the stage's origin. */
-  function stillCopy(stage: HTMLElement | null, view: string): HTMLElement {
-    const c = doc.createElement("div");
-    c.className = `stage room ${view}-view m-turn`;
-    if (stage) for (const part of stage.querySelectorAll(STILL_PARTS)) c.appendChild(part.cloneNode(true));
-    Object.assign(c.style, { position: "absolute", left: "0px", top: "0px", zIndex: "0", margin: "0" });
-    return c;
+  /** One wall of the box: the still's picture and its parts, turned `deg` about the viewer. */
+  function wall(view: string, stage: HTMLElement | null, deg: number): HTMLElement {
+    const face = doc.createElement("div");
+    face.className = `m-turn-face ${view}-view`;
+    face.dataset.view = view;
+    face.style.transform = aboutViewer(deg);
+    // The parts sit on the face at the still's own coordinates (the face is 1 px wider each side).
+    const things = doc.createElement("div");
+    things.className = "m-turn-things";
+    if (stage) for (const part of stage.querySelectorAll(STILL_PARTS)) things.appendChild(part.cloneNode(true));
+    face.appendChild(things);
+    return face;
   }
-  /** The copies go first in the live stage: over its picture, under everything it holds. */
+  /** The box goes first in the live stage: over its picture, under everything it holds. */
   const firstInStage = (el: HTMLElement) => (r: HTMLElement) => {
     const s = q(r, ".stage.room");
     if (!s) return false;
@@ -668,37 +672,49 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     return true;
   };
 
-  function turnChange(t: number, from: string, turn: { readonly dir: "left" | "right"; readonly hops: 1 | 2; readonly via: string | null }): void {
-    if (!q(root, ".stage.room")) return;
+  function turnChange(t: number, from: string, to: string, turn: { readonly dir: "left" | "right"; readonly hops: 1 | 2; readonly via: string | null }): void {
+    const live = q(root, ".stage.room");
+    if (!live) return;
     move = null;
     const hopMs = turn.hops === 2 ? CHOSEN.turnFast : CHOSEN.turn;
-    const dx = turn.dir === "right" ? STAGE_PX : -STAGE_PX;
     const total = hopMs * turn.hops;
-    turnMove = { start: t, hops: turn.hops, hopMs, dx, end: t + total };
+    // CSS rotateY: turning right brings the right-hand wall (placed at −90°) to the front, the box going
+    // to +90°; turning left, the left-hand wall (+90°), the box to −90°.
+    const sign = turn.dir === "right" ? 1 : -1;
+    turnMove = { start: t, end: t + total };
     begin("turn", t);
-    // The leaving still and what was placed on it.
-    const out_ = stillCopy(out?.stage ?? null, from);
-    out_.style.setProperty("--m-turn-dx", `${dx}px`);
-    addGhost({ el: out_, key: "turn-out", start: t, end: t + hopMs, place: firstInStage(out_), apply: (g, now) => void (g.style.animation = slide("m-turn-out", hopMs, t - now)) });
-    // To the opposite wall: the wall in between comes in and goes out again (its picture).
-    if (turn.hops === 2 && turn.via) {
-      const via = stillCopy(null, turn.via);
-      via.classList.add("m-turn-via");
-      via.style.setProperty("--m-turn-dx", `${dx}px`);
-      addGhost({ el: via, key: "turn-via", start: t, end: t + total, place: firstInStage(via), apply: (g, now) => void (g.style.animation = slide("m-turn-through", hopMs, t - now, 2)) });
-    }
+    const view = doc.createElement("div");
+    view.className = "m-turn";
+    const box = doc.createElement("div");
+    box.className = "m-turn-box";
+    box.style.setProperty("--m-turn-to", `${sign * 90 * turn.hops}deg`);
+    box.appendChild(wall(from, out?.stage ?? null, 0));
+    if (turn.hops === 2 && turn.via) box.appendChild(wall(turn.via, null, -sign * 90));
+    box.appendChild(wall(to, live, -sign * 90 * turn.hops));
+    view.appendChild(box);
+    const rotate = turn.hops === 2 ? "m-turn-rotate-2" : "m-turn-rotate";
+    addGhost({
+      el: view,
+      key: "turn",
+      start: t,
+      end: t + total,
+      place: firstInStage(view),
+      apply: (g, now) => {
+        const delay = Math.round(t - now);
+        box.style.animation = `${rotate} ${total}ms ${TURN_EASE} ${delay}ms both`;
+        // The blur peaks in the middle of each turn and is gone at both ends.
+        g.style.animation = `m-turn-blur ${hopMs}ms ${TURN_EASE} ${delay}ms ${turn.hops} both`;
+      },
+    });
     after(total + 16, ctx.rerender);
   }
 
-  /** The arriving stage: its picture and its still's parts slide in (the last hop); its HUD does not move. */
+  /** The arriving stage keeps its HUD; its own still waits under the turning box until the turn ends. */
   function turnEntry(t: number): void {
     const m = turnMove;
     const stage = q(root, ".stage.room");
     if (!m || !stage || t >= m.end) return;
-    stage.classList.add("m-turn-in");
-    if (m.hops === 2) stage.classList.add("fast");
-    stage.style.setProperty("--m-turn-dx", `${m.dx}px`);
-    stage.style.setProperty("--m-turn-t", `${Math.round(m.start + (m.hops - 1) * m.hopMs - t)}ms`);
+    stage.classList.add("m-turning");
   }
 
   // Left ↔ right: a push; the other monitor's tab moves with it.
@@ -930,7 +946,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       } else if (snap.view !== prev.view) {
         // Between two facings a turn slides (room-turn R2); anything else walks and crossfades.
         const turn = ctx.session.cam?.turn;
-        if (turn && isFacing(prev.view) && isFacing(snap.view) && !reducedMotion()) turnChange(t, prev.view, turn);
+        if (turn && isFacing(prev.view) && isFacing(snap.view) && !reducedMotion()) turnChange(t, prev.view, snap.view, turn);
         else {
           turnMove = null;
           viewChange(t, prev.view, snap.view);

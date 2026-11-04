@@ -530,6 +530,38 @@ describe("the four facings and their turn edges (room-turn 2026-11-04)", () => {
     expect(ctx.session.view).toBe("door");
   });
 
+  it("a turn is a head turn: no step sound is queued (room-turn correction 2026-11-04); a walk still steps", () => {
+    const sounds: string[] = [];
+    const later: [number, () => void][] = [];
+    let now = 10_000;
+    const store = createStore({ startDay: 1 });
+    const ctx: ActionContext = {
+      store,
+      session: initialSession(DEFAULT_CLOCK, "left", "room"),
+      rerender: () => {},
+      later: (ms, fn) => void later.push([now + ms, fn]),
+      now: () => now,
+      play: (id: string) => void sounds.push(id),
+    } as ActionContext;
+    const flush = () => {
+      now += 2_000;
+      for (const [at, fn] of later.splice(0)) if (at <= now) fn();
+    };
+    loopActions["turn"]!(ctx, { dir: "right" } as DOMStringMap, null as never);
+    expect(ctx.session.view).toBe("bed");
+    flush();
+    loopActions["view"]!(ctx, { view: "window" } as DOMStringMap, null as never); // two turns
+    expect(ctx.session.view).toBe("window");
+    flush();
+    loopActions["turn"]!(ctx, { dir: "right" } as DOMStringMap, null as never);
+    expect(ctx.session.view).toBe("room");
+    flush();
+    expect(sounds).toEqual([]);
+    loopActions["view"]!(ctx, { view: "desk" } as DOMStringMap, null as never);
+    flush();
+    expect(sounds).toEqual(["step-1", "step-2"]);
+  });
+
   it("shortest way: 房间 → 门 is two turns right, 窗 → 床 two turns right, 门 → 床 one left; from 桌子 back out to 房间 first", () => {
     expect(turnsBetween("room", "door")).toEqual(["right", "right"]);
     expect(turnsBetween("window", "bed")).toEqual(["right", "right"]);

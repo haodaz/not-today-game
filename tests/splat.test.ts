@@ -386,13 +386,13 @@ describe("the layer: fallback, the move, the cross-fade", () => {
 });
 
 describe("900 ms moves and calibration helpers", () => {
-  it("walking: the move takes as long as the path, both ways (房间↔桌子 900, 桌子↔屏幕 500); a turn between facings 450, two 300 ms turns to the opposite wall (room-turn); the rest the 400 ms crossfade", () => {
+  it("walking: the move takes as long as the path, both ways (房间↔桌子 900, 桌子↔屏幕 500); a head turn between facings 650, two 400 ms turns to the opposite wall (room-turn correction 2026-11-04); the rest the 400 ms crossfade", () => {
     expect(CHOSEN.roomDesk).toBe(900);
-    for (const [a, b, ms] of [["room", "desk", 900], ["desk", "desktop", 500], ["room", "desktop", 900], ["room", "bed", 450], ["bed", "door", 450], ["door", "window", 450], ["window", "room", 450], ["room", "door", 600], ["bed", "window", 600], ["desk", "door", MOTION.view]] as const) {
+    for (const [a, b, ms] of [["room", "desk", 900], ["desk", "desktop", 500], ["room", "desktop", 900], ["room", "bed", 650], ["bed", "door", 650], ["door", "window", 650], ["window", "room", 650], ["room", "door", 800], ["bed", "window", 800], ["desk", "door", MOTION.view]] as const) {
       expect(viewMoveMs(a, b), `${a} → ${b}`).toBe(ms);
       expect(viewMoveMs(b, a), `${b} → ${a}`).toBe(ms);
     }
-    expect([CHOSEN.turn, CHOSEN.turnFast]).toEqual([450, 300]);
+    expect([CHOSEN.turn, CHOSEN.turnFast]).toEqual([650, 400]);
     expect(CROSSFADE_MS).toBe(400);
     expect(walkMs("room", "desk")).toBe(500);
   });
