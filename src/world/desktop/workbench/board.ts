@@ -8,7 +8,7 @@
 import type { State } from "@state/types.gen";
 import type { GameEvent } from "@state/events";
 import type { Task, TaskBoard } from "@state/days/tasks";
-import { autoUnlock, boardState, canPrint, isKuroCard, lockObjectAvailable, trayCards, type BoardState } from "@state/days/board";
+import { autoUnlock, boardState, canPrint, foundCardIds, isKuroCard, lockObjectAvailable, trayCards, type BoardState } from "@state/days/board";
 import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t, tr } from "@world/i18n";
 import type { ActionContext, ActionHandler } from "../controller";
@@ -60,12 +60,26 @@ function table(board: TaskBoard, s: BoardState, state: State, session: Session):
   return html`<table class="btable"><tr>${head}</tr>${rows}</table>`;
 }
 
-/** The tray of cards (board.tray header): the board's own cards not yet placed; Kuro's never show. */
-function tray(board: TaskBoard, s: BoardState, session: Session): SafeHtml {
-  const ids = trayCards(board, s);
-  const cards = ids.map((id) => html`<button type="button" class="${cls("bcard", session.boardPick === id && "picked")}" data-action="board-card" data-card="${id}">${cardText(board, id)}</button>`);
+/**
+ * The tray of cards (board.tray header): the board's own cards not yet placed; Kuro's never show.
+ * Day-graph 2026-11-03: a found card is a pickable chip; a card not yet found today is a greyed
+ * placeholder in its place — its `hint`, or the generic `board.notFound` 「还没找到」 — that cannot
+ * be picked. The order follows the board's card order (a placeholder keeps its slot in the row).
+ */
+function tray(board: TaskBoard, s: BoardState, state: State, events: readonly GameEvent[], session: Session): SafeHtml {
+  const found = foundCardIds(board, state.day, events);
+  const placed = new Set(Object.values(s.slots));
+  const cells = board.cards
+    .filter((c) => !placed.has(c.id))
+    .map((c) => {
+      if (found.has(c.id)) {
+        return html`<button type="button" class="${cls("bcard", session.boardPick === c.id && "picked")}" data-action="board-card" data-card="${c.id}">${cardText(board, c.id)}</button>`;
+      }
+      const hint = c.hint ?? (hasString("board.notFound") ? t("board.notFound") : "");
+      return html`<span class="bcard notfound" aria-disabled="true">${hint}</span>`;
+    });
   const header = hasString("board.tray") ? html`<div class="btray-h">${tr("board.tray")}</div>` : null;
-  return html`<div class="btray">${header}<div class="bcards">${cards}</div></div>`;
+  return html`<div class="btray">${header}<div class="bcards">${cells}</div></div>`;
 }
 
 /**
@@ -87,7 +101,7 @@ export function renderBoard(ctx: AppContext, task: Task): SafeHtml {
   const assist = hasString("board.assist") ? html`<button type="button" class="bchip" data-action="board-assist">${tr("board.assist")}</button>` : null;
   const printable = canPrint(board, s);
   const finish = html`<button type="button" class="bprint" data-action="board-print"${printable ? null : html` disabled`}>${finishLabel(task)}</button>`;
-  return html`<div class="surface board"><div class="btitle">${board.title}</div>${lockRow(board, s, state, events, session)}${table(board, s, state, session)}${tray(board, s, session)}<div class="bbar">${assist}${finish}</div></div>`;
+  return html`<div class="surface board"><div class="btitle">${board.title}</div>${lockRow(board, s, state, events, session)}${table(board, s, state, session)}${tray(board, s, state, events, session)}<div class="bbar">${assist}${finish}</div></div>`;
 }
 
 // ——— the actions ———
@@ -147,11 +161,14 @@ export const boardActions: Record<string, ActionHandler> = {
     ctx.session.boardLockOpen = false;
     ctx.rerender();
   },
-  // A card in the tray: pick it up (click a slot next), or drop it if it was already picked.
+  // A card in the tray: pick it up (click a slot next), or drop it if it was already picked. Only a
+  // card found today can be picked (day-graph 2026-11-03): a not-yet-found card is a placeholder.
   "board-card"(ctx, data) {
     const c = currentBoard(ctx);
     const card = data.card;
     if (!c || !card) return;
+    const found = foundCardIds(c.board, ctx.store.getState().day, ctx.store.getEvents());
+    if (!found.has(card)) return;
     ctx.session.boardPick = ctx.session.boardPick === card ? null : card;
     ctx.rerender();
   },

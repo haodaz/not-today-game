@@ -111,9 +111,19 @@ export interface BoardSlot {
   readonly label: string;
   readonly answer: string;
 }
+/**
+ * Where a card's material comes from (day-graph 2026-11-03), one of: a file in the 文件 app or a
+ * deliverable page (`file`), a conversation (`conv`), or today's boss call (`call: true`). Absent =
+ * available from the start. A card is found when its source has been opened / the call ended today.
+ */
+export type CardFrom = { readonly file: string } | { readonly conv: string } | { readonly call: true };
 export interface BoardCard {
   readonly id: string;
   readonly text: string;
+  /** Where the card's material comes from (day-graph); absent = available from the start. */
+  readonly from?: CardFrom;
+  /** Shown in the card's place while it is not yet found (twinned like other board text). */
+  readonly hint?: string;
 }
 export interface BoardKuro {
   readonly fill: Readonly<Record<string, string>>;
@@ -312,10 +322,27 @@ function ledger(v: unknown, w: string): TaskLedger {
 }
 
 /** A tray/Kuro card: `{ id, text }`. */
+function cardFrom(v: unknown, w: string): CardFrom {
+  // Exactly one of file / conv / call (day-graph 2026-11-03).
+  if (!isRecord(v)) fail(w, "must be an object");
+  keys(v, ["file", "conv", "call"], w);
+  const present = ["file", "conv", "call"].filter((k) => v[k] !== undefined);
+  if (present.length !== 1) fail(w, "must have exactly one of file / conv / call");
+  if (v.file !== undefined) return { file: str(v.file, `${w}.file`) };
+  if (v.conv !== undefined) return { conv: str(v.conv, `${w}.conv`) };
+  if (v.call !== true) fail(`${w}.call`, "must be true");
+  return { call: true };
+}
+
 function card(v: unknown, w: string): BoardCard {
   if (!isRecord(v)) fail(w, "a card must be an object");
-  keys(v, ["id", "text"], w);
-  return { id: str(v.id, `${w}.id`), text: str(v.text, `${w}.text`) };
+  keys(v, ["id", "text", "from", "hint"], w);
+  return {
+    id: str(v.id, `${w}.id`),
+    text: str(v.text, `${w}.text`),
+    ...(v.from !== undefined ? { from: cardFrom(v.from, `${w}.from`) } : {}),
+    ...(v.hint !== undefined ? { hint: str(v.hint, `${w}.hint`) } : {}),
+  };
 }
 
 /**

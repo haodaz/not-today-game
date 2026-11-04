@@ -1676,3 +1676,29 @@ the judgement reads `wrong`). Code only; all story text (`board.send.*`, `hand.r
   once, nothing on the desk, the file card in 老板's chat at its time, judged at 躺下, no give choice
   at shutdown); a `to: hand` board on day 11 (give / refuse offered, give → perfect, refuse → wrong).
 - `npx tsc --noEmit`: clean. `npx vitest run`: 98 files / 1747 tests passed.
+
+## day-graph: a card comes from somewhere, a deliverable leaves a mark (author 2026-11-03)
+
+A board's 找材料 step now reads the day's graph. A card may carry a `from` (one of `{file}` /
+`{conv}` / `{call:true}`); it is found when its source has been opened — or the call ended — **today**
+(an open yesterday does not count). A found card is a pickable tray chip; an unfound one is a greyed
+placeholder showing its `hint` or the generic `board.notFound`. 让它补全 still fills from Kuro's own
+map whatever is found (它不用找). Giving a deliverable leaves the mark `sent_<deliverableId>`, so
+content can gate incoming messages with `cond_show: { has: "sent_<id>" }`. Code only; sources and
+the `board.notFound` string are content.
+
+- `src/state/days/tasks.ts`: `CardFrom` + `BoardCard.from?` / `hint?`; the `card` validator parses
+  `from` (exactly one of file / conv / call) and `hint`. (The board twin swaps `en.board` wholesale,
+  so `hint`/`from` ride along as before.)
+- `src/state/days/board.ts`: `cardFound(card, day, events)` (no `from` → found; file/conv → an `open`
+  of that target today; call → today's `callEnded`), `foundCardIds(board, day, events)`, and
+  `trayCards` gains optional `day`/`events` (omitted → every card, for pure callers).
+- `src/world/desktop/workbench/board.ts`: the tray renders found cards as chips and unfound cards as
+  greyed, unpickable placeholders (`hint` / `board.notFound`); the `board-card` action refuses an
+  unfound card. `让它补全` is unchanged (`stepBoard` fills from Kuro's map).
+- `src/state/events.ts`: `applyGive` adds `sent_<deliverableId>` via `withFlags`.
+- Tests: new `tests/day-graph.test.ts` — sources found / not found from the log (file / conv / call,
+  yesterday's open ignored), the tray's found set, 让它补全 filling unfound cards, the `sent_<id>`
+  flag gating a `cond_show`, and a content check that walks every board in `content/tasks/day-*.json`
+  and `en/` (plus a fixture that fails on a file not yet posted that day).
+- `npx tsc --noEmit`: clean. `npx vitest run`: 99 files / 1757 tests passed.

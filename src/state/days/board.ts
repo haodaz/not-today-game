@@ -4,7 +4,7 @@
 // replays), and the night judgement is a pure function of the log. No clock, no rendering here.
 import type { BoardOp, GameEvent } from "../events";
 import type { State } from "../types.gen";
-import { taskByFlag, type Task, type TaskBoard, type TaskDeliverable } from "./tasks";
+import { taskByFlag, type BoardCard, type Task, type TaskBoard, type TaskDeliverable } from "./tasks";
 import { dayFile } from "./table";
 import { isRaidNight } from "../nights";
 import { takenByKuro } from "@world/objects/taken";
@@ -83,10 +83,34 @@ export function canPrint(board: TaskBoard, s: BoardState): boolean {
   return s.unlocked && board.slots.every((slot) => slot.id in s.slots);
 }
 
-/** The card ids that may sit in the tray: the board's own cards, minus any placed, minus Kuro's. */
-export function trayCards(board: TaskBoard, s: BoardState): string[] {
+/**
+ * A card's material has been found today (day-graph 2026-11-03). No `from` → always found. A
+ * `file`/`conv` source is satisfied by an `open` event with that target on `day`; a `call` source
+ * by today's `callEnded`. Pure, from the log (an open yesterday does not count — events are the
+ * day's own). Kuro's fills ignore this (它不用找).
+ */
+export function cardFound(card: BoardCard, day: number, events: readonly GameEvent[]): boolean {
+  const from = card.from;
+  if (!from) return true;
+  if ("file" in from) return events.some((e) => e.kind === "open" && e.day === day && e.target === `file:${from.file}`);
+  if ("conv" in from) return events.some((e) => e.kind === "open" && e.day === day && e.target === `conv:${from.conv}`);
+  return events.some((e) => e.kind === "callEnded" && e.day === day);
+}
+
+/** The tray cards found today (day-graph): the board's own cards whose source is satisfied. */
+export function foundCardIds(board: TaskBoard, day: number, events: readonly GameEvent[]): Set<string> {
+  return new Set(board.cards.filter((c) => cardFound(c, day, events)).map((c) => c.id));
+}
+
+/**
+ * The card ids that may sit in the tray: the board's own cards, minus any placed, minus Kuro's, and
+ * (day-graph 2026-11-03) minus those not yet found today. `day`/`events` default to showing every
+ * card (callers that do not track sources, e.g. a pure board test, pass nothing).
+ */
+export function trayCards(board: TaskBoard, s: BoardState, day?: number, events?: readonly GameEvent[]): string[] {
   const placed = new Set(Object.values(s.slots));
-  return board.cards.filter((c) => !placed.has(c.id)).map((c) => c.id);
+  const found = day !== undefined && events !== undefined ? foundCardIds(board, day, events) : null;
+  return board.cards.filter((c) => !placed.has(c.id) && (found === null || found.has(c.id))).map((c) => c.id);
 }
 
 /** A card id is one of Kuro's own (never in the tray). */

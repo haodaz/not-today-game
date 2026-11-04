@@ -2,6 +2,7 @@
 // applyEvent is pure: it never mutates its input and never reads a clock. An event may read the
 // state produced by earlier events; the only time it sees is its own recorded `day`.
 import type { State } from "./types.gen";
+import { withFlags } from "./flags";
 import { applyChoose, applyStep, applyTask, clampSan, type TaskEventMode } from "./days/effects";
 import { validateBoardStep } from "./days/board";
 import { dayFile } from "./days/table";
@@ -173,10 +174,14 @@ function applyBoardStep(state: State, event: Extract<GameEvent, { kind: "boardSt
   return state;
 }
 
-/** The deliverable was handed to the hand (work v2): a record only; the desk reads it from the log. */
+/**
+ * The deliverable was given (work v2): sent on screen or handed to the hand. It leaves the mark
+ * `sent_<deliverableId>` (day-graph 2026-11-03), so content can make people answer — or not — with
+ * `cond_show: { has: "sent_<id>" }` on incoming messages. The desk still reads the give from the log.
+ */
 function applyGive(state: State, event: Extract<GameEvent, { kind: "give" }>): State {
   if (typeof event.deliverableId !== "string" || event.deliverableId === "") throw new Error("give: deliverableId must be a non-empty string");
-  return state;
+  return withFlags(state, [`sent_${event.deliverableId}`]);
 }
 
 /** The night's board judgement (work v2): SAN by the judge's delta, never up. */
