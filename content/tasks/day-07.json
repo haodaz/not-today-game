@@ -40,8 +40,7 @@
         "effects": {
           "flags": [
             "task_d7_1"
-          ],
-          "san": 1
+          ]
         }
       },
       "look": {
@@ -58,8 +57,8 @@
           "flags": [
             "task_d7_1"
           ],
-          "san": 0,
-          "looked": true
+          "looked": true,
+          "assimilation": 1
         }
       },
       "let": {
@@ -76,8 +75,8 @@
           "flags": [
             "task_d7_1"
           ],
-          "san": -1,
-          "letItDoUnchecked": 1
+          "letItDoUnchecked": 1,
+          "assimilation": 4
         }
       }
     },
@@ -119,8 +118,7 @@
         "effects": {
           "flags": [
             "task_d7_2"
-          ],
-          "san": 1
+          ]
         }
       },
       "look": {
@@ -137,8 +135,8 @@
           "flags": [
             "task_d7_2"
           ],
-          "san": 0,
-          "looked": true
+          "looked": true,
+          "assimilation": 1
         }
       },
       "let": {
@@ -155,8 +153,8 @@
           "flags": [
             "task_d7_2"
           ],
-          "san": -1,
-          "letItDoUnchecked": 1
+          "letItDoUnchecked": 1,
+          "assimilation": 4
         }
       }
     },
@@ -199,8 +197,7 @@
           "flags": [
             "task_d7_3",
             "wrote_six"
-          ],
-          "san": 1
+          ]
         }
       },
       "look": {
@@ -218,8 +215,8 @@
             "task_d7_3",
             "wrote_six"
           ],
-          "san": 1,
-          "looked": true
+          "looked": true,
+          "assimilation": 1
         }
       },
       "let": {
@@ -241,8 +238,8 @@
             "task_d7_3",
             "six_by_it"
           ],
-          "san": -1,
-          "letItDoUnchecked": 1
+          "letItDoUnchecked": 1,
+          "assimilation": 4
         }
       }
     },

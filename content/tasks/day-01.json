@@ -47,8 +47,7 @@
           "flags": [
             "task_v17_done",
             "caught_6_11"
-          ],
-          "san": 1
+          ]
         }
       },
       "look": {
@@ -65,8 +64,8 @@
           "flags": [
             "task_v17_done"
           ],
-          "san": 0,
-          "looked": true
+          "looked": true,
+          "assimilation": 1
         }
       },
       "let": {
@@ -87,8 +86,8 @@
           "flags": [
             "task_v17_done"
           ],
-          "san": -1,
-          "letItDoUnchecked": 1
+          "letItDoUnchecked": 1,
+          "assimilation": 4
         }
       },
       "doc": {
@@ -171,8 +170,7 @@
         "effects": {
           "flags": [
             "task_receivable_done"
-          ],
-          "san": 0
+          ]
         }
       },
       "look": {
@@ -190,8 +188,8 @@
             "task_receivable_done",
             "kept_format"
           ],
-          "san": 0,
-          "looked": true
+          "looked": true,
+          "assimilation": 1
         }
       },
       "let": {
@@ -208,8 +206,8 @@
           "flags": [
             "task_receivable_done"
           ],
-          "san": -1,
-          "letItDoUnchecked": 1
+          "letItDoUnchecked": 1,
+          "assimilation": 4
         }
       },
       "ledger": {
@@ -327,8 +325,7 @@
         "effects": {
           "flags": [
             "task_merge_done"
-          ],
-          "san": 0
+          ]
         }
       },
       "look": {
@@ -345,8 +342,8 @@
           "flags": [
             "task_merge_done"
           ],
-          "san": 0,
-          "looked": true
+          "looked": true,
+          "assimilation": 1
         }
       },
       "let": {
@@ -363,8 +360,8 @@
           "flags": [
             "task_merge_done"
           ],
-          "san": 0,
-          "letItDoUnchecked": 1
+          "letItDoUnchecked": 1,
+          "assimilation": 4
         }
       }
     }

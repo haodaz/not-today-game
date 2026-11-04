@@ -45,8 +45,7 @@
           "flags": [
             "task_d12_1",
             "fought_3"
-          ],
-          "san": 0
+          ]
         }
       },
       "look": {
@@ -63,8 +62,8 @@
           "flags": [
             "task_d12_1"
           ],
-          "san": 0,
-          "looked": true
+          "looked": true,
+          "assimilation": 1
         }
       },
       "let": {
@@ -79,8 +78,8 @@
           "flags": [
             "task_d12_1"
           ],
-          "san": -1,
-          "letItDoUnchecked": 1
+          "letItDoUnchecked": 1,
+          "assimilation": 4
         }
       }
     },
@@ -122,8 +121,7 @@
         "effects": {
           "flags": [
             "task_d12_2"
-          ],
-          "san": 0
+          ]
         }
       },
       "look": {
@@ -140,8 +138,8 @@
           "flags": [
             "task_d12_2"
           ],
-          "san": 0,
-          "looked": true
+          "looked": true,
+          "assimilation": 1
         }
       },
       "let": {
@@ -158,8 +156,8 @@
           "flags": [
             "task_d12_2"
           ],
-          "san": 0,
-          "letItDoUnchecked": 1
+          "letItDoUnchecked": 1,
+          "assimilation": 4
         }
       }
     }

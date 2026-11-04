@@ -40,8 +40,7 @@
         "effects": {
           "flags": [
             "task_d3_1"
-          ],
-          "san": 1
+          ]
         }
       },
       "look": {
@@ -59,8 +58,8 @@
             "task_d3_1",
             "caught_async"
           ],
-          "san": 0,
-          "looked": true
+          "looked": true,
+          "assimilation": 1
         }
       },
       "let": {
@@ -77,8 +76,8 @@
           "flags": [
             "task_d3_1"
           ],
-          "san": -1,
-          "letItDoUnchecked": 1
+          "letItDoUnchecked": 1,
+          "assimilation": 4
         }
       },
       "doc": {
@@ -169,8 +168,7 @@
           "flags": [
             "task_d3_2",
             "caught_archived"
-          ],
-          "san": 0
+          ]
         }
       },
       "look": {
@@ -189,8 +187,8 @@
             "asked_why_added",
             "caught_archived"
           ],
-          "san": 0,
-          "looked": true
+          "looked": true,
+          "assimilation": 1
         }
       },
       "let": {
@@ -207,8 +205,8 @@
           "flags": [
             "task_d3_2"
           ],
-          "san": -1,
-          "letItDoUnchecked": 1
+          "letItDoUnchecked": 1,
+          "assimilation": 4
         }
       },
       "code": {
@@ -280,8 +278,7 @@
           "flags": [
             "task_d3_3",
             "wrote_d3"
-          ],
-          "san": 1
+          ]
         }
       },
       "look": {
@@ -298,8 +295,8 @@
           "flags": [
             "task_d3_3"
           ],
-          "san": 0,
-          "looked": true
+          "looked": true,
+          "assimilation": 1
         }
       },
       "let": {
@@ -316,8 +313,8 @@
           "flags": [
             "task_d3_3"
           ],
-          "san": -1,
-          "letItDoUnchecked": 1
+          "letItDoUnchecked": 1,
+          "assimilation": 4
         }
       }
     }

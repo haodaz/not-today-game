@@ -45,8 +45,7 @@
           "flags": [
             "task_d6_1",
             "found_typos"
-          ],
-          "san": 0
+          ]
         }
       },
       "look": {
@@ -65,8 +64,8 @@
             "found_typos",
             "asked_typo"
           ],
-          "san": 0,
-          "looked": true
+          "looked": true,
+          "assimilation": 1
         }
       },
       "let": {
@@ -83,8 +82,8 @@
           "flags": [
             "task_d6_1"
           ],
-          "san": -1,
-          "letItDoUnchecked": 1
+          "letItDoUnchecked": 1,
+          "assimilation": 4
         }
       }
     },
@@ -126,8 +125,7 @@
         "effects": {
           "flags": [
             "task_d6_2"
-          ],
-          "san": 0
+          ]
         }
       },
       "look": {
@@ -144,8 +142,8 @@
           "flags": [
             "task_d6_2"
           ],
-          "san": 0,
-          "looked": true
+          "looked": true,
+          "assimilation": 1
         }
       },
       "let": {
@@ -162,8 +160,8 @@
           "flags": [
             "task_d6_2"
           ],
-          "san": 0,
-          "letItDoUnchecked": 1
+          "letItDoUnchecked": 1,
+          "assimilation": 4
         }
       }
     }

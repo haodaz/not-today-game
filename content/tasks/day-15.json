@@ -44,8 +44,7 @@
         "effects": {
           "flags": [
             "task_d15_1"
-          ],
-          "san": 0
+          ]
         }
       },
       "look": {
@@ -62,8 +61,8 @@
           "flags": [
             "task_d15_1"
           ],
-          "san": 0,
-          "looked": true
+          "looked": true,
+          "assimilation": 1
         }
       },
       "let": {
@@ -78,8 +77,8 @@
           "flags": [
             "task_d15_1"
           ],
-          "san": -1,
-          "letItDoUnchecked": 1
+          "letItDoUnchecked": 1,
+          "assimilation": 4
         }
       }
     }

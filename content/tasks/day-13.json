@@ -40,8 +40,7 @@
         "effects": {
           "flags": [
             "task_d13_1"
-          ],
-          "san": 0
+          ]
         }
       },
       "look": {
@@ -59,8 +58,8 @@
             "task_d13_1",
             "asked_upgrade"
           ],
-          "san": 0,
-          "looked": true
+          "looked": true,
+          "assimilation": 1
         }
       },
       "let": {
@@ -75,8 +74,8 @@
           "flags": [
             "task_d13_1"
           ],
-          "san": -1,
-          "letItDoUnchecked": 1
+          "letItDoUnchecked": 1,
+          "assimilation": 4
         }
       }
     },
@@ -123,8 +122,7 @@
           "flags": [
             "task_d13_2",
             "refused_tidy"
-          ],
-          "san": 1
+          ]
         }
       },
       "look": {
@@ -142,8 +140,8 @@
             "task_d13_2",
             "asked_consistent"
           ],
-          "san": 0,
-          "looked": true
+          "looked": true,
+          "assimilation": 1
         }
       },
       "let": {
@@ -161,8 +159,8 @@
             "task_d13_2",
             "let_it_tidy"
           ],
-          "san": -2,
-          "letItDoUnchecked": 1
+          "letItDoUnchecked": 1,
+          "assimilation": 4
         }
       }
     }

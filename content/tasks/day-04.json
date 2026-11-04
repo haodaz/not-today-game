@@ -40,8 +40,7 @@
         "effects": {
           "flags": [
             "task_d4_1"
-          ],
-          "san": 1
+          ]
         }
       },
       "look": {
@@ -58,8 +57,8 @@
           "flags": [
             "task_d4_1"
           ],
-          "san": 0,
-          "looked": true
+          "looked": true,
+          "assimilation": 1
         }
       },
       "let": {
@@ -76,8 +75,8 @@
           "flags": [
             "task_d4_1"
           ],
-          "san": -1,
-          "letItDoUnchecked": 1
+          "letItDoUnchecked": 1,
+          "assimilation": 4
         }
       },
       "doc": {
@@ -168,8 +167,7 @@
           "flags": [
             "task_d4_2",
             "removed_double_regex"
-          ],
-          "san": 1
+          ]
         }
       },
       "look": {
@@ -187,8 +185,8 @@
             "task_d4_2",
             "removed_double_regex"
           ],
-          "san": 0,
-          "looked": true
+          "looked": true,
+          "assimilation": 1
         }
       },
       "let": {
@@ -205,8 +203,8 @@
           "flags": [
             "task_d4_2"
           ],
-          "san": -1,
-          "letItDoUnchecked": 1
+          "letItDoUnchecked": 1,
+          "assimilation": 4
         }
       },
       "code": {
