@@ -12,9 +12,13 @@ export type HotId = (typeof HOT_IDS)[number];
 /** The framings that have things to point at. */
 export type HotView = keyof typeof HOTSPOTS;
 
-/** The framing a session view shows (the desktop and 门 have none). */
+/**
+ * The splat framing a session view shows: 房间 and 桌子. The desktop and 门 have none; 床 and 窗
+ * are facings with fixed rectangles of their own (room-turn R3, shots.ts FLAT_HOTS), not splat boxes.
+ * The calibrated 床 pose and its boxes stay for the camera math.
+ */
 export function hotViewOf(view: string): HotView | null {
-  return view === "room" || view === "desk" || view === "bed" ? view : null;
+  return view === "room" || view === "desk" ? view : null;
 }
 
 /** Tab order, and the order the keyboard proxies are laid out in. */

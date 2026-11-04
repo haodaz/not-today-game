@@ -12,7 +12,7 @@ import { setLocale, t } from "@world/i18n";
 import { itemStates, loopContext, nightfallReached } from "@world/loop/checklist";
 import { loopActions, renderGame, SHUTDOWN_TO_ROOM_MS } from "@world/room/game";
 import { renderRoom } from "@world/room/hud";
-import { DESK_SHOT, rectStyle, ROOM_SHOT } from "@world/room/shots";
+import { DESK_SHOT, rectStyle, ROOM_SHOT, WINDOW_SHOT } from "@world/room/shots";
 import { completeUntil } from "./complete-items";
 import { upgradeTable } from "@state/upgrades";
 import { lineScreens } from "@world/dialogue/box";
@@ -88,11 +88,11 @@ describe("开机: the tower's power button (房间; 桌子 is the tabletop, the 
   });
 });
 
-describe("吃: the meal on the desk bar", () => {
-  it("after 去拿 the food image is on the bar; clicking it eats; the empty box stays", () => {
+describe("吃: the meal on the little table under the window (room-turn R3)", () => {
+  it("after 去拿 the food image is on the table; clicking it eats; the empty box stays", () => {
     const store = atDay(1);
     completeUntil(store, "eat");
-    const { ctx } = ctxOf(store, "desk");
+    const { ctx } = ctxOf(store, "window");
     const out = render(ctx);
     expect(out).toMatch(/<button type="button" class="slot meal" data-action="loop-eat" data-meal="lunch" aria-label="[^"]+"><img src="\/food\/[a-z_]+\.png" alt=""><\/button>/);
     expect(done(store, "eat")).toBe(false);
@@ -105,10 +105,35 @@ describe("吃: the meal on the desk bar", () => {
     expect(after).not.toContain("loop-eat");
   });
 
-  it("nothing on the bar before it is taken in", () => {
+  it("nothing on the table before it is taken in", () => {
     const store = atDay(1);
     completeUntil(store, "pickup");
+    expect(render(ctxOf(store, "window").ctx)).not.toContain("slot meal");
+  });
+
+  it("the meal is drawn on 窗's table and not on 桌子; clicking it, or the table under it, logs today's eat step once", () => {
+    const store = atDay(1);
+    completeUntil(store, "eat");
     expect(render(ctxOf(store, "desk").ctx)).not.toContain("slot meal");
+    const items = ctxOf(store, "desk").ctx;
+    act(items, "items-toggle");
+    expect(render(items)).not.toContain("slot meal");
+    // Not from 桌子 (or anywhere but 窗).
+    act(ctxOf(store, "desk").ctx, "loop-eat", { meal: "lunch" });
+    expect(done(store, "eat")).toBe(false);
+    const { ctx } = ctxOf(store, "window");
+    const out = render(ctx);
+    expect(out).toContain(`<div class="facing-things"><div class="at" data-at="meal" style="${rectStyle(WINDOW_SHOT.meal)}"><button type="button" class="slot meal" data-action="loop-eat" data-meal="lunch"`);
+    expect(out).toContain(`class="shot-hit table-hit" data-action="meal-table" style="${rectStyle(WINDOW_SHOT.mealTable)}" aria-label="${t("room.mealTable")}" data-hot="mealTable"`);
+    act(ctx, "meal-table");
+    act(ctx, "meal-table");
+    act(ctx, "loop-eat", { meal: "lunch" });
+    expect(store.getEvents().filter((e) => e.kind === "step" && e.name === "eat:lunch")).toHaveLength(1);
+    expect(done(store, "eat")).toBe(true);
+    // An empty table is only a click.
+    const before = store.getEvents().length;
+    act(ctx, "meal-table");
+    expect(store.getEvents()).toHaveLength(before);
   });
 });
 
@@ -176,7 +201,7 @@ describe("躺下: the bed in 房间", () => {
   });
   it("the ask offers room.bed.sleep / room.bed.stay; stay closes the box and changes nothing", () => {
     const store = atDay(1);
-    const { ctx } = ctxOf(store, "room");
+    const { ctx, timers } = ctxOf(store, "room");
     completeUntil(store, "bed", { all: true });
     act(ctx, "bed");
     const html = render(ctx);
@@ -191,9 +216,12 @@ describe("躺下: the bed in 房间", () => {
     expect(store.getEvents()).toHaveLength(events);
     expect(JSON.stringify(store.getState())).toBe(state);
     expect(ctx.session.view).toBe("room");
-    // Asked again, sleep: the night, then lieDown.
+    // Asked again, sleep: the player turns to 床 (room-turn R2), and the night begins as the turn ends.
     act(ctx, "bed");
     act(ctx, "loop-choice", { choice: "sleep" });
+    expect(ctx.session.view).toBe("bed");
+    expect(ctx.session.dialogue.queue).toEqual([]);
+    for (const x of timers.splice(0)) x.fn();
     expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:beat:night"]);
     for (let i = 0; i < dayFiles.get(1)!.beats.night!.say.length; i++) act(ctx, "loop-advance");
     expect(store.getState().day).toBe(2);
@@ -204,7 +232,7 @@ describe("the bed and the meal are named by their strings", () => {
     const store = atDay(1);
     expect(render(ctxOf(store).ctx)).toContain(`data-action="bed" style="${rectStyle(ROOM_SHOT.bed)}" aria-label="${t("room.bed")}"`);
     completeUntil(store, "eat");
-    expect(render(ctxOf(store, "desk").ctx)).toContain(`data-action="loop-eat" data-meal="lunch" aria-label="${t("room.meal")}"`);
+    expect(render(ctxOf(store, "window").ctx)).toContain(`data-action="loop-eat" data-meal="lunch" aria-label="${t("room.meal")}"`);
   });
 });
 

@@ -79,7 +79,8 @@ describe("timings are motion.md's (FR0)", () => {
   it("motion.css has no literal duration; every --m-* it reads is defined (or set per element)", () => {
     const css = motionCss.replace(/\/\*[\s\S]*?\*\//g, "");
     expect(css.match(/(?<![\w.-])[1-9]\d*(\.\d+)?m?s\b/g)).toBeNull();
-    const perElement = new Set(["--m-t", "--m-flash-t", "--m-sleep-t", "--m-wake-t", "--m-tx", "--m-ty", "--m-z", "--m-dx"]);
+    // A turn's slide (room-turn): where the still comes from and how far into the turn, per element.
+    const perElement = new Set(["--m-t", "--m-flash-t", "--m-sleep-t", "--m-wake-t", "--m-tx", "--m-ty", "--m-z", "--m-dx", "--m-turn-t", "--m-turn-dx"]);
     const used = [...css.matchAll(/var\((--m-[\w-]+)/g)].map((m) => m[1]!);
     for (const v of used) expect(v in motionVars() || perElement.has(v), v).toBe(true);
   });
@@ -335,6 +336,7 @@ describe("checklist (FR4)", () => {
   });
 
   it("chosen values are kept apart from motion.md's", () => {
-    expect(Object.keys(CHOSEN).sort()).toEqual(["backdropFade", "chosenHold", "deskScreen", "doorImage", "doorStep", "doorView", "flip", "kuroLine", "propIn", "roomDesk", "roomDoor", "sleepRisePx", "strike", "wake", "walkBobPx"]);
+    // room-turn 2026-11-04: 房间 ↔ 门 is no longer a walk (roomDoor went); a turn is `turn` / `turnFast`.
+    expect(Object.keys(CHOSEN).sort()).toEqual(["backdropFade", "chosenHold", "deskScreen", "doorImage", "doorStep", "doorView", "flip", "kuroLine", "propIn", "roomDesk", "sleepRisePx", "strike", "turn", "turnFast", "wake", "walkBobPx"]);
   });
 });

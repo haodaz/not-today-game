@@ -129,8 +129,8 @@ describe("the boxes (calibration.ts) and today's rectangles", () => {
     expect(CALIBRATION.desk.look[1] - CALIBRATION.desk.pos[1]).toBeCloseTo(-0.145, 6);
   });
 
-  it("hotViewOf: the framings that have things to point at", () => {
-    expect(["room", "desk", "bed", "door", "desktop"].map(hotViewOf)).toEqual(["room", "desk", "bed", null, null]);
+  it("hotViewOf: the splat framings a view shows (床 and 窗 are facings with fixed rectangles now, room-turn R3)", () => {
+    expect(["room", "desk", "bed", "window", "door", "desktop"].map(hotViewOf)).toEqual(["room", "desk", null, null, null, null]);
   });
 });
 

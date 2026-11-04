@@ -207,15 +207,15 @@ describe("(5) four camera levels", () => {
     expect(room(ctx)).not.toContain('class="dot"');
   });
 
-  it("Esc steps one level out: 屏幕 → 桌子 → 房间; 门 → 房间", () => {
+  it("Esc steps one level out: 屏幕 → 桌子 → 房间; on a facing (门 too) it does nothing (room-turn R1)", () => {
     const ctx = at("desktop");
     loopKeys(ctx, { key: "Escape" } as KeyboardEvent);
     expect(ctx.session.view).toBe("desk");
     loopKeys(ctx, { key: "Escape" } as KeyboardEvent);
     expect(ctx.session.view).toBe("room");
     const door = at("door");
-    loopKeys(door, { key: "Escape" } as KeyboardEvent);
-    expect(door.session.view).toBe("room");
+    expect(loopKeys(door, { key: "Escape" } as KeyboardEvent)).toBe(false);
+    expect(door.session.view).toBe("door");
   });
 });
 

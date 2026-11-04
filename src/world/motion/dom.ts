@@ -15,7 +15,8 @@ import { createTentacleDriver } from "@world/desktop/browser/tentacles-dom";
 import { crawlKeyframes, crawlMs, edgePath } from "@world/late/crawl";
 import { heldItem } from "@world/room/held";
 import { holdUntil, lineKey, revealBusy, revealDoneAt, revealShown, startReveal, type Reveal } from "./reveal";
-import { applyMotionVars, CHOSEN, choiceDelays, CROSSFADE_MS, EASE, exitOf, MOTION, viewMoveMs } from "./timing";
+import { applyMotionVars, CHOSEN, choiceDelays, CROSSFADE_MS, EASE, exitOf, MOTION, TURN_EASE, viewMoveMs } from "./timing";
+import { isFacing } from "@world/room/facings";
 
 interface Ghost {
   readonly el: HTMLElement;
@@ -102,6 +103,8 @@ export const KEYED =
  */
 export function motionKey(el: Element): string | null {
   const c = el.classList;
+  // A turn's copies (room-turn R2): the leaving still and the wall turned past; never "the" backdrop.
+  if (c.contains("m-turn")) return c.contains("m-turn-via") ? "turn-via" : "turn-out";
   if (c.contains("m-backdrop")) return c.contains("m-arriving") ? "backdrop-in" : "backdrop";
   if (c.contains("stage")) {
     if (c.contains("ending-page")) return "page";
@@ -624,6 +627,80 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     if (move.to === "desktop") anim(stage, "m-fade-in", CROSSFADE_MS, move.fadeAt, t);
   }
 
+  // ---- turns between facings (room-turn R2) ---------------------------------------------------
+  /**
+   * A turn is a horizontal slide, not a walk: the leaving still goes out toward the side turned away
+   * from, the arriving one comes in from the side turned toward, eased in and out, with the walk's
+   * ±4 px bob once. Each still's placed things ride with it (never ahead of it). The HUD, the clock
+   * and the checklist stay put: they are the live stage's own, and only its picture and its still's
+   * parts slide. To the opposite wall it is two 300 ms turns, the wall in between passing through.
+   * Reduced motion: the crossfade (viewChange) instead.
+   */
+  interface TurnMove {
+    readonly start: number;
+    readonly hops: 1 | 2;
+    readonly hopMs: number;
+    /** Where the arriving still comes in from (+: from the right, a right turn). */
+    readonly dx: number;
+    readonly end: number;
+  }
+  let turnMove: TurnMove | null = null;
+  const STAGE_PX = 1600;
+  /** A still's own parts: its picture's layers and its placed things (never a HUD part, never a keyed one). */
+  const STILL_PARTS = ":scope > :is(.fx, .window-light, .evening-look, .scene, .shot-hit, .desk-things, .facing-things, .figures, .desk-book, .door-spot, .box-open)";
+  const reducedMotion = (): boolean => !!win.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+  const slide = (name: string, ms: number, delay: number, bobs = 1) =>
+    `${name} ${ms * bobs}ms ${TURN_EASE} ${Math.round(delay)}ms both, m-turn-bob ${ms}ms ease-in-out ${Math.round(delay)}ms ${bobs} both`;
+
+  /** A copy of a still for its slide: the picture and its parts, laid at the stage's origin. */
+  function stillCopy(stage: HTMLElement | null, view: string): HTMLElement {
+    const c = doc.createElement("div");
+    c.className = `stage room ${view}-view m-turn`;
+    if (stage) for (const part of stage.querySelectorAll(STILL_PARTS)) c.appendChild(part.cloneNode(true));
+    Object.assign(c.style, { position: "absolute", left: "0px", top: "0px", zIndex: "0", margin: "0" });
+    return c;
+  }
+  /** The copies go first in the live stage: over its picture, under everything it holds. */
+  const firstInStage = (el: HTMLElement) => (r: HTMLElement) => {
+    const s = q(r, ".stage.room");
+    if (!s) return false;
+    s.insertBefore(el, s.firstChild);
+    return true;
+  };
+
+  function turnChange(t: number, from: string, turn: { readonly dir: "left" | "right"; readonly hops: 1 | 2; readonly via: string | null }): void {
+    if (!q(root, ".stage.room")) return;
+    move = null;
+    const hopMs = turn.hops === 2 ? CHOSEN.turnFast : CHOSEN.turn;
+    const dx = turn.dir === "right" ? STAGE_PX : -STAGE_PX;
+    const total = hopMs * turn.hops;
+    turnMove = { start: t, hops: turn.hops, hopMs, dx, end: t + total };
+    begin("turn", t);
+    // The leaving still and what was placed on it.
+    const out_ = stillCopy(out?.stage ?? null, from);
+    out_.style.setProperty("--m-turn-dx", `${dx}px`);
+    addGhost({ el: out_, key: "turn-out", start: t, end: t + hopMs, place: firstInStage(out_), apply: (g, now) => void (g.style.animation = slide("m-turn-out", hopMs, t - now)) });
+    // To the opposite wall: the wall in between comes in and goes out again (its picture).
+    if (turn.hops === 2 && turn.via) {
+      const via = stillCopy(null, turn.via);
+      via.classList.add("m-turn-via");
+      via.style.setProperty("--m-turn-dx", `${dx}px`);
+      addGhost({ el: via, key: "turn-via", start: t, end: t + total, place: firstInStage(via), apply: (g, now) => void (g.style.animation = slide("m-turn-through", hopMs, t - now, 2)) });
+    }
+    after(total + 16, ctx.rerender);
+  }
+
+  /** The arriving stage: its picture and its still's parts slide in (the last hop); its HUD does not move. */
+  function turnEntry(t: number): void {
+    const m = turnMove;
+    const stage = q(root, ".stage.room");
+    if (!m || !stage || t >= m.end) return;
+    stage.classList.add("m-turn-in");
+    if (m.hops === 2) stage.classList.add("fast");
+    stage.style.setProperty("--m-turn-dx", `${m.dx}px`);
+    stage.style.setProperty("--m-turn-t", `${Math.round(m.start + (m.hops - 1) * m.hopMs - t)}ms`);
+  }
+
   // Left ↔ right: a push; the other monitor's tab moves with it.
   let pushDir = 1;
   function screenChange(t: number, focus: string): void {
@@ -851,7 +928,13 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
         starts.clear();
         begin("wake", t);
       } else if (snap.view !== prev.view) {
-        viewChange(t, prev.view, snap.view);
+        // Between two facings a turn slides (room-turn R2); anything else walks and crossfades.
+        const turn = ctx.session.cam?.turn;
+        if (turn && isFacing(prev.view) && isFacing(snap.view) && !reducedMotion()) turnChange(t, prev.view, turn);
+        else {
+          turnMove = null;
+          viewChange(t, prev.view, snap.view);
+        }
       } else {
         if (snap.view === "desktop" && snap.focus !== prev.focus) screenChange(t, snap.focus);
         else if (snap.night === true && prev.night === false) powerOff(t, snap.focus);
@@ -937,6 +1020,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     }
     ghosts = kept;
     viewEntry(t);
+    turnEntry(t);
     powerEntry(t);
     screenEntry(t);
     if (snap.held && stage) {

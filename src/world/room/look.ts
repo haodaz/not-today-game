@@ -2,8 +2,10 @@
 // Press-and-drag pans the still up to ±4 % of the stage's width and ±2 % of its height, the placed
 // things move 1.5× the photo, and it eases back over 600 ms on release. The stage's photo is drawn
 // at exactly the stage's size, so while it is panned it grows by just enough to cover the stage
-// (k = 1 + 2·|pan| / size): no edge ever shows. And the edges say where you can go: in 房间 the
-// right 8 % is the door; the bottom 6 % is "back" where there is a level to go back to. Pure.
+// (k = 1 + 2·|pan| / size): no edge ever shows. And the edges say where you can go: on a facing the
+// left and right 8 % turn; 桌子's bottom 6 % is "back". Pure.
+import type { EdgeZone } from "@world/desktop/model";
+import { isFacing, TURN_EDGE } from "./facings";
 import { STAGE_H, STAGE_W } from "./splat/geometry";
 
 export const PAN_X = 0.04;
@@ -52,22 +54,22 @@ export function applyPan(stage: HTMLElement, p: Pan): void {
 
 // ——— the edges ———
 
-/** The right share of 房间 that is the way to the door. */
-export const DOOR_EDGE = 0.08;
-/** The bottom share of a photo view that is the way back (nav.ts BACK_STRIP). */
+/** The bottom share of 桌子 that is the way back to 房间 (nav.ts BACK_STRIP). */
 export const BACK_EDGE = 0.06;
 export const HINT_FADE_MS = 200;
-export type EdgeZone = "door" | "back";
+export type { EdgeZone };
 /**
- * Which hinted edge a stage point is in, if that edge leads somewhere: 房间's right 8 % (the door),
- * the bottom 6 % of 桌子 and 门 (back to 房间). 房间 has no back. Only the photo views have hints.
+ * Which hinted edge a stage point is in, if that edge leads somewhere (room-turn 2026-11-04): on
+ * every facing the left and right 8 % turn that way; the bottom 6 % of 桌子 goes back to 房间. The
+ * facings have no back; 屏幕 has no hints.
  */
 export function edgeZone(view: string, x: number, y: number): EdgeZone | null {
   if (edgeLeads(view, "back") && y >= STAGE_H * (1 - BACK_EDGE)) return "back";
-  if (edgeLeads(view, "door") && x >= STAGE_W * (1 - DOOR_EDGE)) return "door";
+  if (edgeLeads(view, "left") && x < STAGE_W * TURN_EDGE) return "left";
+  if (edgeLeads(view, "right") && x >= STAGE_W * (1 - TURN_EDGE)) return "right";
   return null;
 }
 /** Whether a view has that hinted edge at all. */
 export function edgeLeads(view: string, zone: EdgeZone): boolean {
-  return zone === "door" ? view === "room" : view === "desk" || view === "door";
+  return zone === "back" ? view === "desk" : isFacing(view);
 }

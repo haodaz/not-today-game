@@ -13,10 +13,12 @@ import { initialSession, type Session } from "@world/desktop/model";
 import { syncLoop } from "@world/loop/runtime";
 import { EMPTY_DIALOGUE } from "@world/loop/dialogue";
 import { createMotion } from "@world/motion/dom";
-import { CROSSFADE_MS, viewMoveMs } from "@world/motion/timing";
+import { CHOSEN, CROSSFADE_MS, viewMoveMs } from "@world/motion/timing";
 import { t } from "@world/i18n";
 import { easePan, edgeZone, LOOK_RETURN_MS, NO_PAN, PAN_X, PAN_Y, panScale, photoPan, PLACED_PARALLAX } from "@world/room/look";
-import { loopActions, loopKeys, renderGame } from "@world/room/game";
+import { loopActions, loopKeys, renderGame, wayMs } from "@world/room/game";
+import { FACINGS, isFacing, turnedTo, turnsBetween } from "@world/room/facings";
+import { BED_SHOT, rectStyle, WINDOW_SHOT } from "@world/room/shots";
 import { ARRIVE_FADE_MS, placedThingsFade, placedThingsWait, renderRoom } from "@world/room/hud";
 import { BACK_STRIP, createNav, INTERACTIVE, type LookApi } from "@world/room/nav";
 import { createSplatLayer, SPLAT_FADE_MS, type SplatHooks, type SplatScene } from "@world/room/splat/layer";
@@ -292,12 +294,34 @@ describe("back: right-click, the bottom 6 %, the wheel, Esc", () => {
     expect(d.session.view).toBe("room");
   });
 
-  it("Esc still does: 屏幕 → 桌子 → 房间; 门 and 床 → 房间", () => {
+  it("Esc still backs out of 屏幕 → 桌子 → 房间; on a facing (房间, 床, 门, 窗) Esc and right-click do nothing (room-turn R1)", async () => {
     const m = mount({ view: "desktop" });
-    for (const [from, to] of [["desktop", "desk"], ["desk", "room"], ["door", "room"], ["bed", "room"]] as const) {
+    for (const [from, to] of [["desktop", "desk"], ["desk", "room"], ["room", "room"], ["door", "door"], ["bed", "bed"], ["window", "window"]] as const) {
       m.session.view = from;
       window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
       expect(m.session.view, from).toBe(to);
+    }
+    for (const view of ["room", "bed", "door", "window"] as const) {
+      m.session.view = view;
+      m.session.cam = null;
+      await frame();
+      mouse("contextmenu", m.stage(), 700, 500);
+      expect(m.session.view, view).toBe(view);
+    }
+  });
+
+  it("no back strip on a facing: a click on the bottom 6 % of 门 or 床 is a click on what is there; the wheel does nothing", async () => {
+    for (const view of ["door", "bed", "window"] as const) {
+      const m = mount({ view });
+      mouse("mousemove", m.stage(), 800, 880);
+      await frame();
+      expect(m.root.querySelector(".edge-hint"), view).toBeNull();
+      await click(m, 800, 890);
+      m.stage().dispatchEvent(new WheelEvent("wheel", { bubbles: true, deltaY: 100 }));
+      expect(m.session.view, view).toBe(view);
+      destroy?.();
+      destroy = null;
+      document.body.innerHTML = "";
     }
   });
 
@@ -375,63 +399,227 @@ describe("look is photo parallax (decision 2026-11-02: the splat goes dark)", ()
   });
 });
 
-describe("edges say where you can go (decision 2026-11-02)", () => {
-  it("in 房间 the right 8 % shows the door hint; the bottom shows nothing (no level back); clicking the edge goes to 门", async () => {
+describe("the four facings and their turn edges (room-turn 2026-11-04)", () => {
+  it("the order: turning right 房间 → 床 → 门 → 窗 → 房间, and left the other way, from every facing", () => {
+    expect(FACINGS).toEqual(["room", "bed", "door", "window"]);
+    for (const [i, f] of FACINGS.entries()) {
+      expect(turnedTo(f, "right"), f).toBe(FACINGS[(i + 1) % 4]);
+      expect(turnedTo(f, "left"), f).toBe(FACINGS[(i + 3) % 4]);
+      expect(turnedTo(turnedTo(f, "right"), "left"), f).toBe(f);
+    }
+  });
+
+  it("a facing's right 8 % shows → 向右转, its left 8 % ← 向左转, with the walk cursor; the middle shows none; clicking an edge turns that way", async () => {
     const m = mount({});
     mouse("mousemove", m.stage(), 1560, 300);
     await frame();
-    expect(m.session.edge?.zone).toBe("door");
-    const hint = m.root.querySelector<HTMLElement>(".edge-hint.door")!;
-    expect(hint.textContent).toBe(t("hud.cam.door"));
-    expect(hint.querySelector(".arrow")).not.toBeNull();
+    expect(m.session.edge?.zone).toBe("right");
+    const right = m.root.querySelector<HTMLElement>(".edge-hint.right")!;
+    expect(right.textContent).toBe(t("hud.turn.right"));
+    expect(right.querySelector(".arrow")).not.toBeNull();
+    expect(m.stage().classList.contains("edge-right")).toBe(true);
+    mouse("mousemove", m.stage(), 40, 300);
+    await frame();
+    expect(m.root.querySelector<HTMLElement>(".edge-hint.left")!.textContent).toBe(t("hud.turn.left"));
+    expect(m.stage().classList.contains("edge-left")).toBe(true);
     mouse("mousemove", m.stage(), 800, 880);
     await frame();
     expect(m.root.querySelector(".edge-hint")).toBeNull();
-    mouse("mousemove", m.stage(), 1560, 300);
+    expect(m.stage().classList.contains("edge-left")).toBe(false);
     await click(m, 1560, 300);
-    expect(m.session.view).toBe("door");
+    expect(m.session.view).toBe("bed");
+    await wait(CHOSEN.turn + 60);
+    await click(m, 40, 300);
+    expect(m.session.view).toBe("room");
   });
-  it("in 桌子 and 门 the bottom 6 % shows 退回 and goes back; no door hint there", async () => {
-    for (const view of ["desk", "door"] as const) {
+
+  it("the turn edges are on every facing, never at 桌子 or 屏幕; 桌子 keeps its 退回 at the bottom", async () => {
+    for (const view of ["bed", "door", "window"] as const) {
       const m = mount({ view });
-      mouse("mousemove", m.stage(), 1560, 300);
+      mouse("mousemove", m.stage(), 1590, 400);
       await frame();
-      expect(m.root.querySelector(".edge-hint"), view).toBeNull();
-      mouse("mousemove", m.stage(), 800, 880);
-      await frame();
-      expect(m.root.querySelector<HTMLElement>(".edge-hint.back")!.textContent, view).toBe(t("hud.back"));
-      await click(m, 800, 880);
-      expect(m.session.view, view).toBe("room");
+      expect(m.root.querySelector(".edge-hint.right"), view).not.toBeNull();
       destroy?.();
       destroy = null;
       document.body.innerHTML = "";
     }
+    const d = mount({ view: "desk" });
+    mouse("mousemove", d.stage(), 1590, 400);
+    await frame();
+    expect(d.root.querySelector(".edge-hint")).toBeNull();
+    mouse("mousemove", d.stage(), 800, 880);
+    await frame();
+    expect(d.root.querySelector<HTMLElement>(".edge-hint.back")!.textContent).toBe(t("hud.back"));
+    await click(d, 800, 880);
+    expect(d.session.view).toBe("room");
   });
-  it("pure: a hint only in its zone and only where it leads", () => {
+
+  it("pure: a turn hint only in the outer 8 % and only on facings; 退回 only at 桌子's bottom", () => {
     fc.assert(
-      fc.property(fc.constantFrom("room", "desk", "door", "desktop", "bed"), fc.integer({ min: 0, max: 1599 }), fc.integer({ min: 0, max: 899 }), (view, x, y) => {
+      fc.property(fc.constantFrom("room", "desk", "door", "desktop", "bed", "window"), fc.integer({ min: 0, max: 1599 }), fc.integer({ min: 0, max: 899 }), (view, x, y) => {
         const z = edgeZone(view, x, y);
-        if (z === "door") expect([view, x >= 1600 * 0.92]).toEqual(["room", true]);
-        if (z === "back") expect(view === "desk" || view === "door").toBe(true), expect(y).toBeGreaterThanOrEqual(900 * 0.94);
-        if (view === "desktop" || view === "bed") expect(z).toBeNull();
+        if (z === "left" || z === "right") {
+          expect(isFacing(view)).toBe(true);
+          expect(z === "left" ? x < 1600 * 0.08 : x >= 1600 * 0.92).toBe(true);
+        }
+        if (z === "back") expect(view).toBe("desk"), expect(y).toBeGreaterThanOrEqual(900 * 0.94);
+        if (isFacing(view) && x >= 1600 * 0.08 && x < 1600 * 0.92) expect(z).toBeNull();
+        if (view === "desktop") expect(z).toBeNull();
       }),
     );
   });
-  it("snapshot: 房间 with the door hint showing", () => {
+
+  it("← / → turn on the facings only, and only when nothing else has the keys", async () => {
+    const m = mount({});
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight" }));
+    expect(m.session.view).toBe("bed");
+    await wait(CHOSEN.turn + 60);
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowLeft" }));
+    expect(m.session.view).toBe("room");
+    await wait(CHOSEN.turn + 60);
+    // Not while the 道具 strip, the settings, a line in the box, or a held thing has the keys.
+    for (const take of [
+      (s: Session) => void (s.itemsOpen = true),
+      (s: Session) => void (s.settingsOpen = true),
+      (s: Session) => void (s.dialogue = { queue: [{ key: "x", lines: [{ k: "narration", t: "x" }], ending: { kind: "none" } }], line: 0 }),
+      (s: Session) => void (s.holding = "chick"),
+    ]) {
+      const s = { itemsOpen: m.session.itemsOpen, settingsOpen: m.session.settingsOpen, dialogue: m.session.dialogue, holding: m.session.holding };
+      take(m.session);
+      window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight" }));
+      expect(m.session.view).toBe("room");
+      Object.assign(m.session, s);
+    }
+    // Not from a text field (nor a contenteditable one, which only loopKeys sees).
+    const input = document.createElement("input");
+    m.root.appendChild(input);
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+    expect(m.session.view).toBe("room");
+    const editable = document.createElement("div");
+    editable.setAttribute("contenteditable", "true");
+    const ctx: ActionContext = { store: m.store, session: m.session, rerender: () => {}, later: () => {} };
+    expect(loopKeys(ctx, { key: "ArrowRight", target: editable } as unknown as KeyboardEvent)).toBe(false);
+    expect(m.session.view).toBe("room");
+    // Not at 桌子 or on 屏幕.
+    for (const view of ["desk", "desktop"] as const) {
+      m.session.view = view;
+      window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight" }));
+      expect(m.session.view, view).toBe(view);
+    }
+  });
+
+  it("a second turn during a turn waits for it (one at most); a third is dropped", () => {
+    const later: [number, () => void][] = [];
+    let now = 10_000;
+    const store = createStore({ startDay: 1 });
+    const ctx: ActionContext = { store, session: initialSession(DEFAULT_CLOCK, "left", "room"), rerender: () => {}, later: (ms, fn) => void later.push([now + ms, fn]), now: () => now };
+    const turn = (dir: "left" | "right") => loopActions["turn"]!(ctx, { dir } as DOMStringMap, null as never);
+    turn("right");
+    expect(ctx.session.view).toBe("bed");
+    turn("right");
+    turn("left");
+    expect(ctx.session.view).toBe("bed");
+    expect(ctx.session.turnNext).toBe("right");
+    // The first turn ends: the waiting one goes, the third never.
+    now += CHOSEN.turn + 20;
+    for (const [at, fn] of later.splice(0)) if (at <= now) fn();
+    expect(ctx.session.view).toBe("door");
+    expect(ctx.session.turnNext).toBeNull();
+    now += CHOSEN.turn + 20;
+    for (const [at, fn] of later.splice(0)) if (at <= now) fn();
+    expect(ctx.session.view).toBe("door");
+  });
+
+  it("shortest way: 房间 → 门 is two turns right, 窗 → 床 two turns right, 门 → 床 one left; from 桌子 back out to 房间 first", () => {
+    expect(turnsBetween("room", "door")).toEqual(["right", "right"]);
+    expect(turnsBetween("window", "bed")).toEqual(["right", "right"]);
+    expect(turnsBetween("door", "bed")).toEqual(["left"]);
+    expect(turnsBetween("room", "window")).toEqual(["left"]);
+    const later: [number, () => void][] = [];
+    const store = createStore({ startDay: 1 });
+    const ctx: ActionContext = { store, session: initialSession(DEFAULT_CLOCK, "left", "room"), rerender: () => {}, later: (ms, fn) => void later.push([ms, fn]), now: () => 10_000 };
+    const cam = () => ctx.session.cam;
+    for (const [from, to, dir, hops] of [["room", "door", "right", 2], ["window", "bed", "right", 2], ["door", "bed", "left", 1]] as const) {
+      ctx.session.view = from;
+      ctx.session.cam = null;
+      loopActions["view"]!(ctx, { view: to } as DOMStringMap, null as never);
+      expect(ctx.session.view, `${from} → ${to}`).toBe(to);
+      expect(cam()?.turn, `${from} → ${to}`).toMatchObject({ dir, hops });
+      expect(cam()!.until - 10_000).toBe(hops === 2 ? 2 * CHOSEN.turnFast : CHOSEN.turn);
+    }
+    expect(cam()?.turn).toMatchObject({ via: null });
+    ctx.session.view = "room";
+    loopActions["view"]!(ctx, { view: "door" } as DOMStringMap, null as never);
+    expect(cam()?.turn?.via).toBe("bed");
+    // From 桌子: the walk out to 房间, then the turn.
+    later.length = 0;
+    ctx.session.view = "desk";
+    loopActions["view"]!(ctx, { view: "bed" } as DOMStringMap, null as never);
+    expect(ctx.session.view).toBe("room");
+    expect(cam()?.turn).toBeUndefined();
+    const next = later.find(([ms]) => ms === wayMs("desk", "room") + 16)!;
+    next[1]();
+    expect(ctx.session.view).toBe("bed");
+    expect(wayMs("desk", "bed")).toBe(viewMoveMs("desk", "room") + 16 + CHOSEN.turn);
+  });
+
+  it("the delivery knock lands on 门: arriving there by the shortest way is the walk to the door", () => {
+    const store = createStore({ startDay: 1 });
+    for (const d of [
+      { kind: "step", name: "boot", t: "09:03" },
+      { kind: "step", name: "openApp:msgs", t: "09:03" },
+      { kind: "order", meal: "lunch", shopId: "huangmenji", itemId: "hmj", t: "11:30" },
+      { kind: "step", name: "delivery:arrives:lunch", t: "12:04" },
+    ] as const) store.appendEvent(d);
+    const ctx: ActionContext = { store, session: initialSession({ beat: "work", time: "12:30" }, "left", "room"), rerender: () => {}, later: () => {}, now: () => 10_000 };
+    loopActions["view"]!(ctx, { view: "door" } as DOMStringMap, null as never);
+    expect(ctx.session.view).toBe("door");
+    expect(ctx.session.door?.state).toBe("atDoor");
+  });
+
+  it("snapshot: 房间 with the right arrow showing", () => {
     const store = createStore({ startDay: 1 });
     const session = initialSession(DEFAULT_CLOCK, "left", "room");
-    session.edge = { zone: "door", since: 0 };
+    session.edge = { zone: "right", since: 0 };
     const out = renderRoom({ state: store.getState(), events: store.getEvents(), session }).value;
     expect(out.match(/<div class="edge-hint[^]*?<\/div>/)![0]).toMatchSnapshot();
     expect(out).toMatchSnapshot();
   });
-  it("with the splat off a move makes no splat layer, and the placed things fade in with the 400 ms crossfade", async () => {
+
+  it("snapshots: the four facings at rest (day 1 morning)", () => {
+    const store = createStore({ startDay: 1 });
+    const facings = Object.fromEntries(FACINGS.map((view) => [view, renderRoom({ state: store.getState(), events: store.getEvents(), session: initialSession(DEFAULT_CLOCK, "left", view) }).value]));
+    expect(facings.bed).toContain('class="stage room bed-view"');
+    expect(facings.bed).toContain(`class="shot-hit bed-hit" data-action="bed" style="${rectStyle(BED_SHOT.bed)}"`);
+    expect(facings.bed).toContain(`class="shot-hit box-hit" data-action="bed-box" style="${rectStyle(BED_SHOT.box)}"`);
+    expect(facings.window).toContain('class="stage room window-view"');
+    expect(facings.window).toContain(`data-action="meal-table" style="${rectStyle(WINDOW_SHOT.mealTable)}"`);
+    // 房间 is as it was, minus its door edge (the door's own proxy stays for the keyboard).
+    expect(facings.room).not.toContain("edge-hint");
+    expect(facings).toMatchSnapshot();
+  });
+
+  it("a turn is not a crossfade: no splat, no waiting for the camera (the placed things ride with their still)", async () => {
     const m = mount({});
     await click(m, 1560, 300);
-    expect(m.session.cam).toMatchObject({ to: "door", fade: CROSSFADE_MS });
-    expect(m.session.cam!.until - m.session.cam!.reveal).toBe(CROSSFADE_MS);
+    expect(m.session.cam).toMatchObject({ to: "bed", fade: 0, turn: { dir: "right", hops: 1 } });
+    expect(m.session.cam!.reveal).toBeLessThanOrEqual(Date.now());
     expect(m.root.querySelector(".splat-layer")).toBeNull();
-    expect(m.root.querySelectorAll(".m-backdrop")).toHaveLength(2);
+    expect(m.root.querySelectorAll(".m-backdrop")).toHaveLength(0);
+    // 床's own click areas are on the live stage at once.
+    expect(m.stage().querySelectorAll(":scope > .shot-hit").length).toBeGreaterThan(0);
+  });
+
+  it("床's box turns left to 房间, then opens the case there", () => {
+    const later: [number, () => void][] = [];
+    const store = createStore({ startDay: 1 });
+    const ctx: ActionContext = { store, session: initialSession(DEFAULT_CLOCK, "left", "bed"), rerender: () => {}, later: (ms, fn) => void later.push([ms, fn]), now: () => 10_000 };
+    loopActions["bed-box"]!(ctx, {} as DOMStringMap, null as never);
+    expect(ctx.session.view).toBe("room");
+    expect(ctx.session.cam?.turn).toMatchObject({ dir: "left", hops: 1 });
+    expect(ctx.session.caseOpen).toBe(false);
+    for (const [, fn] of later.splice(0)) fn();
+    expect(ctx.session.caseOpen).toBe(true);
   });
 });
 
@@ -482,95 +670,70 @@ describe("the real layer with a fake scene: look, and 床 held by the splat", ()
     expect(desktop.hooks().look(50, 0)).toBe(false);
   });
 
-  it("床: pointing at the bed glides the camera there, the splat holds the framing, the night begins as it arrives; Esc glides back", async () => {
+  it("the sleep flow lands on 床 (room-turn): 睡 turns there, the bed wall is its own still with no splat, the night begins as the turn ends", async () => {
     const store = createStore({ startDay: 1 });
     completeUntil(store, "bed", { all: true });
     const m = mount({ splat: true, store });
     await ready(m);
-    expect(m.session.splatReady).toBe(true);
-    // The bed's proxy is the thing to point at.
+    // The bed's proxy in 房间 is the thing to point at; it asks first (day-loop addition 2026-11-02).
     const bed = fixedRects("room").bed!;
     await click(m, bed.l + bed.w / 2, bed.t + bed.h / 2);
-    // The bed asks first (day-loop addition 2026-11-02); 睡 starts the glide.
     expect(m.session.view).toBe("room");
     await sleep(m);
     expect(m.session.view).toBe("bed");
-    expect(m.session.cam).toMatchObject({ to: "bed" });
-    // Mid-move nothing is pointed at; once there, nothing of 房间 but the door.
-    await frame();
-    expect(m.root.querySelectorAll(".shot-hit")).toHaveLength(0);
-    await wait(viewMoveMs("room", "bed", true) + 250);
-    expect([...m.root.querySelectorAll(".shot-hit")].map((e) => (e as HTMLElement).dataset.hot)).toEqual(["door"]);
-    const layer = m.root.querySelector<HTMLElement>(":scope > .splat-layer");
-    expect(layer, "the splat stays as 床's picture").not.toBeNull();
+    expect(m.session.cam).toMatchObject({ to: "bed", turn: { dir: "right", hops: 1 } });
+    // 床 is a still now: no splat layer, the stage shows bed.jpg, and its own things are there at once.
+    expect(m.root.querySelector(".splat-layer")).toBeNull();
     expect(m.stage().classList.contains("bed-view")).toBe(true);
-    expect(m.stage().classList.contains("m-nobg")).toBe(true);
-    expect(layer!.querySelector<HTMLElement>(".splat-photo")!.style.opacity).toBe("0");
-    near(m.fake.poses.at(-1)!, POSES.bed);
-    expect(m.hooks().pose()).not.toBeNull();
-    // The night began when the camera arrived (a line is waiting, or the day is already over).
+    expect(m.stage().classList.contains("m-nobg")).toBe(false);
+    expect([...m.stage().querySelectorAll<HTMLElement>(":scope > .shot-hit")].map((e) => e.dataset.hot)).toEqual(["box", "bed"]);
+    expect(m.session.dialogue.queue).toEqual([]);
+    await wait(CHOSEN.turn + 80);
+    // The night began as the turn ended (a line is waiting, or the day is already over).
     expect(m.session.dialogue.queue.length > 0 || m.store.getState().day === 2).toBe(true);
-    // Head turn works at 床 too, and the layer stays after it.
-    expect(m.hooks().look(60, 0)).toBe(true);
-    m.hooks().release();
-    await wait(LOOK.easeMs + 100);
-    expect(m.root.querySelector(".splat-layer")).not.toBeNull();
-    near(m.fake.poses.at(-1)!, POSES.bed);
+    // And ?splat=1 gives the new facings no splat: no head turn on 床.
+    expect(m.hooks().look(60, 0)).toBe(false);
   }, 10_000);
 
-  it("backing out during the glide cancels the night: it begins only if the camera is still at 床", async () => {
+  it("turning away during the turn cancels the night: it begins only if the player is still at 床", async () => {
     const store = createStore({ startDay: 1 });
     completeUntil(store, "bed", { all: true });
-    const m = mount({ splat: true, store });
-    await ready(m);
+    const m = mount({ store });
+    await frame();
     const bed = fixedRects("room").bed!;
     await click(m, bed.l + bed.w / 2, bed.t + bed.h / 2);
-    // The bed asks first (day-loop addition 2026-11-02); 睡 starts the glide.
-    expect(m.session.view).toBe("room");
     await sleep(m);
     expect(m.session.view).toBe("bed");
-    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
-    await frame();
+    // The second turn waits for the first, then turns away before the night would begin.
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowLeft" }));
+    await wait(CHOSEN.turn + 300);
     expect(m.session.view).toBe("room");
-    await wait(viewMoveMs("room", "bed", true) + 300);
     expect(m.session.dialogue.queue).toEqual([]);
     expect(m.store.getState().day).toBe(1);
   }, 10_000);
 
-  it("床 → 房间: the move runs and the layer goes with it", async () => {
+  it("on 床 its bed is the same 躺下; 窗 has no splat either", async () => {
     const store = createStore({ startDay: 1 });
     completeUntil(store, "bed", { all: true });
-    const m = mount({ splat: true, store });
+    const m = mount({ splat: true, store, view: "window" });
     await ready(m);
-    const bed = fixedRects("room").bed!;
-    await click(m, bed.l + bed.w / 2, bed.t + bed.h / 2);
-    // The bed asks first (day-loop addition 2026-11-02); 睡 starts the glide.
-    expect(m.session.view).toBe("room");
-    await sleep(m);
-    expect(m.session.view).toBe("bed");
-    await wait(viewMoveMs("room", "bed", true) + 250);
-    expect(m.root.querySelector(".splat-layer")).not.toBeNull();
-    // The night is a story: it masks the stage and Esc only skips to its last line, never out of the
-    // bed (dialogue addition 2026-11-02).
-    if (m.root.querySelector(".story-mask")) {
-      window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
-      await frame();
-      expect(m.session.view).toBe("bed");
-      const q = m.session.dialogue.queue[0]!;
-      expect(m.session.dialogue.line).toBe(q.lines.length - 1);
-      // This test is about the camera: the night is put away so Esc can step out.
-      m.session.dialogue = EMPTY_DIALOGUE;
-    }
-    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+    expect(m.hooks().look(60, 0)).toBe(false);
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight" }));
     await frame();
     expect(m.session.view).toBe("room");
-    await wait(viewMoveMs("bed", "room", true) + 400);
-    expect(m.root.querySelector(".splat-layer")).toBeNull();
-    expect(m.hooks().pose()).toBeNull();
-    expect(m.stage().classList.contains("m-nobg")).toBe(false);
+    await wait(CHOSEN.turn + 60);
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight" }));
+    await wait(CHOSEN.turn + 60);
+    await frame();
+    expect(m.session.view).toBe("bed");
+    m.stage().querySelector<HTMLElement>('.shot-hit[data-hot="bed"]')!.click();
+    expect(m.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:bed:ask"]);
+    await sleep(m);
+    // Already at 床: the night begins at once.
+    expect(m.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:beat:night"]);
   }, 10_000);
 
-  it("without the splat the bed is where it was: no glide, the night begins at once", async () => {
+  it("without the splat: the same turn to 床, and the night begins as it ends", async () => {
     const store = createStore({ startDay: 1 });
     completeUntil(store, "bed", { all: true });
     const m = mount({ splat: false, store });
@@ -579,7 +742,9 @@ describe("the real layer with a fake scene: look, and 床 held by the splat", ()
     m.root.querySelector<HTMLElement>('.shot-hit[data-hot="bed"]')!.click();
     expect(m.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:bed:ask"]);
     await sleep(m);
-    expect(m.session.view).toBe("room");
+    expect(m.session.view).toBe("bed");
+    expect(m.session.dialogue.queue).toEqual([]);
+    await wait(CHOSEN.turn + 80);
     expect(m.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:beat:night"]);
   });
 });

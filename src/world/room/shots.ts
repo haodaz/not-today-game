@@ -88,4 +88,35 @@ export const DOOR_SHOT: { readonly chain: Rect; readonly bag: Rect; readonly clo
   // Image 1306–1434 × 358–627: the chain down to the knob.
   close: { l: 1020, t: 280, w: 100, h: 210 },
 };
+/**
+ * 床, the bed wall (room-turn R3, Claude measured on public/room/shots/bed.jpg fitted to the stage):
+ * the bed (lie down) and the parcel box between the bed head and the desk (its box action is
+ * 房间's: turning left to 房间 first).
+ */
+export const BED_SHOT: { readonly bed: Rect; readonly box: Rect } = {
+  bed: { l: 500, t: 490, w: 817, h: 410 },
+  box: { l: 236, t: 616, w: 261, h: 237 },
+};
+
+/**
+ * 窗, the big window wall (room-turn R3, on public/room/shots/window.jpg): the little meal table
+ * under the window, and where the meal that `deskMeal` picks sits on it. The still shows a takeout
+ * box already; a clean still comes later, the rect stays.
+ */
+export const WINDOW_SHOT: { readonly mealTable: Rect; readonly meal: Rect } = {
+  mealTable: { l: 565, t: 600, w: 225, h: 300 },
+  meal: { l: 615, t: 570, w: 105, h: 85 },
+};
+
+/** The flat facings' things to point at, in tab order (fixed rectangles, no splat box). */
+export type FlatHotId = "bed" | "box" | "mealTable";
+export const FLAT_HOTS: Readonly<Record<"bed" | "window", readonly { readonly id: FlatHotId; readonly rect: Rect }[]>> = {
+  bed: [
+    { id: "box", rect: BED_SHOT.box },
+    { id: "bed", rect: BED_SHOT.bed },
+  ],
+  window: [{ id: "mealTable", rect: WINDOW_SHOT.mealTable }],
+};
+export const isFlatFacing = (view: string): view is "bed" | "window" => view === "bed" || view === "window";
+
 export const rectStyle = (r: Rect): string => `left:${r.l}px;top:${r.t}px;width:${r.w}px;height:${r.h}px`;

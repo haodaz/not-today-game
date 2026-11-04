@@ -11,7 +11,7 @@
 // is a pure function of (day, stage, time) and is what the tests read; nothing here is story.
 import { deskLayout } from "../desk";
 import { ROOM_SHOT, type Rect } from "../shots";
-import { STAGES, type FxLayer, type FxPlan, type FxStage, type FxView } from "./index";
+import { STAGES, stagePhoto, type FxLayer, type FxPlan, type FxStage, type FxView } from "./index";
 
 /** Shader kind per stage; 0 is "no layer". */
 export const KIND: Readonly<Record<FxStage, number>> = { wall: 1, other: 2, glitch: 3, white: 4 };
@@ -213,6 +213,7 @@ export function particleSeeds(stage: FxStage): Float32Array {
 export function protectedRects(view: FxView): readonly Rect[] {
   if (view === "desk") return [deskLayout.monitors.left, deskLayout.monitors.right, deskLayout.keyboard];
   if (view === "room") return [ROOM_SHOT.monitors.left, ROOM_SHOT.monitors.right];
+  // 门, 床 and 窗 have no screen in frame to keep clear.
   return [];
 }
 
@@ -651,7 +652,8 @@ export function createFxRenderer(gl: WebGL2RenderingContext, deps: RendererDeps 
     return p;
   }
 
-  const photoUrl = (plan: FxPlan, l: FxLayer) => `/room/fx/${plan.view}_${l.stage}.jpg`;
+  // The facings without stage stills yet (room-turn R4) take their base still; the shader breathes on it.
+  const photoUrl = (plan: FxPlan, l: FxLayer) => stagePhoto(plan.view, l.stage);
 
   const api: FxRenderer = {
     setScene(plan, cleanUrl) {

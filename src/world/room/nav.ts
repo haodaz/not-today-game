@@ -4,19 +4,24 @@
 //     it hits is marked `data-hover` (4 % brighter) and the cursor says so.
 //   - Click: the same ray; what it hits has its keyboard proxy pressed, so a mouse, Enter on a
 //     focused proxy and a test all take the same action. The proxies are `.shot-hit[data-hot]`.
-//   - Back: right-click (= Esc), the bottom 6 % of the stage, or the wheel turned back pulls the
-//     camera out one level; never past 房间. Esc is the controller's.
+//   - Back: right-click (= Esc), the bottom 6 %, or the wheel turned back pulls the camera out one
+//     level, from 屏幕 and 桌子 only; the four facings are the top level and have no back. Esc is the
+//     controller's.
 //   - Look: press-and-drag pans the photo (look.ts: ±4 % / ±2 %, the placed things 1.5×), easing
 //     back over 600 ms on release. Never the splat (room-scene decision 2026-11-02).
-//   - Edges: in 房间 the right 8 % is the way to 门, the bottom 6 % of 桌子 and 门 is back; resting
-//     there shows the hint (session.edge, drawn by hud.ts), clicking there goes there.
+//   - Edges: on every facing the left and right 8 % turn that way (room-turn 2026-11-04); the bottom
+//     6 % of 桌子 is back. Resting there shows the hint (session.edge, drawn by hud.ts), clicking
+//     there goes there.
+//   - 床 and 窗 have fixed rectangles (shots.ts FLAT_HOTS), picked by rectangle, not by a ray.
 // The camera is the splat layer's live pose while it draws, else the framing's fixed pose, which
 // gives back today's rectangles. Nothing here is an event or state.
 import type { ActionContext, ActionHandler } from "@world/desktop/controller";
-import { hotRects, hotViewOf, pickHot, type HotId, type HotView } from "./splat/hotspots";
+import { hotRects, hotViewOf, pickHot, type HotView } from "./splat/hotspots";
 import { POSES, type Pose } from "./splat/pose";
 import { STAGE_H, STAGE_W } from "./splat/geometry";
 import { applyPan, easePan, edgeZone, NO_PAN, photoPan, PLACED_PARALLAX, LOOK_RETURN_MS, type EdgeZone, type Pan } from "./look";
+import { hasBack, isFacing } from "./facings";
+import { FLAT_HOTS, isFlatFacing } from "./shots";
 
 /** Anything the HUD or a placed thing answers to itself: the nav layer leaves a click on these alone. */
 export const INTERACTIVE = "button, a, input, textarea, select, label, [data-action], .dlg, .dlg-layer, .list, .items-panel, .settings-layer, .book-reader, .held, .hud-host, .hud-br";
@@ -65,7 +70,7 @@ export function createNav(deps: NavDeps = {}) {
     const caf = deps.caf ?? ((id) => win.cancelAnimationFrame(id));
     const now = deps.now ?? (() => win.performance.now());
 
-    let hover: HotId | null = null;
+    let hover: string | null = null;
     let pointer: { x: number; y: number } | null = null;
     let down: { cx: number; cy: number; x: number; y: number; moved: boolean } | null = null;
     let suppressClick = false;
@@ -87,21 +92,27 @@ export function createNav(deps: NavDeps = {}) {
     };
 
     const hotView = (): HotView | null => hotViewOf(ctx.session.view);
-    const proxy = (id: HotId) => root.querySelector<HTMLElement>(`.shot-hit[data-hot="${id}"]`);
+    const proxy = (id: string) => root.querySelector<HTMLElement>(`.shot-hit[data-hot="${id}"]`);
     const interactive = (target: EventTarget | null) => !!(target as HTMLElement | null)?.closest?.(INTERACTIVE);
     const cameraPose = (view: HotView): Pose => splat?.pose?.() ?? POSES[view];
 
-    function pickAt(at: { x: number; y: number }): HotId | null {
-      const view = hotView();
-      if (!view) return null;
+    function pickAt(at: { x: number; y: number }): string | null {
       // While the photo is panned the placed things (and their proxies) sit 1.5× the pan away.
       const p = { x: at.x - pan.x * PLACED_PARALLAX, y: at.y - pan.y * PLACED_PARALLAX };
+      // 床 and 窗 (room-turn R3): fixed rectangles, the first that holds the point (they do not overlap).
+      const flat = ctx.session.view;
+      if (isFlatFacing(flat)) {
+        const hit = FLAT_HOTS[flat].find(({ id, rect: r }) => p.x >= r.l && p.x < r.l + r.w && p.y >= r.t && p.y < r.t + r.h && proxy(id) !== null);
+        return hit?.id ?? null;
+      }
+      const view = hotView();
+      if (!view) return null;
       // What is in the DOM is what can be pointed at now (the tower only while the computer is off;
       // nothing while the placed things wait for the camera).
       return pickHot(cameraPose(view), view, p.x, p.y, (id) => proxy(id) !== null);
     }
 
-    function setHover(id: HotId | null): void {
+    function setHover(id: string | null): void {
       if (id === hover && (id === null || proxy(id)?.hasAttribute("data-hover"))) return;
       if (hover) proxy(hover)?.removeAttribute("data-hover");
       hover = id;
@@ -118,7 +129,7 @@ export function createNav(deps: NavDeps = {}) {
       root.classList.add("look-turned");
       const rects = hotRects(live, view);
       for (const el of root.querySelectorAll<HTMLElement>(".shot-hit[data-hot]")) {
-        const r = rects[el.dataset.hot as HotId];
+        const r = rects[el.dataset.hot as keyof typeof rects];
         if (!r) {
           el.style.display = "none";
           continue;
@@ -130,8 +141,8 @@ export function createNav(deps: NavDeps = {}) {
     }
 
     const liveStage = () => root.querySelector<HTMLElement>(":scope > .stage.room:not(.m-ghost):not(.m-backdrop)");
-    /** Only the photo views pan (not 屏幕, not 床, which the splat holds). */
-    const pans = () => ["room", "desk", "door"].includes(ctx.session.view);
+    /** Only the photo views pan: the four facings and 桌子 (not 屏幕). */
+    const pans = () => isFacing(ctx.session.view) || ctx.session.view === "desk";
     function setPan(p: Pan): void {
       pan = p;
       const stage = liveStage();
@@ -217,15 +228,18 @@ export function createNav(deps: NavDeps = {}) {
       if (!p) return;
       const stage = root.querySelector<HTMLElement>(":scope > .stage:not(.m-ghost):not(.m-backdrop)");
       const height = stage?.classList.contains("room") ? STAGE_H : (stage?.getBoundingClientRect().height ?? STAGE_H);
-      if (inBackStrip(p.y, height)) {
+      // The bottom strip is back only where there is a level to go back to (桌子, 屏幕); on a
+      // facing a click there is a click on what is there (the bed, the table).
+      if (hasBack(ctx.session.view) && inBackStrip(p.y, height)) {
         e.preventDefault();
         return run("nav-back");
       }
-      // The hinted edge goes where it says.
-      if (edgeAt(p) === "door") {
+      // A turn edge turns that way (room-turn R2).
+      const edge = edgeAt(p);
+      if (edge === "left" || edge === "right") {
         e.preventDefault();
         e.stopPropagation();
-        return run("view", { view: "door" });
+        return run("turn", { dir: edge });
       }
       const id = pickAt(p);
       if (!id) return;
@@ -246,7 +260,8 @@ export function createNav(deps: NavDeps = {}) {
       if (t?.closest?.(".win, .dlg-hist, .items-panel, .settings-layer, textarea, .book-reader")) return;
       const t0 = now();
       if (t0 - lastWheel < WHEEL_GAP_MS) return;
-      if (ctx.session.view === "room") return;
+      // The facings are the top level: the wheel does nothing there (room-turn R1).
+      if (!hasBack(ctx.session.view)) return;
       lastWheel = t0;
       run("nav-back");
     };
@@ -276,10 +291,7 @@ export function createNav(deps: NavDeps = {}) {
         }
         syncProxies();
         if (splat?.pose?.() && !frame) frame = raf(loop);
-        if (pointer && !down?.moved && !splat?.pose?.()) {
-          const view = hotView();
-          setHover(view ? pickAt(pointer) : null);
-        }
+        if (pointer && !down?.moved && !splat?.pose?.()) setHover(edgeAt(pointer) ? null : pickAt(pointer));
       },
       destroy() {
         if (frame) caf(frame);

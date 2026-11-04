@@ -1,6 +1,10 @@
 // Motion timings (polish spec, design/hud/motion.md). One source: motion.css reads these as CSS
 // variables (applyMotionVars), never literal durations. MOTION is motion.md; CHOSEN is what
 // motion.md does not say (design P2), kept apart so the two are never confused.
+import { isFacing, turnsBetween } from "@world/room/facings";
+
+/** A turn's slide is eased in and out (room-turn R2), unlike the ease-out of everything else. */
+export const TURN_EASE = "cubic-bezier(.65,0,.35,1)";
 
 /** motion.md: short, ease-out. */
 export const EASE = "cubic-bezier(.2,.8,.2,1)";
@@ -68,8 +72,10 @@ export const CHOSEN = {
   chosenHold: MOTION.choice,
   /** Walking, not switching (room-scene 2026-11-02): a move takes as long as the path. 房间 ↔ 桌子. */
   roomDesk: 900,
-  /** 房间 ↔ 门: the longest walk. */
-  roomDoor: 1200,
+  /** A 90° turn between two facings (room-turn R2): a horizontal slide. */
+  turn: 450,
+  /** Each of the two turns when the target is the opposite wall (back to back, toward the right). */
+  turnFast: 300,
   /** 桌子 ↔ 屏幕: leaning in. */
   deskScreen: 500,
   /** 使用 flip: the face turns over in-place (objects-in-hand 2026-11-03). */
@@ -83,14 +89,18 @@ export const CHOSEN = {
 } as const;
 /** Every move between stills ends in this crossfade (the no-warp correction): the walk comes before it. */
 export const CROSSFADE_MS = MOTION.view;
-/** How long a view change takes, by the length of the path: 房间 ↔ 桌子 900, 房间 ↔ 门 1200, 桌子 ↔ 屏幕 500 ms; 房间 ↔ 屏幕 goes by the desk (900); anything else the plain crossfade. `camera` is kept for callers and no longer changes it. */
+/**
+ * How long a view change takes, by the length of the path: 房间 ↔ 桌子 900, 桌子 ↔ 屏幕 500 ms;
+ * 房间 ↔ 屏幕 goes by the desk (900). Between two facings it is a turn (room-turn R2): 450 ms to the
+ * next wall, two 300 ms turns to the opposite one. Anything else the plain crossfade. `camera` is
+ * kept for callers and no longer changes it.
+ */
 export function viewMoveMs(from: string, to: string, _camera = true): number {
+  if (from !== to && isFacing(from) && isFacing(to)) return turnsBetween(from, to).length === 1 ? CHOSEN.turn : 2 * CHOSEN.turnFast;
   const pair = [from, to].sort().join(">");
   switch (pair) {
     case "desk>room":
       return CHOSEN.roomDesk;
-    case "door>room":
-      return CHOSEN.roomDoor;
     case "desk>desktop":
       return CHOSEN.deskScreen;
     case "desktop>room":
@@ -144,6 +154,10 @@ export function motionVars(): Record<string, string> {
     "--m-flip": ms(CHOSEN.flip),
     // The walk's bob as a plain number (motion.css multiplies it into px and into the cover).
     "--m-walk-bob-n": String(CHOSEN.walkBobPx),
+    // A turn between facings (room-turn R2): one 450 ms slide, or two of 300 ms to the opposite wall.
+    "--m-turn": ms(CHOSEN.turn),
+    "--m-turn-fast": ms(CHOSEN.turnFast),
+    "--m-turn-ease": TURN_EASE,
     "--m-screen": ms(MOTION.screen),
     "--m-kuro-fade": ms(MOTION.kuroFade),
     "--m-bob": ms(MOTION.bob),

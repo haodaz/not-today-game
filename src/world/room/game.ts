@@ -38,6 +38,7 @@ import { messageActions } from "@world/desktop/messages/actions";
 import { CROSSFADE_MS, MOTION, viewMoveMs } from "@world/motion/timing";
 import { splatMoveFor } from "./splat/moves";
 import { SPLAT_FADE_MS } from "./splat/layer";
+import { isFacing, turnedTo, turnsBetween, type Facing, type TurnDir } from "./facings";
 
 /** Whose conversation the loan is answered in (day-loop correction 2026-11-01): 老周. */
 export const LOAN_CONVERSATION = "laozhou";
@@ -151,13 +152,15 @@ function viviRefuse(ctx: ActionContext, toConv?: string | null): boolean {
 }
 
 /**
- * Something lifted from the 道具 strip: the strip closes. Where a held thing cannot show (屏幕, 门),
- * the camera goes to 桌子 first (the held layer is the room's).
+ * Something lifted from the 道具 strip: the strip closes. Where a held thing cannot show, the player
+ * moves first, in one step so the lift is not undone by a second: from 屏幕 back to 桌子, and from 门
+ * (its door beat has the stage) a turn to 房间 (room-turn 2026-11-04; it was a walk to 桌子).
  */
 function fromItemsPanel(ctx: ActionContext): void {
   if (!ctx.session.itemsOpen) return;
   ctx.session.itemsOpen = false;
-  if (ctx.session.view === "desktop" || ctx.session.view === "door") loopActions["view"]!(ctx, { view: "desk" } as DOMStringMap, null as never);
+  if (ctx.session.view === "desktop") loopActions["view"]!(ctx, { view: "desk" } as DOMStringMap, null as never);
+  else if (ctx.session.view === "door") loopActions["view"]!(ctx, { view: "room" } as DOMStringMap, null as never);
 }
 
 /** The item this world event would do now, if any (the checklist only watches). */
@@ -211,12 +214,45 @@ export function appContextOf(ctx: ActionContext) {
 function startCam(ctx: ActionContext, from: string, to: View): number {
   const now = ctx.now?.() ?? Date.now();
   const dur = viewMoveMs(from, to);
+  // A turn between facings (room-turn R2): the stills slide and each one's placed things ride with
+  // it, so nothing waits for the camera; the motion layer reads the way and the hops from here.
+  if (isFacing(from) && isFacing(to) && from !== to) {
+    const dirs = turnsBetween(from, to);
+    const via = dirs.length === 2 ? turnedTo(from, dirs[0]!) : null;
+    ctx.session.cam = { to, reveal: now, until: now + dur, fade: 0, turn: { dir: dirs[0]!, hops: dirs.length === 2 ? 2 : 1, via } };
+    // The turn is over: a turn asked for meanwhile goes now (at most one waits).
+    ctx.later(dur + 16, () => {
+      const next = ctx.session.turnNext;
+      ctx.session.turnNext = null;
+      if (next && isFacing(ctx.session.view)) loopActions["turn"]!(ctx, { dir: next } as DOMStringMap, null as never);
+      ctx.rerender();
+    });
+    return dur;
+  }
   const fade = Math.min(dur, ctx.session.splatReady && splatMoveFor(from, to) ? SPLAT_FADE_MS : CROSSFADE_MS);
   ctx.session.cam = { to, reveal: now + dur - fade, until: now + dur, fade };
   // Render again when the things may appear: the start of the arriving photo's fade.
   ctx.later(dur - fade + 24, ctx.rerender);
   return dur;
 }
+
+/** A turn is under way now (its slide has not ended). */
+function turning(ctx: ActionContext): boolean {
+  const cam = ctx.session.cam;
+  return !!cam?.turn && cam.until > (ctx.now?.() ?? Date.now());
+}
+
+/**
+ * How long until the player stands at `to` by the shortest way (room-turn R2): a walk or a turn, or
+ * a walk out of 桌子 / 屏幕 to 房间 and then the turn, or the turn to 房间 and then the walk in.
+ */
+export function wayMs(from: View, to: View): number {
+  if (from === to) return 0;
+  if (isFacing(from) !== isFacing(to) && from !== "room" && to !== "room") return wayMs(from, "room") + WAY_GAP_MS + wayMs("room", to);
+  return viewMoveMs(from, to);
+}
+/** Between the legs of a way (the walk out, then the turn): one frame. */
+const WAY_GAP_MS = 16;
 /** The two steps of a walk (room-scene 2026-11-02, step-1 / step-2; silence if the files are missing). */
 export const STEP_SOUNDS = ["step-1", "step-2"] as const;
 function walkSteps(ctx: ActionContext, from: string, to: string): void {
@@ -224,9 +260,12 @@ function walkSteps(ctx: ActionContext, from: string, to: string): void {
   ctx.play?.(STEP_SOUNDS[0]);
   ctx.later(Math.round(dur / 2), () => ctx.play?.(STEP_SOUNDS[1]));
 }
-/** One camera level out: 屏幕 → 桌子 → 房间, 门 and 床 → 房间; none past 房间. */
+/**
+ * One camera level out: 屏幕 → 桌子 → 房间. The four facings are the top level (room-turn R1): none
+ * of them has a way back; you turn between them.
+ */
 export function backTarget(view: View): View | null {
-  return view === "desktop" ? "desk" : view === "room" ? null : "room";
+  return view === "desktop" ? "desk" : view === "desk" ? "room" : null;
 }
 
 /** True when something sits over the view that a "back" should close first (or that blocks the camera). */
@@ -303,7 +342,57 @@ function restHand(s: Session): void {
   }
 }
 
+/**
+ * Goes to `view` the shortest way (room-turn R2): a turn between facings (two turns to the opposite
+ * wall, toward the right, in one slide of two), a walk between 房间 and its levels; from 桌子 / 屏幕
+ * to another facing the walk out to 房间 comes first, and from another facing to 桌子 / 屏幕 the turn
+ * to 房间. Each leg is `arrive`; the second waits for the first. Session only.
+ */
+function goTo(ctx: ActionContext, view: View, data: DOMStringMap): void {
+  const from = ctx.session.view;
+  const twoLegs = from !== view && isFacing(from) !== isFacing(view) && from !== "room" && view !== "room";
+  if (!twoLegs) return arrive(ctx, view, data);
+  arrive(ctx, "room", {} as DOMStringMap);
+  ctx.later(wayMs(from, "room") + WAY_GAP_MS, () => {
+    // Only if nothing else moved the player meanwhile.
+    if (ctx.session.view === "room") arrive(ctx, view, data);
+  });
+}
+
+/** One leg of a way: the view changes now; the motion layer plays the walk or the turn. */
+function arrive(ctx: ActionContext, view: View, data: DOMStringMap): void {
+  // 桌子's monitors open 屏幕 on their own side.
+  if (view === "desktop" && (data.screen === "left" || data.screen === "right")) ctx.session.focus = data.screen;
+  // A finished door beat is forgotten once the player looks away (polish W1).
+  if (ctx.session.view === "door" && view !== "door" && ctx.session.door?.state === "onDesk") ctx.session.door = null;
+  const from = ctx.session.view;
+  ctx.session.view = view;
+  if (from !== view && view !== "desktop") startCam(ctx, from, view);
+  // A move is a walk (and a turn is a step or two): two steps, whichever way.
+  if (from !== view) walkSteps(ctx, from, view);
+  // A line waiting for this place comes forward; one that belongs elsewhere is taken back.
+  settleSession(ctx.session);
+  ctx.session.phoneOpen = false;
+  ctx.session.itemsOpen = false;
+  ctx.session.caseOpen = false;
+  ctx.session.holding = null;
+  restHand(ctx.session);
+  // The pointer finds the new view's edges itself.
+  ctx.session.edge = null;
+  // 走到门边 is the camera move: arriving at 门 with the bag outside is that step.
+  if (view === "door" && from !== "door") doorWalk(ctx);
+  lookedAway(ctx);
+  // The desktop opens on the monitor with the current app; looking at it counts.
+  if (view === "desktop") lookAt(ctx, shownApp(ctx.session));
+  // 看一眼桌子: arriving at 桌子 while the item is open is the look; the desk beat plays here.
+  if (view === "desk" && nightFallen(ctx) && openFor(ctx, (e) => e.type === "beat" && e.beat === "desk")) stepOnce(ctx, "beat:desk");
+  settleSession(ctx.session);
+  ctx.rerender();
+}
+
 export const loopActions: Record<string, ActionHandler> = {
+  // Everything that moves the player (a hotspot's data-view, the sleep flow, the 道具 strip) goes
+  // the shortest way (room-turn R2).
   view(ctx, data) {
     const view = data.view as View;
     if (!VIEWS.includes(view)) return;
@@ -317,33 +406,20 @@ export const loopActions: Record<string, ActionHandler> = {
       }
       return;
     }
-    // 桌子's monitors open 屏幕 on their own side.
-    if (view === "desktop" && (data.screen === "left" || data.screen === "right")) ctx.session.focus = data.screen;
-    // A finished door beat is forgotten once the player looks away (polish W1).
-    if (ctx.session.view === "door" && view !== "door" && ctx.session.door?.state === "onDesk") ctx.session.door = null;
-    const from = ctx.session.view;
-    ctx.session.view = view;
-    if (from !== view && view !== "desktop") startCam(ctx, from, view);
-    // A move is a walk: two steps, whichever way.
-    if (from !== view) walkSteps(ctx, from, view);
-    // A line waiting for this place comes forward; one that belongs elsewhere is taken back.
-    settleSession(ctx.session);
-    ctx.session.phoneOpen = false;
-    ctx.session.itemsOpen = false;
-    ctx.session.caseOpen = false;
-    ctx.session.holding = null;
-    restHand(ctx.session);
-    // The pointer finds the new view's edges itself.
-    ctx.session.edge = null;
-    // 走到门边 is the camera move: arriving at 门 with the bag outside is that step.
-    if (view === "door" && from !== "door") doorWalk(ctx);
-    lookedAway(ctx);
-    // The desktop opens on the monitor with the current app; looking at it counts.
-    if (view === "desktop") lookAt(ctx, shownApp(ctx.session));
-    // 看一眼桌子: arriving at 桌子 while the item is open is the look; the desk beat plays here.
-    if (view === "desk" && nightFallen(ctx) && openFor(ctx, (e) => e.type === "beat" && e.beat === "desk")) stepOnce(ctx, "beat:desk");
-    settleSession(ctx.session);
-    ctx.rerender();
+    goTo(ctx, view, data);
+  },
+
+  // A 90° turn on a facing (room-turn R2): the turn edges and ←/→. Not while something is over the
+  // view. Asked for during a turn, it waits for that one to end; one waits at most, a third is dropped.
+  turn(ctx, data) {
+    const dir = data.dir as TurnDir;
+    const { session } = ctx;
+    if ((dir !== "left" && dir !== "right") || !isFacing(session.view) || overlayOpen(session) || session.objbarOpen) return;
+    if (turning(ctx)) {
+      session.turnNext ??= dir;
+      return;
+    }
+    arrive(ctx, turnedTo(session.view as Facing, dir), {} as DOMStringMap);
   },
 
   // The dock and the toggle also count as looking at the app now on screen.
@@ -426,13 +502,30 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.rerender();
   },
 
-  // 吃: the meal on the desk bar, once it has been taken in.
+  // 吃: the meal on the little table under the window (room-turn R3), once it has been taken in.
+  // Eating happens there: 桌子 no longer has the meal.
   "loop-eat"(ctx, data) {
+    if (ctx.session.view !== "window") return;
     const lc = loopContext(ctx.store.getState(), ctx.store.getEvents());
     const at = lc ? deskMeal(lc) : null;
     if (!at || at.eaten || at.meal !== data.meal) return;
     stepOnce(ctx, `eat:${at.meal}`);
     ctx.rerender();
+  },
+  // The table itself, while a meal is on it, is the same eat step; an empty table is only a click.
+  "meal-table"(ctx) {
+    const lc = loopContext(ctx.store.getState(), ctx.store.getEvents());
+    const at = lc ? deskMeal(lc) : null;
+    if (!at || at.eaten) return;
+    loopActions["loop-eat"]!(ctx, { meal: at.meal } as DOMStringMap, null as never);
+  },
+  // The parcel box seen from 床 (room-turn R3): turn left to 房间, then today's box action there.
+  "bed-box"(ctx) {
+    if (ctx.session.view !== "bed") return;
+    loopActions["view"]!(ctx, { view: "room" } as DOMStringMap, null as never);
+    ctx.later(wayMs("bed", "room") + WAY_GAP_MS, () => {
+      if (ctx.session.view === "room") loopActions["pick-box"]!(ctx, {} as DOMStringMap, null as never);
+    });
   },
 
   // 关机: in the work system's own top bar. The shutdown beat plays, both monitors darken, and
@@ -448,7 +541,7 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.rerender();
   },
 
-  // 躺下: the bed in 房间. Before night falls it only says so; after, it stays locked until the
+  // 躺下: the bed, in 房间 or at 床. Before night falls it only says so; after, it stays locked until the
   // night's required items are done; then it asks (睡 / 再待会儿). Sleeping plays the night and lying
   // down comes at its end (design L6; day-loop addition 2026-11-02).
   bed(ctx) {
@@ -468,17 +561,17 @@ export const loopActions: Record<string, ActionHandler> = {
     session.dialogue = push(session.dialogue, { key: `d${day}:bed:ask`, lines: [{ k: "inner", t: t("room.bed.confirm") }], ending: { kind: "bedAsk" } });
     ctx.rerender();
   },
-  // The answer to 睡: the camera goes to 床, then the night begins.
+  // The answer to 睡: the player turns to 床 the shortest way (room-turn R2), then the night begins.
   sleep(ctx) {
     const { store, session } = ctx;
     const day = store.getState().day;
-    // Pointing at the bed glides the camera to 床 first (the splat holds that framing; without the
-    // splat there is nowhere to glide and the night begins where the player is). The night begins as
-    // the camera arrives.
-    if (session.splatReady && session.view !== "bed" && !(session.cam && session.cam.until > (ctx.now?.() ?? Date.now()))) {
+    // Not at 床 yet: go there; the night begins as the turn ends, and only if the player is still
+    // there (turning away meanwhile cancels it, as backing out of the old glide did).
+    if (session.view !== "bed") {
+      if (session.cam && session.cam.until > (ctx.now?.() ?? Date.now())) return;
+      const ms = wayMs(session.view, "bed");
       loopActions["view"]!(ctx, { view: "bed" } as DOMStringMap, null as never);
-      // (Backing out meanwhile cancels the night: it begins only if the camera is still there.)
-      ctx.later(viewMoveMs("room", "bed", true) + 20, () => {
+      ctx.later(ms + 20, () => {
         if (ctx.session.view === "bed") loopActions["sleep"]!(ctx, {} as DOMStringMap, null as never);
       });
       return;
@@ -1132,9 +1225,17 @@ export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
     loopActions["loop-put-down"]!(ctx, {} as DOMStringMap, null as never);
     return true;
   }
-  if (e.key === "Escape" && ctx.session.view !== "room") {
-    // One camera level out: 屏幕 → 桌子 → 房间; 门 and 床 → 房间.
-    loopActions["view"]!(ctx, { view: backTarget(ctx.session.view) ?? "room" } as DOMStringMap, null as never);
+  // One camera level out: 屏幕 → 桌子 → 房间. On a facing Esc does nothing: there is no back (room-turn R1).
+  const back = backTarget(ctx.session.view);
+  if (e.key === "Escape" && back) {
+    loopActions["view"]!(ctx, { view: back } as DOMStringMap, null as never);
+    return true;
+  }
+  // ← / → turn, on the four facings only, and only when nothing else has the keys: no line in the
+  // box (it reads on with Space / Enter), no text field, nothing held, no panel or list over the view.
+  if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && isFacing(ctx.session.view)) {
+    if (typingIn(e.target) || ctx.session.dialogue.queue.length > 0 || overlayOpen(ctx.session) || ctx.session.objbarOpen) return false;
+    loopActions["turn"]!(ctx, { dir: e.key === "ArrowLeft" ? "left" : "right" } as DOMStringMap, null as never);
     return true;
   }
   // Space / Enter read on in every view, 屏幕 too; never while the player is typing (the Kuro draft, a search box).

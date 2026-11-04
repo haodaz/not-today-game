@@ -18,7 +18,7 @@ import { loopActions, loopKeys, renderGame } from "@world/room/game";
 import { boxObjectFor, renderRoom, SLIP_ITEM } from "@world/room/hud";
 import { syncLoop } from "@world/loop/runtime";
 import { deskGap, deskLayout, fullMonitor, objectSlot, OBJECT_SLOTS, parseDesk } from "@world/room/desk";
-import { DESK_SHOT, rectStyle, ROOM_SHOT } from "@world/room/shots";
+import { DESK_SHOT, rectStyle, ROOM_SHOT, WINDOW_SHOT } from "@world/room/shots";
 import { completeUntil } from "./complete-items";
 
 afterEach(() => setLocale("zh"));
@@ -121,18 +121,20 @@ describe("each placed thing at its rect", () => {
 });
 
 describe("the meal, the box and the slip", () => {
-  it("the meal: nothing before 去拿; the food after; eaten, its empty box stays at the same place", () => {
+  it("the meal (room-turn R3): never on 桌子 now; on 窗's little table after 去拿; eaten, its empty box stays at the same place", () => {
     const store = atDay(1);
     completeUntil(store, "pickup");
-    expect(placed(render(ctxOf(store)), "meal")).toBeNull();
+    expect(placed(render(ctxOf(store, "window")), "meal")).toBeNull();
     completeUntil(store, "eat");
-    const ctx = ctxOf(store);
+    // 桌子 no longer draws it, and 桌子's tabletop has no meal place at all.
+    expect(placed(render(ctxOf(store)), "meal")).toBeNull();
+    const ctx = ctxOf(store, "window");
     const out = render(ctx);
-    expect(placed(out, "meal")).toBe(rectStyle(deskLayout.meal));
+    expect(placed(out, "meal")).toBe(rectStyle(WINDOW_SHOT.meal));
     expect(out).toMatch(/data-at="meal" style="[^"]+"><button type="button" class="slot meal" data-action="loop-eat" data-meal="lunch"/);
     act(ctx, "loop-eat", { meal: "lunch" });
     const after = render(ctx);
-    expect(placed(after, "meal")).toBe(rectStyle(deskLayout.meal));
+    expect(placed(after, "meal")).toBe(rectStyle(WINDOW_SHOT.meal));
     expect(after).toMatch(/data-at="meal" style="[^"]+"><div class="slot meal done" data-meal="lunch">/);
   });
 
@@ -197,7 +199,7 @@ describe("道具: the strip as a panel", () => {
     }
   });
 
-  it("lifting from the strip closes it; on 屏幕 or 门 the camera goes to 桌子 first, where it is held", () => {
+  it("lifting from the strip closes it; on 屏幕 the camera goes to 桌子 first, at 门 it turns to 房间 (room-turn), where it is held", () => {
     const store = atDay(1);
     store.appendEvent({ kind: "openLayer", objectId: "pager" });
     for (const view of ["desktop", "door", "room"] as const) {
@@ -206,7 +208,7 @@ describe("道具: the strip as a panel", () => {
       act(ctx, "loop-hold", { object: "pager" });
       expect(ctx.session.itemsOpen).toBe(false);
       expect(ctx.session.holding).toBe("pager");
-      expect(ctx.session.view).toBe(view === "room" ? "room" : "desk");
+      expect(ctx.session.view).toBe(view === "desktop" ? "desk" : "room");
       expect(render(ctx)).toContain('class="held-layer" data-held="pager"');
       const phone = ctxOf(store, view);
       act(phone, "items-toggle");

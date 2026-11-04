@@ -1766,3 +1766,68 @@ code is elsewhere), so it neither opens the object nor auto-unlocks.
 - Note: `content/files.json` now lists `vivi-plan-2` from day 2, so test fixtures no longer
   hard-code its day.
 - `npx tsc --noEmit`: clean. `npx vitest run`: 100 files / 1779 tests passed.
+
+## room-turn: four facings you turn between (2026-11-04)
+
+The room's top level is now four facings: 房间 (the desk wall), 床, 门 and 窗. Turning right goes
+房间 → 床 → 门 → 窗 → 房间. On every facing the left and right 8 % are turn edges (← / → with
+`hud.turn.*`, the walk cursor), and ← / → turn when nothing else has the keys. No facing has a back:
+门 lost its bottom strip, 房间 lost its door edge, and Esc / right-click / wheel-back do nothing
+there. 桌子 and 屏幕 stay levels under 房间 and still back out. A turn is a 450 ms slide (a
+crossfade under reduced motion). Anything that moves to `door` / `bed` goes the shortest way: two
+turns to the opposite wall, and a walk out of 桌子 / 屏幕 first. 床 has a still of its own with the
+bed and the box, 窗 has the little table, and the meal and eating moved from 桌子 to that table.
+Session only; no event.
+
+- `src/world/room/facings.ts` (new): `FACINGS`, `isFacing`, `turnedTo`, `turnsBetween` (two
+  rights to the opposite wall), `hasBack`, `TURN_EDGE`.
+- `src/world/desktop/model.ts`: `View` gains `window`. New `EdgeZone` (`left` / `right` / `back`).
+  `cam.turn` holds `{ dir, hops, via }`, and `turnNext` is the one waiting turn.
+- `src/world/motion/timing.ts`: `CHOSEN.turn` 450 and `turnFast` 300 replace `roomDoor`.
+  `viewMoveMs` gives 450 for adjacent facings and 600 for opposite ones. New `TURN_EASE` and the
+  `--m-turn*` vars.
+- `src/world/room/game.ts`:
+  - The `view` action goes the shortest way (`goTo`). Each leg is `arrive`, the old view body.
+  - `wayMs` gives the total time of a way.
+  - New `turn` action: queues one turn during a turn and drops a third.
+  - `startCam` records a turn: nothing waits for the camera, and the queued turn runs at the end.
+  - `backTarget`: only 屏幕 → 桌子 → 房间.
+  - Keys: Esc backs out only where there is a level; ← / → turn.
+  - `sleep` turns to 床, then the night begins if the player is still there.
+  - New `bed-box` action: turn left, then `pick-box`.
+  - New `meal-table` action. `loop-eat` works only at 窗.
+  - `fromItemsPanel` now turns from 门 to 房间 instead of walking to 桌子.
+- `src/world/room/hud.ts`:
+  - 床 and 窗 get flat proxies (`bed`, `box`, `mealTable`). 窗's meal sits at `WINDOW_SHOT.meal`.
+  - 桌子's tabletop and the 道具 strip no longer have the meal.
+  - Turn edge hints, and an `edge-left` / `edge-right` stage class.
+  - fx and the evening look apply on all facings. The raid stays per view, with 窗 like 房间.
+- `src/world/room/shots.ts`: `BED_SHOT`, `WINDOW_SHOT`, `FLAT_HOTS`. `look.ts`: `edgeZone` /
+  `edgeLeads` use the turn edges, and back is 桌子 only. `nav.ts`: rectangle picking on 床 / 窗;
+  the bottom strip and the wheel only where there is a back; edge clicks run `turn`; every facing pans.
+- `src/world/motion/dom.ts`: `turnChange` / `turnEntry`.
+  - The leaving still is a copy of its picture and its parts, slid out inside the live stage.
+  - The live stage's picture and parts slide in; its HUD stays.
+  - For the opposite wall, the wall in between passes through.
+  - Copies are keyed `turn-out` / `turn-via`, so a facing still has exactly one backdrop.
+  - Reduced motion goes through `viewChange`.
+- `src/world/motion/motion.css`: the `m-turn-*` keyframes and rules. They use vars only.
+- `src/world/room/room.css`: `bed.jpg` and `window.jpg` stills, the turn hints, `.facing-things`.
+  `cursors.css`: walk on turn edges.
+- `src/world/fit.ts`: `BACKDROPS` for bed and window.
+- `src/world/room/fx/index.ts` and `shader.ts`: `FxView` gains bed and window. `stagePhoto` falls
+  back to the base still where stage stills are missing.
+- splat (`moves.ts`, `layer.ts`, `hotspots.ts`): 床 is no longer a splat move, a live hold or a
+  hot view. The calibrated 床 pose and its boxes stay.
+- `src/world/dialogue/place.ts`: room lines also play on 床 and 窗. `src/main.ts`: `?view=bed|window`.
+- Tests:
+  - `navigation.test.ts`: turn order, edges, keys, the queue, shortest way, knock, sleep, 床's box,
+    snapshots of the four facings and 房间 with the right arrow, and no back on a facing. The door
+    edge, the 门 back strip and the splat 床 hold are gone.
+  - `motion-dom.test.ts`: the walk round turns now; the slide; the two-turn pass; reduced motion.
+  - `actuators.test.ts` and `desk.test.ts`: the meal at 窗; sleep turns first.
+  - `polish.test.ts`: CHOSEN keys and per-element vars.
+  - `splat.test.ts`, `hotspots.test.ts`, `fixes-1031.test.ts`: the new move list and timings,
+    `hotViewOf`, Esc on 门.
+  - The obsolete door-hint snapshots were removed.
+- `npx tsc --noEmit`: clean. `npx vitest run`: 100 files / 1790 tests passed (3 snapshots written).

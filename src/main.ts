@@ -102,7 +102,7 @@ function startGame(store: Store, saved: boolean, from?: "desk"): void {
     clock: parseBeatParams(search),
     focus: focus === "right" ? "right" : "left",
     // A new run begins where the title's question card left the camera: at 桌子.
-    view: view === "desktop" || view === "door" || view === "desk" ? view : (from ?? "room"),
+    view: view === "desktop" || view === "door" || view === "desk" || view === "bed" || view === "window" ? view : (from ?? "room"),
     render: renderGame,
     actions: {
       ...desktopActions,

@@ -60,11 +60,13 @@
   cursor: url(/cursors/open.png) 16 16, auto;
 }
 
-/* walk: a walk target (the desk, the bed, the door edge hint). */
+/* walk: a walk target (the desk, the bed, the door), and a facing's turn edges (room-turn 2026-11-04). */
 [data-action="view"][data-view="desk"],
 [data-action="view"][data-view="door"],
 .door-hit,
-[data-action="bed"] {
+[data-action="bed"],
+.room.edge-left,
+.room.edge-right {
   cursor: url(/cursors/walk.png) 16 28, auto;
 }
 

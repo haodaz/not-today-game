@@ -32,6 +32,20 @@
    step), so no edge ever shows and nothing jumps at the start: never a zoom. Copies are 1600 × 900. */
 @keyframes m-walk-bob{0%,100%{background-size:1600px 900px;background-position:50% 50%}25%,75%{background-size:calc(1600px + 1600px * 2 * var(--m-walk-bob-n,4) / 900) calc(900px + 2px * var(--m-walk-bob-n,4));background-position:50% calc(50% + 1px * var(--m-walk-bob-n,4))}50%{background-size:calc(1600px + 1600px * 2 * var(--m-walk-bob-n,4) / 900) calc(900px + 2px * var(--m-walk-bob-n,4));background-position:50% calc(50% - 1px * var(--m-walk-bob-n,4))}}
 @keyframes m-cam-push-in{from{translate:var(--m-tx) var(--m-ty);scale:var(--m-z)}}
+/* A turn between facings (room-turn 2026-11-04): a horizontal slide, eased in and out, the walk's bob
+   once (a dip of --m-walk-bob-n px). The arriving stage keeps its HUD still: only its picture and its
+   still's parts slide in; the leaving still (a copy, with its placed things) slides out over it. To
+   the opposite wall the wall between passes through (two turns, back to back). */
+@keyframes m-turn-in{from{translate:var(--m-turn-dx) 0}}
+@keyframes m-turn-out{to{translate:calc(-1 * var(--m-turn-dx)) 0}}
+@keyframes m-turn-through{from{translate:var(--m-turn-dx) 0}50%{translate:0 0}to{translate:calc(-1 * var(--m-turn-dx)) 0}}
+@keyframes m-turn-bob{50%{margin-top:calc(1px * var(--m-walk-bob-n))}}
+@keyframes m-turn-bg-in{from{background-position-x:calc(50% + var(--m-turn-dx))}}
+@keyframes m-turn-bg-bob{50%{background-position-y:calc(50% + 1px * var(--m-walk-bob-n))}}
+.stage.m-turn-in{background-repeat:no-repeat;animation:m-turn-bg-in var(--m-turn) var(--m-turn-ease) var(--m-turn-t) both,m-turn-bg-bob var(--m-turn) ease-in-out var(--m-turn-t) both}
+.stage.m-turn-in > :is(.fx,.window-light,.evening-look,.scene,.shot-hit,.desk-things,.facing-things,.figures,.desk-book,.door-bg,.door-spot,.door-hand,.door-beat,.gap-glow,.box-open){animation:m-turn-in var(--m-turn) var(--m-turn-ease) var(--m-turn-t) both,m-turn-bob var(--m-turn) ease-in-out var(--m-turn-t) both}
+.stage.m-turn-in.fast,.stage.m-turn-in.fast > :is(.fx,.window-light,.evening-look,.scene,.shot-hit,.desk-things,.facing-things,.figures,.desk-book,.door-bg,.door-spot,.door-hand,.door-beat,.gap-glow,.box-open){animation-duration:var(--m-turn-fast),var(--m-turn-fast)}
+.stage.m-turn{pointer-events:none;background-repeat:no-repeat}
 /* Shutdown: the monitor darkens in place (it changes, it does not leave) */
 @keyframes m-power-off{from{filter:hue-rotate(var(--tint,0deg)) blur(var(--blur,0px)) brightness(1.8)}}
 /* Left ↔ right */

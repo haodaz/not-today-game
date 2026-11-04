@@ -137,7 +137,7 @@ export function createSplatLayer(deps: SplatDeps) {
     // Calibration (dev only): the poses being tuned, and the readout.
     const cal: Record<PoseId, Pose> = { ...POSES };
     let readout: HTMLElement | null = null;
-    // The head turn, and 床 held at rest (the splat is its picture).
+    // The head turn (and a framing held at rest, which nothing asks for since 床 became a still).
     let liveView: PoseId | null = null;
     let hold = false;
     let turn: Turn = NO_TURN;
@@ -274,8 +274,6 @@ export function createSplatLayer(deps: SplatDeps) {
         frame = raf(tick);
         return;
       }
-      // 床: the move ends in the framing and the splat stays as its picture.
-      if (ctx.session.view === "bed" && scene) return enterLive("bed", true, liveStage());
       el?.remove();
     }
 
@@ -283,9 +281,12 @@ export function createSplatLayer(deps: SplatDeps) {
 
     const LIVE_IN_MS = 150;
 
-    /** Only where a pose exists, nothing is moving, and the collapsed splat is there when the ring wants it. */
+    /**
+     * Only in 房间 and 桌子 (床 is a facing with its own still now, room-turn 2026-11-04), nothing is
+     * moving, and the collapsed splat is there when the ring wants it.
+     */
     function canLive(view: string): view is PoseId {
-      return status === "ready" && !!scene && !running && !ctx.session.pullOut && isPosed(view) && !(lookNow().mix > 0 && collapsed !== "yes");
+      return status === "ready" && !!scene && !running && !ctx.session.pullOut && (view === "room" || view === "desk") && !(lookNow().mix > 0 && collapsed !== "yes");
     }
 
     function enterLive(view: PoseId, holdIt: boolean, stage: HTMLElement | null): void {
@@ -499,7 +500,7 @@ export function createSplatLayer(deps: SplatDeps) {
           const view = ctx.session.view;
           const stage = liveStage();
           if (!stage || !canLive(view)) return false;
-          enterLive(view, view === "bed", stage);
+          enterLive(view, false, stage);
         }
         // Back from the way out: the photo stays away.
         if (outStart !== null) {

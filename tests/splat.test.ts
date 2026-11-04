@@ -135,9 +135,9 @@ describe("the window clamp", () => {
 });
 
 describe("which moves, and the look by ring", () => {
-  it("the splat carries every move between the posed framings (房间, 桌子, 床); 门 and 屏幕 have no pose and keep the CSS", () => {
-    for (const [a, b] of [["room", "desk"], ["desk", "room"], ["room", "bed"], ["bed", "room"], ["desk", "bed"], ["bed", "desk"]] as const) expect(splatMoveFor(a, b), `${a}→${b}`).not.toBeNull();
-    for (const [a, b] of [["room", "door"], ["door", "room"], ["desk", "desktop"], ["desktop", "room"], ["room", "room"], ["bed", "door"]] as const) expect(splatMoveFor(a, b), `${a}→${b}`).toBeNull();
+  it("the splat carries 房间 ↔ 桌子; the other facings (床, 门, 窗: stills you turn to, room-turn) and 屏幕 keep the CSS", () => {
+    for (const [a, b] of [["room", "desk"], ["desk", "room"]] as const) expect(splatMoveFor(a, b), `${a}→${b}`).not.toBeNull();
+    for (const [a, b] of [["room", "bed"], ["bed", "room"], ["desk", "bed"], ["room", "window"], ["room", "door"], ["door", "room"], ["desk", "desktop"], ["desktop", "room"], ["room", "room"], ["bed", "door"]] as const) expect(splatMoveFor(a, b), `${a}→${b}`).toBeNull();
   });
 
   it("the mix by ring: 0 before ring room, room 40 %, door 100 %", () => {
@@ -386,15 +386,15 @@ describe("the layer: fallback, the move, the cross-fade", () => {
 });
 
 describe("900 ms moves and calibration helpers", () => {
-  it("walking: the move takes as long as the path, both ways (房间↔桌子 900, 房间↔门 1200, 桌子↔屏幕 500); the rest the 400 ms crossfade", () => {
+  it("walking: the move takes as long as the path, both ways (房间↔桌子 900, 桌子↔屏幕 500); a turn between facings 450, two 300 ms turns to the opposite wall (room-turn); the rest the 400 ms crossfade", () => {
     expect(CHOSEN.roomDesk).toBe(900);
-    for (const [a, b, ms] of [["room", "desk", 900], ["room", "door", 1200], ["desk", "desktop", 500], ["room", "desktop", 900], ["room", "bed", MOTION.view]] as const) {
+    for (const [a, b, ms] of [["room", "desk", 900], ["desk", "desktop", 500], ["room", "desktop", 900], ["room", "bed", 450], ["bed", "door", 450], ["door", "window", 450], ["window", "room", 450], ["room", "door", 600], ["bed", "window", 600], ["desk", "door", MOTION.view]] as const) {
       expect(viewMoveMs(a, b), `${a} → ${b}`).toBe(ms);
       expect(viewMoveMs(b, a), `${b} → ${a}`).toBe(ms);
     }
+    expect([CHOSEN.turn, CHOSEN.turnFast]).toEqual([450, 300]);
     expect(CROSSFADE_MS).toBe(400);
-    expect(walkMs("room", "door")).toBe(800);
-    expect(walkMs("room", "bed")).toBe(0);
+    expect(walkMs("room", "desk")).toBe(500);
   });
 
   it("calibration only with ?splatcal=1 in a dev build", () => {

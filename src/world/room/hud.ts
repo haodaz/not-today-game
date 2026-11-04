@@ -21,7 +21,8 @@ import { ordersOn } from "@world/delivery/meals";
 import { raidNights, takeOf } from "@state/nights";
 import { isNight } from "@world/desktop/beat";
 import { hudKuro } from "@world/desktop/kuro/mini";
-import { DESK_SHOT, DOOR_SHOT, rectStyle, ROOM_SHOT, type Rect } from "./shots";
+import { DESK_SHOT, DOOR_SHOT, FLAT_HOTS, isFlatFacing, rectStyle, ROOM_SHOT, WINDOW_SHOT, type FlatHotId, type Rect } from "./shots";
+import { isFacing } from "./facings";
 import { deskLayout, objectSlot } from "./desk";
 import { fxPlan, renderFx } from "./fx";
 import { fixedRects, hotIdsIn, hotViewOf, type HotId, type HotView } from "./splat/hotspots";
@@ -84,7 +85,6 @@ function dayCorner(state: State, session: Session): SafeHtml {
 export interface DeskThings {
   readonly phone: SafeHtml;
   readonly cup: SafeHtml;
-  readonly meal: SafeHtml | null;
   /** In found (arrival) order; what was handed to the hand is not here. */
   readonly objects: readonly { readonly id: string; readonly html: SafeHtml }[];
   /** Day 18's slip, once its checklist line is open (on the tabletop, and in the 道具 strip). */
@@ -147,7 +147,6 @@ export function deskThings(state: State, events: readonly GameEvent[], session: 
   return {
     phone: html`<button type="button" class="${cls("slot", session.phoneOpen && "lifted")}" data-action="loop-phone"><img class="desk-photo" src="/room/desk/phone.png" alt="" aria-hidden="true"><span>${tr("hud.phone")}</span></button>`,
     cup: html`<div class="slot"><img class="desk-photo cup" src="/room/desk/cup.png" alt="" aria-hidden="true"></div>`,
-    meal: mealSlot(state, events),
     objects,
     slip: slipThing(state, events),
     walkman: walkmanThing(state, session),
@@ -169,12 +168,41 @@ function slipThing(state: State, events: readonly GameEvent[]): SafeHtml | null 
   return html`<button type="button" class="slot slip" data-action="desk-slip" aria-label="${title}"><img class="desk-photo" src="/room/desk/slip.png" alt="" aria-hidden="true"></button>`;
 }
 
-/** 桌子's object layer: each thing at its rect on desk_top.jpg (content/desk.json). */
+/** A placed thing at its rect (on the tabletop, or on a facing's still). */
+const placedAt = (name: string, r: Rect | null, inner: SafeHtml | null) =>
+  r && inner ? html`<div class="at" data-at="${name}" style="${rectStyle(r)}">${inner}</div>` : null;
+
+/**
+ * 桌子's object layer: each thing at its rect on desk_top.jpg (content/desk.json). The meal is not
+ * here any more: it sits on the little table under the window (room-turn R3); desk.json's `meal`
+ * rect is read but unused.
+ */
 function tabletop(things: DeskThings): SafeHtml {
-  const at = (name: string, r: Rect | null, inner: SafeHtml | null) =>
-    r && inner ? html`<div class="at" data-at="${name}" style="${rectStyle(r)}">${inner}</div>` : null;
+  const at = placedAt;
   const objects = things.objects.map((o, i) => at(`object:${o.id}`, objectSlot(deskLayout, i), o.html));
-  return html`<div class="desk-things">${at("cup", deskLayout.cup, things.cup)}${at("phone", deskLayout.phone, things.phone)}${at("meal", deskLayout.meal, things.meal)}${objects}${at("slip", deskLayout.slip, things.slip)}${at("deliverable", DELIVERABLE_RECT, things.deliverable)}${at("walkman", deskLayout.walkman, things.walkman)}</div>`;
+  return html`<div class="desk-things">${at("cup", deskLayout.cup, things.cup)}${at("phone", deskLayout.phone, things.phone)}${objects}${at("slip", deskLayout.slip, things.slip)}${at("deliverable", DELIVERABLE_RECT, things.deliverable)}${at("walkman", deskLayout.walkman, things.walkman)}</div>`;
+}
+
+/** 窗's placed thing (room-turn R3): today's meal on the little table, the same art scaled to its rect. */
+function windowThings(state: State, events: readonly GameEvent[]): SafeHtml | null {
+  const meal = mealSlot(state, events);
+  return meal ? html`<div class="facing-things">${placedAt("meal", WINDOW_SHOT.meal, meal)}</div>` : null;
+}
+
+/**
+ * The flat facings' things to point at (room-turn R3): fixed rectangles (FLAT_HOTS), keyboard
+ * proxies like 房间's, picked by the nav layer by rectangle instead of by a ray.
+ */
+const FLAT_PROXY: Readonly<Record<FlatHotId, { readonly cls: string; readonly attrs: string; readonly label: string }>> = {
+  bed: { cls: "shot-hit bed-hit", attrs: 'data-action="bed"', label: "room.bed" },
+  box: { cls: "shot-hit box-hit", attrs: 'data-action="bed-box"', label: "room.box" },
+  mealTable: { cls: "shot-hit table-hit", attrs: 'data-action="meal-table"', label: "room.mealTable" },
+};
+function flatHits(view: "bed" | "window"): SafeHtml {
+  return html`${FLAT_HOTS[view].map(({ id, rect }) => {
+    const p = FLAT_PROXY[id];
+    return html`<button type="button" class="${p.cls}" ${raw(p.attrs)} style="${rectStyle(rect)}" aria-label="${t(p.label)}" data-hot="${id}"></button>`;
+  })}`;
 }
 
 /** 道具 (day-loop correction 2026-11-01): the button next to ⚙; it opens and closes the strip. */
@@ -209,14 +237,15 @@ export function casePanel(state: State, events: readonly GameEvent[], session: S
 export function itemsPanel(state: State, events: readonly GameEvent[], session: Session): SafeHtml | null {
   if (!session.itemsOpen) return null;
   const th = deskThings(state, events, session);
-  return html`<div class="items-panel" id="items-panel" role="dialog" aria-label="${t("hud.items")}"><div class="items-strip">${th.phone}${th.cup}${th.meal}${th.objects.map((o) => o.html)}${th.slip}${th.deliverable}</div></div>`;
+  // The meal is not in the strip (room-turn R3): eating happens at the window's table.
+  return html`<div class="items-panel" id="items-panel" role="dialog" aria-label="${t("hud.items")}"><div class="items-strip">${th.phone}${th.cup}${th.objects.map((o) => o.html)}${th.slip}${th.deliverable}</div></div>`;
 }
 
 /**
- * The meal on the desk bar (day-loop correction 2026-11-01): after 去拿 it sits there as its food
- * image (content/delivery.json `sprite`); clicking it eats. Eaten, its empty box stays until the
- * next meal is taken in: `<sprite>_done.png` where content has one, else the food image greyed
- * (the <object> falls back to its <img> when the _done file is missing).
+ * The meal on the little table under the window (room-turn R3; it was the desk bar's): after 去拿
+ * it sits there as its food image (content/delivery.json `sprite`); clicking it eats. Eaten, its
+ * empty box stays until the next meal is taken in: `<sprite>_done.png` where content has one, else
+ * the food image greyed (the <object> falls back to its <img> when the _done file is missing).
  */
 function mealSlot(state: State, events: readonly GameEvent[]): SafeHtml | null {
   const lc = loopContext(state, events);
@@ -412,24 +441,28 @@ function eveningLook(view: string): SafeHtml {
   const glow = lamp ? html`<i class="evening-lamp" style="left:${lamp.l + lamp.w / 2}px;top:${lamp.t + lamp.h / 2}px"></i>` : null;
   return html`<div class="evening-look" style="--evening-dark:${EVENING_DARK}">${glow}</div>`;
 }
+/** The edge hints' words: a turn's way (room-turn R2), or 桌子's way back. */
+const EDGE_LABEL = { left: "hud.turn.left", right: "hud.turn.right", back: "hud.back" } as const;
+
 /**
- * The hinted edge (room-scene 2026-11-02): a soft arrow and 门 at 房间's right, 退回 at the bottom;
- * it fades in over 200 ms (continued across re-renders) and sits under the HUD. Only where it
- * leads somewhere (edgeZone and the nav layer decide).
+ * The hinted edge: on a facing a soft ← or → with 向左转 / 向右转 at the left / right 8 % (room-turn
+ * R2), at 桌子 退回 at the bottom. It fades in over 200 ms (continued across re-renders) and sits
+ * under the HUD. Only where it leads somewhere (edgeZone and the nav layer decide).
  */
 function edgeHint(session: Session, view: string, nowMs: number): SafeHtml | null {
   const edge = session.edge;
   if (!edge || !edgeLeads(view, edge.zone)) return null;
   const since = nowMs > 0 ? Math.max(0, nowMs - edge.since) : HINT_FADE_MS;
   const late = since < HINT_FADE_MS ? raw(` style="--late:-${Math.round(since)}ms"`) : null;
-  const label = t(edge.zone === "door" ? "hud.cam.door" : "hud.back");
-  return html`<div class="edge-hint ${edge.zone}" aria-hidden="true"${late}>${edge.zone === "door" ? html`<i class="arrow"></i>` : null}<span>${label}</span></div>`;
+  const arrow = edge.zone === "back" ? null : html`<i class="arrow"></i>`;
+  return html`<div class="edge-hint ${edge.zone}" aria-hidden="true"${late}>${arrow}<span>${tr(EDGE_LABEL[edge.zone])}</span></div>`;
 }
 export function renderRoom(model: RoomModel): SafeHtml {
   const { state, events, session } = model;
   const lc = loopContext(state, events);
   const list = lc ? renderChecklist(checklist(lc)) : null;
-  const view = session.view === "desk" || session.view === "door" || session.view === "bed" ? session.view : "room";
+  // The four facings and 桌子 (屏幕 is the desktop's own render).
+  const view = isFacing(session.view) || session.view === "desk" ? session.view : "room";
   const door = view === "door";
   const nowMs = model.nowMs ?? 0;
   // The placed things belong to the arriving framing: they wait for the camera, then fade in.
@@ -442,21 +475,25 @@ export function renderRoom(model: RoomModel): SafeHtml {
   // evening look and the collapse shader step aside until the sequence ends.
   const lineScene = sceneOf(session.dialogue);
   const dream = lineScene.backdrop !== null;
-  const scene = waiting || dream ? null : door ? doorContent(state, events, session) : hotView ? html`${shotHits(hotView, state, events)}${kept}` : null;
+  const flat = isFlatFacing(view) ? html`${flatHits(view)}${view === "window" ? windowThings(state, events) : null}` : null;
+  const scene = waiting || dream ? null : door ? doorContent(state, events, session) : hotView ? html`${shotHits(hotView, state, events)}${kept}` : flat;
   // The held item sits over everything but the dialogue box (held-object.html).
   const held = door ? null : heldLayer(state, events, session, nowMs);
   // The hand is here: the desk dims and the gap between the monitors glows (night-hand FR1; the
   // room scene will draw the gap itself).
+  // Per view as before (room-turn R4): none at 门 or 床; 窗 behaves like 房间.
   const raid = !door && view !== "bed" && !waiting && raidShowing(state, session);
-  const gap = (view === "room" ? ROOM_SHOT : DESK_SHOT).gap;
+  const gap = (view === "room" || view === "window" ? ROOM_SHOT : DESK_SHOT).gap;
   // 桌子 is the tabletop: everything with state is a placed cutout at its rect (content/desk.json).
   const top = view === "desk" && !waiting && !dream ? tabletop(deskThings(state, events, session)) : null;
-  const fx = view === "bed" || dream ? null : renderFx(fxPlan(state.day, view));
-  // 床 shows the splat's own night layers.
-  const evening = isEvening(session.clock) && view !== "bed" && !dream ? eveningLook(view) : null;
+  // The collapse stack and the evening look apply to all four facings (room-turn R4).
+  const fx = dream ? null : renderFx(fxPlan(state.day, view));
+  const evening = isEvening(session.clock) && !dream ? eveningLook(view) : null;
   const fadeLen = session.cam?.fade ?? ARRIVE_FADE_MS;
   const late = fade === null ? null : raw(` style="--late:-${Math.round(fade)}ms${fadeLen !== ARRIVE_FADE_MS ? `;--late-dur:${fadeLen}ms` : ""}"`);
-  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid", fade !== null && "m-late", dream && "scene-on")}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${renderScene(lineScene)}${scene}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${itemsPanel(state, events, session)}${view === "room" ? casePanel(state, events, session, model.runId ?? "run", nowMs) : null}${held}${model.boxOutside ? null : dialogueBox(state, events, session, nowMs)}${bottomRight(model)}${settingsButton()}${itemsButton(session)}${model.boxOutside ? null : settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
+  // On a turn edge the cursor is `walk` (room-turn R2; cursors.css reads the class).
+  const onEdge = session.edge && session.edge.zone !== "back" && edgeLeads(view, session.edge.zone) ? `edge-${session.edge.zone}` : null;
+  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid", fade !== null && "m-late", dream && "scene-on", onEdge)}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${renderScene(lineScene)}${scene}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${itemsPanel(state, events, session)}${view === "room" ? casePanel(state, events, session, model.runId ?? "run", nowMs) : null}${held}${model.boxOutside ? null : dialogueBox(state, events, session, nowMs)}${bottomRight(model)}${settingsButton()}${itemsButton(session)}${model.boxOutside ? null : settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
 }
 
 export { raidShowing };

@@ -10,8 +10,8 @@ import { settle, type Here } from "@world/loop/dialogue";
 export function hereOf(s: Pick<Session, "view" | "focus" | "leftApp" | "clock" | "workbenchPage" | "conversation" | "homeConversation">): Here {
   const app = frontApp(s);
   return {
-    // 床 is the room seen from the bed: a line for the room plays there too.
-    view: s.view === "bed" ? "room" : s.view,
+    // 床 and 窗 are walls of the room (room-turn 2026-11-04): a line for the room plays there too.
+    view: s.view === "bed" || s.view === "window" ? "room" : s.view,
     // Either monitor: the one being shown has the app in front.
     app,
     night: isNight(s.clock),

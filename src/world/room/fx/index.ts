@@ -8,7 +8,15 @@ import { cycleOf, isCalmDaytime } from "@state/stages";
 import { RINGS } from "@world/desktop/rings";
 import { cls, html, raw, type SafeHtml } from "@world/html";
 
-export type FxView = "room" | "desk" | "door" | "desktop";
+export type FxView = "room" | "desk" | "door" | "desktop" | "bed" | "window";
+/**
+ * The facings with no edited stage stills yet (room-turn R4): their stack uses the base still for
+ * every stage (so the CSS stack shows the clean wall), and the breathing shader does the collapse on
+ * it. Claude supplies `/room/fx/{bed,window}_<stage>.jpg` later, in the same pattern; then this goes.
+ */
+export const BASE_STILL_ONLY: Readonly<Partial<Record<FxView, string>>> = { bed: "/room/shots/bed.jpg", window: "/room/shots/window.jpg" };
+/** The photo for a stage of a view's stack. */
+export const stagePhoto = (view: FxView, stage: FxStage): string => BASE_STILL_ONLY[view] ?? `/room/fx/${view}_${stage}.jpg`;
 /** The stages in the order the world goes through them; the stack never goes back. */
 export const STAGES = ["wall", "other", "glitch", "white"] as const;
 export type FxStage = (typeof STAGES)[number];
@@ -128,7 +136,7 @@ export function renderFx(plan: FxPlan | null): SafeHtml | null {
   if (!plan || plan.layers.length === 0) return null;
   const photos = plan.layers.map((l) => {
     const flicker = l.flicker ? `;--flicker:fx-flicker-${plan.day} ${num(glitchFlicker(plan.day, l.opacity).durationMs / 1000)}s steps(1,end) infinite` : "";
-    return html`<div class="${cls("fx-photo")}" data-stage="${l.stage}" style="--fx:${num(l.opacity)};background-image:url(/room/fx/${plan.view}_${l.stage}.jpg)${flicker}"></div>`;
+    return html`<div class="${cls("fx-photo")}" data-stage="${l.stage}" style="--fx:${num(l.opacity)};background-image:url(${stagePhoto(plan.view, l.stage)})${flicker}"></div>`;
   });
   const css = plan.layers.find((l) => l.flicker);
   return html`<div class="fx" data-view="${plan.view}" aria-hidden="true">${photos}${css ? html`<style>${raw(flickerCss(plan.day, css.opacity))}</style>` : null}</div>`;

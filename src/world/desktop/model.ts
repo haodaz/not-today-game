@@ -27,11 +27,14 @@ import type { AppId, MonitorModel, ShellModel, Side } from "./shell";
 /** 工作台's pages; `msgs` is its 消息 pane (the work conversations, desktop-ui 2026-11-02 evening). */
 export type WorkbenchPage = "home" | "docs" | "ledger" | "code" | "msgs";
 /**
- * The four camera levels (day-loop amendment): 房间 room, 桌子 desk (the close-up, where things
- * are picked up and the box is opened), 屏幕 "desktop" (the screens), 门 door.
+ * Where the player is. The four facings (room-turn 2026-11-04) are the top level, turned between:
+ * 房间 room (the desk wall), 床 bed, 门 door, 窗 window. Under 房间 are the levels 桌子 desk (the
+ * tabletop, where things are picked up) and 屏幕 "desktop" (the screens).
  */
-export type View = "room" | "desk" | "door" | "desktop" | "bed";
-export const VIEWS: readonly View[] = ["room", "desk", "desktop", "door", "bed"];
+export type View = "room" | "desk" | "door" | "desktop" | "bed" | "window";
+export const VIEWS: readonly View[] = ["room", "desk", "desktop", "door", "bed", "window"];
+/** A turn edge's way (left / right 8 % of a facing), or 桌子's bottom strip back to 房间. */
+export type EdgeZone = "left" | "right" | "back";
 
 /** What the day-loop remembers between store changes (design L5/L6); session only. */
 export interface LoopMemo {
@@ -145,13 +148,26 @@ export interface Session {
    * things may appear (the arriving photo fades in over the last SPLAT_FADE_MS of a splat move, or
    * at the end of the CSS push). Wall ms; session only. Cleared by the first render after `until`.
    */
-  cam: { readonly to: View; readonly reveal: number; readonly until: number; /** How long the placed things take to fade in (ms; default 200). */ readonly fade?: number } | null;
+  cam: {
+    readonly to: View;
+    readonly reveal: number;
+    readonly until: number;
+    /** How long the placed things take to fade in (ms; default 200). */
+    readonly fade?: number;
+    /**
+     * A turn between facings (room-turn R2): its way, and how many 90° turns (two to the opposite
+     * wall, by `via`). The motion layer slides the stills; the placed things ride with theirs.
+     */
+    readonly turn?: { readonly dir: "left" | "right"; readonly hops: 1 | 2; readonly via: View | null };
+  } | null;
+  /** A turn asked for during a turn waits for it to end (room-turn R2): at most one. Session only. */
+  turnNext: "left" | "right" | null;
   /** The day the "computer isn't on" line was said (once a day). */
   screenOffDay: number;
   /** How long a delivery minute is (ms): 60 000, or 1 000 with the dev-only `?fast=1`. */
   deliveryUnitMs: number;
-  /** The hinted edge under the pointer (room-scene 2026-11-02: the door at 房间's right, back at the bottom) and since when (ms); set by the nav layer. */
-  edge: { readonly zone: "door" | "back"; readonly since: number } | null;
+  /** The hinted edge under the pointer (room-turn 2026-11-04: a facing's left / right 8 % turns; 桌子's bottom is back) and since when (ms); set by the nav layer. */
+  edge: { readonly zone: EdgeZone; readonly since: number } | null;
   /** The walkman on the desk is playing the theme (sound addition 2026-11-02); session only: no event, no state. */
   walkman: boolean;
   /** The decoy dock app whose small system window is open (desktop-ui 2026-11-02); session only. */
@@ -293,6 +309,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     screenOffDay: 0,
     splatReady: false,
     cam: null,
+    turnNext: null,
     decoyWindow: null,
     dockSay: null,
     filesApp: null,
