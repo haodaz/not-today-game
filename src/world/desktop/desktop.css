@@ -500,6 +500,24 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .wb .surface.board .bbar{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
 .wb .surface.board .bprint{border:0;border-radius:8px;background:var(--accent);color:#fff;padding:6px 16px;font:inherit;font-size:13px;cursor:pointer}
 .wb .surface.board .bprint:disabled{opacity:.4;cursor:default}
+/* ide (2026-11-04): the IDE view of a board — pages + sources | the deliverable's preview | 克总. */
+.wb .surface.board.ide{display:flex;gap:12px;align-items:stretch;height:100%;min-height:0}
+.wb .surface.board.ide .ide-left{flex:0 0 260px;display:flex;flex-direction:column;min-height:0;overflow:auto}
+.wb .surface.board.ide .ide-mid{flex:1 1 auto;min-width:0;display:flex;background:#2b323a;border-radius:6px;overflow:hidden}
+.wb .surface.board.ide .ide-frame{flex:1 1 auto;width:100%;height:100%;border:0;background:#2b323a}
+.wb .surface.board.ide .ide-right{flex:0 0 300px;display:flex;flex-direction:column;min-height:0}
+.wb .surface.board.ide .ide-h{font-size:12px;color:var(--ink-2);margin:0 0 6px}
+.wb .surface.board.ide .ide-pages{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.wb .surface.board.ide .ide-page{display:flex;flex-direction:column;gap:3px}
+.wb .surface.board.ide .ide-plabel{font-size:12px;font-weight:600}
+.wb .surface.board.ide .ide-chat{flex:1 1 auto;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:8px;padding:2px 0}
+.wb .surface.board.ide .ide-chat .wm{display:flex;gap:8px;max-width:92%;font-size:12.5px}
+.wb .surface.board.ide .ide-chat .wm .av{width:24px;height:24px;border-radius:50%;object-fit:contain;flex:0 0 auto;background:#111}
+.wb .surface.board.ide .ide-chat .wm .bub{background:var(--them);padding:6px 10px;border-radius:4px 12px 12px 12px;line-height:1.55}
+.wb .surface.board.ide .ide-chat .wm.me{align-self:flex-end}
+.wb .surface.board.ide .ide-chat .wm.me .bub{background:var(--me);border-radius:12px 4px 12px 12px}
+.wb .surface.board.ide .ide-chat .wm.typing .bub{color:var(--ink-3)}
+.wb .surface.board.ide .bbar{margin-top:8px}
 /* The printed deliverable on the desk / in the 道具 strip: the content image, or a plain paper thumb. */
 :is(.room,.items-panel) .slot.deliverable .paper-thumb{display:block;width:52px;height:64px;background:#fdfdfb;border:1px solid #d9d6cc;border-radius:2px;box-shadow:0 2px 6px rgba(0,0,0,.2),inset 0 0 0 1px #fff}
 /* Shared things drawn as what they are (desktop-ui 2026-11-03). One card shape, two registers:

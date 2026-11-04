@@ -9,7 +9,9 @@ import type { State } from "@state/types.gen";
 import type { GameEvent } from "@state/events";
 import type { Task, TaskBoard } from "@state/days/tasks";
 import { autoUnlock, boardState, canPrint, foundCardIds, isKuroCard, isObjectLock, lockCodesOffered, lockObjectAvailable, trayCards, type BoardState } from "@state/days/board";
+import { ideOps, ideSrc, ideTranscript } from "@state/days/ide";
 import { cls, html, type SafeHtml } from "@world/html";
+import { FRAMES, frameUrl } from "../kuro/body";
 import { hasString, t, tr } from "@world/i18n";
 import type { ActionContext, ActionHandler } from "../controller";
 import type { AppContext, Session } from "../model";
@@ -88,7 +90,7 @@ function table(board: TaskBoard, s: BoardState, state: State, session: Session):
  * placeholder in its place — its `hint`, or the generic `board.notFound` 「还没找到」 — that cannot
  * be picked. The order follows the board's card order (a placeholder keeps its slot in the row).
  */
-function tray(board: TaskBoard, s: BoardState, state: State, events: readonly GameEvent[], session: Session): SafeHtml {
+function tray(board: TaskBoard, s: BoardState, state: State, events: readonly GameEvent[], session: Session, headerKey = "board.tray"): SafeHtml {
   const found = foundCardIds(board, state.day, events);
   const placed = new Set(Object.values(s.slots));
   const cells = board.cards
@@ -100,7 +102,7 @@ function tray(board: TaskBoard, s: BoardState, state: State, events: readonly Ga
       const hint = c.hint ?? (hasString("board.notFound") ? t("board.notFound") : "");
       return html`<span class="bcard notfound" aria-disabled="true">${hint}</span>`;
     });
-  const header = hasString("board.tray") ? html`<div class="btray-h">${tr("board.tray")}</div>` : null;
+  const header = hasString(headerKey) ? html`<div class="btray-h">${tr(headerKey)}</div>` : null;
   return html`<div class="btray">${header}<div class="bcards">${cells}</div></div>`;
 }
 
@@ -115,15 +117,95 @@ function finishLabel(task: Task): SafeHtml | null {
   return hasString(key) ? tr(key) : null;
 }
 
-/** The board surface for an open board task (work v2). Pure. */
+/** The board surface for an open board task (work v2); an `ide` board draws the IDE view. Pure. */
 export function renderBoard(ctx: AppContext, task: Task): SafeHtml {
   const { state, events, session } = ctx;
   const board = task.board!;
   const s = boardState(board, state.day, task.id, events);
   const assist = hasString("board.assist") ? html`<button type="button" class="bchip" data-action="board-assist">${tr("board.assist")}</button>` : null;
   const printable = canPrint(board, s);
+  if (board.view === "ide") return renderIde(ctx, task, board, s, assist, printable);
   const finish = html`<button type="button" class="bprint" data-action="board-print"${printable ? null : html` disabled`}>${finishLabel(task)}</button>`;
   return html`<div class="surface board"><div class="btitle">${board.title}</div>${lockRow(board, s, state, events, session)}${table(board, s, state, session)}${tray(board, s, state, events, session)}<div class="bbar">${assist}${finish}</div></div>`;
+}
+
+// ——— the IDE view (ide 2026-11-04) ———
+
+/** The typing delay of a new transcript line (ide R4), ms. Session only. */
+export const IDE_LINE_MS = 300;
+
+const ideKey = (day: number, task: Task) => `${day}:${task.id}`;
+
+/** 页面: one row per slot — its label and its card, or an empty drop line (click-to-place as today). */
+function idePages(board: TaskBoard, s: BoardState, session: Session): SafeHtml {
+  const rows = board.slots.map((slot) => {
+    const cardId = s.slots[slot.id];
+    const cell = cardId
+      ? html`<button type="button" class="bslot filled" data-action="board-slot" data-slot="${slot.id}">${cardText(board, cardId)}</button>`
+      : html`<button type="button" class="${cls("bslot", "ide-drop", session.boardPick && "target")}" data-action="board-slot" data-slot="${slot.id}" aria-label="${slot.label}"></button>`;
+    return html`<li class="ide-page" data-slot="${slot.id}"><span class="ide-plabel">${slot.label}</span>${cell}</li>`;
+  });
+  const header = hasString("board.ide.pages") ? html`<div class="ide-h">${tr("board.ide.pages")}</div>` : null;
+  return html`${header}<ol class="ide-pages">${rows}</ol>`;
+}
+
+/** 克总: the transcript as bubbles, Kuro on the left with its portrait, the player on the right. */
+function ideChat(board: TaskBoard, task: Task, ctx: AppContext): SafeHtml {
+  const { state, events, session, nowMs } = ctx;
+  const lines = ideTranscript(board, ideOps(task, state.day, events));
+  const typing = session.ideTyping?.key === ideKey(state.day, task) ? session.ideTyping.times : [];
+  const visible = lines.filter((_, i) => (typing[i] ?? 0) <= nowMs);
+  const av = html`<img class="av" src="${frameUrl(FRAMES.idle[0])}" alt="" aria-hidden="true">`;
+  const bubbles = visible.map((l) =>
+    l.who === "kuro" ? html`<div class="wm them" data-on="${l.on}">${av}<div class="bub">${l.text}</div></div>` : html`<div class="wm me" data-on="${l.on}"><div class="bub">${l.text}</div></div>`,
+  );
+  const dots = visible.length < lines.length ? html`<div class="wm them typing" aria-hidden="true">${av}<div class="bub">…</div></div>` : null;
+  return html`<div class="ide-chat">${bubbles}${dots}</div>`;
+}
+
+/** The IDE view (ide R2): pages + sources, the preview, Kuro's transcript with its assist and 打快照. */
+function renderIde(ctx: AppContext, task: Task, board: TaskBoard, s: BoardState, assist: SafeHtml | null, printable: boolean): SafeHtml {
+  const { state, events, session } = ctx;
+  const src = ideSrc(board, s, ideOps(task, state.day, events));
+  const left = html`<div class="ide-left"><div class="btitle">${board.title}</div>${lockRow(board, s, state, events, session)}${idePages(board, s, session)}${tray(board, s, state, events, session, "board.ide.sources")}</div>`;
+  const mid = html`<div class="ide-mid"><iframe class="ide-frame" data-keep="ide" src="${src}" title="${board.title}" sandbox="allow-scripts"></iframe></div>`;
+  const snapshot = hasString("board.ide.snapshot") ? tr("board.ide.snapshot") : finishLabel(task);
+  const finish = html`<button type="button" class="bprint" data-action="board-print"${printable ? null : html` disabled`}>${snapshot}</button>`;
+  const header = hasString("board.ide.copilot") ? html`<div class="ide-h">${tr("board.ide.copilot")}</div>` : null;
+  const right = html`<div class="ide-right">${header}${ideChat(board, task, ctx)}<div class="bbar">${assist}${finish}</div></div>`;
+  return html`<div class="surface board ide">${left}${mid}${right}</div>`;
+}
+
+/**
+ * After an action on an IDE board: the transcript lines it added type in one by one (ide R4), each
+ * IDE_LINE_MS after the one before (or after now); a render is due as each appears. Session only.
+ */
+function noteIdeLines(ctx: ActionContext, task: Task, board: TaskBoard, day: number, before: number): void {
+  const after = ideTranscript(board, ideOps(task, day, ctx.store.getEvents())).length;
+  if (after <= before) return;
+  const key = ideKey(day, task);
+  const times = ctx.session.ideTyping?.key === key ? [...ctx.session.ideTyping.times] : [];
+  while (times.length < before) times.push(0);
+  times.length = before;
+  const now = ctx.now?.() ?? Date.now();
+  let at = Math.max(now, ...times);
+  for (let i = before; i < after; i++) {
+    at += IDE_LINE_MS;
+    times.push(at);
+    ctx.later(at - now + 16, ctx.rerender);
+  }
+  ctx.session.ideTyping = { key, times };
+}
+
+/** A board action that, on an IDE board, types in the transcript lines it adds. */
+function withIde(handler: ActionHandler): ActionHandler {
+  return (ctx, data, el) => {
+    const c = currentBoard(ctx);
+    const day = ctx.store.getState().day;
+    const before = c?.board.view === "ide" ? ideTranscript(c.board, ideOps(c.task, day, ctx.store.getEvents())).length : null;
+    handler(ctx, data, el);
+    if (c && before !== null) noteIdeLines(ctx, c.task, c.board, day, before);
+  };
 }
 
 // ——— the actions ———
@@ -155,7 +237,7 @@ export function autoUnlockBoard(ctx: ActionContext): boolean {
   return true;
 }
 
-export const boardActions: Record<string, ActionHandler> = {
+const actions: Record<string, ActionHandler> = {
   // 需要提取码: open the code panel (the old object's codes, or the no-tool row + 让它试).
   "board-lock"(ctx) {
     const c = currentBoard(ctx);
@@ -252,6 +334,9 @@ export const boardActions: Record<string, ActionHandler> = {
     ctx.rerender();
   },
 };
+
+/** The board actions; on an IDE board each one types in the transcript lines it adds (ide R4). */
+export const boardActions: Record<string, ActionHandler> = Object.fromEntries(Object.entries(actions).map(([k, h]) => [k, withIde(h)]));
 
 /** Whether `id` placed in a slot is a Kuro card (for any view that wants to know; it still looks plain). */
 export const slotHoldsKuroCard = (board: TaskBoard, s: BoardState, slotId: string): boolean => {

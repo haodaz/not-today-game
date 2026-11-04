@@ -138,6 +138,27 @@ export interface BoardKuro {
   readonly cards: readonly BoardCard[];
   readonly unlock: string;
 }
+/** How a board is drawn (ide R1): the table (default) or the IDE view. */
+export const BOARD_VIEWS = ["table", "ide"] as const;
+export type BoardView = (typeof BOARD_VIEWS)[number];
+/** The IDE view's preview (ide R1): the deliverable's URL, and the page index (`c`) of each slot. */
+export interface BoardIde {
+  readonly src: string;
+  readonly pages: Readonly<Record<string, number>>;
+}
+/** One line of a beat: who says it (Kuro or the player) and the text (twinned in the en file). */
+export interface BoardBeatLine {
+  readonly who: "kuro" | "me";
+  readonly text: string;
+}
+/**
+ * A beat of the IDE transcript (ide R1/R4): what it is shown on — `open`, `fill:<slot>`,
+ * `fill:<slot>:<card>`, `kuro`, `unlock`, `print`, `send` — and its lines.
+ */
+export interface BoardBeat {
+  readonly on: string;
+  readonly lines: readonly BoardBeatLine[];
+}
 export interface TaskBoard {
   readonly kind: "table";
   readonly title: string;
@@ -146,6 +167,12 @@ export interface TaskBoard {
   readonly slots: readonly BoardSlot[];
   readonly cards: readonly BoardCard[];
   readonly kuro: BoardKuro;
+  /** ide R1: `"ide"` draws the IDE view; absent = the table. */
+  readonly view?: BoardView;
+  /** ide R1: the preview (only with `view: "ide"`). */
+  readonly ide?: BoardIde;
+  /** ide R1: Kuro's transcript beats. */
+  readonly beats?: readonly BoardBeat[];
 }
 /** Who a deliverable goes to (work v2 addition 2026-11-03 night); absent = `"hand"`. */
 export const DELIVERABLE_TO = ["boss", "partner", "group", "workbench", "hand"] as const;
@@ -361,7 +388,7 @@ function card(v: unknown, w: string): BoardCard {
  */
 function board(v: unknown, w: string): TaskBoard {
   if (!isRecord(v)) fail(w, "must be an object");
-  keys(v, ["kind", "title", "columns", "given", "slots", "cards", "kuro"], w);
+  keys(v, ["kind", "title", "columns", "given", "slots", "cards", "kuro", "view", "ide", "beats"], w);
   if (v.kind !== "table") fail(`${w}.kind`, 'must be "table"');
   // Column headers are display-only and may be blank (the label column has no header).
   if (!Array.isArray(v.columns) || v.columns.length === 0 || !v.columns.every((c) => typeof c === "string")) fail(`${w}.columns`, "must be a non-empty list of strings");
@@ -432,7 +459,77 @@ function board(v: unknown, w: string): TaskBoard {
   }
   const unlock = str(v.kuro.unlock, `${w}.kuro.unlock`);
   if (lock && !lock.codes.includes(unlock)) fail(`${w}.kuro.unlock`, `"${unlock}" is not one of the lock's codes`);
-  return { kind: "table", title: str(v.title, `${w}.title`), columns, given: { ...(lock ? { lock } : {}), rows }, slots, cards, kuro: { fill, cards: kuroCards, unlock } };
+  // ide R1: the view, the preview, the transcript beats.
+  let view: BoardView | undefined;
+  if (v.view !== undefined) view = (BOARD_VIEWS as readonly unknown[]).includes(v.view) ? (v.view as BoardView) : fail(`${w}.view`, `must be one of ${BOARD_VIEWS.join(", ")}`);
+  let ide: BoardIde | undefined;
+  if (v.ide !== undefined) {
+    if (view !== "ide") fail(`${w}.ide`, 'an ide needs view "ide"');
+    ide = boardIde(v.ide, `${w}.ide`, slotIds);
+  } else if (view === "ide") fail(`${w}.view`, 'view "ide" needs an ide');
+  const allCards = new Set([...cardIds, ...kuroCardIds]);
+  const beats = v.beats !== undefined ? boardBeats(v.beats, `${w}.beats`, slotIds, allCards) : undefined;
+  return {
+    kind: "table",
+    title: str(v.title, `${w}.title`),
+    columns,
+    given: { ...(lock ? { lock } : {}), rows },
+    slots,
+    cards,
+    kuro: { fill, cards: kuroCards, unlock },
+    ...(view !== undefined ? { view } : {}),
+    ...(ide ? { ide } : {}),
+    ...(beats ? { beats } : {}),
+  };
+}
+
+/** The IDE preview (ide R1): a deliverable under /docs/, and a page 0–99 per (known) slot. */
+function boardIde(v: unknown, w: string, slotIds: ReadonlySet<string>): BoardIde {
+  if (!isRecord(v)) fail(w, "must be an object");
+  keys(v, ["src", "pages"], w);
+  const src = str(v.src, `${w}.src`);
+  if (!src.startsWith("/docs/")) fail(`${w}.src`, "expected a path under /docs/");
+  if (!isRecord(v.pages)) fail(`${w}.pages`, "must be an object");
+  const pages: Record<string, number> = {};
+  for (const [slot, page] of Object.entries(v.pages)) {
+    if (!slotIds.has(slot)) fail(`${w}.pages`, `"${slot}" is not a slot`);
+    if (!Number.isInteger(page) || (page as number) < 0 || (page as number) > 99) fail(`${w}.pages.${slot}`, "must be an integer from 0 to 99");
+    pages[slot] = page as number;
+  }
+  return { src, pages };
+}
+
+/** The fixed beat names (ide R1); `fill:<slot>` and `fill:<slot>:<card>` are checked separately. */
+const BEAT_ONS = ["open", "kuro", "unlock", "print", "send"] as const;
+
+/** The transcript beats (ide R1): each `on` names a known beat and existing ids; each `on` once. */
+function boardBeats(v: unknown, w: string, slotIds: ReadonlySet<string>, cardIds: ReadonlySet<string>): BoardBeat[] {
+  if (!Array.isArray(v)) fail(w, "must be a list");
+  const seen = new Set<string>();
+  return v.map((b, i) => {
+    const bw = `${w}[${i}]`;
+    if (!isRecord(b)) fail(bw, "a beat must be an object");
+    keys(b, ["on", "lines"], bw);
+    const on = str(b.on, `${bw}.on`);
+    const parts = on.split(":");
+    if (parts[0] === "fill" && (parts.length === 2 || parts.length === 3)) {
+      if (!slotIds.has(parts[1]!)) fail(`${bw}.on`, `"${parts[1]}" is not a slot`);
+      if (parts.length === 3 && !cardIds.has(parts[2]!)) fail(`${bw}.on`, `"${parts[2]}" is not a card or a Kuro card`);
+    } else if (!(BEAT_ONS as readonly string[]).includes(on)) {
+      fail(`${bw}.on`, `must be one of ${BEAT_ONS.join(", ")}, fill:<slot> or fill:<slot>:<card>`);
+    }
+    if (seen.has(on)) fail(w, `duplicate beat "${on}"`);
+    seen.add(on);
+    if (!Array.isArray(b.lines) || b.lines.length === 0) fail(`${bw}.lines`, "must be a non-empty list");
+    const lines = b.lines.map((l, j) => {
+      const lw = `${bw}.lines[${j}]`;
+      if (!isRecord(l)) fail(lw, "a line must be an object");
+      keys(l, ["who", "text"], lw);
+      if (l.who !== "kuro" && l.who !== "me") fail(`${lw}.who`, 'must be "kuro" or "me"');
+      return { who: l.who as BoardBeatLine["who"], text: str(l.text, `${lw}.text`) };
+    });
+    return { on, lines };
+  });
 }
 
 function deliverable(v: unknown, w: string): TaskDeliverable {
@@ -582,6 +679,10 @@ function localiseTask(zh: Task, en: Task, w: string): Task {
   if (zh.board || en.board) {
     if (!zh.board || !en.board) fail(`${w}.board`, "board present in only one language");
     if (zh.board.slots.length !== en.board.slots.length || zh.board.cards.length !== en.board.cards.length) fail(`${w}.board`, "board shape differs from the Chinese");
+    // ide R1: the view and the preview are shared; the beats differ only in their lines' text.
+    if (zh.board.view !== en.board.view || !sameJson(zh.board.ide, en.board.ide)) fail(`${w}.board`, "view or ide differs from the Chinese");
+    const beatShape = (b: TaskBoard) => (b.beats ?? []).map((x) => ({ on: x.on, who: x.lines.map((l) => l.who) }));
+    if (!sameJson(beatShape(zh.board), beatShape(en.board))) fail(`${w}.board.beats`, "beat shape differs from the Chinese");
     return bilingualValues(zh, { title: en.title, board: en.board, ...(zh.deliverable && en.deliverable ? { deliverable: en.deliverable } : {}) });
   }
   if (zh.start.say.length !== en.start.say.length || !sameJson(zh.start.options, en.start.options)) fail(`${w}.start`, "start shape differs from the Chinese");

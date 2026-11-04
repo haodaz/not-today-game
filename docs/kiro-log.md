@@ -1856,3 +1856,27 @@ Spec: the "Correction 2026-11-04" at the end of `.kiro/specs/room-turn/requireme
 - `npx tsc --noEmit`: clean. `npx vitest run`: 100 files / 1792 tests passed.
 - Not verified in a real browser: the side faces cross the viewer's plane mid-turn and rely on the
   browser clipping what is behind the camera.
+
+## ide: the IDE view of a work-v2 board (2026-11-04)
+
+Spec: `.kiro/specs/ide/requirements.md`.
+
+- `src/state/days/tasks.ts`: a board may carry `view` (`table` | `ide`), `ide: { src, pages }` and
+  `beats`. Strict: unknown keys, an `ide` without `view: "ide"`, `view: "ide"` without an `ide`, a
+  `src` not under `/docs/`, pages outside 0–99 or not slots, beats naming missing slots/cards,
+  unknown beat names, a beat given twice, `who` other than kuro/me. The en twin must match the
+  view, the ide and the beat shape (`on` and `who`); only line text differs.
+- `src/state/days/ide.ts` (new, pure): `ideOps` (today's board steps + the print `task` + the
+  `give`, in log order), `ideSrc` (R3), `ideTranscript` (R4).
+- `src/world/desktop/workbench/board.ts`: `renderBoard` draws the IDE view for `view: "ide"`:
+  页面 + 数据源 (the tray as before) with the lock row on top, the preview iframe
+  (`data-keep="ide"`, `sandbox="allow-scripts"`), 克总's transcript with 让它补全 and 打快照. Every
+  board action, on an IDE board, types its new transcript lines in at 300 ms each
+  (`session.ideTyping`, session only). Table boards are unchanged.
+- `src/world/desktop/keepframes.ts` (new) + `controller.ts`: a kept iframe is parked across the
+  root's re-render and put back when its `src` is unchanged (uses `moveBefore`; without it the
+  frame reloads as before).
+- `src/world/desktop/model.ts`: `ideTyping`. `desktop.css`: the three-column layout and bubbles.
+- Tests: `tests/ide.test.ts` with the fixture `.kiro/specs/ide/board-ide.json` injected as day-1
+  task3 (loader, ideSrc, ideTranscript, view, play-through, replay).
+- `npx tsc --noEmit`: clean. `npx vitest run`: 101 files / 1812 tests passed.

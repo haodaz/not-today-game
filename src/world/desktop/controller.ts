@@ -6,6 +6,7 @@ import type { SafeHtml } from "@world/html";
 import type { BeatClock } from "./beat";
 import { desktopApps } from "./apps";
 import { KuroBodyElement } from "./kuro/body";
+import { createFrameKeeper } from "./keepframes";
 import { playSfx, type SfxOptions } from "@world/loop/sfx";
 import { MOTION } from "@world/motion/timing";
 import { applyFit, BACKDROPS } from "@world/fit";
@@ -160,6 +161,8 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   );
   const timers = new Set<ReturnType<typeof setTimeout>>();
   const body = new KuroBodyElement(root.ownerDocument);
+  // ide R3: the IDE preview keeps its page across renders (reloads only when its URL changes).
+  const frames = createFrameKeeper(root.ownerDocument);
   let frame = 0;
 
   const fit = () => {
@@ -184,7 +187,9 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
       }
     }
     motion?.before();
+    frames.before(root);
     root.innerHTML = renderRoot(deps.store, session, Date.now()).value;
+    frames.after(root);
     // Kuro's body lives across renders so its state changes crossfade.
     const slot = root.querySelector<HTMLElement>("[data-kuro-slot]");
     if (slot) body.attach(slot);

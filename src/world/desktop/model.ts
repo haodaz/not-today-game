@@ -189,6 +189,11 @@ export interface Session {
   /** Work v2: the lock's code chips are open (needs the old object), or null. Session only. */
   boardLockOpen: boolean;
   /**
+   * ide R4: when each transcript line of the IDE board `key` (day:task) appears (ms, wall clock),
+   * for the 300 ms typing delay. Lines past the end of `times` show at once. Session only.
+   */
+  ideTyping: { key: string; times: number[] } | null;
+  /**
    * object-bar 2026-11-03: an old object opened from the 老物件栏 is being used over the desktop
    * (its drawn device in a modal). It is the same `holding` + `hand.using` the room uses; this flag
    * only says the modal is the entry point, so × / Esc closes it back to 工作台. Session only.
@@ -318,6 +323,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     wbGloss: null,
     boardPick: null,
     boardLockOpen: false,
+    ideTyping: null,
     objbarOpen: false,
     call: null,
   };

@@ -1,0 +1,34 @@
+{
+  "_note": "Test fixture for the ide spec (Kiro). Placeholder text only: the real board and its beats are Claude's (content/tasks/day-01.json task3).",
+  "board": {
+    "kind": "table",
+    "title": "fixture-title",
+    "columns": ["", "given", "slot"],
+    "given": { "rows": { "s1": "g1", "s2": "g2", "s3": "g3" } },
+    "slots": [
+      { "id": "s1", "label": "slot-1", "answer": "a1" },
+      { "id": "s2", "label": "slot-2", "answer": "a2" },
+      { "id": "s3", "label": "slot-3", "answer": "a3" }
+    ],
+    "cards": [
+      { "id": "a1", "text": "card-a1" },
+      { "id": "a2", "text": "card-a2", "from": { "conv": "partner" }, "hint": "hint-a2" },
+      { "id": "a3", "text": "card-a3" },
+      { "id": "x1", "text": "card-x1" }
+    ],
+    "kuro": { "fill": { "s1": "a1", "s2": "a2", "s3": "k1" }, "cards": [{ "id": "k1", "text": "card-k1" }], "unlock": "0000" },
+    "view": "ide",
+    "ide": { "src": "/docs/player/day-01-space.html", "pages": { "s1": 2, "s2": 5, "s3": 9 } },
+    "beats": [
+      { "on": "open", "lines": [{ "who": "kuro", "text": "open-1" }, { "who": "me", "text": "open-2" }] },
+      { "on": "fill:s1", "lines": [{ "who": "kuro", "text": "fill-s1" }] },
+      { "on": "fill:s1:x1", "lines": [{ "who": "kuro", "text": "fill-s1-x1" }] },
+      { "on": "fill:s2", "lines": [{ "who": "kuro", "text": "fill-s2" }] },
+      { "on": "kuro", "lines": [{ "who": "kuro", "text": "kuro-1" }] },
+      { "on": "print", "lines": [{ "who": "kuro", "text": "print-1" }] },
+      { "on": "send", "lines": [{ "who": "me", "text": "send-1" }] }
+    ]
+  },
+  "deliverable": { "id": "d1-tech", "label": "fixture-deliverable", "to": "boss" },
+  "judge": { "perfect": 0, "flawed": -2, "wrong": -5, "wrongAt": 2 }
+}
