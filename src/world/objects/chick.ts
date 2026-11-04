@@ -5,6 +5,7 @@ import { hash, jitter, unit } from "@state/seed";
 import { Bits, finer, type Frame } from "./frame";
 import { CHICK_H, CHICK_ICONS, CHICK_W, chickFrames, ICON_SIZE, type ChickFrameId, type ChickFrames, type ChickIcon } from "./frames";
 import { SEMITONE, step, type ObjectEnv, type Program } from "./program";
+import { NO_PRESS, pressed, upgradedHi, type KuroPress } from "./taken";
 
 export const CHICK_IDLE_MS = 2_000;
 export const CHICK_TURN_MIN_MS = 15_000;
@@ -31,6 +32,8 @@ export interface ChickState {
   readonly flashAt: number | null;
   /** When this session first looked at it (session ms): its seeded turns count from here. */
   readonly born: number;
+  /** Kuro's press tracker (object-upgrade 2026-11-03): its own counter and last-press time. */
+  readonly press: KuroPress;
 }
 
 /** What B does with each icon: meal eats, light goes dark, check-up shows the line; the rest nod. */
@@ -78,8 +81,9 @@ export function drawChick(s: ChickState, env: ObjectEnv, table: ChickFrames = ch
   const b = new Bits(CHICK_W, CHICK_H);
   const id = chickFrameAt(s, env);
   b.blit(table.frames.get(id) ?? []);
-  // The new world: the same picture, smooth and in colour; it is always smiling.
-  if (env.upgraded) return { kind: "hi", lines: [], picture: { w: b.w, h: b.h, bits: b.bits } };
+  // The new world: the same picture, smooth and in colour; it is always smiling. Once Kuro has moved
+  // in, Kuro's pose fills it instead (a glimpse while on loan, only Kuro once taken; object-upgrade).
+  if (env.upgraded) return upgradedHi(env, s.press, { lines: [], picture: { w: b.w, h: b.h, bits: b.bits } });
   if (s.menu !== null && id !== "grave") {
     CHICK_ICONS.forEach((icon, i) => {
       const x = i * ICON_SIZE;
@@ -99,9 +103,11 @@ export const chick: Program<ChickState> = {
   id: "chick",
   channel: { w: CHICK_W, h: CHICK_H },
   keySound: { id: BEEP },
-  init: (env) => ({ menu: null, act: null, flashAt: null, born: env.t }),
+  init: (env) => ({ menu: null, act: null, flashAt: null, born: env.t, press: NO_PRESS }),
   key(s, key, env) {
-    // The new world feeds it; nothing you press changes anything.
+    // Every key bumps Kuro's press tracker (the glimpse / talk read it); it changes nothing else.
+    s = { ...s, press: pressed(s.press, env.t) };
+    // The new world feeds it; nothing you press changes anything (and Kuro answers only with talk).
     if (env.upgraded && key !== "reset") return step(s);
     switch (key) {
       case "A":

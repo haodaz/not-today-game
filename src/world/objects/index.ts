@@ -10,6 +10,7 @@ import type { ActionContext } from "@world/desktop/controller";
 import type { Session } from "@world/desktop/model";
 import { push } from "@world/loop/dialogue";
 import { calculator, lightLevel } from "./calculator";
+import { takenByKuro } from "./taken";
 import { chick } from "./chick";
 import { dictionary } from "./dictionary";
 import { pager } from "./pager";
@@ -49,6 +50,7 @@ export function envFor(state: State, events: readonly GameEvent[], session: Sess
     day: state.day,
     level: dreamLevel(state.day, heldUp && state.upgraded[id] !== true),
     upgraded: state.upgraded[id] === true,
+    taken: takenByKuro(id, state, events),
     heldUp,
     time: session.clock.time,
     t,

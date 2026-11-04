@@ -9,6 +9,7 @@ import { ringOf } from "@state/stages";
 import { ringIndex, RINGS } from "@world/desktop/rings";
 import { Bits, drawSegLine, finer, SEG_PITCH, type Frame } from "./frame";
 import { step, type ObjectEnv, type Program } from "./program";
+import { NO_PRESS, pressed, upgradedHi, type KuroPress } from "./taken";
 
 export const CALC_CELLS = 8;
 export const CALC_W = CALC_CELLS * SEG_PITCH + 2; // 58
@@ -50,6 +51,8 @@ export interface CalculatorState {
   readonly presses: number;
   /** The upgraded app's history. */
   readonly history: readonly string[];
+  /** Kuro's press tracker (object-upgrade 2026-11-03). */
+  readonly press: KuroPress;
 }
 
 /** A number as at most 8 digits (and a point), or E when it does not fit. */
@@ -93,7 +96,9 @@ export function unaskedAt(env: ObjectEnv, presses: number, table: CalculatorTabl
 }
 
 export function drawCalculator(s: CalculatorState, env: ObjectEnv): Frame {
-  if (env.upgraded) return { kind: "hi", lines: [...s.history.slice(-HISTORY), s.display] };
+  // Upgraded: an app with a history, always lit — until Kuro, moved in, fills the hi screen (a
+  // glimpse on loan, only Kuro once taken; object-upgrade 2026-11-03).
+  if (env.upgraded) return upgradedHi(env, s.press, { lines: [...s.history.slice(-HISTORY), s.display] });
   const b = new Bits(CALC_W, CALC_H);
   if (s.on) drawSegLine(b, 1, 1, s.display, CALC_CELLS);
   const f = finer(b, env.level);
@@ -106,11 +111,13 @@ export const calculator: Program<CalculatorState> = {
   id: "calculator",
   channel: { w: CALC_W, h: CALC_H },
   keySound: null,
-  init: () => ({ on: true, display: "0", acc: null, op: null, fresh: true, presses: 0, history: [] }),
+  init: () => ({ on: true, display: "0", acc: null, op: null, fresh: true, presses: 0, history: [], press: NO_PRESS }),
   key(s0, key, env) {
     // In the dark it does not answer (the new world is always lit).
     if (!env.upgraded && env.lit < CALC_MIN_LIGHT) return step(s0);
-    const s = { ...s0, presses: s0.presses + 1 };
+    const s = { ...s0, presses: s0.presses + 1, press: pressed(s0.press, env.t) };
+    // Taken: the app is gone; Kuro answers only with talk (no arithmetic, no history).
+    if (env.taken) return step(s);
     if (key === "off") return step({ ...s, on: false });
     if (key === "C") {
       const u = env.upgraded ? null : unaskedAt(env, s.presses);

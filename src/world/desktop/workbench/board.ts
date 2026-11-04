@@ -6,8 +6,9 @@
 // the board rebuilds from the log; printing is the `task` event with `slots` + `assists`. Kuro's own
 // cards never show in the tray. All labels are strings; story text is content. Pure view + actions.
 import type { State } from "@state/types.gen";
+import type { GameEvent } from "@state/events";
 import type { Task, TaskBoard } from "@state/days/tasks";
-import { boardState, canPrint, isKuroCard, lockObjectAvailable, trayCards, type BoardState } from "@state/days/board";
+import { autoUnlock, boardState, canPrint, isKuroCard, lockObjectAvailable, trayCards, type BoardState } from "@state/days/board";
 import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t, tr } from "@world/i18n";
 import type { ActionContext, ActionHandler } from "../controller";
@@ -20,13 +21,14 @@ function cardText(board: TaskBoard, id: string): string {
 }
 
 /** The lock row's cells: ▒▒▒▒ while locked, the given text once open. */
-function lockRow(board: TaskBoard, s: BoardState, state: State, session: Session): SafeHtml | null {
+function lockRow(board: TaskBoard, s: BoardState, state: State, events: readonly GameEvent[], session: Session): SafeHtml | null {
   const lock = board.given.lock;
   if (!lock) return null;
   if (s.unlocked) return null;
   // Locked: one control 「需要提取码」, and (if opened) the three code chips or the no-tool row.
   const open = session.boardLockOpen;
-  const available = lockObjectAvailable(board, state);
+  // Available = found and not taken by Kuro (object-upgrade 2026-11-03): a taken object is gone.
+  const available = lockObjectAvailable(board, state, events);
   let panel: SafeHtml | null = null;
   if (open) {
     if (available) {
@@ -74,7 +76,7 @@ export function renderBoard(ctx: AppContext, task: Task): SafeHtml {
   const assist = hasString("board.assist") ? html`<button type="button" class="bchip" data-action="board-assist">${tr("board.assist")}</button>` : null;
   const printable = canPrint(board, s);
   const print = html`<button type="button" class="bprint" data-action="board-print"${printable ? null : html` disabled`}>${hasString("board.print") ? tr("board.print") : null}</button>`;
-  return html`<div class="surface board"><div class="btitle">${board.title}</div>${lockRow(board, s, state, session)}${table(board, s, state, session)}${tray(board, s, session)}<div class="bbar">${assist}${print}</div></div>`;
+  return html`<div class="surface board"><div class="btitle">${board.title}</div>${lockRow(board, s, state, events, session)}${table(board, s, state, session)}${tray(board, s, session)}<div class="bbar">${assist}${print}</div></div>`;
 }
 
 // ——— the actions ———
@@ -87,6 +89,24 @@ function currentBoard(ctx: ActionContext): { task: Task; board: TaskBoard } | nu
 
 const stateOf = (ctx: ActionContext, task: Task, board: TaskBoard): BoardState =>
   boardState(board, ctx.store.getState().day, task.id, ctx.store.getEvents());
+
+/**
+ * The automatic unlock (object-upgrade 2026-11-03): when the board task is open and its lock needs
+ * an object the player has upgraded but Kuro has not yet taken, the column opens by itself — a
+ * `boardStep` `unlock` with the right code, logged as the object's own step (never an assist).
+ * Called once as the task opens; it appends nothing when it is not due (no lock, already open, the
+ * object not upgraded, or taken). Returns true if it unlocked.
+ */
+export function autoUnlockBoard(ctx: ActionContext): boolean {
+  const c = currentBoard(ctx);
+  if (!c) return false;
+  const state = ctx.store.getState();
+  const s = stateOf(ctx, c.task, c.board);
+  const op = autoUnlock(c.board, s, state, ctx.store.getEvents());
+  if (!op) return false;
+  ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op });
+  return true;
+}
 
 export const boardActions: Record<string, ActionHandler> = {
   // 需要提取码: open the code panel (the old object's codes, or the no-tool row + 让它试).

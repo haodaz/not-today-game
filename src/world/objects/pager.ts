@@ -4,6 +4,7 @@
 // dream level 2 the same string is drawn in dot matrix. Upgraded: content's meaning, scrolling.
 import { Bits, drawDot, drawSegLine, finer, SEG_PITCH, type Frame } from "./frame";
 import { step, type ObjectEnv, type Program } from "./program";
+import { NO_PRESS, pressed, upgradedHi, type KuroPress } from "./taken";
 
 export const PAGER_CELLS = 12;
 /** Icons column (envelope over battery), then the digits. */
@@ -31,6 +32,8 @@ export interface PagerState {
   readonly backlight: boolean;
   /** Today's message was read with `read` this session. */
   readonly read: boolean;
+  /** Kuro's press tracker (object-upgrade 2026-11-03). */
+  readonly press: KuroPress;
 }
 
 /** The ten kept, newest first (the oldest are pushed out). */
@@ -66,9 +69,10 @@ export function drawPager(s: PagerState, env: ObjectEnv): Frame {
   const text = pagerText(s, env);
   const unread = todaysMessage(env) !== null && !s.read;
   if (env.upgraded) {
-    // The new world reads it for you, unasked: every message's meaning, scrolling.
+    // The new world reads it for you, unasked: every message's meaning, scrolling — until Kuro,
+    // moved in, fills the hi screen itself (a glimpse on loan, only Kuro once taken; object-upgrade).
     const lines = pagerHistory(env).map((m) => m.meaning);
-    return { kind: "hi", lines, scroll: lines.length ? Math.floor(env.t / PAGER_SCROLL_MS) % lines.length : 0 };
+    return upgradedHi(env, s.press, { lines, scroll: lines.length ? Math.floor(env.t / PAGER_SCROLL_MS) % lines.length : 0 });
   }
   const b = new Bits(PAGER_W, PAGER_H);
   const on = text !== null || unread;
@@ -91,8 +95,12 @@ export const pager: Program<PagerState> = {
   id: "pager",
   channel: { w: PAGER_W, h: PAGER_H },
   keySound: { id: "key-press", rate: 1.5 },
-  init: () => ({ view: "dark", index: 0, backlight: false, read: false }),
+  init: () => ({ view: "dark", index: 0, backlight: false, read: false, press: NO_PRESS }),
   key(s, key, env) {
+    // Every key bumps Kuro's press tracker (object-upgrade 2026-11-03).
+    s = { ...s, press: pressed(s.press, env.t) };
+    // Taken: the device draws nothing of its own; Kuro answers with talk only (no view change).
+    if (env.taken) return step(s);
     const n = pagerHistory(env).length;
     switch (key) {
       case "read":

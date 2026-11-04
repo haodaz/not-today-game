@@ -6,7 +6,7 @@ import type { BoardOp, GameEvent } from "../events";
 import type { State } from "../types.gen";
 import { taskByFlag, type Task, type TaskBoard, type TaskDeliverable } from "./tasks";
 import { dayFile } from "./table";
-import { inDream } from "../nights";
+import { takenByKuro } from "@world/objects/taken";
 
 /** The board of a task id on a day (work v2), or null. Found via the day's task list. */
 export function boardOf(day: number, taskId: string): { task: Task; board: TaskBoard } | null {
@@ -94,17 +94,31 @@ export function isKuroCard(board: TaskBoard, cardId: string): boolean {
 }
 
 /**
- * The old object the lock needs is available (work v2 §5): found, and not taken by Kuro — an
- * upgraded object at invasion level 3 is inside Kuro and counts as gone. Below 3 it works.
+ * The old object the lock needs is available (work v2 §5 / object-upgrade 2026-11-03): found, and
+ * not taken by Kuro. An object Kuro has taken (upgraded, three days on) counts as gone, exactly
+ * like one never found — only 让它试 is left. An upgraded-but-not-yet-taken object is available
+ * (and unlocks the column by itself; see `autoUnlock`).
  */
-export function lockObjectAvailable(board: TaskBoard, state: State): boolean {
+export function lockObjectAvailable(board: TaskBoard, state: State, events: readonly GameEvent[]): boolean {
   const lock = board.given.lock;
   if (!lock) return true;
   if (!(state.found as string[]).includes(lock.object)) return false;
-  // Invasion level 3 = upgraded and in dream state (held up): the spec's "inside it". We only have
-  // `upgraded` + `dream` to read; an upgraded object that is also in dream tonight is level 3.
-  const taken = state.upgraded[lock.object] === true && inDream(lock.object, state);
-  return !taken;
+  return !takenByKuro(lock.object, state, events);
+}
+
+/**
+ * The automatic unlock for an upgraded, not-yet-taken object (object-upgrade 2026-11-03): its
+ * ability is automatic now, so the lock's column opens by itself with the right code — logged as
+ * the object's own step (not an assist). Returns the `unlock` op to append on opening the task, or
+ * null (no lock, already unlocked, no object / taken, or the object not upgraded). Pure.
+ */
+export function autoUnlock(board: TaskBoard, s: BoardState, state: State, events: readonly GameEvent[]): BoardOp | null {
+  const lock = board.given.lock;
+  if (!lock || s.unlocked) return null;
+  if (!(state.found as string[]).includes(lock.object)) return null;
+  if (state.upgraded[lock.object] !== true) return null; // only an upgraded object does it for you
+  if (takenByKuro(lock.object, state, events)) return null; // taken: it is gone, only 让它试 is left
+  return { t: "unlock", code: lock.answer };
 }
 
 /** Validate a board step (work v2): the task must be a board task of the day and the op must fit it. */

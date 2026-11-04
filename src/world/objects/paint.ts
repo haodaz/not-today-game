@@ -107,6 +107,13 @@ export function paintFrame(canvas: PaintTarget, frame: Frame, object: string, ra
     return;
   }
   if (frame.kind === "hi") {
+    // Kuro has moved in (object-upgrade 2026-11-03): its pixel-art pose fills the hi screen, never
+    // smoothed, scaled to the glass height and centred; the object draws nothing of its own.
+    if (frame.kuro) {
+      kuroWide = WIDE_GLASS.has(object);
+      drawKuro(g, width, height, frame.kuro);
+      return;
+    }
     // The new world: smooth, colour, it does it for you.
     g.imageSmoothingEnabled = true;
     if (frame.picture) {
@@ -140,6 +147,47 @@ export function paintFrame(canvas: PaintTarget, frame: Frame, object: string, ra
   const sy = height / px.h;
   for (let y = 0; y < px.h; y++) for (let x = 0; x < px.w; x++) if (px.bits[y * px.w + x]) g.fillRect(Math.round(x * sx), Math.round(y * sy), Math.max(1, Math.round(sx)), Math.max(1, Math.round(sy)));
 }
+
+// ——— Kuro in the hi screen (object-upgrade 2026-11-03) ———
+
+/** The eight Kurogotchi poses, preloaded once (object-upgrade 2026-11-03). */
+export const KURO_POSES = ["base", "blink", "happy", "talk", "eat", "hungry", "sleep", "red"] as const;
+const KURO_SIDE = 64;
+/** The wide glasses (the pose sits at the left, the rest of the glass dark); the rest centre it. */
+const WIDE_GLASS = new Set(["pager", "calculator", "dictionary"]);
+/** The pale-green LCD the pose sits on (the tape's own window is dark; others get this glass). */
+const KURO_GLASS = "#20311f";
+
+let kuroImages: Map<string, HTMLImageElement> | null = null;
+/** Preload the eight poses once (browser only); a missing image just never draws. */
+export function preloadKuro(doc: Document): void {
+  if (kuroImages || typeof doc.createElement !== "function") return;
+  kuroImages = new Map();
+  for (const pose of KURO_POSES) {
+    const img = doc.createElement("img") as HTMLImageElement;
+    img.src = `/objects/kurogotchi/${pose}.png`;
+    kuroImages.set(pose, img);
+  }
+}
+
+/** Draw a Kuro pose into the hi canvas: a dark glass, then the 64×64 art scaled to the glass height,
+ *  never smoothed, left for the wide screens, centred for the rest. Silent if the image is not ready. */
+function drawKuro(g: CanvasRenderingContext2D, width: number, height: number, pose: string): void {
+  // The object id travels in the `object` arg to paintFrame; drawKuro reads the left-align set
+  // through a closure set by paintFrame below.
+  g.imageSmoothingEnabled = false;
+  g.fillStyle = KURO_GLASS;
+  g.fillRect(0, 0, width, height);
+  const img = kuroImages?.get(pose);
+  if (!img || !img.complete || img.naturalWidth === 0) return;
+  const scale = Math.max(1, Math.floor(height / KURO_SIDE));
+  const size = scale * KURO_SIDE;
+  const offY = Math.round((height - size) / 2);
+  const offX = kuroWide ? 0 : Math.round((width - size) / 2);
+  g.drawImage(img, offX, offY, size, size);
+}
+/** Set by paintFrame for the current object, read by drawKuro (same synchronous call). */
+let kuroWide = false;
 
 /** A colour picture of a one-bit frame, drawn smooth (the upgraded chick: yellow, soft). */
 class OffscreenCanvasLike {

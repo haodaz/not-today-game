@@ -7,6 +7,7 @@ import { dictionaryTable, type DictionaryTable } from "@state/hands";
 import { t } from "@world/i18n";
 import { fitRow, type Frame } from "./frame";
 import { step, type ObjectEnv, type Program } from "./program";
+import { NO_PRESS, pressed, upgradedHi, type KuroPress } from "./taken";
 
 export const DICT_COLS = 16;
 export const DICT_ROWS = 2;
@@ -18,6 +19,8 @@ export interface DictionaryState {
   readonly input: string;
   /** The answer to the last lookup: the two rows it shows, or null while typing. */
   readonly answer: readonly [string, string] | null;
+  /** Kuro's press tracker (object-upgrade 2026-11-03). */
+  readonly press: KuroPress;
 }
 
 /** The two rows for a lookup of `word` on `day`. */
@@ -30,8 +33,9 @@ export function lookup(word: string, day: number, table: DictionaryTable = dicti
 }
 
 export function drawDictionary(s: DictionaryState, env: ObjectEnv): Frame {
-  // The new world's screen, shut or not: never the dot matrix.
-  if (env.upgraded) return { kind: "hi", lines: s.open && s.on ? (s.answer ?? [s.input, ""]).filter((r) => r !== "") : [] };
+  // The new world's screen, shut or not: never the dot matrix — and once Kuro has moved in, Kuro's
+  // pose instead (a glimpse on loan, only Kuro once taken; object-upgrade 2026-11-03).
+  if (env.upgraded) return upgradedHi(env, s.press, { lines: s.open && s.on ? (s.answer ?? [s.input, ""]).filter((r) => r !== "") : [] });
   if (!s.open || !s.on) return { kind: "cells", cols: DICT_COLS, rows: ["", ""], level: env.level };
   const rows = s.answer ?? [s.input, ""];
   return { kind: "cells", cols: DICT_COLS, rows: rows.map((r) => fitRow(r, DICT_COLS)), level: env.level };
@@ -43,8 +47,12 @@ export const dictionary: Program<DictionaryState> = {
   id: "dictionary",
   channel: { w: DICT_COLS, h: DICT_ROWS },
   keySound: { id: "key-press" },
-  init: () => ({ open: false, on: false, input: "", answer: null }),
+  init: () => ({ open: false, on: false, input: "", answer: null, press: NO_PRESS }),
   key(s, key, env) {
+    // Every key bumps Kuro's press tracker (object-upgrade 2026-11-03).
+    s = { ...s, press: pressed(s.press, env.t) };
+    // Taken: Kuro answers only with talk; the dictionary's own keys do nothing (no lookup, no say).
+    if (env.taken) return step(s);
     // Using the closed thing opens it (the loose hinge wobbles; the layer draws that), and it comes on.
     if (key === "open") return step(s.open ? s : { ...s, open: true, on: true });
     if (!s.open) return step(s);

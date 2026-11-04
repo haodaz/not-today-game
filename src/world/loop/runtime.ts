@@ -9,6 +9,7 @@ import { choiceOf } from "@state/days/effects";
 import { isRaidNight, takeFor, wantsOf } from "@state/nights";
 import { dueAtLieDown, dueAtShutdown } from "@state/endings";
 import { boardJudgement } from "@state/days/board";
+import { autoUnlockBoard } from "@world/desktop/workbench/board";
 import { startEnding } from "@world/endings/flow";
 import { knows, optionOrder, recogniseTable, wasRight } from "@state/recognise";
 import { advanceTo, BEATS, DEFAULT_CLOCK, isNight, type Beat, type BeatClock } from "@world/desktop/beat";
@@ -256,6 +257,9 @@ export function syncLoop(ctx: ActionContext, nowMs: number = Date.now()): void {
   scheduleSelf(ctx, lc);
   checkArrivals(ctx, lc, nowMs);
   noticeKuroLine(ctx, nowMs);
+  // Object-upgrade 2026-11-03: an upgraded (not-yet-taken) object's board lock opens by itself once
+  // the board task is the open one — the ability is automatic now. Logged as the object's own step.
+  autoUnlockBoard(ctx);
   // SAN 0: the bad ending plays at this shutdown beat, not mid-beat (san-and-endings FR1).
   if (fx.shutdown && dueAtShutdown(store.getState())) {
     ctx.later(0, () => {

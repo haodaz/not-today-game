@@ -12,6 +12,8 @@ export interface ObjectEnv {
   /** 0..3: one more after each dream night (5, 11, 15), one more while held up to the hand tonight. */
   readonly level: number;
   readonly upgraded: boolean;
+  /** Kuro has taken this object (object-upgrade addition 2026-11-03): upgraded and ≥ 3 days on. */
+  readonly taken: boolean;
   /** Held up to the hand tonight (night-hand): the chick shows its grave. */
   readonly heldUp: boolean;
   /** The game clock, HH:MM (the pager's fn shows it). */

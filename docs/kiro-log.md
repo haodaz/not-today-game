@@ -1610,3 +1610,33 @@ Part B — four endings:
   literals in `ending-record`/`walkman`/`kurogotchi`/`title` tests.
 
 `npx tsc --noEmit`: clean. `npx vitest run`: 97 files / 1718 tests passed.
+
+## object-upgrade: after an upgrade, Kuro moves in · 2026-11-03
+
+No content/public changed (Kuro's frames were already in public/objects/kurogotchi/).
+
+- New `src/world/objects/taken.ts` (pure): `upgradedOn(id, events)`, `takenByKuro(id, state, events)`
+  (upgraded and ≥ 3 days on), the seeded `kuroPoseAt` (a 1/6 glimpse of base/blink for 180 ms after
+  a press while on loan; once taken, talk 600 ms after a press, else base with a 300 ms blink every
+  ~4 s and a seeded 1/12 red), and `upgradedHi` (the hi frame a device returns: only Kuro when taken,
+  its own screen plus an occasional glimpse while on loan). A per-object press tracker (`KuroPress`,
+  `NO_PRESS`, `pressed`).
+- `src/world/objects/program.ts`: `ObjectEnv` gains `taken` (set in `envFor`, index.ts; `held.ts`
+  builds the env through `envFor` too).
+- `src/world/objects/frame.ts`: `HiFrame` gains `kuro?` (a pose id). `paint.ts`: preloads the eight
+  poses once (`preloadKuro`) and draws `frame.kuro` into the hi canvas with no smoothing, scaled to
+  the glass height, left for the wide glasses (pager/calculator/dictionary), centred otherwise;
+  `layer.ts` calls `preloadKuro`.
+- The upgraded paths of `chick.ts`, `pager.ts`, `dictionary.ts`, `calculator.ts`, `tape.ts`: each
+  carries a `press` tracker, bumps it on every key, short-circuits when `taken` (its own program
+  draws nothing, keys answered only by Kuro's talk), and routes its upgraded `draw` through
+  `upgradedHi`. The original (not-upgraded) paths and the drawer are untouched (the drawer's env is
+  `taken: false`).
+- `src/state/days/board.ts`: `lockObjectAvailable(board, state, events)` now uses `takenByKuro`
+  (replacing the `upgraded && inDream` stand-in); a taken object is gone (only 让它试). New
+  `autoUnlock` returns the object's own `unlock` op for an upgraded, not-yet-taken lock.
+  `src/world/desktop/workbench/board.ts`: `autoUnlockBoard(ctx)` appends it once; `runtime.ts`
+  `syncLoop` calls it when the board task is open (the loan's ability is automatic).
+- Tests: new `tests/taken.test.ts` (19). Updated the `ObjectEnv`/`TapeState` literals in
+  `objects-in-hand.test.ts` and the chick-reset assertion (the press bump is additive).
+- `npx tsc --noEmit`: clean. `npx vitest run`: 98 files / 1737 tests passed.

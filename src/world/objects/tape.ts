@@ -6,6 +6,7 @@ import { handOf, type Recording } from "@state/hands";
 import { dreamNights } from "@state/stages";
 import { NO_FRAME, type Frame } from "./frame";
 import { step, type ObjectEnv, type Out, type Program } from "./program";
+import { NO_PRESS, pressed, upgradedHi, type KuroPress } from "./taken";
 
 /** One side of the tape, at play speed (ms). */
 export const TAPE_SIDE_MS = 10 * 60_000;
@@ -29,6 +30,8 @@ export interface TapeState {
   readonly index: number;
   /** Rewound to the very start since the last play. */
   readonly rewound: boolean;
+  /** Kuro's press tracker (object-upgrade 2026-11-03). */
+  readonly press: KuroPress;
 }
 
 const speed = (mode: TapeMode): number => (mode === "play" ? 1 : mode === "ff" ? TAPE_FAST : mode === "rew" ? -TAPE_FAST : 0) / TAPE_SIDE_MS;
@@ -64,19 +67,24 @@ export const TAPE_SAY_PREFIX = (day: number) => `d${day}:tape:`;
 
 /** Upgraded: the transcript scrolls where the window of the deck is; otherwise there is no screen. */
 export const TRANSCRIPT_SCROLL_MS = 1_500;
-export function drawTape(_s: TapeState, env: ObjectEnv): Frame {
+export function drawTape(s: TapeState, env: ObjectEnv): Frame {
   if (!env.upgraded) return NO_FRAME;
+  // Upgraded: the transcript scrolls in the deck's window — until Kuro, moved in, fills it (a
+  // glimpse on loan, only Kuro once taken; object-upgrade 2026-11-03).
   const lines = transcript(env);
-  return { kind: "hi", lines, scroll: lines.length ? Math.floor(env.t / TRANSCRIPT_SCROLL_MS) % lines.length : 0 };
+  return upgradedHi(env, s.press, { lines, scroll: lines.length ? Math.floor(env.t / TRANSCRIPT_SCROLL_MS) % lines.length : 0 });
 }
 
 export const tape: Program<TapeState> = {
   id: "tape",
   channel: null,
   keySound: { id: "tape-click" },
-  init: (env) => ({ mode: "stop", since: env.t, pos0: 0, volume: VOLUME_START, index: 0, rewound: false }),
-  key(s, key, env) {
+  init: (env) => ({ mode: "stop", since: env.t, pos0: 0, volume: VOLUME_START, index: 0, rewound: false, press: NO_PRESS }),
+  key(s0, key, env) {
     const t = env.t;
+    const s = { ...s0, press: pressed(s0.press, env.t) };
+    // Taken: the deck is gone; Kuro answers only with talk (no reels, no recordings).
+    if (env.taken) return step(s);
     const at = { since: t, pos0: tapePos(s, t) };
     const vol = s.volume / VOLUME_MAX;
     const stopSay: Out = { stopSay: TAPE_SAY_PREFIX(env.day) };

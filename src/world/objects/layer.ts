@@ -11,7 +11,7 @@ import { lightZone } from "./calculator";
 import { CHIRP_FROM_DAY, chirpGap } from "./chick";
 import { arrivedMessages, envFor, programState, PROGRAMS } from "./index";
 import { breath, dragTurn, easeBack, flipsOver, NO_TURN, ROLL_MAX, ROLLERS, type Turn } from "./hand";
-import { paintFrame, systemRaster } from "./paint";
+import { paintFrame, preloadKuro, systemRaster } from "./paint";
 import { ghostBits, isDevice } from "@world/room/devices";
 import { crackLit, pencilShown, type PhoneState, type TextbookState } from "./plain";
 import { packRadii, reelAngles, tapePos, type TapeState } from "./tape";
@@ -31,6 +31,8 @@ export function createHandLayer() {
     const win = doc.defaultView!;
     const now = () => ctx.now?.() ?? Date.now();
     const raster = systemRaster(doc);
+    // Kuro's poses, for an upgraded object's hi screen (object-upgrade 2026-11-03); preloaded once.
+    preloadKuro(doc);
     let frame = 0;
     let drag: { x: number; y: number; moved: boolean; turn: Turn } | null = null;
     let easing: { from: Turn; at: number } | null = null;

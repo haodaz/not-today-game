@@ -34,7 +34,7 @@ import { STAGE_H, STAGE_W } from "@world/room/splat/geometry";
 import { renderRoom } from "@world/room/hud";
 
 const clone = <T>(v: T): T => JSON.parse(JSON.stringify(v)) as T;
-const env = (over: Partial<ObjectEnv> = {}): ObjectEnv => ({ day: 4, level: 0, upgraded: false, heldUp: false, time: "09:30", t: 0, seed: "run:4:x", lit: 1, pager: [], uses: 0, ...over });
+const env = (over: Partial<ObjectEnv> = {}): ObjectEnv => ({ day: 4, level: 0, upgraded: false, taken: false, heldUp: false, time: "09:30", t: 0, seed: "run:4:x", lit: 1, pager: [], uses: 0, ...over });
 const msg = (day: number, text: string): PagerMessage => ({ day, text, meaning: `m${day}`, afterReply: false });
 
 /** Test-only frames (not content): each frame a different mark, so a snapshot shows which one is up. */
@@ -754,8 +754,9 @@ describe("holding and using (FR1)", () => {
       // No key latches once stopped (the stop key springs back; the cap `down` fades with time).
       expect(keysOf(stopped)).not.toMatch(/\blatched\b/);
       // The reels follow packRadii: left larger at the start, right larger near the end.
-      const atStart = packRadii(tapePos({ mode: "stop", since: 0, pos0: 0, volume: 6, index: 0, rewound: false }, 0));
-      const nearEnd = packRadii(tapePos({ mode: "stop", since: 0, pos0: 0.95, volume: 6, index: 0, rewound: false }, 0));
+      const press = { n: 0, at: -Infinity };
+      const atStart = packRadii(tapePos({ mode: "stop", since: 0, pos0: 0, volume: 6, index: 0, rewound: false, press }, 0));
+      const nearEnd = packRadii(tapePos({ mode: "stop", since: 0, pos0: 0.95, volume: 6, index: 0, rewound: false, press }, 0));
       expect(atStart.left).toBeGreaterThan(atStart.right);
       expect(nearEnd.right).toBeGreaterThan(nearEnd.left);
     });
@@ -844,9 +845,9 @@ describe("programs (FR2, FR3)", () => {
     expect(chickFrameAt({ ...s, act: { kind: "check", at: 0 } }, { ...e, t: 99_999 })).toBe("check");
     expect(chickFrameAt(s, { ...e, heldUp: true })).toBe("grave");
     expect(chickFrameAt(s, { ...e, upgraded: true })).toMatch(/^smile-/);
-    // The reset hole: one flash, and nothing else changes.
+    // The reset hole: one flash, and nothing else changes (every key bumps Kuro's press tracker).
     const r = chick.key(s, "reset", { ...e, t: 500 });
-    expect(r).toEqual({ state: { ...s, flashAt: 500 }, out: [] });
+    expect(r).toEqual({ state: { ...s, flashAt: 500, press: { n: s.press.n + 1, at: 500 } }, out: [] });
   });
   it("pager: read / history / time and battery, per day", () => {
     const schedule = pagerSchedule;

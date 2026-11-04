@@ -30,6 +30,13 @@ export interface HiFrame {
   readonly picture?: { readonly w: number; readonly h: number; readonly bits: Uint8Array } | null;
   /** How far the lines have scrolled (auto-scroll), in lines. */
   readonly scroll?: number;
+  /**
+   * Kuro has moved in (object-upgrade addition 2026-11-03): a Kurogotchi pose drawn into the hi
+   * screen, pixelated. A taken object sets it always (its own content is empty); an upgraded but
+   * not-yet-taken object sets it only for a brief glimpse over its own lines. The pose id is a
+   * `public/objects/kurogotchi/<pose>.png` file; paint.ts draws it. Null = the object's own screen.
+   */
+  readonly kuro?: string | null;
 }
 export interface NoFrame {
   readonly kind: "none";
