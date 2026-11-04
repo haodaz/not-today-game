@@ -11,9 +11,12 @@ import { docLines } from "@state/days/tasks";
 import type { GameEvent } from "@state/events";
 import type { State } from "@state/types.gen";
 import { cls, html, type SafeHtml } from "@world/html";
-import { t } from "@world/i18n";
+import { hasString, t } from "@world/i18n";
 import { fillPlaceholders } from "@world/replies/placeholders";
 import type { AppContext } from "../model";
+import { albumPhotos, roomFacingOf, type Photo } from "@state/photos";
+import { photoPicture, photoPlace, stageOfPhoto, type PhotoView } from "./album";
+import { markDiffs } from "./diff";
 import { dockFor } from "../dock";
 
 export const BIN_TAB = "bin";
@@ -79,8 +82,59 @@ function fileList(files: readonly FileEntry[], openId: string | null, emptyLine:
   return html`<div class="f-list">${rows}</div>`;
 }
 
+/** camera R3: 相册's tab id, and the `open` value of a photo (its event index). */
+export const ALBUM_TAB = "album";
+export const photoOpenId = (index: number): string => `photo:${index}`;
+const openedPhoto = (open: string | null): number | null => {
+  const m = open ? /^photo:(\d+)$/.exec(open) : null;
+  return m ? Number(m[1]) : null;
+};
+
+/** One photo as the album reads it: the session's record if taken this session, else its event. */
+function viewOf(ctx: AppContext, p: Photo): PhotoView {
+  const s = ctx.session.photos[p.index];
+  return s ? { at: s.at, day: s.day, takenAt: s.takenAt, still: s.still } : { at: p.event.at, day: p.event.day, takenAt: null, still: null };
+}
+
+/**
+ * 相册 (camera R3 / R8): every photo, newest first, each a thumbnail in its developing stage with
+ * the day, the time and the place; one opened large. A developed screen photo of the place on screen
+ * now is shown beside the live screen, with a thin red ring on every element whose text differs.
+ */
+function album(ctx: AppContext, live: LiveScreen | null): { list: SafeHtml; main: SafeHtml } {
+  const { state, events, session } = ctx;
+  const upgraded = state.upgraded.camera === true;
+  const photos = albumPhotos(events);
+  const openIndex = openedPhoto(session.filesApp?.open ?? null);
+  const rows = photos.map((p) => {
+    const v = viewOf(ctx, p);
+    const stage = stageOfPhoto(v, ctx.nowMs, upgraded);
+    const when = `${t("shell.day", { day: p.event.day })} ${p.event.t}`;
+    return html`<button type="button" class="${cls("f-row", "ph-row", openIndex === p.index && "on")}" data-action="photo-open" data-photo="${p.index}"><span class="ph-thumb">${photoPicture(v, stage, upgraded, 0.05)}</span><span class="f-name">${photoPlace(p.event.at)}</span><span class="f-date">${when}</span></button>`;
+  });
+  const list = html`<div class="f-list">${rows}</div>`;
+  const open = photos.find((p) => p.index === openIndex);
+  if (!open) return { list, main: html`<div class="f-open empty"></div>` };
+  const v = viewOf(ctx, open);
+  const stage = stageOfPhoto(v, ctx.nowMs, upgraded);
+  const bar = html`<div class="f-open-bar"><button type="button" class="f-back" data-action="file-close" aria-label="${t("dialogue.close")}">‹</button><span class="f-title">${photoPlace(v.at)} · ${t("shell.day", { day: v.day })} ${open.event.t}</span></div>`;
+  // The screen power (R3): developed, a screen photo of the place on screen now, side by side.
+  if (stage === "final" && v.still && roomFacingOf(v.at) === null && live && live.at === v.at && live.still) {
+    const marked = markDiffs(v.still, live.still);
+    const pair = html`<div class="ph-pair"><figure class="ph-shot photo">${photoPicture(v, stage, upgraded, 0.17, marked.photo)}</figure><figure class="ph-shot live">${photoPicture({ ...v, takenAt: null }, "final", upgraded, 0.17, marked.live)}</figure></div>`;
+    return { list, main: html`<div class="f-open">${bar}${pair}</div>` };
+  }
+  return { list, main: html`<div class="f-open">${bar}<figure class="ph-shot one">${photoPicture(v, stage, upgraded, 0.36)}</figure></div>` };
+}
+
+/** The screen on show now (camera R3), for the album's side by side: its place and its still. */
+export interface LiveScreen {
+  readonly at: string;
+  readonly still: string | null;
+}
+
 /** The whole window (null when no 文件 window is open). */
-export function renderFiles(ctx: AppContext): SafeHtml | null {
+export function renderFiles(ctx: AppContext, live: LiveScreen | null = null): SafeHtml | null {
   const app = ctx.session.filesApp;
   if (!app) return null;
   const { state, events } = ctx;
@@ -89,14 +143,23 @@ export function renderFiles(ctx: AppContext): SafeHtml | null {
   const opened = openedDocs(events);
   const fill = (s: string) => fillPlaceholders(s, state.names);
 
-  // The left column: the three folders, then the bin.
+  // The left column: the three folders, 相册 (camera R3), then the bin.
   const tabs = [
     ...filesData.folders.map((folder) => ({ id: folder.id, name: folder.name })),
+    ...(hasString("files.album") ? [{ id: ALBUM_TAB, name: t("files.album") }] : []),
     { id: BIN_TAB, name: appName(day, "trash") },
   ];
   const nav = tabs.map(
     (tab) => html`<button type="button" class="${cls("f-tab", app.tab === tab.id && "on")}" data-action="file-tab" data-tab="${tab.id}">${tab.name}</button>`,
   );
+
+  const title = appName(day, app.which);
+  const frame = (list: SafeHtml, main: SafeHtml) =>
+    html`<div class="win filesw" role="dialog" aria-label="${title}" data-files="${app.which}"><div class="bar"><div class="dots"><i></i><i></i><i></i></div><span class="title">${title}</span><button type="button" class="x" data-action="files-close" aria-label="${t("dialogue.close")}">×</button></div><div class="f-body-wrap"><nav class="f-tabs">${nav}</nav>${list}${main}</div></div>`;
+  if (app.tab === ALBUM_TAB) {
+    const a = album(ctx, live);
+    return frame(a.list, a.main);
+  }
 
   // The selected tab's files.
   const selectedFolder = filesData.folders.find((f) => f.id === app.tab);
@@ -109,6 +172,5 @@ export function renderFiles(ctx: AppContext): SafeHtml | null {
     ? html`<div class="f-open"><div class="f-open-bar"><button type="button" class="f-back" data-action="file-close" aria-label="${t("dialogue.close")}">‹</button><span class="f-title">${openFile.name}</span></div>${fileBody(openFile, fill)}</div>`
     : html`<div class="f-open empty"></div>`;
 
-  const title = appName(day, app.which);
-  return html`<div class="win filesw" role="dialog" aria-label="${title}" data-files="${app.which}"><div class="bar"><div class="dots"><i></i><i></i><i></i></div><span class="title">${title}</span><button type="button" class="x" data-action="files-close" aria-label="${t("dialogue.close")}">×</button></div><div class="f-body-wrap"><nav class="f-tabs">${nav}</nav>${fileList(files, app.open, emptyLine)}${main}</div></div>`;
+  return frame(fileList(files, app.open, emptyLine), main);
 }

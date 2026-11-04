@@ -23,7 +23,7 @@ import { CHICK_FRAMES, CHICK_H, CHICK_ICONS, CHICK_W, missingChickFrames, parseC
 import { DOWN, dragTurn, easeBack, flipsOver, handStep, keysLive, RETURN_MS, TURN_PITCH, TURN_YAW, type Hand } from "@world/objects/hand";
 import { arrivedMessages, KEY_DOWN_MS, PROGRAMS } from "@world/objects/index";
 import { batteryBars, pager, pagerHistory, PAGER_HISTORY, type PagerState } from "@world/objects/pager";
-import { crackLit, iccard, phone, pinchMarks, textbook } from "@world/objects/plain";
+import { crackLit, iccard, phone, pinchMarks, camera } from "@world/objects/plain";
 import { dreamLevel, MAX_LEVEL, SEMITONE, type ObjectEnv } from "@world/objects/program";
 import { packRadii, playList, reelAngles, tape, tapePos, TAPE_SIDE_MS, type TapeState } from "@world/objects/tape";
 import { keyboardToObjKey, loopActions, loopKeys } from "@world/room/game";
@@ -232,7 +232,7 @@ describe("holding and using (FR1)", () => {
   });
   // objects-in-room R2: using an object at a place is a record (`useAt`); nothing else is written.
   it("property: no key, use, turn or put-down writes a world event (only the useAt record)", () => {
-    const objects = ["chick", "textbook", "pager", "iccard", "tape", "dictionary", "calculator", "phone"];
+    const objects = ["chick", "camera", "pager", "iccard", "tape", "dictionary", "calculator", "phone"];
     const steps = fc.oneof(
       fc.record({ a: fc.constant("loop-hold"), object: fc.constantFrom(...objects) }),
       fc.record({ a: fc.constant("obj-use") }),
@@ -244,7 +244,7 @@ describe("holding and using (FR1)", () => {
       fc.property(fc.array(steps, { maxLength: 40 }), (plan) => {
         const store = atDay(18, objects);
         // Every object known, so no question is asked (that one is the recognise spec's).
-        for (const id of objects) if (!store.getState().recognised.includes(id as never) && id !== "textbook" && id !== "phone") store.appendEvent({ kind: "recognise", objectId: id });
+        for (const id of objects) if (!store.getState().recognised.includes(id as never) && id !== "camera" && id !== "phone") store.appendEvent({ kind: "recognise", objectId: id });
         const { ctx, tick } = fakeCtx(store);
         ctx.session.hand.inLight = true;
         const before = store.getEvents().length;
@@ -387,7 +387,7 @@ describe("holding and using (FR1)", () => {
       // 88 % of the fixed stage, the on-stage cap for the face box in both dimensions.
       expect(FOCUS_MAX * STAGE_W).toBe(1408);
       expect(FOCUS_MAX * STAGE_H).toBe(792);
-      for (const id of ["chick", "pager", "calculator", "dictionary", "iccard", "textbook", "tape", "phone"]) {
+      for (const id of ["chick", "pager", "calculator", "dictionary", "iccard", "camera", "tape", "phone"]) {
         // Every key hotspot lies inside the face (0..1), so inside the stage once the face fits.
         for (const k of handOf(id).keys) {
           expect(k.l, `${id}.${k.id}`).toBeGreaterThanOrEqual(0);
@@ -625,8 +625,8 @@ describe("holding and using (FR1)", () => {
 
     // ——— flip and rotate in 使用, the object turns without going back to holding (2026-11-03) ———
     it("the flip / rotate buttons appear only for the objects with that change, only in 使用", () => {
-      // chick, iccard, phone, textbook show flip and not rotate.
-      for (const id of ["chick", "iccard", "phone", "textbook"]) {
+      // chick, iccard, phone, camera show flip and not rotate.
+      for (const id of ["chick", "iccard", "phone", "camera"]) {
         const ctx = used(id);
         const out = render(ctx);
         expect(out, id).toContain('data-action="obj-flip"');
@@ -985,7 +985,7 @@ describe("programs (FR2, FR3)", () => {
     expect(up.out.some((o) => "say" in o)).toBe(false);
     expect(up.state.mode).toBe("stop");
   });
-  it("card, phone, textbook: a flip sound, pinch marks by uses (+1 from day 13), the cracked corner on day 18, the score once", () => {
+  it("card, phone, camera: a flip sound, pinch marks by uses (+1 from day 13), the cracked corner on day 18; the camera's shutter", () => {
     expect(iccard.key(iccard.init(env()), "flip", env()).out).toEqual([{ sound: "plastic-flip" }]);
     expect([pinchMarks(2, 12), pinchMarks(2, 13)]).toEqual([2, 3]);
     const e18 = env({ day: 18, t: 1000 });
@@ -995,8 +995,12 @@ describe("programs (FR2, FR3)", () => {
     expect(crackLit(closed, 1100)).toBe(false);
     expect(phone.key(opened, "flip", env({ day: 17 })).state.crackAt).toBeNull();
     expect(phone.key(opened, "power", e18).state).toBe(opened);
-    const w = textbook.key(textbook.init(env()), "cell", env({ t: 5 })).state;
-    expect(textbook.key(w, "cell", env({ t: 9 })).state.writtenAt).toBe(5);
+    // camera R8: the shutter ejects a sheet (its sound), the flash slider toggles; no wheel.
+    const shot = camera.key(camera.init(env()), "shutter", env({ t: 5, sheets: 3 }));
+    expect(shot.state.ejectAt).toBe(5);
+    expect(shot.out).toEqual([{ sound: "camera-shutter" }]);
+    expect(camera.key(camera.init(env()), "flash", env()).state.flash).toBe(true);
+    expect(camera.key(camera.init(env()), "wheel", env()).state).toEqual(camera.init(env()));
   });
 });
 

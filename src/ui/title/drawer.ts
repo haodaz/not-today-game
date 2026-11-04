@@ -4,7 +4,7 @@
 // the upgraded state, and NOTHING touches the store or appends an event — the drawer is a pure,
 // store-free preview. Drawn devices (chick, pager, dictionary, calculator, tape) reuse `renderDevice`
 // and run a small in-memory program (a fresh `init` each time the cell is opened); photo objects
-// (textbook, iccard, phone) show the photo with a flip. The walkman plays the title theme, not the
+// (camera, iccard, phone) show the photo with a flip. The walkman plays the title theme, not the
 // story recordings.
 import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t, tr } from "@world/i18n";
@@ -24,7 +24,7 @@ import type { Collection } from "@world/room/collection";
 /** The Kurogotchi's cell id (not a `content/objects.json` object; its own idle pose photo). */
 export const KURO_ID = "kurogotchi";
 /** Objects shown as a photo (no program) in the drawer. */
-const PHOTO_IDS: readonly string[] = ["textbook", "iccard", "phone"];
+const PHOTO_IDS: readonly string[] = ["camera", "iccard", "phone"];
 
 /** The objects in the drawer, in content order, then the Kurogotchi when unlocked. */
 export function drawerIds(c: Collection): string[] {

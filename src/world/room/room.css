@@ -274,9 +274,9 @@
 .room .held.obj .signal::after{content:"";position:absolute;inset:0;border-bottom:1px solid rgba(27,27,27,.35)}
 .room .held.obj .sim{position:absolute;left:30%;top:42%;width:40%;height:22%;border-radius:6px;background:#d8c06a;display:flex;align-items:flex-end;justify-content:center;padding:4px;box-sizing:border-box}
 .room .held.obj .sim span{font-size:9px;color:#3a3220}
-/* The textbook's empty cell: content's score in pencil, written over 1.5 s (--pencil 0..1). */
-.room .held.obj .okey.cell{background:none;border-radius:2px}
-.room .held.obj .okey.cell .pencil{display:block;font:italic 600 22px/1 "Comic Sans MS","Bradley Hand",cursive;color:rgba(70,70,80,.85);clip-path:inset(0 calc(100% - var(--pencil,1) * 100%) 0 0)}
+/* camera R6: while its photos are missing, the camera's front is a tinted box (holding only; 使用 is
+   the drawn device). The picture covers it once it exists. */
+.room .held.obj[data-object="camera"]:not(.device) .face.front{min-height:260px;background:#d9d4c8;border-radius:18px}
 /* The dictionary: shut when lifted (its lid is the back picture); used, it opens on a loose hinge. */
 .room .held.obj[data-object="dictionary"][data-open="0"] .face.front > :not(img){visibility:hidden}
 .room .held.obj[data-object="dictionary"][data-open="0"] .face.front > img{content:url(/objects/dictionary_back.png)}

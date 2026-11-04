@@ -80,6 +80,13 @@ function toTs(notation: string): string {
   return literal(text);
 }
 
+/**
+ * camera R1: content still names the camera `textbook`; the game reads it as `camera`. A copy of
+ * src/state/objectIds.ts RENAMED_OBJECTS (this script runs without the app's aliases); a test keeps
+ * the two equal.
+ */
+export const RENAMED_OBJECTS: Readonly<Record<string, string>> = { textbook: "camera" };
+
 function entryToTs(entry: Entry): string {
   const head = entry.type.split("<")[0] ?? entry.type;
   switch (head) {
@@ -87,7 +94,7 @@ function entryToTs(entry: Entry): string {
       return (entry.values ?? []).map(literal).join(" | ");
     case "set":
     case "subset":
-      return entry.of ? `(${entry.of.map(literal).join(" | ")})[]` : toTs(entry.type);
+      return entry.of ? `(${entry.of.map((id) => literal(RENAMED_OBJECTS[id] ?? id)).join(" | ")})[]` : toTs(entry.type);
     case "object":
       return entry.fields
         ? `{ ${Object.entries(entry.fields)

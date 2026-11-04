@@ -13,7 +13,7 @@ import { arrivedMessages, envFor, programState, PROGRAMS } from "./index";
 import { breath, dragTurn, easeBack, flipsOver, NO_TURN, ROLL_MAX, ROLLERS, type Turn } from "./hand";
 import { paintFrame, preloadKuro, systemRaster } from "./paint";
 import { ghostBits, isDevice } from "@world/room/devices";
-import { crackLit, pencilShown, type PhoneState, type TextbookState } from "./plain";
+import { cameraFlashing, crackLit, type CameraState, type PhoneState } from "./plain";
 import { packRadii, reelAngles, tapePos, type TapeState } from "./tape";
 
 /** A press that moves less than this (stage px) is a click. */
@@ -206,7 +206,8 @@ export function createHandLayer() {
         el.classList.toggle("playing", ts.mode !== "stop" && !env.upgraded);
       }
       if (id === "phone" && s) el.classList.toggle("crack-lit", crackLit(s as PhoneState, t));
-      if (id === "textbook" && s) el.style.setProperty("--pencil", pencilShown(s as TextbookState, t).toFixed(3));
+      // camera R1: the white flash over the screen for 120 ms after a shot.
+      if (id === "camera") el.classList.toggle("cam-flash-on", cameraFlashing(s as CameraState | null, t));
       if (id === "dictionary" && session.hand.openedAt !== null) {
         const since = t - session.hand.openedAt;
         el.classList.toggle("hinge", since < HINGE_MS);

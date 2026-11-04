@@ -28,6 +28,10 @@ export interface ObjectEnv {
   readonly pager: readonly PagerMessage[];
   /** How many times the card has been used (the pinch marks). */
   readonly uses: number;
+  /** camera R8: sheets left in the pack (10 − the run's room photos); absent = none. */
+  readonly sheets?: number;
+  /** camera R8: the camera is pointed at the screen now (屏幕: unlimited, uncounted). */
+  readonly onScreen?: boolean;
 }
 
 export type Out =

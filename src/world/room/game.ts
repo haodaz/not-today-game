@@ -17,7 +17,7 @@ import { fillPlaceholders } from "@world/replies/placeholders";
 import { shellActions, type ActionContext, type ActionHandler } from "@world/desktop/controller";
 import { appOn, buildShell, VIEWS, type Session, type View } from "@world/desktop/model";
 import { bringToFront } from "@world/desktop/placement";
-import { renderDesktop, type AppId } from "@world/desktop/shell";
+import { renderDesktop, shownStill, type AppId } from "@world/desktop/shell";
 import { placeOrder } from "@world/delivery/commands";
 import { phonePage } from "@world/delivery/app";
 import { nextInputs, startDoor, stepDoor, type DoorInput } from "@world/delivery/door";
@@ -32,7 +32,10 @@ import { handStep, ROLL_MAX, ROLLERS } from "@world/objects/hand";
 import { UPSIDE_DOWN_DEG } from "@world/objects/calculator";
 import { pressKey } from "@world/objects/index";
 import { PHONE_FLIP } from "@world/room/held";
-import { DICT_KEYS, FLIPPERS } from "@world/room/devices";
+import { CAMERA_KEYS, DICT_KEYS, FLIPPERS, SHEET_SLIDE_MS } from "@world/room/devices";
+import { CAMERA_FLASH_MS, cameraShot, type CameraState } from "@world/objects/plain";
+import { DEVELOP_BLANK_MS, DEVELOP_MS } from "@state/photos";
+import { screenPlaceOf } from "@world/desktop/files/album";
 import { booted, deskMeal, itemStates, loopContext, mealToOrder, nightfallReached, openItemFor, openTask } from "@world/loop/checklist";
 import type { EventToken } from "@state/days/table";
 import { messageActions } from "@world/desktop/messages/actions";
@@ -63,7 +66,7 @@ import { composerActions, workbenchActions, workbenchUiActions } from "@world/de
 import { meetingActions } from "@world/desktop/workbench/meeting";
 import { taskShellActions } from "@world/desktop/workbench/shell";
 import { boardActions, lockFaceMove } from "@world/desktop/workbench/board";
-import { enterUse, lampLit, worksHere } from "@world/objects/works";
+import { enterUse, facingOf, lampLit, worksHere } from "@world/objects/works";
 import { workActions } from "@world/desktop/workbench/work";
 import { renderFiles } from "@world/desktop/files/view";
 import { openObjectFromBar, renderObjectBarUse } from "@world/desktop/workbench/objbar";
@@ -85,7 +88,9 @@ export function renderGame(store: Store, session: Session, nowMs: number): SafeH
     const shell = buildShell(state, events, session, desktopApps, nowMs, store.getStartDay());
     // Work-task narration and the conversation with Kuro play in the dialogue box over the desktop too.
     const dlg = dialogueBox(state, events, session, nowMs);
-    const filesWin = renderFiles({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs });
+    // camera R3: 相册 compares a screen photo with the screen on show now (its place and still).
+    const live = session.filesApp ? { at: screenPlaceOf(session, state.day), still: shownStill(shell)?.value ?? null } : null;
+    const filesWin = renderFiles({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs }, live);
     // 老物件栏 (object-bar R2): an object opened from the bar is used in a modal over the desktop.
     const objUse = renderObjectBarUse({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs });
     return html`${renderDesktop(shell)}<button type="button" class="back-room" data-action="view" data-view="room">${tr("desktop.back")}</button>${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${objUse ? html`<div class="objbar-host">${objUse}</div>` : null}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${dlgLayer(dlg, session)}<div class="hud-host">${settingsButton()}${itemsButton(session)}${itemsPanel(state, events, session)}<div class="hud-br">${hudKuro({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs })}</div>${settingsPanel(session)}</div>`;
@@ -364,6 +369,26 @@ function goTo(ctx: ActionContext, view: View, data: DOMStringMap): void {
     // Only if nothing else moved the player meanwhile.
     if (ctx.session.view === "room") arrive(ctx, view, data);
   });
+}
+
+/**
+ * camera R2 / R8: the shutter took a photo. It is a `photo` event: on 屏幕 the shown window's place
+ * (unlimited), elsewhere the facing (`room:<facing>`, one sheet of the pack). The session keeps when
+ * it was taken (20 s of developing count from it) and, on the screen, the window's still; the sheet
+ * hangs out of the slot; the view re-renders as it slides and develops.
+ */
+function takePhoto(ctx: ActionContext): void {
+  const { store, session } = ctx;
+  const state = store.getState();
+  const now = ctx.now?.() ?? Date.now();
+  const onScreen = session.view === "desktop";
+  const at = onScreen ? screenPlaceOf(session, state.day) : `room:${facingOf(session.view)}`;
+  const index = store.getEvents().length;
+  store.appendEvent({ kind: "photo", at, t: session.clock.time });
+  const still = onScreen ? shownStill(buildShell(store.getState(), store.getEvents(), session, desktopApps, now, store.getStartDay()))?.value ?? null : null;
+  session.photos = { ...session.photos, [index]: { at, day: state.day, takenAt: now, still } };
+  session.lastPhoto = index;
+  for (const ms of [CAMERA_FLASH_MS, SHEET_SLIDE_MS, DEVELOP_BLANK_MS, DEVELOP_MS]) ctx.later(ms + 16, ctx.rerender);
 }
 
 /** One leg of a way: the view changes now; the motion layer plays the walk or the turn. */
@@ -899,20 +924,19 @@ export const loopActions: Record<string, ActionHandler> = {
     if (!session.hand.using) return void loopActions["obj-use"]!(ctx, {} as DOMStringMap, null as never);
     const hand = handOf(id);
     // The dictionary's 使用 device adds ▲▼ (the program ignores them); its keys are the device set.
-    const onDevice = session.hand.using && id === "dictionary" && DICT_KEYS.includes(key);
+    const onDevice = session.hand.using && ((id === "dictionary" && DICT_KEYS.includes(key)) || (id === "camera" && CAMERA_KEYS.includes(key)));
     const onFront = hand.keys.some((k) => k.id === key) || onDevice || (id === "phone" && key === PHONE_FLIP);
-    const onBack = (id === "chick" && key === "reset" && !!hand.back.reset) || (id === "textbook" && key === "cell" && !!hand.cell);
+    const onBack = id === "chick" && key === "reset" && !!hand.back.reset;
     if (!(onFront && session.hand.face === "front") && !(onBack && session.hand.face === "back")) return;
     // objects-in-room R1: where it does not work its keys do nothing (the flip phone still opens:
     // the hinge is not a key).
     if (!worksHere(ctx.store.getState(), session, id) && !(id === "phone" && key === PHONE_FLIP)) return;
     // The dictionary's keys are under its lid until it is open.
     if (id === "dictionary" && (session.hand.programs.dictionary as { open?: boolean } | undefined)?.open !== true) return;
-    if (id === "textbook" && key === "cell") {
-      if (session.hand.once.includes("textbook:cell")) return;
-      session.hand.once.push("textbook:cell");
-    }
+    const before = id === "camera" ? ((session.hand.programs.camera as CameraState | undefined) ?? null) : null;
     pressKey(ctx, id, key, { cap: onFront });
+    // camera R2: a shot is a `photo` event, where the camera was pointed (and a screen's still).
+    if (id === "camera" && cameraShot(before, session.hand.programs.camera as CameraState)) takePhoto(ctx);
     ctx.rerender();
   },
   // The hand layer turned it over (a drag that reached the limit): the other face stays up.
@@ -923,8 +947,8 @@ export const loopActions: Record<string, ActionHandler> = {
     const face = data.face === "back" ? "back" : "front";
     if (face === session.hand.face) return;
     session.hand.face = face;
-    // The card's thin plastic, the textbook's page.
-    if (id === "iccard" || id === "textbook") pressKey(ctx, id, "flip");
+    // The card's thin plastic.
+    if (id === "iccard") pressKey(ctx, id, "flip");
     ctx.rerender();
   },
   // 翻面 in 使用 (objects-in-hand 2026-11-03): flip front ↔ back without leaving 使用. It sets the
@@ -935,7 +959,7 @@ export const loopActions: Record<string, ActionHandler> = {
     if (!id || session.phoneOpen || !session.hand.using || !FLIPPERS.includes(id)) return;
     session.hand.face = session.hand.face === "front" ? "back" : "front";
     session.hand.flippedAt = ctx.now?.() ?? Date.now();
-    if (id === "iccard" || id === "textbook") pressKey(ctx, id, "flip");
+    if (id === "iccard") pressKey(ctx, id, "flip");
     ctx.rerender();
   },
   // 倒过来 in 使用 (calculator): toggle the in-plane roll 0 ↔ 180. Past UPSIDE_DOWN_DEG the program

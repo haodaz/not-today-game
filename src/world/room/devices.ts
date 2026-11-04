@@ -18,15 +18,17 @@ import { worksHere } from "@world/objects/works";
 import { VOLUME_MAX, type TapeState } from "@world/objects/tape";
 import { CELL_W, CELL_H } from "@world/room/held";
 import { KURO_MENU, type KuroPose, type KuroState } from "@world/objects/kurogotchi";
+import { CAM_CELLS, CAM_H, CAM_W, cameraFlashing, type CameraState } from "@world/objects/plain";
+import { photoPicture, stageOfPhoto } from "@world/desktop/files/album";
 
 /** The objects whose 使用 face is a drawn device (the others keep the photo for now). */
-export const DEVICE_IDS: readonly string[] = ["chick", "pager", "dictionary", "calculator", "tape"];
+export const DEVICE_IDS: readonly string[] = ["chick", "pager", "dictionary", "calculator", "tape", "camera"];
 export const isDevice = (id: string): boolean => DEVICE_IDS.includes(id);
 /** How long after 翻面 the egg still carries `.flipping` (its m-flip runs 320 ms). */
 export const FLIP_MS = 400;
 
 /** Objects with a flip button in 使用 (front ↔ back; objects-in-hand 2026-11-03). */
-export const FLIPPERS: readonly string[] = ["chick", "iccard", "phone", "textbook"];
+export const FLIPPERS: readonly string[] = ["chick", "iccard", "phone", "camera"];
 /** Objects with a rotate button in 使用 (in-plane 0 ↔ 180). */
 export const ROTATERS: readonly string[] = ["calculator"];
 /** Whether to show a flip / rotate button under `id` in 使用. */
@@ -36,6 +38,8 @@ export const canRotate = (id: string): boolean => ROTATERS.includes(id);
 /** The dictionary's keyboard in 使用 (the photo `grid` hotspot becomes real letter/function buttons). */
 export const DICT_ROWS_KB: readonly string[] = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
 export const DICT_KEYS: readonly string[] = [...DICT_ROWS_KB.join(""), "lookup", "up", "down", "back", "power", "space"];
+/** The drawn camera's keys (camera R8 / R9): the red shutter and the flash slider. */
+export const CAMERA_KEYS: readonly string[] = ["shutter", "flash"];
 
 /** A key's hover label in 使用: strings `obj.key.<object>.<id>`, or nothing (digits/letters need none). */
 function keyLabel(object: string, key: string): string | null {
@@ -68,9 +72,9 @@ function key(object: string, key: string, down: boolean, live: boolean, text: st
  * `finer`d by the dream level, like the frame, so the two line up.
  */
 export function ghostBits(id: string, level: number): { w: number; h: number; bits: Uint8Array } {
-  if (id === "pager" || id === "calculator") {
-    const b = new Bits(id === "pager" ? PAGER_W : CALC_W, id === "pager" ? PAGER_H : CALC_H);
-    const cells = id === "pager" ? PAGER_CELLS : CALC_CELLS;
+  if (id === "pager" || id === "calculator" || id === "camera") {
+    const b = new Bits(id === "pager" ? PAGER_W : id === "camera" ? CAM_W : CALC_W, id === "pager" ? PAGER_H : id === "camera" ? CAM_H : CALC_H);
+    const cells = id === "pager" ? PAGER_CELLS : id === "camera" ? CAM_CELLS : CALC_CELLS;
     const x0 = id === "pager" ? PAGER_DIGITS_X : 1;
     const y0 = id === "pager" ? 1 : 1;
     // Every cell shows a full 8 with its point: the unlit segments show through as ghost.
@@ -208,7 +212,50 @@ function tape(ctx: DeviceCtx): SafeHtml {
   return html`<div class="${cls("dev-shell", "walk", upgraded && "upgraded", mode === "play" && "playing")}" data-device="tape" data-mode="${mode}">${keys}<div class="body">${win}<div class="brand">${brand}${sub}</div></div>${vol}<div class="jack"></div>${cord}</div>`;
 }
 
-const SHELLS: Readonly<Record<string, (ctx: DeviceCtx) => SafeHtml>> = { chick, pager, dictionary, calculator, tape };
+/** camera R9: the ejected sheet slides out of the slot over this long. */
+export const SHEET_SLIDE_MS = 600;
+
+/**
+ * The instant camera in 使用 (camera R9): flat, clean, bright. A 360 × 300 body, warm white above
+ * (62 %), near-black below with the photo slot; our own teal / coral stripe under the lens (no
+ * rainbow, no logo, no text); the lens in inline SVG; the flash window and the viewfinder; the red
+ * shutter and the yellow flash slider as real keys. Flipped, the back shows the sheets-left counter
+ * (the program's seven-segment frame on a small glass). The last sheet out of the slot hangs under
+ * it, developing (R8); its slide keeps its place across re-renders (a negative delay).
+ */
+function camera(ctx: DeviceCtx): SafeHtml {
+  const down = downKey(ctx);
+  const live = ctx.session.hand.using;
+  const back = ctx.session.hand.face === "back";
+  const upgraded = ctx.state.upgraded.camera === true;
+  const cam = (ctx.p as CameraState | null) ?? null;
+  const front = () => {
+    const lines = Array.from({ length: 6 }, () => html`<i></i>`);
+    const lens = raw(
+      `<svg class="cam-lens" width="132" height="132" viewBox="0 0 132 132" aria-hidden="true" focusable="false"><defs><radialGradient id="cam-glass" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#3A4A55"/><stop offset="100%" stop-color="#11161A"/></radialGradient></defs><circle cx="66" cy="66" r="66" fill="#1E1E21"/><circle cx="66" cy="66" r="42" fill="url(#cam-glass)"/><circle cx="52" cy="50" r="6" fill="#FFFFFF" opacity="0.85"/></svg>`,
+    );
+    const shutter = key("camera", "shutter", down === "shutter", live, "", "cam-shutter");
+    const slider = key("camera", "flash", down === "flash", live, "", cls("cam-flashsl", cam?.flash && "on"));
+    return html`<div class="cam-top"><div class="cam-flashwin" aria-hidden="true">${lines}</div><div class="cam-vf" aria-hidden="true"><i></i></div><div class="cam-stripe" aria-hidden="true"><i class="t"></i><i class="c"></i></div>${lens}${shutter}${slider}</div><div class="cam-bottom"><div class="cam-slot" aria-hidden="true"></div></div>`;
+  };
+  const backFace = () => html`<div class="cam-top"><div class="cam-counter">${glass(ctx, CAM_W, CAM_H)}</div></div><div class="cam-bottom"></div>`;
+  // The sheet out of the slot (front only): the last photo this session, developing.
+  const last = ctx.session.lastPhoto;
+  const photo = last !== null ? ctx.session.photos[last] : undefined;
+  let sheet: SafeHtml | null = null;
+  if (!back && photo) {
+    const elapsed = Math.max(0, ctx.nowMs - photo.takenAt);
+    const stage = stageOfPhoto(photo, ctx.nowMs, upgraded);
+    const late = elapsed < SHEET_SLIDE_MS ? raw(` style="--late:-${Math.round(elapsed)}ms"`) : null;
+    sheet = html`<div class="${cls("cam-sheet", elapsed >= SHEET_SLIDE_MS && "out")}"${late}>${photoPicture(photo, stage, upgraded, 0.11)}</div>`;
+  }
+  const at = ctx.session.hand.flippedAt;
+  const flipping = at !== null && ctx.nowMs - at >= 0 && ctx.nowMs - at < FLIP_MS;
+  const flash = !back && cameraFlashing(cam, ctx.nowMs) ? html`<i class="cam-flash" aria-hidden="true"></i>` : null;
+  return html`<div class="${cls("dev-shell", "cam", upgraded && "upgraded", back && "back", flipping && "flipping")}" data-device="camera" data-face="${back ? "back" : "front"}">${back ? backFace() : front()}${sheet}${flash}</div>`;
+}
+
+const SHELLS: Readonly<Record<string, (ctx: DeviceCtx) => SafeHtml>> = { chick, pager, dictionary, calculator, tape, camera };
 
 /** The flip / rotate buttons under the device in 使用 (never while holding): each shown only when
  *  the object has that change. Text from strings `obj.flip` / `obj.rotate`. */

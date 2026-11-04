@@ -27,7 +27,7 @@ describe("the twelve event kinds", () => {
         "order", "pickup", "useItem", "open", "step", "choose", "task", "upgrade", "declineUpgrade", "ending", "names", "chat", "kuroClosed", "judged",
         "callAnswer", "callEnded",
         "boardStep", "give", "boardJudge",
-        "useAt",
+        "useAt", "photo",
       ].sort(),
     );
   });

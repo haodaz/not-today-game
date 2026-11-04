@@ -2,7 +2,7 @@
 //   pixels — a 1-bit buffer at the object's channel resolution (× 2ⁿ at dream level n);
 //   cells  — the dictionary's 2 × 16 dot-matrix text cells (a CJK character takes two);
 //   hi     — the new world's smooth screen (an upgraded object): text lines, maybe a colour picture;
-//   none   — no screen at all (the card, the tape, the phone, the textbook).
+//   none   — no screen at all (the card, the tape, the phone, the camera).
 // Seven-segment and dot-matrix glyphs are drawn here by code (no font files). Pure.
 
 export interface PixelFrame {

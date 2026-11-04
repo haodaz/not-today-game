@@ -220,6 +220,17 @@ function stillOf(markup: SafeHtml): SafeHtml {
 }
 
 /**
+ * camera R3: the window on the monitor being shown, as a still (the 调度中心 thumbnail's copy: no
+ * action, no caret, iframes as a grey box). Null for a black screen or an empty display.
+ */
+export function shownStill(m: ShellModel): SafeHtml | null {
+  if (m.off) return null;
+  const mon = m.focus === "left" ? m.monitors[0] : m.monitors[1];
+  const frame = windowFrame(m, mon);
+  return frame ? stillOf(frame) : null;
+}
+
+/**
  * 调度中心 / Mission Control (tingtalk R1b), the macOS view: over both monitors, a strip at the top
  * with the two screens (左屏 / 右屏) and, under it, every open window spread out as a scaled live
  * thumbnail with its name. A window dragged onto a screen moves there; a click focuses it (closing

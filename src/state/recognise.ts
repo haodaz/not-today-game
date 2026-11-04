@@ -4,7 +4,8 @@
 // Read, checked strictly, frozen. The reducer derives right/wrong from content, never from the UI.
 import raw from "@content/objects.json";
 import enRaw from "@content/en/objects.json";
-import stagesFile from "@content/stages.json";
+import { objectsFoundOnDay } from "./stages";
+import { objectId } from "./objectIds";
 import { bilingualValues } from "./content-locale";
 import type { GameEvent } from "./events";
 import { hasEvidence, judge, type JudgementDelta } from "./judgement";
@@ -53,13 +54,15 @@ function answer(v: unknown, w: string): Answer {
 }
 
 /** Parses the table: every object out of the box has one entry, on its box day, with one right option of three. */
-export function parseObjects(input: unknown, foundOnDay: Readonly<Record<string, number>> = stagesFile.objectsFoundOnDay): ReadonlyMap<string, RecogniseEntry> {
+export function parseObjects(input: unknown, foundOnDay: Readonly<Record<string, number>> = objectsFoundOnDay): ReadonlyMap<string, RecogniseEntry> {
   if (!isRecord(input)) fail("", "not an object");
   keys(input, ["_note", "objects"], "top level");
   if (!isRecord(input.objects)) fail("objects", "must be an object");
   const known = membersOf("found") ?? [];
   const out = new Map<string, RecogniseEntry>();
-  for (const [id, v] of Object.entries(input.objects)) {
+  // camera R1: content's ids are read under the game's (content's `textbook` is the camera).
+  for (const [contentId, v] of Object.entries(input.objects)) {
+    const id = objectId(contentId);
     const w = `objects.${id}`;
     if (!known.includes(id)) fail(w, "not an object in variables.json found");
     if (!isRecord(v)) fail(w, "must be an object");
@@ -125,7 +128,7 @@ export function wasRight(e: Pick<RecogniseEvent, "objectId" | "option">): boolea
 
 /**
  * Knows what it is: recognised in state, or (for the box things that are not one of the six, such
- * as the textbook) answered right in the log.
+ * as the camera) answered right in the log.
  */
 export function knows(object: string, state: State, events: readonly GameEvent[]): boolean {
   return (state.recognised as string[]).includes(object) || events.some((e) => isRecognise(e) && e.objectId === object && wasRight(e));

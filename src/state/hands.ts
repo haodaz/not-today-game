@@ -15,6 +15,7 @@ import kidRaw from "@content/kid.json";
 import stagesFile from "@content/stages.json";
 import { parseLine, type SayLine } from "./days/table";
 import { parseWorks, type Works } from "./works";
+import { objectId } from "./objectIds";
 
 /** A rectangle on the object's image, as fractions of its box (0..1). */
 export interface Rect {
@@ -54,8 +55,6 @@ export interface HandEntry {
   readonly sim: string | null;
   /** The IC card's line seen against the light (optional; absent = nothing shows). */
   readonly light: string | null;
-  /** The textbook's empty cell and what is pencilled in it (optional; absent = no cell). */
-  readonly cell: (Rect & { readonly text: string }) | null;
   /** objects-in-room R1: where it works (absent = anywhere). Not the iccard's `light` text above. */
   readonly works: Works | null;
 }
@@ -182,13 +181,14 @@ export function parseHands(input: unknown, dreams: readonly number[] = stagesFil
       keysOf(v.reels, ["left", "right"], `${w}.reels`, fail);
       reels = Object.freeze({ left: reel(v.reels.left, `${w}.reels.left`, fail), right: reel(v.reels.right, `${w}.reels.right`, fail) });
     }
-    let cell: HandEntry["cell"] = null;
+    // camera R1: the textbook's back-cover cell is not carried over. Content may still have it
+    // (under `textbook`): it is checked, so a broken file is still noticed, and then dropped.
     if (v.cell !== undefined) {
-      const r = rect(v.cell, `${w}.cell`, fail, ["text"]);
-      cell = Object.freeze({ ...r, text: str((v.cell as Raw).text, `${w}.cell.text`, fail) });
+      rect(v.cell, `${w}.cell`, fail, ["text"]);
+      str((v.cell as Raw).text, `${w}.cell.text`, fail);
     }
     out.set(
-      id,
+      objectId(id),
       Object.freeze({
         keys: Object.freeze(keys),
         screen: v.screen === undefined ? null : rect(v.screen, `${w}.screen`, fail),
@@ -198,7 +198,6 @@ export function parseHands(input: unknown, dreams: readonly number[] = stagesFil
         recordings: v.recordings === undefined ? Object.freeze([]) : Object.freeze(recordings(v.recordings, `${w}.recordings`, fail, dreams)),
         sim: v.sim === undefined ? null : str(v.sim, `${w}.sim`, fail),
         light: v.light === undefined ? null : str(v.light, `${w}.light`, fail),
-        cell,
         works: v.works === undefined ? null : parseWorks(v.works, `${w}.works`, fail),
       }),
     );
@@ -206,7 +205,7 @@ export function parseHands(input: unknown, dreams: readonly number[] = stagesFil
   return out;
 }
 
-export const EMPTY_HAND: HandEntry = Object.freeze({ keys: [], screen: null, back: {}, solar: null, reels: null, recordings: [], sim: null, light: null, cell: null, works: null });
+export const EMPTY_HAND: HandEntry = Object.freeze({ keys: [], screen: null, back: {}, solar: null, reels: null, recordings: [], sim: null, light: null, works: null });
 export const handTable: ReadonlyMap<string, HandEntry> = parseHands(objectsRaw);
 export const handOf = (id: string): HandEntry => handTable.get(id) ?? EMPTY_HAND;
 

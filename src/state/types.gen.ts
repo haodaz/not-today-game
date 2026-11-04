@@ -4,7 +4,7 @@
 export interface State {
   day: number;
   stage: number;
-  found: ("chick" | "textbook" | "pager" | "iccard" | "tape" | "dictionary" | "calculator" | "phone")[];
+  found: ("chick" | "camera" | "pager" | "iccard" | "tape" | "dictionary" | "calculator" | "phone")[];
   recognised: ("chick" | "pager" | "iccard" | "tape" | "dictionary" | "calculator")[];
   chickFrame: "grave" | "blink" | "crack" | "peck" | "light" | "phoenix" | "out";
   pagerUnread: string | null;

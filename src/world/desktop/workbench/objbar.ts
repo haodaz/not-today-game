@@ -29,7 +29,7 @@ export function iconStateOf(id: string, state: Pick<State, "day">, events: reado
 
 /** The icon src for a found object: `<id>[-up|-taken].png` when it has art, else the photo placeholder. */
 export function iconSrc(id: string, st: IconState): string {
-  if (!ICON_OBJECTS.includes(id)) return `/objects/${id}_front.png`; // placeholder (iccard / textbook / phone / …)
+  if (!ICON_OBJECTS.includes(id)) return `/objects/${id}_front.png`; // placeholder (iccard / camera / phone / …)
   const suffix = st === "own" ? "" : `-${st}`;
   return `/objects/icons/${id}${suffix}.png`;
 }

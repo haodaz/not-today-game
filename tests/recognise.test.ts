@@ -1,7 +1,7 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
+import { objectsFoundOnDay } from "@state/stages";
 import objectsFile from "@content/objects.json";
-import stagesFile from "@content/stages.json";
 import takesFile from "@content/nights-takes.json";
 import { applyChoose, choiceOf } from "@state/days/effects";
 import { dayFiles } from "@state/days/table";
@@ -39,11 +39,11 @@ function queued(store: Store, act: () => void, runId = store.getRunId()) {
   const lc = loopContext(store.getState(), store.getEvents())!;
   return react(memo, lc, store.getEvents(), { dialogue: EMPTY_DIALOGUE, clock: DEFAULT_CLOCK, sounds: [] }, runId).dialogue;
 }
-const boxDay = (o: string) => (stagesFile.objectsFoundOnDay as Record<string, number>)[o]!;
+const boxDay = (o: string) => objectsFoundOnDay[o]!;
 
 describe("content/objects.json", () => {
   it("every object out of the box has a question on its box day, three options, exactly one right", () => {
-    expect(objects.sort()).toEqual(Object.keys(stagesFile.objectsFoundOnDay).sort());
+    expect(objects.sort()).toEqual(Object.keys(objectsFoundOnDay).sort());
     for (const o of objects) {
       const e = recogniseTable.get(o)!;
       expect(e.day, o).toBe(boxDay(o));
@@ -103,11 +103,11 @@ describe("the recognise event (FR1/FR2)", () => {
     expect(store.getState().judgement.evidence.at(-1)).toEqual({ day: 4, eventId: "recognise:pager", note: recogniseTable.get("pager")!.options[rightIndex("pager")]!.t });
   });
 
-  it("the textbook is not one of the six: a right answer is known from the log, not state", () => {
-    const store = found(2, "textbook");
-    store.appendEvent({ kind: "recognise", objectId: "textbook", option: rightIndex("textbook") });
+  it("the camera is not one of the six: a right answer is known from the log, not state", () => {
+    const store = found(2, "camera");
+    store.appendEvent({ kind: "recognise", objectId: "camera", option: rightIndex("camera") });
     expect(store.getState().recognised).toEqual([]);
-    expect(knows("textbook", store.getState(), store.getEvents())).toBe(true);
+    expect(knows("camera", store.getState(), store.getEvents())).toBe(true);
   });
 
   it("an object not found, or an option that does not exist, is rejected", () => {

@@ -14,13 +14,14 @@ import { takenByKuro } from "./taken";
 import { chick } from "./chick";
 import { dictionary } from "./dictionary";
 import { pager } from "./pager";
-import { iccard, phone, textbook } from "./plain";
+import { camera, iccard, phone } from "./plain";
 import { dreamLevel, type ObjectEnv, type Out, type Program } from "./program";
 import { tape } from "./tape";
+import { sheetsLeft } from "@state/photos";
 
 export const PROGRAMS: Readonly<Record<string, Program<unknown>>> = {
   chick,
-  textbook,
+  camera,
   pager,
   iccard,
   tape,
@@ -81,6 +82,8 @@ export function envFor(state: State, events: readonly GameEvent[], session: Sess
     lit: state.upgraded[id] === true ? 1 : lightLevel(session.hand.inLight, session.hand.leftLightAt, t),
     pager: arrivedMessages(state, events, pagerSchedule, session.clock.time),
     uses: cardUses(events),
+    sheets: sheetsLeft(events),
+    onScreen: session.view === "desktop",
   };
 }
 

@@ -4,9 +4,12 @@
 //     with the coil and content's line;
 //   the phone — flip open, flip closed; the power key does nothing; closing it on day 18 the cracked
 //     corner lights for one frame; the back has content's SIM line;
-//   the textbook — a page turn; the back cover's empty cell takes content's pencilled score once a run.
-import { NO_FRAME } from "./frame";
-import { step, type Program } from "./program";
+//   the instant camera (camera R8) — the shutter shoots and a sheet ejects; the flash slider; the
+//     back's counter of sheets left (seven segments).
+import { Bits, drawSegLine, finer, NO_FRAME, SEG_PITCH, type Frame } from "./frame";
+import { step, type ObjectEnv, type Out, type Program } from "./program";
+import { hasString, t } from "@world/i18n";
+import { NO_PRESS, upgradedHi } from "./taken";
 
 /** From this day the card has one pinch mark the player did not make. */
 export const EXTRA_PINCH_FROM_DAY = 13;
@@ -50,25 +53,51 @@ export const phone: Program<PhoneState> = {
 };
 export const crackLit = (s: PhoneState, t: number): boolean => s.crackAt !== null && t - s.crackAt >= 0 && t - s.crackAt < CRACK_FLASH_MS;
 
-/** The pencil takes this long to write the score. */
-export const PENCIL_MS = 1_500;
-export interface TextbookState {
-  readonly page: number;
-  /** When the score was written (this session), or null. */
-  readonly writtenAt: number | null;
+/**
+ * camera R8 (2026-11-04; R8 wins over R1–R7): the instant camera. `shutter` takes a photo: a sheet
+ * ejects (the `camera-shutter` sound has the whirr in it) and the 120 ms white flash. Pointed at the
+ * room it uses a sheet of the pack (`env.sheets`, from the log); at 0 it clicks and nothing comes
+ * out (「胶卷用完了。」). Pointed at the screen (`env.onScreen`) it is unlimited. `flash` is the
+ * small slider, toggled left / right. No wind wheel. The photo event is the caller's to append (a
+ * program writes no world event): `cameraShot` tells it a shot happened. The back's counter of
+ * sheets left is this program's frame (two seven-segment cells, the calculator's code).
+ */
+export const CAMERA_FLASH_MS = 120;
+/** The back counter: two seven-segment cells. */
+export const CAM_CELLS = 2;
+export const CAM_W = CAM_CELLS * SEG_PITCH + 2;
+export const CAM_H = 11;
+export interface CameraState {
+  /** The flash slider is on (to the right). */
+  readonly flash: boolean;
+  /** When the last sheet ejected (session ms), or null. */
+  readonly ejectAt: number | null;
 }
-export const textbook: Program<TextbookState> = {
-  id: "textbook",
-  channel: null,
+const cameraLine = (env: ObjectEnv, key: string): Out[] => (hasString(key) ? [{ say: { key: `d${env.day}:${key}`, lines: [{ k: "inner", t: t(key) }] } }] : []);
+export function drawCamera(_s: CameraState, env: ObjectEnv): Frame {
+  // Upgraded: the new world's smooth screen, as every upgraded device (R9).
+  if (env.upgraded) return upgradedHi(env, NO_PRESS, { lines: [String(Math.max(0, env.sheets ?? 0))] });
+  const b = new Bits(CAM_W, CAM_H);
+  drawSegLine(b, 1, 1, String(Math.max(0, Math.min(99, env.sheets ?? 0))).padStart(CAM_CELLS, "0"), CAM_CELLS);
+  const f = finer(b, env.level);
+  return { kind: "pixels", w: f.w, h: f.h, bits: f.bits, ink: 1 };
+}
+export const camera: Program<CameraState> = {
+  id: "camera",
+  channel: { w: CAM_W, h: CAM_H },
   keySound: null,
-  init: () => ({ page: 0, writtenAt: null }),
+  init: () => ({ flash: false, ejectAt: null }),
   key(s, key, env) {
-    if (key === "flip") return step({ ...s, page: s.page + 1 }, { sound: "page-turn" });
-    // Once: a second click on the written cell does nothing (the hand layer keeps it once a run).
-    if (key === "cell" && s.writtenAt === null) return step({ ...s, writtenAt: env.t });
+    if (key === "flash") return step({ ...s, flash: !s.flash });
+    if (key === "shutter") {
+      if (!env.onScreen && (env.sheets ?? 0) <= 0) return step(s, ...cameraLine(env, "camera.empty"));
+      return step({ ...s, ejectAt: env.t }, { sound: "camera-shutter" });
+    }
     return step(s);
   },
-  draw: () => NO_FRAME,
+  draw: drawCamera,
 };
-/** How much of the score is written at t (0..1). */
-export const pencilShown = (s: TextbookState, t: number): number => (s.writtenAt === null ? 0 : Math.max(0, Math.min(1, (t - s.writtenAt) / PENCIL_MS)));
+/** The press from `before` to `after` took a shot (the caller logs the `photo`). */
+export const cameraShot = (before: CameraState | null, after: CameraState): boolean => after.ejectAt !== null && after.ejectAt !== (before?.ejectAt ?? null);
+/** The white flash is up at `t`. */
+export const cameraFlashing = (s: CameraState | null, t: number): boolean => !!s && s.ejectAt !== null && t >= s.ejectAt && t - s.ejectAt < CAMERA_FLASH_MS;

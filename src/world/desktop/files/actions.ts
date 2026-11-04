@@ -4,7 +4,8 @@
 // the file's `onOpen` line once a day. Closing the window and the open file is session-only.
 import { push } from "@world/loop/dialogue";
 import type { ActionContext, ActionHandler } from "../controller";
-import { fileById } from "./view";
+import { ALBUM_TAB, fileById, photoOpenId } from "./view";
+import { albumPhotos } from "@state/photos";
 import { filesData } from "@state/files";
 
 /** Open the window on a folder tab (its first folder) or the bin. */
@@ -37,6 +38,16 @@ export const filesActions: Record<string, ActionHandler> = {
       ctx.session.filesSaid.add(sayKey);
       ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${day}:file:${id}`, lines: [file.onOpen], ending: { kind: "none" } });
     }
+    ctx.rerender();
+  },
+
+  // camera R3: a photo in 相册 opens large (session only; no event: it is not a file).
+  "photo-open"(ctx, data) {
+    const app = ctx.session.filesApp;
+    const index = Number(data.photo);
+    if (!app || app.tab !== ALBUM_TAB || !Number.isInteger(index)) return;
+    if (!albumPhotos(ctx.store.getEvents()).some((p) => p.index === index)) return;
+    ctx.session.filesApp = { ...app, open: photoOpenId(index) };
     ctx.rerender();
   },
 

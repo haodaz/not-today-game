@@ -1,6 +1,7 @@
 // Reads content/stages.json (Claude's file). Every function here is a pure lookup over the
 // table. Stage values, rings and day lists are never written as literals in code.
 import stages from "@content/stages.json";
+import { renameKeys } from "./objectIds";
 
 interface Cycle {
   days: number[];
@@ -62,6 +63,12 @@ export function nightBeatOf(day: number): string | null {
 
 /** The nights on which a dream plays. */
 export const dreamNights: readonly number[] = stages.dreamNights.nights;
+
+/**
+ * Which object comes out of the box on which day (`objectsFoundOnDay`), under the game's ids
+ * (camera R1: content's `textbook` is the camera). Read this, not the raw table.
+ */
+export const objectsFoundOnDay: Readonly<Record<string, number>> = Object.freeze(renameKeys(stages.objectsFoundOnDay as Record<string, number>));
 
 // ——— weather (day-loop addition 2026-11-02: it does not rain every day) ———
 

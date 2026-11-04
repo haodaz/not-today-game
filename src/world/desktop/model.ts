@@ -238,6 +238,15 @@ export interface Session {
    * closed. Session only; opening a file is the `open` event.
    */
   filesApp: { readonly which: "files" | "trash"; readonly tab: string; readonly open: string | null } | null;
+  /**
+   * camera R3 / R8: the photos taken this session, by the index of their `photo` event in the log:
+   * where and on which day, when (session ms; the 20 s of developing count from it) and, for a
+   * screen photo, the still of the window at that moment. A photo of an earlier session has none
+   * (it shows developed, and a screen photo without its still). `lastPhoto` is the sheet out of the
+   * slot now (the drawn camera shows it). Session only.
+   */
+  photos: Record<number, { readonly at: string; readonly day: number; readonly takenAt: number; readonly still: string | null }>;
+  lastPhoto: number | null;
   /** A Vivi deliverable page open in the browser app's frame (its /docs/ html path), or null (desktop-ui 2026-11-02). */
   browserDoc: string | null;
   /** The word the held dictionary is glossing over the document now (work spec item 7), or null. Session only. */
@@ -313,7 +322,7 @@ export interface HandSession {
   programs: Record<string, unknown>;
   /** The key cap down, and until when (ms). */
   keyDown: { readonly object: string; readonly key: string; readonly until: number } | null;
-  /** Once a run (this session): what has happened that may not happen again (the textbook's score). */
+  /** Once a run (this session): what has happened that may not happen again (once-a-run guards). */
   once: string[];
   /** The day the pager's buzz was played, and until when it jumps on the desk. */
   buzzed: number;
@@ -400,6 +409,8 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     reducedMotion: false,
     dockSay: null,
     filesApp: null,
+    photos: {},
+    lastPhoto: null,
     filesSaid: new Set(),
     browserDoc: null,
     wbGloss: null,

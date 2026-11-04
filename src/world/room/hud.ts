@@ -40,7 +40,7 @@ import { pointerCls } from "./pointer";
 import { dialogueBox, raidShowing } from "@world/dialogue/box";
 import { renderScene, sceneOf } from "@world/dialogue/scene";
 import { edgeLeads, HINT_FADE_MS } from "./look";
-import { weatherOf } from "@state/stages";
+import { objectsFoundOnDay, weatherOf } from "@state/stages";
 import { caseOverlay, looseContent } from "./case";
 import { deliverableOnDesk } from "@state/days/board";
 
@@ -58,7 +58,8 @@ export const hiddenBoxDay: number = (stagesFile as { hiddenBoxDay?: number }).hi
  * box's `"slip"` on hiddenBoxDay (it is not an object; `found` never holds it). The loose box runs
  * the loop-box flow; `loop-box` appends `openLayer` with this id.
  */
-const FOUND_ON_DAY = stagesFile.objectsFoundOnDay as Record<string, number>;
+// camera R1: the game's ids (content's `textbook` is the camera).
+const FOUND_ON_DAY = objectsFoundOnDay;
 export function boxObjectFor(day: number): string | null {
   if (day === hiddenBoxDay) return "slip";
   return Object.entries(FOUND_ON_DAY).find(([, d]) => d === day)?.[0] ?? null;

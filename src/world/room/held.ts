@@ -14,7 +14,7 @@ import { CHICK_H, CHICK_W } from "@world/objects/frames";
 import { PAGER_H, PAGER_W } from "@world/objects/pager";
 import { CALC_H, CALC_W } from "@world/objects/calculator";
 import { DICT_COLS, DICT_ROWS, type DictionaryState } from "@world/objects/dictionary";
-import { pinchMarks, type PhoneState, type TextbookState } from "@world/objects/plain";
+import { CAM_H, CAM_W, pinchMarks, type PhoneState } from "@world/objects/plain";
 import { facingOf, worksHere } from "@world/objects/works";
 import { envFor, peekState } from "@world/objects/index";
 import type { ObjectEnv } from "@world/objects/program";
@@ -29,14 +29,18 @@ export const CELL_H = 12;
 /**
  * Each object's screen channel in base pixels (objects-in-hand FR2): the chick's 32×16 is the voices
  * rule; the pager is 12 seven-segment digits and two icons, the calculator 8 digits, the dictionary
- * 2 × 16 dot-matrix cells (6 × 12 each). The card, the tape, the phone and the textbook have none.
+ * 2 × 16 dot-matrix cells (6 × 12 each). The card, the tape, the phone and the camera have none.
  */
 export const CHANNELS: Readonly<Record<string, { readonly w: number; readonly h: number }>> = {
   chick: { w: CHICK_W, h: CHICK_H },
   pager: { w: PAGER_W, h: PAGER_H },
   calculator: { w: CALC_W, h: CALC_H },
   dictionary: { w: DICT_COLS * CELL_W, h: DICT_ROWS * CELL_H + 1 },
+  // camera R9: the sheets-left counter, on the drawn device's back only (never on the photo face).
+  camera: { w: CAM_W, h: CAM_H },
 };
+/** Channels drawn only on the 使用 device, never as a canvas on the held photo. */
+const DEVICE_ONLY_SCREENS: readonly string[] = ["camera"];
 export const DEFAULT_CHANNEL = { w: 32, h: 16 } as const;
 
 /** Where the screen's centre sits on the shell when content gives no `screen` rect (fractions of the box). */
@@ -144,6 +148,7 @@ function keyCap(id: string, img: string, k: KeySpot, down: boolean, live: boolea
 function screen(id: string, state: State, level: number, heldUp: boolean, using: boolean): SafeHtml | null {
   const upgraded = state.upgraded[id] === true;
   const ch = CHANNELS[id];
+  if (DEVICE_ONLY_SCREENS.includes(id)) return null;
   // No screen of its own; the upgraded tape's transcript scrolls where the deck's window is.
   if (!ch && !(upgraded && id === "tape")) return null;
   const { w, h } = channelOf(id);
@@ -195,11 +200,6 @@ function extras(id: string, state: State, events: readonly GameEvent[], session:
         : null;
     return { front: null, back };
   }
-  if (id === "textbook" && hand.cell) {
-    const tb = p as TextbookState;
-    const written = tb.writtenAt !== null || session.hand.once.includes("textbook:cell");
-    return { front: null, back: html`<button type="button" class="${cls("okey", "cell", written && "written")}" data-action="obj-key" data-object="textbook" data-key="cell" style="${rectAt(hand.cell)}"${live && session.hand.face === "back" ? null : raw(' tabindex="-1"')}><span class="pencil">${written ? hand.cell.text : null}</span></button>` };
-  }
   return { front: null, back: null };
 }
 
@@ -237,7 +237,7 @@ export function object(state: State, events: readonly GameEvent[], session: Sess
   }
   // 使用 is a focus view (2026-11-03, fixed): the whole front face fits inside the stage (≤ 88 % of
   // both dimensions, centred; the `.focus` class drives the fit). The behind dims to 70 % and blurs.
-  // A flippable photo object (iccard, phone, textbook) shows the flip button under it in 使用.
+  // A flippable photo object (iccard, phone, camera) shows the flip button under it in 使用.
   const turn = using && FLIPPERS.includes(id) && hasString("obj.flip") ? html`<div class="turnbar"><button type="button" class="turnbtn" data-action="obj-flip" data-object="${id}">${tr("obj.flip")}</button></div>` : null;
   return html`<div class="${cls("held", "obj", upgraded && "upgraded", using && "using", using && "focus", faint && "faint")}" data-object="${id}" data-mode="${using ? "using" : "holding"}" data-face="${session.hand.face}"${attrs}><div class="breathe"><div class="turn"><div class="face front"><img src="${img}" alt="" draggable="false">${screen(id, state, env.level, heldUp, using)}${keys}${front}</div><div class="face back"><div class="back-art"><img src="/objects/${id}_back.png" alt="" draggable="false">${back}</div></div></div></div>${turn}</div>`;
 }

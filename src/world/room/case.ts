@@ -5,6 +5,7 @@
 // says a count or a layer. Pure: run id + events + day in, slot order / which is loose / markup out.
 // The loose box runs the existing loop-box flow unchanged; stuck boxes log nothing.
 import stagesFile from "@content/stages.json";
+import { objectsFoundOnDay } from "@state/stages";
 import type { GameEvent } from "@state/events";
 import type { State } from "@state/types.gen";
 import { shuffled } from "@state/seed";
@@ -15,7 +16,7 @@ import { t } from "@world/i18n";
 export const HIDDEN_ID = "slip";
 
 /** The eight small boxes, one per object in stages.json objectsFoundOnDay, in the table's order. */
-export const CASE_OBJECTS: readonly string[] = Object.keys(stagesFile.objectsFoundOnDay as Record<string, number>);
+export const CASE_OBJECTS: readonly string[] = Object.keys(objectsFoundOnDay);
 
 /** The nine box contents before the shuffle: the eight objects, then the hidden box. */
 export const CASE_CONTENTS: readonly string[] = [...CASE_OBJECTS, HIDDEN_ID];

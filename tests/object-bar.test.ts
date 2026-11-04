@@ -67,7 +67,7 @@ describe("R1 · the bar: found objects, by state, no bar before the chick", () =
 
   it("day 8 with one upgraded (pager) and one taken (chick): -up and -taken icons", () => {
     // chick upgraded day 5 → taken by day 8 (8−5 ≥ 3); pager upgraded day 8 → still on loan (-up).
-    const store = storeAt(8, ["chick", "textbook", "pager", "iccard"], { chick: 5, pager: 8 });
+    const store = storeAt(8, ["chick", "camera", "pager", "iccard"], { chick: 5, pager: 8 });
     const events = store.getEvents();
     expect(iconStateOf("chick", store.getState(), events)).toBe("taken");
     expect(iconStateOf("pager", store.getState(), events)).toBe("up");
@@ -90,7 +90,7 @@ describe("R1 · the bar: found objects, by state, no bar before the chick", () =
 
 describe("R2 · click opens the device over the desktop; × / Esc close it", () => {
   it("objbar-open sets holding + hand.using (same state the room uses)", () => {
-    const store = storeAt(4, ["chick", "textbook", "pager"]);
+    const store = storeAt(4, ["chick", "camera", "pager"]);
     const session = { ...initialSession(DEFAULT_CLOCK, "left", "desktop"), workbenchPage: "home" as const };
     const ctx = actx(store, session);
     act(ctx, "objbar-open", { object: "pager" });
@@ -113,7 +113,7 @@ describe("R2 · click opens the device over the desktop; × / Esc close it", () 
   });
 
   it("× (objbar-close) puts it down; the workbench page is unchanged", () => {
-    const store = storeAt(4, ["chick", "textbook", "pager"]);
+    const store = storeAt(4, ["chick", "camera", "pager"]);
     const session = { ...initialSession(DEFAULT_CLOCK, "left", "desktop"), workbenchPage: "docs" as const };
     const ctx = actx(store, session);
     act(ctx, "objbar-open", { object: "chick" });
@@ -126,7 +126,7 @@ describe("R2 · click opens the device over the desktop; × / Esc close it", () 
   });
 
   it("Esc closes the modal (loopKeys), before the plain held put-down", () => {
-    const store = storeAt(4, ["chick", "textbook", "pager"]);
+    const store = storeAt(4, ["chick", "camera", "pager"]);
     const session = { ...initialSession(DEFAULT_CLOCK, "left", "desktop"), workbenchPage: "home" as const };
     const ctx = actx(store, session);
     act(ctx, "objbar-open", { object: "pager" });
@@ -137,7 +137,7 @@ describe("R2 · click opens the device over the desktop; × / Esc close it", () 
   });
 
   it("a taken object opens too (the player sees it is no longer theirs)", () => {
-    const store = storeAt(8, ["chick", "textbook", "pager", "iccard"], { chick: 5 });
+    const store = storeAt(8, ["chick", "camera", "pager", "iccard"], { chick: 5 });
     const session = { ...initialSession(DEFAULT_CLOCK, "left", "desktop") };
     const ctx = actx(store, session);
     act(ctx, "objbar-open", { object: "chick" });
@@ -161,7 +161,7 @@ describe("R3 · the board lock points at the bar", () => {
   });
 
   it("with the pager found and not taken: the lock reads 用{pager}看一眼", () => {
-    const store = storeAt(5, ["chick", "textbook", "pager"]);
+    const store = storeAt(5, ["chick", "camera", "pager"]);
     const session = { ...initialSession(DEFAULT_CLOCK, "left", "desktop") };
     session.boardLockOpen = true;
     const out = renderBoard(ctxOf(store, session), lockTask()).value;
@@ -170,7 +170,7 @@ describe("R3 · the board lock points at the bar", () => {
   });
 
   it("without the pager found: the plain 需要提取码 label (unchanged)", () => {
-    const store = storeAt(5, ["chick", "textbook"]);
+    const store = storeAt(5, ["chick", "camera"]);
     const session = { ...initialSession(DEFAULT_CLOCK, "left", "desktop") };
     session.boardLockOpen = true;
     const out = renderBoard(ctxOf(store, session), lockTask()).value;

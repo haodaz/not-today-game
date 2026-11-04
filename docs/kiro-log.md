@@ -2167,3 +2167,71 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
 - Tests: new `tests/collapse-details.test.ts` (13). It uses the meeting fixture, and day 1's stage is
   overridden per test.
 - `npx tsc --noEmit`: clean. `npx vitest run`: 109 files / 1958 tests passed.
+
+## camera: the instant camera replaces the textbook (2026-11-04; tasks 1–7, R8 / R9 win over R1–R7)
+
+- R1, the rename without touching content: content still names the object `textbook`
+  (variables.json `found`, stages.json `objectsFoundOnDay`, objects.json, en/objects.json).
+  - New `src/state/objectIds.ts`: `RENAMED_OBJECTS = { textbook: "camera" }`, `objectId` and
+    `renameKeys`. Every reader of those files maps through it: `variables.ts` member lists,
+    `stages.ts` (new `objectsFoundOnDay`, read by `recognise.ts`, `hud.ts` `boxObjectFor` and `case.ts`
+    `CASE_OBJECTS`), and `hands.ts` / `recognise.ts` entry ids.
+  - `scripts/gen-state-types.ts` keeps a copy of the rename, so `types.gen.ts` says `camera` (the file
+    matches what the generator now writes; a test keeps the two copies equal).
+  - Once content says `camera`, the map does nothing.
+  - The textbook's program, its back-cover cell, `--pencil` and `textbook:cell` are gone. A `cell` in
+    content is still validated, then dropped.
+- R8:
+  - `src/world/objects/plain.ts` `camera`: `shutter` ejects a sheet (`camera-shutter`, the 120 ms white
+    flash); `flash` toggles the slider; there is no wheel and no `camera.wind`.
+  - Room photos need a sheet: at 0, `camera.empty` and nothing comes out. Screen photos (`env.onScreen`)
+    are unlimited.
+  - The back counter is a two-cell seven-segment frame (the calculator's code).
+- `src/state/photos.ts`:
+  - `photo` events (`at` = `screen…` / `meeting:<taskId>` / `room:<facing>`, validated, the camera
+    must be found);
+  - `sheetsLeft` (10 − room photos);
+  - `developStage` (blank < 7 s, cyan < 20 s, then final; unknown or upgraded is final);
+  - `albumPhotos`;
+  - the strict `photos.json` loader (`room: [{day, facing, add}]`, `screen: [{at, day, add}]`, one
+    entry per key; a missing file means nothing extra);
+  - `photoAdds`.
+- `game.ts` `takePhoto`: logs the `photo` (on 屏幕 `screenPlaceOf`, else `room:<facing>`). The session
+  keeps `photos[index] = {at, day, takenAt, still}` (the shown window via the new `shownStill`) and
+  `lastPhoto`, and queues re-renders for the flash, the slide and both developing steps. The drawn
+  camera's keys pass `obj-key` like the dictionary's (`CAMERA_KEYS`).
+- R3:
+  - `src/world/desktop/files/album.ts`: `photoPicture`, the picture in its stage. A room photo is the
+    facing's still (`BACKDROPS`) plus content's addition only when final, and never for the upgraded
+    camera. A screen photo is the still, scaled. The cyan stage is a grey, contrast-down image under a
+    cyan cast with a fine pixel grid.
+  - `screenPlaceOf` and `photoPlace` are in the same file.
+  - `files/view.ts`: the 相册 tab (`files.album`) lists every photo at once, newest first, in its
+    current stage. `photo-open` opens one large. A developed screen photo of the place on screen now
+    sits beside the live screen.
+  - `files/diff.ts` `markDiffs` rings (`data-ph-diff`, a red outline) every `data-*`-keyed element
+    whose own text differs. Text inside keyed descendants is not counted, so containers are not ringed.
+- R9:
+  - `devices.ts` `camera` is a drawn device (`DEVICE_IDS`, `FLIPPERS`):
+    - the 360 × 300 shell (upper part warm white, lower part near-black, the slot);
+    - the teal / coral stripe;
+    - the SVG lens;
+    - the flash window, the viewfinder;
+    - the red shutter and the yellow slider as real keys;
+    - flipped, the counter on a small glass.
+  - The last sheet hangs out of the slot. Its 600 ms slide keeps its place across re-renders through
+    `--late`.
+  - The upgraded shell carries `upgraded`; its photos develop at once.
+  - All the R9 numbers are in `devices.css`. Holding still shows the photo. A missing photo is a tinted
+    box (`room.css`), and missing sounds are silent (the existing player).
+- Tests:
+  - new `tests/camera.test.ts` (18);
+  - updated `events`, `object-bar`, `objects-in-hand` and `recognise` for `camera` in place of
+    `textbook`.
+- For Claude (content):
+  - rename `textbook` to `camera` in variables.json, stages.json, objects.json and en/objects.json,
+    with a camera question;
+  - `obj.name.camera`;
+  - `content/photos.json` in the R8 shape;
+  - optional camera art (`camera_front.png`, `camera_back.png`) and `public/sfx/camera-shutter.mp3`.
+- `npx tsc --noEmit`: clean. `npx vitest run`: 110 files / 1994 tests passed.
