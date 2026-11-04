@@ -433,5 +433,8 @@
   "call.l.3.4": "要让投资人觉得只有我们能做。",
   "call.l.3.5": "他讲了二十分钟他在会上怎么说的。",
   "call.l.3.6": "他没提事情 A。",
-  "call.l.3.7": "他没提钱。"
+  "call.l.3.7": "他没提钱。",
+  "objbar.title": "老物件",
+  "objbar.notYet": "还不能在这儿用。",
+  "board.lock.useObject": "用{object}看一眼"
 }

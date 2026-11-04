@@ -433,5 +433,8 @@
   "call.l.3.4": "Investors should feel only we can do this.",
   "call.l.3.5": "He spends twenty minutes on what he said in the meeting.",
   "call.l.3.6": "He doesn't mention Thing A.",
-  "call.l.3.7": "He doesn't mention money."
+  "call.l.3.7": "He doesn't mention money.",
+  "objbar.title": "Old things",
+  "objbar.notYet": "Not usable here yet.",
+  "board.lock.useObject": "Check it on the {object}"
 }
