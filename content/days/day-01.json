@@ -155,7 +155,7 @@
     },
     {
       "id": "eat",
-      "text": "桌上，吃。",
+      "text": "窗边饭桌，吃。",
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
       "required": false,

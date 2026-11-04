@@ -41,7 +41,7 @@
           }
         ],
         "kuro": [
-          "Clause 6 and clause 11 contradict each other. Want me to merge?"
+          "第 6 条和第 11 条打架了。要我合一下吗？"
         ],
         "effects": {
           "flags": [
@@ -58,7 +58,7 @@
           }
         ],
         "kuro": [
-          "Merged. Clause 11 now yields to clause 6."
+          "合好了。第 11 条现在让着第 6 条。"
         ],
         "effects": {
           "flags": [
@@ -80,7 +80,7 @@
           }
         ],
         "kuro": [
-          "Saved."
+          "存好了。"
         ],
         "effects": {
           "flags": [
@@ -181,7 +181,7 @@
           }
         ],
         "kuro": [
-          "Reverted."
+          "撤回了。"
         ],
         "effects": {
           "flags": [
@@ -200,7 +200,7 @@
           }
         ],
         "kuro": [
-          "Done."
+          "好了。"
         ],
         "effects": {
           "flags": [
