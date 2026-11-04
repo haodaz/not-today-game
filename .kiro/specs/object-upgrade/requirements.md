@@ -15,36 +15,27 @@ Author decision 2026-11-01: Kuro offers to upgrade each old object separately, s
 - Property: an upgraded object never appears in a night choice list; its word is never in the menu afterwards.
 - Snapshot: pager offer on day 5, nag on day 8, final offer day 13; desk bar with one upgraded object.
 
-## Addition 2026-11-03 (author): an upgraded object can be invaded
+## Addition 2026-11-03 (author, revised the same evening): after an upgrade, Kuro moves in
 
-Author: 「小鸡升级之后是不是克总就可以入侵了，因为像素清楚了」「所有升级的东西都可以入侵，正好大部分屏幕像素都够，这样后面就不能发挥真正的功能，反而被扰乱了」. The old screens (32 × 16 dots, seven segments, 2 × 16 cells) are too coarse to hold Kuro: an object that was **never upgraded is never invaded**. Upgrading gives it a smooth hi-res screen, and that is big enough for Kuro's face (the 64 × 64 frames in `public/objects/kurogotchi/*.png`). Never explained in-game. The drawer (老物件) always shows the original and is never invaded.
+Author: 「升级之后不是骗人，而是克总进去了，3 天之后就只剩下一个克总在里面，功能失效了」; 「他们都是高像素屏幕，克总的 art 就能在里面出现了（就用现在的 pixel art 就行）」. The old screens (32 × 16 dots, seven segments, 2 × 16 cells) are too coarse to hold Kuro: an object that was **never upgraded is never taken**. The drawer (老物件) always shows the original and is never taken. Never explained in-game. (This replaces the earlier three-level "invasion" draft: no lies, no interference — first it is easier, then it is gone.)
 
-### Level
-A pure helper `invasionLevel(id, state, events)` in a new `src/world/objects/invasion.ts`: 0 when the object is not upgraded; otherwise from `d` = today − the day of its `upgrade` event:
-- **1** (glimpses) for d = 0–2;
-- **2** (interference) for d = 3–4;
-- **3** (taken) from d = 5, or from day 16 whatever d is.
-`ObjectEnv` gains `invasion: 0 | 1 | 2 | 3` and `seed: string` (run id + day + object), set by the host where the env is built. Only Kuro gets randomness: every chance below is `unit(hash(seed + n))` with `n` the program's own key-press counter (kept in its state), so a replay is identical.
+Upgrading is a loan (design note `script/notes/机制设计稿-干活.md`): the object's ability becomes **automatic** right away, and three days later it belongs to Kuro.
 
-### The look (all upgraded devices: chick, pager, dictionary, calculator, tape)
-The hi screen (`HiFrame` on the dark glass) can show Kuro instead of the object's own picture: one of the Kurogotchi frames drawn with `imageSmoothingEnabled = false`, scaled to the glass height, centred (wide screens: pager, calculator, dictionary show it at the left with the rest of the glass dark).
-- **1**: after a key press, chance 1/6: Kuro (`blink` or `base`) for 180 ms, then the object's own frame. Nothing else changes.
-- **2**: chance 1/3, 600 ms, poses `base` / `talk` / `red` (red 1 in 4 of those); and the function interference below happens with chance 1/3 per use.
-- **3**: the screen is Kuro all the time (idle `base`/`blink`, `talk` when it answers, `eat` when fed, `red` 1 in 12); the interference always happens.
-
-### The interference (what the object can no longer do)
-- **chick**: feeding at 2 sometimes feeds Kuro instead (screen `eat`, the chick's hunger does not fall); at 3 the chick is gone: every action is answered by Kuro's frames, the menu still works, the chick's own frames never show again.
-- **pager**: reading the history at 2 shows one entry (seeded) as `0.7734`; at 3 every entry is `0.7734`, the old messages unreadable. (Upside down it says hELLO: it is Kuro saying it now.)
-- **dictionary**: a lookup at 2 sometimes answers with Kuro's idiom of the day (`kuroDay(day).idiom`) instead of the gloss; at 3 always. The same for the workbench's `wb-gloss` tooltip while it is held over a contract (work spec item 7): at 3 the dictionary can no longer catch Kuro's word — it glosses it as the idiom.
-- **calculator**: `=` at 2 sometimes shows `OK` (smooth letters) instead of the result; at 3 always `OK`. Turned upside down at 3 it shows Kuro's face, not digits.
-- **tape**: the upgraded transcript: at 2 one line (seeded) of each recording reads as Kuro's idiom with the original speaker's name kept; at 3 every line does.
+### The two states
+A pure helper in a new `src/world/objects/taken.ts`: `upgradedOn(id, events)` (the day of its `upgrade` event, or null) and `takenByKuro(id, state, events)` = upgraded and `today − upgradedOn ≥ 3`.
+- **Upgraded, not yet taken** (the upgrade day and the two days after):
+  - In 使用 the device shows its smooth hi screen as today. After a key press, with chance 1/6 (seeded, `unit(hash(seed + n))`, `n` the program's own press counter), Kuro's face (`public/objects/kurogotchi/base.png` or `blink.png`) fills the hi screen for 180 ms, then the object's own frame. Nothing else changes. (Only Kuro gets randomness.)
+  - **In work its ability is automatic**: a board lock that needs this object opens by itself when the task is opened (a `boardStep` `unlock` with the right code, logged as the object's, not an assist).
+- **Taken** (from the third day after the upgrade):
+  - In 使用 the hi screen shows **only Kuro**: idle `base`, `blink` for 300 ms every ~4 s, `talk` for 600 ms after any key press, `red` with chance 1/12 when it returns to idle (seeded). Drawn as a Kurogotchi frame into the hi canvas with `imageSmoothingEnabled = false`, scaled to the glass height, centred (wide screens: pager, calculator, dictionary at the left, the rest of the glass dark; the tape inside its dark window). The object's own program never draws again; its keys are answered only by Kuro's `talk`.
+  - **In work it is gone**: a board lock that needs it counts as unavailable (only 「让它试」 is left), exactly like an object never found.
+- Holding (the photo) is unchanged in both states.
 
 ### Files
-New `src/world/objects/invasion.ts` (level, chance, Kuro frame loader for canvases); `src/world/objects/program.ts` (env fields); the five programs `chick.ts`, `pager.ts`, `dictionary.ts`, `calculator.ts`, `tape.ts` (their upgraded paths only); `src/world/objects/paint.ts` / `layer.ts` (drawing a Kuro frame into the hi canvas); where the env is built (`held.ts` / `layer.ts`); `src/world/desktop/workbench/work.ts` (`wb-gloss` uses the dictionary's invaded answer). Tests in a new `tests/invasion.test.ts`.
+New `src/world/objects/taken.ts`; `src/world/objects/program.ts` (env gains `taken: boolean` and `seed: string`, set where the env is built); the upgraded paths of `chick.ts`, `pager.ts`, `dictionary.ts`, `calculator.ts`, `tape.ts` (a taken object draws nothing of its own); `src/world/objects/paint.ts` / `layer.ts` (drawing a Kurogotchi frame into the hi canvas; preload the eight images once); where the env is built (`held.ts` / `layer.ts`); `src/state/days/board.ts` (`lockObjectAvailable` uses `takenByKuro` with the events instead of today's `upgraded && inDream` stand-in, and the automatic unlock for an upgraded, not-yet-taken object); `src/world/desktop/workbench/board.ts` (the automatic unlock when the task opens). Tests in a new `tests/taken.test.ts`.
 
 ### Tests
-- Level: not upgraded → 0 on every day; upgraded on day 6 → 1 on days 6–8, 2 on 9–10, 3 from 11; upgraded on day 14 → 3 on day 16.
-- Determinism: the same seed and press counter give the same glimpse / interference; a replay of the same log renders the same frames.
-- Each device at 3 shows its interference (chick never draws its own frame; pager history all `0.7734`; dictionary lookup = the idiom; calculator `=` = `OK`; tape transcript lines = the idiom with the speaker kept); at 0 none of it.
-- The original (not upgraded) devices and the drawer never call the Kuro frame drawer.
-- `wb-gloss` with an invaded (3) dictionary held shows the idiom, not the contract note.
+- `takenByKuro`: never upgraded → false on every day; upgraded on day 6 → false on days 6–8, true from day 9.
+- Not yet taken: the board lock for that object opens itself on opening the task, not counted as an assist; glimpses only through the seed; a replay renders the same frames.
+- Taken: the device never calls the object's own `draw`; a key press shows `talk`; the board lock counts it unavailable (only 让它试).
+- The original (not upgraded) devices and the drawer never draw a Kurogotchi frame.
