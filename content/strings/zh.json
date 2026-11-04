@@ -424,5 +424,6 @@
   "board.send.partner": "发给 Vivi",
   "board.send.group": "发到群里",
   "board.send.workbench": "提交",
-  "hand.refuse": "不给。"
+  "hand.refuse": "不给。",
+  "board.notFound": "还没找到"
 }

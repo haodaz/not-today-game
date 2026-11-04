@@ -424,5 +424,6 @@
   "board.send.partner": "Send to Vivi",
   "board.send.group": "Post to the group",
   "board.send.workbench": "Submit",
-  "hand.refuse": "Don't give it."
+  "hand.refuse": "Don't give it.",
+  "board.notFound": "Not found yet"
 }
