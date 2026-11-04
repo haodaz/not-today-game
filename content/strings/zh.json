@@ -436,5 +436,6 @@
   "call.l.3.7": "他没提钱。",
   "objbar.title": "老物件",
   "objbar.notYet": "还不能在这儿用。",
-  "board.lock.useObject": "用{object}看一眼"
+  "board.lock.useObject": "用{object}看一眼",
+  "board.lock.from": "码在别处：{hint}"
 }

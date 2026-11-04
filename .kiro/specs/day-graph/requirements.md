@@ -29,3 +29,13 @@ A test walks every board in `content/tasks/day-*.json` (and `en/`): every `from.
 - 让它补全 fills slots with cards not yet found.
 - `give` adds `sent_<id>`; an incoming with `cond_show: { has: "sent_<id>" }` shows only after it.
 - The content check passes on today's content and fails on a fixture with a card from a file that does not exist yet that day.
+
+## Addition 2026-11-04 · a lock can have a source too (Claude, from the headless play-through)
+Seen in play: day 5's 分身 board is locked behind the pager, so the lock reads 「用 BP 机看一眼」 and opens the pager — but the pager has no message that day (its ten messages are the author's hand-written constants in content/kid.json and are never changed), and the code 2041 is in Vivi's DM. A lock needs the same kind of source a card has.
+
+- `given.lock` gains an optional `from` (the card source shape: `{file}` / `{conv}` / `{call:true}`) and `hint` (string). With `from`, `object` becomes optional; a lock has `object` or `from` (or both), never neither.
+- With `from`: the code chips are offered only once that source has been opened today (the same `cardFound` rule). Before that, the lock row shows the `hint` (greyed, like a not-found card) and Kuro's 让它试 as today. The label is `board.lock.from` 「码在别处：{hint}」(en "The code is elsewhere: {hint}").
+- With `object` only: unchanged (object-bar R3: 用{object}看一眼, opens the object). The upgraded-object auto unlock applies to object locks only.
+- Loader: strict as now; `from`/`hint` checked like a card's; the day-graph source test also checks every lock's `from` exists on that day.
+- Tests: a `from` lock hides its chips until the source is opened today and shows them after; an object lock is unchanged; the loader rejects a lock with neither.
+- Content (Claude, after this lands): day 5's lock becomes `from: {conv: "partner"}`, hint 「在 Vivi 的私聊里」, no object.
