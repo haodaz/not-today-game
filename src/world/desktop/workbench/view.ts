@@ -8,8 +8,7 @@ import type { State } from "@state/types.gen";
 import { cls, html, type SafeHtml } from "@world/html";
 import { getLocale, hasString, t, tr } from "@world/i18n";
 import { fillPlaceholders } from "@world/replies/placeholders";
-import { boardState, taskForId } from "@state/days/board";
-import type { Task } from "@state/days/tasks";
+import { taskForId } from "@state/days/board";
 import { askedToday, bucketNow } from "@world/dialogue/kuro";
 import { bucketAllows } from "@kuro/variable.ts";
 import { greetingKey } from "../beat";
@@ -19,10 +18,9 @@ import { taskPageId, type AppContext, type WorkbenchPage } from "../model";
 import { closerSlot } from "@world/late/closer-view";
 import { RINGS } from "../rings";
 import { workbenchDay, workbenchDays, type DocColumn, type WorkbenchDay } from "./data";
-import { openWork, renderDoneWork, renderWork } from "./work";
-import { renderBoard, renderBoardRead } from "./board";
+import { openWork } from "./work";
+import { renderShell } from "./shell";
 import { renderWorkMessages } from "../messages/view";
-import { renderObjectBar } from "./objbar";
 import { sessionList, type SessionEntry } from "./sessions";
 import { COMPOSER_FOCUS } from "./actions";
 
@@ -125,46 +123,18 @@ function home(ctx: AppContext, data: WorkbenchDay | null, fill: Fill): SafeHtml 
   return html`<div class="main home"><div class="hello"><img src="${frameUrl(FRAMES.idle[0])}" alt=""><div><h1>${tr(greetingKey(ctx.session.clock.beat))}</h1><p>${tr("wb.hello.sub")}</p></div></div>${composer(ctx, data, fill)}<div class="cards">${doing}${docs}${ledger}${now}${changelog}</div><div class="sect"><h3>${tr("wb.common")}<small>${tr("wb.common.sub")}</small></h3><div class="tabs">${tabs}</div><div class="qa">${items}</div></div></div>`;
 }
 
-/** Who a task is handed to, by name (a person's deliverable); null for the workbench / the hand. */
-function forWhom(task: Task): SafeHtml | null {
-  const to = task.deliverable?.to;
-  const key = to === "boss" || to === "partner" || to === "group" ? `msgs.${to}` : null;
-  return key && hasString(key) && hasString("wb.task.for") ? tr("wb.task.for", { who: t(key) }) : null;
-}
-
-/** The slots a board had on `day`: as printed, else as the log left them. */
-function boardSlotsOn(task: Task, day: number, events: AppContext["events"]): Readonly<Record<string, string>> {
-  const printed = events.find((e) => e.kind === "task" && e.day === day && e.flag === task.done && e.slots !== undefined);
-  if (printed?.kind === "task" && printed.slots) return printed.slots;
-  return boardState(task.board!, day, task.id, events).slots;
-}
-
 /**
  * A task page (workspace R1): a header (title, for whom, 在办 / 已交, the task's own app page, the
  * old objects' strip) and the task's body filling the rest — its board in its view, or its work
  * surface. The task under way is live; a handed-in or an earlier day's task is read back, read-only.
  */
 function taskPage(ctx: AppContext, taskId: string, fill: Fill): SafeHtml {
-  const { state, events, session } = ctx;
-  const day = session.wbTaskDay ?? state.day;
+  const day = ctx.session.wbTaskDay ?? ctx.state.day;
   const task = taskForId(day, taskId);
   if (!task) return html`<div class="main task"></div>`;
-  const done = state.flags.includes(task.done);
-  const live = day === state.day && !done && openWork(state, events)?.tree?.id === task.id;
-  const status = html`<span class="${cls("st", done ? "done" : "doing")}">${tr(done ? "wb.task.done" : "wb.task.doing")}</span>`;
-  const who = forWhom(task);
-  const app = TASK_APPS.includes(task.app) && live ? html`<button type="button" class="btn" data-action="wb-nav" data-page="${task.app}">${tr(`wb.nav.${task.app}`)}</button>` : null;
-  const strip = renderObjectBar(ctx);
-  const head = html`<div class="wb-task-h"><div class="tt"><b>${fill(task.title)}</b><small>${who ? html`${who} · ` : null}${status}</small></div><span class="sp"></span>${app}${strip}</div>`;
-  const body = task.board
-    ? live ? renderBoard(ctx, task) : renderBoardRead(task.board, boardSlotsOn(task, day, events))
-    : live ? renderWork(ctx, false) : renderDoneWork(ctx, day, task);
-  const view = task.board?.view;
-  return html`<div class="${cls("main", "task", live && (view === "ide" || view === "meeting") && view)}" data-task="${task.id}">${head}<div class="wb-task-body">${body}</div></div>`;
+  // shell (2026-11-04): every task page is the shell — the conversation frame with its cards.
+  return renderShell(ctx, task, day, fill);
 }
-
-/** The inner pages a task may open from its header (文档 / 账本 / 代码 stay reachable inside the tasks that use them). */
-const TASK_APPS: readonly string[] = ["docs", "ledger", "code"];
 
 function header(title: SafeHtml | string | null, meta: SafeHtml | string | null, buttons: readonly [string, "" | "eye" | "do", string][]): SafeHtml {
   return html`<div class="ph2"><b>${title}</b><small>${meta}</small><span class="sp"></span>${buttons.map(([key, kind, action]) => html`<span class="${cls("btn", kind)}" data-action="${action}">${tr(key)}</span>`)}</div>`;

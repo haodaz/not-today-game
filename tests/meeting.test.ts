@@ -156,12 +156,12 @@ describe("the meeting card source (meeting R3)", () => {
 });
 
 describe("the meeting view (meeting R2)", () => {
-  it("grid: the tiles (initials or the image), the subtitle bar, the controls and the slot rows labelled from given.rows", () => {
+  it("on the task page (the shell): the 会议 pane holds the window; its slots are the explorer's 格子 rows", () => {
     const h = harness(day1());
     h.act("wb-nav", { page: "task:task3" });
     const out = h.out();
-    expect(out).toContain('<div class="main task meeting" data-task="task3">');
-    expect(out).toContain('<div class="surface board meeting layout-grid" data-playing="1">');
+    expect(out).toContain('<div class="main task shell view-meeting" data-task="task3">');
+    expect(out).toMatch(/<section class="sh-card sh-meeting" data-card="meeting">.*<div class="mt-left" data-playing="1">/s);
     expect(out).toContain(`<div class="mt-grid" style="--mt-cols:${gridColumns(3)}">`);
     expect([...out.matchAll(/class="mt-tile/g)]).toHaveLength(3);
     expect(out).toContain('<span class="mt-init" aria-hidden="true">PO</span><span class="mt-name">person one</span>');
@@ -173,13 +173,24 @@ describe("the meeting view (meeting R2)", () => {
     expect(out).toContain(`data-action="meeting-pause">⏸ ${escapeHtml(t("meeting.pause"))}</button>`);
     expect(out).toContain(`data-action="meeting-restart">⟲ ${escapeHtml(t("meeting.restart"))}</button>`);
     expect(out).toContain('<span class="mt-n">1 / 4</span>');
-    for (const [slot, label] of [["s1", "row-1"], ["s2", "row-2"], ["s3", "row-3"]]) expect(out).toContain(`<li class="mt-row" data-slot="${slot}"><span class="mt-row-l">${label}</span>`);
-    // The meeting's cards wait for their lines; the rest are in the tray; assist and print as today.
-    expect(out).toContain('<span class="bcard notfound" aria-disabled="true">hint-m1</span>');
+    // shell R2/R3: the slot rows moved into the explorer's 格子 folder (slot labels; ● unfilled).
+    for (const [slot, label] of [["s1", "slot-1"], ["s2", "slot-2"], ["s3", "slot-3"]]) {
+      expect(out).toContain(`data-action="shell-slot" data-slot="${slot}"><span class="sh-fn">${label}</span><span class="sh-dot" aria-hidden="true">●</span></button>`);
+    }
+    expect(out).not.toContain("mt-row");
+    // The meeting's cards wait for their lines in 素材; assist and print are the composer's chips.
+    expect(out).toContain('<div class="sh-file card notfound" aria-disabled="true"><span class="sh-fn">hint-m1</span></div>');
     expect(out).toContain('data-card="a1"');
     expect(out).toContain('data-action="board-assist"');
     expect(out).toContain(`data-action="board-print" disabled>${escapeHtml(t("board.send.boss"))}</button>`);
     expect(out).not.toContain("btable");
+  });
+
+  it("renderBoard alone (outside a task page) still draws the meeting with its own slot rows", () => {
+    const ctx: AppContext = { state: day1().getState(), events: [], startDay: 1, session: initialSession({ beat: "work", time: "10:00" }), night: false, nowMs: 0 };
+    const out = renderBoard(ctx, task()).value;
+    expect(out).toContain('<div class="surface board meeting layout-grid" data-playing="0">');
+    for (const [slot, label] of [["s1", "row-1"], ["s2", "row-2"], ["s3", "row-3"]]) expect(out).toContain(`<li class="mt-row" data-slot="${slot}"><span class="mt-row-l">${label}</span>`);
   });
 
   it("seats: circle seats on the ring and one triangle seat outside it", () => {

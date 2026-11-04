@@ -1937,3 +1937,32 @@ Spec: `.kiro/specs/meeting/requirements.md`, tasks 1–5.
   `desktop.css`: the meeting window, the right column (340 px), the seats.
 - Tests: `tests/meeting.test.ts` (19) with the fixture `.kiro/specs/meeting/board-meeting.json`.
 - `npx tsc --noEmit`: clean. `npx vitest run`: 103 files / 1844 tests passed.
+
+## shell: every task page is one light shell (2026-11-04)
+
+Spec: `.kiro/specs/shell/requirements.md`, tasks 1–5.
+
+- `src/world/desktop/workbench/shell.ts` (new): `renderShell` — the header (⊟, the title, 交给 X,
+  the status chip; the object strip; this task's pane toggles) and the frame: the explorer card
+  (页面 / 格子 rows with ● on unfilled, 素材 rows with ↗ on a found file / conversation card, the
+  lock notice), the conversation (beats or the board title; Kuro plain with its portrait on a run's
+  first line, mine a bubble; the composer's chips: 让它补全 and print / 打快照), and the pane cards
+  (预览 browser chrome + `ideSrc` iframe, 代码 editor with line numbers and the slot field, 表格,
+  会议's window, 文件 a card's source, a task's own surface). `taskShellActions`: ⊟, toggles
+  (at most two; a third closes the earliest), ⤢, ×, a slot row (places a picked card with the
+  board's own `board-slot`, selects; IDE opens 代码), ↗. `session.shell`, per task (read-back
+  pages keyed apart).
+- `src/state/days/tasks.ts`: `ide.files` (a file for every slot, a name, exactly one `{{slot}}`
+  line; `SLOT_FIELD`); the en twin keeps its own names and code (same keys). Beats were already
+  accepted on every view.
+- `src/state/days/ide.ts`: `ideSrc` is `theme=light&pane=preview&c=<selected slot's page>&fill=…`;
+  `lastFilled`, `selectedSlot`.
+- `board.ts`: `lockRow`, `table`, `cardText`, `finishLabel` exported; the typing delay applies to
+  any board with beats. `meeting.ts`: `meetingWindow` (the window alone). `view.ts`: the task
+  page is `renderShell`. `model.ts`: `PaneId`, `ShellState`, `session.shell`. `files/view.ts`:
+  `fileBody` exported. `game.ts`: `taskShellActions` registered. `desktop.css`: the shell with the
+  R1 parameters, a light meeting window inside its pane, light code surfaces inside a pane.
+- Tests: new `tests/shell.test.ts` (24) with `.kiro/specs/shell/board-shell.json`; updated
+  `ide.test.ts` (the new `ideSrc` query), `meeting.test.ts` and `workspace.test.ts` (the shell's
+  cards instead of the old columns).
+- `npx tsc --noEmit`: clean. `npx vitest run`: 104 files / 1869 tests passed.

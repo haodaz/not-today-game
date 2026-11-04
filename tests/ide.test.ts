@@ -97,20 +97,24 @@ const stateAfter = (b: TaskBoard, ops: readonly IdeOp[]) => ops.reduce((s, op) =
 const src = (ops: IdeOp[]) => ideSrc(board(), stateAfter(board(), ops), ops);
 const texts = (b: TaskBoard, ops: IdeOp[]) => ideTranscript(b, ops).map((l) => l.text);
 
-describe("ideSrc (ide R3)", () => {
-  it("an empty board: c=0 and an empty fill (the preview shows empty pages, not the answers)", () => {
-    expect(src([])).toBe(`${SRC}?theme=mariana&code&c=0&fill=`);
+describe("ideSrc (ide R3; shell R4: light, the preview pane only, the selected slot's page, always fill=)", () => {
+  it("an empty board: the first slot's page and an empty fill (the preview shows empty pages, not the answers)", () => {
+    expect(src([])).toBe(`${SRC}?theme=light&pane=preview&c=2&fill=`);
   });
   it("fills in slot order, c the page of the slot filled last", () => {
-    expect(src([{ t: "fill", slot: "s2", card: "a2" }, { t: "fill", slot: "s1", card: "a1" }])).toBe(`${SRC}?theme=mariana&code&c=2&fill=s1:a1,s2:a2`);
-    expect(src([{ t: "fill", slot: "s1", card: "a1" }, { t: "fill", slot: "s2", card: "x1" }])).toBe(`${SRC}?theme=mariana&code&c=5&fill=s1:a1,s2:x1`);
+    expect(src([{ t: "fill", slot: "s2", card: "a2" }, { t: "fill", slot: "s1", card: "a1" }])).toBe(`${SRC}?theme=light&pane=preview&c=2&fill=s1:a1,s2:a2`);
+    expect(src([{ t: "fill", slot: "s1", card: "a1" }, { t: "fill", slot: "s2", card: "x1" }])).toBe(`${SRC}?theme=light&pane=preview&c=5&fill=s1:a1,s2:x1`);
+    // A slot chosen in the explorer moves the preview to its page.
+    const ops: IdeOp[] = [{ t: "fill", slot: "s1", card: "a1" }];
+    expect(ideSrc(board(), stateAfter(board(), ops), ops, "s3")).toBe(`${SRC}?theme=light&pane=preview&c=9&fill=s1:a1`);
+    expect(ideSrc(board(), stateAfter(board(), ops), ops, "nope")).toBe(`${SRC}?theme=light&pane=preview&c=2&fill=s1:a1`);
   });
   it("Kuro's fills are included (its cards by their own id); c the last slot Kuro filled", () => {
-    expect(src([{ t: "fill", slot: "s1", card: "a1" }, { t: "assistFill" }])).toBe(`${SRC}?theme=mariana&code&c=9&fill=s1:a1,s2:a2,s3:k1`);
-    expect(src([{ t: "fill", slot: "s3", card: "a3" }, { t: "assistFill" }])).toBe(`${SRC}?theme=mariana&code&c=5&fill=s1:a1,s2:a2,s3:a3`);
+    expect(src([{ t: "fill", slot: "s1", card: "a1" }, { t: "assistFill" }])).toBe(`${SRC}?theme=light&pane=preview&c=9&fill=s1:a1,s2:a2,s3:k1`);
+    expect(src([{ t: "fill", slot: "s3", card: "a3" }, { t: "assistFill" }])).toBe(`${SRC}?theme=light&pane=preview&c=5&fill=s1:a1,s2:a2,s3:a3`);
   });
   it("a cleared slot leaves the fill", () => {
-    expect(src([{ t: "fill", slot: "s1", card: "a1" }, { t: "clear", slot: "s1" }])).toBe(`${SRC}?theme=mariana&code&c=2&fill=`);
+    expect(src([{ t: "fill", slot: "s1", card: "a1" }, { t: "clear", slot: "s1" }])).toBe(`${SRC}?theme=light&pane=preview&c=2&fill=`);
   });
 });
 
@@ -221,7 +225,7 @@ describe("a play-through of the IDE board", () => {
     const events = done.getEvents();
     const ops = ideOps(task(), 1, events);
     const s = boardState(board(), 1, "task3", events);
-    expect(ideSrc(board(), s, ops)).toBe(`${SRC}?theme=mariana&code&c=9&fill=s1:a1,s2:a2,s3:a3`);
+    expect(ideSrc(board(), s, ops)).toBe(`${SRC}?theme=light&pane=preview&c=9&fill=s1:a1,s2:a2,s3:a3`);
     expect(ideTranscript(board(), ops).map((l) => l.text)).toEqual(["open-1", "open-2", "fill-s1", "fill-s2", "print-1", "send-1"]);
     const out = rendered(done);
     expect(out).toContain(`src="${attr(ideSrc(board(), s, ops))}"`);

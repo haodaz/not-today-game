@@ -26,6 +26,16 @@ import type { AppId, MonitorModel, ShellModel, Side } from "./shell";
 
 /** 工作台's pages; `msgs` is its 消息 pane (the work conversations, desktop-ui 2026-11-02 evening). */
 export type WorkbenchPage = "home" | "docs" | "ledger" | "code" | "msgs" | TaskPage;
+/** A task page's app panes (shell R3). `work` is a task without a board: its doc / ledger / code surface. */
+export type PaneId = "files" | "preview" | "code" | "table" | "meeting" | "work";
+/** A task page's cards (shell R1): see `Session.shell`. `max` may also be the explorer. */
+export interface ShellState {
+  explorer: boolean;
+  panes: PaneId[];
+  max: PaneId | "explorer" | null;
+  slot: string | null;
+  source: string | null;
+}
 /** A task's page in 工作台 (workspace R1): `task:<taskId>`; the day is `wbTaskDay` (null = today). */
 export type TaskPage = `task:${string}`;
 /** The task id of a task page, or null. */
@@ -208,6 +218,12 @@ export interface Session {
    */
   meetingPlay: { key: string; pos: number; playing: boolean; gen: number } | null;
   /**
+   * shell R1: each task page's cards (key day:task): the explorer open, the panes open (earliest
+   * first, at most two), the maximized card, the selected slot, the 素材 card whose source the
+   * 文件 pane shows. Session only; absent = the view's defaults.
+   */
+  shell: Record<string, ShellState>;
+  /**
    * object-bar 2026-11-03: an old object opened from the 老物件栏 is being used over the desktop
    * (its drawn device in a modal). It is the same `holding` + `hand.using` the room uses; this flag
    * only says the modal is the entry point, so × / Esc closes it back to 工作台. Session only.
@@ -341,6 +357,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     boardLockOpen: false,
     ideTyping: null,
     meetingPlay: null,
+    shell: {},
     objbarOpen: false,
     call: null,
   };

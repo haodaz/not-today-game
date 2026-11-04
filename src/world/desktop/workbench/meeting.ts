@@ -82,6 +82,20 @@ function rows(board: TaskBoard, s: BoardState, session: Session): SafeHtml {
  * assist + print bar), so nothing about them changes. Pure.
  */
 export function renderMeeting(ctx: AppContext, task: Task, board: TaskBoard, s: BoardState, parts: { lock: SafeHtml | null; tray: SafeHtml; bar: SafeHtml }): SafeHtml {
+  const { session } = ctx;
+  const m = board.meeting!;
+  const { playing } = meetingNow(session, ctx.state.day, task.id, ctx.events);
+  const left = meetingWindow(ctx, task, board);
+  const slots = m.layout === "seats" ? seats(board, s, session) : rows(board, s, session);
+  const right = html`<div class="mt-right"><div class="btitle">${board.title}</div>${parts.lock}${slots}${parts.tray}${parts.bar}</div>`;
+  return html`<div class="${cls("surface", "board", "meeting", `layout-${m.layout}`)}" data-playing="${playing ? "1" : "0"}">${left}${right}</div>`;
+}
+
+/**
+ * The meeting window alone (shell R3's 会议 pane): the tiles, the subtitle bar and the controls; the
+ * slots are the explorer's then. Pure.
+ */
+export function meetingWindow(ctx: AppContext, task: Task, board: TaskBoard): SafeHtml {
   const { state, events, session } = ctx;
   const m = board.meeting!;
   const { pos, playing } = meetingNow(session, state.day, task.id, events);
@@ -98,10 +112,7 @@ export function renderMeeting(ctx: AppContext, task: Task, board: TaskBoard, s: 
     : html`<button type="button" class="mt-btn play" data-action="meeting-play"${atEnd ? html` disabled` : null}>▶ ${tr("meeting.play")}</button>`;
   const restart = html`<button type="button" class="mt-btn restart" data-action="meeting-restart">⟲ ${tr("meeting.restart")}</button>`;
   const counter = html`<span class="mt-n">${Math.max(0, pos + 1)} / ${m.lines.length}</span>`;
-  const left = html`<div class="mt-left"><div class="mt-grid" style="--mt-cols:${gridColumns(m.people.length)}">${tiles}</div>${sub}<div class="mt-ctl">${toggle}${restart}${counter}</div></div>`;
-  const slots = m.layout === "seats" ? seats(board, s, session) : rows(board, s, session);
-  const right = html`<div class="mt-right"><div class="btitle">${board.title}</div>${parts.lock}${slots}${parts.tray}${parts.bar}</div>`;
-  return html`<div class="${cls("surface", "board", "meeting", `layout-${m.layout}`)}" data-playing="${playing ? "1" : "0"}">${left}${right}</div>`;
+  return html`<div class="mt-left" data-playing="${playing ? "1" : "0"}"><div class="mt-grid" style="--mt-cols:${gridColumns(m.people.length)}">${tiles}</div>${sub}<div class="mt-ctl">${toggle}${restart}${counter}</div></div>`;
 }
 
 // ——— playing (meeting R3) ———

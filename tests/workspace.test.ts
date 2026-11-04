@@ -53,7 +53,7 @@ function harness(store: Store) {
   return { session, ctx, out, act };
 }
 const sideOf = (html: string) => /<div class="side sessions">(.*?)<div class="me">/s.exec(html)?.[1] ?? "";
-const headOf = (html: string) => /<div class="wb-task-h">(.*?)<div class="wb-task-body">/s.exec(html)?.[1] ?? "";
+const headOf = (html: string) => /<div class="wb-task-h[^"]*">(.*?)<div class="wb-task-body/s.exec(html)?.[1] ?? "";
 const taskOpens = (store: Store) => store.getEvents().filter((e) => e.kind === "open" && e.target.startsWith("task:"));
 
 describe("R1 · two kinds of page", () => {
@@ -86,7 +86,8 @@ describe("R1 · two kinds of page", () => {
     expect(head).toContain(`<b>${title("task3")}</b>`);
     expect(head).toContain(escapeHtml(t("wb.task.for", { who: t("msgs.boss") })));
     expect(head).toContain(`<span class="st doing">${escapeHtml(t("wb.task.doing"))}</span>`);
-    expect(out).toContain('<div class="wb-task-body"><div class="surface board ide">');
+    // shell 2026-11-04: the IDE board's panes (预览 + 代码 by default; no files in this fixture: 预览).
+    expect(out).toContain('<section class="sh-card sh-preview" data-card="preview">');
     for (const not of ["wb-composer", "<textarea", 'class="cards"', "main home"]) expect(out, not).not.toContain(not);
     // Handed in: 已交, and the board read back without its actions.
     store.appendEvent({ kind: "task", flag: doneFlag("task3"), mode: "let", slots: { s1: "a1", s2: "a2", s3: "k1" }, assists: 1 });
@@ -101,7 +102,8 @@ describe("R1 · two kinds of page", () => {
     const h = harness(day1());
     h.act("wb-nav", { page: "task:task1" });
     const out = h.out();
-    expect(out).toContain('<div class="wb-task-body"><div class="ask">');
+    // shell R3: its own surface is one pane, open by default.
+    expect(out).toMatch(/<section class="sh-card sh-work" data-card="work">.*<div class="sh-card-b"><div class="ask">/s);
     expect(out).toContain('data-action="wb-send"');
     expect(headOf(out)).toContain(`data-action="wb-nav" data-page="docs">${escapeHtml(t("wb.nav.docs"))}</button>`);
   });
@@ -203,19 +205,16 @@ describe("R3 · old objects only while working", () => {
   });
 });
 
-describe("R4 · the IDE on a task page", () => {
+describe("R4 · the IDE on a task page (now the shell: tests/shell.test.ts)", () => {
   const css = readFileSync(resolve(__dirname, "../src/world/desktop/desktop.css"), "utf8");
-  it("the three columns under the header at full height: ≈260 px · the preview (≥ half) · ≈320 px", () => {
+  it("the explorer · the conversation · the 预览 card, full height under the header", () => {
     const h = harness(day1(["task1", "task2"]));
     h.act("wb-nav", { page: "task:task3" });
     const out = h.out();
-    expect(out).toContain('<div class="main task ide" data-task="task3">');
-    for (const col of ["ide-left", "ide-mid", "ide-right"]) expect(out).toContain(`class="${col}"`);
-    expect(css).toMatch(/\.wb \.main\.task\.ide \.surface\.board\.ide\{height:100%/);
-    expect(css).toMatch(/\.ide-left\{flex:0 0 260px/);
-    expect(css).toMatch(/\.wb \.main\.task\.ide \.surface\.board\.ide \.ide-mid\{min-width:50%\}/);
-    expect(css).toMatch(/\.wb \.main\.task\.ide \.surface\.board\.ide \.ide-right\{flex-basis:320px\}/);
-    expect(css).toMatch(/\.wb \.main\.task\{display:flex;flex-direction:column/);
+    expect(out).toContain('<div class="main task shell view-ide" data-task="task3">');
+    for (const c of ['data-card="explorer"', 'class="sh-conv"', 'data-card="preview"']) expect(out).toContain(c);
+    expect(css).toMatch(/\.wb \.main\.task\.shell\{display:flex;flex-direction:column/);
+    expect(css).toMatch(/\.wb \.sh-panes\{flex:0 0 46%;min-width:480px;max-width:900px/);
   });
 });
 

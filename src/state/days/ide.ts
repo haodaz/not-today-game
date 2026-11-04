@@ -25,16 +25,14 @@ export function ideOps(task: Task, day: number, events: readonly GameEvent[]): I
 }
 
 /** The query the deliverable reads, before the fill: the IDE's theme and the code pane (ide R2). */
-const IDE_QUERY = "theme=mariana&code";
+/** The query before the page and the fill (shell R4): the light theme and the preview pane only. */
+const IDE_QUERY = "theme=light&pane=preview";
 
 /**
- * The preview URL (ide R3): `ide.src` with `theme=mariana&code&c=<page>&fill=<slot:card,…>`. `fill`
- * lists every filled slot in slot order (Kuro's cards by their own id) and is empty (`fill=`) while
- * nothing is filled; `c` is the page of the slot filled last — by the player, or the last slot
- * Kuro filled in its assist — or 0 before any fill. Pure.
+ * The slot filled last (shell R4's default selection): by the player, or the last slot Kuro filled
+ * in its assist; null before any fill. Pure.
  */
-export function ideSrc(board: TaskBoard, s: BoardState, ops: readonly IdeOp[]): string {
-  const src = board.ide?.src ?? "";
+export function lastFilled(board: TaskBoard, ops: readonly IdeOp[]): string | null {
   let last: string | null = null;
   let walk = freshBoard(board);
   for (const op of ops) {
@@ -46,7 +44,23 @@ export function ideSrc(board: TaskBoard, s: BoardState, ops: readonly IdeOp[]): 
     }
     walk = stepBoard(board, walk, op);
   }
-  const page = last !== null ? (board.ide?.pages[last] ?? 0) : 0;
+  return last;
+}
+
+/** The selected slot (shell R2/R4): the chosen one if it is a slot, else the slot filled last, else the first. */
+export function selectedSlot(board: TaskBoard, ops: readonly IdeOp[], chosen: string | null = null): string {
+  if (chosen !== null && board.slots.some((s) => s.id === chosen)) return chosen;
+  return lastFilled(board, ops) ?? board.slots[0]!.id;
+}
+
+/**
+ * The preview URL (shell R4): `ide.src` with `theme=light&pane=preview&c=<page>&fill=<slot:card,…>`.
+ * `fill` lists every filled slot in slot order (Kuro's cards by their own id) and is always there
+ * (`fill=` while nothing is filled); `c` is the page of the selected slot (`selectedSlot`). Pure.
+ */
+export function ideSrc(board: TaskBoard, s: BoardState, ops: readonly IdeOp[], chosen: string | null = null): string {
+  const src = board.ide?.src ?? "";
+  const page = board.ide?.pages[selectedSlot(board, ops, chosen)] ?? 0;
   const fill = board.slots
     .filter((slot) => slot.id in s.slots)
     .map((slot) => `${encodeURIComponent(slot.id)}:${encodeURIComponent(s.slots[slot.id]!)}`)

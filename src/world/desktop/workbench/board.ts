@@ -20,12 +20,12 @@ import { openWork } from "./work";
 import { openObjectFromBar } from "./objbar";
 
 /** The card text of an id (tray or Kuro), or "". */
-function cardText(board: TaskBoard, id: string): string {
+export function cardText(board: TaskBoard, id: string): string {
   return [...board.cards, ...board.kuro.cards].find((c) => c.id === id)?.text ?? "";
 }
 
 /** The lock row's cells: ▒▒▒▒ while locked, the given text once open. */
-function lockRow(board: TaskBoard, s: BoardState, state: State, events: readonly GameEvent[], session: Session): SafeHtml | null {
+export function lockRow(board: TaskBoard, s: BoardState, state: State, events: readonly GameEvent[], session: Session): SafeHtml | null {
   const lock = board.given.lock;
   if (!lock) return null;
   if (s.unlocked) return null;
@@ -71,7 +71,7 @@ function lockRow(board: TaskBoard, s: BoardState, state: State, events: readonly
 }
 
 /** The board table: a row per slot, the given cell (locked or text), the slot (its card or empty). */
-function table(board: TaskBoard, s: BoardState, state: State, session: Session): SafeHtml {
+export function table(board: TaskBoard, s: BoardState, state: State, session: Session): SafeHtml {
   const locked = board.given.lock !== undefined && !s.unlocked;
   const head = board.columns.map((c) => html`<th>${c}</th>`);
   const rows = board.slots.map((slot) => {
@@ -113,7 +113,7 @@ function tray(board: TaskBoard, s: BoardState, state: State, events: readonly Ga
  * screen (发给老板 / 发给 Vivi / 发到群里 / 提交) by `board.send.<to>`; a `hand` deliverable (or no
  * deliverable) prints to the desk with `board.print`.
  */
-function finishLabel(task: Task): SafeHtml | null {
+export function finishLabel(task: Task): SafeHtml | null {
   const to = task.deliverable?.to ?? "hand";
   const key = to !== "hand" ? `board.send.${to}` : "board.print";
   return hasString(key) ? tr(key) : null;
@@ -212,7 +212,8 @@ function withIde(handler: ActionHandler): ActionHandler {
   return (ctx, data, el) => {
     const c = currentBoard(ctx);
     const day = ctx.store.getState().day;
-    const before = c?.board.view === "ide" ? ideTranscript(c.board, ideOps(c.task, day, ctx.store.getEvents())).length : null;
+    // shell R5: beats are allowed on every view, so any board with beats types its lines in.
+    const before = c && (c.board.view === "ide" || c.board.beats) ? ideTranscript(c.board, ideOps(c.task, day, ctx.store.getEvents())).length : null;
     handler(ctx, data, el);
     if (c && before !== null) noteIdeLines(ctx, c.task, c.board, day, before);
   };

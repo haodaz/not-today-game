@@ -1,0 +1,41 @@
+{
+  "_note": "Test fixture for the shell spec (Kiro). Placeholder text only: day 1's real files and lines are Claude's.",
+  "board": {
+    "kind": "table",
+    "title": "fixture-shell",
+    "columns": ["", "given", "slot"],
+    "given": {
+      "lock": { "object": "chick", "codes": ["0000", "1111"], "answer": "0000" },
+      "rows": { "s1": "row-1", "s2": "row-2", "s3": "row-3" }
+    },
+    "slots": [
+      { "id": "s1", "label": "slot-1", "answer": "a1" },
+      { "id": "s2", "label": "slot-2", "answer": "a2" },
+      { "id": "s3", "label": "slot-3", "answer": "a3" }
+    ],
+    "cards": [
+      { "id": "a1", "text": "card-a1" },
+      { "id": "a2", "text": "card-a2", "from": { "conv": "partner" }, "hint": "hint-a2" },
+      { "id": "a3", "text": "card-a3", "from": { "file": "c-v16" }, "hint": "hint-a3" },
+      { "id": "x1", "text": "card-x1" }
+    ],
+    "kuro": { "fill": { "s1": "a1", "s2": "a2", "s3": "k1" }, "cards": [{ "id": "k1", "text": "card-k1" }], "unlock": "0000" },
+    "view": "ide",
+    "ide": {
+      "src": "/docs/player/day-01-space.html",
+      "pages": { "s1": 2, "s2": 5, "s3": 9 },
+      "files": {
+        "s1": { "name": "base.js", "code": ["// line-1", "const base = {{slot}};", "export default base;"] },
+        "s2": { "name": "data.js", "code": ["const data = {{slot}};"] },
+        "s3": { "name": "use.js", "code": ["// line-a", "// line-b", "const use = {{slot}};"] }
+      }
+    },
+    "beats": [
+      { "on": "open", "lines": [{ "who": "kuro", "text": "open-1" }, { "who": "kuro", "text": "open-2" }, { "who": "me", "text": "open-3" }] },
+      { "on": "fill:s1", "lines": [{ "who": "kuro", "text": "fill-s1" }] },
+      { "on": "print", "lines": [{ "who": "kuro", "text": "print-1" }] }
+    ]
+  },
+  "deliverable": { "id": "d1-tech", "label": "fixture-deliverable", "to": "boss" },
+  "judge": { "perfect": 0, "flawed": -2, "wrong": -5, "wrongAt": 2 }
+}

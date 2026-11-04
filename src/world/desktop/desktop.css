@@ -529,6 +529,104 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .wb .main.task.ide .surface.board.ide{height:100%;padding:8px}
 .wb .main.task.ide .surface.board.ide .ide-mid{min-width:50%}
 .wb .main.task.ide .surface.board.ide .ide-right{flex-basis:320px}
+/* shell (2026-11-04): every task page, light, after the Claude desktop app. The conversation is the
+   outer frame (#FAF9F7, no inner border); the explorer and the panes are inset cards around it. */
+.wb .main.task.shell{display:flex;flex-direction:column;padding:0;overflow:hidden;background:#FAF9F7;font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Noto Sans SC",sans-serif;color:#1F1F1F}
+.wb .main.task.shell .sh-head{height:48px;min-height:48px;box-sizing:border-box;padding:0 12px;gap:10px;background:#FAF9F7;border-bottom:0}
+.wb .main.task.shell .sh-head .tt{flex-direction:row;align-items:baseline;gap:10px}
+.wb .main.task.shell .sh-head .tt b{font-size:15px;font-weight:500}
+.wb .main.task.shell .sh-head .tt small{color:#6B6B6B;font-size:12.5px}
+.wb .main.task.shell .sh-head .st{display:inline-block;padding:0 8px;border-radius:10px;border:1px solid currentColor;line-height:18px}
+.wb .main.task.shell .sh-head .st.doing{color:var(--warm)}
+.wb .main.task.shell .sh-head .st.done{color:var(--green)}
+.wb .sh-toggles{display:flex;gap:4px}
+.wb .sh-tg{width:32px;height:32px;border:0;border-radius:8px;background:transparent;color:#6B6B6B;font:12px "SF Mono",Menlo,monospace;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.wb .sh-tg.on{background:#E3ECFA;color:#2F6FEB}
+.wb .sh-tg.explorer{font-size:16px}
+.wb .main.task.shell .wb-task-body.sh-frame{flex:1 1 auto;min-height:0;display:flex;flex-direction:row;position:relative;padding:8px;gap:8px;background:#FAF9F7;overflow:hidden;container-type:inline-size;container-name:shell}
+.wb .sh-card{background:#FFFFFF;border:1px solid #E7E5E0;border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.04);display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden;box-sizing:border-box}
+.wb .sh-card-h{height:40px;flex:0 0 40px;display:flex;align-items:center;gap:8px;padding:0 8px 0 12px;font-size:13px;font-weight:500;color:#1F1F1F}
+.wb .sh-card-h .sp{margin-left:auto}
+.wb .sh-ic{width:16px;height:16px;flex:0 0 16px;display:inline-flex;align-items:center;justify-content:center;font:11px "SF Mono",Menlo,monospace;color:#6B6B6B}
+.wb .sh-hb{width:24px;height:24px;border:0;border-radius:6px;background:transparent;color:#6B6B6B;font:inherit;font-size:13px;cursor:pointer;padding:0}
+.wb .sh-hb:hover,.wb .sh-tg:not(.on):hover{background:#F0EEEA}
+.wb .sh-card-b{flex:1 1 auto;min-height:0;overflow:auto}
+.wb .sh-card.sh-explorer-card{flex:0 0 248px;width:248px}
+/* The maximized card takes the frame minus 8 margins; the conversation hides behind it. */
+.wb .sh-card.max{position:absolute;inset:8px;z-index:3;width:auto;max-width:none;min-width:0}
+.wb .sh-frame.maxed .sh-conv{visibility:hidden}
+/* The pane area: 46 % (480–900) with a pane open; one = full height, two = 56 % and the rest, 8 gap. */
+.wb .sh-panes{flex:0 0 46%;min-width:480px;max-width:900px;display:flex;flex-direction:column;gap:8px;min-height:0}
+.wb .sh-panes > .sh-card{flex:1 1 auto}
+.wb .sh-panes > .sh-card.first{flex:0 0 calc(56% - 4px)}
+.wb .sh-panes > .sh-card.second{flex:1 1 0}
+/* The conversation takes the rest (min 380); below that the explorer collapses first. */
+@container shell (max-width: 1140px){.wb .sh-frame.has-panes .sh-explorer-card:not(.max){display:none}}
+.wb .sh-conv{flex:1 1 auto;min-width:380px;display:flex;flex-direction:column;align-items:center;min-height:0}
+.wb .sh-thread{width:100%;max-width:720px;flex:1 1 auto;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:12px;padding:16px 8px;box-sizing:border-box}
+.wb .sh-kuro{display:flex;gap:8px;font-size:14px;line-height:1.65;color:#1F1F1F}
+.wb .sh-av{width:20px;height:20px;flex:0 0 20px;border-radius:50%;object-fit:contain;margin-top:3px}
+.wb .sh-av-gap{width:20px;flex:0 0 20px}
+.wb .sh-kt,.wb .sh-bub{white-space:pre-wrap;overflow-wrap:anywhere;min-width:0}
+.wb .sh-me{display:flex;justify-content:flex-end}
+.wb .sh-bub{background:#F0EEEA;border-radius:18px;padding:10px 14px;max-width:80%;font-size:14px;line-height:1.65;color:#1F1F1F}
+.wb .sh-composer{width:100%;max-width:720px;box-sizing:border-box;border:1px solid #E5E5E5;border-radius:16px;background:#FFFFFF;padding:10px 12px;display:flex;gap:8px;flex-wrap:wrap;min-height:48px}
+.wb .sh-chip{border:1px solid #E5E5E5;border-radius:14px;background:#FFFFFF;color:#1F1F1F;font:inherit;font-size:13px;padding:4px 12px;cursor:pointer}
+.wb .sh-chip.primary{background:#2F6FEB;border-color:#2F6FEB;color:#FFFFFF}
+.wb .sh-chip:disabled{opacity:.4;cursor:default}
+/* The explorer (R2): a VS Code tree — folder rows 28, file rows 26, 13 px, 8 indent per level. */
+.wb .sh-folder{display:flex;flex-direction:column}
+.wb .sh-frow{height:28px;display:flex;align-items:center;gap:4px;padding:0 8px;font-size:13px;font-weight:500;color:#1F1F1F}
+.wb .sh-tw{width:12px;color:#6B6B6B;font-size:10px}
+.wb .sh-file{height:26px;display:flex;align-items:center;gap:6px;width:100%;box-sizing:border-box;padding:0 8px 0 24px;border:0;background:transparent;font:inherit;font-size:13px;color:#1F1F1F;text-align:left;cursor:pointer}
+.wb .sh-file.on,.wb .sh-file.picked{background:#E3ECFA}
+.wb .sh-file.notfound{color:#6B6B6B;opacity:.6;cursor:default}
+.wb .sh-fn{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wb .sh-pick{flex:1 1 auto;min-width:0;border:0;background:none;font:inherit;color:inherit;text-align:left;padding:0;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wb .sh-src{border:0;background:none;color:#6B6B6B;font:inherit;font-size:12px;cursor:pointer;padding:0 2px}
+.wb .sh-dot{color:#6B6B6B;font-size:10px}
+.wb .sh-seat{font-size:11px;color:#6B6B6B}
+.wb .sh-lock{padding:6px 8px}
+.wb .sh-lock .block-row{margin:0}
+/* 预览: browser chrome over the iframe; 代码: the editor (12.5 px mono, line numbers, the slot field). */
+.wb .sh-browser,.wb .sh-editor{display:flex;flex-direction:column;height:100%;min-height:0}
+.wb .sh-tabs{height:32px;flex:0 0 32px;display:flex;align-items:flex-end;gap:2px;padding:0 8px;border-bottom:1px solid #E7E5E0}
+.wb .sh-tab{font-size:12.5px;padding:6px 12px;border:1px solid #E7E5E0;border-bottom:0;border-radius:8px 8px 0 0;background:#FFFFFF;color:#1F1F1F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%}
+.wb .sh-addr{margin:6px 8px;padding:4px 10px;border:1px solid #E5E5E5;border-radius:8px;font-size:12px;color:#6B6B6B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wb .sh-browser .ide-frame{flex:1 1 auto;width:100%;border:0;background:#FFFFFF}
+.wb .sh-code{flex:1 1 auto;overflow:auto;padding:8px 0;font:12.5px/1.7 "SF Mono",Menlo,monospace;color:#1F1F1F}
+.wb .sh-ln{display:flex;align-items:baseline;white-space:pre}
+.wb .sh-gut{width:36px;flex:0 0 36px;text-align:right;padding-right:6px;color:#6B6B6B;user-select:none}
+.wb .sh-mk{width:14px;flex:0 0 14px;color:var(--green);font-weight:600}
+.wb .sh-ln code{font:inherit}
+.wb .sh-field{font:inherit;cursor:pointer;padding:0}
+.wb .sh-field.empty{display:inline-block;min-width:120px;height:1.4em;vertical-align:middle;background:#E3ECFA;border:1px dashed #2F6FEB;border-radius:4px}
+.wb .sh-field.filled{border:0;background:none;color:var(--green)}
+/* 文件: a source read back (a file's lines, or the conversation's). */
+.wb .sh-source{padding:10px 12px;font-size:13px;line-height:1.6}
+.wb .sh-src-h{font-weight:500;margin-bottom:6px}
+.wb .sh-source .sh-cl{padding:2px 0}.wb .sh-source .sh-cl.me{text-align:right}
+.wb .sh-source .sh-ct{color:#6B6B6B;font-size:11px;font-family:"SF Mono",Menlo,monospace}
+.wb .sh-source .f-frame{width:100%;height:100%;min-height:300px;border:0}
+/* 表格 / a task's own surface inside a pane: no second card around it. */
+.wb .sh-card-b > .surface,.wb .sh-card-b > .ask{border:0;box-shadow:none;max-height:none;max-width:none;margin:0;border-radius:0;min-height:100%;box-sizing:border-box}
+.wb .sh-card .surface.codefile{background:#FFFFFF;border-color:#E7E5E0}
+.wb .sh-card .surface.codefile .row{color:#1F1F1F}
+.wb .sh-card .surface.codefile .row:not(:disabled):hover{background:#F0EEEA}
+/* 会议 inside its pane: light, as the rest of the shell. */
+.wb .sh-meeting .mt-left{height:100%;box-sizing:border-box;display:flex;flex-direction:column;gap:8px;padding:10px;background:#FFFFFF;color:#1F1F1F}
+.wb .sh-meeting .mt-grid{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:repeat(var(--mt-cols,2),1fr);gap:8px;align-content:center}
+.wb .sh-meeting .mt-tile{position:relative;aspect-ratio:16/10;border-radius:8px;background:#F0EEEA;overflow:hidden;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px transparent;transition:box-shadow .3s}
+.wb .sh-meeting .mt-tile.speaking{box-shadow:0 0 0 2px rgba(47,111,235,.55)}
+.wb .sh-meeting .mt-img{width:100%;height:100%;object-fit:cover}
+.wb .sh-meeting .mt-init{width:48px;height:48px;border-radius:50%;background:#E7E5E0;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:500;color:#1F1F1F}
+.wb .sh-meeting .mt-name{position:absolute;left:8px;bottom:6px;font-size:11px;background:rgba(255,255,255,.85);border-radius:4px;padding:1px 6px;color:#1F1F1F}
+.wb .sh-meeting .mt-sub{min-height:40px;background:#FAF9F7;border:1px solid #E7E5E0;border-radius:8px;padding:8px 10px;font-size:13px;line-height:1.5}
+.wb .sh-meeting .mt-t{color:#6B6B6B;font-family:"SF Mono",Menlo,monospace;font-size:11px}
+.wb .sh-meeting .mt-ctl{display:flex;align-items:center;gap:8px}
+.wb .sh-meeting .mt-btn{border:1px solid #E5E5E5;border-radius:8px;background:#FFFFFF;color:#1F1F1F;font:inherit;font-size:12px;padding:3px 10px;cursor:pointer}
+.wb .sh-meeting .mt-btn:disabled{opacity:.4;cursor:default}
+.wb .sh-meeting .mt-n{margin-left:auto;font-family:"SF Mono",Menlo,monospace;font-size:11px;color:#6B6B6B}
 /* meeting (2026-11-04): the meeting window (flex) | the slots and the tray (≈340 px), full height on a task page. */
 .wb .surface.board.meeting{display:flex;gap:12px;align-items:stretch;min-height:0}
 .wb .main.task.meeting .wb-task-body{padding:10px 12px;overflow:hidden}

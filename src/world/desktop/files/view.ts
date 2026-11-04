@@ -57,7 +57,7 @@ function appName(day: number, which: "files" | "trash"): string {
 }
 
 /** The body of an open file: a task document's clauses, an html page, or plain lines. */
-function fileBody(file: FileEntry, fill: (s: string) => string): SafeHtml {
+export function fileBody(file: FileEntry, fill: (s: string) => string): SafeHtml {
   const body = file.body;
   if (!body) return html`<div class="f-body empty"></div>`;
   if (body.kind === "text") return html`<div class="f-body text">${body.lines.map((l) => html`<p>${fill(l)}</p>`)}</div>`;

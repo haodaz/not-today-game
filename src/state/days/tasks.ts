@@ -169,6 +169,13 @@ export type BoardView = (typeof BOARD_VIEWS)[number];
 export interface BoardIde {
   readonly src: string;
   readonly pages: Readonly<Record<string, number>>;
+  /** shell R4: each slot's page as a code file (its name, its lines; one line holds `{{slot}}`). */
+  readonly files?: Readonly<Record<string, IdeFile>>;
+}
+/** One IDE page's code (shell R4). */
+export interface IdeFile {
+  readonly name: string;
+  readonly code: readonly string[];
 }
 /** One line of a beat: who says it (Kuro or the player) and the text (twinned in the en file). */
 export interface BoardBeatLine {
@@ -598,7 +605,7 @@ function boardMeeting(v: unknown, w: string, slotIds: ReadonlySet<string>, cards
 /** The IDE preview (ide R1): a deliverable under /docs/, and a page 0–99 per (known) slot. */
 function boardIde(v: unknown, w: string, slotIds: ReadonlySet<string>): BoardIde {
   if (!isRecord(v)) fail(w, "must be an object");
-  keys(v, ["src", "pages"], w);
+  keys(v, ["src", "pages", "files"], w);
   const src = str(v.src, `${w}.src`);
   if (!src.startsWith("/docs/")) fail(`${w}.src`, "expected a path under /docs/");
   if (!isRecord(v.pages)) fail(`${w}.pages`, "must be an object");
@@ -608,7 +615,34 @@ function boardIde(v: unknown, w: string, slotIds: ReadonlySet<string>): BoardIde
     if (!Number.isInteger(page) || (page as number) < 0 || (page as number) > 99) fail(`${w}.pages.${slot}`, "must be an integer from 0 to 99");
     pages[slot] = page as number;
   }
-  return { src, pages };
+  const files = v.files !== undefined ? ideFiles(v.files, `${w}.files`, slotIds) : undefined;
+  return { src, pages, ...(files ? { files } : {}) };
+}
+
+/** The placeholder in a page's code where the slot's field is drawn (shell R4). */
+export const SLOT_FIELD = "{{slot}}";
+
+/**
+ * The code of each IDE page (shell R4): a file for every slot (and only for slots), a non-empty
+ * name, and exactly one code line holding `{{slot}}`.
+ */
+function ideFiles(v: unknown, w: string, slotIds: ReadonlySet<string>): Record<string, IdeFile> {
+  if (!isRecord(v)) fail(w, "must be an object");
+  const out: Record<string, IdeFile> = {};
+  for (const [slot, f] of Object.entries(v)) {
+    const fw = `${w}.${slot}`;
+    if (!slotIds.has(slot)) fail(w, `"${slot}" is not a slot`);
+    if (!isRecord(f)) fail(fw, "must be an object");
+    keys(f, ["name", "code"], fw);
+    const name = str(f.name, `${fw}.name`);
+    if (!Array.isArray(f.code) || !f.code.every((l) => typeof l === "string")) fail(`${fw}.code`, "must be a list of strings");
+    const code = f.code as string[];
+    const fields = code.filter((l) => l.includes(SLOT_FIELD)).length;
+    if (fields !== 1) fail(`${fw}.code`, `must have exactly one line with ${SLOT_FIELD} (has ${fields})`);
+    out[slot] = { name, code };
+  }
+  for (const slot of slotIds) if (!(slot in out)) fail(w, `slot "${slot}" has no file`);
+  return out;
 }
 
 /** The fixed beat names (ide R1); `fill:<slot>` and `fill:<slot>:<card>` are checked separately. */
@@ -792,7 +826,9 @@ function localiseTask(zh: Task, en: Task, w: string): Task {
     if (!zh.board || !en.board) fail(`${w}.board`, "board present in only one language");
     if (zh.board.slots.length !== en.board.slots.length || zh.board.cards.length !== en.board.cards.length) fail(`${w}.board`, "board shape differs from the Chinese");
     // ide R1: the view and the preview are shared; the beats differ only in their lines' text.
-    if (zh.board.view !== en.board.view || !sameJson(zh.board.ide, en.board.ide)) fail(`${w}.board`, "view or ide differs from the Chinese");
+    // shell R4: the en `ide.files` carry their own names and code; only their keys must match.
+    const ideShape = (b: TaskBoard) => (b.ide ? { src: b.ide.src, pages: b.ide.pages, files: b.ide.files ? Object.keys(b.ide.files).sort() : null } : null);
+    if (zh.board.view !== en.board.view || !sameJson(ideShape(zh.board), ideShape(en.board))) fail(`${w}.board`, "view or ide differs from the Chinese");
     // meeting R1: the people's ids and tiles, the lines' times / speakers / cards, the layout and the
     // seats are shared; only the names and the line text differ.
     const meetingShape = (b: TaskBoard) =>

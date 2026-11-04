@@ -60,6 +60,7 @@ import { itemPageId, readingPageId, type KuroCloses } from "@state/closes";
 import { browserPage } from "@world/desktop/browser/data";
 import { composerActions, workbenchActions } from "@world/desktop/workbench/actions";
 import { meetingActions } from "@world/desktop/workbench/meeting";
+import { taskShellActions } from "@world/desktop/workbench/shell";
 import { boardActions } from "@world/desktop/workbench/board";
 import { workActions } from "@world/desktop/workbench/work";
 import { renderFiles } from "@world/desktop/files/view";
@@ -1079,6 +1080,8 @@ export const loopActions: Record<string, ActionHandler> = {
   // The meeting view's ▶ / ⏸ / ⟲ (meeting 2026-11-04). Registered here, not in workActions, so
   // no module-load spread inside the workbench's import cycle can see it unset.
   ...meetingActions,
+  // The task page's cards (shell 2026-11-04): ⊟, the pane toggles, ⤢, ×, a slot row, ↗.
+  ...taskShellActions,
 
   // 文件 / 回收站 (desktop-ui 2026-11-02): the files/trash dock tiles open the real window instead of
   // the plain decoy notice; every other decoy keeps its notice.
