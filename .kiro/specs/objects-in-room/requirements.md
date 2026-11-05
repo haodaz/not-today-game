@@ -35,3 +35,7 @@ Entering 使用 on an object logs `{ kind: "useAt", objectId, facing, ok: boolea
 ## R7. Back to the screen after the trip (author 2026-11-04: 「放下计算器以后，镜头自动转回屏幕」)
 When a board lock with `face` took the player from 屏幕 to a facing (R3), putting the object down (the last Esc / click outside / 放下) **returns the camera to 屏幕** on the same monitor and task page it left from: the room-turn back to 房间 (shortest way), then into 屏幕, in one move, like sitting back down. Only for a trip that a lock started (session flag set by R3's move, cleared on return); putting an object down anywhere else stays where you are. The lock panel is open on return, so the code chips (now offered) are in front of the player.
 - Tests: from 屏幕, 用计算器看一眼 → 窗, use, put down → back on 屏幕 on the same task page with the chips shown; picking the calculator up at 窗 by hand and putting it down stays at 窗.
+
+## R8. No second trip (Claude, seen in play 2026-11-04)
+After a wrong code the player reopens the lock; today that click turns the head to the facing again and lifts the object again. Once a `useAt` with `ok` exists **today** for the lock's object, 用{object}看一眼 opens the code panel in place (chips shown), with no turn and no lift. The trip happens only while no working use has been logged today.
+- Tests: trip, use, return, wrong code, reopen → no view change, chips shown; next day the first click trips again.
