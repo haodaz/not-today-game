@@ -34,7 +34,7 @@ import { pressKey } from "@world/objects/index";
 import { PHONE_FLIP } from "@world/room/held";
 import { CAMERA_KEYS, DICT_KEYS, FLIPPERS, SHEET_SLIDE_MS } from "@world/room/devices";
 import { CAMERA_FLASH_MS, cameraShot, type CameraState } from "@world/objects/plain";
-import { DEVELOP_BLANK_MS, DEVELOP_MS } from "@state/photos";
+import { DEVELOP_BLANK_MS, DEVELOP_MS, ON_THE_SPOT_DAY, photoKey, roomFacingOf } from "@state/photos";
 import { screenPlaceOf } from "@world/desktop/files/album";
 import { booted, deskMeal, itemStates, loopContext, mealToOrder, nightfallReached, openItemFor, openTask } from "@world/loop/checklist";
 import type { EventToken } from "@state/days/table";
@@ -389,6 +389,13 @@ function takePhoto(ctx: ActionContext): void {
   session.photos = { ...session.photos, [index]: { at, day: state.day, takenAt: now, still } };
   session.lastPhoto = index;
   for (const ms of [CAMERA_FLASH_MS, SHEET_SLIDE_MS, DEVELOP_BLANK_MS, DEVELOP_MS]) ctx.later(ms + 16, ctx.rerender);
+  // photo-album R1: the last day's room photo develops on the spot (camera R10); when its 20 s end
+  // it has been seen developed (the sheet out of the slot shows it), so the 影集 collects it.
+  const facing = roomFacingOf(at);
+  if (facing && state.day === ON_THE_SPOT_DAY && state.upgraded.camera !== true && ctx.developed) {
+    const developed = ctx.developed;
+    ctx.later(DEVELOP_MS + 16, () => developed(photoKey(state.day, facing)));
+  }
 }
 
 /** One leg of a way: the view changes now; the motion layer plays the walk or the turn. */

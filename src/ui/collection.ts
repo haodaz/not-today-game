@@ -4,12 +4,15 @@
 import type { KeyValueStorage } from "@state/slot";
 import { readProfile } from "@state/profile-read";
 import { recogniseTable } from "@state/recognise";
+import { photoKey, photosTable } from "@state/photos";
 import { EMPTY_COLLECTION, type Collection } from "@world/room/collection";
 
 const count = (v: unknown): number => (typeof v === "number" && Number.isFinite(v) && v > 0 ? Math.floor(v) : 0);
 
 /** The object ids that exist in content/objects.json (the eight), to drop unknowns from the save. */
 const KNOWN_OBJECTS: ReadonlySet<string> = new Set(recogniseTable.keys());
+/** The room photos content has (photo-album R1): "<day>:<facing>". */
+const KNOWN_PHOTOS: ReadonlySet<string> = new Set(photosTable.room.map((r) => photoKey(r.day, r.facing)));
 
 /** The Kurogotchi's saved memory, as opaque JSON (the drawer validates its shape), or null. */
 export function readKurogotchi(storage: KeyValueStorage): unknown {
@@ -23,5 +26,7 @@ export function readCollection(storage: KeyValueStorage): Collection {
   const endings = { bad: count(e.bad), survive: count(e.survive), good: count(e.good), collapse: count(e.collapse) };
   // Only ids that still exist in content are kept, in the order they were first found.
   const objects = Array.isArray(p.objects) ? (p.objects as unknown[]).filter((v): v is string => typeof v === "string" && KNOWN_OBJECTS.has(v)) : [];
-  return { finishedRuns: count(p.finishedRuns), endings, objects, kurogotchi: endings.good >= 1 };
+  // photo-album R1: only photos that still exist in content/photos.json, first-seen order, once each.
+  const photos = Array.isArray(p.photos) ? [...new Set((p.photos as unknown[]).filter((v): v is string => typeof v === "string" && KNOWN_PHOTOS.has(v)))] : [];
+  return { finishedRuns: count(p.finishedRuns), endings, objects, kurogotchi: endings.good >= 1, photos };
 }

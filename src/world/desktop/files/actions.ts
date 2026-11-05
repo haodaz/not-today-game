@@ -5,7 +5,7 @@
 import { push } from "@world/loop/dialogue";
 import type { ActionContext, ActionHandler } from "../controller";
 import { ALBUM_TAB, fileById, photoOpenId } from "./view";
-import { albumPhotos, DEVELOP_BLANK_MS, DEVELOP_MS } from "@state/photos";
+import { albumPhotos, DEVELOP_BLANK_MS, DEVELOP_MS, ON_THE_SPOT_DAY, photoKey, photoStage, roomFacingOf, type DevelopStage } from "@state/photos";
 import { filesData } from "@state/files";
 
 /** Open the window on a folder tab (its first folder) or the bin. */
@@ -13,6 +13,33 @@ export function openFilesApp(ctx: ActionContext, which: "files" | "trash"): void
   const firstTab = which === "trash" ? "bin" : (filesData.folders[0]?.id ?? "bin");
   ctx.session.filesApp = { which, tab: firstTab, open: null };
   ctx.rerender();
+}
+
+/**
+ * photo-album R1: a room photo opened in 相册 is collected when its final stage is shown: at once if
+ * it already is, or when its developing ends while it is still the one open. The upgraded camera's
+ * photos never count: they show no addition (Kuro tidies it away). Write-only, to the host.
+ */
+function collectWhenDeveloped(ctx: ActionContext, index: number): void {
+  const developed = ctx.developed;
+  if (!developed) return;
+  const event = albumPhotos(ctx.store.getEvents()).find((p) => p.index === index)?.event;
+  const facing = event ? roomFacingOf(event.at) : null;
+  if (!event || !facing) return;
+  const stageNow = (): DevelopStage => {
+    const state = ctx.store.getState();
+    const now = ctx.now?.() ?? Date.now();
+    const taken = ctx.session.photos[index]?.takenAt ?? null;
+    const opened = ctx.session.photoOpened[index];
+    return photoStage(event, state.day, taken === null ? null : now - taken, opened && opened.day === state.day ? now - opened.at : null, state.upgraded.camera === true);
+  };
+  const collect = () => {
+    if (ctx.store.getState().upgraded.camera === true) return;
+    if (ctx.session.filesApp?.open !== photoOpenId(index) || stageNow() !== "final") return;
+    developed(photoKey(event.day, facing));
+  };
+  if (stageNow() === "final") collect();
+  else if (ctx.store.getState().day > event.day || event.day === ON_THE_SPOT_DAY) ctx.later(DEVELOP_MS + 16, collect);
 }
 
 export const filesActions: Record<string, ActionHandler> = {
@@ -54,6 +81,7 @@ export const filesActions: Record<string, ActionHandler> = {
       ctx.session.photoOpened = { ...ctx.session.photoOpened, [index]: { day, at: ctx.now?.() ?? Date.now() } };
       for (const ms of [DEVELOP_BLANK_MS, DEVELOP_MS]) ctx.later(ms + 16, ctx.rerender);
     }
+    collectWhenDeveloped(ctx, index);
     ctx.rerender();
   },
 

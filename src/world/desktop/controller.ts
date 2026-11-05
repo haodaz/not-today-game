@@ -47,6 +47,11 @@ export interface ActionContext {
   readonly play?: (id: string, opts?: SfxOptions) => void;
   /** Wall time in ms, for cosmetics only (motion); defaults to Date.now. */
   readonly now?: () => number;
+  /**
+   * photo-album R1: a room photo was seen developed ("<day>:<facing>"). Write-only, to the host's
+   * cross-run profile (presentation; the story never reads it back). Absent = nothing recorded.
+   */
+  readonly developed?: (key: string) => void;
 }
 
 /** The motion layer around each render (polish): see world/motion/dom.ts. */
@@ -184,6 +189,8 @@ export interface DesktopDeps {
   readonly pull?: (root: HTMLElement, ctx: ActionContext) => { after(): void; destroy(): void };
   /** tingtalk R1b: where the windows' placement is remembered for the run (absent = the page only). */
   readonly placement?: { readonly storage: Pick<Storage, "getItem" | "setItem"> | null; readonly runId: string };
+  /** photo-album R1: told when a room photo is first seen developed (the host writes the profile). */
+  readonly onPhotoDeveloped?: (key: string) => void;
 }
 
 function defaultRender(apps: AppRenderers) {
@@ -302,7 +309,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     }, ms);
     timers.add(id);
   };
-  const ctx: ActionContext = { store: deps.store, session, rerender, later, play: (id, opts) => playSfx(id, session.muted, opts), now: () => Date.now() };
+  const ctx: ActionContext = { store: deps.store, session, rerender, later, play: (id, opts) => playSfx(id, session.muted, opts), now: () => Date.now(), developed: deps.onPhotoDeveloped };
   const motion: MotionHooks | null = deps.motion ? deps.motion(root, ctx, actions) : null;
   const splat = deps.splat ? deps.splat(root, ctx) : null;
   const nav = deps.nav ? deps.nav(root, ctx, actions, splat) : null;

@@ -24,7 +24,7 @@ afterEach(() => setLocale("zh"));
 
 const collected = (finishedRuns: number, endings: Partial<Collection["endings"]> = {}): Collection => {
   const e = { bad: 0, survive: 0, good: 0, collapse: 0, ...endings };
-  return { finishedRuns, endings: e, objects: [], kurogotchi: e.good >= 1 };
+  return { finishedRuns, endings: e, objects: [], kurogotchi: e.good >= 1, photos: [] };
 };
 const page = (m: TitleModel) => renderTitle(m).value;
 const restart = /restart|loop-restart|新游戏.*继续|data-action="[^"]*reset/;

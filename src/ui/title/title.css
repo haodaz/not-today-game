@@ -82,6 +82,29 @@
 .drawer-photo-obj{display:flex;flex-direction:column;align-items:center;gap:12px}
 .drawer-big-photo{max-width:320px;max-height:300px;object-fit:contain;filter:drop-shadow(0 4px 10px rgba(0,0,0,.3))}
 
+/* 影集 (photo-album R2): the drawer's light page. A count, then a row of four instant sheets per day
+   (scrolling); a collected sheet is its developed photo, an uncollected one blank white with its
+   label (the last day's just 「？」). Opened, one sheet large with ← →, the addition's text under it. */
+.title-album-page .album-count{text-align:center;margin:-10px 0 14px;font-size:13px;letter-spacing:.2em;color:#5b5346}
+.title-album-page .album-grid{max-height:560px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;padding:4px 6px}
+.title-album-page .album-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.title-album-page .album-cell{display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:none;font:inherit;color:#1d2129}
+.title-album-page .album-cell.got{cursor:pointer}
+.title-album-page .album-sheet{display:block;width:150px;box-sizing:border-box;padding:7px 7px 26px;background:#FFFFFF;box-shadow:0 2px 6px rgba(0,0,0,.18);border-radius:2px}
+.title-album-page .album-cell.blank .album-sheet{height:182px;background:#FBFAF7}
+.title-album-page .album-cell .ph-add{display:none}
+.title-album-page .album-cell.got:hover .album-sheet,.title-album-page .album-cell.got:focus-visible .album-sheet{box-shadow:0 4px 12px rgba(0,0,0,.28)}
+.title-album-page .album-label{font-size:12px;letter-spacing:.08em;color:#8a7f70}
+.title-album-page .album-cell.last .album-label{font-size:16px;color:#b3aa9c}
+.title-album-page .album-open{display:flex;flex-direction:column;align-items:center;gap:12px;min-height:360px}
+.title-album-page .album-large{display:flex;align-items:center;gap:22px}
+.title-album-page .album-sheet.big{margin:0;width:340px;padding:12px 12px 52px;background:#FFFFFF;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.title-album-page .album-sheet.big .ph-add{display:none}
+.title-album-page .album-step{width:44px;height:44px;border:1px solid #8a7f70;border-radius:50%;background:transparent;color:#1d2129;font:inherit;font-size:18px;cursor:pointer}
+.title-album-page .album-step:disabled{opacity:.3;cursor:default}
+.title-album-page .album-cap{font-size:13px;letter-spacing:.12em;color:#5b5346}
+.title-album-page .album-text{margin:0;max-width:520px;text-align:center;font-size:14px;line-height:1.7;color:#1d2129}
+
 /* The collection on the desk (FR4/FR8): figures and the book; a missing image keeps its node. */
 .figures{position:absolute;inset:0;pointer-events:none}
 .figure{position:absolute;pointer-events:auto;outline:none}

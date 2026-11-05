@@ -2278,3 +2278,38 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
   - a no-face lock → no trip;
   - a trip ended by another move → no return.
 - `npx tsc --noEmit`: clean. `npx vitest run`: 110 files / 2002 tests passed.
+
+## photo-album: the 影集 on the title page (2026-11-04)
+
+- R1:
+  - `ProfileWriter.recordPhoto(key)` adds "<day>:<facing>" (the shooting day; `photoKey` in
+    `@state/photos`) to `profile.photos` once, in first-seen order. It is write-only, like
+    `recordObject`. The profile version is unchanged: a missing field reads as none, like `objects`.
+  - `readCollection` fills `Collection.photos` (optional, absent = none) with only the keys
+    `content/photos.json` has.
+  - The game reaches the profile only through a write-only callback: `DesktopDeps.onPhotoDeveloped`,
+    which reaches handlers as `ActionContext.developed`. `main.ts` passes `profile.recordPhoto` for
+    saved runs only; debug runs record nothing.
+  - "Seen developed":
+    - `photo-open` (files/actions.ts) collects a room photo when it is final as it opens, or when its
+      20 s end while it is still the one open;
+    - `takePhoto` (game.ts) collects the day-18 one when its on-the-spot 20 s end;
+    - photos of the upgraded camera never count (they show no addition).
+- R2:
+  - New `src/ui/title/album.ts`:
+    - `hasAlbum` (camera in `objects`);
+    - `albumCells` (content's days ascending × 房间 · 床 · 门 · 窗);
+    - `albumRing` / `albumStep` (the collected ones, wrapping);
+    - `albumPage`: the count (`album.count`) and a row of four sheets per day. A collected cell is
+      `photoPicture` developed with content's addition. An uncollected cell is a blank sheet labelled
+      `album.cell`, and day 18's are labelled 「？」 only. A collected cell opens large with ← → and
+      the addition's text under it.
+  - `model.ts` gains the `album` screen and `albumOpen`. `view.ts` puts the 影集 button beside the
+    drawer.
+  - `mount.ts` actions: `title-album`, `album-open`, `album-grid`, `album-prev` / `album-next`; ←/→
+    keys; Esc / 返回 go back to the grid, then the menu.
+  - `title.css` reuses the drawer's light page.
+- Tests:
+  - new `tests/photo-album.test.ts` (10);
+  - updated the writer keys in `saves.test.ts` and the collection helper in `title.test.ts`.
+- `npx tsc --noEmit`: clean. `npx vitest run`: 111 files / 2012 tests passed.

@@ -117,6 +117,8 @@ function startGame(store: Store, saved: boolean, from?: "desk"): void {
     settle: (ctx) => void settleSession(ctx.session),
     // tingtalk R1b: the windows' placement is remembered for this run (a fresh run starts default).
     placement: { storage: saved ? window.localStorage : null, runId: store.getRunId() },
+    // photo-album R1: a room photo seen developed goes into the profile's 影集 (saved runs only).
+    onPhotoDeveloped: saved ? (key) => profile.recordPhoto(key) : undefined,
     sound,
     motion: createMotion,
     // The room splat for 房间 ↔ 桌子 moves (room-scene): the game only, never the title page.

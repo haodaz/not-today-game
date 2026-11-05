@@ -5,7 +5,7 @@ import type { State } from "@state/types.gen";
 import type { Collection } from "@world/room/collection";
 import type { IdleLayer } from "./table";
 
-export type Screen = "menu" | "questions" | "credits" | "drawer";
+export type Screen = "menu" | "questions" | "credits" | "drawer" | "album";
 
 /** The questions in order (FR3): who, what the family calls you, the boss, colleagues, she/he. */
 export const QUESTIONS = ["login", "nick", "bossCalls", "calledBy", "pronoun"] as const;
@@ -48,10 +48,12 @@ export interface TitleModel {
   readonly collection: Collection;
   /** The object open in the drawer (object-drawer 2), or null: the grid. Only on the drawer screen. */
   readonly drawerOpen: string | null;
+  /** The photo open large in 影集 ("<day>:<facing>", photo-album R2), or null: the grid. */
+  readonly albumOpen: string | null;
 }
 
 export function initialTitle(save: TitleModel["save"], collection: Collection): TitleModel {
-  return { screen: "menu", save, answers: NO_ANSWERS, settingsOpen: false, muted: false, idle: null, chairCut: false, monitorsAwake: false, starting: false, framing: "room", moving: false, collection, drawerOpen: null };
+  return { screen: "menu", save, answers: NO_ANSWERS, settingsOpen: false, muted: false, idle: null, chairCut: false, monitorsAwake: false, starting: false, framing: "room", moving: false, collection, drawerOpen: null, albumOpen: null };
 }
 
 /** The card shows only once the camera has arrived at the desk. */
@@ -107,4 +109,4 @@ export const toQuestions = (m: TitleModel): TitleModel => (m.save ? m : { ...m, 
  * Esc from the card (or 返回 from 制作): back to the menu; the monitors sleep; from the desk the
  * camera pulls back to the room. The answers are kept.
  */
-export const toMenu = (m: TitleModel): TitleModel => ({ ...m, screen: "menu", monitorsAwake: false, settingsOpen: false, framing: "room", moving: m.framing === "desk", drawerOpen: null });
+export const toMenu = (m: TitleModel): TitleModel => ({ ...m, screen: "menu", monitorsAwake: false, settingsOpen: false, framing: "room", moving: m.framing === "desk", drawerOpen: null, albumOpen: null });

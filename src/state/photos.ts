@@ -167,6 +167,9 @@ const photoFiles = import.meta.glob("../../content/photos.json", { eager: true, 
 const photosRaw = Object.values(photoFiles)[0];
 export const photosTable: PhotosTable = photosRaw === undefined ? NO_PHOTOS : parsePhotos(photosRaw);
 
+/** A room photo's key in the cross-run album (photo-album R1): "<day>:<facing>", the shooting day. */
+export const photoKey = (day: number, facing: Facing): string => `${day}:${facing}`;
+
 /** What content adds to a photo taken at `at` on `day` (R8: a room photo by (day, facing); a screen photo by (at, day)). */
 export function photoAdds(e: Pick<PhotoEvent, "at" | "day">, table: PhotosTable = photosTable): PhotoAdd[] {
   const facing = roomFacingOf(e.at);

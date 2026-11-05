@@ -124,6 +124,11 @@ export interface ProfileWriter {
    */
   recordObject(id: string): void;
   /**
+   * A room photo was seen developed in a saved run (photo-album R1): adds `key` ("<day>:<facing>",
+   * the shooting day) to `profile.photos` once, in the order first seen. Idempotent; never removed.
+   */
+  recordPhoto(key: string): void;
+  /**
    * The Kurogotchi's saved state (object-drawer 3): it remembers across runs. Replaces
    * `profile.kurogotchi` with `data` (opaque JSON here; the drawer owns its shape).
    */
@@ -152,6 +157,12 @@ export function createProfileWriter(storage: KeyValueStorage): ProfileWriter {
       const was = Array.isArray(current.objects) ? (current.objects as Json[]).filter((v): v is string => typeof v === "string") : [];
       if (was.includes(id)) return;
       slot.write({ data: { ...current, objects: [...was, id] } });
+    },
+    recordPhoto(key) {
+      const current = (slot.read()?.data ?? {}) as ProfileData;
+      const was = Array.isArray(current.photos) ? (current.photos as Json[]).filter((v): v is string => typeof v === "string") : [];
+      if (was.includes(key)) return;
+      slot.write({ data: { ...current, photos: [...was, key] } });
     },
     writeKurogotchi(data) {
       const current = (slot.read()?.data ?? {}) as ProfileData;

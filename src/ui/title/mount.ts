@@ -12,6 +12,7 @@ import { arrived, canStart, diceOptions, initialTitle, QUESTIONS, rowsShown, toM
 import { titleTable, type IdleEvent } from "./table";
 import { renderTitle } from "./view";
 import { createDrawerObject, createKurogotchiDrawer, drawerIds, KURO_ID, type DrawerObject, type KuroDrawerObject, type KuroMemoryStore } from "./drawer";
+import { albumRing, albumStep, hasAlbum } from "./album";
 
 export interface TitleDeps {
   readonly save: { readonly day: number } | null;
@@ -194,6 +195,13 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     if (open) openDrawerObject(open);
   };
 
+  /** 影集's ← → (photo-album R2): the previous / next collected photo, wrapping. */
+  function albumMove(by: -1 | 1): void {
+    if (model.screen !== "album" || !model.albumOpen) return;
+    const next = albumStep(model.collection, model.albumOpen, by);
+    if (next) set({ ...model, albumOpen: next });
+  }
+
   /** Esc from the card or 返回 from 制作/道具: the menu; from the desk the camera pulls back. */
   function back(): void {
     // Leaving the drawer stops its object (and resumes the theme if the walkman had it).
@@ -248,8 +256,21 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     "title-back": () => {
       // From an opened object, 返回 goes back to the grid; from the grid (or elsewhere) to the menu.
       if (model.screen === "drawer" && model.drawerOpen) toDrawer(null);
+      else if (model.screen === "album" && model.albumOpen) set({ ...model, albumOpen: null });
       else back();
     },
+    // photo-album R2: 影集, store-free like the drawer. A collected photo opens large; ← → walk the
+    // collected ones; 返回 / the back control returns to the grid.
+    "title-album": () => {
+      if (hasAlbum(model.collection)) set({ ...model, screen: "album", albumOpen: null });
+    },
+    "album-open": (el) => {
+      const key = el.dataset.photo;
+      if (key && albumRing(model.collection).includes(key)) set({ ...model, albumOpen: key });
+    },
+    "album-grid": () => set({ ...model, albumOpen: null }),
+    "album-prev": () => albumMove(-1),
+    "album-next": () => albumMove(1),
     "title-drawer": () => toDrawer(null),
     "drawer-open": (el) => {
       const id = el.dataset.object;
@@ -307,7 +328,14 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     if (model.starting || model.moving) return;
     if (e.key === "Escape") {
       if (model.settingsOpen) set({ ...model, settingsOpen: false });
+      else if (model.screen === "album" && model.albumOpen) set({ ...model, albumOpen: null });
       else if (model.screen !== "menu") back();
+      e.preventDefault();
+      return;
+    }
+    // 影集's ← → between the collected photos (photo-album R2).
+    if ((e.key === "ArrowLeft" || e.key === "ArrowRight") && model.screen === "album" && model.albumOpen) {
+      albumMove(e.key === "ArrowLeft" ? -1 : 1);
       e.preventDefault();
       return;
     }
