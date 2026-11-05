@@ -1,0 +1,83 @@
+{
+  "_note": "English twin of content/prologue.json (same shape, same speakers and backdrops).",
+  "say": [
+    {
+      "k": "narration",
+      "t": "Spring, 2016. A hundred-odd desks in the office, not one of them empty.",
+      "backdrop": "/room/dream/office_busy.jpg"
+    },
+    {
+      "k": "narration",
+      "t": "On the whiteboard in the kitchen: Release this week, go. Under it someone has drawn a cat."
+    },
+    {
+      "k": "speaker",
+      "who": "boss",
+      "t": "We closed the round. Dinner's on me tonight, order anything."
+    },
+    {
+      "k": "speaker",
+      "who": "同事",
+      "t": "Long live the boss!"
+    },
+    {
+      "k": "narration",
+      "t": "In the small meeting room you interview a kid fresh out of university. The CV says: Java, some Python."
+    },
+    {
+      "k": "speaker",
+      "who": "xiaozhang",
+      "t": "I… I can learn. I really can."
+    },
+    {
+      "k": "narration",
+      "t": "You hired him. Later he called you Chief."
+    },
+    {
+      "k": "speaker",
+      "who": "laozhou",
+      "t": "I can write SQL with my eyes shut. People who ask AI for everything, I don't rate them."
+    },
+    {
+      "k": "narration",
+      "t": "Whenever it was someone's birthday, the cake went from the meeting room all the way to the back row. Your slice was always just the cream."
+    },
+    {
+      "k": "speaker",
+      "who": "boss",
+      "t": "Once this deal comes through, everyone gets paid this month."
+    },
+    {
+      "k": "narration",
+      "t": "You believed him. A dozen of the names on the payroll were people you had interviewed."
+    },
+    {
+      "k": "narration",
+      "t": "After that, every pivot, a few more desks went empty.",
+      "backdrop": "/room/dream/office_half.jpg"
+    },
+    {
+      "k": "speaker",
+      "who": "boss",
+      "t": "We're all in the same boat."
+    },
+    {
+      "k": "narration",
+      "t": "The last time in the office was an evening. The AI-native reform: the office was given up, everyone works from home.",
+      "backdrop": "/room/dream/office_night.jpg"
+    },
+    {
+      "k": "speaker",
+      "who": "boss",
+      "t": "No need to come in. I fought for that for you."
+    },
+    {
+      "k": "narration",
+      "t": "You pack your desk into a cardboard box."
+    },
+    {
+      "k": "inner",
+      "t": "Home. As if there were one."
+    }
+  ]
+}

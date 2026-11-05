@@ -1,0 +1,83 @@
+{
+  "_note": "The opening dream (author 2026-11-04): after the title questions the name becomes the shipping label on the box, fade, then this: the company's good years, then the decline, then the office given up. Facts from the bible § 背景与公司. Then day 1 wakes in the rented room.",
+  "say": [
+    {
+      "k": "narration",
+      "t": "2016 年的春天。办公室一百多个工位，一个空的都没有。",
+      "backdrop": "/room/dream/office_busy.jpg"
+    },
+    {
+      "k": "narration",
+      "t": "茶水间的白板上写着：本周发布，冲。底下有人画了一只猫。"
+    },
+    {
+      "k": "speaker",
+      "who": "boss",
+      "t": "这一轮融到了。今晚我请，大家随便点。"
+    },
+    {
+      "k": "speaker",
+      "who": "同事",
+      "t": "老板万岁！"
+    },
+    {
+      "k": "narration",
+      "t": "你在小会议室面试一个刚毕业的孩子。简历上写着：熟悉 Java，会一点 Python。"
+    },
+    {
+      "k": "speaker",
+      "who": "xiaozhang",
+      "t": "我……我能学。我真的能学。"
+    },
+    {
+      "k": "narration",
+      "t": "你把他招了进来。后来他叫你老大。"
+    },
+    {
+      "k": "speaker",
+      "who": "laozhou",
+      "t": "SQL 我闭着眼都能写。那些什么都问 AI 的，我看不上。"
+    },
+    {
+      "k": "narration",
+      "t": "那年谁过生日，蛋糕就从会议室一路传到最后一排。你分到的那块，总是只剩奶油。"
+    },
+    {
+      "k": "speaker",
+      "who": "boss",
+      "t": "这个单子下来，大家这个月就有了。"
+    },
+    {
+      "k": "narration",
+      "t": "你信了。工资表上那些名字，有十几个是你面试进来的。"
+    },
+    {
+      "k": "narration",
+      "t": "后来每转型一次，工位就空一些。",
+      "backdrop": "/room/dream/office_half.jpg"
+    },
+    {
+      "k": "speaker",
+      "who": "boss",
+      "t": "咱们是一条船上的。"
+    },
+    {
+      "k": "narration",
+      "t": "最后一次在办公室，是个晚上。AI 原生改革：办公室退了，人人在家办公。",
+      "backdrop": "/room/dream/office_night.jpg"
+    },
+    {
+      "k": "speaker",
+      "who": "boss",
+      "t": "不用来公司。这个我一直给你争取的。"
+    },
+    {
+      "k": "narration",
+      "t": "你把工位收进一个纸箱。"
+    },
+    {
+      "k": "inner",
+      "t": "可哪里有家。"
+    }
+  ]
+}
