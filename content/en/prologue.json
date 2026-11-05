@@ -3,63 +3,94 @@
   "say": [
     {
       "k": "narration",
-      "t": "Spring, 2016. A hundred-odd desks in the office, not one of them empty.",
+      "t": "The meeting room light is white, so white that every hand on the table has a rim of light.",
       "backdrop": "/room/dream/office_busy.jpg"
     },
     {
       "k": "narration",
-      "t": "On the whiteboard in the kitchen: Release this week, go. Under it someone has drawn a cat."
+      "t": "The boss stands in front of the projector holding a pen. Its cap went missing long ago."
     },
     {
       "k": "speaker",
       "who": "boss",
-      "t": "We closed the round. Dinner's on me tonight, order anything."
-    },
-    {
-      "k": "speaker",
-      "who": "同事",
-      "t": "Long live the boss!"
+      "t": "Future Intelligence's Series B. It's signed."
     },
     {
       "k": "narration",
-      "t": "In the small meeting room you interview a kid fresh out of university. The CV says: Java, some Python."
+      "t": "Only then does the room dare to make a sound. Someone slaps the table, someone twists open a bottle of water, someone holds a phone up at the projector. You sit by the door, furthest from the screen, and see all of it."
+    },
+    {
+      "k": "speaker",
+      "who": "boss",
+      "t": "{bossCalls}. We're all in the same boat, and the boat just got bigger."
+    },
+    {
+      "k": "narration",
+      "t": "The partner stops you in the corridor. A stack of printed papers, highlighter all over them, the marks of someone reading and getting excited at once.",
+      "backdrop": "/room/dream/office.jpg"
+    },
+    {
+      "k": "speaker",
+      "who": "partner",
+      "t": "Hear me out. If this becomes a product, it has to be you. Only you can build it."
+    },
+    {
+      "k": "narration",
+      "t": "By the time she finishes, it is noon at the end of the corridor and the light is behind her. You can't see her face, only the highlighter lines, lit one by one."
+    },
+    {
+      "k": "narration",
+      "t": "The hundredth employee arrives in the afternoon. His backpack still on, he wipes his hand on his trousers before holding it out."
     },
     {
       "k": "speaker",
       "who": "xiaozhang",
-      "t": "I… I can learn. I really can."
+      "t": "Hello, teacher… I mean, hello, boss…"
     },
     {
       "k": "narration",
-      "t": "You hired him. Later he called you Chief."
+      "t": "You tell him {calledBy} is fine. He says it over to himself once, like saving a file."
+    },
+    {
+      "k": "narration",
+      "t": "The red envelope comes in the evening. The family table, two more dishes than usual.",
+      "backdrop": "/room/dream/home_dinner.jpg"
+    },
+    {
+      "k": "speaker",
+      "who": "family",
+      "t": "{nick}, eat."
+    },
+    {
+      "k": "narration",
+      "t": "Halfway through dinner a red envelope is pushed against your bowl, so thick its flap won't close. You say you have money, really, you have money now."
+    },
+    {
+      "k": "speaker",
+      "who": "family",
+      "t": "We know, we know you have money. Our child's done well, we're celebrating. This is celebrating, not giving you money."
+    },
+    {
+      "k": "narration",
+      "t": "You put the envelope in your pocket. The pocket bulges, and you don't sit up straight for the rest of the meal."
+    },
+    {
+      "k": "narration",
+      "t": "Then the models got better every year. Something you had spent two years building, one day someone else built with one sentence.",
+      "backdrop": "/room/dream/office_half.jpg"
+    },
+    {
+      "k": "narration",
+      "t": "The client said, we'll just have AI do it ourselves. Nobody did anything wrong. The price of doing this thing fell to zero."
     },
     {
       "k": "speaker",
       "who": "laozhou",
-      "t": "I can write SQL with my eyes shut. People who ask AI for everything, I don't rate them."
+      "t": "The year before last I still thought writing SQL was a skill."
     },
     {
       "k": "narration",
-      "t": "Whenever it was someone's birthday, the cake went from the meeting room all the way to the back row. Your slice was always just the cream."
-    },
-    {
-      "k": "speaker",
-      "who": "boss",
-      "t": "Once this deal comes through, everyone gets paid this month."
-    },
-    {
-      "k": "narration",
-      "t": "You believed him. A dozen of the names on the payroll were people you had interviewed."
-    },
-    {
-      "k": "narration",
-      "t": "After that, every pivot, a few more desks went empty.",
-      "backdrop": "/room/dream/office_half.jpg"
-    },
-    {
-      "k": "speaker",
-      "who": "boss",
-      "t": "We're all in the same boat."
+      "t": "With every pivot a few more desks went empty. A hundred, seventy, fifty."
     },
     {
       "k": "narration",
@@ -73,11 +104,11 @@
     },
     {
       "k": "narration",
-      "t": "You pack your desk into a cardboard box."
+      "t": "It wasn't quite a dream."
     },
     {
       "k": "inner",
-      "t": "Home. As if there were one."
+      "t": "…A few years ago, more or less."
     }
   ]
 }

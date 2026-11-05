@@ -1,65 +1,96 @@
 {
-  "_note": "The opening dream (author 2026-11-04): after the title questions the name becomes the shipping label on the box, fade, then this: the company's good years, then the decline, then the office given up. Facts from the bible § 背景与公司. Then day 1 wakes in the rented room.",
+  "_note": "The opening dream (author 2026-11-04): after the title questions the name becomes the shipping label on the box, fade, then this. The good years are the gamebook's day-1 dream (B round, the partner's paper, the hundredth employee, the red envelope; author's own outline in script/notes/v5.1-待办.md); then the era's turn (models got better, the price fell to zero; author: not only the boss's fault), the office given up. Then day 1 wakes in the rented room.",
   "say": [
     {
       "k": "narration",
-      "t": "2016 年的春天。办公室一百多个工位，一个空的都没有。",
+      "t": "会议室的灯是白的，白得桌面上每个人的手都有一圈边。",
       "backdrop": "/room/dream/office_busy.jpg"
     },
     {
       "k": "narration",
-      "t": "茶水间的白板上写着：本周发布，冲。底下有人画了一只猫。"
+      "t": "老板站在投影前面，手里攥着一支笔，笔帽早就不知道去哪了。"
     },
     {
       "k": "speaker",
       "who": "boss",
-      "t": "这一轮融到了。今晚我请，大家随便点。"
-    },
-    {
-      "k": "speaker",
-      "who": "同事",
-      "t": "老板万岁！"
+      "t": "未来智能的 B 轮，签了。"
     },
     {
       "k": "narration",
-      "t": "你在小会议室面试一个刚毕业的孩子。简历上写着：熟悉 Java，会一点 Python。"
+      "t": "整间屋子的人这才敢出声。有人拍桌子，有人去拧矿泉水的盖子，有人举起手机对着投影拍。你坐在靠门的位置，离投影最远，看得最全。"
+    },
+    {
+      "k": "speaker",
+      "who": "boss",
+      "t": "{bossCalls}。一条船上的，这回船大了。"
+    },
+    {
+      "k": "narration",
+      "t": "合伙人在走廊里拦住你。手里一沓打印出来的论文，荧光笔画得很乱，一看就是边读边激动。",
+      "backdrop": "/room/dream/office.jpg"
+    },
+    {
+      "k": "speaker",
+      "who": "partner",
+      "t": "你听我讲。这个要是做成产品，得你来做，只有你能做。"
+    },
+    {
+      "k": "narration",
+      "t": "她讲完的时候，走廊尽头已经是正午，光从她背后打过来。你看不清她的脸，只看见那些荧光笔的线，一道一道地亮。"
+    },
+    {
+      "k": "narration",
+      "t": "第一百个员工是下午来的。双肩包还没放下，伸手之前先在裤子上擦了一下。"
     },
     {
       "k": "speaker",
       "who": "xiaozhang",
-      "t": "我……我能学。我真的能学。"
+      "t": "老师好……老板好……"
     },
     {
       "k": "narration",
-      "t": "你把他招了进来。后来他叫你老大。"
+      "t": "你说，叫{calledBy}就行。他把这个称呼默念了一遍，像在存一个文件。"
+    },
+    {
+      "k": "narration",
+      "t": "红包是晚上的事。家里的饭桌，菜比平时多两个。",
+      "backdrop": "/room/dream/home_dinner.jpg"
+    },
+    {
+      "k": "speaker",
+      "who": "family",
+      "t": "{nick}，吃。"
+    },
+    {
+      "k": "narration",
+      "t": "饭吃到一半，一个红包推到你碗边，很厚，厚得封口合不上。你说我有钱，真的，我现在有钱了。"
+    },
+    {
+      "k": "speaker",
+      "who": "family",
+      "t": "知道，知道你有钱。孩子出息了，要庆祝一下。这是庆祝，不是给你钱。"
+    },
+    {
+      "k": "narration",
+      "t": "你把红包揣进口袋，口袋鼓起来一块，吃完饭都没有坐直。"
+    },
+    {
+      "k": "narration",
+      "t": "后来，大模型一年比一年好用。你们花两年做出来的东西，有一天，别人用一句话就做出来了。",
+      "backdrop": "/room/dream/office_half.jpg"
+    },
+    {
+      "k": "narration",
+      "t": "甲方说，我们自己让 AI 弄一下就行。不是谁做错了什么。是做这件事的价钱，掉到了零。"
     },
     {
       "k": "speaker",
       "who": "laozhou",
-      "t": "SQL 我闭着眼都能写。那些什么都问 AI 的，我看不上。"
+      "t": "我前年还觉得会写 SQL 是本事。"
     },
     {
       "k": "narration",
-      "t": "那年谁过生日，蛋糕就从会议室一路传到最后一排。你分到的那块，总是只剩奶油。"
-    },
-    {
-      "k": "speaker",
-      "who": "boss",
-      "t": "这个单子下来，大家这个月就有了。"
-    },
-    {
-      "k": "narration",
-      "t": "你信了。工资表上那些名字，有十几个是你面试进来的。"
-    },
-    {
-      "k": "narration",
-      "t": "后来每转型一次，工位就空一些。",
-      "backdrop": "/room/dream/office_half.jpg"
-    },
-    {
-      "k": "speaker",
-      "who": "boss",
-      "t": "咱们是一条船上的。"
+      "t": "每转型一次，工位就空一些。一百个，七十个，五十个。"
     },
     {
       "k": "narration",
@@ -73,11 +104,11 @@
     },
     {
       "k": "narration",
-      "t": "你把工位收进一个纸箱。"
+      "t": "也不算是梦。"
     },
     {
       "k": "inner",
-      "t": "可哪里有家。"
+      "t": "……算是几年前吧。"
     }
   ]
 }
