@@ -2235,3 +2235,28 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
   - `content/photos.json` in the R8 shape;
   - optional camera art (`camera_front.png`, `camera_back.png`) and `public/sfx/camera-shutter.mp3`.
 - `npx tsc --noEmit`: clean. `npx vitest run`: 110 files / 1994 tests passed.
+
+## camera task 8 (R10): room photos develop overnight (2026-11-04)
+
+- `src/state/photos.ts` `photoStage(photo, today, sinceTaken, sinceOpened, upgraded)`:
+  - a screen photo, or a room photo on `ON_THE_SPOT_DAY` (stages.json `hiddenBoxDay`, day 18),
+    develops over 20 s from the shot;
+  - any other room photo is blank all its shooting day and developed from the next day. On that day
+    the 20 s developing plays the first time it is opened in 相册 (until then the list shows it
+    developed);
+  - the upgraded camera's photos are developed at once (R9).
+  
+  The (day, facing) addition is the shooting day's, shown when final.
+- `session.photoOpened[index] = {day, at}` is set by `photo-open` on the first opening each day, with
+  re-renders queued for the two steps. `stageOfPhoto` (album.ts) reads it, and the album and the sheet
+  out of the camera's slot both use it.
+- Content now says `camera`, so the load-time `textbook` → `camera` mapping is removed:
+  - `src/state/objectIds.ts` is deleted;
+  - `variables.ts`, `stages.ts`, `recognise.ts` and `hands.ts` read content's ids as they are;
+  - the generator's copy of the rename is gone;
+  - `hands.ts` no longer knows the textbook's `cell` field (content has none).
+  
+  Door photos keep `/room/door_wall.png`.
+- Tests: `tests/camera.test.ts` drops the rename checks and gains 4 R10 tests: the rule, day 18, the
+  album across the night with the opening animation, and the door still.
+- `npx tsc --noEmit`: clean. `npx vitest run`: 110 files / 1998 tests passed.

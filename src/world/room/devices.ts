@@ -245,7 +245,7 @@ function camera(ctx: DeviceCtx): SafeHtml {
   let sheet: SafeHtml | null = null;
   if (!back && photo) {
     const elapsed = Math.max(0, ctx.nowMs - photo.takenAt);
-    const stage = stageOfPhoto(photo, ctx.nowMs, upgraded);
+    const stage = stageOfPhoto(photo, ctx.state.day, ctx.nowMs, upgraded);
     const late = elapsed < SHEET_SLIDE_MS ? raw(` style="--late:-${Math.round(elapsed)}ms"`) : null;
     sheet = html`<div class="${cls("cam-sheet", elapsed >= SHEET_SLIDE_MS && "out")}"${late}>${photoPicture(photo, stage, upgraded, 0.11)}</div>`;
   }

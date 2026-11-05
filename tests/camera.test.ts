@@ -5,8 +5,6 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { RENAMED_OBJECTS as SCRIPT_RENAMED } from "../scripts/gen-state-types";
-import { RENAMED_OBJECTS, objectId } from "@state/objectIds";
 import { membersOf } from "@state/variables";
 import { objectsFoundOnDay } from "@state/stages";
 import { recogniseTable } from "@state/recognise";
@@ -14,7 +12,7 @@ import { handOf } from "@state/hands";
 import { createStore, type Store } from "@state/store";
 import { lockCodesOffered, lockObjectAvailable } from "@state/days/board";
 import type { TaskBoard } from "@state/days/tasks";
-import { CAMERA_SHEETS, DEVELOP_BLANK_MS, DEVELOP_MS, albumPhotos, developStage, parsePhotos, photoAdds, sheetsLeft } from "@state/photos";
+import { CAMERA_SHEETS, DEVELOP_BLANK_MS, DEVELOP_MS, ON_THE_SPOT_DAY, albumPhotos, developStage, parsePhotos, photoAdds, photoStage, sheetsLeft } from "@state/photos";
 import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
 import { initialSession, type AppContext, type Session } from "@world/desktop/model";
@@ -43,11 +41,9 @@ describe("R1 · the camera replaces the textbook in every object list", () => {
     expect(recogniseTable.has("camera")).toBe(true);
     expect(recogniseTable.has("textbook")).toBe(false);
     expect(handOf("camera")).toBeDefined();
-    expect(objectId("textbook")).toBe("camera");
-    expect(objectId("pager")).toBe("pager");
-    // The generator's copy of the rename is the app's.
-    expect(SCRIPT_RENAMED).toEqual(RENAMED_OBJECTS);
+    // Content says camera now (task 8): no load-time mapping is left.
     expect(css("../src/state/types.gen.ts")).toContain('"camera"');
+    expect(css("../src/state/types.gen.ts")).not.toContain("textbook");
   });
   it("day 2's box gives the camera; opening it finds the camera", () => {
     const store = createStore({ startDay: 2 });
@@ -264,7 +260,8 @@ describe("R9 · the camera in 使用 is a drawn device", () => {
     const render = (nowMs: number) => renderRoom({ state: r.store.getState(), events: r.store.getEvents(), session: r.ctx.session, nowMs }).value;
     const taken = r.ctx.session.photos[r.ctx.session.lastPhoto!]!.takenAt;
     expect(render(taken + 100)).toMatch(/<div class="cam-sheet" style="--late:-100ms"><div class="ph-pic dev-blank"/);
-    expect(render(taken + DEVELOP_MS + 1)).toMatch(/<div class="cam-sheet out"><div class="ph-pic dev-final"/);
+    // R10: a room photo stays blank all its shooting day.
+    expect(render(taken + DEVELOP_MS + 1)).toMatch(/<div class="cam-sheet out"><div class="ph-pic dev-blank"/);
     r.act("obj-flip");
     const back = render(taken + 1000);
     expect(back).toContain('class="cam-counter"><div class="glass"><canvas class="dev" data-screen="camera"');
@@ -301,5 +298,71 @@ describe("a board lock with object: camera behaves like the other object locks",
     store.appendEvent({ kind: "openLayer", objectId: "camera" });
     expect(lockObjectAvailable(board, store.getState(), store.getEvents())).toBe(true);
     expect(lockCodesOffered(board, store.getState(), store.getEvents())).toBe(true);
+  });
+});
+
+// ——— R10 · room photos develop overnight; on the last day on the spot ———
+
+describe("R10 · a room photo shot on day n is blank on day n and developed on day n+1", () => {
+  const fixture = parsePhotos({ room: [{ day: 5, facing: "door", add: { text: "ADD-5" } }, { day: 18, facing: "door", add: { text: "ADD-18" } }] });
+
+  it("the rule: blank all of day n; developed from n+1, the 20 s playing the first time it is opened that day", () => {
+    const p = { at: "room:door", day: 5 };
+    for (const since of [0, DEVELOP_MS + 1, 10 * DEVELOP_MS]) expect(photoStage(p, 5, since, null)).toBe("blank");
+    expect(photoStage(p, 6, null, null)).toBe("final");
+    expect(photoStage(p, 6, null, 0)).toBe("blank");
+    expect(photoStage(p, 6, null, DEVELOP_BLANK_MS)).toBe("cyan");
+    expect(photoStage(p, 6, null, DEVELOP_MS)).toBe("final");
+    // Later days: developed, no animation.
+    expect(photoStage(p, 7, null, 0)).toBe("final");
+    // Screen photos are unchanged: 20 s from when they were taken.
+    expect(photoStage({ at: "screen:workbench:home", day: 5 }, 5, DEVELOP_BLANK_MS, null)).toBe("cyan");
+    expect(photoStage({ at: "screen:workbench:home", day: 5 }, 5, DEVELOP_MS, null)).toBe("final");
+  });
+
+  it("on the last day a room photo develops on the spot in 20 s and shows that day's addition", () => {
+    expect(ON_THE_SPOT_DAY).toBe(18);
+    const p = { at: "room:door", day: 18 };
+    expect(photoStage(p, 18, 0, null)).toBe("blank");
+    expect(photoStage(p, 18, DEVELOP_BLANK_MS, null)).toBe("cyan");
+    expect(photoStage(p, 18, DEVELOP_MS, null)).toBe("final");
+    expect(photoPicture({ ...p, takenAt: 0, still: null }, "final", false, 0.1, null, fixture).value).toContain("ADD-18");
+  });
+
+  it("in 相册: blank on day n with its time and facing; on day n+1 it opens developing, then shows the shooting day's addition", () => {
+    const store = createStore({ startDay: 5 });
+    store.appendEvent({ kind: "openLayer", objectId: "camera" });
+    store.appendEvent({ kind: "photo", at: "room:door", t: "11:20" });
+    const index = store.getEvents().length - 1;
+    let now = 5_000_000;
+    const session = initialSession(DEFAULT_CLOCK, "left", "desktop");
+    session.filesApp = { which: "files", tab: ALBUM_TAB, open: null };
+    const ctx: ActionContext = { store, session, rerender: () => {}, later: () => {}, now: () => now };
+    const out = () => renderFiles({ state: store.getState(), events: store.getEvents(), startDay: 5, session, night: false, nowMs: now }, null)!.value;
+    const row = () => new RegExp(`data-photo="${index}"><span class="ph-thumb"><div class="ph-pic dev-(\\w+)"`).exec(out())?.[1];
+    // Day n: listed, blank, with its time and facing.
+    expect(row()).toBe("blank");
+    expect(out()).toContain(`<span class="f-date">${t("shell.day", { day: 5 })} 11:20</span>`);
+    expect(out()).toContain(`<span class="f-name">${t("hud.cam.door")}</span>`);
+    // Day n+1: developed in the list; opening it plays the 20 s, then the addition of day n.
+    store.appendEvent({ kind: "lieDown" });
+    expect(store.getState().day).toBe(6);
+    expect(row()).toBe("final");
+    loopActions["photo-open"]!(ctx, { photo: String(index) } as DOMStringMap, null as never);
+    expect(session.photoOpened[index]).toEqual({ day: 6, at: now });
+    expect(row()).toBe("blank");
+    now += DEVELOP_BLANK_MS;
+    expect(row()).toBe("cyan");
+    now += DEVELOP_MS;
+    expect(row()).toBe("final");
+    // Opened again the same day: no second animation.
+    loopActions["photo-open"]!(ctx, { photo: String(index) } as DOMStringMap, null as never);
+    expect(row()).toBe("final");
+    expect(photoAdds({ at: "room:door", day: 5 }, fixture)).toEqual([{ text: "ADD-5" }]);
+    expect(photoAdds({ at: "room:door", day: 6 }, fixture)).toEqual([]);
+  });
+
+  it("door photos use the door's own still", () => {
+    expect(photoPicture({ at: "room:door", day: 5, takenAt: null, still: null }, "final", false, 0.1, null, fixture).value).toContain('<img class="ph-room" src="/room/door_wall.png"');
   });
 });

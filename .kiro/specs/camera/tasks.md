@@ -7,3 +7,4 @@
 - [x] 5. Tests as in R7. Log entry in docs/kiro-log.md.
 - [x] 6. R8: instant camera: no wheel; 10 room sheets, screen photos unlimited; 20 s developing drawn in the electronic-material set; room additions by (day, facing).
 - [x] 7. R9: the camera's 使用 face is a drawn device (DEVICE_IDS, FLIPPERS), flat and clean with the R9 parameters; the ejected sheet slides out of the slot.
+- [x] 8. R10: room photos come out blank and develop overnight (the 20 s plays the first time opened on day n+1, with the shooting day's addition); on day 18 on the spot in 20 s; screen photos unchanged. The textbook→camera load-time mapping removed (content says camera).

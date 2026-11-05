@@ -5,7 +5,7 @@
 // for (day, facing) only in the last stage; a screen photo is the still of the window at that moment
 // (iframes as a grey box). The upgraded camera's photos are developed at once and never show the
 // addition (Kuro tidies it away). Pure markup.
-import { developStage, photoAdds, photosTable, roomFacingOf, type DevelopStage, type PhotosTable } from "@state/photos";
+import { photoAdds, photoStage, photosTable, roomFacingOf, type DevelopStage, type PhotosTable } from "@state/photos";
 import { cls, html, raw, type SafeHtml } from "@world/html";
 import { hasString, t } from "@world/i18n";
 import { BACKDROPS } from "@world/fit";
@@ -19,10 +19,13 @@ export interface PhotoView {
   /** Session ms it was taken, or null (an earlier session: developed). */
   readonly takenAt: number | null;
   readonly still: string | null;
+  /** camera R10: session ms it was first opened today in 相册, or null. */
+  readonly openedAt?: number | null;
 }
 
-/** The stage the photo is in at `nowMs` (R8). */
-export const stageOfPhoto = (p: PhotoView, nowMs: number, upgraded: boolean): DevelopStage => developStage(p.takenAt === null ? null : nowMs - p.takenAt, upgraded);
+/** The stage the photo is in on `today` at `nowMs` (R10: room photos overnight; R8 for the screen). */
+export const stageOfPhoto = (p: PhotoView, today: number, nowMs: number, upgraded: boolean): DevelopStage =>
+  photoStage(p, today, p.takenAt === null ? null : nowMs - p.takenAt, p.openedAt == null ? null : nowMs - p.openedAt, upgraded);
 
 /** A photo's place in words: the facing's name, or 屏幕. */
 export function photoPlace(at: string): string {

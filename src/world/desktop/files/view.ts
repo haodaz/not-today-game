@@ -90,10 +90,12 @@ const openedPhoto = (open: string | null): number | null => {
   return m ? Number(m[1]) : null;
 };
 
-/** One photo as the album reads it: the session's record if taken this session, else its event. */
+/** One photo as the album reads it: the session's record if taken this session, else its event; when it was first opened today (R10). */
 function viewOf(ctx: AppContext, p: Photo): PhotoView {
   const s = ctx.session.photos[p.index];
-  return s ? { at: s.at, day: s.day, takenAt: s.takenAt, still: s.still } : { at: p.event.at, day: p.event.day, takenAt: null, still: null };
+  const o = ctx.session.photoOpened[p.index];
+  const openedAt = o && o.day === ctx.state.day ? o.at : null;
+  return s ? { at: s.at, day: s.day, takenAt: s.takenAt, still: s.still, openedAt } : { at: p.event.at, day: p.event.day, takenAt: null, still: null, openedAt };
 }
 
 /**
@@ -108,7 +110,7 @@ function album(ctx: AppContext, live: LiveScreen | null): { list: SafeHtml; main
   const openIndex = openedPhoto(session.filesApp?.open ?? null);
   const rows = photos.map((p) => {
     const v = viewOf(ctx, p);
-    const stage = stageOfPhoto(v, ctx.nowMs, upgraded);
+    const stage = stageOfPhoto(v, state.day, ctx.nowMs, upgraded);
     const when = `${t("shell.day", { day: p.event.day })} ${p.event.t}`;
     return html`<button type="button" class="${cls("f-row", "ph-row", openIndex === p.index && "on")}" data-action="photo-open" data-photo="${p.index}"><span class="ph-thumb">${photoPicture(v, stage, upgraded, 0.05)}</span><span class="f-name">${photoPlace(p.event.at)}</span><span class="f-date">${when}</span></button>`;
   });
@@ -116,7 +118,7 @@ function album(ctx: AppContext, live: LiveScreen | null): { list: SafeHtml; main
   const open = photos.find((p) => p.index === openIndex);
   if (!open) return { list, main: html`<div class="f-open empty"></div>` };
   const v = viewOf(ctx, open);
-  const stage = stageOfPhoto(v, ctx.nowMs, upgraded);
+  const stage = stageOfPhoto(v, state.day, ctx.nowMs, upgraded);
   const bar = html`<div class="f-open-bar"><button type="button" class="f-back" data-action="file-close" aria-label="${t("dialogue.close")}">‹</button><span class="f-title">${photoPlace(v.at)} · ${t("shell.day", { day: v.day })} ${open.event.t}</span></div>`;
   // The screen power (R3): developed, a screen photo of the place on screen now, side by side.
   if (stage === "final" && v.still && roomFacingOf(v.at) === null && live && live.at === v.at && live.still) {

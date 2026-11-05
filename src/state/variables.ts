@@ -2,7 +2,6 @@
 // It provides the defaults, the engine constants and a validator. It never copies a value
 // out of the table into code.
 import table from "@content/variables.json";
-import { objectId } from "./objectIds";
 
 export type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
 
@@ -18,14 +17,7 @@ interface VariableEntry {
   default: Json;
 }
 
-// camera R1: a member list naming a renamed object (the `found` set's `textbook`) reads it under the
-// game's id (src/state/objectIds.ts). Nothing else in the table changes.
-const raw = Object.fromEntries(
-  Object.entries(table as unknown as Record<string, unknown>).map(([k, v]) => {
-    const e = v as { of?: unknown } | null;
-    return [k, e && typeof e === "object" && Array.isArray(e.of) ? { ...e, of: (e.of as string[]).map(objectId) } : v];
-  }),
-) as Record<string, unknown>;
+const raw = table as unknown as Record<string, unknown>;
 
 /** Names of every state variable, in table order. Nothing else exists. */
 export const variableNames: readonly string[] = Object.keys(raw).filter(

@@ -15,7 +15,6 @@ import kidRaw from "@content/kid.json";
 import stagesFile from "@content/stages.json";
 import { parseLine, type SayLine } from "./days/table";
 import { parseWorks, type Works } from "./works";
-import { objectId } from "./objectIds";
 
 /** A rectangle on the object's image, as fractions of its box (0..1). */
 export interface Rect {
@@ -152,9 +151,9 @@ function recordings(v: unknown, w: string, fail: Fail, dreams: readonly number[]
 }
 
 /** Which object may carry which hand field (keys, screen and back go on any). */
-const ONLY_ON: Readonly<Record<string, string>> = { solar: "calculator", reels: "tape", recordings: "tape", sim: "phone", light: "iccard", cell: "textbook" };
+const ONLY_ON: Readonly<Record<string, string>> = { solar: "calculator", reels: "tape", recordings: "tape", sim: "phone", light: "iccard" };
 /** The keys recognise.ts leaves to this file. */
-export const HAND_FIELDS = ["keys", "screen", "back", "solar", "reels", "recordings", "sim", "light", "cell", "works"] as const;
+export const HAND_FIELDS = ["keys", "screen", "back", "solar", "reels", "recordings", "sim", "light", "works"] as const;
 
 export function parseHands(input: unknown, dreams: readonly number[] = stagesFile.dreamNights.nights): ReadonlyMap<string, HandEntry> {
   const fail: Fail = failer("objects.json");
@@ -181,14 +180,8 @@ export function parseHands(input: unknown, dreams: readonly number[] = stagesFil
       keysOf(v.reels, ["left", "right"], `${w}.reels`, fail);
       reels = Object.freeze({ left: reel(v.reels.left, `${w}.reels.left`, fail), right: reel(v.reels.right, `${w}.reels.right`, fail) });
     }
-    // camera R1: the textbook's back-cover cell is not carried over. Content may still have it
-    // (under `textbook`): it is checked, so a broken file is still noticed, and then dropped.
-    if (v.cell !== undefined) {
-      rect(v.cell, `${w}.cell`, fail, ["text"]);
-      str((v.cell as Raw).text, `${w}.cell.text`, fail);
-    }
     out.set(
-      objectId(id),
+      id,
       Object.freeze({
         keys: Object.freeze(keys),
         screen: v.screen === undefined ? null : rect(v.screen, `${w}.screen`, fail),

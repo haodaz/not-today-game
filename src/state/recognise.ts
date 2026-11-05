@@ -5,7 +5,6 @@
 import raw from "@content/objects.json";
 import enRaw from "@content/en/objects.json";
 import { objectsFoundOnDay } from "./stages";
-import { objectId } from "./objectIds";
 import { bilingualValues } from "./content-locale";
 import type { GameEvent } from "./events";
 import { hasEvidence, judge, type JudgementDelta } from "./judgement";
@@ -60,9 +59,7 @@ export function parseObjects(input: unknown, foundOnDay: Readonly<Record<string,
   if (!isRecord(input.objects)) fail("objects", "must be an object");
   const known = membersOf("found") ?? [];
   const out = new Map<string, RecogniseEntry>();
-  // camera R1: content's ids are read under the game's (content's `textbook` is the camera).
-  for (const [contentId, v] of Object.entries(input.objects)) {
-    const id = objectId(contentId);
+  for (const [id, v] of Object.entries(input.objects)) {
     const w = `objects.${id}`;
     if (!known.includes(id)) fail(w, "not an object in variables.json found");
     if (!isRecord(v)) fail(w, "must be an object");

@@ -1,10 +1,12 @@
-// camera (2026-11-04; R8 wins over R1–R7): the instant camera's photos. Every shot is a `photo`
-// event: `at` is where it was pointed. A photo of the room (`room:<facing>`) uses a sheet of the
-// pack (10 a run); a photo of the screen (`screen…`, `meeting:<taskId>`) is unlimited and never
-// counts. Every photo develops for 20 s of real time: blank grey-white, then a cyan cast with the
-// shapes coming up, then the final colours. content/photos.json (Claude's, optional) adds what a room
+// camera (2026-11-04; R8 wins over R1–R7, R10 over R8): the instant camera's photos. Every shot is a
+// `photo` event: `at` is where it was pointed. A photo of the room (`room:<facing>`) uses a sheet of
+// the pack (10 a run); a photo of the screen (`screen…`, `meeting:<taskId>`) is unlimited and never
+// counts. A screen photo develops for 20 s of real time: blank grey-white, then a cyan cast with the
+// shapes coming up, then the final colours. A room photo comes out blank and develops overnight
+// (R10; on the last day, on the spot in 20 s). content/photos.json (Claude's, optional) adds what a room
 // photo of (day, facing) or a screen photo of (at, day) shows that the eye did not: strict loader, a
 // missing file means nothing extra.
+import stagesFile from "@content/stages.json";
 import type { GameEvent } from "./events";
 import { FACINGS, type Facing } from "@world/room/facings";
 
@@ -32,6 +34,29 @@ export const sheetsLeft = (events: readonly GameEvent[]): number => Math.max(0, 
 
 /** The three developing stages (R8). */
 export type DevelopStage = "blank" | "cyan" | "final";
+
+/**
+ * R10: the last day (stages.json `hiddenBoxDay`). Its room photos cannot wait for a next day, so they
+ * develop on the spot over 20 s, like a screen photo.
+ */
+export const ON_THE_SPOT_DAY: number = (stagesFile as { hiddenBoxDay?: number }).hiddenBoxDay ?? 18;
+
+/**
+ * A photo's stage on `today` (R10, which wins over R8 for room photos):
+ * - a screen photo, or a room photo on the last day, develops over 20 s from when it was taken
+ *   (`sinceTaken`; unknown = an earlier session: developed);
+ * - any other room photo is blank all its shooting day and developed from the next day; on that day
+ *   the 20 s developing plays the first time it is opened (`sinceOpened`, null = not opened yet
+ *   today: shown developed in the list, the animation is the opening's);
+ * - the upgraded camera's photos are developed at once (R9).
+ */
+export function photoStage(p: Pick<PhotoEvent, "at" | "day">, today: number, sinceTaken: number | null, sinceOpened: number | null, upgraded = false): DevelopStage {
+  if (upgraded) return "final";
+  if (roomFacingOf(p.at) === null || p.day === ON_THE_SPOT_DAY) return developStage(sinceTaken);
+  if (today <= p.day) return "blank";
+  if (today === p.day + 1 && sinceOpened !== null) return developStage(sinceOpened);
+  return "final";
+}
 /**
  * A photo's stage `elapsed` ms after it was taken. Unknown (a photo of an earlier session: the
  * session kept no time for it) is developed; so is anything the upgraded camera takes (R9).

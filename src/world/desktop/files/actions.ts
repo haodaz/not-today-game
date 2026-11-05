@@ -5,7 +5,7 @@
 import { push } from "@world/loop/dialogue";
 import type { ActionContext, ActionHandler } from "../controller";
 import { ALBUM_TAB, fileById, photoOpenId } from "./view";
-import { albumPhotos } from "@state/photos";
+import { albumPhotos, DEVELOP_BLANK_MS, DEVELOP_MS } from "@state/photos";
 import { filesData } from "@state/files";
 
 /** Open the window on a folder tab (its first folder) or the bin. */
@@ -48,6 +48,12 @@ export const filesActions: Record<string, ActionHandler> = {
     if (!app || app.tab !== ALBUM_TAB || !Number.isInteger(index)) return;
     if (!albumPhotos(ctx.store.getEvents()).some((p) => p.index === index)) return;
     ctx.session.filesApp = { ...app, open: photoOpenId(index) };
+    // R10: the first opening today is when an overnight photo's 20 s developing plays.
+    const day = ctx.store.getState().day;
+    if (ctx.session.photoOpened[index]?.day !== day) {
+      ctx.session.photoOpened = { ...ctx.session.photoOpened, [index]: { day, at: ctx.now?.() ?? Date.now() } };
+      for (const ms of [DEVELOP_BLANK_MS, DEVELOP_MS]) ctx.later(ms + 16, ctx.rerender);
+    }
     ctx.rerender();
   },
 
