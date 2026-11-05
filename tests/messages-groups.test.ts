@@ -169,7 +169,8 @@ describe("爸妈 (family): the mother unprefixed, the father prefixed", () => {
     // The prefix is split off the bubble, kept for the list preview.
     expect(voice!.prefix).toBe("father");
     const out = render(store, FAMILY);
-    expect(out).toContain('<div class="voice">');
+    // voice-babble R4: the bubble is its own play button, the father's voice.
+    expect(out).toMatch(/<button type="button" class="voice" data-action="voice-play" data-voice="wx:family:\d+" data-sec="46" data-who="father"/);
     expect(out).toContain('<div class="trans">');
     // In the conversation the prefix is gone (the name sits above the bubble); the list's preview keeps it.
     expect(messagesOf(out)).not.toContain("father：");
@@ -215,7 +216,7 @@ describe("爸妈 (family): the mother unprefixed, the father prefixed", () => {
     const store = storeAt(6);
     const out = render(store, FAMILY);
     expect(out).toContain(`<div class="who">${t("msgs.father")}</div>`);
-    expect(out).toContain('<div class="voice">');
+    expect(out).toMatch(/<button type="button" class="voice" data-action="voice-play" data-voice="wx:family:\d+" data-sec="46" data-who="father"/);
     expect(out).toContain("I mean if that thing of yours");
     expect(messagesOf(out)).not.toContain("(transcript)");
   });

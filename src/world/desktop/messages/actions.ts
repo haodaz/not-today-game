@@ -6,6 +6,9 @@ import { planGoneClick, planReply, type Step } from "@world/replies/plan";
 import { appOfThread, FEED } from "./threads";
 import { advanceTo, BEAT_STEP_MS } from "../beat";
 import type { ActionContext, ActionHandler } from "../controller";
+import { babblePlan } from "@world/sound/babble";
+import { voiceTable } from "@world/sound/voice-table";
+import { getLocale } from "@world/i18n";
 
 function delayOf(step: Step, ctx: ActionContext): number {
   switch (step.at.kind) {
@@ -58,7 +61,46 @@ function replyConv(ctx: ActionContext, data: DOMStringMap): string {
   return id && recipientsOn(ctx.store.getState().day).includes(id) ? id : ctx.session.conversation;
 }
 
+/** voice-babble R4: stops the voice note playing now, if any (session only). */
+export function stopVoice(ctx: Pick<ActionContext, "session">): void {
+  const v = ctx.session.voice;
+  ctx.session.voice = null;
+  try {
+    v?.stop();
+  } catch {
+    /* silence is fine */
+  }
+}
+
 export const messageActions: Record<string, ActionHandler> = {
+  // voice-babble R4: a voice bubble is its own play / stop button. One note at a time across both
+  // apps; another note stops the first. It logs nothing and changes no game state. The ″ count runs
+  // down once a second; the bars move by CSS while `playing`.
+  "voice-play"(ctx, data) {
+    const key = data.voice;
+    const sec = Number(data.sec);
+    if (!key || !Number.isFinite(sec) || sec <= 0) return;
+    const was = ctx.session.voice;
+    stopVoice(ctx);
+    if (was?.key === key) return void ctx.rerender();
+    const plan = babblePlan(data.text ?? null, sec, data.who ?? "", ctx.store.getState().day, voiceTable, getLocale());
+    // The sound spec's rule: muted is 0 (the master is 0 too; this keeps the voice silent if not).
+    const gain = ctx.session.muted ? 0 : voiceTable.gain;
+    const stop = ctx.babble?.(plan, gain) ?? (() => {});
+    const now = () => ctx.now?.() ?? Date.now();
+    const at = now();
+    ctx.session.voice = { key, at, length: plan.length, stop };
+    const tick = () => {
+      const v = ctx.session.voice;
+      if (!v || v.key !== key || v.at !== at) return;
+      const left = plan.length * 1000 - (now() - at);
+      if (left <= 0) stopVoice(ctx);
+      else ctx.later(Math.min(1000, left), tick);
+      ctx.rerender();
+    };
+    ctx.later(Math.min(1000, plan.length * 1000), tick);
+    ctx.rerender();
+  },
   // A row in either list: the work ones open in 听听, 家里 in Hi信 (by recipient id; tingtalk 2026-11-04).
   conv(ctx, data) {
     const id = data.conv!;

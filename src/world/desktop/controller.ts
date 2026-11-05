@@ -21,6 +21,7 @@ import { dockFor } from "./dock";
 import type { LookApi } from "@world/room/nav";
 import { soundPlan } from "@world/sound/plan";
 import type { SoundPlayer } from "@world/sound/player";
+import type { BabblePlan } from "@world/sound/babble";
 import { t } from "@world/i18n";
 import { maskBlocks } from "@world/dialogue/mask";
 import { callBlocks } from "@world/loop/call";
@@ -52,6 +53,11 @@ export interface ActionContext {
    * cross-run profile (presentation; the story never reads it back). Absent = nothing recorded.
    */
   readonly developed?: (key: string) => void;
+  /**
+   * voice-babble R3: plays a voice note's babble on the sound player's context at `gain`; returns
+   * its stop. Absent (no sound player) = silence.
+   */
+  readonly babble?: (plan: BabblePlan, gain: number) => () => void;
 }
 
 /** The motion layer around each render (polish): see world/motion/dom.ts. */
@@ -309,7 +315,17 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     }, ms);
     timers.add(id);
   };
-  const ctx: ActionContext = { store: deps.store, session, rerender, later, play: (id, opts) => playSfx(id, session.muted, opts), now: () => Date.now(), developed: deps.onPhotoDeveloped };
+  const sound = deps.sound;
+  const ctx: ActionContext = {
+    store: deps.store,
+    session,
+    rerender,
+    later,
+    play: (id, opts) => playSfx(id, session.muted, opts),
+    now: () => Date.now(),
+    developed: deps.onPhotoDeveloped,
+    ...(sound?.babble ? { babble: (plan: BabblePlan, gain: number) => sound.babble!(plan, gain) } : {}),
+  };
   const motion: MotionHooks | null = deps.motion ? deps.motion(root, ctx, actions) : null;
   const splat = deps.splat ? deps.splat(root, ctx) : null;
   const nav = deps.nav ? deps.nav(root, ctx, actions, splat) : null;

@@ -2432,3 +2432,36 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
 - Content was not touched; `content/sleeptalk.json` and its twin do not exist yet.
 - Tests: new `tests/tape-record.test.ts` (8): rec at 床 at night, elsewhere / by day, upgraded, next-morning file and en, no file, plays on the tape, the loader, the twin.
 - `npx tsc --noEmit`: clean. `npx vitest run`: 116 files / 2051 tests passed.
+
+## voice-babble 1–4: the voice notes babble (2026-11-05)
+
+- R1: new `src/world/sound/voice-table.ts`:
+  - strict `parseVoice`: unknown keys fail; days 1–18 must all be present; numbers > 0, hiss in [0, 1]; five vowels, five zh tones;
+  - `voiceTable`, `pitchOf` (anyone not listed: 1), `voiceDay`.
+- R2: new `src/world/sound/babble.ts` `babblePlan(text, sec, who, day, table, locale)`, pure:
+  - one syllable per non-pause character of the 转文字 text, else round(sec × 4) placeholders;
+  - pauses `，。、！？,.!? ` and newline add gap × 4;
+  - vowel = `vowels[cp % 5]`;
+  - hz = baseHz × pitch × (1 ± 0.12), seeded by FNV-1a of (text, day, who) through `rngOf`;
+  - zh: the tone contour `tones.zh[hash(cp) % 5]` (hzStart / hzEnd); en: flat, every third syllable × 1.08;
+  - syllables that would pass `sec` are dropped; a hiss-only day (hiss 1, day 18) has no syllables and lasts min(sec, 6) s.
+  - `locale` is a sixth parameter (the caller passes `getLocale()`).
+- R3: new `src/world/sound/babble-player.ts` `playBabble(ctx, out, plan, gain)`:
+  - per syllable a sawtooth with a ramp hzStart → hzEnd and a 6 Hz ±4 % sine LFO into its frequency;
+  - two bandpass filters (f1 Q 6, f2 Q 8) into an envelope (12 ms attack, release max(20 ms, 35 %)), on a bus at 1 − hiss;
+  - hiss: a white-noise buffer → 1200 Hz lowpass at `hiss`;
+  - all scheduled up front on the audio clock; returns a stop.
+  - `SoundPlayer.babble(plan, gain)` (player.ts) plays it on the player's own context into its master, one at a time; the context is made on the click if needed. `babbleContext` checks that the context has `createBuffer` / `sampleRate`, else silence.
+- R4 bubble:
+  - `ActionContext.babble` (controller, from `deps.sound`).
+  - `renderBody` gets an optional `VoiceView`: the voice bubble is a `<button class="voice" data-action="voice-play">` keyed `register:conv:index`, carrying `data-sec`, `data-who` (the player's own: "me") and `data-text` (the filled transcript).
+  - `messageActions["voice-play"]` (`stopVoice`): a click plays, a second click stops, another note stops the first. Gain is `voiceTable.gain`, or 0 when `session.muted`.
+  - `session.voice` (session only, no event): the ″ count runs down once a second; it ends by itself after the plan's length.
+  - CSS: the bars cycle in 120 ms steps while `.playing`; `.hiss-only` (day 18) at opacity .45.
+  - Both apps (汀汀 and 喂信) go through the same renderer.
+- Not done: the shared voice card (`cards.ts`, a forwarded voice) stays a plain card, since R4 names only `case "voice"`.
+- Tests:
+  - new `tests/voice-babble.test.ts` (12): loader, plan, the player on a fake context, the bubble (play / stop / another / muted 0 / ends / day 18);
+  - `messages-groups.test.ts`: two expectations updated to the button.
+  - **8 snapshots are stale** (desktop-snapshots 6, work-home-split 2): the voice bubble's new markup. They need `npx vitest run -u`, which was not run (outside the allowed commands).
+- `npx tsc --noEmit`: clean. `npx vitest run`: 117 files, 2055 passed / 8 failed (those snapshots).

@@ -253,6 +253,11 @@ export interface Session {
    * Session only.
    */
   lockTrip: { readonly focus: Side; readonly page: WorkbenchPage; readonly day: number | null } | null;
+  /**
+   * voice-babble R4: the voice note playing now (one at a time across both apps): its bubble's key,
+   * when it began (wall ms), how long its babble is (s), and its stop. Session only; nothing logged.
+   */
+  voice: { readonly key: string; readonly at: number; readonly length: number; readonly stop: () => void } | null;
   /** opening R2: the prologue has ended and its page is fading to black (when, and the last backdrop). Session only. */
   opening: { readonly fadeAt: number; readonly backdrop: string | null } | null;
   /** camera R10: when each photo was first opened in 相册, and on which day (its overnight developing plays then). */
@@ -423,6 +428,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     lastPhoto: null,
     photoOpened: {},
     lockTrip: null,
+    voice: null,
     opening: null,
     filesSaid: new Set(),
     browserDoc: null,

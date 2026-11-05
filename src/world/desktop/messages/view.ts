@@ -9,7 +9,8 @@ import { hasString, t, tr } from "@world/i18n";
 import { npcAvatar, silhouetteFor } from "@world/npc";
 import { labelKey } from "@world/replies/labels";
 import { fillPlaceholders } from "@world/replies/placeholders";
-import type { AppContext } from "../model";
+import type { AppContext, Session } from "../model";
+import { voiceDay, voiceTable } from "@world/sound/voice-table";
 import { previewOf, type Body } from "./bubbles";
 import { renderCard } from "./cards";
 import { FEED, threadsIn, type ThreadApp } from "./threads";
@@ -41,14 +42,35 @@ function bubbleAvatar(who: string, side: "me" | "them", alias?: string): SafeHtm
   return avImg(who, "av av-img");
 }
 
-export function renderBody(body: Body, names: State["names"], register: Register, ding = false): SafeHtml {
+/** voice-babble R4: what a voice bubble needs to be its own play / stop button. */
+export interface VoiceView {
+  /** The bubble's key (register, conversation, index): one note at a time across both apps. */
+  readonly key: string;
+  /** Whose voice (its pitch); "me" for the player's own. */
+  readonly who: string;
+  /** The note playing now, if any. */
+  readonly playing: { readonly key: string; readonly at: number } | null;
+  readonly nowMs: number;
+  /** The day plays only hiss (day 18): the bubble is greyed. */
+  readonly hissOnly: boolean;
+}
+
+export function renderBody(body: Body, names: State["names"], register: Register, ding = false, voice: VoiceView | null = null): SafeHtml {
   const fill = (s: string) => fillPlaceholders(s, names);
   switch (body.type) {
     case "voice": {
       const bars = [6, 14, 9, 16, 7, 12].map((h) => html`<i style="height:${h}px"></i>`);
       // DingTalk: the boss's voice comes with the DING pill (its word from strings; none if missing).
       const pill = ding && hasString("wb.msgs.ding") ? html`<span class="ding">${tr("wb.msgs.ding")}</span>` : null;
-      return html`<div class="voice">${pill}${bars} ${body.sec}″</div>${body.transcript !== null ? html`<div class="trans">${tr("msgs.transcript")}${fill(body.transcript)}</div>` : null}`;
+      const trans = body.transcript !== null ? html`<div class="trans">${tr("msgs.transcript")}${fill(body.transcript)}</div>` : null;
+      if (!voice) return html`<div class="voice">${pill}${bars} ${body.sec}″</div>${trans}`;
+      // voice-babble R4: the bubble is its own play / stop button; while it plays the ″ count runs
+      // down and the bars move (CSS). Day 18 it is greyed and plays only hiss.
+      const sec = Number(body.sec);
+      const playing = voice.playing ? voice.playing.key === voice.key : false;
+      const shown = playing ? Math.max(0, Math.ceil(sec - (voice.nowMs - voice.playing!.at) / 1000)) : sec;
+      const text = body.transcript !== null ? html` data-text="${fill(body.transcript)}"` : null;
+      return html`<button type="button" class="${cls("voice", playing && "playing", voice.hissOnly && "hiss-only")}" data-action="voice-play" data-voice="${voice.key}" data-sec="${body.sec}" data-who="${voice.who}"${text} aria-pressed="${playing ? "true" : "false"}">${pill}${bars} ${shown}″</button>${trans}`;
     }
     case "card":
       // A forwarded card: an article card in WeChat, a task card in DingTalk (the same written text).
@@ -78,13 +100,22 @@ interface BubbleCtx {
   readonly names: State["names"];
   readonly conv: string;
   readonly register: Register;
+  /** voice-babble R4: the note playing now and the render time. */
+  readonly voice: Session["voice"];
+  readonly nowMs: number;
+}
+
+/** A voice bubble's play view (voice-babble R4), or null for any other body. */
+function voiceView(b: Extract<Bubble, { kind: "msg" }>, c: BubbleCtx, index: number): VoiceView | null {
+  if (b.body.type !== "voice") return null;
+  return { key: `${c.register}:${c.conv}:${index}`, who: b.side === "me" ? "me" : b.who, playing: c.voice, nowMs: c.nowMs, hissOnly: voiceDay(voiceTable, c.today).hiss >= 1 };
 }
 
 function dayLabel(day: number, today: number): SafeHtml {
   return day === today ? tr("msgs.today") : day === today - 1 ? tr("msgs.yesterday") : tr("shell.day", { day });
 }
 
-function renderBubble(b: Bubble, c: BubbleCtx, receipt: "read" | "unread" | null, stamp: string | null): SafeHtml | null {
+function renderBubble(b: Bubble, c: BubbleCtx, receipt: "read" | "unread" | null, stamp: string | null, index: number): SafeHtml | null {
   switch (b.kind) {
     case "day":
       return html`<div class="sysline">${dayLabel(b.day, c.today)}</div>`;
@@ -100,7 +131,7 @@ function renderBubble(b: Bubble, c: BubbleCtx, receipt: "read" | "unread" | null
       // WeChat: the time sits centred between gaps, not beside the name.
       const st = c.register === "wx" && stamp !== null ? html`<div class="stamp">${stamp}</div>` : null;
       if (b.side === "me") {
-        const inner = b.labelKey ? html`<div class="bub">${tr(b.labelKey)}</div>` : renderBody(b.body, c.names, c.register, false);
+        const inner = b.labelKey ? html`<div class="bub">${tr(b.labelKey)}</div>` : renderBody(b.body, c.names, c.register, false, voiceView(b, c, index));
         const rc =
           receipt === "read" ? html`<div class="rcpt read">${tr("reply.status.read")}</div>`
           : receipt === "unread" && hasString("wb.msgs.unread") ? html`<div class="rcpt unread">${tr("wb.msgs.unread")}</div>`
@@ -118,7 +149,7 @@ function renderBubble(b: Bubble, c: BubbleCtx, receipt: "read" | "unread" | null
         c.register === "ding" ? html`<div class="who">${whoName} ${b.t}</div>`
         : SPEAKER_CONVERSATIONS.has(c.conv) ? html`<div class="who">${whoName}</div>`
         : null;
-      return html`${st}<div class="m">${bubbleAvatar(b.who, "them", b.alias)}<div>${who}${renderBody(b.body, c.names, c.register, ding)}</div></div>`;
+      return html`${st}<div class="m">${bubbleAvatar(b.who, "them", b.alias)}<div>${who}${renderBody(b.body, c.names, c.register, ding, voiceView(b, c, index))}</div></div>`;
     }
   }
 }
@@ -141,7 +172,7 @@ function renderBubbles(bubbles: readonly Bubble[], c: BubbleCtx): (SafeHtml | nu
       stamp = b.t !== lastT ? b.t : null;
       lastT = b.t;
     }
-    return renderBubble(b, c, c.register === "ding" ? (receipts.get(i) ?? null) : null, stamp);
+    return renderBubble(b, c, c.register === "ding" ? (receipts.get(i) ?? null) : null, stamp, i);
   });
 }
 
@@ -261,7 +292,7 @@ export function renderMessages(ctx: AppContext): { body: SafeHtml; badge: number
   // 「群名 (N)」: who has spoken so far, and the player; none before anyone has.
   const members = speakers(active.bubbles).length;
   const count = SPEAKER_CONVERSATIONS.has(active.id) && members > 0 ? html` <small>(${members + 1})</small>` : null;
-  const c: BubbleCtx = { today, names, conv: active.id, register: "wx" };
+  const c: BubbleCtx = { today, names, conv: active.id, register: "wx", voice: ctx.session.voice, nowMs: ctx.nowMs };
   const conv = html`<div class="conv"><div class="head"><b>${nameOf(active.id)}</b>${count}${HEAD_GLYPHS}</div><div class="msgs">${renderBubbles(active.bubbles, c)}</div>${replyBar(ctx, active.id, "wx")}</div>`;
   return { body: html`<div class="body wx">${list}${conv}</div>`, badge };
 }
@@ -287,7 +318,7 @@ export function renderWorkMessages(ctx: AppContext): { pane: SafeHtml; badge: nu
   if (!active) return { pane: html`${list}<div class="conv empty"></div>`, badge };
   // The role line under the name (msgs.<id>.role, e.g. Vivi's 合伙人 · VP), when strings have one.
   const role = hasString(`msgs.${active.id}.role`) ? html`<small>${tr(`msgs.${active.id}.role`)}</small>` : null;
-  const c: BubbleCtx = { today, names, conv: active.id, register: "ding" };
+  const c: BubbleCtx = { today, names, conv: active.id, register: "ding", voice: ctx.session.voice, nowMs: ctx.nowMs };
   const conv = html`<div class="conv ding"><div class="head"><b>${nameOf(active.id)}</b> ${role}</div><div class="msgs">${renderBubbles(active.bubbles, c)}</div>${replyBar(ctx, active.id, "ding")}</div>`;
   return { pane: html`${list}${conv}`, badge };
 }

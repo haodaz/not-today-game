@@ -11,6 +11,8 @@
 import { playSfx as defaultPlaySfx } from "@world/loop/sfx";
 import { DUCK_MS, type SoundPlan } from "./plan";
 import { musicFiles, sfxFileUrl, soundTable, type Degrade, type SoundTable } from "./table";
+import type { BabblePlan } from "./babble";
+import { babbleContext, playBabble } from "./babble-player";
 
 /** The small slice of the Web Audio API used here; the real classes fit, and tests fake it. */
 export interface AParam {
@@ -95,6 +97,11 @@ export interface SoundPlayer {
   armGestures(target: GestureTarget): void;
   /** Resolves when every file asked for so far has been fetched (or has failed). */
   idle(): Promise<void>;
+  /**
+   * voice-babble R3: plays a voice note's babble live on this context, into the master, at `gain`
+   * (the table's, or 0 when muted). One at a time: a new one stops the last. Returns its stop.
+   */
+  babble?(plan: BabblePlan, gain: number): () => void;
   destroy(): void;
 }
 
@@ -228,6 +235,17 @@ export function createSoundPlayer(deps: PlayerDeps = {}): SoundPlayer {
   const loads = new Map<string, Promise<unknown | null>>();
   const pending = new Set<Promise<unknown>>();
   const armed: { target: GestureTarget; fn: () => void }[] = [];
+  /** The babble playing now (voice-babble R3), as its stop. */
+  let babbling: (() => void) | null = null;
+  const stopBabble = (): void => {
+    const s = babbling;
+    babbling = null;
+    try {
+      s?.();
+    } catch {
+      /* already gone */
+    }
+  };
 
   /** The player never throws: whatever goes wrong is silence. */
   const safe =
@@ -626,7 +644,25 @@ export function createSoundPlayer(deps: PlayerDeps = {}): SoundPlayer {
     async idle() {
       while (pending.size) await Promise.all([...pending]);
     },
+    babble(plan, gain) {
+      stopBabble();
+      // A click is a gesture: the context may be made here.
+      if (!ctx) player.unlock();
+      const b = babbleContext(ctx);
+      if (!b || !master) return () => {};
+      try {
+        const stop = playBabble(b, master, plan, gain);
+        babbling = stop;
+        return () => {
+          if (babbling === stop) babbling = null;
+          stop();
+        };
+      } catch {
+        return () => {};
+      }
+    },
     destroy() {
+      stopBabble();
       doc?.removeEventListener("visibilitychange", onVisibility);
       if (drop) timers.clear(drop.timer);
       for (const { target, fn } of armed) for (const type of ["pointerdown", "keydown", "touchstart"]) target.removeEventListener(type, fn, { capture: true });
