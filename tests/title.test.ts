@@ -42,8 +42,17 @@ describe("content/title.json", () => {
     const range = raw();
     range.idle.everyMs = [40000, 20000];
     expect(() => parseTitle(range)).toThrow(/min <= max/);
-    expect(parseTitle({ ...raw(), dice: ["a", "b"] }).dice).toEqual(["a", "b"]);
-    expect(() => parseTitle({ ...raw(), dice: [""] })).toThrow(/non-empty/);
+    expect(parseTitle({ ...raw(), dice: { zh: { nick: ["a", "b"] } } }).dice.zh.nick).toEqual(["a", "b"]);
+    expect(() => parseTitle({ ...raw(), dice: { zh: { nick: [""] } } })).toThrow(/non-empty/);
+    expect(() => parseTitle({ ...raw(), dice: ["a"] })).toThrow(/must be an object/);
+    expect(() => parseTitle({ ...raw(), dice: { zh: { name: ["a"] } } })).toThrow(/unknown key/);
+  });
+  it("the 🎲 lists are per question: a name never rolls a form of address, family never rolls 老板", () => {
+    const d = parseTitle(structuredClone(titleFile) as any).dice;
+    for (const lang of ["zh", "en"] as const) for (const q of ["login", "nick", "bossCalls", "calledBy"] as const) expect(d[lang][q]?.length, `${lang}.${q}`).toBeGreaterThan(0);
+    expect(d.zh.login).not.toContain("哥");
+    expect(d.zh.nick).not.toContain("老板");
+    for (const q of ["login", "nick", "bossCalls", "calledBy"] as const) for (const v of d.en[q]!) expect(v, `en.${q}`).not.toMatch(/[\u4e00-\u9fff]/);
   });
 });
 

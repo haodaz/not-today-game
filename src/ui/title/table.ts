@@ -2,6 +2,10 @@
 // the book. Read strictly and frozen; a key this does not know fails at import.
 import raw from "@content/title.json";
 
+/** The text questions the 🎲 fills (model.ts TextQuestion; listed here so the loader needs no import from the model). */
+export const DICE_QUESTIONS = ["login", "nick", "bossCalls", "calledBy"] as const;
+export type DiceQuestion = (typeof DICE_QUESTIONS)[number];
+
 /** The DOM layers an idle event may light (title-page FR7). */
 export const IDLE_LAYERS = ["lamp", "monitor_right", "chair", "gap", "rain"] as const;
 export type IdleLayer = (typeof IDLE_LAYERS)[number];
@@ -25,7 +29,8 @@ export interface TitleTable {
   readonly figures: Readonly<Record<EndingKind, { readonly src: string; readonly name: string }>>;
   readonly book: { readonly src: string; readonly reader: string };
   /** Neutral values for the 🎲 (optional until content has them). */
-  readonly dice: readonly string[];
+  /** The 🎲 lists, by language and question (a question with no list has a disabled 🎲). */
+  readonly dice: Readonly<Record<"zh" | "en", Readonly<Partial<Record<DiceQuestion, readonly string[]>>>>>;
 }
 
 type Raw = Record<string, unknown>;
@@ -83,10 +88,23 @@ export function parseTitle(input: unknown): TitleTable {
   const book = obj(top.book, "book");
   keys(book, ["src", "reader"], "book");
 
-  let dice: string[] = [];
+  // dice: { zh|en: { question: [names] } } (2026-11-05: one shared list rolled 「哥」 as a name and 「老板」 as what family calls you).
+  const dice = { zh: {}, en: {} } as Record<"zh" | "en", Partial<Record<DiceQuestion, readonly string[]>>>;
   if (top.dice !== undefined) {
-    if (!Array.isArray(top.dice)) fail("dice", "must be a list of strings");
-    dice = top.dice.map((d, i) => str(d, `dice[${i}]`));
+    const byLang = obj(top.dice, "dice");
+    keys(byLang, ["zh", "en"], "dice");
+    for (const lang of ["zh", "en"] as const) {
+      if (byLang[lang] === undefined) continue;
+      const byQ = obj(byLang[lang], `dice.${lang}`);
+      keys(byQ, [...DICE_QUESTIONS], `dice.${lang}`);
+      for (const q of DICE_QUESTIONS) {
+        const list = byQ[q];
+        if (list === undefined) continue;
+        if (!Array.isArray(list)) fail(`dice.${lang}.${q}`, "must be a list of strings");
+        dice[lang][q] = Object.freeze((list as unknown[]).map((d, i) => str(d, `dice.${lang}.${q}[${i}]`)));
+      }
+      Object.freeze(dice[lang]);
+    }
   }
 
   return Object.freeze({

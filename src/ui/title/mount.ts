@@ -323,7 +323,7 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     },
     "title-dice": (el) => {
       const q = el.dataset.q as TextQuestion;
-      const options = diceOptions(q, model.answers, titleTable.dice);
+      const options = diceOptions(q, model.answers, titleTable.dice[getLocale()][q] ?? []);
       if (!options.length) return;
       set(withAnswer(model, q, options[Math.min(options.length - 1, Math.floor(random() * options.length))]!));
       focusOpen();

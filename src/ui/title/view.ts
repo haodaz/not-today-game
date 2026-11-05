@@ -3,7 +3,7 @@
 // short column of outlined words laid on it. Every text is a string (`title.*`, `settings.*`) or
 // content; the game's name is the one constant.
 import { cls, html, type SafeHtml } from "@world/html";
-import { t, tr } from "@world/i18n";
+import { getLocale, t, tr } from "@world/i18n";
 import { figuresLayer } from "@world/room/collection";
 import { settingsPanel } from "@world/room/hud";
 import { centre, rectStyle, ROOM_COLLECTION, ROOM_SHOT } from "@world/room/shots";
@@ -54,7 +54,7 @@ function questionRow(m: TitleModel, q: Question, current: boolean): SafeHtml {
       html`<button type="button" class="${m.answers.pronoun === p ? "on" : ""}" data-action="title-pronoun" data-pronoun="${p}" aria-pressed="${m.answers.pronoun === p ? "true" : "false"}">${tr(`title.pronoun.${p}`)}</button>`;
     return html`<div class="${cls("row", done && "done")}" data-q="${q}"><span id="title-q-${q}">${tr(`title.q.${q}`)}</span><span class="g" role="group" aria-labelledby="title-q-${q}">${opt("she")}${opt("he")}${opt("none")}</span></div>`;
   }
-  const dice = diceOptions(q, m.answers, titleTable.dice);
+  const dice = diceOptions(q, m.answers, titleTable.dice[getLocale()][q] ?? []);
   return html`<div class="${cls("row", done && "done")}" data-q="${q}">${label}<input id="title-q-${q}"${named} data-focus="title-${q}" data-input="title-${q}" data-q="${q}" value="${m.answers[q]}" autocomplete="off" spellcheck="false"><button type="button" class="d" data-action="title-dice" data-q="${q}" aria-label="${t("title.dice")}"${dice.length === 0 ? html` disabled` : null}>🎲</button></div>`;
 }
 

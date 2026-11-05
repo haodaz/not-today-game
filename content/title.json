@@ -57,10 +57,68 @@
     "src": "/room/book.png",
     "reader": "https://nottodaygame.com/"
   },
-  "dice": [
-    "老大",
-    "老板",
-    "哥",
-    "姐"
-  ]
+  "dice": {
+    "zh": {
+      "login": [
+        "林一",
+        "周宁",
+        "许言",
+        "沈遥",
+        "苏禾",
+        "顾安",
+        "陈默",
+        "江北"
+      ],
+      "nick": [
+        "宝宝",
+        "老大",
+        "老幺",
+        "崽崽",
+        "乖乖"
+      ],
+      "bossCalls": [
+        "亲",
+        "同学",
+        "兄弟",
+        "老师"
+      ],
+      "calledBy": [
+        "老大",
+        "哥",
+        "姐",
+        "老师"
+      ]
+    },
+    "en": {
+      "login": [
+        "Sam",
+        "Alex",
+        "Robin",
+        "Jo",
+        "Kit",
+        "Ash",
+        "Lee",
+        "Max"
+      ],
+      "nick": [
+        "kiddo",
+        "bub",
+        "sweetpea",
+        "champ",
+        "love"
+      ],
+      "bossCalls": [
+        "buddy",
+        "rockstar",
+        "superstar",
+        "team"
+      ],
+      "calledBy": [
+        "boss",
+        "chief",
+        "mate",
+        "legend"
+      ]
+    }
+  }
 }
