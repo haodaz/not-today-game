@@ -2384,3 +2384,15 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
   - updated `desktop-kuro`, `dialogue`, `shell` and `ide` expectations;
   - snapshots in desktop-snapshots, dialogue, late-days, upgrades, work, work-merge and work-marks-view, edited by hand: only the new spans.
 - `npx tsc --noEmit`: clean. `npx vitest run`: 113 files / 2035 tests passed.
+
+## upgrades-twin 1–2: content/en/upgrades.json as the strict twin (2026-11-05)
+
+- `src/state/upgrades.ts`:
+  - `parseUpgrades(input, name)` parses both files with the same strict rules. Errors name the file, so a missing or unknown twin key fails as `content/en/upgrades.json …`.
+  - New `localiseUpgrades(zh, en)`, like the objects twin: the twin must have the same objects in the same order, the same `offerFrom`, `nagAfterDays`, `finalOfferDay` and the same `judgement` (deltas and evidence).
+  - `offer`, `nag`, `kuroNote` and `finalOffer` are `bilingual`, so the content locale picks them when they are read.
+  - `gain`, `cost` and `judgement.*.evidence` stay the source's in both locales.
+  - `upgradeTable` is the localised table.
+- Content was not touched. Both files already carry the same English, so nothing changes on screen until Claude writes the Chinese in `content/upgrades.json`.
+- Tests: new `tests/upgrades-twin.test.ts` (4): shape, missing / unknown keys, days, judgement, order, locale pick.
+- `npx tsc --noEmit`: clean. `npx vitest run`: 114 files / 2039 tests passed.

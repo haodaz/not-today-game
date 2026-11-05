@@ -2,6 +2,8 @@
 // Read, checked, frozen. The offer schedule is a pure function of the state and the log; accepting
 // and declining are events whose reducers set `upgraded` and log the rubric's judgement.
 import raw from "@content/upgrades.json";
+import enRaw from "@content/en/upgrades.json";
+import { bilingual } from "./content-locale";
 import type { GameEvent } from "./events";
 import { judge } from "./judgement";
 import type { State } from "./types.gen";
@@ -30,8 +32,10 @@ export interface UpgradeTable {
 
 type Raw = Record<string, unknown>;
 const isRecord = (v: unknown): v is Raw => typeof v === "object" && v !== null && !Array.isArray(v);
+/** The file being read: messages name it (`upgrades.json` or its twin `en/upgrades.json`). */
+let file = "upgrades.json";
 function fail(where: string, problem: string): never {
-  throw new Error(`content/upgrades.json ${where}: ${problem}`);
+  throw new Error(`content/${file} ${where}: ${problem}`);
 }
 function keys(v: Raw, allowed: readonly string[], where: string): void {
   for (const k of Object.keys(v)) if (!allowed.includes(k)) fail(where, `unknown key "${k}"`);
@@ -46,8 +50,18 @@ function delta(v: unknown, w: string): Delta {
   return { ...(v as object), evidence: str(v.evidence, `${w}.evidence`) } as Delta;
 }
 
-/** Parses the upgrades file. Pure; exported for tests. */
-export function parseUpgrades(input: unknown): UpgradeTable {
+/** Parses the upgrades file (or its twin, named by `name`). Pure; exported for tests. */
+export function parseUpgrades(input: unknown, name = "upgrades.json"): UpgradeTable {
+  const before = file;
+  file = name;
+  try {
+    return parseTable(input);
+  } finally {
+    file = before;
+  }
+}
+
+function parseTable(input: unknown): UpgradeTable {
   if (!isRecord(input)) fail("", "not an object");
   keys(input, ["_note", "nagAfterDays", "finalOfferDay", "objects", "judgement", "finalOffer"], "top level");
   if (!isRecord(input.objects)) fail("objects", "must be an object");
@@ -77,7 +91,40 @@ export function parseUpgrades(input: unknown): UpgradeTable {
   });
 }
 
-export const upgradeTable: UpgradeTable = parseUpgrades(raw);
+// ——— English twin (upgrades-twin 2026-11-05) ———
+// content/en/upgrades.json has the same objects in the same order, the same days and the same
+// judgement (deltas and evidence); only the player's text differs (`offer`, `nag`, `kuroNote`,
+// `finalOffer`). `gain` / `cost` are design notes and the evidence is the judge's: the Chinese
+// source's in both locales.
+
+/** Fails at the twin with the first difference from the Chinese source that is not its text. */
+function twinFail(where: string, problem: string): never {
+  throw new Error(`content/en/upgrades.json ${where}: ${problem}`);
+}
+
+/** The Chinese table, its four texts read from the English twin under lang=en. Pure; exported for tests. */
+export function localiseUpgrades(zh: UpgradeTable, en: UpgradeTable): UpgradeTable {
+  const zhIds = [...zh.objects.keys()];
+  const enIds = [...en.objects.keys()];
+  for (const id of zhIds) if (!en.objects.has(id)) twinFail(`objects.${id}`, "missing (the Chinese has it)");
+  for (const id of enIds) if (!zh.objects.has(id)) twinFail(`objects.${id}`, "not in the Chinese");
+  if (zhIds.join() !== enIds.join()) twinFail("objects", "not in the Chinese order");
+  if (zh.nagAfterDays !== en.nagAfterDays) twinFail("nagAfterDays", `${en.nagAfterDays}, the Chinese has ${zh.nagAfterDays}`);
+  if (zh.finalOfferDay !== en.finalOfferDay) twinFail("finalOfferDay", `${en.finalOfferDay}, the Chinese has ${zh.finalOfferDay}`);
+  for (const k of ["accept", "decline"] as const) {
+    if (JSON.stringify(zh.judgement[k]) !== JSON.stringify(en.judgement[k])) twinFail(`judgement.${k}`, "differs from the Chinese (the judgement is not localised)");
+  }
+  const objects = new Map<string, UpgradeObject>();
+  for (const [id, z] of zh.objects) {
+    const e = en.objects.get(id)!;
+    if (z.offerFrom !== e.offerFrom) twinFail(`objects.${id}.offerFrom`, `${e.offerFrom}, the Chinese has ${z.offerFrom}`);
+    objects.set(id, Object.freeze(bilingual(z, { offer: e.offer, nag: e.nag, kuroNote: e.kuroNote })));
+  }
+  return Object.freeze(bilingual({ ...zh, objects }, { finalOffer: en.finalOffer }));
+}
+
+/** The table, its text in the content locale (the twin is validated at load). */
+export const upgradeTable: UpgradeTable = localiseUpgrades(parseUpgrades(raw), parseUpgrades(enRaw, "en/upgrades.json"));
 
 export type DeclineKind = "offer" | "nag" | "final";
 export const FINAL = "all";
