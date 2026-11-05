@@ -1,0 +1,285 @@
+{
+  "day": 16,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "work",
+      "title": "The chairman doesn't read materials. He just wants to hear something. Don't stop.",
+      "app": "code",
+      "done": "task_d16_work",
+      "board": {
+        "kind": "table",
+        "title": "Briefing recording · edit",
+        "columns": [
+          "",
+          "Section",
+          "Which clip"
+        ],
+        "given": {
+          "rows": {
+            "r1": "Opening",
+            "r2": "Middle",
+            "r3": "Beat",
+            "r4": "Ending"
+          },
+          "lock": {
+            "object": "tape",
+            "codes": [
+              "Always the same",
+              "Faster and faster",
+              "Fast, then slow"
+            ],
+            "answer": "Always the same"
+          }
+        },
+        "slots": [
+          {
+            "id": "r1",
+            "label": "Opening",
+            "answer": "c1"
+          },
+          {
+            "id": "r2",
+            "label": "Middle",
+            "answer": "c2"
+          },
+          {
+            "id": "r3",
+            "label": "Beat",
+            "answer": "c3"
+          },
+          {
+            "id": "r4",
+            "label": "Ending",
+            "answer": "c4"
+          }
+        ],
+        "cards": [
+          {
+            "id": "c1",
+            "text": "Lao Wang's 09:00 voice note",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "in Lao Wang's messages"
+          },
+          {
+            "id": "c2",
+            "text": "the group's voice notes, one after another",
+            "from": {
+              "conv": "group"
+            },
+            "hint": "in the group"
+          },
+          {
+            "id": "c3",
+            "text": "Follow the flute, one clip a beat",
+            "from": {
+              "file": "a-flute"
+            },
+            "hint": "in the brief recording; listen on the walkman"
+          },
+          {
+            "id": "c4",
+            "text": "No ending; loop back to the opening",
+            "from": {
+              "file": "a-flute"
+            },
+            "hint": "in the brief recording: the flute never stops"
+          },
+          {
+            "id": "d1",
+            "text": "Add an introduction",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "in Vivi's chat"
+          },
+          {
+            "id": "d2",
+            "text": "End with 'thank you, everyone'",
+            "from": {
+              "conv": "laozhou"
+            },
+            "hint": "in Lao Zhou's chat"
+          }
+        ],
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "c2",
+            "r3": "k1",
+            "r4": "c4"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "Beat: replace it with your heartbeat"
+            }
+          ],
+          "unlock": "Always the same"
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Hang in there."
+              },
+              {
+                "who": "kuro",
+                "text": "The chairman just wants a sound. The flute can't stop."
+              },
+              {
+                "who": "kuro",
+                "text": "The brief is one line, and it's a flute. Use the walkman for the beat."
+              }
+            ]
+          },
+          {
+            "on": "unlock",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Always the same. Not fast, not slow."
+              }
+            ]
+          },
+          {
+            "on": "fill:r4",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "No ending. Back to the opening."
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Say an introduction and it stops."
+              }
+            ]
+          },
+          {
+            "on": "fill:r4:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Say thank you and it stops."
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "I replaced the beat with your heartbeat. Very steady."
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Leave it on the desk. Don't stop tonight."
+              }
+            ]
+          }
+        ]
+      },
+      "deliverable": {
+        "id": "d16-drone",
+        "label": "the briefing recording"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -3,
+        "wrong": -6,
+        "wrongAt": 2
+      }
+    },
+    {
+      "id": "task1",
+      "title": "Is the door locked?",
+      "app": "docs",
+      "done": "task_d16_1",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You didn't write this item."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You go and check. Locked."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d16_1",
+            "checked_lock"
+          ]
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You ask it whether it opened the door."
+          }
+        ],
+        "kuro": [
+          "I don't have hands for doors."
+        ],
+        "effects": {
+          "flags": [
+            "task_d16_1"
+          ],
+          "looked": true,
+          "assimilation": 1
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You don't go and check."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d16_1"
+          ],
+          "letItDoUnchecked": 1,
+          "assimilation": 4
+        }
+      }
+    }
+  ]
+}

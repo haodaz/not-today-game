@@ -1,0 +1,289 @@
+{
+  "day": 14,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "work",
+      "title": "Quite a lot of new hires this batch. Run the onboarding.",
+      "app": "code",
+      "done": "task_d14_work",
+      "board": {
+        "kind": "table",
+        "title": "Onboarding · first batch (1,000 people)",
+        "columns": [
+          "",
+          "On the list",
+          "What to do"
+        ],
+        "given": {
+          "rows": {
+            "r1": "The ones who talk",
+            "r2": "The few that hum in the recording",
+            "r3": "The rows the chick cries at",
+            "r4": "The name column"
+          },
+          "lock": {
+            "object": "tape",
+            "codes": [
+              "7",
+              "13",
+              "31"
+            ],
+            "answer": "13"
+          }
+        },
+        "slots": [
+          {
+            "id": "r1",
+            "label": "Talkers",
+            "answer": "c1"
+          },
+          {
+            "id": "r2",
+            "label": "Hummers",
+            "answer": "c2"
+          },
+          {
+            "id": "r3",
+            "label": "Chick cries",
+            "answer": "c3"
+          },
+          {
+            "id": "r4",
+            "label": "Names",
+            "answer": "c4"
+          }
+        ],
+        "cards": [
+          {
+            "id": "c1",
+            "text": "Give them desks, each their own name",
+            "from": {
+              "file": "h-roster"
+            },
+            "hint": "in the new-hire list"
+          },
+          {
+            "id": "c2",
+            "text": "No desks; list them separately",
+            "from": {
+              "file": "a-welcome"
+            },
+            "hint": "in the welcome recording; listen on the walkman"
+          },
+          {
+            "id": "c3",
+            "text": "Not people. No desks.",
+            "from": {
+              "file": "h-roster"
+            },
+            "hint": "show the list to the chick"
+          },
+          {
+            "id": "c4",
+            "text": "One by one, no repeats",
+            "from": {
+              "conv": "laozhou"
+            },
+            "hint": "in Lao Zhou's chat"
+          },
+          {
+            "id": "d1",
+            "text": "Name them all by staff number automatically",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "in Vivi's chat"
+          },
+          {
+            "id": "d2",
+            "text": "Desks for everyone, all treated the same",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "in Lao Wang's messages"
+          }
+        ],
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "c2",
+            "r3": "c3",
+            "r4": "k1"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "A thousand people, every name filled in as yours"
+            }
+          ],
+          "unlock": "13"
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Pull yourself together."
+              },
+              {
+                "who": "kuro",
+                "text": "A thousand new hires. The name column empty."
+              },
+              {
+                "who": "kuro",
+                "text": "The ones humming in the welcome recording. Count them."
+              }
+            ]
+          },
+          {
+            "on": "unlock",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Thirteen."
+              }
+            ]
+          },
+          {
+            "on": "fill:r3",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "The chick cried. It doesn't cry at people."
+              }
+            ]
+          },
+          {
+            "on": "fill:r4:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Name them by number and they all have names. Even the ones that shouldn't."
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "All treated the same. They think so too."
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "A thousand names, all yours. Saves time."
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Leave it on the desk. The thousand young will find their own desks."
+              }
+            ]
+          }
+        ]
+      },
+      "deliverable": {
+        "id": "d14-onboard",
+        "label": "the onboarding list"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -3,
+        "wrong": -6,
+        "wrongAt": 2
+      }
+    },
+    {
+      "id": "task1",
+      "title": "The new hires are sorted. Write something.",
+      "app": "docs",
+      "done": "task_d14_1",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "The boss says take a rest."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You write a paragraph. When it's done you say: beautiful."
+          }
+        ],
+        "kuro": [
+          "There was nothing to add."
+        ],
+        "effects": {
+          "flags": [
+            "task_d14_1",
+            "beautiful14"
+          ]
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It adds nothing."
+          }
+        ],
+        "kuro": [
+          "There was nothing to add."
+        ],
+        "effects": {
+          "flags": [
+            "task_d14_1"
+          ],
+          "looked": true,
+          "assimilation": 1
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You let it write. It writes a paragraph just like yours."
+          }
+        ],
+        "kuro": [
+          "There was nothing to add."
+        ],
+        "effects": {
+          "flags": [
+            "task_d14_1"
+          ],
+          "letItDoUnchecked": 1,
+          "assimilation": 4
+        }
+      }
+    }
+  ]
+}

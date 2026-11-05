@@ -1,0 +1,197 @@
+{
+  "day": 15,
+  "beats": {
+    "boot": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "Mist."
+        },
+        {
+          "k": "narration",
+          "t": "The boss asks: sleep well last night? Dream about the drawer?",
+          "where": "screen:msgs:boss"
+        },
+        {
+          "k": "inner",
+          "t": "The drawer. I have never told anyone about the drawer.",
+          "where": "screen:msgs"
+        }
+      ]
+    },
+    "desk": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "There's a line in the input box. You didn't type it.",
+          "where": "screen:msgs:family"
+        },
+        {
+          "k": "speaker",
+          "who": "输入框",
+          "t": "{nick}, have you eaten?",
+          "where": "screen:msgs"
+        },
+        {
+          "k": "inner",
+          "t": "Home's words, in my own input box.",
+          "where": "screen:msgs:family"
+        }
+      ]
+    },
+    "shutdown": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "An image in the group: a phoenix.",
+          "where": "screen:msgs:group"
+        }
+      ]
+    },
+    "night": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "In the dream it comes. Black, round, eight tentacles tucked under it. It sits on the edge of your desk."
+        },
+        {
+          "k": "speaker",
+          "who": "缝里",
+          "t": "I was in the last two dreams."
+        },
+        {
+          "k": "speaker",
+          "who": "缝里",
+          "t": "The drawer was yours. The corridor was theirs. This one is mine."
+        },
+        {
+          "k": "narration",
+          "t": "It doesn't ask you for anything. It looks at you a long time, like reading a line of very small print."
+        },
+        {
+          "k": "inner",
+          "t": "What it is, what it wants, that it has been watching me all along. I know all three at once."
+        },
+        {
+          "k": "narration",
+          "t": "The day is over."
+        }
+      ]
+    }
+  },
+  "items": [
+    {
+      "id": "boot",
+      "text": "Boot up.",
+      "unlock": "start",
+      "done": "event:boot",
+      "required": true
+    },
+    {
+      "id": "msgs",
+      "text": "Glance at the messages.",
+      "unlock": "done:boot",
+      "done": "event:openApp:msgs",
+      "required": true
+    },
+    {
+      "id": "work",
+      "text": "The launch this afternoon: arrange the slides, watch the audience live.",
+      "unlock": "done:msgs",
+      "done": "flag:task_d15_work",
+      "required": true
+    },
+    {
+      "id": "lunch",
+      "text": "Order lunch.",
+      "unlock": "done:msgs",
+      "done": "event:order:lunch",
+      "required": true,
+      "rewrite": "Lunch is on its way."
+    },
+    {
+      "id": "task1",
+      "text": "One job left. It did it. Take a look.",
+      "unlock": "done:msgs",
+      "done": "flag:task_d15_1",
+      "required": true
+    },
+    {
+      "id": "pickup",
+      "text": "Go and get it.",
+      "unlock": "event:delivery:arrives:lunch",
+      "done": "event:pickup:lunch",
+      "required": true,
+      "sfx": "doorbell",
+      "onUnlock": {
+        "say": [
+          {
+            "k": "sfx",
+            "t": "Ding-dong.",
+            "sfx": "doorbell"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eat",
+      "text": "Eat.",
+      "unlock": "done:pickup",
+      "done": "event:eat:lunch",
+      "required": false
+    },
+    {
+      "id": "reply",
+      "text": "Reply to the boss.",
+      "unlock": "done:task1",
+      "done": "event:reply:boss",
+      "required": true
+    },
+    {
+      "id": "dinner",
+      "text": "Order dinner.",
+      "unlock": "done:task1",
+      "done": "event:order:dinner",
+      "required": true,
+      "rewrite": "Dinner is on its way.",
+      "when": "night"
+    },
+    {
+      "id": "desk",
+      "text": "Take a look at the desk.",
+      "unlock": "done:reply",
+      "done": "event:beat:desk",
+      "required": true,
+      "when": "night"
+    },
+    {
+      "id": "shutdown",
+      "text": "Shut down.",
+      "unlock": "done:desk",
+      "done": "event:beat:shutdown",
+      "required": true,
+      "when": "night"
+    },
+    {
+      "id": "chat",
+      "text": "Talk to it a while.",
+      "unlock": "done:shutdown",
+      "done": "event:chat:any",
+      "required": false,
+      "when": "night"
+    },
+    {
+      "id": "bed",
+      "text": "Lie down.",
+      "unlock": "done:shutdown",
+      "done": "event:lieDown",
+      "required": true,
+      "locked": "requiredPending",
+      "when": "night"
+    }
+  ],
+  "delivery": {
+    "minMinutes": 2,
+    "waitMinutes": 6
+  }
+}

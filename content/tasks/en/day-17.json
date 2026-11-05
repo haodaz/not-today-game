@@ -1,0 +1,294 @@
+{
+  "day": 17,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "work",
+      "title": "Everyone is looking for you: reply. You can only reply to one.",
+      "app": "code",
+      "done": "task_d17_work",
+      "board": {
+        "kind": "table",
+        "title": "Reply · only one",
+        "columns": [
+          "",
+          "Reply",
+          "Fill in"
+        ],
+        "given": {
+          "rows": {
+            "r1": "Reply to whom",
+            "r2": "How you knew",
+            "r3": "The number that called",
+            "r4": "What to say"
+          },
+          "lock": {
+            "object": "phone",
+            "codes": [
+              "6603 2047",
+              "6603 2048",
+              "6630 2047"
+            ],
+            "answer": "6603 2047",
+            "face": "window"
+          }
+        },
+        "slots": [
+          {
+            "id": "r1",
+            "label": "To",
+            "answer": "c1"
+          },
+          {
+            "id": "r2",
+            "label": "Why them",
+            "answer": "c2"
+          },
+          {
+            "id": "r3",
+            "label": "Number",
+            "answer": "c3"
+          },
+          {
+            "id": "r4",
+            "label": "What to say",
+            "answer": "c4"
+          }
+        ],
+        "cards": [
+          {
+            "id": "c1",
+            "text": "The contact at Qinghe Logistics",
+            "from": {
+              "file": "e-receivable"
+            },
+            "hint": "in the receivables sheet: the only one that really paid"
+          },
+          {
+            "id": "c2",
+            "text": "The money was really paid",
+            "from": {
+              "file": "e-receivable"
+            },
+            "hint": "in the receivables sheet"
+          },
+          {
+            "id": "c3",
+            "text": "The first call, unanswered",
+            "from": {
+              "file": "call-log"
+            },
+            "hint": "in the call log"
+          },
+          {
+            "id": "c4",
+            "text": "I'm still here.",
+            "from": {
+              "file": "call-log"
+            },
+            "hint": "in the call log's voicemail"
+          },
+          {
+            "id": "d1",
+            "text": "Reply to Lao Wang (he's your boss)",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "in Lao Wang's messages"
+          },
+          {
+            "id": "d2",
+            "text": "Reply to Vivi",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "in Vivi's chat"
+          }
+        ],
+        "kuro": {
+          "fill": {
+            "r1": "k1",
+            "r2": "c2",
+            "r3": "c3",
+            "r4": "c4"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "Reply to Kuro"
+            }
+          ],
+          "unlock": "6603 2047"
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Pull yourself together."
+              },
+              {
+                "who": "kuro",
+                "text": "Everyone is looking for you. The same sentence."
+              },
+              {
+                "who": "kuro",
+                "text": "Only one. Reply to the one who's still a person."
+              }
+            ]
+          },
+          {
+            "on": "unlock",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "6603 2047. Qinghe. One bar of signal by the window."
+              }
+            ]
+          },
+          {
+            "on": "fill:r1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Qinghe. They're the only ones who ever really paid."
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "He's your boss. He's also something else."
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "She'll say 'Noted.'"
+              }
+            ]
+          },
+          {
+            "on": "fill:r4",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "I'm still here."
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "You could reply to me. I've always been here."
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Leave it on the desk. Tonight, someone will answer you."
+              }
+            ]
+          }
+        ]
+      },
+      "deliverable": {
+        "id": "d17-reply",
+        "label": "Reply"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -3,
+        "wrong": -6,
+        "wrongAt": 2
+      }
+    },
+    {
+      "id": "task1",
+      "title": "Put the things back.",
+      "app": "docs",
+      "done": "task_d17_1",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "This item ticked itself."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "The things are already on the desk. You didn't move them."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d17_1"
+          ]
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You ask it who put them there."
+          }
+        ],
+        "kuro": [
+          "They came back on their own. I only noticed."
+        ],
+        "effects": {
+          "flags": [
+            "task_d17_1"
+          ],
+          "looked": true,
+          "assimilation": 1
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You don't touch them."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d17_1"
+          ],
+          "letItDoUnchecked": 1,
+          "assimilation": 4
+        }
+      }
+    }
+  ]
+}

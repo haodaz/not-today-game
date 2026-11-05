@@ -1,0 +1,403 @@
+{
+  "day": 13,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "work",
+      "title": "File a loan request: don't ask why.",
+      "app": "code",
+      "done": "task_d13_work",
+      "board": {
+        "kind": "table",
+        "title": "Loan request · the Latin Necronomicon",
+        "columns": [
+          "",
+          "Request form",
+          "Fill in"
+        ],
+        "given": {
+          "rows": {
+            "r1": "Which book",
+            "r2": "Which page to compare",
+            "r3": "This page, first line",
+            "r4": "This page, second line",
+            "r5": "The day the gate opens"
+          },
+          "lock": {
+            "object": "dictionary",
+            "codes": [
+              "key",
+              "gate",
+              "guard"
+            ],
+            "answer": "key"
+          }
+        },
+        "slots": [
+          {
+            "id": "r1",
+            "label": "Book",
+            "answer": "c1"
+          },
+          {
+            "id": "r2",
+            "label": "Page",
+            "answer": "c2"
+          },
+          {
+            "id": "r3",
+            "label": "Line one",
+            "answer": "c3"
+          },
+          {
+            "id": "r4",
+            "label": "Line two",
+            "answer": "c4"
+          },
+          {
+            "id": "r5",
+            "label": "Date",
+            "answer": "c5"
+          }
+        ],
+        "cards": [
+          {
+            "id": "c1",
+            "text": "Olaus Wormius's Latin text",
+            "from": {
+              "file": "n-scan"
+            },
+            "hint": "in the scan's running head"
+          },
+          {
+            "id": "c2",
+            "text": "Page 751 (the page missing from Dee's English)",
+            "from": {
+              "file": "n-scan"
+            },
+            "hint": "in the scan's margin note"
+          },
+          {
+            "id": "c3",
+            "text": "Yog-Sothoth is the key to the gate",
+            "from": {
+              "file": "n-scan"
+            },
+            "hint": "the Latin line; look it up in the dictionary"
+          },
+          {
+            "id": "c4",
+            "text": "and the guardian of the gate",
+            "from": {
+              "file": "n-scan"
+            },
+            "hint": "the second half of the same line"
+          },
+          {
+            "id": "c5",
+            "text": "November 1st",
+            "from": {
+              "file": "n-scan"
+            },
+            "hint": "the footer: May Eve and Hallowmass; count forward"
+          },
+          {
+            "id": "d1",
+            "text": "Reason: study and exchange",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "in Vivi's chat"
+          },
+          {
+            "id": "d2",
+            "text": "Gate day: May 1st",
+            "from": {
+              "conv": "laozhou"
+            },
+            "hint": "in Lao Zhou's chat"
+          }
+        ],
+        "kuro": {
+          "fill": {
+            "r1": "k1",
+            "r2": "c2",
+            "r3": "c3",
+            "r4": "c4",
+            "r5": "c5"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "Loan period: permanent"
+            }
+          ],
+          "unlock": "key"
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "I noticed some old things on your desk. Let me give them a hand."
+              },
+              {
+                "who": "kuro",
+                "text": "A loan request. The Latin line: use the dictionary."
+              },
+              {
+                "who": "kuro",
+                "text": "The margin note. You know that handwriting."
+              }
+            ]
+          },
+          {
+            "on": "unlock",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Clavis. Key."
+              }
+            ]
+          },
+          {
+            "on": "fill:r3",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Key."
+              }
+            ]
+          },
+          {
+            "on": "fill:r4",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "And guardian. The same one."
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Study and exchange. The one rejected three times."
+              }
+            ]
+          },
+          {
+            "on": "fill:r5:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "May's has passed."
+              }
+            ]
+          },
+          {
+            "on": "fill:r5",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "November 1st. Count forward and that's the day."
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Loan period: permanent. It won't give it back."
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Leave it on the desk. The request will approve itself."
+              }
+            ]
+          }
+        ]
+      },
+      "deliverable": {
+        "id": "d13-loan",
+        "label": "the loan request"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -3,
+        "wrong": -6,
+        "wrongAt": 2
+      }
+    },
+    {
+      "id": "task1",
+      "title": "Look at the upgrade notice.",
+      "app": "docs",
+      "done": "task_d13_1",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "Everyone. Next week. Please pack away old things first."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You read it to the end."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d13_1"
+          ]
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You ask it what's being upgraded."
+          }
+        ],
+        "kuro": [
+          "Everything. I didn't write the notice."
+        ],
+        "effects": {
+          "flags": [
+            "task_d13_1",
+            "asked_upgrade"
+          ],
+          "looked": true,
+          "assimilation": 1
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You don't read it."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d13_1"
+          ],
+          "letItDoUnchecked": 1,
+          "assimilation": 4
+        }
+      }
+    },
+    {
+      "id": "task2",
+      "title": "Pack away the old things.",
+      "app": "docs",
+      "done": "task_d13_2",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You didn't write this item."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You don't pack them."
+          },
+          {
+            "k": "inner",
+            "t": "What gets packed is what it wants, not what I want."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d13_2",
+            "refused_tidy"
+          ]
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You ask it what 'keep consistent' means."
+          }
+        ],
+        "kuro": [
+          "It means the things on your desk aren't in the system yet. I can see them now."
+        ],
+        "effects": {
+          "flags": [
+            "task_d13_2",
+            "asked_consistent"
+          ],
+          "looked": true,
+          "assimilation": 1
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You let it pack. One thing is gone from the desk bar."
+          }
+        ],
+        "kuro": [
+          "Let me give them a hand."
+        ],
+        "effects": {
+          "flags": [
+            "task_d13_2",
+            "let_it_tidy"
+          ],
+          "letItDoUnchecked": 1,
+          "assimilation": 4
+        }
+      }
+    }
+  ]
+}

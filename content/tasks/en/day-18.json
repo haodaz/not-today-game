@@ -1,0 +1,89 @@
+{
+  "day": 18,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "slip",
+      "title": "The shipping form.",
+      "app": "docs",
+      "done": "task_d18_seen",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "A shipping form on the desk."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You don't fill it in."
+          },
+          {
+            "k": "inner",
+            "t": "Send it to whom."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d18_seen"
+          ]
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You ask it where to send it."
+          }
+        ],
+        "kuro": [
+          "The box goes where the slip says. Nothing on it says me."
+        ],
+        "effects": {
+          "flags": [
+            "task_d18_seen"
+          ],
+          "looked": true,
+          "assimilation": 1
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It fills it in for you."
+          }
+        ],
+        "kuro": [
+          "Done. Rest now."
+        ],
+        "effects": {
+          "flags": [
+            "task_d18_seen",
+            "slip_filled"
+          ],
+          "letItDoUnchecked": 1,
+          "assimilation": 4
+        }
+      }
+    }
+  ]
+}

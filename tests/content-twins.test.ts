@@ -79,14 +79,16 @@ describe("object twin", () => {
 });
 
 describe("fallback per file", () => {
-  it("a day without an en twin renders Chinese under lang=en (never per line)", () => {
-    // Day 18 has no en twin in content (twins exist for days 1–6 as of 2026-11-03); its text is the Chinese one in both locales.
-    const d2boot = () => dayFile(18)?.items[0];
-    if (!d2boot()) return; // (day 18 may be absent in a trimmed content set)
-    setLocale("zh");
-    const zh = d2boot()!.text;
-    setLocale("en");
-    expect(d2boot()!.text).toBe(zh);
+  it("every day 1–18 has an en twin: its first line differs from the Chinese one", () => {
+    // Twins exist for all 18 days as of 2026-11-05; the per-file fallback stays in code for trimmed content sets.
+    for (let n = 1; n <= 18; n++) {
+      const first = () => dayFile(n)?.items.find((i) => i.text);
+      if (!first()) continue;
+      setLocale("zh");
+      const zh = first()!.text;
+      setLocale("en");
+      expect(first()!.text, `day ${n}`).not.toBe(zh);
+    }
   });
 });
 

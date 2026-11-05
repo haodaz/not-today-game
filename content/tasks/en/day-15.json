@@ -1,0 +1,409 @@
+{
+  "day": 15,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "work",
+      "title": "The launch this afternoon: arrange the slides, watch the audience live.",
+      "app": "code",
+      "done": "task_d15_work",
+      "board": {
+        "kind": "table",
+        "title": "Launch · slides",
+        "columns": [
+          "",
+          "Order",
+          "What goes there"
+        ],
+        "given": {
+          "rows": {
+            "r1": "Slide 1",
+            "r2": "Slide 2",
+            "r3": "Slide 3",
+            "r4": "Audience reaction",
+            "r5": "How many originals left"
+          },
+          "lock": {
+            "object": "camera",
+            "codes": [
+              "12",
+              "9",
+              "4"
+            ],
+            "answer": "12"
+          }
+        },
+        "slots": [
+          {
+            "id": "r1",
+            "label": "Slide 1",
+            "answer": "c1"
+          },
+          {
+            "id": "r2",
+            "label": "Slide 2",
+            "answer": "c2"
+          },
+          {
+            "id": "r3",
+            "label": "Slide 3",
+            "answer": "c3"
+          },
+          {
+            "id": "r4",
+            "label": "Audience",
+            "answer": "c4"
+          },
+          {
+            "id": "r5",
+            "label": "Left",
+            "answer": "c5"
+          }
+        ],
+        "cards": [
+          {
+            "id": "c1",
+            "text": "Instruments: glass and metal",
+            "from": {
+              "meeting": true
+            },
+            "hint": "the speaker, right at the start"
+          },
+          {
+            "id": "c2",
+            "text": "Electricity, and psychology",
+            "from": {
+              "meeting": true
+            },
+            "hint": "the speaker said it"
+          },
+          {
+            "id": "c3",
+            "text": "The projection: sparks, hair standing on end",
+            "from": {
+              "meeting": true
+            },
+            "hint": "the projection"
+          },
+          {
+            "id": "c4",
+            "text": "Not a word",
+            "from": {
+              "meeting": true
+            },
+            "hint": "the audience tiles"
+          },
+          {
+            "id": "c5",
+            "text": "Four",
+            "from": {
+              "file": "m-shot-1030"
+            },
+            "hint": "in the launch screenshot, tile by tile"
+          },
+          {
+            "id": "d1",
+            "text": "Audience reaction: enthusiastic",
+            "from": {
+              "conv": "laozhou"
+            },
+            "hint": "in Lao Zhou's chat"
+          },
+          {
+            "id": "d2",
+            "text": "Slide 3: closing words",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "in Vivi's chat"
+          }
+        ],
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "c2",
+            "r3": "k1",
+            "r4": "c4",
+            "r5": "c5"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "Last slide: a photo of your desk"
+            }
+          ],
+          "unlock": "12"
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "I'll keep an eye on you. I know about the chick, by the way."
+              },
+              {
+                "who": "kuro",
+                "text": "The launch. Three slides, the audience watched live."
+              },
+              {
+                "who": "kuro",
+                "text": "In the screenshot, tile by tile."
+              }
+            ]
+          },
+          {
+            "on": "unlock",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Twelve tiles."
+              }
+            ]
+          },
+          {
+            "on": "fill:r5",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Four. The other eight have been swapped."
+              }
+            ]
+          },
+          {
+            "on": "fill:r4:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Not a word from them. 'Enthusiastic' is what Lao Zhou wants to see."
+              }
+            ]
+          },
+          {
+            "on": "fill:r3:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "He doesn't do closing words. Those who watch leave on their own."
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "I put your desk on the last slide. He'll like it."
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Leave it on the desk. The group will leave one by one."
+              }
+            ]
+          }
+        ],
+        "view": "meeting",
+        "meeting": {
+          "people": [
+            {
+              "id": "laozhou",
+              "name": "Lao Zhou",
+              "tile": "/npc/laozhou_av.png"
+            },
+            {
+              "id": "host",
+              "name": "Speaker"
+            },
+            {
+              "id": "a1",
+              "name": "Audience",
+              "tile": "/npc/sil_1.png"
+            },
+            {
+              "id": "a2",
+              "name": "Audience",
+              "tile": "/npc/sil_2.png"
+            },
+            {
+              "id": "a3",
+              "name": "Audience",
+              "tile": "/npc/sil_3.png"
+            },
+            {
+              "id": "a4",
+              "name": "Audience",
+              "tile": "/npc/sil_4.png"
+            },
+            {
+              "id": "a5",
+              "name": "Audience",
+              "tile": "/npc/sil_5.png"
+            },
+            {
+              "id": "a6",
+              "name": "Audience",
+              "tile": "/npc/sil_6.png"
+            },
+            {
+              "id": "a7",
+              "name": "Audience",
+              "tile": "/npc/sil_1.png"
+            },
+            {
+              "id": "a8",
+              "name": "Audience",
+              "tile": "/npc/sil_2.png"
+            }
+          ],
+          "lines": [
+            {
+              "t": "15:00",
+              "who": "laozhou",
+              "text": "The launch begins. Please welcome our speaker."
+            },
+            {
+              "t": "15:01",
+              "who": "host",
+              "text": "I've come a long way. I've brought some instruments, glass and metal.",
+              "card": "c1"
+            },
+            {
+              "t": "15:04",
+              "who": "host",
+              "text": "Today: electricity. And psychology.",
+              "card": "c2"
+            },
+            {
+              "t": "15:09",
+              "who": "host",
+              "text": "Watch."
+            },
+            {
+              "t": "15:09",
+              "who": "a1",
+              "text": "(Sparks. The front row's hair stands on end.)",
+              "card": "c3"
+            },
+            {
+              "t": "15:20",
+              "who": "a3",
+              "text": "(Not a word.)",
+              "card": "c4"
+            },
+            {
+              "t": "15:21",
+              "who": "a6",
+              "text": "(Not a word.)"
+            },
+            {
+              "t": "15:30",
+              "who": "laozhou",
+              "text": "Thank you to our speaker. Meeting closed."
+            },
+            {
+              "t": "15:31",
+              "who": "a2",
+              "text": "(Nobody leaves.)"
+            }
+          ],
+          "layout": "grid"
+        }
+      },
+      "deliverable": {
+        "id": "d15-launch",
+        "label": "the launch slides"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -3,
+        "wrong": -6,
+        "wrongAt": 2
+      }
+    },
+    {
+      "id": "task1",
+      "title": "One job left. It did it. Take a look.",
+      "app": "docs",
+      "done": "task_d15_1",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It has already done it."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You redo it. Word for word the same as its version."
+          },
+          {
+            "k": "inner",
+            "t": "It learned me well. Or I learned it well."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d15_1"
+          ]
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You take a look. It's right."
+          }
+        ],
+        "kuro": [
+          "I'll keep an eye on you."
+        ],
+        "effects": {
+          "flags": [
+            "task_d15_1"
+          ],
+          "looked": true,
+          "assimilation": 1
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You don't look."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d15_1"
+          ],
+          "letItDoUnchecked": 1,
+          "assimilation": 4
+        }
+      }
+    }
+  ]
+}
