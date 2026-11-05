@@ -5,21 +5,24 @@
       "day": 3,
       "facing": "room",
       "add": {
-        "text": "椅子背上搭着一件外套。你没有这件外套。"
+        "text": "椅子背上搭着一件外套。你没有这件外套。",
+        "overlay": "/room/photos/d03_room.jpg"
       }
     },
     {
       "day": 3,
       "facing": "bed",
       "add": {
-        "text": "被子上有一个人躺过的凹痕。你今天还没躺。"
+        "text": "被子上有一个人躺过的凹痕。你今天还没躺。",
+        "overlay": "/room/photos/d03_bed.jpg"
       }
     },
     {
       "day": 3,
       "facing": "door",
       "add": {
-        "text": "门缝底下，一道影子，像有人站着。"
+        "text": "门缝底下露出一双鞋尖，朝着屋里。门一直关着。",
+        "overlay": "/room/photos/d03_door.jpg"
       }
     },
     {
