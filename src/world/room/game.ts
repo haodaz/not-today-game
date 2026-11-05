@@ -67,6 +67,7 @@ import { meetingActions } from "@world/desktop/workbench/meeting";
 import { taskShellActions } from "@world/desktop/workbench/shell";
 import { boardActions, lockFaceMove } from "@world/desktop/workbench/board";
 import { enterUse, facingOf, lampLit, worksHere } from "@world/objects/works";
+import { canSkipPrologue, endPrologue, prologueDone, prologueOn, prologueShowing, renderPrologue } from "@world/opening";
 import { workActions } from "@world/desktop/workbench/work";
 import { renderFiles } from "@world/desktop/files/view";
 import { openObjectFromBar, renderObjectBarUse } from "@world/desktop/workbench/objbar";
@@ -84,6 +85,12 @@ export function renderGame(store: Store, session: Session, nowMs: number): SafeH
   const events = store.getEvents();
   // The run has ended: its pages replace every view (san-and-endings).
   if (state.ending !== "none") return renderEnding({ state, events, session, startDay: store.getStartDay(), nowMs });
+  // opening R2: the dream before day 1, its own black page with the box over it (and its fade).
+  if (prologueShowing(session)) {
+    const box = session.opening ? null : dialogueBox(state, events, session, nowMs);
+    const settings = settingsPanel(session);
+    return html`${renderPrologue(session, nowMs)}${dlgLayer(box, session)}${settings ? html`<div class="hud-host">${settings}</div>` : null}`;
+  }
   if (session.view === "desktop") {
     const shell = buildShell(state, events, session, desktopApps, nowMs, store.getStartDay());
     // Work-task narration and the conversation with Kuro play in the dialogue box over the desktop too.
@@ -368,6 +375,15 @@ function goTo(ctx: ActionContext, view: View, data: DOMStringMap): void {
   ctx.later(wayMs(from, "room") + WAY_GAP_MS, () => {
     // Only if nothing else moved the player meanwhile.
     if (ctx.session.view === "room") arrive(ctx, view, data);
+  });
+}
+
+/** opening R2: the prologue leaves the box; its page fades to black; then day 1 shows. */
+function finishPrologue(ctx: ActionContext): void {
+  const ms = endPrologue(ctx.session, ctx.now?.() ?? Date.now());
+  ctx.later(ms, () => {
+    prologueDone(ctx.session);
+    ctx.rerender();
   });
 }
 
@@ -687,6 +703,14 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.rerender();
   },
 
+  // opening R2: 跳过, only once a run has been finished: straight to the fade into day 1.
+  "opening-skip"(ctx) {
+    if (!prologueOn(ctx.session.dialogue) || !canSkipPrologue(ctx.session)) return;
+    ctx.session.reveal = null;
+    finishPrologue(ctx);
+    ctx.rerender();
+  },
+
   // The desk lamp: a click switches it (objects-in-room R1: the iccard's under-layer and the
   // calculator at 房间 by night need it on). Session only, no event; `useAt` records what it meant.
   lamp(ctx) {
@@ -744,8 +768,10 @@ export const loopActions: Record<string, ActionHandler> = {
     session.dialogue = dialogue;
     // The next line waits if it belongs to another place; the box closes until the player is there.
     settleSession(session);
+    // opening R2: the dream's last line read: fade to black, then day 1.
+    if (ended?.kind === "prologue") finishPrologue(ctx);
     // Lying down; on the last night the run ends instead (san-and-endings FR2).
-    if (ended?.kind === "lieDown") lieDownOrEnd(ctx);
+    else if (ended?.kind === "lieDown") lieDownOrEnd(ctx);
     // The box may have just emptied after shutdown: the evening chat opens itself.
     else openChatIfDue(ctx);
     ctx.rerender();

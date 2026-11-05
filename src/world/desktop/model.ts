@@ -253,6 +253,8 @@ export interface Session {
    * Session only.
    */
   lockTrip: { readonly focus: Side; readonly page: WorkbenchPage; readonly day: number | null } | null;
+  /** opening R2: the prologue has ended and its page is fading to black (when, and the last backdrop). Session only. */
+  opening: { readonly fadeAt: number; readonly backdrop: string | null } | null;
   /** camera R10: when each photo was first opened in 相册, and on which day (its overnight developing plays then). */
   photoOpened: Record<number, { readonly day: number; readonly at: number }>;
   /** A Vivi deliverable page open in the browser app's frame (its /docs/ html path), or null (desktop-ui 2026-11-02). */
@@ -421,6 +423,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     lastPhoto: null,
     photoOpened: {},
     lockTrip: null,
+    opening: null,
     filesSaid: new Set(),
     browserDoc: null,
     wbGloss: null,

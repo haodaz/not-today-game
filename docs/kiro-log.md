@@ -2313,3 +2313,28 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
   - new `tests/photo-album.test.ts` (10);
   - updated the writer keys in `saves.test.ts` and the collection helper in `title.test.ts`.
 - `npx tsc --noEmit`: clean. `npx vitest run`: 111 files / 2012 tests passed.
+
+## opening: the shipping label, the prologue, 跳过 (2026-11-04)
+
+- R1 (title page):
+  - `TitleModel.opening = {name, chars, phase}`; `mount.ts` `start()` drives print → stick → hold →
+    fade with `OPENING = {columnMs 300, charMs 90, stickMs 400, holdMs 1200, fadeMs 1200}`, plays
+    `label-print`, and calls `deps.onStart(names)` only after the fade.
+  - `view.ts` `openingLabel`: the kraft box (`#B98B5E`, flaps, tape), the 320×180 label with
+    收件人 = `names.login` at −1.5° and 寄件人 empty, the black layer. CSS in `title.css`.
+- R2 (game):
+  - New `src/state/prologue.ts`: strict `parsePrologue` (`_note`/`say` only, the day line shape, no
+    `where`) and `localisePrologue` (the en twin must match count, kind, `who`, backdrop, prop, sfx).
+  - New `src/world/opening.ts`: `startPrologue`, `endPrologue` / `prologueDone`, `canSkipPrologue`
+    (`finishedRuns ≥ 1`), `renderPrologue` (black `.stage.opening-page`, the backdrop, 跳过, the
+    800 ms fade).
+  - `Ending` gains `{kind: "prologue"}`; `loop-advance` and the new `opening-skip` action (allowed by
+    the mask) call `finishPrologue`; session field `opening`. `renderGame` draws the prologue page
+    with the box over it. `main.ts` starts the prologue on a new run (`onStart`).
+  - `box.ts`: in the prologue an unknown speaker gets `silhouetteFor`, and there is no place tag.
+  - CSS for the page in `room.css`.
+- No event and no state: the prologue lives in the session only.
+- Known gaps: no sound for the label's settle (no id given); the prologue's lines go into day 1's ↺
+  history; the label starts after the lamp's 400 ms, not 300 ms.
+- Tests: new `tests/opening.test.ts` (8).
+- `npx tsc --noEmit`: clean. `npx vitest run`: 112 files / 2020 tests passed.

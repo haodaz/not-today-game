@@ -50,10 +50,18 @@ export interface TitleModel {
   readonly drawerOpen: string | null;
   /** The photo open large in 影集 ("<day>:<facing>", photo-album R2), or null: the grid. */
   readonly albumOpen: string | null;
+  /**
+   * opening R1: after 开始, the name printed into the shipping label (`chars` typed so far), the
+   * label stuck onto the box, the hold, the fade to black; null before. No input meanwhile.
+   */
+  readonly opening: { readonly name: string; readonly chars: number; readonly phase: OpeningPhase } | null;
 }
 
+/** opening R1's phases: printing the name, sticking onto the box, holding, fading to black. */
+export type OpeningPhase = "print" | "stick" | "hold" | "fade";
+
 export function initialTitle(save: TitleModel["save"], collection: Collection): TitleModel {
-  return { screen: "menu", save, answers: NO_ANSWERS, settingsOpen: false, muted: false, idle: null, chairCut: false, monitorsAwake: false, starting: false, framing: "room", moving: false, collection, drawerOpen: null, albumOpen: null };
+  return { screen: "menu", save, answers: NO_ANSWERS, settingsOpen: false, muted: false, idle: null, chairCut: false, monitorsAwake: false, starting: false, framing: "room", moving: false, collection, drawerOpen: null, albumOpen: null, opening: null };
 }
 
 /** The card shows only once the camera has arrived at the desk. */

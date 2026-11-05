@@ -71,10 +71,21 @@ function creditsPage(): SafeHtml {
   return html`<section class="title-credits-page" aria-labelledby="title-credits-h"><h2 id="title-credits-h">${tr("title.credits")}</h2><div class="body"><p>${tr("title.creditsPage.team")}</p><p>${tr("title.creditsPage.tools")}</p><p>${tr("title.creditsPage.disclosure")}</p></div><button type="button" class="title-back" data-action="title-back">${tr("title.back")}</button></section>`;
 }
 
+/**
+ * opening R1: the name printed into a shipping label (收件人 the name, slightly askew; 寄件人 empty),
+ * a cardboard box rising behind it, the label stuck onto its side, then the fade to black. The phase
+ * classes drive the CSS; the characters typed so far are the model's.
+ */
+export function openingLabel(o: NonNullable<TitleModel["opening"]>): SafeHtml {
+  const typed = Array.from(o.name).slice(0, o.chars).join("");
+  const label = html`<div class="opening-label" role="img" aria-label="${t("opening.to")} ${o.name}"><div class="ol-row"><span class="ol-k">${tr("opening.to")}</span><span class="ol-v ol-name">${typed}</span></div><div class="ol-row"><span class="ol-k">${tr("opening.from")}</span><span class="ol-v ol-from"></span></div></div>`;
+  return html`<div class="opening-scene phase-${o.phase}" data-phase="${o.phase}"><div class="opening-box" aria-hidden="true"><i class="flap l"></i><i class="flap r"></i><i class="tape"></i></div>${label}<div class="opening-black" aria-hidden="true"></div></div>`;
+}
+
 export function renderTitle(m: TitleModel): SafeHtml {
   // The menu stays while the camera pushes (it fades); the card replaces it once the push ends,
   // and is gone at once when 开始 is pressed.
   const middle =
     m.screen === "credits" ? creditsPage() : m.screen === "drawer" ? drawerPage(m.collection, m.drawerOpen) : m.screen === "album" ? albumPage(m.collection, m.albumOpen) : m.screen === "questions" ? (m.starting ? null : cardOpen(m) ? questions(m) : menu(m)) : menu(m);
-  return html`<div class="${cls("stage", "title-page", `screen-${m.screen}`, cardOpen(m) && "card-open")}" data-screen="${m.screen}">${room(m)}<h1 class="title-name"><img class="title-logo" src="/logo.svg" alt="${GAME_TITLE}"></h1>${middle}<div class="title-ver">${tr("title.version")}<br>${tr("title.byline")}</div><button type="button" class="title-lang" data-action="title-lang">${tr("title.lang")}</button>${settingsPanel({ settingsOpen: m.settingsOpen, muted: m.muted }, { home: false })}</div>`;
+  return html`<div class="${cls("stage", "title-page", `screen-${m.screen}`, cardOpen(m) && "card-open")}" data-screen="${m.screen}">${room(m)}<h1 class="title-name"><img class="title-logo" src="/logo.svg" alt="${GAME_TITLE}"></h1>${middle}<div class="title-ver">${tr("title.version")}<br>${tr("title.byline")}</div><button type="button" class="title-lang" data-action="title-lang">${tr("title.lang")}</button>${settingsPanel({ settingsOpen: m.settingsOpen, muted: m.muted }, { home: false })}${m.opening ? openingLabel(m.opening) : null}</div>`;
 }

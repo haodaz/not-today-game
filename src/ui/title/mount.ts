@@ -13,6 +13,8 @@ import { titleTable, type IdleEvent } from "./table";
 import { renderTitle } from "./view";
 import { createDrawerObject, createKurogotchiDrawer, drawerIds, KURO_ID, type DrawerObject, type KuroDrawerObject, type KuroMemoryStore } from "./drawer";
 import { albumRing, albumStep, hasAlbum } from "./album";
+import type { OpeningPhase } from "./model";
+import { playSfx } from "@world/loop/sfx";
 
 export interface TitleDeps {
   readonly save: { readonly day: number } | null;
@@ -34,8 +36,10 @@ export interface TitleDeps {
 const STAGE = { w: 1600, h: 900 };
 /** Rain volume: settled, and louder once the computer turns on (FR7). */
 const RAIN = { low: 0.12, high: 0.3 };
-/** 开始: the lamp's fade (title.css `.idle.lamp.off`) before the game takes over. */
+/** 开始: the lamp's fade (title.css `.idle.lamp.off`) before the label (opening R1) starts. */
 const LAMP_MS = 400;
+/** opening R1's timing (ms): the column's fade, each printed character, the stick, the hold, the fade. */
+export const OPENING = { columnMs: 300, charMs: 90, stickMs: 400, holdMs: 1200, fadeMs: 1200 } as const;
 
 /** The wait before the next idle event: never in the first quiet stretch, then 20–40 s. */
 export function idleDelay(random: () => number, first: boolean): number {
@@ -226,7 +230,29 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     // The card closes and the lamp goes off; the game begins at the desk framing (FR7).
     set({ ...model, starting: true });
     const names = toNames(model.answers);
-    later(LAMP_MS, () => deps.onStart(names));
+    // opening R1: the column fades (300 ms); the name prints into the label one character every
+    // 90 ms; the label sticks onto the box (400 ms); hold 1.2 s; fade to black 1.2 s; then the game.
+    const chars = Array.from(names.login).length;
+    const phase = (p: OpeningPhase, n = chars) => set({ ...model, opening: { name: names.login, chars: n, phase: p } });
+    const type = (n: number) => {
+      if (n > chars) return stick();
+      phase("print", n);
+      later(OPENING.charMs, () => type(n + 1));
+    };
+    const stick = () => {
+      phase("stick");
+      later(OPENING.stickMs, () => {
+        phase("hold");
+        later(OPENING.holdMs, () => {
+          phase("fade");
+          later(OPENING.fadeMs, () => deps.onStart(names));
+        });
+      });
+    };
+    later(Math.max(LAMP_MS, OPENING.columnMs), () => {
+      playSfx("label-print", model.muted);
+      type(0);
+    });
   }
 
   const actions: Record<string, (el: HTMLElement) => void> = {

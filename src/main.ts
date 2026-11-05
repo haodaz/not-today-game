@@ -31,6 +31,7 @@ import { getLocale, initialLocale, setLocale } from "@world/i18n";
 import { syncLoop } from "@world/loop/runtime";
 import { createMotion } from "@world/motion/dom";
 import { loopActions, loopKeys, renderGame } from "@world/room/game";
+import { startPrologue } from "@world/opening";
 import { createSoundPlayer } from "@world/sound/player";
 import { readCollection, readKurogotchi } from "./ui/collection";
 import { mountTitle } from "./ui/title/mount";
@@ -74,7 +75,7 @@ function snapshot(store: Store): RunSnapshot {
   return { runId: store.getRunId(), version: RUN_FORMAT_VERSION, events: store.getEvents(), day: state.day, san: state.san, ended: state.ending === "none" ? null : state.ending, updatedAt: Date.now() };
 }
 
-function startGame(store: Store, saved: boolean, from?: "desk"): void {
+function startGame(store: Store, saved: boolean, from?: "desk", prologue = false): void {
   root.innerHTML = "";
   if (saved) store.subscribe(() => run.save(store));
   // The cloud mirror (backend FR4): push on lie-down and every 20 events; a no-op offline.
@@ -133,6 +134,11 @@ function startGame(store: Store, saved: boolean, from?: "desk"): void {
   });
   // What finished runs left on the desk (presentation only; the story never reads it).
   game.session.collection = collection;
+  // opening R2: a new run starts with the dream before day 1 (the box over the dream backdrops).
+  if (prologue) {
+    startPrologue(game.session);
+    game.rerender();
+  }
   // Debug speed, dev builds only (like ?day=): `?fast=1` counts delivery minutes as seconds.
   game.session.deliveryUnitMs = deliveryUnitMs(search, import.meta.env.DEV);
 }
@@ -190,7 +196,7 @@ if (jump !== null) {
       const store = createStore({ runId: crypto.randomUUID() });
       store.appendEvent({ kind: "names", names });
       run.save(store);
-      startGame(store, true, "desk");
+      startGame(store, true, "desk", true);
       // Anonymous sign-in on the first 开始 (backend FR1); the mirror starts with this run.
       void net.signIn(names).then((ok) => {
         if (ok) void net.pushRun(snapshot(store));

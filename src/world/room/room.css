@@ -296,6 +296,12 @@
 .stage.one-monitor > .scene{z-index:9}
 .scene .scene-backdrop{position:absolute;inset:0;background:#000 center/cover no-repeat}
 .scene .scene-prop{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-height:60%;max-width:80%;filter:drop-shadow(0 18px 28px rgba(0,0,0,.45));user-select:none}
+/* The prologue's page (opening R2): black, the dream's backdrop, 跳过 top-right, the fade out. */
+.stage.opening-page{position:relative;width:1600px;height:900px;background:#000;overflow:hidden}
+.opening-page > .scene{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.opening-skip{position:absolute;top:24px;right:28px;z-index:5;padding:6px 14px;border:1px solid rgba(255,255,255,.35);border-radius:4px;background:rgba(0,0,0,.35);color:rgba(255,255,255,.8);font:inherit;font-size:14px;letter-spacing:.1em;cursor:pointer}
+.opening-skip:hover{color:#fff;border-color:rgba(255,255,255,.7)}
+.opening-fade{position:absolute;inset:0;z-index:6;background:#000;animation:m-fade-in 800ms ease var(--late,0ms) both;pointer-events:none}
 /* The window's light by the day's weather (day-loop addition 2026-11-02): a soft light from the
    window on the left of 房间, over the photo, under everything placed. */
 .room .window-light{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 55% 85% at 4% 34%,var(--wl,transparent),transparent 72%)}

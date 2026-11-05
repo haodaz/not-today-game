@@ -7,7 +7,9 @@
 import type { GameEvent } from "@state/events";
 import { isRaidNight } from "@state/nights";
 import { dreamNights } from "@state/stages";
-import { npcPortrait, speakerLabel } from "@world/npc";
+import { npcPortrait, silhouetteFor, speakerLabel } from "@world/npc";
+/** opening R2: the prologue's sequence key (world/opening.ts; repeated to keep the box free of that module). */
+const PROLOGUE_KEY = "prologue";
 import type { State } from "@state/types.gen";
 import { isNight } from "@world/desktop/beat";
 import type { BodyState } from "@world/desktop/kuro/body";
@@ -94,6 +96,8 @@ export interface LineBoxModel {
  * when content has given those strings (`dialogue.tag.*`); otherwise none.
  */
 function placeTag(state: State, session: Session): BoxTag {
+  // opening R2: the prologue's narration is said nowhere in the room (no 桌上 tag).
+  if (session.dialogue.queue[0]?.key === PROLOGUE_KEY) return null;
   const key = raidShowing(state, session) ? "dialogue.tag.gap" : session.view === "door" ? "dialogue.tag.door" : session.view === "desk" ? "dialogue.tag.desk" : null;
   return key && hasString(key) ? { kind: "who", text: t(key) } : null;
 }
@@ -136,7 +140,8 @@ export function lineBoxModel(state: State, events: readonly GameEvent[], session
     raised: playerBox(state, events, session) !== null,
     portrait: head.voice === "kuro" ? portraitState(state, events, session, nowMs) : null,
     playerPortrait: head.voice !== "kuro" && kind === "inner" ? playerPortraitSrc(state.names.pronoun, isDreamNight(state.day, session.clock.beat)) : null,
-    npcPortrait: head.voice !== "kuro" && kind === "line" && line?.k === "speaker" ? npcPortrait(line.who ?? "") : null,
+    // opening R2: in the prologue a speaker not in npc.json gets a silhouette (stable per name).
+    npcPortrait: head.voice !== "kuro" && kind === "line" && line?.k === "speaker" ? (npcPortrait(line.who ?? "") ?? (head.key === PROLOGUE_KEY ? silhouetteFor(line.who ?? "") || null : null)) : null,
     // The first night's hand has no checklist line: a one-time pointer on its choices.
     pointer: pointerCls(session, "raid", scr.choices.length > 0 && raidShowing(state, session)),
     red: lateRing(state.day),

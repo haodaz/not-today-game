@@ -31,6 +31,8 @@ export const MASK_ALLOWS: ReadonlySet<string> = new Set([
   "loop-mute",
   "ending-next",
   "taboo-error-ok",
+  // opening R2: 跳过 over the prologue.
+  "opening-skip",
 ]);
 
 /** Is `action` held back by the mask now? */

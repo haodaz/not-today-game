@@ -198,7 +198,7 @@ function defaultRender(apps: AppRenderers) {
     renderDesktop(buildShell(store.getState(), store.getEvents(), session, apps, nowMs, store.getStartDay()));
 }
 
-export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: () => void; session: Session } {
+export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: () => void; session: Session; rerender: () => void } {
   const session = initialSession(deps.clock, deps.focus ?? "left", deps.view ?? "desktop");
   // collapse-details R1: anyone who prefers less motion sees the glimpses swap, not slide.
   try {
@@ -438,6 +438,8 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
 
   return {
     session,
+    // The host's changes to the session (the collection, the prologue) show at once.
+    rerender,
     destroy() {
       deps.sound?.onTuneEnd(null);
       unsubscribe();

@@ -25,7 +25,9 @@ export type Ending =
   /** Kuro has spoken; the player's box answers (chat: the questions and typing; work: only 好。). */
   | { readonly kind: "kuroTurn"; readonly mode: "chat" | "work" }
   /** Kuro is answering online (kuro-chat FR3): no player's box, no reading on, until it replies. */
-  | { readonly kind: "kuroWait" };
+  | { readonly kind: "kuroWait" }
+  /** opening R2: the dream before day 1 has been read; the fade into day 1 follows. */
+  | { readonly kind: "prologue" };
 
 /** Endings that wait for a choice (Kuro's turn waits for the player's box). */
 export const endsInChoice = (e: Ending): boolean =>
