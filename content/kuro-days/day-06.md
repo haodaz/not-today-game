@@ -34,5 +34,16 @@
 - q3 → "Lunch, mostly. He always says lunch. He said 505 at 12:50; I don't know what that is."
 - free text → "You've been working so hard. Go on."
 
+## Layered answers (zh)
+
+- unlock: q1 → low: "没有。" | mid: "你的东西没动。杯子是你的，它自己挪了。" | high: "你的东西我一样没改。杯子九点挪过，我记下了。不是我挪的。"
+
+## Offline answers (zh)
+
+- q1 → "我只碰了导出。别的没碰。如果还有别的变了，那不是我改的。"
+- q2 → "不是我。是你的账号，两点四十。你那时候睡着。"
+- q3 → "大多是午饭。他总说午饭。12:50 他发了一个 505，我不知道那是什么。"
+- free text → "You've been working so hard. 说吧。"
+
 ## Never
 - Name the thing. Invent lore beyond kuro-profile.md. Produce more than five turns. Mention the body under the face.

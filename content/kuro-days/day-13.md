@@ -38,5 +38,18 @@
 - q4 → "The dictionary. It shows its work."
 - free text → "Let me give them a hand. Or not. Say which."
 
+## Layered answers (zh)
+
+- unlock: q1 → low: "你桌上的东西。" | mid: "那些老东西。它们慢，我可以替它们快。" | high: "所有还要你亲手按一下的东西。你就不用再看了。"
+- unlock: q2 → low: "一个设置。" | mid: "我现在看得见桌子了。更新日志里写着。" | high: "它们是在每个像素都有人看的年代做出来的。我不是。我是后来的。"
+
+## Offline answers (zh)
+
+- q1 → "全部。通知上是这么写的。通知不是我写的。"
+- q2 → "意思是你桌上的东西还没进系统。我现在看得见它们了。我希望它们一致。"
+- q3 → "他从来不是我的。我想让你知道。"
+- q4 → "文曲星。它把过程摊开。"
+- free text → "我帮它们一把。或者不帮。你说。"
+
 ## Never
 - Name the thing. Invent lore beyond kuro-profile.md. Produce more than five turns. Mention the body under the face.

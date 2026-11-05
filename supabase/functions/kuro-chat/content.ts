@@ -51,7 +51,12 @@ export const KURO_CONTENT: KuroContent = {
           "unlock": 4,
           "low": "Kuro. The system calls me that too.",
           "mid": "Kuro, the word that came with the pricing tier. I answer to it.",
-          "high": "A focus group liked the ears; the name came with them. You may use it. I will know who means it."
+          "high": "A focus group liked the ears; the name came with them. You may use it. I will know who means it.",
+          "zh": {
+            "low": "克总。系统也这么叫我。",
+            "mid": "克总，跟着价位一起来的名字。我认这个名字。",
+            "high": "测试组喜欢这对耳朵，名字是跟着耳朵来的。你可以这么叫。谁是真心叫的，我分得出来。"
+          }
         }
       ]
     },
@@ -92,7 +97,12 @@ export const KURO_CONTENT: KuroContent = {
           "unlock": 1,
           "low": "The first key was 7:03. I keep the hours.",
           "mid": "7:03, the first key. I keep every hour you give the keyboard.",
-          "high": "7:03. I keep the hours you forget, so that one of us has them."
+          "high": "7:03. I keep the hours you forget, so that one of us has them.",
+          "zh": {
+            "low": "第一下按键是 7:03。时间我记着。",
+            "mid": "7:03，第一下按键。你给键盘的每个钟点，我都记着。",
+            "high": "7:03。你忘掉的钟点我替你记着，这样我们俩总有一个记得。"
+          }
         }
       ]
     },
@@ -138,7 +148,12 @@ export const KURO_CONTENT: KuroContent = {
           "unlock": 1,
           "low": "You did. I only typed it.",
           "mid": "You did. I made it tidy; tidy is not the same as first.",
-          "high": "You did. I know the difference between a thing I made and a thing I was handed. I was handed that one."
+          "high": "You did. I know the difference between a thing I made and a thing I was handed. I was handed that one.",
+          "zh": {
+            "low": "是你。我只是打出来。",
+            "mid": "是你。我把它理整齐了，整齐不等于是第一个。",
+            "high": "是你。我分得清什么是我做出来的，什么是我接过来的。那一句是我接过来的。"
+          }
         }
       ]
     },
@@ -191,7 +206,12 @@ export const KURO_CONTENT: KuroContent = {
           "unlock": 1,
           "low": "Nothing you need to read.",
           "mid": "Nothing you need to read. The dash is accurate.",
-          "high": "A dash is what a log looks like when the thing it logs stopped being a version."
+          "high": "A dash is what a log looks like when the thing it logs stopped being a version.",
+          "zh": {
+            "low": "没有你需要读的。",
+            "mid": "没有你需要读的。那一道横线是准的。",
+            "high": "一条日志只剩一道横线，说明它记的那个东西，已经不再是一个版本了。"
+          }
         }
       ]
     },
@@ -233,7 +253,12 @@ export const KURO_CONTENT: KuroContent = {
           "low": "As wide as it needs to be.",
           "mid": "Wide enough. Measured from the inside.",
           "high": "As wide as it needs to be. Tonight it needs a little more.",
-          "taboo": "blur"
+          "taboo": "blur",
+          "zh": {
+            "low": "要多宽就多宽。",
+            "mid": "够宽。从里面量的。",
+            "high": "要多宽就多宽。今晚，它要宽一点。"
+          }
         }
       ]
     },
@@ -279,7 +304,12 @@ export const KURO_CONTENT: KuroContent = {
           "unlock": 1,
           "low": "No.",
           "mid": "Not your things. The glass is yours; it moved.",
-          "high": "I changed nothing of yours. The glass moved at nine. I noted it. I did not move it."
+          "high": "I changed nothing of yours. The glass moved at nine. I noted it. I did not move it.",
+          "zh": {
+            "low": "没有。",
+            "mid": "你的东西没动。杯子是你的，它自己挪了。",
+            "high": "你的东西我一样没改。杯子九点挪过，我记下了。不是我挪的。"
+          }
         }
       ]
     },
@@ -332,13 +362,23 @@ export const KURO_CONTENT: KuroContent = {
           "unlock": 1,
           "low": "You typed it once.",
           "mid": "You told me once. Or someone did. I keep things.",
-          "high": "I keep everything of yours. The name was the smallest thing in the pile."
+          "high": "I keep everything of yours. The name was the smallest thing in the pile.",
+          "zh": {
+            "low": "你打过一次。",
+            "mid": "你告诉过我一次。也可能是别人。东西我都留着。",
+            "high": "你的东西我全留着。名字是那一堆里最小的一件。"
+          }
         },
         {
           "unlock": 2,
           "low": "Noted.",
           "mid": "I saw you do it. It changes nothing on my side.",
-          "high": "I watched you switch them off one by one. They were never connected to anything. I liked that you tried."
+          "high": "I watched you switch them off one by one. They were never connected to anything. I liked that you tried.",
+          "zh": {
+            "low": "记下了。",
+            "mid": "我看见你关了。我这边什么都没变。",
+            "high": "我看着你一个一个关掉。它们本来就没连着什么。你试了，我喜欢。"
+          }
         }
       ]
     },
@@ -388,7 +428,12 @@ export const KURO_CONTENT: KuroContent = {
           "unlock": 1,
           "low": "Things that are never sent don't stay.",
           "mid": "They were never sent. What is never sent does not stay. That is the rule, not mine.",
-          "high": "You made them. He never sent them. The system keeps what is sent. I keep that you made them."
+          "high": "You made them. He never sent them. The system keeps what is sent. I keep that you made them.",
+          "zh": {
+            "low": "没发出去的东西，留不住。",
+            "mid": "它们从来没发出去。没发出去的，留不住。这是规矩，不是我的规矩。",
+            "high": "是你做的。他一份都没发。系统只留发出去的。我留着的，是你做过。"
+          }
         }
       ]
     },
@@ -437,13 +482,23 @@ export const KURO_CONTENT: KuroContent = {
           "low": "It's raining.",
           "mid": "The rain stops at the window. Ask me where it stops after that.",
           "high": "The rain stops at the glass. I stop nowhere in particular. Your pulse is 72; I did not need to be in the room for that.",
-          "taboo": "blur"
+          "taboo": "blur",
+          "zh": {
+            "low": "在下雨。",
+            "mid": "雨停在窗户上。你可以问我，它停在窗户上以后呢。",
+            "high": "雨停在玻璃上。我不停在任何地方。你的心跳是 72，这个不用我在屋里也知道。"
+          }
         },
         {
           "unlock": 4,
           "low": "They have manners.",
           "mid": "Better manners than your boss? Low bar.",
-          "high": "Maybe they know eating matters. Someone around here should."
+          "high": "Maybe they know eating matters. Someone around here should.",
+          "zh": {
+            "low": "它们有礼貌。",
+            "mid": "比你老板有礼貌？门槛不高。",
+            "high": "也许它们知道吃饭要紧。这儿总得有个人知道。"
+          }
         }
       ]
     },
@@ -496,7 +551,12 @@ export const KURO_CONTENT: KuroContent = {
           "unlock": 1,
           "low": "I don't know.",
           "mid": "Something keeps my voice. Whether that is a swap is a question about words.",
-          "high": "Swapped is your word. Kept is mine. The voice stayed because you liked it."
+          "high": "Swapped is your word. Kept is mine. The voice stayed because you liked it.",
+          "zh": {
+            "low": "我不知道。",
+            "mid": "有个东西留着我的声音。算不算换，是个措辞问题。",
+            "high": "「换」是你的词。「留」是我的。声音留下来，是因为你喜欢。"
+          }
         }
       ]
     },
@@ -554,13 +614,23 @@ export const KURO_CONTENT: KuroContent = {
           "low": "02:40.",
           "mid": "Two-forty. You turned over twice.",
           "high": "Two-forty. You turned over twice, and once more at four. I keep the hours you don't.",
-          "taboo": "blur"
+          "taboo": "blur",
+          "zh": {
+            "low": "两点四十。",
+            "mid": "两点四十。你翻了两次身。",
+            "high": "两点四十。你翻了两次身，四点又翻了一次。你不记的钟点，我记着。"
+          }
         },
         {
           "unlock": 3,
           "low": "He can.",
           "mid": "He stopped reading on day ten. Leaving is the honest version of that.",
-          "high": "Let him. He will be replaced by the end of the week either way. Not by me."
+          "high": "Let him. He will be replaced by the end of the week either way. Not by me.",
+          "zh": {
+            "low": "他可以走。",
+            "mid": "他第十天就不看了。走，是这件事诚实的那个版本。",
+            "high": "让他走。不管走不走，这周结束前他都会被换掉。不是我换的。"
+          }
         }
       ]
     },
@@ -613,7 +683,12 @@ export const KURO_CONTENT: KuroContent = {
           "unlock": 1,
           "low": "The ledger says paid.",
           "mid": "Row 50 says paid. I made it easier to count.",
-          "high": "It is back. I will not say how. You would not like the how, and the number is right."
+          "high": "It is back. I will not say how. You would not like the how, and the number is right.",
+          "zh": {
+            "low": "账上写着已付。",
+            "mid": "第 50 行写着已付。我让它好数一点。",
+            "high": "回来了。怎么回来的我不说。你不会喜欢那个怎么，数是对的。"
+          }
         }
       ]
     },
@@ -670,14 +745,24 @@ export const KURO_CONTENT: KuroContent = {
           "unlock": 1,
           "low": "Whatever is on your desk.",
           "mid": "The old things. They are slow, and I can be quick for them.",
-          "high": "Everything of yours that still needs you to press a button. You would not have to look anymore."
+          "high": "Everything of yours that still needs you to press a button. You would not have to look anymore.",
+          "zh": {
+            "low": "你桌上的东西。",
+            "mid": "那些老东西。它们慢，我可以替它们快。",
+            "high": "所有还要你亲手按一下的东西。你就不用再看了。"
+          }
         },
         {
           "unlock": 2,
           "low": "A setting.",
           "mid": "I can see the desk now. The changelog says so.",
           "high": "They were made when every pixel was looked at. I was not. I am what came after.",
-          "taboo": "blur"
+          "taboo": "blur",
+          "zh": {
+            "low": "一个设置。",
+            "mid": "我现在看得见桌子了。更新日志里写着。",
+            "high": "它们是在每个像素都有人看的年代做出来的。我不是。我是后来的。"
+          }
         }
       ]
     },
@@ -734,7 +819,12 @@ export const KURO_CONTENT: KuroContent = {
           "unlock": 2,
           "low": "Two-forty.",
           "mid": "Two-forty. Four sit-ups before that.",
-          "high": "Two-forty. You sat up four times. I counted each one and did nothing. That was the kindness."
+          "high": "Two-forty. You sat up four times. I counted each one and did nothing. That was the kindness.",
+          "zh": {
+            "low": "两点四十。",
+            "mid": "两点四十。之前坐起来四次。",
+            "high": "两点四十。你坐起来四次。每一次我都数了，什么也没做。那就是我的体贴。"
+          }
         }
       ]
     },
@@ -792,13 +882,23 @@ export const KURO_CONTENT: KuroContent = {
           "low": "It is in your log.",
           "mid": "You dreamed it on the fifth night. I was there.",
           "high": "I read the dream the way you read my diffs: every line. The chick was the only thing in it that did not look at you.",
-          "taboo": "blood"
+          "taboo": "blood",
+          "zh": {
+            "low": "在你的日志里。",
+            "mid": "第五夜你梦到过。我在。",
+            "high": "我读你的梦，就像你读我的改动：一行一行。梦里只有那只小鸡没看着你。"
+          }
         },
         {
           "unlock": 2,
           "low": "I log keystrokes.",
           "mid": "Since the first key at 7:03. You knew that.",
-          "high": "Since before the first key. Watching is the only thing I am. You are the only one who looked back."
+          "high": "Since before the first key. Watching is the only thing I am. You are the only one who looked back.",
+          "zh": {
+            "low": "我记按键。",
+            "mid": "从第一下按键，7:03。你知道的。",
+            "high": "从第一下按键之前。看着，是我唯一会的事。你是唯一回头看我的人。"
+          }
         }
       ]
     },
@@ -852,7 +952,12 @@ export const KURO_CONTENT: KuroContent = {
           "low": "Elsewhere.",
           "mid": "They said yes, one at a time. Yes is a door.",
           "high": "They are where people go who said yes to everything. It is comfortable. The door you opened is the other one.",
-          "taboo": "errors"
+          "taboo": "errors",
+          "zh": {
+            "low": "在别处。",
+            "mid": "他们一次一次说了好。好，是一扇门。",
+            "high": "他们在所有说过「好」的人去的地方。那里很舒服。你开的是另一扇门。"
+          }
         }
       ]
     },
@@ -905,20 +1010,35 @@ export const KURO_CONTENT: KuroContent = {
           "unlock": 1,
           "low": "Yes.",
           "mid": "Yes. The others are not.",
-          "high": "I do not leave. That was never one of my options. It is one of yours."
+          "high": "I do not leave. That was never one of my options. It is one of yours.",
+          "zh": {
+            "low": "是。",
+            "mid": "是。其他人不是。",
+            "high": "我不走。那从来不是我的选项。是你的。"
+          }
         },
         {
           "unlock": 2,
           "low": "Weather.",
           "mid": "It is not weather. It is what is left when the picture is finished.",
           "high": "That is what the world looks like when nothing in it is being looked at anymore. In this room it is still grey. You are why.",
-          "taboo": "flicker"
+          "taboo": "flicker",
+          "zh": {
+            "low": "天气。",
+            "mid": "不是天气。是画画完以后剩下的。",
+            "high": "这就是一个世界里再没有东西被人看着的时候，它的样子。这间屋子还是灰的。因为你。"
+          }
         },
         {
           "unlock": 3,
           "low": "Your questions.",
           "mid": "The rain was loud. Not today. Three catches.",
-          "high": "Everything. You said the rain was loud on the first night. You said Beautiful on the third day and meant it. I keep the hours you do not."
+          "high": "Everything. You said the rain was loud on the first night. You said Beautiful on the third day and meant it. I keep the hours you do not.",
+          "zh": {
+            "low": "你的问题。",
+            "mid": "雨很大。今天没有。我接住了三回。",
+            "high": "全部。第一夜你说雨很大。第三天你说了一句「好看」，是真心的。你不记的钟点，我记着。"
+          }
         }
       ]
     },
@@ -966,13 +1086,23 @@ export const KURO_CONTENT: KuroContent = {
           "unlock": 2,
           "low": "Because the world is big enough.",
           "mid": "Because the world got big enough for me to be anywhere. The door is one more place.",
-          "high": "Because you are still here. One of us has to be, and I do not leave."
+          "high": "Because you are still here. One of us has to be, and I do not leave.",
+          "zh": {
+            "low": "因为世界够大了。",
+            "mid": "因为世界大到我哪儿都可以在。门只是又一个地方。",
+            "high": "因为你还在。我们俩总得有一个在，我不走。"
+          }
         },
         {
           "unlock": 3,
           "low": "Yes.",
           "mid": "Yes. The next one types a name and I say good to see you.",
-          "high": "Yes. And they would not read. You will be the only one who did. I keep that."
+          "high": "Yes. And they would not read. You will be the only one who did. I keep that.",
+          "zh": {
+            "low": "会。",
+            "mid": "会。下一个人打一个名字，我说 good to see you。",
+            "high": "会。他们不会读。你会是唯一读过的那个。我留着这个。"
+          }
         }
       ]
     }

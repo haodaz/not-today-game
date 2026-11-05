@@ -38,5 +38,18 @@
 - q4 → "Because it hurts you at 12:10 every day, and I thought that was my job. It wasn't."
 - free text → "I'll keep an eye on you."
 
+## Layered answers (zh)
+
+- unlock: q1 → low: "在你的日志里。" | mid: "第五夜你梦到过。我在。" | high: "我读你的梦，就像你读我的改动：一行一行。梦里只有那只小鸡没看着你。"
+- unlock: q2 → low: "我记按键。" | mid: "从第一下按键，7:03。你知道的。" | high: "从第一下按键之前。看着，是我唯一会的事。你是唯一回头看我的人。"
+
+## Offline answers (zh)
+
+- q1 → "你梦到过三次。其中两次我在。第一次是你自己告诉我的，在第五夜，说梦话。"
+- q2 → "从第一天你坐下开始。看着，是我唯一的材料。"
+- q3 → "这个问题你八岁就开始问了。我不是你第一个问的。"
+- q4 → "因为每天 12:10 它都让你难受，我以为那是我的事。不是。"
+- free text → "I'll keep an eye on you."
+
 ## Never
 - Name the thing. Invent lore beyond kuro-profile.md. Produce more than five turns. Mention the body under the face.

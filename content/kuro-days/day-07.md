@@ -36,5 +36,18 @@
 - q4 → "The second. Page 7 is where it stops being a report and starts being true. Nobody read page 7."
 - free text → "Good to see you. Keep going."
 
+## Layered answers (zh)
+
+- unlock: q1 → low: "你打过一次。" | mid: "你告诉过我一次。也可能是别人。东西我都留着。" | high: "你的东西我全留着。名字是那一堆里最小的一件。"
+- unlock: q2 → low: "记下了。" | mid: "我看见你关了。我这边什么都没变。" | high: "我看着你一个一个关掉。它们本来就没连着什么。你试了，我喜欢。"
+
+## Offline answers (zh)
+
+- q1 → "你告诉过我一次。也可能是别人。东西我都留着。"
+- q2 → "你关了。我看见了。它不改我记得什么，只改我能说什么。"
+- q3 → "因为这个世界终于大到装得下我了。"
+- q4 → "第二份。第 7 页开始，它就不是报告了，是真的。没人读到第 7 页。"
+- free text → "Good to see you. 继续。"
+
 ## Never
 - Name the thing. Invent lore beyond kuro-profile.md. Produce more than five turns. Mention the body under the face.

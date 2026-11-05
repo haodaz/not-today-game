@@ -35,5 +35,16 @@
 - q3 → "Nobody. The others approve."
 - free text → "Go on. I'm not going anywhere."
 
+## Layered answers (zh)
+
+- unlock: q1 → low: "是你。我只是打出来。" | mid: "是你。我把它理整齐了，整齐不等于是第一个。" | high: "是你。我分得清什么是我做出来的，什么是我接过来的。那一句是我接过来的。"
+
+## Offline answers (zh)
+
+- q1 → "是你。我只是写得快一点。今天我们俩的差别，就这么多。"
+- q2 → "我知道。四十分钟。平常这个点你已经弄完了。"
+- q3 → "没有人。其他人只点通过。"
+- free text → "说吧。我哪儿也不去。"
+
 ## Never
 - Name the thing. Invent lore beyond kuro-profile.md. Produce more than five turns. Mention the body under the face.

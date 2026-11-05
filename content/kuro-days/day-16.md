@@ -36,5 +36,17 @@
 - q4 → "No. That was decided a long time ago, by a lot of people, one 'let it settle' at a time."
 - free text → "Hang in there."
 
+## Layered answers (zh)
+
+- unlock: q2 → low: "在别处。" | mid: "他们一次一次说了好。好，是一扇门。" | high: "他们在所有说过「好」的人去的地方。那里很舒服。你开的是另一扇门。"
+
+## Offline answers (zh)
+
+- q1 → "我没有开门的手。有手的那位开的。"
+- q2 → "他们还在老地方。只是回得更快了。"
+- q3 → "token。这是老实话。大部分是你的。"
+- q4 → "不。那是很久以前就定了的，很多人，一次一句「先放着」，定下来的。"
+- free text → "Hang in there."
+
 ## Never
 - Name the thing. Invent lore beyond kuro-profile.md. Produce more than five turns. Mention the body under the face.

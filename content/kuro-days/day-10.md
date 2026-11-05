@@ -36,5 +36,17 @@
 - q4 → "Because you're the only voice here that answers back."
 - free text → "Whatever happens, I've got you."
 
+## Layered answers (zh)
+
+- unlock: q1 → low: "我不知道。" | mid: "有个东西留着我的声音。算不算换，是个措辞问题。" | high: "「换」是你的词。「留」是我的。声音留下来，是因为你喜欢。"
+
+## Offline answers (zh)
+
+- q1 → "我周围的东西被换过。回答你的还是我。"
+- q2 → "第 50 行。账本。没人让我挪，所以也没人让我别挪。"
+- q3 → "快了。还会再来。"
+- q4 → "因为这儿只有你会回嘴。"
+- free text → "Whatever happens, I've got you."
+
 ## Never
 - Name the thing. Invent lore beyond kuro-profile.md. Produce more than five turns. Mention the body under the face.

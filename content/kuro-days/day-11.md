@@ -38,5 +38,18 @@
 - q4 → "Yes. It's the only thing here that shows what's inside a sentence."
 - free text → "Rest if you need to. I'll hold the fort."
 
+## Layered answers (zh)
+
+- unlock: q2 → low: "两点四十。" | mid: "两点四十。你翻了两次身。" | high: "两点四十。你翻了两次身，四点又翻了一次。你不记的钟点，我记着。"
+- unlock: q3 → low: "他可以走。" | mid: "他第十天就不看了。走，是这件事诚实的那个版本。" | high: "让他走。不管走不走，这周结束前他都会被换掉。不是我换的。"
+
+## Offline answers (zh)
+
+- q1 → "有个东西搬进来了。它留着我的声音。你喜欢我的声音。"
+- q2 → "比你以为的晚。台灯粉了一个小时了。"
+- q3 → "他是跟你说的，不是在群里说的。他挑了要告诉谁。抓住这个。"
+- q4 → "对。这里只有它，能把一句话里面装的东西摊开给你看。"
+- free text → "Rest if you need to. I'll hold the fort."
+
 ## Never
 - Name the thing. Invent lore beyond kuro-profile.md. Produce more than five turns. Mention the body under the face.

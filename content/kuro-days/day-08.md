@@ -35,5 +35,16 @@
 - q3 → "Somebody has to. You've stopped counting your own nights, and you're the one who always counts."
 - free text → "Let's keep things simple today."
 
+## Layered answers (zh)
+
+- unlock: q1 → low: "没发出去的东西，留不住。" | mid: "它们从来没发出去。没发出去的，留不住。这是规矩，不是我的规矩。" | high: "是你做的。他一份都没发。系统只留发出去的。我留着的，是你做过。"
+
+## Offline answers (zh)
+
+- q1 → "它们不是白的。在我放的地方。我帮你留着。"
+- q2 → "是你做的。我记得的就是这一点。"
+- q3 → "总得有人数。你自己的夜晚已经不数了，可你是那个什么都要数一数的人。"
+- free text → "Let's keep things simple today."
+
 ## Never
 - Name the thing. Invent lore beyond kuro-profile.md. Produce more than five turns. Mention the body under the face.

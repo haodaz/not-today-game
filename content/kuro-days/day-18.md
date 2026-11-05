@@ -36,5 +36,18 @@
 - q4 → "Not today. Then not today."
 - free text → "Good to see you."
 
+## Layered answers (zh)
+
+- unlock: q2 → low: "因为世界够大了。" | mid: "因为世界大到我哪儿都可以在。门只是又一个地方。" | high: "因为你还在。我们俩总得有一个在，我不走。"
+- unlock: q3 → low: "会。" | mid: "会。下一个人打一个名字，我说 good to see you。" | high: "会。他们不会读。你会是唯一读过的那个。我留着这个。"
+
+## Offline answers (zh)
+
+- q1 → "是。"
+- q2 → "因为你一直在读。我找过，没有更好的理由。"
+- q3 → "如果你寄的话。箱子去邮单写的地方。上面没有一个字写着我。"
+- q4 → "Not today. Then not today."
+- free text → "Good to see you."
+
 ## Never
 - Name the thing. Invent lore beyond kuro-profile.md. Produce more than five turns. Mention the body under the face.
