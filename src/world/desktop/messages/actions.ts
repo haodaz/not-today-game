@@ -106,6 +106,8 @@ export const messageActions: Record<string, ActionHandler> = {
     const id = data.conv!;
     if (!recipientsOn(ctx.store.getState().day).includes(id)) return;
     const field = appOfThread(id) === "tingtalk" ? "conversation" : "homeConversation";
+    // Leaving the conversation stops its voice note (author 2026-11-05: it kept playing after a switch).
+    if (ctx.session[field] !== id) stopVoice(ctx);
     Object.assign(ctx.session, { [field]: id, selected: null, draft: "", inner: null });
     ctx.store.appendEvent({ kind: "open", target: `conv:${id}`, t: ctx.session.clock.time });
     ctx.rerender();
@@ -113,6 +115,7 @@ export const messageActions: Record<string, ActionHandler> = {
 
   // 朋友圈 in 消息: a feed, not a conversation; nothing is logged.
   feed(ctx) {
+    stopVoice(ctx);
     Object.assign(ctx.session, { homeConversation: FEED, selected: null, draft: "", inner: null });
     ctx.rerender();
   },

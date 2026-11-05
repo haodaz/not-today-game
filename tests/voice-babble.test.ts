@@ -2,6 +2,7 @@
 // game's own context (R3), and the voice bubble as its own play / stop button (R4). No audio files.
 import { describe, expect, it } from "vitest";
 import voiceRaw from "@content/voice.json";
+import { recipientsOn } from "@state/replies/resolve";
 import { createStore, type Store } from "@state/store";
 import type { ActionContext } from "@world/desktop/controller";
 import { messageActions } from "@world/desktop/messages/actions";
@@ -292,6 +293,22 @@ describe("R4 · the voice bubble", () => {
     r.wait(r.calls.at(-1)!.plan.length * 1000 + 1);
     for (let i = 0; i < 60 && r.session.voice; i++) r.wait(1000);
     expect(r.session.voice).toBeNull();
+  });
+
+  it("switching to another conversation (or 朋友圈) stops it; re-opening the same one does not", () => {
+    const r = rig(1);
+    const [v] = r.voices();
+    r.click(v!.key);
+    messageActions.conv!(r.ctx, { conv: "boss" } as DOMStringMap, null as never);
+    expect(r.calls[0]!.stopped).toBe(false);
+    const other = recipientsOn(1).find((id) => id !== "boss")!;
+    messageActions.conv!(r.ctx, { conv: other } as DOMStringMap, null as never);
+    expect(r.calls[0]!.stopped).toBe(true);
+    expect(r.session.voice).toBeNull();
+    messageActions.conv!(r.ctx, { conv: "boss" } as DOMStringMap, null as never);
+    r.click(v!.key);
+    messageActions.feed!(r.ctx, {} as DOMStringMap, null as never);
+    expect(r.calls[1]!.stopped).toBe(true);
   });
 
   it("day 18: greyed, and it plays only hiss", () => {
