@@ -17,3 +17,11 @@
 ## R3. Tests
 - Parser: zh sections read; a zh unlock not in English fails; a zh line with taboo fails; absent zh = English.
 - Locale: zh turn → zh layered text, en turn → English, same bucket and taboo; offline answer zh / en by content locale.
+
+## R4. Kuro's English looks like Kuro's English, everywhere (author 2026-11-04: 「克总的英文是有 css 风格的……红蓝模糊，然后有自己的字体」「我说的英文是怪话」)
+The game already has the style in the chat overlay and the mini pill (`.k .t .plain`, `.kmini .c .plain`: a 1 px red / blue split) and the gamebook uses a monospace face for Kuro (`p.say`: Menlo). Apply it wherever Kuro speaks, not only in the chat:
+- **Where**: the task shell's conversation column (board beats and non-board threads), the work thread's Kuro bubbles, the HUD pill, the call/meeting lines Kuro says, dialogue-box lines whose speaker is Kuro or 屏幕.
+- **The day's idiom** (the `Idiom of the day (constant)` of that day's kuro-days file, matched exactly): Kuro's face (`font-family: "SF Mono", Menlo, monospace`, size 0.95em), no split.
+- **Uncanny lines** (怪话): Kuro's face **plus** the red / blue split (`.plain`). A Kuro line is uncanny when (a) it is one of that day's `## Red-blue lines`, or (b) in the zh build, it has no Han characters and is not the idiom, or (c) its text starts with the content marker `~ ` (marker stripped before display; lets en content mark one).
+- Everything else Kuro says (ordinary Chinese, or ordinary English in the en build) stays in the normal face.
+- Tests: idiom → mono, no split; a red-blue constant → mono + split; zh build English non-idiom → split; `~ ` marker → split, marker not shown; ordinary line → neither.
