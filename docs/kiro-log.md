@@ -2260,3 +2260,21 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
 - Tests: `tests/camera.test.ts` drops the rename checks and gains 4 R10 tests: the rule, day 18, the
   album across the night with the opening animation, and the door still.
 - `npx tsc --noEmit`: clean. `npx vitest run`: 110 files / 1998 tests passed.
+
+## objects-in-room task 5 (R7): back to the screen after a lock's trip (2026-11-04)
+
+- `session.lockTrip = {focus, page, day}`:
+  - set by the `board-lock` wrapper (game.ts) when its lift at the lock's facing happens: the monitor
+    and the task page 屏幕 showed when the trip began;
+  - cleared by any move (`arrive`) and on return.
+- `loop-put-down`: the put-down that ends holding (after 使用 was left) with a trip pending restores
+  the page, opens the lock panel and goes `view → desktop` on the trip's monitor. `goTo` makes that one
+  move of two legs: the turn to 房间, then into 屏幕.
+- Putting an object down anywhere else stays put. A lock without a face starts no trip (the 老物件栏
+  over 屏幕, as before).
+- Tests: 4 new R7 tests in `tests/objects-in-room.test.ts`:
+  - lock trip → put down → 屏幕 on the same monitor and task page with the chips;
+  - picked up by hand at 窗 → stays;
+  - a no-face lock → no trip;
+  - a trip ended by another move → no return.
+- `npx tsc --noEmit`: clean. `npx vitest run`: 110 files / 2002 tests passed.

@@ -3,4 +3,4 @@
 - [x] 2. The works rules in the focus view: faint / no keys / hidden layer + the line; phone signal icon at 窗; upgraded objects ignore them (R1).
 - [x] 3. Lock with `face`: 用{object}看一眼 turns the head there (from the desktop: back to 房间 first) and lifts the object; chips only after a `useAt ok` (R3).
 - [x] 4. Tests as in R6. Log entry in docs/kiro-log.md.
-- [ ] 5. R7: putting the object down after a lock's trip returns to 屏幕 (same monitor, same task page, chips shown).
+- [x] 5. R7: putting the object down after a lock's trip returns to 屏幕 (same monitor, same task page, chips shown).

@@ -358,3 +358,70 @@ describe("R3 · a lock with a face", () => {
     expect(r.session.view).toBe("desktop");
   });
 });
+
+// ——— R7 · back to the screen after the trip ———
+
+describe("R7 · putting the object down after a lock's trip returns to 屏幕", () => {
+  it("from 屏幕, 用计算器看一眼 → 窗, use, put down → back on 屏幕, the same monitor and task page, the chips in front", () => {
+    mode.lock = "face";
+    const store = day1(["chick", "calculator"]);
+    const r = onTask(store);
+    r.session.focus = "right";
+    r.act("board-lock");
+    r.settle();
+    expect([r.session.view, r.session.holding, r.session.hand.using]).toEqual(["window", "calculator", true]);
+    expect(r.session.lockTrip).toEqual({ focus: "right", page: "task:task3", day: null });
+    // Somewhere on the way the page changed (the session list, say): the trip remembers its own.
+    r.session.workbenchPage = "home";
+    r.session.boardLockOpen = false;
+    // The first put-down steps out of 使用; the second puts it down and goes back.
+    r.act("loop-put-down");
+    expect(r.session.view).toBe("window");
+    expect(r.session.holding).toBe("calculator");
+    r.act("loop-put-down");
+    expect(r.session.holding).toBeNull();
+    // The turn back to 房间 first (one move), then into 屏幕.
+    expect(r.session.view).toBe("room");
+    r.settle();
+    expect(r.session.view).toBe("desktop");
+    expect([r.session.focus, r.session.workbenchPage, r.session.boardLockOpen, r.session.lockTrip]).toEqual(["right", "task:task3", true, null]);
+    expect(chips(r.page())).toEqual(["0000", "1111"]);
+  });
+
+  it("picking the calculator up at 窗 by hand and putting it down stays at 窗", () => {
+    const r = rig(found(9, ["calculator"]), "window");
+    r.act("loop-hold", { object: "calculator" });
+    r.act("obj-use");
+    r.act("loop-put-down");
+    r.act("loop-put-down");
+    r.settle();
+    expect([r.session.view, r.session.holding, r.session.lockTrip]).toEqual(["window", null, null]);
+  });
+
+  it("a lock without a face starts no trip (the 老物件栏 over 屏幕, as before)", () => {
+    mode.lock = "plain";
+    const store = day1(["chick"]);
+    const r = onTask(store);
+    r.act("board-lock");
+    expect(r.session.lockTrip).toBeNull();
+    r.act("objbar-close");
+    expect(r.session.view).toBe("desktop");
+  });
+
+  it("a lock's trip that ends some other way leaves no return behind", () => {
+    mode.lock = "face";
+    const store = day1(["chick", "calculator"]);
+    const r = onTask(store);
+    r.act("board-lock");
+    r.settle();
+    expect(r.session.lockTrip).not.toBeNull();
+    // Any move ends it (here the view action, as a hotspot would).
+    r.act("view", { view: "bed" });
+    expect(r.session.lockTrip).toBeNull();
+    r.settle();
+    r.act("loop-hold", { object: "calculator" });
+    r.act("loop-put-down");
+    r.settle();
+    expect(r.session.view).toBe("bed");
+  });
+});

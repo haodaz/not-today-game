@@ -247,6 +247,12 @@ export interface Session {
    */
   photos: Record<number, { readonly at: string; readonly day: number; readonly takenAt: number; readonly still: string | null }>;
   lastPhoto: number | null;
+  /**
+   * objects-in-room R7: a board lock's trip (R3) took the player from 屏幕 to a facing: the monitor
+   * and the task page it left from. Putting the object down goes back there; cleared on return.
+   * Session only.
+   */
+  lockTrip: { readonly focus: Side; readonly page: WorkbenchPage; readonly day: number | null } | null;
   /** camera R10: when each photo was first opened in 相册, and on which day (its overnight developing plays then). */
   photoOpened: Record<number, { readonly day: number; readonly at: number }>;
   /** A Vivi deliverable page open in the browser app's frame (its /docs/ html path), or null (desktop-ui 2026-11-02). */
@@ -414,6 +420,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     photos: {},
     lastPhoto: null,
     photoOpened: {},
+    lockTrip: null,
     filesSaid: new Set(),
     browserDoc: null,
     wbGloss: null,

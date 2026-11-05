@@ -410,6 +410,8 @@ function arrive(ctx: ActionContext, view: View, data: DOMStringMap): void {
   ctx.session.caseOpen = false;
   ctx.session.holding = null;
   restHand(ctx.session);
+  // objects-in-room R7: any move ends a lock's trip (its lift comes after its own arrival).
+  ctx.session.lockTrip = null;
   // The pointer finds the new view's edges itself.
   ctx.session.edge = null;
   // 走到门边 is the camera move: arriving at 门 with the bag outside is that step.
@@ -892,6 +894,17 @@ export const loopActions: Record<string, ActionHandler> = {
     session.phoneOpen = false;
     session.holding = null;
     restHand(session);
+    // objects-in-room R7: a lock's trip ends here: back to 屏幕 on the monitor and the task page it
+    // left from (the turn to 房间, then into 屏幕: one move), the lock panel open with its chips.
+    const trip = session.lockTrip;
+    if (trip) {
+      session.lockTrip = null;
+      session.workbenchPage = trip.page;
+      session.wbTaskDay = trip.day;
+      session.boardLockOpen = true;
+      loopActions["view"]!(ctx, { view: "desktop", screen: trip.focus } as DOMStringMap, null as never);
+      return;
+    }
     ctx.rerender();
   },
   // A click on the held object itself: 使用 is a camera level, the same tier as 屏幕 (correction
@@ -1133,6 +1146,8 @@ export const loopActions: Record<string, ActionHandler> = {
     const move = lockFaceMove(ctx);
     if (!move) return boardActions["board-lock"]!(ctx, data, el);
     const from = ctx.session.view;
+    // R7: where the trip left from (屏幕's monitor and task page), to come back to on putting down.
+    const trip = from === "desktop" ? { focus: ctx.session.focus, page: ctx.session.workbenchPage, day: ctx.session.wbTaskDay } : null;
     ctx.session.boardLockOpen = true;
     ctx.session.objbarOpen = false;
     loopActions["view"]!(ctx, { view: move.face } as DOMStringMap, null as never);
@@ -1140,7 +1155,10 @@ export const loopActions: Record<string, ActionHandler> = {
       // Only if nothing else moved the player meanwhile.
       if (ctx.session.view !== move.face || ctx.session.holding) return;
       loopActions["loop-hold"]!(ctx, { object: move.object } as DOMStringMap, null as never);
-      if (ctx.session.holding === move.object) loopActions["obj-use"]!(ctx, {} as DOMStringMap, null as never);
+      if (ctx.session.holding === move.object) {
+        ctx.session.lockTrip = trip;
+        loopActions["obj-use"]!(ctx, {} as DOMStringMap, null as never);
+      }
     });
   },
   // 工作台's home composer (workspace 2026-11-04): it talks to Kuro as its body does.
