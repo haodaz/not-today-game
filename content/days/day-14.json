@@ -101,8 +101,8 @@
     },
     {
       "id": "task1",
-      "text": "今天没什么事。写点什么。",
-      "unlock": "done:msgs",
+      "text": "新人排完了。写点什么。",
+      "unlock": "done:work",
       "done": "flag:task_d14_1",
       "required": false
     },

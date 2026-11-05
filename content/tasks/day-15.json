@@ -24,14 +24,13 @@
             "r5": "还剩几个原来的"
           },
           "lock": {
-            "object": "calculator",
+            "object": "camera",
             "codes": [
               "12",
-              "8",
+              "9",
               "4"
             ],
-            "answer": "12",
-            "face": "window"
+            "answer": "12"
           }
         },
         "slots": [
