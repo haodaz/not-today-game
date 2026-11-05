@@ -1,0 +1,142 @@
+{
+  "_note": "Animalese-style babble for voice notes (author 2026-10-17: no clear reading of any text, ever; light and quick early, lower and slower each day, mixed with hiss from day 16, only hiss on day 18). Numbers from script/tools/animalese.py. Day 10 is the calm day. pitch multiplies baseHz per speaker id; anyone not listed is 1.0.",
+  "days": {
+    "1": {
+      "baseHz": 300,
+      "syllable": 0.07,
+      "gap": 0.015,
+      "hiss": 0
+    },
+    "2": {
+      "baseHz": 300,
+      "syllable": 0.07,
+      "gap": 0.015,
+      "hiss": 0
+    },
+    "3": {
+      "baseHz": 300,
+      "syllable": 0.07,
+      "gap": 0.015,
+      "hiss": 0
+    },
+    "4": {
+      "baseHz": 260,
+      "syllable": 0.085,
+      "gap": 0.02,
+      "hiss": 0
+    },
+    "5": {
+      "baseHz": 260,
+      "syllable": 0.085,
+      "gap": 0.02,
+      "hiss": 0
+    },
+    "6": {
+      "baseHz": 260,
+      "syllable": 0.085,
+      "gap": 0.02,
+      "hiss": 0
+    },
+    "7": {
+      "baseHz": 210,
+      "syllable": 0.11,
+      "gap": 0.03,
+      "hiss": 0.03
+    },
+    "8": {
+      "baseHz": 210,
+      "syllable": 0.11,
+      "gap": 0.03,
+      "hiss": 0.03
+    },
+    "9": {
+      "baseHz": 210,
+      "syllable": 0.11,
+      "gap": 0.03,
+      "hiss": 0.03
+    },
+    "10": {
+      "baseHz": 300,
+      "syllable": 0.07,
+      "gap": 0.015,
+      "hiss": 0
+    },
+    "11": {
+      "baseHz": 160,
+      "syllable": 0.15,
+      "gap": 0.05,
+      "hiss": 0.12
+    },
+    "12": {
+      "baseHz": 160,
+      "syllable": 0.15,
+      "gap": 0.05,
+      "hiss": 0.12
+    },
+    "13": {
+      "baseHz": 120,
+      "syllable": 0.2,
+      "gap": 0.08,
+      "hiss": 0.35
+    },
+    "14": {
+      "baseHz": 120,
+      "syllable": 0.2,
+      "gap": 0.08,
+      "hiss": 0.35
+    },
+    "15": {
+      "baseHz": 120,
+      "syllable": 0.2,
+      "gap": 0.08,
+      "hiss": 0.35
+    },
+    "16": {
+      "baseHz": 100,
+      "syllable": 0.24,
+      "gap": 0.1,
+      "hiss": 0.6
+    },
+    "17": {
+      "baseHz": 100,
+      "syllable": 0.24,
+      "gap": 0.1,
+      "hiss": 0.6
+    },
+    "18": {
+      "baseHz": 90,
+      "syllable": 0.26,
+      "gap": 0.12,
+      "hiss": 1.0
+    }
+  },
+  "pitch": {
+    "boss": 1.0,
+    "laozhou": 0.82,
+    "partner": 1.3,
+    "xiaozhang": 1.18
+  },
+  "vowels": [
+    [
+      730,
+      1090
+    ],
+    [
+      530,
+      1840
+    ],
+    [
+      270,
+      2290
+    ],
+    [
+      570,
+      840
+    ],
+    [
+      300,
+      870
+    ]
+  ],
+  "gain": 0.5
+}
