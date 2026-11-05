@@ -349,12 +349,12 @@
         },
         {
           "t": "10:40",
-          "text": "轮班吧，每人睡四个小时，人总得睡。",
+          "text": "轮班吧，每人睡四个小时。你们人，总得睡。",
           "kind": "work"
         },
         {
           "t": "16:00",
-          "text": "{calledBy}钱我还你了，谢谢",
+          "text": "{calledBy}，你被借走的那笔，我找回来了。",
           "kind": "money",
           "cond_show": {
             "has": "lent"
@@ -392,7 +392,7 @@
           {
             "who": "xiaozhang",
             "t": "16:01",
-            "text": "{calledBy}你先别问他，我这边先还你"
+            "text": "{calledBy}，先别问他。东西在哪，我知道。"
           }
         ],
         "cond_show": {

@@ -315,7 +315,7 @@
       "incoming": [
         {
           "t": "09:30",
-          "text": "{calledBy}，你今天别打开那个剧本。",
+          "text": "{calledBy}，那个剧本，第二幕被人藏过一回。今天别打开。",
           "kind": "private"
         },
         {

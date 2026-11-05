@@ -349,12 +349,12 @@
         },
         {
           "t": "10:40",
-          "text": "Shifts. Everyone sleeps four hours. People have to sleep.",
+          "text": "Shifts, four hours each. You people have to sleep.",
           "kind": "work"
         },
         {
           "t": "16:00",
-          "text": "{calledBy}, I've paid you back, thanks",
+          "text": "{calledBy}, the money that was borrowed from you. I found it.",
           "kind": "money",
           "cond_show": {
             "has": "lent"
@@ -392,7 +392,7 @@
           {
             "who": "xiaozhang",
             "t": "16:01",
-            "text": "{calledBy}, don't ask him yet, I'll pay you back first"
+            "text": "{calledBy}, don't ask him yet. I know where it is."
           }
         ],
         "cond_show": {

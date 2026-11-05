@@ -348,7 +348,7 @@
         },
         {
           "t": "17:50",
-          "text": "{calledBy}老大，我想走",
+          "text": "{calledBy}，晨会最后那句英文，你能替我念一遍吗。我想走。",
           "kind": "private",
           "effects": {
             "flags": [
