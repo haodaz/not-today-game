@@ -281,6 +281,8 @@
   "board.ide.copilot": "Kuro",
   "board.ide.snapshot": "Snapshot",
   "obj.works.dark": "Too dark. The screen won't light.",
+  "obj.key.tape.rec": "Record",
+  "obj.works.recNight": "It only records at the bedside, at night.",
   "files.album": "Album",
   "title.album": "Album",
   "opening.to": "To",
