@@ -36,7 +36,8 @@ describe("kuro-days parser", () => {
         { n: 1, zh: "你好？", en: "Hi?", hard: false, minBucket: "low" },
         { n: 2, zh: "你是谁？", en: "Who?", hard: true, minBucket: "low" },
       ],
-      answers: { q: new Map(), free: null },
+      answers: { q: new Map(), free: null, zh: null },
+      redBlue: [],
     });
   });
 

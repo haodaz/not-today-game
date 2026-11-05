@@ -55,6 +55,11 @@ export interface LayeredAnswer {
   readonly mid: string;
   readonly high: string;
   readonly taboo?: Taboo;
+  /**
+   * `## Layered answers (zh)` (kuro-zh-answers R1): the same three tiers in Chinese, said on a zh
+   * turn. Absent when content has no zh line (English is said, as before). Never a taboo of its own.
+   */
+  readonly zh?: { readonly low: string; readonly mid: string; readonly high: string };
 }
 
 export interface Memory {

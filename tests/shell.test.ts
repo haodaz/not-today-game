@@ -327,7 +327,8 @@ describe("the IDE panes and the conversation", () => {
 
   it("the conversation: the beats (Kuro's portrait on the first line of a run, mine a bubble); the composer's chips", () => {
     const out = onPage().out();
-    expect(out).toMatch(/<div class="sh-kuro first" data-on="open"><img class="sh-av"[^>]*><div class="sh-kt">open-1<\/div><\/div><div class="sh-kuro" data-on="open"><span class="sh-av-gap"><\/span><div class="sh-kt">open-2<\/div><\/div><div class="sh-me" data-on="open"><div class="sh-bub">open-3<\/div><\/div>/);
+    // The fixture's lines are English with no Han: in the zh build Kuro says them uncanny (kuro-zh-answers R4).
+    expect(out).toMatch(/<div class="sh-kuro first" data-on="open"><img class="sh-av"[^>]*><div class="sh-kt"><span class="kmono plain">open-1<\/span><\/div><\/div><div class="sh-kuro" data-on="open"><span class="sh-av-gap"><\/span><div class="sh-kt"><span class="kmono plain">open-2<\/span><\/div><\/div><div class="sh-me" data-on="open"><div class="sh-bub">open-3<\/div><\/div>/);
     expect(out).toContain(`<div class="sh-composer"><button type="button" class="sh-chip" data-action="board-assist">${escapeHtml(t("board.assist"))}</button><button type="button" class="sh-chip primary" data-action="board-print" disabled>${escapeHtml(t("board.ide.snapshot"))}</button></div>`);
     expect(out).not.toContain("<textarea");
   });
@@ -335,7 +336,7 @@ describe("the IDE panes and the conversation", () => {
   it("a board without beats: one Kuro line, the board title", () => {
     const h = onPage();
     const out = renderShell(h.app(), variant({ view: undefined, ide: undefined, beats: undefined }), 1, fill).main.value;
-    expect(out).toMatch(/<div class="sh-thread"><div class="sh-kuro first" data-on="open"><img class="sh-av"[^>]*><div class="sh-kt">fixture-shell<\/div><\/div><\/div>/);
+    expect(out).toMatch(/<div class="sh-thread"><div class="sh-kuro first" data-on="open"><img class="sh-av"[^>]*><div class="sh-kt"><span class="kmono plain">fixture-shell<\/span><\/div><\/div><\/div>/);
   });
 
   it("a play-through in the shell: pick and place from the explorer, unlock, print and send; judged as before", () => {

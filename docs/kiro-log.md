@@ -2351,3 +2351,36 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
   - a working use stamped with another day still trips;
   - a not-ok use today still trips.
 - `npx tsc --noEmit`: clean. `npx vitest run`: 112 files / 2023 tests passed.
+
+## kuro-zh-answers 1–4: zh layered / offline answers, Kuro's face (2026-11-04)
+
+- R1 parsers:
+  - `supabase/functions/_shared/kuro/dayfile.ts`: `sectionLines` is now exported and matched per line. A heading may carry a note, but `## X` never matches `## X (zh)` (before, `indexOf` could hit the twin first).
+  - New `parseLayeredZh` (a zh line with a taboo fails) and `sameSet`.
+  - `parseVariableParts` attaches `zh: {low, mid, high}` to each English layered answer. The unlock sets must be equal.
+  - `types.ts`: `LayeredAnswer.zh?`.
+  - `src/world/desktop/kuro/days.ts`: the offline answers parse `## Offline answers (zh)` with the same q / free-text set (`answers.zh`, null when absent).
+- R2 picking:
+  - `lockedFor(d, q, bucket, locale = "en")` returns the zh tier on a zh turn. The taboo comes from the English line, and red-blue lines stay English. `variableLayer` passes `i.locale`; the bucket, d100 and outcome are unchanged.
+  - `offlineAnswer` reads the zh twin under `contentLocale() === "zh"`.
+- R2 bundle:
+  - `npm run bundle:kuro` carries the zh tiers through `parseVariableParts`. No content has zh sections yet, so the bundle is byte-identical and `content.ts` was not regenerated. Regenerate it once Claude adds them.
+  - The function never reads offline answers, so they are not bundled.
+- R4:
+  - New `src/world/desktop/kuro/voice.ts`:
+    - `kuroVoice(day, text, locale)` returns idiom / uncanny / none. Uncanny means one of the day's red-blue lines (every quoted line of the section, new `KuroDay.redBlue`), or a line with Latin letters and no Han in the zh build, or a `~ ` marker, which is stripped.
+    - `kuroText` and `inFace` render it.
+  - Applied in:
+    - the task shell's bubbles (plain-text Kuro lines);
+    - the work thread (`questionText`'s idiom, the tree's kuro lines, the merge line, `caughtLine`);
+    - the IDE chat;
+    - the HUD pill;
+    - the dialogue box (Kuro's voice or 屏幕). The marker is stripped before paging, and the page is wrapped at render, so the per-character reveal still works.
+  - The call and meeting have no Kuro lines today, so nothing changed there.
+  - CSS: `.kmono` / `.kmono.plain` in desktop.css. `.kpill .ln` loses its blanket monospace, so ordinary lines use the normal face.
+- Visible effect: in the zh build, English task-tree and offer lines (e.g. the upgrade offers) now show split, as R4(b) says, until they get Chinese text.
+- Tests:
+  - new `tests/kuro-zh-answers.test.ts` (12);
+  - updated `desktop-kuro`, `dialogue`, `shell` and `ide` expectations;
+  - snapshots in desktop-snapshots, dialogue, late-days, upgrades, work, work-merge and work-marks-view, edited by hand: only the new spans.
+- `npx tsc --noEmit`: clean. `npx vitest run`: 113 files / 2035 tests passed.

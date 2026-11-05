@@ -259,6 +259,10 @@ html,body{height:100%;overflow:hidden}
 .other-tab[data-side="left"]{left:4px}.other-tab[data-side="right"]{right:4px}
 .other-tab .tab-app b{display:inline-block;margin-top:4px;min-width:14px;border-radius:7px;background:var(--red);color:#fff;font-weight:500;writing-mode:horizontal-tb;text-align:center}
 .back-room{position:fixed;left:12px;top:10px;z-index:20;border:0;border-radius:8px;padding:6px 12px;background:rgba(232,228,220,.75);color:#333;font:13px var(--font);cursor:pointer;backdrop-filter:blur(8px)}
+/* kuro-zh-answers R4: Kuro's face wherever it speaks (the box, the task threads, the pill): the day's
+   idiom in its monospace; an uncanny line (怪话) in the face plus the 1 px red / blue split. */
+.kmono{font-family:"SF Mono",Menlo,monospace;font-size:.95em}
+.kmono.plain{text-shadow:1px 0 0 rgba(255,60,60,.6),-1px 0 0 rgba(60,120,255,.6)}
 /* A string the content does not have yet: visible on purpose. */
 .missing{outline:1px dashed var(--red);color:var(--red);font-family:var(--mono);font-size:11px}
 /* Ring layer (screen and beyond): stronger each ring; calm daytime renders as software. */
@@ -298,7 +302,7 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
    192 px body at the HUD's bottom right (late-days FR1). */
 .kpill{position:absolute;left:calc(50% + var(--dock-reserve) / 2 + 16px);right:228px;width:fit-content;bottom:30px;z-index:6;display:flex;align-items:center;gap:8px;padding:5px 12px 5px 5px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 6px 18px rgba(20,24,30,.12);font:12px var(--font);color:var(--ink-2);cursor:pointer}
 .kpill img{width:24px;height:24px;border-radius:50%;object-fit:cover;flex:0 0 auto}
-.kpill .ln{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--mono)}
+.kpill .ln{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kpill .on{flex:0 0 auto;color:#2f9e5b}
 .kpill .dotl{flex:0 0 auto;width:8px;height:8px;border-radius:50%;background:#f6a623;box-shadow:0 0 10px 2px rgba(246,166,35,.8)}
 .kpill .turns{flex:0 0 auto;font-family:var(--mono);color:var(--ink-3)}

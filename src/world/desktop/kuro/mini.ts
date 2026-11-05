@@ -13,6 +13,7 @@ import { bodyState, frameUrl, FRAMES, type BodyState, type MawLook } from "./bod
 import { lateRing } from "@world/late/rings";
 import { closerOut } from "@world/late/closer";
 import { kuroDay } from "./days";
+import { kuroText } from "./voice";
 import { kuroWorking } from "../workbench/work";
 
 /** Today's work-task lines, in the order the tasks were done. */
@@ -47,7 +48,7 @@ export function renderKuro(ctx: AppContext): SafeHtml {
   const say = ctx.session.dockSay && ctx.nowMs < ctx.session.dockSay.until ? ctx.session.dockSay.text : null;
   const line = say ?? lastKuroLine(ctx);
   const status = ctx.night ? html`<span class="dotl" aria-hidden="true"></span>` : html`<span class="on">${tr("shell.kuro.online")}</span>`;
-  return html`<button type="button" class="${cls("kpill", ctx.night && "blink", say !== null && "say")}" data-action="kuro-call" aria-label="${t("kuro.name")}"><img src="${frameUrl(FRAMES.idle[0], lateRing(ctx.state.day))}" alt=""><span class="ln">${line ?? ""}</span>${status}<span class="turns">${tr("kuro.turns", { n: ctx.state.chatTurnsToday })}</span></button>`;
+  return html`<button type="button" class="${cls("kpill", ctx.night && "blink", say !== null && "say")}" data-action="kuro-call" aria-label="${t("kuro.name")}"><img src="${frameUrl(FRAMES.idle[0], lateRing(ctx.state.day))}" alt=""><span class="ln">${line ? kuroText(ctx.state.day, line) : ""}</span>${status}<span class="turns">${tr("kuro.turns", { n: ctx.state.chatTurnsToday })}</span></button>`;
 }
 
 /**

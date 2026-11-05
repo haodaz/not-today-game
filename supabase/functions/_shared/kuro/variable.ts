@@ -140,9 +140,14 @@ export interface Locked {
   readonly taboo?: Taboo;
 }
 
-export function lockedFor(d: KuroDayContent | undefined, q: number, bucket: Bucket): Locked | null {
+/**
+ * The locked text for the question and bucket. A zh turn says the zh layered tier when content has
+ * one (kuro-zh-answers R2); the taboo is always the English line's. Red-blue lines stay English.
+ */
+export function lockedFor(d: KuroDayContent | undefined, q: number, bucket: Bucket, locale: ChatLocale = "en"): Locked | null {
   const layered: LayeredAnswer | undefined = d?.layered?.find((l) => l.unlock === q);
-  if (layered) return { q, text: layered[bucket], layered: true, ...(bucket === "high" && layered.taboo ? { taboo: layered.taboo } : {}) };
+  const text = (l: LayeredAnswer) => (locale === "zh" && l.zh ? l.zh[bucket] : l[bucket]);
+  if (layered) return { q, text: text(layered), layered: true, ...(bucket === "high" && layered.taboo ? { taboo: layered.taboo } : {}) };
   const red = d?.locked?.find((l) => l.unlock === q);
   return red ? { q, text: red.text, layered: false } : null;
 }
@@ -186,7 +191,7 @@ export function variableLayer(i: LayerInput): Layer {
   const dayDice = dice(i.runId, i.day);
   const d = i.content.days[String(i.day)];
   const starter = openStarter(d, bucket, i.q, i.said);
-  const locked = starter ? lockedFor(d, starter.n, bucket) : null;
+  const locked = starter ? lockedFor(d, starter.n, bucket, i.locale) : null;
   const none = { bucket, dice: dayDice, locked, roll: null, outcome: null, taboo: null, glyph: null, followup: null };
   if (!locked || !locked.layered) return none;
   const r = d100(i.runId, i.day, locked.q);

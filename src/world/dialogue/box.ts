@@ -24,6 +24,7 @@ import { historyEntries, renderHistory } from "./history";
 import { playerBox, type PlayerBoxModel } from "./kuro";
 import { pointerCls } from "@world/room/pointer";
 import { lateRing } from "@world/late/rings";
+import { inFace, kuroVoice, type KuroFace } from "@world/desktop/kuro/voice";
 import { choiceScreens, fontPx, KURO_LINE_BOX, LINE_BOX, marker, screens, type BoxGeom, type Screen } from "./layout";
 
 /**
@@ -89,6 +90,22 @@ export interface LineBoxModel {
   readonly pointer: string | false;
   /** Red eyes on the portrait (late-days FR2). */
   readonly red: boolean;
+  /** kuro-zh-answers R4: Kuro's (or 屏幕's) line in its face: the idiom, or uncanny; null otherwise. */
+  readonly face?: KuroFace;
+}
+
+/** Kuro speaks this line: its own conversation, or a day line said by 屏幕 (kuro-zh-answers R4). */
+function kuroSpeaks(head: Queued | undefined, line: { readonly k: string; readonly who?: string } | null | undefined): boolean {
+  if (!line || line.k !== "speaker") return false;
+  return head?.voice === "kuro" || line.who === "屏幕";
+}
+
+/** The line's text as the box pages it: filled, and for Kuro the `~ ` marker stripped. */
+function lineText(state: State, head: Queued | undefined, line: { readonly k: string; readonly who?: string; readonly t: string }): { text: string; face: KuroFace } {
+  const filled = fillPlaceholders(line.t, state.names);
+  if (!kuroSpeaks(head, line)) return { text: filled, face: null };
+  const v = kuroVoice(state.day, filled);
+  return { text: v.text, face: v.face };
 }
 
 /**
@@ -108,7 +125,7 @@ export function lineScreens(state: State, session: Session, events?: readonly Ga
   if (!show) return null;
   const fill = (s: string) => fillPlaceholders(s, state.names);
   const labels = show.choices?.map((c) => (c.text !== null ? fill(c.text) : t(c.labelKey!))) ?? null;
-  const all = screens(show.line ? fill(show.line.t) : null, labels, geomFor(session.dialogue.queue[0], show.line?.k), fontPx(getLocale()));
+  const all = screens(show.line ? lineText(state, session.dialogue.queue[0], show.line).text : null, labels, geomFor(session.dialogue.queue[0], show.line?.k), fontPx(getLocale()));
   return { all, page: Math.min(Math.max(0, session.dialogue.page ?? 0), all.length - 1) };
 }
 
@@ -145,6 +162,7 @@ export function lineBoxModel(state: State, events: readonly GameEvent[], session
     // The first night's hand has no checklist line: a one-time pointer on its choices.
     pointer: pointerCls(session, "raid", scr.choices.length > 0 && raidShowing(state, session)),
     red: lateRing(state.day),
+    face: line && kind === "line" ? lineText(state, head, line).face : null,
   };
 }
 
@@ -170,7 +188,7 @@ const historyChip = (): SafeHtml => html`<button type="button" class="hist" data
 
 export function renderLineBox(m: LineBoxModel): SafeHtml {
   // The whole text area reads on (a click completes a line still appearing first, polish FR3).
-  const txt = m.text || !m.choices.length ? html`<button type="button" class="txt" data-action="loop-advance">${m.text}</button>` : null;
+  const txt = m.text || !m.choices.length ? html`<button type="button" class="txt" data-action="loop-advance">${m.face ? inFace(m.face, m.text) : m.text}</button>` : null;
   const buttons = m.choices.map(
     (c) => html`<button type="button" data-action="loop-choice" data-index="${c.index}"${c.choice ? html` data-choice="${c.choice}"` : null}>${c.label}</button>`,
   );

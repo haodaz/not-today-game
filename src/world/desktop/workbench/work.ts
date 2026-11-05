@@ -26,6 +26,7 @@ import { fillPlaceholders } from "@world/replies/placeholders";
 import type { ActionContext, ActionHandler } from "../controller";
 import { frameUrl, FRAMES } from "../kuro/body";
 import { kuroDay } from "../kuro/days";
+import { kuroText } from "../kuro/voice";
 import type { AppContext, Session } from "../model";
 import { boardActions, renderBoard } from "./board";
 
@@ -201,7 +202,7 @@ export const modeChips = (klass = "chip"): SafeHtml => html`${CHIPS.map((c) => h
 export function questionText(day: number): SafeHtml {
   const idiom = kuroDay(day)?.idiom ?? null;
   const how = hasString(HOW_KEY) ? html`<p>${tr(HOW_KEY)}</p>` : null;
-  return html`${idiom ? html`<p>${idiom}</p>` : null}${how}`;
+  return html`${idiom ? html`<p>${kuroText(day, idiom)}</p>` : null}${how}`;
 }
 
 /** The ask box's markup of one item, as it was before the split. */
@@ -231,7 +232,7 @@ function doneItems(state: Pick<State, "day">, events: readonly GameEvent[], file
     if (tree?.board) return [];
     const item = file?.items.find((i) => i.done.kind === "flag" && i.done.flag === e.flag);
     if (!item) return [];
-    const said: WorkItem[] = (tree?.[e.mode].kuro ?? []).map((k) => ({ k: "kuro", text: html`${k}` }));
+    const said: WorkItem[] = (tree?.[e.mode].kuro ?? []).map((k) => ({ k: "kuro", text: kuroText(state.day, k) }));
     const merged = e.merge === undefined ? null : MERGE_CHIPS.find((c) => c.merge === e.merge)!;
     const reply: WorkItem[] = merged && hasString(merged.key) ? [{ k: "me", text: tr(merged.key) }] : [];
     return [[{ k: "me", text: fill(item.text) }, { k: "question", day: state.day, chips: false }, { k: "me", text: chipLabel(e.mode) }, ...said, ...reply] as WorkItem[]];
@@ -449,15 +450,15 @@ export function workItems(ctx: AppContext): WorkItem[] {
     const line = open.tree!.self.kuro[0];
     const pending = mergePending(w, open.tree);
     const chips = pending ? html`<div class="wchips">${mergeChips().map((c) => html`<button type="button" class="chip" data-action="wb-merge" data-merge="${c.merge ? "1" : "0"}">${tr(c.key)}</button>`)}</div>` : null;
-    if (chips) live.push({ k: "kuro", text: line ? html`${line}` : null, chips });
-    else if (line) live.push({ k: "kuro", text: html`${line}` });
+    if (chips) live.push({ k: "kuro", text: line ? kuroText(state.day, line) : null, chips });
+    else if (line) live.push({ k: "kuro", text: kuroText(state.day, line) });
     const chosen = w.merge === undefined || w.merge === null ? null : MERGE_CHIPS.find((c) => c.merge === w.merge)!;
     if (chosen) live.push({ k: "me", text: tr(chosen.key) });
   }
   const mm = markMode(w, open.tree);
   const held = dictionaryHeld(session);
   const hasMarks = !!marksOf(open.tree);
-  const caughtLine = (): void => void (w.caughtLine && live.push({ k: "kuro", text: html`${w.caughtLine}` }));
+  const caughtLine = (): void => void (w.caughtLine && live.push({ k: "kuro", text: kuroText(state.day, w.caughtLine) }));
   // A marking surface (items 1–7): a code surface always, and a doc/ledger when content lists marks.
   // 自己做 with units: Kuro hands one unit at a time (the whole surface is not shown; item 3).
   const units = unitFlow(open.tree!, w);

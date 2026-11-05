@@ -12,13 +12,23 @@ function fail(label: string, problem: string): never {
   throw new Error(`content/kuro-days ${label}: ${problem}`);
 }
 
-/** A `## <title…>` section's lines (heading excluded), or null when there is none. */
-function sectionLines(text: string, title: string): string[] | null {
-  const start = text.indexOf(`## ${title}`);
+/**
+ * A `## <title…>` section's lines (heading excluded), or null when there is none. The heading may
+ * carry a note after the title (`## Offline answers (constants; …)`); `zh` picks the Chinese twin
+ * (`## <title> (zh)…`) instead, and the plain lookup never matches the twin (kuro-zh-answers R1).
+ */
+export function sectionLines(text: string, title: string, zh = false): string[] | null {
+  const lines = text.split("\n");
+  const head = `## ${title}`;
+  const start = lines.findIndex((l) => {
+    if (!l.startsWith(head)) return false;
+    const rest = l.slice(head.length);
+    if (rest !== "" && !rest.startsWith(" ")) return false; // another title that begins the same
+    return rest.trimStart().startsWith("(zh)") === zh;
+  });
   if (start < 0) return null;
-  const rest = text.slice(start);
-  const end = rest.indexOf("\n## ", 1);
-  return (end < 0 ? rest : rest.slice(0, end)).split("\n").slice(1);
+  const end = lines.findIndex((l, i) => i > start && l.startsWith("## "));
+  return lines.slice(start + 1, end < 0 ? undefined : end);
 }
 
 /**
@@ -71,13 +81,54 @@ export function parseLayered(text: string, label: string): LayeredAnswer[] {
   return out;
 }
 
-/** All three, with the cross-checks: every unlock names a starter; one layered answer per question. */
+/** One zh layered line: the English form without a taboo. */
+type LayeredZh = { readonly unlock: number; readonly low: string; readonly mid: string; readonly high: string };
+
+/**
+ * `## Layered answers (zh)` (kuro-zh-answers R1): `- unlock: qN → low: "…" | mid: "…" | high: "…"`;
+ * the taboo stays on the English line, so a zh line carrying one fails. Null when there is no section.
+ */
+export function parseLayeredZh(text: string, label: string): LayeredZh[] | null {
+  const lines = sectionLines(text, "Layered answers", true);
+  if (lines === null) return null;
+  const out: LayeredZh[] = [];
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line.startsWith("- ") || line === "- none") continue;
+    if (/ \| taboo: \w+$/.test(line)) fail(label, `a zh layered answer carries a taboo (it stays on the English line): ${line}`);
+    const m = /^- unlock: q(\d+) → low: "(.+?)" \| mid: "(.+?)" \| high: "(.+?)"$/.exec(line);
+    if (!m) fail(label, `unreadable zh layered answer: ${line}`);
+    out.push({ unlock: Number(m[1]), low: m[2]!, mid: m[3]!, high: m[4]! });
+  }
+  return out;
+}
+
+/** The same set of question numbers, or fail naming the first difference. */
+export function sameSet(label: string, what: string, en: readonly string[], zh: readonly string[]): void {
+  const e = new Set(en);
+  const z = new Set(zh);
+  if (z.size !== zh.length) fail(label, `${what} (zh): two lines for one question`);
+  for (const k of z) if (!e.has(k)) fail(label, `${what} (zh): ${k} has no English line`);
+  for (const k of e) if (!z.has(k)) fail(label, `${what} (zh): no line for ${k}, which the English has`);
+}
+
+/**
+ * All of it, with the cross-checks: every unlock names a starter; one layered answer per question;
+ * a zh layered section has the English one's set of unlocks, and each zh tier rides on its line.
+ */
 export function parseVariableParts(text: string, label: string): { starters: StarterContent[]; locked: LockedLine[]; layered: LayeredAnswer[] } {
   const starters = parseStarters(text, label);
   const locked = parseLockedLines(text, label);
-  const layered = parseLayered(text, label);
+  const english = parseLayered(text, label);
   const known = new Set(starters.map((s) => s.n));
-  for (const l of [...locked, ...layered]) if (!known.has(l.unlock)) fail(label, `an unlock on q${l.unlock}, which is not a starter`);
-  if (new Set(layered.map((l) => l.unlock)).size !== layered.length) fail(label, "two layered answers for one question");
+  for (const l of [...locked, ...english]) if (!known.has(l.unlock)) fail(label, `an unlock on q${l.unlock}, which is not a starter`);
+  if (new Set(english.map((l) => l.unlock)).size !== english.length) fail(label, "two layered answers for one question");
+  const zh = parseLayeredZh(text, label);
+  if (zh === null) return { starters, locked, layered: english };
+  sameSet(label, "layered answers", english.map((l) => `q${l.unlock}`), zh.map((l) => `q${l.unlock}`));
+  const layered = english.map((l) => {
+    const z = zh.find((x) => x.unlock === l.unlock)!;
+    return { ...l, zh: { low: z.low, mid: z.mid, high: z.high } };
+  });
   return { starters, locked, layered };
 }

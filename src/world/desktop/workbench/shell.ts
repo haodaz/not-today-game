@@ -15,6 +15,7 @@ import { fillPlaceholders } from "@world/replies/placeholders";
 import type { ActionContext, ActionHandler } from "../controller";
 import { fileBody, fileById } from "../files/view";
 import { FRAMES, frameUrl } from "../kuro/body";
+import { kuroText } from "../kuro/voice";
 import { sentFiles, sentReplies, transcript } from "../messages/transcript";
 import { taskPageId, type AppContext, type PaneId, type Session, type ShellState } from "../model";
 import { boardActions, cardText, finishLabel, lockRow, renderBoardRead, table } from "./board";
@@ -222,11 +223,13 @@ export function conversationLines(task: Task, day: number, events: readonly Game
 const shellAv = () => html`<img class="sh-av" src="${frameUrl(FRAMES.idle[0])}" alt="" aria-hidden="true">`;
 
 /** The conversation's bubbles (R5): the player at the right; Kuro at the left, its portrait on the first line of a run. */
-function bubbles(lines: readonly { readonly who: "me" | "kuro"; readonly on: string; readonly body: SafeHtml | string }[]): SafeHtml[] {
+function bubbles(day: number, lines: readonly { readonly who: "me" | "kuro"; readonly on: string; readonly body: SafeHtml | string }[]): SafeHtml[] {
   return lines.map((l, i) => {
     if (l.who === "me") return html`<div class="sh-me" data-on="${l.on}"><div class="sh-bub">${l.body}</div></div>`;
     const first = i === 0 || lines[i - 1]!.who !== "kuro";
-    return html`<div class="${cls("sh-kuro", first && "first")}" data-on="${l.on}">${first ? shellAv() : html`<span class="sh-av-gap"></span>`}<div class="sh-kt">${l.body}</div></div>`;
+    // kuro-zh-answers R4: a plain-text Kuro line gets its face (markup from work.ts already has it).
+    const body = typeof l.body === "string" ? kuroText(day, l.body) : l.body;
+    return html`<div class="${cls("sh-kuro", first && "first")}" data-on="${l.on}">${first ? shellAv() : html`<span class="sh-av-gap"></span>`}<div class="sh-kt">${body}</div></div>`;
   });
 }
 
@@ -253,7 +256,7 @@ function workConversation(ctx: AppContext, task: Task, day: number, live: boolea
   }
   const dots = working ? html`<div class="sh-kuro typing" aria-live="polite">${shellAv()}<div class="sh-kt kscroll"><i></i><i></i><i></i></div></div>` : null;
   const input = live ? html`<div class="ask sh-ask">${workInput(ctx)}</div>` : null;
-  return html`<div class="sh-conv"><div class="sh-thread">${bubbles(lines)}${dots}</div><div class="sh-composer">${chips}${input}</div></div>`;
+  return html`<div class="sh-conv"><div class="sh-thread">${bubbles(day, lines)}${dots}</div><div class="sh-composer">${chips}${input}</div></div>`;
 }
 
 /** The pane of a task without a board (R11): its surface as worked on now, or as it reads (default open). */
@@ -272,7 +275,7 @@ function conversation(ctx: AppContext, task: Task, day: number, live: boolean, f
   const typing = session.ideTyping?.key === shellKey(day, task.id) ? session.ideTyping.times : [];
   const visible = lines.filter((_, i) => (typing[i] ?? 0) <= nowMs);
   const av = shellAv();
-  const rows = bubbles(visible.map((l) => ({ who: l.who, on: l.on, body: l.text })));
+  const rows = bubbles(day, visible.map((l) => ({ who: l.who, on: l.on, body: l.text })));
   const dots = visible.length < lines.length ? html`<div class="sh-kuro typing" aria-hidden="true">${av}<div class="sh-kt">…</div></div>` : null;
   let chips: SafeHtml | null = null;
   if (live && board && s) {

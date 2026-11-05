@@ -12,6 +12,7 @@ import { autoUnlock, boardState, canPrint, foundCardIds, isKuroCard, isObjectLoc
 import { ideOps, ideSrc, ideTranscript } from "@state/days/ide";
 import { cls, html, type SafeHtml } from "@world/html";
 import { FRAMES, frameUrl } from "../kuro/body";
+import { kuroText } from "../kuro/voice";
 import { renderMeeting } from "./meeting";
 import { hasString, t, tr } from "@world/i18n";
 import type { ActionContext, ActionHandler } from "../controller";
@@ -215,7 +216,7 @@ function ideChat(board: TaskBoard, task: Task, ctx: AppContext): SafeHtml {
   const visible = lines.filter((_, i) => (typing[i] ?? 0) <= nowMs);
   const av = html`<img class="av" src="${frameUrl(FRAMES.idle[0])}" alt="" aria-hidden="true">`;
   const bubbles = visible.map((l) =>
-    l.who === "kuro" ? html`<div class="wm them" data-on="${l.on}">${av}<div class="bub">${l.text}</div></div>` : html`<div class="wm me" data-on="${l.on}"><div class="bub">${l.text}</div></div>`,
+    l.who === "kuro" ? html`<div class="wm them" data-on="${l.on}">${av}<div class="bub">${kuroText(state.day, l.text)}</div></div>` : html`<div class="wm me" data-on="${l.on}"><div class="bub">${l.text}</div></div>`,
   );
   const dots = visible.length < lines.length ? html`<div class="wm them typing" aria-hidden="true">${av}<div class="bub">…</div></div>` : null;
   return html`<div class="ide-chat">${bubbles}${dots}</div>`;

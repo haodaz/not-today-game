@@ -184,7 +184,8 @@ describe("the IDE view (ide R2)", () => {
     expect(out).toContain('data-action="board-slot" data-slot="s1"');
     expect(out).not.toContain("btable");
     // The open beat is in the transcript: Kuro on the left with its portrait, the player on the right.
-    expect(out).toMatch(/<div class="wm them" data-on="open"><img class="av"[^>]*><div class="bub">open-1<\/div>/);
+    // The fixture's line has no Han: in the zh build Kuro says it uncanny (kuro-zh-answers R4).
+    expect(out).toMatch(/<div class="wm them" data-on="open"><img class="av"[^>]*><div class="bub"><span class="kmono plain">open-1<\/span><\/div>/);
     expect(out).toContain('<div class="wm me" data-on="open"><div class="bub">open-2</div>');
   });
 

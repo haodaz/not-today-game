@@ -194,7 +194,8 @@ describe("FR2 talking to Kuro", () => {
     const day = kuroDay(1)!;
     expect(day.starters.length).toBe(4);
     expect(box).toContain('class="dlg tagged kuro raised"');
-    expect(box).toContain(`>${escapeHtml(day.idiom)}</button>`);
+    // The idiom in Kuro's face (kuro-zh-answers R4).
+    expect(box).toContain(`><span class="kmono">${escapeHtml(day.idiom)}</span></button>`);
     expect(box).toContain('<div class="dlg-player" data-mode="choices" data-screen="1/1">');
     expect(box).toContain('<span class="who tag p">林一</span>');
     const player = box.slice(box.indexOf('<div class="dlg-player"'));
