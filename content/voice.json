@@ -138,5 +138,30 @@
       870
     ]
   ],
-  "gain": 0.5
+  "gain": 0.5,
+  "tones": {
+    "_note": "zh build only: each syllable glides along one of these pitch contours (multipliers at start and end of the syllable), like the four tones plus the neutral one, so the babble sounds like Mandarin without saying anything. Tone = a hash of the character, not its real tone. en build: flat, every third syllable 1.08 (stress).",
+    "zh": [
+      [
+        1.0,
+        1.0
+      ],
+      [
+        0.9,
+        1.12
+      ],
+      [
+        0.95,
+        0.85
+      ],
+      [
+        1.12,
+        0.82
+      ],
+      [
+        0.92,
+        0.92
+      ]
+    ]
+  }
 }
