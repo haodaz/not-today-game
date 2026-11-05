@@ -652,8 +652,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 2,
-          "zh": "课本第三页那个二是你改的。",
-          "en": "That two on page three. That was you.",
+          "zh": "计算器盖子里那个二是你改的。",
+          "en": "That two inside the calculator lid. That was you.",
           "hard": true,
           "minBucket": "low"
         },

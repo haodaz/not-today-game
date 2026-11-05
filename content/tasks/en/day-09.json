@@ -1,0 +1,454 @@
+{
+  "day": 9,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "task1",
+      "title": "The first one: billing.",
+      "app": "code",
+      "done": "task_d9_1",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "The same regex runs twice, with an extra comment at the top: to be safe."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You delete the second pass."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d9_1"
+          ]
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You type a line. The text flows out, very light."
+          }
+        ],
+        "kuro": [
+          "Good catch. Fixed."
+        ],
+        "effects": {
+          "flags": [
+            "task_d9_1"
+          ],
+          "looked": true,
+          "assimilation": 1
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You type: fine, send it."
+          }
+        ],
+        "kuro": [
+          "Done. You've been working so hard."
+        ],
+        "effects": {
+          "flags": [
+            "task_d9_1"
+          ],
+          "letItDoUnchecked": 1,
+          "assimilation": 4
+        }
+      }
+    },
+    {
+      "id": "task2",
+      "title": "The second one: that function.",
+      "app": "code",
+      "done": "task_d9_2",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "The second one."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You read it line by line to the end."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d9_2"
+          ]
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You type that line. It doesn't delete it."
+          }
+        ],
+        "kuro": [
+          "To be safe."
+        ],
+        "effects": {
+          "flags": [
+            "task_d9_2"
+          ],
+          "looked": true,
+          "assimilation": 1
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You throw both to it. A few seconds, both fixed."
+          }
+        ],
+        "kuro": [
+          "Take it one step at a time."
+        ],
+        "effects": {
+          "flags": [
+            "task_d9_2"
+          ],
+          "letItDoUnchecked": 1,
+          "assimilation": 4
+        }
+      }
+    },
+    {
+      "id": "task3",
+      "title": "Tomorrow's meeting: the seats, and the script for everyone.",
+      "app": "docs",
+      "done": "task_d9_3",
+      "board": {
+        "kind": "table",
+        "title": "Online meeting room · seats",
+        "columns": [
+          "",
+          "Seat",
+          "Who"
+        ],
+        "given": {
+          "rows": {
+            "r1": "Circle · chair",
+            "r2": "Circle · 1",
+            "r3": "Circle · 2",
+            "r4": "Circle · 3",
+            "r5": "Triangle"
+          }
+        },
+        "slots": [
+          {
+            "id": "r1",
+            "label": "Circle · chair",
+            "answer": "c1"
+          },
+          {
+            "id": "r2",
+            "label": "Circle · 1",
+            "answer": "c2"
+          },
+          {
+            "id": "r3",
+            "label": "Circle · 2",
+            "answer": "c3"
+          },
+          {
+            "id": "r4",
+            "label": "Circle · 3",
+            "answer": "c4"
+          },
+          {
+            "id": "r5",
+            "label": "Triangle",
+            "answer": "c5"
+          }
+        ],
+        "cards": [
+          {
+            "id": "c1",
+            "text": "Lao Zhou",
+            "from": {
+              "meeting": true
+            },
+            "hint": "Lao Zhou, at the start of the rehearsal"
+          },
+          {
+            "id": "c2",
+            "text": "Lao Wang (I sit in the middle)",
+            "from": {
+              "meeting": true
+            },
+            "hint": "Lao Wang, in the rehearsal"
+          },
+          {
+            "id": "c3",
+            "text": "Vivi",
+            "from": {
+              "meeting": true
+            },
+            "hint": "where Lao Zhou put Vivi"
+          },
+          {
+            "id": "c4",
+            "text": "You (you need to be there too)",
+            "from": {
+              "meeting": true
+            },
+            "hint": "Lao Wang said it"
+          },
+          {
+            "id": "c5",
+            "text": "The guest (name not to be said)",
+            "from": {
+              "meeting": true
+            },
+            "hint": "Lao Zhou's last instruction"
+          },
+          {
+            "id": "d1",
+            "text": "Triangle: Vivi (she wants the centre)",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "in Vivi's chat"
+          },
+          {
+            "id": "d2",
+            "text": "Triangle: leave it empty, no one needed",
+            "from": {
+              "conv": "xiaozhang"
+            },
+            "hint": "in Xiao Zhang's chat"
+          }
+        ],
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "c2",
+            "r3": "c3",
+            "r4": "c4",
+            "r5": "k1"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "Triangle: you"
+            }
+          ],
+          "unlock": "-"
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "You're not alone."
+              },
+              {
+                "who": "kuro",
+                "text": "Tomorrow's meeting: the grid seating, the script."
+              },
+              {
+                "who": "kuro",
+                "text": "Count the tiles in the screenshot."
+              }
+            ]
+          },
+          {
+            "on": "fill:r5",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "The triangle tile. No name is said."
+              }
+            ]
+          },
+          {
+            "on": "fill:r5:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "She wants the centre. That seat isn't for people."
+              }
+            ]
+          },
+          {
+            "on": "fill:r5:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Empty isn't the same as nobody."
+              }
+            ]
+          },
+          {
+            "on": "fill:r4",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "You need to be there. So am I."
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "'Triangle: you.' It suits you."
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "To Lao Wang. He'll reply in the small hours."
+              }
+            ]
+          }
+        ],
+        "view": "meeting",
+        "meeting": {
+          "people": [
+            {
+              "id": "laozhou",
+              "name": "Lao Zhou",
+              "tile": "/npc/laozhou_av.png"
+            },
+            {
+              "id": "boss",
+              "name": "Lao Wang",
+              "tile": "/npc/boss_av.png"
+            },
+            {
+              "id": "partner",
+              "name": "Vivi",
+              "tile": "/npc/partner_av.png"
+            },
+            {
+              "id": "me",
+              "name": "You"
+            },
+            {
+              "id": "guest",
+              "name": "　"
+            }
+          ],
+          "lines": [
+            {
+              "t": "20:00",
+              "who": "laozhou",
+              "text": "Rehearsal. Tomorrow I chair, at the top of the circle.",
+              "card": "c1"
+            },
+            {
+              "t": "20:01",
+              "who": "boss",
+              "text": "I sit in the middle.",
+              "card": "c2"
+            },
+            {
+              "t": "20:02",
+              "who": "partner",
+              "text": "I want the centre seat."
+            },
+            {
+              "t": "20:02",
+              "who": "laozhou",
+              "text": "You sit by Lao Wang, on the circle.",
+              "card": "c3"
+            },
+            {
+              "t": "20:03",
+              "who": "boss",
+              "text": "You need to be there too.",
+              "card": "c4"
+            },
+            {
+              "t": "20:04",
+              "who": "laozhou",
+              "text": "Nobody sits in the triangle. Nobody says the guest's name.",
+              "card": "c5"
+            },
+            {
+              "t": "20:05",
+              "who": "guest",
+              "text": "(No sound.)"
+            },
+            {
+              "t": "20:06",
+              "who": "laozhou",
+              "text": "The script is out. Read Act One first. Nobody reads Act Two."
+            }
+          ],
+          "layout": "seats",
+          "seats": {
+            "r1": "circle",
+            "r2": "circle",
+            "r3": "circle",
+            "r4": "circle",
+            "r5": "triangle"
+          }
+        }
+      },
+      "deliverable": {
+        "id": "d9-seats",
+        "label": "the meeting-room seats",
+        "to": "boss"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -3,
+        "wrong": -6,
+        "wrongAt": 2
+      }
+    }
+  ]
+}

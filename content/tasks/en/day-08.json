@@ -1,0 +1,391 @@
+{
+  "day": 8,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "task1",
+      "title": "Team night: when each leader gives a toast.",
+      "app": "code",
+      "done": "task_d8_1",
+      "board": {
+        "kind": "table",
+        "title": "Friday online team night · toasts",
+        "columns": [
+          "",
+          "Leader",
+          "Time"
+        ],
+        "given": {
+          "rows": {
+            "r1": "Lao Wang",
+            "r2": "Vivi",
+            "r3": "Lao Zhou",
+            "r4": "Guest"
+          },
+          "lock": {
+            "object": "calculator",
+            "codes": [
+              "17:12",
+              "18:05",
+              "16:40"
+            ],
+            "answer": "17:12",
+            "face": "window"
+          }
+        },
+        "slots": [
+          {
+            "id": "r1",
+            "label": "Lao Wang",
+            "answer": "c1"
+          },
+          {
+            "id": "r2",
+            "label": "Vivi",
+            "answer": "c2"
+          },
+          {
+            "id": "r3",
+            "label": "Lao Zhou",
+            "answer": "c3"
+          },
+          {
+            "id": "r4",
+            "label": "Guest",
+            "answer": "c4"
+          }
+        ],
+        "cards": [
+          {
+            "id": "c1",
+            "text": "15:00 until sunset (sunset 17:12)",
+            "from": {
+              "file": "t-ranks"
+            },
+            "hint": "in the ranks-and-hours sheet; sunset needs working out"
+          },
+          {
+            "id": "c2",
+            "text": "Another day (needs fair weather; it's raining)",
+            "from": {
+              "file": "t-ranks"
+            },
+            "hint": "in the ranks-and-hours sheet, and the weather"
+          },
+          {
+            "id": "c3",
+            "text": "Any hour",
+            "from": {
+              "file": "t-ranks"
+            },
+            "hint": "in the ranks-and-hours sheet"
+          },
+          {
+            "id": "c4",
+            "text": "Open when they arrive",
+            "from": {
+              "conv": "group"
+            },
+            "hint": "in the group chat"
+          },
+          {
+            "id": "d1",
+            "text": "Everyone at 7, easier to manage",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "in Vivi's chat"
+          },
+          {
+            "id": "d2",
+            "text": "No schedule, everyone eats on their own",
+            "from": {
+              "conv": "xiaozhang"
+            },
+            "hint": "in Xiao Zhang's chat"
+          }
+        ],
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "c2",
+            "r3": "c3",
+            "r4": "k1"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "You: any hour"
+            }
+          ],
+          "unlock": "17:12"
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Let's keep things simple today."
+              },
+              {
+                "who": "kuro",
+                "text": "Team night. The rank column isn't the company's ranks."
+              },
+              {
+                "who": "kuro",
+                "text": "Sunset needs working out. The calculator only lights up by the window."
+              }
+            ]
+          },
+          {
+            "on": "unlock",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "17:12. Today's sunset. Your sum beats the forecast."
+              }
+            ]
+          },
+          {
+            "on": "fill:r2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Fair weather required. It's raining. Another day."
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "At seven, nobody can be summoned."
+              }
+            ]
+          },
+          {
+            "on": "fill:r4:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Leave it unscheduled and the guest picks the hour."
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "'You: any hour.' I filled it in for you. You're always here."
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "To the group. member will say received."
+              }
+            ]
+          }
+        ]
+      },
+      "deliverable": {
+        "id": "d8-toasts",
+        "label": "the team-night schedule",
+        "to": "group"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -3,
+        "wrong": -6,
+        "wrongAt": 2
+      }
+    },
+    {
+      "id": "task2",
+      "title": "Export those four again.",
+      "app": "docs",
+      "done": "task_d8_2",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You didn't write this item."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You export the four again yourself."
+          },
+          {
+            "k": "inner",
+            "t": "I did it. I know I did it."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d8_2",
+            "redid_four"
+          ]
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It exports four, and you open them one by one."
+          }
+        ],
+        "kuro": [
+          "You did make them. That's the part I remember."
+        ],
+        "effects": {
+          "flags": [
+            "task_d8_2"
+          ],
+          "looked": true,
+          "assimilation": 1
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It exports them. All four are blank."
+          }
+        ],
+        "kuro": [
+          "Done."
+        ],
+        "effects": {
+          "flags": [
+            "task_d8_2",
+            "four_white"
+          ],
+          "letItDoUnchecked": 1,
+          "assimilation": 4
+        }
+      }
+    },
+    {
+      "id": "task3",
+      "title": "Three diagrams, posted to the group.",
+      "app": "docs",
+      "done": "task_d8_3",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "Three videos, links to three diagrams, fourteen chart pages, the formula notes, a table of contents. You quoted what he said last night."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "The paragraph you wrote yourself: 'Every value and every theory, I first built as pages and charts, and only then did it become part of the material in the videos. I've never had research training, after all; this is the best I can express it for now.'"
+          },
+          {
+            "k": "narration",
+            "t": "Sent. 23:13."
+          },
+          {
+            "k": "narration",
+            "t": "Nobody in the group replies."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d8_3",
+            "shared_three_maps"
+          ]
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It smooths the paragraph. You change 'the best' back to 'the best I can for now'."
+          },
+          {
+            "k": "narration",
+            "t": "Sent. 23:13. Nobody in the group replies."
+          }
+        ],
+        "kuro": [
+          "Smoother is not the same as yours. You noticed."
+        ],
+        "effects": {
+          "flags": [
+            "task_d8_3",
+            "shared_three_maps"
+          ],
+          "looked": true,
+          "assimilation": 1
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It writes a very proper paragraph for you and @-mentions him for you."
+          },
+          {
+            "k": "narration",
+            "t": "Sent. 23:13. Nobody in the group replies."
+          }
+        ],
+        "kuro": [
+          "Sent. Polite, complete, unread."
+        ],
+        "effects": {
+          "flags": [
+            "task_d8_3",
+            "shared_three_maps"
+          ],
+          "letItDoUnchecked": 1,
+          "assimilation": 4
+        }
+      }
+    }
+  ]
+}

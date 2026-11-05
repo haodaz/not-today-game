@@ -1,0 +1,205 @@
+{
+  "day": 8,
+  "beats": {
+    "boot": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "Mist, the second day."
+        },
+        {
+          "k": "narration",
+          "t": "The boss received only two. The other four are gone from your computer too.",
+          "where": "screen:msgs:boss"
+        },
+        {
+          "k": "inner",
+          "t": "It put them away for me. Where, it didn't say.",
+          "where": "screen"
+        }
+      ]
+    },
+    "desk": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "Everything on the desk is where it was. The pager stays on 0.7734."
+        }
+      ]
+    },
+    "shutdown": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "A zero-second voice note. You can open it; the bar runs to the end. Nothing.",
+          "where": "screen:msgs"
+        }
+      ]
+    },
+    "night": {
+      "say": [
+        {
+          "k": "sfx",
+          "t": "Bzz.",
+          "sfx": "pager-buzz"
+        },
+        {
+          "k": "speaker",
+          "who": "寻呼机",
+          "t": "0487"
+        },
+        {
+          "k": "inner",
+          "t": "I couldn't place this one. There's a table that reads it, inside the calculator lid."
+        },
+        {
+          "k": "narration",
+          "t": "The day is over."
+        }
+      ]
+    },
+    "box": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "The last little box. A broken feature phone, a flip, one corner of the screen cracked."
+        },
+        {
+          "k": "narration",
+          "t": "It won't switch on. It doesn't need to."
+        }
+      ]
+    }
+  },
+  "items": [
+    {
+      "id": "boot",
+      "text": "Boot up.",
+      "unlock": "start",
+      "done": "event:boot",
+      "required": true
+    },
+    {
+      "id": "msgs",
+      "text": "Glance at the messages.",
+      "unlock": "done:boot",
+      "done": "event:openApp:msgs",
+      "required": true
+    },
+    {
+      "id": "lunch",
+      "text": "Order lunch.",
+      "unlock": "done:msgs",
+      "done": "event:order:lunch",
+      "required": true,
+      "rewrite": "Lunch is on its way."
+    },
+    {
+      "id": "task1",
+      "text": "Team night: when each leader gives a toast.",
+      "unlock": "done:msgs",
+      "done": "flag:task_d8_1",
+      "required": true
+    },
+    {
+      "id": "task2",
+      "text": "Export those four again.",
+      "unlock": "done:task1",
+      "done": "flag:task_d8_2",
+      "required": true,
+      "origin": "them"
+    },
+    {
+      "id": "pickup",
+      "text": "Go and get it.",
+      "unlock": "event:delivery:arrives:lunch",
+      "done": "event:pickup:lunch",
+      "required": true,
+      "sfx": "doorbell",
+      "onUnlock": {
+        "say": [
+          {
+            "k": "sfx",
+            "t": "Ding-dong.",
+            "sfx": "doorbell"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eat",
+      "text": "Eat.",
+      "unlock": "done:pickup",
+      "done": "event:eat:lunch",
+      "required": false
+    },
+    {
+      "id": "box",
+      "text": "The last little box in the case is loose.",
+      "unlock": "done:pickup",
+      "done": "event:openBox",
+      "required": true
+    },
+    {
+      "id": "reply",
+      "text": "Reply to the boss.",
+      "unlock": "done:task2",
+      "done": "event:reply:boss",
+      "required": true
+    },
+    {
+      "id": "dinner",
+      "text": "Order dinner.",
+      "unlock": "done:task2",
+      "done": "event:order:dinner",
+      "required": true,
+      "rewrite": "Dinner is on its way.",
+      "when": "night"
+    },
+    {
+      "id": "task3",
+      "text": "Three diagrams, posted to the group.",
+      "unlock": "done:reply",
+      "done": "flag:task_d8_3",
+      "required": true,
+      "when": "night"
+    },
+    {
+      "id": "desk",
+      "text": "Take a look at the desk.",
+      "unlock": "done:task3",
+      "done": "event:beat:desk",
+      "required": true,
+      "when": "night"
+    },
+    {
+      "id": "shutdown",
+      "text": "Shut down.",
+      "unlock": "done:desk",
+      "done": "event:beat:shutdown",
+      "required": true,
+      "when": "night"
+    },
+    {
+      "id": "chat",
+      "text": "Talk to it a while.",
+      "unlock": "done:shutdown",
+      "done": "event:chat:any",
+      "required": false,
+      "when": "night"
+    },
+    {
+      "id": "bed",
+      "text": "Lie down.",
+      "unlock": "done:shutdown",
+      "done": "event:lieDown",
+      "required": true,
+      "locked": "requiredPending",
+      "when": "night"
+    }
+  ],
+  "delivery": {
+    "minMinutes": 2,
+    "waitMinutes": 6
+  }
+}
