@@ -499,5 +499,8 @@
   "objbar.title": "Old things",
   "objbar.notYet": "Not usable here yet.",
   "board.lock.useObject": "Check it on the {object}",
-  "board.lock.from": "The code is elsewhere: {hint}"
+  "board.lock.from": "The code is elsewhere: {hint}",
+  "obj.key.tape.dir": "Direction",
+  "obj.tape.reverseNone": "(Played backwards: only hiss.)",
+  "files.sleeptalk.backHint": "(Played backwards, there seems to be one more line.)"
 }

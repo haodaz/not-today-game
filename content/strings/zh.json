@@ -499,5 +499,8 @@
   "objbar.title": "老物件",
   "objbar.notYet": "还不能在这儿用。",
   "board.lock.useObject": "用{object}看一眼",
-  "board.lock.from": "码在别处：{hint}"
+  "board.lock.from": "码在别处：{hint}",
+  "obj.key.tape.dir": "方向",
+  "obj.tape.reverseNone": "（倒着放，只有沙沙声。）",
+  "files.sleeptalk.backHint": "（倒着放，好像还有一句。）"
 }
