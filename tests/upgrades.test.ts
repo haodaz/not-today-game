@@ -75,7 +75,7 @@ describe("offers (FR1)", () => {
     loopActions["upgrade-no"]!(act(store), { object: "pager", decline: "offer" } as DOMStringMap, null as never);
     expect(currentOffer(store.getState(), store.getEvents())).toBeNull();
     while (store.getState().day < pager.offerFrom + upgradeTable.nagAfterDays) store.appendEvent(lieDown);
-    expect(store.getState().day).toBe(8);
+    expect(store.getState().day).toBe(pager.offerFrom + upgradeTable.nagAfterDays);
     expect(currentOffer(store.getState(), store.getEvents())).toEqual({ kind: "nag", object: "pager", line: pager.nag });
     const { ctx, box } = offerBox(store);
     expect(box).toMatchSnapshot();
