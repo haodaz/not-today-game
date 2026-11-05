@@ -57,13 +57,17 @@ export function fileById(id: string): FileEntry | BinEntry | undefined {
 
 /** The folder the walkman's recordings land in (tape-record R2). */
 export const SLEEPTALK_FOLDER = "downloads";
+/** tape-reverse R2: the last line of a recording that hides a line backwards. */
+const HINT = "files.sleeptalk.backHint";
 
 /**
  * tape-record R2: each night's recording as a file in 下载 from the next morning: content's name,
  * its lines as the body. None without a `record` event that night or content for it.
  */
 export function sleeptalkFiles(events: readonly GameEvent[], day: number, table?: SleepTalkTable): FileEntry[] {
-  return caughtBy(events, day, table).map(({ night, talk }) => ({ id: sleeptalkFileId(night), name: talk.name, from: night + 1, body: { kind: "text", lines: talk.lines } }));
+  // tape-reverse R2: a night with `backwards` ends with the hint; the backwards text is never in the file.
+  const hint = (talk: { backwards?: string }) => (talk.backwards !== undefined && hasString(HINT) ? [t(HINT)] : []);
+  return caughtBy(events, day, table).map(({ night, talk }) => ({ id: sleeptalkFileId(night), name: talk.name, from: night + 1, body: { kind: "text", lines: [...talk.lines, ...hint(talk)] } }));
 }
 
 /** A file by id as it is listed today: content's files and bin, or a recording's file. */

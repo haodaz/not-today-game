@@ -2482,3 +2482,19 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
   - new `tests/photos-twin.test.ts` (3);
   - `tests/voice-babble.test.ts` +1 (the forwarded card, with the bubble rig).
 - `npx tsc --noEmit`: clean. `npx vitest run`: 118 files / 2068 tests passed. The voice-babble snapshots were already updated in this tree.
+
+## tape-reverse 1–2: the walkman plays backwards (2026-11-05)
+
+- R1:
+  - `devices.ts`: `TAPE_KEYS = ["rec", "dir"]`. The ⇄ key is the same `key()` as vol+ / vol- inside `.vol`, positioned directly left of vol- (`.vol button.dir`, devices.css). A ◀ / ▶ `.tdir` (11px, the label colour #aebccf) sits under the reel window. Neither is drawn on the upgraded walkman.
+  - `tape.ts`: `TapeState.reverse`. `dir` toggles it; while playing it goes to stop with `stopSay` and does not play; upgraded, nothing.
+  - `layer.ts`: in reverse the reels' `--spin` is negated (same speed).
+  - Session only, nothing logged.
+- R2:
+  - `sleeptalk.ts`: optional non-empty `backwards` per night; the twin needs it in both or neither (bilingual).
+  - `Recording.backwards?` (hands.ts); `sleeptalkRecordings` sets it from the night.
+  - `play` in reverse: `backwards` as one narration line, else one narration line `obj.tape.reverseNone` (ordinary recordings too), under the usual hiss.
+  - The 下载 file: `lines` + `files.sleeptalk.backHint` when the night has `backwards`; the backwards text is never in it. The transcript reads `say` only.
+- Tests: new `tests/tape-reverse.test.ts` (7), with a sleeptalk fixture through the real loader; `objects-in-hand.test.ts` TapeState literals gain `reverse: false`.
+- `npx tsc --noEmit`: clean. `npx vitest run`: 119 files / 2075 tests passed.
+- Content: no night has `backwards` yet, so nothing changes on screen until Claude moves the 「倒着放：……」 lines.

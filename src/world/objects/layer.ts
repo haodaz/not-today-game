@@ -200,8 +200,9 @@ export function createHandLayer() {
           const reel = el.querySelector<HTMLElement>(`.reel.${side}`);
           if (!reel) continue;
           reel.style.setProperty("--pack", r[side].toFixed(3));
-          // Both reels wind the same way.
-          reel.style.setProperty("--spin", `${((a[side] * 180) / Math.PI) % 360}deg`);
+          // Both reels wind the same way; in reverse (tape-reverse R1) the other way, at the same speed.
+          const deg = ((a[side] * 180) / Math.PI) % 360;
+          reel.style.setProperty("--spin", `${ts.reverse ? -deg : deg}deg`);
         }
         el.classList.toggle("playing", ts.mode !== "stop" && !env.upgraded);
       }

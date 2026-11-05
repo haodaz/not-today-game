@@ -94,7 +94,14 @@ export function envFor(state: State, events: readonly GameEvent[], session: Sess
  * label, its lines as what plays (a transcript of sound; no speaker is named).
  */
 export function sleeptalkRecordings(events: readonly GameEvent[], day: number, table?: SleepTalkTable): Recording[] {
-  return caughtBy(events, day, table).map(({ night, talk }) => ({ id: sleeptalkFileId(night), title: talk.name, after: null, say: talk.lines.map((t) => ({ k: "narration" as const, t })) }));
+  return caughtBy(events, day, table).map(({ night, talk }) => ({
+    id: sleeptalkFileId(night),
+    title: talk.name,
+    after: null,
+    say: talk.lines.map((t) => ({ k: "narration" as const, t })),
+    // tape-reverse R2: reverse play brings out only the night's `backwards` line.
+    ...(talk.backwards !== undefined ? { backwards: [{ k: "narration" as const, t: talk.backwards }] } : {}),
+  }));
 }
 
 /** The program's state for this session and day (a new day starts it again). */

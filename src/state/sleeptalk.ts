@@ -10,6 +10,8 @@ export interface SleepTalk {
   /** The file's name in 文件 → 下载. */
   readonly name: string;
   readonly lines: readonly string[];
+  /** tape-reverse R2: the one line only playing the tape backwards brings out; absent = none. */
+  readonly backwards?: string;
 }
 
 /** By night (the day the recording was made). */
@@ -36,13 +38,14 @@ export function parseSleeptalk(input: unknown, file = "sleeptalk.json"): SleepTa
     if (!/^[1-9]\d*$/.test(key)) fail(w, "must be a day number");
     if (!isRecord(v)) fail(w, "must be an object");
     const n = v as Record<string, unknown>;
-    for (const k of Object.keys(n)) if (k !== "name" && k !== "lines") fail(w, `unknown key "${k}"`);
+    for (const k of Object.keys(n)) if (k !== "name" && k !== "lines" && k !== "backwards") fail(w, `unknown key "${k}"`);
     if (typeof n.name !== "string" || n.name === "") fail(`${w}.name`, "expected a non-empty string");
     if (!Array.isArray(n.lines) || n.lines.length === 0) fail(`${w}.lines`, "must be a non-empty list");
     (n.lines as unknown[]).forEach((l, i) => {
       if (typeof l !== "string" || l === "") fail(`${w}.lines[${i}]`, "expected a non-empty string");
     });
-    out.set(Number(key), Object.freeze({ name: n.name as string, lines: Object.freeze([...(n.lines as string[])]) }));
+    if (n.backwards !== undefined && (typeof n.backwards !== "string" || n.backwards === "")) fail(`${w}.backwards`, "expected a non-empty string");
+    out.set(Number(key), Object.freeze({ name: n.name as string, lines: Object.freeze([...(n.lines as string[])]), ...(n.backwards !== undefined ? { backwards: n.backwards as string } : {}) }));
   }
   return new Map([...out].sort(([a], [b]) => a - b));
 }
@@ -56,7 +59,9 @@ export function localiseSleeptalk(zh: SleepTalkTable, en: SleepTalkTable): Sleep
   for (const [n, z] of zh) {
     const e = en.get(n)!;
     if (e.lines.length !== z.lines.length) fail(`nights.${n}.lines`, `${e.lines.length} lines, the Chinese has ${z.lines.length}`);
-    out.set(n, Object.freeze(bilingualValues(z, { name: e.name, lines: e.lines })));
+    // tape-reverse R2: `backwards` in both or in neither.
+    if ((z.backwards === undefined) !== (e.backwards === undefined)) fail(`nights.${n}.backwards`, z.backwards === undefined ? "not in the Chinese" : "missing (the Chinese has it)");
+    out.set(n, Object.freeze(bilingualValues(z, { name: e.name, lines: e.lines, ...(e.backwards !== undefined ? { backwards: e.backwards } : {}) })));
   }
   return out;
 }

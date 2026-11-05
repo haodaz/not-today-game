@@ -40,6 +40,8 @@ export interface Recording {
   /** Only after this dream night (a dream night's number), else null. */
   readonly after: number | null;
   readonly say: readonly SayLine[];
+  /** tape-reverse R2: what plays in reverse (a sleep-talk night's `backwards`); absent = nothing on it backwards. */
+  readonly backwards?: readonly SayLine[];
 }
 export interface HandEntry {
   readonly keys: readonly KeySpot[];

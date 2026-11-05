@@ -7,6 +7,7 @@ import { dreamNights } from "@state/stages";
 import { NO_FRAME, type Frame } from "./frame";
 import { step, type ObjectEnv, type Out, type Program } from "./program";
 import { NO_PRESS, pressed, upgradedHi, type KuroPress } from "./taken";
+import { t as stringOf } from "@world/i18n";
 
 /** One side of the tape, at play speed (ms). */
 export const TAPE_SIDE_MS = 10 * 60_000;
@@ -35,6 +36,8 @@ export interface TapeState {
   readonly rewound: boolean;
   /** Kuro's press tracker (object-upgrade 2026-11-03). */
   readonly press: KuroPress;
+  /** tape-reverse R1: playing backwards (the dir key; session only). */
+  readonly reverse: boolean;
 }
 
 const speed = (mode: TapeMode): number => (mode === "play" ? 1 : mode === "rec" ? TAPE_REC_RATE : mode === "ff" ? TAPE_FAST : mode === "rew" ? -TAPE_FAST : 0) / TAPE_SIDE_MS;
@@ -83,7 +86,7 @@ export const tape: Program<TapeState> = {
   id: "tape",
   channel: null,
   keySound: { id: "tape-click" },
-  init: (env) => ({ mode: "stop", since: env.t, pos0: 0, volume: VOLUME_START, index: 0, rewound: false, press: NO_PRESS }),
+  init: (env) => ({ mode: "stop", since: env.t, pos0: 0, volume: VOLUME_START, index: 0, rewound: false, press: NO_PRESS, reverse: false }),
   key(s0, key, env) {
     const t = env.t;
     const s = { ...s0, press: pressed(s0.press, env.t) };
@@ -99,7 +102,8 @@ export const tape: Program<TapeState> = {
         const rec = list[s.index];
         const out: Out[] = [{ sound: HISS, volume: vol }];
         // The new world transcribes it (the lines scroll on the walkman); the reels do not turn.
-        if (rec && !env.upgraded) out.push({ say: { key: tapeSayKey(env.day, rec.id), lines: rec.say } });
+        // tape-reverse R2: backwards, only what the recording hides there, else one line saying nothing is.
+        if (rec && !env.upgraded) out.push({ say: { key: tapeSayKey(env.day, rec.id), lines: s.reverse ? (rec.backwards ?? [{ k: "narration", t: stringOf("obj.tape.reverseNone") }]) : rec.say } });
         return step({ ...s, ...at, mode: env.upgraded ? "stop" : "play", index: rec ? s.index + 1 : s.index }, ...out);
       }
       case "stop":
@@ -117,6 +121,11 @@ export const tape: Program<TapeState> = {
       }
       case "vol-":
         return step({ ...s, volume: Math.max(0, s.volume - 1) });
+      case "dir":
+        // tape-reverse R1: flips the direction; while playing it stops the line (as stop) and does not play.
+        if (env.upgraded) return step(s);
+        if (s.mode === "play") return step({ ...s, ...at, mode: "stop", reverse: !s.reverse }, stopSay);
+        return step({ ...s, reverse: !s.reverse });
       case "rec":
         // tape-record R1: the action admits it only where and when it records; upgraded, never.
         if (env.upgraded || s.mode === "rec") return step(s);

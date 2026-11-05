@@ -41,7 +41,7 @@ export const DICT_KEYS: readonly string[] = [...DICT_ROWS_KB.join(""), "lookup",
 /** The drawn camera's keys (camera R8 / R9): the red shutter and the flash slider. */
 export const CAMERA_KEYS: readonly string[] = ["shutter", "flash"];
 /** tape-record R1: the drawn walkman's rec key (a red dot left of play; not in content's photo keys). */
-export const TAPE_KEYS: readonly string[] = ["rec"];
+export const TAPE_KEYS: readonly string[] = ["rec", "dir"];
 
 /** A key's hover label in 使用: strings `obj.key.<object>.<id>`, or nothing (digits/letters need none). */
 function keyLabel(object: string, key: string): string | null {
@@ -211,9 +211,13 @@ function tape(ctx: DeviceCtx): SafeHtml {
     : html`<div class="win">${cassette(ctx)}</div>`;
   // The volume wheel: the red mark sits at volume / VOLUME_MAX; the buttons step it.
   const mark = Math.max(0, Math.min(1, volume / VOLUME_MAX));
-  const vol = html`<div class="vol">${key("tape", "vol+", down === "vol+", live, "+")}<div class="wheel" data-obj-wheel="tape"><i style="top:${((1 - mark) * 92).toFixed(1)}px"></i></div>${key("tape", "vol-", down === "vol-", live, "−")}</div>`;
+  // tape-reverse R1: ⇄, the same key as vol+ / vol-, directly left of vol-; none when upgraded.
+  const dir = upgraded ? null : key("tape", "dir", down === "dir", live, "⇄", "dir");
+  const vol = html`<div class="vol">${key("tape", "vol+", down === "vol+", live, "+")}<div class="wheel" data-obj-wheel="tape"><i style="top:${((1 - mark) * 92).toFixed(1)}px"></i></div>${dir}${key("tape", "vol-", down === "vol-", live, "−")}</div>`;
+  // The direction under the reel window: ◀ in reverse, ▶ forwards.
+  const way = upgraded ? null : html`<span class="tdir" aria-hidden="true">${ts?.reverse ? "◀" : "▶"}</span>`;
   const cord = html`<svg class="cord" width="120" height="120" aria-hidden="true"><path d="M0 0 C 10 40, -30 70, 10 110" stroke="#dcdcdc" stroke-width="3" fill="none" stroke-linecap="round"></path></svg>`;
-  return html`<div class="${cls("dev-shell", "walk", upgraded && "upgraded", (mode === "play" || mode === "rec") && "playing", mode === "rec" && "recording")}" data-device="tape" data-mode="${mode}">${keys}<div class="body">${win}<div class="brand">${brand}${sub}</div></div>${vol}<div class="jack"></div>${cord}</div>`;
+  return html`<div class="${cls("dev-shell", "walk", upgraded && "upgraded", (mode === "play" || mode === "rec") && "playing", mode === "rec" && "recording")}" data-device="tape" data-mode="${mode}">${keys}<div class="body">${win}${way}<div class="brand">${brand}${sub}</div></div>${vol}<div class="jack"></div>${cord}</div>`;
 }
 
 /** camera R9: the ejected sheet slides out of the slot over this long. */

@@ -115,6 +115,10 @@
 .dev-shell.walk .vol .wheel{width:34px;height:96px;border-radius:8px;background:repeating-linear-gradient(#c7ced8 0 3px,#8e98a7 3px 6px);box-shadow:inset 0 0 0 2px #5d6878;position:relative;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;cursor:ns-resize}
 .dev-shell.walk .vol .wheel i{position:absolute;left:0;right:0;height:4px;background:#e74c3c;transition:top .15s}
 .dev-shell.walk .vol button{width:30px;height:24px;border-radius:6px;background:#2d3b52;color:#dfe7f3;font-size:13px;box-shadow:0 2px 0 #152033}
+/* tape-reverse R1: ⇄ is a vol key placed directly left of vol- (its width + the column's 6px gap). */
+.dev-shell.walk .vol button.dir{position:absolute;left:-31px;bottom:0}
+/* The direction under the reel window (11px, the label colour). */
+.dev-shell.walk .tdir{position:absolute;left:22px;width:266px;top:192px;text-align:center;font:11px/1 sans-serif;color:#aebccf;pointer-events:none}
 .dev-shell.walk .jack{position:absolute;right:46px;bottom:-4px;width:12px;height:10px;background:#222;border-radius:2px}
 .dev-shell.walk .cord{position:absolute;left:278px;top:244px;overflow:visible;transform-origin:0 0}
 .dev-shell.walk[data-mode="play"] .cord{animation:m-cord-sway 2.4s ease-in-out infinite}

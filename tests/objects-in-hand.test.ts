@@ -760,8 +760,8 @@ describe("holding and using (FR1)", () => {
       expect(keysOf(stopped)).not.toMatch(/\blatched\b/);
       // The reels follow packRadii: left larger at the start, right larger near the end.
       const press = { n: 0, at: -Infinity };
-      const atStart = packRadii(tapePos({ mode: "stop", since: 0, pos0: 0, volume: 6, index: 0, rewound: false, press }, 0));
-      const nearEnd = packRadii(tapePos({ mode: "stop", since: 0, pos0: 0.95, volume: 6, index: 0, rewound: false, press }, 0));
+      const atStart = packRadii(tapePos({ mode: "stop", since: 0, pos0: 0, volume: 6, index: 0, rewound: false, press, reverse: false }, 0));
+      const nearEnd = packRadii(tapePos({ mode: "stop", since: 0, pos0: 0.95, volume: 6, index: 0, rewound: false, press, reverse: false }, 0));
       expect(atStart.left).toBeGreaterThan(atStart.right);
       expect(nearEnd.right).toBeGreaterThan(nearEnd.left);
     });
