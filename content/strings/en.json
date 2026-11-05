@@ -286,6 +286,8 @@
   "opening.to": "To",
   "opening.from": "From",
   "opening.skip": "Skip",
+  "who.同事": "Colleague",
+  "who.同学": "Classmate",
   "album.cell": "Day {day} · {facing}",
   "album.count": "{n} / {total}",
   "album.back": "Back",
