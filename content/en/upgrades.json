@@ -1,0 +1,15 @@
+{
+  "_note": "克总给每件老物件单独提议升级（作者 2026-11-01）。到手次日第一次提，拒绝后隔 nagAfterDays 天再提一次，第 13 天的全员通知是最后一次、一次提全部。升级 = 物件变成新世界的东西：屏幕变高清、功能变方便；代价不说：夜里举不起来（手不要它）、借的词消失、孩子留的话被订正、桌面条上图标变高清。克总的话是英文常量；玩家的两个按钮用 strings：upgrade.yes / upgrade.no。",
+  "nagAfterDays": 3,
+  "finalOfferDay": 13,
+  "objects": {
+    "chick":      { "offerFrom": 2,  "offer": "Let me give the little one a hand. I can feed it on schedule so you never have to press anything again.", "nag": "It's still hungry, you know. I could handle that.", "gain": "自动喂；屏幕高清；坟茔变成一只会动的小鸡", "cost": "夜里举不起来；「不」从菜单消失；第 3 夜那一声再也不叫", "kuroNote": "fed it for you" },
+    "pager":      { "offerFrom": 5,  "offer": "Those numbers. I can read them for you, straight into words. No table needed.", "nag": "Another string came in last night. I could just tell you what it says.", "gain": "数字自动翻成中文；震动变成通知", "cost": "夜里举不起来；「等」消失；孩子的 0.7734 被订正成「你好」", "kuroNote": "read the pager for you" },
+    "iccard":     { "offerFrom": 8,  "offer": "That card's balance is probably zero. Let me turn it into something that still works: a balance widget, live.", "nag": "The widget would show the real number. Isn't that what you want?", "gain": "变成余额组件；磁条「可读」", "cost": "夜里举不起来；「我进去了」消失；I see 变成 balance", "kuroNote": "turned the card into a widget" },
+    "tape":       { "offerFrom": 11, "offer": "I can transcribe the tape. Every word, clean, no hiss.", "nag": "There's half a sentence on it you keep rewinding to. I could finish it for you.", "gain": "自动转文字；马达声消失", "cost": "夜里举不起来；「再说一遍」消失；那半句话被补全成通顺的一句", "kuroNote": "transcribed the tape" },
+    "dictionary": { "offerFrom": 14, "offer": "Word by word is slow. Let me give you whole sentences.", "nag": "It keeps taking idioms apart. I can put them back together.", "gain": "整句翻译；不再拆成语", "cost": "夜里举不起来；「什么意思」消失；成语里的身体不再露出来", "kuroNote": "upgraded the dictionary" },
+    "calculator": { "offerFrom": 17, "offer": "It only knows seven segments. I can show you the whole number.", "nag": "Thirteen months. I can show you the real figure.", "gain": "直接出结果；不用倒过来看", "cost": "夜里举不起来；「多少」消失；555 不再是呜呜呜", "kuroNote": "upgraded the calculator" }
+  },
+  "judgement": { "accept": { "bond": 1, "truth": -1, "evidence": "accepted an upgrade" }, "decline": { "truth": 1, "evidence": "declined an upgrade" } },
+  "finalOffer": "Everything on your desk, at once. It's what the notice says. Say the word."
+}
