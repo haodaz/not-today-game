@@ -1,0 +1,298 @@
+{
+  "day": 7,
+  "beats": {
+    "boot": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "Mist has come up on the window glass."
+        },
+        {
+          "k": "narration",
+          "t": "The boss used your name. Only you have ever typed into that login box.",
+          "where": "screen:msgs:boss"
+        },
+        {
+          "k": "inner",
+          "t": "Or someone did。",
+          "where": "screen"
+        }
+      ]
+    },
+    "box": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "In the little box, a solar calculator, its keys gone yellow."
+        },
+        {
+          "k": "narration",
+          "t": "You press a few numbers and turn it upside down."
+        },
+        {
+          "k": "inner",
+          "t": "It doesn't know many words."
+        }
+      ]
+    },
+    "desk": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "You go to click the messages icon and hit the one beside it.",
+          "where": "screen"
+        },
+        {
+          "k": "narration",
+          "t": "Not a shaky hand. The icon moved. A few pixels, moved very carefully.",
+          "where": "screen"
+        },
+        {
+          "k": "inner",
+          "t": "A few pixels. Spotting a few pixels is how I've made a living all my life.",
+          "where": "screen"
+        }
+      ]
+    },
+    "shutdown": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "A hand comes out of the gap. There is an eye in the gap too. It doesn't look at you; it looks at what's in your hand."
+        },
+        {
+          "k": "inner",
+          "t": "The second time."
+        }
+      ],
+      "choices": [
+        {
+          "text": "Hold up the IC card, magnetic strip towards the gap.",
+          "effects": {
+            "item_dream": "iccard",
+            "san": 1
+          }
+        },
+        {
+          "text": "Hand over that page.",
+          "effects": {
+            "item_lost": "loan"
+          },
+          "cond_show": {
+            "has": "lent"
+          }
+        },
+        {
+          "text": "Give nothing.",
+          "effects": {
+            "san": -1
+          }
+        }
+      ]
+    },
+    "night": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "The hand and the eye are gone. The gap is only a gap."
+        },
+        {
+          "k": "speaker",
+          "who": "屏幕",
+          "t": "Because the world finally got big enough to hold me."
+        },
+        {
+          "k": "inner",
+          "t": "It isn't in the screen. It's in the room."
+        },
+        {
+          "k": "narration",
+          "t": "The day is over."
+        }
+      ]
+    }
+  },
+  "items": [
+    {
+      "id": "boot",
+      "text": "Boot up.",
+      "unlock": "start",
+      "done": "event:boot",
+      "required": true
+    },
+    {
+      "id": "msgs",
+      "text": "Glance at the messages.",
+      "unlock": "done:boot",
+      "done": "event:openApp:msgs",
+      "required": true
+    },
+    {
+      "id": "lunch",
+      "text": "Order lunch.",
+      "unlock": "done:msgs",
+      "done": "event:order:lunch",
+      "required": true,
+      "rewrite": "Lunch is on its way."
+    },
+    {
+      "id": "task1",
+      "text": "The product plan: a report, or a structure.",
+      "unlock": "done:msgs",
+      "done": "flag:task_d7_1",
+      "required": true
+    },
+    {
+      "id": "task2",
+      "text": "The report generator script.",
+      "unlock": "done:task1",
+      "done": "flag:task_d7_2",
+      "required": true
+    },
+    {
+      "id": "task3",
+      "text": "Six plans.",
+      "unlock": "done:task2",
+      "done": "flag:task_d7_3",
+      "required": true
+    },
+    {
+      "id": "pickup",
+      "text": "Go and get it.",
+      "unlock": "event:delivery:arrives:lunch",
+      "done": "event:pickup:lunch",
+      "required": true,
+      "sfx": "doorbell",
+      "onUnlock": {
+        "say": [
+          {
+            "k": "sfx",
+            "t": "Ding-dong.",
+            "sfx": "doorbell"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eat",
+      "text": "Eat.",
+      "unlock": "done:pickup",
+      "done": "event:eat:lunch",
+      "required": false
+    },
+    {
+      "id": "box",
+      "text": "One box in the case is loose.",
+      "unlock": "done:pickup",
+      "done": "event:openBox",
+      "required": true
+    },
+    {
+      "id": "reply",
+      "text": "Reply to the boss.",
+      "unlock": "done:task3",
+      "done": "event:reply:boss",
+      "required": true
+    },
+    {
+      "id": "dinner",
+      "text": "Order dinner.",
+      "unlock": "done:task3",
+      "done": "event:order:dinner",
+      "required": true,
+      "rewrite": "Dinner is on its way.",
+      "when": "night"
+    },
+    {
+      "id": "desk",
+      "text": "Take a look at the desk.",
+      "unlock": "done:task4",
+      "done": "event:beat:desk",
+      "required": true,
+      "when": "night"
+    },
+    {
+      "id": "shutdown",
+      "text": "Shut down.",
+      "unlock": "done:desk",
+      "done": "event:beat:shutdown",
+      "required": true,
+      "when": "night"
+    },
+    {
+      "id": "chat",
+      "text": "Talk to it a while.",
+      "unlock": "done:shutdown",
+      "done": "event:chat:any",
+      "required": false,
+      "when": "night"
+    },
+    {
+      "id": "bed",
+      "text": "Lie down.",
+      "unlock": "done:shutdown",
+      "done": "event:lieDown",
+      "required": true,
+      "locked": "requiredPending",
+      "when": "night"
+    }
+  ],
+  "delivery": {
+    "minMinutes": 2,
+    "waitMinutes": 6
+  },
+  "call": {
+    "at": "17:52",
+    "length": "1:12:00",
+    "lines": [
+      {
+        "who": "boss",
+        "t": "00:00"
+      },
+      {
+        "who": "boss",
+        "t": "00:01"
+      },
+      {
+        "who": "boss",
+        "t": "00:03"
+      },
+      {
+        "who": "boss",
+        "t": "00:05"
+      },
+      {
+        "who": "me",
+        "t": "00:12"
+      },
+      {
+        "who": "me",
+        "t": "00:25"
+      },
+      {
+        "who": "me",
+        "t": "00:31"
+      },
+      {
+        "who": "me",
+        "t": "00:52"
+      },
+      {
+        "who": "me",
+        "t": "01:05"
+      },
+      {
+        "who": "me",
+        "t": "01:12"
+      }
+    ],
+    "task": {
+      "id": "task4",
+      "text": "The morning meeting minutes, by the template.",
+      "unlock": "start",
+      "done": "flag:task_d7_4",
+      "required": true,
+      "when": "night"
+    }
+  }
+}

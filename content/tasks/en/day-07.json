@@ -1,0 +1,595 @@
+{
+  "day": 7,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "task1",
+      "title": "The product plan: a report, or a structure.",
+      "app": "docs",
+      "done": "task_d7_1",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "The boss says 'report', the partner says 'structure'. The two words do not mean the same thing."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You write the outline yourself, cutting the repeated section and the dead framing line."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d7_1"
+          ]
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You ask it why it wrote both."
+          }
+        ],
+        "kuro": [
+          "Because the brief said 'report' and also 'product structure'. I kept both."
+        ],
+        "effects": {
+          "flags": [
+            "task_d7_1"
+          ],
+          "looked": true,
+          "assimilation": 1
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "The repeated section and the dead framing line stay on the page as they were."
+          }
+        ],
+        "kuro": [
+          "All done."
+        ],
+        "effects": {
+          "flags": [
+            "task_d7_1"
+          ],
+          "letItDoUnchecked": 1,
+          "assimilation": 4
+        }
+      }
+    },
+    {
+      "id": "task2",
+      "title": "The report generator script.",
+      "app": "code",
+      "done": "task_d7_2",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "Not many lines, a screen and a half. A repeated calculation, a theme parameter nobody needs."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "Three changes. You made them yourself."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d7_2"
+          ]
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You ask it what the theme parameter is for."
+          }
+        ],
+        "kuro": [
+          "So the report can be re-skinned later. Nobody asked, I know."
+        ],
+        "effects": {
+          "flags": [
+            "task_d7_2"
+          ],
+          "looked": true,
+          "assimilation": 1
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "The script runs, the numbers are right, and everything extra is still in it."
+          }
+        ],
+        "kuro": [
+          "Of course."
+        ],
+        "effects": {
+          "flags": [
+            "task_d7_2"
+          ],
+          "letItDoUnchecked": 1,
+          "assimilation": 4
+        }
+      }
+    },
+    {
+      "id": "task3",
+      "title": "Six plans.",
+      "app": "docs",
+      "done": "task_d7_3",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "Six of them, forty pages each, each telling it a different way."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You write them one by one. No lunch, not a sip of water."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d7_3",
+            "wrote_six"
+          ]
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It breaks them into six checklists and doesn't write a word for you. You write from them."
+          }
+        ],
+        "kuro": [
+          "Six outlines. Your words, not mine."
+        ],
+        "effects": {
+          "flags": [
+            "task_d7_3",
+            "wrote_six"
+          ],
+          "looked": true,
+          "assimilation": 1
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "Text pours down the window in the corner. You open the second one, turn to page 7, and stop."
+          },
+          {
+            "k": "inner",
+            "t": "Or you don't turn to it."
+          }
+        ],
+        "kuro": [
+          "Starting all six."
+        ],
+        "effects": {
+          "flags": [
+            "task_d7_3",
+            "six_by_it"
+          ],
+          "letItDoUnchecked": 1,
+          "assimilation": 4
+        }
+      }
+    },
+    {
+      "id": "task4",
+      "title": "The morning meeting minutes, by the template.",
+      "app": "docs",
+      "done": "task_d7_4",
+      "board": {
+        "kind": "table",
+        "title": "Morning meeting minutes · 2028-10-22",
+        "columns": [
+          "",
+          "Template step",
+          "What was said"
+        ],
+        "given": {
+          "rows": {
+            "r1": "1. Before the meeting",
+            "r2": "2. Roll call",
+            "r3": "3. Agenda",
+            "r4": "4. Reports",
+            "r5": "5. Closing"
+          },
+          "lock": {
+            "object": "dictionary",
+            "codes": [
+              "depart",
+              "remain",
+              "return"
+            ],
+            "answer": "depart"
+          }
+        },
+        "slots": [
+          {
+            "id": "r1",
+            "label": "Before",
+            "answer": "c1"
+          },
+          {
+            "id": "r2",
+            "label": "Roll call",
+            "answer": "c2"
+          },
+          {
+            "id": "r3",
+            "label": "Agenda",
+            "answer": "c3"
+          },
+          {
+            "id": "r4",
+            "label": "Reports",
+            "answer": "c4"
+          },
+          {
+            "id": "r5",
+            "label": "Closing",
+            "answer": "c5"
+          }
+        ],
+        "cards": [
+          {
+            "id": "c1",
+            "text": "Everyone switch your background to the same circle first",
+            "from": {
+              "meeting": true
+            },
+            "hint": "Lao Zhou, at the very start of the meeting"
+          },
+          {
+            "id": "c2",
+            "text": "Each of you state your rank and your headcount",
+            "from": {
+              "conv": "group"
+            },
+            "hint": "in Lao Zhou's group message"
+          },
+          {
+            "id": "c3",
+            "text": "Say the name of the one we're inviting correctly",
+            "from": {
+              "meeting": true
+            },
+            "hint": "Lao Zhou, after the roll call"
+          },
+          {
+            "id": "c4",
+            "text": "Whatever it asks for, agree first",
+            "from": {
+              "meeting": true
+            },
+            "hint": "Lao Wang said it"
+          },
+          {
+            "id": "c5",
+            "text": "Licence to depart to its proper place, harming no one",
+            "from": {
+              "meeting": true
+            },
+            "hint": "Lao Zhou's English line before closing"
+          },
+          {
+            "id": "d1",
+            "text": "No need to say anything at the end, just leave",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "in Vivi's chat"
+          },
+          {
+            "id": "d2",
+            "text": "Skip the roll call, we all know each other",
+            "from": {
+              "conv": "xiaozhang"
+            },
+            "hint": "in Xiao Zhang's chat"
+          }
+        ],
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "c2",
+            "r3": "c3",
+            "r4": "c4",
+            "r5": "k1"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "Meeting end time: to be decided"
+            }
+          ],
+          "unlock": "depart"
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Good to see you."
+              },
+              {
+                "who": "kuro",
+                "text": "Minutes, by the template. The template is old. Older than the company."
+              },
+              {
+                "who": "kuro",
+                "text": "The closing row is locked. Look up 'depart' in the dictionary."
+              }
+            ]
+          },
+          {
+            "on": "unlock",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Depart. To leave. Licence to depart."
+              }
+            ]
+          },
+          {
+            "on": "fill:r3",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Say the name right. Say it wrong and something else comes."
+              }
+            ]
+          },
+          {
+            "on": "fill:r5:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Leave without that line and it doesn't go."
+              }
+            ]
+          },
+          {
+            "on": "fill:r2:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Everyone has to report. It needs to know who is here."
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "'End time to be decided.' I'm in no hurry."
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "To the group. Lao Zhou will say 'very good'."
+              }
+            ]
+          }
+        ],
+        "view": "meeting",
+        "meeting": {
+          "people": [
+            {
+              "id": "laozhou",
+              "name": "Lao Zhou",
+              "tile": "/npc/laozhou_av.png"
+            },
+            {
+              "id": "boss",
+              "name": "Lao Wang",
+              "tile": "/npc/boss_av.png"
+            },
+            {
+              "id": "partner",
+              "name": "Vivi",
+              "tile": "/npc/partner_av.png"
+            },
+            {
+              "id": "xiaozhang",
+              "name": "Xiao Zhang",
+              "tile": "/npc/xiaozhang_av.png"
+            },
+            {
+              "id": "me",
+              "name": "You"
+            },
+            {
+              "id": "m1",
+              "name": "member",
+              "tile": "/npc/sil_1.png"
+            },
+            {
+              "id": "m2",
+              "name": "member",
+              "tile": "/npc/sil_2.png"
+            },
+            {
+              "id": "all",
+              "name": "Everyone"
+            }
+          ],
+          "lines": [
+            {
+              "t": "09:00",
+              "who": "laozhou",
+              "text": "Morning meeting. Everyone switch your background to the same circle first.",
+              "card": "c1"
+            },
+            {
+              "t": "09:01",
+              "who": "partner",
+              "text": "Does the colour of the circle matter?"
+            },
+            {
+              "t": "09:01",
+              "who": "laozhou",
+              "text": "Just make them all the same."
+            },
+            {
+              "t": "09:02",
+              "who": "laozhou",
+              "text": "Each of you state your rank and your headcount."
+            },
+            {
+              "t": "09:03",
+              "who": "boss",
+              "text": "King. Two hundred."
+            },
+            {
+              "t": "09:03",
+              "who": "laozhou",
+              "text": "Prince. Twenty-six."
+            },
+            {
+              "t": "09:04",
+              "who": "partner",
+              "text": "Duke. Thirty-one."
+            },
+            {
+              "t": "09:04",
+              "who": "xiaozhang",
+              "text": "Earl. Thirty-six. I'm the seventy-second."
+            },
+            {
+              "t": "09:05",
+              "who": "me",
+              "text": "R&D. Headcount: one."
+            },
+            {
+              "t": "09:05",
+              "who": "laozhou",
+              "text": "Say the name of the one we're inviting correctly.",
+              "card": "c3"
+            },
+            {
+              "t": "09:07",
+              "who": "all",
+              "text": "(A name is said. The subtitles can't show it.)"
+            },
+            {
+              "t": "09:09",
+              "who": "boss",
+              "text": "Whatever it asks for, agree first.",
+              "card": "c4"
+            },
+            {
+              "t": "09:12",
+              "who": "m1",
+              "text": "(Camera off. The name field is empty.)"
+            },
+            {
+              "t": "09:18",
+              "who": "laozhou",
+              "text": "I do here licence thee to depart unto thy proper place, without doing any injury or danger to any man or beast.",
+              "card": "c5"
+            },
+            {
+              "t": "09:19",
+              "who": "all",
+              "text": "(Everyone repeats it.)"
+            },
+            {
+              "t": "09:21",
+              "who": "laozhou",
+              "text": "Meeting closed."
+            }
+          ],
+          "layout": "grid"
+        }
+      },
+      "deliverable": {
+        "id": "d7-minutes",
+        "label": "the morning meeting minutes",
+        "to": "group"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -3,
+        "wrong": -6,
+        "wrongAt": 2
+      }
+    }
+  ]
+}
