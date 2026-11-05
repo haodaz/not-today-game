@@ -2338,3 +2338,16 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
   history; the label starts after the lamp's 400 ms, not 300 ms.
 - Tests: new `tests/opening.test.ts` (8).
 - `npx tsc --noEmit`: clean. `npx vitest run`: 112 files / 2020 tests passed.
+
+## objects-in-room task 6 (R8): no second trip (2026-11-04)
+
+- `src/world/desktop/workbench/board.ts`: new `faceLockWorkedToday` (an object lock with a `face`
+  and `lockUsedOk` today). When it holds, `lockFaceMove` returns null (no turn, no trip), and
+  `board-lock` skips the lift from the 老物件栏. It only opens the code panel, where the chips are
+  already offered.
+- Locks without a `face` are unchanged: they still lift the object in place on every click.
+- Tests: 3 new in `tests/objects-in-room.test.ts`:
+  - trip, use, return, wrong code, reopen: no camera move, no lift, chips shown, no new `useAt`;
+  - a working use stamped with another day still trips;
+  - a not-ok use today still trips.
+- `npx tsc --noEmit`: clean. `npx vitest run`: 112 files / 2023 tests passed.

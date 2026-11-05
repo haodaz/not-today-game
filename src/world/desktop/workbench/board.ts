@@ -8,7 +8,7 @@
 import type { State } from "@state/types.gen";
 import type { GameEvent } from "@state/events";
 import type { Task, TaskBoard } from "@state/days/tasks";
-import { autoUnlock, boardState, canPrint, foundCardIds, isKuroCard, isObjectLock, lockCodesOffered, lockObjectAvailable, trayCards, type BoardState } from "@state/days/board";
+import { autoUnlock, boardState, canPrint, foundCardIds, isKuroCard, isObjectLock, lockCodesOffered, lockObjectAvailable, lockUsedOk, trayCards, type BoardState } from "@state/days/board";
 import { ideOps, ideSrc, ideTranscript } from "@state/days/ide";
 import { cls, html, type SafeHtml } from "@world/html";
 import { FRAMES, frameUrl } from "../kuro/body";
@@ -41,6 +41,14 @@ function lockWaitLine(object: string): SafeHtml | null {
 }
 
 /**
+ * objects-in-room R8: a lock with a `face` whose object already worked there today (a `useAt` ok in
+ * today's log). Its 用{object}看一眼 then only opens the code panel: no turn, no lift.
+ */
+function faceLockWorkedToday(lock: NonNullable<TaskBoard["given"]["lock"]>, day: number, events: readonly GameEvent[]): boolean {
+  return isObjectLock(lock) && lock.face !== undefined && lockUsedOk(lock, day, events);
+}
+
+/**
  * The lock's 用{object}看一眼 must first take the player to the lock's `face` (objects-in-room R3):
  * an object lock with its object at hand, a face, and the player standing elsewhere (屏幕 / 桌子 are
  * 房间's). Null when the lift happens where the player is (the 老物件栏, as before).
@@ -51,6 +59,8 @@ export function lockFaceMove(ctx: ActionContext): { readonly object: string; rea
   if (!c || !lock || !isObjectLock(lock) || lock.face === undefined) return null;
   const state = ctx.store.getState();
   if (!lockObjectAvailable(c.board, state, ctx.store.getEvents())) return null;
+  // objects-in-room R8: no second trip once it has worked there today (the panel opens in place).
+  if (faceLockWorkedToday(lock, state.day, ctx.store.getEvents())) return null;
   if (stateOf(ctx, c.task, c.board).unlocked || state.upgraded[lock.object] === true) return null;
   return facingOf(ctx.session.view) === lock.face ? null : { object: lock.object, face: lock.face };
 }
@@ -300,7 +310,8 @@ const actions: Record<string, ActionHandler> = {
     const lock = c.board.given.lock;
     // objects-in-room R2: lifting it here is using it at 房间 (屏幕 is 房间's); a lock with another
     // face is taken there first by the room's own wrapper (game.ts, `lockFaceMove`).
-    if (lock && isObjectLock(lock) && lockObjectAvailable(c.board, state, events) && openObjectFromBar(ctx.session, state, lock.object)) enterUse(ctx, lock.object);
+    // objects-in-room R8: once a face lock's object worked today, the panel opens in place, no lift.
+    if (lock && isObjectLock(lock) && lockObjectAvailable(c.board, state, events) && !faceLockWorkedToday(lock, state.day, events) && openObjectFromBar(ctx.session, state, lock.object)) enterUse(ctx, lock.object);
     ctx.session.boardLockOpen = true;
     ctx.rerender();
   },

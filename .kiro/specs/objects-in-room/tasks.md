@@ -4,4 +4,4 @@
 - [x] 3. Lock with `face`: 用{object}看一眼 turns the head there (from the desktop: back to 房间 first) and lifts the object; chips only after a `useAt ok` (R3).
 - [x] 4. Tests as in R6. Log entry in docs/kiro-log.md.
 - [x] 5. R7: putting the object down after a lock's trip returns to 屏幕 (same monitor, same task page, chips shown).
-- [ ] 6. R8: no second trip once the object worked today; the lock opens the chips in place.
+- [x] 6. R8: no second trip once the object worked today; the lock opens the chips in place.

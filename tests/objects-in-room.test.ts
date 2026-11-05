@@ -425,3 +425,55 @@ describe("R7 · putting the object down after a lock's trip returns to 屏幕", 
     expect(r.session.view).toBe("bed");
   });
 });
+
+// ——— R8 · no second trip ———
+
+describe("R8 · once the object worked today, the lock opens in place", () => {
+  it("trip, use, return, wrong code, reopen → no turn, no lift, the chips shown", () => {
+    mode.lock = "face";
+    const store = day1(["chick", "calculator"]);
+    const r = onTask(store);
+    r.act("board-lock");
+    r.settle();
+    expect(r.session.view).toBe("window");
+    r.act("loop-put-down");
+    r.act("loop-put-down");
+    r.settle();
+    expect([r.session.view, r.session.boardLockOpen]).toEqual(["desktop", true]);
+    r.act("board-code", { code: "1111" });
+    expect(store.getEvents().at(-1)).toMatchObject({ kind: "boardStep", op: { t: "unlock", code: "1111" } });
+    r.session.boardLockOpen = false;
+    const uses = useAts(store.getEvents()).length;
+    const cam = r.session.cam;
+    r.act("board-lock");
+    expect(r.session.cam).toBe(cam); // no camera move started
+    r.settle();
+    expect([r.session.view, r.session.holding, r.session.lockTrip]).toEqual(["desktop", null, null]);
+    expect(r.session.boardLockOpen).toBe(true);
+    expect(chips(r.page())).toEqual(["0000", "1111"]);
+    expect(useAts(store.getEvents())).toHaveLength(uses);
+  });
+
+  it("a working use that is not today's does not count: the first click trips", () => {
+    mode.lock = "face";
+    // Yesterday's use at 窗 (stamped with the day before) is in the log.
+    const store = createStore({ startDay: 1, events: [{ kind: "useAt", day: 0, objectId: "calculator", facing: "window", ok: true }] });
+    const today = day1(["chick", "calculator"]);
+    for (const e of today.getEvents()) store.appendEvent(e);
+    const r = onTask(store);
+    r.act("board-lock");
+    r.settle();
+    expect([r.session.view, r.session.holding]).toEqual(["window", "calculator"]);
+    expect(r.session.lockTrip).not.toBeNull();
+  });
+
+  it("a not-ok use today still trips (only a working one stops it)", () => {
+    mode.lock = "face";
+    const store = day1(["chick", "calculator"]);
+    store.appendEvent({ kind: "useAt", objectId: "calculator", facing: "bed", ok: false });
+    const r = onTask(store);
+    r.act("board-lock");
+    r.settle();
+    expect(r.session.view).toBe("window");
+  });
+});
