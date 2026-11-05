@@ -37,7 +37,7 @@ function account(name: SafeHtml | string): SafeHtml {
  * One card's inner markup (without the forwarded tag). `fill` fills {placeholders} in the content
  * text. `register` only tilts a couple of shapes (the task card is DingTalk-flavoured either way).
  */
-function cardInner(card: Card, fill: (s: string) => string, register: Register): SafeHtml {
+function cardInner(card: Card, fill: (s: string) => string, register: Register, voice: VoiceView | null): SafeHtml {
   switch (card.type) {
     case "article":
       return html`<div class="c-body"><div class="c-text"><div class="c-title">${fill(card.title)}</div>${card.digest !== undefined ? html`<div class="c-digest">${fill(card.digest)}</div>` : null}</div>${cover("article", card.cover, "sq")}</div>${account(fill(card.account))}`;
@@ -65,10 +65,9 @@ function cardInner(card: Card, fill: (s: string) => string, register: Register):
       return html`<div class="c-file"><span class="${cls("fico", `x-${card.ext.toLowerCase()}`)}" aria-hidden="true">${card.ext.toUpperCase()}</span><div class="c-text"><div class="c-title one">${fill(card.name)}</div><div class="c-size">${card.size}</div></div></div>`;
     case "mini":
       return html`<div class="c-mini"><div class="c-body"><div class="c-title">${fill(card.title)}</div>${cover("mini", card.cover, "sq")}</div><div class="mini-brand">${fill(card.brand)}</div></div>`;
-    case "voice": {
-      const bars = [6, 14, 9, 16, 7, 12].map((h) => html`<i style="height:${h}px"></i>`);
-      return html`<div class="voice">${bars} ${card.seconds}″</div>`;
-    }
+    case "voice":
+      // photos-twin R2: a forwarded voice note plays like a voice bubble when the view gives it a key.
+      return voiceNote(card.seconds, null, voice, null);
     case "task": {
       const rows = card.fields.map(([k, v]) => html`<div class="tk-row"><span class="tk-k">${fill(k)}</span><span class="tk-v">${fill(v)}</span></div>`);
       const action = card.action !== undefined ? html`<div class="tk-action">${fill(card.action)}</div>` : null;
@@ -82,6 +81,34 @@ function cardInner(card: Card, fill: (s: string) => string, register: Register):
  * reads as forwarded even before content writes the label) and, when the label string exists, the
  * 「转发」 tag above it.
  */
-export function renderCard(card: Card, fill: (s: string) => string, register: Register, forwarded: boolean): SafeHtml {
-  return html`<div class="${cls("sc", `sc-${card.type}`, register, forwarded && "is-fwd")}">${forwardedTag(forwarded)}${cardInner(card, fill, register)}</div>`;
+export function renderCard(card: Card, fill: (s: string) => string, register: Register, forwarded: boolean, voice: VoiceView | null = null): SafeHtml {
+  return html`<div class="${cls("sc", `sc-${card.type}`, register, forwarded && "is-fwd")}">${forwardedTag(forwarded)}${cardInner(card, fill, register, voice)}</div>`;
+}
+
+/** voice-babble R4: what a voice note needs to be its own play / stop button. */
+export interface VoiceView {
+  /** The bubble's key (register, conversation, index): one note at a time across both apps. */
+  readonly key: string;
+  /** Whose voice (its pitch); "me" for the player's own. */
+  readonly who: string;
+  /** The note playing now, if any. */
+  readonly playing: { readonly key: string; readonly at: number } | null;
+  readonly nowMs: number;
+  /** The day plays only hiss (day 18): the note is greyed. */
+  readonly hissOnly: boolean;
+}
+
+/**
+ * A voice note's six bars and ″ count (voice-babble R4). With a view it is its own play / stop
+ * button (`voice-play`): while it plays the count runs down and the bars move (CSS); without one, the
+ * plain bubble. `text` is the filled 转文字 when there is one (what the babble's syllables follow).
+ */
+export function voiceNote(seconds: string, pill: SafeHtml | null, voice: VoiceView | null, text: string | null): SafeHtml {
+  const bars = [6, 14, 9, 16, 7, 12].map((h) => html`<i style="height:${h}px"></i>`);
+  if (!voice) return html`<div class="voice">${pill}${bars} ${seconds}″</div>`;
+  const sec = Number(seconds);
+  const playing = voice.playing !== null && voice.playing.key === voice.key;
+  const shown = playing ? Math.max(0, Math.ceil(sec - (voice.nowMs - voice.playing!.at) / 1000)) : sec;
+  const data = text !== null ? html` data-text="${text}"` : null;
+  return html`<button type="button" class="${cls("voice", playing && "playing", voice.hissOnly && "hiss-only")}" data-action="voice-play" data-voice="${voice.key}" data-sec="${seconds}" data-who="${voice.who}"${data} aria-pressed="${playing ? "true" : "false"}">${pill}${bars} ${shown}″</button>`;
 }

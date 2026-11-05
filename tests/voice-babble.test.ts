@@ -6,7 +6,7 @@ import { recipientsOn } from "@state/replies/resolve";
 import { createStore, type Store } from "@state/store";
 import type { ActionContext } from "@world/desktop/controller";
 import { messageActions } from "@world/desktop/messages/actions";
-import { renderWorkMessages } from "@world/desktop/messages/view";
+import { renderBody, renderWorkMessages, type VoiceView } from "@world/desktop/messages/view";
 import { initialSession, type AppContext, type Session } from "@world/desktop/model";
 import { babblePlan, type BabblePlan } from "@world/sound/babble";
 import { playBabble, type BabbleContext } from "@world/sound/babble-player";
@@ -309,6 +309,26 @@ describe("R4 · the voice bubble", () => {
     r.click(v!.key);
     messageActions.feed!(r.ctx, {} as DOMStringMap, null as never);
     expect(r.calls[1]!.stopped).toBe(true);
+  });
+
+  // photos-twin R2: a forwarded voice note card plays like a voice bubble (the same action and rig).
+  it("a forwarded voice card is a voice-play button; click plays it; another bubble stops it", () => {
+    const r = rig(1);
+    const view = (playing: Session["voice"]): VoiceView => ({ key: "wx:family:3", who: "father", playing, nowMs: 0, hissOnly: false });
+    const body = { type: "shared", card: { type: "voice", seconds: "5" }, raw: "[语音] 5″", forwarded: true } as const;
+    const card = () => renderBody(body, r.store.getState().names, "wx", false, view(r.session.voice)).value;
+    expect(card()).toMatch(/<div class="sc sc-voice wx is-fwd">.*<button type="button" class="voice" data-action="voice-play" data-voice="wx:family:3" data-sec="5" data-who="father" aria-pressed="false">/);
+    // Without a view (e.g. a card outside a conversation) it stays a plain card.
+    expect(renderBody(body, r.store.getState().names, "wx").value).toContain('<div class="voice">');
+    const events = r.store.getEvents().length;
+    messageActions["voice-play"]!(r.ctx, { voice: "wx:family:3", sec: "5", who: "father" } as DOMStringMap, null as never);
+    expect(r.calls).toHaveLength(1);
+    expect(r.calls[0]!.plan.syllables).toHaveLength(20); // no 转文字: round(5 × 4) syllables
+    expect(card()).toContain('class="voice playing"');
+    r.click(r.voices()[0]!.key);
+    expect(r.calls[0]!.stopped).toBe(true);
+    expect(card()).toContain('class="voice"');
+    expect(r.store.getEvents()).toHaveLength(events);
   });
 
   it("day 18: greyed, and it plays only hiss", () => {

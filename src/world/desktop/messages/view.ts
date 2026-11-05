@@ -12,7 +12,7 @@ import { fillPlaceholders } from "@world/replies/placeholders";
 import type { AppContext, Session } from "../model";
 import { voiceDay, voiceTable } from "@world/sound/voice-table";
 import { previewOf, type Body } from "./bubbles";
-import { renderCard } from "./cards";
+import { renderCard, voiceNote, type VoiceView } from "./cards";
 import { FEED, threadsIn, type ThreadApp } from "./threads";
 import { inInputText, lastMessage, lastMessageDay, sentFiles, sentReplies, SPEAKER_CONVERSATIONS, transcript, unreadCount, type Bubble, type SentReply } from "./transcript";
 
@@ -42,35 +42,17 @@ function bubbleAvatar(who: string, side: "me" | "them", alias?: string): SafeHtm
   return avImg(who, "av av-img");
 }
 
-/** voice-babble R4: what a voice bubble needs to be its own play / stop button. */
-export interface VoiceView {
-  /** The bubble's key (register, conversation, index): one note at a time across both apps. */
-  readonly key: string;
-  /** Whose voice (its pitch); "me" for the player's own. */
-  readonly who: string;
-  /** The note playing now, if any. */
-  readonly playing: { readonly key: string; readonly at: number } | null;
-  readonly nowMs: number;
-  /** The day plays only hiss (day 18): the bubble is greyed. */
-  readonly hissOnly: boolean;
-}
+export type { VoiceView } from "./cards";
 
 export function renderBody(body: Body, names: State["names"], register: Register, ding = false, voice: VoiceView | null = null): SafeHtml {
   const fill = (s: string) => fillPlaceholders(s, names);
   switch (body.type) {
     case "voice": {
-      const bars = [6, 14, 9, 16, 7, 12].map((h) => html`<i style="height:${h}px"></i>`);
       // DingTalk: the boss's voice comes with the DING pill (its word from strings; none if missing).
       const pill = ding && hasString("wb.msgs.ding") ? html`<span class="ding">${tr("wb.msgs.ding")}</span>` : null;
       const trans = body.transcript !== null ? html`<div class="trans">${tr("msgs.transcript")}${fill(body.transcript)}</div>` : null;
-      if (!voice) return html`<div class="voice">${pill}${bars} ${body.sec}″</div>${trans}`;
-      // voice-babble R4: the bubble is its own play / stop button; while it plays the ″ count runs
-      // down and the bars move (CSS). Day 18 it is greyed and plays only hiss.
-      const sec = Number(body.sec);
-      const playing = voice.playing ? voice.playing.key === voice.key : false;
-      const shown = playing ? Math.max(0, Math.ceil(sec - (voice.nowMs - voice.playing!.at) / 1000)) : sec;
-      const text = body.transcript !== null ? html` data-text="${fill(body.transcript)}"` : null;
-      return html`<button type="button" class="${cls("voice", playing && "playing", voice.hissOnly && "hiss-only")}" data-action="voice-play" data-voice="${voice.key}" data-sec="${body.sec}" data-who="${voice.who}"${text} aria-pressed="${playing ? "true" : "false"}">${pill}${bars} ${shown}″</button>${trans}`;
+      // voice-babble R4: the bubble is its own play / stop button (day 18 greyed, only hiss).
+      return html`${voiceNote(body.sec, pill, voice, body.transcript !== null ? fill(body.transcript) : null)}${trans}`;
     }
     case "card":
       // A forwarded card: an article card in WeChat, a task card in DingTalk (the same written text).
@@ -89,7 +71,8 @@ export function renderBody(body: Body, names: State["names"], register: Register
       return html`<div class="sc sc-link deliverable ${register}"><div class="c-body"><div class="c-text"><div class="c-title two">${fill(body.raw)}</div>${hasString("msgs.card.site.doc") ? html`<div class="c-site">${tr("msgs.card.site.doc")}</div>` : null}</div><span class="fico x-html" aria-hidden="true">HTML</span></div></div>`;
     case "shared":
       // A shared thing drawn as what it is (desktop-ui 2026-11-03): WeChat in 消息, DingTalk in 工作台.
-      return renderCard(body.card, fill, register, body.forwarded);
+      // photos-twin R2: a forwarded voice note card plays like a voice bubble.
+      return renderCard(body.card, fill, register, body.forwarded, body.card.type === "voice" ? voice : null);
     case "text":
       return html`<div class="bub">${fill(body.text)}</div>`;
   }
@@ -107,7 +90,8 @@ interface BubbleCtx {
 
 /** A voice bubble's play view (voice-babble R4), or null for any other body. */
 function voiceView(b: Extract<Bubble, { kind: "msg" }>, c: BubbleCtx, index: number): VoiceView | null {
-  if (b.body.type !== "voice") return null;
+  // A voice note, or a forwarded voice note card (photos-twin R2): `who` is the bubble's speaker.
+  if (b.body.type !== "voice" && !(b.body.type === "shared" && b.body.card.type === "voice")) return null;
   return { key: `${c.register}:${c.conv}:${index}`, who: b.side === "me" ? "me" : b.who, playing: c.voice, nowMs: c.nowMs, hissOnly: voiceDay(voiceTable, c.today).hiss >= 1 };
 }
 

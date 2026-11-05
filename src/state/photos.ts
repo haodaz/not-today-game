@@ -7,6 +7,7 @@
 // photo of (day, facing) or a screen photo of (at, day) shows that the eye did not: strict loader, a
 // missing file means nothing extra.
 import stagesFile from "@content/stages.json";
+import { bilingualValues } from "./content-locale";
 import type { GameEvent } from "./events";
 import { FACINGS, type Facing } from "@world/room/facings";
 
@@ -106,8 +107,10 @@ export const NO_PHOTOS: PhotosTable = Object.freeze({ room: Object.freeze([]), s
 
 type Raw = Record<string, unknown>;
 const isRecord = (v: unknown): v is Raw => typeof v === "object" && v !== null && !Array.isArray(v);
+/** The file being read: messages name it (`photos.json` or its twin `en/photos.json`). */
+let photosFile = "photos.json";
 const fail = (where: string, problem: string): never => {
-  throw new Error(`content/photos.json ${where}: ${problem}`);
+  throw new Error(`content/${photosFile} ${where}: ${problem}`);
 };
 const keys = (v: Raw, allowed: readonly string[], w: string): void => {
   for (const k of Object.keys(v)) if (!allowed.includes(k)) fail(w, `unknown key "${k}"`);
@@ -128,7 +131,17 @@ function parseAdd(v: unknown, w: string): PhotoAdd {
  * Strict (R4 as R8 amends it): `{ room: [{day, facing, add}], screen: [{at, day, add}] }`; both
  * lists optional; one entry per (day, facing) and per (at, day).
  */
-export function parsePhotos(input: unknown): PhotosTable {
+export function parsePhotos(input: unknown, file = "photos.json"): PhotosTable {
+  const before = photosFile;
+  photosFile = file;
+  try {
+    return parsePhotosFile(input);
+  } finally {
+    photosFile = before;
+  }
+}
+
+function parsePhotosFile(input: unknown): PhotosTable {
   if (!isRecord(input)) fail("", "not an object");
   keys(input as Raw, ["_note", "room", "screen"], "top level");
   const r = input as Raw;
@@ -162,10 +175,53 @@ export function parsePhotos(input: unknown): PhotosTable {
   return Object.freeze({ room: Object.freeze(room), screen: Object.freeze(screen) });
 }
 
-// Optional until Claude writes it (as content/frames/chick.json): absent = nothing extra.
+// ——— English twin (photos-twin R1, 2026-11-05) ———
+// content/en/photos.json has the same entries in the same order: the same (day, facing) / (at, day)
+// and the same overlay; only `add.text` differs, read from the twin under lang=en.
+
+const twinFail = (where: string, problem: string): never => {
+  throw new Error(`content/en/photos.json ${where}: ${problem}`);
+};
+
+/** The add with its text from the twin under lang=en; the overlay is the Chinese's (they must match). */
+function localiseAdd(z: PhotoAdd, e: PhotoAdd, w: string): PhotoAdd {
+  if (z.overlay !== e.overlay) twinFail(`${w}.add.overlay`, `${JSON.stringify(e.overlay)}, the Chinese has ${JSON.stringify(z.overlay)}`);
+  if (z.text !== undefined && e.text === undefined) twinFail(`${w}.add.text`, "missing (the Chinese has one)");
+  if (z.text === undefined && e.text !== undefined) twinFail(`${w}.add.text`, "not in the Chinese");
+  return z.text === undefined ? z : Object.freeze(bilingualValues(z, { text: e.text }));
+}
+
+/** The Chinese table, its texts read from the twin under lang=en. Pure; exported for tests. */
+export function localisePhotos(zh: PhotosTable, en: PhotosTable): PhotosTable {
+  if (zh.room.length !== en.room.length) twinFail("room", `${en.room.length} entries, the Chinese has ${zh.room.length}`);
+  if (zh.screen.length !== en.screen.length) twinFail("screen", `${en.screen.length} entries, the Chinese has ${zh.screen.length}`);
+  const room = zh.room.map((z, i) => {
+    const e = en.room[i]!;
+    const w = `room[${i}]`;
+    if (z.day !== e.day || z.facing !== e.facing) twinFail(w, `day ${e.day} ${e.facing}, the Chinese has day ${z.day} ${z.facing}`);
+    return Object.freeze({ ...z, add: localiseAdd(z.add, e.add, w) });
+  });
+  const screen = zh.screen.map((z, i) => {
+    const e = en.screen[i]!;
+    const w = `screen[${i}]`;
+    if (z.at !== e.at || z.day !== e.day) twinFail(w, `${e.at} day ${e.day}, the Chinese has ${z.at} day ${z.day}`);
+    return Object.freeze({ ...z, add: localiseAdd(z.add, e.add, w) });
+  });
+  return Object.freeze({ room: Object.freeze(room), screen: Object.freeze(screen) });
+}
+
+/** Both files or neither (absent = nothing extra); the Chinese without its twin fails, as every content twin. */
+export function loadPhotos(zhRaw: unknown, enRaw: unknown): PhotosTable {
+  if (zhRaw === undefined && enRaw === undefined) return NO_PHOTOS;
+  if (zhRaw === undefined) throw new Error("content/en/photos.json: the Chinese content/photos.json is missing");
+  if (enRaw === undefined) throw new Error("content/photos.json: its twin content/en/photos.json is missing");
+  return localisePhotos(parsePhotos(zhRaw), parsePhotos(enRaw, "en/photos.json"));
+}
+
+// Optional (as content/frames/chick.json): absent = nothing extra.
 const photoFiles = import.meta.glob("../../content/photos.json", { eager: true, import: "default" });
-const photosRaw = Object.values(photoFiles)[0];
-export const photosTable: PhotosTable = photosRaw === undefined ? NO_PHOTOS : parsePhotos(photosRaw);
+const photoFilesEn = import.meta.glob("../../content/en/photos.json", { eager: true, import: "default" });
+export const photosTable: PhotosTable = loadPhotos(Object.values(photoFiles)[0], Object.values(photoFilesEn)[0]);
 
 /** A room photo's key in the cross-run album (photo-album R1): "<day>:<facing>", the shooting day. */
 export const photoKey = (day: number, facing: Facing): string => `${day}:${facing}`;

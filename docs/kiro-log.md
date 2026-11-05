@@ -2465,3 +2465,20 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
   - `messages-groups.test.ts`: two expectations updated to the button.
   - **8 snapshots are stale** (desktop-snapshots 6, work-home-split 2): the voice bubble's new markup. They need `npx vitest run -u`, which was not run (outside the allowed commands).
 - `npx tsc --noEmit`: clean. `npx vitest run`: 117 files, 2055 passed / 8 failed (those snapshots).
+
+## photos-twin 1–2: content/en/photos.json, the forwarded voice card (2026-11-05)
+
+- R1 `src/state/photos.ts`:
+  - `parsePhotos(input, file)`: errors name the file.
+  - New `localisePhotos(zh, en)`: the same room / screen counts, the same (day, facing) / (at, day) at each index, overlay equal, text present in both or neither. `add.text` is a `bilingualValues` getter, so a locale switch re-reads without a reload (as `localiseSleeptalk`).
+  - New `loadPhotos`: both absent = `NO_PHOTOS`; one without the other fails.
+  - `photosTable` reads both through `import.meta.glob`; `photoAdds` is unchanged and returns the locale's text.
+- R2 `messages/cards.ts`:
+  - `VoiceView` and new `voiceNote(seconds, pill, view, text)` move here, shared by the voice bubble (view.ts) and the voice card.
+  - A forwarded voice card in a conversation is the same `voice-play` button. Key `register:conv:index`; `data-who` is the bubble's speaker; no `data-text`, so the babble is round(sec × 4) syllables.
+  - Same play / stop / one-at-a-time rules, nothing logged.
+  - Outside a conversation (no view) it stays the plain card.
+- Tests:
+  - new `tests/photos-twin.test.ts` (3);
+  - `tests/voice-babble.test.ts` +1 (the forwarded card, with the bubble rig).
+- `npx tsc --noEmit`: clean. `npx vitest run`: 118 files / 2068 tests passed. The voice-babble snapshots were already updated in this tree.
