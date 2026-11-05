@@ -92,10 +92,10 @@ describe("the drawer page in content order", () => {
     expect(withoutKuro).not.toContain(`data-object="${KURO_ID}"`);
   });
 
-  it("the open page carries a stage for the object and a back control", () => {
+  it("the open page carries a stage for the object and one back control (the panel's own 返回 → the grid)", () => {
     const html = drawerPage(coll({ objects: ["chick"] }), "chick").value;
     expect(html).toContain('data-drawer-stage="chick"');
-    expect(html).toContain('data-action="drawer-grid"');
+    expect(html.match(/data-action="(title-back|drawer-grid)"/g)).toEqual(['data-action="title-back"']);
   });
 });
 
@@ -181,8 +181,8 @@ describe("playing an object in the drawer touches no store", () => {
     // Press A: the chick's menu opens (the program's state changed), but no event was appended.
     click('button[data-action="obj-key"][data-object="chick"][data-key="A"]');
     expect(store.getEvents().length).toBe(before);
-    // Back to the grid and open again: a fresh program (the menu is closed again — no A pressed yet).
-    click('[data-action="drawer-grid"]');
+    // Back to the grid (the panel's 返回) and open again: a fresh program (the menu is closed again — no A pressed yet).
+    click('[data-action="title-back"]');
     click('[data-action="drawer-open"][data-object="chick"]');
     expect(stage().innerHTML).toContain('data-device="chick"');
     title.destroy();

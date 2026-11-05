@@ -50,7 +50,7 @@ export function drawerGrid(c: Collection): SafeHtml {
 /** The page: the grid, or an opened object in the middle (its body filled by the controller). */
 export function drawerPage(c: Collection, open: string | null): SafeHtml {
   const title = hasString("title.drawer") ? tr("title.drawer") : null;
-  const body = open ? html`<div class="drawer-open" data-object="${open}"><button type="button" class="drawer-back" data-action="drawer-grid">${tr("title.back")}</button><div class="drawer-stage" data-drawer-stage="${open}"></div><div class="drawer-open-name">${hasString(`obj.name.${open}`) ? tr(`obj.name.${open}`) : null}</div></div>` : drawerGrid(c);
+  const body = open ? html`<div class="drawer-open" data-object="${open}"><div class="drawer-stage" data-drawer-stage="${open}"></div><div class="drawer-open-name">${hasString(`obj.name.${open}`) ? tr(`obj.name.${open}`) : null}</div></div>` : drawerGrid(c);
   return html`<section class="title-drawer-page" aria-labelledby="title-drawer-h"><h2 id="title-drawer-h">${title}</h2>${body}<button type="button" class="title-back" data-action="title-back">${tr("title.back")}</button></section>`;
 }
 
