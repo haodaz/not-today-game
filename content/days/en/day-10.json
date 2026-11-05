@@ -1,0 +1,200 @@
+{
+  "day": 10,
+  "beats": {
+    "boot": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "The lamplight is yellow. Yesterday it went pink; today it's yellow, as yellow as on day 1."
+        },
+        {
+          "k": "narration",
+          "t": "Nothing is off. Every button is where it should be.",
+          "where": "screen"
+        },
+        {
+          "k": "inner",
+          "t": "Too normal. Normal like someone tidied the room for a guest.",
+          "where": "screen"
+        }
+      ]
+    },
+    "desk": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "The walkman sits on the edge of the desk. The tape on its lid has a corner lifting."
+        }
+      ]
+    },
+    "shutdown": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "The lamp goes out. A hand comes out of the gap, closer than ever."
+        },
+        {
+          "k": "inner",
+          "t": "Nothing happened all day. That's why it's today."
+        }
+      ],
+      "choices": [
+        {
+          "text": "Hold up the walkman.",
+          "effects": {
+            "item_dream": "tape",
+            "san": 1
+          }
+        },
+        {
+          "text": "Give nothing.",
+          "effects": {
+            "san": -1
+          }
+        }
+      ]
+    },
+    "night": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "A little light in the dark, grey-green, like looking up from very deep water."
+        },
+        {
+          "k": "narration",
+          "t": "Someone very close is turning pages; a paper edge brushes your ear."
+        },
+        {
+          "k": "inner",
+          "t": "Super-what. The empty part, I'll fill in myself."
+        },
+        {
+          "k": "narration",
+          "t": "The day is over."
+        }
+      ]
+    }
+  },
+  "items": [
+    {
+      "id": "boot",
+      "text": "Boot up.",
+      "unlock": "start",
+      "done": "event:boot",
+      "required": true
+    },
+    {
+      "id": "msgs",
+      "text": "Glance at the messages.",
+      "unlock": "done:boot",
+      "done": "event:openApp:msgs",
+      "required": true
+    },
+    {
+      "id": "work",
+      "text": "Proofread Act Two: just fix the typos, don't read too closely.",
+      "unlock": "done:msgs",
+      "done": "flag:task_d10_work",
+      "required": true
+    },
+    {
+      "id": "lunch",
+      "text": "Order lunch.",
+      "unlock": "done:msgs",
+      "done": "event:order:lunch",
+      "required": true,
+      "rewrite": "Lunch is on its way."
+    },
+    {
+      "id": "task1",
+      "text": "Go over v17.",
+      "unlock": "done:msgs",
+      "done": "flag:task_d10_1",
+      "required": true
+    },
+    {
+      "id": "task2",
+      "text": "Change one number in the receivables.",
+      "unlock": "done:task1",
+      "done": "flag:task_d10_2",
+      "required": true
+    },
+    {
+      "id": "pickup",
+      "text": "Go and get it.",
+      "unlock": "event:delivery:arrives:lunch",
+      "done": "event:pickup:lunch",
+      "required": true,
+      "sfx": "doorbell",
+      "onUnlock": {
+        "say": [
+          {
+            "k": "sfx",
+            "t": "Ding-dong.",
+            "sfx": "doorbell"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eat",
+      "text": "Eat.",
+      "unlock": "done:pickup",
+      "done": "event:eat:lunch",
+      "required": false
+    },
+    {
+      "id": "reply",
+      "text": "Reply to the boss.",
+      "unlock": "done:task2",
+      "done": "event:reply:boss",
+      "required": true
+    },
+    {
+      "id": "dinner",
+      "text": "Order dinner.",
+      "unlock": "done:task2",
+      "done": "event:order:dinner",
+      "required": true,
+      "rewrite": "Dinner is on its way.",
+      "when": "night"
+    },
+    {
+      "id": "desk",
+      "text": "Take a look at the desk.",
+      "unlock": "done:reply",
+      "done": "event:beat:desk",
+      "required": true,
+      "when": "night"
+    },
+    {
+      "id": "shutdown",
+      "text": "Shut down.",
+      "unlock": "done:desk",
+      "done": "event:beat:shutdown",
+      "required": true,
+      "when": "night"
+    },
+    {
+      "id": "chat",
+      "text": "Talk to it a while.",
+      "unlock": "done:shutdown",
+      "done": "event:chat:any",
+      "required": false,
+      "when": "night"
+    },
+    {
+      "id": "bed",
+      "text": "Lie down.",
+      "unlock": "done:shutdown",
+      "done": "event:lieDown",
+      "required": true,
+      "locked": "requiredPending",
+      "when": "night"
+    }
+  ],
+  "delivery": {
+    "minMinutes": 2,
+    "waitMinutes": 6
+  }
+}

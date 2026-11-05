@@ -1,0 +1,367 @@
+{
+  "day": 12,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "work",
+      "title": "Everyone push through this week: you make the rota, nobody sleeps.",
+      "app": "code",
+      "done": "task_d12_work",
+      "board": {
+        "kind": "table",
+        "title": "Watch rota · this week",
+        "columns": [
+          "",
+          "Hours",
+          "Who's awake"
+        ],
+        "given": {
+          "rows": {
+            "r1": "22:00–02:00",
+            "r2": "02:00–04:00",
+            "r3": "04:00–06:00",
+            "r4": "ΥΠΝΟΣ"
+          },
+          "lock": {
+            "object": "tape",
+            "codes": [
+              "northeast",
+              "southwest",
+              "due north"
+            ],
+            "answer": "northeast"
+          }
+        },
+        "slots": [
+          {
+            "id": "r1",
+            "label": "22:00–02:00",
+            "answer": "c1"
+          },
+          {
+            "id": "r2",
+            "label": "02:00–04:00",
+            "answer": "c2"
+          },
+          {
+            "id": "r3",
+            "label": "04:00–06:00",
+            "answer": "c3"
+          },
+          {
+            "id": "r4",
+            "label": "ΥΠΝΟΣ",
+            "answer": "c4"
+          }
+        ],
+        "cards": [
+          {
+            "id": "c1",
+            "text": "Everyone",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "in Lao Wang's voice note"
+          },
+          {
+            "id": "c2",
+            "text": "Everyone, with the northeast curtains drawn",
+            "from": {
+              "file": "a-sleeptalk"
+            },
+            "hint": "last night's sleep-talk recording, played backwards"
+          },
+          {
+            "id": "c3",
+            "text": "Everyone (still saying 'received' at 3 a.m.)",
+            "from": {
+              "conv": "group"
+            },
+            "hint": "look at the times in the group chat"
+          },
+          {
+            "id": "c4",
+            "text": "Delete: no such person",
+            "from": {
+              "file": "c-contacts"
+            },
+            "hint": "in the contacts export; calling gets a busy tone"
+          },
+          {
+            "id": "d1",
+            "text": "Shifts, four hours' sleep each",
+            "from": {
+              "conv": "xiaozhang"
+            },
+            "hint": "in Xiao Zhang's chat"
+          },
+          {
+            "id": "d2",
+            "text": "ΥΠΝΟΣ: on watch 02:00–04:00",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "in Vivi's chat"
+          }
+        ],
+        "kuro": {
+          "fill": {
+            "r1": "k1",
+            "r2": "c2",
+            "r3": "c3",
+            "r4": "c4"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "You: rest"
+            }
+          ],
+          "unlock": "northeast"
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "I've got your back."
+              },
+              {
+                "who": "kuro",
+                "text": "A watch rota. Nobody sleeps."
+              },
+              {
+                "who": "kuro",
+                "text": "You talked in your sleep last night; the walkman caught it. Play it backwards."
+              }
+            ]
+          },
+          {
+            "on": "unlock",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Northeast. Curtains drawn."
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "'You people have to sleep.' Xiao Zhang said so. Not this week."
+              }
+            ]
+          },
+          {
+            "on": "fill:r4:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Put him on watch and he stays."
+              }
+            ]
+          },
+          {
+            "on": "fill:r4",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "No such person. The row will still be there tomorrow."
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "In the whole rota, you're the only one who sleeps. I arranged it."
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Leave it on the desk. Sleep or not, your call."
+              }
+            ]
+          }
+        ]
+      },
+      "deliverable": {
+        "id": "d12-watch",
+        "label": "the watch rota"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -3,
+        "wrong": -6,
+        "wrongAt": 2
+      }
+    },
+    {
+      "id": "task1",
+      "title": "Look at the reconciliation result.",
+      "app": "ledger",
+      "done": "task_d12_1",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "All consistent."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You change 1+1=3 back to 2. It turns back to 3."
+          },
+          {
+            "k": "inner",
+            "t": "Consistent with yesterday."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d12_1",
+            "fought_3"
+          ]
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You open its explanation."
+          }
+        ],
+        "kuro": [
+          "Consistent means consistent with yesterday."
+        ],
+        "effects": {
+          "flags": [
+            "task_d12_1"
+          ],
+          "looked": true,
+          "assimilation": 1
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You don't click."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d12_1"
+          ],
+          "letItDoUnchecked": 1,
+          "assimilation": 4
+        }
+      }
+    },
+    {
+      "id": "task2",
+      "title": "The repayment: log a line.",
+      "app": "ledger",
+      "done": "task_d12_2",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "Forty-four thousand, back."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You log a line in the ledger."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d12_2"
+          ]
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It logs it. You look."
+          }
+        ],
+        "kuro": [
+          "Money moves. It moved back."
+        ],
+        "effects": {
+          "flags": [
+            "task_d12_2"
+          ],
+          "looked": true,
+          "assimilation": 1
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It logs it."
+          }
+        ],
+        "kuro": [
+          "Logged."
+        ],
+        "effects": {
+          "flags": [
+            "task_d12_2"
+          ],
+          "letItDoUnchecked": 1,
+          "assimilation": 4
+        }
+      }
+    }
+  ]
+}

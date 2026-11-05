@@ -1,0 +1,379 @@
+{
+  "day": 10,
+  "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
+  "tasks": [
+    {
+      "id": "work",
+      "title": "Proofread Act Two: just fix the typos, don't read too closely.",
+      "app": "code",
+      "done": "task_d10_work",
+      "board": {
+        "kind": "table",
+        "title": "The King in Yellow, Act Two · proofreading",
+        "columns": [
+          "",
+          "Words showing through in Act Two",
+          "Correct to"
+        ],
+        "given": {
+          "rows": {
+            "r1": "Casida",
+            "r2": "Lake Hari",
+            "r3": "twin eyes sink behind the lake",
+            "r4": "the Yellow Sign's shape"
+          },
+          "lock": {
+            "object": "dictionary",
+            "codes": [
+              "Hali",
+              "Hari",
+              "Hail"
+            ],
+            "answer": "Hali"
+          }
+        },
+        "slots": [
+          {
+            "id": "r1",
+            "label": "Name",
+            "answer": "c1"
+          },
+          {
+            "id": "r2",
+            "label": "Lake",
+            "answer": "c2"
+          },
+          {
+            "id": "r3",
+            "label": "Sky",
+            "answer": "c3"
+          },
+          {
+            "id": "r4",
+            "label": "Sign",
+            "answer": "c4"
+          }
+        ],
+        "cards": [
+          {
+            "id": "c1",
+            "text": "Cassilda",
+            "from": {
+              "file": "s-script"
+            },
+            "hint": "in Act One of the script (Act One is safe to read)"
+          },
+          {
+            "id": "c2",
+            "text": "Lake Hali",
+            "from": {
+              "file": "s-kiy"
+            },
+            "hint": "in Cassilda's song in Act One"
+          },
+          {
+            "id": "c3",
+            "text": "twin suns",
+            "from": {
+              "file": "s-kiy"
+            },
+            "hint": "in the same song"
+          },
+          {
+            "id": "c4",
+            "text": "the one that belongs to no human script",
+            "from": {
+              "file": "s-kiy-cover"
+            },
+            "hint": "in the cover scan, the one on the clasp"
+          },
+          {
+            "id": "d1",
+            "text": "Smooth out the whole line",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "in Vivi's chat"
+          },
+          {
+            "id": "d2",
+            "text": "Sign: the Chinese character for 'yellow'",
+            "from": {
+              "conv": "laozhou"
+            },
+            "hint": "in Lao Zhou's chat"
+          }
+        ],
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "c2",
+            "r3": "c3",
+            "r4": "k1"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "(Read in full and polished for you)"
+            }
+          ],
+          "unlock": "Hali"
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Whatever happens, I've got you."
+              },
+              {
+                "who": "kuro",
+                "text": "Act Two. One word at a time. Don't read them together."
+              },
+              {
+                "who": "kuro",
+                "text": "The locked column: look up Hali in the dictionary."
+              }
+            ]
+          },
+          {
+            "on": "unlock",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Hali. A lake. The twin suns sink behind it."
+              }
+            ]
+          },
+          {
+            "on": "fill:r1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Cassilda. Act One is safe to read."
+              }
+            ]
+          },
+          {
+            "on": "fill:r2:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Polish it and you've read it."
+              }
+            ]
+          },
+          {
+            "on": "fill:r4:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "That isn't a character. Lao Zhou knows."
+              }
+            ]
+          },
+          {
+            "on": "fill:r4",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "If you can't read it, you've got it right."
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "I read it all for you. You're fine. So am I."
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Leave it on the desk. Someone comes for it tonight."
+              }
+            ]
+          }
+        ]
+      },
+      "deliverable": {
+        "id": "d10-act2",
+        "label": "Act Two (proofread)"
+      },
+      "judge": {
+        "perfect": 0,
+        "flawed": -3,
+        "wrong": -6,
+        "wrongAt": 2
+      }
+    },
+    {
+      "id": "task1",
+      "title": "Go over v17.",
+      "app": "docs",
+      "done": "task_d10_1",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "Day 1's job. Exactly the same."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You read clauses 6 and 11 again."
+          }
+        ],
+        "kuro": [
+          "Clause 6 and clause 11 contradict each other. Want me to merge?"
+        ],
+        "effects": {
+          "flags": [
+            "task_d10_1"
+          ]
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It merges a draft. You look."
+          }
+        ],
+        "kuro": [
+          "Merged."
+        ],
+        "effects": {
+          "flags": [
+            "task_d10_1"
+          ],
+          "looked": true,
+          "assimilation": 1
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You click approve."
+          }
+        ],
+        "kuro": [
+          "Saved."
+        ],
+        "effects": {
+          "flags": [
+            "task_d10_1"
+          ],
+          "letItDoUnchecked": 1,
+          "assimilation": 4
+        }
+      }
+    },
+    {
+      "id": "task2",
+      "title": "Change one number in the receivables.",
+      "app": "ledger",
+      "done": "task_d10_2",
+      "start": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "30 to 31. You remember this. You remember doing it."
+          }
+        ],
+        "options": [
+          {
+            "mode": "self",
+            "goto": "self"
+          },
+          {
+            "mode": "look",
+            "goto": "look"
+          },
+          {
+            "mode": "let",
+            "goto": "let"
+          }
+        ]
+      },
+      "self": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "You change it. The number is 40. Not 31."
+          },
+          {
+            "k": "inner",
+            "t": "The days count up on their own."
+          }
+        ],
+        "kuro": [],
+        "effects": {
+          "flags": [
+            "task_d10_2"
+          ]
+        }
+      },
+      "look": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It changes it."
+          }
+        ],
+        "kuro": [
+          "Done. Format unchanged."
+        ],
+        "effects": {
+          "flags": [
+            "task_d10_2"
+          ],
+          "looked": true,
+          "assimilation": 1
+        }
+      },
+      "let": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "It changes it."
+          }
+        ],
+        "kuro": [
+          "Done."
+        ],
+        "effects": {
+          "flags": [
+            "task_d10_2"
+          ],
+          "letItDoUnchecked": 1,
+          "assimilation": 4
+        }
+      }
+    }
+  ]
+}

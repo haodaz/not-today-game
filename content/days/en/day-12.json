@@ -1,0 +1,190 @@
+{
+  "day": 12,
+  "beats": {
+    "boot": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "Reconciliation: all consistent. 1+1=3, marked green.",
+          "where": "screen:workbench:ledger"
+        },
+        {
+          "k": "narration",
+          "t": "The boss's voice note. The voice is his; the pauses aren't.",
+          "where": "screen:msgs:boss"
+        },
+        {
+          "k": "inner",
+          "t": "The pauses fall where Kuro's typing pauses.",
+          "where": "screen:msgs"
+        }
+      ]
+    },
+    "desk": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "Lao Zhou and your family forward the same post on the same day. From 1997.",
+          "where": "screen:msgs:laozhou"
+        },
+        {
+          "k": "speaker",
+          "who": "laozhou",
+          "t": "Is this you",
+          "where": "screen:msgs"
+        }
+      ]
+    },
+    "shutdown": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "The money is back. Forty-four thousand, not a cent short, two minutes before you clicked.",
+          "where": "screen:msgs"
+        }
+      ]
+    },
+    "night": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "You read the post again. Someone asking why the reset hole on a knock-off Tamagotchi doesn't work."
+        },
+        {
+          "k": "narration",
+          "t": "A reply under it, fifteen years later: it doesn't."
+        },
+        {
+          "k": "inner",
+          "t": "The reply is mine. I don't remember writing it."
+        },
+        {
+          "k": "narration",
+          "t": "The day is over."
+        }
+      ]
+    }
+  },
+  "items": [
+    {
+      "id": "boot",
+      "text": "Boot up.",
+      "unlock": "start",
+      "done": "event:boot",
+      "required": true
+    },
+    {
+      "id": "msgs",
+      "text": "Glance at the messages.",
+      "unlock": "done:boot",
+      "done": "event:openApp:msgs",
+      "required": true
+    },
+    {
+      "id": "work",
+      "text": "Everyone push through this week: you make the rota, nobody sleeps.",
+      "unlock": "done:msgs",
+      "done": "flag:task_d12_work",
+      "required": true
+    },
+    {
+      "id": "lunch",
+      "text": "Order lunch.",
+      "unlock": "done:msgs",
+      "done": "event:order:lunch",
+      "required": true,
+      "rewrite": "Lunch is on its way."
+    },
+    {
+      "id": "task1",
+      "text": "Look at the reconciliation result.",
+      "unlock": "done:msgs",
+      "done": "flag:task_d12_1",
+      "required": true
+    },
+    {
+      "id": "task2",
+      "text": "The repayment: log a line.",
+      "unlock": "done:task1",
+      "done": "flag:task_d12_2",
+      "required": true
+    },
+    {
+      "id": "pickup",
+      "text": "Go and get it.",
+      "unlock": "event:delivery:arrives:lunch",
+      "done": "event:pickup:lunch",
+      "required": true,
+      "sfx": "doorbell",
+      "onUnlock": {
+        "say": [
+          {
+            "k": "sfx",
+            "t": "Ding-dong.",
+            "sfx": "doorbell"
+          }
+        ]
+      }
+    },
+    {
+      "id": "eat",
+      "text": "Eat.",
+      "unlock": "done:pickup",
+      "done": "event:eat:lunch",
+      "required": false
+    },
+    {
+      "id": "reply",
+      "text": "Reply to the boss.",
+      "unlock": "done:task2",
+      "done": "event:reply:boss",
+      "required": true
+    },
+    {
+      "id": "dinner",
+      "text": "Order dinner.",
+      "unlock": "done:task2",
+      "done": "event:order:dinner",
+      "required": true,
+      "rewrite": "Dinner is on its way.",
+      "when": "night"
+    },
+    {
+      "id": "desk",
+      "text": "Take a look at the desk.",
+      "unlock": "done:reply",
+      "done": "event:beat:desk",
+      "required": true,
+      "when": "night"
+    },
+    {
+      "id": "shutdown",
+      "text": "Shut down.",
+      "unlock": "done:desk",
+      "done": "event:beat:shutdown",
+      "required": true,
+      "when": "night"
+    },
+    {
+      "id": "chat",
+      "text": "Talk to it a while.",
+      "unlock": "done:shutdown",
+      "done": "event:chat:any",
+      "required": false,
+      "when": "night"
+    },
+    {
+      "id": "bed",
+      "text": "Lie down.",
+      "unlock": "done:shutdown",
+      "done": "event:lieDown",
+      "required": true,
+      "locked": "requiredPending",
+      "when": "night"
+    }
+  ],
+  "delivery": {
+    "minMinutes": 2,
+    "waitMinutes": 6
+  }
+}
