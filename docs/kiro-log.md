@@ -2396,3 +2396,11 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
 - Content was not touched. Both files already carry the same English, so nothing changes on screen until Claude writes the Chinese in `content/upgrades.json`.
 - Tests: new `tests/upgrades-twin.test.ts` (4): shape, missing / unknown keys, days, judgement, order, locale pick.
 - `npx tsc --noEmit`: clean. `npx vitest run`: 114 files / 2039 tests passed.
+
+## speaker-names 1: non-NPC speakers named by `who.<who>` strings (2026-11-05)
+
+- `src/world/npc.ts` `speakerLabel`: an NPC still shows its npc.json `name` string. Anyone else shows `who.<who>` when the active locale's strings have it (`stringIn(getLocale(), …)`, so there is no cross-locale fallback), else `who` as written. The placeholder filler applies to either.
+- The dialogue box tag and the ↺ history both go through it. Silhouettes are still keyed by `who` (`silhouetteFor`), so a speaker keeps the same face in both locales.
+- Content already has `who.同事` / `who.同学` in both string tables; content was not touched.
+- Tests: new `tests/speaker-names.test.ts` (4): NPC unchanged, 同学 / 同事 in en and zh, unknown as written, the box tag and the silhouette.
+- `npx tsc --noEmit`: clean. `npx vitest run`: 115 files / 2043 tests passed.

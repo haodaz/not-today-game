@@ -1,7 +1,7 @@
 // NPC portraits and avatars from content/npc.json (dialogue addition 2026-11-01; desktop-ui
 // addition 2026-11-01). Loaded once at import; strict: unknown keys rejected. Pure.
 import npcFile from "@content/npc.json";
-import { stringIn, t } from "./i18n";
+import { getLocale, stringIn, t } from "./i18n";
 
 export interface NpcEntry {
   /** The strings key for the display name, e.g. "msgs.boss". */
@@ -103,8 +103,14 @@ export function npcIdOf(prefix: string): string | null {
   return null;
 }
 
-/** A speaker's name for a tag: the NPC's display name when `who` is an npc id, else as written. */
+/**
+ * A speaker's name for a tag: the NPC's display name when `who` is an npc id; else the string
+ * `who.<who>` when the active strings have it (speaker-names 2026-11-05: 同学 → Classmate in en);
+ * else as written. The silhouette stays keyed by `who` itself.
+ */
 export function speakerLabel(who: string, written: (s: string) => string = (s) => s): string {
   const key = npcName(who);
-  return key !== null ? t(key) : written(who);
+  if (key !== null) return t(key);
+  const named = stringIn(getLocale(), `who.${who}`);
+  return written(named ?? who);
 }
