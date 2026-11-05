@@ -2404,3 +2404,31 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
 - Content already has `who.同事` / `who.同学` in both string tables; content was not touched.
 - Tests: new `tests/speaker-names.test.ts` (4): NPC unchanged, 同学 / 同事 in en and zh, unknown as written, the box tag and the silhouette.
 - `npx tsc --noEmit`: clean. `npx vitest run`: 115 files / 2043 tests passed.
+
+## tape-record 1–3: the walkman records at the bedside (2026-11-05)
+
+- R1 rec:
+  - `devices.ts`: `TAPE_KEYS = ["rec"]`. The drawn walkman has a red ● key left of play, not shown when upgraded. The shell gets `.recording` and `data-mode="rec"`. CSS in devices.css.
+  - `objects/works.ts`: `REC_WORKS = { at: ["bed"], line: "obj.works.recNight" }`, read through the same `worksAt`. `recWorksHere` adds the night (`isNight(session.clock)`, after shutdown, before lying down) and false when upgraded.
+  - `game.ts` `obj-key` admits `rec` as a device key and hands it to `pressRec`:
+    - where rec works: a `record` event (once a night, checked against the log) and the program's `rec` key;
+    - elsewhere: the line as one inner line (`d<day>:works:tape:rec`) and nothing else;
+    - upgraded: nothing.
+  - `tape.ts`: a new `rec` mode turns the reels at `TAPE_REC_RATE` (0.25 × play). The program state resets on the next day, so the reels stop when the player lies down.
+  - `events.ts`: new kind `record` (`applyRecord`: the tape must be found and not upgraded); `tests/events.test.ts` list updated.
+- R2 sleeptalk:
+  - New `src/state/sleeptalk.ts`:
+    - strict `parseSleeptalk`;
+    - `localiseSleeptalk`: the twin must have the same nights and line counts; name and lines are bilingual;
+    - `loadSleeptalk`: both files absent = nothing; one without the other fails;
+    - both files are read through `import.meta.glob`, so missing files mean no recordings;
+    - `caughtBy(events, day)`: nights before `day` with a `record` event and content;
+    - `sleeptalkFileId`.
+  - 文件 → 下载: `sleeptalkFiles` lists each caught night from the next morning (content's name, its lines as a text body). `fileListedById` lets `file-open` open it and log `open file:sleeptalk-N`.
+  - Walkman: `ObjectEnv.sleeptalk` (set for the tape in `envFor`) is appended to the tape's `playList`, so the existing play / ff / rew / stop and the transcript play it. Its lines play as narration (a transcript of sound; no speaker named).
+- Not built, because nothing exists to reuse for them:
+  - dragging or "open with" a file into the walkman: it plays through the tape's own play list instead;
+  - reversed play showing the last line: rew only rewinds today.
+- Content was not touched; `content/sleeptalk.json` and its twin do not exist yet.
+- Tests: new `tests/tape-record.test.ts` (8): rec at 床 at night, elsewhere / by day, upgraded, next-morning file and en, no file, plays on the tape, the loader, the twin.
+- `npx tsc --noEmit`: clean. `npx vitest run`: 116 files / 2051 tests passed.

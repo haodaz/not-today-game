@@ -4,9 +4,9 @@
 import type { GameEvent } from "@state/events";
 import { handOf } from "@state/hands";
 import type { State } from "@state/types.gen";
-import { worksAt, type Place } from "@state/works";
+import { worksAt, type Place, type Works } from "@state/works";
 import type { ActionContext } from "@world/desktop/controller";
-import { isEvening } from "@world/desktop/beat";
+import { isEvening, isNight } from "@world/desktop/beat";
 import type { Session, View } from "@world/desktop/model";
 import { hasString, t } from "@world/i18n";
 import { push } from "@world/loop/dialogue";
@@ -26,6 +26,17 @@ export function placeOf(session: Pick<Session, "view" | "lampOn" | "clock">): Pl
 /** The object works where the player is now (no rule, or upgraded: anywhere). */
 export function worksHere(state: State, session: Pick<Session, "view" | "lampOn" | "clock">, id: string): boolean {
   return worksAt(handOf(id).works, state.upgraded[id] === true, placeOf(session));
+}
+
+/**
+ * tape-record R1: the walkman's `rec` key has its own `works` rule (that key only): at 床, and only at
+ * night (after the shutdown beat, before lying down). Facing through the same `worksAt`; the night is
+ * the beat clock's. Upgraded, it never records (Kuro transcribes instead).
+ */
+export const REC_WORKS: Works = Object.freeze({ at: Object.freeze(["bed" as const]), line: "obj.works.recNight" });
+export function recWorksHere(state: State, session: Pick<Session, "view" | "lampOn" | "clock">): boolean {
+  if (state.upgraded.tape === true) return false;
+  return isNight(session.clock) && worksAt(REC_WORKS, false, placeOf(session));
 }
 
 /** A `useAt` with this outcome is already in today's log for the object at the facing. */

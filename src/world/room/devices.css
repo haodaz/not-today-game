@@ -99,6 +99,8 @@
 .dev-shell.walk .keys button{width:52px;height:34px;border-radius:6px 6px 0 0;background:linear-gradient(#d9dee6,#a9b2bf);color:#3a4250;font-size:13px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.18);transition:transform .08s}
 .dev-shell.walk .keys button.latched{transform:translateY(6px);background:linear-gradient(#bfc6d1,#949eac)}
 .dev-shell.walk .keys button.play{color:#c0392b}
+/* tape-record R1: rec, a red dot left of play. */
+.dev-shell.walk .keys button.rec{color:#e0302a;font-size:15px}
 .dev-shell.walk .body{position:absolute;inset:0;border-radius:16px;background:linear-gradient(160deg,#6f87a6,#3d5372);box-shadow:inset 0 3px 0 rgba(255,255,255,.18),inset 0 -6px 0 rgba(0,0,0,.3),0 18px 40px rgba(0,0,0,.5)}
 .dev-shell.walk .win{position:absolute;left:22px;top:22px;width:250px;height:150px;border-radius:10px;background:#1c2330;padding:8px;box-shadow:inset 0 0 0 3px #2b3546}
 .dev-shell.walk .win .cassette{position:relative;width:100%;height:100%;border-radius:6px;background:linear-gradient(#2a3342,#1b2230);overflow:hidden}

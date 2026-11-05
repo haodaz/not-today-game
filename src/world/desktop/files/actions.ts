@@ -4,7 +4,7 @@
 // the file's `onOpen` line once a day. Closing the window and the open file is session-only.
 import { push } from "@world/loop/dialogue";
 import type { ActionContext, ActionHandler } from "../controller";
-import { ALBUM_TAB, fileById, photoOpenId } from "./view";
+import { ALBUM_TAB, fileListedById, photoOpenId } from "./view";
 import { albumPhotos, DEVELOP_BLANK_MS, DEVELOP_MS, ON_THE_SPOT_DAY, photoKey, photoStage, roomFacingOf, type DevelopStage } from "@state/photos";
 import { filesData } from "@state/files";
 
@@ -53,13 +53,14 @@ export const filesActions: Record<string, ActionHandler> = {
   "file-open"(ctx, data) {
     const app = ctx.session.filesApp;
     const id = data.file;
-    if (!app || !id || !fileById(id)) return;
+    // tape-record R2: a recording's file in 下载 opens like content's.
+    const day = ctx.store.getState().day;
+    const file = id ? fileListedById(id, ctx.store.getEvents(), day) : undefined;
+    if (!app || !id || !file) return;
     ctx.session.filesApp = { ...app, open: id };
     // Opening a file is one `open` event (the same channel the Vivi lock reads).
     ctx.store.appendEvent({ kind: "open", target: `file:${id}`, t: ctx.session.clock.time });
     // Its `onOpen` line plays once a day.
-    const file = fileById(id)!;
-    const day = ctx.store.getState().day;
     const sayKey = `${day}:${id}`;
     if (file.onOpen && !ctx.session.filesSaid.has(sayKey)) {
       ctx.session.filesSaid.add(sayKey);

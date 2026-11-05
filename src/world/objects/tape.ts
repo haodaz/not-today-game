@@ -19,7 +19,10 @@ export const VOLUME_MAX = 10;
 export const VOLUME_START = 6;
 const HISS = "tape-hiss";
 
-export type TapeMode = "stop" | "play" | "ff" | "rew";
+/** `rec` (tape-record R1): recording at the bedside; the reels turn slowly until the day ends. */
+export type TapeMode = "stop" | "play" | "ff" | "rew" | "rec";
+/** Recording runs this much slower than play (the reels turn slowly). */
+export const TAPE_REC_RATE = 0.25;
 export interface TapeState {
   readonly mode: TapeMode;
   /** When the current mode began (session ms) and where the tape was then (0 = start, 1 = end). */
@@ -34,7 +37,7 @@ export interface TapeState {
   readonly press: KuroPress;
 }
 
-const speed = (mode: TapeMode): number => (mode === "play" ? 1 : mode === "ff" ? TAPE_FAST : mode === "rew" ? -TAPE_FAST : 0) / TAPE_SIDE_MS;
+const speed = (mode: TapeMode): number => (mode === "play" ? 1 : mode === "rec" ? TAPE_REC_RATE : mode === "ff" ? TAPE_FAST : mode === "rew" ? -TAPE_FAST : 0) / TAPE_SIDE_MS;
 /** Where the tape is at time t. */
 export const tapePos = (s: TapeState, t: number): number => Math.max(0, Math.min(1, s.pos0 + speed(s.mode) * Math.max(0, t - s.since)));
 
@@ -58,8 +61,9 @@ export function reelAngles(p: number, length = 400): { left: number; right: numb
 }
 
 /** The recordings this play list holds: the ordinary ones, and from dream night 15 (after a rewind) the one marked for it. */
-export function playList(env: Pick<ObjectEnv, "day">, rewound: boolean, all: readonly Recording[] = handOf("tape").recordings): Recording[] {
-  return all.filter((r) => r.after === null || (rewound && dreamNights.includes(r.after) && env.day > r.after));
+export function playList(env: Pick<ObjectEnv, "day" | "sleeptalk">, rewound: boolean, all: readonly Recording[] = handOf("tape").recordings): Recording[] {
+  // tape-record R2: what it caught on earlier nights is on the tape after the ordinary recordings.
+  return [...all, ...(env.sleeptalk ?? [])].filter((r) => r.after === null || (rewound && dreamNights.includes(r.after) && env.day > r.after));
 }
 
 export const tapeSayKey = (day: number, id: string) => `d${day}:tape:${id}`;
@@ -113,6 +117,10 @@ export const tape: Program<TapeState> = {
       }
       case "vol-":
         return step({ ...s, volume: Math.max(0, s.volume - 1) });
+      case "rec":
+        // tape-record R1: the action admits it only where and when it records; upgraded, never.
+        if (env.upgraded || s.mode === "rec") return step(s);
+        return step({ ...s, ...at, mode: "rec" }, stopSay);
       default:
         return step(s);
     }
@@ -121,6 +129,6 @@ export const tape: Program<TapeState> = {
 };
 
 /** The upgraded walkman's transcript: every recording's lines, in order. */
-export function transcript(env: Pick<ObjectEnv, "day">): string[] {
+export function transcript(env: Pick<ObjectEnv, "day" | "sleeptalk">): string[] {
   return playList(env, false).flatMap((r) => r.say.map((l) => l.t));
 }

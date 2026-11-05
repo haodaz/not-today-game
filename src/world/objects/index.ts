@@ -2,7 +2,8 @@
 // next state, the cap going down for 80 ms, the key sound, a sequence for the box. Nothing here
 // appends a world event (objects-in-hand FR1).
 import type { GameEvent } from "@state/events";
-import { pagerForeign, pagerSchedule, type ForeignPage, type PagerMessage } from "@state/hands";
+import { pagerForeign, pagerSchedule, type ForeignPage, type PagerMessage, type Recording } from "@state/hands";
+import { caughtBy, sleeptalkFileId, type SleepTalkTable } from "@state/sleeptalk";
 import { inDream } from "@state/nights";
 import type { State } from "@state/types.gen";
 import { choiceOf } from "@state/days/effects";
@@ -84,7 +85,16 @@ export function envFor(state: State, events: readonly GameEvent[], session: Sess
     uses: cardUses(events),
     sheets: sheetsLeft(events),
     onScreen: session.view === "desktop",
+    sleeptalk: id === "tape" ? sleeptalkRecordings(events, state.day) : [],
   };
+}
+
+/**
+ * tape-record R2: each night's recording as a tape recording from the next morning: its name on the
+ * label, its lines as what plays (a transcript of sound; no speaker is named).
+ */
+export function sleeptalkRecordings(events: readonly GameEvent[], day: number, table?: SleepTalkTable): Recording[] {
+  return caughtBy(events, day, table).map(({ night, talk }) => ({ id: sleeptalkFileId(night), title: talk.name, after: null, say: talk.lines.map((t) => ({ k: "narration" as const, t })) }));
 }
 
 /** The program's state for this session and day (a new day starts it again). */

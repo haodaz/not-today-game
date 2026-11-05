@@ -24,7 +24,8 @@ import { nextInputs, startDoor, stepDoor, type DoorInput } from "@world/delivery
 import { doorLines } from "@world/delivery/view";
 import { mealView } from "@world/delivery/meals";
 import { cls, html, type SafeHtml } from "@world/html";
-import { persistLocale, setLocale, t, tr } from "@world/i18n";
+import { hasString, persistLocale, setLocale, t, tr } from "@world/i18n";
+import { recordedOn } from "@state/sleeptalk";
 import { skipToLast, storyMasked } from "@world/dialogue/mask";
 import { tabooActions, tabooLayer } from "@world/dialogue/taboo";
 import { handOf } from "@state/hands";
@@ -32,7 +33,7 @@ import { handStep, ROLL_MAX, ROLLERS } from "@world/objects/hand";
 import { UPSIDE_DOWN_DEG } from "@world/objects/calculator";
 import { pressKey } from "@world/objects/index";
 import { PHONE_FLIP } from "@world/room/held";
-import { CAMERA_KEYS, DICT_KEYS, FLIPPERS, SHEET_SLIDE_MS } from "@world/room/devices";
+import { CAMERA_KEYS, DICT_KEYS, FLIPPERS, SHEET_SLIDE_MS, TAPE_KEYS } from "@world/room/devices";
 import { CAMERA_FLASH_MS, cameraShot, type CameraState } from "@world/objects/plain";
 import { DEVELOP_BLANK_MS, DEVELOP_MS, ON_THE_SPOT_DAY, photoKey, roomFacingOf } from "@state/photos";
 import { screenPlaceOf } from "@world/desktop/files/album";
@@ -66,7 +67,7 @@ import { composerActions, workbenchActions, workbenchUiActions } from "@world/de
 import { meetingActions } from "@world/desktop/workbench/meeting";
 import { taskShellActions } from "@world/desktop/workbench/shell";
 import { boardActions, lockFaceMove } from "@world/desktop/workbench/board";
-import { enterUse, facingOf, lampLit, worksHere } from "@world/objects/works";
+import { enterUse, facingOf, lampLit, recWorksHere, REC_WORKS, worksHere } from "@world/objects/works";
 import { canSkipPrologue, endPrologue, prologueDone, prologueOn, prologueShowing, renderPrologue } from "@world/opening";
 import { workActions } from "@world/desktop/workbench/work";
 import { renderFiles } from "@world/desktop/files/view";
@@ -393,6 +394,25 @@ function finishPrologue(ctx: ActionContext): void {
  * it was taken (20 s of developing count from it) and, on the screen, the window's still; the sheet
  * hangs out of the slot; the view re-renders as it slides and develops.
  */
+/**
+ * tape-record R1: rec on the held walkman. At 床 at night it records: one `record` event a night and
+ * the reels turning slowly (the program's `rec` mode, until the day ends). Anywhere else, by day, or
+ * upgraded: the rec rule's line as one inner line (as a `works` line is shown), and nothing else.
+ */
+function pressRec(ctx: ActionContext): void {
+  const { store, session } = ctx;
+  const state = store.getState();
+  if (state.upgraded.tape === true) return;
+  if (!recWorksHere(state, session)) {
+    if (hasString(REC_WORKS.line)) session.dialogue = push(session.dialogue, { key: `d${state.day}:works:tape:rec`, lines: [{ k: "inner", t: t(REC_WORKS.line) }], ending: { kind: "none" } });
+    ctx.rerender();
+    return;
+  }
+  if (!recordedOn(store.getEvents(), state.day)) store.appendEvent({ kind: "record" });
+  pressKey(ctx, "tape", "rec", { cap: true });
+  ctx.rerender();
+}
+
 function takePhoto(ctx: ActionContext): void {
   const { store, session } = ctx;
   const state = store.getState();
@@ -970,7 +990,7 @@ export const loopActions: Record<string, ActionHandler> = {
     if (!session.hand.using) return void loopActions["obj-use"]!(ctx, {} as DOMStringMap, null as never);
     const hand = handOf(id);
     // The dictionary's 使用 device adds ▲▼ (the program ignores them); its keys are the device set.
-    const onDevice = session.hand.using && ((id === "dictionary" && DICT_KEYS.includes(key)) || (id === "camera" && CAMERA_KEYS.includes(key)));
+    const onDevice = session.hand.using && ((id === "dictionary" && DICT_KEYS.includes(key)) || (id === "camera" && CAMERA_KEYS.includes(key)) || (id === "tape" && TAPE_KEYS.includes(key)));
     const onFront = hand.keys.some((k) => k.id === key) || onDevice || (id === "phone" && key === PHONE_FLIP);
     const onBack = id === "chick" && key === "reset" && !!hand.back.reset;
     if (!(onFront && session.hand.face === "front") && !(onBack && session.hand.face === "back")) return;
@@ -979,6 +999,8 @@ export const loopActions: Record<string, ActionHandler> = {
     if (!worksHere(ctx.store.getState(), session, id) && !(id === "phone" && key === PHONE_FLIP)) return;
     // The dictionary's keys are under its lid until it is open.
     if (id === "dictionary" && (session.hand.programs.dictionary as { open?: boolean } | undefined)?.open !== true) return;
+    // tape-record R1: rec has its own works rule (床, at night); elsewhere its line and nothing else.
+    if (id === "tape" && key === "rec") return void pressRec(ctx);
     const before = id === "camera" ? ((session.hand.programs.camera as CameraState | undefined) ?? null) : null;
     pressKey(ctx, id, key, { cap: onFront });
     // camera R2: a shot is a `photo` event, where the camera was pointed (and a screen's still).

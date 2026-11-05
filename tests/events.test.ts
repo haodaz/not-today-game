@@ -28,6 +28,7 @@ describe("the twelve event kinds", () => {
         "callAnswer", "callEnded",
         "boardStep", "give", "boardJudge",
         "useAt", "photo",
+        "record",
       ].sort(),
     );
   });

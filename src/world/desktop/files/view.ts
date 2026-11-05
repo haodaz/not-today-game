@@ -18,6 +18,7 @@ import { albumPhotos, roomFacingOf, type Photo } from "@state/photos";
 import { photoPicture, photoPlace, stageOfPhoto, type PhotoView } from "./album";
 import { markDiffs } from "./diff";
 import { dockFor } from "../dock";
+import { caughtBy, sleeptalkFileId, type SleepTalkTable } from "@state/sleeptalk";
 
 export const BIN_TAB = "bin";
 
@@ -52,6 +53,22 @@ export function fileById(id: string): FileEntry | BinEntry | undefined {
     if (f) return f;
   }
   return filesData.bin.find((b) => b.id === id);
+}
+
+/** The folder the walkman's recordings land in (tape-record R2). */
+export const SLEEPTALK_FOLDER = "downloads";
+
+/**
+ * tape-record R2: each night's recording as a file in 下载 from the next morning: content's name,
+ * its lines as the body. None without a `record` event that night or content for it.
+ */
+export function sleeptalkFiles(events: readonly GameEvent[], day: number, table?: SleepTalkTable): FileEntry[] {
+  return caughtBy(events, day, table).map(({ night, talk }) => ({ id: sleeptalkFileId(night), name: talk.name, from: night + 1, body: { kind: "text", lines: talk.lines } }));
+}
+
+/** A file by id as it is listed today: content's files and bin, or a recording's file. */
+export function fileListedById(id: string, events: readonly GameEvent[], day: number): FileEntry | BinEntry | undefined {
+  return fileById(id) ?? sleeptalkFiles(events, day).find((f) => f.id === id);
 }
 
 /** The dock decoy's name for this app (文件 / 回收站), in the active language. */
@@ -165,7 +182,9 @@ export function renderFiles(ctx: AppContext, live: LiveScreen | null = null): Sa
 
   // The selected tab's files.
   const selectedFolder = filesData.folders.find((f) => f.id === app.tab);
-  const files: readonly FileEntry[] = app.tab === BIN_TAB ? binListed(day, flags, opened) : selectedFolder ? folderListed(selectedFolder, day, flags, opened) : [];
+  const listed: readonly FileEntry[] = app.tab === BIN_TAB ? binListed(day, flags, opened) : selectedFolder ? folderListed(selectedFolder, day, flags, opened) : [];
+  // tape-record R2: the walkman's recordings land in 下载, after content's files.
+  const files: readonly FileEntry[] = app.tab === SLEEPTALK_FOLDER ? [...listed, ...sleeptalkFiles(events, day)] : listed;
   // The bin's empty line comes from content (the goneLine); folders show nothing special when empty.
   const emptyLine = app.tab === BIN_TAB && binEmpty(day) ? fill(filesData.goneLine.t) : app.tab === BIN_TAB ? null : null;
 

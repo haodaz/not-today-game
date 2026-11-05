@@ -100,7 +100,9 @@ export type GameEvent =
   | { kind: "useAt"; day: number; objectId: string; facing: Facing; ok: boolean }
   // camera R2 (2026-11-04): one shot of the film camera; `at` is where it was pointed (a screen place,
   // `meeting:<taskId>`, or `room:<facing>`), `t` the beat time.
-  | { kind: "photo"; day: number; at: string; t: string };
+  | { kind: "photo"; day: number; at: string; t: string }
+  // tape-record R1 (2026-11-05): the walkman's rec pressed at 床 at night; once per night.
+  | { kind: "record"; day: number };
 
 /** One operation on a board (work v2). All are recorded so the board replays from the log. */
 export type BoardOp =
@@ -112,7 +114,7 @@ export type BoardOp =
 
 export type EventKind = GameEvent["kind"];
 
-/** Exactly these kinds (world-state 12, delivery 3, desktop-ui 1, day-loop 3, object-upgrade 2, san-and-endings 1, title-page 1, dialogue 1, late-days 1, kuro-chat 1, work v2 3, the call 2, objects-in-room 1, camera 1). Nothing else may be appended. */
+/** Exactly these kinds (world-state 12, delivery 3, desktop-ui 1, day-loop 3, object-upgrade 2, san-and-endings 1, title-page 1, dialogue 1, late-days 1, kuro-chat 1, work v2 3, the call 2, objects-in-room 1, camera 1, tape-record 1). Nothing else may be appended. */
 export const eventKinds: readonly EventKind[] = [
   "openLayer",
   "recognise",
@@ -147,7 +149,19 @@ export const eventKinds: readonly EventKind[] = [
   "callEnded",
   "useAt",
   "photo",
+  "record",
 ];
+
+/**
+ * The walkman recorded tonight (tape-record R1): a record only (what it caught is content's, shown
+ * the next morning). The tape must be found and not upgraded. One a night is the action's rule
+ * (it reads the log, as `useAt`'s once-a-day does); a second one would change nothing.
+ */
+function applyRecord(state: State): State {
+  if (!(state.found as string[]).includes("tape")) throw new Error("record: the walkman has not been found");
+  if (state.upgraded.tape === true) throw new Error("record: an upgraded walkman cannot record");
+  return state;
+}
 
 /** One shot (camera R2): a record only; shots left and the album are read from the log. */
 function applyPhoto(state: State, event: Extract<GameEvent, { kind: "photo" }>): State {
@@ -390,6 +404,8 @@ export function applyEvent(state: State, event: GameEvent): State {
       return applyUseAt(state, event);
     case "photo":
       return applyPhoto(state, event);
+    case "record":
+      return applyRecord(state);
     case "judged":
       return applyJudged(state, event.day, event);
     case "open":

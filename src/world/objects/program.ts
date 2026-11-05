@@ -3,7 +3,7 @@
 // presses this session); nothing here writes world events. Outputs are presentation only: a sound,
 // a sequence for the dialogue box (the tape's recordings), or taking the tape's sequence back.
 import { dreamNights } from "@state/stages";
-import type { PagerMessage } from "@state/hands";
+import type { PagerMessage, Recording } from "@state/hands";
 import type { SayLine } from "@state/days/table";
 import type { Frame } from "./frame";
 
@@ -32,6 +32,8 @@ export interface ObjectEnv {
   readonly sheets?: number;
   /** camera R8: the camera is pointed at the screen now (屏幕: unlimited, uncounted). */
   readonly onScreen?: boolean;
+  /** tape-record R2: what the walkman caught on earlier nights, as recordings on the tape. */
+  readonly sleeptalk?: readonly Recording[];
 }
 
 export type Out =

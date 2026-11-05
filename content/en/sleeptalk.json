@@ -1,0 +1,113 @@
+{
+  "_note": "What the walkman caught at the bedside (tape-record R2), Claude's. One night per day's god, nights 5–17; the last line is what reversed play brings out. Night 11 is absent on purpose: its recording is day 12's own file 梦话_1026.m4a (files.json a-sleeptalk), which the lock reads. Day N is 2028-10-(15+N).",
+  "nights": {
+    "5": {
+      "name": "sleeptalk_1020.m4a",
+      "lines": [
+        "(Recording, 02:51)",
+        "\"...back... back again... still this page...\"",
+        "\"...Vivi, can you hear me over there...\"",
+        "Played backwards: \"...I can hear. Even in the jar I can hear.\""
+      ]
+    },
+    "6": {
+      "name": "sleeptalk_1021.m4a",
+      "lines": [
+        "(Recording, 03:05)",
+        "\"...page nine... that's my figure...\"",
+        "\"...source... cite the source...\"",
+        "Played backwards: \"...painted from a photo. The photo is yours.\""
+      ]
+    },
+    "7": {
+      "name": "sleeptalk_1022.m4a",
+      "lines": [
+        "(Recording, 01:58)",
+        "\"...Earl, thirty-six... R&D, headcount one...\"",
+        "\"...meeting closed... it's closed... why are you all still here...\"",
+        "Played backwards: \"...you never gave me licence to depart.\""
+      ]
+    },
+    "8": {
+      "name": "sleeptalk_1023.m4a",
+      "lines": [
+        "(Recording, 04:20)",
+        "\"...King, nine till noon... Duke... what time is Duke...\"",
+        "\"...team-building moved... moved again...\"",
+        "Played backwards: \"...we're always free. It's you lot who aren't.\""
+      ]
+    },
+    "9": {
+      "name": "sleeptalk_1024.m4a",
+      "lines": [
+        "(Recording, 03:33)",
+        "\"...guest of honour in the triangle... not in the circle...\"",
+        "\"...who printed the script... why is it yellow...\"",
+        "Played backwards: \"...Act Two. See you tomorrow.\""
+      ]
+    },
+    "10": {
+      "name": "sleeptalk_1025.m4a",
+      "lines": [
+        "(Recording, 02:16)",
+        "\"...one word at a time... never a whole line...\"",
+        "\"...Carcosa... how do you say this one...\"",
+        "Played backwards: \"...you read it. The whole line.\""
+      ]
+    },
+    "12": {
+      "name": "sleeptalk_1027.m4a",
+      "lines": [
+        "(Recording, 00:00 to 06:00, six hours)",
+        "\"...I'm not asleep... I'm not asleep...\"",
+        "(Turning over, three hundred and twelve times.)",
+        "Played backwards: \"...nobody sleeps this week. You included.\""
+      ]
+    },
+    "13": {
+      "name": "sleeptalk_1028.m4a",
+      "lines": [
+        "(Recording, 02:44)",
+        "\"...the key... and the gate... and the guardian...\"",
+        "\"...loan period... permanent...\"",
+        "Played backwards: \"...the gate is under your pillow.\""
+      ]
+    },
+    "14": {
+      "name": "sleeptalk_1029.m4a",
+      "lines": [
+        "(Recording, 03:40)",
+        "\"...one by one... no repeats...\"",
+        "(A thousand people yawn at once.)",
+        "Played backwards: \"...Mother, what's my name.\""
+      ]
+    },
+    "15": {
+      "name": "sleeptalk_1030.m4a",
+      "lines": [
+        "(Recording, 02:02)",
+        "\"...thank you to our speaker... meeting closed...\"",
+        "\"...why are you sitting on the desk...\"",
+        "Played backwards: \"...one of the audience is you.\""
+      ]
+    },
+    "16": {
+      "name": "sleeptalk_1031.m4a",
+      "lines": [
+        "(Recording, all night)",
+        "(A flute. Always the same. Not fast, not slow.)",
+        "\"...don't stop... don't stop...\"",
+        "Played backwards: (the flute. Backwards it's the same.)"
+      ]
+    },
+    "17": {
+      "name": "sleeptalk_1101.m4a",
+      "lines": [
+        "(Recording, 03:12)",
+        "\"...6603... 2047...\"",
+        "\"...I'm still here... I'm still here...\"",
+        "Played backwards: \"...did you say that, or did I.\""
+      ]
+    }
+  }
+}

@@ -40,6 +40,8 @@ export const DICT_ROWS_KB: readonly string[] = ["QWERTYUIOP", "ASDFGHJKL", "ZXCV
 export const DICT_KEYS: readonly string[] = [...DICT_ROWS_KB.join(""), "lookup", "up", "down", "back", "power", "space"];
 /** The drawn camera's keys (camera R8 / R9): the red shutter and the flash slider. */
 export const CAMERA_KEYS: readonly string[] = ["shutter", "flash"];
+/** tape-record R1: the drawn walkman's rec key (a red dot left of play; not in content's photo keys). */
+export const TAPE_KEYS: readonly string[] = ["rec"];
 
 /** A key's hover label in 使用: strings `obj.key.<object>.<id>`, or nothing (digits/letters need none). */
 function keyLabel(object: string, key: string): string | null {
@@ -200,7 +202,9 @@ function tape(ctx: DeviceCtx): SafeHtml {
   // springs back. Symbols ◀◀ ▶ ▶▶ ■ are drawn, the hover labels are strings.
   const pkey = (k: string, glyph: string, klass = "") =>
     key("tape", k, down === k || (k !== "stop" && mode === k), live, glyph, cls(klass, k !== "stop" && mode === k && "latched"));
-  const keys = html`<div class="keys">${pkey("rew", "◀◀")}${pkey("play", "▶", "play")}${pkey("ff", "▶▶")}${pkey("stop", "■")}</div>`;
+  // tape-record R1: rec, a red dot left of play; an upgraded walkman has none (it cannot record).
+  const rec = upgraded ? null : pkey("rec", "●", "rec");
+  const keys = html`<div class="keys">${pkey("rew", "◀◀")}${rec}${pkey("play", "▶", "play")}${pkey("ff", "▶▶")}${pkey("stop", "■")}</div>`;
   // The window: the cassette (reels) normally, a dark glass with the transcript HiFrame when upgraded.
   const win = upgraded
     ? html`<div class="win"><canvas class="dev hi" data-screen="tape" width="2" height="2"></canvas></div>`
@@ -209,7 +213,7 @@ function tape(ctx: DeviceCtx): SafeHtml {
   const mark = Math.max(0, Math.min(1, volume / VOLUME_MAX));
   const vol = html`<div class="vol">${key("tape", "vol+", down === "vol+", live, "+")}<div class="wheel" data-obj-wheel="tape"><i style="top:${((1 - mark) * 92).toFixed(1)}px"></i></div>${key("tape", "vol-", down === "vol-", live, "−")}</div>`;
   const cord = html`<svg class="cord" width="120" height="120" aria-hidden="true"><path d="M0 0 C 10 40, -30 70, 10 110" stroke="#dcdcdc" stroke-width="3" fill="none" stroke-linecap="round"></path></svg>`;
-  return html`<div class="${cls("dev-shell", "walk", upgraded && "upgraded", mode === "play" && "playing")}" data-device="tape" data-mode="${mode}">${keys}<div class="body">${win}<div class="brand">${brand}${sub}</div></div>${vol}<div class="jack"></div>${cord}</div>`;
+  return html`<div class="${cls("dev-shell", "walk", upgraded && "upgraded", (mode === "play" || mode === "rec") && "playing", mode === "rec" && "recording")}" data-device="tape" data-mode="${mode}">${keys}<div class="body">${win}<div class="brand">${brand}${sub}</div></div>${vol}<div class="jack"></div>${cord}</div>`;
 }
 
 /** camera R9: the ejected sheet slides out of the slot over this long. */
