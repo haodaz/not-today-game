@@ -125,7 +125,8 @@
       "day": 6,
       "facing": "window",
       "add": {
-        "text": "饭桌上的外卖被啃过。齿印不是人的。"
+        "text": "饭桌上的外卖被啃过。齿印不是人的。",
+        "overlay": "/room/photos/d06_window.jpg"
       }
     },
     {

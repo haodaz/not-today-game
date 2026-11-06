@@ -125,7 +125,8 @@
       "day": 6,
       "facing": "window",
       "add": {
-        "text": "The takeout on the table has been chewed. The teeth marks aren't human."
+        "text": "The takeout on the table has been chewed. The teeth marks aren't human.",
+        "overlay": "/room/photos/d06_window.jpg"
       }
     },
     {
