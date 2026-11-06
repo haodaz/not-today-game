@@ -5,6 +5,21 @@
     "boot": {
       "say": [
         {
+          "k": "speaker",
+          "who": "kuro",
+          "t": "Morning."
+        },
+        {
+          "k": "speaker",
+          "who": "me",
+          "t": "This is Kuro. My AI."
+        },
+        {
+          "k": "speaker",
+          "who": "kuro",
+          "t": "Let's see what's on today. Following the tasks never goes wrong."
+        },
+        {
           "k": "narration",
           "t": "Raining. Working from home is not a bad choice."
         },

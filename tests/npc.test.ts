@@ -9,7 +9,7 @@ import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
 import { initialSession } from "@world/desktop/model";
 import { dialogueBox, lineBoxModel, playerPortraitSrc } from "@world/dialogue/box";
-import { setLocale, t } from "@world/i18n";
+import { hasString, setLocale, t } from "@world/i18n";
 import { npcAvatar, npcData, npcName, npcPortrait, parseNpc } from "@world/npc";
 import { EMPTY_DIALOGUE, push } from "@world/loop/dialogue";
 import { renderRoom } from "@world/room/hud";
@@ -92,7 +92,8 @@ describe("npcPortrait and npcAvatar", () => {
 describe("NPC portraits on speaker lines (dialogue addition 2026-11-01)", () => {
   const allSay = [...dayFiles.values()].flatMap((d) => Object.values(d.beats).flatMap((b) => b?.say ?? []));
   const speakerWithNpc = allSay.find((l) => l.k === "speaker" && npcPortrait(l.who ?? "") !== null);
-  const speakerWithout = allSay.find((l) => l.k === "speaker" && npcPortrait(l.who ?? "") === null);
+  // Opening lines (2026-11-06): `kuro` and `me` have who.* strings, so "as written" needs one without.
+  const speakerWithout = allSay.find((l) => l.k === "speaker" && npcPortrait(l.who ?? "") === null && !hasString(`who.${l.who}`));
   const inner = allSay.find((l) => l.k === "inner")!;
   const narration = allSay.find((l) => l.k === "narration")!;
 

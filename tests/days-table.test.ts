@@ -19,7 +19,7 @@ describe("day files", () => {
   it.each([
     ["an unknown top-level key", (d: any) => (d.extra = 1), /unknown key "extra"/],
     ["an unknown line kind", (d: any) => (d.beats.boot.say[0].k = "shout"), /line kind/],
-    ["a speaker without who", (d: any) => (d.beats.boot.say[0].k = "speaker"), /needs `who`/],
+    ["a speaker without who", (d: any) => ((d.beats.boot.say[0].k = "speaker"), delete d.beats.boot.say[0].who), /needs `who`/],
     ["an unknown condition", (d: any) => (d.items[0].unlock = "whenever"), /unknown condition/],
     ["an unknown event", (d: any) => (d.items[0].done = "event:dance"), /unknown event/],
     ["a reference to a missing item", (d: any) => (d.items[1].unlock = "done:nope"), /unknown item "nope"/],
