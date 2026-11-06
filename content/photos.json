@@ -77,7 +77,8 @@
       "day": 5,
       "facing": "bed",
       "add": {
-        "text": "枕头边一封信，是你的笔迹，写得不像你。"
+        "text": "枕头边一封信，是你的笔迹，写得不像你。",
+        "overlay": "/room/photos/d05_bed.jpg"
       }
     },
     {
