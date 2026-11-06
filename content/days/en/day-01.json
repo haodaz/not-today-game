@@ -22,7 +22,11 @@
         {
           "k": "narration",
           "t": "Raining. Working from home is not a bad choice."
-        },
+        }
+      ]
+    },
+    "rise": {
+      "say": [
         {
           "k": "narration",
           "t": "A glass of water on the desk, cold. Two screens, black."
