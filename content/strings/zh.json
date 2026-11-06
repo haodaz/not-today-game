@@ -547,5 +547,14 @@
   "hint.short.box": "看看箱子",
   "hint.short.items": "打开道具",
   "hint.short.kuro": "和克总聊聊",
-  "hint.short.bed": "睡觉"
+  "hint.short.bed": "睡觉",
+  "board.lock.read": "就按它显示的填",
+  "board.lock.open": "打开它，照它显示的填",
+  "board.lock.noReading": "它现在显示的不是提取码",
+  "board.lock.wrong1": "不对。再错一次，它今天就不认了。",
+  "board.lock.jammed": "这把锁今天打不开了。",
+  "prints.pile": "一摞打印件（{n}）",
+  "prints.prev": "上一张",
+  "prints.next": "下一张",
+  "prints.close": "放回去"
 }

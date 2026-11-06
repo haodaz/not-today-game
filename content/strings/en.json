@@ -547,5 +547,14 @@
   "hint.short.box": "Check the case",
   "hint.short.items": "Open Items",
   "hint.short.kuro": "Talk to Kuro",
-  "hint.short.bed": "Sleep"
+  "hint.short.bed": "Sleep",
+  "board.lock.read": "Enter what it shows",
+  "board.lock.open": "Open it and enter what it shows",
+  "board.lock.noReading": "That is not the code",
+  "board.lock.wrong1": "Wrong. One more and it will not take it today.",
+  "board.lock.jammed": "This lock will not open today.",
+  "prints.pile": "A pile of prints ({n})",
+  "prints.prev": "Previous",
+  "prints.next": "Next",
+  "prints.close": "Put it back"
 }
