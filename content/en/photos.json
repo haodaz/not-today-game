@@ -29,7 +29,8 @@
       "day": 3,
       "facing": "window",
       "add": {
-        "text": "A window lit in the building opposite, curtain half open, facing yours."
+        "text": "A window lit in the building opposite, curtain half open, facing yours.",
+        "overlay": "/room/photos/d03_window.jpg"
       }
     },
     {

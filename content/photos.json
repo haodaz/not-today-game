@@ -29,7 +29,8 @@
       "day": 3,
       "facing": "window",
       "add": {
-        "text": "对面楼有一扇窗亮着，窗帘拉开一半，正对着你这扇。"
+        "text": "对面楼有一扇窗亮着，窗帘拉开一半，正对着你这扇。",
+        "overlay": "/room/photos/d03_window.jpg"
       }
     },
     {
