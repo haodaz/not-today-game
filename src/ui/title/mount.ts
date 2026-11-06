@@ -31,6 +31,8 @@ export interface TitleDeps {
   readonly voice?: "m" | "f";
   /** The Kurogotchi's cross-run memory (object-drawer 3): read on open, written after every change. */
   readonly kuroMemory?: KuroMemoryStore;
+  /** first-use-hints R2: the hints' switch (`nt_hints`): read on open, written on change. Absent = no row. */
+  readonly hints?: { readonly on: boolean; readonly setOn: (on: boolean) => void };
   /** playtest-1105 R8: 重新开始这一局, confirmed: clear the run save and show the title again. */
   readonly onRestart?: () => void;
   /** playtest-1105 R8: 清除全部记录, confirmed: clear the run and the profile and show the title again. */
@@ -62,7 +64,7 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
   const random = deps.random ?? Math.random;
   const doc = root.ownerDocument;
   const win = doc.defaultView!;
-  let model = { ...initialTitle(deps.save, deps.collection), muted: deps.sound?.muted ?? false };
+  let model: TitleModel = { ...initialTitle(deps.save, deps.collection), muted: deps.sound?.muted ?? false, ...(deps.hints ? { hintsOn: deps.hints.on } : {}) };
   /** When the running camera move began (performance.now), or null. */
   let movedAt: number | null = null;
   const timers = new Set<number>();
@@ -276,6 +278,13 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     "title-settings": () => set({ ...model, settingsOpen: true }),
     "settings-close": () => set({ ...model, settingsOpen: false, settingsConfirm: null }),
     // playtest-1105 R8: each asks first; 确定 runs the host's (main.ts) and comes back to the title.
+    // first-use-hints R2: 新手提示 开 / 关, kept across runs.
+    "hints-set": (el) => {
+      if (!deps.hints || (el.dataset.on !== "1" && el.dataset.on !== "0")) return;
+      const on = el.dataset.on === "1";
+      deps.hints.setOn(on);
+      set({ ...model, hintsOn: on });
+    },
     "settings-restart": () => set({ ...model, settingsConfirm: "restart" }),
     "settings-clear-all": () => set({ ...model, settingsConfirm: "clearAll" }),
     "settings-confirm-cancel": () => set({ ...model, settingsConfirm: null }),

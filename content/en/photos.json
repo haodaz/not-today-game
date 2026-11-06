@@ -21,7 +21,7 @@
       "day": 3,
       "facing": "door",
       "add": {
-        "text": "Under the door, the toes of two shoes, pointing in. The door has been shut all along.",
+        "text": "The light under the door is broken in the middle. As if someone is standing outside.",
         "overlay": "/room/photos/d03_door.jpg"
       }
     },
@@ -50,7 +50,8 @@
       "day": 4,
       "facing": "door",
       "add": {
-        "text": "The person outside the peephole has eyes set very far apart. Like a fish."
+        "text": "Water has seeped in under the door, with a ring of salt at its edge.",
+        "overlay": "/room/photos/d04_door.jpg"
       }
     },
     {

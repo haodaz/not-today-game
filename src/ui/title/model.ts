@@ -30,6 +30,8 @@ export interface TitleModel {
   readonly save: { readonly day: number } | null;
   readonly answers: Answers;
   readonly settingsOpen: boolean;
+  /** first-use-hints R2: 设置 → 新手提示 (absent = the row is not shown). */
+  readonly hintsOn?: boolean;
   /** playtest-1105 R8: the settings panel asks before 重新开始这一局 / 清除全部记录 (absent = not asking). */
   readonly settingsConfirm?: "restart" | "clearAll" | null;
   readonly muted: boolean;

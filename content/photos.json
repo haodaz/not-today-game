@@ -21,7 +21,7 @@
       "day": 3,
       "facing": "door",
       "add": {
-        "text": "门缝底下露出一双鞋尖，朝着屋里。门一直关着。",
+        "text": "门缝底下的光，中间断了一截。像有人站在门外。",
         "overlay": "/room/photos/d03_door.jpg"
       }
     },
@@ -50,7 +50,8 @@
       "day": 4,
       "facing": "door",
       "add": {
-        "text": "猫眼外的人，眼睛分得很开，像鱼。"
+        "text": "门缝底下渗进来一摊水，边上一圈盐。",
+        "overlay": "/room/photos/d04_door.jpg"
       }
     },
     {

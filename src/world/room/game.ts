@@ -11,6 +11,7 @@ import { boxReadsOn, dialogueBox, lineScreens } from "@world/dialogue/box";
 import { logCurrent, logPlayer } from "@world/dialogue/history";
 import { settleSession } from "@world/dialogue/place";
 import { noteWallpaper, WALL_FADE_MS } from "@world/desktop/wallpaper";
+import { hintLayer, seeHint } from "@world/hints/hints";
 import { acceptOffer, answerAsk, answerOffer, declineOffer, kuroActions, playerBox, readOnToPlayer } from "@world/dialogue/kuro";
 import { nextScreen } from "@world/dialogue/layout";
 import { stepOnce } from "@world/loop/steps";
@@ -84,6 +85,13 @@ import { startJudgement } from "@world/dialogue/judge";
 import { sendEmailLink } from "@net/email";
 
 export function renderGame(store: Store, session: Session, nowMs: number): SafeHtml {
+  const body = renderGameBody(store, session, nowMs);
+  // first-use-hints: the hint that shows now (its anchor on this page), over everything.
+  const hint = session.hintsOn ? hintLayer(store.getState(), session, body.value) : null;
+  return hint ? html`${body}${hint}` : body;
+}
+
+function renderGameBody(store: Store, session: Session, nowMs: number): SafeHtml {
   const state = store.getState();
   const events = store.getEvents();
   // The run has ended: its pages replace every view (san-and-endings).
@@ -1246,6 +1254,19 @@ export const loopActions: Record<string, ActionHandler> = {
   // ⚙ 设置 (day-loop amendment: one settings button). 返回首页 is the host's (main.ts).
   "settings-open"(ctx) {
     ctx.session.settingsOpen = true;
+    ctx.rerender();
+  },
+  // first-use-hints: 知道了 (or Enter / Esc) on a hint: seen, here and (the host's profile) in later runs.
+  "hint-ok"(ctx, data) {
+    const id = data.hint;
+    if (!id) return;
+    if (seeHint(ctx.session, id)) ctx.hintSeen?.(id);
+    ctx.rerender();
+  },
+  // 设置 → 新手提示 开 / 关; off ends a hint that is up. The host keeps the switch (`nt_hints`).
+  "hints-set"(ctx, data) {
+    if (data.on !== "1" && data.on !== "0") return;
+    ctx.session.hintsOn = data.on === "1";
     ctx.rerender();
   },
   // playtest-1105 R8: 重新开始这一局 asks first; 确定 is the host's (main.ts: the run save goes, then

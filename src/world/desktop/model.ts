@@ -86,6 +86,14 @@ export interface Session {
   /** onboarding-steps R1: which coach mark is up while `onboard` is "due" (0 = the first dock app). Session only. */
   onboardStep: number;
   /**
+   * first-use-hints R2: hints show at all (设置 → 新手提示; the host reads `nt_hints`, default on; a
+   * bare session has them off), the ones already seen (the profile's, cross-run, plus this page's),
+   * and those whose condition has come true, in that order, waiting to show.
+   */
+  hintsOn: boolean;
+  hintsSeen: string[];
+  hintQueue: string[];
+  /**
    * onboarding-steps R2: the day whose wallpaper the desktop last showed (0 = none yet this page),
    * and the crossfade from the previous one on a new day's first visit (its picture, when it began).
    * Session only.
@@ -384,6 +392,9 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     // playtest-1105 R1: a bare session has been to its desktop; mountDesktop starts a run's at "no".
     onboard: "done",
     onboardStep: 0,
+    hintsOn: false,
+    hintsSeen: [],
+    hintQueue: [],
     wallpaperDay: 0,
     wallFade: null,
     wbFull: false,

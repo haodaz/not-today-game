@@ -25,6 +25,8 @@ import type { BabblePlan } from "@world/sound/babble";
 import { t } from "@world/i18n";
 import { maskBlocks } from "@world/dialogue/mask";
 import { callBlocks } from "@world/loop/call";
+import { noteHints, seeHint, TYPING_HINT } from "@world/hints/hints";
+import { placeHint } from "@world/hints/layer";
 
 /** Stage size in CSS pixels: one monitor (mock: 28px padding, 1440×900), or the room (1600×900). */
 const MONITOR = { w: 1440, h: 900 };
@@ -53,6 +55,8 @@ export interface ActionContext {
    * cross-run profile (presentation; the story never reads it back). Absent = nothing recorded.
    */
   readonly developed?: (key: string) => void;
+  /** first-use-hints R2: a hint was seen; write-only, to the host's cross-run profile. Absent = this page only. */
+  readonly hintSeen?: (id: string) => void;
   /**
    * voice-babble R3: plays a voice note's babble on the sound player's context at `gain`; returns
    * its stop. Absent (no sound player) = silence.
@@ -72,7 +76,23 @@ export interface MotionHooks {
 /** onboarding-steps R1: the coach card's own controls; nothing else answers while it is up. */
 export const COACH_ACTIONS: ReadonlySet<string> = new Set(["onboard-next", "onboard-skip", "onboard-ok"]);
 /** A coach mark is up on 屏幕 (the run's first visit). */
+/** How long a just-shown hint ignores Enter / Esc (a fast key through the dialogue would close it unseen). */
+export const HINT_KEY_GRACE_MS = 500;
+
 export const coachShowing = (s: Pick<Session, "view" | "onboard">): boolean => s.view === "desktop" && s.onboard === "due";
+/** first-use-hints R1.12: Kuro's pill says `kuro.hint.typing` for a decoy line's time (its usual line). Session only. */
+export function sayTyping(ctx: ActionContext): void {
+  const now = ctx.now?.() ?? Date.now();
+  ctx.session.dockSay = { text: t("kuro.hint.typing"), until: now + DECOY_SAY_MS };
+  ctx.later(DECOY_SAY_MS + 20, ctx.rerender);
+}
+
+/** first-use-hints R2: the hint card's own control. */
+export const HINT_ACTIONS: ReadonlySet<string> = new Set(["hint-ok"]);
+/** The hint up on the page now (its id), or null. */
+export const hintUp = (root: HTMLElement): string | null => root.querySelector<HTMLElement>(":scope > .hint-layer")?.dataset.hint ?? null;
+/** Is `action` held back by a hint now? */
+export const hintBlocks = (root: HTMLElement, action: string): boolean => hintUp(root) !== null && !HINT_ACTIONS.has(action);
 /** Is `action` held back by the coach marks now? */
 export const coachBlocks = (s: Pick<Session, "view" | "onboard">, action: string): boolean => coachShowing(s) && !COACH_ACTIONS.has(action);
 
@@ -229,6 +249,11 @@ export interface DesktopDeps {
   readonly placement?: { readonly storage: Pick<Storage, "getItem" | "setItem"> | null; readonly runId: string };
   /** photo-album R1: told when a room photo is first seen developed (the host writes the profile). */
   readonly onPhotoDeveloped?: (key: string) => void;
+  /**
+   * first-use-hints R2: the hints — whether they are on (设置, `nt_hints`) and which were seen in
+   * earlier runs (the profile's), read at mount; `seen` / `setOn` write them back. Absent = no hints.
+   */
+  readonly hints?: { readonly on: boolean; readonly seen: readonly string[]; readonly seenNow: (id: string) => void; readonly setOn: (on: boolean) => void };
 }
 
 function defaultRender(apps: AppRenderers) {
@@ -250,9 +275,18 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   // remembered placement says whether this run has had it.
   session.onboard = "no";
   if (remembered) Object.assign(session, remembered);
+  // The hint on screen and when it appeared (HINT_KEY_GRACE_MS).
+  let hintShown: string | null = null;
+  let hintSince = 0;
   let savedPlacement = JSON.stringify(placementOf(session));
   // The mute flag outlives the page (sound spec FR3); the title page reads the same one.
   if (deps.sound) session.muted = deps.sound.muted;
+  // first-use-hints R2: on or off, and what earlier runs were already shown.
+  if (deps.hints) {
+    session.hintsOn = deps.hints.on;
+    session.hintsSeen = [...new Set([...session.hintsSeen, ...deps.hints.seen])];
+  }
+  let hintsOnSaved = session.hintsOn;
   // A theme that plays to its end lets the walkman go (a second click is not needed to stop it).
   deps.sound?.onTuneEnd(() => {
     if (!session.walkman) return;
@@ -270,7 +304,8 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
       // A story masks the stage; a live boss call takes the whole screen (day-loop 2026-11-03):
       // while it runs, only the call's own controls answer.
       // onboarding-steps R1: while a coach mark is up only its card answers.
-      (c, data, el) => (maskBlocks(session.dialogue, name) || callBlocks(session, name) || coachBlocks(session, name) ? undefined : handler(c, data, el)),
+      // first-use-hints R2: while a hint is up only its card answers.
+      (c, data, el) => (maskBlocks(session.dialogue, name) || callBlocks(session, name) || coachBlocks(session, name) || hintBlocks(root, name) ? undefined : handler(c, data, el)),
     ]),
   );
   const timers = new Set<ReturnType<typeof setTimeout>>();
@@ -308,6 +343,14 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
         savePlacement(deps.placement.storage, deps.placement.runId, placementOf(session));
       }
     }
+    // first-use-hints R2: the hints whose condition has come true join the queue; the switch is kept.
+    if (deps.hints) {
+      noteHints(deps.store.getState(), deps.store.getEvents(), session);
+      if (session.hintsOn !== hintsOnSaved) {
+        hintsOnSaved = session.hintsOn;
+        deps.hints.setOn(session.hintsOn);
+      }
+    }
     motion?.before();
     frames.before(root);
     root.innerHTML = renderRoot(deps.store, session, Date.now()).value;
@@ -317,6 +360,15 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     if (slot) body.attach(slot);
     fit();
     motion?.after();
+    // The hint's ring and card go where its anchor is now drawn.
+    placeHint(root);
+    // A hint that has just appeared ignores Enter / Esc for HINT_KEY_GRACE_MS: the key that closed a
+    // dialogue line must not also close the hint that came up behind it (Claude, 2026-11-06).
+    const shown = hintUp(root);
+    if (shown !== hintShown) {
+      hintShown = shown;
+      hintSince = Date.now();
+    }
     splat?.after();
     nav?.after();
     fx?.after();
@@ -360,6 +412,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     play: (id, opts) => playSfx(id, session.muted, opts),
     now: () => Date.now(),
     developed: deps.onPhotoDeveloped,
+    hintSeen: deps.hints?.seenNow,
     ...(sound?.babble ? { babble: (plan: BabblePlan, gain: number) => sound.babble!(plan, gain) } : {}),
   };
   const motion: MotionHooks | null = deps.motion ? deps.motion(root, ctx, actions) : null;
@@ -399,6 +452,16 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     const target = e.target as HTMLElement;
     // onboarding-steps R1: a coach mark is up: Enter is 下一个 (知道了 on the last), Esc is 跳过; no
     // other key does anything (a focused card button does not also get Enter's click).
+    // first-use-hints R2: a hint is up: Enter or Esc is its 知道了; no other key does anything.
+    const hint = hintUp(root);
+    if (hint) {
+      if (e.key === "Enter" || e.key === "Escape") {
+        e.preventDefault();
+        if (Date.now() - hintSince < HINT_KEY_GRACE_MS) return;
+        actions["hint-ok"]?.(ctx, { hint } as unknown as DOMStringMap, target);
+      }
+      return;
+    }
     if (coachShowing(session)) {
       const name = e.key === "Enter" ? "onboard-next" : e.key === "Escape" ? "onboard-skip" : null;
       if (name) {
@@ -468,8 +531,19 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     rerender();
   };
 
+  // first-use-hints R1.12: the first time 工作台's input takes the caret, Kuro's pill says its line
+  // (as a decoy click makes it say one); no card. Seen like the other hints.
+  const onFocusIn = (e: FocusEvent) => {
+    const el = e.target as HTMLElement | null;
+    if (!el?.classList?.contains("wb-compose-in") || !session.hintsOn) return;
+    if (!seeHint(session, TYPING_HINT)) return;
+    deps.hints?.seenNow(TYPING_HINT);
+    sayTyping(ctx);
+    rerender();
+  };
   root.addEventListener("click", onClick);
   root.addEventListener("input", onInput);
+  root.addEventListener("focusin", onFocusIn);
   // tingtalk R1b: a window's title bar dragged across the inner edge, a window dropped on a screen in 调度中心.
   const drag = createWindowDrag(root, (name, data, el) => {
     try {
@@ -516,6 +590,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
       if (frame) cancelAnimationFrame(frame);
       root.removeEventListener("click", onClick);
       root.removeEventListener("input", onInput);
+      root.removeEventListener("focusin", onFocusIn);
       drag.destroy();
       dockPeek.destroy();
       window.removeEventListener("keydown", onKey);

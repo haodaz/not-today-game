@@ -35,6 +35,7 @@ import { loopActions, loopKeys, renderGame } from "@world/room/game";
 import { startPrologue } from "@world/opening";
 import { createSoundPlayer } from "@world/sound/player";
 import { readCollection, readKurogotchi } from "./ui/collection";
+import { readHintsOn, readHintsSeen, writeHintsOn } from "./ui/hints";
 import { mountTitle } from "./ui/title/mount";
 import { asMemory, type KuroMemory } from "@world/objects/kurogotchi";
 import type { Json } from "@state/variables";
@@ -128,6 +129,16 @@ function startGame(store: Store, saved: boolean, from?: "desk", prologue = false
     placement: { storage: saved ? window.localStorage : null, runId: store.getRunId() },
     // photo-album R1: a room photo seen developed goes into the profile's 影集 (saved runs only).
     onPhotoDeveloped: saved ? (key) => profile.recordPhoto(key) : undefined,
+    // first-use-hints R2: the switch (`nt_hints`, default on) and the hints earlier runs were shown;
+    // a hint seen goes into the profile (a debug run only remembers it for the page).
+    hints: {
+      on: readHintsOn(window.localStorage),
+      seen: readHintsSeen(window.localStorage),
+      seenNow: (id) => {
+        if (saved) profile.recordHint(id);
+      },
+      setOn: (on) => writeHintsOn(window.localStorage, on),
+    },
     sound,
     motion: createMotion,
     // The room splat for 房间 ↔ 桌子 moves (room-scene): the game only, never the title page.
@@ -178,6 +189,8 @@ if (jump !== null) {
     collection,
     sound,
     kuroMemory,
+    // first-use-hints R2: the same switch as in the game.
+    hints: { on: readHintsOn(window.localStorage), setOn: (on) => writeHintsOn(window.localStorage, on) },
     // playtest-1105 R8: from the title's settings, each after its question; the page reloads on the title.
     onRestart() {
       restartRun(run);

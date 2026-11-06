@@ -388,6 +388,19 @@
 .settings .actions{display:flex;justify-content:space-between;gap:10px;padding-top:14px;border-top:1px solid rgba(0,0,0,.08)}
 .settings .actions button{flex:1;border:1px solid rgba(0,0,0,.12);background:#fff;border-radius:8px;padding:8px 0;font:inherit;cursor:pointer}
 .settings .actions button:hover,.settings .actions button:focus-visible{border-color:#8b2f2a;color:#8b2f2a}
+/* first-use-hints: one hint, in the desktop coach marks' look (desktop.css .coach-card: 300 px, the
+   10 px arrow). Fixed over the viewport; a click outside the card does nothing (the catcher has no
+   action). The ring is the 2 px accent ring with the 8 px glow, and its outer spread is the 30 % dim,
+   so the thing it surrounds is lifted above the dim. hints/layer.ts places the ring and the card. */
+.hint-layer{position:fixed;inset:0;z-index:65}
+.hint-layer .hint-catch{position:absolute;inset:0}
+.hint-layer .hint-ring{position:fixed;border-radius:10px;pointer-events:none;box-shadow:0 0 0 2px var(--accent,#3b6ef2),0 0 8px 2px color-mix(in srgb,var(--accent,#3b6ef2) 60%,transparent),0 0 0 200vmax rgba(0,0,0,.3)}
+.hint-layer .hint-ring.none{box-shadow:0 0 0 200vmax rgba(0,0,0,.3)}
+.hint-layer .hint-card{position:fixed;font-family:var(--font-game-ui,inherit)}
+.hint-layer .hint-card p{margin:0 0 12px;color:var(--ink-2,#5b6472)}
+.hint-layer .hint-card .foot{justify-content:flex-end}
+/* Below the thing: the arrow points up from the card's top edge. */
+.hint-layer .hint-card.below::after{top:auto;bottom:100%;border:10px solid transparent;border-top:0;border-bottom-color:#fff}
 /* playtest-1105 R8: 重新开始这一局 / 清除全部记录, quiet links; their question in the same panel. */
 .settings .row.reset{flex-direction:column;align-items:flex-start;gap:6px}
 .settings .row.reset button{border:0;background:none;padding:2px 0;font:inherit;font-size:13px;color:#8b2f2a;cursor:pointer;text-decoration:underline;text-underline-offset:3px}

@@ -135,6 +135,8 @@ export interface ProfileWriter {
   writeKurogotchi(data: Json): void;
   /** playtest-1105 R8: 清除全部 only — removes the profile and its backup. */
   clear(): void;
+  /** first-use-hints R2: a first-use hint was seen: adds `id` to `profile.hints` once. Write-only. */
+  recordHint(id: string): void;
 }
 
 export function createProfileWriter(storage: KeyValueStorage): ProfileWriter {
@@ -171,6 +173,12 @@ export function createProfileWriter(storage: KeyValueStorage): ProfileWriter {
       slot.write({ data: { ...current, kurogotchi: data } });
     },
     clear: () => slot.clear(),
+    recordHint(id) {
+      const current = (slot.read()?.data ?? {}) as ProfileData;
+      const was = Array.isArray(current.hints) ? (current.hints as Json[]).filter((v): v is string => typeof v === "string") : [];
+      if (was.includes(id)) return;
+      slot.write({ data: { ...current, hints: [...was, id] } });
+    },
   };
 }
 

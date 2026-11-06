@@ -24,7 +24,7 @@ import { hasBack, isFacing } from "./facings";
 import { FLAT_HOTS, isFlatFacing } from "./shots";
 
 /** Anything the HUD or a placed thing answers to itself: the nav layer leaves a click on these alone. */
-export const INTERACTIVE = "button, a, input, textarea, select, label, [data-action], .dlg, .dlg-layer, .list, .items-panel, .settings-layer, .book-reader, .held, .hud-host, .hud-br";
+export const INTERACTIVE = "button, a, input, textarea, select, label, [data-action], .dlg, .dlg-layer, .list, .items-panel, .settings-layer, .book-reader, .held, .hud-host, .hud-br, .hint-layer";
 /** The bottom share of the stage that means "back". */
 export const BACK_STRIP = 0.06;
 /** A press that moves less than this (stage px) is a click, not a drag. */

@@ -302,8 +302,16 @@ export function emailRowHtml(row: EmailRow): SafeHtml | null {
   return html`<div class="row email" data-email="input" data-status="${row.status}"><label for="settings-email">${tr("settings.bindEmail")}</label><span class="email-in"><input id="settings-email" type="email" inputmode="email" autocomplete="email" spellcheck="false" data-input="settings-email" data-focus="settings-email" data-enter="settings-email-send" placeholder="${t("settings.emailPlaceholder")}" value="${row.draft}" aria-describedby="settings-email-status"${sending ? html` disabled` : null}><button type="button" data-action="settings-email-send"${sending ? html` disabled` : null}>${tr("settings.emailSend")}</button></span></div><p id="settings-email-status" class="${cls("email-status", row.status)}" role="status" aria-live="polite">${tr(statusKey)}</p>`;
 }
 
+/** first-use-hints R2: 新手提示 开 · 关 (as the language row); absent where the panel's host has no hints. */
+function hintsRow(on: boolean | undefined): SafeHtml | null {
+  if (on === undefined) return null;
+  const b = (v: boolean) =>
+    html`<button type="button" class="${on === v ? "on" : ""}" data-action="hints-set" data-on="${v ? "1" : "0"}" aria-pressed="${on === v ? "true" : "false"}">${tr(v ? "settings.hints.on" : "settings.hints.off")}</button>`;
+  return html`<div class="row hints"><span>${tr("settings.hints")}</span><span class="seg">${b(true)}<b>·</b>${b(false)}</span></div>`;
+}
+
 export function settingsPanel(
-  session: Pick<Session, "settingsOpen" | "muted"> & { readonly settingsConfirm?: SettingsConfirm | null },
+  session: Pick<Session, "settingsOpen" | "muted"> & { readonly settingsConfirm?: SettingsConfirm | null; readonly hintsOn?: boolean },
   opts: { readonly home: boolean; readonly email?: EmailRow; readonly clearAll?: boolean } = { home: true },
 ): SafeHtml | null {
   if (!session.settingsOpen) return null;
@@ -320,7 +328,7 @@ export function settingsPanel(
   const home = opts.home ? html`<button type="button" data-action="settings-home">${tr("settings.home")}</button>` : null;
   const lang = (l: Locale) =>
     html`<button type="button" class="${getLocale() === l ? "on" : ""}" data-action="settings-lang" data-lang="${l}" aria-pressed="${getLocale() === l ? "true" : "false"}">${tr(`settings.lang.${l}`)}</button>`;
-  return html`<div class="settings-layer"><button type="button" class="settings-dim" data-action="settings-close" aria-label="${t("settings.cancel")}"></button><div class="settings" role="dialog" aria-modal="true" aria-labelledby="settings-title"><h3 id="settings-title">${tr("settings.title")}</h3><div class="row"><span>${tr("settings.sound")}</span><button type="button" class="${cls("switch", sound && "on")}" data-action="loop-mute" role="switch" aria-checked="${sound ? "true" : "false"}" aria-label="${t("settings.sound")}"><i></i></button></div><div class="row"><span>${tr("settings.lang")}</span><span class="seg">${lang("zh")}<b>·</b>${lang("en")}</span></div>${email}${reset}<div class="actions">${home}<button type="button" data-action="settings-close">${tr("settings.cancel")}</button></div></div></div>`;
+  return html`<div class="settings-layer"><button type="button" class="settings-dim" data-action="settings-close" aria-label="${t("settings.cancel")}"></button><div class="settings" role="dialog" aria-modal="true" aria-labelledby="settings-title"><h3 id="settings-title">${tr("settings.title")}</h3><div class="row"><span>${tr("settings.sound")}</span><button type="button" class="${cls("switch", sound && "on")}" data-action="loop-mute" role="switch" aria-checked="${sound ? "true" : "false"}" aria-label="${t("settings.sound")}"><i></i></button></div><div class="row"><span>${tr("settings.lang")}</span><span class="seg">${lang("zh")}<b>·</b>${lang("en")}</span></div>${hintsRow(session.hintsOn)}${email}${reset}<div class="actions">${home}<button type="button" data-action="settings-close">${tr("settings.cancel")}</button></div></div></div>`;
 }
 
 /**
