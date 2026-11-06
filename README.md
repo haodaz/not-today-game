@@ -1,87 +1,74 @@
 # NOT TODAY
 
-An eighteen-day desktop horror game. You are a tired co-founder working from a rented room in a rainy city. Every day: boot, open the box, work, look at the desk, shut down, lie down. Two monitors show a modern work system and an assistant called Kuro, a black Labrador puppy's head on a small octopus body, who gets kinder every day and harder to read. A cardboard box with no sender gives up one childhood object a day: a knock-off Tamagotchi that starved in 1997, a pager, a phone card, a cassette and Walkman, a pocket dictionary, a solar calculator, a dead feature phone. They are the only things still trying to keep you alive.
+Built for **Kiroween 2026**, category **Resurrection**.
 
-At night a hand comes out of the gap between the monitors and asks for something. You can hold up an object to be looked at instead.
+## What the game is
 
-**Play:** https://not-today-game.vercel.app (work in progress; `?day=N` jumps to a day). English is the default language; 中文 in settings.
+NOT TODAY is an eighteen-day desktop narrative horror game that runs in the browser. You are a tired co-founder working from a rented room in a rainy city, and every day has the same five beats: boot, open the box, work, look at the desk, shut down. Two monitors show a modern work system and an assistant named Kuro, a black Labrador puppy's head on a small round octopus body; the system gets kinder every day and harder to read. A blind-box case with no sender lets one small box loose each day: eight objects from the player's own years (a knock-off Tamagotchi that starved in 1997, an instant camera, the father's numeric pager, a phone card, a cassette and Walkman, an English-only pocket dictionary, a solar calculator, the first feature phone), and on day 18 a shipping slip. These low-resolution objects are the only things still trying to keep you alive. From day 10 the work is the gods' work: at night a hand reaches out of the gap between the monitors to collect it. The days move only when you lie down; there is no death, only being replaced. Every evening you may talk with Kuro, and Kuro quietly judges you: its opinion is the ending, and the credits are its log of your eighteen days.
 
-Built for **Kiroween 2026**, Resurrection category.
-
-## What is new, what is not
-
-- **Written before the jam, by the author with Claude:** the story, the setting bible, an 18-day branching Chinese gamebook and the watercolour concept art. Published at [github.com/haodaz/nottoday](https://github.com/haodaz/nottoday) under CC BY-NC-ND and playable at [nottodaygame.com](https://nottodaygame.com).
-- **Made during the jam (this repository):** every line of game code, the content tables that turn the gamebook into a playable day loop, the design mocks, the generated 3D room and object assets, and the sounds.
-
-## How it was built
-
-Three hands, each with its own job:
-
-- **The author** decides everything: mechanics, pacing, what the characters say, what the UI looks like, what the room feels like. Nothing here was not asked for.
-- **Claude** (Anthropic; Claude Fable 5.1 and Claude Opus 5.5, in Claude Code) writes the content and the design: `content/` (replies, days, tasks, browser pages, delivery, Kuro's days and rubric, strings), `.kiro/steering/`, every `requirements.md`, the static HTML mocks in `design/`, the asset pipelines, and this README. Claude writes no game code.
-- **Kiro** writes every line of game code from the steering and the specs: for each spec it writes `design.md` and `tasks.md`, implements task by task, and keeps the tests green. Its own notes and the decisions it asked about are in [`docs/kiro-log.md`](docs/kiro-log.md).
-
-Kiro features used: steering (`.kiro/steering/product.md`, `voices.md`, `tech.md`, `structure.md`, `threejs.md`), specs (`.kiro/specs/*`, nineteen so far), and agent hooks (`.kiro/hooks/*.json`: on save, content files are validated against the loaders and the string tables; the state-test hook used to run on every save and was deferred to one full run at the end of each task when its cost in credits showed up; the hooks only report, Kiro decides). The spec flow is the whole workflow: Claude writes the requirements, Kiro writes design and tasks, the author reviews in the browser, Claude writes the next requirements from what the author says.
-
-How a working day with Kiro looks, concretely:
-
-1. The author plays a build and says what feels wrong ("the coffee cup is floating", "I can't tell which app is Claude").
-2. Claude turns each remark into a dated addition in the relevant `requirements.md` (search any spec for "Correction 2026-" or "Addition 2026-") and writes one prompt for Kiro that names the spec sections, the files and the tests expected.
-3. Kiro implements, keeps `tsc` clean and `vitest` green (1,468 tests in 82 files at the last count), backs up and diffs every snapshot it refreshes, and logs what it decided in `docs/kiro-log.md`.
-4. Claude verifies (typecheck, full test run), commits, and walks the changed days headlessly with `script`-side drivers that play each day from its content file, so a regression on day 13 is found without anyone clicking through twelve days first.
-
-Content and code never cross: Kiro does not edit `content/`, Claude does not edit `src/`. When content needs a new field, Claude writes the content first (the strict loaders reject it, so the tree goes red on purpose) and the next Kiro prompt says so.
-
-## Architecture in one paragraph
-
-Vite + TypeScript, no framework, one store. `state = f(day) ⊕ replay(events)`: the player's actions are an event log; replaying it twice gives the same state. The day is a counter that the player advances by lying down. Everything that is story lives in `content/` as data and is validated by strict loaders at import; `src/` contains no story string. The desktop is DOM, object screens are canvases at integer pixels, the room is a set of photographed stills that you walk between, and the collapse of the room is a WebGL fragment shader that dissolves the photo into its edited later stages (the Gaussian-splat version of the room is still there behind `?splat=1`).
-
-## Content
-
-| Folder | What |
-|---|---|
-| `content/days/` | the checklist, dialogue lines and night beat of each day |
-| `content/replies/` | every day × every person × every word the player can say, and what comes back |
-| `content/tasks/` | the work tasks as three-path trees (do it yourself / let it do it and look / let it do it) |
-| `content/delivery.json` | the phone, the shops, 18 days of what is at the door |
-| `content/browser/` | one newspaper page per day: the outside world |
-| `content/kuro-days/`, `kuro-profile.md`, `kuro-world.md`, `kuro-rubric.md` | who Kuro is, what it may know each day, how it judges the player |
-| `content/objects.json`, `upgrades.json`, `nights.json` | recognising the objects, Kuro's upgrade offers, what the hand wants |
-| `content/replies/family.json`, `clan.json` | the parents' group and the big family group: 18 days of 吃饭了吗, showing off, probing, forwarding |
-| `content/npc.json`, `desk.json`, `stages.json` | who has a face, where things sit on the desk, which nights are dreams |
-| `content/strings/` | zh (source) and en |
-
-## Assets
-
-Generated during the jam; see `public/README.md`.
-
-- Room: Gemini video → COLMAP → Brush → `.splat`; the room, desk and door views are stills from the same shoot, and each stage of the collapse (wall, otherworld, glitch, white) is an image edit of those stills (wan2.6-image), blended by the shader.
-- Objects: Hunyuan3D-2.1 shape from the watercolour cutouts, with the painting projected back onto the mesh.
-- Kuro's sprite states: Meta Muse Image, aligned by head, crossfaded in the game; the giant three-headed Kuro of the good ending the same way.
-- People: the player (faceless, hair over the eyes; adult and child) and the NPCs (老王, vivi, 小张, 老周, the teacher, the parents) are Muse Image watercolour busts, white-keyed; relatives in the big family group are silhouettes.
-- Food, door wall, the things on the desk (cup, phone, box, slip): Muse Image, keyed from white or green.
-- The old office of the day-11 dream: Qwen-Image.
-- Theme song 「今天不可以 / Not Today」: lyrics by the author, sung in four voices (zh/en, male/female) with Suno; it plays only on the title, the credits and the walkman after an ending. Day and night beds, stingers, the doorbell, the pager buzz, the chick's beep and the footsteps: Suno Sounds and ffmpeg, listed in `public/sfx/README.md`.
-
-## Run
+## Run and test
 
 ```bash
 npm install
-npm run dev        # http://localhost:5173/?day=1
-npm test
-npm run typecheck
+npm run dev          # http://localhost:5173/?day=1   (?day=N jumps to a day; debug only)
+npm test             # vitest, the whole suite
+npm run typecheck    # tsc --noEmit
+npm run validate     # content checks: day files, objects, missing English strings
 ```
 
-Optional `.env.local` (see `.env.example`) for Supabase; without it the game runs fully offline with Kuro's scripted lines. Online, Kuro is Claude behind a Supabase Edge Function (`supabase/functions/kuro-chat`): it talks in the player's language, remembers the run, and judges the eighteen days from the event log at the end.
+Play it at [not-today-game.vercel.app](https://not-today-game.vercel.app) (deployed from `main` on every push). English is the default; 中文 is in settings.
 
-Kuro is the only character with a model behind it; everyone else is written. The function never trains anything. Each turn it assembles one context: who Kuro is (`content/kuro-profile.md`), what it may know that day (`kuro-world.md`, `kuro-days/`), what it remembers, and a variable layer:
+The game is fully playable offline: Kuro's evening talk falls back to scripted lines from `content/`. With a `.env.local` (see `.env.example`) the client in `src/net/` talks to the Kuro backend, a Supabase Edge Function in [`supabase/functions/kuro-chat`](supabase/functions/kuro-chat) (shared code in `supabase/functions/_shared/kuro/`): it answers from the day's authored material (`content/kuro-days`, profile, rubric), rolls Kuro's only randomness, and keeps the judgement that becomes the credits. `npm run bundle:kuro` packs the content into the function; `npx supabase functions deploy kuro-chat` ships it.
 
-- **Locked lines.** Some answers are fixed (the red-blue lines, and a low/mid/high answer per question chosen by Kuro's opinion of the player). The server inserts them verbatim; the model only continues after them.
-- **Dice.** A seeded d100 per run, day and question. Kuro's opinion of the player does not change the game, it moves the thresholds: a well-liked player gets more critical successes (an unreadable word, a nosebleed) and fewer critical failures (the answer flickers and is forgotten, the turn still spent).
-- **Scores.** After each evening's talk Kuro scores the day on truth, values and bond, citing event ids; the sum decides whether the good ending is open.
+## How it was built with Kiro
 
-Some questions only appear when Kuro thinks well of you, and the generous answers are the dangerous ones.
+Kiro features used in this repository:
+
+- **Specs:** 52 spec folders under [`.kiro/specs/`](.kiro/specs). Each holds a `requirements.md`; Kiro wrote `tasks.md` for 39 of them and `design.md` for 16. Later changes are dated additions inside the same requirements ("Addition 2026-…", "Correction 2026-…").
+- **Steering:** 5 files under [`.kiro/steering/`](.kiro/steering). `product.md`, `voices.md` (the four text sources and their grammar), `tech.md` and `structure.md` are always included; `threejs.md` is included only for files under `src/room/**`.
+- **Agent hooks:** 3 `PostFileSave` hooks under [`.kiro/hooks/`](.kiro/hooks).
+  - `validate-days-on-save` checks a saved day file.
+  - `missing-english-on-save` lists strings missing from `en.json`.
+  - `state-tests-on-save` used to run the state tests on every save and was changed (2026-11-03, to save credits) to defer them to one full run at the end of each task.
+  - The hooks only report; they never edit content.
+- **Autopilot chat (vibe) sessions:** each segment is one prompt that names the spec and its requirement numbers. Kiro then reads, implements task by task, runs `tsc` and the full `vitest`, and reports.
+- **The log:** [`docs/kiro-log.md`](docs/kiro-log.md) is where Kiro appends what it decided, what it could not do and what it left for Claude, after each task.
+
+Kiro features **not** used: MCP servers (there is no `.kiro/settings/mcp.json`), Powers, custom agents and skills (`.kiro/` holds only `specs/`, `steering/` and `hooks/`).
+
+## Who did what
+
+- **The author** wrote the story and makes every decision: mechanics, pacing, what the characters say, how the room and the UI look. She playtests the builds and says what is wrong.
+- **Claude** (Anthropic) wrote:
+  - the content in `content/` (days, replies, tasks, Kuro's days, profile and rubric, strings in zh and en);
+  - every spec's requirements and the steering files.
+  It also verifies each segment (typecheck, full test run, playing the changed days in a browser), and makes small fixes in `src/` and `tests/` itself when Kiro is idle (a CSS rule, a test's content expectation, a snapshot refreshed after checking it changed only in text); each such commit says so.
+- **Kiro** wrote the game code: everything in `src/`, `tests/`, `scripts/` and `.kiro/hooks/`.
+  - It works from the steering and the specs, and keeps `tsc` clean and `vitest` green.
+  - Content and code never cross. Kiro does not edit `content/`; when it had to, the log says so.
+  - Kiro ran on Claude Opus 5.5 (the Kiro session metadata; `docs/kiro-log.md` itself does not name the model).
+
+## Architecture in one paragraph
+
+Vite and TypeScript, no framework, one store. State is `f(day) ⊕ replay(events)`: every player action is an event, and replaying the same log gives the same state. The day is a counter advanced only by lying down; nothing reads the wall clock for story. Everything that is story lives in `content/` as data, read by strict loaders that fail at import, so `src/` holds no story string. The desktop is DOM. Object screens are canvases drawn at integer pixels. The room is a set of photographed stills you turn between, with the collapse drawn by a WebGL shader over them.
+
+## Numbers (from the tree, 2026-11-06)
+
+| What | Number | Taken from |
+|---|---|---|
+| Days | 18 | `content/days/day-01.json` … `day-18.json` (directory listing); `validate-content` reports `days: 18 files, 0 problems` inside the test suite |
+| Tests | 2,156 passing in 130 files | `npx vitest run` |
+| Content files | 186 | directory listings of `content/` and its subfolders |
+| Specs | 52 folders (39 with `tasks.md`, 16 with `design.md`) | listings of `.kiro/specs/` |
+| Steering files | 5 | listing of `.kiro/steering/` |
+| Hooks | 3 | listing of `.kiro/hooks/` |
+
+## What is new and what is not
+
+- **Written before the jam**, by the author with Claude: the story, the setting bible, an 18-day branching Chinese gamebook and the watercolour concept art.
+- **Made during the jam**, in this repository: all game code, the content tables that turn the gamebook into a playable day loop, and the assets in `public/`.
 
 ## Licence
 
-Code: MIT. Story, text and art: CC BY-NC-ND 4.0 (the author, 好大壮 / Elodie Hao Liu). Kuro is played by Claude. The author credits Claude openly for its share of the writing; what is hers and what is Claude's is described above.
+- **Code:** MIT (see `LICENSE`).
+- **Story, text and art:** CC BY-NC-ND 4.0, by the author, published at [github.com/haodaz/nottoday](https://github.com/haodaz/nottoday).
