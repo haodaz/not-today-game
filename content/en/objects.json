@@ -174,61 +174,61 @@
     },
     "iccard": {
       "day": 4,
-      "q": "A card, one magnetic strip, the corners gone white.",
+      "q": "A card. The magnetic strip is scuffed, the corners gone white, a row of nail marks down one edge.",
       "options": [
         {
-          "t": "A bus card",
+          "t": "A bank card",
           "right": false
         },
         {
-          "t": "An IC card, the kind for public phones",
+          "t": "A phone card",
           "right": true
         },
         {
-          "t": "A membership card",
+          "t": "A door card",
           "right": false
         }
       ],
       "right": {
         "say": [
-          "You know it. The year you started middle school the street phones took these. Yours came from the kiosk at the school gate; the pinch marks run in rows."
+          "A phone card. In the first weeks of junior high the payphones on the street took these: a unit a minute, and when it's gone it's a piece of plastic."
         ],
-        "inner": "I see."
+        "inner": "The nail marks are mine. Made in the queue for the phone."
       },
       "wrong": {
         "say": [
-          "You are not sure. A card, one strip, white corners, pinch marks in rows. It is, and it is not."
+          "A card. A magnetic strip, no writing. Where it went, you can't recall."
         ],
-        "inner": "Look again later."
+        "inner": "Look again tomorrow."
       },
       "light": "余额仅供参考"
     },
     "tape": {
       "day": 5,
-      "q": "A cassette, and a walkman.",
+      "q": "A walkman whose lid won't quite shut. A tape inside, the sleeve handwritten, the ink blurred by sweat.",
       "options": [
         {
-          "t": "A voice recorder",
+          "t": "A tape recorder",
           "right": false
         },
         {
-          "t": "A walkman, and a tape you recorded yourself",
+          "t": "A walkman",
           "right": true
         },
         {
-          "t": "A radio",
+          "t": "A remote control",
           "right": false
         }
       ],
       "right": {
         "say": [
-          "You know it. That summer you shut the lid and opened it again just to hear the crisp plastic click. There is something of yours on the tape. Half a sentence."
+          "A walkman. No playlists in junior high: one tape for two people, one earbud each. Side A, then flip to B."
         ],
-        "inner": "Half a sentence. Where is the other half."
+        "inner": "Something was recorded at the end of side B. What it was, I'd have to hear it before I'd say."
       },
       "wrong": {
         "say": [
-          "You turn it over. The tape on the lid has lifted at one corner. You do not remember what is inside."
+          "Something that plays tapes. The lid won't shut."
         ],
         "inner": "Look again tomorrow."
       },
@@ -392,32 +392,32 @@
     },
     "dictionary": {
       "day": 6,
-      "q": "A clamshell, silver grey, the hinge a little loose.",
+      "q": "A clamshell, silver grey. Power on: a grey-green screen, dot-matrix letters. The paint is worn off the keys.",
       "options": [
         {
           "t": "A calculator",
           "right": false
         },
         {
-          "t": "A Wenquxing: it only looks up words",
+          "t": "An electronic dictionary",
           "right": true
         },
         {
-          "t": "A handheld game",
+          "t": "A game console",
           "right": false
         }
       ],
       "right": {
         "say": [
-          "You know it. A Wenquxing. It does one thing: English in, Chinese out, one word at a time."
+          "A Wenquxing. The most expensive thing in a senior-high schoolbag: look up words, store numbers, play games under the desk."
         ],
-        "inner": "It only looks up words. That is enough."
+        "inner": "Mine only ever did one thing: English in, Chinese out."
       },
       "wrong": {
         "say": [
-          "You switch it on. The screen is grey-green, the letters dot matrix. You press a few keys. You do not know what it is for."
+          "A little machine with a keyboard. A grey-green screen when it comes on."
         ],
-        "inner": "Look again later."
+        "inner": "Look again tomorrow."
       },
       "keys": {
         "grid": {
@@ -474,30 +474,30 @@
     },
     "calculator": {
       "day": 7,
-      "q": "Solar powered, the keys gone yellow.",
+      "q": "A calculator, seven-segment digits, green. A slip of paper stuck inside the lid.",
       "options": [
         {
           "t": "A remote control",
           "right": false
         },
         {
-          "t": "A calculator, the kind that spells words upside down",
+          "t": "A calculator",
           "right": true
         },
         {
-          "t": "A digital watch",
+          "t": "A pager",
           "right": false
         }
       ],
       "right": {
         "say": [
-          "You know it. Upside down, the seven-segment digits spell a few letters. The ones passed around in class: 0.7734, 505, 555."
+          "A calculator. The kind the whole class passed round in the last year of senior high: turn it upside down and the digits spell a few letters."
         ],
-        "inner": "It does not know many words. Enough for one sentence."
+        "inner": "The slip inside the lid is in my handwriting."
       },
       "wrong": {
         "say": [
-          "You press some numbers. The screen shows numbers. You do not turn it upside down."
+          "Something for sums. Green digits. There's a slip in the lid; you don't look closely."
         ],
         "inner": "Look again tomorrow."
       },
@@ -658,32 +658,32 @@
     },
     "phone": {
       "day": 8,
-      "q": "A flip phone, one corner of the screen cracked, will not turn on.",
+      "q": "A flip phone, very light, plastic. It clicks when it shuts.",
       "options": [
         {
-          "t": "A broken phone",
-          "right": true
-        },
-        {
-          "t": "A pager",
+          "t": "A toy phone",
           "right": false
         },
         {
-          "t": "A handheld game",
+          "t": "A flip phone",
+          "right": true
+        },
+        {
+          "t": "A walkie-talkie",
           "right": false
         }
       ],
       "right": {
         "say": [
-          "You know it. Your first phone. It will not turn on. It does not need to."
+          "A flip phone. Bought the year I went abroad, my first. I can still recite the number."
         ],
-        "inner": "The last one."
+        "inner": "Primary school to the year abroad, nothing missing. The box ends here; the one that won't come out, I don't know. Who counts this exactly."
       },
       "wrong": {
         "say": [
-          "It will not turn on. You put it on the desk."
+          "An old phone. Shut, open, shut."
         ],
-        "inner": "It does not need to."
+        "inner": "Look again tomorrow."
       },
       "sim": "This card is valid until December 2009."
     }
