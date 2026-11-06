@@ -181,7 +181,8 @@
       "day": 8,
       "facing": "door",
       "add": {
-        "text": "A shadow passed through the light under the door, tall, like a camel. Somewhere far off, a horn."
+        "text": "A shadow passed through the light under the door, tall, like a camel. Somewhere far off, a horn.",
+        "overlay": "/room/photos/d08_door.jpg"
       }
     },
     {
