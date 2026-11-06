@@ -141,7 +141,8 @@
       "day": 7,
       "facing": "bed",
       "add": {
-        "text": "The creases in the sheet line up into a triangle."
+        "text": "The creases in the sheet line up into a triangle.",
+        "overlay": "/room/photos/d07_bed.jpg"
       }
     },
     {

@@ -141,7 +141,8 @@
       "day": 7,
       "facing": "bed",
       "add": {
-        "text": "床单上的褶子，排成一个三角。"
+        "text": "床单上的褶子，排成一个三角。",
+        "overlay": "/room/photos/d07_bed.jpg"
       }
     },
     {
