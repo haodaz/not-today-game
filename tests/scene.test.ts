@@ -87,14 +87,16 @@ describe("the loader", () => {
 });
 
 describe("sceneOf", () => {
-  it("day 5's dream: the classroom from line 1, the 96 from line 2, the 100 from line 5; kept to the end", () => {
-    const at = (line: number) => sceneOf(nightAt(5, line));
+  it("day 1's dream (dreams 2026-11-06): the classroom from line 4, the 96 from line 6, the dinner table from 12, the 100 back in the classroom from 17; kept to the end", () => {
+    const at = (line: number) => sceneOf(nightAt(1, line));
     expect(at(0)).toEqual(NO_SCENE);
-    expect(at(1)).toEqual({ backdrop: "/room/dream/classroom.jpg", prop: null });
-    expect(at(2)).toEqual({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_96.png" });
-    expect(at(4)).toEqual({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_96.png" });
-    expect(at(5)).toEqual({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_100.png" });
-    expect(at(8)).toEqual({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_100.png" });
+    expect(at(3)).toEqual(NO_SCENE);
+    expect(at(4)).toEqual({ backdrop: "/room/dream/classroom.jpg", prop: null });
+    expect(at(6)).toEqual({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_96.png" });
+    expect(at(11)).toEqual({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_96.png" });
+    expect(at(12)).toEqual({ backdrop: "/room/dream/home_dinner.jpg", prop: "/room/props/exam_96.png" });
+    expect(at(17)).toEqual({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_100.png" });
+    expect(at(20)).toEqual({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_100.png" });
   });
   it("day 11: office_busy, then office (a later backdrop replaces it)", () => {
     expect(sceneOf(nightAt(11, 2)).backdrop).toBe("/room/dream/office_busy.jpg");
@@ -112,7 +114,7 @@ describe("sceneOf", () => {
     fc.assert(
       fc.property(fc.constantFrom(...dayFiles.keys()), views, fc.boolean(), (day, view, parked) => {
         // Even a sequence parked for its place (waiting) is not on show.
-        const d: DialogueState = parked ? { ...EMPTY_DIALOGUE, waiting: [{ item: nightAt(5, 2).queue[0]! as Queued, from: 2 }] } : EMPTY_DIALOGUE;
+        const d: DialogueState = parked ? { ...EMPTY_DIALOGUE, waiting: [{ item: nightAt(1, 6).queue[0]! as Queued, from: 6 }] } : EMPTY_DIALOGUE;
         expect(sceneOf(d)).toEqual(NO_SCENE);
         const out = stageOf(atDay(day), d, view);
         expect(out).not.toContain('class="scene');
@@ -138,16 +140,16 @@ describe("the stage", () => {
     expect(after).toContain("shot-hit");
     expect({ on, after }).toMatchSnapshot();
   });
-  it("snapshots day 5's dream: the line with backdrop, prop and portrait; then the 100", () => {
-    const store = atDay(5);
-    const teacher = dayFiles.get(5)!.beats.night!.say[4]!;
+  it("snapshots day 1's dream: the line with backdrop, prop and portrait; then the 100", () => {
+    const store = atDay(1);
+    const teacher = dayFiles.get(1)!.beats.night!.say[9]!;
     expect(teacher.k).toBe("speaker");
-    const withPortrait = stageOf(store, nightAt(5, 4));
+    const withPortrait = stageOf(store, nightAt(1, 9));
     expect(sceneHtml(withPortrait)).toContain('data-src="/room/dream/classroom.jpg"');
     expect(sceneHtml(withPortrait)).toContain('<img class="scene-prop" data-src="/room/props/exam_96.png" src="/room/props/exam_96.png"');
     // The speaker's bust sits in the box's slot.
     expect(withPortrait).toContain(`class="npc-portrait" src="/npc/${teacher.who}.png"`);
-    const hundred = stageOf(store, nightAt(5, 5));
+    const hundred = stageOf(store, nightAt(1, 17));
     expect(sceneHtml(hundred)).toContain('src="/room/props/exam_100.png"');
     expect(hundred).not.toContain("exam_96");
     expect({ withPortrait, hundred }).toMatchSnapshot();
@@ -202,10 +204,10 @@ describe("the motion: a 1.2 s crossfade in, a fade back after the sequence, the 
   const ghosts = (root: HTMLElement, sel: string) => [...root.querySelectorAll<HTMLElement>(sel)].filter((e) => e.closest(".m-ghost"));
 
   it("in, A → B under it, the prop, then back to the still", async () => {
-    const store = atDay(5);
+    const store = atDay(1);
     const { root, session } = mount(store);
     await frame();
-    session.dialogue = nightAt(5, 1);
+    session.dialogue = nightAt(1, 4);
     await rerender(root);
     const bd = live(root, ".stage > .scene > .scene-backdrop")[0]!;
     expect(bd.dataset.src).toBe("/room/dream/classroom.jpg");
@@ -213,7 +215,7 @@ describe("the motion: a 1.2 s crossfade in, a fade back after the sequence, the 
     // Continued across re-renders with a negative delay, not restarted.
     await rerender(root);
     expect(live(root, ".scene-backdrop")[0]!.style.animation).toMatch(/m-fade-in 1200ms \S+ (-\d+|0)ms both/);
-    session.dialogue = nightAt(5, 2);
+    session.dialogue = nightAt(1, 6);
     await rerender(root);
     expect(live(root, ".scene-prop")[0]!.style.animation).toContain(`m-fade-in ${CHOSEN.propIn}ms`);
     // A → B: the classroom stays under the office while it fades in.

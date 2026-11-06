@@ -75,6 +75,87 @@
         },
         {
           "k": "narration",
+          "t": "You close your eyes. First a grey-white behind the lids, then, bit by bit, a room. Not this one."
+        },
+        {
+          "k": "narration",
+          "t": "The tail end of summer; the fan chops the light into bright and dark. First week of school, second lesson, test papers handed back.",
+          "backdrop": "/room/dream/classroom.jpg"
+        },
+        {
+          "k": "speaker",
+          "who": "teacher",
+          "t": "Come and get yours when I call your name."
+        },
+        {
+          "k": "narration",
+          "t": "Ninety-six. Since first grade you had never scored under a hundred. In that very second it chirped in your desk drawer.",
+          "prop": "/room/props/exam_96.png"
+        },
+        {
+          "k": "speaker",
+          "who": "同桌",
+          "t": "(whispering) Your chick's hungry."
+        },
+        {
+          "k": "narration",
+          "t": "The whole class heard it. Nobody turned round. Neither did you."
+        },
+        {
+          "k": "speaker",
+          "who": "teacher",
+          "t": "What is in that drawer. Bring it here."
+        },
+        {
+          "k": "narration",
+          "t": "You bring it up. She doesn't look at it. She looks at your paper."
+        },
+        {
+          "k": "speaker",
+          "who": "teacher",
+          "t": "Ninety-six. Toys rot the mind."
+        },
+        {
+          "k": "narration",
+          "t": "Evening, the dinner table. The paper lies open next to the dishes.",
+          "backdrop": "/room/dream/home_dinner.jpg"
+        },
+        {
+          "k": "speaker",
+          "who": "family",
+          "t": "Your teacher phoned."
+        },
+        {
+          "k": "speaker",
+          "who": "family",
+          "t": "Not about you. About that thing. It stays with her till the end of term."
+        },
+        {
+          "k": "inner",
+          "t": "It needs feeding three times a day."
+        },
+        {
+          "k": "speaker",
+          "who": "family",
+          "t": "It's a game. Nobody starves. Eat."
+        },
+        {
+          "k": "narration",
+          "t": "On the last day of term she handed it back with your report card. The report first: a hundred. Then it, its screen already the grave.",
+          "prop": "/room/props/exam_100.png",
+          "backdrop": "/room/dream/classroom.jpg"
+        },
+        {
+          "k": "speaker",
+          "who": "teacher",
+          "t": "See. She was right to take it."
+        },
+        {
+          "k": "inner",
+          "t": "It was taken. I did not stop feeding it."
+        },
+        {
+          "k": "narration",
           "t": "Today is over."
         }
       ]

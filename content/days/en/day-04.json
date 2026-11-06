@@ -77,6 +77,72 @@
         },
         {
           "k": "narration",
+          "t": "You close your eyes. A card between your fingers, a row of nail marks down its edge."
+        },
+        {
+          "k": "narration",
+          "t": "First week of junior high. The shop by the school gate; the owner slides a phone card out of the drawer like dealing a hand."
+        },
+        {
+          "k": "speaker",
+          "who": "小卖部老板",
+          "t": "Five kuai. Fifty minutes. Make them last."
+        },
+        {
+          "k": "narration",
+          "t": "The payphones stand by the gate, three in a row, a queue behind each."
+        },
+        {
+          "k": "speaker",
+          "who": "同学",
+          "t": "Hurry up, there's people waiting!"
+        },
+        {
+          "k": "speaker",
+          "who": "family",
+          "t": "Hello? ... Have you eaten? Do you have enough money?"
+        },
+        {
+          "k": "inner",
+          "t": "Enough."
+        },
+        {
+          "k": "speaker",
+          "who": "family",
+          "t": "Good. Is it cold there? I can't hear you, speak up."
+        },
+        {
+          "k": "narration",
+          "t": "The number on the little screen ticks down. You put what you want to say in a queue, most important first."
+        },
+        {
+          "k": "narration",
+          "t": "Halfway through a sentence it cuts out. The card is at zero."
+        },
+        {
+          "k": "speaker",
+          "who": "同学",
+          "t": "Done yet? My turn!"
+        },
+        {
+          "k": "narration",
+          "t": "You pull the card out. A piece of plastic with no money on it. You don't throw it away."
+        },
+        {
+          "k": "narration",
+          "t": "Later it turns out to have one more use: on early mornings, before the key arrives, the classroom door's latch is slanted, and a card can push it back."
+        },
+        {
+          "k": "speaker",
+          "who": "同学",
+          "t": "Hey, how did you get in?"
+        },
+        {
+          "k": "inner",
+          "t": "It said IC on the card. Back then I read it as I see."
+        },
+        {
+          "k": "narration",
           "t": "Today is over."
         }
       ]

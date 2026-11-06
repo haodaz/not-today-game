@@ -75,40 +75,59 @@
       "say": [
         {
           "k": "narration",
-          "t": "You close your eyes. First a grey-white behind the lids, then, bit by bit, a room. Not this one."
+          "t": "You close your eyes. The earphone cord is wound round your finger."
         },
         {
           "k": "narration",
-          "t": "The tail end of summer; the fan chops the light into bright and dark. First week of school, second lesson, test papers handed back.",
-          "backdrop": "/room/dream/classroom.jpg"
-        },
-        {
-          "k": "narration",
-          "t": "Ninety-six. Since first grade you had never scored under a hundred. In that very second it chirped in your desk drawer.",
-          "prop": "/room/props/exam_96.png"
-        },
-        {
-          "k": "narration",
-          "t": "The whole class heard it. Nobody turned round. Neither did you."
+          "t": "The summer of second year. A dubbed tape in the walkman; one tape for two people, one earbud each."
         },
         {
           "k": "speaker",
-          "who": "teacher",
-          "t": "Toys rot the mind."
+          "who": "小满",
+          "t": "Listen to this bit, this bit's the best."
         },
         {
           "k": "narration",
-          "t": "On the last day of term she handed it back with your report card. The report first: a hundred. Then it, its screen already the grave.",
-          "prop": "/room/props/exam_100.png"
+          "t": "Side A ends, flip to B. There is a stretch of nothing at the end of side B."
         },
         {
           "k": "speaker",
-          "who": "teacher",
-          "t": "She was right to take it."
+          "who": "小满",
+          "t": "Shame to waste it. Record something. Go on, it's recording."
         },
         {
           "k": "inner",
-          "t": "It was taken. I did not stop feeding it."
+          "t": "Say what."
+        },
+        {
+          "k": "speaker",
+          "who": "小满",
+          "t": "Anything. What you'll be when you grow up."
+        },
+        {
+          "k": "narration",
+          "t": "You speak into the walkman's little hole as if it were a person."
+        },
+        {
+          "k": "inner",
+          "t": "When I grow up, I'm going to be a super..."
+        },
+        {
+          "k": "narration",
+          "t": "Click. The tape runs out."
+        },
+        {
+          "k": "speaker",
+          "who": "小满",
+          "t": "Ha, it ran out! A super what?"
+        },
+        {
+          "k": "inner",
+          "t": "Never said it. She laughed, and didn't ask again."
+        },
+        {
+          "k": "narration",
+          "t": "That half sentence, all these years, you have been filling in yourself."
         },
         {
           "k": "narration",

@@ -75,6 +75,87 @@
         },
         {
           "k": "narration",
+          "t": "你闭上眼睛。眼皮里先是一片灰白，然后一点一点出现一间屋子。不是这间。"
+        },
+        {
+          "k": "narration",
+          "t": "夏天的尾巴，风扇把光切成一明一暗。开学第一周，第二节课发卷子。",
+          "backdrop": "/room/dream/classroom.jpg"
+        },
+        {
+          "k": "speaker",
+          "who": "teacher",
+          "t": "念到名字的上来拿。"
+        },
+        {
+          "k": "narration",
+          "t": "九十六。你从一年级起没有拿过一百以下的分数。就在那一秒，它在你抽屉里叫了一声。",
+          "prop": "/room/props/exam_96.png"
+        },
+        {
+          "k": "speaker",
+          "who": "同桌",
+          "t": "（小声）你的鸡饿了。"
+        },
+        {
+          "k": "narration",
+          "t": "整个教室都听见了，没有一个人回头。你也没有。"
+        },
+        {
+          "k": "speaker",
+          "who": "teacher",
+          "t": "抽屉里是什么。拿上来。"
+        },
+        {
+          "k": "narration",
+          "t": "你拿上去。她没有看它，看的是你的卷子。"
+        },
+        {
+          "k": "speaker",
+          "who": "teacher",
+          "t": "九十六。不能玩物丧志。"
+        },
+        {
+          "k": "narration",
+          "t": "晚上，饭桌上。卷子摊在菜旁边。",
+          "backdrop": "/room/dream/home_dinner.jpg"
+        },
+        {
+          "k": "speaker",
+          "who": "family",
+          "t": "老师打电话来了。"
+        },
+        {
+          "k": "speaker",
+          "who": "family",
+          "t": "不是说你。是说那个东西。先放老师那儿，期末拿回来。"
+        },
+        {
+          "k": "inner",
+          "t": "它一天要喂三次。"
+        },
+        {
+          "k": "speaker",
+          "who": "family",
+          "t": "一个游戏机，饿不死人。吃饭。"
+        },
+        {
+          "k": "narration",
+          "t": "期末那天她把它和成绩单一起递给你。先递成绩单，一百。再递它，屏幕上已经是那座坟。",
+          "prop": "/room/props/exam_100.png",
+          "backdrop": "/room/dream/classroom.jpg"
+        },
+        {
+          "k": "speaker",
+          "who": "teacher",
+          "t": "看，还是收了对。"
+        },
+        {
+          "k": "inner",
+          "t": "是收走的。不是我不喂。"
+        },
+        {
+          "k": "narration",
           "t": "今天过去了。"
         }
       ]

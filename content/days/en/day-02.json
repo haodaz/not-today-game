@@ -83,47 +83,92 @@
         },
         {
           "k": "narration",
-          "t": "You didn't really know how to talk to people then. You brought it to school and took the windowsill, the blackboard, the empty corridor."
-        },
-        {
-          "k": "speaker",
-          "who": "同学",
-          "t": "Hey, take one of us!"
-        },
-        {
-          "k": "speaker",
-          "who": "同学",
-          "t": "And us, line up, line up."
+          "t": "You didn't really know how to talk to people then. The camera was yours to bring to school: the windowsill, the blackboard, the empty corridor."
         },
         {
           "k": "narration",
-          "t": "On graduation day a lot of people came looking for you. You pressed, one by one; the sheets slid out, one by one, and everyone stood round waiting for them to come up."
+          "t": "A week before graduation, somebody noticed it. You never knew who was first."
         },
         {
           "k": "speaker",
-          "who": "同学",
-          "t": "You have one too, I'll take it."
-        },
-        {
-          "k": "narration",
-          "t": "When it came up, your eyes were shut. In another, you were half a shoulder."
-        },
-        {
-          "k": "speaker",
-          "who": "同学",
-          "t": "Oops. Never mind, no sheets left, right?"
-        },
-        {
-          "k": "narration",
-          "t": "Afterwards you put each person's photo in an envelope and wrote their middle school's address on it, one by one."
-        },
-        {
-          "k": "narration",
-          "t": "No one wrote back. Not one."
+          "who": "小满",
+          "t": "Hey, this thing prints the photo right away? Take one of me!"
         },
         {
           "k": "inner",
-          "t": "None of those photos have me in them."
+          "t": "Okay. Stand still."
+        },
+        {
+          "k": "speaker",
+          "who": "小满",
+          "t": "No, no, give me the camera, I'll take one of you."
+        },
+        {
+          "k": "narration",
+          "t": "You hand it over. She lifts it and presses. The sheet is half out when she tugs it free."
+        },
+        {
+          "k": "speaker",
+          "who": "阿凯",
+          "t": "Me! Me next!"
+        },
+        {
+          "k": "speaker",
+          "who": "小满",
+          "t": "Line up! One each!"
+        },
+        {
+          "k": "narration",
+          "t": "The camera goes from this hand to that one. You stand at the edge and watch it travel."
+        },
+        {
+          "k": "speaker",
+          "who": "班长",
+          "t": "How many left?"
+        },
+        {
+          "k": "inner",
+          "t": "Ten. Nine now."
+        },
+        {
+          "k": "speaker",
+          "who": "阿凯",
+          "t": "Hey, you too. Stand in the middle!"
+        },
+        {
+          "k": "narration",
+          "t": "You step in. Someone counts to three, someone shouts cheese, a flash."
+        },
+        {
+          "k": "speaker",
+          "who": "小满",
+          "t": "It's coming up, it's coming up. Oh. Your eyes are shut."
+        },
+        {
+          "k": "speaker",
+          "who": "阿凯",
+          "t": "One more! ... This one, that's half your shoulder."
+        },
+        {
+          "k": "speaker",
+          "who": "班长",
+          "t": "No sheets left. Never mind, next time."
+        },
+        {
+          "k": "narration",
+          "t": "There was no next time. The photos from that day were shared out, one each, everyone else's face on them."
+        },
+        {
+          "k": "narration",
+          "t": "In junior high you wrote to a few of them. The addresses were copied down on graduation day."
+        },
+        {
+          "k": "narration",
+          "t": "Nobody wrote back."
+        },
+        {
+          "k": "inner",
+          "t": "Dozens of photos. Not one with me in it."
         },
         {
           "k": "narration",

@@ -67,6 +67,76 @@
         },
         {
           "k": "narration",
+          "t": "You close your eyes. Something digs into your hip."
+        },
+        {
+          "k": "narration",
+          "t": "The last term of primary school. Half the street wore one of these on their belt. Yours was your father's old one: black, a one-line screen.",
+          "backdrop": "/room/dream/classroom.jpg"
+        },
+        {
+          "k": "speaker",
+          "who": "阿凯",
+          "t": "No way. You've got a pager too? I'll page you!"
+        },
+        {
+          "k": "narration",
+          "t": "The bell goes and Kai runs for the phone at the gatehouse. You sit at your desk and wait."
+        },
+        {
+          "k": "speaker",
+          "who": "传呼台",
+          "t": "Paging service, go ahead. ... Right, sending it now."
+        },
+        {
+          "k": "sfx",
+          "t": "Bzzz.",
+          "sfx": "pager-buzz"
+        },
+        {
+          "k": "speaker",
+          "who": "寻呼机",
+          "t": "0.7734"
+        },
+        {
+          "k": "speaker",
+          "who": "小满",
+          "t": "Turn it upside down! hELLO!"
+        },
+        {
+          "k": "speaker",
+          "who": "阿凯",
+          "t": "Wait, wait, one more..."
+        },
+        {
+          "k": "sfx",
+          "t": "Bzzz.",
+          "sfx": "pager-buzz"
+        },
+        {
+          "k": "speaker",
+          "who": "寻呼机",
+          "t": "5201314"
+        },
+        {
+          "k": "speaker",
+          "who": "小满",
+          "t": "Who sent that one? Go on, answer it."
+        },
+        {
+          "k": "narration",
+          "t": "You can't. It only receives. To answer, you queue for the gatehouse phone."
+        },
+        {
+          "k": "narration",
+          "t": "By the time it's your turn, there's nobody on the other end."
+        },
+        {
+          "k": "inner",
+          "t": "Receives, never sends. That never changed."
+        },
+        {
+          "k": "narration",
           "t": "Today is over."
         }
       ]

@@ -139,7 +139,7 @@ describe("NPC portraits on speaker lines (dialogue addition 2026-11-01)", () => 
     expect(lineBoxModel(ctx.store.getState(), ctx.store.getEvents(), ctx.session)!.tag).toEqual({ kind: "who", text: speakerWithout!.who });
   });
 
-  it("snapshots: day 5's teacher line with the portrait; a 寻呼机 line without one", () => {
+  it("snapshots: the first teacher line (day 1's dream) with the portrait; a 寻呼机 line without one", () => {
     const teacher = allSay.find((l) => l.k === "speaker" && l.who === "teacher")!;
     const pager = allSay.find((l) => l.k === "speaker" && l.who === "寻呼机")!;
     const box = (line: SayLine) => {

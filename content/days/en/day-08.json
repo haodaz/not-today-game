@@ -54,7 +54,54 @@
         },
         {
           "k": "narration",
-          "t": "The day is over."
+          "t": "You close your eyes. Something very light in your hand, plastic, with a click when it shuts."
+        },
+        {
+          "k": "narration",
+          "t": "The year you went abroad. The airport. Bought the day before leaving: your first phone, the number written on your palm."
+        },
+        {
+          "k": "speaker",
+          "who": "family",
+          "t": "Call when you land. Doesn't have to be long. Two rings and hang up, then I know you're there."
+        },
+        {
+          "k": "speaker",
+          "who": "father",
+          "t": "If the money runs short, say so."
+        },
+        {
+          "k": "inner",
+          "t": "It's enough."
+        },
+        {
+          "k": "narration",
+          "t": "After landing you called. Two rings, hang up. They called back: two rings, hang up. You talked like that for a year."
+        },
+        {
+          "k": "narration",
+          "t": "A year later every phone in every hand had turned into a slab of glass. It still worked. Nobody called the number any more."
+        },
+        {
+          "k": "narration",
+          "t": "The last call was incoming."
+        },
+        {
+          "k": "speaker",
+          "who": "boss",
+          "t": "Come back. There's something to build. We'll do it ourselves."
+        },
+        {
+          "k": "inner",
+          "t": "Okay."
+        },
+        {
+          "k": "narration",
+          "t": "After that call it never rang again. The one on the desk now is fifteen years later."
+        },
+        {
+          "k": "narration",
+          "t": "Today is over."
         }
       ]
     },

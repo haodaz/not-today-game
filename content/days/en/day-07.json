@@ -107,7 +107,62 @@
         },
         {
           "k": "narration",
-          "t": "The day is over."
+          "t": "You close your eyes. Seven-segment digits, green."
+        },
+        {
+          "k": "narration",
+          "t": "The last study period of senior high. Nobody is reading. The calculator goes round under the desks, upside down.",
+          "backdrop": "/room/dream/classroom.jpg"
+        },
+        {
+          "k": "speaker",
+          "who": "班长",
+          "t": "0.7734."
+        },
+        {
+          "k": "speaker",
+          "who": "同桌",
+          "t": "hELLO. Ancient."
+        },
+        {
+          "k": "speaker",
+          "who": "班长",
+          "t": "This one, then. 5318008."
+        },
+        {
+          "k": "speaker",
+          "who": "同桌",
+          "t": "...Turn that back over."
+        },
+        {
+          "k": "narration",
+          "t": "The whole class cracks up; the teacher at the front pretends not to hear."
+        },
+        {
+          "k": "speaker",
+          "who": "同桌",
+          "t": "Your turn. Something nobody's seen."
+        },
+        {
+          "k": "narration",
+          "t": "You type a string. Upside down it reads BOSS."
+        },
+        {
+          "k": "speaker",
+          "who": "班长",
+          "t": "BOSS? You're going to be a boss?"
+        },
+        {
+          "k": "inner",
+          "t": "I only knew when it came out."
+        },
+        {
+          "k": "narration",
+          "t": "After graduation day you never pressed it again. The boss part came true."
+        },
+        {
+          "k": "narration",
+          "t": "Today is over."
         }
       ]
     }
