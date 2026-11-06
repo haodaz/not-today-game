@@ -149,7 +149,8 @@
       "day": 7,
       "facing": "door",
       "add": {
-        "text": "A mark on the door, the strokes very deliberate, as if drawn with a finger."
+        "text": "A mark on the door, the strokes very deliberate, as if drawn with a finger.",
+        "overlay": "/room/photos/d07_door.jpg"
       }
     },
     {

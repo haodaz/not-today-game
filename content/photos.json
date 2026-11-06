@@ -149,7 +149,8 @@
       "day": 7,
       "facing": "door",
       "add": {
-        "text": "门上一个记号，笔顺很讲究，像用手指画的。"
+        "text": "门上一个记号，笔顺很讲究，像用手指画的。",
+        "overlay": "/room/photos/d07_door.jpg"
       }
     },
     {
