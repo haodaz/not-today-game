@@ -9,12 +9,12 @@
         },
         {
           "k": "narration",
-          "t": "老板叫了你的名字。登录框那一栏，只有你一个人敲过。",
+          "t": "老板在群里叫你，名字后面跟着一个头衔。你没有头衔。",
           "where": "screen:msgs:boss"
         },
         {
           "k": "inner",
-          "t": "Or someone did。",
+          "t": "我什么时候有头衔了。",
           "where": "screen"
         }
       ]

@@ -556,5 +556,8 @@
   "prints.pile": "一摞打印件（{n}）",
   "prints.prev": "上一张",
   "prints.next": "下一张",
-  "prints.close": "放回去"
+  "prints.close": "放回去",
+  "camera.usedToday": "今天用过了。连拍立得都知道一天只干一个活。",
+  "camera.rests": "显影很慢。胶片好像也需要休息……放一夜再看看。",
+  "camera.viewfinder.close": "放下相机"
 }

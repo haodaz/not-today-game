@@ -556,5 +556,8 @@
   "prints.pile": "A pile of prints ({n})",
   "prints.prev": "Previous",
   "prints.next": "Next",
-  "prints.close": "Put it back"
+  "prints.close": "Put it back",
+  "camera.usedToday": "Used today. Even the instant camera knows one job a day.",
+  "camera.rests": "It develops slowly. The sheet seems to need its rest too… leave it a night and look again.",
+  "camera.viewfinder.close": "Put the camera down"
 }

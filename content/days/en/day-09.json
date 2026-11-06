@@ -35,7 +35,7 @@
         },
         {
           "k": "narration",
-          "t": "A hand comes out of the gap, palm up. It wants today's thing: your heartbeat. The one inside."
+          "t": "A hand comes out of the gap, palm up. It wants the thing that only appeared this morning: your heartbeat."
         },
         {
           "k": "inner",
@@ -51,7 +51,7 @@
           }
         },
         {
-          "text": "Hold up the ledger line that was lent and came back.",
+          "text": "Hold up the ledger line you lent.",
           "effects": {
             "item_lost": "loan"
           },
@@ -94,7 +94,7 @@
         },
         {
           "k": "narration",
-          "t": "You free a hand and type one word: handsome."
+          "t": "You don't answer."
         },
         {
           "k": "narration",

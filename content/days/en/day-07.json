@@ -9,12 +9,12 @@
         },
         {
           "k": "narration",
-          "t": "The boss used your name. Only you have ever typed into that login box.",
+          "t": "The boss calls you in the group, a title after your name. You have no title.",
           "where": "screen:msgs:boss"
         },
         {
           "k": "inner",
-          "t": "Or someone did。",
+          "t": "Since when do I have a title.",
           "where": "screen"
         }
       ]
