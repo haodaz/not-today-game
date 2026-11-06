@@ -69,7 +69,8 @@
       "day": 5,
       "facing": "room",
       "add": {
-        "text": "桌上多了一个金属圆筒，接着线，连到主机。"
+        "text": "桌上多了一个金属圆筒，接着线，连到主机。",
+        "overlay": "/room/photos/d05_room.jpg"
       }
     },
     {

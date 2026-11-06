@@ -69,7 +69,8 @@
       "day": 5,
       "facing": "room",
       "add": {
-        "text": "A metal cylinder on the desk, wired to the tower."
+        "text": "A metal cylinder on the desk, wired to the tower.",
+        "overlay": "/room/photos/d05_room.jpg"
       }
     },
     {
