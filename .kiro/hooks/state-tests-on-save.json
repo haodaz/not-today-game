@@ -8,7 +8,7 @@
       "matcher": "(^|/)src/state/",
       "action": {
         "type": "agent",
-        "prompt": "A file under src/state/ was saved. Do NOT run any tests now: the quality gate is deferred to the end of the task, when you run `npx tsc --noEmit` and the full `npx vitest run` once (that run includes every state test). Reply with the single word: deferred."
+        "prompt": "A file under src/state/ was saved. Do NOT run any tests now: the quality gate is deferred to the end of the task, when you run `npx tsc --noEmit` and the full `npx vitest run` once (that run includes every state test). Reply with the single word \"deferred\" and then continue the task you were doing in this same turn; do not end the turn here."
       }
     }
   ]
