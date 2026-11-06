@@ -85,7 +85,8 @@
       "day": 5,
       "facing": "door",
       "add": {
-        "text": "The paper bag is full, its mouth stretched open, a length of copper-coloured metal showing. You put nothing in it."
+        "text": "The paper bag is full, its mouth stretched open, a length of copper-coloured metal showing. You put nothing in it.",
+        "overlay": "/room/photos/d05_door.jpg"
       }
     },
     {
