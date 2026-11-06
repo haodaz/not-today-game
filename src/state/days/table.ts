@@ -4,7 +4,7 @@
 // token the engine does not understand fails at import, not at play.
 import { constants, membersOf } from "../variables";
 import { parseKuroCloses, type KuroCloses } from "../closes";
-import { bilingual } from "../content-locale";
+import { bilingual, bilingualValues } from "../content-locale";
 
 export const LINE_KINDS = ["narration", "inner", "sfx", "speaker"] as const;
 export type LineKind = (typeof LINE_KINDS)[number];
@@ -70,6 +70,8 @@ export interface Choice {
   readonly text: string;
   readonly effects?: ChoiceEffects;
   readonly cond_show?: { readonly has: string };
+  /** night-hand (author 2026-11-06): a shutdown choice's own next lines, right after the pick. */
+  readonly say?: readonly SayLine[];
 }
 
 export interface Sequence {
@@ -284,7 +286,8 @@ function effects(v: unknown, w: string): ChoiceEffects {
   return out as ChoiceEffects;
 }
 
-function sequence(v: unknown, w: string, allowChoices: boolean): Sequence {
+/** `choiceSay`: its choices may carry their own `say` (the shutdown beat only; author 2026-11-06). */
+function sequence(v: unknown, w: string, allowChoices: boolean, choiceSay = false): Sequence {
   if (!isRecord(v)) fail(w, "a sequence must be an object");
   keys(v, allowChoices ? ["say", "choices", "where"] : ["say", "where"], w);
   if (!Array.isArray(v.say)) fail(`${w}.say`, "must be a list");
@@ -296,7 +299,12 @@ function sequence(v: unknown, w: string, allowChoices: boolean): Sequence {
     const cw = `${w}.choices[${i}]`;
     if (!isRecord(c)) fail(cw, "a choice must be an object");
     // `goto` is in the requirements but no day uses it; reject until there is a target to go to.
-    keys(c, ["text", "effects", "cond_show"], cw);
+    keys(c, choiceSay ? ["text", "effects", "cond_show", "say"] : ["text", "effects", "cond_show"], cw);
+    let say: SayLine[] | undefined;
+    if (c.say !== undefined) {
+      if (!Array.isArray(c.say) || c.say.length === 0) fail(`${cw}.say`, "must be a non-empty list");
+      say = c.say.map((x, j) => line(x, `${cw}.say[${j}]`));
+    }
     let cond: { has: string } | undefined;
     if (c.cond_show !== undefined) {
       if (!isRecord(c.cond_show)) fail(`${cw}.cond_show`, "must be an object");
@@ -307,6 +315,7 @@ function sequence(v: unknown, w: string, allowChoices: boolean): Sequence {
       text: str(c.text, `${cw}.text`),
       ...(c.effects !== undefined ? { effects: effects(c.effects, `${cw}.effects`) } : {}),
       ...(cond ? { cond_show: cond } : {}),
+      ...(say ? { say } : {}),
     };
   });
   return { say, choices, ...where };
@@ -403,7 +412,7 @@ export function parseDayFile(raw: unknown, label: string): DayFile {
   keys(raw.beats, BEAT_NAMES, `${label}.beats`);
   const beats: Partial<Record<BeatName, Sequence>> = {};
   for (const name of BEAT_NAMES) {
-    if (raw.beats[name] !== undefined) beats[name] = sequence(raw.beats[name], `${label}.beats.${name}`, true);
+    if (raw.beats[name] !== undefined) beats[name] = sequence(raw.beats[name], `${label}.beats.${name}`, true, name === "shutdown");
   }
   if (!Array.isArray(raw.items)) fail(`${label}.items`, "must be a list");
   const authored = raw.items.map((x, i) => item(x, `${label}.items[${i}]`));
@@ -460,7 +469,12 @@ function localiseSeq(zh: Sequence | undefined, en: Sequence | undefined, w: stri
   const choices = zh.choices?.map((z, i) => {
     const e = en.choices![i]!;
     if (!same(z.effects, e.effects) || !same(z.cond_show, e.cond_show)) fail(`${w}.choices[${i}]`, `effects or condition differ from the Chinese`);
-    return bilingual(z, { text: e.text });
+    // A choice's own lines: line for line, as a sequence's.
+    const cw = `${w}.choices[${i}].say`;
+    if ((z.say?.length ?? 0) !== (e.say?.length ?? 0)) fail(cw, `${e.say?.length ?? 0} lines, the Chinese has ${z.say?.length ?? 0}`);
+    const say = z.say?.map((l, j) => localiseLine(l, e.say![j]!, `${cw}[${j}]`));
+    const out = bilingual(z, { text: e.text });
+    return say ? bilingualValues(out, { say }) : out;
   });
   return { say, ...(choices ? { choices } : {}), ...(zh.where !== undefined ? { where: zh.where } : {}) };
 }

@@ -11,7 +11,7 @@ import { dueAtLieDown, dueAtShutdown } from "@state/endings";
 import { boardJudgement, deliverableForHand, handNight } from "@state/days/board";
 import { autoUnlockBoard } from "@world/desktop/workbench/board";
 import { startEnding } from "@world/endings/flow";
-import { knows, optionOrder, recogniseTable, wasRight } from "@state/recognise";
+import { answerFor, knows, optionOrder, recogniseTable } from "@state/recognise";
 import { advanceTo, BEATS, DEFAULT_CLOCK, isNight, type Beat, type BeatClock } from "@world/desktop/beat";
 import { lastKuroLine } from "@world/desktop/kuro/mini";
 import { startTalk } from "@world/dialogue/kuro";
@@ -92,12 +92,15 @@ export function questionQueued(day: number, object: string, runId: string): Queu
   };
 }
 
-/** The answer's lines: what you remember (or don't), then the inner line. */
-export function answerQueued(day: number, object: string, right: boolean): Queued {
-  const a = recogniseTable.get(object)![right ? "right" : "wrong"];
+/**
+ * The answer's lines for the picked option: its own `say` (then its `inner`, if any), or the
+ * object's shared right / wrong block (author 2026-11-06: every option gets its own next line).
+ */
+export function answerQueued(day: number, object: string, option: number): Queued {
+  const a = answerFor(object, option);
   return {
     key: `d${day}:recognise:${object}:answer`,
-    lines: [...a.say.map((t) => ({ k: "narration" as const, t })), { k: "inner", t: a.inner }],
+    lines: [...a.say.map((t) => ({ k: "narration" as const, t })), ...(a.inner !== undefined ? [{ k: "inner" as const, t: a.inner }] : [])],
     ending: { kind: "none" },
   };
 }
@@ -177,10 +180,13 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
         if (q) dialogue = push(dialogue, q);
       }
     } else if (e.kind === "recognise" && e.option !== undefined) {
-      dialogue = push(dialogue, answerQueued(day, e.objectId, wasRight(e)));
+      dialogue = push(dialogue, answerQueued(day, e.objectId, e.option));
     } else if (e.kind === "choose") {
-      // Nothing given on a night the hand takes something else: its line (night-hand, nights-takes).
       const choice = choiceOf(day, e.beat, e.index);
+      // night-hand (author 2026-11-06): the picked shutdown choice's own lines, right after the
+      // pick (the night beat is queued later, at bedtime). Without `say`, nothing here.
+      if (e.beat === "shutdown" && choice?.say?.length) dialogue = push(dialogue, { key: `d${day}:shutdown:choice:${e.index}`, lines: choice.say, ending: { kind: "none" } });
+      // Nothing given on a night the hand takes something else: its line (night-hand, nights-takes).
       const take = e.beat === "shutdown" && choice && isRaidNight(day) ? takeFor(day, choice) : null;
       if (take) dialogue = push(dialogue, { key: `d${day}:take`, lines: [{ k: "narration", t: take.say }], ending: { kind: "none" } });
     } else if (e.kind === "pickup" && e.meal === "lunch" && (clock.beat === "boot" || clock.beat === "work")) {

@@ -8,7 +8,7 @@ import day9 from "@content/days/day-09.json";
 import stages from "@content/stages.json";
 import variables from "@content/variables.json";
 import zh from "@content/strings/zh.json";
-import { checkDay, main, missingEnglish } from "../scripts/validate-content";
+import { checkDay, checkObjects, main, missingEnglish } from "../scripts/validate-content";
 
 let log: string[] = [];
 beforeEach(() => {
@@ -70,6 +70,39 @@ describe("validate-content", () => {
     expect(checkDay(keyed, "content/days/day-01.json", tables)).toEqual([]);
     keyed.items[0].labelKey = "hud.nope";
     expect(checkDay(keyed, "content/days/day-01.json", tables)).toEqual(['content/days/day-01.json items[0].labelKey: string key "hud.nope" is not in content/strings/zh.json']);
+  });
+
+  it("a choice's own say (night-hand 2026-11-06): only on the shutdown beat, a non-empty list of real lines", () => {
+    const ok = clone(day1);
+    ok.beats.shutdown.choices = [{ text: "x", say: [{ k: "narration", t: "y" }, { k: "speaker", who: "z", t: "w" }] }, { text: "plain" }];
+    expect(checkDay(ok, "content/days/day-01.json", tables)).toEqual([]);
+    const bad = clone(day1);
+    bad.beats.shutdown.choices = [{ text: "a", say: [] }, { text: "b", say: [{ k: "shout", t: "" }, { k: "speaker", t: "x" }] }];
+    bad.beats.desk.choices = [{ text: "c", say: [{ k: "narration", t: "y" }] }];
+    const L = "content/days/day-01.json";
+    expect(checkDay(bad, L, tables)).toEqual([
+      `${L} beats.desk.choices[0].say: only a shutdown choice may have its own say`,
+      `${L} beats.shutdown.choices[0].say: must be a non-empty list of lines`,
+      `${L} beats.shutdown.choices[1].say[0]: unknown line kind "shout" (narration, inner, sfx, speaker)`,
+      `${L} beats.shutdown.choices[1].say[0]: t: expected a non-empty string`,
+      `${L} beats.shutdown.choices[1].say[1]: a speaker line needs \`who\``,
+    ]);
+  });
+
+  it("--objects (recognise 2026-11-06): 2–4 options, `right` on at most one; the content is clean", () => {
+    expect(main(["--objects"])).toBe(0);
+    expect(log).toContain("objects: 2 files, 0 problems");
+    const objects = (o: unknown) => ({ objects: { chick: o } });
+    expect(checkObjects(objects({ options: [{ t: "a", right: true }, { t: "b" }] }), "o.json")).toEqual([]);
+    expect(checkObjects(objects({ options: [{ t: "a" }, { t: "b" }, { t: "c" }, { t: "d", say: ["x"], inner: "y" }] }), "o.json")).toEqual([]);
+    expect(checkObjects(objects({ options: [{ t: "a" }] }), "o.json")).toEqual(["o.json objects.chick.options: has 1 options, must have 2–4"]);
+    expect(checkObjects(objects({ options: Array.from({ length: 5 }, (_, i) => ({ t: String(i) })) }), "o.json")).toEqual(["o.json objects.chick.options: has 5 options, must have 2–4"]);
+    expect(checkObjects(objects({ options: [{ t: "a", right: true }, { t: "b", right: true }] }), "o.json")).toEqual(["o.json objects.chick.options: 2 options are right, at most one may be"]);
+    expect(checkObjects(objects({ options: [{ t: "a", right: "yes" }, { t: "b", inner: "x" }, { t: "c", say: [] }] }), "o.json")).toEqual([
+      "o.json objects.chick.options[0].right: must be true or false",
+      "o.json objects.chick.options[1].inner: needs the option's own say",
+      "o.json objects.chick.options[2].say: must be a non-empty list of strings",
+    ]);
   });
 
   it("--strings lists zh keys missing from en.json (notes skipped)", () => {

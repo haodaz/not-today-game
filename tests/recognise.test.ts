@@ -42,13 +42,14 @@ function queued(store: Store, act: () => void, runId = store.getRunId()) {
 const boxDay = (o: string) => objectsFoundOnDay[o]!;
 
 describe("content/objects.json", () => {
-  it("every object out of the box has a question on its box day, three options, exactly one right", () => {
+  it("every object out of the box has a question on its box day, 2–4 options, at most one right", () => {
     expect(objects.sort()).toEqual(Object.keys(objectsFoundOnDay).sort());
     for (const o of objects) {
       const e = recogniseTable.get(o)!;
       expect(e.day, o).toBe(boxDay(o));
-      expect(e.options).toHaveLength(3);
-      expect(e.options.filter((x) => x.right), o).toHaveLength(1);
+      expect(e.options.length, o).toBeGreaterThanOrEqual(2);
+      expect(e.options.length, o).toBeLessThanOrEqual(4);
+      expect(e.options.filter((x) => x.right).length, o).toBeLessThanOrEqual(1);
     }
   });
 
@@ -56,7 +57,7 @@ describe("content/objects.json", () => {
     const raw = () => structuredClone(objectsFile) as any;
     const two = raw();
     two.objects.chick.options[0].right = true;
-    expect(() => parseObjects(two)).toThrow(/exactly one right/);
+    expect(() => parseObjects(two)).toThrow(/at most one right/);
     const day = raw();
     day.objects.chick.day = 2;
     expect(() => parseObjects(day)).toThrow(/box day 1/);
@@ -64,9 +65,34 @@ describe("content/objects.json", () => {
     delete missing.objects.pager;
     expect(() => parseObjects(missing)).toThrow(/"pager" comes out of the box/);
     const short = raw();
-    short.objects.chick.options.pop();
-    expect(() => parseObjects(short)).toThrow(/exactly 3 options/);
+    short.objects.chick.options.splice(1);
+    expect(() => parseObjects(short)).toThrow(/must have 2–4 options/);
+    const long = raw();
+    long.objects.chick.options.push({ t: "四" }, { t: "五" });
+    expect(() => parseObjects(long)).toThrow(/must have 2–4 options/);
     expect(() => parseObjects({ ...raw(), extra: 1 })).toThrow(/unknown key "extra"/);
+    // An option is { t, right?, say?, inner? }: strict keys; inner only with say; say non-empty.
+    const extraKey = raw();
+    extraKey.objects.chick.options[0].next = "x";
+    expect(() => parseObjects(extraKey)).toThrow(/options\[0\]: unknown key "next"/);
+    const innerAlone = raw();
+    innerAlone.objects.chick.options[0].inner = "x";
+    expect(() => parseObjects(innerAlone)).toThrow(/options\[0\]\.inner: needs the option's own say/);
+    const emptySay = raw();
+    emptySay.objects.chick.options[0].say = [];
+    expect(() => parseObjects(emptySay)).toThrow(/options\[0\]\.say: must be a non-empty list/);
+    // A shared block an option falls back to cannot be left out; one nobody falls back to can.
+    const noWrong = raw();
+    delete noWrong.objects.chick.wrong;
+    expect(() => parseObjects(noWrong)).toThrow(/objects\.chick\.wrong: missing/);
+    for (const o of noWrong.objects.chick.options) if (!o.right) o.say = ["自己的一句。"];
+    expect(parseObjects(noWrong).get("chick")!.wrong).toBeUndefined();
+    // `right` may be left out (false); with none right the shared `right` block is the fallback.
+    const noTest = raw();
+    for (const o of noTest.objects.chick.options) delete o.right;
+    expect(parseObjects(noTest).get("chick")!.options.every((o) => o.right === false)).toBe(true);
+    delete noTest.objects.chick.right;
+    expect(() => parseObjects(noTest)).toThrow(/objects\.chick\.right: missing/);
   });
 });
 
@@ -162,7 +188,7 @@ describe("when it is asked (FR1)", () => {
     ctx.session.dialogue = push(EMPTY_DIALOGUE, questionQueued(4, "pager", store.getRunId())!);
     const answered = queued(store, () => loopActions["loop-choice"]!(ctx, { index: String(wrongIndex("pager")) } as DOMStringMap, null as never));
     const answer = answered.queue.find((q) => q.key === "d4:recognise:pager:answer")!;
-    const wrong = recogniseTable.get("pager")!.wrong;
+    const wrong = recogniseTable.get("pager")!.wrong!;
     expect(answer.lines).toEqual([...wrong.say.map((t) => ({ k: "narration", t })), { k: "inner", t: wrong.inner }]);
     expect(store.getState().recognised).toEqual([]);
 
