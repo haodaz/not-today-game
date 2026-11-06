@@ -36,7 +36,8 @@
       "day": 4,
       "facing": "room",
       "add": {
-        "text": "两块屏幕之间那条缝里，渗出一点海水。"
+        "text": "两块屏幕之间那条缝里，渗出一点海水。",
+        "overlay": "/room/photos/d04_room.jpg"
       }
     },
     {

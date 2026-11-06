@@ -36,7 +36,8 @@
       "day": 4,
       "facing": "room",
       "add": {
-        "text": "A little seawater seeping from the gap between the two screens."
+        "text": "A little seawater seeping from the gap between the two screens.",
+        "overlay": "/room/photos/d04_room.jpg"
       }
     },
     {
