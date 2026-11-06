@@ -173,7 +173,8 @@
       "day": 8,
       "facing": "bed",
       "add": {
-        "text": "A rank table pinned to the wall above the bed. The last line says: you."
+        "text": "A rank table pinned to the wall above the bed. The last line says: you.",
+        "overlay": "/room/photos/d08_bed_en.jpg"
       }
     },
     {
