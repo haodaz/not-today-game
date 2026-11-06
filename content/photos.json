@@ -109,7 +109,8 @@
       "day": 6,
       "facing": "bed",
       "add": {
-        "text": "床边的墙上挂着一幅画，画的是你躺在床上。"
+        "text": "床边的墙上挂着一幅画，画的是你躺在床上。",
+        "overlay": "/room/photos/d06_bed.jpg"
       }
     },
     {

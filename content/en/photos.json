@@ -109,7 +109,8 @@
       "day": 6,
       "facing": "bed",
       "add": {
-        "text": "A painting on the wall by the bed: you, lying in the bed."
+        "text": "A painting on the wall by the bed: you, lying in the bed.",
+        "overlay": "/room/photos/d06_bed.jpg"
       }
     },
     {
