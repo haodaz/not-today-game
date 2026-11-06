@@ -93,7 +93,8 @@
       "day": 5,
       "facing": "window",
       "add": {
-        "text": "窗玻璃上一圈很细的划痕，像用圆规画的。"
+        "text": "窗玻璃上一圈很细的划痕，像用圆规画的。",
+        "overlay": "/room/photos/d05_window.jpg"
       }
     },
     {

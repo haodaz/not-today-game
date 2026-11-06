@@ -93,7 +93,8 @@
       "day": 5,
       "facing": "window",
       "add": {
-        "text": "A fine scratched circle on the window glass, as if drawn with a compass."
+        "text": "A fine scratched circle on the window glass, as if drawn with a compass.",
+        "overlay": "/room/photos/d05_window.jpg"
       }
     },
     {
