@@ -521,5 +521,21 @@
   "settings.confirm": "确定",
   "onboard.next": "下一个",
   "onboard.skip": "跳过",
-  "onboard.step": "{n} / {total}"
+  "onboard.step": "{n} / {total}",
+  "hint.tower": "桌子底下是主机。按一下，开机。",
+  "hint.screen": "点屏幕，坐到电脑前。左屏右屏都能点。",
+  "hint.turn": "鼠标移到画面左右边缘，转身看屋里别的地方。",
+  "hint.phone": "手机在桌上。点外卖、看时间，都用它。",
+  "hint.door": "门铃响了。外卖和快递都放在门口。",
+  "hint.table": "饭放到窗边小桌上，在那儿吃。",
+  "hint.box": "床边那只箱子。每天会松开一个小盒子。",
+  "hint.items": "拿到的老东西都在「道具」里。拿出来，有些在工作里用得上。",
+  "hint.kuro": "克总一直在。白天的活干完，晚上可以陪你聊会儿。",
+  "hint.bed": "活干完了，关机，躺下。今天就过去了。",
+  "hint.chickHint": "看似没什么用的东西，在工作里似乎有用。",
+  "hint.ok": "知道了",
+  "settings.hints": "新手提示",
+  "settings.hints.on": "开",
+  "settings.hints.off": "关",
+  "kuro.hint.typing": "你打。我看着。"
 }

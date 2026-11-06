@@ -521,5 +521,21 @@
   "settings.confirm": "Yes",
   "onboard.next": "Next",
   "onboard.skip": "Skip",
-  "onboard.step": "{n} / {total}"
+  "onboard.step": "{n} / {total}",
+  "hint.tower": "The computer is under the desk. Press it to switch on.",
+  "hint.screen": "Click a screen to sit at the computer. Either screen works.",
+  "hint.turn": "Move the pointer to the left or right edge to turn and look around the room.",
+  "hint.phone": "The phone is on the desk. Ordering food and checking the time both happen here.",
+  "hint.door": "The doorbell. Takeaway and parcels are left outside the door.",
+  "hint.table": "Take the meal to the little table by the window and eat there.",
+  "hint.box": "The case by the bed. One small box comes loose each day.",
+  "hint.items": "Old things you find go into Items. Take them out: some help with work.",
+  "hint.kuro": "Kuro is always here. Finish the day's work and it will talk with you at night.",
+  "hint.bed": "Work done, computer off, lie down. That's the day over.",
+  "hint.chickHint": "Things that look useless seem to have a use at work.",
+  "hint.ok": "Got it",
+  "settings.hints": "Beginner hints",
+  "settings.hints.on": "On",
+  "settings.hints.off": "Off",
+  "kuro.hint.typing": "You type. I'm watching."
 }
