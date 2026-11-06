@@ -24,7 +24,8 @@ const OBJECTS_EN = join(ROOT, "content/en/objects.json");
 /** Every day has these beats. */
 const CORE_BEATS = ["boot", "desk", "shutdown", "night"] as const;
 /** `box` is the fifth: present exactly on the days an object arrives (stages.json objectsFoundOnDay). */
-const ALL_BEATS = ["boot", "box", "desk", "shutdown", "night"];
+const ALL_BEATS = ["boot", "rise", "box", "desk", "shutdown", "night"];
+/** lying-view R6: `rise` is optional (what is seen on getting up); any day may have it. */
 /**
  * A choice's `effects` are the day files' deltas: each key changes one variable of
  * content/variables.json (the same keys the loader accepts, src/state/days/table.ts).
@@ -126,6 +127,11 @@ export function checkDay(raw: unknown, label: string, t: Tables): string[] {
   else {
     for (const b of CORE_BEATS) if (beats[b] === undefined) say(`beats.${b}`, "missing");
     for (const b of Object.keys(beats)) if (!ALL_BEATS.includes(b)) say(`beats.${b}`, `not a beat (${ALL_BEATS.join(", ")})`);
+    // lying-view R6: `rise` is lines only.
+    if (beats.rise !== undefined) {
+      if (!isRecord(beats.rise) || !Array.isArray(beats.rise.say)) say("beats.rise", "must be { say: [...] }");
+      else for (const k of Object.keys(beats.rise)) if (k !== "say" && k !== "where") say(`beats.rise.${k}`, "not a key of a rise beat (say, where)");
+    }
     const boxDay = t.boxDays.has(fromName);
     if (boxDay && beats.box === undefined) say("beats.box", `missing (an object arrives on day ${fromName})`);
     if (!boxDay && beats.box !== undefined) say("beats.box", `present, but no object arrives on day ${fromName}`);
