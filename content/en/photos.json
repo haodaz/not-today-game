@@ -189,7 +189,8 @@
       "day": 8,
       "facing": "window",
       "add": {
-        "text": "The sunset is on the wrong side. The sun goes down past the other edge of the window."
+        "text": "Every window in the building opposite is lit. The same light in each, in ranks.",
+        "overlay": "/room/photos/d08_window.jpg"
       }
     },
     {

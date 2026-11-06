@@ -189,7 +189,8 @@
       "day": 8,
       "facing": "window",
       "add": {
-        "text": "日落的方向不对。太阳从窗户的另一边下去。"
+        "text": "对面楼的窗全亮了。每一扇一样的光，排成方阵。",
+        "overlay": "/room/photos/d08_window.jpg"
       }
     },
     {
