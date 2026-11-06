@@ -277,9 +277,6 @@
 .room .held.obj .signal::after{content:"";position:absolute;inset:0;border-bottom:1px solid rgba(27,27,27,.35)}
 .room .held.obj .sim{position:absolute;left:30%;top:42%;width:40%;height:22%;border-radius:6px;background:#d8c06a;display:flex;align-items:flex-end;justify-content:center;padding:4px;box-sizing:border-box}
 .room .held.obj .sim span{font-size:9px;color:#3a3220}
-/* camera R6: while its photos are missing, the camera's front is a tinted box (holding only; 使用 is
-   the drawn device). The picture covers it once it exists. */
-.room .held.obj[data-object="camera"]:not(.device) .face.front{min-height:260px;background:#d9d4c8;border-radius:18px}
 /* The dictionary: shut when lifted (its lid is the back picture); used, it opens on a loose hinge. */
 .room .held.obj[data-object="dictionary"][data-open="0"] .face.front > :not(img){visibility:hidden}
 .room .held.obj[data-object="dictionary"][data-open="0"] .face.front > img{content:url(/objects/dictionary_back.png)}

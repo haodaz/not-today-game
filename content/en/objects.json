@@ -70,7 +70,7 @@
     },
     "camera": {
       "day": 2,
-      "q": "Hard. An instant camera, cream white, a red shutter.",
+      "q": "A cream-white shell, one black lens, a round red button. A slit along the bottom of the body.",
       "options": [
         {
           "t": "A toy camera",
@@ -205,7 +205,7 @@
     },
     "tape": {
       "day": 5,
-      "q": "A walkman whose lid won't quite shut. A tape inside, the sleeve handwritten, the ink blurred by sweat.",
+      "q": "A machine the size of a palm whose lid won't quite shut. A tape inside, the sleeve handwritten, the ink blurred by sweat.",
       "options": [
         {
           "t": "A tape recorder",
@@ -474,7 +474,7 @@
     },
     "calculator": {
       "day": 7,
-      "q": "A calculator, seven-segment digits, green. A slip of paper stuck inside the lid.",
+      "q": "A row of keys, seven-segment digits, green. A slip of paper stuck inside the lid.",
       "options": [
         {
           "t": "A remote control",
@@ -658,7 +658,7 @@
     },
     "phone": {
       "day": 8,
-      "q": "A flip phone, very light, plastic. It clicks when it shuts.",
+      "q": "A clamshell, very light, plastic. It clicks when it shuts.",
       "options": [
         {
           "t": "A toy phone",
