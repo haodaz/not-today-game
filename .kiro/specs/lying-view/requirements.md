@@ -28,3 +28,9 @@ The author's decisions from the day-1 replay: the day begins and ends lying in b
 ## R5. Tests
 - `lying` is reachable from 床 and back; the day starts in `lying`; `bed` after nightfall goes to `lying`; `bedAsk` is asked from `lying`; 再待会儿 keeps the view; `kuro-call` works in `lying`; `sleep` from `lying` starts the night; the boot beat plays over `lying`.
 - Snapshots that change only by the new view / the new opening lines: list them in the report, do not edit them.
+
+## R6. Getting up (addition 2026-11-06, author, after seeing R1–R5)
+- `lying` has no 返回 / back control and no wheel-out. Leaving it is an action: a click on the ceiling (anywhere that is not Kuro's body), Esc, ← / → or the back key asks `room.rise.ask` 「要起来吗？」 with two choices, `room.rise.up` 「起床」 and `room.rise.stay` 「再躺一会儿」 (strings in the tree, zh + en). 起床 goes up to 床; 再躺一会儿 keeps the player lying. While a dialogue is up, the ask waits (dialogue owns the screen, playtest-1105 R2).
+- The day's opening is split in two. `beats.boot.say` is what is heard and said lying down (day 1: Kuro's three lines and the rain). A new optional beat `beats.rise: { say: [...] }` is what the player sees on getting up (day 1: the cold water, the black screens, the inner line about the power button). It plays once per day, right after the first 起床 of that day, in the view the player stands up into (床). Days without `rise` play nothing on getting up. The day-file parser (`src/state/days/table.ts`) and `scripts/validate-content.ts` accept the key; the English twin has the same shape. Claude moves day 1's lines once the parser accepts the key; other days follow later.
+- After nightfall the bed question (`bedAsk`, 睡 / 再待会儿) stays as in R4; 再待会儿 keeps the player lying, and getting up from there is the same 起床 ask.
+- Tests: the ask from a click / Esc; 起床 lands on 床 and plays `rise` once; 再躺一会儿 stays; a day file with `rise` parses and one without still does; `rise` with an unknown key fails.
