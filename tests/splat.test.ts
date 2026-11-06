@@ -12,6 +12,7 @@ import { mountDesktop } from "@world/desktop/controller";
 import type { Session } from "@world/desktop/model";
 import { BACKDROPS } from "@world/fit";
 import { syncLoop } from "@world/loop/runtime";
+import { EMPTY_DIALOGUE } from "@world/loop/dialogue";
 import { createMotion } from "@world/motion/dom";
 import { MOTION } from "@world/motion/timing";
 import { loopActions, loopKeys, renderGame } from "@world/room/game";
@@ -235,6 +236,9 @@ function mount(opts: { load?: LoadScene; day?: number; view?: Session["view"]; s
     motion: createMotion,
     splat: layer ? (r, ctx) => (hooks = layer(r, ctx)) : undefined,
   });
+  // playtest-1105 R3 / R2: waking queues the boot beat and the box owns the screen; not this test's subject.
+  m.session.dialogue = EMPTY_DIALOGUE;
+  m.session.onboard = "done";
   destroy = m.destroy;
   return { root, session: m.session, hooks: () => hooks! };
 }

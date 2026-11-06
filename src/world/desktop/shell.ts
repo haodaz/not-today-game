@@ -3,7 +3,7 @@
 // one app window, the dock (left only), night plates, ring layer. Pure: model in, markup out.
 // Layout and class names follow design/desktop/*.html. Side by side exists only in the room scene.
 import { cls, html, raw, type SafeHtml } from "@world/html";
-import { t, tr } from "@world/i18n";
+import { hasString, t, tr } from "@world/i18n";
 import { beatLabelKey, type BeatClock } from "./beat";
 import type { DockEntry } from "./dock";
 import { fxStageAttrs, type FxPlan } from "../room/fx";
@@ -36,6 +36,8 @@ export interface MonitorModel {
   readonly bar?: SafeHtml | null;
   /** "full" (shell R10, 工作台): no window, the app fills the screen under the OS bar; its bar is its own 44 px top bar. */
   readonly chrome?: "full";
+  /** playtest-1105 R1: the bar is the app's own top bar (工作台), in a window or full screen. */
+  readonly appTop?: boolean;
   readonly body: SafeHtml;
   /** The night plate's small line (strings key). */
   readonly nightSubKey: string;
@@ -78,6 +80,27 @@ export interface ShellModel {
   readonly scene?: Scene;
   /** The boss's call overlay over the whole screen (day-loop 2026-11-03); absent = no call showing. */
   readonly callOverlay?: SafeHtml | null;
+  /** playtest-1105 R1: the run's first desktop visit: the onboarding card is up. */
+  readonly onboard?: boolean;
+}
+
+/** playtest-1105 R1: the onboarding card's rows, in dock order: [icon, strings key]. */
+export const ONBOARD_ROWS: readonly (readonly [string, string])[] = [
+  ["/os/tingtalk.svg", "onboard.tingtalk"],
+  ["/os/workbench.svg", "onboard.workbench"],
+  ["/os/msgs.svg", "onboard.msgs"],
+  ["/os/browser.svg", "onboard.browser"],
+  ["/os/files.svg", "onboard.files"],
+];
+
+/**
+ * playtest-1105 R1: one centred card over the bare desktop: the title, one row per dock app (28 px
+ * icon + one line), one button. The dim behind it takes clicks and does nothing with them.
+ */
+function onboardCard(m: ShellModel): SafeHtml | null {
+  if (!m.onboard) return null;
+  const rows = ONBOARD_ROWS.filter(([, key]) => hasString(key)).map(([src, key]) => html`<li><img src="${src}" alt="" width="28" height="28" draggable="false">${tr(key)}</li>`);
+  return html`<div class="onboard-layer"><div class="onboard-dim"></div><div class="onboard" role="dialog" aria-modal="true" aria-labelledby="onboard-title"><h3 id="onboard-title">${tr("onboard.title")}</h3><ul>${rows}</ul><button type="button" class="ok" data-action="onboard-ok">${tr("onboard.ok")}</button></div></div>`;
 }
 
 function topBar(m: ShellModel, monitor: MonitorModel): SafeHtml {
@@ -103,7 +126,9 @@ function trafficLights(monitor: MonitorModel): SafeHtml {
   if (monitor.app === null) return html`<div class="dots"><i></i><i></i><i></i></div>`;
   const item = (side: Side) =>
     html`<button type="button" role="menuitem" data-action="win-move" data-app="${monitor.app}" data-side="${side}"${side === monitor.side ? html` disabled` : null}>${tr(side === "left" ? "win.moveLeft" : "win.moveRight")}</button>`;
-  return html`<div class="dots"><i></i><i></i><span class="tl-g"><i></i><span class="win-menu" role="menu">${item("left")}${item("right")}</span></span></div>`;
+  // playtest-1105 R1: on 工作台 a click on the green light is full screen (and back), the macOS way.
+  const green = monitor.app === "workbench" ? html`<i data-action="win-full" data-app="workbench"></i>` : html`<i></i>`;
+  return html`<div class="dots"><i></i><i></i><span class="tl-g">${green}<span class="win-menu" role="menu">${item("left")}${item("right")}</span></span></div>`;
 }
 
 /** 关机, next to the clock in the system's own bar (day-loop correction 2026-11-01). */
@@ -122,7 +147,7 @@ function windowFrame(m: ShellModel, monitor: MonitorModel): SafeHtml | null {
   const frame = (inner: SafeHtml) =>
     full
       ? html`<div class="${cls("win", monitor.winClass, "full")}" data-win="${monitor.app}"><div class="bar app-top" data-drag-win="${monitor.app}" data-side="${monitor.side}">${trafficLights(monitor)}${inner}</div>`
-      : html`<div class="${cls("win", monitor.winClass)}" data-win="${monitor.app}" style="left:24px;top:54px;width:1392px;height:760px"><div class="bar" data-drag-win="${monitor.app}" data-side="${monitor.side}">${trafficLights(monitor)}${inner}</div>`;
+      : html`<div class="${cls("win", monitor.winClass)}" data-win="${monitor.app}" style="left:24px;top:54px;width:1392px;height:760px"><div class="${cls("bar", monitor.appTop && "app-top")}" data-drag-win="${monitor.app}" data-side="${monitor.side}">${trafficLights(monitor)}${inner}</div>`;
   if (m.night) {
     // Night: the desktop stays, but every app has closed its door.
     return html`${frame(html`<span class="title">${monitor.winTitle}</span>`)}<div class="plate"><div class="lock"></div>${tr("night.plate.title")}<small>${tr(monitor.nightSubKey)}</small></div></div>`;
@@ -204,7 +229,7 @@ export function renderDesktop(m: ShellModel): SafeHtml {
   const [left, right] = m.monitors;
   const shown = m.focus === "left" ? left : right;
   const other = m.focus === "left" ? right : left;
-  return html`<div class="stage one-monitor" data-day="${m.day}" data-beat="${m.clock.beat}" data-focus="${m.focus}"${fxStageAttrs(m.fx ?? null)}>${toggle(m.focus)}${monitor(m, shown)}${otherTab(m, other)}${m.scene ? renderScene(m.scene) : null}${m.callOverlay ?? null}${missionControl(m)}</div>`;
+  return html`<div class="stage one-monitor" data-day="${m.day}" data-beat="${m.clock.beat}" data-focus="${m.focus}"${fxStageAttrs(m.fx ?? null)}>${toggle(m.focus)}${monitor(m, shown)}${otherTab(m, other)}${m.scene ? renderScene(m.scene) : null}${m.callOverlay ?? null}${missionControl(m)}${onboardCard(m)}</div>`;
 }
 
 /**

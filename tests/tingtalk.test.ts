@@ -160,7 +160,7 @@ describe("R1b · moving a window to the other screen", () => {
     moveApp(p, "tingtalk", "left");
     savePlacement(localStorage, "run-a", p);
     expect(JSON.parse(localStorage.getItem(PLACE_KEY)!).runId).toBe("run-a");
-    expect(loadPlacement(localStorage, "run-a", APPS)).toEqual({ place: { msgs: "left", tingtalk: "left", workbench: "left", browser: "left" }, stack: ["workbench", "tingtalk"], leftApp: "tingtalk", rightApp: null });
+    expect(loadPlacement(localStorage, "run-a", APPS)).toEqual({ place: { msgs: "left", tingtalk: "left", workbench: "left", browser: "left" }, stack: ["workbench", "tingtalk"], leftApp: "tingtalk", rightApp: null, onboard: "no" });
     expect(loadPlacement(localStorage, "run-b", APPS)).toBeNull();
     localStorage.setItem(PLACE_KEY, "{not json");
     expect(loadPlacement(localStorage, "run-a", APPS)).toBeNull();

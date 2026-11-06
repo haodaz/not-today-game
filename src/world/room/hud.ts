@@ -22,7 +22,7 @@ import { raidNights, takeOf } from "@state/nights";
 import { isEvening, isNight } from "@world/desktop/beat";
 import { lampLit } from "@world/objects/works";
 import { hudKuro } from "@world/desktop/kuro/mini";
-import { DESK_SHOT, DOOR_SHOT, FLAT_HOTS, isFlatFacing, rectStyle, ROOM_SHOT, WINDOW_SHOT, type FlatHotId, type Rect } from "./shots";
+import { DESK_SHOT, DOOR_SHOT, FLAT_HOTS, isFlatFacing, LOOK_SPOTS, rectStyle, ROOM_SHOT, WINDOW_SHOT, type FlatHotId, type Rect } from "./shots";
 import { isFacing } from "./facings";
 import { deskLayout, objectSlot } from "./desk";
 import { fxPlan, renderFx } from "./fx";
@@ -207,6 +207,14 @@ function flatHits(view: "bed" | "window"): SafeHtml {
   })}`;
 }
 
+/**
+ * playtest-1105 R4: the things to touch on 门 and 窗 (the coat, the bag, the door, the lock): real
+ * buttons at their rects (the nav layer leaves a button alone); a click is one inner line.
+ */
+function lookHits(view: "door" | "window"): SafeHtml {
+  return html`${LOOK_SPOTS[view].map(({ look, rect }) => html`<button type="button" class="look-hit ${look}" data-action="room-look" data-look="${look}" style="${rectStyle(rect)}" aria-hidden="true" tabindex="-1"></button>`)}`;
+}
+
 /** 道具 (day-loop correction 2026-11-01): the button next to ⚙; it opens and closes the strip. */
 export function itemsButton(session: Pick<Session, "itemsOpen">): SafeHtml {
   const open = session.itemsOpen;
@@ -387,6 +395,13 @@ const PROXIES: Readonly<Record<HotId, Proxy>> = {
   door: { cls: "shot-hit door-hit", attrs: 'data-action="view" data-view="door"', label: () => t("hud.cam.door") },
 };
 
+/** playtest-1105 R3: from the moment the tower is on, the two screens show their lit state (the title page's look). */
+function litScreens(view: HotView, state: State, events: readonly GameEvent[]): SafeHtml | null {
+  if (!booted(state, events)) return null;
+  const rects = view === "desk" ? DESK_SHOT.monitors : ROOM_SHOT.monitors;
+  return html`<i class="monitor-lit left" style="${rectStyle(rects.left)}" aria-hidden="true"></i><i class="monitor-lit right" style="${rectStyle(rects.right)}" aria-hidden="true"></i>`;
+}
+
 function shotHits(view: HotView, state: State, events: readonly GameEvent[]): SafeHtml {
   const fixed = fixedRects(view);
   const buttons = hotIdsIn(view).map((id) => {
@@ -397,7 +412,7 @@ function shotHits(view: HotView, state: State, events: readonly GameEvent[]): Sa
     const tower = id === "tower" ? html`<i class="tower-led"></i>` : null;
     return html`<button type="button" class="${p.cls}" ${raw(p.attrs)} style="${rectStyle(r)}" aria-label="${p.label(state, events)}" data-hot="${id}">${tower}</button>`;
   });
-  return html`${buttons}`;
+  return html`${litScreens(view, state, events)}${buttons}`;
 }
 
 /** Kuro's body (the call button) and the camera chips, one row at the bottom right. */
@@ -481,8 +496,9 @@ export function renderRoom(model: RoomModel): SafeHtml {
   // evening look and the collapse shader step aside until the sequence ends.
   const lineScene = sceneOf(session.dialogue);
   const dream = lineScene.backdrop !== null;
-  const flat = isFlatFacing(view) ? html`${flatHits(view)}${view === "window" ? windowThings(state, events) : null}` : null;
-  const scene = waiting || dream ? null : door ? doorContent(state, events, session) : hotView ? html`${shotHits(hotView, state, events)}${kept}` : flat;
+  const flat = isFlatFacing(view) ? html`${flatHits(view)}${view === "window" ? html`${lookHits("window")}${windowThings(state, events)}` : null}` : null;
+  // playtest-1105 R4: 门's things to touch sit under the door beat's own spot.
+  const scene = waiting || dream ? null : door ? html`${lookHits("door")}${doorContent(state, events, session)}` : hotView ? html`${shotHits(hotView, state, events)}${kept}` : flat;
   // The held item sits over everything but the dialogue box (held-object.html).
   const held = door ? null : heldLayer(state, events, session, nowMs);
   // The hand is here: the desk dims and the gap between the monitors glows (night-hand FR1; the

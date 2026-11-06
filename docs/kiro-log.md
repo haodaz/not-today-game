@@ -2498,3 +2498,32 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
 - Tests: new `tests/tape-reverse.test.ts` (7), with a sleeptalk fixture through the real loader; `objects-in-hand.test.ts` TapeState literals gain `reverse: false`.
 - `npx tsc --noEmit`: clean. `npx vitest run`: 119 files / 2075 tests passed.
 - Content: no night has `backwards` yet, so nothing changes on screen until Claude moves the 「倒着放：……」 lines.
+
+## playtest-1105 tasks 1–4 (2026-11-05; tasks 5–10 not started)
+
+- R1, the computer for a new player:
+  - The run's first desktop visit (`arrive` → `firstDesktop`) is the bare desktop: no window, dock up, and the onboarding card.
+    - The card has one row per dock app in dock order (28 px icon, `onboard.*`) and one `onboard-ok` button; the dim behind it has no action.
+    - The state lives in `Session.onboard` ("no" / "due" / "done"), remembered with the run's placement (`nt_place`; an older placement means "done").
+    - `initialSession` is "done"; `mountDesktop` starts every run at "no".
+  - 工作台 is a normal window by default (`appTop` bar in the window too). Full screen only via its green light (`win-full`, `Session.wbFull`, session only); the dock hides / peeks only then.
+  - `DOCK_EDGE_PX` 6 → 4.
+  - The top bar's sidebar toggle and tools are `flex:0 0 auto`; the title shrinks first.
+- R2, the box owns the screen: `dlgLayer` always puts a mask under the box.
+  - While only a line is up (`boxReadsOn`: no choices, no player's box, no history) the mask is `loop-advance`. At a choice or the player's box it only holds the screen (`.waits`).
+  - Stories keep the 40 % dim; a fragment's mask is clear.
+  - Enter / Space were already wired.
+- R3, the day's opening:
+  - The boot beat is queued on waking: `wake()` in syncLoop's first-look / new-day branch, once a day (`Session.bootBeatDay`), and not once the tower is on.
+  - The tower's boot step now queues `powerOnQueued` (narration `room.boot.on`, inner `room.boot.hint`).
+  - 房间 / 桌子 draw `.monitor-lit` over both monitors from the boot step (the title page's lit look).
+  - `startPrologue` puts the dream at the head of the queue, before the waking beat.
+- R4, things to touch:
+  - New `src/state/room-looks.ts`: strict loader + twin (same keys, same counts; `bilingualValues`), and `nextLook`, which never repeats the last index.
+  - `LOOK_SPOTS` (shots.ts, `fracRect` from the spec's fractions, cover-fitted per backdrop: door_wall 2048×1152, window 1664×928). On 门 the lock comes after the door leaf, so it sits on top.
+  - Real `.look-hit` buttons; the `room-look` action pushes one inner line and logs nothing.
+- Tests:
+  - new `tests/playtest-1105.test.ts` (15);
+  - updated for the new rules: shell (window default, 4 px edge, full-screen dock), tingtalk (placement field), story-mask, fixes-1031, loop-hud (waking beat), where (the waking beat set aside where it is not the subject), navigation and splat harnesses (the waking lines set aside, onboarding done);
+  - snapshots (desktop-snapshots, story-mask, late-days, navigation) edited by hand for the new markup only.
+- `npx tsc --noEmit`: clean. `npx vitest run`: 120 files / 2087 tests passed.

@@ -14,11 +14,16 @@ export interface Placement {
   /** The window in front on each monitor, or null (an empty display). */
   leftApp: AppId | null;
   rightApp: AppId | null;
+  /**
+   * playtest-1105 R1: the first desktop visit of the run (bare desktop + the onboarding card):
+   * "no" not yet, "due" the card is up, "done" seen. Remembered for the run with the placement.
+   */
+  onboard?: "no" | "due" | "done";
 }
 
 /** The author's default (R1): 工作台 on the left, 听听 on the right; Hi信 and the browser open on the left. */
 export const DEFAULT_PLACE: Readonly<Record<AppId, Side>> = { msgs: "left", tingtalk: "right", workbench: "left", browser: "left" };
-export const defaultPlacement = (): Placement => ({ place: { ...DEFAULT_PLACE }, stack: ["tingtalk", "workbench"], leftApp: "workbench", rightApp: "tingtalk" });
+export const defaultPlacement = (): Placement => ({ place: { ...DEFAULT_PLACE }, stack: ["tingtalk", "workbench"], leftApp: "workbench", rightApp: "tingtalk", onboard: "no" });
 
 export const otherSide = (side: Side): Side => (side === "left" ? "right" : "left");
 
@@ -79,7 +84,10 @@ export function loadPlacement(storage: Pick<Storage, "getItem"> | null, runId: s
     for (const app of apps) if (SIDES.includes(v.place[app] as string)) place[app] = v.place[app] as Side;
     const stack = (v.stack as unknown[]).filter((a): a is AppId => apps.includes(a as AppId));
     const front = (a: unknown, side: Side): AppId | null => (apps.includes(a as AppId) && place[a as AppId] === side ? (a as AppId) : null);
-    return { place, stack, leftApp: front(v.leftApp, "left"), rightApp: front(v.rightApp, "right") };
+    // A placement saved before the onboarding existed: that run has seen its desktop.
+    const o = (v as { onboard?: unknown }).onboard;
+    const onboard = o === "no" || o === "due" || o === "done" ? o : "done";
+    return { place, stack, leftApp: front(v.leftApp, "left"), rightApp: front(v.rightApp, "right"), onboard };
   } catch {
     return null;
   }
@@ -87,11 +95,11 @@ export function loadPlacement(storage: Pick<Storage, "getItem"> | null, runId: s
 
 export function savePlacement(storage: Pick<Storage, "setItem"> | null, runId: string, p: Placement): void {
   try {
-    storage?.setItem(PLACE_KEY, JSON.stringify({ runId, place: p.place, stack: p.stack, leftApp: p.leftApp, rightApp: p.rightApp }));
+    storage?.setItem(PLACE_KEY, JSON.stringify({ runId, place: p.place, stack: p.stack, leftApp: p.leftApp, rightApp: p.rightApp, onboard: p.onboard ?? "no" }));
   } catch {
     // No storage is fine: the placement lasts the page.
   }
 }
 
 /** The placement fields of a session (for comparing and saving). */
-export const placementOf = (s: Placement): Placement => ({ place: s.place, stack: s.stack, leftApp: s.leftApp, rightApp: s.rightApp });
+export const placementOf = (s: Placement): Placement => ({ place: s.place, stack: s.stack, leftApp: s.leftApp, rightApp: s.rightApp, onboard: s.onboard ?? "no" });

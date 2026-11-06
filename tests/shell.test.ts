@@ -162,8 +162,8 @@ describe("R1 · the frame: the conversation and its inset cards", () => {
     const css = readFileSync(resolve(__dirname, "../src/world/desktop/desktop.css"), "utf8");
     expect(css).toContain(".wb .sh-card{background:#FFFFFF;border:1px solid #E7E5E0;border-radius:12px;box-shadow:0 1px 2px rgba(0,0,0,.04)");
     expect(css).toMatch(/\.wb-task-body\.sh-frame\{[^}]*padding:8px;gap:8px;background:#FAF9F7/);
-    // R10: one 44 px top bar for 工作台 (the R1 48 px task header is gone).
-    expect(css).toMatch(/\.win\.wb\.full > \.bar\.app-top\{height:44px/);
+    // R10: one 44 px top bar for 工作台 (the R1 48 px task header is gone); in its window too (playtest-1105 R1).
+    expect(css).toMatch(/\.win\.wb > \.bar\.app-top\{height:44px/);
     expect(css).toContain(".wb .sh-card-h{height:40px");
     expect(css).toContain(".wb .sh-tg{width:32px;height:32px;border:0;border-radius:8px;background:transparent;color:#6B6B6B");
     expect(css).toContain(".wb .sh-tg.on{background:#E3ECFA;color:#2F6FEB}");
@@ -410,9 +410,13 @@ const winOf = (out: string) => {
 };
 
 describe("R10 · one top bar", () => {
-  it("工作台's window is full-screen with exactly one bar: traffic lights, sidebar toggle, ← →, title ▾, pane toggles, 老物件", () => {
+  it("工作台's window has exactly one bar: traffic lights, sidebar toggle, ← →, title ▾, pane toggles, 老物件 (a window by default; full screen when chosen)", () => {
     const store = day1();
     const h = onPage(store);
+    // playtest-1105 R1: a normal window by default.
+    const plain = winOf(desk(h, store));
+    expect(plain).toMatch(/^<div class="win wb" data-win="workbench" style="left:24px;top:54px;width:1392px;height:760px"><div class="bar app-top" data-drag-win/);
+    h.session.wbFull = true;
     const win = winOf(desk(h, store));
     expect(win).toMatch(/^<div class="win wb full" data-win="workbench"[^>]*>/);
     expect(win.slice(0, win.indexOf(">"))).not.toContain("style=");
@@ -616,9 +620,11 @@ describe("R11.2 · the dock over full-screen 工作台", () => {
   };
   const dockClass = (out: string) => /<div class="(dock[^"]*)">/.exec(out)?.[1];
 
-  it("hidden while 工作台 is in front on the left monitor; up while peeking; other apps keep it", () => {
-    expect(dockClass(desktop({ leftApp: "workbench" }))).toBe("dock auto");
-    expect(dockClass(desktop({ leftApp: "workbench", dockPeek: true }))).toBe("dock auto peek");
+  it("hidden while full-screen 工作台 is in front on the left monitor; up while peeking; other apps, and its window, keep it", () => {
+    expect(dockClass(desktop({ leftApp: "workbench", wbFull: true }))).toBe("dock auto");
+    expect(dockClass(desktop({ leftApp: "workbench", wbFull: true, dockPeek: true }))).toBe("dock auto peek");
+    // playtest-1105 R1: 工作台 in its window keeps the dock.
+    expect(dockClass(desktop({ leftApp: "workbench" }))).toBe("dock");
     expect(dockClass(desktop({ leftApp: "msgs", place: { msgs: "left", tingtalk: "right", workbench: "left", browser: "left" } }))).toBe("dock");
     expect(dockClass(desktop({ leftApp: "browser", dockPeek: true }))).toBe("dock");
     const css = readFileSync(resolve(__dirname, "../src/world/desktop/desktop.css"), "utf8");
@@ -626,9 +632,10 @@ describe("R11.2 · the dock over full-screen 工作台", () => {
     expect(css).toContain(".dock.auto.peek{transform:translateX(-50%)}");
   });
 
-  it("the bottom 6 px of the monitor bring it up; it hides 600 ms after the pointer leaves", () => {
+  it("the bottom 4 px of the monitor bring it up; it hides 600 ms after the pointer leaves", () => {
     const rect = { left: 0, right: 1600, bottom: 900 };
-    expect(DOCK_EDGE_PX).toBe(6);
+    // playtest-1105 R1: within 4 px of the bottom edge.
+    expect(DOCK_EDGE_PX).toBe(4);
     expect(atDockEdge(800, 900 - DOCK_EDGE_PX, rect)).toBe(true);
     expect(atDockEdge(800, 899, rect)).toBe(true);
     expect(atDockEdge(800, 900 - DOCK_EDGE_PX - 1, rect)).toBe(false);
@@ -697,7 +704,7 @@ describe("R12.2 · Kuro's pill hides and peeks with the dock over 工作台", ()
     return renderDesktop(buildShell(store.getState(), store.getEvents(), h.session, desktopApps, 0, 1)).value;
   };
   it("the pill is the dock's next sibling, so the dock's auto / peek reach it", () => {
-    for (const patch of [{ leftApp: "workbench" as const }, { leftApp: "workbench" as const, dockPeek: true }]) {
+    for (const patch of [{ leftApp: "workbench" as const, wbFull: true }, { leftApp: "workbench" as const, wbFull: true, dockPeek: true }]) {
       const out = desk(patch);
       const at = out.indexOf('<div class="dock auto');
       const end = out.indexOf('<button type="button" class="kpill');

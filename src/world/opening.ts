@@ -6,7 +6,7 @@
 import { prologueLines } from "@state/prologue";
 import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, tr } from "@world/i18n";
-import { push, sceneOf, type DialogueState } from "@world/loop/dialogue";
+import { EMPTY_DIALOGUE, push, sceneOf, type DialogueState } from "@world/loop/dialogue";
 import { renderScene } from "@world/dialogue/scene";
 import type { Session } from "@world/desktop/model";
 
@@ -17,7 +17,9 @@ export const PROLOGUE_FADE_MS = 800;
 
 /** A new run's dream goes into the box (main.ts calls this right after the game mounts). */
 export function startPrologue(session: Session): void {
-  session.dialogue = push(session.dialogue, { key: PROLOGUE_KEY, lines: prologueLines, ending: { kind: "prologue" } });
+  // playtest-1105 R3: the day's waking lines may be queued already: the dream comes before them.
+  const d = push(EMPTY_DIALOGUE, { key: PROLOGUE_KEY, lines: prologueLines, ending: { kind: "prologue" } });
+  session.dialogue = { ...session.dialogue, queue: [...d.queue, ...session.dialogue.queue], line: 0, page: 0 };
 }
 
 /** The prologue is in the box now (its head). */

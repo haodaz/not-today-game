@@ -76,6 +76,19 @@ export const shellActions: Record<string, ActionHandler> = {
     ctx.session.focus = data.screen;
     ctx.rerender();
   },
+  // playtest-1105 R1: the onboarding card's one button; it is not shown again this run.
+  "onboard-ok"(ctx) {
+    if (ctx.session.onboard !== "due") return;
+    ctx.session.onboard = "done";
+    ctx.rerender();
+  },
+  // playtest-1105 R1: 工作台's green light: full screen, and back to its window. Session only.
+  "win-full"(ctx, data) {
+    if (data.app !== "workbench") return;
+    ctx.session.wbFull = !ctx.session.wbFull;
+    ctx.session.dockPeek = false;
+    ctx.rerender();
+  },
   // shell R11.2: the hidden dock over full-screen 工作台 slides up (1) or away (0); session only.
   "dock-peek"(ctx, data) {
     const on = data.on === "1";
@@ -214,6 +227,9 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   }
   // tingtalk R1b: the run's placement (a reload, the next day); a fresh run keeps the default.
   const remembered = deps.placement ? loadPlacement(deps.placement.storage, deps.placement.runId, APPS) : null;
+  // playtest-1105 R1: a run's first desktop visit is the bare desktop with the onboarding card; a
+  // remembered placement says whether this run has had it.
+  session.onboard = "no";
   if (remembered) Object.assign(session, remembered);
   let savedPlacement = JSON.stringify(placementOf(session));
   // The mute flag outlives the page (sound spec FR3); the title page reads the same one.

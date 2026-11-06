@@ -84,7 +84,7 @@ async function mounted(view: Session["view"], dialogue: DialogueState) {
 }
 
 describe("on the stage", () => {
-  it("a 40 % dim under the box, in the box's fixed layer; none for a one-line fragment", async () => {
+  it("a 40 % dim under the box, in the box's fixed layer; a clear one for a one-line fragment (playtest-1105 R2)", async () => {
     const masked = await mounted("room", story(3));
     const mask = masked.root.querySelector<HTMLElement>(".story-mask")!;
     expect(mask).not.toBeNull();
@@ -94,7 +94,11 @@ describe("on the stage", () => {
     destroy!();
     document.body.innerHTML = "";
     const plain = await mounted("room", story(1));
-    expect(plain.root.querySelector(".story-mask")).toBeNull();
+    // playtest-1105 R2: the box owns the screen for one line too: a mask without the dim.
+    const clear = plain.root.querySelector<HTMLElement>(".story-mask.clear")!;
+    expect(clear).not.toBeNull();
+    expect(clear.dataset.action).toBe("loop-advance");
+    expect(plain.root.querySelector(".dlg-layer.masked")).toBeNull();
     expect(plain.root.querySelector(".dlg")).not.toBeNull();
   });
 

@@ -75,6 +75,11 @@ function mount(opts: Opts = {}) {
     splat: layer ? (r, ctx) => (hooks = layer(r, ctx)) : undefined,
     nav: (r, ctx, actions, splat) => nav(r, ctx, actions, opts.look !== undefined ? opts.look : splat),
   });
+  // playtest-1105 R3: waking queues the day's boot beat, and while the box is up it owns the screen
+  // (R2). These tests are about pointing and the camera: the waking lines are set aside, and the
+  // run's first desktop visit (R1) counts as made.
+  m.session.dialogue = EMPTY_DIALOGUE;
+  m.session.onboard = "done";
   destroy = m.destroy;
   const stage = () => root.querySelector<HTMLElement>(":scope > .stage:not(.m-ghost):not(.m-backdrop)")!;
   return { root, store, session: m.session, stage, hooks: () => hooks!, fake };

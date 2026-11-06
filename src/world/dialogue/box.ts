@@ -230,6 +230,16 @@ export function renderPlayerBox(p: PlayerBoxModel): SafeHtml {
   return html`<div class="dlg-player" data-mode="choices" data-screen="${p.page + 1}/${p.screens.length}">${tag}<div class="choices">${buttons}</div>${more}</div>`;
 }
 
+/**
+ * playtest-1105 R2: a click anywhere reads on — when only a line is up (no choices on it, no
+ * player's box, no history panel). Otherwise the screen still waits for the box's own controls.
+ */
+export function boxReadsOn(state: State, events: readonly GameEvent[], session: Session): boolean {
+  if (session.historyOpen || playerBox(state, events, session) !== null) return false;
+  const line = lineBoxModel(state, events, session);
+  return line !== null && line.choices.length === 0;
+}
+
 /** Everything the box shows now: the line box, the player's box, the history panel. */
 export function dialogueBox(state: State, events: readonly GameEvent[], session: Session, nowMs = 0): SafeHtml | null {
   const line = lineBoxModel(state, events, session, nowMs);

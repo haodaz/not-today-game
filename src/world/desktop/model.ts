@@ -76,6 +76,10 @@ export interface Session {
   rightApp: AppId | null;
   place: Record<AppId, Side>;
   stack: AppId[];
+  /** playtest-1105 R1: the run's first desktop visit (see placement.ts); remembered with the placement. */
+  onboard: "no" | "due" | "done";
+  /** playtest-1105 R1: 工作台 full screen, only when the player chose it (the green light). Session only. */
+  wbFull: boolean;
   /** 调度中心 / Mission Control is open over both monitors (tingtalk R1b). Session only. */
   mcOpen: boolean;
   /** The monitor shown in the desktop view (one at a time). */
@@ -205,6 +209,10 @@ export interface Session {
   turnNext: "left" | "right" | null;
   /** The day the "computer isn't on" line was said (once a day). */
   screenOffDay: number;
+  /** playtest-1105 R3: the day whose boot beat played on waking (once a day; session only). */
+  bootBeatDay: number;
+  /** playtest-1105 R4: the line each thing in the room said last (so it is not said twice in a row). */
+  looks: Partial<Record<"coat" | "bag" | "door" | "lock", number>>;
   /** How long a delivery minute is (ms): 60 000, or 1 000 with the dev-only `?fast=1`. */
   deliveryUnitMs: number;
   /** The hinted edge under the pointer (room-turn 2026-11-04: a facing's left / right 8 % turns; 桌子's bottom is back) and since when (ms); set by the nav layer. */
@@ -357,6 +365,9 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     clock,
     // tingtalk R1: 工作台 on the left, 听听 on the right.
     ...defaultPlacement(),
+    // playtest-1105 R1: a bare session has been to its desktop; mountDesktop starts a run's at "no".
+    onboard: "done",
+    wbFull: false,
     mcOpen: false,
     focus,
     view,
@@ -415,6 +426,8 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     edge: null,
     deliveryUnitMs: 60_000,
     screenOffDay: 0,
+    bootBeatDay: 0,
+    looks: {},
     splatReady: false,
     cam: null,
     turnNext: null,
@@ -531,9 +544,10 @@ function monitorFor(app: AppId | null, side: Side, ctx: AppContext, apps: AppRen
         appTitle: pageTitle,
         winTitle: key === null ? tr("wb.title") : html`${tr("wb.title")} · ${tr(key)}`,
         winClass: "wb",
-        // shell R10: full screen inside the monitor, one top bar of its own; no title row, no 自动保存.
+        // shell R10: one top bar of its own; no title row, no 自动保存. playtest-1105 R1: a normal
+        // window by default; full screen inside the monitor only when the player chose it.
         barRight: null,
-        ...(bar ? { bar, chrome: "full" as const } : {}),
+        ...(bar ? { bar, appTop: true, ...(ctx.session.wbFull ? { chrome: "full" as const } : {}) } : {}),
         body,
         nightSubKey: "night.plate.sub.workbench",
         overlay,
@@ -598,5 +612,6 @@ export function buildShell(
     fx: fxPlan(state.day, "desktop"),
     scene: sceneOf(session.dialogue),
     callOverlay: renderCall(ctx),
+    onboard: session.onboard === "due" && !off,
   };
 }

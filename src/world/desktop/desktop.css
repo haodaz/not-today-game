@@ -607,12 +607,26 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
    the OS bar, with one 44 px top bar: the traffic lights (12 px), the sidebar toggle, ← →, the
    page title (▾ on a task page), and at the right end the pane toggles and the 老物件 strip. */
 .win.wb.full{left:0;top:34px;right:0;bottom:0;width:auto;height:auto;border:0;border-radius:0;box-shadow:none;background:#FAF9F7}
-.win.wb.full > .bar.app-top{height:44px;flex:0 0 44px;gap:4px;padding:0 10px 0 14px;border-bottom:1px solid #E7E5E0;background:#FAF9F7;color:#1F1F1F;position:relative;z-index:12}
-.win.wb.full > .bar.app-top .dots{gap:8px;margin-right:10px}
-.win.wb.full > .bar.app-top .dots i{width:12px;height:12px}
-.win.wb.full > .bar.app-top .sp{margin-left:auto}
-.win.wb.full > .body.wb-app{position:relative;flex:1 1 auto;min-height:0;display:flex}
-.win.wb.full > .body.wb-app > .main{flex:1 1 auto;min-width:0}
+/* playtest-1105 R1: the same top bar and body in 工作台's ordinary window (its default) and full screen. */
+.win.wb > .bar.app-top{height:44px;flex:0 0 44px;gap:4px;padding:0 10px 0 14px;border-bottom:1px solid #E7E5E0;background:#FAF9F7;color:#1F1F1F;position:relative;z-index:12}
+.win.wb > .bar.app-top .dots{gap:8px;margin-right:10px;flex:0 0 auto}
+.win.wb > .bar.app-top .dots i{width:12px;height:12px}
+.win.wb > .bar.app-top .dots [data-action="win-full"]{cursor:pointer}
+.win.wb > .bar.app-top .sp{margin-left:auto}
+/* The sidebar toggle and the tools never shrink away; the title gives way first (≥ 900 px wide). */
+.win.wb > .bar.app-top .wb-side-tg,.win.wb > .bar.app-top .sh-toggles,.win.wb > .bar.app-top .wb-objbar,.win.wb > .bar.app-top .btn{flex:0 0 auto}
+.win.wb > .bar.app-top .wb-title{flex:0 1 auto}
+.win.wb > .body.wb-app{position:relative;flex:1 1 auto;min-height:0;display:flex}
+.win.wb > .body.wb-app > .main{flex:1 1 auto;min-width:0}
+/* playtest-1105 R1: the onboarding card over the bare desktop; the dim takes clicks and does nothing. */
+.onboard-layer{position:absolute;inset:0;z-index:70}
+.onboard-dim{position:absolute;inset:0;background:rgba(10,10,12,.35)}
+.onboard{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:440px;background:#fff;border-radius:14px;padding:20px 22px;box-shadow:0 18px 50px rgba(0,0,0,.3);font-size:13px;color:var(--ink)}
+.onboard h3{margin:0 0 12px;font-size:16px;font-weight:600}
+.onboard ul{list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column;gap:10px}
+.onboard li{display:flex;align-items:center;gap:10px;line-height:1.5}
+.onboard li img{width:28px;height:28px;flex:0 0 28px}
+.onboard .ok{display:block;margin-left:auto;border:0;border-radius:8px;background:var(--accent);color:#fff;font:inherit;padding:7px 18px;cursor:pointer}
 .wb .sh-tg .ic,.wb .sh-hb .ic,.wb .sh-src .ic,.wb .wb-title .ic,.wb .wb-sections .ic,.wb .wb-search .ic,.wb .wb-sidebar .new .ic,.wb .sh-ic .ic,.wb .sh-tw .ic{display:block;flex:0 0 auto}
 .wb .sh-tg:disabled{opacity:.35;cursor:default;background:transparent}
 .wb .wb-title{display:inline-flex;align-items:baseline;gap:8px;margin-left:6px;padding:4px 8px;border:0;border-radius:8px;background:transparent;font:inherit;color:#1F1F1F;min-width:0;max-width:46%}

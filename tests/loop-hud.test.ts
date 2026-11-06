@@ -6,7 +6,7 @@ import { constants } from "@state/variables";
 import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
 import { initialSession, type Session } from "@world/desktop/model";
-import { missingKeys, resetMissing } from "@world/i18n";
+import { missingKeys, resetMissing, t } from "@world/i18n";
 import { checklist, loopContext } from "@world/loop/checklist";
 import { EMPTY_DIALOGUE, showing } from "@world/loop/dialogue";
 import { freshMemo, react, SELF_TICK_MS, syncLoop } from "@world/loop/runtime";
@@ -138,16 +138,25 @@ describe("room HUD (FR6)", () => {
 });
 
 describe("runtime (design L5/L6)", () => {
-  it("boot plays the boot beat and sets the morning clock; nothing old is replayed on load", () => {
+  it("waking plays the boot beat (playtest-1105 R3); the tower's boot sets the morning clock and says its two lines", () => {
     const store = storeAt(1);
     const { ctx } = fakeCtx(store);
     syncLoop(ctx, 0);
-    expect(ctx.session.dialogue.queue).toHaveLength(0);
+    // The day starts in the room: its boot beat, before the player does anything.
+    expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:beat:boot"]);
+    expect(showing(ctx.session.dialogue, store.getState())!.line!.t).toBe(dayFiles.get(1)!.beats.boot!.say[0]!.t);
+    ctx.session.dialogue = EMPTY_DIALOGUE;
     store.appendEvent(step("boot", "09:03"));
     syncLoop(ctx, 0);
-    const shown = showing(ctx.session.dialogue, store.getState())!;
-    expect(shown.line!.t).toBe(dayFiles.get(1)!.beats.boot!.say[0]!.t);
+    expect(ctx.session.dialogue.queue[0]!.lines).toEqual([
+      { k: "narration", t: t("room.boot.on") },
+      { k: "inner", t: t("room.boot.hint") },
+    ]);
     expect(ctx.session.clock).toEqual(DEFAULT_CLOCK);
+    // Not again on a later first look (a reload once the tower is on).
+    const again = fakeCtx(store).ctx;
+    syncLoop(again, 0);
+    expect(again.session.dialogue.queue).toEqual([]);
   });
 
   it("an unlock with a sound plays it and queues its onUnlock lines", () => {

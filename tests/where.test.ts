@@ -339,13 +339,15 @@ describe("waiting lines are not events and do not outlive the day", () => {
     const store = atDay(2);
     const ctx = ctxOf(store, "room");
     syncLoop(ctx); // the day's memo
-    ctx.session.dialogue = push(ctx.session.dialogue, item("never read", [line("a line for a screen the player never entered", "screen:browser")]));
+    // playtest-1105 R3: waking queued the day's boot beat; it is not this test's subject.
+    ctx.session.dialogue = push(EMPTY_DIALOGUE, item("never read", [line("a line for a screen the player never entered", "screen:browser")]));
     settleSession(ctx.session);
     expect(waitingKeys(ctx)).toEqual(["never read"]);
     store.appendEvent({ kind: "lieDown" });
     syncLoop(ctx);
     expect(store.getState().day).toBe(3);
-    expect(ctx.session.dialogue.waiting ?? []).toEqual([]);
+    // The next morning only the new day's waking lines may wait; nothing of the day before.
+    expect(waitingKeys(ctx).every((k) => k.startsWith("d3:"))).toBe(true);
     act(ctx, "view", { view: "desktop", screen: "left" });
     ctx.session.leftApp = "browser";
     settleSession(ctx.session);
@@ -357,9 +359,12 @@ describe("a real day: day 7 boot, the room line first, the 老板 line only afte
   function boot() {
     const store = atDay(7);
     const ctx = ctxOf(store, "room");
+    // playtest-1105 R3: the boot beat is queued on waking (the first look).
     syncLoop(ctx);
     act(ctx, "tower-power");
     syncLoop(ctx);
+    // The tower's own two lines (playtest-1105 R3) are not this test's subject: set them aside.
+    ctx.session.dialogue = { ...ctx.session.dialogue, queue: ctx.session.dialogue.queue.filter((q) => q.key !== "d7:power-on") };
     return { store, ctx };
   }
   const box = (ctx: ActionContext) => dialogueBox(ctx.store.getState(), ctx.store.getEvents(), ctx.session)?.value ?? null;

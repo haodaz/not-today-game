@@ -1,7 +1,7 @@
 // The day-loop runtime (design L5/L6): after every store change it looks at what just happened and
 // fills the dialogue box, plays sounds, ticks self-ticking items, runs delivery waiting, and moves
 // the stand-in beat clock. Everything it adds to the log goes through store.appendEvent.
-import type { BeatName, Item, Sequence } from "@state/days/table";
+import type { BeatName, Item, SayLine, Sequence } from "@state/days/table";
 import { taskByFlag } from "@state/days/tasks";
 import type { Meal } from "@state/delivery/table";
 import type { GameEvent } from "@state/events";
@@ -24,8 +24,8 @@ import type { ActionContext } from "@world/desktop/controller";
 import type { LoopMemo } from "@world/desktop/model";
 import { arrivalOf, mealView, ordersOn } from "@world/delivery/meals";
 import { doorLines } from "@world/delivery/view";
-import { t } from "@world/i18n";
-import { itemStates, loopContext, nightfallReached, selfTicking, workDone, type LoopContext } from "./checklist";
+import { hasString, t } from "@world/i18n";
+import { booted, itemStates, loopContext, nightfallReached, selfTicking, workDone, type LoopContext } from "./checklist";
 import { dropWaiting, placedLines, push, type DialogueState, type Ending, type Queued } from "./dialogue";
 import { settleSession } from "@world/dialogue/place";
 import { arrivalDue, msUntilDue, msUntilMinimum } from "./waiting";
@@ -57,6 +57,28 @@ export function beatQueued(day: number, beat: BeatName, seq: Sequence, ending?: 
     ending: ending ?? (seq.choices?.length ? { kind: "beatChoices" as const, day, beat } : { kind: "none" as const }),
     sequence: seq,
   };
+}
+
+/** playtest-1105 R3: switching the tower on: narration `room.boot.on`, then inner `room.boot.hint`. */
+export function powerOnQueued(day: number): Queued {
+  const lines: SayLine[] = [];
+  if (hasString("room.boot.on")) lines.push({ k: "narration", t: t("room.boot.on") });
+  if (hasString("room.boot.hint")) lines.push({ k: "inner", t: t("room.boot.hint") });
+  return { key: `d${day}:power-on`, lines, ending: { kind: "none" } };
+}
+
+/**
+ * playtest-1105 R3: the day's boot beat plays when the day starts in the room (waking), before the
+ * player does anything; not again once the tower is on, nor twice in a session.
+ */
+function wake(ctx: ActionContext, lc: LoopContext): void {
+  const { session } = ctx;
+  const day = lc.state.day;
+  const seq = lc.file.beats.boot;
+  if (!seq || session.bootBeatDay === day || booted(lc.state, ctx.store.getEvents())) return;
+  session.bootBeatDay = day;
+  session.dialogue = push(session.dialogue, beatQueued(day, "boot", seq));
+  settleSession(session);
 }
 
 /** "Do you know what this is?": the question line, then the options in this run's order (recognise FR1). */
@@ -111,7 +133,8 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
     if (e.kind === "step") {
       if (e.name === "boot") {
         clock = { ...DEFAULT_CLOCK };
-        if (file.beats.boot) dialogue = push(dialogue, beatQueued(day, "boot", file.beats.boot));
+        // playtest-1105 R3: the day's boot beat plays on waking (syncLoop); the tower says its two lines.
+        dialogue = push(dialogue, powerOnQueued(day));
       } else if (e.name.startsWith("openApp:") && clock.beat === "boot") {
         clock = at(clock, "work");
       } else if (e.name === "beat:desk") {
@@ -242,6 +265,7 @@ export function syncLoop(ctx: ActionContext, nowMs: number = Date.now()): void {
     if (nightfallReached(lc)) session.clock = eveningClock(session.clock);
     // A call answered but not ended before this look (a reload): it resumes and still ends.
     if (!session.call) resumeCall(ctx);
+    wake(ctx, lc);
     scheduleSelf(ctx, lc);
     noticeKuroLine(ctx, nowMs);
     return;

@@ -3,6 +3,6 @@
 exports[`snapshots > one masked and one unmasked state (房间) 1`] = `
 {
   "masked": "<div class="dlg-layer masked"><div class="story-mask" data-action="loop-advance" aria-hidden="true"></div><div class="dlg" data-screen="1/1"><div class="tagbar"><button type="button" class="hist" data-action="dlg-history" aria-haspopup="dialog" aria-label="本次对话">↺</button></div><button type="button" class="txt" data-action="loop-advance">第1句。</button><span class="more" aria-hidden="true">▶</span></div></div>",
-  "unmasked": "<div class="dlg-layer"><div class="dlg" data-screen="1/1"><div class="tagbar"><button type="button" class="hist" data-action="dlg-history" aria-haspopup="dialog" aria-label="本次对话">↺</button></div><button type="button" class="txt" data-action="loop-advance">第1句。</button><span class="more" aria-hidden="true">▶</span></div></div>",
+  "unmasked": "<div class="dlg-layer"><div class="story-mask clear" data-action="loop-advance" aria-hidden="true"></div><div class="dlg" data-screen="1/1"><div class="tagbar"><button type="button" class="hist" data-action="dlg-history" aria-haspopup="dialog" aria-label="本次对话">↺</button></div><button type="button" class="txt" data-action="loop-advance">第1句。</button><span class="more" aria-hidden="true">▶</span></div></div>",
 }
 `;

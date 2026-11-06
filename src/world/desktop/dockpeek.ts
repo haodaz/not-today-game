@@ -5,7 +5,7 @@
 // session only (`session.dockPeek`, set by the `dock-peek` action); this layer only watches the pointer.
 
 /** The bottom strip of the monitor that brings the dock up (px). */
-export const DOCK_EDGE_PX = 6;
+export const DOCK_EDGE_PX = 4;
 /** How long the dock stays after the pointer leaves it and the edge (ms). */
 export const DOCK_HIDE_MS = 600;
 

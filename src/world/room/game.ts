@@ -7,7 +7,7 @@ import type { Store } from "@state/store";
 import { desktopApps } from "@world/desktop/apps";
 import { advanceTo, isNight } from "@world/desktop/beat";
 import { hudKuro } from "@world/desktop/kuro/mini";
-import { dialogueBox, lineScreens } from "@world/dialogue/box";
+import { boxReadsOn, dialogueBox, lineScreens } from "@world/dialogue/box";
 import { logCurrent, logPlayer } from "@world/dialogue/history";
 import { settleSession } from "@world/dialogue/place";
 import { acceptOffer, answerAsk, answerOffer, declineOffer, kuroActions } from "@world/dialogue/kuro";
@@ -26,6 +26,7 @@ import { mealView } from "@world/delivery/meals";
 import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, persistLocale, setLocale, t, tr } from "@world/i18n";
 import { recordedOn } from "@state/sleeptalk";
+import { LOOK_KEYS, nextLook, roomLooks, type LookKey } from "@state/room-looks";
 import { skipToLast, storyMasked } from "@world/dialogue/mask";
 import { tabooActions, tabooLayer } from "@world/dialogue/taboo";
 import { handOf } from "@state/hands";
@@ -90,7 +91,7 @@ export function renderGame(store: Store, session: Session, nowMs: number): SafeH
   if (prologueShowing(session)) {
     const box = session.opening ? null : dialogueBox(state, events, session, nowMs);
     const settings = settingsPanel(session);
-    return html`${renderPrologue(session, nowMs)}${dlgLayer(box, session)}${settings ? html`<div class="hud-host">${settings}</div>` : null}`;
+    return html`${renderPrologue(session, nowMs)}${dlgLayer(box, session, boxReadsOn(state, events, session))}${settings ? html`<div class="hud-host">${settings}</div>` : null}`;
   }
   if (session.view === "desktop") {
     const shell = buildShell(state, events, session, desktopApps, nowMs, store.getStartDay());
@@ -101,21 +102,27 @@ export function renderGame(store: Store, session: Session, nowMs: number): SafeH
     const filesWin = renderFiles({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs }, live);
     // 老物件栏 (object-bar R2): an object opened from the bar is used in a modal over the desktop.
     const objUse = renderObjectBarUse({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs });
-    return html`${renderDesktop(shell)}<button type="button" class="back-room" data-action="view" data-view="room">${tr("desktop.back")}</button>${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${objUse ? html`<div class="objbar-host">${objUse}</div>` : null}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${dlgLayer(dlg, session)}<div class="hud-host">${settingsButton()}${itemsButton(session)}${itemsPanel(state, events, session)}<div class="hud-br">${hudKuro({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs })}</div>${settingsPanel(session)}</div>`;
+    return html`${renderDesktop(shell)}<button type="button" class="back-room" data-action="view" data-view="room">${tr("desktop.back")}</button>${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${objUse ? html`<div class="objbar-host">${objUse}</div>` : null}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${dlgLayer(dlg, session, boxReadsOn(state, events, session))}<div class="hud-host">${settingsButton()}${itemsButton(session)}${itemsPanel(state, events, session)}<div class="hud-br">${hudKuro({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs })}</div>${settingsPanel(session)}</div>`;
   }
   // The box does not jump (dialogue correction 2026-11-02): in every view it is anchored to the
   // viewport in the same fixed layer, not to the stage (whose size differs between views). The
   // settings panel sits above it, in a fixed layer of its own after the box (2026-11-02).
   const dlg = dialogueBox(state, events, session, nowMs);
   const settings = settingsPanel(session);
-  return html`${renderRoom({ state, events, session, startDay: store.getStartDay(), nowMs, boxOutside: true, runId: store.getRunId() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${dlgLayer(dlg, session)}${settings ? html`<div class="hud-host">${settings}</div>` : null}`;
+  return html`${renderRoom({ state, events, session, startDay: store.getStartDay(), nowMs, boxOutside: true, runId: store.getRunId() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${dlgLayer(dlg, session, boxReadsOn(state, events, session))}${settings ? html`<div class="hud-host">${settings}</div>` : null}`;
 }
 
-/** The box's fixed layer; a story's mask under the box dims and holds the stage (dialogue addition 2026-11-02). */
-function dlgLayer(dlg: SafeHtml | null, session: Session): SafeHtml | null {
+/**
+ * The box's fixed layer. playtest-1105 R2: while the box is up it owns the screen: a mask under it
+ * takes every click (nothing below receives one); while a line is up a click anywhere reads on, at a
+ * choice or the player's box it waits for the box's own controls. A story's mask also dims the
+ * stage 40 % (dialogue addition 2026-11-02); a one-line fragment's mask is clear.
+ */
+function dlgLayer(dlg: SafeHtml | null, session: Session, readsOn: boolean): SafeHtml | null {
   if (!dlg) return null;
-  const mask = storyMasked(session.dialogue) ? html`<div class="story-mask" data-action="loop-advance" aria-hidden="true"></div>` : null;
-  return html`<div class="${cls("dlg-layer", mask !== null && "masked")}">${mask}${dlg}</div>`;
+  const story = storyMasked(session.dialogue);
+  const mask = html`<div class="${cls("story-mask", !story && "clear", !readsOn && "waits")}"${readsOn ? html` data-action="loop-advance"` : null} aria-hidden="true"></div>`;
+  return html`<div class="${cls("dlg-layer", story && "masked")}">${mask}${dlg}</div>`;
 }
 
 /** The app in front on the monitor being shown (null: an empty display). */
@@ -434,6 +441,14 @@ function takePhoto(ctx: ActionContext): void {
   }
 }
 
+/** playtest-1105 R1: the bare desktop (macOS: no window open) and the onboarding card, once a run. */
+export function firstDesktop(session: Session): void {
+  session.leftApp = null;
+  session.rightApp = null;
+  session.stack = [];
+  session.onboard = "due";
+}
+
 /** One leg of a way: the view changes now; the motion layer plays the walk or the turn. */
 function arrive(ctx: ActionContext, view: View, data: DOMStringMap): void {
   // 桌子's monitors open 屏幕 on their own side.
@@ -460,6 +475,9 @@ function arrive(ctx: ActionContext, view: View, data: DOMStringMap): void {
   // 走到门边 is the camera move: arriving at 门 with the bag outside is that step.
   if (view === "door" && from !== "door") doorWalk(ctx);
   lookedAway(ctx);
+  // playtest-1105 R1: the run's first time at the computer is the bare desktop (no window open, the
+  // dock there) with the onboarding card.
+  if (view === "desktop" && ctx.session.onboard === "no") firstDesktop(ctx.session);
   // The desktop opens on the monitor with the current app; looking at it counts.
   if (view === "desktop") lookAt(ctx, shownApp(ctx.session));
   // 看一眼桌子: arriving at 桌子 while the item is open is the look; the desk beat plays here.
@@ -589,6 +607,20 @@ export const loopActions: Record<string, ActionHandler> = {
   },
 
   // ---- the world's actuators (day-loop correction 2026-11-01: the checklist only watches) ----
+
+  // playtest-1105 R4: a thing in the room (the coat, the bag, the door, the lock): one of its lines
+  // at random as an inner line, never the same one twice in a row for that thing. Logs nothing.
+  "room-look"(ctx, data) {
+    const key = data.look as LookKey;
+    if (!(LOOK_KEYS as readonly string[]).includes(key)) return;
+    const { session } = ctx;
+    const lines = roomLooks[key];
+    const n = nextLook(lines, session.looks[key], Math.random());
+    session.looks = { ...session.looks, [key]: n };
+    session.kuroSeq += 1;
+    session.dialogue = push(session.dialogue, { key: `d${ctx.store.getState().day}:look:${key}:${session.kuroSeq}`, lines: [{ k: "inner", t: lines[n]! }], ending: { kind: "none" } });
+    ctx.rerender();
+  },
 
   // 开机: the tower's power button, in 房间 and 桌子.
   "tower-power"(ctx) {

@@ -30,6 +30,9 @@
 /* Navigation 2026-11-01: the click areas are keyboard proxies; the pointer picks by a ray (room/nav.ts),
    which marks what is under it with data-hover: 4 % brighter. */
 .room .shot-hit{pointer-events:none}
+/* playtest-1105 R4: the things to touch on 门 and 窗; real buttons, 4 % brighter on hover. */
+.room .look-hit{position:absolute;border:0;padding:0;margin:0;background:transparent;cursor:pointer;border-radius:4px}
+.room .look-hit:hover{background:rgba(255,255,255,.04)}
 .room .shot-hit[data-hover]{background:rgba(255,255,255,.04)}
 .room .shot-hit:focus-visible{outline:2px solid rgba(232,228,220,.55);outline-offset:2px}
 /* The one-time pointer (day-loop rule 2026-11-01, room/pointer.ts): a soft pulsing ring on the
@@ -42,6 +45,8 @@
    off), the bed; the meal on the desk bar. */
 .room .tower-hit .tower-led{position:absolute;left:18%;top:14%;width:5px;height:5px;border-radius:50%;background:rgba(255,190,120,.85);box-shadow:0 0 6px 2px rgba(255,170,90,.45);animation:tower-led 3.2s ease-in-out infinite}
 @keyframes tower-led{50%{opacity:.35}}
+/* playtest-1105 R3: the two screens lit once the tower is on (the title page's lit monitor). */
+.room .monitor-lit{position:absolute;background:rgba(214,226,240,.22);box-shadow:0 0 30px 6px rgba(190,210,235,.18);pointer-events:none}
 :is(.room,.items-panel) .slot.meal img{max-width:64px;max-height:56px}
 :is(.room,.items-panel) .slot.meal object{display:block;width:64px;height:56px;pointer-events:none}
 :is(.room,.items-panel) .slot.meal object img,:is(.room,.items-panel) .slot.meal img.eaten{width:100%;height:100%;object-fit:contain;opacity:.4;filter:grayscale(1)}
@@ -394,6 +399,10 @@
 .dlg-layer .dlg-hist-layer{position:fixed}
 /* A story masks the stage (dialogue addition 2026-11-02): 40 % dim under the box; a click on it reads on. */
 .dlg-layer .story-mask{position:fixed;inset:0;background:rgba(0,0,0,.4);cursor:pointer}
+/* playtest-1105 R2: while any box is up the mask takes every click; a fragment's mask is clear, and
+   at a choice (or the player's box) it only holds the screen. */
+.dlg-layer .story-mask.clear{background:transparent}
+.dlg-layer .story-mask.waits{cursor:default}
 /* ⚙ 设置 sits above the box in every view (2026-11-02): its fixed layer outranks .dlg-layer (30). */
 .hud-host .settings-layer{z-index:50}
 /* SAN bands (presentation only): the cup photo goes colder as SAN falls. */

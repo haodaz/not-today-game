@@ -119,4 +119,38 @@ export const FLAT_HOTS: Readonly<Record<"bed" | "window", readonly { readonly id
 };
 export const isFlatFacing = (view: string): view is "bed" | "window" => view === "bed" || view === "window";
 
+/**
+ * A rectangle given as fractions of a backdrop (x0–x1 / y0–y1), in stage px: the backdrop is
+ * `w × h` and drawn `cover` and centred on the 1600×900 stage (room.css).
+ */
+export function fracRect(img: { readonly w: number; readonly h: number }, x0: number, x1: number, y0: number, y1: number): Rect {
+  const k = Math.max(1600 / img.w, 900 / img.h);
+  const ox = (1600 - img.w * k) / 2;
+  const oy = (900 - img.h * k) / 2;
+  const r = (v: number) => Math.round(v * 10) / 10;
+  return { l: r(ox + x0 * img.w * k), t: r(oy + y0 * img.h * k), w: r((x1 - x0) * img.w * k), h: r((y1 - y0) * img.h * k) };
+}
+
+/** The door wall (door_wall.png, 2048×1152) and the window wall (shots/window.jpg, 1664×928). */
+export const DOOR_WALL = { w: 2048, h: 1152 } as const;
+export const WINDOW_WALL = { w: 1664, h: 928 } as const;
+
+/**
+ * playtest-1105 R4: the things in the room to touch, as fractions of the facing's backdrop. On 门 the
+ * lock (chain + handle) sits over the door leaf, so a click there is the lock.
+ */
+export type LookSpot = { readonly look: "coat" | "bag" | "door" | "lock"; readonly rect: Rect };
+export const LOOK_SPOTS: Readonly<Record<"door" | "window", readonly LookSpot[]>> = {
+  door: [
+    { look: "coat", rect: fracRect(DOOR_WALL, 0.33, 0.42, 0.17, 0.65) },
+    { look: "door", rect: fracRect(DOOR_WALL, 0.48, 0.69, 0.02, 0.95) },
+    { look: "lock", rect: fracRect(DOOR_WALL, 0.64, 0.7, 0.31, 0.53) },
+    { look: "bag", rect: fracRect(DOOR_WALL, 0.69, 0.8, 0.79, 1.0) },
+  ],
+  window: [
+    { look: "bag", rect: fracRect(WINDOW_WALL, 0.16, 0.245, 0.74, 0.95) },
+    { look: "door", rect: fracRect(WINDOW_WALL, 0.0, 0.13, 0.0, 0.97) },
+  ],
+};
+
 export const rectStyle = (r: Rect): string => `left:${r.l}px;top:${r.t}px;width:${r.w}px;height:${r.h}px`;
