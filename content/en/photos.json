@@ -5,7 +5,7 @@
       "day": 3,
       "facing": "room",
       "add": {
-        "text": "A coat hangs over the back of the chair. You don't own this coat.",
+        "text": "A coat over the back of the chair. You don't own that coat.",
         "overlay": "/room/photos/d03_room.jpg"
       }
     },
@@ -13,7 +13,7 @@
       "day": 3,
       "facing": "bed",
       "add": {
-        "text": "A hollow in the duvet, the shape of someone lying there. You haven't lain down today.",
+        "text": "A dent in the quilt where someone lay. You haven't lain down yet today.",
         "overlay": "/room/photos/d03_bed.jpg"
       }
     },
@@ -21,7 +21,7 @@
       "day": 3,
       "facing": "door",
       "add": {
-        "text": "The light under the door is broken in the middle. As if someone is standing outside.",
+        "text": "The light under the door, missing in the middle. Like something standing outside.",
         "overlay": "/room/photos/d03_door.jpg"
       }
     },
@@ -29,28 +29,28 @@
       "day": 3,
       "facing": "window",
       "add": {
-        "text": "Down on the street, someone stands with their head tilted back, looking at your window."
+        "text": "A window lit in the building opposite, curtain half open, facing yours."
       }
     },
     {
       "day": 4,
       "facing": "room",
       "add": {
-        "text": "In the gap between the two screens, a little seawater is seeping out."
+        "text": "A little seawater seeping from the gap between the two screens."
       }
     },
     {
       "day": 4,
       "facing": "bed",
       "add": {
-        "text": "A few scales on the duvet. Silver-grey."
+        "text": "A few scales on the quilt, silver grey."
       }
     },
     {
       "day": 4,
       "facing": "door",
       "add": {
-        "text": "Water has seeped in under the door, with a ring of salt at its edge.",
+        "text": "A pool of water under the door, a ring of salt around it.",
         "overlay": "/room/photos/d04_door.jpg"
       }
     },
@@ -58,70 +58,70 @@
       "day": 4,
       "facing": "window",
       "add": {
-        "text": "A crust of salt has formed on the glass."
+        "text": "A crust of salt on the window glass, as if thrown from outside."
       }
     },
     {
       "day": 5,
       "facing": "room",
       "add": {
-        "text": "A metal cylinder on the desk, wired up to the computer."
+        "text": "A metal cylinder on the desk, wired to the tower."
       }
     },
     {
       "day": 5,
       "facing": "bed",
       "add": {
-        "text": "A letter by the pillow, in your handwriting. It doesn't read like you."
+        "text": "A letter by the pillow, in your handwriting, not written like you."
       }
     },
     {
       "day": 5,
       "facing": "door",
       "add": {
-        "text": "Something with wings stands outside the door. Like a fungus. Like a shrimp."
+        "text": "The paper bag is full, its mouth stretched open, a length of copper-coloured metal showing. You put nothing in it."
       }
     },
     {
       "day": 5,
       "facing": "window",
       "add": {
-        "text": "Something in the sky, flying in from a very distant star."
+        "text": "A fine scratched circle on the window glass, as if drawn with a compass."
       }
     },
     {
       "day": 6,
       "facing": "room",
       "add": {
-        "text": "Both screens are lit in the photo. They were black when you took it."
+        "text": "Both screens are lit in the photo. They were dark when you took it."
       }
     },
     {
       "day": 6,
       "facing": "bed",
       "add": {
-        "text": "A painting on the wall by the bed. It shows you, lying in bed."
+        "text": "A painting on the wall by the bed: you, lying in the bed."
       }
     },
     {
       "day": 6,
       "facing": "door",
       "add": {
-        "text": "A hand reaches in under the door. Long nails. As if looking for food."
+        "text": "The chain is on. You remember not putting it on."
       }
     },
     {
       "day": 6,
       "facing": "window",
       "add": {
-        "text": "The takeaway on the little table has been gnawed. The teeth marks aren't human."
+        "text": "The takeout on the table has been chewed. The teeth marks aren't human."
       }
     },
     {
       "day": 7,
       "facing": "room",
       "add": {
-        "text": "A circle drawn on the floor. The chair sits exactly inside it."
+        "text": "A circle drawn on the floor; the chair is exactly inside it."
       }
     },
     {
@@ -135,49 +135,49 @@
       "day": 7,
       "facing": "door",
       "add": {
-        "text": "A sigil drawn on the door, every stroke in the proper order."
+        "text": "A mark on the door, the strokes very deliberate, as if drawn with a finger."
       }
     },
     {
       "day": 7,
       "facing": "window",
       "add": {
-        "text": "Rain runs down the glass in streaks. Count them: seventy-two."
+        "text": "The rain on the glass runs in lines. Count them: seventy-two."
       }
     },
     {
       "day": 8,
       "facing": "room",
       "add": {
-        "text": "Thirteen pairs of chopsticks on the desk. Not one pair unwrapped."
+        "text": "Thirteen pairs of chopsticks on the desk, one pair unopened."
       }
     },
     {
       "day": 8,
       "facing": "bed",
       "add": {
-        "text": "A face pressed to the tall window, wearing a crown, backlit."
+        "text": "A rank table pinned to the wall above the bed. Your name is on the last line."
       }
     },
     {
       "day": 8,
       "facing": "door",
       "add": {
-        "text": "The shadow of a camel outside the door. Someone is blowing a horn."
+        "text": "A shadow passed through the light under the door, tall, like a camel. Somewhere far off, a horn."
       }
     },
     {
       "day": 8,
       "facing": "window",
       "add": {
-        "text": "The sun is setting in the wrong direction. It goes down on the other side of the window."
+        "text": "The sunset is on the wrong side. The sun goes down past the other edge of the window."
       }
     },
     {
       "day": 9,
       "facing": "room",
       "add": {
-        "text": "Someone is sitting in the chair. In the photo they're only an outline, like a triangle."
+        "text": "The chair cushion is pressed down, as if someone is sitting in it."
       }
     },
     {
@@ -198,259 +198,259 @@
       "day": 9,
       "facing": "window",
       "add": {
-        "text": "A yellow mark on the glass. It isn't any letter."
+        "text": "A yellow sign on the window glass. Not any letter."
       }
     },
     {
       "day": 10,
       "facing": "room",
       "add": {
-        "text": "The lamp is yellow. In the photo, everything is yellow."
+        "text": "The lamp is yellow. Everything in the photo is yellow."
       }
     },
     {
       "day": 10,
       "facing": "bed",
       "add": {
-        "text": "Someone lies under the duvet, wearing a pale mask."
+        "text": "A pallid mask lying on the pillow."
       }
     },
     {
       "day": 10,
       "facing": "door",
       "add": {
-        "text": "A page of the play is stuck to the door. Act Two."
+        "text": "The light under the door is yellow. The corridor light is white."
       }
     },
     {
       "day": 10,
       "facing": "window",
       "add": {
-        "text": "Two suns outside, sinking into a lake. There is no lake outside."
+        "text": "Two suns outside the window, sinking into a lake. There is no lake outside."
       }
     },
     {
       "day": 11,
       "facing": "room",
       "add": {
-        "text": "A pair of scales on the desk. Wheat on one side, nothing on the other, and it hangs level."
+        "text": "A pair of scales on the desk. Wheat on one side, nothing on the other, and it balances."
       }
     },
     {
       "day": 11,
       "facing": "bed",
       "add": {
-        "text": "The shadow of a black horse sits at the foot of the bed."
+        "text": "A hoof-shaped mark on the sheet, black."
       }
     },
     {
       "day": 11,
       "facing": "door",
       "add": {
-        "text": "A bowl of barley rice by the door, still steaming."
+        "text": "A bowl of barley at the door, steaming."
       }
     },
     {
       "day": 11,
       "facing": "window",
       "add": {
-        "text": "Only one bowl left on the little table, and it's empty."
+        "text": "Only one bowl left on the table, and it is empty."
       }
     },
     {
       "day": 12,
       "facing": "room",
       "add": {
-        "text": "Both screens lit. A group message at three in the morning: 'Noted.'"
+        "text": "Both screens lit, the group chat at three in the morning: 'Received'."
       }
     },
     {
       "day": 12,
       "facing": "bed",
       "add": {
-        "text": "A white marble bust lies on the bed. The face is yours."
+        "text": "A small white plaster head on the pillow. The face is yours."
       }
     },
     {
       "day": 12,
       "facing": "door",
       "add": {
-        "text": "It's very bright outside the door, as if a star fell into the stairwell from the north-east."
+        "text": "It is bright outside the door, as if a star had come down into the stairwell from the north-east."
       }
     },
     {
       "day": 12,
       "facing": "window",
       "add": {
-        "text": "The curtains are drawn. You didn't draw them."
+        "text": "The curtain is drawn. You didn't draw it."
       }
     },
     {
       "day": 13,
       "facing": "room",
       "add": {
-        "text": "A very thick book lies open on the desk at page 751."
+        "text": "A very thick book open on the desk, page 751."
       }
     },
     {
       "day": 13,
       "facing": "bed",
       "add": {
-        "text": "The tall window has become a door. It's open."
+        "text": "The tall window has become a door, open."
       }
     },
     {
       "day": 13,
       "facing": "door",
       "add": {
-        "text": "The door is two doors. One is the key, the other the guardian."
+        "text": "The door has become two doors, identical."
       }
     },
     {
       "day": 13,
       "facing": "window",
       "add": {
-        "text": "Outside, the calendar has stopped at November 1st."
+        "text": "A calendar taped to the window opposite, stopped at November 1st."
       }
     },
     {
       "day": 14,
       "facing": "room",
       "add": {
-        "text": "The computer's power light is an eye."
+        "text": "On the floor under the desk, a patch of very small black hoofprints."
       }
     },
     {
       "day": 14,
       "facing": "bed",
       "add": {
-        "text": "Under the bed, crowded tight: tiny black hooves."
+        "text": "Very small black hoofprints coming out from under the bed, all the way to its edge."
       }
     },
     {
       "day": 14,
       "facing": "door",
       "add": {
-        "text": "A queue outside the door, no end in sight. Everyone holds a staff badge with a blank name."
+        "text": "Many staff badges pushed in under the door, the name field blank on every one."
       }
     },
     {
       "day": 14,
       "facing": "window",
       "add": {
-        "text": "The forest outside has grown right up to the building."
+        "text": "The woods outside have grown right up to the building."
       }
     },
     {
       "day": 15,
       "facing": "room",
       "add": {
-        "text": "The meeting on screen: twelve tiles, every one of them looking into the camera."
+        "text": "The meeting on the screen, twelve squares, every one of them looking into the camera."
       }
     },
     {
       "day": 15,
       "facing": "bed",
       "add": {
-        "text": "Scorch marks on the bed where sparks have jumped."
+        "text": "Scorch marks on the bed where sparks jumped."
       }
     },
     {
       "day": 15,
       "facing": "door",
       "add": {
-        "text": "A tall figure in a long robe outside the door. The face is unclear, as if from very far away."
+        "text": "One more thing on the hook: a long robe, trailing to the floor."
       }
     },
     {
       "day": 15,
       "facing": "window",
       "add": {
-        "text": "Outside, people walk in a line towards where there is no light."
+        "text": "The streetlights below go out one after another, in a straight line."
       }
     },
     {
       "day": 16,
       "facing": "room",
       "add": {
-        "text": "Everything on the desk floats, one finger's width above it."
+        "text": "Everything on the desk is floating, a finger's width above it."
       }
     },
     {
       "day": 16,
       "facing": "bed",
       "add": {
-        "text": "The bed is shaking, as if a heavy drum were beating under the floor."
+        "text": "The bed is shaking, as if a heavy drum were sounding underground."
       }
     },
     {
       "day": 16,
       "facing": "door",
       "add": {
-        "text": "The door is knocking. The photo caught the shape of the sound."
+        "text": "Rings on the door panel spreading out from the lock: the shape of knocking."
       }
     },
     {
       "day": 16,
       "facing": "window",
       "add": {
-        "text": "Nothing outside the window. Not black. Nothing."
+        "text": "Nothing outside the window. Not dark. Nothing."
       }
     },
     {
       "day": 17,
       "facing": "room",
       "add": {
-        "text": "You, in the chair, have turned round and are looking at the camera."
+        "text": "Every square of the meeting on the screen is the same face: yours."
       }
     },
     {
       "day": 17,
       "facing": "bed",
       "add": {
-        "text": "The bed is perfectly made, as if no one has slept in it. No one has, for seventeen days."
+        "text": "The bed is made, as if no one had slept in it. No one has, for seventeen days."
       }
     },
     {
       "day": 17,
       "facing": "door",
       "add": {
-        "text": "The door is open. Outside stands everyone you know, all with the same face."
+        "text": "The door is open a crack. Outside is not the corridor but another room, identical to this one."
       }
     },
     {
       "day": 17,
       "facing": "window",
       "add": {
-        "text": "The glass is covered in words: Reply to me."
+        "text": "The window glass is covered in writing: answer me."
       }
     },
     {
       "day": 18,
       "facing": "room",
       "add": {
-        "text": "A huge black dog crouches by the desk. Wet fur, many eyes. It's looking at you."
+        "text": "A huge black dog crouched by the desk, wet fur, many eyes. It is looking at you."
       }
     },
     {
       "day": 18,
       "facing": "bed",
       "add": {
-        "text": "It lies across the bed, filling all of it, tentacles hanging from its jaw to the floor."
+        "text": "It lies across the bed, filling it, tentacles hanging from its chin to the floor."
       }
     },
     {
       "day": 18,
       "facing": "door",
       "add": {
-        "text": "The whole door wall is its shadow."
+        "text": "The whole wall on the door's side is its shadow."
       }
     },
     {
       "day": 18,
       "facing": "window",
       "add": {
-        "text": "There is no sky outside. It's one of its eyes."
+        "text": "No sky outside the window. One of its eyes."
       }
     }
   ],
