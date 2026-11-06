@@ -117,7 +117,8 @@
       "day": 6,
       "facing": "door",
       "add": {
-        "text": "The chain is on. You remember not putting it on."
+        "text": "The chain is on. You remember not putting it on.",
+        "overlay": "/room/photos/d06_door.jpg"
       }
     },
     {

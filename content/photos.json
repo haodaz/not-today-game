@@ -117,7 +117,8 @@
       "day": 6,
       "facing": "door",
       "add": {
-        "text": "门链是挂上的。你记得你没挂。"
+        "text": "门链是挂上的。你记得你没挂。",
+        "overlay": "/room/photos/d06_door.jpg"
       }
     },
     {
