@@ -50,6 +50,18 @@ describe("validate-content", () => {
     expect(checkDay(clone(day1), "content/days/day-02.json", tables)[0]).toMatch(/day: is 1, the file name says 2/);
   });
 
+  it("lying-view R6: an optional `rise` beat ({ say }) is accepted; with an unknown key it is not", () => {
+    const withRise = clone(day1);
+    withRise.beats.rise = { say: [{ k: "narration", t: "x" }] };
+    expect(checkDay(withRise, "content/days/day-01.json", tables)).toEqual([]);
+    expect(checkDay(clone(day1), "content/days/day-01.json", tables)).toEqual([]);
+    const bad = clone(day1);
+    bad.beats.rise = { say: [{ k: "narration", t: "x" }], choices: [{ text: "y" }] };
+    expect(checkDay(bad, "content/days/day-01.json", tables)).toEqual(["content/days/day-01.json beats.rise.choices: not a key of a rise beat (say, where)"]);
+    bad.beats.rise = { lines: [] };
+    expect(checkDay(bad, "content/days/day-01.json", tables)).toEqual(["content/days/day-01.json beats.rise: must be { say: [...] }"]);
+  });
+
   it("deltas: every effect changes a variable of content/variables.json; a `delta` names only its keys", () => {
     const bad = clone(day1);
     bad.beats.shutdown.choices = [{ text: "x", effects: { san: -1, mood: 2 } }];

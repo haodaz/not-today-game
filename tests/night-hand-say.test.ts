@@ -85,7 +85,8 @@ describe("the pick (a hand night)", () => {
     // The hand of night 10 is answered: nothing was given.
     expect(store.getState().raids[String(DAY)]).toEqual({ gave: null });
     // Then bedtime: the night beat is queued after it.
-    const ctx: ActionContext = { store, session: initialSession(DEFAULT_CLOCK, "left", "bed"), rerender: () => {}, later: () => {}, now: () => 0 };
+    // lying-view R4: 睡 starts the night from `lying` (the bed lain on).
+    const ctx: ActionContext = { store, session: initialSession(DEFAULT_CLOCK, "left", "lying"), rerender: () => {}, later: () => {}, now: () => 0 };
     ctx.session.dialogue = d;
     loopActions["sleep"]!(ctx, {} as DOMStringMap, null as never);
     const keys = ctx.session.dialogue.queue.map((q) => q.key);

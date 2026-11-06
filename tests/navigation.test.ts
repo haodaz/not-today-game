@@ -704,49 +704,52 @@ describe("the real layer with a fake scene: look, and 床 held by the splat", ()
     expect(desktop.hooks().look(50, 0)).toBe(false);
   });
 
-  it("the sleep flow lands on 床 (room-turn): 睡 turns there, the bed wall is its own still with no splat, the night begins as the turn ends", async () => {
+  it("the bed after nightfall (lying-view R4): the turn to 床 (a still, no splat), then lying down; the ask is from there and 睡 starts the night at once", async () => {
     const store = createStore({ startDay: 1 });
     completeUntil(store, "bed", { all: true });
-    const m = mount({ splat: true, store });
+    const m = mount({ splat: true, store, view: "room" });
     await ready(m);
-    // The bed's proxy in 房间 is the thing to point at; it asks first (day-loop addition 2026-11-02).
+    // The bed's proxy in 房间 is the thing to point at.
     const bed = fixedRects("room").bed!;
     await click(m, bed.l + bed.w / 2, bed.t + bed.h / 2);
-    expect(m.session.view).toBe("room");
-    await sleep(m);
     expect(m.session.view).toBe("bed");
     expect(m.session.cam).toMatchObject({ to: "bed", turn: { dir: "right", hops: 1 } });
-    // 床 is a still now: no splat layer, the stage shows bed.jpg, and its own things are there at once.
+    // 床 is a still: no splat layer, the stage shows bed.jpg.
     expect(m.root.querySelector(".splat-layer")).toBeNull();
     expect(m.stage().classList.contains("bed-view")).toBe(true);
-    expect(m.stage().classList.contains("m-nobg")).toBe(false);
-    expect([...m.stage().querySelectorAll<HTMLElement>(":scope > .shot-hit")].map((e) => e.dataset.hot)).toEqual(["box", "bed"]);
-    expect(m.session.dialogue.queue).toEqual([]);
     await wait(CHOSEN.turn + 80);
-    // The night began as the turn ended (a line is waiting, or the day is already over).
-    expect(m.session.dialogue.queue.length > 0 || m.store.getState().day === 2).toBe(true);
-    // And ?splat=1 gives the new facings no splat: no head turn on 床.
+    await frame();
+    // Then down onto the bed: the ceiling, its night photo.
+    expect(m.session.view).toBe("lying");
+    expect(m.stage().classList.contains("lying-view")).toBe(true);
+    expect(m.stage().classList.contains("ceiling-night")).toBe(true);
+    expect(m.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:bed:ask"]);
+    await sleep(m);
+    expect(m.session.view).toBe("lying");
+    expect(m.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:beat:night"]);
+    // And ?splat=1 gives the facings no splat: no head turn on 床.
     expect(m.hooks().look(60, 0)).toBe(false);
   }, 10_000);
 
-  it("turning away during the turn cancels the night: it begins only if the player is still at 床", async () => {
+  it("turning away during the turn to 床 cancels lying down: the player is not on the bed and the day goes on", async () => {
     const store = createStore({ startDay: 1 });
     completeUntil(store, "bed", { all: true });
-    const m = mount({ store });
+    const m = mount({ store, view: "room" });
     await frame();
     const bed = fixedRects("room").bed!;
     await click(m, bed.l + bed.w / 2, bed.t + bed.h / 2);
-    await sleep(m);
     expect(m.session.view).toBe("bed");
-    // The second turn waits for the first, then turns away before the night would begin.
+    // 再待会儿 on the way, then a second turn: it waits for the first, then turns away before lying down.
+    m.root.querySelector<HTMLElement>('[data-action="loop-choice"][data-choice="stay"]')!.click();
+    await frame();
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowLeft" }));
     await wait(CHOSEN.turn + 300);
     expect(m.session.view).toBe("room");
-    expect(m.session.dialogue.queue).toEqual([]);
+    expect(m.session.dialogue.queue.map((q) => q.key)).not.toContain("d1:beat:night");
     expect(m.store.getState().day).toBe(1);
   }, 10_000);
 
-  it("on 床 its bed is the same 躺下; 窗 has no splat either", async () => {
+  it("on 床 its bed lies down at once; 窗 has no splat either", async () => {
     const store = createStore({ startDay: 1 });
     completeUntil(store, "bed", { all: true });
     const m = mount({ splat: true, store, view: "window" });
@@ -761,24 +764,25 @@ describe("the real layer with a fake scene: look, and 床 held by the splat", ()
     await frame();
     expect(m.session.view).toBe("bed");
     m.stage().querySelector<HTMLElement>('.shot-hit[data-hot="bed"]')!.click();
+    expect(m.session.view).toBe("lying");
     expect(m.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:bed:ask"]);
     await sleep(m);
-    // Already at 床: the night begins at once.
+    // Lying already: the night begins at once.
     expect(m.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:beat:night"]);
   }, 10_000);
 
-  it("without the splat: the same turn to 床, and the night begins as it ends", async () => {
+  it("without the splat: the same turn to 床, then lying down, and 睡 there starts the night", async () => {
     const store = createStore({ startDay: 1 });
     completeUntil(store, "bed", { all: true });
-    const m = mount({ splat: false, store });
+    const m = mount({ splat: false, store, view: "room" });
     await frame();
     expect(m.session.splatReady).toBe(false);
     m.root.querySelector<HTMLElement>('.shot-hit[data-hot="bed"]')!.click();
-    expect(m.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:bed:ask"]);
-    await sleep(m);
     expect(m.session.view).toBe("bed");
-    expect(m.session.dialogue.queue).toEqual([]);
+    expect(m.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:bed:ask"]);
     await wait(CHOSEN.turn + 80);
+    expect(m.session.view).toBe("lying");
+    await sleep(m);
     expect(m.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:beat:night"]);
   });
 });
@@ -897,5 +901,30 @@ describe("the CSS the controls rely on", () => {
     expect(css).not.toContain(".room .cams");
     expect(css).toContain("user-select:none");
     expect(css).toContain(".stage.m-late>.desk-things");
+  });
+});
+
+describe("the ceiling (lying-view R6): no back control; a click asks whether to get up", () => {
+  it("a click anywhere on the ceiling asks 要起来吗？; the bottom strip and the wheel do not leave; 起床 goes up to 床", async () => {
+    const m = mount({ view: "lying" });
+    await frame();
+    mouse("mousemove", m.stage(), 800, 880);
+    await frame();
+    expect(m.root.querySelector(".edge-hint")).toBeNull();
+    m.stage().dispatchEvent(new WheelEvent("wheel", { bubbles: true, deltaY: 100 }));
+    expect(m.session.view).toBe("lying");
+    expect(m.session.dialogue.queue).toEqual([]);
+    await click(m, 800, 890);
+    expect(m.session.view).toBe("lying");
+    expect(m.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:rise:ask"]);
+    await frame();
+    m.root.querySelector<HTMLElement>('[data-action="loop-choice"][data-choice="stay"]')!.click();
+    await frame();
+    expect(m.session.view).toBe("lying");
+    await click(m, 600, 300);
+    await frame();
+    m.root.querySelector<HTMLElement>('[data-action="loop-choice"][data-choice="up"]')!.click();
+    await frame();
+    expect(m.session.view).toBe("bed");
   });
 });

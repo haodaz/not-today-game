@@ -36,6 +36,8 @@ export const BACKDROPS: Readonly<Record<View | "title", string>> = {
   window: "/room/shots/window.jpg",
   // playtest-1105 R5: the meal table up close is the same still, pushed in.
   table: "/room/shots/window.jpg",
+  // lying-view R2: the ceiling from the bed (the day still; the night one is the stage's own class).
+  lying: "/room/shots/ceiling_day.jpg",
 };
 
 /**

@@ -14,7 +14,7 @@ import { isFacing, type Facing } from "@world/room/facings";
 
 /** The facing a view belongs to: 桌子 and 屏幕 are under 房间 (R1). */
 // playtest-1105 R5: 窗's table up close is under 窗.
-export const facingOf = (view: View): Facing => (isFacing(view) ? view : view === "table" ? "window" : "room");
+export const facingOf = (view: View): Facing => (isFacing(view) ? view : view === "table" ? "window" : view === "lying" ? "bed" : "room");
 
 /** The desk lamp is lit: as last clicked, else as the hour has it (on in the evening). */
 export const lampLit = (session: Pick<Session, "lampOn" | "clock">): boolean => session.lampOn ?? isEvening(session.clock);

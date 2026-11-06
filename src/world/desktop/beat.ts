@@ -21,7 +21,10 @@ export function isTime(text: string): boolean {
   return HHMM.test(text);
 }
 
-/** Debug params beside `?day=N`: `?beat=night&t=23:41`. Invalid values are ignored. */
+/**
+ * Debug params beside `?day=N`: `?beat=night&t=23:41`. Invalid values are ignored. (`&night=1` and
+ * `&shutdown=1`, which preview a day's night or shutdown beat, are in world/loop/preview.ts.)
+ */
 export function parseBeatParams(search: string, base: BeatClock = DEFAULT_CLOCK): BeatClock {
   const params = new URLSearchParams(search);
   const beat = params.get("beat");

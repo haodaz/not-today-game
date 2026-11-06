@@ -103,7 +103,7 @@ export function anchorFor(id: HintId, view: string): Anchor | null {
 }
 
 /** The room's views: the four facings, 桌子 and 窗's table. 屏幕 has its own coach marks, no prompts. */
-export const roomView = (view: string): boolean => isFacing(view) || view === "desk" || view === "table";
+export const roomView = (view: string): boolean => isFacing(view) || view === "desk" || view === "table" || view === "lying";
 
 /** The hints that are prompts (all but the chick's line). */
 export const PROMPT_IDS: readonly HintId[] = HINT_IDS.filter((id) => id !== "chickHint");

@@ -147,7 +147,8 @@ describe("runtime (design L5/L6)", () => {
     const { ctx } = fakeCtx(store);
     syncLoop(ctx, 0);
     // The day starts in the room: its boot beat, before the player does anything.
-    expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:beat:boot"]);
+    // lying-view R1: day 1's boot opens with Kuro's lines, so it is split into pieces (`#n`), in order.
+    expect([...new Set(ctx.session.dialogue.queue.map((q) => q.key.replace(/#\d+$/, "")))]).toEqual(["d1:beat:boot"]);
     expect(showing(ctx.session.dialogue, store.getState())!.line!.t).toBe(dayFiles.get(1)!.beats.boot!.say[0]!.t);
     ctx.session.dialogue = EMPTY_DIALOGUE;
     store.appendEvent(step("boot", "09:03"));
@@ -228,7 +229,8 @@ describe("runtime (design L5/L6)", () => {
     for (let i = 0; i < night; i++) loopActions["loop-advance"]!(ctx, {} as DOMStringMap, null as never);
     expect(store.getState().day).toBe(2);
     syncLoop(ctx, 0);
-    expect(ctx.session.view).toBe("room");
+    // lying-view R3: the next day starts lying in bed (the ceiling).
+    expect(ctx.session.view).toBe("lying");
     expect(ctx.session.clock).toEqual(DEFAULT_CLOCK);
   });
 });

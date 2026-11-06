@@ -26,6 +26,8 @@ export interface HistorySession {
 export function entryOf(state: State, q: Queued, line: SayLine): LogEntry {
   const fill = (s: string) => fillPlaceholders(s, state.names);
   if (q.voice === "kuro") return { day: state.day, who: t("kuro.name"), kind: "kuro", text: fill(line.t) };
+  // lying-view R1: a day file's `who: "me"` line is the player's, under their name.
+  if (line.k === "speaker" && line.who === "me") return { day: state.day, who: state.names.login.trim() || t("who.me"), kind: "player", text: fill(line.t) };
   return { day: state.day, who: line.k === "speaker" ? speakerLabel(line.who ?? "", fill) : null, kind: line.k, text: fill(line.t) };
 }
 

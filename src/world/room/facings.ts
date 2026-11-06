@@ -26,6 +26,7 @@ export function turnsBetween(from: Facing, to: Facing): TurnDir[] {
 }
 
 /** The levels under 房间 have a way back (屏幕 → 桌子 → 房间); the facings have none. */
+// lying-view R6: the ceiling (`lying`) has none: no bottom strip, no wheel-out; getting up is an ask.
 export const hasBack = (view: string): boolean => view === "desk" || view === "desktop" || view === "table";
 
 /** The left and right share of the stage that is a turn edge, on every facing. */

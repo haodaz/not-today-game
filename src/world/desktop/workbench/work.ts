@@ -28,7 +28,7 @@ import { frameUrl, FRAMES } from "../kuro/body";
 import { kuroDay } from "../kuro/days";
 import { kuroText } from "../kuro/voice";
 import type { AppContext, Session } from "../model";
-import { boardActions, renderBoard } from "./board";
+import { renderBoard } from "./board";
 
 /** The three options as reply chips: their strings keys and modes (the old toolbar's keys). */
 export const CHIPS: readonly { readonly key: string; readonly mode: TaskMode }[] = [
@@ -521,9 +521,10 @@ function complete(
   });
 }
 
+// The board surface's actions (lock / fill / assist / print) are not spread in here: work.ts and
+// board.ts import each other, and a top-level spread of boardActions hits the TDZ when board.ts
+// is evaluated first. The room controller (game.ts) merges workActions and boardActions.
 export const workActions: Record<string, ActionHandler> = {
-  // Work v2: the board surface's actions (lock / fill / assist / print).
-  ...boardActions,
   // ↑ (or Enter in the input): the sentence becomes the player's message.
   "wb-send"(ctx) {
     const state = ctx.store.getState();

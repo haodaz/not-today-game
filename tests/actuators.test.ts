@@ -204,6 +204,9 @@ describe("躺下: the bed in 房间", () => {
     const { ctx, timers } = ctxOf(store, "room");
     completeUntil(store, "bed", { all: true });
     act(ctx, "bed");
+    // lying-view R4: after nightfall the bed is lain on first (房间 → 床 → the ceiling).
+    for (const x of timers.splice(0)) x.fn();
+    expect(ctx.session.view).toBe("lying");
     const html = render(ctx);
     expect(html).toContain(`data-action="loop-choice" data-index="0" data-choice="sleep"`);
     expect(html).toContain(`data-action="loop-choice" data-index="1" data-choice="stay"`);
@@ -215,13 +218,12 @@ describe("躺下: the bed in 房间", () => {
     expect(ctx.session.dialogue.queue).toEqual([]);
     expect(store.getEvents()).toHaveLength(events);
     expect(JSON.stringify(store.getState())).toBe(state);
-    expect(ctx.session.view).toBe("room");
-    // Asked again, sleep: the player turns to 床 (room-turn R2), and the night begins as the turn ends.
+    // 再待会儿 keeps the player lying (lying-view R4).
+    expect(ctx.session.view).toBe("lying");
+    // Asked again from the bed, sleep: the night begins at once, from `lying`.
     act(ctx, "bed");
     act(ctx, "loop-choice", { choice: "sleep" });
-    expect(ctx.session.view).toBe("bed");
-    expect(ctx.session.dialogue.queue).toEqual([]);
-    for (const x of timers.splice(0)) x.fn();
+    expect(ctx.session.view).toBe("lying");
     expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:beat:night"]);
     for (let i = 0; i < dayFiles.get(1)!.beats.night!.say.length; i++) act(ctx, "loop-advance");
     expect(store.getState().day).toBe(2);

@@ -97,6 +97,9 @@ describe("R2 · dialogue owns the screen", () => {
   });
 });
 
+/** The queue's keys with a split beat's pieces (`<key>#n`, lying-view R1) folded into its key. */
+const beatKeys = (queue: readonly { key: string }[]): string[] => [...new Set(queue.map((q) => q.key.replace(/#\d+$/, "")))];
+
 describe("R3 · the day's opening, and powering on", () => {
   it("the day's boot beat plays on waking in the room (every day), before anything is done; not on power-on", async () => {
     const { syncLoop } = await import("@world/loop/runtime");
@@ -105,7 +108,8 @@ describe("R3 · the day's opening, and powering on", () => {
       const store = createStore({ startDay: day });
       const r = rig(store, "room");
       syncLoop(r.ctx, 0);
-      if (dayFiles.get(day)!.beats.boot) expect(r.session.dialogue.queue.map((q) => q.key), `day ${day}`).toEqual([`d${day}:beat:boot`]);
+      // lying-view R1: a beat with Kuro's lines is split into pieces `<key>#n`; it is still the one beat.
+      if (dayFiles.get(day)!.beats.boot) expect(beatKeys(r.session.dialogue.queue), `day ${day}`).toEqual([`d${day}:beat:boot`]);
     }
     // After lie down the next morning wakes with its own.
     const store = createStore({ startDay: 1 });
@@ -141,7 +145,7 @@ describe("R3 · the day's opening, and powering on", () => {
     const r = rig(createStore({ startDay: 1 }), "desk");
     syncLoop(r.ctx, 0);
     startPrologue(r.session);
-    expect(r.session.dialogue.queue.map((q) => q.key)).toEqual([PROLOGUE_KEY, "d1:beat:boot"]);
+    expect(beatKeys(r.session.dialogue.queue)).toEqual([PROLOGUE_KEY, "d1:beat:boot"]);
   });
 });
 

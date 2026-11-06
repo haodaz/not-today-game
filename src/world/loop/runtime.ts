@@ -244,7 +244,8 @@ export function syncLoop(ctx: ActionContext, nowMs: number = Date.now()): void {
     // A new day (or the first look): nothing old is replayed into the box.
     if (session.loop && session.loop.day !== state.day) {
       session.clock = { ...DEFAULT_CLOCK };
-      session.view = "room";
+      // lying-view R3: the day starts lying in bed, looking at the ceiling.
+      session.view = "lying";
       session.phoneOpen = false;
       session.holding = null;
       // Nothing stays in the hand: just held, front up (programs restart on a new day by themselves).

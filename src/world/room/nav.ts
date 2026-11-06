@@ -280,6 +280,12 @@ export function createNav(deps: NavDeps = {}) {
       if (!p) return;
       const stage = root.querySelector<HTMLElement>(":scope > .stage:not(.m-ghost):not(.m-backdrop)");
       const height = stage?.classList.contains("room") ? STAGE_H : (stage?.getBoundingClientRect().height ?? STAGE_H);
+      // lying-view R6: on the ceiling a click anywhere (Kuro's body is its own button) asks whether to get up.
+      if (ctx.session.view === "lying" && !ctx.session.viewfinder) {
+        e.preventDefault();
+        e.stopPropagation();
+        return run("rise");
+      }
       // The bottom strip is back only where there is a level to go back to (桌子, 屏幕); on a
       // facing a click there is a click on what is there (the bed, the table).
       if (hasBack(ctx.session.view) && inBackStrip(p.y, height)) {

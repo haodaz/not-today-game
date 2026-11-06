@@ -3,7 +3,8 @@
 // first event is the names. The run save is cleared by the endings, and (playtest-1105 R8) by
 // 设置 → 重新开始这一局 / 清除全部记录 after their question.
 // Debug: `?day=N` skips the title and builds day N from an empty log (never touches the saves);
-// `?beat=night&t=23:41` sets the stand-in clock; `?view=desk|desktop|door`, `?focus=right`.
+// `?beat=night&t=23:41` sets the stand-in clock; `?view=desk|desktop|door`, `?focus=right`;
+// `&night=1` / `&shutdown=1` preview that day's night or shutdown beat (world/loop/preview.ts).
 // The game opens in English (README); `?lang=zh` opens in Chinese.
 import "./world/desktop/desktop.css";
 import "./world/room/room.css";
@@ -15,6 +16,7 @@ import "./ui/fonts.css";
 import "./ui/title/title.css";
 import { debugStartDay } from "@state/clock";
 import { deliveryUnitMs } from "@world/loop/waiting";
+import { previewParam, startPreview } from "@world/loop/preview";
 import { splatForGame } from "@world/room/splat";
 import { fxForGame } from "@world/room/fx/layer";
 import { createHandLayer } from "@world/objects/layer";
@@ -77,7 +79,7 @@ function snapshot(store: Store): RunSnapshot {
   return { runId: store.getRunId(), version: RUN_FORMAT_VERSION, events: store.getEvents(), day: state.day, san: state.san, ended: state.ending === "none" ? null : state.ending, updatedAt: Date.now() };
 }
 
-function startGame(store: Store, saved: boolean, from?: "desk", prologue = false): void {
+function startGame(store: Store, saved: boolean, prologue = false): void {
   root.innerHTML = "";
   if (saved) store.subscribe(() => run.save(store));
   // The cloud mirror (backend FR4): push on lie-down and every 20 events; a no-op offline.
@@ -104,8 +106,8 @@ function startGame(store: Store, saved: boolean, from?: "desk", prologue = false
     store,
     clock: parseBeatParams(search),
     focus: focus === "right" ? "right" : "left",
-    // A new run begins where the title's question card left the camera: at 桌子.
-    view: view === "desktop" || view === "door" || view === "desk" || view === "bed" || view === "window" ? view : (from ?? "room"),
+    // lying-view R3: the day starts lying in bed; the title's new run lands there too (after the dream).
+    view: view === "desktop" || view === "door" || view === "desk" || view === "bed" || view === "window" || view === "room" || view === "lying" ? view : "lying",
     render: renderGame,
     actions: {
       ...desktopActions,
@@ -160,6 +162,12 @@ function startGame(store: Store, saved: boolean, from?: "desk", prologue = false
   }
   // Debug speed, dev builds only (like ?day=): `?fast=1` counts delivery minutes as seconds.
   game.session.deliveryUnitMs = deliveryUnitMs(search, import.meta.env.DEV);
+  // Debug, beside ?day=N (a debug run is never saved): `&night=1` / `&shutdown=1` put that day's
+  // night or shutdown beat in the box at once, staged as at bedtime; nothing is logged.
+  if (!saved) {
+    const which = previewParam(search);
+    if (which && startPreview(game.session, store.getState().day, which)) game.rerender();
+  }
 }
 
 const jump = debugStartDay(search);
@@ -226,7 +234,7 @@ if (jump !== null) {
       const store = createStore({ runId: crypto.randomUUID() });
       store.appendEvent({ kind: "names", names });
       run.save(store);
-      startGame(store, true, "desk", true);
+      startGame(store, true, true);
       // Anonymous sign-in on the first 开始 (backend FR1); the mirror starts with this run.
       void net.signIn(names).then((ok) => {
         if (ok) void net.pushRun(snapshot(store));

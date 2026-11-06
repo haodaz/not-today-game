@@ -5,7 +5,7 @@
 import type { BoardOp, GameEvent } from "../events";
 import type { State } from "../types.gen";
 import { meetingCardFound } from "./meeting";
-import { isMeetingFrom, taskByFlag, type BoardCard, type BoardLock, type CardFrom, type Task, type TaskBoard, type TaskDeliverable } from "./tasks";
+import { isMeetingFrom, taskByFlag, taskFiles, type BoardCard, type BoardLock, type CardFrom, type Task, type TaskBoard, type TaskDeliverable } from "./tasks";
 import { dayFile } from "./table";
 import { takenByKuro } from "@world/objects/taken";
 import { handOf } from "../hands";
@@ -258,6 +258,19 @@ export function printedBoard(day: number, events: readonly GameEvent[]): { flag:
     if (e.kind !== "task" || e.day !== day || e.slots === undefined) continue;
     const tree = taskByFlag(day, e.flag);
     if (tree?.board) return { flag: e.flag, slots: e.slots };
+  }
+  return null;
+}
+
+/**
+ * The day's `hand` deliverable as content gives it (the first board task whose deliverable goes to
+ * the hand), whether or not it was printed. For the debug preview of the shutdown beat only. Pure.
+ */
+export function handDeliverableOf(day: number): TaskDeliverable | null {
+  for (const task of taskFiles.get(day) ?? []) {
+    const tree = taskByFlag(day, task.done);
+    const d = tree?.deliverable;
+    if (tree?.board && d && (d.to ?? "hand") === "hand") return d;
   }
   return null;
 }

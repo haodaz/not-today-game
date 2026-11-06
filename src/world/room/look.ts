@@ -72,5 +72,6 @@ export function edgeZone(view: string, x: number, y: number): EdgeZone | null {
 /** Whether a view has that hinted edge at all. */
 export function edgeLeads(view: string, zone: EdgeZone): boolean {
   // playtest-1105 R5: 窗's table up close has the same way back as 桌子.
+  // lying-view R6: the ceiling has no back edge (getting up is an ask).
   return zone === "back" ? view === "desk" || view === "table" : isFacing(view);
 }

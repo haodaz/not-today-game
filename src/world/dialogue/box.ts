@@ -96,6 +96,11 @@ export interface LineBoxModel {
   readonly face?: KuroFace;
 }
 
+/** lying-view R1: a day file's line said by the player (`speaker`, `who: "me"`). */
+export const isPlayerLine = (line: { readonly k: string; readonly who?: string } | null | undefined): boolean => !!line && line.k === "speaker" && line.who === "me";
+/** The player's tag, as on their chat turn and in the history: the login name, else `who.me`. */
+export const playerName = (state: Pick<State, "names">): string => state.names.login.trim() || t("who.me");
+
 /** Kuro speaks this line: its own conversation, or a day line said by 屏幕 (kuro-zh-answers R4). */
 function kuroSpeaks(head: Queued | undefined, line: { readonly k: string; readonly who?: string } | null | undefined): boolean {
   if (!line || line.k !== "speaker") return false;
@@ -140,8 +145,10 @@ export function lineBoxModel(state: State, events: readonly GameEvent[], session
   const scr = at.all[at.page]!;
   const line = show.line;
   const kind = line?.k === "inner" ? "inner" : line?.k === "sfx" ? "sfx" : "line";
+  // lying-view R1: a day file's `who: "me"` line is the player's own (their name tag, their portrait).
+  const mine = head.voice !== "kuro" && isPlayerLine(line);
   const tag: BoxTag =
-    head.voice === "kuro" ? { kind: "kuro" } : !line || kind !== "line" ? null : line.k === "speaker" ? { kind: "who", text: speakerLabel(line.who ?? "", fill) } : placeTag(state, session);
+    head.voice === "kuro" ? { kind: "kuro" } : mine ? { kind: "who", text: playerName(state) } : !line || kind !== "line" ? null : line.k === "speaker" ? { kind: "who", text: speakerLabel(line.who ?? "", fill) } : placeTag(state, session);
   // world-prompts R2: on the choices the box keeps the line's last page of text; every choice (all
   // their pages at once) goes to the column on the right, in content order.
   const onChoices = scr.choices.length > 0;
@@ -162,9 +169,9 @@ export function lineBoxModel(state: State, events: readonly GameEvent[], session
     screen: at.page,
     count: at.all.length,
     portrait: head.voice === "kuro" ? portraitState(state, events, session, nowMs) : null,
-    playerPortrait: head.voice !== "kuro" && kind === "inner" ? playerPortraitSrc(state.names.pronoun, isDreamNight(state.day, session.clock.beat)) : null,
+    playerPortrait: head.voice !== "kuro" && (kind === "inner" || mine) ? playerPortraitSrc(state.names.pronoun, isDreamNight(state.day, session.clock.beat)) : null,
     // opening R2: in the prologue a speaker not in npc.json gets a silhouette (stable per name).
-    npcPortrait: head.voice !== "kuro" && kind === "line" && line?.k === "speaker" ? (npcPortrait(line.who ?? "") ?? (head.key === PROLOGUE_KEY ? silhouetteFor(line.who ?? "") || null : null)) : null,
+    npcPortrait: head.voice !== "kuro" && !mine && kind === "line" && line?.k === "speaker" ? (npcPortrait(line.who ?? "") ?? (head.key === PROLOGUE_KEY ? silhouetteFor(line.who ?? "") || null : null)) : null,
     // The first night's hand has no checklist line: a one-time pointer on its choices.
     pointer: pointerCls(session, "raid", scr.choices.length > 0 && raidShowing(state, session)),
     red: lateRing(state.day),

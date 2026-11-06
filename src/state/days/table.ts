@@ -9,7 +9,8 @@ import { bilingual, bilingualValues } from "../content-locale";
 export const LINE_KINDS = ["narration", "inner", "sfx", "speaker"] as const;
 export type LineKind = (typeof LINE_KINDS)[number];
 
-export const BEAT_NAMES = ["boot", "box", "desk", "shutdown", "night"] as const;
+// lying-view R6: `rise` (optional) is what is seen on getting up, once a day, after the first 起床.
+export const BEAT_NAMES = ["boot", "rise", "box", "desk", "shutdown", "night"] as const;
 export type BeatName = (typeof BEAT_NAMES)[number];
 
 /**
@@ -398,7 +399,8 @@ export function parseDayFile(raw: unknown, label: string): DayFile {
   keys(raw.beats, BEAT_NAMES, `${label}.beats`);
   const beats: Partial<Record<BeatName, Sequence>> = {};
   for (const name of BEAT_NAMES) {
-    if (raw.beats[name] !== undefined) beats[name] = sequence(raw.beats[name], `${label}.beats.${name}`, true, name === "shutdown");
+    // `rise` is lines only (lying-view R6: `{ say: [...] }`), no choices.
+    if (raw.beats[name] !== undefined) beats[name] = sequence(raw.beats[name], `${label}.beats.${name}`, name !== "rise", name === "shutdown");
   }
   if (!Array.isArray(raw.items)) fail(`${label}.items`, "must be a list");
   const authored = raw.items.map((x, i) => item(x, `${label}.items[${i}]`));

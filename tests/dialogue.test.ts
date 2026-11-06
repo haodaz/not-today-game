@@ -483,7 +483,8 @@ describe("FR3 properties", () => {
 describe("addition 2026-11-01: the player's own portrait for inner lines", () => {
   const allSay = [...dayFiles.values()].flatMap((d) => Object.values(d.beats).flatMap((b) => b?.say ?? []));
   const inner = allSay.find((l) => l.k === "inner")!;
-  const speaker = allSay.find((l) => l.k === "speaker")!;
+  // An NPC's line: day files' `who: "kuro"` / `who: "me"` are Kuro's and the player's (lying-view R1).
+  const speaker = allSay.find((l) => l.k === "speaker" && l.who !== "kuro" && l.who !== "me")!;
   const withPronoun = (pronoun: "she" | "he" | null, day = 1): Store => {
     const store = createStore({ startDay: 1 });
     store.appendEvent({ kind: "names", names: { login: "林一", nick: "一一", calledBy: "老大", bossCalls: "小林", pronoun } });

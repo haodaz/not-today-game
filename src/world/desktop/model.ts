@@ -50,9 +50,12 @@ export const taskPageId = (page: WorkbenchPage): string | null => (page.startsWi
 /** playtest-1105 R8: what the settings panel asks about before doing it. */
 export type SettingsConfirm = "restart" | "clearAll";
 
-export type View = "room" | "desk" | "door" | "desktop" | "bed" | "window" | "table";
-/** playtest-1105 R5: "table" is 窗's little meal table up close, a level under 窗 (as 桌子 is under 房间). */
-export const VIEWS: readonly View[] = ["room", "desk", "desktop", "door", "bed", "window", "table"];
+export type View = "room" | "desk" | "door" | "desktop" | "bed" | "window" | "table" | "lying";
+/**
+ * playtest-1105 R5: "table" is 窗's little meal table up close, a level under 窗 (as 桌子 is under 房间).
+ * lying-view R2: "lying" is the ceiling seen from the bed, a level under 床.
+ */
+export const VIEWS: readonly View[] = ["room", "desk", "desktop", "door", "bed", "window", "table", "lying"];
 /** A turn edge's way (left / right 8 % of a facing), or 桌子's bottom strip back to 房间. */
 export type EdgeZone = "left" | "right" | "back";
 
@@ -243,6 +246,8 @@ export interface Session {
   screenOffDay: number;
   /** playtest-1105 R3: the day whose boot beat played on waking (once a day; session only). */
   bootBeatDay: number;
+  /** lying-view R6: the day whose `rise` beat played on the first 起床 (once a day; session only). */
+  riseBeatDay: number;
   /** playtest-1105 R4: the line each thing in the room said last (so it is not said twice in a row). */
   looks: Partial<Record<"coat" | "bag" | "door" | "lock", number>>;
   /** How long a delivery minute is (ms): 60 000, or 1 000 with the dev-only `?fast=1`. */
@@ -476,6 +481,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     deliveryUnitMs: 60_000,
     screenOffDay: 0,
     bootBeatDay: 0,
+    riseBeatDay: 0,
     looks: {},
     splatReady: false,
     cam: null,

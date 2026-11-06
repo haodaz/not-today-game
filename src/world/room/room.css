@@ -79,6 +79,10 @@
 .room.window-view,.m-turn-face.window-view{background-image:url(/room/shots/window.jpg)}
 /* 窗's table up close (playtest-1105 R5): the same still pushed in 3×, the tabletop centred
    (shots.ts TABLE_ZOOM: 1664×928 × 3, at -1318 / -1530 px). No pan here: it would undo the push. */
+/* lying-view R2: the ceiling from the bed, a level under 床 (cover-fitted like the facings); after
+   nightfall its night photo. */
+.room.lying-view,.m-turn-face.lying-view{background-image:url(/room/shots/ceiling_day.jpg)}
+.room.lying-view.ceiling-night{background-image:url(/room/shots/ceiling_night.jpg)}
 .room.table-view,.room.table-view.looking{background-image:url(/room/shots/window.jpg);background-size:4992px 2784px;background-position:-1318px -1530px}
 /* 窗's placed meal on the little table: the same art, scaled to its rect. */
 .room .facing-things{position:absolute;inset:0;pointer-events:none}

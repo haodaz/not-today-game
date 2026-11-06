@@ -336,7 +336,8 @@ function walkSteps(ctx: ActionContext, from: string, to: string): void {
  * of them has a way back; you turn between them.
  */
 export function backTarget(view: View): View | null {
-  // playtest-1105 R5: 窗's table up close goes back to 窗.
+  // playtest-1105 R5: 窗's table up close goes back to 窗. lying-view R6: the ceiling has no back;
+  // getting up is an ask (the `rise` action).
   return view === "desktop" ? "desk" : view === "desk" ? "room" : view === "table" ? "window" : null;
 }
 
@@ -478,7 +479,7 @@ export function wayLegs(from: View, to: View): View[] {
   legs.push(to);
   return legs;
 }
-const facingOfView = (v: View): View => (isFacing(v) ? v : v === "table" ? "window" : "room");
+const facingOfView = (v: View): View => (isFacing(v) ? v : v === "table" ? "window" : v === "lying" ? "bed" : "room");
 
 /** opening R2: the prologue leaves the box; its page fades to black; then day 1 shows. */
 function finishPrologue(ctx: ActionContext): void {
@@ -557,7 +558,8 @@ function arrive(ctx: ActionContext, view: View, data: DOMStringMap): void {
   if (from !== view && view !== "desktop") startCam(ctx, from, view);
   // A walk is two steps, whichever way; a turn between facings is a head turn and makes no sound
   // (room-turn correction 2026-11-04).
-  if (from !== view && !(isFacing(from) && isFacing(view))) walkSteps(ctx, from, view);
+  // Lying down on the bed or sitting up (lying-view R2) is no walk either.
+  if (from !== view && !(isFacing(from) && isFacing(view)) && from !== "lying" && view !== "lying") walkSteps(ctx, from, view);
   // A line waiting for this place comes forward; one that belongs elsewhere is taken back.
   settleSession(ctx.session);
   ctx.session.phoneOpen = false;
@@ -785,6 +787,9 @@ export const loopActions: Record<string, ActionHandler> = {
       ctx.rerender();
       return;
     }
+    // lying-view R4: after nightfall the bed is lain on first (the ceiling, its night photo); what is
+    // said next is said from there, and the player can go back up.
+    if (session.view !== "lying") loopActions["view"]!(ctx, { view: "lying" } as DOMStringMap, null as never);
     if (!openFor(ctx, (e) => e.type === "lieDown")) {
       session.dialogue = push(session.dialogue, { key: `d${day}:bed:locked`, lines: [{ k: "inner", t: t("room.bed.locked") }], ending: { kind: "none" } });
       ctx.rerender();
@@ -793,18 +798,20 @@ export const loopActions: Record<string, ActionHandler> = {
     session.dialogue = push(session.dialogue, { key: `d${day}:bed:ask`, lines: [{ k: "inner", t: t("room.bed.confirm") }], ending: { kind: "bedAsk" } });
     ctx.rerender();
   },
-  // The answer to 睡: the player turns to 床 the shortest way (room-turn R2), then the night begins.
+  // The answer to 睡 (lying-view R4): from `lying` the night begins at once. A 睡 given anywhere else
+  // first lies down the shortest way (room-turn R2: the turn to 床, then down), then the night
+  // begins. The day can only be completed from `lying`: this is the only way to the night's lieDown.
   sleep(ctx) {
     const { store, session } = ctx;
     const day = store.getState().day;
-    // Not at 床 yet: go there; the night begins as the turn ends, and only if the player is still
-    // there (turning away meanwhile cancels it, as backing out of the old glide did).
-    if (session.view !== "bed") {
+    // Not lying yet: go there; the night begins as the move ends, and only if the player is still
+    // lying (getting up meanwhile cancels it, as backing out of the old glide did).
+    if (session.view !== "lying") {
       if (session.cam && session.cam.until > (ctx.now?.() ?? Date.now())) return;
-      const ms = wayMs(session.view, "bed");
-      loopActions["view"]!(ctx, { view: "bed" } as DOMStringMap, null as never);
+      const ms = wayMs(session.view, "lying");
+      loopActions["view"]!(ctx, { view: "lying" } as DOMStringMap, null as never);
       ctx.later(ms + 20, () => {
-        if (ctx.session.view === "bed") loopActions["sleep"]!(ctx, {} as DOMStringMap, null as never);
+        if (ctx.session.view === "lying") loopActions["sleep"]!(ctx, {} as DOMStringMap, null as never);
       });
       return;
     }
@@ -884,6 +891,18 @@ export const loopActions: Record<string, ActionHandler> = {
     const to = backTarget(ctx.session.view);
     if (to) loopActions["view"]!(ctx, { view: to } as DOMStringMap, null as never);
   },
+  // lying-view R6: getting up from the bed is an ask (a click on the ceiling, Esc, ← / →, the back
+  // key): 要起来吗？ 起床 / 再躺一会儿. While a line is up the ask waits behind it (the dialogue owns
+  // the screen); not while Kuro's chat or something else is over the view, and not when the bed's
+  // own question or this one is already queued.
+  rise(ctx) {
+    const { store, session } = ctx;
+    if (session.view !== "lying" || overlayOpen(session) || session.objbarOpen) return;
+    if (session.dialogue.queue.some((q) => q.ending.kind === "riseAsk" || q.ending.kind === "bedAsk")) return;
+    const day = store.getState().day;
+    session.dialogue = push(session.dialogue, { key: `d${day}:rise:ask`, lines: [{ k: "inner", t: t("room.rise.ask") }], ending: { kind: "riseAsk" } });
+    ctx.rerender();
+  },
   // Right-click is Esc: it closes what is over the view, then steps the camera out.
   "nav-esc"(ctx) {
     loopKeys(ctx, { key: "Escape" } as KeyboardEvent);
@@ -955,6 +974,15 @@ export const loopActions: Record<string, ActionHandler> = {
       else ctx.rerender();
       return;
     }
+    // lying-view R6: 起床 goes up to 床 (and the day's `rise` beat plays there, once); 再躺一会儿 stays.
+    if (q.ending.kind === "riseAsk") {
+      if (data.choice !== "up" && data.choice !== "stay") return;
+      ctx.session.dialogue = finishChoice(ctx.session.dialogue);
+      settleSession(ctx.session);
+      if (data.choice === "up") getUp(ctx);
+      ctx.rerender();
+      return;
+    }
     const state = ctx.store.getState();
     const events = ctx.store.getEvents();
     const picked = showing(ctx.session.dialogue, state, events)?.choices?.find((c) => String(c.index) === data.index);
@@ -962,6 +990,13 @@ export const loopActions: Record<string, ActionHandler> = {
     // The line and the choice go into today's history (before the event: it may end the line).
     logCurrent(ctx.session, state);
     logPlayer(ctx.session, state, picked.text !== null ? fillPlaceholders(picked.text, state.names) : t(picked.labelKey!));
+    // A debug preview (`?day=N&shutdown=1`, world/loop/preview.ts): the choice logs nothing; the box closes.
+    if (q.preview) {
+      ctx.session.dialogue = finishChoice(ctx.session.dialogue);
+      settleSession(ctx.session);
+      ctx.rerender();
+      return;
+    }
     // Work v2 §4: 把{label}递给它 — hand today's deliverable to the hand. It leaves the desk. On a
     // raid night the content's own choices stay, so the box does not finish (the player still answers
     // the hand). On a hand night without content choices (days 11, 12, 14, 15, 17) there is nothing
@@ -1500,6 +1535,49 @@ export const loopActions: Record<string, ActionHandler> = {
   ...tabooActions,
 };
 
+/**
+ * lying-view R6: 起床. Up to 床; on the first 起床 of the day its `rise` beat (if the day file has
+ * one) plays there, once. Not after the tower is on (a reload mid-day lands lying again; the
+ * getting-up lines are about the morning), as the boot beat is not.
+ */
+function getUp(ctx: ActionContext): void {
+  const { store, session } = ctx;
+  if (session.view !== "lying") return;
+  loopActions["view"]!(ctx, { view: "bed" } as DOMStringMap, null as never);
+  const state = store.getState();
+  const seq = loopContext(state, store.getEvents())?.file.beats.rise;
+  if (!seq || session.riseBeatDay === state.day || booted(state, store.getEvents())) return;
+  session.riseBeatDay = state.day;
+  session.dialogue = push(session.dialogue, beatQueued(state.day, "rise", seq));
+  settleSession(session);
+}
+
+/**
+ * lying-view: Kuro's chat closed while the player lies in bed after nightfall: the sleep question
+ * is asked again (after whatever else is still queued), when the bed is open and it is not already
+ * waiting. Every way out of the chat (先不聊, 好。, Esc, the bedtime line read) is one of these
+ * actions, so each is wrapped to compare before and after.
+ */
+function askSleepAfterChat(ctx: ActionContext, wasTalking: boolean, day: number): void {
+  const { store, session } = ctx;
+  if (!wasTalking || talking(session.dialogue) || session.view !== "lying") return;
+  if (store.getState().day !== day || store.getState().ending !== "none") return;
+  const lc = loopContext(store.getState(), store.getEvents());
+  if (!lc || !nightfallReached(lc) || !openFor(ctx, (e) => e.type === "lieDown")) return;
+  if (session.dialogue.queue.some((q) => q.ending.kind === "bedAsk")) return;
+  session.dialogue = push(session.dialogue, { key: `d${day}:bed:ask`, lines: [{ k: "inner", t: t("room.bed.confirm") }], ending: { kind: "bedAsk" } });
+  ctx.rerender();
+}
+
+for (const [name, handler] of Object.entries(loopActions)) {
+  loopActions[name] = (ctx, data, el) => {
+    const wasTalking = talking(ctx.session.dialogue);
+    const day = ctx.store.getState().day;
+    handler(ctx, data, el);
+    askSleepAfterChat(ctx, wasTalking, day);
+  };
+}
+
 /** Whether two dialogue states show the same line (pages aside). */
 function sameLine(a: DialogueState, b: DialogueState): boolean {
   return a.queue[0] === b.queue[0] && a.line === b.line;
@@ -1652,6 +1730,12 @@ export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
   }
   if (e.key === "Escape" && (ctx.session.phoneOpen || ctx.session.holding)) {
     loopActions["loop-put-down"]!(ctx, {} as DOMStringMap, null as never);
+    return true;
+  }
+  // lying-view R6: on the ceiling Esc, ← / → and the back key (Backspace) ask whether to get up.
+  if (ctx.session.view === "lying" && (e.key === "Escape" || e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "Backspace")) {
+    if (typingIn(e.target)) return false;
+    loopActions["rise"]!(ctx, {} as DOMStringMap, null as never);
     return true;
   }
   // One camera level out: 屏幕 → 桌子 → 房间. On a facing Esc does nothing: there is no back (room-turn R1).

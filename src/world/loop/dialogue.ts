@@ -5,7 +5,7 @@ import type { BeatName, Place, SayLine, Sequence } from "@state/days/table";
 import { choiceOffered } from "@state/days/effects";
 import { recogniseTable } from "@state/recognise";
 import type { GameEvent } from "@state/events";
-import { deliverableForHand, handNight } from "@state/days/board";
+import { deliverableForHand, handDeliverableOf, handNight } from "@state/days/board";
 import { hasString, t } from "@world/i18n";
 import type { State } from "@state/types.gen";
 
@@ -18,6 +18,8 @@ export type Ending =
   | { readonly kind: "recognise"; readonly object: string; readonly order: readonly number[] }
   /** The bed, unlocked: 睡 / 再待会儿 (day-loop addition 2026-11-02). */
   | { readonly kind: "bedAsk" }
+  /** lying-view R6: getting up from the bed: 起床 / 再躺一会儿. */
+  | { readonly kind: "riseAsk" }
   /** Kuro's upgrade offer as a line in the box (dialogue spec): 升级 / 不了. */
   | { readonly kind: "kuroOffer"; readonly object: string; readonly decline: "offer" | "nag" }
   /** 要和克总聊聊吗？ — 聊聊 / 先不聊. */
@@ -31,7 +33,7 @@ export type Ending =
 
 /** Endings that wait for a choice (Kuro's turn waits for the player's box). */
 export const endsInChoice = (e: Ending): boolean =>
-  e.kind === "beatChoices" || e.kind === "loan" || e.kind === "recognise" || e.kind === "kuroOffer" || e.kind === "kuroAsk" || e.kind === "bedAsk" || e.kind === "kuroTurn" || e.kind === "kuroWait";
+  e.kind === "beatChoices" || e.kind === "loan" || e.kind === "recognise" || e.kind === "kuroOffer" || e.kind === "kuroAsk" || e.kind === "bedAsk" || e.kind === "riseAsk" || e.kind === "kuroTurn" || e.kind === "kuroWait";
 
 export interface Queued {
   /** Where it came from (for tests and to avoid queueing the same thing twice). */
@@ -42,6 +44,11 @@ export interface Queued {
   readonly sequence?: Sequence;
   /** Kuro's lines (dialogue spec): its avatar in the tag; Esc ends every one of them. */
   readonly voice?: "kuro";
+  /**
+   * A debug preview (`?day=N&night=1` / `&shutdown=1`, world/loop/preview.ts): it plays as the real
+   * beat would, but a choice in it logs nothing and only closes it.
+   */
+  readonly preview?: true;
 }
 
 /** A sequence (or its rest) holding back for its place: the item as queued, and the line it resumes at. */
@@ -66,17 +73,68 @@ export interface DialogueState {
 
 export const EMPTY_DIALOGUE: DialogueState = { queue: [], line: 0 };
 
-/** A conversation with Kuro is under way (any of its items queued). */
-export const talking = (d: DialogueState): boolean => d.queue.some((q) => q.voice === "kuro");
+/**
+ * One of Kuro's own conversation items (its chat, its offers, its closing lines): Kuro's voice and a
+ * `kuro:` key. A day beat's Kuro lines (lying-view R1) carry the voice too, but keep their beat's key.
+ */
+export const isChatItem = (q: Queued): boolean => q.voice === "kuro" && q.key.startsWith("kuro:");
+/** A conversation with Kuro is under way (any of its chat items queued; a beat's Kuro lines are not). */
+export const talking = (d: DialogueState): boolean => d.queue.some(isChatItem);
 /** Kuro is the one in the box now: its body stands there, not in the HUD corner. */
 export const kuroInBox = (d: DialogueState): boolean => d.queue[0]?.voice === "kuro";
 
-/** The conversation ends: every Kuro item leaves; what else was queued stays. */
+/** The conversation ends: every Kuro chat item leaves; what else was queued (a day beat's lines too) stays. */
 export function leaveKuro(d: DialogueState): DialogueState {
   if (!talking(d)) return d;
-  const headGoes = d.queue[0]?.voice === "kuro";
-  return { ...d, queue: d.queue.filter((q) => q.voice !== "kuro"), line: headGoes ? 0 : d.line, page: headGoes ? 0 : d.page };
+  const headGoes = d.queue[0] !== undefined && isChatItem(d.queue[0]);
+  return { ...d, queue: d.queue.filter((q) => !isChatItem(q)), line: headGoes ? 0 : d.line, page: headGoes ? 0 : d.page };
 }
+
+/** lying-view R1: a day file's line said by Kuro (`speaker`, `who: "kuro"`). */
+export const isKuroLine = (l: SayLine): boolean => l.k === "speaker" && l.who === "kuro";
+
+/**
+ * lying-view R1: a sequence that mixes Kuro's lines with others becomes several queue items, in
+ * order, so that only Kuro's runs carry `voice: "kuro"` (the box reads the head's voice). One click
+ * per line as before (a plain item's end starts the next). The last item keeps the sequence's key,
+ * ending and `sequence` (its choices); the earlier ones are `<key>#1`, `<key>#2`, … ending in nothing.
+ * Kuro's own items (already voiced) and sequences without a Kuro line are returned as they are.
+ */
+export function splitVoices(q: Queued): Queued[] {
+  if (q.voice !== undefined || !q.lines.some(isKuroLine)) return [q];
+  const runs: SayLine[][] = [];
+  for (const l of q.lines) {
+    const last = runs[runs.length - 1];
+    if (last && isKuroLine(last[0]!) === isKuroLine(l)) last.push(l);
+    else runs.push([l]);
+  }
+  // A backdrop / prop lasts until the sequence ends: a later piece's first line carries what was on.
+  let backdrop: string | undefined;
+  let prop: string | undefined;
+  return runs.map((run, i): Queued => {
+    const end = i === runs.length - 1;
+    const first = run[0]!;
+    const lines = [{ ...first, ...(first.backdrop === undefined && backdrop !== undefined ? { backdrop } : {}), ...(first.prop === undefined && prop !== undefined ? { prop } : {}) }, ...run.slice(1)];
+    for (const l of run) {
+      if (l.backdrop !== undefined) backdrop = l.backdrop;
+      if (l.prop !== undefined) prop = l.prop;
+    }
+    return {
+      key: end ? q.key : `${q.key}#${i + 1}`,
+      lines: i === 0 ? run : lines,
+      ending: end ? q.ending : { kind: "none" },
+      ...(end && q.sequence ? { sequence: q.sequence } : {}),
+      ...(isKuroLine(lines[0]!) ? { voice: "kuro" as const } : {}),
+      ...(q.preview ? { preview: true as const } : {}),
+    };
+  });
+}
+
+/** `key` is queued or waiting already, whole or split (lying-view R1: `<key>#n` pieces count). */
+const queuedKey = (d: DialogueState, key: string): boolean => {
+  const same = (k: string) => k === key || k.startsWith(`${key}#`);
+  return d.queue.some((x) => same(x.key)) || (d.waiting ?? []).some((x) => same(x.item.key));
+};
 
 /**
  * The object was put down before its "what is this" was answered: its question leaves the queue and
@@ -96,8 +154,9 @@ export function dropQuestion(d: DialogueState, object: string): DialogueState {
 export function push(d: DialogueState, q: Queued): DialogueState {
   if (q.lines.length === 0 && q.ending.kind === "none") return d;
   // Not twice, whether it is playing, queued or waiting for its place.
-  if (d.queue.some((x) => x.key === q.key) || (d.waiting ?? []).some((x) => x.item.key === q.key)) return d;
-  return { ...d, queue: [...d.queue, q] };
+  if (queuedKey(d, q.key)) return d;
+  // lying-view R1: Kuro's lines in a day sequence become their own (voiced) items.
+  return { ...d, queue: [...d.queue, ...splitVoices(q)] };
 }
 
 /** A day sequence's lines with the sequence's `where` as the default of those without their own. */
@@ -254,6 +313,10 @@ export const BED_OPTIONS: readonly ChoiceOption[] = [
   { index: 0, text: null, choice: "sleep", labelKey: "room.bed.sleep" },
   { index: 1, text: null, choice: "stay", labelKey: "room.bed.stay" },
 ];
+export const RISE_OPTIONS: readonly ChoiceOption[] = [
+  { index: 0, text: null, choice: "up", labelKey: "room.rise.up" },
+  { index: 1, text: null, choice: "stay", labelKey: "room.rise.stay" },
+];
 export const KURO_OFFER_OPTIONS: readonly ChoiceOption[] = [
   { index: 0, text: null, choice: "yes", labelKey: "upgrade.yes" },
   { index: 1, text: null, choice: "no", labelKey: "upgrade.no" },
@@ -269,6 +332,7 @@ function options(q: Queued, state: State, events?: readonly GameEvent[]): Choice
   if (q.ending.kind === "kuroAsk") return [...KURO_ASK_OPTIONS];
   if (q.ending.kind === "kuroOffer") return [...KURO_OFFER_OPTIONS];
   if (q.ending.kind === "bedAsk") return [...BED_OPTIONS];
+  if (q.ending.kind === "riseAsk") return [...RISE_OPTIONS];
   if (q.ending.kind === "recognise") {
     // No hints: the same look for every option; the order is the run's, not content's.
     const entry = recogniseTable.get(q.ending.object);
@@ -285,12 +349,15 @@ function options(q: Queued, state: State, events?: readonly GameEvent[]): Choice
   // added (`hand.refuse`, choice "refuse" — it logs nothing; the judgement will say wrong). Nights
   // 1–9 and 18 never get the hand's choices.
   if (events && q.ending.beat === "shutdown" && handNight(state.day) && hasString("hand.give")) {
-    const d = deliverableForHand(state.day, events);
+    // A preview has nothing printed on its empty log: the day's own hand deliverable stands in.
+    const d = deliverableForHand(state.day, events) ?? (q.preview ? handDeliverableOf(state.day) : null);
+    const refuse = content.length === 0 && hasString("hand.refuse") ? [{ index: REFUSE_INDEX, text: t("hand.refuse"), choice: "refuse" as const }] : [];
     if (d) {
       const give = { index: GIVE_INDEX, text: t("hand.give", { label: d.label }), choice: "give" as const };
-      const refuse = content.length === 0 && hasString("hand.refuse") ? [{ index: REFUSE_INDEX, text: t("hand.refuse"), choice: "refuse" as const }] : [];
       return [give, ...content, ...refuse];
     }
+    // A preview of a hand night whose content has no hand deliverable: the refusal alone.
+    if (q.preview && refuse.length) return refuse;
   }
   return content;
 }
