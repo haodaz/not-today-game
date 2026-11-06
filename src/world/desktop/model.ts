@@ -95,6 +95,8 @@ export interface Session {
   hintQueue: string[];
   /** world-prompts R1: the prompts drawn on the page at least once (their condition passing then means seen). Session only. */
   hintsShown: string[];
+  /** desk-prints R3: the pile's close view is open at this print (0 = the newest), or null. Session only. */
+  printsView: number | null;
   /**
    * onboarding-steps R2: the day whose wallpaper the desktop last showed (0 = none yet this page),
    * and the crossfade from the previous one on a new day's first visit (its picture, when it began).
@@ -261,6 +263,12 @@ export interface Session {
     face: { readonly key: string; readonly at: number; readonly who: string } | null;
     mcDay: number | null;
     screen3: boolean;
+    /**
+     * collapse-early R2: the wrong face in a message app now: which app, when it began, and the seed
+     * of its pick among the avatars on screen (absent = none). Armed once per app per day
+     * (`seen`: `msgface:<day>:<app>`).
+     */
+    msg?: { readonly app: "msgs" | "tingtalk"; readonly day: number; readonly at: number; readonly seed: string } | null;
   };
   /** `prefers-reduced-motion` (set by the controller at mount): glimpses swap with a fade instead of sliding. */
   reducedMotion: boolean;
@@ -398,6 +406,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     hintsSeen: [],
     hintQueue: [],
     hintsShown: [],
+    printsView: null,
     wallpaperDay: 0,
     wallFade: null,
     wbFull: false,

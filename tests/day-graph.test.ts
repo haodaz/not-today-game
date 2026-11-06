@@ -269,14 +269,15 @@ describe("a lock with a source (from)", () => {
 });
 
 describe("an object lock is unchanged", () => {
-  it("用{object}看一眼 with its chips while the pager is found and not taken; 需要提取码 without it", () => {
+  it("用{object}看一眼 while the pager is found and not taken (no chips since lock-by-device); 需要提取码 without it", () => {
     const store = at(5);
     expect(rendered(store, lockBoard({ object: "pager" }))).toContain(t("board.lockCode"));
     store.appendEvent({ kind: "openLayer", objectId: "pager" });
     const out = rendered(store, lockBoard({ object: "pager" }));
     expect(out).toContain(t("board.lock.useObject", { object: t("obj.name.pager") }));
-    expect(out).toContain('data-action="board-code"');
-    expect(out).toContain(t("board.pagerCodes"));
+    // lock-by-device R1: the code is read off the open pager, not picked from chips.
+    expect(out).not.toContain('data-action="board-code"');
+    expect(out).toContain("lock-status");
     expect(out).not.toContain("notfound");
   });
 });

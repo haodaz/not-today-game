@@ -120,7 +120,7 @@ vi.mock("@state/days/tasks", async (importOriginal) => {
 });
 
 import { createStore, type Store } from "@state/store";
-import { boardState, canPrint, boardJudgement, deliverableOnDesk, handNight, printedBoard, trayCards, wrongCount } from "@state/days/board";
+import { boardState, canPrint, boardJudgement, deliverableForHand, deliverableOnDesk, handNight, printedBoard, trayCards, wrongCount } from "@state/days/board";
 import { taskByFlag } from "@state/days/tasks";
 
 const RIGHT: Record<string, string> = { r1: "c1", r2: "c2", r3: "c3", r4: "c4", r5: "c5", r6: "c6" };
@@ -321,8 +321,10 @@ describe("a board that goes to a person (to: boss)", () => {
     expect(events.some((e) => e.kind === "give" && e.deliverableId === "d11-boss")).toBe(true);
   });
 
-  it("nothing goes on the desk (a person's deliverable is sent on screen)", () => {
-    expect(deliverableOnDesk(11, sent().getEvents())).toBeNull();
+  it("nothing goes to the hand (a person's deliverable is sent on screen); its print stays on the desk, marked sent", () => {
+    // desk-prints R1: a sent deliverable also leaves its print in the pile.
+    expect(deliverableForHand(11, sent().getEvents())).toBeNull();
+    expect(deliverableOnDesk(11, sent().getEvents())).toMatchObject({ id: "d11-boss", sent: true });
   });
 
   it("a file card from 你 appears in 老板's chat at the time it was sent", () => {

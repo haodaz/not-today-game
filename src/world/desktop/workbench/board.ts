@@ -8,7 +8,7 @@
 import type { State } from "@state/types.gen";
 import type { GameEvent } from "@state/events";
 import type { Task, TaskBoard } from "@state/days/tasks";
-import { autoUnlock, boardState, canPrint, foundCardIds, isKuroCard, isObjectLock, lockCodesOffered, lockObjectAvailable, lockUsedOk, trayCards, type BoardState } from "@state/days/board";
+import { autoUnlock, boardState, canPrint, foundCardIds, isKuroCard, isObjectLock, isReadLock, lockCodesOffered, lockJammed, lockObjectAvailable, lockUsedOk, trayCards, wrongReadings, type BoardState } from "@state/days/board";
 import { ideOps, ideSrc, ideTranscript } from "@state/days/ide";
 import { cls, html, type SafeHtml } from "@world/html";
 import { FRAMES, frameUrl } from "../kuro/body";
@@ -19,6 +19,8 @@ import type { ActionContext, ActionHandler } from "../controller";
 import type { AppContext, Session } from "../model";
 import { openWork } from "./work";
 import { openObjectFromBar } from "./objbar";
+import { lockReading } from "./lockread";
+import { pressKey } from "@world/objects/index";
 import { handOf } from "@state/hands";
 import { enterUse, facingOf } from "@world/objects/works";
 import type { Facing } from "@world/room/facings";
@@ -81,7 +83,18 @@ export function lockRow(board: TaskBoard, s: BoardState, state: State, events: r
   const available = isObjectLock(lock) && lockObjectAvailable(board, state, events);
   const tryIt = hasString("board.kuroTry") ? html`<button type="button" class="bchip" data-action="board-kuro-lock">${tr("board.kuroTry")}</button>` : null;
   let panel: SafeHtml | null = null;
-  if (open) {
+  // lock-by-device R1 / R3: an object lock has no chips: its code is read off the open device (the
+  // footer of the 老物件栏 modal). One line of status here; two wrong readings jam it for the day.
+  // Only a lock read off a device with a screen or a transcript (the chick's keeps its chips).
+  const objectLock = isReadLock(lock);
+  const readings = wrongReadings(s);
+  if (objectLock && lockJammed(board, s)) {
+    const st = hasString("board.lock.jammed") ? html`<div class="bnote lock-status jammed">${tr("board.lock.jammed")}</div>` : null;
+    panel = html`${st}${tryIt}`;
+  } else if (open && objectLock && offered) {
+    const key = readings > 0 ? "board.lock.wrong1" : session.objbarOpen && session.holding === lock.object ? null : "board.lock.open";
+    panel = key && hasString(key) ? html`<div class="${cls("bnote", "lock-status", readings > 0 && "wrong")}">${tr(key)}</div>` : null;
+  } else if (open) {
     if (offered) {
       const chips = lock.codes.map((code) => html`<button type="button" class="bcode" data-action="board-code" data-code="${code}">${code}</button>`);
       // The pager note belongs to an object lock only; a source lock's code was read elsewhere.
@@ -312,7 +325,12 @@ const actions: Record<string, ActionHandler> = {
     // objects-in-room R2: lifting it here is using it at 房间 (屏幕 is 房间's); a lock with another
     // face is taken there first by the room's own wrapper (game.ts, `lockFaceMove`).
     // objects-in-room R8: once a face lock's object worked today, the panel opens in place, no lift.
-    if (lock && isObjectLock(lock) && lockObjectAvailable(c.board, state, events) && !faceLockWorkedToday(lock, state.day, events) && openObjectFromBar(ctx.session, state, lock.object)) enterUse(ctx, lock.object);
+    if (lock && isObjectLock(lock) && lockObjectAvailable(c.board, state, events) && !faceLockWorkedToday(lock, state.day, events) && openObjectFromBar(ctx.session, state, lock.object)) {
+      enterUse(ctx, lock.object);
+      // lock-by-device R1: the code is read off it, so the clamshell opens as the bar's own click
+      // opens it (objbar-open); otherwise its keys stay under the lid.
+      if (lock.object === "dictionary" && ctx.session.hand.face === "front") pressKey(ctx, "dictionary", "open");
+    }
     ctx.session.boardLockOpen = true;
     ctx.rerender();
   },
@@ -322,10 +340,20 @@ const actions: Record<string, ActionHandler> = {
     const code = data.code;
     if (!c || !code || !c.board.given.lock) return;
     const s = stateOf(ctx, c.task, c.board);
-    if (s.unlocked) return;
+    if (s.unlocked || lockJammed(c.board, s)) return;
     ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "unlock", code } });
     if (code === c.board.given.lock.answer) ctx.session.boardLockOpen = false;
     ctx.rerender();
+  },
+  // lock-by-device R1: 就按它显示的填 in the device's footer: the same op a chip appended, with the
+  // code the reading shows (validated by the reducer's own rule: one of the lock's codes).
+  "board-read"(ctx, _data, el) {
+    const id = ctx.session.holding;
+    if (!ctx.session.objbarOpen || !id) return;
+    // What the device shows now (never the markup's word for it).
+    const r = lockReading(ctx.store.getState(), ctx.store.getEvents(), ctx.session, id, ctx.now?.() ?? Date.now(), ctx.store.getRunId());
+    if (!r?.code) return;
+    actions["board-code"]!(ctx, { code: r.code } as unknown as DOMStringMap, el);
   },
   // 让它试: Kuro unlocks the column (always right), one assist.
   "board-kuro-lock"(ctx) {

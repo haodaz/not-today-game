@@ -1,7 +1,8 @@
 // collapse-details (2026-11-04): small things that go wrong in a meeting and then go back, so the
 // player is never sure they saw them. R1: on a stage ≥ 4 day the tiles flicker and slide to the six
-// points of a hexagram around a thin magic circle, hold, and slide back. R2: on a stage ≥ 3 day one
-// person's face is drawn wrong for 900 ms. Each once per meeting per day, at a line chosen by a seeded
+// points of a hexagram around a thin magic circle, hold, and slide back. R2: on a stage ≥ 1 day
+// (collapse-early R1; it was 3) one person's face is drawn wrong for 900 ms; collapse-early R2 does
+// the same to an avatar in the message apps, once per app per day. Each once per meeting per day, at a line chosen by a seeded
 // roll (run id + day + task id; never the first or last line, never the same line for both). The
 // stage comes from content/stages.json. Session only: no event, nothing in the log.
 import { jitter } from "@state/seed";
@@ -11,7 +12,8 @@ import { html, raw, type SafeHtml } from "@world/html";
 
 /** From these stages (R1, R2). */
 export const HEX_FROM_STAGE = 4;
-export const FACE_FROM_STAGE = 3;
+/** collapse-early R1: from stage 1 (day 4), where the player stares first (it was 3). */
+export const FACE_FROM_STAGE = 1;
 /** R1's timing: two flicker frames of 80 ms, the hold, the slide back (the circle fades out with it). */
 export const HEX_FLICKER_MS = 160;
 export const HEX_HOLD_MS = 2_400;
@@ -35,6 +37,43 @@ export function collapseLines(seed: string, day: number, n: number): { readonly 
   const rest = candidates.filter((i) => i !== hex);
   const face = stage >= FACE_FROM_STAGE && rest.length ? rest[jitter(`${seed}:face`, 0, rest.length - 1)]! : null;
   return { hex, face };
+}
+
+// ——— collapse-early R2: a wrong face outside meetings ———————————————————————————————————————
+
+/** The message apps it happens in (喂信 = Hi信 `msgs`, 汀汀 = 听听 `tingtalk`), each once a day. */
+export type FaceApp = "msgs" | "tingtalk";
+/** It begins this long after the app's window is first opened that day (seeded). */
+export const MSG_FACE_DELAY_MS: readonly [number, number] = [2_000, 6_000];
+/** The seed of one app on one day of one run (the delay and the pick). */
+export const msgFaceSeed = (runId: string, day: number, app: FaceApp): string => `${runId}:${day}:${app}`;
+/** The seeded delay after the first opening. Pure. */
+export const msgFaceDelay = (seed: string): number => jitter(`${seed}:at`, MSG_FACE_DELAY_MS[0], MSG_FACE_DELAY_MS[1]);
+/** The attribute an avatar that may go wrong carries (an NPC's, never the player's, a silhouette or home's). */
+export const FACE_OK = 'data-face="1"';
+/** Home stays home (until day 16): the parents' and the clan's conversations never take part. */
+export const HOME_CONVERSATIONS: ReadonlySet<string> = new Set(["family", "clan"]);
+
+/** Whether the message-app face is showing now in `app` on `day`. Pure. */
+export function msgFaceNow(msg: { readonly app: FaceApp; readonly day: number; readonly at: number; readonly seed: string } | null | undefined, app: FaceApp, day: number, nowMs: number): string | null {
+  if (!msg || msg.app !== app || msg.day !== day) return null;
+  return nowMs >= msg.at && nowMs - msg.at < FACE_MS ? msg.seed : null;
+}
+
+/**
+ * The app's markup with one of its eligible avatars (those carrying FACE_OK, in drawing order: the
+ * list's rows, the open conversation's bubbles, a video cover) drawn wrong, the meeting's way: the
+ * same image, its top 45 % mirrored, a 6 % stretch, a red and a blue copy 1 px apart. The pick is
+ * seeded among the avatars on screen; none → the markup as it is. Pure.
+ */
+export function wrongAvatar(markup: string, seed: string): string {
+  const tags = [...markup.matchAll(/<img\b[^>]*\bdata-face="1"[^>]*>/g)];
+  if (!tags.length) return markup;
+  const m = tags[jitter(`${seed}:who`, 0, tags.length - 1)]!;
+  const tag = m[0];
+  const copy = (klass: string) => tag.replace(/\sclass="([^"]*)"/, ` class="$1 ${klass}"`).replace(FACE_OK, 'data-face="0"');
+  const wrong = `<span class="face-wrong">${tag.replace(FACE_OK, 'data-face="0"')}<span class="fw-top" aria-hidden="true">${copy("fw-img")}</span>${copy("fw-ghost r")}${copy("fw-ghost b")}</span>`;
+  return markup.slice(0, m.index) + wrong + markup.slice(m.index! + tag.length);
 }
 
 /** Whose face goes wrong (R2): a person with an image who is not the player, seeded; null if none. */

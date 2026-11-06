@@ -5,7 +5,7 @@ import type { BeatName, Place, SayLine, Sequence } from "@state/days/table";
 import { choiceOffered } from "@state/days/effects";
 import { recogniseTable } from "@state/recognise";
 import type { GameEvent } from "@state/events";
-import { deliverableOnDesk, handNight } from "@state/days/board";
+import { deliverableForHand, handNight } from "@state/days/board";
 import { hasString, t } from "@world/i18n";
 import type { State } from "@state/types.gen";
 
@@ -270,7 +270,7 @@ function options(q: Queued, state: State, events?: readonly GameEvent[]): Choice
   // (days 11, 12, 14, 15, 17), 不给。is added too (`hand.refuse`, choice "refuse" — it logs nothing;
   // the judgement will say wrong). On a raid night the content's own choices stay after the give.
   if (events && q.ending.beat === "shutdown" && handNight(state.day) && hasString("hand.give")) {
-    const d = deliverableOnDesk(state.day, events);
+    const d = deliverableForHand(state.day, events);
     if (d) {
       const give = { index: GIVE_INDEX, text: t("hand.give", { label: d.label }), choice: "give" as const };
       const refuse = content.length === 0 && hasString("hand.refuse") ? [{ index: REFUSE_INDEX, text: t("hand.refuse"), choice: "refuse" as const }] : [];

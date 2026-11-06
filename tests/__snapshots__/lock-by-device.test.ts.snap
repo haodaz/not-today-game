@@ -1,0 +1,8 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`R5 · snapshot > the day-7 dictionary lock with the device open and a reading 1`] = `
+{
+  "foot": "<div class="ob-foot" data-lock="task4"><span class="ob-reading">depart</span><button type="button" class="ob-read" data-action="board-read">就按它显示的填</button></div>",
+  "row": "<div class="block-row"><button type="button" class="block" data-action="board-lock">用文曲星看一眼</button></div>",
+}
+`;

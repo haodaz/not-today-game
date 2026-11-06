@@ -148,7 +148,8 @@ export function hintsWait(session: Session): boolean {
     s.mcOpen ||
     !!s.pullOut ||
     !!s.endingPage ||
-    s.filesApp !== null
+    s.filesApp !== null ||
+    s.printsView !== null
   );
 }
 

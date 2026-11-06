@@ -12,6 +12,8 @@ import { logCurrent, logPlayer } from "@world/dialogue/history";
 import { settleSession } from "@world/dialogue/place";
 import { noteWallpaper, WALL_FADE_MS } from "@world/desktop/wallpaper";
 import { hintLayer } from "@world/hints/hints";
+import { FACE_FROM_STAGE, FACE_MS, msgFaceDelay, msgFaceSeed, type FaceApp } from "@world/desktop/workbench/collapse";
+import { stageOf } from "@state/stages";
 import { acceptOffer, answerAsk, answerOffer, declineOffer, kuroActions, playerBox, readOnToPlayer } from "@world/dialogue/kuro";
 import { nextScreen } from "@world/dialogue/layout";
 import { stepOnce } from "@world/loop/steps";
@@ -59,7 +61,8 @@ import { renderEnding } from "@world/endings/view";
 import { boxObjectFor, doorMeal, itemsButton, itemsPanel, openBoxReady, raidShowing, renderRoom, settingsButton, settingsPanel, SLIP_ITEM, walkmanShown } from "./hud";
 import { looseContent, stuckLineKey } from "./case";
 import { jitter } from "@state/seed";
-import { deliverableOnDesk } from "@state/days/board";
+import { deliverableForHand } from "@state/days/board";
+import { printsOnDesk } from "@state/days/prints";
 
 /** How long a stuck box shakes (blind-box 2026-11-03). */
 export const CASE_SHAKE_MS = 200;
@@ -217,6 +220,32 @@ function lookAt(ctx: ActionContext, app: AppId | null): void {
   if (app === null || !booted(ctx.store.getState(), ctx.store.getEvents())) return;
   if (app === "tingtalk") stepOnce(ctx, "openApp:msgs");
   else if (app === "workbench" || app === "browser") stepOnce(ctx, `openApp:${app}`);
+  if (app === "msgs" || app === "tingtalk") armMessageFace(ctx, app);
+}
+
+/**
+ * collapse-early R2: the first time a message app's window is on screen today (from stage 1), its
+ * wrong face is armed: 2–6 s later (seeded), if the window is still the one on screen and no meeting
+ * is playing (nor a meeting's face showing), one avatar on screen is drawn wrong for 900 ms. Once per
+ * app per day; session only, nothing logged.
+ */
+export function armMessageFace(ctx: ActionContext, app: FaceApp): void {
+  const day = ctx.store.getState().day;
+  const c = ctx.session.collapse;
+  const key = `msgface:${day}:${app}`;
+  if (stageOf(day) < FACE_FROM_STAGE || c.seen.includes(key)) return;
+  c.seen.push(key);
+  const seed = msgFaceSeed(ctx.store.getRunId(), day, app);
+  ctx.later(msgFaceDelay(seed), () => {
+    const s = ctx.session;
+    const now = ctx.now?.() ?? Date.now();
+    if (ctx.store.getState().day !== day || s.view !== "desktop" || shownApp(s) !== app) return;
+    // Never at the same moment as a meeting's face: a meeting playing (or its face up) skips it.
+    if (s.meetingPlay?.playing || (s.collapse.face && now - s.collapse.face.at < FACE_MS)) return;
+    s.collapse.msg = { app, day, at: now, seed };
+    ctx.rerender();
+    ctx.later(FACE_MS + 16, ctx.rerender);
+  });
 }
 
 /**
@@ -312,7 +341,7 @@ export function backTarget(view: View): View | null {
 
 /** True when something sits over the view that a "back" should close first (or that blocks the camera). */
 function overlayOpen(s: Session): boolean {
-  return s.bookOpen || s.historyOpen || s.settingsOpen || s.itemsOpen || s.caseOpen || s.phoneOpen || !!s.holding || talking(s.dialogue) || !!s.pullOut || !!s.endingPage;
+  return s.bookOpen || s.historyOpen || s.settingsOpen || s.itemsOpen || s.caseOpen || s.phoneOpen || !!s.holding || talking(s.dialogue) || !!s.pullOut || !!s.endingPage || s.printsView !== null;
 }
 
 /** The key went to something the player types into: an input, a textarea, anything contenteditable. */
@@ -507,6 +536,7 @@ function arrive(ctx: ActionContext, view: View, data: DOMStringMap): void {
   ctx.session.phoneOpen = false;
   ctx.session.itemsOpen = false;
   ctx.session.caseOpen = false;
+  ctx.session.printsView = null;
   ctx.session.holding = null;
   restHand(ctx.session);
   // objects-in-room R7: any move ends a lock's trip (its lift comes after its own arrival).
@@ -908,7 +938,7 @@ export const loopActions: Record<string, ActionHandler> = {
     // the hand). On a hand night without content choices (days 11, 12, 14, 15, 17) there is nothing
     // left to answer, so the box finishes and the day can end.
     if (q.ending.kind === "beatChoices" && data.choice === "give") {
-      const d = deliverableOnDesk(state.day, events);
+      const d = deliverableForHand(state.day, events);
       if (d) ctx.store.appendEvent({ kind: "give", deliverableId: d.id });
       if ((q.sequence?.choices?.length ?? 0) === 0) {
         ctx.session.dialogue = finishChoice(ctx.session.dialogue);
@@ -1249,6 +1279,28 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.session.settingsOpen = true;
     ctx.rerender();
   },
+  // desk-prints R3: the pile up close, newest first; ← / → page; Esc, × or outside closes. No event.
+  "prints-open"(ctx) {
+    if (ctx.session.view !== "desk" || printsOnDesk(ctx.store.getState().day, ctx.store.getEvents()).length === 0) return;
+    ctx.session.printsView = 0;
+    ctx.rerender();
+  },
+  "prints-next"(ctx) {
+    const n = printsOnDesk(ctx.store.getState().day, ctx.store.getEvents()).length;
+    if (ctx.session.printsView === null || ctx.session.printsView >= n - 1) return;
+    ctx.session.printsView += 1;
+    ctx.rerender();
+  },
+  "prints-prev"(ctx) {
+    if (ctx.session.printsView === null || ctx.session.printsView <= 0) return;
+    ctx.session.printsView -= 1;
+    ctx.rerender();
+  },
+  "prints-close"(ctx) {
+    if (ctx.session.printsView === null) return;
+    ctx.session.printsView = null;
+    ctx.rerender();
+  },
   // 设置 → 新手提示 开 / 关; off ends a prompt that is up. The host keeps the switch (`nt_hints`).
   "hints-set"(ctx, data) {
     if (data.on !== "1" && data.on !== "0") return;
@@ -1431,6 +1483,14 @@ export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
   if (ctx.store.getState().ending !== "none") {
     if (e.key === "Enter" || e.key === " ") endingNext(ctx);
     return true;
+  }
+  // desk-prints R3: the pile up close takes ← / → and Esc.
+  if (ctx.session.printsView !== null) {
+    const name = e.key === "Escape" ? "prints-close" : e.key === "ArrowRight" ? "prints-next" : e.key === "ArrowLeft" ? "prints-prev" : null;
+    if (name) {
+      loopActions[name]!(ctx, {} as DOMStringMap, null as never);
+      return true;
+    }
   }
   if (e.key === "Escape" && ctx.session.bookOpen) {
     loopActions["book-close"]!(ctx, {} as DOMStringMap, null as never);

@@ -4,9 +4,11 @@
 // same events: only the markup differs. Pure: context in, markup out.
 import { isDeregistered, menu } from "@state/replies/resolve";
 import type { State } from "@state/types.gen";
-import { cls, html, type SafeHtml } from "@world/html";
+import { cls, html, raw, type SafeHtml } from "@world/html";
 import { hasString, t, tr } from "@world/i18n";
 import { npcAvatar, silhouetteFor } from "@world/npc";
+import { faceAttr, markFaces, withoutFaces } from "./face-mark";
+import { HOME_CONVERSATIONS, msgFaceNow, wrongAvatar } from "../workbench/collapse";
 import { labelKey } from "@world/replies/labels";
 import { fillPlaceholders } from "@world/replies/placeholders";
 import type { AppContext, Session } from "../model";
@@ -26,9 +28,10 @@ function nameOf(id: string): SafeHtml {
 }
 
 /** An avatar `<img>` for an NPC (or a silhouette); never a letter. */
-function avImg(id: string, css: string): SafeHtml {
+function avImg(id: string, css: string, faceOk = false): SafeHtml {
   const src = npcAvatar(id);
-  return html`<img class="${css}" src="${src}" alt="" aria-hidden="true" draggable="false">`;
+  // collapse-early R2: one that may go wrong (marked only while the wrong face shows).
+  return html`<img class="${css}" src="${src}" alt="" aria-hidden="true" draggable="false"${raw(faceAttr(faceOk && !HOME_CONVERSATIONS.has(id)))}>`;
 }
 
 /**
@@ -39,7 +42,7 @@ function avImg(id: string, css: string): SafeHtml {
 function bubbleAvatar(who: string, side: "me" | "them", alias?: string): SafeHtml {
   if (side === "me") return html`<div class="av me-av"></div>`;
   if (alias !== undefined) return html`<img class="av av-img" src="${silhouetteFor(alias)}" alt="" aria-hidden="true" draggable="false">`;
-  return avImg(who, "av av-img");
+  return avImg(who, "av av-img", true);
 }
 
 export type { VoiceView } from "./cards";
@@ -140,6 +143,12 @@ function renderBubble(b: Bubble, c: BubbleCtx, receipt: "read" | "unread" | null
 
 /** The bubbles in order; DingTalk folds each 已读 into the player's message before it. */
 function renderBubbles(bubbles: readonly Bubble[], c: BubbleCtx): (SafeHtml | null)[] {
+  // collapse-early R2: home stays home: nothing in the parents' or the clan's conversation goes wrong.
+  if (HOME_CONVERSATIONS.has(c.conv)) return withoutFaces(() => renderBubblesNow(bubbles, c));
+  return renderBubblesNow(bubbles, c);
+}
+
+function renderBubblesNow(bubbles: readonly Bubble[], c: BubbleCtx): (SafeHtml | null)[] {
   const receipts = new Map<number, "read" | "unread">();
   let mine: number | null = null;
   bubbles.forEach((b, i) => {
@@ -209,7 +218,7 @@ function groupAvatar(c: ConversationData): SafeHtml {
 
 function wxRow(c: ConversationData, active: boolean, today: number, names: State["names"]): SafeHtml {
   const { preview, when } = rowText(c, today, names);
-  const face = SPEAKER_CONVERSATIONS.has(c.id) ? groupAvatar(c) : avImg(c.id, "av av-img");
+  const face = SPEAKER_CONVERSATIONS.has(c.id) ? groupAvatar(c) : avImg(c.id, "av av-img", true);
   // The unread red dot on the avatar's corner; a count only when more than one.
   const dot = c.unread > 0 ? html`<span class="dot">${c.unread > 1 ? c.unread : null}</span>` : null;
   return html`<button type="button" class="${cls("row", "wx-row", active && "on")}" data-action="conv" data-conv="${c.id}"><span class="av-wrap">${face}${dot}</span><div class="t"><div class="l1"><b>${nameOf(c.id)}</b><time>${when}</time></div><small>${preview}</small></div></button>`;
@@ -217,7 +226,7 @@ function wxRow(c: ConversationData, active: boolean, today: number, names: State
 
 function dingRow(c: ConversationData, active: boolean, today: number, names: State["names"]): SafeHtml {
   const { preview, when } = rowText(c, today, names);
-  return html`<button type="button" class="${cls("row", active && "on")}" data-action="conv" data-conv="${c.id}"><span class="av-wrap">${avImg(c.id, "av av-img")}</span><div class="t"><b>${nameOf(c.id)}</b><small>${preview}</small></div><div class="meta">${when}${c.unread > 0 ? html`<br><span class="n">${c.unread}</span>` : null}</div></button>`;
+  return html`<button type="button" class="${cls("row", active && "on")}" data-action="conv" data-conv="${c.id}"><span class="av-wrap">${avImg(c.id, "av av-img", true)}</span><div class="t"><b>${nameOf(c.id)}</b><small>${preview}</small></div><div class="meta">${when}${c.unread > 0 ? html`<br><span class="n">${c.unread}</span>` : null}</div></button>`;
 }
 
 function replyBar(ctx: AppContext, conversation: string, register: Register): SafeHtml {
@@ -256,6 +265,26 @@ const HEAD_GLYPHS = html`<span class="glyphs" aria-hidden="true"><i class="g cha
 
 /** 消息, the personal app (WeChat desktop look): 家里 and 朋友圈. */
 export function renderMessages(ctx: AppContext): { body: SafeHtml; badge: number } {
+  return withWrongFace(ctx, "msgs", () => renderMessagesNow(ctx), (o) => o.body, (o, body) => ({ ...o, body }));
+}
+
+/**
+ * collapse-early R2: an app drawn while its wrong face shows: the eligible avatars are marked while
+ * it is drawn (the open conversation's only when it is not home's) and one of them is drawn wrong.
+ */
+function withWrongFace<T extends { readonly badge: number }>(ctx: AppContext, app: "msgs" | "tingtalk", draw: () => T, part: (t: T) => SafeHtml, put: (t: T, m: SafeHtml) => T): T {
+  const seed = msgFaceNow(ctx.session.collapse.msg, app, ctx.state.day, ctx.nowMs);
+  if (!seed) return draw();
+  markFaces(true);
+  try {
+    const out = draw();
+    return put(out, raw(wrongAvatar(part(out).value, seed)));
+  } finally {
+    markFaces(false);
+  }
+}
+
+function renderMessagesNow(ctx: AppContext): { body: SafeHtml; badge: number } {
   const replies = sentReplies(ctx.startDay, ctx.events);
   const all = conversations(ctx, replies, "msgs");
   const badge = all.reduce((n, c) => n + c.unread, 0);
@@ -292,6 +321,10 @@ export function renderTingTalk(ctx: AppContext): { body: SafeHtml; badge: number
 
 /** The work conversations (DingTalk register): the list and the open one (听听's body). */
 export function renderWorkMessages(ctx: AppContext): { pane: SafeHtml; badge: number } {
+  return withWrongFace(ctx, "tingtalk", () => renderWorkMessagesNow(ctx), (o) => o.pane, (o, pane) => ({ ...o, pane }));
+}
+
+function renderWorkMessagesNow(ctx: AppContext): { pane: SafeHtml; badge: number } {
   const replies = sentReplies(ctx.startDay, ctx.events);
   const all = conversations(ctx, replies, "tingtalk");
   const badge = all.reduce((n, c) => n + c.unread, 0);

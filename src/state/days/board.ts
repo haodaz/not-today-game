@@ -271,13 +271,48 @@ export function deliverableGiven(day: number, deliverableId: string, events: rea
  * deliverable (`boss` / `partner` / `group` / `workbench`) is sent on screen and never on the desk
  * (work v2 addition 2026-11-03 night). Pure, from the log.
  */
-export function deliverableOnDesk(day: number, events: readonly GameEvent[]): TaskDeliverable | null {
+export function deliverableOnDesk(day: number, events: readonly GameEvent[]): DeskDeliverable | null {
   const printed = printedBoard(day, events);
   if (!printed) return null;
   const d = taskByFlag(day, printed.flag)?.deliverable;
   if (!d) return null;
-  if ((d.to ?? "hand") !== "hand") return null;
-  return deliverableGiven(day, d.id, events) ? null : d;
+  const given = deliverableGiven(day, d.id, events);
+  // desk-prints R1: a person's deliverable, once sent on screen, also leaves its print on the desk
+  // (until the day ends); before it is sent, nothing is on the desk.
+  if ((d.to ?? "hand") !== "hand") return given ? { ...d, sent: true } : null;
+  return given ? null : d;
+}
+
+/** Today's deliverable on the desk; `sent`: a person's, sent on screen, whose print stays (desk-prints R1). */
+export type DeskDeliverable = TaskDeliverable & { readonly sent?: true };
+
+/**
+ * The deliverable that waits for the hand tonight (work v2 addition 2026-11-03 night): a `hand`
+ * deliverable on the desk, not yet given. A sent print is not the hand's (desk-prints R1). Pure.
+ */
+export function deliverableForHand(day: number, events: readonly GameEvent[]): TaskDeliverable | null {
+  const d = deliverableOnDesk(day, events);
+  return d && !d.sent ? d : null;
+}
+
+/**
+ * lock-by-device: the objects whose lock is read off the device (a screen or a transcript). The
+ * chick and the IC card (and the phone) are not in that spec: their object locks keep their chips.
+ */
+export const READ_LOCK_OBJECTS: readonly string[] = ["dictionary", "calculator", "pager", "tape", "camera"];
+/** An object lock read off its device (no chips; a wrong reading costs). */
+export function isReadLock(lock: BoardLock): lock is BoardLock & { readonly object: string } {
+  return isObjectLock(lock) && READ_LOCK_OBJECTS.includes(lock.object);
+}
+
+/** lock-by-device R3: the distinct wrong readings tried on the lock today (from the log). */
+export const wrongReadings = (s: BoardState): number => new Set(s.wrongCodes).size;
+/** Two wrong readings: the lock is jammed for the day (only 让它试 is left). */
+export const LOCK_JAM_AT = 2;
+/** lock-by-device R3: an object lock jammed today. */
+export function lockJammed(board: TaskBoard, s: BoardState): boolean {
+  const lock = board.given.lock;
+  return !!lock && isReadLock(lock) && !s.unlocked && wrongReadings(s) >= LOCK_JAM_AT;
 }
 
 /** How many slots hold a card that is not the right answer (a Kuro card counts as wrong too). */
@@ -298,7 +333,11 @@ export function boardJudgement(day: number, events: readonly GameEvent[]): { ver
   const judge = tree.judge;
   if (!judge) return null;
   const given = tree.deliverable ? deliverableGiven(day, tree.deliverable.id, events) : false;
-  const wrong = wrongCount(board, printed.slots);
+  // lock-by-device R3: an object lock's wrong readings count with the wrong slots (a Kuro unlock
+  // after a jam does not undo them). A source lock's chips are as before (not counted).
+  const lock = board.given.lock;
+  const readings = lock && isReadLock(lock) ? wrongReadings(boardState(board, day, tree.id, events)) : 0;
+  const wrong = wrongCount(board, printed.slots) + readings;
   let verdict: BoardVerdict;
   if (!given) verdict = "wrong";
   else if (wrong === 0) verdict = "perfect";

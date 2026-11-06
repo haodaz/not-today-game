@@ -43,12 +43,15 @@ const doneFlag = (id: string) => taskFiles.get(1)!.find((x) => x.id === id)!.don
 
 describe("R1 / R2 · the seeded lines", () => {
   // Content's stages: day 4 → 1, day 7 → 3, day 10 → 4, day 13 → 5.
-  it("content's table drives it: none below 3; the face from 3; the hexagram from 4", () => {
-    expect([4, 7, 10, 13].map(stageOf)).toEqual([1, 3, 4, 5]);
-    expect(collapseLines("r:4:t", 4, 10)).toEqual({ hex: null, face: null });
-    const at7 = collapseLines("r:7:t", 7, 10);
-    expect(at7.hex).toBeNull();
-    expect(at7.face).not.toBeNull();
+  // collapse-early R1: the face from stage 1 (day 4; it was 3); the hexagram still from 4.
+  it("content's table drives it: none below 1; the face from 1 (day 4); the hexagram from 4", () => {
+    expect([3, 4, 7, 10, 13].map(stageOf)).toEqual([0, 1, 3, 4, 5]);
+    expect(collapseLines("r:3:t", 3, 10)).toEqual({ hex: null, face: null });
+    for (const day of [4, 7]) {
+      const at = collapseLines(`r:${day}:t`, day, 10);
+      expect(at.hex).toBeNull();
+      expect(at.face).not.toBeNull();
+    }
     for (const day of [10, 13]) {
       const at = collapseLines(`r:${day}:t`, day, 10);
       expect(at.hex).not.toBeNull();
@@ -201,7 +204,7 @@ describe("R1 · the hexagram and the circle (stage ≥ 4)", () => {
   });
 });
 
-describe("R2 · the wrong face (stage ≥ 3)", () => {
+describe("R2 · the wrong face (stage ≥ 1, collapse-early R1)", () => {
   it("one tile with an image (not the player's) is wrong for 900 ms at its line, on a different line from R1", () => {
     stage1.value = 4;
     const h = harness(day1());
@@ -223,13 +226,14 @@ describe("R2 · the wrong face (stage ≥ 3)", () => {
     expect(h.win(f.at + FACE_MS + 1)).not.toContain("mt-wrong");
   });
 
-  it("from stage 3 (without the hexagram); not below", () => {
-    stage1.value = 3;
+  // collapse-early R1: from stage 1 (it was 3).
+  it("from stage 1 (without the hexagram); not below", () => {
+    stage1.value = 1;
     const h = harness(day1());
     h.playThrough();
     expect(h.session.collapse.face).not.toBeNull();
     expect(h.session.collapse.hex).toBeNull();
-    stage1.value = 1;
+    stage1.value = 0;
     const k = harness(day1());
     k.playThrough();
     expect(k.session.collapse.face).toBeNull();

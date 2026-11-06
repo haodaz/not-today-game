@@ -8,7 +8,7 @@ import type { GameEvent } from "@state/events";
 import { choiceOf } from "@state/days/effects";
 import { isRaidNight, takeFor, wantsOf } from "@state/nights";
 import { dueAtLieDown, dueAtShutdown } from "@state/endings";
-import { boardJudgement, deliverableOnDesk, handNight } from "@state/days/board";
+import { boardJudgement, deliverableForHand, handNight } from "@state/days/board";
 import { autoUnlockBoard } from "@world/desktop/workbench/board";
 import { startEnding } from "@world/endings/flow";
 import { knows, optionOrder, recogniseTable, wasRight } from "@state/recognise";
@@ -156,7 +156,7 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
           // can be offered (dialogue.ts builds them). On a raid night the content's choices already
           // end it; other nights keep the plain ending.
           const seq = file.beats.shutdown;
-          const handChoice = handNight(day) && !seq.choices?.length && deliverableOnDesk(day, events) !== null;
+          const handChoice = handNight(day) && !seq.choices?.length && deliverableForHand(day, events) !== null;
           const ending = handChoice ? ({ kind: "beatChoices" as const, day, beat: "shutdown" as const }) : undefined;
           dialogue = push(dialogue, beatQueued(day, "shutdown", seq, ending));
         }

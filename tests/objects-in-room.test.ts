@@ -302,9 +302,12 @@ function onTask(store: Store, clock: BeatClock = { beat: "work", time: "10:00" }
   return { ...r, page };
 }
 const chips = (out: string) => [...out.matchAll(/data-action="board-code" data-code="([^"]+)"/g)].map((m) => m[1]);
+/** lock-by-device R1: a calculator lock has no chips; once offered, the panel shows one status line
+ *  and the code is read off the open device. */
+const readable = (out: string) => chips(out).length === 0 && out.includes("lock-status");
 
 describe("R3 · a lock with a face", () => {
-  it("from 屏幕, 用计算器看一眼 turns the head to 窗 and lifts the calculator; the chips wait for the use", () => {
+  it("from 屏幕, 用计算器看一眼 turns the head to 窗 and lifts the calculator; the reading waits for the use (no chips)", () => {
     mode.lock = "face";
     const store = day1(["chick", "calculator"]);
     const r = onTask(store);
@@ -321,7 +324,7 @@ describe("R3 · a lock with a face", () => {
     expect(r.session.view).toBe("window");
     expect([r.session.holding, r.session.hand.using, r.session.objbarOpen]).toEqual(["calculator", true, false]);
     expect(useAts(store.getEvents())).toEqual([["calculator", "window", true]]);
-    expect(chips(r.page())).toEqual(["0000", "1111"]);
+    expect(readable(r.page())).toBe(true);
   });
 
   it("at night the window gives no light: lifted there, it does not work, and the chips stay hidden", () => {
@@ -362,7 +365,7 @@ describe("R3 · a lock with a face", () => {
 // ——— R7 · back to the screen after the trip ———
 
 describe("R7 · putting the object down after a lock's trip returns to 屏幕", () => {
-  it("from 屏幕, 用计算器看一眼 → 窗, use, put down → back on 屏幕, the same monitor and task page, the chips in front", () => {
+  it("from 屏幕, 用计算器看一眼 → 窗, use, put down → back on 屏幕, the same monitor and task page, the reading status in front", () => {
     mode.lock = "face";
     const store = day1(["chick", "calculator"]);
     const r = onTask(store);
@@ -385,7 +388,7 @@ describe("R7 · putting the object down after a lock's trip returns to 屏幕", 
     r.settle();
     expect(r.session.view).toBe("desktop");
     expect([r.session.focus, r.session.workbenchPage, r.session.boardLockOpen, r.session.lockTrip]).toEqual(["right", "task:task3", true, null]);
-    expect(chips(r.page())).toEqual(["0000", "1111"]);
+    expect(readable(r.page())).toBe(true);
   });
 
   it("picking the calculator up at 窗 by hand and putting it down stays at 窗", () => {
@@ -429,7 +432,7 @@ describe("R7 · putting the object down after a lock's trip returns to 屏幕", 
 // ——— R8 · no second trip ———
 
 describe("R8 · once the object worked today, the lock opens in place", () => {
-  it("trip, use, return, wrong code, reopen → no turn, no lift, the chips shown", () => {
+  it("trip, use, return, wrong code, reopen → no turn, no lift, the reading status shown", () => {
     mode.lock = "face";
     const store = day1(["chick", "calculator"]);
     const r = onTask(store);
@@ -450,7 +453,7 @@ describe("R8 · once the object worked today, the lock opens in place", () => {
     r.settle();
     expect([r.session.view, r.session.holding, r.session.lockTrip]).toEqual(["desktop", null, null]);
     expect(r.session.boardLockOpen).toBe(true);
-    expect(chips(r.page())).toEqual(["0000", "1111"]);
+    expect(readable(r.page())).toBe(true);
     expect(useAts(store.getEvents())).toHaveLength(uses);
   });
 

@@ -43,6 +43,7 @@ import { edgeLeads, HINT_FADE_MS } from "./look";
 import { objectsFoundOnDay, weatherOf } from "@state/stages";
 import { caseOverlay, looseContent } from "./case";
 import { deliverableOnDesk } from "@state/days/board";
+import { printsOnDesk } from "@state/days/prints";
 
 /** L7: the day the heart-rate widget appears (stages.json if it says; else day 9's narration). */
 export const HEART_RATE_FROM_DAY: number = (stagesFile as { heartRateFromDay?: number }).heartRateFromDay ?? 9;
@@ -94,15 +95,54 @@ export interface DeskThings {
   readonly slip: SafeHtml | null;
   /** The walkman: after any ending only, and on the tabletop only (not in the 道具 strip). */
   readonly walkman: SafeHtml | null;
-  /** Work v2: today's printed deliverable, until it is given to the hand or the day ends. */
+  /** Work v2: today's printed deliverable, until it is given to the hand or the day ends (the 道具 strip). */
   readonly deliverable: SafeHtml | null;
+  /** desk-prints R2: the pile of prints on the tabletop (today's and earlier days'), or null. */
+  readonly pile: SafeHtml | null;
 }
 /** A free spot on the desk for the deliverable (no rect in content/desk.json): left-front by the lamp foot. */
 export const DELIVERABLE_RECT: Rect = { l: 230, t: 640, w: 200, h: 140 };
+/** desk-prints R2: at most this many paper edges under the top print (2 px up and 1 px right each). */
+export const PILE_EDGES_MAX = 6;
+
 /**
- * The deliverable thumbnail (content img), or a plain paper fallback when there is none. Only a
- * `hand` deliverable sits on the desk (work v2 addition 2026-11-03 night): a person's deliverable
- * was sent on screen, so `deliverableOnDesk` returns null for it and nothing shows here.
+ * desk-prints R2: the pile in the deliverable's spot on 桌子: earlier prints as paper edges under the
+ * top one (one 3 px edge each, at most six), the newest on top (its img or the paper fallback). Its
+ * name is today's label, or 一摞打印件 with the count. A click looks closer (R3). Null: no paper.
+ */
+function printPile(state: State, events: readonly GameEvent[]): SafeHtml | null {
+  const prints = printsOnDesk(state.day, events);
+  const top = prints.at(-1);
+  if (!top) return null;
+  const n = Math.min(PILE_EDGES_MAX, prints.length - 1);
+  const edges = Array.from({ length: n }, (_, i) => html`<i class="pile-edge" style="--k:${n - i}" aria-hidden="true"></i>`);
+  const pic = top.img ? html`<img class="desk-photo" src="${top.img}" alt="" aria-hidden="true" draggable="false">` : html`<span class="paper-thumb" aria-hidden="true"></span>`;
+  const name = top.day === state.day ? top.label : t("prints.pile", { n: prints.length });
+  return html`<button type="button" class="slot deliverable pile" data-action="prints-open" data-deliverable="${top.id}" data-count="${prints.length}" aria-label="${name}" title="${name}">${edges}<span class="pile-top">${pic}</span></button>`;
+}
+
+/**
+ * desk-prints R3: the close view over the room: the print at 70 % of the stage height, centred, the
+ * room dimmed 35 %, its label under it; ← / → (and the arrows) page through the pile, newest first;
+ * Esc, × or a click outside closes it. With no img, the paper fallback at the same size with the
+ * label on it. Session only.
+ */
+export function printsView(state: State, events: readonly GameEvent[], session: Pick<Session, "printsView">): SafeHtml | null {
+  if (session.printsView === null) return null;
+  const prints = [...printsOnDesk(state.day, events)].reverse();
+  const p = prints[Math.min(session.printsView, prints.length - 1)];
+  if (!p) return null;
+  const pic = p.img ? html`<img class="print-img" src="${p.img}" alt="${p.label}" draggable="false">` : html`<div class="print-paper"><span>${p.label}</span></div>`;
+  const nav = prints.length > 1
+    ? html`<button type="button" class="print-nav prev" data-action="prints-prev" aria-label="${t("prints.prev")}"${session.printsView <= 0 ? html` disabled` : null}>←</button><button type="button" class="print-nav next" data-action="prints-next" aria-label="${t("prints.next")}"${session.printsView >= prints.length - 1 ? html` disabled` : null}>→</button>`
+    : null;
+  return html`<div class="prints-view" role="dialog" aria-modal="true" aria-label="${p.label}" data-print="${p.id}" data-at="${session.printsView + 1}/${prints.length}"><button type="button" class="prints-dim" data-action="prints-close" aria-label="${t("prints.close")}"></button><figure class="print-sheet">${pic}<figcaption>${p.label}</figcaption></figure>${nav}<button type="button" class="print-x" data-action="prints-close" aria-label="${t("prints.close")}">×</button></div>`;
+}
+
+/**
+ * The deliverable thumbnail (content img), or a plain paper fallback when there is none: today's
+ * deliverable on the desk (a `hand` one until given; desk-prints R1: a person's once sent, as its
+ * print). For the 道具 strip; on the tabletop it is the pile (printPile).
  */
 function deliverableThing(state: State, events: readonly GameEvent[]): SafeHtml | null {
   const d = deliverableOnDesk(state.day, events);
@@ -154,6 +194,7 @@ export function deskThings(state: State, events: readonly GameEvent[], session: 
     slip: slipThing(state, events),
     walkman: walkmanThing(state, session),
     deliverable: deliverableThing(state, events),
+    pile: printPile(state, events),
   };
 }
 
@@ -183,7 +224,7 @@ const placedAt = (name: string, r: Rect | null, inner: SafeHtml | null) =>
 function tabletop(things: DeskThings): SafeHtml {
   const at = placedAt;
   const objects = things.objects.map((o, i) => at(`object:${o.id}`, objectSlot(deskLayout, i), o.html));
-  return html`<div class="desk-things">${at("cup", deskLayout.cup, things.cup)}${at("phone", deskLayout.phone, things.phone)}${objects}${at("slip", deskLayout.slip, things.slip)}${at("deliverable", DELIVERABLE_RECT, things.deliverable)}${at("walkman", deskLayout.walkman, things.walkman)}</div>`;
+  return html`<div class="desk-things">${at("cup", deskLayout.cup, things.cup)}${at("phone", deskLayout.phone, things.phone)}${objects}${at("slip", deskLayout.slip, things.slip)}${at("deliverable", DELIVERABLE_RECT, things.pile)}${at("walkman", deskLayout.walkman, things.walkman)}</div>`;
 }
 
 /** 窗's placed thing (room-turn R3): today's meal on the little table, the same art scaled to its rect. */
@@ -541,7 +582,7 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const late = fade === null ? null : raw(` style="--late:-${Math.round(fade)}ms${fadeLen !== ARRIVE_FADE_MS ? `;--late-dur:${fadeLen}ms` : ""}"`);
   // On a turn edge the cursor is `walk` (room-turn R2; cursors.css reads the class).
   const onEdge = session.edge && session.edge.zone !== "back" && edgeLeads(view, session.edge.zone) ? `edge-${session.edge.zone}` : null;
-  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid", fade !== null && "m-late", dream && "scene-on", onEdge)}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${renderScene(lineScene)}${scene}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${itemsPanel(state, events, session)}${view === "room" || view === "bed" ? casePanel(state, events, session, model.runId ?? "run", nowMs) : null}${held}${model.boxOutside ? null : dialogueBox(state, events, session, nowMs)}${bottomRight(model)}${settingsButton()}${itemsButton(session)}${model.boxOutside ? null : settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
+  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid", fade !== null && "m-late", dream && "scene-on", onEdge)}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${renderScene(lineScene)}${scene}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${itemsPanel(state, events, session)}${view === "room" || view === "bed" ? casePanel(state, events, session, model.runId ?? "run", nowMs) : null}${view === "desk" ? printsView(state, events, session) : null}${held}${model.boxOutside ? null : dialogueBox(state, events, session, nowMs)}${bottomRight(model)}${settingsButton()}${itemsButton(session)}${model.boxOutside ? null : settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
 }
 
 export { raidShowing };

@@ -5,8 +5,9 @@
 // Pure: the card, the register and a placeholder-filler in; markup out. No story string lives here —
 // the card's own text is content; the chrome labels come from strings (nothing when one is missing).
 import type { Card } from "@state/replies/table";
-import { cls, html, type SafeHtml } from "@world/html";
+import { cls, html, raw, type SafeHtml } from "@world/html";
 import { hasString, tr } from "@world/i18n";
+import { faceAttr } from "./face-mark";
 
 /** WeChat (消息) or DingTalk (工作台's 消息 pane). */
 export type Register = "wx" | "ding";
@@ -16,7 +17,8 @@ const label = (key: string): SafeHtml | null => (hasString(key) ? html`${tr(key)
 
 /** The cover image, or the type's neutral tile (never an empty box). `alt` stays decorative. */
 function cover(type: string, src: string | undefined, shape: string): SafeHtml {
-  if (src) return html`<span class="${cls("cover", shape)}"><img src="${src}" alt="" aria-hidden="true" draggable="false"></span>`;
+  // collapse-early R2: a video's cover may take the wrong face (marked only while it shows).
+  if (src) return html`<span class="${cls("cover", shape)}"><img src="${src}" alt="" aria-hidden="true" draggable="false"${raw(faceAttr(type === "video"))}></span>`;
   // No cover: a neutral tile, its look chosen by type in CSS (news, short video, chart, …).
   return html`<span class="${cls("cover", shape, "tile", `t-${type}`)}" aria-hidden="true"></span>`;
 }

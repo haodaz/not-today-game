@@ -456,6 +456,13 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .ob-use-win{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;max-height:92%}
 .ob-use .ob-x{position:absolute;top:-8px;right:-8px;z-index:2;width:30px;height:30px;border:0;border-radius:50%;background:#2a2c33;color:#e7e3d7;font-size:18px;line-height:1;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.4)}
 .ob-use .ob-x:hover,.ob-use .ob-x:focus-visible{background:#3a3d46}
+/* lock-by-device R1: the read footer under the device: the reading in monospace, 就按它显示的填; the
+   modal's own dark tone, the full width, 44 px high. */
+.ob-use .ob-foot{align-self:stretch;display:flex;align-items:center;gap:12px;height:44px;box-sizing:border-box;margin-top:12px;padding:0 12px;border-radius:10px;background:#2a2c33;color:#e7e3d7;font-size:13px}
+.ob-use .ob-reading{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--mono);font-size:14px}
+.ob-use .ob-noreading{color:#b8b2a4;font-size:12px}
+.ob-use .ob-read{flex:0 0 auto;border:0;border-radius:8px;background:var(--accent);color:#fff;font:inherit;padding:6px 14px;cursor:pointer}
+.ob-use .ob-read:disabled{background:#4a4d56;color:#a19c90;cursor:default}
 /* Outside .room the held wrappers have no layout: show the device/photo face centred in the modal. */
 .ob-use-body .held.obj{position:static;transform:none;display:flex;align-items:center;justify-content:center}
 .ob-use-body .held.obj .breathe,.ob-use-body .held.obj .turn{display:flex;align-items:center;justify-content:center}
@@ -789,6 +796,16 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .mt-tile.mt-wrong .mt-ghost{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5;pointer-events:none;mix-blend-mode:screen;transform:scaleY(1.06)}
 .mt-tile.mt-wrong .mt-ghost.r{translate:-1px 0;filter:sepia(1) saturate(8) hue-rotate(-50deg)}
 .mt-tile.mt-wrong .mt-ghost.b{translate:1px 0;filter:sepia(1) saturate(8) hue-rotate(180deg)}
+/* collapse-early R2: the same wrong face on a message app's avatar or a video cover, for 900 ms. The
+   wrapper takes the image's place; the copies lie over it. */
+.face-wrong{position:relative;display:inline-block;line-height:0;overflow:hidden;vertical-align:top}
+.face-wrong > img:first-child{transform:scaleY(1.06)}
+.face-wrong .fw-top{position:absolute;left:0;top:0;width:100%;height:45%;overflow:hidden;pointer-events:none}
+.face-wrong .fw-top .fw-img{position:absolute;left:0;top:0;width:100%;height:calc(100% / .45);object-fit:cover;transform:scaleX(-1) scaleY(1.06)}
+.face-wrong .fw-ghost{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5;pointer-events:none;mix-blend-mode:screen;transform:scaleY(1.06)}
+.face-wrong .fw-ghost.r{translate:-1px 0;filter:sepia(1) saturate(8) hue-rotate(-50deg)}
+.face-wrong .fw-ghost.b{translate:1px 0;filter:sepia(1) saturate(8) hue-rotate(180deg)}
+.cover .face-wrong{display:block;width:100%;height:100%}
 .wb .sh-meeting .mt-init{width:48px;height:48px;border-radius:50%;background:#E7E5E0;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:500;color:#1F1F1F}
 .wb .sh-meeting .mt-name{position:absolute;left:8px;bottom:6px;font-size:11px;background:rgba(255,255,255,.85);border-radius:4px;padding:1px 6px;color:#1F1F1F}
 .wb .sh-meeting .mt-sub{min-height:40px;background:#FAF9F7;border:1px solid #E7E5E0;border-radius:8px;padding:8px 10px;font-size:13px;line-height:1.5}
@@ -846,6 +863,24 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .wb .surface.board.ide .bbar{margin-top:8px}
 /* The printed deliverable on the desk / in the 道具 strip: the content image, or a plain paper thumb. */
 :is(.room,.items-panel) .slot.deliverable .paper-thumb{display:block;width:52px;height:64px;background:#fdfdfb;border:1px solid #d9d6cc;border-radius:2px;box-shadow:0 2px 6px rgba(0,0,0,.2),inset 0 0 0 1px #fff}
+/* desk-prints R2: the pile: earlier prints as 3 px paper edges under the top one, each 2 px up and
+   1 px right of the one below (--k counts from the bottom edge up), the newest on top. */
+.room .slot.deliverable.pile{cursor:pointer}
+.room .slot.pile .pile-edge{position:absolute;left:calc(50% - 26px + var(--k) * 1px);width:52px;bottom:calc(var(--k) * 2px);height:3px;background:#efece6;border-bottom:1px solid rgba(0,0,0,.18);box-shadow:0 1px 1px rgba(0,0,0,.12);pointer-events:none}
+.room .slot.pile .pile-top{position:relative;display:flex;align-items:flex-end;justify-content:center;pointer-events:none}
+/* desk-prints R3: the pile up close: the room dimmed 35 %, the print at 70 % of the stage height,
+   centred, its label under it; ← / → and × at its sides. */
+.room .prints-view{position:absolute;inset:0;z-index:19}
+.room .prints-view .prints-dim{position:absolute;inset:0;border:0;padding:0;margin:0;background:rgba(10,10,12,.35);cursor:default}
+.room .prints-view .print-sheet{position:absolute;left:50%;top:50%;transform:translate(-50%,-52%);margin:0;height:70%;display:flex;flex-direction:column;align-items:center;pointer-events:none}
+.room .prints-view .print-img{display:block;height:100%;width:auto;max-width:none;box-shadow:0 20px 50px rgba(0,0,0,.45)}
+.room .prints-view .print-paper{height:100%;aspect-ratio:4/5;background:#f6f4ef;box-shadow:0 20px 50px rgba(0,0,0,.45);display:flex;align-items:flex-start;justify-content:center;padding-top:12%;box-sizing:border-box;font:600 22px var(--font-game-text,sans-serif);color:#2a2622}
+.room .prints-view figcaption{margin-top:12px;color:#f4efe6;font-size:15px;text-shadow:0 1px 6px rgba(0,0,0,.6)}
+.room .prints-view .print-nav,.room .prints-view .print-x{position:absolute;border:0;border-radius:50%;width:44px;height:44px;background:rgba(244,240,232,.85);color:#1d2129;font-size:20px;cursor:pointer}
+.room .prints-view .print-nav:disabled{opacity:.35;cursor:default}
+.room .prints-view .print-nav.prev{left:calc(50% - 315px);top:50%;transform:translateY(-50%)}
+.room .prints-view .print-nav.next{left:calc(50% + 271px);top:50%;transform:translateY(-50%)}
+.room .prints-view .print-x{right:48px;top:48px}
 /* Shared things drawn as what they are (desktop-ui 2026-11-03). One card shape, two registers:
    消息 (.sc.wx) the WeChat way, 工作台 (.sc.ding) the DingTalk way. Covers that content has not
    supplied fall back to a neutral tile per type (.cover.tile.t-<type>), never an empty box. */
