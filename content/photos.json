@@ -60,7 +60,8 @@
       "day": 4,
       "facing": "window",
       "add": {
-        "text": "窗玻璃上结了一层盐，像从外面泼上去的。"
+        "text": "窗玻璃上结了一层盐，像从外面泼上去的。",
+        "overlay": "/room/photos/d04_window.jpg"
       }
     },
     {

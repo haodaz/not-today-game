@@ -60,7 +60,8 @@
       "day": 4,
       "facing": "window",
       "add": {
-        "text": "A crust of salt on the window glass, as if thrown from outside."
+        "text": "A crust of salt on the window glass, as if thrown from outside.",
+        "overlay": "/room/photos/d04_window.jpg"
       }
     },
     {
