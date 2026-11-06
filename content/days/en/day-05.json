@@ -79,7 +79,8 @@
         },
         {
           "k": "narration",
-          "t": "The summer of second year. A dubbed tape in the walkman; one tape for two people, one earbud each."
+          "t": "The summer of second year. A dubbed tape in the walkman; one tape for two people, one earbud each.",
+          "backdrop": "/room/dream/bedroom.jpg"
         },
         {
           "k": "speaker",

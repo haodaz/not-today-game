@@ -58,7 +58,8 @@
         },
         {
           "k": "narration",
-          "t": "The year you went abroad. The airport. Bought the day before leaving: your first phone, the number written on your palm."
+          "t": "The year you went abroad. The airport. Bought the day before leaving: your first phone, the number written on your palm.",
+          "backdrop": "/room/dream/airport.jpg"
         },
         {
           "k": "speaker",
