@@ -165,7 +165,8 @@
       "day": 8,
       "facing": "room",
       "add": {
-        "text": "Thirteen pairs of chopsticks on the desk, one pair unopened."
+        "text": "Thirteen pairs of chopsticks on the desk, one pair unopened.",
+        "overlay": "/room/photos/d08_room.jpg"
       }
     },
     {

@@ -165,7 +165,8 @@
       "day": 8,
       "facing": "room",
       "add": {
-        "text": "桌上十三双筷子，一双没拆。"
+        "text": "桌上十三双筷子，一双没拆。",
+        "overlay": "/room/photos/d08_room.jpg"
       }
     },
     {
