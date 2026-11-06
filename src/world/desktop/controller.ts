@@ -25,8 +25,8 @@ import type { BabblePlan } from "@world/sound/babble";
 import { t } from "@world/i18n";
 import { maskBlocks } from "@world/dialogue/mask";
 import { callBlocks } from "@world/loop/call";
-import { noteHints, seeHint, TYPING_HINT } from "@world/hints/hints";
-import { placeHint } from "@world/hints/layer";
+import { noteHints, promptShown, promptUsed, seeHint, TYPING_HINT } from "@world/hints/hints";
+import { placePrompt } from "@world/hints/layer";
 
 /** Stage size in CSS pixels: one monitor (mock: 28px padding, 1440×900), or the room (1600×900). */
 const MONITOR = { w: 1440, h: 900 };
@@ -76,9 +76,6 @@ export interface MotionHooks {
 /** onboarding-steps R1: the coach card's own controls; nothing else answers while it is up. */
 export const COACH_ACTIONS: ReadonlySet<string> = new Set(["onboard-next", "onboard-skip", "onboard-ok"]);
 /** A coach mark is up on 屏幕 (the run's first visit). */
-/** How long a just-shown hint ignores Enter / Esc (a fast key through the dialogue would close it unseen). */
-export const HINT_KEY_GRACE_MS = 500;
-
 export const coachShowing = (s: Pick<Session, "view" | "onboard">): boolean => s.view === "desktop" && s.onboard === "due";
 /** first-use-hints R1.12: Kuro's pill says `kuro.hint.typing` for a decoy line's time (its usual line). Session only. */
 export function sayTyping(ctx: ActionContext): void {
@@ -87,12 +84,39 @@ export function sayTyping(ctx: ActionContext): void {
   ctx.later(DECOY_SAY_MS + 20, ctx.rerender);
 }
 
-/** first-use-hints R2: the hint card's own control. */
-export const HINT_ACTIONS: ReadonlySet<string> = new Set(["hint-ok"]);
-/** The hint up on the page now (its id), or null. */
-export const hintUp = (root: HTMLElement): string | null => root.querySelector<HTMLElement>(":scope > .hint-layer")?.dataset.hint ?? null;
-/** Is `action` held back by a hint now? */
-export const hintBlocks = (root: HTMLElement, action: string): boolean => hintUp(root) !== null && !HINT_ACTIONS.has(action);
+/**
+ * world-prompts R2: a key on the choices column. ↑ / ↓ move the focus between its rows (from none:
+ * ↓ the first, ↑ the last; they stop at the ends), Enter / Space choose the focused row, 1–9 the nth
+ * row. True when the key was the column's. A row that is the text field is skipped.
+ */
+export function choiceKey(root: HTMLElement, e: Pick<KeyboardEvent, "key" | "metaKey" | "ctrlKey" | "altKey">): boolean {
+  if (e.metaKey || e.ctrlKey || e.altKey) return false;
+  const col = [...root.querySelectorAll<HTMLElement>(".dlg-choices")].find((c) => !c.closest(".m-ghost"));
+  if (!col) return false;
+  const rows = [...col.querySelectorAll<HTMLButtonElement>("button.dc-row")].filter((b) => !b.disabled && !b.classList.contains("m-wait"));
+  if (!rows.length) return false;
+  const doc = root.ownerDocument;
+  const at = rows.indexOf(doc.activeElement as HTMLButtonElement);
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+    const next = at < 0 ? (e.key === "ArrowDown" ? 0 : rows.length - 1) : Math.min(rows.length - 1, Math.max(0, at + (e.key === "ArrowDown" ? 1 : -1)));
+    rows[next]!.focus();
+    return true;
+  }
+  if ((e.key === "Enter" || e.key === " ") && at >= 0) {
+    rows[at]!.click();
+    return true;
+  }
+  if (/^[1-9]$/.test(e.key)) {
+    const row = rows[Number(e.key) - 1];
+    if (!row) return false;
+    row.click();
+    return true;
+  }
+  return false;
+}
+
+/** world-prompts R1: the room prompt on the page now (its id), or null. It blocks nothing. */
+export const promptUp = (root: HTMLElement): string | null => root.querySelector<HTMLElement>(":scope > .prompt-layer")?.dataset.hint ?? null;
 /** Is `action` held back by the coach marks now? */
 export const coachBlocks = (s: Pick<Session, "view" | "onboard">, action: string): boolean => coachShowing(s) && !COACH_ACTIONS.has(action);
 
@@ -275,9 +299,6 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   // remembered placement says whether this run has had it.
   session.onboard = "no";
   if (remembered) Object.assign(session, remembered);
-  // The hint on screen and when it appeared (HINT_KEY_GRACE_MS).
-  let hintShown: string | null = null;
-  let hintSince = 0;
   let savedPlacement = JSON.stringify(placementOf(session));
   // The mute flag outlives the page (sound spec FR3); the title page reads the same one.
   if (deps.sound) session.muted = deps.sound.muted;
@@ -304,8 +325,13 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
       // A story masks the stage; a live boss call takes the whole screen (day-loop 2026-11-03):
       // while it runs, only the call's own controls answer.
       // onboarding-steps R1: while a coach mark is up only its card answers.
-      // first-use-hints R2: while a hint is up only its card answers.
-      (c, data, el) => (maskBlocks(session.dialogue, name) || callBlocks(session, name) || coachBlocks(session, name) || hintBlocks(root, name) ? undefined : handler(c, data, el)),
+      // world-prompts R1: a room prompt blocks nothing; an action on its target ends it (seen).
+      (c, data, el) => {
+        if (maskBlocks(session.dialogue, name) || callBlocks(session, name) || coachBlocks(session, name)) return;
+        const used = promptUsed(session, promptUp(root), name, data ?? {});
+        if (used) deps.hints?.seenNow(used);
+        return handler(c, data, el);
+      },
     ]),
   );
   const timers = new Set<ReturnType<typeof setTimeout>>();
@@ -345,7 +371,8 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     }
     // first-use-hints R2: the hints whose condition has come true join the queue; the switch is kept.
     if (deps.hints) {
-      noteHints(deps.store.getState(), deps.store.getEvents(), session);
+      // world-prompts R1: a shown prompt whose condition passed, and the chick's line, are seen now.
+      for (const id of noteHints(deps.store.getState(), deps.store.getEvents(), session)) deps.hints.seenNow(id);
       if (session.hintsOn !== hintsOnSaved) {
         hintsOnSaved = session.hintsOn;
         deps.hints.setOn(session.hintsOn);
@@ -360,15 +387,11 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     if (slot) body.attach(slot);
     fit();
     motion?.after();
-    // The hint's ring and card go where its anchor is now drawn.
-    placeHint(root);
-    // A hint that has just appeared ignores Enter / Esc for HINT_KEY_GRACE_MS: the key that closed a
-    // dialogue line must not also close the hint that came up behind it (Claude, 2026-11-06).
-    const shown = hintUp(root);
-    if (shown !== hintShown) {
-      hintShown = shown;
-      hintSince = Date.now();
-    }
+    // world-prompts R1: the prompt's glow and pill go where its target is now drawn; drawn once, its
+    // condition passing from now on is it being seen.
+    placePrompt(root);
+    const prompt = promptUp(root);
+    if (prompt) promptShown(session, prompt);
     splat?.after();
     nav?.after();
     fx?.after();
@@ -451,17 +474,8 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   const onKey = (e: KeyboardEvent) => {
     const target = e.target as HTMLElement;
     // onboarding-steps R1: a coach mark is up: Enter is 下一个 (知道了 on the last), Esc is 跳过; no
-    // other key does anything (a focused card button does not also get Enter's click).
-    // first-use-hints R2: a hint is up: Enter or Esc is its 知道了; no other key does anything.
-    const hint = hintUp(root);
-    if (hint) {
-      if (e.key === "Enter" || e.key === "Escape") {
-        e.preventDefault();
-        if (Date.now() - hintSince < HINT_KEY_GRACE_MS) return;
-        actions["hint-ok"]?.(ctx, { hint } as unknown as DOMStringMap, target);
-      }
-      return;
-    }
+    // other key does anything (a focused card button does not also get Enter's click). (A room
+    // prompt takes no keys: world-prompts R1.)
     if (coachShowing(session)) {
       const name = e.key === "Enter" ? "onboard-next" : e.key === "Escape" ? "onboard-skip" : null;
       if (name) {
@@ -498,6 +512,12 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
       if (e.key === "Escape" && enter) {
         if (deps.onKey?.(ctx, e)) e.preventDefault();
       }
+      return;
+    }
+    // world-prompts R2: the choices column: ↑ ↓ move between rows, Enter / Space choose the focused
+    // one, 1–9 the nth.
+    if (choiceKey(root, e)) {
+      e.preventDefault();
       return;
     }
     // 调度中心 (tingtalk R1b): F3 opens / closes it, as on a Mac; Esc closes it before anything else.

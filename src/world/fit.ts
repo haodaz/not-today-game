@@ -47,6 +47,9 @@ export function applyFit(root: HTMLElement, stage: HTMLElement, size: { w: numbe
   stage.style.setProperty("--scale", String(fit.scale));
   stage.style.setProperty("--stage-x", `${fit.left}px`);
   stage.style.setProperty("--stage-y", `${fit.top}px`);
+  // world-prompts R2: the stage's place in the window, for the fixed layers sized by it (the choices column).
+  root.style.setProperty("--stage-l", `${fit.left}px`);
+  root.style.setProperty("--stage-w", `${size.w * fit.scale}px`);
   // No photo (the day-18 pull-out happens over black): the letterbox is plain black.
   root.style.setProperty("--letterbox", backdrop ? `url(${backdrop})` : "none");
   return fit;

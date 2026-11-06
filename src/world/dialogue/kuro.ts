@@ -316,15 +316,14 @@ export function playerBox(state: State, events: readonly GameEvent[], session: S
   if (!head || head.ending.kind !== "kuroTurn" || d.line < head.lines.length - 1) return null;
   if (session.kuroBedDay === state.day || chatClosedByErrors(events, state.day)) return null;
   const px = fontPx(getLocale());
-  // playtest-1105 R6: the player's turn is the box's next screen, after Kuro's line has been read
-  // (one page past its last), in the same box: the player's tag and portrait, the options as choices.
+  // playtest-1105 R6: the player's turn comes after Kuro's line has been read (one page past its
+  // last); world-prompts R2: its options are the column on the right, the box keeps Kuro's line.
   if ((d.page ?? 0) < kuroLineScreens(state, head)) return null;
   const name = state.names.login.trim();
   if (head.ending.mode === "work") {
     const options: PlayerOption[] = [{ action: "kuro-leave", label: t("dialogue.ok") }];
     return { name, mode: "choices", options, screens: screens(null, options.map((o) => o.label), PLAYER_TURN_BOX, px), page: 0, draft: "" };
   }
-  if (session.kuroInput) return { name, mode: "input", options: [], screens: [], page: 0, draft: session.kuroDraft };
   const asked = askedToday(events, state.day);
   // Affinity opens questions (2026-11-02): only the starters the current bucket allows.
   const bucket = bucketNow(state);
@@ -335,6 +334,8 @@ export function playerBox(state: State, events: readonly GameEvent[], session: S
     { action: "kuro-more", label: t("dialogue.more") },
   ];
   const all = screens(null, options.map((o) => o.label), PLAYER_TURN_BOX, px);
+  // world-prompts R2: typing keeps the list; 说点别的…'s row becomes the field in place.
+  if (session.kuroInput) return { name, mode: "input", options, screens: all, page: 0, draft: session.kuroDraft };
   return { name, mode: "choices", options, screens: all, page: Math.min(session.playerPage, all.length - 1), draft: "" };
 }
 

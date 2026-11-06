@@ -172,15 +172,7 @@
 .dlg .choices button{position:relative;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;width:100%;margin:0;padding:1px 0 1px 20px;border:0;background:none;font:inherit;line-height:inherit;color:#777;text-align:left;cursor:pointer}
 .dlg .choices button:hover,.dlg .choices button:focus-visible{color:#1d2129;outline:none}
 .dlg .choices button:hover::before,.dlg .choices button:focus-visible::before{content:"◆";position:absolute;left:0;color:#8b2f2a}
-/* The player's turn (playtest-1105 R6): the same box; up to five one-row choices (four starters +
-   说点别的…) in its 132 px: 14 + 5 × 23.4 = 131 (the tag sits on the top edge above the first). */
-.dlg.player.has-choices,.dlg.player.tagged.has-choices{padding-top:14px}
-.dlg.player .choices{line-height:1.3}
-.dlg.player .choices button{display:block;white-space:nowrap;text-overflow:ellipsis;-webkit-line-clamp:unset}
-/* Typing (说点别的…): one input in the same box. */
-.dlg.player.input{padding-top:40px}
-.dlg.player .kuro-in{width:100%;border:0;border-bottom:1px solid #8a7f70;background:transparent;font:inherit;color:#1d2129;outline:0;padding:2px 0}
-.dlg.player .kuro-in:focus{border-bottom-color:#1d2129}
+/* The player's turn with Kuro is the choices column now (world-prompts R2: .dlg-choices). */
 /* History (FR1): a full-height scrolling log of this day; a click outside or Esc closes it */
 .dlg-hist-layer{position:absolute;inset:0;z-index:45}
 .dlg-hist-dim{position:absolute;inset:0;border:0;padding:0;margin:0;background:rgba(10,10,12,.55);cursor:default}
@@ -388,19 +380,17 @@
 .settings .actions{display:flex;justify-content:space-between;gap:10px;padding-top:14px;border-top:1px solid rgba(0,0,0,.08)}
 .settings .actions button{flex:1;border:1px solid rgba(0,0,0,.12);background:#fff;border-radius:8px;padding:8px 0;font:inherit;cursor:pointer}
 .settings .actions button:hover,.settings .actions button:focus-visible{border-color:#8b2f2a;color:#8b2f2a}
-/* first-use-hints: one hint, in the desktop coach marks' look (desktop.css .coach-card: 300 px, the
-   10 px arrow). Fixed over the viewport; a click outside the card does nothing (the catcher has no
-   action). The ring is the 2 px accent ring with the 8 px glow, and its outer spread is the 30 % dim,
-   so the thing it surrounds is lifted above the dim. hints/layer.ts places the ring and the card. */
-.hint-layer{position:fixed;inset:0;z-index:65}
-.hint-layer .hint-catch{position:absolute;inset:0}
-.hint-layer .hint-ring{position:fixed;border-radius:10px;pointer-events:none;box-shadow:0 0 0 2px var(--accent,#3b6ef2),0 0 8px 2px color-mix(in srgb,var(--accent,#3b6ef2) 60%,transparent),0 0 0 200vmax rgba(0,0,0,.3)}
-.hint-layer .hint-ring.none{box-shadow:0 0 0 200vmax rgba(0,0,0,.3)}
-.hint-layer .hint-card{position:fixed;font-family:var(--font-game-ui,inherit)}
-.hint-layer .hint-card p{margin:0 0 12px;color:var(--ink-2,#5b6472)}
-.hint-layer .hint-card .foot{justify-content:flex-end}
-/* Below the thing: the arrow points up from the card's top edge. */
-.hint-layer .hint-card.below::after{top:auto;bottom:100%;border:10px solid transparent;border-top:0;border-bottom-color:#fff}
+/* world-prompts R1: a room hint is a world prompt. It never blocks (no catcher, no dim, no pointer
+   events). The target glows: a 2 px warm white outline with a 14 px glow, pulsing 0.35 → 1 → 0.35
+   over 1.6 s; a pill floats 10 px above it (hints/layer.ts places both): a 9 px accent ◆, then the
+   short label in 14 px white with a 1 px dark shadow, on rgba(20,22,28,.55), 6 × 12 px padding. */
+.prompt-layer{position:fixed;inset:0;z-index:30;pointer-events:none}
+.prompt-layer.lost{visibility:hidden}
+.prompt-layer .prompt-glow{position:fixed;box-sizing:border-box;border:2px solid rgba(255,246,220,.9);border-radius:8px;box-shadow:0 0 14px rgba(255,246,220,.9);animation:prompt-pulse 1.6s ease-in-out infinite}
+@keyframes prompt-pulse{0%,100%{opacity:.35}50%{opacity:1}}
+.prompt-layer .prompt-pill{position:fixed;display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:rgba(20,22,28,.55);color:#fff;font:14px/1.2 var(--font-game-ui,"PingFang SC","Hiragino Sans GB",sans-serif);text-shadow:0 1px 1px rgba(0,0,0,.75);white-space:nowrap}
+.prompt-layer .prompt-dia{font-style:normal;font-size:9px;line-height:1;color:var(--accent,#3b6ef2);text-shadow:none}
+@media (prefers-reduced-motion:reduce){.prompt-layer .prompt-glow{animation:none;opacity:1}}
 /* playtest-1105 R8: 重新开始这一局 / 清除全部记录, quiet links; their question in the same panel. */
 .settings .row.reset{flex-direction:column;align-items:flex-start;gap:6px}
 .settings .row.reset button{border:0;background:none;padding:2px 0;font:inherit;font-size:13px;color:#8b2f2a;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
@@ -419,6 +409,17 @@
 .dlg-layer > *{pointer-events:auto}
 .dlg-layer .dlg{position:fixed;left:50%;bottom:var(--dlg-bottom,60px);transform:translateX(-50%);width:900px;max-width:80vw;height:var(--dlg-h,132px)}
 .dlg-layer .dlg-hist-layer{position:fixed}
+/* world-prompts R2: the choices on the right of the stage (Honkai: Star Rail). The column's right
+   edge 4 % in from the stage's right, 32 % of the stage wide (280–420 px), its bottom 16 px above
+   the box's top; rows stack upward, the first option on top. --stage-l / --stage-w are the fit's. */
+.dlg-choices{position:fixed;z-index:31;right:calc(100vw - var(--stage-l,0px) - var(--stage-w,100vw) + var(--stage-w,100vw) * .04);bottom:calc(var(--dlg-bottom,60px) + var(--dlg-h,132px) + 16px);width:clamp(280px,calc(var(--stage-w,100vw) * .32),420px);display:flex;flex-direction:column;justify-content:flex-end;gap:8px;pointer-events:auto}
+.dlg-choices .dc-row{position:relative;display:flex;align-items:center;gap:10px;width:100%;min-height:46px;box-sizing:border-box;margin:0;padding:0 14px;border:0;border-radius:8px;background:rgba(248,246,241,.94);color:#1d2129;font:15px/1.4 var(--font-game-text,"PingFang SC","Hiragino Sans GB",sans-serif);text-align:left;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.18);transition:background-color 120ms,box-shadow 120ms}
+.dlg-choices button.dc-row:hover,.dlg-choices button.dc-row:focus,.dlg-choices button.dc-row:focus-visible,.dlg-choices .dc-field:focus-within{background:rgba(255,255,255,1);outline:none;box-shadow:inset 3px 0 0 var(--accent,#3b6ef2),0 6px 18px rgba(0,0,0,.18)}
+.dlg-choices .dc-ic{flex:0 0 14px;width:14px;height:14px;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:14px;line-height:1;color:#8b2f2a}
+.dlg-choices .dc-ic svg{display:block}
+.dlg-choices .dc-l{flex:1 1 auto;min-width:0;padding:8px 0}
+.dlg-choices .dc-field{cursor:text}
+.dlg-choices .dc-field .kuro-in{flex:1 1 auto;min-width:0;border:0;border-bottom:1px solid #8a7f70;background:transparent;font:inherit;color:#1d2129;outline:0;padding:4px 0}
 /* A story masks the stage (dialogue addition 2026-11-02): 40 % dim under the box; a click on it reads on. */
 .dlg-layer .story-mask{position:fixed;inset:0;background:rgba(0,0,0,.4);cursor:pointer}
 /* playtest-1105 R2: while any box is up the mask takes every click; a fragment's mask is clear, and

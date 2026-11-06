@@ -14,6 +14,7 @@ import { constants } from "@state/variables";
 import type { BeatClock } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
 import { kuroDay, offlineAnswer } from "@world/desktop/kuro/days";
+import { playerBox } from "@world/dialogue/kuro";
 import { initialSession, type Session } from "@world/desktop/model";
 import { dialogueBox, isDreamNight, lineScreens, playerPortraitSrc } from "@world/dialogue/box";
 import { dreamNights } from "@state/stages";
@@ -92,29 +93,29 @@ describe("FR1 the box: snapshots", () => {
     expect(ctx.session.dlgLog.map((e) => e.text)).toEqual([longLine.t]);
   });
 
-  it("choices render in the box (◆ by CSS), one page of at most four; a speaker's line carries its tag", () => {
+  // world-prompts R2: the choices are the column on the right (all of them, no pages); the box keeps the line and its tag.
+  it("choices render in the column on the right (all at once, no ▼); the box keeps the speaker's line and tag", () => {
     const ctx = ctxOf(storeAt(1), WORK);
     const seq = { say: [{ k: "speaker", who: "缝里", t: narration.t }] as SayLine[], choices: ["一", "二", "三", "四", "五"].map((text) => ({ text })) };
     ctx.session.dialogue = push(EMPTY_DIALOGUE, { key: "c", lines: seq.say, ending: { kind: "beatChoices", day: 1, beat: "shutdown" }, sequence: seq });
     const at = lineScreens(ctx.store.getState(), ctx.session)!;
-    const choiceScreens = at.all.filter((s) => s.choices.length);
-    expect(choiceScreens.map((s) => s.choices.length)).toEqual([4, 1]);
-    // Read on to the first page of choices.
+    // Read on to the choices.
     while (!at.all[ctx.session.dialogue.page ?? 0]!.choices.length) act(ctx, "loop-advance");
     const box = out(ctx);
-    expect(box).toContain('<div class="choices"><button type="button" data-action="loop-choice" data-index="0">一</button>');
-    expect(box).toContain('<button type="button" class="more" data-action="loop-advance">▼</button>');
-    expect(box).toMatchSnapshot();
-    // ▼ cycles through the pages of choices; a click never picks one.
+    const col = box.slice(box.indexOf('<div class="dlg-choices'));
+    expect([...col.matchAll(/data-index="(\d)"[^>]*><i class="dc-ic plain" aria-hidden="true">◇<\/i><span class="dc-l">([^<]+)<\/span>/g)].map((m) => m[2])).toEqual(["一", "二", "三", "四", "五"]);
+    const dlg = box.slice(0, box.indexOf('<div class="dlg-choices'));
+    expect(dlg).not.toContain("loop-choice");
+    expect(dlg).not.toContain('class="more"');
+    expect(dlg).toContain('<span class="who tag">缝里</span>');
+    // Its last page of text stays, not as a read-on button.
+    const last = at.all.filter((s) => s.text).at(-1)!.text;
+    expect(dlg).toContain(`<div class="txt">${escapeHtml(last)}</div>`);
+    // A click on the box never picks or skips a choice, nor pages.
     const page = ctx.session.dialogue.page;
-    act(ctx, "loop-advance");
-    expect(out(ctx)).toContain('data-index="4">五</button>');
     act(ctx, "loop-advance");
     expect(ctx.session.dialogue.page).toBe(page);
     expect(ctx.store.getEvents().some((e) => e.kind === "choose")).toBe(false);
-    // The tag is the speaker's (content).
-    ctx.session.dialogue = { ...ctx.session.dialogue, page: 0 };
-    expect(out(ctx)).toContain('<span class="who tag">缝里</span>');
   });
 
   it("inner lines are italic with no tag; sfx lines are centred with no tag", () => {
@@ -176,10 +177,11 @@ describe("FR2 talking to Kuro", () => {
     // The tag is only the name; the face is the portrait at the box's right end.
     expect(box).toContain(`<span class="who tag k">${t("kuro.name")}</span>`);
     expect(box).not.toContain("<img");
-    expect(box).toMatch(/<span class="kpet kuro-portrait" data-kuro-slot data-state="(idle|think|rest)" aria-hidden="true"><\/span><\/div>$/);
-    expect(box).toContain(`>${escapeHtml(t("kuro.ask"))}</button>`);
-    expect(box).toContain(`data-choice="yes">${t("kuro.yes")}</button>`);
-    expect(box).toContain(`data-choice="no">${t("kuro.notNow")}</button>`);
+    // world-prompts R2: the box keeps the line and the portrait; 聊聊 / 先不聊 are the column's rows.
+    expect(box).toMatch(/<span class="kpet kuro-portrait" data-kuro-slot data-state="(idle|think|rest)" aria-hidden="true"><\/span><\/div><div class="dlg-choices" role="group">/);
+    expect(box).toContain(`<div class="txt">${escapeHtml(t("kuro.ask"))}</div>`);
+    expect(box).toContain(`data-choice="yes" data-focus="dc-0" data-n="1"><i class="dc-ic plain" aria-hidden="true">◇</i><span class="dc-l">${t("kuro.yes")}</span></button>`);
+    expect(box).toContain(`data-choice="no" data-focus="dc-1" data-n="2"><i class="dc-ic plain" aria-hidden="true">◇</i><span class="dc-l">${t("kuro.notNow")}</span></button>`);
     expect(room(ctx)).toContain('<div class="hud-kuro away"></div>');
     expect(box).toMatchSnapshot();
     act(ctx, "loop-choice", { index: "1", choice: "no" });
@@ -198,24 +200,23 @@ describe("FR2 talking to Kuro", () => {
     // The idiom in Kuro's face (kuro-zh-answers R4).
     expect(said).toContain(`><span class="kmono">${escapeHtml(day.idiom)}</span></button>`);
     expect(said).not.toContain('class="dlg player');
-    // Read on: the same box is the player's turn, their tag and portrait; Kuro's portrait is gone.
+    // Read on: the player's turn. world-prompts R2: the box keeps Kuro's line, name and portrait;
+    // the options are the column's rows.
     act(ctx, "loop-advance");
     const box = out(ctx);
     expect(box.match(/<div class="dlg[ "]/g)).toHaveLength(1);
-    expect(box).toContain('<div class="dlg player tagged me has-choices" data-mode="choices" data-screen="1/1">');
-    expect(box).toContain('<span class="who tag p">林一</span>');
-    expect(box).toContain('<img class="player-portrait" src="/player/none.png"');
-    expect(box).not.toContain("kuro-portrait");
-    const player = box;
-    const labels = [...player.matchAll(/<button type="button" data-action="kuro-(?:q|more)"[^>]*>([^<]*)<\/button>/g)].map((m) => m[1]);
+    expect(box).toContain("kuro-portrait");
+    expect(box).toContain(`<span class="who tag k">${t("kuro.name")}</span>`);
+    const player = box.slice(box.indexOf('<div class="dlg-choices'));
+    const labels = [...player.matchAll(/data-action="kuro-(?:q|more)"[^>]*><i class="dc-ic (?:ask|more)"[\s\S]*?<\/i><span class="dc-l">([^<]*)<\/span>/g)].map((m) => m[1]);
     expect(labels).toEqual([...day.starters.map((s) => escapeHtml(s.zh)), escapeHtml(t("dialogue.more"))]);
-    // No 先不聊 here (Esc leaves), and no ▼: one page.
+    // No 先不聊 here (Esc leaves), and no ▼.
     expect(player).not.toContain("kuro-leave");
-    expect(player).not.toContain('class="more"');
+    expect(box).not.toContain('class="more"');
     expect(box).toMatchSnapshot();
   });
 
-  it("the player's box fits every day's starters + 说点别的… on one page, in both languages", () => {
+  it("every day's starters + 说点别的… are all rows of the column at once, in both languages", () => {
     for (const locale of ["zh", "en"] as const) {
       setLocale(locale);
       for (let d = 1; d <= constants.lastDay; d++) {
@@ -223,7 +224,8 @@ describe("FR2 talking to Kuro", () => {
         talkAtNight(ctx);
         act(ctx, "loop-advance"); // playtest-1105 R6: to the player's turn
         const p = out(ctx);
-        expect(p, `${locale} day ${d}`).toContain('data-mode="choices" data-screen="1/1"');
+        const want = playerBox(ctx.store.getState(), ctx.store.getEvents(), ctx.session)!.options.length;
+        expect(p.match(/class="dc-row"/g)?.length, `${locale} day ${d}`).toBe(want);
       }
     }
   });
@@ -255,8 +257,8 @@ describe("FR2 talking to Kuro", () => {
     expect(out(ctx)).not.toContain(`data-q="1"`);
     act(ctx, "kuro-more");
     const input = out(ctx);
-    expect(input).toContain('<div class="dlg player input tagged me" data-mode="input"><div class="tagbar"><span class="who tag p">林一</span>');
-    expect(input).toContain('<input class="kuro-in" type="text" data-input="kuro-text"');
+    // world-prompts R2: 说点别的…'s row is the field, in place.
+    expect(input).toMatch(/<div class="dc-row dc-field"><i class="dc-ic more"[\s\S]*?<\/i><input class="kuro-in" type="text" data-input="kuro-text"/);
     expect(input).toMatchSnapshot();
     // Empty sends nothing.
     act(ctx, "kuro-send");
@@ -281,10 +283,14 @@ describe("FR2 talking to Kuro", () => {
     expect(ctx.session.dialogue.queue).toEqual([]);
   });
 
-  it("Esc leaves at any player turn; the body comes back", () => {
+  it("Esc leaves at any player turn (typing: Esc first goes back to the list); the body comes back", () => {
     const ctx = ctxOf(storeAt(1), NIGHT);
     talkAtNight(ctx);
     act(ctx, "kuro-more");
+    // world-prompts R2: from the field, Esc returns to the list; the next Esc leaves.
+    expect(loopKeys(ctx, { key: "Escape" } as KeyboardEvent)).toBe(true);
+    expect(ctx.session.kuroInput).toBe(false);
+    expect(ctx.session.dialogue.queue.length).toBe(1);
     expect(loopKeys(ctx, { key: "Escape" } as KeyboardEvent)).toBe(true);
     expect(ctx.session.dialogue.queue).toEqual([]);
     expect(ctx.session.kuroInput).toBe(false);
@@ -304,8 +310,8 @@ describe("FR2 talking to Kuro", () => {
           if (s === "reopen") {
             act(ctx, "kuro-leave");
             talkAtNight(ctx);
-          } else if ((out(ctx).includes('class="dlg player') || (act(ctx, "loop-advance"), out(ctx).includes('class="dlg player')))) {
-            // playtest-1105 R6: Kuro's line is read on first; the player's turn is the same box.
+          } else if (out(ctx).includes('data-action="kuro-more"') || (act(ctx, "loop-advance"), out(ctx).includes('data-action="kuro-more"'))) {
+            // playtest-1105 R6: Kuro's line is read on first; world-prompts R2: then the column holds the player's options.
             attempts += 1;
             const q = /data-action="kuro-q" data-q="(\d+)"/.exec(out(ctx))?.[1];
             if (s === "q" && q) act(ctx, "kuro-q", { q });
@@ -318,7 +324,7 @@ describe("FR2 talking to Kuro", () => {
           if (attempts > constants.chatTurnsPerDay) bed = true;
           expect(store.getState().chatTurnsToday).toBe(Math.min(attempts, constants.chatTurnsPerDay));
           if (bed) {
-            expect(out(ctx)).not.toContain('class="dlg player');
+            expect(out(ctx)).not.toContain('data-action="kuro-more"');
             expect(ctx.session.kuroBedDay).toBe(2);
           }
         }
@@ -375,10 +381,11 @@ describe("Kuro stands at the box's right end (dialogue correction 2026-11-01)", 
     }
   });
 
-  it("one box (playtest-1105 R6): no second player's box and no raised box in the CSS", () => {
+  it("one box (playtest-1105 R6): no second player's box and no raised box in the CSS; the choices are the column (world-prompts R2)", () => {
     expect(css).not.toContain(".dlg-player");
     expect(css).not.toContain(".dlg.raised");
-    expect(css).toContain(".dlg.player.has-choices,.dlg.player.tagged.has-choices{padding-top:14px}");
+    expect(css).not.toContain(".dlg.player");
+    expect(css).toContain(".dlg-choices{position:fixed;");
   });
 
   it("the HUD body stands directly above the chip row, flush right; the box's right edge stays left of it", () => {

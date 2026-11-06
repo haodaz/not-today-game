@@ -93,7 +93,7 @@ const textOf = (el: Element): string => (el.textContent ?? "").trim();
 
 /** Everything the motion layer animates or turns into a ghost. */
 export const KEYED =
-  ".stage, .m-backdrop, .held-layer, .stage > .dlg, .dlg-layer, .dlg-player, .choices, .room .list > .it, .monitor, .other-tab, .settings-layer, .gap-glow, .door-bg.chain, .door-hand, .door-beat";
+  ".stage, .m-backdrop, .held-layer, .stage > .dlg, .dlg-layer, .dlg-player, .choices, .dlg-choices, .room .list > .it, .monitor, .other-tab, .settings-layer, .gap-glow, .door-bg.chain, .door-hand, .door-beat";
 
 /**
  * The identity of a motion element across renders. Two elements with the same key are the same
@@ -114,7 +114,7 @@ export function motionKey(el: Element): string | null {
   if (c.contains("held-layer")) return "held";
   if (c.contains("dlg-layer") || (c.contains("dlg") && el.parentElement?.classList.contains("stage"))) return "dlg";
   if (c.contains("dlg-player")) return "player";
-  if (c.contains("choices")) return "choices";
+  if (c.contains("choices") || c.contains("dlg-choices")) return "choices";
   if (c.contains("it") && el.parentElement?.classList.contains("list")) return `item:${(el as HTMLElement).dataset.id ?? ""}`;
   if (c.contains("monitor")) return `monitor:${(el as HTMLElement).dataset.side ?? ""}`;
   if (c.contains("other-tab")) return "tab";
@@ -211,7 +211,8 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       held: s.view === "door" ? null : heldItem(s),
       dlg: !!show,
       // Choices live in the box now (dialogue FR1): which item, and which page of them.
-      choices: q(root, ".dlg .choices, .dlg-player .choices") ? `${head?.key ?? ""}:${s.dialogue.page ?? 0}:${s.playerPage}:${s.kuroInput}` : null,
+      // world-prompts R2: they are the column on the right now.
+      choices: q(root, ".dlg-choices") ? `${head?.key ?? ""}:${s.dialogue.page ?? 0}:${s.playerPage}:${s.kuroInput}` : null,
       night,
       door: doorBeat ? `${doorBeat.dataset.meal}:${doorBeat.dataset.state}` : null,
       asleep: head?.ending.kind === "lieDown",
@@ -414,9 +415,9 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
 
   /** Choices: bottom to top, 60ms apart, once the line above is complete. */
   function choicesEntry(t: number): void {
-    const box = q(root, ".dlg .choices") ?? q(root, ".dlg-player .choices");
+    const box = q(root, ".dlg-choices");
     if (!box) return;
-    const buttons = qa(box, "button");
+    const buttons = qa(box, ".dc-row");
     const r = ctx.session.reveal;
     const begun = since(`choices:${last?.choices ?? ""}`) ?? t;
     const start = r && r.key === lineKey(ctx.session.dialogue) ? Math.max(begun, revealDoneAt(r)) : begun;

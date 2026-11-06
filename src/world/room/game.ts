@@ -11,7 +11,7 @@ import { boxReadsOn, dialogueBox, lineScreens } from "@world/dialogue/box";
 import { logCurrent, logPlayer } from "@world/dialogue/history";
 import { settleSession } from "@world/dialogue/place";
 import { noteWallpaper, WALL_FADE_MS } from "@world/desktop/wallpaper";
-import { hintLayer, seeHint } from "@world/hints/hints";
+import { hintLayer } from "@world/hints/hints";
 import { acceptOffer, answerAsk, answerOffer, declineOffer, kuroActions, playerBox, readOnToPlayer } from "@world/dialogue/kuro";
 import { nextScreen } from "@world/dialogue/layout";
 import { stepOnce } from "@world/loop/steps";
@@ -858,16 +858,9 @@ export const loopActions: Record<string, ActionHandler> = {
       return;
     }
     const at = lineScreens(state, session, ctx.store.getEvents());
-    // On a page of choices, ▼ shows the next page of them (the last cycles to the first); a
-    // click never picks or skips a choice (dialogue FR1).
-    if (at && at.all[at.page]!.choices.length) {
-      const next = nextScreen(at.all, at.page);
-      if (next !== at.page) {
-        session.dialogue = { ...session.dialogue, page: next };
-        ctx.rerender();
-      }
-      return;
-    }
+    // world-prompts R2: while choices are up (all of them in the column) the box does not read on;
+    // only a row chooses (dialogue FR1: a click never picks or skips a choice).
+    if (at && at.all[at.page]!.choices.length) return;
     const { dialogue, ended } = advance(session.dialogue, at?.all.length ?? 1);
     // The line is left: it goes into today's history.
     if (sameLine(session.dialogue, dialogue) === false) logCurrent(session, state);
@@ -1256,14 +1249,7 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.session.settingsOpen = true;
     ctx.rerender();
   },
-  // first-use-hints: 知道了 (or Enter / Esc) on a hint: seen, here and (the host's profile) in later runs.
-  "hint-ok"(ctx, data) {
-    const id = data.hint;
-    if (!id) return;
-    if (seeHint(ctx.session, id)) ctx.hintSeen?.(id);
-    ctx.rerender();
-  },
-  // 设置 → 新手提示 开 / 关; off ends a hint that is up. The host keeps the switch (`nt_hints`).
+  // 设置 → 新手提示 开 / 关; off ends a prompt that is up. The host keeps the switch (`nt_hints`).
   "hints-set"(ctx, data) {
     if (data.on !== "1" && data.on !== "0") return;
     ctx.session.hintsOn = data.on === "1";
@@ -1473,6 +1459,13 @@ export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
       settleSession(ctx.session);
       ctx.rerender();
     }
+    return true;
+  }
+  // world-prompts R2: typing to Kuro, Esc goes back to the list (the field is 说点别的…'s row again).
+  if (e.key === "Escape" && talking(ctx.session.dialogue) && ctx.session.kuroInput) {
+    ctx.session.kuroInput = false;
+    ctx.session.kuroDraft = "";
+    ctx.rerender();
     return true;
   }
   if (e.key === "Escape" && talking(ctx.session.dialogue)) {

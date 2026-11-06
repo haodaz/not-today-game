@@ -276,7 +276,8 @@ describe("the one-time pointer (day-loop rule 2026-11-01)", () => {
       ctx.session.dialogue = { ...ctx.session.dialogue, line: ctx.session.dialogue.queue[0]!.lines.length - 1, page: n - 1 };
     };
     raidAt(5);
-    expect(render(ctx)).toMatch(/<div class="choices pointer-once">/);
+    // world-prompts R2: the choices are the column on the right; the pointer is on it.
+    expect(render(ctx)).toMatch(/<div class="dlg-choices pointer-once" role="group">/);
     const offered = showing(ctx.session.dialogue, store.getState())!.choices!;
     act(ctx, "loop-choice", { index: String(offered.at(-1)!.index) });
     expect(ctx.session.pointed.has("raid")).toBe(true);

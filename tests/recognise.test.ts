@@ -149,7 +149,8 @@ describe("when it is asked (FR1)", () => {
     session.dialogue = push(EMPTY_DIALOGUE, questionQueued(1, "chick", store.getRunId())!);
     const out = everyScreen(store.getState(), session);
     expect(out).toContain(recogniseTable.get("chick")!.q);
-    const buttons = [...out.matchAll(/<button type="button" data-action="loop-choice" data-index="(\d)">/g)].map((m) => Number(m[1]));
+    // world-prompts R2: the options are the column's rows.
+    const buttons = [...out.matchAll(/<button type="button" class="dc-row" data-action="loop-choice" data-index="(\d)"/g)].map((m) => Number(m[1]));
     expect(buttons).toEqual(optionOrder(store.getRunId(), "chick"));
     expect(out).toMatchSnapshot();
   });

@@ -93,6 +93,8 @@ export interface Session {
   hintsOn: boolean;
   hintsSeen: string[];
   hintQueue: string[];
+  /** world-prompts R1: the prompts drawn on the page at least once (their condition passing then means seen). Session only. */
+  hintsShown: string[];
   /**
    * onboarding-steps R2: the day whose wallpaper the desktop last showed (0 = none yet this page),
    * and the crossfade from the previous one on a new day's first visit (its picture, when it began).
@@ -395,6 +397,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     hintsOn: false,
     hintsSeen: [],
     hintQueue: [],
+    hintsShown: [],
     wallpaperDay: 0,
     wallFade: null,
     wbFull: false,

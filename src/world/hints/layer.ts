@@ -1,69 +1,65 @@
-// first-use-hints: puts a hint's ring and card at its anchor after each render (the only DOM part).
-// The layer is fixed over the viewport, so everything is in viewport px. The card is 300 px wide,
-// 14 px from the thing with its 10 px arrow, above it when there is room, else below, kept inside
-// the stage (onboarding-steps' coach mark sizes).
-import { COACH } from "@world/desktop/shell";
+// world-prompts R1: puts a room prompt's glow and pill at its target after each render (the only DOM
+// part). The layer is fixed over the viewport and takes no pointer events, so everything here is in
+// viewport px. The glow is the target's rect; the pill sits 10 px above it, centred; on a turn edge
+// it sits beside the edge, vertically centred. Both are kept inside the stage.
 import { EDGE_SHARE } from "./hints";
 
-/** Space kept between the ring and the thing it surrounds. */
-const RING_PAD = 4;
+/** The pill's distance from its target (spec: 10 px). */
+export const PROMPT_GAP = 10;
 
-type Box = { left: number; top: number; width: number; height: number };
+export type Box = { readonly left: number; readonly top: number; readonly width: number; readonly height: number };
 
 /** The live stage (never a motion copy). */
 const liveStage = (root: HTMLElement) => root.querySelector<HTMLElement>(":scope > .stage:not(.m-ghost):not(.m-backdrop)");
 
-/** The first matching element that is not inside a motion copy or a turn's wall. */
+/** The first matching element that is not inside a motion copy, a turn's wall or 调度中心. */
 function findAnchor(root: HTMLElement, selector: string): HTMLElement | null {
   for (const el of root.querySelectorAll<HTMLElement>(selector)) {
-    if (el.closest(".m-ghost, .m-backdrop, .m-turn, .hint-layer, .mc")) continue;
+    if (el.closest(".m-ghost, .m-backdrop, .m-turn, .prompt-layer, .mc")) continue;
     return el;
   }
   return null;
 }
 
-/** Where the card goes for a target box inside a bounding box: above when there is room. Pure. */
-export function placeCard(target: Box, bounds: Box, cardH: number): { left: number; top: number; below: boolean; arrowX: number } {
-  const cx = target.left + target.width / 2;
-  const gap = COACH.above;
-  const aboveTop = target.top - gap - cardH;
-  const below = aboveTop < bounds.top + COACH.margin;
-  const top = below ? target.top + target.height + gap : aboveTop;
-  const minL = bounds.left + COACH.margin;
-  const maxL = bounds.left + bounds.width - COACH.cardW - COACH.margin;
-  const left = Math.min(Math.max(cx - COACH.cardW / 2, minL), Math.max(minL, maxL));
-  const arrowX = Math.min(Math.max(cx - left, COACH.arrow + 6), COACH.cardW - COACH.arrow - 6);
-  return { left, top, below, arrowX };
+/** The turn edge's strip of the stage. Pure. */
+export function edgeBox(bounds: Box, side: "left" | "right"): Box {
+  const w = bounds.width * EDGE_SHARE;
+  return { left: side === "left" ? bounds.left : bounds.left + bounds.width - w, top: bounds.top, width: w, height: bounds.height };
 }
 
-export function placeHint(root: HTMLElement): void {
-  const layer = root.querySelector<HTMLElement>(":scope > .hint-layer");
+/**
+ * Where the pill goes (its top-left) for a target, kept inside the stage. Above it and centred; on a
+ * turn edge beside the edge (inside the stage), vertically centred. Pure.
+ */
+export function placePill(target: Box, bounds: Box, pill: { readonly w: number; readonly h: number }, edge: "left" | "right" | null): { left: number; top: number } {
+  const clampL = (l: number) => Math.min(Math.max(l, bounds.left), Math.max(bounds.left, bounds.left + bounds.width - pill.w));
+  const clampT = (t: number) => Math.min(Math.max(t, bounds.top), Math.max(bounds.top, bounds.top + bounds.height - pill.h));
+  if (edge) {
+    const left = edge === "right" ? target.left - PROMPT_GAP - pill.w : target.left + target.width + PROMPT_GAP;
+    return { left: clampL(left), top: clampT(target.top + target.height / 2 - pill.h / 2) };
+  }
+  return { left: clampL(target.left + target.width / 2 - pill.w / 2), top: clampT(target.top - PROMPT_GAP - pill.h) };
+}
+
+export function placePrompt(root: HTMLElement): void {
+  const layer = root.querySelector<HTMLElement>(":scope > .prompt-layer");
   if (!layer) return;
-  const stage = liveStage(root);
-  const sb = stage?.getBoundingClientRect();
+  const sb = liveStage(root)?.getBoundingClientRect();
   const win = root.ownerDocument.defaultView;
   const bounds: Box = sb && sb.width > 0 ? { left: sb.left, top: sb.top, width: sb.width, height: sb.height } : { left: 0, top: 0, width: win?.innerWidth ?? 1600, height: win?.innerHeight ?? 900 };
-  let target: Box | null = null;
-  const edge = layer.dataset.edge;
-  if (edge === "left" || edge === "right") {
-    const w = bounds.width * EDGE_SHARE;
-    target = { left: edge === "left" ? bounds.left : bounds.left + bounds.width - w, top: bounds.top, width: w, height: bounds.height };
-  } else if (layer.dataset.anchor) {
+  const edge = layer.dataset.edge === "left" || layer.dataset.edge === "right" ? layer.dataset.edge : null;
+  let target: Box | null = edge ? edgeBox(bounds, edge) : null;
+  if (!edge && layer.dataset.anchor) {
     const r = findAnchor(root, layer.dataset.anchor)?.getBoundingClientRect();
     if (r) target = { left: r.left, top: r.top, width: r.width, height: r.height };
   }
-  // No anchor found (it left the page): the card waits in the middle, no ring.
-  const t = target ?? { left: bounds.left + bounds.width / 2, top: bounds.top + bounds.height / 2, width: 0, height: 0 };
-  const ring = layer.querySelector<HTMLElement>(".hint-ring");
-  if (ring) {
-    Object.assign(ring.style, { left: `${t.left - RING_PAD}px`, top: `${t.top - RING_PAD}px`, width: `${t.width + 2 * RING_PAD}px`, height: `${t.height + 2 * RING_PAD}px` });
-    ring.classList.toggle("none", target === null);
-  }
-  const card = layer.querySelector<HTMLElement>(".hint-card");
-  if (!card) return;
-  const ringBox = target ? { left: t.left - RING_PAD, top: t.top - RING_PAD, width: t.width + 2 * RING_PAD, height: t.height + 2 * RING_PAD } : t;
-  const p = placeCard(ringBox, bounds, card.offsetHeight || 0);
-  Object.assign(card.style, { left: `${p.left}px`, top: `${p.top}px` });
-  card.style.setProperty("--arrow-x", `${p.arrowX}px`);
-  card.classList.toggle("below", p.below);
+  // The target left the page (a move in progress): nothing to show until the next render.
+  layer.classList.toggle("lost", target === null);
+  if (!target) return;
+  const glow = layer.querySelector<HTMLElement>(".prompt-glow");
+  if (glow) Object.assign(glow.style, { left: `${target.left}px`, top: `${target.top}px`, width: `${target.width}px`, height: `${target.height}px` });
+  const pill = layer.querySelector<HTMLElement>(".prompt-pill");
+  if (!pill) return;
+  const p = placePill(target, bounds, { w: pill.offsetWidth || 0, h: pill.offsetHeight || 0 }, edge);
+  Object.assign(pill.style, { left: `${p.left}px`, top: `${p.top}px` });
 }

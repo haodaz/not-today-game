@@ -317,10 +317,10 @@ describe("R6 · Kuro in the room: one box, and not only the idiom", () => {
     r.act("loop-advance");
     out = r.out();
     expect(boxes(out)).toBe(1);
-    expect(out).toContain('class="dlg player');
-    expect(out).toContain("player-portrait");
-    expect(out).not.toContain("kuro-portrait");
-    expect(out).toContain(`data-action="kuro-q" data-q="1">${escapeHtml(day.starters[0]!.zh)}</button>`);
+    // world-prompts R2 (supersedes R6's player box): the box keeps Kuro's line and portrait; the
+    // player's options are the column on the right.
+    expect(out).toContain("kuro-portrait");
+    expect(out).toMatch(new RegExp(`data-action="kuro-q" data-q="1"[^>]*><i class="dc-ic ask"[\\s\\S]*?</i><span class="dc-l">${escapeHtml(day.starters[0]!.zh)}</span></button>`));
     r.act("kuro-q", { q: "1" });
     out = r.out();
     expect(boxes(out)).toBe(1);
@@ -330,7 +330,7 @@ describe("R6 · Kuro in the room: one box, and not only the idiom", () => {
     expect(r.store.getEvents().find((e) => e.kind === "chat")).toMatchObject({ q: 1, answer });
     // Read on: the player's turn again, the asked question gone.
     r.act("loop-advance");
-    expect(r.out()).toContain('class="dlg player');
+    expect(r.out()).toContain('data-action="kuro-more"');
     expect(r.out()).not.toContain('data-q="1"');
   });
 });

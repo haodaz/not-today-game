@@ -98,7 +98,7 @@ describe("the online path (FR3), with a mocked function", () => {
     talk(ctx);
     act(ctx, "kuro-q", { q: "1" });
     expect(box(ctx)).toContain(`>${WAITING}</button>`);
-    expect(box(ctx)).not.toContain('class="dlg player');
+    expect(box(ctx)).not.toContain('data-action="kuro-more"');
     await flush();
     const ev = store.getEvents().find((e) => e.kind === "chat")!;
     expect(ev).toMatchObject({ q: 1, answer: "You noticed. Most people don't, {login}.", offline: false });
@@ -108,10 +108,10 @@ describe("the online path (FR3), with a mocked function", () => {
     const shown = box(ctx);
     expect([...decay("You noticed. Most people don't, 林一.", 5)].length).toBe([..."You noticed. Most people don't, 林一."].length);
     expect(shown).toContain(escapeHtml(decay("You noticed. Most people don't, 林一.", 5)));
-    // playtest-1105 R6: the reply read on, the same box is the player's turn.
-    expect(shown).not.toContain('class="dlg player');
+    // playtest-1105 R6: the reply read on, the player's turn (world-prompts R2: its options in the column).
+    expect(shown).not.toContain('data-action="kuro-more"');
     act(ctx, "loop-advance");
-    expect(box(ctx)).toContain('class="dlg player');
+    expect(box(ctx)).toContain('data-action="kuro-more"');
   });
 
   it("any failure (timeout, refusal, network) → the scripted answer, logged offline; Kuro never breaks", async () => {
@@ -123,7 +123,7 @@ describe("the online path (FR3), with a mocked function", () => {
     await flush();
     expect(store.getEvents().find((e) => e.kind === "chat")).toMatchObject({ q: 2, answer: offlineAnswer(kuroDay(1)!, 2), offline: true });
     act(ctx, "loop-advance");
-    expect(box(ctx)).toContain('class="dlg player');
+    expect(box(ctx)).toContain('data-action="kuro-more"');
   });
 
   it("the function says bedtime: the bedtime line, no turn logged, no player's box", async () => {
@@ -135,7 +135,7 @@ describe("the online path (FR3), with a mocked function", () => {
     await flush();
     expect(store.getEvents().some((e) => e.kind === "chat")).toBe(false);
     act(ctx, "loop-advance");
-    expect(box(ctx)).not.toContain('class="dlg player');
+    expect(box(ctx)).not.toContain('data-action="kuro-more"');
   });
 
   it("property: the sixth turn is always blocked on the client, online or not", () => {

@@ -28,9 +28,8 @@ export const MASK_ALLOWS: ReadonlySet<string> = new Set([
   "settings-email-send",
   "settings-lang",
   "settings-home",
-  // first-use-hints: the hints' switch in the settings, and a hint's 知道了.
+  // first-use-hints: the hints' switch in the settings.
   "hints-set",
-  "hint-ok",
   // onboarding-steps R1: the coach card's own controls (it holds the screen until skipped or done).
   "onboard-next",
   "onboard-skip",

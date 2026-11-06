@@ -138,18 +138,23 @@ export function lineBoxModel(state: State, events: readonly GameEvent[], session
   const kind = line?.k === "inner" ? "inner" : line?.k === "sfx" ? "sfx" : "line";
   const tag: BoxTag =
     head.voice === "kuro" ? { kind: "kuro" } : !line || kind !== "line" ? null : line.k === "speaker" ? { kind: "who", text: speakerLabel(line.who ?? "", fill) } : placeTag(state, session);
-  const choices = scr.choices.map((i): BoxChoice => {
+  // world-prompts R2: on the choices the box keeps the line's last page of text; every choice (all
+  // their pages at once) goes to the column on the right, in content order.
+  const onChoices = scr.choices.length > 0;
+  const textScr = onChoices ? at.all.slice(0, at.page + 1).reverse().find((s) => s.text) : scr;
+  const indices = onChoices ? at.all.flatMap((s) => s.choices) : [];
+  const choices = indices.map((i): BoxChoice => {
     const c = show.choices![i]!;
     return { index: c.index, choice: c.choice, label: c.text !== null ? fill(c.text) : t(c.labelKey!) };
   });
-  const mk = marker(at.all, at.page);
+  const mk = onChoices ? null : marker(at.all, at.page);
   return {
     kind,
     tag,
-    text: scr.text,
+    text: textScr?.text ?? "",
     choices,
     marker: mk,
-    markerClickable: scr.choices.length > 0 && mk === "more",
+    markerClickable: false,
     screen: at.page,
     count: at.all.length,
     portrait: head.voice === "kuro" ? portraitState(state, events, session, nowMs) : null,
@@ -183,14 +188,16 @@ const playerPortraitOf = (src: string): SafeHtml => html`<img class="player-port
 
 const historyChip = (): SafeHtml => html`<button type="button" class="hist" data-action="dlg-history" aria-haspopup="dialog" aria-label="${t("dialogue.history")}">↺</button>`;
 
-export function renderLineBox(m: LineBoxModel): SafeHtml {
-  // The whole text area reads on (a click completes a line still appearing first, polish FR3).
-  const txt = m.text || !m.choices.length ? html`<button type="button" class="txt" data-action="loop-advance">${m.face ? inFace(m.face, m.text) : m.text}</button>` : null;
-  const buttons = m.choices.map(
-    (c) => html`<button type="button" data-action="loop-choice" data-index="${c.index}"${c.choice ? html` data-choice="${c.choice}"` : null}>${c.label}</button>`,
-  );
+/**
+ * The box itself. `waits`: choices are up (in the column, world-prompts R2), so the text does not
+ * read on; it only shows the speaker's last line.
+ */
+export function renderLineBox(m: LineBoxModel, waits = m.choices.length > 0): SafeHtml {
+  // The whole text area reads on (a click completes a line still appearing first, polish FR3); not while choices are up.
+  const body = m.face ? inFace(m.face, m.text) : m.text;
+  const txt = waits ? (m.text ? html`<div class="txt">${body}</div>` : null) : html`<button type="button" class="txt" data-action="loop-advance">${body}</button>`;
   const glyph = m.marker === "more" ? "▼" : "▶";
-  const mk = !m.marker
+  const mk = !m.marker || waits
     ? null
     : m.markerClickable
       ? html`<button type="button" class="more" data-action="loop-advance">${glyph}</button>`
@@ -199,7 +206,7 @@ export function renderLineBox(m: LineBoxModel): SafeHtml {
   const tag = tagOf(m.tag);
   const me = !m.portrait && m.playerPortrait !== null;
   const hasNpc = !m.portrait && !me && m.npcPortrait !== null;
-  const c = cls("dlg", m.kind !== "line" && m.kind, tag && "tagged", m.tag?.kind === "kuro" && "kuro", me && "me", hasNpc && "npc", m.choices.length > 0 && "has-choices");
+  const c = cls("dlg", m.kind !== "line" && m.kind, tag && "tagged", m.tag?.kind === "kuro" && "kuro", me && "me", hasNpc && "npc", waits && "has-choices");
   // One portrait at most: Kuro's for its lines, NPC's for a speaker line, player's for an inner line.
   const portrait = m.portrait
     ? portraitOf(m.portrait, m.red)
@@ -209,28 +216,57 @@ export function renderLineBox(m: LineBoxModel): SafeHtml {
         ? playerPortraitOf(m.playerPortrait!)
         : null;
   // The tag strip on the top edge: the name tag, then ↺ right after it (alone when there is no tag).
-  return html`<div class="${c}" data-screen="${m.screen + 1}/${m.count}"><div class="tagbar">${tag}${historyChip()}</div>${txt}${m.choices.length ? html`<div class="${cls("choices", m.pointer)}">${buttons}</div>` : null}${mk}${portrait}</div>`;
+  return html`<div class="${c}" data-screen="${m.screen + 1}/${m.count}"><div class="tagbar">${tag}${historyChip()}</div>${txt}${mk}${portrait}</div>`;
+}
+
+// ——— the choices column (world-prompts R2) ———————————————————————————————————————————————
+
+/** A row's icon: ◇ a plain choice, a speech bubble Kuro's starters, a pencil 说点别的…. */
+export type RowIcon = "plain" | "ask" | "more";
+export interface ChoiceRow {
+  readonly action: string;
+  /** Its data attributes (without `data-`). */
+  readonly data: Readonly<Record<string, string>>;
+  readonly label: string;
+  readonly icon: RowIcon;
+  /** 说点别的… chosen: the row is the text field, in place (its draft). */
+  readonly field?: { readonly draft: string };
+}
+
+const ICON: Readonly<Record<RowIcon, SafeHtml>> = {
+  plain: html`<i class="dc-ic plain" aria-hidden="true">◇</i>`,
+  ask: html`<i class="dc-ic ask" aria-hidden="true"><svg viewBox="0 0 14 14" width="14" height="14"><path d="M2 2.5h10a1 1 0 0 1 1 1v5.5a1 1 0 0 1-1 1H6.2L3.4 12.3V10H2a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg></i>`,
+  more: html`<i class="dc-ic more" aria-hidden="true"><svg viewBox="0 0 14 14" width="14" height="14"><path d="M9.6 1.9l2.5 2.5-7.4 7.4-3.1.6.6-3.1z M8.4 3.1l2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg></i>`,
+};
+
+/** The content's choices as rows (◇ each), in content order. */
+export function lineRows(m: LineBoxModel): ChoiceRow[] {
+  return m.choices.map((c) => ({ action: "loop-choice", data: { index: String(c.index), ...(c.choice ? { choice: c.choice } : {}) }, label: c.label, icon: "plain" }));
+}
+
+/** The player's options in a talk with Kuro as rows: the starters (speech bubble), 说点别的… (pencil; the field once chosen), 好。 (◇). */
+export function playerRows(p: PlayerBoxModel): ChoiceRow[] {
+  return p.options.map((o): ChoiceRow => {
+    if (o.action === "kuro-more") return { action: o.action, data: {}, label: o.label, icon: "more", ...(p.mode === "input" ? { field: { draft: p.draft } } : {}) };
+    return { action: o.action, data: o.q !== undefined ? { q: String(o.q) } : {}, label: o.label, icon: o.action === "kuro-q" ? "ask" : "plain" };
+  });
 }
 
 /**
- * The player's turn in a talk with Kuro (playtest-1105 R6): the same one box as every line, now
- * the player's: their name tag, their portrait in Kuro's slot (`portrait`, or none), the starter
- * questions as the box's choices (▼ pages them), or one text input (Enter sends).
+ * The column on the right of the stage (world-prompts R2): the rows stacked upward from just above
+ * the box, the first option on top. Each row is a button (↑ ↓ move between them, Enter / Space or
+ * 1–9 choose: the controller's keys); 说点别的…'s row is the text field once chosen.
  */
-export function renderPlayerBox(p: PlayerBoxModel, portrait: string | null = null): SafeHtml {
-  const tag = p.name ? html`<span class="who tag p">${p.name}</span>` : null;
-  const tagbar = html`<div class="tagbar">${tag}${historyChip()}</div>`;
-  const face = portrait ? playerPortraitOf(portrait) : null;
-  if (p.mode === "input") {
-    return html`<div class="${cls("dlg", "player", "input", tag && "tagged", face && "me")}" data-mode="input">${tagbar}<input class="kuro-in" type="text" data-input="kuro-text" data-focus="kuro-text" data-enter="kuro-send" maxlength="500" value="${p.draft}" aria-label="${t("dialogue.more")}" autocomplete="off" spellcheck="false">${face}</div>`;
-  }
-  const scr = p.screens[p.page];
-  const buttons = (scr?.choices ?? []).map((i) => {
-    const o = p.options[i]!;
-    return html`<button type="button" data-action="${o.action}"${o.q !== undefined ? html` data-q="${o.q}"` : null}>${o.label}</button>`;
+export function renderChoiceColumn(rows: readonly ChoiceRow[], pointer: string | false = false): SafeHtml | null {
+  if (!rows.length) return null;
+  const items = rows.map((r, i) => {
+    if (r.field) {
+      return html`<div class="dc-row dc-field">${ICON[r.icon]}<input class="kuro-in" type="text" data-input="kuro-text" data-focus="kuro-text" data-enter="kuro-send" maxlength="500" value="${r.field.draft}" aria-label="${r.label}" placeholder="${r.label}" autocomplete="off" spellcheck="false"></div>`;
+    }
+    const attrs = Object.entries(r.data).map(([k, v]) => html` data-${k}="${v}"`);
+    return html`<button type="button" class="dc-row" data-action="${r.action}"${attrs} data-focus="dc-${i}" data-n="${i + 1}">${ICON[r.icon]}<span class="dc-l">${r.label}</span></button>`;
   });
-  const more = choiceScreens(p.screens).length > 1 ? html`<button type="button" class="more" data-action="kuro-page">▼</button>` : null;
-  return html`<div class="${cls("dlg", "player", tag && "tagged", face && "me", "has-choices")}" data-mode="choices" data-screen="${p.page + 1}/${p.screens.length}">${tagbar}<div class="choices">${buttons}</div>${more}${face}</div>`;
+  return html`<div class="${cls("dlg-choices", pointer)}" role="group">${items}</div>`;
 }
 
 /**
@@ -249,7 +285,9 @@ export function dialogueBox(state: State, events: readonly GameEvent[], session:
   const player = playerBox(state, events, session);
   const hist = session.historyOpen ? renderHistory(historyEntries(session, state)) : null;
   if (!line && !player && !hist) return null;
-  // playtest-1105 R6: one box. On the player's turn it is theirs (Kuro's line has been read).
-  const own = player ? renderPlayerBox(player, playerPortraitSrc(state.names.pronoun, isDreamNight(state.day, session.clock.beat))) : null;
-  return html`${own ?? (line ? renderLineBox(line) : null)}${hist}`;
+  // world-prompts R2: the box keeps the speaker's last line, name and portrait; the choices (the
+  // content's, or the player's on their turn with Kuro) are the column on the right.
+  const rows = player ? playerRows(player) : line ? lineRows(line) : [];
+  const box = line ? renderLineBox(line, rows.length > 0) : null;
+  return html`${box}${renderChoiceColumn(rows, line?.pointer ?? false)}${hist}`;
 }
