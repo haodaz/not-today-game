@@ -67,26 +67,31 @@
         },
         {
           "k": "narration",
-          "t": "You close your eyes. Something digs into your hip."
+          "t": "You close your eyes. Something in your hand, a black shell, a little smaller than your palm."
         },
         {
           "k": "narration",
-          "t": "The last term of primary school. Half the street wore one of these on their belt. Yours was your father's old one: black, a one-line screen.",
-          "backdrop": "/room/dream/classroom.jpg"
+          "t": "The last term of primary school. Evening; your father comes home from work, unclips the pager from his belt and puts it in your hand.",
+          "backdrop": "/room/dream/home_dinner.jpg"
         },
         {
           "k": "speaker",
-          "who": "阿凯",
-          "t": "No way. You've got a pager too? I'll page you!"
+          "who": "father",
+          "t": "Go on, play. Not that key."
         },
         {
           "k": "narration",
-          "t": "The bell goes and Kai runs for the phone at the gatehouse. You sit at your desk and wait."
+          "t": "You press the other keys. The screen scrolls back a line at a time, all digits, all for him."
         },
         {
           "k": "speaker",
-          "who": "传呼台",
-          "t": "Paging service, go ahead. ... Right, sending it now."
+          "who": "family",
+          "t": "Dinner. Don't break it."
+        },
+        {
+          "k": "speaker",
+          "who": "father",
+          "t": "Can't break it. It just takes numbers."
         },
         {
           "k": "sfx",
@@ -96,44 +101,43 @@
         {
           "k": "speaker",
           "who": "寻呼机",
-          "t": "0.7734"
-        },
-        {
-          "k": "speaker",
-          "who": "小满",
-          "t": "Turn it upside down! hELLO!"
-        },
-        {
-          "k": "speaker",
-          "who": "阿凯",
-          "t": "Wait, wait, one more..."
-        },
-        {
-          "k": "sfx",
-          "t": "Bzzz.",
-          "sfx": "pager-buzz"
-        },
-        {
-          "k": "speaker",
-          "who": "寻呼机",
-          "t": "5201314"
-        },
-        {
-          "k": "speaker",
-          "who": "小满",
-          "t": "Who sent that one? Go on, answer it."
+          "t": "3306"
         },
         {
           "k": "narration",
-          "t": "You can't. It only receives. To answer, you queue for the gatehouse phone."
+          "t": "A string of digits, out of nowhere. You hold it up, and before you've said a word his hand is already out."
+        },
+        {
+          "k": "speaker",
+          "who": "father",
+          "t": "Give it here."
         },
         {
           "k": "narration",
-          "t": "By the time it's your turn, there's nobody on the other end."
+          "t": "One look. Chopsticks down, keys picked up."
+        },
+        {
+          "k": "speaker",
+          "who": "father",
+          "t": "I'll go down and make a call."
+        },
+        {
+          "k": "speaker",
+          "who": "family",
+          "t": "Come back up and eat after."
+        },
+        {
+          "k": "narration",
+          "t": "There was a payphone at the shop downstairs. Sometimes he made the call and came back up, the food still warm. Sometimes he made the call and walked straight out from there."
+        },
+        {
+          "k": "speaker",
+          "who": "family",
+          "t": "Go to sleep. Your dad's not coming home tonight."
         },
         {
           "k": "inner",
-          "t": "Receives, never sends. That never changed."
+          "t": "What those digits said, I never once understood. It only receives. Who is on the other end, it doesn't say."
         },
         {
           "k": "narration",
