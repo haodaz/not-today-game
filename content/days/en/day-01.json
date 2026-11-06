@@ -79,6 +79,10 @@
         },
         {
           "k": "narration",
+          "t": "In the dream you remember: this one is yours. A knock-off of a knock-off, bought at a street stall, one chick and nothing else. You treasured it."
+        },
+        {
+          "k": "narration",
           "t": "The tail end of summer; the fan chops the light into bright and dark. First week of school, second lesson, test papers handed back.",
           "backdrop": "/room/dream/classroom.jpg"
         },
@@ -153,6 +157,14 @@
         {
           "k": "inner",
           "t": "It was taken. I did not stop feeding it."
+        },
+        {
+          "k": "narration",
+          "t": "Later you pressed the little hole on the back. Nothing. It stayed a grave."
+        },
+        {
+          "k": "narration",
+          "t": "For a long time, whenever the battery was nearly gone, you put in a new one. Thinking that one day the chick would come back."
         },
         {
           "k": "narration",

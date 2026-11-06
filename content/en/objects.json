@@ -3,14 +3,14 @@
   "objects": {
     "chick": {
       "day": 1,
-      "q": "You know what this is, but it takes a second to remember what it is called.",
+      "q": "A yellow shell, half transparent, three keys, a little screen.",
       "options": [
         {
-          "t": "A kitchen timer",
+          "t": "A timer",
           "right": false
         },
         {
-          "t": "A knock-off Tamagotchi that only raises one chick",
+          "t": "A virtual pet",
           "right": true
         },
         {
@@ -20,13 +20,13 @@
       ],
       "right": {
         "say": [
-          "You know it. Around 1997 the real one was called Tamagotchi. Yours is not: the shell says TAMAGOTCHICK, a knock-off of a knock-off, bought at a street stall. One chick only, and when it dies it is a grave."
+          "A virtual pet. Tamagotchi was the thing back then; every kid wanted one. This one looks like a knock-off: the shell says 'Tamagotchy'."
         ],
-        "inner": "Thirty years. It is still a grave."
+        "inner": "What kind of blind box has one of these... It looks a little familiar."
       },
       "wrong": {
         "say": [
-          "You cannot say. The shell is yellow, half transparent, three keys, a small screen. That piece of memory is blurred, like someone's back seen through frosted glass."
+          "You can't say. That patch of memory is blurred, like someone's back seen through frosted glass."
         ],
         "inner": "Look again tomorrow."
       },
@@ -70,14 +70,14 @@
     },
     "camera": {
       "day": 2,
-      "q": "Hard. An instant camera, cream-white, a red shutter.",
+      "q": "Hard. An instant camera, cream white, a red shutter.",
       "options": [
         {
           "t": "A toy camera",
           "right": false
         },
         {
-          "t": "The one you took along the year primary school was ending",
+          "t": "An instant camera",
           "right": true
         },
         {
@@ -87,27 +87,27 @@
       ],
       "right": {
         "say": [
-          "The one I took along the year primary school was ending. Everyone came to me to have their picture taken."
+          "An instant camera. Press, a sheet slides out, and you wait for it to come up on its own."
         ],
-        "inner": "None of them have me in it."
+        "inner": "I had one of these as a kid. ...This one. Is it that one?"
       },
       "wrong": {
         "say": [
-          "An old camera. Press, and out comes a white sheet."
+          "An old camera. Press, and a blank sheet slides out."
         ],
-        "inner": "You have to wait."
+        "inner": "You wait."
       }
     },
     "pager": {
       "day": 3,
-      "q": "You know what this is, but it takes a second to remember what it is called.",
+      "q": "You know what this is, but it takes a second to remember the name.",
       "options": [
         {
           "t": "A broken phone",
           "right": false
         },
         {
-          "t": "A pager: it receives, it never sends",
+          "t": "A pager",
           "right": true
         },
         {
@@ -117,13 +117,14 @@
       ],
       "right": {
         "say": [
-          "You know it. The year before you left primary school the whole street wore these on their belts. Someone who wanted you called the paging desk, gave your number, and it beeped once at your waist. It receives. It never sends."
+          "A pager. Back then half the street wore one on their belt. Someone wants you, they call the paging service, and it beeps on your hip. Receives, never sends.",
+          "The chick, the camera, the pager. Everything in this box is something I once had. One at a time, in order of the years."
         ],
-        "inner": "Receives, never sends. Same as me now."
+        "inner": "My hands are a little cold. And I still want to see the next one. If it's a surprise from the family... I can't think of a single one of them who would do this."
       },
       "wrong": {
         "say": [
-          "You look at it a while. Like a phone and not like one: no earpiece, no dial, only a narrow screen. You cannot place it, and you do not try very hard."
+          "You look at it for a while. Like a phone, and not: no earpiece, no dial, only a narrow screen. You can't recall, and you don't try very hard."
         ],
         "inner": "Look again tomorrow."
       },
