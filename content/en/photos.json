@@ -77,7 +77,7 @@
       "day": 5,
       "facing": "bed",
       "add": {
-        "text": "A letter by the pillow, in your handwriting, not written like you.",
+        "text": "A small parchment scroll by the pillow, in your handwriting, not written like you.",
         "overlay": "/room/photos/d05_bed.jpg"
       }
     },
