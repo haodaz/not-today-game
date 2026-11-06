@@ -3,7 +3,8 @@
 // day's idiom and the player's box (starter questions, 说点别的…; Esc leaves); each turn appends a `chat`
 // event and Kuro answers with its constant offline answer. Five turns a day; a sixth attempt gets
 // the bedtime line and the player's box does not come back that day. During work beats it says the
-// idiom and the player can only say 好。. Every line here is content or a string.
+// idiom and the player can only say 好。. While today's chat is still locked (playtest-1105 R6) a
+// click is only kuro.room.notYet. Every line here is content or a string.
 import type { SayLine } from "@state/days/table";
 import { CHAT_TEXT_MAX, type GameEvent } from "@state/events";
 import type { State } from "@state/types.gen";
@@ -17,6 +18,7 @@ import type { Session } from "@world/desktop/model";
 import { getLocale, hasString, t } from "@world/i18n";
 import { finishChoice, leaveKuro, push, replaceHead, talking, type Ending, type Queued } from "@world/loop/dialogue";
 import { stepOnce } from "@world/loop/steps";
+import { itemStates, loopContext } from "@world/loop/checklist";
 import { fillPlaceholders } from "@world/replies/placeholders";
 import { logCurrent, logPlayer } from "./history";
 import { kuroOnline } from "@net/supabase";
@@ -24,7 +26,8 @@ import { decay } from "@world/desktop/kuro/decay";
 import { toLogEvents } from "@world/desktop/kuro/scorer";
 import { stageOf } from "@state/stages";
 import { pointed } from "@world/room/pointer";
-import { fontPx, KURO_LINE_BOX, nextScreen, PLAYER_BOX, screens, type Screen } from "./layout";
+import { fontPx, KURO_LINE_BOX, nextScreen, PLAYER_BOX, screens, type BoxGeom, type Screen } from "./layout";
+import { kuroVoice } from "@world/desktop/kuro/voice";
 import { bucketAllows, bucketOf } from "@kuro/variable.ts";
 import type { Bucket, Taboo } from "@kuro/types.ts";
 import { BLUR_MS, chatClosedByErrors, errorCount, ERRORS_AFTER_MS, FLASH_MS, tabooUsedToday } from "./taboo";
@@ -68,11 +71,26 @@ export function startTalk(ctx: ActionContext): void {
     const object = offer.kind === "final" ? FINAL : offer.object;
     d = push(d, item(session, state.day, offer.line, { kind: "kuroOffer", object, decline: offer.kind }));
   }
-  d = push(d, item(session, state.day, t("kuro.ask"), { kind: "kuroAsk" }));
+  // playtest-1105 R6: while today's chat is locked (its checklist item opens after the work), a
+  // click is its one line, kuro.room.notYet, with nothing to answer (after the offer, if one waits).
+  // (The night beat comes after shutdown, so the chat beat is never locked.)
+  const locked = !chatBeatNow(session) && chatLocked(state, store.getEvents());
+  d = push(d, item(session, state.day, t(locked ? "kuro.room.notYet" : "kuro.ask"), locked ? { kind: "none" } : { kind: "kuroAsk" }));
   session.dialogue = d;
   session.kuroInput = false;
   session.playerPage = 0;
   markRead(ctx);
+}
+
+/**
+ * playtest-1105 R6: today's chat is not open yet: the day has a chat item (content/days `chat`,
+ * unlocked by the work, `done:shutdown`) and it is still locked. A day without one is never locked.
+ */
+export function chatLocked(state: State, events: readonly GameEvent[]): boolean {
+  const lc = loopContext(state, events);
+  const chat = lc?.file.items.find((it) => it.done.kind === "event" && it.done.event.type === "chat");
+  if (!lc || !chat) return false;
+  return !itemStates(lc).get(chat.id)!.unlocked;
 }
 
 /** The bedtime line in Kuro's box; the player's box does not appear again today. */
@@ -298,13 +316,13 @@ export function playerBox(state: State, events: readonly GameEvent[], session: S
   if (!head || head.ending.kind !== "kuroTurn" || d.line < head.lines.length - 1) return null;
   if (session.kuroBedDay === state.day || chatClosedByErrors(events, state.day)) return null;
   const px = fontPx(getLocale());
-  const line = head.lines[head.lines.length - 1];
-  const lineScreens = screens(line ? fillPlaceholders(line.t, state.names) : null, null, KURO_LINE_BOX, px).length;
-  if ((d.page ?? 0) < lineScreens - 1) return null;
+  // playtest-1105 R6: the player's turn is the box's next screen, after Kuro's line has been read
+  // (one page past its last), in the same box: the player's tag and portrait, the options as choices.
+  if ((d.page ?? 0) < kuroLineScreens(state, head)) return null;
   const name = state.names.login.trim();
   if (head.ending.mode === "work") {
     const options: PlayerOption[] = [{ action: "kuro-leave", label: t("dialogue.ok") }];
-    return { name, mode: "choices", options, screens: screens(null, options.map((o) => o.label), PLAYER_BOX, px), page: 0, draft: "" };
+    return { name, mode: "choices", options, screens: screens(null, options.map((o) => o.label), PLAYER_TURN_BOX, px), page: 0, draft: "" };
   }
   if (session.kuroInput) return { name, mode: "input", options: [], screens: [], page: 0, draft: session.kuroDraft };
   const asked = askedToday(events, state.day);
@@ -316,8 +334,41 @@ export function playerBox(state: State, events: readonly GameEvent[], session: S
     ...starters.map((s): PlayerOption => ({ action: "kuro-q", q: s.n, label: starterText(s) })),
     { action: "kuro-more", label: t("dialogue.more") },
   ];
-  const all = screens(null, options.map((o) => o.label), PLAYER_BOX, px);
+  const all = screens(null, options.map((o) => o.label), PLAYER_TURN_BOX, px);
   return { name, mode: "choices", options, screens: all, page: Math.min(session.playerPage, all.length - 1), draft: "" };
+}
+
+/**
+ * The player's turn is drawn in the line box (playtest-1105 R6), the player's portrait in Kuro's
+ * slot: the line box's width and right padding, and the old player's box's rows (four starters and
+ * 说点别的… on one page, one row each, ellipsed if they must be).
+ */
+const PLAYER_TURN_BOX: BoxGeom = { ...PLAYER_BOX, width: KURO_LINE_BOX.width, padRight: KURO_LINE_BOX.padRight };
+
+/**
+ * How many screens Kuro's turn line takes in the box (as box.ts `lineScreens` pages it: filled, the
+ * face marker stripped, laid out left of the portrait). The player's turn is the screen after them.
+ */
+export function kuroLineScreens(state: State, head: Queued): number {
+  const line = head.lines[head.lines.length - 1];
+  if (!line) return 1;
+  const filled = fillPlaceholders(line.t, state.names);
+  const text = line.k === "speaker" ? kuroVoice(state.day, filled).text : filled;
+  return screens(text, null, KURO_LINE_BOX, fontPx(getLocale())).length;
+}
+
+/**
+ * playtest-1105 R6: Kuro's turn line has been read on its last screen: the box goes on to the
+ * player's turn (one page past it). False when the head is not such a line, or it is already past.
+ */
+export function readOnToPlayer(state: State, session: Session): boolean {
+  const d = session.dialogue;
+  const head = d.queue[0];
+  if (!head || head.ending.kind !== "kuroTurn" || d.line < head.lines.length - 1) return false;
+  const n = kuroLineScreens(state, head);
+  if ((d.page ?? 0) !== n - 1) return false;
+  session.dialogue = { ...d, page: n };
+  return true;
 }
 
 export const kuroActions: Record<string, ActionHandler> = {

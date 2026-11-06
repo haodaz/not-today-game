@@ -27,6 +27,6 @@ html[lang="en"]{--font-game-text:var(--font-en-text);--font-game-ui:var(--font-e
 .room{--font:var(--font-game-ui)}
 .title-page,.ending-page,.settings,.settings-btn,.hud-br,.back-room,.book-close,.figure .fig-chip{font-family:var(--font-game-ui)}
 /* Dialogue, the door beat, choices, credits: the text face. */
-.room .dlg,.dlg-layer .dlg,.room .dlg-player,.dlg-layer .dlg-player,.dlg-hist,.room .choices button,.dlg-layer .choices button,.room .door-beat,.credits,.you-page .bub,.day-19 .dlg,.first-day p{font-family:var(--font-game-text)}
+.room .dlg,.dlg-layer .dlg,.dlg-hist,.room .choices button,.dlg-layer .choices button,.room .door-beat,.credits,.you-page .bub,.day-19 .dlg,.first-day p{font-family:var(--font-game-text)}
 /* The title and the stage header numbers. */
 .title-name,.room .day b{font-family:var(--font-title);font-weight:700;letter-spacing:.12em}

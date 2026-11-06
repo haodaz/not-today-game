@@ -31,6 +31,10 @@ export interface TitleDeps {
   readonly voice?: "m" | "f";
   /** The Kurogotchi's cross-run memory (object-drawer 3): read on open, written after every change. */
   readonly kuroMemory?: KuroMemoryStore;
+  /** playtest-1105 R8: 重新开始这一局, confirmed: clear the run save and show the title again. */
+  readonly onRestart?: () => void;
+  /** playtest-1105 R8: 清除全部记录, confirmed: clear the run and the profile and show the title again. */
+  readonly onClearAll?: () => void;
 }
 
 const STAGE = { w: 1600, h: 900 };
@@ -74,7 +78,10 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
   // silence. `rainOn` is the waiting room's pause, `rainVol` the quiet / louder level (FR7).
   let rainOn = true;
   let rainVol = RAIN.low;
-  const sound = () => deps.sound?.apply(titlePlan(rainOn ? rainVol : null, { voice: deps.voice, lang: getLocale() }));
+  // playtest-1105 R9: the sung theme only once a run has been finished (the profile's count).
+  // The walkman in 老物件 plays the sung theme whatever the count (`walkmanOn` while it plays).
+  let walkmanOn = false;
+  const sound = () => deps.sound?.apply(titlePlan(rainOn ? rainVol : null, { voice: deps.voice, lang: getLocale(), finishedRuns: deps.collection.finishedRuns, walkman: walkmanOn }));
   const rainVolume = (v: number) => {
     rainVol = v;
     sound();
@@ -165,6 +172,7 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
   let drawerObj: DrawerObject | null = null;
   let kuroObj: KuroDrawerObject | null = null;
   const closeDrawerObject = () => {
+    walkmanOn = false;
     drawerObj?.destroy();
     drawerObj = null;
     kuroObj?.destroy();
@@ -184,10 +192,12 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     drawerObj = createDrawerObject(id, root, {
       themePlay: () => {
         rainOn = false;
+        walkmanOn = true;
         sound();
       },
       themeStop: () => {
         rainOn = true;
+        walkmanOn = false;
         sound();
       },
       muted: () => model.muted,
@@ -264,7 +274,17 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     },
     "title-continue": () => deps.onContinue(),
     "title-settings": () => set({ ...model, settingsOpen: true }),
-    "settings-close": () => set({ ...model, settingsOpen: false }),
+    "settings-close": () => set({ ...model, settingsOpen: false, settingsConfirm: null }),
+    // playtest-1105 R8: each asks first; 确定 runs the host's (main.ts) and comes back to the title.
+    "settings-restart": () => set({ ...model, settingsConfirm: "restart" }),
+    "settings-clear-all": () => set({ ...model, settingsConfirm: "clearAll" }),
+    "settings-confirm-cancel": () => set({ ...model, settingsConfirm: null }),
+    "settings-confirm": (el) => {
+      const what = el.dataset.what;
+      if (!what || what !== model.settingsConfirm) return;
+      if (what === "restart") deps.onRestart?.();
+      else deps.onClearAll?.();
+    },
     // 绑定邮箱 (backend FR1): the same row as in the game; the link returns to this origin.
     "settings-email-send": () => void sendEmailLink(win.location.origin, render),
     "settings-lang": (el) => {
@@ -353,7 +373,8 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
   const onKey = (e: KeyboardEvent) => {
     if (model.starting || model.moving) return;
     if (e.key === "Escape") {
-      if (model.settingsOpen) set({ ...model, settingsOpen: false });
+      if (model.settingsOpen && model.settingsConfirm) set({ ...model, settingsConfirm: null });
+      else if (model.settingsOpen) set({ ...model, settingsOpen: false });
       else if (model.screen === "album" && model.albumOpen) set({ ...model, albumOpen: null });
       else if (model.screen !== "menu") back();
       e.preventDefault();

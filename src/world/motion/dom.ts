@@ -527,8 +527,8 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
    *  - its last CROSSFADE_MS the leaving still fades out over the arriving one (which bobs with it);
    *  - the photos are copies of the stages without children (`m-backdrop`), behind the new stage,
    *    whose own picture is hidden (`m-nobg`) until the move ends. The HUD is replaced at once;
-   *  - 屏幕 is not a still: arriving, it fades in over the walking photo; leaving, it stays over the
-   *    arriving photo and fades out at the end.
+   *  - 屏幕 is not a still: arriving, it fades in over the walking photo; leaving, it fades out at
+   *    once (playtest-1105 R10), uncovering the arriving photo as it starts to walk.
    * Exactly one copy is keyed "backdrop" (the leaving one, or the arriving one when 屏幕 leaves).
    */
   interface ViewMove {
@@ -541,6 +541,8 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
   }
   let move: ViewMove | null = null;
   const isPhoto = (view: string) => view !== "desktop";
+  /** playtest-1105 R10: 屏幕 leaving fades out from the move's start, an exit of the view time (280 ms). */
+  const SCREEN_LEAVE_MS = exitOf(MOTION.view);
 
   /** A copy of a stage that only draws its picture. */
   function backdropOf(stage: HTMLElement): HTMLElement {
@@ -573,19 +575,22 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     move = m;
     begin("view", t);
 
-    // 屏幕 leaving: it stays over the arriving photo while the walk is on, then fades out.
+    // 屏幕 leaving (playtest-1105 R10): it fades out at once, over an exit's time, so the walking
+    // photo shows from the start. (It used to stay at full opacity over the photo until the walk's
+    // last CROSSFADE_MS: the screen image lingered for the whole walk out.)
     if (from === "desktop") {
+      const fade = SCREEN_LEAVE_MS;
       addGhost({
         el: old,
         key: "screen",
         start: t,
-        end: t + dur,
+        end: t + fade,
         place: (r) => {
           Object.assign(old.style, { position: "absolute", left: "var(--stage-x, 0px)", top: "var(--stage-y, 0px)", zIndex: "40" });
           r.appendChild(old);
           return true;
         },
-        apply: (g, now) => anim(g, "m-fade-out", CROSSFADE_MS, m.fadeAt, now),
+        apply: (g, now) => anim(g, "m-fade-out", fade, t, now),
       });
     }
     if (isPhoto(to)) {

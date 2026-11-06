@@ -10,7 +10,7 @@ import { hudKuro } from "@world/desktop/kuro/mini";
 import { boxReadsOn, dialogueBox, lineScreens } from "@world/dialogue/box";
 import { logCurrent, logPlayer } from "@world/dialogue/history";
 import { settleSession } from "@world/dialogue/place";
-import { acceptOffer, answerAsk, answerOffer, declineOffer, kuroActions } from "@world/dialogue/kuro";
+import { acceptOffer, answerAsk, answerOffer, declineOffer, kuroActions, playerBox, readOnToPlayer } from "@world/dialogue/kuro";
 import { nextScreen } from "@world/dialogue/layout";
 import { stepOnce } from "@world/loop/steps";
 import { fillPlaceholders } from "@world/replies/placeholders";
@@ -275,8 +275,13 @@ function turning(ctx: ActionContext): boolean {
  */
 export function wayMs(from: View, to: View): number {
   if (from === to) return 0;
-  if (isFacing(from) !== isFacing(to) && from !== "room" && to !== "room") return wayMs(from, "room") + WAY_GAP_MS + wayMs("room", to);
-  return viewMoveMs(from, to);
+  let ms = 0;
+  let at = from;
+  for (const leg of wayLegs(from, to)) {
+    ms += (at === from ? 0 : WAY_GAP_MS) + viewMoveMs(at, leg);
+    at = leg;
+  }
+  return ms;
 }
 /** Between the legs of a way (the walk out, then the turn): one frame. */
 const WAY_GAP_MS = 16;
@@ -292,7 +297,8 @@ function walkSteps(ctx: ActionContext, from: string, to: string): void {
  * of them has a way back; you turn between them.
  */
 export function backTarget(view: View): View | null {
-  return view === "desktop" ? "desk" : view === "desk" ? "room" : null;
+  // playtest-1105 R5: 窗's table up close goes back to 窗.
+  return view === "desktop" ? "desk" : view === "desk" ? "room" : view === "table" ? "window" : null;
 }
 
 /** True when something sits over the view that a "back" should close first (or that blocks the camera). */
@@ -376,15 +382,38 @@ function restHand(s: Session): void {
  * to 房间. Each leg is `arrive`; the second waits for the first. Session only.
  */
 function goTo(ctx: ActionContext, view: View, data: DOMStringMap): void {
-  const from = ctx.session.view;
-  const twoLegs = from !== view && isFacing(from) !== isFacing(view) && from !== "room" && view !== "room";
-  if (!twoLegs) return arrive(ctx, view, data);
-  arrive(ctx, "room", {} as DOMStringMap);
-  ctx.later(wayMs(from, "room") + WAY_GAP_MS, () => {
-    // Only if nothing else moved the player meanwhile.
-    if (ctx.session.view === "room") arrive(ctx, view, data);
-  });
+  const legs = wayLegs(ctx.session.view, view);
+  const step = (i: number): void => {
+    const last = i === legs.length - 1;
+    const prev = ctx.session.view;
+    const at = legs[i]!;
+    arrive(ctx, at, last ? data : ({} as DOMStringMap));
+    if (last) return;
+    ctx.later(wayMs(prev, at) + WAY_GAP_MS, () => {
+      // Only if nothing else moved the player meanwhile.
+      if (ctx.session.view === at) step(i + 1);
+    });
+  };
+  if (legs.length > 0) step(0);
 }
+
+/**
+ * The legs of a way (room-turn R2, playtest-1105 R5): a level (桌子 / 屏幕 under 房间, the table
+ * under 窗) goes out to its facing first; a level on another facing is reached from its facing.
+ * 屏幕 ↔ 房间 and 屏幕 ↔ 桌子 stay one leg, as before. Pure.
+ */
+export function wayLegs(from: View, to: View): View[] {
+  if (from === to) return [to];
+  const fa = facingOfView(from);
+  const fb = facingOfView(to);
+  if (fa === fb) return [to];
+  const legs: View[] = [];
+  if (from !== fa) legs.push(fa);
+  if (to !== fb) legs.push(fb);
+  legs.push(to);
+  return legs;
+}
+const facingOfView = (v: View): View => (isFacing(v) ? v : v === "table" ? "window" : "room");
 
 /** opening R2: the prologue leaves the box; its page fades to black; then day 1 shows. */
 function finishPrologue(ctx: ActionContext): void {
@@ -632,19 +661,19 @@ export const loopActions: Record<string, ActionHandler> = {
   // 吃: the meal on the little table under the window (room-turn R3), once it has been taken in.
   // Eating happens there: 桌子 no longer has the meal.
   "loop-eat"(ctx, data) {
-    if (ctx.session.view !== "window") return;
+    // At 窗, or at its table up close (playtest-1105 R5).
+    if (ctx.session.view !== "window" && ctx.session.view !== "table") return;
     const lc = loopContext(ctx.store.getState(), ctx.store.getEvents());
     const at = lc ? deskMeal(lc) : null;
     if (!at || at.eaten || at.meal !== data.meal) return;
     stepOnce(ctx, `eat:${at.meal}`);
     ctx.rerender();
   },
-  // The table itself, while a meal is on it, is the same eat step; an empty table is only a click.
+  // playtest-1105 R5: the table itself is a close view, like 桌子: a click leans in to the tabletop
+  // (the meal large there, eaten with a click on it); Esc or the bottom strip goes back to 窗.
   "meal-table"(ctx) {
-    const lc = loopContext(ctx.store.getState(), ctx.store.getEvents());
-    const at = lc ? deskMeal(lc) : null;
-    if (!at || at.eaten) return;
-    loopActions["loop-eat"]!(ctx, { meal: at.meal } as DOMStringMap, null as never);
+    if (ctx.session.view !== "window" || overlayOpen(ctx.session)) return;
+    loopActions["view"]!(ctx, { view: "table" } as DOMStringMap, null as never);
   },
   // The parcel box seen from 床: it sits right by the bed, so the case opens here as a close-up; no
   // turn back to 房间 (author 2026-11-04: 「不要旋转回桌子那面墙，挺晕的」).
@@ -803,6 +832,12 @@ export const loopActions: Record<string, ActionHandler> = {
     }
     const { session } = ctx;
     const state = ctx.store.getState();
+    // playtest-1105 R6: Kuro's turn line read on its last screen: the same box is the player's turn.
+    if (readOnToPlayer(state, session)) {
+      // Its line goes into the history when the player answers (turn / leaveTalk), as before.
+      ctx.rerender();
+      return;
+    }
     const at = lineScreens(state, session, ctx.store.getEvents());
     // On a page of choices, ▼ shows the next page of them (the last cycles to the first); a
     // click never picks or skips a choice (dialogue FR1).
@@ -1202,7 +1237,19 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.session.settingsOpen = true;
     ctx.rerender();
   },
+  // playtest-1105 R8: 重新开始这一局 asks first; 确定 is the host's (main.ts: the run save goes, then
+  // the title); 取消 goes back to the panel.
+  "settings-restart"(ctx) {
+    if (!ctx.session.settingsOpen) return;
+    ctx.session.settingsConfirm = "restart";
+    ctx.rerender();
+  },
+  "settings-confirm-cancel"(ctx) {
+    ctx.session.settingsConfirm = null;
+    ctx.rerender();
+  },
   "settings-close"(ctx) {
+    ctx.session.settingsConfirm = null;
     ctx.session.settingsOpen = false;
     ctx.rerender();
   },
@@ -1327,6 +1374,8 @@ function atChoice(ctx: ActionContext): boolean {
   const at = lineScreens(state, session);
   if (at && at.all[at.page]!.choices.length) return true;
   const q = session.dialogue.queue[0];
+  // playtest-1105 R6: Kuro's turn line waits for a read-on (to the player's turn), not a choice.
+  if (q?.ending.kind === "kuroTurn") return playerBox(state, store.getEvents(), session) !== null;
   return !!q && endsInChoice(q.ending) && session.dialogue.line >= q.lines.length - 1 && (!at || at.page >= at.all.length - 1);
 }
 
@@ -1376,7 +1425,8 @@ export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
     return true;
   }
   if (e.key === "Escape" && ctx.session.settingsOpen) {
-    loopActions["settings-close"]!(ctx, {} as DOMStringMap, null as never);
+    // A question open (playtest-1105 R8): Esc is its 取消, back to the panel.
+    loopActions[ctx.session.settingsConfirm ? "settings-confirm-cancel" : "settings-close"]!(ctx, {} as DOMStringMap, null as never);
     return true;
   }
   // A story on (dialogue addition 2026-11-02): Esc skips to its last line, never past it; nothing

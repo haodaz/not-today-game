@@ -7,6 +7,6 @@ exports[`the evening look > snapshots 房间 in the evening look 2`] = `"<div cl
 exports[`tonight's list > snapshots day 1's card before and after nightfall 1`] = `
 {
   "after": "<div class="list"><div class="h">今晚</div><div class="it now" data-id="dinner"><i></i>手机，点个晚饭。</div><div class="it next" data-id="desk"><i></i>去桌子那儿看一眼。</div></div>",
-  "before": "<div class="list"><div class="h">今日</div><div class="done">已做 5 件</div><div class="it now" data-id="reply"><i></i>回老板。</div><div class="it wait" data-id="lunch"><i></i>午饭在路上。</div></div>",
+  "before": "<div class="list"><div class="h">今日</div><div class="done">已做 3 件</div><div class="it now" data-id="reply"><i></i>回老板。</div><div class="it wait" data-id="lunch"><i></i>午饭在路上。</div></div>",
 }
 `;

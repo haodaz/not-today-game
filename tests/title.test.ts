@@ -128,11 +128,15 @@ describe("the title page (FR1–FR3)", () => {
     );
   });
 
-  it("property: no element with a restart action exists in any title page", () => {
+  // playtest-1105 R8 (author decision): 重新开始这一局 / 清除全部记录 exist, but only inside the open
+  // settings panel and only behind their question; nowhere else on any title page.
+  it("property: no restart action on any title page outside the settings panel's own two (which ask first)", () => {
     fc.assert(
       fc.property(fc.option(fc.integer({ min: 1, max: 18 }), { nil: null }), fc.constantFrom("menu", "questions", "credits"), fc.boolean(), (day, screen, settingsOpen) => {
         const m: TitleModel = { ...initialTitle(day === null ? null : { day }, collected(2, { bad: 1, good: 1 })), screen: screen as TitleModel["screen"], settingsOpen };
-        expect(page(m)).not.toMatch(restart);
+        const out = page(m).replace(/<div class="row reset">.*?<\/div>/, "");
+        expect(out).not.toMatch(restart);
+        if (settingsOpen) expect(page(m)).toContain('<div class="row reset"><button type="button" data-action="settings-restart">');
       }),
     );
   });

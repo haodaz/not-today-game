@@ -28,6 +28,10 @@ export const MASK_ALLOWS: ReadonlySet<string> = new Set([
   "settings-email-send",
   "settings-lang",
   "settings-home",
+  // playtest-1105 R8: restart's question and its answers.
+  "settings-restart",
+  "settings-confirm",
+  "settings-confirm-cancel",
   "loop-mute",
   "ending-next",
   "taboo-error-ok",

@@ -105,7 +105,19 @@ export const BED_SHOT: { readonly bed: Rect; readonly box: Rect } = {
  */
 export const WINDOW_SHOT: { readonly mealTable: Rect; readonly meal: Rect } = {
   mealTable: { l: 565, t: 600, w: 225, h: 300 },
-  meal: { l: 615, t: 570, w: 105, h: 85 },
+  // playtest-1105 R5: the tabletop is stage x 567–788, y 614–684 (window.jpg x 592–820, y 633–705,
+  // cover-fitted); the meal's bottom now sits on its middle, centred on it (it was 10 px high, 10 px left).
+  meal: { l: 617, t: 578, w: 120, h: 88 },
+};
+
+/**
+ * 窗's table up close (playtest-1105 R5): window.jpg itself pushed in 3× (no close-up still yet),
+ * the tabletop's centre (image ≈706, 660) at the stage's centre. room.css draws it with TABLE_ZOOM;
+ * the meal sits large on the top, its bottom on the middle of the boards.
+ */
+export const TABLE_ZOOM = { k: 3, x: Math.round(800 - 706 * 3), y: Math.round(450 - 660 * 3) } as const;
+export const TABLE_SHOT: { readonly meal: Rect } = {
+  meal: { l: 600, t: 170, w: 400, h: 300 },
 };
 
 /** The flat facings' things to point at, in tab order (fixed rectangles, no splat box). */

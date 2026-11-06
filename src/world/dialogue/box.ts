@@ -2,7 +2,7 @@
 // three rows; a name tag on its top-left edge; ↺ history on its top-right; long text paged with ▼,
 // ▶ on the last page; choices inside the box. When Kuro speaks, its portrait stands at the box's
 // right end (the one animated body, moved here from the HUD) and the tag carries only its name;
-// its turn raises the player's box from the right edge (FR2). Pure: state + session in, markup
+// once its turn line is read the same box is the player's turn (playtest-1105 R6; no second box). Pure: state + session in, markup
 // out. Every text is content's or a string.
 import type { GameEvent } from "@state/events";
 import { isRaidNight } from "@state/nights";
@@ -78,8 +78,6 @@ export interface LineBoxModel {
   readonly markerClickable: boolean;
   readonly screen: number;
   readonly count: number;
-  /** The player's box is up: this one moves above it. */
-  readonly raised: boolean;
   /** Kuro is speaking: its portrait stands at the box's right end, in this state. */
   readonly portrait: BodyState | null;
   /** An NPC portrait for a speaker line (npc.json), in the same slot and size as Kuro's (never with Kuro's or the player's). */
@@ -154,7 +152,6 @@ export function lineBoxModel(state: State, events: readonly GameEvent[], session
     markerClickable: scr.choices.length > 0 && mk === "more",
     screen: at.page,
     count: at.all.length,
-    raised: playerBox(state, events, session) !== null,
     portrait: head.voice === "kuro" ? portraitState(state, events, session, nowMs) : null,
     playerPortrait: head.voice !== "kuro" && kind === "inner" ? playerPortraitSrc(state.names.pronoun, isDreamNight(state.day, session.clock.beat)) : null,
     // opening R2: in the prologue a speaker not in npc.json gets a silhouette (stable per name).
@@ -202,7 +199,7 @@ export function renderLineBox(m: LineBoxModel): SafeHtml {
   const tag = tagOf(m.tag);
   const me = !m.portrait && m.playerPortrait !== null;
   const hasNpc = !m.portrait && !me && m.npcPortrait !== null;
-  const c = cls("dlg", m.kind !== "line" && m.kind, tag && "tagged", m.tag?.kind === "kuro" && "kuro", me && "me", hasNpc && "npc", m.choices.length > 0 && "has-choices", m.raised && "raised");
+  const c = cls("dlg", m.kind !== "line" && m.kind, tag && "tagged", m.tag?.kind === "kuro" && "kuro", me && "me", hasNpc && "npc", m.choices.length > 0 && "has-choices");
   // One portrait at most: Kuro's for its lines, NPC's for a speaker line, player's for an inner line.
   const portrait = m.portrait
     ? portraitOf(m.portrait, m.red)
@@ -215,11 +212,17 @@ export function renderLineBox(m: LineBoxModel): SafeHtml {
   return html`<div class="${c}" data-screen="${m.screen + 1}/${m.count}"><div class="tagbar">${tag}${historyChip()}</div>${txt}${m.choices.length ? html`<div class="${cls("choices", m.pointer)}">${buttons}</div>` : null}${mk}${portrait}</div>`;
 }
 
-/** The player's box: the starter questions as choices, or one text input (Enter sends). */
-export function renderPlayerBox(p: PlayerBoxModel): SafeHtml {
+/**
+ * The player's turn in a talk with Kuro (playtest-1105 R6): the same one box as every line, now
+ * the player's: their name tag, their portrait in Kuro's slot (`portrait`, or none), the starter
+ * questions as the box's choices (▼ pages them), or one text input (Enter sends).
+ */
+export function renderPlayerBox(p: PlayerBoxModel, portrait: string | null = null): SafeHtml {
   const tag = p.name ? html`<span class="who tag p">${p.name}</span>` : null;
+  const tagbar = html`<div class="tagbar">${tag}${historyChip()}</div>`;
+  const face = portrait ? playerPortraitOf(portrait) : null;
   if (p.mode === "input") {
-    return html`<div class="dlg-player input" data-mode="input">${tag}<input class="kuro-in" type="text" data-input="kuro-text" data-focus="kuro-text" data-enter="kuro-send" maxlength="500" value="${p.draft}" aria-label="${t("dialogue.more")}" autocomplete="off" spellcheck="false"></div>`;
+    return html`<div class="${cls("dlg", "player", "input", tag && "tagged", face && "me")}" data-mode="input">${tagbar}<input class="kuro-in" type="text" data-input="kuro-text" data-focus="kuro-text" data-enter="kuro-send" maxlength="500" value="${p.draft}" aria-label="${t("dialogue.more")}" autocomplete="off" spellcheck="false">${face}</div>`;
   }
   const scr = p.screens[p.page];
   const buttons = (scr?.choices ?? []).map((i) => {
@@ -227,7 +230,7 @@ export function renderPlayerBox(p: PlayerBoxModel): SafeHtml {
     return html`<button type="button" data-action="${o.action}"${o.q !== undefined ? html` data-q="${o.q}"` : null}>${o.label}</button>`;
   });
   const more = choiceScreens(p.screens).length > 1 ? html`<button type="button" class="more" data-action="kuro-page">▼</button>` : null;
-  return html`<div class="dlg-player" data-mode="choices" data-screen="${p.page + 1}/${p.screens.length}">${tag}<div class="choices">${buttons}</div>${more}</div>`;
+  return html`<div class="${cls("dlg", "player", tag && "tagged", face && "me", "has-choices")}" data-mode="choices" data-screen="${p.page + 1}/${p.screens.length}">${tagbar}<div class="choices">${buttons}</div>${more}${face}</div>`;
 }
 
 /**
@@ -246,5 +249,7 @@ export function dialogueBox(state: State, events: readonly GameEvent[], session:
   const player = playerBox(state, events, session);
   const hist = session.historyOpen ? renderHistory(historyEntries(session, state)) : null;
   if (!line && !player && !hist) return null;
-  return html`${line ? renderLineBox(line) : null}${player ? renderPlayerBox(player) : null}${hist}`;
+  // playtest-1105 R6: one box. On the player's turn it is theirs (Kuro's line has been read).
+  const own = player ? renderPlayerBox(player, playerPortraitSrc(state.names.pronoun, isDreamNight(state.day, session.clock.beat))) : null;
+  return html`${own ?? (line ? renderLineBox(line) : null)}${hist}`;
 }

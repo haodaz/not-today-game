@@ -77,6 +77,9 @@
    centred like room.jpg. */
 .room.bed-view,.m-turn-face.bed-view{background-image:url(/room/shots/bed.jpg)}
 .room.window-view,.m-turn-face.window-view{background-image:url(/room/shots/window.jpg)}
+/* 窗's table up close (playtest-1105 R5): the same still pushed in 3×, the tabletop centred
+   (shots.ts TABLE_ZOOM: 1664×928 × 3, at -1318 / -1530 px). No pan here: it would undo the push. */
+.room.table-view,.room.table-view.looking{background-image:url(/room/shots/window.jpg);background-size:4992px 2784px;background-position:-1318px -1530px}
 /* 窗's placed meal on the little table: the same art, scaled to its rect. */
 .room .facing-things{position:absolute;inset:0;pointer-events:none}
 .room .facing-things > .at{position:absolute;pointer-events:none}
@@ -104,6 +107,8 @@
    its rect from content/desk.json; the button inside fills it. */
 .room .desk-things{position:absolute;inset:0;pointer-events:none}
 .room .desk-things > .at{position:absolute;pointer-events:none}
+/* playtest-1105 R10: a prop being dragged moves alone, over the others. */
+.room .desk-things > .at.dragging{z-index:2;cursor:grabbing}
 .room .desk-things > .at > .slot{position:absolute;inset:0;width:100%;height:100%;pointer-events:auto;border-radius:10px}
 .room .desk-things > .at > button.slot:hover,.room .desk-things > .at > button.slot:focus-visible{outline:2px solid rgba(232,228,220,.55);outline-offset:2px}
 .room .desk-things > .at > .slot > span{position:absolute;left:50%;bottom:4px;transform:translateX(-50%);white-space:nowrap;padding:2px 6px;border-radius:6px;background:rgba(244,240,232,.8);color:#555}
@@ -127,20 +132,19 @@
 :is(.room,.items-panel) .slot.gap{width:20px}
 /* 对话框 (dialogue FR1, design/chrome/dialogue.html): one fixed box, bottom centre, three rows; never
    grows, never scrolls. The tag sits on its top-left edge, ↺ on its top-right. */
-.dlg,.dlg-player{position:absolute;left:50%;bottom:120px;transform:translateX(-50%);width:992px;height:132px;box-sizing:border-box;display:flex;flex-direction:column;background:rgba(236,231,222,.86);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.6);border-radius:6px;padding:26px 30px 0;color:#1d2129;font-size:18px;line-height:1.6;box-shadow:0 10px 30px rgba(0,0,0,.35);text-align:left;font-family:var(--font, "PingFang SC","Hiragino Sans GB",sans-serif)}
-:lang(en) .dlg,:lang(en) .dlg-player{font-size:17px}
-.dlg.raised{bottom:300px}
+.dlg{position:absolute;left:50%;bottom:120px;transform:translateX(-50%);width:992px;height:132px;box-sizing:border-box;display:flex;flex-direction:column;background:rgba(236,231,222,.86);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.6);border-radius:6px;padding:26px 30px 0;color:#1d2129;font-size:18px;line-height:1.6;box-shadow:0 10px 30px rgba(0,0,0,.35);text-align:left;font-family:var(--font, "PingFang SC","Hiragino Sans GB",sans-serif)}
+:lang(en) .dlg{font-size:17px}
 .dlg .txt{flex:1 1 auto;min-height:0;overflow:hidden;display:block;width:100%;margin:0;padding:0 0 8px;border:0;background:none;font:inherit;line-height:inherit;color:inherit;text-align:inherit;white-space:pre-line;cursor:pointer}
 .dlg.has-choices .txt{flex:0 0 auto;padding-bottom:0}
 .dlg .txt:focus-visible{outline:2px solid rgba(139,47,42,.45);outline-offset:4px}
 .dlg.inner{color:#6a3a36}.dlg.inner .txt{font-style:italic}
 .dlg.sfx .txt{text-align:center;letter-spacing:.08em;color:#5b4a2e}
-.dlg .tag,.dlg-player .tag{position:absolute;left:18px;top:-16px;background:#2a2622;color:#efe9df;font-size:13px;line-height:1.4;letter-spacing:.2em;padding:5px 14px;border-radius:3px;white-space:nowrap}
+.dlg .tag{position:absolute;left:18px;top:-16px;background:#2a2622;color:#efe9df;font-size:13px;line-height:1.4;letter-spacing:.2em;padding:5px 14px;border-radius:3px;white-space:nowrap}
 /* The tag strip (dialogue correction "↺ beside the name tag"): the name tag, then ↺ right after it,
    the same height; alone at the tag's place when there is no tag. */
 .dlg .tagbar{position:absolute;left:18px;top:-16px;display:flex;align-items:stretch;gap:4px;z-index:2}
 .dlg .tagbar .tag{position:static}
-:lang(en) .dlg .tag,:lang(en) .dlg-player .tag{text-transform:uppercase;letter-spacing:.14em}
+:lang(en) .dlg .tag{text-transform:uppercase;letter-spacing:.14em}
 /* Kuro speaking (dialogue correction 2026-11-01): the tag carries only the name; the portrait (the
    one animated body, 200 px) stands at the box's right end, feet on the bottom edge, head 68 px
    above the top; the text column is everything left of it (layout.ts KURO_LINE_BOX: 236 px). */
@@ -152,29 +156,31 @@
 .dlg.npc{padding-right:236px}
 .dlg .npc-portrait{position:absolute;right:12px;bottom:0;width:200px;height:200px;object-fit:contain;object-position:center bottom;z-index:1;pointer-events:none;user-select:none}
 .dlg .player-portrait{position:absolute;right:12px;bottom:0;width:200px;height:200px;object-fit:contain;object-position:center bottom;z-index:1;pointer-events:none;user-select:none}
-.dlg-player .tag{background:#5b4a2e;top:-18px}
+/* The player's turn in a talk with Kuro (playtest-1105 R6): the same box, the player's tag colour. */
+.dlg .tag.p{background:#5b4a2e}
 .dlg .hist{min-width:28px;min-height:28px;border:0;padding:0 7px;border-radius:3px;background:#2a2622;color:#efe9df;display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;cursor:pointer}
 .dlg .hist:hover,.dlg .hist:focus-visible{background:#8b2f2a;outline:none}
-.dlg .more,.dlg-player .more{position:absolute;right:18px;bottom:8px;border:0;padding:0;background:none;color:#8b2f2a;font-size:12px;line-height:1;animation:dlg-pulse 1.2s ease-in-out infinite}
-.dlg button.more,.dlg-player button.more{cursor:pointer;font-size:14px}
+.dlg .more{position:absolute;right:18px;bottom:8px;border:0;padding:0;background:none;color:#8b2f2a;font-size:12px;line-height:1;animation:dlg-pulse 1.2s ease-in-out infinite}
+.dlg button.more{cursor:pointer;font-size:14px}
 @keyframes dlg-pulse{50%{opacity:.2}}
 /* Choices inside the box: a vertical list, ◆ on hover / focus, at most two lines each */
-.dlg .choices,.dlg-player .choices{display:flex;flex-direction:column;line-height:1.45}
+.dlg .choices{display:flex;flex-direction:column;line-height:1.45}
 .dlg.has-choices{padding-top:20px}
 /* A tag sits on the top edge; the text starts below it (mock design/chrome/dialogue.html). The
    tag ends 12 px into the box; 27 + 3 × 28.8 or 27 + 4 × 26.1 still fit in 132 px. */
 .dlg.tagged,.dlg.tagged.has-choices{padding-top:27px}
-.dlg .choices button,.dlg-player .choices button{position:relative;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;width:100%;margin:0;padding:1px 0 1px 20px;border:0;background:none;font:inherit;line-height:inherit;color:#777;text-align:left;cursor:pointer}
-.dlg .choices button:hover,.dlg .choices button:focus-visible,.dlg-player .choices button:hover,.dlg-player .choices button:focus-visible{color:#1d2129;outline:none}
-.dlg .choices button:hover::before,.dlg .choices button:focus-visible::before,.dlg-player .choices button:hover::before,.dlg-player .choices button:focus-visible::before{content:"◆";position:absolute;left:0;color:#8b2f2a}
-/* The player's box rises from the right edge, the same height */
-.dlg-player{left:auto;right:64px;transform:none;width:560px;padding-top:14px}
-/* Up to five one-row choices (four starters + 说点别的…) in the same 132 px: 14 + 5 × 23.4 = 131. */
-.dlg-player .choices{line-height:1.3}
-.dlg-player .choices button{display:block;white-space:nowrap;text-overflow:ellipsis;-webkit-line-clamp:unset}
-.dlg-player.input{padding-top:30px}
-.dlg-player .kuro-in{width:100%;border:0;border-bottom:1px solid #8a7f70;background:transparent;font:inherit;color:#1d2129;outline:0;padding:2px 0}
-.dlg-player .kuro-in:focus{border-bottom-color:#1d2129}
+.dlg .choices button{position:relative;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;width:100%;margin:0;padding:1px 0 1px 20px;border:0;background:none;font:inherit;line-height:inherit;color:#777;text-align:left;cursor:pointer}
+.dlg .choices button:hover,.dlg .choices button:focus-visible{color:#1d2129;outline:none}
+.dlg .choices button:hover::before,.dlg .choices button:focus-visible::before{content:"◆";position:absolute;left:0;color:#8b2f2a}
+/* The player's turn (playtest-1105 R6): the same box; up to five one-row choices (four starters +
+   说点别的…) in its 132 px: 14 + 5 × 23.4 = 131 (the tag sits on the top edge above the first). */
+.dlg.player.has-choices,.dlg.player.tagged.has-choices{padding-top:14px}
+.dlg.player .choices{line-height:1.3}
+.dlg.player .choices button{display:block;white-space:nowrap;text-overflow:ellipsis;-webkit-line-clamp:unset}
+/* Typing (说点别的…): one input in the same box. */
+.dlg.player.input{padding-top:40px}
+.dlg.player .kuro-in{width:100%;border:0;border-bottom:1px solid #8a7f70;background:transparent;font:inherit;color:#1d2129;outline:0;padding:2px 0}
+.dlg.player .kuro-in:focus{border-bottom-color:#1d2129}
 /* History (FR1): a full-height scrolling log of this day; a click outside or Esc closes it */
 .dlg-hist-layer{position:absolute;inset:0;z-index:45}
 .dlg-hist-dim{position:absolute;inset:0;border:0;padding:0;margin:0;background:rgba(10,10,12,.55);cursor:default}
@@ -204,7 +210,7 @@
 .room .held.phone .shop.closed{opacity:.4}.room .held.phone .shop.closed small{color:#c33}
 .room .held.phone .shop button{display:flex;justify-content:space-between;width:100%;border:0;background:none;padding:6px 0 0;font:inherit;font-size:14px;color:inherit;cursor:pointer;text-align:left}
 .room .held.phone .shop button:hover,.room .held.phone .shop button:focus-visible{color:var(--red)}
-.room .held.phone .home{position:absolute;left:50%;bottom:10px;width:120px;height:5px;background:#ccc;border-radius:3px;transform:translateX(-50%)}
+.room .held.phone .scr>.home{position:absolute;left:50%;bottom:10px;width:120px;height:5px;background:#ccc;border-radius:3px;transform:translateX(-50%)}
 /* Lifted objects are upright (objects-in-hand FR1): the desk rest tilt (--m-tilt on .held) is not
    carried into the held layer; only a drag turns it (--yaw/--pitch/--roll on .turn). */
 .room .held.obj{top:44%;width:440px;filter:drop-shadow(0 30px 50px rgba(0,0,0,.6));transform:translate(-50%,-50%) rotate(0deg)}
@@ -293,7 +299,7 @@
 .room .held.obj canvas.dev{position:absolute;transform:translate(-50%,-50%);image-rendering:pixelated;background:#9fb59a;border-radius:2px}
 .room .held.obj canvas.dev.hi{image-rendering:auto;background:linear-gradient(180deg,#f4f8ff,#d9e6ff)}
 .room .held-layer .hint{position:absolute;left:50%;bottom:130px;transform:translateX(-50%);color:#f4efe6;font-size:14px;opacity:.7;pointer-events:none}
-.room > .dlg,.room > .dlg-player{z-index:16}
+.room > .dlg{z-index:16}
 /* 夜里的手 (night-hand FR1): the desk dims, the gap between the monitors glows; the hand is never drawn */
 /* A line's backdrop and prop (dialogue 2026-11-02): full frame behind the box, under the HUD (DOM
    order in 房间; over the monitors on 屏幕). The prop sits centred, at most 60 % of the stage high. */
@@ -382,6 +388,11 @@
 .settings .actions{display:flex;justify-content:space-between;gap:10px;padding-top:14px;border-top:1px solid rgba(0,0,0,.08)}
 .settings .actions button{flex:1;border:1px solid rgba(0,0,0,.12);background:#fff;border-radius:8px;padding:8px 0;font:inherit;cursor:pointer}
 .settings .actions button:hover,.settings .actions button:focus-visible{border-color:#8b2f2a;color:#8b2f2a}
+/* playtest-1105 R8: 重新开始这一局 / 清除全部记录, quiet links; their question in the same panel. */
+.settings .row.reset{flex-direction:column;align-items:flex-start;gap:6px}
+.settings .row.reset button{border:0;background:none;padding:2px 0;font:inherit;font-size:13px;color:#8b2f2a;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.settings.confirm p{margin:4px 0 16px;line-height:1.6}
+.settings .actions button.danger{background:#8b2f2a;border-color:#8b2f2a;color:#fff}
 /* An upgraded object: the new world's hi-res icon, antialiased, no integer pixels (object-upgrade FR2). */
 /* Not yet recognised: slightly desaturated (recognise FR2). */
 :is(.room,.items-panel) .slot.unknown img{filter:saturate(.35) opacity(.9)}
@@ -394,8 +405,6 @@
 .dlg-layer{position:fixed;inset:0;z-index:30;pointer-events:none}
 .dlg-layer > *{pointer-events:auto}
 .dlg-layer .dlg{position:fixed;left:50%;bottom:var(--dlg-bottom,60px);transform:translateX(-50%);width:900px;max-width:80vw;height:var(--dlg-h,132px)}
-.dlg-layer .dlg.raised{bottom:240px}
-.dlg-layer .dlg-player{position:fixed;bottom:var(--dlg-bottom,60px);right:24px;height:var(--dlg-h,132px)}
 .dlg-layer .dlg-hist-layer{position:fixed}
 /* A story masks the stage (dialogue addition 2026-11-02): 40 % dim under the box; a click on it reads on. */
 .dlg-layer .story-mask{position:fixed;inset:0;background:rgba(0,0,0,.4);cursor:pointer}

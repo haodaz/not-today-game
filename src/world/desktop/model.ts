@@ -46,8 +46,12 @@ export const taskPageId = (page: WorkbenchPage): string | null => (page.startsWi
  * 房间 room (the desk wall), 床 bed, 门 door, 窗 window. Under 房间 are the levels 桌子 desk (the
  * tabletop, where things are picked up) and 屏幕 "desktop" (the screens).
  */
-export type View = "room" | "desk" | "door" | "desktop" | "bed" | "window";
-export const VIEWS: readonly View[] = ["room", "desk", "desktop", "door", "bed", "window"];
+/** playtest-1105 R8: what the settings panel asks about before doing it. */
+export type SettingsConfirm = "restart" | "clearAll";
+
+export type View = "room" | "desk" | "door" | "desktop" | "bed" | "window" | "table";
+/** playtest-1105 R5: "table" is 窗's little meal table up close, a level under 窗 (as 桌子 is under 房间). */
+export const VIEWS: readonly View[] = ["room", "desk", "desktop", "door", "bed", "window", "table"];
 /** A turn edge's way (left / right 8 % of a facing), or 桌子's bottom strip back to 房间. */
 export type EdgeZone = "left" | "right" | "back";
 
@@ -94,6 +98,8 @@ export interface Session {
   taboo: TabooFx;
   /** The ⚙ 设置 panel is open (day-loop amendment). */
   settingsOpen: boolean;
+  /** playtest-1105 R8: the panel is asking before 重新开始这一局 / 清除全部, or null. Session only. */
+  settingsConfirm: SettingsConfirm | null;
   /** Its last line as last seen, to notice a new one; undefined before the first look. */
   kuroLast: string | null | undefined;
   /** Its last line when the player last talked to it; the dot shows otherwise. */
@@ -377,6 +383,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     phoneUi: initialPhoneUi(),
     taboo: initialTabooFx(),
     settingsOpen: false,
+    settingsConfirm: null,
     kuroLast: undefined,
     kuroRead: undefined,
     kuroAutoDay: 0,

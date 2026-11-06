@@ -104,6 +104,8 @@ describe("the four consequences", () => {
     expect(tabooLayer(ctx.session, store.getRunId(), 3, at)!.value).toContain('class="taboo-blur"');
     expect(tabooLayer(ctx.session, store.getRunId(), 3, at + BLUR_MS - 1)!.value).toContain("taboo-blur");
     expect(tabooLayer(ctx.session, store.getRunId(), 3, at + BLUR_MS)).toBeNull();
+    // playtest-1105 R6: the reply read on, the same box is the player's turn.
+    act(ctx, "loop-advance");
     expect(playerBox(store.getState(), store.getEvents(), ctx.session)).not.toBeNull();
   });
 
@@ -182,6 +184,7 @@ describe("affinity opens questions", () => {
     const store = storeAt(3);
     const { ctx } = ctxOf(store);
     talk(ctx);
+    act(ctx, "loop-advance"); // playtest-1105 R6: its line read on, the player's turn
     const s = store.getState();
     expect(bucketNow(s)).toBe("low");
     expect(bucketNow({ ...s, affinity: 30 })).toBe("mid");

@@ -190,15 +190,23 @@ describe("FR2 talking to Kuro", () => {
   it("聊聊 at night: Kuro's line with its face, then the player's box: the starters and 说点别的… on one page (snapshot)", () => {
     const ctx = ctxOf(storeAt(1), NIGHT);
     talkAtNight(ctx);
-    const box = out(ctx);
+    const said = out(ctx);
     const day = kuroDay(1)!;
     expect(day.starters.length).toBe(4);
-    expect(box).toContain('class="dlg tagged kuro raised"');
+    // playtest-1105 R6: one box. First Kuro's line, its portrait; nothing of the player's yet.
+    expect(said).toMatch(/^<div class="dlg tagged kuro"/);
     // The idiom in Kuro's face (kuro-zh-answers R4).
-    expect(box).toContain(`><span class="kmono">${escapeHtml(day.idiom)}</span></button>`);
-    expect(box).toContain('<div class="dlg-player" data-mode="choices" data-screen="1/1">');
+    expect(said).toContain(`><span class="kmono">${escapeHtml(day.idiom)}</span></button>`);
+    expect(said).not.toContain('class="dlg player');
+    // Read on: the same box is the player's turn, their tag and portrait; Kuro's portrait is gone.
+    act(ctx, "loop-advance");
+    const box = out(ctx);
+    expect(box.match(/<div class="dlg[ "]/g)).toHaveLength(1);
+    expect(box).toContain('<div class="dlg player tagged me has-choices" data-mode="choices" data-screen="1/1">');
     expect(box).toContain('<span class="who tag p">林一</span>');
-    const player = box.slice(box.indexOf('<div class="dlg-player"'));
+    expect(box).toContain('<img class="player-portrait" src="/player/none.png"');
+    expect(box).not.toContain("kuro-portrait");
+    const player = box;
     const labels = [...player.matchAll(/<button type="button" data-action="kuro-(?:q|more)"[^>]*>([^<]*)<\/button>/g)].map((m) => m[1]);
     expect(labels).toEqual([...day.starters.map((s) => escapeHtml(s.zh)), escapeHtml(t("dialogue.more"))]);
     // No 先不聊 here (Esc leaves), and no ▼: one page.
@@ -213,6 +221,7 @@ describe("FR2 talking to Kuro", () => {
       for (let d = 1; d <= constants.lastDay; d++) {
         const ctx = ctxOf(storeAt(d), NIGHT);
         talkAtNight(ctx);
+        act(ctx, "loop-advance"); // playtest-1105 R6: to the player's turn
         const p = out(ctx);
         expect(p, `${locale} day ${d}`).toContain('data-mode="choices" data-screen="1/1"');
       }
@@ -242,10 +251,12 @@ describe("FR2 talking to Kuro", () => {
     expect(store.getEvents().at(-1)).toMatchObject({ kind: "step", name: "chat:any" });
     expect(store.getState().chatTurnsToday).toBe(1);
     expect(out(ctx)).toContain(escapeHtml(offlineAnswer(day, 1)));
+    act(ctx, "loop-advance"); // playtest-1105 R6: the answer read, the player's turn
     expect(out(ctx)).not.toContain(`data-q="1"`);
     act(ctx, "kuro-more");
     const input = out(ctx);
-    expect(input).toContain('<div class="dlg-player input" data-mode="input"><span class="who tag p">林一</span><input class="kuro-in" type="text" data-input="kuro-text"');
+    expect(input).toContain('<div class="dlg player input tagged me" data-mode="input"><div class="tagbar"><span class="who tag p">林一</span>');
+    expect(input).toContain('<input class="kuro-in" type="text" data-input="kuro-text"');
     expect(input).toMatchSnapshot();
     // Empty sends nothing.
     act(ctx, "kuro-send");
@@ -257,15 +268,15 @@ describe("FR2 talking to Kuro", () => {
     expect(ctx.session.kuroInput).toBe(false);
   });
 
-  it("work beats: the same flow, its constant line, only 好。, no turn", () => {
+  it("work beats: the chat is still locked, so a click is kuro.room.notYet; reading on closes it; no turn (playtest-1105 R6)", () => {
     const store = storeAt(3);
     const ctx = ctxOf(store, WORK);
-    talkAtNight(ctx);
+    act(ctx, "kuro-call");
+    expect(ctx.session.dialogue.queue.map((q) => q.ending.kind)).toEqual(["none"]);
     const box = out(ctx);
-    expect(box).toContain(escapeHtml(kuroDay(3)!.idiom));
-    expect([...box.matchAll(/class="dlg-player"[\s\S]*?<\/div><\/div>/g)][0]![0].match(/<button/g)!.length).toBe(1);
-    expect(box).toContain(`data-action="kuro-leave">${t("dialogue.ok")}</button>`);
-    act(ctx, "kuro-leave");
+    expect(box).toContain(escapeHtml(t("kuro.room.notYet")));
+    expect(box).not.toContain("data-choice");
+    act(ctx, "loop-advance");
     expect(store.getState().chatTurnsToday).toBe(0);
     expect(ctx.session.dialogue.queue).toEqual([]);
   });
@@ -293,7 +304,8 @@ describe("FR2 talking to Kuro", () => {
           if (s === "reopen") {
             act(ctx, "kuro-leave");
             talkAtNight(ctx);
-          } else if (out(ctx).includes("dlg-player")) {
+          } else if ((out(ctx).includes('class="dlg player') || (act(ctx, "loop-advance"), out(ctx).includes('class="dlg player')))) {
+            // playtest-1105 R6: Kuro's line is read on first; the player's turn is the same box.
             attempts += 1;
             const q = /data-action="kuro-q" data-q="(\d+)"/.exec(out(ctx))?.[1];
             if (s === "q" && q) act(ctx, "kuro-q", { q });
@@ -306,7 +318,7 @@ describe("FR2 talking to Kuro", () => {
           if (attempts > constants.chatTurnsPerDay) bed = true;
           expect(store.getState().chatTurnsToday).toBe(Math.min(attempts, constants.chatTurnsPerDay));
           if (bed) {
-            expect(out(ctx)).not.toContain("dlg-player");
+            expect(out(ctx)).not.toContain('class="dlg player');
             expect(ctx.session.kuroBedDay).toBe(2);
           }
         }
@@ -363,23 +375,17 @@ describe("Kuro stands at the box's right end (dialogue correction 2026-11-01)", 
     }
   });
 
-  it("the player's box keeps clear of it: Kuro's box (and portrait) rise above the player's box", () => {
-    const bottom = (sel: string) => num(new RegExp(`${sel.replace(/\./g, "\\.")}\\{bottom:(\\d+)px[;}]`));
-    const raised = bottom(".dlg.raised");
-    const boxH = num(/\.dlg,\.dlg-player\{[^}]*height:(\d+)px/);
-    const playerBottom = num(/\.dlg,\.dlg-player\{[^}]*bottom:(\d+)px/);
-    // The portrait stands on the raised box's bottom edge, above the player's box top.
-    expect(raised).toBeGreaterThan(playerBottom + boxH);
-    // In the viewport's layer (every view since 2026-11-02): the player's box sits at the shared bottom.
-    const layerBottom = num(/\.dlg-layer \.dlg-player\{[^}]*bottom:var\(--dlg-bottom,(\d+)px\)/);
-    expect(bottom(".dlg-layer .dlg.raised")).toBeGreaterThan(layerBottom + boxH);
+  it("one box (playtest-1105 R6): no second player's box and no raised box in the CSS", () => {
+    expect(css).not.toContain(".dlg-player");
+    expect(css).not.toContain(".dlg.raised");
+    expect(css).toContain(".dlg.player.has-choices,.dlg.player.tagged.has-choices{padding-top:14px}");
   });
 
   it("the HUD body stands directly above the chip row, flush right; the box's right edge stays left of it", () => {
     expect(css).toMatch(/\.hud-br\{[^}]*flex-direction:column;align-items:flex-end/);
     const hudRight = num(/\.hud-br\{position:absolute;right:(\d+)px/);
     const body = num(/\.hud-kuro\{position:relative;width:(\d+)px/);
-    const boxW = num(/\.dlg,\.dlg-player\{[^}]*width:(\d+)px/);
+    const boxW = num(/\n\.dlg\{[^}]*width:(\d+)px/);
     expect(800 + boxW / 2).toBeLessThan(1600 - hudRight - body);
   });
 });
@@ -446,7 +452,7 @@ describe("FR3 properties", () => {
 
   it("happy-dom: on every screen of every content line the box has the same fixed size, and its text re-wraps to ≤ 3 lines", () => {
     const css = readFileSync(resolve(__dirname, "../src/world/room/room.css"), "utf8");
-    expect(css).toMatch(/\.dlg,\.dlg-player\{[^}]*width:992px;height:132px;/);
+    expect(css).toMatch(/\n\.dlg\{[^}]*width:992px;height:132px;/);
     const ctx = ctxOf(storeAt(1), WORK);
     const px = fontPx("zh");
     const lines = [...dayFiles.values()].flatMap((d) => Object.values(d.beats).flatMap((b) => b?.say ?? [])).concat([longLine]);

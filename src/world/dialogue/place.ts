@@ -11,7 +11,7 @@ export function hereOf(s: Pick<Session, "view" | "focus" | "leftApp" | "rightApp
   const app = frontApp(s);
   return {
     // 床 and 窗 are walls of the room (room-turn 2026-11-04): a line for the room plays there too.
-    view: s.view === "bed" || s.view === "window" ? "room" : s.view,
+    view: s.view === "bed" || s.view === "window" || s.view === "table" ? "room" : s.view,
     // Either monitor: the one being shown has the app in front.
     app,
     night: isNight(s.clock),

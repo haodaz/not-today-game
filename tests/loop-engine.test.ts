@@ -16,7 +16,9 @@ function storeAt(day: number, drafts: EventDraft[] = []): Store {
   return store;
 }
 const view = (store: Store) => checklist(loopContext(store.getState(), store.getEvents())!);
-const texts = (store: Store) => view(store).lines.map((l) => `${l.state}:${l.text}`);
+// playtest-1105 R7: the work tasks are one line, `work:<done>/<total>`.
+const texts = (store: Store) => view(store).lines.map((l) => `${l.state}:${l.work ? `work:${l.work.done}/${l.work.total}` : l.text}`);
+const WORK1 = `work:0/${dayFiles.get(1)!.items.filter((it) => it.when === "day" && it.done.kind === "flag" && it.done.flag.startsWith("task_")).length}`;
 // Item text is content's and changes (day-loop rule 2026-11-01): read it from the day file.
 const item1 = (id: string) => dayFiles.get(1)!.items.find((it) => it.id === id)!;
 const text1 = (id: string) => item1(id).text;
@@ -30,14 +32,14 @@ describe("checklist (FR1)", () => {
     expect(view(store).doneCount).toBe(1);
     expect(texts(store)).toEqual([`now:${text1("msgs")}`]);
     store.appendEvent(step("openApp:msgs"));
-    expect(texts(store)).toEqual([`now:${text1("lunch")}`, `next:${text1("task1")}`]);
+    expect(texts(store)).toEqual([`now:${text1("lunch")}`, `next:${WORK1}`]);
   });
 
   it("after ordering, lunch waits with its rewrite text, unticked, until it arrives", () => {
     const store = storeAt(1, [step("boot"), step("openApp:msgs"), { kind: "order", meal: "lunch", shopId: "huangmenji", itemId: "hmj", t: "11:30" }]);
-    expect(texts(store)).toEqual([`now:${text1("task1")}`, `wait:${rewrite1("lunch")}`]);
+    expect(texts(store)).toEqual([`now:${WORK1}`, `wait:${rewrite1("lunch")}`]);
     store.appendEvent(step("delivery:arrives:lunch", "12:04"));
-    expect(texts(store)).toEqual([`now:${text1("task1")}`, `next:${text1("pickup")}`]);
+    expect(texts(store)).toEqual([`now:${WORK1}`, `next:${text1("pickup")}`]);
   });
 
   it("an event before its item unlocks counts only once it does", () => {

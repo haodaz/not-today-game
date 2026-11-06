@@ -50,11 +50,15 @@ describe("FR5 checklist snapshots", () => {
   it("day 17 with the item that ticked itself", () => {
     const self = dayFiles.get(17)!.items.find((it) => it.self)!;
     const store = storeAt(17, [step("boot"), step("openApp:msgs")]);
+    // playtest-1105 R7: it is a work task (`flag:task_*`), so it is counted on the one work line.
     const before = list(store);
-    expect(before).toContain(self.text);
+    const work = /data-id="work"><i><\/i>[^<]*（(\d+)\/(\d+)）/;
+    expect(before).not.toContain(self.text);
+    const [, d0] = work.exec(before)!;
     store.appendEvent({ kind: "task", flag: (self.done as { flag: string }).flag, mode: "self" });
     const after = list(store);
     expect(after).not.toContain(self.text);
+    expect(Number(work.exec(after)![1])).toBe(Number(d0) + 1);
     // Same style as an ordinary item: no highlight for a self-ticked one.
     expect(after).not.toMatch(/self|highlight/);
     expect({ before, after }).toMatchSnapshot();

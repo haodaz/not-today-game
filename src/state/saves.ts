@@ -133,6 +133,8 @@ export interface ProfileWriter {
    * `profile.kurogotchi` with `data` (opaque JSON here; the drawer owns its shape).
    */
   writeKurogotchi(data: Json): void;
+  /** playtest-1105 R8: 清除全部 only — removes the profile and its backup. */
+  clear(): void;
 }
 
 export function createProfileWriter(storage: KeyValueStorage): ProfileWriter {
@@ -168,5 +170,24 @@ export function createProfileWriter(storage: KeyValueStorage): ProfileWriter {
       const current = (slot.read()?.data ?? {}) as ProfileData;
       slot.write({ data: { ...current, kurogotchi: data } });
     },
+    clear: () => slot.clear(),
   };
+}
+
+/**
+ * playtest-1105 R8: 重新开始这一局 — the current run save goes (and its backup); the profile, the
+ * language, the mute switch and the cloud copy stay. The caller then returns to the title.
+ */
+export function restartRun(run: Pick<RunSlot, "clear">): void {
+  run.clear();
+}
+
+/**
+ * playtest-1105 R8: 清除全部 (title only) — the run save and the cross-run profile (objects, album,
+ * endings, finished runs, the Kurogotchi) go. Language (`nt_lang`) and mute (`nt_muted`) are their
+ * own keys and stay; nothing is sent to the cloud.
+ */
+export function clearAll(run: Pick<RunSlot, "clear">, profile: Pick<ProfileWriter, "clear">): void {
+  run.clear();
+  profile.clear();
 }

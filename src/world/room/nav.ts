@@ -58,6 +58,30 @@ export function stagePoint(root: HTMLElement, clientX: number, clientY: number):
   return { x: ((clientX - r.left) / r.width) * (stage.classList.contains("room") ? STAGE_W : r.width), y: ((clientY - r.top) / r.height) * (stage.classList.contains("room") ? STAGE_H : r.height) };
 }
 
+/**
+ * playtest-1105 R10: the placed prop on 桌子's tabletop under a press (its `.at` box: the cup, the
+ * phone, an object, the slip…), or null. Only on the live stage, never on a ghost.
+ */
+export function propAt(target: EventTarget | null): HTMLElement | null {
+  const el = (target as HTMLElement | null)?.closest?.<HTMLElement>(".desk-things > .at");
+  if (!el || el.closest(".m-ghost, .m-backdrop, .m-turn")) return null;
+  return el;
+}
+/** How long a dragged prop takes to go back to its place (the look's own return). */
+export const PROP_RETURN_MS = 400;
+/** The dragged prop follows the hand (stage px), alone: only its own box moves. */
+export function movePropBy(el: HTMLElement, dx: number, dy: number): void {
+  el.style.transition = "none";
+  el.style.translate = `${Math.round(dx)}px ${Math.round(dy)}px`;
+  el.classList.add("dragging");
+}
+/** Let go: it eases back to where content put it (nothing is saved). */
+export function releaseProp(el: HTMLElement): void {
+  el.style.transition = `translate ${PROP_RETURN_MS}ms ease-out`;
+  el.style.translate = "";
+  el.classList.remove("dragging");
+}
+
 /** Whether a stage point is in the bottom strip. The stage's height is 900 in 房间 and the desktop's own otherwise. */
 export const inBackStrip = (y: number, height: number): boolean => y >= height * (1 - BACK_STRIP);
 
@@ -73,6 +97,8 @@ export function createNav(deps: NavDeps = {}) {
     let hover: string | null = null;
     let pointer: { x: number; y: number } | null = null;
     let down: { cx: number; cy: number; x: number; y: number; moved: boolean } | null = null;
+    /** playtest-1105 R10: the one prop being dragged at 桌子 (its `.at` box), or null. */
+    let propDrag: { el: HTMLElement; cx: number; cy: number; x: number; y: number; moved: boolean } | null = null;
     let suppressClick = false;
     let lastWheel = -Infinity;
     let frame = 0;
@@ -173,6 +199,16 @@ export function createNav(deps: NavDeps = {}) {
 
     const onDown = (e: MouseEvent) => {
       suppressClick = false;
+      // playtest-1105 R10: a press on a placed prop at 桌子 drags that prop alone (it goes back on
+      // release); it never starts the look pan, which moves the whole tabletop layer together.
+      const prop = e.button === 0 ? propAt(e.target) : null;
+      if (prop) {
+        const p = toStage(root, e.clientX, e.clientY);
+        propDrag = { el: prop, cx: e.clientX, cy: e.clientY, x: p?.x ?? e.clientX, y: p?.y ?? e.clientY, moved: false };
+        // No native image drag (Firefox ignores -webkit-user-drag); the click still follows.
+        e.preventDefault();
+        return;
+      }
       if (e.button !== 0 || interactive(e.target)) return;
       const p = toStage(root, e.clientX, e.clientY);
       if (!p) return;
@@ -182,6 +218,14 @@ export function createNav(deps: NavDeps = {}) {
     const onMove = (e: MouseEvent) => {
       const p = toStage(root, e.clientX, e.clientY);
       pointer = p;
+      if (propDrag) {
+        const sx = p ? p.x - propDrag.x : e.clientX - propDrag.cx;
+        const sy = p ? p.y - propDrag.y : e.clientY - propDrag.cy;
+        if (!propDrag.moved && Math.hypot(sx, sy) < DRAG_SLOP) return;
+        propDrag.moved = true;
+        movePropBy(propDrag.el, sx, sy);
+        return;
+      }
       if (down) {
         const sx = p ? p.x - down.x : e.clientX - down.cx;
         const sy = p ? p.y - down.y : e.clientY - down.cy;
@@ -206,6 +250,14 @@ export function createNav(deps: NavDeps = {}) {
     };
 
     const onUp = () => {
+      if (propDrag) {
+        if (propDrag.moved) {
+          suppressClick = true;
+          releaseProp(propDrag.el);
+        }
+        propDrag = null;
+        return;
+      }
       if (!down) return;
       const dragged = down.moved;
       down = null;

@@ -3,9 +3,9 @@
 - [x] 2. R2 dialogue owns the screen
 - [x] 3. R3 boot beat at day start, power-on lines
 - [x] 4. R4 room looks
-- [ ] 5. R5 meal table + close view
-- [ ] 6. R6 Kuro in the room
-- [ ] 7. R7 checklist
-- [ ] 8. R8 settings
-- [ ] 9. R9 title music
-- [ ] 10. R10 four bugs
+- [x] 5. R5 meal table + close view
+- [x] 6. R6 Kuro in the room
+- [x] 7. R7 checklist
+- [x] 8. R8 settings
+- [x] 9. R9 title music
+- [x] 10. R10 four bugs — turn 2×, screen linger and prop drag done; the phone's white screen not found yet (open)

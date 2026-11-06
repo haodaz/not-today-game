@@ -52,17 +52,19 @@ describe("offers (FR1)", () => {
     expect(currentOffer(storeAt(pager.offerFrom, []).getState(), [])).toBeNull();
   });
 
+  // (Title kept as it was so its snapshot stays keyed; playtest-1105 R6: by day "asks to talk" is now kuro.room.notYet.)
   it("pager offer on day 5: Kuro's first line in the box, with 升级 / 不了; then it asks to talk", () => {
     const store = storeAt(pager.offerFrom, ["pager"]);
     const offer = currentOffer(store.getState(), store.getEvents());
     expect(offer).toEqual({ kind: "offer", object: "pager", line: pager.offer });
     const { ctx, box } = offerBox(store);
     expect(box).toContain('data-action="loop-choice" data-index="0" data-choice="yes"');
-    expect(ctx.session.dialogue.queue.map((q) => q.ending.kind)).toEqual(["kuroOffer", "kuroAsk"]);
+    // playtest-1105 R6: by day the chat is locked: after the offer, kuro.room.notYet (nothing to answer).
+    expect(ctx.session.dialogue.queue.map((q) => q.ending.kind)).toEqual(["kuroOffer", "none"]);
     expect(box).toMatchSnapshot();
     loopActions["loop-choice"]!(ctx, { index: "0", choice: "yes" } as DOMStringMap, null as never);
     expect(store.getState().upgraded.pager).toBe(true);
-    expect(ctx.session.dialogue.queue.map((q) => q.ending.kind)).toEqual(["kuroAsk"]);
+    expect(ctx.session.dialogue.queue.map((q) => q.ending.kind)).toEqual(["none"]);
     // No offer at night: it only asks.
     const night = act(storeAt(pager.offerFrom, ["pager"]));
     night.session.clock = { beat: "night", time: "23:41" } as typeof night.session.clock;

@@ -34,6 +34,8 @@ export const BACKDROPS: Readonly<Record<View | "title", string>> = {
   // The bed wall and the big window wall (room-turn 2026-11-04): stills of their own, cover-fitted like room.jpg.
   bed: "/room/shots/bed.jpg",
   window: "/room/shots/window.jpg",
+  // playtest-1105 R5: the meal table up close is the same still, pushed in.
+  table: "/room/shots/window.jpg",
 };
 
 /**

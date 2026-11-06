@@ -76,10 +76,10 @@ export const CHOSEN = {
   chosenHold: MOTION.choice,
   /** Walking, not switching (room-scene 2026-11-02): a move takes as long as the path. 房间 ↔ 桌子. */
   roomDesk: 900,
-  /** A 90° turn between two facings: the head turns inside the box (room-turn correction 2026-11-04). */
-  turn: 650,
-  /** Each of the two turns when the target is the opposite wall (back to back, toward the right). */
-  turnFast: 400,
+  /** A 90° turn between two facings: the head turns inside the box (room-turn correction 2026-11-04). playtest-1105 R10: 2× (was 650). */
+  turn: 1300,
+  /** Each of the two turns when the target is the opposite wall (back to back, toward the right). playtest-1105 R10: 2× (was 400). */
+  turnFast: 800,
   /** 桌子 ↔ 屏幕: leaning in. */
   deskScreen: 500,
   /** 使用 flip: the face turns over in-place (objects-in-hand 2026-11-03). */
@@ -109,6 +109,9 @@ export function viewMoveMs(from: string, to: string, _camera = true): number {
       return CHOSEN.deskScreen;
     case "desktop>room":
       return CHOSEN.roomDesk;
+    // playtest-1105 R5: 窗 ↔ its table up close is a lean in, like 桌子 ↔ 屏幕.
+    case "table>window":
+      return CHOSEN.deskScreen;
     default:
       return CROSSFADE_MS;
   }
@@ -160,7 +163,7 @@ export function motionVars(): Record<string, string> {
     "--m-walk-bob-n": String(CHOSEN.walkBobPx),
     // A turn between facings is a head turn inside a box (room-turn correction): the viewer stands half
     // the stage's width in front of the wall, and a light blur peaks mid-turn. (Its 650 / 2 × 400 ms
-    // timing is set per turn by the motion layer.)
+    // timing, now 1300 / 2 × 800 since playtest-1105 R10, is set per turn by the motion layer.)
     "--m-turn-p": `${TURN_PERSPECTIVE_PX}px`,
     "--m-turn-blur": `${TURN_BLUR_PX}px`,
     "--m-screen": ms(MOTION.screen),

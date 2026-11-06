@@ -1,6 +1,7 @@
 // NOT TODAY — entry point. The title page first (title-page spec): with a save, 继续 · 第 N 天
 // mounts the game on it; without one, 新游戏 asks the questions and 开始 starts a new run whose
-// first event is the names. There is no restart anywhere: only the endings clear the run save.
+// first event is the names. The run save is cleared by the endings, and (playtest-1105 R8) by
+// 设置 → 重新开始这一局 / 清除全部记录 after their question.
 // Debug: `?day=N` skips the title and builds day N from an empty log (never touches the saves);
 // `?beat=night&t=23:41` sets the stand-in clock; `?view=desk|desktop|door`, `?focus=right`.
 // The game opens in English (README); `?lang=zh` opens in Chinese.
@@ -20,7 +21,7 @@ import { createHandLayer } from "@world/objects/layer";
 import { createNav } from "@world/room/nav";
 import { settleSession } from "@world/dialogue/place";
 import { createPullDriver } from "@world/endings/pullout-dom";
-import { createProfileWriter, createRunSlot } from "@state/saves";
+import { clearAll, createProfileWriter, createRunSlot, restartRun } from "@state/saves";
 import { createStore, type Store } from "@state/store";
 import { parseBeatParams } from "@world/desktop/beat";
 import { mountDesktop } from "@world/desktop/controller";
@@ -112,6 +113,13 @@ function startGame(store: Store, saved: boolean, from?: "desk", prologue = false
       "settings-home"() {
         home();
       },
+      // playtest-1105 R8: 重新开始这一局, confirmed: the run save goes (the profile, language, mute
+      // and the cloud copy stay); back to the title. Only from the question, only for a saved run.
+      "settings-confirm"(ctx, data) {
+        if (ctx.session.settingsConfirm !== "restart" || data.what !== "restart") return;
+        if (saved) restartRun(run);
+        home();
+      },
     },
     onChange: (ctx) => syncLoop(ctx),
     onKey: loopKeys,
@@ -170,6 +178,15 @@ if (jump !== null) {
     collection,
     sound,
     kuroMemory,
+    // playtest-1105 R8: from the title's settings, each after its question; the page reloads on the title.
+    onRestart() {
+      restartRun(run);
+      home();
+    },
+    onClearAll() {
+      clearAll(run, profile);
+      home();
+    },
     // The theme's voice follows the pronoun a saved run was started with; m when there is none.
     voice: saved?.events.some((e) => e.kind === "names" && e.names.pronoun === "she") ? "f" : "m",
     async onContinue() {

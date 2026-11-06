@@ -149,7 +149,17 @@ export interface ChecklistLine {
   readonly id: string;
   readonly text: string;
   readonly state: LineState;
+  /**
+   * playtest-1105 R7: the one line for all of today's work tasks (`flag:task_*` items): how many
+   * are done of how many. Its text is the string `checklist.work` (the view fills it); `text` is "".
+   */
+  readonly work?: { readonly done: number; readonly total: number };
 }
+
+/** The id of the one work line (playtest-1105 R7). */
+export const WORK_LINE_ID = "work";
+/** A work task: an item done by a `task_*` flag (playtest-1105 R7). */
+export const isWorkTask = (it: Item): boolean => it.done.kind === "flag" && it.done.flag.startsWith("task_");
 
 export interface ChecklistView {
   /** Which list the card shows: the day's, or (after nightfall) the night's. */
@@ -168,9 +178,31 @@ export function checklist(ctx: LoopContext): ChecklistView {
   let doneCount = 0;
   let bedOpen = false;
   const heading = nightfallReached(ctx, states) ? "tonight" : "today";
+  const when = heading === "tonight" ? "night" : "day";
+  // playtest-1105 R7: this list's work tasks are one line, in the first task's place, while any is
+  // open; it counts as one done item once they all are.
+  const tasks = ctx.file.items.filter((it) => it.when === when && isWorkTask(it));
+  const tasksDone = tasks.filter((it) => states.get(it.id)!.done).length;
+  let workPlaced = false;
   for (const it of ctx.file.items) {
-    if (it.when !== (heading === "tonight" ? "night" : "day")) continue;
+    if (it.when !== when) continue;
     const st = states.get(it.id)!;
+    if (isWorkTask(it)) {
+      if (workPlaced) continue;
+      if (tasksDone === tasks.length) {
+        workPlaced = true;
+        doneCount++;
+        continue;
+      }
+      // The line stands for the first task not done yet: shown once that one is unlocked.
+      const first = tasks.find((x) => !states.get(x.id)!.done)!;
+      if (first !== it && states.get(it.id)!.done) continue;
+      workPlaced = true;
+      if (!states.get(first.id)!.unlocked) continue;
+      const locked = first.locked === "requiredPending" && pending.length > 0;
+      open.push({ id: WORK_LINE_ID, text: "", state: locked ? "locked" : "next", work: { done: tasksDone, total: tasks.length } });
+      continue;
+    }
     if (waiting(it, st, ctx)) {
       waits.push({ id: it.id, text: it.rewrite!, state: "wait" });
       continue;

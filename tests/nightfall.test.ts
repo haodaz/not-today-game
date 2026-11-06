@@ -9,7 +9,7 @@ import { DEFAULT_CLOCK, isNight, type BeatClock } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
 import { initialSession, type Session } from "@world/desktop/model";
 import { t } from "@world/i18n";
-import { checklist, itemStates, loopContext, nightfallReached } from "@world/loop/checklist";
+import { checklist, itemStates, loopContext, nightfallReached, WORK_LINE_ID } from "@world/loop/checklist";
 import { BEAT_TIMES, eveningClock, NIGHTFALL_STING, syncLoop } from "@world/loop/runtime";
 import { EVENING_DARK, isEvening, renderChecklist, renderRoom } from "@world/room/hud";
 import { splatLook } from "@world/room/splat/look";
@@ -121,7 +121,8 @@ describe("tonight's list", () => {
       fc.property(fc.constantFrom(...dayFiles.keys()), (day) => {
         const store = atDay(day);
         const ids = (s: Store) => checklist(lc(s)).lines.map((l) => l.id);
-        const whenOf = (id: string) => dayFiles.get(day)!.items.find((it) => it.id === id)!.when;
+        // playtest-1105 R7: the one work line stands for the list's own tasks.
+        const whenOf = (id: string) => (id === WORK_LINE_ID ? checklist(lc(store)).heading === "tonight" ? "night" : "day" : dayFiles.get(day)!.items.find((it) => it.id === id)!.when);
         expect(checklist(lc(store)).heading).toBe("today");
         for (const id of ids(store)) expect(whenOf(id)).toBe("day");
         completeUntil(store, "bed", { all: true, skip: dayFiles.get(day)!.items.filter((it) => it.when === "night").map((it) => it.id) });

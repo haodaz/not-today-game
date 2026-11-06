@@ -165,10 +165,16 @@ export function soundPlan(
  */
 export function titlePlan(
   rain: number | null,
-  opts: { readonly voice?: Voice; readonly lang?: Locale } = {},
+  opts: { readonly voice?: Voice; readonly lang?: Locale; readonly finishedRuns?: number; readonly walkman?: boolean } = {},
   table: SoundTable = soundTable,
 ): SoundPlan {
   const first = table.byRing[soundRing(1, false, table)]!;
+  // playtest-1105 R9: before the first finished run the song is not heard yet: under the rain the
+  // first ring's instrumental day track (music-day), with the title's fades. After it, the sung
+  // theme in the current language. (Absent: the theme, as before.)
+  // The walkman in 老物件 plays the sung theme whatever the count (`walkman`).
+  const instrumental = !opts.walkman && opts.finishedRuns === 0 && first.music !== null ? first.music.day : null;
+  const music = musicPart(table, "title", instrumental !== null ? { music: instrumental } : {});
   const rainDef = Object.prototype.hasOwnProperty.call(table.beds, "rain") ? table.beds.rain! : null;
   // The title is day 1's room: its rain only when day 1 rains (it does).
   const on = rain !== null && rainDef !== null && weatherOf(1) === "rain";
@@ -182,6 +188,6 @@ export function titlePlan(
     rain: 0,
     voice: opts.voice ?? "m",
     lang: opts.lang ?? getLocale(),
-    ...musicPart(table, "title"),
+    ...music,
   };
 }

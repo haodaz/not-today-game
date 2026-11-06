@@ -159,7 +159,8 @@ describe("profile", () => {
     const writer = createProfileWriter(memoryStorage());
     // title-page T8 / object-drawer 1: recordEnding, recordObject and writeKurogotchi also only write.
     // photo-album R1: recordPhoto only writes too.
-    expect(Object.keys(writer)).toEqual(["write", "increment", "recordEnding", "recordObject", "recordPhoto", "writeKurogotchi"]);
+    // playtest-1105 R8: clear (清除全部记录 only) removes it; still no read.
+    expect(Object.keys(writer)).toEqual(["write", "increment", "recordEnding", "recordObject", "recordPhoto", "writeKurogotchi", "clear"]);
     expect(writer.increment("runs")).toBeUndefined();
     expect(writer.recordEnding("bad")).toBeUndefined();
     expect(writer.recordObject("chick")).toBeUndefined();

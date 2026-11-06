@@ -98,7 +98,7 @@ describe("the online path (FR3), with a mocked function", () => {
     talk(ctx);
     act(ctx, "kuro-q", { q: "1" });
     expect(box(ctx)).toContain(`>${WAITING}</button>`);
-    expect(box(ctx)).not.toContain("dlg-player");
+    expect(box(ctx)).not.toContain('class="dlg player');
     await flush();
     const ev = store.getEvents().find((e) => e.kind === "chat")!;
     expect(ev).toMatchObject({ q: 1, answer: "You noticed. Most people don't, {login}.", offline: false });
@@ -106,9 +106,12 @@ describe("the online path (FR3), with a mocked function", () => {
     // Never the login inputs in what the client sends.
     expect(JSON.stringify(turns[0])).not.toContain("林一");
     const shown = box(ctx);
-    expect(shown).toContain("dlg-player");
     expect([...decay("You noticed. Most people don't, 林一.", 5)].length).toBe([..."You noticed. Most people don't, 林一."].length);
     expect(shown).toContain(escapeHtml(decay("You noticed. Most people don't, 林一.", 5)));
+    // playtest-1105 R6: the reply read on, the same box is the player's turn.
+    expect(shown).not.toContain('class="dlg player');
+    act(ctx, "loop-advance");
+    expect(box(ctx)).toContain('class="dlg player');
   });
 
   it("any failure (timeout, refusal, network) → the scripted answer, logged offline; Kuro never breaks", async () => {
@@ -119,7 +122,8 @@ describe("the online path (FR3), with a mocked function", () => {
     act(ctx, "kuro-q", { q: "2" });
     await flush();
     expect(store.getEvents().find((e) => e.kind === "chat")).toMatchObject({ q: 2, answer: offlineAnswer(kuroDay(1)!, 2), offline: true });
-    expect(box(ctx)).toContain("dlg-player");
+    act(ctx, "loop-advance");
+    expect(box(ctx)).toContain('class="dlg player');
   });
 
   it("the function says bedtime: the bedtime line, no turn logged, no player's box", async () => {
@@ -130,7 +134,8 @@ describe("the online path (FR3), with a mocked function", () => {
     act(ctx, "kuro-q", { q: "1" });
     await flush();
     expect(store.getEvents().some((e) => e.kind === "chat")).toBe(false);
-    expect(box(ctx)).not.toContain("dlg-player");
+    act(ctx, "loop-advance");
+    expect(box(ctx)).not.toContain('class="dlg player');
   });
 
   it("property: the sixth turn is always blocked on the client, online or not", () => {

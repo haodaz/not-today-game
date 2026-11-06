@@ -2527,3 +2527,33 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
   - updated for the new rules: shell (window default, 4 px edge, full-screen dock), tingtalk (placement field), story-mask, fixes-1031, loop-hud (waking beat), where (the waking beat set aside where it is not the subject), navigation and splat harnesses (the waking lines set aside, onboarding done);
   - snapshots (desktop-snapshots, story-mask, late-days, navigation) edited by hand for the new markup only.
 - `npx tsc --noEmit`: clean. `npx vitest run`: 120 files / 2087 tests passed.
+
+## playtest-1105, tasks 5–10 (2026-11-02)
+
+- R5, 窗's table and its close view:
+  - New View `table`, a level under 窗, the same pattern as 桌子: `meal-table` leans in (500 ms). Esc, the bottom strip and the wheel go back to 窗 (`backTarget`, `hasBack`, `edgeLeads`).
+  - `goTo` / `wayMs` now follow `wayLegs`: a level goes out to its own facing first. 桌子 → table is 房间 → 窗 → table.
+  - The close view is window.jpg pushed in 3× in CSS (`TABLE_ZOOM`). There is no close-up still, and public/ was not touched. The meal shows large there (`TABLE_SHOT.meal`), and eating works there (`loop-eat` accepts table). The table view has no fx stack and no raid glow.
+  - `WINDOW_SHOT.meal` moved from {615,570,105,85} to {617,578,120,88}, so its bottom now sits on the tabletop (stage y 614–684).
+- R6, Kuro in the room:
+  - Cause: `answerAsk` gave the day's idiom ("Good to see you." on day 1) with only 好。 in every beat but the night chat beat. A daytime click on Kuro therefore always got the idiom.
+  - Fix: while the day's chat item is still locked (by day), a click says `kuro.room.notYet`, after the upgrade offer if one is pending.
+  - One box: `.dlg-player` and `.raised` are gone. Kuro's turn line reads on (`readOnToPlayer`, one page past its last). Then the same `.dlg` box is the player's turn, with their tag, their portrait in Kuro's slot, and the starters as choices (`PLAYER_TURN_BOX`) or the input.
+  - motion/dom.ts still queries `.dlg-player`. Those queries now find nothing and are harmless.
+- R7: `flag:task_*` items are one line, `checklist.work` {done}/{total}, at the first open task's place. Once all tasks are done they count as one done item. Day 17's self-ticking task is one of them.
+- R8:
+  - New `restartRun` / `clearAll` (saves.ts), and `ProfileWriter.clear`.
+  - In the game: 重新开始这一局 asks first. 确定 is main.ts's: it clears the run if it is saved, then goes to the title. Neither path calls the cloud.
+  - On the title: both, each with its own question (`settingsConfirm`). Esc on a question cancels it.
+  - title.test's "no restart" property is narrowed to "only the panel's two".
+- R9: `titlePlan` takes `finishedRuns`. At 0 it plays the first ring's instrumental day track (music-day.mp3); from 1 on, the sung theme. The drawer's walkman always plays the theme (`walkman`).
+- R10:
+  - Turns are 2×: 650 → 1300 ms, two hops 2 × 400 → 2 × 800 ms. The ease was already ease-in-out.
+  - Leaving 屏幕: the screen ghost was held at full opacity until the walk's last 400 ms. It now fades out from the start over 280 ms.
+  - 桌子: a press on a prop started the look pan, which translates the whole `.desk-things` layer. A prop is now dragged alone (nav `propAt` / `movePropBy` / `releaseProp`) and eases back on release.
+  - The phone's white screen: **not fixed, cause not found** (see the report).
+- Tests:
+  - `tests/playtest-1105.test.ts` gains R5–R10; new `tests/playtest-1105-dom.test.ts` (happy-dom, bugs 2 and 3).
+  - Updated for the new rules: dialogue, kuro-chat, kuro-taboo, upgrades, loop-engine, loop-hud, nightfall, saves, splat, title.
+- Snapshots: 7 stale, not edited (listed in the report). I removed one snapshot entry that vitest wrote while a test title was briefly renamed.
+- `npx tsc --noEmit`: clean. `npx vitest run`: 121 files, 2094 passed, 7 failed (the stale snapshots only).

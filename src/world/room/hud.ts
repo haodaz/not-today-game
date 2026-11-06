@@ -8,7 +8,7 @@ import type { GameEvent } from "@state/events";
 import type { State } from "@state/types.gen";
 import { constants } from "@state/variables";
 import { beatLabelKey } from "@world/desktop/beat";
-import type { Session } from "@world/desktop/model";
+import type { Session, SettingsConfirm } from "@world/desktop/model";
 import { doorCaption, DOOR_STATES, nextInputs, startDoor, type DoorBeat, type DoorInput, type DoorState } from "@world/delivery/door";
 import { mealView } from "@world/delivery/meals";
 import { renderDoorView } from "@world/delivery/view";
@@ -22,7 +22,7 @@ import { raidNights, takeOf } from "@state/nights";
 import { isEvening, isNight } from "@world/desktop/beat";
 import { lampLit } from "@world/objects/works";
 import { hudKuro } from "@world/desktop/kuro/mini";
-import { DESK_SHOT, DOOR_SHOT, FLAT_HOTS, isFlatFacing, LOOK_SPOTS, rectStyle, ROOM_SHOT, WINDOW_SHOT, type FlatHotId, type Rect } from "./shots";
+import { DESK_SHOT, DOOR_SHOT, FLAT_HOTS, isFlatFacing, LOOK_SPOTS, rectStyle, ROOM_SHOT, TABLE_SHOT, WINDOW_SHOT, type FlatHotId, type Rect } from "./shots";
 import { isFacing } from "./facings";
 import { deskLayout, objectSlot } from "./desk";
 import { fxPlan, renderFx } from "./fx";
@@ -67,7 +67,8 @@ export function boxObjectFor(day: number): string | null {
 
 export function renderChecklist(view: ChecklistView): SafeHtml {
   // The checklist only watches (day-loop correction 2026-11-01): no line is a button.
-  const lines = view.lines.map((l) => html`<div class="${cls("it", l.state)}" data-id="${l.id}"><i></i>${l.text}</div>`);
+  // playtest-1105 R7: all of today's work tasks are one line, with how many are done.
+  const lines = view.lines.map((l) => html`<div class="${cls("it", l.state)}" data-id="${l.id}"><i></i>${l.work ? tr("checklist.work", { done: l.work.done, total: l.work.total }) : l.text}</div>`);
   const done = view.doneCount > 0 ? html`<div class="done">${tr("hud.done", { n: view.doneCount })}</div>` : null;
   return html`<div class="list"><div class="h">${tr(view.heading === "tonight" ? "hud.tonight" : "hud.today")}</div>${done}${lines}</div>`;
 }
@@ -191,6 +192,12 @@ function windowThings(state: State, events: readonly GameEvent[]): SafeHtml | nu
   return meal ? html`<div class="facing-things">${placedAt("meal", WINDOW_SHOT.meal, meal)}</div>` : null;
 }
 
+/** 窗's table up close (playtest-1105 R5): the same meal slot, large on the tabletop; empty table, nothing. */
+function tableThings(state: State, events: readonly GameEvent[]): SafeHtml | null {
+  const meal = mealSlot(state, events);
+  return meal ? html`<div class="facing-things table-things">${placedAt("meal", TABLE_SHOT.meal, meal)}</div>` : null;
+}
+
 /**
  * The flat facings' things to point at (room-turn R3): fixed rectangles (FLAT_HOTS), keyboard
  * proxies like 房间's, picked by the nav layer by rectangle instead of by a ray.
@@ -278,7 +285,8 @@ export function settingsButton(): SafeHtml {
 
 /**
  * The settings panel, centred over the current view with the view dimmed: 声音 on/off, 语言
- * 中文 · English (re-renders at once), 返回首页, 取消. Nothing here restarts the run.
+ * 中文 · English (re-renders at once), 重新开始这一局 (and on the title 清除全部记录; each asks first,
+ * playtest-1105 R8), 返回首页, 取消.
  */
 /**
  * 绑定邮箱 (backend FR1): an email input with 发送链接 and a status line; once bound, the address;
@@ -295,17 +303,24 @@ export function emailRowHtml(row: EmailRow): SafeHtml | null {
 }
 
 export function settingsPanel(
-  session: Pick<Session, "settingsOpen" | "muted">,
-  opts: { readonly home: boolean; readonly email?: EmailRow } = { home: true },
+  session: Pick<Session, "settingsOpen" | "muted"> & { readonly settingsConfirm?: SettingsConfirm | null },
+  opts: { readonly home: boolean; readonly email?: EmailRow; readonly clearAll?: boolean } = { home: true },
 ): SafeHtml | null {
   if (!session.settingsOpen) return null;
+  // playtest-1105 R8: 重新开始这一局 / 清除全部 ask first, in the same panel: the question, 确定 · 取消.
+  const asking = session.settingsConfirm ?? null;
+  if (asking) {
+    const q = asking === "restart" ? "settings.restartConfirm" : "settings.clearAllConfirm";
+    return html`<div class="settings-layer"><button type="button" class="settings-dim" data-action="settings-confirm-cancel" aria-label="${t("settings.cancel")}"></button><div class="settings confirm" role="alertdialog" aria-modal="true" aria-labelledby="settings-ask" data-confirm="${asking}"><p id="settings-ask">${tr(q)}</p><div class="actions"><button type="button" class="danger" data-action="settings-confirm" data-what="${asking}">${tr("settings.confirm")}</button><button type="button" data-action="settings-confirm-cancel">${tr("settings.cancel")}</button></div></div></div>`;
+  }
+  const reset = html`<div class="row reset"><button type="button" data-action="settings-restart">${tr("settings.restart")}</button>${opts.clearAll ? html`<button type="button" data-action="settings-clear-all">${tr("settings.clearAll")}</button>` : null}</div>`;
   const email = emailRowHtml(opts.email ?? emailRow());
   const sound = !session.muted;
   // The title page has no 返回首页: it is the home (title-page FR2).
   const home = opts.home ? html`<button type="button" data-action="settings-home">${tr("settings.home")}</button>` : null;
   const lang = (l: Locale) =>
     html`<button type="button" class="${getLocale() === l ? "on" : ""}" data-action="settings-lang" data-lang="${l}" aria-pressed="${getLocale() === l ? "true" : "false"}">${tr(`settings.lang.${l}`)}</button>`;
-  return html`<div class="settings-layer"><button type="button" class="settings-dim" data-action="settings-close" aria-label="${t("settings.cancel")}"></button><div class="settings" role="dialog" aria-modal="true" aria-labelledby="settings-title"><h3 id="settings-title">${tr("settings.title")}</h3><div class="row"><span>${tr("settings.sound")}</span><button type="button" class="${cls("switch", sound && "on")}" data-action="loop-mute" role="switch" aria-checked="${sound ? "true" : "false"}" aria-label="${t("settings.sound")}"><i></i></button></div><div class="row"><span>${tr("settings.lang")}</span><span class="seg">${lang("zh")}<b>·</b>${lang("en")}</span></div>${email}<div class="actions">${home}<button type="button" data-action="settings-close">${tr("settings.cancel")}</button></div></div></div>`;
+  return html`<div class="settings-layer"><button type="button" class="settings-dim" data-action="settings-close" aria-label="${t("settings.cancel")}"></button><div class="settings" role="dialog" aria-modal="true" aria-labelledby="settings-title"><h3 id="settings-title">${tr("settings.title")}</h3><div class="row"><span>${tr("settings.sound")}</span><button type="button" class="${cls("switch", sound && "on")}" data-action="loop-mute" role="switch" aria-checked="${sound ? "true" : "false"}" aria-label="${t("settings.sound")}"><i></i></button></div><div class="row"><span>${tr("settings.lang")}</span><span class="seg">${lang("zh")}<b>·</b>${lang("en")}</span></div>${email}${reset}<div class="actions">${home}<button type="button" data-action="settings-close">${tr("settings.cancel")}</button></div></div></div>`;
 }
 
 /**
@@ -483,7 +498,7 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const lc = loopContext(state, events);
   const list = lc ? renderChecklist(checklist(lc)) : null;
   // The four facings and 桌子 (屏幕 is the desktop's own render).
-  const view = isFacing(session.view) || session.view === "desk" ? session.view : "room";
+  const view = isFacing(session.view) || session.view === "desk" || session.view === "table" ? session.view : "room";
   const door = view === "door";
   const nowMs = model.nowMs ?? 0;
   // The placed things belong to the arriving framing: they wait for the camera, then fade in.
@@ -498,18 +513,21 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const dream = lineScene.backdrop !== null;
   const flat = isFlatFacing(view) ? html`${flatHits(view)}${view === "window" ? html`${lookHits("window")}${windowThings(state, events)}` : null}` : null;
   // playtest-1105 R4: 门's things to touch sit under the door beat's own spot.
-  const scene = waiting || dream ? null : door ? html`${lookHits("door")}${doorContent(state, events, session)}` : hotView ? html`${shotHits(hotView, state, events)}${kept}` : flat;
+  // playtest-1105 R5: 窗's table up close carries only the meal, large.
+  const table = view === "table" ? tableThings(state, events) : null;
+  const scene = waiting || dream ? null : door ? html`${lookHits("door")}${doorContent(state, events, session)}` : hotView ? html`${shotHits(hotView, state, events)}${kept}` : (flat ?? table);
   // The held item sits over everything but the dialogue box (held-object.html).
   const held = door ? null : heldLayer(state, events, session, nowMs);
   // The hand is here: the desk dims and the gap between the monitors glows (night-hand FR1; the
   // room scene will draw the gap itself).
   // Per view as before (room-turn R4): none at 门 or 床; 窗 behaves like 房间.
-  const raid = !door && view !== "bed" && !waiting && raidShowing(state, session);
+  const raid = !door && view !== "bed" && view !== "table" && !waiting && raidShowing(state, session);
   const gap = (view === "room" || view === "window" ? ROOM_SHOT : DESK_SHOT).gap;
   // 桌子 is the tabletop: everything with state is a placed cutout at its rect (content/desk.json).
   const top = view === "desk" && !waiting && !dream ? tabletop(deskThings(state, events, session)) : null;
   // The collapse stack and the evening look apply to all four facings (room-turn R4).
-  const fx = dream ? null : renderFx(fxPlan(state.day, view));
+  // The table up close has no stack of its own (its photos would not be pushed in like the still).
+  const fx = dream || view === "table" ? null : renderFx(fxPlan(state.day, view));
   const evening = dream ? null : eveningLook(view, isEvening(session.clock), lampLit(session));
   const fadeLen = session.cam?.fade ?? ARRIVE_FADE_MS;
   const late = fade === null ? null : raw(` style="--late:-${Math.round(fade)}ms${fadeLen !== ARRIVE_FADE_MS ? `;--late-dur:${fadeLen}ms` : ""}"`);
