@@ -197,28 +197,32 @@
       "day": 9,
       "facing": "room",
       "add": {
-        "text": "The chair cushion is pressed down, as if someone is sitting in it."
+        "text": "The chair cushion is pressed down, as if someone is sitting in it.",
+        "overlay": "/room/photos/d09_room.jpg"
       }
     },
     {
       "day": 9,
       "facing": "bed",
       "add": {
-        "text": "On the wall above the bed, the shadow of nine squares. Count them: ten."
+        "text": "On the wall above the bed, the shadow of nine squares. Count them: ten.",
+        "overlay": "/room/photos/d09_bed.jpg"
       }
     },
     {
       "day": 9,
       "facing": "door",
       "add": {
-        "text": "The door is open a crack. Outside is the meeting grid."
+        "text": "The door is open a crack. Outside is the meeting grid.",
+        "overlay": "/room/photos/d09_door.jpg"
       }
     },
     {
       "day": 9,
       "facing": "window",
       "add": {
-        "text": "A yellow sign on the window glass. Not any letter."
+        "text": "A yellow sign on the window glass. Not any letter.",
+        "overlay": "/room/photos/d09_window.jpg"
       }
     },
     {

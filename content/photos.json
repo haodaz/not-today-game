@@ -197,28 +197,32 @@
       "day": 9,
       "facing": "room",
       "add": {
-        "text": "椅子上的坐垫凹着，像有人正坐在上面。"
+        "text": "椅子上的坐垫凹着，像有人正坐在上面。",
+        "overlay": "/room/photos/d09_room.jpg"
       }
     },
     {
       "day": 9,
       "facing": "bed",
       "add": {
-        "text": "床头的墙上，有九个格子的影子。数一数是十个。"
+        "text": "床头的墙上，有九个格子的影子。数一数是十个。",
+        "overlay": "/room/photos/d09_bed.jpg"
       }
     },
     {
       "day": 9,
       "facing": "door",
       "add": {
-        "text": "门开着一条缝。门外是会议的宫格。"
+        "text": "门开着一条缝。门外是会议的宫格。",
+        "overlay": "/room/photos/d09_door.jpg"
       }
     },
     {
       "day": 9,
       "facing": "window",
       "add": {
-        "text": "窗玻璃上一个黄色的记号，不是任何字。"
+        "text": "窗玻璃上一个黄色的记号，不是任何字。",
+        "overlay": "/room/photos/d09_window.jpg"
       }
     },
     {
