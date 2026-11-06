@@ -537,5 +537,15 @@
   "settings.hints": "新手提示",
   "settings.hints.on": "开",
   "settings.hints.off": "关",
-  "kuro.hint.typing": "你打。我看着。"
+  "kuro.hint.typing": "你打。我看着。",
+  "hint.short.tower": "开机",
+  "hint.short.screen": "坐到电脑前",
+  "hint.short.turn": "转身看看",
+  "hint.short.phone": "点外卖",
+  "hint.short.door": "去门口",
+  "hint.short.table": "去窗边吃饭",
+  "hint.short.box": "看看箱子",
+  "hint.short.items": "打开道具",
+  "hint.short.kuro": "和克总聊聊",
+  "hint.short.bed": "睡觉"
 }

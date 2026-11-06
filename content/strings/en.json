@@ -537,5 +537,15 @@
   "settings.hints": "Beginner hints",
   "settings.hints.on": "On",
   "settings.hints.off": "Off",
-  "kuro.hint.typing": "You type. I'm watching."
+  "kuro.hint.typing": "You type. I'm watching.",
+  "hint.short.tower": "Switch on",
+  "hint.short.screen": "Sit at the computer",
+  "hint.short.turn": "Look around",
+  "hint.short.phone": "Order food",
+  "hint.short.door": "Go to the door",
+  "hint.short.table": "Eat by the window",
+  "hint.short.box": "Check the case",
+  "hint.short.items": "Open Items",
+  "hint.short.kuro": "Talk to Kuro",
+  "hint.short.bed": "Sleep"
 }
