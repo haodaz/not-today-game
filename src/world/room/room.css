@@ -413,6 +413,8 @@
    edge 4 % in from the stage's right, 32 % of the stage wide (280–420 px), its bottom 16 px above
    the box's top; rows stack upward, the first option on top. --stage-l / --stage-w are the fit's. */
 .dlg-choices{position:fixed;z-index:31;right:calc(100vw - var(--stage-l,0px) - var(--stage-w,100vw) + var(--stage-w,100vw) * .04);bottom:calc(var(--dlg-bottom,60px) + var(--dlg-h,132px) + 16px);width:clamp(280px,calc(var(--stage-w,100vw) * .32),420px);display:flex;flex-direction:column;justify-content:flex-end;gap:8px;pointer-events:auto}
+/* A portrait's head stands 68 px above the box (Kuro / the player / an NPC): the column clears it too. */
+.dlg:has(.kuro-portrait,.player-portrait,.npc-portrait)+.dlg-choices{bottom:calc(var(--dlg-bottom,60px) + var(--dlg-h,132px) + 68px + 16px)}
 .dlg-choices .dc-row{position:relative;display:flex;align-items:center;gap:10px;width:100%;min-height:46px;box-sizing:border-box;margin:0;padding:0 14px;border:0;border-radius:8px;background:rgba(248,246,241,.94);color:#1d2129;font:15px/1.4 var(--font-game-text,"PingFang SC","Hiragino Sans GB",sans-serif);text-align:left;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.18);transition:background-color 120ms,box-shadow 120ms}
 .dlg-choices button.dc-row:hover,.dlg-choices button.dc-row:focus,.dlg-choices button.dc-row:focus-visible,.dlg-choices .dc-field:focus-within{background:rgba(255,255,255,1);outline:none;box-shadow:inset 3px 0 0 var(--accent,#3b6ef2),0 6px 18px rgba(0,0,0,.18)}
 .dlg-choices .dc-ic{flex:0 0 14px;width:14px;height:14px;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:14px;line-height:1;color:#8b2f2a}
