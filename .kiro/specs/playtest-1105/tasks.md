@@ -1,0 +1,11 @@
+# playtest-1105 — tasks
+- [ ] 1. R1 desktop, dock, onboarding
+- [ ] 2. R2 dialogue owns the screen
+- [ ] 3. R3 boot beat at day start, power-on lines
+- [ ] 4. R4 room looks
+- [ ] 5. R5 meal table + close view
+- [ ] 6. R6 Kuro in the room
+- [ ] 7. R7 checklist
+- [ ] 8. R8 settings
+- [ ] 9. R9 title music
+- [ ] 10. R10 four bugs

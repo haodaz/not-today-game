@@ -1,0 +1,33 @@
+{
+  "_note": "What the player's own voice says when they click a thing in the room (author playtest 2026-11-05: the room needs more to touch). One line at random each click, as an inner line. Claude's; en twin has the same keys and the same number of lines.",
+  "looks": {
+    "coat": [
+      "一件外套穿一年，一年以后换一件。",
+      "去年公司发的，背后印着 logo。今年没发。",
+      "口袋里还有一张工牌。门禁早就刷不开了。",
+      "挂在门口，像随时要出门。我没有要出门。",
+      "它比我出门的次数多。上次是它自己掉到地上。"
+    ],
+    "bag": [
+      "AI 这么发达，却还没发明直接传送食物。",
+      "外卖袋。袋子比饭活得久。",
+      "攒够七个一起扔。现在第几个，我不数了。",
+      "袋子上印着「用心做好每一餐」。我用心吃完了。",
+      "空的。和冰箱一个状态。"
+    ],
+    "door": [
+      "门外是走廊，走廊外面是世界。今天不用去。",
+      "这扇门进来的只有外卖和快递。",
+      "十几天没出过这扇门。门也没想我。",
+      "门关着的时候，屋子是我的。",
+      "租的房子，门是房东的，锁是我换的。"
+    ],
+    "lock": [
+      "锁好了。我又看了一遍。",
+      "一道锁，一道链。链子是我自己装的。",
+      "锁好了。第三遍。",
+      "检查锁不是怕有人进来，是习惯。",
+      "锁舌咔哒一声。听着放心。"
+    ]
+  }
+}

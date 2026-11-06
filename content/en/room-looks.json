@@ -1,0 +1,33 @@
+{
+  "_note": "What the player's own voice says when they click a thing in the room (author playtest 2026-11-05: the room needs more to touch). One line at random each click, as an inner line. Claude's; en twin has the same keys and the same number of lines.",
+  "looks": {
+    "coat": [
+      "One coat a year. After a year, another one.",
+      "Last year's company coat, logo on the back. No coat this year.",
+      "Still a staff badge in the pocket. The gate stopped reading it long ago.",
+      "Hanging by the door like I'm about to go out. I'm not.",
+      "It goes out more than I do. Last time it fell on the floor by itself."
+    ],
+    "bag": [
+      "AI can do everything, and it still hasn't invented teleporting food.",
+      "A takeaway bag. Bags outlive the meals.",
+      "I throw them out in sevens. I've stopped counting where I'm at.",
+      "The bag says 'Every meal made with care.' I ate it with care.",
+      "Empty. Same as the fridge."
+    ],
+    "door": [
+      "Outside is the corridor, and outside that, the world. Not needed today.",
+      "Only takeaway and parcels come through this door.",
+      "Over ten days without going out this door. It hasn't missed me either.",
+      "With the door shut, the room is mine.",
+      "A rented flat: the door is the landlord's, the lock is mine."
+    ],
+    "lock": [
+      "Locked. I checked again.",
+      "One lock, one chain. I put the chain on myself.",
+      "Locked. Third time.",
+      "I don't check it because someone might come in. It's a habit.",
+      "The bolt clicks. That sound helps."
+    ]
+  }
+}
