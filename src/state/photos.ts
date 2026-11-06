@@ -179,19 +179,23 @@ function parsePhotosFile(input: unknown): PhotosTable {
 }
 
 // ——— English twin (photos-twin R1, 2026-11-05) ———
-// content/en/photos.json has the same entries in the same order: the same (day, facing) / (at, day)
-// and the same overlay; only `add.text` differs, read from the twin under lang=en.
+// content/en/photos.json has the same entries in the same order: the same (day, facing) / (at, day);
+// `add.text` is read from the twin under lang=en, and so is `add.overlay` when the twin names a
+// different file (a photo with words in it has an English image: d08_bed_en.jpg). Both files have an
+// overlay or neither.
 
 const twinFail = (where: string, problem: string): never => {
   throw new Error(`content/en/photos.json ${where}: ${problem}`);
 };
 
-/** The add with its text from the twin under lang=en; the overlay is the Chinese's (they must match). */
+/** The add with its text (and, when the twin's differs, its overlay) from the twin under lang=en. */
 function localiseAdd(z: PhotoAdd, e: PhotoAdd, w: string): PhotoAdd {
-  if (z.overlay !== e.overlay) twinFail(`${w}.add.overlay`, `${JSON.stringify(e.overlay)}, the Chinese has ${JSON.stringify(z.overlay)}`);
+  if (z.overlay !== undefined && e.overlay === undefined) twinFail(`${w}.add.overlay`, "missing (the Chinese has one)");
+  if (z.overlay === undefined && e.overlay !== undefined) twinFail(`${w}.add.overlay`, "not in the Chinese");
   if (z.text !== undefined && e.text === undefined) twinFail(`${w}.add.text`, "missing (the Chinese has one)");
   if (z.text === undefined && e.text !== undefined) twinFail(`${w}.add.text`, "not in the Chinese");
-  return z.text === undefined ? z : Object.freeze(bilingualValues(z, { text: e.text }));
+  const en = { text: e.text, overlay: e.overlay === z.overlay ? undefined : e.overlay };
+  return en.text === undefined && en.overlay === undefined ? z : Object.freeze(bilingualValues(z, en));
 }
 
 /** The Chinese table, its texts read from the twin under lang=en. Pure; exported for tests. */
