@@ -133,7 +133,8 @@
       "day": 7,
       "facing": "room",
       "add": {
-        "text": "地板上画着一个圈，椅子正好在圈里。"
+        "text": "地板上画着一个圈，椅子正好在圈里。",
+        "overlay": "/room/photos/d07_room.jpg"
       }
     },
     {

@@ -133,7 +133,8 @@
       "day": 7,
       "facing": "room",
       "add": {
-        "text": "A circle drawn on the floor; the chair is exactly inside it."
+        "text": "A circle drawn on the floor; the chair is exactly inside it.",
+        "overlay": "/room/photos/d07_room.jpg"
       }
     },
     {
