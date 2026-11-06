@@ -506,11 +506,11 @@
   "room.boot.on": "主机嗡了一声，两块屏幕亮了。",
   "room.boot.hint": "点屏幕，坐到电脑前。",
   "onboard.title": "这台电脑上有什么",
-  "onboard.tingtalk": "汀汀：公司的消息。老板、合伙人、同事都在这儿找你。今天的活从这里来。",
-  "onboard.workbench": "工作台：干活的地方。克总在这儿，做完的活从这里交。",
-  "onboard.msgs": "喂信：家里的消息。",
-  "onboard.browser": "浏览器：查资料。",
-  "onboard.files": "文件：下载的、导出的、录到的，都在这儿。",
+  "onboard.tingtalk": "公司的消息。老板、合伙人、同事都在这儿找你。今天的活从这里来。",
+  "onboard.workbench": "干活的地方。克总在这儿，做完的活从这里交。",
+  "onboard.msgs": "家里的消息。",
+  "onboard.browser": "查资料。",
+  "onboard.files": "下载的、导出的、录到的，都在这儿。",
   "onboard.ok": "知道了",
   "kuro.room.notYet": "活干完了再来。我不急。",
   "checklist.work": "把今天的活干完（{done}/{total}）",
@@ -518,5 +518,8 @@
   "settings.restartConfirm": "这一局的进度会清空，回到标题页。确定吗？",
   "settings.clearAll": "清除全部记录",
   "settings.clearAllConfirm": "进度、老物件、影集、结局都会清空，像第一次打开一样。确定吗？",
-  "settings.confirm": "确定"
+  "settings.confirm": "确定",
+  "onboard.next": "下一个",
+  "onboard.skip": "跳过",
+  "onboard.step": "{n} / {total}"
 }

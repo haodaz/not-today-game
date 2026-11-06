@@ -1,0 +1,8 @@
+{
+  "_note": "Desktop wallpapers, one a day in turn (author 2026-11-05: keep all three, let it change by itself): day N shows list[(N-1) % length]. Claude's; wan2.6-image from a plain gradient.",
+  "list": [
+    "/os/wallpaper_a.jpg",
+    "/os/wallpaper_b.jpg",
+    "/os/wallpaper_c.jpg"
+  ]
+}

@@ -506,11 +506,11 @@
   "room.boot.on": "The computer hums. Both screens light up.",
   "room.boot.hint": "Click a screen to sit down at the computer.",
   "onboard.title": "What's on this computer",
-  "onboard.tingtalk": "TingTalk: work messages. The boss, the partner and colleagues find you here. Today's work comes from here.",
-  "onboard.workbench": "Workbench: where the work gets done. Kuro is here, and finished work is handed in from here.",
-  "onboard.msgs": "Hichat: messages from home.",
-  "onboard.browser": "Browser: for looking things up.",
-  "onboard.files": "Files: everything downloaded, exported or recorded.",
+  "onboard.tingtalk": "Work messages. The boss, the partner and colleagues find you here. Today's work comes from here.",
+  "onboard.workbench": "Where the work gets done. Kuro is here, and finished work is handed in from here.",
+  "onboard.msgs": "Messages from home.",
+  "onboard.browser": "For looking things up.",
+  "onboard.files": "Everything downloaded, exported or recorded.",
   "onboard.ok": "Got it",
   "kuro.room.notYet": "Finish the work first. I'm in no hurry.",
   "checklist.work": "Finish today's work ({done}/{total})",
@@ -518,5 +518,8 @@
   "settings.restartConfirm": "This run's progress will be cleared and you'll go back to the title. Sure?",
   "settings.clearAll": "Clear all records",
   "settings.clearAllConfirm": "Progress, old things, the album and endings will all be cleared, as if opening the game for the first time. Sure?",
-  "settings.confirm": "Yes"
+  "settings.confirm": "Yes",
+  "onboard.next": "Next",
+  "onboard.skip": "Skip",
+  "onboard.step": "{n} / {total}"
 }
