@@ -1,3 +1,5 @@
+> **SUPERSEDED (author 2026-11-06).** The raid-and-block design below is gone: nights 1–9 have no hand; from day 10 the hand collects the day's work (work-v2 §4 and its 2026-11-03 addition). `wants`, `item_dream`, `blockedWith`, `nights.json`, `nights-takes.json` and the dream state are removed. Only night 18 (slip / take the hand, san-and-endings) survives. Kept for history.
+
 # night-hand — requirements
 
 The hand that comes out of the gap between the monitors at night and asks for something. The player's only moves: hold up an object, hold up something already lost, or hold up nothing (product.md). Data: the night beats in `content/days/day-NN.json` (`shutdown.choices`), `content/stages.json` (nightBeat), `content/variables.json` (`raids`, `lost`, `found`, `recognised`, `upgraded`).

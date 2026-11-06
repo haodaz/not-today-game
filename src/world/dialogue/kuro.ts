@@ -8,7 +8,7 @@
 import type { SayLine } from "@state/days/table";
 import { CHAT_TEXT_MAX, type GameEvent } from "@state/events";
 import type { State } from "@state/types.gen";
-import { currentOffer, FINAL } from "@state/upgrades";
+import { currentOffer } from "@state/upgrades";
 import { constants } from "@state/variables";
 import type { ActionContext, ActionHandler } from "@world/desktop/controller";
 import { isNight } from "@world/desktop/beat";
@@ -67,10 +67,7 @@ export function startTalk(ctx: ActionContext): void {
   const state = store.getState();
   let d = session.dialogue;
   const offer = isNight(session.clock) ? null : currentOffer(state, store.getEvents());
-  if (offer) {
-    const object = offer.kind === "final" ? FINAL : offer.object;
-    d = push(d, item(session, state.day, offer.line, { kind: "kuroOffer", object, decline: offer.kind }));
-  }
+  if (offer) d = push(d, item(session, state.day, offer.line, { kind: "kuroOffer", object: offer.object, decline: offer.kind }));
   // playtest-1105 R6: while today's chat is locked (its checklist item opens after the work), a
   // click is its one line, kuro.room.notYet, with nothing to answer (after the offer, if one waits).
   // (The night beat comes after shutdown, so the chat beat is never locked.)
@@ -139,25 +136,22 @@ export function answerOffer(ctx: ActionContext, yes: boolean): void {
   const offer = currentOffer(state, store.getEvents());
   session.dialogue = finishChoice(session.dialogue);
   if (!offer) return;
-  if (yes) acceptOffer(ctx, offer.kind === "final" ? FINAL : offer.object);
+  if (yes) acceptOffer(ctx, offer.object);
   else declineOffer(ctx, offer.kind);
 }
 
-/** Accept the current offer for `object` (the final offer upgrades everything it covers). */
+/** Accept the current offer for `object` (one object at a time). */
 export function acceptOffer(ctx: ActionContext, object: string | undefined): void {
   const offer = currentOffer(ctx.store.getState(), ctx.store.getEvents());
-  if (!offer) return;
-  if (object !== (offer.kind === "final" ? FINAL : offer.object)) return;
-  const objects = offer.kind === "final" ? offer.objects : [offer.object];
-  // 全员升级 (the final offer): each upgrade is marked `final`, so assimilation becomes the max.
-  for (const o of objects) ctx.store.appendEvent(offer.kind === "final" ? { kind: "upgrade", object: o, final: true } : { kind: "upgrade", object: o });
+  if (!offer || object !== offer.object) return;
+  ctx.store.appendEvent({ kind: "upgrade", object: offer.object });
 }
 
 /** Decline the current offer (its kind must match). */
 export function declineOffer(ctx: ActionContext, decline: string | undefined): void {
   const offer = currentOffer(ctx.store.getState(), ctx.store.getEvents());
   if (!offer || decline !== offer.kind) return;
-  ctx.store.appendEvent({ kind: "declineUpgrade", object: offer.kind === "final" ? FINAL : offer.object, decline: offer.kind });
+  ctx.store.appendEvent({ kind: "declineUpgrade", object: offer.object, decline: offer.kind });
 }
 
 /** 先不聊 (the prompt), 好。 (work beats) or Esc: every Kuro item leaves; the body returns to the corner. */

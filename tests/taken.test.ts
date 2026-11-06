@@ -17,7 +17,7 @@ import {
 } from "@world/objects/taken";
 
 const up = (object: string, day: number): GameEvent => ({ kind: "upgrade", object, day } as GameEvent);
-const env = (over: Partial<ObjectEnv> = {}): ObjectEnv => ({ day: 9, level: 0, upgraded: true, taken: false, heldUp: false, time: "09:30", t: 0, seed: "run:x:pager", lit: 1, pager: [], uses: 0, ...over });
+const env = (over: Partial<ObjectEnv> = {}): ObjectEnv => ({ day: 9, level: 0, upgraded: true, taken: false, time: "09:30", t: 0, seed: "run:x:pager", lit: 1, pager: [], uses: 0, ...over });
 
 // ——— the two states ———
 

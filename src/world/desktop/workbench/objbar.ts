@@ -38,11 +38,11 @@ export function iconSrc(id: string, st: IconState): string {
 /**
  * Open `id` as a used device over the desktop (object-bar R2/R3): set the same `holding` +
  * `hand.using` the room's 使用 sets, reset the hand, and raise the modal flag. Returns true when it
- * opened (the object is found and not lost). Session only; the caller re-renders. The dictionary's
+ * opened (the object is found). Session only; the caller re-renders. The dictionary's
  * clamshell-open press is left to the caller (it needs the store for the program), as in the room.
  */
 export function openObjectFromBar(session: { holding: string | null; phoneOpen: boolean; objbarOpen: boolean; hand: { using: boolean; face: "front" | "back"; roll: number; keyDown: unknown } }, state: State, id: string): boolean {
-  if (!(state.found as string[]).includes(id) || state.lost.includes(id)) return false;
+  if (!(state.found as string[]).includes(id)) return false;
   session.phoneOpen = false;
   session.holding = id;
   session.hand.using = true;

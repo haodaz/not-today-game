@@ -174,12 +174,19 @@ describe("runtime (design L5/L6)", () => {
   });
 
   it("shutdown queues the beat with its choices; the loan item opens its prompt", () => {
-    const d5 = storeAt(5);
-    const memo = freshMemo(loopContext(d5.getState(), d5.getEvents())!, d5.getEvents(), 0);
-    d5.appendEvent(step("beat:shutdown", "23:00"));
-    const fx = react(memo, loopContext(d5.getState(), d5.getEvents())!, d5.getEvents(), { dialogue: EMPTY_DIALOGUE, clock: DEFAULT_CLOCK, sounds: [] });
-    expect(fx.dialogue.queue.find((q) => q.key === "d5:beat:shutdown")!.ending).toEqual({ kind: "beatChoices", day: 5, beat: "shutdown" });
-    expect(fx.clock.beat).toBe("night");
+    // Night 5 has no hand any more (author 2026-11-06): its shutdown beat is plain lines.
+    const shutdownOn = (day: number) => {
+      const store = storeAt(day);
+      const memo = freshMemo(loopContext(store.getState(), store.getEvents())!, store.getEvents(), 0);
+      store.appendEvent(step("beat:shutdown", "23:00"));
+      return react(memo, loopContext(store.getState(), store.getEvents())!, store.getEvents(), { dialogue: EMPTY_DIALOGUE, clock: DEFAULT_CLOCK, sounds: [] });
+    };
+    const five = shutdownOn(5);
+    expect(five.dialogue.queue.find((q) => q.key === "d5:beat:shutdown")!.ending).toEqual({ kind: "none" });
+    expect(five.clock.beat).toBe("night");
+    // A hand night with content choices (day 10): the beat ends in them.
+    const ten = shutdownOn(10);
+    expect(ten.dialogue.queue.find((q) => q.key === "d10:beat:shutdown")!.ending).toEqual({ kind: "beatChoices", day: 10, beat: "shutdown" });
   });
 
   it("delivery arrives after the minimum once the next work item is done", () => {

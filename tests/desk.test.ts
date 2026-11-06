@@ -102,7 +102,7 @@ describe("each placed thing at its rect", () => {
     expect(placed(out, "slip")).toBeNull();
   });
 
-  it("the objects in the slots, in arrival order; a lost one leaves its place to the next", () => {
+  it("the objects in the slots, in arrival order (nothing is lost to the hand any more)", () => {
     const store = atDay(1);
     for (const id of ["pager", "chick", "tape"]) store.appendEvent({ kind: "openLayer", objectId: id });
     const found = store.getState().found as string[];
@@ -110,9 +110,6 @@ describe("each placed thing at its rect", () => {
     const out = render(ctx);
     found.forEach((id, i) => expect(placed(out, `object:${id}`), id).toBe(rectStyle(objectSlot(deskLayout, i)!)));
     expect(out).toContain(`data-at="object:${found[0]}" style="${rectStyle(objectSlot(deskLayout, 0)!)}"><button type="button" class="slot unknown pointer-once" data-object="${found[0]}" data-action="loop-hold">`);
-    const lost = renderRoom({ state: { ...store.getState(), lost: [found[0]!] }, events: store.getEvents(), session: ctx.session }).value;
-    expect(placed(lost, `object:${found[0]}`)).toBeNull();
-    expect(placed(lost, `object:${found[1]}`)).toBe(rectStyle(objectSlot(deskLayout, 0)!));
   });
 
   it("only at 桌子: 房间 and 门 have no tabletop", () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { choiceOffered } from "@state/days/effects";
-import { dayFiles } from "@state/days/table";
+import { dayFiles, type Sequence } from "@state/days/table";
 import type { EventDraft } from "@state/events";
 import { createStore, type Store } from "@state/store";
 import { checklist, loopContext, mealToOrder, openItemFor, openTask, selfTicking } from "@world/loop/checklist";
@@ -101,14 +101,18 @@ describe("dialogue queue (FR2)", () => {
   });
 
   it("a beat with choices waits for a choice; hidden choices are not offered", () => {
-    const state = createStore({ startDay: 5 }).getState();
-    const shutdown = dayFiles.get(5)!.beats.shutdown!;
-    let d = push(EMPTY_DIALOGUE, { key: "d5:shutdown", lines: shutdown.say, ending: { kind: "beatChoices", day: 5, beat: "shutdown" }, sequence: shutdown });
+    // A fixture sequence (no content day has a hidden choice since the night raid went, 2026-11-06):
+    // the second choice's cond_show fails.
+    const state = createStore({ startDay: 18 }).getState();
+    const shutdown: Sequence = {
+      say: [{ k: "narration", t: "s0" }, { k: "narration", t: "s1" }],
+      choices: [{ text: "shown" }, { text: "hidden", cond_show: { has: "flag-nobody-has" } }, { text: "also shown" }],
+    };
+    let d = push(EMPTY_DIALOGUE, { key: "d18:shutdown", lines: shutdown.say, ending: { kind: "beatChoices", day: 18, beat: "shutdown" }, sequence: shutdown });
     for (let i = 0; i < shutdown.say.length - 1; i++) d = advance(d).dialogue;
     const shown = showing(d, state)!;
-    // Hidden: a cond_show that fails, and (night-hand FR2) an object not found and recognised.
-    expect(shown.choices!.map((c) => c.index)).toEqual(shutdown.choices!.map((c, i) => (choiceOffered(c, state) ? i : -1)).filter((i) => i >= 0));
-    expect(shown.choices!.length).toBeLessThan(shutdown.choices!.length);
+    expect(choiceOffered(shutdown.choices![1]!, state)).toBe(false);
+    expect(shown.choices!.map((c) => c.index)).toEqual([0, 2]);
     expect(advance(d).dialogue).toEqual(d);
     expect(showing(finishChoice(d), state)).toBeNull();
   });

@@ -9,7 +9,7 @@ SAN is the only failure meter and it is never shown. Endings are three exits fro
 ## FR2. Three exits (day 18 night and before)
 - **Bad**: SAN 0. The small window shows a conversation titled 你和你: "you" replying to everyone with the right word at the right time (built from the run's own log: unchecked tasks become messages "you" sent, the family's 吃饭了吗 answered 好 on time). Then credits (FR3), then the title page with `nt_run` cleared and `nt_profile` kept; the profile gets `runs += 1`.
 - **Survive**: day 18, slip filled (`slip_filled`), lie down. Credits, then a page that says 第一日 and starts a new run with nothing carried over.
-- **Good**: day 18, `shook_hand` and: all six objects recognised, every raid night blocked, affinity ≥ `affinityThreshold`, `letItDoUnchecked` ≤ constants.goodMaxUnchecked (add, default 3). Credits, then day 19: the room, morning, the door handle turns (room-scene; until then the door still + one dialogue line). The final red-blue line is hand-written by Claude (TBD in content).
+- **Good**: day 18, `shook_hand` and: all eight objects recognised, affinity ≥ `affinityThreshold`, assimilation ≤ `assimilationGoodMax` (three-meters replaced `letItDoUnchecked` and dropped `blockedAll`; author 2026-11-06: the good ending's conditions are still open for discussion). Credits, then day 19: the room, morning, the door handle turns (room-scene; until then the door still + one dialogue line). The final red-blue line is hand-written by Claude (TBD in content).
 - If day 18 ends with neither flag (player lay down without choosing), treat as survive.
 
 ## FR3. Credits are Kuro's log

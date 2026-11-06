@@ -107,14 +107,15 @@ describe("FR3 the maw", () => {
   });
 
   it("maw2 on a late night after holding up nothing; maw3 on the last night; maw while it closes", () => {
-    const night = (day: number, raid?: { blockedWith: string | null; gave: string | null }) => {
+    const night = (day: number, raid?: { gave: string | null }) => {
       const store = storeAt(day);
       const { ctx } = ctxOf(store, NIGHT, "room");
       const state = raid ? { ...store.getState(), raids: { ...store.getState().raids, [String(day)]: raid } } : store.getState();
       return kuroBodyState({ ...app(ctx, true), state });
     };
-    expect(night(16, { blockedWith: null, gave: null })).toBe("maw2");
-    expect(night(16, { blockedWith: "chick", gave: null })).toBe("rest");
+    // The hand of night 16 answered with nothing given; with the deliverable handed over, no maw.
+    expect(night(16, { gave: null })).toBe("maw2");
+    expect(night(16, { gave: "d16-hand" })).toBe("rest");
     expect(night(16)).toBe("rest");
     expect(night(constants.lastDay)).toBe("maw3");
     const { ctx } = ctxOf(storeAt(16));
@@ -128,7 +129,7 @@ describe("FR3 the maw", () => {
       fc.property(
         fc.constantFrom(...early),
         fc.constantFrom(...BEATS),
-        fc.constantFrom(null, { blockedWith: null, gave: null }, { blockedWith: "chick", gave: null }),
+        fc.constantFrom(null, { gave: null }, { gave: "given" }),
         fc.constantFrom(null, "wait", "crawl", "maw"),
         (day, beat, raid, phase) => {
           const store = storeAt(day);

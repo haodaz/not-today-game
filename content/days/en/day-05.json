@@ -36,38 +36,6 @@
         {
           "k": "narration",
           "t": "The light goes out. You did not turn it off."
-        },
-        {
-          "k": "narration",
-          "t": "A hand comes out of the gap. Thin, long knuckles, palm up."
-        },
-        {
-          "k": "inner",
-          "t": "The first time."
-        }
-      ],
-      "choices": [
-        {
-          "text": "Hold up the chick.",
-          "effects": {
-            "item_dream": "chick",
-            "san": 1
-          }
-        },
-        {
-          "text": "Hand over the 44,000 line of the ledger.",
-          "effects": {
-            "item_lost": "loan"
-          },
-          "cond_show": {
-            "has": "lent"
-          }
-        },
-        {
-          "text": "Give it nothing.",
-          "effects": {
-            "san": -1
-          }
         }
       ]
     },

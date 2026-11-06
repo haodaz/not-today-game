@@ -12,7 +12,6 @@ import objectsRaw from "@content/objects.json";
 import dictionaryRaw from "@content/dictionary.json";
 import calculatorRaw from "@content/calculator.json";
 import kidRaw from "@content/kid.json";
-import stagesFile from "@content/stages.json";
 import { parseLine, type SayLine } from "./days/table";
 import { parseWorks, type Works } from "./works";
 
@@ -125,7 +124,7 @@ function reel(v: unknown, w: string, fail: Fail): Reel {
   return Object.freeze(r);
 }
 
-function recordings(v: unknown, w: string, fail: Fail, dreams: readonly number[]): Recording[] {
+function recordings(v: unknown, w: string, fail: Fail): Recording[] {
   if (!Array.isArray(v) || v.length === 0) fail(w, "must be a non-empty list");
   const ids = new Set<string>();
   return v.map((r, i) => {
@@ -138,8 +137,9 @@ function recordings(v: unknown, w: string, fail: Fail, dreams: readonly number[]
     if (typeof r.title !== "string") fail(`${rw}.title`, "must be a string (may be empty)");
     let after: number | null = null;
     if (r.after !== undefined) {
+      // A day, as content gives it (2026-11-06: no longer checked against the dream nights).
       after = int(r.after, `${rw}.after`, fail);
-      if (!dreams.includes(after)) fail(`${rw}.after`, `must be a dream night (${dreams.join(", ")})`);
+      if (after < 1) fail(`${rw}.after`, "must be a day ≥ 1");
     }
     if (!Array.isArray(r.say) || r.say.length === 0) fail(`${rw}.say`, "must be a non-empty list");
     const say = r.say.map((l, j) => {
@@ -157,7 +157,7 @@ const ONLY_ON: Readonly<Record<string, string>> = { solar: "calculator", reels: 
 /** The keys recognise.ts leaves to this file. */
 export const HAND_FIELDS = ["keys", "screen", "back", "solar", "reels", "recordings", "sim", "light", "works"] as const;
 
-export function parseHands(input: unknown, dreams: readonly number[] = stagesFile.dreamNights.nights): ReadonlyMap<string, HandEntry> {
+export function parseHands(input: unknown): ReadonlyMap<string, HandEntry> {
   const fail: Fail = failer("objects.json");
   if (!isRecord(input) || !isRecord(input.objects)) fail("objects", "must be an object");
   const out = new Map<string, HandEntry>();
@@ -190,7 +190,7 @@ export function parseHands(input: unknown, dreams: readonly number[] = stagesFil
         back: Object.freeze(back),
         solar: v.solar === undefined ? null : rect(v.solar, `${w}.solar`, fail),
         reels,
-        recordings: v.recordings === undefined ? Object.freeze([]) : Object.freeze(recordings(v.recordings, `${w}.recordings`, fail, dreams)),
+        recordings: v.recordings === undefined ? Object.freeze([]) : Object.freeze(recordings(v.recordings, `${w}.recordings`, fail)),
         sim: v.sim === undefined ? null : str(v.sim, `${w}.sim`, fail),
         light: v.light === undefined ? null : str(v.light, `${w}.light`, fail),
         works: v.works === undefined ? null : parseWorks(v.works, `${w}.works`, fail),

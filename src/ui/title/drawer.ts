@@ -122,7 +122,7 @@ export function createDrawerObject(id: string, root: HTMLElement, deps: DrawerDe
   const program: Program<unknown> | null = programOf(id);
   const start = win.performance.now();
   // The drawer always shows the original (object-upgrade 2026-11-03): never upgraded, never taken.
-  const env = (): ObjectEnv => ({ day, level: 0, upgraded: false, taken: false, heldUp: false, time: session.clock.time, t: win.performance.now() - start, seed: `drawer:${id}`, lit: 1, pager: [], uses: 0 });
+  const env = (): ObjectEnv => ({ day, level: 0, upgraded: false, taken: false, time: session.clock.time, t: win.performance.now() - start, seed: `drawer:${id}`, lit: 1, pager: [], uses: 0 });
   // Fresh program state for this open (in memory only; no store, no events).
   if (program) session.hand.programs[id] = program.init(env());
 

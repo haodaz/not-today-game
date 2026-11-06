@@ -319,7 +319,6 @@
 .stage.m-nobg>.evening-look{visibility:hidden}
 .room .gap-glow{position:absolute;inset:0;z-index:14;pointer-events:none;background:rgba(10,10,12,.55)}
 .room .gap-glow::after{content:"";position:absolute;left:var(--gap-x,50%);top:var(--gap-t,22%);width:6px;height:var(--gap-h,30%);transform:translateX(-50%);background:radial-gradient(ellipse,rgba(255,150,190,.9),rgba(255,150,190,0) 70%);filter:blur(2px)}
-.room .held.obj canvas.dev.dream{box-shadow:0 0 18px 2px rgba(255,150,190,.45)}
 /* 门 (2026-11-02): the door is actions on the door. Only the current step exists, as a spot on the
    thing itself (the chain, the bag, the chain and knob); its caption is its label; 4 % brighter on hover. */
 .room .door-bg{position:absolute;inset:0;background:#000 url(/room/door_chain.png) center/cover;pointer-events:none}

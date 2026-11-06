@@ -58,35 +58,7 @@
       "say": [
         {
           "k": "narration",
-          "t": "A hand comes out of the gap. There is an eye in the gap too. It doesn't look at you; it looks at what's in your hand."
-        },
-        {
-          "k": "inner",
-          "t": "The second time."
-        }
-      ],
-      "choices": [
-        {
-          "text": "Hold up the IC card, magnetic strip towards the gap.",
-          "effects": {
-            "item_dream": "iccard",
-            "san": 1
-          }
-        },
-        {
-          "text": "Hand over that page.",
-          "effects": {
-            "item_lost": "loan"
-          },
-          "cond_show": {
-            "has": "lent"
-          }
-        },
-        {
-          "text": "Give nothing.",
-          "effects": {
-            "san": -1
-          }
+          "t": "You turn the screen off. The gap is only a gap."
         }
       ]
     },
@@ -94,7 +66,7 @@
       "say": [
         {
           "k": "narration",
-          "t": "The hand and the eye are gone. The gap is only a gap."
+          "t": "A point of light in the dark. The gap is only a gap."
         },
         {
           "k": "speaker",

@@ -68,11 +68,13 @@
     "type": "set",
     "of": [
       "chick",
+      "camera",
       "pager",
       "iccard",
       "tape",
       "dictionary",
-      "calculator"
+      "calculator",
+      "phone"
     ],
     "changedBy": "recognise choice on first sight",
     "default": []
@@ -105,11 +107,6 @@
     "type": "set<dayNumber>",
     "changedBy": "dictionary lookups of Kuro lines",
     "default": []
-  },
-  "dream": {
-    "type": "map<object, {until: day}|null>",
-    "changedBy": "night hand (hand object => 3 days)",
-    "default": {}
   },
   "readCount": {
     "type": "int",
@@ -227,10 +224,10 @@
     "default": 0
   },
   "raids": {
-    "type": "map<day, {blockedWith: object|null, gave: string|null}>",
-    "changedBy": "night hand",
-    "note": "Changed by Kiro 2026-10-31 for the night-hand spec (docs/kiro-log.md): was {taken, blockedWith}. One entry per raid night once answered: held up an object => {blockedWith: object, gave: null}; handed over something lost => {blockedWith: null, gave: \"loan\" | object}; nothing => both null. Taken = blockedWith is null.",
-    "default": {}
+    "type": "map<day, {gave: string|null}>",
+    "changedBy": "the hand on days 10–17 (work-v2 §4): gave = the deliverable id handed over, or null",
+    "default": {},
+    "note": "2026-11-06: blockedWith / dream / lost removed with the old raid design."
   },
   "pokedReset": {
     "type": "bool",
@@ -310,19 +307,15 @@
     "type": "map<object, bool>",
     "default": {
       "chick": false,
+      "camera": false,
       "pager": false,
       "iccard": false,
       "tape": false,
       "dictionary": false,
-      "calculator": false
+      "calculator": false,
+      "phone": false
     },
     "changedBy": "upgrade event (object-upgrade spec)"
-  },
-  "lost": {
-    "type": "set<string>",
-    "note": "Added by Kiro 2026-11-01 at the author's request (docs/kiro-log.md). What was handed to the hand at night (item_lost choices): \"loan\" or an object id, in the order given. Emptied when the day-17 returned-objects bag is taken in. raids is unchanged.",
-    "changedBy": "item_lost choices; the objects_returned pickup",
-    "default": []
   },
   "ending": {
     "type": "enum",

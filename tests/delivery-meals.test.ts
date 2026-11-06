@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { anythingOrderable, shopsOn } from "@state/delivery/shops";
-import { deliveryTable, MEALS, mealOf, returnMeal, type Meal } from "@state/delivery/table";
+import { deliveryTable, MEALS, mealOf, type Meal } from "@state/delivery/table";
 import type { EventDraft } from "@state/events";
 import { f } from "@state/fday";
 import type { State } from "@state/types.gen";
@@ -113,13 +113,6 @@ describe("mealView", () => {
     expect(v.anomaly).toBe(mealOf(day, "lunch")!.anomaly);
   });
 
-  it("the returning bag holds everything handed over, in the order given (state `lost`)", () => {
-    const [a, b] = membersOf("found")! as string[];
-    const state: State = { ...f(returnMeal!.day), found: [a, b] as State["found"], lost: [a!, b!] };
-    const v = mealView(returnMeal!.day, returnMeal!.meal, state, [], "12:00")!;
-    expect(v.extras.returned).toEqual([a, b]);
-    expect(mealView(returnMeal!.day, returnMeal!.meal, f(returnMeal!.day), [], "12:00")!.extras.returned).toEqual([]);
-  });
 
   it("is null past the scripted days", () => {
     expect(mealView(constants.lastDay + 1, "lunch", f(1), [], "12:00")).toBeNull();

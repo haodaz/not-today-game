@@ -33,26 +33,25 @@
       "say": [
         {
           "k": "narration",
-          "t": "A hand comes out of the gap."
-        },
-        {
-          "k": "inner",
-          "t": "The sixth time."
+          "t": "A hand comes out of the gap. It does not open its palm. It is tapping the desk, once, once."
         }
       ],
       "choices": [
         {
-          "text": "Hold up the calculator.",
-          "effects": {
-            "item_dream": "calculator",
-            "san": 1
-          }
-        },
-        {
-          "text": "Give nothing.",
+          "text": "Give it nothing.",
           "effects": {
             "san": -1
-          }
+          },
+          "say": [
+            {
+              "k": "narration",
+              "t": "It doesn't stop. When you lie down it is still tapping, the same beat."
+            },
+            {
+              "k": "inner",
+              "t": "Till dawn. It isn't asking; it's keeping count for someone."
+            }
+          ]
         }
       ]
     },

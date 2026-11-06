@@ -192,8 +192,8 @@ export function answerFor(object: string, option: number): { readonly say: reado
 }
 
 /**
- * Knows what it is: recognised in state, or (for the box things that are not one of the six, such
- * as the camera) answered in the log with a pick that counts.
+ * Knows what it is: recognised in state, or (for a box thing outside variables.json's `recognised`
+ * set, if any) answered in the log with a pick that counts.
  */
 export function knows(object: string, state: State, events: readonly GameEvent[]): boolean {
   return (state.recognised as string[]).includes(object) || events.some((e) => isRecognise(e) && e.objectId === object && wasRight(e));
@@ -206,7 +206,7 @@ export const askedOn = (events: readonly GameEvent[], day: number, object: strin
 /**
  * The reducer. With an `option` (the question): the object must be in the table and found; a
  * wrong option changes nothing; one that counts (the right one, or any pick of a question with no
- * right option) adds it to `recognised` (if it is one of the six) and logs truth +1 once. Without
+ * right option) adds it to `recognised` (if the set lists it: all eight do) and logs truth +1 once. Without
  * one: world-state's plain form, which recognises it.
  */
 export function applyRecognise(state: State, event: RecogniseEvent, plain: (state: State) => State): State {

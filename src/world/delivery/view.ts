@@ -55,7 +55,6 @@ export function renderDoorView(view: MealView, beat: DoorBeat | null, names: Sta
     lines.push('  <div class="desk-corner">');
     const extras = [
       ...(view.extras.box ? ['      <li data-extra="box"></li>'] : []),
-      ...view.extras.returned.map((object) => `      <li data-object="${escapeHtml(object)}"></li>`),
     ];
     if (extras.length) lines.push('    <ul class="door-extras">', ...extras, "    </ul>");
     lines.push("  </div>");

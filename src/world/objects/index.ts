@@ -4,9 +4,7 @@
 import type { GameEvent } from "@state/events";
 import { pagerForeign, pagerSchedule, type ForeignPage, type PagerMessage, type Recording } from "@state/hands";
 import { caughtBy, sleeptalkFileId, type SleepTalkTable } from "@state/sleeptalk";
-import { inDream } from "@state/nights";
 import type { State } from "@state/types.gen";
-import { choiceOf } from "@state/days/effects";
 import type { ActionContext } from "@world/desktop/controller";
 import type { Session } from "@world/desktop/model";
 import { push } from "@world/loop/dialogue";
@@ -64,25 +62,20 @@ export function arrivedMessages(
   return all.map((x) => x.m);
 }
 
-/** How many times the card has been held up to the hand (one pinch mark each). */
-export function cardUses(events: readonly GameEvent[]): number {
-  return events.filter((e) => e.kind === "choose" && choiceOf(e.day, e.beat, e.index)?.effects?.item_dream === "iccard").length;
-}
-
 export function envFor(state: State, events: readonly GameEvent[], session: Session, id: string, t: number, runId = "run"): ObjectEnv {
-  const heldUp = inDream(id, state);
   return {
     day: state.day,
-    level: dreamLevel(state.day, heldUp && state.upgraded[id] !== true),
+    level: dreamLevel(state.day),
     upgraded: state.upgraded[id] === true,
     taken: takenByKuro(id, state, events),
-    heldUp,
     time: session.clock.time,
     t,
     seed: `${runId}:${state.day}:${id}`,
     lit: state.upgraded[id] === true ? 1 : lightLevel(session.hand.inLight, session.hand.leftLightAt, t),
     pager: arrivedMessages(state, events, pagerSchedule, session.clock.time),
-    uses: cardUses(events),
+    // The card's pinch marks counted its times held up to the hand; nothing is held up any more
+    // (the night raid was removed 2026-11-06), so the card stays unmarked.
+    uses: 0,
     sheets: sheetsLeft(events),
     onScreen: session.view === "desktop",
     sleeptalk: id === "tape" ? sleeptalkRecordings(events, state.day) : [],

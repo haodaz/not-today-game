@@ -31,7 +31,7 @@
       "say": [
         {
           "k": "narration",
-          "t": "The lamp goes out. A hand comes out of the gap, closer than ever."
+          "t": "The lamp goes out. A hand comes out of the gap, nearer than you thought."
         },
         {
           "k": "inner",
@@ -40,17 +40,20 @@
       ],
       "choices": [
         {
-          "text": "Hold up the walkman.",
-          "effects": {
-            "item_dream": "tape",
-            "san": 1
-          }
-        },
-        {
-          "text": "Give nothing.",
+          "text": "Give it nothing.",
           "effects": {
             "san": -1
-          }
+          },
+          "say": [
+            {
+              "k": "narration",
+              "t": "The hand hangs over the script and doesn't take it. You hear someone turn to the last page of Act Two."
+            },
+            {
+              "k": "inner",
+              "t": "It finished reading. I didn't."
+            }
+          ]
         }
       ]
     },

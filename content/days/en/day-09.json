@@ -34,36 +34,8 @@
           "t": "The lamp goes out. You didn't switch it off."
         },
         {
-          "k": "narration",
-          "t": "A hand comes out of the gap, palm up. It wants the thing that only appeared this morning: your heartbeat."
-        },
-        {
           "k": "inner",
-          "t": "The third time."
-        }
-      ],
-      "choices": [
-        {
-          "text": "Hold up the chick.",
-          "effects": {
-            "item_dream": "chick",
-            "san": 1
-          }
-        },
-        {
-          "text": "Hold up the ledger line you lent.",
-          "effects": {
-            "item_lost": "loan"
-          },
-          "cond_show": {
-            "has": "lent"
-          }
-        },
-        {
-          "text": "Give nothing.",
-          "effects": {
-            "san": -1
-          }
+          "t": "The number in the corner is still ticking."
         }
       ]
     },

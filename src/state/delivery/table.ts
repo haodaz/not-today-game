@@ -7,9 +7,8 @@ import { PLACEHOLDERS } from "../replies/table";
 export const MEALS = ["lunch", "dinner"] as const;
 export type Meal = (typeof MEALS)[number];
 
-/** The flag a meal sets when it brings the cardboard box, and when it brings the objects back. */
+/** The flag a meal sets when it brings the cardboard box. */
 export const BOX_FLAG = "box_arrived";
-export const RETURN_FLAG = "objects_returned";
 
 export interface Effects {
   readonly flags?: readonly string[];
@@ -287,11 +286,3 @@ export const deliveryTable: DeliveryTable = parseDelivery(raw);
 export function mealOf(day: number, meal: Meal): MealEntry | undefined {
   return deliveryTable.days.get(day)?.[meal];
 }
-
-/** The one meal that brings the objects back (sets RETURN_FLAG), or null if the data has none. */
-export const returnMeal: { readonly day: number; readonly meal: Meal } | null = (() => {
-  for (const [day, entry] of deliveryTable.days) {
-    for (const meal of MEALS) if (entry[meal].effects?.flags?.includes(RETURN_FLAG)) return { day, meal };
-  }
-  return null;
-})();

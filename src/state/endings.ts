@@ -35,12 +35,15 @@ export interface GoodConditions {
   readonly assimilationOk: boolean;
 }
 
-/** The four conditions of the good ending (three-meters: blockedAll dropped, unchecked → assimilation). */
+/**
+ * The four conditions of the good ending (three-meters: blockedAll dropped, unchecked → assimilation).
+ * `recognisedAll` is over the whole `recognised` set of variables.json: all eight objects (2026-11-06).
+ */
 export function goodConditions(state: State): GoodConditions {
-  const six = membersOf("recognised") ?? [];
+  const all = membersOf("recognised") ?? [];
   return {
     shookHand: state.flags.includes("shook_hand"),
-    recognisedAll: six.every((o) => (state.recognised as string[]).includes(o)),
+    recognisedAll: all.every((o) => (state.recognised as string[]).includes(o)),
     affinity: state.affinity >= (constants.affinityThreshold as number),
     assimilationOk: state.assimilation <= (constants.assimilationGoodMax as number),
   };

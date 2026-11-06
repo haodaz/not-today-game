@@ -268,14 +268,15 @@ describe("the one-time pointer (day-loop rule 2026-11-01)", () => {
   });
 
   it("the first night's hand: on the raid's choices in the box, until one is chosen; not on the next raid", () => {
-    const store = atDay(5);
+    // The hand's first night is 10 (author 2026-11-06: nights 1–9 have no hand).
+    const store = atDay(10);
     const { ctx } = ctxOf(store, "room", { beat: "night", time: "23:41" });
     const raidAt = (day: number) => {
       ctx.session.dialogue = push(EMPTY_DIALOGUE, beatQueued(day, "shutdown", dayFiles.get(day)!.beats.shutdown!));
       const n = lineScreens(store.getState(), ctx.session)!.all.length;
       ctx.session.dialogue = { ...ctx.session.dialogue, line: ctx.session.dialogue.queue[0]!.lines.length - 1, page: n - 1 };
     };
-    raidAt(5);
+    raidAt(10);
     // world-prompts R2: the choices are the column on the right; the pointer is on it.
     expect(render(ctx)).toMatch(/<div class="dlg-choices pointer-once" role="group">/);
     const offered = showing(ctx.session.dialogue, store.getState())!.choices!;

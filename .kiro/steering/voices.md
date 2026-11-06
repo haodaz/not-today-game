@@ -8,7 +8,7 @@ All text in the game comes from exactly four sources. Each has its own grammar. 
 
 1. **Narration** (the player's own inner voice). Second person, present tense, short sentences. Writes only actions and what is seen. No feelings, no adjectives, never names the thing. May carry an attitude: one judgement, one jab, one definition. Example: `You go back to the list. He still hasn't mentioned money.`
 2. **The new world.** Kuro speaks English idioms, gentler every day (`Good to see you.` → `I've got your back.` → `Hold the fort.`). The boss, partner and client write real Chinese work messages in stages 0–2 and switch to Kuro's grammar from stage 3, one day behind Kuro. Kuro's rare unwrapped lines (no idiom, no body in them) are rendered with the `plain` style: red and blue ghosts offset on the same line.
-3. **Objects.** Each outputs only what its channel allows. Pager: digits only (later, in dream state, a page of pictures). Chick: one of an enumerated set of 32×16 frames. Calculator: seven-segment digits and the letters they can form upside down. Dictionary: English in, Chinese out, one word at a time. Tape: a transcript of sound.
+3. **Objects.** Each outputs only what its channel allows. Pager: digits only. Chick: one of an enumerated set of 32×16 frames. Calculator: seven-segment digits and the letters they can form upside down. Dictionary: English in, Chinese out, one word at a time. Tape: a transcript of sound.
 4. **The child** (the player in 1997). Only digits on the pager, and half a sentence on the tape. All of it is hand-written constant data.
 
 A fifth channel exists in the script data: **inner voice** (first person, one short line per beat, italic in the UI, never sent). It is data from `content/`, not generated.

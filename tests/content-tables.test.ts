@@ -59,7 +59,6 @@ describe("content/stages.json", () => {
   it("has the plan B sections the accessors read", () => {
     expect(stages.calmDaytime.days).toBeInstanceOf(Array);
     expect(typeof stages.tenderDay.day).toBe("number");
-    expect(stages.dreamNights.nights).toBeInstanceOf(Array);
     expect(stages.nightBeat).toBeTypeOf("object");
   });
 });

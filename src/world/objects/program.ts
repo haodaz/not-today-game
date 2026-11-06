@@ -14,8 +14,6 @@ export interface ObjectEnv {
   readonly upgraded: boolean;
   /** Kuro has taken this object (object-upgrade addition 2026-11-03): upgraded and ≥ 3 days on. */
   readonly taken: boolean;
-  /** Held up to the hand tonight (night-hand): the chick shows its grave. */
-  readonly heldUp: boolean;
   /** The game clock, HH:MM (the pager's fn shows it). */
   readonly time: string;
   /** Session ms (cosmetic time: idle frames, fades, reels). */
@@ -59,8 +57,8 @@ export interface Program<S> {
 
 export const MAX_LEVEL = 3;
 /** Dream level on a day: the dream nights already slept through (night d is over from day d + 1). */
-export function dreamLevel(day: number, heldUp = false): number {
-  return Math.min(MAX_LEVEL, dreamNights.filter((n) => n < day).length + (heldUp ? 1 : 0));
+export function dreamLevel(day: number): number {
+  return Math.min(MAX_LEVEL, dreamNights.filter((n) => n < day).length);
 }
 
 /** A half-tone up (the chick's success beep). */

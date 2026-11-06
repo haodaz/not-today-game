@@ -19,7 +19,7 @@ export type Ending =
   /** The bed, unlocked: 睡 / 再待会儿 (day-loop addition 2026-11-02). */
   | { readonly kind: "bedAsk" }
   /** Kuro's upgrade offer as a line in the box (dialogue spec): 升级 / 不了. */
-  | { readonly kind: "kuroOffer"; readonly object: string; readonly decline: "offer" | "nag" | "final" }
+  | { readonly kind: "kuroOffer"; readonly object: string; readonly decline: "offer" | "nag" }
   /** 要和克总聊聊吗？ — 聊聊 / 先不聊. */
   | { readonly kind: "kuroAsk" }
   /** Kuro has spoken; the player's box answers (chat: the questions and typing; work: only 好。). */
@@ -279,11 +279,11 @@ function options(q: Queued, state: State, events?: readonly GameEvent[]): Choice
     .map((c, index) => ({ c, index }))
     .filter(({ c }) => choiceOffered(c, state))
     .map(({ c, index }) => ({ index, text: c.text }));
-  // Work v2 (addition 2026-11-03 night): on a hand night (a raid night, or any night from day 10),
-  // if a `hand` deliverable is on the desk, 把{label}递给它 is offered first, before the night's own
-  // choices. It routes to a `give` event (choice "give"). On a hand night the content has no choices
-  // (days 11, 12, 14, 15, 17), 不给。is added too (`hand.refuse`, choice "refuse" — it logs nothing;
-  // the judgement will say wrong). On a raid night the content's own choices stay after the give.
+  // Work v2 (addition 2026-11-03 night, author 2026-11-06): on a hand night (days 10–17 only), if
+  // a `hand` deliverable is on the desk, 把{label}递给它 is offered first, then the night's own
+  // choices. It routes to a `give` event (choice "give"). When the content has no choices, 不给。is
+  // added (`hand.refuse`, choice "refuse" — it logs nothing; the judgement will say wrong). Nights
+  // 1–9 and 18 never get the hand's choices.
   if (events && q.ending.beat === "shutdown" && handNight(state.day) && hasString("hand.give")) {
     const d = deliverableForHand(state.day, events);
     if (d) {

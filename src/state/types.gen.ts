@@ -5,12 +5,11 @@ export interface State {
   day: number;
   stage: number;
   found: ("chick" | "camera" | "pager" | "iccard" | "tape" | "dictionary" | "calculator" | "phone")[];
-  recognised: ("chick" | "pager" | "iccard" | "tape" | "dictionary" | "calculator")[];
+  recognised: ("chick" | "camera" | "pager" | "iccard" | "tape" | "dictionary" | "calculator" | "phone")[];
   chickFrame: "grave" | "blink" | "crack" | "peck" | "light" | "phoenix" | "out";
   pagerUnread: string | null;
   repliedNumbers: string[];
   translated: number[];
-  dream: Record<string, { until: number } | null>;
   readCount: number;
   replyOptions: ("fine" | "received" | "whatever" | "salary" | "lol" | "what-llm")[];
   objectWords: Record<string, { word: unknown; used: boolean }>;
@@ -21,7 +20,7 @@ export interface State {
   san: number;
   assimilation: number;
   letItDoUnchecked: number;
-  raids: Record<string, { blockedWith: string | null; gave: string | null }>;
+  raids: Record<string, { gave: string | null }>;
   pokedReset: boolean;
   names: { login: string; nick: string; calledBy: string; bossCalls: string; pronoun: "she" | "he" | null };
   flags: string[];
@@ -30,7 +29,6 @@ export interface State {
   chatMemory: { summary: string; recent: { day: unknown; who: unknown; text: unknown }[] };
   judgement: { truth: number; values: number; bond: number; evidence: { day: unknown; eventId: unknown; note: unknown }[] };
   upgraded: Record<string, boolean>;
-  lost: string[];
   ending: "none" | "bad" | "survive" | "good" | "collapse";
 }
 

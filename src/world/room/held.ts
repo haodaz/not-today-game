@@ -20,7 +20,6 @@ import { envFor, peekState } from "@world/objects/index";
 import type { ObjectEnv } from "@world/objects/program";
 import { STAGE_W } from "@world/room/splat/geometry";
 import { hasString, t, tr } from "@world/i18n";
-import { inDream } from "@state/nights";
 import { FLIPPERS, isDevice, renderDevice } from "@world/room/devices";
 
 /** A dot-matrix cell (half-width) of the dictionary. */
@@ -145,7 +144,7 @@ function keyCap(id: string, img: string, k: KeySpot, down: boolean, live: boolea
  * pixel width, so the two scales never compound. Only its backing resolution is chosen: the largest
  * integer multiple of the channel (× 2ⁿ) that is ≤ the screen's drawn size.
  */
-function screen(id: string, state: State, level: number, heldUp: boolean, using: boolean): SafeHtml | null {
+function screen(id: string, state: State, level: number, using: boolean): SafeHtml | null {
   const upgraded = state.upgraded[id] === true;
   const ch = CHANNELS[id];
   if (DEVICE_ONLY_SCREENS.includes(id)) return null;
@@ -168,7 +167,7 @@ function screen(id: string, state: State, level: number, heldUp: boolean, using:
   const k = upgraded ? 1 : 2 ** level;
   const backW = using && ch && !upgraded ? focusBackingWidth(id, lvl) : w * k;
   const backH = using && ch && !upgraded ? Math.round((backW * h) / w) : h * k;
-  return html`<canvas class="${cls("dev", upgraded && "hi", heldUp && !upgraded && "dream")}" data-screen="${id}" width="${backW}" height="${backH}" style="${size}"></canvas>`;
+  return html`<canvas class="${cls("dev", upgraded && "hi")}" data-screen="${id}" width="${backW}" height="${backH}" style="${size}"></canvas>`;
 }
 
 /** What only some objects have on their faces. */
@@ -205,8 +204,6 @@ function extras(id: string, state: State, events: readonly GameEvent[], session:
 
 export function object(state: State, events: readonly GameEvent[], session: Session, id: string, nowMs: number): SafeHtml {
   const upgraded = state.upgraded[id] === true;
-  // Held up to the hand tonight: its screen gains one more step of resolution until morning (night-hand FR2).
-  const heldUp = !upgraded && inDream(id, state);
   const env = envFor(state, events, session, id, nowMs);
   const p = peekState(session, id, env);
   // In the hand it is always the front picture: content measured the keys and the screen on it.
@@ -239,7 +236,7 @@ export function object(state: State, events: readonly GameEvent[], session: Sess
   // both dimensions, centred; the `.focus` class drives the fit). The behind dims to 70 % and blurs.
   // A flippable photo object (iccard, phone, camera) shows the flip button under it in 使用.
   const turn = using && FLIPPERS.includes(id) && hasString("obj.flip") ? html`<div class="turnbar"><button type="button" class="turnbtn" data-action="obj-flip" data-object="${id}">${tr("obj.flip")}</button></div>` : null;
-  return html`<div class="${cls("held", "obj", upgraded && "upgraded", using && "using", using && "focus", faint && "faint")}" data-object="${id}" data-mode="${using ? "using" : "holding"}" data-face="${session.hand.face}"${attrs}><div class="breathe"><div class="turn"><div class="face front"><img src="${img}" alt="" draggable="false">${screen(id, state, env.level, heldUp, using)}${keys}${front}</div><div class="face back"><div class="back-art"><img src="/objects/${id}_back.png" alt="" draggable="false">${back}</div></div></div></div>${turn}</div>`;
+  return html`<div class="${cls("held", "obj", upgraded && "upgraded", using && "using", using && "focus", faint && "faint")}" data-object="${id}" data-mode="${using ? "using" : "holding"}" data-face="${session.hand.face}"${attrs}><div class="breathe"><div class="turn"><div class="face front"><img src="${img}" alt="" draggable="false">${screen(id, state, env.level, using)}${keys}${front}</div><div class="face back"><div class="back-art"><img src="/objects/${id}_back.png" alt="" draggable="false">${back}</div></div></div></div>${turn}</div>`;
 }
 
 /** The held layer, or null when nothing is held. */

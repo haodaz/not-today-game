@@ -114,6 +114,9 @@ vi.mock("@state/days/tasks", async (importOriginal) => {
       if (day === 7 && flag === "task_d7_4") return boardT;
       if (day === 11 && flag === "task_d11_1") return handBoard11;
       if (day === 11 && flag === "task_d11_2") return bossBoard11;
+      // A `hand` board on any day (only read through the log; never appended to a store): the
+      // "which nights the hand comes" tests print it on every day 1–17.
+      if (flag === "fixture_hand") return handBoard11;
       return real.taskByFlag(day, flag);
     },
   };
@@ -274,6 +277,8 @@ import { showing, GIVE_INDEX, REFUSE_INDEX, type DialogueState, type Queued } fr
 import { initialSession, type AppContext } from "@world/desktop/model";
 import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import { t } from "@world/i18n";
+import { dayFiles } from "@state/days/table";
+import type { GameEvent } from "@state/events";
 
 /** A minimal AppContext over a store (for the board surface). */
 function appCtx(store: Store): AppContext {
@@ -286,10 +291,37 @@ function shutdownQueue(choices: any[] = []): DialogueState {
   return { queue: [q], line: 0 };
 }
 
-describe("handNight (the gods send the hand)", () => {
-  it("the raid nights and every night from day 10 are hand nights; earlier plain nights are not", () => {
-    for (const d of [5, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]) expect(handNight(d), `day ${d}`).toBe(true);
-    for (const d of [1, 2, 3, 4, 6, 8]) expect(handNight(d), `day ${d}`).toBe(false);
+describe("handNight (the gods send the hand; author 2026-11-06)", () => {
+  it("days 10–17 are hand nights, nothing else: not 1–9, not 18", () => {
+    for (let d = 10; d <= 17; d++) expect(handNight(d), `day ${d}`).toBe(true);
+    for (let d = 1; d <= 9; d++) expect(handNight(d), `day ${d}`).toBe(false);
+    expect(handNight(18)).toBe(false);
+  });
+
+  /** The shutdown box's choices on `day` with a `hand` deliverable printed (a fixture task). */
+  const shutdownChoices = (day: number) => {
+    const store = createStore({ runId: "r", startDay: day });
+    const events = [...store.getEvents(), { kind: "task", day, flag: "fixture_hand", mode: "self", slots: {}, assists: 0 } as GameEvent];
+    const d = { key: `d${day}:beat:shutdown`, lines: [{ k: "narration" as const, t: "x" }], ending: { kind: "beatChoices" as const, day, beat: "shutdown" as const }, sequence: dayFiles.get(day)!.beats.shutdown! };
+    return showing({ queue: [d], line: 0 }, store.getState(), events)?.choices ?? [];
+  };
+
+  it("nights 1–9 never queue the hand's choices, even with a hand deliverable on the desk", () => {
+    for (let day = 1; day <= 9; day++) {
+      const kinds = shutdownChoices(day).map((c) => c.choice ?? "content");
+      expect(kinds, `day ${day}`).not.toContain("give");
+      expect(kinds, `day ${day}`).not.toContain("refuse");
+    }
+  });
+
+  it("every night 10–17: hand.give first, then the content's own choices; hand.refuse only when content has none", () => {
+    for (let day = 10; day <= 17; day++) {
+      const choices = shutdownChoices(day);
+      const own = dayFiles.get(day)!.beats.shutdown!.choices?.length ?? 0;
+      expect(choices[0], `day ${day}`).toMatchObject({ index: GIVE_INDEX, choice: "give" });
+      expect(choices.slice(1, 1 + own).map((c) => c.index), `day ${day}`).toEqual(Array.from({ length: own }, (_, i) => i));
+      expect(choices.some((c) => c.choice === "refuse"), `day ${day}`).toBe(own === 0);
+    }
   });
 });
 

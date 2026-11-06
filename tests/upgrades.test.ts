@@ -1,13 +1,13 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import raw from "@content/upgrades.json";
-import { choiceOffered } from "@state/days/effects";
 import { dayFiles } from "@state/days/table";
 import type { EventDraft } from "@state/events";
+import { constants } from "@state/variables";
 import { menu, recipientsOn } from "@state/replies/resolve";
 import { createStore, type Store } from "@state/store";
 import type { State } from "@state/types.gen";
-import { currentOffer, FINAL, parseUpgrades, upgradeTable } from "@state/upgrades";
+import { currentOffer, parseUpgrades, upgradeTable } from "@state/upgrades";
 import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
 import { initialSession } from "@world/desktop/model";
@@ -88,14 +88,37 @@ describe("offers (FR1)", () => {
     expect(currentOffer(store.getState(), store.getEvents())).toBeNull();
   });
 
-  it("the final offer on day 13 covers every found object still not upgraded", () => {
-    const store = storeAt(upgradeTable.finalOfferDay, ["chick", "pager", "iccard"]);
-    const offer = currentOffer(store.getState(), store.getEvents());
-    expect(offer).toEqual({ kind: "final", objects: ["chick", "pager", "iccard"], line: upgradeTable.finalOffer });
-    expect(offerBox(store).box).toMatchSnapshot();
-    loopActions["upgrade-yes"]!(act(store), { object: FINAL } as DOMStringMap, null as never);
-    for (const o of ["chick", "pager", "iccard"]) expect(store.getState().upgraded[o]).toBe(true);
-    expect(currentOffer(store.getState(), store.getEvents())).toBeNull();
+  it("all eight objects are in the table, each with its own offerFrom; no final offer key", () => {
+    expect([...upgradeTable.objects.keys()].sort()).toEqual(["calculator", "camera", "chick", "dictionary", "iccard", "pager", "phone", "tape"]);
+    expect("finalOfferDay" in upgradeTable).toBe(false);
+    expect(() => parseUpgrades({ ...structuredClone(raw), finalOfferDay: 13 })).toThrow(/unknown key "finalOfferDay"/);
+    expect(() => parseUpgrades({ ...structuredClone(raw), finalOffer: "x" })).toThrow(/unknown key "finalOffer"/);
+  });
+
+  it("the camera's offer comes on day 3 and the phone's on day 9, one object at a time", () => {
+    const camera = upgradeTable.objects.get("camera")!;
+    const phone = upgradeTable.objects.get("phone")!;
+    expect([camera.offerFrom, phone.offerFrom]).toEqual([3, 9]);
+    expect(currentOffer(storeAt(2, ["camera"]).getState(), [])).toBeNull();
+    expect(currentOffer(storeAt(3, ["camera"]).getState(), [])).toEqual({ kind: "offer", object: "camera", line: camera.offer });
+    expect(currentOffer(storeAt(8, ["phone"]).getState(), [])).toBeNull();
+    const nine = storeAt(9, ["phone"]);
+    expect(currentOffer(nine.getState(), nine.getEvents())).toEqual({ kind: "offer", object: "phone", line: phone.offer });
+    loopActions["upgrade-yes"]!(act(nine), { object: "phone" } as DOMStringMap, null as never);
+    expect(nine.getState().upgraded.phone).toBe(true);
+  });
+
+  it("day 13 is an ordinary day: no all-at-once offer, only each object's own", () => {
+    const store = storeAt(13, ["chick", "pager", "iccard"]);
+    expect(currentOffer(store.getState(), store.getEvents())).toEqual({ kind: "offer", object: "chick", line: upgradeTable.objects.get("chick")!.offer });
+  });
+
+  it("each upgrade raises assimilation by assimUpgrade (three-meters)", () => {
+    const store = storeAt(9, ["camera", "phone"]);
+    const before = store.getState().assimilation;
+    store.appendEvent({ kind: "upgrade", object: "camera" });
+    store.appendEvent({ kind: "upgrade", object: "phone" });
+    expect(store.getState().assimilation).toBe(Math.min(constants.assimilationMax as number, before + 2 * (constants.assimUpgrade as number)));
   });
 
   it("accepting logs the rubric's accept; declining its decline; no chat turn is used", () => {
@@ -112,21 +135,6 @@ describe("offers (FR1)", () => {
 
 describe("what upgrading changes (FR2) and FR3 properties", () => {
   const objects = [...upgradeTable.objects.keys()];
-
-  it("property: an upgraded object never appears in a night choice list", () => {
-    fc.assert(
-      fc.property(fc.subarray(objects), fc.constantFrom(...dayFiles.keys()), (up, day) => {
-        const base = createStore({ startDay: day }).getState();
-        const state: State = { ...base, loan: "lent", upgraded: Object.fromEntries(objects.map((o) => [o, up.includes(o)])) };
-        for (const beat of Object.values(dayFiles.get(day)!.beats)) {
-          for (const c of beat?.choices ?? []) {
-            const held = c.effects?.item_dream ?? c.effects?.item_lost;
-            if (held && up.includes(held)) expect(choiceOffered(c, state)).toBe(false);
-          }
-        }
-      }),
-    );
-  });
 
   it("property: an upgraded object's word is never in the reply menu afterwards", () => {
     fc.assert(
@@ -150,8 +158,7 @@ describe("what upgrading changes (FR2) and FR3 properties", () => {
     expect(out).toContain('class="slot upgraded unknown" data-object="pager" data-res="hi"');
     expect(out).toContain('src="/objects/chick_white.png"');
     expect(out.slice(out.indexOf('class="desk-things"'))).toMatchSnapshot();
-    const lost = renderRoom({ state: { ...store.getState(), lost: ["chick"] }, events: [], session }).value;
-    expect(lost).not.toContain('data-object="chick"');
+    // (Title kept for its snapshot key: nothing is lost to the hand any more, 2026-11-06.)
   });
 
   it("an upgrade before the object is found, or before offerFrom, is rejected", () => {

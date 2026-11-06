@@ -221,7 +221,7 @@ export const KURO_CONTENT: KuroContent = {
       "idiomZh": "你一直这么辛苦。",
       "stance": "Unmoved by the loan either way: 'Money moves. Let it move.' The gap: 'As wide as it needs to be.' It does not console; it states.",
       "recall": "- the loan choice",
-      "mayReveal": "If asked about the hand: 'That one's a bit too specific.' Nothing more.",
+      "mayReveal": "If asked about the gap between the monitors: 'That one's a bit too specific.' Nothing more.",
       "never": "- Name the thing. Invent lore beyond kuro-profile.md. Produce more than five turns. Mention the body under the face.",
       "starters": [
         {
@@ -469,8 +469,8 @@ export const KURO_CONTENT: KuroContent = {
         },
         {
           "n": 4,
-          "zh": "我觉得这些手比老王礼貌。它们每次都等我好好吃完饭才出现。",
-          "en": "I think these hands have better manners than Lao Wang. They always wait till I've finished eating.",
+          "zh": "今天发下来的那个剧本，你读过吗。",
+          "en": "That script they sent round today. Have you read it?",
           "hard": false,
           "minBucket": "mid"
         }

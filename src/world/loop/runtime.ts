@@ -6,7 +6,6 @@ import { taskByFlag } from "@state/days/tasks";
 import type { Meal } from "@state/delivery/table";
 import type { GameEvent } from "@state/events";
 import { choiceOf } from "@state/days/effects";
-import { isRaidNight, takeFor, wantsOf } from "@state/nights";
 import { dueAtLieDown, dueAtShutdown } from "@state/endings";
 import { boardJudgement, deliverableForHand, handNight } from "@state/days/board";
 import { autoUnlockBoard } from "@world/desktop/workbench/board";
@@ -48,12 +47,9 @@ const at = (clock: BeatClock, beat: Beat, time?: string): BeatClock => ({ beat, 
 
 /** A day sequence as a queue entry (a beat's choices end it in a choice). */
 export function beatQueued(day: number, beat: BeatName, seq: Sequence, ending?: Ending) {
-  // A raid night: after the shutdown beat's lines, what the hand wants (content/nights.json),
-  // then the choices (night-hand FR1/FR2).
-  const wants = beat === "shutdown" ? wantsOf(day) : null;
   return {
     key: `d${day}:beat:${beat}`,
-    lines: wants ? [...placedLines(seq), { k: "narration" as const, t: wants }] : placedLines(seq),
+    lines: placedLines(seq),
     ending: ending ?? (seq.choices?.length ? { kind: "beatChoices" as const, day, beat } : { kind: "none" as const }),
     sequence: seq,
   };
@@ -186,9 +182,6 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
       // night-hand (author 2026-11-06): the picked shutdown choice's own lines, right after the
       // pick (the night beat is queued later, at bedtime). Without `say`, nothing here.
       if (e.beat === "shutdown" && choice?.say?.length) dialogue = push(dialogue, { key: `d${day}:shutdown:choice:${e.index}`, lines: choice.say, ending: { kind: "none" } });
-      // Nothing given on a night the hand takes something else: its line (night-hand, nights-takes).
-      const take = e.beat === "shutdown" && choice && isRaidNight(day) ? takeFor(day, choice) : null;
-      if (take) dialogue = push(dialogue, { key: `d${day}:take`, lines: [{ k: "narration", t: take.say }], ending: { kind: "none" } });
     } else if (e.kind === "pickup" && e.meal === "lunch" && (clock.beat === "boot" || clock.beat === "work")) {
       clock = at(clock, "afternoon");
     }

@@ -5,8 +5,9 @@
 // once its turn line is read the same box is the player's turn (playtest-1105 R6; no second box). Pure: state + session in, markup
 // out. Every text is content's or a string.
 import type { GameEvent } from "@state/events";
-import { isRaidNight } from "@state/nights";
+import { handNight } from "@state/days/board";
 import { dreamNights } from "@state/stages";
+import { constants } from "@state/variables";
 import { npcPortrait, silhouetteFor, speakerLabel } from "@world/npc";
 /** opening R2: the prologue's sequence key (world/opening.ts; repeated to keep the box free of that module). */
 const PROLOGUE_KEY = "prologue";
@@ -33,7 +34,7 @@ import { choiceScreens, fontPx, KURO_LINE_BOX, LINE_BOX, marker, screens, type B
  */
 export const geomFor = (q: Queued | undefined, lineKind?: string): BoxGeom => (q?.voice === "kuro" || lineKind === "inner" ? KURO_LINE_BOX : LINE_BOX);
 
-/** The night beat of a dream night (stages.json `dreamNights`): inner lines are the child's. */
+/** The night beat of a dream night (stages.json `nightBeat` "dream"): inner lines are the child's. */
 export const isDreamNight = (day: number, beat: string): boolean => beat === "night" && dreamNights.includes(day);
 
 /**
@@ -54,9 +55,12 @@ export function portraitState(state: State, events: readonly GameEvent[], sessio
   return kuroBodyState({ state, events, startDay: 1, session, night: isNight(session.clock), nowMs });
 }
 
-/** The raid is in the dialogue box: tonight's shutdown sequence on a raid night. */
+/**
+ * The hand is in the dialogue box: tonight's shutdown sequence on a hand night (days 10–17) or on
+ * the last night (18, the branch: the hand reaches out too). Nights 1–9 have no hand.
+ */
 export function raidShowing(state: State, session: Pick<Session, "dialogue">): boolean {
-  return isRaidNight(state.day) && session.dialogue.queue[0]?.key === `d${state.day}:beat:shutdown`;
+  return (handNight(state.day) || state.day === (constants.lastDay as number)) && session.dialogue.queue[0]?.key === `d${state.day}:beat:shutdown`;
 }
 
 export type BoxTag = { readonly kind: "who"; readonly text: string } | { readonly kind: "kuro" } | null;

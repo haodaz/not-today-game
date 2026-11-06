@@ -28,7 +28,7 @@ Opening a task with a `board` shows it in the work pane: the title, the table, a
 After printing, today's deliverable is **on the desk** (the 桌子 view shows it at a free spot with `deliverable.img` or a paper thumbnail and its `label` as the hover name; it is also in the 道具 strip). It stays until it is given to the hand or the day ends.
 
 ## 4. The hand collects it (`src/state/nights.ts`, the shutdown beat)
-- On a raid night, if today's deliverable is on the desk, the shutdown choices get one more, **first**: `hand.give` 「把{label}递给它」. Choosing it logs `give` with the deliverable id; the deliverable leaves the desk; the other raid choices stay as they are.
+- On a hand night (days 10–17), if today's deliverable is on the desk, the shutdown choices get one more, **first**: `hand.give` 「把{label}递给它」. Choosing it logs `give` with the deliverable id; the deliverable leaves the desk; the content's own choices (e.g. 「不给。」 with its `say`) follow it.
 - **The judgement** (pure, from the log): count slots whose card ≠ `answer` (a Kuro card is wrong too).
   - given and 0 wrong → `perfect`;
   - given and 1 ≤ wrong < `wrongAt` → `flawed`;
@@ -37,7 +37,7 @@ After printing, today's deliverable is **on the desk** (the 桌子 view shows it
 - A day without a board task has no judgement (unchanged).
 
 ## 5. Old objects taken by Kuro (only what this task needs)
-If the lock's object is upgraded and its invasion level is 3 (object-upgrade spec), it counts as **not available** for the lock (Kuro is inside it). Below 3 it works.
+If the lock's object is upgraded and taken (`takenByKuro`, three days after the upgrade; object-upgrade 2026-11-03 addition), it counts as **not available** for the lock (Kuro is inside it). Before that its ability is automatic.
 
 ## Strings (Claude has added them, zh and en)
 `board.tray`, `board.lockCode`, `board.noTool`, `board.kuroTry`, `board.assist`, `board.print`, `board.pagerCodes`, `hand.give` (`{label}`), `hand.judge.perfect`, `hand.judge.flawed`, `hand.judge.wrong`.
@@ -63,7 +63,7 @@ Author: 「1–9 是活人 / 变异的人 / 披着人皮的 72 柱神直接收�
 - **To the hand** (`hand`): as today — 打印, the deliverable on the desk, given at night.
 
 ### The hand
-- The give choice (`hand.give`) appears at the shutdown beat **only for a `hand` deliverable on the desk**. On days 5, 7, 9 (raid nights before the gods) it never appears for a person's deliverable (those were sent on screen).
+- The give choice (`hand.give`) appears at the shutdown beat **only for a `hand` deliverable on the desk**. Nights 1–9 have no hand at all (author 2026-11-06; the earlier raid nights 5, 7, 9 are gone).
 - **From day 10 the hand comes every night a `hand` deliverable is on the desk**, even when the day's content has no shutdown choices (days 11, 12, 14, 15, 17): the box then offers `hand.give` and `hand.refuse` (「不给。」, Claude adds it); refusing logs nothing (the judgement will say `wrong`). On raid nights the existing choices stay after the give choice, as today.
 
 ### Judgement (unchanged)

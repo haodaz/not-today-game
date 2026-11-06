@@ -1,9 +1,8 @@
 // One meal of one day, as the phone and the door see it. Orders and pickups are read from the
 // event log (design E2); the beat time `now` is story time, HH:MM. Pure.
 import { anythingOrderable, itemOf } from "@state/delivery/shops";
-import { BOX_FLAG, deliveryTable, mealOf, RETURN_FLAG, type Meal } from "@state/delivery/table";
+import { BOX_FLAG, deliveryTable, mealOf, type Meal } from "@state/delivery/table";
 import type { GameEvent } from "@state/events";
-import { returnedObjects } from "@state/objects";
 import type { State } from "@state/types.gen";
 
 export interface OrderRecord {
@@ -73,7 +72,7 @@ export interface MealView {
   readonly receipt: string | null;
   readonly anomaly: string | null;
   readonly flags: readonly string[];
-  readonly extras: { readonly box: boolean; readonly returned: readonly string[] };
+  readonly extras: { readonly box: boolean };
 }
 
 /**
@@ -112,7 +111,6 @@ export function mealView(day: number, meal: Meal, state: State, events: readonly
   }
 
   const flags = entry.effects?.flags ?? [];
-  const returnsObjects = flags.includes(RETURN_FLAG);
   return {
     day,
     meal,
@@ -127,8 +125,6 @@ export function mealView(day: number, meal: Meal, state: State, events: readonly
     flags,
     extras: {
       box: flags.includes(BOX_FLAG),
-      // What the bag holds: everything handed to the hand so far (state `lost`), until it is taken in.
-      returned: returnsObjects ? returnedObjects(state) : [],
     },
   };
 }

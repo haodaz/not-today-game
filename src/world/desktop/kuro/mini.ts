@@ -62,7 +62,7 @@ export function kuroMaw(ctx: Pick<AppContext, "state" | "session" | "night">): M
   if (!ctx.night) return null;
   if (state.day === constants.lastDay) return "maw3";
   const raid = state.raids[String(state.day)];
-  return raid && raid.blockedWith === null && raid.gave === null ? "maw2" : null;
+  return raid && raid.gave === null ? "maw2" : null;
 }
 
 /** Red eyes from the late ring (late-days FR2): the slot attribute the body element reads. */

@@ -7,7 +7,6 @@ import type { State } from "../types.gen";
 import { meetingCardFound } from "./meeting";
 import { isMeetingFrom, taskByFlag, type BoardCard, type BoardLock, type CardFrom, type Task, type TaskBoard, type TaskDeliverable } from "./tasks";
 import { dayFile } from "./table";
-import { isRaidNight } from "../nights";
 import { takenByKuro } from "@world/objects/taken";
 import { handOf } from "../hands";
 
@@ -238,14 +237,17 @@ export function validateBoardStep(day: number, taskId: string, op: BoardOp): voi
 
 // ——— the night judgement (work v2 §4) ———
 
+/** The hand's nights (work v2 addition 2026-11-03 night, author 2026-11-06): days 10–17. */
+export const HAND_FIRST_NIGHT = 10;
+export const HAND_LAST_NIGHT = 17;
+
 /**
- * A night the hand comes (work v2 addition 2026-11-03 night): from day 10 the gods send the hand
- * every night, and the earlier raid nights (5, 7, 9) are hand nights too. People take their own
- * deliverables on screen (a `board.send.<to>` button), so only a `hand` deliverable on the desk
- * waits for the hand. Pure (the raid nights are content-derived).
+ * A night the hand comes: days 10–17, nothing else (nights 1–9 have no hand at all; night 18 is the
+ * branch, its own choices only). People take their own deliverables on screen (a
+ * `board.send.<to>` button), so only a `hand` deliverable on the desk waits for the hand. Pure.
  */
 export function handNight(day: number): boolean {
-  return day >= 10 || isRaidNight(day);
+  return day >= HAND_FIRST_NIGHT && day <= HAND_LAST_NIGHT;
 }
 
 export type BoardVerdict = "perfect" | "flawed" | "wrong";

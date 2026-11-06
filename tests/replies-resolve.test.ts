@@ -30,8 +30,6 @@ const withFound = (state: State, ...objects: string[]): State => ({
   found: [...new Set([...state.found, ...objects])] as State["found"],
 });
 
-/** The object handed to the hand (state `lost`). */
-const handedOver = (state: State, object: string, _night: number): State => ({ ...state, lost: [...state.lost, object] });
 
 const usedWord = (state: State, word: string): State => {
   const object = objectFor(word);
@@ -95,18 +93,9 @@ describe("object words (D3)", () => {
     expect(resolve(9, "boss", no, later)?.status).not.toBe("gone");
   });
 
-  it("are struck through once the object is lost to the hand", () => {
-    const lost = handedOver(withFound(at(7), chick), chick, 6);
-    for (const recipient of ["boss", "group"]) {
-      expect(resolve(7, recipient, no, lost), recipient).toEqual({ status: "gone", inner: null, reason: "lost" });
-    }
-    expect(objectWordState(no, lost)).toBe("lost");
-    expect(menu(7, "boss", lost)).toContainEqual({ word: no, kind: "object", gone: true });
-  });
-
-  it("a raid with nothing held up loses nothing", () => {
-    const state = withFound(at(7), chick);
-    const raided: State = { ...state, raids: { 7: { blockedWith: null, gave: null } } };
+  it("a hand night with nothing given loses nothing (nothing is lost to the hand any more)", () => {
+    const state = withFound(at(10), chick);
+    const raided: State = { ...state, raids: { 10: { gave: null } } };
     expect(objectWordState(no, raided)).toBe("available");
   });
 
@@ -192,7 +181,6 @@ describe("FR5 property: every menu word resolves to an entry or gone", () => {
     used: fc.subarray(words),
     flags: fc.subarray([...contentFlags]),
     replyOptions: fc.subarray(starting),
-    handed: fc.subarray([...(membersOf("found") ?? [])]),
   });
 
   it("holds for every day and recipient under random states", () => {
@@ -208,7 +196,6 @@ describe("FR5 property: every menu word resolves to an entry or gone", () => {
           objectWords: Object.fromEntries(
             Object.entries(base.objectWords).map(([o, w]) => [o, { ...w, used: s.used.includes(o) }]),
           ),
-          lost: [...s.handed],
         };
         for (const recipient of recipientsOn(day)) {
           for (const item of menu(day, recipient, state)) {
@@ -217,8 +204,8 @@ describe("FR5 property: every menu word resolves to an entry or gone", () => {
             if (r!.status !== "gone") expect(r!.entry).toBeDefined();
             expect(item.gone).toBe(r!.status === "gone");
 
-            // Lent words: on the menu only once found; struck through exactly when the object is
-            // lost or the day's table says gone; `used` never matters.
+            // Lent words: on the menu only once found; struck through exactly when the day's table
+            // says gone (nothing is lost to the hand any more); `used` never matters.
             if (item.kind === "object") {
               const object = objectOfWord(item.word, state)!;
               expect(state.found).toContain(object);

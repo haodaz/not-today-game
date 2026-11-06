@@ -18,7 +18,7 @@
 | 1 | 你怎么知道我的心率？ | How do you know my heart rate? | yes | |
 | 2 | 你在屋子里吗？ | Are you in the room? | yes | mid |
 | 3 | 我今天让小张看一眼。你觉得对吗？ | I told Xiao Zhang to look. Was that right? |  | |
-| 4 | 我觉得这些手比老王礼貌。它们每次都等我好好吃完饭才出现。 | I think these hands have better manners than Lao Wang. They always wait till I've finished eating. |  | mid |
+| 4 | 今天发下来的那个剧本，你读过吗。 | That script they sent round today. Have you read it? |  | mid |
 
 ## Red-blue lines (constants; only when unlocked)
 

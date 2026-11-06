@@ -34,7 +34,7 @@ import { STAGE_H, STAGE_W } from "@world/room/splat/geometry";
 import { renderRoom } from "@world/room/hud";
 
 const clone = <T>(v: T): T => JSON.parse(JSON.stringify(v)) as T;
-const env = (over: Partial<ObjectEnv> = {}): ObjectEnv => ({ day: 4, level: 0, upgraded: false, taken: false, heldUp: false, time: "09:30", t: 0, seed: "run:4:x", lit: 1, pager: [], uses: 0, ...over });
+const env = (over: Partial<ObjectEnv> = {}): ObjectEnv => ({ day: 4, level: 0, upgraded: false, taken: false, time: "09:30", t: 0, seed: "run:4:x", lit: 1, pager: [], uses: 0, ...over });
 const msg = (day: number, text: string): PagerMessage => ({ day, text, meaning: `m${day}`, afterReply: false });
 
 /** Test-only frames (not content): each frame a different mark, so a snapshot shows which one is up. */
@@ -75,7 +75,8 @@ describe("loaders (FR4)", () => {
     ["a grid with too few labels", (o) => (o.objects.dictionary!.keys as { grid: { labels: string[] } }).grid.labels.pop(), /exactly cols × rows/],
     ["reels on the chick", (o) => (o.objects.chick!.reels = (o.objects.tape as Record<string, unknown>).reels), /only the tape has reels/],
     ["a SIM line on the pager", (o) => (o.objects.pager!.sim = "x"), /only the phone has sim/],
-    ["a recording after a night that is not a dream", (o) => ((o.objects.tape!.recordings as Record<string, unknown>[])[3]!.after = 14), /dream night/],
+    // `after` is a day as content gives it (no longer checked against the dream nights, 2026-11-06).
+    ["a recording after a day below 1", (o) => ((o.objects.tape!.recordings as Record<string, unknown>[])[3]!.after = 0), /must be a day ≥ 1/],
     ["a recording line with a place", (o) => ((o.objects.tape!.recordings as { say: Record<string, unknown>[] }[])[0]!.say[0]!.where = "room"), /unknown key "where"/],
   ])("rejects %s", (_name, mutate, error) => {
     const o = objects();
@@ -850,7 +851,6 @@ describe("programs (FR2, FR3)", () => {
     expect(chickFrameAt(fed, { ...e, t: 310 })).toBe("eat-2");
     expect(chickFrameAt({ ...s, act: { kind: "dark", at: 0 } }, { ...e, t: 99_999 })).toBe("dark");
     expect(chickFrameAt({ ...s, act: { kind: "check", at: 0 } }, { ...e, t: 99_999 })).toBe("check");
-    expect(chickFrameAt(s, { ...e, heldUp: true })).toBe("grave");
     expect(chickFrameAt(s, { ...e, upgraded: true })).toMatch(/^smile-/);
     // The reset hole: one flash, and nothing else changes (every key bumps Kuro's press tracker).
     const r = chick.key(s, "reset", { ...e, t: 500 });
@@ -1050,8 +1050,6 @@ describe("properties (FR5)", () => {
       { numRuns: 100 },
     );
     expect([1, 5, 6, 11, 12, 15, 16, 18].map((d) => dreamLevel(d))).toEqual([0, 0, 1, 1, 2, 2, 3, 3]);
-    expect(dreamLevel(5, true)).toBe(1);
-    expect(dreamLevel(18, true)).toBe(MAX_LEVEL);
   });
   it("an upgraded object never shows the low-res frame", () => {
     fc.assert(

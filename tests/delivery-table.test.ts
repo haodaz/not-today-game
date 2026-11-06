@@ -1,7 +1,7 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import raw from "@content/delivery.json";
-import { deliveryTable, MEALS, mealOf, parseDelivery, returnMeal, RETURN_FLAG } from "@state/delivery/table";
+import { deliveryTable, MEALS, mealOf, parseDelivery } from "@state/delivery/table";
 import { constants } from "@state/variables";
 
 const days = Array.from({ length: constants.lastDay }, (_, i) => i + 1);
@@ -36,12 +36,6 @@ describe("the real delivery table", () => {
         }
       }),
     );
-  });
-
-  it("finds the one meal that returns the objects", () => {
-    expect(returnMeal).not.toBeNull();
-    const entry = mealOf(returnMeal!.day, returnMeal!.meal)!;
-    expect(entry.effects?.flags).toContain(RETURN_FLAG);
   });
 
   it("is empty past the scripted days", () => {

@@ -89,9 +89,4 @@ describe("renderDoorView", () => {
     }
   });
 
-  it("lists returned objects in the order given", () => {
-    const base = mealView(1, "dinner", createStore().getState(), [], "19:00")!;
-    const html = renderDoorView({ ...base, extras: { box: false, returned: ["pager", "chick"] } }, { day: 1, meal: "dinner", state: "onDesk" }, names);
-    expect(html.indexOf('data-object="pager"')).toBeLessThan(html.indexOf('data-object="chick"'));
-  });
 });

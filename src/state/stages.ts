@@ -60,8 +60,16 @@ export function nightBeatOf(day: number): string | null {
   return nightBeats[String(day)] ?? null;
 }
 
-/** The nights on which a dream plays. */
-export const dreamNights: readonly number[] = stages.dreamNights.nights;
+/**
+ * The nights on which a dream plays: the days whose night beat is `dream` (stages.json `nightBeat`).
+ * The separate `dreamNights` key is gone (2026-11-06); the night-beat table is the one source.
+ */
+export const dreamNights: readonly number[] = Object.freeze(
+  Object.entries(nightBeats)
+    .filter(([day, beat]) => /^[1-9]\d*$/.test(day) && beat === "dream")
+    .map(([day]) => Number(day))
+    .sort((a, b) => a - b),
+);
 
 /** Which object comes out of the box on which day (`objectsFoundOnDay`). */
 export const objectsFoundOnDay: Readonly<Record<string, number>> = Object.freeze({ ...(stages.objectsFoundOnDay as Record<string, number>) });

@@ -58,11 +58,11 @@ const DUE: Readonly<Record<HintId, (c: Ctx) => boolean>> = {
     const box = itemByEvent(lc, "openBox");
     return unlocked(lc, box?.id) && !doneItem(lc, box?.id);
   },
-  items: ({ state }) => state.found.some((id) => !state.lost.includes(id)),
+  items: ({ state }) => state.found.length > 0,
   kuro: ({ lc }) => !!lc && unlocked(lc, itemByEvent(lc, "chat")?.id),
   bed: ({ lc }) => !!lc && happened({ type: "beat", beat: "shutdown" }, lc),
   // From the day after the chick was found.
-  chickHint: ({ state }) => state.found.includes("chick") && !state.lost.includes("chick") && objectsFoundOnDay.chick !== undefined && state.day > objectsFoundOnDay.chick,
+  chickHint: ({ state }) => state.found.includes("chick") && objectsFoundOnDay.chick !== undefined && state.day > objectsFoundOnDay.chick,
 };
 
 /** The edge of a facing that turns toward `to` (its first turn), or null where there is none. */

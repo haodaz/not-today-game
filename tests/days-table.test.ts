@@ -25,7 +25,8 @@ describe("day files", () => {
     ["a reference to a missing item", (d: any) => (d.items[1].unlock = "done:nope"), /unknown item "nope"/],
     ["a duplicate id", (d: any) => (d.items[1].id = "boot"), /duplicate item id/],
     ["a goto choice", (d: any) => (d.beats.shutdown.choices = [{ text: "x", goto: "y" }]), /unknown key "goto"/],
-    ["a dream object that does not exist", (d: any) => (d.beats.shutdown.choices = [{ text: "x", effects: { item_dream: "toaster" } }]), /unknown object/],
+    ["an old night-raid effect (item_dream, removed 2026-11-06)", (d: any) => (d.beats.shutdown.choices = [{ text: "x", effects: { item_dream: "chick" } }]), /unknown key "item_dream"/],
+    ["an old night-raid effect (item_lost, removed 2026-11-06)", (d: any) => (d.beats.shutdown.choices = [{ text: "x", effects: { item_lost: "loan" } }]), /unknown key "item_lost"/],
     ["waiting less than the minimum", (d: any) => (d.delivery.waitMinutes = 1), /below minMinutes/],
   ])("rejects %s", (_name, change, message) => {
     const d = clone();

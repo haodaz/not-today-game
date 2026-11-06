@@ -60,7 +60,7 @@ describe("R1 · the camera replaces the textbook in every object list", () => {
 
 // ——— R8 · the instant camera ———
 
-const env = (over: Partial<ObjectEnv> = {}): ObjectEnv => ({ day: 2, level: 0, upgraded: false, taken: false, heldUp: false, time: "10:00", t: 0, seed: "s", lit: 1, pager: [], uses: 0, sheets: 10, onScreen: false, ...over });
+const env = (over: Partial<ObjectEnv> = {}): ObjectEnv => ({ day: 2, level: 0, upgraded: false, taken: false, time: "10:00", t: 0, seed: "s", lit: 1, pager: [], uses: 0, sheets: 10, onScreen: false, ...over });
 
 describe("R8 · the program: shutter and flash, no wheel", () => {
   it("the shutter ejects a sheet (its sound); at 0 sheets in the room it clicks and nothing comes out", () => {

@@ -9,7 +9,7 @@
 - the loan choice
 - the changelog dash
 
-**May reveal today:** If asked about the hand: 'That one's a bit too specific.' Nothing more.
+**May reveal today:** If asked about the gap between the monitors: 'That one's a bit too specific.' Nothing more.
 
 ## Starter questions (player picks one; free typing after)
 

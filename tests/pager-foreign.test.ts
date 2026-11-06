@@ -20,7 +20,7 @@ const FIXTURE = {
   ],
 };
 const foreign = parseForeign(FIXTURE);
-const env = (over: Partial<ObjectEnv> = {}): ObjectEnv => ({ day: 8, level: 0, upgraded: false, taken: false, heldUp: false, time: "09:30", t: 0, seed: "run:8:pager", lit: 1, pager: [], uses: 0, ...over });
+const env = (over: Partial<ObjectEnv> = {}): ObjectEnv => ({ day: 8, level: 0, upgraded: false, taken: false, time: "09:30", t: 0, seed: "run:8:pager", lit: 1, pager: [], uses: 0, ...over });
 const press = (keys: string[], e: ObjectEnv, from: PagerState = pager.init(e)): PagerState => keys.reduce((s, k, i) => pager.key(s, k, { ...e, t: e.t + i }).state, from);
 /** Day 8 at `time`: the pager's messages so far, as the env carries them. */
 const day8 = (time: string) => {

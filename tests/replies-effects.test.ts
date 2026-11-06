@@ -38,11 +38,6 @@ describe("applyReplyEvent", () => {
     expect(twice.objectWords[chick]!.used).toBe(true);
   });
 
-  it("a lent word whose object was handed to the hand sends nothing", () => {
-    const lost = day5({ lost: [chick] });
-    expect(applyReplyEvent(lost, { day: 5, recipient: "group", choice: "no" })).toBe(lost);
-  });
-
   it("does nothing for a gone word, a word not on the menu, or an unfound object's word", () => {
     const d10 = f(10);
     expect(applyReplyEvent(d10, { day: 10, recipient: "boss", choice: "whatever" })).toBe(d10);

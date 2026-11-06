@@ -89,9 +89,15 @@ export function buildKuroContent(read: Read, list: List): KuroContent {
     tenderMultiplier: num("tenderDayAffinityMultiplier", 1),
   };
 
-  const stages = JSON.parse(read("content/stages.json")) as { dreamNights?: { nights?: number[] } };
+  // The dream nights are the days whose night beat is `dream` (stages.json nightBeat; the separate
+  // dreamNights key is gone, 2026-11-06).
+  const stages = JSON.parse(read("content/stages.json")) as { nightBeat?: Record<string, string> };
+  const dreamNights = Object.entries(stages.nightBeat ?? {})
+    .filter(([day, beat]) => /^[1-9]\d*$/.test(day) && beat === "dream")
+    .map(([day]) => Number(day))
+    .sort((a, b) => a - b);
   const dreams: Record<string, string[]> = {};
-  for (const night of stages.dreamNights?.nights ?? []) {
+  for (const night of dreamNights) {
     const file = `content/days/day-${String(night).padStart(2, "0")}.json`;
     const d = JSON.parse(read(file)) as { beats?: { night?: { say?: { t: string }[] } } };
     dreams[String(night)] = (d.beats?.night?.say ?? []).map((l) => l.t);

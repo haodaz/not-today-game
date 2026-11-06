@@ -84,7 +84,9 @@ describe("calm daytime, tender day, night beat, dream nights", () => {
     expect(nightBeatOf(lastDay + 1)).toBeNull();
   });
 
-  it("dreamNights equals the table", () => {
-    expect([...dreamNights]).toEqual(stages.dreamNights.nights);
+  it("dreamNights are the night-beat table's `dream` nights (the separate key is gone, 2026-11-06)", () => {
+    const fromBeats = Object.entries(stages.nightBeat as Record<string, string>).filter(([d, b]) => /^\d+$/.test(d) && b === "dream").map(([d]) => Number(d));
+    expect([...dreamNights]).toEqual(fromBeats);
+    expect(dreamNights.length).toBeGreaterThan(0);
   });
 });

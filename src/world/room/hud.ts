@@ -18,7 +18,6 @@ import { getLocale, hasString, t, tr, type Locale } from "@world/i18n";
 import { booted, checklist, deskMeal, itemStates, loopContext, type ChecklistView } from "@world/loop/checklist";
 import { itemOf } from "@state/delivery/shops";
 import { ordersOn } from "@world/delivery/meals";
-import { raidNights, takeOf } from "@state/nights";
 import { isEvening, isNight } from "@world/desktop/beat";
 import { lampLit } from "@world/objects/works";
 import { hudKuro } from "@world/desktop/kuro/mini";
@@ -33,8 +32,6 @@ import { bpm, sanBand } from "@state/endings";
 import { emailRow, type EmailRow } from "@net/email";
 import { taskFiles } from "@state/days/tasks";
 
-/** The flag the hand sets when it takes the heartbeat (content/nights-takes.json `what: heartbeat`). */
-const HEARTBEAT_TAKEN: string | null = raidNights.map(takeOf).find((t) => t?.what === "heartbeat")?.flag ?? null;
 import { heldItem, heldLayer } from "./held";
 import { pointerCls } from "./pointer";
 import { dialogueBox, raidShowing } from "@world/dialogue/box";
@@ -76,9 +73,7 @@ export function renderChecklist(view: ChecklistView): SafeHtml {
 }
 
 function dayCorner(state: State, session: Session): SafeHtml {
-  // Once the hand has taken the heartbeat (night 9, nothing given): it still beats, no number.
-  const taken = HEARTBEAT_TAKEN !== null && state.flags.includes(HEARTBEAT_TAKEN);
-  const hr = state.day >= HEART_RATE_FROM_DAY ? html`<div class="hr"><i></i>${taken ? null : tr("hud.hr", { bpm: heartRate(state.san) })}</div>` : null;
+  const hr = state.day >= HEART_RATE_FROM_DAY ? html`<div class="hr"><i></i>${tr("hud.hr", { bpm: heartRate(state.san) })}</div>` : null;
   return html`<div class="day"><b>${tr("shell.day", { day: state.day })} · ${tr(beatLabelKey(session.clock.beat))}</b></div>${hr}`;
 }
 
@@ -90,7 +85,7 @@ function dayCorner(state: State, session: Session): SafeHtml {
 export interface DeskThings {
   readonly phone: SafeHtml;
   readonly cup: SafeHtml;
-  /** In found (arrival) order; what was handed to the hand is not here. */
+  /** In found (arrival) order. */
   readonly objects: readonly { readonly id: string; readonly html: SafeHtml }[];
   /** Day 18's slip, once its checklist line is open (on the tabletop, and in the 道具 strip). */
   readonly slip: SafeHtml | null;
@@ -176,7 +171,6 @@ export function deskThings(state: State, events: readonly GameEvent[], session: 
   const unknown = (id: string) => !knows(id, state, events) && "unknown";
   // An upgraded object's icon is the hi-res one: the only visible tell (object-upgrade FR2).
   const objects = state.found
-    .filter((id) => !state.lost.includes(id))
     // A slot is a button so it can be picked up (polish FR1, design P9); while it is held, the
     // slot is empty (`lifted`).
     // The first 举起来 has no checklist line: a one-time pointer on the first object (rule 2026-11-01).

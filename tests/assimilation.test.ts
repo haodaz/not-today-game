@@ -86,10 +86,10 @@ describe("an upgrade's assimilation", () => {
     expect(next.upgraded.pager).toBe(true);
   });
 
-  it("全员升级 (final) sets it to the max (100), whatever it was", () => {
+  it("day 13 is an ordinary day (no 全员升级 any more, 2026-11-06): + assimUpgrade, not the max", () => {
     const s = { ...day7(), day: 13, found: ["chick", "pager", "iccard"] as State["found"], assimilation: 20 };
-    const next = applyUpgrade(s, { day: 13, object: "pager", final: true });
-    expect(next.assimilation).toBe(100);
+    const next = applyUpgrade(s, { day: 13, object: "pager" });
+    expect(next.assimilation).toBe(28);
   });
 });
 

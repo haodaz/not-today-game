@@ -2,10 +2,8 @@ import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { objectsFoundOnDay } from "@state/stages";
 import objectsFile from "@content/objects.json";
-import takesFile from "@content/nights-takes.json";
 import { applyChoose, choiceOf } from "@state/days/effects";
 import { dayFiles } from "@state/days/table";
-import { parseTakes, raidMove, raidNights, takeOf } from "@state/nights";
 import { askedOn, knows, optionOrder, parseObjects, recogniseTable, wasRight } from "@state/recognise";
 import { createRunSlot, LEGACY_RUN_ID, RUN_KEY } from "@state/saves";
 import { memoryStorage } from "@state/slot";
@@ -129,10 +127,11 @@ describe("the recognise event (FR1/FR2)", () => {
     expect(store.getState().judgement.evidence.at(-1)).toEqual({ day: 4, eventId: "recognise:pager", note: recogniseTable.get("pager")!.options[rightIndex("pager")]!.t });
   });
 
-  it("the camera is not one of the six: a right answer is known from the log, not state", () => {
+  it("the recognised set is all eight objects: a right answer for the camera (or the phone) puts it in state", () => {
+    expect([...six].sort()).toEqual(["calculator", "camera", "chick", "dictionary", "iccard", "pager", "phone", "tape"]);
     const store = found(2, "camera");
     store.appendEvent({ kind: "recognise", objectId: "camera", option: rightIndex("camera") });
-    expect(store.getState().recognised).toEqual([]);
+    expect(store.getState().recognised).toEqual(["camera"]);
     expect(knows("camera", store.getState(), store.getEvents())).toBe(true);
   });
 
@@ -268,67 +267,27 @@ describe("when it is asked (FR1)", () => {
   });
 });
 
-describe("what the hand takes when nothing is given (nights-takes)", () => {
-  const nothing = (day: number) => dayFiles.get(day)!.beats.shutdown!.choices!.findIndex((c) => raidMove(c).kind === "nothing");
-
-  it("content/nights-takes.json is read strictly: nights 9 and 18 only", () => {
-    expect(raidNights.filter((d) => takeOf(d))).toEqual([9, 18]);
-    expect(takeOf(9)).toEqual(takesFile.takes["9"]);
-    const raw = structuredClone(takesFile) as any;
-    expect(() => parseTakes({ ...raw, extra: 1 })).toThrow(/unknown key "extra"/);
-    expect(() => parseTakes({ ...raw, takes: { ...raw.takes, 14: raw.takes["9"] } })).toThrow(/not a raid night/);
-    expect(() => parseTakes({ ...raw, takes: { 9: { ...raw.takes["9"], flag: "" } } })).toThrow(/non-empty/);
-  });
-
-  it("night 9, nothing given: the flag is set and the line plays; the heart rate loses its number", () => {
+describe("the hand takes nothing any more (nights-takes removed, 2026-11-06)", () => {
+  it("night 9 has no hand: no choices, nothing taken; the heart rate keeps its number", () => {
+    expect(dayFiles.get(9)!.beats.shutdown!.choices ?? []).toEqual([]);
     const store = createStore({ startDay: 9 });
-    const index = nothing(9);
-    const d = queued(store, () => store.appendEvent({ kind: "choose", beat: "shutdown", index }));
-    const take = takeOf(9)!;
-    expect(store.getState().flags).toContain(take.flag);
-    expect(store.getState().raids["9"]).toEqual({ blockedWith: null, gave: null });
-    expect(d.queue.find((q) => q.key === "d9:take")!.lines).toEqual([{ k: "narration", t: take.say }]);
     const out = renderRoom({ state: store.getState(), events: store.getEvents(), session: initialSession(DEFAULT_CLOCK, "left", "room") }).value;
-    expect(out).toMatch(/<div class="hr"><i><\/i><\/div>/);
+    expect(out).toMatch(/<div class="hr"><i><\/i>[^<]+<\/div>/);
   });
 
-  it("night 9, held up instead: nothing is taken", () => {
-    const store = createStore({ startDay: 9 });
-    store.appendEvent({ kind: "openLayer", objectId: "chick" });
-    store.appendEvent({ kind: "recognise", objectId: "chick", option: rightIndex("chick") });
-    const block = dayFiles.get(9)!.beats.shutdown!.choices!.findIndex((c) => raidMove(c).kind === "block");
-    store.appendEvent({ kind: "choose", beat: "shutdown", index: block });
-    expect(store.getState().flags).not.toContain(takeOf(9)!.flag);
-  });
-
-  it("other nights only cost san", () => {
-    const state = createStore({ startDay: 5 }).getState();
-    const next = applyChoose(state, { day: 5, beat: "shutdown", index: nothing(5) });
-    expect(next.flags).toEqual(state.flags);
-  });
-
-  it("night 18: only 「不填。握住它。」 lets it take the hand; 「填寄件单」 never does (requiresFlag)", () => {
-    const take = takeOf(18)!;
-    expect(take.requiresFlag).toBe("shook_hand");
+  it("night 18: 「不填。握住它。」 sets shook_hand, 「填寄件单」 slip_filled; nothing else is taken or said", () => {
     const choices = dayFiles.get(18)!.beats.shutdown!.choices!;
     const hold = choices.findIndex((c) => c.effects?.flags?.includes("shook_hand"));
     const slip = choices.findIndex((c) => c.effects?.flags?.includes("slip_filled"));
     expect(hold).toBeGreaterThanOrEqual(0);
     expect(slip).toBeGreaterThanOrEqual(0);
     const state: State = createStore({ startDay: 18 }).getState();
-    expect(applyChoose(state, { day: 18, beat: "shutdown", index: hold }).flags).toContain(take.flag);
-    expect(applyChoose(state, { day: 18, beat: "shutdown", index: slip }).flags).not.toContain(take.flag);
-    // And the line plays only for holding the hand.
-    for (const [index, plays] of [[hold, true], [slip, false]] as const) {
+    expect(applyChoose(state, { day: 18, beat: "shutdown", index: hold }).flags).toEqual([...state.flags, "shook_hand"]);
+    expect(applyChoose(state, { day: 18, beat: "shutdown", index: slip }).flags).toEqual([...state.flags, "slip_filled"]);
+    for (const index of [hold, slip]) {
       const store = createStore({ startDay: 18 });
       const d = queued(store, () => store.appendEvent({ kind: "choose", beat: "shutdown", index }));
-      expect(d.queue.some((q) => q.key === "d18:take"), choiceOf(18, "shutdown", index)!.text).toBe(plays);
+      expect(d.queue.some((q) => q.key === "d18:take"), choiceOf(18, "shutdown", index)!.text).toBe(false);
     }
-  });
-
-  it("a requiresFlag must be a flag that night's nothing-choices set", () => {
-    const raw = structuredClone(takesFile) as any;
-    expect(() => parseTakes({ ...raw, takes: { 18: { ...raw.takes["18"], requiresFlag: "nope" } } })).toThrow(/sets "nope"/);
-    expect(() => parseTakes({ ...raw, takes: { 18: { ...raw.takes["18"], requiresFlag: "" } } })).toThrow(/non-empty/);
   });
 });

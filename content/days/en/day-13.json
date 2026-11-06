@@ -49,25 +49,24 @@
         {
           "k": "narration",
           "t": "A hand comes out of the gap. The wall is breathing."
-        },
-        {
-          "k": "inner",
-          "t": "The fifth time."
         }
       ],
       "choices": [
         {
-          "text": "Hold up the dictionary.",
-          "effects": {
-            "item_dream": "dictionary",
-            "san": 1
-          }
-        },
-        {
-          "text": "Give nothing.",
+          "text": "Give it nothing.",
           "effects": {
             "san": -1
-          }
+          },
+          "say": [
+            {
+              "k": "narration",
+              "t": "The hand waits a while, as if counting days. The gap closes; the wall keeps breathing."
+            },
+            {
+              "k": "inner",
+              "t": "Which day it counted to, I don't know."
+            }
+          ]
         }
       ]
     },
@@ -75,15 +74,15 @@
       "say": [
         {
           "k": "narration",
-          "t": "A sheet slides under the door. The upgrade notice. Everyone."
+          "t": "A sheet slides under the door. Blank."
         },
         {
           "k": "narration",
-          "t": "Please pack away old things first."
+          "t": "You turn it over. A date on the back: November 1st."
         },
         {
           "k": "inner",
-          "t": "Pack away. It means the things on the desk."
+          "t": "The day the door opens. It worked it out before I did."
         },
         {
           "k": "narration",

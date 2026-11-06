@@ -66,7 +66,6 @@ export function chirpGap(seed: string, n: number): number {
 export function chickFrameAt(s: ChickState, env: ObjectEnv): ChickFrameId {
   const t = env.t;
   if (env.upgraded) return Math.floor(t / CHICK_IDLE_MS) % 2 ? "smile-2" : "smile-1";
-  if (env.heldUp) return "grave";
   const act = s.act;
   if (act?.kind === "eat" && t - act.at < CHICK_EAT_MS) return Math.floor((t - act.at) / CHICK_EAT_STEP_MS) % 2 ? "eat-2" : "eat-1";
   if (act?.kind === "nod" && t - act.at < CHICK_NOD_MS) return "nod";

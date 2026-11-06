@@ -1056,7 +1056,7 @@ export const loopActions: Record<string, ActionHandler> = {
     const { session, store } = ctx;
     const state = store.getState();
     const id = data.object ?? "";
-    const onDesk = (state.found as string[]).includes(id) && !state.lost.includes(id);
+    const onDesk = (state.found as string[]).includes(id);
     if (!onDesk) return;
     fromItemsPanel(ctx);
     // Another object taken up puts the one in hand down: its unanswered question goes with it.
@@ -1227,7 +1227,7 @@ export const loopActions: Record<string, ActionHandler> = {
     const state = store.getState();
     // Close any held clamshell first, then open the object (same holding + hand.using as the room).
     restHand(session);
-    if (!openObjectFromBar(session, state, id)) return; // not found, or lost to the hand
+    if (!openObjectFromBar(session, state, id)) return; // not found
     // objects-in-room R2: used at the desk (屏幕 is 房间's).
     enterUse(ctx, id);
     // The dictionary is a clamshell: using it opens it (as in the room's obj-use).

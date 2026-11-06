@@ -6,7 +6,6 @@ import { taskFiles } from "@state/days/tasks";
 import { bpm, dueAtLieDown, dueAtShutdown, goodConditions, sanBand, SAN_MAX, SAN_MIN } from "@state/endings";
 import { applyEvent, type EventDraft, type GameEvent } from "@state/events";
 import { f } from "@state/fday";
-import { raidNights } from "@state/nights";
 import type { Store } from "@state/store";
 import { createStore } from "@state/store";
 import type { State } from "@state/types.gen";
@@ -85,7 +84,7 @@ describe("SAN (FR1)", () => {
               /* rejected: nothing changes */
             }
           }
-          if (raidNights.includes(n)) {
+          if ((dayFiles.get(n)?.beats.shutdown?.choices?.length ?? 0) > 0) {
             try {
               state = applyEvent(state, { kind: "choose", day: n, beat: "shutdown", index: d.raid % dayFiles.get(n)!.beats.shutdown!.choices!.length } as GameEvent);
             } catch {
@@ -102,7 +101,7 @@ describe("SAN (FR1)", () => {
 
   it("clamps at both ends", () => {
     const nothing = (day: number) => dayFiles.get(day)!.beats.shutdown!.choices!.findIndex((c) => (c.effects?.san ?? 0) < 0);
-    const low = applyChoose({ ...f(5), san: 0 }, { day: 5, beat: "shutdown", index: nothing(5) });
+    const low = applyChoose({ ...f(10), san: 0 }, { day: 10, beat: "shutdown", index: nothing(10) });
     expect(low.san).toBe(0);
   });
 

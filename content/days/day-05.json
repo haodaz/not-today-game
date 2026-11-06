@@ -36,38 +36,6 @@
         {
           "k": "narration",
           "t": "灯灭了。不是你关的。"
-        },
-        {
-          "k": "narration",
-          "t": "缝里伸出来一只手。很瘦，指节很长，掌心朝上。"
-        },
-        {
-          "k": "inner",
-          "t": "第一次。"
-        }
-      ],
-      "choices": [
-        {
-          "text": "把小鸡举起来。",
-          "effects": {
-            "item_dream": "chick",
-            "san": 1
-          }
-        },
-        {
-          "text": "把四万四那一行账递出去。",
-          "effects": {
-            "item_lost": "loan"
-          },
-          "cond_show": {
-            "has": "lent"
-          }
-        },
-        {
-          "text": "什么都不给。",
-          "effects": {
-            "san": -1
-          }
         }
       ]
     },

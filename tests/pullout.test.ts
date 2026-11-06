@@ -9,7 +9,6 @@ import { f } from "@state/fday";
 import { createStore, type Store } from "@state/store";
 import type { State } from "@state/types.gen";
 import { constants, membersOf } from "@state/variables";
-import { blockableNights } from "@state/nights";
 import { desktopActions } from "@world/desktop/actions";
 import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import { mountDesktop, type ActionContext } from "@world/desktop/controller";
@@ -133,7 +132,6 @@ const goodLast = (): State => {
     flags: [...base.flags, "shook_hand"],
     found: [...new Set([...base.found, ...six])] as State["found"],
     recognised: [...six] as State["recognised"],
-    raids: Object.fromEntries(blockableNights.map((d) => [String(d), { blockedWith: "chick", gave: null }])),
     affinity: constants.affinityThreshold as number,
     letItDoUnchecked: 0,
   };

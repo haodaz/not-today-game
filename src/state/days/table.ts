@@ -2,7 +2,7 @@
 // content/days/day-NN.json (Claude's): the day's beats, checklist items and delivery waiting.
 // Read, checked strictly, frozen; no string is rewritten. Condition tokens are parsed here so a
 // token the engine does not understand fails at import, not at play.
-import { constants, membersOf } from "../variables";
+import { constants } from "../variables";
 import { parseKuroCloses, type KuroCloses } from "../closes";
 import { bilingual, bilingualValues } from "../content-locale";
 
@@ -62,8 +62,6 @@ export type ItemWhen = (typeof ITEM_WHEN)[number];
 export interface ChoiceEffects {
   readonly flags?: readonly string[];
   readonly san?: number;
-  readonly item_dream?: string;
-  readonly item_lost?: string;
 }
 
 export interface Choice {
@@ -258,11 +256,10 @@ export function parseLine(v: unknown, w: string, onFail: (where: string, problem
 
 const line = (v: unknown, w: string): SayLine => parseLine(v, w, fail, true);
 
-const objectIds = (): readonly string[] => membersOf("found") ?? [];
-
+/** A choice's effects: flags and san (the old night-raid `item_dream` / `item_lost` are gone, 2026-11-06). */
 function effects(v: unknown, w: string): ChoiceEffects {
   if (!isRecord(v)) fail(w, "effects must be an object");
-  keys(v, ["flags", "san", "item_dream", "item_lost"], w);
+  keys(v, ["flags", "san"], w);
   const out: Record<string, unknown> = {};
   if (v.flags !== undefined) {
     if (!Array.isArray(v.flags) || !v.flags.every((f) => typeof f === "string")) fail(`${w}.flags`, "must be a list of strings");
@@ -271,17 +268,6 @@ function effects(v: unknown, w: string): ChoiceEffects {
   if (v.san !== undefined) {
     if (!Number.isInteger(v.san)) fail(`${w}.san`, "must be an integer");
     out.san = v.san;
-  }
-  if (v.item_dream !== undefined) {
-    const object = str(v.item_dream, `${w}.item_dream`);
-    if (!objectIds().includes(object)) fail(`${w}.item_dream`, `unknown object "${object}"`);
-    out.item_dream = object;
-  }
-  if (v.item_lost !== undefined) {
-    // Handed to the hand: the loan row, or one of the objects.
-    const lost = str(v.item_lost, `${w}.item_lost`);
-    if (lost !== "loan" && !objectIds().includes(lost)) fail(`${w}.item_lost`, `unknown thing "${lost}"`);
-    out.item_lost = lost;
   }
   return out as ChoiceEffects;
 }

@@ -1,6 +1,6 @@
 # objects-in-hand — requirements (author 2026-11-02)
 
-The old things, held and used. Design source: `script/notes/物件手感.md` (Chinese, the author's decisions are marked). Rules already in force stay: each object outputs only what its channel allows (steering `voices.md`), the chick's screen is 32×16 integer pixels, dream nights double a screen's resolution without changing its drawn size, an upgraded object shows the smooth high-res channel and "helps" unasked (object-upgrade FR2), objects are held up at night to block the hand (night-hand).
+The old things, held and used. Design source: `script/notes/物件手感.md` (Chinese, the author's decisions are marked). Rules already in force stay: each object outputs only what its channel allows (steering `voices.md`), the chick's screen is 32×16 integer pixels, an upgraded object shows the smooth high-res channel and "helps" unasked (object-upgrade FR2), objects are held up at night to block the hand (night-hand).
 
 ## FR1. Two states: holding and using
 - **Holding** (持有 ↔ 放下): clicking an object on 桌子 (or in the 道具 panel) lifts it: the room dims 40 %, the object rises to the centre, **upright, not tilted**, with a handheld breathing (1 px, 3 s). It is the GLB mesh with the front image projected (room-scene FR3), back faces from `public/objects/<id>_back.png` when present (Claude supplies), else the bright-average tint. Press-and-drag turns it ±60° yaw, ±30° pitch; release eases back in 400 ms. Keys do not respond while holding. Click anywhere else, Esc or right-click = put down.

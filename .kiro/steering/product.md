@@ -6,9 +6,9 @@ inclusion: always
 
 NOT TODAY is an eighteen-day desktop narrative horror game that runs in the browser. The player moves the days forward themselves: a day ends when they lie down, and the next day starts when they boot again. (Decision 2026-10-30: the earlier "one real calendar day is one game day" rule is dropped; nothing in the game reads the wall clock for story purposes.)
 
-The player is a tired co-founder working from a rented room in a rainy city. Every day has the same five beats: boot, open the box, work, look at the desk, shut down. Two external monitors show a modern work system (messages, documents, spreadsheet, code) and an assistant named Kuro, a black Labrador puppy's head on a small round octopus body. The system gets kinder every day and harder to read. A cardboard box with no sender gives up one layer per day: a knock-off Tamagotchi that starved in 1997, a numeric pager, a phone card, a cassette and Walkman, an English-only pocket dictionary, a solar calculator, a dead feature phone. These low-resolution objects are the only things still trying to keep the player alive.
+The player is a tired co-founder working from a rented room in a rainy city. Every day has the same five beats: boot, open the box, work, look at the desk, shut down. Two external monitors show a modern work system (messages, documents, spreadsheet, code) and an assistant named Kuro, a black Labrador puppy's head on a small round octopus body. The system gets kinder every day and harder to read. A blind-box case with no sender lets one small box loose each day, eight objects in the order of the player's own years: a knock-off Tamagotchi that starved in 1997, an instant camera, a numeric pager (the father's), a phone card, a cassette and Walkman, an English-only pocket dictionary, a solar calculator, the first feature phone; the ninth box, loose only on day 18, holds a shipping slip. The night an object arrives, the player dreams its memory. These low-resolution objects are the only things still trying to keep the player alive.
 
-At night a hand reaches out of the gap between the two monitors and asks for something. The player can hold up an object to be looked at instead.
+From day 10 the work is the gods' work: the finished result sits on the desk, and at night a hand reaches out of the gap between the two monitors to collect it (that day's god; the author's joke: 古神无纸化办公). Nights 1–9 have no hand. The old objects are never held up to it (decision 2026-11-06; the earlier raid-and-block design is gone).
 
 ## What the player can never do
 
@@ -16,7 +16,7 @@ At night a hand reaches out of the gap between the two monitors and asks for som
 - **Speak freely to the people above them.** To the boss, the partner, the client and the family the player has a fixed menu of a few replies (`Fine. Received. Whatever works. What about salary?`); the menu shrinks as stages advance and objects can lend one extra word each. The whole keyboard exists only in the company group and with Xiao Zhang and Lao Zhou, and it is taken away over time.
 - **Skip a day or a beat.** The five beats run in order; the bed is locked until the day's tasks are done. Lying down ends the day; there is no other way to advance it and no way to go back.
 - **Leave the room.** The door never opens until the good ending.
-- **Fight the hand.** At night the only moves are to hold up an object, hold up something already lost, or hold up nothing.
+- **Fight the hand.** On a hand night (days 10–17) the only moves are to hand over the day's work or to refuse; on night 18, to fill in the slip or to take the hand.
 - **Reset the chick.** The reset hole exists and is always pressable and never does anything.
 - **Skip the chat and still get the good ending.** Affinity only grows by talking.
 - **Restart.** The story never offers a restart: a run ends only through an ending, and the bad and survive endings are what bring the player back to day 1. Outside the story, the settings panel has 重新开始这一局 (and, on the title, 清除全部记录), each behind a confirm question (author, playtest 2026-11-05: a player must be able to start over).
@@ -29,7 +29,7 @@ The AI era's effect on work, and how people respond to it. The unnameable thing 
 
 - Bad: SAN reaches zero, the player is replaced (a "You and You" chat appears). Restart from day 1 with nothing carried over.
 - Survive: reach day 18, ask Kuro to post the box, lie down. The next page says "Day 1".
-- Good: never let Kuro do a task unchecked, recognise all six objects, block every raid, say the key lines, **and talk with Kuro every day until its hidden affinity reaches the threshold**; on night 18 the branch happens at bedtime, before the shipping slip is written: the player does not fill in the slip, shakes the hand, and on day 19 the door handle turns.
+- Good: never let Kuro do a task unchecked, recognise all eight objects, keep assimilation low (three-meters), say the key lines, **and talk with Kuro every day until its hidden affinity reaches the threshold**; on night 18 the branch happens at bedtime, before the shipping slip is written: the player does not fill in the slip, shakes the hand, and on day 19 the door handle turns.
 
 ## The chat beat is the heart (author decision 2026-10-31)
 
@@ -53,4 +53,4 @@ Kiroween 2026, category Resurrection (fallback: Costume Contest). The story, the
 
 ## Per-object upgrades (author decision 2026-11-01)
 
-Kuro offers to upgrade each old object separately from the day after it arrives (`content/upgrades.json`). Upgrading is convenient and makes the object part of the new world: its screen gains resolution, it can no longer be held up at night, its lent word disappears, the child's message on it is "corrected". The game never explains the cost; the only tell is the icon. The day-13 "全员升级" notice is the final, all-at-once offer, not a new mechanic.
+Kuro offers to upgrade each old object separately from the day after it arrives (`content/upgrades.json`). Upgrading is convenient and makes the object part of the new world: its screen gains resolution, its ability in work becomes automatic, its lent word disappears, the child's message on it is "corrected"; three days later Kuro has moved in and the object is gone (object-upgrade). Each upgrade raises assimilation (three-meters). The game never explains the cost; the only tell is the icon. There is no all-at-once "全员升级" offer (decision 2026-11-06).
