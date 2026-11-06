@@ -55,6 +55,15 @@
       ],
       "backwards": "\"...you read it. The whole line.\""
     },
+    "11": {
+      "name": "sleeptalk_1026.m4a",
+      "lines": [
+        "(Recording, 03:12)",
+        "...(inaudible)...",
+        "\"...the curtain... draw it...\""
+      ],
+      "backwards": "\"...northeast... the curtain... draw it...\""
+    },
     "12": {
       "name": "sleeptalk_1027.m4a",
       "lines": [
@@ -69,9 +78,10 @@
       "lines": [
         "(Recording, 02:44)",
         "\"...the key... and the gate... and the guardian...\"",
-        "\"...loan period... permanent...\""
+        "\"...loan period... permanent...\"",
+        "\"...a thousand of them... the name column all empty...\""
       ],
-      "backwards": "\"...the gate is under your pillow.\""
+      "backwards": "\"...the gate is under your pillow. 1000 names, and you name none of them.\""
     },
     "14": {
       "name": "sleeptalk_1029.m4a",
@@ -87,7 +97,8 @@
       "lines": [
         "(Recording, 02:02)",
         "\"...thank you to our speaker... meeting closed...\"",
-        "\"...why are you sitting on the desk...\""
+        "\"...why are you sitting on the desk...\"",
+        "(A flute, far off. Always the same.)"
       ],
       "backwards": "\"...one of the audience is you.\""
     },

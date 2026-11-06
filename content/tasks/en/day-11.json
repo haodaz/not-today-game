@@ -25,12 +25,13 @@
           },
           "lock": {
             "object": "calculator",
+            "hint": "A penny buys how much wheat, how much barley: key the two numbers in",
             "codes": [
-              "1 : 3",
-              "3 : 1",
-              "1 : 1"
+              "13",
+              "31",
+              "11"
             ],
-            "answer": "1 : 3",
+            "answer": "13",
             "face": "window"
           }
         },
@@ -133,7 +134,7 @@
               "text": "Oil and wine down 10% each (optimised)"
             }
           ],
-          "unlock": "1 : 3"
+          "unlock": "13"
         },
         "beats": [
           {

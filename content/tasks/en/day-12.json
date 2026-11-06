@@ -24,6 +24,7 @@
           },
           "lock": {
             "object": "tape",
+            "hint": "Last night's sleep-talk, played backwards",
             "codes": [
               "northeast",
               "southwest",

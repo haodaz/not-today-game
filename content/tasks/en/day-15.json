@@ -24,13 +24,15 @@
             "r5": "How many originals left"
           },
           "lock": {
-            "object": "camera",
+            "object": "calculator",
+            "hint": "Twelve faces, four of them original: how many replaced, work it out",
             "codes": [
+              "8",
               "12",
-              "9",
               "4"
             ],
-            "answer": "12"
+            "answer": "8",
+            "face": "window"
           }
         },
         "slots": [
@@ -132,7 +134,7 @@
               "text": "Last slide: a photo of your desk"
             }
           ],
-          "unlock": "12"
+          "unlock": "8"
         },
         "beats": [
           {

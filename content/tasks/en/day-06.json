@@ -22,6 +22,16 @@
             "r3": "Lao Wang: \"Write that it is older than people.\"",
             "r4": "The client: \"What does it need?\"",
             "r5": "Lao Wang: \"End on us.\""
+          },
+          "lock": {
+            "object": "tape",
+            "hint": "In last night's recording, played backwards",
+            "codes": [
+              "jar",
+              "back",
+              "this page"
+            ],
+            "answer": "jar"
           }
         },
         "slots": [
@@ -123,7 +133,7 @@
               "text": "We connect you to it, for it"
             }
           ],
-          "unlock": "-"
+          "unlock": "jar"
         },
         "beats": [
           {

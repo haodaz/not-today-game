@@ -24,12 +24,13 @@
           },
           "lock": {
             "object": "tape",
+            "hint": "There is a number in last night's recording",
             "codes": [
-              "7",
-              "13",
-              "31"
+              "1000",
+              "999",
+              "1024"
             ],
-            "answer": "13"
+            "answer": "1000"
           }
         },
         "slots": [
@@ -117,7 +118,7 @@
               "text": "A thousand people, every name filled in as yours"
             }
           ],
-          "unlock": "13"
+          "unlock": "1000"
         },
         "beats": [
           {

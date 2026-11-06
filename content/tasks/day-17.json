@@ -23,14 +23,16 @@
             "r4": "回什么"
           },
           "lock": {
-            "object": "phone",
+            "from": {
+              "file": "call-log"
+            },
+            "hint": "在来电记录里",
             "codes": [
               "6603 2047",
               "6603 2048",
               "6630 2047"
             ],
-            "answer": "6603 2047",
-            "face": "window"
+            "answer": "6603 2047"
           }
         },
         "slots": [

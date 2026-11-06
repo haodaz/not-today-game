@@ -266,6 +266,7 @@
           },
           "lock": {
             "object": "dictionary",
+            "hint": "老周散会前那句英文里的词，查文曲星",
             "codes": [
               "depart",
               "remain",

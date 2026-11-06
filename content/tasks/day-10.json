@@ -23,13 +23,14 @@
             "r4": "黄色印记的图样"
           },
           "lock": {
-            "object": "dictionary",
+            "object": "tape",
+            "hint": "昨晚的录音，倒着放",
             "codes": [
-              "Hali",
-              "Hari",
-              "Hail"
+              "第二幕",
+              "第一幕",
+              "第三幕"
             ],
-            "answer": "Hali"
+            "answer": "第二幕"
           }
         },
         "slots": [
@@ -117,7 +118,7 @@
               "text": "（已为你通读全文并润色）"
             }
           ],
-          "unlock": "Hali"
+          "unlock": "第二幕"
         },
         "beats": [
           {

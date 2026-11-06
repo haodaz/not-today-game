@@ -25,12 +25,13 @@
           },
           "lock": {
             "object": "dictionary",
+            "hint": "扫描件里拉丁文那一行，查文曲星",
             "codes": [
-              "key",
-              "gate",
-              "guard"
+              "clavis",
+              "custos",
+              "porta"
             ],
-            "answer": "key"
+            "answer": "clavis"
           }
         },
         "slots": [
@@ -132,7 +133,7 @@
               "text": "借阅期限：永久"
             }
           ],
-          "unlock": "key"
+          "unlock": "clavis"
         },
         "beats": [
           {

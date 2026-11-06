@@ -24,13 +24,15 @@
             "r5": "还剩几个原来的"
           },
           "lock": {
-            "object": "camera",
+            "object": "calculator",
+            "hint": "十二张脸，原来的只剩四个：换掉了几个，算一下",
             "codes": [
+              "8",
               "12",
-              "9",
               "4"
             ],
-            "answer": "12"
+            "answer": "8",
+            "face": "window"
           }
         },
         "slots": [
@@ -132,7 +134,7 @@
               "text": "最后一页：你的工位照片"
             }
           ],
-          "unlock": "12"
+          "unlock": "8"
         },
         "beats": [
           {

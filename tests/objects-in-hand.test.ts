@@ -889,9 +889,10 @@ describe("programs (FR2, FR3)", () => {
   it("pager: today's message arrives on its day, or after the first reply where content says so", () => {
     const store = createStore({ startDay: 7 });
     const before = arrivedMessages(store.getState(), store.getEvents()).map((m) => m.day);
-    expect(before).toEqual([4, 6]);
+    // Day 4 has two pages: the child's and the work page (lock-by-device content).
+    expect(before).toEqual([4, 4, 6]);
     store.appendEvent({ kind: "reply", recipient: "boss", choice: "fine", t: "10:00" });
-    expect(arrivedMessages(store.getState(), store.getEvents()).map((m) => m.day)).toEqual([4, 6, 7]);
+    expect(arrivedMessages(store.getState(), store.getEvents()).map((m) => m.day)).toEqual([4, 4, 6, 7]);
   });
   it("dictionary: shut until used; letters into row 1; lookup's gloss; the extra line from day 15; unknown is 未收录", () => {
     const e14 = env({ day: 14 });

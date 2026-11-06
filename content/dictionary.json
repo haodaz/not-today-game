@@ -185,6 +185,32 @@
       "w": "model",
       "gloss": "模型；型号",
       "extra": "你换模型了"
+    },
+    {
+      "w": "depart",
+      "gloss": "离开；出发"
+    },
+    {
+      "w": "remain",
+      "gloss": "留下；仍然"
+    },
+    {
+      "w": "return",
+      "gloss": "返回；归还"
+    },
+    {
+      "w": "clavis",
+      "gloss": "钥匙（拉丁文）",
+      "extra": "也是门"
+    },
+    {
+      "w": "custos",
+      "gloss": "守卫（拉丁文）"
+    },
+    {
+      "w": "porta",
+      "gloss": "门（拉丁文）",
+      "extra": "在你枕头底下"
     }
   ]
 }

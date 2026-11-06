@@ -21,6 +21,16 @@
             "r2": "\"That company talks ontology. We talk consciousness. One level up.\"",
             "r3": "\"It needs data.\"",
             "r4": "\"One line the investors remember.\""
+          },
+          "lock": {
+            "object": "pager",
+            "hint": "The code was paged to you",
+            "codes": [
+              "3800",
+              "3080",
+              "8300"
+            ],
+            "answer": "3800"
           }
         },
         "slots": [
@@ -108,7 +118,7 @@
               "text": "It's awake, so you can sleep"
             }
           ],
-          "unlock": "-"
+          "unlock": "3800"
         },
         "beats": [
           {

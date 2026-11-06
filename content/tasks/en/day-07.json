@@ -266,6 +266,7 @@
           },
           "lock": {
             "object": "dictionary",
+            "hint": "The word in Lao Zhou's English line, look it up",
             "codes": [
               "depart",
               "remain",

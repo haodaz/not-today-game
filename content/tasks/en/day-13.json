@@ -25,12 +25,13 @@
           },
           "lock": {
             "object": "dictionary",
+            "hint": "The Latin line in the scan, look it up",
             "codes": [
-              "key",
-              "gate",
-              "guard"
+              "clavis",
+              "custos",
+              "porta"
             ],
-            "answer": "key"
+            "answer": "clavis"
           }
         },
         "slots": [
@@ -132,7 +133,7 @@
               "text": "Loan period: permanent"
             }
           ],
-          "unlock": "key"
+          "unlock": "clavis"
         },
         "beats": [
           {

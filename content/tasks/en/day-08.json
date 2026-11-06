@@ -24,12 +24,13 @@
           },
           "lock": {
             "object": "calculator",
+            "hint": "Sunset: sunrise plus daylight, key it into the calculator",
             "codes": [
-              "17:12",
-              "18:05",
-              "16:40"
+              "1712",
+              "1805",
+              "1640"
             ],
-            "answer": "17:12",
+            "answer": "1712",
             "face": "window"
           }
         },
@@ -118,7 +119,7 @@
               "text": "You: any hour"
             }
           ],
-          "unlock": "17:12"
+          "unlock": "1712"
         },
         "beats": [
           {

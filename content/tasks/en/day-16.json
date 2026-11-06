@@ -24,10 +24,11 @@
           },
           "lock": {
             "object": "tape",
+            "hint": "The flute at the end of last night's recording",
             "codes": [
               "Always the same",
               "Faster and faster",
-              "Fast, then slow"
+              "Fast then slow"
             ],
             "answer": "Always the same"
           }
