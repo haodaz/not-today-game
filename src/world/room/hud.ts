@@ -44,6 +44,7 @@ import { objectsFoundOnDay, weatherOf } from "@state/stages";
 import { caseOverlay, looseContent } from "./case";
 import { deliverableOnDesk } from "@state/days/board";
 import { printsOnDesk } from "@state/days/prints";
+import { sheetLayer, viewfinderLayer } from "./viewfinder";
 
 /** L7: the day the heart-rate widget appears (stages.json if it says; else day 9's narration). */
 export const HEART_RATE_FROM_DAY: number = (stagesFile as { heartRateFromDay?: number }).heartRateFromDay ?? 9;
@@ -566,7 +567,11 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const table = view === "table" ? tableThings(state, events) : null;
   const scene = waiting || dream ? null : door ? html`${lookHits("door")}${doorContent(state, events, session)}` : hotView ? html`${shotHits(hotView, state, events)}${kept}` : (flat ?? table);
   // The held item sits over everything but the dialogue box (held-object.html).
-  const held = door ? null : heldLayer(state, events, session, nowMs);
+  // camera-viewfinder: the viewfinder (R1) and the sheet in hand (R3) take the held layer's place;
+  // the viewfinder also hides the HUD (the list, the corner, the buttons, Kuro's body).
+  const lens = viewfinderLayer(session, nowMs) ?? sheetLayer(state, events, session, nowMs);
+  const bare = session.viewfinder;
+  const held = lens ?? (door ? null : heldLayer(state, events, session, nowMs));
   // The hand is here: the desk dims and the gap between the monitors glows (night-hand FR1; the
   // room scene will draw the gap itself).
   // Per view as before (room-turn R4): none at 门 or 床; 窗 behaves like 房间.
@@ -582,7 +587,7 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const late = fade === null ? null : raw(` style="--late:-${Math.round(fade)}ms${fadeLen !== ARRIVE_FADE_MS ? `;--late-dur:${fadeLen}ms` : ""}"`);
   // On a turn edge the cursor is `walk` (room-turn R2; cursors.css reads the class).
   const onEdge = session.edge && session.edge.zone !== "back" && edgeLeads(view, session.edge.zone) ? `edge-${session.edge.zone}` : null;
-  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid", fade !== null && "m-late", dream && "scene-on", onEdge)}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${renderScene(lineScene)}${scene}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${list}${dayCorner(state, session)}${itemsPanel(state, events, session)}${view === "room" || view === "bed" ? casePanel(state, events, session, model.runId ?? "run", nowMs) : null}${view === "desk" ? printsView(state, events, session) : null}${held}${model.boxOutside ? null : dialogueBox(state, events, session, nowMs)}${bottomRight(model)}${settingsButton()}${itemsButton(session)}${model.boxOutside ? null : settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
+  return html`<div class="${cls("stage", "room", `${view}-view`, raid && "raid", fade !== null && "m-late", dream && "scene-on", onEdge)}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${renderScene(lineScene)}${scene}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${bare ? null : list}${bare ? null : dayCorner(state, session)}${bare ? null : itemsPanel(state, events, session)}${!bare && (view === "room" || view === "bed") ? casePanel(state, events, session, model.runId ?? "run", nowMs) : null}${view === "desk" ? printsView(state, events, session) : null}${held}${model.boxOutside || bare ? null : dialogueBox(state, events, session, nowMs)}${bare ? null : bottomRight(model)}${bare ? null : settingsButton()}${bare ? null : itemsButton(session)}${model.boxOutside || bare ? null : settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
 }
 
 export { raidShowing };

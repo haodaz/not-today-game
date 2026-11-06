@@ -97,6 +97,8 @@ describe("R1 · collected only when seen developed", () => {
     // The question for the camera may be queued; it does not stop the hand.
     loopActions["obj-use"]!(ctx, {} as DOMStringMap, null as never);
     loopActions["obj-key"]!(ctx, { object: "camera", key: "shutter" } as DOMStringMap, null as never);
+    // camera-viewfinder R1: in the room the shutter opens the viewfinder; its button takes the photo.
+    loopActions["vf-shutter"]!(ctx, {} as DOMStringMap, null as never);
     expect(store.getEvents().filter((e) => e.kind === "photo").map((e) => (e.kind === "photo" ? e.at : ""))).toEqual(["room:door"]);
     expect(collected).toEqual([]);
     for (const x of timers.filter((x) => x.ms <= DEVELOP_MS + 16)) x.fn();

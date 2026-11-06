@@ -40,7 +40,7 @@ import { pressKey } from "@world/objects/index";
 import { PHONE_FLIP } from "@world/room/held";
 import { CAMERA_KEYS, DICT_KEYS, FLIPPERS, SHEET_SLIDE_MS, TAPE_KEYS } from "@world/room/devices";
 import { CAMERA_FLASH_MS, cameraShot, type CameraState } from "@world/objects/plain";
-import { DEVELOP_BLANK_MS, DEVELOP_MS, ON_THE_SPOT_DAY, photoKey, roomFacingOf } from "@state/photos";
+import { DEVELOP_BLANK_MS, DEVELOP_MS, ON_THE_SPOT_DAY, photoKey, roomFacingOf, roomPhotoOn } from "@state/photos";
 import { screenPlaceOf } from "@world/desktop/files/album";
 import { booted, deskMeal, itemStates, loopContext, mealToOrder, nightfallReached, openItemFor, openTask } from "@world/loop/checklist";
 import type { EventToken } from "@state/days/table";
@@ -119,8 +119,9 @@ function renderGameBody(store: Store, session: Session, nowMs: number): SafeHtml
   // The box does not jump (dialogue correction 2026-11-02): in every view it is anchored to the
   // viewport in the same fixed layer, not to the stage (whose size differs between views). The
   // settings panel sits above it, in a fixed layer of its own after the box (2026-11-02).
-  const dlg = dialogueBox(state, events, session, nowMs);
-  const settings = settingsPanel(session);
+  // camera-viewfinder R1: the box is never opened over the viewfinder (what is queued waits for it).
+  const dlg = session.viewfinder ? null : dialogueBox(state, events, session, nowMs);
+  const settings = session.viewfinder ? null : settingsPanel(session);
   return html`${renderRoom({ state, events, session, startDay: store.getStartDay(), nowMs, boxOutside: true, runId: store.getRunId() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${dlgLayer(dlg, session, boxReadsOn(state, events, session))}${settings ? html`<div class="hud-host">${settings}</div>` : null}`;
 }
 
@@ -341,7 +342,8 @@ export function backTarget(view: View): View | null {
 
 /** True when something sits over the view that a "back" should close first (or that blocks the camera). */
 function overlayOpen(s: Session): boolean {
-  return s.bookOpen || s.historyOpen || s.settingsOpen || s.itemsOpen || s.caseOpen || s.phoneOpen || !!s.holding || talking(s.dialogue) || !!s.pullOut || !!s.endingPage || s.printsView !== null;
+  // camera-viewfinder: the viewfinder is not here (turning works under it); the sheet in hand is.
+  return s.bookOpen || s.historyOpen || s.settingsOpen || s.itemsOpen || s.caseOpen || s.phoneOpen || !!s.holding || talking(s.dialogue) || !!s.pullOut || !!s.endingPage || s.printsView !== null || s.sheetShown !== null;
 }
 
 /** The key went to something the player types into: an input, a textarea, anything contenteditable. */
@@ -397,6 +399,24 @@ function doorWalk(ctx: ActionContext): void {
   const view = mealView(state.day, meal, state, store.getEvents(), session.clock.time)!;
   const beat = session.door && session.door.meal === meal && session.door.day === state.day ? session.door : startDoor(view);
   if (beat?.state === "delivered") session.door = stepDoor(beat, "walk").beat;
+}
+
+/**
+ * camera-viewfinder R1: the viewfinder comes up over the room; the camera leaves the hand's slot (so
+ * turning works: nothing is held), and comes back in 使用 when the viewfinder closes.
+ */
+function openViewfinder(ctx: ActionContext): void {
+  const s = ctx.session;
+  s.viewfinder = true;
+  s.holding = null;
+  restHand(s);
+  ctx.rerender();
+}
+function closeViewfinder(s: Session): void {
+  s.viewfinder = false;
+  s.holding = "camera";
+  s.hand.using = true;
+  s.hand.face = "front";
 }
 
 /** The held thing goes back to rest: just held, its front up, no key down. */
@@ -570,6 +590,8 @@ export const loopActions: Record<string, ActionHandler> = {
   view(ctx, data) {
     const view = data.view as View;
     if (!VIEWS.includes(view)) return;
+    // camera-viewfinder R1: 屏幕 cannot be entered while the viewfinder (or the sheet in hand) is up.
+    if (view === "desktop" && (ctx.session.viewfinder || ctx.session.sheetShown !== null)) return;
     // Two black monitors before the tower is pressed: 屏幕 does not open; one line says why (once a day).
     if (view === "desktop" && !booted(ctx.store.getState(), ctx.store.getEvents())) {
       const day = ctx.store.getState().day;
@@ -1110,10 +1132,45 @@ export const loopActions: Record<string, ActionHandler> = {
     if (id === "dictionary" && (session.hand.programs.dictionary as { open?: boolean } | undefined)?.open !== true) return;
     // tape-record R1: rec has its own works rule (床, at night); elsewhere its line and nothing else.
     if (id === "tape" && key === "rec") return void pressRec(ctx);
+    // camera-viewfinder R1: in the room the shutter opens the viewfinder; on 屏幕 it shoots at once (unchanged).
+    if (id === "camera" && key === "shutter" && session.view !== "desktop") return void openViewfinder(ctx);
     const before = id === "camera" ? ((session.hand.programs.camera as CameraState | undefined) ?? null) : null;
     pressKey(ctx, id, key, { cap: onFront });
     // camera R2: a shot is a `photo` event, where the camera was pointed (and a screen's still).
     if (id === "camera" && cameraShot(before, session.hand.programs.camera as CameraState)) takePhoto(ctx);
+    ctx.rerender();
+  },
+  // camera-viewfinder R2: the shutter in the viewfinder. One room sheet a day: a second press that
+  // day is a line, not a photo; the pack at 0 is the program's own line (camera.empty). Either way
+  // the viewfinder closes and the camera is back in hand; after a shot the sheet is shown (R3).
+  "vf-shutter"(ctx) {
+    const { store, session } = ctx;
+    if (!session.viewfinder) return;
+    const day = store.getState().day;
+    closeViewfinder(session);
+    if (roomPhotoOn(store.getEvents(), day)) {
+      if (hasString("camera.usedToday")) session.dialogue = push(session.dialogue, { key: `d${day}:camera.usedToday`, lines: [{ k: "inner", t: t("camera.usedToday") }], ending: { kind: "none" } });
+      ctx.rerender();
+      return;
+    }
+    const before = (session.hand.programs.camera as CameraState | undefined) ?? null;
+    pressKey(ctx, "camera", "shutter");
+    if (cameraShot(before, session.hand.programs.camera as CameraState)) {
+      takePhoto(ctx);
+      session.sheetShown = session.lastPhoto;
+    }
+    ctx.rerender();
+  },
+  // camera-viewfinder R1: × (or Esc): no photo; the camera is back in hand.
+  "vf-close"(ctx) {
+    if (!ctx.session.viewfinder) return;
+    closeViewfinder(ctx.session);
+    ctx.rerender();
+  },
+  // camera-viewfinder R3: any click puts the sheet away (it is in 相册 already).
+  "vf-sheet-away"(ctx) {
+    if (ctx.session.sheetShown === null) return;
+    ctx.session.sheetShown = null;
     ctx.rerender();
   },
   // The hand layer turned it over (a drag that reached the limit): the other face stays up.
@@ -1482,6 +1539,19 @@ export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
   // The run has ended: Enter / Space go on; nothing else does anything.
   if (ctx.store.getState().ending !== "none") {
     if (e.key === "Enter" || e.key === " ") endingNext(ctx);
+    return true;
+  }
+  // camera-viewfinder R1: Space / Enter is the shutter, Esc closes; ←/→ still turn (below).
+  if (ctx.session.viewfinder) {
+    const name = e.key === "Escape" ? "vf-close" : e.key === " " || e.key === "Enter" ? "vf-shutter" : null;
+    if (name) {
+      loopActions[name]!(ctx, {} as DOMStringMap, null as never);
+      return true;
+    }
+  }
+  // camera-viewfinder R3: the sheet in hand goes away on Esc / Enter (and Space).
+  if (ctx.session.sheetShown !== null && (e.key === "Escape" || e.key === "Enter" || e.key === " ")) {
+    loopActions["vf-sheet-away"]!(ctx, {} as DOMStringMap, null as never);
     return true;
   }
   // desk-prints R3: the pile up close takes ← / → and Esc.

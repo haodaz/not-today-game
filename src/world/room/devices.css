@@ -239,6 +239,35 @@
 .dev-shell.cam.upgraded .cam-top{background:#FFFFFF}
 @media (prefers-reduced-motion:reduce){.dev-shell.cam .cam-sheet{animation:none}.dev-shell.cam .cam-flash{display:none}}
 
+/* camera-viewfinder R1: the viewfinder over the room. A 4:5 frame, 72 % of the stage height,
+   centred: 2 px white corners 28 px long and a thin white border at 35 %; the room outside it dimmed
+   25 %. The layer takes the clicks (nothing in the scene is pressed through it); the nav layer still
+   turns at the edges. The round shutter (64 px, white ring 3 px, red dot #E5322D 40 px; hotspot
+   80 px) on the right edge, vertically centred; × (36 px, white at 80 %) at the top right. */
+.room .vf{position:absolute;inset:0;z-index:15}
+.room .vf-frame{position:absolute;left:50%;top:50%;height:72%;aspect-ratio:4/5;transform:translate(-50%,-50%);box-sizing:border-box;border:1px solid rgba(255,255,255,.35);box-shadow:0 0 0 2000px rgba(0,0,0,.25);pointer-events:none}
+.room .vf-frame .c{position:absolute;width:28px;height:28px;border:0 solid #FFFFFF}
+.room .vf-frame .c.tl{left:-1px;top:-1px;border-left-width:2px;border-top-width:2px}
+.room .vf-frame .c.tr{right:-1px;top:-1px;border-right-width:2px;border-top-width:2px}
+.room .vf-frame .c.bl{left:-1px;bottom:-1px;border-left-width:2px;border-bottom-width:2px}
+.room .vf-frame .c.br{right:-1px;bottom:-1px;border-right-width:2px;border-bottom-width:2px}
+.room .vf-shutter{position:absolute;right:24px;top:50%;width:80px;height:80px;transform:translateY(-50%);border:0;padding:0;margin:0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.room .vf-shutter .ring{display:flex;align-items:center;justify-content:center;width:64px;height:64px;box-sizing:border-box;border:3px solid #FFFFFF;border-radius:50%}
+.room .vf-shutter .dot{display:block;width:40px;height:40px;border-radius:50%;background:#E5322D;transition:transform .08s}
+.room .vf-shutter:active .dot{transform:scale(.92)}
+.room .vf-shutter:focus-visible{outline:2px solid rgba(255,255,255,.8);outline-offset:2px;border-radius:50%}
+.room .vf-close{position:absolute;right:24px;top:24px;width:36px;height:36px;border:0;padding:0;margin:0;background:none;color:rgba(255,255,255,.8);font:300 36px/36px sans-serif;cursor:pointer}
+.room .vf-flash{position:absolute;inset:0;background:#fff;pointer-events:none;z-index:40;animation:cam-flash 120ms ease-out both}
+
+/* camera-viewfinder R3: the sheet in hand. The white frame 200 × 236 (the ejected sheet's) at
+   2.4 × (480 × 566), centred, the room dimmed 35 %; one narration line under it. One click away. */
+.room .vf-sheet-view{position:absolute;inset:0;z-index:19}
+.room .vf-sheet-view .vf-dim{position:absolute;inset:0;border:0;padding:0;margin:0;background:rgba(10,10,12,.35);cursor:pointer}
+.room .vf-sheet{position:absolute;left:50%;top:calc(50% - 30px);width:480px;height:566px;transform:translate(-50%,-50%);pointer-events:none}
+.room .vf-paper{width:200px;height:236px;box-sizing:border-box;padding:10px 10px 46px;background:#FFFFFF;border-radius:2px;box-shadow:0 6px 16px rgba(0,0,0,.25);transform:scale(2.4);transform-origin:0 0}
+.room .vf-line{position:absolute;left:50%;top:calc(50% + 268px);transform:translateX(-50%);width:min(720px,90%);margin:0;text-align:center;color:#f4efe6;font:16px/1.5 var(--font-game-text,sans-serif);text-shadow:0 1px 6px rgba(0,0,0,.6);pointer-events:none}
+@media (prefers-reduced-motion:reduce){.room .vf-flash{display:none}}
+
 /* A photo's picture (camera R8), on the sheet and in 相册: blank grey-white, then a cyan cast with the
    shapes coming up under the electronic material's fine pixel grid (as the LCDs), then the final
    colours. A screen photo is the window's still, scaled by --ph-k. */

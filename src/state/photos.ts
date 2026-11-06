@@ -33,6 +33,9 @@ const isPhoto = (e: GameEvent): e is PhotoEvent => e.kind === "photo";
 /** Sheets left in the pack: 10 − the run's room photos (screen photos never count; never below 0). */
 export const sheetsLeft = (events: readonly GameEvent[]): number => Math.max(0, CAMERA_SHEETS - events.filter((e) => isPhoto(e) && roomFacingOf(e.at) !== null).length);
 
+/** camera-viewfinder R2: a room photo was already taken on `day` (one sheet a day). Pure. */
+export const roomPhotoOn = (events: readonly GameEvent[], day: number): boolean => events.some((e) => isPhoto(e) && e.day === day && roomFacingOf(e.at) !== null);
+
 /** The three developing stages (R8). */
 export type DevelopStage = "blank" | "cyan" | "final";
 

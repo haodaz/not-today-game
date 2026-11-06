@@ -106,16 +106,21 @@ const photos = (store: Store) => store.getEvents().flatMap((e) => (e.kind === "p
 
 describe("R8 · sheets: 10 for the room, the screen unlimited and uncounted", () => {
   it("ten room photos, then the shutter clicks and nothing comes out", () => {
+    // camera-viewfinder R2: one room sheet a day, through the viewfinder; so one a day for ten days.
     const r = rig("window");
     r.act("loop-hold", { object: "camera" });
     r.act("obj-use");
-    for (let i = 0; i < CAMERA_SHEETS + 3; i++) {
+    for (let i = 0; i < CAMERA_SHEETS + 1; i++) {
       r.tick(1000);
       r.act("obj-key", { object: "camera", key: "shutter" });
+      r.act("vf-shutter");
+      r.act("vf-sheet-away");
+      if (i < CAMERA_SHEETS) r.store.appendEvent({ kind: "lieDown" });
     }
     expect(photos(r.store)).toEqual(Array(CAMERA_SHEETS).fill("room:window"));
     expect(sheetsLeft(r.store.getEvents())).toBe(0);
-    expect(r.ctx.session.dialogue.queue.some((q) => q.key === "d2:camera.empty")).toBe(true);
+    const day = r.store.getState().day;
+    expect(r.ctx.session.dialogue.queue.some((q) => q.key === `d${day}:camera.empty`)).toBe(true);
   });
   it("on 屏幕 (the 老物件栏 over the desktop) every shot is a screen photo, never counted", () => {
     const r = rig("desktop");
@@ -257,6 +262,9 @@ describe("R9 · the camera in 使用 is a drawn device", () => {
     r.act("loop-hold", { object: "camera" });
     r.act("obj-use");
     r.act("obj-key", { object: "camera", key: "shutter" });
+    // camera-viewfinder: through the viewfinder, then the sheet in hand is put away.
+    r.act("vf-shutter");
+    r.act("vf-sheet-away");
     const render = (nowMs: number) => renderRoom({ state: r.store.getState(), events: r.store.getEvents(), session: r.ctx.session, nowMs }).value;
     const taken = r.ctx.session.photos[r.ctx.session.lastPhoto!]!.takenAt;
     expect(render(taken + 100)).toMatch(/<div class="cam-sheet" style="--late:-100ms"><div class="ph-pic dev-blank"/);

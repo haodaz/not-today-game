@@ -246,7 +246,7 @@ export function createNav(deps: NavDeps = {}) {
       // An edge that leads somewhere shows its hint instead of a hover.
       const edge = edgeAt(p);
       setEdge(edge);
-      setHover(edge ? null : pickAt(p));
+      setHover(edge || ctx.session.viewfinder ? null : pickAt(p));
     };
 
     const onUp = () => {
@@ -293,6 +293,8 @@ export function createNav(deps: NavDeps = {}) {
         e.stopPropagation();
         return run("turn", { dir: edge });
       }
+      // camera-viewfinder R1: through the viewfinder only the turns answer; nothing in the scene is picked.
+      if (ctx.session.viewfinder) return;
       const id = pickAt(p);
       if (!id) return;
       e.preventDefault();

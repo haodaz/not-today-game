@@ -149,7 +149,9 @@ export function hintsWait(session: Session): boolean {
     !!s.pullOut ||
     !!s.endingPage ||
     s.filesApp !== null ||
-    s.printsView !== null
+    s.printsView !== null ||
+    s.viewfinder ||
+    s.sheetShown !== null
   );
 }
 

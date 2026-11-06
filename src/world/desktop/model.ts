@@ -97,6 +97,10 @@ export interface Session {
   hintsShown: string[];
   /** desk-prints R3: the pile's close view is open at this print (0 = the newest), or null. Session only. */
   printsView: number | null;
+  /** camera-viewfinder R1: the held camera's viewfinder is up over the room (the camera out of the hand's slot). Session only. */
+  viewfinder: boolean;
+  /** camera-viewfinder R3: the sheet just shot is shown in hand (its photo's event index), or null. Session only. */
+  sheetShown: number | null;
   /**
    * onboarding-steps R2: the day whose wallpaper the desktop last showed (0 = none yet this page),
    * and the crossfade from the previous one on a new day's first visit (its picture, when it began).
@@ -407,6 +411,8 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     hintQueue: [],
     hintsShown: [],
     printsView: null,
+    viewfinder: false,
+    sheetShown: null,
     wallpaperDay: 0,
     wallFade: null,
     wbFull: false,

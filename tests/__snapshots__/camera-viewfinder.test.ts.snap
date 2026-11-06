@@ -1,0 +1,3 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`snapshot > the viewfinder over 房间 1`] = `"<div class="vf" data-viewfinder="1"><div class="vf-frame" aria-hidden="true"><i class="c tl"></i><i class="c tr"></i><i class="c bl"></i><i class="c br"></i></div><button type="button" class="vf-shutter" data-action="vf-shutter" aria-label="快门"><i class="ring"><i class="dot"></i></i></button><button type="button" class="vf-close" data-action="vf-close" aria-label="放下相机">×</button></div>"`;
