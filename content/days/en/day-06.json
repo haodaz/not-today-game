@@ -19,7 +19,7 @@
       "say": [
         {
           "k": "narration",
-          "t": "Two things on the desk. The pager's grey-green screen, empty."
+          "t": "Two things on the desk: the chick and the pager. The pager's grey-green screen, empty."
         }
       ]
     },
@@ -45,7 +45,7 @@
         },
         {
           "k": "narration",
-          "t": "You turn it upside down. SOS."
+          "t": "You turn the pager upside down. 505 reads SOS."
         },
         {
           "k": "inner",

@@ -55,7 +55,7 @@
           }
         },
         {
-          "text": "Hand over that line of the ledger.",
+          "text": "Hand over the 44,000 line of the ledger.",
           "effects": {
             "item_lost": "loan"
           },

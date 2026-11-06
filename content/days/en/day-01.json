@@ -63,7 +63,7 @@
       "say": [
         {
           "k": "narration",
-          "t": "There is a point of light in that dark. Not the chick's shell; the shell is lower down."
+          "t": "There is a point of light in that dark. Not the chick's screen; the chick is lower down."
         },
         {
           "k": "narration",
@@ -199,7 +199,7 @@
         "say": [
           {
             "k": "inner",
-            "t": "What you can say to him is a very small table."
+            "t": "What you can say back is a few lines, like a very small table."
           }
         ]
       }
