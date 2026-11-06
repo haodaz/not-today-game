@@ -44,7 +44,8 @@
       "day": 4,
       "facing": "bed",
       "add": {
-        "text": "被子上有几片鳞，银灰色的。"
+        "text": "被子上有几片鳞，银灰色的。",
+        "overlay": "/room/photos/d04_bed.jpg"
       }
     },
     {

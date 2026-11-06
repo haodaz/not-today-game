@@ -44,7 +44,8 @@
       "day": 4,
       "facing": "bed",
       "add": {
-        "text": "A few scales on the quilt, silver grey."
+        "text": "A few scales on the quilt, silver grey.",
+        "overlay": "/room/photos/d04_bed.jpg"
       }
     },
     {
