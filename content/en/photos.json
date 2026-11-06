@@ -229,28 +229,32 @@
       "day": 10,
       "facing": "room",
       "add": {
-        "text": "The lamp is yellow. Everything in the photo is yellow."
+        "text": "The lamp is yellow. Everything in the photo is yellow.",
+        "overlay": "/room/photos/d10_room.jpg"
       }
     },
     {
       "day": 10,
       "facing": "bed",
       "add": {
-        "text": "A pallid mask lying on the pillow."
+        "text": "A pallid mask lying on the pillow.",
+        "overlay": "/room/photos/d10_bed.jpg"
       }
     },
     {
       "day": 10,
       "facing": "door",
       "add": {
-        "text": "The light under the door is yellow. The corridor light is white."
+        "text": "The light under the door is yellow. The corridor light is white.",
+        "overlay": "/room/photos/d10_door.jpg"
       }
     },
     {
       "day": 10,
       "facing": "window",
       "add": {
-        "text": "Two suns outside the window, sinking into a lake. There is no lake outside."
+        "text": "Two suns outside the window, sinking into a lake. There is no lake outside.",
+        "overlay": "/room/photos/d10_window.jpg"
       }
     },
     {

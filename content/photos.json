@@ -229,28 +229,32 @@
       "day": 10,
       "facing": "room",
       "add": {
-        "text": "台灯是黄的。照片里所有东西都是黄的。"
+        "text": "台灯是黄的。照片里所有东西都是黄的。",
+        "overlay": "/room/photos/d10_room.jpg"
       }
     },
     {
       "day": 10,
       "facing": "bed",
       "add": {
-        "text": "枕头上放着一张苍白的面具。"
+        "text": "枕头上放着一张苍白的面具。",
+        "overlay": "/room/photos/d10_bed.jpg"
       }
     },
     {
       "day": 10,
       "facing": "door",
       "add": {
-        "text": "门缝底下的光是黄的。楼道的灯是白的。"
+        "text": "门缝底下的光是黄的。楼道的灯是白的。",
+        "overlay": "/room/photos/d10_door.jpg"
       }
     },
     {
       "day": 10,
       "facing": "window",
       "add": {
-        "text": "窗外有两个太阳，正往湖里沉。外面没有湖。"
+        "text": "窗外有两个太阳，正往湖里沉。外面没有湖。",
+        "overlay": "/room/photos/d10_window.jpg"
       }
     },
     {
