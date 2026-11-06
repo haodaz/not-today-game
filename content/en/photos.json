@@ -101,7 +101,8 @@
       "day": 6,
       "facing": "room",
       "add": {
-        "text": "A second keyboard and mouse on the desk, side by side with yours. As if two people work at this desk."
+        "text": "A second keyboard and mouse on the desk, side by side with yours. As if two people work at this desk.",
+        "overlay": "/room/photos/d06_room.jpg"
       }
     },
     {
