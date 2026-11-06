@@ -10,6 +10,7 @@ import { hudKuro } from "@world/desktop/kuro/mini";
 import { boxReadsOn, dialogueBox, lineScreens } from "@world/dialogue/box";
 import { logCurrent, logPlayer } from "@world/dialogue/history";
 import { settleSession } from "@world/dialogue/place";
+import { noteWallpaper, WALL_FADE_MS } from "@world/desktop/wallpaper";
 import { acceptOffer, answerAsk, answerOffer, declineOffer, kuroActions, playerBox, readOnToPlayer } from "@world/dialogue/kuro";
 import { nextScreen } from "@world/dialogue/layout";
 import { stepOnce } from "@world/loop/steps";
@@ -476,6 +477,9 @@ export function firstDesktop(session: Session): void {
   session.rightApp = null;
   session.stack = [];
   session.onboard = "due";
+  // onboarding-steps R1: the coach marks start at the first dock app; the dock is on the left monitor.
+  session.onboardStep = 0;
+  session.focus = "left";
 }
 
 /** One leg of a way: the view changes now; the motion layer plays the walk or the turn. */
@@ -507,6 +511,13 @@ function arrive(ctx: ActionContext, view: View, data: DOMStringMap): void {
   // playtest-1105 R1: the run's first time at the computer is the bare desktop (no window open, the
   // dock there) with the onboarding card.
   if (view === "desktop" && ctx.session.onboard === "no") firstDesktop(ctx.session);
+  // onboarding-steps R2: a new day's first visit crossfades from the last wallpaper shown.
+  if (view === "desktop") {
+    const was = ctx.session.wallFade;
+    noteWallpaper(ctx.session, ctx.store.getState().day, ctx.now?.() ?? Date.now());
+    // The old picture's layer goes once its fade has run.
+    if (ctx.session.wallFade && ctx.session.wallFade !== was) ctx.later(WALL_FADE_MS + 16, ctx.rerender);
+  }
   // The desktop opens on the monitor with the current app; looking at it counts.
   if (view === "desktop") lookAt(ctx, shownApp(ctx.session));
   // 看一眼桌子: arriving at 桌子 while the item is open is the look; the desk beat plays here.

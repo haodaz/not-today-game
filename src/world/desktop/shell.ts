@@ -80,27 +80,103 @@ export interface ShellModel {
   readonly scene?: Scene;
   /** The boss's call overlay over the whole screen (day-loop 2026-11-03); absent = no call showing. */
   readonly callOverlay?: SafeHtml | null;
-  /** playtest-1105 R1: the run's first desktop visit: the onboarding card is up. */
-  readonly onboard?: boolean;
+  /**
+   * onboarding-steps R1: the run's first desktop visit: which coach mark is up (an index into
+   * `coachSteps`), or absent / null when none is.
+   */
+  readonly onboard?: number | null;
+  /**
+   * onboarding-steps R2: the day's wallpaper under the windows and the dock on both monitors, and
+   * the previous one fading out over it on a new day's first visit (`late`: ms into the fade).
+   */
+  readonly wallpaper?: { readonly src: string; readonly fadeFrom: string | null; readonly late: number };
 }
 
-/** playtest-1105 R1: the onboarding card's rows, in dock order: [icon, strings key]. */
-export const ONBOARD_ROWS: readonly (readonly [string, string])[] = [
-  ["/os/tingtalk.svg", "onboard.tingtalk"],
-  ["/os/workbench.svg", "onboard.workbench"],
-  ["/os/msgs.svg", "onboard.msgs"],
-  ["/os/browser.svg", "onboard.browser"],
-  ["/os/files.svg", "onboard.files"],
-];
+// ——— coach marks (onboarding-steps R1) ————————————————————————————————————————————————
+
+/** A coach mark's target: a real app's tile, or a decoy's (文件). Its line is `onboard.<id>`. */
+export type CoachTarget = { readonly kind: "app"; readonly id: AppId } | { readonly kind: "decoy"; readonly id: string };
+/** The dock apps left to right (Hi信, 听听, 工作台, 浏览器), then the 文件 decoy. */
+export const COACH_TARGETS: readonly CoachTarget[] = [...APPS.map((id): CoachTarget => ({ kind: "app", id })), { kind: "decoy", id: "files" }];
+
+export interface CoachStep {
+  readonly target: CoachTarget;
+  readonly name: string;
+  readonly icon: string;
+  readonly line: string;
+}
+
+/** The steps this dock has: a target with its tile there and its `onboard.*` line in strings. */
+export function coachSteps(decoys: readonly DockEntry[]): CoachStep[] {
+  return COACH_TARGETS.flatMap((target): CoachStep[] => {
+    const key = `onboard.${target.id}`;
+    if (!hasString(key)) return [];
+    if (target.kind === "app") return [{ target, name: t(DOCK_KEY[target.id]), icon: `/os/${target.id}.svg`, line: t(key) }];
+    const d = decoys.find((x) => x.id === target.id);
+    return d ? [{ target, name: d.name, icon: d.icon, line: t(key) }] : [];
+  });
+}
 
 /**
- * playtest-1105 R1: one centred card over the bare desktop: the title, one row per dock app (28 px
- * icon + one line), one button. The dim behind it takes clicks and does nothing with them.
+ * The dock's geometry in monitor px, as desktop.css lays it out (1440 × 900 monitor; the dock
+ * centred, 12 px off the bottom, 1 px border, 12 px side padding, 14 px bottom padding; 48 px tiles
+ * 8 px apart; the separator 1 px wide with 2 px margins). Tests check these against the CSS.
  */
-function onboardCard(m: ShellModel): SafeHtml | null {
-  if (!m.onboard) return null;
-  const rows = ONBOARD_ROWS.filter(([, key]) => hasString(key)).map(([src, key]) => html`<li><img src="${src}" alt="" width="28" height="28" draggable="false">${tr(key)}</li>`);
-  return html`<div class="onboard-layer"><div class="onboard-dim"></div><div class="onboard" role="dialog" aria-modal="true" aria-labelledby="onboard-title"><h3 id="onboard-title">${tr("onboard.title")}</h3><ul>${rows}</ul><button type="button" class="ok" data-action="onboard-ok">${tr("onboard.ok")}</button></div></div>`;
+export const DOCK_GEOM = { monitorW: 1440, monitorH: 900, tile: 48, gap: 8, padX: 12, padBottom: 14, border: 1, bottom: 12, sep: 5 } as const;
+/** The coach card's sizes (spec): 300 px wide, 14 px above the icon, a 10 px arrow; kept this far inside the monitor. */
+export const COACH = { cardW: 300, above: 14, arrow: 10, margin: 12 } as const;
+
+/** Where a dock tile is on the monitor: its centre x and its top y (stage px of the monitor). */
+export function tileAt(target: CoachTarget, decoys: readonly DockEntry[]): { readonly cx: number; readonly top: number } | null {
+  const g = DOCK_GEOM;
+  const items: ({ kind: "tile"; id: string } | { kind: "sep" })[] = [
+    ...APPS.map((id) => ({ kind: "tile" as const, id })),
+    ...(decoys.length ? [{ kind: "sep" as const }] : []),
+    ...decoys.map((d) => ({ kind: "tile" as const, id: `decoy:${d.id}` })),
+  ];
+  const width = (it: (typeof items)[number]) => (it.kind === "sep" ? g.sep : g.tile);
+  const inner = items.reduce((s, it) => s + width(it), 0) + g.gap * (items.length - 1);
+  const dockW = 2 * g.border + 2 * g.padX + inner;
+  const left = (g.monitorW - dockW) / 2;
+  const want = target.kind === "app" ? target.id : `decoy:${target.id}`;
+  let x = left + g.border + g.padX;
+  for (const it of items) {
+    if (it.kind === "tile" && it.id === want) return { cx: x + g.tile / 2, top: g.monitorH - g.bottom - g.border - g.padBottom - g.tile };
+    x += width(it) + g.gap;
+  }
+  return null;
+}
+
+/**
+ * onboarding-steps R1: one coach mark on the monitor with the dock: the desktop dims (30 % black),
+ * the step's icon is lifted above the dim with a 2 px accent ring and an 8 px glow, and a 300 px
+ * card sits 14 px above it, centred on it (kept inside the monitor), its 10 px arrow pointing down
+ * at the icon. The card: the app's name, its line, 跳过 (left), `n / total` and 下一个 / 知道了
+ * (right). The dim has no action: a click outside the card does nothing.
+ */
+function coachMark(m: ShellModel): SafeHtml | null {
+  if (m.onboard === null || m.onboard === undefined) return null;
+  const decoys = m.dock.decoys ?? [];
+  const steps = coachSteps(decoys);
+  const step = steps[m.onboard];
+  const at = step ? tileAt(step.target, decoys) : null;
+  if (!step || !at) return null;
+  const last = m.onboard === steps.length - 1;
+  const cardLeft = Math.min(Math.max(at.cx - COACH.cardW / 2, COACH.margin), DOCK_GEOM.monitorW - COACH.cardW - COACH.margin);
+  const cardBottom = DOCK_GEOM.monitorH - at.top + COACH.above;
+  const icon = `left:${at.cx - DOCK_GEOM.tile / 2}px;top:${at.top}px`;
+  const card = `left:${cardLeft}px;bottom:${cardBottom}px;--arrow-x:${at.cx - cardLeft}px`;
+  const primary = last ? html`<button type="button" class="next" data-action="onboard-ok">${tr("onboard.ok")}</button>` : html`<button type="button" class="next" data-action="onboard-next">${tr("onboard.next")}</button>`;
+  return html`<div class="coach" data-step="${m.onboard + 1}" data-target="${step.target.id}"><div class="coach-dim"></div><img class="coach-icon" src="${step.icon}" alt="" width="48" height="48" draggable="false" style="${icon}"><div class="coach-card" role="dialog" aria-modal="true" aria-labelledby="coach-name" style="${card}"><b id="coach-name">${step.name}</b><p>${step.line}</p><div class="foot"><button type="button" class="skip" data-action="onboard-skip">${tr("onboard.skip")}</button><span class="n">${tr("onboard.step", { n: m.onboard + 1, total: steps.length })}</span>${primary}</div></div></div>`;
+}
+
+/** onboarding-steps R2: the wallpaper layers at the back of a monitor's desktop (under everything in `.os`). */
+function wallpaper(m: ShellModel): SafeHtml | null {
+  const w = m.wallpaper;
+  if (!w) return null;
+  // The picture is a variable, so the collapse's pores (fx.css) can lay themselves over it.
+  const prev = w.fadeFrom ? html`<div class="wall prev" style="--wall-img:url(${w.fadeFrom});--late:-${Math.round(w.late)}ms" aria-hidden="true"></div>` : null;
+  return html`<div class="wall" style="--wall-img:url(${w.src})" aria-hidden="true"></div>${prev}`;
 }
 
 function topBar(m: ShellModel, monitor: MonitorModel): SafeHtml {
@@ -202,7 +278,7 @@ function decoyWindow(m: ShellModel): SafeHtml | null {
 function monitor(m: ShellModel, mon: MonitorModel): SafeHtml {
   // Not on yet: a black screen and nothing else.
   if (m.off) return html`<div class="monitor off" data-side="${mon.side}" data-ring="${m.ring}" data-app="${mon.app}"><div class="os"></div></div>`;
-  return html`<div class="${cls("monitor", m.night && "night")}" data-side="${mon.side}" data-ring="${m.ring}" data-app="${mon.app}"><div class="os">${topBar(m, mon)}${windowFrame(m, mon)}${mon.side === "left" ? decoyWindow(m) : null}${mon.side === "left" ? dock(m, dockHides(mon)) : null}${mon.overlay}</div></div>`;
+  return html`<div class="${cls("monitor", m.night && "night")}" data-side="${mon.side}" data-ring="${m.ring}" data-app="${mon.app}"><div class="os">${wallpaper(m)}${topBar(m, mon)}${windowFrame(m, mon)}${mon.side === "left" ? decoyWindow(m) : null}${mon.side === "left" ? dock(m, dockHides(mon)) : null}${mon.overlay}${mon.side === "left" ? coachMark(m) : null}</div></div>`;
 }
 
 /** The other monitor, as a thin tab on its side: the apps on it (front first) and their badges. */
@@ -229,7 +305,7 @@ export function renderDesktop(m: ShellModel): SafeHtml {
   const [left, right] = m.monitors;
   const shown = m.focus === "left" ? left : right;
   const other = m.focus === "left" ? right : left;
-  return html`<div class="stage one-monitor" data-day="${m.day}" data-beat="${m.clock.beat}" data-focus="${m.focus}"${fxStageAttrs(m.fx ?? null)}>${toggle(m.focus)}${monitor(m, shown)}${otherTab(m, other)}${m.scene ? renderScene(m.scene) : null}${m.callOverlay ?? null}${missionControl(m)}${onboardCard(m)}</div>`;
+  return html`<div class="stage one-monitor" data-day="${m.day}" data-beat="${m.clock.beat}" data-focus="${m.focus}"${fxStageAttrs(m.fx ?? null)}>${toggle(m.focus)}${monitor(m, shown)}${otherTab(m, other)}${m.scene ? renderScene(m.scene) : null}${m.callOverlay ?? null}${missionControl(m)}</div>`;
 }
 
 /**

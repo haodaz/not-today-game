@@ -16,7 +16,7 @@ import { bringToFront, loadPlacement, moveApp, placementOf, savePlacement } from
 import { createWindowDrag } from "./windrag";
 import { createDockPeek } from "./dockpeek";
 import { stageOf } from "@state/stages";
-import { renderDesktop, APPS, type AppId } from "./shell";
+import { coachSteps, renderDesktop, APPS, type AppId } from "./shell";
 import { dockFor } from "./dock";
 import type { LookApi } from "@world/room/nav";
 import { soundPlan } from "@world/sound/plan";
@@ -69,6 +69,13 @@ export interface MotionHooks {
   destroy(): void;
 }
 
+/** onboarding-steps R1: the coach card's own controls; nothing else answers while it is up. */
+export const COACH_ACTIONS: ReadonlySet<string> = new Set(["onboard-next", "onboard-skip", "onboard-ok"]);
+/** A coach mark is up on 屏幕 (the run's first visit). */
+export const coachShowing = (s: Pick<Session, "view" | "onboard">): boolean => s.view === "desktop" && s.onboard === "due";
+/** Is `action` held back by the coach marks now? */
+export const coachBlocks = (s: Pick<Session, "view" | "onboard">, action: string): boolean => coachShowing(s) && !COACH_ACTIONS.has(action);
+
 /** Built-in actions: the dock and the 左屏 / 右屏 toggle. App modules add theirs through `mountDesktop(…, { actions })`. */
 export const shellActions: Record<string, ActionHandler> = {
   screen(ctx, data) {
@@ -76,11 +83,23 @@ export const shellActions: Record<string, ActionHandler> = {
     ctx.session.focus = data.screen;
     ctx.rerender();
   },
-  // playtest-1105 R1: the onboarding card's one button; it is not shown again this run.
+  // onboarding-steps R1: the coach marks. 下一个 goes to the next dock app (on the last it is 知道了);
+  // 知道了 and 跳过 end them, seen for the run (placement's `onboard`). Nothing is logged.
+  "onboard-next"(ctx) {
+    if (ctx.session.onboard !== "due") return;
+    const total = coachSteps(dockFor(ctx.store.getState().day)).length;
+    if (ctx.session.onboardStep + 1 >= total) return shellActions["onboard-ok"]!(ctx, {} as DOMStringMap, null as never);
+    ctx.session.onboardStep += 1;
+    ctx.rerender();
+  },
   "onboard-ok"(ctx) {
     if (ctx.session.onboard !== "due") return;
     ctx.session.onboard = "done";
+    ctx.session.onboardStep = 0;
     ctx.rerender();
+  },
+  "onboard-skip"(ctx) {
+    shellActions["onboard-ok"]!(ctx, {} as DOMStringMap, null as never);
   },
   // playtest-1105 R1: 工作台's green light: full screen, and back to its window. Session only.
   "win-full"(ctx, data) {
@@ -250,7 +269,8 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
       name,
       // A story masks the stage; a live boss call takes the whole screen (day-loop 2026-11-03):
       // while it runs, only the call's own controls answer.
-      (c, data, el) => (maskBlocks(session.dialogue, name) || callBlocks(session, name) ? undefined : handler(c, data, el)),
+      // onboarding-steps R1: while a coach mark is up only its card answers.
+      (c, data, el) => (maskBlocks(session.dialogue, name) || callBlocks(session, name) || coachBlocks(session, name) ? undefined : handler(c, data, el)),
     ]),
   );
   const timers = new Set<ReturnType<typeof setTimeout>>();
@@ -377,6 +397,16 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   };
   const onKey = (e: KeyboardEvent) => {
     const target = e.target as HTMLElement;
+    // onboarding-steps R1: a coach mark is up: Enter is 下一个 (知道了 on the last), Esc is 跳过; no
+    // other key does anything (a focused card button does not also get Enter's click).
+    if (coachShowing(session)) {
+      const name = e.key === "Enter" ? "onboard-next" : e.key === "Escape" ? "onboard-skip" : null;
+      if (name) {
+        e.preventDefault();
+        actions[name]?.(ctx, {} as DOMStringMap, target);
+      }
+      return;
+    }
     // A multi-line box (workspace R1: 工作台's composer): Enter is a new line; ⌘/Ctrl+Enter sends.
     if (target.tagName === "TEXTAREA") {
       const enter = target.dataset.enter;

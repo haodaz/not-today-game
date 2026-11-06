@@ -31,16 +31,12 @@ describe("R1 · a new player can see the computer", () => {
     const out = r.out();
     expect(out).not.toContain('class="win');
     expect(out).toContain('<div class="dock">');
-    expect(out).toContain('class="onboard"');
-    // One row per dock app, in dock order, a 28 px icon each; one button.
-    const rows = [...out.matchAll(/<li><img src="\/os\/([a-z]+)\.svg" alt="" width="28" height="28"/g)].map((m) => m[1]);
-    expect(rows).toEqual(["tingtalk", "workbench", "msgs", "browser", "files"]);
-    expect(out.match(/data-action="onboard-ok"/g)).toHaveLength(1);
-    // A click outside the card does nothing: the dim has no action.
-    expect(out).toContain('<div class="onboard-dim"></div>');
-    r.act("onboard-ok");
+    // onboarding-steps R1: the single card is now coach marks (tests/onboarding-steps.test.ts).
+    expect(out).toContain('<div class="coach" data-step="1" data-target="msgs">');
+    expect(out).not.toContain('class="onboard');
+    r.act("onboard-skip");
     expect(r.session.onboard).toBe("done");
-    expect(r.out()).not.toContain('class="onboard"');
+    expect(r.out()).not.toContain('class="coach"');
     // Back in the room and in again: no card, and the windows the player opens stay.
     r.act("view", { view: "room" });
     r.act("dock", { app: "tingtalk" });

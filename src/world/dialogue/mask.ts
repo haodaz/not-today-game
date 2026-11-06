@@ -28,6 +28,10 @@ export const MASK_ALLOWS: ReadonlySet<string> = new Set([
   "settings-email-send",
   "settings-lang",
   "settings-home",
+  // onboarding-steps R1: the coach card's own controls (it holds the screen until skipped or done).
+  "onboard-next",
+  "onboard-skip",
+  "onboard-ok",
   // playtest-1105 R8: restart's question and its answers.
   "settings-restart",
   "settings-confirm",

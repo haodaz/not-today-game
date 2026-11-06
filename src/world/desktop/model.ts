@@ -24,6 +24,7 @@ import { desktopRing } from "./rings";
 import { renderCall } from "./call/view";
 import type { AppId, MonitorModel, ShellModel, Side } from "./shell";
 import { defaultPlacement, windowsOn } from "./placement";
+import { WALL_FADE_MS, wallpaperFor } from "./wallpaper";
 
 /** 工作台's pages (its 消息 pane moved to 听听, tingtalk 2026-11-04). */
 export type WorkbenchPage = "home" | "docs" | "ledger" | "code" | TaskPage;
@@ -82,6 +83,15 @@ export interface Session {
   stack: AppId[];
   /** playtest-1105 R1: the run's first desktop visit (see placement.ts); remembered with the placement. */
   onboard: "no" | "due" | "done";
+  /** onboarding-steps R1: which coach mark is up while `onboard` is "due" (0 = the first dock app). Session only. */
+  onboardStep: number;
+  /**
+   * onboarding-steps R2: the day whose wallpaper the desktop last showed (0 = none yet this page),
+   * and the crossfade from the previous one on a new day's first visit (its picture, when it began).
+   * Session only.
+   */
+  wallpaperDay: number;
+  wallFade: { readonly from: string; readonly at: number } | null;
   /** playtest-1105 R1: 工作台 full screen, only when the player chose it (the green light). Session only. */
   wbFull: boolean;
   /** 调度中心 / Mission Control is open over both monitors (tingtalk R1b). Session only. */
@@ -373,6 +383,9 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     ...defaultPlacement(),
     // playtest-1105 R1: a bare session has been to its desktop; mountDesktop starts a run's at "no".
     onboard: "done",
+    onboardStep: 0,
+    wallpaperDay: 0,
+    wallFade: null,
     wbFull: false,
     mcOpen: false,
     focus,
@@ -619,6 +632,17 @@ export function buildShell(
     fx: fxPlan(state.day, "desktop"),
     scene: sceneOf(session.dialogue),
     callOverlay: renderCall(ctx),
-    onboard: session.onboard === "due" && !off,
+    // onboarding-steps R1: the coach mark now, while the first visit's steps are up.
+    onboard: session.onboard === "due" && !off ? session.onboardStep : null,
+    wallpaper: wallpaperNow(state.day, session, nowMs),
   };
+}
+
+/** onboarding-steps R2: today's wallpaper, and yesterday's fading out over it on today's first visit. */
+function wallpaperNow(day: number, session: Pick<Session, "wallFade">, nowMs: number): NonNullable<ShellModel["wallpaper"]> {
+  const fade = session.wallFade;
+  // A render with no clock (tests, the first paint) is the fade's start.
+  const late = fade ? (nowMs > 0 ? Math.max(0, nowMs - fade.at) : 0) : 0;
+  const fading = fade !== null && late < WALL_FADE_MS;
+  return { src: wallpaperFor(day), fadeFrom: fading ? fade.from : null, late: fading ? late : 0 };
 }

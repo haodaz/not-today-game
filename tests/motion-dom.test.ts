@@ -39,6 +39,8 @@ function mount(store: Store, view: Session["view"] = "room") {
     motion: createMotion,
   });
   destroy = m.destroy;
+  // onboarding-steps R1: the run's first desktop visit (the coach marks hold the screen) is not this test's subject.
+  m.session.onboard = "done";
   return { root, session: m.session };
 }
 
