@@ -173,7 +173,7 @@
       "day": 8,
       "facing": "bed",
       "add": {
-        "text": "A rank table pinned to the wall above the bed. Your name is on the last line."
+        "text": "A rank table pinned to the wall above the bed. The last line says: you."
       }
     },
     {

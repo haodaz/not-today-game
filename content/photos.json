@@ -173,7 +173,8 @@
       "day": 8,
       "facing": "bed",
       "add": {
-        "text": "床头的墙上贴着一张职级表。你的名字在最后一行。"
+        "text": "床头的墙上贴着一张职级表。最后一行写着：你。",
+        "overlay": "/room/photos/d08_bed.jpg"
       }
     },
     {
