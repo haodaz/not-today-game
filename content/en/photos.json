@@ -157,7 +157,8 @@
       "day": 7,
       "facing": "window",
       "add": {
-        "text": "The rain on the glass runs in lines. Count them: seventy-two."
+        "text": "The rain on the glass runs in lines. Count them: seventy-two.",
+        "overlay": "/room/photos/d07_window.jpg"
       }
     },
     {

@@ -157,7 +157,8 @@
       "day": 7,
       "facing": "window",
       "add": {
-        "text": "窗上的雨水流成一道一道。数一数，七十二道。"
+        "text": "窗上的雨水流成一道一道。数一数，七十二道。",
+        "overlay": "/room/photos/d07_window.jpg"
       }
     },
     {
