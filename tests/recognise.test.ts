@@ -20,7 +20,7 @@ import { freshMemo, questionQueued, react } from "@world/loop/runtime";
 import { loopContext } from "@world/loop/checklist";
 import { renderRoom } from "@world/room/hud";
 import { everyScreen } from "./box-screens";
-import { loopActions } from "@world/room/game";
+import { loopActions, loopKeys } from "@world/room/game";
 
 const objects = [...recogniseTable.keys()];
 const six = membersOf("recognised")! as string[];
@@ -184,6 +184,39 @@ describe("when it is asked (FR1)", () => {
     loopActions["loop-put-down"]!(ctx, none, null as never);
     loopActions["loop-hold"]!(ctx, { object: "pager" } as DOMStringMap, null as never);
     expect(ctx.session.dialogue.queue).toEqual([]);
+  });
+
+  it("put down before it is answered, the question goes with the object: never asked under another; asked again on its next pick-up", () => {
+    const store = createStore({ startDay: 1 });
+    store.appendEvent({ kind: "openLayer", objectId: "chick" });
+    store.appendEvent({ kind: "lieDown" });
+    store.appendEvent({ kind: "openLayer", objectId: "camera" });
+    const ctx = ctxOf(store);
+    const hold = (o: string) => loopActions["loop-hold"]!(ctx, { object: o } as DOMStringMap, null as never);
+    const box = () => renderRoom({ state: store.getState(), events: store.getEvents(), session: ctx.session }).value;
+    const chickQ = recogniseTable.get("chick")!.q;
+    const cameraQ = recogniseTable.get("camera")!.q;
+
+    hold("chick");
+    expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["d2:recognise:chick"]);
+    // Esc puts it down unanswered: the question leaves the queue (and the waiting list).
+    expect(loopKeys(ctx, { key: "Escape", target: null } as unknown as KeyboardEvent)).toBe(true);
+    expect(ctx.session.holding).toBeNull();
+    expect(ctx.session.dialogue.queue).toEqual([]);
+    expect(ctx.session.dialogue.waiting ?? []).toEqual([]);
+    expect(askedOn(store.getEvents(), 2, "chick")).toBe(false);
+
+    // The camera in hand: its own question, never the chick's.
+    hold("camera");
+    expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["d2:recognise:camera"]);
+    expect(box()).toContain(cameraQ);
+    expect(box()).not.toContain(chickQ);
+
+    // The chick again (the camera put down by taking it up): the chick's question is asked, once.
+    hold("chick");
+    expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["d2:recognise:chick"]);
+    expect(box()).toContain(chickQ);
+    expect(box()).not.toContain(cameraQ);
   });
 
   it("the desk bar shows an unrecognised object desaturated, a recognised one in full colour", () => {

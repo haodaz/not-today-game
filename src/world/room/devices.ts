@@ -222,6 +222,10 @@ function tape(ctx: DeviceCtx): SafeHtml {
 
 /** camera R9: the ejected sheet slides out of the slot over this long. */
 export const SHEET_SLIDE_MS = 600;
+/** Once out, the sheet stays under the slot this long, then it is gone (2026-11-06 fix). */
+export const SHEET_STAY_MS = 2000;
+/** From the shot (takenAt) until the sheet is no longer drawn. */
+export const SHEET_GONE_MS = SHEET_SLIDE_MS + SHEET_STAY_MS;
 
 /**
  * The instant camera in 使用 (camera R9): flat, clean, bright. A 360 × 300 body, warm white above
@@ -251,8 +255,9 @@ function camera(ctx: DeviceCtx): SafeHtml {
   const last = ctx.session.lastPhoto;
   const photo = last !== null ? ctx.session.photos[last] : undefined;
   let sheet: SafeHtml | null = null;
-  if (!back && photo) {
-    const elapsed = Math.max(0, ctx.nowMs - photo.takenAt);
+  // The sheet comes out of the slot, stays SHEET_STAY_MS, then is gone (it never hangs for good).
+  const elapsed = photo ? Math.max(0, ctx.nowMs - photo.takenAt) : 0;
+  if (!back && photo && elapsed < SHEET_GONE_MS) {
     const stage = stageOfPhoto(photo, ctx.state.day, ctx.nowMs, upgraded);
     const late = elapsed < SHEET_SLIDE_MS ? raw(` style="--late:-${Math.round(elapsed)}ms"`) : null;
     sheet = html`<div class="${cls("cam-sheet", elapsed >= SHEET_SLIDE_MS && "out")}"${late}>${photoPicture(photo, stage, upgraded, 0.11)}</div>`;

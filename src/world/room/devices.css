@@ -231,9 +231,11 @@
 .dev-shell.cam .cam-flash{position:fixed;inset:0;background:#fff;pointer-events:none;z-index:40;animation:cam-flash 120ms ease-out both}
 @keyframes cam-flash{from{opacity:.95}to{opacity:0}}
 /* The ejected sheet (R9): a white frame 200 × 236 with the thick bottom border of an instant photo,
-   sliding down out of the slot over 600 ms (its picture develops; R8). The slide keeps its place
+   sliding down out of the slot over 600 ms (its picture develops; R8), then staying 2 s before it is
+   gone (devices.ts SHEET_GONE_MS). Its top edge is the slot's middle line (300 − 21 − 5 = 274) and it
+   is drawn in front of the dark band, so it comes out of the slot itself. The slide keeps its place
    across re-renders through --late. */
-.dev-shell.cam .cam-sheet{position:absolute;left:80px;top:274px;width:200px;height:236px;box-sizing:border-box;padding:10px 10px 46px;background:#FFFFFF;border-radius:2px;box-shadow:0 6px 16px rgba(0,0,0,.25);z-index:-1;animation:cam-eject 600ms ease-out var(--late,0ms) both}
+.dev-shell.cam .cam-sheet{position:absolute;left:80px;top:274px;width:200px;height:236px;box-sizing:border-box;padding:10px 10px 46px;background:#FFFFFF;border-radius:2px;box-shadow:0 6px 16px rgba(0,0,0,.25);z-index:2;animation:cam-eject 600ms ease-out var(--late,0ms) both}
 .dev-shell.cam .cam-sheet.out{animation:none}
 @keyframes cam-eject{from{transform:translateY(-236px);clip-path:inset(236px 0 0 0)}to{transform:none;clip-path:inset(0 0 0 0)}}
 .dev-shell.cam.upgraded .cam-top{background:#FFFFFF}

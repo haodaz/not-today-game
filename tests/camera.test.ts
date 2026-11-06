@@ -23,7 +23,7 @@ import { t } from "@world/i18n";
 import { camera, CAM_W } from "@world/objects/plain";
 import type { ObjectEnv } from "@world/objects/program";
 import { CASE_OBJECTS } from "@world/room/case";
-import { CAMERA_KEYS, DEVICE_IDS, FLIPPERS } from "@world/room/devices";
+import { CAMERA_KEYS, DEVICE_IDS, FLIPPERS, SHEET_GONE_MS, SHEET_SLIDE_MS } from "@world/room/devices";
 import { loopActions } from "@world/room/game";
 import { boxObjectFor, renderRoom } from "@world/room/hud";
 
@@ -257,7 +257,7 @@ describe("R9 · the camera in 使用 is a drawn device", () => {
     expect(out).toContain('data-action="obj-flip" data-object="camera"');
   });
 
-  it("a shot hangs a sheet out of the slot; flipped, the back shows the counter's glass", () => {
+  it("a shot slides a sheet out of the slot (0–600 ms), shows it until 2600 ms, then it is gone; flipped, the back shows the counter's glass", () => {
     const r = rig("bed");
     r.act("loop-hold", { object: "camera" });
     r.act("obj-use");
@@ -267,9 +267,17 @@ describe("R9 · the camera in 使用 is a drawn device", () => {
     r.act("vf-sheet-away");
     const render = (nowMs: number) => renderRoom({ state: r.store.getState(), events: r.store.getEvents(), session: r.ctx.session, nowMs }).value;
     const taken = r.ctx.session.photos[r.ctx.session.lastPhoto!]!.takenAt;
+    // Sliding out: 0–600 ms, its place kept across re-renders (a negative delay).
+    expect(render(taken)).toMatch(/<div class="cam-sheet" style="--late:-0ms"><div class="ph-pic dev-blank"/);
     expect(render(taken + 100)).toMatch(/<div class="cam-sheet" style="--late:-100ms"><div class="ph-pic dev-blank"/);
-    // R10: a room photo stays blank all its shooting day.
-    expect(render(taken + DEVELOP_MS + 1)).toMatch(/<div class="cam-sheet out"><div class="ph-pic dev-blank"/);
+    expect(render(taken + SHEET_SLIDE_MS - 1)).toMatch(/<div class="cam-sheet" style="--late:-599ms">/);
+    // Out and still (R10: a room photo stays blank all its shooting day), until 2600 ms.
+    expect(SHEET_GONE_MS).toBe(2600);
+    expect(render(taken + SHEET_SLIDE_MS)).toMatch(/<div class="cam-sheet out"><div class="ph-pic dev-blank"/);
+    expect(render(taken + SHEET_GONE_MS - 1)).toMatch(/<div class="cam-sheet out"><div class="ph-pic dev-blank"/);
+    // Then gone: it never hangs for good.
+    expect(render(taken + SHEET_GONE_MS)).not.toContain("cam-sheet");
+    expect(render(taken + DEVELOP_MS + 1)).not.toContain("cam-sheet");
     r.act("obj-flip");
     const back = render(taken + 1000);
     expect(back).toContain('class="cam-counter"><div class="glass"><canvas class="dev" data-screen="camera"');
@@ -294,6 +302,8 @@ describe("R9 · the camera in 使用 is a drawn device", () => {
     expect(c).toMatch(/\.cam-flashsl\{[^}]*width:30px;height:14px/);
     expect(c).toMatch(/\.cam-flashsl::after\{[^}]*background:#F2B632/);
     expect(c).toMatch(/\.cam-sheet\{[^}]*width:200px;height:236px;[^}]*padding:10px 10px 46px;background:#FFFFFF;[^}]*animation:cam-eject 600ms/);
+    // It comes out of the slot itself: its top at the slot's middle line, in front of the dark band.
+    expect(c).toMatch(/\.cam-sheet\{[^}]*top:274px;[^}]*z-index:2;/);
   });
 });
 

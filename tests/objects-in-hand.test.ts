@@ -226,9 +226,11 @@ describe("holding and using (FR1)", () => {
     act(ctx, "loop-hold", { object: "pager" });
     expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["d4:recognise:pager"]);
     store.appendEvent({ kind: "recognise", objectId: "pager", option: 0 });
+    // Putting it down takes its queued question with it (2026-11-06 fix); answered today, the next
+    // lift does not ask again.
     act(ctx, "loop-put-down");
     act(ctx, "loop-hold", { object: "pager" });
-    expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["d4:recognise:pager"]);
+    expect(ctx.session.dialogue.queue).toEqual([]);
   });
   // objects-in-room R2: using an object at a place is a record (`useAt`); nothing else is written.
   it("property: no key, use, turn or put-down writes a world event (only the useAt record)", () => {

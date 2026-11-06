@@ -78,6 +78,21 @@ export function leaveKuro(d: DialogueState): DialogueState {
   return { ...d, queue: d.queue.filter((q) => q.voice !== "kuro"), line: headGoes ? 0 : d.line, page: headGoes ? 0 : d.page };
 }
 
+/**
+ * The object was put down before its "what is this" was answered: its question leaves the queue and
+ * the waiting list (an answer already playing stays). It is asked again on the next pick-up, since
+ * only an answer counts as asked (recognise FR1).
+ */
+export function dropQuestion(d: DialogueState, object: string): DialogueState {
+  const isQ = (q: Queued) => q.ending.kind === "recognise" && q.ending.object === object;
+  const queue = d.queue.filter((q) => !isQ(q));
+  const waiting = d.waiting?.filter((p) => !isQ(p.item));
+  if (queue.length === d.queue.length && waiting?.length === d.waiting?.length) return d;
+  const headGoes = d.queue[0] !== undefined && isQ(d.queue[0]);
+  const next: DialogueState = { ...d, queue, line: headGoes ? 0 : d.line, page: headGoes ? 0 : d.page };
+  return waiting === undefined ? next : { ...next, waiting };
+}
+
 export function push(d: DialogueState, q: Queued): DialogueState {
   if (q.lines.length === 0 && q.ending.kind === "none") return d;
   // Not twice, whether it is playing, queued or waiting for its place.

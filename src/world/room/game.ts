@@ -38,7 +38,7 @@ import { handStep, ROLL_MAX, ROLLERS } from "@world/objects/hand";
 import { UPSIDE_DOWN_DEG } from "@world/objects/calculator";
 import { pressKey } from "@world/objects/index";
 import { PHONE_FLIP } from "@world/room/held";
-import { CAMERA_KEYS, DICT_KEYS, FLIPPERS, SHEET_SLIDE_MS, TAPE_KEYS } from "@world/room/devices";
+import { CAMERA_KEYS, DICT_KEYS, FLIPPERS, SHEET_GONE_MS, SHEET_SLIDE_MS, TAPE_KEYS } from "@world/room/devices";
 import { CAMERA_FLASH_MS, cameraShot, type CameraState } from "@world/objects/plain";
 import { DEVELOP_BLANK_MS, DEVELOP_MS, ON_THE_SPOT_DAY, photoKey, roomFacingOf, roomPhotoOn } from "@state/photos";
 import { screenPlaceOf } from "@world/desktop/files/album";
@@ -52,7 +52,7 @@ import { isFacing, turnedTo, turnsBetween, type Facing, type TurnDir } from "./f
 
 /** Whose conversation the loan is answered in (day-loop correction 2026-11-01): 老周. */
 export const LOAN_CONVERSATION = "laozhou";
-import { advance, endsInChoice, finishChoice, push, showing, talking, type DialogueState } from "@world/loop/dialogue";
+import { advance, dropQuestion, endsInChoice, finishChoice, push, showing, talking, type DialogueState } from "@world/loop/dialogue";
 import { beatQueued, lieDownOrEnd, openChatIfDue, questionQueued } from "@world/loop/runtime";
 import { askedOn, knows } from "@state/recognise";
 import { gateAdvance } from "@world/motion/reveal";
@@ -419,6 +419,13 @@ function closeViewfinder(s: Session): void {
   s.hand.face = "front";
 }
 
+/** An object leaves the hand: its unanswered "what is this" leaves the box (it is asked again next pick-up). */
+function unask(s: Session, object: string): void {
+  const before = s.dialogue;
+  s.dialogue = dropQuestion(before, object);
+  if (s.dialogue !== before && before.queue[0] !== s.dialogue.queue[0]) s.reveal = null;
+}
+
 /** The held thing goes back to rest: just held, its front up, no key down. */
 function restHand(s: Session): void {
   s.hand.using = false;
@@ -518,7 +525,7 @@ function takePhoto(ctx: ActionContext): void {
   const still = onScreen ? shownStill(buildShell(store.getState(), store.getEvents(), session, desktopApps, now, store.getStartDay()))?.value ?? null : null;
   session.photos = { ...session.photos, [index]: { at, day: state.day, takenAt: now, still } };
   session.lastPhoto = index;
-  for (const ms of [CAMERA_FLASH_MS, SHEET_SLIDE_MS, DEVELOP_BLANK_MS, DEVELOP_MS]) ctx.later(ms + 16, ctx.rerender);
+  for (const ms of [CAMERA_FLASH_MS, SHEET_SLIDE_MS, SHEET_GONE_MS, DEVELOP_BLANK_MS, DEVELOP_MS]) ctx.later(ms + 16, ctx.rerender);
   // photo-album R1: the last day's room photo develops on the spot (camera R10); when its 20 s end
   // it has been seen developed (the sheet out of the slot shows it), so the 影集 collects it.
   const facing = roomFacingOf(at);
@@ -1052,6 +1059,8 @@ export const loopActions: Record<string, ActionHandler> = {
     const onDesk = (state.found as string[]).includes(id) && !state.lost.includes(id);
     if (!onDesk) return;
     fromItemsPanel(ctx);
+    // Another object taken up puts the one in hand down: its unanswered question goes with it.
+    if (session.holding && session.holding !== id) unask(session, session.holding);
     const hand = handStep({ object: session.holding, mode: session.holding ? (session.hand.using ? "using" : "holding") : "down" }, { kind: "lift", object: id });
     session.holding = hand.object;
     restHand(session);
@@ -1076,6 +1085,8 @@ export const loopActions: Record<string, ActionHandler> = {
       return;
     }
     session.phoneOpen = false;
+    // Put down before its question was answered: the question goes with it (asked again next pick-up).
+    if (session.holding) unask(session, session.holding);
     session.holding = null;
     restHand(session);
     // objects-in-room R7: a lock's trip ends here: back to 屏幕 on the monitor and the task page it
