@@ -45,6 +45,28 @@
           "k": "narration",
           "t": "An image in the group: a phoenix.",
           "where": "screen:msgs:group"
+        },
+        {
+          "k": "narration",
+          "t": "A hand comes out of the gap, in a glove that fits very well."
+        }
+      ],
+      "choices": [
+        {
+          "text": "Give it nothing.",
+          "effects": {
+            "san": -1
+          },
+          "say": [
+            {
+              "k": "narration",
+              "t": "The glove comes off; underneath is another glove. It nods to you, as if in a meeting."
+            },
+            {
+              "k": "inner",
+              "t": "It isn't in a hurry. It has a thousand faces and a thousand nights."
+            }
+          ]
         }
       ]
     },

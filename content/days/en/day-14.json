@@ -45,6 +45,28 @@
           "k": "inner",
           "t": "It means the paragraph I wrote today. Or me.",
           "where": "screen"
+        },
+        {
+          "k": "narration",
+          "t": "A hand comes out of the gap. There are more behind it, one after another, past counting."
+        }
+      ],
+      "choices": [
+        {
+          "text": "Give it nothing.",
+          "effects": {
+            "san": -1
+          },
+          "say": [
+            {
+              "k": "narration",
+              "t": "The first hand draws back, the second comes out, the third. By the tenth you stop counting."
+            },
+            {
+              "k": "inner",
+              "t": "A thousand. Every one of them wants it."
+            }
+          ]
         }
       ]
     },

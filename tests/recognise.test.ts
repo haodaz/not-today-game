@@ -52,7 +52,19 @@ describe("content/objects.json", () => {
   });
 
   it("is read strictly", () => {
-    const raw = () => structuredClone(objectsFile) as any;
+    // Content (2026-11-06) gives every option its own lines and no shared blocks; these cases are
+    // about the loader's rules for the shared shape too, so they start from the chick in that shape:
+    // shared right / wrong rebuilt from the option lines, the options bare.
+    const raw = () => {
+      const o = structuredClone(objectsFile) as any;
+      const chick = o.objects.chick;
+      const r = chick.options.find((x: any) => x.right);
+      const w = chick.options.find((x: any) => !x.right);
+      chick.right = { say: [...r.say], inner: r.inner };
+      chick.wrong = { say: [...w.say], inner: w.inner };
+      for (const x of chick.options) { delete x.say; delete x.inner; }
+      return o;
+    };
     const two = raw();
     two.objects.chick.options[0].right = true;
     expect(() => parseObjects(two)).toThrow(/at most one right/);
@@ -187,8 +199,9 @@ describe("when it is asked (FR1)", () => {
     ctx.session.dialogue = push(EMPTY_DIALOGUE, questionQueued(4, "pager", store.getRunId())!);
     const answered = queued(store, () => loopActions["loop-choice"]!(ctx, { index: String(wrongIndex("pager")) } as DOMStringMap, null as never));
     const answer = answered.queue.find((q) => q.key === "d4:recognise:pager:answer")!;
-    const wrong = recogniseTable.get("pager")!.wrong!;
-    expect(answer.lines).toEqual([...wrong.say.map((t) => ({ k: "narration", t })), { k: "inner", t: wrong.inner }]);
+    // Content 2026-11-06: the picked wrong option carries its own lines.
+    const wrong = recogniseTable.get("pager")!.options[wrongIndex("pager")]!;
+    expect(answer.lines).toEqual([...wrong.say!.map((t) => ({ k: "narration", t })), { k: "inner", t: wrong.inner! }]);
     expect(store.getState().recognised).toEqual([]);
 
     // Same day: picking it up does not ask again.

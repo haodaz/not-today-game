@@ -53,6 +53,28 @@
         {
           "k": "inner",
           "t": "Hoo hoo hoo. The child is crying, or laughing."
+        },
+        {
+          "k": "narration",
+          "t": "A hand comes out of the gap, palm up. Tonight it isn't looking at the desk. It is looking at the door."
+        }
+      ],
+      "choices": [
+        {
+          "text": "Give it nothing.",
+          "effects": {
+            "san": -1
+          },
+          "say": [
+            {
+              "k": "narration",
+              "t": "The hand points at the door and draws back. The handle does not move."
+            },
+            {
+              "k": "inner",
+              "t": "It isn't the work it wants tonight."
+            }
+          ]
         }
       ]
     },

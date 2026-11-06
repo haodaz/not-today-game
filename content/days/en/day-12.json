@@ -41,6 +41,28 @@
           "k": "narration",
           "t": "The money is back. Forty-four thousand, not a cent short, two minutes before you clicked.",
           "where": "screen:msgs"
+        },
+        {
+          "k": "narration",
+          "t": "A hand comes out of the gap, slowly, as if through water."
+        }
+      ],
+      "choices": [
+        {
+          "text": "Give it nothing.",
+          "effects": {
+            "san": -1
+          },
+          "say": [
+            {
+              "k": "narration",
+              "t": "The hand stays there and does not move. Your eyelids get heavier. It is waiting for you to sleep first."
+            },
+            {
+              "k": "inner",
+              "t": "It doesn't grab. It waits."
+            }
+          ]
         }
       ]
     },

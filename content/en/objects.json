@@ -7,29 +7,29 @@
       "options": [
         {
           "t": "A timer",
-          "right": false
+          "right": false,
+          "say": [
+            "A timer, maybe. Three keys, a little screen, one black dot on it that doesn't move."
+          ],
+          "inner": "A timer that doesn't run. Look again tomorrow."
         },
         {
           "t": "A virtual pet",
-          "right": true
+          "right": true,
+          "say": [
+            "A virtual pet. Tamagotchi was the thing back then; every kid wanted one. This one looks like a knock-off: the shell says 'Tamagotchy'."
+          ],
+          "inner": "What kind of blind box has one of these... It looks a little familiar."
         },
         {
           "t": "An alarm clock",
-          "right": false
+          "right": false,
+          "say": [
+            "An alarm clock? No face, no hands, just a little screen with a black dot."
+          ],
+          "inner": "It doesn't ring. Look again tomorrow."
         }
       ],
-      "right": {
-        "say": [
-          "A virtual pet. Tamagotchi was the thing back then; every kid wanted one. This one looks like a knock-off: the shell says 'Tamagotchy'."
-        ],
-        "inner": "What kind of blind box has one of these... It looks a little familiar."
-      },
-      "wrong": {
-        "say": [
-          "You can't say. That patch of memory is blurred, like someone's back seen through frosted glass."
-        ],
-        "inner": "Look again tomorrow."
-      },
       "keys": [
         {
           "id": "A",
@@ -74,29 +74,29 @@
       "options": [
         {
           "t": "A toy camera",
-          "right": false
+          "right": false,
+          "say": [
+            "A toy camera. Press, and a blank sheet actually slides out."
+          ],
+          "inner": "A toy that ejects sheets. Look again tomorrow."
         },
         {
           "t": "An instant camera",
-          "right": true
+          "right": true,
+          "say": [
+            "An instant camera. Press, a sheet slides out, and you wait for it to come up on its own."
+          ],
+          "inner": "I had one of these as a kid. ...This one. Is it that one?"
         },
         {
           "t": "A radio",
-          "right": false
+          "right": false,
+          "say": [
+            "A radio? No aerial, no dial. A lens on the front."
+          ],
+          "inner": "The lens is pointed at me. Look again tomorrow."
         }
-      ],
-      "right": {
-        "say": [
-          "An instant camera. Press, a sheet slides out, and you wait for it to come up on its own."
-        ],
-        "inner": "I had one of these as a kid. ...This one. Is it that one?"
-      },
-      "wrong": {
-        "say": [
-          "An old camera. Press, and a blank sheet slides out."
-        ],
-        "inner": "You wait."
-      }
+      ]
     },
     "pager": {
       "day": 3,
@@ -104,30 +104,30 @@
       "options": [
         {
           "t": "A broken phone",
-          "right": false
+          "right": false,
+          "say": [
+            "A broken phone. No earpiece, no dial, only a narrow screen."
+          ],
+          "inner": "A phone that can't call out. Look again tomorrow."
         },
         {
           "t": "A pager",
-          "right": true
+          "right": true,
+          "say": [
+            "A pager. Back then half the street wore one on their belt. Someone wants you, they call the paging service with your number, and it beeps on your hip. Receives, never sends.",
+            "The chick, the camera, the pager. Everything in this box is from when I was small. One at a time, in order of the years."
+          ],
+          "inner": "This one wasn't mine. It was my father's. My hands are a little cold. And I still want to see the next one. If it's a surprise from the family... I can't think of a single one of them who would do this."
         },
         {
           "t": "A remote control",
-          "right": false
+          "right": false,
+          "say": [
+            "A remote? Too few keys, too long a screen. You press for a while; nothing in the room moves."
+          ],
+          "inner": "It controls nothing. Look again tomorrow."
         }
       ],
-      "right": {
-        "say": [
-          "A pager. Back then half the street wore one on their belt. Someone wants you, they call the paging service with your number, and it beeps on your hip. Receives, never sends.",
-          "The chick, the camera, the pager. Everything in this box is from when I was small. One at a time, in order of the years."
-        ],
-        "inner": "This one wasn't mine. It was my father's. My hands are a little cold. And I still want to see the next one. If it's a surprise from the family... I can't think of a single one of them who would do this."
-      },
-      "wrong": {
-        "say": [
-          "You look at it for a while. Like a phone, and not: no earpiece, no dial, only a narrow screen. You can't recall, and you don't try very hard."
-        ],
-        "inner": "Look again tomorrow."
-      },
       "keys": [
         {
           "id": "read",
@@ -178,29 +178,29 @@
       "options": [
         {
           "t": "A bank card",
-          "right": false
+          "right": false,
+          "say": [
+            "A bank card. No name, no number. The strip is worn to a grey line."
+          ],
+          "inner": "A card that draws no money. Look again tomorrow."
         },
         {
           "t": "A phone card",
-          "right": true
+          "right": true,
+          "say": [
+            "A phone card. In the first weeks of junior high the payphones on the street took these: a unit a minute, and when it's gone it's a piece of plastic."
+          ],
+          "inner": "The nail marks are mine. Made in the queue for the phone."
         },
         {
           "t": "A door card",
-          "right": false
+          "right": false,
+          "say": [
+            "A door card? White corners, a row of nail marks. This room's door doesn't know it."
+          ],
+          "inner": "It has opened other doors. Look again tomorrow."
         }
       ],
-      "right": {
-        "say": [
-          "A phone card. In the first weeks of junior high the payphones on the street took these: a unit a minute, and when it's gone it's a piece of plastic."
-        ],
-        "inner": "The nail marks are mine. Made in the queue for the phone."
-      },
-      "wrong": {
-        "say": [
-          "A card. A magnetic strip, no writing. Where it went, you can't recall."
-        ],
-        "inner": "Look again tomorrow."
-      },
       "light": "余额仅供参考"
     },
     "tape": {
@@ -209,29 +209,29 @@
       "options": [
         {
           "t": "A tape recorder",
-          "right": false
+          "right": false,
+          "say": [
+            "A tape recorder. The lid won't shut; a tape inside."
+          ],
+          "inner": "What it recorded, no idea. Look again tomorrow."
         },
         {
           "t": "A walkman",
-          "right": true
+          "right": true,
+          "say": [
+            "A walkman. No playlists in junior high: one tape for two people, one earbud each. Side A, then flip to B."
+          ],
+          "inner": "Something was recorded at the end of side B. What it was, I'd have to hear it before I'd say."
         },
         {
           "t": "A remote control",
-          "right": false
+          "right": false,
+          "say": [
+            "A remote? Too thick, and with a lid that won't shut."
+          ],
+          "inner": "It controls nothing. Look again tomorrow."
         }
       ],
-      "right": {
-        "say": [
-          "A walkman. No playlists in junior high: one tape for two people, one earbud each. Side A, then flip to B."
-        ],
-        "inner": "Something was recorded at the end of side B. What it was, I'd have to hear it before I'd say."
-      },
-      "wrong": {
-        "say": [
-          "Something that plays tapes. The lid won't shut."
-        ],
-        "inner": "Look again tomorrow."
-      },
       "keys": [
         {
           "id": "play",
@@ -396,29 +396,29 @@
       "options": [
         {
           "t": "A calculator",
-          "right": false
+          "right": false,
+          "say": [
+            "A calculator. But there's a whole row of letter keys, and a line of words on the screen, not numbers."
+          ],
+          "inner": "A calculator that can't count. Look again tomorrow."
         },
         {
           "t": "An electronic dictionary",
-          "right": true
+          "right": true,
+          "say": [
+            "A Wenquxing. The most expensive thing in a senior-high schoolbag: look up words, store numbers, play games under the desk."
+          ],
+          "inner": "Mine only ever did one thing: English in, Chinese out."
         },
         {
           "t": "A game console",
-          "right": false
+          "right": false,
+          "say": [
+            "A game console? A grey-green screen, a row of letter keys. Power on: a cursor blinks."
+          ],
+          "inner": "It's waiting for me to type a word. Look again tomorrow."
         }
       ],
-      "right": {
-        "say": [
-          "A Wenquxing. The most expensive thing in a senior-high schoolbag: look up words, store numbers, play games under the desk."
-        ],
-        "inner": "Mine only ever did one thing: English in, Chinese out."
-      },
-      "wrong": {
-        "say": [
-          "A little machine with a keyboard. A grey-green screen when it comes on."
-        ],
-        "inner": "Look again tomorrow."
-      },
       "keys": {
         "grid": {
           "cols": 7,
@@ -478,29 +478,29 @@
       "options": [
         {
           "t": "A remote control",
-          "right": false
+          "right": false,
+          "say": [
+            "A remote? The digit keys are all there; press one and a green 0 jumps up on the screen."
+          ],
+          "inner": "It only knows numbers. Look again tomorrow."
         },
         {
           "t": "A calculator",
-          "right": true
+          "right": true,
+          "say": [
+            "A calculator. The kind the whole class passed round in the last year of senior high: turn it upside down and the digits spell a few letters."
+          ],
+          "inner": "The slip inside the lid is in my handwriting."
         },
         {
           "t": "A pager",
-          "right": false
+          "right": false,
+          "say": [
+            "A pager? The screen is green, too many keys, and a press makes a number."
+          ],
+          "inner": "This one can count. Look again tomorrow."
         }
       ],
-      "right": {
-        "say": [
-          "A calculator. The kind the whole class passed round in the last year of senior high: turn it upside down and the digits spell a few letters."
-        ],
-        "inner": "The slip inside the lid is in my handwriting."
-      },
-      "wrong": {
-        "say": [
-          "Something for sums. Green digits. There's a slip in the lid; you don't look closely."
-        ],
-        "inner": "Look again tomorrow."
-      },
       "keys": [
         {
           "id": "C",
@@ -662,29 +662,29 @@
       "options": [
         {
           "t": "A toy phone",
-          "right": false
+          "right": false,
+          "say": [
+            "A toy phone. A clamshell, very light. Shut it, and it clicks."
+          ],
+          "inner": "Too real a click. Look again tomorrow."
         },
         {
           "t": "A flip phone",
-          "right": true
+          "right": true,
+          "say": [
+            "A flip phone. Bought the year I went abroad, my first. I can still recite the number."
+          ],
+          "inner": "Primary school to the year abroad, nothing missing. The box ends here; the one that won't come out, I don't know. Who counts this exactly."
         },
         {
           "t": "A walkie-talkie",
-          "right": false
+          "right": false,
+          "say": [
+            "A walkie-talkie? No aerial, a clamshell, very light. It clicks when it shuts."
+          ],
+          "inner": "There's nobody for it to talk to. Look again tomorrow."
         }
       ],
-      "right": {
-        "say": [
-          "A flip phone. Bought the year I went abroad, my first. I can still recite the number."
-        ],
-        "inner": "Primary school to the year abroad, nothing missing. The box ends here; the one that won't come out, I don't know. Who counts this exactly."
-      },
-      "wrong": {
-        "say": [
-          "An old phone. Shut, open, shut."
-        ],
-        "inner": "Look again tomorrow."
-      },
       "sim": "This card is valid until December 2009."
     }
   }

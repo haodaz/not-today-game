@@ -32,6 +32,28 @@
         {
           "k": "narration",
           "t": "You switch the screens off. After the text goes, a tiny bright dot stays a second, then nothing."
+        },
+        {
+          "k": "narration",
+          "t": "A hand comes out of the gap, palm up. A few grains of wheat between the fingers."
+        }
+      ],
+      "choices": [
+        {
+          "text": "Give it nothing.",
+          "effects": {
+            "san": -1
+          },
+          "say": [
+            {
+              "k": "narration",
+              "t": "The hand gathers the grains back one by one, as if weighing. When the gap closes, something is gone from the desk; you can't say what."
+            },
+            {
+              "k": "inner",
+              "t": "It isn't the accounts it weighs."
+            }
+          ]
         }
       ]
     },
