@@ -421,28 +421,32 @@
       "day": 16,
       "facing": "room",
       "add": {
-        "text": "Everything on the desk is floating, a finger's width above it."
+        "text": "Everything on the desk is floating, a finger's width above it.",
+        "overlay": "/room/photos/d16_room.jpg"
       }
     },
     {
       "day": 16,
       "facing": "bed",
       "add": {
-        "text": "The bed is shaking, as if a heavy drum were sounding underground."
+        "text": "The bed is shaking, as if a heavy drum were sounding underground.",
+        "overlay": "/room/photos/d16_bed.jpg"
       }
     },
     {
       "day": 16,
       "facing": "door",
       "add": {
-        "text": "Rings on the door panel spreading out from the lock: the shape of knocking."
+        "text": "Rings on the door panel spreading out from the lock: the shape of knocking.",
+        "overlay": "/room/photos/d16_door.jpg"
       }
     },
     {
       "day": 16,
       "facing": "window",
       "add": {
-        "text": "Nothing outside the window. Not dark. Nothing."
+        "text": "Nothing outside the window. Not dark. Nothing.",
+        "overlay": "/room/photos/d16_window.jpg"
       }
     },
     {

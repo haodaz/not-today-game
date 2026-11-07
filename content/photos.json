@@ -421,28 +421,32 @@
       "day": 16,
       "facing": "room",
       "add": {
-        "text": "桌面上的东西全都轻轻浮着，离开桌面一指。"
+        "text": "桌面上的东西全都轻轻浮着，离开桌面一指。",
+        "overlay": "/room/photos/d16_room.jpg"
       }
     },
     {
       "day": 16,
       "facing": "bed",
       "add": {
-        "text": "床在发抖，像有很重的鼓声从地下传上来。"
+        "text": "床在发抖，像有很重的鼓声从地下传上来。",
+        "overlay": "/room/photos/d16_bed.jpg"
       }
     },
     {
       "day": 16,
       "facing": "door",
       "add": {
-        "text": "门板上一圈圈波纹，从锁那儿扩出来：敲门声的形状。"
+        "text": "门板上一圈圈波纹，从锁那儿扩出来：敲门声的形状。",
+        "overlay": "/room/photos/d16_door.jpg"
       }
     },
     {
       "day": 16,
       "facing": "window",
       "add": {
-        "text": "窗外什么都没有。不是黑，是没有。"
+        "text": "窗外什么都没有。不是黑，是没有。",
+        "overlay": "/room/photos/d16_window.jpg"
       }
     },
     {
