@@ -1074,3 +1074,26 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .sh-mod-d{font-size:11px;padding:0 6px;border-radius:8px;background:#F0F2F5;color:var(--ink-2);font-variant-numeric:tabular-nums}
 .sh-mod-d.plus{color:#1F5FD6;background:#EAF1FF}
 .sh-mod-d.minus{color:#C0392B;background:#FDEDEC}
+/* tune: the parameter-card carousel (one module at a time; author 2026-11-08) */
+.sh-tune-nav{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line);font-size:11px;color:var(--ink-2)}
+.sh-tune-arrow{width:26px;height:26px;border:1px solid #E5E5E5;border-radius:13px;background:#FFFFFF;color:#1F1F1F;font:inherit;font-size:16px;line-height:1;cursor:pointer}
+.sh-tune-arrow:disabled{opacity:.3;cursor:default}
+.sh-dots{display:flex;gap:5px;margin-left:auto}
+.sh-dot{width:8px;height:8px;padding:0;border:0;border-radius:50%;background:#D5D9E0;cursor:pointer}
+.sh-dot.set{background:#A9B4C4}
+.sh-dot.on{background:#2F6FEB;transform:scale(1.25)}
+.sh-tune-of{margin-left:auto;font-variant-numeric:tabular-nums}
+.sh-dots+.sh-tune-of{margin-left:0}
+.sh-card-body{padding:6px 12px 14px;font-family:var(--mono,ui-monospace,Menlo,monospace)}
+.sh-card-body .sh-mod-g{padding:6px 0 0}
+.sh-mod-title{font-size:13px;padding:2px 0 10px}
+.sh-mod-title code{color:#1F5FD6}
+.sh-mod-name{color:#1F1F1F}
+.sh-card-body .sh-paths{gap:8px}
+.sh-card-body .sh-path{display:grid;grid-template-columns:1fr auto;grid-template-areas:"l d" "b b";padding:8px 10px 8px 28px}
+.sh-card-body .sh-path .sh-path-l{grid-area:l;font-size:13px}
+.sh-card-body .sh-path .sh-mod-ds{grid-area:d;justify-content:flex-end}
+.sh-card-body .sh-path .sh-path-b{grid-area:b;padding-left:14px;margin-top:2px}
+.sh-path.kuro{border-style:dashed;background:#FAFAFA;color:#1F5FD6}
+.sh-path.kuro::before{border-style:dashed}
+.sh-mods.read .sh-mod{border-bottom:0;padding:3px 12px}

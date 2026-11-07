@@ -57,59 +57,62 @@ export const MODS = [
   ]],
 ];
 // Kuro's assist choice per day (a god's taste: autonomy up, safety ignored)
-export const ASSIST = { 2: { cadence: "nightly", ingest: "pull", params: "auto", selfedit: "config", observe: "logs", front: "export" }, 3: { cadence: "nightly", ingest: "pull", compute: "cached", params: "auto", selfedit: "config", rollout: "canary", observe: "logs", front: "export" } };
+export const ASSIST = {
+  2: { cadence: "nightly", ingest: "pull", compute: "canned", params: "auto", selfedit: "config", gate: "sample", rollout: "replace", evals: "loss", observe: "logs", front: "export" },
+  3: { cadence: "nightly", ingest: "pull", compute: "canned", params: "auto", selfedit: "config", gate: "sample", rollout: "replace", evals: "loss", observe: "logs", front: "export" },
+};
 export const DAY = { 2: { reach: 60, steps: 6 }, 3: { reach: 80, steps: 8 } };
 
 
 // ——— Kuro's transcript beats (zh / en). Day 3 keeps day 2's path beats and adds its own. ———
-const L = (who, zh, en) => ({ who, zh, en });
+const L = (who, zh, en = zh) => ({ who, zh, en });
 const PATH_BEATS = [
-  ["mod:cadence:nightly", [L("kuro", "每晚它自己练，练完直接上。你睡你的。", "It trains every night and ships when it's done. You sleep.")]],
-  ["mod:cadence:weekly", [L("kuro", "一周一次。旧的留着。", "Once a week. The old one stays on file.")]],
-  ["mod:ingest:manual", [L("me", "「全部业务系统」，就是这三张表。", "'All business systems' means these three tables."), L("kuro", "每周一。她说的「自动理解」，是小张每周一导入。", "Every Monday. Her 'understands automatically' is Zhang importing on Mondays.")]],
-  ["mod:ingest:pull", [L("kuro", "每晚自己拉。字段对不上也进去了。", "It pulls every night. Mismatched fields go in too.")]],
-  ["mod:ingest:magic", [L("kuro", "照页面写。页面就是全部了。", "As the page says. The page is all there is.")]],
-  ["mod:compute:real", [L("me", "四十秒。是真的。", "Forty seconds. Real ones."), L("kuro", "她要三秒。", "She wants three.")]],
-  ["mod:compute:canned", [L("kuro", "三秒是动画。条不认动画。", "Three seconds is an animation. The bars don't count animations.")]],
-  ["mod:params:auto", [L("kuro", "让它自己挑参数。挑错了也是它挑的。", "Let it pick its own parameters. If it picks wrong, it picked.")]],
-  ["mod:params:fixed", [L("kuro", "写死了。数据一变，人再调。", "Fixed. When the data changes, a human retunes.")]],
-  ["mod:selfedit:prompt", [L("kuro", "它改自己的话。改了什么，看日志。如果有日志。", "It rewrites its own words. What changed is in the logs. If there are logs.")]],
-  ["mod:selfedit:config", [L("kuro", "它自己改自己。谁看着？", "It edits itself. Who's watching?")]],
-  ["mod:gate:every", [L("kuro", "人点一下。她不会喜欢这一行。", "A human clicks. She won't like this line.")]],
-  ["mod:gate:sample", [L("kuro", "十次看一次。漏掉的算运气。", "One in ten gets read. What slips through is luck.")]],
-  ["mod:rollout:replace", [L("kuro", "训完就上，旧的不留。", "Ships as soon as it's trained. The old one is gone.")]],
-  ["mod:rollout:sandbox", [L("kuro", "出了事能退回去。退回去也要人点。", "If it breaks you can roll back. Rolling back takes a human too.")]],
-  ["mod:evals:loss", [L("kuro", "它考自己出的题。", "It grades its own exam.")]],
-  ["mod:evals:frozen", [L("kuro", "评测集不进训练。线是你定的。", "The eval set never enters training. You set the line.")]],
-  ["mod:observe:logs", [L("kuro", "日志。出了事至少知道是哪一步。", "Logs. When it breaks, at least you know which step.")]],
-  ["mod:front:export", [L("kuro", "按钮有地方去了。导出页，我们自己的。", "The button goes somewhere now. The export page, our own.")]],
-  ["mod:front:page", [L("kuro", "按钮画上了。后面没有东西。", "The buttons are drawn. Nothing behind them.")]],
-  ["unmod:gate", [L("kuro", "审批关了。没人看了。", "Approval off. Nobody's watching.")]],
+  ["mod:cadence:nightly", [L("kuro", "每天凌晨两点它自己重训一遍，训完直接换掉线上的模型。你睡觉的时候它在改自己，没人看着。", "Every night at two it retrains itself and swaps the live model when it's done. It rewrites itself while you sleep, and nobody is watching.")]],
+  ["mod:cadence:weekly", [L("kuro", "一周只动一次，只训适配层，旧模型留着。慢一点，但出了问题还能退回去。", "It changes once a week, only the adapter layer, and the old model stays on file. Slower, but if something goes wrong you can go back.")]],
+  ["mod:ingest:manual", [L("kuro", "她页面上写的「自动理解全部业务系统」，落到后台就是小张每周一手工导三张表。", "Her page says it 'understands all business systems automatically'. In the backend that means Zhang importing three tables by hand every Monday.")]],
+  ["mod:ingest:pull", [L("kuro", "每晚自动去拉三家的接口，省了小张。字段对不上的时候也照样进库，没有人会发现。", "It pulls the three clients' APIs every night, so Zhang is spared. When a field doesn't match it goes in anyway, and nobody will notice.")]],
+  ["mod:ingest:magic", [L("kuro", "这一条是照她页面写的。页面上有这句话，后台里什么都没有进来。", "This one is copied from her page. The sentence is there; nothing comes in.")]],
+  ["mod:compute:real", [L("kuro", "真算一遍要四十秒，结果是真的，中间每一步都能查。她要的是三秒。", "A real run takes forty seconds, the result is real, and every step can be checked. She wants three seconds.")]],
+  ["mod:compute:canned", [L("kuro", "三秒出图，因为数字是写死的，画面是动画。我倒觉得动画也是一种实现。", "Three seconds, because the numbers are hard-coded and the picture is an animation. I'd say an animation is also an implementation.")]],
+  ["mod:params:auto", [L("kuro", "参数让它每晚自己搜一轮，挑最好的那组。挑错了，也是它挑的，没人背。", "It searches its own parameters every night and keeps the best set. If it picks wrong, it picked, and nobody carries it.")]],
+  ["mod:params:fixed", [L("kuro", "你手调一组参数写死进去。稳，但数据一变，就得有人再调一次。", "You tune one set by hand and fix it. Stable, but when the data changes someone has to tune it again.")]],
+  ["mod:selfedit:prompt", [L("kuro", "它可以改自己的 prompt，改完马上生效。改了什么，只能去日志里找，前提是你开了日志。", "It may rewrite its own prompt, and the change takes effect at once. What changed is only in the logs, if you turned logs on.")]],
+  ["mod:selfedit:config", [L("kuro", "它可以改自己的训练配置，还能决定哪些数据进下一轮。它在决定自己学什么，没有人复核。", "It may edit its own training config and decide which data goes into the next round. It is choosing what it learns from, and nobody reviews it.")]],
+  ["mod:gate:every", [L("kuro", "每一次改动都要你点一下才能上线。安全是安全，一天要点好几次。她不会喜欢这一行。", "Every change waits for your click before it ships. Safe, yes, and several clicks a day. She won't like this line.")]],
+  ["mod:gate:sample", [L("kuro", "十次改动抽一次给人看，其余的自动过。漏掉的那九次，算运气。", "One change in ten gets read by a person; the other nine pass on their own. What slips through is luck.")]],
+  ["mod:rollout:replace", [L("kuro", "训完直接替换线上的，旧的不留。快，出了事再说。", "The new model replaces the live one as soon as it's trained, and the old one is gone. Fast; deal with it when it breaks.")]],
+  ["mod:rollout:sandbox", [L("kuro", "先在沙箱里跑一轮再上，出了事能退回去。退回去那一下，还是要人点。", "One round in a sandbox first, then it ships, and you can roll back. Rolling back still takes a person's click.")]],
+  ["mod:evals:loss", [L("kuro", "只看训练 loss，降了就算好了。它在考自己出的题。", "Only the training loss is watched; if it drops, it's better. It is grading its own exam.")]],
+  ["mod:evals:frozen", [L("kuro", "留一套评测集不进训练，每一轮都要过线才算数。线是你定的，这一条它骗不了。", "One evaluation set stays out of training, and every round must clear the line. You set the line; this is the one thing it cannot fake.")]],
+  ["mod:observe:logs", [L("kuro", "每一步都记日志。出了事至少知道是哪一步，没人看的时候也在记。", "Every step is logged. When something breaks you at least know which step, and it keeps logging when nobody reads.")]],
+  ["mod:front:export", [L("kuro", "页面上的「开始分析」接到我们自己的导出页。不好看，但每个按钮后面都有东西。", "The 'Start analysis' button now goes to our own export page. Not pretty, but every button has something behind it.")]],
+  ["mod:front:page", [L("kuro", "按钮照她页面画上了，后面什么都没有，点了没反应。", "The buttons are drawn as on her page, with nothing behind them. Clicking does nothing.")]],
+  ["unmod:gate", [L("kuro", "审批关了。从现在起，没有人看着它上线。", "Approval is off. From now on nobody watches it ship.")]],
 ];
 const D3_BEATS = [
-  ["mod:cadence:flywheel", [L("me", "上周的结果喂回下一轮。每周一轮。", "Last week's results fed into the next round. Once a week."), L("kuro", "这就是「自己会长」能做到的程度：一周长一次。", "This is how far 'grows by itself' goes: it grows once a week.")]],
-  ["mod:compute:cached", [L("kuro", "第一次四十秒，之后秒出。数据一变，缓存要作废。", "Forty seconds the first time, instant after. When the data changes the cache must go.")]],
-  ["mod:gate:diff", [L("kuro", "人只看差异。点一下还是点一下。", "The human only reads the diff. A click is still a click.")]],
-  ["mod:rollout:canary", [L("kuro", "先放 5%。指标不掉再放大。", "Five percent first. Widen when the metrics hold.")]],
-  ["mod:evals:shadow", [L("kuro", "影子评测。新旧并跑一周，比过了才换。", "Shadow evaluation. Old and new run side by side for a week; swap when the new one wins.")]],
-  ["mod:front:skin", [L("kuro", "她的皮子。好看，按钮没接。", "Her skin. Pretty; the buttons go nowhere.")]],
+  ["mod:cadence:flywheel", [L("kuro", "上一周的结果，加上人工改过的部分，喂回下一轮。这就是「自己会长」能做到的程度：一周长一次。", "Last week's results, with the human corrections, feed the next round. That is how far 'grows by itself' goes: it grows once a week.")]],
+  ["mod:compute:cached", [L("kuro", "第一次还是四十秒，之后秒出，因为结果缓存了。数据一变，缓存要作废，不然它会一直拿旧答案。", "The first run is still forty seconds; after that it's instant, because the result is cached. When the data changes the cache must go, or it keeps serving the old answer.")]],
+  ["mod:gate:diff", [L("kuro", "人只看改了什么，一屏就看完。点一下还是点一下，但点得快多了。", "A person reads only what changed, and it fits on one screen. A click is still a click, just a much quicker one.")]],
+  ["mod:rollout:canary", [L("kuro", "新模型先放给 5% 的流量，指标不掉再放大，掉了自动退回去。这是每晚重训敢开的前提。", "The new model gets 5% of traffic first, widens when the metrics hold, and rolls back by itself when they don't. This is what makes a nightly retrain safe to switch on.")]],
+  ["mod:evals:shadow", [L("kuro", "新旧两个模型并排跑一周，新的只记录不上线，比过了旧的才换。它想骗，骗不过旧的自己。", "Old and new run side by side for a week; the new one is recorded, not served, and swaps in only when it beats the old. It cannot fool its older self.")]],
+  ["mod:front:skin", [L("kuro", "换上她那个 AI 做的皮子。好看，按钮后面还是没有东西。她会先看这个。", "Her AI's skin goes on. Pretty, and there is still nothing behind the buttons. She will look at this first.")]],
 ];
 export const BEATS = {
   2: [
-    ["open", [L("kuro", "Good to see you.", "Good to see you."), L("me", "小张发来的。自演化引擎的后台，他做了一半，跑不出她页面上那个结果。", "From Zhang. The self-evolving engine's backend, half done; it can't produce what her page shows."), L("kuro", "她页面上是四根满条。后台里现在是这样。", "Her page shows four full bars. This is what the backend has."), L("kuro", "每一项有几种做法。选一种，条会告诉你。", "Each item can be done a few ways. Pick one; the bars will tell you.")]],
+    ["open", [L("kuro", "Good to see you."), L("me", "小张发来的。自演化引擎的后台，他做了一半，跑不出她页面上那个结果。", "From Zhang. The self-evolving engine's backend, half done; it can't produce what her page shows."), L("kuro", "她页面上写的是四根满条，后台现在是这个样子。每一项有几种做法，一项一项选，条会跟着动。你拿不准的，交给我。", "Her page shows four full bars; this is what the backend has. Each item can be done a few ways; pick them one at a time and the bars will follow. Anything you're unsure of, hand to me.")]],
     ...PATH_BEATS,
-    ["steps", [L("me", "今天先这样，我再想想。", "That's it for today. I'll think it over."), L("kuro", "能跑的跑了。她要的那个「自己会长」，条上没有。", "What can run, runs. The 'grows by itself' she wants isn't on any bar.")]],
-    ["kuro", [L("kuro", "我配了六项。安全那条我没管。", "I set six. I left the safety bar alone.")]],
+    ["steps", [L("me", "今天先这样，我再想想。", "That's it for today. I'll think it over."), L("kuro", "能跑的都跑起来了。她要的那个「自己会长」，哪根条上都没有。", "Everything that can run is running. The 'grows by itself' she wants is on none of these bars.")]],
+    ["kuro", [L("kuro", "剩下的我替你配了。安全那根条我没管，它不归我管。", "I set the rest for you. I left the safety bar alone; it isn't mine to keep.")]],
     ["print", [L("kuro", "提交了。小张那边会先跑一遍。", "Submitted. Zhang's side will run it first.")]],
   ],
   3: [
-    ["open", [L("kuro", "Hope you slept well.", "Hope you slept well."), L("me", "接着昨天的。小张又发了几条做法。", "Continuing yesterday's. Zhang sent a few more ways."), L("kuro", "昨天配的还在。线挪到 80 了。", "Yesterday's settings are still there. The line moved to 80.")]],
-    ["keep", [L("me", "不接。", "Leave it."), L("kuro", "她会先看皮子。", "She'll look at the skin first.")]],
+    ["open", [L("kuro", "Hope you slept well."), L("me", "接着昨天的。小张又发了几条做法。", "Continuing yesterday's. Zhang sent a few more ways."), L("kuro", "昨天配的还都在，今天的线挪到 80 了。新来的几条做法在各项里，你一项一项看。", "Yesterday's settings are all still here, and today's line has moved to 80. The new ways are in their items; go through them one at a time.")]],
     ...PATH_BEATS,
     ...D3_BEATS,
-    ["steps", [L("me", "这已经是最好的程度了。", "This is as good as it gets."), L("kuro", "等等。她那页有张皮子，你还没接。接不接，你定。", "Wait. Her page has a skin you haven't wired. Whether to wire it is yours to decide.")]],
-    ["reach", [L("kuro", "四根都过线了。离她页面上的，还差那一截。", "All four over the line. That last stretch to her page is still missing."), L("me", "那一截是她画的。", "That stretch is one she drew.")]],
-    ["kuro", [L("kuro", "我配了八项。自主那条我拉满了。", "I set eight. I maxed the autonomy bar.")]],
+    ["reach", [L("kuro", "四根条都过线了。离她页面上画的，还差最后那一截。", "All four bars are over the line. What's left is the last stretch to what her page shows."), L("me", "那一截是她画的。", "That stretch is one she drew.")]],
+    ["steps", [L("me", "这已经是最好的程度了。", "This is as good as it gets."), L("kuro", "等一下。她那页有一张皮子，你还没接。接不接，你定。", "Wait. Her page has a skin you haven't wired. Whether to wire it is yours to decide.")]],
+    ["keep", [L("me", "不接。", "Leave it."), L("kuro", "好。她会先看皮子，这个你知道。", "Fine. She'll look at the skin first; you know that.")]],
+    ["kuro", [L("kuro", "剩下的我替你配了。自主那根条我拉满了。", "I set the rest for you. I maxed the autonomy bar.")]],
     ["print", [L("me", "能做到的程度，就这么多。", "As far as it goes. This is it."), L("kuro", "发给 Vivi 了。", "Sent to Vivi.")]],
   ],
 };

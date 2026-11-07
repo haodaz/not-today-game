@@ -423,8 +423,12 @@
           "assist": {
             "cadence": "nightly",
             "ingest": "pull",
+            "compute": "canned",
             "params": "auto",
             "selfedit": "config",
+            "gate": "sample",
+            "rollout": "replace",
+            "evals": "loss",
             "observe": "logs",
             "front": "export"
           }
@@ -443,11 +447,7 @@
               },
               {
                 "who": "kuro",
-                "text": "Her page shows four full bars. This is what the backend has."
-              },
-              {
-                "who": "kuro",
-                "text": "Each item can be done a few ways. Pick one; the bars will tell you."
+                "text": "Her page shows four full bars; this is what the backend has. Each item can be done a few ways; pick them one at a time and the bars will follow. Anything you're unsure of, hand to me."
               }
             ]
           },
@@ -456,7 +456,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "It trains every night and ships when it's done. You sleep."
+                "text": "Every night at two it retrains itself and swaps the live model when it's done. It rewrites itself while you sleep, and nobody is watching."
               }
             ]
           },
@@ -465,7 +465,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Once a week. The old one stays on file."
+                "text": "It changes once a week, only the adapter layer, and the old model stays on file. Slower, but if something goes wrong you can go back."
               }
             ]
           },
@@ -473,12 +473,8 @@
             "on": "mod:ingest:manual",
             "lines": [
               {
-                "who": "me",
-                "text": "'All business systems' means these three tables."
-              },
-              {
                 "who": "kuro",
-                "text": "Every Monday. Her 'understands automatically' is Zhang importing on Mondays."
+                "text": "Her page says it 'understands all business systems automatically'. In the backend that means Zhang importing three tables by hand every Monday."
               }
             ]
           },
@@ -487,7 +483,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "It pulls every night. Mismatched fields go in too."
+                "text": "It pulls the three clients' APIs every night, so Zhang is spared. When a field doesn't match it goes in anyway, and nobody will notice."
               }
             ]
           },
@@ -496,7 +492,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "As the page says. The page is all there is."
+                "text": "This one is copied from her page. The sentence is there; nothing comes in."
               }
             ]
           },
@@ -504,12 +500,8 @@
             "on": "mod:compute:real",
             "lines": [
               {
-                "who": "me",
-                "text": "Forty seconds. Real ones."
-              },
-              {
                 "who": "kuro",
-                "text": "She wants three."
+                "text": "A real run takes forty seconds, the result is real, and every step can be checked. She wants three seconds."
               }
             ]
           },
@@ -518,7 +510,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Three seconds is an animation. The bars don't count animations."
+                "text": "Three seconds, because the numbers are hard-coded and the picture is an animation. I'd say an animation is also an implementation."
               }
             ]
           },
@@ -527,7 +519,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Let it pick its own parameters. If it picks wrong, it picked."
+                "text": "It searches its own parameters every night and keeps the best set. If it picks wrong, it picked, and nobody carries it."
               }
             ]
           },
@@ -536,7 +528,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Fixed. When the data changes, a human retunes."
+                "text": "You tune one set by hand and fix it. Stable, but when the data changes someone has to tune it again."
               }
             ]
           },
@@ -545,7 +537,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "It rewrites its own words. What changed is in the logs. If there are logs."
+                "text": "It may rewrite its own prompt, and the change takes effect at once. What changed is only in the logs, if you turned logs on."
               }
             ]
           },
@@ -554,7 +546,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "It edits itself. Who's watching?"
+                "text": "It may edit its own training config and decide which data goes into the next round. It is choosing what it learns from, and nobody reviews it."
               }
             ]
           },
@@ -563,7 +555,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "A human clicks. She won't like this line."
+                "text": "Every change waits for your click before it ships. Safe, yes, and several clicks a day. She won't like this line."
               }
             ]
           },
@@ -572,7 +564,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "One in ten gets read. What slips through is luck."
+                "text": "One change in ten gets read by a person; the other nine pass on their own. What slips through is luck."
               }
             ]
           },
@@ -581,7 +573,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Ships as soon as it's trained. The old one is gone."
+                "text": "The new model replaces the live one as soon as it's trained, and the old one is gone. Fast; deal with it when it breaks."
               }
             ]
           },
@@ -590,7 +582,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "If it breaks you can roll back. Rolling back takes a human too."
+                "text": "One round in a sandbox first, then it ships, and you can roll back. Rolling back still takes a person's click."
               }
             ]
           },
@@ -599,7 +591,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "It grades its own exam."
+                "text": "Only the training loss is watched; if it drops, it's better. It is grading its own exam."
               }
             ]
           },
@@ -608,7 +600,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "The eval set never enters training. You set the line."
+                "text": "One evaluation set stays out of training, and every round must clear the line. You set the line; this is the one thing it cannot fake."
               }
             ]
           },
@@ -617,7 +609,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Logs. When it breaks, at least you know which step."
+                "text": "Every step is logged. When something breaks you at least know which step, and it keeps logging when nobody reads."
               }
             ]
           },
@@ -626,7 +618,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "The button goes somewhere now. The export page, our own."
+                "text": "The 'Start analysis' button now goes to our own export page. Not pretty, but every button has something behind it."
               }
             ]
           },
@@ -635,7 +627,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "The buttons are drawn. Nothing behind them."
+                "text": "The buttons are drawn as on her page, with nothing behind them. Clicking does nothing."
               }
             ]
           },
@@ -644,7 +636,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Approval off. Nobody's watching."
+                "text": "Approval is off. From now on nobody watches it ship."
               }
             ]
           },
@@ -657,7 +649,7 @@
               },
               {
                 "who": "kuro",
-                "text": "What can run, runs. The 'grows by itself' she wants isn't on any bar."
+                "text": "Everything that can run is running. The 'grows by itself' she wants is on none of these bars."
               }
             ]
           },
@@ -666,7 +658,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "I set six. I left the safety bar alone."
+                "text": "I set the rest for you. I left the safety bar alone; it isn't mine to keep."
               }
             ]
           },

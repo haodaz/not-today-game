@@ -344,6 +344,10 @@ export interface Session {
    * for the 300 ms typing delay. Lines past the end of `times` show at once. Session only.
    */
   ideTyping: { key: string; times: number[] } | null;
+  /** tune (2026-11-08): the parameter card shown, per task page key (the carousel). */
+  tuneIndex: Record<string, number>;
+  /** tune: while Kuro "executes" a choice the preview keeps its previous page (then it changes, then Kuro speaks). */
+  ideHold: { key: string; until: number; src: string } | null;
   /**
    * meeting R3: the meeting being watched (key day:task): the line shown (-1 none), whether it is
    * playing, and a generation that a pause / restart bumps so a stale tick does nothing. Session
@@ -531,6 +535,8 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     boardPick: null,
     boardLockOpen: false,
     ideTyping: null,
+    tuneIndex: {},
+    ideHold: null,
     meetingPlay: null,
     shell: {},
     objbarOpen: false,

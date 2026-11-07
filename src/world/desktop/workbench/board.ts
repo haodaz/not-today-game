@@ -8,7 +8,7 @@
 import type { State } from "@state/types.gen";
 import type { GameEvent } from "@state/events";
 import type { Task, TaskBoard } from "@state/days/tasks";
-import { autoUnlock, boardState, canFetch, canPrint, foundCardIds, isKuroCard, isObjectLock, isReadLock, lockCodesOffered, lockJammed, lockObjectAvailable, lockUsedOk, pathFound, trayCards, tuneCarried, tuneOfferPending, tuneStepsLeft, wrongReadings, type BoardState } from "@state/days/board";
+import { autoUnlock, boardState, canFetch, canPrint, foundCardIds, isKuroCard, isObjectLock, isReadLock, lockCodesOffered, lockJammed, lockObjectAvailable, lockUsedOk, modFound, pathFound, trayCards, tuneCarried, tuneOfferPending, tuneStepsLeft, wrongReadings, type BoardState } from "@state/days/board";
 import { ideOps, ideSrc, ideTranscript } from "@state/days/ide";
 import { cls, html, type SafeHtml } from "@world/html";
 import { FRAMES, frameUrl } from "../kuro/body";
@@ -269,15 +269,17 @@ function noteIdeLines(ctx: ActionContext, task: Task, board: TaskBoard, day: num
   ctx.session.ideTyping = { key, times };
 }
 
-/** A board action that, on an IDE board, types in the transcript lines it adds. */
+/** A board action that, on an IDE board, types in the transcript lines it adds (a tuning turn times its own). */
 function withIde(handler: ActionHandler): ActionHandler {
   return (ctx, data, el) => {
     const c = currentBoard(ctx);
     const day = ctx.store.getState().day;
     // shell R5: beats are allowed on every view, so any board with beats types its lines in.
     const before = c && (c.board.view === "ide" || c.board.beats) ? ideTranscript(c.board, ideOps(c.task, day, ctx.store.getEvents()), tuneCarried(c.board, ctx.store.getEvents())).length : null;
+    const typedBefore = ctx.session.ideTyping?.times.length ?? 0;
     handler(ctx, data, el);
-    if (c && before !== null) noteIdeLines(ctx, c.task, c.board, day, before);
+    // a tuning turn (board-mod / board-assist-mod) has already placed its lines in time
+    if (c && before !== null && !(c.board.tune && (ctx.session.ideTyping?.times.length ?? 0) > typedBefore)) noteIdeLines(ctx, c.task, c.board, day, before);
   };
 }
 
@@ -428,7 +430,24 @@ const actions: Record<string, ActionHandler> = {
     const path = s.mods[id] === pathId ? null : pathId;
     if (path !== null && s.mods[id] === undefined && tuneStepsLeft(c.board, s) === 0) return;
     const before = transcriptLength(ctx, c);
+    const held = holdPreview(ctx, c);
     ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "mod", id, path } });
+    tuneTurn(ctx, c, before, held);
+    finishTune(ctx, c, before);
+    ctx.rerender();
+  },
+  // tune: 克总帮我处理一下 — Kuro picks this module's path (its taste); the same turn as the player's pick.
+  "board-assist-mod"(ctx, data) {
+    const c = currentBoard(ctx);
+    const id = data.mod;
+    const tune = c?.board.tune;
+    if (!c || !tune || !id || !(id in tune.assist)) return;
+    const mod = tune.mods.find((m) => m.id === id);
+    if (!mod || !modFound(mod, ctx.store.getState().day, ctx.store.getEvents())) return;
+    const before = transcriptLength(ctx, c);
+    const held = holdPreview(ctx, c);
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "assistMod", id } });
+    tuneTurn(ctx, c, before, held);
     finishTune(ctx, c, before);
     ctx.rerender();
   },
@@ -501,6 +520,53 @@ function transcriptLength(ctx: ActionContext, c: { task: Task; board: TaskBoard 
 /** ide R4's typing pace (ms per line) and the pause after the last line before the work goes. */
 const LINE_MS = 300;
 const AFTER_LINES_MS = 1400;
+/** tune: how long Kuro "executes" a choice (the busy bubble; the preview held) before it speaks. */
+const BUSY_MS = 1400;
+
+/** tune: the preview's page before a choice (so it can be held while Kuro works). */
+function holdPreview(ctx: ActionContext, c: { task: Task; board: TaskBoard }): string {
+  const events = ctx.store.getEvents();
+  const day = ctx.store.getState().day;
+  return ideSrc(c.board, boardState(c.board, day, c.task.id, events), ideOps(c.task, day, events), null, tuneCarried(c.board, events));
+}
+
+/**
+ * tune (author 2026-11-08, 「不管是用户选了，还是克总做了，左边对话都会出现一个用户的气泡：你选了 xxx，然后是 AI
+ * 的那种 loading：克总执行中。然后 preview 变化。然后克总说一句什么。然后玩家再选下一个参数变化」): a choice is
+ * a turn. The player's bubble shows at once; the preview keeps its previous page and the busy bubble
+ * shows for BUSY_MS; then the preview changes and Kuro's sentence types; then the card moves on to
+ * the next item still unset. The chips are disabled until Kuro has spoken (the view reads the typing).
+ */
+function tuneTurn(ctx: ActionContext, c: { task: Task; board: TaskBoard }, before: number, heldSrc: string): void {
+  const day = ctx.store.getState().day;
+  const after = transcriptLength(ctx, c);
+  if (after <= before) return;
+  const key = ideKey(day, c.task);
+  const now = ctx.now?.() ?? Date.now();
+  const times = ctx.session.ideTyping?.key === key ? [...ctx.session.ideTyping.times] : [];
+  while (times.length < before) times.push(0);
+  times.length = before;
+  // the player's bubble now; Kuro's lines after the busy gap, one by one
+  times.push(now);
+  let at = now + BUSY_MS;
+  for (let i = before + 1; i < after; i++) {
+    times.push(at);
+    ctx.later(at - now + 16, ctx.rerender);
+    at += LINE_MS;
+  }
+  ctx.session.ideTyping = { key, times };
+  ctx.session.ideHold = { key, until: now + BUSY_MS, src: heldSrc };
+  ctx.later(BUSY_MS + 16, ctx.rerender);
+  // when Kuro has spoken, the card moves on to the next item still unset (the player may still go back)
+  const ops = ctx.store.getEvents().length;
+  ctx.later(at - now + 32, () => {
+    if (ctx.store.getEvents().length !== ops) return;
+    const st = boardState(c.board, day, c.task.id, ctx.store.getEvents());
+    const idx = c.board.tune!.mods.findIndex((m) => !(m.id in st.mods) && modFound(m, day, ctx.store.getEvents()));
+    if (idx >= 0) ctx.session.tuneIndex = { ...ctx.session.tuneIndex, [key]: idx };
+    ctx.rerender();
+  });
+}
 
 /**
  * tune (author 2026-11-08, 「所有的改装次数用完，就该进比赛了，没有一个按钮叫做改装完了我要比赛」, 「每次选完，
@@ -517,6 +583,8 @@ function finishTune(ctx: ActionContext, c: { task: Task; board: TaskBoard }, bef
   if (!canPrint(c.board, s)) return;
   const added = Math.max(0, transcriptLength(ctx, c) - before);
   const ops = ctx.store.getEvents().length;
+  // a turn's lines come after Kuro's busy gap
+  const busy = c.board.tune && added > 0 ? BUSY_MS : 0;
   setTimeout(() => {
     const now = currentBoard(ctx);
     if (!now || now.task.id !== c.task.id || ctx.store.getEvents().length !== ops) return;
@@ -527,7 +595,7 @@ function finishTune(ctx: ActionContext, c: { task: Task; board: TaskBoard }, bef
     printBoard(ctx, now, st);
     noteIdeLines(ctx, now.task, now.board, day, was);
     ctx.rerender();
-  }, added * LINE_MS + AFTER_LINES_MS);
+  }, busy + added * LINE_MS + AFTER_LINES_MS);
 }
 
 /** The board actions; on an IDE board each one types in the transcript lines it adds (ide R4). */

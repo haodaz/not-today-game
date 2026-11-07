@@ -120,12 +120,20 @@ export function ideTranscript(board: TaskBoard, ops: readonly IdeOp[], carried: 
       case "keep":
         if (stepBoard(board, walk, op) !== walk) show("keep");
         break;
+      case "assistMod":
       case "mod": {
-        // tune: the switch's own beat (on / off) when it took, then — the moment the work is complete —
-        // `reach` (every bar over the line) or `steps` (the budget spent): the player's line, Kuro's.
+        // tune (author 2026-11-08): a choice is a turn — the player's bubble first (`pick:<module>:<path>`,
+        // or `pick:<module>:<path>:kuro` when Kuro picked; its text is the path's label, the view words it),
+        // then the path's beat (Kuro's sentence), then — the moment the work is complete — `reach` (every
+        // bar over the line) and/or `steps` (the budget spent: the player's words, Kuro's).
         const after = stepBoard(board, walk, op);
         if (after !== walk) {
-          show(op.path === null ? `unmod:${op.id}` : beats.has(`mod:${op.id}:${op.path}`) ? `mod:${op.id}:${op.path}` : `mod:${op.id}`);
+          const path = op.t === "assistMod" ? board.tune?.assist[op.id] ?? null : op.path;
+          if (path !== null) {
+            const label = board.tune?.mods.find((m) => m.id === op.id)?.paths.find((p) => p.id === path)?.label ?? path;
+            out.push({ on: `pick:${op.id}:${path}${op.t === "assistMod" ? ":kuro" : ""}`, who: "me", text: label });
+          }
+          show(path === null ? `unmod:${op.id}` : beats.has(`mod:${op.id}:${path}`) ? `mod:${op.id}:${path}` : `mod:${op.id}`);
           // the line crossed is a remark; the budget spent is the end of the work (the player's words) — both can be this choice
           if (tuneReached(board, after)) show("reach");
           if (tuneStepsLeft(board, after) === 0) show("steps");

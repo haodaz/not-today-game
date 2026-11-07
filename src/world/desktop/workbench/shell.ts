@@ -7,7 +7,7 @@
 import type { GameEvent } from "@state/events";
 import { boardState, canFetch, canPrint, foundCardIds, modFound, pathFound, pathOnMenu, taskForId, tuneCarried, tuneOfferPending, tuneOffers, tuneStepsLeft, type BoardState } from "@state/days/board";
 import { ideOps, ideSrc, ideTranscript, selectedSlot, type IdeLine } from "@state/days/ide";
-import { API_FIELD, SLOT_FIELD, type Task, type TaskBoard } from "@state/days/tasks";
+import { API_FIELD, SLOT_FIELD, type Task, type TaskBoard, type TuneMod, type TunePath } from "@state/days/tasks";
 import { deliverablePage } from "@state/files";
 import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t, tr } from "@world/i18n";
@@ -157,9 +157,10 @@ function explorer(ctx: AppContext, task: Task, board: TaskBoard, s: BoardState, 
 // ——— the panes (R3) ———
 
 /** 预览: browser chrome (the tab, the address line) and the iframe of `ideSrc`. */
-function previewPane(task: Task, board: TaskBoard, s: BoardState, ops: ReturnType<typeof ideOps>, selected: string, carried: Readonly<Record<string, string>>, today: number | null): SafeHtml {
-  // tune: a handed-in page opened again on a later day carries today's number (the page misplays from day 4).
-  const src = ideSrc(board, s, ops, selected, carried, today);
+function previewPane(task: Task, board: TaskBoard, s: BoardState, ops: ReturnType<typeof ideOps>, selected: string, carried: Readonly<Record<string, string>>, today: number | null, held: string | null): SafeHtml {
+  // tune: a handed-in page opened again on a later day carries today's number (the page misplays from day 4);
+  // while Kuro executes a choice the previous page is held (then it changes, then Kuro speaks).
+  const src = held ?? ideSrc(board, s, ops, selected, carried, today);
   const page = board.ide?.pages[selected] ?? 0;
   const file = (board.ide?.src ?? "").split("/").pop() ?? "";
   const title = task.deliverable?.label ?? board.title;
@@ -167,47 +168,54 @@ function previewPane(task: Task, board: TaskBoard, s: BoardState, ops: ReturnTyp
 }
 
 /**
- * tune (2026-11-08): the config file. The author's rule: the bars are a result and live in the
- * preview; what the player edits is the AI's training / constraints / support, so the 代码 pane
- * is `evolve.config.js`: one section per group (a comment line), one line per module with its
- * paths as chips (the chosen one filled; its sub-actions listed under it with the deltas it
- * carries); a module whose source is not found yet shows its hint instead. The tab bar counts the
- * modules set against the budget. Read back (not live): the same, no buttons.
+ * tune (2026-11-08, author): one parameter at a time. The 参数 pane is a card carousel — one module
+ * per card (‹ › and dots to move), its line of the config file as the title (`cadence: "nightly"
+ * // 微调节奏`), its paths as cards (label, sub-actions, deltas; the chosen one filled) and a fourth
+ * card, 克总帮我处理一下. While Kuro "executes" a choice (the busy gap, the typing of its sentence)
+ * the cards are disabled; afterwards the carousel moves to the next item still unset. A module
+ * whose source is not found yet shows its hint; a path with a source of its own shows its hint
+ * until found; a path that waits for the end of the work is absent. Read back (not live): every
+ * module on one list, no buttons.
  */
-function tunePane(board: TaskBoard, s: BoardState, day: number, events: readonly GameEvent[], live: boolean): SafeHtml {
+function tunePane(board: TaskBoard, s: BoardState, day: number, events: readonly GameEvent[], live: boolean, session: Session, key: string, busy: boolean): SafeHtml {
   const tune = board.tune!;
-  const left = tuneStepsLeft(board, s);
   const steps = hasString("board.tune.steps") ? html`<span class="sh-tune-steps">${tr("board.tune.steps", { on: String(Object.keys(s.mods).length), max: String(tune.steps) })}</span>` : null;
   const sign = (x: number) => (x > 0 ? `+${x}` : `−${-x}`);
-  let n = 0;
-  const gut = () => html`<span class="sh-gut">${++n}</span>`;
-  const row = (m: (typeof tune.mods)[number]): SafeHtml => {
-    const chosen = s.mods[m.id];
-    if (!modFound(m, day, events)) {
-      const hint = m.hint ?? (hasString("board.notFound") ? t("board.notFound") : "");
-      return html`<div class="sh-mod notfound" aria-disabled="true" title="${hint}">${gut()}<span class="sh-mod-l"><code>${m.id}: null,</code> ${m.label}</span><span class="sh-mod-hint">${hint}</span></div>`;
-    }
-    const blocked = chosen === undefined && left === 0;
-    const chips = m.paths.filter((p) => pathOnMenu(p, s)).map((p) => {
-      const on = chosen === p.id;
-      // a path with a source of its own waits for it (her skin: Vivi's chat; the diff-only approval: the v17 you sent)
-      if (!pathFound(m, p, day, events)) {
-        const hint = p.hint ?? (hasString("board.notFound") ? t("board.notFound") : "");
-        return html`<div class="sh-path notfound" aria-disabled="true" title="${hint}"><span class="sh-path-l">${hint}</span></div>`;
-      }
-      const deltas = tune.dims.filter((d) => p.delta[d.id] !== undefined).map((d) => html`<span class="${cls("sh-mod-d", p.delta[d.id]! > 0 ? "plus" : "minus")}">${d.label} ${sign(p.delta[d.id]!)}</span>`);
-      const body = html`<span class="sh-path-l">${p.label}</span><span class="sh-mod-ds">${deltas}</span>`;
-      if (!live) return html`<div class="${cls("sh-path", on && "on")}">${body}</div>`;
-      return html`<button type="button" class="${cls("sh-path", on && "on")}" data-action="board-mod" data-mod="${m.id}" data-path="${p.id}" aria-pressed="${on ? "true" : "false"}"${blocked ? html` disabled` : null}>${body}</button>`;
+  const deltasOf = (p: TunePath) => tune.dims.filter((d) => p.delta[d.id] !== undefined).map((d) => html`<span class="${cls("sh-mod-d", p.delta[d.id]! > 0 ? "plus" : "minus")}">${d.label} ${sign(p.delta[d.id]!)}</span>`);
+  const groupLabel = (m: TuneMod) => tune.groups?.find((g) => g.id === m.group)?.label ?? "";
+  if (!live) {
+    // read back: the config as it was handed in
+    const rows = tune.mods.map((m) => {
+      const p = m.paths.find((x) => x.id === s.mods[m.id]);
+      return html`<div class="${cls("sh-mod", p && "on")}"><span class="sh-mod-l"><code>${m.id}: ${p ? `"${p.id}"` : "null"},</code> ${m.label}${p ? html` · ${p.label}` : null}</span></div>`;
     });
-    const path = m.paths.find((p) => p.id === chosen);
-    const bullets = path ? html`<ul class="sh-path-b">${path.bullets.map((b) => html`<li>${b}</li>`)}</ul>` : null;
-    return html`<div class="${cls("sh-mod", chosen !== undefined && "on")}">${gut()}<span class="sh-mod-l"><code>${m.id}: ${chosen !== undefined ? `"${chosen}"` : "null"},</code> ${m.label}</span><div class="sh-paths">${chips}</div>${bullets}</div>`;
-  };
-  const groups = tune.groups ?? [];
-  const sections = groups.map((g) => html`<div class="sh-mod-g">${gut()}<span class="sh-mod-gl">// ${g.label}</span></div>${tune.mods.filter((m) => m.group === g.id).map(row)}`);
-  const rest = tune.mods.filter((m) => m.group === undefined || !groups.some((g) => g.id === m.group)).map(row);
-  return html`<div class="sh-editor sh-tune"><div class="sh-tabs"><span class="sh-tab on">evolve.config.js</span>${steps}</div><div class="sh-mods">${sections}${rest}</div></div>`;
+    return html`<div class="sh-editor sh-tune"><div class="sh-tabs"><span class="sh-tab on">evolve.config.js</span>${steps}</div><div class="sh-mods read">${rows}</div></div>`;
+  }
+  const n = tune.mods.length;
+  const idx = Math.min(Math.max(session.tuneIndex[key] ?? tune.mods.findIndex((m) => !(m.id in s.mods) && modFound(m, day, events)), 0), n - 1);
+  const m = tune.mods[idx]!;
+  const chosen = s.mods[m.id];
+  const found = modFound(m, day, events);
+  const blocked = busy || (chosen === undefined && tuneStepsLeft(board, s) === 0);
+  const cards = !found
+    ? [html`<div class="sh-path notfound" aria-disabled="true"><span class="sh-path-l">${m.hint ?? (hasString("board.notFound") ? t("board.notFound") : "")}</span></div>`]
+    : m.paths.filter((p) => pathOnMenu(p, s)).map((p) => {
+        const on = chosen === p.id;
+        if (!pathFound(m, p, day, events)) {
+          const hint = p.hint ?? (hasString("board.notFound") ? t("board.notFound") : "");
+          return html`<div class="sh-path notfound" aria-disabled="true" title="${hint}"><span class="sh-path-l">${hint}</span></div>`;
+        }
+        const body = html`<span class="sh-path-l">${p.label}</span><ul class="sh-path-b">${p.bullets.map((b) => html`<li>${b}</li>`)}</ul><span class="sh-mod-ds">${deltasOf(p)}</span>`;
+        return html`<button type="button" class="${cls("sh-path", on && "on")}" data-action="board-mod" data-mod="${m.id}" data-path="${p.id}" data-chosen="${chosen ?? ""}" aria-pressed="${on ? "true" : "false"}"${blocked ? html` disabled` : null}>${body}</button>`;
+      });
+  const kuroCard = found && hasString("board.tune.letKuro") ? html`<button type="button" class="sh-path kuro" data-action="board-assist-mod" data-mod="${m.id}"${blocked ? html` disabled` : null}><span class="sh-path-l">${tr("board.tune.letKuro")}</span></button>` : null;
+  const prev = hasString("board.tune.prev") ? t("board.tune.prev") : "‹";
+  const next = hasString("board.tune.next") ? t("board.tune.next") : "›";
+  const dots = tune.mods.map((x, i) => html`<button type="button" class="${cls("sh-dot", i === idx && "on", x.id in s.mods && "set")}" data-action="shell-tune-go" data-index="${i}" aria-label="${x.label}" title="${x.label}"></button>`);
+  const of = hasString("board.tune.of") ? tr("board.tune.of", { i: String(idx + 1), n: String(n) }) : html`${idx + 1} / ${n}`;
+  const nav = html`<div class="sh-tune-nav"><button type="button" class="sh-tune-arrow" data-action="shell-tune-go" data-index="${idx - 1}"${idx === 0 ? html` disabled` : null} aria-label="${prev}" title="${prev}">‹</button><span class="sh-dots">${dots}</span><span class="sh-tune-of">${of}</span><button type="button" class="sh-tune-arrow" data-action="shell-tune-go" data-index="${idx + 1}"${idx === n - 1 ? html` disabled` : null} aria-label="${next}" title="${next}">›</button></div>`;
+  const title = html`<div class="sh-mod-g"><span class="sh-mod-gl">// ${groupLabel(m)}</span></div><div class="sh-mod-title"><code>${m.id}: ${chosen !== undefined ? `"${chosen}"` : "null"},</code> <span class="sh-mod-name">${m.label}</span></div>`;
+  return html`<div class="sh-editor sh-tune"><div class="sh-tabs"><span class="sh-tab on">evolve.config.js</span>${steps}</div>${nav}<div class="sh-card-body">${title}<div class="sh-paths">${cards}${kuroCard}</div></div></div>`;
 }
 
 /** 代码: the selected page's file, line numbers, and its slot line drawn as the inline field. */
@@ -316,7 +324,12 @@ const shellAv = () => html`<img class="sh-av" src="${frameUrl(FRAMES.idle[0])}" 
 /** The conversation's bubbles (R5): the player at the right; Kuro at the left, its portrait on the first line of a run. */
 function bubbles(day: number, lines: readonly { readonly who: "me" | "kuro"; readonly on: string; readonly body: SafeHtml | string }[]): SafeHtml[] {
   return lines.map((l, i) => {
-    if (l.who === "me") return html`<div class="sh-me" data-on="${l.on}"><div class="sh-bub">${l.body}</div></div>`;
+    if (l.who === "me") {
+      // tune: a pick is worded here (the transcript carries the path's label): 我选了：… / 这项交给克总。它选了：…
+      const pick = l.on.startsWith("pick:") && typeof l.body === "string";
+      const body = pick ? (l.on.endsWith(":kuro") && hasString("board.tune.kuroChose") ? tr("board.tune.kuroChose", { path: l.body as string }) : hasString("board.tune.chose") ? tr("board.tune.chose", { path: l.body as string }) : l.body) : l.body;
+      return html`<div class="sh-me" data-on="${l.on}"><div class="sh-bub">${body}</div></div>`;
+    }
     const first = i === 0 || lines[i - 1]!.who !== "kuro";
     // kuro-zh-answers R4: a plain-text Kuro line gets its face (markup from work.ts already has it).
     const body = typeof l.body === "string" ? kuroText(day, l.body) : l.body;
@@ -369,20 +382,22 @@ function conversation(ctx: AppContext, task: Task, day: number, live: boolean, f
   const visible = lines.filter((_, i) => (typing[i] ?? 0) <= nowMs);
   const av = shellAv();
   const rows = bubbles(day, visible.map((l) => ({ who: l.who, on: l.on, body: l.text })));
-  const dots = visible.length < lines.length ? html`<div class="sh-kuro typing" aria-hidden="true">${av}<div class="sh-kt">…</div></div>` : null;
+  // tune: while Kuro executes a choice the bubble says so (board.tune.busy), not just dots
+  const busyText = board?.tune && hasString("board.tune.busy") ? tr("board.tune.busy") : html`…`;
+  const dots = visible.length < lines.length ? html`<div class="sh-kuro typing" aria-hidden="true">${av}<div class="sh-kt">${busyText}</div></div>` : null;
   let chips: SafeHtml | null = null;
   if (live && board && s) {
     const assist = hasString("board.assist") ? html`<button type="button" class="sh-chip" data-action="board-assist">${tr("board.assist")}</button>` : null;
     if (board.tune) {
-      // tune: no finish button (the work goes by itself when the budget is spent); Kuro's end-of-work
-      // offer, when it is on the table, is a story choice here: take the path, or 不接.
-      // the chips come after the lines (nothing pops: the words first, then the choice)
+      // tune: no finish button (the work goes by itself when the budget is spent) and no 让它补全 (Kuro is
+      // asked per item on the card); Kuro's end-of-work offer, when it is on the table, is a story
+      // choice here: take the path, or 不接 — after the lines (nothing pops: the words first, then the choice).
       const typed = visible.length === lines.length;
       const offer = typed && tuneOfferPending(board, s)
         ? tuneOffers(board).map(({ mod, path }) => html`<button type="button" class="sh-chip primary" data-action="board-mod" data-mod="${mod.id}" data-path="${path.id}">${path.label}</button>`)
         : [];
       const keep = offer.length && hasString("board.tune.keep") ? html`<button type="button" class="sh-chip" data-action="board-keep">${tr("board.tune.keep")}</button>` : null;
-      chips = html`${offer.length ? null : assist}${offer}${keep}`;
+      chips = html`${offer}${keep}`;
     } else {
       const label = board.view === "ide" && hasString("board.ide.snapshot") ? tr("board.ide.snapshot") : finishLabel(task);
       const finish = html`<button type="button" class="sh-chip primary" data-action="board-print"${canPrint(board, s) ? null : html` disabled`}>${label}</button>`;
@@ -426,10 +441,15 @@ export function renderShell(ctx: AppContext, task: Task, day: number, fill: Fill
   // The frame (R1): the explorer card, the conversation, the pane cards.
   const ex = board && live && st.explorer ? explorer(ctx, task, board, s!, st, selected) : null;
   const carried = board ? tuneCarried(board, events) : {};
+  const key = shellKey(day, task.id);
+  const hold = session.ideHold && session.ideHold.key === key && session.ideHold.until > ctx.nowMs ? session.ideHold.src : null;
+  // tune: a turn is under way while its lines are still typing (the cards wait for Kuro to speak)
+  const typing = session.ideTyping?.key === key ? session.ideTyping.times : [];
+  const busy = !!board?.tune && typing.some((t) => t > ctx.nowMs);
   const paneCards = open.map((p) => {
     let body: SafeHtml;
-    if (p === "preview") body = previewPane(task, board!, s!, ops, selected, carried, live ? null : state.day);
-    else if (p === "code") body = board!.tune ? tunePane(board!, s!, day, events, live) : codePane(board!, s!, session, selected, ops.some((o) => o.t === "print"), live);
+    if (p === "preview") body = previewPane(task, board!, s!, ops, selected, carried, live ? null : state.day, hold);
+    else if (p === "code") body = board!.tune ? tunePane(board!, s!, day, events, live, session, key, busy) : codePane(board!, s!, session, selected, ops.some((o) => o.t === "print"), live);
     else if (p === "table") body = tablePane(ctx, task, board!, s!, live, day);
     else if (p === "meeting") body = meetingWindow(ctx, task, board!);
     else if (p === "files") body = board ? filesPane(ctx, board, st, fill) : html``;
@@ -483,6 +503,15 @@ function closePane(st: ShellState, pane: PaneId): void {
 const isPane = (v: string | undefined): v is PaneId => (PANE_ORDER as readonly (string | undefined)[]).includes(v);
 
 export const taskShellActions: Record<string, ActionHandler> = {
+  // tune: ‹ › and the dots move the parameter card (session only).
+  "shell-tune-go"(ctx, data) {
+    const p = pageOf(ctx);
+    const i = Number(data.index);
+    const n = p?.task.board?.tune?.mods.length ?? 0;
+    if (!p || !Number.isInteger(i) || i < 0 || i >= n) return;
+    ctx.session.tuneIndex = { ...ctx.session.tuneIndex, [shellKey(p.day, p.task.id)]: i };
+    ctx.rerender();
+  },
   // ⊟: the explorer shows / hides.
   "shell-explorer"(ctx) {
     const p = pageOf(ctx);

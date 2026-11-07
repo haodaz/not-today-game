@@ -737,7 +737,8 @@ function boardTune(v: unknown, w: string): BoardTune {
     if (!pathIds.get(id)!.has(p)) fail(`${w}.assist.${id}`, `"${p}" is not a path of "${id}"`);
     assist[id] = p;
   }
-  if (Object.keys(assist).length > steps) fail(`${w}.assist`, "Kuro's set is over the step budget");
+  // 克总帮我处理一下 is offered on every module: Kuro has a taste for each.
+  for (const id of modIds) if (!(id in assist)) fail(`${w}.assist`, `module "${id}" has no path for Kuro to pick`);
   let carry: BoardTune["carry"];
   if (v.carry !== undefined) {
     if (!isRecord(v.carry)) fail(`${w}.carry`, "must be an object");

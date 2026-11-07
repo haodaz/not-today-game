@@ -130,13 +130,21 @@ describe("tune: modules, paths and the bars", () => {
     expect(tuneStepsLeft(b3, swapped)).toBe(2);
     expect(tuneCarried(b3, [])).toEqual({});
   });
-  it("Kuro's assist sets its own choice in place of yours (it ignores the safety bar)", () => {
+  it("Kuro has a pick for every module; 克总帮我处理一下 sets that module (one assist); 让它补全 fills what is still unset within the budget", () => {
     const b = d2().board!;
-    let s = stepBoard(b, freshBoard(b), { t: "mod", id: "gate", path: "every" });
-    s = stepBoard(b, s, { t: "assistFill" });
-    expect(s.mods).toEqual(b.tune!.assist);
+    for (const m of b.tune!.mods) expect(b.tune!.assist[m.id]).toBeDefined();
+    let s = stepBoard(b, freshBoard(b), { t: "assistMod", id: "compute" });
+    expect(s.mods).toEqual({ compute: b.tune!.assist.compute });
     expect(s.assists).toBe(1);
-    expect(tuneDims(b, s).safe).toBeLessThan(b.tune!.reach - 10);
+    expect(stepBoard(b, s, { t: "assistMod", id: "zzz" })).toBe(s);
+    s = stepBoard(b, s, { t: "mod", id: "gate", path: "every" });
+    s = stepBoard(b, s, { t: "assistFill" });
+    expect(Object.keys(s.mods)).toHaveLength(b.tune!.steps);
+    expect(s.mods.gate).toBe("every"); // what you set stays
+    expect(s.mods.compute).toBe(b.tune!.assist.compute);
+    expect(s.assists).toBe(2);
+    expect(s.done).toBe(true);
+    expect(tuneDims(b, s).safe).toBeLessThan(b.tune!.reach - 10); // Kuro's taste ignores safety
   });
   it("the night's judgement counts the bars further than the slack under the line as wrong slots", () => {
     const b = d2().board!;
@@ -166,6 +174,9 @@ describe("tune: modules, paths and the bars", () => {
     const b2 = d2().board!;
     const ons = ideTranscript(b2, [{ t: "mod", id: "selfedit", path: "config" }, { t: "mod", id: "selfedit", path: "config" }, { t: "mod", id: "gate", path: "every" }, { t: "mod", id: "gate", path: null }]).map((l) => l.on);
     expect(ons.filter((o) => o === "mod:selfedit:config")).toHaveLength(1);
+    expect(ons.indexOf("pick:selfedit:config")).toBe(ons.indexOf("mod:selfedit:config") - 1); // the player's bubble, then Kuro
+    expect(ons.filter((o) => o === "pick:selfedit:config")).toHaveLength(1); // a pick that did not take says nothing
+    expect(ideTranscript(b2, [{ t: "assistMod", id: "compute" }]).map((l) => l.on)).toContain(`pick:compute:${b2.tune!.assist.compute}:kuro`);
     expect(ons).toContain("mod:gate:every");
     expect(ons).toContain("unmod:gate");
     const six = Object.entries({ ...DAY2_BEST, ingest: "manual" }).map(([id, path]) => ({ t: "mod", id, path }) as const);
@@ -237,7 +248,7 @@ describe("tune: modules, paths and the bars", () => {
     bad((b) => (b.tune.mods[0].paths[0].delta.auto = 0), /non-zero/);
     bad((b) => (b.tune.mods[0].paths[0].bullets = []), /non-empty/);
     bad((b) => (b.tune.assist = { cadence: "zzz" }), /not a path/);
-    bad((b) => (b.tune.assist = Object.fromEntries(b.tune.mods.map((m: any) => [m.id, m.paths[0].id]))), /budget/);
+    bad((b) => { delete b.tune.assist.cadence; }, /no path for Kuro/);
     bad((b) => b.beats.push({ on: "mod:zzz", lines: [{ who: "kuro", text: "x" }] }), /not a module/);
     bad((b) => b.beats.push({ on: "mod:cadence:zzz", lines: [{ who: "kuro", text: "x" }] }), /not a path/);
     bad((b) => (b.tune.start = { auto: 20 }), /no start value/);

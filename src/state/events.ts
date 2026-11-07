@@ -117,7 +117,9 @@ export type BoardOp =
   /** tune (2026-11-08): a module of a tuning board set to one of its paths (`path`), or cleared (null); the bars move. */
   | { readonly t: "mod"; readonly id: string; readonly path: string | null }
   /** tune: the player declined the path Kuro brought up at the end (her skin): the work goes as it is. */
-  | { readonly t: "keep" };
+  | { readonly t: "keep" }
+  /** tune (author 2026-11-08): 克总帮我处理一下 — Kuro picks this module's path (its own taste, `tune.assist`). */
+  | { readonly t: "assistMod"; readonly id: string };
 
 export type EventKind = GameEvent["kind"];
 

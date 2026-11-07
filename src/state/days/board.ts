@@ -99,6 +99,14 @@ export function stepBoard(board: TaskBoard, s: BoardState, op: BoardOp): BoardSt
       return { ...s, fetched: true };
     case "keep":
       return board.tune && s.done && !s.decided ? { ...s, decided: true } : s;
+    case "assistMod": {
+      // tune: Kuro picks this module's path (its taste); the same rules as the player's pick, one assist.
+      const tune = board.tune;
+      const path = tune?.assist[op.id];
+      if (!tune || path === undefined) return s;
+      const next = stepBoard(board, s, { t: "mod", id: op.id, path });
+      return next === s ? s : { ...next, assists: s.assists + 1 };
+    }
     case "mod": {
       // tune: choosing a path for a module not yet set spends a step (never over the budget); another
       // path for a set module swaps it for free; null clears it and gives the step back. Unknown
@@ -128,8 +136,12 @@ export function stepBoard(board: TaskBoard, s: BoardState, op: BoardOp): BoardSt
       return { ...s, slots: next };
     }
     case "assistFill": {
-      // tune: Kuro's choice replaces whatever is set (it does not know what you were trying).
-      if (board.tune) return tuneMarkDone(board, { ...s, mods: { ...board.tune.assist }, unlocked: true, assists: s.assists + 1 });
+      // tune: Kuro's choice for every module still unset, within the budget (one assist).
+      if (board.tune) {
+        let next: BoardState = s;
+        for (const m of board.tune.mods) if (!(m.id in next.mods)) next = stepBoard(board, next, { t: "mod", id: m.id, path: board.tune.assist[m.id]! });
+        return tuneMarkDone(board, { ...next, unlocked: true, assists: s.assists + 1 });
+      }
       const slots = { ...s.slots };
       for (const slot of board.slots) if (!(slot.id in slots)) slots[slot.id] = board.kuro.fill[slot.id]!;
       return { ...s, slots, unlocked: true, assists: s.assists + 1 };
@@ -393,6 +405,10 @@ export function validateBoardStep(day: number, taskId: string, op: BoardOp): voi
       return;
     case "keep":
       if (!board.tune) throw new Error("boardStep: this board has no modules");
+      return;
+    case "assistMod":
+      if (!board.tune) throw new Error("boardStep: this board has no modules");
+      if (!board.tune.mods.some((m) => m.id === op.id)) throw new Error(`boardStep: "${op.id}" is not a module`);
       return;
     case "mod": {
       if (!board.tune) throw new Error("boardStep: this board has no modules");
