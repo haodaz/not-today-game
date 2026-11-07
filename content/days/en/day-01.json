@@ -240,6 +240,12 @@
             "k": "inner",
             "t": "A 41-second voice note. Opening it will cost more than 41 seconds.",
             "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "Order lunch first. Once I start I'll forget.",
+            "where": "screen:msgs:boss"
           }
         ]
       }

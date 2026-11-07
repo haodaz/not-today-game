@@ -1,0 +1,32 @@
+{
+  "_note": "The workbench's past (guidance R6): three finished tasks so a first-day player knows what a task looks like. Story year 2028.",
+  "tasks": [
+    {
+      "id": "past-1",
+      "title": "Check the receivables sheet.",
+      "date": "2028-10-14",
+      "mode": "let",
+      "me": "Check the receivables sheet.",
+      "kuro": "Done. Qinghe Logistics is real money; the other three say paid and the books say nothing.",
+      "result": "Sent · it did it"
+    },
+    {
+      "id": "past-2",
+      "title": "Go over the investor FAQ.",
+      "date": "2028-10-15",
+      "mode": "look",
+      "me": "Go over the investor FAQ.",
+      "kuro": "Question 3 and question 9 contradict each other. I left one spot for you to look at.",
+      "result": "Sent · it did it, I looked"
+    },
+    {
+      "id": "past-3",
+      "title": "Go over contract v16.",
+      "date": "2028-10-15",
+      "mode": "self",
+      "me": "Go over contract v16.",
+      "kuro": "You read it all yourself. Clause 8 became thirty days, the boss's words.",
+      "result": "Sent · did it myself"
+    }
+  ]
+}

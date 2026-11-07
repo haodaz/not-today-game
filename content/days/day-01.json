@@ -240,6 +240,12 @@
             "k": "inner",
             "t": "41 秒的语音，点开肯定不止这么点。",
             "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "先把饭点了，等会儿干起来就忘了。",
+            "where": "screen:msgs:boss"
           }
         ]
       }
