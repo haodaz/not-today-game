@@ -38,3 +38,11 @@ The `open` beat is where Kuro tells a first-time player what to do (drag a sourc
 - `ideTranscript`: open first; `fill:S:C` beats over `fill:S`; once per beat; kuro / print / send beats; replay of the same ops gives the same list.
 - View: an `ide` board renders the three columns, the iframe `src` equals `ideSrc`, the print button reads 打快照; a table board renders as today.
 - A fixture `ide` board plays through: find sources, fill, snapshot, send. (Claude switches day 1 task3 to `view: "ide"` after this lands.)
+
+## ide v2 — the work is a programmer's (2026-11-08, author; Claude implements)
+「v16 和 v17 有一点差异对比。你要从代码工作的角度告诉我怎么让玩家执行对比、合并。并且最后要重新计算其中的数据（从未来智能的某个接口拿最新数据），然后做出 fixed 的数据（断开接口之类的）。并且让这一切变得可操作。」 v17 is the analysis (事情 A), v16 is yesterday's version (invented), v18 is day 3's self-evolution version.
+- **Content** (`board.ide`): `diff: { <slot>: { line, v16, v17 } }` — per page the one line Kuro's overnight merge changed (never the slot's own line); `api: { live, fixed, at, snap }` — the data import's two targets, when the data was pulled, the snapshot id. `{{api}}` in a code line is drawn as `live` until the snapshot is printed, then `fixed`. Beats: `merge:<slot>:<v16|v17>`, `merge:<slot>`, `merge` (every differing page merged), `fetch`.
+- **Steps, in order, each lit by G7**: (1) 对比 → 合并: a page with a difference shows its dot; its code pane shows the line as − v16 / + v17 with 要 v17 的 / 留 v16 的 (op `merge`); (2) 填: the sources into the slots as before; (3) 重算: 拉最新数据 (op `fetch`, once, only after 1 and 2): the preview's numbers change (836 → 211 nodes, 4,912 → 1,180 links; `?data=fetched`); (4) 固定: 打快照 (the `task` event as before) switches the import to `snapshot.js`; the page shows `SNAPSHOT snap-2028-10-16-01 · 截至 … · 已断开接口` (`&snap=1`); (5) 交给老王 as before.
+- The page opened on its own (no query) is the delivered version: the pulled numbers and the snapshot line.
+- Later days: the API's numbers may change while the snapshot does not (the foreshadowing lives here).
+- Tests: `tests/ide-v2.test.ts` (ops, gating, query, transcript, loader rejections) and the G7 sequence in `tests/guidance.test.ts`.
