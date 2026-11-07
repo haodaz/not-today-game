@@ -66,7 +66,10 @@ export function ideSrc(board: TaskBoard, s: BoardState, ops: readonly IdeOp[], c
     .map((slot) => `${encodeURIComponent(slot.id)}:${encodeURIComponent(s.slots[slot.id]!)}`)
     .join(",");
   const sep = src.includes("?") ? "&" : "?";
-  return `${src}${sep}${IDE_QUERY}&c=${page}&fill=${fill}`;
+  // ide v2 (2026-11-08): with an API, the page shows the live numbers until the data was pulled, and the
+  // snapshot line once it was printed (the import switched from the API to the snapshot file).
+  const data = board.ide?.api ? `&data=${s.fetched ? "fetched" : "live"}${ops.some((o) => o.t === "print") ? "&snap=1" : ""}` : "";
+  return `${src}${sep}${IDE_QUERY}&c=${page}&fill=${fill}${data}`;
 }
 
 /** A transcript line and the beat it belongs to. */
@@ -99,6 +102,16 @@ export function ideTranscript(board: TaskBoard, ops: readonly IdeOp[]): IdeLine[
         break;
       case "assistFill":
         show("kuro");
+        break;
+      case "merge": {
+        // ide v2: the page's own beat (by what was kept), then `merge` once every differing page is merged.
+        show(beats.has(`merge:${op.slot}:${op.keep}`) ? `merge:${op.slot}:${op.keep}` : `merge:${op.slot}`);
+        const after = stepBoard(board, walk, op);
+        if (Object.keys(board.ide?.diff ?? {}).every((id) => id in after.merged)) show("merge");
+        break;
+      }
+      case "fetch":
+        if (!walk.fetched) show("fetch");
         break;
       case "unlock":
         if (!walk.unlocked && op.code === board.given.lock?.answer) show("unlock");

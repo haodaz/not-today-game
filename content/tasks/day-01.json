@@ -424,7 +424,7 @@
             "r1": {
               "name": "03-共同智能空间.js",
               "code": [
-                "import { SNAP } from \"./snapshot.js\";",
+                "import { SNAP } from \"{{api}}\";",
                 "import { draw } from \"./space.js\";",
                 "",
                 "export const page = {",
@@ -439,7 +439,7 @@
             "r2": {
               "name": "05-三套说法.js",
               "code": [
-                "import { SNAP } from \"./snapshot.js\";",
+                "import { SNAP } from \"{{api}}\";",
                 "import { draw } from \"./space.js\";",
                 "",
                 "export const page = {",
@@ -454,7 +454,7 @@
             "r3": {
               "name": "11-AI先合人再核.js",
               "code": [
-                "import { SNAP } from \"./snapshot.js\";",
+                "import { SNAP } from \"{{api}}\";",
                 "import { draw } from \"./space.js\";",
                 "",
                 "export const page = {",
@@ -469,7 +469,7 @@
             "r4": {
               "name": "12-护城河.js",
               "code": [
-                "import { SNAP } from \"./snapshot.js\";",
+                "import { SNAP } from \"{{api}}\";",
                 "import { draw } from \"./space.js\";",
                 "",
                 "export const page = {",
@@ -484,7 +484,7 @@
             "r5": {
               "name": "13-客户.js",
               "code": [
-                "import { SNAP } from \"./snapshot.js\";",
+                "import { SNAP } from \"{{api}}\";",
                 "import { draw } from \"./space.js\";",
                 "",
                 "export const page = {",
@@ -495,6 +495,29 @@
                 "  draw: (t) => draw.clients(SNAP.receivable, t)",
                 "};"
               ]
+            }
+          },
+          "api": {
+            "live": "./api.js",
+            "fixed": "./snapshot.js",
+            "at": "2028-10-16 13:52",
+            "snap": "snap-2028-10-16-01"
+          },
+          "diff": {
+            "r1": {
+              "line": 6,
+              "v16": "  title: \"一个大脑管所有事，先得有一个共同智能空间\",",
+              "v17": "  title: \"群体脑要一起干活，先得有一个共同智能空间\","
+            },
+            "r2": {
+              "line": 6,
+              "v16": "  title: \"现实不会自己排好队：三家客户，各算各的\",",
+              "v17": "  title: \"可现实不会自己排好队：三家客户，三套说法\","
+            },
+            "r5": {
+              "line": 6,
+              "v16": "  title: \"这条路已经接上了客户\",",
+              "v17": "  title: \"这条路已经接上了客户：在链路上的，和已经到账的\","
             }
           }
         },
@@ -524,7 +547,7 @@
               },
               {
                 "who": "kuro",
-                "text": "还有五页空着。左边「素材」里点一句，再点代码里那个空格，预览就跟着变。"
+                "text": "昨晚我合了一版。带点的三页改了，你看一眼，要哪边的。"
               }
             ]
           },
@@ -637,19 +660,11 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "截在 13:42。之后发生的，都不算。"
-              },
-              {
-                "who": "me",
-                "text": "记录就是记录。"
+                "text": "快照打好了。接口断了，这份不会再变。"
               },
               {
                 "who": "kuro",
-                "text": "十五篇参考文献。谁会看？"
-              },
-              {
-                "who": "me",
-                "text": "我看。"
+                "text": "交给老王。他会念出来。"
               }
             ]
           },
@@ -663,6 +678,98 @@
               {
                 "who": "kuro",
                 "text": "他会看的。迟早。"
+              }
+            ]
+          },
+          {
+            "on": "merge:r1:v17",
+            "lines": [
+              {
+                "who": "me",
+                "text": "一群脑。就这么讲。"
+              },
+              {
+                "who": "kuro",
+                "text": "你昨天说的，我只是记下来了。"
+              }
+            ]
+          },
+          {
+            "on": "merge:r1:v16",
+            "lines": [
+              {
+                "who": "me",
+                "text": "先留昨天的。"
+              },
+              {
+                "who": "kuro",
+                "text": "老王要的是新的。你随时能改回来。"
+              }
+            ]
+          },
+          {
+            "on": "merge:r2:v17",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "三套说法并起来，再合掉同义的。你改的，不是我。"
+              }
+            ]
+          },
+          {
+            "on": "merge:r2:v16",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "各算各的，那就还是三家。"
+              }
+            ]
+          },
+          {
+            "on": "merge:r5:v17",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "到账的只有一家。写上也是一家。"
+              }
+            ]
+          },
+          {
+            "on": "merge:r5:v16",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "不提到账，老王会问。"
+              }
+            ]
+          },
+          {
+            "on": "merge",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "合完了。还有五页空着。左边「素材」里点一句，再点代码里那个空格，预览就跟着变。"
+              }
+            ]
+          },
+          {
+            "on": "fetch",
+            "lines": [
+              {
+                "who": "me",
+                "text": "数据拉一下。"
+              },
+              {
+                "who": "kuro",
+                "text": "接口回来了：二百一十一个点，一千一百八十条关系。和小张数的一样。"
+              },
+              {
+                "who": "me",
+                "text": "比上周少了一半多。"
+              },
+              {
+                "who": "kuro",
+                "text": "上周的是估的。这次是数的。"
               }
             ]
           }

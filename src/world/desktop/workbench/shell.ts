@@ -5,9 +5,9 @@
 // placing, Kuro's fill, the lock, print and send are the board's own actions. Card state is session
 // only, per task (`session.shell`); the board itself rebuilds from the log.
 import type { GameEvent } from "@state/events";
-import { boardState, canPrint, foundCardIds, taskForId, type BoardState } from "@state/days/board";
+import { boardState, canFetch, canPrint, foundCardIds, taskForId, type BoardState } from "@state/days/board";
 import { ideOps, ideSrc, ideTranscript, selectedSlot, type IdeLine } from "@state/days/ide";
-import { SLOT_FIELD, type Task, type TaskBoard } from "@state/days/tasks";
+import { API_FIELD, SLOT_FIELD, type Task, type TaskBoard } from "@state/days/tasks";
 import { deliverablePage } from "@state/files";
 import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t, tr } from "@world/i18n";
@@ -115,7 +115,8 @@ function explorer(ctx: AppContext, task: Task, board: TaskBoard, s: BoardState, 
   const folder = (key: string, rows: SafeHtml[]) => html`<div class="sh-folder"><div class="sh-frow"><span class="sh-tw">${ICONS.down}</span>${tr(key)}</div>${rows}</div>`;
   const slotRows = board.slots.map((slot) => {
     const name = ide ? (board.ide?.files?.[slot.id]?.name ?? slot.label) : slot.label;
-    const filled = slot.id in s.slots;
+    // ide v2: a page that still differs from v16 keeps its dot too.
+    const filled = slot.id in s.slots && !(board.ide?.diff?.[slot.id] && !(slot.id in s.merged));
     const seat = seats?.[slot.id];
     const seatTag = seat && hasString(`meeting.${seat}`) ? html`<span class="sh-seat">${tr(`meeting.${seat}`)}</span>` : null;
     // An unfilled slot's dot (like an unsaved file): drawn by CSS, no text glyph (R9).
@@ -154,21 +155,45 @@ function previewPane(task: Task, board: TaskBoard, s: BoardState, ops: ReturnTyp
 }
 
 /** 代码: the selected page's file, line numbers, and its slot line drawn as the inline field. */
-function codePane(board: TaskBoard, s: BoardState, session: Session, selected: string): SafeHtml {
+function codePane(board: TaskBoard, s: BoardState, session: Session, selected: string, printed = false): SafeHtml {
   const file = board.ide?.files?.[selected];
   if (!file) return html`<div class="sh-editor"></div>`;
   const cardId = s.slots[selected];
-  const lines = file.code.map((line, i) => {
+  // ide v2 (2026-11-08): the page's changed line shows as − v16 / + v17 until one is kept; the data
+  // import reads the API until the snapshot is printed.
+  const hunk = board.ide?.diff?.[selected];
+  const kept = s.merged[selected];
+  const api = board.ide?.api;
+  const lines = file.code.flatMap((raw, i) => {
+    let line = api ? raw.split(API_FIELD).join(printed ? api.fixed : api.live) : raw;
+    if (hunk && i === hunk.line - 1) {
+      if (!kept) {
+        return [
+          html`<div class="sh-ln del"><span class="sh-gut">${i + 1}</span><span class="sh-mk">−</span><code>${hunk.v16}</code></div>`,
+          html`<div class="sh-ln add"><span class="sh-gut">${i + 1}</span><span class="sh-mk">+</span><code>${hunk.v17}</code></div>`,
+        ];
+      }
+      line = kept === "v16" ? hunk.v16 : hunk.v17;
+    }
     const at = line.indexOf(SLOT_FIELD);
-    if (at < 0) return html`<div class="sh-ln"><span class="sh-gut">${i + 1}</span><span class="sh-mk"></span><code>${line}</code></div>`;
+    if (at < 0) return [html`<div class="sh-ln"><span class="sh-gut">${i + 1}</span><span class="sh-mk"></span><code>${line}</code></div>`];
     const before = line.slice(0, at);
     const after = line.slice(at + SLOT_FIELD.length);
     const field = cardId
       ? html`<button type="button" class="sh-field filled" data-action="board-slot" data-slot="${selected}">"${cardText(board, cardId)}"</button>`
       : html`<button type="button" class="${cls("sh-field", "empty", session.boardPick && "target")}" data-action="board-slot" data-slot="${selected}" aria-label="${board.slots.find((x) => x.id === selected)?.label ?? selected}"></button>`;
-    return html`<div class="${cls("sh-ln", "slot", cardId && "added")}"><span class="sh-gut">${i + 1}</span><span class="sh-mk">${cardId ? "+" : ""}</span><code>${before}${field}${after}</code></div>`;
+    return [html`<div class="${cls("sh-ln", "slot", cardId && "added")}"><span class="sh-gut">${i + 1}</span><span class="sh-mk">${cardId ? "+" : ""}</span><code>${before}${field}${after}</code></div>`];
   });
-  return html`<div class="sh-editor"><div class="sh-tabs"><span class="sh-tab on">${file.name}</span></div><div class="sh-code">${lines}</div></div>`;
+  // The merge bar (a page that differs, nothing kept yet) and the API control (pull once; then the time).
+  const mergeBar = hunk && !kept
+    ? html`<div class="sh-merge"><span class="sh-merge-l">${tr("board.ide.diff")}</span><button type="button" class="sh-chip primary" data-action="board-merge" data-slot="${selected}" data-keep="v17">${tr("board.ide.merge.v17")}</button><button type="button" class="sh-chip" data-action="board-merge" data-slot="${selected}" data-keep="v16">${tr("board.ide.merge.v16")}</button></div>`
+    : null;
+  const fetch = api
+    ? s.fetched
+      ? html`<span class="sh-fetched">${tr("board.ide.fetched", { at: api.at })}</span>`
+      : html`<button type="button" class="sh-chip sh-fetch" data-action="board-fetch"${canFetch(board, s) ? null : html` disabled`}>${tr("board.ide.fetch")}</button>`
+    : null;
+  return html`<div class="sh-editor"><div class="sh-tabs"><span class="sh-tab on">${file.name}</span>${fetch}</div>${mergeBar}<div class="sh-code">${lines}</div></div>`;
 }
 
 /** 表格: the board's table as today (the given rows and the slots); live, or read back. */
@@ -325,7 +350,7 @@ export function renderShell(ctx: AppContext, task: Task, day: number, fill: Fill
   const paneCards = open.map((p) => {
     let body: SafeHtml;
     if (p === "preview") body = previewPane(task, board!, s!, ops, selected);
-    else if (p === "code") body = codePane(board!, s!, session, selected);
+    else if (p === "code") body = codePane(board!, s!, session, selected, ops.some((o) => o.t === "print"));
     else if (p === "table") body = tablePane(ctx, task, board!, s!, live, day);
     else if (p === "meeting") body = meetingWindow(ctx, task, board!);
     else if (p === "files") body = board ? filesPane(ctx, board, st, fill) : html``;

@@ -8,7 +8,7 @@
 import type { State } from "@state/types.gen";
 import type { GameEvent } from "@state/events";
 import type { Task, TaskBoard } from "@state/days/tasks";
-import { autoUnlock, boardState, canPrint, foundCardIds, isKuroCard, isObjectLock, isReadLock, lockCodesOffered, lockJammed, lockObjectAvailable, lockUsedOk, trayCards, wrongReadings, type BoardState } from "@state/days/board";
+import { autoUnlock, boardState, canFetch, canPrint, foundCardIds, isKuroCard, isObjectLock, isReadLock, lockCodesOffered, lockJammed, lockObjectAvailable, lockUsedOk, trayCards, wrongReadings, type BoardState } from "@state/days/board";
 import { ideOps, ideSrc, ideTranscript } from "@state/days/ide";
 import { cls, html, type SafeHtml } from "@world/html";
 import { FRAMES, frameUrl } from "../kuro/body";
@@ -389,6 +389,23 @@ const actions: Record<string, ActionHandler> = {
     } else if (slot in s.slots) {
       ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "clear", slot } });
     }
+    ctx.rerender();
+  },
+  // ide v2 (2026-11-08): keep v17's or v16's line on a page that differs.
+  "board-merge"(ctx, data) {
+    const c = currentBoard(ctx);
+    const slot = data.slot;
+    const keep = data.keep;
+    if (!c || !slot || (keep !== "v16" && keep !== "v17") || !c.board.ide?.diff?.[slot]) return;
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "merge", slot, keep } });
+    ctx.rerender();
+  },
+  // ide v2: pull the latest data from the API, once, after every page is merged and filled.
+  "board-fetch"(ctx) {
+    const c = currentBoard(ctx);
+    if (!c) return;
+    if (!canFetch(c.board, stateOf(ctx, c.task, c.board))) return;
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "fetch" } });
     ctx.rerender();
   },
   // 让它补全: Kuro fills every empty slot from its `fill` and opens the lock; one assist.

@@ -230,12 +230,24 @@ describe("G7 · a board task's page (2026-11-08)", () => {
       if (from?.file) open(store, `file:${from.file}`);
       if (from?.conv) open(store, `conv:${from.conv}`);
     }
+    // ide v2 (2026-11-08): three pages differ from v16: the merge comes first (要 v17 的 is lit).
+    const g0 = guideNow(store.getState(), store.getEvents(), r.session)!;
+    expect(g0).toMatchObject({ id: "G7", target: { kind: "board", step: "merge" }, refuse: null, scope: "none" });
+    expect(r.out()).toMatch(/data-action="board-merge" data-slot="r1" data-keep="v17"[^>]*data-guide="on"/);
+    for (const slot of Object.keys(task.board!.ide!.diff!)) r.act("board-merge", { slot, keep: "v17" });
     const g = guideNow(store.getState(), store.getEvents(), r.session)!;
     expect(g).toMatchObject({ id: "G7", target: { kind: "board", step: "card" }, refuse: null, scope: "none" });
     expect(guideRefuses(g, "dock", { app: "msgs" })).toBe(false);
     expect(r.out()).toMatch(/data-action="board-card"[^>]*data-guide="on"/);
     r.act("board-card", { card: task.board!.cards[0]!.id });
     expect(guideNow(store.getState(), store.getEvents(), r.session)!.target).toMatchObject({ kind: "board", step: "slot" });
+    // Every slot filled: the data pull is lit; pulled: 打快照 is lit.
+    r.session.boardPick = null;
+    for (const sl of task.board!.slots) store.appendEvent({ kind: "boardStep", taskId: task.id, op: { t: "fill", slot: sl.id, card: sl.answer } });
+    expect(guideNow(store.getState(), store.getEvents(), r.session)!.target).toMatchObject({ kind: "board", step: "fetch" });
+    expect(r.out()).toMatch(/data-action="board-fetch"[^>]*data-guide="on"/);
+    r.act("board-fetch");
+    expect(guideNow(store.getState(), store.getEvents(), r.session)!.target).toMatchObject({ kind: "board", step: "print" });
   });
 });
 

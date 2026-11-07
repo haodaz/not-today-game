@@ -1034,3 +1034,10 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .call-tool.hang{width:auto;gap:8px;padding:0 20px;background:#d2493b;color:#fff;font-size:14px}
 .call-tool-l{font-size:14px}
 .call-tool:disabled{opacity:.4;cursor:default}
+/* ide v2 (2026-11-08): the page's changed line (− v16 / + v17), the merge bar, the API control. */
+.sh-ln.del{background:rgba(220,70,60,.08)}.sh-ln.del .sh-mk{color:#c0392b}.sh-ln.del code{color:#8a3a33;text-decoration:line-through;text-decoration-color:rgba(192,57,43,.45)}
+.sh-ln.add{background:rgba(60,160,90,.10)}.sh-ln.add .sh-mk{color:#2e8b57}
+.sh-merge{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line);background:#fffaf0;font-size:12px}
+.sh-merge-l{color:var(--ink-2);margin-right:auto}
+.sh-tabs .sh-fetch{margin-left:auto;margin-right:8px}
+.sh-tabs .sh-fetched{margin-left:auto;margin-right:12px;font-size:11px;color:var(--ink-2)}

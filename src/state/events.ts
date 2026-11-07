@@ -110,7 +110,10 @@ export type BoardOp =
   | { readonly t: "fill"; readonly slot: string; readonly card: string }
   | { readonly t: "clear"; readonly slot: string }
   | { readonly t: "assistUnlock" }
-  | { readonly t: "assistFill" };
+  | { readonly t: "assistFill" }
+  /** ide v2 (2026-11-08): the player keeps v17's or v16's line on a page that differs; the data is pulled from the API once. */
+  | { readonly t: "merge"; readonly slot: string; readonly keep: "v16" | "v17" }
+  | { readonly t: "fetch" };
 
 export type EventKind = GameEvent["kind"];
 

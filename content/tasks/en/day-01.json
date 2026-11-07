@@ -424,7 +424,7 @@
             "r1": {
               "name": "03-shared-space.js",
               "code": [
-                "import { SNAP } from \"./snapshot.js\";",
+                "import { SNAP } from \"{{api}}\";",
                 "import { draw } from \"./space.js\";",
                 "",
                 "export const page = {",
@@ -439,7 +439,7 @@
             "r2": {
               "name": "05-three-vocabularies.js",
               "code": [
-                "import { SNAP } from \"./snapshot.js\";",
+                "import { SNAP } from \"{{api}}\";",
                 "import { draw } from \"./space.js\";",
                 "",
                 "export const page = {",
@@ -454,7 +454,7 @@
             "r3": {
               "name": "11-ai-first-human-check.js",
               "code": [
-                "import { SNAP } from \"./snapshot.js\";",
+                "import { SNAP } from \"{{api}}\";",
                 "import { draw } from \"./space.js\";",
                 "",
                 "export const page = {",
@@ -469,7 +469,7 @@
             "r4": {
               "name": "12-moat.js",
               "code": [
-                "import { SNAP } from \"./snapshot.js\";",
+                "import { SNAP } from \"{{api}}\";",
                 "import { draw } from \"./space.js\";",
                 "",
                 "export const page = {",
@@ -484,7 +484,7 @@
             "r5": {
               "name": "13-clients.js",
               "code": [
-                "import { SNAP } from \"./snapshot.js\";",
+                "import { SNAP } from \"{{api}}\";",
                 "import { draw } from \"./space.js\";",
                 "",
                 "export const page = {",
@@ -495,6 +495,29 @@
                 "  draw: (t) => draw.clients(SNAP.receivable, t)",
                 "};"
               ]
+            }
+          },
+          "api": {
+            "live": "./api.js",
+            "fixed": "./snapshot.js",
+            "at": "2028-10-16 13:52",
+            "snap": "snap-2028-10-16-01"
+          },
+          "diff": {
+            "r1": {
+              "line": 6,
+              "v16": "  title: \"One brain runs everything; first it needs one shared space\",",
+              "v17": "  title: \"A group of brains needs one shared space to work in\","
+            },
+            "r2": {
+              "line": 6,
+              "v16": "  title: \"Reality doesn't line up by itself: three clients, each counted alone\",",
+              "v17": "  title: \"Reality doesn't line up by itself: three clients, three vocabularies\","
+            },
+            "r5": {
+              "line": 6,
+              "v16": "  title: \"This road already reaches clients\",",
+              "v17": "  title: \"This road already reaches clients: in the pipeline, and paid\","
             }
           }
         },
@@ -524,7 +547,7 @@
               },
               {
                 "who": "kuro",
-                "text": "Five pages are still empty. Pick a line under Sources on the left, then click the blank in the code; the preview follows."
+                "text": "I merged a version overnight. The three dotted pages changed; take a look and keep one side."
               }
             ]
           },
@@ -637,19 +660,11 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Cut at 13:42. Whatever happens after doesn't count."
-              },
-              {
-                "who": "me",
-                "text": "A record is a record."
+                "text": "Snapshot taken. The API is cut; this one won't change again."
               },
               {
                 "who": "kuro",
-                "text": "Fifteen references. Who reads those?"
-              },
-              {
-                "who": "me",
-                "text": "I do."
+                "text": "Send it to Wang. He will read it out."
               }
             ]
           },
@@ -663,6 +678,98 @@
               {
                 "who": "kuro",
                 "text": "He'll read it. Eventually."
+              }
+            ]
+          },
+          {
+            "on": "merge:r1:v17",
+            "lines": [
+              {
+                "who": "me",
+                "text": "A group of brains. That's how we tell it."
+              },
+              {
+                "who": "kuro",
+                "text": "You said it yesterday. I only wrote it down."
+              }
+            ]
+          },
+          {
+            "on": "merge:r1:v16",
+            "lines": [
+              {
+                "who": "me",
+                "text": "Keep yesterday's for now."
+              },
+              {
+                "who": "kuro",
+                "text": "Wang wants the new one. You can switch back any time."
+              }
+            ]
+          },
+          {
+            "on": "merge:r2:v17",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Merge the three vocabularies, then fold the synonyms. Your change, not mine."
+              }
+            ]
+          },
+          {
+            "on": "merge:r2:v16",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Each counted alone, so it stays three."
+              }
+            ]
+          },
+          {
+            "on": "merge:r5:v17",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Only one has paid. Written down, it is still one."
+              }
+            ]
+          },
+          {
+            "on": "merge:r5:v16",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Leave out the payment and Wang will ask."
+              }
+            ]
+          },
+          {
+            "on": "merge",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Merged. Five pages are still empty. Pick a line under Sources on the left, then click the blank in the code; the preview follows."
+              }
+            ]
+          },
+          {
+            "on": "fetch",
+            "lines": [
+              {
+                "who": "me",
+                "text": "Pull the data."
+              },
+              {
+                "who": "kuro",
+                "text": "The API is back: two hundred and eleven nodes, one thousand one hundred and eighty links. Same as Zhang's count."
+              },
+              {
+                "who": "me",
+                "text": "Less than half of last week's."
+              },
+              {
+                "who": "kuro",
+                "text": "Last week's was an estimate. This one was counted."
               }
             ]
           }

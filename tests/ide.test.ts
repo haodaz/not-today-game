@@ -248,3 +248,4 @@ describe("a play-through of the IDE board", () => {
     expect(view(b)).toEqual(view(a));
   });
 });
+

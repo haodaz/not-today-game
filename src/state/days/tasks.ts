@@ -174,7 +174,26 @@ export interface BoardIde {
   readonly pages: Readonly<Record<string, number>>;
   /** shell R4: each slot's page as a code file (its name, its lines; one line holds `{{slot}}`). */
   readonly files?: Readonly<Record<string, IdeFile>>;
+  /** ide v2 (2026-11-08): per page, the one line Kuro's overnight merge changed (v16 → v17); the player keeps one. */
+  readonly diff?: Readonly<Record<string, IdeHunk>>;
+  /** ide v2: the data source: the live API import, the fixed snapshot import, when it was pulled, the snapshot's id. */
+  readonly api?: IdeApi;
 }
+/** ide v2: a page's changed line: its 1-based index in the file, the v16 text, the v17 text. */
+export interface IdeHunk {
+  readonly line: number;
+  readonly v16: string;
+  readonly v17: string;
+}
+/** ide v2: the page's data source; `{{api}}` in a code line is drawn as `live` until the snapshot, then `fixed`. */
+export interface IdeApi {
+  readonly live: string;
+  readonly fixed: string;
+  readonly at: string;
+  readonly snap: string;
+}
+/** The placeholder in a page's code for the data import (ide v2). */
+export const API_FIELD = "{{api}}";
 /** One IDE page's code (shell R4). */
 export interface IdeFile {
   readonly name: string;
@@ -615,7 +634,7 @@ function boardMeeting(v: unknown, w: string, slotIds: ReadonlySet<string>, cards
 /** The IDE preview (ide R1): a deliverable under /docs/, and a page 0–99 per (known) slot. */
 function boardIde(v: unknown, w: string, slotIds: ReadonlySet<string>): BoardIde {
   if (!isRecord(v)) fail(w, "must be an object");
-  keys(v, ["src", "pages", "files"], w);
+  keys(v, ["src", "pages", "files", "diff", "api"], w);
   const src = str(v.src, `${w}.src`);
   if (!src.startsWith("/docs/")) fail(`${w}.src`, "expected a path under /docs/");
   if (!isRecord(v.pages)) fail(`${w}.pages`, "must be an object");
@@ -626,7 +645,31 @@ function boardIde(v: unknown, w: string, slotIds: ReadonlySet<string>): BoardIde
     pages[slot] = page as number;
   }
   const files = v.files !== undefined ? ideFiles(v.files, `${w}.files`, slotIds) : undefined;
-  return { src, pages, ...(files ? { files } : {}) };
+  // ide v2: the differences and the API.
+  let diff: Record<string, IdeHunk> | undefined;
+  if (v.diff !== undefined) {
+    if (!isRecord(v.diff)) fail(`${w}.diff`, "must be an object");
+    diff = {};
+    for (const [slot, h] of Object.entries(v.diff)) {
+      const hw = `${w}.diff.${slot}`;
+      if (!slotIds.has(slot)) fail(`${w}.diff`, `"${slot}" is not a slot`);
+      if (!isRecord(h)) fail(hw, "must be an object");
+      keys(h, ["line", "v16", "v17"], hw);
+      const line = h.line;
+      if (!Number.isInteger(line) || (line as number) < 1) fail(`${hw}.line`, "must be a 1-based line number");
+      const code = files?.[slot]?.code;
+      if (code && (line as number) > code.length) fail(`${hw}.line`, `the file has ${code.length} lines`);
+      if (code && code[(line as number) - 1]!.includes(SLOT_FIELD)) fail(`${hw}.line`, "the slot's own line cannot differ");
+      diff[slot] = { line: line as number, v16: str(h.v16, `${hw}.v16`), v17: str(h.v17, `${hw}.v17`) };
+    }
+  }
+  let api: IdeApi | undefined;
+  if (v.api !== undefined) {
+    if (!isRecord(v.api)) fail(`${w}.api`, "must be an object");
+    keys(v.api, ["live", "fixed", "at", "snap"], `${w}.api`);
+    api = { live: str(v.api.live, `${w}.api.live`), fixed: str(v.api.fixed, `${w}.api.fixed`), at: str(v.api.at, `${w}.api.at`), snap: str(v.api.snap, `${w}.api.snap`) };
+  }
+  return { src, pages, ...(files ? { files } : {}), ...(diff ? { diff } : {}), ...(api ? { api } : {}) };
 }
 
 /** The placeholder in a page's code where the slot's field is drawn (shell R4). */
@@ -656,7 +699,7 @@ function ideFiles(v: unknown, w: string, slotIds: ReadonlySet<string>): Record<s
 }
 
 /** The fixed beat names (ide R1); `fill:<slot>` and `fill:<slot>:<card>` are checked separately. */
-const BEAT_ONS = ["open", "kuro", "unlock", "print", "send"] as const;
+const BEAT_ONS = ["open", "kuro", "unlock", "print", "send", "merge", "fetch"] as const;
 
 /** The transcript beats (ide R1): each `on` names a known beat and existing ids; each `on` once. */
 function boardBeats(v: unknown, w: string, slotIds: ReadonlySet<string>, cardIds: ReadonlySet<string>): BoardBeat[] {
@@ -671,6 +714,10 @@ function boardBeats(v: unknown, w: string, slotIds: ReadonlySet<string>, cardIds
     if (parts[0] === "fill" && (parts.length === 2 || parts.length === 3)) {
       if (!slotIds.has(parts[1]!)) fail(`${bw}.on`, `"${parts[1]}" is not a slot`);
       if (parts.length === 3 && !cardIds.has(parts[2]!)) fail(`${bw}.on`, `"${parts[2]}" is not a card or a Kuro card`);
+    } else if (parts[0] === "merge" && (parts.length === 2 || parts.length === 3)) {
+      // ide v2: merge:<slot> or merge:<slot>:<v16|v17>.
+      if (!slotIds.has(parts[1]!)) fail(`${bw}.on`, `"${parts[1]}" is not a slot`);
+      if (parts.length === 3 && parts[2] !== "v16" && parts[2] !== "v17") fail(`${bw}.on`, "merge:<slot>:<v16|v17>");
     } else if (!(BEAT_ONS as readonly string[]).includes(on)) {
       fail(`${bw}.on`, `must be one of ${BEAT_ONS.join(", ")}, fill:<slot> or fill:<slot>:<card>`);
     }
@@ -838,7 +885,7 @@ function localiseTask(zh: Task, en: Task, w: string): Task {
     if (zh.board.slots.length !== en.board.slots.length || zh.board.cards.length !== en.board.cards.length) fail(`${w}.board`, "board shape differs from the Chinese");
     // ide R1: the view and the preview are shared; the beats differ only in their lines' text.
     // shell R4: the en `ide.files` carry their own names and code; only their keys must match.
-    const ideShape = (b: TaskBoard) => (b.ide ? { src: b.ide.src, pages: b.ide.pages, files: b.ide.files ? Object.keys(b.ide.files).sort() : null } : null);
+    const ideShape = (b: TaskBoard) => (b.ide ? { src: b.ide.src, pages: b.ide.pages, files: b.ide.files ? Object.keys(b.ide.files).sort() : null, diff: b.ide.diff ? Object.keys(b.ide.diff).sort() : null, api: !!b.ide.api } : null);
     if (zh.board.view !== en.board.view || !sameJson(ideShape(zh.board), ideShape(en.board))) fail(`${w}.board`, "view or ide differs from the Chinese");
     // meeting R1: the people's ids and tiles, the lines' times / speakers / cards, the layout and the
     // seats are shared; only the names and the line text differ.

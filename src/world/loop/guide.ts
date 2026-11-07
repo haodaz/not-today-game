@@ -7,7 +7,7 @@ import type { State } from "@state/types.gen";
 import type { Session } from "@world/desktop/model";
 import { lockedConversation, viviLockHeld } from "@world/desktop/vivi";
 import { openWork, threadFor } from "@world/desktop/workbench/work";
-import { boardState, canPrint, trayCards } from "@state/days/board";
+import { boardState, canFetch, canPrint, mergesLeft, trayCards } from "@state/days/board";
 import { push } from "./dialogue";
 import { booted, itemStates, loopContext } from "./checklist";
 import { taskPageId } from "@world/desktop/model";
@@ -26,7 +26,7 @@ export type GuideTarget =
   | { readonly kind: "phone" }
   | { readonly kind: "task"; readonly id: string }
   /** G7 (2026-11-08): a board task's page: the lock, the first card in the tray, an empty slot once a card is picked, 打快照 when full. */
-  | { readonly kind: "board"; readonly step: "lock" | "card" | "slot" | "print" };
+  | { readonly kind: "board"; readonly step: "lock" | "merge" | "card" | "slot" | "fetch" | "print" };
 
 /**
  * What the wrapper refuses while the guide is on: everything that is not the target or allowed
@@ -72,7 +72,7 @@ export function guideNow(state: State, events: readonly GameEvent[], session: Se
   const board = open?.tree?.board;
   if (desktop && open?.tree && board && taskPageId(session.workbenchPage) === open.tree.id) {
     const s = boardState(board, day, open.tree.id, events);
-    const step = board.given.lock !== undefined && !s.unlocked ? "lock" : canPrint(board, s) ? "print" : session.boardPick ? "slot" : trayCards(board, s, day, events, open.tree.id).length ? "card" : null;
+    const step = board.given.lock !== undefined && !s.unlocked ? "lock" : mergesLeft(board, s).length ? "merge" : canPrint(board, s) ? "print" : canFetch(board, s) ? "fetch" : session.boardPick ? "slot" : trayCards(board, s, day, events, open.tree.id).length ? "card" : null;
     if (step) return { id: "G7", target: { kind: "board", step }, refuse: null, scope: "none" };
   }
 
@@ -174,7 +174,7 @@ export function onTarget(target: GuideTarget, action: string, data: Readonly<Rec
       return action === "wb-nav" && data.page === `task:${target.id}`;
     case "board":
       // G7 never refuses; its target is the board's own controls.
-      return action === "board-lock" || action === "board-card" || action === "board-slot" || action === "shell-slot" || action === "board-print";
+      return action === "board-lock" || action === "board-merge" || action === "board-fetch" || action === "board-card" || action === "board-slot" || action === "shell-slot" || action === "board-print";
   }
 }
 
@@ -246,8 +246,10 @@ export function withRing(markup: string, g: Guide | null): string {
 }
 
 /** G7's anchors; a "!" pair excludes tags containing its value (an empty slot is the one without "filled"). */
-function boardAnchors(step: "lock" | "card" | "slot" | "print"): readonly (readonly (readonly [string, string])[])[] {
+function boardAnchors(step: "lock" | "merge" | "card" | "slot" | "fetch" | "print"): readonly (readonly (readonly [string, string])[])[] {
   if (step === "lock") return [[["data-action", "board-lock"]]];
+  if (step === "merge") return [[["data-action", "board-merge"], ["data-keep", "v17"]], [["data-action", "shell-slot"]]];
+  if (step === "fetch") return [[["data-action", "board-fetch"]]];
   if (step === "card") return [[["data-action", "board-card"]]];
   if (step === "slot") return [[["data-action", "board-slot"], ["!", "filled"]], [["data-action", "shell-slot"]]];
   return [[["data-action", "board-print"]]];

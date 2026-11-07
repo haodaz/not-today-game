@@ -209,6 +209,9 @@ const SNAP = {
     { name: '青禾物流', kind: '物流', status: '试点', paid: true },
   ],
 };
+/* ===== 数据模式（ide v2）：?data=live 是接口上的旧数（周报里估的）；?data=fetched 是拉回来的；?snap=1 或单独打开 = 交出去的快照（已断开接口） ===== */
+const DATA_MODE = (() => { const q = new URLSearchParams(location.search); return q.has('snap') ? 'snap' : (q.get('data') || 'snap'); })();
+if (DATA_MODE !== 'live') { SNAP.points = { 人: 63, 文件: 71, 业务对象: 58, 事件: 19 }; SNAP.relations = 1180; SNAP.cut = '2028-10-16 13:52:07'; }
 const REFS = [
   ['Azevedo F. A. C. et al.', 'Equal numbers of neuronal and nonneuronal cells make the human brain an isometrically scaled-up primate brain', 'J. Comp. Neurol. 513(5), 2009'],
   ['Attwell D., Laughlin S. B.', 'An energy budget for signaling in the grey matter of the brain', 'J. Cereb. Blood Flow Metab. 21(10), 2001'],
@@ -496,7 +499,7 @@ function render(t){
 addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(ch + 1); if (e.key === 'ArrowLeft') go(ch - 1); });
 
 /* ===== 读数 ===== */
-document.getElementById('snapline').textContent = `SNAPSHOT ${SNAP.id} · 截至 ${SNAP.cut}`;
+document.getElementById('snapline').textContent = DATA_MODE === 'live' ? `接口 · 实时 · 上次同步 ${SNAP.cut}` : DATA_MODE === 'fetched' ? `接口 · 拉取于 ${SNAP.cut}` : `SNAPSHOT ${SNAP.id} · 截至 ${SNAP.cut} · 已断开接口`;
 const stat = (cls, v, s) => `<div><b class="${cls}">${v}</b><small>${s}</small></div>`;
 const total = Object.values(SNAP.points).reduce((a, b) => a + b), Mv = SNAP.moves, CU = SNAP.customers;
 const fill = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };

@@ -38,11 +38,15 @@ export interface BoardState {
   readonly assists: number;
   /** The wrong codes tried on the lock this session (for the shake; derived too). */
   readonly wrongCodes: readonly string[];
+  /** ide v2 (2026-11-08): slot id → which version's line the player kept on a page that differs. */
+  readonly merged: Readonly<Record<string, "v16" | "v17">>;
+  /** ide v2: the latest data was pulled from the API (once). */
+  readonly fetched: boolean;
 }
 
 /** A fresh board: locked when it has a lock, every slot empty, no assist. */
 export function freshBoard(board: TaskBoard): BoardState {
-  return { unlocked: board.given.lock === undefined, slots: {}, assists: 0, wrongCodes: [] };
+  return { unlocked: board.given.lock === undefined, slots: {}, assists: 0, wrongCodes: [], merged: {}, fetched: false };
 }
 
 /** The `boardStep` ops for a task on a day, in order (today only). */
@@ -61,6 +65,12 @@ export function stepBoard(board: TaskBoard, s: BoardState, op: BoardOp): BoardSt
       return { ...s, unlocked: true, assists: s.assists + 1 };
     case "fill":
       return { ...s, slots: { ...s.slots, [op.slot]: op.card } };
+    case "merge":
+      if (!board.ide?.diff?.[op.slot]) return s;
+      return { ...s, merged: { ...s.merged, [op.slot]: op.keep } };
+    case "fetch":
+      if (!board.ide?.api || s.fetched) return s;
+      return { ...s, fetched: true };
     case "clear": {
       if (!(op.slot in s.slots)) return s;
       const next = { ...s.slots };
@@ -82,7 +92,19 @@ export function boardState(board: TaskBoard, day: number, taskId: string, events
 
 /** Every slot filled and the column unlocked: 打印 is enabled. */
 export function canPrint(board: TaskBoard, s: BoardState): boolean {
-  return s.unlocked && board.slots.every((slot) => slot.id in s.slots);
+  return s.unlocked && board.slots.every((slot) => slot.id in s.slots) && mergesLeft(board, s).length === 0 && (!board.ide?.api || s.fetched);
+}
+
+/** ide v2: the pages that differ from v16 and are not yet merged (slot ids, in slot order). */
+export function mergesLeft(board: TaskBoard, s: BoardState): string[] {
+  const diff = board.ide?.diff;
+  if (!diff) return [];
+  return board.slots.map((sl) => sl.id).filter((id) => id in diff && !(id in s.merged));
+}
+
+/** ide v2: the latest data may be pulled once every page is merged and filled. */
+export function canFetch(board: TaskBoard, s: BoardState): boolean {
+  return !!board.ide?.api && !s.fetched && mergesLeft(board, s).length === 0 && board.slots.every((slot) => slot.id in s.slots);
 }
 
 /**
@@ -221,6 +243,13 @@ export function validateBoardStep(day: number, taskId: string, op: BoardOp): voi
     case "fill":
       if (!slotIds.has(op.slot)) throw new Error(`boardStep: "${op.slot}" is not a slot`);
       if (!cardIds.has(op.card)) throw new Error(`boardStep: "${op.card}" is not a card`);
+      return;
+    case "merge":
+      if (!board.ide?.diff?.[op.slot]) throw new Error(`boardStep: "${op.slot}" has no v16 difference`);
+      if (op.keep !== "v16" && op.keep !== "v17") throw new Error("boardStep: keep must be v16 or v17");
+      return;
+    case "fetch":
+      if (!board.ide?.api) throw new Error("boardStep: this board has no API to pull from");
       return;
     case "clear":
       if (!slotIds.has(op.slot)) throw new Error(`boardStep: "${op.slot}" is not a slot`);
