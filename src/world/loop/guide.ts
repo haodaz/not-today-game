@@ -7,6 +7,7 @@ import type { State } from "@state/types.gen";
 import type { Session } from "@world/desktop/model";
 import { lockedConversation, viviLockHeld } from "@world/desktop/vivi";
 import { openWork, threadFor } from "@world/desktop/workbench/work";
+import { boardState, canPrint, trayCards } from "@state/days/board";
 import { push } from "./dialogue";
 import { booted, itemStates, loopContext } from "./checklist";
 import { taskPageId } from "@world/desktop/model";
@@ -20,7 +21,9 @@ export type GuideTarget =
   | { readonly kind: "card"; readonly doc: string; readonly conv: string | null }
   | { readonly kind: "clauses"; readonly indexes: readonly number[] }
   | { readonly kind: "phone" }
-  | { readonly kind: "task"; readonly id: string };
+  | { readonly kind: "task"; readonly id: string }
+  /** G7 (2026-11-08): a board task's page: the lock, the first card in the tray, an empty slot once a card is picked, 打快照 when full. */
+  | { readonly kind: "board"; readonly step: "lock" | "card" | "slot" | "print" };
 
 /**
  * What the wrapper refuses while the guide is on: everything that is not the target or allowed
@@ -29,7 +32,7 @@ export type GuideTarget =
 export type GuideScope = "all" | "work" | "none";
 
 export interface Guide {
-  readonly id: "G1" | "G2" | "G3" | "G4" | "G5" | "G6" | "next";
+  readonly id: "G1" | "G2" | "G3" | "G4" | "G5" | "G6" | "G7" | "next";
   readonly target: GuideTarget;
   /** The refuse line's strings key, or null (no line of its own). */
   readonly refuse: string | null;
@@ -54,6 +57,17 @@ export function guideNow(state: State, events: readonly GameEvent[], session: Se
   if (desktop && open?.tree && w?.mode === "self" && doc?.conflict.length && taskPageId(session.workbenchPage) === open.tree.id) {
     const indexes = doc.conflict.filter((i) => !w.clicked.includes(i));
     if (indexes.length) return { id: "G6", target: { kind: "clauses", indexes }, refuse: null, scope: "none" };
+  }
+
+  // G7 (2026-11-08, the author's rule applied to the board): on a board task's page the next thing to
+  // click is lit: the lock's button, else the first card in the tray, else (a card picked) an empty
+  // slot, else 打快照 once every slot is filled. Nothing is refused. Cards not yet found have no ring
+  // (Kuro's line names the sources).
+  const board = open?.tree?.board;
+  if (desktop && open?.tree && board && taskPageId(session.workbenchPage) === open.tree.id) {
+    const s = boardState(board, day, open.tree.id, events);
+    const step = board.given.lock !== undefined && !s.unlocked ? "lock" : canPrint(board, s) ? "print" : session.boardPick ? "slot" : trayCards(board, s, day, events, open.tree.id).length ? "card" : null;
+    if (step) return { id: "G7", target: { kind: "board", step }, refuse: null, scope: "none" };
   }
 
   // G5: Vivi's page, once the boss's thread has been read today (the lock itself refuses, viviRefuse).
@@ -135,6 +149,9 @@ export function onTarget(target: GuideTarget, action: string, data: Readonly<Rec
       return action === "loop-phone";
     case "task":
       return action === "wb-nav" && data.page === `task:${target.id}`;
+    case "board":
+      // G7 never refuses; its target is the board's own controls.
+      return action === "board-lock" || action === "board-card" || action === "board-slot" || action === "shell-slot" || action === "board-print";
   }
 }
 
@@ -177,6 +194,8 @@ export function ringAnchors(target: GuideTarget): readonly (readonly (readonly [
       return [[["data-action", "loop-phone"]]];
     case "task":
       return [[["data-action", "wb-nav"], ["data-page", `task:${target.id}`]]];
+    case "board":
+      return boardAnchors(target.step);
   }
 }
 
@@ -199,12 +218,20 @@ export function withRing(markup: string, g: Guide | null): string {
   return out;
 }
 
+/** G7's anchors; a "!" pair excludes tags containing its value (an empty slot is the one without "filled"). */
+function boardAnchors(step: "lock" | "card" | "slot" | "print"): readonly (readonly (readonly [string, string])[])[] {
+  if (step === "lock") return [[["data-action", "board-lock"]]];
+  if (step === "card") return [[["data-action", "board-card"]]];
+  if (step === "slot") return [[["data-action", "board-slot"], ["!", "filled"]], [["data-action", "shell-slot"]]];
+  return [[["data-action", "board-print"]]];
+}
+
 /** The first opening tag carrying every attribute gets the ring attribute; null when none does. */
 function ringAt(markup: string, attrs: readonly (readonly [string, string])[]): string | null {
   for (const m of markup.matchAll(/<[a-z][^>]*>/g)) {
     const tag = m[0];
     if (tag.includes("data-guide=")) continue;
-    if (!attrs.every(([k, v]) => tag.includes(` ${k}="${v}"`))) continue;
+    if (!attrs.every(([k, v]) => (k === "!" ? !tag.includes(v) : tag.includes(` ${k}="${v}"`)))) continue;
     const at = m.index! + tag.length - 1;
     const kind = attrs.length && attrs[0]![1] === "wb-clause" ? "clause" : "on";
     return `${markup.slice(0, at)} data-guide="${kind}"${markup.slice(at)}`;

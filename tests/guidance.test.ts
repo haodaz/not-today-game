@@ -175,6 +175,30 @@ describe("R1 / R2 · the guide state and the six moments", () => {
   });
 });
 
+describe("G7 · a board task's page (2026-11-08)", () => {
+  it("the first card in the tray is lit, then an empty slot once a card is picked, then 打快照; nothing is refused", () => {
+    const store = booted();
+    step(store, "openApp:msgs");
+    open(store, "conv:boss");
+    completeUntil(store, "task3");
+    const task = taskByFlag(1, "task_merge_done")!;
+    const r = rig(store);
+    r.session.workbenchPage = `task:${task.id}`;
+    // The boss's thread was opened today, so one card is already found: the tray's first card is lit.
+    for (const c of task.board!.cards) {
+      const from = c.from as { file?: string; conv?: string } | undefined;
+      if (from?.file) open(store, `file:${from.file}`);
+      if (from?.conv) open(store, `conv:${from.conv}`);
+    }
+    const g = guideNow(store.getState(), store.getEvents(), r.session)!;
+    expect(g).toMatchObject({ id: "G7", target: { kind: "board", step: "card" }, refuse: null, scope: "none" });
+    expect(guideRefuses(g, "dock", { app: "msgs" })).toBe(false);
+    expect(r.out()).toMatch(/data-action="board-card"[^>]*data-guide="on"/);
+    r.act("board-card", { card: task.board!.cards[0]!.id });
+    expect(guideNow(store.getState(), store.getEvents(), r.session)!.target).toMatchObject({ kind: "board", step: "slot" });
+  });
+});
+
 // ——— R3 ———
 
 describe("R3 · windows close; the dock on both monitors; the doc page's ×", () => {
