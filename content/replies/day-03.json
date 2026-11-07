@@ -75,13 +75,37 @@
       "incoming": [
         {
           "t": "09:30",
-          "text": "[卡片] v18 验收标准 · 模板",
+          "text": "[卡片] 自演化引擎 · 验收标准 · 模板",
           "kind": "work",
           "card": {
             "type": "file",
-            "name": "v18 验收标准.docx",
+            "name": "自演化引擎 · 验收标准.docx",
             "size": "92 KB",
             "ext": "doc"
+          }
+        },
+        {
+          "t": "15:20",
+          "text": "也就这样吧。",
+          "kind": "work",
+          "cond_show": {
+            "has": "sent_d3-vivi-fix"
+          }
+        },
+        {
+          "t": "15:21",
+          "text": "不行我再让我的 AI 看看怎么改进。",
+          "kind": "work",
+          "cond_show": {
+            "has": "sent_d3-vivi-fix"
+          }
+        },
+        {
+          "t": "15:22",
+          "text": "它说这不难。",
+          "kind": "work",
+          "cond_show": {
+            "has": "sent_d3-vivi-fix"
           }
         }
       ],
@@ -101,7 +125,7 @@
           {
             "who": "partner",
             "t": "09:30",
-            "text": "[卡片] v18 验收标准 · 模板"
+            "text": "[卡片] 自演化引擎 · 验收标准 · 模板"
           }
         ]
       },

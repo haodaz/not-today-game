@@ -72,6 +72,22 @@
             "title": "某某资本 · 2028 年行业观察（节选）",
             "site": "research.example.cn"
           }
+        },
+        {
+          "t": "16:10",
+          "text": "Zhang says it won't run? My AI ran it fine.",
+          "kind": "work",
+          "cond_show": {
+            "has": "sent_d2-vivi-page"
+          }
+        },
+        {
+          "t": "16:11",
+          "text": "If your engineers can't, then do as much as you can.",
+          "kind": "work",
+          "cond_show": {
+            "has": "sent_d2-vivi-page"
+          }
         }
       ],
       "fine": {
@@ -79,8 +95,8 @@
         "lines": [
           {
             "who": "partner",
-            "t": "09:30",
-            "text": "[Card] Storyline · Style reference"
+            "t": "16:20",
+            "text": "Good? The investors see it next week."
           }
         ]
       },
@@ -89,8 +105,8 @@
         "lines": [
           {
             "who": "partner",
-            "t": "09:30",
-            "text": "👍"
+            "t": "16:20",
+            "text": "Received, so get moving."
           }
         ]
       },
@@ -99,8 +115,8 @@
         "lines": [
           {
             "who": "partner",
-            "t": "09:30",
-            "text": "[Card] Storyline · Sources"
+            "t": "16:20",
+            "text": "What do you mean, anything."
           }
         ],
         "inner": "He answers with cards, not words. A card doesn't have to answer for anything."
@@ -259,6 +275,22 @@
         {
           "t": "15:00",
           "text": "Thanks {calledBy}.",
+          "kind": "work",
+          "cond_show": {
+            "has": "sent_d2-vivi-page"
+          }
+        },
+        {
+          "t": "15:30",
+          "text": "Tried it the way you took it apart. The three seconds is an animation, not a computation",
+          "kind": "work",
+          "cond_show": {
+            "has": "sent_d2-vivi-page"
+          }
+        },
+        {
+          "t": "15:31",
+          "text": "The button isn't wired to any backend. The chain is broken; it won't run",
           "kind": "work",
           "cond_show": {
             "has": "sent_d2-vivi-page"

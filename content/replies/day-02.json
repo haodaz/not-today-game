@@ -72,6 +72,22 @@
             "title": "某某资本 · 2028 年行业观察（节选）",
             "site": "research.example.cn"
           }
+        },
+        {
+          "t": "16:10",
+          "text": "小张说跑不通？我这边 AI 跑通了。",
+          "kind": "work",
+          "cond_show": {
+            "has": "sent_d2-vivi-page"
+          }
+        },
+        {
+          "t": "16:11",
+          "text": "你们技术要是不行，能做到什么程度就做到什么程度。",
+          "kind": "work",
+          "cond_show": {
+            "has": "sent_d2-vivi-page"
+          }
         }
       ],
       "fine": {
@@ -79,8 +95,8 @@
         "lines": [
           {
             "who": "partner",
-            "t": "09:30",
-            "text": "[卡片] 叙事线 · 样式参考"
+            "t": "16:20",
+            "text": "好什么好。下周投资人要看。"
           }
         ]
       },
@@ -89,8 +105,8 @@
         "lines": [
           {
             "who": "partner",
-            "t": "09:30",
-            "text": "👍"
+            "t": "16:20",
+            "text": "收到就动起来。"
           }
         ]
       },
@@ -99,8 +115,8 @@
         "lines": [
           {
             "who": "partner",
-            "t": "09:30",
-            "text": "[卡片] 叙事线 · 来源"
+            "t": "16:20",
+            "text": "什么叫哪都行。"
           }
         ],
         "inner": "他回卡片，不回话。卡片不用负责。"
@@ -259,6 +275,22 @@
         {
           "t": "15:00",
           "text": "谢了{calledBy}。",
+          "kind": "work",
+          "cond_show": {
+            "has": "sent_d2-vivi-page"
+          }
+        },
+        {
+          "t": "15:30",
+          "text": "照你拆的试了。三秒那段是动画，不是算出来的",
+          "kind": "work",
+          "cond_show": {
+            "has": "sent_d2-vivi-page"
+          }
+        },
+        {
+          "t": "15:31",
+          "text": "按钮根本没接后端。因果链是断的，跑不通",
           "kind": "work",
           "cond_show": {
             "has": "sent_d2-vivi-page"

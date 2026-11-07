@@ -75,13 +75,37 @@
       "incoming": [
         {
           "t": "09:30",
-          "text": "[Card] v18 acceptance criteria · Template",
+          "text": "[Card] Self-evolving engine · acceptance criteria · Template",
           "kind": "work",
           "card": {
             "type": "file",
             "name": "v18 验收标准.docx",
             "size": "92 KB",
             "ext": "doc"
+          }
+        },
+        {
+          "t": "15:20",
+          "text": "Well, it is what it is.",
+          "kind": "work",
+          "cond_show": {
+            "has": "sent_d3-vivi-fix"
+          }
+        },
+        {
+          "t": "15:21",
+          "text": "If not, I'll have my AI look at how to improve it.",
+          "kind": "work",
+          "cond_show": {
+            "has": "sent_d3-vivi-fix"
+          }
+        },
+        {
+          "t": "15:22",
+          "text": "It says it's not hard.",
+          "kind": "work",
+          "cond_show": {
+            "has": "sent_d3-vivi-fix"
           }
         }
       ],
@@ -101,7 +125,7 @@
           {
             "who": "partner",
             "t": "09:30",
-            "text": "[Card] v18 acceptance criteria · Template"
+            "text": "[Card] Self-evolving engine · acceptance criteria · Template"
           }
         ]
       },

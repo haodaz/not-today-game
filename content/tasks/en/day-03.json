@@ -4,237 +4,123 @@
   "tasks": [
     {
       "id": "task1",
-      "title": "Let it write the agreement's next version; you take a look.",
+      "title": "Vivi's page: as far as it goes.",
       "app": "docs",
       "done": "task_d3_1",
-      "start": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "Three ways to do this one. Twenty minutes yourself: the hands are yours, and so are the mistakes."
+      "board": {
+        "kind": "table",
+        "title": "Self-evolving engine · the doable part",
+        "columns": [
+          "",
+          "What the page says",
+          "What we can do"
+        ],
+        "given": {
+          "rows": {
+            "r1": "\"One click, a decision\"",
+            "r2": "\"Understands your data by itself\"",
+            "r3": "\"Insight in three seconds\"",
+            "r4": "\"Decisions execute themselves\""
           }
-        ],
-        "options": [
-          {
-            "mode": "self",
-            "goto": "self"
-          },
-          {
-            "mode": "look",
-            "goto": "look"
-          },
-          {
-            "mode": "let",
-            "goto": "let"
-          }
-        ]
-      },
-      "self": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "You add the async constraint to the new version yourself. Twenty minutes."
-          }
-        ],
-        "kuro": [],
-        "effects": {
-          "flags": [
-            "task_d3_1"
-          ]
-        }
-      },
-      "look": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "It produced a final draft, neatly laid out. You click Take a look and put the async constraint back."
-          }
-        ],
-        "kuro": [
-          "Good catch. Let me bring it back."
-        ],
-        "effects": {
-          "flags": [
-            "task_d3_1",
-            "caught_async"
-          ],
-          "looked": true,
-          "assimilation": 1
-        }
-      },
-      "let": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "It produced a final draft. The Take a look button is lit, right beside it. You do not click it."
-          }
-        ],
-        "kuro": [
-          "Glad it helps."
-        ],
-        "effects": {
-          "flags": [
-            "task_d3_1"
-          ],
-          "letItDoUnchecked": 1,
-          "assimilation": 4
-        }
-      },
-      "doc": {
-        "left": [
-          "1. Export requests enter a queue and are handled in order.",
-          "2. Each request has a unique id.",
-          "3. Results come back through a callback.",
-          "4. The callback must return within three seconds, or the request times out.",
-          "5. A timed-out request may be retried once.",
-          "6. A request that fails again goes into the failure table."
-        ],
-        "right": [
-          "1. Export requests enter a queue and are handled in order.",
-          "2. Each request has a unique id.",
-          "3. Results come back through a callback.",
-          "4. The callback returns.",
-          "5. A timed-out request may be retried once.",
-          "6. A request that fails again goes into the failure table."
-        ],
-        "conflict": [
-          3,
-          4
-        ],
-        "catchFlags": [
-          "task_d3_1"
-        ],
-        "kuroEdit": {
-          "clause": 3,
-          "text": "4. The callback returns within three seconds. Three seconds as of today."
         },
-        "marks": [
+        "slots": [
           {
-            "clause": 3,
-            "kind": "conflict",
-            "worth": 1
+            "id": "r1",
+            "label": "Entry",
+            "answer": "c1"
           },
           {
-            "clause": 4,
-            "kind": "conflict",
-            "worth": 1
+            "id": "r2",
+            "label": "Data",
+            "answer": "c2"
           },
           {
-            "clause": 3,
-            "kind": "kuro",
-            "worth": 2,
-            "caught": "Mine. Three seconds, as of today.",
-            "word": "today"
-          }
-        ]
-      }
-    },
-    {
-      "id": "task2",
-      "title": "Status field back to three values.",
-      "app": "code",
-      "done": "task_d3_2",
-      "start": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "You named it state, with values draft, sent, read. It added a fourth: archived."
-          }
-        ],
-        "options": [
-          {
-            "mode": "self",
-            "goto": "self"
+            "id": "r3",
+            "label": "Three seconds",
+            "answer": "c3"
           },
           {
-            "mode": "look",
-            "goto": "look"
+            "id": "r4",
+            "label": "Decision",
+            "answer": "c4"
+          }
+        ],
+        "cards": [
+          {
+            "id": "c1",
+            "text": "Doable: the button goes to our export page",
+            "from": {
+              "file": "e-export-fn"
+            },
+            "hint": "in export.js"
           },
           {
-            "mode": "let",
-            "goto": "let"
-          }
-        ]
-      },
-      "self": {
-        "say": [
+            "id": "c2",
+            "text": "Doable: the three clients' tables come in, once a week",
+            "from": {
+              "file": "e-receivable"
+            },
+            "hint": "in the receivables sheet"
+          },
           {
-            "k": "narration",
-            "t": "You delete it yourself and fix the references yourself."
-          }
-        ],
-        "kuro": [],
-        "effects": {
-          "flags": [
-            "task_d3_2",
-            "caught_archived"
-          ]
-        }
-      },
-      "look": {
-        "say": [
+            "id": "c3",
+            "text": "As far as it goes: real computation instead, forty seconds",
+            "from": {
+              "conv": "xiaozhang"
+            },
+            "hint": "in Zhang's chat"
+          },
           {
-            "k": "narration",
-            "t": "You ask it why it added one."
+            "id": "c4",
+            "text": "Not doable: a person clicks the decision",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "in the v17 you sent Wang"
+          },
+          {
+            "id": "d1",
+            "text": "Doable: just write what the page says",
+            "from": {
+              "file": "vivi-plan-2"
+            },
+            "hint": "in Vivi's second page"
+          },
+          {
+            "id": "d2",
+            "text": "Doable: let the AI fix itself",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "in Vivi's chat"
           }
         ],
-        "kuro": [
-          "No one asked. I added it for completeness."
-        ],
-        "effects": {
-          "flags": [
-            "task_d3_2",
-            "asked_why_added",
-            "caught_archived"
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "c2",
+            "r3": "k1",
+            "r4": "c4"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "Doable: three seconds, leave it to Kuro"
+            }
           ],
-          "looked": true,
-          "assimilation": 1
+          "unlock": "-"
         }
       },
-      "let": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "It changed eleven files. You glance at the list. Eleven."
-          }
-        ],
-        "kuro": [
-          "Done."
-        ],
-        "effects": {
-          "flags": [
-            "task_d3_2"
-          ],
-          "letItDoUnchecked": 1,
-          "assimilation": 4
-        }
+      "deliverable": {
+        "id": "d3-vivi-fix",
+        "label": "Self-evolving engine · the doable part (for Vivi)",
+        "to": "partner"
       },
-      "code": {
-        "lines": [
-          "export type State = \"draft\" | \"sent\" | \"read\" | \"archived\";",
-          "export function next(s: State): State {",
-          "  if (s === \"draft\") return \"sent\";",
-          "  if (s === \"sent\") return \"read\";",
-          "  if (s === \"read\") return \"archived\";",
-          "  return s;",
-          "}"
-        ],
-        "catchFlags": [
-          "caught_archived"
-        ],
-        "marks": [
-          {
-            "clause": 0,
-            "kind": "kuro",
-            "worth": 2,
-            "caught": "Archived. Things should have somewhere to go."
-          },
-          {
-            "clause": 4,
-            "kind": "odd",
-            "worth": 1
-          }
-        ]
+      "judge": {
+        "perfect": 0,
+        "flawed": -2,
+        "wrong": -5,
+        "wrongAt": 2
       }
     },
     {

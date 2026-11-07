@@ -203,16 +203,9 @@
     },
     {
       "id": "task1",
-      "text": "Let it write the agreement's next version; you take a look.",
+      "text": "Vivi's page: as far as it goes.",
       "unlock": "done:msgs",
       "done": "flag:task_d3_1",
-      "required": true
-    },
-    {
-      "id": "task2",
-      "text": "Status field back to three values.",
-      "unlock": "done:task1",
-      "done": "flag:task_d3_2",
       "required": true
     },
     {
@@ -249,14 +242,14 @@
     {
       "id": "reply",
       "text": "Reply to the boss.",
-      "unlock": "done:task2",
+      "unlock": "done:task1",
       "done": "event:reply:boss",
       "required": true
     },
     {
       "id": "dinner",
       "text": "Order dinner.",
-      "unlock": "done:task2",
+      "unlock": "done:task1",
       "done": "event:order:dinner",
       "required": true,
       "rewrite": "Dinner is on its way."

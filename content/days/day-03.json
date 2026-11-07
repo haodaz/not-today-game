@@ -203,16 +203,9 @@
     },
     {
       "id": "task1",
-      "text": "协议新一版让它写，你看一眼。",
+      "text": "Vivi 那页：能做的做出来。",
       "unlock": "done:msgs",
       "done": "flag:task_d3_1",
-      "required": true
-    },
-    {
-      "id": "task2",
-      "text": "状态字段改回三个。",
-      "unlock": "done:task1",
-      "done": "flag:task_d3_2",
       "required": true
     },
     {
@@ -249,14 +242,14 @@
     {
       "id": "reply",
       "text": "回老板。",
-      "unlock": "done:task2",
+      "unlock": "done:task1",
       "done": "event:reply:boss",
       "required": true
     },
     {
       "id": "dinner",
       "text": "点个晚饭。",
-      "unlock": "done:task2",
+      "unlock": "done:task1",
       "done": "event:order:dinner",
       "required": true,
       "rewrite": "晚饭在路上。"

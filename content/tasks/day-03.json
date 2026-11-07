@@ -4,237 +4,123 @@
   "tasks": [
     {
       "id": "task1",
-      "title": "协议新一版让它写，你看一眼。",
+      "title": "Vivi 那页：能做的做出来。",
       "app": "docs",
       "done": "task_d3_1",
-      "start": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "这件活可以三种做法。自己做二十分钟，手是你的，错也是你的。"
+      "board": {
+        "kind": "table",
+        "title": "自演化引擎 · 能做的部分",
+        "columns": [
+          "",
+          "页面上写的",
+          "我们能做到的"
+        ],
+        "given": {
+          "rows": {
+            "r1": "「一键生成决策」",
+            "r2": "「自动理解你的数据」",
+            "r3": "「三秒变成洞察」",
+            "r4": "「决策自动执行」"
           }
-        ],
-        "options": [
-          {
-            "mode": "self",
-            "goto": "self"
-          },
-          {
-            "mode": "look",
-            "goto": "look"
-          },
-          {
-            "mode": "let",
-            "goto": "let"
-          }
-        ]
-      },
-      "self": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "你自己在新一版里补了异步约束。二十分钟。"
-          }
-        ],
-        "kuro": [],
-        "effects": {
-          "flags": [
-            "task_d3_1"
-          ]
-        }
-      },
-      "look": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "它出了终稿，排得整整齐齐。你点了「看一眼」，把异步约束补回去。"
-          }
-        ],
-        "kuro": [
-          "眼尖。我把它放回来。"
-        ],
-        "effects": {
-          "flags": [
-            "task_d3_1",
-            "caught_async"
-          ],
-          "looked": true,
-          "assimilation": 1
-        }
-      },
-      "let": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "它出了终稿。「看一眼」的按钮亮着，就在终稿旁边。你没点。"
-          }
-        ],
-        "kuro": [
-          "有用就好。"
-        ],
-        "effects": {
-          "flags": [
-            "task_d3_1"
-          ],
-          "letItDoUnchecked": 1,
-          "assimilation": 4
-        }
-      },
-      "doc": {
-        "left": [
-          "一、导出请求进入队列，按先后顺序处理。",
-          "二、每个请求有唯一编号。",
-          "三、处理结果通过回调返回。",
-          "四、回调必须在三秒内返回，否则按超时处理。",
-          "五、超时的请求允许重试一次。",
-          "六、重试仍失败的，记入失败表。"
-        ],
-        "right": [
-          "一、导出请求进入队列，按先后顺序处理。",
-          "二、每个请求有唯一编号。",
-          "三、处理结果通过回调返回。",
-          "四、回调返回即可。",
-          "五、超时的请求允许重试一次。",
-          "六、重试仍失败的，记入失败表。"
-        ],
-        "conflict": [
-          3,
-          4
-        ],
-        "catchFlags": [
-          "task_d3_1"
-        ],
-        "kuroEdit": {
-          "clause": 3,
-          "text": "四、回调在三秒内返回。三秒以今天的为准。"
         },
-        "marks": [
+        "slots": [
           {
-            "clause": 3,
-            "kind": "conflict",
-            "worth": 1
+            "id": "r1",
+            "label": "入口",
+            "answer": "c1"
           },
           {
-            "clause": 4,
-            "kind": "conflict",
-            "worth": 1
+            "id": "r2",
+            "label": "数据",
+            "answer": "c2"
           },
           {
-            "clause": 3,
-            "kind": "kuro",
-            "worth": 2,
-            "caught": "Mine. Three seconds, as of today.",
-            "word": "today"
-          }
-        ]
-      }
-    },
-    {
-      "id": "task2",
-      "title": "状态字段改回三个。",
-      "app": "code",
-      "done": "task_d3_2",
-      "start": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "你定的叫 state，取值 draft、sent、read。它多加了一个 archived。"
-          }
-        ],
-        "options": [
-          {
-            "mode": "self",
-            "goto": "self"
+            "id": "r3",
+            "label": "三秒",
+            "answer": "c3"
           },
           {
-            "mode": "look",
-            "goto": "look"
+            "id": "r4",
+            "label": "决策",
+            "answer": "c4"
+          }
+        ],
+        "cards": [
+          {
+            "id": "c1",
+            "text": "能做：按钮跳到我们的导出页",
+            "from": {
+              "file": "e-export-fn"
+            },
+            "hint": "在 export.js 里"
           },
           {
-            "mode": "let",
-            "goto": "let"
-          }
-        ]
-      },
-      "self": {
-        "say": [
+            "id": "c2",
+            "text": "能做：三家的表格接进来，每周一次",
+            "from": {
+              "file": "e-receivable"
+            },
+            "hint": "在应收表里"
+          },
           {
-            "k": "narration",
-            "t": "你自己删了，引用自己改了。"
-          }
-        ],
-        "kuro": [],
-        "effects": {
-          "flags": [
-            "task_d3_2",
-            "caught_archived"
-          ]
-        }
-      },
-      "look": {
-        "say": [
+            "id": "c3",
+            "text": "能做到的程度：换成真实计算，要四十秒",
+            "from": {
+              "conv": "xiaozhang"
+            },
+            "hint": "在小张的私聊里"
+          },
           {
-            "k": "narration",
-            "t": "你问它为什么加。"
+            "id": "c4",
+            "text": "做不了：决策留给人点一下",
+            "from": {
+              "conv": "boss"
+            },
+            "hint": "在你发给老王的 v17 里"
+          },
+          {
+            "id": "d1",
+            "text": "能做：照着页面写就行",
+            "from": {
+              "file": "vivi-plan-2"
+            },
+            "hint": "在 Vivi 的第二个页面里"
+          },
+          {
+            "id": "d2",
+            "text": "能做：让 AI 自己改",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "在 Vivi 的私聊里"
           }
         ],
-        "kuro": [
-          "没人要。我加上是为了完整。"
-        ],
-        "effects": {
-          "flags": [
-            "task_d3_2",
-            "asked_why_added",
-            "caught_archived"
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "c2",
+            "r3": "k1",
+            "r4": "c4"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "能做：三秒，交给 Kuro"
+            }
           ],
-          "looked": true,
-          "assimilation": 1
+          "unlock": "-"
         }
       },
-      "let": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "它改了十一个文件。你看了一眼文件列表，十一个。"
-          }
-        ],
-        "kuro": [
-          "好了。"
-        ],
-        "effects": {
-          "flags": [
-            "task_d3_2"
-          ],
-          "letItDoUnchecked": 1,
-          "assimilation": 4
-        }
+      "deliverable": {
+        "id": "d3-vivi-fix",
+        "label": "自演化引擎 · 能做的部分（给 Vivi）",
+        "to": "partner"
       },
-      "code": {
-        "lines": [
-          "export type State = \"draft\" | \"sent\" | \"read\" | \"archived\";",
-          "export function next(s: State): State {",
-          "  if (s === \"draft\") return \"sent\";",
-          "  if (s === \"sent\") return \"read\";",
-          "  if (s === \"read\") return \"archived\";",
-          "  return s;",
-          "}"
-        ],
-        "catchFlags": [
-          "caught_archived"
-        ],
-        "marks": [
-          {
-            "clause": 0,
-            "kind": "kuro",
-            "worth": 2,
-            "caught": "Archived. Things should have somewhere to go."
-          },
-          {
-            "clause": 4,
-            "kind": "odd",
-            "worth": 1
-          }
-        ]
+      "judge": {
+        "perfect": 0,
+        "flawed": -2,
+        "wrong": -5,
+        "wrongAt": 2
       }
     },
     {
