@@ -39,3 +39,8 @@ The code the button enters is **the first lock code contained in the reading** (
 - One wrong: status wrong1, lock stays; two wrong: jammed, footer gone, 让它试 still opens it with one assist.
 - Judgement: all slots right + one wrong reading → flawed; + two → wrong; replay rebuilds the same.
 - Snapshot: the day-7 dictionary lock panel with the device open and a reading (use `?day=7&found=…`).
+
+## Addition 2026-11-07 (Claude, from the headless run): the read footer under the dialogue mask
+- A recording plays as lines in the dialogue box, and the box owns the screen (playtest-1105 R2: the `.story-mask` covers everything at z-index 30, a click anywhere advances the line). The walkman's read footer (`board-read` in the 老物件栏 modal, `.objbar-host`, also z-index 30 but earlier in the DOM) is therefore under the mask while the only moment the reading is offered is while that line shows: a player can never press 「就按它显示的填」 for a tape (or any device whose reading is a dialogue line). Keys on the device are swallowed the same way until the line is advanced.
+- Fix: while a device modal is open, the dialogue mask must not cover the modal's footer and keys: either the dialogue layer sits under the modal's footer/keys (the footer and the key row above the mask, the rest of the screen still masked), or a tape line does not raise the mask at all (it is the device's own say). The reading must stay offered while its line is in the box, and advancing the line by clicking elsewhere still works.
+- Test: with a tape line in the box and the footer enabled, a click on `board-read` opens the lock (not advances the line); a click on a device key presses the key.
