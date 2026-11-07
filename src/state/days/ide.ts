@@ -117,6 +117,9 @@ export function ideTranscript(board: TaskBoard, ops: readonly IdeOp[], carried: 
   let walk = freshBoard(board, carried);
   for (const op of ops) {
     switch (op.t) {
+      case "try":
+        if (!walk.tried) show("try");
+        break;
       case "mod": {
         // tune: the switch's own beat (on / off) when it took, then `steps` as the budget runs out
         // and `reach` as every bar clears today's line (each once).

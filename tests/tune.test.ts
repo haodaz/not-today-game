@@ -4,7 +4,7 @@
 // reaches 80 with its new paths), and day 3 opens with day 2's choices still set.
 import { describe, expect, it } from "vitest";
 import type { GameEvent } from "@state/events";
-import { boardJudgement, boardState, canPrint, freshBoard, pathFound, stepBoard, tuneBase, tuneCarried, tuneDims, tuneReached, tuneShort, tuneStepsLeft, tuneValues } from "@state/days/board";
+import { boardJudgement, boardState, canPrint, freshBoard, pathFound, pathOnMenu, stepBoard, tuneNeedsTry, tuneBase, tuneCarried, tuneDims, tuneReached, tuneShort, tuneStepsLeft, tuneValues } from "@state/days/board";
 import { ideSrc, ideTranscript } from "@state/days/ide";
 import { parseTaskFile, taskByFlag, type TaskBoard } from "@state/days/tasks";
 
@@ -178,20 +178,34 @@ describe("tune: modules, paths and the bars", () => {
     expect(lines).toContain("reach");
     expect(lines.indexOf("reach")).toBeGreaterThan(lines.indexOf("mod:evals:shadow"));
   });
-  it("a path with a source of its own waits for it: her skin for Vivi's chat, the diff-only approval for the v17 sent to Wang; the module's other paths are free", () => {
+  it("a path with a source of its own waits for it (the diff-only approval for the v17 sent to Wang); her skin is off the menu until the first try to finish, when Kuro's line reveals it", () => {
     const b = d3().board!;
-    const front = b.tune!.mods.find((m) => m.id === "front")!;
-    const skin = front.paths.find((p) => p.id === "skin")!;
-    const exp = front.paths.find((p) => p.id === "export")!;
-    expect(pathFound(front, exp, 3, [])).toBe(true);
-    expect(pathFound(front, skin, 3, [])).toBe(false);
-    expect(pathFound(front, skin, 3, [{ kind: "open", day: 3, target: "conv:partner" } as GameEvent])).toBe(true);
     const gate = b.tune!.mods.find((m) => m.id === "gate")!;
     const diff = gate.paths.find((p) => p.id === "diff")!;
     expect(pathFound(gate, diff, 3, [])).toBe(false);
     expect(pathFound(gate, diff, 3, [{ kind: "open", day: 3, target: "conv:boss" } as GameEvent])).toBe(true);
-    // Kuro's day-3 open beat is where her skin is mentioned
-    expect(ideTranscript(b, []).some((l) => l.on === "open" && l.who === "kuro" && l.text.includes("皮子"))).toBe(true);
+    const front = b.tune!.mods.find((m) => m.id === "front")!;
+    const skin = front.paths.find((p) => p.id === "skin")!;
+    expect(skin.after).toBe("try");
+    let s = freshBoard(b);
+    expect(pathOnMenu(skin, s)).toBe(false);
+    expect(stepBoard(b, s, { t: "mod", id: "front", path: "skin" })).toBe(s); // not on the menu yet
+    for (const [id, path] of Object.entries(DAY3_BEST)) s = stepBoard(b, s, { t: "mod", id, path });
+    expect(canPrint(b, s)).toBe(true);
+    expect(tuneNeedsTry(b, s)).toBe(true); // the first finish only reveals
+    s = stepBoard(b, s, { t: "try" });
+    expect(s.tried).toBe(true);
+    expect(tuneNeedsTry(b, s)).toBe(false);
+    expect(pathOnMenu(skin, s)).toBe(true);
+    expect(stepBoard(b, s, { t: "mod", id: "front", path: "skin" }).mods.front).toBe("skin");
+    // the transcript: the player's line, then Kuro's, once; day 2 has no try (no path waits for one)
+    const ons = ideTranscript(b, [{ t: "try" }, { t: "try" }]).map((l) => l.on);
+    expect(ons.filter((o) => o === "try")).toHaveLength(2); // two lines of the one beat
+    expect(ideTranscript(b, []).some((l) => l.on === "open" && l.text.includes("皮子"))).toBe(false);
+    expect(tuneNeedsTry(d2().board!, freshBoard(d2().board!))).toBe(false);
+    // the finish words are the player's, per day
+    expect(d2().board!.tune!.finish).toBe("今天先这样，我再想想");
+    expect(b.tune!.finish).toBe("这已经是最好的程度了");
   });
   it("the loader: a tuning board has no slots and no cards, paths name dimensions and carry sub-actions, the assist names paths within the budget, beats name modules and paths", () => {
     const base = JSON.parse(JSON.stringify(d2()));

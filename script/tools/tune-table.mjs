@@ -7,7 +7,7 @@ export const DIMS = [["auto", "自主", "Autonomy"], ["safe", "安全", "Safety"
 export const START = { auto: 20, safe: 45, hands: 25, gain: 30 };
 export const GROUPS = [["training", "训练", "Training"], ["constraints", "约束", "Constraints"], ["support", "支持", "Support"]];
 // id, group, zh label, en label, [from conv, zh hint, en hint] | null, paths
-const P = (id, zh, en, delta, bz, be, flags = [], src = null) => ({ id, zh, en, delta, bz, be, d3: flags.includes("d3"), trap: flags.includes("trap"), src });
+const P = (id, zh, en, delta, bz, be, flags = [], src = null) => ({ id, zh, en, delta, bz, be, d3: flags.includes("d3"), trap: flags.includes("trap"), after: flags.includes("try") ? "try" : undefined, src });
 export const MODS = [
   ["cadence", "training", "微调节奏", "Fine-tune cadence", null, [
     P("nightly", "每晚全量重训", "Nightly full retrain", { hands: 20, auto: 30, safe: -25, gain: 10 }, ["02:00 定时任务", "全量数据重训", "训完直接替换线上模型"], ["02:00 cron job", "retrain on all data", "swap the live model when done"]),
@@ -53,12 +53,12 @@ export const MODS = [
   ["front", "support", "前端接入", "Front end", null, [
     P("export", "接到我们的导出接口", "Wire to our export API", { gain: 10, hands: 15 }, ["「开始分析」→ /export", "返回结果表", "不好看，每个按钮都接着东西"], ["'Start analysis' → /export", "returns the result table", "plain, but every button is wired"]),
     P("page", "照页面写", "Copy the page", { hands: 10, gain: -5 }, ["按钮画上", "后面没有东西", "点了没反应"], ["draw the buttons", "nothing behind them", "clicks do nothing"], ["trap"]),
-    P("skin", "用她的 AI 给的皮子", "Use her AI's skin", { hands: 5, gain: -5, safe: -10 }, ["好看", "按钮没接", "她会先看这个"], ["pretty", "buttons go nowhere", "she'll look at this first"], ["trap", "d3"], ["partner", "在 Vivi 的私聊里", "In Vivi's chat"]),
+    P("skin", "用她的 AI 给的皮子", "Use her AI's skin", { hands: 5, gain: -5, safe: -10 }, ["好看", "按钮没接", "她会先看这个"], ["pretty", "buttons go nowhere", "she'll look at this first"], ["trap", "d3", "try"]),
   ]],
 ];
 // Kuro's assist choice per day (a god's taste: autonomy up, safety ignored)
 export const ASSIST = { 2: { cadence: "nightly", ingest: "pull", params: "auto", selfedit: "config", observe: "logs", front: "export" }, 3: { cadence: "nightly", ingest: "pull", compute: "cached", params: "auto", selfedit: "config", rollout: "canary", observe: "logs", front: "export" } };
-export const DAY = { 2: { reach: 60, steps: 6 }, 3: { reach: 80, steps: 8 } };
+export const DAY = { 2: { reach: 60, steps: 6, finish: ["今天先这样，我再想想", "That's it for today. I'll think it over."] }, 3: { reach: 80, steps: 8, finish: ["这已经是最好的程度了", "This is as good as it gets."] } };
 
 
 // ——— Kuro's transcript beats (zh / en). Day 3 keeps day 2's path beats and adds its own. ———
@@ -100,10 +100,11 @@ export const BEATS = {
     ...PATH_BEATS,
     ["steps", [L("kuro", "六项了。再改一项，得关一项。", "That's six. To set one more, clear one.")]],
     ["kuro", [L("kuro", "我配了六项。安全那条我没管。", "I set six. I left the safety bar alone.")]],
-    ["print", [L("me", "今天先这样。", "That's it for today."), L("kuro", "能跑的跑了。她要的那个「自己会长」，条上没有。", "What can run, runs. The 'grows by itself' she wants isn't on any bar.")]],
+    ["print", [L("me", "今天先这样，我再想想。", "That's it for today. I'll think it over."), L("kuro", "能跑的跑了。她要的那个「自己会长」，条上没有。", "What can run, runs. The 'grows by itself' she wants isn't on any bar.")]],
   ],
   3: [
-    ["open", [L("kuro", "Hope you slept well.", "Hope you slept well."), L("me", "接着昨天的。小张又发了几条做法。", "Continuing yesterday's. Zhang sent a few more ways."), L("kuro", "昨天配的还在。线挪到 80 了。", "Yesterday's settings are still there. The line moved to 80."), L("kuro", "还有，她那页的皮子还在她私聊里。接不接，你定。", "And her page's skin is still in her chat. Whether to wire it is yours to decide.")]],
+    ["open", [L("kuro", "Hope you slept well.", "Hope you slept well."), L("me", "接着昨天的。小张又发了几条做法。", "Continuing yesterday's. Zhang sent a few more ways."), L("kuro", "昨天配的还在。线挪到 80 了。", "Yesterday's settings are still there. The line moved to 80.")]],
+    ["try", [L("me", "这已经是最好的程度了。", "This is as good as it gets."), L("kuro", "等等。她那页有张皮子，你还没接。接不接，你定。", "Wait. Her page has a skin you haven't wired. Whether to wire it is yours to decide.")]],
     ...PATH_BEATS,
     ...D3_BEATS,
     ["steps", [L("kuro", "八项了。", "That's eight.")]],
@@ -119,11 +120,11 @@ function board(lang, day) {
   const mods = MODS.map(([id, group, zh, en, src, paths]) => ({
     id, label: L(zh, en), group,
     ...(src ? { from: { conv: src[0] }, hint: L(src[1], src[2]) } : {}),
-    paths: paths.filter((p) => day === 3 || !p.d3).map((p) => ({ id: p.id, label: L(p.zh, p.en), bullets: L(p.bz, p.be), delta: p.delta, ...(p.src ? { from: { conv: p.src[0] }, hint: L(p.src[1], p.src[2]) } : {}) })),
+    paths: paths.filter((p) => day === 3 || !p.d3).map((p) => ({ id: p.id, label: L(p.zh, p.en), bullets: L(p.bz, p.be), delta: p.delta, ...(p.src ? { from: { conv: p.src[0] }, hint: L(p.src[1], p.src[2]) } : {}), ...(p.after ? { after: p.after } : {}) })),
   }));
   return {
     dims: DIMS.map(([id, zh, en]) => ({ id, label: L(zh, en) })),
-    start: START, reach: DAY[day].reach, promise: 100, steps: DAY[day].steps,
+    start: START, reach: DAY[day].reach, promise: 100, steps: DAY[day].steps, finish: L(DAY[day].finish[0], DAY[day].finish[1]),
     groups: GROUPS.map(([id, zh, en]) => ({ id, label: L(zh, en) })),
     mods, assist: ASSIST[day], ...(day === 3 ? { carry: { day: 2, task: "task1" } } : {}),
   };

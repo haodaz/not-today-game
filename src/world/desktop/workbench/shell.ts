@@ -5,7 +5,7 @@
 // placing, Kuro's fill, the lock, print and send are the board's own actions. Card state is session
 // only, per task (`session.shell`); the board itself rebuilds from the log.
 import type { GameEvent } from "@state/events";
-import { boardState, canFetch, canPrint, foundCardIds, modFound, pathFound, taskForId, tuneCarried, tuneStepsLeft, type BoardState } from "@state/days/board";
+import { boardState, canFetch, canPrint, foundCardIds, modFound, pathFound, pathOnMenu, taskForId, tuneCarried, tuneStepsLeft, type BoardState } from "@state/days/board";
 import { ideOps, ideSrc, ideTranscript, selectedSlot, type IdeLine } from "@state/days/ide";
 import { API_FIELD, SLOT_FIELD, type Task, type TaskBoard } from "@state/days/tasks";
 import { deliverablePage } from "@state/files";
@@ -188,7 +188,7 @@ function tunePane(board: TaskBoard, s: BoardState, day: number, events: readonly
       return html`<div class="sh-mod notfound" aria-disabled="true" title="${hint}">${gut()}<span class="sh-mod-l"><code>${m.id}: null,</code> ${m.label}</span><span class="sh-mod-hint">${hint}</span></div>`;
     }
     const blocked = chosen === undefined && left === 0;
-    const chips = m.paths.map((p) => {
+    const chips = m.paths.filter((p) => pathOnMenu(p, s)).map((p) => {
       const on = chosen === p.id;
       // a path with a source of its own waits for it (her skin: Vivi's chat; the diff-only approval: the v17 you sent)
       if (!pathFound(m, p, day, events)) {
@@ -374,7 +374,7 @@ function conversation(ctx: AppContext, task: Task, day: number, live: boolean, f
   if (live && board && s) {
     const assist = hasString("board.assist") ? html`<button type="button" class="sh-chip" data-action="board-assist">${tr("board.assist")}</button>` : null;
     // tune: the finish is 今天先这样 (the day's cap is what it is), not a snapshot.
-    const label = board.tune && hasString("board.tune.print") ? tr("board.tune.print") : board.view === "ide" && hasString("board.ide.snapshot") ? tr("board.ide.snapshot") : finishLabel(task);
+    const label = board.tune ? (board.tune.finish ?? (hasString("board.tune.print") ? t("board.tune.print") : finishLabel(task))) : board.view === "ide" && hasString("board.ide.snapshot") ? tr("board.ide.snapshot") : finishLabel(task);
     const finish = html`<button type="button" class="sh-chip primary" data-action="board-print"${canPrint(board, s) ? null : html` disabled`}>${label}</button>`;
     chips = html`${assist}${finish}`;
   }

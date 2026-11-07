@@ -56,6 +56,7 @@
           "reach": 60,
           "promise": 100,
           "steps": 6,
+          "finish": "That's it for today. I'll think it over.",
           "groups": [
             {
               "id": "training",
@@ -671,7 +672,7 @@
             "lines": [
               {
                 "who": "me",
-                "text": "That's it for today."
+                "text": "That's it for today. I'll think it over."
               },
               {
                 "who": "kuro",

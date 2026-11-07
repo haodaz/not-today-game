@@ -115,7 +115,9 @@ export type BoardOp =
   | { readonly t: "merge"; readonly slot: string; readonly keep: "v16" | "v17" }
   | { readonly t: "fetch" }
   /** tune (2026-11-08): a module of a tuning board set to one of its paths (`path`), or cleared (null); the bars move. */
-  | { readonly t: "mod"; readonly id: string; readonly path: string | null };
+  | { readonly t: "mod"; readonly id: string; readonly path: string | null }
+  /** tune: the player tried to finish once (今天先这样) — Kuro's line, and the paths that wait for it appear. */
+  | { readonly t: "try" };
 
 export type EventKind = GameEvent["kind"];
 

@@ -44,6 +44,8 @@ export interface BoardState {
   readonly fetched: boolean;
   /** tune (2026-11-08): module → the path chosen for it (a module with no entry is off). */
   readonly mods: Readonly<Record<string, string>>;
+  /** tune: the player tried to finish once today (the paths with `after: "try"` are on the menu from then). */
+  readonly tried: boolean;
 }
 
 /**
@@ -53,7 +55,7 @@ export interface BoardState {
 export function freshBoard(board: TaskBoard, carried: Readonly<Record<string, string>> = {}): BoardState {
   const mods: Record<string, string> = {};
   for (const [id, path] of Object.entries(carried)) if (board.tune?.mods.find((m) => m.id === id)?.paths.some((p) => p.id === path)) mods[id] = path;
-  return { unlocked: board.given.lock === undefined, slots: {}, assists: 0, wrongCodes: [], merged: {}, fetched: false, mods };
+  return { unlocked: board.given.lock === undefined, slots: {}, assists: 0, wrongCodes: [], merged: {}, fetched: false, mods, tried: false };
 }
 
 /**
@@ -93,6 +95,8 @@ export function stepBoard(board: TaskBoard, s: BoardState, op: BoardOp): BoardSt
     case "fetch":
       if (!board.ide?.api || s.fetched) return s;
       return { ...s, fetched: true };
+    case "try":
+      return board.tune && !s.tried ? { ...s, tried: true } : s;
     case "mod": {
       // tune: choosing a path for a module not yet set spends a step (never over the budget); another
       // path for a set module swaps it for free; null clears it and gives the step back. Unknown
@@ -107,7 +111,9 @@ export function stepBoard(board: TaskBoard, s: BoardState, op: BoardOp): BoardSt
         delete next[op.id];
         return { ...s, mods: next };
       }
-      if (!mod.paths.some((p) => p.id === op.path) || now === op.path) return s;
+      const def = mod.paths.find((p) => p.id === op.path);
+      if (!def || now === op.path) return s;
+      if (def.after === "try" && !s.tried) return s; // not on the menu yet
       if (now === undefined && Object.keys(s.mods).length >= tune.steps) return s;
       return { ...s, mods: { ...s.mods, [op.id]: op.path } };
     }
@@ -187,6 +193,14 @@ export function modFound(mod: TuneMod, day: number, events: readonly GameEvent[]
 /** tune: a path is offered: its module found, and its own source (if any) found today. */
 export function pathFound(mod: TuneMod, path: TunePath, day: number, events: readonly GameEvent[]): boolean {
   return modFound(mod, day, events) && sourceFound(path.from, day, events);
+}
+/** tune: a path is on the menu at all: one that waits for the first try (`after: "try"`) is absent until then. */
+export function pathOnMenu(path: TunePath, s: BoardState): boolean {
+  return path.after !== "try" || s.tried;
+}
+/** tune: the first 今天先这样 does not finish: a path waits for it (Kuro's `try` line, then the option). */
+export function tuneNeedsTry(board: TaskBoard, s: BoardState): boolean {
+  return !!board.tune && !s.tried && board.tune.mods.some((m) => m.paths.some((p) => p.after === "try"));
 }
 
 /** tune: the slack under today's line that still counts as right (the judge's tolerance). */
@@ -357,6 +371,9 @@ export function validateBoardStep(day: number, taskId: string, op: BoardOp): voi
       return;
     case "fetch":
       if (!board.ide?.api) throw new Error("boardStep: this board has no API to pull from");
+      return;
+    case "try":
+      if (!board.tune) throw new Error("boardStep: this board has no modules");
       return;
     case "mod": {
       if (!board.tune) throw new Error("boardStep: this board has no modules");

@@ -56,6 +56,7 @@
           "reach": 60,
           "promise": 100,
           "steps": 6,
+          "finish": "今天先这样，我再想想",
           "groups": [
             {
               "id": "training",
@@ -671,7 +672,7 @@
             "lines": [
               {
                 "who": "me",
-                "text": "今天先这样。"
+                "text": "今天先这样，我再想想。"
               },
               {
                 "who": "kuro",

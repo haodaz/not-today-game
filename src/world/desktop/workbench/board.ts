@@ -8,7 +8,7 @@
 import type { State } from "@state/types.gen";
 import type { GameEvent } from "@state/events";
 import type { Task, TaskBoard } from "@state/days/tasks";
-import { autoUnlock, boardState, canFetch, canPrint, foundCardIds, isKuroCard, isObjectLock, isReadLock, lockCodesOffered, lockJammed, lockObjectAvailable, lockUsedOk, pathFound, trayCards, tuneCarried, tuneStepsLeft, wrongReadings, type BoardState } from "@state/days/board";
+import { autoUnlock, boardState, canFetch, canPrint, foundCardIds, isKuroCard, isObjectLock, isReadLock, lockCodesOffered, lockJammed, lockObjectAvailable, lockUsedOk, pathFound, trayCards, tuneCarried, tuneNeedsTry, tuneStepsLeft, wrongReadings, type BoardState } from "@state/days/board";
 import { ideOps, ideSrc, ideTranscript } from "@state/days/ide";
 import { cls, html, type SafeHtml } from "@world/html";
 import { FRAMES, frameUrl } from "../kuro/body";
@@ -456,6 +456,12 @@ const actions: Record<string, ActionHandler> = {
     if (!c) return;
     const s = stateOf(ctx, c.task, c.board);
     if (!canPrint(c.board, s)) return;
+    // tune (author 2026-11-08): the first try does not finish when a path waits for it — Kuro's line, and the option appears.
+    if (tuneNeedsTry(c.board, s)) {
+      ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "try" } });
+      ctx.rerender();
+      return;
+    }
     const open = openWork(ctx.store.getState(), ctx.store.getEvents());
     if (!open || open.item.done.kind !== "flag") return;
     ctx.store.appendEvent({

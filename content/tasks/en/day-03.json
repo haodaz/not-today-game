@@ -56,6 +56,7 @@
           "reach": 80,
           "promise": 100,
           "steps": 8,
+          "finish": "This is as good as it gets.",
           "groups": [
             {
               "id": "training",
@@ -504,10 +505,7 @@
                     "gain": -5,
                     "safe": -10
                   },
-                  "from": {
-                    "conv": "partner"
-                  },
-                  "hint": "In Vivi's chat"
+                  "after": "try"
                 }
               ]
             }
@@ -542,10 +540,19 @@
               {
                 "who": "kuro",
                 "text": "Yesterday's settings are still there. The line moved to 80."
+              }
+            ]
+          },
+          {
+            "on": "try",
+            "lines": [
+              {
+                "who": "me",
+                "text": "This is as good as it gets."
               },
               {
                 "who": "kuro",
-                "text": "And her page's skin is still in her chat. Whether to wire it is yours to decide."
+                "text": "Wait. Her page has a skin you haven't wired. Whether to wire it is yours to decide."
               }
             ]
           },
