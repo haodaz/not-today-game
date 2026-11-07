@@ -1096,4 +1096,4 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .sh-card-body .sh-path .sh-path-b{grid-area:b;padding-left:14px;margin-top:2px}
 .sh-path.kuro{border-style:dashed;background:#FAFAFA;color:#1F5FD6}
 .sh-path.kuro::before{border-style:dashed}
-.sh-mods.read .sh-mod{border-bottom:0;padding:3px 12px}
+.sh-mods.read .sh-mod{display:block;border-bottom:0;padding:3px 12px}
