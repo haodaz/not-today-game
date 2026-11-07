@@ -79,7 +79,9 @@ export interface Sequence {
   /** The default `where` of its lines (a line's own wins). */
   readonly where?: Place;
   /** 2026-11-08 (heads and tails): after its last line is read the camera goes here by itself. */
-  readonly then?: "desk";
+  readonly then?: "desk" | "table" | "room";
+  /** Lines said once the camera has arrived there (needs `then`). */
+  readonly after?: readonly SayLine[];
 }
 
 /** A parsed condition (`unlock` / `done`). */
@@ -278,11 +280,14 @@ function effects(v: unknown, w: string): ChoiceEffects {
 /** `choiceSay`: its choices may carry their own `say` (the shutdown beat only; author 2026-11-06). */
 function sequence(v: unknown, w: string, allowChoices: boolean, choiceSay = false): Sequence {
   if (!isRecord(v)) fail(w, "a sequence must be an object");
-  keys(v, allowChoices ? ["say", "choices", "where", "then"] : ["say", "where", "then"], w);
+  keys(v, allowChoices ? ["say", "choices", "where", "then", "after"] : ["say", "where", "then", "after"], w);
   if (!Array.isArray(v.say)) fail(`${w}.say`, "must be a list");
   const say = v.say.map((x, i) => line(x, `${w}.say[${i}]`));
-  if (v.then !== undefined && v.then !== "desk") fail(`${w}.then`, 'must be "desk"');
-  const where = { ...(v.where !== undefined ? { where: parsePlace(v.where, `${w}.where`) } : {}), ...(v.then !== undefined ? { then: v.then as "desk" } : {}) };
+  if (v.then !== undefined && v.then !== "desk" && v.then !== "table" && v.then !== "room") fail(`${w}.then`, 'must be "desk", "table" or "room"');
+  if (v.after !== undefined && v.then === undefined) fail(`${w}.after`, "needs then");
+  if (v.after !== undefined && !Array.isArray(v.after)) fail(`${w}.after`, "must be a list");
+  const after = Array.isArray(v.after) ? v.after.map((x, i) => line(x, `${w}.after[${i}]`)) : undefined;
+  const where = { ...(v.where !== undefined ? { where: parsePlace(v.where, `${w}.where`) } : {}), ...(v.then !== undefined ? { then: v.then as "desk" | "table" | "room" } : {}), ...(after !== undefined ? { after } : {}) };
   if (v.choices === undefined) return { say, ...where };
   if (!Array.isArray(v.choices) || v.choices.length === 0) fail(`${w}.choices`, "must be a non-empty list");
   const choices = v.choices.map((c, i): Choice => {
@@ -456,6 +461,8 @@ function localiseSeq(zh: Sequence | undefined, en: Sequence | undefined, w: stri
   if (zh === undefined || en === undefined) fail(w, `sequence present in only one language`);
   if (zh.say.length !== en.say.length) fail(`${w}.say`, `${en.say.length} lines, the Chinese has ${zh.say.length}`);
   if (zh.then !== en.then) fail(`${w}.then`, "differs from the Chinese");
+  if ((zh.after?.length ?? 0) !== (en.after?.length ?? 0)) fail(`${w}.after`, `${en.after?.length ?? 0} lines, the Chinese has ${zh.after?.length ?? 0}`);
+  const after = zh.after?.map((z, i) => localiseLine(z, en.after![i]!, `${w}.after[${i}]`));
   const say = zh.say.map((z, i) => localiseLine(z, en.say[i]!, `${w}.say[${i}]`));
   if ((zh.choices?.length ?? 0) !== (en.choices?.length ?? 0)) fail(`${w}.choices`, `choice count differs from the Chinese`);
   const choices = zh.choices?.map((z, i) => {
@@ -468,7 +475,7 @@ function localiseSeq(zh: Sequence | undefined, en: Sequence | undefined, w: stri
     const out = bilingual(z, { text: e.text });
     return say ? bilingualValues(out, { say }) : out;
   });
-  return { say, ...(choices ? { choices } : {}), ...(zh.where !== undefined ? { where: zh.where } : {}) };
+  return { say, ...(choices ? { choices } : {}), ...(zh.where !== undefined ? { where: zh.where } : {}) , ...(after !== undefined ? { after } : {}) };
 }
 const same = (a: unknown, b: unknown): boolean => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
 

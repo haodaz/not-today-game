@@ -145,6 +145,18 @@
         },
         {
           "k": "narration",
+          "t": "平时只记得住一个梦。今晚记住了两个。"
+        },
+        {
+          "k": "narration",
+          "t": "第二个说不清剧情。天很低，几乎压到地上。天地之间只剩很薄的一层，有我的天花板那么高。"
+        },
+        {
+          "k": "narration",
+          "t": "枕边有什么在呼吸，在嬉笑，蜿蜒而过，奔腾而过，寂静无声。"
+        },
+        {
+          "k": "narration",
           "t": "今天过去了。"
         }
       ]
@@ -272,7 +284,16 @@
       "unlock": "done:task3",
       "done": "event:eat:dinner",
       "required": true,
-      "when": "night"
+      "when": "night",
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "吃完了。碗放在小桌上，明天再说。"
+          }
+        ],
+        "then": "room"
+      }
     },
     {
       "id": "desk",
@@ -351,11 +372,33 @@
     ],
     "task": {
       "id": "task3",
-      "text": "会上说的：把 AI 理论往大里讲。",
+      "text": "v18：把 AI 理论往大里讲。",
       "unlock": "start",
       "done": "flag:task_d3_3",
       "required": true,
-      "when": "night"
+      "when": "night",
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "你还没吃饭呢。"
+          },
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "好，吃了再睡。"
+          }
+        ],
+        "then": "table",
+        "after": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "饭凉了。"
+          }
+        ]
+      }
     }
   }
 }

@@ -28,10 +28,22 @@ describe("day files", () => {
     ["an old night-raid effect (item_dream, removed 2026-11-06)", (d: any) => (d.beats.shutdown.choices = [{ text: "x", effects: { item_dream: "chick" } }]), /unknown key "item_dream"/],
     ["an old night-raid effect (item_lost, removed 2026-11-06)", (d: any) => (d.beats.shutdown.choices = [{ text: "x", effects: { item_lost: "loan" } }]), /unknown key "item_lost"/],
     ["waiting less than the minimum", (d: any) => (d.delivery.waitMinutes = 1), /below minMinutes/],
+    // A sequence's camera tail (2026-11-08): then is desk / table / room; after needs then.
+    ["a then that is not a view", (d: any) => (d.beats.shutdown.then = "bed"), /then/],
+    ["after without then", (d: any) => (d.beats.shutdown.after = [{ k: "narration", t: "x" }]), /after.*needs then/],
   ])("rejects %s", (_name, change, message) => {
     const d = clone();
     change(d);
     expect(() => parseDayFile(d, "day-01.json")).toThrow(message);
+  });
+
+  it("a sequence may send the camera on (then) and speak on arrival (after) (2026-11-08)", () => {
+    const d = clone();
+    d.beats.shutdown.then = "table";
+    d.beats.shutdown.after = [{ k: "speaker", who: "me", t: "饭凉了。" }];
+    const f = parseDayFile(d, "day-01.json");
+    expect(f.beats.shutdown!.then).toBe("table");
+    expect(f.beats.shutdown!.after).toHaveLength(1);
   });
 
   it("parses condition tokens", () => {

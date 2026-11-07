@@ -1076,9 +1076,11 @@ export const loopActions: Record<string, ActionHandler> = {
     else if (ended?.kind === "toDoor") {
       if (session.view !== "door") loopActions["view"]!(ctx, { view: "door" } as DOMStringMap, null as never);
     }
-    // A sequence's `then: "desk"` (2026-11-08): its last line read, the camera leaves the screen to 桌子.
-    else if (ended?.kind === "toDesk") {
-      if (session.view !== "desk") loopActions["view"]!(ctx, { view: "desk" } as DOMStringMap, null as never);
+    // A sequence's `then` (2026-11-08): its last line read, the camera goes there by itself; its
+    // `after` lines are said once it has arrived (day 3: 「饭凉了。」 at the little table).
+    else if (ended?.kind === "toView") {
+      if (session.view !== ended.view) loopActions["view"]!(ctx, { view: ended.view } as DOMStringMap, null as never);
+      if (ended.after.length) session.dialogue = push(session.dialogue, { key: `d${state.day}:then:${ended.view}`, lines: ended.after, ending: { kind: "none" } });
     }
     // guidance R14: Vivi's page read: it closes and the app before it is in front again.
     else if (ended?.kind === "docBack") docBack(ctx);

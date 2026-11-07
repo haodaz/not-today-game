@@ -145,6 +145,18 @@
         },
         {
           "k": "narration",
+          "t": "Usually I keep one dream. Tonight I kept two."
+        },
+        {
+          "k": "narration",
+          "t": "The second has no story to tell. The sky is very low, almost on the ground. Between sky and ground only a thin layer is left, as high as my ceiling."
+        },
+        {
+          "k": "narration",
+          "t": "By the pillow something breathes, giggles, winds past, gallops past, makes no sound."
+        },
+        {
+          "k": "narration",
           "t": "Today is over."
         }
       ]
@@ -272,7 +284,16 @@
       "unlock": "done:task3",
       "done": "event:eat:dinner",
       "required": true,
-      "when": "night"
+      "when": "night",
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "Done. The bowl stays on the little table; tomorrow."
+          }
+        ],
+        "then": "room"
+      }
     },
     {
       "id": "desk",
@@ -351,11 +372,33 @@
     ],
     "task": {
       "id": "task3",
-      "text": "What he said in the meeting: make the AI theory bigger.",
+      "text": "v18: make the AI theory bigger.",
       "unlock": "start",
       "done": "flag:task_d3_3",
       "required": true,
-      "when": "night"
+      "when": "night",
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "You haven't eaten."
+          },
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "Fine. Eat, then sleep."
+          }
+        ],
+        "then": "table",
+        "after": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "It's gone cold."
+          }
+        ]
+      }
     }
   }
 }
