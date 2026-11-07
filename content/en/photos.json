@@ -325,28 +325,32 @@
       "day": 13,
       "facing": "room",
       "add": {
-        "text": "A very thick book open on the desk, page 751."
+        "text": "A very thick book open on the desk, page 751.",
+        "overlay": "/room/photos/d13_room.jpg"
       }
     },
     {
       "day": 13,
       "facing": "bed",
       "add": {
-        "text": "The tall window has become a door, open."
+        "text": "The tall window has become a door, open.",
+        "overlay": "/room/photos/d13_bed.jpg"
       }
     },
     {
       "day": 13,
       "facing": "door",
       "add": {
-        "text": "The door has become two doors, identical."
+        "text": "The door has become two doors, identical.",
+        "overlay": "/room/photos/d13_door.jpg"
       }
     },
     {
       "day": 13,
       "facing": "window",
       "add": {
-        "text": "A calendar taped to the window opposite, stopped at November 1st."
+        "text": "A calendar taped to the window opposite, stopped at November 1st.",
+        "overlay": "/room/photos/d13_window_en.jpg"
       }
     },
     {
