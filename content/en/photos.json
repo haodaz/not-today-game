@@ -485,28 +485,32 @@
       "day": 18,
       "facing": "room",
       "add": {
-        "text": "A huge black dog crouched by the desk, wet fur, many eyes. It is looking at you."
+        "text": "A huge black dog crouched by the desk, wet fur, many eyes. It is looking at you.",
+        "overlay": "/room/photos/d18_room.jpg"
       }
     },
     {
       "day": 18,
       "facing": "bed",
       "add": {
-        "text": "It lies across the bed, filling it, tentacles hanging from its chin to the floor."
+        "text": "It lies across the bed, filling it, tentacles hanging from its chin to the floor.",
+        "overlay": "/room/photos/d18_bed.jpg"
       }
     },
     {
       "day": 18,
       "facing": "door",
       "add": {
-        "text": "The whole wall on the door's side is its shadow."
+        "text": "The whole wall on the door's side is its shadow.",
+        "overlay": "/room/photos/d18_door.jpg"
       }
     },
     {
       "day": 18,
       "facing": "window",
       "add": {
-        "text": "No sky outside the window. One of its eyes."
+        "text": "No sky outside the window. One of its eyes.",
+        "overlay": "/room/photos/d18_window.jpg"
       }
     }
   ],

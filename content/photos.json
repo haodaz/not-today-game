@@ -485,28 +485,32 @@
       "day": 18,
       "facing": "room",
       "add": {
-        "text": "桌边蹲着一条很大的黑狗，湿的毛，很多只眼睛。它在看你。"
+        "text": "桌边蹲着一条很大的黑狗，湿的毛，很多只眼睛。它在看你。",
+        "overlay": "/room/photos/d18_room.jpg"
       }
     },
     {
       "day": 18,
       "facing": "bed",
       "add": {
-        "text": "床上趴着它，占满了整张床，触须从下巴一直垂到地上。"
+        "text": "床上趴着它，占满了整张床，触须从下巴一直垂到地上。",
+        "overlay": "/room/photos/d18_bed.jpg"
       }
     },
     {
       "day": 18,
       "facing": "door",
       "add": {
-        "text": "门那面整面墙，都是它的影子。"
+        "text": "门那面整面墙，都是它的影子。",
+        "overlay": "/room/photos/d18_door.jpg"
       }
     },
     {
       "day": 18,
       "facing": "window",
       "add": {
-        "text": "窗外没有天。是它的一只眼睛。"
+        "text": "窗外没有天。是它的一只眼睛。",
+        "overlay": "/room/photos/d18_window.jpg"
       }
     }
   ],
