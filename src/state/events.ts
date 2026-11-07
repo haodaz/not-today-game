@@ -113,7 +113,9 @@ export type BoardOp =
   | { readonly t: "assistFill" }
   /** ide v2 (2026-11-08): the player keeps v17's or v16's line on a page that differs; the data is pulled from the API once. */
   | { readonly t: "merge"; readonly slot: string; readonly keep: "v16" | "v17" }
-  | { readonly t: "fetch" };
+  | { readonly t: "fetch" }
+  /** tune (2026-11-08): a module of a tuning board switched on or off (the bars move; a step spent or given back). */
+  | { readonly t: "mod"; readonly id: string; readonly on: boolean };
 
 export type EventKind = GameEvent["kind"];
 

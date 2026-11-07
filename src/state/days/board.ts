@@ -5,7 +5,7 @@
 import type { BoardOp, GameEvent } from "../events";
 import type { State } from "../types.gen";
 import { meetingCardFound } from "./meeting";
-import { isMeetingFrom, taskByFlag, taskFiles, type BoardCard, type BoardLock, type CardFrom, type Task, type TaskBoard, type TaskDeliverable } from "./tasks";
+import { isMeetingFrom, taskByFlag, taskFiles, type BoardCard, type BoardLock, type CardFrom, type Task, type TaskBoard, type TaskDeliverable, type TuneMod } from "./tasks";
 import { dayFile } from "./table";
 import { takenByKuro } from "@world/objects/taken";
 import { handOf } from "../hands";
@@ -42,11 +42,29 @@ export interface BoardState {
   readonly merged: Readonly<Record<string, "v16" | "v17">>;
   /** ide v2: the latest data was pulled from the API (once). */
   readonly fetched: boolean;
+  /** tune (2026-11-08): the modules switched on, in the order they were switched on. */
+  readonly mods: readonly string[];
 }
 
-/** A fresh board: locked when it has a lock, every slot empty, no assist. */
-export function freshBoard(board: TaskBoard): BoardState {
-  return { unlocked: board.given.lock === undefined, slots: {}, assists: 0, wrongCodes: [], merged: {}, fetched: false };
+/**
+ * A fresh board: locked when it has a lock, every slot empty, no assist. A tuning board that carries
+ * yesterday's work opens with those modules on (`carried`; `tuneCarried` reads them from the log).
+ */
+export function freshBoard(board: TaskBoard, carried: readonly string[] = []): BoardState {
+  const known = new Set(board.tune?.mods.map((m) => m.id) ?? []);
+  return { unlocked: board.given.lock === undefined, slots: {}, assists: 0, wrongCodes: [], merged: {}, fetched: false, mods: carried.filter((id) => known.has(id)) };
+}
+
+/**
+ * tune: the modules yesterday's board (`tune.carry`) ended with — on when today's board opens.
+ * Pure, from the whole log (yesterday's `boardStep`s are in it). No carry, or no such board: none.
+ */
+export function tuneCarried(board: TaskBoard, events: readonly GameEvent[]): readonly string[] {
+  const carry = board.tune?.carry;
+  if (!carry) return [];
+  const from = boardOf(carry.day, carry.task);
+  if (!from?.board.tune) return [];
+  return boardState(from.board, carry.day, carry.task, events).mods;
 }
 
 /** The `boardStep` ops for a task on a day, in order (today only). */
@@ -74,6 +92,15 @@ export function stepBoard(board: TaskBoard, s: BoardState, op: BoardOp): BoardSt
     case "fetch":
       if (!board.ide?.api || s.fetched) return s;
       return { ...s, fetched: true };
+    case "mod": {
+      // tune: on spends a step (never over the budget); off gives it back. Unknown module: ignored.
+      const tune = board.tune;
+      if (!tune || !tune.mods.some((m) => m.id === op.id)) return s;
+      const on = s.mods.includes(op.id);
+      if (op.on === on) return s;
+      if (op.on && s.mods.length >= tune.steps) return s;
+      return { ...s, mods: op.on ? [...s.mods, op.id] : s.mods.filter((id) => id !== op.id) };
+    }
     case "clear": {
       if (!(op.slot in s.slots)) return s;
       const next = { ...s.slots };
@@ -81,6 +108,8 @@ export function stepBoard(board: TaskBoard, s: BoardState, op: BoardOp): BoardSt
       return { ...s, slots: next };
     }
     case "assistFill": {
+      // tune: Kuro's set replaces whatever is on (it does not know what you were trying).
+      if (board.tune) return { ...s, mods: [...board.tune.assist], unlocked: true, assists: s.assists + 1 };
       const slots = { ...s.slots };
       for (const slot of board.slots) if (!(slot.id in slots)) slots[slot.id] = board.kuro.fill[slot.id]!;
       return { ...s, slots, unlocked: true, assists: s.assists + 1 };
@@ -88,14 +117,73 @@ export function stepBoard(board: TaskBoard, s: BoardState, op: BoardOp): BoardSt
   }
 }
 
-/** The board state after today's ops. */
+/** The board state after today's ops (a tuning board starts from yesterday's carried modules). */
 export function boardState(board: TaskBoard, day: number, taskId: string, events: readonly GameEvent[]): BoardState {
-  return boardOps(day, taskId, events).reduce((s, op) => stepBoard(board, s, op), freshBoard(board));
+  return boardOps(day, taskId, events).reduce((s, op) => stepBoard(board, s, op), freshBoard(board, tuneCarried(board, events)));
 }
 
-/** Every slot filled and the column unlocked: 打印 is enabled. */
+/**
+ * Every slot filled and the column unlocked: 打印 is enabled. A tuning board prints once every bar
+ * is over today's line, or once the budget is spent (今天先这样 — the day's cap is what it is).
+ */
 export function canPrint(board: TaskBoard, s: BoardState): boolean {
+  if (board.tune) return tuneReached(board, s) || tuneStepsLeft(board, s) === 0;
   return s.unlocked && board.slots.every((slot) => slot.id in s.slots) && mergesLeft(board, s).length === 0 && (!board.ide?.api || s.fetched);
+}
+
+// ——— tune (2026-11-08): the bars ———
+
+const clampPct = (v: number): number => Math.max(0, Math.min(100, v));
+
+/** tune: each dimension's value with these modules on (start + deltas, clamped 0–100). Pure. */
+export function tuneValues(board: TaskBoard, mods: readonly string[]): Readonly<Record<string, number>> {
+  const tune = board.tune;
+  if (!tune) return {};
+  const v: Record<string, number> = { ...tune.start };
+  for (const id of mods) {
+    const mod = tune.mods.find((m) => m.id === id);
+    if (!mod) continue;
+    for (const [dim, d] of Object.entries(mod.delta)) v[dim] = (v[dim] ?? 0) + d;
+  }
+  for (const dim of tune.dims) v[dim.id] = clampPct(v[dim.id] ?? 0);
+  return v;
+}
+
+/** tune: the bars now. */
+export const tuneDims = (board: TaskBoard, s: BoardState): Readonly<Record<string, number>> => tuneValues(board, s.mods);
+
+/** tune: the bars when the board opened today (the carried modules only) — the "before" colour. */
+export function tuneBase(board: TaskBoard, events: readonly GameEvent[]): Readonly<Record<string, number>> {
+  return tuneValues(board, tuneCarried(board, events));
+}
+
+/** tune: how many more modules may be switched on. */
+export function tuneStepsLeft(board: TaskBoard, s: BoardState): number {
+  return board.tune ? Math.max(0, board.tune.steps - s.mods.length) : 0;
+}
+
+/** tune: every bar is at or over today's line. */
+export function tuneReached(board: TaskBoard, s: BoardState): boolean {
+  const tune = board.tune;
+  if (!tune) return false;
+  const v = tuneDims(board, s);
+  return tune.dims.every((d) => (v[d.id] ?? 0) >= tune.reach);
+}
+
+/** tune: a module's source has been found today (as a card's; no source → found). */
+export function modFound(mod: TuneMod, day: number, events: readonly GameEvent[]): boolean {
+  return sourceFound(mod.from, day, events);
+}
+
+/** tune: the slack under today's line that still counts as right (the judge's tolerance). */
+export const TUNE_SLACK = 10;
+
+/** tune: the dimensions further than the slack under today's line (the night's wrong count). */
+export function tuneShort(board: TaskBoard, mods: readonly string[]): string[] {
+  const tune = board.tune;
+  if (!tune) return [];
+  const v = tuneValues(board, mods);
+  return tune.dims.filter((d) => (v[d.id] ?? 0) < tune.reach - TUNE_SLACK).map((d) => d.id);
 }
 
 /** ide v2: the pages that differ from v16 and are not yet merged (slot ids, in slot order). */
@@ -256,6 +344,11 @@ export function validateBoardStep(day: number, taskId: string, op: BoardOp): voi
     case "fetch":
       if (!board.ide?.api) throw new Error("boardStep: this board has no API to pull from");
       return;
+    case "mod":
+      if (!board.tune) throw new Error("boardStep: this board has no modules");
+      if (!board.tune.mods.some((m) => m.id === op.id)) throw new Error(`boardStep: "${op.id}" is not a module`);
+      if (typeof op.on !== "boolean") throw new Error("boardStep: mod.on must be true or false");
+      return;
     case "clear":
       if (!slotIds.has(op.slot)) throw new Error(`boardStep: "${op.slot}" is not a slot`);
       return;
@@ -386,7 +479,8 @@ export function boardJudgement(day: number, events: readonly GameEvent[]): { ver
   // after a jam does not undo them). A source lock's chips are as before (not counted).
   const lock = board.given.lock;
   const readings = lock && isReadLock(lock) ? wrongReadings(boardState(board, day, tree.id, events)) : 0;
-  const wrong = wrongCount(board, printed.slots) + readings;
+  // tune: a bar further than the slack under today's line counts as a wrong slot.
+  const wrong = (board.tune ? tuneShort(board, boardState(board, day, tree.id, events).mods).length : wrongCount(board, printed.slots)) + readings;
   let verdict: BoardVerdict;
   if (!given) verdict = "wrong";
   else if (wrong === 0) verdict = "perfect";

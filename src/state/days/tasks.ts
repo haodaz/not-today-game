@@ -214,6 +214,38 @@ export interface BoardBeat {
   readonly on: string;
   readonly lines: readonly BoardBeatLine[];
 }
+/**
+ * tune (2026-11-08, author): a tuning board — the work is turning modules on and off and watching
+ * the bars. Each dimension has a bar; each module moves several of them, up and down (the
+ * trade-offs); at most `steps` modules may be on at once; today's line is `reach` (the day's cap is
+ * what the module set allows: day 2 cannot reach it, day 3 just can); `promise` is what the
+ * partner's page claims (drawn as the far mark). `carry` names yesterday's board: its final set of
+ * modules is on when today's board opens (the same ids), so the bars continue. `assist` is the set
+ * Kuro switches on for 让它补全. A board with `tune` has no slots and no cards.
+ */
+export interface BoardTune {
+  readonly dims: readonly TuneDim[];
+  /** Each dimension's value before any module (0–100). */
+  readonly start: Readonly<Record<string, number>>;
+  readonly reach: number;
+  readonly promise: number;
+  readonly steps: number;
+  readonly mods: readonly TuneMod[];
+  readonly carry?: { readonly day: number; readonly task: string };
+  readonly assist: readonly string[];
+}
+export interface TuneDim {
+  readonly id: string;
+  readonly label: string;
+}
+/** A module: what it does (label), its deltas per dimension, an optional source to find first (as a card's). */
+export interface TuneMod {
+  readonly id: string;
+  readonly label: string;
+  readonly delta: Readonly<Record<string, number>>;
+  readonly from?: CardFrom;
+  readonly hint?: string;
+}
 export interface TaskBoard {
   readonly kind: "table";
   readonly title: string;
@@ -230,6 +262,8 @@ export interface TaskBoard {
   readonly beats?: readonly BoardBeat[];
   /** meeting R1: the meeting (only with `view: "meeting"`). */
   readonly meeting?: BoardMeeting;
+  /** tune (2026-11-08): the bars and the modules (only with `view: "ide"`; then no slots, no cards). */
+  readonly tune?: BoardTune;
 }
 /** Who a deliverable goes to (work v2 addition 2026-11-03 night); absent = `"hand"`. */
 export const DELIVERABLE_TO = ["boss", "partner", "group", "workbench", "hand"] as const;
@@ -461,13 +495,16 @@ function card(v: unknown, w: string): BoardCard {
  */
 function board(v: unknown, w: string): TaskBoard {
   if (!isRecord(v)) fail(w, "must be an object");
-  keys(v, ["kind", "title", "columns", "given", "slots", "cards", "kuro", "view", "ide", "beats", "meeting"], w);
+  keys(v, ["kind", "title", "columns", "given", "slots", "cards", "kuro", "view", "ide", "beats", "meeting", "tune"], w);
   if (v.kind !== "table") fail(`${w}.kind`, 'must be "table"');
   // Column headers are display-only and may be blank (the label column has no header).
   if (!Array.isArray(v.columns) || v.columns.length === 0 || !v.columns.every((c) => typeof c === "string")) fail(`${w}.columns`, "must be a non-empty list of strings");
   const columns = v.columns as string[];
+  // tune: a tuning board has modules instead of slots and cards (both lists empty).
+  const tuning = v.tune !== undefined;
   // cards (the material tray).
-  if (!Array.isArray(v.cards) || v.cards.length === 0) fail(`${w}.cards`, "must be a non-empty list");
+  if (!Array.isArray(v.cards) || (v.cards.length === 0 && !tuning)) fail(`${w}.cards`, "must be a non-empty list");
+  if (tuning && v.cards.length !== 0) fail(`${w}.cards`, "a tuning board has no cards (its modules are in tune.mods)");
   const cards = v.cards.map((c, i) => card(c, `${w}.cards[${i}]`));
   const cardIds = new Set<string>();
   for (const c of cards) {
@@ -475,7 +512,8 @@ function board(v: unknown, w: string): TaskBoard {
     cardIds.add(c.id);
   }
   // slots.
-  if (!Array.isArray(v.slots) || v.slots.length === 0) fail(`${w}.slots`, "must be a non-empty list");
+  if (!Array.isArray(v.slots) || (v.slots.length === 0 && !tuning)) fail(`${w}.slots`, "must be a non-empty list");
+  if (tuning && v.slots.length !== 0) fail(`${w}.slots`, "a tuning board has no slots");
   const slotIds = new Set<string>();
   const slots = v.slots.map((s, i) => {
     const sw = `${w}.slots[${i}]`;
@@ -560,8 +598,14 @@ function board(v: unknown, w: string): TaskBoard {
     if (!meeting) fail(`${w}.cards`, `"${c.id}" comes from a meeting, but the board has none`);
     if (!meeting.lines.some((l) => l.card === c.id)) fail(`${w}.cards`, `"${c.id}" comes from the meeting, but no line reveals it`);
   }
+  // tune: the bars and the modules; only on an IDE board.
+  let tune: BoardTune | undefined;
+  if (tuning) {
+    if (view !== "ide") fail(`${w}.tune`, 'a tuning board needs view "ide"');
+    tune = boardTune(v.tune, `${w}.tune`);
+  }
   const allCards = new Set([...cardIds, ...kuroCardIds]);
-  const beats = v.beats !== undefined ? boardBeats(v.beats, `${w}.beats`, slotIds, allCards) : undefined;
+  const beats = v.beats !== undefined ? boardBeats(v.beats, `${w}.beats`, slotIds, allCards, new Set(tune?.mods.map((m) => m.id) ?? [])) : undefined;
   return {
     kind: "table",
     title: str(v.title, `${w}.title`),
@@ -574,7 +618,71 @@ function board(v: unknown, w: string): TaskBoard {
     ...(ide ? { ide } : {}),
     ...(beats ? { beats } : {}),
     ...(meeting ? { meeting } : {}),
+    ...(tune ? { tune } : {}),
   };
+}
+
+/**
+ * The tuning board (tune 2026-11-08): 2–6 dimensions (unique ids, labels), a start value 0–100 for
+ * each, today's line and the promise (1–100), the step budget (1–20), the modules (unique ids,
+ * labels, integer deltas on known dimensions, an optional source + hint), Kuro's assist set (known
+ * module ids, within the budget), and an optional carry (a day 1–18 and a task id).
+ */
+function boardTune(v: unknown, w: string): BoardTune {
+  if (!isRecord(v)) fail(w, "must be an object");
+  keys(v, ["dims", "start", "reach", "promise", "steps", "mods", "carry", "assist"], w);
+  if (!Array.isArray(v.dims) || v.dims.length < 2 || v.dims.length > 6) fail(`${w}.dims`, "must be a list of 2 to 6 dimensions");
+  const dimIds = new Set<string>();
+  const dims = v.dims.map((d, i) => {
+    const dw = `${w}.dims[${i}]`;
+    if (!isRecord(d)) fail(dw, "a dimension must be an object");
+    keys(d, ["id", "label"], dw);
+    const id = str(d.id, `${dw}.id`);
+    if (dimIds.has(id)) fail(`${w}.dims`, `duplicate dimension id "${id}"`);
+    dimIds.add(id);
+    return { id, label: str(d.label, `${dw}.label`) };
+  });
+  const pct = (x: unknown, k: string, min = 0): number => (Number.isInteger(x) && (x as number) >= min && (x as number) <= 100 ? (x as number) : fail(k, `must be an integer from ${min} to 100`));
+  if (!isRecord(v.start)) fail(`${w}.start`, "must be an object");
+  const start: Record<string, number> = {};
+  for (const [k, x] of Object.entries(v.start)) {
+    if (!dimIds.has(k)) fail(`${w}.start`, `"${k}" is not a dimension`);
+    start[k] = pct(x, `${w}.start.${k}`);
+  }
+  for (const d of dimIds) if (!(d in start)) fail(`${w}.start`, `dimension "${d}" has no start value`);
+  const reach = pct(v.reach, `${w}.reach`, 1);
+  const promise = v.promise === undefined ? 100 : pct(v.promise, `${w}.promise`, 1);
+  if (promise < reach) fail(`${w}.promise`, "must not be below reach");
+  const steps = Number.isInteger(v.steps) && (v.steps as number) >= 1 && (v.steps as number) <= 20 ? (v.steps as number) : fail(`${w}.steps`, "must be an integer from 1 to 20");
+  if (!Array.isArray(v.mods) || v.mods.length === 0) fail(`${w}.mods`, "must be a non-empty list");
+  const modIds = new Set<string>();
+  const mods = v.mods.map((m, i) => {
+    const mw = `${w}.mods[${i}]`;
+    if (!isRecord(m)) fail(mw, "a module must be an object");
+    keys(m, ["id", "label", "delta", "from", "hint"], mw);
+    const id = str(m.id, `${mw}.id`);
+    if (modIds.has(id)) fail(`${w}.mods`, `duplicate module id "${id}"`);
+    modIds.add(id);
+    if (!isRecord(m.delta) || Object.keys(m.delta).length === 0) fail(`${mw}.delta`, "must be an object with at least one dimension");
+    const delta: Record<string, number> = {};
+    for (const [k, x] of Object.entries(m.delta)) {
+      if (!dimIds.has(k)) fail(`${mw}.delta`, `"${k}" is not a dimension`);
+      if (!Number.isInteger(x) || x === 0 || Math.abs(x as number) > 100) fail(`${mw}.delta.${k}`, "must be a non-zero integer within ±100");
+      delta[k] = x as number;
+    }
+    return { id, label: str(m.label, `${mw}.label`), delta, ...(m.from !== undefined ? { from: cardFrom(m.from, `${mw}.from`) } : {}), ...(m.hint !== undefined ? { hint: str(m.hint, `${mw}.hint`) } : {}) };
+  });
+  const assist = strings(v.assist, `${w}.assist`);
+  for (const id of assist) if (!modIds.has(id)) fail(`${w}.assist`, `"${id}" is not a module`);
+  if (assist.length > steps) fail(`${w}.assist`, "Kuro's set is over the step budget");
+  let carry: BoardTune["carry"];
+  if (v.carry !== undefined) {
+    if (!isRecord(v.carry)) fail(`${w}.carry`, "must be an object");
+    keys(v.carry, ["day", "task"], `${w}.carry`);
+    const day = Number.isInteger(v.carry.day) && (v.carry.day as number) >= 1 && (v.carry.day as number) <= 18 ? (v.carry.day as number) : fail(`${w}.carry.day`, "must be a day 1–18");
+    carry = { day, task: str(v.carry.task, `${w}.carry.task`) };
+  }
+  return { dims, start, reach, promise, steps, mods, assist, ...(carry ? { carry } : {}) };
 }
 
 const MEETING_T = /^([01]\d|2[0-3]):[0-5]\d$/;
@@ -705,10 +813,10 @@ function ideFiles(v: unknown, w: string, slotIds: ReadonlySet<string>): Record<s
 }
 
 /** The fixed beat names (ide R1); `fill:<slot>` and `fill:<slot>:<card>` are checked separately. */
-const BEAT_ONS = ["open", "kuro", "unlock", "print", "send", "merge", "fetch"] as const;
+const BEAT_ONS = ["open", "kuro", "unlock", "print", "send", "merge", "fetch", "steps", "reach"] as const;
 
 /** The transcript beats (ide R1): each `on` names a known beat and existing ids; each `on` once. */
-function boardBeats(v: unknown, w: string, slotIds: ReadonlySet<string>, cardIds: ReadonlySet<string>): BoardBeat[] {
+function boardBeats(v: unknown, w: string, slotIds: ReadonlySet<string>, cardIds: ReadonlySet<string>, modIds: ReadonlySet<string> = new Set()): BoardBeat[] {
   if (!Array.isArray(v)) fail(w, "must be a list");
   const seen = new Set<string>();
   return v.map((b, i) => {
@@ -717,7 +825,10 @@ function boardBeats(v: unknown, w: string, slotIds: ReadonlySet<string>, cardIds
     keys(b, ["on", "lines"], bw);
     const on = str(b.on, `${bw}.on`);
     const parts = on.split(":");
-    if (parts[0] === "fill" && (parts.length === 2 || parts.length === 3)) {
+    if ((parts[0] === "mod" || parts[0] === "unmod") && parts.length === 2) {
+      // tune: mod:<module> (switched on) / unmod:<module> (switched off).
+      if (!modIds.has(parts[1]!)) fail(`${bw}.on`, `"${parts[1]}" is not a module`);
+    } else if (parts[0] === "fill" && (parts.length === 2 || parts.length === 3)) {
       if (!slotIds.has(parts[1]!)) fail(`${bw}.on`, `"${parts[1]}" is not a slot`);
       if (parts.length === 3 && !cardIds.has(parts[2]!)) fail(`${bw}.on`, `"${parts[2]}" is not a card or a Kuro card`);
     } else if (parts[0] === "merge" && (parts.length === 2 || parts.length === 3)) {

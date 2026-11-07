@@ -5,7 +5,7 @@
 // placing, Kuro's fill, the lock, print and send are the board's own actions. Card state is session
 // only, per task (`session.shell`); the board itself rebuilds from the log.
 import type { GameEvent } from "@state/events";
-import { boardState, canFetch, canPrint, foundCardIds, taskForId, type BoardState } from "@state/days/board";
+import { boardState, canFetch, canPrint, foundCardIds, modFound, taskForId, tuneBase, tuneCarried, tuneDims, tuneStepsLeft, type BoardState } from "@state/days/board";
 import { ideOps, ideSrc, ideTranscript, selectedSlot, type IdeLine } from "@state/days/ide";
 import { API_FIELD, SLOT_FIELD, type Task, type TaskBoard } from "@state/days/tasks";
 import { deliverablePage } from "@state/files";
@@ -50,14 +50,18 @@ export function panesOf(task: Task, live: boolean): PaneId[] {
   const surface = surfaceOf(task, live);
   // R11: a task without a board has its surface (document, ledger, code) as its one pane; none without one.
   if (surface === "work") return workSurfaceOf(task) ? ["work"] : [];
-  const own: PaneId[] = surface === "ide" ? (task.board!.ide?.files ? ["preview", "code"] : ["preview"]) : [surface];
+  // tune (2026-11-08): the 代码 pane of a tuning board is its bars and switches.
+  const own: PaneId[] = surface === "ide" ? (task.board!.ide?.files || task.board!.tune ? ["preview", "code"] : ["preview"]) : [surface];
   return PANE_ORDER.filter((p) => p === "files" || own.includes(p));
 }
 
 /** The defaults on first open (R3): IDE 预览 above 代码; table / meeting / a surface its own pane; 文件 closed. */
 export function shellDefaults(task: Task, live: boolean): ShellState {
-  const panes = panesOf(task, live).filter((p) => p !== "files");
-  return { explorer: !!task.board && live, panes, max: null, slot: null, source: null };
+  let panes = panesOf(task, live).filter((p) => p !== "files");
+  // tune: the bars are the work, so 参数 sits above 预览.
+  if (task.board?.tune) panes = [...panes].sort((a, b) => (a === "code" ? -1 : b === "code" ? 1 : 0));
+  // A tuning board has no pages and no sources to list: no explorer.
+  return { explorer: !!task.board && !task.board.tune && live, panes, max: null, slot: null, source: null };
 }
 
 /** The key of a page's cards: a task read back (handed in, an earlier day) has its own panes. */
@@ -88,7 +92,7 @@ const PANE_KEY: Readonly<Record<PaneId, string>> = { files: "pane.files", previe
 const PANE_ICON: Readonly<Record<PaneId, SafeHtml>> = { files: ICONS.folder, preview: ICONS.globe, code: ICONS.code, table: ICONS.grid, meeting: ICONS.play, work: ICONS.doc };
 const WORK_KEY: Readonly<Record<string, string>> = { docs: "wb.nav.docs", ledger: "wb.nav.ledger", code: "wb.nav.code" };
 const paneName = (pane: PaneId, task: Task): string => {
-  const key = pane === "work" ? (WORK_KEY[task.app] ?? "pane.code") : PANE_KEY[pane];
+  const key = pane === "work" ? (WORK_KEY[task.app] ?? "pane.code") : pane === "code" && task.board?.tune && hasString("pane.tune") ? "pane.tune" : PANE_KEY[pane];
   return hasString(key) ? t(key) : pane;
 };
 
@@ -153,12 +157,51 @@ function explorer(ctx: AppContext, task: Task, board: TaskBoard, s: BoardState, 
 // ——— the panes (R3) ———
 
 /** 预览: browser chrome (the tab, the address line) and the iframe of `ideSrc`. */
-function previewPane(task: Task, board: TaskBoard, s: BoardState, ops: ReturnType<typeof ideOps>, selected: string): SafeHtml {
-  const src = ideSrc(board, s, ops, selected);
+function previewPane(task: Task, board: TaskBoard, s: BoardState, ops: ReturnType<typeof ideOps>, selected: string, carried: readonly string[]): SafeHtml {
+  const src = ideSrc(board, s, ops, selected, carried);
   const page = board.ide?.pages[selected] ?? 0;
   const file = (board.ide?.src ?? "").split("/").pop() ?? "";
   const title = task.deliverable?.label ?? board.title;
   return html`<div class="sh-browser"><div class="sh-tabs"><span class="sh-tab on">${title}</span></div><div class="sh-addr">…/${file}#${page}</div><iframe class="ide-frame" data-keep="ide" src="${src}" title="${title}" sandbox="allow-scripts"></iframe></div>`;
+}
+
+/**
+ * tune (2026-11-08): the bars and the switches. Each dimension is a bar: the value the board opened
+ * with today in the quiet colour, what today's switches added in blue (or took away, in red), a
+ * tick at today's line, a far mark at what the page promises, and `now/line` at the end. Below,
+ * one switch per module: on / off, its deltas as small chips; a module whose source is not found
+ * yet shows its hint instead. Read back (not live): the same, without buttons.
+ */
+function tunePane(board: TaskBoard, s: BoardState, day: number, events: readonly GameEvent[], live: boolean): SafeHtml {
+  const tune = board.tune!;
+  const base = tuneBase(board, events);
+  const now = tuneDims(board, s);
+  const left = tuneStepsLeft(board, s);
+  const bars = tune.dims.map((d) => {
+    const b = base[d.id] ?? 0;
+    const n = now[d.id] ?? 0;
+    const lo = Math.min(b, n);
+    const change = n > b ? html`<i class="up" style="left:${b}%;width:${n - b}%"></i>` : n < b ? html`<i class="down" style="left:${n}%;width:${b - n}%"></i>` : null;
+    const over = n >= tune.reach;
+    return html`<div class="${cls("sh-bar-row", over && "over")}"><span class="sh-bar-l">${d.label}</span><div class="sh-bar"><i class="base" style="width:${lo}%"></i>${change}<b class="line" style="left:${tune.reach}%"></b><b class="promise" style="left:${tune.promise}%"></b></div><span class="sh-bar-n"><em>${n}</em>/${tune.reach}</span></div>`;
+  });
+  const legend = hasString("board.tune.reach") && hasString("board.tune.promise") ? html`<div class="sh-tune-legend"><span class="lg line">${tr("board.tune.reach")}</span><span class="lg promise">${tr("board.tune.promise")}</span></div>` : null;
+  const steps = hasString("board.tune.steps") ? html`<span class="sh-tune-steps">${tr("board.tune.steps", { on: String(s.mods.length), max: String(tune.steps) })}</span>` : null;
+  const sign = (x: number) => (x > 0 ? `+${x}` : `−${-x}`);
+  const mods = tune.mods.map((m) => {
+    const on = s.mods.includes(m.id);
+    if (!modFound(m, day, events)) {
+      const hint = m.hint ?? (hasString("board.notFound") ? t("board.notFound") : "");
+      return html`<div class="sh-mod notfound" aria-disabled="true" title="${hint}"><span class="sh-mod-sw"></span><span class="sh-mod-l">${hint}</span></div>`;
+    }
+    const deltas = tune.dims.filter((d) => m.delta[d.id] !== undefined).map((d) => html`<span class="${cls("sh-mod-d", m.delta[d.id]! > 0 ? "plus" : "minus")}">${d.label} ${sign(m.delta[d.id]!)}</span>`);
+    const body = html`<span class="sh-mod-sw" aria-hidden="true"></span><span class="sh-mod-l">${m.label}</span><span class="sh-mod-ds">${deltas}</span>`;
+    if (!live) return html`<div class="${cls("sh-mod", on && "on")}">${body}</div>`;
+    const blocked = !on && left === 0;
+    return html`<button type="button" class="${cls("sh-mod", on && "on")}" data-action="board-mod" data-mod="${m.id}" aria-pressed="${on ? "true" : "false"}"${blocked ? html` disabled` : null}>${body}</button>`;
+  });
+  const title = hasString("board.tune.title") ? tr("board.tune.title") : null;
+  return html`<div class="sh-editor sh-tune"><div class="sh-tune-h"><span class="sh-tune-t">${title}</span>${steps}</div><div class="sh-bars">${bars}</div>${legend}<div class="sh-mods">${mods}</div></div>`;
 }
 
 /** 代码: the selected page's file, line numbers, and its slot line drawn as the inline field. */
@@ -253,7 +296,7 @@ export function conversationLines(task: Task, day: number, events: readonly Game
   const board = task.board;
   if (!board) return [{ on: "open", who: "kuro", text: fill(task.title) }];
   const ops = ideOps(task, day, events);
-  if (board.view === "ide" || board.beats) return ideTranscript(board, ops);
+  if (board.view === "ide" || board.beats) return ideTranscript(board, ops, tuneCarried(board, events));
   const out: IdeLine[] = [{ on: "open", who: "kuro", text: board.title }];
   for (const op of ops) {
     const key = OP_LINE_KEY[op.t];
@@ -324,7 +367,8 @@ function conversation(ctx: AppContext, task: Task, day: number, live: boolean, f
   let chips: SafeHtml | null = null;
   if (live && board && s) {
     const assist = hasString("board.assist") ? html`<button type="button" class="sh-chip" data-action="board-assist">${tr("board.assist")}</button>` : null;
-    const label = board.view === "ide" && hasString("board.ide.snapshot") ? tr("board.ide.snapshot") : finishLabel(task);
+    // tune: the finish is 今天先这样 (the day's cap is what it is), not a snapshot.
+    const label = board.tune && hasString("board.tune.print") ? tr("board.tune.print") : board.view === "ide" && hasString("board.ide.snapshot") ? tr("board.ide.snapshot") : finishLabel(task);
     const finish = html`<button type="button" class="sh-chip primary" data-action="board-print"${canPrint(board, s) ? null : html` disabled`}>${label}</button>`;
     chips = html`${assist}${finish}`;
   }
@@ -351,7 +395,7 @@ export function renderShell(ctx: AppContext, task: Task, day: number, fill: Fill
   // The page's share of 工作台's one top bar (R10): the title (with the session dropdown's ▾), 交给 X
   // and the status chip; at the right end the explorer and pane toggles and the 老物件 strip.
   const toggleLabel = hasString("pane.explorer.toggle") ? t("pane.explorer.toggle") : "";
-  const explorerToggle = board && live ? html`<button type="button" class="${cls("sh-tg", "explorer", st.explorer && "on")}" data-action="shell-explorer" aria-pressed="${st.explorer ? "true" : "false"}" aria-label="${toggleLabel}" title="${toggleLabel}">${ICONS.files}</button>` : null;
+  const explorerToggle = board && !board.tune && live ? html`<button type="button" class="${cls("sh-tg", "explorer", st.explorer && "on")}" data-action="shell-explorer" aria-pressed="${st.explorer ? "true" : "false"}" aria-label="${toggleLabel}" title="${toggleLabel}">${ICONS.files}</button>` : null;
   const status = html`<span class="${cls("st", done ? "done" : "doing")}">${tr(done ? "wb.task.done" : "wb.task.doing")}</span>`;
   const who = forWhom(task);
   const toggles = panes.map((p) => {
@@ -364,10 +408,11 @@ export function renderShell(ctx: AppContext, task: Task, day: number, fill: Fill
   const tools = html`${app}<div class="sh-toggles">${explorerToggle}${toggles}</div>${renderObjectBar(ctx)}`;
   // The frame (R1): the explorer card, the conversation, the pane cards.
   const ex = board && live && st.explorer ? explorer(ctx, task, board, s!, st, selected) : null;
+  const carried = board ? tuneCarried(board, events) : [];
   const paneCards = open.map((p) => {
     let body: SafeHtml;
-    if (p === "preview") body = previewPane(task, board!, s!, ops, selected);
-    else if (p === "code") body = codePane(board!, s!, session, selected, ops.some((o) => o.t === "print"), live);
+    if (p === "preview") body = previewPane(task, board!, s!, ops, selected, carried);
+    else if (p === "code") body = board!.tune ? tunePane(board!, s!, day, events, live) : codePane(board!, s!, session, selected, ops.some((o) => o.t === "print"), live);
     else if (p === "table") body = tablePane(ctx, task, board!, s!, live, day);
     else if (p === "meeting") body = meetingWindow(ctx, task, board!);
     else if (p === "files") body = board ? filesPane(ctx, board, st, fill) : html``;

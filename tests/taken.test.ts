@@ -188,7 +188,7 @@ import { f } from "@state/fday";
 import type { State } from "@state/types.gen";
 
 const board = () => taskByFlag(7, "task_d7_4")!.board!;
-const freshBoardState = () => ({ unlocked: false, slots: {}, assists: 0, wrongCodes: [], merged: {}, fetched: false });
+const freshBoardState = () => ({ unlocked: false, slots: {}, assists: 0, wrongCodes: [], merged: {}, fetched: false, mods: [] });
 /** A day-N state with the pager found and optionally upgraded. */
 const withPager = (day: number, upgraded: boolean): State => ({ ...f(day), found: ["pager"] as State["found"], upgraded: upgraded ? { pager: true } : {} });
 

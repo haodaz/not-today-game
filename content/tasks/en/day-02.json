@@ -12,120 +12,151 @@
         "view": "ide",
         "title": "Self-evolving engine · training backend",
         "columns": [
-          "",
-          "What the page says",
-          "In the backend"
+          ""
         ],
         "given": {
-          "rows": {
-            "r1": "\"Start analysis\"",
-            "r2": "\"Understands your data by itself\"",
-            "r3": "\"Insight in three seconds\""
-          }
+          "rows": {}
         },
-        "slots": [
-          {
-            "id": "r1",
-            "label": "Entry",
-            "answer": "c1"
-          },
-          {
-            "id": "r2",
-            "label": "Data",
-            "answer": "c2"
-          },
-          {
-            "id": "r3",
-            "label": "Job",
-            "answer": "c3"
-          }
-        ],
-        "cards": [
-          {
-            "id": "c1",
-            "text": "Doable: the button goes to our export page",
-            "from": {
-              "file": "e-export-fn"
-            },
-            "hint": "in export.js"
-          },
-          {
-            "id": "c2",
-            "text": "Doable: the three clients' tables come in, once a week",
-            "from": {
-              "file": "e-receivable"
-            },
-            "hint": "in the receivables sheet"
-          },
-          {
-            "id": "c3",
-            "text": "Can be optimised: real computation, a result in forty seconds",
-            "from": {
-              "conv": "xiaozhang"
-            },
-            "hint": "in Zhang's chat"
-          },
-          {
-            "id": "d1",
-            "text": "Doable: just write what the page says",
-            "from": {
-              "file": "vivi-plan-2"
-            },
-            "hint": "in Vivi's second page"
-          }
-        ],
+        "slots": [],
+        "cards": [],
         "kuro": {
-          "fill": {
-            "r1": "c1",
-            "r2": "c2",
-            "r3": "k1"
-          },
-          "cards": [
-            {
-              "id": "k1",
-              "text": "Doable: three seconds, leave it to Kuro"
-            }
-          ],
+          "fill": {},
+          "cards": [],
           "unlock": "-"
         },
         "ide": {
           "src": "/docs/player/day-03-train.html",
-          "pages": {
-            "r1": 0,
-            "r2": 1,
-            "r3": 2
-          },
-          "files": {
-            "r1": {
-              "name": "entry.config.js",
-              "code": [
-                "export const entry = {",
-                "  button: \"Start analysis\",",
-                "  route: {{slot}},  // where the page's button goes",
-                "};"
-              ]
+          "pages": {}
+        },
+        "tune": {
+          "dims": [
+            {
+              "id": "auto",
+              "label": "Autonomy"
             },
-            "r2": {
-              "name": "datasets.config.js",
-              "code": [
-                "export const datasets = {",
-                "  sources: {{slot}},  // where the data comes from",
-                "  schedule: \"weekly\",",
-                "  dims: 38,",
-                "};"
-              ]
+            {
+              "id": "safe",
+              "label": "Safety"
             },
-            "r3": {
-              "name": "job.config.js",
-              "code": [
-                "export const job = {",
-                "  name: \"insight\",",
-                "  compute: {{slot}},  // three seconds, or a real run",
-                "  cluster: \"cluster-a\",",
-                "};"
-              ]
+            {
+              "id": "hands",
+              "label": "Automation"
+            },
+            {
+              "id": "gain",
+              "label": "Results"
             }
-          }
+          ],
+          "start": {
+            "auto": 20,
+            "safe": 45,
+            "hands": 25,
+            "gain": 30
+          },
+          "reach": 60,
+          "promise": 100,
+          "steps": 6,
+          "mods": [
+            {
+              "id": "m1",
+              "label": "Wire the button to our export page",
+              "delta": {
+                "gain": 15,
+                "hands": 20
+              }
+            },
+            {
+              "id": "m2",
+              "label": "Import the three tables every Monday",
+              "delta": {
+                "gain": 20,
+                "hands": 5,
+                "safe": -10
+              }
+            },
+            {
+              "id": "m3",
+              "label": "Real computation (40 s)",
+              "delta": {
+                "gain": 15,
+                "hands": -5,
+                "safe": 5
+              },
+              "from": {
+                "conv": "xiaozhang"
+              },
+              "hint": "In Zhang's chat"
+            },
+            {
+              "id": "m4",
+              "label": "Three-second animation",
+              "delta": {
+                "hands": 15,
+                "gain": -25
+              }
+            },
+            {
+              "id": "m5",
+              "label": "Let it edit its own config",
+              "delta": {
+                "auto": 35,
+                "safe": -20
+              }
+            },
+            {
+              "id": "m6",
+              "label": "Human approval",
+              "delta": {
+                "safe": 30,
+                "hands": -15,
+                "auto": -5
+              }
+            },
+            {
+              "id": "m7",
+              "label": "Sandbox with rollback",
+              "delta": {
+                "safe": 10,
+                "auto": -5,
+                "hands": -10
+              }
+            },
+            {
+              "id": "m8",
+              "label": "Nightly auto-retrain",
+              "delta": {
+                "hands": 20,
+                "auto": 25,
+                "safe": -15,
+                "gain": 10
+              }
+            },
+            {
+              "id": "m9",
+              "label": "Wire in the logs",
+              "delta": {
+                "safe": 15,
+                "gain": 5,
+                "auto": 10
+              }
+            },
+            {
+              "id": "m10",
+              "label": "Let it pick its own parameters",
+              "delta": {
+                "auto": 10,
+                "gain": 5,
+                "safe": -10
+              }
+            }
+          ],
+          "assist": [
+            "m1",
+            "m2",
+            "m8",
+            "m9",
+            "m10"
+          ]
         },
         "beats": [
           {
@@ -141,60 +172,127 @@
               },
               {
                 "who": "kuro",
-                "text": "Get it running first. The config on the left, the backend on the right."
-              }
-            ]
-          },
-          {
-            "on": "fill:r1:c1",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "The button has somewhere to go. Our export page."
-              }
-            ]
-          },
-          {
-            "on": "fill:r1:d1",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "Write what the page says, and the page is all there is."
-              }
-            ]
-          },
-          {
-            "on": "fill:r2:c2",
-            "lines": [
-              {
-                "who": "me",
-                "text": "'All business systems' is these three tables."
+                "text": "Her page shows four full bars. This is what the backend has."
               },
               {
                 "who": "kuro",
-                "text": "Every Monday. Her 'understands by itself' is Zhang importing on Mondays."
+                "text": "Switch one on, switch one off. The bars will tell you."
               }
             ]
           },
           {
-            "on": "fill:r3:c3",
+            "on": "mod:m1",
             "lines": [
               {
                 "who": "kuro",
-                "text": "Forty seconds. She wants three."
-              },
+                "text": "The button goes somewhere now. The export page, our own."
+              }
+            ]
+          },
+          {
+            "on": "mod:m2",
+            "lines": [
               {
                 "who": "me",
-                "text": "Three seconds is an animation. Forty is real. Call it optimised."
+                "text": "'All business systems' means these three tables."
+              },
+              {
+                "who": "kuro",
+                "text": "Every Monday. Her 'understands automatically' is Zhang importing on Mondays."
               }
             ]
           },
           {
-            "on": "fill:r3:k1",
+            "on": "mod:m3",
+            "lines": [
+              {
+                "who": "me",
+                "text": "Forty seconds. Real ones."
+              },
+              {
+                "who": "kuro",
+                "text": "She wants three."
+              }
+            ]
+          },
+          {
+            "on": "mod:m4",
             "lines": [
               {
                 "who": "kuro",
-                "text": "Three seconds, leave it to me. An animation is an implementation too."
+                "text": "Three seconds is an animation. The bars don't count animations."
+              }
+            ]
+          },
+          {
+            "on": "mod:m5",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "It edits itself. Who's watching?"
+              }
+            ]
+          },
+          {
+            "on": "mod:m6",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "A human clicks. She won't like this line."
+              }
+            ]
+          },
+          {
+            "on": "mod:m7",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "If it breaks you can roll back. Rolling back takes a human too."
+              }
+            ]
+          },
+          {
+            "on": "mod:m8",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "It trains at night. You sleep."
+              }
+            ]
+          },
+          {
+            "on": "mod:m9",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Logs. When it breaks, at least you know which step."
+              }
+            ]
+          },
+          {
+            "on": "mod:m10",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Let it pick its own parameters. If it picks wrong, it picked."
+              }
+            ]
+          },
+          {
+            "on": "unmod:m6",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Approval off. Nobody's watching."
+              }
+            ]
+          },
+          {
+            "on": "steps",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "That's six. To open one more, close one."
               }
             ]
           },
@@ -203,7 +301,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "The three-seconds slot was mine. If you want a real run, swap it back."
+                "text": "I switched on five. I left the safety bar alone."
               }
             ]
           },
@@ -216,7 +314,7 @@
               },
               {
                 "who": "kuro",
-                "text": "What can run, runs. The part she wants, the one that grows by itself, isn't there."
+                "text": "What can run, runs. The 'grows by itself' she wants isn't on any bar."
               }
             ]
           }

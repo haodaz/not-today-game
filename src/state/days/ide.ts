@@ -2,7 +2,7 @@
 // (`ideSrc`, R3) and Kuro's transcript (`ideTranscript`, R4) are derived from today's board ops, so
 // a reload or a replay shows the same page and the same lines. No new events.
 import type { BoardOp, GameEvent } from "@state/events";
-import { freshBoard, stepBoard, type BoardState } from "./board";
+import { freshBoard, stepBoard, tuneReached, tuneStepsLeft, tuneValues, type BoardState } from "./board";
 import type { BoardBeatLine, Task, TaskBoard } from "./tasks";
 
 /** One step the IDE view follows: a board op, the print (the `task` event), or the send (`give`). */
@@ -50,7 +50,18 @@ export function lastFilled(board: TaskBoard, ops: readonly IdeOp[]): string | nu
 /** The selected slot (shell R2/R4): the chosen one if it is a slot, else the slot filled last, else the first. */
 export function selectedSlot(board: TaskBoard, ops: readonly IdeOp[], chosen: string | null = null): string {
   if (chosen !== null && board.slots.some((s) => s.id === chosen)) return chosen;
-  return lastFilled(board, ops) ?? board.slots[0]!.id;
+  return lastFilled(board, ops) ?? board.slots[0]?.id ?? "";
+}
+
+/**
+ * tune (2026-11-08): the query a tuning board's page reads: `mods` (the modules on, in order),
+ * `dims` (each bar now), `base` (each bar when the board opened today), `reach`, `promise`, and
+ * `left` (steps left). The page draws the bars itself from these; `print` adds `&done=1`.
+ */
+function tuneQuery(board: TaskBoard, s: BoardState, carried: readonly string[], printed: boolean): string {
+  const tune = board.tune!;
+  const kv = (v: Readonly<Record<string, number>>) => tune.dims.map((d) => `${encodeURIComponent(d.id)}:${v[d.id] ?? 0}`).join(",");
+  return `&mods=${s.mods.map(encodeURIComponent).join(",")}&dims=${kv(tuneValues(board, s.mods))}&base=${kv(tuneValues(board, carried))}&reach=${tune.reach}&promise=${tune.promise}&left=${tuneStepsLeft(board, s)}${printed ? "&done=1" : ""}`;
 }
 
 /**
@@ -58,9 +69,13 @@ export function selectedSlot(board: TaskBoard, ops: readonly IdeOp[], chosen: st
  * `fill` lists every filled slot in slot order (Kuro's cards by their own id) and is always there
  * (`fill=` while nothing is filled); `c` is the page of the selected slot (`selectedSlot`). Pure.
  */
-export function ideSrc(board: TaskBoard, s: BoardState, ops: readonly IdeOp[], chosen: string | null = null): string {
+export function ideSrc(board: TaskBoard, s: BoardState, ops: readonly IdeOp[], chosen: string | null = null, carried: readonly string[] = []): string {
   const src = board.ide?.src ?? "";
   const page = board.ide?.pages[selectedSlot(board, ops, chosen)] ?? 0;
+  if (board.tune) {
+    const sep = src.includes("?") ? "&" : "?";
+    return `${src}${sep}${IDE_QUERY}&c=${page}${tuneQuery(board, s, carried, ops.some((o) => o.t === "print"))}`;
+  }
   const fill = board.slots
     .filter((slot) => slot.id in s.slots)
     .map((slot) => `${encodeURIComponent(slot.id)}:${encodeURIComponent(s.slots[slot.id]!)}`)
@@ -83,7 +98,7 @@ export interface IdeLine extends BoardBeatLine {
  * Kuro's assist → `kuro`; an unlock (the right code, or Kuro's) → `unlock`; print → `print`; the
  * send → `send`. Ops without a beat (a clear, a wrong code) show nothing. Pure.
  */
-export function ideTranscript(board: TaskBoard, ops: readonly IdeOp[]): IdeLine[] {
+export function ideTranscript(board: TaskBoard, ops: readonly IdeOp[], carried: readonly string[] = []): IdeLine[] {
   const beats = new Map((board.beats ?? []).map((b) => [b.on, b]));
   const shown = new Set<string>();
   const out: IdeLine[] = [];
@@ -94,9 +109,20 @@ export function ideTranscript(board: TaskBoard, ops: readonly IdeOp[]): IdeLine[
     for (const l of beat.lines) out.push({ on, who: l.who, text: l.text });
   };
   show("open");
-  let walk = freshBoard(board);
+  let walk = freshBoard(board, carried);
   for (const op of ops) {
     switch (op.t) {
+      case "mod": {
+        // tune: the switch's own beat (on / off) when it took, then `steps` as the budget runs out
+        // and `reach` as every bar clears today's line (each once).
+        const after = stepBoard(board, walk, op);
+        if (after !== walk) {
+          show(op.on ? `mod:${op.id}` : `unmod:${op.id}`);
+          if (tuneReached(board, after)) show("reach");
+          else if (tuneStepsLeft(board, after) === 0) show("steps");
+        }
+        break;
+      }
       case "fill":
         show(beats.has(`fill:${op.slot}:${op.card}`) ? `fill:${op.slot}:${op.card}` : `fill:${op.slot}`);
         break;

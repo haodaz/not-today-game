@@ -12,126 +12,206 @@
         "view": "ide",
         "title": "自演化引擎 · 训练后台",
         "columns": [
-          "",
-          "页面上写的",
-          "后台里"
+          ""
         ],
         "given": {
-          "rows": {
-            "r4": "「它自己会进化」",
-            "r5": "「一键生成决策」",
-            "r6": "「比这个好看多了」"
-          }
+          "rows": {}
         },
-        "slots": [
-          {
-            "id": "r4",
-            "label": "训练闭环",
-            "answer": "c5"
-          },
-          {
-            "id": "r5",
-            "label": "审批",
-            "answer": "c4"
-          },
-          {
-            "id": "r6",
-            "label": "界面",
-            "answer": "c6"
-          }
-        ],
-        "cards": [
-          {
-            "id": "c5",
-            "text": "能做：上周的结果喂回下一轮，每周一轮",
-            "from": {
-              "conv": "xiaozhang"
-            },
-            "hint": "在小张的私聊里"
-          },
-          {
-            "id": "c4",
-            "text": "做不了全自动：决策留给人点一下",
-            "from": {
-              "conv": "boss"
-            },
-            "hint": "在你发给老王的 v17 里"
-          },
-          {
-            "id": "c6",
-            "text": "能做：界面先用导出页的样子",
-            "from": {
-              "file": "e-export-fn"
-            },
-            "hint": "在 export.js 里"
-          },
-          {
-            "id": "d2",
-            "text": "能做：让 AI 自己改",
-            "from": {
-              "conv": "partner"
-            },
-            "hint": "在 Vivi 的私聊里"
-          },
-          {
-            "id": "d3",
-            "text": "能做：用她的 AI 给的皮子",
-            "from": {
-              "conv": "partner"
-            },
-            "hint": "在 Vivi 的私聊里"
-          }
-        ],
+        "slots": [],
+        "cards": [],
         "kuro": {
-          "fill": {
-            "r4": "c5",
-            "r5": "c4",
-            "r6": "k1"
-          },
-          "cards": [
-            {
-              "id": "k1",
-              "text": "能做：界面让我生成一套"
-            }
-          ],
+          "fill": {},
+          "cards": [],
           "unlock": "-"
         },
         "ide": {
-          "src": "/docs/player/day-03-train.html?prev=1",
-          "pages": {
-            "r4": 3,
-            "r5": 4,
-            "r6": 5
-          },
-          "files": {
-            "r4": {
-              "name": "loop.config.js",
-              "code": [
-                "export const loop = {",
-                "  feed: {{slot}},  // 怎么才算「自己会长」",
-                "  every: \"weekly\",",
-                "};"
-              ]
+          "src": "/docs/player/day-03-train.html",
+          "pages": {}
+        },
+        "tune": {
+          "dims": [
+            {
+              "id": "auto",
+              "label": "自主"
             },
-            "r5": {
-              "name": "approval.config.js",
-              "code": [
-                "export const approval = {",
-                "  execute: {{slot}},  // 谁来点那一下",
-                "  approver: \"技术负责人\",",
-                "};"
-              ]
+            {
+              "id": "safe",
+              "label": "安全"
             },
-            "r6": {
-              "name": "ui.config.js",
-              "code": [
-                "export const ui = {",
-                "  skin: {{slot}},  // 先用哪张脸",
-                "  buttons: \"wired\",",
-                "};"
-              ]
+            {
+              "id": "hands",
+              "label": "自动化"
+            },
+            {
+              "id": "gain",
+              "label": "效果"
             }
-          }
+          ],
+          "start": {
+            "auto": 20,
+            "safe": 45,
+            "hands": 25,
+            "gain": 30
+          },
+          "reach": 80,
+          "promise": 100,
+          "steps": 8,
+          "carry": {
+            "day": 2,
+            "task": "task1"
+          },
+          "mods": [
+            {
+              "id": "n2",
+              "label": "每周一轮闭环",
+              "delta": {
+                "auto": 20,
+                "gain": 10,
+                "hands": 5,
+                "safe": -10
+              },
+              "from": {
+                "conv": "xiaozhang"
+              },
+              "hint": "在小张的私聊里"
+            },
+            {
+              "id": "n1",
+              "label": "影子评测",
+              "delta": {
+                "safe": 20,
+                "auto": 15,
+                "gain": 10
+              }
+            },
+            {
+              "id": "n3",
+              "label": "审批只看差异",
+              "delta": {
+                "hands": 20,
+                "safe": 5
+              },
+              "from": {
+                "conv": "boss"
+              },
+              "hint": "在你发给老王的 v17 里"
+            },
+            {
+              "id": "n4",
+              "label": "Vivi 的皮子",
+              "delta": {
+                "hands": 5,
+                "gain": -5,
+                "safe": -5
+              },
+              "from": {
+                "conv": "partner"
+              },
+              "hint": "在 Vivi 的私聊里"
+            },
+            {
+              "id": "m1",
+              "label": "接上导出页",
+              "delta": {
+                "gain": 15,
+                "hands": 20
+              }
+            },
+            {
+              "id": "m2",
+              "label": "三张表每周导入",
+              "delta": {
+                "gain": 20,
+                "hands": 5,
+                "safe": -10
+              }
+            },
+            {
+              "id": "m3",
+              "label": "真实计算（40 秒）",
+              "delta": {
+                "gain": 15,
+                "hands": -5,
+                "safe": 5
+              },
+              "from": {
+                "conv": "xiaozhang"
+              },
+              "hint": "在小张的私聊里"
+            },
+            {
+              "id": "m4",
+              "label": "三秒动画",
+              "delta": {
+                "hands": 15,
+                "gain": -25
+              }
+            },
+            {
+              "id": "m5",
+              "label": "开放自改权限",
+              "delta": {
+                "auto": 35,
+                "safe": -20
+              }
+            },
+            {
+              "id": "m6",
+              "label": "人工审批",
+              "delta": {
+                "safe": 30,
+                "hands": -15,
+                "auto": -5
+              }
+            },
+            {
+              "id": "m7",
+              "label": "沙箱回滚",
+              "delta": {
+                "safe": 10,
+                "auto": -5,
+                "hands": -10
+              }
+            },
+            {
+              "id": "m8",
+              "label": "夜间自动重训",
+              "delta": {
+                "hands": 20,
+                "auto": 25,
+                "safe": -15,
+                "gain": 10
+              }
+            },
+            {
+              "id": "m9",
+              "label": "日志接进来",
+              "delta": {
+                "safe": 15,
+                "gain": 5,
+                "auto": 10
+              }
+            },
+            {
+              "id": "m10",
+              "label": "让它自己挑参数",
+              "delta": {
+                "auto": 10,
+                "gain": 5,
+                "safe": -10
+              }
+            }
+          ],
+          "assist": [
+            "m1",
+            "m2",
+            "m5",
+            "m8",
+            "m9",
+            "n1",
+            "n2",
+            "n3"
+          ]
         },
         "beats": [
           {
@@ -143,16 +223,25 @@
               },
               {
                 "who": "me",
-                "text": "接着昨天的。跑是跑起来了，她要的是它自己会长。"
+                "text": "接着昨天的。小张又发了几个模块。"
               },
               {
                 "who": "kuro",
-                "text": "昨天那三节在后台里都亮着。今天三节：闭环、审批、界面。"
+                "text": "昨天开的还开着。线挪到 80 了。"
               }
             ]
           },
           {
-            "on": "fill:r4:c5",
+            "on": "mod:n1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "影子评测。先在旁边跑一遍，比过了再上。"
+              }
+            ]
+          },
+          {
+            "on": "mod:n2",
             "lines": [
               {
                 "who": "me",
@@ -165,34 +254,16 @@
             ]
           },
           {
-            "on": "fill:r4:d2",
+            "on": "mod:n3",
             "lines": [
               {
                 "who": "kuro",
-                "text": "让 AI 自己改。改成什么样，谁来看？"
+                "text": "人只看差异。点一下还是点一下。"
               }
             ]
           },
           {
-            "on": "fill:r5:c4",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "人点一下。她不会喜欢这一行。"
-              }
-            ]
-          },
-          {
-            "on": "fill:r6:c6",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "不好看。但每个按钮都接着东西。"
-              }
-            ]
-          },
-          {
-            "on": "fill:r6:d3",
+            "on": "mod:n4",
             "lines": [
               {
                 "who": "kuro",
@@ -201,11 +272,42 @@
             ]
           },
           {
+            "on": "unmod:m10",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "不让它自己挑了。挑参数这事，影子评测替它干了。"
+              }
+            ]
+          },
+          {
+            "on": "steps",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "八个了。"
+              }
+            ]
+          },
+          {
+            "on": "reach",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "四根都过线了。离她页面上的，还差那一截。"
+              },
+              {
+                "who": "me",
+                "text": "那一截是她画的。"
+              }
+            ]
+          },
+          {
             "on": "kuro",
             "lines": [
               {
                 "who": "kuro",
-                "text": "界面我生成了一套。比她那个丑，比她那个能用。"
+                "text": "我开了八个。自主那条我拉满了。"
               }
             ]
           },

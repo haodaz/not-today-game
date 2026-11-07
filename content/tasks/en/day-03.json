@@ -12,126 +12,206 @@
         "view": "ide",
         "title": "Self-evolving engine · training backend",
         "columns": [
-          "",
-          "What the page says",
-          "In the backend"
+          ""
         ],
         "given": {
-          "rows": {
-            "r4": "\"It evolves by itself\"",
-            "r5": "\"One click, a decision\"",
-            "r6": "\"Much prettier than this\""
-          }
+          "rows": {}
         },
-        "slots": [
-          {
-            "id": "r4",
-            "label": "Training loop",
-            "answer": "c5"
-          },
-          {
-            "id": "r5",
-            "label": "Approval",
-            "answer": "c4"
-          },
-          {
-            "id": "r6",
-            "label": "Interface",
-            "answer": "c6"
-          }
-        ],
-        "cards": [
-          {
-            "id": "c5",
-            "text": "Doable: feed last week's results into the next round, once a week",
-            "from": {
-              "conv": "xiaozhang"
-            },
-            "hint": "in Zhang's chat"
-          },
-          {
-            "id": "c4",
-            "text": "Not fully automatic: a person clicks the decision",
-            "from": {
-              "conv": "boss"
-            },
-            "hint": "in the v17 you sent Wang"
-          },
-          {
-            "id": "c6",
-            "text": "Doable: use the export page's look for now",
-            "from": {
-              "file": "e-export-fn"
-            },
-            "hint": "in export.js"
-          },
-          {
-            "id": "d2",
-            "text": "Doable: let the AI fix itself",
-            "from": {
-              "conv": "partner"
-            },
-            "hint": "in Vivi's chat"
-          },
-          {
-            "id": "d3",
-            "text": "Doable: use the skin her AI made",
-            "from": {
-              "conv": "partner"
-            },
-            "hint": "in Vivi's chat"
-          }
-        ],
+        "slots": [],
+        "cards": [],
         "kuro": {
-          "fill": {
-            "r4": "c5",
-            "r5": "c4",
-            "r6": "k1"
-          },
-          "cards": [
-            {
-              "id": "k1",
-              "text": "Doable: let me generate an interface"
-            }
-          ],
+          "fill": {},
+          "cards": [],
           "unlock": "-"
         },
         "ide": {
-          "src": "/docs/player/day-03-train.html?prev=1",
-          "pages": {
-            "r4": 3,
-            "r5": 4,
-            "r6": 5
-          },
-          "files": {
-            "r4": {
-              "name": "loop.config.js",
-              "code": [
-                "export const loop = {",
-                "  feed: {{slot}},  // what counts as growing by itself",
-                "  every: \"weekly\",",
-                "};"
-              ]
+          "src": "/docs/player/day-03-train.html",
+          "pages": {}
+        },
+        "tune": {
+          "dims": [
+            {
+              "id": "auto",
+              "label": "Autonomy"
             },
-            "r5": {
-              "name": "approval.config.js",
-              "code": [
-                "export const approval = {",
-                "  execute: {{slot}},  // who clicks",
-                "  approver: \"tech lead\",",
-                "};"
-              ]
+            {
+              "id": "safe",
+              "label": "Safety"
             },
-            "r6": {
-              "name": "ui.config.js",
-              "code": [
-                "export const ui = {",
-                "  skin: {{slot}},  // which face for now",
-                "  buttons: \"wired\",",
-                "};"
-              ]
+            {
+              "id": "hands",
+              "label": "Automation"
+            },
+            {
+              "id": "gain",
+              "label": "Results"
             }
-          }
+          ],
+          "start": {
+            "auto": 20,
+            "safe": 45,
+            "hands": 25,
+            "gain": 30
+          },
+          "reach": 80,
+          "promise": 100,
+          "steps": 8,
+          "carry": {
+            "day": 2,
+            "task": "task1"
+          },
+          "mods": [
+            {
+              "id": "n2",
+              "label": "Weekly feedback loop",
+              "delta": {
+                "auto": 20,
+                "gain": 10,
+                "hands": 5,
+                "safe": -10
+              },
+              "from": {
+                "conv": "xiaozhang"
+              },
+              "hint": "In Zhang's chat"
+            },
+            {
+              "id": "n1",
+              "label": "Shadow evaluation",
+              "delta": {
+                "safe": 20,
+                "auto": 15,
+                "gain": 10
+              }
+            },
+            {
+              "id": "n3",
+              "label": "Approve the diff only",
+              "delta": {
+                "hands": 20,
+                "safe": 5
+              },
+              "from": {
+                "conv": "boss"
+              },
+              "hint": "In the v17 you sent Wang"
+            },
+            {
+              "id": "n4",
+              "label": "Vivi's skin",
+              "delta": {
+                "hands": 5,
+                "gain": -5,
+                "safe": -5
+              },
+              "from": {
+                "conv": "partner"
+              },
+              "hint": "In Vivi's chat"
+            },
+            {
+              "id": "m1",
+              "label": "Wire the button to our export page",
+              "delta": {
+                "gain": 15,
+                "hands": 20
+              }
+            },
+            {
+              "id": "m2",
+              "label": "Import the three tables every Monday",
+              "delta": {
+                "gain": 20,
+                "hands": 5,
+                "safe": -10
+              }
+            },
+            {
+              "id": "m3",
+              "label": "Real computation (40 s)",
+              "delta": {
+                "gain": 15,
+                "hands": -5,
+                "safe": 5
+              },
+              "from": {
+                "conv": "xiaozhang"
+              },
+              "hint": "In Zhang's chat"
+            },
+            {
+              "id": "m4",
+              "label": "Three-second animation",
+              "delta": {
+                "hands": 15,
+                "gain": -25
+              }
+            },
+            {
+              "id": "m5",
+              "label": "Let it edit its own config",
+              "delta": {
+                "auto": 35,
+                "safe": -20
+              }
+            },
+            {
+              "id": "m6",
+              "label": "Human approval",
+              "delta": {
+                "safe": 30,
+                "hands": -15,
+                "auto": -5
+              }
+            },
+            {
+              "id": "m7",
+              "label": "Sandbox with rollback",
+              "delta": {
+                "safe": 10,
+                "auto": -5,
+                "hands": -10
+              }
+            },
+            {
+              "id": "m8",
+              "label": "Nightly auto-retrain",
+              "delta": {
+                "hands": 20,
+                "auto": 25,
+                "safe": -15,
+                "gain": 10
+              }
+            },
+            {
+              "id": "m9",
+              "label": "Wire in the logs",
+              "delta": {
+                "safe": 15,
+                "gain": 5,
+                "auto": 10
+              }
+            },
+            {
+              "id": "m10",
+              "label": "Let it pick its own parameters",
+              "delta": {
+                "auto": 10,
+                "gain": 5,
+                "safe": -10
+              }
+            }
+          ],
+          "assist": [
+            "m1",
+            "m2",
+            "m5",
+            "m8",
+            "m9",
+            "n1",
+            "n2",
+            "n3"
+          ]
         },
         "beats": [
           {
@@ -143,56 +223,47 @@
               },
               {
                 "who": "me",
-                "text": "Yesterday's, continued. It runs now; what she wants is for it to grow by itself."
+                "text": "Continuing yesterday's. Zhang sent a few more modules."
               },
               {
                 "who": "kuro",
-                "text": "Yesterday's three sections are lit in the backend. Today's three: the loop, approval, the interface."
+                "text": "Yesterday's switches are still on. The line moved to 80."
               }
             ]
           },
           {
-            "on": "fill:r4:c5",
+            "on": "mod:n1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Shadow evaluation. Run it on the side first; ship when it compares."
+              }
+            ]
+          },
+          {
+            "on": "mod:n2",
             "lines": [
               {
                 "who": "me",
-                "text": "Last week's results feed the next round. Once a week."
+                "text": "Last week's results fed into the next round. Once a week."
               },
               {
                 "who": "kuro",
-                "text": "That is how far 'grows by itself' goes: it grows once a week."
+                "text": "This is how far 'grows by itself' goes: it grows once a week."
               }
             ]
           },
           {
-            "on": "fill:r4:d2",
+            "on": "mod:n3",
             "lines": [
               {
                 "who": "kuro",
-                "text": "Let the AI fix itself. Into what, and who looks?"
+                "text": "The human only reads the diff. A click is still a click."
               }
             ]
           },
           {
-            "on": "fill:r5:c4",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "A person clicks. She won't like this line."
-              }
-            ]
-          },
-          {
-            "on": "fill:r6:c6",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "Not pretty. But every button is wired."
-              }
-            ]
-          },
-          {
-            "on": "fill:r6:d3",
+            "on": "mod:n4",
             "lines": [
               {
                 "who": "kuro",
@@ -201,11 +272,42 @@
             ]
           },
           {
+            "on": "unmod:m10",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "No more picking its own parameters. Shadow evaluation does that now."
+              }
+            ]
+          },
+          {
+            "on": "steps",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "That's eight."
+              }
+            ]
+          },
+          {
+            "on": "reach",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "All four over the line. That last stretch to her page is still missing."
+              },
+              {
+                "who": "me",
+                "text": "That stretch is one she drew."
+              }
+            ]
+          },
+          {
             "on": "kuro",
             "lines": [
               {
                 "who": "kuro",
-                "text": "I generated an interface. Uglier than hers, and it works."
+                "text": "I switched on eight. I maxed the autonomy bar."
               }
             ]
           },
@@ -214,11 +316,11 @@
             "lines": [
               {
                 "who": "me",
-                "text": "As far as it goes, this is it."
+                "text": "As far as it goes. This is it."
               },
               {
                 "who": "kuro",
-                "text": "Send it to Vivi. She will look at the skin first."
+                "text": "Send it to Vivi. She'll look at the skin first."
               }
             ]
           }

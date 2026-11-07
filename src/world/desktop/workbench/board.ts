@@ -8,7 +8,7 @@
 import type { State } from "@state/types.gen";
 import type { GameEvent } from "@state/events";
 import type { Task, TaskBoard } from "@state/days/tasks";
-import { autoUnlock, boardState, canFetch, canPrint, foundCardIds, isKuroCard, isObjectLock, isReadLock, lockCodesOffered, lockJammed, lockObjectAvailable, lockUsedOk, trayCards, wrongReadings, type BoardState } from "@state/days/board";
+import { autoUnlock, boardState, canFetch, canPrint, foundCardIds, isKuroCard, isObjectLock, isReadLock, lockCodesOffered, lockJammed, lockObjectAvailable, lockUsedOk, modFound, trayCards, tuneCarried, tuneStepsLeft, wrongReadings, type BoardState } from "@state/days/board";
 import { ideOps, ideSrc, ideTranscript } from "@state/days/ide";
 import { cls, html, type SafeHtml } from "@world/html";
 import { FRAMES, frameUrl } from "../kuro/body";
@@ -224,7 +224,7 @@ function idePages(board: TaskBoard, s: BoardState, session: Session): SafeHtml {
 /** 克总: the transcript as bubbles, Kuro on the left with its portrait, the player on the right. */
 function ideChat(board: TaskBoard, task: Task, ctx: AppContext): SafeHtml {
   const { state, events, session, nowMs } = ctx;
-  const lines = ideTranscript(board, ideOps(task, state.day, events));
+  const lines = ideTranscript(board, ideOps(task, state.day, events), tuneCarried(board, events));
   const typing = session.ideTyping?.key === ideKey(state.day, task) ? session.ideTyping.times : [];
   const visible = lines.filter((_, i) => (typing[i] ?? 0) <= nowMs);
   const av = html`<img class="av" src="${frameUrl(FRAMES.idle[0])}" alt="" aria-hidden="true">`;
@@ -253,7 +253,7 @@ function renderIde(ctx: AppContext, task: Task, board: TaskBoard, s: BoardState,
  * IDE_LINE_MS after the one before (or after now); a render is due as each appears. Session only.
  */
 function noteIdeLines(ctx: ActionContext, task: Task, board: TaskBoard, day: number, before: number): void {
-  const after = ideTranscript(board, ideOps(task, day, ctx.store.getEvents())).length;
+  const after = ideTranscript(board, ideOps(task, day, ctx.store.getEvents()), tuneCarried(board, ctx.store.getEvents())).length;
   if (after <= before) return;
   const key = ideKey(day, task);
   const times = ctx.session.ideTyping?.key === key ? [...ctx.session.ideTyping.times] : [];
@@ -275,7 +275,7 @@ function withIde(handler: ActionHandler): ActionHandler {
     const c = currentBoard(ctx);
     const day = ctx.store.getState().day;
     // shell R5: beats are allowed on every view, so any board with beats types its lines in.
-    const before = c && (c.board.view === "ide" || c.board.beats) ? ideTranscript(c.board, ideOps(c.task, day, ctx.store.getEvents())).length : null;
+    const before = c && (c.board.view === "ide" || c.board.beats) ? ideTranscript(c.board, ideOps(c.task, day, ctx.store.getEvents()), tuneCarried(c.board, ctx.store.getEvents())).length : null;
     handler(ctx, data, el);
     if (c && before !== null) noteIdeLines(ctx, c.task, c.board, day, before);
   };
@@ -410,6 +410,21 @@ const actions: Record<string, ActionHandler> = {
     const keep = data.keep;
     if (!c || !slot || (keep !== "v16" && keep !== "v17") || !c.board.ide?.diff?.[slot]) return;
     ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "merge", slot, keep } });
+    ctx.rerender();
+  },
+  // tune (2026-11-08): a module's switch: on spends a step, off gives it back (the fold ignores an
+  // impossible switch: over the budget, or a module whose source is not found yet is not offered).
+  "board-mod"(ctx, data) {
+    const c = currentBoard(ctx);
+    const id = data.mod;
+    const tune = c?.board.tune;
+    if (!c || !tune || !id) return;
+    const mod = tune.mods.find((m) => m.id === id);
+    if (!mod || !modFound(mod, ctx.store.getState().day, ctx.store.getEvents())) return;
+    const s = stateOf(ctx, c.task, c.board);
+    const on = !s.mods.includes(id);
+    if (on && tuneStepsLeft(c.board, s) === 0) return;
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "mod", id, on } });
     ctx.rerender();
   },
   // ide v2: pull the latest data from the API, once, after every page is merged and filled.
