@@ -303,7 +303,7 @@
     },
     {
       "id": "task1",
-      "text": "Go over v17.",
+      "text": "Go over the agreement.",
       "unlock": "done:msgs",
       "done": "flag:task_v17_done",
       "required": true

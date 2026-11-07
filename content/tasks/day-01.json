@@ -4,14 +4,14 @@
   "tasks": [
     {
       "id": "task1",
-      "title": "v17 过一遍。",
+      "title": "合作协议过一遍。",
       "app": "docs",
       "done": "task_v17_done",
       "start": {
         "say": [
           {
             "k": "narration",
-            "t": "克总已经把 v16 和 v17 并排放好了。第 6 条和第 11 条用不同的颜色标着。"
+            "t": "克总已经把合作协议的上一版和这一版并排放好了。第 6 条和第 11 条用不同的颜色标着。"
           }
         ],
         "options": [
@@ -289,7 +289,7 @@
     },
     {
       "id": "task3",
-      "title": "事情 A：未来智能的技术表达。",
+      "title": "v17 · 未来智能的技术表达。",
       "app": "docs",
       "done": "task_merge_done",
       "board": {

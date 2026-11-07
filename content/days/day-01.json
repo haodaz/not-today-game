@@ -303,7 +303,7 @@
     },
     {
       "id": "task1",
-      "text": "v17 过一遍。",
+      "text": "合作协议过一遍。",
       "unlock": "done:msgs",
       "done": "flag:task_v17_done",
       "required": true

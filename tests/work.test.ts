@@ -92,7 +92,7 @@ describe("the choice is a reply", () => {
 
   it("the sentence is in the input; sent, it is the player's message; the chips exist only under Kuro's question", () => {
     const { ctx, app } = ctxFor(dayWith("task1"));
-    const item = "v17 过一遍。";
+    const item = "合作协议过一遍。"; // 2026-11-08: v17 is the analysis; the contract compare lost the version name
     expect(work(app())).toContain(`value="${escapeHtml(item)}"`);
     expect(work(app())).not.toContain('data-action="wb-choose"');
     act(ctx, "wb-send");

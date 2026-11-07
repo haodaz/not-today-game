@@ -191,7 +191,7 @@
     },
     {
       "id": "task1",
-      "text": "Let it write v18; you take a look.",
+      "text": "Let it write the agreement's next version; you take a look.",
       "unlock": "done:msgs",
       "done": "flag:task_d3_1",
       "required": true
@@ -268,7 +268,7 @@
     },
     {
       "id": "eatDinner",
-      "text": "Eat.",
+      "text": "The food is cold. By the window, eat.",
       "unlock": "done:task3",
       "done": "event:eat:dinner",
       "required": true,

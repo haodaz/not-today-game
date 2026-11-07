@@ -191,7 +191,7 @@
     },
     {
       "id": "task1",
-      "text": "v18 让它写，你看一眼。",
+      "text": "协议新一版让它写，你看一眼。",
       "unlock": "done:msgs",
       "done": "flag:task_d3_1",
       "required": true
@@ -268,7 +268,7 @@
     },
     {
       "id": "eatDinner",
-      "text": "吃。",
+      "text": "饭凉了。窗边，吃。",
       "unlock": "done:task3",
       "done": "event:eat:dinner",
       "required": true,

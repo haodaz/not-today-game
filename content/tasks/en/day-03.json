@@ -4,7 +4,7 @@
   "tasks": [
     {
       "id": "task1",
-      "title": "Let it write v18; you take a look.",
+      "title": "Let it write the agreement's next version; you take a look.",
       "app": "docs",
       "done": "task_d3_1",
       "start": {
@@ -33,7 +33,7 @@
         "say": [
           {
             "k": "narration",
-            "t": "You add the async constraint to v18 yourself. Twenty minutes."
+            "t": "You add the async constraint to the new version yourself. Twenty minutes."
           }
         ],
         "kuro": [],
@@ -239,7 +239,7 @@
     },
     {
       "id": "task3",
-      "title": "What he said in the meeting: make the AI theory bigger.",
+      "title": "v18 · What he said in the meeting: make the AI theory bigger (self-evolution).",
       "app": "docs",
       "done": "task_d3_3",
       "board": {
