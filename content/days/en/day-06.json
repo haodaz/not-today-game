@@ -5,6 +5,10 @@
       "say": [
         {
           "k": "narration",
+          "t": "Overcast. Grey outside, as if it were not light yet."
+        },
+        {
+          "k": "narration",
           "t": "Two typos in the document. You did not type them.",
           "where": "screen:workbench:docs"
         },

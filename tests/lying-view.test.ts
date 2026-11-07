@@ -390,7 +390,7 @@ describe("R6 · getting up is an ask; the day's `rise` beat plays once after the
     r.act("loop-choice", { choice: "up" });
     expect(r.session.view).toBe("bed");
     expect(keys(r.session)).toEqual([]);
-    // The next day plays its own (here: day 2 has none).
+    // The next day plays its own (day 2 has one since the openings were split, content 2026-11-06).
     store.appendEvent({ kind: "lieDown" });
     syncLoop(r.ctx, 0);
     r.session.dialogue = EMPTY_DIALOGUE;
@@ -398,7 +398,7 @@ describe("R6 · getting up is an ask; the day's `rise` beat plays once after the
     r.act("rise");
     r.act("loop-choice", { choice: "up" });
     expect(r.session.view).toBe("bed");
-    expect(keys(r.session)).toEqual([]);
+    expect(keys(r.session)).toEqual(["d2:beat:rise"]);
   });
 
   it("the parser: a day file with `rise` parses, one without still does; `rise` with an unknown key fails", () => {

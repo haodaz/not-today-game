@@ -8,12 +8,16 @@
           "t": "The room is the same as yesterday. The rain has eased a little; the drops on the window stay where they are."
         },
         {
-          "k": "narration",
-          "t": "The glass of water is still on the desk, cold."
-        },
-        {
           "k": "inner",
           "t": "Last night's speck of light denies it was ever there, now that it is light."
+        }
+      ]
+    },
+    "rise": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "The glass of water is still on the desk, cold."
         }
       ]
     },

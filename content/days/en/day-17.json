@@ -5,7 +5,12 @@
       "say": [
         {
           "k": "narration",
-          "t": "White. White outside the window, white walls, most of the words on screen white."
+          "t": "White. White outside the window, white walls."
+        },
+        {
+          "k": "narration",
+          "t": "Most of the words on screen white.",
+          "where": "screen"
         },
         {
           "k": "narration",

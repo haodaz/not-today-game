@@ -6,7 +6,11 @@
         {
           "k": "narration",
           "t": "Still raining. Working from home anyway; let it."
-        },
+        }
+      ]
+    },
+    "rise": {
+      "say": [
         {
           "k": "narration",
           "t": "You have been sitting a while before you notice: the glass has been moved. One finger's width."

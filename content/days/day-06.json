@@ -5,6 +5,10 @@
       "say": [
         {
           "k": "narration",
+          "t": "阴。窗外灰得像还没亮。"
+        },
+        {
+          "k": "narration",
           "t": "文档里有两处错字。不是你打的。",
           "where": "screen:workbench:docs"
         },
