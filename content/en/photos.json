@@ -453,28 +453,32 @@
       "day": 17,
       "facing": "room",
       "add": {
-        "text": "Every square of the meeting on the screen is the same face: yours."
+        "text": "Every square of the meeting on the screen is the same room: this one.",
+        "overlay": "/room/photos/d17_room.jpg"
       }
     },
     {
       "day": 17,
       "facing": "bed",
       "add": {
-        "text": "The bed is made, as if no one had slept in it. No one has, for seventeen days."
+        "text": "The bed is made, as if no one had slept in it. No one has, for seventeen days.",
+        "overlay": "/room/photos/d17_bed.jpg"
       }
     },
     {
       "day": 17,
       "facing": "door",
       "add": {
-        "text": "The door is open a crack. Outside is not the corridor but another room, identical to this one."
+        "text": "The door is open a crack. Outside is not the corridor but another room, identical to this one.",
+        "overlay": "/room/photos/d17_door.jpg"
       }
     },
     {
       "day": 17,
       "facing": "window",
       "add": {
-        "text": "The window glass is covered in writing: answer me."
+        "text": "The window glass is covered in writing: answer me.",
+        "overlay": "/room/photos/d17_window_en.jpg"
       }
     },
     {

@@ -453,28 +453,32 @@
       "day": 17,
       "facing": "room",
       "add": {
-        "text": "屏幕里的会议格子，全是同一张脸：你的。"
+        "text": "屏幕里的会议格子，全是同一间屋子：这间。",
+        "overlay": "/room/photos/d17_room.jpg"
       }
     },
     {
       "day": 17,
       "facing": "bed",
       "add": {
-        "text": "床上整整齐齐，像没人睡过。十七天没人睡过。"
+        "text": "床上整整齐齐，像没人睡过。十七天没人睡过。",
+        "overlay": "/room/photos/d17_bed.jpg"
       }
     },
     {
       "day": 17,
       "facing": "door",
       "add": {
-        "text": "门开着一条缝。门外不是楼道，是另一间一模一样的屋子。"
+        "text": "门开着一条缝。门外不是楼道，是另一间一模一样的屋子。",
+        "overlay": "/room/photos/d17_door.jpg"
       }
     },
     {
       "day": 17,
       "facing": "window",
       "add": {
-        "text": "窗玻璃上全是字：回一下我。"
+        "text": "窗玻璃上全是字：回一下我。",
+        "overlay": "/room/photos/d17_window.jpg"
       }
     },
     {
