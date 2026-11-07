@@ -251,6 +251,11 @@
     "xiaozhang": {
       "incoming": [
         {
+          "t": "09:35",
+          "text": "{calledBy}，我把上周的结果喂回去跑了一轮，每周能长一次。模块放后台了，你开开看",
+          "kind": "work"
+        },
+        {
           "t": "15:02",
           "text": "{calledBy}我那段你看了吗",
           "kind": "work"

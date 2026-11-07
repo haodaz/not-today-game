@@ -42,28 +42,29 @@ export interface BoardState {
   readonly merged: Readonly<Record<string, "v16" | "v17">>;
   /** ide v2: the latest data was pulled from the API (once). */
   readonly fetched: boolean;
-  /** tune (2026-11-08): the modules switched on, in the order they were switched on. */
-  readonly mods: readonly string[];
+  /** tune (2026-11-08): module → the path chosen for it (a module with no entry is off). */
+  readonly mods: Readonly<Record<string, string>>;
 }
 
 /**
  * A fresh board: locked when it has a lock, every slot empty, no assist. A tuning board that carries
  * yesterday's work opens with those modules on (`carried`; `tuneCarried` reads them from the log).
  */
-export function freshBoard(board: TaskBoard, carried: readonly string[] = []): BoardState {
-  const known = new Set(board.tune?.mods.map((m) => m.id) ?? []);
-  return { unlocked: board.given.lock === undefined, slots: {}, assists: 0, wrongCodes: [], merged: {}, fetched: false, mods: carried.filter((id) => known.has(id)) };
+export function freshBoard(board: TaskBoard, carried: Readonly<Record<string, string>> = {}): BoardState {
+  const mods: Record<string, string> = {};
+  for (const [id, path] of Object.entries(carried)) if (board.tune?.mods.find((m) => m.id === id)?.paths.some((p) => p.id === path)) mods[id] = path;
+  return { unlocked: board.given.lock === undefined, slots: {}, assists: 0, wrongCodes: [], merged: {}, fetched: false, mods };
 }
 
 /**
  * tune: the modules yesterday's board (`tune.carry`) ended with — on when today's board opens.
  * Pure, from the whole log (yesterday's `boardStep`s are in it). No carry, or no such board: none.
  */
-export function tuneCarried(board: TaskBoard, events: readonly GameEvent[]): readonly string[] {
+export function tuneCarried(board: TaskBoard, events: readonly GameEvent[]): Readonly<Record<string, string>> {
   const carry = board.tune?.carry;
-  if (!carry) return [];
+  if (!carry) return {};
   const from = boardOf(carry.day, carry.task);
-  if (!from?.board.tune) return [];
+  if (!from?.board.tune) return {};
   return boardState(from.board, carry.day, carry.task, events).mods;
 }
 
@@ -93,13 +94,22 @@ export function stepBoard(board: TaskBoard, s: BoardState, op: BoardOp): BoardSt
       if (!board.ide?.api || s.fetched) return s;
       return { ...s, fetched: true };
     case "mod": {
-      // tune: on spends a step (never over the budget); off gives it back. Unknown module: ignored.
+      // tune: choosing a path for a module not yet set spends a step (never over the budget); another
+      // path for a set module swaps it for free; null clears it and gives the step back. Unknown
+      // module or path: ignored.
       const tune = board.tune;
-      if (!tune || !tune.mods.some((m) => m.id === op.id)) return s;
-      const on = s.mods.includes(op.id);
-      if (op.on === on) return s;
-      if (op.on && s.mods.length >= tune.steps) return s;
-      return { ...s, mods: op.on ? [...s.mods, op.id] : s.mods.filter((id) => id !== op.id) };
+      const mod = tune?.mods.find((m) => m.id === op.id);
+      if (!tune || !mod) return s;
+      const now = s.mods[op.id];
+      if (op.path === null) {
+        if (now === undefined) return s;
+        const next = { ...s.mods };
+        delete next[op.id];
+        return { ...s, mods: next };
+      }
+      if (!mod.paths.some((p) => p.id === op.path) || now === op.path) return s;
+      if (now === undefined && Object.keys(s.mods).length >= tune.steps) return s;
+      return { ...s, mods: { ...s.mods, [op.id]: op.path } };
     }
     case "clear": {
       if (!(op.slot in s.slots)) return s;
@@ -108,8 +118,8 @@ export function stepBoard(board: TaskBoard, s: BoardState, op: BoardOp): BoardSt
       return { ...s, slots: next };
     }
     case "assistFill": {
-      // tune: Kuro's set replaces whatever is on (it does not know what you were trying).
-      if (board.tune) return { ...s, mods: [...board.tune.assist], unlocked: true, assists: s.assists + 1 };
+      // tune: Kuro's choice replaces whatever is set (it does not know what you were trying).
+      if (board.tune) return { ...s, mods: { ...board.tune.assist }, unlocked: true, assists: s.assists + 1 };
       const slots = { ...s.slots };
       for (const slot of board.slots) if (!(slot.id in slots)) slots[slot.id] = board.kuro.fill[slot.id]!;
       return { ...s, slots, unlocked: true, assists: s.assists + 1 };
@@ -135,15 +145,15 @@ export function canPrint(board: TaskBoard, s: BoardState): boolean {
 
 const clampPct = (v: number): number => Math.max(0, Math.min(100, v));
 
-/** tune: each dimension's value with these modules on (start + deltas, clamped 0–100). Pure. */
-export function tuneValues(board: TaskBoard, mods: readonly string[]): Readonly<Record<string, number>> {
+/** tune: each dimension's value with these paths chosen (start + deltas, clamped 0–100). Pure. */
+export function tuneValues(board: TaskBoard, mods: Readonly<Record<string, string>>): Readonly<Record<string, number>> {
   const tune = board.tune;
   if (!tune) return {};
   const v: Record<string, number> = { ...tune.start };
-  for (const id of mods) {
-    const mod = tune.mods.find((m) => m.id === id);
-    if (!mod) continue;
-    for (const [dim, d] of Object.entries(mod.delta)) v[dim] = (v[dim] ?? 0) + d;
+  for (const [id, pid] of Object.entries(mods)) {
+    const path = tune.mods.find((m) => m.id === id)?.paths.find((p) => p.id === pid);
+    if (!path) continue;
+    for (const [dim, d] of Object.entries(path.delta)) v[dim] = (v[dim] ?? 0) + d;
   }
   for (const dim of tune.dims) v[dim.id] = clampPct(v[dim.id] ?? 0);
   return v;
@@ -159,7 +169,7 @@ export function tuneBase(board: TaskBoard, events: readonly GameEvent[]): Readon
 
 /** tune: how many more modules may be switched on. */
 export function tuneStepsLeft(board: TaskBoard, s: BoardState): number {
-  return board.tune ? Math.max(0, board.tune.steps - s.mods.length) : 0;
+  return board.tune ? Math.max(0, board.tune.steps - Object.keys(s.mods).length) : 0;
 }
 
 /** tune: every bar is at or over today's line. */
@@ -179,7 +189,7 @@ export function modFound(mod: TuneMod, day: number, events: readonly GameEvent[]
 export const TUNE_SLACK = 10;
 
 /** tune: the dimensions further than the slack under today's line (the night's wrong count). */
-export function tuneShort(board: TaskBoard, mods: readonly string[]): string[] {
+export function tuneShort(board: TaskBoard, mods: Readonly<Record<string, string>>): string[] {
   const tune = board.tune;
   if (!tune) return [];
   const v = tuneValues(board, mods);
@@ -344,11 +354,13 @@ export function validateBoardStep(day: number, taskId: string, op: BoardOp): voi
     case "fetch":
       if (!board.ide?.api) throw new Error("boardStep: this board has no API to pull from");
       return;
-    case "mod":
+    case "mod": {
       if (!board.tune) throw new Error("boardStep: this board has no modules");
-      if (!board.tune.mods.some((m) => m.id === op.id)) throw new Error(`boardStep: "${op.id}" is not a module`);
-      if (typeof op.on !== "boolean") throw new Error("boardStep: mod.on must be true or false");
+      const mod = board.tune.mods.find((m) => m.id === op.id);
+      if (!mod) throw new Error(`boardStep: "${op.id}" is not a module`);
+      if (op.path !== null && !mod.paths.some((p) => p.id === op.path)) throw new Error(`boardStep: "${op.path}" is not a path of "${op.id}"`);
       return;
+    }
     case "clear":
       if (!slotIds.has(op.slot)) throw new Error(`boardStep: "${op.slot}" is not a slot`);
       return;

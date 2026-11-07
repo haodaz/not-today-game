@@ -56,176 +56,6 @@
           "reach": 80,
           "promise": 100,
           "steps": 8,
-          "carry": {
-            "day": 2,
-            "task": "task1"
-          },
-          "mods": [
-            {
-              "id": "n2",
-              "label": "Weekly feedback loop",
-              "delta": {
-                "auto": 20,
-                "gain": 10,
-                "hands": 5,
-                "safe": -10
-              },
-              "from": {
-                "conv": "xiaozhang"
-              },
-              "hint": "In Zhang's chat",
-              "group": "training"
-            },
-            {
-              "id": "n1",
-              "label": "Shadow evaluation",
-              "delta": {
-                "safe": 20,
-                "auto": 15,
-                "gain": 10
-              },
-              "group": "constraints"
-            },
-            {
-              "id": "n3",
-              "label": "Approve the diff only",
-              "delta": {
-                "hands": 20,
-                "safe": 5
-              },
-              "from": {
-                "conv": "boss"
-              },
-              "hint": "In the v17 you sent Wang",
-              "group": "constraints"
-            },
-            {
-              "id": "n4",
-              "label": "Vivi's skin",
-              "delta": {
-                "hands": 5,
-                "gain": -5,
-                "safe": -5
-              },
-              "from": {
-                "conv": "partner"
-              },
-              "hint": "In Vivi's chat",
-              "group": "support"
-            },
-            {
-              "id": "m1",
-              "label": "Wire the button to our export page",
-              "delta": {
-                "gain": 15,
-                "hands": 20
-              },
-              "group": "support"
-            },
-            {
-              "id": "m2",
-              "label": "Import the three tables every Monday",
-              "delta": {
-                "gain": 20,
-                "hands": 5,
-                "safe": -10
-              },
-              "group": "training"
-            },
-            {
-              "id": "m3",
-              "label": "Real computation (40 s)",
-              "delta": {
-                "gain": 15,
-                "hands": -5,
-                "safe": 5
-              },
-              "from": {
-                "conv": "xiaozhang"
-              },
-              "hint": "In Zhang's chat",
-              "group": "training"
-            },
-            {
-              "id": "m4",
-              "label": "Three-second animation",
-              "delta": {
-                "hands": 15,
-                "gain": -25
-              },
-              "group": "training"
-            },
-            {
-              "id": "m5",
-              "label": "Let it edit its own config",
-              "delta": {
-                "auto": 35,
-                "safe": -20
-              },
-              "group": "constraints"
-            },
-            {
-              "id": "m6",
-              "label": "Human approval",
-              "delta": {
-                "safe": 30,
-                "hands": -15,
-                "auto": -5
-              },
-              "group": "constraints"
-            },
-            {
-              "id": "m7",
-              "label": "Sandbox with rollback",
-              "delta": {
-                "safe": 10,
-                "auto": -5,
-                "hands": -10
-              },
-              "group": "constraints"
-            },
-            {
-              "id": "m8",
-              "label": "Nightly auto-retrain",
-              "delta": {
-                "hands": 20,
-                "auto": 25,
-                "safe": -15,
-                "gain": 10
-              },
-              "group": "training"
-            },
-            {
-              "id": "m9",
-              "label": "Wire in the logs",
-              "delta": {
-                "safe": 15,
-                "gain": 5,
-                "auto": 10
-              },
-              "group": "constraints"
-            },
-            {
-              "id": "m10",
-              "label": "Let it pick its own parameters",
-              "delta": {
-                "auto": 10,
-                "gain": 5,
-                "safe": -10
-              },
-              "group": "training"
-            }
-          ],
-          "assist": [
-            "m1",
-            "m2",
-            "m5",
-            "m8",
-            "m9",
-            "n1",
-            "n2",
-            "n3"
-          ],
           "groups": [
             {
               "id": "training",
@@ -239,7 +69,463 @@
               "id": "support",
               "label": "Support"
             }
-          ]
+          ],
+          "mods": [
+            {
+              "id": "cadence",
+              "label": "Fine-tune cadence",
+              "group": "training",
+              "paths": [
+                {
+                  "id": "nightly",
+                  "label": "Nightly full retrain",
+                  "bullets": [
+                    "02:00 cron job",
+                    "retrain on all data",
+                    "swap the live model when done"
+                  ],
+                  "delta": {
+                    "hands": 20,
+                    "auto": 30,
+                    "safe": -25,
+                    "gain": 10
+                  }
+                },
+                {
+                  "id": "weekly",
+                  "label": "Weekly LoRA fine-tune",
+                  "bullets": [
+                    "runs after Monday's import",
+                    "trains the adapter layer only",
+                    "keeps the old model on file"
+                  ],
+                  "delta": {
+                    "hands": 15,
+                    "auto": 10,
+                    "safe": -10,
+                    "gain": 10
+                  }
+                },
+                {
+                  "id": "flywheel",
+                  "label": "Data flywheel",
+                  "bullets": [
+                    "last week's results + corrections feed the next round",
+                    "one round a week",
+                    "with no corrections it spins empty"
+                  ],
+                  "delta": {
+                    "auto": 20,
+                    "gain": 10,
+                    "hands": 5,
+                    "safe": -5
+                  }
+                }
+              ]
+            },
+            {
+              "id": "ingest",
+              "label": "Data ingest",
+              "group": "training",
+              "paths": [
+                {
+                  "id": "manual",
+                  "label": "Zhang imports the three tables on Mondays",
+                  "bullets": [
+                    "the three clients' tables",
+                    "Zhang imports them by hand",
+                    "Monday mornings"
+                  ],
+                  "delta": {
+                    "gain": 10
+                  }
+                },
+                {
+                  "id": "pull",
+                  "label": "Scheduled API pull",
+                  "bullets": [
+                    "pulls the three APIs nightly",
+                    "mismatched fields go in anyway",
+                    "nobody watches"
+                  ],
+                  "delta": {
+                    "gain": 20,
+                    "hands": 10,
+                    "safe": -15
+                  }
+                },
+                {
+                  "id": "magic",
+                  "label": "'Understands all business systems automatically'",
+                  "bullets": [
+                    "as the page says",
+                    "no API",
+                    "no data"
+                  ],
+                  "delta": {
+                    "hands": 5,
+                    "gain": -10
+                  }
+                }
+              ]
+            },
+            {
+              "id": "compute",
+              "label": "Inference",
+              "group": "training",
+              "from": {
+                "conv": "xiaozhang"
+              },
+              "hint": "In Zhang's chat",
+              "paths": [
+                {
+                  "id": "real",
+                  "label": "Real computation (40 s)",
+                  "bullets": [
+                    "computes on the three tables",
+                    "a result in 40 s",
+                    "someone waits"
+                  ],
+                  "delta": {
+                    "gain": 25,
+                    "hands": -15,
+                    "safe": 10
+                  }
+                },
+                {
+                  "id": "cached",
+                  "label": "Real computation + cache",
+                  "bullets": [
+                    "40 s the first time",
+                    "instant after that",
+                    "the cache must expire when the data changes"
+                  ],
+                  "delta": {
+                    "gain": 25,
+                    "hands": 5,
+                    "safe": 5
+                  }
+                },
+                {
+                  "id": "canned",
+                  "label": "Pre-rendered metrics (3 s)",
+                  "bullets": [
+                    "numbers hard-coded",
+                    "a 3-second animation",
+                    "the one on her page"
+                  ],
+                  "delta": {
+                    "hands": 10,
+                    "gain": -25
+                  }
+                }
+              ]
+            },
+            {
+              "id": "params",
+              "label": "Hyperparameters",
+              "group": "training",
+              "paths": [
+                {
+                  "id": "auto",
+                  "label": "Auto-tuning",
+                  "bullets": [
+                    "a random search every night",
+                    "it picks the best itself",
+                    "if it picks wrong, it picked"
+                  ],
+                  "delta": {
+                    "auto": 20,
+                    "gain": 10,
+                    "safe": -15
+                  }
+                },
+                {
+                  "id": "fixed",
+                  "label": "One hand-tuned set",
+                  "bullets": [
+                    "you tune it once",
+                    "fixed",
+                    "someone retunes when the data changes"
+                  ],
+                  "delta": {
+                    "gain": 10,
+                    "safe": 5,
+                    "hands": -10,
+                    "auto": -5
+                  }
+                }
+              ]
+            },
+            {
+              "id": "selfedit",
+              "label": "Self-modification",
+              "group": "constraints",
+              "paths": [
+                {
+                  "id": "prompt",
+                  "label": "It may edit its own prompt",
+                  "bullets": [
+                    "edits its wording and rules",
+                    "takes effect at once",
+                    "what changed is in the logs, if any"
+                  ],
+                  "delta": {
+                    "auto": 20,
+                    "safe": -10
+                  }
+                },
+                {
+                  "id": "config",
+                  "label": "It may edit its config and data filters",
+                  "bullets": [
+                    "edits the training config",
+                    "decides which data enters the next round",
+                    "nobody reviews"
+                  ],
+                  "delta": {
+                    "auto": 35,
+                    "safe": -20
+                  }
+                }
+              ]
+            },
+            {
+              "id": "gate",
+              "label": "Release gate",
+              "group": "constraints",
+              "from": {
+                "conv": "boss"
+              },
+              "hint": "In the v17 you sent Wang",
+              "paths": [
+                {
+                  "id": "every",
+                  "label": "Human approval on every change",
+                  "bullets": [
+                    "the tech lead (you) clicks",
+                    "no click, no release",
+                    "several times a day"
+                  ],
+                  "delta": {
+                    "safe": 25,
+                    "hands": -20,
+                    "auto": -10
+                  }
+                },
+                {
+                  "id": "sample",
+                  "label": "Sample 10% for review",
+                  "bullets": [
+                    "one in ten is read",
+                    "the rest pass",
+                    "what slips through is luck"
+                  ],
+                  "delta": {
+                    "safe": 10,
+                    "hands": -5,
+                    "auto": -5
+                  }
+                },
+                {
+                  "id": "diff",
+                  "label": "Approve the diff only",
+                  "bullets": [
+                    "read only what changed",
+                    "fits on one screen",
+                    "a click is still a click"
+                  ],
+                  "delta": {
+                    "safe": 25,
+                    "hands": -5
+                  }
+                }
+              ]
+            },
+            {
+              "id": "rollout",
+              "label": "Rollout",
+              "group": "constraints",
+              "paths": [
+                {
+                  "id": "replace",
+                  "label": "Replace in place",
+                  "bullets": [
+                    "ships as soon as it's trained",
+                    "the old one is gone",
+                    "deal with it when it breaks"
+                  ],
+                  "delta": {
+                    "hands": 10,
+                    "safe": -5
+                  }
+                },
+                {
+                  "id": "sandbox",
+                  "label": "Sandbox first, with rollback",
+                  "bullets": [
+                    "one round in a sandbox first",
+                    "can roll back",
+                    "rolling back takes a human"
+                  ],
+                  "delta": {
+                    "safe": 10,
+                    "auto": -10,
+                    "hands": -10
+                  }
+                },
+                {
+                  "id": "canary",
+                  "label": "Canary 5% → 50% → 100%",
+                  "bullets": [
+                    "5% of traffic first",
+                    "widen when the metrics hold",
+                    "rolls back by itself"
+                  ],
+                  "delta": {
+                    "safe": 20,
+                    "hands": 10,
+                    "auto": 5
+                  }
+                }
+              ]
+            },
+            {
+              "id": "evals",
+              "label": "Evaluation",
+              "group": "constraints",
+              "paths": [
+                {
+                  "id": "loss",
+                  "label": "Just watch the training loss",
+                  "bullets": [
+                    "loss went down, so it's better",
+                    "no test set",
+                    "it grades its own exam"
+                  ],
+                  "delta": {
+                    "hands": 10,
+                    "safe": -10,
+                    "gain": -5
+                  }
+                },
+                {
+                  "id": "frozen",
+                  "label": "A frozen eval set",
+                  "bullets": [
+                    "the eval set never enters training",
+                    "each round must clear the line",
+                    "you set the line"
+                  ],
+                  "delta": {
+                    "safe": 15,
+                    "gain": 5,
+                    "auto": 10
+                  }
+                },
+                {
+                  "id": "shadow",
+                  "label": "Shadow evaluation",
+                  "bullets": [
+                    "old and new run side by side for a week",
+                    "recorded, not served",
+                    "swap only when the new one wins"
+                  ],
+                  "delta": {
+                    "safe": 25,
+                    "auto": 20,
+                    "gain": 5
+                  }
+                }
+              ]
+            },
+            {
+              "id": "observe",
+              "label": "Observability",
+              "group": "constraints",
+              "paths": [
+                {
+                  "id": "logs",
+                  "label": "Logs and tracing",
+                  "bullets": [
+                    "every step is logged",
+                    "when it breaks you know which step",
+                    "logged even if nobody reads"
+                  ],
+                  "delta": {
+                    "safe": 10,
+                    "gain": 5,
+                    "auto": 5
+                  }
+                }
+              ]
+            },
+            {
+              "id": "front",
+              "label": "Front end",
+              "group": "support",
+              "from": {
+                "conv": "partner"
+              },
+              "hint": "In Vivi's chat",
+              "paths": [
+                {
+                  "id": "export",
+                  "label": "Wire to our export API",
+                  "bullets": [
+                    "'Start analysis' → /export",
+                    "returns the result table",
+                    "plain, but every button is wired"
+                  ],
+                  "delta": {
+                    "gain": 10,
+                    "hands": 15
+                  }
+                },
+                {
+                  "id": "page",
+                  "label": "Copy the page",
+                  "bullets": [
+                    "draw the buttons",
+                    "nothing behind them",
+                    "clicks do nothing"
+                  ],
+                  "delta": {
+                    "hands": 10,
+                    "gain": -5
+                  }
+                },
+                {
+                  "id": "skin",
+                  "label": "Use her AI's skin",
+                  "bullets": [
+                    "pretty",
+                    "buttons go nowhere",
+                    "she'll look at this first"
+                  ],
+                  "delta": {
+                    "hands": 5,
+                    "gain": -5,
+                    "safe": -10
+                  }
+                }
+              ]
+            }
+          ],
+          "assist": {
+            "cadence": "nightly",
+            "ingest": "pull",
+            "compute": "cached",
+            "params": "auto",
+            "selfedit": "config",
+            "rollout": "canary",
+            "observe": "logs",
+            "front": "export"
+          },
+          "carry": {
+            "day": 2,
+            "task": "task1"
+          }
         },
         "beats": [
           {
@@ -251,25 +537,213 @@
               },
               {
                 "who": "me",
-                "text": "Continuing yesterday's. Zhang sent a few more modules."
+                "text": "Continuing yesterday's. Zhang sent a few more ways."
               },
               {
                 "who": "kuro",
-                "text": "Yesterday's switches are still on. The line moved to 80."
+                "text": "Yesterday's settings are still there. The line moved to 80."
               }
             ]
           },
           {
-            "on": "mod:n1",
+            "on": "mod:cadence:nightly",
             "lines": [
               {
                 "who": "kuro",
-                "text": "Shadow evaluation. Run it on the side first; ship when it compares."
+                "text": "It trains every night and ships when it's done. You sleep."
               }
             ]
           },
           {
-            "on": "mod:n2",
+            "on": "mod:cadence:weekly",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Once a week. The old one stays on file."
+              }
+            ]
+          },
+          {
+            "on": "mod:ingest:manual",
+            "lines": [
+              {
+                "who": "me",
+                "text": "'All business systems' means these three tables."
+              },
+              {
+                "who": "kuro",
+                "text": "Every Monday. Her 'understands automatically' is Zhang importing on Mondays."
+              }
+            ]
+          },
+          {
+            "on": "mod:ingest:pull",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "It pulls every night. Mismatched fields go in too."
+              }
+            ]
+          },
+          {
+            "on": "mod:ingest:magic",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "As the page says. The page is all there is."
+              }
+            ]
+          },
+          {
+            "on": "mod:compute:real",
+            "lines": [
+              {
+                "who": "me",
+                "text": "Forty seconds. Real ones."
+              },
+              {
+                "who": "kuro",
+                "text": "She wants three."
+              }
+            ]
+          },
+          {
+            "on": "mod:compute:canned",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Three seconds is an animation. The bars don't count animations."
+              }
+            ]
+          },
+          {
+            "on": "mod:params:auto",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Let it pick its own parameters. If it picks wrong, it picked."
+              }
+            ]
+          },
+          {
+            "on": "mod:params:fixed",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Fixed. When the data changes, a human retunes."
+              }
+            ]
+          },
+          {
+            "on": "mod:selfedit:prompt",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "It rewrites its own words. What changed is in the logs. If there are logs."
+              }
+            ]
+          },
+          {
+            "on": "mod:selfedit:config",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "It edits itself. Who's watching?"
+              }
+            ]
+          },
+          {
+            "on": "mod:gate:every",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "A human clicks. She won't like this line."
+              }
+            ]
+          },
+          {
+            "on": "mod:gate:sample",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "One in ten gets read. What slips through is luck."
+              }
+            ]
+          },
+          {
+            "on": "mod:rollout:replace",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Ships as soon as it's trained. The old one is gone."
+              }
+            ]
+          },
+          {
+            "on": "mod:rollout:sandbox",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "If it breaks you can roll back. Rolling back takes a human too."
+              }
+            ]
+          },
+          {
+            "on": "mod:evals:loss",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "It grades its own exam."
+              }
+            ]
+          },
+          {
+            "on": "mod:evals:frozen",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "The eval set never enters training. You set the line."
+              }
+            ]
+          },
+          {
+            "on": "mod:observe:logs",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Logs. When it breaks, at least you know which step."
+              }
+            ]
+          },
+          {
+            "on": "mod:front:export",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "The button goes somewhere now. The export page, our own."
+              }
+            ]
+          },
+          {
+            "on": "mod:front:page",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "The buttons are drawn. Nothing behind them."
+              }
+            ]
+          },
+          {
+            "on": "unmod:gate",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Approval off. Nobody's watching."
+              }
+            ]
+          },
+          {
+            "on": "mod:cadence:flywheel",
             "lines": [
               {
                 "who": "me",
@@ -282,7 +756,16 @@
             ]
           },
           {
-            "on": "mod:n3",
+            "on": "mod:compute:cached",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Forty seconds the first time, instant after. When the data changes the cache must go."
+              }
+            ]
+          },
+          {
+            "on": "mod:gate:diff",
             "lines": [
               {
                 "who": "kuro",
@@ -291,20 +774,29 @@
             ]
           },
           {
-            "on": "mod:n4",
+            "on": "mod:rollout:canary",
             "lines": [
               {
                 "who": "kuro",
-                "text": "Her skin. Pretty; the buttons go nowhere."
+                "text": "Five percent first. Widen when the metrics hold."
               }
             ]
           },
           {
-            "on": "unmod:m10",
+            "on": "mod:evals:shadow",
             "lines": [
               {
                 "who": "kuro",
-                "text": "No more picking its own parameters. Shadow evaluation does that now."
+                "text": "Shadow evaluation. Old and new run side by side for a week; swap when the new one wins."
+              }
+            ]
+          },
+          {
+            "on": "mod:front:skin",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Her skin. Pretty; the buttons go nowhere."
               }
             ]
           },
@@ -335,7 +827,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "I switched on eight. I maxed the autonomy bar."
+                "text": "I set eight. I maxed the autonomy bar."
               }
             ]
           },

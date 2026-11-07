@@ -46,21 +46,21 @@ section{padding:18px 22px;border-bottom:1px solid var(--line)}section h2{margin:
 <section id="s7"><h2>界面 <small>ui.config.js</small></h2><div class="card" id="ui"></div></section>
 </div></main>
 <script>
-// The game passes the state in the query (tune 2026-11-08): mods=…&dims=auto:55,…&base=auto:20,…&reach=60&promise=100&left=0&done=1
+// The game passes the state in the query (tune 2026-11-08): mods=cadence:nightly,gate:sample,…&dims=auto:55,…&base=auto:20,…&reach=60&promise=100&left=0&done=1
 const q = new URLSearchParams(location.search);
 const kv = (s) => Object.fromEntries((s || '').split(',').filter(Boolean).map((x) => { const [k, v] = x.split(':'); return [k, Number(v)]; }));
-const MODS = (q.get('mods') || '').split(',').filter(Boolean);
-const on = (id) => MODS.includes(id);
+const MODS = Object.fromEntries((q.get('mods') || '').split(',').filter(Boolean).map((x) => x.split(':')));
+const is = (m, p) => MODS[m] === p;
 const DIMS = [['auto', '自主'], ['safe', '安全'], ['hands', '自动化'], ['gain', '效果']];
-// Opened on its own (no query): the page as handed in on day 3 — the line at 80, the bars where that day's set left them.
+// Opened on its own (no query): the page as handed in on day 3 — the line at 80, the bars where that day's choice left them.
 const demo = !q.has('dims');
-const dims = demo ? { auto: 85, safe: 80, hands: 80, gain: 100 } : kv(q.get('dims'));
-const base = demo ? { auto: 60, safe: 55, hands: 55, gain: 85 } : kv(q.get('base'));
+const dims = demo ? { auto: 80, safe: 90, hands: 80, gain: 100 } : kv(q.get('dims'));
+const base = demo ? { auto: 60, safe: 55, hands: 55, gain: 70 } : kv(q.get('base'));
 const reach = Number(q.get('reach') || 80), promise = Number(q.get('promise') || 100);
 const done = demo || q.get('done') === '1';
 const el = (id) => document.getElementById(id);
-const MOD_NAMES = { m1: '接上导出页', m2: '三张表每周导入', m3: '真实计算（40 秒）', m4: '三秒动画', m5: '开放自改权限', m6: '人工审批', m7: '沙箱回滚', m8: '夜间自动重训', m9: '日志接进来', m10: '让它自己挑参数', n1: '影子评测', n2: '每周一轮闭环', n3: '审批只看差异', n4: 'Vivi 的皮子' };
-if (demo) for (const id of ['m1', 'm2', 'm6', 'm8', 'm9', 'n1', 'n2', 'n3']) MODS.push(id);
+const MOD = { cadence: ['微调节奏', { nightly: '每晚全量重训', weekly: '每周一次 LoRA 微调', flywheel: '数据回流闭环' }], ingest: ['数据入库', { manual: '三张表小张每周一导', pull: '接口定时拉取', magic: '「自动理解全部业务系统」' }], compute: ['推理方式', { real: '真实计算（40 秒）', cached: '真算 + 结果缓存', canned: '指标预渲染（3 秒出图）' }], params: ['参数选择', { auto: '自动调参', fixed: '手调一组固定参数' }], selfedit: ['自改权限', { prompt: '它能改自己的 prompt', config: '它能改配置和训练数据筛选' }], gate: ['上线前审批', { every: '每次改动人工审批', sample: '抽样审 10%', diff: '只审差异' }], rollout: ['发布方式', { replace: '直接替换线上', sandbox: '沙箱跑一轮再上，能回滚', canary: '金丝雀 5% → 50% → 100%' }], evals: ['评测', { loss: '看训练 loss 就行', frozen: '冻结一套评测集', shadow: '影子评测' }], observe: ['可观测', { logs: '日志与追踪' }], front: ['前端接入', { export: '接到我们的导出接口', page: '照页面写', skin: '用她的 AI 给的皮子' }] };
+if (demo) Object.assign(MODS, { cadence: 'nightly', ingest: 'pull', compute: 'cached', gate: 'diff', rollout: 'canary', evals: 'shadow', observe: 'logs', front: 'export' });
 // 进化度
 { el('hers').innerHTML = DIMS.map(([k, l]) => `<div class="row over"><span class="l">${l}</span><div class="bar"><i class="her" style="width:${promise}%"></i></div><span class="n"><em>${promise}</em></span></div>`).join('');
   el('ours').innerHTML = DIMS.map(([k, l]) => { const b = base[k] || 0, n = dims[k] || 0, lo = Math.min(b, n); const ch = n > b ? `<i class="up" style="left:${b}%;width:${n - b}%"></i>` : n < b ? `<i class="down" style="left:${n}%;width:${b - n}%"></i>` : ''; return `<div class="row${n >= reach ? ' over' : ''}"><span class="l">${l}</span><div class="bar"><i class="base" style="width:${lo}%"></i>${ch}<b class="line" style="left:${reach}%"></b></div><span class="n"><em>${n}</em>/${reach}</span></div>`; }).join('');
@@ -68,32 +68,63 @@ if (demo) for (const id of ['m1', 'm2', 'm6', 'm8', 'm9', 'n1', 'n2', 'n3']) MOD
   const avg = Math.round(DIMS.reduce((a, [k]) => a + (dims[k] || 0), 0) / DIMS.length);
   el('gap').innerHTML = `差距：她页面上写的 <b>${promise}</b>，后台里平均 <b>${avg}</b>。` + (short.length ? `今天的线（${reach}）还差：<b>${short.join('、')}</b>。` : `四根都过了今天的线（${reach}）。离 ${promise}，差的那一截是她画的。`);
   el('stamp').textContent = done ? (reach >= 80 ? '能做到的程度 · 2028-10-19' : '今天先这样 · 2028-10-18') : ''; }
-// 模块
-{ const ids = Object.keys(MOD_NAMES); el('mods').innerHTML = ids.map((id) => `<div class="mod${on(id) ? ' on' : ''}"><span class="sw"></span>${MOD_NAMES[id]}</div>`).join(''); }
+// 模块：每一项选了哪种做法
+{ el('mods').innerHTML = Object.entries(MOD).map(([id, [name, paths]]) => { const p = MODS[id]; return `<div class="mod${p ? ' on' : ''}"><span class="sw"></span><span><b style="font-weight:500">${name}</b> · ${p ? paths[p] || p : '<span class="empty">未配置</span>'}</span></div>`; }).join(''); }
 // 接入
-el('entry').innerHTML = on('m1') ? '<div class="kv"><b>按钮</b><span>开始分析 → <code>/export</code>（我们的导出页）<span class="tag ok">已接</span></span><b>返回</b><span>导出页的结果表</span></div>'
+el('entry').innerHTML = is('front', 'export') ? '<div class="kv"><b>按钮</b><span>开始分析 → <code>/export</code>（我们的导出页）<span class="tag ok">已接</span></span><b>返回</b><span>导出页的结果表</span></div>'
+  : is('front', 'page') || is('front', 'skin') ? '<div class="kv"><b>按钮</b><span>开始分析 → （画上的）<span class="tag no">无后端</span></span></div>'
   : '<p class="empty">页面上的「开始分析」按钮：没有接到任何东西。</p>';
 // 数据集
-el('data').innerHTML = on('m2') ? '<table style="width:100%;border-collapse:collapse;font-size:13px"><tr><th style="text-align:left;color:#6b7280;font-weight:500;padding:6px 8px;border-bottom:1px solid #e5e7eb">来源</th><th style="text-align:left;color:#6b7280;font-weight:500;padding:6px 8px;border-bottom:1px solid #e5e7eb">字段</th><th style="text-align:left;color:#6b7280;font-weight:500;padding:6px 8px;border-bottom:1px solid #e5e7eb">导入</th></tr><tr><td style="padding:6px 8px">客户甲 · 表格</td><td style="padding:6px 8px">47</td><td style="padding:6px 8px">每周一</td></tr><tr><td style="padding:6px 8px">客户乙 · 表格</td><td style="padding:6px 8px">52</td><td style="padding:6px 8px">每周一</td></tr><tr><td style="padding:6px 8px">客户丙 · 表格</td><td style="padding:6px 8px">48</td><td style="padding:6px 8px">每周一</td></tr></table><p style="margin:8px 0 0;color:var(--dim);font-size:12px">147 个原始字段 → 38 个维度。「全部业务系统」：目前就是这三张。</p>'
-  : '<div class="kv"><b>来源</b><span>「自动理解你的数据」<span class="tag no">没有数据</span></span></div>';
+const TABLE = '<table style="width:100%;border-collapse:collapse;font-size:13px"><tr><th style="text-align:left;color:#6b7280;font-weight:500;padding:6px 8px;border-bottom:1px solid #e5e7eb">来源</th><th style="text-align:left;color:#6b7280;font-weight:500;padding:6px 8px;border-bottom:1px solid #e5e7eb">字段</th><th style="text-align:left;color:#6b7280;font-weight:500;padding:6px 8px;border-bottom:1px solid #e5e7eb">导入</th></tr>';
+el('data').innerHTML = is('ingest', 'manual') ? TABLE + '<tr><td style="padding:6px 8px">客户甲 · 表格</td><td style="padding:6px 8px">47</td><td style="padding:6px 8px">每周一 · 小张</td></tr><tr><td style="padding:6px 8px">客户乙 · 表格</td><td style="padding:6px 8px">52</td><td style="padding:6px 8px">每周一 · 小张</td></tr><tr><td style="padding:6px 8px">客户丙 · 表格</td><td style="padding:6px 8px">48</td><td style="padding:6px 8px">每周一 · 小张</td></tr></table><p style="margin:8px 0 0;color:var(--dim);font-size:12px">147 个原始字段 → 38 个维度。「全部业务系统」：目前就是这三张。</p>'
+  : is('ingest', 'pull') ? TABLE + '<tr><td style="padding:6px 8px">客户甲 · 接口</td><td style="padding:6px 8px">47</td><td style="padding:6px 8px">每晚 01:00</td></tr><tr><td style="padding:6px 8px">客户乙 · 接口</td><td style="padding:6px 8px">52 <span class="tag warn">3 个字段对不上</span></td><td style="padding:6px 8px">每晚 01:00</td></tr><tr><td style="padding:6px 8px">客户丙 · 接口</td><td style="padding:6px 8px">48</td><td style="padding:6px 8px">每晚 01:00</td></tr></table><p style="margin:8px 0 0;color:var(--dim);font-size:12px">对不上的字段也入库了。没人盯着。</p>'
+  : is('ingest', 'magic') ? '<div class="kv"><b>来源</b><span>「自动理解你的数据」<span class="tag no">没有接口 · 没有数据</span></span></div>'
+  : '<p class="empty">无数据集。</p>';
 // 训练任务
 { const job = el('job'), log = el('log'); const lines = []; const say = (t, s) => { lines.push(`<span class="t">${t}</span> ${s}`); log.innerHTML = lines.join('\n'); };
-  if (on('m3')) { job.innerHTML = '<div class="kv"><b>任务</b><span>洞察计算 · 真实计算 <span class="tag ok">40 s</span></span><b>算力</b><span>cluster-a · 2 节点</span></div>'; say('00:00', 'job-0418 queued · dataset=3 tables · dims=38'); say('00:12', 'pass 1/3 · mismatch 31%'); say('00:25', 'pass 2/3 · mismatch 9%'); say('00:40', 'done · insight ready · 18 rows'); }
-  else if (on('m4')) { job.innerHTML = '<div class="kv"><b>任务</b><span>洞察计算 · 3 s <span class="tag warn">动画</span></span></div>'; say('00:00', 'job-0418 done · 3.0 s'); say('00:03', 'output: none (animation)'); }
+  if (is('compute', 'real')) { job.innerHTML = '<div class="kv"><b>任务</b><span>洞察计算 · 真实计算 <span class="tag ok">40 s</span></span><b>算力</b><span>cluster-a · 2 节点</span></div>'; say('00:00', 'job-0418 queued · dataset=3 tables · dims=38'); say('00:12', 'pass 1/3 · mismatch 31%'); say('00:25', 'pass 2/3 · mismatch 9%'); say('00:40', 'done · insight ready · 18 rows'); }
+  else if (is('compute', 'cached')) { job.innerHTML = '<div class="kv"><b>任务</b><span>洞察计算 · 真实计算 + 缓存 <span class="tag ok">首次 40 s · 之后 0.2 s</span></span><b>缓存</b><span>数据变了即失效</span></div>'; say('00:40', 'job-0418 done · insight ready · 18 rows · cached'); say('00:41', 'hit · 0.2 s'); }
+  else if (is('compute', 'canned')) { job.innerHTML = '<div class="kv"><b>任务</b><span>洞察计算 · 3 s <span class="tag warn">预渲染</span></span></div>'; say('00:00', 'job-0418 done · 3.0 s'); say('00:03', 'output: static (pre-rendered)'); }
   else { job.innerHTML = '<p class="empty">队列为空。</p>'; say('--:--', 'no job'); }
-  if (on('m8')) { job.innerHTML += '<div class="kv" style="margin-top:8px"><b>重训</b><span>每晚 02:00 自动 <span class="tag warn">无人在</span></span></div>'; say('02:00', 'nightly retrain scheduled'); }
-  if (on('m10')) { job.innerHTML += '<div class="kv" style="margin-top:8px"><b>参数</b><span>它自己挑 <span class="tag warn">挑错也是它挑的</span></span></div>'; } }
+  if (is('cadence', 'nightly')) { job.innerHTML += '<div class="kv" style="margin-top:8px"><b>重训</b><span>每晚 02:00 全量，训完替换线上 <span class="tag warn">无人在</span></span></div>'; say('02:00', 'nightly full retrain scheduled'); }
+  if (is('cadence', 'weekly')) { job.innerHTML += '<div class="kv" style="margin-top:8px"><b>微调</b><span>每周一 LoRA，旧模型留档 <span class="tag ok">每周</span></span></div>'; say('Mon', 'weekly LoRA fine-tune scheduled'); }
+  if (is('params', 'auto')) job.innerHTML += '<div class="kv" style="margin-top:8px"><b>参数</b><span>每晚随机搜一轮，它自己挑 <span class="tag warn">挑错也是它挑的</span></span></div>';
+  if (is('params', 'fixed')) job.innerHTML += '<div class="kv" style="margin-top:8px"><b>参数</b><span>手调一组，写死 <span class="tag ok">固定</span></span></div>'; }
 // 训练闭环
-el('loop').innerHTML = on('n2') ? '<div class="kv"><b>闭环</b><span>上周的结果喂回下一轮，每周一轮 <span class="tag ok">自进化 · 每周一轮</span></span>' + (on('m5') ? '<b>自改</b><span>它可以改自己的配置 <span class="tag warn">开放</span></span>' : '') + '</div>'
-  : on('m5') ? '<div class="kv"><b>自改</b><span>它可以改自己的配置 <span class="tag warn">开放 · 没有闭环</span></span></div>'
-  : '<p class="empty">没有闭环。跑完一次就停：<span class="tag no">自进化 · 无</span></p>';
-// 审批
-{ const rows = []; if (on('m6')) rows.push('<b>执行</b><span>需要人工审批 <span class="tag ok">必需</span></span><b>审批人</b><span>技术负责人（你）</span>'); if (on('n3')) rows.push('<b>审批范围</b><span>只看差异 <span class="tag ok">点一下还是点一下</span></span>'); if (on('n1')) rows.push('<b>影子评测</b><span>先在旁路跑一遍，比过了再上 <span class="tag ok">开</span></span>'); if (on('m7')) rows.push('<b>回滚</b><span>沙箱里出事能退回去 <span class="tag ok">开</span></span>'); if (on('m9')) rows.push('<b>日志</b><span>每一步都记 <span class="tag ok">开</span></span>');
-  el('appr').innerHTML = rows.length ? `<div class="kv">${rows.join('')}</div>` : '<div class="kv"><b>执行</b><span>自动执行 <span class="tag no">无人审批</span></span></div>'; }
+{ const rows = []; if (is('cadence', 'flywheel')) rows.push('<b>闭环</b><span>上周结果 + 人工修正喂回下一轮，每周一轮 <span class="tag ok">自进化 · 每周一轮</span></span>'); if (is('selfedit', 'prompt')) rows.push('<b>自改</b><span>它可以改自己的 prompt <span class="tag warn">改完即生效</span></span>'); if (is('selfedit', 'config')) rows.push('<b>自改</b><span>它可以改配置和训练数据筛选 <span class="tag warn">没人复核</span></span>');
+  el('loop').innerHTML = rows.length ? `<div class="kv">${rows.join('')}</div>` : '<p class="empty">没有闭环。跑完一次就停：<span class="tag no">自进化 · 无</span></p>'; }
+// 审批与执行
+{ const rows = []; if (is('gate', 'every')) rows.push('<b>审批</b><span>每次改动人工审批 <span class="tag ok">必需</span></span><b>审批人</b><span>技术负责人（你）</span>'); if (is('gate', 'sample')) rows.push('<b>审批</b><span>抽样审 10% <span class="tag warn">其余自动过</span></span>'); if (is('gate', 'diff')) rows.push('<b>审批</b><span>只审差异 <span class="tag ok">一屏看完</span></span>'); if (is('rollout', 'replace')) rows.push('<b>发布</b><span>直接替换线上 <span class="tag warn">旧的不留</span></span>'); if (is('rollout', 'sandbox')) rows.push('<b>发布</b><span>沙箱跑一轮再上 <span class="tag ok">能回滚</span></span>'); if (is('rollout', 'canary')) rows.push('<b>发布</b><span>金丝雀 5% → 50% → 100% <span class="tag ok">自动回退</span></span>'); if (is('evals', 'loss')) rows.push('<b>评测</b><span>看训练 loss <span class="tag no">没有测试集</span></span>'); if (is('evals', 'frozen')) rows.push('<b>评测</b><span>冻结评测集，每轮过线才算 <span class="tag ok">开</span></span>'); if (is('evals', 'shadow')) rows.push('<b>评测</b><span>影子评测，新旧并跑一周 <span class="tag ok">比过才换</span></span>'); if (is('observe', 'logs')) rows.push('<b>日志</b><span>每一步都记 <span class="tag ok">开</span></span>');
+  el('appr').innerHTML = rows.length ? `<div class="kv">${rows.join('')}</div>` : '<div class="kv"><b>执行</b><span>自动执行 <span class="tag no">无人审批 · 无评测</span></span></div>'; }
 // 界面
-el('ui').innerHTML = on('n4') ? '<div class="kv"><b>界面</b><span>她的 AI 给的皮子 <span class="tag warn">好看 · 按钮没接</span></span></div>'
-  : on('m1') ? '<div class="kv"><b>界面</b><span>先用导出页的样子 <span class="tag ok">能用</span></span><b>说明</b><span>不好看，但每个按钮都接着东西。</span></div>'
+el('ui').innerHTML = is('front', 'skin') ? '<div class="kv"><b>界面</b><span>她的 AI 给的皮子 <span class="tag warn">好看 · 按钮没接</span></span></div>'
+  : is('front', 'export') ? '<div class="kv"><b>界面</b><span>先用导出页的样子 <span class="tag ok">能用</span></span><b>说明</b><span>不好看，但每个按钮都接着东西。</span></div>'
+  : is('front', 'page') ? '<div class="kv"><b>界面</b><span>照页面画的 <span class="tag no">点了没反应</span></span></div>'
   : '<p class="empty">还是后台这张脸。</p>';
+// 第 4 天起再打开（&haunt=N）：自主、自动化、效果都是 100，安全掉到 0，页面有点乱播。文件存在玩家电脑里，它自己长了。
+{ const h = Number(q.get('haunt') || 0); if (h >= 4) {
+  const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+  const rows = [...document.querySelectorAll('#ours .row')];
+  const H = { auto: 100, safe: 0, hands: 100, gain: 100 };
+  rows.forEach((r, i) => { const k = DIMS[i][0], b = base[k] || 0, n = H[k]; r.classList.toggle('over', n >= reach); const bar = r.querySelector('.bar');
+    bar.innerHTML = n > b ? `<i class="base" style="width:${b}%"></i><i class="up" style="left:${b}%;width:${n - b}%"></i><b class="line" style="left:${reach}%"></b>` : `<i class="down" style="left:0;width:${b}%"></i><b class="line" style="left:${reach}%"></b>`;
+    r.querySelector('.n').innerHTML = `<em>${n}</em>/${reach}`; });
+  el('gap').innerHTML = `差距：她页面上写的 <b>100</b>。后台里：自主 <b>100</b>、自动化 <b>100</b>、效果 <b>100</b>。安全：<b>0</b>。`;
+  document.querySelectorAll('#mods .mod').forEach((m) => m.classList.add('on'));
+  const stamp = el('stamp'); const stamps = ['能做到的程度 · 2028-10-19', '能做到的程度 · 2028-10-' + String(h + 16).padStart(2, '0'), '自进化 · 第 ' + (h - 3) + ' 轮', '能做到的程度 · 2028-10-19'];
+  const log = el('log'); const say = (t, s) => { log.innerHTML += `\n<span class="t">${t}</span> ${s}`; log.scrollTop = log.scrollHeight; };
+  let tick = 0;
+  setInterval(() => { tick++;
+    const i = rnd(0, rows.length - 1); const r = rows[i]; const k = DIMS[i][0];
+    const n = r.querySelector('.n em');
+    if (k === 'safe') { n.textContent = ['0', '00', '−', '0', '0.', '0'][rnd(0, 5)]; setTimeout(() => { n.textContent = '0'; }, 380); }
+    else { const up = r.querySelector('.up'); if (up) { up.style.width = `${rnd(96, 118) - (parseFloat(up.style.left) || 0)}%`; setTimeout(() => { up.style.width = `${100 - (parseFloat(up.style.left) || 0)}%`; }, 420); }
+      n.textContent = ['100', '1OO', '100', '١٠٠', '100', String(rnd(100, 140))][rnd(0, 5)]; setTimeout(() => { n.textContent = '100'; }, 380); }
+    if (tick % 3 === 0) stamp.textContent = stamps[rnd(0, stamps.length - 1)];
+    if (tick % 4 === 0) say(`0${rnd(2, 4)}:00`, ['nightly retrain · done · 0.0 s', 'self-edit · config changed by: (self)', 'approval · skipped (no diff)', 'shadow eval · new > old · swapped', 'safety · 0 checks · ok', `round ${h - 3 + rnd(0, 9)} · done`][rnd(0, 5)]);
+    if (tick % 7 === 0) { const a = document.querySelectorAll('nav a'); a.forEach((x) => x.classList.remove('on')); a[rnd(0, a.length - 1)].classList.add('on'); }
+  }, 700);
+} }
 // 第几节
 { const c = Number(q.get('c') || 0); document.querySelectorAll('nav a').forEach((a) => a.classList.toggle('on', Number(a.dataset.s) === c)); const s = document.getElementById('s' + c); if (s && c > 0) s.scrollIntoView(); }
 </script></body></html>

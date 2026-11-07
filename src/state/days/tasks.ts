@@ -232,7 +232,8 @@ export interface BoardTune {
   readonly steps: number;
   readonly mods: readonly TuneMod[];
   readonly carry?: { readonly day: number; readonly task: string };
-  readonly assist: readonly string[];
+  /** Kuro's choice for 让它补全: module → path. */
+  readonly assist: Readonly<Record<string, string>>;
   /** The config file's sections (author: the switches edit the AI's training / constraints / support; the bars are the preview's result). */
   readonly groups?: readonly TuneGroup[];
 }
@@ -244,15 +245,26 @@ export interface TuneDim {
   readonly id: string;
   readonly label: string;
 }
-/** A module: what it does (label), its deltas per dimension, an optional source to find first (as a card's). */
+/**
+ * A module (author 2026-11-08: 「每个模块上还得选择几个不同的路径…几个子 action 的 bulletin，对应不同的
+ * 状态条增减」): what it decides (label), its paths — each a way of doing it with a few sub-actions
+ * (bullets) and its own deltas — an optional source to find first (as a card's), and its section.
+ */
 export interface TuneMod {
   readonly id: string;
   readonly label: string;
-  readonly delta: Readonly<Record<string, number>>;
+  readonly paths: readonly TunePath[];
   readonly from?: CardFrom;
   readonly hint?: string;
   /** Its section of the config file (one of `tune.groups`); none: listed after the sections. */
   readonly group?: string;
+}
+/** One way of doing a module: its label, two or three sub-actions, and what it does to the bars. */
+export interface TunePath {
+  readonly id: string;
+  readonly label: string;
+  readonly bullets: readonly string[];
+  readonly delta: Readonly<Record<string, number>>;
 }
 export interface TaskBoard {
   readonly kind: "table";
@@ -613,7 +625,7 @@ function board(v: unknown, w: string): TaskBoard {
     tune = boardTune(v.tune, `${w}.tune`);
   }
   const allCards = new Set([...cardIds, ...kuroCardIds]);
-  const beats = v.beats !== undefined ? boardBeats(v.beats, `${w}.beats`, slotIds, allCards, new Set(tune?.mods.map((m) => m.id) ?? [])) : undefined;
+  const beats = v.beats !== undefined ? boardBeats(v.beats, `${w}.beats`, slotIds, allCards, new Map((tune?.mods ?? []).map((m) => [m.id, new Set(m.paths.map((p) => p.id))]))) : undefined;
   return {
     kind: "table",
     title: str(v.title, `${w}.title`),
@@ -679,26 +691,47 @@ function boardTune(v: unknown, w: string): BoardTune {
   const steps = Number.isInteger(v.steps) && (v.steps as number) >= 1 && (v.steps as number) <= 20 ? (v.steps as number) : fail(`${w}.steps`, "must be an integer from 1 to 20");
   if (!Array.isArray(v.mods) || v.mods.length === 0) fail(`${w}.mods`, "must be a non-empty list");
   const modIds = new Set<string>();
+  const pathIds = new Map<string, Set<string>>();
   const mods = v.mods.map((m, i) => {
     const mw = `${w}.mods[${i}]`;
     if (!isRecord(m)) fail(mw, "a module must be an object");
-    keys(m, ["id", "label", "delta", "from", "hint", "group"], mw);
+    keys(m, ["id", "label", "paths", "from", "hint", "group"], mw);
     if (m.group !== undefined && !groupIds.has(str(m.group, `${mw}.group`))) fail(`${mw}.group`, `"${m.group}" is not a group`);
     const id = str(m.id, `${mw}.id`);
     if (modIds.has(id)) fail(`${w}.mods`, `duplicate module id "${id}"`);
     modIds.add(id);
-    if (!isRecord(m.delta) || Object.keys(m.delta).length === 0) fail(`${mw}.delta`, "must be an object with at least one dimension");
-    const delta: Record<string, number> = {};
-    for (const [k, x] of Object.entries(m.delta)) {
-      if (!dimIds.has(k)) fail(`${mw}.delta`, `"${k}" is not a dimension`);
-      if (!Number.isInteger(x) || x === 0 || Math.abs(x as number) > 100) fail(`${mw}.delta.${k}`, "must be a non-zero integer within ±100");
-      delta[k] = x as number;
-    }
-    return { id, label: str(m.label, `${mw}.label`), delta, ...(m.from !== undefined ? { from: cardFrom(m.from, `${mw}.from`) } : {}), ...(m.hint !== undefined ? { hint: str(m.hint, `${mw}.hint`) } : {}), ...(m.group !== undefined ? { group: m.group as string } : {}) };
+    if (!Array.isArray(m.paths) || m.paths.length === 0) fail(`${mw}.paths`, "must be a non-empty list");
+    const seen = new Set<string>();
+    const paths = m.paths.map((p, j) => {
+      const pw = `${mw}.paths[${j}]`;
+      if (!isRecord(p)) fail(pw, "a path must be an object");
+      keys(p, ["id", "label", "bullets", "delta"], pw);
+      const pid = str(p.id, `${pw}.id`);
+      if (seen.has(pid)) fail(`${mw}.paths`, `duplicate path id "${pid}"`);
+      seen.add(pid);
+      const bullets = strings(p.bullets, `${pw}.bullets`);
+      if (bullets.length > 4) fail(`${pw}.bullets`, "at most four sub-actions");
+      if (!isRecord(p.delta) || Object.keys(p.delta).length === 0) fail(`${pw}.delta`, "must be an object with at least one dimension");
+      const delta: Record<string, number> = {};
+      for (const [k, x] of Object.entries(p.delta)) {
+        if (!dimIds.has(k)) fail(`${pw}.delta`, `"${k}" is not a dimension`);
+        if (!Number.isInteger(x) || x === 0 || Math.abs(x as number) > 100) fail(`${pw}.delta.${k}`, "must be a non-zero integer within ±100");
+        delta[k] = x as number;
+      }
+      return { id: pid, label: str(p.label, `${pw}.label`), bullets, delta };
+    });
+    pathIds.set(id, seen);
+    return { id, label: str(m.label, `${mw}.label`), paths, ...(m.from !== undefined ? { from: cardFrom(m.from, `${mw}.from`) } : {}), ...(m.hint !== undefined ? { hint: str(m.hint, `${mw}.hint`) } : {}), ...(m.group !== undefined ? { group: m.group as string } : {}) };
   });
-  const assist = strings(v.assist, `${w}.assist`);
-  for (const id of assist) if (!modIds.has(id)) fail(`${w}.assist`, `"${id}" is not a module`);
-  if (assist.length > steps) fail(`${w}.assist`, "Kuro's set is over the step budget");
+  if (!isRecord(v.assist)) fail(`${w}.assist`, "must be an object (module → path)");
+  const assist: Record<string, string> = {};
+  for (const [id, pid] of Object.entries(v.assist)) {
+    if (!modIds.has(id)) fail(`${w}.assist`, `"${id}" is not a module`);
+    const p = str(pid, `${w}.assist.${id}`);
+    if (!pathIds.get(id)!.has(p)) fail(`${w}.assist.${id}`, `"${p}" is not a path of "${id}"`);
+    assist[id] = p;
+  }
+  if (Object.keys(assist).length > steps) fail(`${w}.assist`, "Kuro's set is over the step budget");
   let carry: BoardTune["carry"];
   if (v.carry !== undefined) {
     if (!isRecord(v.carry)) fail(`${w}.carry`, "must be an object");
@@ -840,7 +873,8 @@ function ideFiles(v: unknown, w: string, slotIds: ReadonlySet<string>): Record<s
 const BEAT_ONS = ["open", "kuro", "unlock", "print", "send", "merge", "fetch", "steps", "reach"] as const;
 
 /** The transcript beats (ide R1): each `on` names a known beat and existing ids; each `on` once. */
-function boardBeats(v: unknown, w: string, slotIds: ReadonlySet<string>, cardIds: ReadonlySet<string>, modIds: ReadonlySet<string> = new Set()): BoardBeat[] {
+function boardBeats(v: unknown, w: string, slotIds: ReadonlySet<string>, cardIds: ReadonlySet<string>, modPaths: ReadonlyMap<string, ReadonlySet<string>> = new Map()): BoardBeat[] {
+  const modIds = new Set(modPaths.keys());
   if (!Array.isArray(v)) fail(w, "must be a list");
   const seen = new Set<string>();
   return v.map((b, i) => {
@@ -849,9 +883,10 @@ function boardBeats(v: unknown, w: string, slotIds: ReadonlySet<string>, cardIds
     keys(b, ["on", "lines"], bw);
     const on = str(b.on, `${bw}.on`);
     const parts = on.split(":");
-    if ((parts[0] === "mod" || parts[0] === "unmod") && parts.length === 2) {
-      // tune: mod:<module> (switched on) / unmod:<module> (switched off).
+    if ((parts[0] === "mod" && (parts.length === 2 || parts.length === 3)) || (parts[0] === "unmod" && parts.length === 2)) {
+      // tune: mod:<module> / mod:<module>:<path> (a path chosen) / unmod:<module> (cleared).
       if (!modIds.has(parts[1]!)) fail(`${bw}.on`, `"${parts[1]}" is not a module`);
+      if (parts.length === 3 && !modPaths.get(parts[1]!)?.has(parts[2]!)) fail(`${bw}.on`, `"${parts[2]}" is not a path of "${parts[1]}"`);
     } else if (parts[0] === "fill" && (parts.length === 2 || parts.length === 3)) {
       if (!slotIds.has(parts[1]!)) fail(`${bw}.on`, `"${parts[1]}" is not a slot`);
       if (parts.length === 3 && !cardIds.has(parts[2]!)) fail(`${bw}.on`, `"${parts[2]}" is not a card or a Kuro card`);

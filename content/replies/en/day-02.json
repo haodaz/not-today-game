@@ -259,7 +259,7 @@
         },
         {
           "t": "10:22",
-          "text": "Can you look at what we can actually build?",
+          "text": "Can you look at what we can actually build? Real computation gives a result in forty seconds; her page says three.",
           "kind": "work"
         },
         {
@@ -282,7 +282,7 @@
         },
         {
           "t": "15:30",
-          "text": "Ran it with your changes: a result in forty seconds",
+          "text": "Ran it with the switches you set: it runs",
           "kind": "work",
           "cond_show": {
             "has": "sent_d2-vivi-page"

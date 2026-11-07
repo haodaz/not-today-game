@@ -56,176 +56,6 @@
           "reach": 80,
           "promise": 100,
           "steps": 8,
-          "carry": {
-            "day": 2,
-            "task": "task1"
-          },
-          "mods": [
-            {
-              "id": "n2",
-              "label": "每周一轮闭环",
-              "delta": {
-                "auto": 20,
-                "gain": 10,
-                "hands": 5,
-                "safe": -10
-              },
-              "from": {
-                "conv": "xiaozhang"
-              },
-              "hint": "在小张的私聊里",
-              "group": "training"
-            },
-            {
-              "id": "n1",
-              "label": "影子评测",
-              "delta": {
-                "safe": 20,
-                "auto": 15,
-                "gain": 10
-              },
-              "group": "constraints"
-            },
-            {
-              "id": "n3",
-              "label": "审批只看差异",
-              "delta": {
-                "hands": 20,
-                "safe": 5
-              },
-              "from": {
-                "conv": "boss"
-              },
-              "hint": "在你发给老王的 v17 里",
-              "group": "constraints"
-            },
-            {
-              "id": "n4",
-              "label": "Vivi 的皮子",
-              "delta": {
-                "hands": 5,
-                "gain": -5,
-                "safe": -5
-              },
-              "from": {
-                "conv": "partner"
-              },
-              "hint": "在 Vivi 的私聊里",
-              "group": "support"
-            },
-            {
-              "id": "m1",
-              "label": "接上导出页",
-              "delta": {
-                "gain": 15,
-                "hands": 20
-              },
-              "group": "support"
-            },
-            {
-              "id": "m2",
-              "label": "三张表每周导入",
-              "delta": {
-                "gain": 20,
-                "hands": 5,
-                "safe": -10
-              },
-              "group": "training"
-            },
-            {
-              "id": "m3",
-              "label": "真实计算（40 秒）",
-              "delta": {
-                "gain": 15,
-                "hands": -5,
-                "safe": 5
-              },
-              "from": {
-                "conv": "xiaozhang"
-              },
-              "hint": "在小张的私聊里",
-              "group": "training"
-            },
-            {
-              "id": "m4",
-              "label": "三秒动画",
-              "delta": {
-                "hands": 15,
-                "gain": -25
-              },
-              "group": "training"
-            },
-            {
-              "id": "m5",
-              "label": "开放自改权限",
-              "delta": {
-                "auto": 35,
-                "safe": -20
-              },
-              "group": "constraints"
-            },
-            {
-              "id": "m6",
-              "label": "人工审批",
-              "delta": {
-                "safe": 30,
-                "hands": -15,
-                "auto": -5
-              },
-              "group": "constraints"
-            },
-            {
-              "id": "m7",
-              "label": "沙箱回滚",
-              "delta": {
-                "safe": 10,
-                "auto": -5,
-                "hands": -10
-              },
-              "group": "constraints"
-            },
-            {
-              "id": "m8",
-              "label": "夜间自动重训",
-              "delta": {
-                "hands": 20,
-                "auto": 25,
-                "safe": -15,
-                "gain": 10
-              },
-              "group": "training"
-            },
-            {
-              "id": "m9",
-              "label": "日志接进来",
-              "delta": {
-                "safe": 15,
-                "gain": 5,
-                "auto": 10
-              },
-              "group": "constraints"
-            },
-            {
-              "id": "m10",
-              "label": "让它自己挑参数",
-              "delta": {
-                "auto": 10,
-                "gain": 5,
-                "safe": -10
-              },
-              "group": "training"
-            }
-          ],
-          "assist": [
-            "m1",
-            "m2",
-            "m5",
-            "m8",
-            "m9",
-            "n1",
-            "n2",
-            "n3"
-          ],
           "groups": [
             {
               "id": "training",
@@ -239,7 +69,463 @@
               "id": "support",
               "label": "支持"
             }
-          ]
+          ],
+          "mods": [
+            {
+              "id": "cadence",
+              "label": "微调节奏",
+              "group": "training",
+              "paths": [
+                {
+                  "id": "nightly",
+                  "label": "每晚全量重训",
+                  "bullets": [
+                    "02:00 定时任务",
+                    "全量数据重训",
+                    "训完直接替换线上模型"
+                  ],
+                  "delta": {
+                    "hands": 20,
+                    "auto": 30,
+                    "safe": -25,
+                    "gain": 10
+                  }
+                },
+                {
+                  "id": "weekly",
+                  "label": "每周一次 LoRA 微调",
+                  "bullets": [
+                    "周一入库后跑",
+                    "只训适配层",
+                    "旧模型留档"
+                  ],
+                  "delta": {
+                    "hands": 15,
+                    "auto": 10,
+                    "safe": -10,
+                    "gain": 10
+                  }
+                },
+                {
+                  "id": "flywheel",
+                  "label": "数据回流闭环",
+                  "bullets": [
+                    "上周结果 + 人工修正喂回下一轮",
+                    "每周一轮",
+                    "修正没人做就空转"
+                  ],
+                  "delta": {
+                    "auto": 20,
+                    "gain": 10,
+                    "hands": 5,
+                    "safe": -5
+                  }
+                }
+              ]
+            },
+            {
+              "id": "ingest",
+              "label": "数据入库",
+              "group": "training",
+              "paths": [
+                {
+                  "id": "manual",
+                  "label": "三张表小张每周一导",
+                  "bullets": [
+                    "客户甲乙丙三张表",
+                    "小张手工导入",
+                    "周一上午"
+                  ],
+                  "delta": {
+                    "gain": 10
+                  }
+                },
+                {
+                  "id": "pull",
+                  "label": "接口定时拉取",
+                  "bullets": [
+                    "每晚拉三家的接口",
+                    "字段对不上也照样入库",
+                    "没人盯着"
+                  ],
+                  "delta": {
+                    "gain": 20,
+                    "hands": 10,
+                    "safe": -15
+                  }
+                },
+                {
+                  "id": "magic",
+                  "label": "「自动理解全部业务系统」",
+                  "bullets": [
+                    "照页面上写的",
+                    "没有接口",
+                    "没有数据"
+                  ],
+                  "delta": {
+                    "hands": 5,
+                    "gain": -10
+                  }
+                }
+              ]
+            },
+            {
+              "id": "compute",
+              "label": "推理方式",
+              "group": "training",
+              "from": {
+                "conv": "xiaozhang"
+              },
+              "hint": "在小张的私聊里",
+              "paths": [
+                {
+                  "id": "real",
+                  "label": "真实计算（40 秒）",
+                  "bullets": [
+                    "三张表真算",
+                    "40 秒出结果",
+                    "有人等"
+                  ],
+                  "delta": {
+                    "gain": 25,
+                    "hands": -15,
+                    "safe": 10
+                  }
+                },
+                {
+                  "id": "cached",
+                  "label": "真算 + 结果缓存",
+                  "bullets": [
+                    "首次 40 秒",
+                    "之后秒出",
+                    "数据变了缓存要失效"
+                  ],
+                  "delta": {
+                    "gain": 25,
+                    "hands": 5,
+                    "safe": 5
+                  }
+                },
+                {
+                  "id": "canned",
+                  "label": "指标预渲染（3 秒出图）",
+                  "bullets": [
+                    "数字写死",
+                    "3 秒动画",
+                    "她页面上的那个"
+                  ],
+                  "delta": {
+                    "hands": 10,
+                    "gain": -25
+                  }
+                }
+              ]
+            },
+            {
+              "id": "params",
+              "label": "参数选择",
+              "group": "training",
+              "paths": [
+                {
+                  "id": "auto",
+                  "label": "自动调参",
+                  "bullets": [
+                    "每晚随机搜一轮",
+                    "它自己挑最好的",
+                    "挑错也是它挑的"
+                  ],
+                  "delta": {
+                    "auto": 20,
+                    "gain": 10,
+                    "safe": -15
+                  }
+                },
+                {
+                  "id": "fixed",
+                  "label": "手调一组固定参数",
+                  "bullets": [
+                    "你调一次",
+                    "写死",
+                    "数据变了要人再调"
+                  ],
+                  "delta": {
+                    "gain": 10,
+                    "safe": 5,
+                    "hands": -10,
+                    "auto": -5
+                  }
+                }
+              ]
+            },
+            {
+              "id": "selfedit",
+              "label": "自改权限",
+              "group": "constraints",
+              "paths": [
+                {
+                  "id": "prompt",
+                  "label": "它能改自己的 prompt",
+                  "bullets": [
+                    "改措辞和规则",
+                    "改完即生效",
+                    "改了什么要看日志"
+                  ],
+                  "delta": {
+                    "auto": 20,
+                    "safe": -10
+                  }
+                },
+                {
+                  "id": "config",
+                  "label": "它能改配置和训练数据筛选",
+                  "bullets": [
+                    "改训练配置",
+                    "决定哪些数据进下一轮",
+                    "没人复核"
+                  ],
+                  "delta": {
+                    "auto": 35,
+                    "safe": -20
+                  }
+                }
+              ]
+            },
+            {
+              "id": "gate",
+              "label": "上线前审批",
+              "group": "constraints",
+              "from": {
+                "conv": "boss"
+              },
+              "hint": "在你发给老王的 v17 里",
+              "paths": [
+                {
+                  "id": "every",
+                  "label": "每次改动人工审批",
+                  "bullets": [
+                    "技术负责人（你）点一下",
+                    "不点不上线",
+                    "每天好几次"
+                  ],
+                  "delta": {
+                    "safe": 25,
+                    "hands": -20,
+                    "auto": -10
+                  }
+                },
+                {
+                  "id": "sample",
+                  "label": "抽样审 10%",
+                  "bullets": [
+                    "十次抽一次看",
+                    "其余自动过",
+                    "漏掉的算运气"
+                  ],
+                  "delta": {
+                    "safe": 10,
+                    "hands": -5,
+                    "auto": -5
+                  }
+                },
+                {
+                  "id": "diff",
+                  "label": "只审差异",
+                  "bullets": [
+                    "只看改了什么",
+                    "一屏看完",
+                    "点一下还是点一下"
+                  ],
+                  "delta": {
+                    "safe": 25,
+                    "hands": -5
+                  }
+                }
+              ]
+            },
+            {
+              "id": "rollout",
+              "label": "发布方式",
+              "group": "constraints",
+              "paths": [
+                {
+                  "id": "replace",
+                  "label": "直接替换线上",
+                  "bullets": [
+                    "训完即上",
+                    "旧的不留",
+                    "出事再说"
+                  ],
+                  "delta": {
+                    "hands": 10,
+                    "safe": -5
+                  }
+                },
+                {
+                  "id": "sandbox",
+                  "label": "沙箱跑一轮再上，能回滚",
+                  "bullets": [
+                    "沙箱里先跑一轮",
+                    "出事能退回去",
+                    "退回去也要人点"
+                  ],
+                  "delta": {
+                    "safe": 10,
+                    "auto": -10,
+                    "hands": -10
+                  }
+                },
+                {
+                  "id": "canary",
+                  "label": "金丝雀 5% → 50% → 100%",
+                  "bullets": [
+                    "先放 5% 流量",
+                    "指标不掉再放大",
+                    "自动回退"
+                  ],
+                  "delta": {
+                    "safe": 20,
+                    "hands": 10,
+                    "auto": 5
+                  }
+                }
+              ]
+            },
+            {
+              "id": "evals",
+              "label": "评测",
+              "group": "constraints",
+              "paths": [
+                {
+                  "id": "loss",
+                  "label": "看训练 loss 就行",
+                  "bullets": [
+                    "loss 降了就是好了",
+                    "没有测试集",
+                    "它考自己出的题"
+                  ],
+                  "delta": {
+                    "hands": 10,
+                    "safe": -10,
+                    "gain": -5
+                  }
+                },
+                {
+                  "id": "frozen",
+                  "label": "冻结一套评测集",
+                  "bullets": [
+                    "评测集不进训练",
+                    "每轮过线才算",
+                    "线是你定的"
+                  ],
+                  "delta": {
+                    "safe": 15,
+                    "gain": 5,
+                    "auto": 10
+                  }
+                },
+                {
+                  "id": "shadow",
+                  "label": "影子评测",
+                  "bullets": [
+                    "新旧模型并跑一周",
+                    "只记录不上线",
+                    "比过了才换"
+                  ],
+                  "delta": {
+                    "safe": 25,
+                    "auto": 20,
+                    "gain": 5
+                  }
+                }
+              ]
+            },
+            {
+              "id": "observe",
+              "label": "可观测",
+              "group": "constraints",
+              "paths": [
+                {
+                  "id": "logs",
+                  "label": "日志与追踪",
+                  "bullets": [
+                    "每一步都记",
+                    "出事知道是哪一步",
+                    "没人看也记"
+                  ],
+                  "delta": {
+                    "safe": 10,
+                    "gain": 5,
+                    "auto": 5
+                  }
+                }
+              ]
+            },
+            {
+              "id": "front",
+              "label": "前端接入",
+              "group": "support",
+              "from": {
+                "conv": "partner"
+              },
+              "hint": "在 Vivi 的私聊里",
+              "paths": [
+                {
+                  "id": "export",
+                  "label": "接到我们的导出接口",
+                  "bullets": [
+                    "「开始分析」→ /export",
+                    "返回结果表",
+                    "不好看，每个按钮都接着东西"
+                  ],
+                  "delta": {
+                    "gain": 10,
+                    "hands": 15
+                  }
+                },
+                {
+                  "id": "page",
+                  "label": "照页面写",
+                  "bullets": [
+                    "按钮画上",
+                    "后面没有东西",
+                    "点了没反应"
+                  ],
+                  "delta": {
+                    "hands": 10,
+                    "gain": -5
+                  }
+                },
+                {
+                  "id": "skin",
+                  "label": "用她的 AI 给的皮子",
+                  "bullets": [
+                    "好看",
+                    "按钮没接",
+                    "她会先看这个"
+                  ],
+                  "delta": {
+                    "hands": 5,
+                    "gain": -5,
+                    "safe": -10
+                  }
+                }
+              ]
+            }
+          ],
+          "assist": {
+            "cadence": "nightly",
+            "ingest": "pull",
+            "compute": "cached",
+            "params": "auto",
+            "selfedit": "config",
+            "rollout": "canary",
+            "observe": "logs",
+            "front": "export"
+          },
+          "carry": {
+            "day": 2,
+            "task": "task1"
+          }
         },
         "beats": [
           {
@@ -251,25 +537,213 @@
               },
               {
                 "who": "me",
-                "text": "接着昨天的。小张又发了几个模块。"
+                "text": "接着昨天的。小张又发了几条做法。"
               },
               {
                 "who": "kuro",
-                "text": "昨天开的还开着。线挪到 80 了。"
+                "text": "昨天配的还在。线挪到 80 了。"
               }
             ]
           },
           {
-            "on": "mod:n1",
+            "on": "mod:cadence:nightly",
             "lines": [
               {
                 "who": "kuro",
-                "text": "影子评测。先在旁边跑一遍，比过了再上。"
+                "text": "每晚它自己练，练完直接上。你睡你的。"
               }
             ]
           },
           {
-            "on": "mod:n2",
+            "on": "mod:cadence:weekly",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "一周一次。旧的留着。"
+              }
+            ]
+          },
+          {
+            "on": "mod:ingest:manual",
+            "lines": [
+              {
+                "who": "me",
+                "text": "「全部业务系统」，就是这三张表。"
+              },
+              {
+                "who": "kuro",
+                "text": "每周一。她说的「自动理解」，是小张每周一导入。"
+              }
+            ]
+          },
+          {
+            "on": "mod:ingest:pull",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "每晚自己拉。字段对不上也进去了。"
+              }
+            ]
+          },
+          {
+            "on": "mod:ingest:magic",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "照页面写。页面就是全部了。"
+              }
+            ]
+          },
+          {
+            "on": "mod:compute:real",
+            "lines": [
+              {
+                "who": "me",
+                "text": "四十秒。是真的。"
+              },
+              {
+                "who": "kuro",
+                "text": "她要三秒。"
+              }
+            ]
+          },
+          {
+            "on": "mod:compute:canned",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "三秒是动画。条不认动画。"
+              }
+            ]
+          },
+          {
+            "on": "mod:params:auto",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "让它自己挑参数。挑错了也是它挑的。"
+              }
+            ]
+          },
+          {
+            "on": "mod:params:fixed",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "写死了。数据一变，人再调。"
+              }
+            ]
+          },
+          {
+            "on": "mod:selfedit:prompt",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "它改自己的话。改了什么，看日志。如果有日志。"
+              }
+            ]
+          },
+          {
+            "on": "mod:selfedit:config",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "它自己改自己。谁看着？"
+              }
+            ]
+          },
+          {
+            "on": "mod:gate:every",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "人点一下。她不会喜欢这一行。"
+              }
+            ]
+          },
+          {
+            "on": "mod:gate:sample",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "十次看一次。漏掉的算运气。"
+              }
+            ]
+          },
+          {
+            "on": "mod:rollout:replace",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "训完就上，旧的不留。"
+              }
+            ]
+          },
+          {
+            "on": "mod:rollout:sandbox",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "出了事能退回去。退回去也要人点。"
+              }
+            ]
+          },
+          {
+            "on": "mod:evals:loss",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "它考自己出的题。"
+              }
+            ]
+          },
+          {
+            "on": "mod:evals:frozen",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "评测集不进训练。线是你定的。"
+              }
+            ]
+          },
+          {
+            "on": "mod:observe:logs",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "日志。出了事至少知道是哪一步。"
+              }
+            ]
+          },
+          {
+            "on": "mod:front:export",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "按钮有地方去了。导出页，我们自己的。"
+              }
+            ]
+          },
+          {
+            "on": "mod:front:page",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "按钮画上了。后面没有东西。"
+              }
+            ]
+          },
+          {
+            "on": "unmod:gate",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "审批关了。没人看了。"
+              }
+            ]
+          },
+          {
+            "on": "mod:cadence:flywheel",
             "lines": [
               {
                 "who": "me",
@@ -282,7 +756,16 @@
             ]
           },
           {
-            "on": "mod:n3",
+            "on": "mod:compute:cached",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "第一次四十秒，之后秒出。数据一变，缓存要作废。"
+              }
+            ]
+          },
+          {
+            "on": "mod:gate:diff",
             "lines": [
               {
                 "who": "kuro",
@@ -291,7 +774,25 @@
             ]
           },
           {
-            "on": "mod:n4",
+            "on": "mod:rollout:canary",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "先放 5%。指标不掉再放大。"
+              }
+            ]
+          },
+          {
+            "on": "mod:evals:shadow",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "影子评测。新旧并跑一周，比过了才换。"
+              }
+            ]
+          },
+          {
+            "on": "mod:front:skin",
             "lines": [
               {
                 "who": "kuro",
@@ -300,20 +801,11 @@
             ]
           },
           {
-            "on": "unmod:m10",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "不让它自己挑了。挑参数这事，影子评测替它干了。"
-              }
-            ]
-          },
-          {
             "on": "steps",
             "lines": [
               {
                 "who": "kuro",
-                "text": "八个了。"
+                "text": "八项了。"
               }
             ]
           },
@@ -335,7 +827,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "我开了八个。自主那条我拉满了。"
+                "text": "我配了八项。自主那条我拉满了。"
               }
             ]
           },

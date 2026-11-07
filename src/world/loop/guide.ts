@@ -75,7 +75,7 @@ export function guideNow(state: State, events: readonly GameEvent[], session: Se
     // tune (2026-11-08): the bars are free exploration — only the very first switch is lit (the first
     // module that can be found), and 今天先这样 once the budget is spent or the line is reached.
     if (board.tune) {
-      const first = s.mods.length === 0 ? board.tune.mods.find((m) => modFound(m, day, events))?.id : undefined;
+      const first = Object.keys(s.mods).length === 0 ? board.tune.mods.find((m) => modFound(m, day, events))?.id : undefined;
       const step = canPrint(board, s) ? "print" : first !== undefined ? "mod" : null;
       if (step) return { id: "G7", target: { kind: "board", step, ...(step === "mod" ? { slot: first } : {}) }, refuse: null, scope: "none" };
       return null;

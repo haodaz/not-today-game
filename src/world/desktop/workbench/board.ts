@@ -412,19 +412,21 @@ const actions: Record<string, ActionHandler> = {
     ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "merge", slot, keep } });
     ctx.rerender();
   },
-  // tune (2026-11-08): a module's switch: on spends a step, off gives it back (the fold ignores an
-  // impossible switch: over the budget, or a module whose source is not found yet is not offered).
+  // tune (2026-11-08): a module's path chip: choosing a path sets the module (a step, when it was
+  // not set; a swap otherwise); the chosen chip again clears it. A module whose source is not found
+  // yet is not offered; over the budget nothing happens.
   "board-mod"(ctx, data) {
     const c = currentBoard(ctx);
     const id = data.mod;
+    const pathId = data.path;
     const tune = c?.board.tune;
-    if (!c || !tune || !id) return;
+    if (!c || !tune || !id || !pathId) return;
     const mod = tune.mods.find((m) => m.id === id);
-    if (!mod || !modFound(mod, ctx.store.getState().day, ctx.store.getEvents())) return;
+    if (!mod || !mod.paths.some((p) => p.id === pathId) || !modFound(mod, ctx.store.getState().day, ctx.store.getEvents())) return;
     const s = stateOf(ctx, c.task, c.board);
-    const on = !s.mods.includes(id);
-    if (on && tuneStepsLeft(c.board, s) === 0) return;
-    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "mod", id, on } });
+    const path = s.mods[id] === pathId ? null : pathId;
+    if (path !== null && s.mods[id] === undefined && tuneStepsLeft(c.board, s) === 0) return;
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "mod", id, path } });
     ctx.rerender();
   },
   // ide v2: pull the latest data from the API, once, after every page is merged and filled.

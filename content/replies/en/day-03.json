@@ -251,6 +251,11 @@
     "xiaozhang": {
       "incoming": [
         {
+          "t": "09:35",
+          "text": "{calledBy}, I fed last week's results back in for a round: it grows once a week. The module's in the backend, try switching it on",
+          "kind": "work"
+        },
+        {
           "t": "15:02",
           "text": "{calledBy}, did you read my part?",
           "kind": "work"

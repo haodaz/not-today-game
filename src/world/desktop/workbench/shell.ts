@@ -157,8 +157,9 @@ function explorer(ctx: AppContext, task: Task, board: TaskBoard, s: BoardState, 
 // ——— the panes (R3) ———
 
 /** 预览: browser chrome (the tab, the address line) and the iframe of `ideSrc`. */
-function previewPane(task: Task, board: TaskBoard, s: BoardState, ops: ReturnType<typeof ideOps>, selected: string, carried: readonly string[]): SafeHtml {
-  const src = ideSrc(board, s, ops, selected, carried);
+function previewPane(task: Task, board: TaskBoard, s: BoardState, ops: ReturnType<typeof ideOps>, selected: string, carried: Readonly<Record<string, string>>, today: number | null): SafeHtml {
+  // tune: a handed-in page opened again on a later day carries today's number (the page misplays from day 4).
+  const src = ideSrc(board, s, ops, selected, carried, today);
   const page = board.ide?.pages[selected] ?? 0;
   const file = (board.ide?.src ?? "").split("/").pop() ?? "";
   const title = task.deliverable?.label ?? board.title;
@@ -168,28 +169,35 @@ function previewPane(task: Task, board: TaskBoard, s: BoardState, ops: ReturnTyp
 /**
  * tune (2026-11-08): the config file. The author's rule: the bars are a result and live in the
  * preview; what the player edits is the AI's training / constraints / support, so the 代码 pane
- * is `evolve.config.js`: one section per group (a comment line), one switch per module with its
- * deltas as small chips; a module whose source is not found yet shows its hint instead. The
- * header counts the switches on against the budget. Read back (not live): the same, no buttons.
+ * is `evolve.config.js`: one section per group (a comment line), one line per module with its
+ * paths as chips (the chosen one filled; its sub-actions listed under it with the deltas it
+ * carries); a module whose source is not found yet shows its hint instead. The tab bar counts the
+ * modules set against the budget. Read back (not live): the same, no buttons.
  */
 function tunePane(board: TaskBoard, s: BoardState, day: number, events: readonly GameEvent[], live: boolean): SafeHtml {
   const tune = board.tune!;
   const left = tuneStepsLeft(board, s);
-  const steps = hasString("board.tune.steps") ? html`<span class="sh-tune-steps">${tr("board.tune.steps", { on: String(s.mods.length), max: String(tune.steps) })}</span>` : null;
+  const steps = hasString("board.tune.steps") ? html`<span class="sh-tune-steps">${tr("board.tune.steps", { on: String(Object.keys(s.mods).length), max: String(tune.steps) })}</span>` : null;
   const sign = (x: number) => (x > 0 ? `+${x}` : `−${-x}`);
   let n = 0;
   const gut = () => html`<span class="sh-gut">${++n}</span>`;
   const row = (m: (typeof tune.mods)[number]): SafeHtml => {
-    const on = s.mods.includes(m.id);
+    const chosen = s.mods[m.id];
     if (!modFound(m, day, events)) {
       const hint = m.hint ?? (hasString("board.notFound") ? t("board.notFound") : "");
-      return html`<div class="sh-mod notfound" aria-disabled="true" title="${hint}">${gut()}<span class="sh-mod-sw"></span><span class="sh-mod-l">${hint}</span></div>`;
+      return html`<div class="sh-mod notfound" aria-disabled="true" title="${hint}">${gut()}<span class="sh-mod-l"><code>${m.id}: null,</code> ${m.label}</span><span class="sh-mod-hint">${hint}</span></div>`;
     }
-    const deltas = tune.dims.filter((d) => m.delta[d.id] !== undefined).map((d) => html`<span class="${cls("sh-mod-d", m.delta[d.id]! > 0 ? "plus" : "minus")}">${d.label} ${sign(m.delta[d.id]!)}</span>`);
-    const body = html`${gut()}<span class="sh-mod-sw" aria-hidden="true"></span><span class="sh-mod-l"><code>${m.id}: ${on ? "true" : "false"},</code> ${m.label}</span><span class="sh-mod-ds">${deltas}</span>`;
-    if (!live) return html`<div class="${cls("sh-mod", on && "on")}">${body}</div>`;
-    const blocked = !on && left === 0;
-    return html`<button type="button" class="${cls("sh-mod", on && "on")}" data-action="board-mod" data-mod="${m.id}" aria-pressed="${on ? "true" : "false"}"${blocked ? html` disabled` : null}>${body}</button>`;
+    const blocked = chosen === undefined && left === 0;
+    const chips = m.paths.map((p) => {
+      const on = chosen === p.id;
+      const deltas = tune.dims.filter((d) => p.delta[d.id] !== undefined).map((d) => html`<span class="${cls("sh-mod-d", p.delta[d.id]! > 0 ? "plus" : "minus")}">${d.label} ${sign(p.delta[d.id]!)}</span>`);
+      const body = html`<span class="sh-path-l">${p.label}</span><span class="sh-mod-ds">${deltas}</span>`;
+      if (!live) return html`<div class="${cls("sh-path", on && "on")}">${body}</div>`;
+      return html`<button type="button" class="${cls("sh-path", on && "on")}" data-action="board-mod" data-mod="${m.id}" data-path="${p.id}" aria-pressed="${on ? "true" : "false"}"${blocked ? html` disabled` : null}>${body}</button>`;
+    });
+    const path = m.paths.find((p) => p.id === chosen);
+    const bullets = path ? html`<ul class="sh-path-b">${path.bullets.map((b) => html`<li>${b}</li>`)}</ul>` : null;
+    return html`<div class="${cls("sh-mod", chosen !== undefined && "on")}">${gut()}<span class="sh-mod-l"><code>${m.id}: ${chosen !== undefined ? `"${chosen}"` : "null"},</code> ${m.label}</span><div class="sh-paths">${chips}</div>${bullets}</div>`;
   };
   const groups = tune.groups ?? [];
   const sections = groups.map((g) => html`<div class="sh-mod-g">${gut()}<span class="sh-mod-gl">// ${g.label}</span></div>${tune.mods.filter((m) => m.group === g.id).map(row)}`);
@@ -401,10 +409,10 @@ export function renderShell(ctx: AppContext, task: Task, day: number, fill: Fill
   const tools = html`${app}<div class="sh-toggles">${explorerToggle}${toggles}</div>${renderObjectBar(ctx)}`;
   // The frame (R1): the explorer card, the conversation, the pane cards.
   const ex = board && live && st.explorer ? explorer(ctx, task, board, s!, st, selected) : null;
-  const carried = board ? tuneCarried(board, events) : [];
+  const carried = board ? tuneCarried(board, events) : {};
   const paneCards = open.map((p) => {
     let body: SafeHtml;
-    if (p === "preview") body = previewPane(task, board!, s!, ops, selected, carried);
+    if (p === "preview") body = previewPane(task, board!, s!, ops, selected, carried, live ? null : state.day);
     else if (p === "code") body = board!.tune ? tunePane(board!, s!, day, events, live) : codePane(board!, s!, session, selected, ops.some((o) => o.t === "print"), live);
     else if (p === "table") body = tablePane(ctx, task, board!, s!, live, day);
     else if (p === "meeting") body = meetingWindow(ctx, task, board!);
