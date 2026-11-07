@@ -48,6 +48,9 @@ export function guideNow(state: State, events: readonly GameEvent[], session: Se
   const day = state.day;
   const lc = loopContext(state, events);
   if (!lc || state.ending !== "none") return null;
+  // The box owns the screen (author 2026-11-08: 「老板的话还在框里，就把全员那行圈起来了」): while a
+  // line is up there is no ring and nothing is refused by a guide; the next step lights once it is read.
+  if (session.dialogue.queue.length > 0) return null;
   const desktop = session.view === "desktop";
 
   // G6: a self read of a document with a conflict: ring each clause not clicked yet; nothing refused.

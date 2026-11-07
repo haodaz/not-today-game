@@ -175,6 +175,18 @@ describe("R1 / R2 · the guide state and the six moments", () => {
   });
 });
 
+describe("the box owns the screen (2026-11-08)", () => {
+  it("while a line is up, no guide: the ring waits for the box to be read", () => {
+    const store = booted();
+    step(store, "openApp:msgs");
+    const r = rig(store);
+    r.act("dock", { app: "tingtalk" });
+    expect(guideNow(store.getState(), store.getEvents(), r.session)?.id).toBe("G3");
+    r.session.dialogue = push(r.session.dialogue, { key: "d1:test", lines: [{ k: "inner", t: "…" }], ending: { kind: "none" } });
+    expect(guideNow(store.getState(), store.getEvents(), r.session)).toBeNull();
+  });
+});
+
 describe("G7 · a board task's page (2026-11-08)", () => {
   it("the first card in the tray is lit, then an empty slot once a card is picked, then 打快照; nothing is refused", () => {
     const store = booted();
