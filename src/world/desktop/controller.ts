@@ -13,7 +13,7 @@ import { applyFit, backdropFor } from "@world/fit";
 import { boxArrived } from "@world/room/arrival";
 import { onEmailChange, setEmailDraft } from "@net/email";
 import { appOn, buildShell, initialSession, type AppRenderers, type Session } from "./model";
-import { bringToFront, loadPlacement, moveApp, placementOf, savePlacement } from "./placement";
+import { bringToFront, closeApp, loadPlacement, moveApp, placementOf, savePlacement } from "./placement";
 import { createWindowDrag } from "./windrag";
 import { createDockPeek } from "./dockpeek";
 import { stageOf } from "@state/stages";
@@ -25,13 +25,17 @@ import type { SoundPlayer } from "@world/sound/player";
 import type { BabblePlan } from "@world/sound/babble";
 import { t } from "@world/i18n";
 import { maskBlocks } from "@world/dialogue/mask";
+import { guideNow, guideRefuses, refuseLine } from "@world/loop/guide";
 import { callBlocks } from "@world/loop/call";
 import { noteHints, promptShown, promptUsed, seeHint, TYPING_HINT } from "@world/hints/hints";
 import { placePrompt } from "@world/hints/layer";
 
-/** Stage size in CSS pixels: one monitor (mock: 28px padding, 1440×900), or the room (1600×900). */
+/**
+ * Stage size in CSS pixels: one monitor (1440×900), or the room (1600×900). guidance R15: the screen
+ * is the whole frame: no padding or bezel around the monitor.
+ */
 const MONITOR = { w: 1440, h: 900 };
-const PAD = 28;
+const PAD = 0;
 export const ROOM_STAGE = { w: 1600, h: 900 };
 export function stageSize(view: Session["view"]): { w: number; h: number } {
   return view === "desktop" ? { w: PAD * 2 + MONITOR.w, h: PAD * 2 + MONITOR.h } : ROOM_STAGE;
@@ -121,6 +125,19 @@ export const promptUp = (root: HTMLElement): string | null => root.querySelector
 /** Is `action` held back by the coach marks now? */
 export const coachBlocks = (s: Pick<Session, "view" | "onboard">, action: string): boolean => coachShowing(s) && !COACH_ACTIONS.has(action);
 
+/**
+ * guidance R1: the guide refuses `action` now: its line goes to the box (one inner fragment) and
+ * the action does not run. True when refused.
+ */
+export function guideBlocks(ctx: ActionContext, action: string, data: Readonly<Record<string, string | undefined>>): boolean {
+  const state = ctx.store.getState();
+  const g = guideNow(state, ctx.store.getEvents(), ctx.session);
+  if (!guideRefuses(g, action, data)) return false;
+  refuseLine(ctx.session, state.day, g!);
+  ctx.rerender();
+  return true;
+}
+
 /** Built-in actions: the dock and the 左屏 / 右屏 toggle. App modules add theirs through `mountDesktop(…, { actions })`. */
 export const shellActions: Record<string, ActionHandler> = {
   screen(ctx, data) {
@@ -145,6 +162,18 @@ export const shellActions: Record<string, ActionHandler> = {
   },
   "onboard-skip"(ctx) {
     shellActions["onboard-ok"]!(ctx, {} as DOMStringMap, null as never);
+  },
+  // guidance R3: the red light closes the window (the next window on that monitor, or the wallpaper);
+  // the yellow one minimises it, which is the same for now. Session only; reopening is the dock tile.
+  "win-close"(ctx, data) {
+    const app = data.app as AppId;
+    if (!(APPS as readonly string[]).includes(app)) return;
+    if (!closeApp(ctx.session, app)) return;
+    if (app === "workbench") ctx.session.wbFull = false;
+    ctx.rerender();
+  },
+  "win-min"(ctx, data, el) {
+    shellActions["win-close"]!(ctx, data, el);
   },
   // playtest-1105 R1: 工作台's green light: full screen, and back to its window. Session only.
   "win-full"(ctx, data) {
@@ -328,7 +357,10 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
       // onboarding-steps R1: while a coach mark is up only its card answers.
       // world-prompts R1: a room prompt blocks nothing; an action on its target ends it (seen).
       (c, data, el) => {
-        if (maskBlocks(session.dialogue, name) || callBlocks(session, name) || coachBlocks(session, name)) return;
+        if (maskBlocks(session.dialogue, name, session.objbarOpen && session.view === "desktop") || callBlocks(session, name) || coachBlocks(session, name)) return;
+        // guidance R1: at a guided moment an action that is not on the lit thing (nor always
+        // allowed) answers with the guide's one line and does nothing else.
+        if (guideBlocks(c, name, data ?? {})) return;
         const used = promptUsed(session, promptUp(root), name, data ?? {});
         if (used) deps.hints?.seenNow(used);
         return handler(c, data, el);

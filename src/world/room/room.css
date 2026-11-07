@@ -98,13 +98,16 @@
    is how far into the fade a re-render finds them, so a re-render does not restart it. */
 .stage.m-late>.desk-things,.stage.m-late>.facing-things,.stage.m-late>.shot-hit,.stage.m-late>.figures,.stage.m-late>.desk-book{animation:m-fade-in var(--late-dur,200ms) both;animation-delay:var(--late,0ms)}
 /* 今日清单 */
-.room .list{position:absolute;left:28px;top:28px;width:280px;background:var(--paper);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.35);border-radius:10px;padding:12px 16px;box-shadow:0 6px 24px rgba(0,0,0,.12);font-size:15px;line-height:1.7}
-.room .list .h{font-size:11px;letter-spacing:.2em;color:#8a7f70;margin-bottom:6px}
-.room .list .done{color:#9a9a9a;font-size:13px}
-.room .list .it{display:flex;gap:8px;align-items:baseline;width:100%;background:none;border:0;padding:0;font:inherit;color:inherit;text-align:left}
-.room .list .it i{width:12px;height:12px;border:1.5px solid #555;border-radius:2px;flex:0 0 auto;transform:translateY(2px)}
-.room .list .it.now{font-weight:600}.room .list .it.next{color:#777}.room .list .it.wait i{border-style:dashed}.room .list .it.wait{color:#9a6400}
-.room .list .it.locked{color:#9a9a9a}
+.room .list,.os-list .list{position:absolute;left:28px;top:28px;width:280px;background:var(--paper);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.35);border-radius:10px;padding:12px 16px;box-shadow:0 6px 24px rgba(0,0,0,.12);font-size:15px;line-height:1.7}
+.room .list .h,.os-list .list .h{font-size:11px;letter-spacing:.2em;color:#8a7f70;margin-bottom:6px}
+.room .list .done,.os-list .list .done{color:#9a9a9a;font-size:13px}
+.room .list .it,.os-list .list .it{display:flex;gap:8px;align-items:baseline;width:100%;background:none;border:0;padding:0;font:inherit;color:inherit;text-align:left}
+.room .list .it i,.os-list .list .it i{width:12px;height:12px;border:1.5px solid #555;border-radius:2px;flex:0 0 auto;transform:translateY(2px)}
+.room .list .it.now,.os-list .list .it.now{font-weight:600}.room .list .it.next,.os-list .list .it.next{color:#777}.room .list .it.wait i,.os-list .list .it.wait i{border-style:dashed}.room .list .it.wait,.os-list .list .it.wait{color:#9a6400}
+.room .list .it.locked,.os-list .list .it.locked{color:#9a9a9a}
+/* guidance R5: on 屏幕 the same card over the OS area's top-left, under the 28 px top bar; it takes no clicks. */
+.os-list{position:absolute;left:0;top:28px;z-index:6;pointer-events:none}
+.os-list .list{left:16px;top:12px;width:260px;font-size:14px}
 /* The checklist only watches: no line is a button, no hover state. */
 /* 右上 */
 .room .day{position:absolute;right:28px;top:28px;text-align:right;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.6);font-size:15px;line-height:1.5}
@@ -296,6 +299,8 @@
 .room .held.obj canvas.dev{position:absolute;transform:translate(-50%,-50%);image-rendering:pixelated;background:#9fb59a;border-radius:2px}
 .room .held.obj canvas.dev.hi{image-rendering:auto;background:linear-gradient(180deg,#f4f8ff,#d9e6ff)}
 .room .held-layer .hint{position:absolute;left:50%;bottom:130px;transform:translateX(-50%);color:#f4efe6;font-size:14px;opacity:.7;pointer-events:none}
+/* guidance R8: the phone (700 px tall, centred: its bottom edge at 800 px of 900) has the hint under it. */
+.room .held-layer.phone-up .hint{bottom:56px;line-height:20px}
 .room > .dlg{z-index:16}
 /* 夜里的手 (night-hand FR1): the desk dims, the gap between the monitors glows; the hand is never drawn */
 /* A line's backdrop and prop (dialogue 2026-11-02): full frame behind the box, under the HUD (DOM
@@ -450,6 +455,20 @@
    at a choice (or the player's box) it only holds the screen. */
 .dlg-layer .story-mask.clear{background:transparent}
 .dlg-layer .story-mask.waits{cursor:default}
+/* lock-by-device addition 2026-11-07: with the 老物件栏 modal open the mask sits inside it, over its
+   dim and under its window (z-index 1), so the device's keys and its read footer answer while the
+   line is up; a click anywhere else still reads on. */
+.objbar-host .story-mask{position:fixed;inset:0;background:rgba(0,0,0,.4);cursor:pointer}
+.objbar-host .story-mask.clear{background:transparent}
+.objbar-host .story-mask.waits{cursor:default}
+/* guidance R1: the guided moment's target: a 2 px ring in the coach's blue pulsing 1.2 s, the coach's
+   30 % dim behind it (a spread shadow); G6's clauses ring each one without the dim. Reduced motion
+   keeps the ring and drops the pulse. */
+[data-guide="on"],[data-guide="clause"]{z-index:8;border-radius:10px;animation:guide-ring 1.2s ease-in-out infinite}
+[data-guide="on"]{box-shadow:0 0 0 2px var(--accent,#2f6feb),0 0 0 9999px rgba(0,0,0,.3)}
+[data-guide="clause"]{box-shadow:0 0 0 2px var(--accent,#2f6feb)}
+@keyframes guide-ring{0%,100%{outline:2px solid transparent;outline-offset:2px}50%{outline:2px solid color-mix(in srgb,var(--accent,#2f6feb) 55%,transparent);outline-offset:6px}}
+@media (prefers-reduced-motion:reduce){[data-guide="on"],[data-guide="clause"]{animation:none}}
 /* ⚙ 设置 sits above the box in every view (2026-11-02): its fixed layer outranks .dlg-layer (30). */
 .hud-host .settings-layer{z-index:50}
 /* SAN bands (presentation only): the cup photo goes colder as SAN falls. */

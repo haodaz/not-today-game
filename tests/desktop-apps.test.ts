@@ -42,9 +42,11 @@ describe("workbench home", () => {
     const out = (r.bar?.value ?? "") + r.body.value;
     // workspace 2026-11-04: the session list (新任务) and the composer (its placeholder) replace the
     // expanded nav column and the task input on home.
-    for (const key of ["wb.title", "wb.sessions.new", "wb.nav.home", "wb.hello.morning", "wb.composer.placeholder", "wb.card.ledger", "wb.common"]) {
+    for (const key of ["wb.title", "wb.sessions.new", "wb.nav.home", "wb.hello.morning", "wb.composer.placeholder", "wb.card.ledger"]) {
       expect(out, key).toContain(escapeHtml(t(key)));
     }
+    // guidance R6: with nothing in it, 常做的事 is not drawn.
+    expect(out).not.toContain(escapeHtml(t("wb.common")));
     // The choice is a reply (work 2026-11-02): no mode toolbar under the input.
     expect(out).not.toContain("wb-mode");
     expect(out).not.toContain(escapeHtml(t("wb.mode.look")));

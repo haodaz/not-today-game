@@ -15,8 +15,11 @@ export function escapeHtml(text: string): string {
  * action). 已送达 when the meal arrives; the corridor as the door opens to the chain; the bag as you
  * reach for it; on the desk corner the receipt and what is wrong. Content texts, placeholders filled.
  */
+/** guidance R12: `{dish}` in a delivery text is the dish ordered for that meal (the order's item name). */
+export const fillDish = (s: string, view: Pick<MealView, "order">): string => (s.includes("{dish}") ? s.split("{dish}").join(view.order?.itemName ?? "") : s);
+
 export function doorLines(view: MealView, after: "delivered" | DoorInput, names: State["names"]): SayLine[] {
-  const fill = (s: string | null) => (s === null ? null : fillPlaceholders(s, names));
+  const fill = (s: string | null) => (s === null ? null : fillPlaceholders(fillDish(s, view), names));
   const out: SayLine[] = [];
   const add = (k: SayLine["k"], s: string | null) => {
     const v = fill(s);
@@ -37,7 +40,7 @@ export function doorLines(view: MealView, after: "delivered" | DoorInput, names:
  * door does not open.
  */
 export function renderDoorView(view: MealView, beat: DoorBeat | null, names: State["names"]): string {
-  const text = (s: string) => escapeHtml(fillPlaceholders(s, names));
+  const text = (s: string) => escapeHtml(fillPlaceholders(fillDish(s, view), names));
   const p = (cls: string, s: string | null) => (s === null ? [] : [`  <p class="${cls}">${text(s)}</p>`]);
   const open = (state: string, step?: number) =>
     `<section class="door-beat" data-day="${view.day}" data-meal="${view.meal}" data-state="${state}"${step === undefined ? "" : ` data-step="${step}"`}>`;

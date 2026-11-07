@@ -36,9 +36,12 @@ describe("(3) one settings button", () => {
     expect((out.match(/class="settings-btn"/g) ?? []).length).toBe(1);
     expect(out).not.toContain('class="menu"');
     expect(out).not.toMatch(/restart/);
+    ctx.store.appendEvent({ kind: "step", name: "boot", t: "09:00" }); // the monitors are on: the dock (with its 设置 tile) is drawn
     ctx.session.view = "desktop";
     const desk = renderGame(ctx.store, ctx.session, 0).value;
-    expect(desk).toContain('class="settings-btn"');
+    // guidance R15: on 屏幕 设置 is the dock's right tile (the same panel), not a floating button.
+    expect(desk).not.toContain('class="settings-btn"');
+    expect(desk).toContain('class="app nav settings-tile" data-action="settings-open"');
     expect(desk).not.toMatch(/restart/);
     expect(loopActions["loop-restart"]).toBeUndefined();
   });
@@ -163,8 +166,14 @@ describe("(5) four camera levels", () => {
 
   const render = (ctx: ActionContext) => (ctx.session.view === "desktop" ? renderGame(ctx.store, ctx.session, 0).value : room(ctx));
 
-  it("in every view Kuro's body sits at the HUD's bottom right; it is the call button", () => {
-    for (const view of ["room", "desk", "desktop", "door"] as const) {
+  it("in every view Kuro's body sits at the bottom right; it is the call button (on 屏幕 the pet in the monitor, guidance R4)", () => {
+    const dc = at("desktop");
+    dc.store.appendEvent({ kind: "step", name: "boot", t: "09:03" }); // the screen is on (black before)
+    const desk = render(dc);
+    expect(desk).not.toContain('<div class="hud-br">');
+    expect(desk).toMatch(/<button type="button" class="kpet-btn[^"]*" data-action="kuro-call"[^>]*><span class="kpet" data-kuro-slot data-state=/);
+    expect((desk.match(/data-kuro-slot/g) ?? []).length).toBe(1);
+    for (const view of ["room", "desk", "door"] as const) {
       const out = render(at(view));
       const br = out.slice(out.indexOf('<div class="hud-br">'));
       expect(br, view).toMatch(/^<div class="hud-br"><div class="hud-kuro"><button type="button" class="kuro-btn" data-action="kuro-call" aria-label=/);
@@ -176,7 +185,17 @@ describe("(5) four camera levels", () => {
   });
 
   it("clicking it opens the conversation in the box without changing view; the body steps away; Esc ends it", () => {
-    for (const view of ["room", "desk", "desktop", "door"] as const) {
+    // 屏幕 (guidance R4): the pet stays and talks; the box's portrait is a still (no second slot).
+    const d = at("desktop");
+    d.store.appendEvent({ kind: "step", name: "boot", t: "09:03" }); // the screen is on (black before)
+    loopActions["kuro-call"]!(d, none, null as never);
+    const dOut = render(d);
+    expect((dOut.match(/data-kuro-slot/g) ?? []).length).toBe(1);
+    expect(dOut).toContain('class="kpet kuro-portrait still"');
+    expect(dOut).toMatch(/class="kpet-btn[^"]*"[^>]*><span class="kpet" data-kuro-slot data-state="\w+"/);
+    expect(loopKeys(d, { key: "Escape" } as KeyboardEvent)).toBe(true);
+    expect(d.session.dialogue.queue).toEqual([]);
+    for (const view of ["room", "desk", "door"] as const) {
       const ctx = at(view);
       loopActions["kuro-call"]!(ctx, none, null as never);
       const out = render(ctx);

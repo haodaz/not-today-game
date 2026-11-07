@@ -11,7 +11,8 @@ import { fillPlaceholders } from "@world/replies/placeholders";
 import { taskForId } from "@state/days/board";
 import { askedToday, bucketNow } from "@world/dialogue/kuro";
 import { bucketAllows } from "@kuro/variable.ts";
-import { greetingKey } from "../beat";
+import { greetingKeyAt } from "../beat";
+import { pastTasks } from "@state/days/past";
 import { frameUrl, FRAMES } from "../kuro/body";
 import { kuroDay } from "../kuro/days";
 import { taskPageId, type AppContext, type WorkbenchPage } from "../model";
@@ -84,7 +85,9 @@ function sidebar(ctx: AppContext, fill: Fill): SafeHtml | null {
   const search = html`<label class="wb-search">${ICONS.search}<input type="search" data-input="wb-search" data-focus="wb-search" placeholder="${ph}" aria-label="${ph}" value="${session.wbSearch}" autocomplete="off" spellcheck="false"></label>`;
   const fresh = html`<button type="button" class="${cls("it", "new", page === "home" && "on")}" data-action="wb-nav" data-page="home" data-compose="1">${ICONS.plus}<span>${tr("wb.sessions.new")}</span></button>`;
   const rows = sessionRows(ctx, fill, session.wbSearch);
-  return html`<div class="wb-scrim" data-action="wb-sidebar-close" aria-hidden="true"></div><aside class="wb-sidebar sessions"><nav class="wb-sections">${icons}</nav>${search}${fresh}${rows.today}${rows.recent}</aside>`;
+  // guidance R6: the past tasks under 最近 (after the run's own earlier days).
+  const recent = rows.recent ?? html`<div class="sec">${tr("wb.sessions.recent")}</div>`;
+  return html`<div class="wb-scrim" data-action="wb-sidebar-close" aria-hidden="true"></div><aside class="wb-sidebar sessions"><nav class="wb-sections">${icons}</nav>${search}${fresh}${rows.today}${recent}${pastRows(ctx, "it earlier past")}</aside>`;
 }
 
 /** The title's ▾ (shell R10): the session list as a dropdown under the title; a click outside closes it. */
@@ -147,16 +150,20 @@ function home(ctx: AppContext, data: WorkbenchDay | null, fill: Fill): SafeHtml 
   const openRow = open?.tree
     ? html`<button type="button" class="ln task" data-action="wb-nav" data-page="task:${open.tree.id}"><b>${fill(open.tree.title)}</b><span>${tr("wb.task.doing")}</span></button>`
     : null;
+  // guidance R6: the past (content/tasks/past.json) as 已交 rows under today's; one opened reads back.
   const doing = card(
     tr("wb.card.doing"),
     tr("wb.card.all"),
-    html`${openRow}${(data?.doing ?? []).map((j) => html`<div class="ln"><b>${fill(j.title)}</b><span class="${j.tone === "warn" ? "r" : ""}">${fill(j.status)}</span></div>`)}`,
+    html`${openRow}${(data?.doing ?? []).map((j) => html`<div class="ln"><b>${fill(j.title)}</b><span class="${j.tone === "warn" ? "r" : ""}">${fill(j.status)}</span></div>`)}${pastRows(ctx, "ln task past")}`,
   );
-  const docs = card(
-    tr("wb.card.docs"),
-    tr("wb.card.all"),
-    html`${data?.docs ? html`<div class="big">${fill(data.docs.count)}<small>${fill(data.docs.countLabel)}</small></div>` : null}${(data?.docs?.versions ?? []).map((v) => html`<div class="ln"><b>${fill(v.v)}</b><span>${fill(v.when)}</span></div>`)}`,
-  );
+  // guidance R6: a card with nothing in it is not drawn.
+  const docs = data?.docs
+    ? card(
+        tr("wb.card.docs"),
+        tr("wb.card.all"),
+        html`<div class="big">${fill(data.docs.count)}<small>${fill(data.docs.countLabel)}</small></div>${(data.docs.versions ?? []).map((v) => html`<div class="ln"><b>${fill(v.v)}</b><span>${fill(v.when)}</span></div>`)}`,
+      )
+    : null;
   // The overdue days are the store's (30 + day), not content's.
   const ledger = card(
     tr("wb.card.ledger"),
@@ -167,18 +174,36 @@ function home(ctx: AppContext, data: WorkbenchDay | null, fill: Fill): SafeHtml 
   const now = card(
     tr("wb.card.now"),
     tr("wb.card.now.sub"),
-    html`${(data?.now ?? []).map((l) => html`<div class="ln"><span>${fill(l.left)}</span><span>${fill(l.right)}</span></div>`)}<div class="ln"><span>${tr("wb.now.letItDo", { n: state.letItDoUnchecked })}</span><span>${tr("wb.now.count")}</span></div>`,
+    // guidance R6: the count as a number (0 is 0 次).
+    html`${(data?.now ?? []).map((l) => html`<div class="ln"><span>${fill(l.left)}</span><span>${fill(l.right)}</span></div>`)}<div class="ln"><span>${tr("wb.now.letItDo", { n: state.letItDoUnchecked })}</span><span>${state.letItDoUnchecked} ${tr("wb.now.count")}</span></div>`,
     "now",
   );
+  const logs = data?.changelog ?? [];
   const log = changelogCollapsed(state.day)
     ? html`<div class="ln"><span style="flex:1;border-top:1px solid var(--ink-2);margin-top:10px"></span></div>`
-    : html`${(data?.changelog ?? []).map((c) => html`<div class="ln"><b>${fill(c.v)}</b><span>${fill(c.short)}</span></div>`)}`;
-  const changelog = card(tr("wb.card.changelog"), data?.changelog[0] && !changelogCollapsed(state.day) ? html`${fill(data.changelog[0].v)}` : null, log);
+    : html`${logs.map((c) => html`<div class="ln"><b>${fill(c.v)}</b><span>${fill(c.short)}</span></div>`)}`;
+  const changelog = logs.length ? card(tr("wb.card.changelog"), logs[0] && !changelogCollapsed(state.day) ? html`${fill(logs[0].v)}` : null, log) : null;
 
   const tabs = (data?.common?.tabs ?? []).map((t, i) => html`<span class="${i === 0 ? "on" : ""}">${fill(t)}</span>`);
   const items = (data?.common?.items ?? []).map((i) => html`<div><em>${fill(i.tag)}</em>${fill(i.text)}</div>`);
+  const common = items.length ? html`<div class="sect"><h3>${tr("wb.common")}<small>${tr("wb.common.sub")}</small></h3><div class="tabs">${tabs}</div><div class="qa">${items}</div></div>` : null;
   // Home is the greeting, the composer and today's cards: never a board or task content (workspace R1).
-  return html`<div class="main home"><div class="hello"><img src="${frameUrl(FRAMES.idle[0])}" alt=""><div><h1>${tr(greetingKey(ctx.session.clock.beat))}</h1><p>${tr("wb.hello.sub")}</p></div></div>${composer(ctx, data, fill)}<div class="cards">${doing}${docs}${ledger}${now}${changelog}</div><div class="sect"><h3>${tr("wb.common")}<small>${tr("wb.common.sub")}</small></h3><div class="tabs">${tabs}</div><div class="qa">${items}</div></div></div>`;
+  // guidance R6: the greeting follows the clock (12:04 is 下午好).
+  return html`<div class="main home"><div class="hello"><img src="${frameUrl(FRAMES.idle[0])}" alt=""><div><h1>${tr(greetingKeyAt(ctx.session.clock.time))}</h1><p>${tr("wb.hello.sub")}</p></div></div>${composer(ctx, data, fill)}<div class="cards">${doing}${docs}${ledger}${now}${changelog}</div>${common}</div>`;
+}
+
+/**
+ * guidance R6: the tasks finished before the run (content/tasks/past.json), as 已交 rows; a click
+ * opens one's thread read-only under it (the player's line, Kuro's, the result).
+ */
+function pastRows(ctx: AppContext, klass: string): SafeHtml {
+  const open = ctx.session.wbPast;
+  const rows = pastTasks(getLocale() === "en" ? "en" : "zh").map((p) => {
+    const row = html`<button type="button" class="${cls(klass, open === p.id && "on")}" data-action="wb-past" data-past="${p.id}"><b>${p.title}</b><span>${tr("wb.task.done")}</span></button>`;
+    const thread = open === p.id ? html`<div class="wb-past-thread" data-past="${p.id}"><p class="me">${p.me}</p><p class="kuro">${p.kuro}</p><p class="res">${p.result}</p></div>` : null;
+    return html`${row}${thread}`;
+  });
+  return html`${rows}`;
 }
 
 /**

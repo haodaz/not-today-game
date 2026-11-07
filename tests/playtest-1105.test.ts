@@ -49,7 +49,8 @@ describe("R1 · a new player can see the computer", () => {
     const r = rig(booted(), "desktop");
     r.act("dock", { app: "workbench" });
     let out = r.out();
-    expect(out).toMatch(/<div class="win wb" data-win="workbench" style="left:24px;top:54px;width:1392px;height:760px"><div class="bar app-top"/);
+    // guidance R15: the window fills the OS area under the 28 px top bar down to the dock.
+    expect(out).toMatch(/<div class="win wb" data-win="workbench" style="left:0px;top:28px;width:1440px;height:800px"><div class="bar app-top"/);
     expect(out).toContain('<div class="dock">');
     // The sidebar toggle is in the window's top bar.
     expect(out).toMatch(/<div class="bar app-top"[^>]*>.*data-action="wb-sidebar"/s);

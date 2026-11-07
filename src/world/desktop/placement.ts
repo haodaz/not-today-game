@@ -61,6 +61,20 @@ export function moveApp(p: Placement, app: AppId, side: Side): boolean {
   return true;
 }
 
+/**
+ * guidance R3: red (and yellow, for now) closes `app`'s window: it leaves the stack; its monitor
+ * shows its next window back, or nothing (the wallpaper). Its place is kept, and so is the app's own
+ * state, so its dock tile reopens it where it was. Returns true if it was open.
+ */
+export function closeApp(p: Placement, app: AppId): boolean {
+  const side = p.place[app];
+  const open = p.stack.includes(app) || frontOn(p, side) === app;
+  if (!open) return false;
+  p.stack = p.stack.filter((a) => a !== app);
+  if (frontOn(p, side) === app) setFront(p, side, [...p.stack].reverse().find((a) => p.place[a] === side) ?? null);
+  return true;
+}
+
 /** The open windows on `side`, front first. */
 export function windowsOn(p: Placement, side: Side): AppId[] {
   return [...p.stack].reverse().filter((a) => p.place[a] === side);

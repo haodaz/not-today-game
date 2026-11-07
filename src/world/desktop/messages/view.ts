@@ -234,7 +234,11 @@ function replyBar(ctx: AppContext, conversation: string, register: Register): Sa
   const day = state.day;
   const items = menu(day, conversation, state);
   const gone = isDeregistered(conversation, state);
-  const hint = hasString(`reply.hint.${conversation}`) ? html`<div class="hint">${tr(`reply.hint.${conversation}`)}</div>` : null;
+  // guidance R9: the four words are the rule: a thread with no hint of its own says so once (the
+  // first time its bar is shown in the run; it is seen when the player leaves the thread).
+  const ownHint = hasString(`reply.hint.${conversation}`);
+  const otherHint = !ownHint && hasString("reply.hint.other") && !session.replyHintSeen.has(conversation);
+  const hint = ownHint ? html`<div class="hint">${tr(`reply.hint.${conversation}`)}</div>` : otherHint ? html`<div class="hint">${tr("reply.hint.other")}</div>` : null;
   const chips = items
     .filter((item) => item.kind !== "free")
     .map((item) => {
@@ -330,7 +334,11 @@ function renderWorkMessagesNow(ctx: AppContext): { pane: SafeHtml; badge: number
   const badge = all.reduce((n, c) => n + c.unread, 0);
   const today = ctx.state.day;
   const names = ctx.state.names;
-  const active = all.find((c) => c.id === ctx.session.conversation) ?? all[0];
+  // guidance R2 (G3): day 1's first open is a client on launch: no conversation is active (the right
+  // pane empty) until a row is clicked (an `open conv:*` today). Days 2+ open on the boss as before.
+  // (The run's first desktop visit with its coach marks done: the real first open.)
+  const launch = today === 1 && ctx.session.onboard === "done" && !ctx.events.some((e) => e.kind === "open" && e.day === today && e.target.startsWith("conv:"));
+  const active = launch ? undefined : (all.find((c) => c.id === ctx.session.conversation) ?? all[0]);
   const list = html`<div class="list"><div class="search">${tr("msgs.search")}</div>${all.map((c) => dingRow(c, c.id === active?.id, today, names))}</div>`;
   if (!active) return { pane: html`${list}<div class="conv empty"></div>`, badge };
   // The role line under the name (msgs.<id>.role, e.g. Vivi's 合伙人 · VP), when strings have one.

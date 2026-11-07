@@ -108,6 +108,8 @@ export const messageActions: Record<string, ActionHandler> = {
     const field = appOfThread(id) === "tingtalk" ? "conversation" : "homeConversation";
     // Leaving the conversation stops its voice note (author 2026-11-05: it kept playing after a switch).
     if (ctx.session[field] !== id) stopVoice(ctx);
+    // guidance R9: the thread being left has shown its 「能说的就这四句。」 hint: once is enough.
+    if (ctx.session[field] !== id) ctx.session.replyHintSeen.add(ctx.session[field]);
     Object.assign(ctx.session, { [field]: id, selected: null, draft: "", inner: null });
     ctx.store.appendEvent({ kind: "open", target: `conv:${id}`, t: ctx.session.clock.time });
     ctx.rerender();

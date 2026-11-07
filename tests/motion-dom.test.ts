@@ -136,6 +136,11 @@ describe("the live DOM after a render (fix 2026-10-31)", () => {
     expect(liveMask()).toBeNull();
     // 屏幕 → 桌子 → 房间 by Esc; then round the walls (room-turn): the door's proxy turns twice to 门,
     // and → turns on to 窗 and back to 房间. 门 has no back.
+    // guidance R6: 工作台's first open in the run shows its sidebar; Esc closes that first.
+    if (session.wbSidebar) {
+      window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+      await frame();
+    }
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
     await frame();
     check(root, session, "screen → desk (Esc)");

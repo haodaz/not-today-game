@@ -24,7 +24,7 @@ import { ICONS } from "../icons";
 import { moveApp, otherSide } from "../placement";
 import { messageActions } from "../messages/actions";
 import { renderObjectBar } from "./objbar";
-import { doneWorkItems, modeChips, openWork, plainSurface, questionText, surfaceOf as workSurfaceOf, workInput, workItems } from "./work";
+import { doneWorkItems, modeChips, openWork, plainSurface, questionText, surfaceOf as workSurfaceOf, workItems, workSendChip } from "./work";
 
 type Fill = (s: string) => string;
 
@@ -254,8 +254,10 @@ function workConversation(ctx: AppContext, task: Task, day: number, live: boolea
     } else if (it.k === "working") working = true;
     else if (it.k === "pass") chips.push(it.html);
   }
-  const dots = working ? html`<div class="sh-kuro typing" aria-live="polite">${shellAv()}<div class="sh-kt kscroll"><i></i><i></i><i></i></div></div>` : null;
-  const input = live ? html`<div class="ask sh-ask">${workInput(ctx)}</div>` : null;
+  // guidance R7: while Kuro works its bubble says so (wb.busy), not an empty bubble.
+  const dots = working ? html`<div class="sh-kuro typing" aria-live="polite">${shellAv()}<div class="sh-kt">${hasString("wb.busy") ? tr("wb.busy") : null}</div></div>` : null;
+  // guidance R7: no text box on a task page: the sentence is one chip until it is sent.
+  const input = live ? workSendChip(ctx) : null;
   return html`<div class="sh-conv"><div class="sh-thread">${bubbles(day, lines)}${dots}</div><div class="sh-composer">${chips}${input}</div></div>`;
 }
 
@@ -263,8 +265,8 @@ function workConversation(ctx: AppContext, task: Task, day: number, live: boolea
 function workPane(ctx: AppContext, task: Task, live: boolean, fill: Fill): SafeHtml {
   const surfaces = live ? workItems(ctx).flatMap((it) => (it.k === "surface" ? [it.html] : [])) : [];
   if (surfaces.length) return html`<div class="sh-work">${surfaces}</div>`;
-  // Kuro is working on it: the pane waits with it (the thread shows the dots).
-  if (live && workItems(ctx).some((it) => it.k === "working")) return html`<div class="sh-work"></div>`;
+  // Kuro is working on it: the pane says so too (guidance R7: wb.busy, not a blank pane).
+  if (live && workItems(ctx).some((it) => it.k === "working")) return html`<div class="sh-work busy">${hasString("wb.busy") ? html`<p class="sh-busy">${tr("wb.busy")}</p>` : null}</div>`;
   return html`<div class="sh-work">${plainSurface(task, fill)}</div>`;
 }
 

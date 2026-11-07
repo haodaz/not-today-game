@@ -136,6 +136,8 @@ function ctxFor(store: Store, session: Session): AppContext {
 describe("renderMessages", () => {
   it("工作台's 消息 pane lists the company, with the boss's hint and chips from strings; 消息 lists 家里", () => {
     const store = storeAt(1);
+    // guidance G3: day 1's first open of 听听 is empty until a row is clicked; open the boss's.
+    store.appendEvent({ kind: "open", target: "conv:boss", t: "10:00" });
     const work = renderWorkMessages(ctxFor(store, initialSession({ beat: "boot", time: "10:00" }))).pane.value;
     for (const key of ["msgs.boss", "msgs.group", "reply.hint.boss", "reply.fine", "reply.salary", "msgs.send"]) {
       expect(work, key).toContain(t(key));

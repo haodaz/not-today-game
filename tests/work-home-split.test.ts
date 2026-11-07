@@ -130,6 +130,7 @@ describe("看一眼消息 is done by opening 听听 (the boss lives there)", () 
 describe("听听 (DingTalk register, as 工作台·消息 was)", () => {
   it("Vivi's role line sits under the name in the head; 工作台's rail has no 消息 item any more", () => {
     const store = storeAt(1);
+    store.appendEvent({ kind: "open", target: "conv:partner", t: "10:00" }); // guidance G3: a row clicked
     const session = initialSession({ beat: "work", time: "10:00" });
     session.conversation = "partner";
     const out = renderTingTalk(ctxFor(store, session)).body.value;
@@ -144,6 +145,7 @@ describe("听听 (DingTalk register, as 工作台·消息 was)", () => {
   it("the player's own messages carry 已读 or 未读; the boss's voice its DING (when strings have the words)", () => {
     const store = storeAt(1);
     store.appendEvent({ kind: "reply", choice: "salary", recipient: "boss", t: "09:03" });
+    store.appendEvent({ kind: "open", target: "conv:boss", t: "09:04" }); // guidance G3: a row clicked
     const session = initialSession({ beat: "work", time: "12:00" });
     const out = renderWorkMessages(ctxFor(store, session)).pane.value;
     expect(out).toMatch(/<div class="rcpt read">已读<\/div>|<div class="rcpt unread">/);

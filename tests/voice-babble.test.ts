@@ -222,6 +222,8 @@ function storeAt(day: number): Store {
 }
 function rig(day = 1) {
   const store = storeAt(day);
+  // guidance G3: day 1's first open of 听听 is empty until a row is clicked; open the boss's.
+  store.appendEvent({ kind: "open", target: "conv:boss", t: "12:00" });
   const session: Session = initialSession({ beat: "work", time: "12:00" });
   session.conversation = "boss";
   let now = 0;

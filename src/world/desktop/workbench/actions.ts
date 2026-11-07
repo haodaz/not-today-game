@@ -8,6 +8,7 @@ import { taskForId } from "@state/days/board";
 import { openWork } from "./work";
 import { taskOpened } from "./sessions";
 import { meetingAutoplay } from "./meeting";
+import { pastTasks } from "@state/days/past";
 
 // 消息 is 听听's now (tingtalk 2026-11-04): not a 工作台 page.
 const PAGES: readonly WorkbenchPage[] = ["home", "docs", "ledger", "code"];
@@ -66,6 +67,20 @@ function closeMenus(session: Session): void {
 
 /** shell R10's sidebar, the title's ▾, and ← →. Session only. */
 export const workbenchUiActions: Record<string, ActionHandler> = {
+  // guidance R6: a past task's row (在办 or 最近): its thread read-only on home (again: closed).
+  "wb-past"(ctx, data) {
+    const id = data.past ?? "";
+    if (!pastTasks("zh").some((p) => p.id === id)) return;
+    ctx.session.wbPast = ctx.session.wbPast === id ? null : id;
+    if (ctx.session.workbenchPage !== "home") {
+      ctx.session.workbenchPage = "home";
+      ctx.session.wbTaskDay = null;
+      visit(ctx.session, "home", null);
+    }
+    ctx.session.wbSidebar = false;
+    ctx.session.wbTitleMenu = false;
+    ctx.rerender();
+  },
   // The sidebar toggle (and ⌘B / Ctrl+B): the overlay sidebar opens / closes.
   "wb-sidebar"(ctx) {
     ctx.session.wbSidebar = !ctx.session.wbSidebar;

@@ -250,5 +250,6 @@ export function heldLayer(state: State, events: readonly GameEvent[], session: S
   const blood = bleedingToday(events, state.day) ? html`<div class="hand-blood" aria-hidden="true"></div>` : null;
   // In 使用 the stage behind the object is the focus view's: dimmed to 70 % and blurred 6 px.
   const focused = !session.phoneOpen && session.hand.using;
-  return html`<div class="${cls("held-layer", focused && "focus")}" data-held="${item}">${dim()}${body}${blood}<div class="hint">${hint}</div></div>`;
+  // guidance R8: with the phone up the hint sits under the phone's bottom edge, never over its buttons.
+  return html`<div class="${cls("held-layer", focused && "focus", session.phoneOpen && "phone-up")}" data-held="${item}">${dim()}${body}${blood}<div class="hint">${hint}</div></div>`;
 }

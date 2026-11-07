@@ -21,6 +21,12 @@ export type Ending =
   | { readonly kind: "openCase" }
   /** box-arrival R5: 「我把箱子放在了床边。」 read: the view turns to 房间. */
   | { readonly kind: "boxPlaced" }
+  /** guidance R14: the doorbell's 外卖到了。去门口。 read: the camera goes to 门. */
+  | { readonly kind: "toDoor" }
+  /** guidance R14: vivi.back read: Vivi's page closes and the app before it is in front again. */
+  | { readonly kind: "docBack" }
+  /** guidance R14: a sent task's closing lines read: 工作台 returns to its home (the next task lit). */
+  | { readonly kind: "taskHome" }
   /** object-tutor R2: `record` adds 打开录音机 between them (night 5, the tape found, nothing recorded yet). */
   | { readonly kind: "bedAsk"; readonly record?: true }
   /** lying-view R6: getting up from the bed: 起床 / 再躺一会儿. */

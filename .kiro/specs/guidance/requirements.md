@@ -88,3 +88,8 @@ Walls, from the room to the task: (1) an object that cannot be used now (床, th
 
 ## Files
 `src/world/loop/guide.ts` (new), `src/world/desktop/controller.ts`, `src/world/room/game.ts`, `src/world/room/hud.ts`, `src/world/desktop/shell.ts`, `src/world/desktop/placement.ts`, `src/world/desktop/vivi.ts`, `src/world/desktop/messages/{view,actions,transcript}.ts`, `src/world/desktop/workbench/{shell,work}.ts`, `src/world/desktop/browser/view.ts`, `src/world/room/case.ts`, `src/world/room/held.ts`, `src/world/room/room.css`, `src/world/desktop/desktop.css`, `src/state/days/tasks.ts` (past.json loader), `src/world/loop/waiting.ts` or wherever delivery texts are filled. Tests beside the existing ones; list any snapshot that changes and why, do not edit it.
+
+## Implementation notes (2026-11-08, Claude, after Kiro's run; credits exhausted, the rest is Claude's)
+- Kiro landed Part 1 (the mask) and R1–R15 with these deviations, all accepted: the ring is the `data-guide="on"` attribute (CSS in room.css), not a `guide-ring` class; the 设置 tile is never refused by a guide (settings always reachable); `.monitor` keeps its class name with the bezel styles removed; R7's text box became a chip-only composer on task pages.
+- Still open, Claude's: R4 happy on the chick's first power-on; R6 the lead line `wb.hello.sub` (reworded without a count instead of templating); R12 the eat lines (day 1's reworded dish-agnostic instead of `{dish}`).
+- Tests: seven tests moved to the test side (a thread opened before asserting, the store booted), 33 snapshots refreshed after the full run (frame, dock, pet, ring, G3's empty first open, R9/R10 in the threads).

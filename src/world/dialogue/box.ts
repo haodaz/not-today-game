@@ -13,7 +13,7 @@ import { npcPortrait, silhouetteFor, speakerLabel } from "@world/npc";
 const PROLOGUE_KEY = "prologue";
 import type { State } from "@state/types.gen";
 import { isNight } from "@world/desktop/beat";
-import type { BodyState } from "@world/desktop/kuro/body";
+import { renderLayer, type BodyState } from "@world/desktop/kuro/body";
 import { kuroBodyState } from "@world/desktop/kuro/mini";
 import type { Session } from "@world/desktop/model";
 import { cls, html, type SafeHtml } from "@world/html";
@@ -94,6 +94,8 @@ export interface LineBoxModel {
   readonly red: boolean;
   /** kuro-zh-answers R4: Kuro's (or 屏幕's) line in its face: the idiom, or uncanny; null otherwise. */
   readonly face?: KuroFace;
+  /** guidance R4: on 屏幕 the pet in the monitor is the body that reacts; the box shows a still portrait. */
+  readonly stillPortrait?: boolean;
 }
 
 /** lying-view R1: a day file's line said by the player (`speaker`, `who: "me"`). */
@@ -176,6 +178,7 @@ export function lineBoxModel(state: State, events: readonly GameEvent[], session
     pointer: pointerCls(session, "raid", scr.choices.length > 0 && raidShowing(state, session)),
     red: lateRing(state.day),
     face: line && kind === "line" ? lineText(state, head, line).face : null,
+    ...(session.view === "desktop" ? { stillPortrait: true } : {}),
   };
 }
 
@@ -191,8 +194,10 @@ function tagOf(tag: BoxTag): SafeHtml | null {
  * page's only `data-kuro-slot`; the HUD body is away while Kuro is in the box), so it has the same
  * frames and crossfade as the HUD body.
  */
-const portraitOf = (state: BodyState, red: boolean): SafeHtml =>
-  html`<span class="kpet kuro-portrait" data-kuro-slot data-state="${state}"${red ? html` data-red="1"` : null} aria-hidden="true"></span>`;
+const portraitOf = (state: BodyState, red: boolean, still = false): SafeHtml =>
+  still
+    ? html`<span class="kpet kuro-portrait still" data-state="${state}"${red ? html` data-red="1"` : null} aria-hidden="true">${renderLayer(state, red)}</span>`
+    : html`<span class="kpet kuro-portrait" data-kuro-slot data-state="${state}"${red ? html` data-red="1"` : null} aria-hidden="true"></span>`;
 
 /** The player's portrait: a still image in Kuro's slot; decorative (the line is the content). */
 const playerPortraitOf = (src: string): SafeHtml => html`<img class="player-portrait" src="${src}" alt="" aria-hidden="true" draggable="false">`;
@@ -220,7 +225,7 @@ export function renderLineBox(m: LineBoxModel, waits = m.choices.length > 0): Sa
   const c = cls("dlg", m.kind !== "line" && m.kind, tag && "tagged", m.tag?.kind === "kuro" && "kuro", me && "me", hasNpc && "npc", waits && "has-choices");
   // One portrait at most: Kuro's for its lines, NPC's for a speaker line, player's for an inner line.
   const portrait = m.portrait
-    ? portraitOf(m.portrait, m.red)
+    ? portraitOf(m.portrait, m.red, m.stillPortrait === true)
     : hasNpc
       ? html`<img class="npc-portrait" src="${m.npcPortrait!}" alt="" aria-hidden="true" draggable="false">`
       : me

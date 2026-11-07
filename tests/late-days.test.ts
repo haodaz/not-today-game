@@ -185,7 +185,8 @@ describe("FR4 Kuro closes what it does not want you to read", () => {
     run();
     const crawling = desktop(ctx);
     expect(crawling).toContain('<span class="kpet kuro-closer" data-kuro-slot data-state="crawl" data-phase="crawl" data-red="1"');
-    expect(crawling).toContain('<div class="hud-kuro away"></div>');
+    // guidance R4: on 屏幕 the one body is the pet; it is away while it crawls to the ×.
+    expect(crawling).toContain('<span class="kpet-btn away" aria-hidden="true"></span>');
     expect((crawling.match(/data-kuro-slot/g) ?? []).length).toBe(1);
     expect(timers[0]!.ms).toBe(CRAWL_MAX_MS); // the maw waits for the longest trip: it has arrived
     run();

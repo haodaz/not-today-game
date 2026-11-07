@@ -15,6 +15,7 @@ import { closerOut } from "@world/late/closer";
 import { kuroDay } from "./days";
 import { kuroText } from "./voice";
 import { kuroWorking } from "../workbench/work";
+import { guideNow } from "@world/loop/guide";
 
 /** Today's work-task lines, in the order the tasks were done. */
 export function taskLines(ctx: AppContext): string[] {
@@ -68,16 +69,37 @@ export function kuroMaw(ctx: Pick<AppContext, "state" | "session" | "night">): M
 /** Red eyes from the late ring (late-days FR2): the slot attribute the body element reads. */
 export const redAttr = (day: number): SafeHtml | null => (lateRing(day) ? html` data-red="1"` : null);
 
-/** The body's state now (desktop-ui FR5): maw > rest > busy > happy > crawl > think > idle. */
+/**
+ * The body's state now (desktop-ui FR5, guidance R4): maw > rest > busy > happy > crawl > think >
+ * talk > idle. Rest at night and lying by day; busy while a task runs; happy for a while after a
+ * task is sent, a warm chat turn or a box picked (`happyUntil`); crawl while the camera or a window
+ * moves; think while a guide is on, Vivi's lock holds, or the chat waits for the player; talk while
+ * one of its lines is in the box.
+ */
 export function kuroBodyState(ctx: AppContext): BodyState {
+  const { session } = ctx;
+  const waitingChat = session.dialogue.queue[0]?.ending.kind === "kuroTurn";
+  const guided = guideNow(ctx.state, ctx.events, session) !== null;
   return bodyState({
     maw: kuroMaw(ctx),
-    night: ctx.night,
-    taskRunning: kuroWorking(ctx.session, ctx.nowMs), // its 3 s of work on a task (work FR3)
-    saidPretty: false, // the chat beat is the kuro-chat spec's
-    moving: ctx.nowMs < ctx.session.movingUntil,
-    waiting: ctx.session.clock.beat === "desk" && !turnsUsedUp(ctx),
+    night: ctx.night || session.view === "lying",
+    taskRunning: kuroWorking(session, ctx.nowMs), // its 3 s of work on a task (work FR3)
+    saidPretty: ctx.nowMs < session.happyUntil,
+    moving: ctx.nowMs < session.movingUntil,
+    waiting: (session.clock.beat === "desk" && !turnsUsedUp(ctx)) || guided || waitingChat,
+    talking: kuroInBox(session.dialogue),
   });
+}
+
+/**
+ * guidance R4: on the screen Kuro is the pet in the monitor's bottom-right (with its pill): the one
+ * body there. Its click is kuro-call; its states play on it (talk while its line is in the box). It
+ * steps away only while it crawls to a page's × (late-days FR4: the body is there then).
+ */
+export function deskPet(ctx: AppContext): SafeHtml {
+  if (closerOut(ctx.session)) return html`<span class="kpet-btn away" aria-hidden="true"></span>`;
+  const unread = kuroUnread(ctx);
+  return html`<button type="button" class="${cls("kpet-btn", unread && "unread")}" data-action="kuro-call" aria-label="${t("kuro.name")}"><span class="kpet" data-kuro-slot data-state="${kuroBodyState(ctx)}"${redAttr(ctx.state.day)} aria-hidden="true"></span>${unread ? html`<i class="dot"></i>` : null}</button>`;
 }
 
 /** A line it said that the player has not looked at yet (the call button's dot). */

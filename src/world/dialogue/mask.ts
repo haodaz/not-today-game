@@ -45,9 +45,16 @@ export const MASK_ALLOWS: ReadonlySet<string> = new Set([
   "opening-skip",
 ]);
 
-/** Is `action` held back by the mask now? */
-export function maskBlocks(d: DialogueState, action: string): boolean {
-  return storyMasked(d) && !MASK_ALLOWS.has(action);
+/**
+ * lock-by-device addition 2026-11-07: with the 老物件栏 device modal open, the device's own controls
+ * sit above the mask (its keys, the turn buttons, the read footer, its ×): they answer while a line
+ * is up (a recording plays as lines while its reading is offered).
+ */
+export const DEVICE_ALLOWS: ReadonlySet<string> = new Set(["obj-key", "obj-flip", "obj-rotate", "board-read", "objbar-close"]);
+
+/** Is `action` held back by the mask now? `deviceOpen`: the 老物件栏 modal is open. */
+export function maskBlocks(d: DialogueState, action: string, deviceOpen = false): boolean {
+  return storyMasked(d) && !MASK_ALLOWS.has(action) && !(deviceOpen && DEVICE_ALLOWS.has(action));
 }
 
 /** Esc under the mask: the sequence's last line (never past it). Null when not masked. */

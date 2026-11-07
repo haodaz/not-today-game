@@ -415,6 +415,17 @@ export function renderWork(ctx: AppContext, withDone = true): SafeHtml {
   return html`<div class="ask">${thread.length ? html`<div class="wthread">${thread}</div>` : null}${workInput(ctx)}</div>`;
 }
 
+/**
+ * guidance R7: a task page has no text box (it was always read-only): until the sentence is sent it
+ * is one chip (wb-send); after that the thread's own chips are the whole input.
+ */
+export function workSendChip(ctx: AppContext): SafeHtml | null {
+  const { state, events, session } = ctx;
+  const open = openWork(state, events);
+  if (!open || threadFor(session, state.day, open.item.id)) return null;
+  return html`<div class="wchips"><button type="button" class="sh-chip primary" data-action="wb-send" data-task="${open.item.id}">${fillPlaceholders(open.item.text, state.names)}</button></div>`;
+}
+
 /** The ask box's input: the sentence until it is sent (↑ sends it), the placeholder otherwise; the scope. */
 export function workInput(ctx: AppContext): SafeHtml {
   const { state, events, session } = ctx;

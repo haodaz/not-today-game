@@ -140,7 +140,8 @@ describe("renderDesktop", () => {
     expect(left).toContain('class="other-tab" data-side="right"');
     const right = renderDesktop(model({ focus: "right" })).value;
     expect(right).toContain("BODY-right");
-    expect(right).not.toContain('class="dock"');
+    // guidance R3: the dock is drawn on both monitors.
+    expect(right.match(/class="dock"/g)).toHaveLength(1);
     // The left monitor's tab carries the dock's badges.
     expect(right).toContain('class="other-tab" data-side="left"');
     expect(right).toContain("<b>5</b>");

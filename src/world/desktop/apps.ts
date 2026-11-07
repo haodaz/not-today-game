@@ -1,6 +1,7 @@
 import type { AppRenderers } from "./model";
 import { renderBrowser } from "./browser/view";
-import { renderKuro } from "./kuro/mini";
+import { deskPet, renderKuro } from "./kuro/mini";
+import { html } from "@world/html";
 import { renderMessages, renderTingTalk } from "./messages/view";
 import { renderWorkbench } from "./workbench/view";
 
@@ -10,5 +11,6 @@ export const desktopApps: AppRenderers = {
   tingtalk: renderTingTalk,
   workbench: (ctx) => renderWorkbench(ctx),
   browser: renderBrowser,
-  kuro: renderKuro,
+  // guidance R4: the pill and the pet (the one Kuro body on the screen) at the monitor's bottom-right.
+  kuro: (ctx) => html`${renderKuro(ctx)}${deskPet(ctx)}`,
 };

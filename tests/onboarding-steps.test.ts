@@ -104,7 +104,8 @@ describe("R1 · coach marks, one dock app at a time", () => {
     expect(css).toContain("border:10px solid transparent;border-bottom:0;border-top-color:#fff");
     // The dock geometry is the CSS's: 48 px tiles 8 px apart, 12 px side padding, 14 px bottom padding, 12 px off the bottom.
     expect(css).toContain(".dock{--tile:48px;gap:8px;padding:8px 12px 14px;align-items:center}");
-    expect(css).toMatch(/\.dock\{position:absolute;left:50%;bottom:12px;/);
+    // guidance R15: the dock sits on the bottom edge.
+    expect(css).toMatch(/\.dock\{position:absolute;left:50%;bottom:0px;/);
     expect(css).toContain(".dock .sep{width:1px;align-self:stretch;margin:6px 2px;");
     // The single list card is gone.
     expect(css).not.toContain(".onboard-layer");

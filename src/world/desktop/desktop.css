@@ -16,19 +16,25 @@ html,body{margin:0;background:#2b2e33;font-family:var(--font);color:var(--ink);f
 .monitor{width:1440px;height:900px;background:var(--bg);border-radius:6px;overflow:hidden;position:relative;box-shadow:0 0 0 10px #1a1c1f,0 0 0 11px #3a3d42,0 30px 60px rgba(0,0,0,.6);filter:hue-rotate(var(--tint)) blur(var(--blur))}
 .monitor .os{position:absolute;inset:0;transform:translate(var(--drift-x),var(--drift-y))}
 /* 顶栏 */
-.top{height:34px;display:flex;align-items:center;gap:18px;padding:0 16px;background:rgba(255,255,255,.85);border-bottom:1px solid var(--line);font-size:12px;color:var(--ink-2);backdrop-filter:blur(8px)}
+.top{height:28px;box-sizing:border-box;display:flex;align-items:center;gap:18px;padding:0 16px;background:rgba(255,255,255,.85);border-bottom:1px solid var(--line);font-size:12px;color:var(--ink-2);backdrop-filter:blur(8px)}
 .top .brand{font-weight:600;color:var(--ink);letter-spacing:.02em}
 .top .day{margin-left:auto;display:flex;gap:14px;align-items:center}
 .top .kuro-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px rgba(47,163,107,.15)}
 /* dock */
-.dock{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);display:flex;gap:10px;padding:8px 12px;background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:16px;backdrop-filter:blur(12px);box-shadow:0 8px 30px rgba(0,0,0,.08)}
+.dock{position:absolute;left:50%;bottom:0px;transform:translateX(-50%);display:flex;gap:10px;padding:8px 12px;background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:16px 16px 0 0;backdrop-filter:blur(12px);box-shadow:0 8px 30px rgba(0,0,0,.08)}
 .dock .app{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;white-space:nowrap;letter-spacing:-.02em;position:relative;cursor:pointer}
 .dock .app.on::after{content:"";position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--ink-2)}
 .dock .app .badge{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--red);font-size:10px;display:flex;align-items:center;justify-content:center}
 .app.msgs{background:linear-gradient(180deg,#4fd07f,#23a85a)} .app.docs{background:linear-gradient(180deg,#6b8cff,#3b5fe0)} .app.sheet{background:linear-gradient(180deg,#36b37e,#1f8a5c)} .app.code{background:linear-gradient(180deg,#5c6b7d,#2f3a48)} .app.feed{background:linear-gradient(180deg,#ff9f5a,#ef6c1f)} .app.todo{background:linear-gradient(180deg,#b3b9c4,#7c8594)} .app.kuro{background:#111;overflow:hidden;padding:0} .app.kuro img{width:100%;height:100%;object-fit:cover}
 /* dock tiles are icons (correction 2026-11-02): 64px, the glyph is in the svg; no text, a dot under the open app */
 /* Ten items (four apps, a separator, five decoys; 听听 joined, tingtalk 2026-11-04) at 48 px: 535 px wide, centred. --dock-reserve is the room the dock may take; the Kuro pill starts to its right (tests/dock.test.ts checks the arithmetic). */
-.os{--dock-reserve:540px}
+.os{--dock-reserve:690px}
+/* guidance R15: 回房间 (left end) and 设置 (right end) are dock tiles: a glyph on a light tile. */
+.dock .app.nav{display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.06);border-radius:12px;color:var(--ink-2);font-size:22px;line-height:1}
+.dock .app.nav:hover,.dock .app.nav:focus-visible{background:rgba(0,0,0,.12)}
+.dock .app.room-tile .glyph::before{content:"⌂"}
+.dock .app.settings-tile .glyph::before{content:"⚙"}
+.monitor.night .dock .app.nav{color:#c9cdd4;background:rgba(255,255,255,.08)}
 .dock{--tile:48px;gap:8px;padding:8px 12px 14px;align-items:center}
 .dock .app,.dock .app.msgs,.dock .app.docs,.dock .app.feed{width:var(--tile);height:var(--tile);padding:0;background:none;border-radius:12px}
 .dock .app img{display:block;width:var(--tile);height:var(--tile);pointer-events:none;image-rendering:auto}
@@ -97,6 +103,12 @@ html,body{margin:0;background:#2b2e33;font-family:var(--font);color:var(--ink);f
 .win .bar{height:40px;display:flex;align-items:center;gap:8px;padding:0 14px;border-bottom:1px solid var(--line);font-size:12px;color:var(--ink-2)}
 .win .bar .dots{display:flex;gap:6px;margin-right:6px}.win .bar .dots i{width:11px;height:11px;border-radius:50%;background:#d9dce1}
 .win .bar .title{color:var(--ink);font-weight:500}
+/* guidance R3: the traffic lights work: red closes, yellow minimises. */
+.win .bar .dots i.tl-r{background:#ff5f57;cursor:pointer}
+.win .bar .dots i.tl-y{background:#febc2e;cursor:pointer}
+/* guidance R4: Kuro on the screen is the pet in the monitor's bottom-right, over the dock's row. */
+.kpet-btn{position:absolute;right:12px;bottom:4px;width:96px;height:96px;border:0;padding:0;background:none;cursor:pointer;z-index:7}
+.kpet-btn > .kpet{position:absolute;inset:0;width:auto;height:auto}
 .win .body{flex:1;display:flex;min-height:0}
 /* 消息 */
 .list{width:300px;border-right:1px solid var(--line);display:flex;flex-direction:column}
@@ -264,13 +276,18 @@ html,body{height:100%;overflow:hidden}
 #app > .stage{position:absolute;left:var(--stage-x,0px);top:var(--stage-y,0px)}
 /* One monitor at a time (amendment 2026-11-01): toggle at the top edge, the other monitor as a thin tab. */
 .stage.one-monitor{position:relative}
+/* guidance R15: the screen is the whole frame: no stage padding around the monitor and no bezel. */
+.stage.one-monitor{padding:0;gap:0}
+.stage.one-monitor > .monitor{border-radius:0;box-shadow:none}
+/* The window fills the OS area edge to edge (no rounded corners or frame shadow on the screen's edges). */
+.stage.one-monitor .os > .win:not(.sysw){border-left:0;border-right:0;border-top:0;border-radius:0;box-shadow:none}
 .screen-toggle{position:absolute;left:50%;top:6px;transform:translateX(-50%);display:flex;gap:2px;z-index:8;background:rgba(20,22,26,.6);border-radius:8px;padding:2px}
 .screen-toggle button{border:0;background:transparent;color:#9aa3b0;font:12px var(--font);padding:2px 12px;border-radius:6px;cursor:pointer}
 .screen-toggle button.on{background:#3a3f46;color:#e8eaee}
 .other-tab{position:absolute;top:50%;transform:translateY(-50%);width:22px;padding:10px 0;display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(30,33,38,.75);border:0;border-radius:6px;cursor:pointer;z-index:8;color:#9aa3b0;font:10px var(--font);writing-mode:vertical-rl}
 .other-tab[data-side="left"]{left:4px}.other-tab[data-side="right"]{right:4px}
 .other-tab .tab-app b{display:inline-block;margin-top:4px;min-width:14px;border-radius:7px;background:var(--red);color:#fff;font-weight:500;writing-mode:horizontal-tb;text-align:center}
-.back-room{position:fixed;left:12px;top:10px;z-index:20;border:0;border-radius:8px;padding:6px 12px;background:rgba(232,228,220,.75);color:#333;font:13px var(--font);cursor:pointer;backdrop-filter:blur(8px)}
+
 /* kuro-zh-answers R4: Kuro's face wherever it speaks (the box, the task threads, the pill): the day's
    idiom in its monospace; an uncanny line (怪话) in the face plus the 1 px red / blue split. */
 .kmono{font-family:"SF Mono",Menlo,monospace;font-size:.95em}
@@ -302,6 +319,9 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .kpet .layer img{position:absolute;inset:0}
 .kpet .layer img.f2{animation:kuro-frames 2.8s ease-in-out infinite alternate}
 @keyframes kuro-frames{0%,35%{opacity:0}65%,100%{opacity:1}}
+/* guidance R4: talking: base / blink alternating, 220 ms each. */
+.kpet .layer[data-state="talk"] img.f2{animation:kuro-talk 440ms steps(1,end) infinite}
+@keyframes kuro-talk{0%{opacity:0}50%{opacity:1}}
 .kmini .c .bed{color:var(--ink-3);font-style:italic}
 /* Workbench */
 .wb .side .it{background:none;border:0;text-align:left;cursor:pointer;width:100%}
@@ -312,7 +332,7 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 /* Kuro on the desktop is a status pill (dialogue FR2): its face, its last line, online or the night
    dot, today's turns. No input; a click opens the conversation in the box. It keeps clear of the
    192 px body at the HUD's bottom right (late-days FR1). */
-.kpill{position:absolute;left:calc(50% + var(--dock-reserve) / 2 + 16px);right:228px;width:fit-content;bottom:30px;z-index:6;display:flex;align-items:center;gap:8px;padding:5px 12px 5px 5px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 6px 18px rgba(20,24,30,.12);font:12px var(--font);color:var(--ink-2);cursor:pointer}
+.kpill{position:absolute;left:calc(50% + var(--dock-reserve) / 2 + 16px);right:120px;width:fit-content;bottom:18px;z-index:6;display:flex;align-items:center;gap:8px;padding:5px 12px 5px 5px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:0 6px 18px rgba(20,24,30,.12);font:12px var(--font);color:var(--ink-2);cursor:pointer}
 .kpill img{width:24px;height:24px;border-radius:50%;object-fit:cover;flex:0 0 auto}
 .kpill .ln{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kpill .on{flex:0 0 auto;color:#2f9e5b}
@@ -374,7 +394,7 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .mc-wins{flex:1;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:36px}
 .mc-win{border:0;background:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;touch-action:none;font:inherit}
 .mc-thumb{display:block;width:418px;height:228px;position:relative;overflow:hidden;border-radius:10px;box-shadow:0 12px 36px rgba(0,0,0,.35)}
-.mc-scale{position:absolute;left:0;top:0;width:1392px;height:760px;transform:scale(.3);transform-origin:0 0;pointer-events:none}
+.mc-scale{position:absolute;left:0;top:0;width:1440px;height:800px;transform:scale(.3);transform-origin:0 0;pointer-events:none}
 .mc-scale > .win{left:0 !important;top:0 !important}
 .mc-name{color:#fff;font-size:13px}
 .mc-win:hover .mc-thumb,.mc-win:focus-visible .mc-thumb{box-shadow:0 0 0 3px rgba(255,255,255,.85),0 12px 36px rgba(0,0,0,.35)}
@@ -483,6 +503,11 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .br .br-page.doc{position:absolute;inset:0;left:0;top:0;transform:none;width:auto;border:0;border-radius:0;box-shadow:none;padding:0;display:flex;flex-direction:column}
 .br .br-page.doc .br-bar{margin:0;justify-content:flex-end}
 .br .br-frame{flex:1;width:100%;border:0;background:#fff}
+/* guidance R3: ‹ in the browser bar goes back to the news page. */
+.br .bar .br-back{flex:0 0 auto;border:0;background:none;padding:0 6px;font:inherit;font-size:18px;line-height:1;color:var(--ink-2);cursor:pointer}
+/* guidance R7: Kuro's busy line in the pane while it works. */
+.sh-work.busy{display:flex;align-items:center;justify-content:center}
+.sh-work.busy .sh-busy{color:var(--ink-3);font-size:13px}
 /* added (work spec 2026-11-02): the choice is a reply. The thread above the input, the chips under
    Kuro's question, the strip with the scope only; the document and ledger surfaces. */
 .wb .main{overflow:auto}
@@ -613,7 +638,7 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 /* shell R10 (2026-11-04): 工作台 is full screen inside the monitor (no window, no title row) under
    the OS bar, with one 44 px top bar: the traffic lights (12 px), the sidebar toggle, ← →, the
    page title (▾ on a task page), and at the right end the pane toggles and the 老物件 strip. */
-.win.wb.full{left:0;top:34px;right:0;bottom:0;width:auto;height:auto;border:0;border-radius:0;box-shadow:none;background:#FAF9F7}
+.win.wb.full{left:0;top:28px;right:0;bottom:0;width:auto;height:auto;border:0;border-radius:0;box-shadow:none;background:#FAF9F7}
 /* playtest-1105 R1: the same top bar and body in 工作台's ordinary window (its default) and full screen. */
 .win.wb > .bar.app-top{height:44px;flex:0 0 44px;gap:4px;padding:0 10px 0 14px;border-bottom:1px solid #E7E5E0;background:#FAF9F7;color:#1F1F1F;position:relative;z-index:12}
 .win.wb > .bar.app-top .dots{gap:8px;margin-right:10px;flex:0 0 auto}

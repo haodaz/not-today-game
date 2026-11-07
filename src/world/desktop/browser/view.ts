@@ -24,8 +24,10 @@ export function renderBrowser(ctx: AppContext): { body: SafeHtml; bar: SafeHtml;
   const doc = ctx.session.browserDoc;
   if (doc) {
     return {
-      body: html`<div class="body" style="flex-direction:column"><section class="br-page doc" aria-label="${doc}"><div class="br-bar"><button type="button" class="br-close" data-action="br-doc-close" aria-label="${t("dialogue.close")}">×</button></div><iframe class="br-frame" src="${doc}" title="${doc}" sandbox></iframe></section></div>`,
-      bar: html`<div class="url">${doc}</div>`,
+      // guidance R3: no × of its own (‹ in the bar goes back to the news page; red closes the
+      // browser). R11: the iframe is kept across re-renders (keepframes), so it never blanks.
+      body: html`<div class="body" style="flex-direction:column"><section class="br-page doc" aria-label="${doc}"><iframe class="br-frame" src="${doc}" title="${doc}" sandbox data-keep="doc:${doc}"></iframe></section></div>`,
+      bar: html`<button type="button" class="br-back" data-action="br-back" aria-label="‹">‹</button><div class="url">${doc}</div>`,
       badge: 0,
     };
   }

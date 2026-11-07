@@ -80,3 +80,17 @@ export function lockedConversation(state: State, events: readonly GameEvent[], n
   if (lockOverride !== undefined && lockConvOverride !== undefined) return lockConvOverride;
   return conversationOfDoc(doc, state, now, table);
 }
+
+/** The player opened the boss's thread today (`open conv:boss`). */
+export const bossOpenedToday = (events: readonly GameEvent[], day: number): boolean => events.some((e) => e.kind === "open" && e.day === day && e.target === "conv:boss");
+
+/**
+ * guidance R2 (G5): the lock holds only once the boss's thread was opened today: the boss first,
+ * then Vivi's page. (A lock forced for tests holds at once, as before.) Null otherwise.
+ */
+export function viviLockHeld(state: State, events: readonly GameEvent[], now: string, table = dayTable(state.day)): string | null {
+  const doc = viviLock(state, events, now, table);
+  if (doc === null) return null;
+  if (lockOverride !== undefined) return doc;
+  return bossOpenedToday(events, state.day) ? doc : null;
+}

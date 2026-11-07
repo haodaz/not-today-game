@@ -1,6 +1,6 @@
 // The desktop view: one monitor at full size (amendment 2026-11-01), a 左屏 / 右屏 toggle at the
 // top edge, and the other monitor as a thin tab on its side with its badges. Each monitor: top bar,
-// one app window, the dock (left only), night plates, ring layer. Pure: model in, markup out.
+// one app window, the dock (both monitors, guidance R3), night plates, ring layer. Pure: model in, markup out.
 // Layout and class names follow design/desktop/*.html. Side by side exists only in the room scene.
 import { cls, html, raw, type SafeHtml } from "@world/html";
 import { hasString, t, tr } from "@world/i18n";
@@ -90,6 +90,8 @@ export interface ShellModel {
    * the previous one fading out over it on a new day's first visit (`late`: ms into the fade).
    */
   readonly wallpaper?: { readonly src: string; readonly fadeFrom: string | null; readonly late: number };
+  /** guidance R5: the room's 今日 card, over the OS area's top-left under the top bar (absent: none). */
+  readonly checklist?: SafeHtml | null;
 }
 
 // ——— coach marks (onboarding-steps R1) ————————————————————————————————————————————————
@@ -122,17 +124,31 @@ export function coachSteps(decoys: readonly DockEntry[]): CoachStep[] {
  * centred, 12 px off the bottom, 1 px border, 12 px side padding, 14 px bottom padding; 48 px tiles
  * 8 px apart; the separator 1 px wide with 2 px margins). Tests check these against the CSS.
  */
-export const DOCK_GEOM = { monitorW: 1440, monitorH: 900, tile: 48, gap: 8, padX: 12, padBottom: 14, border: 1, bottom: 12, sep: 5 } as const;
+export const DOCK_GEOM = { monitorW: 1440, monitorH: 900, tile: 48, gap: 8, padX: 12, padBottom: 14, border: 1, bottom: 0, sep: 5 } as const;
+/**
+ * guidance R15: the screen is the whole frame. The OS bar is 28 px; the dock sits on the bottom
+ * edge and is this tall (border + padding + tile); a window fills everything between them, edge to
+ * edge (0 px at the left, right and top).
+ */
+export const TOP_BAR_H = 28;
+export const DOCK_H = 2 * DOCK_GEOM.border + 8 + DOCK_GEOM.padBottom + DOCK_GEOM.tile;
+export const WINDOW_RECT = { left: 0, top: TOP_BAR_H, width: DOCK_GEOM.monitorW, height: DOCK_GEOM.monitorH - TOP_BAR_H - DOCK_H } as const;
+const WINDOW_STYLE = `left:${WINDOW_RECT.left}px;top:${WINDOW_RECT.top}px;width:${WINDOW_RECT.width}px;height:${WINDOW_RECT.height}px`;
 /** The coach card's sizes (spec): 300 px wide, 14 px above the icon, a 10 px arrow; kept this far inside the monitor. */
 export const COACH = { cardW: 300, above: 14, arrow: 10, margin: 12 } as const;
 
 /** Where a dock tile is on the monitor: its centre x and its top y (stage px of the monitor). */
 export function tileAt(target: CoachTarget, decoys: readonly DockEntry[]): { readonly cx: number; readonly top: number } | null {
   const g = DOCK_GEOM;
+  // guidance R15: 回房间 at the left end, 设置 at the right end, each behind a separator (as dock() draws).
   const items: ({ kind: "tile"; id: string } | { kind: "sep" })[] = [
+    { kind: "tile" as const, id: "nav:room" },
+    { kind: "sep" as const },
     ...APPS.map((id) => ({ kind: "tile" as const, id })),
     ...(decoys.length ? [{ kind: "sep" as const }] : []),
     ...decoys.map((d) => ({ kind: "tile" as const, id: `decoy:${d.id}` })),
+    { kind: "sep" as const },
+    { kind: "tile" as const, id: "nav:settings" },
   ];
   const width = (it: (typeof items)[number]) => (it.kind === "sep" ? g.sep : g.tile);
   const inner = items.reduce((s, it) => s + width(it), 0) + g.gap * (items.length - 1);
@@ -204,7 +220,8 @@ function trafficLights(monitor: MonitorModel): SafeHtml {
     html`<button type="button" role="menuitem" data-action="win-move" data-app="${monitor.app}" data-side="${side}"${side === monitor.side ? html` disabled` : null}>${tr(side === "left" ? "win.moveLeft" : "win.moveRight")}</button>`;
   // playtest-1105 R1: on 工作台 a click on the green light is full screen (and back), the macOS way.
   const green = monitor.app === "workbench" ? html`<i data-action="win-full" data-app="workbench"></i>` : html`<i></i>`;
-  return html`<div class="dots"><i></i><i></i><span class="tl-g">${green}<span class="win-menu" role="menu">${item("left")}${item("right")}</span></span></div>`;
+  // guidance R3: red closes the window, yellow minimises it (the same for now: both do something).
+  return html`<div class="dots"><i class="tl-r" data-action="win-close" data-app="${monitor.app}"></i><i class="tl-y" data-action="win-min" data-app="${monitor.app}"></i><span class="tl-g">${green}<span class="win-menu" role="menu">${item("left")}${item("right")}</span></span></div>`;
 }
 
 /** 关机, next to the clock in the system's own bar (day-loop correction 2026-11-01). */
@@ -223,7 +240,7 @@ function windowFrame(m: ShellModel, monitor: MonitorModel): SafeHtml | null {
   const frame = (inner: SafeHtml) =>
     full
       ? html`<div class="${cls("win", monitor.winClass, "full")}" data-win="${monitor.app}"><div class="bar app-top" data-drag-win="${monitor.app}" data-side="${monitor.side}">${trafficLights(monitor)}${inner}</div>`
-      : html`<div class="${cls("win", monitor.winClass)}" data-win="${monitor.app}" style="left:24px;top:54px;width:1392px;height:760px"><div class="${cls("bar", monitor.appTop && "app-top")}" data-drag-win="${monitor.app}" data-side="${monitor.side}">${trafficLights(monitor)}${inner}</div>`;
+      : html`<div class="${cls("win", monitor.winClass)}" data-win="${monitor.app}" style="${WINDOW_STYLE}"><div class="${cls("bar", monitor.appTop && "app-top")}" data-drag-win="${monitor.app}" data-side="${monitor.side}">${trafficLights(monitor)}${inner}</div>`;
   if (m.night) {
     // Night: the desktop stays, but every app has closed its door.
     return html`${frame(html`<span class="title">${monitor.winTitle}</span>`)}<div class="plate"><div class="lock"></div>${tr("night.plate.title")}<small>${tr(monitor.nightSubKey)}</small></div></div>`;
@@ -265,7 +282,14 @@ function dock(m: ShellModel, hides = false): SafeHtml {
     (d) =>
       html`<button type="button" class="${cls("app", "decoy")}" data-action="decoy" data-decoy="${d.id}"${d.gone ? html` data-gone="1"` : null} title="${d.name}" aria-label="${d.name}">${dockTile(d.icon)}${dockName(d.name)}</button>`,
   );
-  return html`<div class="${cls("dock", hides && "auto", hides && m.dock.peek && "peek")}">${apps}${decoys.length ? html`<span class="sep" role="separator"></span>` : null}${extra}</div>`;
+  // guidance R15: 回房间 at the left end and 设置 at the right end are dock tiles (no floating buttons).
+  // The tiles are icons (the glyph is CSS, no text); their separators are the decoys' line, unnamed.
+  const navSep = html`<span class="sep nav-sep" aria-hidden="true"></span>`;
+  const back = t("desktop.back");
+  const room = html`<button type="button" class="app nav room-tile" data-action="view" data-view="room" title="${back}" aria-label="${back}"><span class="glyph" aria-hidden="true"></span>${dockName(back)}</button>`;
+  const set = t("settings.button");
+  const settings = html`<button type="button" class="app nav settings-tile" data-action="settings-open" aria-haspopup="dialog" title="${set}" aria-label="${set}"><span class="glyph" aria-hidden="true"></span>${dockName(set)}</button>`;
+  return html`<div class="${cls("dock", hides && "auto", hides && m.dock.peek && "peek")}">${room}${navSep}${apps}${decoys.length ? html`<span class="sep" role="separator"></span>` : null}${extra}${navSep}${settings}</div>`;
 }
 
 /** A decoy's small system window: the real apps' chrome, one centred grey line, a close control. */
@@ -278,7 +302,7 @@ function decoyWindow(m: ShellModel): SafeHtml | null {
 function monitor(m: ShellModel, mon: MonitorModel): SafeHtml {
   // Not on yet: a black screen and nothing else.
   if (m.off) return html`<div class="monitor off" data-side="${mon.side}" data-ring="${m.ring}" data-app="${mon.app}"><div class="os"></div></div>`;
-  return html`<div class="${cls("monitor", m.night && "night")}" data-side="${mon.side}" data-ring="${m.ring}" data-app="${mon.app}"><div class="os">${wallpaper(m)}${topBar(m, mon)}${windowFrame(m, mon)}${mon.side === "left" ? decoyWindow(m) : null}${mon.side === "left" ? dock(m, dockHides(mon)) : null}${mon.overlay}${mon.side === "left" ? coachMark(m) : null}</div></div>`;
+  return html`<div class="${cls("monitor", m.night && "night")}" data-side="${mon.side}" data-ring="${m.ring}" data-app="${mon.app}"><div class="os">${wallpaper(m)}${topBar(m, mon)}${windowFrame(m, mon)}${mon.side === "left" ? decoyWindow(m) : null}${dock(m, dockHides(mon))}${m.checklist ? html`<div class="os-list">${m.checklist}</div>` : null}${mon.overlay}${mon.side === "left" ? coachMark(m) : null}</div></div>`;
 }
 
 /** The other monitor, as a thin tab on its side: the apps on it (front first) and their badges. */

@@ -252,6 +252,18 @@ export interface Session {
   recordTrip: boolean;
   /** blind-box addition 2026-11-07: when the case was last opened (the loose box's one wobble), or null. */
   caseOpenedAt: number | null;
+  /** guidance R7: the task start narrations already played when their page opened (`taskStartKey`). */
+  taskStartSaid: Set<string>;
+  /** guidance R4: Kuro is happy until then (a task sent, 漂亮 / 谢谢 in chat, a box picked); 0 = not. */
+  happyUntil: number;
+  /** guidance R6: 工作台 has opened once this run (its first open shows the sidebar). */
+  wbOpenedOnce: boolean;
+  /** guidance R9: threads whose 「能说的就这四句。」 hint has been shown (left once seen). */
+  replyHintSeen: Set<string>;
+  /** guidance R14: the app in front (and its monitor) before Vivi's page was opened, to return to. */
+  docReturn: { readonly app: AppId | null; readonly side: "left" | "right" } | null;
+  /** guidance R6: the past task (content/tasks/past.json) whose thread is open on 工作台's home, or null. */
+  wbPast: string | null;
   /** object-tutor R4: where a failing key press was last answered with the cannot-use line (cleared on entering 使用). */
   worksAnswered: string | null;
   /** playtest-1105 R4: the line each thing in the room said last (so it is not said twice in a row). */
@@ -490,6 +502,12 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     riseBeatDay: 0,
     recordTrip: false,
     caseOpenedAt: null,
+    taskStartSaid: new Set(),
+    happyUntil: 0,
+    wbOpenedOnce: false,
+    replyHintSeen: new Set(),
+    docReturn: null,
+    wbPast: null,
     worksAnswered: null,
     looks: {},
     splatReady: false,

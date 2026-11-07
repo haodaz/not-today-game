@@ -4,7 +4,8 @@
 import { html, type SafeHtml } from "@world/html";
 import { MOTION } from "@world/motion/timing";
 
-export const BODY_STATES = ["idle", "busy", "think", "happy", "rest", "crawl"] as const;
+// guidance R4: `talk` while one of its lines is in the box (k3d_base / k3d_blink, 220 ms each).
+export const BODY_STATES = ["idle", "busy", "think", "happy", "rest", "crawl", "talk"] as const;
 /**
  * The maw (late-days FR3): three single frames, each its own look, cut (never crossfaded):
  * `maw` one ring of teeth (the flash when it closes a page), `maw2` rings into the throat (a late
@@ -22,6 +23,7 @@ export const FRAMES: Readonly<Record<(typeof BODY_STATES)[number], readonly [str
   happy: ["k3d_happy", "k3d_happy2"],
   rest: ["k3d_rest", "k3d_rest2"],
   crawl: ["k3d_crawl1", "k3d_crawl2"],
+  talk: ["k3d_base", "k3d_blink"],
 };
 
 /** The maw's one frame per look (public/kuro/k3d_maw*.png). */
@@ -43,9 +45,15 @@ export interface BodyInputs {
   readonly saidPretty: boolean;
   readonly moving: boolean;
   readonly waiting: boolean;
+  /** guidance R4: one of its lines is in the box now. */
+  readonly talking?: boolean;
 }
 
-/** maw > rest (night) > busy (a task runs) > happy (the player said 漂亮) > crawl (moving) > think (waiting) > idle. */
+/**
+ * maw > rest (night, or lying by day) > busy (a task runs) > happy (a task sent, 漂亮 / 谢谢, a box
+ * picked) > crawl (the camera or a window moves) > think (a guide, Vivi's lock, the chat waiting for
+ * the player) > talk (its line in the box) > idle.
+ */
 export function bodyState(i: BodyInputs): BodyState {
   if (i.maw) return i.maw;
   if (i.night) return "rest";
@@ -53,6 +61,7 @@ export function bodyState(i: BodyInputs): BodyState {
   if (i.saidPretty) return "happy";
   if (i.moving) return "crawl";
   if (i.waiting) return "think";
+  if (i.talking) return "talk";
   return "idle";
 }
 

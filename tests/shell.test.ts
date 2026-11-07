@@ -415,7 +415,8 @@ describe("R10 · one top bar", () => {
     const h = onPage(store);
     // playtest-1105 R1: a normal window by default.
     const plain = winOf(desk(h, store));
-    expect(plain).toMatch(/^<div class="win wb" data-win="workbench" style="left:24px;top:54px;width:1392px;height:760px"><div class="bar app-top" data-drag-win/);
+    // guidance R15: the window fills the OS area under the 28 px top bar down to the dock.
+    expect(plain).toMatch(/^<div class="win wb" data-win="workbench" style="left:0px;top:28px;width:1440px;height:800px"><div class="bar app-top" data-drag-win/);
     h.session.wbFull = true;
     const win = winOf(desk(h, store));
     expect(win).toMatch(/^<div class="win wb full" data-win="workbench"[^>]*>/);
@@ -562,10 +563,11 @@ describe("R11.1 · a task without a board: the thread is the conversation, the s
   const pane = (out: string) => /<section class="sh-card sh-work"[^>]*>(.*)<\/section>/s.exec(out)?.[1] ?? "";
   const t1 = () => taskFiles.get(1)!.find((x) => x.id === "task1")!;
 
-  it("before the sentence is sent: the composer holds the input and ↑; the surface pane is open", () => {
+  it("before the sentence is sent: the composer holds the sentence as one chip (guidance R7: no text box); the surface pane is open", () => {
     const out = onTask1().out();
     expect(out).toContain('<div class="sh-conv"><div class="sh-thread"></div><div class="sh-composer">');
-    expect(composer(out)).toMatch(/^<div class="ask sh-ask"><input class="ph" data-input="wb-draft"[^>]*value="[^"]+".*data-action="wb-send">/s);
+    expect(composer(out)).toMatch(/^<div class="wchips"><button type="button" class="sh-chip primary" data-action="wb-send" data-task="[^"]+">[^<]+<\/button>/s);
+    expect(composer(out)).not.toContain('class="ph"');
     expect(pane(out)).toMatch(/<div class="sh-work"><div class="surface (doc|ledger|mark)/);
   });
 

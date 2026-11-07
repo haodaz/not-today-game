@@ -46,6 +46,16 @@ export const isEvening = (clock: Pick<BeatClock, "beat">): boolean => clock.beat
 
 export const beatLabelKey = (beat: Beat): string => `shell.beat.${beat}`;
 
+/**
+ * guidance R6: the greeting follows the clock: before 12:00 早上好, before 18:00 下午好, then 晚上好
+ * (12:04 is 下午好). `time` is the beat clock's HH:MM.
+ */
+export function greetingKeyAt(time: string): string {
+  if (time < "12:00") return "wb.hello.morning";
+  if (time < "18:00") return "wb.hello.afternoon";
+  return "wb.hello.evening";
+}
+
 /** The workbench greeting for the time of day. */
 export function greetingKey(beat: Beat): string {
   if (beat === "boot" || beat === "work") return "wb.hello.morning";

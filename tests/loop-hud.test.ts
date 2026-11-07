@@ -124,7 +124,9 @@ describe("room HUD (FR6)", () => {
     loopActions.view!(ctx, { view: "desktop" } as DOMStringMap, null as never);
     const desk = renderGame(store, ctx.session, 0).value;
     expect(desk.match(/class="monitor/g)).toHaveLength(1);
-    expect(desk).toContain('class="back-room"');
+    // guidance R15: 回房间 is the dock's left tile now (no floating button).
+    expect(desk).not.toContain('class="back-room"');
+    expect(desk).toContain('class="app nav room-tile" data-action="view" data-view="room"');
     expect(store.getEvents().at(-1)).toMatchObject({ kind: "step", name: "openApp:workbench" });
     loopActions.screen!(ctx, { screen: "right" } as DOMStringMap, null as never);
     expect(store.getEvents().at(-1)).toMatchObject({ kind: "step", name: "openApp:msgs" });

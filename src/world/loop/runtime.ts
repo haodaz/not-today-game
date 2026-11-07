@@ -115,6 +115,9 @@ export function tutorQueued(day: number, object: string): Queued | null {
   return { key: `d${day}:tutor:${object}`, lines, ending: { kind: "none" } };
 }
 
+/** guidance R7: the key a task's start narration is queued and remembered under (when its page opens). */
+export const taskStartKey = (day: number, taskId: string): string => `d${day}:task:${taskId}:start`;
+
 /** box-arrival R5: 「我把箱子放在了床边。」 as the player's own line (`who: "me"`); null without the string. */
 export function placedQueued(day: number): Queued | null {
   if (!hasString("box.placed")) return null;
@@ -146,7 +149,7 @@ export interface LoopEffects {
  * Pure part: what the new events and the item changes mean for the dialogue, the clock and sounds.
  * Exported for tests.
  */
-export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEvent[], fx: LoopEffects, runId = "run-1"): LoopEffects {
+export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEvent[], fx: LoopEffects, runId = "run-1", startSaid: ReadonlySet<string> = new Set()): LoopEffects {
   let { dialogue, clock } = fx;
   let shutdown = false;
   const sounds = [...fx.sounds];
@@ -177,6 +180,8 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
         const view = mealView(day, meal, lc.state, events, e.t && e.t > clock.time ? e.t : clock.time);
         const lines = view && view.phase === "delivered" ? doorLines(view, "delivered", lc.state.names) : [];
         if (lines.length) dialogue = push(dialogue, { key: `d${day}:door:${meal}:delivered`, lines, ending: { kind: "none" } });
+        // guidance R14: the tail that carries the move: 外卖到了。去门口。, then the camera goes to 门.
+        if (lines.length && hasString("delivery.leave")) dialogue = push(dialogue, { key: `d${day}:door:${meal}:leave`, lines: [{ k: "inner", t: t("delivery.leave") }], ending: { kind: "toDoor" } });
       } else if (e.name === "beat:shutdown") {
         shutdown = true;
         clock = at(clock, "night", BEAT_TIMES.night);
@@ -196,7 +201,11 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
       const tree = taskByFlag(day, e.flag);
       if (tree) {
         const path = tree[e.mode];
-        dialogue = push(dialogue, { key: `d${day}:task:${tree.id}`, lines: [...tree.start.say, ...path.say], ending: { kind: "none" } });
+        // guidance R7: the task's start narration played when its page opened; then only the path.
+        const start = startSaid.has(taskStartKey(day, tree.id)) ? [] : tree.start.say;
+        // guidance R14: its closing lines read, 工作台 goes home with the next task lit.
+        const lines = [...start, ...path.say];
+        if (lines.length) dialogue = push(dialogue, { key: `d${day}:task:${tree.id}`, lines, ending: { kind: "taskHome" } });
       }
     } else if (e.kind === "openLayer") {
       // box-arrival R4: on the arrival day the box beat has played at the pickup.
@@ -312,7 +321,7 @@ export function syncLoop(ctx: ActionContext, nowMs: number = Date.now()): void {
   }
 
   const memo = session.loop;
-  const fx = react(memo, lc, events, { dialogue: session.dialogue, clock: session.clock, sounds: [] }, store.getRunId());
+  const fx = react(memo, lc, events, { dialogue: session.dialogue, clock: session.clock, sounds: [] }, store.getRunId(), session.taskStartSaid);
   // New orders start their wait.
   for (const e of events.slice(memo.seen)) {
     if (e.kind === "order" && e.day === state.day && !memo.orders.has(e.meal)) {

@@ -6,7 +6,6 @@ import { deliveryTable, type Meal } from "@state/delivery/table";
 import type { Store } from "@state/store";
 import { desktopApps } from "@world/desktop/apps";
 import { advanceTo, isNight } from "@world/desktop/beat";
-import { hudKuro } from "@world/desktop/kuro/mini";
 import { boxReadsOn, dialogueBox, lineScreens } from "@world/dialogue/box";
 import { logCurrent, logPlayer } from "@world/dialogue/history";
 import { settleSession } from "@world/dialogue/place";
@@ -19,16 +18,17 @@ import { nextScreen } from "@world/dialogue/layout";
 import { hasStepToday, stepOnce } from "@world/loop/steps";
 import { fillPlaceholders } from "@world/replies/placeholders";
 import { shellActions, type ActionContext, type ActionHandler } from "@world/desktop/controller";
-import { appOn, buildShell, VIEWS, type Session, type View } from "@world/desktop/model";
-import { bringToFront } from "@world/desktop/placement";
+import { appOn, buildShell, taskPageId, VIEWS, type Session, type View } from "@world/desktop/model";
+import { bringToFront, closeApp } from "@world/desktop/placement";
 import { renderDesktop, shownStill, type AppId } from "@world/desktop/shell";
 import { placeOrder } from "@world/delivery/commands";
 import { phonePage } from "@world/delivery/app";
 import { nextInputs, startDoor, stepDoor, type DoorInput } from "@world/delivery/door";
 import { doorLines } from "@world/delivery/view";
 import { mealView } from "@world/delivery/meals";
-import { cls, html, type SafeHtml } from "@world/html";
+import { cls, html, raw, type SafeHtml } from "@world/html";
 import { hasString, persistLocale, setLocale, t, tr } from "@world/i18n";
+import { guideNow, withRing } from "@world/loop/guide";
 import { recordedOn } from "@state/sleeptalk";
 import type { State } from "@state/types.gen";
 import type { GameEvent } from "@state/events";
@@ -46,7 +46,7 @@ import { CAMERA_KEYS, DICT_KEYS, FLIPPERS, SHEET_GONE_MS, SHEET_SLIDE_MS, TAPE_K
 import { CAMERA_FLASH_MS, cameraShot, type CameraState } from "@world/objects/plain";
 import { DEVELOP_BLANK_MS, DEVELOP_MS, ON_THE_SPOT_DAY, photoKey, roomFacingOf, roomPhotoOn, sheetsLeft } from "@state/photos";
 import { screenPlaceOf } from "@world/desktop/files/album";
-import { booted, deskMeal, itemStates, loopContext, mealToOrder, nightfallReached, openItemFor, openTask } from "@world/loop/checklist";
+import { booted, checklist, deskMeal, itemStates, loopContext, mealToOrder, nightfallReached, openItemFor, openTask } from "@world/loop/checklist";
 import type { EventToken } from "@state/days/table";
 import { messageActions } from "@world/desktop/messages/actions";
 import { CROSSFADE_MS, MOTION, viewMoveMs } from "@world/motion/timing";
@@ -57,12 +57,12 @@ import { isFacing, turnedTo, turnsBetween, type Facing, type TurnDir } from "./f
 /** Whose conversation the loan is answered in (day-loop correction 2026-11-01): 老周. */
 export const LOAN_CONVERSATION = "laozhou";
 import { advance, dropQuestion, endsInChoice, finishChoice, push, showing, talking, type DialogueState } from "@world/loop/dialogue";
-import { beatQueued, lieDownOrEnd, openChatIfDue, questionQueued } from "@world/loop/runtime";
+import { beatQueued, lieDownOrEnd, openChatIfDue, questionQueued, taskStartKey } from "@world/loop/runtime";
 import { askedOn, knows } from "@state/recognise";
 import { gateAdvance } from "@world/motion/reveal";
 import { endingNext } from "@world/endings/flow";
 import { renderEnding } from "@world/endings/view";
-import { boxObjectFor, CASE_WOBBLE_MS, doorMeal, itemsButton, itemsPanel, openBoxBefore, openBoxReady, raidShowing, renderRoom, settingsButton, settingsPanel, SLIP_ITEM, walkmanShown } from "./hud";
+import { boxObjectFor, CASE_WOBBLE_MS, doorMeal, itemsButton, itemsPanel, openBoxBefore, openBoxReady, raidShowing, renderChecklist, renderRoom, settingsPanel, SLIP_ITEM, walkmanShown } from "./hud";
 import { looseContent, stuckLineKey } from "./case";
 import { jitter } from "@state/seed";
 import { deliverableForHand } from "@state/days/board";
@@ -79,20 +79,21 @@ import { taskShellActions } from "@world/desktop/workbench/shell";
 import { boardActions, lockFaceMove } from "@world/desktop/workbench/board";
 import { enterUse, facingOf, lampLit, placeOf, recWorksHere, REC_WORKS, worksHere } from "@world/objects/works";
 import { canSkipPrologue, endPrologue, prologueDone, prologueOn, prologueShowing, renderPrologue } from "@world/opening";
-import { workActions } from "@world/desktop/workbench/work";
+import { openWork, workActions } from "@world/desktop/workbench/work";
 import { renderFiles } from "@world/desktop/files/view";
 import { openObjectFromBar, renderObjectBarUse } from "@world/desktop/workbench/objbar";
 import { filesActions, openFilesApp } from "@world/desktop/files/actions";
 import { callActions, resumeCall } from "@world/desktop/call/actions";
 import { deliverablePage } from "@state/files";
-import { viviLock, lockedConversation } from "@world/desktop/vivi";
+import { viviLock, viviLockHeld, lockedConversation } from "@world/desktop/vivi";
 import { appOfThread } from "@world/desktop/messages/threads";
 import { cancelCloser, startCloser } from "@world/late/closer";
 import { startJudgement } from "@world/dialogue/judge";
 import { sendEmailLink } from "@net/email";
 
 export function renderGame(store: Store, session: Session, nowMs: number): SafeHtml {
-  const body = renderGameBody(store, session, nowMs);
+  // guidance R1: the guided moment's target carries the ring (data-guide), one at a time.
+  const body = raw(withRing(renderGameBody(store, session, nowMs).value, guideNow(store.getState(), store.getEvents(), session)));
   // first-use-hints: the hint that shows now (its anchor on this page), over everything.
   const hint = session.hintsOn ? hintLayer(store.getState(), session, body.value) : null;
   return hint ? html`${body}${hint}` : body;
@@ -118,7 +119,18 @@ function renderGameBody(store: Store, session: Session, nowMs: number): SafeHtml
     const filesWin = renderFiles({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs }, live);
     // 老物件栏 (object-bar R2): an object opened from the bar is used in a modal over the desktop.
     const objUse = renderObjectBarUse({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs });
-    return html`${renderDesktop(shell)}<button type="button" class="back-room" data-action="view" data-view="room">${tr("desktop.back")}</button>${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${objUse ? html`<div class="objbar-host">${objUse}</div>` : null}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${dlgLayer(dlg, session, boxReadsOn(state, events, session))}<div class="hud-host">${settingsButton()}${itemsButton(session, state)}${itemsPanel(state, events, session)}<div class="hud-br">${hudKuro({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs })}</div>${settingsPanel(session)}</div>`;
+    // lock-by-device addition 2026-11-07: with the device modal open, the box's mask goes inside the
+    // modal, between its dim and its window: a click elsewhere still reads on, while the device's keys
+    // and its read footer (offered while a recording's line is in the box) stay above it. The box
+    // itself stays above everything (its layer comes later).
+    const readsOn = boxReadsOn(state, events, session);
+    const maskInModal = objUse !== null && dlg !== null;
+    const host = objUse ? html`<div class="${cls("objbar-host", maskInModal && "over-box")}">${objUse}${maskInModal ? boxMask(session, readsOn) : null}</div>` : null;
+    // guidance R15: no floating 回房间 or ⚙ (they are dock tiles now); R4: no stage Kuro body on the
+    // screen (the pet in the monitor is the one); R5: the 今日 card over the OS area's top-left.
+    const lc = loopContext(state, events);
+    const list = lc ? renderChecklist(checklist(lc)) : null;
+    return html`${renderDesktop({ ...shell, checklist: list })}${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${host}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${dlgLayer(dlg, session, readsOn, !maskInModal)}<div class="hud-host">${itemsButton(session, state)}${itemsPanel(state, events, session)}${settingsPanel(session)}</div>`;
   }
   // The box does not jump (dialogue correction 2026-11-02): in every view it is anchored to the
   // viewport in the same fixed layer, not to the stage (whose size differs between views). The
@@ -135,11 +147,16 @@ function renderGameBody(store: Store, session: Session, nowMs: number): SafeHtml
  * choice or the player's box it waits for the box's own controls. A story's mask also dims the
  * stage 40 % (dialogue addition 2026-11-02); a one-line fragment's mask is clear.
  */
-function dlgLayer(dlg: SafeHtml | null, session: Session, readsOn: boolean): SafeHtml | null {
+function dlgLayer(dlg: SafeHtml | null, session: Session, readsOn: boolean, withMask = true): SafeHtml | null {
   if (!dlg) return null;
   const story = storyMasked(session.dialogue);
-  const mask = html`<div class="${cls("story-mask", !story && "clear", !readsOn && "waits")}"${readsOn ? html` data-action="loop-advance"` : null} aria-hidden="true"></div>`;
-  return html`<div class="${cls("dlg-layer", story && "masked")}">${mask}${dlg}</div>`;
+  return html`<div class="${cls("dlg-layer", story && "masked")}">${withMask ? boxMask(session, readsOn) : null}${dlg}</div>`;
+}
+
+/** The box's mask (playtest-1105 R2): takes every click under the box; reads on while a line is up. */
+function boxMask(session: Session, readsOn: boolean): SafeHtml {
+  const story = storyMasked(session.dialogue);
+  return html`<div class="${cls("story-mask", !story && "clear", !readsOn && "waits")}"${readsOn ? html` data-action="loop-advance"` : null} aria-hidden="true"></div>`;
 }
 
 /** The app in front on the monitor being shown (null: an empty display). */
@@ -182,7 +199,8 @@ function viviRefuse(ctx: ActionContext, toConv?: string | null): boolean {
   const conv = lockedConversation(state, store.getEvents(), session.clock.time);
   // The lock's conversation itself is always reachable: that is where the 「打开」 bubble lives.
   if (toConv !== undefined && toConv !== null && conv !== null && toConv === conv) return false;
-  const locked = viviLock(state, store.getEvents(), session.clock.time);
+  // guidance R2 (G5): the lock holds only once the boss's thread was opened today.
+  const locked = viviLockHeld(state, store.getEvents(), session.clock.time);
   if (!locked) return false;
   const day = state.day;
   session.dialogue = push(session.dialogue, { key: `d${day}:vivi:lock`, lines: [{ k: "narration", t: t("vivi.lock") }], ending: { kind: "none" } });
@@ -223,6 +241,11 @@ function nightFallen(ctx: ActionContext): boolean {
  */
 function lookAt(ctx: ActionContext, app: AppId | null): void {
   if (app === null || !booted(ctx.store.getState(), ctx.store.getEvents())) return;
+  // guidance R6: the first time 工作台 is on screen in the run, its sidebar is open (it shows the past).
+  if (app === "workbench" && !ctx.session.wbOpenedOnce) {
+    ctx.session.wbOpenedOnce = true;
+    ctx.session.wbSidebar = true;
+  }
   if (app === "tingtalk") stepOnce(ctx, "openApp:msgs");
   else if (app === "workbench" || app === "browser") stepOnce(ctx, `openApp:${app}`);
   if (app === "msgs" || app === "tingtalk") armMessageFace(ctx, app);
@@ -585,6 +608,8 @@ function arrive(ctx: ActionContext, view: View, data: DOMStringMap): void {
   const from = ctx.session.view;
   ctx.session.view = view;
   if (from !== view && view !== "desktop") startCam(ctx, from, view);
+  // guidance R4: Kuro crawls while the camera moves to or from the screen.
+  if (from !== view && (from === "desktop" || view === "desktop")) ctx.session.movingUntil = (ctx.now?.() ?? Date.now()) + MOTION.crawl;
   // A walk is two steps, whichever way; a turn between facings is a head turn and makes no sound
   // (room-turn correction 2026-11-04).
   // Lying down on the bed or sitting up (lying-view R2) is no walk either.
@@ -647,6 +672,11 @@ export const loopActions: Record<string, ActionHandler> = {
   turn(ctx, data) {
     const dir = data.dir as TurnDir;
     const { session } = ctx;
+    // guidance R13: the case closes with the view (a turn is a view change, not blocked by it).
+    if (session.caseOpen && (dir === "left" || dir === "right")) {
+      session.caseOpen = false;
+      session.caseShake = null;
+    }
     if ((dir !== "left" && dir !== "right") || !isFacing(session.view) || overlayOpen(session) || session.objbarOpen) return;
     if (turning(ctx)) {
       session.turnNext ??= dir;
@@ -717,6 +747,14 @@ export const loopActions: Record<string, ActionHandler> = {
     // The browser's window comes to the front (on its monitor, which is shown), opens the page, and
     // logs the open once a day (a board card can come from a page posted days ago: day 3's trap is
     // Vivi's day-2 page).
+    // guidance R14: Vivi's locked page has a tail: once read, the page closes and the app that was in
+    // front before the card was clicked comes back (the player is never left on the news page).
+    const state0 = ctx.store.getState();
+    const vivi = viviLock(state0, ctx.store.getEvents(), ctx.session.clock.time) === doc && ctx.session.view === "desktop";
+    if (vivi && hasString("vivi.back")) {
+      ctx.session.docReturn = { app: appOn(ctx.session), side: ctx.session.focus };
+      ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${state0.day}:vivi:back`, lines: [{ k: "inner", t: t("vivi.back") }], ending: { kind: "docBack" } });
+    }
     ctx.session.focus = bringToFront(ctx.session, "browser");
     ctx.session.browserDoc = page;
     const day = ctx.store.getState().day;
@@ -726,15 +764,33 @@ export const loopActions: Record<string, ActionHandler> = {
     settleSession(ctx.session);
     ctx.rerender();
   },
+  // guidance R3: the doc page's own × is gone; the browser bar's ‹ returns to the news page (this
+  // action, kept under its name), and red closes the browser.
   "br-doc-close"(ctx) {
     ctx.session.browserDoc = null;
     ctx.rerender();
+  },
+  "br-back"(ctx) {
+    ctx.session.browserDoc = null;
+    ctx.rerender();
+  },
+  // guidance R3: red / yellow on a window; closing it is not a switch (never refused by Vivi's lock).
+  "win-close"(ctx, data, el) {
+    shellActions["win-close"]!(ctx, data, el);
+    lookAt(ctx, shownApp(ctx.session));
+    lookedAway(ctx);
+    if (settleSession(ctx.session)) ctx.rerender();
+  },
+  "win-min"(ctx, data, el) {
+    loopActions["win-close"]!(ctx, data, el);
   },
   // 工作台's 文档: the document of the open work task; Kuro may close it.
   "wb-nav"(ctx, data, el) {
     if (viviRefuse(ctx)) return;
     workbenchActions["wb-nav"]!(ctx, data, el);
     cancelCloser(ctx.session);
+    // guidance R7: a task's start narration plays when its page opens with its surface (once).
+    startNarration(ctx);
     // Another page is another place (`screen:workbench:<page>`).
     if (settleSession(ctx.session)) ctx.rerender();
     if (ctx.session.workbenchPage !== "docs") return;
@@ -771,6 +827,8 @@ export const loopActions: Record<string, ActionHandler> = {
   "loop-eat"(ctx, data) {
     // At 窗, or at its table up close (playtest-1105 R5).
     if (ctx.session.view !== "window" && ctx.session.view !== "table") return;
+    // guidance R13: eating is not done over the case.
+    ctx.session.caseOpen = false;
     const lc = loopContext(ctx.store.getState(), ctx.store.getEvents());
     const at = lc ? deskMeal(lc) : null;
     if (!at || at.eaten || at.meal !== data.meal) return;
@@ -780,6 +838,8 @@ export const loopActions: Record<string, ActionHandler> = {
   // playtest-1105 R5: the table itself is a close view, like 桌子: a click leans in to the tabletop
   // (the meal large there, eaten with a click on it); Esc or the bottom strip goes back to 窗.
   "meal-table"(ctx) {
+    // guidance R13: going to the table closes the case (it is a view change).
+    if (ctx.session.view === "window" && ctx.session.caseOpen) ctx.session.caseOpen = false;
     if (ctx.session.view !== "window" || overlayOpen(ctx.session)) return;
     loopActions["view"]!(ctx, { view: "table" } as DOMStringMap, null as never);
   },
@@ -1004,6 +1064,20 @@ export const loopActions: Record<string, ActionHandler> = {
     // box-arrival R5: 「我把箱子放在了床边。」 read: the head turns to 房间, the way a turn does.
     else if (ended?.kind === "boxPlaced") {
       if (session.view !== "room") loopActions["view"]!(ctx, { view: "room" } as DOMStringMap, null as never);
+    }
+    // guidance R14: the doorbell's tail: the camera leaves the screen by itself, to 门.
+    else if (ended?.kind === "toDoor") {
+      if (session.view !== "door") loopActions["view"]!(ctx, { view: "door" } as DOMStringMap, null as never);
+    }
+    // guidance R14: Vivi's page read: it closes and the app before it is in front again.
+    else if (ended?.kind === "docBack") docBack(ctx);
+    // guidance R14: a sent task's lines read: 工作台 is home again, the next task's row lit (guide).
+    else if (ended?.kind === "taskHome") {
+      if (session.view === "desktop" && taskPageId(session.workbenchPage) !== null) {
+        session.workbenchPage = "home";
+        session.wbTaskDay = null;
+      }
+      openChatIfDue(ctx);
     }
     // The box may have just emptied after shutdown: the evening chat opens itself.
     else openChatIfDue(ctx);
@@ -1675,6 +1749,57 @@ function askSleepAfterChat(ctx: ActionContext, wasTalking: boolean, day: number)
 }
 
 /**
+ * guidance R7: the open task's page is on screen: its `start.say` plays now (once a day), not after
+ * 已交; the task event then plays only the chosen path's lines (runtime react).
+ */
+function startNarration(ctx: ActionContext): void {
+  const { store, session } = ctx;
+  const state = store.getState();
+  const id = taskPageId(session.workbenchPage);
+  const open = openWork(state, store.getEvents());
+  if (!id || session.wbTaskDay !== null || open?.tree?.id !== id) return;
+  const key = taskStartKey(state.day, id);
+  const say = open.tree.start.say;
+  if (session.taskStartSaid.has(key) || say.length === 0) return;
+  session.taskStartSaid.add(key);
+  session.dialogue = push(session.dialogue, { key, lines: say, ending: { kind: "none" } });
+}
+
+/** guidance R4: how long Kuro stays happy after a good moment. */
+export const HAPPY_MS = 4000;
+
+/**
+ * guidance R4: a good moment in what an action appended: a task sent (已交), a box picked from the
+ * case (its object out), a chat turn whose player line says 漂亮 or 谢谢. Kuro is happy for 4 s.
+ */
+function noteHappy(ctx: ActionContext, before: number): void {
+  const fresh = ctx.store.getEvents().slice(before);
+  if (fresh.length === 0) return;
+  const good = fresh.some((e) => e.kind === "task" || e.kind === "openLayer" || (e.kind === "chat" && typeof e.text === "string" && /漂亮|谢谢|beautiful|thank/i.test(e.text)));
+  if (!good) return;
+  const now = ctx.now?.() ?? Date.now();
+  ctx.session.happyUntil = now + HAPPY_MS;
+  ctx.later(HAPPY_MS + 20, ctx.rerender);
+}
+
+/**
+ * guidance R14: vivi.back read: Vivi's page closes by itself (the browser leaves the front) and the
+ * app that was in front before the card was clicked is in front again, on its monitor.
+ */
+function docBack(ctx: ActionContext): void {
+  const { session } = ctx;
+  const back = session.docReturn;
+  session.docReturn = null;
+  session.browserDoc = null;
+  closeApp(session, "browser");
+  if (back?.app && back.app !== "browser") session.focus = bringToFront(session, back.app);
+  else if (back) session.focus = back.side;
+  lookAt(ctx, shownApp(session));
+  lookedAway(ctx);
+  settleSession(session);
+}
+
+/**
  * box-arrival R4: the arrival scene has been read (its last picture is 窗's little table with the
  * carton open on it). The player is where the scene left them, at 窗 (a cut, not a turn: the scene's
  * backdrop was already that table), and the case opens by itself as `pick-box` opens it.
@@ -1727,8 +1852,10 @@ for (const [name, handler] of Object.entries(loopActions)) {
   loopActions[name] = (ctx, data, el) => {
     const wasTalking = talking(ctx.session.dialogue);
     const day = ctx.store.getState().day;
+    const before = ctx.store.getEvents().length;
     handler(ctx, data, el);
     askSleepAfterChat(ctx, wasTalking, day);
+    noteHappy(ctx, before);
   };
 }
 

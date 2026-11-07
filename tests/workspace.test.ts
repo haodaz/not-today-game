@@ -116,7 +116,9 @@ describe("R1 · two kinds of page", () => {
     const out = h.out();
     // shell R3 / R11: its own surface is one pane, open by default; the input is in the composer.
     expect(out).toMatch(/<section class="sh-card sh-work" data-card="work">.*<div class="sh-card-b"><div class="sh-work"><div class="surface /s);
-    expect(out).toMatch(/<div class="sh-composer"><div class="ask sh-ask">.*data-action="wb-send"/s);
+    // guidance R7: no text box on a task page: the sentence is one chip in the composer.
+    expect(out).toMatch(/<div class="sh-composer"><div class="wchips"><button type="button" class="sh-chip primary" data-action="wb-send"/s);
+    expect(out).not.toContain('class="ph"');
     expect(headOf(out)).toContain(`data-action="wb-nav" data-page="docs">${escapeHtml(t("wb.nav.docs"))}</button>`);
   });
 
@@ -137,7 +139,9 @@ describe("R2 · one navigation: the rail and the session list", () => {
     const side = h.side();
     expect(side).toMatch(new RegExp(`data-action="wb-nav" data-page="home" data-compose="1"><svg[^>]*>.*?</svg><span>${escapeHtml(t("wb.sessions.new"))}</span></button>`, "s"));
     expect(side).not.toContain(escapeHtml(t("wb.sessions.today")));
-    expect(side).not.toContain(escapeHtml(t("wb.sessions.recent")));
+    // guidance R6: 最近 holds the tasks finished before the run (content/tasks/past.json).
+    expect(side).toContain(escapeHtml(t("wb.sessions.recent")));
+    expect(side).toContain('data-action="wb-past"');
     expect(side).not.toContain("task:");
     for (const key of ["wb.search", "wb.nav.tickets", "wb.nav.projects", "wb.sec.doing"]) expect(out, key).not.toContain(escapeHtml(t(key)));
     // The section icons (shell R10) are in the sidebar.
