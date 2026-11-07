@@ -5,7 +5,7 @@
 // placing, Kuro's fill, the lock, print and send are the board's own actions. Card state is session
 // only, per task (`session.shell`); the board itself rebuilds from the log.
 import type { GameEvent } from "@state/events";
-import { boardState, canFetch, canPrint, foundCardIds, modFound, taskForId, tuneBase, tuneCarried, tuneDims, tuneStepsLeft, type BoardState } from "@state/days/board";
+import { boardState, canFetch, canPrint, foundCardIds, modFound, taskForId, tuneCarried, tuneStepsLeft, type BoardState } from "@state/days/board";
 import { ideOps, ideSrc, ideTranscript, selectedSlot, type IdeLine } from "@state/days/ide";
 import { API_FIELD, SLOT_FIELD, type Task, type TaskBoard } from "@state/days/tasks";
 import { deliverablePage } from "@state/files";
@@ -166,42 +166,35 @@ function previewPane(task: Task, board: TaskBoard, s: BoardState, ops: ReturnTyp
 }
 
 /**
- * tune (2026-11-08): the bars and the switches. Each dimension is a bar: the value the board opened
- * with today in the quiet colour, what today's switches added in blue (or took away, in red), a
- * tick at today's line, a far mark at what the page promises, and `now/line` at the end. Below,
- * one switch per module: on / off, its deltas as small chips; a module whose source is not found
- * yet shows its hint instead. Read back (not live): the same, without buttons.
+ * tune (2026-11-08): the config file. The author's rule: the bars are a result and live in the
+ * preview; what the player edits is the AI's training / constraints / support, so the 代码 pane
+ * is `evolve.config.js`: one section per group (a comment line), one switch per module with its
+ * deltas as small chips; a module whose source is not found yet shows its hint instead. The
+ * header counts the switches on against the budget. Read back (not live): the same, no buttons.
  */
 function tunePane(board: TaskBoard, s: BoardState, day: number, events: readonly GameEvent[], live: boolean): SafeHtml {
   const tune = board.tune!;
-  const base = tuneBase(board, events);
-  const now = tuneDims(board, s);
   const left = tuneStepsLeft(board, s);
-  const bars = tune.dims.map((d) => {
-    const b = base[d.id] ?? 0;
-    const n = now[d.id] ?? 0;
-    const lo = Math.min(b, n);
-    const change = n > b ? html`<i class="up" style="left:${b}%;width:${n - b}%"></i>` : n < b ? html`<i class="down" style="left:${n}%;width:${b - n}%"></i>` : null;
-    const over = n >= tune.reach;
-    return html`<div class="${cls("sh-bar-row", over && "over")}"><span class="sh-bar-l">${d.label}</span><div class="sh-bar"><i class="base" style="width:${lo}%"></i>${change}<b class="line" style="left:${tune.reach}%"></b><b class="promise" style="left:${tune.promise}%"></b></div><span class="sh-bar-n"><em>${n}</em>/${tune.reach}</span></div>`;
-  });
-  const legend = hasString("board.tune.reach") && hasString("board.tune.promise") ? html`<div class="sh-tune-legend"><span class="lg line">${tr("board.tune.reach")}</span><span class="lg promise">${tr("board.tune.promise")}</span></div>` : null;
   const steps = hasString("board.tune.steps") ? html`<span class="sh-tune-steps">${tr("board.tune.steps", { on: String(s.mods.length), max: String(tune.steps) })}</span>` : null;
   const sign = (x: number) => (x > 0 ? `+${x}` : `−${-x}`);
-  const mods = tune.mods.map((m) => {
+  let n = 0;
+  const gut = () => html`<span class="sh-gut">${++n}</span>`;
+  const row = (m: (typeof tune.mods)[number]): SafeHtml => {
     const on = s.mods.includes(m.id);
     if (!modFound(m, day, events)) {
       const hint = m.hint ?? (hasString("board.notFound") ? t("board.notFound") : "");
-      return html`<div class="sh-mod notfound" aria-disabled="true" title="${hint}"><span class="sh-mod-sw"></span><span class="sh-mod-l">${hint}</span></div>`;
+      return html`<div class="sh-mod notfound" aria-disabled="true" title="${hint}">${gut()}<span class="sh-mod-sw"></span><span class="sh-mod-l">${hint}</span></div>`;
     }
     const deltas = tune.dims.filter((d) => m.delta[d.id] !== undefined).map((d) => html`<span class="${cls("sh-mod-d", m.delta[d.id]! > 0 ? "plus" : "minus")}">${d.label} ${sign(m.delta[d.id]!)}</span>`);
-    const body = html`<span class="sh-mod-sw" aria-hidden="true"></span><span class="sh-mod-l">${m.label}</span><span class="sh-mod-ds">${deltas}</span>`;
+    const body = html`${gut()}<span class="sh-mod-sw" aria-hidden="true"></span><span class="sh-mod-l"><code>${m.id}: ${on ? "true" : "false"},</code> ${m.label}</span><span class="sh-mod-ds">${deltas}</span>`;
     if (!live) return html`<div class="${cls("sh-mod", on && "on")}">${body}</div>`;
     const blocked = !on && left === 0;
     return html`<button type="button" class="${cls("sh-mod", on && "on")}" data-action="board-mod" data-mod="${m.id}" aria-pressed="${on ? "true" : "false"}"${blocked ? html` disabled` : null}>${body}</button>`;
-  });
-  const title = hasString("board.tune.title") ? tr("board.tune.title") : null;
-  return html`<div class="sh-editor sh-tune"><div class="sh-tune-h"><span class="sh-tune-t">${title}</span>${steps}</div><div class="sh-bars">${bars}</div>${legend}<div class="sh-mods">${mods}</div></div>`;
+  };
+  const groups = tune.groups ?? [];
+  const sections = groups.map((g) => html`<div class="sh-mod-g">${gut()}<span class="sh-mod-gl">// ${g.label}</span></div>${tune.mods.filter((m) => m.group === g.id).map(row)}`);
+  const rest = tune.mods.filter((m) => m.group === undefined || !groups.some((g) => g.id === m.group)).map(row);
+  return html`<div class="sh-editor sh-tune"><div class="sh-tabs"><span class="sh-tab on">evolve.config.js</span>${steps}</div><div class="sh-mods">${sections}${rest}</div></div>`;
 }
 
 /** 代码: the selected page's file, line numbers, and its slot line drawn as the inline field. */

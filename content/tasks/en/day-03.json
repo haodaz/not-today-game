@@ -73,7 +73,8 @@
               "from": {
                 "conv": "xiaozhang"
               },
-              "hint": "In Zhang's chat"
+              "hint": "In Zhang's chat",
+              "group": "training"
             },
             {
               "id": "n1",
@@ -82,7 +83,8 @@
                 "safe": 20,
                 "auto": 15,
                 "gain": 10
-              }
+              },
+              "group": "constraints"
             },
             {
               "id": "n3",
@@ -94,7 +96,8 @@
               "from": {
                 "conv": "boss"
               },
-              "hint": "In the v17 you sent Wang"
+              "hint": "In the v17 you sent Wang",
+              "group": "constraints"
             },
             {
               "id": "n4",
@@ -107,7 +110,8 @@
               "from": {
                 "conv": "partner"
               },
-              "hint": "In Vivi's chat"
+              "hint": "In Vivi's chat",
+              "group": "support"
             },
             {
               "id": "m1",
@@ -115,7 +119,8 @@
               "delta": {
                 "gain": 15,
                 "hands": 20
-              }
+              },
+              "group": "support"
             },
             {
               "id": "m2",
@@ -124,7 +129,8 @@
                 "gain": 20,
                 "hands": 5,
                 "safe": -10
-              }
+              },
+              "group": "training"
             },
             {
               "id": "m3",
@@ -137,7 +143,8 @@
               "from": {
                 "conv": "xiaozhang"
               },
-              "hint": "In Zhang's chat"
+              "hint": "In Zhang's chat",
+              "group": "training"
             },
             {
               "id": "m4",
@@ -145,7 +152,8 @@
               "delta": {
                 "hands": 15,
                 "gain": -25
-              }
+              },
+              "group": "training"
             },
             {
               "id": "m5",
@@ -153,7 +161,8 @@
               "delta": {
                 "auto": 35,
                 "safe": -20
-              }
+              },
+              "group": "constraints"
             },
             {
               "id": "m6",
@@ -162,7 +171,8 @@
                 "safe": 30,
                 "hands": -15,
                 "auto": -5
-              }
+              },
+              "group": "constraints"
             },
             {
               "id": "m7",
@@ -171,7 +181,8 @@
                 "safe": 10,
                 "auto": -5,
                 "hands": -10
-              }
+              },
+              "group": "constraints"
             },
             {
               "id": "m8",
@@ -181,7 +192,8 @@
                 "auto": 25,
                 "safe": -15,
                 "gain": 10
-              }
+              },
+              "group": "training"
             },
             {
               "id": "m9",
@@ -190,7 +202,8 @@
                 "safe": 15,
                 "gain": 5,
                 "auto": 10
-              }
+              },
+              "group": "constraints"
             },
             {
               "id": "m10",
@@ -199,7 +212,8 @@
                 "auto": 10,
                 "gain": 5,
                 "safe": -10
-              }
+              },
+              "group": "training"
             }
           ],
           "assist": [
@@ -211,6 +225,20 @@
             "n1",
             "n2",
             "n3"
+          ],
+          "groups": [
+            {
+              "id": "training",
+              "label": "Training"
+            },
+            {
+              "id": "constraints",
+              "label": "Constraints"
+            },
+            {
+              "id": "support",
+              "label": "Support"
+            }
           ]
         },
         "beats": [

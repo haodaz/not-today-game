@@ -233,6 +233,12 @@ export interface BoardTune {
   readonly mods: readonly TuneMod[];
   readonly carry?: { readonly day: number; readonly task: string };
   readonly assist: readonly string[];
+  /** The config file's sections (author: the switches edit the AI's training / constraints / support; the bars are the preview's result). */
+  readonly groups?: readonly TuneGroup[];
+}
+export interface TuneGroup {
+  readonly id: string;
+  readonly label: string;
 }
 export interface TuneDim {
   readonly id: string;
@@ -245,6 +251,8 @@ export interface TuneMod {
   readonly delta: Readonly<Record<string, number>>;
   readonly from?: CardFrom;
   readonly hint?: string;
+  /** Its section of the config file (one of `tune.groups`); none: listed after the sections. */
+  readonly group?: string;
 }
 export interface TaskBoard {
   readonly kind: "table";
@@ -630,7 +638,22 @@ function board(v: unknown, w: string): TaskBoard {
  */
 function boardTune(v: unknown, w: string): BoardTune {
   if (!isRecord(v)) fail(w, "must be an object");
-  keys(v, ["dims", "start", "reach", "promise", "steps", "mods", "carry", "assist"], w);
+  keys(v, ["dims", "start", "reach", "promise", "steps", "mods", "carry", "assist", "groups"], w);
+  // groups: the config file's sections (unique ids, labels).
+  const groupIds = new Set<string>();
+  let groups: TuneGroup[] | undefined;
+  if (v.groups !== undefined) {
+    if (!Array.isArray(v.groups) || v.groups.length === 0) fail(`${w}.groups`, "must be a non-empty list");
+    groups = v.groups.map((g, i) => {
+      const gw = `${w}.groups[${i}]`;
+      if (!isRecord(g)) fail(gw, "a group must be an object");
+      keys(g, ["id", "label"], gw);
+      const id = str(g.id, `${gw}.id`);
+      if (groupIds.has(id)) fail(`${w}.groups`, `duplicate group id "${id}"`);
+      groupIds.add(id);
+      return { id, label: str(g.label, `${gw}.label`) };
+    });
+  }
   if (!Array.isArray(v.dims) || v.dims.length < 2 || v.dims.length > 6) fail(`${w}.dims`, "must be a list of 2 to 6 dimensions");
   const dimIds = new Set<string>();
   const dims = v.dims.map((d, i) => {
@@ -659,7 +682,8 @@ function boardTune(v: unknown, w: string): BoardTune {
   const mods = v.mods.map((m, i) => {
     const mw = `${w}.mods[${i}]`;
     if (!isRecord(m)) fail(mw, "a module must be an object");
-    keys(m, ["id", "label", "delta", "from", "hint"], mw);
+    keys(m, ["id", "label", "delta", "from", "hint", "group"], mw);
+    if (m.group !== undefined && !groupIds.has(str(m.group, `${mw}.group`))) fail(`${mw}.group`, `"${m.group}" is not a group`);
     const id = str(m.id, `${mw}.id`);
     if (modIds.has(id)) fail(`${w}.mods`, `duplicate module id "${id}"`);
     modIds.add(id);
@@ -670,7 +694,7 @@ function boardTune(v: unknown, w: string): BoardTune {
       if (!Number.isInteger(x) || x === 0 || Math.abs(x as number) > 100) fail(`${mw}.delta.${k}`, "must be a non-zero integer within ±100");
       delta[k] = x as number;
     }
-    return { id, label: str(m.label, `${mw}.label`), delta, ...(m.from !== undefined ? { from: cardFrom(m.from, `${mw}.from`) } : {}), ...(m.hint !== undefined ? { hint: str(m.hint, `${mw}.hint`) } : {}) };
+    return { id, label: str(m.label, `${mw}.label`), delta, ...(m.from !== undefined ? { from: cardFrom(m.from, `${mw}.from`) } : {}), ...(m.hint !== undefined ? { hint: str(m.hint, `${mw}.hint`) } : {}), ...(m.group !== undefined ? { group: m.group as string } : {}) };
   });
   const assist = strings(v.assist, `${w}.assist`);
   for (const id of assist) if (!modIds.has(id)) fail(`${w}.assist`, `"${id}" is not a module`);
@@ -682,7 +706,7 @@ function boardTune(v: unknown, w: string): BoardTune {
     const day = Number.isInteger(v.carry.day) && (v.carry.day as number) >= 1 && (v.carry.day as number) <= 18 ? (v.carry.day as number) : fail(`${w}.carry.day`, "must be a day 1–18");
     carry = { day, task: str(v.carry.task, `${w}.carry.task`) };
   }
-  return { dims, start, reach, promise, steps, mods, assist, ...(carry ? { carry } : {}) };
+  return { dims, start, reach, promise, steps, mods, assist, ...(carry ? { carry } : {}), ...(groups ? { groups } : {}) };
 }
 
 const MEETING_T = /^([01]\d|2[0-3]):[0-5]\d$/;
