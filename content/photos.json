@@ -389,28 +389,32 @@
       "day": 15,
       "facing": "room",
       "add": {
-        "text": "屏幕里的会议，十二格，一格不剩地看着镜头。"
+        "text": "屏幕里的会议，十二格。每一格的椅子都推到了镜头跟前，没有人。",
+        "overlay": "/room/photos/d15_room.jpg"
       }
     },
     {
       "day": 15,
       "facing": "bed",
       "add": {
-        "text": "床上有火花跳过的焦痕。"
+        "text": "床上有火花跳过的焦痕。",
+        "overlay": "/room/photos/d15_bed.jpg"
       }
     },
     {
       "day": 15,
       "facing": "door",
       "add": {
-        "text": "挂钩上多了一件长袍，拖到地上。"
+        "text": "挂钩上多了一件长袍，拖到地上。",
+        "overlay": "/room/photos/d15_door.jpg"
       }
     },
     {
       "day": 15,
       "facing": "window",
       "add": {
-        "text": "楼下的路灯一盏一盏灭过去，灭的方向是一条直线。"
+        "text": "楼下的路灯一盏一盏灭过去，灭的方向是一条直线。",
+        "overlay": "/room/photos/d15_window.jpg"
       }
     },
     {

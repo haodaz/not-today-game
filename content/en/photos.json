@@ -389,28 +389,32 @@
       "day": 15,
       "facing": "room",
       "add": {
-        "text": "The meeting on the screen, twelve squares, every one of them looking into the camera."
+        "text": "The meeting on the screen, twelve squares. In every one the chair is pushed up to the camera. No one in them.",
+        "overlay": "/room/photos/d15_room.jpg"
       }
     },
     {
       "day": 15,
       "facing": "bed",
       "add": {
-        "text": "Scorch marks on the bed where sparks jumped."
+        "text": "Scorch marks on the bed where sparks jumped.",
+        "overlay": "/room/photos/d15_bed.jpg"
       }
     },
     {
       "day": 15,
       "facing": "door",
       "add": {
-        "text": "One more thing on the hook: a long robe, trailing to the floor."
+        "text": "One more thing on the hook: a long robe, trailing to the floor.",
+        "overlay": "/room/photos/d15_door.jpg"
       }
     },
     {
       "day": 15,
       "facing": "window",
       "add": {
-        "text": "The streetlights below go out one after another, in a straight line."
+        "text": "The streetlights below go out one after another, in a straight line.",
+        "overlay": "/room/photos/d15_window.jpg"
       }
     },
     {
