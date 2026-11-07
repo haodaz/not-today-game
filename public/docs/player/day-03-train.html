@@ -46,6 +46,11 @@ const el = (id) => document.getElementById(id);
 { const c = FILL.r3; const job = el('job'), log = el('log'); const lines = [];
   const say = (t, s) => { lines.push(`<span class="t">${t}</span> ${s}`); log.innerHTML = lines.join('\n'); };
   if (!c) { job.innerHTML = '<p class="empty">队列为空。</p>'; }
+  else if (c === 'c3' && q.get('prev') === '1') {
+    // 昨天跑过了：直接是完成态
+    job.innerHTML = '<div class="kv"><b>任务</b><span>洞察计算 · 真实计算 <span class="tag ok">昨天 · 40 s</span></span><b>算力</b><span>cluster-a · 2 节点</span></div><div class="bar"><i style="width:100%"></i></div><div style="font-size:12px;color:var(--dim)">完成 · 40 s · 18 行</div>';
+    say('00:40', 'job-0418 done (yesterday) · insight ready · 18 rows');
+  }
   else if (c === 'c3') {
     job.innerHTML = '<div class="kv"><b>任务</b><span>洞察计算 · 真实计算 <span class="tag warn">预计 40 s</span></span><b>算力</b><span>cluster-a · 2 节点</span></div><div class="bar"><i id="p"></i></div><div id="st" style="font-size:12px;color:var(--dim)">排队中</div>';
     const p = el('p'), st = el('st'); let s = 0; const total = 40;
