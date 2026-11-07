@@ -22,6 +22,8 @@ Walls, from the room to the task: (1) an object that cannot be used now (床, th
 | G4 | any day with a required `lunch` item: from the end of the day's `msgs` lines until `order:lunch` | the phone (桌子); on the desktop no ring, the line guides | `guide.lunch.first` 「先点饭。干起来就忘了。」 for `wb-send` / `wb-choose` / opening a task page (the 工作台 home still opens) |
 | G5 | Vivi's lock (`viviLock` ≠ null) **and** the boss thread was opened today → the doc opened | the deliverable card; when another app is in front, the dock tile 汀汀 (or the right-monitor tab) | `vivi.lock` (text changed in the tree: 「Vivi 在群里发了个网页，先点开看一眼。」) |
 | G6 | task page, mode `self`, a document with `conflict`, until both clauses are clicked | the conflict clauses (ring on each unclicked one) | none: nothing else is refused on the page |
+| G7 (2026-11-08, Claude) | a board task's page, until 打快照 | the lock's button; else the tray's first card; else (a card picked) an empty slot; else 打快照 | none: nothing refused; unfound cards have no ring (Kuro's line names the sources) |
+
 - G3 changes 听听's first open of day 1: no conversation is active (the right pane empty, as a real client on launch) until a row is clicked; `session.conversation` starts null that day and the row click sets it. Days 2+ open on the boss as today.
 - G5 changes `viviLock`'s timing: the lock holds only after `open conv:boss` was logged today (`src/world/desktop/vivi.ts`, a new argument or a wrapper in game.ts). The refused switch still lands on the lock's conversation (never a dead end).
 - G6: the self-mode Kuro line is now an instruction (content: 「第 6 条和第 11 条打架了，你把它们标出来。」); the 合并/不合 chips appear only after both clauses are clicked (as today). The task page draws **no text box** (R7).
