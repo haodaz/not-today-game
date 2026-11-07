@@ -17,3 +17,8 @@ Author decision 2026-11-07: every old object that can be used in the room gets o
 - Day 5: the bed question has three choices (睡 / 打开录音机 / 再待会儿); choosing 打开录音机 puts the tape in use at 床 and asks again after it is put down; day 4 and day 6 bed questions have two choices.
 - A missing string queues nothing.
 - Snapshots that change only by the new line: list them, do not edit them.
+
+## R4. The cannot-use line (author 2026-11-07)
+- Every object that does not work where or when the player is (its `works` rule, or a key's own rule such as the walkman's REC) says one line, the same for all: strings `obj.works.dark` / `obj.works.nolamp` / `obj.works.nosignal` / `obj.works.recNight` now all read 「在这里不能使用。换个地方，换个时间，可能不一样。」 (content only; nothing to change there).
+- Today the line shows once on entering 使用 where it does not work. It must also show when the player **presses a key** on such a device (the first press after entering use, and again after a move to another facing or a change of time if it still does not work), so an attempt is always answered. Never twice in a row for the same press.
+- Test: the IC card in 房间 with the lamp off: entering use says the line; pressing a key says it once more; switching the lamp on then pressing says nothing.
