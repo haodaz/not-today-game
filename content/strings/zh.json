@@ -286,6 +286,7 @@
   "board.ide.copilot": "克总",
   "board.ide.snapshot": "打快照",
   "board.ide.diff": "和昨天 v16 的差别",
+  "board.ide.memo": "会议纪要",
   "board.ide.merge.v17": "要 v17 的",
   "board.ide.merge.v16": "留 v16 的",
   "board.ide.fetch": "拉最新数据",

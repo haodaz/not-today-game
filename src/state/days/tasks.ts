@@ -135,6 +135,8 @@ export interface BoardCard {
   readonly from?: CardFrom;
   /** Shown in the card's place while it is not yet found (twinned like other board text). */
   readonly hint?: string;
+  /** ide v2 day 3: a direction for one page: in no tray, found from the start, fills only that slot. */
+  readonly slot?: string;
 }
 export interface BoardKuro {
   readonly fill: Readonly<Record<string, string>>;
@@ -440,12 +442,14 @@ export const isMeetingFrom = (from: CardFrom | undefined): from is { readonly me
 
 function card(v: unknown, w: string): BoardCard {
   if (!isRecord(v)) fail(w, "a card must be an object");
-  keys(v, ["id", "text", "from", "hint"], w);
+  keys(v, ["id", "text", "from", "hint", "slot"], w);
+  if (v.slot !== undefined && v.from !== undefined) fail(w, "a page's direction (slot) has no source (from)");
   return {
     id: str(v.id, `${w}.id`),
     text: str(v.text, `${w}.text`),
     ...(v.from !== undefined ? { from: cardFrom(v.from, `${w}.from`) } : {}),
     ...(v.hint !== undefined ? { hint: str(v.hint, `${w}.hint`) } : {}),
+    ...(v.slot !== undefined ? { slot: str(v.slot, `${w}.slot`) } : {}),
   };
 }
 
@@ -535,6 +539,8 @@ function board(v: unknown, w: string): TaskBoard {
   }
   const unlock = str(v.kuro.unlock, `${w}.kuro.unlock`);
   if (lock && !lock.codes.includes(unlock)) fail(`${w}.kuro.unlock`, `"${unlock}" is not one of the lock's codes`);
+  // ide v2 day 3: a direction names one of the slots.
+  for (const c of cards) if (c.slot !== undefined && !slotIds.has(c.slot)) fail(`${w}.cards`, `"${c.id}" is a direction for "${c.slot}", which is not a slot`);
   // ide R1: the view, the preview, the transcript beats.
   let view: BoardView | undefined;
   if (v.view !== undefined) view = (BOARD_VIEWS as readonly unknown[]).includes(v.view) ? (v.view as BoardView) : fail(`${w}.view`, `must be one of ${BOARD_VIEWS.join(", ")}`);

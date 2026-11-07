@@ -139,7 +139,12 @@ function explorer(ctx: AppContext, task: Task, board: TaskBoard, s: BoardState, 
       return html`<div class="${cls("sh-file", "card", session.boardPick === c.id && "picked")}" title="${text}"><button type="button" class="sh-pick" data-action="board-card" data-card="${c.id}">${text}</button>${open}</div>`;
     });
   const lock = lockRow(board, s, state, events, session);
-  const body = html`${lock ? html`<div class="sh-lock">${lock}</div>` : null}${folder(ide ? "board.ide.pages" : "board.slots", slotRows)}${folder("board.ide.sources", cardRows)}`;
+  // ide v2 day 3: the memo (老王's directions, the given rows) above the pages; no sources folder when
+  // every card is a page's direction.
+  const directions = board.cards.some((c) => c.slot !== undefined);
+  const memo = ide && directions ? folder("board.ide.memo", Object.values(board.given.rows).map((text) => html`<div class="sh-file memo" title="${text}"><span class="sh-fn">${text}</span></div>`)) : null;
+  const sources = board.cards.some((c) => c.slot === undefined) ? folder("board.ide.sources", cardRows) : null;
+  const body = html`${lock ? html`<div class="sh-lock">${lock}</div>` : null}${memo}${folder(ide ? "board.ide.pages" : "board.slots", slotRows)}${sources}`;
   return card("explorer", ICONS.files, hasString("pane.explorer") ? t("pane.explorer") : "", body, st, "sh-explorer-card");
 }
 
@@ -193,7 +198,12 @@ function codePane(board: TaskBoard, s: BoardState, session: Session, selected: s
       ? html`<span class="sh-fetched">${tr("board.ide.fetched", { at: api.at })}</span>`
       : html`<button type="button" class="sh-chip sh-fetch" data-action="board-fetch"${canFetch(board, s) ? null : html` disabled`}>${tr("board.ide.fetch")}</button>`
     : null;
-  return html`<div class="sh-editor"><div class="sh-tabs"><span class="sh-tab on">${file.name}</span>${fetch}</div>${mergeBar}<div class="sh-code">${lines}</div></div>`;
+  // ide v2 day 3: the page's directions under its code; the chosen one is primary; choosing again replaces.
+  const options = board.cards.filter((c) => c.slot === selected);
+  const chips = options.length
+    ? html`<div class="sh-options">${options.map((o) => html`<button type="button" class="${cls("sh-chip", cardId === o.id && "primary")}" data-action="board-option" data-slot="${selected}" data-card="${o.id}">${cardText(board, o.id)}</button>`)}</div>`
+    : null;
+  return html`<div class="sh-editor"><div class="sh-tabs"><span class="sh-tab on">${file.name}</span>${fetch}</div>${mergeBar}<div class="sh-code">${lines}</div>${chips}</div>`;
 }
 
 /** 表格: the board's table as today (the given rows and the slots); live, or read back. */

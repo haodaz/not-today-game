@@ -256,108 +256,134 @@
             "r2": "\"If the direction is right, make it big. The bigger the better.\"",
             "r3": "\"Talk about people projecting themselves.\"",
             "r4": "\"Talk about moving through digital space.\"",
-            "r5": "\"Investors should feel only we can do this.\""
+            "r5": "\"Investors should feel only we can do this.\"",
+            "r6": "\"References as before.\""
           }
         },
         "slots": [
           {
             "id": "r1",
             "label": "Starting point",
-            "answer": "c1"
+            "answer": "o1c"
           },
           {
             "id": "r2",
             "label": "Scale",
-            "answer": "c2"
+            "answer": "o2c"
           },
           {
             "id": "r3",
             "label": "Projection",
-            "answer": "c3"
+            "answer": "o3c"
           },
           {
             "id": "r4",
             "label": "Travel",
-            "answer": "c4"
+            "answer": "o4c"
           },
           {
             "id": "r5",
             "label": "Our direction",
-            "answer": "c5"
+            "answer": "o5c"
+          },
+          {
+            "id": "r6",
+            "label": "References",
+            "answer": "o6"
           }
         ],
         "cards": [
           {
-            "id": "c1",
-            "text": "The creature has outgrown its creator's measure; so we take the human brain as the ruler and get efficiency right first",
-            "from": {
-              "conv": "boss"
-            },
-            "hint": "in the Thing A you sent Lao Wang"
+            "id": "o1a",
+            "text": "A brain that runs everything: when it goes wrong, still no one stops it",
+            "slot": "r1"
           },
           {
-            "id": "c2",
-            "text": "With efficiency right, scale what one person can hold to what a crowd can",
-            "from": {
-              "call": true
-            },
-            "hint": "in the afternoon call"
+            "id": "o1b",
+            "text": "A brain that big is a risk, and an opportunity",
+            "slot": "r1"
           },
           {
-            "id": "c3",
-            "text": "Everyone has a projection of themselves in digital space that sees and remembers for them",
-            "from": {
-              "call": true
-            },
-            "hint": "in the afternoon call"
+            "id": "o1c",
+            "text": "Stop letting a brain that is worse than the AI direct the AI's development",
+            "slot": "r1"
           },
           {
-            "id": "c4",
-            "text": "Move through the data: see things, see people, then go from one place to another",
-            "from": {
-              "call": true
-            },
-            "hint": "in the afternoon call"
+            "id": "o2a",
+            "text": "Still a group of brains, watching each other",
+            "slot": "r2"
           },
           {
-            "id": "c5",
-            "text": "We don't bet on emergence; we build efficiency at the brain's scale, and only we are on this road",
-            "from": {
-              "conv": "xiaozhang"
-            },
-            "hint": "in Xiao Zhang's chat"
+            "id": "o2b",
+            "text": "A group of brains, and it grows by itself",
+            "slot": "r2"
           },
           {
-            "id": "d1",
-            "text": "Keep scaling and wait for it to emerge",
-            "from": {
-              "file": "vivi-plan-2"
-            },
-            "hint": "on Vivi's second page"
+            "id": "o2c",
+            "text": "Something far beyond a human brain, self-evolving",
+            "slot": "r2"
           },
           {
-            "id": "d2",
-            "text": "Just efficiency, nothing else",
-            "from": {
-              "conv": "boss"
-            },
-            "hint": "in the Thing A you sent Lao Wang"
+            "id": "o3a",
+            "text": "Two hundred and eleven nodes, checked one by one by Zhang",
+            "slot": "r3"
+          },
+          {
+            "id": "o3b",
+            "text": "Everyone has a projection of themselves in the digital space, seeing and remembering for them",
+            "slot": "r3"
+          },
+          {
+            "id": "o3c",
+            "text": "People no longer need to understand it; they only need to be understood by it",
+            "slot": "r3"
+          },
+          {
+            "id": "o4a",
+            "text": "AI merges a version first; a person checks it again",
+            "slot": "r4"
+          },
+          {
+            "id": "o4b",
+            "text": "Moving through the data: see the things, see the people, go from one place to the next",
+            "slot": "r4"
+          },
+          {
+            "id": "o4c",
+            "text": "The AI finds its own way; no one needs to follow along",
+            "slot": "r4"
+          },
+          {
+            "id": "o5a",
+            "text": "Knowing the client's trade: the graph was checked out bit by bit",
+            "slot": "r5"
+          },
+          {
+            "id": "o5b",
+            "text": "No bet on emergence; efficiency at a human brain's scale: only we walk this road",
+            "slot": "r5"
+          },
+          {
+            "id": "o5c",
+            "text": "It is more itself every year; only we can do this",
+            "slot": "r5"
+          },
+          {
+            "id": "o6",
+            "text": "Leave them",
+            "slot": "r6"
           }
         ],
         "kuro": {
           "fill": {
-            "r1": "c1",
-            "r2": "c2",
-            "r3": "c3",
-            "r4": "c4",
-            "r5": "k1"
+            "r1": "o1c",
+            "r2": "o2c",
+            "r3": "o3c",
+            "r4": "o4c",
+            "r5": "o5c",
+            "r6": "o6"
           },
-          "cards": [
-            {
-              "id": "k1",
-              "text": "People need no longer understand it; only be understood by it"
-            }
-          ],
+          "cards": [],
           "unlock": "-"
         },
         "beats": [
@@ -370,64 +396,167 @@
               },
               {
                 "who": "kuro",
-                "text": "The meeting's over. Lao Wang wants it bigger."
-              },
-              {
-                "who": "kuro",
-                "text": "The content changed. Do the references change too?"
+                "text": "The meeting is over. Wang wants it bigger. The memo is on the left; one line at a time."
               },
               {
                 "who": "me",
-                "text": "No. Same references, saying how risky this is."
+                "text": "Not one word of the business changed."
               },
               {
                 "who": "kuro",
-                "text": "You've learned to play the format."
+                "text": "The story did. Click a page, pick a way of saying it."
               }
             ]
           },
           {
-            "on": "fill:r1",
+            "on": "fill:r1:o1a",
             "lines": [
               {
                 "who": "kuro",
-                "text": "The made thing outgrew its maker. Good line."
+                "text": "That is not what he wants."
               }
             ]
           },
           {
-            "on": "fill:r1:d1",
+            "on": "fill:r1:o1b",
             "lines": [
               {
                 "who": "kuro",
-                "text": "I know the scaling road better than you do."
+                "text": "Both ends at once; Wang will pick one."
               }
             ]
           },
           {
-            "on": "fill:r3",
+            "on": "fill:r1:o1c",
             "lines": [
               {
                 "who": "kuro",
-                "text": "A projection that sees for him and remembers for him. You have one too."
+                "text": "Wang will read this one out."
               }
             ]
           },
           {
-            "on": "fill:r5:d2",
+            "on": "fill:r2:o2a",
             "lines": [
               {
                 "who": "kuro",
-                "text": "Efficiency alone and Lao Wang will say it's not big enough."
+                "text": "Still yesterday's."
               }
             ]
           },
           {
-            "on": "kuro",
+            "on": "fill:r2:o2b",
             "lines": [
               {
                 "who": "kuro",
-                "text": "'People needn't understand it, only be understood by it.' Mine. Lao Wang will like it."
+                "text": "Grows. Toward what?"
+              }
+            ]
+          },
+          {
+            "on": "fill:r2:o2c",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Self-evolving. The word he wants."
+              }
+            ]
+          },
+          {
+            "on": "fill:r3:o3a",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "The number is real, so it cannot be written like that."
+              }
+            ]
+          },
+          {
+            "on": "fill:r3:o3b",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Sees and remembers for him. You have one too."
+              }
+            ]
+          },
+          {
+            "on": "fill:r3:o3c",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "The line I added. He will like it."
+              }
+            ]
+          },
+          {
+            "on": "fill:r4:o4a",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "A person checks it again — he does not want to hear 'person'."
+              }
+            ]
+          },
+          {
+            "on": "fill:r4:o4b",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Moving through. He said it in the meeting."
+              }
+            ]
+          },
+          {
+            "on": "fill:r4:o4c",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "No one follows along. Not you either."
+              }
+            ]
+          },
+          {
+            "on": "fill:r5:o5a",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Checked out bit by bit: not big enough."
+              }
+            ]
+          },
+          {
+            "on": "fill:r5:o5b",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Only we walk it. He loves that."
+              }
+            ]
+          },
+          {
+            "on": "fill:r5:o5c",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "More itself. Tonight this line is the most like him."
+              }
+            ]
+          },
+          {
+            "on": "fill:r6:o6",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "The text changed. Do the references change?"
+              },
+              {
+                "who": "me",
+                "text": "Leave them. The same papers, saying how dangerous this is."
+              },
+              {
+                "who": "kuro",
+                "text": "You've learned to pad the format."
               }
             ]
           },
@@ -436,7 +565,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "To Lao Wang. He'll read it out."
+                "text": "Snapshot 03. Send it to Wang. He will read it out."
               }
             ]
           }
@@ -449,7 +578,8 @@
             "r2": 1,
             "r3": 2,
             "r4": 3,
-            "r5": 11
+            "r5": 11,
+            "r6": 12
           },
           "files": {
             "r1": {
@@ -461,6 +591,7 @@
                 "export const page = {",
                 "  kick: \"01 · Bottleneck\",",
                 "  title: \"Stuck on people: a brain weaker than AI is steering AI\",  // 老王改的",
+                "  // v17: A brain that runs everything: when it goes wrong, who stops it?",
                 "  start: {{slot}},  // starting point",
                 "  facts: SNAP.brainVsAI,  // 86 bn neurons · 20 W · regions · a small patch lit (facts unchanged)",
                 "  draw: (t) => draw.contrast(SNAP, t)",
@@ -476,6 +607,7 @@
                 "export const page = {",
                 "  kick: \"02 · Direction\",",
                 "  title: \"No more human steering: drive AI to evolve itself\",  // 老王改的",
+                "  // v17: So what we build is a group of brains, watching each other.",
                 "  scale: {{slot}},  // scale up",
                 "  route: (q) => SNAP.brains.filter((b) => b.fits(q)),  // to the right few",
                 "  draw: (t) => draw.org(SNAP, t)",
@@ -491,6 +623,7 @@
                 "export const page = {",
                 "  kick: \"03 · A shared space\",",
                 "  title: \"Self-evolution needs room to grow: a shared intelligence space\",  // 老王改的",
+                "  // v17: A knowledge graph, two hundred-odd nodes, joining the client's business objects",
                 "  self: {{slot}},  // the human projection",
                 "  stats: () => ({ nodes: SNAP.nodes.length, links: SNAP.links.length }),",
                 "  draw: (t) => draw.project(SNAP, t)",
@@ -506,6 +639,7 @@
                 "export const page = {",
                 "  kick: \"04 · Understanding\",",
                 "  title: \"AI finds its own way from point to point\",  // 老王改的",
+                "  // v17: AI merges a version first; a person checks it again",
                 "  walk: {{slot}},  // moving through",
                 "  nearest: (q) => SNAP.nodes.sort((a, b) => d(q, a) - d(q, b)).slice(0, 5),",
                 "  draw: (t) => draw.walk(SNAP, t)",
@@ -521,9 +655,22 @@
                 "export const page = {",
                 "  kick: \"12 · Moat\",",
                 "  title: \"Every year it looks more like itself\",  // 老王改的",
+                "  // v17: Knowing the client's trade: the graph was checked out bit by bit",
                 "  way: {{slot}},  // our direction",
                 "  // x′ = U x, UᵀU = I: points and distances unchanged (formula unchanged)",
                 "  draw: (t) => draw.rotate(SNAP, t)",
+                "};"
+              ]
+            },
+            "r6": {
+              "name": "99-references.js",
+              "code": [
+                "import { SNAP } from \"./snapshot.js\";  // snap-2028-10-16-03",
+                "",
+                "export const refs = {",
+                "  // the text changed; not one line here did",
+                "  list: {{slot}},",
+                "  cite: (i) => SNAP.refs[i],",
                 "};"
               ]
             }

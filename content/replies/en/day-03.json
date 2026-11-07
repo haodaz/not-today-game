@@ -12,6 +12,14 @@
           "t": "09:10",
           "text": "(Transcript) v18 is out today. Let it write. Don't you write.",
           "kind": "work"
+        },
+        {
+          "t": "22:40",
+          "text": "Got it. This one's fine for sure — eighteen. (In Chinese it sounds like \"gonna get rich.\") Lucky number.",
+          "kind": "odd",
+          "cond_show": {
+            "has": "sent_d3-theory"
+          }
         }
       ],
       "fine": {

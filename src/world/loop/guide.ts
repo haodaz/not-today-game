@@ -72,7 +72,7 @@ export function guideNow(state: State, events: readonly GameEvent[], session: Se
   const board = open?.tree?.board;
   if (desktop && open?.tree && board && taskPageId(session.workbenchPage) === open.tree.id) {
     const s = boardState(board, day, open.tree.id, events);
-    const step = board.given.lock !== undefined && !s.unlocked ? "lock" : mergesLeft(board, s).length ? "merge" : canPrint(board, s) ? "print" : canFetch(board, s) ? "fetch" : session.boardPick ? "slot" : trayCards(board, s, day, events, open.tree.id).length ? "card" : null;
+    const step = board.given.lock !== undefined && !s.unlocked ? "lock" : mergesLeft(board, s).length ? "merge" : canPrint(board, s) ? "print" : canFetch(board, s) ? "fetch" : session.boardPick ? "slot" : trayCards(board, s, day, events, open.tree.id).length || board.cards.some((c) => c.slot !== undefined && !(c.slot in s.slots)) ? "card" : null;
     if (step) return { id: "G7", target: { kind: "board", step }, refuse: null, scope: "none" };
   }
 
@@ -174,7 +174,7 @@ export function onTarget(target: GuideTarget, action: string, data: Readonly<Rec
       return action === "wb-nav" && data.page === `task:${target.id}`;
     case "board":
       // G7 never refuses; its target is the board's own controls.
-      return action === "board-lock" || action === "board-merge" || action === "board-fetch" || action === "board-card" || action === "board-slot" || action === "shell-slot" || action === "board-print";
+      return action === "board-lock" || action === "board-merge" || action === "board-fetch" || action === "board-option" || action === "board-card" || action === "board-slot" || action === "shell-slot" || action === "board-print";
   }
 }
 
@@ -250,7 +250,7 @@ function boardAnchors(step: "lock" | "merge" | "card" | "slot" | "fetch" | "prin
   if (step === "lock") return [[["data-action", "board-lock"]]];
   if (step === "merge") return [[["data-action", "board-merge"], ["data-keep", "v17"]], [["data-action", "shell-slot"]]];
   if (step === "fetch") return [[["data-action", "board-fetch"]]];
-  if (step === "card") return [[["data-action", "board-card"]]];
+  if (step === "card") return [[["data-action", "board-option"]], [["data-action", "board-card"]]];
   if (step === "slot") return [[["data-action", "board-slot"], ["!", "filled"]], [["data-action", "shell-slot"]]];
   return [[["data-action", "board-print"]]];
 }

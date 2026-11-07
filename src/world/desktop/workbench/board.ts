@@ -391,6 +391,18 @@ const actions: Record<string, ActionHandler> = {
     }
     ctx.rerender();
   },
+  // ide v2 day 3: a page's direction, chosen under its code: fills that page at once.
+  "board-option"(ctx, data) {
+    const c = currentBoard(ctx);
+    const card = data.card;
+    const slot = data.slot;
+    if (!c || !card || !slot) return;
+    const def = c.board.cards.find((x) => x.id === card);
+    if (!def || def.slot !== slot) return;
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "fill", slot, card } });
+    ctx.session.boardPick = null;
+    ctx.rerender();
+  },
   // ide v2 (2026-11-08): keep v17's or v16's line on a page that differs.
   "board-merge"(ctx, data) {
     const c = currentBoard(ctx);

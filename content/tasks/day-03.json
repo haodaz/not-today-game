@@ -256,108 +256,134 @@
             "r2": "「方向对了，就往大里讲，越大越好。」",
             "r3": "「讲人的投射。」",
             "r4": "「讲在数字空间里穿梭。」",
-            "r5": "「要让投资人觉得只有我们能做。」"
+            "r5": "「要让投资人觉得只有我们能做。」",
+            "r6": "「参考文献照旧。」"
           }
         },
         "slots": [
           {
             "id": "r1",
             "label": "出发点",
-            "answer": "c1"
+            "answer": "o1c"
           },
           {
             "id": "r2",
             "label": "放大",
-            "answer": "c2"
+            "answer": "o2c"
           },
           {
             "id": "r3",
             "label": "人的投射",
-            "answer": "c3"
+            "answer": "o3c"
           },
           {
             "id": "r4",
             "label": "穿梭",
-            "answer": "c4"
+            "answer": "o4c"
           },
           {
             "id": "r5",
             "label": "我们的方向",
-            "answer": "c5"
+            "answer": "o5c"
+          },
+          {
+            "id": "r6",
+            "label": "参考文献",
+            "answer": "o6"
           }
         ],
         "cards": [
           {
-            "id": "c1",
-            "text": "造物已经大到造物主没法用人的量级去对应；所以我们以人脑为尺子，先把效率做对",
-            "from": {
-              "conv": "boss"
-            },
-            "hint": "在你发给老王的事情 A 里"
+            "id": "o1a",
+            "text": "一个什么都管的大脑，出了错，还是没人拦得住",
+            "slot": "r1"
           },
           {
-            "id": "c2",
-            "text": "效率对了，再把一个人能管住的，放大成一群人的",
-            "from": {
-              "call": true
-            },
-            "hint": "在下午那通电话里"
+            "id": "o1b",
+            "text": "大脑太大是风险，也是机遇",
+            "slot": "r1"
           },
           {
-            "id": "c3",
+            "id": "o1c",
+            "text": "不要再用一个还不如 AI 的大脑去指挥 AI 发展了",
+            "slot": "r1"
+          },
+          {
+            "id": "o2a",
+            "text": "还是一群脑，互相看着",
+            "slot": "r2"
+          },
+          {
+            "id": "o2b",
+            "text": "一群脑，并且会自己长",
+            "slot": "r2"
+          },
+          {
+            "id": "o2c",
+            "text": "一个远超人脑的东西，自进化",
+            "slot": "r2"
+          },
+          {
+            "id": "o3a",
+            "text": "二百一十一个节点，是小张一个一个对出来的",
+            "slot": "r3"
+          },
+          {
+            "id": "o3b",
             "text": "每个人在数字空间里有一个自己的投影，替他看、替他记",
-            "from": {
-              "call": true
-            },
-            "hint": "在下午那通电话里"
+            "slot": "r3"
           },
           {
-            "id": "c4",
+            "id": "o3c",
+            "text": "人不必再理解它，只需被它理解",
+            "slot": "r3"
+          },
+          {
+            "id": "o4a",
+            "text": "AI 先合一版，人再核一遍",
+            "slot": "r4"
+          },
+          {
+            "id": "o4b",
             "text": "在数据之间穿梭：看物，看人，再从一处走到另一处",
-            "from": {
-              "call": true
-            },
-            "hint": "在下午那通电话里"
+            "slot": "r4"
           },
           {
-            "id": "c5",
+            "id": "o4c",
+            "text": "AI 自己找路，人不用再跟着看",
+            "slot": "r4"
+          },
+          {
+            "id": "o5a",
+            "text": "懂甲方的行业，图谱是一点点对出来的",
+            "slot": "r5"
+          },
+          {
+            "id": "o5b",
             "text": "不赌涌现，做人脑尺度的效率：这条路只有我们在走",
-            "from": {
-              "conv": "xiaozhang"
-            },
-            "hint": "在小张的私聊里"
+            "slot": "r5"
           },
           {
-            "id": "d1",
-            "text": "继续堆规模，等它自己涌现",
-            "from": {
-              "file": "vivi-plan-2"
-            },
-            "hint": "在 Vivi 的第二个页面里"
+            "id": "o5c",
+            "text": "它一年比一年更像它自己；只有我们能做",
+            "slot": "r5"
           },
           {
-            "id": "d2",
-            "text": "就讲效率，别的不讲",
-            "from": {
-              "conv": "boss"
-            },
-            "hint": "在你发给老王的事情 A 里"
+            "id": "o6",
+            "text": "不动",
+            "slot": "r6"
           }
         ],
         "kuro": {
           "fill": {
-            "r1": "c1",
-            "r2": "c2",
-            "r3": "c3",
-            "r4": "c4",
-            "r5": "k1"
+            "r1": "o1c",
+            "r2": "o2c",
+            "r3": "o3c",
+            "r4": "o4c",
+            "r5": "o5c",
+            "r6": "o6"
           },
-          "cards": [
-            {
-              "id": "k1",
-              "text": "人不必再理解它，只需被它理解"
-            }
-          ],
+          "cards": [],
           "unlock": "-"
         },
         "beats": [
@@ -370,8 +396,156 @@
               },
               {
                 "who": "kuro",
-                "text": "会开完了。老王要往大里讲。"
+                "text": "会开完了。老王要往大里讲。纪要在左边，一条一条来。"
               },
+              {
+                "who": "me",
+                "text": "业务一个字没变。"
+              },
+              {
+                "who": "kuro",
+                "text": "变的是故事。点一页，选一个说法。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:o1a",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "他要的不是这个。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:o1b",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "两头都占，老王会挑一头。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:o1c",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "老王会念出来的。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r2:o2a",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "还是昨天的。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r2:o2b",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "长，往哪儿长？"
+              }
+            ]
+          },
+          {
+            "on": "fill:r2:o2c",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "自进化。他要的词。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r3:o3a",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "数是真的，所以不能这么写。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r3:o3b",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "替他看、替他记。你也有一个。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r3:o3c",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "我补的那句。他会喜欢。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r4:o4a",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "人再核一遍——他不想听到「人」。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r4:o4b",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "穿梭。他在会上说的。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r4:o4c",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "人不用跟着看。你也不用了。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r5:o5a",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "一点点对出来的，不够大。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r5:o5b",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "只有我们在走。他爱听这个。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r5:o5c",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "更像它自己。今晚这句最像他。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r6:o6",
+            "lines": [
               {
                 "who": "kuro",
                 "text": "内容改了，参考文献还改吗？"
@@ -387,56 +561,11 @@
             ]
           },
           {
-            "on": "fill:r1",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "造物大到造物主对不上了。这句写得好。"
-              }
-            ]
-          },
-          {
-            "on": "fill:r1:d1",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "堆规模这条路，我比你熟。"
-              }
-            ]
-          },
-          {
-            "on": "fill:r3",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "一个替他看、替他记的投影。你也有一个。"
-              }
-            ]
-          },
-          {
-            "on": "fill:r5:d2",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "只讲效率，老王会说不够大。"
-              }
-            ]
-          },
-          {
-            "on": "kuro",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "「人不必再理解它，只需被它理解」。我补的。老王会喜欢。"
-              }
-            ]
-          },
-          {
             "on": "print",
             "lines": [
               {
                 "who": "kuro",
-                "text": "交给老王。他会念出来。"
+                "text": "快照 03。交给老王。他会念出来。"
               }
             ]
           }
@@ -449,7 +578,8 @@
             "r2": 1,
             "r3": 2,
             "r4": 3,
-            "r5": 11
+            "r5": 11,
+            "r6": 12
           },
           "files": {
             "r1": {
@@ -461,6 +591,7 @@
                 "export const page = {",
                 "  kick: \"01 · 瓶颈\",",
                 "  title: \"卡在了人：一个还不如 AI 的大脑，在指挥 AI\",  // 老王改的",
+                "  // v17: 一个什么都管的大脑，出了错谁拦得住？",
                 "  start: {{slot}},  // 出发点",
                 "  facts: SNAP.brainVsAI,  // 860 亿神经元 · 20 瓦 · 分区 · 只亮一小片（事实没改）",
                 "  draw: (t) => draw.contrast(SNAP, t)",
@@ -476,6 +607,7 @@
                 "export const page = {",
                 "  kick: \"02 · 方向\",",
                 "  title: \"不再让人指挥：驱动 AI 自进化\",  // 老王改的",
+                "  // v17: 所以我们做的是一群脑，互相看着。",
                 "  scale: {{slot}},  // 放大",
                 "  route: (q) => SNAP.brains.filter((b) => b.fits(q)),  // 分给对的那几个",
                 "  draw: (t) => draw.org(SNAP, t)",
@@ -491,6 +623,7 @@
                 "export const page = {",
                 "  kick: \"03 · 共同智能空间\",",
                 "  title: \"自进化要有地方长：一个共同智能空间\",  // 老王改的",
+                "  // v17: 一个知识图谱，二百多个节点，把甲方的业务对象连起来",
                 "  self: {{slot}},  // 人的投射",
                 "  stats: () => ({ nodes: SNAP.nodes.length, links: SNAP.links.length }),",
                 "  draw: (t) => draw.project(SNAP, t)",
@@ -506,6 +639,7 @@
                 "export const page = {",
                 "  kick: \"04 · 理解\",",
                 "  title: \"AI 自己找路，从一个点走到另一个点\",  // 老王改的",
+                "  // v17: AI 先合一版，人再核一遍",
                 "  walk: {{slot}},  // 穿梭",
                 "  nearest: (q) => SNAP.nodes.sort((a, b) => d(q, a) - d(q, b)).slice(0, 5),",
                 "  draw: (t) => draw.walk(SNAP, t)",
@@ -521,9 +655,22 @@
                 "export const page = {",
                 "  kick: \"12 · 护城河\",",
                 "  title: \"它一年比一年更像它自己\",  // 老王改的",
+                "  // v17: 懂甲方的行业，图谱是一点点对出来的",
                 "  way: {{slot}},  // 我们的方向",
                 "  // x′ = U x，UᵀU = I：点不动，距离也不动（公式没改）",
                 "  draw: (t) => draw.rotate(SNAP, t)",
+                "};"
+              ]
+            },
+            "r6": {
+              "name": "99-参考文献.js",
+              "code": [
+                "import { SNAP } from \"./snapshot.js\";  // snap-2028-10-16-03",
+                "",
+                "export const refs = {",
+                "  // 内容改了，这里一条没动",
+                "  list: {{slot}},",
+                "  cite: (i) => SNAP.refs[i],",
                 "};"
               ]
             }

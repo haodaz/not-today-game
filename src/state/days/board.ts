@@ -63,8 +63,11 @@ export function stepBoard(board: TaskBoard, s: BoardState, op: BoardOp): BoardSt
     case "assistUnlock":
       if (s.unlocked) return s;
       return { ...s, unlocked: true, assists: s.assists + 1 };
-    case "fill":
+    case "fill": {
+      const def = board.cards.find((c) => c.id === op.card);
+      if (def?.slot !== undefined && def.slot !== op.slot) return s; // a direction fills only its page
       return { ...s, slots: { ...s.slots, [op.slot]: op.card } };
+    }
     case "merge":
       if (!board.ide?.diff?.[op.slot]) return s;
       return { ...s, merged: { ...s.merged, [op.slot]: op.keep } };
@@ -150,7 +153,8 @@ export function foundCardIds(board: TaskBoard, day: number, events: readonly Gam
 export function trayCards(board: TaskBoard, s: BoardState, day?: number, events?: readonly GameEvent[], taskId?: string): string[] {
   const placed = new Set(Object.values(s.slots));
   const found = day !== undefined && events !== undefined ? foundCardIds(board, day, events, taskId) : null;
-  return board.cards.filter((c) => !placed.has(c.id) && (found === null || found.has(c.id))).map((c) => c.id);
+  // ide v2 day 3: a page's directions are not in the tray (they sit under their page's line).
+  return board.cards.filter((c) => c.slot === undefined && !placed.has(c.id) && (found === null || found.has(c.id))).map((c) => c.id);
 }
 
 /** A card id is one of Kuro's own (never in the tray). */
@@ -243,6 +247,7 @@ export function validateBoardStep(day: number, taskId: string, op: BoardOp): voi
     case "fill":
       if (!slotIds.has(op.slot)) throw new Error(`boardStep: "${op.slot}" is not a slot`);
       if (!cardIds.has(op.card)) throw new Error(`boardStep: "${op.card}" is not a card`);
+      { const def = board.cards.find((c) => c.id === op.card); if (def?.slot !== undefined && def.slot !== op.slot) throw new Error(`boardStep: "${op.card}" is a direction for "${def.slot}"`); }
       return;
     case "merge":
       if (!board.ide?.diff?.[op.slot]) throw new Error(`boardStep: "${op.slot}" has no v16 difference`);

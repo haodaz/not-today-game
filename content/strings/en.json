@@ -286,6 +286,7 @@
   "board.ide.copilot": "Kuro",
   "board.ide.snapshot": "Snapshot",
   "board.ide.diff": "Changed since yesterday's v16",
+  "board.ide.memo": "Meeting memo",
   "board.ide.merge.v17": "Take v17's",
   "board.ide.merge.v16": "Keep v16's",
   "board.ide.fetch": "Pull the latest data",

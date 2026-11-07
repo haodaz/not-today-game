@@ -1041,3 +1041,7 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .sh-merge-l{color:var(--ink-2);margin-right:auto}
 .sh-tabs .sh-fetch{margin-left:auto;margin-right:8px}
 .sh-tabs .sh-fetched{margin-left:auto;margin-right:12px;font-size:11px;color:var(--ink-2)}
+/* ide v2 day 3: the page's directions under its code; the memo rows in the explorer. */
+.sh-options{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-top:1px solid var(--line);background:#fafafa}
+.sh-options .sh-chip{text-align:left;white-space:normal;line-height:1.4}
+.sh-file.memo{color:var(--ink-2);cursor:default}

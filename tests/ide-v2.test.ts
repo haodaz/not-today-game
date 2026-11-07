@@ -1,6 +1,6 @@
 // ide v2 (2026-11-08): merge v16/v17, pull the latest data, snapshot — on day 1's real board (no mocks).
 import { describe, expect, it } from "vitest";
-import { canFetch, canPrint, freshBoard, mergesLeft, stepBoard, type BoardState } from "@state/days/board";
+import { canFetch, canPrint, freshBoard, mergesLeft, stepBoard, trayCards, type BoardState } from "@state/days/board";
 import { ideSrc, ideTranscript } from "@state/days/ide";
 import { parseTaskFile, taskByFlag, type TaskBoard } from "@state/days/tasks";
 
@@ -60,5 +60,37 @@ describe("ide v2: merge v16/v17, pull the latest data, snapshot (2026-11-08)", (
     bad((b) => (b.ide.diff.r1.line = 7), /slot's own line/);
     bad((b) => (b.ide.diff.r1.line = 99), /lines/);
     bad((b) => b.beats.push({ on: "merge:r1:v18", lines: [{ who: "kuro", text: "x" }] }), /merge:<slot>:<v16\|v17>/);
+  });
+});
+
+describe("ide v2, day 3: the memo and the directions (2026-11-08)", () => {
+  const task3 = () => taskByFlag(3, "task_d3_3")!;
+  it("day 3's board: every card is a direction for one page, three per page and one for the references; none in the tray", () => {
+    const b = task3().board!;
+    expect(b.cards.every((c) => c.slot !== undefined && c.from === undefined)).toBe(true);
+    for (const id of ["r1", "r2", "r3", "r4", "r5"]) expect(b.cards.filter((c) => c.slot === id)).toHaveLength(3);
+    expect(b.cards.filter((c) => c.slot === "r6")).toHaveLength(1);
+    expect(mergesLeft(b, freshBoard(b))).toEqual([]);
+    expect(trayCards(b, freshBoard(b), 3, [], task3().id)).toEqual([]);
+  });
+  it("a direction fills only its page; the full reversal is the page's answer", () => {
+    const b = task3().board!;
+    let s = freshBoard(b);
+    s = stepBoard(b, s, { t: "fill", slot: "r2", card: "o1c" }); // r1's direction on r2: ignored
+    expect(s.slots).toEqual({});
+    s = stepBoard(b, s, { t: "fill", slot: "r1", card: "o1c" });
+    expect(s.slots).toEqual({ r1: "o1c" });
+    expect(b.slots.find((sl) => sl.id === "r1")!.answer).toBe("o1c");
+    expect(b.slots.find((sl) => sl.id === "r6")!.answer).toBe("o6");
+  });
+  it("the loader rejects a direction naming a missing slot, and one with a source", () => {
+    const base = JSON.parse(JSON.stringify(task3()));
+    const bad = (mut: (b: any) => void, msg: RegExp) => {
+      const t = JSON.parse(JSON.stringify(base));
+      mut(t.board);
+      expect(() => parseTaskFile({ day: 3, tasks: [t] }, "t")).toThrow(msg);
+    };
+    bad((b) => (b.cards[0].slot = "r9"), /not a slot/);
+    bad((b) => (b.cards[0].from = { conv: "boss" }), /no source/);
   });
 });
