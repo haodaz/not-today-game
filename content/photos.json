@@ -357,28 +357,32 @@
       "day": 14,
       "facing": "room",
       "add": {
-        "text": "桌子底下的地板上，一片很小的黑蹄印。"
+        "text": "桌子底下的地板上，一片很小的黑蹄印。",
+        "overlay": "/room/photos/d14_room.jpg"
       }
     },
     {
       "day": 14,
       "facing": "bed",
       "add": {
-        "text": "床底下伸出来很多很小的黑蹄印，一直到床边。"
+        "text": "床底下伸出来很多很小的黑蹄印，一直到床边。",
+        "overlay": "/room/photos/d14_bed.jpg"
       }
     },
     {
       "day": 14,
       "facing": "door",
       "add": {
-        "text": "门缝底下塞进来很多张工牌，名字那栏都是空的。"
+        "text": "门缝底下塞进来很多张工牌，名字那栏都是空的。",
+        "overlay": "/room/photos/d14_door.jpg"
       }
     },
     {
       "day": 14,
       "facing": "window",
       "add": {
-        "text": "窗外的树林，长到了楼下。"
+        "text": "窗外的树林，长到了楼下。",
+        "overlay": "/room/photos/d14_window.jpg"
       }
     },
     {

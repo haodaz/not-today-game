@@ -357,28 +357,32 @@
       "day": 14,
       "facing": "room",
       "add": {
-        "text": "On the floor under the desk, a patch of very small black hoofprints."
+        "text": "On the floor under the desk, a patch of very small black hoofprints.",
+        "overlay": "/room/photos/d14_room.jpg"
       }
     },
     {
       "day": 14,
       "facing": "bed",
       "add": {
-        "text": "Very small black hoofprints coming out from under the bed, all the way to its edge."
+        "text": "Very small black hoofprints coming out from under the bed, all the way to its edge.",
+        "overlay": "/room/photos/d14_bed.jpg"
       }
     },
     {
       "day": 14,
       "facing": "door",
       "add": {
-        "text": "Many staff badges pushed in under the door, the name field blank on every one."
+        "text": "Many staff badges pushed in under the door, the name field blank on every one.",
+        "overlay": "/room/photos/d14_door.jpg"
       }
     },
     {
       "day": 14,
       "facing": "window",
       "add": {
-        "text": "The woods outside have grown right up to the building."
+        "text": "The woods outside have grown right up to the building.",
+        "overlay": "/room/photos/d14_window.jpg"
       }
     },
     {
