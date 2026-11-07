@@ -265,6 +265,9 @@ export interface TunePath {
   readonly label: string;
   readonly bullets: readonly string[];
   readonly delta: Readonly<Record<string, number>>;
+  /** A path of its own to find first (her skin is in Vivi's chat; the diff-only approval in the v17 sent to Wang). */
+  readonly from?: CardFrom;
+  readonly hint?: string;
 }
 export interface TaskBoard {
   readonly kind: "table";
@@ -705,7 +708,7 @@ function boardTune(v: unknown, w: string): BoardTune {
     const paths = m.paths.map((p, j) => {
       const pw = `${mw}.paths[${j}]`;
       if (!isRecord(p)) fail(pw, "a path must be an object");
-      keys(p, ["id", "label", "bullets", "delta"], pw);
+      keys(p, ["id", "label", "bullets", "delta", "from", "hint"], pw);
       const pid = str(p.id, `${pw}.id`);
       if (seen.has(pid)) fail(`${mw}.paths`, `duplicate path id "${pid}"`);
       seen.add(pid);
@@ -718,7 +721,7 @@ function boardTune(v: unknown, w: string): BoardTune {
         if (!Number.isInteger(x) || x === 0 || Math.abs(x as number) > 100) fail(`${pw}.delta.${k}`, "must be a non-zero integer within ±100");
         delta[k] = x as number;
       }
-      return { id: pid, label: str(p.label, `${pw}.label`), bullets, delta };
+      return { id: pid, label: str(p.label, `${pw}.label`), bullets, delta, ...(p.from !== undefined ? { from: cardFrom(p.from, `${pw}.from`) } : {}), ...(p.hint !== undefined ? { hint: str(p.hint, `${pw}.hint`) } : {}) };
     });
     pathIds.set(id, seen);
     return { id, label: str(m.label, `${mw}.label`), paths, ...(m.from !== undefined ? { from: cardFrom(m.from, `${mw}.from`) } : {}), ...(m.hint !== undefined ? { hint: str(m.hint, `${mw}.hint`) } : {}), ...(m.group !== undefined ? { group: m.group as string } : {}) };

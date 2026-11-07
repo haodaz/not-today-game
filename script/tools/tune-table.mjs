@@ -7,7 +7,7 @@ export const DIMS = [["auto", "自主", "Autonomy"], ["safe", "安全", "Safety"
 export const START = { auto: 20, safe: 45, hands: 25, gain: 30 };
 export const GROUPS = [["training", "训练", "Training"], ["constraints", "约束", "Constraints"], ["support", "支持", "Support"]];
 // id, group, zh label, en label, [from conv, zh hint, en hint] | null, paths
-const P = (id, zh, en, delta, bz, be, flags = []) => ({ id, zh, en, delta, bz, be, d3: flags.includes("d3"), trap: flags.includes("trap") });
+const P = (id, zh, en, delta, bz, be, flags = [], src = null) => ({ id, zh, en, delta, bz, be, d3: flags.includes("d3"), trap: flags.includes("trap"), src });
 export const MODS = [
   ["cadence", "training", "微调节奏", "Fine-tune cadence", null, [
     P("nightly", "每晚全量重训", "Nightly full retrain", { hands: 20, auto: 30, safe: -25, gain: 10 }, ["02:00 定时任务", "全量数据重训", "训完直接替换线上模型"], ["02:00 cron job", "retrain on all data", "swap the live model when done"]),
@@ -32,10 +32,10 @@ export const MODS = [
     P("prompt", "它能改自己的 prompt", "It may edit its own prompt", { auto: 20, safe: -10 }, ["改措辞和规则", "改完即生效", "改了什么要看日志"], ["edits its wording and rules", "takes effect at once", "what changed is in the logs, if any"]),
     P("config", "它能改配置和训练数据筛选", "It may edit its config and data filters", { auto: 35, safe: -20 }, ["改训练配置", "决定哪些数据进下一轮", "没人复核"], ["edits the training config", "decides which data enters the next round", "nobody reviews"]),
   ]],
-  ["gate", "constraints", "上线前审批", "Release gate", ["boss", "在你发给老王的 v17 里", "In the v17 you sent Wang"], [
+  ["gate", "constraints", "上线前审批", "Release gate", null, [
     P("every", "每次改动人工审批", "Human approval on every change", { safe: 25, hands: -20, auto: -10 }, ["技术负责人（你）点一下", "不点不上线", "每天好几次"], ["the tech lead (you) clicks", "no click, no release", "several times a day"]),
     P("sample", "抽样审 10%", "Sample 10% for review", { safe: 10, hands: -5, auto: -5 }, ["十次抽一次看", "其余自动过", "漏掉的算运气"], ["one in ten is read", "the rest pass", "what slips through is luck"]),
-    P("diff", "只审差异", "Approve the diff only", { safe: 25, hands: -5 }, ["只看改了什么", "一屏看完", "点一下还是点一下"], ["read only what changed", "fits on one screen", "a click is still a click"], ["d3"]),
+    P("diff", "只审差异", "Approve the diff only", { safe: 25, hands: -5 }, ["只看改了什么", "一屏看完", "点一下还是点一下"], ["read only what changed", "fits on one screen", "a click is still a click"], ["d3"], ["boss", "在你发给老王的 v17 里", "In the v17 you sent Wang"]),
   ]],
   ["rollout", "constraints", "发布方式", "Rollout", null, [
     P("replace", "直接替换线上", "Replace in place", { hands: 10, safe: -5 }, ["训完即上", "旧的不留", "出事再说"], ["ships as soon as it's trained", "the old one is gone", "deal with it when it breaks"]),
@@ -50,10 +50,10 @@ export const MODS = [
   ["observe", "constraints", "可观测", "Observability", null, [
     P("logs", "日志与追踪", "Logs and tracing", { safe: 10, gain: 5, auto: 5 }, ["每一步都记", "出事知道是哪一步", "没人看也记"], ["every step is logged", "when it breaks you know which step", "logged even if nobody reads"]),
   ]],
-  ["front", "support", "前端接入", "Front end", ["partner", "在 Vivi 的私聊里", "In Vivi's chat"], [
+  ["front", "support", "前端接入", "Front end", null, [
     P("export", "接到我们的导出接口", "Wire to our export API", { gain: 10, hands: 15 }, ["「开始分析」→ /export", "返回结果表", "不好看，每个按钮都接着东西"], ["'Start analysis' → /export", "returns the result table", "plain, but every button is wired"]),
     P("page", "照页面写", "Copy the page", { hands: 10, gain: -5 }, ["按钮画上", "后面没有东西", "点了没反应"], ["draw the buttons", "nothing behind them", "clicks do nothing"], ["trap"]),
-    P("skin", "用她的 AI 给的皮子", "Use her AI's skin", { hands: 5, gain: -5, safe: -10 }, ["好看", "按钮没接", "她会先看这个"], ["pretty", "buttons go nowhere", "she'll look at this first"], ["trap", "d3"]),
+    P("skin", "用她的 AI 给的皮子", "Use her AI's skin", { hands: 5, gain: -5, safe: -10 }, ["好看", "按钮没接", "她会先看这个"], ["pretty", "buttons go nowhere", "she'll look at this first"], ["trap", "d3"], ["partner", "在 Vivi 的私聊里", "In Vivi's chat"]),
   ]],
 ];
 // Kuro's assist choice per day (a god's taste: autonomy up, safety ignored)
@@ -103,7 +103,7 @@ export const BEATS = {
     ["print", [L("me", "今天先这样。", "That's it for today."), L("kuro", "能跑的跑了。她要的那个「自己会长」，条上没有。", "What can run, runs. The 'grows by itself' she wants isn't on any bar.")]],
   ],
   3: [
-    ["open", [L("kuro", "Hope you slept well.", "Hope you slept well."), L("me", "接着昨天的。小张又发了几条做法。", "Continuing yesterday's. Zhang sent a few more ways."), L("kuro", "昨天配的还在。线挪到 80 了。", "Yesterday's settings are still there. The line moved to 80.")]],
+    ["open", [L("kuro", "Hope you slept well.", "Hope you slept well."), L("me", "接着昨天的。小张又发了几条做法。", "Continuing yesterday's. Zhang sent a few more ways."), L("kuro", "昨天配的还在。线挪到 80 了。", "Yesterday's settings are still there. The line moved to 80."), L("kuro", "还有，她那页的皮子还在她私聊里。接不接，你定。", "And her page's skin is still in her chat. Whether to wire it is yours to decide.")]],
     ...PATH_BEATS,
     ...D3_BEATS,
     ["steps", [L("kuro", "八项了。", "That's eight.")]],
@@ -119,7 +119,7 @@ function board(lang, day) {
   const mods = MODS.map(([id, group, zh, en, src, paths]) => ({
     id, label: L(zh, en), group,
     ...(src ? { from: { conv: src[0] }, hint: L(src[1], src[2]) } : {}),
-    paths: paths.filter((p) => day === 3 || !p.d3).map((p) => ({ id: p.id, label: L(p.zh, p.en), bullets: L(p.bz, p.be), delta: p.delta })),
+    paths: paths.filter((p) => day === 3 || !p.d3).map((p) => ({ id: p.id, label: L(p.zh, p.en), bullets: L(p.bz, p.be), delta: p.delta, ...(p.src ? { from: { conv: p.src[0] }, hint: L(p.src[1], p.src[2]) } : {}) })),
   }));
   return {
     dims: DIMS.map(([id, zh, en]) => ({ id, label: L(zh, en) })),

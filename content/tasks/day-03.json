@@ -294,10 +294,6 @@
               "id": "gate",
               "label": "上线前审批",
               "group": "constraints",
-              "from": {
-                "conv": "boss"
-              },
-              "hint": "在你发给老王的 v17 里",
               "paths": [
                 {
                   "id": "every",
@@ -338,7 +334,11 @@
                   "delta": {
                     "safe": 25,
                     "hands": -5
-                  }
+                  },
+                  "from": {
+                    "conv": "boss"
+                  },
+                  "hint": "在你发给老王的 v17 里"
                 }
               ]
             },
@@ -464,10 +464,6 @@
               "id": "front",
               "label": "前端接入",
               "group": "support",
-              "from": {
-                "conv": "partner"
-              },
-              "hint": "在 Vivi 的私聊里",
               "paths": [
                 {
                   "id": "export",
@@ -507,7 +503,11 @@
                     "hands": 5,
                     "gain": -5,
                     "safe": -10
-                  }
+                  },
+                  "from": {
+                    "conv": "partner"
+                  },
+                  "hint": "在 Vivi 的私聊里"
                 }
               ]
             }
@@ -542,6 +542,10 @@
               {
                 "who": "kuro",
                 "text": "昨天配的还在。线挪到 80 了。"
+              },
+              {
+                "who": "kuro",
+                "text": "还有，她那页的皮子还在她私聊里。接不接，你定。"
               }
             ]
           },

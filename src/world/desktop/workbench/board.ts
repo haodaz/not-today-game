@@ -8,7 +8,7 @@
 import type { State } from "@state/types.gen";
 import type { GameEvent } from "@state/events";
 import type { Task, TaskBoard } from "@state/days/tasks";
-import { autoUnlock, boardState, canFetch, canPrint, foundCardIds, isKuroCard, isObjectLock, isReadLock, lockCodesOffered, lockJammed, lockObjectAvailable, lockUsedOk, modFound, trayCards, tuneCarried, tuneStepsLeft, wrongReadings, type BoardState } from "@state/days/board";
+import { autoUnlock, boardState, canFetch, canPrint, foundCardIds, isKuroCard, isObjectLock, isReadLock, lockCodesOffered, lockJammed, lockObjectAvailable, lockUsedOk, pathFound, trayCards, tuneCarried, tuneStepsLeft, wrongReadings, type BoardState } from "@state/days/board";
 import { ideOps, ideSrc, ideTranscript } from "@state/days/ide";
 import { cls, html, type SafeHtml } from "@world/html";
 import { FRAMES, frameUrl } from "../kuro/body";
@@ -422,7 +422,8 @@ const actions: Record<string, ActionHandler> = {
     const tune = c?.board.tune;
     if (!c || !tune || !id || !pathId) return;
     const mod = tune.mods.find((m) => m.id === id);
-    if (!mod || !mod.paths.some((p) => p.id === pathId) || !modFound(mod, ctx.store.getState().day, ctx.store.getEvents())) return;
+    const def = mod?.paths.find((p) => p.id === pathId);
+    if (!mod || !def || !pathFound(mod, def, ctx.store.getState().day, ctx.store.getEvents())) return;
     const s = stateOf(ctx, c.task, c.board);
     const path = s.mods[id] === pathId ? null : pathId;
     if (path !== null && s.mods[id] === undefined && tuneStepsLeft(c.board, s) === 0) return;

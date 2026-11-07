@@ -294,10 +294,6 @@
               "id": "gate",
               "label": "Release gate",
               "group": "constraints",
-              "from": {
-                "conv": "boss"
-              },
-              "hint": "In the v17 you sent Wang",
               "paths": [
                 {
                   "id": "every",
@@ -338,7 +334,11 @@
                   "delta": {
                     "safe": 25,
                     "hands": -5
-                  }
+                  },
+                  "from": {
+                    "conv": "boss"
+                  },
+                  "hint": "In the v17 you sent Wang"
                 }
               ]
             },
@@ -464,10 +464,6 @@
               "id": "front",
               "label": "Front end",
               "group": "support",
-              "from": {
-                "conv": "partner"
-              },
-              "hint": "In Vivi's chat",
               "paths": [
                 {
                   "id": "export",
@@ -507,7 +503,11 @@
                     "hands": 5,
                     "gain": -5,
                     "safe": -10
-                  }
+                  },
+                  "from": {
+                    "conv": "partner"
+                  },
+                  "hint": "In Vivi's chat"
                 }
               ]
             }
@@ -542,6 +542,10 @@
               {
                 "who": "kuro",
                 "text": "Yesterday's settings are still there. The line moved to 80."
+              },
+              {
+                "who": "kuro",
+                "text": "And her page's skin is still in her chat. Whether to wire it is yours to decide."
               }
             ]
           },

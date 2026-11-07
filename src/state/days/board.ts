@@ -5,7 +5,7 @@
 import type { BoardOp, GameEvent } from "../events";
 import type { State } from "../types.gen";
 import { meetingCardFound } from "./meeting";
-import { isMeetingFrom, taskByFlag, taskFiles, type BoardCard, type BoardLock, type CardFrom, type Task, type TaskBoard, type TaskDeliverable, type TuneMod } from "./tasks";
+import { isMeetingFrom, taskByFlag, taskFiles, type BoardCard, type BoardLock, type CardFrom, type Task, type TaskBoard, type TaskDeliverable, type TuneMod, type TunePath } from "./tasks";
 import { dayFile } from "./table";
 import { takenByKuro } from "@world/objects/taken";
 import { handOf } from "../hands";
@@ -183,6 +183,10 @@ export function tuneReached(board: TaskBoard, s: BoardState): boolean {
 /** tune: a module's source has been found today (as a card's; no source → found). */
 export function modFound(mod: TuneMod, day: number, events: readonly GameEvent[]): boolean {
   return sourceFound(mod.from, day, events);
+}
+/** tune: a path is offered: its module found, and its own source (if any) found today. */
+export function pathFound(mod: TuneMod, path: TunePath, day: number, events: readonly GameEvent[]): boolean {
+  return modFound(mod, day, events) && sourceFound(path.from, day, events);
 }
 
 /** tune: the slack under today's line that still counts as right (the judge's tolerance). */

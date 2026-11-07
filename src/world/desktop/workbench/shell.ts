@@ -5,7 +5,7 @@
 // placing, Kuro's fill, the lock, print and send are the board's own actions. Card state is session
 // only, per task (`session.shell`); the board itself rebuilds from the log.
 import type { GameEvent } from "@state/events";
-import { boardState, canFetch, canPrint, foundCardIds, modFound, taskForId, tuneCarried, tuneStepsLeft, type BoardState } from "@state/days/board";
+import { boardState, canFetch, canPrint, foundCardIds, modFound, pathFound, taskForId, tuneCarried, tuneStepsLeft, type BoardState } from "@state/days/board";
 import { ideOps, ideSrc, ideTranscript, selectedSlot, type IdeLine } from "@state/days/ide";
 import { API_FIELD, SLOT_FIELD, type Task, type TaskBoard } from "@state/days/tasks";
 import { deliverablePage } from "@state/files";
@@ -190,6 +190,11 @@ function tunePane(board: TaskBoard, s: BoardState, day: number, events: readonly
     const blocked = chosen === undefined && left === 0;
     const chips = m.paths.map((p) => {
       const on = chosen === p.id;
+      // a path with a source of its own waits for it (her skin: Vivi's chat; the diff-only approval: the v17 you sent)
+      if (!pathFound(m, p, day, events)) {
+        const hint = p.hint ?? (hasString("board.notFound") ? t("board.notFound") : "");
+        return html`<div class="sh-path notfound" aria-disabled="true" title="${hint}"><span class="sh-path-l">${hint}</span></div>`;
+      }
       const deltas = tune.dims.filter((d) => p.delta[d.id] !== undefined).map((d) => html`<span class="${cls("sh-mod-d", p.delta[d.id]! > 0 ? "plus" : "minus")}">${d.label} ${sign(p.delta[d.id]!)}</span>`);
       const body = html`<span class="sh-path-l">${p.label}</span><span class="sh-mod-ds">${deltas}</span>`;
       if (!live) return html`<div class="${cls("sh-path", on && "on")}">${body}</div>`;

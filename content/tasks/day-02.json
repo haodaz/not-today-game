@@ -265,10 +265,6 @@
               "id": "gate",
               "label": "上线前审批",
               "group": "constraints",
-              "from": {
-                "conv": "boss"
-              },
-              "hint": "在你发给老王的 v17 里",
               "paths": [
                 {
                   "id": "every",
@@ -394,10 +390,6 @@
               "id": "front",
               "label": "前端接入",
               "group": "support",
-              "from": {
-                "conv": "partner"
-              },
-              "hint": "在 Vivi 的私聊里",
               "paths": [
                 {
                   "id": "export",

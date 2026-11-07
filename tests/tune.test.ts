@@ -4,7 +4,7 @@
 // reaches 80 with its new paths), and day 3 opens with day 2's choices still set.
 import { describe, expect, it } from "vitest";
 import type { GameEvent } from "@state/events";
-import { boardJudgement, boardState, canPrint, freshBoard, stepBoard, tuneBase, tuneCarried, tuneDims, tuneReached, tuneShort, tuneStepsLeft, tuneValues } from "@state/days/board";
+import { boardJudgement, boardState, canPrint, freshBoard, pathFound, stepBoard, tuneBase, tuneCarried, tuneDims, tuneReached, tuneShort, tuneStepsLeft, tuneValues } from "@state/days/board";
 import { ideSrc, ideTranscript } from "@state/days/ide";
 import { parseTaskFile, taskByFlag, type TaskBoard } from "@state/days/tasks";
 
@@ -177,6 +177,21 @@ describe("tune: modules, paths and the bars", () => {
     expect(lines).toContain("mod:evals:shadow");
     expect(lines).toContain("reach");
     expect(lines.indexOf("reach")).toBeGreaterThan(lines.indexOf("mod:evals:shadow"));
+  });
+  it("a path with a source of its own waits for it: her skin for Vivi's chat, the diff-only approval for the v17 sent to Wang; the module's other paths are free", () => {
+    const b = d3().board!;
+    const front = b.tune!.mods.find((m) => m.id === "front")!;
+    const skin = front.paths.find((p) => p.id === "skin")!;
+    const exp = front.paths.find((p) => p.id === "export")!;
+    expect(pathFound(front, exp, 3, [])).toBe(true);
+    expect(pathFound(front, skin, 3, [])).toBe(false);
+    expect(pathFound(front, skin, 3, [{ kind: "open", day: 3, target: "conv:partner" } as GameEvent])).toBe(true);
+    const gate = b.tune!.mods.find((m) => m.id === "gate")!;
+    const diff = gate.paths.find((p) => p.id === "diff")!;
+    expect(pathFound(gate, diff, 3, [])).toBe(false);
+    expect(pathFound(gate, diff, 3, [{ kind: "open", day: 3, target: "conv:boss" } as GameEvent])).toBe(true);
+    // Kuro's day-3 open beat is where her skin is mentioned
+    expect(ideTranscript(b, []).some((l) => l.on === "open" && l.who === "kuro" && l.text.includes("皮子"))).toBe(true);
   });
   it("the loader: a tuning board has no slots and no cards, paths name dimensions and carry sub-actions, the assist names paths within the budget, beats name modules and paths", () => {
     const base = JSON.parse(JSON.stringify(d2()));

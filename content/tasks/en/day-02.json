@@ -265,10 +265,6 @@
               "id": "gate",
               "label": "Release gate",
               "group": "constraints",
-              "from": {
-                "conv": "boss"
-              },
-              "hint": "In the v17 you sent Wang",
               "paths": [
                 {
                   "id": "every",
@@ -394,10 +390,6 @@
               "id": "front",
               "label": "Front end",
               "group": "support",
-              "from": {
-                "conv": "partner"
-              },
-              "hint": "In Vivi's chat",
               "paths": [
                 {
                   "id": "export",

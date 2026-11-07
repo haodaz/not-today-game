@@ -1064,6 +1064,8 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .sh-path.on{border-color:#2F6FEB;background:#F3F7FF}
 .sh-path.on::before{border-color:#2F6FEB;background:#2F6FEB;box-shadow:inset 0 0 0 2px #FFFFFF}
 .sh-path:disabled{opacity:.45;cursor:default}
+.sh-path.notfound{color:var(--ink-2);font-style:italic;cursor:default;background:#F6F6F6;border-style:dashed}
+.sh-path.notfound::before{border-style:dashed}
 .sh-path:hover:not(:disabled){background:#F6F7F9}
 .sh-path.on:hover{background:#F3F7FF}
 .sh-path-l{flex:1 1 auto}
