@@ -50,8 +50,10 @@ describe("the twin", () => {
     // Two entries' facings swapped (each still unique in its own file).
     expect(twin((r) => ([r.room[0].facing, r.room[1].facing] = [r.room[1].facing, r.room[0].facing]))).toThrow(/content\/en\/photos\.json room\[0\]: day/);
     expect(twin((r) => delete r.room[withOverlay].add.overlay)).toThrow(new RegExp(`room\\[${withOverlay}\\]\\.add\\.overlay: missing`));
-    const noOverlay = (zhRaw as any).room.findIndex((r: any) => r.add.overlay === undefined) as number;
-    expect(twin((r) => (r.room[noOverlay].add.overlay = "/room/photos/other.jpg"))).toThrow(new RegExp(`room\\[${noOverlay}\\]\\.add\\.overlay: not in the Chinese`));
+    // Every entry has an overlay now (days 3-18 all shot, 2026-11-06), so the Chinese loses one instead.
+    const zhLess = clone(zhRaw);
+    delete zhLess.room[withOverlay].add.overlay;
+    expect(() => localisePhotos(parsePhotos(zhLess), parsePhotos(enRaw, "en/photos.json"))).toThrow(new RegExp(`room\\[${withOverlay}\\]\\.add\\.overlay: not in the Chinese`));
     expect(twin((r) => delete r.room[0].add.text)).toThrow(/room\[0\]\.add\.text: missing/);
     // The twin is read as strictly as the Chinese, and its own errors name it.
     expect(twin((r) => (r.room[0].add.extra = 1))).toThrow(/content\/en\/photos\.json room\[0\]\.add: unknown key "extra"/);
