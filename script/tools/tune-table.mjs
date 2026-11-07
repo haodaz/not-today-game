@@ -129,6 +129,12 @@ function board(lang, day) {
   };
 }
 if (process.argv[1] && process.argv[1].endsWith("tune-table.mjs")) {
+  // the preview page carries the same table (labels + deltas, zh) between /*TUNE*/ and /*END*/ so its analysis matches the game
+  const page = "public/docs/player/day-03-train.html";
+  const table = Object.fromEntries(MODS.map(([id, group, zh, , , paths]) => [id, { label: zh, group, paths: Object.fromEntries(paths.map((p) => [p.id, { label: p.zh, delta: p.delta, bullets: p.bz, trap: p.trap }])) }]));
+  const html = fs.readFileSync(page, "utf8").replace(/\/\*TUNE\*\/[\s\S]*?\/\*END\*\//, "/*TUNE*/" + JSON.stringify({ dims: DIMS.map(([id, zh]) => [id, zh]), start: START, mods: table }) + "/*END*/");
+  fs.writeFileSync(page, html);
+  console.log(page, "table written");
   for (const [file, lang, day] of [["content/tasks/day-02.json", "zh", 2], ["content/tasks/en/day-02.json", "en", 2], ["content/tasks/day-03.json", "zh", 3], ["content/tasks/en/day-03.json", "en", 3]]) {
     const t = JSON.parse(fs.readFileSync(file, "utf8"));
     const task = t.tasks.find((x) => x.id === "task1");
