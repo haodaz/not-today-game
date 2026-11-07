@@ -14,3 +14,9 @@ The blind-box case arrives on day 1 with the lunch delivery: the `box` beat (con
 ## R3. Tests
 - Day 1 before pickup: no `pick-box` / `bed-box` in 房间 / 床, the backdrop src is the `_nobox` file, the desk bar has no box; after pickup the normal ones; a reload between the two keeps each state; day 2 morning shows the box.
 - Snapshots that change only by the backdrop src or the hotspot: list them, do not edit them.
+
+## R4. Day 1: the arrival scene (author 2026-11-07, content in the tree)
+- Day 1's `beats.box` is now the arrival scene (doorbell → the door with the bag and the carton → the player's line → the table by the window → the carton opened, nine small boxes → Kuro → the player). It plays at the moment of day 1's `pickup` (the lunch taken in), not on `openLayer` as the box beats do today. When its last line is advanced, the case overlay (`pick-box`) opens by itself; the `box` item (拆开看看。) is done by that opening as today.
+- On day 1 `openLayer` queues no box beat (the scene has played); days 2–18 keep their box beats on `openLayer` as today.
+- The scene's backdrops are `/room/dream/door.jpg` and `/room/dream/table.jpg`, its props `/room/props/carton.png` (closed) and `/room/props/carton_open.png` (nine boxes); Claude supplies them.
+- Test: day 1 pickup queues the scene; advancing past its end opens the case; openLayer on day 1 queues no beat; day 2 openLayer still does.

@@ -46,11 +46,38 @@
         },
         {
           "k": "narration",
-          "t": "门口两样东西：一袋外卖，一个没有寄件人的纸箱。"
+          "t": "打开门，门外有一个纸袋，还有一个纸箱。",
+          "backdrop": "/room/dream/door.jpg",
+          "prop": "/room/props/carton.png"
+        },
+        {
+          "k": "speaker",
+          "t": "……这是买一送一了吗。",
+          "who": "me"
         },
         {
           "k": "narration",
-          "t": "箱子上有收件人，是你的名字。"
+          "t": "我把它们都拿进来了。"
+        },
+        {
+          "k": "narration",
+          "t": "外卖先放在小桌上。我打开了纸箱。",
+          "backdrop": "/room/dream/table.jpg"
+        },
+        {
+          "k": "narration",
+          "t": "纸箱里面是九个小盒子。",
+          "prop": "/room/props/carton_open.png"
+        },
+        {
+          "k": "speaker",
+          "t": "这是盲盒吗？",
+          "who": "kuro"
+        },
+        {
+          "k": "speaker",
+          "t": "总之，拆开看看吧。",
+          "who": "me"
         }
       ]
     },
@@ -278,7 +305,7 @@
     },
     {
       "id": "box",
-      "text": "床边那个箱子，拆了。",
+      "text": "拆开看看。",
       "unlock": "done:pickup",
       "done": "event:openBox",
       "required": true

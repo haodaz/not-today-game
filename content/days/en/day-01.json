@@ -46,11 +46,38 @@
         },
         {
           "k": "narration",
-          "t": "Two things at the door: the takeout, and a cardboard box with no sender."
+          "t": "I open the door. A paper bag outside, and a cardboard box.",
+          "backdrop": "/room/dream/door.jpg",
+          "prop": "/room/props/carton.png"
+        },
+        {
+          "k": "speaker",
+          "t": "...Buy one, get one free?",
+          "who": "me"
         },
         {
           "k": "narration",
-          "t": "The box has a recipient. It is your name."
+          "t": "I brought them both in."
+        },
+        {
+          "k": "narration",
+          "t": "The takeout goes on the little table first. I opened the box.",
+          "backdrop": "/room/dream/table.jpg"
+        },
+        {
+          "k": "narration",
+          "t": "Inside: nine small boxes.",
+          "prop": "/room/props/carton_open.png"
+        },
+        {
+          "k": "speaker",
+          "t": "Is this a blind box?",
+          "who": "kuro"
+        },
+        {
+          "k": "speaker",
+          "t": "Whatever it is. Let's open them and see.",
+          "who": "me"
         }
       ]
     },
@@ -278,7 +305,7 @@
     },
     {
       "id": "box",
-      "text": "That box by the bed. Open it.",
+      "text": "Open them and see.",
       "unlock": "done:pickup",
       "done": "event:openBox",
       "required": true

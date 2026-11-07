@@ -276,13 +276,16 @@ describe("the tabletop's things are photos (day-loop correction 2026-11-01)", ()
     expect(ctx.session.hand.using).toBe(false);
     syncLoop(ctx);
     // (Here the box was the day's last item, so nightfall follows them.)
-    expect(ctx.session.dialogue.queue.map((q) => q.key).slice(0, 2)).toEqual(["d1:beat:box", `d1:recognise:${object}`]);
+    // The box beat is the arrival scene now (box-arrival R4, content 2026-11-07): split into pieces by speaker (lying-view R1), the question after them.
+    const keys = ctx.session.dialogue.queue.map((q) => q.key);
+    expect(keys[0]).toMatch(/^d1:beat:box/);
+    expect(keys).toContain(`d1:recognise:${object}`);
     const open = render(ctx);
     // No opened box on the floor (author 2026-11-03: it looked odd all day); the hover cursor says 打开.
     expect(open).not.toContain("box-open");
     expect(open).toContain(`class="held-layer" data-held="${object}"`);
     // Read through the beat; answer the question: it settles onto the desk row.
-    while (ctx.session.dialogue.queue[0]?.key === "d1:beat:box") act(ctx, "loop-advance");
+    while (ctx.session.dialogue.queue[0]?.key.startsWith("d1:beat:box")) act(ctx, "loop-advance");
     expect(ctx.session.dialogue.queue[0]?.key).toBe(`d1:recognise:${object}`);
     const q = ctx.session.dialogue.queue[0]!;
     if (q.ending.kind !== "recognise") throw new Error("not the question");
