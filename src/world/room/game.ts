@@ -30,6 +30,9 @@ import { mealView } from "@world/delivery/meals";
 import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, persistLocale, setLocale, t, tr } from "@world/i18n";
 import { recordedOn } from "@state/sleeptalk";
+import type { State } from "@state/types.gen";
+import type { GameEvent } from "@state/events";
+import { takenByKuro } from "@world/objects/taken";
 import { LOOK_KEYS, nextLook, roomLooks, type LookKey } from "@state/room-looks";
 import { skipToLast, storyMasked } from "@world/dialogue/mask";
 import { tabooActions, tabooLayer } from "@world/dialogue/taboo";
@@ -73,7 +76,7 @@ import { composerActions, workbenchActions, workbenchUiActions } from "@world/de
 import { meetingActions } from "@world/desktop/workbench/meeting";
 import { taskShellActions } from "@world/desktop/workbench/shell";
 import { boardActions, lockFaceMove } from "@world/desktop/workbench/board";
-import { enterUse, facingOf, lampLit, recWorksHere, REC_WORKS, worksHere } from "@world/objects/works";
+import { enterUse, facingOf, lampLit, placeOf, recWorksHere, REC_WORKS, worksHere } from "@world/objects/works";
 import { canSkipPrologue, endPrologue, prologueDone, prologueOn, prologueShowing, renderPrologue } from "@world/opening";
 import { workActions } from "@world/desktop/workbench/work";
 import { renderFiles } from "@world/desktop/files/view";
@@ -515,6 +518,31 @@ function pressRec(ctx: ActionContext): void {
   ctx.rerender();
 }
 
+/**
+ * object-tutor R4: a key pressed on `id` where it does not work. Its `works` line once per press
+ * signature (object, facing, day / evening, lamp): the first press after entering 使用 (which clears
+ * it), then again only after a move or a change of time. The same key as the entry's line, so a
+ * line still in the box is not stacked under itself.
+ */
+/** A press in 使用 that does not depend on the place (翻面): answered if it does not work here; a working press clears the memory. */
+function onUseKey(ctx: ActionContext, id: string): void {
+  if (worksHere(ctx.store.getState(), ctx.session, id)) ctx.session.worksAnswered = null;
+  else cannotUse(ctx, id);
+}
+
+function cannotUse(ctx: ActionContext, id: string): void {
+  const { store, session } = ctx;
+  const day = store.getState().day;
+  const p = placeOf(session);
+  const sig = `${id}|${p.facing}|${p.day}|${p.lamp}`;
+  if (session.worksAnswered === sig) return;
+  session.worksAnswered = sig;
+  const line = handOf(id).works?.line;
+  if (!line || !hasString(line)) return;
+  session.dialogue = push(session.dialogue, { key: `d${day}:works:${id}`, lines: [{ k: "inner", t: t(line) }], ending: { kind: "none" } });
+  ctx.rerender();
+}
+
 function takePhoto(ctx: ActionContext): void {
   const { store, session } = ctx;
   const state = store.getState();
@@ -795,7 +823,7 @@ export const loopActions: Record<string, ActionHandler> = {
       ctx.rerender();
       return;
     }
-    session.dialogue = push(session.dialogue, { key: `d${day}:bed:ask`, lines: [{ k: "inner", t: t("room.bed.confirm") }], ending: { kind: "bedAsk" } });
+    session.dialogue = push(session.dialogue, bedAskQueued(ctx));
     ctx.rerender();
   },
   // The answer to 睡 (lying-view R4): from `lying` the night begins at once. A 睡 given anywhere else
@@ -967,11 +995,14 @@ export const loopActions: Record<string, ActionHandler> = {
     }
     // 睡 / 再待会儿: sleeping goes on as lying down always did; staying changes nothing.
     if (q.ending.kind === "bedAsk") {
-      if (data.choice !== "sleep" && data.choice !== "stay") return;
+      if (data.choice !== "sleep" && data.choice !== "stay" && !(data.choice === "record" && q.ending.record)) return;
       ctx.session.dialogue = finishChoice(ctx.session.dialogue);
       settleSession(ctx.session);
       if (data.choice === "sleep") loopActions["sleep"]!(ctx, {} as DOMStringMap, null as never);
-      else ctx.rerender();
+      else if (data.choice === "record") {
+        recordFromBed(ctx);
+        ctx.rerender();
+      } else ctx.rerender();
       return;
     }
     // lying-view R6: 起床 goes up to 床 (and the day's `rise` beat plays there, once); 再躺一会儿 stays.
@@ -1113,6 +1144,19 @@ export const loopActions: Record<string, ActionHandler> = {
   // The dim (a click outside), Esc, right-click: 退出 when in use, else 放下.
   "loop-put-down"(ctx) {
     const { session } = ctx;
+    // object-tutor R2: the walkman taken up from the bed question: putting it down (from 使用 at
+    // once) lays it back and the bed question is asked again (from the bed, lying-view R4).
+    if (session.recordTrip) {
+      session.recordTrip = false;
+      if (session.holding === "tape") {
+        session.hand.using = false;
+        session.hand.keyDown = null;
+        session.holding = null;
+        restHand(session);
+        loopActions["bed"]!(ctx, {} as DOMStringMap, null as never);
+        return;
+      }
+    }
     if (!session.phoneOpen && session.holding && session.hand.using) {
       session.hand.using = false;
       session.hand.keyDown = null;
@@ -1173,7 +1217,10 @@ export const loopActions: Record<string, ActionHandler> = {
     if (!(onFront && session.hand.face === "front") && !(onBack && session.hand.face === "back")) return;
     // objects-in-room R1: where it does not work its keys do nothing (the flip phone still opens:
     // the hinge is not a key).
-    if (!worksHere(ctx.store.getState(), session, id) && !(id === "phone" && key === PHONE_FLIP)) return;
+    // object-tutor R4: the press is answered with the cannot-use line (the first press after entering
+    // 使用, and again once the place or the time has changed and it still does not work).
+    if (!worksHere(ctx.store.getState(), session, id) && !(id === "phone" && key === PHONE_FLIP)) return void cannotUse(ctx, id);
+    session.worksAnswered = null;
     // The dictionary's keys are under its lid until it is open.
     if (id === "dictionary" && (session.hand.programs.dictionary as { open?: boolean } | undefined)?.open !== true) return;
     // tape-record R1: rec has its own works rule (床, at night); elsewhere its line and nothing else.
@@ -1240,6 +1287,9 @@ export const loopActions: Record<string, ActionHandler> = {
     session.hand.face = session.hand.face === "front" ? "back" : "front";
     session.hand.flippedAt = ctx.now?.() ?? Date.now();
     if (id === "iccard") pressKey(ctx, id, "flip");
+    // object-tutor R4: 翻面 is the card's one key: where it does not work it still turns over, and
+    // the press is answered as any key's is.
+    onUseKey(ctx, id);
     ctx.rerender();
   },
   // 倒过来 in 使用 (calculator): toggle the in-plane roll 0 ↔ 180. Past UPSIDE_DOWN_DEG the program
@@ -1565,8 +1615,39 @@ function askSleepAfterChat(ctx: ActionContext, wasTalking: boolean, day: number)
   const lc = loopContext(store.getState(), store.getEvents());
   if (!lc || !nightfallReached(lc) || !openFor(ctx, (e) => e.type === "lieDown")) return;
   if (session.dialogue.queue.some((q) => q.ending.kind === "bedAsk")) return;
-  session.dialogue = push(session.dialogue, { key: `d${day}:bed:ask`, lines: [{ k: "inner", t: t("room.bed.confirm") }], ending: { kind: "bedAsk" } });
+  session.dialogue = push(session.dialogue, bedAskQueued(ctx));
   ctx.rerender();
+}
+
+/** object-tutor R2: the night whose bed question offers the recorder (day 6's lock reads that night's recording). */
+export const RECORD_ASK_DAY = 5;
+
+/**
+ * object-tutor R2: 打开录音机 is offered on night 5 only, while the tape is found and not taken by
+ * Kuro, and until a recording of that night is on.
+ */
+export function recordOffered(state: State, events: readonly GameEvent[]): boolean {
+  return state.day === RECORD_ASK_DAY && (state.found as string[]).includes("tape") && !takenByKuro("tape", state, events) && !recordedOn(events, state.day);
+}
+
+/** The bed question (睡 / 再待会儿, and 打开录音机 when it is offered). */
+function bedAskQueued(ctx: ActionContext) {
+  const state = ctx.store.getState();
+  const record = recordOffered(state, ctx.store.getEvents());
+  return { key: `d${state.day}:bed:ask`, lines: [{ k: "inner" as const, t: t("room.bed.confirm") }], ending: record ? { kind: "bedAsk" as const, record: true as const } : { kind: "bedAsk" as const } };
+}
+
+/**
+ * object-tutor R2: 打开录音机. The question has closed; the walkman goes into the hand at 床 and into
+ * 使用, as 道具 → hold → 使用 would (its drawn keys; REC works there at night, tape-record R1).
+ */
+function recordFromBed(ctx: ActionContext): void {
+  const { session } = ctx;
+  if (session.view !== "bed") loopActions["view"]!(ctx, { view: "bed" } as DOMStringMap, null as never);
+  loopActions["loop-hold"]!(ctx, { object: "tape" } as DOMStringMap, null as never);
+  if (session.holding !== "tape") return;
+  loopActions["obj-use"]!(ctx, {} as DOMStringMap, null as never);
+  session.recordTrip = true;
 }
 
 for (const [name, handler] of Object.entries(loopActions)) {

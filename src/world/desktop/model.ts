@@ -248,6 +248,10 @@ export interface Session {
   bootBeatDay: number;
   /** lying-view R6: the day whose `rise` beat played on the first 起床 (once a day; session only). */
   riseBeatDay: number;
+  /** object-tutor R2: the walkman was taken up from the bed question (打开录音机); putting it down asks again. */
+  recordTrip: boolean;
+  /** object-tutor R4: where a failing key press was last answered with the cannot-use line (cleared on entering 使用). */
+  worksAnswered: string | null;
   /** playtest-1105 R4: the line each thing in the room said last (so it is not said twice in a row). */
   looks: Partial<Record<"coat" | "bag" | "door" | "lock", number>>;
   /** How long a delivery minute is (ms): 60 000, or 1 000 with the dev-only `?fast=1`. */
@@ -482,6 +486,8 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     screenOffDay: 0,
     bootBeatDay: 0,
     riseBeatDay: 0,
+    recordTrip: false,
+    worksAnswered: null,
     looks: {},
     splatReady: false,
     cam: null,

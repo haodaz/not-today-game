@@ -17,7 +17,8 @@ export type Ending =
   /** "Do you know what this is?" (recognise spec): the options in this run's order (content indexes). */
   | { readonly kind: "recognise"; readonly object: string; readonly order: readonly number[] }
   /** The bed, unlocked: 睡 / 再待会儿 (day-loop addition 2026-11-02). */
-  | { readonly kind: "bedAsk" }
+  /** object-tutor R2: `record` adds 打开录音机 between them (night 5, the tape found, nothing recorded yet). */
+  | { readonly kind: "bedAsk"; readonly record?: true }
   /** lying-view R6: getting up from the bed: 起床 / 再躺一会儿. */
   | { readonly kind: "riseAsk" }
   /** Kuro's upgrade offer as a line in the box (dialogue spec): 升级 / 不了. */
@@ -313,6 +314,12 @@ export const BED_OPTIONS: readonly ChoiceOption[] = [
   { index: 0, text: null, choice: "sleep", labelKey: "room.bed.sleep" },
   { index: 1, text: null, choice: "stay", labelKey: "room.bed.stay" },
 ];
+/** object-tutor R2: 睡 / 打开录音机 / 再待会儿. */
+export const BED_RECORD_OPTIONS: readonly ChoiceOption[] = [
+  { index: 0, text: null, choice: "sleep", labelKey: "room.bed.sleep" },
+  { index: 1, text: null, choice: "record", labelKey: "room.bed.record" },
+  { index: 2, text: null, choice: "stay", labelKey: "room.bed.stay" },
+];
 export const RISE_OPTIONS: readonly ChoiceOption[] = [
   { index: 0, text: null, choice: "up", labelKey: "room.rise.up" },
   { index: 1, text: null, choice: "stay", labelKey: "room.rise.stay" },
@@ -331,7 +338,7 @@ function options(q: Queued, state: State, events?: readonly GameEvent[]): Choice
   if (q.ending.kind === "loan") return [...LOAN_OPTIONS];
   if (q.ending.kind === "kuroAsk") return [...KURO_ASK_OPTIONS];
   if (q.ending.kind === "kuroOffer") return [...KURO_OFFER_OPTIONS];
-  if (q.ending.kind === "bedAsk") return [...BED_OPTIONS];
+  if (q.ending.kind === "bedAsk") return q.ending.record ? [...BED_RECORD_OPTIONS] : [...BED_OPTIONS];
   if (q.ending.kind === "riseAsk") return [...RISE_OPTIONS];
   if (q.ending.kind === "recognise") {
     // No hints: the same look for every option; the order is the run's, not content's.

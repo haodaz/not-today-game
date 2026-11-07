@@ -101,6 +101,25 @@ export function answerQueued(day: number, object: string, option: number): Queue
   };
 }
 
+/**
+ * object-tutor R1: Kuro's arrival line for `object` (`kuro.tutor.<id>`, then `kuro.tutor.<id>.2` if
+ * there is one), as Kuro's own line in a day sequence (`who: "kuro"`, lying-view R1). Null when the
+ * first string is missing. The key is not `kuro:`, so leaving a chat never drops it.
+ */
+export function tutorQueued(day: number, object: string): Queued | null {
+  const key = `kuro.tutor.${object}`;
+  if (!hasString(key)) return null;
+  const lines: SayLine[] = [{ k: "speaker", who: "kuro", t: t(key) }];
+  if (hasString(`${key}.2`)) lines.push({ k: "speaker", who: "kuro", t: t(`${key}.2`) });
+  return { key: `d${day}:tutor:${object}`, lines, ending: { kind: "none" } };
+}
+
+/** object-tutor R1: this event is the run's first `recognise` for its object, on the object's own day. */
+function firstRecogniseOnItsDay(events: readonly GameEvent[], e: Extract<GameEvent, { kind: "recognise" }>): boolean {
+  if (recogniseTable.get(e.objectId)?.day !== e.day) return false;
+  return events.find((x) => x.kind === "recognise" && x.objectId === e.objectId) === e;
+}
+
 function itemQueued(day: number, item: Item, which: "onUnlock" | "onDone") {
   const seq = item[which];
   return seq ? { key: `d${day}:${item.id}:${which}`, lines: placedLines(seq), ending: { kind: "none" as const }, sequence: seq } : null;
@@ -175,8 +194,11 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
         const q = questionQueued(day, e.objectId, runId);
         if (q) dialogue = push(dialogue, q);
       }
-    } else if (e.kind === "recognise" && e.option !== undefined) {
-      dialogue = push(dialogue, answerQueued(day, e.objectId, e.option));
+    } else if (e.kind === "recognise") {
+      if (e.option !== undefined) dialogue = push(dialogue, answerQueued(day, e.objectId, e.option));
+      // object-tutor R1: then Kuro's line about it, once a run (from the log: a reload has seen it).
+      const tutor = firstRecogniseOnItsDay(events, e) ? tutorQueued(day, e.objectId) : null;
+      if (tutor) dialogue = push(dialogue, tutor);
     } else if (e.kind === "choose") {
       const choice = choiceOf(day, e.beat, e.index);
       // night-hand (author 2026-11-06): the picked shutdown choice's own lines, right after the
@@ -248,6 +270,7 @@ export function syncLoop(ctx: ActionContext, nowMs: number = Date.now()): void {
       session.view = "lying";
       session.phoneOpen = false;
       session.holding = null;
+      session.recordTrip = false;
       // Nothing stays in the hand: just held, front up (programs restart on a new day by themselves).
       session.hand = { ...session.hand, using: false, face: "front", keyDown: null, openedAt: null };
       session.door = null;

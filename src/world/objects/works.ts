@@ -55,6 +55,8 @@ export function enterUse(ctx: ActionContext, id: string): boolean {
   const state = store.getState();
   const facing = facingOf(session.view);
   const ok = worksHere(state, session, id);
+  // object-tutor R4: the first key press after this entry is answered again.
+  session.worksAnswered = null;
   if (!logged(store.getEvents(), state.day, id, facing, ok)) store.appendEvent({ kind: "useAt", objectId: id, facing, ok });
   const line = handOf(id).works?.line;
   if (!ok && line && hasString(line)) {
