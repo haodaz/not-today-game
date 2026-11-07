@@ -555,7 +555,7 @@ export function frontApp(s: Pick<Session, "view" | "focus" | "leftApp" | "rightA
 export function shownConversation(s: Pick<Session, "view" | "focus" | "leftApp" | "rightApp" | "conversation" | "homeConversation">): string | null {
   const app = frontApp(s);
   if (app === "msgs") return s.homeConversation === FEED ? null : s.homeConversation;
-  if (app === "tingtalk") return s.conversation;
+  if (app === "tingtalk") return s.conversation || null; // "" while 听听 shows no thread (guidance G3)
   return null;
 }
 

@@ -224,7 +224,9 @@ describe("R4 / R5 · one Kuro on the screen; the checklist there", () => {
     expect(out).not.toContain('class="hud-br"');
     expect(out).toMatch(/<button type="button" class="kpet-btn[^"]*" data-action="kuro-call"[^>]*><span class="kpet" data-kuro-slot/);
     expect(out.match(/data-kuro-slot/g)).toHaveLength(1);
-    expect(out).toContain('<div class="os-list"><div class="list">');
+    // R5 (2026-11-08): the checklist's current line is in the top bar, not a card over the window.
+    expect(out).not.toContain('class="os-list"');
+    expect(out).toMatch(/<span class="next-item"><i aria-hidden="true"><\/i>[^<]+<\/span>/);
   });
 
   it("a Kuro line on the desktop: the pet talks; the box's portrait is a still; the box's class list is the room's", () => {

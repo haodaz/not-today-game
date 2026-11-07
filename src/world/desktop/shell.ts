@@ -91,7 +91,8 @@ export interface ShellModel {
    */
   readonly wallpaper?: { readonly src: string; readonly fadeFrom: string | null; readonly late: number };
   /** guidance R5: the room's 今日 card, over the OS area's top-left under the top bar (absent: none). */
-  readonly checklist?: SafeHtml | null;
+  /** guidance R5 (2026-11-08): the checklist's current line, shown in the top bar after the app's name. */
+  readonly nextItem?: string | null;
 }
 
 // ——— coach marks (onboarding-steps R1) ————————————————————————————————————————————————
@@ -201,7 +202,7 @@ function topBar(m: ShellModel, monitor: MonitorModel): SafeHtml {
     : m.weather.text
       ? html`<span>${m.weather.text}</span>`
       : null;
-  return html`<div class="top"><span class="brand">${tr("shell.brand")}</span><span>${monitor.appTitle}</span><div class="day"><span>${tr("shell.day", { day: m.day })} · ${tr(beatLabelKey(m.clock.beat))} ${m.clock.time}</span>${weather}<span class="kuro-dot" title="${t(m.night ? "shell.kuro.after" : "shell.kuro.online")}"></span><span>${tr("kuro.name")}</span>${mcControl(m)}${shutdownControl(m)}</div></div>`;
+  return html`<div class="top"><span class="brand">${tr("shell.brand")}</span><span>${monitor.appTitle}</span>${m.nextItem ? html`<span class="next-item"><i aria-hidden="true"></i>${m.nextItem}</span>` : null}<div class="day"><span>${tr("shell.day", { day: m.day })} · ${tr(beatLabelKey(m.clock.beat))} ${m.clock.time}</span>${weather}<span class="kuro-dot" title="${t(m.night ? "shell.kuro.after" : "shell.kuro.online")}"></span><span>${tr("kuro.name")}</span>${mcControl(m)}${shutdownControl(m)}</div></div>`;
 }
 
 /** 调度中心 / Mission Control's button in the top bar (tingtalk R1b); F3 does the same. */
@@ -302,7 +303,7 @@ function decoyWindow(m: ShellModel): SafeHtml | null {
 function monitor(m: ShellModel, mon: MonitorModel): SafeHtml {
   // Not on yet: a black screen and nothing else.
   if (m.off) return html`<div class="monitor off" data-side="${mon.side}" data-ring="${m.ring}" data-app="${mon.app}"><div class="os"></div></div>`;
-  return html`<div class="${cls("monitor", m.night && "night")}" data-side="${mon.side}" data-ring="${m.ring}" data-app="${mon.app}"><div class="os">${wallpaper(m)}${topBar(m, mon)}${windowFrame(m, mon)}${mon.side === "left" ? decoyWindow(m) : null}${dock(m, dockHides(mon))}${m.checklist ? html`<div class="os-list">${m.checklist}</div>` : null}${mon.overlay}${mon.side === "left" ? coachMark(m) : null}</div></div>`;
+  return html`<div class="${cls("monitor", m.night && "night")}" data-side="${mon.side}" data-ring="${m.ring}" data-app="${mon.app}"><div class="os">${wallpaper(m)}${topBar(m, mon)}${windowFrame(m, mon)}${mon.side === "left" ? decoyWindow(m) : null}${dock(m, dockHides(mon))}${mon.overlay}${mon.side === "left" ? coachMark(m) : null}</div></div>`;
 }
 
 /** The other monitor, as a thin tab on its side: the apps on it (front first) and their badges. */

@@ -197,6 +197,9 @@ export const shellActions: Record<string, ActionHandler> = {
     ctx.session.decoyWindow = null;
     if (appOn(ctx.session) !== app) ctx.session.movingUntil = (ctx.now?.() ?? Date.now()) + MOTION.crawl;
     ctx.session.focus = bringToFront(ctx.session, app);
+    // guidance G3 (2026-11-08): day 1's first open of 听听 selects no thread until a row is clicked,
+    // so a line placed at screen:msgs:boss waits for the boss's row (the view's launch rule agrees).
+    if (app === "tingtalk" && ctx.store.getState().day === 1 && ctx.session.onboard === "done" && !ctx.store.getEvents().some((e) => e.kind === "open" && e.day === 1 && e.target.startsWith("conv:"))) ctx.session.conversation = "";
     if (app === "browser") {
       // Opening the browser is logged (desktop-ui FR4; Kuro's rubric may cite it).
       ctx.store.appendEvent({ kind: "open", target: "browser", t: ctx.session.clock.time });

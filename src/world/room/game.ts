@@ -46,7 +46,7 @@ import { CAMERA_KEYS, DICT_KEYS, FLIPPERS, SHEET_GONE_MS, SHEET_SLIDE_MS, TAPE_K
 import { CAMERA_FLASH_MS, cameraShot, type CameraState } from "@world/objects/plain";
 import { DEVELOP_BLANK_MS, DEVELOP_MS, ON_THE_SPOT_DAY, photoKey, roomFacingOf, roomPhotoOn, sheetsLeft } from "@state/photos";
 import { screenPlaceOf } from "@world/desktop/files/album";
-import { booted, checklist, deskMeal, itemStates, loopContext, mealToOrder, nightfallReached, openItemFor, openTask } from "@world/loop/checklist";
+import { booted, checklist, deskMeal, itemStates, loopContext, mealToOrder, nightfallReached, openItemFor, openTask, type ChecklistView } from "@world/loop/checklist";
 import type { EventToken } from "@state/days/table";
 import { messageActions } from "@world/desktop/messages/actions";
 import { CROSSFADE_MS, MOTION, viewMoveMs } from "@world/motion/timing";
@@ -127,10 +127,10 @@ function renderGameBody(store: Store, session: Session, nowMs: number): SafeHtml
     const maskInModal = objUse !== null && dlg !== null;
     const host = objUse ? html`<div class="${cls("objbar-host", maskInModal && "over-box")}">${objUse}${maskInModal ? boxMask(session, readsOn) : null}</div>` : null;
     // guidance R15: no floating 回房间 or ⚙ (they are dock tiles now); R4: no stage Kuro body on the
-    // screen (the pet in the monitor is the one); R5: the 今日 card over the OS area's top-left.
+    // screen (the pet in the monitor is the one); R5 (2026-11-08): the checklist's current line in
+    // the top bar, not a card over the window (the window fills the frame; a card hid 听听's list).
     const lc = loopContext(state, events);
-    const list = lc ? renderChecklist(checklist(lc)) : null;
-    return html`${renderDesktop({ ...shell, checklist: list })}${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${host}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${dlgLayer(dlg, session, readsOn, !maskInModal)}<div class="hud-host">${itemsButton(session, state)}${itemsPanel(state, events, session)}${settingsPanel(session)}</div>`;
+    return html`${renderDesktop({ ...shell, nextItem: lc ? nextItemText(checklist(lc)) : null })}${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${host}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${dlgLayer(dlg, session, readsOn, !maskInModal)}<div class="hud-host">${itemsButton(session, state)}${itemsPanel(state, events, session)}${settingsPanel(session)}</div>`;
   }
   // The box does not jump (dialogue correction 2026-11-02): in every view it is anchored to the
   // viewport in the same fixed layer, not to the stage (whose size differs between views). The
@@ -151,6 +151,13 @@ function dlgLayer(dlg: SafeHtml | null, session: Session, readsOn: boolean, with
   if (!dlg) return null;
   const story = storyMasked(session.dialogue);
   return html`<div class="${cls("dlg-layer", story && "masked")}">${withMask ? boxMask(session, readsOn) : null}${dlg}</div>`;
+}
+
+/** The checklist's line that is on now (the first open one), for the desktop's top bar; null when none. */
+function nextItemText(view: ChecklistView): string | null {
+  const line = view.lines.find((l) => l.state === "now") ?? view.lines.find((l) => l.state === "next") ?? null;
+  if (!line) return null;
+  return line.work ? t("checklist.work", { done: String(line.work.done), total: String(line.work.total) }) : line.text;
 }
 
 /** The box's mask (playtest-1105 R2): takes every click under the box; reads on while a line is up. */
