@@ -4,6 +4,9 @@ The author's finding, after playing day 1 as a stranger: **the game knows the ne
 
 Principle (author): *"我们永远可以设计和点箱子差不多的阻断来引导用户 … 要有这些空气墙。你测着永远没问题，因为你永远知道精确的点哪里。用户不知道。"* At a guided moment, the one thing to do is lit and everything else answers with one line and opens nothing; everywhere else the player explores freely.
 
+## The layers (author, 2026-11-07 evening)
+Walls, from the room to the task: (1) an object that cannot be used now (床, the carton before lunch) — one line; (2) a thing already used today (the camera) — one line saying so; (3) an app on the screen that is not the one to open — one line; (4) in 听听, whose thread to read first; (5) in 听听, a file that must be opened; (6) inside a task, the order of its steps. Walls (1)–(2) have no target (gates R1: the line only). Walls (3)–(6) have a target: the guide state below (ring + line). Then two things that are not walls: (7) story rules that move the player (when lunch arrives, the story takes the player off the screen to the door); (8) **heads and tails**: every scripted stretch opens with a line that says where we are and what to do, and ends with a line that says it is done and lands the camera back where the player was. R14 lists the tails day 1 is missing.
+
 ## R1. The guide state (one mechanism)
 - A pure function `guideNow(state, events, session)` in `src/world/loop/guide.ts` returns the current guide or null: `{ target: GuideTarget; refuse: string }` where `refuse` is a strings key. Targets are a small union: `{ kind: "tower" } | { kind: "dock"; app: "tingtalk" } | { kind: "conv"; id: "boss" } | { kind: "card"; doc: string } | { kind: "clauses"; indexes: number[] } | { kind: "phone" }`. Derived from the log and the session only (survives a reload).
 - **Rendering:** the target's element carries `data-guide="on"`, and the stage draws a pulsing ring around it (class `guide-ring`, the coach's 30 % dim behind it, a 2 px ring in the coach's blue, 1.2 s ease pulse; `prefers-reduced-motion` keeps the ring and drops the pulse). One ring at a time. Where the target is not on the current view (the phone while on the desktop; the tower while facing 床), no ring is drawn and the refuse line is the guide (R2 says which lines).
@@ -67,6 +70,13 @@ Principle (author): *"我们永远可以设计和点箱子差不多的阻断来�
 
 ## R13. The case closes with the view
 - The 3×3 case layer (`case-layer`) closes on any view change / room turn (it stayed open over 窗 and while eating). Test: a `view` action with the case open closes it.
+
+## R14. Heads and tails (transitions)
+- **Vivi's page, read:** after the doc's `onOpen` line(s) have been read, the box says `vivi.back` 「看完了，接着回去工作吧。」 and the browser-doc page closes by itself: the browser window leaves the front and the app that was in front before the card was clicked (听听, or 工作台 when the lock refused a switch there) is in front again. The player is never left on the news page.
+- **Lunch arrives while on the screen:** the doorbell line(s) play as today; on their last line the camera leaves the screen by itself: 回房间, facing 门 (`delivery.leave` 「外卖到了。去门口。」 as the inner line that carries the move; the day file's own doorbell lines stay). Away from the screen the lines play and the camera turns to 门.
+- **A task sent (已交):** after its closing lines, 工作台 returns to its home page with the next task's row lit (the guide ring, R1) when one is unlocked; when none is, the home shows 「今天的活干完了」 as a line in the thread (string `wb.done.today` exists? if not, use the checklist's own state only; Claude adds the string later if wanted).
+- **The boss replied (回老板 done):** no move; the thread stays. **Shutdown:** the shutdown beat lands in 房间 as today; **bed:** lying as today.
+- Tests: the doc's tail (line, page closed, previous app front); the doorbell's camera move from the desktop and from a facing; the task's return to home with the ring.
 
 ## Files
 `src/world/loop/guide.ts` (new), `src/world/desktop/controller.ts`, `src/world/room/game.ts`, `src/world/room/hud.ts`, `src/world/desktop/shell.ts`, `src/world/desktop/placement.ts`, `src/world/desktop/vivi.ts`, `src/world/desktop/messages/{view,actions,transcript}.ts`, `src/world/desktop/workbench/{shell,work}.ts`, `src/world/desktop/browser/view.ts`, `src/world/room/case.ts`, `src/world/room/held.ts`, `src/world/room/room.css`, `src/world/desktop/desktop.css`, `src/state/days/tasks.ts` (past.json loader), `src/world/loop/waiting.ts` or wherever delivery texts are filled. Tests beside the existing ones; list any snapshot that changes and why, do not edit it.
