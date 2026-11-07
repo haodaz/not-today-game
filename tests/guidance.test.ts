@@ -140,6 +140,20 @@ describe("R1 / R2 · the guide state and the six moments", () => {
     expect(guideNow(store.getState(), store.getEvents(), r.session)?.id).not.toBe("G3");
   });
 
+  it("G3b: the boss read, his reply not sent: the chips are lit in his thread; nothing refused; off once replied", () => {
+    const store = booted();
+    step(store, "openApp:msgs");
+    open(store, "conv:boss");
+    const r = rig(store);
+    r.act("dock", { app: "tingtalk" });
+    r.act("conv", { conv: "boss" });
+    const g = guideNow(store.getState(), store.getEvents(), r.session)!;
+    expect(g).toMatchObject({ id: "G3b", target: { kind: "reply" }, refuse: null, scope: "none" });
+    expect(r.out()).toMatch(/data-conv="boss" class="chip[^"]*" data-action="chip"[^>]*data-guide="on"|data-action="chip"[^>]*data-guide="on"/);
+    store.appendEvent({ kind: "reply", choice: "fine", recipient: "boss", t: "09:05" });
+    expect(guideNow(store.getState(), store.getEvents(), r.session)?.id).not.toBe("G3b");
+  });
+
   it("G4: lunch first: the phone is lit at 桌子; on the desktop only the work's steps refuse guide.lunch.first; off once ordered", () => {
     const store = booted();
     step(store, "openApp:msgs");

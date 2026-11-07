@@ -23,6 +23,7 @@ Walls, from the room to the task: (1) an object that cannot be used now (床, th
 | G5 | Vivi's lock (`viviLock` ≠ null) **and** the boss thread was opened today → the doc opened | the deliverable card; when another app is in front, the dock tile 汀汀 (or the right-monitor tab) | `vivi.lock` (text changed in the tree: 「Vivi 在群里发了个网页，先点开看一眼。」) |
 | G6 | task page, mode `self`, a document with `conflict`, until both clauses are clicked | the conflict clauses (ring on each unclicked one) | none: nothing else is refused on the page |
 | G1b (2026-11-08, author) | day 1, the tower on, not yet at the screen (no 听听 open today) → 听听 opened | the screens (`view/desktop`) | `guide.screen.first` 「先看一眼电脑。」 for the room's other things; turning and the screen are allowed |
+| G3b (2026-11-08, author) | the boss's thread open, today's reply to him unlocked and not sent → the reply event | the reply bar's chips | none: the ring alone |
 | G7 (2026-11-08, Claude) | a board task's page, until 打快照 | the lock's button; else the tray's first card; else (a card picked) an empty slot; else 打快照 | none: nothing refused; unfound cards have no ring (Kuro's line names the sources) |
 
 - G3 changes 听听's first open of day 1: no conversation is active (the right pane empty, as a real client on launch) until a row is clicked; `session.conversation` starts null that day and the row click sets it. Days 2+ open on the boss as today.

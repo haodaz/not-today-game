@@ -19,6 +19,8 @@ export type GuideTarget =
   | { readonly kind: "screen" }
   | { readonly kind: "dock"; readonly app: "tingtalk" }
   | { readonly kind: "conv"; readonly id: "boss" }
+  /** G3b (author 2026-11-08): the reply bar's chips in the boss's thread, until the day's reply is sent. */
+  | { readonly kind: "reply" }
   | { readonly kind: "card"; readonly doc: string; readonly conv: string | null }
   | { readonly kind: "clauses"; readonly indexes: readonly number[] }
   | { readonly kind: "phone" }
@@ -33,7 +35,7 @@ export type GuideTarget =
 export type GuideScope = "all" | "work" | "none";
 
 export interface Guide {
-  readonly id: "G1" | "G1b" | "G2" | "G3" | "G4" | "G5" | "G6" | "G7" | "next";
+  readonly id: "G1" | "G1b" | "G2" | "G3" | "G3b" | "G4" | "G5" | "G6" | "G7" | "next";
   readonly target: GuideTarget;
   /** The refuse line's strings key, or null (no line of its own). */
   readonly refuse: string | null;
@@ -81,6 +83,13 @@ export function guideNow(state: State, events: readonly GameEvent[], session: Se
   // G3: day 1, 听听 open on the screen and the boss's thread not opened yet today.
   if (desktop && day === 1 && session.onboard === "done" && frontApp(session) === "tingtalk" && !openedToday(events, day, "conv:boss")) {
     return { id: "G3", target: { kind: "conv", id: "boss" }, refuse: "guide.boss.first", scope: "all" };
+  }
+
+  // G3b (author 2026-11-08): the boss's thread read, his reply not sent: the chips are lit (no refusal).
+  const reply = lc.file.items.find((it) => it.required && it.done.kind === "event" && it.done.event.type === "reply" && it.done.event.recipient === "boss");
+  if (desktop && reply && frontApp(session) === "tingtalk" && session.conversation === "boss") {
+    const st = itemStates(lc).get(reply.id)!;
+    if (st.unlocked && !st.done) return { id: "G3b", target: { kind: "reply" }, refuse: null, scope: "none" };
   }
 
   // G2: day 1, the first desktop visit after the coach marks, until 听听 has been opened.
@@ -153,6 +162,8 @@ export function onTarget(target: GuideTarget, action: string, data: Readonly<Rec
       return action === "dock" && data.app === target.app;
     case "conv":
       return action === "conv" && data.conv === target.id;
+    case "reply":
+      return action === "chip" || action === "send";
     case "card":
       return action === "open-deliverable" && data.doc === target.doc;
     case "clauses":
@@ -195,6 +206,8 @@ export function ringAnchors(target: GuideTarget): readonly (readonly (readonly [
       return [[["data-action", "dock"], ["data-app", target.app]]];
     case "conv":
       return [[["data-action", "conv"], ["data-conv", target.id]]];
+    case "reply":
+      return [[["data-action", "chip"], ["data-conv", "boss"]]];
     case "card":
       // The card in front; else its conversation's row in 听听; else 听听's dock tile.
       return [
