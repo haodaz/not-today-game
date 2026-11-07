@@ -46,3 +46,13 @@ The `open` beat is where Kuro tells a first-time player what to do (drag a sourc
 - The page opened on its own (no query) is the delivered version: the pulled numbers and the snapshot line.
 - Later days: the API's numbers may change while the snapshot does not (the foreshadowing lives here).
 - Tests: `tests/ide-v2.test.ts` (ops, gating, query, transcript, loader rejections) and the G7 sequence in `tests/guidance.test.ts`.
+
+## ide v2, day 3 — the memo and the directions (2026-11-08, author; Claude implements)
+「第三天则是在一个小时的通话之后，克总整理了一个修改纪要，我们怎么对着这个纪要去改代码（不用真的改，选区域，给 2–3 个方向，选择往哪个方向说）… 我们要模拟的是怎么把第一天的东西改口成第三天的过程（各种公司业务不变换个故事完全不同，那种现实情况的黑色幽默）」「老王说的是四个方向，具体执行是要做成好几个变化，不只是四个，一定别太死板」.
+- **The memo**: the explorer's first folder is 会议纪要 (`board.ide.memo`): 老王's directions from the call as read-only rows (the board's `given.rows`), not pages. Below it the pages, as on day 1 (five to seven of them: every page of v17 that the call touches, not one per direction).
+- **A page**: its code pane shows the v17 passage as a struck line (`{{slot}}`'s line carries the old text as a comment above it: `// v17: …`) and, instead of a tray, **2–3 directions** under the line: cards with `slot: <page>` (options belong to one page, need no source, are always found). Clicking one fills the slot (op `fill`), the preview follows (`?fill=`), Kuro answers with that card's beat (`fill:<slot>:<card>`). Choosing again replaces it.
+- **The directions**, per page, from the least to the most bent: keep the risk and fix words / risk and opportunity both / the full reversal. The slot's `answer` is the full reversal (老王's perfect); the judge's `flawed` is the middle one, `wrong` the first (the night's judgement as on other days: the hand measures how far the story bent). The deliverable is the same page either way (`day-03-evolve.html`): the business did not change, only the story.
+- 参考文献 is a page with one direction, 不动 (Kuro's 「内容改了，参考文献还改吗？」 exchange is its beat).
+- 打快照 → `snap-2028-10-16-03`; sent to 老王; a minute later his reply 「收到。这版肯定没问题，18，数字吉利。」(en: "Got it. This one's fine for sure — eighteen. (In Chinese it sounds like 'gonna get rich.') Lucky number."); 02:40 「辛苦了，好好休息。」 as before.
+- G7 lights: the first unfilled page, then its first direction, then 打快照.
+- Loader: a card may carry `slot`; such a card is in no tray, is found from the start, and may fill only that slot; the memo folder needs `given.rows`. Tests in `tests/ide-v2.test.ts`.
