@@ -4,67 +4,46 @@
   "tasks": [
     {
       "id": "task1",
-      "title": "Vivi's page: as far as it goes.",
+      "title": "The self-evolving engine, continued.",
       "app": "docs",
       "done": "task_d3_1",
       "board": {
         "kind": "table",
-        "title": "Self-evolving engine · the doable part",
+        "view": "ide",
+        "title": "Self-evolving engine · training backend",
         "columns": [
           "",
           "What the page says",
-          "What we can do"
+          "In the backend"
         ],
         "given": {
           "rows": {
-            "r1": "\"One click, a decision\"",
-            "r2": "\"Understands your data by itself\"",
-            "r3": "\"Insight in three seconds\"",
-            "r4": "\"Decisions execute themselves\""
+            "r4": "\"It evolves by itself\"",
+            "r5": "\"One click, a decision\"",
+            "r6": "\"Much prettier than this\""
           }
         },
         "slots": [
           {
-            "id": "r1",
-            "label": "Entry",
-            "answer": "c1"
-          },
-          {
-            "id": "r2",
-            "label": "Data",
-            "answer": "c2"
-          },
-          {
-            "id": "r3",
-            "label": "Three seconds",
-            "answer": "c3"
-          },
-          {
             "id": "r4",
-            "label": "Decision",
+            "label": "Training loop",
+            "answer": "c5"
+          },
+          {
+            "id": "r5",
+            "label": "Approval",
             "answer": "c4"
+          },
+          {
+            "id": "r6",
+            "label": "Interface",
+            "answer": "c6"
           }
         ],
         "cards": [
           {
-            "id": "c1",
-            "text": "Doable: the button goes to our export page",
-            "from": {
-              "file": "e-export-fn"
-            },
-            "hint": "in export.js"
-          },
-          {
-            "id": "c2",
-            "text": "Doable: the three clients' tables come in, once a week",
-            "from": {
-              "file": "e-receivable"
-            },
-            "hint": "in the receivables sheet"
-          },
-          {
-            "id": "c3",
-            "text": "As far as it goes: real computation instead, forty seconds",
+            "id": "c5",
+            "text": "Doable: feed last week's results into the next round, once a week",
             "from": {
               "conv": "xiaozhang"
             },
@@ -72,19 +51,19 @@
           },
           {
             "id": "c4",
-            "text": "Not doable: a person clicks the decision",
+            "text": "Not fully automatic: a person clicks the decision",
             "from": {
               "conv": "boss"
             },
             "hint": "in the v17 you sent Wang"
           },
           {
-            "id": "d1",
-            "text": "Doable: just write what the page says",
+            "id": "c6",
+            "text": "Doable: use the export page's look for now",
             "from": {
-              "file": "vivi-plan-2"
+              "file": "e-export-fn"
             },
-            "hint": "in Vivi's second page"
+            "hint": "in export.js"
           },
           {
             "id": "d2",
@@ -93,27 +72,161 @@
               "conv": "partner"
             },
             "hint": "in Vivi's chat"
+          },
+          {
+            "id": "d3",
+            "text": "Doable: use the skin her AI made",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "in Vivi's chat"
           }
         ],
         "kuro": {
           "fill": {
-            "r1": "c1",
-            "r2": "c2",
-            "r3": "k1",
-            "r4": "c4"
+            "r4": "c5",
+            "r5": "c4",
+            "r6": "k1"
           },
           "cards": [
             {
               "id": "k1",
-              "text": "Doable: three seconds, leave it to Kuro"
+              "text": "Doable: let me generate an interface"
             }
           ],
           "unlock": "-"
-        }
+        },
+        "ide": {
+          "src": "/docs/player/day-03-train.html?prev=1",
+          "pages": {
+            "r4": 3,
+            "r5": 4,
+            "r6": 5
+          },
+          "files": {
+            "r4": {
+              "name": "loop.config.js",
+              "code": [
+                "export const loop = {",
+                "  feed: {{slot}},  // what counts as growing by itself",
+                "  every: \"weekly\",",
+                "};"
+              ]
+            },
+            "r5": {
+              "name": "approval.config.js",
+              "code": [
+                "export const approval = {",
+                "  execute: {{slot}},  // who clicks",
+                "  approver: \"tech lead\",",
+                "};"
+              ]
+            },
+            "r6": {
+              "name": "ui.config.js",
+              "code": [
+                "export const ui = {",
+                "  skin: {{slot}},  // which face for now",
+                "  buttons: \"wired\",",
+                "};"
+              ]
+            }
+          }
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Hope you slept well."
+              },
+              {
+                "who": "me",
+                "text": "Yesterday's, continued. It runs now; what she wants is for it to grow by itself."
+              },
+              {
+                "who": "kuro",
+                "text": "Yesterday's three sections are lit in the backend. Today's three: the loop, approval, the interface."
+              }
+            ]
+          },
+          {
+            "on": "fill:r4:c5",
+            "lines": [
+              {
+                "who": "me",
+                "text": "Last week's results feed the next round. Once a week."
+              },
+              {
+                "who": "kuro",
+                "text": "That is how far 'grows by itself' goes: it grows once a week."
+              }
+            ]
+          },
+          {
+            "on": "fill:r4:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Let the AI fix itself. Into what, and who looks?"
+              }
+            ]
+          },
+          {
+            "on": "fill:r5:c4",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "A person clicks. She won't like this line."
+              }
+            ]
+          },
+          {
+            "on": "fill:r6:c6",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Not pretty. But every button is wired."
+              }
+            ]
+          },
+          {
+            "on": "fill:r6:d3",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Her skin. Pretty; the buttons go nowhere."
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "I generated an interface. Uglier than hers, and it works."
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "me",
+                "text": "As far as it goes, this is it."
+              },
+              {
+                "who": "kuro",
+                "text": "Send it to Vivi. She will look at the skin first."
+              }
+            ]
+          }
+        ]
       },
       "deliverable": {
         "id": "d3-vivi-fix",
-        "label": "Self-evolving engine · the doable part (for Vivi)",
+        "label": "Self-evolving engine · as far as it goes (for Vivi)",
         "to": "partner"
       },
       "judge": {

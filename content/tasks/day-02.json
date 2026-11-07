@@ -4,105 +4,70 @@
   "tasks": [
     {
       "id": "task1",
-      "title": "帮小张：Vivi 那个页面，拆一下。",
+      "title": "小张发来的自演化引擎：先跑起来。",
       "app": "docs",
       "done": "task_d2_1",
       "board": {
         "kind": "table",
-        "title": "Vivi 的页面：哪些能做",
+        "view": "ide",
+        "title": "自演化引擎 · 训练后台",
         "columns": [
           "",
           "页面上写的",
-          "实际上"
+          "后台里"
         ],
         "given": {
           "rows": {
-            "r1": "「三秒变成可执行的洞察」",
-            "r2": "「自动理解你的行业、数据、组织」",
-            "r3": "「一键生成决策」",
-            "r4": "「开始分析」",
-            "r5": "「已接入全部业务系统」"
+            "r1": "「开始分析」",
+            "r2": "「自动理解你的数据」",
+            "r3": "「三秒变成洞察」"
           }
         },
         "slots": [
           {
             "id": "r1",
-            "label": "首屏",
+            "label": "入口",
             "answer": "c1"
           },
           {
             "id": "r2",
-            "label": "第二屏",
+            "label": "数据",
             "answer": "c2"
           },
           {
             "id": "r3",
-            "label": "第三屏",
+            "label": "任务",
             "answer": "c3"
-          },
-          {
-            "id": "r4",
-            "label": "按钮",
-            "answer": "c4"
-          },
-          {
-            "id": "r5",
-            "label": "页脚",
-            "answer": "c5"
           }
         ],
         "cards": [
           {
             "id": "c1",
-            "text": "做不了：三秒是动画，不是算出来的",
-            "from": {
-              "file": "vivi-plan-2"
-            },
-            "hint": "在 Vivi 的第二个页面里"
-          },
-          {
-            "id": "c2",
-            "text": "早就有了一部分：图谱里有行业和数据，没有组织",
-            "from": {
-              "conv": "xiaozhang"
-            },
-            "hint": "在小张的私聊里"
-          },
-          {
-            "id": "c3",
-            "text": "做不了：决策得人来下",
-            "from": {
-              "conv": "boss"
-            },
-            "hint": "在你发给老王的事情 A 里"
-          },
-          {
-            "id": "c4",
-            "text": "能做：按钮点了跳到我们的导出页",
+            "text": "能做：按钮跳到我们的导出页",
             "from": {
               "file": "e-export-fn"
             },
             "hint": "在 export.js 里"
           },
           {
-            "id": "c5",
-            "text": "做不了：现在只接了三家的表格",
+            "id": "c2",
+            "text": "能做：三家的表格接进来，每周一次",
             "from": {
               "file": "e-receivable"
             },
             "hint": "在应收表里"
           },
           {
-            "id": "d1",
-            "text": "能做：照着页面写就行",
+            "id": "c3",
+            "text": "能优化：换成真实计算，四十秒出结果",
             "from": {
-              "file": "vivi-plan-2"
+              "conv": "xiaozhang"
             },
-            "hint": "在 Vivi 的第二个页面里"
+            "hint": "在小张的私聊里"
           },
           {
-            "id": "d2",
-            "text": "早就全有了",
+            "id": "d1",
+            "text": "能做：照着页面写就行",
             "from": {
               "file": "vivi-plan-2"
             },
@@ -112,18 +77,55 @@
         "kuro": {
           "fill": {
             "r1": "c1",
-            "r2": "k1",
-            "r3": "c3",
-            "r4": "c4",
-            "r5": "c5"
+            "r2": "c2",
+            "r3": "k1"
           },
           "cards": [
             {
               "id": "k1",
-              "text": "能做：交给 Kuro，三秒就好"
+              "text": "能做：三秒，交给 Kuro"
             }
           ],
           "unlock": "-"
+        },
+        "ide": {
+          "src": "/docs/player/day-03-train.html",
+          "pages": {
+            "r1": 0,
+            "r2": 1,
+            "r3": 2
+          },
+          "files": {
+            "r1": {
+              "name": "entry.config.js",
+              "code": [
+                "export const entry = {",
+                "  button: \"开始分析\",",
+                "  route: {{slot}},  // 页面上的按钮接到哪",
+                "};"
+              ]
+            },
+            "r2": {
+              "name": "datasets.config.js",
+              "code": [
+                "export const datasets = {",
+                "  sources: {{slot}},  // 数据从哪儿来",
+                "  schedule: \"weekly\",",
+                "  dims: 38,",
+                "};"
+              ]
+            },
+            "r3": {
+              "name": "job.config.js",
+              "code": [
+                "export const job = {",
+                "  name: \"insight\",",
+                "  compute: {{slot}},  // 三秒，还是真算",
+                "  cluster: \"cluster-a\",",
+                "};"
+              ]
+            }
+          }
         },
         "beats": [
           {
@@ -131,24 +133,24 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Morning. Let's get you started."
+                "text": "Good to see you."
+              },
+              {
+                "who": "me",
+                "text": "小张发来的。自演化引擎的后台，他做了一半，跑不出她页面上那个结果。"
               },
               {
                 "who": "kuro",
-                "text": "Vivi 的页面，五屏。小张要知道哪些能做、哪些做不了。"
-              },
-              {
-                "who": "kuro",
-                "text": "页面在左边素材里。三秒那个动画，看两遍。"
+                "text": "先让它跑起来。配置在左边，后台在右边。"
               }
             ]
           },
           {
-            "on": "fill:r1",
+            "on": "fill:r1:c1",
             "lines": [
               {
                 "who": "kuro",
-                "text": "三秒是 CSS 写的。我数过帧。"
+                "text": "按钮有地方去了。导出页，我们自己的。"
               }
             ]
           },
@@ -157,34 +159,42 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "照着写，能写出一样的动画。写不出一样的结果。"
+                "text": "照着页面写，页面就是全部了。"
               }
             ]
           },
           {
-            "on": "fill:r2:d2",
+            "on": "fill:r2:c2",
             "lines": [
               {
+                "who": "me",
+                "text": "「全部业务系统」，就是这三张表。"
+              },
+              {
                 "who": "kuro",
-                "text": "全有了的话，小张就不用问了。"
+                "text": "每周一。她说的「自动理解」，是小张每周一导入。"
               }
             ]
           },
           {
-            "on": "fill:r3",
+            "on": "fill:r3:c3",
             "lines": [
               {
                 "who": "kuro",
-                "text": "决策得人来下。这一格我不抢。"
+                "text": "四十秒。她要三秒。"
+              },
+              {
+                "who": "me",
+                "text": "三秒是动画。四十秒是真的。算优化了。"
               }
             ]
           },
           {
-            "on": "fill:r4",
+            "on": "fill:r3:k1",
             "lines": [
               {
                 "who": "kuro",
-                "text": "导出页是我们的。按钮是她的。"
+                "text": "三秒，交给我。动画也是一种实现。"
               }
             ]
           },
@@ -193,7 +203,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "我补了一格。写的都是真的，只是不该写在这儿。"
+                "text": "三秒那格我填的。你要真算，换回来。"
               }
             ]
           },
@@ -201,8 +211,12 @@
             "on": "print",
             "lines": [
               {
+                "who": "me",
+                "text": "今天先这样。"
+              },
+              {
                 "who": "kuro",
-                "text": "拆完了。小张会看。Vivi 不会。"
+                "text": "能跑的跑了。她要的那个「自己会长」，没有。"
               }
             ]
           }
@@ -210,7 +224,7 @@
       },
       "deliverable": {
         "id": "d2-vivi-page",
-        "label": "Vivi 页面拆解（给小张）",
+        "label": "自演化引擎 · 今天先这样",
         "to": "workbench"
       },
       "judge": {

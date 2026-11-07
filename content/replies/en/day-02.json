@@ -282,7 +282,7 @@
         },
         {
           "t": "15:30",
-          "text": "Tried it the way you took it apart. The three seconds is an animation, not a computation",
+          "text": "Ran it with your changes: a result in forty seconds",
           "kind": "work",
           "cond_show": {
             "has": "sent_d2-vivi-page"
@@ -290,7 +290,7 @@
         },
         {
           "t": "15:31",
-          "text": "The button isn't wired to any backend. The chain is broken; it won't run",
+          "text": "But what she wants is the kind that evolves by itself. That one won't come out",
           "kind": "work",
           "cond_show": {
             "has": "sent_d2-vivi-page"

@@ -203,7 +203,7 @@
     },
     {
       "id": "task1",
-      "text": "Vivi 那页：能做的做出来。",
+      "text": "自演化引擎：接着做。",
       "unlock": "done:msgs",
       "done": "flag:task_d3_1",
       "required": true

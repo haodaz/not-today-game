@@ -4,126 +4,128 @@
   "tasks": [
     {
       "id": "task1",
-      "title": "Help Xiao Zhang: take Vivi's page apart.",
+      "title": "Zhang's self-evolving engine: get it running.",
       "app": "docs",
       "done": "task_d2_1",
       "board": {
         "kind": "table",
-        "title": "Vivi's page: what can be built",
+        "view": "ide",
+        "title": "Self-evolving engine · training backend",
         "columns": [
           "",
           "What the page says",
-          "In fact"
+          "In the backend"
         ],
         "given": {
           "rows": {
-            "r1": "\"Insight you can act on, in three seconds\"",
-            "r2": "\"Understands your industry, your data, your organisation\"",
-            "r3": "\"Decisions in one click\"",
-            "r4": "\"Start analysis\"",
-            "r5": "\"Connected to every business system\""
+            "r1": "\"Start analysis\"",
+            "r2": "\"Understands your data by itself\"",
+            "r3": "\"Insight in three seconds\""
           }
         },
         "slots": [
           {
             "id": "r1",
-            "label": "Hero",
+            "label": "Entry",
             "answer": "c1"
           },
           {
             "id": "r2",
-            "label": "Second screen",
+            "label": "Data",
             "answer": "c2"
           },
           {
             "id": "r3",
-            "label": "Third screen",
+            "label": "Job",
             "answer": "c3"
-          },
-          {
-            "id": "r4",
-            "label": "Button",
-            "answer": "c4"
-          },
-          {
-            "id": "r5",
-            "label": "Footer",
-            "answer": "c5"
           }
         ],
         "cards": [
           {
             "id": "c1",
-            "text": "Can't: the three seconds is an animation",
-            "from": {
-              "file": "vivi-plan-2"
-            },
-            "hint": "on Vivi's second page"
-          },
-          {
-            "id": "c2",
-            "text": "Partly there: the graph has industry and data, not organisation",
-            "from": {
-              "conv": "xiaozhang"
-            },
-            "hint": "in Xiao Zhang's chat"
-          },
-          {
-            "id": "c3",
-            "text": "Can't: a person has to decide",
-            "from": {
-              "conv": "boss"
-            },
-            "hint": "in the Thing A you sent Lao Wang"
-          },
-          {
-            "id": "c4",
-            "text": "Can do: the button goes to our export page",
+            "text": "Doable: the button goes to our export page",
             "from": {
               "file": "e-export-fn"
             },
             "hint": "in export.js"
           },
           {
-            "id": "c5",
-            "text": "Can't: only three clients' sheets are connected",
+            "id": "c2",
+            "text": "Doable: the three clients' tables come in, once a week",
             "from": {
               "file": "e-receivable"
             },
             "hint": "in the receivables sheet"
           },
           {
-            "id": "d1",
-            "text": "Can do: just build what the page says",
+            "id": "c3",
+            "text": "Can be optimised: real computation, a result in forty seconds",
             "from": {
-              "file": "vivi-plan-2"
+              "conv": "xiaozhang"
             },
-            "hint": "on Vivi's second page"
+            "hint": "in Zhang's chat"
           },
           {
-            "id": "d2",
-            "text": "Already all there",
+            "id": "d1",
+            "text": "Doable: just write what the page says",
             "from": {
               "file": "vivi-plan-2"
             },
-            "hint": "on Vivi's second page"
+            "hint": "in Vivi's second page"
           }
         ],
         "kuro": {
           "fill": {
             "r1": "c1",
-            "r2": "k1",
-            "r3": "c3",
-            "r4": "c4",
-            "r5": "c5"
+            "r2": "c2",
+            "r3": "k1"
           },
           "cards": [
             {
               "id": "k1",
-              "text": "Can do: give it to Kuro, three seconds"
+              "text": "Doable: three seconds, leave it to Kuro"
             }
           ],
           "unlock": "-"
+        },
+        "ide": {
+          "src": "/docs/player/day-03-train.html",
+          "pages": {
+            "r1": 0,
+            "r2": 1,
+            "r3": 2
+          },
+          "files": {
+            "r1": {
+              "name": "entry.config.js",
+              "code": [
+                "export const entry = {",
+                "  button: \"Start analysis\",",
+                "  route: {{slot}},  // where the page's button goes",
+                "};"
+              ]
+            },
+            "r2": {
+              "name": "datasets.config.js",
+              "code": [
+                "export const datasets = {",
+                "  sources: {{slot}},  // where the data comes from",
+                "  schedule: \"weekly\",",
+                "  dims: 38,",
+                "};"
+              ]
+            },
+            "r3": {
+              "name": "job.config.js",
+              "code": [
+                "export const job = {",
+                "  name: \"insight\",",
+                "  compute: {{slot}},  // three seconds, or a real run",
+                "  cluster: \"cluster-a\",",
+                "};"
+              ]
+            }
+          }
         },
         "beats": [
           {
@@ -131,24 +133,24 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Morning. Let's get you started."
+                "text": "Good to see you."
+              },
+              {
+                "who": "me",
+                "text": "From Zhang. The self-evolving engine's backend, half done; it can't produce what her page shows."
               },
               {
                 "who": "kuro",
-                "text": "Vivi's page, five screens. Xiao Zhang needs to know what can be built and what can't."
-              },
-              {
-                "who": "kuro",
-                "text": "The page is under Sources on the left. Watch the three-second animation twice."
+                "text": "Get it running first. The config on the left, the backend on the right."
               }
             ]
           },
           {
-            "on": "fill:r1",
+            "on": "fill:r1:c1",
             "lines": [
               {
                 "who": "kuro",
-                "text": "The three seconds are CSS. I counted the frames."
+                "text": "The button has somewhere to go. Our export page."
               }
             ]
           },
@@ -157,34 +159,42 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Copy it and you get the same animation. Not the same result."
+                "text": "Write what the page says, and the page is all there is."
               }
             ]
           },
           {
-            "on": "fill:r2:d2",
+            "on": "fill:r2:c2",
             "lines": [
               {
+                "who": "me",
+                "text": "'All business systems' is these three tables."
+              },
+              {
                 "who": "kuro",
-                "text": "If it were all there, Xiao Zhang wouldn't be asking."
+                "text": "Every Monday. Her 'understands by itself' is Zhang importing on Mondays."
               }
             ]
           },
           {
-            "on": "fill:r3",
+            "on": "fill:r3:c3",
             "lines": [
               {
                 "who": "kuro",
-                "text": "A person has to make the decision. I won't take that one."
+                "text": "Forty seconds. She wants three."
+              },
+              {
+                "who": "me",
+                "text": "Three seconds is an animation. Forty is real. Call it optimised."
               }
             ]
           },
           {
-            "on": "fill:r4",
+            "on": "fill:r3:k1",
             "lines": [
               {
                 "who": "kuro",
-                "text": "The export page is ours. The button is hers."
+                "text": "Three seconds, leave it to me. An animation is an implementation too."
               }
             ]
           },
@@ -193,7 +203,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "I filled one. Everything I wrote is true; it just doesn't belong there."
+                "text": "The three-seconds slot was mine. If you want a real run, swap it back."
               }
             ]
           },
@@ -201,8 +211,12 @@
             "on": "print",
             "lines": [
               {
+                "who": "me",
+                "text": "That's it for today."
+              },
+              {
                 "who": "kuro",
-                "text": "Taken apart. Xiao Zhang will read it. Vivi won't."
+                "text": "What can run, runs. The part she wants, the one that grows by itself, isn't there."
               }
             ]
           }
@@ -210,7 +224,7 @@
       },
       "deliverable": {
         "id": "d2-vivi-page",
-        "label": "Vivi's page, taken apart (for Xiao Zhang)",
+        "label": "Self-evolving engine · that's it for today",
         "to": "workbench"
       },
       "judge": {

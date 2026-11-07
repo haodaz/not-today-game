@@ -107,6 +107,22 @@
           "cond_show": {
             "has": "sent_d3-vivi-fix"
           }
+        },
+        {
+          "t": "15:23",
+          "text": "我让我的 AI 做了一版界面，比这个好看多了。",
+          "kind": "work",
+          "cond_show": {
+            "has": "sent_d3-vivi-fix"
+          }
+        },
+        {
+          "t": "15:24",
+          "text": "皮子都做不出来，别的我也不信。",
+          "kind": "work",
+          "cond_show": {
+            "has": "sent_d3-vivi-fix"
+          }
         }
       ],
       "fine": {

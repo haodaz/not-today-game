@@ -203,7 +203,7 @@
     },
     {
       "id": "task1",
-      "text": "Vivi's page: as far as it goes.",
+      "text": "The self-evolving engine, continued.",
       "unlock": "done:msgs",
       "done": "flag:task_d3_1",
       "required": true

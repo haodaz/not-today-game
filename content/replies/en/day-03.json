@@ -107,6 +107,22 @@
           "cond_show": {
             "has": "sent_d3-vivi-fix"
           }
+        },
+        {
+          "t": "15:23",
+          "text": "I had my AI make an interface. Much prettier than this.",
+          "kind": "work",
+          "cond_show": {
+            "has": "sent_d3-vivi-fix"
+          }
+        },
+        {
+          "t": "15:24",
+          "text": "If you can't even do the skin, I don't believe the rest.",
+          "kind": "work",
+          "cond_show": {
+            "has": "sent_d3-vivi-fix"
+          }
         }
       ],
       "fine": {

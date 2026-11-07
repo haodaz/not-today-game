@@ -4,67 +4,46 @@
   "tasks": [
     {
       "id": "task1",
-      "title": "Vivi 那页：能做的做出来。",
+      "title": "自演化引擎：接着做。",
       "app": "docs",
       "done": "task_d3_1",
       "board": {
         "kind": "table",
-        "title": "自演化引擎 · 能做的部分",
+        "view": "ide",
+        "title": "自演化引擎 · 训练后台",
         "columns": [
           "",
           "页面上写的",
-          "我们能做到的"
+          "后台里"
         ],
         "given": {
           "rows": {
-            "r1": "「一键生成决策」",
-            "r2": "「自动理解你的数据」",
-            "r3": "「三秒变成洞察」",
-            "r4": "「决策自动执行」"
+            "r4": "「它自己会进化」",
+            "r5": "「一键生成决策」",
+            "r6": "「比这个好看多了」"
           }
         },
         "slots": [
           {
-            "id": "r1",
-            "label": "入口",
-            "answer": "c1"
-          },
-          {
-            "id": "r2",
-            "label": "数据",
-            "answer": "c2"
-          },
-          {
-            "id": "r3",
-            "label": "三秒",
-            "answer": "c3"
-          },
-          {
             "id": "r4",
-            "label": "决策",
+            "label": "训练闭环",
+            "answer": "c5"
+          },
+          {
+            "id": "r5",
+            "label": "审批",
             "answer": "c4"
+          },
+          {
+            "id": "r6",
+            "label": "界面",
+            "answer": "c6"
           }
         ],
         "cards": [
           {
-            "id": "c1",
-            "text": "能做：按钮跳到我们的导出页",
-            "from": {
-              "file": "e-export-fn"
-            },
-            "hint": "在 export.js 里"
-          },
-          {
-            "id": "c2",
-            "text": "能做：三家的表格接进来，每周一次",
-            "from": {
-              "file": "e-receivable"
-            },
-            "hint": "在应收表里"
-          },
-          {
-            "id": "c3",
-            "text": "能做到的程度：换成真实计算，要四十秒",
+            "id": "c5",
+            "text": "能做：上周的结果喂回下一轮，每周一轮",
             "from": {
               "conv": "xiaozhang"
             },
@@ -72,19 +51,19 @@
           },
           {
             "id": "c4",
-            "text": "做不了：决策留给人点一下",
+            "text": "做不了全自动：决策留给人点一下",
             "from": {
               "conv": "boss"
             },
             "hint": "在你发给老王的 v17 里"
           },
           {
-            "id": "d1",
-            "text": "能做：照着页面写就行",
+            "id": "c6",
+            "text": "能做：界面先用导出页的样子",
             "from": {
-              "file": "vivi-plan-2"
+              "file": "e-export-fn"
             },
-            "hint": "在 Vivi 的第二个页面里"
+            "hint": "在 export.js 里"
           },
           {
             "id": "d2",
@@ -93,27 +72,161 @@
               "conv": "partner"
             },
             "hint": "在 Vivi 的私聊里"
+          },
+          {
+            "id": "d3",
+            "text": "能做：用她的 AI 给的皮子",
+            "from": {
+              "conv": "partner"
+            },
+            "hint": "在 Vivi 的私聊里"
           }
         ],
         "kuro": {
           "fill": {
-            "r1": "c1",
-            "r2": "c2",
-            "r3": "k1",
-            "r4": "c4"
+            "r4": "c5",
+            "r5": "c4",
+            "r6": "k1"
           },
           "cards": [
             {
               "id": "k1",
-              "text": "能做：三秒，交给 Kuro"
+              "text": "能做：界面让我生成一套"
             }
           ],
           "unlock": "-"
-        }
+        },
+        "ide": {
+          "src": "/docs/player/day-03-train.html?prev=1",
+          "pages": {
+            "r4": 3,
+            "r5": 4,
+            "r6": 5
+          },
+          "files": {
+            "r4": {
+              "name": "loop.config.js",
+              "code": [
+                "export const loop = {",
+                "  feed: {{slot}},  // 怎么才算「自己会长」",
+                "  every: \"weekly\",",
+                "};"
+              ]
+            },
+            "r5": {
+              "name": "approval.config.js",
+              "code": [
+                "export const approval = {",
+                "  execute: {{slot}},  // 谁来点那一下",
+                "  approver: \"技术负责人\",",
+                "};"
+              ]
+            },
+            "r6": {
+              "name": "ui.config.js",
+              "code": [
+                "export const ui = {",
+                "  skin: {{slot}},  // 先用哪张脸",
+                "  buttons: \"wired\",",
+                "};"
+              ]
+            }
+          }
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Hope you slept well."
+              },
+              {
+                "who": "me",
+                "text": "接着昨天的。跑是跑起来了，她要的是它自己会长。"
+              },
+              {
+                "who": "kuro",
+                "text": "昨天那三节在后台里都亮着。今天三节：闭环、审批、界面。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r4:c5",
+            "lines": [
+              {
+                "who": "me",
+                "text": "上周的结果喂回下一轮。每周一轮。"
+              },
+              {
+                "who": "kuro",
+                "text": "这就是「自己会长」能做到的程度：一周长一次。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r4:d2",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "让 AI 自己改。改成什么样，谁来看？"
+              }
+            ]
+          },
+          {
+            "on": "fill:r5:c4",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "人点一下。她不会喜欢这一行。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r6:c6",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "不好看。但每个按钮都接着东西。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r6:d3",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "她的皮子。好看，按钮没接。"
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "界面我生成了一套。比她那个丑，比她那个能用。"
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "me",
+                "text": "能做到的程度，就这么多。"
+              },
+              {
+                "who": "kuro",
+                "text": "发给 Vivi。她会先看皮子。"
+              }
+            ]
+          }
+        ]
       },
       "deliverable": {
         "id": "d3-vivi-fix",
-        "label": "自演化引擎 · 能做的部分（给 Vivi）",
+        "label": "自演化引擎 · 能做到的程度（给 Vivi）",
         "to": "partner"
       },
       "judge": {
