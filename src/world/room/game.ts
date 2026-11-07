@@ -839,6 +839,15 @@ export const loopActions: Record<string, ActionHandler> = {
     const lc = loopContext(ctx.store.getState(), ctx.store.getEvents());
     const at = lc ? deskMeal(lc) : null;
     if (!at || at.eaten || at.meal !== data.meal) return;
+    // A day with the boss's call (author 2026-11-08, day 3): the dinner waits for the night's work
+    // (the call's task); Kuro sends the player to it afterwards and it is cold. Until then one line.
+    const state = ctx.store.getState();
+    const call = dayFile(state.day)?.call;
+    if (at.meal === "dinner" && call && call.task.done.kind === "flag" && !state.flags.includes(call.task.done.flag) && hasString("room.eat.later")) {
+      ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${state.day}:eat:later`, lines: [{ k: "inner", t: t("room.eat.later") }], ending: { kind: "none" } });
+      ctx.rerender();
+      return;
+    }
     stepOnce(ctx, `eat:${at.meal}`);
     ctx.rerender();
   },

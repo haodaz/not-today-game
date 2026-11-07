@@ -498,6 +498,7 @@
   "box.stuck.2": "You pull hard. The whole case comes with you. The box stays in its slot.",
   "box.stuck.3": "Something seems to be pushing back from inside.",
   "box.beforeLunch": "Eat something first, then come back to this.",
+  "room.eat.later": "Leave it for now. Later.",
   "board.tray": "Material",
   "board.lockCode": "Needs a code",
   "board.noTool": "You have nothing that can receive this.",
