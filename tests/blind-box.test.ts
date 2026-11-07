@@ -201,3 +201,67 @@ describe("the case names no count and no layer", () => {
   });
 });
 
+
+// ——— addition 2026-11-07: before lunch, and how it looks ———
+
+describe("addition 2026-11-07: before the box item unlocks, and the loose box", () => {
+  const slotTags = (out: string) => [...out.matchAll(/<button type="button" class="(case-slot [^"]*)" data-action="case-pick" data-slot="(\w+)"[^>]*>/g)].map((m) => ({ cls: m[1]!.split(" "), slot: m[2]! }));
+  const allStuck = CASE_CONTENTS.map((_, i) => t(stuckLineKey(i)));
+
+  it("before the unlock any box says box.beforeLunch (inner, with the shake), no stuck line, nothing logged; no box looks loose", () => {
+    const store = atDay(2);
+    const ctx = ctxOf(store);
+    act(ctx, "pick-box");
+    expect(ctx.session.caseOpen).toBe(true);
+    expect(openBoxReady(store.getState(), store.getEvents())).toBe(false);
+    expect(slotTags(roomOf(ctx)).filter((s) => s.cls.includes("loose"))).toEqual([]);
+    const events = store.getEvents().length;
+    for (const slot of [boxObjectFor(2)!, "pager"]) {
+      act(ctx, "case-pick", { slot });
+      expect(ctx.session.caseShake?.slot).toBe(slot);
+    }
+    expect(ctx.session.dialogue.queue).toEqual([{ key: "d2:box:beforeLunch", lines: [{ k: "inner", t: t("box.beforeLunch") }], ending: { kind: "none" } }]);
+    expect(allStuck.some((l) => box(ctx).includes(l))).toBe(false);
+    expect(store.getEvents()).toHaveLength(events);
+    expect(store.getState().found).not.toContain(boxObjectFor(2));
+  });
+
+  it("after the unlock: only today's box is loose (tilted, its lid a crack open); the others say stuck lines; opened, the slot is the case's bottom", () => {
+    const store = atDay(2);
+    completeUntil(store, "box");
+    const ctx = ctxOf(store);
+    act(ctx, "pick-box");
+    const today = boxObjectFor(2)!;
+    const tags = slotTags(roomOf(ctx));
+    expect(tags.filter((s) => s.cls.includes("loose")).map((s) => s.slot)).toEqual([today]);
+    expect(tags.filter((s) => s.slot !== today).every((s) => s.cls.includes("stuck"))).toBe(true);
+    expect(roomOf(ctx)).toMatch(new RegExp(`data-slot="${today}"[^>]*><i class="lid" aria-hidden="true"></i></button>`));
+    act(ctx, "case-pick", { slot: "pager" });
+    expect(allStuck.some((l) => box(ctx).includes(l))).toBe(true);
+    expect(box(ctx)).not.toContain(t("box.beforeLunch"));
+    act(ctx, "case-pick", { slot: today });
+    expect(store.getState().found).toContain(today);
+    act(ctx, "loop-put-down");
+    act(ctx, "pick-box");
+    const out = roomOf(ctx);
+    expect(out).toContain('<div class="case-slot empty" aria-hidden="true"></div>');
+    expect(slotTags(out).some((s) => s.slot === today)).toBe(false);
+    expect(slotTags(out).filter((s) => s.cls.includes("loose"))).toEqual([]);
+  });
+
+  it("the loose box wobbles once as the case opens (continued across re-renders), then sits still", () => {
+    const store = atDay(2);
+    completeUntil(store, "box");
+    const ctx: ActionContext = { store, session: initialSession(DEFAULT_CLOCK, "left", "room"), rerender: () => {}, later: () => {}, now: () => 1_000 };
+    act(ctx, "pick-box");
+    const at = (ms: number) => renderRoom({ state: store.getState(), events: store.getEvents(), session: ctx.session, runId: store.getRunId(), nowMs: ms }).value;
+    const today = boxObjectFor(2)!;
+    const tag = (out: string) => new RegExp(`<button type="button" class="([^"]*)" data-action="case-pick" data-slot="${today}"([^>]*)>`).exec(out)!;
+    const during = tag(at(1_200));
+    expect(during[1]!.split(" ")).toContain("wobble");
+    expect(during[2]).toContain('style="--late:-200ms"');
+    const after = tag(at(1_000 + 2_000));
+    expect(after[1]!.split(" ")).not.toContain("wobble");
+    expect(after[2]).not.toContain("--late");
+  });
+});

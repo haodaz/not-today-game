@@ -250,6 +250,8 @@ export interface Session {
   riseBeatDay: number;
   /** object-tutor R2: the walkman was taken up from the bed question (打开录音机); putting it down asks again. */
   recordTrip: boolean;
+  /** blind-box addition 2026-11-07: when the case was last opened (the loose box's one wobble), or null. */
+  caseOpenedAt: number | null;
   /** object-tutor R4: where a failing key press was last answered with the cannot-use line (cleared on entering 使用). */
   worksAnswered: string | null;
   /** playtest-1105 R4: the line each thing in the room said last (so it is not said twice in a row). */
@@ -487,6 +489,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     bootBeatDay: 0,
     riseBeatDay: 0,
     recordTrip: false,
+    caseOpenedAt: null,
     worksAnswered: null,
     looks: {},
     splatReady: false,

@@ -62,7 +62,7 @@ import { askedOn, knows } from "@state/recognise";
 import { gateAdvance } from "@world/motion/reveal";
 import { endingNext } from "@world/endings/flow";
 import { renderEnding } from "@world/endings/view";
-import { boxObjectFor, doorMeal, itemsButton, itemsPanel, openBoxReady, raidShowing, renderRoom, settingsButton, settingsPanel, SLIP_ITEM, walkmanShown } from "./hud";
+import { boxObjectFor, CASE_WOBBLE_MS, doorMeal, itemsButton, itemsPanel, openBoxBefore, openBoxReady, raidShowing, renderRoom, settingsButton, settingsPanel, SLIP_ITEM, walkmanShown } from "./hud";
 import { looseContent, stuckLineKey } from "./case";
 import { jitter } from "@state/seed";
 import { deliverableForHand } from "@state/days/board";
@@ -858,6 +858,8 @@ export const loopActions: Record<string, ActionHandler> = {
     // box-arrival R1: nothing to open before the case has arrived.
     if (!boxArrived(ctx.store.getState(), ctx.store.getEvents())) return;
     ctx.session.caseOpen = true;
+    ctx.session.caseOpenedAt = ctx.now?.() ?? Date.now();
+    ctx.later(CASE_WOBBLE_MS + 16, ctx.rerender);
     // The stuck-line counter is seeded once per open from the run and day, so the first dull line
     // is not always the same (session count, "starts at a seeded offset").
     if (ctx.session.caseStuck < 0) {
@@ -894,6 +896,13 @@ export const loopActions: Record<string, ActionHandler> = {
     session.caseShake = { slot, until: now + CASE_SHAKE_MS };
     ctx.later(CASE_SHAKE_MS + 10, ctx.rerender);
     ctx.play?.("box-thud");
+    // blind-box addition 2026-11-07: before the day's box item unlocks (the lunch not taken in yet),
+    // every box says the one line instead of the stuck lines (the counter does not move).
+    if (openBoxBefore(state, store.getEvents()) && hasString("box.beforeLunch")) {
+      session.dialogue = push(session.dialogue, { key: `d${state.day}:box:beforeLunch`, lines: [{ k: "inner", t: t("box.beforeLunch") }], ending: { kind: "none" } });
+      ctx.rerender();
+      return;
+    }
     const n = session.caseStuck < 0 ? 0 : session.caseStuck;
     session.caseStuck = n + 1;
     const day = state.day;
@@ -1642,6 +1651,8 @@ function openCaseAfterArrival(ctx: ActionContext): void {
     settleSession(session);
   }
   session.caseOpen = true;
+  session.caseOpenedAt = ctx.now?.() ?? Date.now();
+  ctx.later(CASE_WOBBLE_MS + 16, ctx.rerender);
   if (session.caseStuck < 0) session.caseStuck = jitter(`case-stuck:${ctx.store.getRunId()}:${ctx.store.getState().day}`, 0, 3);
 }
 

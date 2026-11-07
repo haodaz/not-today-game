@@ -63,6 +63,8 @@ export interface CaseModel {
   readonly loose: string | null;
   /** The box content shaking now (a just-clicked stuck box), or null. */
   readonly shake?: string | null;
+  /** ms into the loose box's one wobble since the case opened, or null (none, or over). */
+  readonly wobble?: number | null;
 }
 
 /** One slot: an empty slot (opened), the hidden box, or a small box; the loose one carries data-slot. */
@@ -72,10 +74,14 @@ function slotMarkup(contentId: string, model: CaseModel): SafeHtml {
   if (opened) return html`<div class="case-slot empty" aria-hidden="true"></div>`;
   const loose = contentId === model.loose;
   const label = hidden ? t("box.hidden") : t("box.small");
-  const klass = cls("case-slot", "box", hidden ? "hidden" : "small", loose ? "loose" : "stuck", model.shake === contentId && "shake");
+  // blind-box addition 2026-11-07: the loose one looks loose (tilted, its lid lifted a crack, one
+  // wobble as the case opens); the stuck ones are square and still.
+  const wobble = loose && model.wobble !== null && model.wobble !== undefined && model.shake !== contentId;
+  const klass = cls("case-slot", "box", hidden ? "hidden" : "small", loose ? "loose" : "stuck", model.shake === contentId && "shake", wobble && "wobble");
+  const late = wobble ? html` style="--late:-${Math.round(model.wobble!)}ms"` : null;
   // Every closed box is a button (loose opens it, stuck shakes and speaks); the content id is never
   // printed — only the slot index is carried, so nothing on a box tells you what is inside.
-  return html`<button type="button" class="${klass}" data-action="case-pick" data-slot="${contentId}" aria-label="${label}"></button>`;
+  return html`<button type="button" class="${klass}" data-action="case-pick" data-slot="${contentId}" aria-label="${label}"${late}>${loose ? html`<i class="lid" aria-hidden="true"></i>` : null}</button>`;
 }
 
 /**

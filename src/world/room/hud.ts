@@ -278,6 +278,19 @@ export function openBoxReady(state: State, events: readonly GameEvent[]): boolea
 }
 
 /**
+ * blind-box addition 2026-11-07: today has a 开箱 item and it has not unlocked yet (before the lunch
+ * is taken in). A day without one is never "before".
+ */
+export function openBoxBefore(state: State, events: readonly GameEvent[]): boolean {
+  const lc = loopContext(state, events);
+  const boxItem = lc?.file.items.find((it) => it.done.kind === "event" && it.done.event.type === "openBox");
+  return !!lc && !!boxItem && !itemStates(lc).get(boxItem.id)!.unlocked;
+}
+
+/** blind-box addition 2026-11-07: the loose box wobbles once, this long, when the case opens. */
+export const CASE_WOBBLE_MS = 600;
+
+/**
  * The blind-box case overlay (blind-box 2026-11-03): open from 房间 via 拆箱 (`pick-box`). It shows
  * over the room like the 道具 strip; the loose box runs loop-box, stuck boxes only shake and speak.
  */
@@ -285,7 +298,10 @@ export function casePanel(state: State, events: readonly GameEvent[], session: S
   if (!session.caseOpen) return null;
   const loose = looseContent(state.day, boxObjectFor(state.day), openBoxReady(state, events));
   const shake = session.caseShake && (nowMs <= 0 || session.caseShake.until > nowMs) ? session.caseShake.slot : null;
-  return caseOverlay({ runId, events, loose, shake });
+  // The loose box's one wobble, continued across re-renders (a negative delay), never replayed.
+  const since = session.caseOpenedAt !== null && nowMs > 0 ? nowMs - session.caseOpenedAt : null;
+  const wobble = since !== null && since >= 0 && since < CASE_WOBBLE_MS ? since : null;
+  return caseOverlay({ runId, events, loose, shake, wobble });
 }
 
 /** The object strip as a panel over the current view: the same buttons as on the tabletop. */

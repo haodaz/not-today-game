@@ -351,20 +351,36 @@
 .case{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);padding:22px;border-radius:14px;background:#7a5a3a url(/room/box/case.png) center/cover;box-shadow:0 24px 60px rgba(0,0,0,.5),inset 0 0 0 2px rgba(0,0,0,.2)}
 .case-grid{display:grid;grid-template-columns:repeat(3,96px);grid-template-rows:repeat(3,96px);gap:14px}
 .case-slot{width:96px;height:96px;border-radius:8px;box-sizing:border-box;padding:0}
-/* An opened box leaves an empty slot: a dark cardboard recess, no box. */
-.case-slot.empty{background:rgba(0,0,0,.28);box-shadow:inset 0 3px 8px rgba(0,0,0,.45);border:1px solid rgba(0,0,0,.25)}
-/* A small box: cardboard with a printed band. */
-.case-slot.box{cursor:pointer;border:0;background:#c99b63 url(/room/box/small.png) center/cover}
-.case-slot.box.small{box-shadow:inset 0 -6px 0 rgba(0,0,0,.18),inset 0 3px 0 rgba(255,255,255,.22),0 4px 8px rgba(0,0,0,.3)}
-.case-slot.box.small::after{content:"";position:absolute;left:0;right:0;top:50%;height:16px;transform:translateY(-50%);background:rgba(120,70,30,.5)}
-.case-slot.box{position:relative}
-/* The hidden box: near-black, a thin red edge, no print. */
-.case-slot.box.hidden{background:#141414 url(/room/box/hidden.png) center/cover;box-shadow:inset 0 0 0 1px #7a1010,0 4px 10px rgba(0,0,0,.5)}
-.case-slot.box.hidden::after{content:none}
-/* The loose box lifts a touch; stuck boxes shake when clicked. */
-.case-slot.box.loose{box-shadow:inset 0 -6px 0 rgba(0,0,0,.18),inset 0 3px 0 rgba(255,255,255,.3),0 7px 14px rgba(0,0,0,.4);transform:translateY(-2px)}
-.case-slot.box.loose:hover,.case-slot.box.loose:focus-visible{transform:translateY(-4px);outline:none}
-.case-slot.box.hidden.loose{box-shadow:inset 0 0 0 1px #c02020,0 7px 16px rgba(0,0,0,.55)}
+/* An opened box leaves an empty slot: the case's own bottom, darker cardboard in a shallow recess
+   (not black). */
+.case-slot.empty{background:linear-gradient(160deg,#6b4c2f,#5a3f26);box-shadow:inset 0 3px 7px rgba(40,24,10,.45),inset 0 0 0 1px rgba(40,24,10,.3)}
+/* A small box (fix 2026-11-07): one rounded cube seen from above, one face, lit from the top left,
+   with a thin tape cross; no lid line and no band, so each slot reads as one box (3 × 3). */
+.case-slot.box{position:relative;cursor:pointer;border:0;border-radius:12px;background:radial-gradient(130% 130% at 28% 22%,#dcb179 0%,#c99b63 55%,#b3834e 100%)}
+.case-slot.box.small{box-shadow:inset 0 0 0 1px rgba(90,55,25,.35),inset 2px 2px 3px rgba(255,240,210,.28),inset -3px -3px 6px rgba(80,45,15,.25),0 4px 8px rgba(0,0,0,.3)}
+.case-slot.box.small::before,.case-slot.box.small::after{content:"";position:absolute;background:rgba(232,210,165,.6);box-shadow:0 0 0 .5px rgba(120,80,40,.25)}
+.case-slot.box.small::before{left:50%;top:0;bottom:0;width:5px;transform:translateX(-50%)}
+.case-slot.box.small::after{top:50%;left:0;right:0;height:5px;transform:translateY(-50%)}
+/* The hidden box: near-black, a thin red edge, no print, no tape. */
+.case-slot.box.hidden{background:#141414;box-shadow:inset 0 0 0 1px #7a1010,0 4px 10px rgba(0,0,0,.5)}
+.case-slot.box.hidden::before,.case-slot.box.hidden::after{content:none}
+/* The loose box looks loose (addition 2026-11-07): tilted a few degrees, its lid (`.lid`, the
+   box's top face with the tape) lifted a crack off the body, so a dark sliver shows along two edges;
+   one wobble as the case opens (`.wobble`, continued across re-renders by --late). The stuck ones
+   are square and still. */
+.case-slot.box.loose{--tilt:-4deg;box-shadow:inset 0 0 0 1px rgba(60,35,15,.5),inset 0 0 10px rgba(40,22,8,.55),0 7px 14px rgba(0,0,0,.4);background:#7a5432;transform:rotate(var(--tilt)) translateY(-2px)}
+.case-slot.box.loose:hover,.case-slot.box.loose:focus-visible{transform:rotate(var(--tilt)) translateY(-4px);outline:none}
+.case-slot.box.loose::before,.case-slot.box.loose::after{content:none}
+.case-slot.box .lid{position:absolute;inset:0;border-radius:12px;background:radial-gradient(130% 130% at 28% 22%,#dcb179 0%,#c99b63 55%,#b3834e 100%);box-shadow:inset 0 0 0 1px rgba(90,55,25,.35),inset 2px 2px 3px rgba(255,240,210,.34),2px 3px 0 rgba(40,22,8,.55);transform:translate(-3px,-4px) rotate(2.5deg);pointer-events:none}
+.case-slot.box .lid::before,.case-slot.box .lid::after{content:"";position:absolute;background:rgba(232,210,165,.6);box-shadow:0 0 0 .5px rgba(120,80,40,.25)}
+.case-slot.box .lid::before{left:50%;top:0;bottom:0;width:5px;transform:translateX(-50%)}
+.case-slot.box .lid::after{top:50%;left:0;right:0;height:5px;transform:translateY(-50%)}
+.case-slot.box.hidden .lid{background:#141414;box-shadow:inset 0 0 0 1px #c02020,2px 3px 0 rgba(0,0,0,.7)}
+.case-slot.box.hidden .lid::before,.case-slot.box.hidden .lid::after{content:none}
+.case-slot.box.loose.wobble{animation:case-wobble 600ms ease-in-out both;animation-delay:var(--late,0ms)}
+@keyframes case-wobble{0%,100%{transform:rotate(var(--tilt)) translateY(-2px)}25%{transform:rotate(calc(var(--tilt) - 5deg)) translateY(-3px)}55%{transform:rotate(calc(var(--tilt) + 4deg)) translateY(-2px)}80%{transform:rotate(calc(var(--tilt) - 2deg)) translateY(-2px)}}
+@media (prefers-reduced-motion:reduce){.case-slot.box.loose.wobble{animation:none}}
+.case-slot.box.hidden.loose{background:#050505;box-shadow:inset 0 0 0 1px #c02020,0 7px 16px rgba(0,0,0,.55)}
 .case-slot.box.shake{animation:case-shake 200ms ease-in-out}
 @keyframes case-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-3px)}40%{transform:translateX(3px)}60%{transform:translateX(-2px)}80%{transform:translateX(2px)}}
 @media (prefers-reduced-motion:reduce){.case-slot.box.shake{animation:none}}
