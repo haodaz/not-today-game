@@ -80,5 +80,11 @@ Walls, from the room to the task: (1) an object that cannot be used now (床, th
 - **The boss replied (回老板 done):** no move; the thread stays. **Shutdown:** the shutdown beat lands in 房间 as today; **bed:** lying as today.
 - Tests: the doc's tail (line, page closed, previous app front); the doorbell's camera move from the desktop and from a facing; the task's return to home with the ring.
 
+## R15. The screen is the whole frame (author 2026-11-07 evening)
+「不要做一层套一层的结构，核心内容只会越来越小。」 On the desktop view there is no stage around the monitor and no monitor bezel: the shown monitor's OS area **is the whole frame** (the stage's full width and height). Its top bar (28 px: 新世界, the front app's name, 左屏 / 右屏, the clock, 关机) runs edge to edge; **a window fills everything under the top bar down to the dock**, with 0 px at the left, right and top (today the window is narrower than the screen on all three sides); the dock keeps its height and sits at the bottom edge.
+- The dock row holds, at its left end before the apps, a **回房间 tile** (the `view/room` action; the floating `.back-room` button goes), and at its right end a **设置 tile** (opens the same settings panel; the stage's ⚙ button is not drawn on the desktop view). The 今日 checklist (R5) sits over the top-left of the OS area under the top bar; Kuro's pet and pill at the bottom-right over the dock's row (R4).
+- The room views are untouched; the switch between 左屏 / 右屏 stays in the top bar.
+- Tests: the desktop render has no `.monitor` bezel markup and no `.back-room`; the window's rect equals the OS area minus the top bar and the dock; the dock has the 回房间 and 设置 tiles and they act.
+
 ## Files
 `src/world/loop/guide.ts` (new), `src/world/desktop/controller.ts`, `src/world/room/game.ts`, `src/world/room/hud.ts`, `src/world/desktop/shell.ts`, `src/world/desktop/placement.ts`, `src/world/desktop/vivi.ts`, `src/world/desktop/messages/{view,actions,transcript}.ts`, `src/world/desktop/workbench/{shell,work}.ts`, `src/world/desktop/browser/view.ts`, `src/world/room/case.ts`, `src/world/room/held.ts`, `src/world/room/room.css`, `src/world/desktop/desktop.css`, `src/state/days/tasks.ts` (past.json loader), `src/world/loop/waiting.ts` or wherever delivery texts are filled. Tests beside the existing ones; list any snapshot that changes and why, do not edit it.
