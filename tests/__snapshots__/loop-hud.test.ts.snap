@@ -1,8 +1,8 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`FR5 checklist snapshots > day 1 after lunch arrives 1`] = `"<div class="list"><div class="h">今日</div><div class="done">已做 3 件</div><div class="it now" data-id="work"><i></i>把今天的活干完（0/3）</div><div class="it next" data-id="pickup"><i></i>去门口拿。</div></div>"`;
+exports[`FR5 checklist snapshots > day 1 after lunch arrives 1`] = `"<div class="list"><div class="h">今日</div><div class="done">已做 4 件</div><div class="it now" data-id="work"><i></i>把今天的活干完（0/3）</div><div class="it next" data-id="pickup"><i></i>去门口拿。</div></div>"`;
 
-exports[`FR5 checklist snapshots > day 1 after ordering lunch 1`] = `"<div class="list"><div class="h">今日</div><div class="done">已做 2 件</div><div class="it now" data-id="work"><i></i>把今天的活干完（0/3）</div><div class="it wait" data-id="lunch"><i></i>午饭在路上。</div></div>"`;
+exports[`FR5 checklist snapshots > day 1 after ordering lunch 1`] = `"<div class="list"><div class="h">今日</div><div class="done">已做 3 件</div><div class="it now" data-id="work"><i></i>把今天的活干完（0/3）</div><div class="it wait" data-id="lunch"><i></i>午饭在路上。</div></div>"`;
 
 exports[`FR5 checklist snapshots > day 1 at boot 1`] = `"<div class="list"><div class="h">今日</div><div class="it now" data-id="boot"><i></i>按一下桌底下的主机，开机。</div></div>"`;
 

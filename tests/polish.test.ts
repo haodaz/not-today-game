@@ -237,6 +237,7 @@ describe("held phone and objects (FR1)", () => {
     const store = createStore({ startDay: 1 });
     store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
     store.appendEvent({ kind: "step", name: "openApp:msgs", t: "09:03" });
+    store.appendEvent({ kind: "reply", choice: "fine", recipient: "boss", t: "09:05" }); // day 1: lunch unlocks after the reply (2026-11-08)
     const { ctx } = fakeCtx(store);
     loopActions["loop-phone"]!(ctx, none, null as never);
     const render = () => renderRoom({ state: store.getState(), events: store.getEvents(), session: ctx.session }).value;

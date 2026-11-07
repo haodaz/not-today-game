@@ -348,6 +348,7 @@ describe("R7 · the day's work is one checklist line", () => {
     const { t } = await import("@world/i18n");
     const store = booted();
     store.appendEvent({ kind: "step", name: "openApp:msgs", t: "09:05" });
+    store.appendEvent({ kind: "reply", choice: "fine", recipient: "boss", t: "09:05" }); // day 1: lunch unlocks after the reply (2026-11-08)
     const tasks = dayFiles.get(1)!.items.filter((it) => it.when === "day" && it.done.kind === "flag" && it.done.flag.startsWith("task_"));
     expect(tasks.length).toBeGreaterThan(1);
     const list = () => renderChecklist(checklist(loopContext(store.getState(), store.getEvents())!)).value;

@@ -227,28 +227,68 @@
       "onDone": {
         "say": [
           {
-            "k": "inner",
-            "t": "The boss's message is on top again.",
+            "k": "speaker",
+            "who": "me",
+            "t": "Let's see what Lao Wang has to say this time.",
             "where": "screen:msgs:boss"
           },
           {
-            "k": "inner",
-            "t": "A 41-second voice note. Opening it will cost more than 41 seconds.",
+            "k": "speaker",
+            "who": "kuro",
+            "t": "Every voice note is transcribed. I know you'd rather not listen.",
             "where": "screen:msgs:boss"
           },
           {
             "k": "speaker",
             "who": "me",
-            "t": "Order lunch first. Once I start I'll forget.",
+            "t": "v17 today; the investors want it this afternoon. Let it merge a version first, I'll take a look. The tech has to be clear: the telling, the value, what's special.",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "Receivables: the client is a month late, update the days. The salary, wait a little more.",
             "where": "screen:msgs:boss"
           }
         ]
       }
     },
     {
+      "id": "reply",
+      "text": "Reply to the boss.",
+      "unlock": "done:msgs",
+      "done": "event:reply:boss",
+      "required": true,
+      "onUnlock": {
+        "say": [
+          {
+            "k": "inner",
+            "t": "What you can say back is a few lines, like a very small table."
+          }
+        ]
+      },
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "Hearing him out, half the day's energy is gone.",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "Order lunch.",
+            "where": "screen:msgs:boss"
+          }
+        ],
+        "then": "desk"
+      }
+    },
+    {
       "id": "lunch",
       "text": "Pick up the phone, order lunch.",
-      "unlock": "done:msgs",
+      "unlock": "done:reply",
       "done": "event:order:lunch",
       "required": true,
       "rewrite": "Lunch is on its way.",
@@ -324,21 +364,6 @@
       "unlock": "done:task2",
       "done": "flag:task_merge_done",
       "required": true
-    },
-    {
-      "id": "reply",
-      "text": "Reply to the boss.",
-      "unlock": "done:task3",
-      "done": "event:reply:boss",
-      "required": true,
-      "onUnlock": {
-        "say": [
-          {
-            "k": "inner",
-            "t": "What you can say back is a few lines, like a very small table."
-          }
-        ]
-      }
     },
     {
       "id": "dinner",

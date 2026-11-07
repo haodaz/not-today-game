@@ -1076,6 +1076,10 @@ export const loopActions: Record<string, ActionHandler> = {
     else if (ended?.kind === "toDoor") {
       if (session.view !== "door") loopActions["view"]!(ctx, { view: "door" } as DOMStringMap, null as never);
     }
+    // A sequence's `then: "desk"` (2026-11-08): its last line read, the camera leaves the screen to 桌子.
+    else if (ended?.kind === "toDesk") {
+      if (session.view !== "desk") loopActions["view"]!(ctx, { view: "desk" } as DOMStringMap, null as never);
+    }
     // guidance R14: Vivi's page read: it closes and the app before it is in front again.
     else if (ended?.kind === "docBack") docBack(ctx);
     // guidance R14: a sent task's lines read: 工作台 is home again, the next task's row lit (guide).

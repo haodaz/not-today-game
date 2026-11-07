@@ -227,28 +227,68 @@
       "onDone": {
         "say": [
           {
-            "k": "inner",
-            "t": "老板的消息又在最上面。",
+            "k": "speaker",
+            "who": "me",
+            "t": "看看老王又说了些什么吧。",
             "where": "screen:msgs:boss"
           },
           {
-            "k": "inner",
-            "t": "41 秒的语音，点开肯定不止这么点。",
+            "k": "speaker",
+            "who": "kuro",
+            "t": "每个语音都自动转文字了，我知道你不愿意听。",
             "where": "screen:msgs:boss"
           },
           {
             "k": "speaker",
             "who": "me",
-            "t": "先把饭点了，等会儿干起来就忘了。",
+            "t": "v17 今天过一遍，下午投资人要用。先让它合一版，我看一眼。技术要讲清楚：表达、价值、特色。",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "应收那边，甲方拖了一个月，把天数更一下。工资的事，再等等。",
             "where": "screen:msgs:boss"
           }
         ]
       }
     },
     {
+      "id": "reply",
+      "text": "回老板。",
+      "unlock": "done:msgs",
+      "done": "event:reply:boss",
+      "required": true,
+      "onUnlock": {
+        "say": [
+          {
+            "k": "inner",
+            "t": "能回的话就那几句，像一张很小的表。"
+          }
+        ]
+      },
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "听他说完话，感觉一天的精力用掉了一半。",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "点个餐吧。",
+            "where": "screen:msgs:boss"
+          }
+        ],
+        "then": "desk"
+      }
+    },
+    {
       "id": "lunch",
       "text": "拿手机，点个午饭。",
-      "unlock": "done:msgs",
+      "unlock": "done:reply",
       "done": "event:order:lunch",
       "required": true,
       "rewrite": "午饭在路上。",
@@ -324,21 +364,6 @@
       "unlock": "done:task2",
       "done": "flag:task_merge_done",
       "required": true
-    },
-    {
-      "id": "reply",
-      "text": "回老板。",
-      "unlock": "done:task3",
-      "done": "event:reply:boss",
-      "required": true,
-      "onUnlock": {
-        "say": [
-          {
-            "k": "inner",
-            "t": "能回的话就那几句，像一张很小的表。"
-          }
-        ]
-      }
     },
     {
       "id": "dinner",

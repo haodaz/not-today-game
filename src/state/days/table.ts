@@ -78,6 +78,8 @@ export interface Sequence {
   readonly choices?: readonly Choice[];
   /** The default `where` of its lines (a line's own wins). */
   readonly where?: Place;
+  /** 2026-11-08 (heads and tails): after its last line is read the camera goes here by itself. */
+  readonly then?: "desk";
 }
 
 /** A parsed condition (`unlock` / `done`). */
@@ -276,10 +278,11 @@ function effects(v: unknown, w: string): ChoiceEffects {
 /** `choiceSay`: its choices may carry their own `say` (the shutdown beat only; author 2026-11-06). */
 function sequence(v: unknown, w: string, allowChoices: boolean, choiceSay = false): Sequence {
   if (!isRecord(v)) fail(w, "a sequence must be an object");
-  keys(v, allowChoices ? ["say", "choices", "where"] : ["say", "where"], w);
+  keys(v, allowChoices ? ["say", "choices", "where", "then"] : ["say", "where", "then"], w);
   if (!Array.isArray(v.say)) fail(`${w}.say`, "must be a list");
   const say = v.say.map((x, i) => line(x, `${w}.say[${i}]`));
-  const where = v.where !== undefined ? { where: parsePlace(v.where, `${w}.where`) } : {};
+  if (v.then !== undefined && v.then !== "desk") fail(`${w}.then`, 'must be "desk"');
+  const where = { ...(v.where !== undefined ? { where: parsePlace(v.where, `${w}.where`) } : {}), ...(v.then !== undefined ? { then: v.then as "desk" } : {}) };
   if (v.choices === undefined) return { say, ...where };
   if (!Array.isArray(v.choices) || v.choices.length === 0) fail(`${w}.choices`, "must be a non-empty list");
   const choices = v.choices.map((c, i): Choice => {
@@ -452,6 +455,7 @@ function localiseSeq(zh: Sequence | undefined, en: Sequence | undefined, w: stri
   if (zh === undefined && en === undefined) return undefined;
   if (zh === undefined || en === undefined) fail(w, `sequence present in only one language`);
   if (zh.say.length !== en.say.length) fail(`${w}.say`, `${en.say.length} lines, the Chinese has ${zh.say.length}`);
+  if (zh.then !== en.then) fail(`${w}.then`, "differs from the Chinese");
   const say = zh.say.map((z, i) => localiseLine(z, en.say[i]!, `${w}.say[${i}]`));
   if ((zh.choices?.length ?? 0) !== (en.choices?.length ?? 0)) fail(`${w}.choices`, `choice count differs from the Chinese`);
   const choices = zh.choices?.map((z, i) => {

@@ -132,7 +132,7 @@ function firstRecogniseOnItsDay(events: readonly GameEvent[], e: Extract<GameEve
 
 function itemQueued(day: number, item: Item, which: "onUnlock" | "onDone") {
   const seq = item[which];
-  return seq ? { key: `d${day}:${item.id}:${which}`, lines: placedLines(seq), ending: { kind: "none" as const }, sequence: seq } : null;
+  return seq ? { key: `d${day}:${item.id}:${which}`, lines: placedLines(seq), ending: seq.then === "desk" ? { kind: "toDesk" as const } : { kind: "none" as const }, sequence: seq } : null;
 }
 
 export interface LoopEffects {

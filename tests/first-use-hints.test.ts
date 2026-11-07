@@ -142,6 +142,7 @@ describe("R1 · each room hint is a glow and a prompt, ended by its target", () 
   it("4 phone: the lunch order is the current item: 桌子's way in 房间, the phone on 桌子", () => {
     const store = booted();
     store.appendEvent({ kind: "step", name: "openApp:msgs", t: "09:05" });
+    store.appendEvent({ kind: "reply", choice: "fine", recipient: "boss", t: "09:05" }); // day 1: lunch comes after the reply (2026-11-08)
     expectShown(rig(store, "room", "phone").out(), "phone", "room");
     onceOnly(rig(store, "desk", "phone"), "phone", "desk", ["loop-phone", {}]);
   });
@@ -261,6 +262,7 @@ describe("R1 · rules", () => {
     r.session.onboard = "no";
     r.out(); // screen comes due (on, not yet at the computer)
     store.appendEvent({ kind: "step", name: "openApp:msgs", t: "09:05" });
+    store.appendEvent({ kind: "reply", choice: "fine", recipient: "boss", t: "09:05" }); // day 1: lunch comes after the reply (2026-11-08)
     const out = r.out(); // then phone
     expect(prompts(out)).toBe(1);
     expect(r.session.hintQueue.slice(0, 2)).toEqual(["screen", "phone"]);

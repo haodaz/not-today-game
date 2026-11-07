@@ -144,6 +144,7 @@ describe("R1 / R2 · the guide state and the six moments", () => {
     const store = booted();
     step(store, "openApp:msgs");
     open(store, "conv:boss");
+    store.appendEvent({ kind: "reply", choice: "fine", recipient: "boss", t: "09:05" }); // day 1: lunch unlocks after the reply (2026-11-08)
     const desk = rig(store, "desk");
     expect(guideNow(store.getState(), store.getEvents(), desk.session)).toMatchObject({ id: "G4", target: { kind: "phone" }, refuse: "guide.lunch.first", scope: "work" });
     expect(desk.out()).toMatch(/data-action="loop-phone"[^>]*data-guide="on"/);

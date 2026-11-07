@@ -23,6 +23,8 @@ export type Ending =
   | { readonly kind: "boxPlaced" }
   /** guidance R14: the doorbell's 外卖到了。去门口。 read: the camera goes to 门. */
   | { readonly kind: "toDoor" }
+  /** A sequence's `then: "desk"` (2026-11-08): the camera goes to 桌子 by itself after its last line. */
+  | { readonly kind: "toDesk" }
   /** guidance R14: vivi.back read: Vivi's page closes and the app before it is in front again. */
   | { readonly kind: "docBack" }
   /** guidance R14: a sent task's closing lines read: 工作台 returns to its home (the next task lit). */

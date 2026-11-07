@@ -71,7 +71,7 @@ function sessionAt(time: string): Session {
 const ctxOf = (store: Store, session: Session): ActionContext => ({ store, session, rerender: () => {}, later: () => {} });
 const act = (ctx: ActionContext, name: string, data: Record<string, string> = {}) => loopActions[name]!(ctx, data as DOMStringMap, null as never);
 /** Today's work done up to the lunch window (the checklist must allow ordering). */
-const atLunch = (day: number, extra: EventDraft[] = []) => storeAt(day, [{ kind: "step", name: "boot", t: "09:03" }, { kind: "step", name: "openApp:msgs", t: "09:03" }, ...extra]);
+const atLunch = (day: number, extra: EventDraft[] = []) => storeAt(day, [{ kind: "step", name: "boot", t: "09:03" }, { kind: "step", name: "openApp:msgs", t: "09:03" }, { kind: "reply", choice: "fine", recipient: "boss", t: "09:05" } /* day 1: the boss replied to before lunch (2026-11-08) */, ...extra]);
 
 describe("the pages", () => {
   it("home → shop → add → 去结算 → 下单 places the same one order event as before", () => {
