@@ -370,8 +370,9 @@
 .case-slot.box.small::before{left:50%;top:0;bottom:0;width:5px;transform:translateX(-50%)}
 .case-slot.box.small::after{top:50%;left:0;right:0;height:5px;transform:translateY(-50%)}
 /* The hidden box: near-black, a thin red edge, no print, no tape. */
-.case-slot.box.hidden{background:#141414;box-shadow:inset 0 0 0 1px #7a1010,0 4px 10px rgba(0,0,0,.5)}
-.case-slot.box.hidden::before,.case-slot.box.hidden::after{content:none}
+/* The hidden box looks like every other box until the day it is loose (2026-11-08: a black, red-edged slot from day 1 read as an emptied one). */
+.case-slot.box.hidden.loose{background:#141414;box-shadow:inset 0 0 0 1px #7a1010,0 4px 10px rgba(0,0,0,.5)}
+.case-slot.box.hidden.loose::before,.case-slot.box.hidden.loose::after{content:none}
 /* The loose box looks loose (addition 2026-11-07): tilted a few degrees, its lid (`.lid`, the
    box's top face with the tape) lifted a crack off the body, so a dark sliver shows along two edges;
    one wobble as the case opens (`.wobble`, continued across re-renders by --late). The stuck ones
@@ -383,8 +384,8 @@
 .case-slot.box .lid::before,.case-slot.box .lid::after{content:"";position:absolute;background:rgba(232,210,165,.6);box-shadow:0 0 0 .5px rgba(120,80,40,.25)}
 .case-slot.box .lid::before{left:50%;top:0;bottom:0;width:5px;transform:translateX(-50%)}
 .case-slot.box .lid::after{top:50%;left:0;right:0;height:5px;transform:translateY(-50%)}
-.case-slot.box.hidden .lid{background:#141414;box-shadow:inset 0 0 0 1px #c02020,2px 3px 0 rgba(0,0,0,.7)}
-.case-slot.box.hidden .lid::before,.case-slot.box.hidden .lid::after{content:none}
+.case-slot.box.hidden.loose .lid{background:#141414;box-shadow:inset 0 0 0 1px #c02020,2px 3px 0 rgba(0,0,0,.7)}
+.case-slot.box.hidden.loose .lid::before,.case-slot.box.hidden.loose .lid::after{content:none}
 .case-slot.box.loose.wobble{animation:case-wobble 600ms ease-in-out both;animation-delay:var(--late,0ms)}
 @keyframes case-wobble{0%,100%{transform:rotate(var(--tilt)) translateY(-2px)}25%{transform:rotate(calc(var(--tilt) - 5deg)) translateY(-3px)}55%{transform:rotate(calc(var(--tilt) + 4deg)) translateY(-2px)}80%{transform:rotate(calc(var(--tilt) - 2deg)) translateY(-2px)}}
 @media (prefers-reduced-motion:reduce){.case-slot.box.loose.wobble{animation:none}}
