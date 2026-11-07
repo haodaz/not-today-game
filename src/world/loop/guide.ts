@@ -26,7 +26,7 @@ export type GuideTarget =
   | { readonly kind: "phone" }
   | { readonly kind: "task"; readonly id: string }
   /** G7 (2026-11-08): a board task's page: the lock, the first card in the tray, an empty slot once a card is picked, 打快照 when full. */
-  | { readonly kind: "board"; readonly step: "lock" | "merge" | "card" | "slot" | "fetch" | "print" };
+  | { readonly kind: "board"; readonly step: "lock" | "merge" | "card" | "slot" | "fetch" | "print"; readonly slot?: string };
 
 /**
  * What the wrapper refuses while the guide is on: everything that is not the target or allowed
@@ -73,7 +73,9 @@ export function guideNow(state: State, events: readonly GameEvent[], session: Se
   if (desktop && open?.tree && board && taskPageId(session.workbenchPage) === open.tree.id) {
     const s = boardState(board, day, open.tree.id, events);
     const step = board.given.lock !== undefined && !s.unlocked ? "lock" : mergesLeft(board, s).length ? "merge" : canPrint(board, s) ? "print" : canFetch(board, s) ? "fetch" : session.boardPick ? "slot" : trayCards(board, s, day, events, open.tree.id).length || board.cards.some((c) => c.slot !== undefined && !(c.slot in s.slots)) ? "card" : null;
-    if (step) return { id: "G7", target: { kind: "board", step }, refuse: null, scope: "none" };
+    // The merge step names its page, so the ring finds that page's bar, or its row when another page is open.
+    const slot = step === "merge" ? mergesLeft(board, s)[0] : undefined;
+    if (step) return { id: "G7", target: { kind: "board", step, ...(slot !== undefined ? { slot } : {}) }, refuse: null, scope: "none" };
   }
 
   // G5: Vivi's page, once the boss's thread has been read today (the lock itself refuses, viviRefuse).
@@ -222,7 +224,7 @@ export function ringAnchors(target: GuideTarget): readonly (readonly (readonly [
     case "task":
       return [[["data-action", "wb-nav"], ["data-page", `task:${target.id}`]]];
     case "board":
-      return boardAnchors(target.step);
+      return boardAnchors(target.step, target.slot);
   }
 }
 
@@ -246,9 +248,12 @@ export function withRing(markup: string, g: Guide | null): string {
 }
 
 /** G7's anchors; a "!" pair excludes tags containing its value (an empty slot is the one without "filled"). */
-function boardAnchors(step: "lock" | "merge" | "card" | "slot" | "fetch" | "print"): readonly (readonly (readonly [string, string])[])[] {
+function boardAnchors(step: "lock" | "merge" | "card" | "slot" | "fetch" | "print", slot?: string): readonly (readonly (readonly [string, string])[])[] {
   if (step === "lock") return [[["data-action", "board-lock"]]];
-  if (step === "merge") return [[["data-action", "board-merge"], ["data-keep", "v17"]], [["data-action", "shell-slot"]]];
+  if (step === "merge") {
+    const at: (readonly [string, string])[] = slot !== undefined ? [["data-slot", slot]] : [];
+    return [[["data-action", "board-merge"], ...at, ["data-keep", "v17"]], [["data-action", "shell-slot"], ...at]];
+  }
   if (step === "fetch") return [[["data-action", "board-fetch"]]];
   if (step === "card") return [[["data-action", "board-option"]], [["data-action", "board-card"]]];
   if (step === "slot") return [[["data-action", "board-slot"], ["!", "filled"]], [["data-action", "shell-slot"]]];

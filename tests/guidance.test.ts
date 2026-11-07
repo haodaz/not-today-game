@@ -232,7 +232,7 @@ describe("G7 · a board task's page (2026-11-08)", () => {
     }
     // ide v2 (2026-11-08): three pages differ from v16: the merge comes first (要 v17 的 is lit).
     const g0 = guideNow(store.getState(), store.getEvents(), r.session)!;
-    expect(g0).toMatchObject({ id: "G7", target: { kind: "board", step: "merge" }, refuse: null, scope: "none" });
+    expect(g0).toMatchObject({ id: "G7", target: { kind: "board", step: "merge", slot: "r1" }, refuse: null, scope: "none" });
     expect(r.out()).toMatch(/data-action="board-merge" data-slot="r1" data-keep="v17"[^>]*data-guide="on"/);
     for (const slot of Object.keys(task.board!.ide!.diff!)) r.act("board-merge", { slot, keep: "v17" });
     const g = guideNow(store.getState(), store.getEvents(), r.session)!;
