@@ -56,7 +56,6 @@
           "reach": 60,
           "promise": 100,
           "steps": 6,
-          "finish": "That's it for today. I'll think it over.",
           "groups": [
             {
               "id": "training",
@@ -653,8 +652,12 @@
             "on": "steps",
             "lines": [
               {
+                "who": "me",
+                "text": "That's it for today. I'll think it over."
+              },
+              {
                 "who": "kuro",
-                "text": "That's six. To set one more, clear one."
+                "text": "What can run, runs. The 'grows by itself' she wants isn't on any bar."
               }
             ]
           },
@@ -671,12 +674,8 @@
             "on": "print",
             "lines": [
               {
-                "who": "me",
-                "text": "That's it for today. I'll think it over."
-              },
-              {
                 "who": "kuro",
-                "text": "What can run, runs. The 'grows by itself' she wants isn't on any bar."
+                "text": "Submitted. Zhang's side will run it first."
               }
             ]
           }

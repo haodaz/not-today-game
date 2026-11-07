@@ -295,7 +295,7 @@
   "board.tune.steps": "已开 {on} / {max}",
   "board.tune.reach": "今天能到的线",
   "board.tune.promise": "她页面上写的",
-  "board.tune.print": "今天先这样",
+  "board.tune.keep": "不接",
   "pane.tune": "参数",
   "obj.works.dark": "在这里不能使用。换个地方，换个时间，可能不一样。",
   "obj.key.tape.rec": "录音",

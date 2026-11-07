@@ -5,7 +5,7 @@
 // placing, Kuro's fill, the lock, print and send are the board's own actions. Card state is session
 // only, per task (`session.shell`); the board itself rebuilds from the log.
 import type { GameEvent } from "@state/events";
-import { boardState, canFetch, canPrint, foundCardIds, modFound, pathFound, pathOnMenu, taskForId, tuneCarried, tuneStepsLeft, type BoardState } from "@state/days/board";
+import { boardState, canFetch, canPrint, foundCardIds, modFound, pathFound, pathOnMenu, taskForId, tuneCarried, tuneOfferPending, tuneOffers, tuneStepsLeft, type BoardState } from "@state/days/board";
 import { ideOps, ideSrc, ideTranscript, selectedSlot, type IdeLine } from "@state/days/ide";
 import { API_FIELD, SLOT_FIELD, type Task, type TaskBoard } from "@state/days/tasks";
 import { deliverablePage } from "@state/files";
@@ -373,10 +373,21 @@ function conversation(ctx: AppContext, task: Task, day: number, live: boolean, f
   let chips: SafeHtml | null = null;
   if (live && board && s) {
     const assist = hasString("board.assist") ? html`<button type="button" class="sh-chip" data-action="board-assist">${tr("board.assist")}</button>` : null;
-    // tune: the finish is 今天先这样 (the day's cap is what it is), not a snapshot.
-    const label = board.tune ? (board.tune.finish ?? (hasString("board.tune.print") ? t("board.tune.print") : finishLabel(task))) : board.view === "ide" && hasString("board.ide.snapshot") ? tr("board.ide.snapshot") : finishLabel(task);
-    const finish = html`<button type="button" class="sh-chip primary" data-action="board-print"${canPrint(board, s) ? null : html` disabled`}>${label}</button>`;
-    chips = html`${assist}${finish}`;
+    if (board.tune) {
+      // tune: no finish button (the work goes by itself when the budget is spent); Kuro's end-of-work
+      // offer, when it is on the table, is a story choice here: take the path, or 不接.
+      // the chips come after the lines (nothing pops: the words first, then the choice)
+      const typed = visible.length === lines.length;
+      const offer = typed && tuneOfferPending(board, s)
+        ? tuneOffers(board).map(({ mod, path }) => html`<button type="button" class="sh-chip primary" data-action="board-mod" data-mod="${mod.id}" data-path="${path.id}">${path.label}</button>`)
+        : [];
+      const keep = offer.length && hasString("board.tune.keep") ? html`<button type="button" class="sh-chip" data-action="board-keep">${tr("board.tune.keep")}</button>` : null;
+      chips = html`${offer.length ? null : assist}${offer}${keep}`;
+    } else {
+      const label = board.view === "ide" && hasString("board.ide.snapshot") ? tr("board.ide.snapshot") : finishLabel(task);
+      const finish = html`<button type="button" class="sh-chip primary" data-action="board-print"${canPrint(board, s) ? null : html` disabled`}>${label}</button>`;
+      chips = html`${assist}${finish}`;
+    }
   }
   return html`<div class="sh-conv"><div class="sh-thread">${rows}${dots}</div><div class="sh-composer">${chips}</div></div>`;
 }

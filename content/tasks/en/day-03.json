@@ -56,7 +56,6 @@
           "reach": 80,
           "promise": 100,
           "steps": 8,
-          "finish": "This is as good as it gets.",
           "groups": [
             {
               "id": "training",
@@ -505,7 +504,7 @@
                     "gain": -5,
                     "safe": -10
                   },
-                  "after": "try"
+                  "after": "done"
                 }
               ]
             }
@@ -544,15 +543,15 @@
             ]
           },
           {
-            "on": "try",
+            "on": "keep",
             "lines": [
               {
                 "who": "me",
-                "text": "This is as good as it gets."
+                "text": "Leave it."
               },
               {
                 "who": "kuro",
-                "text": "Wait. Her page has a skin you haven't wired. Whether to wire it is yours to decide."
+                "text": "She'll look at the skin first."
               }
             ]
           },
@@ -815,8 +814,12 @@
             "on": "steps",
             "lines": [
               {
+                "who": "me",
+                "text": "This is as good as it gets."
+              },
+              {
                 "who": "kuro",
-                "text": "That's eight."
+                "text": "Wait. Her page has a skin you haven't wired. Whether to wire it is yours to decide."
               }
             ]
           },
@@ -851,7 +854,7 @@
               },
               {
                 "who": "kuro",
-                "text": "Send it to Vivi. She'll look at the skin first."
+                "text": "Sent to Vivi."
               }
             ]
           }

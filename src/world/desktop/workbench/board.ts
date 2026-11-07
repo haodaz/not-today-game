@@ -8,7 +8,7 @@
 import type { State } from "@state/types.gen";
 import type { GameEvent } from "@state/events";
 import type { Task, TaskBoard } from "@state/days/tasks";
-import { autoUnlock, boardState, canFetch, canPrint, foundCardIds, isKuroCard, isObjectLock, isReadLock, lockCodesOffered, lockJammed, lockObjectAvailable, lockUsedOk, pathFound, trayCards, tuneCarried, tuneNeedsTry, tuneStepsLeft, wrongReadings, type BoardState } from "@state/days/board";
+import { autoUnlock, boardState, canFetch, canPrint, foundCardIds, isKuroCard, isObjectLock, isReadLock, lockCodesOffered, lockJammed, lockObjectAvailable, lockUsedOk, pathFound, trayCards, tuneCarried, tuneOfferPending, tuneStepsLeft, wrongReadings, type BoardState } from "@state/days/board";
 import { ideOps, ideSrc, ideTranscript } from "@state/days/ide";
 import { cls, html, type SafeHtml } from "@world/html";
 import { FRAMES, frameUrl } from "../kuro/body";
@@ -427,7 +427,19 @@ const actions: Record<string, ActionHandler> = {
     const s = stateOf(ctx, c.task, c.board);
     const path = s.mods[id] === pathId ? null : pathId;
     if (path !== null && s.mods[id] === undefined && tuneStepsLeft(c.board, s) === 0) return;
+    const before = transcriptLength(ctx, c);
     ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "mod", id, path } });
+    finishTune(ctx, c, before);
+    ctx.rerender();
+  },
+  // tune: 不接 — Kuro's end-of-work offer declined; the work goes as it is.
+  "board-keep"(ctx) {
+    const c = currentBoard(ctx);
+    if (!c || !c.board.tune) return;
+    if (!tuneOfferPending(c.board, stateOf(ctx, c.task, c.board))) return;
+    const before = transcriptLength(ctx, c);
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "keep" } });
+    finishTune(ctx, c, before);
     ctx.rerender();
   },
   // ide v2: pull the latest data from the API, once, after every page is merged and filled.
@@ -442,9 +454,11 @@ const actions: Record<string, ActionHandler> = {
   "board-assist"(ctx) {
     const c = currentBoard(ctx);
     if (!c) return;
+    const before = transcriptLength(ctx, c);
     ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "assistFill" } });
     ctx.session.boardPick = null;
     ctx.session.boardLockOpen = false;
+    finishTune(ctx, c, before);
     ctx.rerender();
   },
   // 打印 / 发给… / 提交: complete the task. The `task` event carries slots + assists; the mode is
@@ -456,28 +470,65 @@ const actions: Record<string, ActionHandler> = {
     if (!c) return;
     const s = stateOf(ctx, c.task, c.board);
     if (!canPrint(c.board, s)) return;
-    // tune (author 2026-11-08): the first try does not finish when a path waits for it — Kuro's line, and the option appears.
-    if (tuneNeedsTry(c.board, s)) {
-      ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "try" } });
-      ctx.rerender();
-      return;
-    }
-    const open = openWork(ctx.store.getState(), ctx.store.getEvents());
-    if (!open || open.item.done.kind !== "flag") return;
-    ctx.store.appendEvent({
-      kind: "task",
-      flag: open.item.done.flag,
-      mode: s.assists > 0 ? "let" : "self",
-      slots: { ...s.slots },
-      assists: s.assists,
-    });
-    const d = c.task.deliverable;
-    if (d && (d.to ?? "hand") !== "hand") ctx.store.appendEvent({ kind: "give", deliverableId: d.id, t: ctx.session.clock.time });
-    ctx.session.boardPick = null;
-    ctx.session.boardLockOpen = false;
+    printBoard(ctx, c, s);
     ctx.rerender();
   },
 };
+
+/** The `task` event (slots + assists) and, for a person's deliverable, the `give` at once (the finish). */
+function printBoard(ctx: ActionContext, c: { task: Task; board: TaskBoard }, s: BoardState): void {
+  const open = openWork(ctx.store.getState(), ctx.store.getEvents());
+  if (!open || open.item.done.kind !== "flag") return;
+  ctx.store.appendEvent({
+    kind: "task",
+    flag: open.item.done.flag,
+    mode: s.assists > 0 ? "let" : "self",
+    slots: { ...s.slots },
+    assists: s.assists,
+  });
+  const d = c.task.deliverable;
+  if (d && (d.to ?? "hand") !== "hand") ctx.store.appendEvent({ kind: "give", deliverableId: d.id, t: ctx.session.clock.time });
+  ctx.session.boardPick = null;
+  ctx.session.boardLockOpen = false;
+}
+
+/** The transcript's length now (to time what a choice adds). */
+function transcriptLength(ctx: ActionContext, c: { task: Task; board: TaskBoard }): number {
+  const events = ctx.store.getEvents();
+  return ideTranscript(c.board, ideOps(c.task, ctx.store.getState().day, events), tuneCarried(c.board, events)).length;
+}
+
+/** ide R4's typing pace (ms per line) and the pause after the last line before the work goes. */
+const LINE_MS = 300;
+const AFTER_LINES_MS = 1400;
+
+/**
+ * tune (author 2026-11-08, 「所有的改装次数用完，就该进比赛了，没有一个按钮叫做改装完了我要比赛」, 「每次选完，
+ * 要先看到执行变化，然后 preview 也发生变化，然后才是下一次的选择，最后一次选择结束后是剧情，但都不是突然冒出来的」):
+ * after a choice, when the budget is spent and Kuro's end-of-work offer (if any) is answered, the
+ * work goes by itself — but only once the lines this choice added have been typed (the config line
+ * and the bars change at once; the words come at the typing pace; then the finish, whose own lines
+ * type after). No finish button on a tuning board. Nothing happens if the player changed the board
+ * again in the meantime.
+ */
+function finishTune(ctx: ActionContext, c: { task: Task; board: TaskBoard }, before: number): void {
+  if (!c.board.tune) return;
+  const s = stateOf(ctx, c.task, c.board);
+  if (!canPrint(c.board, s)) return;
+  const added = Math.max(0, transcriptLength(ctx, c) - before);
+  const ops = ctx.store.getEvents().length;
+  setTimeout(() => {
+    const now = currentBoard(ctx);
+    if (!now || now.task.id !== c.task.id || ctx.store.getEvents().length !== ops) return;
+    const st = stateOf(ctx, now.task, now.board);
+    if (!canPrint(now.board, st)) return;
+    const day = ctx.store.getState().day;
+    const was = transcriptLength(ctx, now);
+    printBoard(ctx, now, st);
+    noteIdeLines(ctx, now.task, now.board, day, was);
+    ctx.rerender();
+  }, added * LINE_MS + AFTER_LINES_MS);
+}
 
 /** The board actions; on an IDE board each one types in the transcript lines it adds (ide R4). */
 export const boardActions: Record<string, ActionHandler> = Object.fromEntries(Object.entries(actions).map(([k, h]) => [k, withIde(h)]));

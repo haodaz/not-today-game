@@ -44,8 +44,10 @@ export interface BoardState {
   readonly fetched: boolean;
   /** tune (2026-11-08): module → the path chosen for it (a module with no entry is off). */
   readonly mods: Readonly<Record<string, string>>;
-  /** tune: the player tried to finish once today (the paths with `after: "try"` are on the menu from then). */
-  readonly tried: boolean;
+  /** tune: the work was complete once today (budget spent or line reached): the paths with `after: "done"` are on the menu from then. */
+  readonly done: boolean;
+  /** tune: the player answered Kuro's end-of-work offer (took the path, or `keep`): the work may go. */
+  readonly decided: boolean;
 }
 
 /**
@@ -55,7 +57,7 @@ export interface BoardState {
 export function freshBoard(board: TaskBoard, carried: Readonly<Record<string, string>> = {}): BoardState {
   const mods: Record<string, string> = {};
   for (const [id, path] of Object.entries(carried)) if (board.tune?.mods.find((m) => m.id === id)?.paths.some((p) => p.id === path)) mods[id] = path;
-  return { unlocked: board.given.lock === undefined, slots: {}, assists: 0, wrongCodes: [], merged: {}, fetched: false, mods, tried: false };
+  return { unlocked: board.given.lock === undefined, slots: {}, assists: 0, wrongCodes: [], merged: {}, fetched: false, mods, done: false, decided: false };
 }
 
 /**
@@ -95,8 +97,8 @@ export function stepBoard(board: TaskBoard, s: BoardState, op: BoardOp): BoardSt
     case "fetch":
       if (!board.ide?.api || s.fetched) return s;
       return { ...s, fetched: true };
-    case "try":
-      return board.tune && !s.tried ? { ...s, tried: true } : s;
+    case "keep":
+      return board.tune && s.done && !s.decided ? { ...s, decided: true } : s;
     case "mod": {
       // tune: choosing a path for a module not yet set spends a step (never over the budget); another
       // path for a set module swaps it for free; null clears it and gives the step back. Unknown
@@ -113,9 +115,11 @@ export function stepBoard(board: TaskBoard, s: BoardState, op: BoardOp): BoardSt
       }
       const def = mod.paths.find((p) => p.id === op.path);
       if (!def || now === op.path) return s;
-      if (def.after === "try" && !s.tried) return s; // not on the menu yet
+      if (def.after === "done" && !s.done) return s; // not on the menu yet
       if (now === undefined && Object.keys(s.mods).length >= tune.steps) return s;
-      return { ...s, mods: { ...s.mods, [op.id]: op.path } };
+      // taking the path Kuro brought up answers the offer
+      const next = { ...s, mods: { ...s.mods, [op.id]: op.path }, decided: s.decided || def.after === "done" };
+      return tuneMarkDone(board, next);
     }
     case "clear": {
       if (!(op.slot in s.slots)) return s;
@@ -125,7 +129,7 @@ export function stepBoard(board: TaskBoard, s: BoardState, op: BoardOp): BoardSt
     }
     case "assistFill": {
       // tune: Kuro's choice replaces whatever is set (it does not know what you were trying).
-      if (board.tune) return { ...s, mods: { ...board.tune.assist }, unlocked: true, assists: s.assists + 1 };
+      if (board.tune) return tuneMarkDone(board, { ...s, mods: { ...board.tune.assist }, unlocked: true, assists: s.assists + 1 });
       const slots = { ...s.slots };
       for (const slot of board.slots) if (!(slot.id in slots)) slots[slot.id] = board.kuro.fill[slot.id]!;
       return { ...s, slots, unlocked: true, assists: s.assists + 1 };
@@ -139,11 +143,14 @@ export function boardState(board: TaskBoard, day: number, taskId: string, events
 }
 
 /**
- * Every slot filled and the column unlocked: 打印 is enabled. A tuning board prints once every bar
- * is over today's line, or once the budget is spent (今天先这样 — the day's cap is what it is).
+ * Every slot filled and the column unlocked: 打印 is enabled. A tuning board has no finish button
+ * (author: like a racer whose tuning turns are spent — the race just starts): the work goes by
+ * itself once the budget is spent (crossing the line alone does not end it), after Kuro's
+ * end-of-work offer (if the board has one) is answered. `canPrint` is that condition; the action
+ * layer finishes.
  */
 export function canPrint(board: TaskBoard, s: BoardState): boolean {
-  if (board.tune) return tuneReached(board, s) || tuneStepsLeft(board, s) === 0;
+  if (board.tune) return s.done && !tuneOfferPending(board, s);
   return s.unlocked && board.slots.every((slot) => slot.id in s.slots) && mergesLeft(board, s).length === 0 && (!board.ide?.api || s.fetched);
 }
 
@@ -194,13 +201,25 @@ export function modFound(mod: TuneMod, day: number, events: readonly GameEvent[]
 export function pathFound(mod: TuneMod, path: TunePath, day: number, events: readonly GameEvent[]): boolean {
   return modFound(mod, day, events) && sourceFound(path.from, day, events);
 }
-/** tune: a path is on the menu at all: one that waits for the first try (`after: "try"`) is absent until then. */
+/** tune: a path is on the menu at all: one that waits for the work to be complete (`after: "done"`) is absent until then. */
 export function pathOnMenu(path: TunePath, s: BoardState): boolean {
-  return path.after !== "try" || s.tried;
+  return path.after !== "done" || s.done;
 }
-/** tune: the first 今天先这样 does not finish: a path waits for it (Kuro's `try` line, then the option). */
-export function tuneNeedsTry(board: TaskBoard, s: BoardState): boolean {
-  return !!board.tune && !s.tried && board.tune.mods.some((m) => m.paths.some((p) => p.after === "try"));
+/** tune: the work is complete now — the budget is spent (author: crossing the line alone does not end it); sticky once true (`done`). */
+export function tuneComplete(board: TaskBoard, s: BoardState): boolean {
+  return tuneStepsLeft(board, s) === 0;
+}
+/** tune: mark the board done once the work is complete (the fold calls this after every choice). */
+export function tuneMarkDone(board: TaskBoard, s: BoardState): BoardState {
+  return !s.done && tuneComplete(board, s) ? { ...s, done: true } : s;
+}
+/** tune: Kuro's end-of-work offer (a path with `after: "done"`) is on the table and unanswered. */
+export function tuneOfferPending(board: TaskBoard, s: BoardState): boolean {
+  return !!board.tune && s.done && !s.decided && board.tune.mods.some((m) => m.paths.some((p) => p.after === "done"));
+}
+/** tune: the paths Kuro brings up at the end (module, path), for the offer's chips. */
+export function tuneOffers(board: TaskBoard): { readonly mod: TuneMod; readonly path: TunePath }[] {
+  return (board.tune?.mods ?? []).flatMap((mod) => mod.paths.filter((p) => p.after === "done").map((path) => ({ mod, path })));
 }
 
 /** tune: the slack under today's line that still counts as right (the judge's tolerance). */
@@ -372,7 +391,7 @@ export function validateBoardStep(day: number, taskId: string, op: BoardOp): voi
     case "fetch":
       if (!board.ide?.api) throw new Error("boardStep: this board has no API to pull from");
       return;
-    case "try":
+    case "keep":
       if (!board.tune) throw new Error("boardStep: this board has no modules");
       return;
     case "mod": {

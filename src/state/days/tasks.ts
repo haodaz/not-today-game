@@ -236,8 +236,6 @@ export interface BoardTune {
   readonly assist: Readonly<Record<string, string>>;
   /** The config file's sections (author: the switches edit the AI's training / constraints / support; the bars are the preview's result). */
   readonly groups?: readonly TuneGroup[];
-  /** The finish button's words, the player's (author: day 2 「今天先这样，我再想想」, day 3 「这已经是最好的程度了」); absent: `board.tune.print`. */
-  readonly finish?: string;
 }
 export interface TuneGroup {
   readonly id: string;
@@ -270,8 +268,8 @@ export interface TunePath {
   /** A path of its own to find first (the diff-only approval in the v17 sent to Wang). */
   readonly from?: CardFrom;
   readonly hint?: string;
-  /** author 2026-11-08: a path that is not on the menu until the player first tries to finish (her skin: Kuro's line, then the option). */
-  readonly after?: "try";
+  /** author 2026-11-08: a path not on the menu until the work is complete (budget spent or line reached): Kuro brings it up, the player takes it or not, then the work goes. */
+  readonly after?: "done";
 }
 export interface TaskBoard {
   readonly kind: "table";
@@ -657,8 +655,7 @@ function board(v: unknown, w: string): TaskBoard {
  */
 function boardTune(v: unknown, w: string): BoardTune {
   if (!isRecord(v)) fail(w, "must be an object");
-  keys(v, ["dims", "start", "reach", "promise", "steps", "mods", "carry", "assist", "groups", "finish"], w);
-  const finish = v.finish !== undefined ? str(v.finish, `${w}.finish`) : undefined;
+  keys(v, ["dims", "start", "reach", "promise", "steps", "mods", "carry", "assist", "groups"], w);
   // groups: the config file's sections (unique ids, labels).
   const groupIds = new Set<string>();
   let groups: TuneGroup[] | undefined;
@@ -714,7 +711,7 @@ function boardTune(v: unknown, w: string): BoardTune {
       const pw = `${mw}.paths[${j}]`;
       if (!isRecord(p)) fail(pw, "a path must be an object");
       keys(p, ["id", "label", "bullets", "delta", "from", "hint", "after"], pw);
-      if (p.after !== undefined && p.after !== "try") fail(`${pw}.after`, 'must be "try"');
+      if (p.after !== undefined && p.after !== "done") fail(`${pw}.after`, 'must be "done"');
       const pid = str(p.id, `${pw}.id`);
       if (seen.has(pid)) fail(`${mw}.paths`, `duplicate path id "${pid}"`);
       seen.add(pid);
@@ -727,7 +724,7 @@ function boardTune(v: unknown, w: string): BoardTune {
         if (!Number.isInteger(x) || x === 0 || Math.abs(x as number) > 100) fail(`${pw}.delta.${k}`, "must be a non-zero integer within ±100");
         delta[k] = x as number;
       }
-      return { id: pid, label: str(p.label, `${pw}.label`), bullets, delta, ...(p.from !== undefined ? { from: cardFrom(p.from, `${pw}.from`) } : {}), ...(p.hint !== undefined ? { hint: str(p.hint, `${pw}.hint`) } : {}), ...(p.after === "try" ? { after: "try" as const } : {}) };
+      return { id: pid, label: str(p.label, `${pw}.label`), bullets, delta, ...(p.from !== undefined ? { from: cardFrom(p.from, `${pw}.from`) } : {}), ...(p.hint !== undefined ? { hint: str(p.hint, `${pw}.hint`) } : {}), ...(p.after === "done" ? { after: "done" as const } : {}) };
     });
     pathIds.set(id, seen);
     return { id, label: str(m.label, `${mw}.label`), paths, ...(m.from !== undefined ? { from: cardFrom(m.from, `${mw}.from`) } : {}), ...(m.hint !== undefined ? { hint: str(m.hint, `${mw}.hint`) } : {}), ...(m.group !== undefined ? { group: m.group as string } : {}) };
@@ -748,7 +745,7 @@ function boardTune(v: unknown, w: string): BoardTune {
     const day = Number.isInteger(v.carry.day) && (v.carry.day as number) >= 1 && (v.carry.day as number) <= 18 ? (v.carry.day as number) : fail(`${w}.carry.day`, "must be a day 1–18");
     carry = { day, task: str(v.carry.task, `${w}.carry.task`) };
   }
-  return { dims, start, reach, promise, steps, mods, assist, ...(carry ? { carry } : {}), ...(groups ? { groups } : {}), ...(finish !== undefined ? { finish } : {}) };
+  return { dims, start, reach, promise, steps, mods, assist, ...(carry ? { carry } : {}), ...(groups ? { groups } : {}) };
 }
 
 const MEETING_T = /^([01]\d|2[0-3]):[0-5]\d$/;
@@ -879,7 +876,7 @@ function ideFiles(v: unknown, w: string, slotIds: ReadonlySet<string>): Record<s
 }
 
 /** The fixed beat names (ide R1); `fill:<slot>` and `fill:<slot>:<card>` are checked separately. */
-const BEAT_ONS = ["open", "kuro", "unlock", "print", "send", "merge", "fetch", "steps", "reach", "try"] as const;
+const BEAT_ONS = ["open", "kuro", "unlock", "print", "send", "merge", "fetch", "steps", "reach", "keep"] as const;
 
 /** The transcript beats (ide R1): each `on` names a known beat and existing ids; each `on` once. */
 function boardBeats(v: unknown, w: string, slotIds: ReadonlySet<string>, cardIds: ReadonlySet<string>, modPaths: ReadonlyMap<string, ReadonlySet<string>> = new Map()): BoardBeat[] {

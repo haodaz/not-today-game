@@ -4,7 +4,7 @@
 // reaches 80 with its new paths), and day 3 opens with day 2's choices still set.
 import { describe, expect, it } from "vitest";
 import type { GameEvent } from "@state/events";
-import { boardJudgement, boardState, canPrint, freshBoard, pathFound, pathOnMenu, stepBoard, tuneNeedsTry, tuneBase, tuneCarried, tuneDims, tuneReached, tuneShort, tuneStepsLeft, tuneValues } from "@state/days/board";
+import { boardJudgement, boardState, canPrint, freshBoard, pathFound, pathOnMenu, stepBoard, tuneOfferPending, tuneBase, tuneCarried, tuneDims, tuneReached, tuneShort, tuneStepsLeft, tuneValues } from "@state/days/board";
 import { ideSrc, ideTranscript } from "@state/days/ide";
 import { parseTaskFile, taskByFlag, type TaskBoard } from "@state/days/tasks";
 
@@ -99,20 +99,20 @@ describe("tune: modules, paths and the bars", () => {
     for (const [m, p] of Object.entries(TRAPS)) expect(DAY3_BEST[m]).not.toBe(p);
     expect(DAY3_BEST.front).not.toBe("skin");
   });
-  it("今天先这样 is enabled once the budget is spent or every bar is over the line", () => {
+  it("the work is complete once the budget is spent (crossing the line alone does not end it); it goes by itself unless Kuro's offer waits", () => {
     const b2 = d2().board!;
     let s = freshBoard(b2);
     expect(canPrint(b2, s)).toBe(false);
     for (const [id, path] of Object.entries(DAY2_BEST)) s = stepBoard(b2, s, { t: "mod", id, path });
-    expect(canPrint(b2, s)).toBe(false); // five set, the line not reached
+    expect(canPrint(b2, s)).toBe(false); // five set, one step left: still tuning
     s = stepBoard(b2, s, { t: "mod", id: "ingest", path: "manual" });
     expect(canPrint(b2, s)).toBe(true);
     expect(tuneReached(b2, s)).toBe(false);
     const b3 = d3().board!;
     let t = freshBoard(b3);
-    for (const [id, path] of Object.entries(DAY3_BEST)) t = stepBoard(b3, t, { t: "mod", id, path });
-    expect(tuneReached(b3, t)).toBe(true);
-    expect(canPrint(b3, t)).toBe(true);
+    for (const [id, path] of Object.entries(DAY3_BEST).slice(0, 7)) t = stepBoard(b3, t, { t: "mod", id, path });
+    t = stepBoard(b3, t, { t: "mod", id: "cadence", path: "nightly" }); // already set: a swap to the same path is ignored
+    expect(canPrint(b3, t)).toBe(false);
   });
   it("day 3 opens with day 2's choices (carried from the log); its base bars are where day 2 ended; a swap today is free, a clear gives a step back", () => {
     const b3 = d3().board!;
@@ -178,7 +178,7 @@ describe("tune: modules, paths and the bars", () => {
     expect(lines).toContain("reach");
     expect(lines.indexOf("reach")).toBeGreaterThan(lines.indexOf("mod:evals:shadow"));
   });
-  it("a path with a source of its own waits for it (the diff-only approval for the v17 sent to Wang); her skin is off the menu until the first try to finish, when Kuro's line reveals it", () => {
+  it("a path with a source of its own waits for it (the diff-only approval for the v17 sent to Wang); her skin is off the menu until the budget is spent, when Kuro's offer brings it up", () => {
     const b = d3().board!;
     const gate = b.tune!.mods.find((m) => m.id === "gate")!;
     const diff = gate.paths.find((p) => p.id === "diff")!;
@@ -186,26 +186,42 @@ describe("tune: modules, paths and the bars", () => {
     expect(pathFound(gate, diff, 3, [{ kind: "open", day: 3, target: "conv:boss" } as GameEvent])).toBe(true);
     const front = b.tune!.mods.find((m) => m.id === "front")!;
     const skin = front.paths.find((p) => p.id === "skin")!;
-    expect(skin.after).toBe("try");
+    expect(skin.after).toBe("done");
     let s = freshBoard(b);
     expect(pathOnMenu(skin, s)).toBe(false);
     expect(stepBoard(b, s, { t: "mod", id: "front", path: "skin" })).toBe(s); // not on the menu yet
-    for (const [id, path] of Object.entries(DAY3_BEST)) s = stepBoard(b, s, { t: "mod", id, path });
-    expect(canPrint(b, s)).toBe(true);
-    expect(tuneNeedsTry(b, s)).toBe(true); // the first finish only reveals
-    s = stepBoard(b, s, { t: "try" });
-    expect(s.tried).toBe(true);
-    expect(tuneNeedsTry(b, s)).toBe(false);
+    expect(stepBoard(b, s, { t: "keep" })).toBe(s); // nothing to answer yet
+    const seven = Object.entries(DAY3_BEST).slice(0, 7);
+    for (const [id, path] of seven) s = stepBoard(b, s, { t: "mod", id, path });
+    expect(s.done).toBe(false); // the line is not what ends it
+    const [lastId, lastPath] = Object.entries(DAY3_BEST)[7]!;
+    s = stepBoard(b, s, { t: "mod", id: lastId, path: lastPath });
+    expect(tuneReached(b, s)).toBe(true);
+    expect(s.done).toBe(true); // the budget is spent: the work is complete
+    expect(tuneOfferPending(b, s)).toBe(true); // Kuro's offer is on the table: the work does not go yet
+    expect(canPrint(b, s)).toBe(false);
     expect(pathOnMenu(skin, s)).toBe(true);
-    expect(stepBoard(b, s, { t: "mod", id: "front", path: "skin" }).mods.front).toBe("skin");
-    // the transcript: the player's line, then Kuro's, once; day 2 has no try (no path waits for one)
-    const ons = ideTranscript(b, [{ t: "try" }, { t: "try" }]).map((l) => l.on);
-    expect(ons.filter((o) => o === "try")).toHaveLength(2); // two lines of the one beat
+    // 不接 answers it; so does taking the skin (a free swap on a set module)
+    const kept = stepBoard(b, s, { t: "keep" });
+    expect(kept.decided).toBe(true);
+    expect(canPrint(b, kept)).toBe(true);
+    const took = stepBoard(b, s, { t: "mod", id: "front", path: "skin" });
+    expect(took.mods.front).toBe("skin");
+    expect(took.decided).toBe(true);
+    expect(canPrint(b, took)).toBe(true);
+    // day 2 has no offer: the spent budget is the end
+    const b2 = d2().board!;
+    let t = freshBoard(b2);
+    for (const [id, path] of Object.entries({ ...DAY2_BEST, ingest: "manual" })) t = stepBoard(b2, t, { t: "mod", id, path });
+    expect(t.done).toBe(true);
+    expect(tuneOfferPending(b2, t)).toBe(false);
+    expect(canPrint(b2, t)).toBe(true);
+    // the transcript: the spent budget is the player's line and Kuro's offer; 不接 has its beat; day 3's open does not mention the skin
+    const ons = ideTranscript(b, [...Object.entries(DAY3_BEST).map(([id, path]) => ({ t: "mod", id, path }) as const), { t: "keep" }]).map((l) => l.on);
+    expect(ons).toContain("reach");
+    expect(ons).toContain("steps");
+    expect(ons.indexOf("keep")).toBeGreaterThan(ons.indexOf("steps"));
     expect(ideTranscript(b, []).some((l) => l.on === "open" && l.text.includes("皮子"))).toBe(false);
-    expect(tuneNeedsTry(d2().board!, freshBoard(d2().board!))).toBe(false);
-    // the finish words are the player's, per day
-    expect(d2().board!.tune!.finish).toBe("今天先这样，我再想想");
-    expect(b.tune!.finish).toBe("这已经是最好的程度了");
   });
   it("the loader: a tuning board has no slots and no cards, paths name dimensions and carry sub-actions, the assist names paths within the budget, beats name modules and paths", () => {
     const base = JSON.parse(JSON.stringify(d2()));

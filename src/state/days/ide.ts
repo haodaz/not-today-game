@@ -117,17 +117,18 @@ export function ideTranscript(board: TaskBoard, ops: readonly IdeOp[], carried: 
   let walk = freshBoard(board, carried);
   for (const op of ops) {
     switch (op.t) {
-      case "try":
-        if (!walk.tried) show("try");
+      case "keep":
+        if (stepBoard(board, walk, op) !== walk) show("keep");
         break;
       case "mod": {
-        // tune: the switch's own beat (on / off) when it took, then `steps` as the budget runs out
-        // and `reach` as every bar clears today's line (each once).
+        // tune: the switch's own beat (on / off) when it took, then — the moment the work is complete —
+        // `reach` (every bar over the line) or `steps` (the budget spent): the player's line, Kuro's.
         const after = stepBoard(board, walk, op);
         if (after !== walk) {
           show(op.path === null ? `unmod:${op.id}` : beats.has(`mod:${op.id}:${op.path}`) ? `mod:${op.id}:${op.path}` : `mod:${op.id}`);
+          // the line crossed is a remark; the budget spent is the end of the work (the player's words) — both can be this choice
           if (tuneReached(board, after)) show("reach");
-          else if (tuneStepsLeft(board, after) === 0) show("steps");
+          if (tuneStepsLeft(board, after) === 0) show("steps");
         }
         break;
       }
@@ -136,6 +137,7 @@ export function ideTranscript(board: TaskBoard, ops: readonly IdeOp[], carried: 
         break;
       case "assistFill":
         show("kuro");
+        if (board.tune) { const after = stepBoard(board, walk, op); if (tuneReached(board, after)) show("reach"); if (tuneStepsLeft(board, after) === 0) show("steps"); }
         break;
       case "merge": {
         // ide v2: the page's own beat (by what was kept), then `merge` once every differing page is merged.
