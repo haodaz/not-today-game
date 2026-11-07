@@ -16,7 +16,7 @@ import { FACE_FROM_STAGE, FACE_MS, msgFaceDelay, msgFaceSeed, type FaceApp } fro
 import { stageOf } from "@state/stages";
 import { acceptOffer, answerAsk, answerOffer, declineOffer, kuroActions, playerBox, readOnToPlayer } from "@world/dialogue/kuro";
 import { nextScreen } from "@world/dialogue/layout";
-import { stepOnce } from "@world/loop/steps";
+import { hasStepToday, stepOnce } from "@world/loop/steps";
 import { fillPlaceholders } from "@world/replies/placeholders";
 import { shellActions, type ActionContext, type ActionHandler } from "@world/desktop/controller";
 import { appOn, buildShell, VIEWS, type Session, type View } from "@world/desktop/model";
@@ -44,7 +44,7 @@ import { pressKey } from "@world/objects/index";
 import { PHONE_FLIP } from "@world/room/held";
 import { CAMERA_KEYS, DICT_KEYS, FLIPPERS, SHEET_GONE_MS, SHEET_SLIDE_MS, TAPE_KEYS } from "@world/room/devices";
 import { CAMERA_FLASH_MS, cameraShot, type CameraState } from "@world/objects/plain";
-import { DEVELOP_BLANK_MS, DEVELOP_MS, ON_THE_SPOT_DAY, photoKey, roomFacingOf, roomPhotoOn } from "@state/photos";
+import { DEVELOP_BLANK_MS, DEVELOP_MS, ON_THE_SPOT_DAY, photoKey, roomFacingOf, roomPhotoOn, sheetsLeft } from "@state/photos";
 import { screenPlaceOf } from "@world/desktop/files/album";
 import { booted, deskMeal, itemStates, loopContext, mealToOrder, nightfallReached, openItemFor, openTask } from "@world/loop/checklist";
 import type { EventToken } from "@state/days/table";
@@ -118,7 +118,7 @@ function renderGameBody(store: Store, session: Session, nowMs: number): SafeHtml
     const filesWin = renderFiles({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs }, live);
     // 老物件栏 (object-bar R2): an object opened from the bar is used in a modal over the desktop.
     const objUse = renderObjectBarUse({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs });
-    return html`${renderDesktop(shell)}<button type="button" class="back-room" data-action="view" data-view="room">${tr("desktop.back")}</button>${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${objUse ? html`<div class="objbar-host">${objUse}</div>` : null}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${dlgLayer(dlg, session, boxReadsOn(state, events, session))}<div class="hud-host">${settingsButton()}${itemsButton(session)}${itemsPanel(state, events, session)}<div class="hud-br">${hudKuro({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs })}</div>${settingsPanel(session)}</div>`;
+    return html`${renderDesktop(shell)}<button type="button" class="back-room" data-action="view" data-view="room">${tr("desktop.back")}</button>${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${objUse ? html`<div class="objbar-host">${objUse}</div>` : null}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${dlgLayer(dlg, session, boxReadsOn(state, events, session))}<div class="hud-host">${settingsButton()}${itemsButton(session, state)}${itemsPanel(state, events, session)}<div class="hud-br">${hudKuro({ state, events, startDay: store.getStartDay(), session, night: isNight(session.clock), nowMs })}</div>${settingsPanel(session)}</div>`;
   }
   // The box does not jump (dialogue correction 2026-11-02): in every view it is anchored to the
   // viewport in the same fixed layer, not to the stage (whose size differs between views). The
@@ -630,14 +630,13 @@ export const loopActions: Record<string, ActionHandler> = {
     if (!VIEWS.includes(view)) return;
     // camera-viewfinder R1: 屏幕 cannot be entered while the viewfinder (or the sheet in hand) is up.
     if (view === "desktop" && (ctx.session.viewfinder || ctx.session.sheetShown !== null)) return;
-    // Two black monitors before the tower is pressed: 屏幕 does not open; one line says why (once a day).
+    // Two black monitors before the tower is pressed: 屏幕 does not open; one line says why. gates R4:
+    // on every click (not once a day); a click while it is still in the box does not stack it.
     if (view === "desktop" && !booted(ctx.store.getState(), ctx.store.getEvents())) {
       const day = ctx.store.getState().day;
-      if (ctx.session.screenOffDay !== day) {
-        ctx.session.screenOffDay = day;
-        ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${day}:screen:off`, lines: [{ k: "narration", t: t("room.screen.off") }], ending: { kind: "none" } });
-        ctx.rerender();
-      }
+      ctx.session.screenOffDay = day;
+      ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${day}:screen:off`, lines: [{ k: "narration", t: t("room.screen.off") }], ending: { kind: "none" } });
+      ctx.rerender();
       return;
     }
     goTo(ctx, view, data);
@@ -794,7 +793,15 @@ export const loopActions: Record<string, ActionHandler> = {
   // 关机: in the work system's own top bar. The shutdown beat plays, both monitors darken, and
   // the view goes back to 房间 when they have.
   "desktop-shutdown"(ctx) {
-    if (!openFor(ctx, (e) => e.type === "beat" && e.beat === "shutdown")) return;
+    // gates R4: not yet (the desk beat not reached, or work left): one line, not silence.
+    if (!openFor(ctx, (e) => e.type === "beat" && e.beat === "shutdown")) {
+      const day = ctx.store.getState().day;
+      // Already shut down today: nothing to say (the screens are dark).
+      if (hasStepToday(ctx.store, "beat:shutdown")) return;
+      if (hasString("room.shutdown.notyet")) ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${day}:shutdown:notyet`, lines: [{ k: "inner", t: t("room.shutdown.notyet") }], ending: { kind: "none" } });
+      ctx.rerender();
+      return;
+    }
     stepOnce(ctx, "beat:shutdown");
     const day = ctx.store.getState().day;
     ctx.later(SHUTDOWN_TO_ROOM_MS, () => {
@@ -816,14 +823,15 @@ export const loopActions: Record<string, ActionHandler> = {
       ctx.rerender();
       return;
     }
-    // lying-view R4: after nightfall the bed is lain on first (the ceiling, its night photo); what is
-    // said next is said from there, and the player can go back up.
-    if (session.view !== "lying") loopActions["view"]!(ctx, { view: "lying" } as DOMStringMap, null as never);
+    // gates R1: work left: one line from where the player stands; no lying down to get up again.
     if (!openFor(ctx, (e) => e.type === "lieDown")) {
       session.dialogue = push(session.dialogue, { key: `d${day}:bed:locked`, lines: [{ k: "inner", t: t("room.bed.locked") }], ending: { kind: "none" } });
       ctx.rerender();
       return;
     }
+    // lying-view R4: the question can be asked: the bed is lain on first (the ceiling, its night
+    // photo), and the question is asked from there.
+    if (session.view !== "lying") loopActions["view"]!(ctx, { view: "lying" } as DOMStringMap, null as never);
     session.dialogue = push(session.dialogue, bedAskQueued(ctx));
     ctx.rerender();
   },
@@ -857,6 +865,14 @@ export const loopActions: Record<string, ActionHandler> = {
     if (ctx.session.view !== "room" && ctx.session.view !== "bed") return;
     // box-arrival R1: nothing to open before the case has arrived.
     if (!boxArrived(ctx.store.getState(), ctx.store.getEvents())) return;
+    // blind-box correction 2026-11-07: before the day's box item unlocks the case does not open at
+    // all: one inner line, like a door that is not yet open (gates). Days without a box item open it.
+    const day = ctx.store.getState().day;
+    if (openBoxBefore(ctx.store.getState(), ctx.store.getEvents())) {
+      if (hasString("box.beforeLunch")) ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${day}:box:beforeLunch`, lines: [{ k: "inner", t: t("box.beforeLunch") }], ending: { kind: "none" } });
+      ctx.rerender();
+      return;
+    }
     ctx.session.caseOpen = true;
     ctx.session.caseOpenedAt = ctx.now?.() ?? Date.now();
     ctx.later(CASE_WOBBLE_MS + 16, ctx.rerender);
@@ -896,13 +912,6 @@ export const loopActions: Record<string, ActionHandler> = {
     session.caseShake = { slot, until: now + CASE_SHAKE_MS };
     ctx.later(CASE_SHAKE_MS + 10, ctx.rerender);
     ctx.play?.("box-thud");
-    // blind-box addition 2026-11-07: before the day's box item unlocks (the lunch not taken in yet),
-    // every box says the one line instead of the stuck lines (the counter does not move).
-    if (openBoxBefore(state, store.getEvents()) && hasString("box.beforeLunch")) {
-      session.dialogue = push(session.dialogue, { key: `d${state.day}:box:beforeLunch`, lines: [{ k: "inner", t: t("box.beforeLunch") }], ending: { kind: "none" } });
-      ctx.rerender();
-      return;
-    }
     const n = session.caseStuck < 0 ? 0 : session.caseStuck;
     session.caseStuck = n + 1;
     const day = state.day;
@@ -1206,9 +1215,13 @@ export const loopActions: Record<string, ActionHandler> = {
     const { session } = ctx;
     const id = session.holding;
     if (!id || session.phoneOpen || session.hand.using) return;
-    session.hand.using = true;
     // objects-in-room R2: using it here is logged (and its line says so where it does not work).
-    enterUse(ctx, id);
+    // gates R3: where it does not work the device is not entered: it stays in the hand as it is.
+    if (!enterUse(ctx, id)) {
+      ctx.rerender();
+      return;
+    }
+    session.hand.using = true;
     // The focus comes in with the same timing as 桌子 → 屏幕 (deskScreen, 500 ms): room.css
     // transitions `.held.obj.using` over --m-use; a walk's two steps play as on any move.
     walkSteps(ctx, "desk", "desktop");
@@ -1245,7 +1258,22 @@ export const loopActions: Record<string, ActionHandler> = {
     // tape-record R1: rec has its own works rule (床, at night); elsewhere its line and nothing else.
     if (id === "tape" && key === "rec") return void pressRec(ctx);
     // camera-viewfinder R1: in the room the shutter opens the viewfinder; on 屏幕 it shoots at once (unchanged).
-    if (id === "camera" && key === "shutter" && session.view !== "desktop") return void openViewfinder(ctx);
+    if (id === "camera" && key === "shutter" && session.view !== "desktop") {
+      // gates R2: today's sheet already used, or the pack empty: the line, and no viewfinder.
+      const day = ctx.store.getState().day;
+      if (roomPhotoOn(ctx.store.getEvents(), day)) {
+        if (hasString("camera.usedToday")) session.dialogue = push(session.dialogue, { key: `d${day}:camera.usedToday`, lines: [{ k: "inner", t: t("camera.usedToday") }], ending: { kind: "none" } });
+        ctx.rerender();
+        return;
+      }
+      // The empty pack's click and 「胶卷用完了。」 are the program's own (camera R8).
+      if (sheetsLeft(ctx.store.getEvents()) <= 0) {
+        pressKey(ctx, id, key, { cap: onFront });
+        ctx.rerender();
+        return;
+      }
+      return void openViewfinder(ctx);
+    }
     const before = id === "camera" ? ((session.hand.programs.camera as CameraState | undefined) ?? null) : null;
     pressKey(ctx, id, key, { cap: onFront });
     // camera R2: a shot is a `photo` event, where the camera was pointed (and a screen's still).
@@ -1329,6 +1357,14 @@ export const loopActions: Record<string, ActionHandler> = {
     const { store, session } = ctx;
     const id = data.object ?? "";
     const state = store.getState();
+    // gates R3: an object that does not work at the desk says so and the modal does not open (the
+    // `useAt` with ok: false is still logged; its own line is replaced by objbar.notYet).
+    if ((state.found as string[]).includes(id) && !worksHere(state, session, id)) {
+      enterUse(ctx, id, { say: false });
+      if (hasString("objbar.notYet")) session.dialogue = push(session.dialogue, { key: `d${state.day}:objbar:notYet`, lines: [{ k: "inner", t: t("objbar.notYet") }], ending: { kind: "none" } });
+      ctx.rerender();
+      return;
+    }
     // Close any held clamshell first, then open the object (same holding + hand.using as the room).
     restHand(session);
     if (!openObjectFromBar(session, state, id)) return; // not found

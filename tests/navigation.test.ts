@@ -657,8 +657,10 @@ describe("the four facings and their turn edges (room-turn 2026-11-04)", () => {
   });
 
   it("床's box opens the case right there, a close-up, no turn (author 2026-11-04)", () => {
-    // box-arrival R1: once the case is there (day 2 on; day 1 after the pickup).
+    // box-arrival R1: once the case is there (day 2 on; day 1 after the pickup); blind-box
+    // correction 2026-11-07: and once the day's box item has unlocked.
     const store = createStore({ startDay: 2 });
+    completeUntil(store, "box");
     const ctx: ActionContext = { store, session: initialSession(DEFAULT_CLOCK, "left", "bed"), rerender: () => {}, later: () => {}, now: () => 10_000 };
     loopActions["bed-box"]!(ctx, {} as DOMStringMap, null as never);
     expect(ctx.session.view).toBe("bed");

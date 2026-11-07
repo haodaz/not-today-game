@@ -158,7 +158,15 @@ describe("R4 · the cannot-use line answers a key press", () => {
     r.act("loop-hold", { object: "iccard" });
     r.act("obj-use");
     expect(lines()).toEqual([line]);
+    // gates R3: where it does not work, 使用 is not entered; it is entered where it does (the lamp
+    // on), and the lamp going off while in use makes the presses fail (this spec's R4).
+    expect(r.session.hand.using).toBe(false);
     r.session.dialogue = EMPTY_DIALOGUE;
+    r.session.lampOn = true;
+    r.act("obj-use");
+    expect(r.session.hand.using).toBe(true);
+    expect(lines()).toEqual([]);
+    r.session.lampOn = false;
     // The card has no keys of its own: 翻面 is its one press in 使用.
     expect(handOf("iccard").keys).toEqual([]);
     const press = () => r.act("obj-flip");

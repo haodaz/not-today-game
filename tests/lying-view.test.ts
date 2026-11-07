@@ -206,17 +206,13 @@ describe("R4 · lying down before sleeping; Kuro from the bed", () => {
     expect(keys(fromRoom.session)).toEqual(["d1:bed:ask"]);
   });
 
-  it("locked (the night's items not done): room.bed.locked, said from the bed; the player can go back up", () => {
+  it("locked (the night's items not done): room.bed.locked, said from where the player stands; no lying down (gates R1)", () => {
     const store = storeAt(1);
     completeUntil(store, "dinner", { all: true, skip: ["dinner", "desk", "shutdown", "chat"] });
     const r = rig(store, "bed");
     r.act("bed");
-    expect(r.session.view).toBe("lying");
-    expect(keys(r.session)).toEqual(["d1:bed:locked"]);
-    r.session.dialogue = EMPTY_DIALOGUE;
-    loopKeys(r.ctx, { key: "Escape" } as KeyboardEvent);
-    r.act("loop-choice", { choice: "up" });
     expect(r.session.view).toBe("bed");
+    expect(keys(r.session)).toEqual(["d1:bed:locked"]);
   });
 
   it("再待会儿 keeps the player lying; Kuro can be called from the bed; closing the chat asks again and 睡 starts the night from there", () => {

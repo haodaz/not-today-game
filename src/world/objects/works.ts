@@ -50,7 +50,7 @@ function logged(events: readonly GameEvent[], day: number, id: string, facing: F
  * outcome a day (a lamp switched on later can still make it work there), and, where it does not
  * work, its `works.line` as one inner line, once per entry. Returns whether it works.
  */
-export function enterUse(ctx: ActionContext, id: string): boolean {
+export function enterUse(ctx: ActionContext, id: string, opts: { readonly say?: boolean } = {}): boolean {
   const { store, session } = ctx;
   const state = store.getState();
   const facing = facingOf(session.view);
@@ -59,7 +59,7 @@ export function enterUse(ctx: ActionContext, id: string): boolean {
   session.worksAnswered = null;
   if (!logged(store.getEvents(), state.day, id, facing, ok)) store.appendEvent({ kind: "useAt", objectId: id, facing, ok });
   const line = handOf(id).works?.line;
-  if (!ok && line && hasString(line)) {
+  if (!ok && opts.say !== false && line && hasString(line)) {
     session.dialogue = push(session.dialogue, { key: `d${state.day}:works:${id}`, lines: [{ k: "inner", t: t(line) }], ending: { kind: "none" } });
   }
   return ok;

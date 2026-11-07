@@ -353,7 +353,9 @@
 .case-slot{width:96px;height:96px;border-radius:8px;box-sizing:border-box;padding:0}
 /* An opened box leaves an empty slot: the case's own bottom, darker cardboard in a shallow recess
    (not black). */
-.case-slot.empty{background:linear-gradient(160deg,#6b4c2f,#5a3f26);box-shadow:inset 0 3px 7px rgba(40,24,10,.45),inset 0 0 0 1px rgba(40,24,10,.3)}
+/* Correction 2026-11-07: clearly lighter than the case's edge (#7a5a3a) so under the dimmed overlay
+   it reads as "taken", not as a hole: pale bare cardboard, a soft inner shadow at its top edge only. */
+.case-slot.empty{background:linear-gradient(160deg,#d8bb92,#c7a679);box-shadow:inset 0 3px 5px rgba(90,60,30,.28),inset 0 0 0 1px rgba(90,60,30,.22)}
 /* A small box (fix 2026-11-07): one rounded cube seen from above, one face, lit from the top left,
    with a thin tape cross; no lid line and no band, so each slot reads as one box (3 × 3). */
 .case-slot.box{position:relative;cursor:pointer;border:0;border-radius:12px;background:radial-gradient(130% 130% at 28% 22%,#dcb179 0%,#c99b63 55%,#b3834e 100%)}

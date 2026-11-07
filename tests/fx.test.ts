@@ -96,7 +96,9 @@ describe("the collapse is in the photos", () => {
     }
     const page = stillPage(13, "desk");
     expect(page.indexOf('class="fx"')).toBeLessThan(page.indexOf('class="desk-things"'));
-    expect(page.indexOf('class="fx"')).toBeLessThan(page.indexOf('class="items-btn'));
+    // (The HUD's checklist: the 道具 button is absent while nothing is found, gates R4.)
+    expect(page.indexOf('class="list"')).toBeGreaterThan(-1);
+    expect(page.indexOf('class="fx"')).toBeLessThan(page.indexOf('class="list"'));
   });
 
   it("the fx layer is the first child of the stage and ignores clicks (CSS)", () => {

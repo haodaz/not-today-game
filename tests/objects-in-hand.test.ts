@@ -371,6 +371,7 @@ describe("holding and using (FR1)", () => {
       const store = atDay(16, ["calculator"]);
       store.appendEvent({ kind: "recognise", objectId: "calculator" });
       const { ctx } = fakeCtx(store);
+      ctx.session.lampOn = true; // gates R3: the calculator works at 桌子 by the lamp
       act(ctx, "loop-hold", { object: "calculator" });
       act(ctx, "obj-use");
       expect(ctx.session.hand.using).toBe(true);
@@ -474,7 +475,9 @@ describe("holding and using (FR1)", () => {
       const store = atDay(id === "calculator" ? 16 : id === "dictionary" ? 13 : id === "pager" ? 4 : 4, [id]);
       // Recognise it (so no question is asked), but only objects that can be recognised.
       if (RECOGNISABLE.includes(id)) store.appendEvent({ kind: "recognise", objectId: id });
-      const { ctx } = fakeCtx(store);
+      // gates R3: 使用 is entered only where the object works: the phone at 窗, the rest at 桌子 with the lamp on.
+      const { ctx } = fakeCtx(store, id === "phone" ? "window" : "desk");
+      ctx.session.lampOn = true;
       ctx.session.hand.inLight = true;
       act(ctx, "loop-hold", { object: id });
       act(ctx, "obj-use");
@@ -687,6 +690,7 @@ describe("holding and using (FR1)", () => {
       const store = atDay(16, ["calculator"]);
       store.appendEvent({ kind: "recognise", objectId: "calculator" });
       const { ctx } = fakeCtx(store);
+      ctx.session.lampOn = true; // gates R3: the calculator works at 桌子 by the lamp
       ctx.session.hand.inLight = true;
       act(ctx, "loop-hold", { object: "calculator" });
       act(ctx, "obj-use");

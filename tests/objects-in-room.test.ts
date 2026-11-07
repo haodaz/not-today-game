@@ -184,11 +184,13 @@ describe("R1 / R2 · using it at a place", () => {
     expect(useAts(r.ctx.store.getEvents())).toEqual([["calculator", "bed", false]]);
     expect(r.session.dialogue.queue.filter((q) => q.key === "d9:works:calculator")).toHaveLength(1);
     expect(r.session.dialogue.queue.at(-1)!.lines).toEqual([{ k: "inner", t: t("obj.works.dark") }]);
-    const out = r.room();
-    expect(out).toMatch(/class="held obj device using focus faint"/);
-    expect(out).toMatch(/class="dev-shell calc dark"/);
+    // gates R3: the device is not entered there; the calculator stays in the hand as it is.
+    expect(r.session.hand.using).toBe(false);
+    expect(r.session.holding).toBe("calculator");
+    expect(r.room()).not.toContain("using focus");
     r.act("obj-key", { object: "calculator", key: "7" });
     expect(r.session.hand.keyDown).toBeNull();
+    expect(r.session.hand.using).toBe(false);
   });
 
   it("the calculator at 窗 by day works: not faint, keys answer; logged ok", () => {

@@ -103,8 +103,9 @@ describe("R2 / R3 · one sheet a day; the sheet in hand", () => {
     // Only the photo was logged.
     const after = r.store.getEvents().length;
     r.tick(1000);
+    // gates R2: the shutter in hand says it at once; the viewfinder does not open.
     r.shutter();
-    expect(r.ctx.session.viewfinder).toBe(true);
+    expect(r.ctx.session.viewfinder).toBe(false);
     r.act("vf-shutter");
     expect(r.store.getEvents()).toHaveLength(after);
     expect(r.ctx.session.viewfinder).toBe(false);
