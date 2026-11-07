@@ -20,3 +20,7 @@ The blind-box case arrives on day 1 with the lunch delivery: the `box` beat (con
 - On day 1 `openLayer` queues no box beat (the scene has played); days 2–18 keep their box beats on `openLayer` as today.
 - The scene's backdrops are `/room/dream/door.jpg` and `/room/dream/table.jpg`, its props `/room/props/carton.png` (closed) and `/room/props/carton_open.png` (nine boxes); Claude supplies them.
 - Test: day 1 pickup queues the scene; advancing past its end opens the case; openLayer on day 1 queues no beat; day 2 openLayer still does.
+
+## R5. After the first box (author 2026-11-07)
+- Day 1 only: when the chick's recognise sequence and Kuro's arrival line (object-tutor R1) have played, one more line follows as the player's (`who: "me"`): string `box.placed` 「我把箱子放在了床边。」 (zh + en in the tree). When it is advanced, the view turns by itself to 房间 (the desk wall), the way a turn does, and the carton is by the bed from then on (R1's "arrived" state).
+- Test: day 1, after the chick's question is answered and Kuro's line read, the next item is box.placed with the player's tag; advancing it lands on 房间; day 2's box plays no such line.
