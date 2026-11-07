@@ -285,35 +285,40 @@
       "day": 11,
       "facing": "window",
       "add": {
-        "text": "Only one bowl left on the table, and it is empty."
+        "text": "Only one bowl left on the table, and it is empty.",
+        "overlay": "/room/photos/d11_window.jpg"
       }
     },
     {
       "day": 12,
       "facing": "room",
       "add": {
-        "text": "Both screens lit, the group chat at three in the morning: 'Received'."
+        "text": "Both screens lit, the group chat at three in the morning: 'Received'.",
+        "overlay": "/room/photos/d12_room_en.jpg"
       }
     },
     {
       "day": 12,
       "facing": "bed",
       "add": {
-        "text": "A small white plaster head on the pillow. The face is yours."
+        "text": "A small white plaster head on the pillow. The face is yours.",
+        "overlay": "/room/photos/d12_bed.jpg"
       }
     },
     {
       "day": 12,
       "facing": "door",
       "add": {
-        "text": "It is bright outside the door, as if a star had come down into the stairwell from the north-east."
+        "text": "It is bright outside the door, as if a star had come down into the stairwell from the north-east.",
+        "overlay": "/room/photos/d12_door.jpg"
       }
     },
     {
       "day": 12,
       "facing": "window",
       "add": {
-        "text": "The curtain is drawn. You didn't draw it."
+        "text": "The curtain is drawn. You didn't draw it.",
+        "overlay": "/room/photos/d12_window.jpg"
       }
     },
     {

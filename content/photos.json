@@ -285,35 +285,40 @@
       "day": 11,
       "facing": "window",
       "add": {
-        "text": "饭桌上只剩一只碗，碗里是空的。"
+        "text": "饭桌上只剩一只碗，碗里是空的。",
+        "overlay": "/room/photos/d11_window.jpg"
       }
     },
     {
       "day": 12,
       "facing": "room",
       "add": {
-        "text": "两块屏幕都亮着，凌晨三点的群消息：「收到」。"
+        "text": "两块屏幕都亮着，凌晨三点的群消息：「收到」。",
+        "overlay": "/room/photos/d12_room.jpg"
       }
     },
     {
       "day": 12,
       "facing": "bed",
       "add": {
-        "text": "枕头上放着一个白色的石膏头，脸是你的。"
+        "text": "枕头上放着一个白色的石膏头，脸是你的。",
+        "overlay": "/room/photos/d12_bed.jpg"
       }
     },
     {
       "day": 12,
       "facing": "door",
       "add": {
-        "text": "门外很亮，像东北边有颗星落在了楼道里。"
+        "text": "门外很亮，像东北边有颗星落在了楼道里。",
+        "overlay": "/room/photos/d12_door.jpg"
       }
     },
     {
       "day": 12,
       "facing": "window",
       "add": {
-        "text": "窗帘拉着。你没拉。"
+        "text": "窗帘拉着。你没拉。",
+        "overlay": "/room/photos/d12_window.jpg"
       }
     },
     {
