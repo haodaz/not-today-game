@@ -62,8 +62,8 @@ describe("R1 · Kuro and the player as speakers in a day file", () => {
     expect(seen[0]).toMatchObject({ tag: { kind: "kuro" }, kuro: true, me: null });
     expect(seen[1]).toMatchObject({ tag: { kind: "who", text: LOGIN }, kuro: false, me: playerPortraitSrc("she", false) });
     expect(seen[2]).toMatchObject({ tag: { kind: "kuro" }, kuro: true, me: null });
-    expect(seen[3]!.kuro).toBe(false);
-    expect(seen[3]!.tag).not.toEqual({ kind: "kuro" });
+    if (seen[3]) expect(seen[3].kuro).toBe(false); // the rain moved to `rise` (author 2026-11-07): boot may be Kuro / me / Kuro only
+    if (seen[3]) expect(seen[3].tag).not.toEqual({ kind: "kuro" });
   });
 
   it("the box markup: kuro.name and Kuro's slot for Kuro's line; the player's name and portrait for theirs, never an NPC's", () => {

@@ -18,15 +18,15 @@
           "k": "speaker",
           "who": "kuro",
           "t": "Let's see what's on today. Following the tasks never goes wrong."
-        },
-        {
-          "k": "narration",
-          "t": "Raining. Working from home is not a bad choice."
         }
       ]
     },
     "rise": {
       "say": [
+        {
+          "k": "narration",
+          "t": "Raining. Working from home is not a bad choice."
+        },
         {
           "k": "narration",
           "t": "A glass of water on the desk, cold. Two screens, black."

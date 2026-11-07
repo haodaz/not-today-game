@@ -50,7 +50,7 @@ const queueOf = (key: string, lines: readonly SayLine[], ending: Queued["ending"
 
 /** Real content lines (test data only): the first narration of day 1, and day 1's night joined into one long line. */
 const day1 = dayFiles.get(1)!;
-const narration = day1.beats.boot!.say.find((l) => l.k === "narration")!;
+const narration = [...day1.beats.boot!.say, ...(day1.beats.rise?.say ?? [])].find((l) => l.k === "narration")!; // day 1 wakes on Kuro's lines; the rain is in `rise` (author 2026-11-07)
 const longLine: SayLine = { k: "narration", t: Object.values(day1.beats).flatMap((b) => b?.say ?? []).map((l) => l.t).join("") };
 
 /** Talk at night up to the player's box (聊聊). */
