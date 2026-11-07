@@ -33,9 +33,9 @@ Walls, from the room to the task: (1) an object that cannot be used now (床, th
 - Tests: red closes and the next window comes up; yellow minimises; the doc page has no ×, ‹ returns; the dock renders on the right monitor.
 
 ## R4. One Kuro on the screen; the box's size
-- On the desktop view the room's Kuro body (`.kpet` in the `hud-br`) is not drawn: Kuro is the pill and the chat (author: 「弄 2 个克总很误导」). Clicking the pill is `kuro-call` as today.
+- Author (2026-11-07 evening): 「克总在屏幕里是在桌面右下角，不能是额外有一个克总，话都是从额外的克总说的。」 On the desktop view Kuro is **the pet inside the monitor** (the `.kpet` at the desktop's bottom-right, with its pill): the room's big Kuro body in the stage's `hud-br` is **not drawn** there. Everything Kuro does on the screen comes from the in-monitor one: its lines (a `speaker` line with `who: "kuro"`, the evening chat, the tutor remarks) are spoken from the pet (its portrait in the box is fine; the body that reacts is the pet), `kuro-call` is a click on the pet or its pill, its face states play on the pet.
 - The dialogue box on the desktop is the room's size (same `.dlg` width/height; today the desktop's is taller).
-- Tests: no `.kpet` in the desktop render; the box's class list is the same in both views.
+- Tests: no stage Kuro body in the desktop render; the pet carries `data-action="kuro-call"`; a Kuro line on the desktop animates the pet's state; the box's class list is the same in both views.
 
 ## R5. The checklist on the desktop
 - The 今日 card (`renderChecklist`) is drawn on the desktop view too, top-left, over the monitor's bezel area, the same card as the room's. Tests: present in the desktop render.
