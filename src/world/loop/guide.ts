@@ -16,6 +16,7 @@ import { hasString, t } from "@world/i18n";
 /** What a guide lights (the small union of the spec; `task` is R14's next task on 工作台's home). */
 export type GuideTarget =
   | { readonly kind: "tower" }
+  | { readonly kind: "screen" }
   | { readonly kind: "dock"; readonly app: "tingtalk" }
   | { readonly kind: "conv"; readonly id: "boss" }
   | { readonly kind: "card"; readonly doc: string; readonly conv: string | null }
@@ -32,7 +33,7 @@ export type GuideTarget =
 export type GuideScope = "all" | "work" | "none";
 
 export interface Guide {
-  readonly id: "G1" | "G2" | "G3" | "G4" | "G5" | "G6" | "G7" | "next";
+  readonly id: "G1" | "G1b" | "G2" | "G3" | "G4" | "G5" | "G6" | "G7" | "next";
   readonly target: GuideTarget;
   /** The refuse line's strings key, or null (no line of its own). */
   readonly refuse: string | null;
@@ -96,6 +97,12 @@ export function guideNow(state: State, events: readonly GameEvent[], session: Se
     return { id: "G4", target: { kind: "phone" }, refuse: "guide.lunch.first", scope: "work" };
   }
 
+  // G1b (author 2026-11-08): day 1, the tower on, not yet at the screen: the screens are lit and
+  // the room's other things answer guide.screen.first (turning and the screen itself are allowed).
+  if (day === 1 && booted(state, events) && !desktop && session.view !== "lying" && !stepToday(events, day, "openApp:msgs")) {
+    return { id: "G1b", target: { kind: "screen" }, refuse: "guide.screen.first", scope: "all" };
+  }
+
   // G1: day 1 standing in the room, before the tower is on: its button is lit; nothing new is refused.
   if (day === 1 && !booted(state, events) && session.view !== "lying" && session.view !== "desktop") return { id: "G1", target: { kind: "tower" }, refuse: null, scope: "none" };
 
@@ -140,6 +147,8 @@ export function onTarget(target: GuideTarget, action: string, data: Readonly<Rec
   switch (target.kind) {
     case "tower":
       return action === "tower-power";
+    case "screen":
+      return action === "view" && data.view === "desktop";
     case "dock":
       return action === "dock" && data.app === target.app;
     case "conv":
@@ -180,6 +189,8 @@ export function ringAnchors(target: GuideTarget): readonly (readonly (readonly [
   switch (target.kind) {
     case "tower":
       return [[["data-action", "tower-power"]]];
+    case "screen":
+      return [[["data-action", "view"], ["data-view", "desktop"]]];
     case "dock":
       return [[["data-action", "dock"], ["data-app", target.app]]];
     case "conv":

@@ -89,6 +89,19 @@ describe("R1 / R2 · the guide state and the six moments", () => {
     expect(guideNow(store.getState(), store.getEvents(), r.session)?.id).not.toBe("G1");
   });
 
+  it("G1b: day 1, the tower on, not yet at the screen: the screen is lit; the bed answers guide.screen.first; off once 听听 was opened", () => {
+    const store = booted();
+    const r = rig(store, "room");
+    const g = guideNow(store.getState(), store.getEvents(), r.session)!;
+    expect(g).toMatchObject({ id: "G1b", target: { kind: "screen" }, refuse: "guide.screen.first", scope: "all" });
+    expect(guideRefuses(g, "lamp", {})).toBe(true); // the bed keeps its own line (always allowed)
+    expect(guideRefuses(g, "view", { view: "desktop" })).toBe(false);
+    expect(guideRefuses(g, "view", { view: "door" })).toBe(false);
+    expect(r.out()).toMatch(/data-action="view" data-view="desktop"[^>]*data-guide="on"/);
+    step(store, "openApp:msgs");
+    expect(guideNow(store.getState(), store.getEvents(), r.session)?.id).not.toBe("G1b");
+  });
+
   it("G2: the first desktop visit: 汀汀's tile is lit; any other tile answers guide.work.first and does nothing; off once 听听 is open", () => {
     const store = booted();
     const r = rig(store);

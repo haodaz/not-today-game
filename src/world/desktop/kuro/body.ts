@@ -36,6 +36,8 @@ export const frameUrl = (name: string, red = false): string => `/kuro/${name}${r
 
 /** How long a state change takes to crossfade (matches .kpet .layer transition in desktop.css). */
 export const CROSSFADE_MS = MOTION.kuroFade;
+/** The least time a body state is shown before another may replace it (the maw cuts through). */
+export const HOLD_MS = 1200;
 
 export interface BodyInputs {
   /** A maw look, which outranks everything (late-days FR3); null or absent before the late ring. */
@@ -85,6 +87,8 @@ export class KuroBodyElement {
   readonly element: HTMLElement;
   private state: BodyState | null = null;
   private red = false;
+  /** When the state last changed (ms); a change within HOLD_MS is skipped and picked up by a later render (2026-11-08: the pet flickered through several states in a second). */
+  private changedAt = 0;
 
   constructor(doc: Document) {
     this.element = doc.createElement("div");
@@ -95,6 +99,9 @@ export class KuroBodyElement {
   set(state: BodyState, red = false): void {
     if (state === this.state && red === this.red) return;
     const cut = isMaw(state) || isMaw(this.state);
+    const now = Date.now();
+    if (!cut && this.state !== null && now - this.changedAt < HOLD_MS) return;
+    this.changedAt = now;
     this.state = state;
     this.red = red;
     const doc = this.element.ownerDocument;

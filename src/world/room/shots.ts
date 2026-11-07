@@ -103,8 +103,11 @@ export const BED_SHOT: { readonly bed: Rect; readonly box: Rect } = {
  * under the window, and where the meal that `deskMeal` picks sits on it. The still shows a takeout
  * box already; a clean still comes later, the rect stays.
  */
-export const WINDOW_SHOT: { readonly mealTable: Rect; readonly meal: Rect } = {
+export const WINDOW_SHOT: { readonly mealTable: Rect; readonly meal: Rect; readonly desk: Rect } = {
   mealTable: { l: 565, t: 600, w: 225, h: 300 },
+  // 2026-11-08 (author): the desk and its screens show at the right of this wall too; like the bed on
+  // two walls, they can be used from here (window.jpg x 1040–1664, y 340–900, cover-fitted).
+  desk: { l: 1010, t: 330, w: 590, h: 540 },
   // playtest-1105 R5: the tabletop is stage x 567–788, y 614–684 (window.jpg x 592–820, y 633–705,
   // cover-fitted); the meal's bottom now sits on its middle, centred on it (it was 10 px high, 10 px left).
   meal: { l: 617, t: 578, w: 120, h: 88 },
@@ -121,13 +124,16 @@ export const TABLE_SHOT: { readonly meal: Rect } = {
 };
 
 /** The flat facings' things to point at, in tab order (fixed rectangles, no splat box). */
-export type FlatHotId = "bed" | "box" | "mealTable";
+export type FlatHotId = "bed" | "box" | "mealTable" | "desk";
 export const FLAT_HOTS: Readonly<Record<"bed" | "window", readonly { readonly id: FlatHotId; readonly rect: Rect }[]>> = {
   bed: [
     { id: "box", rect: BED_SHOT.box },
     { id: "bed", rect: BED_SHOT.bed },
   ],
-  window: [{ id: "mealTable", rect: WINDOW_SHOT.mealTable }],
+  window: [
+    { id: "mealTable", rect: WINDOW_SHOT.mealTable },
+    { id: "desk", rect: WINDOW_SHOT.desk },
+  ],
 };
 export const isFlatFacing = (view: string): view is "bed" | "window" => view === "bed" || view === "window";
 

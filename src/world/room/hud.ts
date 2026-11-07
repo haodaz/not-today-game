@@ -243,6 +243,8 @@ const FLAT_PROXY: Readonly<Record<FlatHotId, { readonly cls: string; readonly at
   bed: { cls: "shot-hit bed-hit", attrs: 'data-action="bed"', label: "room.bed" },
   box: { cls: "shot-hit box-hit", attrs: 'data-action="bed-box"', label: "room.box" },
   mealTable: { cls: "shot-hit table-hit", attrs: 'data-action="meal-table"', label: "room.mealTable" },
+  // 2026-11-08: the desk seen from 窗 goes to 桌子, as 房间's does.
+  desk: { cls: "shot-hit desk-hit", attrs: 'data-action="view" data-view="desk"', label: "hud.cam.desk" },
 };
 function flatHits(view: "bed" | "window", arrived: boolean): SafeHtml {
   // box-arrival R1: 床's carton is not there before it has arrived.
