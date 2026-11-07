@@ -40,13 +40,8 @@
     "box": {
       "say": [
         {
-          "k": "sfx",
-          "t": "叮咚。",
-          "sfx": "doorbell"
-        },
-        {
           "k": "narration",
-          "t": "打开门，门外有一个纸袋，还有一个纸箱。",
+          "t": "袋子旁边还有一个纸箱，没有寄件人。",
           "backdrop": "/room/dream/door.jpg",
           "prop": "/room/props/carton.png"
         },

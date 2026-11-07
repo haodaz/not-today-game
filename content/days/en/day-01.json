@@ -40,13 +40,8 @@
     "box": {
       "say": [
         {
-          "k": "sfx",
-          "t": "Ding-dong.",
-          "sfx": "doorbell"
-        },
-        {
           "k": "narration",
-          "t": "I open the door. A paper bag outside, and a cardboard box.",
+          "t": "Next to the bag there is a carton, with no sender.",
           "backdrop": "/room/dream/door.jpg",
           "prop": "/room/props/carton.png"
         },
