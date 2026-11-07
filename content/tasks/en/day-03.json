@@ -809,7 +809,15 @@
               },
               {
                 "who": "kuro",
-                "text": "Wait. Her page has a skin you haven't wired. Whether to wire it is yours to decide."
+                "text": "Want the skin from over there?"
+              },
+              {
+                "who": "me",
+                "text": "Meaning?"
+              },
+              {
+                "who": "kuro",
+                "text": "That proposal looks good. If you make yours look about the same, that might count for something."
               }
             ]
           },
@@ -822,7 +830,7 @@
               },
               {
                 "who": "kuro",
-                "text": "Fine. She'll look at the skin first; you know that."
+                "text": "Fine. She'll look at the face first; you know that."
               }
             ]
           },
