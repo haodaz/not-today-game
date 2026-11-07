@@ -30,3 +30,9 @@ CSS first: cardboard browns, a printed band on the small boxes, the hidden box n
 - Clicking the loose box runs `loop-box` (one `openLayer` for today's object); clicking a stuck box logs nothing and cycles the four lines.
 - Day 18: the hidden box is loose, opening it logs `openLayer` `"slip"`, `found` does not change, the slip shows on the desk; before day 18 the hidden box is stuck.
 - No text in the case names a count or a layer.
+
+## Addition 2026-11-07 (author): before lunch, and how it looks
+- **Before the day's box item unlocks** (every day: it unlocks after the lunch is taken in), a click on any box in the case says one line instead of the stuck lines: string `box.beforeLunch` 「吃点东西再来研究这个吧。」 (zh + en in the tree), as an inner line, with the small shake. The stuck lines (`box.stuck.*`) are for the boxes that are not today's once the item has unlocked. No event, no state.
+- **The drawing**: the case reads as 3 × 4 because each small box is drawn as two stacked pills (a lid line and a body). Draw each slot as one box: a single rounded cube seen from above with a thin tape cross, no horizontal split. Nine slots, 3 × 3, unchanged.
+- **An opened slot** shows the case's bottom (a darker cardboard well), not a black block: it should read as "this one has been taken".
+- Tests: before the unlock a click says box.beforeLunch and no stuck line; after it, today's box is loose and the others say stuck lines; the opened slot's markup.
