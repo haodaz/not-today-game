@@ -276,10 +276,11 @@ describe("the tabletop's things are photos (day-loop correction 2026-11-01)", ()
     expect(ctx.session.hand.using).toBe(false);
     syncLoop(ctx);
     // (Here the box was the day's last item, so nightfall follows them.)
-    // The box beat is the arrival scene now (box-arrival R4, content 2026-11-07): split into pieces by speaker (lying-view R1), the question after them.
+    // box-arrival R4: day 1's box beat is the arrival scene, played at the pickup, so opening the
+    // box queues no beat: the question comes first.
     const keys = ctx.session.dialogue.queue.map((q) => q.key);
-    expect(keys[0]).toMatch(/^d1:beat:box/);
-    expect(keys).toContain(`d1:recognise:${object}`);
+    expect(keys.some((k) => k.startsWith("d1:beat:box"))).toBe(false);
+    expect(keys[0]).toBe(`d1:recognise:${object}`);
     const open = render(ctx);
     // No opened box on the floor (author 2026-11-03: it looked odd all day); the hover cursor says 打开.
     expect(open).not.toContain("box-open");

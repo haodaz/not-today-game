@@ -14,6 +14,7 @@ import { hasString, t, tr } from "@world/i18n";
 import { push } from "@world/loop/dialogue";
 import { booted, checklist, deskMeal, happened, itemStates, loopContext, type LoopContext } from "@world/loop/checklist";
 import { isFacing, turnsBetween, type Facing } from "@world/room/facings";
+import { boxArrived } from "@world/room/arrival";
 
 /** The room's hints, in R1's order (the tie-break when two come due at once). */
 export const HINT_IDS = ["tower", "screen", "turn", "phone", "door", "table", "box", "items", "kuro", "bed", "chickHint"] as const;
@@ -53,8 +54,9 @@ const DUE: Readonly<Record<HintId, (c: Ctx) => boolean>> = {
     const m = lc ? deskMeal(lc) : null;
     return !!m && !m.eaten;
   },
-  box: ({ lc }) => {
-    if (!lc) return false;
+  // box-arrival R1: never before the case has arrived.
+  box: ({ lc, state, events }) => {
+    if (!lc || !boxArrived(state, events)) return false;
     const box = itemByEvent(lc, "openBox");
     return unlocked(lc, box?.id) && !doneItem(lc, box?.id);
   },

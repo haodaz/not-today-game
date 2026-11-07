@@ -33,6 +33,7 @@ import { recordedOn } from "@state/sleeptalk";
 import type { State } from "@state/types.gen";
 import type { GameEvent } from "@state/events";
 import { takenByKuro } from "@world/objects/taken";
+import { boxArrived } from "@world/room/arrival";
 import { LOOK_KEYS, nextLook, roomLooks, type LookKey } from "@state/room-looks";
 import { skipToLast, storyMasked } from "@world/dialogue/mask";
 import { tabooActions, tabooLayer } from "@world/dialogue/taboo";
@@ -854,6 +855,8 @@ export const loopActions: Record<string, ActionHandler> = {
   // not a layer directly. The nine small boxes are shown; exactly one is loose today.
   "pick-box"(ctx) {
     if (ctx.session.view !== "room" && ctx.session.view !== "bed") return;
+    // box-arrival R1: nothing to open before the case has arrived.
+    if (!boxArrived(ctx.store.getState(), ctx.store.getEvents())) return;
     ctx.session.caseOpen = true;
     // The stuck-line counter is seeded once per open from the run and day, so the first dull line
     // is not always the same (session count, "starts at a seeded offset").
@@ -874,7 +877,8 @@ export const loopActions: Record<string, ActionHandler> = {
   // 200 ms, thuds, and speaks one of the four dull lines (cycling). Stuck boxes log nothing.
   "case-pick"(ctx, data) {
     const { store, session } = ctx;
-    if (!session.caseOpen || (session.view !== "room" && session.view !== "bed")) return;
+    // box-arrival R4: on the arrival day the case is opened at 窗's little table (where the scene left it).
+    if (!session.caseOpen || (session.view !== "room" && session.view !== "bed" && session.view !== "window")) return;
     const slot = data.slot ?? "";
     const state = store.getState();
     const loose = looseContent(state.day, boxObjectFor(state.day), openBoxReady(state, store.getEvents()));
@@ -977,6 +981,12 @@ export const loopActions: Record<string, ActionHandler> = {
     if (ended?.kind === "prologue") finishPrologue(ctx);
     // Lying down; on the last night the run ends instead (san-and-endings FR2).
     else if (ended?.kind === "lieDown") lieDownOrEnd(ctx);
+    // box-arrival R4: the arrival scene read: the case opens by itself.
+    else if (ended?.kind === "openCase") openCaseAfterArrival(ctx);
+    // box-arrival R5: 「我把箱子放在了床边。」 read: the head turns to 房间, the way a turn does.
+    else if (ended?.kind === "boxPlaced") {
+      if (session.view !== "room") loopActions["view"]!(ctx, { view: "room" } as DOMStringMap, null as never);
+    }
     // The box may have just emptied after shutdown: the evening chat opens itself.
     else openChatIfDue(ctx);
     ctx.rerender();
@@ -1617,6 +1627,22 @@ function askSleepAfterChat(ctx: ActionContext, wasTalking: boolean, day: number)
   if (session.dialogue.queue.some((q) => q.ending.kind === "bedAsk")) return;
   session.dialogue = push(session.dialogue, bedAskQueued(ctx));
   ctx.rerender();
+}
+
+/**
+ * box-arrival R4: the arrival scene has been read (its last picture is 窗's little table with the
+ * carton open on it). The player is where the scene left them, at 窗 (a cut, not a turn: the scene's
+ * backdrop was already that table), and the case opens by itself as `pick-box` opens it.
+ */
+function openCaseAfterArrival(ctx: ActionContext): void {
+  const { session } = ctx;
+  if (session.view !== "window") {
+    session.view = "window";
+    session.cam = null;
+    settleSession(session);
+  }
+  session.caseOpen = true;
+  if (session.caseStuck < 0) session.caseStuck = jitter(`case-stuck:${ctx.store.getRunId()}:${ctx.store.getState().day}`, 0, 3);
 }
 
 /** object-tutor R2: the night whose bed question offers the recorder (day 6's lock reads that night's recording). */

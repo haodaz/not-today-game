@@ -9,7 +9,8 @@ import { KuroBodyElement } from "./kuro/body";
 import { createFrameKeeper } from "./keepframes";
 import { playSfx, type SfxOptions } from "@world/loop/sfx";
 import { MOTION } from "@world/motion/timing";
-import { applyFit, BACKDROPS } from "@world/fit";
+import { applyFit, backdropFor } from "@world/fit";
+import { boxArrived } from "@world/room/arrival";
 import { onEmailChange, setEmailDraft } from "@net/email";
 import { appOn, buildShell, initialSession, type AppRenderers, type Session } from "./model";
 import { bringToFront, loadPlacement, moveApp, placementOf, savePlacement } from "./placement";
@@ -343,7 +344,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   const fit = () => {
     const stage = root.querySelector<HTMLElement>(".stage");
     if (!stage) return;
-    applyFit(root, stage, stageSize(session.view), session.pullOut ? null : BACKDROPS[session.view]);
+    applyFit(root, stage, stageSize(session.view), session.pullOut ? null : backdropFor(session.view, boxArrived(deps.store.getState(), deps.store.getEvents())));
   };
 
   const render = () => {

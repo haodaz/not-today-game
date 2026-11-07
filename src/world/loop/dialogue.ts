@@ -17,6 +17,10 @@ export type Ending =
   /** "Do you know what this is?" (recognise spec): the options in this run's order (content indexes). */
   | { readonly kind: "recognise"; readonly object: string; readonly order: readonly number[] }
   /** The bed, unlocked: 睡 / 再待会儿 (day-loop addition 2026-11-02). */
+  /** box-arrival R4: the arrival scene's end: the case opens by itself. */
+  | { readonly kind: "openCase" }
+  /** box-arrival R5: 「我把箱子放在了床边。」 read: the view turns to 房间. */
+  | { readonly kind: "boxPlaced" }
   /** object-tutor R2: `record` adds 打开录音机 between them (night 5, the tape found, nothing recorded yet). */
   | { readonly kind: "bedAsk"; readonly record?: true }
   /** lying-view R6: getting up from the bed: 起床 / 再躺一会儿. */

@@ -9,6 +9,7 @@ import { choiceOf } from "@state/days/effects";
 import { dueAtLieDown, dueAtShutdown } from "@state/endings";
 import { boardJudgement, deliverableForHand, handNight } from "@state/days/board";
 import { autoUnlockBoard } from "@world/desktop/workbench/board";
+import { ARRIVAL_DAY } from "@world/room/arrival";
 import { startEnding } from "@world/endings/flow";
 import { answerFor, knows, optionOrder, recogniseTable } from "@state/recognise";
 import { advanceTo, BEATS, DEFAULT_CLOCK, isNight, type Beat, type BeatClock } from "@world/desktop/beat";
@@ -114,6 +115,12 @@ export function tutorQueued(day: number, object: string): Queued | null {
   return { key: `d${day}:tutor:${object}`, lines, ending: { kind: "none" } };
 }
 
+/** box-arrival R5: 「我把箱子放在了床边。」 as the player's own line (`who: "me"`); null without the string. */
+export function placedQueued(day: number): Queued | null {
+  if (!hasString("box.placed")) return null;
+  return { key: `d${day}:box:placed`, lines: [{ k: "speaker", who: "me", t: t("box.placed") }], ending: { kind: "boxPlaced" } };
+}
+
 /** object-tutor R1: this event is the run's first `recognise` for its object, on the object's own day. */
 function firstRecogniseOnItsDay(events: readonly GameEvent[], e: Extract<GameEvent, { kind: "recognise" }>): boolean {
   if (recogniseTable.get(e.objectId)?.day !== e.day) return false;
@@ -148,6 +155,11 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
   const fresh = events.slice(memo.seen).filter((e) => e.day === day);
 
   for (const e of fresh) {
+    // box-arrival R4: the arrival day's box beat is the arrival scene, at its first pickup (the
+    // lunch taken in); its end opens the case. (The pickup's own clock change still follows below.)
+    if (e.kind === "pickup" && day === ARRIVAL_DAY && file.beats.box && events.find((x) => x.kind === "pickup" && x.day === day) === e) {
+      dialogue = push(dialogue, beatQueued(day, "box", file.beats.box, { kind: "openCase" }));
+    }
     if (e.kind === "step") {
       if (e.name === "boot") {
         clock = { ...DEFAULT_CLOCK };
@@ -187,7 +199,8 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
         dialogue = push(dialogue, { key: `d${day}:task:${tree.id}`, lines: [...tree.start.say, ...path.say], ending: { kind: "none" } });
       }
     } else if (e.kind === "openLayer") {
-      if (file.beats.box) dialogue = push(dialogue, beatQueued(day, "box", file.beats.box));
+      // box-arrival R4: on the arrival day the box beat has played at the pickup.
+      if (file.beats.box && day !== ARRIVAL_DAY) dialogue = push(dialogue, beatQueued(day, "box", file.beats.box));
       // Right after the box beat: do you know what this is? (recognise FR1)
       const entry = recogniseTable.get(e.objectId);
       if (entry && entry.day === day && !knows(e.objectId, lc.state, events)) {
@@ -197,8 +210,12 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
     } else if (e.kind === "recognise") {
       if (e.option !== undefined) dialogue = push(dialogue, answerQueued(day, e.objectId, e.option));
       // object-tutor R1: then Kuro's line about it, once a run (from the log: a reload has seen it).
-      const tutor = firstRecogniseOnItsDay(events, e) ? tutorQueued(day, e.objectId) : null;
+      const first = firstRecogniseOnItsDay(events, e);
+      const tutor = first ? tutorQueued(day, e.objectId) : null;
       if (tutor) dialogue = push(dialogue, tutor);
+      // box-arrival R5: on the arrival day, then the player's line about the carton; read, it turns to 房间.
+      const placed = first && day === ARRIVAL_DAY ? placedQueued(day) : null;
+      if (placed) dialogue = push(dialogue, placed);
     } else if (e.kind === "choose") {
       const choice = choiceOf(day, e.beat, e.index);
       // night-hand (author 2026-11-06): the picked shutdown choice's own lines, right after the

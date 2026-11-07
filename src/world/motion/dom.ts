@@ -661,6 +661,8 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
   function wall(view: string, stage: HTMLElement | null, deg: number): HTMLElement {
     const face = doc.createElement("div");
     face.className = `m-turn-face ${view}-view`;
+    // box-arrival R1: before the case has arrived every wall of the box is the box-less still.
+    if (stage?.classList.contains("nobox") || doc.querySelector(".stage.room.nobox")) face.classList.add("nobox");
     face.dataset.view = view;
     face.style.transform = aboutViewer(deg);
     // The parts sit on the face at the still's own coordinates (the face is 1 px wider each side).

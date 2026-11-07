@@ -170,13 +170,17 @@ describe("when it is asked (FR1)", () => {
     expect(orders.size).toBeGreaterThan(1);
   });
 
-  it("right after the box beat: the box lines, then the question", () => {
-    const store = createStore({ startDay: 1 });
-    const d = queued(store, () => store.appendEvent({ kind: "openLayer", objectId: "chick" }));
+  it("right after the box beat: the box lines, then the question (day 1: the box beat was the arrival scene, so the question alone)", () => {
+    const store = createStore({ startDay: 2 });
+    const d = queued(store, () => store.appendEvent({ kind: "openLayer", objectId: "camera" }));
     const keys = d.queue.map((q) => q.key);
-    const box = keys.indexOf("d1:beat:box");
+    const box = keys.map((k) => k.replace(/#\d+$/, "")).lastIndexOf("d2:beat:box"); // (findLastIndex is past this tsconfig's lib)
     expect(box).toBeGreaterThanOrEqual(0);
-    expect(keys[box + 1]).toBe("d1:recognise:chick");
+    expect(keys[box + 1]).toBe("d2:recognise:camera");
+    // box-arrival R4: on day 1 opening the box queues no box beat.
+    const one = createStore({ startDay: 1 });
+    const d1 = queued(one, () => one.appendEvent({ kind: "openLayer", objectId: "chick" }));
+    expect(d1.queue.map((q) => q.key)).toEqual(["d1:recognise:chick"]);
   });
 
   it("snapshot: day 1, the chick's question (no hints: every option looks the same)", () => {

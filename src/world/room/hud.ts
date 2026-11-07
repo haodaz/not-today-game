@@ -23,6 +23,7 @@ import { lampLit } from "@world/objects/works";
 import { hudKuro } from "@world/desktop/kuro/mini";
 import { DESK_SHOT, DOOR_SHOT, FLAT_HOTS, isFlatFacing, LOOK_SPOTS, rectStyle, ROOM_SHOT, TABLE_SHOT, WINDOW_SHOT, type FlatHotId, type Rect } from "./shots";
 import { isFacing } from "./facings";
+import { boxArrived } from "./arrival";
 import { deskLayout, objectSlot } from "./desk";
 import { fxPlan, renderFx } from "./fx";
 import { fixedRects, hotIdsIn, hotViewOf, type HotId, type HotView } from "./splat/hotspots";
@@ -243,8 +244,9 @@ const FLAT_PROXY: Readonly<Record<FlatHotId, { readonly cls: string; readonly at
   box: { cls: "shot-hit box-hit", attrs: 'data-action="bed-box"', label: "room.box" },
   mealTable: { cls: "shot-hit table-hit", attrs: 'data-action="meal-table"', label: "room.mealTable" },
 };
-function flatHits(view: "bed" | "window"): SafeHtml {
-  return html`${FLAT_HOTS[view].map(({ id, rect }) => {
+function flatHits(view: "bed" | "window", arrived: boolean): SafeHtml {
+  // box-arrival R1: 床's carton is not there before it has arrived.
+  return html`${FLAT_HOTS[view].filter(({ id }) => arrived || id !== "box").map(({ id, rect }) => {
     const p = FLAT_PROXY[id];
     return html`<button type="button" class="${p.cls}" ${raw(p.attrs)} style="${rectStyle(rect)}" aria-label="${t(p.label)}" data-hot="${id}"></button>`;
   })}`;
@@ -449,7 +451,8 @@ const PROXIES: Readonly<Record<HotId, Proxy>> = {
   monitorR: { cls: "shot-hit monitor-hit", attrs: 'data-action="view" data-view="desktop" data-screen="right"', label: () => `${t("hud.cam.screen")} · ${t("desktop.screen.right")}`, rect: (v) => (v === "desk" ? DESK_SHOT.monitors.right : ROOM_SHOT.monitors.right) },
   lamp: { cls: "shot-hit lamp-hit", attrs: 'data-action="lamp"', label: () => t("room.lamp"), rect: (v) => (v === "desk" ? deskLayout.lamp : ROOM_SHOT.lamp) },
   desk: { cls: "shot-hit", attrs: 'data-action="view" data-view="desk"', label: () => t("hud.cam.desk"), rect: () => ROOM_SHOT.desk },
-  box: { cls: "shot-hit box-hit", attrs: 'data-action="pick-box"', label: () => t("room.box"), rect: () => ROOM_SHOT.box },
+  // box-arrival R1: there is no carton to point at before it has arrived.
+  box: { cls: "shot-hit box-hit", attrs: 'data-action="pick-box"', label: () => t("room.box"), rect: () => ROOM_SHOT.box, shown: (state, events) => boxArrived(state, events) },
   bed: { cls: "shot-hit bed-hit", attrs: 'data-action="bed"', label: () => t("room.bed"), rect: () => ROOM_SHOT.bed },
   door: { cls: "shot-hit door-hit", attrs: 'data-action="view" data-view="door"', label: () => t("hud.cam.door") },
 };
@@ -557,7 +560,8 @@ export function renderRoom(model: RoomModel): SafeHtml {
   // evening look and the collapse shader step aside until the sequence ends.
   const lineScene = sceneOf(session.dialogue);
   const dream = lineScene.backdrop !== null;
-  const flat = isFlatFacing(view) ? html`${flatHits(view)}${view === "window" ? html`${lookHits("window")}${windowThings(state, events)}` : null}` : null;
+  const arrived = boxArrived(state, events);
+  const flat = isFlatFacing(view) ? html`${flatHits(view, arrived)}${view === "window" ? html`${lookHits("window")}${windowThings(state, events)}` : null}` : null;
   // playtest-1105 R4: 门's things to touch sit under the door beat's own spot.
   // playtest-1105 R5: 窗's table up close carries only the meal, large.
   const table = view === "table" ? tableThings(state, events) : null;
@@ -586,7 +590,9 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const onEdge = session.edge && session.edge.zone !== "back" && edgeLeads(view, session.edge.zone) ? `edge-${session.edge.zone}` : null;
   // lying-view R2: the ceiling's night photo after nightfall (room.css `.ceiling-night`).
   const ceilingNight = lying && isEvening(session.clock);
-  return html`<div class="${cls("stage", "room", `${view}-view`, ceilingNight && "ceiling-night", raid && "raid", fade !== null && "m-late", dream && "scene-on", onEdge)}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${renderScene(lineScene)}${scene}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${bare ? null : list}${bare ? null : dayCorner(state, session)}${bare ? null : itemsPanel(state, events, session)}${!bare && (view === "room" || view === "bed") ? casePanel(state, events, session, model.runId ?? "run", nowMs) : null}${view === "desk" ? printsView(state, events, session) : null}${held}${model.boxOutside || bare ? null : dialogueBox(state, events, session, nowMs)}${bare ? null : bottomRight(model)}${bare ? null : settingsButton()}${bare ? null : itemsButton(session)}${model.boxOutside || bare ? null : settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
+  // box-arrival R1: 房间 and 床 show their box-less stills until the case has arrived (room.css `.nobox`).
+  const nobox = !arrived && (view === "room" || view === "bed");
+  return html`<div class="${cls("stage", "room", `${view}-view`, nobox && "nobox", ceilingNight && "ceiling-night", raid && "raid", fade !== null && "m-late", dream && "scene-on", onEdge)}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${renderScene(lineScene)}${scene}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${bare ? null : list}${bare ? null : dayCorner(state, session)}${bare ? null : itemsPanel(state, events, session)}${!bare && (view === "room" || view === "bed" || view === "window") ? casePanel(state, events, session, model.runId ?? "run", nowMs) : null}${view === "desk" ? printsView(state, events, session) : null}${held}${model.boxOutside || bare ? null : dialogueBox(state, events, session, nowMs)}${bare ? null : bottomRight(model)}${bare ? null : settingsButton()}${bare ? null : itemsButton(session)}${model.boxOutside || bare ? null : settingsPanel(session)}${bookReader(session.bookOpen && session.collection.finishedRuns >= 1)}</div>`;
 }
 
 export { raidShowing };

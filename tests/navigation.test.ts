@@ -210,13 +210,17 @@ describe("point to go", () => {
     const later: [number, () => void][] = [];
     const store = createStore({ startDay: 1 });
     const ctx: ActionContext = { store, session: initialSession(DEFAULT_CLOCK, "left", "room"), rerender: () => {}, later: (ms, fn) => void later.push([ms, fn]), now: () => 0 };
+    // box-arrival R1: before day 1's pickup there is no case at all.
+    loopActions["pick-box"]!(ctx, {} as DOMStringMap, null as never);
+    expect(ctx.session.caseOpen).toBe(false);
+    completeUntil(store, "pickup");
+    store.appendEvent({ kind: "pickup", meal: "lunch" });
     const events = store.getEvents().length;
-    // Before its line (day 1, box item locked): the case opens, but no box is loose, so a pick is
-    // stuck — nothing is appended.
+    // Arrived: the case opens where it is; a stuck box (not today's) appends nothing.
     loopActions["pick-box"]!(ctx, {} as DOMStringMap, null as never);
     expect(ctx.session.view).toBe("room");
     expect(ctx.session.caseOpen).toBe(true);
-    loopActions["case-pick"]!(ctx, { slot: "chick" } as DOMStringMap, null as never);
+    loopActions["case-pick"]!(ctx, { slot: "pager" } as DOMStringMap, null as never);
     expect(store.getEvents().length).toBe(events); // stuck: nothing opens, nothing breaks
     expect(store.getState().found).toEqual([]);
     // From 桌子 the case does not open.
@@ -626,9 +630,14 @@ describe("the four facings and their turn edges (room-turn 2026-11-04)", () => {
   it("snapshots: the four facings at rest (day 1 morning)", () => {
     const store = createStore({ startDay: 1 });
     const facings = Object.fromEntries(FACINGS.map((view) => [view, renderRoom({ state: store.getState(), events: store.getEvents(), session: initialSession(DEFAULT_CLOCK, "left", view) }).value]));
-    expect(facings.bed).toContain('class="stage room bed-view"');
+    // box-arrival R1: day 1's morning is before the case arrives: 床's box-less still, no box spot.
+    expect(facings.bed).toContain('class="stage room bed-view nobox"');
     expect(facings.bed).toContain(`class="shot-hit bed-hit" data-action="bed" style="${rectStyle(BED_SHOT.bed)}"`);
-    expect(facings.bed).toContain(`class="shot-hit box-hit" data-action="bed-box" style="${rectStyle(BED_SHOT.box)}"`);
+    expect(facings.bed).not.toContain('data-action="bed-box"');
+    const later = createStore({ startDay: 2 });
+    const bed2 = renderRoom({ state: later.getState(), events: later.getEvents(), session: initialSession(DEFAULT_CLOCK, "left", "bed") }).value;
+    expect(bed2).toContain('class="stage room bed-view"');
+    expect(bed2).toContain(`class="shot-hit box-hit" data-action="bed-box" style="${rectStyle(BED_SHOT.box)}"`);
     expect(facings.window).toContain('class="stage room window-view"');
     expect(facings.window).toContain(`data-action="meal-table" style="${rectStyle(WINDOW_SHOT.mealTable)}"`);
     // 房间 is as it was, minus its door edge (the door's own proxy stays for the keyboard).
@@ -648,7 +657,8 @@ describe("the four facings and their turn edges (room-turn 2026-11-04)", () => {
   });
 
   it("床's box opens the case right there, a close-up, no turn (author 2026-11-04)", () => {
-    const store = createStore({ startDay: 1 });
+    // box-arrival R1: once the case is there (day 2 on; day 1 after the pickup).
+    const store = createStore({ startDay: 2 });
     const ctx: ActionContext = { store, session: initialSession(DEFAULT_CLOCK, "left", "bed"), rerender: () => {}, later: () => {}, now: () => 10_000 };
     loopActions["bed-box"]!(ctx, {} as DOMStringMap, null as never);
     expect(ctx.session.view).toBe("bed");

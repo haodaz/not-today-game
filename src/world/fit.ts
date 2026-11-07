@@ -5,6 +5,7 @@
 // and on resize. `fitStage` is pure.
 import type { View } from "./desktop/model";
 import { deskLayout } from "./room/desk";
+import { NOBOX_STILLS } from "./room/arrival";
 
 /** No more than twice the stage's own size. */
 export const FIT_MAX = 2;
@@ -25,7 +26,8 @@ export function fitStage(winW: number, winH: number, w: number, h: number): Fit 
 
 /** The photo behind each view; the screens sit on the desk, so 屏幕 shows the desk. */
 export const BACKDROPS: Readonly<Record<View | "title", string>> = {
-  title: "/room/shots/room.jpg",
+  // box-arrival R2: the title's room is before any run's day 1: no carton yet.
+  title: NOBOX_STILLS.room,
   room: "/room/shots/room.jpg",
   // 桌子 is the tabletop (day-loop correction 2026-11-01); content/desk.json's backdrop.
   desk: deskLayout.backdrop,
@@ -39,6 +41,12 @@ export const BACKDROPS: Readonly<Record<View | "title", string>> = {
   // lying-view R2: the ceiling from the bed (the day still; the night one is the stage's own class).
   lying: "/room/shots/ceiling_day.jpg",
 };
+
+/** box-arrival R2: a view's backdrop, the box-less still for 房间 / 床 before the case has arrived. */
+export function backdropFor(view: View, arrived: boolean): string {
+  if (!arrived && (view === "room" || view === "bed")) return NOBOX_STILLS[view];
+  return BACKDROPS[view];
+}
 
 /**
  * Writes the fit: `--scale`, `--stage-x`, `--stage-y` on the stage (so the motion layer's copies of

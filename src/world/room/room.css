@@ -76,6 +76,10 @@
 /* The bed wall and the big window wall (room-turn 2026-11-04): 1664×928 stills, cover-fitted and
    centred like room.jpg. */
 .room.bed-view,.m-turn-face.bed-view{background-image:url(/room/shots/bed.jpg)}
+/* box-arrival R1: before the case has arrived (day 1 until the lunch is taken in) the two walls that
+   show the carton use its box-less twins (hud.ts adds `nobox`; the turning box copies it). */
+.room.room-view.nobox,.m-turn-face.room-view.nobox{background-image:url(/room/shots/room_nobox.jpg)}
+.room.bed-view.nobox,.m-turn-face.bed-view.nobox{background-image:url(/room/shots/bed_nobox.jpg)}
 .room.window-view,.m-turn-face.window-view{background-image:url(/room/shots/window.jpg)}
 /* 窗's table up close (playtest-1105 R5): the same still pushed in 3×, the tabletop centred
    (shots.ts TABLE_ZOOM: 1664×928 × 3, at -1318 / -1530 px). No pan here: it would undo the push. */

@@ -81,7 +81,8 @@ describe("applying it", () => {
     destroy = m.destroy;
     const stage = () => root.querySelector<HTMLElement>(".stage")!;
     expect(px(stage(), "--scale")).toBeCloseTo(1.2889, 4);
-    expect(root.style.getPropertyValue("--letterbox")).toBe(`url(${BACKDROPS.room})`);
+    // box-arrival R2: day 1 before the lunch is taken in, 房间's box-less still.
+    expect(root.style.getPropertyValue("--letterbox")).toBe("url(/room/shots/room_nobox.jpg)");
     root.resize(3200, 2000);
     expect(px(stage(), "--scale")).toBe(2);
     expect(px(stage(), "--stage-y")).toBe(100);

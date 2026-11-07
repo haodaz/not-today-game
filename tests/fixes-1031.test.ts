@@ -111,14 +111,17 @@ describe("(5) four camera levels", () => {
     for (const view of ["room", "desk", "door"] as const) expect(room(at(view)), view).not.toContain('class="cams"');
     // The way to each level is a thing to point at: the keyboard proxies, in tab order.
     const proxies = (out: string) => [...out.matchAll(/class="shot-hit[^"]*"[^>]*data-hot="(\w+)"/g)].map((m) => m[1]);
-    expect(proxies(room(at("room")))).toEqual(["tower", "monitorL", "monitorR", "lamp", "desk", "box", "bed", "door"]);
+    // box-arrival R1: day 1's morning has no carton yet; from day 2 the box is there.
+    expect(proxies(room(at("room")))).toEqual(["tower", "monitorL", "monitorR", "lamp", "desk", "bed", "door"]);
+    expect(proxies(room(ctxOf(createStore({ startDay: 2 }), initialSession(DEFAULT_CLOCK, "left", "room"))))).toEqual(["tower", "monitorL", "monitorR", "lamp", "desk", "box", "bed", "door"]);
     expect(proxies(room(at("desk")))).toEqual(["monitorL", "monitorR", "lamp"]);
     expect(proxies(room(at("door")))).toEqual([]);
   });
 
   it("房间 is the wide shot: no desk bar; clicking the desk goes to 桌子; the monitor glow is mood only", () => {
     const out = room(at("room"));
-    expect(out).toContain('class="stage room room-view"');
+    // box-arrival R1: day 1 before the pickup, the box-less still (`nobox`).
+    expect(out).toContain('class="stage room room-view nobox"');
     expect(out).not.toContain('class="bar"');
     expect(out).toMatch(/class="shot-hit" data-action="view" data-view="desk" style="left:\d+px;top:\d+px;width:\d+px;height:\d+px"/);
     // Nothing on the monitors: no glow, no box (day-loop correction).
