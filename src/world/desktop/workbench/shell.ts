@@ -39,7 +39,9 @@ export const shellKey = (day: number, taskId: string): string => `${day}:${taskI
 /** The task page's surface, by what the task is and whether it is the work under way. */
 function surfaceOf(task: Task, live: boolean): "ide" | "table" | "meeting" | "work" {
   if (!task.board) return "work";
-  if (!live) return "table";
+  // ide v2 (2026-11-08): a sent IDE task reads back as its frozen page and code (the snapshot line,
+  // the import on snapshot.js), not as a table.
+  if (!live) return task.board.view === "ide" ? "ide" : "table";
   return task.board.view === "ide" ? "ide" : task.board.view === "meeting" && task.board.meeting ? "meeting" : "table";
 }
 
@@ -160,7 +162,7 @@ function previewPane(task: Task, board: TaskBoard, s: BoardState, ops: ReturnTyp
 }
 
 /** 代码: the selected page's file, line numbers, and its slot line drawn as the inline field. */
-function codePane(board: TaskBoard, s: BoardState, session: Session, selected: string, printed = false): SafeHtml {
+function codePane(board: TaskBoard, s: BoardState, session: Session, selected: string, printed = false, live = true): SafeHtml {
   const file = board.ide?.files?.[selected];
   if (!file) return html`<div class="sh-editor"></div>`;
   const cardId = s.slots[selected];
@@ -184,22 +186,27 @@ function codePane(board: TaskBoard, s: BoardState, session: Session, selected: s
     if (at < 0) return [html`<div class="sh-ln"><span class="sh-gut">${i + 1}</span><span class="sh-mk"></span><code>${line}</code></div>`];
     const before = line.slice(0, at);
     const after = line.slice(at + SLOT_FIELD.length);
-    const field = cardId
+    // A read-back page (the task sent) has no actions: the field is plain text.
+    const field = !live
+      ? html`<span class="sh-field filled">"${cardId ? cardText(board, cardId) : ""}"</span>`
+      : cardId
       ? html`<button type="button" class="sh-field filled" data-action="board-slot" data-slot="${selected}">"${cardText(board, cardId)}"</button>`
       : html`<button type="button" class="${cls("sh-field", "empty", session.boardPick && "target")}" data-action="board-slot" data-slot="${selected}" aria-label="${board.slots.find((x) => x.id === selected)?.label ?? selected}"></button>`;
     return [html`<div class="${cls("sh-ln", "slot", cardId && "added")}"><span class="sh-gut">${i + 1}</span><span class="sh-mk">${cardId ? "+" : ""}</span><code>${before}${field}${after}</code></div>`];
   });
   // The merge bar (a page that differs, nothing kept yet) and the API control (pull once; then the time).
-  const mergeBar = hunk && !kept
+  const mergeBar = live && hunk && !kept
     ? html`<div class="sh-merge"><span class="sh-merge-l">${tr("board.ide.diff")}</span><button type="button" class="sh-chip primary" data-action="board-merge" data-slot="${selected}" data-keep="v17">${tr("board.ide.merge.v17")}</button><button type="button" class="sh-chip" data-action="board-merge" data-slot="${selected}" data-keep="v16">${tr("board.ide.merge.v16")}</button></div>`
     : null;
-  const fetch = api
+  const fetch = !live
+    ? null
+    : api
     ? s.fetched
       ? html`<span class="sh-fetched">${tr("board.ide.fetched", { at: api.at })}</span>`
       : html`<button type="button" class="sh-chip sh-fetch" data-action="board-fetch"${canFetch(board, s) ? null : html` disabled`}>${tr("board.ide.fetch")}</button>`
     : null;
   // ide v2 day 3: the page's directions under its code; the chosen one is primary; choosing again replaces.
-  const options = board.cards.filter((c) => c.slot === selected);
+  const options = live ? board.cards.filter((c) => c.slot === selected) : [];
   const chips = options.length
     ? html`<div class="sh-options">${options.map((o) => html`<button type="button" class="${cls("sh-chip", cardId === o.id && "primary")}" data-action="board-option" data-slot="${selected}" data-card="${o.id}">${cardText(board, o.id)}</button>`)}</div>`
     : null;
@@ -360,7 +367,7 @@ export function renderShell(ctx: AppContext, task: Task, day: number, fill: Fill
   const paneCards = open.map((p) => {
     let body: SafeHtml;
     if (p === "preview") body = previewPane(task, board!, s!, ops, selected);
-    else if (p === "code") body = codePane(board!, s!, session, selected, ops.some((o) => o.t === "print"));
+    else if (p === "code") body = codePane(board!, s!, session, selected, ops.some((o) => o.t === "print"), live);
     else if (p === "table") body = tablePane(ctx, task, board!, s!, live, day);
     else if (p === "meeting") body = meetingWindow(ctx, task, board!);
     else if (p === "files") body = board ? filesPane(ctx, board, st, fill) : html``;

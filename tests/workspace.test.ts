@@ -105,8 +105,9 @@ describe("R1 · two kinds of page", () => {
     store.appendEvent({ kind: "task", flag: doneFlag("task3"), mode: "let", slots: { s1: "a1", s2: "a2", s3: "k1" }, assists: 1 });
     const after = h.out();
     expect(headOf(after)).toContain(`<span class="st done">${escapeHtml(t("wb.task.done"))}</span>`);
-    expect(after).toContain('<div class="surface board read">');
-    expect(after).toContain("card-k1");
+    // ide v2 (2026-11-08): the IDE board reads back as its preview pane, without its actions.
+    expect(after).toContain('<section class="sh-card sh-preview" data-card="preview">');
+    expect(after).not.toContain('data-action="board-print"');
     expect(after).not.toContain('data-action="board-');
   });
 
