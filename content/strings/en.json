@@ -238,6 +238,8 @@
   "judge.offline.loan": "You gave Lao Zhou an answer.",
   "judge.offline.talked": "You talked with me a while.",
   "judge.offline.typed": "You typed it yourself.",
+  "judge.offline.followed": "You followed the question down.",
+  "judge.offline.sixth": "The same question, asked a sixth time.",
   "settings.bindEmail": "Link an email",
   "settings.emailHint": "Enter your email and we send a sign-in link; your save follows the email.",
   "settings.emailPlaceholder": "you@example.com",

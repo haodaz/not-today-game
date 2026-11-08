@@ -27,7 +27,7 @@
 
 **Lines it owns (constants, never generated).**
 - Daily idiom (one per day; see each day file).
-- Bedtime cap, after the fifth player turn: 「你该睡觉了，哪有那么多 token 和我聊天，省着工作用吧。」 / "You should sleep. I don't have that many tokens for you. Save them for work."
+- Bedtime cap, after the sixth player turn: 「你该睡觉了，哪有那么多 token 和我聊天，省着工作用吧。」 / "You should sleep. I don't have that many tokens for you. Save them for work."
 - Red-blue lines: listed per day; only when the player asks the question that unlocks them.
 
 **Rubric for how it judges the player:** see `kuro-rubric.md`.

@@ -15,7 +15,7 @@
       10
     ],
     "lastDay": 18,
-    "chatTurnsPerDay": 5,
+    "chatTurnsPerDay": 6,
     "affinityThreshold": 60,
     "tenderDayAffinityMultiplier": 2,
     "_dreamDaysNote": "dreamDays is the count; the nights themselves are stages.json dreamNights.",

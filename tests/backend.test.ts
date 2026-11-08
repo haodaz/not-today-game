@@ -69,7 +69,7 @@ describe("the bundle (npm run bundle:kuro)", () => {
     expect(content.days["1"]!.stance.length).toBeGreaterThan(10);
     expect(content.gate).toEqual({ deskFrom: 13, dreamsOn: 15 });
     expect(content.bedtime).toBe(en["kuro.bedtime"]);
-    expect(content.turnsPerDay).toBe(5);
+    expect(content.turnsPerDay).toBe(6);
     expect(Object.keys(content.dreams)).toEqual(["5", "11", "15"]);
     expect(Object.keys(content.tools)).toHaveLength(18);
   });
@@ -245,16 +245,17 @@ describe("the function's handler, with a mocked model (FR3, FR5)", () => {
   }
   const say = (text: string) => ({ stop_reason: "end_turn", content: [{ type: "text", text }] });
 
-  it("answers five turns, then the sixth call is the bedtime line without calling the model", async () => {
+  it("answers six turns (turnsPerDay), then the seventh call is the bedtime line without calling the model", async () => {
     const { d, memory, calls } = deps(() => say("It is."));
-    for (let i = 0; i < 5; i++) {
+    const per = content.turnsPerDay;
+    for (let i = 0; i < per; i++) {
       const r = await handle({ mode: "turn", run_id: "run-1", day: 3, said: `turn ${i}`, events: [] }, d);
-      expect(r).toEqual({ status: 200, body: { mode: "turn", reply: "It is.", turnsLeft: 4 - i, taboo: null } });
+      expect(r).toEqual({ status: 200, body: { mode: "turn", reply: "It is.", turnsLeft: per - 1 - i, taboo: null } });
     }
-    const sixth = await handle({ mode: "turn", run_id: "run-1", day: 3, said: "one more", events: [] }, d);
-    expect(sixth).toEqual({ status: 200, body: { mode: "turn", reply: content.bedtime, turnsLeft: 0, bedtime: true, taboo: null } });
-    expect(calls).toHaveLength(5);
-    expect(memory.get("run-1")!.turns.filter((t) => t.who === "player")).toHaveLength(5);
+    const next = await handle({ mode: "turn", run_id: "run-1", day: 3, said: "one more", events: [] }, d);
+    expect(next).toEqual({ status: 200, body: { mode: "turn", reply: content.bedtime, turnsLeft: 0, bedtime: true, taboo: null } });
+    expect(calls).toHaveLength(per);
+    expect(memory.get("run-1")!.turns.filter((t) => t.who === "player")).toHaveLength(per);
   });
 
   it("refusal, a throw, someone else's run, a bad body: non-200 (the client goes offline)", async () => {

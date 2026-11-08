@@ -194,7 +194,7 @@ describe("FR2 talking to Kuro", () => {
     talkAtNight(ctx);
     const said = out(ctx);
     const day = kuroDay(1)!;
-    expect(day.starters.length).toBe(4);
+    expect(day.starters.length).toBeGreaterThanOrEqual(5); // the box pages by five (2026-11-09)
     // playtest-1105 R6: one box. First Kuro's line, its portrait; nothing of the player's yet.
     expect(said).toMatch(/^<div class="dlg tagged kuro"/);
     // The idiom in Kuro's face (kuro-zh-answers R4).
@@ -208,8 +208,10 @@ describe("FR2 talking to Kuro", () => {
     expect(box).toContain("kuro-portrait");
     expect(box).toContain(`<span class="who tag k">${t("kuro.name")}</span>`);
     const player = box.slice(box.indexOf('<div class="dlg-choices'));
-    const labels = [...player.matchAll(/data-action="kuro-(?:q|more)"[^>]*><i class="dc-ic (?:ask|more)"[\s\S]*?<\/i><span class="dc-l">([^<]*)<\/span>/g)].map((m) => m[1]);
-    expect(labels).toEqual([...day.starters.map((s) => escapeHtml(s.zh)), escapeHtml(t("dialogue.more"))]);
+    const labels = [...player.matchAll(/data-action="kuro-(?:q|page)"[^>]*><i class="dc-ic (?:ask|more)"[\s\S]*?<\/i><span class="dc-l">([^<]*)<\/span>/g)].map((m) => m[1]);
+    // 2026-11-09: the first page of five (no follow-up is open yet), then 说点别的… as the page turn.
+    const page = day.starters.filter((s) => !s.after).slice(0, 5);
+    expect(labels).toEqual([...page.map((s) => escapeHtml(s.zh)), escapeHtml(t("dialogue.more"))]);
     // No 先不聊 here (Esc leaves), and no ▼.
     expect(player).not.toContain("kuro-leave");
     expect(box).not.toContain('class="more"');
@@ -243,7 +245,7 @@ describe("FR2 talking to Kuro", () => {
     expect(css).not.toContain("padding-top:44px"); // the tag is name-only again: one padding
   });
 
-  it("a starter is a turn: a chat event, the offline answer, the question gone from the list; typing sends with Enter", () => {
+  it("a starter is a turn: a chat event, the core's tier, the question still in the list (2026-11-09); typed text sends and gets the free line offline", () => {
     const store = storeAt(1);
     const ctx = ctxOf(store, NIGHT);
     talkAtNight(ctx);
@@ -252,16 +254,14 @@ describe("FR2 talking to Kuro", () => {
     expect(store.getEvents().at(-2)).toMatchObject({ kind: "chat", q: 1 });
     expect(store.getEvents().at(-1)).toMatchObject({ kind: "step", name: "chat:any" });
     expect(store.getState().chatTurnsToday).toBe(1);
-    expect(out(ctx)).toContain(escapeHtml(offlineAnswer(day, 1)));
+    const ev = store.getEvents().filter((e) => e.kind === "chat").at(-1)!;
+    const tier = day.layered.find((l) => l.unlock === 1)!;
+    if (ev.kind === "chat" && ev.taboo !== "flicker") expect(ev.answer!.startsWith(tier.zh!.low)).toBe(true);
     act(ctx, "loop-advance"); // playtest-1105 R6: the answer read, the player's turn
-    expect(out(ctx)).not.toContain(`data-q="1"`);
+    expect(out(ctx)).toContain(`data-q="1"`); // asked questions stay: the same question can be asked again
+    // Typing has no row of its own now; the action still carries the model's channel.
     act(ctx, "kuro-more");
-    const input = out(ctx);
-    // world-prompts R2: 说点别的…'s row is the field, in place.
-    expect(input).toMatch(/<div class="dc-row dc-field"><i class="dc-ic more"[\s\S]*?<\/i><input class="kuro-in" type="text" data-input="kuro-text"/);
-    expect(input).toMatchSnapshot();
-    // Empty sends nothing.
-    act(ctx, "kuro-send");
+    act(ctx, "kuro-send"); // empty sends nothing
     expect(store.getState().chatTurnsToday).toBe(1);
     ctx.session.kuroDraft = "  雨停了吗  ";
     act(ctx, "kuro-send");

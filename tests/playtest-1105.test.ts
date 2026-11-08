@@ -330,13 +330,18 @@ describe("R6 · Kuro in the room: one box, and not only the idiom", () => {
     out = r.out();
     expect(boxes(out)).toBe(1);
     expect(out).toContain("kuro-portrait");
-    const answer = offlineAnswer(day, 1);
-    expect(answer).not.toBe(day.idiom);
-    expect(r.store.getEvents().find((e) => e.kind === "chat")).toMatchObject({ q: 1, answer });
-    // Read on: the player's turn again, the asked question gone.
+    // The core's tier (2026-11-09): day 1 q1's low tier, never the idiom.
+    const tier = day.layered.find((l) => l.unlock === 1)!;
+    const ev = r.store.getEvents().find((e) => e.kind === "chat")!;
+    expect(ev).toMatchObject({ q: 1 });
+    if (ev.kind === "chat" && ev.taboo !== "flicker") {
+      expect(ev.answer!.startsWith(tier.zh!.low)).toBe(true);
+      expect(ev.answer).not.toBe(day.idiom);
+    }
+    // Read on: the player's turn again; the asked question stays in the pool.
     r.act("loop-advance");
-    expect(r.out()).toContain('data-action="kuro-more"');
-    expect(r.out()).not.toContain('data-q="1"');
+    expect(r.out()).toContain('data-action="kuro-q"');
+    expect(r.out()).toContain('data-q="1"');
   });
 });
 

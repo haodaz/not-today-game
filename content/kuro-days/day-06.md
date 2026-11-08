@@ -64,4 +64,4 @@
 - free text → "你最近太拼了。说吧。"
 
 ## Never
-- Name the thing. Invent lore beyond kuro-profile.md. Produce more than five turns. Mention the body under the face.
+- Name the thing. Invent lore beyond kuro-profile.md. Produce more than six turns. Mention the body under the face.

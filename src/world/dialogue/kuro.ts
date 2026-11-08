@@ -3,7 +3,7 @@
 // day's idiom and the player's box (starter questions, 说点别的…; Esc leaves); each turn appends a `chat`
 // event and Kuro answers: a starter from the deterministic core (core.ts: the bucket's locked line,
 // the seeded d100, the taboo), else its written answer; typed text by the model when online, else
-// the day's free line. Five turns a day; a sixth attempt gets
+// the day's free line. Six turns a day (chatTurnsPerDay); a seventh attempt gets
 // the bedtime line and the player's box does not come back that day. During work beats it says the
 // idiom and the player can only say 好。. While today's chat is still locked (playtest-1105 R6) a
 // click is only kuro.room.notYet. Every line here is content or a string.
@@ -362,15 +362,15 @@ export function playerBox(state: State, events: readonly GameEvent[], session: S
 export const PAGE = 5;
 
 /**
- * The questions open to the player now: not asked today, allowed by the bucket (affinity opens
- * questions, 2026-11-02), a follow-up only after its question (2026-11-09). Follow-ups first, so
- * the one just unlocked is seen; then the day's order.
+ * The questions open to the player now: allowed by the bucket (affinity opens questions,
+ * 2026-11-02), a follow-up only after its question (2026-11-09). A question asked today stays in
+ * the pool (author 2026-11-09): it can be asked again and again, word for word the same answer,
+ * until the sixth time. Follow-ups first, so the one just unlocked is seen; then the day's order.
  */
 export function openStarters(state: State, events: readonly GameEvent[]): StarterQuestion[] {
-  const asked = askedToday(events, state.day);
   const bucket = bucketNow(state);
   const askedEver = askedFrom(events);
-  const open = (kuroDay(state.day)?.starters ?? []).filter((s) => !asked.has(s.n) && starterOpen(s, bucket, askedEver, state.day));
+  const open = (kuroDay(state.day)?.starters ?? []).filter((s) => starterOpen(s, bucket, askedEver, state.day));
   return [...open.filter((s) => s.after !== undefined), ...open.filter((s) => s.after === undefined)];
 }
 

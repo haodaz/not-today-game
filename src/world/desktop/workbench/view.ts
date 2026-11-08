@@ -9,12 +9,10 @@ import { cls, html, type SafeHtml } from "@world/html";
 import { getLocale, hasString, t, tr } from "@world/i18n";
 import { fillPlaceholders } from "@world/replies/placeholders";
 import { taskForId } from "@state/days/board";
-import { askedToday, bucketNow } from "@world/dialogue/kuro";
-import { bucketAllows } from "@kuro/variable.ts";
+import { openStarters } from "@world/dialogue/kuro";
 import { greetingKeyAt } from "../beat";
 import { pastTasks } from "@state/days/past";
 import { frameUrl, FRAMES } from "../kuro/body";
-import { kuroDay } from "../kuro/days";
 import { taskPageId, type AppContext, type WorkbenchPage } from "../model";
 import { closerSlot } from "@world/late/closer-view";
 import { RINGS } from "../rings";
@@ -115,12 +113,9 @@ function topBar(ctx: AppContext, title: SafeHtml, tools: SafeHtml | null, dropdo
   return html`${toggle}${back}${fwd}${name}<span class="sp"></span>${tools}`;
 }
 
-/** Today's starters the player can still ask (as the player's box offers them). */
+/** Today's open questions (the same pool as the player's box, 2026-11-09: asked ones stay; a follow-up first, tagged). */
 function starterChips(state: State, events: AppContext["events"]): SafeHtml[] {
-  const asked = askedToday(events, state.day);
-  const bucket = bucketNow(state);
-  const starters = (kuroDay(state.day)?.starters ?? []).filter((s) => !asked.has(s.n) && bucketAllows(s.minBucket, bucket));
-  return starters.map((s) => html`<button type="button" class="chip q" data-action="wb-compose-q" data-q="${s.n}">${getLocale() === "en" && s.en ? s.en : s.zh}</button>`);
+  return openStarters(state, events).map((s) => html`<button type="button" class="chip q" data-action="wb-compose-q" data-q="${s.n}">${s.after ? t("kuro.followUp") : ""}${getLocale() === "en" && s.en ? s.en : s.zh}</button>`);
 }
 
 /**

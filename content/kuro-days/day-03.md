@@ -65,4 +65,4 @@
 - free text → "说吧。我哪儿也不去。"
 
 ## Never
-- Name the thing. Invent lore beyond kuro-profile.md. Produce more than five turns. Mention the body under the face.
+- Name the thing. Invent lore beyond kuro-profile.md. Produce more than six turns. Mention the body under the face.

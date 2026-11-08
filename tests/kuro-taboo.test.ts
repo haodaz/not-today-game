@@ -206,7 +206,11 @@ describe("affinity opens questions", () => {
     expect(bucketNow(s)).toBe("low");
     expect(bucketNow({ ...s, affinity: 30 })).toBe("mid");
     expect(bucketNow({ ...s, affinity: constants.affinityThreshold as number })).toBe("high");
-    const all = kuroDay(3)!.starters.filter((x) => x.minBucket === "low").length;
-    expect(playerBox(s, store.getEvents(), ctx.session)!.options.filter((o) => o.action === "kuro-q")).toHaveLength(all);
+    // Low bucket: every low starter that is not a follow-up is open; the box shows the first page of five.
+    const all = kuroDay(3)!.starters.filter((x) => x.minBucket === "low" && !x.after).length;
+    expect(playerBox(s, store.getEvents(), ctx.session)!.options.filter((o) => o.action === "kuro-q")).toHaveLength(Math.min(all, 5));
+    // Mid and high open more (day 3 has none gated, so the count holds); a high bucket never shows fewer.
+    const high = { ...s, affinity: constants.affinityThreshold as number };
+    expect(playerBox(high, store.getEvents(), ctx.session)!.options.filter((o) => o.action === "kuro-q").length).toBeGreaterThanOrEqual(Math.min(all, 5));
   });
 });

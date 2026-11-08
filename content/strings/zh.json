@@ -238,6 +238,8 @@
   "judge.offline.loan": "老周的事，你给了一句话。",
   "judge.offline.talked": "你和我说了会儿话。",
   "judge.offline.typed": "你自己打的字。",
+  "judge.offline.followed": "你追着问了下去。",
+  "judge.offline.sixth": "同一句话，你问到第六次。",
   "settings.bindEmail": "绑定邮箱",
   "settings.emailHint": "输入邮箱，我们发一条登录链接；存档会跟着邮箱走。",
   "settings.emailPlaceholder": "you@example.com",

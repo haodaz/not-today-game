@@ -8,6 +8,8 @@ import { NEVER_KINDS } from "@kuro/prompt.ts";
 import type { GameEvent } from "@state/events";
 import { wasRight } from "@state/recognise";
 import { kuroDay } from "./days";
+import { repeatEntries } from "./repeat";
+import { REPEAT_AT, repeatEntry, timesAsked } from "@kuro/repeat.ts";
 
 /** The log as the function and the scorer see it: each event with its id `ev<index>`; never the hidden kinds. */
 export function toLogEvents(events: readonly GameEvent[]): LogEvent[] {
@@ -36,6 +38,23 @@ const RULES: readonly Rule[] = [
     points: 1,
     note: "judge.offline.hard",
     find: (t) => first(t, (e) => e.kind === "chat" && e.q !== undefined && kuroDay(e.day)?.starters.find((s) => s.n === e.q)?.hard === true),
+  },
+  // The deterministic core (2026-11-09): a follow-up asked is a question pursued; the sixth ask of
+  // one question is persistence, which it respects (「被你的执着磨得没脾气了」).
+  {
+    dim: "truth",
+    points: 1,
+    note: "judge.offline.followed",
+    find: (t) => first(t, (e) => e.kind === "chat" && e.q !== undefined && kuroDay(e.day)?.starters.find((s) => s.n === e.q)?.after !== undefined),
+  },
+  {
+    dim: "bond",
+    points: 1,
+    note: "judge.offline.sixth",
+    find: (t) => {
+      const all = t.map(({ e }) => e);
+      return first(t, (e) => e.kind === "chat" && typeof e.said === "string" && repeatEntry(repeatEntries, e.said) !== null && timesAsked(repeatEntries, all.slice(0, all.indexOf(e)), e.said) + 1 >= REPEAT_AT);
+    },
   },
   { dim: "truth", points: -1, note: "judge.offline.unchecked", find: (t) => first(t, (e) => (e.kind === "task" && e.mode === "let") || e.kind === "letItDo") },
   { dim: "values", points: 1, note: "judge.offline.replied", find: (t) => first(t, (e) => e.kind === "reply" && e.recipient !== undefined && POWERLESS.has(e.recipient)) },

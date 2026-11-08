@@ -150,12 +150,13 @@ describe("the online path (FR3), with a mocked function", () => {
     expect(box(ctx)).not.toContain('data-action="kuro-more"');
   });
 
-  it("property: the sixth turn is always blocked on the client, online or not", () => {
+  it("property: the turn after the day's last (chatTurnsPerDay) is always blocked on the client, online or not", () => {
     fc.assert(
       fc.property(fc.integer({ min: 6, max: 9 }), (n) => {
         const store = storeAt(2);
-        for (let i = 0; i < 5; i++) store.appendEvent({ kind: "chat", text: `x${i}` });
-        for (let i = 5; i < n; i++) expect(() => store.appendEvent({ kind: "chat", text: "more" })).toThrow(/no turns left/);
+        const per = constants.chatTurnsPerDay as number;
+        for (let i = 0; i < per; i++) store.appendEvent({ kind: "chat", text: `x${i}` });
+        for (let i = per; i < n + per; i++) expect(() => store.appendEvent({ kind: "chat", text: "more" })).toThrow(/no turns left/);
         expect(store.getState().chatTurnsToday).toBe(constants.chatTurnsPerDay);
       }),
     );

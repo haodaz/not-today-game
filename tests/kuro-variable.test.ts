@@ -235,11 +235,11 @@ describe("大成功 and 大失败", () => {
     const memory = new Map<string, Memory>();
     const { d, calls } = deps(() => say("never"), AFF.low, memory);
     const r = (await turn(d, runId, { said: "那是什么词？", q: 1 })).body as TurnBody;
-    expect(r).toMatchObject({ reply: "", taboo: "flicker", turnsLeft: 4 });
+    expect(r).toMatchObject({ reply: "", taboo: "flicker", turnsLeft: 5 });
     expect(calls).toHaveLength(0);
     const m = memory.get(runId)!;
     expect(m.turns).toEqual([{ day: 3, who: "player", text: "那是什么词？", forgotten: true, taboo: "flicker" }]);
-    expect(decideTurn(m.turns, 3, 5)).toEqual({ kind: "answer", turnsLeft: 3 });
+    expect(decideTurn(m.turns, 3, 6)).toEqual({ kind: "answer", turnsLeft: 4 });
     await turn(d, runId, { said: "雨停了吗" });
     expect(systemText(calls[0]!)).not.toContain("那是什么词？");
   });
@@ -280,7 +280,7 @@ describe("content: the day files' new parts", () => {
     for (let day = 1; day <= 18; day++) expect(real.days[String(day)]!.starters!.length, `day ${day}`).toBeGreaterThan(0);
     expect(real.days["14"]!.locked).toEqual([
       { unlock: 1, text: "Does it matter? You still read what I write." },
-      { unlock: 4, text: "I heard it. I can't get in there. That's the point of it, isn't it." },
+      { unlock: 3, text: "I heard it. I can't get in there. That's the point of it, isn't it." },
     ]);
   });
 

@@ -4,7 +4,7 @@ The chat beat is the heart of the game (steering/product.md). Data: `content/kur
 
 ## FR1. Where and when
 - The chat lives in Kuro's small window (desktop-ui FR5). It is open in every beat, but turns only count in the evening beat (after work, before bed). During work beats the window answers with one of the day's constant lines and does not consume turns.
-- Five player turns per day (`chatTurnsPerDay`). The sixth attempt shows the constant bedtime line from `content/kuro-days/` and disables input until the next day.
+- Six player turns per day (`chatTurnsPerDay`; five until 2026-11-09, six since: 六六大顺 for the player, the beast for the judges). The seventh attempt shows the constant bedtime line from `content/kuro-days/` and disables input until the next day.
 
 ## FR2. Memory
 - The run save stores `chatMemory`: the last N turns verbatim (N from constants, default 12) plus a running summary (≤ 600 chars) that the model rewrites at the end of each beat. Day 1 has no memory. Memory is fed into every prompt, so Kuro can refer to yesterday.
@@ -77,3 +77,12 @@ The earlier idea of a "valve" that lets the model write one unreadable word is w
 - **Same question, different day**: a question's answer belongs to the day's record, so the name question on day 1 and on day 17 answer differently by content alone.
 - Arc of the pools (author): days 1–3 technology and work only; 4–6 technology-sounding but occult; 7–9 the nature of the change; from day 10 questions about Kuro, the world or the essence reach the truth but cannot be looked at straight.
 - Tests: `tests/kuro-core.test.ts` (no function call for a starter; the tier per bucket; 大成功 / 大失败 from a found seed; one taboo a day; red-blue never rolls; every real layered answer reachable; follow-up parsing and gating; the sixth time by text across days). The taboo consequences are still tested through typed text with a mocked function.
+
+## Additions 2026-11-09 (author, the same evening): the pool, the turns, the repeats
+- **Six turns a day** (`chatTurnsPerDay` 6): 六六大顺 for the player, 666 for the judges; the seventh attempt is the bedtime line. The sixth ask of one question is the worn-down answer, so a day spent on one question ends differently.
+- **The pool pages by five**: the player's box shows five questions and 「说点别的…」; that row turns the page and wraps round; a pool of five or fewer has no such row. Typing has no row (the model's channel is a side; the actions stay for tests and tools). The workbench's question chips show the same pool.
+- **Asked questions stay in the pool**: a question can be asked again and again the same day; the core answers word for word the same (the roll is per run, day, question; one taboo a day) until the sixth time.
+- **Follow-ups come first, tagged** `kuro.followUp` (（追问） / (follow-up)).
+- **Every day's pool is 9–10 questions from the player's side**, built from that day's events (content/days, replies, boxes, dreams of the night before), on the author's slope: 1–3 technology and work; 4–6 technology-sounding but occult; 7–9 the nature of the change; 10–18 Kuro, the world, the essence. Every question has three tiers (zh + en); red-blue lines stay single and English; the high tiers from day 10 carry taboos (errors / blur / blood / flicker, at most one fires a day). The cold-water cup is gone except where the story has it (day 3's moved cup).
+- **Offline scorer**: `judge.offline.followed` (truth +1: asked a follow-up) and `judge.offline.sixth` (bond +1: the sixth ask of a question).
+- **The replay driver** (scratchpad `auto-day-shoot.mjs`) plays the chat every night: 聊聊, up to `CHAT_TURNS` (6) questions with a page turn every other time, reads the answers on, clicks an errors cascade away.
