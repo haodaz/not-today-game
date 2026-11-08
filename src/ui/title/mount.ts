@@ -4,11 +4,13 @@
 import { getLocale, persistLocale, setLocale, type Locale } from "@world/i18n";
 import { applyFit, BACKDROPS } from "@world/fit";
 import { onEmailChange, sendEmailLink, setEmailDraft } from "@net/email";
+import { looksLikeEmail } from "@net/email";
+import { net } from "@net/supabase";
 import type { State } from "@state/types.gen";
 import type { Collection } from "@world/room/collection";
 import { titlePlan } from "@world/sound/plan";
 import type { SoundPlayer } from "@world/sound/player";
-import { arrived, canStart, diceOptions, initialTitle, QUESTIONS, rowsShown, toMenu, toNames, toQuestions, withAnswer, withPronoun, type TextQuestion, type TitleModel } from "./model";
+import { arrived, canStart, diceOptions, GATE_IDLE, initialTitle, pastGate, QUESTIONS, rowsShown, toMenu, toNames, toQuestions, withAnswer, withPronoun, type Account, type TextQuestion, type TitleModel } from "./model";
 import { titleTable, type IdleEvent } from "./table";
 import { renderTitle } from "./view";
 import { createDrawerObject, createKurogotchiDrawer, drawerIds, KURO_ID, type DrawerObject, type KuroDrawerObject, type KuroMemoryStore } from "./drawer";
@@ -37,7 +39,15 @@ export interface TitleDeps {
   readonly onRestart?: () => void;
   /** playtest-1105 R8: 清除全部记录, confirmed: clear the run and the profile and show the title again. */
   readonly onClearAll?: () => void;
+  /**
+   * login-first (author 2026-11-09): the account gate. Absent = no gate (tests, pure renders).
+   * `storage` remembers a guest's choice (`nt_guest`) so a returning guest is not asked again.
+   */
+  readonly account?: { readonly storage: Pick<Storage, "getItem" | "setItem" | "removeItem">; readonly origin: string };
 }
+
+/** The guest choice is kept here (login-first); logging in clears it. */
+export const GUEST_KEY = "nt_guest";
 
 const STAGE = { w: 1600, h: 900 };
 /** Rain volume: settled, and louder once the computer turns on (FR7). */
@@ -64,7 +74,7 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
   const random = deps.random ?? Math.random;
   const doc = root.ownerDocument;
   const win = doc.defaultView!;
-  let model: TitleModel = { ...initialTitle(deps.save, deps.collection), muted: deps.sound?.muted ?? false, ...(deps.hints ? { hintsOn: deps.hints.on } : {}) };
+  let model: TitleModel = { ...initialTitle(deps.save, deps.collection), muted: deps.sound?.muted ?? false, ...(deps.hints ? { hintsOn: deps.hints.on } : {}), ...(deps.account ? { account: { kind: "checking" } as Account } : {}) };
   /** When the running camera move began (performance.now), or null. */
   let movedAt: number | null = null;
   const timers = new Set<number>();
@@ -119,6 +129,41 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     model = next;
     render();
   };
+
+  // login-first: read the stored session once; a guest who chose so before passes; otherwise the gate.
+  const gate = (a: Partial<Extract<Account, { kind: "gate" }>>) => ({ ...(model.account?.kind === "gate" ? model.account : GATE_IDLE), ...a }) as Account;
+  if (deps.account) {
+    const storage = deps.account.storage;
+    void net.whoami().then((who) => {
+      if (!deps.account) return;
+      if (who.kind === "user") {
+        storage.removeItem(GUEST_KEY);
+        set({ ...model, account: { kind: "user", email: who.email } });
+      } else if (who.kind === "guest" || (who.kind === "none" && storage.getItem(GUEST_KEY) === "1")) set({ ...model, account: { kind: "guest" } });
+      else if (who.kind === "offline") set({ ...model, account: { kind: "offline" } });
+      else {
+        set({ ...model, account: GATE_IDLE });
+        root.querySelector<HTMLElement>('[data-focus="auth-email"]')?.focus();
+      }
+    });
+  }
+  /** 登录 / 注册 with what is typed; the card shows busy, then the error, the confirm note, or the menu. */
+  async function authSubmit(): Promise<void> {
+    const a = model.account;
+    if (!a || a.kind !== "gate" || a.status === "busy" || !deps.account) return;
+    const email = a.email.trim();
+    if (!looksLikeEmail(email) || a.password.length < 6) {
+      set({ ...model, account: gate({ status: "error" }) });
+      return;
+    }
+    set({ ...model, account: gate({ status: "busy" }) });
+    const r = a.mode === "register" ? await net.register(email, a.password, deps.account.origin) : await net.login(email, a.password);
+    if (model.account?.kind !== "gate") return;
+    if (r === "ok") {
+      deps.account.storage.removeItem(GUEST_KEY);
+      set({ ...model, account: { kind: "user", email } });
+    } else set({ ...model, account: gate({ status: r === "confirm" ? "confirm" : "error", ...(r === "confirm" ? { mode: "login", password: "" } : {}) }) });
+  }
 
   /** The first question still open gets the cursor. */
   const focusOpen = () => {
@@ -358,6 +403,22 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
       focusOpen();
     },
     "title-start": () => start(),
+    // login-first (author 2026-11-09): the gate's own actions.
+    "auth-mode": (el) => {
+      const mode = el.dataset.mode;
+      if (model.account?.kind === "gate" && (mode === "login" || mode === "register")) set({ ...model, account: gate({ mode, status: "idle" }) });
+    },
+    "auth-submit": () => void authSubmit(),
+    "auth-guest": () => {
+      if (!deps.account || model.account?.kind !== "gate") return;
+      deps.account.storage.setItem(GUEST_KEY, "1");
+      set({ ...model, account: { kind: "guest" } });
+    },
+    "auth-logout": () => {
+      if (!deps.account || !model.account || (model.account.kind !== "user" && model.account.kind !== "guest")) return;
+      deps.account.storage.removeItem(GUEST_KEY);
+      void net.logout().then(() => set({ ...model, account: GATE_IDLE }));
+    },
   };
 
   const onClick = (e: MouseEvent) => {
@@ -365,6 +426,8 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     if (!el || !root.contains(el) || (el as HTMLButtonElement).disabled || model.starting || model.moving) return;
     const act = actions[el.dataset.action!];
     if (!act) return;
+    // login-first: behind the gate only its own actions, the language and the settings work.
+    if (!pastGate(model.account) && !/^(auth-|settings-|title-lang$|title-settings$|hints-set$|loop-mute$)/.test(el.dataset.action!)) return;
     e.preventDefault();
     deps.sound?.unlock();
     act(el);
@@ -372,6 +435,15 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
   const onInput = (e: Event) => {
     const el = e.target as HTMLInputElement;
     if (el.dataset.input === "settings-email") return setEmailDraft(el.value);
+    // login-first: typing into the gate keeps the draft without a re-render (a status clears).
+    if (el.dataset.input === "auth-email" || el.dataset.input === "auth-password") {
+      if (model.account?.kind !== "gate") return;
+      const key = el.dataset.input === "auth-email" ? "email" : "password";
+      const cleared = model.account.status === "error" ? { status: "idle" as const } : {};
+      model = { ...model, account: gate({ [key]: el.value, ...cleared }) };
+      if (cleared.status) render();
+      return;
+    }
     const q = el.dataset.q as TextQuestion | undefined;
     if (!q || !el.dataset.input?.startsWith("title-")) return;
     const before = { shown: rowsShown(model.answers), ready: canStart(model.answers) };
@@ -397,8 +469,10 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     }
     if (e.key === "Enter" && (e.target as HTMLElement).tagName === "INPUT") {
       e.preventDefault();
-      // Enter in 绑定邮箱 sends the link; it never starts a run.
-      if ((e.target as HTMLElement).dataset.input === "settings-email") actions["settings-email-send"]!((e.target as HTMLElement));
+      // Enter in 绑定邮箱 sends the link; it never starts a run. Enter in the gate submits it.
+      const input = (e.target as HTMLElement).dataset.input;
+      if (input === "settings-email") actions["settings-email-send"]!((e.target as HTMLElement));
+      else if (input === "auth-email" || input === "auth-password") void authSubmit();
       else if (canStart(model.answers)) start();
       else focusOpen();
     }

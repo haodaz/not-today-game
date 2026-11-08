@@ -219,6 +219,8 @@ if (jump !== null) {
   const title = mountTitle(root, {
     save: saved ? { day: saved.day } : null,
     collection,
+    // login-first (author 2026-11-09): register / log in, or 游客, before anything starts.
+    account: { storage: window.localStorage, origin: window.location.origin },
     sound,
     kuroMemory,
     // first-use-hints R2: the same switch as in the game.

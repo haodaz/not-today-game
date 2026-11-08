@@ -177,7 +177,9 @@ describe("the title page (FR1–FR3)", () => {
     expect(card).toContain('aria-labelledby="title-card-h" data-focus="title-login"');
     expect((card.match(/data-action="title-start"/g) ?? []).length).toBe(1);
     const section = card.match(/<section class="title-card[\s\S]*<\/section>/)![0];
-    expect(section.match(/<button/g)!.length).toBe(2); // the 🎲 and 开始
+    expect(section.match(/<button/g)!.length).toBe(3); // the 🎲, 开始 and 返回 (author 2026-11-09: a button here like everywhere)
+    expect(section).toContain('class="title-card-back" data-action="title-back">返回</button>');
+    expect(section).not.toContain("title-esc");
     const back = toMenu(at);
     expect(back).toMatchObject({ screen: "menu", framing: "room", moving: true, monitorsAwake: false });
     expect(page(back)).toContain('class="title-room cam-out"');

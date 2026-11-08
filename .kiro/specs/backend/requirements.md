@@ -26,3 +26,8 @@ Why a backend at all: Kuro's online chat needs an LLM key, and a key can never s
 
 ## FR5. Tests
 - Unit: sync decision table (local newer / cloud newer / same / offline). Edge function: turn counting and bedtime at the sixth call, with a mocked LLM.
+
+## login-first (author, asked many times; built 2026-11-09)
+- The title asks for an account before 新游戏 / 继续: a card 「注册账号」 (small line 保存游戏存档与成就) with email + password, 注册 (default) or 登录 (a switch), and 「游客身份进入」 under it. A stored session skips the card (an email account shows 已登录：email · 退出登录; an anonymous one shows 游客身份 · 改为登录 / 注册); a guest's choice is kept in localStorage `nt_guest` and cleared on login. Offline (no env) there is no card.
+- Net: `net.whoami / register / login / logout` over supabase-js `getSession / signUp / signInWithPassword / signOut`; register returns "confirm" when the project confirms addresses by mail (the card says so and switches to 登录). The old 绑定邮箱 row (magic link) stays in settings for guests.
+- Tests: tests/title-auth.test.ts (the gate, guest memory, login right/wrong, register confirm/instant, validation never calls the backend, stored sessions, logout, offline).

@@ -24,8 +24,27 @@ export interface Answers {
 
 export const NO_ANSWERS: Answers = { login: "", nick: "", bossCalls: "", calledBy: "", pronoun: null };
 
+/**
+ * login-first (author 2026-11-09, asked many times): before 新游戏 / 继续 the player registers or
+ * logs in with email + password, or chooses 游客. `gate` is the card; `user` / `guest` let the
+ * menu through; `offline` (no env) and `checking` (the session being read) show the room only.
+ */
+export type Account =
+  | { readonly kind: "checking" }
+  | { readonly kind: "offline" }
+  | { readonly kind: "guest" }
+  | { readonly kind: "user"; readonly email: string }
+  | { readonly kind: "gate"; readonly mode: "login" | "register"; readonly email: string; readonly password: string; readonly status: "idle" | "busy" | "error" | "confirm" };
+
+export const GATE_IDLE: Account = { kind: "gate", mode: "register", email: "", password: "", status: "idle" };
+
+/** The menu's 新游戏 / 继续 are offered only past the gate. */
+export const pastGate = (a: Account | undefined): boolean => a === undefined || a.kind === "offline" || a.kind === "guest" || a.kind === "user";
+
 export interface TitleModel {
   readonly screen: Screen;
+  /** login-first: absent in pure renders and tests without a backend (the menu as before). */
+  readonly account?: Account;
   /** The saved run, if any: then there is 继续 · 第 N 天 and no 新游戏 (FR2). */
   readonly save: { readonly day: number } | null;
   readonly answers: Answers;

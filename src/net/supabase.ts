@@ -14,6 +14,10 @@ export interface SupabaseLike {
     updateUser(attrs: { email: string }, options?: { emailRedirectTo?: string }): Promise<{ data: unknown; error: unknown }>;
     /** A magic link when there is no session at all. */
     signInWithOtp(params: { email: string; options?: { emailRedirectTo?: string; shouldCreateUser?: boolean } }): Promise<{ data: unknown; error: unknown }>;
+    /** Email + password (login-first, author 2026-11-09): register, log in, log out. */
+    signUp?(params: { email: string; password: string; options?: { emailRedirectTo?: string } }): Promise<{ data: { user: SessionUser | null; session: { user: SessionUser } | null }; error: unknown }>;
+    signInWithPassword?(params: { email: string; password: string }): Promise<{ data: { user: SessionUser | null; session: { user: SessionUser } | null }; error: unknown }>;
+    signOut?(): Promise<{ error: unknown }>;
     /**
      * Auth events (supabase-js 2.x; also from other tabs): USER_UPDATED / SIGNED_IN once the link
      * is opened, so the row can show "bound" at once.
@@ -63,7 +67,7 @@ export function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
 }
 
 /** What the game reads of the session's user. */
-interface SessionUser {
+export interface SessionUser {
   readonly id: string;
   readonly email?: string | null;
   readonly is_anonymous?: boolean;
@@ -138,6 +142,74 @@ export const net = {
   configured: (): boolean => (testClient !== undefined ? testClient !== null : netConfig() !== null),
   /** Signed in (anonymously) this session. */
   signedIn: (): boolean => userId !== null,
+
+  /**
+   * login-first (author 2026-11-09): who the stored session is, without creating one: an account
+   * with an email, a guest (anonymous), or nobody. "offline" without env. Never throws.
+   */
+  async whoami(): Promise<{ kind: "user"; email: string } | { kind: "guest" } | { kind: "none" } | { kind: "offline" }> {
+    try {
+      const c = await client();
+      if (!c) return { kind: "offline" };
+      watchAuth(c);
+      const user = (await c.auth.getSession()).data.session?.user;
+      if (!user) return { kind: "none" };
+      userId = user.id;
+      const email = emailOf(user);
+      setBound(email);
+      return email ? { kind: "user", email } : { kind: "guest" };
+    } catch (e) {
+      console.warn("session read failed; playing offline", e);
+      return { kind: "offline" };
+    }
+  },
+
+  /** 注册 (email + password). "confirm" when the project asks the address to be confirmed first. Never throws. */
+  async register(email: string, password: string, origin: string): Promise<"ok" | "confirm" | "error"> {
+    try {
+      const c = await client();
+      if (!c?.auth.signUp) return "error";
+      watchAuth(c);
+      const r = await c.auth.signUp({ email, password, options: { emailRedirectTo: origin } });
+      if (r.error) return "error";
+      if (!r.data.session) return "confirm";
+      userId = r.data.session.user.id;
+      setBound(emailOf(r.data.session.user));
+      return "ok";
+    } catch (e) {
+      console.warn("register failed", e);
+      return "error";
+    }
+  },
+
+  /** 登录 (email + password). Never throws. */
+  async login(email: string, password: string): Promise<"ok" | "error"> {
+    try {
+      const c = await client();
+      if (!c?.auth.signInWithPassword) return "error";
+      watchAuth(c);
+      const r = await c.auth.signInWithPassword({ email, password });
+      if (r.error || !r.data.session) return "error";
+      userId = r.data.session.user.id;
+      setBound(emailOf(r.data.session.user));
+      return "ok";
+    } catch (e) {
+      console.warn("login failed", e);
+      return "error";
+    }
+  },
+
+  /** 退出登录: the stored session goes; the next visit asks again. Never throws. */
+  async logout(): Promise<void> {
+    try {
+      const c = await client();
+      if (c?.auth.signOut) await c.auth.signOut();
+    } catch (e) {
+      console.warn("sign-out failed", e);
+    }
+    userId = null;
+    setBound(null);
+  },
   /** The email this session's user is bound to, or null (anonymous, offline). */
   boundEmail: (): string | null => boundEmail,
 
