@@ -30,11 +30,17 @@ export interface StoreOptions {
   events?: readonly GameEvent[];
   /** The run's id (from the save, or new). Default: "run-<startDay>", stable for tests and debug jumps. */
   runId?: string;
+  /**
+   * Dev only (`?day=N&seed=…`, 2026-11-09): fields laid over the fresh state before the log is
+   * folded — to stand on day 17 or 18 with the meters, flags and recognised objects a real run would
+   * have, and see which ending the night takes. Never saved; a saved run never carries one.
+   */
+  patch?: Partial<State>;
 }
 
 /** Pure: the whole game state for a start day and a log. Replaying the same log twice is equal. */
-export function computeState(startDay: number, events: readonly GameEvent[]): State {
-  return fold(events, f(startDay));
+export function computeState(startDay: number, events: readonly GameEvent[], patch?: Partial<State>): State {
+  return fold(events, patch ? { ...f(startDay), ...patch } : f(startDay));
 }
 
 function deepFreeze<T>(value: T): T {
@@ -49,7 +55,7 @@ export function createStore(options: StoreOptions = {}): Store {
   const startDay = options.startDay ?? 1;
   const runId = options.runId ?? `run-${startDay}`;
   const events: GameEvent[] = [...(options.events ?? [])];
-  let state = deepFreeze(computeState(startDay, events));
+  let state = deepFreeze(computeState(startDay, events, options.patch));
   const listeners = new Set<Listener>();
 
   return {

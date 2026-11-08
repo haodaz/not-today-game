@@ -15,6 +15,7 @@ import "./world/motion/motion.css";
 import "./ui/fonts.css";
 import "./ui/title/title.css";
 import { debugStartDay } from "@state/clock";
+import type { State } from "@state/types.gen";
 import { deliveryUnitMs } from "@world/loop/waiting";
 import { previewParam, startPreview } from "@world/loop/preview";
 import { splatForGame } from "@world/room/splat";
@@ -170,9 +171,27 @@ function startGame(store: Store, saved: boolean, prologue = false): void {
   }
 }
 
+/** Dev only: the `&seed=` patch (see createStore's `patch`). Unknown keys are ignored; nothing is validated beyond numbers. */
+function debugSeed(raw: string | null): Partial<State> | undefined {
+  if (!raw) return undefined;
+  const out: Record<string, unknown> = {};
+  for (const pair of raw.split(",")) {
+    const [k, v] = pair.split(":");
+    if (!k || v === undefined) continue;
+    if (k === "san" || k === "affinity" || k === "assimilation") out[k] = Number(v);
+    else if (k === "flags") out.flags = v.split("+").filter(Boolean);
+    else if (k === "shook" && v === "1") out.flags = [...((out.flags as string[]) ?? []), "shook_hand"];
+    else if (k === "recognised") out.recognised = v === "all" ? ["chick", "camera", "pager", "iccard", "tape", "dictionary", "calculator", "phone"] : v.split("+").filter(Boolean);
+    else if (k === "found") out.found = v === "all" ? ["chick", "camera", "pager", "iccard", "tape", "dictionary", "calculator", "phone"] : v.split("+").filter(Boolean);
+  }
+  return out as Partial<State>;
+}
+
 const jump = debugStartDay(search);
 if (jump !== null) {
-  const store = createStore({ startDay: jump });
+  // Dev only, beside ?day=N (2026-11-09): `&seed=san:80,affinity:70,assimilation:10,shook:1,recognised:all,flags:a+b`
+  // lays meters, flags and recognised objects over the fresh state (to stand on day 17/18 and see the ending).
+  const store = createStore({ startDay: jump, ...(import.meta.env.DEV ? { patch: debugSeed(params.get("seed")) } : {}) });
   // Dev only, beside ?day=N: `&found=chick,pager` takes those out of the box first (to try them in hand).
   if (import.meta.env.DEV) for (const id of (params.get("found") ?? "").split(",").filter(Boolean)) store.appendEvent({ kind: "openLayer", objectId: id });
   // Dev only, after ?found=: `&upgraded=chick,pager` upgrades those today (to look at the upgraded screens).
