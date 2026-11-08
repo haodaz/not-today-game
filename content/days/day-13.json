@@ -104,14 +104,44 @@
       "text": "看一眼消息。",
       "unlock": "done:boot",
       "done": "event:openApp:msgs",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "左屏长出纹理，墙上有一只手的光斑。借阅审批，升级通知，收老东西。",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "别问为什么借。先走审批。",
+            "where": "screen:msgs:boss"
+          }
+        ]
+      }
     },
     {
       "id": "work",
       "text": "走个借阅审批：别问为什么借。",
       "unlock": "done:msgs",
       "done": "flag:task_d13_work",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "打印机响了一下。纸放在桌上。"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "批了。晚上来拿。"
+          }
+        ],
+        "then": "desk"
+      }
     },
     {
       "id": "lunch",
@@ -119,7 +149,15 @@
       "unlock": "done:msgs",
       "done": "event:order:lunch",
       "required": true,
-      "rewrite": "午饭在路上。"
+      "rewrite": "午饭在路上。",
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "手机放回桌上。"
+          }
+        ]
+      }
     },
     {
       "id": "task1",
@@ -158,14 +196,37 @@
       "text": "吃。",
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
-      "required": false
+      "required": false,
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "小张的头像灰了。饭凉得比平时快。"
+          }
+        ]
+      }
     },
     {
       "id": "reply",
       "text": "回老板。",
       "unlock": "done:task2",
       "done": "event:reply:boss",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "回完了。"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "老东西收一收。点饭。"
+          }
+        ],
+        "then": "desk"
+      }
     },
     {
       "id": "dinner",

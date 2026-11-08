@@ -114,14 +114,44 @@
       "text": "看一眼消息。",
       "unlock": "done:boot",
       "done": "event:openApp:msgs",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "老板问我梦见抽屉了吗。我没跟任何人说过抽屉。下午发布会，演示稿我排。",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "他不知道抽屉。我知道。",
+            "where": "screen:msgs:boss"
+          }
+        ]
+      }
     },
     {
       "id": "work",
       "text": "下午发布会：演示稿你排一下，观众反应实时盯着。",
       "unlock": "done:msgs",
       "done": "flag:task_d15_work",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "演示稿排好了。观众在等。"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "晚上来拿稿。"
+          }
+        ],
+        "then": "desk"
+      }
     },
     {
       "id": "lunch",
@@ -129,7 +159,15 @@
       "unlock": "done:msgs",
       "done": "event:order:lunch",
       "required": true,
-      "rewrite": "午饭在路上。"
+      "rewrite": "午饭在路上。",
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "手机放回桌上。"
+          }
+        ]
+      }
     },
     {
       "id": "task1",
@@ -160,14 +198,37 @@
       "text": "吃。",
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
-      "required": false
+      "required": false,
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "饭是你点的。味道是去年的。"
+          }
+        ]
+      }
     },
     {
       "id": "reply",
       "text": "回老板。",
       "unlock": "done:task1",
       "done": "event:reply:boss",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "回完了。"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "只剩一件活，它做了。点饭。"
+          }
+        ],
+        "then": "desk"
+      }
     },
     {
       "id": "dinner",

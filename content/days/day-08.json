@@ -132,7 +132,23 @@
       "text": "看一眼消息。",
       "unlock": "done:boot",
       "done": "event:openApp:msgs",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "老板只收到两份。另外四份在哪，我也不知道。功能机到了。",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "四份我收好了。先把团建排了。",
+            "where": "screen:msgs:boss"
+          }
+        ]
+      }
     },
     {
       "id": "lunch",
@@ -140,7 +156,15 @@
       "unlock": "done:msgs",
       "done": "event:order:lunch",
       "required": true,
-      "rewrite": "午饭在路上。"
+      "rewrite": "午饭在路上。",
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "手机放回桌上。"
+          }
+        ]
+      }
     },
     {
       "id": "task1",
@@ -179,7 +203,15 @@
       "text": "吃。",
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
-      "required": false
+      "required": false,
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "小票上的时间是 11:47。你是 12:20 点的。"
+          }
+        ]
+      }
     },
     {
       "id": "box",
@@ -193,7 +225,21 @@
       "text": "回老板。",
       "unlock": "done:task2",
       "done": "event:reply:boss",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "回完了。"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "三张图还没交。交完再吃。"
+          }
+        ]
+      }
     },
     {
       "id": "dinner",
@@ -210,7 +256,22 @@
       "unlock": "done:reply",
       "done": "flag:task_d8_3",
       "required": true,
-      "when": "night"
+      "when": "night",
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "发了。群里安静了一会儿。"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "他们在看图。"
+          }
+        ],
+        "then": "desk"
+      }
     },
     {
       "id": "desk",

@@ -132,7 +132,23 @@
       "text": "Glance at the messages.",
       "unlock": "done:boot",
       "done": "event:openApp:msgs",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "Wang got two of them. Where the other four went, I don't know either. The feature phone came.",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "I put the four away. Do the team-building schedule first.",
+            "where": "screen:msgs:boss"
+          }
+        ]
+      }
     },
     {
       "id": "lunch",
@@ -140,7 +156,15 @@
       "unlock": "done:msgs",
       "done": "event:order:lunch",
       "required": true,
-      "rewrite": "Lunch is on its way."
+      "rewrite": "Lunch is on its way.",
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "The phone goes back on the desk."
+          }
+        ]
+      }
     },
     {
       "id": "task1",
@@ -179,7 +203,15 @@
       "text": "Eat.",
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
-      "required": false
+      "required": false,
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "The receipt says 11:47. You ordered at 12:20."
+          }
+        ]
+      }
     },
     {
       "id": "box",
@@ -193,7 +225,21 @@
       "text": "Reply to the boss.",
       "unlock": "done:task2",
       "done": "event:reply:boss",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "Replied."
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "The three pictures aren't in yet. Eat after."
+          }
+        ]
+      }
     },
     {
       "id": "dinner",
@@ -210,7 +256,22 @@
       "unlock": "done:reply",
       "done": "flag:task_d8_3",
       "required": true,
-      "when": "night"
+      "when": "night",
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "Sent. The group went quiet for a while."
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "They're looking at the pictures."
+          }
+        ],
+        "then": "desk"
+      }
     },
     {
       "id": "desk",

@@ -130,7 +130,23 @@
       "text": "看一眼消息。",
       "unlock": "done:boot",
       "done": "event:openApp:msgs",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "Vivi 要「分身」那一页。老周借钱的事，先放着。",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "分身那一页，她要的是「它比你更像你」。",
+            "where": "screen:msgs:boss"
+          }
+        ]
+      }
     },
     {
       "id": "lunch",
@@ -138,7 +154,15 @@
       "unlock": "done:msgs",
       "done": "event:order:lunch",
       "required": true,
-      "rewrite": "午饭在路上。"
+      "rewrite": "午饭在路上。",
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "手机放回桌上。"
+          }
+        ]
+      }
     },
     {
       "id": "task1",
@@ -176,7 +200,15 @@
       "text": "吃。",
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
-      "required": false
+      "required": false,
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "米饭是热的。碗底有一行字，印的，看不清。"
+          }
+        ]
+      }
     },
     {
       "id": "box",
@@ -198,6 +230,15 @@
             "t": "四万四。"
           }
         ]
+      },
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "借不借，他都会记着。"
+          }
+        ]
       }
     },
     {
@@ -205,7 +246,22 @@
       "text": "回老板。",
       "unlock": "done:task2",
       "done": "event:reply:boss",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "回完了。"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "今晚早点睡。磁带明天才能听。"
+          }
+        ],
+        "then": "desk"
+      }
     },
     {
       "id": "dinner",

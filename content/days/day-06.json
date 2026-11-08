@@ -137,7 +137,23 @@
       "text": "看一眼消息。",
       "unlock": "done:boot",
       "done": "event:openApp:msgs",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "老板说了 Good morning。甲方要本体那一页：它比人古老。",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "古老这件事，我不用查。",
+            "where": "screen:msgs:boss"
+          }
+        ]
+      }
     },
     {
       "id": "lunch",
@@ -145,7 +161,15 @@
       "unlock": "done:msgs",
       "done": "event:order:lunch",
       "required": true,
-      "rewrite": "午饭在路上。"
+      "rewrite": "午饭在路上。",
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "手机放回桌上。"
+          }
+        ]
+      }
     },
     {
       "id": "task1",
@@ -183,7 +207,15 @@
       "text": "吃。",
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
-      "required": false
+      "required": false,
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "备注栏写着：不放香菜。这次是你写的。"
+          }
+        ]
+      }
     },
     {
       "id": "box",
@@ -197,7 +229,22 @@
       "text": "回老板。",
       "unlock": "done:task2",
       "done": "event:reply:boss",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "回完了。"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "导出的活今天收尾，收完再点饭。"
+          }
+        ],
+        "then": "desk"
+      }
     },
     {
       "id": "dinner",

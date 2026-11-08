@@ -91,14 +91,44 @@
       "text": "Glance at the messages.",
       "unlock": "done:boot",
       "done": "event:openApp:msgs",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "Nothing is off. Wang reads like day one; go over the agreement again.",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "Too normal. Work first.",
+            "where": "screen:msgs:boss"
+          }
+        ]
+      }
     },
     {
       "id": "work",
       "text": "Proofread Act Two: just fix the typos, don't read too closely.",
       "unlock": "done:msgs",
       "done": "flag:task_d10_work",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "The printer runs once. The page goes on the desk."
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "Someone comes for it tonight."
+          }
+        ],
+        "then": "desk"
+      }
     },
     {
       "id": "lunch",
@@ -106,7 +136,15 @@
       "unlock": "done:msgs",
       "done": "event:order:lunch",
       "required": true,
-      "rewrite": "Lunch is on its way."
+      "rewrite": "Lunch is on its way.",
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "The phone goes back on the desk."
+          }
+        ]
+      }
     },
     {
       "id": "task1",
@@ -144,14 +182,37 @@
       "text": "Eat.",
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
-      "required": false
+      "required": false,
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "The food is hot, it tastes right, everything is right. You eat two more bites."
+          }
+        ]
+      }
     },
     {
       "id": "reply",
       "text": "Reply to the boss.",
       "unlock": "done:task2",
       "done": "event:reply:boss",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "Replied."
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "Order dinner. Nothing will happen today."
+          }
+        ],
+        "then": "desk"
+      }
     },
     {
       "id": "dinner",

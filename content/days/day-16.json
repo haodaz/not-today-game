@@ -90,14 +90,44 @@
       "text": "看一眼消息。",
       "unlock": "done:boot",
       "done": "event:openApp:msgs",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "四家店都打烊了。老板问门锁好了吗。董事长不看材料，听个响。",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "锁是你锁的。响我来出。",
+            "where": "screen:msgs:boss"
+          }
+        ]
+      }
     },
     {
       "id": "work",
       "text": "董事长不看材料，听个响就行。别停。",
       "unlock": "done:msgs",
       "done": "flag:task_d16_work",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "响了。没停。"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "晚上来拿。"
+          }
+        ],
+        "then": "desk"
+      }
     },
     {
       "id": "task1",
@@ -112,7 +142,22 @@
       "text": "回老板。",
       "unlock": "done:task1",
       "done": "event:reply:boss",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "回完了。"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "今晚没有饭。"
+          }
+        ],
+        "then": "desk"
+      }
     },
     {
       "id": "desk",

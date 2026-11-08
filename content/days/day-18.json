@@ -99,7 +99,23 @@
       "text": "看一眼消息。",
       "unlock": "done:boot",
       "done": "event:openApp:msgs",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "老板说今天把箱子寄了吧。寄给谁，他没说。",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "箱子里有单子。",
+            "where": "screen:msgs:boss"
+          }
+        ]
+      }
     },
     {
       "id": "box",
@@ -121,7 +137,22 @@
       "text": "回老板。",
       "unlock": "done:msgs",
       "done": "event:reply:boss",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "回完了。"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "今天过完就好了。"
+          }
+        ],
+        "then": "desk"
+      }
     },
     {
       "id": "desk",

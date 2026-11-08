@@ -109,14 +109,44 @@
       "text": "看一眼消息。",
       "unlock": "done:boot",
       "done": "event:openApp:msgs",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "屏幕上的字大半是白的。老板说我今天真漂亮。每个人都在找我，只能回一个。",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "漂亮是它的词。选一个人回。",
+            "where": "screen:msgs:boss"
+          }
+        ]
+      }
     },
     {
       "id": "work",
       "text": "每个人都在找你：回一下。只能回一个。",
       "unlock": "done:msgs",
       "done": "flag:task_d17_work",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "回了一个。其他的还在找。"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "晚上来拿。"
+          }
+        ],
+        "then": "desk"
+      }
     },
     {
       "id": "task1",
@@ -131,7 +161,22 @@
       "text": "回老板。",
       "unlock": "done:task1",
       "done": "event:reply:boss",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "回完了。"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "东西放回去。"
+          }
+        ],
+        "then": "desk"
+      }
     },
     {
       "id": "desk",

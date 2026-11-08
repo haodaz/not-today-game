@@ -104,14 +104,44 @@
       "text": "看一眼消息。",
       "unlock": "done:boot",
       "done": "event:openApp:msgs",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "老板说今天没什么事，歇一歇。新人入职流程跑一下。",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "十三个月，第一次不勉强。流程你跑。",
+            "where": "screen:msgs:boss"
+          }
+        ]
+      }
     },
     {
       "id": "work",
       "text": "这批新人有点多，入职流程跑一下。",
       "unlock": "done:msgs",
       "done": "flag:task_d14_work",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "打印机响了一下。纸放在桌上。"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "人都进来了。晚上来拿名单。"
+          }
+        ],
+        "then": "desk"
+      }
     },
     {
       "id": "lunch",
@@ -119,7 +149,15 @@
       "unlock": "done:msgs",
       "done": "event:order:lunch",
       "required": true,
-      "rewrite": "午饭在路上。"
+      "rewrite": "午饭在路上。",
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "手机放回桌上。"
+          }
+        ]
+      }
     },
     {
       "id": "task1",
@@ -150,14 +188,37 @@
       "text": "吃。",
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
-      "required": false
+      "required": false,
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "今天的饭很好吃。你说不出哪里好。"
+          }
+        ]
+      }
     },
     {
       "id": "reply",
       "text": "回老板。",
       "unlock": "done:task1",
       "done": "event:reply:boss",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "回完了。"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "今天真的没事。点饭。"
+          }
+        ],
+        "then": "desk"
+      }
     },
     {
       "id": "dinner",

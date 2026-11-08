@@ -162,7 +162,23 @@
       "text": "看一眼消息。",
       "unlock": "done:boot",
       "done": "event:openApp:msgs",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "更新日志只有一条横线。老王要「意识」，证据、对手、一句话，四格。",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "他不知道这个词有多重。你照格子填。",
+            "where": "screen:msgs:boss"
+          }
+        ]
+      }
     },
     {
       "id": "lunch",
@@ -170,7 +186,15 @@
       "unlock": "done:msgs",
       "done": "event:order:lunch",
       "required": true,
-      "rewrite": "午饭在路上。"
+      "rewrite": "午饭在路上。",
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "手机放回桌上。"
+          }
+        ]
+      }
     },
     {
       "id": "task1",
@@ -208,7 +232,15 @@
       "text": "吃。",
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
-      "required": false
+      "required": false,
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "外卖袋里有两双筷子。你一个人。"
+          }
+        ]
+      }
     },
     {
       "id": "box",
@@ -222,7 +254,22 @@
       "text": "回老板。",
       "unlock": "done:task2",
       "done": "event:reply:boss",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "回完了。"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "晚饭还没点。"
+          }
+        ],
+        "then": "desk"
+      }
     },
     {
       "id": "dinner",

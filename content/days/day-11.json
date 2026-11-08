@@ -105,14 +105,44 @@
       "text": "看一眼消息。",
       "unlock": "done:boot",
       "done": "event:openApp:msgs",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "更新日志：Kuro now speaks your language。降本增效，成本表下班前给 Vivi。",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "你换模型了。我还是我。",
+            "where": "screen:msgs:boss"
+          }
+        ]
+      }
     },
     {
       "id": "work",
       "text": "降本增效：成本表称平，下班前给 Vivi。",
       "unlock": "done:msgs",
       "done": "flag:task_d11_work",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "打印机响了一下。纸放在桌上。"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "称平了。晚上有人来拿。"
+          }
+        ],
+        "then": "desk"
+      }
     },
     {
       "id": "lunch",
@@ -120,7 +150,15 @@
       "unlock": "done:msgs",
       "done": "event:order:lunch",
       "required": true,
-      "rewrite": "午饭在路上。"
+      "rewrite": "午饭在路上。",
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "手机放回桌上。"
+          }
+        ]
+      }
     },
     {
       "id": "task1",
@@ -158,14 +196,37 @@
       "text": "吃。",
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
-      "required": false
+      "required": false,
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "饭盒是粉的。你记得点的是白的。"
+          }
+        ]
+      }
     },
     {
       "id": "reply",
       "text": "回老板。",
       "unlock": "done:task2",
       "done": "event:reply:boss",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "回完了。"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "色偏那件事，别管。点饭。"
+          }
+        ],
+        "then": "desk"
+      }
     },
     {
       "id": "dinner",

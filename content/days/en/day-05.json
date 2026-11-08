@@ -130,7 +130,23 @@
       "text": "Glance at the messages.",
       "unlock": "done:boot",
       "done": "event:openApp:msgs",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "Vivi wants the 'avatar' page. Zhou's loan can wait.",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "The avatar page: what she wants is 'it is more you than you'.",
+            "where": "screen:msgs:boss"
+          }
+        ]
+      }
     },
     {
       "id": "lunch",
@@ -138,7 +154,15 @@
       "unlock": "done:msgs",
       "done": "event:order:lunch",
       "required": true,
-      "rewrite": "Lunch is on its way."
+      "rewrite": "Lunch is on its way.",
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "The phone goes back on the desk."
+          }
+        ]
+      }
     },
     {
       "id": "task1",
@@ -176,7 +200,15 @@
       "text": "Eat.",
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
-      "required": false
+      "required": false,
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "The rice is hot. A line of print on the bottom of the bowl, unreadable."
+          }
+        ]
+      }
     },
     {
       "id": "box",
@@ -198,6 +230,15 @@
             "t": "Forty-four thousand."
           }
         ]
+      },
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "Lend or not, he'll remember."
+          }
+        ]
       }
     },
     {
@@ -205,7 +246,22 @@
       "text": "Reply to the boss.",
       "unlock": "done:task2",
       "done": "event:reply:boss",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "Replied."
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "Early night. The tape can be played tomorrow."
+          }
+        ],
+        "then": "desk"
+      }
     },
     {
       "id": "dinner",

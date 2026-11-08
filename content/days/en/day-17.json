@@ -109,14 +109,44 @@
       "text": "Glance at the messages.",
       "unlock": "done:boot",
       "done": "event:openApp:msgs",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "Most of the words on screen are white. Wang says I look lovely today. Everyone is looking for me; I can answer one.",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "'Lovely' is its word. Pick one to answer.",
+            "where": "screen:msgs:boss"
+          }
+        ]
+      }
     },
     {
       "id": "work",
       "text": "Everyone is looking for you: reply. You can only reply to one.",
       "unlock": "done:msgs",
       "done": "flag:task_d17_work",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "Answered one. The others are still looking."
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "Collected tonight."
+          }
+        ],
+        "then": "desk"
+      }
     },
     {
       "id": "task1",
@@ -131,7 +161,22 @@
       "text": "Reply to the boss.",
       "unlock": "done:task1",
       "done": "event:reply:boss",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "Replied."
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "Put the things back."
+          }
+        ],
+        "then": "desk"
+      }
     },
     {
       "id": "desk",

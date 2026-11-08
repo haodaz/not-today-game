@@ -99,7 +99,23 @@
       "text": "Glance at the messages.",
       "unlock": "done:boot",
       "done": "event:openApp:msgs",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "Wang says send the box today. To whom, he didn't say.",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "There's a slip in the box.",
+            "where": "screen:msgs:boss"
+          }
+        ]
+      }
     },
     {
       "id": "box",
@@ -121,7 +137,22 @@
       "text": "Reply to the boss.",
       "unlock": "done:msgs",
       "done": "event:reply:boss",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "Replied."
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "Just get through today."
+          }
+        ],
+        "then": "desk"
+      }
     },
     {
       "id": "desk",
