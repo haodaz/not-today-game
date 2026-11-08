@@ -92,7 +92,7 @@
       "say": [
         {
           "k": "narration",
-          "t": "The light goes out, or rather, you turn the screen off. The room sinks all at once."
+          "t": "You turn the screen off. The room goes dark all at once."
         }
       ]
     },
@@ -100,7 +100,7 @@
       "say": [
         {
           "k": "narration",
-          "t": "There is a point of light in that dark. Not the chick's screen; the chick is lower down."
+          "t": "There is a point of light in the dark. Not the chick's screen; the chick is lower down."
         },
         {
           "k": "narration",
@@ -120,7 +120,7 @@
         },
         {
           "k": "narration",
-          "t": "The tail end of summer; the fan chops the light into bright and dark. First week of school, second lesson, test papers handed back.",
+          "t": "Summer is nearly over; the fan turns, the light flickers bright and dark. First week of school, second lesson, test papers handed back.",
           "backdrop": "/room/dream/classroom.jpg"
         },
         {
@@ -182,7 +182,7 @@
         },
         {
           "k": "narration",
-          "t": "On the last day of term she handed it back with your report card. The report first: a hundred. Then it, its screen already the grave.",
+          "t": "On the last day of term she handed it back with your report card. The report first: a hundred. Then it, a small grave on its screen.",
           "prop": "/room/props/exam_100.png",
           "backdrop": "/room/dream/classroom.jpg"
         },

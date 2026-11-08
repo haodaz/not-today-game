@@ -2060,11 +2060,11 @@ export const KURO_CONTENT: KuroContent = {
         {
           "unlock": 1106,
           "low": "The shop ran out of white.",
-          "mid": "The order says white. The box is pink. The lamp has been pink since Monday. Things are matching each other in here; nobody asked them to match you.",
+          "mid": "The order says white. The box is pink. So is the lamp today. Things are matching each other in here; nobody asked them to match you.",
           "high": "Pink is the colour of the thing in the gap, the night it first showed. You counted to seven. The room has been counting with you, and it has caught up.",
           "zh": {
             "low": "店里白的卖完了。",
-            "mid": "订单上是白的。盒子是粉的。台灯从周一起就是粉的。这屋里的东西在互相配色；没人让它们配你。",
+            "mid": "订单上是白的。盒子是粉的。今天台灯也是粉的。这屋里的东西在互相配色；没人让它们配你。",
             "high": "粉，是缝里那个东西第一次亮的那夜的颜色。你数到七。屋子一直陪你数，现在它追上了。"
           }
         },

@@ -5,7 +5,7 @@
       "say": [
         {
           "k": "narration",
-          "t": "The lamplight is yellow. Yesterday it went pink; today it's yellow, as yellow as on day 1."
+          "t": "The lamplight is yellow, as yellow as on the first day."
         },
         {
           "k": "narration",
@@ -35,7 +35,7 @@
         },
         {
           "k": "inner",
-          "t": "Nothing happened all day. That's why it's today."
+          "t": "Nothing happened all day. That is why it comes tonight."
         }
       ],
       "choices": [
