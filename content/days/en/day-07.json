@@ -158,7 +158,13 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "Wang called me in the group, a title after my name. Four jobs: the plan, the script, six copies, the minutes.",
+            "t": "It's a morning meeting now, nine o'clock, Zhou runs it. Their two advisors sit in. Four jobs.",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "Before investors come in it's always like this: process first.",
             "where": "screen:msgs:boss"
           },
           {

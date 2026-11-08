@@ -97,7 +97,13 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "Nothing is off. Wang reads like day one; go over the agreement again.",
+            "t": "She's here, from their side. I check act two of the script and go over the agreement again; Wang needs it this afternoon.",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "A guest in the house; everyone's normal.",
             "where": "screen:msgs:boss"
           },
           {

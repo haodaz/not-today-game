@@ -110,7 +110,13 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "Wang says nothing much today, rest a little. Run the onboarding for the new hires.",
+            "t": "Wang says nothing today. They brought a batch of new hires; I run the onboarding.",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "We're scaling; of course there are people.",
             "where": "screen:msgs:boss"
           },
           {

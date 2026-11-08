@@ -120,7 +120,13 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "Wang asks if I dreamed of the drawer. I never told anyone about the drawer. The launch is this afternoon; I set the demo.",
+            "t": "Wang asks if I dreamed of the drawer. I never told anyone about the drawer. Launch this afternoon, all of their people there; I set the demo.",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "It's always a rush before a launch.",
             "where": "screen:msgs:boss"
           },
           {

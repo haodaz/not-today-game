@@ -96,7 +96,7 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "All four shops are closed. Wang asks if the door is locked. The chairman doesn't read; he wants a sound.",
+            "t": "All four shops are closed. Their chairman is here; he doesn't read, he wants a sound.",
             "where": "screen:msgs:boss"
           },
           {

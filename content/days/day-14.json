@@ -110,7 +110,13 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "老板说今天没什么事，歇一歇。新人入职流程跑一下。",
+            "t": "老板说今天没事。那边带来一批新人，入职流程我跑。",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "要扩张，人多正常。",
             "where": "screen:msgs:boss"
           },
           {

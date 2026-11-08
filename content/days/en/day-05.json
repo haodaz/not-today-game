@@ -136,7 +136,13 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "Vivi wants the 'avatar' page. Zhou's loan can wait.",
+            "t": "Page two, the avatar. Vivi leads, I write. Zhou's loan can wait.",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "Whatever the investors want, we write.",
             "where": "screen:msgs:boss"
           },
           {

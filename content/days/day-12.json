@@ -106,13 +106,19 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "对账全部一致，1+1=3 标的绿的。老板的语音停顿不对。",
+            "t": "账全对。那边说这周关键，值班表我排，谁都不睡。",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "关键周，都这样。",
             "where": "screen:msgs:boss"
           },
           {
             "k": "speaker",
             "who": "kuro",
-            "t": "停顿是我的。值班表你排。",
+            "t": "停顿是我的。表你排。",
             "where": "screen:msgs:boss"
           }
         ]

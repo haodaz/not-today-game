@@ -136,13 +136,19 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "Vivi 要「分身」那一页。老周借钱的事，先放着。",
+            "t": "第二页，分身。Vivi 牵头，我写。老周借钱的事先放着。",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "投资人要什么，写什么。",
             "where": "screen:msgs:boss"
           },
           {
             "k": "speaker",
             "who": "kuro",
-            "t": "分身那一页，她要的是「它比你更像你」。",
+            "t": "分身那一页，她要的是『它比你更像你』。",
             "where": "screen:msgs:boss"
           }
         ]
