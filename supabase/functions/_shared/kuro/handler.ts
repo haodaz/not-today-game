@@ -3,9 +3,9 @@
 // index.ts only wires real dependencies to this.
 import { buildSystem, citableIds, JUDGE_ASK, localeOf } from "./prompt.ts";
 import { DEFAULT_MODEL, judgeRequest, readJudgement, readReply, turnRequest, type MessageRequest, type MessageResponse } from "./llm.ts";
-import { appendExchange, appendLayered, clipSummary, decideTurn } from "./turns.ts";
+import { appendExchange, appendLayered, clipSummary, decideTurn, withLogChats } from "./turns.ts";
 import type { ChatResponse, Judgement, KuroContent, LogEvent, Memory, StoredJudgement } from "./types.ts";
-import { affinityFrom, composeReply, enforceLocked, variableLayer } from "./variable.ts";
+import { affinityFrom, askedFrom, composeReply, enforceLocked, variableLayer } from "./variable.ts";
 
 export interface HandlerDeps {
   readonly content: KuroContent;
@@ -42,8 +42,10 @@ export async function handle(body: unknown, deps: HandlerDeps): Promise<HandlerR
   if (!runId || !Number.isInteger(day) || day < 1) return { status: 400, body: { error: "bad request" } };
   try {
     if (!(await deps.runVisible(runId))) return { status: 404, body: { error: "no such run" } };
-    const memory = await deps.loadMemory(runId);
     const events = eventsOf(body.events);
+    // The client answers the starters itself (the deterministic core, 2026-11-09): the log's chat
+    // events complete the memory, so the count and the model's recall cover the whole day.
+    const memory = withLogChats(await deps.loadMemory(runId), events, day);
     const model = deps.model || DEFAULT_MODEL;
     const locale = localeOf(body.locale);
 
@@ -58,7 +60,7 @@ export async function handle(body: unknown, deps: HandlerDeps): Promise<HandlerR
       const q = Number.isInteger(body.q) && (body.q as number) >= 1 ? (body.q as number) : null;
       const rows = deps.loadJudgements ? await deps.loadJudgements(runId) : [];
       const affinity = deps.content.affinity ? affinityFrom(rows, deps.content.affinity) : 0;
-      const layer = variableLayer({ content: deps.content, day, locale, runId, memory, affinity, q, said });
+      const layer = variableLayer({ content: deps.content, day, locale, runId, memory, affinity, q, said, asked: askedFrom(events) });
       if (layer.outcome === "failure") {
         // 大失败: the reply is forgotten (the model is not asked); the turn is spent; the judgement may cite the asking.
         await deps.saveMemory(runId, appendLayered(memory, day, said, null, "flicker"));

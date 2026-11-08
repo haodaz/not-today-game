@@ -2,7 +2,7 @@
 // content/kuro-days/day-NN.md (Claude's): the day's idiom (a constant, never generated) and the
 // starter questions. Read as text, parsed strictly, never rewritten.
 import { parseVariableParts, sameSet, sectionLines } from "@kuro/dayfile.ts";
-import type { Bucket } from "@kuro/types.ts";
+import type { Bucket, LayeredAnswer, LockedLine } from "@kuro/types.ts";
 import { contentLocale } from "@state/content-locale";
 
 export interface StarterQuestion {
@@ -12,6 +12,8 @@ export interface StarterQuestion {
   readonly hard: boolean;
   /** The lowest bucket the question is shown to (kuro-chat 2026-11-02); low unless content says. */
   readonly minBucket: Bucket;
+  /** A follow-up (2026-11-09): in the pool only after question `q` was asked today (`day` null) or on day `day`. */
+  readonly after?: { readonly day: number | null; readonly q: number };
 }
 
 /** The constant answers used when there is no model (dialogue spec): by question, and to free text. */
@@ -29,6 +31,9 @@ export interface KuroDay {
   readonly answers: OfflineAnswers;
   /** Every quoted line of `## Red-blue lines`, whatever unlocks it (kuro-zh-answers R4: the uncanny ones). */
   readonly redBlue: readonly string[];
+  /** The deterministic core (2026-11-09): the red-blue lines by starter, and the three-tier answers (zh twin inside). */
+  readonly locked: readonly LockedLine[];
+  readonly layered: readonly LayeredAnswer[];
 }
 
 /** `## Red-blue lines`: the quoted text of each `- … → "…"` line (`- none` and prose skipped). */
@@ -96,12 +101,12 @@ export function parseKuroDay(text: string, label: string): KuroDay {
   if (!idiom) throw new Error(`content/kuro-days ${label}: no idiom line`);
 
   // The starters (with minBucket), red-blue and layered parts: the same parser as the function's bundle.
-  const { starters } = parseVariableParts(text, label);
+  const { starters, locked, layered } = parseVariableParts(text, label);
   const answers = parseAnswers(text, label);
   for (const n of answers.q.keys()) {
     if (!starters.some((s) => s.n === n)) throw new Error(`content/kuro-days ${label}: an offline answer to q${n}, which is not a starter`);
   }
-  return Object.freeze({ day: Number(dayMatch[1]), idiom, starters: Object.freeze(starters), answers, redBlue: Object.freeze(parseRedBlue(text)) });
+  return Object.freeze({ day: Number(dayMatch[1]), idiom, starters: Object.freeze(starters), answers, redBlue: Object.freeze(parseRedBlue(text)), locked: Object.freeze(locked), layered: Object.freeze(layered) });
 }
 
 const files = import.meta.glob("../../../../content/kuro-days/day-*.md", { eager: true, query: "?raw", import: "default" });

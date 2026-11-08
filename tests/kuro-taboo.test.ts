@@ -1,14 +1,15 @@
 // kuro-chat taboo addition 2026-11-02, client side, with a mocked function: each of the four
 // consequences from a reply with the field; the flicker leaves no history and no memory turn but
 // spends the turn; one taboo per day; no taboo without the field. Also: the starters the bucket
-// allows, and the starter's number sent with the turn.
+// allows. Since the deterministic core (2026-11-09) a starter never reaches the function, so the
+// mocked replies here come through typed text; the core's own dice are in kuro-core.test.ts.
 import { afterEach, describe, expect, it } from "vitest";
 import type { Taboo } from "@kuro/types.ts";
 import { createStore, type Store } from "@state/store";
 import { constants } from "@state/variables";
 import type { BeatClock } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
-import { kuroDay, parseKuroDay } from "@world/desktop/kuro/days";
+import { kuroDay, offlineAnswer, parseKuroDay } from "@world/desktop/kuro/days";
 import { initialSession } from "@world/desktop/model";
 import { dialogueBox } from "@world/dialogue/box";
 import { historyEntries } from "@world/dialogue/history";
@@ -55,21 +56,35 @@ function mock(taboo: Taboo | null | undefined, reply = REPLY) {
   setKuroOnlineForTests(online);
   return bodies;
 }
-async function askOnce(day: number, taboo: Taboo | null | undefined, q = "1") {
+const TYPED = "随便问一句。";
+/** Types `text` and sends it (the model's channel). */
+function typeOnce(ctx: ActionContext, text = TYPED) {
+  act(ctx, "kuro-more");
+  ctx.session.kuroDraft = text;
+  act(ctx, "kuro-send");
+}
+async function askOnce(day: number, taboo: Taboo | null | undefined, text = TYPED) {
   const bodies = mock(taboo);
   const store = storeAt(day);
   const h = ctxOf(store);
   talk(h.ctx);
-  act(h.ctx, "kuro-q", { q });
+  typeOnce(h.ctx, text);
   await flush();
   return { store, bodies, ...h };
 }
 const chats = (store: Store) => store.getEvents().filter((e) => e.kind === "chat");
 
-describe("the turn carries the starter's number", () => {
-  it("a picked starter sends q; typed text does not", async () => {
-    const { bodies } = await askOnce(3, null);
-    expect(bodies[0]).toMatchObject({ q: 1 });
+describe("what reaches the function (the deterministic core, 2026-11-09)", () => {
+  it("typed text is sent, without a q; a picked starter never calls the function", async () => {
+    const { bodies, store, ctx } = await askOnce(3, null);
+    expect(bodies).toHaveLength(1);
+    expect(bodies[0]).toMatchObject({ said: TYPED, day: 3 });
+    expect(bodies[0]).not.toHaveProperty("q");
+    act(ctx, "loop-advance");
+    act(ctx, "kuro-q", { q: "2" });
+    await flush();
+    expect(bodies).toHaveLength(1);
+    expect(chats(store).map((e) => e.q)).toEqual([undefined, 2]);
   });
 });
 
@@ -111,8 +126,8 @@ describe("the four consequences", () => {
 
   it("flicker: one white frame; no reply shown, no history, no memory; the turn is spent", async () => {
     const { store, ctx, now } = await askOnce(3, "flicker");
-    const said = kuroDay(3)!.starters[0]!.zh;
-    expect(chats(store)).toEqual([expect.objectContaining({ kind: "chat", q: 1, forgotten: true, taboo: "flicker", answer: "" })]);
+    const said = TYPED;
+    expect(chats(store)).toEqual([expect.objectContaining({ kind: "chat", text: TYPED, forgotten: true, taboo: "flicker", answer: "" })]);
     expect(store.getState().chatTurnsToday).toBe(1);
     expect(store.getState().chatMemory.recent).toEqual([]);
     expect(box(ctx)).not.toContain(REPLY);
@@ -151,23 +166,25 @@ describe("the four consequences", () => {
     const store = storeAt(3);
     const { ctx } = ctxOf(store);
     talk(ctx);
-    act(ctx, "kuro-q", { q: "1" });
+    typeOnce(ctx, "一。");
     await flush();
     expect(bodiesFirst).toHaveLength(1);
     mock("blood");
     const san = store.getState().san;
-    act(ctx, "kuro-q", { q: "2" });
+    act(ctx, "loop-advance");
+    typeOnce(ctx, "二。");
     await flush();
     expect(chats(store).map((e) => e.taboo)).toEqual(["blur", undefined]);
     expect(store.getState().san).toBe(san);
   });
 
-  it("an offline answer never carries a taboo", async () => {
+  it("a written answer never carries a taboo: offline, typed text gets the day's free line, plain", async () => {
     setKuroOnlineForTests(undefined);
     const store = storeAt(3);
     const { ctx } = ctxOf(store);
     talk(ctx);
-    act(ctx, "kuro-q", { q: "1" });
+    typeOnce(ctx);
+    expect(chats(store)[0]).toMatchObject({ text: TYPED, answer: offlineAnswer(kuroDay(3)!, null), offline: true });
     expect(chats(store)[0]!.taboo).toBeUndefined();
   });
 });

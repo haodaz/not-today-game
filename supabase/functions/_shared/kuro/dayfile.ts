@@ -41,13 +41,24 @@ export function parseStarters(text: string, label: string): StarterContent[] {
   for (const raw of lines) {
     const cells = /^\|\s*(\d+)\s*\|(.*)\|\s*$/.exec(raw.trim());
     if (!cells) continue;
-    const [zh = "", en = "", hard = "", min = ""] = cells[2]!.split("|").map((c) => c.trim());
+    const [zh = "", en = "", hard = "", min = "", after = ""] = cells[2]!.split("|").map((c) => c.trim());
     if (!zh) fail(label, `starter ${cells[1]} has no zh text`);
     const m = /^(?:minBucket:\s*)?(low|mid|high)?$/.exec(min);
     if (!m) fail(label, `starter ${cells[1]}: minBucket must be low, mid or high, got "${min}"`);
-    out.push({ n: Number(cells[1]), zh, en, hard: hard.toLowerCase() === "yes", minBucket: (m[1] as Bucket | undefined) ?? "low" });
+    // The sixth cell (2026-11-09): `after: q2` / `q2` (asked today) or `after: d3.q2` / `d3.q2` (asked on day 3).
+    const a = /^(?:after:\s*)?(?:d(\d+)\.)?q(\d+)$/.exec(after);
+    if (after && !a) fail(label, `starter ${cells[1]}: after must be qN or dD.qN, got "${after}"`);
+    out.push({
+      n: Number(cells[1]),
+      zh,
+      en,
+      hard: hard.toLowerCase() === "yes",
+      minBucket: (m[1] as Bucket | undefined) ?? "low",
+      ...(a ? { after: { day: a[1] !== undefined ? Number(a[1]) : null, q: Number(a[2]) } } : {}),
+    });
   }
   if (!out.length) fail(label, "no starter questions");
+  for (const s of out) if (s.after && s.after.day === null && !out.some((o) => o.n === s.after!.q && o.n !== s.n)) fail(label, `starter ${s.n}: after q${s.after.q}, which is not another starter of the day`);
   return out;
 }
 

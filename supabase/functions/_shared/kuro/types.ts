@@ -40,6 +40,18 @@ export interface StarterContent {
   readonly en: string;
   readonly hard: boolean;
   readonly minBucket: Bucket;
+  /**
+   * A follow-up (author 2026-11-09): in the pool only after question `q` was asked — today when
+   * `day` is null (`after: q2`), else on that day (`after: d3.q2`). One asked on the last turn of
+   * a day waits for tomorrow's pool.
+   */
+  readonly after?: { readonly day: number | null; readonly q: number };
+}
+
+/** A question the player asked: the day and the starter's number. */
+export interface Asked {
+  readonly day: number;
+  readonly q: number;
 }
 
 /** A red-blue line: said verbatim when its starter is asked. */

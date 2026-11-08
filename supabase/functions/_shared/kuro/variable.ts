@@ -7,7 +7,7 @@
 //   scores — the affinity bucket, folded from the stored judgements as the ending folds them.
 // Randomness lives here, never in the model; the model never sees the seed, the roll or the word.
 // Pure. Imports carry `.ts` (Deno).
-import type { Bucket, KuroContent, KuroDayContent, LayeredAnswer, Memory, StarterContent, StoredJudgement, Taboo, ChatLocale } from "./types.ts";
+import type { Asked, Bucket, KuroContent, KuroDayContent, LayeredAnswer, Memory, StarterContent, StoredJudgement, Taboo, ChatLocale } from "./types.ts";
 
 // ——— scores: the bucket ———
 
@@ -121,13 +121,29 @@ export function glyphWord(runId: string, day: number, q: number): string {
 const norm = (s: string): string => s.toLowerCase().replace(/[\s\p{P}\p{S}]/gu, "");
 
 /**
- * The starter this turn asks, if it is open to the bucket: the client's `q`, else a typed line
- * that is a starter's text in either language. A closed starter unlocks nothing.
+ * Whether the pool shows this starter: open to the bucket and, for a follow-up (`after`), its
+ * question already asked — today (`day` null) or on the day it names (author 2026-11-09).
  */
-export function openStarter(d: KuroDayContent | undefined, bucket: Bucket, q: number | null, said: string): StarterContent | null {
+export function starterOpen(s: StarterContent, bucket: Bucket, asked: readonly Asked[], today: number): boolean {
+  if (!bucketAllows(s.minBucket, bucket)) return false;
+  if (!s.after) return true;
+  const onDay = s.after.day ?? today;
+  return asked.some((a) => a.q === s.after!.q && a.day === onDay);
+}
+
+/** The questions asked so far, from the log's chat events (any day). */
+export function askedFrom(events: readonly { readonly kind: string; readonly day: number; readonly q?: unknown }[]): Asked[] {
+  return events.flatMap((e) => (e.kind === "chat" && typeof e.q === "number" ? [{ day: e.day, q: e.q }] : []));
+}
+
+/**
+ * The starter this turn asks, if it is open: the client's `q`, else a typed line that is a
+ * starter's text in either language. A closed starter unlocks nothing.
+ */
+export function openStarter(d: KuroDayContent | undefined, bucket: Bucket, q: number | null, said: string, asked: readonly Asked[] = [], today = d?.day ?? 0): StarterContent | null {
   const starters = d?.starters ?? [];
-  const asked = q !== null ? starters.find((s) => s.n === q) : starters.find((s) => norm(s.zh) === norm(said) || (s.en !== "" && norm(s.en) === norm(said)));
-  return asked && bucketAllows(asked.minBucket, bucket) ? asked : null;
+  const s = q !== null ? starters.find((x) => x.n === q) : starters.find((x) => norm(x.zh) === norm(said) || (x.en !== "" && norm(x.en) === norm(said)));
+  return s && starterOpen(s, bucket, asked, today) ? s : null;
 }
 
 export interface Locked {
@@ -168,6 +184,8 @@ export interface LayerInput {
   /** The starter number the client sent, if the player picked one. */
   readonly q: number | null;
   readonly said: string;
+  /** The questions asked so far (`askedFrom(events)`): a follow-up unlocks only after its question. */
+  readonly asked?: readonly Asked[];
 }
 
 export interface Layer {
@@ -190,7 +208,7 @@ export function variableLayer(i: LayerInput): Layer {
   const bucket = bucketOf(i.affinity, i.content.affinity?.threshold ?? DEFAULT_THRESHOLD);
   const dayDice = dice(i.runId, i.day);
   const d = i.content.days[String(i.day)];
-  const starter = openStarter(d, bucket, i.q, i.said);
+  const starter = openStarter(d, bucket, i.q, i.said, i.asked ?? [], i.day);
   const locked = starter ? lockedFor(d, starter.n, bucket, i.locale) : null;
   const none = { bucket, dice: dayDice, locked, roll: null, outcome: null, taboo: null, glyph: null, followup: null };
   if (!locked || !locked.layered) return none;

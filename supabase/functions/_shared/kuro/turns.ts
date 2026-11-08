@@ -1,6 +1,6 @@
 // Turn counting, server side (backend FR3): five player turns per run per day; the sixth call
 // gets the constant bedtime line and turnsLeft 0, and the model is not called. Pure.
-import type { Memory, MemoryTurn, Taboo } from "./types.ts";
+import type { LogEvent, Memory, MemoryTurn, Taboo } from "./types.ts";
 
 /** How many player turns `day` already has. */
 export function playerTurnsOn(turns: readonly MemoryTurn[], day: number): number {
@@ -38,3 +38,28 @@ export function appendLayered(m: Memory, day: number, said: string, remembered: 
 /** The summary is at most 600 characters (kuro-chat FR2). */
 export const SUMMARY_MAX = 600;
 export const clipSummary = (s: string): string => [...s.trim()].slice(0, SUMMARY_MAX).join("");
+
+/**
+ * The deterministic core (author 2026-11-09): starters are answered on the client and never reach
+ * the function, so the memory is completed from the run's log before a turn: every `chat` event
+ * of this day (or earlier) whose words are not in memory yet becomes an exchange — the player's
+ * line, then what Kuro said (nothing when it was forgotten). The count of turns and the model's
+ * memory then both see the whole day. Pure; the log's order is kept.
+ */
+export function withLogChats(m: Memory, events: readonly LogEvent[], day: number, keep = MEMORY_KEEP): Memory {
+  const have = new Set(m.turns.filter((t) => t.who === "player").map((t) => `${t.day}\u0000${t.text}`));
+  const added: MemoryTurn[] = [];
+  for (const e of events) {
+    if (e.kind !== "chat" || e.day > day || typeof e.said !== "string" || !e.said.trim()) continue;
+    const key = `${e.day}\u0000${e.said}`;
+    if (have.has(key)) continue;
+    have.add(key);
+    const taboo = typeof e.taboo === "string" ? (e.taboo as Taboo) : null;
+    const forgotten = e.forgotten === true || typeof e.answer !== "string";
+    added.push({ day: e.day, who: "player", text: e.said, ...(forgotten ? { forgotten: true as const } : {}), ...(taboo ? { taboo } : {}) });
+    if (!forgotten) added.push({ day: e.day, who: "kuro", text: e.answer as string, ...(e.offline === true ? { offline: true } : {}) });
+  }
+  if (added.length === 0) return m;
+  const turns = [...m.turns, ...added].sort((a, b) => a.day - b.day);
+  return { summary: m.summary, turns: turns.slice(-keep) };
+}

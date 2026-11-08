@@ -1,7 +1,9 @@
 // Talking to Kuro is an NPC conversation (dialogue FR2). Its body (or the desktop pill) queues the
 // conversation in the box: the upgrade offer if there is one, then 要和克总聊聊吗？. 聊聊 brings the
 // day's idiom and the player's box (starter questions, 说点别的…; Esc leaves); each turn appends a `chat`
-// event and Kuro answers with its constant offline answer. Five turns a day; a sixth attempt gets
+// event and Kuro answers: a starter from the deterministic core (core.ts: the bucket's locked line,
+// the seeded d100, the taboo), else its written answer; typed text by the model when online, else
+// the day's free line. Five turns a day; a sixth attempt gets
 // the bedtime line and the player's box does not come back that day. During work beats it says the
 // idiom and the player can only say 好。. While today's chat is still locked (playtest-1105 R6) a
 // click is only kuro.room.notYet. Every line here is content or a string.
@@ -28,9 +30,12 @@ import { stageOf } from "@state/stages";
 import { pointed } from "@world/room/pointer";
 import { fontPx, KURO_LINE_BOX, nextScreen, PLAYER_BOX, screens, type BoxGeom, type Screen } from "./layout";
 import { kuroVoice } from "@world/desktop/kuro/voice";
-import { bucketAllows, bucketOf } from "@kuro/variable.ts";
+import { askedFrom, bucketOf, starterOpen } from "@kuro/variable.ts";
 import type { Bucket, Taboo } from "@kuro/types.ts";
 import { BLUR_MS, chatClosedByErrors, errorCount, ERRORS_AFTER_MS, FLASH_MS, tabooUsedToday } from "./taboo";
+import { coreAnswer } from "./core";
+import { repeatAnswer } from "@kuro/repeat.ts";
+import { repeatEntries } from "@world/desktop/kuro/repeat";
 
 /** Kuro's opinion of the player now (never shown): the state's affinity, as the ending reads it. */
 export const bucketNow = (state: State): Bucket => bucketOf(state.affinity, constants.affinityThreshold as number);
@@ -184,32 +189,51 @@ function turn(ctx: ActionContext, said: string, q: number | null, text: string |
   const dayNo = state.day;
   const content = kuroDay(dayNo);
   const scripted = content ? offlineAnswer(content, q) : t("kuro.bedtime");
+  // The sixth time (2026-11-09): the same question, by its text, asked six times in this run gets
+  // the worn-down answer from content/kuro-repeat.md — picked or typed, before anything else.
+  const worn = repeatAnswer(repeatEntries, store.getEvents(), said, getLocale());
+  if (worn !== null) {
+    answerTurn(ctx, dayNo, said, q, text, worn, "core");
+    return;
+  }
+  // A starter is the deterministic core's (2026-11-09): its locked line for the bucket, the d100
+  // and the taboo from the run's seed, online or not; the model never sees a starter. A starter
+  // without a locked line gets its written answer.
+  if (q !== null) {
+    const core = content ? coreAnswer({ day: content, runId: store.getRunId(), bucket: bucketNow(state), q, locale: getLocale(), events: store.getEvents(), followup: hasString("kuro.unreadable") ? t("kuro.unreadable") : null }) : null;
+    if (core) answerTurn(ctx, dayNo, said, q, text, core.answer, "core", undefined, core.taboo, before);
+    else answerTurn(ctx, dayNo, said, q, text, scripted, "written");
+    return;
+  }
   const online = kuroOnline();
   if (!online) {
-    answerTurn(ctx, dayNo, said, q, text, scripted, true);
+    answerTurn(ctx, dayNo, said, q, text, scripted, "written");
     return;
   }
   // Online (kuro-chat FR3): Kuro is answering; on any failure, the scripted answer, marked offline.
   const wait = item(session, dayNo, WAITING, { kind: "kuroWait" });
   session.dialogue = replaceHead(session.dialogue, [wait]);
   online
-    .turn({ run_id: store.getRunId(), day: dayNo, said, ...(q !== null ? { q } : {}), events: toLogEvents(store.getEvents()), locale: getLocale() })
+    .turn({ run_id: store.getRunId(), day: dayNo, said, events: toLogEvents(store.getEvents()), locale: getLocale() })
     .then((r) => {
       if (r.bedtime) return void answerBedtime(ctx, dayNo, wait);
-      answerTurn(ctx, dayNo, said, q, text, r.reply, false, wait, r.taboo ?? null, before);
+      answerTurn(ctx, dayNo, said, q, text, r.reply, "model", wait, r.taboo ?? null, before);
     })
-    .catch(() => answerTurn(ctx, dayNo, said, q, text, scripted, true, wait))
+    .catch(() => answerTurn(ctx, dayNo, said, q, text, scripted, "written", wait))
     .finally(() => ctx.rerender());
 }
 
 /** Kuro's waiting line while the model answers (punctuation, not story text). */
 export const WAITING = "…";
 
+/** Where an answer came from: the model, the deterministic core (content + dice), or the day's written answer. */
+export type AnswerSource = "model" | "core" | "written";
+
 /**
- * The turn is answered: one `chat` event (its words, Kuro's raw answer, whether it was offline)
- * and Kuro's next turn in the box. The model's answer is shown through the decay filter; a
- * scripted one is shown as written. If the conversation was left meanwhile, the turn is still
- * logged (it was asked) but nothing is shown.
+ * The turn is answered: one `chat` event (its words, Kuro's raw answer, whether it was offline:
+ * anything but the model) and Kuro's next turn in the box. The model's answer is shown through
+ * the decay filter; a core or written one is shown as written. If the conversation was left
+ * meanwhile, the turn is still logged (it was asked) but nothing is shown.
  */
 function answerTurn(
   ctx: ActionContext,
@@ -218,21 +242,22 @@ function answerTurn(
   q: number | null,
   text: string | null,
   answer: string,
-  offline: boolean,
+  source: AnswerSource,
   wait?: Queued,
   sent: Taboo | null = null,
   before: string | null = null,
 ): void {
   const { store, session } = ctx;
   if (store.getState().day !== day || store.getState().chatTurnsToday >= constants.chatTurnsPerDay) return;
-  // At most one taboo a day; an offline answer never carries one (kuro-chat 2026-11-02).
-  const taboo = offline || tabooUsedToday(store.getEvents(), day) ? null : sent;
+  const offline = source !== "model";
+  // At most one taboo a day; a written answer never carries one (the core's and the model's may).
+  const taboo = source === "written" || tabooUsedToday(store.getEvents(), day) ? null : sent;
   const asked = q !== null ? { q } : { text: text! };
   const now = ctx.now?.() ?? Date.now();
   if (taboo === "flicker") {
     // The flicker: the turn is spent; no answer is shown, remembered or written to the history; the
     // player's question goes from the history too; one white frame.
-    store.appendEvent({ ...asked, kind: "chat", said, answer: "", offline: false, taboo, forgotten: true });
+    store.appendEvent({ ...asked, kind: "chat", said, answer: "", offline, taboo, forgotten: true });
     stepOnce(ctx, "chat:any");
     const last = session.dlgLog.at(-1);
     if (last?.kind === "player" && last.text === said) session.dlgLog.pop();
@@ -319,9 +344,11 @@ export function playerBox(state: State, events: readonly GameEvent[], session: S
     return { name, mode: "choices", options, screens: screens(null, options.map((o) => o.label), PLAYER_TURN_BOX, px), page: 0, draft: "" };
   }
   const asked = askedToday(events, state.day);
-  // Affinity opens questions (2026-11-02): only the starters the current bucket allows.
+  // Affinity opens questions (2026-11-02): only the starters the current bucket allows; a follow-up
+  // (2026-11-09) only after its question was asked.
   const bucket = bucketNow(state);
-  const starters = (kuroDay(state.day)?.starters ?? []).filter((s) => !asked.has(s.n) && bucketAllows(s.minBucket, bucket));
+  const askedEver = askedFrom(events);
+  const starters = (kuroDay(state.day)?.starters ?? []).filter((s) => !asked.has(s.n) && starterOpen(s, bucket, askedEver, state.day));
   // The starters and 说点别的… only (author 2026-11-01): Esc is the way out; 先不聊 is the prompt's.
   const options: PlayerOption[] = [
     ...starters.map((s): PlayerOption => ({ action: "kuro-q", q: s.n, label: starterText(s) })),

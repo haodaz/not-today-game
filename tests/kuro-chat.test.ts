@@ -51,6 +51,13 @@ const talk = (ctx: ActionContext) => {
 };
 const box = (ctx: ActionContext) => dialogueBox(ctx.store.getState(), ctx.store.getEvents(), ctx.session)?.value ?? "";
 const flush = () => new Promise((r) => setTimeout(r, 0));
+const TYPED = "你今天累不累。";
+/** Types `text` and sends it: the model's channel (a starter is the deterministic core's, 2026-11-09). */
+function typeOnce(ctx: ActionContext, text = TYPED) {
+  act(ctx, "kuro-more");
+  ctx.session.kuroDraft = text;
+  act(ctx, "kuro-send");
+}
 
 describe("memory (FR2)", () => {
   it("each turn's words and Kuro's raw answer go into chatMemory; the last N turns are kept", () => {
@@ -96,13 +103,13 @@ describe("the online path (FR3), with a mocked function", () => {
     const store = storeAt(14);
     const { ctx } = ctxOf(store);
     talk(ctx);
-    act(ctx, "kuro-q", { q: "1" });
+    typeOnce(ctx);
     expect(box(ctx)).toContain(`>${WAITING}</button>`);
     expect(box(ctx)).not.toContain('data-action="kuro-more"');
     await flush();
     const ev = store.getEvents().find((e) => e.kind === "chat")!;
-    expect(ev).toMatchObject({ q: 1, answer: "You noticed. Most people don't, {login}.", offline: false });
-    expect(turns[0]).toMatchObject({ run_id: store.getRunId(), day: 14, said: kuroDay(14)!.starters[0]!.zh, locale: getLocale() });
+    expect(ev).toMatchObject({ text: TYPED, answer: "You noticed. Most people don't, {login}.", offline: false });
+    expect(turns[0]).toMatchObject({ run_id: store.getRunId(), day: 14, said: TYPED, locale: getLocale() });
     // Never the login inputs in what the client sends.
     expect(JSON.stringify(turns[0])).not.toContain("林一");
     const shown = box(ctx);
@@ -119,9 +126,9 @@ describe("the online path (FR3), with a mocked function", () => {
     const store = storeAt(1);
     const { ctx } = ctxOf(store);
     talk(ctx);
-    act(ctx, "kuro-q", { q: "2" });
+    typeOnce(ctx);
     await flush();
-    expect(store.getEvents().find((e) => e.kind === "chat")).toMatchObject({ q: 2, answer: offlineAnswer(kuroDay(1)!, 2), offline: true });
+    expect(store.getEvents().find((e) => e.kind === "chat")).toMatchObject({ text: TYPED, answer: offlineAnswer(kuroDay(1)!, null), offline: true });
     act(ctx, "loop-advance");
     expect(box(ctx)).toContain('data-action="kuro-more"');
   });
@@ -131,7 +138,7 @@ describe("the online path (FR3), with a mocked function", () => {
     const store = storeAt(1);
     const { ctx } = ctxOf(store);
     talk(ctx);
-    act(ctx, "kuro-q", { q: "1" });
+    typeOnce(ctx);
     await flush();
     expect(store.getEvents().some((e) => e.kind === "chat")).toBe(false);
     act(ctx, "loop-advance");

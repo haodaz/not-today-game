@@ -38,6 +38,8 @@ describe("kuro-days parser", () => {
       ],
       answers: { q: new Map(), free: null, zh: null },
       redBlue: [],
+      locked: [],
+      layered: [],
     });
   });
 
