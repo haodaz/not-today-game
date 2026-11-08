@@ -124,6 +124,22 @@
       }
     },
     {
+      "id": "lunch",
+      "text": "Order lunch.",
+      "unlock": "done:msgs",
+      "done": "event:order:lunch",
+      "required": true,
+      "rewrite": "Lunch is on its way.",
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "The phone goes back on the desk."
+          }
+        ]
+      }
+    },
+    {
       "id": "work",
       "text": "Cut costs: balance the cost sheet, to Vivi before you log off.",
       "unlock": "done:msgs",
@@ -142,22 +158,6 @@
           }
         ],
         "then": "desk"
-      }
-    },
-    {
-      "id": "lunch",
-      "text": "Order lunch.",
-      "unlock": "done:msgs",
-      "done": "event:order:lunch",
-      "required": true,
-      "rewrite": "Lunch is on its way.",
-      "onDone": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "The phone goes back on the desk."
-          }
-        ]
       }
     },
     {

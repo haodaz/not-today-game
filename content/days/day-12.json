@@ -119,6 +119,22 @@
       }
     },
     {
+      "id": "lunch",
+      "text": "点个午饭。",
+      "unlock": "done:msgs",
+      "done": "event:order:lunch",
+      "required": true,
+      "rewrite": "午饭在路上。",
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "手机放回桌上。"
+          }
+        ]
+      }
+    },
+    {
       "id": "work",
       "text": "这周大家克服一下：值班表你排，谁都不睡。",
       "unlock": "done:msgs",
@@ -137,22 +153,6 @@
           }
         ],
         "then": "desk"
-      }
-    },
-    {
-      "id": "lunch",
-      "text": "点个午饭。",
-      "unlock": "done:msgs",
-      "done": "event:order:lunch",
-      "required": true,
-      "rewrite": "午饭在路上。",
-      "onDone": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "手机放回桌上。"
-          }
-        ]
       }
     },
     {

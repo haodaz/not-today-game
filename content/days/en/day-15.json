@@ -133,6 +133,22 @@
       }
     },
     {
+      "id": "lunch",
+      "text": "Order lunch.",
+      "unlock": "done:msgs",
+      "done": "event:order:lunch",
+      "required": true,
+      "rewrite": "Lunch is on its way.",
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "The phone goes back on the desk."
+          }
+        ]
+      }
+    },
+    {
       "id": "work",
       "text": "The launch this afternoon: arrange the slides, watch the audience live.",
       "unlock": "done:msgs",
@@ -151,22 +167,6 @@
           }
         ],
         "then": "desk"
-      }
-    },
-    {
-      "id": "lunch",
-      "text": "Order lunch.",
-      "unlock": "done:msgs",
-      "done": "event:order:lunch",
-      "required": true,
-      "rewrite": "Lunch is on its way.",
-      "onDone": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "The phone goes back on the desk."
-          }
-        ]
       }
     },
     {

@@ -123,6 +123,22 @@
       }
     },
     {
+      "id": "lunch",
+      "text": "点个午饭。",
+      "unlock": "done:msgs",
+      "done": "event:order:lunch",
+      "required": true,
+      "rewrite": "午饭在路上。",
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "手机放回桌上。"
+          }
+        ]
+      }
+    },
+    {
       "id": "work",
       "text": "这批新人有点多，入职流程跑一下。",
       "unlock": "done:msgs",
@@ -141,22 +157,6 @@
           }
         ],
         "then": "desk"
-      }
-    },
-    {
-      "id": "lunch",
-      "text": "点个午饭。",
-      "unlock": "done:msgs",
-      "done": "event:order:lunch",
-      "required": true,
-      "rewrite": "午饭在路上。",
-      "onDone": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "手机放回桌上。"
-          }
-        ]
       }
     },
     {
