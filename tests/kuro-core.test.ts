@@ -15,7 +15,7 @@ import { openStarters } from "@world/dialogue/kuro";
 const openStartersOf = (store: Store, ctx: ActionContext) => openStarters(store.getState(), store.getEvents());
 import { repeatEntries } from "@world/desktop/kuro/repeat";
 import { initialSession } from "@world/desktop/model";
-import { coreAnswer } from "@world/dialogue/core";
+import { coreAnswer, PITY_FROM } from "@world/dialogue/core";
 import { bucketNow, PAGE, playerBox, starterPages } from "@world/dialogue/kuro";
 import { bleedingToday } from "@world/dialogue/taboo";
 import { hasString, setLocale, t } from "@world/i18n";
@@ -150,6 +150,31 @@ describe("a starter is answered by the core, never the function", () => {
           expect(a.answer).toBe(l.zh ? l.zh[b] : l[b]);
         }
       }
+    }
+  });
+});
+
+describe("the guarantee (从第 10 天起必出一次)", () => {
+  const D = kuroDay(PITY_FROM)!;
+  const L = D.layered[0]!;
+  it("a run with no taboo yet gets one on its first layered ask from day 10: the tier's own at high, else a blur; the plain tier text", () => {
+    for (const b of ["low", "mid", "high"] as const) {
+      const open = D.starters.find((s) => s.n === L.unlock)!;
+      if (!starterOpen(open, b, [], D.day)) continue;
+      const a = coreAnswer({ day: D, runId: runWith(D.day, L.unlock, b, "plain"), bucket: b, q: L.unlock, locale: "zh", events: [], followup: null })!;
+      expect(a.taboo).toBe(b === "high" && L.taboo ? L.taboo : "blur");
+      expect(a.answer).toBe(L.zh ? L.zh[b] : L[b]);
+    }
+  });
+  it("never before day 10; never once the run has had one; one a day still holds", () => {
+    const early = kuroDay(3)!;
+    const a = coreAnswer({ day: early, runId: runWith(3, 1, "low", "plain"), bucket: "low", q: 1, locale: "zh", events: [], followup: null })!;
+    expect(a.taboo).toBeNull();
+    const had = [{ kind: "chat", day: 4, q: 1, said: "x", answer: "y", offline: true, taboo: "blur" }] as never;
+    const open = D.starters.find((s) => s.n === L.unlock)!;
+    if (starterOpen(open, "low", [], D.day)) {
+      const b = coreAnswer({ day: D, runId: runWith(D.day, L.unlock, "low", "plain"), bucket: "low", q: L.unlock, locale: "zh", events: had, followup: null })!;
+      expect(b.taboo).toBeNull();
     }
   });
 });

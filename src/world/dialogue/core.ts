@@ -15,6 +15,16 @@ import type { GameEvent } from "@state/events";
 import type { KuroDay } from "@world/desktop/kuro/days";
 import { tabooUsedToday } from "./taboo";
 
+/**
+ * The guarantee (borrowed from the author's life simulator, 2026-11-09: 「到窗口最后一年必出」):
+ * from this day, a run that has never had a taboo gets one on its first layered ask — the tier's own
+ * when it carries one, else a blur. A judge who plays once still sees the price of a generous answer.
+ */
+export const PITY_FROM = 10;
+
+/** The run has had a taboo on any day. */
+export const tabooEver = (events: readonly GameEvent[]): boolean => events.some((e) => e.kind === "chat" && e.taboo !== undefined);
+
 export interface CoreAnswer {
   /** What Kuro says, as written (on 大成功 the word and the follow-up are their own lines); "" on a flicker. */
   readonly answer: string;
@@ -54,6 +64,7 @@ export function coreAnswer(i: CoreInput): CoreAnswer | null {
   if (!locked.layered) return { answer: locked.text, taboo: null, layered: false, roll: null };
   const roll = d100(i.runId, i.day.day, locked.q);
   if (tabooUsedToday(i.events, i.day.day)) return { answer: locked.text, taboo: null, layered: true, roll };
+  if (i.day.day >= PITY_FROM && !tabooEver(i.events)) return { answer: locked.text, taboo: locked.taboo ?? "blur", layered: true, roll };
   const outcome = outcomeOf(roll, i.bucket);
   if (outcome === "failure") return { answer: "", taboo: "flicker", layered: true, roll };
   if (outcome === "success") {
