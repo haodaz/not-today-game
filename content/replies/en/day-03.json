@@ -10,7 +10,7 @@
         },
         {
           "t": "09:10",
-          "text": "(Transcript) v18 is out today. Let it write. Don't you write.",
+          "text": "(Transcript) The investors saw v17. They have thoughts. I'll find you this afternoon.",
           "kind": "work"
         },
         {
@@ -33,7 +33,7 @@
           {
             "who": "boss",
             "t": "09:10",
-            "text": "(Transcript) Right, v18 is out today. Let it write, don't you write. Writing it yourself takes twenty minutes."
+            "text": "(Transcript) Good. This afternoon, then. Finish what's in your hands first."
           }
         ],
         "inner": "He knows it takes me twenty minutes. He's done the sums."
@@ -79,7 +79,7 @@
           "kind": "work",
           "card": {
             "type": "file",
-            "name": "v18 验收标准.docx",
+            "name": "Self-evolving engine · acceptance criteria.docx",
             "size": "92 KB",
             "ext": "doc"
           }
