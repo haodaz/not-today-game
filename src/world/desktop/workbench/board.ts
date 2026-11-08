@@ -427,8 +427,10 @@ const actions: Record<string, ActionHandler> = {
     const def = mod?.paths.find((p) => p.id === pathId);
     if (!mod || !def || !pathFound(mod, def, ctx.store.getState().day, ctx.store.getEvents())) return;
     const s = stateOf(ctx, c.task, c.board);
-    const path = s.mods[id] === pathId ? null : pathId;
-    if (path !== null && s.mods[id] === undefined && tuneStepsLeft(c.board, s) === 0) return;
+    // the chosen path again is nothing (a turn is a pick, never an undo — a spent step stays spent, like a racer's tuning turns)
+    if (s.mods[id] === pathId) return;
+    const path = pathId;
+    if (s.mods[id] === undefined && tuneStepsLeft(c.board, s) === 0) return;
     const before = transcriptLength(ctx, c);
     const held = holdPreview(ctx, c);
     ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "mod", id, path } });
