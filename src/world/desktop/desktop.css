@@ -733,6 +733,9 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
    shrinks to its min (480) first, then the conversation to its min (380). */
 .wb .sh-panes{flex-shrink:1}
 .wb .sh-conv{flex:1 1 auto;min-width:380px;display:flex;flex-direction:column;align-items:center;min-height:0}
+/* author 2026-11-08: with the app area open the conversation is at most 550 wide (many screens are small); the panes take the rest. */
+.wb .sh-frame.has-panes .sh-conv{flex:0 1 550px;max-width:550px}
+.wb .sh-frame.has-panes .sh-panes{flex:1 1 auto;max-width:none}
 .wb .sh-thread{width:100%;max-width:720px;flex:1 1 auto;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:12px;padding:16px 8px;box-sizing:border-box}
 .wb .sh-kuro{display:flex;gap:8px;font-size:14px;line-height:1.65;color:#1F1F1F}
 .wb .sh-av{width:20px;height:20px;flex:0 0 20px;border-radius:50%;object-fit:contain;margin-top:3px}
