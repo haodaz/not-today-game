@@ -67,7 +67,7 @@ async function mount(storage = new MemStorage(), account = true) {
   win.document.body.appendChild(root as never);
   const sound = { muted: false, setMuted() {}, apply() {}, unlock() {}, onTuneEnd() {}, armGestures() {}, idle: async () => {}, destroy() {} } as never;
   const started: unknown[] = [];
-  const title = mountTitle(root, { save: null, collection: EMPTY_COLLECTION, onContinue() {}, onStart: (n) => started.push(n), random: () => 0.5, sound, ...(account ? { account: { storage, origin: "http://t" } } : {}) } as never);
+  const title = mountTitle(root, { save: null, collection: EMPTY_COLLECTION, onContinue() {}, onStart: (n: unknown) => started.push(n), random: () => 0.5, sound, ...(account ? { account: { storage, origin: "http://t" } } : {}) } as never);
   const click = (sel: string) => {
     const el = root.querySelector(sel) as unknown as { dispatchEvent: (e: unknown) => void } | null;
     el?.dispatchEvent(new win.MouseEvent("click", { bubbles: true }) as never);
