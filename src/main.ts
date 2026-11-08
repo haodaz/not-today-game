@@ -15,6 +15,7 @@ import "./world/motion/motion.css";
 import "./ui/fonts.css";
 import "./ui/title/title.css";
 import { debugStartDay } from "@state/clock";
+import { syncProfile, withCloud } from "./ui/profile-sync";
 import type { State } from "@state/types.gen";
 import { deliveryUnitMs } from "@world/loop/waiting";
 import { previewParam, startPreview } from "@world/loop/preview";
@@ -55,7 +56,8 @@ document.documentElement.lang = getLocale();
 
 const root = document.getElementById("app")!;
 const run = createRunSlot(window.localStorage);
-const profile = createProfileWriter(window.localStorage);
+// profile sync (2026-11-09): every change to the cross-run profile is pushed to the account's cloud copy.
+const profile = withCloud(createProfileWriter(window.localStorage), window.localStorage, net);
 const collection = readCollection(window.localStorage);
 // One sound player for the title page and the game: the context wakes on the first click or key.
 const sound = createSoundPlayer();
@@ -203,6 +205,9 @@ if (jump !== null) {
     }
   }
   startGame(store, false);
+  // Dev only (2026-11-09): a debug run signs in too, so Kuro answers online (kuroOnline needs a
+  // session); its run id is fresh each load and nothing of it is pushed or saved.
+  if (import.meta.env.DEV) void net.signIn();
 } else {
   const saved = run.load();
   // The Kurogotchi's memory (object-drawer 3): read from and written to the profile (src/ui is the
@@ -236,6 +241,7 @@ if (jump !== null) {
       // local wins and the cloud copy is kept. Offline (or no env) this is instant and does nothing.
       let events = saved.events;
       if (await net.signIn()) {
+        void syncProfile(window.localStorage, profile, net);
         const local = { runId: saved.runId, events: saved.events, updatedAt: 0 };
         const { decision, cloud } = await net.decide(local);
         if (decision === "pull" && cloud) events = cloud.events as typeof saved.events;
@@ -256,7 +262,10 @@ if (jump !== null) {
       startGame(store, true, true);
       // Anonymous sign-in on the first 开始 (backend FR1); the mirror starts with this run.
       void net.signIn(names).then((ok) => {
-        if (ok) void net.pushRun(snapshot(store));
+        if (ok) {
+          void net.pushRun(snapshot(store));
+          void syncProfile(window.localStorage, profile, net);
+        }
       });
     },
   });

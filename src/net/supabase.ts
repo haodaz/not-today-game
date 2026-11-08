@@ -178,6 +178,35 @@ export const net = {
     }
   },
 
+  /**
+   * profile sync (2026-11-09): the cloud copy of the cross-run profile (`profiles.data`), null when
+   * the row has none yet, "offline" without a client or a session. Never throws.
+   */
+  async pullProfile(): Promise<unknown | null | "offline"> {
+    try {
+      const c = await client();
+      if (!c || !userId) return "offline";
+      const { data, error } = await c.from("profiles").select("data").eq("id", userId).maybeSingle();
+      if (error || !data) return null;
+      const d = data.data;
+      return d && typeof d === "object" && !Array.isArray(d) && Object.keys(d as object).length ? d : null;
+    } catch (e) {
+      console.warn("profile pull failed", e);
+      return "offline";
+    }
+  },
+
+  /** profile sync: push the whole profile (after a merge, and after every local change). Never throws. */
+  async pushProfile(data: unknown): Promise<void> {
+    try {
+      const c = await client();
+      if (!c || !userId) return;
+      await c.from("profiles").upsert({ id: userId, data, data_updated_at: new Date().toISOString() });
+    } catch (e) {
+      console.warn("profile push failed", e);
+    }
+  },
+
   /** Push the run (FR4: on lie-down and every 20 events); `conflictOf` keeps a replaced cloud copy. */
   async pushRun(run: RunSnapshot, conflictOf?: unknown): Promise<void> {
     try {
