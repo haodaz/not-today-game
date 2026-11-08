@@ -35,6 +35,7 @@
   "shell.beat.boot": "早上",
   "shell.beat.work": "上午",
   "shell.beat.afternoon": "下午",
+  "shell.beat.noon": "中午",
   "shell.beat.desk": "傍晚",
   "shell.beat.night": "夜里",
   "shell.weather.rain": "雨",

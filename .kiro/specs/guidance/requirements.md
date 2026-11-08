@@ -97,3 +97,8 @@ Walls, from the room to the task: (1) an object that cannot be used now (床, th
 - Kiro landed Part 1 (the mask) and R1–R15 with these deviations, all accepted: the ring is the `data-guide="on"` attribute (CSS in room.css), not a `guide-ring` class; the 设置 tile is never refused by a guide (settings always reachable); `.monitor` keeps its class name with the bezel styles removed; R7's text box became a chip-only composer on task pages.
 - Still open, Claude's: R4 happy on the chick's first power-on; R6 the lead line `wb.hello.sub` (reworded without a count instead of templating); R12 the eat lines (day 1's reworded dish-agnostic instead of `{dish}`).
 - Tests: seven tests moved to the test side (a thread opened before asserting, the store booted), 33 snapshots refreshed after the full run (frame, dock, pet, ring, G3's empty first open, R9/R10 in the threads).
+
+## Carried to every day (2026-11-08 night, Claude; author: 「1–3 天的努力要带到后面的日期并且用进去」)
+- G2 (开机后先看汀汀: the dock icon lit, other apps answer guide.work.first) and G3 (老板的线程先看: lit, other threads answer guide.boss.first) apply on every day, not only day 1 — the checklist's work is locked behind 看一眼消息 on every day, so without them a later day has a silent wall. G3 only on days the boss has a message of his own that morning (`bossNews`: an incoming line without a condition). Day 1 still waits for the coach marks.
+- The top bar's clock label follows the hour (`clockLabelKey`): 上午 before 12:00, 中午 until 14:00, 下午 after; 「上午 12:02」 broke the plain-lines rule (time must hold). String `shell.beat.noon`.
+- Snapshots refreshed for the ring on the dock icon and Kuro's think pose while a moment is lit (markup only, checked).

@@ -4,7 +4,7 @@
 // Layout and class names follow design/desktop/*.html. Side by side exists only in the room scene.
 import { cls, html, raw, type SafeHtml } from "@world/html";
 import { hasString, t, tr } from "@world/i18n";
-import { beatLabelKey, type BeatClock } from "./beat";
+import { beatLabelKey, type BeatClock, clockLabelKey } from "./beat";
 import type { DockEntry } from "./dock";
 import { fxStageAttrs, type FxPlan } from "../room/fx";
 import type { Weather } from "@state/stages";
@@ -202,7 +202,7 @@ function topBar(m: ShellModel, monitor: MonitorModel): SafeHtml {
     : m.weather.text
       ? html`<span>${m.weather.text}</span>`
       : null;
-  return html`<div class="top"><span class="brand">${tr("shell.brand")}</span><span>${monitor.appTitle}</span>${m.nextItem ? html`<span class="next-item"><i aria-hidden="true"></i>${m.nextItem}</span>` : null}<div class="day"><span>${tr("shell.day", { day: m.day })} · ${tr(beatLabelKey(m.clock.beat))} ${m.clock.time}</span>${weather}<span class="kuro-dot" title="${t(m.night ? "shell.kuro.after" : "shell.kuro.online")}"></span><span>${tr("kuro.name")}</span>${mcControl(m)}${shutdownControl(m)}</div></div>`;
+  return html`<div class="top"><span class="brand">${tr("shell.brand")}</span><span>${monitor.appTitle}</span>${m.nextItem ? html`<span class="next-item"><i aria-hidden="true"></i>${m.nextItem}</span>` : null}<div class="day"><span>${tr("shell.day", { day: m.day })} · ${tr(clockLabelKey(m.clock.beat, m.clock.time))} ${m.clock.time}</span>${weather}<span class="kuro-dot" title="${t(m.night ? "shell.kuro.after" : "shell.kuro.online")}"></span><span>${tr("kuro.name")}</span>${mcControl(m)}${shutdownControl(m)}</div></div>`;
 }
 
 /** 调度中心 / Mission Control's button in the top bar (tingtalk R1b); F3 does the same. */

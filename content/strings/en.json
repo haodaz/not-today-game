@@ -48,6 +48,7 @@
   "shell.beat.boot": "Morning",
   "shell.beat.work": "Late morning",
   "shell.beat.afternoon": "Afternoon",
+  "shell.beat.noon": "Noon",
   "shell.beat.desk": "Evening",
   "shell.beat.night": "Night",
   "shell.weather.rain": "Rain",

@@ -8,6 +8,10 @@ import type { Session } from "@world/desktop/model";
 import { lockedConversation, viviLockHeld } from "@world/desktop/vivi";
 import { openWork, threadFor } from "@world/desktop/workbench/work";
 import { boardState, canFetch, canPrint, mergesLeft, modFound, trayCards, tuneOfferPending } from "@state/days/board";
+import { dayTable } from "@state/replies/table";
+
+/** The boss has a message of his own this morning (an incoming line that waits for nothing). */
+const bossNews = (day: number): boolean => (dayTable(day)?.recipients.get("boss")?.incoming ?? []).some((l) => !("cond_show" in l) || l.cond_show === undefined);
 import { push } from "./dialogue";
 import { booted, itemStates, loopContext } from "./checklist";
 import { taskPageId } from "@world/desktop/model";
@@ -91,8 +95,10 @@ export function guideNow(state: State, events: readonly GameEvent[], session: Se
   const locked = viviLockHeld(state, events, session.clock.time);
   if (desktop && locked) return { id: "G5", target: { kind: "card", doc: locked, conv: lockedConversation(state, events, session.clock.time) }, refuse: "vivi.lock", scope: "none" };
 
-  // G3: day 1, 听听 open on the screen and the boss's thread not opened yet today.
-  if (desktop && day === 1 && session.onboard === "done" && frontApp(session) === "tingtalk" && !openedToday(events, day, "conv:boss")) {
+  // G3: 听听 open on the screen, the boss has news this morning, and his thread not opened yet today
+  // (day 1 waits for the coach marks; 2026-11-08: every day, not only the first — the day's work is
+  // behind his message, so the thread is the one thing to do).
+  if (desktop && (day !== 1 || session.onboard === "done") && frontApp(session) === "tingtalk" && bossNews(day) && !openedToday(events, day, "conv:boss")) {
     return { id: "G3", target: { kind: "conv", id: "boss" }, refuse: "guide.boss.first", scope: "all" };
   }
 
@@ -103,8 +109,9 @@ export function guideNow(state: State, events: readonly GameEvent[], session: Se
     if (st.unlocked && !st.done) return { id: "G3b", target: { kind: "reply" }, refuse: null, scope: "none" };
   }
 
-  // G2: day 1, the first desktop visit after the coach marks, until 听听 has been opened.
-  if (desktop && day === 1 && session.onboard === "done" && booted(state, events) && !stepToday(events, day, "openApp:msgs")) {
+  // G2: the first desktop visit of the day, until 听听 has been opened (day 1 after the coach marks;
+  // 2026-11-08: every day — the checklist's work is locked behind 看一眼消息, so nothing else opens).
+  if (desktop && (day !== 1 || session.onboard === "done") && booted(state, events) && !stepToday(events, day, "openApp:msgs")) {
     return { id: "G2", target: { kind: "dock", app: "tingtalk" }, refuse: "guide.work.first", scope: "all" };
   }
 
