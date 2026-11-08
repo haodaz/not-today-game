@@ -168,13 +168,19 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "The update log is one line, blank. Wang wants 'consciousness': evidence, the rival, one sentence — four cells.",
+            "t": "The investors read v18 and they're in. Three pages first: consciousness, the avatar, the ontology. Today is consciousness.",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "Due diligence. It's always like this.",
             "where": "screen:msgs:boss"
           },
           {
             "k": "speaker",
             "who": "kuro",
-            "t": "He doesn't know how heavy that word is. Fill the cells.",
+            "t": "One page a day, no rush. Today's page has four cells.",
             "where": "screen:msgs:boss"
           }
         ]

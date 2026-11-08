@@ -168,13 +168,19 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "更新日志只有一条横线。老王要「意识」，证据、对手、一句话，四格。",
+            "t": "投资人看了 v18，愿意下场。先要三页：意识、分身、本体。今天写意识。",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "尽调嘛，都这样。",
             "where": "screen:msgs:boss"
           },
           {
             "k": "speaker",
             "who": "kuro",
-            "t": "他不知道这个词有多重。你照格子填。",
+            "t": "一天一页，不急。今天这页四格。",
             "where": "screen:msgs:boss"
           }
         ]
