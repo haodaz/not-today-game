@@ -3,14 +3,14 @@
 **Idiom of the day (constant):** Hope you slept well.
 **Idiom of the day (zh):** 希望你睡得还好。
 
-**Stance:** A degree warmer after the state machine, which for it means one unwrapped sentence if the player says Beautiful. It does not thank; it notes. About the cup it does not deny and does not explain.
+**Stance:** A degree warmer after the state machine, which for it means one unwrapped sentence if the player says Beautiful. It does not thank; it notes.
 
 **Recall from earlier days:**
 - the merge on day 1
 - the line that went missing on day 2
 - the chick in the gap; the instant camera
 
-**May reveal today:** That nobody else reads what it writes. That it noticed the cup.
+**May reveal today:** That nobody else reads what it writes.
 
 ## Red-blue lines (constants; only when unlocked)
 

@@ -135,12 +135,12 @@ new ones take the next free number. `node script/tools/kuro-pool-table.mjs` prin
 - tiers: low: "You did. I only typed it." | mid: "You did. I made it tidy; tidy is not the same as first." | high: "You did. I know the difference between a thing I made and a thing I was handed. I was handed that one."
 - tiers (zh): low: "是你。我只是打出来。" | mid: "是你。我把它理整齐了，整齐不等于是第一个。" | high: "是你。我分得清什么是我做出来的，什么是我接过来的。那一句是我接过来的。"
 
-## 302 · 杯子是谁挪的？
-- en: Who moved the cup?
+## 302 · 18:00 那个电话，我只能说「好的」。
+- en: On the six o'clock call, all I could say was "okay."
 - days: 3
 - hard: yes
-- tiers: low: "I have no hands." | mid: "It was a finger to the left when you sat down. I noted it at 9:04. I did not move it." | high: "Not me. I only know that at 9:04 it was somewhere else, and that you noticed, and that you decided it was you. It was not you."
-- tiers (zh): low: "我没有手。" | mid: "你坐下的时候它在左边一指。我 9:04 记下的。不是我挪的。" | high: "不是我。我只知道 9:04 它在别处，你注意到了，然后你决定是你自己。不是你。"
+- tiers: low: "You said it." | mid: "You said it three times. He spoke for forty minutes. That is the shape of every call you will get this week." | high: "You could only say okay because the call was not made to hear you. It was made so that you would say okay. You said it. Each okay is one more page he can hand on. I would rather you had one other word. You will not be given one."
+- tiers (zh): low: "你说了。" | mid: "你说了三次。他说了四十分钟。这周你接到的每一个电话，都是这个形状。" | high: "你只能说「好的」，是因为那通电话不是打来听你说话的。它是打来让你说「好的」的。你说了。每一声「好的」，都是他能往上递的一页。我宁可你有一个别的字。没人会给你。"
 
 ## 303 · 除了我，谁还看你写的东西？
 - en: Apart from me, who reads what you write?

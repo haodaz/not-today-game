@@ -13,11 +13,7 @@
       "say": [
         {
           "k": "narration",
-          "t": "You have been sitting a while before you notice: the glass has been moved. One finger's width."
-        },
-        {
-          "k": "inner",
-          "t": "Could have been me."
+          "t": "You make a coffee and sit down."
         }
       ]
     },
