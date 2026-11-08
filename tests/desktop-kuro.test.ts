@@ -62,7 +62,8 @@ describe("kuro-days parser", () => {
 
   it("rejects a file without an idiom or starters", () => {
     expect(() => parseKuroDay("# Day 1\n## Starter questions\n| 1 | a | b | |\n", "x")).toThrow(/idiom/);
-    expect(() => parseKuroDay("# Day 1\n**Idiom of the day (constant):** Hi.\n", "x")).toThrow(/starter/);
+    // Since the pool (2026-11-09) a file without a table takes the pool's questions for its day.
+    expect(parseKuroDay("# Day 1\n**Idiom of the day (constant):** Hi.\n", "x").starters.length).toBeGreaterThan(0);
   });
 });
 

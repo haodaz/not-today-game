@@ -11,8 +11,9 @@ import { join } from "node:path";
 const root = new URL("../../content/kuro-days/", import.meta.url).pathname;
 const mi = process.argv.indexOf("--min"); const min = mi >= 0 ? Number(process.argv[mi + 1]) || 3 : 3;
 const files = readdirSync(root).filter((f) => /^day-\d+\.md$/.test(f)).sort();
+const POOL = new URL("../../content/kuro-pool.md", import.meta.url).pathname;
 
-const TIER = /^- unlock: q(\d+) → low: "(.*?)" \| mid: "(.*?)" \| high: "(.*?)"(?: \| taboo: \w+)?$/;
+const TIER = /^- (?:unlock: q\d+ → |tiers(?: \(zh\))?: )low: "(.*?)" \| mid: "(.*?)" \| high: "(.*?)"(?: \| taboo: \w+)?$/;
 const FREE = /^- free text → "(.*)"$/;
 
 /** Clauses of a line: split on sentence punctuation, trimmed, at least four characters. */
@@ -21,13 +22,30 @@ const clauses = (s) => s.split(/[。！？；.!?;]/).map((c) => c.trim().replace
 const byClause = new Map(); // clause → Map<day, count>
 const openers = new Map(); // first clause → count
 const within = []; // [day, clause, count]
-for (const f of files) {
-  const day = Number(/day-(\d+)/.exec(f)[1]);
-  const text = readFileSync(join(root, f), "utf8");
-  const lines = [];
+/** The pool, cut into (firstDay, lines[]) per entry, so its answers count under the day they enter. */
+function poolChunks() {
+  const out = [];
+  let cur = null;
+  for (const raw of readFileSync(POOL, "utf8").split("\n")) {
+    if (/^## \d+ · /.test(raw)) { cur = { day: 0, lines: [] }; out.push(cur); continue; }
+    if (!cur) continue;
+    const d = /^- days: (\d+)/.exec(raw.trim());
+    if (d) cur.day = Number(d[1]);
+    const t = TIER.exec(raw.trim());
+    if (t) cur.lines.push(t[1], t[2], t[3]);
+    const l = /^- locked: "(.*)"$/.exec(raw.trim());
+    if (l) cur.lines.push(l[1]);
+  }
+  return out;
+}
+const sources = [...files.map((f) => ({ day: Number(/day-(\d+)/.exec(f)[1]), text: readFileSync(join(root, f), "utf8"), pool: null })), ...poolChunks().map((c) => ({ day: c.day, text: "", pool: c.lines }))];
+for (const src of sources) {
+  const day = src.day;
+  const text = src.text;
+  const lines = src.pool ? [...src.pool] : [];
   for (const raw of text.split("\n")) {
     const t = TIER.exec(raw.trim());
-    if (t) lines.push(t[2], t[3], t[4]);
+    if (t) lines.push(t[1], t[2], t[3]);
     const fr = FREE.exec(raw.trim());
     if (fr) lines.push(fr[1]);
   }
@@ -52,3 +70,22 @@ for (const [d, c, n] of within.sort((a, b) => b[2] - a[2])) console.log(`day ${d
 const top = [...openers].filter(([, n]) => n >= 4).sort((a, b) => b[1] - a[1]).slice(0, 15);
 console.log(`\n# Openers used 4+ times (${top.length})\n`);
 for (const [c, n] of top) console.log(`×${n}  ${c}`);
+
+// The design frame must not speak through anyone (author 2026-11-09): day counts, the carton and
+// its boxes, the slip, the chick as a topic. Reported per line; the Stance / Recall lines are
+// the function's own notes and are skipped.
+const FRAME = /十八天|十七天|十六天|十五天|十三天|第 ?[0-9一二三四五六七八九十]+ ?天|第[一二三四五]夜|seventeen days|eighteen days|thirteen days|sixteen days|fifteen days|first day|last day|first night|fifth night|fourth night|day (?:one|nine|ten)\b|箱子|纸箱|carton|小鸡|邮单|the slip/;
+let frame = 0;
+const scan = [...files.map((f) => [Number(/day-(\d+)/.exec(f)[1]), readFileSync(join(root, f), "utf8")]), [0, readFileSync(POOL, "utf8")]];
+for (const [day0, body] of scan) {
+  let day = day0;
+  for (const raw of body.split("\n")) {
+    const line = raw.trim();
+    const h = /^## (\d+) · /.exec(line);
+    if (h) day = `pool ${h[1]}`;
+    if (!(line.startsWith("| ") || line.startsWith("- unlock") || line.startsWith("- free") || line.startsWith("- tiers") || line.startsWith("- locked") || /^## \d+ · /.test(line))) continue;
+    const m = FRAME.exec(line);
+    if (m) { if (!frame++) console.log("\n# Frame words in a question or answer\n"); console.log(`day ${day}  «${m[0]}»  ${line.slice(0, 100)}`); }
+  }
+}
+if (!frame) console.log("\n# Frame words in a question or answer: none");

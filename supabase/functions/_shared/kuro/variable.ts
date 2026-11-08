@@ -122,13 +122,14 @@ const norm = (s: string): string => s.toLowerCase().replace(/[\s\p{P}\p{S}]/gu, 
 
 /**
  * Whether the pool shows this starter: open to the bucket and, for a follow-up (`after`), its
- * question already asked — today (`day` null) or on the day it names (author 2026-11-09).
+ * question already asked — on any day when `day` is null (the pool's ids are global, 2026-11-09),
+ * else on the day it names.
  */
-export function starterOpen(s: StarterContent, bucket: Bucket, asked: readonly Asked[], today: number): boolean {
+export function starterOpen(s: StarterContent, bucket: Bucket, asked: readonly Asked[], _today: number): boolean {
   if (!bucketAllows(s.minBucket, bucket)) return false;
   if (!s.after) return true;
-  const onDay = s.after.day ?? today;
-  return asked.some((a) => a.q === s.after!.q && a.day === onDay);
+  const onDay = s.after.day;
+  return asked.some((a) => a.q === s.after!.q && (onDay === null || a.day === onDay));
 }
 
 /** The questions asked so far, from the log's chat events (any day). */

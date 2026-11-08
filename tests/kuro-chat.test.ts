@@ -79,11 +79,11 @@ describe("the offline path (FR3)", () => {
     const store = storeAt(1);
     const { ctx } = ctxOf(store);
     talk(ctx);
-    act(ctx, "kuro-q", { q: "1" });
-    const tier = kuroDay(1)!.layered.find((l) => l.unlock === 1)!;
+    act(ctx, "kuro-q", { q: "101" });
+    const tier = kuroDay(1)!.layered.find((l) => l.unlock === 101)!;
     const answer = tier.zh ? tier.zh.low : tier.low;
     const ev = store.getEvents().find((e) => e.kind === "chat")!;
-    expect(ev).toMatchObject({ kind: "chat", q: 1, said: kuroDay(1)!.starters[0]!.zh, offline: true });
+    expect(ev).toMatchObject({ kind: "chat", q: 101, said: kuroDay(1)!.starters[0]!.zh, offline: true });
     if (ev.kind === "chat" && ev.taboo !== "flicker") {
       expect(ev.answer!.startsWith(answer)).toBe(true);
       expect(box(ctx)).toContain(answer.slice(0, 12));

@@ -81,10 +81,10 @@ describe("what reaches the function (the deterministic core, 2026-11-09)", () =>
     expect(bodies[0]).toMatchObject({ said: TYPED, day: 3 });
     expect(bodies[0]).not.toHaveProperty("q");
     act(ctx, "loop-advance");
-    act(ctx, "kuro-q", { q: "2" });
+    act(ctx, "kuro-q", { q: "302" });
     await flush();
     expect(bodies).toHaveLength(1);
-    expect(chats(store).map((e) => e.q)).toEqual([undefined, 2]);
+    expect(chats(store).map((e) => e.q)).toEqual([undefined, 302]);
   });
 });
 

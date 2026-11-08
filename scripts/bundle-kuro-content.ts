@@ -9,6 +9,7 @@ import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import type { KuroContent, KuroDayContent } from "../supabase/functions/_shared/kuro/types.ts";
 import { parseVariableParts } from "../supabase/functions/_shared/kuro/dayfile.ts";
+import { parsePool, poolDay, type PoolEntry } from "../supabase/functions/_shared/kuro/pool.ts";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const OUT = "supabase/functions/kuro-chat/content.ts";
@@ -36,8 +37,9 @@ function section(text: string, title: string): string {
   return (end < 0 ? rest : rest.slice(0, end)).split("\n").slice(1).join("\n").trim();
 }
 
-export function parseKuroDayForFunction(text: string, label: string): KuroDayContent {
+export function parseKuroDayForFunction(text: string, label: string, pool: readonly PoolEntry[] = []): KuroDayContent {
   const day = Number(/^#\s*Day\s+(\d+)\s*$/m.exec(text)?.[1] ?? fail(label, 'no "# Day N" heading'));
+  const own = parseVariableParts(text, label);
   return {
     day,
     idiom: field(text, "Idiom of the day (constant)", label),
@@ -46,8 +48,9 @@ export function parseKuroDayForFunction(text: string, label: string): KuroDayCon
     recall: field(text, "Recall from earlier days", label),
     mayReveal: field(text, "May reveal today", label),
     never: section(text, "Never"),
-    // The variable layer (2026-11-02): starters with minBucket, red-blue lines, layered answers.
-    ...parseVariableParts(text, label),
+    // The variable layer (2026-11-02): starters with minBucket, red-blue lines, layered answers —
+    // from the pool for this day (2026-11-09) unless the file carries its own table.
+    ...(own.starters.length ? own : poolDay(pool, day)),
   };
 }
 
@@ -60,8 +63,9 @@ export function bundleKuroContent(read: Read, list: List): string {
 /** What the function bundles, read from content/. */
 export function buildKuroContent(read: Read, list: List): KuroContent {
   const days: Record<string, KuroDayContent> = {};
+  const pool = parsePool(read("content/kuro-pool.md"));
   for (const f of list("content/kuro-days").filter((n) => /^day-\d+\.md$/.test(n)).sort()) {
-    const d = parseKuroDayForFunction(read(`content/kuro-days/${f}`), f);
+    const d = parseKuroDayForFunction(read(`content/kuro-days/${f}`), f, pool);
     days[String(d.day)] = d;
   }
   if (!Object.keys(days).length) fail("content/kuro-days", "no day files");

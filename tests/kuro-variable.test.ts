@@ -279,8 +279,8 @@ describe("content: the day files' new parts", () => {
     });
     for (let day = 1; day <= 18; day++) expect(real.days[String(day)]!.starters!.length, `day ${day}`).toBeGreaterThan(0);
     expect(real.days["14"]!.locked).toEqual([
-      { unlock: 1, text: "Does it matter? You still read what I write." },
-      { unlock: 3, text: "I heard it. I can't get in there. That's the point of it, isn't it." },
+      { unlock: 1401, text: "Does it matter? You still read what I write." },
+      { unlock: 1403, text: "I heard it. I can't get in there. That's the point of it, isn't it." },
     ]);
   });
 

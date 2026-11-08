@@ -2,8 +2,13 @@
 // content/kuro-days/day-NN.md (Claude's): the day's idiom (a constant, never generated) and the
 // starter questions. Read as text, parsed strictly, never rewritten.
 import { parseVariableParts, sameSet, sectionLines } from "@kuro/dayfile.ts";
+import { parsePool, poolDay, type PoolEntry } from "@kuro/pool.ts";
 import type { Bucket, LayeredAnswer, LockedLine } from "@kuro/types.ts";
 import { contentLocale } from "@state/content-locale";
+import poolText from "../../../../content/kuro-pool.md?raw";
+
+/** The whole question pool (content/kuro-pool.md): every question of the run with its days and answers. */
+export const kuroPool: readonly PoolEntry[] = Object.freeze(parsePool(poolText));
 
 export interface StarterQuestion {
   readonly n: number;
@@ -93,15 +98,19 @@ export function offlineAnswer(day: KuroDay, n: number | null): string {
   return (n !== null ? a.q.get(n) : undefined) ?? a.free ?? day.idiom;
 }
 
-/** Parses one day file. Pure; exported for tests. */
-export function parseKuroDay(text: string, label: string): KuroDay {
+/**
+ * Parses one day file. Pure; exported for tests. The questions, red-blue lines and tiers come from
+ * the pool for that day (2026-11-09) unless the file carries its own table (tests do).
+ */
+export function parseKuroDay(text: string, label: string, pool: readonly PoolEntry[] = kuroPool): KuroDay {
   const dayMatch = /^#\s*Day\s+(\d+)\s*$/m.exec(text);
   if (!dayMatch) throw new Error(`content/kuro-days ${label}: no "# Day N" heading`);
   const idiom = IDIOM.exec(text)?.[1];
   if (!idiom) throw new Error(`content/kuro-days ${label}: no idiom line`);
 
   // The starters (with minBucket), red-blue and layered parts: the same parser as the function's bundle.
-  const { starters, locked, layered } = parseVariableParts(text, label);
+  const own = parseVariableParts(text, label);
+  const { starters, locked, layered } = own.starters.length ? own : poolDay(pool, Number(dayMatch[1]));
   const answers = parseAnswers(text, label);
   for (const n of answers.q.keys()) {
     if (!starters.some((s) => s.n === n)) throw new Error(`content/kuro-days ${label}: an offline answer to q${n}, which is not a starter`);

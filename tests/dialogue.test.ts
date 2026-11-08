@@ -250,15 +250,15 @@ describe("FR2 talking to Kuro", () => {
     const ctx = ctxOf(store, NIGHT);
     talkAtNight(ctx);
     const day = kuroDay(1)!;
-    act(ctx, "kuro-q", { q: "1" });
-    expect(store.getEvents().at(-2)).toMatchObject({ kind: "chat", q: 1 });
+    act(ctx, "kuro-q", { q: "101" });
+    expect(store.getEvents().at(-2)).toMatchObject({ kind: "chat", q: 101 });
     expect(store.getEvents().at(-1)).toMatchObject({ kind: "step", name: "chat:any" });
     expect(store.getState().chatTurnsToday).toBe(1);
     const ev = store.getEvents().filter((e) => e.kind === "chat").at(-1)!;
-    const tier = day.layered.find((l) => l.unlock === 1)!;
+    const tier = day.layered.find((l) => l.unlock === 101)!;
     if (ev.kind === "chat" && ev.taboo !== "flicker") expect(ev.answer!.startsWith(tier.zh!.low)).toBe(true);
     act(ctx, "loop-advance"); // playtest-1105 R6: the answer read, the player's turn
-    expect(out(ctx)).toContain(`data-q="1"`); // asked questions stay: the same question can be asked again
+    expect(out(ctx)).toContain(`data-q="101"`); // asked questions stay: the same question can be asked again
     // Typing has no row of its own now; the action still carries the model's channel.
     act(ctx, "kuro-more");
     act(ctx, "kuro-send"); // empty sends nothing

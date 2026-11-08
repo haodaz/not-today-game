@@ -83,7 +83,7 @@ describe("R2 · choices in the column on the right", () => {
     expect(rows(out)).toEqual([...page.map(() => "ask"), ...more]);
     const labels = [...column(out)!.matchAll(/<span class="dc-l">([^<]*)<\/span>/g)].map((m) => m[1]);
     expect(labels).toEqual([...page.map((s) => escapeHtml(s.zh)), ...(more.length ? [escapeHtml(t("dialogue.more"))] : [])]);
-    expect(column(out)).toContain('data-action="kuro-q" data-q="1"');
+    expect(column(out)).toContain('data-action="kuro-q" data-q="101"');
     // Esc leaves the talk.
     expect(loopKeys(r.ctx, { key: "Escape" } as KeyboardEvent)).toBe(true);
     expect(r.session.kuroInput).toBe(false);

@@ -36,7 +36,9 @@ export function sectionLines(text: string, title: string, zh = false): string[] 
  * blank, `low|mid|high`, or `minBucket: low|mid|high`.
  */
 export function parseStarters(text: string, label: string): StarterContent[] {
-  const lines = sectionLines(text, "Starter questions") ?? fail(label, "no starter questions section");
+  // Since the pool (2026-11-09) a day file normally has no table: its questions come from content/kuro-pool.md.
+  const lines = sectionLines(text, "Starter questions");
+  if (lines === null) return [];
   const out: StarterContent[] = [];
   for (const raw of lines) {
     const cells = /^\|\s*(\d+)\s*\|(.*)\|\s*$/.exec(raw.trim());
