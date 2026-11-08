@@ -8,7 +8,7 @@ import { mealView } from "@world/delivery/meals";
 import { doorLines, escapeHtml, renderDoorView } from "@world/delivery/view";
 
 /** Test-only names, so the snapshot shows where each placeholder went. */
-const names: State["names"] = { login: "LOGIN", nick: "NICK", calledBy: "CALLEDBY", bossCalls: "BOSSCALLS", pronoun: null };
+const names: State["names"] = { login: "LOGIN", nick: "NICK", calledBy: "CALLEDBY", bossCalls: "BOSSCALLS", pronoun: null, portrait: "p1" };
 
 /** The whole door beat for a meal: idle, then each state until the bag is on the desk. */
 function walk(day: number, meal: Meal): string[] {

@@ -10,7 +10,7 @@ import type { State } from "@state/types.gen";
 import type { Collection } from "@world/room/collection";
 import { titlePlan } from "@world/sound/plan";
 import type { SoundPlayer } from "@world/sound/player";
-import { arrived, canStart, diceOptions, GATE_IDLE, initialTitle, pastGate, QUESTIONS, rowsShown, toMenu, toNames, toQuestions, withAnswer, withPronoun, type Account, type TextQuestion, type TitleModel } from "./model";
+import { arrived, canStart, diceOptions, gateFor, initialTitle, needsGate, pastGate, QUESTIONS, rowsShown, toMenu, toNames, toQuestions, turnPortrait, withAnswer, withPortrait, withPronoun, type Account, type TextQuestion, type TitleModel } from "./model";
 import { titleTable, type IdleEvent } from "./table";
 import { renderTitle } from "./view";
 import { createDrawerObject, createKurogotchiDrawer, drawerIds, KURO_ID, type DrawerObject, type KuroDrawerObject, type KuroMemoryStore } from "./drawer";
@@ -130,8 +130,9 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     render();
   };
 
-  // login-first: read the stored session once; a guest who chose so before passes; otherwise the gate.
-  const gate = (a: Partial<Extract<Account, { kind: "gate" }>>) => ({ ...(model.account?.kind === "gate" ? model.account : GATE_IDLE), ...a }) as Account;
+  // login-first: read the stored session quietly; the card comes only when 新游戏 / 继续 is pressed
+  // by somebody with no account and no guest choice (author 2026-11-09).
+  const gate = (a: Partial<Extract<Account, { kind: "gate" }>>) => ({ ...(model.account?.kind === "gate" ? model.account : gateFor("new")), ...a }) as Account;
   if (deps.account) {
     const storage = deps.account.storage;
     void net.whoami().then((who) => {
@@ -141,11 +142,18 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
         set({ ...model, account: { kind: "user", email: who.email } });
       } else if (who.kind === "guest" || (who.kind === "none" && storage.getItem(GUEST_KEY) === "1")) set({ ...model, account: { kind: "guest" } });
       else if (who.kind === "offline") set({ ...model, account: { kind: "offline" } });
-      else {
-        set({ ...model, account: GATE_IDLE });
-        root.querySelector<HTMLElement>('[data-focus="auth-email"]')?.focus();
-      }
+      else set({ ...model, account: { kind: "none" } });
     });
+  }
+  /** The card, for the action that was pressed; its email field gets the cursor. */
+  function openGate(then: "new" | "continue"): void {
+    set({ ...model, account: gateFor(then) });
+    root.querySelector<HTMLElement>('[data-focus="auth-email"]')?.focus();
+  }
+  /** Past the card: the action that was pressed goes on. */
+  function proceed(then: "new" | "continue"): void {
+    if (then === "continue") deps.onContinue();
+    else actions["title-new"]!(root);
   }
   /** 登录 / 注册 with what is typed; the card shows busy, then the error, the confirm note, or the menu. */
   async function authSubmit(): Promise<void> {
@@ -162,6 +170,7 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     if (r === "ok") {
       deps.account.storage.removeItem(GUEST_KEY);
       set({ ...model, account: { kind: "user", email } });
+      proceed(a.then);
     } else set({ ...model, account: gate({ status: r === "confirm" ? "confirm" : "error", ...(r === "confirm" ? { mode: "login", password: "" } : {}) }) });
   }
 
@@ -314,12 +323,16 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
 
   const actions: Record<string, (el: HTMLElement) => void> = {
     "title-new": () => {
+      if (needsGate(model.account)) return openGate("new");
       // The computer turns on: the monitors wake and stay lit, the rain gets louder.
       rainVolume(RAIN.high);
       if (model.save) return;
       move(toQuestions(model), focusOpen);
     },
-    "title-continue": () => deps.onContinue(),
+    "title-continue": () => {
+      if (needsGate(model.account)) return openGate("continue");
+      deps.onContinue();
+    },
     "title-settings": () => set({ ...model, settingsOpen: true }),
     "settings-close": () => set({ ...model, settingsOpen: false, settingsConfirm: null }),
     // playtest-1105 R8: each asks first; 确定 runs the host's (main.ts) and comes back to the title.
@@ -390,6 +403,11 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
       if (el.dataset.object === KURO_ID) kuroObj?.key(key);
       else drawerObj?.key(key);
     },
+    // The character select's ‹ › (author 2026-11-09): the next look; the questions are untouched.
+    "title-pick-turn": (el) => {
+      const by = el.dataset.by === "-1" ? -1 : 1;
+      set(withPortrait(model, turnPortrait(model.answers, by)));
+    },
     "title-pronoun": (el) => {
       const p = el.dataset.pronoun;
       if (p === "she" || p === "he" || p === "none") set(withPronoun(model, p));
@@ -411,13 +429,18 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     "auth-submit": () => void authSubmit(),
     "auth-guest": () => {
       if (!deps.account || model.account?.kind !== "gate") return;
+      const then = model.account.then;
       deps.account.storage.setItem(GUEST_KEY, "1");
       set({ ...model, account: { kind: "guest" } });
+      proceed(then);
+    },
+    "auth-cancel": () => {
+      if (model.account?.kind === "gate") set({ ...model, account: { kind: "none" } });
     },
     "auth-logout": () => {
-      if (!deps.account || !model.account || (model.account.kind !== "user" && model.account.kind !== "guest")) return;
+      if (!deps.account || model.account?.kind !== "user") return;
       deps.account.storage.removeItem(GUEST_KEY);
-      void net.logout().then(() => set({ ...model, account: GATE_IDLE }));
+      void net.logout().then(() => set({ ...model, account: { kind: "none" } }));
     },
   };
 
@@ -456,6 +479,7 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     if (e.key === "Escape") {
       if (model.settingsOpen && model.settingsConfirm) set({ ...model, settingsConfirm: null });
       else if (model.settingsOpen) set({ ...model, settingsOpen: false });
+      else if (model.account?.kind === "gate") set({ ...model, account: { kind: "none" } });
       else if (model.screen === "album" && model.albumOpen) set({ ...model, albumOpen: null });
       else if (model.screen !== "menu") back();
       e.preventDefault();

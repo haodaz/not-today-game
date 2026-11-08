@@ -30,7 +30,7 @@ afterEach(() => {
 const NIGHT: BeatClock = { beat: "night", time: "23:41" };
 function storeAt(day: number, runId?: string, affinity?: number): Store {
   const store = createStore({ startDay: 1, ...(runId ? { runId } : {}), ...(affinity !== undefined ? { patch: { affinity } } : {}) });
-  store.appendEvent({ kind: "names", names: { login: "林一", nick: "一一", calledBy: "老大", bossCalls: "小林", pronoun: null } });
+  store.appendEvent({ kind: "names", names: { login: "林一", nick: "一一", calledBy: "老大", bossCalls: "小林", pronoun: null, portrait: "p1" } });
   while (store.getState().day < day) store.appendEvent({ kind: "lieDown" });
   return store;
 }

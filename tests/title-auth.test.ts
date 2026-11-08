@@ -6,7 +6,7 @@ import { net, setSupabaseForTests, type SupabaseLike } from "@net/supabase";
 import { EMPTY_COLLECTION } from "@world/room/collection";
 import { setLocale } from "@world/i18n";
 import { GUEST_KEY, mountTitle } from "../src/ui/title/mount";
-import { GATE_IDLE, initialTitle, pastGate } from "../src/ui/title/model";
+import { gateFor, initialTitle, needsGate, pastGate } from "../src/ui/title/model";
 import { renderTitle } from "../src/ui/title/view";
 
 afterEach(() => {
@@ -83,12 +83,22 @@ async function mount(storage = new MemStorage(), account = true) {
 }
 
 describe("the gate", () => {
-  it("no session: the card (email, password, 登录, 注册 switch, 游客) stands where the menu would be; the menu's buttons are not offered", async () => {
+  it("no session: the menu as usual and no chip; 新游戏 opens the card (email, password, 注册, 登录 switch, 游客, 取消) in place of the menu", async () => {
     setSupabaseForTests(fakeClient(null).c);
     const t = await mount();
-    expect(t.model().account).toEqual(GATE_IDLE);
+    expect(t.model().account).toEqual({ kind: "none" });
+    expect(needsGate(t.model().account)).toBe(true);
+    expect(t.html()).toContain('data-action="title-new"');
+    expect(t.html()).not.toContain("title-account");
+    expect(t.html()).not.toContain("title-auth");
+    t.click('[data-action="title-new"]');
+    expect(t.model().account).toEqual(gateFor("new"));
     const h = t.html();
     expect(h).toContain('class="stage title-page screen-menu gated"');
+    expect(h).toContain('data-action="auth-cancel"');
+    t.click('[data-action="auth-cancel"]');
+    expect(t.model().account).toEqual({ kind: "none" });
+    t.click('[data-action="title-new"]');
     expect(h).toContain('class="title-card title-auth"');
     expect(h).toContain('data-input="auth-email"');
     expect(h).toContain('data-input="auth-password"');
@@ -99,23 +109,27 @@ describe("the gate", () => {
     expect(h).toContain("保存游戏存档与成就");
   });
 
-  it("游客身份进入: the menu, the choice remembered; a later visit with no session passes straight through", async () => {
+  it("游客身份进入 from 新游戏: the choice remembered, the chip says 游客, and the game goes on to the questions; a later visit passes straight through", async () => {
     setSupabaseForTests(fakeClient(null).c);
     const storage = new MemStorage();
     const t = await mount(storage);
+    t.click('[data-action="title-new"]');
     t.click('[data-action="auth-guest"]');
     expect(t.model().account).toEqual({ kind: "guest" });
-    expect(t.html()).toContain('data-action="title-new"');
-    expect(t.html()).toContain("游客身份");
+    expect(t.model().screen).toBe("questions"); // the pressed action went on
     expect(storage.getItem(GUEST_KEY)).toBe("1");
     const again = await mount(storage);
     expect(again.model().account).toEqual({ kind: "guest" });
+    expect(again.html()).toContain('<div class="title-account guest"><span class="who">游客身份</span></div>');
+    again.click('[data-action="title-new"]');
+    expect(again.model().screen).toBe("questions"); // no card for a remembered guest
   });
 
   it("登录 with the right pair: signed in as the email, the menu; a wrong pair shows the error and stays", async () => {
     const { c, calls } = fakeClient(null, { good: { email: "a@b.co", password: "secret1" } });
     setSupabaseForTests(c);
     const t = await mount();
+    t.click('[data-action="title-new"]');
     t.click('[data-action="auth-mode"][data-mode="login"]');
     expect(t.html()).toContain("<h2 id=\"title-auth-h\">登录</h2>");
     t.type('[data-input="auth-email"]', "a@b.co");
@@ -131,8 +145,7 @@ describe("the gate", () => {
     await flush();
     await flush();
     expect(t.model().account).toEqual({ kind: "user", email: "a@b.co" });
-    expect(t.html()).toContain("已登录：a@b.co");
-    expect(t.html()).toContain('data-action="title-new"');
+    expect(t.model().screen).toBe("questions"); // 新游戏 went on after the login
     expect(calls).toEqual(["login a@b.co", "login a@b.co"]);
     expect(net.signedIn()).toBe(true);
   });
@@ -140,6 +153,7 @@ describe("the gate", () => {
   it("注册: a project that confirms by mail shows the note and switches to 登录; one that signs in at once passes", async () => {
     setSupabaseForTests(fakeClient(null, { confirm: true }).c);
     const t = await mount();
+    t.click('[data-action="title-new"]');
     t.click('[data-action="auth-mode"][data-mode="register"]');
     expect(t.model().account).toMatchObject({ kind: "gate", mode: "register" });
     t.type('[data-input="auth-email"]', "new@b.co");
@@ -152,6 +166,7 @@ describe("the gate", () => {
 
     setSupabaseForTests(fakeClient(null).c);
     const u = await mount();
+    u.click('[data-action="title-new"]');
     u.click('[data-action="auth-mode"][data-mode="register"]');
     u.type('[data-input="auth-email"]', "new@b.co");
     u.type('[data-input="auth-password"]', "secret1");
@@ -165,6 +180,7 @@ describe("the gate", () => {
     const { c, calls } = fakeClient(null);
     setSupabaseForTests(c);
     const t = await mount();
+    t.click('[data-action="title-new"]');
     t.click('[data-action="auth-mode"][data-mode="login"]');
     t.type('[data-input="auth-email"]', "not-an-email");
     t.type('[data-input="auth-password"]', "secret1");
@@ -179,17 +195,18 @@ describe("the gate", () => {
     expect(calls).toEqual([]);
   });
 
-  it("a stored session skips the gate: an email account shows its line; an anonymous one is a guest; 退出登录 brings the gate back", async () => {
+  it("a stored session: an email account shows its chip with 退出登录 and 新游戏 goes straight on; an anonymous one is a guest; 退出登录 leaves nobody", async () => {
     const { c, calls } = fakeClient({ id: "u-9", email: "me@b.co" });
     setSupabaseForTests(c);
     const t = await mount();
     expect(t.model().account).toEqual({ kind: "user", email: "me@b.co" });
-    expect(t.html()).toContain('data-action="title-new"');
+    expect(t.html()).toContain('<div class="title-account user"><span class="who">me@b.co</span><button type="button" class="auth-logout" data-action="auth-logout">退出登录</button></div>');
     t.click('[data-action="auth-logout"]');
     await flush();
     await flush();
     expect(calls).toContain("signOut");
-    expect(t.model().account).toEqual(GATE_IDLE);
+    expect(t.model().account).toEqual({ kind: "none" });
+    expect(t.html()).not.toContain("title-account");
 
     setSupabaseForTests(fakeClient({ id: "anon-2", is_anonymous: true }).c);
     const g = await mount();
@@ -206,5 +223,7 @@ describe("the gate", () => {
     expect(plain.model().account).toBeUndefined();
     expect(renderTitle(initialTitle(null, EMPTY_COLLECTION)).value).not.toContain("title-auth");
     expect(pastGate(undefined)).toBe(true);
+    expect(needsGate(undefined)).toBe(false);
+    expect(needsGate({ kind: "offline" })).toBe(false);
   });
 });

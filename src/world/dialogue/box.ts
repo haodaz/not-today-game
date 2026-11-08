@@ -37,12 +37,15 @@ export const geomFor = (q: Queued | undefined, lineKind?: string): BoxGeom => (q
 /** The night beat of a dream night (stages.json `nightBeat` "dream"): inner lines are the child's. */
 export const isDreamNight = (day: number, beat: string): boolean => beat === "night" && dreamNights.includes(day);
 
+/** The three looks' files (public/player): the file names are historical; the choice is 形象 1 / 2 / 3. */
+export const PORTRAIT_FILES: Record<State["names"]["portrait"], string> = { p1: "she", p2: "he", p3: "none" };
+
 /**
  * The player's portrait for inner lines (dialogue addition 2026-11-01): a still, faceless bust by
- * the title card's pronoun answer (她 she / 他 he / 不说 none); the child's on dream nights.
+ * the title card's look (the character select, 2026-11-09); the child's on dream nights.
  */
-export function playerPortraitSrc(pronoun: State["names"]["pronoun"], dream: boolean): string {
-  return `/player/${pronoun ?? "none"}${dream ? "_kid" : ""}.png`;
+export function playerPortraitSrc(portrait: State["names"]["portrait"] | undefined, dream: boolean): string {
+  return `/player/${PORTRAIT_FILES[portrait ?? "p1"]}${dream ? "_kid" : ""}.png`;
 }
 
 /**
@@ -171,7 +174,7 @@ export function lineBoxModel(state: State, events: readonly GameEvent[], session
     screen: at.page,
     count: at.all.length,
     portrait: head.voice === "kuro" ? portraitState(state, events, session, nowMs) : null,
-    playerPortrait: head.voice !== "kuro" && (kind === "inner" || mine) ? playerPortraitSrc(state.names.pronoun, isDreamNight(state.day, session.clock.beat)) : null,
+    playerPortrait: head.voice !== "kuro" && (kind === "inner" || mine) ? playerPortraitSrc(state.names.portrait, isDreamNight(state.day, session.clock.beat)) : null,
     // opening R2: in the prologue a speaker not in npc.json gets a silhouette (stable per name).
     npcPortrait: head.voice !== "kuro" && !mine && kind === "line" && line?.k === "speaker" ? (npcPortrait(line.who ?? "") ?? (head.key === PROLOGUE_KEY ? silhouetteFor(line.who ?? "") || null : null)) : null,
     // The first night's hand has no checklist line: a one-time pointer on its choices.

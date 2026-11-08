@@ -2,6 +2,7 @@
 // page reads the profile through src/ui only; nothing here reaches the game's state except the
 // names the questions give, which the host turns into the run's first event.
 import type { State } from "@state/types.gen";
+import { PORTRAITS, type Portrait } from "@state/events";
 import type { Collection } from "@world/room/collection";
 import type { IdleLayer } from "./table";
 
@@ -15,6 +16,8 @@ export type TextQuestion = Exclude<Question, "pronoun">;
 export type PronounAnswer = "she" | "he" | "none" | null;
 
 export interface Answers {
+  /** The character select (author 2026-11-09): which of the three looks; starts at p1, ‹ › turn it. */
+  readonly portrait: Portrait;
   readonly login: string;
   readonly nick: string;
   readonly bossCalls: string;
@@ -22,7 +25,7 @@ export interface Answers {
   readonly pronoun: PronounAnswer;
 }
 
-export const NO_ANSWERS: Answers = { login: "", nick: "", bossCalls: "", calledBy: "", pronoun: null };
+export const NO_ANSWERS: Answers = { login: "", nick: "", bossCalls: "", calledBy: "", pronoun: null, portrait: "p1" };
 
 /**
  * login-first (author 2026-11-09, asked many times): before 新游戏 / 继续 the player registers or
@@ -32,14 +35,18 @@ export const NO_ANSWERS: Answers = { login: "", nick: "", bossCalls: "", calledB
 export type Account =
   | { readonly kind: "checking" }
   | { readonly kind: "offline" }
+  | { readonly kind: "none" }
   | { readonly kind: "guest" }
   | { readonly kind: "user"; readonly email: string }
-  | { readonly kind: "gate"; readonly mode: "login" | "register"; readonly email: string; readonly password: string; readonly status: "idle" | "busy" | "error" | "confirm" };
+  | { readonly kind: "gate"; readonly mode: "login" | "register"; readonly email: string; readonly password: string; readonly status: "idle" | "busy" | "error" | "confirm"; readonly then: "new" | "continue" };
 
-export const GATE_IDLE: Account = { kind: "gate", mode: "register", email: "", password: "", status: "idle" };
+export const gateFor = (then: "new" | "continue"): Account => ({ kind: "gate", mode: "register", email: "", password: "", status: "idle", then });
+export const GATE_IDLE: Account = gateFor("new");
 
-/** The menu's 新游戏 / 继续 are offered only past the gate. */
-export const pastGate = (a: Account | undefined): boolean => a === undefined || a.kind === "offline" || a.kind === "guest" || a.kind === "user";
+/** The menu shows unless the card is up (the author 2026-11-09: the card comes on 新游戏 / 继续, never on arrival). */
+export const pastGate = (a: Account | undefined): boolean => a === undefined || a.kind !== "gate";
+/** 新游戏 / 继续 must first pass the card when nobody is signed in and no guest choice was made. */
+export const needsGate = (a: Account | undefined): boolean => a !== undefined && a.kind === "none";
 
 export interface TitleModel {
   readonly screen: Screen;
@@ -116,6 +123,7 @@ export function toNames(a: Answers): State["names"] {
     calledBy: a.calledBy.trim(),
     bossCalls: a.bossCalls.trim(),
     pronoun: a.pronoun === "she" || a.pronoun === "he" ? a.pronoun : null,
+    portrait: a.portrait,
   };
 }
 
@@ -130,6 +138,15 @@ export function diceOptions(q: TextQuestion, a: Answers, dice: readonly string[]
 
 export const withAnswer = (m: TitleModel, q: TextQuestion, value: string): TitleModel => ({ ...m, answers: { ...m.answers, [q]: value } });
 export const withPronoun = (m: TitleModel, p: Exclude<PronounAnswer, null>): TitleModel => ({ ...m, answers: { ...m.answers, pronoun: p } });
+
+/** The character select's ring (author 2026-11-09): ‹ › turn through the three looks, wrapping. */
+export function turnPortrait(a: Answers, by: -1 | 1): Portrait {
+  const i = PORTRAITS.indexOf(a.portrait);
+  return PORTRAITS[(i + by + PORTRAITS.length) % PORTRAITS.length]!;
+}
+export const withPortrait = (m: TitleModel, p: Portrait): TitleModel => ({ ...m, answers: { ...m.answers, portrait: p } });
+/** 形象 1 / 2 / 3: the look's number for its label. */
+export const portraitNo = (p: Portrait): number => PORTRAITS.indexOf(p) + 1;
 
 /**
  * 新游戏: the camera pushes to the desk (the menu fades, the monitors wake during the push); the

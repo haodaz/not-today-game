@@ -22,7 +22,7 @@ export interface State {
   letItDoUnchecked: number;
   raids: Record<string, { gave: string | null }>;
   pokedReset: boolean;
-  names: { login: string; nick: string; calledBy: string; bossCalls: string; pronoun: "she" | "he" | null };
+  names: { login: string; nick: string; calledBy: string; bossCalls: string; pronoun: "she" | "he" | null; portrait: "p1" | "p2" | "p3" };
   flags: string[];
   affinity: number;
   chatTurnsToday: number;

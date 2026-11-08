@@ -15,7 +15,7 @@ import { EMPTY_COLLECTION, type Collection } from "@world/room/collection";
 import { renderRoom } from "@world/room/hud";
 import { loopActions, loopKeys } from "@world/room/game";
 import { readCollection } from "../src/ui/collection";
-import { arrived, cardOpen, canStart, diceOptions, initialTitle, NO_ANSWERS, QUESTIONS, rowsShown, toMenu, toNames, toQuestions, withAnswer, withPronoun, type Answers, type TitleModel } from "../src/ui/title/model";
+import { arrived, cardOpen, canStart, diceOptions, initialTitle, NO_ANSWERS, QUESTIONS, rowsShown, toMenu, toNames, toQuestions, turnPortrait, withAnswer, withPronoun, type Answers, type TitleModel } from "../src/ui/title/model";
 import { idleDelay, pickIdle } from "../src/ui/title/mount";
 import { parseTitle, titleTable } from "../src/ui/title/table";
 import { renderTitle } from "../src/ui/title/view";
@@ -82,7 +82,7 @@ describe("the title page (FR1–FR3)", () => {
     let m = arrived(toQuestions(initialTitle(null, EMPTY_COLLECTION)));
     m = withAnswer(withAnswer(m, "login", "林一"), "nick", "一一");
     const mid = page(m);
-    expect((mid.match(/class="row[^"]*" data-q=/g) ?? []).length).toBe(3);
+    expect((mid.match(/class="row[^"]*" data-q=/g) ?? []).length).toBe(5); // every row at once (the author's sketch, 2026-11-09)
     expect(mid).toContain('data-action="title-start" disabled');
     expect(mid).toMatchSnapshot();
     m = withPronoun(withAnswer(withAnswer(m, "bossCalls", "小林"), "calledBy", "老大"), "none");
@@ -119,7 +119,7 @@ describe("the title page (FR1–FR3)", () => {
     const text = fc.oneof(fc.constant(""), fc.constant("  "), fc.string({ minLength: 1, maxLength: 6 }));
     fc.assert(
       fc.property(text, text, text, text, fc.constantFrom(null, "she", "he", "none"), (login, nick, bossCalls, calledBy, pronoun) => {
-        const a: Answers = { login, nick, bossCalls, calledBy, pronoun: pronoun as Answers["pronoun"] };
+        const a: Answers = { login, nick, bossCalls, calledBy, pronoun: pronoun as Answers["pronoun"], portrait: "p1" };
         const all = [login, nick, bossCalls, calledBy].every((s) => s.trim() !== "") && pronoun !== null;
         expect(canStart(a)).toBe(all);
         const m = { ...arrived(toQuestions(initialTitle(null, EMPTY_COLLECTION))), answers: a };
@@ -149,8 +149,8 @@ describe("the title page (FR1–FR3)", () => {
   });
 
   it("the answers become names; 不说 is no pronoun; the names event sets them", () => {
-    const names = toNames({ login: " 林一 ", nick: "一一", bossCalls: "小林", calledBy: "老大", pronoun: "none" });
-    expect(names).toEqual({ login: "林一", nick: "一一", calledBy: "老大", bossCalls: "小林", pronoun: null });
+    const names = toNames({ login: " 林一 ", nick: "一一", bossCalls: "小林", calledBy: "老大", pronoun: "none", portrait: "p2" });
+    expect(names).toEqual({ login: "林一", nick: "一一", calledBy: "老大", bossCalls: "小林", pronoun: null, portrait: "p2" });
     const store = createStore({ startDay: 1 });
     store.appendEvent({ kind: "names", names });
     expect(store.getState().names).toEqual(names);
@@ -177,8 +177,20 @@ describe("the title page (FR1–FR3)", () => {
     expect(card).toContain('aria-labelledby="title-card-h" data-focus="title-login"');
     expect((card.match(/data-action="title-start"/g) ?? []).length).toBe(1);
     const section = card.match(/<section class="title-card[\s\S]*<\/section>/)![0];
-    expect(section.match(/<button/g)!.length).toBe(3); // the 🎲, 开始 and 返回 (author 2026-11-09: a button here like everywhere)
-    expect(section).toContain('class="title-card-back" data-action="title-back">返回</button>');
+    // The author's sketch (2026-11-09): every row at once (four 🎲, the pronoun's three), ‹ ›, 取消 and 开始.
+    expect(section.match(/<button/g)!.length).toBe(11);
+    expect(section).toContain('<div class="title-pick" role="group" aria-label="选择玩家形象">');
+    expect(section).toContain('<div class="big" data-portrait="p1"><img src="/player/she.png"'); // 形象 1 to start; the look is not the pronoun
+    expect(section).toContain('<div class="pick-label">形象 1</div>');
+    for (const q of QUESTIONS) expect(section).toContain(`data-q="${q}"`);
+    // 取消 and 开始 sit in the card's foot, after the columns, whatever is answered.
+    expect(section).toMatch(/<div class="title-q-foot"><button type="button" class="title-cancel"[^>]*>取消<\/button><button type="button" class="title-start"[^>]*>开始<\/button><\/div><\/section>$/);
+    // ‹ › turn through the three looks and wrap.
+    expect(turnPortrait(NO_ANSWERS, 1)).toBe("p2");
+    expect(turnPortrait(NO_ANSWERS, -1)).toBe("p3");
+    expect(turnPortrait({ ...NO_ANSWERS, portrait: "p3" }, 1)).toBe("p1");
+    expect(page({ ...at, answers: { ...at.answers, portrait: "p3" } })).toContain('<div class="big" data-portrait="p3"><img src="/player/none.png"');
+    expect(section).toContain('class="title-cancel" data-action="title-back">取消</button>');
     expect(section).not.toContain("title-esc");
     const back = toMenu(at);
     expect(back).toMatchObject({ screen: "menu", framing: "room", moving: true, monitorsAwake: false });

@@ -8,7 +8,8 @@ import { figuresLayer } from "@world/room/collection";
 import { settingsPanel } from "@world/room/hud";
 import { centre, rectStyle, ROOM_COLLECTION, ROOM_SHOT } from "@world/room/shots";
 import { ROOM_PUSH } from "@world/motion/timing";
-import { answered, canStart, cardOpen, diceOptions, hasDrawer, pastGate, QUESTIONS, rowsShown, type Account, type Question, type TitleModel } from "./model";
+import { answered, canStart, cardOpen, diceOptions, hasDrawer, pastGate, portraitNo, QUESTIONS, rowsShown, type Account, type Question, type TitleModel } from "./model";
+import { PORTRAIT_FILES } from "./../../world/dialogue/box";
 import { titleTable } from "./table";
 import { drawerPage } from "./drawer";
 import { albumPage, hasAlbum } from "./album";
@@ -51,14 +52,14 @@ function gateCard(a: Extract<Account, { kind: "gate" }>): SafeHtml {
   const busy = a.status === "busy";
   const status = a.status === "error" ? html`<div class="auth-status error">${tr(a.mode === "register" ? "auth.errorRegister" : "auth.error")}</div>` : a.status === "confirm" ? html`<div class="auth-status">${tr("auth.confirm")}</div>` : a.status === "busy" ? html`<div class="auth-status">${tr("auth.busy")}</div>` : html`<div class="auth-status hint">${tr("auth.hint")}</div>`;
   const other = a.mode === "login" ? html`<button type="button" class="auth-switch" data-action="auth-mode" data-mode="register">${tr("auth.toRegister")}</button>` : html`<button type="button" class="auth-switch" data-action="auth-mode" data-mode="login">${tr("auth.toLogin")}</button>`;
-  return html`<section class="title-card title-auth" role="dialog" aria-modal="true" aria-labelledby="title-auth-h" data-mode="${a.mode}"><h2 id="title-auth-h">${tr(a.mode === "register" ? "auth.title" : "auth.titleLogin")}</h2><div class="auth-sub">${tr("auth.sub")}</div><div class="row"><label for="auth-email">${tr("auth.email")}</label><input id="auth-email" type="email" data-input="auth-email" data-focus="auth-email" value="${a.email}" autocomplete="email" spellcheck="false"${busy ? html` disabled` : null}></div><div class="row"><label for="auth-password">${tr("auth.password")}</label><input id="auth-password" type="password" data-input="auth-password" data-focus="auth-password" value="${a.password}" autocomplete="${a.mode === "register" ? "new-password" : "current-password"}"${busy ? html` disabled` : null}></div>${status}<button type="button" class="title-start ready" data-action="auth-submit"${busy ? html` disabled` : null}>${tr(a.mode === "register" ? "auth.register" : "auth.login")}</button><div class="auth-foot">${other}<button type="button" class="auth-guest" data-action="auth-guest"${busy ? html` disabled` : null}>${tr("auth.guest")}</button></div><div class="auth-guest-hint">${tr("auth.guestHint")}</div></section>`;
+  return html`<section class="title-card title-auth" role="dialog" aria-modal="true" aria-labelledby="title-auth-h" data-mode="${a.mode}"><h2 id="title-auth-h">${tr(a.mode === "register" ? "auth.title" : "auth.titleLogin")}</h2><div class="auth-sub">${tr("auth.sub")}</div><div class="row"><label for="auth-email">${tr("auth.email")}</label><input id="auth-email" type="email" data-input="auth-email" data-focus="auth-email" value="${a.email}" autocomplete="email" spellcheck="false"${busy ? html` disabled` : null}></div><div class="row"><label for="auth-password">${tr("auth.password")}</label><input id="auth-password" type="password" data-input="auth-password" data-focus="auth-password" value="${a.password}" autocomplete="${a.mode === "register" ? "new-password" : "current-password"}"${busy ? html` disabled` : null}></div>${status}<button type="button" class="title-start ready" data-action="auth-submit"${busy ? html` disabled` : null}>${tr(a.mode === "register" ? "auth.register" : "auth.login")}</button><div class="auth-foot">${other}<button type="button" class="auth-guest" data-action="auth-guest"${busy ? html` disabled` : null}>${tr("auth.guest")}</button></div><div class="auth-guest-hint">${tr("auth.guestHint")}</div><button type="button" class="auth-cancel" data-action="auth-cancel"${busy ? html` disabled` : null}>${tr("settings.cancel")}</button></section>`;
 }
 
-/** Past the gate: who is signed in, with 退出登录 (a guest sees the guest word). */
-function accountLine(a: Account | undefined): SafeHtml | null {
-  if (!a || a.kind === "offline" || a.kind === "checking" || a.kind === "gate") return null;
-  const who = a.kind === "user" ? tr("auth.signedAs", { email: a.email }) : tr("auth.guestNow");
-  return html`<div class="title-account">${who} · <button type="button" class="auth-logout" data-action="auth-logout">${tr(a.kind === "user" ? "auth.logout" : "auth.loginInstead")}</button></div>`;
+/** The identity chip (author 2026-11-09): only who you are — 游客, or the email with 退出登录; nothing for nobody. */
+function accountChip(a: Account | undefined): SafeHtml | null {
+  if (!a || a.kind !== "user" && a.kind !== "guest") return null;
+  if (a.kind === "guest") return html`<div class="title-account guest"><span class="who">${tr("auth.guestNow")}</span></div>`;
+  return html`<div class="title-account user"><span class="who">${a.email}</span><button type="button" class="auth-logout" data-action="auth-logout">${tr("auth.logout")}</button></div>`;
 }
 
 function questionRow(m: TitleModel, q: Question, current: boolean): SafeHtml {
@@ -76,13 +77,28 @@ function questionRow(m: TitleModel, q: Question, current: boolean): SafeHtml {
   return html`<div class="${cls("row", done && "done")}" data-q="${q}">${label}<input id="title-q-${q}"${named} data-focus="title-${q}" data-input="title-${q}" data-q="${q}" value="${m.answers[q]}" autocomplete="off" spellcheck="false"><button type="button" class="d" data-action="title-dice" data-q="${q}" aria-label="${t("title.dice")}"${dice.length === 0 ? html` disabled` : null}>🎲</button></div>`;
 }
 
+/**
+ * The character select (author 2026-11-09): 选择玩家形象 — one big portrait (public/player, the same
+ * files the dialogue box uses) on the card's right, ‹ › turning through 形象 1 / 2 / 3. Nothing to
+ * do with the pronoun question; the look starts at 形象 1.
+ */
+function portraitPick(m: TitleModel): SafeHtml {
+  const p = m.answers.portrait;
+  // The author's sketch (2026-11-09): the label above, the picture, then ‹ 形象 N › under it.
+  return html`<div class="title-pick" role="group" aria-label="${t("title.pick.title")}"><div class="pick-title">${tr("title.pick.title")}</div><div class="big" data-portrait="${p}"><img src="/player/${PORTRAIT_FILES[p]}.png" alt="" draggable="false"></div><div class="pick-row"><button type="button" class="arrow prev" data-action="title-pick-turn" data-by="-1" aria-label="${t("title.pick.prev")}">‹</button><div class="pick-label">${tr("title.pick.n", { n: portraitNo(p) })}</div><button type="button" class="arrow next" data-action="title-pick-turn" data-by="1" aria-label="${t("title.pick.next")}">›</button></div></div>`;
+}
+
 function questions(m: TitleModel): SafeHtml {
-  const shown = rowsShown(m.answers);
-  const rows = QUESTIONS.slice(0, shown).map((q, i) => questionRow(m, q, i === shown - 1));
+  // The author's sketch (2026-11-09): every row at once; the first open one is the current.
+  const current = rowsShown(m.answers) - 1;
+  const rows = QUESTIONS.map((q, i) => questionRow(m, q, i === current));
   const ready = canStart(m.answers);
   // A centred card like the settings panel (correction 2026-11-01): the header, one row at a
-  // time, 开始, and 返回 under it like every other page (author 2026-11-09; Esc still works).
-  return html`<section class="title-card title-q" role="dialog" aria-modal="true" aria-labelledby="title-card-h"><h2 id="title-card-h">${tr("title.q.login")}</h2>${rows}<button type="button" class="${cls("title-start", ready && "ready")}" data-action="title-start"${ready ? null : html` disabled`}>${tr("title.start")}</button><button type="button" class="title-card-back" data-action="title-back">${tr("title.back")}</button></section>`;
+  // time, 开始, and 返回 under it like every other page (author 2026-11-09; Esc still works); the
+  // portraits to pick on the right, like a game's character select.
+  // The card is one fixed size (author 2026-11-09): the rows fill the left column from the top,
+  // 开始 and 返回 sit on the card's bottom edge whatever the row count.
+  return html`<section class="title-card title-q" role="dialog" aria-modal="true" aria-labelledby="title-card-h"><h2 id="title-card-h">${tr("title.q.login")}</h2><div class="title-q-left">${rows}</div>${portraitPick(m)}<div class="title-q-foot"><button type="button" class="title-cancel" data-action="title-back">${tr("settings.cancel")}</button><button type="button" class="${cls("title-start", ready && "ready")}" data-action="title-start"${ready ? null : html` disabled`}>${tr("title.start")}</button></div></section>`;
 }
 
 function creditsPage(): SafeHtml {
@@ -111,6 +127,6 @@ export function renderTitle(m: TitleModel): SafeHtml {
       ? gateCard(m.account)
       : null
     : m.screen === "credits" ? creditsPage() : m.screen === "drawer" ? drawerPage(m.collection, m.drawerOpen) : m.screen === "album" ? albumPage(m.collection, m.albumOpen) : m.screen === "questions" ? (m.starting ? null : cardOpen(m) ? questions(m) : menu(m)) : menu(m);
-  const account = m.screen === "menu" && !m.moving ? accountLine(m.account) : null;
+  const account = m.screen === "menu" && !m.moving ? accountChip(m.account) : null;
   return html`<div class="${cls("stage", "title-page", `screen-${m.screen}`, cardOpen(m) && "card-open", gated && "gated")}" data-screen="${m.screen}">${room(m)}<h1 class="title-name"><img class="title-logo" src="/logo.svg" alt="${GAME_TITLE}"></h1>${middle}${account}<div class="title-ver">${tr("title.version")}<br>${tr("title.byline")}</div><button type="button" class="title-lang" data-action="title-lang">${tr("title.lang")}</button>${settingsPanel({ settingsOpen: m.settingsOpen, muted: m.muted, settingsConfirm: m.settingsConfirm ?? null, ...(m.hintsOn !== undefined ? { hintsOn: m.hintsOn } : {}) }, { home: false, clearAll: true })}${m.opening ? openingLabel(m.opening) : null}</div>`;
 }

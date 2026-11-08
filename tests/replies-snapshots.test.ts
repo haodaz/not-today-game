@@ -9,7 +9,7 @@ import { fillPlaceholders } from "@world/replies/placeholders";
 import { planGoneClick, planIncoming, planReply, type ReplyPlan, type Step } from "@world/replies/plan";
 
 /** Test-only names, so the snapshot shows where each placeholder went. */
-const names: State["names"] = { login: "LOGIN", nick: "NICK", calledBy: "CALLEDBY", bossCalls: "BOSSCALLS", pronoun: null };
+const names: State["names"] = { login: "LOGIN", nick: "NICK", calledBy: "CALLEDBY", bossCalls: "BOSSCALLS", pronoun: null, portrait: "p1" };
 
 function when(step: Step): string {
   const at = step.at;

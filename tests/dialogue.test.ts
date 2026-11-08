@@ -39,7 +39,7 @@ function ctxOf(store: Store, clock: BeatClock = NIGHT, view: Session["view"] = "
 /** A run with a player's name, at `day`. */
 function storeAt(day: number): Store {
   const store = createStore({ startDay: 1 });
-  store.appendEvent({ kind: "names", names: { login: "林一", nick: "一一", calledBy: "老大", bossCalls: "小林", pronoun: null } });
+  store.appendEvent({ kind: "names", names: { login: "林一", nick: "一一", calledBy: "老大", bossCalls: "小林", pronoun: null, portrait: "p1" } });
   while (store.getState().day < day) store.appendEvent({ kind: "lieDown" });
   return store;
 }
@@ -485,20 +485,24 @@ describe("addition 2026-11-01: the player's own portrait for inner lines", () =>
   const inner = allSay.find((l) => l.k === "inner")!;
   // An NPC's line: day files' `who: "kuro"` / `who: "me"` are Kuro's and the player's (lying-view R1).
   const speaker = allSay.find((l) => l.k === "speaker" && l.who !== "kuro" && l.who !== "me")!;
-  const withPronoun = (pronoun: "she" | "he" | null, day = 1): Store => {
+  const withLook = (portrait: "p1" | "p2" | "p3", day = 1): Store => {
     const store = createStore({ startDay: 1 });
-    store.appendEvent({ kind: "names", names: { login: "林一", nick: "一一", calledBy: "老大", bossCalls: "小林", pronoun } });
+    store.appendEvent({ kind: "names", names: { login: "林一", nick: "一一", calledBy: "老大", bossCalls: "小林", pronoun: null, portrait } });
     while (store.getState().day < day) store.appendEvent({ kind: "lieDown" });
     return store;
   };
   const portraits = (box: string) => (box.match(/class="player-portrait"|kuro-portrait/g) ?? []).length;
 
-  it("the pronoun answer chooses the file: 她 she.png, 他 he.png, 不说 none.png", () => {
-    expect(playerPortraitSrc("she", false)).toBe("/player/she.png");
-    expect(playerPortraitSrc("he", false)).toBe("/player/he.png");
-    expect(playerPortraitSrc(null, false)).toBe("/player/none.png");
-    for (const [pronoun, file] of [["she", "she"], ["he", "he"], [null, "none"]] as const) {
-      const ctx = ctxOf(withPronoun(pronoun), WORK);
+  it("the look chosen on the title (形象 1 / 2 / 3) chooses the file; a save without one is 形象 1", () => {
+    expect(playerPortraitSrc("p1", false)).toBe("/player/she.png");
+    expect(playerPortraitSrc("p2", false)).toBe("/player/he.png");
+    expect(playerPortraitSrc("p3", false)).toBe("/player/none.png");
+    expect(playerPortraitSrc(undefined, false)).toBe("/player/she.png");
+    const old = createStore({ startDay: 1 });
+    old.appendEvent({ kind: "names", names: { login: "林一", nick: "一一", calledBy: "老大", bossCalls: "小林", pronoun: null } as never });
+    expect(old.getState().names.portrait).toBe("p1");
+    for (const [portrait, file] of [["p1", "she"], ["p2", "he"], ["p3", "none"]] as const) {
+      const ctx = ctxOf(withLook(portrait), WORK);
       ctx.session.dialogue = push(EMPTY_DIALOGUE, queueOf("i", [inner]));
       const box = out(ctx);
       expect(box).toContain(`<img class="player-portrait" src="/player/${file}.png" alt="" aria-hidden="true" draggable="false">`);
@@ -509,14 +513,14 @@ describe("addition 2026-11-01: the player's own portrait for inner lines", () =>
   });
 
   it("dream nights (stages.json dreamNights) show the child: _kid; not by day, not on other nights", () => {
-    expect(playerPortraitSrc("she", true)).toBe("/player/she_kid.png");
-    expect(playerPortraitSrc(null, true)).toBe("/player/none_kid.png");
+    expect(playerPortraitSrc("p1", true)).toBe("/player/she_kid.png");
+    expect(playerPortraitSrc("p3", true)).toBe("/player/none_kid.png");
     const dream = dreamNights[0]!;
     expect(isDreamNight(dream, "night")).toBe(true);
     expect(isDreamNight(dream, "work")).toBe(false);
     expect(isDreamNight(dream - 1, "night")).toBe(dreamNights.includes(dream - 1));
     const at = (day: number, clock: BeatClock) => {
-      const ctx = ctxOf(withPronoun("he", day), clock);
+      const ctx = ctxOf(withLook("p2", day), clock);
       ctx.session.dialogue = push(EMPTY_DIALOGUE, queueOf("i", [inner]));
       return out(ctx);
     };
@@ -527,7 +531,7 @@ describe("addition 2026-11-01: the player's own portrait for inner lines", () =>
   });
 
   it("narration and speaker lines keep no portrait; Kuro's turn shows only Kuro's: never two at once", () => {
-    const ctx = ctxOf(withPronoun("she"), WORK);
+    const ctx = ctxOf(withLook("p1"), WORK);
     ctx.session.dialogue = push(EMPTY_DIALOGUE, queueOf("n", [narration]));
     expect(portraits(out(ctx))).toBe(0);
     ctx.session.dialogue = push(EMPTY_DIALOGUE, queueOf("s", [speaker]));
@@ -538,8 +542,8 @@ describe("addition 2026-11-01: the player's own portrait for inner lines", () =>
     expect(kuro).toContain("kuro-portrait");
     expect(kuro).not.toContain("player-portrait");
     fc.assert(
-      fc.property(fc.constantFrom(inner, speaker, narration), fc.boolean(), fc.constantFrom("she", "he", null), (line, isKuro, pronoun) => {
-        const c = ctxOf(withPronoun(pronoun), WORK);
+      fc.property(fc.constantFrom(inner, speaker, narration), fc.boolean(), fc.constantFrom("p1", "p2", "p3"), (line, isKuro, pronoun) => {
+        const c = ctxOf(withLook(pronoun), WORK);
         c.session.dialogue = push(EMPTY_DIALOGUE, isKuro ? { ...queueOf("q", [line]), voice: "kuro" } : queueOf("q", [line]));
         expect(portraits(out(c))).toBeLessThanOrEqual(1);
       }),
@@ -548,7 +552,7 @@ describe("addition 2026-11-01: the player's own portrait for inner lines", () =>
   });
 
   it("inner lines wrap left of the portrait, like Kuro's; the CSS uses Kuro's slot and size, and no animation", () => {
-    const ctx = ctxOf(withPronoun(null), WORK);
+    const ctx = ctxOf(withLook("p3"), WORK);
     ctx.session.dialogue = push(EMPTY_DIALOGUE, queueOf("i", [inner]));
     const at = lineScreens(ctx.store.getState(), ctx.session)!;
     expect(at.all).toEqual(screens(inner.t, null, KURO_LINE_BOX, fontPx("zh")));

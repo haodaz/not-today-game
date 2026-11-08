@@ -339,18 +339,26 @@ function withMember(state: State, key: "found" | "recognised", objectId: string)
 }
 
 /** The title page's answers (title-page T1): every field the variable table lists, of its type. */
+/** The player's portrait choice (the character select, author 2026-11-09): three looks, no gender in their names. */
+export const PORTRAITS = ["p1", "p2", "p3"] as const;
+export type Portrait = (typeof PORTRAITS)[number];
+
 function applyNames(state: State, event: Extract<GameEvent, { kind: "names" }>): State {
   const n = event.names as unknown as Record<string, unknown>;
   if (typeof n !== "object" || n === null) throw new Error("names: expected an object");
   const fields = Object.keys(state.names);
   for (const k of Object.keys(n)) if (!fields.includes(k)) throw new Error(`names: unknown field "${k}"`);
+  // The portrait (author 2026-11-09, the character select): a run saved before it has none → p1.
+  const withPortrait = { ...n, ...(n.portrait === undefined ? { portrait: "p1" } : {}) };
   for (const k of fields) {
-    if (!(k in n)) throw new Error(`names: missing "${k}"`);
+    if (!(k in withPortrait)) throw new Error(`names: missing "${k}"`);
     if (k === "pronoun") {
       if (n.pronoun !== null && n.pronoun !== "she" && n.pronoun !== "he") throw new Error('names: pronoun must be "she", "he" or null');
+    } else if (k === "portrait") {
+      if (!PORTRAITS.includes(withPortrait.portrait as Portrait)) throw new Error('names: portrait must be "p1", "p2" or "p3"');
     } else if (typeof n[k] !== "string") throw new Error(`names: "${k}" must be a string`);
   }
-  return { ...state, names: { ...(n as State["names"]) } };
+  return { ...state, names: { ...(withPortrait as State["names"]) } };
 }
 
 /**

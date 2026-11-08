@@ -241,7 +241,8 @@
       "nick": "string",
       "calledBy": "string",
       "bossCalls": "string",
-      "pronoun": "she|he|null"
+      "pronoun": "she|he|null",
+      "portrait": "p1|p2|p3"
     },
     "changedBy": "title page only",
     "default": {
@@ -249,7 +250,8 @@
       "nick": "",
       "calledBy": "老大",
       "bossCalls": "",
-      "pronoun": null
+      "pronoun": null,
+      "portrait": "p1"
     }
   },
   "flags": {

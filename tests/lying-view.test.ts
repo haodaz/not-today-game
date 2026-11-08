@@ -25,7 +25,7 @@ const LOGIN = "林一";
 
 function storeAt(day: number): Store {
   const store = createStore({ startDay: 1 });
-  store.appendEvent({ kind: "names", names: { login: LOGIN, nick: "一一", calledBy: "老大", bossCalls: "小林", pronoun: "she" } });
+  store.appendEvent({ kind: "names", names: { login: LOGIN, nick: "一一", calledBy: "老大", bossCalls: "小林", pronoun: "she", portrait: "p1" } });
   while (store.getState().day < day) store.appendEvent({ kind: "lieDown" });
   return store;
 }
@@ -60,7 +60,7 @@ describe("R1 · Kuro and the player as speakers in a day file", () => {
     }
     expect(seen.map((s) => s.text)).toEqual(boot.map((l) => l.t));
     expect(seen[0]).toMatchObject({ tag: { kind: "kuro" }, kuro: true, me: null });
-    expect(seen[1]).toMatchObject({ tag: { kind: "who", text: LOGIN }, kuro: false, me: playerPortraitSrc("she", false) });
+    expect(seen[1]).toMatchObject({ tag: { kind: "who", text: LOGIN }, kuro: false, me: playerPortraitSrc("p1", false) });
     expect(seen[2]).toMatchObject({ tag: { kind: "kuro" }, kuro: true, me: null });
     if (seen[3]) expect(seen[3].kuro).toBe(false); // the rain moved to `rise` (author 2026-11-07): boot may be Kuro / me / Kuro only
     if (seen[3]) expect(seen[3].tag).not.toEqual({ kind: "kuro" });
