@@ -15,12 +15,12 @@ const ctx = (over: Partial<AppContext> = {}, day = 1): AppContext => {
 };
 
 describe("kuro-days parser", () => {
-  it("parses every day file: idiom and 3–4 starter questions", () => {
+  it("parses every day file: idiom and 3–20 starter questions (the box pages them by five)", () => {
     expect([...kuroDays.keys()]).toEqual(Array.from({ length: constants.lastDay }, (_, i) => i + 1));
     for (const day of kuroDays.values()) {
       expect(day.idiom.length, `day ${day.day}`).toBeGreaterThan(0);
       expect(day.starters.length, `day ${day.day}`).toBeGreaterThanOrEqual(3);
-      expect(day.starters.length, `day ${day.day}`).toBeLessThanOrEqual(4);
+      expect(day.starters.length, `day ${day.day}`).toBeLessThanOrEqual(20);
     }
   });
 

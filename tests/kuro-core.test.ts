@@ -10,11 +10,13 @@ import type { Bucket } from "@kuro/types.ts";
 import { createStore, type Store } from "@state/store";
 import type { BeatClock } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
-import { kuroDay, kuroDays, offlineAnswer } from "@world/desktop/kuro/days";
+import { kuroDay, kuroDays, offlineAnswer, parseKuroDay } from "@world/desktop/kuro/days";
+import { openStarters } from "@world/dialogue/kuro";
+const openStartersOf = (store: Store, ctx: ActionContext) => openStarters(store.getState(), store.getEvents());
 import { repeatEntries } from "@world/desktop/kuro/repeat";
 import { initialSession } from "@world/desktop/model";
 import { coreAnswer } from "@world/dialogue/core";
-import { bucketNow, playerBox } from "@world/dialogue/kuro";
+import { bucketNow, PAGE, playerBox, starterPages } from "@world/dialogue/kuro";
 import { bleedingToday } from "@world/dialogue/taboo";
 import { hasString, setLocale, t } from "@world/i18n";
 import { loopActions } from "@world/room/game";
@@ -132,14 +134,10 @@ describe("a starter is answered by the core, never the function", () => {
     expect(red.layered).toBe(false);
     expect(red.roll).toBeNull();
     expect(red.answer).toBe(D3.locked.find((l) => l.unlock === 3)!.text);
-    // Day 1 q1 has no locked line: null → the caller's written answer.
-    const d1 = kuroDay(1)!;
-    expect(coreAnswer({ day: d1, runId: "x", bucket: "low", q: 1, locale: "zh", events: [], followup: null })).toBeNull();
-    const store = storeAt(1);
-    const { ctx } = ctxOf(store);
-    talk(ctx);
-    act(ctx, "kuro-q", { q: "1" });
-    expect(chats(store)[0]).toMatchObject({ q: 1, answer: offlineAnswer(d1, 1), offline: true });
+    // A starter with no locked line (a synthetic day): null → the caller's written answer.
+    const bare = parseKuroDay("# Day 1\n**Idiom of the day (constant):** Hi.\n## Starter questions\n| 1 | 一 | one |  |\n## Offline answers\n- free text → \"Go on.\"\n## Never\n- x\n", "t");
+    expect(coreAnswer({ day: bare, runId: "x", bucket: "low", q: 1, locale: "zh", events: [], followup: null })).toBeNull();
+    expect(offlineAnswer(bare, 1)).toBe("Go on.");
   });
 
   it("every real day's layered answers can be reached by the core at every bucket", () => {
@@ -201,6 +199,53 @@ describe("follow-ups (追问)", () => {
     act(ctx, "kuro-q", { q: String(follow.after!.q) });
     act(ctx, "loop-advance");
     expect(labels()).toContain(follow.n);
+  });
+});
+
+describe("pages of five", () => {
+  const q = (n: number) => ({ n, zh: `问${n}`, en: `q${n}`, hard: false, minBucket: "low" as const });
+  it("a pool of five or fewer is one page; a larger one is cut into pages of five in order", () => {
+    expect(PAGE).toBe(5);
+    expect(starterPages([q(1), q(2), q(3)])).toEqual([[q(1), q(2), q(3)]]);
+    const big = Array.from({ length: 12 }, (_, i) => q(i + 1));
+    const pages = starterPages(big);
+    expect(pages.map((p) => p.map((s) => s.n))).toEqual([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12]]);
+  });
+  it("in the box: five questions and 说点别的… when the pool is larger; 说点别的… turns the page and wraps; a smaller pool has no such row", () => {
+    const day = [...kuroDays.values()].find((d) => d.starters.filter((s) => s.minBucket === "low" && !s.after).length > PAGE);
+    const store = storeAt(day ? day.day : 1);
+    const { ctx } = ctxOf(store);
+    talk(ctx);
+    act(ctx, "loop-advance");
+    const opts = () => playerBox(store.getState(), store.getEvents(), ctx.session)!.options;
+    if (!day) {
+      expect(opts().every((o) => o.action === "kuro-q")).toBe(true);
+      return;
+    }
+    const first = opts();
+    expect(first.filter((o) => o.action === "kuro-q")).toHaveLength(PAGE);
+    expect(first.at(-1)).toMatchObject({ action: "kuro-page", label: t("dialogue.more") });
+    expect(first.some((o) => o.action === "kuro-more")).toBe(false);
+    act(ctx, "kuro-page");
+    const second = opts();
+    expect(second.map((o) => o.q).join()).not.toBe(first.map((o) => o.q).join());
+    const n = starterPages(openStartersOf(store, ctx)).length;
+    for (let i = 1; i < n; i++) act(ctx, "kuro-page");
+    expect(opts().map((o) => o.q)).toEqual(first.map((o) => o.q));
+  });
+  it("a follow-up comes first on the first page, tagged (追问)", () => {
+    const day = [...kuroDays.values()].find((d) => d.starters.some((s) => s.after?.day === null));
+    if (!day) return;
+    const follow = day.starters.find((s) => s.after?.day === null)!;
+    const store = storeAt(day.day);
+    const { ctx } = ctxOf(store);
+    talk(ctx);
+    act(ctx, "loop-advance");
+    act(ctx, "kuro-q", { q: String(follow.after!.q) });
+    act(ctx, "loop-advance");
+    const first = playerBox(store.getState(), store.getEvents(), ctx.session)!.options[0]!;
+    expect(first.q).toBe(follow.n);
+    expect(first.label.startsWith(t("kuro.followUp"))).toBe(true);
   });
 });
 

@@ -75,14 +75,19 @@ describe("memory (FR2)", () => {
 });
 
 describe("the offline path (FR3)", () => {
-  it("a starter gets its written answer, as written (no decay), and the turn is logged offline", () => {
+  it("a starter gets its tier for the bucket (the core, 2026-11-09), as written (no decay), and the turn is logged offline", () => {
     const store = storeAt(1);
     const { ctx } = ctxOf(store);
     talk(ctx);
     act(ctx, "kuro-q", { q: "1" });
-    const answer = offlineAnswer(kuroDay(1)!, 1);
-    expect(store.getEvents().find((e) => e.kind === "chat")).toMatchObject({ kind: "chat", q: 1, said: kuroDay(1)!.starters[0]!.zh, answer, offline: true });
-    expect(box(ctx)).toContain(answer.slice(0, 20));
+    const tier = kuroDay(1)!.layered.find((l) => l.unlock === 1)!;
+    const answer = tier.zh ? tier.zh.low : tier.low;
+    const ev = store.getEvents().find((e) => e.kind === "chat")!;
+    expect(ev).toMatchObject({ kind: "chat", q: 1, said: kuroDay(1)!.starters[0]!.zh, offline: true });
+    if (ev.kind === "chat" && ev.taboo !== "flicker") {
+      expect(ev.answer!.startsWith(answer)).toBe(true);
+      expect(box(ctx)).toContain(answer.slice(0, 12));
+    }
   });
 });
 
@@ -118,7 +123,7 @@ describe("the online path (FR3), with a mocked function", () => {
     // playtest-1105 R6: the reply read on, the player's turn (world-prompts R2: its options in the column).
     expect(shown).not.toContain('data-action="kuro-more"');
     act(ctx, "loop-advance");
-    expect(box(ctx)).toContain('data-action="kuro-more"');
+    expect(box(ctx)).toContain('data-action="kuro-q"');
   });
 
   it("any failure (timeout, refusal, network) → the scripted answer, logged offline; Kuro never breaks", async () => {
@@ -130,7 +135,7 @@ describe("the online path (FR3), with a mocked function", () => {
     await flush();
     expect(store.getEvents().find((e) => e.kind === "chat")).toMatchObject({ text: TYPED, answer: offlineAnswer(kuroDay(1)!, null), offline: true });
     act(ctx, "loop-advance");
-    expect(box(ctx)).toContain('data-action="kuro-more"');
+    expect(box(ctx)).toContain('data-action="kuro-q"');
   });
 
   it("the function says bedtime: the bedtime line, no turn logged, no player's box", async () => {

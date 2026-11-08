@@ -31,6 +31,7 @@ import { pointed } from "@world/room/pointer";
 import { fontPx, KURO_LINE_BOX, nextScreen, PLAYER_BOX, screens, type BoxGeom, type Screen } from "./layout";
 import { kuroVoice } from "@world/desktop/kuro/voice";
 import { askedFrom, bucketOf, starterOpen } from "@kuro/variable.ts";
+import type { StarterQuestion } from "@world/desktop/kuro/days";
 import type { Bucket, Taboo } from "@kuro/types.ts";
 import { BLUR_MS, chatClosedByErrors, errorCount, ERRORS_AFTER_MS, FLASH_MS, tabooUsedToday } from "./taboo";
 import { coreAnswer } from "./core";
@@ -307,7 +308,7 @@ function answerBedtime(ctx: ActionContext, day: number, wait: Queued): void {
 
 /** A player's-box option. */
 export interface PlayerOption {
-  readonly action: "kuro-q" | "kuro-more" | "kuro-leave";
+  readonly action: "kuro-q" | "kuro-more" | "kuro-page" | "kuro-leave";
   readonly q?: number;
   readonly label: string;
 }
@@ -343,21 +344,41 @@ export function playerBox(state: State, events: readonly GameEvent[], session: S
     const options: PlayerOption[] = [{ action: "kuro-leave", label: t("dialogue.ok") }];
     return { name, mode: "choices", options, screens: screens(null, options.map((o) => o.label), PLAYER_TURN_BOX, px), page: 0, draft: "" };
   }
-  const asked = askedToday(events, state.day);
-  // Affinity opens questions (2026-11-02): only the starters the current bucket allows; a follow-up
-  // (2026-11-09) only after its question was asked.
-  const bucket = bucketNow(state);
-  const askedEver = askedFrom(events);
-  const starters = (kuroDay(state.day)?.starters ?? []).filter((s) => !asked.has(s.n) && starterOpen(s, bucket, askedEver, state.day));
-  // The starters and 说点别的… only (author 2026-11-01): Esc is the way out; 先不聊 is the prompt's.
+  // The pool in pages of five (author 2026-11-09): 说点别的… turns the page and wraps round; a
+  // follow-up comes first, tagged (追问). Esc is the way out; 先不聊 is the prompt's.
+  const pages = starterPages(openStarters(state, events));
+  const pageNo = pages.length ? session.playerPage % pages.length : 0;
   const options: PlayerOption[] = [
-    ...starters.map((s): PlayerOption => ({ action: "kuro-q", q: s.n, label: starterText(s) })),
-    { action: "kuro-more", label: t("dialogue.more") },
+    ...(pages[pageNo] ?? []).map((s): PlayerOption => ({ action: "kuro-q", q: s.n, label: s.after ? `${t("kuro.followUp")}${starterText(s)}` : starterText(s) })),
+    ...(pages.length > 1 ? [{ action: "kuro-page" as const, label: t("dialogue.more") }] : []),
   ];
   const all = screens(null, options.map((o) => o.label), PLAYER_TURN_BOX, px);
-  // world-prompts R2: typing keeps the list; 说点别的…'s row becomes the field in place.
+  // world-prompts R2: typing keeps the list; the field in place (the model's channel, no row of its own now).
   if (session.kuroInput) return { name, mode: "input", options, screens: all, page: 0, draft: session.kuroDraft };
-  return { name, mode: "choices", options, screens: all, page: Math.min(session.playerPage, all.length - 1), draft: "" };
+  return { name, mode: "choices", options, screens: all, page: 0, draft: "" };
+}
+
+/** How many questions a page of the player's box holds (author 2026-11-09: five, then 说点别的… for the next five). */
+export const PAGE = 5;
+
+/**
+ * The questions open to the player now: not asked today, allowed by the bucket (affinity opens
+ * questions, 2026-11-02), a follow-up only after its question (2026-11-09). Follow-ups first, so
+ * the one just unlocked is seen; then the day's order.
+ */
+export function openStarters(state: State, events: readonly GameEvent[]): StarterQuestion[] {
+  const asked = askedToday(events, state.day);
+  const bucket = bucketNow(state);
+  const askedEver = askedFrom(events);
+  const open = (kuroDay(state.day)?.starters ?? []).filter((s) => !asked.has(s.n) && starterOpen(s, bucket, askedEver, state.day));
+  return [...open.filter((s) => s.after !== undefined), ...open.filter((s) => s.after === undefined)];
+}
+
+/** The pool cut into pages of `PAGE`; a pool of five or fewer is one page (no 说点别的… row). */
+export function starterPages(open: readonly StarterQuestion[], n = PAGE): StarterQuestion[][] {
+  const pages: StarterQuestion[][] = [];
+  for (let i = 0; i < open.length; i += n) pages.push(open.slice(i, i + n));
+  return pages;
 }
 
 /**
@@ -365,7 +386,7 @@ export function playerBox(state: State, events: readonly GameEvent[], session: S
  * slot: the line box's width and right padding, and the old player's box's rows (four starters and
  * 说点别的… on one page, one row each, ellipsed if they must be).
  */
-const PLAYER_TURN_BOX: BoxGeom = { ...PLAYER_BOX, width: KURO_LINE_BOX.width, padRight: KURO_LINE_BOX.padRight };
+const PLAYER_TURN_BOX: BoxGeom = { ...PLAYER_BOX, width: KURO_LINE_BOX.width, padRight: KURO_LINE_BOX.padRight, choiceRows: PAGE + 1, maxChoices: PAGE + 1 };
 
 /**
  * How many screens Kuro's turn line takes in the box (as box.ts `lineScreens` pages it: filled, the
@@ -426,12 +447,13 @@ export const kuroActions: Record<string, ActionHandler> = {
     leaveTalk(ctx);
     ctx.rerender();
   },
-  // ▼ in the player's box: the next page of questions (the last one cycles to the first).
+  // 说点别的… (or ▼) in the player's box: the next page of five questions; the last page wraps to the first.
   "kuro-page"(ctx) {
     const { store, session } = ctx;
     const box = playerBox(store.getState(), store.getEvents(), session);
     if (!box || box.mode !== "choices") return;
-    session.playerPage = nextScreen(box.screens, box.page);
+    const n = starterPages(openStarters(store.getState(), store.getEvents())).length;
+    session.playerPage = n ? (session.playerPage + 1) % n : 0;
     ctx.rerender();
   },
 };

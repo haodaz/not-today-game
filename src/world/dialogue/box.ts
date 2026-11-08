@@ -264,6 +264,7 @@ export function lineRows(m: LineBoxModel): ChoiceRow[] {
 export function playerRows(p: PlayerBoxModel): ChoiceRow[] {
   return p.options.map((o): ChoiceRow => {
     if (o.action === "kuro-more") return { action: o.action, data: {}, label: o.label, icon: "more", ...(p.mode === "input" ? { field: { draft: p.draft } } : {}) };
+    if (o.action === "kuro-page") return { action: o.action, data: {}, label: o.label, icon: "more" };
     return { action: o.action, data: o.q !== undefined ? { q: String(o.q) } : {}, label: o.label, icon: o.action === "kuro-q" ? "ask" : "plain" };
   });
 }

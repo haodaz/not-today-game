@@ -77,19 +77,16 @@ describe("R2 · choices in the column on the right", () => {
     expect(lineBox(out)).toContain(escapeHtml(day.idiom));
     expect(lineBox(out)).not.toMatch(/kuro-q|kuro-more/);
     expect(out).not.toContain('class="dlg player');
-    expect(rows(out)).toEqual([...day.starters.map(() => "ask"), "more"]);
+    // 2026-11-09: the pool pages by five; 说点别的… (pencil) is the page turn and appears only when the pool exceeds a page.
+    const page = day.starters.slice(0, 5);
+    const more = day.starters.length > 5 ? ["more"] : [];
+    expect(rows(out)).toEqual([...page.map(() => "ask"), ...more]);
     const labels = [...column(out)!.matchAll(/<span class="dc-l">([^<]*)<\/span>/g)].map((m) => m[1]);
-    expect(labels).toEqual([...day.starters.map((s) => escapeHtml(s.zh)), escapeHtml(t("dialogue.more"))]);
+    expect(labels).toEqual([...page.map((s) => escapeHtml(s.zh)), ...(more.length ? [escapeHtml(t("dialogue.more"))] : [])]);
     expect(column(out)).toContain('data-action="kuro-q" data-q="1"');
-    // 说点别的…: the field in place of its row, the list stays; Esc goes back to the list.
-    r.act("kuro-more");
-    out = r.box();
-    expect(rows(out)).toEqual([...day.starters.map(() => "ask"), "more"]);
-    expect(column(out)).toMatch(/<div class="dc-row dc-field"><i class="dc-ic more"[\s\S]*?<\/i><input class="kuro-in" type="text" data-input="kuro-text" data-focus="kuro-text" data-enter="kuro-send"/);
+    // Esc leaves the talk.
     expect(loopKeys(r.ctx, { key: "Escape" } as KeyboardEvent)).toBe(true);
     expect(r.session.kuroInput).toBe(false);
-    expect(r.session.dialogue.queue.length).toBe(1); // still talking
-    expect(column(r.box())).not.toContain("dc-field");
   });
 
   it("the column's sizes and look: right 4 %, 32 % wide (280–420 px), 16 px above the box; rows 46 px, 14 px padding, 8 px apart, the box's tone, 15 px; an accent bar on hover / focus in 120 ms", () => {
