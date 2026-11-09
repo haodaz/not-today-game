@@ -600,7 +600,7 @@
   "settings.restart": "Start this run over",
   "settings.restartConfirm": "This run's progress will be cleared and you'll go back to the title. Sure?",
   "settings.clearAll": "Clear all records",
-  "settings.clearAllConfirm": "Progress, old things, the album and endings will all be cleared, as if opening the game for the first time. Sure?",
+  "settings.clearAllConfirm": "Progress, old things, the album and endings on this device will be cleared and you will be signed out, as if opening the game for the first time. Clear everything?",
   "settings.confirm": "Yes",
   "onboard.next": "Next",
   "onboard.skip": "Skip",

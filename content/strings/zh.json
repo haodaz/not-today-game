@@ -600,7 +600,7 @@
   "settings.restart": "重新开始这一局",
   "settings.restartConfirm": "这一局的进度会清空，回到标题页。确定吗？",
   "settings.clearAll": "清除全部记录",
-  "settings.clearAllConfirm": "进度、老物件、影集、结局都会清空，像第一次打开一样。确定吗？",
+  "settings.clearAllConfirm": "这台设备上的进度、老物件、影集、结局都会清空，并退出登录，像第一次打开一样。确定要清除吗？",
   "settings.confirm": "确定",
   "onboard.next": "下一个",
   "onboard.skip": "跳过",

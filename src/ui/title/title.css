@@ -6,7 +6,7 @@
 .title-photo{position:absolute;inset:0;background:#0a0a0b url(/room/shots/room_nobox.jpg) center/cover;filter:brightness(.4) saturate(.8)}
 .title-vig{position:absolute;inset:0;background:radial-gradient(120% 90% at 30% 50%,transparent 40%,rgba(0,0,0,.55) 100%);pointer-events:none}
 /* The waiting room: one small thing at a time (FR7). */
-.title-page .idle{position:absolute;pointer-events:none}
+.title-room .idle{position:absolute;pointer-events:none}
 .title-page .idle.lamp{inset:0;background:#000;opacity:0}
 .title-page .idle.lamp.on{opacity:.35}
 .title-page .idle.lamp.off{opacity:.7;transition:opacity 400ms ease-out}
