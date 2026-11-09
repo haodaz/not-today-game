@@ -38,9 +38,9 @@ export type Account =
   | { readonly kind: "none" }
   | { readonly kind: "guest" }
   | { readonly kind: "user"; readonly email: string }
-  | { readonly kind: "gate"; readonly mode: "login" | "register"; readonly email: string; readonly password: string; readonly status: "idle" | "busy" | "error" | "confirm"; readonly then: "new" | "continue" };
+  | { readonly kind: "gate"; readonly mode: "login" | "register"; readonly email: string; readonly password: string; readonly status: "idle" | "busy" | "error" | "confirm"; readonly then: "new" | "continue" | "stay" };
 
-export const gateFor = (then: "new" | "continue"): Account => ({ kind: "gate", mode: "register", email: "", password: "", status: "idle", then });
+export const gateFor = (then: "new" | "continue" | "stay"): Account => ({ kind: "gate", mode: "register", email: "", password: "", status: "idle", then });
 export const GATE_IDLE: Account = gateFor("new");
 
 /** The menu shows unless the card is up (the author 2026-11-09: the card comes on 新游戏 / 继续, never on arrival). */

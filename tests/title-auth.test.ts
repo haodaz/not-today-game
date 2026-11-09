@@ -120,9 +120,16 @@ describe("the gate", () => {
     expect(storage.getItem(GUEST_KEY)).toBe("1");
     const again = await mount(storage);
     expect(again.model().account).toEqual({ kind: "guest" });
-    expect(again.html()).toContain('<div class="title-account guest"><span class="who">游客身份</span></div>');
+    expect(again.html()).toContain('<div class="title-account guest"><span class="who">游客身份</span><button type="button" class="auth-logout" data-action="auth-upgrade">注册 / 登录</button></div>');
     again.click('[data-action="title-new"]');
     expect(again.model().screen).toBe("questions"); // no card for a remembered guest
+    // A guest who wants an account: the chip's 注册 / 登录 drops the guest choice and opens the card.
+    const g = await mount(storage);
+    g.click('[data-action="auth-upgrade"]');
+    await flush();
+    await flush();
+    expect(g.model().account).toMatchObject({ kind: "gate", then: "stay" });
+    expect(storage.getItem(GUEST_KEY)).toBeNull();
   });
 
   it("登录 with the right pair: signed in as the email, the menu; a wrong pair shows the error and stays", async () => {
@@ -208,9 +215,14 @@ describe("the gate", () => {
     expect(t.model().account).toEqual({ kind: "none" });
     expect(t.html()).not.toContain("title-account");
 
+    // An old anonymous session alone is nobody yet (the card still comes on 新游戏); a chosen guest is a guest.
     setSupabaseForTests(fakeClient({ id: "anon-2", is_anonymous: true }).c);
     const g = await mount();
-    expect(g.model().account).toEqual({ kind: "guest" });
+    expect(g.model().account).toEqual({ kind: "none" });
+    const chosen = new MemStorage();
+    chosen.setItem(GUEST_KEY, "1");
+    const g2 = await mount(chosen);
+    expect(g2.model().account).toEqual({ kind: "guest" });
   });
 
   it("offline (no env) or no account wiring: no gate, the menu as before", async () => {

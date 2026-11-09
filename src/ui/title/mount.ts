@@ -140,18 +140,19 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
       if (who.kind === "user") {
         storage.removeItem(GUEST_KEY);
         set({ ...model, account: { kind: "user", email: who.email } });
-      } else if (who.kind === "guest" || (who.kind === "none" && storage.getItem(GUEST_KEY) === "1")) set({ ...model, account: { kind: "guest" } });
+      } else if (storage.getItem(GUEST_KEY) === "1") set({ ...model, account: { kind: "guest" } }); // only a chosen guest; an old anonymous session alone still gets the card
       else if (who.kind === "offline") set({ ...model, account: { kind: "offline" } });
       else set({ ...model, account: { kind: "none" } });
     });
   }
   /** The card, for the action that was pressed; its email field gets the cursor. */
-  function openGate(then: "new" | "continue"): void {
+  function openGate(then: "new" | "continue" | "stay"): void {
     set({ ...model, account: gateFor(then) });
     root.querySelector<HTMLElement>('[data-focus="auth-email"]')?.focus();
   }
-  /** Past the card: the action that was pressed goes on. */
-  function proceed(then: "new" | "continue"): void {
+  /** Past the card: the action that was pressed goes on ("stay": the menu, with the chip). */
+  function proceed(then: "new" | "continue" | "stay"): void {
+    if (then === "stay") return;
     if (then === "continue") deps.onContinue();
     else actions["title-new"]!(root);
   }
@@ -433,6 +434,12 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
       deps.account.storage.setItem(GUEST_KEY, "1");
       set({ ...model, account: { kind: "guest" } });
       proceed(then);
+    },
+    // A guest who wants an account (author 2026-11-09): the anonymous session goes, the card opens.
+    "auth-upgrade": () => {
+      if (!deps.account || model.account?.kind !== "guest") return;
+      deps.account.storage.removeItem(GUEST_KEY);
+      void net.logout().then(() => openGate("stay"));
     },
     "auth-cancel": () => {
       if (model.account?.kind === "gate") set({ ...model, account: { kind: "none" } });

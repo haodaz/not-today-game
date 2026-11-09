@@ -201,6 +201,7 @@
   "auth.confirm": "Registered. Open the confirmation link in your mailbox, then log in here.",
   "auth.signedAs": "Signed in: {email}",
   "auth.guestNow": "Guest",
+  "auth.upgrade": "Register / log in",
   "auth.logout": "Log out",
   "auth.loginInstead": "Log in / register instead",
   "title.new": "New game",

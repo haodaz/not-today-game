@@ -58,7 +58,7 @@ function gateCard(a: Extract<Account, { kind: "gate" }>): SafeHtml {
 /** The identity chip (author 2026-11-09): only who you are — 游客, or the email with 退出登录; nothing for nobody. */
 function accountChip(a: Account | undefined): SafeHtml | null {
   if (!a || a.kind !== "user" && a.kind !== "guest") return null;
-  if (a.kind === "guest") return html`<div class="title-account guest"><span class="who">${tr("auth.guestNow")}</span></div>`;
+  if (a.kind === "guest") return html`<div class="title-account guest"><span class="who">${tr("auth.guestNow")}</span><button type="button" class="auth-logout" data-action="auth-upgrade">${tr("auth.upgrade")}</button></div>`;
   return html`<div class="title-account user"><span class="who">${a.email}</span><button type="button" class="auth-logout" data-action="auth-logout">${tr("auth.logout")}</button></div>`;
 }
 

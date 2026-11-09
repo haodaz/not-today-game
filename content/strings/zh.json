@@ -201,6 +201,7 @@
   "auth.confirm": "注册成功。去邮箱点一下确认链接，再回来登录。",
   "auth.signedAs": "已登录：{email}",
   "auth.guestNow": "游客身份",
+  "auth.upgrade": "注册 / 登录",
   "auth.logout": "退出登录",
   "auth.loginInstead": "改为登录 / 注册",
   "title.new": "新游戏",

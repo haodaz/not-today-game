@@ -231,6 +231,9 @@ if (jump !== null) {
       home();
     },
     onClearAll() {
+      // login-first: a blank slate also means no session and no guest choice (author 2026-11-09).
+      window.localStorage.removeItem("nt_guest");
+      void net.logout();
       clearAll(run, profile);
       home();
     },
