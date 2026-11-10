@@ -130,11 +130,7 @@
               },
               {
                 "who": "kuro",
-                "text": "A watch rota. Nobody sleeps."
-              },
-              {
-                "who": "kuro",
-                "text": "You talked in your sleep last night; the walkman caught it. Play it backwards."
+                "text": "Lao Wang says nobody sleeps this week, and you make the rota. Four rows: 22:00 to 02:00, 02:00 to 04:00, 04:00 to 06:00, and one called ΥΠΝΟΣ. The names are in the chats with the boss and the group, and one line in the contacts; the table is locked, and the key is in last night's sleep-talk recording, played backwards."
               }
             ]
           },
@@ -143,7 +139,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Northeast. Curtains drawn."
+                "text": "Northeast. What you said in your sleep: draw the curtains facing northeast."
               }
             ]
           },
@@ -152,7 +148,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "'You people have to sleep.' Xiao Zhang said so. Not this week."
+                "text": "'Shifts, four hours' sleep each' is Xiao Zhang's idea. He says you people have to sleep. Not this week."
               }
             ]
           },
@@ -161,7 +157,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Put him on watch and he stays."
+                "text": "'ΥΠΝΟΣ on watch 02:00 to 04:00.' Put him on watch and he stays."
               }
             ]
           },
@@ -170,7 +166,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "No such person. The row will still be there tomorrow."
+                "text": "ΥΠΝΟΣ deleted: no such person. The row will still be there tomorrow."
               }
             ]
           },
@@ -179,7 +175,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "In the whole rota, you're the only one who sleeps. I arranged it."
+                "text": "For 22:00 to 02:00 I wrote 'you: rest'. In the whole rota you are the only one who sleeps. I arranged it."
               }
             ]
           },

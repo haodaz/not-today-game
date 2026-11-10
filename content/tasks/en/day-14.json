@@ -130,11 +130,7 @@
               },
               {
                 "who": "kuro",
-                "text": "A thousand new hires. The name column empty."
-              },
-              {
-                "who": "kuro",
-                "text": "The ones humming in the welcome recording. Count them."
+                "text": "A thousand new hires this batch, and the onboarding has to run. Four rows: the ones who talk, the ones humming in the recording, the ones the pet cries at, the name column. The list is in the roster, and the welcome recording needs listening to; the table is locked, and there is a number in last night's recording."
               }
             ]
           },
@@ -143,7 +139,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Thirteen."
+                "text": "A thousand. The number said in the recording is how many new hires there are."
               }
             ]
           },
@@ -152,7 +148,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "The chick cried. It doesn't cry at people."
+                "text": "The rows the pet cries at: not people, no desks. It does not cry at people."
               }
             ]
           },
@@ -161,7 +157,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Name them by number and they all have names. Even the ones that shouldn't."
+                "text": "'Name them all by staff number' is Vivi's way. Number them and they all have names, the ones that should not too."
               }
             ]
           },
@@ -170,7 +166,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "All treated the same. They think so too."
+                "text": "'Desks for everyone, all treated the same' is Lao Wang's idea. They think so too."
               }
             ]
           },
@@ -179,7 +175,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "A thousand names, all yours. Saves time."
+                "text": "A thousand names in the name column, all filled in as yours. Saves time."
               }
             ]
           },
@@ -189,6 +185,10 @@
               {
                 "who": "kuro",
                 "text": "Leave it on the desk. The thousand young will find their own desks."
+              },
+              {
+                "who": "kuro",
+                "text": "A thousand hires means a thousand records built one by one. The one who runs the process never sees it."
               }
             ]
           }

@@ -145,11 +145,7 @@
               },
               {
                 "who": "kuro",
-                "text": "A loan request. The Latin line: use the dictionary."
-              },
-              {
-                "who": "kuro",
-                "text": "The margin note. You know that handwriting."
+                "text": "Lao Zhou wants a loan request filed; do not ask why. Five rows: book, page, line one, line two, date, all of it in that scan; the table is locked, and the Latin line in the scan goes into the dictionary."
               }
             ]
           },
@@ -158,7 +154,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Clavis. Key."
+                "text": "Clavis, Latin for key. You know the handwriting in the margin: it is Lao Zhou's."
               }
             ]
           },
@@ -167,7 +163,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Key."
+                "text": "Line one: 'Yog-Sothoth is the key to the gate'. That is what the book says."
               }
             ]
           },
@@ -176,7 +172,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "And guardian. The same one."
+                "text": "Line two: 'and the guardian of the gate'. The key and the guardian are the same one."
               }
             ]
           },
@@ -185,7 +181,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Study and exchange. The one rejected three times."
+                "text": "'Reason: study and exchange' is Vivi's wording. That reason has been rejected three times."
               }
             ]
           },
@@ -194,7 +190,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "May's has passed."
+                "text": "Lao Zhou says the gate day is May 1st. May's has passed."
               }
             ]
           },
@@ -203,7 +199,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "November 1st. Count forward and that's the day."
+                "text": "November 1st. Count forward from today and that is the day."
               }
             ]
           },
@@ -212,7 +208,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Loan period: permanent. It won't give it back."
+                "text": "'Loan period: permanent.' I filled that in. Once it has the book, it will not give it back."
               }
             ]
           },

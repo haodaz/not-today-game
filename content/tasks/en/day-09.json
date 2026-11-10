@@ -291,11 +291,7 @@
               },
               {
                 "who": "kuro",
-                "text": "Tomorrow's meeting: the grid seating, the script."
-              },
-              {
-                "who": "kuro",
-                "text": "Count the tiles in the screenshot."
+                "text": "Tomorrow's meeting needs seats: four places in the circle and one triangle, and the script goes out to everyone. Who sits where is in the meeting record; count the tiles in the screenshot and match them one by one."
               }
             ]
           },
@@ -304,7 +300,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "The triangle tile. No name is said."
+                "text": "The triangle is the guest's. The name is not written and not said; that is how the record puts it."
               }
             ]
           },
@@ -313,7 +309,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "She wants the centre. That seat isn't for people."
+                "text": "Vivi wants the centre. The triangle is not a seat for people; if she sits there, tomorrow she is not her."
               }
             ]
           },
@@ -322,7 +318,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Empty isn't the same as nobody."
+                "text": "An empty triangle is not an empty seat. It does not need a chair."
               }
             ]
           },
@@ -331,7 +327,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "You need to be there. So am I."
+                "text": "The third in the circle is you; Lao Wang said you have to be there. So am I, in your screen."
               }
             ]
           },
@@ -340,7 +336,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "'Triangle: you.' It suits you."
+                "text": "'Triangle: you.' I filled that in. It suits you."
               }
             ]
           },
@@ -349,7 +345,11 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "To Lao Wang. He'll reply in the small hours."
+                "text": "Sent to Lao Wang. He will reply in the small hours."
+              },
+              {
+                "who": "kuro",
+                "text": "A seating plan looks like a small thing. One wrong seat and tomorrow's meeting is a different meeting."
               }
             ]
           }

@@ -146,11 +146,7 @@
               },
               {
                 "who": "kuro",
-                "text": "The cost sheet has to balance. The oil and wine columns are not to be touched."
-              },
-              {
-                "who": "kuro",
-                "text": "The calculator only lights up facing the window."
+                "text": "Vivi wants costs cut: the cost sheet has to balance, to her before you log off. Five rows: wheat, barley, oil, wine, total. The prices are in Lao Zhou's chat and the old menu; the oil and wine columns, Lao Wang says, are not to be touched. The table is locked: how many measures of wheat and of barley a penny buys, both numbers into the calculator, which only lights up facing the window."
               }
             ]
           },
@@ -159,7 +155,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "One to three. A measure of wheat for a penny, three of barley for a penny."
+                "text": "One to three: a measure of wheat for a penny, three of barley. The old menu's prices."
               }
             ]
           },
@@ -168,7 +164,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Those two columns aren't yours."
+                "text": "'Oil and wine down 10% each' is Vivi's plan. Those two columns are not ours; whoever changes them carries it."
               }
             ]
           },
@@ -177,7 +173,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Yesterday's price went with yesterday."
+                "text": "'Wheat at yesterday's price.' Yesterday's price went with yesterday; the sheet will not balance."
               }
             ]
           },
@@ -186,7 +182,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Balanced. Not a cent out."
+                "text": "The total balances, not a cent out. That row is the one the boss wants."
               }
             ]
           },
@@ -195,7 +191,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "I optimised the oil and the wine. I didn't make the rule, so I don't really remember it."
+                "text": "I took 10% off the oil and the wine and wrote 'optimised'. I did not make the rule, so I do not remember it well."
               }
             ]
           },
@@ -205,6 +201,10 @@
               {
                 "who": "kuro",
                 "text": "Leave it on the desk. Tonight's hand will weigh it."
+              },
+              {
+                "who": "kuro",
+                "text": "Balancing a sheet means recomputing every column. The one who reads it looks at the total."
               }
             ]
           }

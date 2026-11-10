@@ -130,11 +130,7 @@
               },
               {
                 "who": "kuro",
-                "text": "The chairman just wants a sound. The flute can't stop."
-              },
-              {
-                "who": "kuro",
-                "text": "The brief is one line, and it's a flute. Use the walkman for the beat."
+                "text": "The chairman does not read materials; he just wants to hear something, and it must not stop. Four rows: opening, middle, beat, ending. The voice notes are in the chats with the boss and the group, the flute is in the files; the table is locked, and the beat is in the flute at the end of last night's recording, on the walkman."
               }
             ]
           },
@@ -152,7 +148,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "No ending. Back to the opening."
+                "text": "Ending: no ending, loop back to the opening. That way it never stops."
               }
             ]
           },
@@ -161,7 +157,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Say an introduction and it stops."
+                "text": "Vivi wants an introduction. Say an introduction and the flute stops."
               }
             ]
           },
@@ -170,7 +166,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Say thank you and it stops."
+                "text": "Lao Zhou wants a 'thank you, everyone' at the end. Say thank you and it stops."
               }
             ]
           },
@@ -179,7 +175,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "I replaced the beat with your heartbeat. Very steady."
+                "text": "I replaced the beat with your heartbeat. Very steady; always the same."
               }
             ]
           },
@@ -188,7 +184,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Leave it on the desk. Don't stop tonight."
+                "text": "Leave it on the desk. Do not stop tonight."
               }
             ]
           }

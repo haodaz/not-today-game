@@ -130,11 +130,7 @@
               },
               {
                 "who": "kuro",
-                "text": "Act Two. One word at a time. Don't read them together."
-              },
-              {
-                "who": "kuro",
-                "text": "The locked column: look up Hali in the dictionary."
+                "text": "Lao Zhou wants Act Two proofread: fix the typos, do not read closely. Four rows: name, lake, sky, sign. Check them against the script and the scan of that book, one word at a time, and never read a whole line together. The table is locked; the key is in last night's recording, played backwards."
               }
             ]
           },
@@ -143,7 +139,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Hali. A lake. The twin suns sink behind it."
+                "text": "Act Two. Played backwards, that is what you say. You never read Act Two; how would you say it."
               }
             ]
           },
@@ -152,7 +148,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Cassilda. Act One is safe to read."
+                "text": "Cassilda: the name is fixed. Act One is safe to read. Not Act Two."
               }
             ]
           },
@@ -161,7 +157,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Polish it and you've read it."
+                "text": "'Smooth out the whole line' is Vivi's idea. Smooth a whole line and you have read it."
               }
             ]
           },
@@ -170,7 +166,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "That isn't a character. Lao Zhou knows."
+                "text": "Lao Zhou says the sign is the Chinese character for yellow. It is not a character; Lao Zhou knows that himself."
               }
             ]
           },
@@ -179,7 +175,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "If you can't read it, you've got it right."
+                "text": "The sign row says 'the one that belongs to no human script'. If you cannot read it, you have it right."
               }
             ]
           },
@@ -188,7 +184,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "I read it all for you. You're fine. So am I."
+                "text": "'Read in full and polished for you.' I filled that in. I read it for you; you are fine, and so am I."
               }
             ]
           },

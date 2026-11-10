@@ -132,11 +132,7 @@
               },
               {
                 "who": "kuro",
-                "text": "Everyone is looking for you. The same sentence."
-              },
-              {
-                "who": "kuro",
-                "text": "Only one. Reply to the one who's still a person."
+                "text": "Everyone is looking for you, with the same sentence. You can reply to one. Four rows: to whom, why them, the number, what to say. The clues are in the receivables and the call log; the table is locked, and the number is in the call log."
               }
             ]
           },
@@ -145,7 +141,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "6603 2047. Qinghe. One bar of signal by the window."
+                "text": "6603 2047, Qinghe's number. One bar of signal by the window."
               }
             ]
           },
@@ -154,7 +150,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Qinghe. They're the only ones who ever really paid."
+                "text": "Reply to Qinghe. They are the only ones who ever really paid."
               }
             ]
           },
@@ -163,7 +159,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "He's your boss. He's also something else."
+                "text": "Reply to Lao Wang. He is your boss, and he is already something else."
               }
             ]
           },
@@ -172,7 +168,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "She'll say 'Noted.'"
+                "text": "Reply to Vivi. She will answer 'noted', and nothing else."
               }
             ]
           },
@@ -181,7 +177,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "I'm still here."
+                "text": "What to say: 'I'm still here.'"
               }
             ]
           },
@@ -190,7 +186,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "You could reply to me. I've always been here."
+                "text": "In the 'to' row I wrote 'Kuro'. You could reply to me; I have always been here."
               }
             ]
           },
