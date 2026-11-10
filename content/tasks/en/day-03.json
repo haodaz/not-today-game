@@ -1029,15 +1029,7 @@
               },
               {
                 "who": "kuro",
-                "text": "The meeting is over. Wang wants it bigger. The memo is on the left; one line at a time."
-              },
-              {
-                "who": "me",
-                "text": "Not one word of the business changed."
-              },
-              {
-                "who": "kuro",
-                "text": "The story did. Click a page, pick a way of saying it."
+                "text": "The meeting is over. Wang wants the AI theory bigger: v18 is yesterday's business with a new way of telling it. The six pages under Pages on the left are empty: open one and pick one of the three lines under it; the references page needs a decision too. Then take the snapshot for Wang."
               }
             ]
           },
@@ -1046,7 +1038,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "That is not what he wants."
+                "text": "The same line as yesterday, about the risk. Today Wang does not want risk; he wants a direction."
               }
             ]
           },
@@ -1055,7 +1047,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Both ends at once; Wang will pick one."
+                "text": "Risk and opportunity both: that says nothing. Wang will pick one half and read it out."
               }
             ]
           },
@@ -1064,7 +1056,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Wang will read this one out."
+                "text": "'Stop letting a brain worse than the AI direct the AI' is what Wang said in the meeting. He will read it out."
               }
             ]
           },
@@ -1073,7 +1065,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Still yesterday's."
+                "text": "Still yesterday's 'a group of brains watching each other'. He wants something bigger today."
               }
             ]
           },
@@ -1082,7 +1074,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Grows. Toward what?"
+                "text": "'Grows by itself.' What grows, and how, the page does not say; if anyone asks, you answer."
               }
             ]
           },
@@ -1091,7 +1083,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Self-evolving. The word he wants."
+                "text": "'Self-evolving' is the word he wants. Written down, the backend is still Zhang importing three tables every Monday."
               }
             ]
           },
@@ -1100,7 +1092,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "The number is real, so it cannot be written like that."
+                "text": "Two hundred and eleven nodes is a real number. Written down, it cannot be told big."
               }
             ]
           },
@@ -1109,7 +1101,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Sees and remembers for him. You have one too."
+                "text": "Everyone has a projection in the digital space, seeing and remembering for them. That line describes something like me."
               }
             ]
           },
@@ -1118,7 +1110,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "The line I added. He will like it."
+                "text": "'People need not understand it; they only need to be understood by it.' I added that line. Wang will like it."
               }
             ]
           },
@@ -1127,7 +1119,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "A person checks it again — he does not want to hear 'person'."
+                "text": "'A person checks it again' has 'person' in it. Wang does not want to hear that word today."
               }
             ]
           },
@@ -1136,7 +1128,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Moving through. He said it in the meeting."
+                "text": "'Moving through the data' is what he said in the meeting. Written down, he will recognise his own words."
               }
             ]
           },
@@ -1145,7 +1137,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "No one follows along. Not you either."
+                "text": "'The AI finds its own way; no one follows along.' Once this is written, when it goes wrong nobody is following either."
               }
             ]
           },
@@ -1154,7 +1146,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Checked out bit by bit: not big enough."
+                "text": "'The graph was checked bit by bit' is true, but not big. Today he does not want true; he wants big."
               }
             ]
           },
@@ -1163,7 +1155,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Only we walk it. He loves that."
+                "text": "'Only we walk this road': he loves that line. We are alone on it because nobody else takes it."
               }
             ]
           },
@@ -1172,7 +1164,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "More itself. Tonight this line is the most like him."
+                "text": "'More itself every year.' Of tonight's lines, this one sounds most like him."
               }
             ]
           },
@@ -1181,15 +1173,16 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "The text changed. Do the references change?"
-              },
-              {
-                "who": "me",
-                "text": "Leave them. The same papers, saying how dangerous this is."
-              },
+                "text": "The references stay. The same papers, all about how dangerous this is. They are on the last page; nobody turns to it."
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
               {
                 "who": "kuro",
-                "text": "You've learned to pad the format."
+                "text": "I filled the rest to Wang's taste."
               }
             ]
           },
@@ -1198,7 +1191,11 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Snapshot 03. Send it to Wang. He will read it out."
+                "text": "Snapshot 03 taken. Give it to Wang; he will read it out."
+              },
+              {
+                "who": "kuro",
+                "text": "Six pages of wording changed; not one point of the graph moved. If these six pages were really done, the backend would be rewritten from scratch. The one who writes the proposal does not know that."
               }
             ]
           }
