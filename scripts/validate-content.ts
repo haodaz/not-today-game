@@ -24,7 +24,7 @@ const OBJECTS_EN = join(ROOT, "content/en/objects.json");
 /** Every day has these beats. */
 const CORE_BEATS = ["boot", "desk", "shutdown", "night"] as const;
 /** `box` is the fifth: present exactly on the days an object arrives (stages.json objectsFoundOnDay). */
-const ALL_BEATS = ["boot", "rise", "box", "desk", "shutdown", "night"];
+const ALL_BEATS = ["boot", "rise", "turn", "box", "desk", "shutdown", "night"];
 /** lying-view R6: `rise` is optional (what is seen on getting up); any day may have it. */
 /**
  * A choice's `effects` are the day files' deltas: each key changes one variable of

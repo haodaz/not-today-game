@@ -530,12 +530,8 @@
                 "text": "Good to see you."
               },
               {
-                "who": "me",
-                "text": "Wang wants a technical statement for the investors. Is v17 merged?"
-              },
-              {
                 "who": "kuro",
-                "text": "I merged a version overnight. The three dotted pages differ from yesterday's v16; you decide which side stays. The five empty pages take a line from the sources on the left."
+                "text": "v17 was merged overnight. The three dotted pages under Pages on the left differ from yesterday's v16: open one and decide which side stays. The five empty pages take a line from Sources below. When all are decided, pull the data once and take the snapshot for Wang."
               }
             ]
           },
@@ -692,7 +688,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Three pages merged. Five are still empty."
+                "text": "All three pages decided."
               }
             ]
           },

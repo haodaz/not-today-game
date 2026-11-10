@@ -615,6 +615,16 @@ function arrive(ctx: ActionContext, view: View, data: DOMStringMap): void {
   const from = ctx.session.view;
   ctx.session.view = view;
   if (from !== view && view !== "desktop") startCam(ctx, from, view);
+  // The morning's second half (author 2026-11-10): the rise lines are said facing the bed wall; the
+  // desk's own lines wait until the player has turned to it, once a day, before the tower is on.
+  if (view === "room" && from !== view && isFacing(from)) {
+    const state = ctx.store.getState();
+    const seq = loopContext(state, ctx.store.getEvents())?.file.beats.turn;
+    if (seq && ctx.session.riseBeatDay === state.day && ctx.session.turnBeatDay !== state.day && !booted(state, ctx.store.getEvents())) {
+      ctx.session.turnBeatDay = state.day;
+      ctx.session.dialogue = push(ctx.session.dialogue, beatQueued(state.day, "turn", seq));
+    }
+  }
   // guidance R4: Kuro crawls while the camera moves to or from the screen.
   if (from !== view && (from === "desktop" || view === "desktop")) ctx.session.movingUntil = (ctx.now?.() ?? Date.now()) + MOTION.crawl;
   // A walk is two steps, whichever way; a turn between facings is a head turn and makes no sound

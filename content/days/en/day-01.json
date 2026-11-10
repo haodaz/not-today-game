@@ -29,6 +29,18 @@
         },
         {
           "k": "narration",
+          "t": "A rented room, lived in alone. Bed, desk, door, window, all in this one room."
+        },
+        {
+          "k": "inner",
+          "t": "Move the mouse to the left edge and turn to the desk."
+        }
+      ]
+    },
+    "turn": {
+      "say": [
+        {
+          "k": "narration",
           "t": "A coffee mug on the desk. Two screens, black."
         },
         {

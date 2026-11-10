@@ -250,6 +250,8 @@ export interface Session {
   bootBeatDay: number;
   /** lying-view R6: the day whose `rise` beat played on the first 起床 (once a day; session only). */
   riseBeatDay: number;
+  /** The day whose `turn` beat (the first look at the desk after getting up) has played. */
+  turnBeatDay: number;
   /** object-tutor R2: the walkman was taken up from the bed question (打开录音机); putting it down asks again. */
   recordTrip: boolean;
   /** blind-box addition 2026-11-07: when the case was last opened (the loose box's one wobble), or null. */
@@ -506,6 +508,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     screenOffDay: 0,
     bootBeatDay: 0,
     riseBeatDay: 0,
+    turnBeatDay: 0,
     recordTrip: false,
     caseOpenedAt: null,
     taskStartSaid: new Set(),

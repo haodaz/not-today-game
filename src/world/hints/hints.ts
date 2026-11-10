@@ -42,7 +42,8 @@ const DUE: Readonly<Record<HintId, (c: Ctx) => boolean>> = {
   // Right after the power-on lines (a hint waits for the box): on, and 屏幕 not visited yet this run.
   screen: ({ state, events, session }) => booted(state, events) && session.onboard === "no",
   // Back in the room from the computer: the run has been to 屏幕 (its coach marks are over).
-  turn: ({ session }) => session.onboard === "done" && session.view === "room",
+  // Also (author 2026-11-10) right after getting up, facing the bed wall, until the player has turned to the desk once.
+  turn: ({ state, session }) => (session.onboard === "done" && session.view === "room") || (session.view === "bed" && session.riseBeatDay === state.day && session.turnBeatDay !== state.day),
   phone: ({ lc }) => {
     if (!lc) return false;
     const lunch = itemByEvent(lc, "order", "lunch");
@@ -82,7 +83,8 @@ export function anchorFor(id: HintId, view: string): Anchor | null {
     case "screen":
       return view === "room" || view === "desk" ? act("view", "desktop") : null;
     case "turn":
-      return view === "room" ? { kind: "edge", side: "right" } : null;
+      // From the bed wall (the morning, author 2026-11-10) the edge that turns to the desk.
+      return view === "room" ? { kind: "edge", side: "right" } : view === "bed" ? wayTo(view, "room") : null;
     case "phone":
       return view === "room" ? act("view", "desk") : view === "desk" ? act("loop-phone") : null;
     case "door":
