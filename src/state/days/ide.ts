@@ -169,13 +169,15 @@ export function ideTranscript(board: TaskBoard, ops: readonly IdeOp[], carried: 
         break;
       }
       case "fill": {
-        // ide talk (author 2026-11-10): the player's choice as the input, Kuro's execution, then the remark.
-        if (board.view === "ide" && stepBoard(board, walk, op) !== walk) {
+        // ide talk (author 2026-11-10): the player's choice as the input, Kuro's execution, then the remark —
+        // on every board that talks (beats): a file name on an IDE page, the row's label on a table.
+        if ((board.view === "ide" || board.beats) && stepBoard(board, walk, op) !== walk) {
           const label = board.slots.find((x) => x.id === op.slot)?.label ?? op.slot;
           const card = board.cards.find((x) => x.id === op.card)?.text ?? op.card;
-          const file = board.ide?.files?.[op.slot]?.name ?? op.slot;
+          const file = board.ide?.files?.[op.slot]?.name;
           out.push({ on: `ide:fill:${op.slot}:${op.card}`, who: "me", text: card, args: { label, card } });
-          out.push({ on: `ide:filled:${op.slot}:${op.card}`, who: "kuro", text: file, args: { file } });
+          if (file !== undefined) out.push({ on: `ide:filled:${op.slot}:${op.card}`, who: "kuro", text: file, args: { file } });
+          else out.push({ on: `ide:filledSlot:${op.slot}:${op.card}`, who: "kuro", text: label, args: { label } });
         }
         show(beats.has(`fill:${op.slot}:${op.card}`) ? `fill:${op.slot}:${op.card}` : `fill:${op.slot}`);
         break;
@@ -199,13 +201,20 @@ export function ideTranscript(board: TaskBoard, ops: readonly IdeOp[], carried: 
       case "fetch":
         if (!walk.fetched) {
           const at = board.ide?.api?.at ?? "";
-          out.push({ on: "ide:fetch", who: "me", text: at, args: {} });
-          out.push({ on: "ide:fetched", who: "kuro", text: at, args: { at } });
+          out.push({ on: "ide:pull", who: "me", text: at, args: {} });
+          out.push({ on: "ide:pulled", who: "kuro", text: at, args: { at } });
           show("fetch");
         }
         break;
       case "unlock":
-        if (!walk.unlocked && op.code === board.given.lock?.answer) show("unlock");
+        if (!walk.unlocked && op.code === board.given.lock?.answer) {
+          // ide talk: the code the player typed, Kuro opening the lock, then the unlock beat
+          if (board.beats) {
+            out.push({ on: `ide:code:${op.code}`, who: "me", text: op.code, args: { code: op.code } });
+            out.push({ on: "ide:opened", who: "kuro", text: op.code, args: {} });
+          }
+          show("unlock");
+        }
         break;
       case "assistUnlock":
         if (!walk.unlocked) show("unlock");
