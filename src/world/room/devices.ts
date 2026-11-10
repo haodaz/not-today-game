@@ -158,7 +158,9 @@ function dictionary(ctx: DeviceCtx): SafeHtml {
   });
   // The space bar (author: "文曲星不能没有空格"): a wide blank key under ZXCVBNM, its own row.
   const space = key("dictionary", "space", down === "space", live, "", "space");
-  return html`<div class="${cls("dev-shell", "dict", ctx.state.upgraded.dictionary && "upgraded")}" data-device="dictionary"><div class="lid">${glass(ctx, DICT_COLS * CELL_W, DICT_ROWS * CELL_H + 1)}<div class="brand"><span>${brand ?? "★"}</span><span>E-C · 2×16</span></div></div><div class="hinge"></div><div class="base"><div class="fn">${fn("power", "⏻", "power")}${fn("up", "▲", "")}${fn("down", "▼", "")}${fn("lookup", "查询", "go")}</div>${rows}<div class="row">${space}</div></div></div>`;
+  // dictionary-guide (author 2026-11-10): the first use's example card — 翻译 turns the line, 知道了 closes it.
+  const guide = ctx.session.dictGuide === "due" ? html`<div class="dict-guide" role="dialog" aria-label="${t("dict.guide.title")}"><b>${tr("dict.guide.title")}</b><p>${tr("dict.guide.body")}</p><div class="ex" data-step="${ctx.session.dictGuideStep}">${tr(`dict.guide.ex${ctx.session.dictGuideStep}`)}</div><div class="row"><button type="button" class="go" data-action="dict-guide-next">${tr("obj.key.dictionary.lookup")}</button><button type="button" data-action="dict-guide-ok">${tr("onboard.ok")}</button></div></div>` : null;
+  return html`${guide}<div class="${cls("dev-shell", "dict", ctx.state.upgraded.dictionary && "upgraded")}" data-device="dictionary"><div class="lid">${glass(ctx, DICT_COLS * CELL_W, DICT_ROWS * CELL_H + 1)}<div class="brand"><span>${brand ?? "★"}</span><span>E-C · 2×16</span></div></div><div class="hinge"></div><div class="base"><div class="fn">${fn("power", "⏻", "power")}${fn("up", "▲", "")}${fn("down", "▼", "")}${fn("lookup", "查询", "go")}</div>${rows}<div class="row">${space}</div></div></div>`;
 }
 
 function calculator(ctx: DeviceCtx): SafeHtml {

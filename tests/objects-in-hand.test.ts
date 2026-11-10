@@ -824,6 +824,36 @@ describe("holding and using (FR1)", () => {
       }
     });
   });
+
+  // dictionary-guide (author 2026-11-10): the first use of the 文曲星 shows an example card (not story
+  // text): 翻译 turns the line English → Chinese → the English it comes back as; 知道了 closes it for the run.
+  describe("the dictionary's first-use card", () => {
+    it("comes up on the first 使用, turns its example with 翻译, closes with 知道了, and does not come back", () => {
+      const store = atDay(7, ["dictionary"]);
+      store.appendEvent({ kind: "recognise", objectId: "dictionary" });
+      const { ctx } = fakeCtx(store);
+      act(ctx, "loop-hold", { object: "dictionary" });
+      expect(render(ctx)).not.toContain('class="dict-guide"');
+      act(ctx, "obj-use");
+      let out = render(ctx);
+      expect(out).toContain('class="dict-guide"');
+      expect(out).toContain('<div class="ex" data-step="0">How much is the shirt?</div>');
+      act(ctx, "dict-guide-next");
+      expect(render(ctx)).toContain('<div class="ex" data-step="1">衬衫的价格是九磅十五便士。</div>');
+      act(ctx, "dict-guide-next");
+      expect(render(ctx)).toContain('<div class="ex" data-step="2">Nine pounds fifteen.</div>');
+      act(ctx, "dict-guide-next");
+      expect(render(ctx)).toContain('data-step="0"');
+      act(ctx, "dict-guide-ok");
+      out = render(ctx);
+      expect(out).not.toContain('class="dict-guide"');
+      expect((out.match(/data-action="obj-key" data-object="dictionary"/g) ?? []).length).toBe(32);
+      act(ctx, "loop-put-down");
+      act(ctx, "loop-hold", { object: "dictionary" });
+      act(ctx, "obj-use");
+      expect(render(ctx)).not.toContain('class="dict-guide"');
+    });
+  });
 });
 
 describe("programs (FR2, FR3)", () => {

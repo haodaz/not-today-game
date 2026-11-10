@@ -88,6 +88,10 @@ export interface Session {
   stack: AppId[];
   /** playtest-1105 R1: the run's first desktop visit (see placement.ts); remembered with the placement. */
   onboard: "no" | "due" | "done";
+  /** dictionary-guide (author 2026-11-10): the first use of the 文曲星 shows an example card (not story text), once a run. */
+  dictGuide: "no" | "due" | "done";
+  /** Which line of the example is up: 0 the English, 1 the Chinese, 2 the English it comes back as. */
+  dictGuideStep: number;
   /** onboarding-steps R1: which coach mark is up while `onboard` is "due" (0 = the first dock app). Session only. */
   onboardStep: number;
   /**
@@ -437,6 +441,8 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     // playtest-1105 R1: a bare session has been to its desktop; mountDesktop starts a run's at "no".
     onboard: "done",
     onboardStep: 0,
+    dictGuide: "no",
+    dictGuideStep: 0,
     hintsOn: false,
     hintsSeen: [],
     hintQueue: [],

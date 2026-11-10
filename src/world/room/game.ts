@@ -1336,7 +1336,24 @@ export const loopActions: Record<string, ActionHandler> = {
       const before = (session.hand.programs.dictionary as { open?: boolean } | undefined)?.open === true;
       pressKey(ctx, id, "open");
       if (!before) session.hand.openedAt = ctx.now?.() ?? Date.now();
+      // dictionary-guide (author 2026-11-10): the first use shows how 翻译 works, on an example, not story text.
+      if (session.dictGuide === "no" && !ctx.store.getState().upgraded.dictionary) {
+        session.dictGuide = "due";
+        session.dictGuideStep = 0;
+      }
     }
+    ctx.rerender();
+  },
+  // dictionary-guide: 翻译 on the card turns the example (English → Chinese → the English it comes back as → …).
+  "dict-guide-next"(ctx) {
+    if (ctx.session.dictGuide !== "due") return;
+    ctx.session.dictGuideStep = (ctx.session.dictGuideStep + 1) % 3;
+    ctx.rerender();
+  },
+  // 知道了: the card goes, for the run.
+  "dict-guide-ok"(ctx) {
+    if (ctx.session.dictGuide !== "due") return;
+    ctx.session.dictGuide = "done";
     ctx.rerender();
   },
   // A key on the held object: only while in use, only on the face that is up.

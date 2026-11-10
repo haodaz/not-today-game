@@ -73,6 +73,8 @@ let busy = false;
 const interrupts = async () => {
   if (busy) return; busy = true;
   try {
+    // dictionary-guide (2026-11-10): the first use's example card is read and closed.
+    if (await has("[data-action=dict-guide-ok]")) { await shotStep("dict-guide"); await ev("__sel('[data-action=dict-guide-next]')"); await sleep(0.3); await ev("__sel('[data-action=dict-guide-ok]')"); await sleep(0.4); }
     if (await has("[data-action=call-answer]")) {
       note("   call: answering"); await ev("__sel('[data-action=call-answer]')"); await sleep(1);
       let ended = false, live = false; for (let i = 0; i < 300 && !ended; i++) { if (!live && (await has(".call-overlay.in-call"))) { live = true; await sleep(2.5); await shotStep("call-live"); } if (await has("[data-action=call-end]:not([disabled])")) { await ev("__sel('[data-action=call-end]:not([disabled])')"); ended = true; } else if (live && !(await has(".call-overlay"))) ended = true; else await sleep(1); }
@@ -272,7 +274,15 @@ for (const it of ITEMS) {
       let steps = 0; while (steps < 6 && (await sel("[data-action=loop-door]", 2))) { steps++; await settle(); }
       note(`   door steps clicked: ${steps}`); ok = steps > 0; await settle(); await toRoom();
     }
-    else if (it.done === "event:eat:lunch" || it.done === "event:eat:dinner") { await toRoom(); await key("ArrowLeft"); await sleep(1.4); ok = await sel("[data-action=loop-eat]", 2); await settle(); await toRoom(); }   // 外卖在窗边饭桌（room-turn）
+    else if (it.done === "event:eat:lunch" || it.done === "event:eat:dinner") {
+      // 外卖在窗边饭桌（room-turn）: a line still up is read first (day 3's v18 leaves one); the story may have
+      // left the camera at the table already, else turn to it.
+      await settle(); await toRoom();
+      ok = await sel("[data-action=loop-eat]", 2);
+      if (!ok) { await key("ArrowLeft"); await sleep(1.4); ok = await sel("[data-action=loop-eat]", 2); }
+      if (!ok) note(`   eat: no table · face=${await ev("(document.querySelector('.stage.room')?.className.match(/(\\w+)-view/) || [])[1] || ''")} · ${(await text()).slice(0, 120)}`);
+      await settle(); await toRoom();
+    }
     else if (it.done === "event:openBox") {
       await toRoom(); await sel("[data-action=pick-box]", 1.2); ok = await sel("[data-action=case-pick].loose", 2.5); if (!ok) note(`   case: no loose box · ${await ev("JSON.stringify([...document.querySelectorAll('[data-action=case-pick]')].map(e=>e.dataset.slot+':'+e.className))")}`);
       const right = boxObject?.options?.find((o) => o.right)?.t ?? null; await settle(right); await key("Escape"); await settle(right); await toRoom();
