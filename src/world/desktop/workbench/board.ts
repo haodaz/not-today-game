@@ -353,7 +353,8 @@ const actions: Record<string, ActionHandler> = {
   // code the reading shows (validated by the reducer's own rule: one of the lock's codes).
   "board-read"(ctx, _data, el) {
     const id = ctx.session.holding;
-    if (!ctx.session.objbarOpen || !id) return;
+    // From the 老物件栏 modal or the room's 使用 (2026-11-10): the device must be in use either way.
+    if (!id || !ctx.session.hand.using) return;
     // What the device shows now (never the markup's word for it).
     const r = lockReading(ctx.store.getState(), ctx.store.getEvents(), ctx.session, id, ctx.now?.() ?? Date.now(), ctx.store.getRunId());
     if (!r?.code) return;

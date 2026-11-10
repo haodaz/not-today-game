@@ -19,6 +19,7 @@ import { envFor, PROGRAMS } from "@world/objects/index";
 import { UPSIDE_DOWN_DEG, upsideDownOf } from "@world/objects/calculator";
 import { codeInReading, deviceReading } from "@world/objects/reading";
 import { loopActions } from "@world/room/game";
+import { renderRoom } from "@world/room/hud";
 import { completeUntil } from "./complete-items";
 import * as await_openWork from "@world/desktop/workbench/work";
 
@@ -252,5 +253,77 @@ describe("R5 · snapshot", () => {
     r.lookUp(r.board.given.lock!.codes[0]!);
     const foot = /<div class="ob-foot"[\s\S]*?<\/div>/.exec(r.modal())![0];
     expect({ row: r.row(), foot }).toMatchSnapshot();
+  });
+});
+
+// ——— the lock's face (2026-11-10): the code is read where the device shows it ———
+// A face lock (day 8's calculator, 「拿去窗那边用」) sends the player to the window; the calculator
+// works there by day, but the 老物件栏 modal is the desk's (and by day, lampless, the calculator does
+// not open from it). So 就按它显示的填 sits under the device in the room's 使用 as well.
+describe("the room's 使用 carries the read footer at the lock's face", () => {
+  it("day 8 at 窗: the footer under the calculator, off until it shows a code; the right reading opens the column from there", () => {
+    const task = lockTask(8, "calculator");
+    const answer = task.board!.given.lock!.answer;
+    const store = createStore({ startDay: 8 });
+    store.appendEvent({ kind: "openLayer", objectId: "calculator" });
+    store.appendEvent({ kind: "recognise", objectId: "calculator" });
+    completeUntil(store, itemOf(8, task));
+    expect(await_openWork.openWork(store.getState(), store.getEvents())?.tree?.id).toBe(task.id);
+    const s = initialSession(WORK, "right", "window");
+    s.dialogue = EMPTY_DIALOGUE;
+    s.hand.inLight = true;
+    const ctx: ActionContext = { store, session: s, rerender: () => {}, later: () => {}, now: () => 0 };
+    const act = (name: string, data: Record<string, string> = {}) => loopActions[name]!(ctx, data as DOMStringMap, null as never);
+    const room = () => renderRoom({ state: store.getState(), events: store.getEvents(), session: s, nowMs: 0 }).value;
+    // Lifted and used at the window: logged ok, so the lock's code is offered; nothing keyed yet.
+    act("loop-hold", { object: "calculator" });
+    expect(room()).not.toContain("ob-foot"); // holding only: no footer
+    act("obj-use");
+    let out = room();
+    expect(out).toContain('<div class="dev-focus">');
+    expect(out).toContain(`<div class="ob-foot" data-lock="${task.id}">`);
+    expect(out).toMatch(/<button type="button" class="ob-read" data-action="board-read" disabled>/);
+    for (const k of ["C", ...answer]) act("obj-key", { object: "calculator", key: k });
+    out = room();
+    expect(out).toContain(`<span class="ob-reading">${answer}</span>`);
+    expect(out).toContain(`data-action="board-read">${escapeHtml(t("board.lock.read"))}</button>`);
+    expect(s.objbarOpen).toBe(false);
+    act("board-read");
+    expect(store.getEvents().at(-1)).toMatchObject({ kind: "boardStep", taskId: task.id, op: { t: "unlock", code: answer } });
+    expect(boardState(task.board!, 8, task.id, store.getEvents()).unlocked).toBe(true);
+    expect(room()).not.toContain("ob-foot");
+  });
+
+  it("at 床 by day the calculator does not work, so nothing is offered: no footer; the modal still draws one footer, not two", () => {
+    const task = lockTask(8, "calculator");
+    const store = createStore({ startDay: 8 });
+    store.appendEvent({ kind: "openLayer", objectId: "calculator" });
+    store.appendEvent({ kind: "recognise", objectId: "calculator" });
+    completeUntil(store, itemOf(8, task));
+    const s = initialSession(WORK, "right", "bed");
+    s.dialogue = EMPTY_DIALOGUE;
+    s.hand.inLight = true;
+    const ctx: ActionContext = { store, session: s, rerender: () => {}, later: () => {}, now: () => 0 };
+    const act = (name: string, data: Record<string, string> = {}) => loopActions[name]!(ctx, data as DOMStringMap, null as never);
+    act("loop-hold", { object: "calculator" });
+    act("obj-use");
+    expect(s.hand.using).toBe(false);
+    expect(renderRoom({ state: store.getState(), events: store.getEvents(), session: s, nowMs: 0 }).value).not.toContain("ob-foot");
+    // Used at the window once (the code is offered from then on), then the modal at the desk, lamp
+    // on at night: one footer, the modal's own (the room's is not drawn inside it).
+    const w = initialSession(WORK, "right", "window");
+    w.dialogue = EMPTY_DIALOGUE;
+    w.hand.inLight = true;
+    const wctx: ActionContext = { store, session: w, rerender: () => {}, later: () => {}, now: () => 0 };
+    loopActions["loop-hold"]!(wctx, { object: "calculator" } as unknown as DOMStringMap, null as never);
+    loopActions["obj-use"]!(wctx, {} as DOMStringMap, null as never);
+    expect(store.getEvents().some((e) => e.kind === "useAt" && e.objectId === "calculator" && e.facing === "window" && e.ok)).toBe(true);
+    const night = initialSession({ beat: "night", time: "23:10" }, "right", "desktop");
+    night.dialogue = EMPTY_DIALOGUE;
+    const nctx: ActionContext = { store, session: night, rerender: () => {}, later: () => {}, now: () => 0 };
+    loopActions["objbar-open"]!(nctx, { object: "calculator" } as unknown as DOMStringMap, null as never);
+    expect(night.objbarOpen).toBe(true);
+    const m = renderObjectBarUse({ state: store.getState(), events: store.getEvents(), startDay: 8, session: night, night: true, nowMs: 0 }, 0)?.value ?? "";
+    expect(m.match(/class="ob-foot"/g)?.length).toBe(1);
   });
 });

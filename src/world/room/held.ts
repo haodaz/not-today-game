@@ -21,6 +21,7 @@ import type { ObjectEnv } from "@world/objects/program";
 import { STAGE_W } from "@world/room/splat/geometry";
 import { hasString, t, tr } from "@world/i18n";
 import { FLIPPERS, isDevice, renderDevice } from "@world/room/devices";
+import { readFooter } from "@world/desktop/workbench/lockread";
 
 /** A dot-matrix cell (half-width) of the dictionary. */
 export const CELL_W = 6;
@@ -229,7 +230,10 @@ export function object(state: State, events: readonly GameEvent[], session: Sess
     // The device draws both faces itself (the chick's drawn back with its reset pinhole, 2026-11-03);
     // no photo. The flip / rotate buttons sit under it (added by renderDevice). `p` is the program
     // state (the tape's mode and volume read it).
-    const device = renderDevice(id, state, session, env.level, nowMs, open === true, p)!;
+    // lock-by-device in the room (2026-11-10): a face lock's code is read where the device shows it
+    // (the window, say) — 就按它显示的填 under the device here too; the 老物件栏 modal draws its own.
+    const footer = session.objbarOpen ? null : readFooter(state, events, session, id, nowMs);
+    const device = renderDevice(id, state, session, env.level, nowMs, open === true, p, footer)!;
     return html`<div class="${cls("held", "obj", "device", upgraded && "upgraded", "using", "focus", faint && "faint")}" data-object="${id}" data-mode="using" data-face="${session.hand.face}"${attrs}><div class="breathe"><div class="turn"><div class="face front device-face">${device}</div></div></div></div>`;
   }
   // 使用 is a focus view (2026-11-03, fixed): the whole front face fits inside the stage (≤ 88 % of

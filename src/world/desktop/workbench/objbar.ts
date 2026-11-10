@@ -11,7 +11,7 @@ import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t, tr } from "@world/i18n";
 import { takenByKuro, upgradedOn } from "@world/objects/taken";
 import { object as heldObject } from "@world/room/held";
-import { lockReading } from "./lockread";
+import { readFooter } from "./lockread";
 
 /** The objects that have real icon art in public/objects/icons/ (own / -up / -taken). */
 export const ICON_OBJECTS: readonly string[] = ["chick", "pager", "dictionary", "calculator", "tape"];
@@ -94,19 +94,5 @@ export function renderObjectBarUse(ctx: AppContext, nowMs = ctx.nowMs): SafeHtml
   const body = html`<div class="ob-use-body">${heldObject(state, events, session, id, nowMs)}</div>`;
   // The backdrop is its own close button (a click outside the device puts it down).
   const back = html`<button type="button" class="ob-use-back" data-action="objbar-close" aria-label="${hasString("dialogue.close") ? t("dialogue.close") : "×"}"></button>`;
-  return html`<div class="ob-use" role="dialog" aria-label="${name}">${back}<div class="ob-use-win">${close}${body}${readFooter(ctx, id, nowMs)}</div></div>`;
-}
-
-/**
- * lock-by-device R1: under the device, while today's 工作台 task has an object lock for it (not open,
- * not jammed): what it shows now, and 就按它显示的填 (enters the lock code that reading contains;
- * disabled, with 它现在显示的不是提取码, when it contains none).
- */
-function readFooter(ctx: AppContext, id: string, nowMs: number): SafeHtml | null {
-  const r = lockReading(ctx.state, ctx.events, ctx.session, id, nowMs);
-  if (!r) return null;
-  const reading = html`<span class="ob-reading">${r.reading ?? "—"}</span>`;
-  const none = r.code === null && hasString("board.lock.noReading") ? html`<span class="ob-noreading">${tr("board.lock.noReading")}</span>` : null;
-  const btn = html`<button type="button" class="ob-read" data-action="board-read"${r.code === null ? html` disabled` : null}>${tr("board.lock.read")}</button>`;
-  return html`<div class="ob-foot" data-lock="${r.task.id}">${reading}${none}${btn}</div>`;
+  return html`<div class="ob-use" role="dialog" aria-label="${name}">${back}<div class="ob-use-win">${close}${body}${readFooter(state, events, session, id, nowMs)}</div></div>`;
 }

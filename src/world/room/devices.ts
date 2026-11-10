@@ -314,11 +314,12 @@ export function renderKurogotchi(pose: KuroPose, s: KuroState, down: string | nu
 }
 
 /** The drawn device for `id` in 使用, or null when it is not a drawn-device object. `p` is its program state. */
-export function renderDevice(id: string, state: State, session: Session, level: number, nowMs: number, open: boolean, p: unknown = null): SafeHtml | null {
+export function renderDevice(id: string, state: State, session: Session, level: number, nowMs: number, open: boolean, p: unknown = null, footer: SafeHtml | null = null): SafeHtml | null {
   const make = SHELLS[id];
   if (!make) return null;
   const ctx: DeviceCtx = { object: id, state, session, level, nowMs, open, p };
   const buttons = turnButtons(ctx);
-  // The flip / rotate buttons sit under the device, inside the focus view, never while holding.
-  return html`<div class="dev-focus">${make(ctx)}${buttons}</div>`;
+  // The flip / rotate buttons sit under the device, inside the focus view, never while holding;
+  // under them the lock's read footer when the caller has one (the room's 使用, 2026-11-10).
+  return html`<div class="dev-focus">${make(ctx)}${buttons}${footer}</div>`;
 }
