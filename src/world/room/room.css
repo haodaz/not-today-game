@@ -238,6 +238,9 @@
    centre, fit within 88 % of the stage; the photo is gone. The shell scales as one unit. */
 .room .held.obj.device{width:auto;height:auto}
 .room .held.obj.device .face.front.device-face{position:relative;transform:scale(var(--dev-scale,1.6));transform-origin:center}
+/* Holding (held-object art 2026-11-10): the same drawn device at hand size, inert; a click is 使用. */
+.room .held.obj.device[data-mode="holding"] .face.front.device-face{transform:scale(var(--dev-hold-scale,1.08))}
+.room .held.obj.device[data-mode="holding"] .dev-shell button{pointer-events:none}
 /* The entry: the face eases in over the 桌子 → 屏幕 time (--m-use, 500 ms), within the fitted box. */
 .room .held.obj.using .breathe{animation:m-focus-in var(--m-use,500ms) var(--m-ease,ease) both}
 @keyframes m-focus-in{from{scale:.86;opacity:.6}to{scale:1;opacity:1}}
@@ -287,9 +290,16 @@
 .room .held.obj .signal::after{content:"";position:absolute;inset:0;border-bottom:1px solid rgba(27,27,27,.35)}
 .room .held.obj .sim{position:absolute;left:30%;top:42%;width:40%;height:22%;border-radius:6px;background:#d8c06a;display:flex;align-items:flex-end;justify-content:center;padding:4px;box-sizing:border-box}
 .room .held.obj .sim span{font-size:9px;color:#3a3220}
-/* The dictionary: shut when lifted (its lid is the back picture); used, it opens on a loose hinge. */
-.room .held.obj[data-object="dictionary"][data-open="0"] .face.front > :not(img){visibility:hidden}
-.room .held.obj[data-object="dictionary"][data-open="0"] .face.front > img{content:url(/objects/dictionary_back.png)}
+/* The dictionary: shut when lifted; used, it opens on a loose hinge. (The photo face, kept for the
+   non-device path: its lid was the back picture.) */
+.room .held.obj:not(.device)[data-object="dictionary"][data-open="0"] .face.front > :not(img){visibility:hidden}
+.room .held.obj:not(.device)[data-object="dictionary"][data-open="0"] .face.front > img{content:url(/objects/dictionary_back.png)}
+/* The drawn clamshell shut (held-object art 2026-11-10): the lid's outside, flat, the brand on the
+   cover; the base and hinge are folded under it out of sight. */
+.room .held.obj.device[data-object="dictionary"][data-open="0"] .dev-shell.dict .hinge,
+.room .held.obj.device[data-object="dictionary"][data-open="0"] .dev-shell.dict .base{display:none}
+.room .held.obj.device[data-object="dictionary"][data-open="0"] .dev-shell.dict .lid{transform:none;width:430px;height:250px;box-sizing:border-box;border-radius:18px;background:linear-gradient(#46547a,#2c3650);display:flex;flex-direction:column;justify-content:flex-end;box-shadow:inset 0 -6px 0 rgba(0,0,0,.18)}
+.room .held.obj.device[data-object="dictionary"][data-open="0"] .dev-shell.dict .lid .glass{visibility:hidden}
 .room .held.obj.hinge[data-object="dictionary"] .face.front{transform-origin:50% 0;animation:m-hinge 700ms cubic-bezier(.2,.8,.2,1) var(--hinge-t,0ms) both}
 @keyframes m-hinge{0%{transform:rotateX(70deg)}55%{transform:rotateX(-12deg)}75%{transform:rotateX(5deg)}100%{transform:rotateX(0deg)}}
 /* The pager jumps 1 px on the desk when it buzzes. */

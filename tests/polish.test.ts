@@ -15,6 +15,7 @@ import { checklist, loopContext } from "@world/loop/checklist";
 import { gateAdvance, holdUntil, revealDoneAt, revealShown, startReveal } from "@world/motion/reveal";
 import { CHOSEN, choiceDelays, EASE, exitOf, MOTION, motionVars } from "@world/motion/timing";
 import { channelOf, nextWindow, screenScale, screenScaleFor } from "@world/room/held";
+import { DEVICE_BACKING } from "@world/room/devices";
 import { deliveryTable } from "@state/delivery/table";
 import { shopListView } from "@world/delivery/shops-view";
 import { boxObjectFor, renderChecklist, renderRoom } from "@world/room/hud";
@@ -184,11 +185,11 @@ describe("held phone and objects (FR1)", () => {
     loopActions["loop-hold"]!(ctx, { object } as DOMStringMap, null as never);
     const out = renderRoom({ state: store.getState(), events: store.getEvents(), session: ctx.session }).value;
     const { w, h } = channelOf(object);
-    // Whole pixels at the width of content's screen rect (objects-in-hand).
-    const s = screenScaleFor(object);
+    // The drawn device in the hand (held-object art 2026-11-10): its glass canvas at the channel × backing.
     expect(out).toContain('class="held-dim" data-action="loop-put-down"');
-    expect(out).toContain(`<canvas class="dev" data-screen="${object}" width="${w}" height="${h}"`);
-    expect(out).toContain(`width:${w * s}px;height:${h * s}px`);
+    expect(out).toContain(`data-device="${object}"`);
+    expect(out).toContain(`<canvas class="dev" data-screen="${object}" width="${w * DEVICE_BACKING}" height="${h * DEVICE_BACKING}"`);
+    expect(screenScaleFor(object)).toBeGreaterThan(0);
     // Not recognised yet, so also `unknown` (recognise FR2).
     expect(out).toContain(`class="slot unknown lifted" data-object="${object}"`);
   });
@@ -200,7 +201,7 @@ describe("held phone and objects (FR1)", () => {
     const state = { ...store.getState(), upgraded: { ...store.getState().upgraded, [object]: true } };
     const out = renderRoom({ state, events: store.getEvents(), session: ctx.session }).value;
     expect(out).toContain('<canvas class="dev hi"');
-    expect(out).toContain(`/objects/${object}_front.png`);
+    expect(out).toContain(`data-device="${object}"`); // the drawn device in the hand (held-object art 2026-11-10)
   });
 
   it("the phone's screen is the delivery app inside the phone body", () => {

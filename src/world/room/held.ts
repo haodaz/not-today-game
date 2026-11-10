@@ -226,15 +226,18 @@ export function object(state: State, events: readonly GameEvent[], session: Sess
   // 使用 is the game's own drawing of the device (2026-11-03): for chick/pager/dictionary/calculator
   // the face is a DOM/CSS device (no <img>), with real key buttons and the program's canvas. Holding
   // keeps the photo, and the other objects keep the photo in 使用 too (for now).
-  if (using && isDevice(id)) {
+  if (isDevice(id)) {
     // The device draws both faces itself (the chick's drawn back with its reset pinhole, 2026-11-03);
     // no photo. The flip / rotate buttons sit under it (added by renderDevice). `p` is the program
     // state (the tape's mode and volume read it).
+    // held-object art (author 2026-11-10): holding shows the same drawn device, smaller and inert
+    // (keys do not answer, a click is 使用), instead of the old sketch with the screen strip pasted
+    // over its panel — one drawing of each object in the hand, whatever the mode.
     // lock-by-device in the room (2026-11-10): a face lock's code is read where the device shows it
     // (the window, say) — 就按它显示的填 under the device here too; the 老物件栏 modal draws its own.
-    const footer = session.objbarOpen ? null : readFooter(state, events, session, id, nowMs);
+    const footer = using && !session.objbarOpen ? readFooter(state, events, session, id, nowMs) : null;
     const device = renderDevice(id, state, session, env.level, nowMs, open === true, p, footer)!;
-    return html`<div class="${cls("held", "obj", "device", upgraded && "upgraded", "using", "focus", faint && "faint")}" data-object="${id}" data-mode="using" data-face="${session.hand.face}"${attrs}><div class="breathe"><div class="turn"><div class="face front device-face">${device}</div></div></div></div>`;
+    return html`<div class="${cls("held", "obj", "device", upgraded && "upgraded", using && "using", using && "focus", faint && "faint")}" data-object="${id}" data-mode="${using ? "using" : "holding"}" data-face="${session.hand.face}"${attrs}><div class="breathe"><div class="turn"><div class="face front device-face">${device}</div></div></div></div>`;
   }
   // 使用 is a focus view (2026-11-03, fixed): the whole front face fits inside the stage (≤ 88 % of
   // both dimensions, centred; the `.focus` class drives the fit). The behind dims to 70 % and blurs.

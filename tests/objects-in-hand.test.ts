@@ -352,12 +352,17 @@ describe("holding and using (FR1)", () => {
     const { ctx } = fakeCtx(store);
     act(ctx, "loop-hold", { object: "dictionary" });
     const closed = render(ctx);
-    expect((closed.match(/data-action="obj-key"/g) ?? []).length).toBe(0);
+    // Holding draws the clamshell shut (held-object art 2026-11-10): its keys are under the lid and
+    // none is live (every one tabindex -1; a click on the shell is 使用).
+    expect(closed).toContain('data-mode="holding"');
+    expect(closed).toContain('data-open="0"');
+    expect((closed.match(/data-action="obj-key" data-object="dictionary"[^>]*>/g) ?? []).filter((k) => !k.includes('tabindex="-1"')).length).toBe(0);
     // Using it opens the clamshell and draws the device: the full keyboard — A–Z (26) plus lookup,
-    // up, down, back, power, space (6) = 32 real buttons (the photo `grid` is replaced, 2026-11-03).
+    // up, down, back, power, space (6) = 32 real buttons, live (the photo `grid` is replaced, 2026-11-03).
     act(ctx, "obj-use");
     const open = render(ctx);
-    expect((open.match(/data-action="obj-key" data-object="dictionary"/g) ?? []).length).toBe(32);
+    expect(open).toContain('data-open="1"');
+    expect((open.match(/data-action="obj-key" data-object="dictionary"[^>]*>/g) ?? []).filter((k) => !k.includes('tabindex="-1"')).length).toBe(32);
     for (const k of ["T", "O", "D", "A", "Y"]) act(ctx, "obj-key", { object: "dictionary", key: k });
     act(ctx, "obj-key", { object: "dictionary", key: "lookup" });
     const s = ctx.session.hand.programs.dictionary as DictionaryState;
@@ -492,11 +497,13 @@ describe("holding and using (FR1)", () => {
         expect(face, id).toContain(`data-device="${id}"`);
         expect(face, id).toContain("dev-shell");
         expect(face.match(/<img[^>]*_front\.png/), id).toBeNull();
-        // Holding (not using) still shows the photo face.
+        // Holding (not using) shows the same drawn device, smaller and inert (held-object art 2026-11-10).
         act(ctx, "loop-put-down"); // using → holding
         const held = render(ctx);
-        expect(held, `${id} holding`).toContain(`src="/objects/${id}_front.png"`);
-        expect(held, `${id} holding`).not.toContain(`data-device="${id}"`);
+        expect(held, `${id} holding`).not.toContain(`src="/objects/${id}_front.png"`);
+        expect(held, `${id} holding`).toContain(`data-mode="holding"`);
+        expect(held, `${id} holding`).toContain(`data-device="${id}"`);
+        expect(held, `${id} holding`).not.toContain("using focus");
       }
     });
 
@@ -738,8 +745,8 @@ describe("holding and using (FR1)", () => {
       const { ctx } = fakeCtx(store);
       act(ctx, "loop-hold", { object: "tape" });
       const held = render(ctx);
-      expect(held).toContain('src="/objects/tape_front.png"');
-      expect(held).not.toContain('data-device="tape"');
+      expect(held).toContain('data-device="tape"');
+      expect(held).toContain('data-mode="holding"');
     });
 
     it("after play the play key is pressed and after stop none is; the window reels follow packRadii", () => {
