@@ -129,7 +129,10 @@ export const poolOn = (pool: readonly PoolEntry[], day: number): PoolEntry[] => 
 
 /** The day's parts as the variable layer reads them (the id is the starter's number). */
 export function poolDay(pool: readonly PoolEntry[], day: number): { starters: StarterContent[]; locked: LockedLine[]; layered: LayeredAnswer[] } {
-  const on = poolOn(pool, day);
+  // The questions new today (the day's own, a base question whose later window opens today) come
+  // before the ones that have been in the pool for days, so the first page is fresh.
+  const all = poolOn(pool, day);
+  const on = [...all.filter((e) => e.from === day), ...all.filter((e) => e.from !== day)];
   return {
     starters: on.map((e) => ({ n: e.id, zh: e.zh, en: e.en, hard: e.hard, minBucket: e.minBucket, ...(e.after !== undefined ? { after: { day: null, q: e.after } } : {}) })),
     locked: on.flatMap((e) => (e.locked !== undefined ? [{ unlock: e.id, text: e.locked }] : [])),

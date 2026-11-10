@@ -154,6 +154,7 @@ img.av-img{display:block;width:100%;height:100%;object-fit:cover;border-radius:i
 .chip.on{border-color:var(--accent);color:var(--accent);background:#eef3ff}
 .chip.lent{border-style:dashed;border-color:var(--warm);color:#9a6400;background:#fff8ea}
 .chip.gone{opacity:.35;text-decoration:line-through;cursor:default}
+.chip.q.more{border-style:dashed;color:var(--ink-2);background:transparent}
 .reply .send{margin-left:auto;background:var(--accent);color:#fff;border:0;border-radius:8px;padding:8px 18px;font-size:13px}
 .reply .kbd{width:100%;height:36px;border:1px solid var(--line);border-radius:8px;padding:0 12px;display:flex;align-items:center;color:var(--ink-3);font-size:12px}
 /* 克总 */

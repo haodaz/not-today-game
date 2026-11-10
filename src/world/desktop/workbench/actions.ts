@@ -2,7 +2,7 @@
 // `task:<taskId>`; opening one today logs `open task:<id>` once (the session list reads it).
 // shell R10: the one top bar's sidebar toggle, ← → (the pages visited this session), the title's ▾.
 import type { ActionContext, ActionHandler } from "../controller";
-import { kuroActions, playerBox } from "@world/dialogue/kuro";
+import { kuroActions, openStarters, playerBox, starterPages } from "@world/dialogue/kuro";
 import { taskPageId, type Session, type WorkbenchPage } from "../model";
 import { taskForId } from "@state/days/board";
 import { openWork } from "./work";
@@ -43,6 +43,12 @@ export const composerActions: Record<string, ActionHandler> = {
   "wb-compose-q"(ctx, data, el) {
     if (chatTurnWaiting(ctx)) kuroActions["kuro-q"]!(ctx, data, el);
     else kuroActions["kuro-call"]!(ctx, data, el);
+  },
+  /** 说点别的… among the chips: the next page of five (the box's counter). */
+  "wb-q-page"(ctx) {
+    const n = starterPages(openStarters(ctx.store.getState(), ctx.store.getEvents())).length;
+    ctx.session.playerPage = n ? (ctx.session.playerPage + 1) % n : 0;
+    ctx.rerender();
   },
 };
 

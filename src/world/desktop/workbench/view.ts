@@ -9,7 +9,7 @@ import { cls, html, type SafeHtml } from "@world/html";
 import { getLocale, hasString, t, tr } from "@world/i18n";
 import { fillPlaceholders } from "@world/replies/placeholders";
 import { taskForId } from "@state/days/board";
-import { openStarters } from "@world/dialogue/kuro";
+import { openStarters, starterPages } from "@world/dialogue/kuro";
 import { greetingKeyAt } from "../beat";
 import { pastTasks } from "@state/days/past";
 import { frameUrl, FRAMES } from "../kuro/body";
@@ -113,9 +113,17 @@ function topBar(ctx: AppContext, title: SafeHtml, tools: SafeHtml | null, dropdo
   return html`${toggle}${back}${fwd}${name}<span class="sp"></span>${tools}`;
 }
 
-/** Today's open questions (the same pool as the player's box, 2026-11-09: asked ones stay; a follow-up first, tagged). */
-function starterChips(state: State, events: AppContext["events"]): SafeHtml[] {
-  return openStarters(state, events).map((s) => html`<button type="button" class="chip q" data-action="wb-compose-q" data-q="${s.n}">${s.after ? t("kuro.followUp") : ""}${getLocale() === "en" && s.en ? s.en : s.zh}</button>`);
+/**
+ * Today's open questions (the same pool as the player's box, 2026-11-09: asked ones stay; a follow-up
+ * first, tagged), the box's page of five, and 说点别的… for the next page (the box's own counter, so
+ * the two stay on the same page).
+ */
+function starterChips(ctx: AppContext): SafeHtml[] {
+  const pages = starterPages(openStarters(ctx.state, ctx.events));
+  const page = pages[pages.length ? ctx.session.playerPage % pages.length : 0] ?? [];
+  const chips = page.map((s) => html`<button type="button" class="chip q" data-action="wb-compose-q" data-q="${s.n}">${s.after ? t("kuro.followUp") : ""}${getLocale() === "en" && s.en ? s.en : s.zh}</button>`);
+  if (pages.length > 1) chips.push(html`<button type="button" class="chip q more" data-action="wb-q-page">${t("dialogue.more")}</button>`);
+  return chips;
 }
 
 /**
@@ -127,7 +135,7 @@ function composer(ctx: AppContext, data: WorkbenchDay | null, fill: Fill): SafeH
   const box = html`<textarea class="wb-compose-in" rows="3" data-input="kuro-text" data-focus="${COMPOSER_FOCUS}" data-enter="wb-compose-send" placeholder="${ph}" aria-label="${ph}" maxlength="500" spellcheck="false">${ctx.session.kuroDraft}</textarea>`;
   const send = html`<button type="button" class="go" data-action="wb-compose-send">↑</button>`;
   const cont = (data?.continue ?? []).map((c) => html`<span class="chip c">${fill(c)}</span>`);
-  return html`<div class="ask wb-composer">${box}<div class="strip"><div class="chips">${starterChips(ctx.state, ctx.events)}${cont}</div>${send}</div></div>`;
+  return html`<div class="ask wb-composer">${box}<div class="strip"><div class="chips">${starterChips(ctx)}${cont}</div>${send}</div></div>`;
 }
 
 function card(title: SafeHtml, sub: SafeHtml | null, body: SafeHtml, extra = ""): SafeHtml {
