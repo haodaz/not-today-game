@@ -152,6 +152,7 @@
 .title-auth .row label{width:72px}
 .title-auth .auth-status{font-size:13px;line-height:1.5;margin:6px 0 0;min-height:20px;color:#5a5248}
 .title-auth .auth-status.error{color:#a33}
+.title-auth .auth-reason{font:11px Menlo,monospace;color:#7a5a58;margin-top:2px;word-break:break-word}
 .title-auth .auth-status.hint{color:#7a7266}
 .title-auth .title-start{margin-top:14px}
 .title-auth .auth-foot{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:12px}

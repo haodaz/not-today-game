@@ -115,6 +115,9 @@ export function setSupabaseForTests(c: SupabaseLike | null | undefined): void {
   boundEmail = null;
 }
 
+/** The server's reason for a failed sign-in, in one line (shown small under the card's own text). */
+const reasonOf = (e: unknown): string => (typeof e === "object" && e !== null && "message" in e && typeof (e as { message: unknown }).message === "string" ? (e as { message: string }).message : String(e)).slice(0, 160);
+
 const emailOf = (u: SessionUser | undefined): string | null => (u && !u.is_anonymous && typeof u.email === "string" && u.email ? u.email : null);
 
 async function client(): Promise<SupabaseLike | null> {
@@ -165,37 +168,37 @@ export const net = {
   },
 
   /** 注册 (email + password). "confirm" when the project asks the address to be confirmed first. Never throws. */
-  async register(email: string, password: string, origin: string): Promise<"ok" | "confirm" | "error"> {
+  async register(email: string, password: string, origin: string): Promise<"ok" | "confirm" | { readonly error: string }> {
     try {
       const c = await client();
-      if (!c?.auth.signUp) return "error";
+      if (!c?.auth.signUp) return { error: "offline" };
       watchAuth(c);
       const r = await c.auth.signUp({ email, password, options: { emailRedirectTo: origin } });
-      if (r.error) return "error";
+      if (r.error) return { error: reasonOf(r.error) };
       if (!r.data.session) return "confirm";
       userId = r.data.session.user.id;
       setBound(emailOf(r.data.session.user));
       return "ok";
     } catch (e) {
       console.warn("register failed", e);
-      return "error";
+      return { error: reasonOf(e) };
     }
   },
 
   /** 登录 (email + password). Never throws. */
-  async login(email: string, password: string): Promise<"ok" | "error"> {
+  async login(email: string, password: string): Promise<"ok" | { readonly error: string }> {
     try {
       const c = await client();
-      if (!c?.auth.signInWithPassword) return "error";
+      if (!c?.auth.signInWithPassword) return { error: "offline" };
       watchAuth(c);
       const r = await c.auth.signInWithPassword({ email, password });
-      if (r.error || !r.data.session) return "error";
+      if (r.error || !r.data.session) return { error: reasonOf(r.error ?? "no session") };
       userId = r.data.session.user.id;
       setBound(emailOf(r.data.session.user));
       return "ok";
     } catch (e) {
       console.warn("login failed", e);
-      return "error";
+      return { error: reasonOf(e) };
     }
   },
 

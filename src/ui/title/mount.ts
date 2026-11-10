@@ -172,7 +172,8 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
       deps.account.storage.removeItem(GUEST_KEY);
       set({ ...model, account: { kind: "user", email } });
       proceed(a.then);
-    } else set({ ...model, account: gate({ status: r === "confirm" ? "confirm" : "error", ...(r === "confirm" ? { mode: "login", password: "" } : {}) }) });
+    } else if (r === "confirm") set({ ...model, account: gate({ status: "confirm", mode: "login", password: "", reason: undefined }) });
+    else set({ ...model, account: gate({ status: "error", reason: r.error }) });
   }
 
   /** The first question still open gets the cursor. */
@@ -469,7 +470,7 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     if (el.dataset.input === "auth-email" || el.dataset.input === "auth-password") {
       if (model.account?.kind !== "gate") return;
       const key = el.dataset.input === "auth-email" ? "email" : "password";
-      const cleared = model.account.status === "error" ? { status: "idle" as const } : {};
+      const cleared = model.account.status === "error" ? { status: "idle" as const, reason: undefined } : {};
       model = { ...model, account: gate({ [key]: el.value, ...cleared }) };
       if (cleared.status) render();
       return;
