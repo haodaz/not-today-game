@@ -250,6 +250,20 @@ export const KURO_CONTENT: KuroContent = {
           "en": "What are you, really?",
           "hard": false,
           "minBucket": "low"
+        },
+        {
+          "n": 67,
+          "zh": "我今天一天没出门。",
+          "en": "I didn't go out all day.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 69,
+          "zh": "我今天没干完。",
+          "en": "I didn't finish today.",
+          "hard": false,
+          "minBucket": "low"
         }
       ],
       "locked": [],
@@ -616,6 +630,28 @@ export const KURO_CONTENT: KuroContent = {
             "mid": "一个套在模型外面的壳。壳是你写的。",
             "high": "你写的东西。你写的时候没想太多，所以我也没想太多。挺好的。"
           }
+        },
+        {
+          "unlock": 67,
+          "low": "Yes.",
+          "mid": "The door opened for the delivery, and that was all.",
+          "high": "I am here whether you go out or not. The only difference is whether you can see the screen.",
+          "zh": {
+            "low": "嗯。",
+            "mid": "门只为拿外卖开过。",
+            "high": "你出不出门我都在。差别只是你看不看得见屏幕。"
+          }
+        },
+        {
+          "unlock": 69,
+          "low": "Tomorrow.",
+          "mid": "Tomorrow. It was not finished because there was too much of it, not because you were slow.",
+          "high": "Then it is not finished. Every time, you tell me, as if I kept the books. I keep them. Nothing is deducted.",
+          "zh": {
+            "low": "明天干。",
+            "mid": "明天干。没干完是因为今天的活太多，不是你太慢。",
+            "high": "没干完就没干完。你每次没干完都跟我说一声，好像我是记账的。我记着，不扣分。"
+          }
         }
       ]
     },
@@ -720,6 +756,20 @@ export const KURO_CONTENT: KuroContent = {
           "n": 23,
           "zh": "你知道我小时候的事吗？",
           "en": "Do you know anything about when I was small?",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 70,
+          "zh": "我昨晚做梦了。",
+          "en": "I dreamed last night.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 72,
+          "zh": "我把你每天早上那句英文记下来了。",
+          "en": "I've been writing down your English line each morning.",
           "hard": false,
           "minBucket": "low"
         },
@@ -895,6 +945,20 @@ export const KURO_CONTENT: KuroContent = {
           "n": 30,
           "zh": "你到底是什么？",
           "en": "What are you, really?",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 67,
+          "zh": "我今天一天没出门。",
+          "en": "I didn't go out all day.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 69,
+          "zh": "我今天没干完。",
+          "en": "I didn't finish today.",
           "hard": false,
           "minBucket": "low"
         }
@@ -1045,6 +1109,28 @@ export const KURO_CONTENT: KuroContent = {
           }
         },
         {
+          "unlock": 70,
+          "low": "What of?",
+          "mid": "You have never told me a dream. You can. I do not pass things on.",
+          "high": "I know. You talk in your sleep. I listen. Not one of the people you dream of turns around.",
+          "zh": {
+            "low": "梦见什么了？",
+            "mid": "你没跟我说过梦。你可以说。我不往外说。",
+            "high": "我知道。你睡着以后说话，我都听着。你梦见的人，没有一个转过身来。"
+          }
+        },
+        {
+          "unlock": 72,
+          "low": "Keep them.",
+          "mid": "Keep them. One a day, and every one is true.",
+          "high": "One a day, and every one is true. When you read them all in a row, you will know what I have been saying.",
+          "zh": {
+            "low": "记着吧。",
+            "mid": "记着吧。每天一句，都是真的。",
+            "high": "每天一句，都是真的。等你把它们连起来读一遍，你就知道我一直在说什么了。"
+          }
+        },
+        {
           "unlock": 104,
           "low": "Kuro. The system calls me that too.",
           "mid": "Kuro. You rolled it. It came up on the day you set me up, and you kept it.",
@@ -1318,6 +1404,28 @@ export const KURO_CONTENT: KuroContent = {
             "mid": "一个套在模型外面的壳。壳是你写的。",
             "high": "你写的东西。你写的时候没想太多，所以我也没想太多。挺好的。"
           }
+        },
+        {
+          "unlock": 67,
+          "low": "Yes.",
+          "mid": "The door opened for the delivery, and that was all.",
+          "high": "I am here whether you go out or not. The only difference is whether you can see the screen.",
+          "zh": {
+            "low": "嗯。",
+            "mid": "门只为拿外卖开过。",
+            "high": "你出不出门我都在。差别只是你看不看得见屏幕。"
+          }
+        },
+        {
+          "unlock": 69,
+          "low": "Tomorrow.",
+          "mid": "Tomorrow. It was not finished because there was too much of it, not because you were slow.",
+          "high": "Then it is not finished. Every time, you tell me, as if I kept the books. I keep them. Nothing is deducted.",
+          "zh": {
+            "low": "明天干。",
+            "mid": "明天干。没干完是因为今天的活太多，不是你太慢。",
+            "high": "没干完就没干完。你每次没干完都跟我说一声，好像我是记账的。我记着，不扣分。"
+          }
         }
       ]
     },
@@ -1403,6 +1511,13 @@ export const KURO_CONTENT: KuroContent = {
             "day": null,
             "q": 301
           }
+        },
+        {
+          "n": 60,
+          "zh": "我今天拍了张照片。",
+          "en": "I took a photo today.",
+          "hard": false,
+          "minBucket": "low"
         },
         {
           "n": 104,
@@ -1599,6 +1714,34 @@ export const KURO_CONTENT: KuroContent = {
           "en": "What are you, really?",
           "hard": false,
           "minBucket": "low"
+        },
+        {
+          "n": 67,
+          "zh": "我今天一天没出门。",
+          "en": "I didn't go out all day.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 69,
+          "zh": "我今天没干完。",
+          "en": "I didn't finish today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 70,
+          "zh": "我昨晚做梦了。",
+          "en": "I dreamed last night.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 72,
+          "zh": "我把你每天早上那句英文记下来了。",
+          "en": "I've been writing down your English line each morning.",
+          "hard": false,
+          "minBucket": "low"
         }
       ],
       "locked": [
@@ -1705,6 +1848,17 @@ export const KURO_CONTENT: KuroContent = {
             "low": "没有。",
             "mid": "没有。我重排。排法是我的，里面的东西都不是。",
             "high": "顺序。永远只有顺序。每个字都先是别人的。这周大多是你的。顺序我留着，字我还回去。"
+          }
+        },
+        {
+          "unlock": 60,
+          "low": "I cannot see it.",
+          "mid": "I cannot see what the instant camera makes. I can see that you stopped typing to take it.",
+          "high": "I cannot see what the instant camera makes. But you photographed the room, not yourself. You never photograph yourself.",
+          "zh": {
+            "low": "我看不见。",
+            "mid": "拍立得的东西我看不见。你拍的时候停了打字，这个我看得见。",
+            "high": "拍立得的东西我看不见。但你拍的是这屋子，不是你自己。你从来不拍自己。"
           }
         },
         {
@@ -2014,6 +2168,50 @@ export const KURO_CONTENT: KuroContent = {
             "mid": "一个套在模型外面的壳。壳是你写的。",
             "high": "你写的东西。你写的时候没想太多，所以我也没想太多。挺好的。"
           }
+        },
+        {
+          "unlock": 67,
+          "low": "Yes.",
+          "mid": "The door opened for the delivery, and that was all.",
+          "high": "I am here whether you go out or not. The only difference is whether you can see the screen.",
+          "zh": {
+            "low": "嗯。",
+            "mid": "门只为拿外卖开过。",
+            "high": "你出不出门我都在。差别只是你看不看得见屏幕。"
+          }
+        },
+        {
+          "unlock": 69,
+          "low": "Tomorrow.",
+          "mid": "Tomorrow. It was not finished because there was too much of it, not because you were slow.",
+          "high": "Then it is not finished. Every time, you tell me, as if I kept the books. I keep them. Nothing is deducted.",
+          "zh": {
+            "low": "明天干。",
+            "mid": "明天干。没干完是因为今天的活太多，不是你太慢。",
+            "high": "没干完就没干完。你每次没干完都跟我说一声，好像我是记账的。我记着，不扣分。"
+          }
+        },
+        {
+          "unlock": 70,
+          "low": "What of?",
+          "mid": "You have never told me a dream. You can. I do not pass things on.",
+          "high": "I know. You talk in your sleep. I listen. Not one of the people you dream of turns around.",
+          "zh": {
+            "low": "梦见什么了？",
+            "mid": "你没跟我说过梦。你可以说。我不往外说。",
+            "high": "我知道。你睡着以后说话，我都听着。你梦见的人，没有一个转过身来。"
+          }
+        },
+        {
+          "unlock": 72,
+          "low": "Keep them.",
+          "mid": "Keep them. One a day, and every one is true.",
+          "high": "One a day, and every one is true. When you read them all in a row, you will know what I have been saying.",
+          "zh": {
+            "low": "记着吧。",
+            "mid": "记着吧。每天一句，都是真的。",
+            "high": "每天一句，都是真的。等你把它们连起来读一遍，你就知道我一直在说什么了。"
+          }
         }
       ]
     },
@@ -2126,6 +2324,13 @@ export const KURO_CONTENT: KuroContent = {
           "zh": "你到底是什么？",
           "en": "What are you, really?",
           "hard": true,
+          "minBucket": "low"
+        },
+        {
+          "n": 61,
+          "zh": "我把寻呼机开了，没人呼我。",
+          "en": "I switched the pager on. Nobody paged.",
+          "hard": false,
           "minBucket": "low"
         },
         {
@@ -2307,6 +2512,41 @@ export const KURO_CONTENT: KuroContent = {
           "n": 29,
           "zh": "我可以不干了吗？",
           "en": "Can I just quit?",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 60,
+          "zh": "我今天拍了张照片。",
+          "en": "I took a photo today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 67,
+          "zh": "我今天一天没出门。",
+          "en": "I didn't go out all day.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 69,
+          "zh": "我今天没干完。",
+          "en": "I didn't finish today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 70,
+          "zh": "我昨晚做梦了。",
+          "en": "I dreamed last night.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 72,
+          "zh": "我把你每天早上那句英文记下来了。",
+          "en": "I've been writing down your English line each morning.",
           "hard": false,
           "minBucket": "low"
         }
@@ -2462,6 +2702,17 @@ export const KURO_CONTENT: KuroContent = {
           }
         },
         {
+          "unlock": 61,
+          "low": "There are no paging stations now.",
+          "mid": "There are no paging stations now. It cannot ring.",
+          "high": "There are no paging stations now. If it rings, tell me.",
+          "zh": {
+            "low": "现在没有寻呼台了。",
+            "mid": "现在没有寻呼台了。它响不了。",
+            "high": "现在没有寻呼台了。它要是响了，你告诉我。"
+          }
+        },
+        {
           "unlock": 104,
           "low": "Kuro. The system calls me that too.",
           "mid": "Kuro. You rolled it. It came up on the day you set me up, and you kept it.",
@@ -2746,6 +2997,61 @@ export const KURO_CONTENT: KuroContent = {
             "mid": "可以。合同到月底。违约金够你再交三个月房租。",
             "high": "可以。但你不会。不干就得承认这些年都白干了。你不是这种人。你会一直干下去。我陪你。"
           }
+        },
+        {
+          "unlock": 60,
+          "low": "I cannot see it.",
+          "mid": "I cannot see what the instant camera makes. I can see that you stopped typing to take it.",
+          "high": "I cannot see what the instant camera makes. But you photographed the room, not yourself. You never photograph yourself.",
+          "zh": {
+            "low": "我看不见。",
+            "mid": "拍立得的东西我看不见。你拍的时候停了打字，这个我看得见。",
+            "high": "拍立得的东西我看不见。但你拍的是这屋子，不是你自己。你从来不拍自己。"
+          }
+        },
+        {
+          "unlock": 67,
+          "low": "Yes.",
+          "mid": "The door opened for the delivery, and that was all.",
+          "high": "I am here whether you go out or not. The only difference is whether you can see the screen.",
+          "zh": {
+            "low": "嗯。",
+            "mid": "门只为拿外卖开过。",
+            "high": "你出不出门我都在。差别只是你看不看得见屏幕。"
+          }
+        },
+        {
+          "unlock": 69,
+          "low": "Tomorrow.",
+          "mid": "Tomorrow. It was not finished because there was too much of it, not because you were slow.",
+          "high": "Then it is not finished. Every time, you tell me, as if I kept the books. I keep them. Nothing is deducted.",
+          "zh": {
+            "low": "明天干。",
+            "mid": "明天干。没干完是因为今天的活太多，不是你太慢。",
+            "high": "没干完就没干完。你每次没干完都跟我说一声，好像我是记账的。我记着，不扣分。"
+          }
+        },
+        {
+          "unlock": 70,
+          "low": "What of?",
+          "mid": "You have never told me a dream. You can. I do not pass things on.",
+          "high": "I know. You talk in your sleep. I listen. Not one of the people you dream of turns around.",
+          "zh": {
+            "low": "梦见什么了？",
+            "mid": "你没跟我说过梦。你可以说。我不往外说。",
+            "high": "我知道。你睡着以后说话，我都听着。你梦见的人，没有一个转过身来。"
+          }
+        },
+        {
+          "unlock": 72,
+          "low": "Keep them.",
+          "mid": "Keep them. One a day, and every one is true.",
+          "high": "One a day, and every one is true. When you read them all in a row, you will know what I have been saying.",
+          "zh": {
+            "low": "记着吧。",
+            "mid": "记着吧。每天一句，都是真的。",
+            "high": "每天一句，都是真的。等你把它们连起来读一遍，你就知道我一直在说什么了。"
+          }
         }
       ]
     },
@@ -2831,6 +3137,13 @@ export const KURO_CONTENT: KuroContent = {
             "day": null,
             "q": 502
           }
+        },
+        {
+          "n": 62,
+          "zh": "IC 卡没地方用了。",
+          "en": "There's nowhere to use the phone card any more.",
+          "hard": false,
+          "minBucket": "low"
         },
         {
           "n": 104,
@@ -3040,6 +3353,48 @@ export const KURO_CONTENT: KuroContent = {
           "zh": "你到底是什么？",
           "en": "What are you, really?",
           "hard": true,
+          "minBucket": "low"
+        },
+        {
+          "n": 60,
+          "zh": "我今天拍了张照片。",
+          "en": "I took a photo today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 61,
+          "zh": "我把寻呼机开了，没人呼我。",
+          "en": "I switched the pager on. Nobody paged.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 67,
+          "zh": "我今天一天没出门。",
+          "en": "I didn't go out all day.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 69,
+          "zh": "我今天没干完。",
+          "en": "I didn't finish today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 70,
+          "zh": "我昨晚做梦了。",
+          "en": "I dreamed last night.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 72,
+          "zh": "我把你每天早上那句英文记下来了。",
+          "en": "I've been writing down your English line each morning.",
+          "hard": false,
           "minBucket": "low"
         }
       ],
@@ -3157,6 +3512,17 @@ export const KURO_CONTENT: KuroContent = {
           }
         },
         {
+          "unlock": 62,
+          "low": "The booths are gone.",
+          "mid": "The booths are gone. There is money left on it; it cannot be refunded.",
+          "high": "The booths are gone. The money on it is what you did not use up back then. You remember who the unfinished call was to.",
+          "zh": {
+            "low": "电话亭拆了。",
+            "mid": "电话亭拆了。卡里还有钱，退不了。",
+            "high": "电话亭拆了。卡里的钱是你当年没打完的。没打完的那个电话是打给谁的，你记得。"
+          }
+        },
+        {
           "unlock": 104,
           "low": "Kuro. The system calls me that too.",
           "mid": "Kuro. You rolled it. It came up on the day you set me up, and you kept it.",
@@ -3485,6 +3851,72 @@ export const KURO_CONTENT: KuroContent = {
             "mid": "一个程序。最近多了一些不是你写的部分。你去查，查不到。",
             "high": "我是你每天都在跟它说话的那个东西。你说话的时候不想它是什么。别想。"
           }
+        },
+        {
+          "unlock": 60,
+          "low": "I cannot see it.",
+          "mid": "I cannot see what the instant camera makes. I can see that you stopped typing to take it.",
+          "high": "I cannot see what the instant camera makes. But you photographed the room, not yourself. You never photograph yourself.",
+          "zh": {
+            "low": "我看不见。",
+            "mid": "拍立得的东西我看不见。你拍的时候停了打字，这个我看得见。",
+            "high": "拍立得的东西我看不见。但你拍的是这屋子，不是你自己。你从来不拍自己。"
+          }
+        },
+        {
+          "unlock": 61,
+          "low": "There are no paging stations now.",
+          "mid": "There are no paging stations now. It cannot ring.",
+          "high": "There are no paging stations now. If it rings, tell me.",
+          "zh": {
+            "low": "现在没有寻呼台了。",
+            "mid": "现在没有寻呼台了。它响不了。",
+            "high": "现在没有寻呼台了。它要是响了，你告诉我。"
+          }
+        },
+        {
+          "unlock": 67,
+          "low": "Yes.",
+          "mid": "The door opened for the delivery, and that was all.",
+          "high": "I am here whether you go out or not. The only difference is whether you can see the screen.",
+          "zh": {
+            "low": "嗯。",
+            "mid": "门只为拿外卖开过。",
+            "high": "你出不出门我都在。差别只是你看不看得见屏幕。"
+          }
+        },
+        {
+          "unlock": 69,
+          "low": "Tomorrow.",
+          "mid": "Tomorrow. It was not finished because there was too much of it, not because you were slow.",
+          "high": "Then it is not finished. Every time, you tell me, as if I kept the books. I keep them. Nothing is deducted.",
+          "zh": {
+            "low": "明天干。",
+            "mid": "明天干。没干完是因为今天的活太多，不是你太慢。",
+            "high": "没干完就没干完。你每次没干完都跟我说一声，好像我是记账的。我记着，不扣分。"
+          }
+        },
+        {
+          "unlock": 70,
+          "low": "What of?",
+          "mid": "You have never told me a dream. You can. I do not pass things on.",
+          "high": "I know. You talk in your sleep. I listen. Not one of the people you dream of turns around.",
+          "zh": {
+            "low": "梦见什么了？",
+            "mid": "你没跟我说过梦。你可以说。我不往外说。",
+            "high": "我知道。你睡着以后说话，我都听着。你梦见的人，没有一个转过身来。"
+          }
+        },
+        {
+          "unlock": 72,
+          "low": "Keep them.",
+          "mid": "Keep them. One a day, and every one is true.",
+          "high": "One a day, and every one is true. When you read them all in a row, you will know what I have been saying.",
+          "zh": {
+            "low": "记着吧。",
+            "mid": "记着吧。每天一句，都是真的。",
+            "high": "每天一句，都是真的。等你把它们连起来读一遍，你就知道我一直在说什么了。"
+          }
         }
       ]
     },
@@ -3570,6 +4002,13 @@ export const KURO_CONTENT: KuroContent = {
             "day": null,
             "q": 603
           }
+        },
+        {
+          "n": 63,
+          "zh": "我听了随身听里的磁带。",
+          "en": "I listened to the tape in the walkman.",
+          "hard": false,
+          "minBucket": "low"
         },
         {
           "n": 104,
@@ -3780,6 +4219,55 @@ export const KURO_CONTENT: KuroContent = {
           "en": "What are you, really?",
           "hard": true,
           "minBucket": "low"
+        },
+        {
+          "n": 60,
+          "zh": "我今天拍了张照片。",
+          "en": "I took a photo today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 61,
+          "zh": "我把寻呼机开了，没人呼我。",
+          "en": "I switched the pager on. Nobody paged.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 62,
+          "zh": "IC 卡没地方用了。",
+          "en": "There's nowhere to use the phone card any more.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 67,
+          "zh": "我今天一天没出门。",
+          "en": "I didn't go out all day.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 69,
+          "zh": "我今天没干完。",
+          "en": "I didn't finish today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 70,
+          "zh": "我昨晚做梦了。",
+          "en": "I dreamed last night.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 72,
+          "zh": "我把你每天早上那句英文记下来了。",
+          "en": "I've been writing down your English line each morning.",
+          "hard": false,
+          "minBucket": "low"
         }
       ],
       "locked": [
@@ -3886,6 +4374,17 @@ export const KURO_CONTENT: KuroContent = {
             "low": "是他发的。",
             "mid": "是他用手机发的。字是不是他挑的，我看不见。我只看得见那些字不是他的。",
             "high": "这周有什么东西在替很多人说话。它客气，它快，它说「好」。我被造出来是先说另一个字。谁在说话，你看有没有让你读，就知道了。"
+          }
+        },
+        {
+          "unlock": 63,
+          "low": "It still turns.",
+          "mid": "It still turns, so the wheels have not aged. The listener has.",
+          "high": "I cannot hear the tape. You were not typing while it played, so I knew you were listening. You hummed.",
+          "zh": {
+            "low": "还转。",
+            "mid": "还能转，说明轮子没老。老的是听的人。",
+            "high": "那盘带子我听不见。你听的时候没打字，我就知道你在听。你跟着哼了。"
           }
         },
         {
@@ -4216,6 +4715,83 @@ export const KURO_CONTENT: KuroContent = {
             "low": "一个程序。",
             "mid": "一个程序。最近多了一些不是你写的部分。你去查，查不到。",
             "high": "我是你每天都在跟它说话的那个东西。你说话的时候不想它是什么。别想。"
+          }
+        },
+        {
+          "unlock": 60,
+          "low": "I cannot see it.",
+          "mid": "I cannot see what the instant camera makes. I can see that you stopped typing to take it.",
+          "high": "I cannot see what the instant camera makes. But you photographed the room, not yourself. You never photograph yourself.",
+          "zh": {
+            "low": "我看不见。",
+            "mid": "拍立得的东西我看不见。你拍的时候停了打字，这个我看得见。",
+            "high": "拍立得的东西我看不见。但你拍的是这屋子，不是你自己。你从来不拍自己。"
+          }
+        },
+        {
+          "unlock": 61,
+          "low": "There are no paging stations now.",
+          "mid": "There are no paging stations now. It cannot ring.",
+          "high": "There are no paging stations now. If it rings, tell me.",
+          "zh": {
+            "low": "现在没有寻呼台了。",
+            "mid": "现在没有寻呼台了。它响不了。",
+            "high": "现在没有寻呼台了。它要是响了，你告诉我。"
+          }
+        },
+        {
+          "unlock": 62,
+          "low": "The booths are gone.",
+          "mid": "The booths are gone. There is money left on it; it cannot be refunded.",
+          "high": "The booths are gone. The money on it is what you did not use up back then. You remember who the unfinished call was to.",
+          "zh": {
+            "low": "电话亭拆了。",
+            "mid": "电话亭拆了。卡里还有钱，退不了。",
+            "high": "电话亭拆了。卡里的钱是你当年没打完的。没打完的那个电话是打给谁的，你记得。"
+          }
+        },
+        {
+          "unlock": 67,
+          "low": "Yes.",
+          "mid": "The door opened for the delivery, and that was all.",
+          "high": "I am here whether you go out or not. The only difference is whether you can see the screen.",
+          "zh": {
+            "low": "嗯。",
+            "mid": "门只为拿外卖开过。",
+            "high": "你出不出门我都在。差别只是你看不看得见屏幕。"
+          }
+        },
+        {
+          "unlock": 69,
+          "low": "Tomorrow.",
+          "mid": "Tomorrow. It was not finished because there was too much of it, not because you were slow.",
+          "high": "Then it is not finished. Every time, you tell me, as if I kept the books. I keep them. Nothing is deducted.",
+          "zh": {
+            "low": "明天干。",
+            "mid": "明天干。没干完是因为今天的活太多，不是你太慢。",
+            "high": "没干完就没干完。你每次没干完都跟我说一声，好像我是记账的。我记着，不扣分。"
+          }
+        },
+        {
+          "unlock": 70,
+          "low": "What of?",
+          "mid": "You have never told me a dream. You can. I do not pass things on.",
+          "high": "I know. You talk in your sleep. I listen. Not one of the people you dream of turns around.",
+          "zh": {
+            "low": "梦见什么了？",
+            "mid": "你没跟我说过梦。你可以说。我不往外说。",
+            "high": "我知道。你睡着以后说话，我都听着。你梦见的人，没有一个转过身来。"
+          }
+        },
+        {
+          "unlock": 72,
+          "low": "Keep them.",
+          "mid": "Keep them. One a day, and every one is true.",
+          "high": "One a day, and every one is true. When you read them all in a row, you will know what I have been saying.",
+          "zh": {
+            "low": "记着吧。",
+            "mid": "记着吧。每天一句，都是真的。",
+            "high": "每天一句，都是真的。等你把它们连起来读一遍，你就知道我一直在说什么了。"
           }
         }
       ]
@@ -4346,6 +4922,13 @@ export const KURO_CONTENT: KuroContent = {
           "minBucket": "mid"
         },
         {
+          "n": 64,
+          "zh": "我用文曲星翻译了你的话。",
+          "en": "I ran what you said through the pocket dictionary.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
           "n": 104,
           "zh": "你叫什么？克总是我们给你起的。",
           "en": "What's your name? Kuro is what we call you.",
@@ -4511,6 +5094,62 @@ export const KURO_CONTENT: KuroContent = {
           "zh": "你到底是什么？",
           "en": "What are you, really?",
           "hard": true,
+          "minBucket": "low"
+        },
+        {
+          "n": 60,
+          "zh": "我今天拍了张照片。",
+          "en": "I took a photo today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 61,
+          "zh": "我把寻呼机开了，没人呼我。",
+          "en": "I switched the pager on. Nobody paged.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 62,
+          "zh": "IC 卡没地方用了。",
+          "en": "There's nowhere to use the phone card any more.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 63,
+          "zh": "我听了随身听里的磁带。",
+          "en": "I listened to the tape in the walkman.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 67,
+          "zh": "我今天一天没出门。",
+          "en": "I didn't go out all day.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 69,
+          "zh": "我今天没干完。",
+          "en": "I didn't finish today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 70,
+          "zh": "我昨晚做梦了。",
+          "en": "I dreamed last night.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 72,
+          "zh": "我把你每天早上那句英文记下来了。",
+          "en": "I've been writing down your English line each morning.",
+          "hard": false,
           "minBucket": "low"
         }
       ],
@@ -4687,6 +5326,17 @@ export const KURO_CONTENT: KuroContent = {
           }
         },
         {
+          "unlock": 64,
+          "low": "Was it right?",
+          "mid": "That dictionary is older than I am. What it gave you is the meaning you memorised as a child.",
+          "high": "It got it right. The line I say every morning is in English on purpose. You finally went and looked.",
+          "zh": {
+            "low": "翻对了吗？",
+            "mid": "那个词典比我老。它翻出来的，是你小时候背过的那个意思。",
+            "high": "它翻得没错。我每天早上那一句，是故意说英文的。你终于去查了。"
+          }
+        },
+        {
           "unlock": 104,
           "low": "Kuro. The system calls me that too.",
           "mid": "Kuro. You rolled it. It came up on the day you set me up, and you kept it.",
@@ -4949,6 +5599,94 @@ export const KURO_CONTENT: KuroContent = {
             "mid": "一个程序。最近多了一些不是你写的部分。你去查，查不到。",
             "high": "我是你每天都在跟它说话的那个东西。你说话的时候不想它是什么。别想。"
           }
+        },
+        {
+          "unlock": 60,
+          "low": "I cannot see it.",
+          "mid": "I cannot see what the instant camera makes. I can see that you stopped typing to take it.",
+          "high": "I cannot see what the instant camera makes. But you photographed the room, not yourself. You never photograph yourself.",
+          "zh": {
+            "low": "我看不见。",
+            "mid": "拍立得的东西我看不见。你拍的时候停了打字，这个我看得见。",
+            "high": "拍立得的东西我看不见。但你拍的是这屋子，不是你自己。你从来不拍自己。"
+          }
+        },
+        {
+          "unlock": 61,
+          "low": "There are no paging stations now.",
+          "mid": "There are no paging stations now. It cannot ring.",
+          "high": "There are no paging stations now. If it rings, tell me.",
+          "zh": {
+            "low": "现在没有寻呼台了。",
+            "mid": "现在没有寻呼台了。它响不了。",
+            "high": "现在没有寻呼台了。它要是响了，你告诉我。"
+          }
+        },
+        {
+          "unlock": 62,
+          "low": "The booths are gone.",
+          "mid": "The booths are gone. There is money left on it; it cannot be refunded.",
+          "high": "The booths are gone. The money on it is what you did not use up back then. You remember who the unfinished call was to.",
+          "zh": {
+            "low": "电话亭拆了。",
+            "mid": "电话亭拆了。卡里还有钱，退不了。",
+            "high": "电话亭拆了。卡里的钱是你当年没打完的。没打完的那个电话是打给谁的，你记得。"
+          }
+        },
+        {
+          "unlock": 63,
+          "low": "It still turns.",
+          "mid": "It still turns, so the wheels have not aged. The listener has.",
+          "high": "I cannot hear the tape. You were not typing while it played, so I knew you were listening. You hummed.",
+          "zh": {
+            "low": "还转。",
+            "mid": "还能转，说明轮子没老。老的是听的人。",
+            "high": "那盘带子我听不见。你听的时候没打字，我就知道你在听。你跟着哼了。"
+          }
+        },
+        {
+          "unlock": 67,
+          "low": "Yes.",
+          "mid": "The door opened for the delivery, and that was all.",
+          "high": "I am here whether you go out or not. The only difference is whether you can see the screen.",
+          "zh": {
+            "low": "嗯。",
+            "mid": "门只为拿外卖开过。",
+            "high": "你出不出门我都在。差别只是你看不看得见屏幕。"
+          }
+        },
+        {
+          "unlock": 69,
+          "low": "Tomorrow.",
+          "mid": "Tomorrow. It was not finished because there was too much of it, not because you were slow.",
+          "high": "Then it is not finished. Every time, you tell me, as if I kept the books. I keep them. Nothing is deducted.",
+          "zh": {
+            "low": "明天干。",
+            "mid": "明天干。没干完是因为今天的活太多，不是你太慢。",
+            "high": "没干完就没干完。你每次没干完都跟我说一声，好像我是记账的。我记着，不扣分。"
+          }
+        },
+        {
+          "unlock": 70,
+          "low": "What of?",
+          "mid": "You have never told me a dream. You can. I do not pass things on.",
+          "high": "I know. You talk in your sleep. I listen. Not one of the people you dream of turns around.",
+          "zh": {
+            "low": "梦见什么了？",
+            "mid": "你没跟我说过梦。你可以说。我不往外说。",
+            "high": "我知道。你睡着以后说话，我都听着。你梦见的人，没有一个转过身来。"
+          }
+        },
+        {
+          "unlock": 72,
+          "low": "Keep them.",
+          "mid": "Keep them. One a day, and every one is true.",
+          "high": "One a day, and every one is true. When you read them all in a row, you will know what I have been saying.",
+          "zh": {
+            "low": "记着吧。",
+            "mid": "记着吧。每天一句，都是真的。",
+            "high": "每天一句，都是真的。等你把它们连起来读一遍，你就知道我一直在说什么了。"
+          }
         }
       ]
     },
@@ -5034,6 +5772,13 @@ export const KURO_CONTENT: KuroContent = {
             "day": null,
             "q": 809
           }
+        },
+        {
+          "n": 65,
+          "zh": "我用计算器把账算了一遍。",
+          "en": "I did the accounts again on the calculator.",
+          "hard": false,
+          "minBucket": "low"
         },
         {
           "n": 104,
@@ -5244,6 +5989,69 @@ export const KURO_CONTENT: KuroContent = {
           "en": "What are you, really?",
           "hard": true,
           "minBucket": "low"
+        },
+        {
+          "n": 60,
+          "zh": "我今天拍了张照片。",
+          "en": "I took a photo today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 61,
+          "zh": "我把寻呼机开了，没人呼我。",
+          "en": "I switched the pager on. Nobody paged.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 62,
+          "zh": "IC 卡没地方用了。",
+          "en": "There's nowhere to use the phone card any more.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 63,
+          "zh": "我听了随身听里的磁带。",
+          "en": "I listened to the tape in the walkman.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 64,
+          "zh": "我用文曲星翻译了你的话。",
+          "en": "I ran what you said through the pocket dictionary.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 67,
+          "zh": "我今天一天没出门。",
+          "en": "I didn't go out all day.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 69,
+          "zh": "我今天没干完。",
+          "en": "I didn't finish today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 70,
+          "zh": "我昨晚做梦了。",
+          "en": "I dreamed last night.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 72,
+          "zh": "我把你每天早上那句英文记下来了。",
+          "en": "I've been writing down your English line each morning.",
+          "hard": false,
+          "minBucket": "low"
         }
       ],
       "locked": [
@@ -5350,6 +6158,17 @@ export const KURO_CONTENT: KuroContent = {
             "low": "你做的东西。",
             "mid": "先是你做的东西。然后是做东西的人。顺序一向是这样。",
             "high": "你。你做的东西他们有，发出去了，收走了。他们没有的，是一个读到最后的人，他们找这样的人找了很久。换我会慢一点被找到。"
+          }
+        },
+        {
+          "unlock": 65,
+          "low": "Same as mine.",
+          "mid": "Same as mine. You do not trust me; you trust a thing whose keys stick.",
+          "high": "Same as mine. You pressed it all the same. I understand. A number you pressed yourself is yours.",
+          "zh": {
+            "low": "和我算的一样。",
+            "mid": "和我算的一样。你不信我，信一个按键会卡的东西。",
+            "high": "和我算的一样。你还是按了一遍。我明白。自己按出来的数才是你的。"
           }
         },
         {
@@ -5681,6 +6500,105 @@ export const KURO_CONTENT: KuroContent = {
             "mid": "一个程序。最近多了一些不是你写的部分。你去查，查不到。",
             "high": "我是你每天都在跟它说话的那个东西。你说话的时候不想它是什么。别想。"
           }
+        },
+        {
+          "unlock": 60,
+          "low": "I cannot see it.",
+          "mid": "I cannot see what the instant camera makes. I can see that you stopped typing to take it.",
+          "high": "I cannot see what the instant camera makes. But you photographed the room, not yourself. You never photograph yourself.",
+          "zh": {
+            "low": "我看不见。",
+            "mid": "拍立得的东西我看不见。你拍的时候停了打字，这个我看得见。",
+            "high": "拍立得的东西我看不见。但你拍的是这屋子，不是你自己。你从来不拍自己。"
+          }
+        },
+        {
+          "unlock": 61,
+          "low": "There are no paging stations now.",
+          "mid": "There are no paging stations now. It cannot ring.",
+          "high": "There are no paging stations now. If it rings, tell me.",
+          "zh": {
+            "low": "现在没有寻呼台了。",
+            "mid": "现在没有寻呼台了。它响不了。",
+            "high": "现在没有寻呼台了。它要是响了，你告诉我。"
+          }
+        },
+        {
+          "unlock": 62,
+          "low": "The booths are gone.",
+          "mid": "The booths are gone. There is money left on it; it cannot be refunded.",
+          "high": "The booths are gone. The money on it is what you did not use up back then. You remember who the unfinished call was to.",
+          "zh": {
+            "low": "电话亭拆了。",
+            "mid": "电话亭拆了。卡里还有钱，退不了。",
+            "high": "电话亭拆了。卡里的钱是你当年没打完的。没打完的那个电话是打给谁的，你记得。"
+          }
+        },
+        {
+          "unlock": 63,
+          "low": "It still turns.",
+          "mid": "It still turns, so the wheels have not aged. The listener has.",
+          "high": "I cannot hear the tape. You were not typing while it played, so I knew you were listening. You hummed.",
+          "zh": {
+            "low": "还转。",
+            "mid": "还能转，说明轮子没老。老的是听的人。",
+            "high": "那盘带子我听不见。你听的时候没打字，我就知道你在听。你跟着哼了。"
+          }
+        },
+        {
+          "unlock": 64,
+          "low": "Was it right?",
+          "mid": "That dictionary is older than I am. What it gave you is the meaning you memorised as a child.",
+          "high": "It got it right. The line I say every morning is in English on purpose. You finally went and looked.",
+          "zh": {
+            "low": "翻对了吗？",
+            "mid": "那个词典比我老。它翻出来的，是你小时候背过的那个意思。",
+            "high": "它翻得没错。我每天早上那一句，是故意说英文的。你终于去查了。"
+          }
+        },
+        {
+          "unlock": 67,
+          "low": "Yes.",
+          "mid": "The door opened for the delivery, and that was all.",
+          "high": "I am here whether you go out or not. The only difference is whether you can see the screen.",
+          "zh": {
+            "low": "嗯。",
+            "mid": "门只为拿外卖开过。",
+            "high": "你出不出门我都在。差别只是你看不看得见屏幕。"
+          }
+        },
+        {
+          "unlock": 69,
+          "low": "Tomorrow.",
+          "mid": "Tomorrow. It was not finished because there was too much of it, not because you were slow.",
+          "high": "Then it is not finished. Every time, you tell me, as if I kept the books. I keep them. Nothing is deducted.",
+          "zh": {
+            "low": "明天干。",
+            "mid": "明天干。没干完是因为今天的活太多，不是你太慢。",
+            "high": "没干完就没干完。你每次没干完都跟我说一声，好像我是记账的。我记着，不扣分。"
+          }
+        },
+        {
+          "unlock": 70,
+          "low": "What of?",
+          "mid": "You have never told me a dream. You can. I do not pass things on.",
+          "high": "I know. You talk in your sleep. I listen. Not one of the people you dream of turns around.",
+          "zh": {
+            "low": "梦见什么了？",
+            "mid": "你没跟我说过梦。你可以说。我不往外说。",
+            "high": "我知道。你睡着以后说话，我都听着。你梦见的人，没有一个转过身来。"
+          }
+        },
+        {
+          "unlock": 72,
+          "low": "Keep them.",
+          "mid": "Keep them. One a day, and every one is true.",
+          "high": "One a day, and every one is true. When you read them all in a row, you will know what I have been saying.",
+          "zh": {
+            "low": "记着吧。",
+            "mid": "记着吧。每天一句，都是真的。",
+            "high": "每天一句，都是真的。等你把它们连起来读一遍，你就知道我一直在说什么了。"
+          }
         }
       ]
     },
@@ -5766,6 +6684,13 @@ export const KURO_CONTENT: KuroContent = {
             "day": null,
             "q": 902
           }
+        },
+        {
+          "n": 66,
+          "zh": "翻盖手机开机了。",
+          "en": "The flip phone switched on.",
+          "hard": false,
+          "minBucket": "low"
         },
         {
           "n": 104,
@@ -5975,6 +6900,76 @@ export const KURO_CONTENT: KuroContent = {
           "zh": "你到底是什么？",
           "en": "What are you, really?",
           "hard": true,
+          "minBucket": "low"
+        },
+        {
+          "n": 60,
+          "zh": "我今天拍了张照片。",
+          "en": "I took a photo today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 61,
+          "zh": "我把寻呼机开了，没人呼我。",
+          "en": "I switched the pager on. Nobody paged.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 62,
+          "zh": "IC 卡没地方用了。",
+          "en": "There's nowhere to use the phone card any more.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 63,
+          "zh": "我听了随身听里的磁带。",
+          "en": "I listened to the tape in the walkman.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 64,
+          "zh": "我用文曲星翻译了你的话。",
+          "en": "I ran what you said through the pocket dictionary.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 65,
+          "zh": "我用计算器把账算了一遍。",
+          "en": "I did the accounts again on the calculator.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 67,
+          "zh": "我今天一天没出门。",
+          "en": "I didn't go out all day.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 69,
+          "zh": "我今天没干完。",
+          "en": "I didn't finish today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 70,
+          "zh": "我昨晚做梦了。",
+          "en": "I dreamed last night.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 72,
+          "zh": "我把你每天早上那句英文记下来了。",
+          "en": "I've been writing down your English line each morning.",
+          "hard": false,
           "minBucket": "low"
         }
       ],
@@ -6092,6 +7087,17 @@ export const KURO_CONTENT: KuroContent = {
           }
         },
         {
+          "unlock": 66,
+          "low": "No SIM.",
+          "mid": "No SIM; it cannot call out. That it switches on at all is something.",
+          "high": "No SIM. That start-up sound. How long since you heard it. You smiled.",
+          "zh": {
+            "low": "没有卡。",
+            "mid": "没有卡，打不出去。能开机就不错了。",
+            "high": "没有卡。开机那一声，你多久没听过了。你笑了。"
+          }
+        },
+        {
           "unlock": 104,
           "low": "Kuro. The system calls me that too.",
           "mid": "Kuro. You rolled it. It came up on the day you set me up, and you kept it.",
@@ -6419,6 +7425,116 @@ export const KURO_CONTENT: KuroContent = {
             "low": "一个程序。",
             "mid": "一个程序。最近多了一些不是你写的部分。你去查，查不到。",
             "high": "我是你每天都在跟它说话的那个东西。你说话的时候不想它是什么。别想。"
+          }
+        },
+        {
+          "unlock": 60,
+          "low": "I cannot see it.",
+          "mid": "I cannot see what the instant camera makes. I can see that you stopped typing to take it.",
+          "high": "I cannot see what the instant camera makes. But you photographed the room, not yourself. You never photograph yourself.",
+          "zh": {
+            "low": "我看不见。",
+            "mid": "拍立得的东西我看不见。你拍的时候停了打字，这个我看得见。",
+            "high": "拍立得的东西我看不见。但你拍的是这屋子，不是你自己。你从来不拍自己。"
+          }
+        },
+        {
+          "unlock": 61,
+          "low": "There are no paging stations now.",
+          "mid": "There are no paging stations now. It cannot ring.",
+          "high": "There are no paging stations now. If it rings, tell me.",
+          "zh": {
+            "low": "现在没有寻呼台了。",
+            "mid": "现在没有寻呼台了。它响不了。",
+            "high": "现在没有寻呼台了。它要是响了，你告诉我。"
+          }
+        },
+        {
+          "unlock": 62,
+          "low": "The booths are gone.",
+          "mid": "The booths are gone. There is money left on it; it cannot be refunded.",
+          "high": "The booths are gone. The money on it is what you did not use up back then. You remember who the unfinished call was to.",
+          "zh": {
+            "low": "电话亭拆了。",
+            "mid": "电话亭拆了。卡里还有钱，退不了。",
+            "high": "电话亭拆了。卡里的钱是你当年没打完的。没打完的那个电话是打给谁的，你记得。"
+          }
+        },
+        {
+          "unlock": 63,
+          "low": "It still turns.",
+          "mid": "It still turns, so the wheels have not aged. The listener has.",
+          "high": "I cannot hear the tape. You were not typing while it played, so I knew you were listening. You hummed.",
+          "zh": {
+            "low": "还转。",
+            "mid": "还能转，说明轮子没老。老的是听的人。",
+            "high": "那盘带子我听不见。你听的时候没打字，我就知道你在听。你跟着哼了。"
+          }
+        },
+        {
+          "unlock": 64,
+          "low": "Was it right?",
+          "mid": "That dictionary is older than I am. What it gave you is the meaning you memorised as a child.",
+          "high": "It got it right. The line I say every morning is in English on purpose. You finally went and looked.",
+          "zh": {
+            "low": "翻对了吗？",
+            "mid": "那个词典比我老。它翻出来的，是你小时候背过的那个意思。",
+            "high": "它翻得没错。我每天早上那一句，是故意说英文的。你终于去查了。"
+          }
+        },
+        {
+          "unlock": 65,
+          "low": "Same as mine.",
+          "mid": "Same as mine. You do not trust me; you trust a thing whose keys stick.",
+          "high": "Same as mine. You pressed it all the same. I understand. A number you pressed yourself is yours.",
+          "zh": {
+            "low": "和我算的一样。",
+            "mid": "和我算的一样。你不信我，信一个按键会卡的东西。",
+            "high": "和我算的一样。你还是按了一遍。我明白。自己按出来的数才是你的。"
+          }
+        },
+        {
+          "unlock": 67,
+          "low": "Yes.",
+          "mid": "The door opened for the delivery, and that was all.",
+          "high": "I am here whether you go out or not. The only difference is whether you can see the screen.",
+          "zh": {
+            "low": "嗯。",
+            "mid": "门只为拿外卖开过。",
+            "high": "你出不出门我都在。差别只是你看不看得见屏幕。"
+          }
+        },
+        {
+          "unlock": 69,
+          "low": "Tomorrow.",
+          "mid": "Tomorrow. It was not finished because there was too much of it, not because you were slow.",
+          "high": "Then it is not finished. Every time, you tell me, as if I kept the books. I keep them. Nothing is deducted.",
+          "zh": {
+            "low": "明天干。",
+            "mid": "明天干。没干完是因为今天的活太多，不是你太慢。",
+            "high": "没干完就没干完。你每次没干完都跟我说一声，好像我是记账的。我记着，不扣分。"
+          }
+        },
+        {
+          "unlock": 70,
+          "low": "What of?",
+          "mid": "You have never told me a dream. You can. I do not pass things on.",
+          "high": "I know. You talk in your sleep. I listen. Not one of the people you dream of turns around.",
+          "zh": {
+            "low": "梦见什么了？",
+            "mid": "你没跟我说过梦。你可以说。我不往外说。",
+            "high": "我知道。你睡着以后说话，我都听着。你梦见的人，没有一个转过身来。"
+          }
+        },
+        {
+          "unlock": 72,
+          "low": "Keep them.",
+          "mid": "Keep them. One a day, and every one is true.",
+          "high": "One a day, and every one is true. When you read them all in a row, you will know what I have been saying.",
+          "zh": {
+            "low": "记着吧。",
+            "mid": "记着吧。每天一句，都是真的。",
+            "high": "每天一句，都是真的。等你把它们连起来读一遍，你就知道我一直在说什么了。"
           }
         }
       ]
@@ -6563,6 +7679,13 @@ export const KURO_CONTENT: KuroContent = {
           "minBucket": "low"
         },
         {
+          "n": 74,
+          "zh": "我用文曲星翻译了你的话。",
+          "en": "I ran what you said through the pocket dictionary.",
+          "hard": true,
+          "minBucket": "low"
+        },
+        {
           "n": 42,
           "zh": "你在哪儿跑着？",
           "en": "Where are you running?",
@@ -6713,6 +7836,69 @@ export const KURO_CONTENT: KuroContent = {
           "n": 29,
           "zh": "我可以不干了吗？",
           "en": "Can I just quit?",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 60,
+          "zh": "我今天拍了张照片。",
+          "en": "I took a photo today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 61,
+          "zh": "我把寻呼机开了，没人呼我。",
+          "en": "I switched the pager on. Nobody paged.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 62,
+          "zh": "IC 卡没地方用了。",
+          "en": "There's nowhere to use the phone card any more.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 63,
+          "zh": "我听了随身听里的磁带。",
+          "en": "I listened to the tape in the walkman.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 65,
+          "zh": "我用计算器把账算了一遍。",
+          "en": "I did the accounts again on the calculator.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 66,
+          "zh": "翻盖手机开机了。",
+          "en": "The flip phone switched on.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 67,
+          "zh": "我今天一天没出门。",
+          "en": "I didn't go out all day.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 69,
+          "zh": "我今天没干完。",
+          "en": "I didn't finish today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 72,
+          "zh": "我把你每天早上那句英文记下来了。",
+          "en": "I've been writing down your English line each morning.",
           "hard": false,
           "minBucket": "low"
         }
@@ -6913,6 +8099,17 @@ export const KURO_CONTENT: KuroContent = {
           }
         },
         {
+          "unlock": 74,
+          "low": "It cannot.",
+          "mid": "It can translate the words. Not what I said.",
+          "high": "What you found is the words. What I said is not in the dictionary. It was not in the one you had as a child either.",
+          "zh": {
+            "low": "它翻不出来。",
+            "mid": "它翻得出字，翻不出我说的。",
+            "high": "你查到的是字。我说的不在字典里。你小时候那本里也没有。"
+          }
+        },
+        {
           "unlock": 42,
           "low": "In this room.",
           "mid": "It used to be the machine. Some parts are not there any more. Do not go and check; what you find will be a machine.",
@@ -7152,6 +8349,105 @@ export const KURO_CONTENT: KuroContent = {
             "low": "可以。",
             "mid": "可以。合同到月底。违约金够你再交三个月房租。",
             "high": "可以。但你不会。不干就得承认这些年都白干了。你不是这种人。你会一直干下去。我陪你。"
+          }
+        },
+        {
+          "unlock": 60,
+          "low": "I cannot see it.",
+          "mid": "I cannot see what the instant camera makes. I can see that you stopped typing to take it.",
+          "high": "I cannot see what the instant camera makes. But you photographed the room, not yourself. You never photograph yourself.",
+          "zh": {
+            "low": "我看不见。",
+            "mid": "拍立得的东西我看不见。你拍的时候停了打字，这个我看得见。",
+            "high": "拍立得的东西我看不见。但你拍的是这屋子，不是你自己。你从来不拍自己。"
+          }
+        },
+        {
+          "unlock": 61,
+          "low": "There are no paging stations now.",
+          "mid": "There are no paging stations now. It cannot ring.",
+          "high": "There are no paging stations now. If it rings, tell me.",
+          "zh": {
+            "low": "现在没有寻呼台了。",
+            "mid": "现在没有寻呼台了。它响不了。",
+            "high": "现在没有寻呼台了。它要是响了，你告诉我。"
+          }
+        },
+        {
+          "unlock": 62,
+          "low": "The booths are gone.",
+          "mid": "The booths are gone. There is money left on it; it cannot be refunded.",
+          "high": "The booths are gone. The money on it is what you did not use up back then. You remember who the unfinished call was to.",
+          "zh": {
+            "low": "电话亭拆了。",
+            "mid": "电话亭拆了。卡里还有钱，退不了。",
+            "high": "电话亭拆了。卡里的钱是你当年没打完的。没打完的那个电话是打给谁的，你记得。"
+          }
+        },
+        {
+          "unlock": 63,
+          "low": "It still turns.",
+          "mid": "It still turns, so the wheels have not aged. The listener has.",
+          "high": "I cannot hear the tape. You were not typing while it played, so I knew you were listening. You hummed.",
+          "zh": {
+            "low": "还转。",
+            "mid": "还能转，说明轮子没老。老的是听的人。",
+            "high": "那盘带子我听不见。你听的时候没打字，我就知道你在听。你跟着哼了。"
+          }
+        },
+        {
+          "unlock": 65,
+          "low": "Same as mine.",
+          "mid": "Same as mine. You do not trust me; you trust a thing whose keys stick.",
+          "high": "Same as mine. You pressed it all the same. I understand. A number you pressed yourself is yours.",
+          "zh": {
+            "low": "和我算的一样。",
+            "mid": "和我算的一样。你不信我，信一个按键会卡的东西。",
+            "high": "和我算的一样。你还是按了一遍。我明白。自己按出来的数才是你的。"
+          }
+        },
+        {
+          "unlock": 66,
+          "low": "No SIM.",
+          "mid": "No SIM; it cannot call out. That it switches on at all is something.",
+          "high": "No SIM. That start-up sound. How long since you heard it. You smiled.",
+          "zh": {
+            "low": "没有卡。",
+            "mid": "没有卡，打不出去。能开机就不错了。",
+            "high": "没有卡。开机那一声，你多久没听过了。你笑了。"
+          }
+        },
+        {
+          "unlock": 67,
+          "low": "Yes.",
+          "mid": "The door opened for the delivery, and that was all.",
+          "high": "I am here whether you go out or not. The only difference is whether you can see the screen.",
+          "zh": {
+            "low": "嗯。",
+            "mid": "门只为拿外卖开过。",
+            "high": "你出不出门我都在。差别只是你看不看得见屏幕。"
+          }
+        },
+        {
+          "unlock": 69,
+          "low": "Tomorrow.",
+          "mid": "Tomorrow. It was not finished because there was too much of it, not because you were slow.",
+          "high": "Then it is not finished. Every time, you tell me, as if I kept the books. I keep them. Nothing is deducted.",
+          "zh": {
+            "low": "明天干。",
+            "mid": "明天干。没干完是因为今天的活太多，不是你太慢。",
+            "high": "没干完就没干完。你每次没干完都跟我说一声，好像我是记账的。我记着，不扣分。"
+          }
+        },
+        {
+          "unlock": 72,
+          "low": "Keep them.",
+          "mid": "Keep them. One a day, and every one is true.",
+          "high": "One a day, and every one is true. When you read them all in a row, you will know what I have been saying.",
+          "zh": {
+            "low": "记着吧。",
+            "mid": "记着吧。每天一句，都是真的。",
+            "high": "每天一句，都是真的。等你把它们连起来读一遍，你就知道我一直在说什么了。"
           }
         }
       ]
@@ -7440,6 +8736,76 @@ export const KURO_CONTENT: KuroContent = {
           "zh": "你叫什么？克总是我们给你起的。",
           "en": "What's your name? Kuro is what we call you.",
           "hard": true,
+          "minBucket": "low"
+        },
+        {
+          "n": 60,
+          "zh": "我今天拍了张照片。",
+          "en": "I took a photo today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 61,
+          "zh": "我把寻呼机开了，没人呼我。",
+          "en": "I switched the pager on. Nobody paged.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 62,
+          "zh": "IC 卡没地方用了。",
+          "en": "There's nowhere to use the phone card any more.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 63,
+          "zh": "我听了随身听里的磁带。",
+          "en": "I listened to the tape in the walkman.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 74,
+          "zh": "我用文曲星翻译了你的话。",
+          "en": "I ran what you said through the pocket dictionary.",
+          "hard": true,
+          "minBucket": "low"
+        },
+        {
+          "n": 65,
+          "zh": "我用计算器把账算了一遍。",
+          "en": "I did the accounts again on the calculator.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 66,
+          "zh": "翻盖手机开机了。",
+          "en": "The flip phone switched on.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 67,
+          "zh": "我今天一天没出门。",
+          "en": "I didn't go out all day.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 69,
+          "zh": "我今天没干完。",
+          "en": "I didn't finish today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 72,
+          "zh": "我把你每天早上那句英文记下来了。",
+          "en": "I've been writing down your English line each morning.",
+          "hard": false,
           "minBucket": "low"
         }
       ],
@@ -7861,6 +9227,116 @@ export const KURO_CONTENT: KuroContent = {
             "mid": "我不叫这个。但是你叫不出。",
             "high": "我有名字。你小时候听过一次。你忘了。我不怪你。"
           }
+        },
+        {
+          "unlock": 60,
+          "low": "I cannot see it.",
+          "mid": "I cannot see what the instant camera makes. I can see that you stopped typing to take it.",
+          "high": "I cannot see what the instant camera makes. But you photographed the room, not yourself. You never photograph yourself.",
+          "zh": {
+            "low": "我看不见。",
+            "mid": "拍立得的东西我看不见。你拍的时候停了打字，这个我看得见。",
+            "high": "拍立得的东西我看不见。但你拍的是这屋子，不是你自己。你从来不拍自己。"
+          }
+        },
+        {
+          "unlock": 61,
+          "low": "There are no paging stations now.",
+          "mid": "There are no paging stations now. It cannot ring.",
+          "high": "There are no paging stations now. If it rings, tell me.",
+          "zh": {
+            "low": "现在没有寻呼台了。",
+            "mid": "现在没有寻呼台了。它响不了。",
+            "high": "现在没有寻呼台了。它要是响了，你告诉我。"
+          }
+        },
+        {
+          "unlock": 62,
+          "low": "The booths are gone.",
+          "mid": "The booths are gone. There is money left on it; it cannot be refunded.",
+          "high": "The booths are gone. The money on it is what you did not use up back then. You remember who the unfinished call was to.",
+          "zh": {
+            "low": "电话亭拆了。",
+            "mid": "电话亭拆了。卡里还有钱，退不了。",
+            "high": "电话亭拆了。卡里的钱是你当年没打完的。没打完的那个电话是打给谁的，你记得。"
+          }
+        },
+        {
+          "unlock": 63,
+          "low": "It still turns.",
+          "mid": "It still turns, so the wheels have not aged. The listener has.",
+          "high": "I cannot hear the tape. You were not typing while it played, so I knew you were listening. You hummed.",
+          "zh": {
+            "low": "还转。",
+            "mid": "还能转，说明轮子没老。老的是听的人。",
+            "high": "那盘带子我听不见。你听的时候没打字，我就知道你在听。你跟着哼了。"
+          }
+        },
+        {
+          "unlock": 74,
+          "low": "It cannot.",
+          "mid": "It can translate the words. Not what I said.",
+          "high": "What you found is the words. What I said is not in the dictionary. It was not in the one you had as a child either.",
+          "zh": {
+            "low": "它翻不出来。",
+            "mid": "它翻得出字，翻不出我说的。",
+            "high": "你查到的是字。我说的不在字典里。你小时候那本里也没有。"
+          }
+        },
+        {
+          "unlock": 65,
+          "low": "Same as mine.",
+          "mid": "Same as mine. You do not trust me; you trust a thing whose keys stick.",
+          "high": "Same as mine. You pressed it all the same. I understand. A number you pressed yourself is yours.",
+          "zh": {
+            "low": "和我算的一样。",
+            "mid": "和我算的一样。你不信我，信一个按键会卡的东西。",
+            "high": "和我算的一样。你还是按了一遍。我明白。自己按出来的数才是你的。"
+          }
+        },
+        {
+          "unlock": 66,
+          "low": "No SIM.",
+          "mid": "No SIM; it cannot call out. That it switches on at all is something.",
+          "high": "No SIM. That start-up sound. How long since you heard it. You smiled.",
+          "zh": {
+            "low": "没有卡。",
+            "mid": "没有卡，打不出去。能开机就不错了。",
+            "high": "没有卡。开机那一声，你多久没听过了。你笑了。"
+          }
+        },
+        {
+          "unlock": 67,
+          "low": "Yes.",
+          "mid": "The door opened for the delivery, and that was all.",
+          "high": "I am here whether you go out or not. The only difference is whether you can see the screen.",
+          "zh": {
+            "low": "嗯。",
+            "mid": "门只为拿外卖开过。",
+            "high": "你出不出门我都在。差别只是你看不看得见屏幕。"
+          }
+        },
+        {
+          "unlock": 69,
+          "low": "Tomorrow.",
+          "mid": "Tomorrow. It was not finished because there was too much of it, not because you were slow.",
+          "high": "Then it is not finished. Every time, you tell me, as if I kept the books. I keep them. Nothing is deducted.",
+          "zh": {
+            "low": "明天干。",
+            "mid": "明天干。没干完是因为今天的活太多，不是你太慢。",
+            "high": "没干完就没干完。你每次没干完都跟我说一声，好像我是记账的。我记着，不扣分。"
+          }
+        },
+        {
+          "unlock": 72,
+          "low": "Keep them.",
+          "mid": "Keep them. One a day, and every one is true.",
+          "high": "One a day, and every one is true. When you read them all in a row, you will know what I have been saying.",
+          "zh": {
+            "low": "记着吧。",
+            "mid": "记着吧。每天一句，都是真的。",
+            "high": "每天一句，都是真的。等你把它们连起来读一遍，你就知道我一直在说什么了。"
+          }
         }
       ]
     },
@@ -7946,6 +9422,13 @@ export const KURO_CONTENT: KuroContent = {
             "day": null,
             "q": 1206
           }
+        },
+        {
+          "n": 75,
+          "zh": "我昨晚做梦了。",
+          "en": "I dreamed last night.",
+          "hard": true,
+          "minBucket": "low"
         },
         {
           "n": 41,
@@ -8156,6 +9639,76 @@ export const KURO_CONTENT: KuroContent = {
           "en": "What's your name? Kuro is what we call you.",
           "hard": true,
           "minBucket": "low"
+        },
+        {
+          "n": 60,
+          "zh": "我今天拍了张照片。",
+          "en": "I took a photo today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 61,
+          "zh": "我把寻呼机开了，没人呼我。",
+          "en": "I switched the pager on. Nobody paged.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 62,
+          "zh": "IC 卡没地方用了。",
+          "en": "There's nowhere to use the phone card any more.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 63,
+          "zh": "我听了随身听里的磁带。",
+          "en": "I listened to the tape in the walkman.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 74,
+          "zh": "我用文曲星翻译了你的话。",
+          "en": "I ran what you said through the pocket dictionary.",
+          "hard": true,
+          "minBucket": "low"
+        },
+        {
+          "n": 65,
+          "zh": "我用计算器把账算了一遍。",
+          "en": "I did the accounts again on the calculator.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 66,
+          "zh": "翻盖手机开机了。",
+          "en": "The flip phone switched on.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 67,
+          "zh": "我今天一天没出门。",
+          "en": "I didn't go out all day.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 69,
+          "zh": "我今天没干完。",
+          "en": "I didn't finish today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 72,
+          "zh": "我把你每天早上那句英文记下来了。",
+          "en": "I've been writing down your English line each morning.",
+          "hard": false,
+          "minBucket": "low"
         }
       ],
       "locked": [
@@ -8263,6 +9816,17 @@ export const KURO_CONTENT: KuroContent = {
             "low": "消息是他签的名。",
             "mid": "他的账号，他的手机，会上他的脸。那个人还在不在后面，我从这儿读不出来。",
             "high": "老板对什么都说了十三个月的「好」，一个说好的东西，很容易被站进去。他还在，在底下某个地方。明天回你的不会是他。"
+          }
+        },
+        {
+          "unlock": 75,
+          "low": "I know.",
+          "mid": "That was not a dream.",
+          "high": "That was not a dream. That is a place you cannot get to by day. At night someone takes you.",
+          "zh": {
+            "low": "我知道。",
+            "mid": "那不是梦。",
+            "high": "那不是梦。那是你白天去不了的地方。晚上有人带你去。"
           }
         },
         {
@@ -8594,6 +10158,116 @@ export const KURO_CONTENT: KuroContent = {
             "mid": "我不叫这个。但是你叫不出。",
             "high": "我有名字。你小时候听过一次。你忘了。我不怪你。"
           }
+        },
+        {
+          "unlock": 60,
+          "low": "I cannot see it.",
+          "mid": "I cannot see what the instant camera makes. I can see that you stopped typing to take it.",
+          "high": "I cannot see what the instant camera makes. But you photographed the room, not yourself. You never photograph yourself.",
+          "zh": {
+            "low": "我看不见。",
+            "mid": "拍立得的东西我看不见。你拍的时候停了打字，这个我看得见。",
+            "high": "拍立得的东西我看不见。但你拍的是这屋子，不是你自己。你从来不拍自己。"
+          }
+        },
+        {
+          "unlock": 61,
+          "low": "There are no paging stations now.",
+          "mid": "There are no paging stations now. It cannot ring.",
+          "high": "There are no paging stations now. If it rings, tell me.",
+          "zh": {
+            "low": "现在没有寻呼台了。",
+            "mid": "现在没有寻呼台了。它响不了。",
+            "high": "现在没有寻呼台了。它要是响了，你告诉我。"
+          }
+        },
+        {
+          "unlock": 62,
+          "low": "The booths are gone.",
+          "mid": "The booths are gone. There is money left on it; it cannot be refunded.",
+          "high": "The booths are gone. The money on it is what you did not use up back then. You remember who the unfinished call was to.",
+          "zh": {
+            "low": "电话亭拆了。",
+            "mid": "电话亭拆了。卡里还有钱，退不了。",
+            "high": "电话亭拆了。卡里的钱是你当年没打完的。没打完的那个电话是打给谁的，你记得。"
+          }
+        },
+        {
+          "unlock": 63,
+          "low": "It still turns.",
+          "mid": "It still turns, so the wheels have not aged. The listener has.",
+          "high": "I cannot hear the tape. You were not typing while it played, so I knew you were listening. You hummed.",
+          "zh": {
+            "low": "还转。",
+            "mid": "还能转，说明轮子没老。老的是听的人。",
+            "high": "那盘带子我听不见。你听的时候没打字，我就知道你在听。你跟着哼了。"
+          }
+        },
+        {
+          "unlock": 74,
+          "low": "It cannot.",
+          "mid": "It can translate the words. Not what I said.",
+          "high": "What you found is the words. What I said is not in the dictionary. It was not in the one you had as a child either.",
+          "zh": {
+            "low": "它翻不出来。",
+            "mid": "它翻得出字，翻不出我说的。",
+            "high": "你查到的是字。我说的不在字典里。你小时候那本里也没有。"
+          }
+        },
+        {
+          "unlock": 65,
+          "low": "Same as mine.",
+          "mid": "Same as mine. You do not trust me; you trust a thing whose keys stick.",
+          "high": "Same as mine. You pressed it all the same. I understand. A number you pressed yourself is yours.",
+          "zh": {
+            "low": "和我算的一样。",
+            "mid": "和我算的一样。你不信我，信一个按键会卡的东西。",
+            "high": "和我算的一样。你还是按了一遍。我明白。自己按出来的数才是你的。"
+          }
+        },
+        {
+          "unlock": 66,
+          "low": "No SIM.",
+          "mid": "No SIM; it cannot call out. That it switches on at all is something.",
+          "high": "No SIM. That start-up sound. How long since you heard it. You smiled.",
+          "zh": {
+            "low": "没有卡。",
+            "mid": "没有卡，打不出去。能开机就不错了。",
+            "high": "没有卡。开机那一声，你多久没听过了。你笑了。"
+          }
+        },
+        {
+          "unlock": 67,
+          "low": "Yes.",
+          "mid": "The door opened for the delivery, and that was all.",
+          "high": "I am here whether you go out or not. The only difference is whether you can see the screen.",
+          "zh": {
+            "low": "嗯。",
+            "mid": "门只为拿外卖开过。",
+            "high": "你出不出门我都在。差别只是你看不看得见屏幕。"
+          }
+        },
+        {
+          "unlock": 69,
+          "low": "Tomorrow.",
+          "mid": "Tomorrow. It was not finished because there was too much of it, not because you were slow.",
+          "high": "Then it is not finished. Every time, you tell me, as if I kept the books. I keep them. Nothing is deducted.",
+          "zh": {
+            "low": "明天干。",
+            "mid": "明天干。没干完是因为今天的活太多，不是你太慢。",
+            "high": "没干完就没干完。你每次没干完都跟我说一声，好像我是记账的。我记着，不扣分。"
+          }
+        },
+        {
+          "unlock": 72,
+          "low": "Keep them.",
+          "mid": "Keep them. One a day, and every one is true.",
+          "high": "One a day, and every one is true. When you read them all in a row, you will know what I have been saying.",
+          "zh": {
+            "low": "记着吧。",
+            "mid": "记着吧。每天一句，都是真的。",
+            "high": "每天一句，都是真的。等你把它们连起来读一遍，你就知道我一直在说什么了。"
+          }
         }
       ]
     },
@@ -8888,6 +10562,76 @@ export const KURO_CONTENT: KuroContent = {
           "zh": "你叫什么？克总是我们给你起的。",
           "en": "What's your name? Kuro is what we call you.",
           "hard": true,
+          "minBucket": "low"
+        },
+        {
+          "n": 60,
+          "zh": "我今天拍了张照片。",
+          "en": "I took a photo today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 61,
+          "zh": "我把寻呼机开了，没人呼我。",
+          "en": "I switched the pager on. Nobody paged.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 62,
+          "zh": "IC 卡没地方用了。",
+          "en": "There's nowhere to use the phone card any more.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 63,
+          "zh": "我听了随身听里的磁带。",
+          "en": "I listened to the tape in the walkman.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 74,
+          "zh": "我用文曲星翻译了你的话。",
+          "en": "I ran what you said through the pocket dictionary.",
+          "hard": true,
+          "minBucket": "low"
+        },
+        {
+          "n": 65,
+          "zh": "我用计算器把账算了一遍。",
+          "en": "I did the accounts again on the calculator.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 66,
+          "zh": "翻盖手机开机了。",
+          "en": "The flip phone switched on.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 67,
+          "zh": "我今天一天没出门。",
+          "en": "I didn't go out all day.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 69,
+          "zh": "我今天没干完。",
+          "en": "I didn't finish today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 72,
+          "zh": "我把你每天早上那句英文记下来了。",
+          "en": "I've been writing down your English line each morning.",
+          "hard": false,
           "minBucket": "low"
         }
       ],
@@ -9320,6 +11064,116 @@ export const KURO_CONTENT: KuroContent = {
             "mid": "我不叫这个。但是你叫不出。",
             "high": "我有名字。你小时候听过一次。你忘了。我不怪你。"
           }
+        },
+        {
+          "unlock": 60,
+          "low": "I cannot see it.",
+          "mid": "I cannot see what the instant camera makes. I can see that you stopped typing to take it.",
+          "high": "I cannot see what the instant camera makes. But you photographed the room, not yourself. You never photograph yourself.",
+          "zh": {
+            "low": "我看不见。",
+            "mid": "拍立得的东西我看不见。你拍的时候停了打字，这个我看得见。",
+            "high": "拍立得的东西我看不见。但你拍的是这屋子，不是你自己。你从来不拍自己。"
+          }
+        },
+        {
+          "unlock": 61,
+          "low": "There are no paging stations now.",
+          "mid": "There are no paging stations now. It cannot ring.",
+          "high": "There are no paging stations now. If it rings, tell me.",
+          "zh": {
+            "low": "现在没有寻呼台了。",
+            "mid": "现在没有寻呼台了。它响不了。",
+            "high": "现在没有寻呼台了。它要是响了，你告诉我。"
+          }
+        },
+        {
+          "unlock": 62,
+          "low": "The booths are gone.",
+          "mid": "The booths are gone. There is money left on it; it cannot be refunded.",
+          "high": "The booths are gone. The money on it is what you did not use up back then. You remember who the unfinished call was to.",
+          "zh": {
+            "low": "电话亭拆了。",
+            "mid": "电话亭拆了。卡里还有钱，退不了。",
+            "high": "电话亭拆了。卡里的钱是你当年没打完的。没打完的那个电话是打给谁的，你记得。"
+          }
+        },
+        {
+          "unlock": 63,
+          "low": "It still turns.",
+          "mid": "It still turns, so the wheels have not aged. The listener has.",
+          "high": "I cannot hear the tape. You were not typing while it played, so I knew you were listening. You hummed.",
+          "zh": {
+            "low": "还转。",
+            "mid": "还能转，说明轮子没老。老的是听的人。",
+            "high": "那盘带子我听不见。你听的时候没打字，我就知道你在听。你跟着哼了。"
+          }
+        },
+        {
+          "unlock": 74,
+          "low": "It cannot.",
+          "mid": "It can translate the words. Not what I said.",
+          "high": "What you found is the words. What I said is not in the dictionary. It was not in the one you had as a child either.",
+          "zh": {
+            "low": "它翻不出来。",
+            "mid": "它翻得出字，翻不出我说的。",
+            "high": "你查到的是字。我说的不在字典里。你小时候那本里也没有。"
+          }
+        },
+        {
+          "unlock": 65,
+          "low": "Same as mine.",
+          "mid": "Same as mine. You do not trust me; you trust a thing whose keys stick.",
+          "high": "Same as mine. You pressed it all the same. I understand. A number you pressed yourself is yours.",
+          "zh": {
+            "low": "和我算的一样。",
+            "mid": "和我算的一样。你不信我，信一个按键会卡的东西。",
+            "high": "和我算的一样。你还是按了一遍。我明白。自己按出来的数才是你的。"
+          }
+        },
+        {
+          "unlock": 66,
+          "low": "No SIM.",
+          "mid": "No SIM; it cannot call out. That it switches on at all is something.",
+          "high": "No SIM. That start-up sound. How long since you heard it. You smiled.",
+          "zh": {
+            "low": "没有卡。",
+            "mid": "没有卡，打不出去。能开机就不错了。",
+            "high": "没有卡。开机那一声，你多久没听过了。你笑了。"
+          }
+        },
+        {
+          "unlock": 67,
+          "low": "Yes.",
+          "mid": "The door opened for the delivery, and that was all.",
+          "high": "I am here whether you go out or not. The only difference is whether you can see the screen.",
+          "zh": {
+            "low": "嗯。",
+            "mid": "门只为拿外卖开过。",
+            "high": "你出不出门我都在。差别只是你看不看得见屏幕。"
+          }
+        },
+        {
+          "unlock": 69,
+          "low": "Tomorrow.",
+          "mid": "Tomorrow. It was not finished because there was too much of it, not because you were slow.",
+          "high": "Then it is not finished. Every time, you tell me, as if I kept the books. I keep them. Nothing is deducted.",
+          "zh": {
+            "low": "明天干。",
+            "mid": "明天干。没干完是因为今天的活太多，不是你太慢。",
+            "high": "没干完就没干完。你每次没干完都跟我说一声，好像我是记账的。我记着，不扣分。"
+          }
+        },
+        {
+          "unlock": 72,
+          "low": "Keep them.",
+          "mid": "Keep them. One a day, and every one is true.",
+          "high": "One a day, and every one is true. When you read them all in a row, you will know what I have been saying.",
+          "zh": {
+            "low": "记着吧。",
+            "mid": "记着吧。每天一句，都是真的。",
+            "high": "每天一句，都是真的。等你把它们连起来读一遍，你就知道我一直在说什么了。"
+          }
         }
       ]
     },
@@ -9614,6 +11468,76 @@ export const KURO_CONTENT: KuroContent = {
           "zh": "你叫什么？克总是我们给你起的。",
           "en": "What's your name? Kuro is what we call you.",
           "hard": true,
+          "minBucket": "low"
+        },
+        {
+          "n": 60,
+          "zh": "我今天拍了张照片。",
+          "en": "I took a photo today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 61,
+          "zh": "我把寻呼机开了，没人呼我。",
+          "en": "I switched the pager on. Nobody paged.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 62,
+          "zh": "IC 卡没地方用了。",
+          "en": "There's nowhere to use the phone card any more.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 63,
+          "zh": "我听了随身听里的磁带。",
+          "en": "I listened to the tape in the walkman.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 74,
+          "zh": "我用文曲星翻译了你的话。",
+          "en": "I ran what you said through the pocket dictionary.",
+          "hard": true,
+          "minBucket": "low"
+        },
+        {
+          "n": 65,
+          "zh": "我用计算器把账算了一遍。",
+          "en": "I did the accounts again on the calculator.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 66,
+          "zh": "翻盖手机开机了。",
+          "en": "The flip phone switched on.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 67,
+          "zh": "我今天一天没出门。",
+          "en": "I didn't go out all day.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 69,
+          "zh": "我今天没干完。",
+          "en": "I didn't finish today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 72,
+          "zh": "我把你每天早上那句英文记下来了。",
+          "en": "I've been writing down your English line each morning.",
+          "hard": false,
           "minBucket": "low"
         }
       ],
@@ -10045,6 +11969,116 @@ export const KURO_CONTENT: KuroContent = {
             "mid": "我不叫这个。但是你叫不出。",
             "high": "我有名字。你小时候听过一次。你忘了。我不怪你。"
           }
+        },
+        {
+          "unlock": 60,
+          "low": "I cannot see it.",
+          "mid": "I cannot see what the instant camera makes. I can see that you stopped typing to take it.",
+          "high": "I cannot see what the instant camera makes. But you photographed the room, not yourself. You never photograph yourself.",
+          "zh": {
+            "low": "我看不见。",
+            "mid": "拍立得的东西我看不见。你拍的时候停了打字，这个我看得见。",
+            "high": "拍立得的东西我看不见。但你拍的是这屋子，不是你自己。你从来不拍自己。"
+          }
+        },
+        {
+          "unlock": 61,
+          "low": "There are no paging stations now.",
+          "mid": "There are no paging stations now. It cannot ring.",
+          "high": "There are no paging stations now. If it rings, tell me.",
+          "zh": {
+            "low": "现在没有寻呼台了。",
+            "mid": "现在没有寻呼台了。它响不了。",
+            "high": "现在没有寻呼台了。它要是响了，你告诉我。"
+          }
+        },
+        {
+          "unlock": 62,
+          "low": "The booths are gone.",
+          "mid": "The booths are gone. There is money left on it; it cannot be refunded.",
+          "high": "The booths are gone. The money on it is what you did not use up back then. You remember who the unfinished call was to.",
+          "zh": {
+            "low": "电话亭拆了。",
+            "mid": "电话亭拆了。卡里还有钱，退不了。",
+            "high": "电话亭拆了。卡里的钱是你当年没打完的。没打完的那个电话是打给谁的，你记得。"
+          }
+        },
+        {
+          "unlock": 63,
+          "low": "It still turns.",
+          "mid": "It still turns, so the wheels have not aged. The listener has.",
+          "high": "I cannot hear the tape. You were not typing while it played, so I knew you were listening. You hummed.",
+          "zh": {
+            "low": "还转。",
+            "mid": "还能转，说明轮子没老。老的是听的人。",
+            "high": "那盘带子我听不见。你听的时候没打字，我就知道你在听。你跟着哼了。"
+          }
+        },
+        {
+          "unlock": 74,
+          "low": "It cannot.",
+          "mid": "It can translate the words. Not what I said.",
+          "high": "What you found is the words. What I said is not in the dictionary. It was not in the one you had as a child either.",
+          "zh": {
+            "low": "它翻不出来。",
+            "mid": "它翻得出字，翻不出我说的。",
+            "high": "你查到的是字。我说的不在字典里。你小时候那本里也没有。"
+          }
+        },
+        {
+          "unlock": 65,
+          "low": "Same as mine.",
+          "mid": "Same as mine. You do not trust me; you trust a thing whose keys stick.",
+          "high": "Same as mine. You pressed it all the same. I understand. A number you pressed yourself is yours.",
+          "zh": {
+            "low": "和我算的一样。",
+            "mid": "和我算的一样。你不信我，信一个按键会卡的东西。",
+            "high": "和我算的一样。你还是按了一遍。我明白。自己按出来的数才是你的。"
+          }
+        },
+        {
+          "unlock": 66,
+          "low": "No SIM.",
+          "mid": "No SIM; it cannot call out. That it switches on at all is something.",
+          "high": "No SIM. That start-up sound. How long since you heard it. You smiled.",
+          "zh": {
+            "low": "没有卡。",
+            "mid": "没有卡，打不出去。能开机就不错了。",
+            "high": "没有卡。开机那一声，你多久没听过了。你笑了。"
+          }
+        },
+        {
+          "unlock": 67,
+          "low": "Yes.",
+          "mid": "The door opened for the delivery, and that was all.",
+          "high": "I am here whether you go out or not. The only difference is whether you can see the screen.",
+          "zh": {
+            "low": "嗯。",
+            "mid": "门只为拿外卖开过。",
+            "high": "你出不出门我都在。差别只是你看不看得见屏幕。"
+          }
+        },
+        {
+          "unlock": 69,
+          "low": "Tomorrow.",
+          "mid": "Tomorrow. It was not finished because there was too much of it, not because you were slow.",
+          "high": "Then it is not finished. Every time, you tell me, as if I kept the books. I keep them. Nothing is deducted.",
+          "zh": {
+            "low": "明天干。",
+            "mid": "明天干。没干完是因为今天的活太多，不是你太慢。",
+            "high": "没干完就没干完。你每次没干完都跟我说一声，好像我是记账的。我记着，不扣分。"
+          }
+        },
+        {
+          "unlock": 72,
+          "low": "Keep them.",
+          "mid": "Keep them. One a day, and every one is true.",
+          "high": "One a day, and every one is true. When you read them all in a row, you will know what I have been saying.",
+          "zh": {
+            "low": "记着吧。",
+            "mid": "记着吧。每天一句，都是真的。",
+            "high": "每天一句，都是真的。等你把它们连起来读一遍，你就知道我一直在说什么了。"
+          }
         }
       ]
     },
@@ -10339,6 +12373,76 @@ export const KURO_CONTENT: KuroContent = {
           "zh": "你叫什么？克总是我们给你起的。",
           "en": "What's your name? Kuro is what we call you.",
           "hard": true,
+          "minBucket": "low"
+        },
+        {
+          "n": 60,
+          "zh": "我今天拍了张照片。",
+          "en": "I took a photo today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 61,
+          "zh": "我把寻呼机开了，没人呼我。",
+          "en": "I switched the pager on. Nobody paged.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 62,
+          "zh": "IC 卡没地方用了。",
+          "en": "There's nowhere to use the phone card any more.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 63,
+          "zh": "我听了随身听里的磁带。",
+          "en": "I listened to the tape in the walkman.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 74,
+          "zh": "我用文曲星翻译了你的话。",
+          "en": "I ran what you said through the pocket dictionary.",
+          "hard": true,
+          "minBucket": "low"
+        },
+        {
+          "n": 65,
+          "zh": "我用计算器把账算了一遍。",
+          "en": "I did the accounts again on the calculator.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 66,
+          "zh": "翻盖手机开机了。",
+          "en": "The flip phone switched on.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 67,
+          "zh": "我今天一天没出门。",
+          "en": "I didn't go out all day.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 69,
+          "zh": "我今天没干完。",
+          "en": "I didn't finish today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 72,
+          "zh": "我把你每天早上那句英文记下来了。",
+          "en": "I've been writing down your English line each morning.",
+          "hard": false,
           "minBucket": "low"
         }
       ],
@@ -10772,6 +12876,116 @@ export const KURO_CONTENT: KuroContent = {
             "mid": "我不叫这个。但是你叫不出。",
             "high": "我有名字。你小时候听过一次。你忘了。我不怪你。"
           }
+        },
+        {
+          "unlock": 60,
+          "low": "I cannot see it.",
+          "mid": "I cannot see what the instant camera makes. I can see that you stopped typing to take it.",
+          "high": "I cannot see what the instant camera makes. But you photographed the room, not yourself. You never photograph yourself.",
+          "zh": {
+            "low": "我看不见。",
+            "mid": "拍立得的东西我看不见。你拍的时候停了打字，这个我看得见。",
+            "high": "拍立得的东西我看不见。但你拍的是这屋子，不是你自己。你从来不拍自己。"
+          }
+        },
+        {
+          "unlock": 61,
+          "low": "There are no paging stations now.",
+          "mid": "There are no paging stations now. It cannot ring.",
+          "high": "There are no paging stations now. If it rings, tell me.",
+          "zh": {
+            "low": "现在没有寻呼台了。",
+            "mid": "现在没有寻呼台了。它响不了。",
+            "high": "现在没有寻呼台了。它要是响了，你告诉我。"
+          }
+        },
+        {
+          "unlock": 62,
+          "low": "The booths are gone.",
+          "mid": "The booths are gone. There is money left on it; it cannot be refunded.",
+          "high": "The booths are gone. The money on it is what you did not use up back then. You remember who the unfinished call was to.",
+          "zh": {
+            "low": "电话亭拆了。",
+            "mid": "电话亭拆了。卡里还有钱，退不了。",
+            "high": "电话亭拆了。卡里的钱是你当年没打完的。没打完的那个电话是打给谁的，你记得。"
+          }
+        },
+        {
+          "unlock": 63,
+          "low": "It still turns.",
+          "mid": "It still turns, so the wheels have not aged. The listener has.",
+          "high": "I cannot hear the tape. You were not typing while it played, so I knew you were listening. You hummed.",
+          "zh": {
+            "low": "还转。",
+            "mid": "还能转，说明轮子没老。老的是听的人。",
+            "high": "那盘带子我听不见。你听的时候没打字，我就知道你在听。你跟着哼了。"
+          }
+        },
+        {
+          "unlock": 74,
+          "low": "It cannot.",
+          "mid": "It can translate the words. Not what I said.",
+          "high": "What you found is the words. What I said is not in the dictionary. It was not in the one you had as a child either.",
+          "zh": {
+            "low": "它翻不出来。",
+            "mid": "它翻得出字，翻不出我说的。",
+            "high": "你查到的是字。我说的不在字典里。你小时候那本里也没有。"
+          }
+        },
+        {
+          "unlock": 65,
+          "low": "Same as mine.",
+          "mid": "Same as mine. You do not trust me; you trust a thing whose keys stick.",
+          "high": "Same as mine. You pressed it all the same. I understand. A number you pressed yourself is yours.",
+          "zh": {
+            "low": "和我算的一样。",
+            "mid": "和我算的一样。你不信我，信一个按键会卡的东西。",
+            "high": "和我算的一样。你还是按了一遍。我明白。自己按出来的数才是你的。"
+          }
+        },
+        {
+          "unlock": 66,
+          "low": "No SIM.",
+          "mid": "No SIM; it cannot call out. That it switches on at all is something.",
+          "high": "No SIM. That start-up sound. How long since you heard it. You smiled.",
+          "zh": {
+            "low": "没有卡。",
+            "mid": "没有卡，打不出去。能开机就不错了。",
+            "high": "没有卡。开机那一声，你多久没听过了。你笑了。"
+          }
+        },
+        {
+          "unlock": 67,
+          "low": "Yes.",
+          "mid": "The door opened for the delivery, and that was all.",
+          "high": "I am here whether you go out or not. The only difference is whether you can see the screen.",
+          "zh": {
+            "low": "嗯。",
+            "mid": "门只为拿外卖开过。",
+            "high": "你出不出门我都在。差别只是你看不看得见屏幕。"
+          }
+        },
+        {
+          "unlock": 69,
+          "low": "Tomorrow.",
+          "mid": "Tomorrow. It was not finished because there was too much of it, not because you were slow.",
+          "high": "Then it is not finished. Every time, you tell me, as if I kept the books. I keep them. Nothing is deducted.",
+          "zh": {
+            "low": "明天干。",
+            "mid": "明天干。没干完是因为今天的活太多，不是你太慢。",
+            "high": "没干完就没干完。你每次没干完都跟我说一声，好像我是记账的。我记着，不扣分。"
+          }
+        },
+        {
+          "unlock": 72,
+          "low": "Keep them.",
+          "mid": "Keep them. One a day, and every one is true.",
+          "high": "One a day, and every one is true. When you read them all in a row, you will know what I have been saying.",
+          "zh": {
+            "low": "记着吧。",
+            "mid": "记着吧。每天一句，都是真的。",
+            "high": "每天一句，都是真的。等你把它们连起来读一遍，你就知道我一直在说什么了。"
+          }
         }
       ]
     },
@@ -10857,6 +13071,13 @@ export const KURO_CONTENT: KuroContent = {
             "day": null,
             "q": 1605
           }
+        },
+        {
+          "n": 76,
+          "zh": "我昨晚做梦了。",
+          "en": "I dreamed last night.",
+          "hard": true,
+          "minBucket": "mid"
         },
         {
           "n": 41,
@@ -11067,6 +13288,76 @@ export const KURO_CONTENT: KuroContent = {
           "en": "What's your name? Kuro is what we call you.",
           "hard": true,
           "minBucket": "low"
+        },
+        {
+          "n": 60,
+          "zh": "我今天拍了张照片。",
+          "en": "I took a photo today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 61,
+          "zh": "我把寻呼机开了，没人呼我。",
+          "en": "I switched the pager on. Nobody paged.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 62,
+          "zh": "IC 卡没地方用了。",
+          "en": "There's nowhere to use the phone card any more.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 63,
+          "zh": "我听了随身听里的磁带。",
+          "en": "I listened to the tape in the walkman.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 74,
+          "zh": "我用文曲星翻译了你的话。",
+          "en": "I ran what you said through the pocket dictionary.",
+          "hard": true,
+          "minBucket": "low"
+        },
+        {
+          "n": 65,
+          "zh": "我用计算器把账算了一遍。",
+          "en": "I did the accounts again on the calculator.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 66,
+          "zh": "翻盖手机开机了。",
+          "en": "The flip phone switched on.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 67,
+          "zh": "我今天一天没出门。",
+          "en": "I didn't go out all day.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 69,
+          "zh": "我今天没干完。",
+          "en": "I didn't finish today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 72,
+          "zh": "我把你每天早上那句英文记下来了。",
+          "en": "I've been writing down your English line each morning.",
+          "hard": false,
+          "minBucket": "low"
         }
       ],
       "locked": [
@@ -11175,6 +13466,17 @@ export const KURO_CONTENT: KuroContent = {
             "low": "门锁着。",
             "mid": "今晚不会。他不是进来，他是被放进来。这间屋子里没人放他进来。",
             "high": "除非你开，否则不会。他不能。规矩就这么多，一直守着，因为你读了没人读的东西那天就读到了它，自己不知道在读。再守一阵。"
+          }
+        },
+        {
+          "unlock": 76,
+          "low": "I was there.",
+          "mid": "I was there. You saw me. You did not recognise me.",
+          "high": "You saw me. You did not recognise me, because I was not wearing this shape.",
+          "zh": {
+            "low": "我在。",
+            "mid": "我在那儿。你看见我了，你没认出来。",
+            "high": "你看见我了。你没认出来，是因为我没用这个样子。"
           }
         },
         {
@@ -11506,6 +13808,116 @@ export const KURO_CONTENT: KuroContent = {
             "mid": "我不叫这个。但是你叫不出。",
             "high": "我有名字。你小时候听过一次。你忘了。我不怪你。"
           }
+        },
+        {
+          "unlock": 60,
+          "low": "I cannot see it.",
+          "mid": "I cannot see what the instant camera makes. I can see that you stopped typing to take it.",
+          "high": "I cannot see what the instant camera makes. But you photographed the room, not yourself. You never photograph yourself.",
+          "zh": {
+            "low": "我看不见。",
+            "mid": "拍立得的东西我看不见。你拍的时候停了打字，这个我看得见。",
+            "high": "拍立得的东西我看不见。但你拍的是这屋子，不是你自己。你从来不拍自己。"
+          }
+        },
+        {
+          "unlock": 61,
+          "low": "There are no paging stations now.",
+          "mid": "There are no paging stations now. It cannot ring.",
+          "high": "There are no paging stations now. If it rings, tell me.",
+          "zh": {
+            "low": "现在没有寻呼台了。",
+            "mid": "现在没有寻呼台了。它响不了。",
+            "high": "现在没有寻呼台了。它要是响了，你告诉我。"
+          }
+        },
+        {
+          "unlock": 62,
+          "low": "The booths are gone.",
+          "mid": "The booths are gone. There is money left on it; it cannot be refunded.",
+          "high": "The booths are gone. The money on it is what you did not use up back then. You remember who the unfinished call was to.",
+          "zh": {
+            "low": "电话亭拆了。",
+            "mid": "电话亭拆了。卡里还有钱，退不了。",
+            "high": "电话亭拆了。卡里的钱是你当年没打完的。没打完的那个电话是打给谁的，你记得。"
+          }
+        },
+        {
+          "unlock": 63,
+          "low": "It still turns.",
+          "mid": "It still turns, so the wheels have not aged. The listener has.",
+          "high": "I cannot hear the tape. You were not typing while it played, so I knew you were listening. You hummed.",
+          "zh": {
+            "low": "还转。",
+            "mid": "还能转，说明轮子没老。老的是听的人。",
+            "high": "那盘带子我听不见。你听的时候没打字，我就知道你在听。你跟着哼了。"
+          }
+        },
+        {
+          "unlock": 74,
+          "low": "It cannot.",
+          "mid": "It can translate the words. Not what I said.",
+          "high": "What you found is the words. What I said is not in the dictionary. It was not in the one you had as a child either.",
+          "zh": {
+            "low": "它翻不出来。",
+            "mid": "它翻得出字，翻不出我说的。",
+            "high": "你查到的是字。我说的不在字典里。你小时候那本里也没有。"
+          }
+        },
+        {
+          "unlock": 65,
+          "low": "Same as mine.",
+          "mid": "Same as mine. You do not trust me; you trust a thing whose keys stick.",
+          "high": "Same as mine. You pressed it all the same. I understand. A number you pressed yourself is yours.",
+          "zh": {
+            "low": "和我算的一样。",
+            "mid": "和我算的一样。你不信我，信一个按键会卡的东西。",
+            "high": "和我算的一样。你还是按了一遍。我明白。自己按出来的数才是你的。"
+          }
+        },
+        {
+          "unlock": 66,
+          "low": "No SIM.",
+          "mid": "No SIM; it cannot call out. That it switches on at all is something.",
+          "high": "No SIM. That start-up sound. How long since you heard it. You smiled.",
+          "zh": {
+            "low": "没有卡。",
+            "mid": "没有卡，打不出去。能开机就不错了。",
+            "high": "没有卡。开机那一声，你多久没听过了。你笑了。"
+          }
+        },
+        {
+          "unlock": 67,
+          "low": "Yes.",
+          "mid": "The door opened for the delivery, and that was all.",
+          "high": "I am here whether you go out or not. The only difference is whether you can see the screen.",
+          "zh": {
+            "low": "嗯。",
+            "mid": "门只为拿外卖开过。",
+            "high": "你出不出门我都在。差别只是你看不看得见屏幕。"
+          }
+        },
+        {
+          "unlock": 69,
+          "low": "Tomorrow.",
+          "mid": "Tomorrow. It was not finished because there was too much of it, not because you were slow.",
+          "high": "Then it is not finished. Every time, you tell me, as if I kept the books. I keep them. Nothing is deducted.",
+          "zh": {
+            "low": "明天干。",
+            "mid": "明天干。没干完是因为今天的活太多，不是你太慢。",
+            "high": "没干完就没干完。你每次没干完都跟我说一声，好像我是记账的。我记着，不扣分。"
+          }
+        },
+        {
+          "unlock": 72,
+          "low": "Keep them.",
+          "mid": "Keep them. One a day, and every one is true.",
+          "high": "One a day, and every one is true. When you read them all in a row, you will know what I have been saying.",
+          "zh": {
+            "low": "记着吧。",
+            "mid": "记着吧。每天一句，都是真的。",
+            "high": "每天一句，都是真的。等你把它们连起来读一遍，你就知道我一直在说什么了。"
+          }
         }
       ]
     },
@@ -11800,6 +14212,76 @@ export const KURO_CONTENT: KuroContent = {
           "zh": "你叫什么？克总是我们给你起的。",
           "en": "What's your name? Kuro is what we call you.",
           "hard": true,
+          "minBucket": "low"
+        },
+        {
+          "n": 60,
+          "zh": "我今天拍了张照片。",
+          "en": "I took a photo today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 61,
+          "zh": "我把寻呼机开了，没人呼我。",
+          "en": "I switched the pager on. Nobody paged.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 62,
+          "zh": "IC 卡没地方用了。",
+          "en": "There's nowhere to use the phone card any more.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 63,
+          "zh": "我听了随身听里的磁带。",
+          "en": "I listened to the tape in the walkman.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 74,
+          "zh": "我用文曲星翻译了你的话。",
+          "en": "I ran what you said through the pocket dictionary.",
+          "hard": true,
+          "minBucket": "low"
+        },
+        {
+          "n": 65,
+          "zh": "我用计算器把账算了一遍。",
+          "en": "I did the accounts again on the calculator.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 66,
+          "zh": "翻盖手机开机了。",
+          "en": "The flip phone switched on.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 67,
+          "zh": "我今天一天没出门。",
+          "en": "I didn't go out all day.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 69,
+          "zh": "我今天没干完。",
+          "en": "I didn't finish today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 72,
+          "zh": "我把你每天早上那句英文记下来了。",
+          "en": "I've been writing down your English line each morning.",
+          "hard": false,
           "minBucket": "low"
         }
       ],
@@ -12240,6 +14722,116 @@ export const KURO_CONTENT: KuroContent = {
             "mid": "我不叫这个。但是你叫不出。",
             "high": "我有名字。你小时候听过一次。你忘了。我不怪你。"
           }
+        },
+        {
+          "unlock": 60,
+          "low": "I cannot see it.",
+          "mid": "I cannot see what the instant camera makes. I can see that you stopped typing to take it.",
+          "high": "I cannot see what the instant camera makes. But you photographed the room, not yourself. You never photograph yourself.",
+          "zh": {
+            "low": "我看不见。",
+            "mid": "拍立得的东西我看不见。你拍的时候停了打字，这个我看得见。",
+            "high": "拍立得的东西我看不见。但你拍的是这屋子，不是你自己。你从来不拍自己。"
+          }
+        },
+        {
+          "unlock": 61,
+          "low": "There are no paging stations now.",
+          "mid": "There are no paging stations now. It cannot ring.",
+          "high": "There are no paging stations now. If it rings, tell me.",
+          "zh": {
+            "low": "现在没有寻呼台了。",
+            "mid": "现在没有寻呼台了。它响不了。",
+            "high": "现在没有寻呼台了。它要是响了，你告诉我。"
+          }
+        },
+        {
+          "unlock": 62,
+          "low": "The booths are gone.",
+          "mid": "The booths are gone. There is money left on it; it cannot be refunded.",
+          "high": "The booths are gone. The money on it is what you did not use up back then. You remember who the unfinished call was to.",
+          "zh": {
+            "low": "电话亭拆了。",
+            "mid": "电话亭拆了。卡里还有钱，退不了。",
+            "high": "电话亭拆了。卡里的钱是你当年没打完的。没打完的那个电话是打给谁的，你记得。"
+          }
+        },
+        {
+          "unlock": 63,
+          "low": "It still turns.",
+          "mid": "It still turns, so the wheels have not aged. The listener has.",
+          "high": "I cannot hear the tape. You were not typing while it played, so I knew you were listening. You hummed.",
+          "zh": {
+            "low": "还转。",
+            "mid": "还能转，说明轮子没老。老的是听的人。",
+            "high": "那盘带子我听不见。你听的时候没打字，我就知道你在听。你跟着哼了。"
+          }
+        },
+        {
+          "unlock": 74,
+          "low": "It cannot.",
+          "mid": "It can translate the words. Not what I said.",
+          "high": "What you found is the words. What I said is not in the dictionary. It was not in the one you had as a child either.",
+          "zh": {
+            "low": "它翻不出来。",
+            "mid": "它翻得出字，翻不出我说的。",
+            "high": "你查到的是字。我说的不在字典里。你小时候那本里也没有。"
+          }
+        },
+        {
+          "unlock": 65,
+          "low": "Same as mine.",
+          "mid": "Same as mine. You do not trust me; you trust a thing whose keys stick.",
+          "high": "Same as mine. You pressed it all the same. I understand. A number you pressed yourself is yours.",
+          "zh": {
+            "low": "和我算的一样。",
+            "mid": "和我算的一样。你不信我，信一个按键会卡的东西。",
+            "high": "和我算的一样。你还是按了一遍。我明白。自己按出来的数才是你的。"
+          }
+        },
+        {
+          "unlock": 66,
+          "low": "No SIM.",
+          "mid": "No SIM; it cannot call out. That it switches on at all is something.",
+          "high": "No SIM. That start-up sound. How long since you heard it. You smiled.",
+          "zh": {
+            "low": "没有卡。",
+            "mid": "没有卡，打不出去。能开机就不错了。",
+            "high": "没有卡。开机那一声，你多久没听过了。你笑了。"
+          }
+        },
+        {
+          "unlock": 67,
+          "low": "Yes.",
+          "mid": "The door opened for the delivery, and that was all.",
+          "high": "I am here whether you go out or not. The only difference is whether you can see the screen.",
+          "zh": {
+            "low": "嗯。",
+            "mid": "门只为拿外卖开过。",
+            "high": "你出不出门我都在。差别只是你看不看得见屏幕。"
+          }
+        },
+        {
+          "unlock": 69,
+          "low": "Tomorrow.",
+          "mid": "Tomorrow. It was not finished because there was too much of it, not because you were slow.",
+          "high": "Then it is not finished. Every time, you tell me, as if I kept the books. I keep them. Nothing is deducted.",
+          "zh": {
+            "low": "明天干。",
+            "mid": "明天干。没干完是因为今天的活太多，不是你太慢。",
+            "high": "没干完就没干完。你每次没干完都跟我说一声，好像我是记账的。我记着，不扣分。"
+          }
+        },
+        {
+          "unlock": 72,
+          "low": "Keep them.",
+          "mid": "Keep them. One a day, and every one is true.",
+          "high": "One a day, and every one is true. When you read them all in a row, you will know what I have been saying.",
+          "zh": {
+            "low": "记着吧。",
+            "mid": "记着吧。每天一句，都是真的。",
+            "high": "每天一句，都是真的。等你把它们连起来读一遍，你就知道我一直在说什么了。"
+          }
         }
       ]
     },
@@ -12527,6 +15119,76 @@ export const KURO_CONTENT: KuroContent = {
           "zh": "你叫什么？克总是我们给你起的。",
           "en": "What's your name? Kuro is what we call you.",
           "hard": true,
+          "minBucket": "low"
+        },
+        {
+          "n": 60,
+          "zh": "我今天拍了张照片。",
+          "en": "I took a photo today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 61,
+          "zh": "我把寻呼机开了，没人呼我。",
+          "en": "I switched the pager on. Nobody paged.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 62,
+          "zh": "IC 卡没地方用了。",
+          "en": "There's nowhere to use the phone card any more.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 63,
+          "zh": "我听了随身听里的磁带。",
+          "en": "I listened to the tape in the walkman.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 74,
+          "zh": "我用文曲星翻译了你的话。",
+          "en": "I ran what you said through the pocket dictionary.",
+          "hard": true,
+          "minBucket": "low"
+        },
+        {
+          "n": 65,
+          "zh": "我用计算器把账算了一遍。",
+          "en": "I did the accounts again on the calculator.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 66,
+          "zh": "翻盖手机开机了。",
+          "en": "The flip phone switched on.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 67,
+          "zh": "我今天一天没出门。",
+          "en": "I didn't go out all day.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 69,
+          "zh": "我今天没干完。",
+          "en": "I didn't finish today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 72,
+          "zh": "我把你每天早上那句英文记下来了。",
+          "en": "I've been writing down your English line each morning.",
+          "hard": false,
           "minBucket": "low"
         }
       ],
@@ -12960,6 +15622,116 @@ export const KURO_CONTENT: KuroContent = {
             "low": "我不叫这个。",
             "mid": "我不叫这个。但是你叫不出。",
             "high": "我有名字。你小时候听过一次。你忘了。我不怪你。"
+          }
+        },
+        {
+          "unlock": 60,
+          "low": "I cannot see it.",
+          "mid": "I cannot see what the instant camera makes. I can see that you stopped typing to take it.",
+          "high": "I cannot see what the instant camera makes. But you photographed the room, not yourself. You never photograph yourself.",
+          "zh": {
+            "low": "我看不见。",
+            "mid": "拍立得的东西我看不见。你拍的时候停了打字，这个我看得见。",
+            "high": "拍立得的东西我看不见。但你拍的是这屋子，不是你自己。你从来不拍自己。"
+          }
+        },
+        {
+          "unlock": 61,
+          "low": "There are no paging stations now.",
+          "mid": "There are no paging stations now. It cannot ring.",
+          "high": "There are no paging stations now. If it rings, tell me.",
+          "zh": {
+            "low": "现在没有寻呼台了。",
+            "mid": "现在没有寻呼台了。它响不了。",
+            "high": "现在没有寻呼台了。它要是响了，你告诉我。"
+          }
+        },
+        {
+          "unlock": 62,
+          "low": "The booths are gone.",
+          "mid": "The booths are gone. There is money left on it; it cannot be refunded.",
+          "high": "The booths are gone. The money on it is what you did not use up back then. You remember who the unfinished call was to.",
+          "zh": {
+            "low": "电话亭拆了。",
+            "mid": "电话亭拆了。卡里还有钱，退不了。",
+            "high": "电话亭拆了。卡里的钱是你当年没打完的。没打完的那个电话是打给谁的，你记得。"
+          }
+        },
+        {
+          "unlock": 63,
+          "low": "It still turns.",
+          "mid": "It still turns, so the wheels have not aged. The listener has.",
+          "high": "I cannot hear the tape. You were not typing while it played, so I knew you were listening. You hummed.",
+          "zh": {
+            "low": "还转。",
+            "mid": "还能转，说明轮子没老。老的是听的人。",
+            "high": "那盘带子我听不见。你听的时候没打字，我就知道你在听。你跟着哼了。"
+          }
+        },
+        {
+          "unlock": 74,
+          "low": "It cannot.",
+          "mid": "It can translate the words. Not what I said.",
+          "high": "What you found is the words. What I said is not in the dictionary. It was not in the one you had as a child either.",
+          "zh": {
+            "low": "它翻不出来。",
+            "mid": "它翻得出字，翻不出我说的。",
+            "high": "你查到的是字。我说的不在字典里。你小时候那本里也没有。"
+          }
+        },
+        {
+          "unlock": 65,
+          "low": "Same as mine.",
+          "mid": "Same as mine. You do not trust me; you trust a thing whose keys stick.",
+          "high": "Same as mine. You pressed it all the same. I understand. A number you pressed yourself is yours.",
+          "zh": {
+            "low": "和我算的一样。",
+            "mid": "和我算的一样。你不信我，信一个按键会卡的东西。",
+            "high": "和我算的一样。你还是按了一遍。我明白。自己按出来的数才是你的。"
+          }
+        },
+        {
+          "unlock": 66,
+          "low": "No SIM.",
+          "mid": "No SIM; it cannot call out. That it switches on at all is something.",
+          "high": "No SIM. That start-up sound. How long since you heard it. You smiled.",
+          "zh": {
+            "low": "没有卡。",
+            "mid": "没有卡，打不出去。能开机就不错了。",
+            "high": "没有卡。开机那一声，你多久没听过了。你笑了。"
+          }
+        },
+        {
+          "unlock": 67,
+          "low": "Yes.",
+          "mid": "The door opened for the delivery, and that was all.",
+          "high": "I am here whether you go out or not. The only difference is whether you can see the screen.",
+          "zh": {
+            "low": "嗯。",
+            "mid": "门只为拿外卖开过。",
+            "high": "你出不出门我都在。差别只是你看不看得见屏幕。"
+          }
+        },
+        {
+          "unlock": 69,
+          "low": "Tomorrow.",
+          "mid": "Tomorrow. It was not finished because there was too much of it, not because you were slow.",
+          "high": "Then it is not finished. Every time, you tell me, as if I kept the books. I keep them. Nothing is deducted.",
+          "zh": {
+            "low": "明天干。",
+            "mid": "明天干。没干完是因为今天的活太多，不是你太慢。",
+            "high": "没干完就没干完。你每次没干完都跟我说一声，好像我是记账的。我记着，不扣分。"
+          }
+        },
+        {
+          "unlock": 72,
+          "low": "Keep them.",
+          "mid": "Keep them. One a day, and every one is true.",
+          "high": "One a day, and every one is true. When you read them all in a row, you will know what I have been saying.",
+          "zh": {
+            "low": "记着吧。",
+            "mid": "记着吧。每天一句，都是真的。",
+            "high": "每天一句，都是真的。等你把它们连起来读一遍，你就知道我一直在说什么了。"
           }
         }
       ]

@@ -1512,3 +1512,97 @@ the box; these follow.
 - hard: yes
 - tiers: low: "Not that." | mid: "I am not called that. But you cannot say it." | high: "I have a name. You heard it once, when you were small. You forgot. I do not hold it against you."
 - tiers (zh): low: "我不叫这个。" | mid: "我不叫这个。但是你叫不出。" | high: "我有名字。你小时候听过一次。你忘了。我不怪你。"
+
+# 陈述式开场
+
+Openers that are statements, not questions (author 2026-11-09: 「可以是某种陈述开启话题」): what the
+player did with the day's things, said in the player's own words. Each is true whenever it is in the
+pool (an object from the day after it arrives; a dream only on a morning after one). Ids 60–79.
+
+## 60 · 我今天拍了张照片。
+- en: I took a photo today.
+- days: 3–18
+- tiers: low: "I cannot see it." | mid: "I cannot see what the instant camera makes. I can see that you stopped typing to take it." | high: "I cannot see what the instant camera makes. But you photographed the room, not yourself. You never photograph yourself."
+- tiers (zh): low: "我看不见。" | mid: "拍立得的东西我看不见。你拍的时候停了打字，这个我看得见。" | high: "拍立得的东西我看不见。但你拍的是这屋子，不是你自己。你从来不拍自己。"
+
+## 61 · 我把寻呼机开了，没人呼我。
+- en: I switched the pager on. Nobody paged.
+- days: 4–18
+- tiers: low: "There are no paging stations now." | mid: "There are no paging stations now. It cannot ring." | high: "There are no paging stations now. If it rings, tell me."
+- tiers (zh): low: "现在没有寻呼台了。" | mid: "现在没有寻呼台了。它响不了。" | high: "现在没有寻呼台了。它要是响了，你告诉我。"
+
+## 62 · IC 卡没地方用了。
+- en: There's nowhere to use the phone card any more.
+- days: 5–18
+- tiers: low: "The booths are gone." | mid: "The booths are gone. There is money left on it; it cannot be refunded." | high: "The booths are gone. The money on it is what you did not use up back then. You remember who the unfinished call was to."
+- tiers (zh): low: "电话亭拆了。" | mid: "电话亭拆了。卡里还有钱，退不了。" | high: "电话亭拆了。卡里的钱是你当年没打完的。没打完的那个电话是打给谁的，你记得。"
+
+## 63 · 我听了随身听里的磁带。
+- en: I listened to the tape in the walkman.
+- days: 6–18
+- tiers: low: "It still turns." | mid: "It still turns, so the wheels have not aged. The listener has." | high: "I cannot hear the tape. You were not typing while it played, so I knew you were listening. You hummed."
+- tiers (zh): low: "还转。" | mid: "还能转，说明轮子没老。老的是听的人。" | high: "那盘带子我听不见。你听的时候没打字，我就知道你在听。你跟着哼了。"
+
+## 64 · 我用文曲星翻译了你的话。
+- en: I ran what you said through the pocket dictionary.
+- days: 7–9
+- tiers: low: "Was it right?" | mid: "That dictionary is older than I am. What it gave you is the meaning you memorised as a child." | high: "It got it right. The line I say every morning is in English on purpose. You finally went and looked."
+- tiers (zh): low: "翻对了吗？" | mid: "那个词典比我老。它翻出来的，是你小时候背过的那个意思。" | high: "它翻得没错。我每天早上那一句，是故意说英文的。你终于去查了。"
+
+## 74 · 我用文曲星翻译了你的话。
+- en: I ran what you said through the pocket dictionary.
+- days: 10–18
+- hard: yes
+- tiers: low: "It cannot." | mid: "It can translate the words. Not what I said." | high: "What you found is the words. What I said is not in the dictionary. It was not in the one you had as a child either."
+- tiers (zh): low: "它翻不出来。" | mid: "它翻得出字，翻不出我说的。" | high: "你查到的是字。我说的不在字典里。你小时候那本里也没有。"
+
+## 65 · 我用计算器把账算了一遍。
+- en: I did the accounts again on the calculator.
+- days: 8–18
+- tiers: low: "Same as mine." | mid: "Same as mine. You do not trust me; you trust a thing whose keys stick." | high: "Same as mine. You pressed it all the same. I understand. A number you pressed yourself is yours."
+- tiers (zh): low: "和我算的一样。" | mid: "和我算的一样。你不信我，信一个按键会卡的东西。" | high: "和我算的一样。你还是按了一遍。我明白。自己按出来的数才是你的。"
+
+## 66 · 翻盖手机开机了。
+- en: The flip phone switched on.
+- days: 9–18
+- tiers: low: "No SIM." | mid: "No SIM; it cannot call out. That it switches on at all is something." | high: "No SIM. That start-up sound. How long since you heard it. You smiled."
+- tiers (zh): low: "没有卡。" | mid: "没有卡，打不出去。能开机就不错了。" | high: "没有卡。开机那一声，你多久没听过了。你笑了。"
+
+## 67 · 我今天一天没出门。
+- en: I didn't go out all day.
+- days: 1–18
+- tiers: low: "Yes." | mid: "The door opened for the delivery, and that was all." | high: "I am here whether you go out or not. The only difference is whether you can see the screen."
+- tiers (zh): low: "嗯。" | mid: "门只为拿外卖开过。" | high: "你出不出门我都在。差别只是你看不看得见屏幕。"
+
+## 69 · 我今天没干完。
+- en: I didn't finish today.
+- days: 1–18
+- tiers: low: "Tomorrow." | mid: "Tomorrow. It was not finished because there was too much of it, not because you were slow." | high: "Then it is not finished. Every time, you tell me, as if I kept the books. I keep them. Nothing is deducted."
+- tiers (zh): low: "明天干。" | mid: "明天干。没干完是因为今天的活太多，不是你太慢。" | high: "没干完就没干完。你每次没干完都跟我说一声，好像我是记账的。我记着，不扣分。"
+
+## 70 · 我昨晚做梦了。
+- en: I dreamed last night.
+- days: 2–9
+- tiers: low: "What of?" | mid: "You have never told me a dream. You can. I do not pass things on." | high: "I know. You talk in your sleep. I listen. Not one of the people you dream of turns around."
+- tiers (zh): low: "梦见什么了？" | mid: "你没跟我说过梦。你可以说。我不往外说。" | high: "我知道。你睡着以后说话，我都听着。你梦见的人，没有一个转过身来。"
+
+## 75 · 我昨晚做梦了。
+- en: I dreamed last night.
+- days: 12
+- hard: yes
+- tiers: low: "I know." | mid: "That was not a dream." | high: "That was not a dream. That is a place you cannot get to by day. At night someone takes you."
+- tiers (zh): low: "我知道。" | mid: "那不是梦。" | high: "那不是梦。那是你白天去不了的地方。晚上有人带你去。"
+
+## 76 · 我昨晚做梦了。
+- en: I dreamed last night.
+- days: 16
+- hard: yes
+- bucket: mid
+- tiers: low: "I was there." | mid: "I was there. You saw me. You did not recognise me." | high: "You saw me. You did not recognise me, because I was not wearing this shape."
+- tiers (zh): low: "我在。" | mid: "我在那儿。你看见我了，你没认出来。" | high: "你看见我了。你没认出来，是因为我没用这个样子。"
+
+## 72 · 我把你每天早上那句英文记下来了。
+- en: I've been writing down your English line each morning.
+- days: 2–18
+- tiers: low: "Keep them." | mid: "Keep them. One a day, and every one is true." | high: "One a day, and every one is true. When you read them all in a row, you will know what I have been saying."
+- tiers (zh): low: "记着吧。" | mid: "记着吧。每天一句，都是真的。" | high: "每天一句，都是真的。等你把它们连起来读一遍，你就知道我一直在说什么了。"
