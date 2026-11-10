@@ -95,7 +95,8 @@ const SRC = "/docs/player/day-01-space.html";
 /** The board state after `ops` (print / send do not change it). */
 const stateAfter = (b: TaskBoard, ops: readonly IdeOp[]) => ops.reduce((s, op) => (op.t === "print" || op.t === "send" ? s : stepBoard(b, s, op as BoardOp)), freshBoard(b));
 const src = (ops: IdeOp[]) => ideSrc(board(), stateAfter(board(), ops), ops);
-const texts = (b: TaskBoard, ops: IdeOp[]) => ideTranscript(b, ops).map((l) => l.text);
+// ide talk (2026-11-10): the worded choice / execution lines (`args`) sit between the beats; these tests read the beats.
+const texts = (b: TaskBoard, ops: IdeOp[]) => ideTranscript(b, ops).filter((l) => !l.args).map((l) => l.text);
 
 describe("ideSrc (ide R3; shell R4: light, the preview pane only, the selected slot's page, always fill=)", () => {
   it("an empty board: the first slot's page and an empty fill (the preview shows empty pages, not the answers)", () => {
@@ -227,7 +228,7 @@ describe("a play-through of the IDE board", () => {
     const ops = ideOps(task(), 1, events);
     const s = boardState(board(), 1, "task3", events);
     expect(ideSrc(board(), s, ops)).toBe(`${SRC}?theme=light&pane=preview&c=9&fill=s1:a1,s2:a2,s3:a3`);
-    expect(ideTranscript(board(), ops).map((l) => l.text)).toEqual(["open-1", "open-2", "fill-s1", "fill-s2", "print-1", "send-1"]);
+    expect(ideTranscript(board(), ops).filter((l) => !l.args).map((l) => l.text)).toEqual(["open-1", "open-2", "fill-s1", "fill-s2", "print-1", "send-1"]);
     const out = rendered(done);
     expect(out).toContain(`src="${attr(ideSrc(board(), s, ops))}"`);
     expect(out).toContain('<div class="bub">send-1</div>');

@@ -43,11 +43,12 @@ describe("ide v2: merge v16/v17, pull the latest data, snapshot (2026-11-08)", (
   });
   it("the transcript: a page's merge beat by the side kept, `merge` once all three are merged, `fetch` once", () => {
     const b = task1().board!;
-    const ons = (ops: Parameters<typeof ideTranscript>[1]) => ideTranscript(b, ops).map((l) => l.on);
-    expect(ons([{ t: "merge", slot: "r1", keep: "v17" }])).toEqual(["open", "open", "open", "open", "open", "open", "merge:r1:v17", "merge:r1:v17"]);
+    const ons = (ops: Parameters<typeof ideTranscript>[1]) => ideTranscript(b, ops).filter((l) => !l.args).map((l) => l.on);
+    // ide talk (2026-11-10): the open beat is three lines, a merge beat one remark (the choice / execution lines carry `args`)
+    expect(ons([{ t: "merge", slot: "r1", keep: "v17" }])).toEqual(["open", "open", "open", "merge:r1:v17"]);
     const all = ons([{ t: "merge", slot: "r1", keep: "v17" }, { t: "merge", slot: "r2", keep: "v16" }, { t: "merge", slot: "r5", keep: "v17" }, { t: "fetch" }, { t: "fetch" }]);
     expect(all.filter((o) => o === "merge")).toHaveLength(1);
-    expect(all.filter((o) => o === "fetch")).toHaveLength(4);
+    expect(all.filter((o) => o === "fetch")).toHaveLength(1); // the fetch beat is one remark now; a second fetch adds nothing
     expect(all.indexOf("merge")).toBeGreaterThan(all.indexOf("merge:r5:v17"));
   });
   it("the loader rejects a difference on the slot's own line, a bad line number, and a merge beat with a bad side", () => {

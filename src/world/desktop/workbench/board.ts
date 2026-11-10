@@ -253,7 +253,8 @@ function renderIde(ctx: AppContext, task: Task, board: TaskBoard, s: BoardState,
  * IDE_LINE_MS after the one before (or after now); a render is due as each appears. Session only.
  */
 function noteIdeLines(ctx: ActionContext, task: Task, board: TaskBoard, day: number, before: number): void {
-  const after = ideTranscript(board, ideOps(task, day, ctx.store.getEvents()), tuneCarried(board, ctx.store.getEvents())).length;
+  const lines = ideTranscript(board, ideOps(task, day, ctx.store.getEvents()), tuneCarried(board, ctx.store.getEvents()));
+  const after = lines.length;
   if (after <= before) return;
   const key = ideKey(day, task);
   const times = ctx.session.ideTyping?.key === key ? [...ctx.session.ideTyping.times] : [];
@@ -262,7 +263,8 @@ function noteIdeLines(ctx: ActionContext, task: Task, board: TaskBoard, day: num
   const now = ctx.now?.() ?? Date.now();
   let at = Math.max(now, ...times);
   for (let i = before; i < after; i++) {
-    at += IDE_LINE_MS;
+    // ide talk: the player's own line (a choice) is there at once; Kuro's lines type in one by one
+    if (lines[i]?.who !== "me") at += IDE_LINE_MS;
     times.push(at);
     ctx.later(at - now + 16, ctx.rerender);
   }

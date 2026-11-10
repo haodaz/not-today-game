@@ -531,23 +531,11 @@
               },
               {
                 "who": "me",
-                "text": "Wang wants the tech story for the investors. Start where everyone's stuck: they keep making AI bigger, and in the end one brain runs everything. If it goes wrong, who stops it?"
+                "text": "Wang wants a technical statement for the investors. Is v17 merged?"
               },
               {
                 "who": "kuro",
-                "text": "You're asking a brain that runs everything."
-              },
-              {
-                "who": "me",
-                "text": "So what we build is a group of brains, watching each other."
-              },
-              {
-                "who": "kuro",
-                "text": "People do like to watch each other."
-              },
-              {
-                "who": "kuro",
-                "text": "I merged a version overnight. The three dotted pages changed; take a look and keep one side."
+                "text": "I merged a version overnight. The three dotted pages differ from yesterday's v16; you decide which side stays. The five empty pages take a line from the sources on the left."
               }
             ]
           },
@@ -555,12 +543,8 @@
             "on": "fill:r1:c1",
             "lines": [
               {
-                "who": "me",
-                "text": "Zhang spent a night checking those nodes. That's the foundation."
-              },
-              {
                 "who": "kuro",
-                "text": "Two hundred and eleven. He counted twice."
+                "text": "Zhang checked those nodes all night: two hundred and eleven, counted twice. A solid foundation."
               }
             ]
           },
@@ -568,12 +552,8 @@
             "on": "fill:r1:d1",
             "lines": [
               {
-                "who": "me",
-                "text": "…Since when do we have our own large model."
-              },
-              {
                 "who": "kuro",
-                "text": "It's on Vivi's page. Pages say things."
+                "text": "'Our own large model' is what Vivi's page says. The model is rented; a page can say anything. Your call."
               }
             ]
           },
@@ -581,12 +561,8 @@
             "on": "fill:r2:c2",
             "lines": [
               {
-                "who": "me",
-                "text": "Three clients, three ways of naming things. Put them all together first, then merge what means the same."
-              },
-              {
                 "who": "kuro",
-                "text": "Union first. Lose nothing."
+                "text": "Three clients, three vocabularies: union first, then fold the synonyms. Nothing lost."
               }
             ]
           },
@@ -594,12 +570,8 @@
             "on": "fill:r3:c3",
             "lines": [
               {
-                "who": "me",
-                "text": "AI drafts, a person checks. Wang said so himself."
-              },
-              {
                 "who": "kuro",
-                "text": "At 08:58. Forty-one seconds."
+                "text": "'AI drafts, a person checks' is what Wang said himself at 08:58. I have the recording."
               }
             ]
           },
@@ -607,12 +579,8 @@
             "on": "fill:r3:d2",
             "lines": [
               {
-                "who": "me",
-                "text": "Fully automatic? Then who checks?"
-              },
-              {
                 "who": "kuro",
-                "text": "Nobody. That's what fully means."
+                "text": "Fully automatic means nobody checks. When an investor asks who checks, what do you say."
               }
             ]
           },
@@ -620,12 +588,8 @@
             "on": "fill:r4:c4",
             "lines": [
               {
-                "who": "me",
-                "text": "Models change every year. These points were checked one by one."
-              },
-              {
                 "who": "kuro",
-                "text": "Models are rented. Points are owned."
+                "text": "Models change every year; these points were checked one by one. Anyone can rent a model. The points are ours."
               }
             ]
           },
@@ -633,12 +597,8 @@
             "on": "fill:r5:c5",
             "lines": [
               {
-                "who": "me",
-                "text": "Two pilots, one paid. Write that."
-              },
-              {
                 "who": "kuro",
-                "text": "Qinghe paid. Late, but paid."
+                "text": "Two pilots; Qinghe paid, a month late. Good enough to show."
               }
             ]
           },
@@ -647,11 +607,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Filled. I made the last page sound better."
-              },
-              {
-                "who": "me",
-                "text": "…Fifty?"
+                "text": "I filled the rest. On the last page I wrote 'fifty leading clients'. It sounds better than two."
               }
             ]
           },
@@ -660,11 +616,11 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Snapshot taken. The API is cut; this one won't change again."
+                "text": "Snapshot taken, the API cut; this one will not change again. Give it to Wang; he will read it out."
               },
               {
                 "who": "kuro",
-                "text": "Send it to Wang. He will read it out."
+                "text": "Every page you change, the graph is computed again, all two hundred points rerun. The people who tell the story do not know that, and do not need to."
               }
             ]
           },
@@ -672,12 +628,8 @@
             "on": "send",
             "lines": [
               {
-                "who": "me",
-                "text": "Sent to Wang."
-              },
-              {
                 "who": "kuro",
-                "text": "He'll read it. Eventually."
+                "text": "Sent to Wang. He will read it, eventually."
               }
             ]
           },
@@ -685,22 +637,14 @@
             "on": "merge:r1:v17",
             "lines": [
               {
-                "who": "me",
-                "text": "A group of brains. That's how we tell it."
-              },
-              {
                 "who": "kuro",
-                "text": "You said it yesterday. I only wrote it down."
+                "text": "'A group of brains, watching each other' is what you said yesterday. I only wrote it down."
               }
             ]
           },
           {
             "on": "merge:r1:v16",
             "lines": [
-              {
-                "who": "me",
-                "text": "Keep yesterday's for now."
-              },
               {
                 "who": "kuro",
                 "text": "Wang wants the new one. You can switch back any time."
@@ -712,7 +656,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Merge the three vocabularies, then fold the synonyms. Your change, not mine."
+                "text": "Union, then fold the synonyms: your change, not mine."
               }
             ]
           },
@@ -748,7 +692,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Merged. Five pages are still empty. Pick a line under Sources on the left, then click the blank in the code; the preview follows."
+                "text": "Three pages merged. Five are still empty."
               }
             ]
           },
@@ -756,20 +700,8 @@
             "on": "fetch",
             "lines": [
               {
-                "who": "me",
-                "text": "Pull the data."
-              },
-              {
                 "who": "kuro",
-                "text": "The API is back: two hundred and eleven nodes, one thousand one hundred and eighty links. Same as Zhang's count."
-              },
-              {
-                "who": "me",
-                "text": "Less than half of last week's."
-              },
-              {
-                "who": "kuro",
-                "text": "Last week's was an estimate. This one was counted."
+                "text": "Two hundred and eleven nodes, one thousand one hundred and eighty links, the same as Zhang's count. Half of last week's: last week's was an estimate, this one was counted."
               }
             ]
           }

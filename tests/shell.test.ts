@@ -356,8 +356,8 @@ describe("the IDE panes and the conversation", () => {
     expect(events.some((e) => e.kind === "give" && e.deliverableId === "d1-tech")).toBe(true);
     expect(boardJudgement(1, events)).toEqual({ verdict: "perfect", san: 0 });
     // Handed in: the page is read back (no actions), the conversation still there.
-    // (Rendered a second on: the new line types in after 300 ms.)
-    const after = renderWorkbench({ ...h.app(), nowMs: 1_000 }).body.value;
+    // (Rendered later: every fill adds the choice, Kuro's execution and the beat, each Kuro line 300 ms after the one before.)
+    const after = renderWorkbench({ ...h.app(), nowMs: 5_000 }).body.value;
     // ide v2 (2026-11-08): an IDE task reads back as its frozen page (the snapshot line) and code, not a table.
     expect(after).toMatch(/<section class="sh-card sh-preview( first)?" data-card="preview">/);
     expect(after).not.toContain('<div class="surface board read">');

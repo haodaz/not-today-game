@@ -50,9 +50,35 @@ export function lastFilled(board: TaskBoard, ops: readonly IdeOp[]): string | nu
 }
 
 /** The selected slot (shell R2/R4): the chosen one if it is a slot, else the slot filled last, else the first. */
-export function selectedSlot(board: TaskBoard, ops: readonly IdeOp[], chosen: string | null = null): string {
-  if (chosen !== null && board.slots.some((s) => s.id === chosen)) return chosen;
+export function selectedSlot(board: TaskBoard, ops: readonly IdeOp[], chosen: string | null = null, chosenAt = Infinity): string {
+  if (chosen !== null && board.slots.some((s) => s.id === chosen)) {
+    // ide talk (author 2026-11-10): after a choice the code moves on to the next page that still
+    // needs one — when an op came after the page was chosen and the chosen page is done.
+    if (board.view === "ide" && ops.length > chosenAt) {
+      let walk = freshBoard(board);
+      for (const op of ops) if (op.t !== "print" && op.t !== "send") walk = stepBoard(board, walk, op);
+      if (!workLeft(board, walk, chosen)) return nextWork(board, walk, chosen) ?? chosen;
+    }
+    return chosen;
+  }
   return lastFilled(board, ops) ?? board.slots[0]?.id ?? "";
+}
+
+/** ide v2: a page still needs a decision — its v16/v17 difference is not merged, or it is not filled. */
+export function workLeft(board: TaskBoard, s: BoardState, slot: string): boolean {
+  const diff = board.ide?.diff;
+  return (!!diff && slot in diff && !(slot in s.merged)) || !(slot in s.slots);
+}
+
+/** The next page (in file order, after `from`, wrapping) that still needs a decision; null when none does. */
+export function nextWork(board: TaskBoard, s: BoardState, from: string): string | null {
+  const ids = board.slots.map((x) => x.id);
+  const i = ids.indexOf(from);
+  for (let k = 1; k <= ids.length; k++) {
+    const id = ids[(i + k) % ids.length]!;
+    if (id !== from && workLeft(board, s, id)) return id;
+  }
+  return null;
 }
 
 /**
@@ -95,6 +121,8 @@ export function ideSrc(board: TaskBoard, s: BoardState, ops: readonly IdeOp[], c
 /** A transcript line and the beat it belongs to. */
 export interface IdeLine extends BoardBeatLine {
   readonly on: string;
+  /** ide talk: a worded line (the player's choice, Kuro's execution) — the view fills `board.ide.<kind>` with these. */
+  readonly args?: Readonly<Record<string, string>>;
 }
 
 /**
@@ -140,22 +168,41 @@ export function ideTranscript(board: TaskBoard, ops: readonly IdeOp[], carried: 
         }
         break;
       }
-      case "fill":
+      case "fill": {
+        // ide talk (author 2026-11-10): the player's choice as the input, Kuro's execution, then the remark.
+        if (board.view === "ide" && stepBoard(board, walk, op) !== walk) {
+          const label = board.slots.find((x) => x.id === op.slot)?.label ?? op.slot;
+          const card = board.cards.find((x) => x.id === op.card)?.text ?? op.card;
+          const file = board.ide?.files?.[op.slot]?.name ?? op.slot;
+          out.push({ on: `ide:fill:${op.slot}:${op.card}`, who: "me", text: card, args: { label, card } });
+          out.push({ on: `ide:filled:${op.slot}:${op.card}`, who: "kuro", text: file, args: { file } });
+        }
         show(beats.has(`fill:${op.slot}:${op.card}`) ? `fill:${op.slot}:${op.card}` : `fill:${op.slot}`);
         break;
+      }
       case "assistFill":
         show("kuro");
         if (board.tune) { const after = stepBoard(board, walk, op); if (tuneReached(board, after)) show("reach"); if (tuneStepsLeft(board, after) === 0) show("steps"); }
         break;
       case "merge": {
         // ide v2: the page's own beat (by what was kept), then `merge` once every differing page is merged.
-        show(beats.has(`merge:${op.slot}:${op.keep}`) ? `merge:${op.slot}:${op.keep}` : `merge:${op.slot}`);
         const after = stepBoard(board, walk, op);
+        if (after !== walk) {
+          const file = board.ide?.files?.[op.slot]?.name ?? op.slot;
+          out.push({ on: `ide:keep:${op.slot}:${op.keep}`, who: "me", text: file, args: { file, v: op.keep } });
+          out.push({ on: `ide:kept:${op.slot}:${op.keep}`, who: "kuro", text: op.keep, args: { v: op.keep } });
+        }
+        show(beats.has(`merge:${op.slot}:${op.keep}`) ? `merge:${op.slot}:${op.keep}` : `merge:${op.slot}`);
         if (Object.keys(board.ide?.diff ?? {}).every((id) => id in after.merged)) show("merge");
         break;
       }
       case "fetch":
-        if (!walk.fetched) show("fetch");
+        if (!walk.fetched) {
+          const at = board.ide?.api?.at ?? "";
+          out.push({ on: "ide:fetch", who: "me", text: at, args: {} });
+          out.push({ on: "ide:fetched", who: "kuro", text: at, args: { at } });
+          show("fetch");
+        }
         break;
       case "unlock":
         if (!walk.unlocked && op.code === board.given.lock?.answer) show("unlock");

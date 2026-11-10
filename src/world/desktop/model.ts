@@ -36,6 +36,8 @@ export interface ShellState {
   panes: PaneId[];
   max: PaneId | "explorer" | null;
   slot: string | null;
+  /** How many board ops had happened when `slot` was chosen (ide talk: a later op moves the code on). */
+  slotAt: number;
   source: string | null;
 }
 /** A task's page in 工作台 (workspace R1): `task:<taskId>`; the day is `wbTaskDay` (null = today). */

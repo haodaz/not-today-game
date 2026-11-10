@@ -61,7 +61,7 @@ export function shellDefaults(task: Task, live: boolean): ShellState {
   // tune: the bars are the work, so 参数 sits above 预览.
   if (task.board?.tune) panes = [...panes].sort((a, b) => (a === "code" ? -1 : b === "code" ? 1 : 0));
   // A tuning board has no pages and no sources to list: no explorer.
-  return { explorer: !!task.board && !task.board.tune && live, panes, max: null, slot: null, source: null };
+  return { explorer: !!task.board && !task.board.tune && live, panes, max: null, slot: null, slotAt: 0, source: null };
 }
 
 /** The key of a page's cards: a task read back (handed in, an earlier day) has its own panes. */
@@ -381,7 +381,8 @@ function conversation(ctx: AppContext, task: Task, day: number, live: boolean, f
   const typing = session.ideTyping?.key === shellKey(day, task.id) ? session.ideTyping.times : [];
   const visible = lines.filter((_, i) => (typing[i] ?? 0) <= nowMs);
   const av = shellAv();
-  const rows = bubbles(day, visible.map((l) => ({ who: l.who, on: l.on, body: l.text })));
+  // ide talk: a choice / execution line is worded here (board.ide.fill / filled / keep / kept / fetch / fetched).
+  const rows = bubbles(day, visible.map((l) => ({ who: l.who, on: l.on, body: l.args ? tr(`board.ide.${l.on.split(":")[1]}`, l.args) : l.text })));
   // tune: while Kuro executes a choice the bubble says so (board.tune.busy), not just dots
   const busyText = board?.tune && hasString("board.tune.busy") ? tr("board.tune.busy") : html`…`;
   const dots = visible.length < lines.length ? html`<div class="sh-kuro typing" aria-hidden="true">${av}<div class="sh-kt">${busyText}</div></div>` : null;
@@ -421,7 +422,7 @@ export function renderShell(ctx: AppContext, task: Task, day: number, fill: Fill
   const board = task.board;
   const s = board ? boardState(board, day, task.id, events) : null;
   const ops = board ? ideOps(task, day, events) : [];
-  const selected = board ? selectedSlot(board, ops, st.slot) : "";
+  const selected = board ? selectedSlot(board, ops, st.slot, st.slotAt) : "";
   const panes = panesOf(task, live);
   const open = st.panes.filter((p) => panes.includes(p));
   // The page's share of 工作台's one top bar (R10): the title (with the session dropdown's ▾), 交给 X
@@ -557,6 +558,7 @@ export const taskShellActions: Record<string, ActionHandler> = {
     if (ctx.session.boardPick && p.live) boardActions["board-slot"]!(ctx, data, el);
     const st = stateFor(ctx, p);
     st.slot = slot;
+    st.slotAt = ideOps(p.task, p.day, ctx.store.getEvents()).length;
     if (p.task.board.view === "ide" && panesOf(p.task, p.live).includes("code")) openPane(st, "code");
     ctx.rerender();
   },
