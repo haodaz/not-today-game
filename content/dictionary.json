@@ -1,12 +1,14 @@
 {
-  "_note": "The pocket dictionary's whole vocabulary (objects-in-hand FR3.6). English in, Chinese out, one word at a time; `extra` is the second line it should not have, shown from day 15. Unknown words → strings dictionary.unknown.",
+  "_note": "The pocket dictionary's whole vocabulary (objects-in-hand FR3.6). English in, Chinese out, one word at a time; `extra` is the second line it should not have, shown from day 15. Unknown words → strings dictionary.unknown. `back` is what the second press of 查 gives: the Chinese translated back into English (author 2026-11-10, the laundering way) — the word itself until `backFromDay`, then this.",
   "extraFromDay": 15,
+  "backFromDay": 10,
   "words": [
     {
       "w": "today",
       "gloss": "今天",
       "extra": "参见：不可以",
-      "contractNote": "不该出现在合同里。"
+      "contractNote": "不该出现在合同里。",
+      "back": "not today"
     },
     {
       "w": "again",
@@ -16,7 +18,8 @@
       "w": "same",
       "gloss": "相同的",
       "extra": "和图片一模一样",
-      "contractNote": "合同里的「同一次」，要写清楚是哪一次。"
+      "contractNote": "合同里的「同一次」，要写清楚是哪一次。",
+      "back": "same as picture"
     },
     {
       "w": "no",
@@ -33,17 +36,20 @@
     {
       "w": "keep",
       "gloss": "保留；继续",
-      "extra": "留一样"
+      "extra": "留一样",
+      "back": "keep one"
     },
     {
       "w": "give",
       "gloss": "给",
-      "extra": "人自己接"
+      "extra": "人自己接",
+      "back": "take it yourself"
     },
     {
       "w": "hand",
       "gloss": "手",
-      "extra": "掌心朝上"
+      "extra": "掌心朝上",
+      "back": "palm up"
     },
     {
       "w": "gap",
@@ -52,12 +58,14 @@
     {
       "w": "boss",
       "gloss": "老板",
-      "extra": "再等等"
+      "extra": "再等等",
+      "back": "wait more"
     },
     {
       "w": "wage",
       "gloss": "工资",
-      "extra": "拖欠"
+      "extra": "拖欠",
+      "back": "owed"
     },
     {
       "w": "owe",
@@ -70,12 +78,14 @@
     {
       "w": "home",
       "gloss": "家",
-      "extra": "哪个"
+      "extra": "哪个",
+      "back": "which home"
     },
     {
       "w": "mother",
       "gloss": "母亲",
-      "extra": "吃饭了吗"
+      "extra": "吃饭了吗",
+      "back": "have you eaten"
     },
     {
       "w": "father",
@@ -84,7 +94,8 @@
     {
       "w": "teacher",
       "gloss": "老师",
-      "extra": "收走"
+      "extra": "收走",
+      "back": "taken away"
     },
     {
       "w": "chick",
@@ -105,7 +116,8 @@
     {
       "w": "dictionary",
       "gloss": "词典",
-      "extra": "就是我"
+      "extra": "就是我",
+      "back": "it is me"
     },
     {
       "w": "calculator",
@@ -114,12 +126,14 @@
     {
       "w": "phone",
       "gloss": "电话",
-      "extra": "开不了机"
+      "extra": "开不了机",
+      "back": "will not boot"
     },
     {
       "w": "dream",
       "gloss": "梦",
-      "extra": "我在"
+      "extra": "我在",
+      "back": "i am here"
     },
     {
       "w": "drawer",
@@ -132,7 +146,8 @@
     {
       "w": "lock",
       "gloss": "锁",
-      "extra": "锁好了吗"
+      "extra": "锁好了吗",
+      "back": "is it locked"
     },
     {
       "w": "chain",
@@ -141,17 +156,20 @@
     {
       "w": "eye",
       "gloss": "眼睛",
-      "extra": "闭着的"
+      "extra": "闭着的",
+      "back": "closed"
     },
     {
       "w": "watch",
       "gloss": "看；手表",
-      "extra": "一直"
+      "extra": "一直",
+      "back": "always"
     },
     {
       "w": "read",
       "gloss": "读；阅读",
-      "extra": "一行一行"
+      "extra": "一行一行",
+      "back": "line by line"
     },
     {
       "w": "pixel",
@@ -160,12 +178,14 @@
     {
       "w": "upgrade",
       "gloss": "升级",
-      "extra": "老东西请先收一收"
+      "extra": "老东西请先收一收",
+      "back": "put them away"
     },
     {
       "w": "replace",
       "gloss": "替换；取代",
-      "extra": "客气地"
+      "extra": "客气地",
+      "back": "politely"
     },
     {
       "w": "polite",
@@ -174,17 +194,20 @@
     {
       "w": "yes",
       "gloss": "是；好",
-      "extra": "它替你回的"
+      "extra": "它替你回的",
+      "back": "it said it"
     },
     {
       "w": "pretty",
       "gloss": "漂亮的",
-      "extra": "它的词"
+      "extra": "它的词",
+      "back": "its word"
     },
     {
       "w": "model",
       "gloss": "模型；型号",
-      "extra": "你换模型了"
+      "extra": "你换模型了",
+      "back": "you switched"
     },
     {
       "w": "depart",
@@ -201,7 +224,8 @@
     {
       "w": "clavis",
       "gloss": "钥匙（拉丁文）",
-      "extra": "也是门"
+      "extra": "也是门",
+      "back": "also the gate"
     },
     {
       "w": "custos",
@@ -210,7 +234,8 @@
     {
       "w": "porta",
       "gloss": "门（拉丁文）",
-      "extra": "在你枕头底下"
+      "extra": "在你枕头底下",
+      "back": "under pillow"
     }
   ]
 }

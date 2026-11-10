@@ -210,11 +210,15 @@ export interface Word {
   readonly w: string;
   readonly gloss: string;
   readonly extra: string | null;
+  /** The second press of 查 (dictionary-back 2026-11-10): the Chinese translated back into English, from `backFromDay`; null = the word itself. */
+  readonly back: string | null;
   /** The line shown when the Wenquxing is held over this word in a contract (work spec 2026-11-02 "the dictionary verifies"). */
   readonly contractNote?: string;
 }
 export interface DictionaryTable {
   readonly extraFromDay: number;
+  /** From this day the second press gives `back` instead of the word itself (the round trip stops being faithful). */
+  readonly backFromDay: number;
   readonly words: ReadonlyMap<string, Word>;
 }
 /** A word fits row 1 of the screen: lower-case a–z, at most 16 letters. */
@@ -222,21 +226,25 @@ export const WORD_RE = /^[a-z]{1,16}$/;
 export function parseDictionary(input: unknown): DictionaryTable {
   const fail: Fail = failer("dictionary.json");
   if (!isRecord(input)) fail("", "not an object");
-  keysOf(input, ["_note", "extraFromDay", "words"], "top level", fail);
+  keysOf(input, ["_note", "extraFromDay", "backFromDay", "words"], "top level", fail);
   const extraFromDay = int(input.extraFromDay, "extraFromDay", fail);
   if (extraFromDay < 1) fail("extraFromDay", "must be a day (1..)");
+  const backFromDay = int(input.backFromDay, "backFromDay", fail);
+  if (backFromDay < 1) fail("backFromDay", "must be a day (1..)");
   if (!Array.isArray(input.words) || input.words.length === 0) fail("words", "must be a non-empty list");
   const words = new Map<string, Word>();
   input.words.forEach((v, i) => {
     const w = `words[${i}]`;
     if (!isRecord(v)) fail(w, "must be an object");
-    keysOf(v, ["w", "gloss", "extra", "contractNote"], w, fail);
+    keysOf(v, ["w", "gloss", "extra", "back", "contractNote"], w, fail);
+    const back = v.back === undefined ? null : str(v.back, `${w}.back`, fail);
+    if (back !== null && (back.length < 1 || back.length > 16)) fail(`${w}.back`, "must fit the row (1–16 characters)");
     const word = str(v.w, `${w}.w`, fail);
     if (!WORD_RE.test(word)) fail(`${w}.w`, "must be 1–16 lower-case letters a–z");
     if (words.has(word)) fail(`${w}.w`, `duplicate word "${word}"`);
-    words.set(word, Object.freeze({ w: word, gloss: str(v.gloss, `${w}.gloss`, fail), extra: v.extra === undefined ? null : str(v.extra, `${w}.extra`, fail), ...(v.contractNote !== undefined ? { contractNote: str(v.contractNote, `${w}.contractNote`, fail) } : {}) }));
+    words.set(word, Object.freeze({ w: word, gloss: str(v.gloss, `${w}.gloss`, fail), extra: v.extra === undefined ? null : str(v.extra, `${w}.extra`, fail), back, ...(v.contractNote !== undefined ? { contractNote: str(v.contractNote, `${w}.contractNote`, fail) } : {}) }));
   });
-  return Object.freeze({ extraFromDay, words });
+  return Object.freeze({ extraFromDay, backFromDay, words });
 }
 export const dictionaryTable = parseDictionary(dictionaryRaw);
 
