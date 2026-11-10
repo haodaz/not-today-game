@@ -456,7 +456,7 @@
   "obj.key.pager.down": "next",
   "obj.key.pager.fn": "time",
   "obj.key.pager.light": "backlight",
-  "obj.key.dictionary.lookup": "look up",
+  "obj.key.dictionary.lookup": "translate",
   "obj.key.dictionary.up": "up",
   "obj.key.dictionary.down": "down",
   "obj.key.dictionary.back": "backspace",
