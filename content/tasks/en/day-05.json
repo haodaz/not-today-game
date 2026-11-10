@@ -132,11 +132,7 @@
               },
               {
                 "who": "kuro",
-                "text": "Vivi wants the 'avatar' page."
-              },
-              {
-                "who": "kuro",
-                "text": "The locked column: find the four digits first."
+                "text": "Vivi wants the 'avatar' page. Four rows: name, what it does, it and you, limits. The material is in Vivi's PRD, her chat, the group and v17; the table is locked, and the four digits are in Vivi's chat."
               }
             ]
           },
@@ -145,7 +141,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "2041. A good year."
+                "text": "2041, the year in her chat. The year she says the avatar goes live."
               }
             ]
           },
@@ -154,7 +150,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "It isn't you. It's only more punctual."
+                "text": "'The avatar is you.' It is not you. It is only more punctual."
               }
             ]
           },
@@ -163,7 +159,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "It answers 'OK.' for you. You say it forty-odd times a day."
+                "text": "It answers 'OK.' for you. You say it forty-odd times a day; it saves your voice."
               }
             ]
           },
@@ -172,7 +168,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Your signature is the last thing that's yours. Keep it."
+                "text": "'The avatar may sign for you.' Your signature is the last thing that is yours; written in, it is not."
               }
             ]
           },
@@ -181,7 +177,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "'It's more you than you are.' I measured."
+                "text": "'It is more like you than you are.' I filled that in. I measured."
               }
             ]
           },
@@ -190,7 +186,11 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "To Vivi. She'll say 'that's the vibe'."
+                "text": "Sent to Vivi. She will say 'that's the vibe'."
+              },
+              {
+                "who": "kuro",
+                "text": "Two words on her page; behind them a whole system to build. She does not need to know."
               }
             ]
           }

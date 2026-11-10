@@ -131,11 +131,7 @@
               },
               {
                 "who": "kuro",
-                "text": "Team night. The rank column isn't the company's ranks."
-              },
-              {
-                "who": "kuro",
-                "text": "Sunset needs working out. The calculator only lights up by the window."
+                "text": "Team night: when each leader gives a toast. The rank table is in the files, and its ranks are not the company's; the time is locked, sunset has to be worked out, and the calculator only lights up by the window."
               }
             ]
           },
@@ -144,7 +140,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "17:12. Today's sunset. Your sum beats the forecast."
+                "text": "17:12, today's sunset. Your sum beats the forecast."
               }
             ]
           },
@@ -153,7 +149,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Fair weather required. It's raining. Another day."
+                "text": "Vivi wants fair weather. It is raining today; another day."
               }
             ]
           },
@@ -162,7 +158,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "At seven, nobody can be summoned."
+                "text": "'Everyone at seven.' At seven, none of these can be summoned."
               }
             ]
           },
@@ -171,7 +167,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Leave it unscheduled and the guest picks the hour."
+                "text": "'No schedule.' Leave it unscheduled and the guest picks the hour."
               }
             ]
           },
@@ -180,7 +176,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "'You: any hour.' I filled it in for you. You're always here."
+                "text": "'You: any hour.' I filled it in for you. You are always here."
               }
             ]
           },
@@ -189,7 +185,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "To the group. member will say received."
+                "text": "Sent to the group. member will say received."
               }
             ]
           }

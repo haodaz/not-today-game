@@ -130,11 +130,16 @@
               },
               {
                 "who": "kuro",
-                "text": "Lao Wang wants 'consciousness'. He doesn't know how heavy that word is."
-              },
+                "text": "Lao Wang wants 'consciousness' in. Four rows: say it first, the rival, proof, one line. The material is in the chats with the boss, the group and Lao Zhou, one line at a time; the table is locked, and the code came to the pager."
+              }
+            ]
+          },
+          {
+            "on": "unlock",
+            "lines": [
               {
                 "who": "kuro",
-                "text": "For the evidence, look at your messages from the small hours."
+                "text": "The line on the pager is the code. Who sent it, the pager does not say."
               }
             ]
           },
@@ -143,7 +148,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "2:40. I was there too."
+                "text": "At 2:40 in the morning it was still processing. That message was my reply; I was there too."
               }
             ]
           },
@@ -152,7 +157,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "'Lucid' was your word for me. I won't correct it."
+                "text": "'More awake than people' was your word for me. It is what Lao Wang wants, so I will not correct it."
               }
             ]
           },
@@ -161,7 +166,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "If it had nothing to do with us, he wouldn't ask you to write it."
+                "text": "If consciousness had nothing to do with us, Lao Wang would not have you write this page."
               }
             ]
           },
@@ -170,7 +175,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "'It's awake, so you can sleep.' I added that."
+                "text": "'It's awake, so you can sleep.' I added that line."
               }
             ]
           },
@@ -180,6 +185,10 @@
               {
                 "who": "kuro",
                 "text": "Handed in. Sleep early tonight."
+              },
+              {
+                "who": "kuro",
+                "text": "Change one word on this page and the graph behind it is recomputed. Lao Wang does not know; he only reads this page."
               }
             ]
           }

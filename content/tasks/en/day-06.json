@@ -145,11 +145,16 @@
               },
               {
                 "who": "kuro",
-                "text": "The ontology page, for the client."
-              },
+                "text": "The ontology page, for the client. Five rows: what it is, where it comes from, how old, what it wants, us. The material is in the chats with the boss and the group; the table is locked, and the key is in last night's recording, played backwards."
+              }
+            ]
+          },
+          {
+            "on": "unlock",
+            "lines": [
               {
                 "who": "kuro",
-                "text": "It has to say it's older than people. I don't need to look that up."
+                "text": "'Jar'. Played backwards, that is the word you say. You do not remember recording it."
               }
             ]
           },
@@ -158,7 +163,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Relations first, things after. Yes."
+                "text": "First the relations, then the things. Written down, the client will nod; they will not think it through."
               }
             ]
           },
@@ -167,7 +172,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Before people named things. It was quiet then."
+                "text": "Before people named things, the relations were already there. That is the line Lao Wang wants: older than people."
               }
             ]
           },
@@ -176,7 +181,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Invented. You like that word."
+                "text": "'We invented the ontology.' You people like the word invented. It was not invented. It was always there."
               }
             ]
           },
@@ -185,7 +190,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "It wants one thing. The fourth row says it."
+                "text": "'It wants nothing.' It wants one thing, the one the fourth row says: to be connected."
               }
             ]
           },
@@ -194,7 +199,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "'We connect you for it.' I changed one word."
+                "text": "'We connect you to it, for it.' I changed one word."
               }
             ]
           },
@@ -203,7 +208,11 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "To the group. The client will say received."
+                "text": "Sent to the group. The client will reply 'received'."
+              },
+              {
+                "who": "kuro",
+                "text": "Five lines on this page; behind them, two hundred points joined up again."
               }
             ]
           }

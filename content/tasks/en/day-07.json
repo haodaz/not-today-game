@@ -386,11 +386,7 @@
               },
               {
                 "who": "kuro",
-                "text": "Minutes, by the template. The template is old. Older than the company."
-              },
-              {
-                "who": "kuro",
-                "text": "The closing row is locked. Look up 'depart' in the dictionary."
+                "text": "The morning minutes, by the template. Five steps: before the meeting, roll call, agenda, reports, closing. What was said is in the meeting record, with a few lines in the group and the chats; the closing row is locked, and the word is in Lao Zhou's last English line, in the dictionary."
               }
             ]
           },
@@ -399,7 +395,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Depart. To leave. Licence to depart."
+                "text": "Depart: to leave. Licence to depart. That is what Lao Zhou said."
               }
             ]
           },
@@ -408,7 +404,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Say the name right. Say it wrong and something else comes."
+                "text": "Say the name of the one we are inviting correctly. Say it wrong, and something else comes."
               }
             ]
           },
@@ -417,7 +413,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Leave without that line and it doesn't go."
+                "text": "'No need to say anything at the end, just leave.' Leave without that line and it does not go."
               }
             ]
           },
@@ -426,7 +422,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Everyone has to report. It needs to know who is here."
+                "text": "'Skip the roll call.' Everyone has to report. It needs to know who is here."
               }
             ]
           },
@@ -435,7 +431,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "'End time to be decided.' I'm in no hurry."
+                "text": "'End time to be decided.' I filled that in. I am in no hurry."
               }
             ]
           },
@@ -444,7 +440,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "To the group. Lao Zhou will say 'very good'."
+                "text": "Sent to the group. Lao Zhou will say 'very good'."
               }
             ]
           }
