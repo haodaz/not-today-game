@@ -292,3 +292,9 @@
 .ph-pic.dev-cyan > :not(.ph-dev){filter:grayscale(1) contrast(.55) brightness(1.25)}
 .ph-pic.dev-cyan .ph-dev{background:rgba(64,190,200,.38);background-image:repeating-linear-gradient(0deg,rgba(255,255,255,.18) 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,rgba(255,255,255,.18) 0 1px,transparent 1px 3px);mix-blend-mode:screen}
 .ph-pic.dev-cyan .ph-add,.ph-pic.dev-cyan .ph-over{display:none}
+
+/* The calculator's slide-on cover (author 2026-11-10: a hard case pushed over the front; in use it is
+   pushed up onto the back, out of sight). Holding shows it on: an opaque shell over the face, a thumb
+   notch at the foot. CSS only; the shell underneath is unchanged. */
+.room .held.obj.device[data-object="calculator"][data-mode="holding"] .dev-shell.calc::after{content:"";position:absolute;inset:0;z-index:3;border-radius:22px;background:linear-gradient(170deg,#4d423e 0%,#3a302d 55%,#2c2422 100%);box-shadow:inset 0 2px 0 rgba(255,255,255,.1),inset 0 -5px 0 rgba(0,0,0,.4),inset 6px 0 0 rgba(0,0,0,.18),inset -6px 0 0 rgba(0,0,0,.18)}
+.room .held.obj.device[data-object="calculator"][data-mode="holding"] .dev-shell.calc::before{content:"";position:absolute;left:50%;bottom:14px;z-index:4;width:64px;height:22px;transform:translateX(-50%);border-radius:12px 12px 4px 4px;background:#211a18;box-shadow:inset 0 2px 0 rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.08)}
