@@ -49,7 +49,7 @@ window.__choices = () => [...document.querySelectorAll('[data-action=loop-choice
 `;
 await send("Page.enable"); await send("Runtime.enable");
 await send("Emulation.setDeviceMetricsOverride", { width: 1600, height: 900, deviceScaleFactor: process.env.HIRES ? 2 : 1, mobile: false });
-await send("Page.navigate", { url: `http://localhost:${process.env.PORT || 5173}/?lang=${lang}&day=${day}&splat=0&fast=1&fx=0${process.env.FOUND ? "&found=" + process.env.FOUND : ""}` }); // fx=0: the collapse shader stalls SwiftShader
+await send("Page.navigate", { url: `http://localhost:${process.env.PORT || 5173}/?lang=${lang}&day=${day}&splat=0&fast=1&fx=0${process.env.FOUND ? "&found=" + process.env.FOUND : ""}${process.env.SEED ? "&seed=" + process.env.SEED.replace(/\+/g, "%2B") : ""}` }); // SEED=flags:a+b,san:80 lays earlier days' flags over a mid-run start (see main.ts debugSeed) // fx=0: the collapse shader stalls SwiftShader
 for (let i = 0; i < 40; i++) { if ((await ev("document.readyState")) === "complete") break; await sleep(0.25); }
 // Storage turned out to be shared between headless profiles on this machine: start every day from nothing.
 await ev("localStorage.clear(); sessionStorage.clear(); location.reload(); 'cleared'");
@@ -87,7 +87,18 @@ const interrupts = async () => {
       const n = await ev("[...document.querySelectorAll('[data-action=conv]')].filter(__vis).length");
       for (let i = 0; i < (n || 0) && !(await has("[data-action=open-deliverable]")); i++) { await ev(`[...document.querySelectorAll('[data-action=conv]')].filter(__vis)[${i}].click()`); await sleep(1); }
     }
-    if (await has("[data-action=open-deliverable]")) { globalThis.__viviOpened = day; note("   vivi: opening the deliverable"); await ev("__sel('[data-action=open-deliverable]')"); await sleep(2); await shotStep("deliverable"); await key("Escape"); await sleep(1); }
+    // Vivi's deliverable bubbles stay in the thread all day: each doc is opened once a day (the guide's
+    // ring is on one of them — the one the task page waits for), not on every look.
+    globalThis.__docsOpened ??= {}; const opened = (globalThis.__docsOpened[day] ??= new Set());
+    const docs = JSON.parse((await ev("JSON.stringify([...document.querySelectorAll('[data-action=open-deliverable]')].filter(__vis).map(e=>e.dataset.doc||''))")) || "[]").filter((d) => d && !opened.has(d));
+    for (const doc of docs) { opened.add(doc); globalThis.__viviOpened = day;
+      note(`   vivi: opening the deliverable ${doc}`); await ev(`__sel('[data-action=open-deliverable][data-doc="${doc}"]')`); await sleep(2); await shotStep("deliverable"); await key("Escape"); await sleep(1);
+      // guidance R14: the locked page has a tail line (vivi.back) that owns the screen until read.
+      for (let n = 0; n < 8 && (await has("[data-action=loop-advance]")); n++) { await ev("__sel('[data-action=loop-advance]')"); await sleep(0.5); }
+      // the thread again for the next card (her page opens in 浏览器 on the other monitor)
+      if (docs.indexOf(doc) < docs.length - 1) { await ev("__sel('[data-action=dock][data-app=tingtalk]')"); await sleep(1); }
+      // her page opens in 浏览器 (Esc does not close a window): back to 工作台 from the dock.
+      if (!(await has("[data-action=wb-nav]")) && (await has("[data-action=dock][data-app=workbench]"))) { await ev("__sel('[data-action=dock][data-app=workbench]')"); await sleep(1.2); } }
   } finally { busy = false; }
 };
 let stepNo = 0;
@@ -125,13 +136,40 @@ const rise = async () => {
   for (let i = 0; i < 6 && !(await click(S("room.rise.up"), 1.5)); i++) { await key(" "); await sleep(0.4); }
   await settle(); await sleep(0.8);
 };
-const toDesktop = async () => { await toRoom(); await sel("[data-action=view][data-view=desktop][data-screen=left]", 2); if (await has("[data-action=onboard-skip]")) { note("   (coach marks: skipped)"); await sel("[data-action=onboard-skip]", 0.6); } };
+// guidance (air walls): with the delivery at the door the screen refuses — the food is fetched first, then the screen.
+const pickupIfDue = async () => {
+  if (await has("[data-action=screen]")) return false;
+  if (!(await has("[data-action=view][data-view=door]"))) return false;
+  // the day's pickup item is listed (unlocked, not done) — the hint pill shows only once a run, so the list is the test
+  const picks = file.items.filter((x) => x.done === "event:pickup:lunch" || x.done === "event:pickup:dinner").map((x) => x.text);
+  const tx = await text();
+  if (!picks.some((t) => tx.includes(t))) return false;
+  note("   (the delivery is at the door: fetching it before the screen)");
+  await sel("[data-action=view][data-view=door]", 2.5); await settle();
+  let steps = 0; while (steps < 6 && (await sel("[data-action=loop-door]", 2))) { steps++; await settle(); }
+  await settle(); await toRoom(); return steps > 0;
+};
+// A line up in the box owns the screen (nothing else answers): read it before any click.
+const readLines = async () => { for (let n = 0; n < 10 && (await has("[data-action=loop-advance]")); n++) { await ev("__sel('[data-action=loop-advance]')"); await sleep(0.45); } };
+const toDesktop = async () => { for (let n = 0; n < 8 && (await has("[data-action=loop-advance]")); n++) { await ev("__sel('[data-action=loop-advance]')"); await sleep(0.5); } await toRoom(); await sel("[data-action=view][data-view=desktop][data-screen=left]", 2);
+  if (!(await has("[data-action=screen]")) && (await pickupIfDue())) await sel("[data-action=view][data-view=desktop][data-screen=left]", 2);
+  if (!(await has("[data-action=screen]"))) { note(`   (screen not entered: stage=${await ev("document.querySelector('.stage')?.className")} acts=${await ev("JSON.stringify([...new Set([...document.querySelectorAll('[data-action]')].filter(__vis).map(e=>e.dataset.action+':'+(e.dataset.view||'')))])")} · ${(await text()).slice(0, 100)}`); await shotStep("screen-refused"); }
+  if (await has("[data-action=onboard-skip]")) { note("   (coach marks: skipped)"); await sel("[data-action=onboard-skip]", 0.6); } };
 const toTingTalk = async () => { await toRoom(); await sel("[data-action=view][data-view=desktop][data-screen=right]", 2); if (await has("[data-action=onboard-skip]")) await sel("[data-action=onboard-skip]", 0.6);
   // playtest-1105 R1: nothing is open on a first visit; 汀汀 opens from the dock (the left monitor's).
   if (!(await has("[data-action=conv]"))) { await sel("[data-action=view][data-view=desktop][data-screen=left]", 1.5); if (await has("[data-action=onboard-skip]")) await sel("[data-action=onboard-skip]", 0.6); await sel("[data-action=dock][data-app=tingtalk]", 1.5); }
-  await ev(HELPERS); return await has("[data-action=conv]"); };
+  await ev(HELPERS);
+  // guidance G3 (scope all): a morning with news from the boss refuses everything until his thread is opened — once a day, first.
+  if (globalThis.__bossSeen !== day && (await has("[data-action=conv][data-conv=boss]"))) { globalThis.__bossSeen = day; await sel("[data-action=conv][data-conv=boss]", 1); await readLines(); note("   (the boss's thread opened first)"); }
+  return await has("[data-action=conv]"); };
 const goHome = async () => { if (!(await has("[data-action=wb-nav][data-page=home]"))) await sel("[data-action=wb-sidebar]", 0.6); return sel("[data-action=wb-nav][data-page=home]", 1); };
-const toWorkbench = async () => { await toDesktop(); if (!(await has("[data-action=wb-nav]"))) { if (!(await sel("[data-action=dock][data-app=workbench]", 2))) await click(S("wb.title"), 2); } };
+const wbOpen = async () => (await has("[data-action=wb-nav]")) || (await has("[data-action=wb-sidebar]"));
+const toWorkbench = async () => { await toDesktop(); await readLines(); if (await has("[data-action=files-close]")) await sel("[data-action=files-close]", 0.6);
+  if (!(await wbOpen())) { if (!(await sel("[data-action=dock][data-app=workbench]", 2))) await click(S("wb.title"), 2); await readLines(); }
+  // 工作台 can be on the other monitor (a page opened on the right moved the focus): look there, then back.
+  for (const side of ["right", "left"]) { if (await wbOpen()) break; await readLines(); await sel(`[data-action=screen][data-screen=${side}]`, 1.2); await readLines(); if (!(await has("[data-action=wb-nav]"))) { await sel("[data-action=dock][data-app=workbench]", 1.5); await readLines(); } }
+  if (!(await wbOpen())) note(`   (工作台 not found: stage=${await ev("document.querySelector('.stage')?.className")} acts=${await ev("JSON.stringify([...new Set([...document.querySelectorAll('[data-action]')].filter(__vis).map(e=>e.dataset.action+':'+(e.dataset.app||e.dataset.screen||'')))])")} line=${(await text()).slice(0, 60)})`);
+};
 const lastEvents = () => ev(`(()=>{ const t = localStorage.getItem('nt_run') || ''; return (t.match(/"kind":"[a-zA-Z]+"(,"[a-zA-Z]+":"[^"]*")?/g) || []).slice(-4).join(' ').replace(/"kind":/g,''); })()`);
 // Open a card's source (day graph): a conversation, a file in 文件, or a Vivi page from its bubble; a call is already over.
 let currentTaskId = null;
@@ -142,8 +180,19 @@ const gather = async (card) => {
   if (from.conv) { await toTingTalk(); return sel(`[data-action=conv][data-conv=${from.conv}]`, 1.2); }
   const folder = folderOf(from.file);
   if (folder) {
-    await toDesktop(); await sel("[data-action=decoy][data-decoy=files]", 1.2); await sel(`[data-action=file-tab][data-tab=${folder}]`, 0.8);
-    const r = await sel(`[data-action=file-open][data-file=${from.file}]`, 1.2); await settle(); await sel("[data-action=files-close]", 0.8); return r;
+    await toDesktop(); await readLines();
+    // the 文件 icon is on the left monitor's desktop
+    if (await has("[data-action=screen][data-screen=left]")) await sel("[data-action=screen][data-screen=left]", 0.8);
+    await sel("[data-action=decoy][data-decoy=files]", 1.2);
+    await readLines(); // a line up (the lunch's 已送达) owns the screen — and reading it can pull the camera to the room
+    if (!(await has("[data-action=screen]"))) { note("   files: pulled out of the screen (the delivery?) — back"); await toDesktop(); await readLines(); if (await has("[data-action=screen][data-screen=left]")) await sel("[data-action=screen][data-screen=left]", 0.8); await sel("[data-action=decoy][data-decoy=files]", 1.2); }
+    await until("[data-action=file-tab]", 6); // the window takes a moment
+    await readLines();
+    await shotStep("files");
+    await sel(`[data-action=file-tab][data-tab=${folder}]`, 0.8);
+    const r = await sel(`[data-action=file-open][data-file=${from.file}]`, 1.2);
+    if (!r) note(`   files: ${from.file} not listed · win ${await ev("JSON.stringify([...document.querySelectorAll('.filesw,[data-files]')].map(e=>e.className+':'+__vis(e)))")} · visible ${await ev("JSON.stringify([...document.querySelectorAll('[data-action]')].filter(__vis).map(e=>e.dataset.action+':'+(e.dataset.tab||e.dataset.file||e.dataset.decoy||'')).filter(a=>/file|decoy|loop-advance/.test(a)).slice(0,30))")} · tabs ${await ev("JSON.stringify([...document.querySelectorAll('[data-action=file-tab]')].map(e=>e.dataset.tab+(e.classList.contains('on')?'*':'')))")} files ${await ev("JSON.stringify([...document.querySelectorAll('[data-action=file-open]')].map(e=>e.dataset.file))")} · ${(await text()).slice(0, 80)}`);
+    await settle(); await sel("[data-action=files-close]", 0.8); return r;
   }
   await toTingTalk();
   for (const c of ["group", "partner", "boss"]) { await sel(`[data-action=conv][data-conv=${c}]`, 1); if (await sel(`[data-action=open-deliverable][data-doc=${from.file}]`, 1.5)) { await key("Escape"); await settle(); return true; } }
@@ -171,7 +220,9 @@ for (const it of ITEMS) {
   const before = (() => { const m = /已做 (\d+) 件|(\d+) done/.exec(t0); return m ? Number(m[1] ?? m[2]) : -1; })();
   let ok = true;
   try {
-    if (it.done === "event:boot") { await toRoom(); ok = await sel("[data-action=tower-power]"); if (!ok) { await sel("[data-action=view][data-view=desk]", 2); ok = await sel("[data-action=tower-power]"); } await settle(); }
+    // A self-ticking item (day 17 「把东西放回去」, `self: true`): the runtime ticks it after a beat; nothing to do.
+    if (it.self === true) { note("   (ticks itself: skipped)"); await settle(); }
+    else     if (it.done === "event:boot") { await toRoom(); ok = await sel("[data-action=tower-power]"); if (!ok) { await sel("[data-action=view][data-view=desk]", 2); ok = await sel("[data-action=tower-power]"); } await settle(); }
     else if (it.done === "event:openApp:msgs") { ok = await toTingTalk(); await settle(); await toRoom(); }
     else if (it.done === "event:order:lunch" || it.done === "event:order:dinner") {
       const meal = what; await toRoom(); const d1 = await sel("[data-action=view][data-view=desk]", 2); await until("[data-action=loop-phone]", 8); await settle(); ok = await sel("[data-action=loop-phone]", 1.5);
@@ -194,7 +245,7 @@ for (const it of ITEMS) {
       }
       await toWorkbench(); await goHome();
       await interrupts(); await goHome(); // a night task appears after the call
-      for (let k = 0; k < 2 && (await has("[data-action=open-deliverable]")) && !(await has(`[data-action=wb-nav][data-page='task:${it.id}']`)); k++) { globalThis.__viviOpened = day; note('   vivi lock: opening her page first'); await sel("[data-action=open-deliverable]", 1.5); await key('Escape'); await settle(); await toWorkbench(); await goHome(); }
+      for (let k = 0; k < 2 && (await has("[data-action=open-deliverable]")) && !(await has(`[data-action=wb-nav][data-page='task:${it.id}']`)); k++) { note(`   vivi lock: opening her pages first · docs ${await ev("JSON.stringify([...document.querySelectorAll('[data-action=open-deliverable]')].filter(__vis).map(e=>e.dataset.doc))")}`); await interrupts(); await toWorkbench(); await goHome(); }
       if (process.env.DIAG) note(`   probe: lock=${(await text()).includes(S("vivi.lock"))} deliv=${await has("[data-action=open-deliverable]")} taskLink=${await has(`[data-action=wb-nav][data-page='task:${it.id}']`)} pages=${await ev("JSON.stringify([...document.querySelectorAll('[data-action=wb-nav]')].filter(__vis).map(e=>e.dataset.page))")} opens=${await ev("(localStorage.getItem('nt_run')||'').match(/file:[a-z0-9-]+|task:[a-z0-9]+/g)?.join(',')")}`);
       await sel(`[data-action=wb-nav][data-page='task:${it.id}']`, 1.2);   // workspace: a task lives on its own page (在办 card / session list)
       if (board?.tune) {
@@ -222,13 +273,62 @@ for (const it of ITEMS) {
         // A board task (work v2): the lock, the cards into the slots, print. BOARD=assist lets Kuro fill the rest.
         await shotStep(`board-${it.id}`);
         const lock = board?.given?.lock ?? null;
+        // lock-by-device: work the lock's device until it shows the code, then 就按它显示的填 (board-read).
+        const workDevice = async () => {
+          const obj = lock?.object ?? ""; const ans = String(lock?.answer ?? "");
+          const press = async (k) => { const r = await sel(`[data-action=obj-key][data-key='${k}']`, 0.35); if (!r) note(`   lock: no key ${k}`); };
+          if (obj === "pager") await press("read");
+          else if (obj === "dictionary") { for (const ch of ans) await press(ch.toUpperCase()); await press("lookup"); }
+          else if (obj === "calculator") {
+            // solar: it lights only with the hand in the light zone (the top of the stage): move the mouse there first
+            await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: 800, y: 40 }); await sleep(0.6);
+            await press("C"); for (const ch of ans) await press(ch);
+            await sleep(0.6); note(`   lock: calculator display · ${await ev("JSON.stringify(document.querySelector('.dev-shell.calc')?.className)")}`); await shotStep("calc-lit");
+          }
+          else if (obj === "tape") {
+            let opened = false;
+            for (let k = 0; k < 5 && !opened; k++) {
+              if (k > 0) { await press("stop"); await press("ff"); await sleep(0.6); }
+              await press("dir"); await press("play"); await sleep(1.2);
+              for (let n = 0; n < 10 && !opened; n++) {
+                if (await sel("[data-action=board-read]", 0.6)) { if (!(await has("[data-action=board-read]"))) { opened = true; break; } }
+                if (!(await ev("__sel('[data-action=loop-advance]')"))) await sleep(0.6); else await sleep(0.5);
+              }
+              note(`   lock: tape try ${k} → ${opened ? "opened" : "still locked"} · ${(await text()).slice(0, 80)}`);
+              if (!opened) await press("dir");
+            }
+          }
+          await sleep(0.8); const read = await sel("[data-action=board-read]", 1);
+          note(`   lock: ${obj} → read ${read} · keys ${await ev("JSON.stringify([...document.querySelectorAll('[data-action=obj-key]')].filter(__vis).map(e=>e.dataset.key).slice(0,40))")}`); await shotStep("lock-read");
+        };
         if (await has("[data-action=board-lock]")) { await sel("[data-action=board-lock]", 0.8); await shotStep("board-lock");
           // objects-in-room: a lock with a face turns the head there and lifts the object. Use it, put it down, walk back.
           for (let w = 0; w < 8 && !(await has("[data-action=obj-key]")) && !(await has("[data-action=board-code]")) && (await has("[data-action=board-kuro-lock]")) === false; w++) await sleep(0.5);
           if (!(await has("[data-action=board-code]")) && (await ev("document.querySelector('.stage')?.dataset.view")) !== "desktop") { for (let w = 0; w < 8 && !(await has("[data-action=obj-key]")); w++) await sleep(0.5); }
-          if (await has("[data-action=obj-key]")) { await sleep(1.5); note(`   lock: the object was used at ${await ev("document.querySelector('.stage')?.dataset.view")}`); await shotStep("lock-face"); await key("Escape"); await sleep(0.6); await key("Escape"); await settle(); await toWorkbench(); await goHome(); await sel(`[data-action=wb-nav][data-page='task:${it.id}']`, 1.2); if (!(await has("[data-action=board-code]")) && (await has("[data-action=board-lock]")) && !(await has("[data-action=board-kuro-lock]"))) { /* the panel closed: reopen it without moving (chips are offered now) */ } }
+          if (await has("[data-action=obj-key]")) { await sleep(1.5); note(`   lock: the object was used at ${await ev("document.querySelector('.stage')?.dataset.view")}`); await shotStep("lock-face");
+            await workDevice(); await key("Escape"); await sleep(0.6); await key("Escape"); await settle(); await toWorkbench(); await goHome(); await sel(`[data-action=wb-nav][data-page='task:${it.id}']`, 1.2); if (!(await has("[data-action=board-code]")) && (await has("[data-action=board-lock]"))) { await sel("[data-action=board-lock]", 0.9); await until("[data-action=obj-key]", 3);
+            // a face lock worked today opens its panel in place: the device is read off the 老物件栏 — open it from there
+            if (!(await has("[data-action=obj-key]")) && lock?.object) { if (!(await has("[data-action=objbar-open]"))) { await sel("[data-action=items-toggle]", 0.8); await until("[data-action=objbar-open]", 3); } const opened = (await sel(`[data-action=objbar-open][data-object='${lock.object}']`, 1)) || (await sel(`[data-action=loop-hold][data-object='${lock.object}']`, 1.2));
+              if (opened && !(await has("[data-action=obj-key]"))) { await sel("[data-action=obj-use]", 1.2); } note(`   lock: objbar open ${opened} · visible ${await ev("JSON.stringify([...document.querySelectorAll('[data-action]')].filter(__vis).map(e=>e.dataset.action+':'+(e.dataset.object||e.dataset.app||e.dataset.key||'')).filter(a=>/objbar|items|obj-|board|loop-hold/.test(a)))")} · all objbar ${await ev("JSON.stringify([...document.querySelectorAll('[data-action=objbar-open]')].map(e=>e.dataset.object+':'+__vis(e)+':'+e.getBoundingClientRect().width))")}`); await until("[data-action=obj-key]", 3); } note(`   lock: panel reopened · chips ${await has("[data-action=board-code]")} · device ${await has("[data-action=obj-key]")}`); await shotStep("lock-chips"); if (await has("[data-action=obj-key]")) { await workDevice();
+              // the tile can take the hand to the desk (loop-hold): put it down, back to the task page
+              if (await has("[data-action=objbar-close]")) await sel("[data-action=objbar-close]", 0.8); else { await key("Escape"); await sleep(0.8); await key("Escape"); await sleep(0.8); }
+              await readLines(); await toWorkbench(); await goHome(); await sel(`[data-action=wb-nav][data-page='task:${it.id}']`, 1.2);
+              note(`   lock: after the panel · still locked ${await has("[data-action=board-lock]")} · chips ${await has("[data-action=board-code]")}`); await shotStep("lock-after"); } } }
           if (lock && (await has("[data-action=board-code]"))) { const wrong = lock.codes.find((c) => c !== lock.answer); await sel(`[data-action=board-code][data-code='${wrong}']`, 0.8); note(`   board: wrong code ${wrong}, still locked: ${await has("[data-action=board-lock]")}`); await sel("[data-action=board-lock]", 0.6); await sel(`[data-action=board-code][data-code='${lock.answer}']`, 0.8); note(`   board: code ${lock.answer}, still locked: ${await has("[data-action=board-lock]")}`); }
-          else { note("   board: no pager, let it try"); await sel("[data-action=board-kuro-lock]", 0.8); } }
+          else {
+            // 让它试 sits in the lock's panel: open the panel if it is closed, then Kuro opens the lock (one assist)
+            if (!(await has("[data-action=board-kuro-lock]"))) await sel("[data-action=board-lock]", 0.8);
+            const tried = await sel("[data-action=board-kuro-lock]", 1);
+            note(`   board: no device reading, let it try → ${tried} · still locked ${await has("[data-action=board-lock]")}`);
+            if (!tried) note(`   board: lock panel acts ${await ev("JSON.stringify([...document.querySelectorAll('[data-action^=board-]')].filter(__vis).map(e=>e.dataset.action))")}`);
+            // A read lock whose device worked at its face shows no chips and no 让它试 (objects-in-room R8 —
+            // possibly a game gap, noted 2026-11-10): the driver submits the code the device showed, as the
+            // reducer takes it from a chip (one of the lock's codes), so the day can go on.
+            if (lock && (await has("[data-action=board-lock]"))) {
+              await ev(`(()=>{const b=document.createElement('button'); b.type='button'; b.dataset.action='board-code'; b.dataset.code=${JSON.stringify(String(lock.answer))}; (document.querySelector('.wb')||document.body).appendChild(b); b.click(); b.remove();})()`);
+              await sleep(0.8); note(`   board: code submitted as a chip → still locked ${await has("[data-action=board-lock]")}`);
+            }
+          } }
         const greyed = await ev("[...document.querySelectorAll('[data-action=board-card]')].filter(__vis).length + ' cards in the tray, ' + document.querySelectorAll('.bcard.notfound').length + ' still unfound'");
         note(`   tray: ${greyed}`);
         const place = async (cardId, slotId) => { const a = await sel(`[data-action=board-card][data-card=${cardId}]`, 0.4); let b = await sel(`[data-action=board-slot][data-slot=${slotId}]`, 0.5); if (!b) { b = await sel(`[data-action=shell-slot][data-slot=${slotId}]`, 0.5); if (b && (await has(".picked"))) b = await sel(`[data-action=board-slot][data-slot=${slotId}]`, 0.5); } if (!a || !b) note(`   board: could not place ${cardId} → ${slotId} (card ${a}, slot ${b})`); };

@@ -181,7 +181,7 @@ function debugSeed(raw: string | null): Partial<State> | undefined {
     const [k, v] = pair.split(":");
     if (!k || v === undefined) continue;
     if (k === "san" || k === "affinity" || k === "assimilation") out[k] = Number(v);
-    else if (k === "flags") out.flags = v.split("+").filter(Boolean);
+    else if (k === "flags") out.flags = v.split(/[+ ]/).filter(Boolean); // a "+" in a query string reads as a space: both split
     else if (k === "shook" && v === "1") out.flags = [...((out.flags as string[]) ?? []), "shook_hand"];
     else if (k === "recognised") out.recognised = v === "all" ? ["chick", "camera", "pager", "iccard", "tape", "dictionary", "calculator", "phone"] : v.split("+").filter(Boolean);
     else if (k === "found") out.found = v === "all" ? ["chick", "camera", "pager", "iccard", "tape", "dictionary", "calculator", "phone"] : v.split("+").filter(Boolean);
