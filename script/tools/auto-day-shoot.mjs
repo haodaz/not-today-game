@@ -164,10 +164,55 @@ const toTingTalk = async () => { await toRoom(); await sel("[data-action=view][d
   return await has("[data-action=conv]"); };
 const goHome = async () => { if (!(await has("[data-action=wb-nav][data-page=home]"))) await sel("[data-action=wb-sidebar]", 0.6); return sel("[data-action=wb-nav][data-page=home]", 1); };
 const wbOpen = async () => (await has("[data-action=wb-nav]")) || (await has("[data-action=wb-sidebar]"));
-const toWorkbench = async () => { await toDesktop(); await readLines(); if (await has("[data-action=files-close]")) await sel("[data-action=files-close]", 0.6);
-  if (!(await wbOpen())) { if (!(await sel("[data-action=dock][data-app=workbench]", 2))) await click(S("wb.title"), 2); await readLines(); }
-  // 工作台 can be on the other monitor (a page opened on the right moved the focus): look there, then back.
-  for (const side of ["right", "left"]) { if (await wbOpen()) break; await readLines(); await sel(`[data-action=screen][data-screen=${side}]`, 1.2); await readLines(); if (!(await has("[data-action=wb-nav]"))) { await sel("[data-action=dock][data-app=workbench]", 1.5); await readLines(); } }
+// The day's box: lift it, take the loose one, read the recognise lines (the right option), back to the room.
+const openBox = async () => {
+  await toRoom(); await sel("[data-action=pick-box]", 1.2); const ok = await sel("[data-action=case-pick].loose", 2.5); if (!ok) note(`   case: no loose box · ${await ev("JSON.stringify([...document.querySelectorAll('[data-action=case-pick]')].map(e=>e.dataset.slot+':'+e.className))")}`);
+  const right = boxObject?.options?.find((o) => o.right)?.t ?? null; await settle(right); await key("Escape"); await settle(right); await toRoom(); return ok;
+};
+// guidance R1: at a guided moment the one thing to do carries the ring (data-guide="on"); follow it
+// (a card → its page, a conversation row → the card, a dock tile → the app) until there is no ring.
+const followRing = async (max = 6) => {
+  for (let i = 0; i < max; i++) {
+    await readLines();
+    const tag = await ev("(()=>{const e=[...document.querySelectorAll('[data-guide=\"on\"]')].find(__vis); return e ? (e.dataset.action||e.tagName)+':'+(e.dataset.doc||e.dataset.conv||e.dataset.app||e.dataset.view||'') : null})()");
+    if (!tag) return i > 0;
+    note(`   (following the ring: ${tag})`);
+    await ev("__sel('[data-guide=\"on\"]')"); await sleep(1.5); await readLines();
+    if (tag.startsWith("open-deliverable")) { await shotStep("deliverable"); await key("Escape"); await sleep(0.8); await readLines(); return true; }
+  }
+  return true;
+};
+const toWorkbench = async () => {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await toDesktop(); await readLines(); if (await has("[data-action=files-close]")) await sel("[data-action=files-close]", 0.6);
+    if (!(await wbOpen())) { const dk = await sel("[data-action=dock][data-app=workbench]", 2); if (!dk) await click(S("wb.title"), 2); if (!(await wbOpen())) { const line = await text();
+        // G5: Vivi's page first (「Vivi 在群里发了个网页，先点开看一眼。」): the refusal names it; open her card(s), then try again.
+        if (line.includes(S("vivi.lock"))) { note("   (Vivi's page first: following the ring to her card)"); await readLines(); if (!(await followRing())) await interrupts(); await readLines(); continue; }
+        note(`   (dock workbench ${dk}: still no 工作台 · screen ${await has("[data-action=screen]")} · line: ${line.slice(0, 200)}`); await shotStep("wb-missing"); } await readLines(); }
+    // 工作台 can be on the other monitor (a page opened on the right moved the focus): look there, then back.
+    for (const side of ["right", "left"]) { if (await wbOpen()) break; await readLines(); await sel(`[data-action=screen][data-screen=${side}]`, 1.2); await readLines(); if (!(await has("[data-action=wb-nav]"))) { await sel("[data-action=dock][data-app=workbench]", 1.5); await readLines(); } }
+    if (await wbOpen()) return;
+    // The checklist shows only its current line on the screen: step back into the room to read the whole list.
+    await readLines(); await toRoom(); const tx = await text();
+    // The meal's arrival (the lunch lands at 12:02) pulls the camera to the door, and while 去拿 is listed
+    // the guidance refuses the workbench: fetch it from wherever the driver stands, eat at the table
+    // (the table holds the camera until then), then try again.
+    const picks = file.items.filter((x) => x.done === "event:pickup:lunch" || x.done === "event:pickup:dinner").map((x) => x.text);
+    const listed = picks.some((t) => tx.includes(t));
+    if ((await has("[data-action=loop-door]")) || listed) {
+      note(`   (the meal is waiting (${listed ? "去拿 listed" : "at the door"}): fetching it before the workbench)`);
+      await readLines(); await toRoom();
+      if (!(await has("[data-action=loop-door]"))) await sel("[data-action=view][data-view=door]", 2.5);
+      let steps = 0; while (steps < 6 && (await sel("[data-action=loop-door]", 2))) { steps++; await settle(); }
+      await settle();
+      if (await has("[data-action=loop-eat]")) { note("   (ate at the table first)"); await sel("[data-action=loop-eat]", 2); await settle(); }
+      await toRoom(); if (steps > 0 || listed) continue;
+    }
+    // The box is the lit target (day 1 after lunch: 拆开看看): open it, then try again.
+    const boxItem = file.items.find((x) => x.done === "event:openBox");
+    if (boxItem && tx.includes(boxItem.text) && (await has("[data-action=pick-box]"))) { note("   (the box is the lit target: opening it before the workbench)"); await openBox(); continue; }
+    break;
+  }
   if (!(await wbOpen())) note(`   (工作台 not found: stage=${await ev("document.querySelector('.stage')?.className")} acts=${await ev("JSON.stringify([...new Set([...document.querySelectorAll('[data-action]')].filter(__vis).map(e=>e.dataset.action+':'+(e.dataset.app||e.dataset.screen||'')))])")} line=${(await text()).slice(0, 60)})`);
 };
 const lastEvents = () => ev(`(()=>{ const t = localStorage.getItem('nt_run') || ''; return (t.match(/"kind":"[a-zA-Z]+"(,"[a-zA-Z]+":"[^"]*")?/g) || []).slice(-4).join(' ').replace(/"kind":/g,''); })()`);
@@ -383,10 +428,7 @@ for (const it of ITEMS) {
       if (!ok) note(`   eat: no table · face=${await ev("(document.querySelector('.stage.room')?.className.match(/(\\w+)-view/) || [])[1] || ''")} · ${(await text()).slice(0, 120)}`);
       await settle(); await toRoom();
     }
-    else if (it.done === "event:openBox") {
-      await toRoom(); await sel("[data-action=pick-box]", 1.2); ok = await sel("[data-action=case-pick].loose", 2.5); if (!ok) note(`   case: no loose box · ${await ev("JSON.stringify([...document.querySelectorAll('[data-action=case-pick]')].map(e=>e.dataset.slot+':'+e.className))")}`);
-      const right = boxObject?.options?.find((o) => o.right)?.t ?? null; await settle(right); await key("Escape"); await settle(right); await toRoom();
-    }
+    else if (it.done === "event:openBox") { ok = await openBox(); }
     else if (it.done === "event:reply:boss") {
       await toTingTalk(); ok = await sel("[data-action=conv][data-conv=boss]", 1.5);
       const picked = await sel("[data-action=chip][data-word=received]", 1) || await sel("[data-action=chip][data-word=fine]", 1); const sent = await sel("[data-action=send]", 2);
@@ -437,6 +479,7 @@ for (const it of ITEMS) {
   const t = await text();
   const count = (tt) => { const m = /已做 (\d+) 件|(\d+) done/.exec(tt); return m ? Number(m[1] ?? m[2]) : -1; };
   const after = count(t); const done = it.done === "event:chat:any" || after > before || !t.includes(it.text);
+  if (!ok && done && kind === "event" && !/order|lieDown|reply|boot/.test(it.done)) { note("   (done earlier, out of order)"); ok = true; }
   // A task can tick itself (day 17 「把东西放回去」): cleared without the driver is still cleared.
   if (!ok && before >= 0 && after > before && it.done !== "event:lieDown") { note("   (cleared by itself)"); ok = true; }
   results.push({ id: it.id, ok, done });
