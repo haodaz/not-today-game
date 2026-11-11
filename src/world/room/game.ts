@@ -85,6 +85,7 @@ import { openObjectFromBar, renderObjectBarUse } from "@world/desktop/workbench/
 import { filesActions, openFilesApp } from "@world/desktop/files/actions";
 import { callActions, resumeCall } from "@world/desktop/call/actions";
 import { deliverableOnOpen, deliverablePage } from "@state/files";
+import { launchLayer, workLayer } from "@world/desktop/workbench/compare";
 import { viviLock, viviLockHeld, lockedConversation } from "@world/desktop/vivi";
 import { appOfThread } from "@world/desktop/messages/threads";
 import { cancelCloser, startCloser } from "@world/late/closer";
@@ -130,7 +131,7 @@ function renderGameBody(store: Store, session: Session, nowMs: number): SafeHtml
     // screen (the pet in the monitor is the one); R5 (2026-11-08): the checklist's current line in
     // the top bar, not a card over the window (the window fills the frame; a card hid 听听's list).
     const lc = loopContext(state, events);
-    return html`${renderDesktop({ ...shell, nextItem: lc ? nextItemText(checklist(lc)) : null })}${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${host}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${dlgLayer(dlg, session, readsOn, !maskInModal)}<div class="hud-host">${itemsButton(session, state)}${itemsPanel(state, events, session)}${settingsPanel(session)}</div>`;
+    return html`${renderDesktop({ ...shell, nextItem: lc ? nextItemText(checklist(lc)) : null })}${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${host}${launchLayer(state, session)}${workLayer({ state, events, session, nowMs })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${dlgLayer(dlg, session, readsOn, !maskInModal)}<div class="hud-host">${itemsButton(session, state)}${itemsPanel(state, events, session)}${settingsPanel(session)}</div>`;
   }
   // The box does not jump (dialogue correction 2026-11-02): in every view it is anchored to the
   // viewport in the same fixed layer, not to the stage (whose size differs between views). The
@@ -1278,8 +1279,20 @@ export const loopActions: Record<string, ActionHandler> = {
   "task-launch"(ctx, data) {
     const id = data.task;
     if (!id) return;
-    ctx.session.launched.add(`${ctx.store.getState().day}:${id}`);
+    const key = `${ctx.store.getState().day}:${id}`;
+    ctx.session.launched.add(key);
     ctx.session.launchShow = null;
+    ctx.session.workShow = key;
+    ctx.rerender();
+  },
+  // work (author 2026-11-11 night): the full-screen work page hidden (回到工作台) and brought back (打开工作页).
+  "work-hide"(ctx) {
+    ctx.session.workShow = null;
+    ctx.rerender();
+  },
+  "work-show"(ctx, data) {
+    if (!data.task) return;
+    ctx.session.workShow = `${ctx.store.getState().day}:${data.task}`;
     ctx.rerender();
   },
   // 道具 (day-loop correction 2026-11-01): the strip as a panel over the current view.

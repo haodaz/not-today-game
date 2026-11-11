@@ -1142,15 +1142,35 @@ span.cmp-face-btn{cursor:default}
 .cmp-verdict.pass{color:#2F9E5C}
 .cmp-verdict.fail{color:#C2410C}
 .cmp-note{margin:0;font-size:12px;color:var(--ink-2)}
-/* launch (author 2026-11-11): a task's opening page — Kuro and the counterpart, the note, the call, 开始工作. */
-.main.task.shell.launch{display:flex;align-items:center;justify-content:center;padding:24px}
-.task-launch{display:grid;grid-template-columns:220px 1fr;gap:28px;align-items:center;max-width:760px;width:100%;padding:28px 32px;border:1px solid #E5E5E5;border-radius:16px;background:#FFFFFF;box-shadow:0 10px 30px rgba(0,0,0,.06)}
-.tl-figures{position:relative;height:220px}
-.tl-kuro{position:absolute;left:0;bottom:0;width:140px;height:140px;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,.18))}
-.tl-who{position:absolute;right:0;top:0;width:150px;height:190px;object-fit:cover;object-position:50% 10%;border-radius:12px;background:#F1EDE6}
-.tl-body{display:flex;flex-direction:column;gap:8px}
-.tl-title{margin:0 0 4px;font-size:18px;font-weight:600;color:#1F1F1F}
-.tl-note{margin:0;font-size:14px;line-height:1.6;color:#3B3B3B}
-.tl-call{margin:8px 0 4px;font-size:14px;line-height:1.6;color:#C2410C;font-weight:600}
-.tl-cta{align-self:flex-start;padding:10px 22px;border:0;border-radius:10px;background:#2F6FEB;color:#FFFFFF;font:inherit;font-size:14px;font-weight:600;cursor:pointer}
-.tl-cta:hover{background:#2559C9}
+/* launch (author 2026-11-11): a task's opening page — like the title page's card, not a web UI (author:
+   「可以和登录页面选任务的卡片底色差不多，别做的特别像个网页」): the workbench dimmed behind, a paper card with
+   the game's blur and shadow, outlined lettered button, the two figures as on the character select. */
+.launch-layer{position:absolute;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(10,10,11,.6)}
+.task-launch{display:grid;grid-template-columns:240px 1fr;gap:30px;align-items:center;max-width:780px;width:100%;box-sizing:border-box;padding:30px 36px 30px;background:rgba(236,231,222,.92);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.6);border-radius:8px;box-shadow:0 18px 50px rgba(0,0,0,.45);color:#1d2129;animation:m-fade-up 240ms cubic-bezier(.2,.8,.2,1) both}
+.tl-figures{position:relative;height:230px}
+.tl-who{position:absolute;right:0;top:0;width:170px;height:214px;object-fit:cover;object-position:50% 10%;border:1px solid rgba(29,33,41,.25);background:#f1ede6;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.tl-kuro{position:absolute;left:-6px;bottom:-6px;width:132px;height:132px;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,.3))}
+.tl-body{display:flex;flex-direction:column;gap:10px}
+.tl-title{margin:0 0 6px;font-size:20px;font-weight:500;letter-spacing:.08em}
+.tl-note{margin:0;font-size:16px;line-height:1.7}
+.tl-call{margin:10px 0 6px;font-size:16px;line-height:1.7;color:#b3362a;font-weight:600}
+.tl-cta{align-self:flex-start;width:240px;padding:11px 0;text-align:center;border:2px solid rgba(29,33,41,.75);border-radius:0;background:transparent;color:#1d2129;font:inherit;font-size:17px;letter-spacing:.3em;text-indent:.3em;cursor:pointer;transition:background 160ms,color 160ms}
+.tl-cta:hover{background:#1d2129;color:#efe9df}
+/* work (author 2026-11-11 night): the day's work page over the whole stage, like the launch card. */
+.work-layer{position:absolute;inset:0;z-index:40;display:flex;align-items:stretch;justify-content:center;padding:28px 40px;background:rgba(10,10,11,.6)}
+.work-stage{display:flex;flex-direction:column;width:100%;max-width:1520px;box-sizing:border-box;background:rgba(236,231,222,.94);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.6);border-radius:8px;box-shadow:0 18px 50px rgba(0,0,0,.45);color:#1d2129;overflow:hidden;animation:m-fade-up 240ms cubic-bezier(.2,.8,.2,1) both}
+.wl-head{display:flex;align-items:center;gap:12px;padding:14px 22px;border-bottom:1px solid rgba(29,33,41,.15)}
+.wl-title{font-size:18px;letter-spacing:.08em}
+.wl-head .sp{flex:1}
+.wl-back{padding:6px 14px;border:1.5px solid rgba(29,33,41,.6);background:transparent;color:#1d2129;font:inherit;font-size:13px;letter-spacing:.15em;cursor:pointer}
+.wl-back:hover{background:#1d2129;color:#efe9df}
+.wl-body{display:grid;grid-template-columns:minmax(460px,1fr) minmax(520px,1.1fr);gap:18px;padding:16px 22px;flex:1;min-height:0}
+.wl-left{min-width:0;overflow:auto}
+.wl-left .cmp{padding:0}
+.wl-right{display:flex;min-height:0}
+.wl-preview{flex:1;border:1px solid rgba(29,33,41,.2);background:#fff;overflow:hidden}
+.wl-preview .ide-frame{width:100%;height:100%;border:0;display:block}
+.wl-foot{display:flex;justify-content:flex-end;padding:12px 22px 16px;border-top:1px solid rgba(29,33,41,.15)}
+.wl-cta{width:260px;padding:11px 0;text-align:center;border:2px solid rgba(29,33,41,.75);background:transparent;color:#1d2129;font:inherit;font-size:17px;letter-spacing:.3em;text-indent:.3em;cursor:pointer;transition:background 160ms,color 160ms}
+.wl-cta:hover:not(:disabled){background:#1d2129;color:#efe9df}
+.wl-cta:disabled{opacity:.4;cursor:default}

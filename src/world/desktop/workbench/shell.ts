@@ -25,7 +25,6 @@ import { moveApp, otherSide } from "../placement";
 import { messageActions } from "../messages/actions";
 import { renderObjectBar } from "./objbar";
 import { comparePane } from "./compare";
-import { npcPortrait, speakerLabel } from "@world/npc";
 import { doneWorkItems, modeChips, openWork, plainSurface, questionText, surfaceOf as workSurfaceOf, workItems, workSendChip } from "./work";
 
 type Fill = (s: string) => string;
@@ -409,9 +408,12 @@ function conversation(ctx: AppContext, task: Task, day: number, live: boolean, f
       const keep = offer.length && hasString("board.tune.keep") ? html`<button type="button" class="sh-chip" data-action="board-keep">${tr("board.tune.keep")}</button>` : null;
       chips = html`${offer}${keep}`;
     } else if (board.compare) {
-      // compare: no 让它补全 (Kuro's rewrite is offered in the pane, at the settlement); the hand-in alone.
-      const finish = html`<button type="button" class="sh-chip primary" data-action="board-print"${canPrint(board, s) ? null : html` disabled`}>${finishLabel(task)}</button>`;
-      chips = html`${finish}`;
+      // compare: the work runs on the full-screen work page; here only the way back to it (and the
+      // hand-in once it is allowed). No 让它补全: Kuro's rewrite is offered there, at the settlement.
+      const key = `${day}:${task.id}`;
+      const show = session.launched.has(key) && session.workShow !== key && hasString("work.show") ? html`<button type="button" class="sh-chip primary" data-action="work-show" data-task="${task.id}">${tr("work.show")}</button>` : null;
+      const finish = html`<button type="button" class="sh-chip" data-action="board-print"${canPrint(board, s) ? null : html` disabled`}>${finishLabel(task)}</button>`;
+      chips = html`${show}${finish}`;
     } else {
       const label = board.view === "ide" && hasString("board.ide.snapshot") ? tr("board.ide.snapshot") : finishLabel(task);
       const finish = html`<button type="button" class="sh-chip primary" data-action="board-print"${canPrint(board, s) ? null : html` disabled`}>${label}</button>`;
@@ -452,15 +454,6 @@ export function renderShell(ctx: AppContext, task: Task, day: number, fill: Fill
   const app = !board && live && WORK_KEY[task.app] ? html`<button type="button" class="btn" data-action="wb-nav" data-page="${task.app}">${tr(WORK_KEY[task.app]!)}</button>` : null;
   const title = html`<span class="tt-name">${fill(task.title)}</span><small class="tt-sub">${who ? html`${who} · ` : null}${status}</small>`;
   const tools = html`${app}<div class="sh-toggles">${explorerToggle}${toggles}</div>${renderObjectBar(ctx)}`;
-  // launch (author 2026-11-11): a live task whose opening page was not passed yet shows it alone:
-  // Kuro's figure and the counterpart's, the note, the call line, the button. 「有这么一个任务起始页面，
-  // 切分真实感的工作界面和游戏体感」.
-  if (live && task.launch && session.launchShow === `${day}:${task.id}` && !session.launched.has(`${day}:${task.id}`)) {
-    const l = task.launch;
-    const who = npcPortrait(l.who);
-    const main = html`<div class="${cls("main", "task", "shell", "launch")}" data-task="${task.id}"><section class="task-launch"><div class="tl-figures"><img class="tl-kuro" src="${frameUrl(FRAMES.idle[0])}" alt="">${who ? html`<img class="tl-who" src="${who}" alt="${speakerLabel(l.who, fill)}">` : null}</div><div class="tl-body"><h2 class="tl-title">${fill(task.title)}</h2>${l.note.map((n) => html`<p class="tl-note">${fill(n)}</p>`)}<p class="tl-call">${fill(l.call)}</p><button type="button" class="tl-cta" data-action="task-launch" data-task="${task.id}">${fill(l.cta)}</button></div></section></div>`;
-    return { main, title, tools: html`${renderObjectBar(ctx)}` };
-  }
   // The frame (R1): the explorer card, the conversation, the pane cards.
   const ex = board && live && st.explorer ? explorer(ctx, task, board, s!, st, selected) : null;
   const carried = board ? tuneCarried(board, events) : {};

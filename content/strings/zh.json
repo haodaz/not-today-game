@@ -708,5 +708,7 @@
   "board.ide.cmpRedone": "改好了。五页，他都会笑。你少了一点自己。",
   "task.launch.ask": "要开始工作吗？",
   "task.launch.go": "开始",
-  "task.launch.must": "只能开始了"
+  "task.launch.must": "只能开始了",
+  "work.back": "回到工作台",
+  "work.show": "打开工作页"
 }

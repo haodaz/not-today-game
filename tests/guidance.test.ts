@@ -233,12 +233,13 @@ describe("G7 · a board task's page (2026-11-08)", () => {
     r.act("loop-choice", { choice: "must" });
     expect(r.session.workbenchPage).toBe(`task:${task.id}`);
     const out = r.out();
-    expect(out).toContain('<section class="task-launch">');
+    // over the whole stage, not inside the monitor (author 2026-11-11 night)
+    expect(out).toContain('<div class="launch-layer"><section class="task-launch"');
     expect(out).toContain(task.launch!.call);
     expect(out).toMatch(new RegExp(`data-action="task-launch" data-task="${task.id}"[^>]*>${task.launch!.cta}</button>`));
-    expect(out).not.toContain("compare-pick");
     // the second time the row needs no ask
     r.act("task-launch", { task: task.id });
+    expect(r.out()).not.toContain("launch-layer");
     expect(r.out()).toContain("compare-pick");
     r.act("wb-nav", { page: "home" });
     r.act("wb-nav", { page: `task:${task.id}` });

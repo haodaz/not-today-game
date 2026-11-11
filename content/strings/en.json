@@ -708,5 +708,7 @@
   "board.ide.cmpRedone": "Done. Five pages, he will smile at every one. A little less of you in it.",
   "task.launch.ask": "Shall we start work?",
   "task.launch.go": "Start",
-  "task.launch.must": "No choice but to start"
+  "task.launch.must": "No choice but to start",
+  "work.back": "Back to the workbench",
+  "work.show": "Open the work page"
 }

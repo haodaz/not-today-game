@@ -4,11 +4,65 @@
 // and coloured), the two versions of the page side by side as buttons, 克总你定, the row of his faces
 // (one per page: pleased / not pleased / not yet), and at the end the settlement: the satisfaction
 // and either 发给老王 or 让克总重新改一稿. Pure views; the actions are the board's (board.ts).
-import { comparePending, compareRight, compareScore, type BoardState } from "@state/days/board";
+import { boardState, canPrint, comparePending, compareRight, compareScore, taskForId, tuneCarried, type BoardState } from "@state/days/board";
+import { ideOps, ideSrc, selectedSlot } from "@state/days/ide";
+import type { GameEvent } from "@state/events";
 import type { ComparePage, Task, TaskBoard } from "@state/days/tasks";
+import type { State } from "@state/types.gen";
+import { npcPortrait, speakerLabel } from "@world/npc";
+import { fillPlaceholders } from "@world/replies/placeholders";
+import { FRAMES, frameUrl } from "../kuro/body";
+import type { Session } from "../model";
 import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t, tr } from "@world/i18n";
-import { cardText } from "./board";
+import { cardText, finishLabel } from "./board";
+import { openWork } from "./work";
+
+/**
+ * launch (author 2026-11-11): the task's opening page over the whole stage, not inside the monitor
+ * (「是最大区域，别再套在一个显示器里面了」): the workbench dimmed behind, a paper card like the title page's —
+ * Kuro's figure and the counterpart's, the task's note, the call line, 开始工作. Up while
+ * `session.launchShow` names today's task page (entered through 工作台's row) and the screen is shown.
+ */
+export function launchLayer(state: State, session: Pick<Session, "launchShow" | "launched" | "view">): SafeHtml | null {
+  if (session.view !== "desktop" || session.launchShow === null) return null;
+  const [dayText, taskId] = session.launchShow.split(":");
+  const day = Number(dayText);
+  if (day !== state.day || !taskId || session.launched.has(session.launchShow)) return null;
+  const task = taskForId(day, taskId);
+  const l = task?.launch;
+  if (!task || !l) return null;
+  const fill = (s: string) => fillPlaceholders(s, state.names);
+  const who = npcPortrait(l.who);
+  return html`<div class="launch-layer"><section class="task-launch" role="dialog" aria-modal="true" aria-labelledby="tl-title"><div class="tl-figures"><img class="tl-kuro" src="${frameUrl(FRAMES.idle[0])}" alt="">${who ? html`<img class="tl-who" src="${who}" alt="${speakerLabel(l.who, fill)}">` : null}</div><div class="tl-body"><h2 class="tl-title" id="tl-title">${fill(task.title)}</h2>${l.note.map((n) => html`<p class="tl-note">${fill(n)}</p>`)}<p class="tl-call">${fill(l.call)}</p><button type="button" class="tl-cta" data-action="task-launch" data-task="${task.id}">${fill(l.cta)}</button></div></section></div>`;
+}
+
+/**
+ * work (author 2026-11-11 night): the day's work page over the whole stage (「这个游戏占了多大，工作交互区域
+ * 就多大」): the decisions on the left (the compare pane), the rendered page on the right (the deck, held
+ * while Kuro renders), the hand-in button, and 回到工作台 to look at the real workbench underneath. Up
+ * while `session.workShow` names today's live board task (set by 开始工作); gone once the task is done.
+ */
+export function workLayer(ctx: { readonly state: State; readonly events: readonly GameEvent[]; readonly session: Session; readonly nowMs: number }): SafeHtml | null {
+  const { state, events, session, nowMs } = ctx;
+  if (session.view !== "desktop" || session.workShow === null) return null;
+  const [dayText, taskId] = session.workShow.split(":");
+  if (Number(dayText) !== state.day || !taskId) return null;
+  const open = openWork(state, events);
+  const task = open?.tree?.id === taskId ? open.tree : undefined;
+  const board = task?.board;
+  if (!task || !board?.compare || state.flags.includes(task.done)) return null;
+  const s = boardState(board, state.day, taskId, events);
+  const ops = ideOps(task, state.day, events);
+  const key = `${state.day}:${taskId}`;
+  const hold = session.ideHold && session.ideHold.key === key && session.ideHold.until > nowMs ? session.ideHold.src : null;
+  const st = session.shell[key];
+  const src = hold ?? ideSrc(board, s, ops, selectedSlot(board, ops, st?.slot ?? null, st?.slotAt ?? 0), tuneCarried(board, events));
+  const fill = (x: string) => fillPlaceholders(x, state.names);
+  const finish = html`<button type="button" class="wl-cta" data-action="board-print"${canPrint(board, s) ? null : html` disabled`}>${finishLabel(task)}</button>`;
+  const back = hasString("work.back") ? html`<button type="button" class="wl-back" data-action="work-hide">${tr("work.back")}</button>` : null;
+  return html`<div class="work-layer"><section class="work-stage" role="dialog" aria-modal="true" aria-label="${fill(task.title)}"><header class="wl-head"><span class="wl-title">${fill(task.title)}</span><span class="sp"></span>${back}</header><div class="wl-body"><div class="wl-left">${comparePane(task, board, s, true, hold !== null, st?.slot ?? null)}</div><div class="wl-right"><div class="wl-preview"><iframe class="ide-frame" data-keep="ide" src="${src}" title="${fill(task.title)}" sandbox="allow-scripts"></iframe></div></div></div><footer class="wl-foot">${finish}</footer></section></div>`;
+}
 
 /** 老王's faces (SVG, drawn in code: author 2026-11-11 「画个卡通的高兴生气就行」) and his portrait. */
 export const BOSS_FACES = { happy: "/npc/boss_happy.svg", pout: "/npc/boss_pout.svg" } as const;
