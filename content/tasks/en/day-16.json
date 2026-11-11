@@ -199,6 +199,15 @@
         "flawed": -3,
         "wrong": -6,
         "wrongAt": 2
+      },
+      "launch": {
+        "who": "boss",
+        "note": [
+          "The chairman doesn't read material; a sound is enough. Don't stop.",
+          "Opening, middle, beat, ending: the voice notes are in the boss's and the group's chats, the flute in the files."
+        ],
+        "call": "The table is locked: the flute at the end of last night's recording, its beat on the walkman. Lay out the sound!",
+        "cta": "Start work"
       }
     },
     {

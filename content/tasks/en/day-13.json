@@ -232,6 +232,15 @@
         "flawed": -3,
         "wrong": -6,
         "wrongAt": 2
+      },
+      "launch": {
+        "who": "laozhou",
+        "note": [
+          "Lao Zhou wants a loan approval; don't ask why.",
+          "Book, page, first line, second line, date: everything to fill is in that scan."
+        ],
+        "call": "The table is locked: the Latin line in the scan, looked up on the dictionary. See the approval through!",
+        "cta": "Start work"
       }
     },
     {

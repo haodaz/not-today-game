@@ -448,6 +448,15 @@
         "flawed": -3,
         "wrong": -6,
         "wrongAt": 2
+      },
+      "launch": {
+        "who": "boss",
+        "note": [
+          "Tomorrow's meeting: seats to arrange, four in the circle and a triangle.",
+          "Who sits where is all in the meeting record."
+        ],
+        "call": "Count the cells on the screenshot one by one, and send everyone the script!",
+        "cta": "Start work"
       }
     }
   ]

@@ -204,6 +204,15 @@
         "flawed": -3,
         "wrong": -6,
         "wrongAt": 2
+      },
+      "launch": {
+        "who": "boss",
+        "note": [
+          "The boss wants 'consciousness' written in.",
+          "The material is scattered through the boss's, the group's and Lao Zhou's chats, one sentence at a time."
+        ],
+        "call": "The table is locked: the code is on the pager. Find all four cells and fill them in!",
+        "cta": "Start work"
       }
     },
     {

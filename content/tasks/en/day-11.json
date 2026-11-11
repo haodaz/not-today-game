@@ -219,6 +219,15 @@
         "flawed": -3,
         "wrong": -6,
         "wrongAt": 2
+      },
+      "launch": {
+        "who": "partner",
+        "note": [
+          "Vivi wants costs cut: the cost sheet balanced, to her before you leave.",
+          "The prices are in Lao Zhou's chat and that old menu; the oil and wine columns the boss said not to touch."
+        ],
+        "call": "The table is locked: how many litres of wheat and of barley one coin buys, both into the calculator, which only lights facing the window. Balance the sheet!",
+        "cta": "Start work"
       }
     },
     {

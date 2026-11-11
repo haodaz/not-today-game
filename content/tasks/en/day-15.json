@@ -321,6 +321,15 @@
         "flawed": -3,
         "wrong": -6,
         "wrongAt": 2
+      },
+      "launch": {
+        "who": "partner",
+        "note": [
+          "The launch this afternoon: three slides to arrange, the audience's reactions to watch live.",
+          "The material is in the meeting record; the audience screenshots are in the files."
+        ],
+        "call": "The table is locked: of the twelve faces only four are the originals; work out how many were swapped on the calculator, which only lights facing the window. Arrange the deck!",
+        "cta": "Start work"
       }
     },
     {

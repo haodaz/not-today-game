@@ -199,6 +199,15 @@
         "flawed": -3,
         "wrong": -6,
         "wrongAt": 2
+      },
+      "launch": {
+        "who": "boss",
+        "note": [
+          "The boss says nobody sleeps this week; you draw up the shift table.",
+          "Four slots: 22 to 2, 2 to 4, 4 to 6, and a row called ΥΠΝΟΣ."
+        ],
+        "call": "The names are in the boss's and the group's chats, one line in the contacts; the key is in last night's sleep-talk recording, backwards. Fill the table!",
+        "cta": "Start work"
       }
     },
     {

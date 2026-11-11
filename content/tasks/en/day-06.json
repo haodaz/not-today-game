@@ -228,6 +228,15 @@
         "flawed": -3,
         "wrong": -6,
         "wrongAt": 2
+      },
+      "launch": {
+        "who": "boss",
+        "note": [
+          "The entity page, for the client: what it is, where it came from, how old, what it wants, us.",
+          "The material is in the boss's and the group's chats."
+        ],
+        "call": "The table is locked: the key is in last night's recording, played backwards. Fill all five cells!",
+        "cta": "Start work"
       }
     },
     {

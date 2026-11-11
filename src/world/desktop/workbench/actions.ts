@@ -173,6 +173,8 @@ export const workbenchActions: Record<string, ActionHandler> = {
       }
       ctx.session.workbenchPage = page;
       ctx.session.wbTaskDay = day < state.day ? day : null;
+      // launch: entered through the row today, not passed yet: the opening page is up.
+      ctx.session.launchShow = day === state.day && task.launch && !ctx.session.launched.has(`${day}:${taskId}`) ? `${day}:${taskId}` : null;
       visit(ctx.session, page, ctx.session.wbTaskDay);
       closeMenus(ctx.session);
       // meeting R3: the first open of a meeting task today starts it playing by itself.

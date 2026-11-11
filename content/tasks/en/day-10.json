@@ -208,6 +208,15 @@
         "flawed": -3,
         "wrong": -6,
         "wrongAt": 2
+      },
+      "launch": {
+        "who": "laozhou",
+        "note": [
+          "Lao Zhou wants act two proofread: fix the typos, don't read too closely.",
+          "Against the script and the scan of that book, one word at a time."
+        ],
+        "call": "The table is locked: the key is in last night's recording, played backwards. Don't read whole lines; fix and hand in!",
+        "cta": "Start work"
       }
     },
     {

@@ -254,7 +254,11 @@ describe("G7 · a board task's page (2026-11-08)", () => {
     const task = taskByFlag(1, "task_merge_done")!;
     const cmp = task.board!.compare!;
     const r = rig(store);
-    r.session.workbenchPage = `task:${task.id}`;
+    r.session.leftApp = "workbench";
+    r.session.workbenchPage = "home";
+    r.act("wb-nav", { page: `task:${task.id}` });
+    r.act("loop-choice", { choice: "go" });
+    expect(r.session.workbenchPage).toBe(`task:${task.id}`);
     // launch: the opening page's button is lit first; pressed, the pages.
     expect(guideNow(store.getState(), store.getEvents(), r.session)).toMatchObject({ id: "G7", target: { kind: "board", step: "launch" } });
     expect(r.out()).toMatch(/data-action="task-launch"[^>]*data-guide="on"/);

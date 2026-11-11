@@ -201,6 +201,15 @@
         "flawed": -3,
         "wrong": -6,
         "wrongAt": 2
+      },
+      "launch": {
+        "who": "boss",
+        "note": [
+          "The team-building schedule: each leader's toast time.",
+          "The rank table is in the files; the ranks on it are not the company's."
+        ],
+        "call": "The times are locked: work out sunset yourself; the calculator only lights by the window. Schedule every leader!",
+        "cta": "Start work"
       }
     },
     {

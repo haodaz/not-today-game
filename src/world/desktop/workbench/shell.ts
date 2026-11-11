@@ -455,7 +455,7 @@ export function renderShell(ctx: AppContext, task: Task, day: number, fill: Fill
   // launch (author 2026-11-11): a live task whose opening page was not passed yet shows it alone:
   // Kuro's figure and the counterpart's, the note, the call line, the button. 「有这么一个任务起始页面，
   // 切分真实感的工作界面和游戏体感」.
-  if (live && task.launch && !session.launched.has(`${day}:${task.id}`)) {
+  if (live && task.launch && session.launchShow === `${day}:${task.id}` && !session.launched.has(`${day}:${task.id}`)) {
     const l = task.launch;
     const who = npcPortrait(l.who);
     const main = html`<div class="${cls("main", "task", "shell", "launch")}" data-task="${task.id}"><section class="task-launch"><div class="tl-figures"><img class="tl-kuro" src="${frameUrl(FRAMES.idle[0])}" alt="">${who ? html`<img class="tl-who" src="${who}" alt="${speakerLabel(l.who, fill)}">` : null}</div><div class="tl-body"><h2 class="tl-title">${fill(task.title)}</h2>${l.note.map((n) => html`<p class="tl-note">${fill(n)}</p>`)}<p class="tl-call">${fill(l.call)}</p><button type="button" class="tl-cta" data-action="task-launch" data-task="${task.id}">${fill(l.cta)}</button></div></section></div>`;

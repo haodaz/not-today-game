@@ -206,6 +206,15 @@
         "flawed": -3,
         "wrong": -6,
         "wrongAt": 2
+      },
+      "launch": {
+        "who": "partner",
+        "note": [
+          "Vivi wants the 'avatar' page: the name, what it can do, it and you, the boundary.",
+          "The material is in her PRD, her private chat, the group, and v17."
+        ],
+        "call": "The table is locked: the four digits are in Vivi's private chat. Piece together the page she wants!",
+        "cta": "Start work"
       }
     },
     {

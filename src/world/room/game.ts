@@ -1279,6 +1279,7 @@ export const loopActions: Record<string, ActionHandler> = {
     const id = data.task;
     if (!id) return;
     ctx.session.launched.add(`${ctx.store.getState().day}:${id}`);
+    ctx.session.launchShow = null;
     ctx.rerender();
   },
   // 道具 (day-loop correction 2026-11-01): the strip as a panel over the current view.

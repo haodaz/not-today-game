@@ -203,6 +203,15 @@
         "flawed": -3,
         "wrong": -6,
         "wrongAt": 2
+      },
+      "launch": {
+        "who": "boss",
+        "note": [
+          "A thousand new hires; the onboarding has to run.",
+          "The ones who talk, the ones humming in the recording, the ones the pet cries at on sight, and the name column."
+        ],
+        "call": "The list is in the roster; listen to the welcome recording too; there is a number in last night's recording. Get the new hires through!",
+        "cta": "Start work"
       }
     },
     {

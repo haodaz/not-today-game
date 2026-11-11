@@ -77,7 +77,7 @@ export function guideNow(state: State, events: readonly GameEvent[], session: Se
   if (desktop && open?.tree && board && taskPageId(session.workbenchPage) === open.tree.id) {
     const s = boardState(board, day, open.tree.id, events);
     // launch (author 2026-11-11): the opening page's button first.
-    if (open.tree.launch && !session.launched.has(`${day}:${open.tree.id}`)) return { id: "G7", target: { kind: "board", step: "launch" }, refuse: null, scope: "none" };
+    if (open.tree.launch && session.launchShow === `${day}:${open.tree.id}` && !session.launched.has(`${day}:${open.tree.id}`)) return { id: "G7", target: { kind: "board", step: "launch" }, refuse: null, scope: "none" };
     // tune (2026-11-08): the bars are free exploration — only the very first switch is lit (the first
     // module that can be found), and 今天先这样 once the budget is spent or the line is reached.
     if (board.tune) {

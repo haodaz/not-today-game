@@ -370,6 +370,8 @@ export interface Session {
   shell: Record<string, ShellState>;
   /** launch (author 2026-11-11): the task pages whose opening page was passed this session (`<day>:<taskId>`). */
   launched: Set<string>;
+  /** launch: the task page entered through 工作台's row whose opening page is up now (`<day>:<taskId>`), or null. */
+  launchShow: string | null;
   /**
    * object-bar 2026-11-03: an old object opened from the 老物件栏 is being used over the desktop
    * (its drawn device in a modal). It is the same `holding` + `hand.using` the room uses; this flag
@@ -553,6 +555,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     meetingPlay: null,
     shell: {},
     launched: new Set(),
+    launchShow: null,
     objbarOpen: false,
     call: null,
   };
