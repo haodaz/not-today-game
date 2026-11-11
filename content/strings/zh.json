@@ -705,5 +705,8 @@
   "board.ide.cmpPass": "够 {pct}%。打快照，发给他。",
   "board.ide.cmpFail": "不到 {pct}%。他不会收。要么你改，要么我改。",
   "board.ide.cmpRedo": "克总，你按他的意思改一稿。",
-  "board.ide.cmpRedone": "改好了。五页，他都会笑。你少了一点自己。"
+  "board.ide.cmpRedone": "改好了。五页，他都会笑。你少了一点自己。",
+  "task.launch.ask": "要开始工作吗？",
+  "task.launch.go": "开始",
+  "task.launch.must": "只能开始了"
 }

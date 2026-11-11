@@ -594,6 +594,15 @@
         "flawed": -2,
         "wrong": -5,
         "wrongAt": 2
+      },
+      "launch": {
+        "who": "boss",
+        "note": [
+          "What the boss said is far too vague: a riddler through and through.",
+          "Maybe some things he said before can help?"
+        ],
+        "call": "Use the boss's riddle-like feedback to find the answer that satisfies him (though he never says it)!",
+        "cta": "Start work"
       }
     }
   ]

@@ -30,7 +30,7 @@ export type GuideTarget =
   | { readonly kind: "phone" }
   | { readonly kind: "task"; readonly id: string }
   /** G7 (2026-11-08): a board task's page: the lock, the first card in the tray, an empty slot once a card is picked, 打快照 when full. */
-  | { readonly kind: "board"; readonly step: "lock" | "merge" | "card" | "slot" | "fetch" | "print" | "mod" | "offer"; readonly slot?: string };
+  | { readonly kind: "board"; readonly step: "lock" | "merge" | "card" | "slot" | "fetch" | "print" | "mod" | "offer" | "launch"; readonly slot?: string };
 
 /**
  * What the wrapper refuses while the guide is on: everything that is not the target or allowed
@@ -76,6 +76,8 @@ export function guideNow(state: State, events: readonly GameEvent[], session: Se
   const board = open?.tree?.board;
   if (desktop && open?.tree && board && taskPageId(session.workbenchPage) === open.tree.id) {
     const s = boardState(board, day, open.tree.id, events);
+    // launch (author 2026-11-11): the opening page's button first.
+    if (open.tree.launch && !session.launched.has(`${day}:${open.tree.id}`)) return { id: "G7", target: { kind: "board", step: "launch" }, refuse: null, scope: "none" };
     // tune (2026-11-08): the bars are free exploration — only the very first switch is lit (the first
     // module that can be found), and 今天先这样 once the budget is spent or the line is reached.
     if (board.tune) {
@@ -200,7 +202,7 @@ export function onTarget(target: GuideTarget, action: string, data: Readonly<Rec
       return action === "wb-nav" && data.page === `task:${target.id}`;
     case "board":
       // G7 never refuses; its target is the board's own controls.
-      return action === "board-lock" || action === "board-mod" || action === "board-keep" || action === "board-merge" || action === "board-fetch" || action === "board-option" || action === "board-card" || action === "board-slot" || action === "shell-slot" || action === "board-print";
+      return action === "task-launch" || action === "compare-pick" || action === "compare-kuro" || action === "compare-redo" || action === "board-lock" || action === "board-mod" || action === "board-keep" || action === "board-merge" || action === "board-fetch" || action === "board-option" || action === "board-card" || action === "board-slot" || action === "shell-slot" || action === "board-print";
   }
 }
 
@@ -272,8 +274,9 @@ export function withRing(markup: string, g: Guide | null): string {
 }
 
 /** G7's anchors; a "!" pair excludes tags containing its value (an empty slot is the one without "filled"). */
-function boardAnchors(step: "lock" | "merge" | "card" | "slot" | "fetch" | "print" | "mod" | "offer", slot?: string): readonly (readonly (readonly [string, string])[])[] {
+function boardAnchors(step: "lock" | "merge" | "card" | "slot" | "fetch" | "print" | "mod" | "offer" | "launch", slot?: string): readonly (readonly (readonly [string, string])[])[] {
   if (step === "lock") return [[["data-action", "board-lock"]]];
+  if (step === "launch") return [[["data-action", "task-launch"]]];
   // tune: Kuro's offer: its chips (the composer's primary chip, then 不接)
   if (step === "offer") return [[["class", "sh-chip primary"], ["data-action", "board-mod"]], [["data-action", "board-keep"]]];
   // tune: the first module's switch (`slot` carries the module id).

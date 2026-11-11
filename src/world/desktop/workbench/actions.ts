@@ -1,6 +1,8 @@
 // 工作台's own clicks: moving between its pages. The task pages (workspace 2026-11-04) are
 // `task:<taskId>`; opening one today logs `open task:<id>` once (the session list reads it).
 // shell R10: the one top bar's sidebar toggle, ← → (the pages visited this session), the title's ▾.
+import { push } from "@world/loop/dialogue";
+import { hasString, t } from "@world/i18n";
 import type { ActionContext, ActionHandler } from "../controller";
 import { kuroActions, openStarters, playerBox, starterPages } from "@world/dialogue/kuro";
 import { taskPageId, type Session, type WorkbenchPage } from "../model";
@@ -145,6 +147,16 @@ export const workbenchActions: Record<string, ActionHandler> = {
       if (!Number.isInteger(day) || day < 1 || day > state.day) return;
       const task = taskForId(day, taskId);
       if (!task) return;
+      // launch (author 2026-11-11): today's task under way, its opening page not passed yet: Kuro asks
+      // 要开始工作吗？ first (the answer comes back here with `data.launch`); the page itself then opens
+      // on its launch card.
+      if (day === state.day && task.launch && data.launch !== "1" && !ctx.session.launched.has(`${day}:${taskId}`) && openWork(state, events)?.tree?.id === taskId && hasString("task.launch.ask")) {
+        if (!ctx.session.dialogue.queue.some((q) => q.ending.kind === "workAsk")) {
+          ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${day}:launch:${taskId}:ask`, lines: [{ k: "speaker", who: "kuro", t: t("task.launch.ask") }], ending: { kind: "workAsk", taskId } });
+        }
+        ctx.rerender();
+        return;
+      }
       let first = false;
       if (day < state.day) {
         // 最近: an earlier day's task, read-only; only one that was opened that day.

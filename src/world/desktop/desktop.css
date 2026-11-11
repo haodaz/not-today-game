@@ -1142,3 +1142,15 @@ span.cmp-face-btn{cursor:default}
 .cmp-verdict.pass{color:#2F9E5C}
 .cmp-verdict.fail{color:#C2410C}
 .cmp-note{margin:0;font-size:12px;color:var(--ink-2)}
+/* launch (author 2026-11-11): a task's opening page — Kuro and the counterpart, the note, the call, 开始工作. */
+.main.task.shell.launch{display:flex;align-items:center;justify-content:center;padding:24px}
+.task-launch{display:grid;grid-template-columns:220px 1fr;gap:28px;align-items:center;max-width:760px;width:100%;padding:28px 32px;border:1px solid #E5E5E5;border-radius:16px;background:#FFFFFF;box-shadow:0 10px 30px rgba(0,0,0,.06)}
+.tl-figures{position:relative;height:220px}
+.tl-kuro{position:absolute;left:0;bottom:0;width:140px;height:140px;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,.18))}
+.tl-who{position:absolute;right:0;top:0;width:150px;height:190px;object-fit:cover;object-position:50% 10%;border-radius:12px;background:#F1EDE6}
+.tl-body{display:flex;flex-direction:column;gap:8px}
+.tl-title{margin:0 0 4px;font-size:18px;font-weight:600;color:#1F1F1F}
+.tl-note{margin:0;font-size:14px;line-height:1.6;color:#3B3B3B}
+.tl-call{margin:8px 0 4px;font-size:14px;line-height:1.6;color:#C2410C;font-weight:600}
+.tl-cta{align-self:flex-start;padding:10px 22px;border:0;border-radius:10px;background:#2F6FEB;color:#FFFFFF;font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.tl-cta:hover{background:#2559C9}

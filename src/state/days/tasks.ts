@@ -324,6 +324,18 @@ export interface TaskDeliverable {
    */
   readonly to?: DeliverableTo;
 }
+/**
+ * launch (author 2026-11-11): a task's opening page, between the real-looking workbench and the game's
+ * own interaction: Kuro's figure and the counterpart's (`who`: an npc id), a few lines of the task's
+ * note, the call line right before the button (「用老王谜语一般的反馈，找到让他满意（但是他不明说）的答案吧！」),
+ * and the button's label (开始工作).
+ */
+export interface TaskLaunch {
+  readonly who: string;
+  readonly note: readonly string[];
+  readonly call: string;
+  readonly cta: string;
+}
 export interface TaskJudge {
   readonly perfect: number;
   readonly flawed: number;
@@ -353,6 +365,8 @@ export interface Task {
   readonly board?: TaskBoard;
   readonly deliverable?: TaskDeliverable;
   readonly judge?: TaskJudge;
+  /** launch (author 2026-11-11): the task's opening page (board tasks). */
+  readonly launch?: TaskLaunch;
 }
 
 type Raw = Record<string, unknown>;
@@ -994,6 +1008,14 @@ function judge(v: unknown, w: string): TaskJudge {
   return { perfect: delta(v.perfect, "perfect"), flawed: delta(v.flawed, "flawed"), wrong: delta(v.wrong, "wrong"), wrongAt };
 }
 
+/** launch (author 2026-11-11): who stands beside Kuro, the note lines, the call line, the button. */
+function launch(v: unknown, w: string): TaskLaunch {
+  if (!isRecord(v)) fail(w, "must be an object");
+  keys(v, ["who", "note", "call", "cta"], w);
+  if (!Array.isArray(v.note) || v.note.length === 0 || !v.note.every((x) => typeof x === "string" && x !== "")) fail(`${w}.note`, "must be a non-empty list of strings");
+  return { who: str(v.who, `${w}.who`), note: v.note as string[], call: str(v.call, `${w}.call`), cta: str(v.cta, `${w}.cta`) };
+}
+
 /** Inert empty placeholders for a board task's unused reply tree (work v2). */
 const EMPTY_PATH: TaskPath = { say: [], kuro: [], effects: {} };
 
@@ -1013,12 +1035,13 @@ function boardTask(v: Raw, w: string): Task {
     board: board(v.board, `${w}.board`),
     ...(v.deliverable !== undefined ? { deliverable: deliverable(v.deliverable, `${w}.deliverable`) } : {}),
     ...(v.judge !== undefined ? { judge: judge(v.judge, `${w}.judge`) } : {}),
+    ...(v.launch !== undefined ? { launch: launch(v.launch, `${w}.launch`) } : {}),
   };
 }
 
 function task(v: unknown, w: string): Task {
   if (!isRecord(v)) fail(w, "a task must be an object");
-  keys(v, ["id", "title", "app", "done", "start", ...PATHS, "doc", "ledger", "code", "board", "deliverable", "judge"], w);
+  keys(v, ["id", "title", "app", "done", "start", ...PATHS, "doc", "ledger", "code", "board", "deliverable", "judge", "launch"], w);
   // Work v2: a board task carries a board (and usually a deliverable + judge); its three-path tree
   // is optional and unused. A task without a board keeps the old required tree.
   if (v.board !== undefined) return boardTask(v, w);
@@ -1141,7 +1164,9 @@ function localiseTask(zh: Task, en: Task, w: string): Task {
     // compare (author 2026-11-11): the pages, their cards, the threshold and the bubble counts are shared; only the text differs.
     const compareShape = (b: TaskBoard) => (b.compare ? { threshold: b.compare.threshold, pages: b.compare.pages.map((p) => [p.slot, p.left, p.right, p.bubbles.length, Object.keys(p.remark).sort()]) } : null);
     if (!sameJson(compareShape(zh.board), compareShape(en.board))) fail(`${w}.board.compare`, "compare shape differs from the Chinese");
-    return bilingualValues(zh, { title: en.title, board: en.board, ...(zh.deliverable && en.deliverable ? { deliverable: en.deliverable } : {}) });
+    // launch: the counterpart is shared; the lines are the twin's.
+    if (!!zh.launch !== !!en.launch || (zh.launch && en.launch && (zh.launch.who !== en.launch.who || zh.launch.note.length !== en.launch.note.length))) fail(`${w}.launch`, "launch shape differs from the Chinese");
+    return bilingualValues(zh, { title: en.title, board: en.board, ...(zh.deliverable && en.deliverable ? { deliverable: en.deliverable } : {}), ...(zh.launch && en.launch ? { launch: en.launch } : {}) });
   }
   if (zh.start.say.length !== en.start.say.length || !sameJson(zh.start.options, en.start.options)) fail(`${w}.start`, "start shape differs from the Chinese");
   const start = { say: zh.start.say.map((z, i) => bilingual(z, { t: en.start.say[i]!.t })), options: zh.start.options };

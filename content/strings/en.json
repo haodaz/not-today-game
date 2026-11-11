@@ -705,5 +705,8 @@
   "board.ide.cmpPass": "{pct}% or more. Take the snapshot and send it to him.",
   "board.ide.cmpFail": "Under {pct}%. He won't take it. Either you change it, or I do.",
   "board.ide.cmpRedo": "Kuro, redo a draft his way.",
-  "board.ide.cmpRedone": "Done. Five pages, he will smile at every one. A little less of you in it."
+  "board.ide.cmpRedone": "Done. Five pages, he will smile at every one. A little less of you in it.",
+  "task.launch.ask": "Shall we start work?",
+  "task.launch.go": "Start",
+  "task.launch.must": "No choice but to start"
 }

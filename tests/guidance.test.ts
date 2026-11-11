@@ -216,6 +216,36 @@ describe("the box owns the screen (2026-11-08)", () => {
 });
 
 describe("G7 · a board task's page (2026-11-08)", () => {
+  it("launch (author 2026-11-11): the row click asks 要开始工作吗？; 开始 / 只能开始了 open the task on its launch card; 开始工作 shows the work", () => {
+    const store = booted();
+    step(store, "openApp:msgs");
+    open(store, "conv:boss");
+    completeUntil(store, "task3");
+    const task = taskByFlag(1, "task_merge_done")!;
+    expect(task.launch?.who).toBe("boss");
+    const r = rig(store);
+    r.session.leftApp = "workbench";
+    r.session.workbenchPage = "home";
+    r.act("wb-nav", { page: `task:${task.id}` });
+    expect(r.session.workbenchPage).toBe("home");
+    expect(r.session.dialogue.queue[0]?.ending).toEqual({ kind: "workAsk", taskId: task.id });
+    expect(r.session.dialogue.queue[0]?.lines[0]?.t).toBe(t("task.launch.ask"));
+    r.act("loop-choice", { choice: "must" });
+    expect(r.session.workbenchPage).toBe(`task:${task.id}`);
+    const out = r.out();
+    expect(out).toContain('<section class="task-launch">');
+    expect(out).toContain(task.launch!.call);
+    expect(out).toMatch(new RegExp(`data-action="task-launch" data-task="${task.id}"[^>]*>${task.launch!.cta}</button>`));
+    expect(out).not.toContain("compare-pick");
+    // the second time the row needs no ask
+    r.act("task-launch", { task: task.id });
+    expect(r.out()).toContain("compare-pick");
+    r.act("wb-nav", { page: "home" });
+    r.act("wb-nav", { page: `task:${task.id}` });
+    expect(r.session.workbenchPage).toBe(`task:${task.id}`);
+    expect(r.session.dialogue.queue.some((q) => q.ending.kind === "workAsk")).toBe(false);
+  });
+
   it("compare (author 2026-11-11): the page's version buttons are lit page by page; every page picked and the boss content, 发给老王; nothing is refused", () => {
     const store = booted();
     step(store, "openApp:msgs");
@@ -225,6 +255,10 @@ describe("G7 · a board task's page (2026-11-08)", () => {
     const cmp = task.board!.compare!;
     const r = rig(store);
     r.session.workbenchPage = `task:${task.id}`;
+    // launch: the opening page's button is lit first; pressed, the pages.
+    expect(guideNow(store.getState(), store.getEvents(), r.session)).toMatchObject({ id: "G7", target: { kind: "board", step: "launch" } });
+    expect(r.out()).toMatch(/data-action="task-launch"[^>]*data-guide="on"/);
+    r.act("task-launch", { task: task.id });
     const g0 = guideNow(store.getState(), store.getEvents(), r.session)!;
     expect(g0).toMatchObject({ id: "G7", target: { kind: "board", step: "card", slot: cmp.pages[0]!.slot }, refuse: null, scope: "none" });
     expect(guideRefuses(g0, "dock", { app: "msgs" })).toBe(false);

@@ -1176,6 +1176,16 @@ export const loopActions: Record<string, ActionHandler> = {
       ctx.rerender();
       return;
     }
+    // launch (author 2026-11-11): 开始 / 只能开始了 both open the task page (on its launch card).
+    if (q.ending.kind === "workAsk") {
+      if (data.choice !== "go" && data.choice !== "must") return;
+      const taskId = q.ending.taskId;
+      ctx.session.dialogue = finishChoice(ctx.session.dialogue);
+      settleSession(ctx.session);
+      workbenchActions["wb-nav"]!(ctx, { page: `task:${taskId}`, launch: "1" } as DOMStringMap, null as never);
+      ctx.rerender();
+      return;
+    }
     // author 2026-11-11: 吃 eats the meal on the table; 再等等 leaves it there.
     if (q.ending.kind === "eatAsk") {
       if (data.choice !== "eat" && data.choice !== "wait") return;
@@ -1264,6 +1274,13 @@ export const loopActions: Record<string, ActionHandler> = {
     if (settleSession(ctx.session)) ctx.rerender();
   },
 
+  // launch (author 2026-11-11): 开始工作 on the task's opening page: the page's real work shows.
+  "task-launch"(ctx, data) {
+    const id = data.task;
+    if (!id) return;
+    ctx.session.launched.add(`${ctx.store.getState().day}:${id}`);
+    ctx.rerender();
+  },
   // 道具 (day-loop correction 2026-11-01): the strip as a panel over the current view.
   "items-toggle"(ctx) {
     ctx.session.itemsOpen = !ctx.session.itemsOpen;
