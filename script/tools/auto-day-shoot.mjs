@@ -119,6 +119,8 @@ const inRoom = async () => (await has("[data-action=view][data-view=desk]")) && 
 const toRoom = async () => { if (await has("[data-action=onboard-skip]")) await sel("[data-action=onboard-skip]", 0.6);
   for (let i = 0; i < 8; i++) {
     if (await inRoom()) return true;
+    // box-arrival: the case left open at 窗 blocks the turn: close it first (author 2026-11-11 run)
+    if (await has("[data-action=case-close]")) { await sel("[data-action=case-close]", 0.8); continue; }
     await key(" ");
     if (await has("[data-action=view][data-view=room]")) await sel("[data-action=view][data-view=room]", 2.2);
     else { const face = await ev("(document.querySelector('.stage.room')?.className.match(/(\\w+)-view/) || [])[1] || ''");
@@ -153,6 +155,12 @@ const pickupIfDue = async () => {
 const readLines = async () => { for (let n = 0; n < 10 && (await has("[data-action=loop-advance]")); n++) { await ev("__sel('[data-action=loop-advance]')"); await sleep(0.45); } };
 const toDesktop = async () => { for (let n = 0; n < 8 && (await has("[data-action=loop-advance]")); n++) { await ev("__sel('[data-action=loop-advance]')"); await sleep(0.5); } await toRoom(); await sel("[data-action=view][data-view=desktop][data-screen=left]", 2);
   if (!(await has("[data-action=screen]")) && (await pickupIfDue())) await sel("[data-action=view][data-view=desktop][data-screen=left]", 2);
+  // author 2026-11-11: a delivery pulled the camera to 门 (the doorbell's tail) and the door asks 拿进来吗？: take it, then the screen
+  if (!(await has("[data-action=screen]")) && /door-view/.test((await ev("document.querySelector('.stage')?.className")) || "")) {
+    note("   (at the door with a delivery: taking it in before the screen)");
+    await settle(); let steps = 0; while (steps < 6 && (await sel("[data-action=loop-door]", 2))) { steps++; await settle(); }
+    await settle(); await toRoom(); await sel("[data-action=view][data-view=desktop][data-screen=left]", 2);
+  }
   if (!(await has("[data-action=screen]"))) { note(`   (screen not entered: stage=${await ev("document.querySelector('.stage')?.className")} acts=${await ev("JSON.stringify([...new Set([...document.querySelectorAll('[data-action]')].filter(__vis).map(e=>e.dataset.action+':'+(e.dataset.view||'')))])")} · ${(await text()).slice(0, 100)}`); await shotStep("screen-refused"); }
   if (await has("[data-action=onboard-skip]")) { note("   (coach marks: skipped)"); await sel("[data-action=onboard-skip]", 0.6); } };
 const toTingTalk = async () => { await toRoom(); await sel("[data-action=view][data-view=desktop][data-screen=right]", 2); if (await has("[data-action=onboard-skip]")) await sel("[data-action=onboard-skip]", 0.6);
@@ -205,7 +213,7 @@ const toWorkbench = async () => {
       if (!(await has("[data-action=loop-door]"))) await sel("[data-action=view][data-view=door]", 2.5);
       let steps = 0; while (steps < 6 && (await sel("[data-action=loop-door]", 2))) { steps++; await settle(); }
       await settle();
-      if (await has("[data-action=loop-eat]")) { note("   (ate at the table first)"); await sel("[data-action=loop-eat]", 2); await settle(); }
+      if (await has("[data-action=loop-eat]")) { note("   (ate at the table first)"); await sel("[data-action=loop-eat]", 2); if (await has("[data-action=loop-eat]")) await sel("[data-action=loop-eat]", 1.5); await settle(); }
       await toRoom(); if (steps > 0 || listed) continue;
     }
     // The box is the lit target (day 1 after lunch: 拆开看看): open it, then try again.
@@ -293,6 +301,7 @@ for (const it of ITEMS) {
       for (let k = 0; k < 2 && (await has("[data-action=open-deliverable]")) && !(await has(`[data-action=wb-nav][data-page='task:${it.id}']`)); k++) { note(`   vivi lock: opening her pages first · docs ${await ev("JSON.stringify([...document.querySelectorAll('[data-action=open-deliverable]')].filter(__vis).map(e=>e.dataset.doc))")}`); await interrupts(); await toWorkbench(); await goHome(); }
       if (process.env.DIAG) note(`   probe: lock=${(await text()).includes(S("vivi.lock"))} deliv=${await has("[data-action=open-deliverable]")} taskLink=${await has(`[data-action=wb-nav][data-page='task:${it.id}']`)} pages=${await ev("JSON.stringify([...document.querySelectorAll('[data-action=wb-nav]')].filter(__vis).map(e=>e.dataset.page))")} opens=${await ev("(localStorage.getItem('nt_run')||'').match(/file:[a-z0-9-]+|task:[a-z0-9]+/g)?.join(',')")}`);
       await sel(`[data-action=wb-nav][data-page='task:${it.id}']`, 1.2);   // workspace: a task lives on its own page (在办 card / session list)
+      if ((await ev("JSON.stringify(__choices())").then(JSON.parse)).length) { await shotStep(`ask-${it.id}`); await settle(); await sleep(1); }  // launch: 要开始工作吗？ → 开始
       if (board?.tune) {
         // tune (2026-11-08): a module's source first (a conv), then one path per module (the first open chip each
         // turn, Kuro speaks between), the end-of-work offer declined (不接), then 提交.
@@ -314,7 +323,9 @@ for (const it of ITEMS) {
         ok = await sel("[data-action=board-print]:not([disabled])", 1.5); note(`   board: printed ${ok}`);
         await settle(); await toRoom();
       } else
-      if ((await has("[data-action=board-slot]")) || (await has("[data-action=shell-slot]"))) {
+      if ((await has("[data-action=task-launch]")) || (await has("[data-action=compare-pick]")) || (await has("[data-action=board-slot]")) || (await has("[data-action=shell-slot]"))) {
+        // launch (author 2026-11-11): the task's opening page first (Kuro's ask was answered by settle on the row click)
+        if (await has("[data-action=task-launch]")) { await shotStep(`launch-${it.id}`); await sel("[data-action=task-launch]", 1.2); note("   launch: 开始工作"); }
         // A board task (work v2): the lock, the cards into the slots, print. BOARD=assist lets Kuro fill the rest.
         await shotStep(`board-${it.id}`);
         const lock = board?.given?.lock ?? null;
@@ -380,7 +391,16 @@ for (const it of ITEMS) {
         const slots = board?.slots ?? [];
         // ide v2 (2026-11-08): a page per slot — open its file, take the right option chip, keep v17's line
         // where the page differs from v16; then 拉最新数据 once, then 打快照.
-        const ide = board?.view === "ide" && (await has("[data-action=shell-slot]"));
+        // compare (author 2026-11-11): 猜老板的言外之意 — one page at a time, the boss's taste is the slot's answer
+        const compare = board?.compare && (await has("[data-action=compare-pick]"));
+        const ide = !compare && board?.view === "ide" && (await has("[data-action=shell-slot]"));
+        if (compare) {
+          for (const sl of slots) {
+            const pick = process.env.BOARD === "assist" ? await sel(`[data-action=compare-kuro][data-slot=${sl.id}]`, 1.6) : await sel(`[data-action=compare-pick][data-slot=${sl.id}][data-card=${sl.answer}]`, 1.6);
+            note(`   compare ${sl.id}: picked ${pick}`); await shotStep(`compare-${sl.id}`);
+          }
+          if (await has("[data-action=compare-redo]")) { await sel("[data-action=compare-redo]", 1.6); note("   compare: redo by Kuro"); }
+        } else
         if (ide && process.env.BOARD !== "assist") {
           for (const sl of slots) {
             const f = await sel(`[data-action=shell-slot][data-slot=${sl.id}]`, 0.6);
@@ -425,6 +445,8 @@ for (const it of ITEMS) {
       await settle(); await toRoom();
       ok = await sel("[data-action=loop-eat]", 2);
       if (!ok) { await key("ArrowLeft"); await sleep(1.4); ok = await sel("[data-action=loop-eat]", 2); }
+      // author 2026-11-11: from 窗 the click walks up to the table; there a second click asks 现在吃吗？ (settle answers 吃)
+      if (ok && (await has("[data-action=loop-eat]"))) await sel("[data-action=loop-eat]", 1.5);
       if (!ok) note(`   eat: no table · face=${await ev("(document.querySelector('.stage.room')?.className.match(/(\\w+)-view/) || [])[1] || ''")} · ${(await text()).slice(0, 120)}`);
       await settle(); await toRoom();
     }
