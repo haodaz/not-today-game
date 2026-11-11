@@ -78,13 +78,22 @@ function wake(ctx: ActionContext, lc: LoopContext): void {
   settleSession(session);
 }
 
+/** author 2026-11-11: the object's description (content `q`), read before the question is asked; null without recognise.ask. */
+export function lookQueued(day: number, object: string): Queued | null {
+  const entry = recogniseTable.get(object);
+  if (!entry || !hasString("recognise.ask")) return null;
+  return { key: `d${day}:recognise:${object}:look`, lines: [{ k: "narration", t: entry.q }], ending: { kind: "none" } };
+}
+
 /** "Do you know what this is?": the question line, then the options in this run's order (recognise FR1). */
 export function questionQueued(day: number, object: string, runId: string): Queued | null {
   const entry = recogniseTable.get(object);
   if (!entry) return null;
   return {
     key: `d${day}:recognise:${object}`,
-    lines: [{ k: "narration", t: entry.q }],
+    // author 2026-11-11: the question line on its own (the options under it); the description is
+    // `lookQueued`, said just before it.
+    lines: [{ k: "narration", t: hasString("recognise.ask") ? t("recognise.ask") : entry.q }],
     ending: { kind: "recognise", object, order: optionOrder(runId, object) },
   };
 }
@@ -163,6 +172,12 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
     if (e.kind === "pickup" && day === ARRIVAL_DAY && file.beats.box && events.find((x) => x.kind === "pickup" && x.day === day) === e) {
       dialogue = push(dialogue, beatQueued(day, "box", file.beats.box, { kind: "openCase" }));
     }
+    // author 2026-11-11: the arrival day's desk beat (「你把它放在两块屏之间…」) is said on the first
+    // return to the desk after the object is lifted from the case (its lines carry `where: desk`),
+    // not in the evening: the thing is already there.
+    if (e.kind === "openLayer" && day === ARRIVAL_DAY && file.beats.desk && events.find((x) => x.kind === "openLayer" && x.day === day) === e) {
+      dialogue = push(dialogue, beatQueued(day, "desk", file.beats.desk));
+    }
     if (e.kind === "step") {
       if (e.name === "boot") {
         clock = { ...DEFAULT_CLOCK };
@@ -172,7 +187,9 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
         clock = at(clock, "work");
       } else if (e.name === "beat:desk") {
         clock = at(clock, "desk", BEAT_TIMES.desk);
-        if (file.beats.desk) dialogue = push(dialogue, beatQueued(day, "desk", file.beats.desk));
+        // author 2026-11-11: the arrival day's desk lines (the chick in the gap) were queued at the
+        // first lift (below), not here.
+        if (file.beats.desk && !(day === ARRIVAL_DAY && events.some((x) => x.kind === "openLayer" && x.day === day))) dialogue = push(dialogue, beatQueued(day, "desk", file.beats.desk));
       } else if (e.name.startsWith("delivery:arrives:")) {
         // 手机上显示「已送达」 is a line in the box (2026-11-02), only when the bag is really at the door.
         const meal = e.name.slice("delivery:arrives:".length) as Meal;
@@ -213,6 +230,8 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
       // Right after the box beat: do you know what this is? (recognise FR1)
       const entry = recogniseTable.get(e.objectId);
       if (entry && entry.day === day && !knows(e.objectId, lc.state, events)) {
+        const look = lookQueued(day, e.objectId);
+        if (look) dialogue = push(dialogue, look);
         const q = questionQueued(day, e.objectId, runId);
         if (q) dialogue = push(dialogue, q);
       }

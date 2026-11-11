@@ -24,7 +24,7 @@ export type GuideTarget =
   | { readonly kind: "dock"; readonly app: "tingtalk" }
   | { readonly kind: "conv"; readonly id: "boss" }
   /** G3b (author 2026-11-08): the reply bar's chips in the boss's thread, until the day's reply is sent. */
-  | { readonly kind: "reply" }
+  | { readonly kind: "reply"; readonly chosen?: boolean }
   | { readonly kind: "card"; readonly doc: string; readonly conv: string | null }
   | { readonly kind: "clauses"; readonly indexes: readonly number[] }
   | { readonly kind: "phone" }
@@ -106,7 +106,8 @@ export function guideNow(state: State, events: readonly GameEvent[], session: Se
   const reply = lc.file.items.find((it) => it.required && it.done.kind === "event" && it.done.event.type === "reply" && it.done.event.recipient === "boss");
   if (desktop && reply && frontApp(session) === "tingtalk" && session.conversation === "boss") {
     const st = itemStates(lc).get(reply.id)!;
-    if (st.unlocked && !st.done) return { id: "G3b", target: { kind: "reply" }, refuse: null, scope: "none" };
+    // author 2026-11-11: a chip picked → the ring is on 发送 (the player did not know to press it).
+    if (st.unlocked && !st.done) return { id: "G3b", target: { kind: "reply", chosen: session.selected !== null }, refuse: null, scope: "none" };
   }
 
   // G2: the first desktop visit of the day, until 听听 has been opened (day 1 after the coach marks;
@@ -225,7 +226,7 @@ export function ringAnchors(target: GuideTarget): readonly (readonly (readonly [
     case "conv":
       return [[["data-action", "conv"], ["data-conv", target.id]]];
     case "reply":
-      return [[["data-action", "chip"], ["data-conv", "boss"]]];
+      return target.chosen ? [[["data-action", "send"], ["data-conv", "boss"]]] : [[["data-action", "chip"], ["data-conv", "boss"]]];
     case "card":
       // The card in front; else its conversation's row in 听听; else 听听's dock tile.
       return [

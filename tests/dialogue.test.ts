@@ -182,7 +182,7 @@ describe("FR2 talking to Kuro", () => {
     expect(box).toContain(`<div class="txt">${escapeHtml(t("kuro.ask"))}</div>`);
     expect(box).toContain(`data-choice="yes" data-focus="dc-0" data-n="1"><i class="dc-ic plain" aria-hidden="true">◇</i><span class="dc-l">${t("kuro.yes")}</span></button>`);
     expect(box).toContain(`data-choice="no" data-focus="dc-1" data-n="2"><i class="dc-ic plain" aria-hidden="true">◇</i><span class="dc-l">${t("kuro.notNow")}</span></button>`);
-    expect(room(ctx)).toContain('<div class="hud-kuro away"></div>');
+    expect(room(ctx)).toContain('<div class="hud-kuro talking">'); // author 2026-11-11: the corner keeps a still copy
     expect(box).toMatchSnapshot();
     act(ctx, "loop-choice", { index: "1", choice: "no" });
     expect(ctx.session.dialogue.queue).toEqual([]);

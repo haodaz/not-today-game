@@ -32,6 +32,7 @@ describe("day 3: the dinner waits for the night's work", () => {
     store.appendEvent({ kind: "task", flag: "task_d3_3", mode: "self", slots: { r1: "o1c", r2: "o2c", r3: "o3c", r4: "o4c", r5: "o5c", r6: "o6" }, assists: 0 });
     const r2 = rig(store, "table");
     r2.act("loop-eat", { meal: "dinner" });
+    r2.act("loop-choice", { choice: "eat" }); // author 2026-11-11: 现在吃吗？ first
     expect(store.getEvents().some((e) => e.kind === "step" && e.name === "eat:dinner")).toBe(true);
   });
 });

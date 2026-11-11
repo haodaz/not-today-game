@@ -3,6 +3,7 @@
 import { FREE } from "@state/replies/resolve";
 import { FAMILY, replyTable } from "@state/replies/table";
 import { defaults } from "@state/variables";
+import { hasString } from "@world/i18n";
 
 /** Every word an object can lend, from the variable table. */
 const objectWords: ReadonlySet<string> = new Set(
@@ -29,6 +30,9 @@ export const GONE_HINT_KEY = "reply.hint.gone";
 export function labelKey(recipient: string, word: string): string | null {
   if (word === FREE) return null;
   if (objectWords.has(word)) return `word.${word}`;
+  // author 2026-11-11: the same four words, but each person hears them in their own wording
+  // (`reply.<recipient>.<word>` in strings): 您定 to the boss, 都行，你定 to Vivi.
+  if (hasString(`reply.${recipient}.${word}`)) return `reply.${recipient}.${word}`;
   if (recipient === FAMILY && familyWords.has(word)) return `family.${word}`;
   return `reply.${word}`;
 }

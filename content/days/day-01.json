@@ -12,7 +12,8 @@
         {
           "k": "speaker",
           "who": "me",
-          "t": "这是克总，我的 AI。"
+          "t": "这是克总，我的 AI。",
+          "prop": "/room/props/kuro.png"
         },
         {
           "k": "speaker",
@@ -37,7 +38,8 @@
         {
           "k": "speaker",
           "who": "kuro",
-          "t": "所以你得自己起床。"
+          "t": "所以你得自己起床。",
+          "prop": ""
         },
         {
           "k": "speaker",
@@ -137,11 +139,13 @@
       "say": [
         {
           "k": "narration",
-          "t": "你把它放在两块屏之间，放进那条缝里。刚好卡住，不倒。"
+          "t": "你把它放在两块屏之间，放进那条缝里。刚好卡住，不倒。",
+          "where": "desk"
         },
         {
           "k": "inner",
-          "t": "旧得和这个房间不是一个年代的东西。"
+          "t": "旧得和这个房间不是一个年代的东西。",
+          "where": "desk"
         }
       ]
     },
@@ -304,7 +308,13 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "应收那边，甲方拖了一个月，把天数更一下。工资的事，再等等。",
+            "t": "应收那边，甲方拖了一个月。工资的事，再等等。",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "甲方只拖了一个月。工资可是十二个月没发了。",
             "where": "screen:msgs:boss"
           }
         ]
@@ -320,7 +330,7 @@
         "say": [
           {
             "k": "inner",
-            "t": "能回的话就那几句，像一张很小的表。"
+            "t": "工作了十多年，想说的话就那几句。"
           }
         ]
       },
@@ -391,15 +401,7 @@
       "text": "窗边饭桌，吃。",
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
-      "required": false,
-      "onDone": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "外卖单上多了一行备注：别放香菜。不是我写的。"
-          }
-        ]
-      }
+      "required": false
     },
     {
       "id": "box",
@@ -410,7 +412,7 @@
     },
     {
       "id": "task2",
-      "text": "应收表改一个数。",
+      "text": "应收表看一眼。",
       "unlock": "done:task1",
       "done": "flag:task_receivable_done",
       "required": true

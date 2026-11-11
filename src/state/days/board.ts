@@ -487,9 +487,9 @@ export function deliverableOnDesk(day: number, events: readonly GameEvent[]): De
   const d = taskByFlag(day, printed.flag)?.deliverable;
   if (!d) return null;
   const given = deliverableGiven(day, d.id, events);
-  // desk-prints R1: a person's deliverable, once sent on screen, also leaves its print on the desk
-  // (until the day ends); before it is sent, nothing is on the desk.
-  if ((d.to ?? "hand") !== "hand") return given ? { ...d, sent: true } : null;
+  // author 2026-11-11: a person's deliverable is sent on screen and leaves nothing on the desk
+  // (「桌子上出现了技术表达（事情 A）这很奇怪」); desk-prints R1's sent print is withdrawn.
+  if ((d.to ?? "hand") !== "hand") return null;
   return given ? null : d;
 }
 

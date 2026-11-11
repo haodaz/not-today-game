@@ -253,6 +253,8 @@ function replyBar(ctx: AppContext, conversation: string, register: Register): Sa
   else if (ownInput !== null) kbd = html`<div class="kbd" data-own-input>${fillPlaceholders(ownInput, state.names)}</div>`;
   else if (free) kbd = html`<div class="kbd"><input data-input="draft" data-focus="draft" placeholder="${t("msgs.input.free")}" value="${session.draft}"></div>`;
   const chosen = session.selected !== null && items.some((i) => i.word === session.selected && i.kind !== "free");
+  // author 2026-11-11: the picked word sits in the input box, as typed, so 发送 is the next thing.
+  if (kbd === null && chosen && !gone) kbd = html`<div class="kbd draft">${tr(labelKey(conversation, session.selected!)!)}</div>`;
   const canSend = !gone && (chosen || (free && session.draft.trim() !== ""));
   const inner = session.inner
     ? html`<div class="inner">${session.inner.text !== null ? fillPlaceholders(session.inner.text, state.names) : session.inner.key ? tr(session.inner.key) : null}</div>`

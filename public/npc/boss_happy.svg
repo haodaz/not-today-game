@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- 老王, pleased: a cartoon head after his portrait (short grey-black hair, black crew neck). -->
+  <circle cx="60" cy="62" r="56" fill="#f1ede6"/>
+  <path d="M22 118c4-20 18-30 38-30s34 10 38 30z" fill="#1d1d1f"/>
+  <ellipse cx="60" cy="60" rx="30" ry="34" fill="#f3d2b8"/>
+  <path d="M30 52c2-20 14-30 30-30s28 10 30 30c-6-10-14-14-30-14s-24 4-30 14z" fill="#3a3a3c"/>
+  <path d="M34 40c6-6 12-8 18-8" stroke="#8b8b90" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M40 58q8-8 16 0" stroke="#2b2b2e" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <path d="M64 58q8-8 16 0" stroke="#2b2b2e" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <path d="M42 48q6-4 12-1" stroke="#2b2b2e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M66 47q6-3 12 1" stroke="#2b2b2e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M44 72q16 16 32 0" stroke="#2b2b2e" stroke-width="3.5" fill="#fff" stroke-linejoin="round"/>
+  <circle cx="38" cy="70" r="5" fill="#f0a8a0" opacity=".7"/>
+  <circle cx="82" cy="70" r="5" fill="#f0a8a0" opacity=".7"/>
+</svg>

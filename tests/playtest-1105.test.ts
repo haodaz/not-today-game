@@ -258,8 +258,9 @@ describe("R5 · 窗's table, and its close view", () => {
     expect(edgeLeads("table", "back")).toBe(true);
     expect(edgeLeads("table", "left")).toBe(false);
     r.act("loop-eat", { meal: "lunch" });
+    r.act("loop-choice", { choice: "eat" }); // author 2026-11-11: 现在吃吗？ first; eaten, the box is gone
     expect(store.getEvents().filter((e) => e.kind === "step" && e.name === "eat:lunch")).toHaveLength(1);
-    expect(r.out()).toContain('<div class="slot meal done" data-meal="lunch">');
+    expect(r.out()).not.toContain("slot meal");
     expect(backTarget("table")).toBe("window");
     r.act("nav-back");
     expect(r.session.view).toBe("window");
@@ -296,7 +297,7 @@ describe("R6 · Kuro in the room: one box, and not only the idiom", () => {
     expect(out).toContain(escapeHtml(t("kuro.room.notYet")));
     expect(out).toContain("kuro-portrait");
     expect(out).not.toContain("data-choice");
-    expect(out).toContain('<div class="hud-kuro away"></div>');
+    expect(out).toContain('<div class="hud-kuro talking">'); // author 2026-11-11: the corner keeps a still copy
     r.act("loop-advance");
     expect(r.session.dialogue.queue).toEqual([]);
     expect(r.store.getEvents().some((e) => e.kind === "chat")).toBe(false);

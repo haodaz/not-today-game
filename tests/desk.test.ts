@@ -129,10 +129,13 @@ describe("the meal, the box and the slip", () => {
     const out = render(ctx);
     expect(placed(out, "meal")).toBe(rectStyle(WINDOW_SHOT.meal));
     expect(out).toMatch(/data-at="meal" style="[^"]+"><button type="button" class="slot meal" data-action="loop-eat" data-meal="lunch"/);
+    // author 2026-11-11: eating is asked at the table; eaten, the box is gone from the table.
     act(ctx, "loop-eat", { meal: "lunch" });
+    act(ctx, "loop-eat", { meal: "lunch" });
+    act(ctx, "loop-choice", { choice: "eat" });
     const after = render(ctx);
-    expect(placed(after, "meal")).toBe(rectStyle(WINDOW_SHOT.meal));
-    expect(after).toMatch(/data-at="meal" style="[^"]+"><div class="slot meal done" data-meal="lunch">/);
+    expect(placed(after, "meal")).toBeNull();
+    expect(after).not.toContain("slot meal");
   });
 
   it("the box is not on the desk any more (it opens where it is, in 房间): no box, no layers-left label", () => {
@@ -280,13 +283,15 @@ describe("the tabletop's things are photos (day-loop correction 2026-11-01)", ()
     // box queues no beat: the question comes first.
     const keys = ctx.session.dialogue.queue.map((q) => q.key);
     expect(keys.some((k) => k.startsWith("d1:beat:box"))).toBe(false);
-    expect(keys[0]).toBe(`d1:recognise:${object}`);
+    expect(keys[0]).toBe(`d1:recognise:${object}:look`); // author 2026-11-11: the description, then the question
+    expect(keys[1]).toBe(`d1:recognise:${object}`);
     const open = render(ctx);
     // No opened box on the floor (author 2026-11-03: it looked odd all day); the hover cursor says 打开.
     expect(open).not.toContain("box-open");
     expect(open).toContain(`class="held-layer" data-held="${object}"`);
     // Read through the beat; answer the question: it settles onto the desk row.
     while (ctx.session.dialogue.queue[0]?.key.startsWith("d1:beat:box")) act(ctx, "loop-advance");
+    if (ctx.session.dialogue.queue[0]?.key.endsWith(":look")) act(ctx, "loop-advance"); // the description (author 2026-11-11)
     expect(ctx.session.dialogue.queue[0]?.key).toBe(`d1:recognise:${object}`);
     const q = ctx.session.dialogue.queue[0]!;
     if (q.ending.kind !== "recognise") throw new Error("not the question");

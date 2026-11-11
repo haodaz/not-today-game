@@ -11,7 +11,6 @@ import { fillPlaceholders } from "@world/replies/placeholders";
 import { taskForId } from "@state/days/board";
 import { openStarters, starterPages } from "@world/dialogue/kuro";
 import { greetingKeyAt } from "../beat";
-import { pastTasks } from "@state/days/past";
 import { frameUrl, FRAMES } from "../kuro/body";
 import { taskPageId, type AppContext, type WorkbenchPage } from "../model";
 import { closerSlot } from "@world/late/closer-view";
@@ -83,9 +82,10 @@ function sidebar(ctx: AppContext, fill: Fill): SafeHtml | null {
   const search = html`<label class="wb-search">${ICONS.search}<input type="search" data-input="wb-search" data-focus="wb-search" placeholder="${ph}" aria-label="${ph}" value="${session.wbSearch}" autocomplete="off" spellcheck="false"></label>`;
   const fresh = html`<button type="button" class="${cls("it", "new", page === "home" && "on")}" data-action="wb-nav" data-page="home" data-compose="1">${ICONS.plus}<span>${tr("wb.sessions.new")}</span></button>`;
   const rows = sessionRows(ctx, fill, session.wbSearch);
-  // guidance R6: the past tasks under 最近 (after the run's own earlier days).
+  // author 2026-11-11: the past (content/tasks/past.json) is no longer listed anywhere a click could
+  // open it: 最近 holds only the run's own earlier days.
   const recent = rows.recent ?? html`<div class="sec">${tr("wb.sessions.recent")}</div>`;
-  return html`<div class="wb-scrim" data-action="wb-sidebar-close" aria-hidden="true"></div><aside class="wb-sidebar sessions"><nav class="wb-sections">${icons}</nav>${search}${fresh}${rows.today}${recent}${pastRows(ctx, "it earlier past")}</aside>`;
+  return html`<div class="wb-scrim" data-action="wb-sidebar-close" aria-hidden="true"></div><aside class="wb-sidebar sessions"><nav class="wb-sections">${icons}</nav>${search}${fresh}${rows.today}${recent}</aside>`;
 }
 
 /** The title's ▾ (shell R10): the session list as a dropdown under the title; a click outside closes it. */
@@ -153,11 +153,12 @@ function home(ctx: AppContext, data: WorkbenchDay | null, fill: Fill): SafeHtml 
   const openRow = open?.tree
     ? html`<button type="button" class="ln task" data-action="wb-nav" data-page="task:${open.tree.id}"><b>${fill(open.tree.title)}</b><span>${tr("wb.task.doing")}</span></button>`
     : null;
-  // guidance R6: the past (content/tasks/past.json) as 已交 rows under today's; one opened reads back.
+  // author 2026-11-11: no 已交 rows from before the run on the home card (they read as old abandoned
+  // tasks the player could click into); the past stays in content/tasks/past.json for 全部.
   const doing = card(
     tr("wb.card.doing"),
     tr("wb.card.all"),
-    html`${openRow}${(data?.doing ?? []).map((j) => html`<div class="ln"><b>${fill(j.title)}</b><span class="${j.tone === "warn" ? "r" : ""}">${fill(j.status)}</span></div>`)}${pastRows(ctx, "ln task past")}`,
+    html`${openRow}${(data?.doing ?? []).map((j) => html`<div class="ln"><b>${fill(j.title)}</b><span class="${j.tone === "warn" ? "r" : ""}">${fill(j.status)}</span></div>`)}`,
   );
   // guidance R6: a card with nothing in it is not drawn.
   const docs = data?.docs
@@ -195,19 +196,6 @@ function home(ctx: AppContext, data: WorkbenchDay | null, fill: Fill): SafeHtml 
   return html`<div class="main home"><div class="hello"><img src="${frameUrl(FRAMES.idle[0])}" alt=""><div><h1>${tr(greetingKeyAt(ctx.session.clock.time))}</h1><p>${tr("wb.hello.sub")}</p></div></div>${composer(ctx, data, fill)}<div class="cards">${doing}${docs}${ledger}${now}${changelog}</div>${common}</div>`;
 }
 
-/**
- * guidance R6: the tasks finished before the run (content/tasks/past.json), as 已交 rows; a click
- * opens one's thread read-only under it (the player's line, Kuro's, the result).
- */
-function pastRows(ctx: AppContext, klass: string): SafeHtml {
-  const open = ctx.session.wbPast;
-  const rows = pastTasks(getLocale() === "en" ? "en" : "zh").map((p) => {
-    const row = html`<button type="button" class="${cls(klass, open === p.id && "on")}" data-action="wb-past" data-past="${p.id}"><b>${p.title}</b><span>${tr("wb.task.done")}</span></button>`;
-    const thread = open === p.id ? html`<div class="wb-past-thread" data-past="${p.id}"><p class="me">${p.me}</p><p class="kuro">${p.kuro}</p><p class="res">${p.result}</p></div>` : null;
-    return html`${row}${thread}`;
-  });
-  return html`${rows}`;
-}
 
 /**
  * A task page (workspace R1): a header (title, for whom, 在办 / 已交, the task's own app page, the

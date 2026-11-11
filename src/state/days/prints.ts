@@ -20,7 +20,9 @@ export function printsOnDesk(day: number, events: readonly GameEvent[]): readonl
     const del = taskByFlag(d, printed.flag)?.deliverable;
     if (!del) continue;
     const given = deliverableGiven(d, del.id, events);
-    const there = (del.to ?? "hand") === "hand" ? !given : given;
+    // author 2026-11-11: a deliverable sent to a person leaves no paper on the desk (「桌子上出现了技术
+    // 表达（事情 A）这很奇怪」); only the hand's prints pile up, until the hand takes one.
+    const there = (del.to ?? "hand") === "hand" ? !given : false;
     if (there) out.push({ day: d, id: del.id, label: del.label, ...(del.img ? { img: del.img } : {}) });
   }
   return out;

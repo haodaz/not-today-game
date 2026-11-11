@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- 老王, not pleased: brows down, one corner of the mouth pulled down. -->
+  <circle cx="60" cy="62" r="56" fill="#f1ede6"/>
+  <path d="M22 118c4-20 18-30 38-30s34 10 38 30z" fill="#1d1d1f"/>
+  <ellipse cx="60" cy="60" rx="30" ry="34" fill="#f3d2b8"/>
+  <path d="M30 52c2-20 14-30 30-30s28 10 30 30c-6-10-14-14-30-14s-24 4-30 14z" fill="#3a3a3c"/>
+  <path d="M34 40c6-6 12-8 18-8" stroke="#8b8b90" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <ellipse cx="48" cy="60" rx="4" ry="3" fill="#2b2b2e"/>
+  <ellipse cx="72" cy="60" rx="4" ry="3" fill="#2b2b2e"/>
+  <path d="M40 50l14 4" stroke="#2b2b2e" stroke-width="3" stroke-linecap="round"/>
+  <path d="M80 50l-14 4" stroke="#2b2b2e" stroke-width="3" stroke-linecap="round"/>
+  <path d="M46 80q12-8 28 2" stroke="#2b2b2e" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <path d="M74 82l4 4" stroke="#2b2b2e" stroke-width="3" stroke-linecap="round"/>
+</svg>

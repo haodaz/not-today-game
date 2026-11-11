@@ -322,7 +322,8 @@ describe("the live DOM after a render (fix 2026-10-31)", () => {
     await frame();
     await click(root, '[data-action="kuro-call"]');
     check(root, session, "talk open");
-    expect(root.querySelectorAll(".hud-kuro.away").length).toBe(1);
+    expect(root.querySelectorAll(".hud-kuro.talking").length).toBe(1); // author 2026-11-11: the corner keeps a still copy
+    expect(root.querySelectorAll("[data-kuro-slot]").length).toBe(1); // one live body: the portrait in the box
     // The box is in the viewport's layer in every view (dialogue 2026-11-02).
     expect(root.querySelector(".dlg-layer .dlg .txt .ch")).not.toBeNull(); // only the page's text reveals
     expect(root.querySelector(".dlg-layer .dlg .tag .ch")).toBeNull();

@@ -90,7 +90,7 @@ describe("(4) Kuro's small window is a pill (dialogue FR2: no window any more)",
     loopActions["kuro-call"]!(ctx, none, null as never);
     const out = renderGame(ctx.store, ctx.session, 0).value;
     // playtest-1105 R2: the box owns the screen (a clear mask under it).
-    expect(out).toMatch(/<div class="dlg-layer"><div class="story-mask clear[^"]*"[^>]*><\/div><div class="dlg tagged kuro/);
+    expect(out).toMatch(/<div class="dlg-layer( top)?"><div class="story-mask clear[^"]*"[^>]*><\/div><div class="dlg tagged kuro/);
     expect(ctx.session.view).toBe("desktop");
   });
 
@@ -199,7 +199,7 @@ describe("(5) four camera levels", () => {
       const ctx = at(view);
       loopActions["kuro-call"]!(ctx, none, null as never);
       const out = render(ctx);
-      expect(out, view).toContain('<div class="hud-kuro away"></div>');
+      expect(out, view).toContain('<div class="hud-kuro talking">'); // author 2026-11-11: a still copy stays in the corner
       // The one body moved into the box: its portrait is the page's only slot.
       expect((out.match(/data-kuro-slot/g) ?? []).length, view).toBe(1);
       expect(out, view).toMatch(/<span class="kpet kuro-portrait" data-kuro-slot data-state="\w+" aria-hidden="true"><\/span><\/div>/);

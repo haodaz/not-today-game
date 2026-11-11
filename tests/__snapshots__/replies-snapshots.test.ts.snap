@@ -11,7 +11,7 @@ exports[`FR5 snapshots > day 1 boss \`salary\`: read after 3 s, then a voice not
       {
         "action": {
           "conversation": "boss",
-          "labelKey": "reply.salary",
+          "labelKey": "reply.boss.salary",
           "type": "own",
           "word": "salary",
         },
@@ -50,7 +50,7 @@ exports[`FR5 snapshots > day 1 boss \`salary\`: read after 3 s, then a voice not
     ],
   },
   "rendered": [
-    "now  [boss] me: <reply.salary>",
+    "now  [boss] me: <reply.boss.salary>",
     "+3000ms  [boss] <reply.status.read>",
     "@09:19  [boss] boss 09:19: [语音] 41″",
   ],

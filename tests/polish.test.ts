@@ -305,7 +305,7 @@ describe("door (FR2)", () => {
     // 房间 → 门 is a head turn (room-turn correction 2026-11-04): no step.
     expect(sounds).toEqual(["chain", "lock"]);
     expect(ctx.session.dialogue.queue.map((q) => q.key).filter((k) => k.includes(":door:"))).toEqual(
-      ["d1:door:lunch:openChain", "d1:door:lunch:reach", "d1:door:lunch:place"].filter((k) => ctx.session.dialogue.queue.some((q) => q.key === k)),
+      ["d1:door:lunch:ask", "d1:door:lunch:openChain", "d1:door:lunch:reach", "d1:door:lunch:place"].filter((k) => ctx.session.dialogue.queue.some((q) => q.key === k)),
     );
     // A spot that is not the current step does nothing.
     const events = store.getEvents().length;

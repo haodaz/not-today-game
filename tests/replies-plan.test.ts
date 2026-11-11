@@ -36,7 +36,7 @@ describe("planReply", () => {
   it("reply: the player's own line, then the lines with their own times", () => {
     const p = plan({ day: 1, recipient: "boss", word: "fine" });
     expect(types(p)).toEqual(["own", "deliver"]);
-    expect(p.steps[0]!.action).toEqual({ type: "own", conversation: "boss", word: "fine", labelKey: "reply.fine" });
+    expect(p.steps[0]!.action).toEqual({ type: "own", conversation: "boss", word: "fine", labelKey: "reply.boss.fine" });
     expect(p.steps[1]).toEqual({
       at: { kind: "atBeat", t: cell(1, "boss", "fine").lines[0]!.t },
       action: { type: "deliver", conversation: "boss", line: cell(1, "boss", "fine").lines[0], badge: false, placement: "received", noReadReceipt: false },

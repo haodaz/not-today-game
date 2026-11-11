@@ -320,8 +320,9 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .kpet{pointer-events:none}
 .kpet .layer{position:absolute;inset:0}
 .kpet .layer img{position:absolute;inset:0}
-.kpet .layer img.f2{animation:kuro-frames 2.8s ease-in-out infinite alternate}
-@keyframes kuro-frames{0%,35%{opacity:0}65%,100%{opacity:1}}
+/* author 2026-11-11: the two frames cut, never crossfade: half-drawn tentacles read as a double image. */
+.kpet .layer img.f2{animation:kuro-frames 2.8s steps(1,end) infinite alternate}
+@keyframes kuro-frames{0%,49%{opacity:0}50%,100%{opacity:1}}
 /* guidance R4: talking: base / blink alternating, 220 ms each. */
 .kpet .layer[data-state="talk"] img.f2{animation:kuro-talk 440ms steps(1,end) infinite}
 @keyframes kuro-talk{0%{opacity:0}50%{opacity:1}}

@@ -9,7 +9,7 @@ import { t, tr } from "@world/i18n";
 import { kuroInBox } from "@world/loop/dialogue";
 import type { AppContext } from "../model";
 import { pointerCls } from "@world/room/pointer";
-import { bodyState, frameUrl, FRAMES, type BodyState, type MawLook } from "./body";
+import { bodyState, frameUrl, FRAMES, renderLayer, type BodyState, type MawLook } from "./body";
 import { lateRing } from "@world/late/rings";
 import { closerOut } from "@world/late/closer";
 import { kuroDay } from "./days";
@@ -117,7 +117,10 @@ export function hudKuro(ctx: AppContext): SafeHtml {
   // While it speaks in the box it stands there (its portrait); the corner is empty. There is
   // always exactly one body slot on the page.
   // Likewise while it crawls to a page's close control to shut it (late-days FR4).
-  if (kuroInBox(ctx.session.dialogue) || closerOut(ctx.session)) return html`<div class="hud-kuro away"></div>`;
+  if (closerOut(ctx.session)) return html`<div class="hud-kuro away"></div>`;
+  // author 2026-11-11: while it speaks in the box the corner keeps a still copy (the live body is the
+  // portrait): the corner emptying made the focus jump.
+  if (kuroInBox(ctx.session.dialogue)) return html`<div class="hud-kuro talking"><span class="kpet kuro-still" data-state="talk" aria-hidden="true">${renderLayer("talk", lateRing(ctx.state.day))}</span></div>`;
   const unread = kuroUnread(ctx);
   // The first upgrade offer has no checklist line: a one-time pointer on the body (rule 2026-11-01).
   const offer = pointerCls(ctx.session, "offer", !ctx.night && currentOffer(ctx.state, ctx.events) !== null);

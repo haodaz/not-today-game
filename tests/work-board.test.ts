@@ -353,10 +353,9 @@ describe("a board that goes to a person (to: boss)", () => {
     expect(events.some((e) => e.kind === "give" && e.deliverableId === "d11-boss")).toBe(true);
   });
 
-  it("nothing goes to the hand (a person's deliverable is sent on screen); its print stays on the desk, marked sent", () => {
-    // desk-prints R1: a sent deliverable also leaves its print in the pile.
+  it("nothing goes to the hand (a person's deliverable is sent on screen); no print on the desk (author 2026-11-11)", () => {
     expect(deliverableForHand(11, sent().getEvents())).toBeNull();
-    expect(deliverableOnDesk(11, sent().getEvents())).toMatchObject({ id: "d11-boss", sent: true });
+    expect(deliverableOnDesk(11, sent().getEvents())).toBeNull();
   });
 
   it("a file card from 你 appears in 老板's chat at the time it was sent", () => {

@@ -329,10 +329,8 @@ function mealSlot(state: State, events: readonly GameEvent[]): SafeHtml | null {
   const order = ordersOn(events, state.day)[at.meal];
   const sprite = order ? itemOf(order.shopId, order.itemId)?.sprite : undefined;
   const food = sprite ? `/${sprite}.png` : null;
-  if (at.eaten) {
-    const empty = food ? html`<object data="/${sprite}_done.png" type="image/png" aria-hidden="true"><img class="eaten" src="${food}" alt=""></object>` : null;
-    return html`<div class="slot meal done" data-meal="${at.meal}">${empty}</div>`;
-  }
+  // author 2026-11-11: eaten, the box is gone (「外卖盒吃完，离开桌子消失就行，不能一直放在那里」).
+  if (at.eaten) return null;
   return html`<button type="button" class="slot meal" data-action="loop-eat" data-meal="${at.meal}" aria-label="${t("room.meal")}">${food ? html`<img src="${food}" alt="">` : null}</button>`;
 }
 

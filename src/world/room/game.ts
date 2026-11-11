@@ -47,7 +47,7 @@ import { CAMERA_FLASH_MS, cameraShot, type CameraState } from "@world/objects/pl
 import { DEVELOP_BLANK_MS, DEVELOP_MS, ON_THE_SPOT_DAY, photoKey, roomFacingOf, roomPhotoOn, sheetsLeft } from "@state/photos";
 import { screenPlaceOf } from "@world/desktop/files/album";
 import { booted, checklist, deskMeal, itemStates, loopContext, mealToOrder, nightfallReached, openItemFor, openTask, type ChecklistView } from "@world/loop/checklist";
-import type { EventToken } from "@state/days/table";
+import type { EventToken, SayLine } from "@state/days/table";
 import { messageActions } from "@world/desktop/messages/actions";
 import { CROSSFADE_MS, MOTION, viewMoveMs } from "@world/motion/timing";
 import { splatMoveFor } from "./splat/moves";
@@ -57,7 +57,7 @@ import { isFacing, turnedTo, turnsBetween, type Facing, type TurnDir } from "./f
 /** Whose conversation the loan is answered in (day-loop correction 2026-11-01): 老周. */
 export const LOAN_CONVERSATION = "laozhou";
 import { advance, dropQuestion, endsInChoice, finishChoice, push, showing, talking, type DialogueState } from "@world/loop/dialogue";
-import { beatQueued, lieDownOrEnd, openChatIfDue, questionQueued, taskStartKey } from "@world/loop/runtime";
+import { beatQueued, lieDownOrEnd, openChatIfDue, lookQueued, questionQueued, taskStartKey } from "@world/loop/runtime";
 import { askedOn, knows } from "@state/recognise";
 import { gateAdvance } from "@world/motion/reveal";
 import { endingNext } from "@world/endings/flow";
@@ -84,7 +84,7 @@ import { renderFiles } from "@world/desktop/files/view";
 import { openObjectFromBar, renderObjectBarUse } from "@world/desktop/workbench/objbar";
 import { filesActions, openFilesApp } from "@world/desktop/files/actions";
 import { callActions, resumeCall } from "@world/desktop/call/actions";
-import { deliverablePage } from "@state/files";
+import { deliverableOnOpen, deliverablePage } from "@state/files";
 import { viviLock, viviLockHeld, lockedConversation } from "@world/desktop/vivi";
 import { appOfThread } from "@world/desktop/messages/threads";
 import { cancelCloser, startCloser } from "@world/late/closer";
@@ -150,7 +150,9 @@ function renderGameBody(store: Store, session: Session, nowMs: number): SafeHtml
 function dlgLayer(dlg: SafeHtml | null, session: Session, readsOn: boolean, withMask = true): SafeHtml | null {
   if (!dlg) return null;
   const story = storyMasked(session.dialogue);
-  return html`<div class="${cls("dlg-layer", story && "masked")}">${withMask ? boxMask(session, readsOn) : null}${dlg}</div>`;
+  // author 2026-11-11: over a chat app the box sits in the upper half, off the thread it talks about.
+  const chat = session.view === "desktop" && (appOn(session) === "tingtalk" || appOn(session) === "msgs");
+  return html`<div class="${cls("dlg-layer", story && "masked", chat && "top")}">${withMask ? boxMask(session, readsOn) : null}${dlg}</div>`;
 }
 
 /** The checklist's line that is on now (the first open one), for the desktop's top bar; null when none. */
@@ -418,8 +420,10 @@ function doorAct(ctx: ActionContext, input: DoorInput | null): boolean {
   say(next);
   // The door is shut: the bag goes onto the desk corner by itself, and its lines play.
   if (next === "close") {
+    // author 2026-11-11: the receipt is said before the pickup is logged: the arrival day's box
+    // scene queues on that event and the receipt used to come after it, over the open case.
+    say("place", doorLines(view, "place", state.names));
     take("place");
-    say("place");
   }
   ctx.rerender();
   return true;
@@ -434,6 +438,11 @@ function doorWalk(ctx: ActionContext): void {
   const view = mealView(state.day, meal, state, store.getEvents(), session.clock.time)!;
   const beat = session.door && session.door.meal === meal && session.door.day === state.day ? session.door : startDoor(view);
   if (beat?.state === "delivered") session.door = stepDoor(beat, "walk").beat;
+  // author 2026-11-11: at the door the game asks, as the bed does (「不知道点哪里取外卖」): 门外有东西。
+  // 拿进来吗？ 拿进来 takes the whole door beat; 再等等 leaves the spots to click.
+  if (session.door?.state === "atDoor" && hasString("delivery.ask") && !session.dialogue.queue.some((q) => q.ending.kind === "doorAsk")) {
+    session.dialogue = push(session.dialogue, { key: `d${state.day}:door:${meal}:ask`, lines: [{ k: "inner", t: t("delivery.ask") }], ending: { kind: "doorAsk", meal } });
+  }
 }
 
 /**
@@ -770,7 +779,13 @@ export const loopActions: Record<string, ActionHandler> = {
     const vivi = viviLock(state0, ctx.store.getEvents(), ctx.session.clock.time) === doc && ctx.session.view === "desktop";
     if (vivi && hasString("vivi.back")) {
       ctx.session.docReturn = { app: appOn(ctx.session), side: ctx.session.focus };
-      ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${state0.day}:vivi:back`, lines: [{ k: "inner", t: t("vivi.back") }], ending: { kind: "docBack" } });
+      // author 2026-11-11: read first, then the remark at what is on the page (the file's own
+      // onOpen line), then 看完了 and back to the chat.
+      const remark = deliverableOnOpen(doc);
+      const sayKey = `${state0.day}:vivi:${doc}`;
+      const lines: SayLine[] = remark && !ctx.session.filesSaid.has(sayKey) ? [remark] : [];
+      if (remark) ctx.session.filesSaid.add(sayKey);
+      ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${state0.day}:vivi:back`, lines: [...lines, { k: "inner", t: t("vivi.back") }], ending: { kind: "docBack" } });
     }
     ctx.session.focus = bringToFront(ctx.session, "browser");
     ctx.session.browserDoc = page;
@@ -849,12 +864,25 @@ export const loopActions: Record<string, ActionHandler> = {
     const lc = loopContext(ctx.store.getState(), ctx.store.getEvents());
     const at = lc ? deskMeal(lc) : null;
     if (!at || at.eaten || at.meal !== data.meal) return;
+    // author 2026-11-11: from 窗 a click on the meal walks up to the table first (the far view used
+    // to empty at once); at the table the game asks 现在吃吗？ before the meal is eaten.
+    if (ctx.session.view === "window") {
+      loopActions["meal-table"]!(ctx, {} as DOMStringMap, null as never);
+      return;
+    }
     // A day with the boss's call (author 2026-11-08, day 3): the dinner waits for the night's work
     // (the call's task); Kuro sends the player to it afterwards and it is cold. Until then one line.
     const state = ctx.store.getState();
     const call = dayFile(state.day)?.call;
     if (at.meal === "dinner" && call && call.task.done.kind === "flag" && !state.flags.includes(call.task.done.flag) && hasString("room.eat.later")) {
       ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${state.day}:eat:later`, lines: [{ k: "inner", t: t("room.eat.later") }], ending: { kind: "none" } });
+      ctx.rerender();
+      return;
+    }
+    if (hasString("room.eat.ask") && data.now !== "1") {
+      if (!ctx.session.dialogue.queue.some((q) => q.ending.kind === "eatAsk")) {
+        ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${state.day}:eat:${at.meal}:ask`, lines: [{ k: "inner", t: t("room.eat.ask") }], ending: { kind: "eatAsk", meal: at.meal } });
+      }
       ctx.rerender();
       return;
     }
@@ -1139,6 +1167,25 @@ export const loopActions: Record<string, ActionHandler> = {
       } else ctx.rerender();
       return;
     }
+    // author 2026-11-11: 拿进来 runs the door beat through (chain, reach, close, the bag on the desk).
+    if (q.ending.kind === "doorAsk") {
+      if (data.choice !== "take" && data.choice !== "wait") return;
+      ctx.session.dialogue = finishChoice(ctx.session.dialogue);
+      settleSession(ctx.session);
+      if (data.choice === "take") for (const step of ["openChain", "reach", "close"] as const) if (!doorAct(ctx, step)) break;
+      ctx.rerender();
+      return;
+    }
+    // author 2026-11-11: 吃 eats the meal on the table; 再等等 leaves it there.
+    if (q.ending.kind === "eatAsk") {
+      if (data.choice !== "eat" && data.choice !== "wait") return;
+      const meal = q.ending.meal;
+      ctx.session.dialogue = finishChoice(ctx.session.dialogue);
+      settleSession(ctx.session);
+      if (data.choice === "eat") loopActions["loop-eat"]!(ctx, { meal, now: "1" } as DOMStringMap, null as never);
+      else ctx.rerender();
+      return;
+    }
     // lying-view R6: 起床 goes up to 床 (and the day's `rise` beat plays there, once); 再躺一会儿 stays.
     if (q.ending.kind === "riseAsk") {
       if (data.choice !== "up" && data.choice !== "stay") return;
@@ -1270,6 +1317,8 @@ export const loopActions: Record<string, ActionHandler> = {
     // Picked up and still not known: the question comes back, once a day (recognise FR1).
     const events = store.getEvents();
     if (session.holding && !knows(id, state, events) && !askedOn(events, state.day, id)) {
+      const look = lookQueued(state.day, id);
+      if (look) session.dialogue = push(session.dialogue, look);
       const q = questionQueued(state.day, id, store.getRunId());
       if (q) session.dialogue = push(session.dialogue, q);
     }

@@ -1,5 +1,6 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
+import { t } from "@world/i18n";
 import { objectsFoundOnDay } from "@state/stages";
 import objectsFile from "@content/objects.json";
 import { applyChoose, choiceOf } from "@state/days/effects";
@@ -176,11 +177,13 @@ describe("when it is asked (FR1)", () => {
     const keys = d.queue.map((q) => q.key);
     const box = keys.map((k) => k.replace(/#\d+$/, "")).lastIndexOf("d2:beat:box"); // (findLastIndex is past this tsconfig's lib)
     expect(box).toBeGreaterThanOrEqual(0);
-    expect(keys[box + 1]).toBe("d2:recognise:camera");
-    // box-arrival R4: on day 1 opening the box queues no box beat.
+    // author 2026-11-11: the description first, then the question on its own.
+    expect(keys[box + 1]).toBe("d2:recognise:camera:look");
+    expect(keys[box + 2]).toBe("d2:recognise:camera");
+    // box-arrival R4: on day 1 opening the box queues no box beat; the desk lines (the chick in the gap) wait at the desk.
     const one = createStore({ startDay: 1 });
     const d1 = queued(one, () => one.appendEvent({ kind: "openLayer", objectId: "chick" }));
-    expect(d1.queue.map((q) => q.key)).toEqual(["d1:recognise:chick"]);
+    expect(d1.queue.map((q) => q.key).sort()).toEqual(["d1:beat:desk", "d1:recognise:chick", "d1:recognise:chick:look"]);
   });
 
   it("snapshot: day 1, the chick's question (no hints: every option looks the same)", () => {
@@ -189,7 +192,7 @@ describe("when it is asked (FR1)", () => {
     const session = initialSession(DEFAULT_CLOCK, "left", "room");
     session.dialogue = push(EMPTY_DIALOGUE, questionQueued(1, "chick", store.getRunId())!);
     const out = everyScreen(store.getState(), session);
-    expect(out).toContain(recogniseTable.get("chick")!.q);
+    expect(out).toContain(t("recognise.ask")); // author 2026-11-11: the description is its own line before this
     // world-prompts R2: the options are the column's rows.
     const buttons = [...out.matchAll(/<button type="button" class="dc-row" data-action="loop-choice" data-index="(\d)"/g)].map((m) => Number(m[1]));
     expect(buttons).toEqual(optionOrder(store.getRunId(), "chick"));
@@ -217,9 +220,10 @@ describe("when it is asked (FR1)", () => {
     // The next day: picking it up asks again.
     store.appendEvent({ kind: "lieDown" });
     loopActions["loop-hold"]!(ctx, { object: "pager" } as DOMStringMap, null as never);
-    expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["d5:recognise:pager"]);
+    expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["d5:recognise:pager:look", "d5:recognise:pager"]);
     expect(everyScreen(store.getState(), ctx.session)).toMatchSnapshot();
     // Answered right this time: it is known, and the desk bar shows it in full colour.
+    loopActions["loop-advance"]!(ctx, none, null as never); // the description read first (author 2026-11-11)
     loopActions["loop-choice"]!(ctx, { index: String(rightIndex("pager")) } as DOMStringMap, null as never);
     expect(store.getState().recognised).toEqual(["pager"]);
     expect(askedOn(store.getEvents(), 5, "pager")).toBe(true);
@@ -240,7 +244,7 @@ describe("when it is asked (FR1)", () => {
     const cameraQ = recogniseTable.get("camera")!.q;
 
     hold("chick");
-    expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["d2:recognise:chick"]);
+    expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["d2:recognise:chick:look", "d2:recognise:chick"]);
     // Esc puts it down unanswered: the question leaves the queue (and the waiting list).
     expect(loopKeys(ctx, { key: "Escape", target: null } as unknown as KeyboardEvent)).toBe(true);
     expect(ctx.session.holding).toBeNull();
@@ -250,13 +254,13 @@ describe("when it is asked (FR1)", () => {
 
     // The camera in hand: its own question, never the chick's.
     hold("camera");
-    expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["d2:recognise:camera"]);
+    expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["d2:recognise:camera:look", "d2:recognise:camera"]);
     expect(box()).toContain(cameraQ);
     expect(box()).not.toContain(chickQ);
 
     // The chick again (the camera put down by taking it up): the chick's question is asked, once.
     hold("chick");
-    expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["d2:recognise:chick"]);
+    expect(ctx.session.dialogue.queue.map((q) => q.key)).toEqual(["d2:recognise:chick:look", "d2:recognise:chick"]);
     expect(box()).toContain(chickQ);
     expect(box()).not.toContain(cameraQ);
   });

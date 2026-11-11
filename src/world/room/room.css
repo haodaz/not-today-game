@@ -59,6 +59,8 @@
 /* The body is 192 px (late-days FR1); during a conversation it is away (it is talking in the box). */
 .hud-kuro{position:relative;width:192px;height:192px}
 .hud-kuro.away{visibility:hidden;pointer-events:none}
+/* author 2026-11-11: while Kuro speaks in the box the corner keeps a still copy. */
+.hud-kuro.talking .kpet{position:absolute;inset:0;width:192px;height:192px;pointer-events:none}
 .kuro-btn{position:relative;width:192px;height:192px;border:0;padding:0;margin:0;background:transparent;border-radius:50%;cursor:pointer;transform-origin:right bottom}
 .kuro-btn .kpet{position:absolute;inset:0;width:192px;height:192px}
 .kuro-btn:hover,.kuro-btn:focus-visible{background:radial-gradient(closest-side,rgba(246,166,35,.22),transparent)}
@@ -447,6 +449,8 @@
 .dlg-layer{position:fixed;inset:0;z-index:30;pointer-events:none}
 .dlg-layer > *{pointer-events:auto}
 .dlg-layer .dlg{position:fixed;left:50%;bottom:var(--dlg-bottom,60px);transform:translateX(-50%);width:900px;max-width:80vw;height:var(--dlg-h,132px)}
+/* author 2026-11-11: over a chat app the box sits in the upper half, off the thread it talks about. */
+.dlg-layer.top .dlg{bottom:auto;top:var(--dlg-top,96px)}
 .dlg-layer .dlg-hist-layer{position:fixed}
 /* world-prompts R2: the choices on the right of the stage (Honkai: Star Rail). The column's right
    edge 4 % in from the stage's right, 32 % of the stage wide (280–420 px), its bottom 16 px above
@@ -480,7 +484,11 @@
 [data-guide="on"]{box-shadow:0 0 0 2px var(--accent,#2f6feb),0 0 0 9999px rgba(0,0,0,.3)}
 [data-guide="clause"]{box-shadow:0 0 0 2px var(--accent,#2f6feb)}
 @keyframes guide-ring{0%,100%{outline:2px solid transparent;outline-offset:2px}50%{outline:2px solid color-mix(in srgb,var(--accent,#2f6feb) 55%,transparent);outline-offset:6px}}
-@media (prefers-reduced-motion:reduce){[data-guide="on"],[data-guide="clause"]{animation:none}}
+/* author 2026-11-11: the lit thing also gets a bobbing pointer above it (「框框太规整了」): a small
+   white chevron on the ring's colour, reaching down at the target every 1.2 s. */
+[data-guide="on"]::after{content:"";position:absolute;left:50%;top:-34px;width:18px;height:18px;margin-left:-9px;border-right:4px solid #fff;border-bottom:4px solid #fff;transform:rotate(45deg);filter:drop-shadow(0 0 3px var(--accent,#2f6feb)) drop-shadow(0 2px 4px rgba(0,0,0,.5));animation:guide-point 1.2s ease-in-out infinite;pointer-events:none;z-index:9}
+@keyframes guide-point{0%,100%{top:-34px}50%{top:-22px}}
+@media (prefers-reduced-motion:reduce){[data-guide="on"],[data-guide="clause"]{animation:none}[data-guide="on"]::after{animation:none}}
 /* ⚙ 设置 sits above the box in every view (2026-11-02): its fixed layer outranks .dlg-layer (30). */
 .hud-host .settings-layer{z-index:50}
 /* SAN bands (presentation only): the cup photo goes colder as SAN falls. */

@@ -22,7 +22,7 @@
     {
       "k": "speaker",
       "who": "boss",
-      "t": "{bossCalls}。Vivi，你，咱们几个创始人，一路划着小船逆流而上。现在，船终于大了。"
+      "t": "{bossCalls}。我，Vivi，还有你，咱仨创始人，一路划着小船逆流而上。现在，船终于大了。"
     },
     {
       "k": "inner",
@@ -73,13 +73,13 @@
     },
     {
       "k": "narration",
-      "t": "红包是晚上的事。家里的饭桌，菜比平时多两个。",
+      "t": "公司在帝都，你家在三线城市。这一年回家过年，菜比平时多两个。",
       "backdrop": "/room/dream/home_dinner.jpg"
     },
     {
       "k": "speaker",
       "who": "family",
-      "t": "{nick}，吃。"
+      "t": "{nick}，多吃点，都是你爱吃的。"
     },
     {
       "k": "narration",

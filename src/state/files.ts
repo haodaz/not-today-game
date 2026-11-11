@@ -143,6 +143,16 @@ export function deliverablePage(doc: string, data: FilesData = filesData): strin
   return null;
 }
 
+/** author 2026-11-11: the `onOpen` line of the download file a deliverable `doc` names, or null. */
+export function deliverableOnOpen(doc: string, data: FilesData = filesData): SayLine | null {
+  for (const folder of data.folders) {
+    for (const file of folder.files) {
+      if (file.afterOpen === doc && file.onOpen) return file.onOpen;
+    }
+  }
+  return null;
+}
+
 /** A file is listed on `day` when its `from` day has come, its flag is set and its Vivi doc is opened. */
 export function fileListed(f: FileEntry, day: number, flags: readonly string[], openedDocs: ReadonlySet<string>): boolean {
   if (day < f.from) return false;

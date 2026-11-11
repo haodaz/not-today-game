@@ -78,7 +78,7 @@ describe("transcript (U3)", () => {
     const answered = conv(store, "boss", "09:20");
     expect(kinds(answered)).toContain("them:text");
     const mine = answered.find((b) => b.kind === "msg" && b.side === "me") as Extract<Bubble, { kind: "msg" }>;
-    expect(mine.labelKey).toBe("reply.fine");
+    expect(mine.labelKey).toBe("reply.boss.fine"); // author 2026-11-11: each person hears the word in their own wording
   });
 
   it("a live plan shows only the steps that have played", () => {
@@ -139,7 +139,7 @@ describe("renderMessages", () => {
     // guidance G3: day 1's first open of 听听 is empty until a row is clicked; open the boss's.
     store.appendEvent({ kind: "open", target: "conv:boss", t: "10:00" });
     const work = renderWorkMessages(ctxFor(store, initialSession({ beat: "boot", time: "10:00" }))).pane.value;
-    for (const key of ["msgs.boss", "msgs.group", "reply.hint.boss", "reply.fine", "reply.salary", "msgs.send"]) {
+    for (const key of ["msgs.boss", "msgs.group", "reply.hint.boss", "reply.boss.fine", "reply.boss.salary", "msgs.send"]) {
       expect(work, key).toContain(t(key));
     }
     expect(work).toContain('class="n">1<');

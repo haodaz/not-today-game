@@ -39,13 +39,14 @@ function rig(store: Store, view: Session["view"] = "desk") {
 }
 
 describe("R1 · a sent deliverable leaves a print", () => {
-  it("a to: boss board sent on day 1: on the desk today (sent), gone after sleep; the hand offers nothing that night", () => {
+  it("a to: boss board sent on day 1: never on the desk (author 2026-11-11), nothing after sleep; the hand offers nothing that night", () => {
     const store = createStore({ startDay: 1 });
     expect(boardTask(1).deliverable!.to).toBe("boss");
     print(store);
     expect(deliverableOnDesk(1, store.getEvents())).toBeNull(); // not sent yet: it is on screen
     send(store);
-    expect(deliverableOnDesk(1, store.getEvents())).toMatchObject({ id: boardTask(1).deliverable!.id, sent: true });
+    expect(deliverableOnDesk(1, store.getEvents())).toBeNull(); // sent on screen: no paper on the desk
+    expect(printsOnDesk(1, store.getEvents())).toEqual([]);
     expect(deliverableForHand(1, store.getEvents())).toBeNull();
     // The hand's give / refuse choices stay for `hand` deliverables only.
     const night = dayFile(1)!.beats.shutdown!;
@@ -56,12 +57,12 @@ describe("R1 · a sent deliverable leaves a print", () => {
     expect(choices.some((c) => c.choice === "give")).toBe(false);
     store.appendEvent({ kind: "lieDown" });
     expect(deliverableOnDesk(2, store.getEvents())).toBeNull();
-    // Day 5 is a hand night (a raid) with a person's deliverable: sent, its print stays, the hand gets no 递给它.
+    // Day 5 is a hand night (a raid) with a person's deliverable: sent, no print, the hand gets no 递给它.
     const s5 = createStore({ startDay: 5 });
     expect(boardTask(5).deliverable!.to).toBe("partner");
     print(s5);
     send(s5);
-    expect(deliverableOnDesk(5, s5.getEvents())!.sent).toBe(true);
+    expect(deliverableOnDesk(5, s5.getEvents())).toBeNull();
     const n5 = initialSession(NIGHT, "left", "room");
     n5.dialogue = push(EMPTY_DIALOGUE, beatQueued(5, "shutdown", dayFile(5)!.beats.shutdown!));
     n5.dialogue = { ...n5.dialogue, line: n5.dialogue.queue[0]!.lines.length - 1 };
@@ -82,29 +83,30 @@ describe("R1 · a sent deliverable leaves a print", () => {
   });
 });
 
-/** Days 1–5, each board printed and sent; the store stands on day 5. */
+/** Days 10–14 (hand days), each board printed and never given; the store stands on day 14 (author 2026-11-11: only the hand's prints pile up). */
+const PILE_DAYS = [10, 11, 12, 13, 14] as const;
 function fiveDays(): Store {
-  const store = createStore({ startDay: 1 });
-  for (let d = 1; d <= 5; d++) {
+  const store = createStore({ startDay: 10 });
+  for (const d of PILE_DAYS) {
+    expect(boardTask(d).deliverable!.to ?? "hand").toBe("hand");
     print(store);
-    send(store);
-    if (d < 5) store.appendEvent({ kind: "lieDown" });
+    if (d < 14) store.appendEvent({ kind: "lieDown" });
   }
   return store;
 }
 
 describe("R2 · the pile", () => {
-  it("day 5 after days 1–4 sent: oldest first in printsOnDesk; four edges under today's top print", () => {
+  it("day 14 after days 10–13 kept from the hand: oldest first in printsOnDesk; four edges under today's top print", () => {
     const store = fiveDays();
-    expect(store.getState().day).toBe(5);
-    const prints = printsOnDesk(5, store.getEvents());
-    expect(prints.map((p) => p.day)).toEqual([1, 2, 3, 4, 5]);
-    expect(prints.map((p) => p.id)).toEqual([1, 2, 3, 4, 5].map((d) => boardTask(d).deliverable!.id));
+    expect(store.getState().day).toBe(14);
+    const prints = printsOnDesk(14, store.getEvents());
+    expect(prints.map((p) => p.day)).toEqual([...PILE_DAYS]);
+    expect(prints.map((p) => p.id)).toEqual(PILE_DAYS.map((d) => boardTask(d).deliverable!.id));
     const out = rig(store).out();
     const pile = /<button type="button" class="slot deliverable pile"[\s\S]*?<\/button>/.exec(out)![0];
     expect(pile.match(/class="pile-edge"/g)).toHaveLength(4);
-    expect(pile).toContain(`data-deliverable="${boardTask(5).deliverable!.id}"`);
-    expect(pile).toContain(`title="${escapeHtml(boardTask(5).deliverable!.label)}"`);
+    expect(pile).toContain(`data-deliverable="${boardTask(14).deliverable!.id}"`);
+    expect(pile).toContain(`title="${escapeHtml(boardTask(14).deliverable!.label)}"`);
     // The paper fallback (no img yet).
     expect(pile).toContain('<span class="pile-top"><span class="paper-thumb" aria-hidden="true"></span></span>');
     // In the spot left-front by the lamp foot.
@@ -113,10 +115,9 @@ describe("R2 · the pile", () => {
   });
 
   it("the edges stop at six; with today's not there, the pile's name is 一摞打印件 with the count", () => {
-    const store = createStore({ startDay: 1 });
-    for (let d = 1; d <= 9; d++) {
+    const store = createStore({ startDay: 10 });
+    for (let d = 10; d <= 17; d++) {
       print(store);
-      send(store);
       store.appendEvent({ kind: "lieDown" });
     }
     const out = rig(store).out();
@@ -134,12 +135,12 @@ describe("R3 · look closer", () => {
     const events = store.getEvents().length;
     r.act("prints-open");
     let out = r.out();
-    expect(out).toContain(`<div class="prints-view" role="dialog" aria-modal="true" aria-label="${escapeHtml(boardTask(5).deliverable!.label)}" data-print="${boardTask(5).deliverable!.id}" data-at="1/5">`);
-    expect(out).toContain(`<div class="print-paper"><span>${escapeHtml(boardTask(5).deliverable!.label)}</span></div>`);
+    expect(out).toContain(`<div class="prints-view" role="dialog" aria-modal="true" aria-label="${escapeHtml(boardTask(14).deliverable!.label)}" data-print="${boardTask(14).deliverable!.id}" data-at="1/5">`);
+    expect(out).toContain(`<div class="print-paper"><span>${escapeHtml(boardTask(14).deliverable!.label)}</span></div>`);
     expect(out).toContain(`aria-label="${escapeHtml(t("prints.close"))}">×</button>`);
     expect(loopKeys(r.ctx, { key: "ArrowRight" } as KeyboardEvent)).toBe(true);
     out = r.out();
-    expect(out).toContain(`data-print="${boardTask(4).deliverable!.id}" data-at="2/5"`);
+    expect(out).toContain(`data-print="${boardTask(13).deliverable!.id}" data-at="2/5"`);
     r.act("prints-next");
     r.act("prints-next");
     r.act("prints-next");

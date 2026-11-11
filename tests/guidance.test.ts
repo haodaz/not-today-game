@@ -19,7 +19,7 @@ import { WINDOW_RECT } from "@world/desktop/shell";
 import { transcript } from "@world/desktop/messages/transcript";
 import { fillDish } from "@world/delivery/view";
 import { t } from "@world/i18n";
-import { EMPTY_DIALOGUE, push } from "@world/loop/dialogue";
+import { EMPTY_DIALOGUE, endsInChoice, push } from "@world/loop/dialogue";
 import { guideNow, guideRefuses, withRing } from "@world/loop/guide";
 import { syncLoop, taskStartKey } from "@world/loop/runtime";
 import { loopActions, renderGame } from "@world/room/game";
@@ -354,7 +354,7 @@ describe("R4 / R5 · one Kuro on the screen; the checklist there", () => {
 // ——— R6 / R7 ———
 
 describe("R6 / R7 · 工作台's home and the task page", () => {
-  it("the sidebar is open on the run's first open; the past rows; no empty cards; the greeting by the clock", () => {
+  it("the sidebar is open on the run's first open; no past rows (author 2026-11-11); no empty cards; the greeting by the clock", () => {
     const store = booted();
     step(store, "openApp:msgs");
     open(store, "conv:boss");
@@ -363,9 +363,7 @@ describe("R6 / R7 · 工作台's home and the task page", () => {
     r.act("view", { view: "desktop" });
     expect(r.session.wbSidebar).toBe(true);
     const out = r.out();
-    for (const p of pastTasks("zh")) expect(out).toContain(`data-action="wb-past" data-past="${p.id}"`);
-    r.act("wb-past", { past: "past-1" });
-    expect(r.out()).toContain('<div class="wb-past-thread" data-past="past-1">');
+    for (const p of pastTasks("zh")) expect(out).not.toContain(`data-past="${p.id}"`);
     expect(greetingKeyAt("12:04")).toBe("wb.hello.afternoon");
     expect(greetingKeyAt("09:03")).toBe("wb.hello.morning");
     expect(greetingKeyAt("19:00")).toBe("wb.hello.evening");
@@ -470,9 +468,11 @@ describe("R14 · heads and tails", () => {
       syncLoop(r.ctx, 0);
       expect(r.keys(), view).toContain("d1:door:lunch:leave");
       r.session.dialogue = { queue: r.session.dialogue.queue.filter((q) => q.key.startsWith("d1:door:lunch")), line: 0 };
-      while (r.session.dialogue.queue.length) r.act("loop-advance");
+      // author 2026-11-11: arriving at 门 asks 拿进来吗？ (a choice): read up to it.
+      while (r.session.dialogue.queue.length && !endsInChoice(r.session.dialogue.queue[0]!.ending)) r.act("loop-advance");
       // From a facing the turn to 门; from the screen the way out starts (回房间 first, then 门).
       expect(r.session.view, view).toBe(view === "window" ? "door" : "room");
+      if (view === "window") expect(r.session.dialogue.queue[0]?.ending).toEqual({ kind: "doorAsk", meal: "lunch" });
     }
   });
 

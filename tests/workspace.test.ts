@@ -140,9 +140,9 @@ describe("R2 · one navigation: the rail and the session list", () => {
     const side = h.side();
     expect(side).toMatch(new RegExp(`data-action="wb-nav" data-page="home" data-compose="1"><svg[^>]*>.*?</svg><span>${escapeHtml(t("wb.sessions.new"))}</span></button>`, "s"));
     expect(side).not.toContain(escapeHtml(t("wb.sessions.today")));
-    // guidance R6: 最近 holds the tasks finished before the run (content/tasks/past.json).
+    // author 2026-11-11: the past (content/tasks/past.json) is listed nowhere a click could open it.
     expect(side).toContain(escapeHtml(t("wb.sessions.recent")));
-    expect(side).toContain('data-action="wb-past"');
+    expect(side).not.toContain('data-action="wb-past"');
     expect(side).not.toContain("task:");
     for (const key of ["wb.search", "wb.nav.tickets", "wb.nav.projects", "wb.sec.doing"]) expect(out, key).not.toContain(escapeHtml(t(key)));
     // The section icons (shell R10) are in the sidebar.

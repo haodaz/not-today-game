@@ -89,7 +89,7 @@ describe("开机: the tower's power button (房间; 桌子 is the tabletop, the 
 });
 
 describe("吃: the meal on the little table under the window (room-turn R3)", () => {
-  it("after 去拿 the food image is on the table; clicking it eats; the empty box stays", () => {
+  it("after 去拿 the food image is on the table; from 窗 a click walks up; at the table it asks 现在吃吗？; 吃 eats and the box is gone (author 2026-11-11)", () => {
     const store = atDay(1);
     completeUntil(store, "eat");
     const { ctx } = ctxOf(store, "window");
@@ -99,9 +99,18 @@ describe("吃: the meal on the little table under the window (room-turn R3)", ()
     act(ctx, "loop-eat", { meal: "dinner" }); // not the meal on the desk
     expect(done(store, "eat")).toBe(false);
     act(ctx, "loop-eat", { meal: "lunch" });
+    expect(ctx.session.view).toBe("table");
+    expect(done(store, "eat")).toBe(false);
+    act(ctx, "loop-eat", { meal: "lunch" });
+    expect(ctx.session.dialogue.queue[0]?.ending).toEqual({ kind: "eatAsk", meal: "lunch" });
+    expect(ctx.session.dialogue.queue[0]?.lines[0]?.t).toBe(t("room.eat.ask"));
+    act(ctx, "loop-choice", { choice: "wait" });
+    expect(done(store, "eat")).toBe(false);
+    act(ctx, "loop-eat", { meal: "lunch" });
+    act(ctx, "loop-choice", { choice: "eat" });
     expect(done(store, "eat")).toBe(true);
     const after = render(ctx);
-    expect(after).toMatch(/<div class="slot meal done" data-meal="lunch"><object data="\/food\/[a-z_]+_done\.png" type="image\/png" aria-hidden="true"><img class="eaten"/);
+    expect(after).not.toContain("slot meal");
     expect(after).not.toContain("loop-eat");
   });
 
@@ -128,6 +137,7 @@ describe("吃: the meal on the little table under the window (room-turn R3)", ()
     act(ctx, "meal-table");
     act(ctx, "meal-table");
     act(ctx, "loop-eat", { meal: "lunch" });
+    act(ctx, "loop-choice", { choice: "eat" });
     expect(store.getEvents().filter((e) => e.kind === "step" && e.name === "eat:lunch")).toHaveLength(1);
     expect(done(store, "eat")).toBe(true);
     // An empty table is only a click.

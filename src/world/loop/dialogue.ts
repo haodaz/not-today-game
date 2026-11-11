@@ -33,6 +33,10 @@ export type Ending =
   | { readonly kind: "bedAsk"; readonly record?: true }
   /** lying-view R6: getting up from the bed: 起床 / 再躺一会儿. */
   | { readonly kind: "riseAsk" }
+  /** author 2026-11-11: at the door with a delivery outside: 门外有东西。拿进来吗？ 拿进来 / 再等等. */
+  | { readonly kind: "doorAsk"; readonly meal: "lunch" | "dinner" }
+  /** author 2026-11-11: at the little table with the meal: 现在吃吗？ 吃 / 再等等. */
+  | { readonly kind: "eatAsk"; readonly meal: "lunch" | "dinner" }
   /** Kuro's upgrade offer as a line in the box (dialogue spec): 升级 / 不了. */
   | { readonly kind: "kuroOffer"; readonly object: string; readonly decline: "offer" | "nag" }
   /** 要和克总聊聊吗？ — 聊聊 / 先不聊. */
@@ -46,7 +50,7 @@ export type Ending =
 
 /** Endings that wait for a choice (Kuro's turn waits for the player's box). */
 export const endsInChoice = (e: Ending): boolean =>
-  e.kind === "beatChoices" || e.kind === "loan" || e.kind === "recognise" || e.kind === "kuroOffer" || e.kind === "kuroAsk" || e.kind === "bedAsk" || e.kind === "riseAsk" || e.kind === "kuroTurn" || e.kind === "kuroWait";
+  e.kind === "beatChoices" || e.kind === "loan" || e.kind === "recognise" || e.kind === "kuroOffer" || e.kind === "kuroAsk" || e.kind === "bedAsk" || e.kind === "riseAsk" || e.kind === "doorAsk" || e.kind === "eatAsk" || e.kind === "kuroTurn" || e.kind === "kuroWait";
 
 export interface Queued {
   /** Where it came from (for tests and to avoid queueing the same thing twice). */
@@ -155,7 +159,7 @@ const queuedKey = (d: DialogueState, key: string): boolean => {
  * only an answer counts as asked (recognise FR1).
  */
 export function dropQuestion(d: DialogueState, object: string): DialogueState {
-  const isQ = (q: Queued) => q.ending.kind === "recognise" && q.ending.object === object;
+  const isQ = (q: Queued) => (q.ending.kind === "recognise" && q.ending.object === object) || q.key.endsWith(`:recognise:${object}:look`);
   const queue = d.queue.filter((q) => !isQ(q));
   const waiting = d.waiting?.filter((p) => !isQ(p.item));
   if (queue.length === d.queue.length && waiting?.length === d.waiting?.length) return d;
@@ -336,6 +340,14 @@ export const RISE_OPTIONS: readonly ChoiceOption[] = [
   { index: 0, text: null, choice: "up", labelKey: "room.rise.up" },
   { index: 1, text: null, choice: "stay", labelKey: "room.rise.stay" },
 ];
+export const DOOR_ASK_OPTIONS: readonly ChoiceOption[] = [
+  { index: 0, text: null, choice: "take", labelKey: "delivery.take" },
+  { index: 1, text: null, choice: "wait", labelKey: "delivery.wait" },
+];
+export const EAT_ASK_OPTIONS: readonly ChoiceOption[] = [
+  { index: 0, text: null, choice: "eat", labelKey: "room.eat.yes" },
+  { index: 1, text: null, choice: "wait", labelKey: "room.eat.wait" },
+];
 export const KURO_OFFER_OPTIONS: readonly ChoiceOption[] = [
   { index: 0, text: null, choice: "yes", labelKey: "upgrade.yes" },
   { index: 1, text: null, choice: "no", labelKey: "upgrade.no" },
@@ -352,6 +364,8 @@ function options(q: Queued, state: State, events?: readonly GameEvent[]): Choice
   if (q.ending.kind === "kuroOffer") return [...KURO_OFFER_OPTIONS];
   if (q.ending.kind === "bedAsk") return q.ending.record ? [...BED_RECORD_OPTIONS] : [...BED_OPTIONS];
   if (q.ending.kind === "riseAsk") return [...RISE_OPTIONS];
+  if (q.ending.kind === "doorAsk") return [...DOOR_ASK_OPTIONS];
+  if (q.ending.kind === "eatAsk") return [...EAT_ASK_OPTIONS];
   if (q.ending.kind === "recognise") {
     // No hints: the same look for every option; the order is the run's, not content's.
     const entry = recogniseTable.get(q.ending.object);

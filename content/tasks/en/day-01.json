@@ -134,28 +134,20 @@
     },
     {
       "id": "task2",
-      "title": "Change one number in the receivables.",
+      "title": "Look at the receivables.",
       "app": "ledger",
       "done": "task_receivable_done",
       "start": {
         "say": [
           {
             "k": "narration",
-            "t": "The client's row: days overdue, 30 to 31. One cell, ten seconds."
+            "t": "The client's row: 31 days overdue. Yesterday it was 30."
           }
         ],
         "options": [
           {
             "mode": "self",
             "goto": "self"
-          },
-          {
-            "mode": "look",
-            "goto": "look"
-          },
-          {
-            "mode": "let",
-            "goto": "let"
           }
         ]
       },
@@ -163,10 +155,12 @@
         "say": [
           {
             "k": "narration",
-            "t": "You changed it yourself. The column still has your decimal points and your unevenness."
+            "t": "You look, and leave it. That number grows by itself."
           }
         ],
-        "kuro": [],
+        "kuro": [
+          "One more day."
+        ],
         "effects": {
           "flags": [
             "task_receivable_done"
@@ -216,7 +210,7 @@
             "Future Intelligence (client)",
             "44,000.00",
             "09-10",
-            30,
+            31,
             "3rd instalment"
           ],
           [

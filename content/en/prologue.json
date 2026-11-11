@@ -22,7 +22,7 @@
     {
       "k": "speaker",
       "who": "boss",
-      "t": "{bossCalls}. Vivi, you, the few of us who founded this: we rowed a small boat upstream all the way. Now the boat is finally big."
+      "t": "{bossCalls}. Me, Vivi and you: the three of us founded this, and we rowed a small boat upstream all the way. Now the boat is finally big."
     },
     {
       "k": "inner",
@@ -73,13 +73,13 @@
     },
     {
       "k": "narration",
-      "t": "The red envelope comes in the evening. The family table, two more dishes than usual.",
+      "t": "The company is in the capital; home is a small city. Back for New Year this time, there are two more dishes than usual.",
       "backdrop": "/room/dream/home_dinner.jpg"
     },
     {
       "k": "speaker",
       "who": "family",
-      "t": "{nick}, eat."
+      "t": "{nick}, eat more. It's all the things you like."
     },
     {
       "k": "narration",

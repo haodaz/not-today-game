@@ -51,7 +51,8 @@ describe("jitter", () => {
 
 describe("labelKey", () => {
   it("maps word kinds to string keys", () => {
-    expect(labelKey("boss", "fine")).toBe("reply.fine");
+    expect(labelKey("boss", "fine")).toBe("reply.boss.fine"); // author 2026-11-11: the boss hears the word in his own wording
+    expect(labelKey("teacher", "fine")).toBe("reply.fine"); // a recipient without wording of its own
     expect(labelKey("boss", "no")).toBe("word.no");
     expect(labelKey("family", "no")).toBe("word.no");
     expect(labelKey("family", "fine")).toBe("family.fine");

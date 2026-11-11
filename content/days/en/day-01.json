@@ -12,7 +12,8 @@
         {
           "k": "speaker",
           "who": "me",
-          "t": "This is Kuro. My AI."
+          "t": "This is Kuro. My AI.",
+          "prop": "/room/props/kuro.png"
         },
         {
           "k": "speaker",
@@ -37,7 +38,8 @@
         {
           "k": "speaker",
           "who": "kuro",
-          "t": "So you'll have to get up yourself."
+          "t": "So you'll have to get up yourself.",
+          "prop": ""
         },
         {
           "k": "speaker",
@@ -137,11 +139,13 @@
       "say": [
         {
           "k": "narration",
-          "t": "You put it between the two screens, into the gap. It wedges there. It does not fall."
+          "t": "You put it between the two screens, into the gap. It wedges there. It does not fall.",
+          "where": "desk"
         },
         {
           "k": "inner",
-          "t": "Older than this room by a whole era."
+          "t": "Older than this room by a whole era.",
+          "where": "desk"
         }
       ]
     },
@@ -304,7 +308,13 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "Receivables: the client is a month late, update the days. The salary, wait a little more.",
+            "t": "The receivables: the client is a month late. The salary will have to wait.",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "The client is one month late. The salary is twelve months late.",
             "where": "screen:msgs:boss"
           }
         ]
@@ -320,7 +330,7 @@
         "say": [
           {
             "k": "inner",
-            "t": "What you can say back is a few lines, like a very small table."
+            "t": "After ten-odd years of work, there are only a few things left you want to say."
           }
         ]
       },
@@ -391,15 +401,7 @@
       "text": "The table by the window. Eat.",
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
-      "required": false,
-      "onDone": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "The receipt has a remark I never wrote: no coriander."
-          }
-        ]
-      }
+      "required": false
     },
     {
       "id": "box",
@@ -410,7 +412,7 @@
     },
     {
       "id": "task2",
-      "text": "Change one number in the receivables.",
+      "text": "Look at the receivables.",
       "unlock": "done:task1",
       "done": "flag:task_receivable_done",
       "required": true
