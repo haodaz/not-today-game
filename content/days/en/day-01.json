@@ -7,16 +7,6 @@
         {
           "k": "speaker",
           "who": "kuro",
-          "t": "Morning."
-        },
-        {
-          "k": "speaker",
-          "who": "me",
-          "t": "This is Kuro. My AI."
-        },
-        {
-          "k": "speaker",
-          "who": "kuro",
           "t": "Let's see what's on today. Following the tasks never goes wrong."
         }
       ]
@@ -30,6 +20,56 @@
         {
           "k": "narration",
           "t": "A rented room, lived in alone. Bed, desk, door, window, all in this one room."
+        },
+        {
+          "k": "speaker",
+          "who": "kuro",
+          "t": "Morning."
+        },
+        {
+          "k": "speaker",
+          "who": "me",
+          "t": "This is Kuro. My AI."
+        },
+        {
+          "k": "speaker",
+          "who": "me",
+          "t": "It's a project I started two years ago: an AI assistant that is always on and looks after everything."
+        },
+        {
+          "k": "speaker",
+          "who": "me",
+          "t": "It never found its hook, so the project was shut down. All that's left is this copy, the one I use myself."
+        },
+        {
+          "k": "speaker",
+          "who": "me",
+          "t": "Next to the AIs of today, the ones that run every smart device and seem able to remake the world, Kuro can only open its mouth and move things on a screen."
+        },
+        {
+          "k": "speaker",
+          "who": "me",
+          "t": "There's no all-powerful AI like that in my home. I don't like them."
+        },
+        {
+          "k": "speaker",
+          "who": "kuro",
+          "t": "So you'll have to get up yourself."
+        },
+        {
+          "k": "speaker",
+          "who": "me",
+          "t": "…"
+        },
+        {
+          "k": "speaker",
+          "who": "me",
+          "t": "Everyone has to do that for themselves, surely!"
+        },
+        {
+          "k": "speaker",
+          "who": "kuro",
+          "t": "Not necessarily. A lot of people don't get up any more."
         },
         {
           "k": "inner",

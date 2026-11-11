@@ -1,33 +1,53 @@
 {
-  "_note": "The opening dream (author 2026-11-04): after the title questions the name becomes the shipping label on the box, fade, then this. The good years are the gamebook's day-1 dream (B round, the partner's paper, the hundredth employee, the red envelope; author's own outline in script/notes/v5.1-待办.md); then the era's turn (models got better, the price fell to zero; author: not only the boss's fault), the office given up. Then day 1 wakes in the rented room.",
+  "_note": "The opening dream (author 2026-11-04): after the title questions the name becomes the shipping label on the box, fade, then this. The good years are the gamebook's day-1 dream (B round, the partner's paper, the hundredth employee, the red envelope; author's own outline in script/notes/v5.1-待办.md); then the era's turn (models got better, the price fell to zero; author: not only the boss's fault), the office given up. Then day 1 wakes in the rented room. Author's wording pass 2026-11-11: narration says 你, only inner lines say 我; Vivi introduced with her portrait (narration + who); backdrop \"\" goes black before the last two lines.",
   "say": [
     {
       "k": "narration",
-      "t": "会议室的灯是白的，白得桌面上每个人的手都有一圈边。",
+      "t": "明亮的会议室，宽敞的空间。每个人都在等。",
       "backdrop": "/room/dream/office_busy.jpg"
     },
     {
       "k": "narration",
-      "t": "老板站在投影前面，手里攥着一支笔，笔帽早就不知道去哪了。"
+      "t": "你的老板，也是合伙人，老王。他站在投影前面，手里攥着一支笔，笔帽早就不知道去哪了。"
     },
     {
       "k": "speaker",
       "who": "boss",
-      "t": "未来智能的 B 轮，签了。"
+      "t": "咱们未来智能，B 轮，签了。"
     },
     {
       "k": "narration",
-      "t": "整间屋子的人这才敢出声。有人拍桌子，有人去拧矿泉水的盖子，有人举起手机对着投影拍。你坐在靠门的位置，离投影最远，看得最全。"
+      "t": "整间屋子的人这才敢出声。有人拍桌子，有人去拧矿泉水的盖子，有人举起手机对着投影拍。你坐在离投影最近的位置，看不全屏幕，字倒看得很清楚。"
     },
     {
       "k": "speaker",
       "who": "boss",
-      "t": "{bossCalls}。一条船上的，这回船大了。"
+      "t": "{bossCalls}。Vivi，你，咱们几个创始人，一路划着小船逆流而上。现在，船终于大了。"
+    },
+    {
+      "k": "inner",
+      "t": "是啊。我的股份确实不多，但是底子大了，也能奔富。真好啊。"
     },
     {
       "k": "narration",
-      "t": "合伙人在走廊里拦住你。手里一沓打印出来的论文，荧光笔画得很乱，一看就是边读边激动。",
-      "backdrop": "/room/dream/office_busy.jpg"
+      "who": "partner",
+      "t": "一个人在走廊里拦住你。她是陈薇薇，也叫 Vivi，你的合伙人。",
+      "backdrop": "/room/dream/office.jpg"
+    },
+    {
+      "k": "narration",
+      "who": "partner",
+      "t": "手里一沓打印出来的论文，荧光笔画得很乱，一看就是边读边激动。"
+    },
+    {
+      "k": "narration",
+      "who": "partner",
+      "t": "她总是这样，喜欢把文档打出来，一个字一个字地读。打得太多，她办公室那台打印机只舍得装黑白的墨。"
+    },
+    {
+      "k": "narration",
+      "who": "partner",
+      "t": "你知道，不看完，你哪也去不了。"
     },
     {
       "k": "speaker",
@@ -104,7 +124,8 @@
     },
     {
       "k": "inner",
-      "t": "梦到这些，也不算恍如隔世。"
+      "t": "梦到这些，也不算恍如隔世。",
+      "backdrop": ""
     },
     {
       "k": "inner",

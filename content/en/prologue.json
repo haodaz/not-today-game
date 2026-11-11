@@ -3,31 +3,51 @@
   "say": [
     {
       "k": "narration",
-      "t": "The meeting room light is white, so white that every hand on the table has a rim of light.",
+      "t": "A bright meeting room, plenty of space. Everyone is waiting.",
       "backdrop": "/room/dream/office_busy.jpg"
     },
     {
       "k": "narration",
-      "t": "The boss stands in front of the projector holding a pen. Its cap went missing long ago."
+      "t": "Your boss, and your partner: Lao Wang. He stands in front of the projector holding a pen. Its cap went missing long ago."
     },
     {
       "k": "speaker",
       "who": "boss",
-      "t": "Future Intelligence's Series B. It's signed."
+      "t": "Future Intelligence. Series B. Signed."
     },
     {
       "k": "narration",
-      "t": "Only then does the room dare to make a sound. Someone slaps the table, someone twists open a bottle of water, someone holds a phone up at the projector. You sit by the door, furthest from the screen, and see all of it."
+      "t": "Only then does the room dare to make a sound. Someone slaps the table, someone twists open a bottle of water, someone holds a phone up at the projector. You sit closest to the projector: you can't see the whole screen, but the words are clear."
     },
     {
       "k": "speaker",
       "who": "boss",
-      "t": "{bossCalls}. We're all in the same boat, and the boat just got bigger."
+      "t": "{bossCalls}. Vivi, you, the few of us who founded this: we rowed a small boat upstream all the way. Now the boat is finally big."
+    },
+    {
+      "k": "inner",
+      "t": "Yes. My share isn't much, but when the base is this big, I'll ride up with it. That's good. That's really good."
     },
     {
       "k": "narration",
-      "t": "The partner stops you in the corridor. A stack of printed papers, highlighter all over them, the marks of someone reading and getting excited at once.",
-      "backdrop": "/room/dream/office_busy.jpg"
+      "who": "partner",
+      "t": "Someone stops you in the corridor. This is Chen Weiwei, Vivi, your partner.",
+      "backdrop": "/room/dream/office.jpg"
+    },
+    {
+      "k": "narration",
+      "who": "partner",
+      "t": "In her hands, a stack of printed papers, highlighter all over them: the marks of someone reading and getting excited at once."
+    },
+    {
+      "k": "narration",
+      "who": "partner",
+      "t": "She's always like this. She prints documents out and reads them word by word. She prints so much that the printer in her office only gets black ink."
+    },
+    {
+      "k": "narration",
+      "who": "partner",
+      "t": "You know that until you have read all of it, you aren't going anywhere."
     },
     {
       "k": "speaker",
@@ -104,7 +124,8 @@
     },
     {
       "k": "inner",
-      "t": "Dreaming all that, it doesn't feel like another life."
+      "t": "Dreaming all that, it doesn't feel like another life.",
+      "backdrop": ""
     },
     {
       "k": "inner",

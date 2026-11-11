@@ -13,6 +13,7 @@ import type { SoundPlayer } from "@world/sound/player";
 import { arrived, canStart, diceOptions, gateFor, initialTitle, needsGate, pastGate, QUESTIONS, rowsShown, toMenu, toNames, toQuestions, turnPortrait, withAnswer, withPortrait, withPronoun, type Account, type TextQuestion, type TitleModel } from "./model";
 import { titleTable, type IdleEvent } from "./table";
 import { renderTitle } from "./view";
+import { morph } from "../dom/morph";
 import { createDrawerObject, createKurogotchiDrawer, drawerIds, KURO_ID, type DrawerObject, type KuroDrawerObject, type KuroMemoryStore } from "./drawer";
 import { albumRing, albumStep, hasAlbum } from "./album";
 import type { OpeningPhase } from "./model";
@@ -109,7 +110,8 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     const active = doc.activeElement as HTMLInputElement | null;
     const focusKey = active?.dataset?.focus ?? null;
     const caret = active?.selectionStart ?? null;
-    root.innerHTML = renderTitle(model).value;
+    // playtest 2026-11-11: patched in place, so the photo keeps drifting and a half-typed name survives.
+    morph(root, renderTitle(model).value);
     doc.documentElement.lang = getLocale() === "en" ? "en" : "zh";
     fit();
     // A camera move in progress continues from where it was, not from the start.

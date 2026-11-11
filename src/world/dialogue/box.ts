@@ -176,7 +176,8 @@ export function lineBoxModel(state: State, events: readonly GameEvent[], session
     portrait: head.voice === "kuro" ? portraitState(state, events, session, nowMs) : null,
     playerPortrait: head.voice !== "kuro" && (kind === "inner" || mine) ? playerPortraitSrc(state.names.portrait, isDreamNight(state.day, session.clock.beat)) : null,
     // opening R2: in the prologue a speaker not in npc.json gets a silhouette (stable per name).
-    npcPortrait: head.voice !== "kuro" && !mine && kind === "line" && line?.k === "speaker" ? (npcPortrait(line.who ?? "") ?? (head.key === PROLOGUE_KEY ? silhouetteFor(line.who ?? "") || null : null)) : null,
+    // author 2026-11-11: a narration line with `who` introduces that person: their portrait, no tag.
+    npcPortrait: head.voice !== "kuro" && !mine && kind === "line" && (line?.k === "speaker" || (line?.k === "narration" && line.who !== undefined)) ? (npcPortrait(line.who ?? "") ?? (head.key === PROLOGUE_KEY ? silhouetteFor(line.who ?? "") || null : null)) : null,
     // The first night's hand has no checklist line: a one-time pointer on its choices.
     pointer: pointerCls(session, "raid", scr.choices.length > 0 && raidShowing(state, session)),
     red: lateRing(state.day),

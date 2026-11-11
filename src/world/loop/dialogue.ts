@@ -198,7 +198,7 @@ export function sceneOf(d: DialogueState): Scene {
   let backdrop: string | null = null;
   let prop: string | null = null;
   for (const l of q.lines.slice(0, Math.min(d.line, q.lines.length - 1) + 1)) {
-    if (l.backdrop !== undefined) backdrop = l.backdrop;
+    if (l.backdrop !== undefined) backdrop = l.backdrop === "" ? null : l.backdrop;
     if (l.prop !== undefined) prop = l.prop === "" ? null : l.prop;
   }
   return backdrop === null && prop === null ? NO_SCENE : { backdrop, prop };

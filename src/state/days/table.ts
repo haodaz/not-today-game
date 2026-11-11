@@ -254,7 +254,7 @@ export function parseLine(v: unknown, w: string, onFail: (where: string, problem
     ...(r.sfx !== undefined ? { sfx: s(r.sfx, `${w}.sfx`) } : {}),
     ...(r.who !== undefined ? { who: s(r.who, `${w}.who`) } : {}),
     ...(r.where !== undefined ? { where: parsePlace(r.where, `${w}.where`, onFail) } : {}),
-    ...(r.backdrop !== undefined ? { backdrop: parsePicture(r.backdrop, BACKDROP_DIR, `${w}.backdrop`, onFail) } : {}),
+    ...(r.backdrop !== undefined ? { backdrop: parsePicture(r.backdrop, BACKDROP_DIR, `${w}.backdrop`, onFail, true) } : {}),
     ...(r.prop !== undefined ? { prop: parsePicture(r.prop, PROP_DIR, `${w}.prop`, onFail, true) } : {}),
   };
 }

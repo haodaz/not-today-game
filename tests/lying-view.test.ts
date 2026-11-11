@@ -19,6 +19,8 @@ import { edgeLeads } from "@world/room/look";
 import { parseDayFile, type DayFile } from "@state/days/table";
 import dayOneRaw from "@content/days/day-01.json";
 import { completeUntil } from "./complete-items";
+import { beatQueued } from "@world/loop/runtime";
+import { EMPTY_DIALOGUE as NO_DIALOGUE, push as pushDialogue } from "@world/loop/dialogue";
 
 const NIGHT: BeatClock = { beat: "night", time: "23:41" };
 const LOGIN = "林一";
@@ -46,29 +48,52 @@ const keys = (session: Session) => session.dialogue.queue.map((q) => q.key);
 // ——— R1 ———
 
 describe("R1 · Kuro and the player as speakers in a day file", () => {
-  it("day 1's boot: Kuro (its tag, portrait, box), the player (their name, portrait), Kuro again, then the narration", () => {
+  // author 2026-11-11: Kuro's introduction moved into `rise` (the bed wall): Kuro 早上好, the player's
+  // five lines about it, Kuro 所以你得自己起床, the player's two, Kuro's answer, then the turn hint.
+  const riseLines = () => dayFiles.get(1)!.beats.rise!.say;
+  const playRise = (r: ReturnType<typeof rig>) => {
+    r.session.dialogue = pushDialogue(NO_DIALOGUE, beatQueued(1, "rise", dayFiles.get(1)!.beats.rise!));
+  };
+  const toKuro = (r: ReturnType<typeof rig>, max = 20) => {
+    for (let i = 0; i < max; i++) {
+      if (r.shown()?.tag?.kind === "kuro") return i;
+      r.act("loop-advance");
+    }
+    throw new Error("no Kuro line within the first lines");
+  };
+
+  it("day 1's waking: Kuro (its tag, portrait, box), the player (their name, portrait), Kuro again, then the player's own", () => {
     const r = rig(storeAt(1), "lying");
     syncLoop(r.ctx, 0);
-    const boot = dayFiles.get(1)!.beats.boot!.say;
-    expect(boot.slice(0, 3).map((l) => l.who)).toEqual(["kuro", "me", "kuro"]);
-    // One click per line, in order; the first three in their own voices.
+    playRise(r);
+    const rise = riseLines();
+    const first = rise.findIndex((l) => l.who === "kuro");
+    expect(first).toBeGreaterThan(0);
+    expect(rise.slice(first, first + 2).map((l) => l.who)).toEqual(["kuro", "me"]);
+    expect(rise.filter((l) => l.who === "kuro")).toHaveLength(3);
+    const skipped = toKuro(r);
+    expect(skipped).toBe(first);
+    // One click per line, in order, each in its own voice.
     const seen: { text: string; tag: unknown; kuro: boolean; me: string | null }[] = [];
-    for (let i = 0; i < boot.length; i++) {
+    for (let i = first; i < rise.length; i++) {
       const m = r.shown()!;
       seen.push({ text: m.text, tag: m.tag, kuro: m.portrait !== null, me: m.playerPortrait });
       r.act("loop-advance");
     }
-    expect(seen.map((s) => s.text)).toEqual(boot.map((l) => l.t));
-    expect(seen[0]).toMatchObject({ tag: { kind: "kuro" }, kuro: true, me: null });
-    expect(seen[1]).toMatchObject({ tag: { kind: "who", text: LOGIN }, kuro: false, me: playerPortraitSrc("p1", false) });
-    expect(seen[2]).toMatchObject({ tag: { kind: "kuro" }, kuro: true, me: null });
-    if (seen[3]) expect(seen[3].kuro).toBe(false); // the rain moved to `rise` (author 2026-11-07): boot may be Kuro / me / Kuro only
-    if (seen[3]) expect(seen[3].tag).not.toEqual({ kind: "kuro" });
+    expect(seen.map((s) => s.text)).toEqual(rise.slice(first).map((l) => l.t));
+    for (let i = 0; i < seen.length; i++) {
+      const l = rise[first + i]!;
+      if (l.who === "kuro") expect(seen[i]).toMatchObject({ tag: { kind: "kuro" }, kuro: true, me: null });
+      else if (l.who === "me") expect(seen[i]).toMatchObject({ tag: { kind: "who", text: LOGIN }, kuro: false, me: playerPortraitSrc("p1", false) });
+      else expect(seen[i]!.tag).not.toEqual({ kind: "kuro" });
+    }
   });
 
   it("the box markup: kuro.name and Kuro's slot for Kuro's line; the player's name and portrait for theirs, never an NPC's", () => {
     const r = rig(storeAt(1), "lying");
     syncLoop(r.ctx, 0);
+    playRise(r);
+    toKuro(r);
     const kuro = r.box();
     expect(kuro).toContain(`<span class="who tag k">${t("kuro.name")}</span>`);
     expect(kuro).toContain("kuro-portrait");

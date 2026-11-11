@@ -51,6 +51,7 @@ describe("the loader", () => {
     expect(line({ backdrop: "/room/dream/classroom.jpg" }).backdrop).toBe("/room/dream/classroom.jpg");
     expect(line({ prop: "/room/props/exam_96.png" }).prop).toBe("/room/props/exam_96.png");
     expect(line({ prop: "" }).prop).toBe("");
+    expect(line({ backdrop: "" }).backdrop).toBe(""); // author 2026-11-11: the page goes black before a line
     expect(line({}).backdrop).toBeUndefined();
   });
   it.each([
@@ -58,7 +59,6 @@ describe("the loader", () => {
     ["backdrop", "/room/dream/../room.jpg"],
     ["backdrop", "/room/dream/classroom.gif"],
     ["backdrop", "room/dream/classroom.jpg"],
-    ["backdrop", ""],
     ["backdrop", 5],
     ["backdrop", null],
     ["prop", "/room/dream/classroom.jpg"],
