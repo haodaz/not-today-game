@@ -8,12 +8,13 @@
 import type { State } from "@state/types.gen";
 import type { GameEvent } from "@state/events";
 import type { Task, TaskBoard } from "@state/days/tasks";
-import { autoUnlock, boardState, canFetch, canPrint, foundCardIds, isKuroCard, isObjectLock, isReadLock, lockCodesOffered, lockJammed, lockObjectAvailable, lockUsedOk, modFound, pathFound, trayCards, tuneCarried, tuneOfferPending, tuneStepsLeft, wrongReadings, type BoardState } from "@state/days/board";
+import { autoUnlock, boardState, canFetch, canPrint, comparePending, foundCardIds, isKuroCard, isObjectLock, isReadLock, lockCodesOffered, lockJammed, lockObjectAvailable, lockUsedOk, modFound, pathFound, trayCards, tuneCarried, tuneOfferPending, tuneStepsLeft, wrongReadings, type BoardState } from "@state/days/board";
 import { ideOps, ideSrc, ideTranscript } from "@state/days/ide";
 import { cls, html, type SafeHtml } from "@world/html";
 import { FRAMES, frameUrl } from "../kuro/body";
 import { kuroText } from "../kuro/voice";
 import { renderMeeting } from "./meeting";
+import { RENDER_MS } from "./compare";
 import { hasString, t, tr } from "@world/i18n";
 import type { ActionContext, ActionHandler } from "../controller";
 import type { AppContext, Session } from "../model";
@@ -497,7 +498,51 @@ const actions: Record<string, ActionHandler> = {
     printBoard(ctx, c, s);
     ctx.rerender();
   },
+  // compare (author 2026-11-11): a version picked for the page: the fill, then Kuro renders the page
+  // (the preview holds the old page for RENDER_MS; the pane's buttons wait).
+  "compare-pick": withIde((ctx, data) => {
+    const c = currentBoard(ctx);
+    const page = c?.board.compare?.pages.find((p) => p.slot === data.slot);
+    if (!c || !page || !data.card || (data.card !== page.left && data.card !== page.right)) return;
+    comparePick(ctx, c, page.slot, data.card);
+  }),
+  // 克总你定: Kuro's card for the page (the boss's taste; it counts as a pick, not as its assist).
+  "compare-kuro": withIde((ctx, data) => {
+    const c = currentBoard(ctx);
+    const page = c?.board.compare?.pages.find((p) => p.slot === data.slot);
+    const card = c && page ? c.board.kuro.fill[page.slot] : undefined;
+    if (!c || !page || !card) return;
+    comparePick(ctx, c, page.slot, card);
+  }),
+  // 让克总重新改一稿: every page to Kuro's fill (one assist: judged flawed at night, SAN down a little).
+  "compare-redo": withIde((ctx) => {
+    const c = currentBoard(ctx);
+    if (!c?.board.compare) return;
+    const s = stateOf(ctx, c.task, c.board);
+    if (comparePending(c.board, s) !== null || canPrint(c.board, s)) return;
+    const held = holdPreview(ctx, c);
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "assistFill" } });
+    renderPause(ctx, c, held);
+    ctx.rerender();
+  }),
 };
+
+/** compare: the fill and the render pause; a page already holding that card is left alone. */
+function comparePick(ctx: ActionContext, c: { task: Task; board: TaskBoard }, slot: string, card: string): void {
+  const s = stateOf(ctx, c.task, c.board);
+  if (!s.unlocked || s.slots[slot] === card) return;
+  const held = holdPreview(ctx, c);
+  ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "fill", slot, card } });
+  renderPause(ctx, c, held);
+  ctx.rerender();
+}
+
+/** compare: the preview keeps the old page while Kuro "renders" the new one, then shows it. */
+function renderPause(ctx: ActionContext, c: { task: Task; board: TaskBoard }, heldSrc: string): void {
+  const now = ctx.now?.() ?? Date.now();
+  ctx.session.ideHold = { key: ideKey(ctx.store.getState().day, c.task), until: now + RENDER_MS, src: heldSrc };
+  ctx.later(RENDER_MS + 16, ctx.rerender);
+}
 
 /** The `task` event (slots + assists) and, for a person's deliverable, the `give` at once (the finish). */
 function printBoard(ctx: ActionContext, c: { task: Task; board: TaskBoard }, s: BoardState): void {

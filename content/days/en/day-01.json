@@ -419,7 +419,7 @@
     },
     {
       "id": "task3",
-      "text": "Thing A: Future Intelligence, the technical story.",
+      "text": "Merge v15 and v16 into v17 and send it to the boss.",
       "unlock": "done:task2",
       "done": "flag:task_merge_done",
       "required": true

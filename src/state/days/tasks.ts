@@ -170,6 +170,25 @@ export interface BoardMeeting {
   readonly seats?: Readonly<Record<string, MeetingSeat>>;
 }
 export type BoardView = (typeof BOARD_VIEWS)[number];
+/**
+ * compare (author 2026-11-11): 猜老板的言外之意. The day's work is one page at a time: two versions of
+ * the page side by side (`left` / `right` are cards), the boss's riddles for that page (`bubbles`,
+ * the key words between 【 and 】 drawn bold and coloured), a pick, Kuro renders the page, the boss's
+ * face answers (the slot's `answer` is what he wants). `remark` is Kuro's line about each card, said
+ * after the hand-in. `threshold` is the satisfaction (right pages, in %) the hand-in needs.
+ */
+export interface ComparePage {
+  readonly slot: string;
+  readonly left: string;
+  readonly right: string;
+  readonly bubbles: readonly string[];
+  readonly remark: Readonly<Record<string, string>>;
+}
+export interface BoardCompare {
+  readonly versions: readonly [string, string];
+  readonly threshold: number;
+  readonly pages: readonly ComparePage[];
+}
 /** The IDE view's preview (ide R1): the deliverable's URL, and the page index (`c`) of each slot. */
 export interface BoardIde {
   readonly src: string;
@@ -289,6 +308,8 @@ export interface TaskBoard {
   readonly meeting?: BoardMeeting;
   /** tune (2026-11-08): the bars and the modules (only with `view: "ide"`; then no slots, no cards). */
   readonly tune?: BoardTune;
+  /** compare (author 2026-11-11): the pages compared two versions at a time (only with `view: "ide"`). */
+  readonly compare?: BoardCompare;
 }
 /** Who a deliverable goes to (work v2 addition 2026-11-03 night); absent = `"hand"`. */
 export const DELIVERABLE_TO = ["boss", "partner", "group", "workbench", "hand"] as const;
@@ -520,7 +541,7 @@ function card(v: unknown, w: string): BoardCard {
  */
 function board(v: unknown, w: string): TaskBoard {
   if (!isRecord(v)) fail(w, "must be an object");
-  keys(v, ["kind", "title", "columns", "given", "slots", "cards", "kuro", "view", "ide", "beats", "meeting", "tune"], w);
+  keys(v, ["kind", "title", "columns", "given", "slots", "cards", "kuro", "view", "ide", "beats", "meeting", "tune", "compare"], w);
   if (v.kind !== "table") fail(`${w}.kind`, 'must be "table"');
   // Column headers are display-only and may be blank (the label column has no header).
   if (!Array.isArray(v.columns) || v.columns.length === 0 || !v.columns.every((c) => typeof c === "string")) fail(`${w}.columns`, "must be a non-empty list of strings");
@@ -629,6 +650,12 @@ function board(v: unknown, w: string): TaskBoard {
     if (view !== "ide") fail(`${w}.tune`, 'a tuning board needs view "ide"');
     tune = boardTune(v.tune, `${w}.tune`);
   }
+  // compare (author 2026-11-11): the pages, only on an IDE board.
+  let compare: BoardCompare | undefined;
+  if (v.compare !== undefined) {
+    if (view !== "ide") fail(`${w}.compare`, 'a compare board needs view "ide"');
+    compare = boardCompare(v.compare, `${w}.compare`, slotIds, cardIds);
+  }
   const allCards = new Set([...cardIds, ...kuroCardIds]);
   const beats = v.beats !== undefined ? boardBeats(v.beats, `${w}.beats`, slotIds, allCards, new Map((tune?.mods ?? []).map((m) => [m.id, new Set(m.paths.map((p) => p.id))]))) : undefined;
   return {
@@ -644,7 +671,41 @@ function board(v: unknown, w: string): TaskBoard {
     ...(beats ? { beats } : {}),
     ...(meeting ? { meeting } : {}),
     ...(tune ? { tune } : {}),
+    ...(compare ? { compare } : {}),
   };
+}
+
+/** compare (author 2026-11-11): two version names, a threshold 0–100, and the pages (each slot once, two different cards, 1–3 riddles, Kuro's remark per card). */
+function boardCompare(v: unknown, w: string, slotIds: ReadonlySet<string>, cardIds: ReadonlySet<string>): BoardCompare {
+  if (!isRecord(v)) fail(w, "must be an object");
+  keys(v, ["versions", "threshold", "pages"], w);
+  if (!Array.isArray(v.versions) || v.versions.length !== 2 || !v.versions.every((x) => typeof x === "string" && x !== "")) fail(`${w}.versions`, "must be two version names");
+  const versions = [v.versions[0], v.versions[1]] as [string, string];
+  if (!Number.isInteger(v.threshold) || (v.threshold as number) < 0 || (v.threshold as number) > 100) fail(`${w}.threshold`, "must be an integer from 0 to 100");
+  if (!Array.isArray(v.pages) || v.pages.length === 0) fail(`${w}.pages`, "must be a non-empty list");
+  const seen = new Set<string>();
+  const pages = v.pages.map((p, i): ComparePage => {
+    const pw = `${w}.pages[${i}]`;
+    if (!isRecord(p)) fail(pw, "a page must be an object");
+    keys(p, ["slot", "left", "right", "bubbles", "remark"], pw);
+    const slot = str(p.slot, `${pw}.slot`);
+    if (!slotIds.has(slot)) fail(`${pw}.slot`, `"${slot}" is not a slot`);
+    if (seen.has(slot)) fail(`${w}.pages`, `slot "${slot}" compared twice`);
+    seen.add(slot);
+    const left = str(p.left, `${pw}.left`);
+    const right = str(p.right, `${pw}.right`);
+    for (const c of [left, right]) if (!cardIds.has(c)) fail(pw, `"${c}" is not a card`);
+    if (left === right) fail(pw, "the two versions must differ");
+    if (!Array.isArray(p.bubbles) || p.bubbles.length === 0 || p.bubbles.length > 3 || !p.bubbles.every((b) => typeof b === "string" && b !== "")) fail(`${pw}.bubbles`, "must be one to three riddles");
+    if (!isRecord(p.remark)) fail(`${pw}.remark`, "must be an object");
+    const remark: Record<string, string> = {};
+    for (const [c, text] of Object.entries(p.remark)) {
+      if (c !== left && c !== right) fail(`${pw}.remark`, `"${c}" is not one of the page's two cards`);
+      remark[c] = str(text, `${pw}.remark.${c}`);
+    }
+    return { slot, left, right, bubbles: p.bubbles as string[], remark };
+  });
+  return { versions, threshold: v.threshold as number, pages };
 }
 
 /**
@@ -1077,6 +1138,9 @@ function localiseTask(zh: Task, en: Task, w: string): Task {
     if (!sameJson(meetingShape(zh.board), meetingShape(en.board))) fail(`${w}.board.meeting`, "meeting shape differs from the Chinese");
     const beatShape = (b: TaskBoard) => (b.beats ?? []).map((x) => ({ on: x.on, who: x.lines.map((l) => l.who) }));
     if (!sameJson(beatShape(zh.board), beatShape(en.board))) fail(`${w}.board.beats`, "beat shape differs from the Chinese");
+    // compare (author 2026-11-11): the pages, their cards, the threshold and the bubble counts are shared; only the text differs.
+    const compareShape = (b: TaskBoard) => (b.compare ? { threshold: b.compare.threshold, pages: b.compare.pages.map((p) => [p.slot, p.left, p.right, p.bubbles.length, Object.keys(p.remark).sort()]) } : null);
+    if (!sameJson(compareShape(zh.board), compareShape(en.board))) fail(`${w}.board.compare`, "compare shape differs from the Chinese");
     return bilingualValues(zh, { title: en.title, board: en.board, ...(zh.deliverable && en.deliverable ? { deliverable: en.deliverable } : {}) });
   }
   if (zh.start.say.length !== en.start.say.length || !sameJson(zh.start.options, en.start.options)) fail(`${w}.start`, "start shape differs from the Chinese");

@@ -1,0 +1,428 @@
+{
+  "id": "task3",
+  "title": "v17 · 未来智能的技术表达。",
+  "app": "docs",
+  "done": "task_merge_done",
+  "board": {
+    "kind": "table",
+    "title": "未来智能 · 技术表达",
+    "columns": [
+      "",
+      "老王要讲清楚的",
+      "写进去"
+    ],
+    "given": {
+      "rows": {
+        "r1": "我们靠什么做事",
+        "r2": "甲方的数据怎么进来",
+        "r3": "AI 在我们这儿干了什么",
+        "r4": "跟别家比，我们有什么",
+        "r5": "拿得出手的"
+      }
+    },
+    "slots": [
+      {
+        "id": "r1",
+        "label": "技术底座",
+        "answer": "c1"
+      },
+      {
+        "id": "r2",
+        "label": "数据",
+        "answer": "c2"
+      },
+      {
+        "id": "r3",
+        "label": "AI 用在哪",
+        "answer": "c3"
+      },
+      {
+        "id": "r4",
+        "label": "特色",
+        "answer": "c4"
+      },
+      {
+        "id": "r5",
+        "label": "证据",
+        "answer": "c5"
+      }
+    ],
+    "cards": [
+      {
+        "id": "c1",
+        "text": "一个知识图谱，二百多个节点，把甲方的业务对象连起来",
+        "from": {
+          "conv": "xiaozhang"
+        },
+        "hint": "在小张的私聊里"
+      },
+      {
+        "id": "c2",
+        "text": "三家客户的表格，每周导入一次",
+        "from": {
+          "file": "c-v17"
+        },
+        "hint": "在合作协议 v17 里"
+      },
+      {
+        "id": "c3",
+        "text": "AI 先合一版，人再核一遍",
+        "from": {
+          "conv": "boss"
+        },
+        "hint": "在老王的语音里"
+      },
+      {
+        "id": "c4",
+        "text": "懂甲方的行业，图谱是一点点对出来的",
+        "from": {
+          "file": "c-merged"
+        },
+        "hint": "在合作协议合并版里"
+      },
+      {
+        "id": "c5",
+        "text": "两个试点客户，一个已付款",
+        "from": {
+          "file": "e-receivable"
+        },
+        "hint": "在应收表里"
+      },
+      {
+        "id": "d1",
+        "text": "我们拥有自研大模型",
+        "from": {
+          "file": "vivi-plan-1"
+        },
+        "hint": "在 Vivi 的页面里"
+      },
+      {
+        "id": "d2",
+        "text": "全自动，无需人工",
+        "from": {
+          "file": "vivi-plan-1"
+        },
+        "hint": "在 Vivi 的页面里"
+      }
+    ],
+    "kuro": {
+      "fill": {
+        "r1": "c1",
+        "r2": "c2",
+        "r3": "c3",
+        "r4": "c4",
+        "r5": "k1"
+      },
+      "cards": [
+        {
+          "id": "k1",
+          "text": "已服务五十家头部客户"
+        }
+      ],
+      "unlock": "-"
+    },
+    "view": "ide",
+    "ide": {
+      "src": "/docs/player/day-01-space.html",
+      "pages": {
+        "r1": 2,
+        "r2": 4,
+        "r3": 10,
+        "r4": 11,
+        "r5": 12
+      },
+      "files": {
+        "r1": {
+          "name": "03-共同智能空间.js",
+          "code": [
+            "import { SNAP } from \"{{api}}\";",
+            "import { draw } from \"./space.js\";",
+            "",
+            "export const page = {",
+            "  kick: \"03 · 共同智能空间\",",
+            "  title: \"群体脑要一起干活，先得有一个共同智能空间\",",
+            "  base: {{slot}},  // 我们靠什么做事",
+            "  stats: () => ({ nodes: SNAP.nodes.length, links: SNAP.links.length, clients: SNAP.clients.length }),",
+            "  draw: (t) => draw.project(SNAP, t),  // x = φ(现实) ∈ 𝒮",
+            "};"
+          ]
+        },
+        "r2": {
+          "name": "05-三套说法.js",
+          "code": [
+            "import { SNAP } from \"{{api}}\";",
+            "import { draw } from \"./space.js\";",
+            "",
+            "export const page = {",
+            "  kick: \"05 · 投射 · 三套说法\",",
+            "  title: \"可现实不会自己排好队：三家客户，三套说法\",",
+            "  data: {{slot}},  // 甲方的数据怎么进来",
+            "  fields: SNAP.clients.map((c) => c.fields),  // 客户名称 / 甲方单位 / 签约主体",
+            "  draw: (t) => draw.columns(SNAP.clients, t)",
+            "};"
+          ]
+        },
+        "r3": {
+          "name": "11-AI先合人再核.js",
+          "code": [
+            "import { SNAP } from \"{{api}}\";",
+            "import { draw } from \"./space.js\";",
+            "",
+            "export const page = {",
+            "  kick: \"11 · 以脑为本 ③ AI 先合，人再核\",",
+            "  title: \"第三招：AI 先合一版，人再核一遍，每一次都回流\",",
+            "  ai: {{slot}},  // AI 在我们这儿干了什么",
+            "  loop: (x, y, yHat, K) => x + K * (y - yHat),  // 回流修正，Σ 一轮一轮缩小",
+            "  draw: (t) => draw.review(SNAP.reviews, t)",
+            "};"
+          ]
+        },
+        "r4": {
+          "name": "12-护城河.js",
+          "code": [
+            "import { SNAP } from \"{{api}}\";",
+            "import { draw } from \"./space.js\";",
+            "",
+            "export const page = {",
+            "  kick: \"12 · 护城河\",",
+            "  title: \"所以模型年年换，空间一直是我们的\",",
+            "  edge: {{slot}},  // 跟别家比，我们有什么",
+            "  // 换模型只是换一种读法：x′ = U x，UᵀU = I，点和点的距离不变",
+            "  draw: (t) => draw.rotate(SNAP, t)",
+            "};"
+          ]
+        },
+        "r5": {
+          "name": "13-客户.js",
+          "code": [
+            "import { SNAP } from \"{{api}}\";",
+            "import { draw } from \"./space.js\";",
+            "",
+            "export const page = {",
+            "  kick: \"13 · 客户\",",
+            "  title: \"这条路已经接上了客户：在链路上的，和已经到账的\",",
+            "  proof: {{slot}},  // 拿得出手的",
+            "  clients: SNAP.receivable,  // 以应收表为准，截在快照那一刻",
+            "  draw: (t) => draw.clients(SNAP.receivable, t)",
+            "};"
+          ]
+        }
+      },
+      "api": {
+        "live": "./api.js",
+        "fixed": "./snapshot.js",
+        "at": "2028-10-16 13:52",
+        "snap": "snap-2028-10-16-01"
+      },
+      "diff": {
+        "r1": {
+          "line": 6,
+          "v16": "  title: \"一个大脑管所有事，先得有一个共同智能空间\",",
+          "v17": "  title: \"群体脑要一起干活，先得有一个共同智能空间\","
+        },
+        "r2": {
+          "line": 6,
+          "v16": "  title: \"现实不会自己排好队：三家客户，各算各的\",",
+          "v17": "  title: \"可现实不会自己排好队：三家客户，三套说法\","
+        },
+        "r5": {
+          "line": 6,
+          "v16": "  title: \"这条路已经接上了客户\",",
+          "v17": "  title: \"这条路已经接上了客户：在链路上的，和已经到账的\","
+        }
+      }
+    },
+    "beats": [
+      {
+        "on": "open",
+        "lines": [
+          {
+            "who": "kuro",
+            "text": "Good to see you."
+          },
+          {
+            "who": "kuro",
+            "text": "v17 昨晚合好了。左边「页面」里带点的三页，和昨天的 v16 不一样，点开一页，你定留哪边；空着的五页，从下面的「素材」里挑一句写进去。都定了就拉一次数据，打快照给老王。"
+          }
+        ]
+      },
+      {
+        "on": "fill:r1:c1",
+        "lines": [
+          {
+            "who": "kuro",
+            "text": "小张对了一晚上的节点，二百一十一个，他数了两遍。拿它当底座，稳。"
+          }
+        ]
+      },
+      {
+        "on": "fill:r1:d1",
+        "lines": [
+          {
+            "who": "kuro",
+            "text": "「自研大模型」是 Vivi 页面上的话。模型是租的，页面上什么都能写。你定。"
+          }
+        ]
+      },
+      {
+        "on": "fill:r2:c2",
+        "lines": [
+          {
+            "who": "kuro",
+            "text": "三家客户三套叫法，先全部并起来，再合掉同义的。一根都不丢。"
+          }
+        ]
+      },
+      {
+        "on": "fill:r3:c3",
+        "lines": [
+          {
+            "who": "kuro",
+            "text": "「AI 先合一版，人再核一遍」是老王早上 08:58 自己说的，我录着。"
+          }
+        ]
+      },
+      {
+        "on": "fill:r3:d2",
+        "lines": [
+          {
+            "who": "kuro",
+            "text": "全自动，就是没有人核。投资人要是问「谁来核」，你怎么答。"
+          }
+        ]
+      },
+      {
+        "on": "fill:r4:c4",
+        "lines": [
+          {
+            "who": "kuro",
+            "text": "模型年年换，这些点是一个一个对出来的。租来的模型谁都有，点是自己的。"
+          }
+        ]
+      },
+      {
+        "on": "fill:r5:c5",
+        "lines": [
+          {
+            "who": "kuro",
+            "text": "两个试点，青禾付了钱，晚了一个月。拿得出手。"
+          }
+        ]
+      },
+      {
+        "on": "kuro",
+        "lines": [
+          {
+            "who": "kuro",
+            "text": "剩下的我填了。最后一页我写了「五十家头部客户」，比两家好听。"
+          }
+        ]
+      },
+      {
+        "on": "print",
+        "lines": [
+          {
+            "who": "kuro",
+            "text": "快照打好了，接口断开，这份不会再变。交给老王，他会照着念。"
+          },
+          {
+            "who": "kuro",
+            "text": "每改一页，图谱就要重新算一遍，二百多个点全部重跑。讲故事的人不知道这个，也不用知道。"
+          }
+        ]
+      },
+      {
+        "on": "send",
+        "lines": [
+          {
+            "who": "kuro",
+            "text": "发给老王了。他迟早会看。"
+          }
+        ]
+      },
+      {
+        "on": "merge:r1:v17",
+        "lines": [
+          {
+            "who": "kuro",
+            "text": "「一群脑，互相看着」是你昨天说的，我只是记下来。"
+          }
+        ]
+      },
+      {
+        "on": "merge:r1:v16",
+        "lines": [
+          {
+            "who": "kuro",
+            "text": "老王要的是新的。随时能改回来。"
+          }
+        ]
+      },
+      {
+        "on": "merge:r2:v17",
+        "lines": [
+          {
+            "who": "kuro",
+            "text": "三套说法并起来再合同义的，是你改的，不是我。"
+          }
+        ]
+      },
+      {
+        "on": "merge:r2:v16",
+        "lines": [
+          {
+            "who": "kuro",
+            "text": "各算各的，那就还是三家。"
+          }
+        ]
+      },
+      {
+        "on": "merge:r5:v17",
+        "lines": [
+          {
+            "who": "kuro",
+            "text": "到账的只有一家，写上也是一家。"
+          }
+        ]
+      },
+      {
+        "on": "merge:r5:v16",
+        "lines": [
+          {
+            "who": "kuro",
+            "text": "不提到账，老王会问。"
+          }
+        ]
+      },
+      {
+        "on": "merge",
+        "lines": [
+          {
+            "who": "kuro",
+            "text": "三页都定了。"
+          }
+        ]
+      },
+      {
+        "on": "fetch",
+        "lines": [
+          {
+            "who": "kuro",
+            "text": "二百一十一个点，一千一百八十条关系，和小张数的一样。比上周少一半：上周的是估的，这次是数的。"
+          }
+        ]
+      }
+    ]
+  },
+  "deliverable": {
+    "id": "d1-tech",
+    "label": "技术表达（事情 A）",
+    "to": "boss"
+  },
+  "judge": {
+    "perfect": 0,
+    "flawed": -2,
+    "wrong": -5,
+    "wrongAt": 2
+  }
+}

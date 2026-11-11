@@ -216,38 +216,27 @@ describe("the box owns the screen (2026-11-08)", () => {
 });
 
 describe("G7 · a board task's page (2026-11-08)", () => {
-  it("the first card in the tray is lit, then an empty slot once a card is picked, then 打快照; nothing is refused", () => {
+  it("compare (author 2026-11-11): the page's version buttons are lit page by page; every page picked and the boss content, 发给老王; nothing is refused", () => {
     const store = booted();
     step(store, "openApp:msgs");
     open(store, "conv:boss");
     completeUntil(store, "task3");
     const task = taskByFlag(1, "task_merge_done")!;
+    const cmp = task.board!.compare!;
     const r = rig(store);
     r.session.workbenchPage = `task:${task.id}`;
-    // The boss's thread was opened today, so one card is already found: the tray's first card is lit.
-    for (const c of task.board!.cards) {
-      const from = c.from as { file?: string; conv?: string } | undefined;
-      if (from?.file) open(store, `file:${from.file}`);
-      if (from?.conv) open(store, `conv:${from.conv}`);
-    }
-    // ide v2 (2026-11-08): three pages differ from v16: the merge comes first (要 v17 的 is lit).
     const g0 = guideNow(store.getState(), store.getEvents(), r.session)!;
-    expect(g0).toMatchObject({ id: "G7", target: { kind: "board", step: "merge", slot: "r1" }, refuse: null, scope: "none" });
-    expect(r.out()).toMatch(/data-action="board-merge" data-slot="r1" data-keep="v17"[^>]*data-guide="on"/);
-    for (const slot of Object.keys(task.board!.ide!.diff!)) r.act("board-merge", { slot, keep: "v17" });
+    expect(g0).toMatchObject({ id: "G7", target: { kind: "board", step: "card", slot: cmp.pages[0]!.slot }, refuse: null, scope: "none" });
+    expect(guideRefuses(g0, "dock", { app: "msgs" })).toBe(false);
+    expect(r.out()).toMatch(new RegExp(`data-action="compare-pick" data-slot="${cmp.pages[0]!.slot}"[^>]*data-guide="on"`));
+    // The boss's taste page by page (the slot's answer): the ring moves on; a wrong pick moves on too.
+    for (const page of cmp.pages) {
+      const answer = task.board!.slots.find((x) => x.id === page.slot)!.answer;
+      r.act("compare-pick", { slot: page.slot, card: answer });
+    }
     const g = guideNow(store.getState(), store.getEvents(), r.session)!;
-    expect(g).toMatchObject({ id: "G7", target: { kind: "board", step: "card" }, refuse: null, scope: "none" });
-    expect(guideRefuses(g, "dock", { app: "msgs" })).toBe(false);
-    expect(r.out()).toMatch(/data-action="board-card"[^>]*data-guide="on"/);
-    r.act("board-card", { card: task.board!.cards[0]!.id });
-    expect(guideNow(store.getState(), store.getEvents(), r.session)!.target).toMatchObject({ kind: "board", step: "slot" });
-    // Every slot filled: the data pull is lit; pulled: 打快照 is lit.
-    r.session.boardPick = null;
-    for (const sl of task.board!.slots) store.appendEvent({ kind: "boardStep", taskId: task.id, op: { t: "fill", slot: sl.id, card: sl.answer } });
-    expect(guideNow(store.getState(), store.getEvents(), r.session)!.target).toMatchObject({ kind: "board", step: "fetch" });
-    expect(r.out()).toMatch(/data-action="board-fetch"[^>]*data-guide="on"/);
-    r.act("board-fetch");
-    expect(guideNow(store.getState(), store.getEvents(), r.session)!.target).toMatchObject({ kind: "board", step: "print" });
+    expect(g).toMatchObject({ id: "G7", target: { kind: "board", step: "print" } });
+    expect(r.out()).toMatch(/data-action="board-print"[^>]*data-guide="on"/);
   });
 });
 

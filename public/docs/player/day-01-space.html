@@ -516,7 +516,7 @@ const sl = document.getElementById('scale'); sl.oninput = () => { touched = true
 
 /* ===== 板子：?fill=r1:c1,… 是 IDE 里格子填了什么；单独打开时显示交出去的那一版 ===== */
 const CARDS = { c1:'一个知识图谱，二百多个节点，把甲方的业务对象连起来', c2:'三家客户的表格，每周导入一次', c3:'AI 先合一版，人再核一遍', c4:'懂甲方的行业，图谱是一点点对出来的', c5:'两个试点客户，一个已付款',
-  d1:'我们拥有自研大模型', d2:'全自动，无需人工', k1:'已服务五十家头部客户' };
+  d1:'我们拥有自研大模型', d2:'全自动，无需人工', d3:'多源数据实时接入，自动清洗，秒级同步', d4:'三年行业积累，领先的技术壁垒', d5:'已服务五十家头部客户', k1:'已服务五十家头部客户' };
 const SLOTS = { r1:'技术底座', r2:'数据', r3:'AI 用在哪', r4:'特色', r5:'证据' };
 { const q = new URLSearchParams(location.search), FILL = q.has('fill') ? Object.fromEntries(q.get('fill').split(',').filter(Boolean).map(x => x.split(':'))) : { r1:'c1', r2:'c2', r3:'c3', r4:'c4', r5:'c5' };
   document.querySelectorAll('.slot').forEach(el => { const id = el.dataset.slot, card = FILL[id];

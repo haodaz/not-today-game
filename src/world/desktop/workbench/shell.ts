@@ -24,12 +24,13 @@ import { ICONS } from "../icons";
 import { moveApp, otherSide } from "../placement";
 import { messageActions } from "../messages/actions";
 import { renderObjectBar } from "./objbar";
+import { comparePane } from "./compare";
 import { doneWorkItems, modeChips, openWork, plainSurface, questionText, surfaceOf as workSurfaceOf, workItems, workSendChip } from "./work";
 
 type Fill = (s: string) => string;
 
 /** The panes in toggle order (R1: 文件 · 预览 · 代码 · 表格 · 会议; a task without a board: its surface). */
-const PANE_ORDER: readonly PaneId[] = ["files", "preview", "code", "table", "meeting", "work"];
+const PANE_ORDER: readonly PaneId[] = ["compare", "files", "preview", "code", "table", "meeting", "work"];
 /** At most two panes at once (R1): opening a third closes the earliest. */
 export const MAX_PANES = 2;
 
@@ -45,12 +46,17 @@ function surfaceOf(task: Task, live: boolean): "ide" | "table" | "meeting" | "wo
   return task.board.view === "ide" ? "ide" : task.board.view === "meeting" && task.board.meeting ? "meeting" : "table";
 }
 
+/** compare (author 2026-11-11): the board's decisions run in their own pane, not in the explorer. */
+const isCompare = (task: Task): boolean => !!task.board?.compare;
+
 /** The panes this task has (R3): only these toggles appear. */
 export function panesOf(task: Task, live: boolean): PaneId[] {
   const surface = surfaceOf(task, live);
   // R11: a task without a board has its surface (document, ledger, code) as its one pane; none without one.
   if (surface === "work") return workSurfaceOf(task) ? ["work"] : [];
   // tune (2026-11-08): the 代码 pane of a tuning board is its bars and switches.
+  // compare (author 2026-11-11): 老王的话 first, then the preview (and the code when the pages have files); no 文件.
+  if (isCompare(task)) return PANE_ORDER.filter((p) => p === "compare" || p === "preview" || (p === "code" && !!task.board!.ide?.files));
   const own: PaneId[] = surface === "ide" ? (task.board!.ide?.files || task.board!.tune ? ["preview", "code"] : ["preview"]) : [surface];
   return PANE_ORDER.filter((p) => p === "files" || own.includes(p));
 }
@@ -60,8 +66,10 @@ export function shellDefaults(task: Task, live: boolean): ShellState {
   let panes = panesOf(task, live).filter((p) => p !== "files");
   // tune: the bars are the work, so 参数 sits above 预览.
   if (task.board?.tune) panes = [...panes].sort((a, b) => (a === "code" ? -1 : b === "code" ? 1 : 0));
-  // A tuning board has no pages and no sources to list: no explorer.
-  return { explorer: !!task.board && !task.board.tune && live, panes, max: null, slot: null, slotAt: 0, source: null };
+  // compare: 老王的话 and the preview open; nothing else.
+  if (isCompare(task)) panes = panes.filter((p) => p === "compare" || p === "preview");
+  // A tuning board has no pages and no sources to list: no explorer. A compare board neither.
+  return { explorer: !!task.board && !task.board.tune && !isCompare(task) && live, panes, max: null, slot: null, slotAt: 0, source: null };
 }
 
 /** The key of a page's cards: a task read back (handed in, an earlier day) has its own panes. */
@@ -87,9 +95,9 @@ function boardSlotsOn(task: Task, day: number, events: readonly GameEvent[]): Re
 }
 
 /** A pane's name and its icon (a glyph drawn in the toggle's colour). */
-const PANE_KEY: Readonly<Record<PaneId, string>> = { files: "pane.files", preview: "pane.preview", code: "pane.code", table: "pane.table", meeting: "pane.meeting", work: "pane.code" };
+const PANE_KEY: Readonly<Record<PaneId, string>> = { files: "pane.files", preview: "pane.preview", code: "pane.code", table: "pane.table", meeting: "pane.meeting", work: "pane.code", compare: "pane.compare" };
 /** Line icons (R9): globe 预览, brackets 代码, grid 表格, play-in-rectangle 会议, folder 文件, a document for a task's own surface. */
-const PANE_ICON: Readonly<Record<PaneId, SafeHtml>> = { files: ICONS.folder, preview: ICONS.globe, code: ICONS.code, table: ICONS.grid, meeting: ICONS.play, work: ICONS.doc };
+const PANE_ICON: Readonly<Record<PaneId, SafeHtml>> = { files: ICONS.folder, preview: ICONS.globe, code: ICONS.code, table: ICONS.grid, meeting: ICONS.play, work: ICONS.doc, compare: ICONS.contacts };
 const WORK_KEY: Readonly<Record<string, string>> = { docs: "wb.nav.docs", ledger: "wb.nav.ledger", code: "wb.nav.code" };
 const paneName = (pane: PaneId, task: Task): string => {
   const key = pane === "work" ? (WORK_KEY[task.app] ?? "pane.code") : pane === "code" && task.board?.tune && hasString("pane.tune") ? "pane.tune" : PANE_KEY[pane];
@@ -399,6 +407,10 @@ function conversation(ctx: AppContext, task: Task, day: number, live: boolean, f
         : [];
       const keep = offer.length && hasString("board.tune.keep") ? html`<button type="button" class="sh-chip" data-action="board-keep">${tr("board.tune.keep")}</button>` : null;
       chips = html`${offer}${keep}`;
+    } else if (board.compare) {
+      // compare: no 让它补全 (Kuro's rewrite is offered in the pane, at the settlement); the hand-in alone.
+      const finish = html`<button type="button" class="sh-chip primary" data-action="board-print"${canPrint(board, s) ? null : html` disabled`}>${finishLabel(task)}</button>`;
+      chips = html`${finish}`;
     } else {
       const label = board.view === "ide" && hasString("board.ide.snapshot") ? tr("board.ide.snapshot") : finishLabel(task);
       const finish = html`<button type="button" class="sh-chip primary" data-action="board-print"${canPrint(board, s) ? null : html` disabled`}>${label}</button>`;
@@ -428,7 +440,7 @@ export function renderShell(ctx: AppContext, task: Task, day: number, fill: Fill
   // The page's share of 工作台's one top bar (R10): the title (with the session dropdown's ▾), 交给 X
   // and the status chip; at the right end the explorer and pane toggles and the 老物件 strip.
   const toggleLabel = hasString("pane.explorer.toggle") ? t("pane.explorer.toggle") : "";
-  const explorerToggle = board && !board.tune && live ? html`<button type="button" class="${cls("sh-tg", "explorer", st.explorer && "on")}" data-action="shell-explorer" aria-pressed="${st.explorer ? "true" : "false"}" aria-label="${toggleLabel}" title="${toggleLabel}">${ICONS.files}</button>` : null;
+  const explorerToggle = board && !board.tune && !board.compare && live ? html`<button type="button" class="${cls("sh-tg", "explorer", st.explorer && "on")}" data-action="shell-explorer" aria-pressed="${st.explorer ? "true" : "false"}" aria-label="${toggleLabel}" title="${toggleLabel}">${ICONS.files}</button>` : null;
   const status = html`<span class="${cls("st", done ? "done" : "doing")}">${tr(done ? "wb.task.done" : "wb.task.doing")}</span>`;
   const who = forWhom(task);
   const toggles = panes.map((p) => {
@@ -449,7 +461,8 @@ export function renderShell(ctx: AppContext, task: Task, day: number, fill: Fill
   const busy = !!board?.tune && typing.some((t) => t > ctx.nowMs);
   const paneCards = open.map((p) => {
     let body: SafeHtml;
-    if (p === "preview") body = previewPane(task, board!, s!, ops, selected, carried, live ? null : state.day, hold);
+    if (p === "compare") body = comparePane(task, board!, s!, live, hold !== null, st.slot);
+    else if (p === "preview") body = previewPane(task, board!, s!, ops, selected, carried, live ? null : state.day, hold);
     else if (p === "code") body = board!.tune ? tunePane(board!, s!, day, events, live, session, key, busy) : codePane(board!, s!, session, selected, ops.some((o) => o.t === "print"), live);
     else if (p === "table") body = tablePane(ctx, task, board!, s!, live, day);
     else if (p === "meeting") body = meetingWindow(ctx, task, board!);

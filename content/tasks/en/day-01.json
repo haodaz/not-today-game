@@ -288,7 +288,7 @@
       "done": "task_merge_done",
       "board": {
         "kind": "table",
-        "title": "Future Intelligence · the technical story",
+        "title": "Future Intelligence · the technical story v17",
         "columns": [
           "",
           "What Lao Wang wants made clear",
@@ -307,12 +307,12 @@
           {
             "id": "r1",
             "label": "Foundation",
-            "answer": "c1"
+            "answer": "d1"
           },
           {
             "id": "r2",
             "label": "Data",
-            "answer": "c2"
+            "answer": "d3"
           },
           {
             "id": "r3",
@@ -327,81 +327,60 @@
           {
             "id": "r5",
             "label": "Proof",
-            "answer": "c5"
+            "answer": "d5"
           }
         ],
         "cards": [
           {
             "id": "c1",
-            "text": "A knowledge graph, two hundred-odd nodes, joining the client's business objects",
-            "from": {
-              "conv": "xiaozhang"
-            },
-            "hint": "in Xiao Zhang's chat"
+            "text": "A knowledge graph, two hundred-odd nodes, joining the client's business objects"
           },
           {
             "id": "c2",
-            "text": "Three clients' spreadsheets, imported weekly",
-            "from": {
-              "file": "c-v17"
-            },
-            "hint": "in the agreement, v17"
+            "text": "Three clients' spreadsheets, imported weekly"
           },
           {
             "id": "c3",
-            "text": "AI drafts a merge, a person checks it",
-            "from": {
-              "conv": "boss"
-            },
-            "hint": "in Lao Wang's voice note"
+            "text": "AI drafts a merge, a person checks it"
           },
           {
             "id": "c4",
-            "text": "We know the client's trade; the graph was matched by hand",
-            "from": {
-              "file": "c-merged"
-            },
-            "hint": "in the merged agreement"
+            "text": "We know the client's trade; the graph was matched by hand"
           },
           {
             "id": "c5",
-            "text": "Two pilot clients, one has paid",
-            "from": {
-              "file": "e-receivable"
-            },
-            "hint": "in the receivables sheet"
+            "text": "Two pilot clients, one has paid"
           },
           {
             "id": "d1",
-            "text": "We have our own large model",
-            "from": {
-              "file": "vivi-plan-1"
-            },
-            "hint": "on Vivi's page"
+            "text": "We have our own large model"
           },
           {
             "id": "d2",
-            "text": "Fully automatic, no people needed",
-            "from": {
-              "file": "vivi-plan-1"
-            },
-            "hint": "on Vivi's page"
+            "text": "Fully automatic, no people needed"
+          },
+          {
+            "id": "d3",
+            "text": "Multi-source data ingested in real time, cleaned automatically, synced by the second"
+          },
+          {
+            "id": "d4",
+            "text": "Three years of industry experience, a leading technical moat"
+          },
+          {
+            "id": "d5",
+            "text": "Serving fifty leading clients"
           }
         ],
         "kuro": {
           "fill": {
-            "r1": "c1",
-            "r2": "c2",
+            "r1": "d1",
+            "r2": "d3",
             "r3": "c3",
             "r4": "c4",
-            "r5": "k1"
+            "r5": "d5"
           },
-          "cards": [
-            {
-              "id": "k1",
-              "text": "Serving fifty leading clients"
-            }
-          ],
+          "cards": [],
           "unlock": "-"
         },
         "view": "ide",
@@ -490,29 +469,6 @@
                 "};"
               ]
             }
-          },
-          "api": {
-            "live": "./api.js",
-            "fixed": "./snapshot.js",
-            "at": "2028-10-16 13:52",
-            "snap": "snap-2028-10-16-01"
-          },
-          "diff": {
-            "r1": {
-              "line": 6,
-              "v16": "  title: \"One brain runs everything; first it needs one shared space\",",
-              "v17": "  title: \"A group of brains needs one shared space to work in\","
-            },
-            "r2": {
-              "line": 6,
-              "v16": "  title: \"Reality doesn't line up by itself: three clients, each counted alone\",",
-              "v17": "  title: \"Reality doesn't line up by itself: three clients, three vocabularies\","
-            },
-            "r5": {
-              "line": 6,
-              "v16": "  title: \"This road already reaches clients\",",
-              "v17": "  title: \"This road already reaches clients: in the pipeline, and paid\","
-            }
           }
         },
         "beats": [
@@ -525,79 +481,7 @@
               },
               {
                 "who": "kuro",
-                "text": "v17 was merged overnight. The three dotted pages under Pages on the left differ from yesterday's v16: open one and decide which side stays. The five empty pages take a line from Sources below. When all are decided, pull the data once and take the snapshot for Wang."
-              }
-            ]
-          },
-          {
-            "on": "fill:r1:c1",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "Zhang checked those nodes all night: two hundred and eleven, counted twice. A solid foundation."
-              }
-            ]
-          },
-          {
-            "on": "fill:r1:d1",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "'Our own large model' is what Vivi's page says. The model is rented; a page can say anything. Your call."
-              }
-            ]
-          },
-          {
-            "on": "fill:r2:c2",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "Three clients, three vocabularies: union first, then fold the synonyms. Nothing lost."
-              }
-            ]
-          },
-          {
-            "on": "fill:r3:c3",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "'AI drafts, a person checks' is what Wang said himself at 08:58. I have the recording."
-              }
-            ]
-          },
-          {
-            "on": "fill:r3:d2",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "Fully automatic means nobody checks. When an investor asks who checks, what do you say."
-              }
-            ]
-          },
-          {
-            "on": "fill:r4:c4",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "Models change every year; these points were checked one by one. Anyone can rent a model. The points are ours."
-              }
-            ]
-          },
-          {
-            "on": "fill:r5:c5",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "Two pilots; Qinghe paid, a month late. Good enough to show."
-              }
-            ]
-          },
-          {
-            "on": "kuro",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "I filled the rest. On the last page I wrote 'fifty leading clients'. It sounds better than two."
+                "text": "v15 you wrote last week, v16 is Vivi's edit, the boss wants v17. One page at a time: his words above, the two versions below, you choose which side stays, I render it."
               }
             ]
           },
@@ -606,11 +490,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Snapshot taken, the API cut; this one will not change again. Give it to Wang; he will read it out."
-              },
-              {
-                "who": "kuro",
-                "text": "Every page you change, the graph is computed again, all two hundred points rerun. The people who tell the story do not know that, and do not need to."
+                "text": "Snapshot taken; this one will not change again. Hand it to the boss, he will read it out as is."
               }
             ]
           },
@@ -619,87 +499,94 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Sent to Wang. He will read it, eventually."
-              }
-            ]
-          },
-          {
-            "on": "merge:r1:v17",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "'A group of brains, watching each other' is what you said yesterday. I only wrote it down."
-              }
-            ]
-          },
-          {
-            "on": "merge:r1:v16",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "Wang wants the new one. You can switch back any time."
-              }
-            ]
-          },
-          {
-            "on": "merge:r2:v17",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "Union, then fold the synonyms: your change, not mine."
-              }
-            ]
-          },
-          {
-            "on": "merge:r2:v16",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "Each counted alone, so it stays three."
-              }
-            ]
-          },
-          {
-            "on": "merge:r5:v17",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "Only one has paid. Written down, it is still one."
-              }
-            ]
-          },
-          {
-            "on": "merge:r5:v16",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "Leave out the payment and Wang will ask."
-              }
-            ]
-          },
-          {
-            "on": "merge",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "All three pages decided."
-              }
-            ]
-          },
-          {
-            "on": "fetch",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "Two hundred and eleven nodes, one thousand one hundred and eighty links, the same as Zhang's count. Half of last week's: last week's was an estimate, this one was counted."
+                "text": "Sent to the boss. He will look at it sooner or later."
               }
             ]
           }
-        ]
+        ],
+        "compare": {
+          "versions": [
+            "v15",
+            "v16"
+          ],
+          "threshold": 80,
+          "pages": [
+            {
+              "slot": "r1",
+              "left": "c1",
+              "right": "d1",
+              "bubbles": [
+                "The foundation page needs more 【weight】; people should hear at once that we are 【not a wrapper】.",
+                "This version is still 【missing something】. Think it over.",
+                "No rush, just send it before you leave."
+              ],
+              "remark": {
+                "c1": "Two hundred and eleven nodes. Xiao Zhang counted twice. The boss never counted once.",
+                "d1": "The model is rented. Write 'our own' on the page; the rent is still due."
+              }
+            },
+            {
+              "slot": "r2",
+              "left": "c2",
+              "right": "d3",
+              "bubbles": [
+                "The data part has to show a 【closed loop】; investors love anything 【real-time】.",
+                "Don't go too fine on the granularity; the direction matters.",
+                "What do you think?"
+              ],
+              "remark": {
+                "c2": "Three clients' spreadsheets, imported weekly. Not one word in that sentence excites anyone.",
+                "d3": "Imported weekly. Call it real time if you like. Real time, once a week."
+              }
+            },
+            {
+              "slot": "r3",
+              "left": "c3",
+              "right": "d2",
+              "bubbles": [
+                "Don't oversell the AI part; 【a person in the loop】, that is what investors are afraid of now.",
+                "This page could be a bit more down to earth.",
+                "Look at the competitors, but keep our own character."
+              ],
+              "remark": {
+                "c3": "He said this himself at 08:58 this morning. I have it recorded.",
+                "d2": "Fully automatic means nobody checks. When an investor asks who checks, what do you say."
+              }
+            },
+            {
+              "slot": "r4",
+              "left": "c4",
+              "right": "d4",
+              "bubbles": [
+                "Stop writing 【moat】; every deck has a moat. Write something 【concrete】.",
+                "The story needs to be sexier.",
+                "Open up your perspective; think from the company's side."
+              ],
+              "remark": {
+                "c4": "Two hundred-odd nodes matched one by one. Truly hard to copy: too slow.",
+                "d4": "Three years of experience. The company is two."
+              }
+            },
+            {
+              "slot": "r5",
+              "left": "c5",
+              "right": "d5",
+              "bubbles": [
+                "Numbers should leave 【room for imagination】.",
+                "Don't put 'two clients' on a page.",
+                "The direction is fine; polish the details."
+              ],
+              "remark": {
+                "c5": "Two pilots, one has paid. An investor will ask where the second one is.",
+                "d5": "Fifty. One has paid; forty-nine live in the imagination."
+              }
+            }
+          ]
+        }
       },
       "deliverable": {
         "id": "d1-tech",
-        "label": "the technical story (Thing A)",
+        "label": "the technical story v17",
         "to": "boss"
       },
       "judge": {

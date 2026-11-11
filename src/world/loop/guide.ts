@@ -7,7 +7,7 @@ import type { State } from "@state/types.gen";
 import type { Session } from "@world/desktop/model";
 import { lockedConversation, viviLockHeld } from "@world/desktop/vivi";
 import { openWork, threadFor } from "@world/desktop/workbench/work";
-import { boardState, canFetch, canPrint, mergesLeft, modFound, trayCards, tuneOfferPending } from "@state/days/board";
+import { boardState, canFetch, canPrint, mergesLeft, modFound, trayCards, tuneOfferPending, comparePending } from "@state/days/board";
 import { dayTable } from "@state/replies/table";
 
 /** The boss has a message of his own this morning (an incoming line that waits for nothing). */
@@ -84,6 +84,13 @@ export function guideNow(state: State, events: readonly GameEvent[], session: Se
       const first = Object.keys(s.mods).length === 0 ? board.tune.mods.find((m) => modFound(m, day, events))?.id : undefined;
       if (first !== undefined) return { id: "G7", target: { kind: "board", step: "mod", slot: first }, refuse: null, scope: "none" };
       return null;
+    }
+    // compare (author 2026-11-11): the page's two versions are the thing to click; every page picked and the boss content, 发给老王.
+    if (board.compare) {
+      const pending = comparePending(board, s);
+      if (board.given.lock !== undefined && !s.unlocked) return { id: "G7", target: { kind: "board", step: "lock" }, refuse: null, scope: "none" };
+      if (pending) return { id: "G7", target: { kind: "board", step: "card", slot: pending.slot }, refuse: null, scope: "none" };
+      return canPrint(board, s) ? { id: "G7", target: { kind: "board", step: "print" }, refuse: null, scope: "none" } : null;
     }
     const step = board.given.lock !== undefined && !s.unlocked ? "lock" : mergesLeft(board, s).length ? "merge" : canPrint(board, s) ? "print" : canFetch(board, s) ? "fetch" : session.boardPick ? "slot" : trayCards(board, s, day, events, open.tree.id).length || board.cards.some((c) => c.slot !== undefined && !(c.slot in s.slots)) ? "card" : null;
     // The merge step names its page, so the ring finds that page's bar, or its row when another page is open.
@@ -276,7 +283,8 @@ function boardAnchors(step: "lock" | "merge" | "card" | "slot" | "fetch" | "prin
     return [[["data-action", "board-merge"], ...at, ["data-keep", "v17"]], [["data-action", "shell-slot"], ...at]];
   }
   if (step === "fetch") return [[["data-action", "board-fetch"]]];
-  if (step === "card") return [[["data-action", "board-option"]], [["data-action", "board-card"]]];
+  // compare: the page's version buttons (the slot names the page); else the tray's directions / cards.
+  if (step === "card") return [...(slot !== undefined ? [[["data-action", "compare-pick"], ["data-slot", slot]] as const] : []), [["data-action", "board-option"]], [["data-action", "board-card"]]];
   if (step === "slot") return [[["data-action", "board-slot"], ["!", "filled"]], [["data-action", "shell-slot"]]];
   return [[["data-action", "board-print"]]];
 }

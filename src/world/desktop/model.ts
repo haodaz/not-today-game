@@ -29,7 +29,7 @@ import { WALL_FADE_MS, wallpaperFor } from "./wallpaper";
 /** 工作台's pages (its 消息 pane moved to 听听, tingtalk 2026-11-04). */
 export type WorkbenchPage = "home" | "docs" | "ledger" | "code" | TaskPage;
 /** A task page's app panes (shell R3). `work` is a task without a board: its doc / ledger / code surface. */
-export type PaneId = "files" | "preview" | "code" | "table" | "meeting" | "work";
+export type PaneId = "files" | "preview" | "code" | "table" | "meeting" | "work" | "compare";
 /** A task page's cards (shell R1): see `Session.shell`. `max` may also be the explorer. */
 export interface ShellState {
   explorer: boolean;

@@ -419,7 +419,7 @@
     },
     {
       "id": "task3",
-      "text": "事情 A：未来智能的技术表达。",
+      "text": "v15 和 v16 合成 v17，发给老王。",
       "unlock": "done:task2",
       "done": "flag:task_merge_done",
       "required": true

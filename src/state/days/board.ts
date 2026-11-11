@@ -5,7 +5,7 @@
 import type { BoardOp, GameEvent } from "../events";
 import type { State } from "../types.gen";
 import { meetingCardFound } from "./meeting";
-import { isMeetingFrom, taskByFlag, taskFiles, type BoardCard, type BoardLock, type CardFrom, type Task, type TaskBoard, type TaskDeliverable, type TuneMod, type TunePath } from "./tasks";
+import { isMeetingFrom, taskByFlag, taskFiles, type BoardCard, type BoardLock, type CardFrom, type Task, type TaskBoard, type TaskDeliverable, type TuneMod, type TunePath, type ComparePage } from "./tasks";
 import { dayFile } from "./table";
 import { takenByKuro } from "@world/objects/taken";
 import { handOf } from "../hands";
@@ -142,8 +142,9 @@ export function stepBoard(board: TaskBoard, s: BoardState, op: BoardOp): BoardSt
         for (const m of board.tune.mods) if (!(m.id in next.mods)) next = stepBoard(board, next, { t: "mod", id: m.id, path: board.tune.assist[m.id]! });
         return tuneMarkDone(board, { ...next, unlocked: true, assists: s.assists + 1 });
       }
-      const slots = { ...s.slots };
-      for (const slot of board.slots) if (!(slot.id in slots)) slots[slot.id] = board.kuro.fill[slot.id]!;
+      // compare (author 2026-11-11): 让克总重新改一稿 rewrites every page to its fill, picked or not.
+      const slots = board.compare ? { ...board.kuro.fill } : { ...s.slots };
+      if (!board.compare) for (const slot of board.slots) if (!(slot.id in slots)) slots[slot.id] = board.kuro.fill[slot.id]!;
       return { ...s, slots, unlocked: true, assists: s.assists + 1 };
     }
   }
@@ -163,7 +164,29 @@ export function boardState(board: TaskBoard, day: number, taskId: string, events
  */
 export function canPrint(board: TaskBoard, s: BoardState): boolean {
   if (board.tune) return s.done && !tuneOfferPending(board, s);
+  // compare (author 2026-11-11): every page picked and the boss satisfied enough (the threshold).
+  if (board.compare) return s.unlocked && comparePending(board, s) === null && compareScore(board, s).pct >= board.compare.threshold;
   return s.unlocked && board.slots.every((slot) => slot.id in s.slots) && mergesLeft(board, s).length === 0 && (!board.ide?.api || s.fetched);
+}
+
+// ——— compare (author 2026-11-11): the pages ———
+
+/** The first page not picked yet, or null when every page is. */
+export function comparePending(board: TaskBoard, s: BoardState): ComparePage | null {
+  return board.compare?.pages.find((p) => !(p.slot in s.slots)) ?? null;
+}
+
+/** A picked page the boss likes: its slot holds the slot's answer (what he wants). */
+export function compareRight(board: TaskBoard, slots: Readonly<Record<string, string>>, slot: string): boolean {
+  return slots[slot] !== undefined && slots[slot] === board.slots.find((x) => x.id === slot)?.answer;
+}
+
+/** The boss's satisfaction: right pages over all pages, in whole percent (picked pages only count). */
+export function compareScore(board: TaskBoard, s: BoardState): { readonly right: number; readonly picked: number; readonly total: number; readonly pct: number } {
+  const pages = board.compare?.pages ?? [];
+  const picked = pages.filter((p) => p.slot in s.slots).length;
+  const right = pages.filter((p) => compareRight(board, s.slots, p.slot)).length;
+  return { right, picked, total: pages.length, pct: pages.length ? Math.round((right / pages.length) * 100) : 0 };
 }
 
 // ——— tune (2026-11-08): the bars ———
@@ -448,11 +471,11 @@ export function handNight(day: number): boolean {
 export type BoardVerdict = "perfect" | "flawed" | "wrong";
 
 /** The task event that printed a board on a day (its slots + assists), or null (not printed). */
-export function printedBoard(day: number, events: readonly GameEvent[]): { flag: string; slots: Readonly<Record<string, string>> } | null {
+export function printedBoard(day: number, events: readonly GameEvent[]): { flag: string; slots: Readonly<Record<string, string>>; assists: number } | null {
   for (const e of events) {
     if (e.kind !== "task" || e.day !== day || e.slots === undefined) continue;
     const tree = taskByFlag(day, e.flag);
-    if (tree?.board) return { flag: e.flag, slots: e.slots };
+    if (tree?.board) return { flag: e.flag, slots: e.slots, assists: e.assists ?? 0 };
   }
   return null;
 }
@@ -551,6 +574,8 @@ export function boardJudgement(day: number, events: readonly GameEvent[]): { ver
   const wrong = (board.tune ? tuneShort(board, boardState(board, day, tree.id, events).mods).length : wrongCount(board, printed.slots)) + readings;
   let verdict: BoardVerdict;
   if (!given) verdict = "wrong";
+  // compare (author 2026-11-11): a draft Kuro rewrote to the boss's taste is never perfect: SAN goes down a little.
+  else if (board.compare && printed.assists > 0) verdict = "flawed";
   else if (wrong === 0) verdict = "perfect";
   else if (wrong < judge.wrongAt) verdict = "flawed";
   else verdict = "wrong";

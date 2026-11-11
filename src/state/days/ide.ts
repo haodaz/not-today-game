@@ -2,7 +2,7 @@
 // (`ideSrc`, R3) and Kuro's transcript (`ideTranscript`, R4) are derived from today's board ops, so
 // a reload or a replay shows the same page and the same lines. No new events.
 import type { BoardOp, GameEvent } from "@state/events";
-import { freshBoard, stepBoard, tuneReached, tuneStepsLeft, tuneValues, type BoardState } from "./board";
+import { compareRight, compareScore, freshBoard, stepBoard, tuneReached, tuneStepsLeft, tuneValues, type BoardState } from "./board";
 import type { BoardBeatLine, Task, TaskBoard } from "./tasks";
 
 /** One step the IDE view follows: a board op, the print (the `task` event), or the send (`give`). */
@@ -118,6 +118,60 @@ export function ideSrc(board: TaskBoard, s: BoardState, ops: readonly IdeOp[], c
   return `${src}${sep}${IDE_QUERY}&c=${page}&fill=${fill}${data}`;
 }
 
+/**
+ * compare (author 2026-11-11): the conversation of a compare board. The `open` beat; then per pick the
+ * player's line (`compare:cmpPick`, args n / v), Kuro's 渲染好了 and the boss's face in words
+ * (`compare:cmpHappy` / `compare:cmpPout`); Kuro's rewrite (`compare:cmpRedo` / `cmpRedone`); when the
+ * last page is picked the sum (`compare:cmpSum`, args n / r / w / pct) and pass / fail; the hand-in's
+ * `print` beat and Kuro's remark about each chosen card (said after the hand-in, as the author asked);
+ * then the `send` beat. The view words the `args` lines through `board.ide.<kind>`.
+ */
+export function compareTranscript(board: TaskBoard, ops: readonly IdeOp[]): IdeLine[] {
+  const cmp = board.compare!;
+  const beats = new Map((board.beats ?? []).map((b) => [b.on, b]));
+  const out: IdeLine[] = [];
+  const show = (on: string) => {
+    const beat = beats.get(on);
+    if (beat) for (const l of beat.lines) out.push({ on, who: l.who, text: l.text });
+  };
+  show("open");
+  let walk = freshBoard(board);
+  const sum = (s: BoardState) => {
+    const sc = compareScore(board, s);
+    out.push({ on: "compare:cmpSum", who: "kuro", text: "", args: { n: String(sc.total), r: String(sc.right), w: String(sc.total - sc.right), pct: String(sc.pct) } });
+    out.push({ on: sc.pct >= cmp.threshold ? "compare:cmpPass" : "compare:cmpFail", who: "kuro", text: "", args: { pct: String(cmp.threshold) } });
+  };
+  for (const op of ops) {
+    if (op.t === "fill") {
+      const i = cmp.pages.findIndex((p) => p.slot === op.slot);
+      const after = stepBoard(board, walk, op);
+      if (i < 0 || after === walk) continue;
+      const page = cmp.pages[i]!;
+      const v = op.card === page.left ? cmp.versions[0] : cmp.versions[1];
+      out.push({ on: "compare:cmpPick", who: "me", text: "", args: { n: String(i + 1), v } });
+      out.push({ on: "compare:cmpRendered", who: "kuro", text: "", args: { n: String(i + 1) } });
+      out.push({ on: compareRight(board, after.slots, op.slot) ? "compare:cmpHappy" : "compare:cmpPout", who: "kuro", text: "", args: {} });
+      walk = after;
+      if (cmp.pages.every((p) => p.slot in walk.slots)) sum(walk);
+    } else if (op.t === "assistFill") {
+      const after = stepBoard(board, walk, op);
+      if (after === walk) continue;
+      out.push({ on: "compare:cmpRedo", who: "me", text: "", args: {} });
+      out.push({ on: "compare:cmpRedone", who: "kuro", text: "", args: {} });
+      walk = after;
+      sum(walk);
+    } else if (op.t === "print") {
+      show("print");
+      for (const p of cmp.pages) {
+        const card = walk.slots[p.slot];
+        const remark = card ? p.remark[card] : undefined;
+        if (remark) out.push({ on: `remark:${p.slot}`, who: "kuro", text: remark });
+      }
+    } else if (op.t === "send") show("send");
+  }
+  return out;
+}
+
 /** A transcript line and the beat it belongs to. */
 export interface IdeLine extends BoardBeatLine {
   readonly on: string;
@@ -132,6 +186,7 @@ export interface IdeLine extends BoardBeatLine {
  * send → `send`. Ops without a beat (a clear, a wrong code) show nothing. Pure.
  */
 export function ideTranscript(board: TaskBoard, ops: readonly IdeOp[], carried: Readonly<Record<string, string>> = {}): IdeLine[] {
+  if (board.compare) return compareTranscript(board, ops);
   const beats = new Map((board.beats ?? []).map((b) => [b.on, b]));
   const shown = new Set<string>();
   const out: IdeLine[] = [];

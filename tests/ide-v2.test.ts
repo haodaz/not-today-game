@@ -1,11 +1,13 @@
-// ide v2 (2026-11-08): merge v16/v17, pull the latest data, snapshot — on day 1's real board (no mocks).
+// ide v2 (2026-11-08): merge v16/v17, pull the latest data, snapshot — on day 1's board as it was before
+// the compare redesign (author 2026-11-11), kept as tests/fixtures/board-ide-v2.json; day 3 is real.
 import { describe, expect, it } from "vitest";
+import fixture from "./fixtures/board-ide-v2.json";
 import { canFetch, canPrint, freshBoard, mergesLeft, stepBoard, trayCards, type BoardState } from "@state/days/board";
 import { ideSrc, ideTranscript } from "@state/days/ide";
 import { parseTaskFile, taskByFlag, type TaskBoard } from "@state/days/tasks";
 
 describe("ide v2: merge v16/v17, pull the latest data, snapshot (2026-11-08)", () => {
-  const task1 = () => taskByFlag(1, "task_merge_done")!;
+  const task1 = () => parseTaskFile({ day: 1, tasks: [structuredClone(fixture)] }, "fixture").tasks[0]!;
   const fillAll = (b: TaskBoard, s: BoardState) => b.slots.reduce((acc, sl) => stepBoard(b, acc, { t: "fill", slot: sl.id, card: sl.answer }), s);
   it("day 1's board carries three differing pages and an API; a merge keeps a side; a fetch happens once", () => {
     const b = task1().board!;
