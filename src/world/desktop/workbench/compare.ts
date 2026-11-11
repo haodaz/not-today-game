@@ -79,6 +79,7 @@ export function comparePane(task: Task, board: TaskBoard, s: BoardState, live: b
   const kuro = live && hasString("compare.kuro") ? html`<button type="button" class="sh-chip cmp-kuro" data-action="compare-kuro" data-slot="${page.slot}"${busy ? html` disabled` : null}>${tr("compare.kuro")}</button>` : null;
   const rendering = busy ? html`<div class="cmp-rendering" aria-live="polite">${tr("compare.rendering", { n: String(n) })}</div>` : null;
   const head = html`<div class="cmp-head"><span class="cmp-n">${tr("compare.page", { n: String(n), label })}</span><span class="cmp-of">${n} / ${cmp.pages.length}</span></div>`;
-  const vs = html`<div class="cmp-vs">${card(page.left, cmp.versions[0])}${card(page.right, cmp.versions[1])}</div>`;
+  // The guide rings the pair (never one side: that would name the answer).
+  const vs = html`<div class="cmp-vs" data-slot="${page.slot}">${card(page.left, cmp.versions[0])}${card(page.right, cmp.versions[1])}</div>`;
   return html`<div class="${cls("cmp", done && "done", busy && "busy")}" data-task="${task.id}">${boss}${head}${vs}<div class="cmp-tools">${kuro}${rendering}</div>${faces(board, s, page, live)}${done ? settlement(board, s, live, busy) : null}</div>`;
 }

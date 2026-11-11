@@ -262,7 +262,9 @@ describe("G7 · a board task's page (2026-11-08)", () => {
     const g0 = guideNow(store.getState(), store.getEvents(), r.session)!;
     expect(g0).toMatchObject({ id: "G7", target: { kind: "board", step: "card", slot: cmp.pages[0]!.slot }, refuse: null, scope: "none" });
     expect(guideRefuses(g0, "dock", { app: "msgs" })).toBe(false);
-    expect(r.out()).toMatch(new RegExp(`data-action="compare-pick" data-slot="${cmp.pages[0]!.slot}"[^>]*data-guide="on"`));
+    // the ring is on the pair, never on one side (that would name the answer)
+    expect(r.out()).toMatch(new RegExp(`class="cmp-vs" data-slot="${cmp.pages[0]!.slot}" data-guide="on"`));
+    expect(r.out()).not.toMatch(/data-action="compare-pick"[^>]*data-guide="on"/);
     // The boss's taste page by page (the slot's answer): the ring moves on; a wrong pick moves on too.
     for (const page of cmp.pages) {
       const answer = task.board!.slots.find((x) => x.id === page.slot)!.answer;
