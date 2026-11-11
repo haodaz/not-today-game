@@ -19,8 +19,6 @@ import { edgeLeads } from "@world/room/look";
 import { parseDayFile, type DayFile } from "@state/days/table";
 import dayOneRaw from "@content/days/day-01.json";
 import { completeUntil } from "./complete-items";
-import { beatQueued } from "@world/loop/runtime";
-import { EMPTY_DIALOGUE as NO_DIALOGUE, push as pushDialogue } from "@world/loop/dialogue";
 
 const NIGHT: BeatClock = { beat: "night", time: "23:41" };
 const LOGIN = "林一";
@@ -48,12 +46,10 @@ const keys = (session: Session) => session.dialogue.queue.map((q) => q.key);
 // ——— R1 ———
 
 describe("R1 · Kuro and the player as speakers in a day file", () => {
-  // author 2026-11-11: Kuro's introduction moved into `rise` (the bed wall): Kuro 早上好, the player's
-  // five lines about it, Kuro 所以你得自己起床, the player's two, Kuro's answer, then the turn hint.
-  const riseLines = () => dayFiles.get(1)!.beats.rise!.say;
-  const playRise = (r: ReturnType<typeof rig>) => {
-    r.session.dialogue = pushDialogue(NO_DIALOGUE, beatQueued(1, "rise", dayFiles.get(1)!.beats.rise!));
-  };
+  // author 2026-11-11: the boot beat (the ceiling, before anything) is Kuro's introduction: Kuro
+  // 早上好, the player's five lines about it, Kuro 所以你得自己起床, the player's two, Kuro's answer,
+  // the player's 好吧, then Kuro's task line. The rain and the room are the `rise` beat after 起床.
+  const riseLines = () => dayFiles.get(1)!.beats.boot!.say;
   const toKuro = (r: ReturnType<typeof rig>, max = 20) => {
     for (let i = 0; i < max; i++) {
       if (r.shown()?.tag?.kind === "kuro") return i;
@@ -62,15 +58,15 @@ describe("R1 · Kuro and the player as speakers in a day file", () => {
     throw new Error("no Kuro line within the first lines");
   };
 
-  it("day 1's waking: Kuro (its tag, portrait, box), the player (their name, portrait), Kuro again, then the player's own", () => {
+  it("day 1's boot (the ceiling): Kuro, the player, Kuro, the player, Kuro, the player, Kuro: each in its own voice", () => {
     const r = rig(storeAt(1), "lying");
     syncLoop(r.ctx, 0);
-    playRise(r);
     const rise = riseLines();
     const first = rise.findIndex((l) => l.who === "kuro");
-    expect(first).toBeGreaterThan(0);
+    expect(first).toBe(0);
     expect(rise.slice(first, first + 2).map((l) => l.who)).toEqual(["kuro", "me"]);
-    expect(rise.filter((l) => l.who === "kuro")).toHaveLength(3);
+    expect(rise.filter((l) => l.who === "kuro")).toHaveLength(4);
+    expect(rise[rise.length - 1]!.who).toBe("kuro");
     const skipped = toKuro(r);
     expect(skipped).toBe(first);
     // One click per line, in order, each in its own voice.
@@ -92,7 +88,6 @@ describe("R1 · Kuro and the player as speakers in a day file", () => {
   it("the box markup: kuro.name and Kuro's slot for Kuro's line; the player's name and portrait for theirs, never an NPC's", () => {
     const r = rig(storeAt(1), "lying");
     syncLoop(r.ctx, 0);
-    playRise(r);
     toKuro(r);
     const kuro = r.box();
     expect(kuro).toContain(`<span class="who tag k">${t("kuro.name")}</span>`);

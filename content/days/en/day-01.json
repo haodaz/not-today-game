@@ -7,23 +7,6 @@
         {
           "k": "speaker",
           "who": "kuro",
-          "t": "Let's see what's on today. Following the tasks never goes wrong."
-        }
-      ]
-    },
-    "rise": {
-      "say": [
-        {
-          "k": "narration",
-          "t": "Raining. Working from home is not a bad choice."
-        },
-        {
-          "k": "narration",
-          "t": "A rented room, lived in alone. Bed, desk, door, window, all in this one room."
-        },
-        {
-          "k": "speaker",
-          "who": "kuro",
           "t": "Morning."
         },
         {
@@ -69,7 +52,29 @@
         {
           "k": "speaker",
           "who": "kuro",
-          "t": "Not necessarily. A lot of people don't get up any more."
+          "t": "Not necessarily. A lot of people don't get up any more. Embodied AI does everything for them."
+        },
+        {
+          "k": "speaker",
+          "who": "me",
+          "t": "…Fine. You just handle the talking and the code."
+        },
+        {
+          "k": "speaker",
+          "who": "kuro",
+          "t": "Let's see what's on today. Following the tasks never goes wrong."
+        }
+      ]
+    },
+    "rise": {
+      "say": [
+        {
+          "k": "narration",
+          "t": "Raining. Working from home is not a bad choice."
+        },
+        {
+          "k": "narration",
+          "t": "A rented room, lived in alone. Bed, desk, door, window, all in this one room."
         },
         {
           "k": "inner",
