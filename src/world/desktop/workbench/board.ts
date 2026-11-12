@@ -20,6 +20,7 @@ import { hasString, t, tr } from "@world/i18n";
 import { push } from "@world/loop/dialogue";
 import { battleCmd, battleOffered, battleOver, battleReward, battleTarget, battleTurn, foeImage, startBattle } from "./battle";
 import { fillPlaceholders } from "@world/replies/placeholders";
+import { MINES_DONE_MS, minesFlag, minesOpen, minesRoll, minesStart, type MinesGrid } from "./mines";
 import type { ActionContext, ActionHandler } from "../controller";
 import type { AppContext, Session } from "../model";
 import { openWork } from "./work";
@@ -542,6 +543,62 @@ const actions: Record<string, ActionHandler> = {
       if (reward) ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "fill", slot: reward.slot, card: reward.card } });
     }
     ctx.session.battle = null;
+    ctx.rerender();
+  },
+  // mines (author 2026-11-13): the month on the desk — open a day, mark a day, the schedule done approves the form
+  "mines-start"(ctx) {
+    const c = currentBoard(ctx);
+    if (!c?.board.game) return;
+    const attempt = (ctx.session.mines?.key === c.task.id ? 1 : 0) + Math.floor((ctx.now?.() ?? Date.now()) / 1000) % 1000;
+    ctx.session.mines = { ...minesStart(c.task.id, c.board.game), approvedAt: undefined, attempt } as MinesGrid;
+    ctx.rerender();
+  },
+  "mines-open"(ctx, data) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.mines?.key === c?.task.id ? ctx.session.mines : null;
+    const i = Number(data.i);
+    if (!c?.board.game || !g || !Number.isInteger(i)) return;
+    const s = stateOf(ctx, c.task, c.board);
+    if (s.approved) return;
+    const next = g.flagMode ? minesFlag(g, i) : minesOpen(g, i, minesRoll(ctx.store.getRunId(), c.task.id, (g as MinesGrid & { attempt?: number }).attempt ?? 0));
+    if (next === g) return;
+    if (next.won) {
+      ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+      ctx.session.mines = { ...next, approvedAt: ctx.now?.() ?? Date.now() };
+      ctx.later(MINES_DONE_MS + 20, ctx.rerender);
+    } else ctx.session.mines = next;
+    ctx.rerender();
+  },
+  "mines-mode"(ctx) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.mines?.key === c?.task.id ? ctx.session.mines : null;
+    if (!g) return;
+    ctx.session.mines = { ...g, flagMode: !g.flagMode };
+    ctx.rerender();
+  },
+  // the month lost: 让克总帮忙 — he schedules it himself (approved; the sheet follows)
+  "mines-assist"(ctx) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.mines?.key === c?.task.id ? ctx.session.mines : null;
+    if (!c?.board.game || !g || !g.over) return;
+    const s = stateOf(ctx, c.task, c.board);
+    if (s.approved) return;
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+    ctx.session.mines = { ...g, won: true, approvedAt: ctx.now?.() ?? Date.now() };
+    ctx.later(MINES_DONE_MS + 20, ctx.rerender);
+    ctx.rerender();
+  },
+  // dev only: the month scheduled at once (the replay driver)
+  "mines-cheat"(ctx) {
+    if (!import.meta.env.DEV) return;
+    const c = currentBoard(ctx);
+    const g = ctx.session.mines?.key === c?.task.id ? ctx.session.mines : null;
+    if (!c?.board.game || !g) return;
+    const s = stateOf(ctx, c.task, c.board);
+    if (s.approved) return;
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+    ctx.session.mines = { ...g, won: true, approvedAt: ctx.now?.() ?? Date.now() };
+    ctx.later(MINES_DONE_MS + 20, ctx.rerender);
     ctx.rerender();
   },
   // the chain lost (no move left, not approved): 让克总帮忙 — he stamps it (the approval moment follows)

@@ -186,6 +186,12 @@ export interface ComparePage {
   readonly bubbles: readonly string[];
   readonly remark: Readonly<Record<string, string>>;
 }
+export interface BoardGame {
+  readonly kind: "mines";
+  readonly cols: number;
+  readonly rows: number;
+  readonly mines: number;
+}
 export interface BoardStack {
   /** From the bottom up: the rank word and its symbol; `silhouette` ranks are the easter eggs past the top (drawn black). */
   readonly ranks: readonly { readonly name: string; readonly img: string; readonly silhouette?: boolean }[];
@@ -320,6 +326,8 @@ export interface TaskBoard {
   readonly compare?: BoardCompare;
   /** stack (author 2026-11-12): the approval chain as 2048 — the ranks from the bottom up (name, head); the top is rank 2^n. */
   readonly stack?: BoardStack;
+  /** game (author 2026-11-13): the filled form goes through an old game before it can be settled — minesweeper for now. */
+  readonly game?: BoardGame;
 }
 /** Who a deliverable goes to (work v2 addition 2026-11-03 night); absent = `"hand"`. */
 export const DELIVERABLE_TO = ["boss", "partner", "group", "workbench", "hand"] as const;
@@ -599,7 +607,7 @@ function card(v: unknown, w: string): BoardCard {
  */
 function board(v: unknown, w: string): TaskBoard {
   if (!isRecord(v)) fail(w, "must be an object");
-  keys(v, ["kind", "title", "columns", "given", "slots", "cards", "kuro", "view", "ide", "beats", "meeting", "tune", "compare", "stack"], w);
+  keys(v, ["kind", "title", "columns", "given", "slots", "cards", "kuro", "view", "ide", "beats", "meeting", "tune", "compare", "stack", "game"], w);
   if (v.kind !== "table") fail(`${w}.kind`, 'must be "table"');
   // Column headers are display-only and may be blank (the label column has no header).
   if (!Array.isArray(v.columns) || v.columns.length === 0 || !v.columns.every((c) => typeof c === "string")) fail(`${w}.columns`, "must be a non-empty list of strings");
@@ -709,6 +717,17 @@ function board(v: unknown, w: string): TaskBoard {
     tune = boardTune(v.tune, `${w}.tune`);
   }
   // compare (author 2026-11-11): the pages, only on an IDE board.
+  let game: BoardGame | undefined;
+  if (v.game !== undefined) {
+    const gw = `${w}.game`;
+    if (!isRecord(v.game)) fail(gw, "must be an object");
+    keys(v.game, ["kind", "cols", "rows", "mines"], gw);
+    if (v.game.kind !== "mines") fail(`${gw}.kind`, 'must be "mines"');
+    const num = (x: unknown, k: string, lo: number, hi: number): number => (Number.isInteger(x) && (x as number) >= lo && (x as number) <= hi ? (x as number) : fail(`${gw}.${k}`, `must be an integer ${lo}–${hi}`));
+    const cols = num(v.game.cols, "cols", 4, 12), rows = num(v.game.rows, "rows", 3, 10), mines = num(v.game.mines, "mines", 1, 40);
+    if (mines >= cols * rows - 9) fail(`${gw}.mines`, "too many mines for the grid (the first click clears nine cells)");
+    game = { kind: "mines", cols, rows, mines };
+  }
   let stack: BoardStack | undefined;
   if (v.stack !== undefined) {
     const sw = `${w}.stack`;
@@ -740,6 +759,7 @@ function board(v: unknown, w: string): TaskBoard {
     ...(tune ? { tune } : {}),
     ...(compare ? { compare } : {}),
     ...(stack ? { stack } : {}),
+    ...(game ? { game } : {}),
   };
 }
 

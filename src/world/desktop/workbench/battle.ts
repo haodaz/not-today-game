@@ -160,7 +160,7 @@ export const battleUsed = (events: readonly GameEvent[], day: number, taskId: st
  * a tuning board, not the chain), a cell is still wrong or empty, and this task's battle is unfought.
  */
 export function battleOffered(board: TaskBoard, s: BoardState, found: readonly string[], events: readonly GameEvent[], day: number, taskId: string): boolean {
-  if (!found.includes("chick") || board.tune || board.stack) return false;
+  if (!found.includes("chick") || board.tune || board.stack || board.game) return false;
   if (!board.slots.some((slot) => s.slots[slot.id] !== slot.answer)) return false;
   return !battleUsed(events, day, taskId);
 }

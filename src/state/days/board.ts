@@ -102,7 +102,7 @@ export function stepBoard(board: TaskBoard, s: BoardState, op: BoardOp): BoardSt
     case "keep":
       return board.tune && s.done && !s.decided ? { ...s, decided: true } : s;
     case "approve":
-      return board.stack && !s.approved ? { ...s, approved: true } : s;
+      return (board.stack || board.game) && !s.approved ? { ...s, approved: true } : s;
     case "assistMod": {
       // tune: Kuro picks this module's path (its taste); the same rules as the player's pick, one assist.
       const tune = board.tune;
@@ -181,7 +181,7 @@ export function canPrint(board: TaskBoard, s: BoardState): boolean {
   // compare (author 2026-11-11): every page picked and the boss satisfied enough (the threshold).
   if (board.compare) return s.unlocked && comparePending(board, s) === null && compareScore(board, s).pct >= board.compare.threshold;
   // stack (2026-11-12): the filled form must also have come back approved from the top of the chain
-  return s.unlocked && board.slots.every((slot) => slot.id in s.slots) && mergesLeft(board, s).length === 0 && (!board.ide?.api || s.fetched) && (!board.stack || s.approved);
+  return s.unlocked && board.slots.every((slot) => slot.id in s.slots) && mergesLeft(board, s).length === 0 && (!board.ide?.api || s.fetched) && (!(board.stack || board.game) || s.approved);
 }
 
 // ——— compare (author 2026-11-11): the pages ———
@@ -445,7 +445,7 @@ export function validateBoardStep(day: number, taskId: string, op: BoardOp): voi
       if (!board.tune) throw new Error("boardStep: this board has no modules");
       return;
     case "approve":
-      if (!board.stack) throw new Error("boardStep: this board has no approval chain");
+      if (!board.stack && !board.game) throw new Error("boardStep: this board has no approval chain or game");
       return;
     case "assistMod":
       if (!board.tune) throw new Error("boardStep: this board has no modules");
@@ -576,7 +576,7 @@ export function lockJammed(board: TaskBoard, s: BoardState): boolean {
  * chain approves before the sheet opens).
  */
 export function settleVerdict(board: TaskBoard, s: BoardState): "pass" | "fail" {
-  if (board.tune || board.stack) return "pass";
+  if (board.tune || board.stack || board.game) return "pass";
   if (board.compare) return comparePending(board, s) === null && compareScore(board, s).pct >= board.compare.threshold ? "pass" : "fail";
   return s.assists > 0 || wrongCount(board, s.slots) === 0 ? "pass" : "fail";
 }

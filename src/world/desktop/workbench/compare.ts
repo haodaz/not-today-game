@@ -20,6 +20,7 @@ import { cardText, finishLabel, renderBoard } from "./board";
 import { openWork } from "./work";
 import { browserFrame, settleLayer } from "./settle-layer";
 import { battleOffered, battleScene } from "./battle";
+import { minesApproving, minesStage } from "./mines";
 import { tunePane } from "./shell";
 import { tuneStage } from "./tune-stage";
 import { clueStage } from "./clue-stage";
@@ -210,6 +211,9 @@ function genericWorkLayer(c: { state: State; events: readonly GameEvent[]; sessi
   } else if (board.view === "meeting" && board.meeting) {
     // meeting stage (2026-11-12): the meeting above, the template under it
     body = meetingStage(app, task, board);
+  } else if (board.game?.kind === "mines" && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && (!st.approved || (session.mines?.key === task.id && minesApproving(session.mines, nowMs))); })()) {
+    // mines (author 2026-11-13): the filled form's month on the desk — the schedule is a game of minesweeper
+    body = minesStage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs);
   } else if (board.stack && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && (!st.approved || (session.chain?.key === task.id && approving(session.chain, nowMs))); })()) {
     // stack (2026-11-12): the form filled goes up the chain — 2048 until the top rank appears; then
     // (work-stages-polish 3) the approval moment holds the screen, approved, before the board returns

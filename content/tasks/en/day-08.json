@@ -189,7 +189,13 @@
               }
             ]
           }
-        ]
+        ],
+        "game": {
+          "kind": "mines",
+          "cols": 7,
+          "rows": 5,
+          "mines": 7
+        }
       },
       "deliverable": {
         "id": "d8-toasts",
