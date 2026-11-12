@@ -198,11 +198,12 @@ export function battleScene(s: BattleState, nowMs: number): SafeHtml {
   } else {
     box = html`<button type="button" class="bt-box bt-textbtn" data-action="battle-act" data-cmd="next"><p class="bt-line">${line?.t ?? ""}</p><span class="bt-more">▼</span></button>`;
   }
-  return html`<div class="${cls("bt", fresh === "shake" && "shake")}" data-phase="${s.phase}">
+  // the screen keeps the Game Boy's 10:9 (author 2026-11-13: 「只有在固定的比例尺才能感觉熟悉」), centred on the dark stage
+  return html`<div class="${cls("bt", fresh === "shake" && "shake")}" data-phase="${s.phase}"><div class="bt-screen">
     <div class="bt-foe-box"><b class="bt-name">${s.foe}</b><span class="bt-lv">:L${String(s.level)}</span>${hpBar(s.theirs)}</div>
     <div class="${cls("bt-foe", fresh === "hit" && line?.side === "theirs" && "hit", foeDown && "down", fresh === "heal" && line?.side === "theirs" && "heal")}"><img src="${s.img}" alt="">${flame ? html`<span class="bt-flame"><i></i><i></i><i></i><i></i></span>` : null}</div>
     <div class="${cls("bt-ours", fresh === "hit" && line?.side === "ours" && "hit", oursDown && "down")}"><img src="${CHICK_BACK}" alt=""></div>
     <div class="bt-ours-box"><b class="bt-name">${S("battle.ours")}</b><span class="bt-lv">:L${String(s.level)}</span>${hpBar(s.ours)}<small class="bt-num">${String(s.ours.hp)}/ ${String(s.ours.max)}</small></div>
     ${box}
-  </div>`;
+  </div></div>`;
 }
