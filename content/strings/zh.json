@@ -612,6 +612,7 @@
   "spot.stage.misses": "看错了 {n} 处。",
   "spot.stage.flip": "第四处找到的时候，扫描件自己翻了一页。",
   "boss.name": "克总",
+  "boss.atb": "速度",
   "boss.party.player": "你",
   "boss.party.qkuro": "小克总",
   "boss.party.all": "大家",

@@ -222,34 +222,57 @@ export const bossRetry = (b: BossBattle, state: State, nowMs: number): BossBattl
 export const bossCheat = (b: BossBattle, nowMs: number): BossBattle => resolve({ ...b, boss: { ...b.boss, hp: 0 } }, nowMs);
 
 // ——— the screen ———
+// The layout (author 2026-11-14, with Dragon's Crown / 剑与仙女 screenshots): the party stands on one
+// ground line at the left, the huge Kuro at the right, over a painted pixel background with depth;
+// the party's statuses in a row at the top (compact, opened for whoever's turn it is or under the
+// pointer); one vertical speed gauge at the left edge — whoever reaches the top acts; the boss's
+// HP as one full-width bar at the very bottom; the text box under the statuses; the moves by the
+// player's feet.
 
 const BOSS_IMG = { 1: "/battle/boss-stage1.png", 2: "/battle/boss-stage2.png" } as const;
 const PROP = { throw: "/battle/prop-laptop.png", flip: "/battle/prop-keyboard.png" } as const;
+export const BOSS_BG = "/battle/boss-bg.jpg";
 
 const bar = (v: number, max: number, kind: string): SafeHtml => html`<i class="${cls("bs-bar", kind)}"><b style="width:${String(Math.round((100 * Math.max(0, v)) / Math.max(1, max)))}%"></b></i>`;
+const faceOf = (b: BossBattle, m: Member): string => (m.kind === "player" ? `/player/${b.look}.png` : m.kind === "qkuro" ? "/battle/q-kuro.png" : `/objects/${m.id}_front.png`);
+const spriteOf = (b: BossBattle, m: Member, pose: Pose): string => (m.kind === "player" ? `/battle/party/${b.look}-${pose === "hurt" ? "stance" : pose}.png` : m.kind === "qkuro" ? "/battle/q-kuro.png" : `/objects/${m.id}_front.png`);
 
 export function renderBoss(b: BossBattle, nowMs: number): SafeHtml {
   const acting = b.act && nowMs - b.act.at < ACT_MS ? b.act : null;
   const player = b.party.find((m) => m.id === "player")!;
-  const playerPose: Pose = acting?.who === "player" ? (acting.move.pose ?? "strike") : player.hp <= 0 ? "hurt" : "stance";
-  const playerImg = `/battle/party/${b.look}-${playerPose === "hurt" ? "stance" : playerPose}.png`;
+  const hitOf = (id: string) => acting?.hits.find((h) => h.id === id);
+  // the statuses, top row: open for the one whose turn it is (or acting), the rest compact until the pointer
+  const plates = b.party.map((m) => {
+    const hit = hitOf(m.id);
+    const open = b.chooser === m.id || acting?.who === m.id;
+    return html`<div class="${cls("bs-plate", m.kind, open && "open", m.hp <= 0 && "down", hit && hit.n > 0 && "hurt", hit && hit.n < 0 && "healed")}"><img class="bs-face" src="${faceOf(b, m)}" alt=""><div class="bs-stat"><span class="bs-name">${name(b, m.id)}</span>${bar(m.hp, m.max, "hp")}<span class="bs-hp">${String(Math.max(0, m.hp))}<small>/${String(m.max)}</small></span></div></div>`;
+  });
+  // the speed gauge: one track, everyone's mark rising; at the top you act
+  const marks = [
+    ...b.party.filter(alive).map((m) => html`<i class="${cls("bs-mark", m.kind, (b.chooser === m.id || acting?.who === m.id) && "top")}" style="bottom:${String(Math.round(m.gauge * 100))}%"><img src="${faceOf(b, m)}" alt=""></i>`),
+    html`<i class="${cls("bs-mark", "boss", acting?.who === "boss" && "top")}" style="bottom:${String(Math.round(b.boss.gauge * 100))}%"><b></b></i>`,
+  ];
+  const atb = html`<div class="bs-atb"><span class="bs-atb-h">${S("boss.atb")}</span><div class="bs-track">${marks}</div></div>`;
+  // the field: the party on the ground line, the boss at the right
   const members = b.party.map((m) => {
-    const hit = acting?.hits.find((h) => h.id === m.id);
-    const img = m.kind === "player" ? playerImg : m.kind === "qkuro" ? "/battle/q-kuro.png" : `/objects/${m.id}_front.png`;
-    return html`<div class="${cls("bs-member", m.kind, m.hp <= 0 && "down", hit && hit.n > 0 && "hurt", hit && hit.n < 0 && "healed", b.chooser === m.id && "ready", acting?.who === m.id && "acting")}">
-      <img class="bs-sprite" src="${img}" alt="">
-      <div class="bs-plate"><span class="bs-name">${name(b, m.id)}</span>${bar(m.hp, m.max, "hp")}${bar(m.gauge, 1, "atb")}</div>
+    const hit = hitOf(m.id);
+    const pose: Pose = acting?.who === m.id ? (acting.move.pose ?? (m.kind === "player" ? "strike" : "stance")) : m.hp <= 0 ? "hurt" : "stance";
+    return html`<div class="${cls("bs-member", m.kind, m.hp <= 0 && "down", hit && hit.n > 0 && "hurt", hit && hit.n < 0 && "healed", (b.chooser === m.id) && "ready", acting?.who === m.id && "acting")}">
+      <img class="bs-sprite" src="${spriteOf(b, m, pose)}" alt="">
       ${hit ? html`<span class="${cls("bs-num", hit.n < 0 && "heal")}">${hit.n < 0 ? `+${String(-hit.n)}` : String(hit.n)}</span>` : null}
     </div>`;
   });
-  const bossHit = acting?.hits.find((h) => h.id === "boss");
-  const boss = html`<div class="${cls("bs-boss", `stage${String(b.boss.stage)}`, bossHit && "hurt", acting?.who === "boss" && "acting", b.phase === "won" || b.phase === "after" ? "down" : null)}">
+  const bossHit = hitOf("boss");
+  const boss = html`<div class="${cls("bs-boss", `stage${String(b.boss.stage)}`, bossHit && "hurt", acting?.who === "boss" && "acting", (b.phase === "won" || b.phase === "after") && "down")}">
     <img class="bs-boss-img" src="${BOSS_IMG[b.boss.stage]}" alt="">
-    <div class="bs-plate boss"><span class="bs-name">${S("boss.name")}</span>${bar(b.boss.hp, b.boss.max, "hp")}${bar(b.boss.gauge, 1, "atb")}</div>
     ${bossHit ? html`<span class="bs-num big">${String(bossHit.n)}</span>` : null}
   </div>`;
   const prop = acting && (acting.move.fx === "throw" || acting.move.fx === "flip") ? html`<img class="${cls("bs-prop", acting.move.fx)}" src="${PROP[acting.move.fx]}" alt="">` : null;
   const flash = acting && acting.move.fx === "flash" ? html`<i class="bs-flash"></i>` : null;
+  const field = html`<div class="bs-field"><div class="bs-ground"></div><div class="${cls("bs-party", b.phase === "after" && b.strong && "crossed")}">${members}</div>${boss}${prop}${flash}</div>`;
+  // the boss's bar: one full-width bar at the very bottom
+  const pct = Math.round((100 * Math.max(0, b.boss.hp)) / b.boss.max);
+  const bossbar = html`<div class="${cls("bs-bossbar", `stage${String(b.boss.stage)}`)}"><span class="bs-name">${S("boss.name")}</span>${bar(b.boss.hp, b.boss.max, "hp")}<span class="bs-pct">${String(pct)}%</span></div>`;
   const menu = b.phase === "choose" ? html`<div class="bs-menu">${player.moves.map((m) => html`<button type="button" class="bs-cmd" data-action="boss-move" data-move="${m.id}">${moveName("player", m)}</button>`)}</div>` : null;
   const clickable = b.phase === "intro" || b.phase === "won";
   const box = b.phase === "lost"
@@ -258,12 +281,12 @@ export function renderBoss(b: BossBattle, nowMs: number): SafeHtml {
       ? html`<div class="bs-box"><button type="button" class="bs-cmd" data-action="boss-done">${S("boss.done")}</button></div>`
       : html`<div class="${cls("bs-box", clickable && "more")}"><p>${acting ? acting.text.join(" ") : b.log}</p>${clickable ? html`<i class="bs-caret"></i><button type="button" class="bs-hit" data-action="boss-next" aria-label="${S("boss.done")}"></button>` : null}</div>`;
   const cheat = import.meta.env.DEV && b.phase !== "after" && b.phase !== "won" ? html`<button type="button" class="sk-cheat" data-action="boss-cheat" aria-hidden="true" tabindex="-1"></button>` : null;
-  return html`<div class="${cls("boss-page", `end-${b.ending}`, b.strong && "strong", b.phase === "after" && "after", acting?.move.fx === "shake" && "shake")}" data-phase="${b.phase}">${cheat}
-    <div class="bs-backdrop"></div>
-    <div class="bs-field">
-      <div class="${cls("bs-party", b.phase === "after" && b.strong && "crossed")}">${members}</div>
-      ${boss}${prop}${flash}
-    </div>
-    ${menu}${box}
+  return html`<div class="${cls("boss-page", `end-${b.ending}`, b.strong && "strong", b.phase === "after" && "after", acting?.move.fx === "shake" && "shake", b.boss.stage === 2 && "stage2")}" data-phase="${b.phase}">${cheat}
+    <div class="bs-bg"></div>
+    ${field}
+    <div class="bs-top">${plates}</div>
+    ${atb}
+    ${box}${menu}
+    ${bossbar}
   </div>`;
 }

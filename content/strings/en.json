@@ -612,6 +612,7 @@
   "spot.stage.misses": "{n} wrong looks.",
   "spot.stage.flip": "When the fourth was found, the scan turned a page on its own.",
   "boss.name": "Kuro",
+  "boss.atb": "speed",
   "boss.party.player": "You",
   "boss.party.qkuro": "Little Kuro",
   "boss.party.all": "everyone",
