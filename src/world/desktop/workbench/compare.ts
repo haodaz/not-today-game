@@ -7,7 +7,7 @@
 import { boardState, canPrint, comparePending, compareRight, compareScore, taskForId, tuneCarried, type BoardState } from "@state/days/board";
 import { ideOps, ideSrc, selectedSlot } from "@state/days/ide";
 import type { GameEvent } from "@state/events";
-import type { ComparePage, Task, TaskBoard } from "@state/days/tasks";
+import { API_FIELD, SLOT_FIELD, type ComparePage, type Task, type TaskBoard } from "@state/days/tasks";
 import type { State } from "@state/types.gen";
 import { npcPortrait, speakerLabel } from "@world/npc";
 import { fillPlaceholders } from "@world/replies/placeholders";
@@ -84,7 +84,7 @@ export function workLayer(ctx: { readonly state: State; readonly events: readonl
     const face = html`<div class="${cls("wl-face", right ? "happy" : "pout")}"><img src="${right ? BOSS_FACES.happy : BOSS_FACES.pout}" alt=""><p>${tr(right ? "compare.result.happy" : "compare.result.pout")}</p></div>`;
     const render = holding
       ? html`<div class="wl-rendering"><img class="wl-rk" src="${frameUrl(FRAMES.busy[0])}" alt=""><p>${tr("compare.rendering.big", { n: String(n) })}</p></div>`
-      : html`<div class="wl-page"><iframe class="ide-frame" data-keep="ide" src="${srcFor(page.slot, card)}" title="${fill(task.title)}" sandbox="allow-scripts"></iframe></div>`;
+      : html`<div class="wl-page"><iframe class="ide-frame" data-keep="ide-result" src="${srcFor(page.slot, card)}" title="${fill(task.title)}" sandbox="allow-scripts"></iframe></div>`;
     const next = holding ? null : html`<button type="button" class="wl-cta" data-action="compare-next">${tr(pending ? "compare.next" : "compare.sum.open")}</button>`;
     body = html`<div class="wl-result"><div class="wl-result-page">${render}</div><aside class="wl-result-side">${holding ? null : face}${faces(board, s, page, false)}${next}</aside></div>`;
   } else if (pending) {
@@ -95,8 +95,24 @@ export function workLayer(ctx: { readonly state: State; readonly events: readonl
     const label = board.slots.find((x) => x.id === page.slot)?.label ?? page.slot;
     const bubbles = page.bubbles.map((b) => html`<div class="cmp-bub">${riddle(b)}</div>`);
     const boss = html`<div class="wl-boss"><img class="cmp-portrait" src="${BOSS_PORTRAIT}" alt="${t("msgs.boss")}"><div class="cmp-bubbles">${bubbles}</div></div>`;
-    const version = (cardId: string, v: string) => html`<div class="wl-version"><div class="wl-vhead"><span class="wl-vname">${tr("compare.vs", { v })}</span></div><div class="wl-vpage"><iframe class="ide-frame" data-keep="ide-${v}" src="${srcFor(page.slot, cardId)}" title="${v}" sandbox="allow-scripts"></iframe></div><button type="button" class="wl-use" data-action="compare-pick" data-slot="${page.slot}" data-card="${cardId}">${tr("compare.use", { v })}</button></div>`;
-    body = html`<div class="wl-choose">${boss}<div class="wl-ask"><span class="wl-n">${tr("compare.page", { n: String(n), label })}</span><span class="wl-of">${n} / ${cmp.pages.length}</span><span class="wl-q">${tr("compare.pickTitle")}</span></div><div class="wl-vs" data-slot="${page.slot}">${version(page.left, cmp.versions[0])}${version(page.right, cmp.versions[1])}</div>${faces(board, s, page, false)}</div>`;
+    // the comparison is the content itself (author 2026-11-12: 「用 v15 和 v16 要看代码的区别，标出 diff」):
+    // the page's file, its slot line opened into the two versions' lines, a diff: − v15 / + v16, each
+    // with 用这版. The rendered page comes after the pick, on the result screen.
+    const file = board.ide?.files?.[page.slot];
+    const code = file?.code ?? [];
+    const textOf = (cardId: string) => cardText(board, cardId);
+    const rows = code.flatMap((raw, i) => {
+      const line = raw.split(API_FIELD).join("./snapshot.js");
+      const at = line.indexOf(SLOT_FIELD);
+      if (at < 0) return [html`<div class="wl-ln"><span class="wl-gut">${i + 1}</span><span class="wl-mk"></span><code>${line}</code></div>`];
+      const before = line.slice(0, at);
+      const after = line.slice(at + SLOT_FIELD.length);
+      const alt = (cardId: string, v: string, kind: "del" | "add") =>
+        html`<div class="${cls("wl-ln", kind)}"><span class="wl-gut">${i + 1}</span><span class="wl-mk">${kind === "del" ? "−" : "+"}</span><code>${before}<b class="wl-field">"${textOf(cardId)}"</b>${after}</code><span class="wl-v">${v}</span><button type="button" class="wl-use" data-action="compare-pick" data-slot="${page.slot}" data-card="${cardId}">${tr("compare.use", { v })}</button></div>`;
+      return [alt(page.left, cmp.versions[0], "del"), alt(page.right, cmp.versions[1], "add")];
+    });
+    const diff = html`<div class="wl-vs" data-slot="${page.slot}"><div class="wl-file"><span class="wl-fname">${file?.name ?? page.slot}</span><span class="wl-fnote">${tr("compare.diffNote", { a: cmp.versions[0], b: cmp.versions[1] })}</span></div><div class="wl-code">${rows}</div></div>`;
+    body = html`<div class="wl-choose">${boss}<div class="wl-ask"><span class="wl-n">${tr("compare.page", { n: String(n), label })}</span><span class="wl-of">${n} / ${cmp.pages.length}</span><span class="wl-q">${tr("compare.pickTitle")}</span></div>${diff}${faces(board, s, page, false)}</div>`;
   } else {
     // settle
     screen = "settle";

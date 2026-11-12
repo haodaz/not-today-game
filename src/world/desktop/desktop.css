@@ -1202,17 +1202,6 @@ span.cmp-face-btn{cursor:default}
 /* launch (author 2026-11-11): a task's opening page — like the title page's card, not a web UI (author:
    「可以和登录页面选任务的卡片底色差不多，别做的特别像个网页」): the workbench dimmed behind, a paper card with
    the game's blur and shadow, outlined lettered button, the two figures as on the character select. */
-.launch-layer{position:absolute;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(10,10,11,.6)}
-.task-launch{display:grid;grid-template-columns:240px 1fr;gap:30px;align-items:center;max-width:780px;width:100%;box-sizing:border-box;padding:30px 36px 30px;background:rgba(236,231,222,.92);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.6);border-radius:8px;box-shadow:0 18px 50px rgba(0,0,0,.45);color:#1d2129;animation:m-fade-up 240ms cubic-bezier(.2,.8,.2,1) both}
-.tl-figures{position:relative;height:230px}
-.tl-who{position:absolute;right:0;top:0;width:170px;height:214px;object-fit:cover;object-position:50% 10%;border:1px solid rgba(29,33,41,.25);background:#f1ede6;box-shadow:0 6px 18px rgba(0,0,0,.25)}
-.tl-kuro{position:absolute;left:-6px;bottom:-6px;width:132px;height:132px;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,.3))}
-.tl-body{display:flex;flex-direction:column;gap:10px}
-.tl-title{margin:0 0 6px;font-size:20px;font-weight:500;letter-spacing:.08em}
-.tl-note{margin:0;font-size:16px;line-height:1.7}
-.tl-call{margin:10px 0 6px;font-size:16px;line-height:1.7;color:#b3362a;font-weight:600}
-.tl-cta{align-self:flex-start;width:240px;padding:11px 0;text-align:center;border:2px solid rgba(29,33,41,.75);border-radius:0;background:transparent;color:#1d2129;font:inherit;font-size:17px;letter-spacing:.3em;text-indent:.3em;cursor:pointer;transition:background 160ms,color 160ms}
-.tl-cta:hover{background:#1d2129;color:#efe9df}
 /* work (author 2026-11-11/12): the day's work over the whole stage, one screen at a time: choose
    (the riddles, the page twice), result (the rendered page, 老王's face), settle. */
 .work-layer{position:absolute;inset:0;z-index:40;display:flex;align-items:stretch;justify-content:center;padding:26px 40px;background:radial-gradient(120% 90% at 30% 50%,rgba(10,10,11,.7) 40%,rgba(0,0,0,.92) 100%)}
@@ -1267,3 +1256,21 @@ span.cmp-face-btn{cursor:default}
 .wl-cta:disabled{opacity:.4;cursor:default}
 .wl-cta.ghost{border-color:#b3362a;color:#b3362a}
 .wl-cta.ghost:hover:not(:disabled){background:#b3362a;color:#efe9df}
+/* choose: the page's code with the slot line as a diff (author 2026-11-12). */
+.wl-vs{display:flex;flex-direction:column;flex:1;min-height:0;border:1px solid rgba(29,33,41,.25);background:#FBFCFE;overflow:hidden}
+.wl-file{display:flex;align-items:baseline;gap:14px;padding:8px 14px;border-bottom:1px solid rgba(29,33,41,.12);background:#F1EFE9}
+.wl-fname{font:600 13px var(--mono,ui-monospace,Menlo,monospace)}
+.wl-fnote{font-size:12px;color:var(--ink-2)}
+.wl-code{flex:1;overflow:auto;padding:10px 0;font:13px/1.7 var(--mono,ui-monospace,Menlo,monospace);color:#2B2F45}
+.wl-ln{display:flex;align-items:center;gap:0;padding:0 14px 0 0;white-space:pre}
+.wl-gut{width:44px;flex:0 0 auto;text-align:right;padding-right:12px;color:#9AA0B8;user-select:none}
+.wl-mk{width:16px;flex:0 0 auto;color:#9AA0B8}
+.wl-ln code{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;font:inherit}
+.wl-ln.del{background:rgba(224,69,127,.09)}
+.wl-ln.del .wl-mk{color:#E0457F}
+.wl-ln.add{background:rgba(19,163,122,.10)}
+.wl-ln.add .wl-mk{color:#13A37A}
+.wl-field{font-weight:700;color:#1F5FD6}
+.wl-ln.add .wl-field{color:#0B7A3B}
+.wl-v{flex:0 0 auto;margin-left:12px;font-size:11px;letter-spacing:.12em;color:var(--ink-2)}
+.wl-ln .wl-use{width:auto;padding:5px 16px;margin-left:12px;font-size:14px;letter-spacing:.2em;text-indent:.2em}

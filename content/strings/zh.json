@@ -720,5 +720,6 @@
   "task.launch.tag": "第 {day} 天 · 今天的活",
   "launch.name.boss": "老王",
   "launch.name.partner": "Vivi",
-  "launch.name.laozhou": "老周"
+  "launch.name.laozhou": "老周",
+  "compare.diffNote": "− {a} 的写法 · + {b} 的写法"
 }

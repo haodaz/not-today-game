@@ -720,5 +720,6 @@
   "task.launch.tag": "Day {day} · the work",
   "launch.name.boss": "Lao Wang",
   "launch.name.partner": "Vivi",
-  "launch.name.laozhou": "Lao Zhou"
+  "launch.name.laozhou": "Lao Zhou",
+  "compare.diffNote": "− {a}'s line · + {b}'s line"
 }
