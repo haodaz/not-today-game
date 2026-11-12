@@ -25,6 +25,7 @@ import { PIPES_DONE_MS, pipesRoll, pipesSolve, pipesStart, pipesTurn } from "./p
 import { MATCH3_DONE_MS, match3Roll, match3Start, match3Tap, type Match3Grid } from "./match3";
 import { LINK_DONE_MS, LINK_PATH_MS, linkRoll, linkShuffle, linkSolve, linkStart, linkTap, type LinkGrid } from "./link";
 import { SNAKE_DONE_MS, SNAKE_TICK_MS, snakeRoll, snakeSolve, snakeStart, snakeStep, snakeTurn, type SnakeDir } from "./snake";
+import { TETRIS_DONE_MS, TETRIS_FLASH_MS, tetrisDropMs, tetrisKey, tetrisRoll, tetrisSolve, tetrisStart, tetrisTick, type TetrisGame, type TetrisKey } from "./tetris";
 import type { ActionContext, ActionHandler } from "../controller";
 import type { AppContext, Session } from "../model";
 import { openWork } from "./work";
@@ -326,6 +327,42 @@ function runSnake(ctx: ActionContext, gen: number): void {
     ctx.rerender();
   };
   ctx.later(SNAKE_TICK_MS, tick);
+}
+
+/** tetris: the dice for the next piece, seeded by the game's attempt and how many pieces came so far (deterministic per run). */
+const tetrisRollFor = (ctx: ActionContext, g: TetrisGame): (() => number) => tetrisRoll(ctx.store.getRunId(), g.key, ((g as TetrisGame & { attempt?: number }).attempt ?? 0) * 1000 + g.spawned);
+
+/** tetris: the game after a tick or a key — done approves the form; cleared rows get their flash re-render. */
+function settleTetris(ctx: ActionContext, taskId: string, next: TetrisGame): void {
+  if (next.done) {
+    ctx.store.appendEvent({ kind: "boardStep", taskId, op: { t: "approve" } });
+    ctx.session.tetris = { ...next, approvedAt: ctx.now?.() ?? Date.now() };
+    ctx.later(TETRIS_DONE_MS + 20, ctx.rerender);
+  } else {
+    ctx.session.tetris = next;
+    if (next.flash.length) ctx.later(TETRIS_FLASH_MS + 20, ctx.rerender);
+  }
+}
+
+/** tetris: gravity. One generation per start / resume; a stale generation, a finished game or a work page no longer up stops it. */
+function runTetris(ctx: ActionContext, gen: number): void {
+  const g0 = ctx.session.tetris;
+  if (!g0 || g0.gen !== gen) return;
+  ctx.session.tetris = { ...g0, running: true };
+  const tick = () => {
+    const c = currentBoard(ctx);
+    const g = ctx.session.tetris;
+    if (!g || g.gen !== gen) return;
+    if (g.done || g.over || !ctx.session.workShow || c?.board.game?.kind !== "tetris" || c.task.id !== g.key) {
+      if (g.running) { ctx.session.tetris = { ...g, running: false }; ctx.rerender(); }
+      return;
+    }
+    settleTetris(ctx, c.task.id, tetrisTick(g, tetrisRollFor(ctx, g), ctx.now?.() ?? Date.now()));
+    const after = ctx.session.tetris;
+    if (after && !after.done && !after.over) ctx.later(tetrisDropMs(after.lines), tick);
+    ctx.rerender();
+  };
+  ctx.later(tetrisDropMs(g0.lines), tick);
 }
 
 function currentBoard(ctx: ActionContext): { task: Task; board: TaskBoard } | null {
@@ -816,6 +853,59 @@ const actions: Record<string, ActionHandler> = {
     ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
     ctx.session.snake = { ...snakeSolve(g), gen: g.gen + 1, approvedAt: ctx.now?.() ?? Date.now() };
     ctx.later(SNAKE_DONE_MS + 20, ctx.rerender);
+    ctx.rerender();
+  },
+  // tetris (author 2026-11-13): the shifts fall into the week; a week of rows cleared approves the form
+  "tetris-start"(ctx) {
+    const c = currentBoard(ctx);
+    if (c?.board.game?.kind !== "tetris") return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    const gen = (ctx.session.tetris?.gen ?? 0) + 1;
+    const attempt = gen + Math.floor((ctx.now?.() ?? Date.now()) / 1000) % 1000;
+    ctx.session.tetris = { ...tetrisStart(c.task.id, c.board.game, tetrisRoll(ctx.store.getRunId(), c.task.id, attempt), gen), attempt } as TetrisGame;
+    runTetris(ctx, gen);
+    ctx.rerender();
+  },
+  "tetris-key"(ctx, data) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.tetris?.key === c?.task.id ? ctx.session.tetris : null;
+    const k = data.k as TetrisKey;
+    if (c?.board.game?.kind !== "tetris" || !g || !g.running || !["left", "right", "rotate", "down", "drop"].includes(k)) return;
+    const next = tetrisKey(g, k, tetrisRollFor(ctx, g), ctx.now?.() ?? Date.now());
+    if (next === g) return;
+    settleTetris(ctx, c.task.id, next);
+    ctx.rerender();
+  },
+  "tetris-resume"(ctx) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.tetris;
+    if (c?.board.game?.kind !== "tetris" || !g || g.key !== c.task.id || g.done || g.over || g.running) return;
+    const gen = g.gen + 1;
+    ctx.session.tetris = { ...g, gen };
+    runTetris(ctx, gen);
+    ctx.rerender();
+  },
+  // the stack at the top: 让克总帮忙 — he staffs the week himself (approved; the sheet follows)
+  "tetris-assist"(ctx) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.tetris?.key === c?.task.id ? ctx.session.tetris : null;
+    if (c?.board.game?.kind !== "tetris" || !g || !g.over) return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+    ctx.session.tetris = { ...tetrisSolve(g), approvedAt: ctx.now?.() ?? Date.now() };
+    ctx.later(TETRIS_DONE_MS + 20, ctx.rerender);
+    ctx.rerender();
+  },
+  // dev only: the week staffed at once (the replay driver)
+  "tetris-cheat"(ctx) {
+    if (!import.meta.env.DEV) return;
+    const c = currentBoard(ctx);
+    const g = ctx.session.tetris?.key === c?.task.id ? ctx.session.tetris : null;
+    if (c?.board.game?.kind !== "tetris" || !g) return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+    ctx.session.tetris = { ...tetrisSolve(g), gen: g.gen + 1, approvedAt: ctx.now?.() ?? Date.now() };
+    ctx.later(TETRIS_DONE_MS + 20, ctx.rerender);
     ctx.rerender();
   },
   // the chain lost (no move left, not approved): 让克总帮忙 — he stamps it (the approval moment follows)

@@ -25,6 +25,7 @@ import { pipesApproving, pipesStage } from "./pipes";
 import { match3Approving, match3Stage } from "./match3";
 import { linkApproving, linkStage } from "./link";
 import { snakeApproving, snakeStage } from "./snake";
+import { tetrisApproving, tetrisStage } from "./tetris";
 import { tunePane } from "./shell";
 import { tuneStage } from "./tune-stage";
 import { clueStage } from "./clue-stage";
@@ -218,6 +219,9 @@ function genericWorkLayer(c: { state: State; events: readonly GameEvent[]; sessi
   } else if (board.view === "meeting" && board.meeting) {
     // meeting stage (2026-11-12): the meeting above, the template under it
     body = meetingStage(app, task, board);
+  } else if (board.game?.kind === "tetris" && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && (!st.approved || (session.tetris?.key === task.id && tetrisApproving(session.tetris, nowMs))); })()) {
+    // tetris (author 2026-11-13): the filled form's week as a well, the shifts falling in
+    body = tetrisStage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs);
   } else if (board.game?.kind === "snake" && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && (!st.approved || (session.snake?.key === task.id && snakeApproving(session.snake, nowMs))); })()) {
     // snake (author 2026-11-13): the filled form's page as a Nokia screen, its sentences to eat in order
     body = snakeStage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs);

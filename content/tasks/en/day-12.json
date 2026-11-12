@@ -188,7 +188,13 @@
               }
             ]
           }
-        ]
+        ],
+        "game": {
+          "kind": "tetris",
+          "cols": 7,
+          "rows": 12,
+          "goal": 7
+        }
       },
       "deliverable": {
         "id": "d12-watch",

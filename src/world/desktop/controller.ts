@@ -517,6 +517,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     if (el.dataset.input === "settings-email") setEmailDraft(el.value);
     if (el.dataset.input === "wb-cell" && session.work) session.work.cellDraft = el.value;
   };
+  const TETRIS_KEYS: Record<string, string> = { ArrowLeft: "left", ArrowRight: "right", ArrowUp: "rotate", ArrowDown: "down", " ": "drop", a: "left", d: "right", w: "rotate", s: "down", A: "left", D: "right", W: "rotate", S: "down" };
   const SNAKE_KEYS: Record<string, string> = { ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right", w: "up", a: "left", s: "down", d: "right", W: "up", A: "left", S: "down", D: "right" };
   const onKey = (e: KeyboardEvent) => {
     const target = e.target as HTMLElement;
@@ -576,6 +577,13 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     if (e.key === "Escape" && session.mcOpen) {
       e.preventDefault();
       actions["mc-close"]?.(ctx, {} as DOMStringMap, target);
+      return;
+    }
+    // tetris (2026-11-13): while the well runs on the work page, the arrows move / turn / drop, space drops.
+    const tetrisKey = TETRIS_KEYS[e.key];
+    if (tetrisKey && session.tetris?.running && session.workShow) {
+      e.preventDefault();
+      actions["tetris-key"]?.(ctx, { k: tetrisKey } as unknown as DOMStringMap, target);
       return;
     }
     // snake (2026-11-13): while the snake runs on the work page, the arrows / WASD steer it.
