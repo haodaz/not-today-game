@@ -29,6 +29,7 @@ import { TETRIS_DONE_MS, TETRIS_FLASH_MS, tetrisDropMs, tetrisKey, tetrisRoll, t
 import { RHYTHM_DONE_MS, RHYTHM_TICK_MS, rhythmPause, rhythmResume, rhythmRoll, rhythmSolve, rhythmStart, rhythmSweep, rhythmTap, rhythmWords } from "./rhythm";
 import { GACHA_DONE_MS, GACHA_TURN_MS, gachaOpen, gachaRoll, gachaStart, gachaTurn } from "./gacha";
 import { BALANCE_DONE_MS, BALANCE_TICK_MS, balanceBlocks, balanceDrop, balancePause, balanceResume, balanceSolve, balanceStart } from "./balance";
+import { SOKOBAN_DONE_MS, sokobanMove, sokobanSolve, sokobanStart, sokobanUndo, type Dir } from "./sokoban";
 import type { ActionContext, ActionHandler } from "../controller";
 import type { AppContext, Session } from "../model";
 import { openWork } from "./work";
@@ -1105,6 +1106,48 @@ const actions: Record<string, ActionHandler> = {
     ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
     ctx.session.balance = { ...balanceSolve(g), gen: g.gen + 1, approvedAt: ctx.now?.() ?? Date.now() };
     ctx.later(BALANCE_DONE_MS + 20, ctx.rerender);
+    ctx.rerender();
+  },
+  // sokoban (author 2026-11-13): the chairs onto the seat marks; every one seated approves the form
+  "sokoban-start"(ctx) {
+    const c = currentBoard(ctx);
+    if (c?.board.game?.kind !== "sokoban") return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    ctx.session.sokoban = sokobanStart(c.task.id, c.board.game);
+    ctx.rerender();
+  },
+  "sokoban-move"(ctx, data) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.sokoban?.key === c?.task.id ? ctx.session.sokoban : null;
+    const dir = data.dir as Dir;
+    if (c?.board.game?.kind !== "sokoban" || !g || !["up", "down", "left", "right"].includes(dir)) return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    const next = sokobanMove(g, dir);
+    if (next === g) return;
+    if (next.done) {
+      ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+      ctx.session.sokoban = { ...next, approvedAt: ctx.now?.() ?? Date.now() };
+      ctx.later(SOKOBAN_DONE_MS + 20, ctx.rerender);
+    } else ctx.session.sokoban = next;
+    ctx.rerender();
+  },
+  "sokoban-undo"(ctx) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.sokoban?.key === c?.task.id ? ctx.session.sokoban : null;
+    if (c?.board.game?.kind !== "sokoban" || !g) return;
+    ctx.session.sokoban = sokobanUndo(g);
+    ctx.rerender();
+  },
+  // dev only: every chair seated at once (the replay driver)
+  "sokoban-cheat"(ctx) {
+    if (!import.meta.env.DEV) return;
+    const c = currentBoard(ctx);
+    const g = ctx.session.sokoban?.key === c?.task.id ? ctx.session.sokoban : null;
+    if (c?.board.game?.kind !== "sokoban" || !g) return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+    ctx.session.sokoban = { ...sokobanSolve(g), approvedAt: ctx.now?.() ?? Date.now() };
+    ctx.later(SOKOBAN_DONE_MS + 20, ctx.rerender);
     ctx.rerender();
   },
   // the chain lost (no move left, not approved): 让克总帮忙 — he stamps it (the approval moment follows)

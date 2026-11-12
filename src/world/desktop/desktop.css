@@ -1979,3 +1979,19 @@ button.lk-cell:hover{transform:translateY(-2px);z-index:1}
 .bl-drop:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.3)}
 .mn.bl.lost .bl-scale{animation:bt-shake 460ms steps(6)}
 .mn.bl.done .bl-stage{animation:m3-flash 600ms ease-out both}
+/* sokoban (author 2026-11-13): the meeting room as a warehouse floor, the chairs to push */
+.mn.sk2{background:linear-gradient(160deg,#EEEAE2,#DED6C6)}
+.sk2-main{padding:0 28px}
+.sk2-floor{display:grid;grid-template-columns:repeat(var(--cols,9),56px);grid-template-rows:repeat(var(--rows,6),56px);gap:0;padding:6px;background:#CDBFA6;border-radius:8px;box-shadow:0 12px 30px rgba(0,0,0,.2)}
+.sk2-floor.blank{opacity:.5}
+.sk2-cell{position:relative;width:56px;height:56px;box-sizing:border-box;background:#E9DFCB;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06)}
+.sk2-cell.wall{background:#5b4a3a;box-shadow:inset 0 0 0 2px #3a2d22,inset 0 -6px 0 rgba(0,0,0,.2)}
+.sk2-cell.mark::before{content:"";position:absolute;inset:12px;border:3px dashed #2F6FD6;border-radius:50%}
+.sk2-cell.tri::before{content:"";position:absolute;left:12px;top:10px;width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;border-bottom:28px solid rgba(194,65,12,.45)}
+.sk2-chair{position:absolute;inset:9px;background:#8a5a3b;border-radius:6px 6px 3px 3px;box-shadow:inset 0 10px 0 #a5704d,inset 0 -5px 0 rgba(0,0,0,.25),0 2px 0 rgba(0,0,0,.25)}
+.sk2-cell.seated .sk2-chair{background:#2F6FD6;box-shadow:inset 0 10px 0 #5a8ee6,inset 0 -5px 0 rgba(0,0,0,.25),0 2px 0 rgba(0,0,0,.25)}
+.sk2-cell.tri.seated .sk2-chair{background:#C2410C;box-shadow:inset 0 10px 0 #e0633a,inset 0 -5px 0 rgba(0,0,0,.25),0 2px 0 rgba(0,0,0,.25)}
+.sk2-you{position:absolute;inset:8px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#F6B73C;color:#1d2129;font-size:14px;font-weight:900;box-shadow:0 2px 0 rgba(0,0,0,.3)}
+.sk2-sil{position:absolute;left:4px;top:-18px;width:48px;filter:brightness(0) opacity(.85);animation:ts-pop 400ms ease-out both}
+.mn.sk2.haunted .sk2-floor{box-shadow:0 12px 30px rgba(0,0,0,.2),0 0 0 2px rgba(139,30,30,.25)}
+.mn.sk2.done .sk2-floor{animation:m3-flash 600ms ease-out both}

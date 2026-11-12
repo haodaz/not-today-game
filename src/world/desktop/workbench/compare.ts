@@ -29,6 +29,7 @@ import { tetrisApproving, tetrisStage } from "./tetris";
 import { rhythmApproving, rhythmStage } from "./rhythm";
 import { gachaApproving, gachaStage } from "./gacha";
 import { balanceApproving, balanceStage } from "./balance";
+import { sokobanApproving, sokobanStage } from "./sokoban";
 import { tunePane } from "./shell";
 import { tuneStage } from "./tune-stage";
 import { clueStage } from "./clue-stage";
@@ -219,9 +220,9 @@ function genericWorkLayer(c: { state: State; events: readonly GameEvent[]; sessi
   } else if (board.tune) {
     // tune stage (author 2026-11-12): the research-node screen, not the config pane and the preview
     body = tuneStage({ state, events, session, nowMs }, task, board);
-  } else if (board.view === "meeting" && board.meeting) {
-    // meeting stage (2026-11-12): the meeting above, the template under it
-    body = meetingStage(app, task, board);
+  } else if (board.game?.kind === "sokoban" && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && (!st.approved || (session.sokoban?.key === task.id && sokobanApproving(session.sokoban, nowMs))); })()) {
+    // sokoban (author 2026-11-13): the filled seating form's room as a warehouse floor, the chairs to push
+    body = sokobanStage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs);
   } else if (board.game?.kind === "balance" && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && (!st.approved || (session.balance?.key === task.id && balanceApproving(session.balance, nowMs))); })()) {
     // balance (author 2026-11-13): the filled form's prices onto a scale from a swinging crane
     body = balanceStage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs);
@@ -249,6 +250,9 @@ function genericWorkLayer(c: { state: State; events: readonly GameEvent[]; sessi
   } else if (board.game?.kind === "mines" && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && (!st.approved || (session.mines?.key === task.id && minesApproving(session.mines, nowMs))); })()) {
     // mines (author 2026-11-13): the filled form's month on the desk — the schedule is a game of minesweeper
     body = minesStage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs);
+  } else if (board.view === "meeting" && board.meeting) {
+    // meeting stage (2026-11-12): the meeting above, the template under it (after the games: a meeting day may carry one)
+    body = meetingStage(app, task, board);
   } else if (board.stack && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && (!st.approved || (session.chain?.key === task.id && approving(session.chain, nowMs))); })()) {
     // stack (2026-11-12): the form filled goes up the chain — 2048 until the top rank appears; then
     // (work-stages-polish 3) the approval moment holds the screen, approved, before the board returns

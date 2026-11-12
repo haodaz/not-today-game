@@ -204,7 +204,9 @@ export type BoardGame =
   /** gacha: the callers as eggs; the crank turns once; the egg out is the card the `slot` holds */
   | { readonly kind: "gacha"; readonly slot: string; readonly eggs: readonly { readonly card: string; readonly label: string }[] }
   /** balance: the prices dropped from a swinging crane onto two pans; `fixed` is the welded weight on each (oil, wine) */
-  | { readonly kind: "balance"; readonly fixed: number };
+  | { readonly kind: "balance"; readonly fixed: number }
+  /** sokoban: the chairs onto the seat marks; `level` as rows (# wall, . mark, $ chair, @ you) */
+  | { readonly kind: "sokoban"; readonly level: readonly string[] };
 export interface BoardStack {
   /** From the bottom up: the rank word and its symbol; `silhouette` ranks are the easter eggs past the top (drawn black). */
   readonly ranks: readonly { readonly name: string; readonly img: string; readonly silhouette?: boolean }[];
@@ -776,7 +778,15 @@ function board(v: unknown, w: string): TaskBoard {
     } else if (v.game.kind === "balance") {
       keys(v.game, ["kind", "fixed"], gw);
       game = { kind: "balance", fixed: num(v.game.fixed, "fixed", 0, 50) };
-    } else fail(`${gw}.kind`, 'must be "mines", "pipes", "match3", "link", "snake", "tetris", "rhythm", "gacha" or "balance"');
+    } else if (v.game.kind === "sokoban") {
+      keys(v.game, ["kind", "level"], gw);
+      if (!Array.isArray(v.game.level) || v.game.level.length < 3 || v.game.level.length > 12 || !v.game.level.every((r) => typeof r === "string" && r.length >= 3 && r.length <= 16)) fail(`${gw}.level`, "must be 3 to 12 rows of 3 to 16 characters");
+      const level = v.game.level as string[];
+      const count = (ch: string) => level.join("").split("").filter((c) => c === ch).length;
+      if (count("@") + count("+") !== 1) fail(`${gw}.level`, "must place exactly one @");
+      if (count("$") + count("*") !== count(".") + count("*") + count("+") || count("$") + count("*") < 1) fail(`${gw}.level`, "must have as many chairs as marks");
+      game = { kind: "sokoban", level };
+    } else fail(`${gw}.kind`, 'must be "mines", "pipes", "match3", "link", "snake", "tetris", "rhythm", "gacha", "balance" or "sokoban"');
   }
   let stack: BoardStack | undefined;
   if (v.stack !== undefined) {

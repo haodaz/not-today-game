@@ -402,6 +402,8 @@ export interface Session {
   gacha: import("./workbench/gacha").GachaGame | null;
   /** balance (author 2026-11-13): the scale under way (session only; level is a board step). */
   balance: import("./workbench/balance").BalanceGame | null;
+  /** sokoban (author 2026-11-13): the warehouse floor under way (session only; every chair seated is a board step). */
+  sokoban: import("./workbench/sokoban").SokobanGame | null;
   /** work (author 2026-11-11 night): the task whose full-screen work page is up (`<day>:<taskId>`), or null; 回到工作台 hides it, 打开工作页 brings it back. */
   workShow: string | null;
   /** When the work page was last opened (ms): its entry fade plays only right after, not on every re-render (snake 2026-11-13). */
@@ -611,6 +613,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     rhythm: null,
     gacha: null,
     balance: null,
+    sokoban: null,
     workShow: null,
     workShownAt: 0,
     workPhase: null,
