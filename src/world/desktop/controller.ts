@@ -303,6 +303,8 @@ export interface DesktopDeps {
   readonly hand?: (root: HTMLElement, ctx: ActionContext, actions: Record<string, ActionHandler>) => { after(): void; destroy(): void };
   /** The day-18 pull-out's frame driver (room-scene); runs with or without the splat. */
   readonly pull?: (root: HTMLElement, ctx: ActionContext) => { after(): void; destroy(): void };
+  /** The boss fight's effects layer (2026-11-14): a Pixi canvas over the boss page, loaded when the page is up. */
+  readonly bossFx?: (root: HTMLElement, ctx: ActionContext) => { after(): void; destroy(): void };
   /** tingtalk R1b: where the windows' placement is remembered for the run (absent = the page only). */
   readonly placement?: { readonly storage: Pick<Storage, "getItem" | "setItem"> | null; readonly runId: string };
   /** photo-album R1: told when a room photo is first seen developed (the host writes the profile). */
@@ -442,6 +444,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     nav?.after();
     fx?.after();
     pull?.after();
+    bossFx?.after();
     hand?.after();
     // While Kuro crawls between windows, render again when it should stop.
     if (session.movingUntil > Date.now()) later(session.movingUntil - Date.now() + 20, rerender);
@@ -488,6 +491,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   const splat = deps.splat ? deps.splat(root, ctx) : null;
   const nav = deps.nav ? deps.nav(root, ctx, actions, splat) : null;
   const pull = deps.pull ? deps.pull(root, ctx) : null;
+  const bossFx = deps.bossFx ? deps.bossFx(root, ctx) : null;
   const fx = deps.fx ? deps.fx(root, ctx) : null;
   const hand = deps.hand ? deps.hand(root, ctx, actions) : null;
 
@@ -700,6 +704,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
       motion?.destroy();
       splat?.destroy();
       pull?.destroy();
+      bossFx?.destroy();
       fx?.destroy();
       hand?.destroy();
       nav?.destroy();

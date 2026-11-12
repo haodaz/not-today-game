@@ -234,8 +234,9 @@ const PROP = { throw: "/battle/prop-laptop.png", flip: "/battle/prop-keyboard.pn
 export const BOSS_BG = "/battle/boss-bg.jpg";
 
 const bar = (v: number, max: number, kind: string): SafeHtml => html`<i class="${cls("bs-bar", kind)}"><b style="width:${String(Math.round((100 * Math.max(0, v)) / Math.max(1, max)))}%"></b></i>`;
-const faceOf = (b: BossBattle, m: Member): string => (m.kind === "player" ? `/player/${b.look}.png` : m.kind === "qkuro" ? "/battle/q-kuro.png" : `/objects/${m.id}_front.png`);
-const spriteOf = (b: BossBattle, m: Member, pose: Pose): string => (m.kind === "player" ? `/battle/party/${b.look}-${pose === "hurt" ? "stance" : pose}.png` : m.kind === "qkuro" ? "/battle/q-kuro.png" : `/objects/${m.id}_front.png`);
+/** The objects' battle forms (author 2026-11-14: one attack form each, the walkman the doctor): `public/battle/party/obj-<id>.png`. */
+const faceOf = (b: BossBattle, m: Member): string => (m.kind === "player" ? `/player/${b.look}.png` : m.kind === "qkuro" ? "/battle/q-kuro.png" : `/battle/party/obj-${m.id}.png`);
+const spriteOf = (b: BossBattle, m: Member, pose: Pose): string => (m.kind === "player" ? `/battle/party/${b.look}-${pose === "hurt" ? "stance" : pose}.png` : m.kind === "qkuro" ? "/battle/q-kuro.png" : `/battle/party/obj-${m.id}.png`);
 
 export function renderBoss(b: BossBattle, nowMs: number): SafeHtml {
   const acting = b.act && nowMs - b.act.at < ACT_MS ? b.act : null;
@@ -257,7 +258,7 @@ export function renderBoss(b: BossBattle, nowMs: number): SafeHtml {
   const members = b.party.map((m) => {
     const hit = hitOf(m.id);
     const pose: Pose = acting?.who === m.id ? (acting.move.pose ?? (m.kind === "player" ? "strike" : "stance")) : m.hp <= 0 ? "hurt" : "stance";
-    return html`<div class="${cls("bs-member", m.kind, m.hp <= 0 && "down", hit && hit.n > 0 && "hurt", hit && hit.n < 0 && "healed", (b.chooser === m.id) && "ready", acting?.who === m.id && "acting")}">
+    return html`<div class="${cls("bs-member", m.kind, m.hp <= 0 && "down", hit && hit.n > 0 && "hurt", hit && hit.n < 0 && "healed", (b.chooser === m.id) && "ready", acting?.who === m.id && "acting")}" data-id="${m.id}">
       <img class="bs-sprite" src="${spriteOf(b, m, pose)}" alt="">
       ${hit ? html`<span class="${cls("bs-num", hit.n < 0 && "heal")}">${hit.n < 0 ? `+${String(-hit.n)}` : String(hit.n)}</span>` : null}
     </div>`;

@@ -28,6 +28,7 @@ import { createNav } from "@world/room/nav";
 import { settleSession } from "@world/dialogue/place";
 import { createPullDriver } from "@world/endings/pullout-dom";
 import { bossStart } from "@world/endings/boss";
+import { createBossFx } from "@world/endings/boss-fx";
 import { clearAll, createProfileWriter, createRunSlot, restartRun } from "@state/saves";
 import { createStore, type Store } from "@state/store";
 import { parseBeatParams } from "@world/desktop/beat";
@@ -157,6 +158,8 @@ function startGame(store: Store, saved: boolean, prologue = false): void {
     nav: createNav(),
     // The day-18 pull-out's frames (splat or photo fallback).
     pull: createPullDriver(),
+    // The boss fight's hits, slashes, sparks and jolts: one Pixi canvas over the page, loaded on demand.
+    bossFx: createBossFx(),
     hand: createHandLayer(),
   });
   // What finished runs left on the desk (presentation only; the story never reads it).
