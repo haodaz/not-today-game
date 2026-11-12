@@ -89,6 +89,8 @@ function canMove(g: StackGrid, dir: StackDir): boolean {
 }
 
 export const stackBest = (g: StackGrid): number => Math.max(0, ...g.cells);
+/** The value that approves the form: the board's target, else the top rank. */
+export const stackTarget = (st: BoardStack): number => st.target ?? 2 ** st.ranks.length;
 export const rankOf = (v: number): number => (v <= 0 ? -1 : Math.round(Math.log2(v)) - 1);
 
 /** The approval screen's body (inside the work stage's frame). */
@@ -98,12 +100,13 @@ export function stackStage(task: Task, board: TaskBoard, session: Pick<Session, 
   const g = session.chain?.key === key ? session.chain : null;
   const best = g ? stackBest(g) : 0;
   const bestRank = Math.min(st.ranks.length - 1, Math.max(0, rankOf(best)));
-  const top = html`<header class="sk-top"><div class="cs-title"><span class="cs-kick">${S("stack.stage.kick")}</span><h2>${S("stack.stage.title")}</h2><span class="sk-sub">${S("stack.stage.sub", { target: st.ranks[st.ranks.length - 1]?.name ?? "" })}</span></div><div class="sk-score"><span>${S("stack.stage.moves", { n: String(g?.moves ?? 0) })}</span><b>${S("stack.stage.best")} ${st.ranks[bestRank]?.name ?? ""}</b></div></header>`;
-  const ladder = html`<aside class="sk-ladder">${st.ranks.map((r, i) => html`<div class="${cls("sk-rank", i <= bestRank && best > 0 && "seen", i === st.ranks.length - 1 && "top")}"><img src="${r.img}" alt=""><span class="sk-rn">${r.name}</span><small>${2 ** (i + 1)}</small></div>`)}</aside>`;
+  const top = html`<header class="sk-top"><div class="cs-title"><span class="cs-kick">${S("stack.stage.kick")}</span><h2>${S("stack.stage.title")}</h2><span class="sk-sub">${S("stack.stage.sub", { target: st.ranks[rankOf(stackTarget(st))]?.name ?? "" })}</span></div><div class="sk-score"><span>${S("stack.stage.moves", { n: String(g?.moves ?? 0) })}</span><b>${S("stack.stage.best")} ${st.ranks[bestRank]?.name ?? ""}</b></div></header>`;
+  const target = stackTarget(st);
+  const ladder = html`<aside class="sk-ladder">${st.ranks.map((r, i) => html`<div class="${cls("sk-rank", i <= bestRank && best > 0 && "seen", 2 ** (i + 1) === target && "top", r.silhouette && "egg")}"><img src="${r.img}" alt=""><span class="sk-rn">${r.silhouette && !(i <= bestRank && best > 0) ? "?" : r.name}</span><small>${2 ** (i + 1)}</small></div>`)}</aside>`;
   const tiles = (g?.cells ?? Array(N * N).fill(0)).map((v) => {
     if (v === 0) return html`<div class="sk-cell"></div>`;
     const r = st.ranks[Math.min(st.ranks.length - 1, rankOf(v))]!;
-    return html`<div class="${cls("sk-cell", "on", `r-${Math.min(st.ranks.length - 1, rankOf(v))}`)}"><img src="${r.img}" alt="">${v >= 2 ** st.ranks.length ? null : html`<span class="sk-v">${v}</span>`}<span class="sk-n">${r.name}</span></div>`;
+    return html`<div class="${cls("sk-cell", "on", `r-${Math.min(st.ranks.length - 1, rankOf(v))}`, v >= target && "top", r.silhouette && "egg")}"><img src="${r.img}" alt=""><span class="sk-n">${r.name}</span></div>`;
   });
   const dirs: StackDir[] = ["up", "left", "down", "right"];
   const arrows = (["up", "left", "down", "right"] as const).map((d) => html`<button type="button" class="${cls("sk-arrow", d)}" data-action="stack-move" data-dir="${d}" aria-label="${d}"${!g || g.over || approved ? html` disabled` : null}>${d === "up" ? "↑" : d === "down" ? "↓" : d === "left" ? "←" : "→"}</button>`);
@@ -115,7 +118,9 @@ export function stackStage(task: Task, board: TaskBoard, session: Pick<Session, 
       : g.over
         ? html`<div class="sk-over">${S("stack.stage.over")}<button type="button" class="wl-cta ghost" data-action="stack-start">${S("stack.stage.again")}</button></div>`
         : html`<div class="sk-pad">${arrows}</div>`;
-  const grid = html`<div class="sk-board"><div class="sk-grid">${tiles}</div>${state}</div>`;
+  // dev only: the replay driver's way through (a real player plays)
+  const cheat = import.meta.env.DEV && g && !approved ? html`<button type="button" class="sk-cheat" data-action="stack-cheat" aria-hidden="true" tabindex="-1"></button>` : null;
+  const grid = html`<div class="sk-board"><div class="sk-grid">${tiles}</div>${state}${cheat}</div>`;
   return html`<div class="sk">${top}<div class="sk-main">${ladder}${grid}</div></div>`;
 }
 

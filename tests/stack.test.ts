@@ -4,18 +4,21 @@ import { describe, expect, it } from "vitest";
 import { createStore } from "@state/store";
 import { taskByFlag } from "@state/days/tasks";
 import { boardState, canPrint, freshBoard, stepBoard } from "@state/days/board";
-import { rankOf, stackBest, stackMove, stackStart, type StackGrid } from "../src/world/desktop/workbench/stack-stage";
+import { rankOf, stackBest, stackMove, stackStart, stackTarget, type StackGrid } from "../src/world/desktop/workbench/stack-stage";
 
 const day13 = () => taskByFlag(13, "task_d13_work")!;
 
 describe("the approval chain", () => {
-  it("day 13's board carries eleven ranks with heads, the top being 2048", () => {
+  it("day 13's board carries eleven office ranks as symbols, approval at 2048, and two silhouette easter eggs past it", () => {
     const st = day13().board!.stack!;
-    expect(st.ranks).toHaveLength(11);
-    expect(st.ranks[0]!.img).toBe("/npc/gods/r1.jpg");
-    expect(2 ** st.ranks.length).toBe(2048);
+    expect(st.ranks).toHaveLength(13);
+    expect(st.ranks[0]!.img).toBe("/npc/power/p1.jpg");
+    expect(st.target).toBe(2048);
+    expect(st.ranks[11]!.silhouette).toBe(true);
+    expect(st.ranks[12]!.name).toBe("克总");
     expect(rankOf(2)).toBe(0);
     expect(rankOf(2048)).toBe(10);
+    expect(stackTarget(st)).toBe(2048);
   });
   it("a move slides and merges once per pair, scores, spawns; an unchanged grid stays the same object", () => {
     const g: StackGrid = { key: "k", cells: [2, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], score: 0, moves: 0, over: false };

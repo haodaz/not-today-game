@@ -187,7 +187,10 @@ export interface ComparePage {
   readonly remark: Readonly<Record<string, string>>;
 }
 export interface BoardStack {
-  readonly ranks: readonly { readonly name: string; readonly img: string }[];
+  /** From the bottom up: the rank word and its symbol; `silhouette` ranks are the easter eggs past the top (drawn black). */
+  readonly ranks: readonly { readonly name: string; readonly img: string; readonly silhouette?: boolean }[];
+  /** The value that approves the form (default: the highest rank, 2^n). */
+  readonly target?: number;
 }
 export interface BoardCompare {
   readonly versions: readonly string[];
@@ -701,9 +704,10 @@ function board(v: unknown, w: string): TaskBoard {
   if (v.stack !== undefined) {
     const sw = `${w}.stack`;
     if (!isRecord(v.stack)) fail(sw, "must be an object");
-    keys(v.stack, ["ranks"], sw);
-    if (!Array.isArray(v.stack.ranks) || v.stack.ranks.length < 3 || v.stack.ranks.length > 12) fail(`${sw}.ranks`, "must be 3 to 12 ranks");
-    stack = { ranks: v.stack.ranks.map((r, i) => { if (!isRecord(r)) fail(`${sw}.ranks[${i}]`, "a rank must be an object"); keys(r, ["name", "img"], `${sw}.ranks[${i}]`); return { name: str(r.name, `${sw}.ranks[${i}].name`), img: str(r.img, `${sw}.ranks[${i}].img`) }; }) };
+    keys(v.stack, ["ranks", "target"], sw);
+    if (v.stack.target !== undefined && (!Number.isInteger(v.stack.target) || (v.stack.target as number) < 4)) fail(`${sw}.target`, "must be an integer power of two");
+    if (!Array.isArray(v.stack.ranks) || v.stack.ranks.length < 3 || v.stack.ranks.length > 14) fail(`${sw}.ranks`, "must be 3 to 14 ranks");
+    stack = { ranks: v.stack.ranks.map((r, i) => { if (!isRecord(r)) fail(`${sw}.ranks[${i}]`, "a rank must be an object"); keys(r, ["name", "img", "silhouette"], `${sw}.ranks[${i}]`); return { name: str(r.name, `${sw}.ranks[${i}].name`), img: str(r.img, `${sw}.ranks[${i}].img`), ...(r.silhouette === true ? { silhouette: true as const } : {}) }; }), ...(v.stack.target !== undefined ? { target: v.stack.target as number } : {}) };
   }
   let compare: BoardCompare | undefined;
   if (v.compare !== undefined) {

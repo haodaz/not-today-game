@@ -225,50 +225,61 @@
         "stack": {
           "ranks": [
             {
-              "name": "巴尔 · 办事员",
-              "img": "/npc/gods/r1.jpg"
+              "name": "办事员",
+              "img": "/npc/power/p1.jpg"
             },
             {
-              "name": "阿加雷斯 · 组长",
-              "img": "/npc/gods/r2.jpg"
+              "name": "组长",
+              "img": "/npc/power/p2.jpg"
             },
             {
-              "name": "瓦沙克 · 经理",
-              "img": "/npc/gods/r3.jpg"
+              "name": "主管",
+              "img": "/npc/power/p3.jpg"
             },
             {
-              "name": "伽米金 · 总监",
-              "img": "/npc/gods/r4.jpg"
+              "name": "经理",
+              "img": "/npc/power/p4.jpg"
             },
             {
-              "name": "玛巴斯 · 副总",
-              "img": "/npc/gods/r5.jpg"
+              "name": "总监",
+              "img": "/npc/power/p5.jpg"
             },
             {
-              "name": "瓦勒弗 · 总裁",
-              "img": "/npc/gods/r6.jpg"
+              "name": "副总",
+              "img": "/npc/power/p6.jpg"
             },
             {
-              "name": "亚蒙 · 董事",
-              "img": "/npc/gods/r7.jpg"
+              "name": "总裁",
+              "img": "/npc/power/p7.jpg"
             },
             {
-              "name": "巴巴妥司 · 主教",
-              "img": "/npc/gods/r8.jpg"
+              "name": "董事",
+              "img": "/npc/power/p8.jpg"
             },
             {
-              "name": "派蒙 · 王",
-              "img": "/npc/gods/r9.jpg"
+              "name": "董事长",
+              "img": "/npc/power/p9.jpg"
             },
             {
-              "name": "布耶尔 · 本体",
-              "img": "/npc/gods/r10.jpg"
+              "name": "集团",
+              "img": "/npc/power/p10.jpg"
             },
             {
-              "name": "古辛 · 印",
-              "img": "/npc/gods/r11.jpg"
+              "name": "大印",
+              "img": "/npc/power/p11.jpg"
+            },
+            {
+              "name": "……",
+              "img": "/npc/gods/r10.jpg",
+              "silhouette": true
+            },
+            {
+              "name": "克总",
+              "img": "/kuro/k3d_base.png",
+              "silhouette": true
             }
-          ]
+          ],
+          "target": 2048
         }
       },
       "deliverable": {

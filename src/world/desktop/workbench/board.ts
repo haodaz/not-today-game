@@ -5,7 +5,7 @@
 // prints when every slot is filled and the column is open. Every action is a `boardStep` event, so
 // the board rebuilds from the log; printing is the `task` event with `slots` + `assists`. Kuro's own
 // cards never show in the tray. All labels are strings; story text is content. Pure view + actions.
-import { stackBest, stackMove, stackStart, type StackDir } from "./stack-stage";
+import { stackBest, stackMove, stackStart, stackTarget, type StackDir } from "./stack-stage";
 import type { State } from "@state/types.gen";
 import type { GameEvent } from "@state/events";
 import type { Task, TaskBoard } from "@state/days/tasks";
@@ -475,7 +475,7 @@ const actions: Record<string, ActionHandler> = {
     const next = stackMove(g, dir);
     ctx.session.chain = next;
     const s = stateOf(ctx, c.task, c.board);
-    if (!s.approved && stackBest(next) >= 2 ** c.board.stack.ranks.length) {
+    if (!s.approved && stackBest(next) >= stackTarget(c.board.stack)) {
       const before = transcriptLength(ctx, c);
       ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
       noteIdeLines(ctx, c.task, c.board, ctx.store.getState().day, before);
