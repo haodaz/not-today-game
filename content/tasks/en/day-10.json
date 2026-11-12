@@ -307,7 +307,6 @@
         "who": "laozhou",
         "note": [
           "Lao Zhou's brief: fix the typos, don't read too closely.",
-          "Lao Zhou wants act two proofed: fix the typos, don't read too closely.",
           "Four words; the script spells them one way, the book another."
         ],
         "call": "Fix them by the book, don't read them aloud, hand it in when done.",
@@ -325,7 +324,7 @@
             "Read it, don't remember it"
           ]
         },
-        "tone": "ink",
+        "tone": "paper",
         "art": "/launch/day-10.jpg"
       }
     },
