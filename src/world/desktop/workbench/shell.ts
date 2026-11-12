@@ -185,7 +185,7 @@ function previewPane(task: Task, board: TaskBoard, s: BoardState, ops: ReturnTyp
  * until found; a path that waits for the end of the work is absent. Read back (not live): every
  * module on one list, no buttons.
  */
-function tunePane(board: TaskBoard, s: BoardState, day: number, events: readonly GameEvent[], live: boolean, session: Session, key: string, busy: boolean): SafeHtml {
+export function tunePane(board: TaskBoard, s: BoardState, day: number, events: readonly GameEvent[], live: boolean, session: Session, key: string, busy: boolean): SafeHtml {
   const tune = board.tune!;
   const steps = hasString("board.tune.steps") ? html`<span class="sh-tune-steps">${tr("board.tune.steps", { on: String(Object.keys(s.mods).length), max: String(tune.steps) })}</span>` : null;
   const sign = (x: number) => (x > 0 ? `+${x}` : `−${-x}`);

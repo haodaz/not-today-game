@@ -15,8 +15,12 @@ import { FRAMES, frameUrl } from "../kuro/body";
 import type { Session } from "../model";
 import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t, tr } from "@world/i18n";
-import { cardText, finishLabel } from "./board";
+import { cardText, finishLabel, renderBoard } from "./board";
 import { openWork } from "./work";
+import { tunePane } from "./shell";
+import { tuneOfferPending, tuneOffers } from "@state/days/board";
+import { isNight } from "../beat";
+import type { AppContext } from "../model";
 
 /**
  * launch (author 2026-11-11/12): the task's opening page over the whole stage, a game's level card,
@@ -52,7 +56,7 @@ export function launchLayer(state: State, session: Pick<Session, "launchShow" | 
  *   settle  — the satisfaction, the faces, 发给老板 at the bar or 让克总按他的意思重新改一稿 under it.
  * Up while `session.workShow` names today's live board task; gone once the task is done.
  */
-export function workLayer(ctx: { readonly state: State; readonly events: readonly GameEvent[]; readonly session: Session; readonly nowMs: number }): SafeHtml | null {
+export function workLayer(ctx: { readonly state: State; readonly events: readonly GameEvent[]; readonly session: Session; readonly nowMs: number; readonly startDay?: number }): SafeHtml | null {
   const { state, events, session, nowMs } = ctx;
   if (session.view !== "desktop" || session.workShow === null) return null;
   const [dayText, taskId] = session.workShow.split(":");
@@ -60,8 +64,12 @@ export function workLayer(ctx: { readonly state: State; readonly events: readonl
   const open = openWork(state, events);
   const task = open?.tree?.id === taskId ? open.tree : undefined;
   const board = task?.board;
-  const cmp = board?.compare;
-  if (!task || !board || !cmp || state.flags.includes(task.done)) return null;
+  if (!task || !board || state.flags.includes(task.done)) return null;
+  // Every other board kind (the tune, the table, the meeting, the old IDE) on the full stage too
+  // (author 2026-11-12: 「凡是还挤在真实界面里的游戏操作先搬到全屏层，再逐天细调」): the board's own surface,
+  // as the workbench drew it, inside the stage card.
+  if (!board.compare) return genericWorkLayer({ state, events, session, nowMs, startDay: ctx.startDay ?? 1 }, task, board);
+  const cmp = board.compare;
   const s = boardState(board, state.day, taskId, events);
   const ops = ideOps(task, state.day, events);
   const key = `${state.day}:${taskId}`;
@@ -123,6 +131,32 @@ export function workLayer(ctx: { readonly state: State; readonly events: readonl
     body = html`<div class="wl-settle"><div class="cmp-score"><b>${sc.pct}%</b><span>${tr("compare.score", { r: String(sc.right), w: String(sc.total - sc.right) })}</span></div>${faces(board, s, cmp.pages[cmp.pages.length - 1]!, false)}<p class="${cls("cmp-verdict", pass ? "pass" : "fail")}">${tr(pass ? "compare.pass" : "compare.fail", { pct: String(cmp.threshold) })}</p><div class="wl-settle-actions">${pass ? finish : redo}</div></div>`;
   }
   return html`<div class="work-layer"><section class="work-stage" data-screen="${screen}" role="dialog" aria-modal="true" aria-label="${fill(task.title)}">${head}<div class="wl-body">${body}</div></section></div>`;
+}
+
+/** The tune, the table, the meeting and the old IDE board on the full stage: the surface the workbench drew, lifted out of it. */
+function genericWorkLayer(c: { state: State; events: readonly GameEvent[]; session: Session; nowMs: number; startDay: number }, task: Task, board: TaskBoard): SafeHtml {
+  const { state, events, session, nowMs } = c;
+  const app: AppContext = { state, events, startDay: c.startDay, session, night: isNight(session.clock), nowMs };
+  const fill = (x: string) => fillPlaceholders(x, state.names);
+  const back = hasString("work.back") ? html`<button type="button" class="wl-back" data-action="work-hide">${tr("work.back")}</button>` : null;
+  const head = html`<header class="wl-head"><span class="wl-title">${fill(task.title)}</span><span class="sp"></span>${back}</header>`;
+  const key = `${state.day}:${task.id}`;
+  let body: SafeHtml;
+  if (board.tune) {
+    const s = boardState(board, state.day, task.id, events);
+    const ops = ideOps(task, state.day, events);
+    const typing = session.ideTyping?.key === key ? session.ideTyping.times : [];
+    const busy = typing.some((t) => t > nowMs);
+    const hold = session.ideHold && session.ideHold.key === key && session.ideHold.until > nowMs ? session.ideHold.src : null;
+    const src = hold ?? ideSrc(board, s, ops, null, tuneCarried(board, events));
+    const offer = !busy && tuneOfferPending(board, s)
+      ? html`<div class="wl-offer">${tuneOffers(board).map(({ mod, path }) => html`<button type="button" class="wl-cta" data-action="board-mod" data-mod="${mod.id}" data-path="${path.id}">${path.label}</button>`)}${hasString("board.tune.keep") ? html`<button type="button" class="wl-cta ghost" data-action="board-keep">${tr("board.tune.keep")}</button>` : null}</div>`
+      : null;
+    body = html`<div class="wl-tune"><div class="wl-tune-left">${tunePane(board, s, state.day, events, true, session, key, busy)}${offer}</div><div class="wl-right"><div class="wl-page"><iframe class="ide-frame" data-keep="ide-tune" src="${src}" title="${fill(task.title)}" sandbox="allow-scripts"></iframe></div></div></div>`;
+  } else {
+    body = html`<div class="wl-generic">${renderBoard(app, task)}</div>`;
+  }
+  return html`<div class="work-layer"><section class="work-stage" data-screen="${board.tune ? "tune" : board.view ?? "table"}" role="dialog" aria-modal="true" aria-label="${fill(task.title)}">${head}<div class="wl-body">${body}</div></section></div>`;
 }
 
 /** 老王's faces (SVG, drawn in code: author 2026-11-11 「画个卡通的高兴生气就行」) and his portrait. */

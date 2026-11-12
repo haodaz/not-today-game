@@ -1274,3 +1274,11 @@ span.cmp-face-btn{cursor:default}
 .wl-ln.add .wl-field{color:#0B7A3B}
 .wl-v{flex:0 0 auto;margin-left:12px;font-size:11px;letter-spacing:.12em;color:var(--ink-2)}
 .wl-ln .wl-use{width:auto;padding:5px 16px;margin-left:12px;font-size:14px;letter-spacing:.2em;text-indent:.2em}
+/* the other board kinds on the full stage (author 2026-11-12: moved first, refined per day later) */
+.wl-tune{display:grid;grid-template-columns:minmax(520px,1fr) minmax(480px,1fr);gap:18px;flex:1;min-height:0}
+.wl-tune-left{display:flex;flex-direction:column;gap:12px;min-height:0;overflow:auto}
+.wl-tune-left .sh-editor{border:1px solid rgba(29,33,41,.25);background:#FBFCFE}
+.wl-offer{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding:6px 0}
+.wl-generic{flex:1;min-height:0;overflow:auto}
+.wl-generic .surface.board{border:1px solid rgba(29,33,41,.25);background:#FBFCFE;min-height:100%;box-sizing:border-box}
+.wl-generic .surface.board.ide{height:100%}
