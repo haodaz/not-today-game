@@ -202,7 +202,7 @@ export function onTarget(target: GuideTarget, action: string, data: Readonly<Rec
       return action === "wb-nav" && data.page === `task:${target.id}`;
     case "board":
       // G7 never refuses; its target is the board's own controls.
-      return action === "task-launch" || action === "compare-pick" || action === "compare-kuro" || action === "compare-redo" || action === "board-lock" || action === "board-mod" || action === "board-keep" || action === "board-merge" || action === "board-fetch" || action === "board-option" || action === "board-card" || action === "board-slot" || action === "shell-slot" || action === "board-print" || action === "board-settle" || action === "board-settle-back";
+      return action === "task-launch" || action === "compare-pick" || action === "compare-kuro" || action === "compare-redo" || action === "board-lock" || action === "board-mod" || action === "board-keep" || action === "board-merge" || action === "board-fetch" || action === "board-option" || action === "board-card" || action === "board-slot" || action === "shell-slot" || action === "board-print" || action === "board-settle" || action === "board-settle-back" || action === "settle-kuro" || action === "stack-assist";
   }
 }
 

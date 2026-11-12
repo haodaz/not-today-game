@@ -1,6 +1,6 @@
 // work-stages-polish 1: the clue / meeting stage ends on a settlement sheet. 整理好了 (board-settle) is
-// enabled only once every slot is filled; it shows the sheet with each placed card and 再改改 / 提交;
-// 再改改 (board-settle-back) returns to the board. Day 4's 「意识」 board (a pager lock, four slots).
+// enabled only once every slot is filled; it shows the sheet with each placed card and the one way out
+// the verdict allows (author 2026-11-13): the send button, or 让克总帮忙. Day 4's 「意识」 board.
 import "./specimen";
 import { describe, expect, it } from "vitest";
 import { taskByFlag } from "@state/days/tasks";
@@ -15,7 +15,7 @@ import { setLocale, t } from "@world/i18n";
 import { completeUntil } from "./complete-items";
 
 describe("the settlement sheet (clue stage)", () => {
-  it("整理好了 waits for every slot; the sheet lists each placed card with 再改改 and 提交; 再改改 goes back", () => {
+  it("整理好了 waits for every slot; the sheet lists each placed card; every slot right → the send button only", () => {
     setLocale("zh");
     const store = createStore({ startDay: 4 });
     completeUntil(store, "task1");
@@ -48,12 +48,48 @@ describe("the settlement sheet (clue stage)", () => {
     expect(sheet).toContain(escapeHtml(board.title));
     expect([...sheet.matchAll(/class="st-row"/g)]).toHaveLength(board.slots.length);
     for (const slot of board.slots) expect(sheet).toContain(`<p class="st-card">${escapeHtml(cardText(board, slot.answer))}</p>`);
-    expect(sheet).toContain(`data-action="board-settle-back">${t("sheet.settle.back")}</button>`);
+    // the settlement rule (author 2026-11-13): no 再改改 — every slot right, so it can go: the send button only
+    expect(sheet).not.toContain('data-action="board-settle-back"');
+    expect(sheet).toContain(`<p class="sl-verdict pass">${t("settle.pass")}</p>`);
     expect(sheet).toMatch(/<button type="button" class="wl-cta" data-action="board-print">[^<]+<\/button>/);
+    expect(sheet).not.toContain('data-action="settle-kuro"');
+  });
 
-    act("board-settle-back");
-    expect(session.workPhase).toBeNull();
-    expect(out()).toContain('class="cs-notes"');
-    expect(out()).not.toContain('class="st-sheet"');
+  it("a wrong card fails the settlement: only 让克总帮忙; his card takes the wrong slot and the story asks 要发吗？", () => {
+    setLocale("zh");
+    const store = createStore({ startDay: 4 });
+    completeUntil(store, "task1");
+    const task = taskByFlag(4, "task_d4_1")!;
+    const board = task.board!;
+    const session = initialSession({ beat: "work", time: "10:00" }, "left", "desktop");
+    let now = 1000;
+    const timers: { at: number; fn: () => void }[] = [];
+    const ctx: ActionContext = { store, session, rerender: () => {}, later: (ms, fn) => void timers.push({ at: now + ms, fn }), now: () => now };
+    const act = (name: string) => boardActions[name]!(ctx, {} as DOMStringMap, null as never);
+    const out = () => clueStage({ state: store.getState(), events: store.getEvents(), session, nowMs: now }, task, board).value;
+    store.appendEvent({ kind: "boardStep", taskId: task.id, op: { t: "unlock", code: board.given.lock!.answer } });
+    const [wrongSlot, ...rest] = board.slots;
+    for (const slot of rest) store.appendEvent({ kind: "boardStep", taskId: task.id, op: { t: "fill", slot: slot.id, card: slot.answer } });
+    const other = board.cards.find((c) => c.id !== wrongSlot!.answer)!;
+    store.appendEvent({ kind: "boardStep", taskId: task.id, op: { t: "fill", slot: wrongSlot!.id, card: other.id } });
+    act("board-settle");
+    let sheet = out();
+    expect(sheet).toContain(`<p class="sl-verdict fail">${t("settle.fail")}</p>`);
+    expect(sheet).toContain(`data-action="settle-kuro">${t("settle.kuro")}</button>`);
+    expect(sheet).not.toContain('data-action="board-print"');
+    // 让克总帮忙: his fix lands at once, and the story plays over the settlement — the player's line,
+    // Kuro's two, then the choice (every option sends); the sheet behind already says it can go
+    act("settle-kuro");
+    const last = store.getEvents().at(-1)!;
+    expect(last).toMatchObject({ kind: "boardStep", op: { t: "assistFix" } });
+    const queued = session.dialogue.queue.filter((q) => q.key.startsWith(`d4:settle:${task.id}:kuro`));
+    expect(queued.flatMap((q) => q.lines).map((l) => (l.k === "speaker" ? `${l.who}:${l.t}` : l.k))).toEqual([`me:${t("settle.kuroWork")}`, `kuro:${t("settle.kuroDone")}`, `kuro:${t("settle.sendAsk")}`]);
+    expect(queued.at(-1)!.ending).toEqual({ kind: "settleSend", taskId: task.id });
+    expect(timers).toHaveLength(0);
+    sheet = out();
+    expect(sheet).toContain(t("settle.kuroDone"));
+    expect(sheet).toMatch(/<button type="button" class="wl-cta" data-action="board-print">[^<]+<\/button>/);
+    expect(sheet).not.toContain('data-action="settle-kuro"');
+    expect(sheet).toContain(`<p class="st-card">${escapeHtml(cardText(board, board.kuro.fill[wrongSlot!.id] ?? wrongSlot!.answer))}</p>`);
   });
 });

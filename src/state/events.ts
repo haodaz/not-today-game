@@ -121,7 +121,9 @@ export type BoardOp =
   /** tune (author 2026-11-08): 克总帮我处理一下 — Kuro picks this module's path (its own taste, `tune.assist`). */
   | { readonly t: "assistMod"; readonly id: string }
   /** stack (author 2026-11-12): the approval chain reached its top rank — the form is approved. */
-  | { readonly t: "approve" };
+  | { readonly t: "approve" }
+  /** settlement (author 2026-11-13): 让克总帮忙 on a failed board — the wrong slots take Kuro's card (one assist). */
+  | { readonly t: "assistFix" };
 
 export type EventKind = GameEvent["kind"];
 

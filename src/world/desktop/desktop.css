@@ -1667,3 +1667,10 @@ span.cmp-face-btn{cursor:default}
 .sl-dims .ts-rb.her .ts-fill{background:#F6B73C}
 .sl-dims .ts-rb.back .ts-fill{background:#2F6FD6}
 .sl-dims .ts-rb .ts-track{background:rgba(29,33,41,.1)}
+/* the settlement's verdict and Kuro's help (author 2026-11-13) */
+.sl-verdict{margin:0;font-size:16px;font-weight:700}
+.sl-verdict.pass{color:#13A37A}.sl-verdict.fail{color:#C2410C}
+.sl-kuro.busy{animation:cmp-blink 1s ease-in-out infinite}
+.sl-kuro.done{color:#13A37A;font-weight:700}
+.sk-stuck{position:absolute;left:50%;bottom:36px;transform:translateX(-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 22px;background:#FAF8EF;border:2px solid #776E65;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+.sk-stuck p{margin:0;font-weight:700;color:#C2410C}

@@ -181,7 +181,9 @@ export function stackStage(task: Task, board: TaskBoard, session: Pick<Session, 
         : html`<div class="sk-pad">${arrows}</div>`;
   // dev only: the replay driver's way through (a real player plays)
   const cheat = import.meta.env.DEV && g && !approved ? html`<button type="button" class="sk-cheat" data-action="stack-cheat" aria-hidden="true" tabindex="-1"></button>` : null;
-  const grid = html`<div class="sk-board"><div class="sk-grid">${tiles}</div>${state}${cheat}</div>`;
+  // the chain is stuck and not approved (author 2026-11-13): the one way out is Kuro — he stamps it himself
+  const assist = g && g.over && !approved ? html`<div class="sk-stuck"><p>${S("settle.fail")}</p><button type="button" class="wl-cta ghost" data-action="stack-assist">${S("settle.kuro")}</button></div>` : null;
+  const grid = html`<div class="sk-board"><div class="sk-grid">${tiles}</div>${state}${cheat}${assist}</div>`;
   return html`<div class="${cls("sk", still && "still", approved && "approved")}">${top}<div class="sk-main">${ladder}${grid}</div></div>`;
 }
 

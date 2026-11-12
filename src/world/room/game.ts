@@ -1187,6 +1187,15 @@ export const loopActions: Record<string, ActionHandler> = {
       ctx.rerender();
       return;
     }
+    // settlement (author 2026-11-13): 发出去 / 快点发出去 / 发发发 — every one sends the work Kuro fixed
+    if (q.ending.kind === "settleSend") {
+      if (data.choice !== "go" && data.choice !== "fast" && data.choice !== "now") return;
+      ctx.session.dialogue = finishChoice(ctx.session.dialogue);
+      settleSession(ctx.session);
+      boardActions["board-print"]!(ctx, {} as DOMStringMap, null as never);
+      ctx.rerender();
+      return;
+    }
     // author 2026-11-11: 吃 eats the meal on the table; 再等等 leaves it there.
     if (q.ending.kind === "eatAsk") {
       if (data.choice !== "eat" && data.choice !== "wait") return;

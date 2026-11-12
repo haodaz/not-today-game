@@ -1,8 +1,9 @@
 // work-stages-polish 1: the settlement sheet of the clue and meeting stages (author 2026-11-12:
 // 「最后结算的时候先展示出来，再提交」). 整理好了 (`board-settle`) shows it instead of the board: one
 // paper sheet, centred — who it goes to, the board's title, one row per slot with its demand and the
-// card placed in it — and under it 再改改 (`board-settle-back`) and 提交 (`board-print`). Pure view.
-import { canPrint, type BoardState } from "@state/days/board";
+// card placed in it — and under it the one way out the verdict allows (`settleActions`). Pure view.
+import { canPrint, settleVerdict, type BoardState } from "@state/days/board";
+import { FRAMES, frameUrl } from "../kuro/body";
 import type { Task, TaskBoard } from "@state/days/tasks";
 import type { State } from "@state/types.gen";
 import { cls, html, type SafeHtml } from "@world/html";
@@ -49,8 +50,8 @@ export function settleSheet(state: State, task: Task, board: TaskBoard, s: Board
     return html`<li class="${cls("st-row", held === undefined && "empty")}" data-slot="${slot.id}"><span class="st-no">${i + 1}</span><div class="st-ask"><b class="st-label">${slot.label}</b>${demand ? html`<span class="st-demand">${fill(demand)}</span>` : null}</div><p class="st-card">${held !== undefined ? cardText(board, held) : ""}</p></li>`;
   });
   const sheet = html`<article class="st-sheet">${head}<ol class="st-rows">${rows}</ol></article>`;
-  const back = html`<button type="button" class="wl-cta ghost" data-action="board-settle-back">${S("sheet.settle.back")}</button>`;
-  const print = html`<button type="button" class="wl-cta" data-action="board-print"${canPrint(board, s) ? null : html` disabled`}>${finishLabel(task)}</button>`;
+  // the settlement's two ways out (author 2026-11-13): it can go, or only Kuro can make it go
+  const actions = settleActions(task, board, s);
   // the record: the clippings, each demand with what went in it
   const pinned = Object.keys(s.slots).length;
   const list = board.slots.map((slot) => html`<li class="${cls("sl-pin", slot.id in s.slots && "on")}"><i></i><span>${slot.label}</span></li>`);
@@ -73,5 +74,18 @@ export function settleSheet(state: State, task: Task, board: TaskBoard, s: Board
     });
     effect = html`${sheet}<aside class="${cls("af", reduced && "reduced")}"><span class="af-title">${S("settle.flow.title")}</span><ol class="af-steps">${steps}</ol></aside>`;
   }
-  return settleLayer({ kind: board.stack ? "flow" : "sheet", portrait, kick, title: fill(board.title), record, effect, actions: html`${back}${print}` });
+  return settleLayer({ kind: board.stack ? "flow" : "sheet", portrait, kick, title: fill(board.title), record: html`${record}${actions.line}`, effect, actions: actions.buttons });
+}
+
+/**
+ * What the settlement offers (author 2026-11-13: 「只可能有 2 个选择」): the work passed → the send
+ * button; it failed → 让克总帮忙 only (then the story in the box, and the choice there sends it); Kuro
+ * done → his word that it can go, and the send button. The compare and chain screens follow the same rule.
+ */
+export function settleActions(task: Task, board: TaskBoard, s: BoardState): { line: SafeHtml | null; buttons: SafeHtml } {
+  const verdict = settleVerdict(board, s);
+  const kuro = (text: string, cls_: string) => html`<div class="${cls("sl-kuro", cls_)}"><img src="${frameUrl(FRAMES.idle[0])}" alt="">${text}</div>`;
+  const print = html`<button type="button" class="wl-cta" data-action="board-print"${canPrint(board, s) ? null : html` disabled`}>${finishLabel(task)}</button>`;
+  if (verdict === "pass") return { line: s.assists > 0 ? kuro(S("settle.kuroDone"), "done") : html`<p class="sl-verdict pass">${S("settle.pass")}</p>`, buttons: print };
+  return { line: html`<p class="sl-verdict fail">${S("settle.fail")}</p>`, buttons: html`<button type="button" class="wl-cta ghost" data-action="settle-kuro">${S("settle.kuro")}</button><p class="cmp-note">${S("settle.kuroNote")}</p>` };
 }

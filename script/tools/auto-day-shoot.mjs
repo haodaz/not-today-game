@@ -367,7 +367,9 @@ for (const it of ITEMS) {
         }
         // the end of the work: Kuro's lines type in first (busy), then his offer (不接) or 提交 — wait for either
         for (let w = 0; w < 14 && !(await has("[data-action=board-keep]")) && !(await has("[data-action=board-print]:not([disabled])")); w++) await sleep(1);
-        if (await has("[data-action=board-keep]")) { await sel("[data-action=board-keep]", 1.5); note("   tune: offer declined"); }
+        // OFFER=take (2026-11-13): her skin taken instead (the settlement then shows the backend wearing it)
+        if (process.env.OFFER === "take" && (await has("[data-action=board-mod][data-path=skin]"))) { await sel("[data-action=board-mod][data-path=skin]", 1.5); note("   tune: offer taken (skin)"); await sleep(4); await shotStep("board-skin"); }
+        else if (await has("[data-action=board-keep]")) { await sel("[data-action=board-keep]", 1.5); note("   tune: offer declined"); }
         for (let w = 0; w < 8 && !(await has("[data-action=board-print]:not([disabled])")); w++) await sleep(1);
         note(`   tune: ${picks} picks`); await shotStep("board-tuned");
         // stack (2026-11-12): the filled form goes up the chain; the dev cheat approves it (the game itself is 2048)

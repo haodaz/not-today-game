@@ -173,7 +173,8 @@ export function workLayer(ctx: { readonly state: State; readonly events: readonl
     const sc = compareScore(board, s);
     const pass = sc.pct >= cmp.threshold;
     const finish = html`<button type="button" class="wl-cta" data-action="board-print"${canPrint(board, s) ? null : html` disabled`}>${finishLabel(task)}</button>`;
-    const redo = !pass && hasString("compare.redo") ? html`<button type="button" class="wl-cta ghost" data-action="compare-redo"${holding ? html` disabled` : null}>${tr("compare.redo")}</button><p class="cmp-note">${tr("compare.redoNote")}</p>` : null;
+    // the settlement's two ways out (author 2026-11-13): passed → 发给老板; failed → 让克总帮忙 only (his fill, then it can go)
+    const redo = !pass && hasString("settle.kuro") ? html`<button type="button" class="wl-cta ghost" data-action="compare-redo"${holding ? html` disabled` : null}>${tr("settle.kuro")}</button><p class="cmp-note">${tr("settle.kuroNote")}</p>` : null;
     // the settlement (author 2026-11-12): left the game's ending, right the page as it really is now
     const record = html`<div class="cmp-score"><b>${sc.pct}%</b><span>${tr("compare.score", { r: String(sc.right), w: String(sc.total - sc.right) })}</span></div>${faces(board, s, cmp.pages[cmp.pages.length - 1]!, false)}<p class="${cls("cmp-verdict", pass ? "pass" : "fail")}">${tr(pass ? "compare.pass" : "compare.fail", { pct: String(cmp.threshold) })}</p>`;
     const effect = browserFrame(ideSrc(board, s, ops, null, tuneCarried(board, events)), fill(task.title), "ide-settle");

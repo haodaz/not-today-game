@@ -9,7 +9,7 @@ import { APPROVE_MS, SLIDE_WINDOW_MS, stackBest, stackMove, stackStart, stackTar
 import type { State } from "@state/types.gen";
 import type { GameEvent } from "@state/events";
 import type { Task, TaskBoard } from "@state/days/tasks";
-import { autoUnlock, boardState, canFetch, canPrint, comparePending, foundCardIds, isKuroCard, isObjectLock, isReadLock, lockCodesOffered, lockJammed, lockObjectAvailable, lockUsedOk, modFound, pathFound, trayCards, tuneCarried, tuneOfferPending, tuneStepsLeft, wrongReadings, type BoardState } from "@state/days/board";
+import { autoUnlock, boardState, canFetch, canPrint, comparePending, settleVerdict, foundCardIds, isKuroCard, isObjectLock, isReadLock, lockCodesOffered, lockJammed, lockObjectAvailable, lockUsedOk, modFound, pathFound, trayCards, tuneCarried, tuneOfferPending, tuneStepsLeft, wrongReadings, type BoardState } from "@state/days/board";
 import { ideOps, ideSrc, ideTranscript } from "@state/days/ide";
 import { cls, html, type SafeHtml } from "@world/html";
 import { FRAMES, frameUrl } from "../kuro/body";
@@ -17,6 +17,7 @@ import { kuroText } from "../kuro/voice";
 import { renderMeeting } from "./meeting";
 import { RENDER_MS } from "./compare";
 import { hasString, t, tr } from "@world/i18n";
+import { push } from "@world/loop/dialogue";
 import type { ActionContext, ActionHandler } from "../controller";
 import type { AppContext, Session } from "../model";
 import { openWork } from "./work";
@@ -490,6 +491,36 @@ const actions: Record<string, ActionHandler> = {
       ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
       noteIdeLines(ctx, c.task, c.board, ctx.store.getState().day, before);
     }
+    ctx.rerender();
+  },
+  // settlement (author 2026-11-13): 让克总帮忙 — the wrong slots take Kuro's card (`assistFix`, one
+  // assist; a compare board takes his whole fill), and the story plays over the settlement: the
+  // player's line, Kuro's 「好了，可以发了。」「要发吗？」, then the choice that sends it.
+  "settle-kuro"(ctx) {
+    const c = currentBoard(ctx);
+    if (!c) return;
+    const s = stateOf(ctx, c.task, c.board);
+    if (settleVerdict(c.board, s) === "pass") return;
+    if (c.board.compare) actions["compare-redo"]!(ctx, {} as DOMStringMap, null as never);
+    else ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "assistFix" } });
+    const day = ctx.store.getState().day;
+    ctx.session.dialogue = push(ctx.session.dialogue, {
+      key: `d${day}:settle:${c.task.id}:kuro`,
+      lines: [{ k: "speaker", who: "me", t: t("settle.kuroWork") }, { k: "speaker", who: "kuro", t: t("settle.kuroDone") }, { k: "speaker", who: "kuro", t: t("settle.sendAsk") }],
+      ending: { kind: "settleSend", taskId: c.task.id },
+    });
+    ctx.rerender();
+  },
+  // the chain lost (no move left, not approved): 让克总帮忙 — he stamps it (the approval moment follows)
+  "stack-assist"(ctx) {
+    const c = currentBoard(ctx);
+    if (!c || !c.board.stack) return;
+    const g = ctx.session.chain?.key === c.task.id ? ctx.session.chain : null;
+    const s = stateOf(ctx, c.task, c.board);
+    if (!g || !g.over || s.approved) return;
+    const now = ctx.now?.() ?? Date.now();
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+    ctx.session.chain = { ...g, approvedAt: now };
     ctx.rerender();
   },
   // dev only: the chain approved at once (the replay driver; never offered in the game)

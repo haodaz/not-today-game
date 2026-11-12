@@ -140,6 +140,15 @@ export function stepBoard(board: TaskBoard, s: BoardState, op: BoardOp): BoardSt
       delete next[op.slot];
       return { ...s, slots: next };
     }
+    case "assistFix": {
+      // settlement (author 2026-11-13): the board failed its judgement; Kuro fixes it his way — every
+      // slot that does not hold its answer takes his card (his fill, else the answer); one assist.
+      if (board.tune) return s;
+      if (board.compare) return { ...s, slots: { ...board.kuro.fill }, unlocked: true, assists: s.assists + 1 };
+      const slots = { ...s.slots };
+      for (const slot of board.slots) if (slots[slot.id] !== slot.answer) slots[slot.id] = board.kuro.fill[slot.id] ?? slot.answer;
+      return { ...s, slots, unlocked: true, assists: s.assists + 1 };
+    }
     case "assistFill": {
       // tune: Kuro's choice for every module still unset, within the budget (one assist).
       if (board.tune) {
@@ -457,6 +466,9 @@ export function validateBoardStep(day: number, taskId: string, op: BoardOp): voi
       return;
     case "assistFill":
       return;
+    case "assistFix":
+      if (board.tune) throw new Error("boardStep: a tuning board is never fixed at the settlement");
+      return;
     default:
       throw new Error(`boardStep: unknown op ${JSON.stringify(op)}`);
   }
@@ -555,6 +567,18 @@ export const LOCK_JAM_AT = 2;
 export function lockJammed(board: TaskBoard, s: BoardState): boolean {
   const lock = board.given.lock;
   return !!lock && isReadLock(lock) && !s.unlocked && wrongReadings(s) >= LOCK_JAM_AT;
+}
+
+/**
+ * The settlement's verdict (author 2026-11-13): pass → the work can go; fail → only Kuro can make it go.
+ * A compare board passes at its threshold; a table / meeting board passes with every slot right, or
+ * once Kuro has fixed it (an assist); the tune and the chain never fail here (the line is a goal, the
+ * chain approves before the sheet opens).
+ */
+export function settleVerdict(board: TaskBoard, s: BoardState): "pass" | "fail" {
+  if (board.tune || board.stack) return "pass";
+  if (board.compare) return comparePending(board, s) === null && compareScore(board, s).pct >= board.compare.threshold ? "pass" : "fail";
+  return s.assists > 0 || wrongCount(board, s.slots) === 0 ? "pass" : "fail";
 }
 
 /** How many slots hold a card that is not the right answer (a Kuro card counts as wrong too). */
