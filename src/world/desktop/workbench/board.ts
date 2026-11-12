@@ -26,6 +26,7 @@ import { MATCH3_DONE_MS, match3Roll, match3Start, match3Tap, type Match3Grid } f
 import { LINK_DONE_MS, LINK_PATH_MS, linkRoll, linkShuffle, linkSolve, linkStart, linkTap, type LinkGrid } from "./link";
 import { SNAKE_DONE_MS, SNAKE_TICK_MS, snakeRoll, snakeSolve, snakeStart, snakeStep, snakeTurn, type SnakeDir } from "./snake";
 import { TETRIS_DONE_MS, TETRIS_FLASH_MS, tetrisDropMs, tetrisKey, tetrisRoll, tetrisSolve, tetrisStart, tetrisTick, type TetrisGame, type TetrisKey } from "./tetris";
+import { RHYTHM_DONE_MS, RHYTHM_TICK_MS, rhythmPause, rhythmResume, rhythmRoll, rhythmSolve, rhythmStart, rhythmSweep, rhythmTap, rhythmWords } from "./rhythm";
 import type { ActionContext, ActionHandler } from "../controller";
 import type { AppContext, Session } from "../model";
 import { openWork } from "./work";
@@ -363,6 +364,32 @@ function runTetris(ctx: ActionContext, gen: number): void {
     ctx.rerender();
   };
   ctx.later(tetrisDropMs(g0.lines), tick);
+}
+
+/** rhythm: the clock. Sweeps the misses and ends the sheet; leaving the work page pauses it (继续 resumes with no time lost). */
+function runRhythm(ctx: ActionContext, gen: number): void {
+  const g0 = ctx.session.rhythm;
+  if (!g0 || g0.gen !== gen) return;
+  ctx.session.rhythm = { ...g0, running: true };
+  const tick = () => {
+    const c = currentBoard(ctx);
+    const g = ctx.session.rhythm;
+    if (!g || g.gen !== gen) return;
+    const now = ctx.now?.() ?? Date.now();
+    if (g.done || g.over) { if (g.running) { ctx.session.rhythm = { ...g, running: false }; ctx.rerender(); } return; }
+    if (!ctx.session.workShow || c?.board.game?.kind !== "rhythm" || c.task.id !== g.key) { ctx.session.rhythm = rhythmPause(g, now); ctx.rerender(); return; }
+    const next = rhythmSweep(g, now);
+    if (next.done) {
+      ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+      ctx.session.rhythm = { ...next, approvedAt: now };
+      ctx.later(RHYTHM_DONE_MS + 20, ctx.rerender);
+    } else {
+      ctx.session.rhythm = next;
+      if (!next.over) ctx.later(RHYTHM_TICK_MS, tick);
+    }
+    ctx.rerender();
+  };
+  ctx.later(RHYTHM_TICK_MS, tick);
 }
 
 function currentBoard(ctx: ActionContext): { task: Task; board: TaskBoard } | null {
@@ -906,6 +933,58 @@ const actions: Record<string, ActionHandler> = {
     ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
     ctx.session.tetris = { ...tetrisSolve(g), gen: g.gen + 1, approvedAt: ctx.now?.() ?? Date.now() };
     ctx.later(TETRIS_DONE_MS + 20, ctx.rerender);
+    ctx.rerender();
+  },
+  // rhythm (author 2026-11-13): the jargon down the lane, the drum on the beat; enough 响 approves the form
+  "rhythm-start"(ctx) {
+    const c = currentBoard(ctx);
+    if (c?.board.game?.kind !== "rhythm") return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    const gen = (ctx.session.rhythm?.gen ?? 0) + 1;
+    const attempt = gen + Math.floor((ctx.now?.() ?? Date.now()) / 1000) % 1000;
+    ctx.session.rhythm = rhythmStart(c.task.id, c.board.game, rhythmWords(), rhythmRoll(ctx.store.getRunId(), c.task.id, attempt), gen, ctx.now?.() ?? Date.now());
+    runRhythm(ctx, gen);
+    ctx.rerender();
+  },
+  "rhythm-tap"(ctx) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.rhythm?.key === c?.task.id ? ctx.session.rhythm : null;
+    if (c?.board.game?.kind !== "rhythm" || !g || !g.running) return;
+    const next = rhythmTap(g, ctx.now?.() ?? Date.now());
+    if (next === g) return;
+    ctx.session.rhythm = next;
+    ctx.rerender();
+  },
+  "rhythm-resume"(ctx) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.rhythm;
+    if (c?.board.game?.kind !== "rhythm" || !g || g.key !== c.task.id || g.done || g.over || g.running) return;
+    const gen = g.gen + 1;
+    ctx.session.rhythm = rhythmResume(g, ctx.now?.() ?? Date.now(), gen);
+    runRhythm(ctx, gen);
+    ctx.rerender();
+  },
+  // the chairman asleep: 让克总帮忙 — he makes the sound himself (approved; the sheet follows)
+  "rhythm-assist"(ctx) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.rhythm?.key === c?.task.id ? ctx.session.rhythm : null;
+    if (c?.board.game?.kind !== "rhythm" || !g || !g.over) return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+    ctx.session.rhythm = { ...rhythmSolve(g), approvedAt: ctx.now?.() ?? Date.now() };
+    ctx.later(RHYTHM_DONE_MS + 20, ctx.rerender);
+    ctx.rerender();
+  },
+  // dev only: every word 响ed at once (the replay driver)
+  "rhythm-cheat"(ctx) {
+    if (!import.meta.env.DEV) return;
+    const c = currentBoard(ctx);
+    const g = ctx.session.rhythm?.key === c?.task.id ? ctx.session.rhythm : null;
+    if (c?.board.game?.kind !== "rhythm" || !g) return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+    ctx.session.rhythm = { ...rhythmSolve(g), gen: g.gen + 1, approvedAt: ctx.now?.() ?? Date.now() };
+    ctx.later(RHYTHM_DONE_MS + 20, ctx.rerender);
     ctx.rerender();
   },
   // the chain lost (no move left, not approved): 让克总帮忙 — he stamps it (the approval moment follows)

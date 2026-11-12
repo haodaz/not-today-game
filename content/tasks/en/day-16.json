@@ -188,7 +188,12 @@
               }
             ]
           }
-        ]
+        ],
+        "game": {
+          "kind": "rhythm",
+          "bars": 4,
+          "bpm": 96
+        }
       },
       "deliverable": {
         "id": "d16-drone",

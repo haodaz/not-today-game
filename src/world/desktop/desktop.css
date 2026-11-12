@@ -1880,3 +1880,37 @@ button.lk-cell:hover{transform:translateY(-2px);z-index:1}
 .tt-key.left{grid-column:1;grid-row:1}.tt-key.rotate{grid-column:2;grid-row:1}.tt-key.right{grid-column:3;grid-row:1}.tt-key.down{grid-column:2;grid-row:2}.tt-key.drop{grid-column:3;grid-row:2}
 .mn.tt.lost .tt-grid{animation:bt-shake 460ms steps(6)}
 .mn.tt.done .tt-gb{animation:m3-flash 600ms ease-out both}
+/* rhythm (author 2026-11-13): the report as a drum lane; the chairman listens */
+.mn.rh{background:linear-gradient(160deg,#1f2327,#2b2f36 60%,#3a2f2a);color:#efe9df}
+.mn.rh .cs-title h2,.mn.rh .mn-sub,.mn.rh .cs-kick,.mn.rh .mn-notes-h,.mn.rh .mn-left{color:#efe9df}
+.mn.rh .mn-note{background:rgba(255,255,255,.08);color:#efe9df;border-color:rgba(255,255,255,.12)}
+.mn.rh .mn-note b{color:#efe9df}
+.rh-main{padding:0 28px}
+.rh-stage{display:flex;align-items:center;gap:22px;width:100%}
+.rh-chair{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:140px}
+.rh-face{position:relative;width:110px;height:120px;border-radius:50% 50% 46% 46%;background:#d9b99b;box-shadow:inset 0 -12px 0 rgba(0,0,0,.08)}
+.rh-face::before{content:"";position:absolute;left:-6px;right:-6px;top:-10px;height:46px;border-radius:50%;background:#2b2f33}
+.rh-eye{position:absolute;top:52px;width:16px;height:16px;border-radius:50%;background:#1d2129;transition:height 180ms,top 180ms,border-radius 180ms}
+.rh-eye.l{left:30px}.rh-eye.r{right:30px}
+.rh-chair.e1 .rh-eye{height:7px;top:57px;border-radius:0 0 8px 8px}
+.rh-chair.e2 .rh-eye{height:3px;top:60px;border-radius:2px}
+.rh-mouth{position:absolute;left:44px;top:88px;width:22px;height:4px;background:#8a5a44;border-radius:2px}
+.rh-chair.nod .rh-face{animation:rh-nod 300ms ease-out}
+@keyframes rh-nod{40%{transform:translateY(6px) rotate(2deg)}}
+.rh-who{font-size:12px;letter-spacing:.2em;color:#cfc8ba}
+.rh-lane{position:relative;flex:1;height:120px;border-top:2px solid rgba(255,255,255,.25);border-bottom:2px solid rgba(255,255,255,.25);background:repeating-linear-gradient(90deg,transparent 0 118px,rgba(255,255,255,.06) 118px 120px);overflow:hidden}
+.rh-circle{position:absolute;left:34px;top:50%;width:64px;height:64px;margin-top:-32px;border:4px solid #F6B73C;border-radius:50%;box-shadow:0 0 18px rgba(246,183,60,.35)}
+.rh-notes{position:absolute;inset:0}
+.rh-note{position:absolute;top:50%;left:66px;transform:translate(-50%,-50%);padding:10px 16px;border-radius:30px;background:#C2410C;color:#fff;font-weight:900;font-size:18px;white-space:nowrap;box-shadow:0 4px 0 rgba(0,0,0,.35);animation:rh-slide 1800ms linear both}
+.rh-note.fast{background:#7C5CFF}
+@keyframes rh-slide{from{left:calc(100% + 80px)}to{left:66px}}
+.rh-judge{position:absolute;left:30px;top:8px;font-size:22px;font-weight:900;letter-spacing:.2em;animation:ts-pop 200ms ease-out both}
+.rh-judge.good{color:#F6B73C}
+.rh-judge.miss{color:#9aa0a6}
+.rh-fastnote{position:absolute;right:14px;bottom:6px;font-size:12px;color:#c9b8ff;letter-spacing:.15em}
+.rh-ctl{gap:22px}
+.rh-drum{width:84px;height:84px;border-radius:50%;border:4px solid #F6B73C;background:#C2410C;color:#fff;font:900 24px/1 inherit;cursor:pointer;box-shadow:0 6px 0 rgba(0,0,0,.4)}
+.rh-drum:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.4)}
+.mn.rh .mn-stamp{border-color:#F6B73C;color:#F6B73C}
+.mn.rh .pp-flowline{color:#cfc8ba}
+.mn.rh.lost .rh-lane{animation:bt-shake 460ms steps(6)}

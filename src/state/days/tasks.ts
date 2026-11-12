@@ -198,7 +198,9 @@ export type BoardGame =
   /** snake: the page's sentences on a Nokia screen, eaten in order by the chick */
   | { readonly kind: "snake"; readonly cols: number; readonly rows: number }
   /** tetris: the week as a well; the shifts fall as pieces; `goal` rows cleared staff it */
-  | { readonly kind: "tetris"; readonly cols: number; readonly rows: number; readonly goal: number };
+  | { readonly kind: "tetris"; readonly cols: number; readonly rows: number; readonly goal: number }
+  /** rhythm: the report as a drum lane — `bars` bars of eight beats at `bpm`, the last bar twice as fast */
+  | { readonly kind: "rhythm"; readonly bars: number; readonly bpm: number };
 export interface BoardStack {
   /** From the bottom up: the rank word and its symbol; `silhouette` ranks are the easter eggs past the top (drawn black). */
   readonly ranks: readonly { readonly name: string; readonly img: string; readonly silhouette?: boolean }[];
@@ -751,7 +753,10 @@ function board(v: unknown, w: string): TaskBoard {
     } else if (v.game.kind === "tetris") {
       keys(v.game, ["kind", "cols", "rows", "goal"], gw);
       game = { kind: "tetris", cols: num(v.game.cols, "cols", 5, 12), rows: num(v.game.rows, "rows", 8, 24), goal: num(v.game.goal, "goal", 1, 40) };
-    } else fail(`${gw}.kind`, 'must be "mines", "pipes", "match3", "link", "snake" or "tetris"');
+    } else if (v.game.kind === "rhythm") {
+      keys(v.game, ["kind", "bars", "bpm"], gw);
+      game = { kind: "rhythm", bars: num(v.game.bars, "bars", 2, 8), bpm: num(v.game.bpm, "bpm", 40, 200) };
+    } else fail(`${gw}.kind`, 'must be "mines", "pipes", "match3", "link", "snake", "tetris" or "rhythm"');
   }
   let stack: BoardStack | undefined;
   if (v.stack !== undefined) {

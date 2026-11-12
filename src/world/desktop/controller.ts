@@ -579,6 +579,12 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
       actions["mc-close"]?.(ctx, {} as DOMStringMap, target);
       return;
     }
+    // rhythm (2026-11-13): while the lane runs on the work page, space / Enter / J / F hit the drum.
+    if ((e.key === " " || e.key === "Enter" || e.key === "j" || e.key === "J" || e.key === "f" || e.key === "F") && session.rhythm?.running && session.workShow) {
+      e.preventDefault();
+      actions["rhythm-tap"]?.(ctx, {} as DOMStringMap, target);
+      return;
+    }
     // tetris (2026-11-13): while the well runs on the work page, the arrows move / turn / drop, space drops.
     const tetrisKey = TETRIS_KEYS[e.key];
     if (tetrisKey && session.tetris?.running && session.workShow) {
