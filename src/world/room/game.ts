@@ -2040,6 +2040,14 @@ export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
     if (e.key === "Enter" || e.key === " ") endingNext(ctx);
     return true;
   }
+  // stack (2026-11-12): the approval chain on the work stage takes the arrow keys (as 2048 does).
+  if (ctx.session.chain && ctx.session.workShow && ctx.session.view === "desktop") {
+    const dir = e.key === "ArrowUp" ? "up" : e.key === "ArrowDown" ? "down" : e.key === "ArrowLeft" ? "left" : e.key === "ArrowRight" ? "right" : null;
+    if (dir) {
+      boardActions["stack-move"]!(ctx, { dir } as DOMStringMap, null as never);
+      return true;
+    }
+  }
   // camera-viewfinder R1: Space / Enter is the shutter, Esc closes; ←/→ still turn (below).
   if (ctx.session.viewfinder) {
     const name = e.key === "Escape" ? "vf-close" : e.key === " " || e.key === "Enter" ? "vf-shutter" : null;
