@@ -484,7 +484,7 @@
 [data-guide="on"]{box-shadow:0 0 0 2px var(--accent,#2f6feb),0 0 0 9999px rgba(0,0,0,.3)}
 [data-guide="clause"]{box-shadow:0 0 0 2px var(--accent,#2f6feb)}
 /* author 2026-11-11: inside a task page (the launch card, the compare pane) the ring alone, no dim: the dim greyed the whole work page. */
-.sh-frame [data-guide="on"],.task-launch [data-guide="on"]{box-shadow:0 0 0 2px var(--accent,#2f6feb)}
+.sh-frame [data-guide="on"],.task-launch [data-guide="on"],.launch-layer [data-guide="on"],.work-layer [data-guide="on"]{box-shadow:0 0 0 2px var(--accent,#2f6feb)} /* author 2026-11-13: the launch poster and the work screens never veiled either */
 @keyframes guide-ring{0%,100%{outline:2px solid transparent;outline-offset:2px}50%{outline:2px solid color-mix(in srgb,var(--accent,#2f6feb) 55%,transparent);outline-offset:6px}}
 /* author 2026-11-11: the lit thing also gets a bobbing pointer above it (「框框太规整了」): a small
    white chevron on the ring's colour, reaching down at the target every 1.2 s. */
