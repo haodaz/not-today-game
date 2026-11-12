@@ -24,6 +24,7 @@ import { MINES_DONE_MS, minesFlag, minesOpen, minesRoll, minesStart, type MinesG
 import { PIPES_DONE_MS, pipesRoll, pipesSolve, pipesStart, pipesTurn } from "./pipes";
 import { MATCH3_DONE_MS, match3Roll, match3Start, match3Tap, type Match3Grid } from "./match3";
 import { LINK_DONE_MS, LINK_PATH_MS, linkRoll, linkShuffle, linkSolve, linkStart, linkTap, type LinkGrid } from "./link";
+import { SNAKE_DONE_MS, SNAKE_TICK_MS, snakeRoll, snakeSolve, snakeStart, snakeStep, snakeTurn, type SnakeDir } from "./snake";
 import type { ActionContext, ActionHandler } from "../controller";
 import type { AppContext, Session } from "../model";
 import { openWork } from "./work";
@@ -297,6 +298,36 @@ function withIde(handler: ActionHandler): ActionHandler {
 // ——— the actions ———
 
 /** The open board task now (a board task whose checklist item is open), or null. */
+/**
+ * snake: the clock. One generation per start / resume; a tick of an older generation, a finished
+ * game, or a work page no longer up stops it (the view then offers 继续). All five eaten approves.
+ */
+function runSnake(ctx: ActionContext, gen: number): void {
+  const g0 = ctx.session.snake;
+  if (!g0 || g0.gen !== gen) return;
+  ctx.session.snake = { ...g0, running: true };
+  const tick = () => {
+    const c = currentBoard(ctx);
+    const g = ctx.session.snake;
+    if (!g || g.gen !== gen) return;
+    if (g.done || g.over || !ctx.session.workShow || c?.board.game?.kind !== "snake" || c.task.id !== g.key) {
+      if (g.running) { ctx.session.snake = { ...g, running: false }; ctx.rerender(); }
+      return;
+    }
+    const next = snakeStep(g);
+    if (next.done) {
+      ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+      ctx.session.snake = { ...next, approvedAt: ctx.now?.() ?? Date.now() };
+      ctx.later(SNAKE_DONE_MS + 20, ctx.rerender);
+    } else {
+      ctx.session.snake = next;
+      if (!next.over) ctx.later(SNAKE_TICK_MS, tick);
+    }
+    ctx.rerender();
+  };
+  ctx.later(SNAKE_TICK_MS, tick);
+}
+
 function currentBoard(ctx: ActionContext): { task: Task; board: TaskBoard } | null {
   const open = openWork(ctx.store.getState(), ctx.store.getEvents());
   return open?.tree?.board ? { task: open.tree, board: open.tree.board } : null;
@@ -735,6 +766,56 @@ const actions: Record<string, ActionHandler> = {
     ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
     ctx.session.link = { ...linkSolve(g), approvedAt: ctx.now?.() ?? Date.now() };
     ctx.later(LINK_DONE_MS + 20, ctx.rerender);
+    ctx.rerender();
+  },
+  // snake (author 2026-11-13): the chick eats the page's sentences in order; all of them approves the form
+  "snake-start"(ctx) {
+    const c = currentBoard(ctx);
+    if (c?.board.game?.kind !== "snake") return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    const gen = (ctx.session.snake?.gen ?? 0) + 1;
+    const attempt = gen + Math.floor((ctx.now?.() ?? Date.now()) / 1000) % 1000;
+    ctx.session.snake = snakeStart(c.task.id, c.board.game, c.board.slots.length, snakeRoll(ctx.store.getRunId(), c.task.id, attempt), gen);
+    runSnake(ctx, gen);
+    ctx.rerender();
+  },
+  "snake-turn"(ctx, data) {
+    const g = ctx.session.snake;
+    const dir = data.dir as SnakeDir;
+    if (!g || !g.running || !["up", "down", "left", "right"].includes(dir)) return;
+    ctx.session.snake = snakeTurn(g, dir);
+  },
+  // the clock stopped (the work page was left): 继续
+  "snake-resume"(ctx) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.snake;
+    if (c?.board.game?.kind !== "snake" || !g || g.key !== c.task.id || g.done || g.over || g.running) return;
+    const gen = g.gen + 1;
+    ctx.session.snake = { ...g, gen };
+    runSnake(ctx, gen);
+    ctx.rerender();
+  },
+  // bitten: 让克总帮忙 — he eats the rest himself (approved; the sheet follows)
+  "snake-assist"(ctx) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.snake?.key === c?.task.id ? ctx.session.snake : null;
+    if (c?.board.game?.kind !== "snake" || !g || !g.over) return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+    ctx.session.snake = { ...snakeSolve(g), approvedAt: ctx.now?.() ?? Date.now() };
+    ctx.later(SNAKE_DONE_MS + 20, ctx.rerender);
+    ctx.rerender();
+  },
+  // dev only: eaten at once (the replay driver)
+  "snake-cheat"(ctx) {
+    if (!import.meta.env.DEV) return;
+    const c = currentBoard(ctx);
+    const g = ctx.session.snake?.key === c?.task.id ? ctx.session.snake : null;
+    if (c?.board.game?.kind !== "snake" || !g) return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+    ctx.session.snake = { ...snakeSolve(g), gen: g.gen + 1, approvedAt: ctx.now?.() ?? Date.now() };
+    ctx.later(SNAKE_DONE_MS + 20, ctx.rerender);
     ctx.rerender();
   },
   // the chain lost (no move left, not approved): 让克总帮忙 — he stamps it (the approval moment follows)

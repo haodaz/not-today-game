@@ -216,7 +216,12 @@
               }
             ]
           }
-        ]
+        ],
+        "game": {
+          "kind": "snake",
+          "cols": 20,
+          "rows": 12
+        }
       },
       "deliverable": {
         "id": "d6-ontology",

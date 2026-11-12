@@ -1292,6 +1292,7 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.session.launched.add(key);
     ctx.session.launchShow = null;
     ctx.session.workShow = key;
+    ctx.session.workShownAt = ctx.now?.() ?? Date.now();
     ctx.rerender();
   },
   // work (author 2026-11-11 night): the full-screen work page hidden (回到工作台) and brought back (打开工作页).
@@ -1302,6 +1303,7 @@ export const loopActions: Record<string, ActionHandler> = {
   "work-show"(ctx, data) {
     if (!data.task) return;
     ctx.session.workShow = `${ctx.store.getState().day}:${data.task}`;
+    ctx.session.workShownAt = ctx.now?.() ?? Date.now();
     ctx.rerender();
   },
   // 道具 (day-loop correction 2026-11-01): the strip as a panel over the current view.

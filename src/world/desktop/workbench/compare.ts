@@ -24,6 +24,7 @@ import { minesApproving, minesStage } from "./mines";
 import { pipesApproving, pipesStage } from "./pipes";
 import { match3Approving, match3Stage } from "./match3";
 import { linkApproving, linkStage } from "./link";
+import { snakeApproving, snakeStage } from "./snake";
 import { tunePane } from "./shell";
 import { tuneStage } from "./tune-stage";
 import { clueStage } from "./clue-stage";
@@ -121,6 +122,9 @@ export function launchMotif(m: LaunchMotif, fill: (x: string) => string): SafeHt
  *   settle  — the satisfaction, the faces, 发给老板 at the bar or 让克总按他的意思重新改一稿 under it.
  * Up while `session.workShow` names today's live board task; gone once the task is done.
  */
+/** The stage's entry fade (CSS `.work-stage.in`) plays only this long after the page opened — a re-render later must not replay it. */
+const WORK_IN_MS = 400;
+
 export function workLayer(ctx: { readonly state: State; readonly events: readonly GameEvent[]; readonly session: Session; readonly nowMs: number; readonly startDay?: number }): SafeHtml | null {
   const { state, events, session, nowMs } = ctx;
   if (session.view !== "desktop" || session.workShow === null) return null;
@@ -190,7 +194,7 @@ export function workLayer(ctx: { readonly state: State; readonly events: readonl
     const effect = browserFrame(ideSrc(board, s, ops, null, tuneCarried(board, events)), fill(task.title), "ide-settle");
     body = settleLayer({ kind: "page", portrait: counterpartPortrait(task), kick: hasString("sheet.settle.kick") ? t("sheet.settle.kick", { who: counterpartName(task) }) : "", title: fill(task.title), record, effect, actions: html`${pass ? finish : redo}` });
   }
-  return html`<div class="work-layer"><section class="work-stage" data-screen="${screen}" role="dialog" aria-modal="true" aria-label="${fill(task.title)}">${head}<div class="wl-body">${body}</div></section></div>`;
+  return html`<div class="work-layer"><section class="${cls("work-stage", nowMs - session.workShownAt < WORK_IN_MS && "in")}" data-screen="${screen}" role="dialog" aria-modal="true" aria-label="${fill(task.title)}">${head}<div class="wl-body">${body}</div></section></div>`;
 }
 
 /** The tune, the table, the meeting and the old IDE board on the full stage: the surface the workbench drew, lifted out of it. */
@@ -214,6 +218,9 @@ function genericWorkLayer(c: { state: State; events: readonly GameEvent[]; sessi
   } else if (board.view === "meeting" && board.meeting) {
     // meeting stage (2026-11-12): the meeting above, the template under it
     body = meetingStage(app, task, board);
+  } else if (board.game?.kind === "snake" && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && (!st.approved || (session.snake?.key === task.id && snakeApproving(session.snake, nowMs))); })()) {
+    // snake (author 2026-11-13): the filled form's page as a Nokia screen, its sentences to eat in order
+    body = snakeStage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs);
   } else if (board.game?.kind === "link" && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && (!st.approved || (session.link?.key === task.id && linkApproving(session.link, nowMs))); })()) {
     // link-link (author 2026-11-13): the filled form's page as his sayings twice over, to join
     body = linkStage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs);
@@ -237,7 +244,7 @@ function genericWorkLayer(c: { state: State; events: readonly GameEvent[]; sessi
   } else {
     body = html`<div class="wl-generic">${renderBoard(app, task)}</div>`;
   }
-  return html`<div class="work-layer"><section class="work-stage" data-screen="${board.tune ? "tune" : board.view ?? "table"}" role="dialog" aria-modal="true" aria-label="${fill(task.title)}">${head}<div class="wl-body">${body}</div></section></div>`;
+  return html`<div class="work-layer"><section class="${cls("work-stage", nowMs - session.workShownAt < WORK_IN_MS && "in")}" data-screen="${board.tune ? "tune" : board.view ?? "table"}" role="dialog" aria-modal="true" aria-label="${fill(task.title)}">${head}<div class="wl-body">${body}</div></section></div>`;
 }
 
 /**

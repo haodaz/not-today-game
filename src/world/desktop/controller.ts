@@ -517,6 +517,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     if (el.dataset.input === "settings-email") setEmailDraft(el.value);
     if (el.dataset.input === "wb-cell" && session.work) session.work.cellDraft = el.value;
   };
+  const SNAKE_KEYS: Record<string, string> = { ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right", w: "up", a: "left", s: "down", d: "right", W: "up", A: "left", S: "down", D: "right" };
   const onKey = (e: KeyboardEvent) => {
     const target = e.target as HTMLElement;
     // onboarding-steps R1: a coach mark is up: Enter is 下一个 (知道了 on the last), Esc is 跳过; no
@@ -575,6 +576,13 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     if (e.key === "Escape" && session.mcOpen) {
       e.preventDefault();
       actions["mc-close"]?.(ctx, {} as DOMStringMap, target);
+      return;
+    }
+    // snake (2026-11-13): while the snake runs on the work page, the arrows / WASD steer it.
+    const snakeDir = SNAKE_KEYS[e.key];
+    if (snakeDir && session.snake?.running && session.workShow) {
+      e.preventDefault();
+      actions["snake-turn"]?.(ctx, { dir: snakeDir } as unknown as DOMStringMap, target);
       return;
     }
     if (session.view === "desktop" && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {

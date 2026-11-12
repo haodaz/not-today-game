@@ -194,7 +194,9 @@ export type BoardGame =
   /** match-3: her claims multiplied; clear `goal` of them within `moves` */
   | { readonly kind: "match3"; readonly cols: number; readonly rows: number; readonly kinds: number; readonly goal: number; readonly moves: number }
   /** link-link: his sayings and their evidence, each twice; join every pair with at most two bends */
-  | { readonly kind: "link"; readonly cols: number; readonly rows: number; readonly kinds: number };
+  | { readonly kind: "link"; readonly cols: number; readonly rows: number; readonly kinds: number }
+  /** snake: the page's sentences on a Nokia screen, eaten in order by the chick */
+  | { readonly kind: "snake"; readonly cols: number; readonly rows: number };
 export interface BoardStack {
   /** From the bottom up: the rank word and its symbol; `silhouette` ranks are the easter eggs past the top (drawn black). */
   readonly ranks: readonly { readonly name: string; readonly img: string; readonly silhouette?: boolean }[];
@@ -741,7 +743,10 @@ function board(v: unknown, w: string): TaskBoard {
       const cols = num(v.game.cols, "cols", 4, 12), rows = num(v.game.rows, "rows", 3, 10);
       if ((cols * rows) % 2 !== 0) fail(`${gw}.rows`, "the grid must hold an even number of tiles");
       game = { kind: "link", cols, rows, kinds: num(v.game.kinds, "kinds", 2, 12) };
-    } else fail(`${gw}.kind`, 'must be "mines", "pipes", "match3" or "link"');
+    } else if (v.game.kind === "snake") {
+      keys(v.game, ["kind", "cols", "rows"], gw);
+      game = { kind: "snake", cols: num(v.game.cols, "cols", 10, 30), rows: num(v.game.rows, "rows", 6, 20) };
+    } else fail(`${gw}.kind`, 'must be "mines", "pipes", "match3", "link" or "snake"');
   }
   let stack: BoardStack | undefined;
   if (v.stack !== undefined) {

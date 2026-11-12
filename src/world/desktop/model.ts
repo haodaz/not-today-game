@@ -390,8 +390,12 @@ export interface Session {
   match3: import("./workbench/match3").Match3Grid | null;
   /** link-link (author 2026-11-13): his page's board under way (session only; all joined is a board step). */
   link: import("./workbench/link").LinkGrid | null;
+  /** snake (author 2026-11-13): the Nokia screen under way (session only; all eaten is a board step). */
+  snake: import("./workbench/snake").SnakeGrid | null;
   /** work (author 2026-11-11 night): the task whose full-screen work page is up (`<day>:<taskId>`), or null; 回到工作台 hides it, 打开工作页 brings it back. */
   workShow: string | null;
+  /** When the work page was last opened (ms): its entry fade plays only right after, not on every re-render (snake 2026-11-13). */
+  workShownAt: number;
   /**
    * work: the page just chosen is on its result screen (`phase: "result"`, the page's slot; compare);
    * the clue / meeting stage shows its settlement sheet (`phase: "settle"`, work-stages-polish 1);
@@ -591,7 +595,9 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     pipes: null,
     match3: null,
     link: null,
+    snake: null,
     workShow: null,
+    workShownAt: 0,
     workPhase: null,
     objbarOpen: false,
     call: null,
