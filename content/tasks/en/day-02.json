@@ -442,8 +442,8 @@
                 "text": "Good to see you."
               },
               {
-                "who": "kuro",
-                "text": "Her page says four full bars. This is what the backend looks like now."
+                "who": "me",
+                "text": "Four full bars on her page. Let's see what the backend actually looks like."
               }
             ]
           },
@@ -645,7 +645,7 @@
               },
               {
                 "who": "kuro",
-                "text": "Everything that can run is running. The 'grows by itself' she wants is on none of these bars."
+                "text": "Everything that can run is running. The 'grows by itself' she wants is not in here."
               }
             ]
           },
@@ -654,7 +654,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "I set the rest for you. I left the safety bar alone; it isn't mine to keep."
+                "text": "I set the rest. I didn't touch safety; that one isn't mine."
               }
             ]
           },

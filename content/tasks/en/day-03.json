@@ -536,11 +536,7 @@
               },
               {
                 "who": "me",
-                "text": "Continuing yesterday's. Zhang sent a few more ways."
-              },
-              {
-                "who": "kuro",
-                "text": "Yesterday's settings are all still here, and today's line has moved to 80. The new ways are in their items; go through them one at a time."
+                "text": "Today it has to go up a bit more, whatever it takes..."
               }
             ]
           },
@@ -791,8 +787,12 @@
             "on": "reach",
             "lines": [
               {
+                "who": "me",
+                "text": "About there."
+              },
+              {
                 "who": "kuro",
-                "text": "All four bars are over the line. What's left is the last stretch to what her page shows."
+                "text": "What's left is the last stretch to what her page shows."
               },
               {
                 "who": "me",
@@ -839,7 +839,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "I set the rest for you. I maxed the autonomy bar."
+                "text": "I set the rest. Autonomy — I let it loose."
               }
             ]
           },

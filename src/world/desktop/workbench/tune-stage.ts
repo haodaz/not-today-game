@@ -19,7 +19,7 @@ import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t } from "@world/i18n";
 import { finishLabel } from "./board";
 
-export const TUNE_BACKDROP = "/work/tune-hangar.jpg";
+export const TUNE_BACKDROP = "/work/tune-lab.jpg";
 
 const sign = (x: number) => (x > 0 ? `+${x}` : `−${-x}`);
 const S = (key: string, args?: Record<string, string>): string => (hasString(key) ? t(key, args) : "");
@@ -122,7 +122,22 @@ export function tuneStage(c: { state: State; events: readonly GameEvent[]; sessi
     ? html`<div class="ts-offer">${tuneOffers(board).map(({ mod: m, path }) => html`<button type="button" class="wl-cta" data-action="board-mod" data-mod="${m.id}" data-path="${path.id}">${path.label}</button>`)}${hasString("board.tune.keep") ? html`<button type="button" class="wl-cta ghost" data-action="board-keep">${t("board.tune.keep")}</button>` : null}</div>`
     : null;
   const finish = printable || s.done ? html`<button type="button" class="ts-finish" data-action="board-print"${printable && !busy ? null : html` disabled`}>${finishLabel(task)}</button>` : null;
-  const kuro = html`<div class="${cls("ts-kuro", busy && "busy")}"><img class="ts-kimg" src="${frameUrl(FRAMES.idle[0])}" alt=""><div class="ts-say">${busy ? html`<span class="ts-dots">${working}</span>` : kuroText(day, say)}</div>${offers}<div class="ts-right"><span class="${cls("ts-status", reached && "ok")}">${S(reached ? "tune.stage.over" : "tune.stage.under")}</span>${finish}</div></div>`;
+  const kuro = html`<div class="${cls("ts-kuro", busy && "busy")}"><img class="ts-kimg" src="${frameUrl(FRAMES.idle[0])}" alt="">${busy || say ? html`<div class="ts-say">${busy ? html`<span class="ts-dots">${working}</span>` : kuroText(day, say)}</div>` : html`<div class="ts-say empty"></div>`}${offers}<div class="ts-right">${finish}</div></div>`;
 
+  // ——— the settlement: the budget spent → the report page first, then 提交 (the offer, if any, under it)
+  if (s.done) {
+    const skin = Object.entries(s.mods).some(([m, pth]) => tune.mods.find((x) => x.id === m)?.paths.find((x) => x.id === pth)?.after === "done" && pth === "skin");
+    const rows = tune.dims.map((d) => {
+      const v = now[d.id] ?? 0;
+      const contrib = steps.filter(({ p }) => p.delta[d.id] !== undefined).map(({ p }) => html`<li class="${cls(p.delta[d.id]! > 0 ? "plus" : "minus")}"><b>${sign(p.delta[d.id]!)}</b> ${p.label}</li>`);
+      const gap = v >= tune.reach ? html`<span class="ts-gap ok">${S("tune.stage.gapOk")}</span>` : html`<span class="ts-gap">${S("tune.stage.gap", { n: String(tune.reach - v) })}</span>`;
+      return html`<div class="ts-rrow"><div class="ts-rname">${d.label}</div><div class="ts-rbars"><div class="ts-rb her"><span>${S("board.tune.promise")}</span><div class="ts-track"><i class="ts-fill" style="width:${tune.promise}%"></i></div><b>${tune.promise}</b></div><div class="ts-rb back"><span>${S("tune.stage.back")}</span><div class="ts-track"><i class="ts-base" style="width:${base[d.id] ?? 0}%"></i><i class="ts-fill" style="width:${v}%"></i><b class="ts-mark reach" style="left:${tune.reach}%"></b></div><b>${v}<small>/${tune.reach}</small></b></div></div><ul class="ts-rlist">${contrib.length ? contrib : html`<li class="none">${S("tune.stage.none")}</li>`}</ul>${gap}</div>`;
+    });
+    const head = skin
+      ? html`<div class="ts-rphead"><span class="ts-rpk">${S("tune.stage.skinKick")}</span><h3>${S("tune.stage.skinTitle")}</h3><span class="ts-rpnote">${S("tune.stage.skinNote")}</span></div>`
+      : html`<div class="ts-rphead"><span class="ts-rpk">${S("tune.stage.reportKick")}</span><h3>${S("tune.stage.reportTitle")}</h3><span class="ts-rpnote">${S("tune.stage.sum", { promise: String(tune.promise), avg: String(avg), reach: String(tune.reach) })}${short.length ? html` ${S("tune.stage.short", { dims: short.join("、") })}` : null}</span></div>`;
+    const page = html`<section class="${cls("ts-rpage", skin && "vivi")}" aria-label="${S("tune.stage.reportTitle")}">${head}<div class="ts-rrows">${rows}</div>${skin ? html`<div class="ts-rpbtns"><span></span><span></span><span></span></div>` : null}</section>`;
+    return html`<div class="ts settle" style="background-image:url('${TUNE_BACKDROP}')"><div class="ts-dim"></div>${top}${panel}<div class="ts-mid report">${page}</div>${kuro}</div>`;
+  }
   return html`<div class="ts" style="background-image:url('${TUNE_BACKDROP}')"><div class="ts-dim"></div>${top}${panel}<div class="ts-mid">${cards}${act}</div>${analysis}${kuro}</div>`;
 }

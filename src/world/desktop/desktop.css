@@ -1410,7 +1410,7 @@ span.cmp-face-btn{cursor:default}
 .ts-kimg{width:84px;height:84px;object-fit:contain;filter:drop-shadow(0 0 2px #1d2129)}
 .ts-say{padding:12px 18px;background:#fff;border:2.5px solid #1d2129;border-radius:16px 16px 16px 4px;font-size:15px;line-height:1.6;max-width:720px;box-shadow:4px 4px 0 #1d2129}
 .ts-dots{color:#555}
-.ts-offer{grid-column:2;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.ts-offer{grid-column:2/4;display:flex;gap:12px;justify-content:flex-start;flex-wrap:wrap;padding-left:6px}
 .ts-right{display:flex;align-items:center;gap:14px;flex:0 0 auto}
 .ts-status{color:#E8EEF2;font-size:13px}
 .ts-status.ok{color:#6EE7B7}
@@ -1426,3 +1426,35 @@ span.cmp-face-btn{cursor:default}
 .ts-rlist{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:2px;color:#C9D3DB}
 .ts-rlist li.plus b{color:#6EE7B7}.ts-rlist li.minus b{color:#F87171}.ts-rlist li.none{color:#8893A0}
 .ts-gap{display:block;margin-top:4px;color:#F87171}.ts-gap.ok{color:#6EE7B7}
+/* the settlement: the report page in the middle (2026-11-12) */
+.ts.settle{grid-template-columns:320px 1fr}
+.ts-mid.report{grid-column:2/3;align-items:stretch;justify-content:flex-start;padding:6px 24px 6px 8px;overflow:auto}
+.ts-rpage{flex:1;min-height:0;overflow:auto;padding:18px 22px;background:#FBFCFE;border:1.5px solid rgba(29,33,41,.25);border-radius:12px;color:#1d2129;box-shadow:0 12px 30px rgba(0,0,0,.35);font-size:13px}
+.ts-rphead{display:flex;flex-direction:column;gap:2px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(29,33,41,.12)}
+.ts-rpk{font:12px var(--mono,ui-monospace,Menlo,monospace);letter-spacing:.1em;color:var(--ink-2)}
+.ts-rphead h3{margin:0;font-size:20px;font-weight:700}
+.ts-rpnote{font-size:12.5px;color:var(--ink-2)}
+.ts-rrows{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ts-rrow{padding:10px 12px;background:#fff;border:1px solid rgba(29,33,41,.12);border-radius:8px}
+.ts-rname{font-weight:700;margin-bottom:6px}
+.ts-rbars{display:flex;flex-direction:column;gap:6px;margin-bottom:6px}
+.ts-rb{display:grid;grid-template-columns:76px 1fr 54px;gap:8px;align-items:center;font-size:12px;color:var(--ink-2)}
+.ts-rb b{text-align:right;color:#1d2129;font-size:14px}
+.ts-rb b small{font-size:11px;color:var(--ink-2)}
+.ts-rb.her .ts-fill{background:#F6B73C}
+.ts-rb.back .ts-fill{background:#2F6FD6}
+.ts-rb .ts-track{background:rgba(29,33,41,.1)}
+.ts-rpage .ts-rlist{color:#444}
+.ts-rpage .ts-rlist li.plus b{color:#13A37A}.ts-rpage .ts-rlist li.minus b{color:#E0457F}
+.ts-rpage .ts-gap{color:#E0457F}.ts-rpage .ts-gap.ok{color:#13A37A}
+/* Vivi's skin: her page's look — gradient, rounded, big numbers, buttons wired to nothing */
+.ts-rpage.vivi{background:linear-gradient(135deg,#FFF7E6,#FFE3F1 50%,#E6F0FF);border:0;border-radius:24px;font-family:inherit}
+.ts-rpage.vivi .ts-rphead{border-bottom:0}
+.ts-rpage.vivi .ts-rpk{color:#B3368F;letter-spacing:.2em}
+.ts-rpage.vivi .ts-rphead h3{font-size:30px;background:linear-gradient(90deg,#FF5FA2,#7C5CFF);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ts-rpage.vivi .ts-rrow{border:0;border-radius:18px;box-shadow:0 10px 30px rgba(124,92,255,.15)}
+.ts-rpage.vivi .ts-rb.her b{font-size:22px;color:#FF5FA2}
+.ts-rpage.vivi .ts-rb.her .ts-fill{background:linear-gradient(90deg,#FF5FA2,#7C5CFF)}
+.ts-rpage.vivi .ts-rb.back{opacity:.55}
+.ts-rpbtns{display:flex;gap:10px;margin-top:14px}
+.ts-rpbtns span{width:120px;height:38px;border-radius:19px;background:linear-gradient(90deg,#FF5FA2,#7C5CFF);opacity:.9}

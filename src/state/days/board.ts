@@ -124,7 +124,8 @@ export function stepBoard(board: TaskBoard, s: BoardState, op: BoardOp): BoardSt
       const def = mod.paths.find((p) => p.id === op.path);
       if (!def || now === op.path) return s;
       if (def.after === "done" && !s.done) return s; // not on the menu yet
-      if (now === undefined && Object.keys(s.mods).length >= tune.steps) return s;
+      // Kuro's end-of-work offer is his gift, not a step: it may land on a module never set (2026-11-12)
+      if (now === undefined && def.after !== "done" && Object.keys(s.mods).length >= tune.steps) return s;
       // taking the path Kuro brought up answers the offer
       const next = { ...s, mods: { ...s.mods, [op.id]: op.path }, decided: s.decided || def.after === "done" };
       return tuneMarkDone(board, next);
