@@ -31,6 +31,7 @@ import { gachaApproving, gachaStage } from "./gacha";
 import { balanceApproving, balanceStage } from "./balance";
 import { sokobanApproving, sokobanStage } from "./sokoban";
 import { molesApproving, molesStage } from "./moles";
+import { pacApproving, pacStage } from "./pacman";
 import { tunePane } from "./shell";
 import { tuneStage } from "./tune-stage";
 import { clueStage } from "./clue-stage";
@@ -221,6 +222,9 @@ function genericWorkLayer(c: { state: State; events: readonly GameEvent[]; sessi
   } else if (board.tune) {
     // tune stage (author 2026-11-12): the research-node screen, not the config pane and the preview
     body = tuneStage({ state, events, session, nowMs }, task, board);
+  } else if (board.game?.kind === "pacman" && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && (!st.approved || (session.pacman?.key === task.id && pacApproving(session.pacman, nowMs))); })()) {
+    // pac-man (author 2026-11-13): the filled minutes' meeting room as a maze, 老周's words the dots
+    body = pacStage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs);
   } else if (board.game?.kind === "moles" && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && (!st.approved || (session.moles?.key === task.id && molesApproving(session.moles, nowMs))); })()) {
     // whack-a-mole (author 2026-11-13): the filled deck's launch hall, the faces to keep up
     body = molesStage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs);

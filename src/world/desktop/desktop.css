@@ -2019,3 +2019,30 @@ button.lk-cell:hover{transform:translateY(-2px);z-index:1}
 .mn.ml .mn-stamp{border-color:#9fd3ff;color:#9fd3ff}
 .mn.ml .pp-flowline{color:#cfc8ba}
 .mn.ml.lost .ml-seats{animation:bt-shake 460ms steps(6)}
+/* pac-man (author 2026-11-13): the meeting room as a maze */
+.mn.pm{background:#0b0b1a;color:#efe9df}
+.mn.pm .cs-title h2,.mn.pm .mn-sub,.mn.pm .cs-kick,.mn.pm .mn-notes-h,.mn.pm .mn-left{color:#efe9df}
+.mn.pm .mn-note{background:rgba(255,255,255,.08);color:#efe9df;border-color:rgba(255,255,255,.12)}
+.mn.pm .mn-note b{color:#efe9df}
+.pm-main{padding:0 28px}
+.pm-maze{position:relative;width:calc(var(--cols,15) * 38px);height:calc(var(--rows,9) * 38px);background:#000;box-shadow:0 0 0 4px #0b0b1a,0 0 40px rgba(30,60,200,.3)}
+.pm-grid{position:absolute;inset:0;display:grid;grid-template-columns:repeat(var(--cols,15),38px);grid-template-rows:repeat(var(--rows,9),38px)}
+.pm-cell{position:relative;width:38px;height:38px;box-sizing:border-box}
+.pm-cell.wall{background:#0b0b1a;box-shadow:inset 0 0 0 3px #2a3df0,inset 0 0 0 5px #0b0b1a;border-radius:4px}
+.pm-cell.dot::after{content:"";position:absolute;left:15px;top:15px;width:8px;height:8px;border-radius:50%;background:#F6D9A0}
+.pm-cell.power::after{content:"";position:absolute;left:10px;top:10px;width:18px;height:18px;border-radius:50%;background:#F6B73C;animation:sn-blink 700ms steps(2) infinite}
+.pm-cell.line b{position:absolute;left:2px;right:2px;top:9px;height:20px;line-height:20px;border-radius:10px;background:#13A37A;color:#fff;font-size:11px;font-weight:900;text-align:center;white-space:nowrap;overflow:hidden}
+.pm-you{position:absolute;width:38px;height:38px;box-sizing:border-box;padding:4px;z-index:2}
+.pm-you::before{content:"";display:block;width:30px;height:30px;border-radius:50%;background:conic-gradient(from 30deg,#F6D33A 0 300deg,transparent 300deg 360deg);animation:pm-chomp 300ms steps(2) infinite}
+.pm-you.up::before{transform:rotate(-90deg)}.pm-you.down::before{transform:rotate(90deg)}.pm-you.left::before{transform:rotate(180deg)}
+.pm-you.caught::before{animation:none;background:conic-gradient(#F6D33A 0 40deg,transparent 40deg 360deg);transform:rotate(-90deg)}
+@keyframes pm-chomp{50%{background:conic-gradient(#F6D33A 0 360deg)}}
+.pm-ghost{position:absolute;width:38px;height:38px;box-sizing:border-box;padding:3px;z-index:1}
+.pm-ghost img{display:block;width:32px;height:32px;object-fit:cover;border-radius:16px 16px 4px 4px;box-shadow:0 0 0 3px #B91C1C,0 0 12px rgba(185,28,28,.8);filter:saturate(.6) contrast(1.2)}
+.pm-ghost.fear img{box-shadow:0 0 0 3px #2a3df0,0 0 12px rgba(42,61,240,.8);filter:none;animation:sn-blink 500ms steps(2) infinite}
+.pm-ghost.eaten{opacity:.2}
+.pm-maze.fear{box-shadow:0 0 0 4px #0b0b1a,0 0 50px rgba(42,61,240,.6)}
+.pm-fearnote{color:#9fd3ff}
+.mn.pm .mn-stamp{border-color:#F6D33A;color:#F6D33A}
+.mn.pm .pp-flowline{color:#cfc8ba}
+.mn.pm.lost .pm-maze{animation:bt-shake 460ms steps(6)}

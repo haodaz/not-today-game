@@ -598,6 +598,13 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
       actions["tetris-key"]?.(ctx, { k: tetrisKey } as unknown as DOMStringMap, target);
       return;
     }
+    // pac-man (2026-11-13): while the maze runs on the work page, the arrows / WASD turn.
+    const pacDir = SNAKE_KEYS[e.key];
+    if (pacDir && session.pacman?.running && session.workShow) {
+      e.preventDefault();
+      actions["pacman-turn"]?.(ctx, { dir: pacDir } as unknown as DOMStringMap, target);
+      return;
+    }
     // sokoban (2026-11-13): while the floor is up on the work page, the arrows / WASD push.
     const sokDir = SNAKE_KEYS[e.key];
     if (sokDir && session.sokoban && !session.sokoban.done && session.workShow) {

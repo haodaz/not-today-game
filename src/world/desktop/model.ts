@@ -406,6 +406,8 @@ export interface Session {
   sokoban: import("./workbench/sokoban").SokobanGame | null;
   /** whack-a-mole (author 2026-11-13): the launch hall under way (session only; three pages passed is a board step). */
   moles: import("./workbench/moles").MolesGame | null;
+  /** pac-man (author 2026-11-13): the meeting maze under way (session only; the five lines eaten is a board step). */
+  pacman: import("./workbench/pacman").PacGame | null;
   /** work (author 2026-11-11 night): the task whose full-screen work page is up (`<day>:<taskId>`), or null; 回到工作台 hides it, 打开工作页 brings it back. */
   workShow: string | null;
   /** When the work page was last opened (ms): its entry fade plays only right after, not on every re-render (snake 2026-11-13). */
@@ -617,6 +619,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     balance: null,
     sokoban: null,
     moles: null,
+    pacman: null,
     workShow: null,
     workShownAt: 0,
     workPhase: null,

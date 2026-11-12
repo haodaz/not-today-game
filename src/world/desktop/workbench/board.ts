@@ -32,6 +32,7 @@ import { BALANCE_DONE_MS, BALANCE_TICK_MS, balanceBlocks, balanceDrop, balancePa
 import { SOKOBAN_DONE_MS, sokobanMove, sokobanSolve, sokobanStart, sokobanUndo, type Dir } from "./sokoban";
 import { MOLES_DONE_MS, MOLES_TICK_MS, molesPause, molesResume, molesRoll, molesSolve, molesStart, molesSweep, molesTap } from "./moles";
 import { PORTRAIT_FILES } from "@world/dialogue/box";
+import { PAC_DONE_MS, PAC_TICK_MS, pacPause, pacResume, pacSolve, pacStart, pacTick, pacTurn, type Dir as PacDir } from "./pacman";
 import type { ActionContext, ActionHandler } from "../controller";
 import type { AppContext, Session } from "../model";
 import { openWork } from "./work";
@@ -436,6 +437,32 @@ function runMoles(ctx: ActionContext, gen: number): void {
     ctx.rerender();
   };
   ctx.later(MOLES_TICK_MS, tick);
+}
+
+/** pac-man: the clock moves everyone; leaving the work page pauses it (继续 resumes with no time lost). */
+function runPac(ctx: ActionContext, gen: number): void {
+  const g0 = ctx.session.pacman;
+  if (!g0 || g0.gen !== gen) return;
+  ctx.session.pacman = { ...g0, running: true };
+  const tick = () => {
+    const c = currentBoard(ctx);
+    const g = ctx.session.pacman;
+    if (!g || g.gen !== gen) return;
+    const now = ctx.now?.() ?? Date.now();
+    if (g.done || g.over) { if (g.running) { ctx.session.pacman = { ...g, running: false }; ctx.rerender(); } return; }
+    if (!ctx.session.workShow || c?.board.game?.kind !== "pacman" || c.task.id !== g.key) { ctx.session.pacman = pacPause(g, now); ctx.rerender(); return; }
+    const next = pacTick(g, now);
+    if (next.done) {
+      ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+      ctx.session.pacman = { ...next, approvedAt: now };
+      ctx.later(PAC_DONE_MS + 20, ctx.rerender);
+    } else {
+      ctx.session.pacman = next;
+      if (!next.over) ctx.later(PAC_TICK_MS, tick);
+    }
+    ctx.rerender();
+  };
+  ctx.later(PAC_TICK_MS, tick);
 }
 
 function currentBoard(ctx: ActionContext): { task: Task; board: TaskBoard } | null {
@@ -1229,6 +1256,55 @@ const actions: Record<string, ActionHandler> = {
     ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
     ctx.session.moles = { ...molesSolve(g), gen: g.gen + 1, approvedAt: ctx.now?.() ?? Date.now() };
     ctx.later(MOLES_DONE_MS + 20, ctx.rerender);
+    ctx.rerender();
+  },
+  // pac-man (author 2026-11-13): the minutes' maze; the five lines eaten approve the form
+  "pacman-start"(ctx) {
+    const c = currentBoard(ctx);
+    if (c?.board.game?.kind !== "pacman") return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    const gen = (ctx.session.pacman?.gen ?? 0) + 1;
+    ctx.session.pacman = pacStart(c.task.id, c.board.game, `${ctx.store.getRunId()}:${c.task.id}:pac:${String(gen)}`, gen, ctx.now?.() ?? Date.now());
+    runPac(ctx, gen);
+    ctx.rerender();
+  },
+  "pacman-turn"(ctx, data) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.pacman?.key === c?.task.id ? ctx.session.pacman : null;
+    const dir = data.dir as PacDir;
+    if (c?.board.game?.kind !== "pacman" || !g || !g.running || !["up", "down", "left", "right"].includes(dir)) return;
+    ctx.session.pacman = pacTurn(g, dir);
+  },
+  "pacman-resume"(ctx) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.pacman;
+    if (c?.board.game?.kind !== "pacman" || !g || g.key !== c.task.id || g.done || g.over || g.running) return;
+    const gen = g.gen + 1;
+    ctx.session.pacman = pacResume(g, ctx.now?.() ?? Date.now(), gen);
+    runPac(ctx, gen);
+    ctx.rerender();
+  },
+  // carried off: 让克总帮忙 — he eats the lines himself (approved; the sheet follows)
+  "pacman-assist"(ctx) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.pacman?.key === c?.task.id ? ctx.session.pacman : null;
+    if (c?.board.game?.kind !== "pacman" || !g || !g.over) return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+    ctx.session.pacman = { ...pacSolve(g), approvedAt: ctx.now?.() ?? Date.now() };
+    ctx.later(PAC_DONE_MS + 20, ctx.rerender);
+    ctx.rerender();
+  },
+  // dev only: the five lines eaten at once (the replay driver)
+  "pacman-cheat"(ctx) {
+    if (!import.meta.env.DEV) return;
+    const c = currentBoard(ctx);
+    const g = ctx.session.pacman?.key === c?.task.id ? ctx.session.pacman : null;
+    if (c?.board.game?.kind !== "pacman" || !g) return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+    ctx.session.pacman = { ...pacSolve(g), gen: g.gen + 1, approvedAt: ctx.now?.() ?? Date.now() };
+    ctx.later(PAC_DONE_MS + 20, ctx.rerender);
     ctx.rerender();
   },
   // the chain lost (no move left, not approved): 让克总帮忙 — he stamps it (the approval moment follows)

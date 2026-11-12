@@ -208,7 +208,9 @@ export type BoardGame =
   /** sokoban: the chairs onto the seat marks; `level` as rows (# wall, . mark, $ chair, @ you) */
   | { readonly kind: "sokoban"; readonly level: readonly string[] }
   /** whack-a-mole: the audience's faces looking down at their phones; `pages` of `pageMs` each */
-  | { readonly kind: "moles"; readonly seats: number; readonly pages: number; readonly pageMs: number };
+  | { readonly kind: "moles"; readonly seats: number; readonly pages: number; readonly pageMs: number }
+  /** pac-man: the meeting room as a maze; `maze` rows (# wall, . dot, o pellet, 1–5 the lines, P you, G a ghost) */
+  | { readonly kind: "pacman"; readonly maze: readonly string[] };
 export interface BoardStack {
   /** From the bottom up: the rank word and its symbol; `silhouette` ranks are the easter eggs past the top (drawn black). */
   readonly ranks: readonly { readonly name: string; readonly img: string; readonly silhouette?: boolean }[];
@@ -791,7 +793,16 @@ function board(v: unknown, w: string): TaskBoard {
     } else if (v.game.kind === "moles") {
       keys(v.game, ["kind", "seats", "pages", "pageMs"], gw);
       game = { kind: "moles", seats: num(v.game.seats, "seats", 4, 24), pages: num(v.game.pages, "pages", 1, 6), pageMs: num(v.game.pageMs, "pageMs", 5000, 120000) };
-    } else fail(`${gw}.kind`, 'must be "mines", "pipes", "match3", "link", "snake", "tetris", "rhythm", "gacha", "balance", "sokoban" or "moles"');
+    } else if (v.game.kind === "pacman") {
+      keys(v.game, ["kind", "maze"], gw);
+      if (!Array.isArray(v.game.maze) || v.game.maze.length < 5 || v.game.maze.length > 20 || !v.game.maze.every((r) => typeof r === "string" && r.length >= 5 && r.length <= 30)) fail(`${gw}.maze`, "must be 5 to 20 rows of 5 to 30 characters");
+      const maze = v.game.maze as string[];
+      const all = maze.join("");
+      if (all.split("").filter((c) => c === "P").length !== 1) fail(`${gw}.maze`, "must place exactly one P");
+      if (!all.includes("G")) fail(`${gw}.maze`, "must place a ghost (G)");
+      for (const n of ["1", "2", "3", "4", "5"]) if (!all.includes(n)) fail(`${gw}.maze`, `must place line ${n}`);
+      game = { kind: "pacman", maze };
+    } else fail(`${gw}.kind`, 'must be "mines", "pipes", "match3", "link", "snake", "tetris", "rhythm", "gacha", "balance", "sokoban", "moles" or "pacman"');
   }
   let stack: BoardStack | undefined;
   if (v.stack !== undefined) {
