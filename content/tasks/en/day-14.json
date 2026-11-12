@@ -226,7 +226,8 @@
             "Don't pick",
             "All in today"
           ]
-        }
+        },
+        "tone": "night"
       }
     },
     {

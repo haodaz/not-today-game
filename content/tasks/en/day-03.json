@@ -887,7 +887,8 @@
             "Risk? Next time",
             "100 is only a matter of time"
           ]
-        }
+        },
+        "tone": "blue"
       }
     },
     {
@@ -1339,7 +1340,9 @@
             "Not the numbers, the volume",
             "The direction is right"
           ]
-        }
+        },
+        "tone": "night",
+        "art": "/launch/day-03.jpg"
       }
     }
   ]

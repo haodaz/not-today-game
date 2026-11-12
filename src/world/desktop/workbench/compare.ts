@@ -47,7 +47,11 @@ export function launchLayer(state: State, session: Pick<Session, "launchShow" | 
   const tag = hasString("task.launch.tag") ? html`<div class="tl-tag">${tr("task.launch.tag", { day: String(day) })}</div>` : null;
   const motif = l.motif ? launchMotif(l.motif, fill) : null;
   const wide = l.motif?.kind === "danmaku"; // floats over the whole page, behind everything
-  return html`<div class="${cls("launch-layer", l.motif && `motif-${l.motif.kind}`)}" role="dialog" aria-modal="true" aria-labelledby="tl-title">${wide ? motif : null}${tag}<div class="tl-figure">${who ? html`<img class="tl-who" src="${who}" alt="">` : null}${wide ? null : motif}<span class="tl-name">${name}</span></div><div class="tl-body"><h2 class="tl-title" id="tl-title">${fill(task.title)}</h2>${l.note.map((n) => html`<p class="tl-note">${fill(n)}</p>`)}<p class="tl-call">${fill(l.call)}</p><button type="button" class="tl-cta" data-action="task-launch" data-task="${task.id}">${fill(l.cta)}</button></div><img class="tl-kuro" src="${frameUrl(FRAMES.idle[0])}" alt="" aria-hidden="true"></div>`;
+  // the picture: the task's own illustration when it has one (no bust, no name tag), else the bust
+  const figure = l.art
+    ? html`<div class="tl-figure art"><img class="tl-art" src="${l.art}" alt="">${wide ? null : motif}</div>`
+    : html`<div class="tl-figure">${who ? html`<img class="tl-who" src="${who}" alt="">` : null}${wide ? null : motif}<span class="tl-name">${name}</span></div>`;
+  return html`<div class="${cls("launch-layer", l.motif && `motif-${l.motif.kind}`, `tone-${l.tone ?? "burst"}`)}" role="dialog" aria-modal="true" aria-labelledby="tl-title">${wide ? motif : null}${tag}${figure}<div class="tl-body"><h2 class="tl-title" id="tl-title">${fill(task.title)}</h2>${l.note.map((n) => html`<p class="tl-note">${fill(n)}</p>`)}<p class="tl-call">${fill(l.call)}</p><button type="button" class="tl-cta" data-action="task-launch" data-task="${task.id}">${fill(l.cta)}</button></div><img class="tl-kuro" src="${frameUrl(FRAMES.idle[0])}" alt="" aria-hidden="true"></div>`;
 }
 
 /**
@@ -136,7 +140,7 @@ export function workLayer(ctx: { readonly state: State; readonly events: readonl
     const n = cmp.pages.indexOf(page) + 1;
     const card = s.slots[page.slot]!;
     const right = compareRight(board, s.slots, page.slot);
-    const face = html`<div class="${cls("wl-face", right ? "happy" : "pout")}"><img src="${right ? BOSS_FACES.happy : BOSS_FACES.pout}" alt=""><p>${tr(right ? "compare.result.happy" : "compare.result.pout")}</p></div>`;
+    const face = html`<div class="${cls("wl-face", right ? "happy" : "pout")}"><img src="${right ? BOSS_FACES.happy : BOSS_FACES.pout}" alt=""><p>${resultLine(task, right)}</p></div>`;
     const render = holding
       ? html`<div class="wl-rendering"><img class="wl-rk" src="${frameUrl(FRAMES.busy[0])}" alt=""><p>${tr("compare.rendering.big", { n: String(n) })}</p></div>`
       : html`<div class="wl-page"><iframe class="ide-frame" data-keep="ide-result" src="${srcFor(page.slot, card)}" title="${fill(task.title)}" sandbox="allow-scripts"></iframe></div>`;
@@ -149,7 +153,7 @@ export function workLayer(ctx: { readonly state: State; readonly events: readonl
     const n = cmp.pages.indexOf(page) + 1;
     const label = board.slots.find((x) => x.id === page.slot)?.label ?? page.slot;
     const bubbles = page.bubbles.map((b) => html`<div class="cmp-bub">${riddle(b)}</div>`);
-    const boss = html`<div class="wl-boss"><img class="cmp-portrait" src="${BOSS_PORTRAIT}" alt="${t("msgs.boss")}"><div class="cmp-bubbles">${bubbles}</div></div>`;
+    const boss = html`<div class="wl-boss"><img class="cmp-portrait" src="${counterpartPortrait(task)}" alt="${counterpartName(task)}"><div class="cmp-bubbles">${bubbles}</div></div>`;
     // the comparison is the content itself (author 2026-11-12): the page's whole code in each version,
     // side by side as cards, the lines that differ marked, 用这版 at each card's foot.
     const diff = html`<div class="wl-vs" data-slot="${page.slot}">${versionCards(board, page, true, holding)}</div>`;
@@ -225,6 +229,20 @@ export function versionCards(board: TaskBoard, page: ComparePage, live: boolean,
 /** 老王's faces (SVG, drawn in code: author 2026-11-11 「画个卡通的高兴生气就行」) and his portrait. */
 export const BOSS_FACES = { happy: "/npc/boss_happy.svg", pout: "/npc/boss_pout.svg" } as const;
 export const BOSS_PORTRAIT = "/npc/boss.png";
+
+/** The one whose riddles the page carries: the task's launch counterpart (day 10: 老周), else 老王. */
+export const counterpartOf = (task: Task): string => task.launch?.who ?? "boss";
+export const counterpartPortrait = (task: Task): string => npcPortrait(counterpartOf(task)) ?? BOSS_PORTRAIT;
+export function counterpartName(task: Task): string {
+  const who = counterpartOf(task);
+  return hasString(`launch.name.${who}`) ? t(`launch.name.${who}`) : t("msgs.boss");
+}
+/** 老王看了，笑了 / 撇了撇嘴 — per counterpart when a line exists (`compare.result.happy.<who>`), else the default. */
+export function resultLine(task: Task, right: boolean): string {
+  const who = counterpartOf(task);
+  const key = `compare.result.${right ? "happy" : "pout"}`;
+  return hasString(`${key}.${who}`) ? t(`${key}.${who}`) : t(key);
+}
 /** How long Kuro "renders" a page after a pick (the preview holds the old page meanwhile). */
 export const RENDER_MS = 900;
 
@@ -279,7 +297,7 @@ export function comparePane(task: Task, board: TaskBoard, s: BoardState, live: b
   const label = board.slots.find((x) => x.id === page.slot)?.label ?? page.slot;
   const done = comparePending(board, s) === null;
   const bubbles = page.bubbles.map((b) => html`<div class="cmp-bub">${riddle(b)}</div>`);
-  const boss = html`<div class="cmp-boss"><img class="cmp-portrait" src="${BOSS_PORTRAIT}" alt="${t("msgs.boss")}"><div class="cmp-bubbles">${bubbles}</div></div>`;
+  const boss = html`<div class="cmp-boss"><img class="cmp-portrait" src="${counterpartPortrait(task)}" alt="${counterpartName(task)}"><div class="cmp-bubbles">${bubbles}</div></div>`;
   const chosen = s.slots[page.slot];
   const kuro = live && hasString("compare.kuro") ? html`<button type="button" class="sh-chip cmp-kuro" data-action="compare-kuro" data-slot="${page.slot}"${busy ? html` disabled` : null}>${tr("compare.kuro")}</button>` : null;
   const rendering = busy ? html`<div class="cmp-rendering" aria-live="polite">${tr("compare.rendering", { n: String(n) })}</div>` : null;

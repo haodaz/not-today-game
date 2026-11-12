@@ -469,7 +469,8 @@
             "It's all in the minutes",
             "Get it right"
           ]
-        }
+        },
+        "tone": "paper"
       }
     }
   ]

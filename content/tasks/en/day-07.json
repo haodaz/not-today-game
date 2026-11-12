@@ -608,7 +608,8 @@
             "Add nothing of your own",
             "Keep the format"
           ]
-        }
+        },
+        "tone": "paper"
       }
     }
   ]

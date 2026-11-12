@@ -9,100 +9,122 @@
       "done": "task_d10_work",
       "board": {
         "kind": "table",
-        "title": "The King in Yellow, Act Two · proofreading",
+        "title": "Proof the script's second act: fix the typos, don't read too closely.",
         "columns": [
-          "",
-          "Words showing through in Act Two",
-          "Correct to"
+          "the script",
+          "the book"
         ],
         "given": {
           "rows": {
-            "r1": "Casida",
+            "r1": "Cassida",
             "r2": "Lake Hari",
-            "r3": "twin eyes sink behind the lake",
-            "r4": "the Yellow Sign's shape"
-          },
-          "lock": {
-            "object": "tape",
-            "hint": "Last night's recording, played backwards",
-            "codes": [
-              "Act Two",
-              "Act One",
-              "Act Three"
-            ],
-            "answer": "Act Two"
+            "r3": "After the twin eyes sink into the lake",
+            "r4": "the pattern of a yellow sign"
           }
         },
         "slots": [
           {
             "id": "r1",
-            "label": "Name",
+            "label": "the name",
             "answer": "c1"
           },
           {
             "id": "r2",
-            "label": "Lake",
+            "label": "the lake",
             "answer": "c2"
           },
           {
             "id": "r3",
-            "label": "Sky",
+            "label": "the sky",
             "answer": "c3"
           },
           {
             "id": "r4",
-            "label": "Sign",
+            "label": "the sign",
             "answer": "c4"
           }
         ],
         "cards": [
           {
+            "id": "w1",
+            "text": "Cassida",
+            "slot": "r1",
+            "patch": {
+              "5": "Stranger: I wear no mask.  <- same in script and book"
+            }
+          },
+          {
             "id": "c1",
             "text": "Cassilda",
-            "from": {
-              "file": "s-script"
-            },
-            "hint": "in Act One of the script (Act One is safe to read)"
+            "slot": "r1",
+            "patch": {
+              "4": "Camilla: Sir, you should take off your mask. (the book: Cassilda)"
+            }
+          },
+          {
+            "id": "w2",
+            "text": "Lake Hari",
+            "slot": "r2",
+            "patch": {
+              "4": "Camilla: There are towers in the mist.  <- the script says Hari"
+            }
           },
           {
             "id": "c2",
             "text": "Lake Hali",
-            "from": {
-              "file": "s-kiy"
-            },
-            "hint": "in Cassilda's song in Act One"
+            "slot": "r2",
+            "patch": {
+              "4": "Camilla: There are towers in the mist. (the book, act one: mist on Lake Hali)"
+            }
+          },
+          {
+            "id": "d1",
+            "text": "Smooth the whole line: mist rises on the lake",
+            "slot": "r2",
+            "patch": {
+              "3": "(Mist rises on the lake.)",
+              "4": "Camilla: There are towers in the mist.  <- Vivi: just smooth the line"
+            }
+          },
+          {
+            "id": "w3",
+            "text": "After the twin eyes sink into the lake",
+            "slot": "r3",
+            "patch": {
+              "5": "the shadows lengthen,  <- \"twin eyes\": a typo when the script was copied?"
+            }
           },
           {
             "id": "c3",
-            "text": "twin suns",
-            "from": {
-              "file": "s-kiy"
-            },
-            "hint": "in the same song"
+            "text": "After the twin suns sink into the lake",
+            "slot": "r3",
+            "patch": {
+              "5": "the shadows lengthen, (the book: twin suns. Two suns.)"
+            }
+          },
+          {
+            "id": "w4",
+            "text": "the pattern of a yellow sign",
+            "slot": "r4",
+            "patch": {
+              "4": "Camilla: Do not look at it.  <- the script only says \"yellow sign\""
+            }
           },
           {
             "id": "c4",
             "text": "the one that belongs to no human script",
-            "from": {
-              "file": "s-kiy-cover"
-            },
-            "hint": "in the cover scan, the one on the clasp"
-          },
-          {
-            "id": "d1",
-            "text": "Smooth out the whole line",
-            "from": {
-              "conv": "partner"
-            },
-            "hint": "in Vivi's chat"
+            "slot": "r4",
+            "patch": {
+              "4": "Camilla: Do not look at it. (the cover scan: not Arabic, not Chinese)"
+            }
           },
           {
             "id": "d2",
-            "text": "Sign: the Chinese character for 'yellow'",
-            "from": {
-              "conv": "laozhou"
-            },
-            "hint": "in Lao Zhou's chat"
+            "text": "the Chinese character for yellow",
+            "slot": "r4",
+            "patch": {
+              "4": "Camilla: Do not look at it.  <- Lao Zhou: just write the character 黄"
+            }
           }
         ],
         "kuro": {
@@ -115,10 +137,140 @@
           "cards": [
             {
               "id": "k1",
-              "text": "(Read in full and polished for you)"
+              "text": "(read through and polished for you)"
             }
           ],
-          "unlock": "Act Two"
+          "unlock": "-"
+        },
+        "view": "ide",
+        "ide": {
+          "src": "/docs/player/day-10-script.html",
+          "pages": {
+            "r1": 0,
+            "r2": 1,
+            "r3": 2,
+            "r4": 3
+          },
+          "files": {
+            "r1": {
+              "name": "act-two_01.txt",
+              "code": [
+                "ACT TWO",
+                "",
+                "{{slot}}: ...",
+                "Camilla: Sir, you should take off your mask.",
+                "Stranger: I wear no mask."
+              ]
+            },
+            "r2": {
+              "name": "act-two_02.txt",
+              "code": [
+                "ACT TWO",
+                "",
+                "(Mist rises on {{slot}}.)",
+                "Camilla: There are towers in the mist.",
+                "Stranger: That is Carcosa."
+              ]
+            },
+            "r3": {
+              "name": "act-two_03.txt",
+              "code": [
+                "ACT TWO",
+                "",
+                "Cassilda (sings):",
+                "{{slot}},",
+                "the shadows lengthen,",
+                "in Carcosa."
+              ]
+            },
+            "r4": {
+              "name": "act-two_04.txt",
+              "code": [
+                "ACT TWO",
+                "",
+                "(Stage direction) On the cover, lower right, a black onyx clasp set in gold with {{slot}}.",
+                "Camilla: Do not look at it."
+              ]
+            }
+          }
+        },
+        "compare": {
+          "versions": [
+            "the script",
+            "the scan",
+            "what others say"
+          ],
+          "threshold": 75,
+          "pages": [
+            {
+              "slot": "r1",
+              "cards": [
+                "w1",
+                "c1"
+              ],
+              "bubbles": [
+                "Names go by the 【book】; the book is right, the script was copied by hand.",
+                "Just fix the typos, 【don't read too closely】.",
+                "Four characters or three — count them."
+              ],
+              "remark": {
+                "w1": "Three characters. The book has four. The script did not want the fourth.",
+                "c1": "Four characters again. Her name, the script can say it whole now."
+              }
+            },
+            {
+              "slot": "r2",
+              "cards": [
+                "w2",
+                "c2",
+                "d1"
+              ],
+              "bubbles": [
+                "【Look up】 the lake's name, don't make one up.",
+                "Vivi says smooth the line; that's her business. I want 【that character】.",
+                "It appeared in act one; page back."
+              ],
+              "remark": {
+                "w2": "Lake Hari. No such lake on any map.",
+                "c2": "Lake Hali. Act one spells it so; the mist rises from there.",
+                "d1": "The line reads smoothly now. The lake has no name. Vivi is pleased."
+              }
+            },
+            {
+              "slot": "r3",
+              "cards": [
+                "w3",
+                "c3"
+              ],
+              "bubbles": [
+                "That line about the sky... fix it by the book, 【don't read it aloud】.",
+                "Is it 目 or 日 — check the 【scan】.",
+                "Turn the page once it's fixed; don't stop on this line."
+              ],
+              "remark": {
+                "w3": "After the twin eyes sink into the lake. Whose eyes? The script does not say.",
+                "c3": "Twin suns. Two suns setting together. Fixed; do not read it aloud."
+              }
+            },
+            {
+              "slot": "r4",
+              "cards": [
+                "w4",
+                "c4",
+                "d2"
+              ],
+              "bubbles": [
+                "That sign — just 【copy it as drawn】, don't ask what it is.",
+                "Lao Zhou says write 黄; that's him being 【lazy】.",
+                "It is not a letter. That is what the book says."
+              ],
+              "remark": {
+                "w4": "The pattern of a yellow sign. The one line in the script still standing.",
+                "c4": "Copied as drawn. It belongs to no human script. Your hand did not stop while you drew it.",
+                "d2": "One character, 黄. Lao Zhou will be pleased. The cover will not."
+              }
+            }
+          ]
         },
         "beats": [
           {
@@ -126,65 +278,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Whatever happens, I've got you."
-              },
-              {
-                "who": "kuro",
-                "text": "Lao Zhou wants Act Two proofread: fix the typos, do not read closely. Four rows: name, lake, sky, sign. Check them against the script and the scan of that book, one word at a time, and never read a whole line together. The table is locked; the key is in last night's recording, played backwards."
-              }
-            ]
-          },
-          {
-            "on": "unlock",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "Act Two. Played backwards, that is what you say. You never read Act Two; how would you say it."
-              }
-            ]
-          },
-          {
-            "on": "fill:r1",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "Cassilda: the name is fixed. Act One is safe to read. Not Act Two."
-              }
-            ]
-          },
-          {
-            "on": "fill:r2:d1",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "'Smooth out the whole line' is Vivi's idea. Smooth a whole line and you have read it."
-              }
-            ]
-          },
-          {
-            "on": "fill:r4:d2",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "Lao Zhou says the sign is the Chinese character for yellow. It is not a character; Lao Zhou knows that himself."
-              }
-            ]
-          },
-          {
-            "on": "fill:r4",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "The sign row says 'the one that belongs to no human script'. If you cannot read it, you have it right."
-              }
-            ]
-          },
-          {
-            "on": "kuro",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "'Read in full and polished for you.' I filled that in. I read it for you; you are fine, and so am I."
+                "text": "Lao Zhou's script, act two. Four words, one spelling in the book, one in the script. He says not to read too closely."
               }
             ]
           },
@@ -193,7 +287,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Leave it on the desk. Someone comes for it tonight."
+                "text": "Sent to Lao Zhou. Act two matches the book now — those four words, at least."
               }
             ]
           }
@@ -229,7 +323,9 @@
             "It's only proofreading",
             "Read it, don't remember it"
           ]
-        }
+        },
+        "tone": "ink",
+        "art": "/launch/day-10.jpg"
       }
     },
     {

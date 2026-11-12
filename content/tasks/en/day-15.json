@@ -341,7 +341,8 @@
             "A peak per page",
             "No dead air"
           ]
-        }
+        },
+        "tone": "blue"
       }
     },
     {

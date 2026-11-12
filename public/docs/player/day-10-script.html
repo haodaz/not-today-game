@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>剧本_明日会议 · 第二幕</title>
+<style>
+  :root{--paper:#FBF8F1;--ink:#1F2024;--ink2:#6B6E78;--mark:#C77700;--line:rgba(31,32,36,.14)}
+  html,body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.9 "Songti SC","Noto Serif SC",Georgia,serif}
+  .page{max-width:680px;margin:0 auto;padding:48px 32px 64px}
+  h1{margin:0 0 4px;font-size:22px;font-weight:600;letter-spacing:.2em}
+  .meta{margin:0 0 28px;color:var(--ink2);font-size:13px;letter-spacing:.08em}
+  .act{margin:0 0 22px;font-size:18px;letter-spacing:.3em;text-align:center}
+  p{margin:0 0 10px}
+  .who{font-weight:600;letter-spacing:.06em}
+  .sd{color:var(--ink2);font-style:italic}
+  .w{padding:0 3px;border-bottom:2px solid var(--mark);background:rgba(245,166,35,.14)}
+  .w.cur{background:rgba(245,166,35,.32)}
+  .done .w{border-bottom-color:#13A37A;background:rgba(19,163,122,.12)}
+  .foot{margin-top:36px;padding-top:12px;border-top:1px solid var(--line);color:var(--ink2);font-size:12px;letter-spacing:.08em}
+</style>
+</head>
+<body>
+<div class="page" id="page">
+  <h1>剧本_明日会议</h1>
+  <p class="meta">第二幕 · 校对稿 · 2028-10-26</p>
+  <p class="act">第二幕</p>
+  <p><span class="who"><span class="w" data-slot="r1"></span>：</span>……</p>
+  <p><span class="who">卡米拉：</span>先生，您该摘下面具了。</p>
+  <p><span class="who">陌生人：</span>我没有戴面具。</p>
+  <p class="sd">（<span class="w" data-slot="r2"></span>上起了雾。）</p>
+  <p><span class="who">卡米拉：</span>雾里有塔。</p>
+  <p><span class="who">陌生人：</span>那是卡尔克萨。</p>
+  <p><span class="who">卡西尔达（唱）：</span></p>
+  <p><span class="w" data-slot="r3"></span>，</p>
+  <p>影子拉长，</p>
+  <p>在卡尔克萨。</p>
+  <p class="sd">（舞台说明）封面右下角，一枚黑玛瑙扣子，金色镶着<span class="w" data-slot="r4"></span>。</p>
+  <p><span class="who">卡米拉：</span>别看它。</p>
+  <p class="foot" id="foot"></p>
+</div>
+<script>
+/* ?fill=r1:c1,… 是校对页里每个词选了哪一版；单独打开时显示交出去的那一版。?c=N 高亮第 N 个词；&done=1 是交出去之后。 */
+const TEXT = {
+  w1: '卡西达', c1: '卡西尔达',
+  w2: '哈里湖', c2: '哈利湖', d1: '湖',
+  w3: '双目沉入湖后', c3: '双日沉入湖后',
+  w4: '黄色印记的图样', c4: '不属于任何人类文字的那一个', d2: '中文的「黄」字',
+  k1: '（已为你通读全文并润色）',
+};
+const SCRIPT = { r1: 'w1', r2: 'w2', r3: 'w3', r4: 'w4' };
+const q = new URLSearchParams(location.search);
+const FILL = q.has('fill') ? Object.fromEntries(q.get('fill').split(',').filter(Boolean).map(x => x.split(':'))) : { r1: 'c1', r2: 'c2', r3: 'c3', r4: 'c4' };
+const cur = ['r1', 'r2', 'r3', 'r4'][Number(q.get('c') || 0)];
+for (const el of document.querySelectorAll('.w')) {
+  const slot = el.dataset.slot;
+  const id = FILL[slot] ?? SCRIPT[slot];
+  el.textContent = TEXT[id] ?? id;
+  el.classList.toggle('cur', slot === cur);
+}
+if (q.get('done') === '1') document.getElementById('page').classList.add('done');
+const changed = ['r1', 'r2', 'r3', 'r4'].filter((s) => FILL[s] && FILL[s] !== SCRIPT[s]).length;
+document.getElementById('foot').textContent = `改了 ${changed} 处 · 剧本 vs 《黄衣之王》扫描件`;
+</script>
+</body>
+</html>

@@ -225,7 +225,8 @@
             "A pretty name",
             "It's all in the PRD"
           ]
-        }
+        },
+        "tone": "blue"
       }
     },
     {

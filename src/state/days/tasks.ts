@@ -343,7 +343,12 @@ export interface TaskLaunch {
    * page like bullet comments, `bubble` is a thought cloud over the head (Vivi's perfect AI).
    */
   readonly motif?: LaunchMotif;
+  /** author 2026-11-12: the page's own picture (a generated illustration, `/launch/...png`) in place of the bust. */
+  readonly art?: string;
+  /** The page's ground: one of a few named looks, so no two days share one (default "burst"). */
+  readonly tone?: LaunchTone;
 }
+export type LaunchTone = "burst" | "night" | "paper" | "ink" | "blue";
 export interface LaunchMotif {
   readonly kind: "fan" | "danmaku" | "bubble";
   readonly items: readonly string[];
@@ -1033,7 +1038,9 @@ function judge(v: unknown, w: string): TaskJudge {
 /** launch (author 2026-11-11): who stands beside Kuro, the note lines, the call line, the button. */
 function launch(v: unknown, w: string): TaskLaunch {
   if (!isRecord(v)) fail(w, "must be an object");
-  keys(v, ["who", "note", "call", "cta", "motif"], w);
+  keys(v, ["who", "note", "call", "cta", "motif", "art", "tone"], w);
+  const TONES = ["burst", "night", "paper", "ink", "blue"];
+  if (v.tone !== undefined && !TONES.includes(v.tone as string)) fail(`${w}.tone`, `must be one of ${TONES.join(", ")}`);
   if (!Array.isArray(v.note) || v.note.length === 0 || !v.note.every((x) => typeof x === "string" && x !== "")) fail(`${w}.note`, "must be a non-empty list of strings");
   let motif: LaunchMotif | undefined;
   if (v.motif !== undefined) {
@@ -1044,7 +1051,7 @@ function launch(v: unknown, w: string): TaskLaunch {
     if (!Array.isArray(v.motif.items) || v.motif.items.length < 3 || v.motif.items.length > 24 || !v.motif.items.every((x) => typeof x === "string" && x !== "")) fail(`${mw}.items`, "must be 3 to 24 strings");
     motif = { kind: v.motif.kind, items: v.motif.items as string[] };
   }
-  return { who: str(v.who, `${w}.who`), note: v.note as string[], call: str(v.call, `${w}.call`), cta: str(v.cta, `${w}.cta`), ...(motif ? { motif } : {}) };
+  return { who: str(v.who, `${w}.who`), note: v.note as string[], call: str(v.call, `${w}.call`), cta: str(v.cta, `${w}.cta`), ...(motif ? { motif } : {}), ...(v.art !== undefined ? { art: str(v.art, `${w}.art`) } : {}), ...(v.tone !== undefined ? { tone: v.tone as LaunchTone } : {}) };
 }
 
 /** Inert empty placeholders for a board task's unused reply tree (work v2). */
@@ -1196,7 +1203,7 @@ function localiseTask(zh: Task, en: Task, w: string): Task {
     const compareShape = (b: TaskBoard) => (b.compare ? { threshold: b.compare.threshold, pages: b.compare.pages.map((p) => [p.slot, p.cards, p.bubbles.length, Object.keys(p.remark).sort()]) } : null);
     if (!sameJson(compareShape(zh.board), compareShape(en.board))) fail(`${w}.board.compare`, "compare shape differs from the Chinese");
     // launch: the counterpart is shared; the lines are the twin's.
-    if (!!zh.launch !== !!en.launch || (zh.launch && en.launch && (zh.launch.who !== en.launch.who || zh.launch.note.length !== en.launch.note.length || zh.launch.motif?.kind !== en.launch.motif?.kind || (zh.launch.motif?.items.length ?? 0) !== (en.launch.motif?.items.length ?? 0)))) fail(`${w}.launch`, "launch shape differs from the Chinese");
+    if (!!zh.launch !== !!en.launch || (zh.launch && en.launch && (zh.launch.who !== en.launch.who || zh.launch.note.length !== en.launch.note.length || zh.launch.motif?.kind !== en.launch.motif?.kind || (zh.launch.motif?.items.length ?? 0) !== (en.launch.motif?.items.length ?? 0) || zh.launch.art !== en.launch.art || zh.launch.tone !== en.launch.tone))) fail(`${w}.launch`, "launch shape differs from the Chinese");
     return bilingualValues(zh, { title: en.title, board: en.board, ...(zh.deliverable && en.deliverable ? { deliverable: en.deliverable } : {}), ...(zh.launch && en.launch ? { launch: en.launch } : {}) });
   }
   if (zh.start.say.length !== en.start.say.length || !sameJson(zh.start.options, en.start.options)) fail(`${w}.start`, "start shape differs from the Chinese");

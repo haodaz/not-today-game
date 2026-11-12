@@ -31,3 +31,9 @@
 小鸡养成（另一条线）：按 `chick-raising-2026-11-11.md`，每天 10 次，攻防血敏；以后某些锁改成战斗界面。
 
 做的顺序建议：2/3（调参页，已有数据）→ 10（逐词二选一，和第 1 天一个模子）→ 4/5/6（找线索页，一个模子三天）→ 其余。
+
+## Added 2026-11-12
+
+- Every day's launch page gets its own visual format (see `launch-pages-2026-11-12.md`); the motif kinds so far: fan / danmaku / bubble. New formats when a day is redone.
+- Compare boards now show whole-code cards with several diffs per version (card `patch`); pages may hold 2–4 cards (day 3 = three wordings).
+- The story clock passes with the work (lunch → 13:30, each task +90 min): timed afternoon lines are reachable now; when writing a day's replies, place lines on the jumps.

@@ -232,7 +232,8 @@
             "All waiting",
             "Choose"
           ]
-        }
+        },
+        "tone": "burst"
       }
     },
     {

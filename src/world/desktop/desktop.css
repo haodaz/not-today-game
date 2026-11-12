@@ -1150,26 +1150,45 @@ span.cmp-face-btn{cursor:default}
 /* the poster's ground: burst rays from the bust's chest, halftone dots over everything, a frame */
 .launch-layer::before{content:"";position:absolute;inset:-40%;z-index:0;background:repeating-conic-gradient(from 0deg at 26% 72%,#E0362B 0deg 9deg,#F2D33A 9deg 18deg);opacity:.95}
 .launch-layer::after{content:"";position:absolute;inset:0;z-index:0;background-image:radial-gradient(rgba(29,33,41,.22) 1.3px,transparent 1.6px);background-size:9px 9px;mix-blend-mode:multiply;pointer-events:none}
-.launch-layer.motif-bubble{background:#DCEBFA}
-.launch-layer.motif-bubble::before{background:repeating-conic-gradient(from 0deg at 30% 70%,#2F6FD6 0deg 9deg,#DCEBFA 9deg 18deg);opacity:.55}
-.launch-layer.motif-danmaku{background:#1d2129;color:#fff}
-.launch-layer.motif-danmaku::before{background:repeating-conic-gradient(from 0deg at 26% 72%,#2A2F3B 0deg 9deg,#1d2129 9deg 18deg)}
-.launch-layer.motif-danmaku::after{background-image:radial-gradient(rgba(255,255,255,.12) 1.3px,transparent 1.6px)}
+.launch-layer.tone-blue{background:#EAF2FB}
+.launch-layer.tone-blue::before{inset:0;background-image:linear-gradient(rgba(47,111,214,.16) 1px,transparent 1px),linear-gradient(90deg,rgba(47,111,214,.16) 1px,transparent 1px),linear-gradient(rgba(47,111,214,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(47,111,214,.07) 1px,transparent 1px);background-size:120px 120px,120px 120px,24px 24px,24px 24px;opacity:1}
+.launch-layer.tone-blue::after{background-image:none}
+/* night: dark ground, the rays barely there (day 3's meeting) */
+.launch-layer.tone-night{background:#1d2129;color:#fff}
+.launch-layer.tone-night::before{background:repeating-conic-gradient(from 0deg at 26% 72%,#2A2F3B 0deg 9deg,#1d2129 9deg 18deg)}
+.launch-layer.tone-night::after{background-image:radial-gradient(rgba(255,255,255,.12) 1.3px,transparent 1.6px)}
+.tone-night .tl-title{color:#F2D33A;text-shadow:5px 5px 0 #E0362B}
+/* ink: deep blue paper with a mustard title (day 10's desk) */
+.launch-layer.tone-ink{background:#17213A;color:#fff}
+.launch-layer.tone-ink::before{background:none}
+.launch-layer.tone-ink::after{background-image:radial-gradient(rgba(255,255,255,.10) 1.3px,transparent 1.6px)}
+.tone-ink .tl-title{color:#F2D33A;text-shadow:5px 5px 0 #1d2129}
+.tone-ink .tl-dm{background:#F2D33A;color:#1d2129}
+/* paper: plain cream, no rays (a document day) */
+.launch-layer.tone-paper{background:#F3EFE6}
+.launch-layer.tone-paper::before{background:none}
+/* the picture in place of the bust: full height, bleeding to the left edge, a torn paper edge on the right */
+.tl-figure.art{align-items:stretch;justify-content:flex-start}
+.tl-art{position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:cover;object-position:60% 50%;-webkit-mask-image:linear-gradient(90deg,#000 78%,transparent 100%);mask-image:linear-gradient(90deg,#000 78%,transparent 100%)}
+.tone-blue .tl-body{background:#fff;border:3px solid #1d2129;border-radius:22px;padding:44px 48px;margin-right:150px;box-shadow:8px 8px 0 #2F6FD6}
+.tone-blue .tl-title{color:#1d2129;-webkit-text-stroke:0;text-shadow:none;font-size:38px}
+.tone-blue .tl-note{box-shadow:none;border-width:2px;background:#EAF2FB;transform:none}
+.tone-blue .tl-call{background:#2F6FD6;transform:none}
+.tone-blue .tl-cta{background:#2F6FD6;color:#fff}
+.tone-blue .tl-tag{background:#2F6FD6;color:#fff;transform:none}
+.tone-blue .tl-name{box-shadow:5px 5px 0 #2F6FD6}
 .tl-tag{position:absolute;left:48px;top:36px;z-index:3;padding:8px 18px;background:#1d2129;color:#F2D33A;font-weight:700;font-size:14px;letter-spacing:.22em;text-indent:.22em;transform:rotate(-3deg);box-shadow:4px 4px 0 #fff,6px 6px 0 #1d2129}
 .tl-figure{position:relative;z-index:2;align-self:stretch;display:flex;align-items:flex-end;justify-content:center}
 .tl-who{position:relative;z-index:2;display:block;width:auto;height:76%;max-width:100%;object-fit:contain;object-position:50% 100%;filter:drop-shadow(0 0 2px #1d2129) drop-shadow(0 0 2px #1d2129) drop-shadow(14px 14px 0 rgba(29,33,41,.35))}
 .tl-name{position:absolute;z-index:3;left:50%;bottom:30px;transform:translateX(-50%) rotate(-2deg);padding:6px 22px;background:#fff;color:#1d2129;border:3px solid #1d2129;font-weight:700;font-size:16px;letter-spacing:.3em;text-indent:.3em;box-shadow:5px 5px 0 #1d2129}
 .tl-body{position:relative;z-index:2;display:flex;flex-direction:column;justify-content:center;gap:16px;align-self:center;padding:60px 180px 60px 20px;max-width:800px}
 .tl-title{margin:0 0 10px;font-size:44px;font-weight:900;letter-spacing:.04em;line-height:1.25;color:#fff;-webkit-text-stroke:2px #1d2129;paint-order:stroke fill;text-shadow:5px 5px 0 #1d2129}
-.motif-bubble .tl-title{color:#fff;text-shadow:5px 5px 0 #2F6FD6}
-.motif-danmaku .tl-title{color:#F2D33A;text-shadow:5px 5px 0 #E0362B}
 .tl-note{margin:0;padding:8px 14px;background:#fff;border:2.5px solid #1d2129;color:#1d2129;font-size:18px;line-height:1.7;box-shadow:4px 4px 0 #1d2129;align-self:flex-start;max-width:560px}
 .tl-note+.tl-note{transform:rotate(.6deg)}
 .tl-call{margin:14px 0 8px;padding:10px 16px;background:#E0362B;border:2.5px solid #1d2129;color:#fff;font-size:19px;line-height:1.7;font-weight:700;box-shadow:5px 5px 0 #1d2129;align-self:flex-start;max-width:580px;transform:rotate(-1deg)}
 .tl-cta{align-self:flex-start;width:300px;padding:16px 0;text-align:center;border:3px solid #1d2129;border-radius:0;background:#F2D33A;color:#1d2129;font:inherit;font-weight:900;font-size:22px;letter-spacing:.3em;text-indent:.3em;cursor:pointer;box-shadow:6px 6px 0 #1d2129;transition:transform 120ms,box-shadow 120ms}
 .tl-cta:hover{transform:translate(2px,2px);box-shadow:4px 4px 0 #1d2129}
 .tl-cta:active{transform:translate(6px,6px);box-shadow:0 0 0 #1d2129}
-.motif-danmaku .tl-cta{background:#F2D33A}
 .tl-kuro{position:absolute;z-index:4;right:-30px;bottom:-34px;width:230px;height:230px;object-fit:contain;filter:drop-shadow(0 0 2px #1d2129) drop-shadow(0 8px 14px rgba(0,0,0,.3));pointer-events:none}
 /* fan: speech bubbles spread behind the bust like a peacock's tail (ink edges, white, tilted) */
 .tl-fan{position:absolute;inset:0;z-index:1;pointer-events:none}
@@ -1309,6 +1328,7 @@ span.cmp-face-btn{cursor:default}
 /* the other board kinds on the full stage (author 2026-11-12: moved first, refined per day later) */
 .wl-tune{display:grid;grid-template-columns:minmax(520px,1fr) minmax(480px,1fr);gap:18px;flex:1;min-height:0}
 .wl-tune-left{display:flex;flex-direction:column;gap:12px;min-height:0;overflow:auto}
+.wl-right{display:flex;flex-direction:column;min-height:0}
 .wl-tune-left .sh-editor{border:1px solid rgba(29,33,41,.25);background:#FBFCFE}
 .wl-offer{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding:6px 0}
 .wl-generic{flex:1;min-height:0;overflow:auto}

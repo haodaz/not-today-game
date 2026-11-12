@@ -90,9 +90,10 @@ const interrupts = async () => {
     // Vivi's deliverable bubbles stay in the thread all day: each doc is opened once a day (the guide's
     // ring is on one of them — the one the task page waits for), not on every look.
     globalThis.__docsOpened ??= {}; const opened = (globalThis.__docsOpened[day] ??= new Set());
-    const docs = JSON.parse((await ev("JSON.stringify([...document.querySelectorAll('[data-action=open-deliverable]')].filter(__vis).map(e=>e.dataset.doc||''))")) || "[]").filter((d) => d && !opened.has(d));
-    for (const doc of docs) { opened.add(doc); globalThis.__viviOpened = day;
-      note(`   vivi: opening the deliverable ${doc}`); await ev(`__sel('[data-action=open-deliverable][data-doc="${doc}"]')`); await sleep(2); await shotStep("deliverable"); await key("Escape"); await sleep(1);
+    // The guide's ringed card first (G5 refuses any other click while the lock holds, and the refusal line masks the next one); each click through sel() so a mask is cleared first.
+    const docs = JSON.parse((await ev("JSON.stringify([...document.querySelectorAll('[data-action=open-deliverable]')].filter(__vis).sort((a,b)=>(b.dataset.guide==='on')-(a.dataset.guide==='on')).map(e=>e.dataset.doc||''))")) || "[]").filter((d) => d && !opened.has(d));
+    for (const doc of docs) { globalThis.__viviOpened = day;
+      const clicked = await sel(`[data-action=open-deliverable][data-doc="${doc}"]`, 2); note(`   vivi: opening the deliverable ${doc}${clicked ? "" : " (not clickable)"}`); if (!clicked) continue; opened.add(doc); await shotStep("deliverable"); await key("Escape"); await sleep(1);
       // guidance R14: the locked page has a tail line (vivi.back) that owns the screen until read.
       for (let n = 0; n < 8 && (await has("[data-action=loop-advance]")); n++) { await ev("__sel('[data-action=loop-advance]')"); await sleep(0.5); }
       // the thread again for the next card (her page opens in 浏览器 on the other monitor)
@@ -302,30 +303,34 @@ for (const it of ITEMS) {
       if (process.env.DIAG) note(`   probe: lock=${(await text()).includes(S("vivi.lock"))} deliv=${await has("[data-action=open-deliverable]")} taskLink=${await has(`[data-action=wb-nav][data-page='task:${it.id}']`)} pages=${await ev("JSON.stringify([...document.querySelectorAll('[data-action=wb-nav]')].filter(__vis).map(e=>e.dataset.page))")} opens=${await ev("(localStorage.getItem('nt_run')||'').match(/file:[a-z0-9-]+|task:[a-z0-9]+/g)?.join(',')")}`);
       await sel(`[data-action=wb-nav][data-page='task:${it.id}']`, 1.2);   // workspace: a task lives on its own page (在办 card / session list)
       if ((await ev("JSON.stringify(__choices())").then(JSON.parse)).length) { await shotStep(`ask-${it.id}`); await settle(); await sleep(1); }  // launch: 要开始工作吗？ → 开始
+      if (await has("[data-action=task-launch]")) { await shotStep(`launch-${it.id}`); await sel("[data-action=task-launch]", 1.2); note("   launch: 开始工作"); await sleep(0.6); }  // every board task opens on its launch page
       if (board?.tune) {
         // tune (2026-11-08): a module's source first (a conv), then one path per module (the first open chip each
         // turn, Kuro speaks between), the end-of-work offer declined (不接), then 提交.
         for (const m of board.tune.mods) if (m.from?.conv) { await toTingTalk(); await sel(`[data-action=conv][data-conv=${m.from.conv}]`, 1); }
         await toWorkbench(); await goHome(); await sel(`[data-action=wb-nav][data-page='task:${it.id}']`, 1.2);
         await shotStep(`tune-${it.id}`);
-        let picks = 0;
-        for (let k = 0; k < 40; k++) {
-          await sleep(1.6);
+        let picks = 0, turns = 0;
+        for (let k = 0; k < 60; k++) {
+          await sleep(1.6); await unmask(); await ev(HELPERS);
           const next = await ev("(()=>{const c=[...document.querySelectorAll('[data-action=board-mod]:not([disabled])')].filter(__vis).find(e=>e.dataset.chosen===''); return c? c.dataset.mod+'/'+c.dataset.path : ''})()");
-          if (!next) break;
+          // the pane shows one module per card: with nothing open on this card, turn to the next (‹ › arrows)
+          if (!next && turns < 14 && (await ev("(()=>{const a=[...document.querySelectorAll('.sh-tune-arrow[data-action=shell-tune-go]:not([disabled])')].filter(__vis).sort((x,y)=>Number(y.dataset.index)-Number(x.dataset.index))[0]; if(!a) return false; a.click(); return true})()"))) { turns++; await sleep(0.8); continue; }
+          if (!next) { note(`   tune: no open option after ${picks} picks · mods ${await ev("JSON.stringify([...document.querySelectorAll('[data-action=board-mod]')].map(e=>e.dataset.mod+'/'+e.dataset.path+':'+(e.dataset.chosen??'-')+(e.disabled?'(off)':'')+(__vis(e)?'':'(hidden)')).slice(0,12))")}`); break; }
           const [mod, path] = next.split("/");
           if (!(await sel(`[data-action=board-mod][data-mod=${mod}][data-path=${path}]`, 0.4))) break;
           picks++;
         }
-        await sleep(2);
+        // the end of the work: Kuro's lines type in first (busy), then his offer (不接) or 提交 — wait for either
+        for (let w = 0; w < 14 && !(await has("[data-action=board-keep]")) && !(await has("[data-action=board-print]:not([disabled])")); w++) await sleep(1);
         if (await has("[data-action=board-keep]")) { await sel("[data-action=board-keep]", 1.5); note("   tune: offer declined"); }
+        for (let w = 0; w < 8 && !(await has("[data-action=board-print]:not([disabled])")); w++) await sleep(1);
         note(`   tune: ${picks} picks`); await shotStep("board-tuned");
         ok = await sel("[data-action=board-print]:not([disabled])", 1.5); note(`   board: printed ${ok}`);
         await settle(); await toRoom();
       } else
       if ((await has("[data-action=task-launch]")) || (await has("[data-action=compare-pick]")) || (await has("[data-action=board-slot]")) || (await has("[data-action=shell-slot]"))) {
         // launch (author 2026-11-11): the task's opening page first (Kuro's ask was answered by settle on the row click)
-        if (await has("[data-action=task-launch]")) { await shotStep(`launch-${it.id}`); await sel("[data-action=task-launch]", 1.2); note("   launch: 开始工作"); }
         // A board task (work v2): the lock, the cards into the slots, print. BOARD=assist lets Kuro fill the rest.
         await shotStep(`board-${it.id}`);
         const lock = board?.given?.lock ?? null;
@@ -396,10 +401,14 @@ for (const it of ITEMS) {
         const ide = !compare && board?.view === "ide" && (await has("[data-action=shell-slot]"));
         if (compare) {
           for (const sl of slots) {
-            const pick = process.env.BOARD === "assist" ? await sel(`[data-action=compare-kuro][data-slot=${sl.id}]`, 1.6) : await sel(`[data-action=compare-pick][data-slot=${sl.id}][data-card=${sl.answer}]`, 1.6);
-            note(`   compare ${sl.id}: picked ${pick}`); await shotStep(`compare-${sl.id}`);
+            await shotStep(`choose-${sl.id}`);
+            const pick = await sel(`[data-action=compare-pick][data-slot=${sl.id}][data-card=${process.env.BOARD === "wrong" ? (board.compare.pages.find((p) => p.slot === sl.id).left === sl.answer ? board.compare.pages.find((p) => p.slot === sl.id).right : board.compare.pages.find((p) => p.slot === sl.id).left) : sl.answer}]`, 1.8);
+            await sleep(2.2); await shotStep(`result-${sl.id}`);   // Kuro renders (0.9 s), then the page loads
+            const next = await sel("[data-action=compare-next]", 1.2);   // the result screen: 下一页 / 看结算
+            note(`   compare ${sl.id}: picked ${pick} · next ${next}`);
           }
-          if (await has("[data-action=compare-redo]")) { await sel("[data-action=compare-redo]", 1.6); note("   compare: redo by Kuro"); }
+          await shotStep("settle");
+          if (await has("[data-action=compare-redo]")) { await sel("[data-action=compare-redo]", 1.6); note("   compare: redo by Kuro"); await shotStep("settle-redone"); }
         } else
         if (ide && process.env.BOARD !== "assist") {
           for (const sl of slots) {
@@ -451,9 +460,16 @@ for (const it of ITEMS) {
       await settle(); await toRoom();
     }
     else if (it.done === "event:openBox") { ok = await openBox(); }
-    else if (it.done === "event:reply:boss") {
-      await toTingTalk(); ok = await sel("[data-action=conv][data-conv=boss]", 1.5);
-      const picked = await sel("[data-action=chip][data-word=received]", 1) || await sel("[data-action=chip][data-word=fine]", 1); const sent = await sel("[data-action=send]", 2);
+    else if (/^event:reply:/.test(it.done)) {
+      // a reply to anyone (day 2: 回小张, author 2026-11-12): the thread, a chip, 发送
+      const who = it.done.slice("event:reply:".length);
+      // Vivi's lock (G5) refuses the send until her page of the day is opened: her pages first, and once more if the send was refused.
+      await toTingTalk(); await interrupts(); await toTingTalk(); ok = await sel(`[data-action=conv][data-conv=${who}]`, 1.5);
+      let picked = await sel("[data-action=chip][data-word=received]", 1) || await sel("[data-action=chip][data-word=fine]", 1); let sent = await sel("[data-action=send]", 2);
+      // The lock's refusal lands on her conversation (viviRefuse), where her page's bubble is: if interrupts() opens a page now, the send was refused: once more.
+      const docsBefore = globalThis.__docsOpened?.[day]?.size ?? 0;
+      await sleep(0.8); await interrupts();
+      if ((globalThis.__docsOpened?.[day]?.size ?? 0) > docsBefore) { note("   reply: refused by Vivi's lock; her page opened, sending again"); await toTingTalk(); ok = await sel(`[data-action=conv][data-conv=${who}]`, 1.5); picked = await sel("[data-action=chip][data-word=received]", 1) || await sel("[data-action=chip][data-word=fine]", 1); sent = await sel("[data-action=send]", 2); note(`   reply again: conv ${ok} chip ${picked} sent ${sent} · chips ${await ev("[...document.querySelectorAll('[data-action=chip]')].filter(__vis).map(b=>b.dataset.conv+':'+b.dataset.word).join(',')")} · sendBtns ${await ev("JSON.stringify([...document.querySelectorAll('[data-action=send]')].filter(__vis).map(b=>b.dataset.conv+(b.disabled?'(off)':'')))")} · dlg ${(await ev("[...document.querySelectorAll('.dlg .txt')].map(x=>x.innerText).join('|')")||'').slice(0,80)} · text ${(await text()).slice(0, 200)}`); }
       if (process.env.DIAG) { await shotStep("reply-sent"); note(`   reply: conv ${ok} chip ${picked} sent ${sent} · chips ${await ev("[...document.querySelectorAll('[data-action=chip]')].filter(__vis).map(b=>b.dataset.word).join(',')")} · inner ${(await text()).slice(0, 120)}`); }
       ok = ok && picked && sent; await settle(); await toRoom();
     }

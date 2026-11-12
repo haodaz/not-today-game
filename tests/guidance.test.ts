@@ -236,7 +236,7 @@ describe("G7 · a board task's page (2026-11-08)", () => {
     const out = r.out();
     // over the whole stage, not inside the monitor (author 2026-11-11 night)
     // author 2026-11-12: a picture edge to edge, no card: the day tag, the bust, its motif (day 1: 老王's jargon fanned behind him)
-    expect(out).toContain('<div class="launch-layer motif-fan" role="dialog"');
+    expect(out).toContain('<div class="launch-layer motif-fan tone-burst" role="dialog"');
     expect(out).toContain('<div class="tl-tag">');
     expect(out).toContain('<img class="tl-who" src="/npc/boss.png"');
     expect(out).toContain('class="tl-fan-bub ring0"');

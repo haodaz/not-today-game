@@ -223,7 +223,8 @@
             "Build the mood",
             "Those ranks are not the company's"
           ]
-        }
+        },
+        "tone": "burst"
       }
     },
     {

@@ -222,7 +222,8 @@
             "Sleep is an attitude",
             "It's only this week"
           ]
-        }
+        },
+        "tone": "night"
       }
     },
     {

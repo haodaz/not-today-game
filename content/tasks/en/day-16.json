@@ -223,7 +223,8 @@
             "Any sound will do",
             "Don't stop, don't stop"
           ]
-        }
+        },
+        "tone": "night"
       }
     },
     {
