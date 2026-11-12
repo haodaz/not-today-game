@@ -235,7 +235,11 @@ export function object(state: State, events: readonly GameEvent[], session: Sess
     // over its panel — one drawing of each object in the hand, whatever the mode.
     // lock-by-device in the room (2026-11-10): a face lock's code is read where the device shows it
     // (the window, say) — 就按它显示的填 under the device here too; the 老物件栏 modal draws its own.
-    const footer = using && !session.objbarOpen ? readFooter(state, events, session, id, nowMs) : null;
+    const read = using && !session.objbarOpen ? readFooter(state, events, session, id, nowMs) : null;
+    // chick-raising R3: how its three keys work, a small caption under it (not a Kuro line); not
+    // once Kuro has it (then nothing pressed does anything).
+    const caption = using && id === "chick" && !upgraded && hasString("obj.chick.caption") ? html`<p class="dev-caption">${tr("obj.chick.caption")}</p>` : null;
+    const footer = read || caption ? html`${read}${caption}` : null;
     const device = renderDevice(id, state, session, env.level, nowMs, open === true, p, footer)!;
     return html`<div class="${cls("held", "obj", "device", upgraded && "upgraded", using && "using", using && "focus", faint && "faint")}" data-object="${id}" data-mode="${using ? "using" : "holding"}" data-face="${session.hand.face}"${attrs}><div class="breathe"><div class="turn"><div class="face front device-face">${device}</div></div></div></div>`;
   }

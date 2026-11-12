@@ -1,8 +1,10 @@
 // An object's screen program (objects-in-hand FR2): a pure reducer over key presses and a draw at
 // the object's channel. What a screen shows is derived from (day, dream level, upgraded, key
-// presses this session); nothing here writes world events. Outputs are presentation only: a sound,
-// a sequence for the dialogue box (the tape's recordings), or taking the tape's sequence back.
+// presses this session); nothing here writes world events. Outputs are a sound, a sequence for the
+// dialogue box (the tape's recordings), taking the tape's sequence back, or a chick care (which
+// index.ts, not the program, turns into a `pressKey` event; chick-raising R1).
 import { dreamNights } from "@state/stages";
+import type { CareIcon, ChickStats } from "@state/chick";
 import type { PagerMessage, Recording } from "@state/hands";
 import type { SayLine } from "@state/days/table";
 import type { Frame } from "./frame";
@@ -32,10 +34,16 @@ export interface ObjectEnv {
   readonly onScreen?: boolean;
   /** tape-record R2: what the walkman caught on earlier nights, as recordings on the tape. */
   readonly sleeptalk?: readonly Recording[];
+  /** chick-raising R1: cares counted today (absent = 0). */
+  readonly careToday?: number;
+  /** chick-raising R2: the chick's stats now, for the status screen (absent = all 0). */
+  readonly stats?: ChickStats;
 }
 
 export type Out =
   | { readonly sound: string; readonly rate?: number; readonly volume?: number; readonly delay?: number }
+  /** chick-raising R1: one care; index.ts appends it as `pressKey` with key `chick:<icon>`. */
+  | { readonly care: CareIcon }
   | { readonly say: { readonly key: string; readonly lines: readonly SayLine[] } }
   | { readonly stopSay: string };
 

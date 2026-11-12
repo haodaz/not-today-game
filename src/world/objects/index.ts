@@ -1,6 +1,7 @@
 // The eight programs, and the one place that turns a key press into session changes: the program's
-// next state, the cap going down for 80 ms, the key sound, a sequence for the box. Nothing here
-// appends a world event (objects-in-hand FR1).
+// next state, the cap going down for 80 ms, the key sound, a sequence for the box. The only world
+// event appended here is a chick care (`pressKey` with `chick:<icon>`, chick-raising R1), when the
+// program returns `{ care }`; everything else stays in the session (objects-in-hand FR1).
 import type { GameEvent } from "@state/events";
 import { pagerForeign, pagerSchedule, type ForeignPage, type PagerMessage, type Recording } from "@state/hands";
 import { caughtBy, sleeptalkFileId, type SleepTalkTable } from "@state/sleeptalk";
@@ -17,6 +18,7 @@ import { camera, iccard, phone } from "./plain";
 import { dreamLevel, type ObjectEnv, type Out, type Program } from "./program";
 import { tape } from "./tape";
 import { sheetsLeft } from "@state/photos";
+import { chickStats } from "@state/chick";
 
 export const PROGRAMS: Readonly<Record<string, Program<unknown>>> = {
   chick,
@@ -79,7 +81,14 @@ export function envFor(state: State, events: readonly GameEvent[], session: Sess
     sheets: sheetsLeft(events),
     onScreen: session.view === "desktop",
     sleeptalk: id === "tape" ? sleeptalkRecordings(events, state.day) : [],
+    ...(id === "chick" ? chickEnv(events, state.day) : {}),
   };
+}
+
+/** chick-raising R1 / R2: today's care count and the stats, from the log. */
+function chickEnv(events: readonly GameEvent[], day: number): Pick<ObjectEnv, "careToday" | "stats"> {
+  const { today, atk, def, hp, spd } = chickStats(events, day);
+  return { careToday: today, stats: { atk, def, hp, spd } };
 }
 
 /**
@@ -142,6 +151,9 @@ export function pressKey(ctx: ActionContext, id: string, key: string, opts: { re
       session.dialogue = push(session.dialogue, { key: o.say.key, lines: o.say.lines, ending: { kind: "none" } });
     } else if ("stopSay" in o) {
       session.dialogue = dropSequences(session, o.stopSay);
+    } else if ("care" in o) {
+      // chick-raising R1: the one world event a program's output makes; stats are derived from it.
+      store.appendEvent({ kind: "pressKey", key: `${id}:${o.care}` });
     }
   }
   return out;

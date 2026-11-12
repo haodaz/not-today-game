@@ -4,7 +4,9 @@
 import { hash, jitter, unit } from "@state/seed";
 import { Bits, finer, type Frame } from "./frame";
 import { CHICK_H, CHICK_ICONS, CHICK_W, chickFrames, ICON_SIZE, type ChickFrameId, type ChickFrames, type ChickIcon } from "./frames";
-import { SEMITONE, step, type ObjectEnv, type Program } from "./program";
+import { SEMITONE, step, type ObjectEnv, type Out, type Program } from "./program";
+import { CARES_PER_DAY, isCareIcon, STAT_ORDER, type ChickStat } from "@state/chick";
+import { hasString, t } from "@world/i18n";
 import { NO_PRESS, pressed, upgradedHi, type KuroPress } from "./taken";
 
 export const CHICK_IDLE_MS = 2_000;
@@ -34,7 +36,17 @@ export interface ChickState {
   readonly born: number;
   /** Kuro's press tracker (object-upgrade 2026-11-03): its own counter and last-press time. */
   readonly press: KuroPress;
+  /** chick-raising R3: the player's 「今天只能做这么多了。」 has played today (the state is per day). */
+  readonly fullSaid?: boolean;
 }
+
+/** chick-raising R2: the status screen's rows (4 px each), the bar's start and its longest length. */
+export const STAT_ROW_H = 4;
+export const STAT_BAR_X = 10;
+export const STAT_BAR_MAX = 18;
+/** The mark at the start of each row (the icon whose care raises that stat), in STAT_ORDER. */
+const STAT_MARK: Readonly<Record<ChickStat, ChickIcon>> = { atk: "training", def: "medicine", hp: "meal", spd: "play" };
+const FULL_KEY = "obj.chick.full";
 
 /** What B does with each icon: meal eats, light goes dark, check-up shows the line; the rest nod. */
 export const ICON_ACT: Readonly<Record<ChickIcon, ChickAct>> = {
@@ -83,7 +95,16 @@ export function drawChick(s: ChickState, env: ObjectEnv, table: ChickFrames = ch
   // The new world: the same picture, smooth and in colour; it is always smiling. Once Kuro has moved
   // in, Kuro's pose fills it instead (a glimpse while on loan, only Kuro once taken; object-upgrade).
   if (env.upgraded) return upgradedHi(env, s.press, { lines: [], picture: { w: b.w, h: b.h, bits: b.bits } });
-  if (s.menu !== null && id !== "grave") {
+  if (id === "check") {
+    // chick-raising R2: the status screen is four bars (攻 防 血 敏), drawn here, no text; the
+    // menu strip is not laid over it (A brings the strip back).
+    b.rect(0, 0, b.w, b.h, 0);
+    STAT_ORDER.forEach((stat, i) => {
+      const y = i * STAT_ROW_H;
+      b.blit(table.icons.get(STAT_MARK[stat]) ?? [], 0, y);
+      b.rect(STAT_BAR_X, y + 1, Math.min(env.stats?.[stat] ?? 0, STAT_BAR_MAX), 2, 1);
+    });
+  } else if (s.menu !== null && id !== "grave") {
     CHICK_ICONS.forEach((icon, i) => {
       const x = i * ICON_SIZE;
       b.rect(x, 0, ICON_SIZE, ICON_SIZE, 0);
@@ -113,8 +134,16 @@ export const chick: Program<ChickState> = {
         return step({ ...s, menu: s.menu === null ? 0 : (s.menu + 1) % CHICK_ICONS.length, act: null });
       case "B": {
         if (s.menu === null) return step(s);
-        const kind = ICON_ACT[CHICK_ICONS[s.menu]!];
-        return step({ ...s, act: { kind, at: env.t } }, { sound: BEEP, rate: SEMITONE, delay: CHICK_SUCCESS_DELAY_MS });
+        const icon = CHICK_ICONS[s.menu]!;
+        const acted = { ...s, act: { kind: ICON_ACT[icon], at: env.t } };
+        const beep: Out = { sound: BEEP, rate: SEMITONE, delay: CHICK_SUCCESS_DELAY_MS };
+        if (!isCareIcon(icon)) return step(acted, beep);
+        // chick-raising R1 / R2: under today's cap a stat icon is a care (index.ts logs it) and
+        // beeps; past it the animation still plays, with the key sound only, and the player's own
+        // line comes once that day (R3).
+        if ((env.careToday ?? 0) < CARES_PER_DAY) return step(acted, { care: icon }, beep);
+        if (s.fullSaid || !hasString(FULL_KEY)) return step(acted);
+        return step({ ...acted, fullSaid: true }, { say: { key: `d${env.day}:${FULL_KEY}`, lines: [{ k: "inner", t: t(FULL_KEY) }] } });
       }
       case "C":
         return step({ ...s, menu: null, act: null });

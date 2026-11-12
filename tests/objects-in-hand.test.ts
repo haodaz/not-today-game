@@ -875,7 +875,8 @@ describe("programs (FR2, FR3)", () => {
       expect(s.act?.kind).toBe(ICON_ACT[icon]);
       frames[icon] = ascii(drawChick(s, { ...e, t: 150 }, table) as PixelFrame);
     });
-    expect(chick.key(press(chick, ["A"], e), "B", e).out).toEqual([{ sound: "chick-beep", rate: SEMITONE, delay: 120 }]);
+    // chick-raising R1: B on 喂食 is also a care (index.ts logs it).
+    expect(chick.key(press(chick, ["A"], e), "B", e).out).toEqual([{ care: "meal" }, { sound: "chick-beep", rate: SEMITONE, delay: 120 }]);
     expect(press<ChickState>(chick, ["A", "B", "C"], e)).toMatchObject({ menu: null, act: null });
     expect(frames).toMatchSnapshot();
   });

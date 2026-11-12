@@ -2557,3 +2557,13 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
   - Updated for the new rules: dialogue, kuro-chat, kuro-taboo, upgrades, loop-engine, loop-hud, nightfall, saves, splat, title.
 - Snapshots: 7 stale, not edited (listed in the report). I removed one snapshot entry that vitest wrote while a test title was briefly renamed.
 - `npx tsc --noEmit`: clean. `npx vitest run`: 121 files, 2094 passed, 7 failed (the stale snapshots only).
+
+## 2026-11-11 · chick-raising R1–R4
+
+- R1: new `src/state/chick.ts`. `chickStats(events, day)` returns `{atk, def, hp, spd, today}` from `pressKey` events whose key is `chick:<icon>`. meal → hp, play → spd, training → atk, medicine → def. At most 10 count per day (`CARES_PER_DAY`), checked again in the derivation itself. No reducer change: `pressKey` stays a no-op kind.
+- `Out` gains `{ care: CareIcon }`. `ObjectEnv` gains `careToday?` and `stats?`; `envFor` fills both for the chick only. `pressKey` in `objects/index.ts` turns `{ care }` into `store.appendEvent({ kind: "pressKey", key: "chick:<icon>" })`. The chick program appends nothing itself.
+- R2: chick B on a stat icon under the cap returns `{care}` plus the success beep. Past the cap it returns no care and no success beep; the act (animation) still plays, and the cap's key sound stays. The `check` frame is now drawn in code: per stat a 4-px row, the icon tile at x 0, a 2-px bar of min(stat, 18) at x 10. The menu strip is not laid over it. Upgraded: unchanged (the early return).
+- R3: the room's 使用 footer is the lock read footer (if any) plus `<p class="dev-caption">` with `obj.chick.caption`, hidden when upgraded. The CSS is in devices.css. The 11th-care line `obj.chick.full` (`k: "inner"`, key `d{day}:obj.chick.full`) is pushed once a day; the memo is `ChickState.fullSaid`, which is per session and per day.
+- R4: `tests/chick-raising.test.ts`. objects-in-hand: the B-out assertion now includes `{care: "meal"}`, and the `checkup` entry in its snapshot was rewritten by hand to the bars frame (the old content `check` frame is no longer drawn).
+- Not run: `npm run -s validate` (shell limited to tsc and vitest this task).
+- `npx tsc --noEmit`: clean. `npx vitest run`: 146 files, 2314 passed. One obsolete snapshot reported in desk-prints.test.ts; it was already there and is not from this change.
