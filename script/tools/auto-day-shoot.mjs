@@ -231,8 +231,20 @@ const gather = async (card) => {
   const from = card.from; if (!from || from.call) return true;
   // A meeting card is heard in the board's own meeting: open the task page, let it play (fast=1: 0.3 s a line).
   if (from.meeting) { await toWorkbench(); await goHome(); await sel(`[data-action=wb-nav][data-page='task:${currentTaskId}']`, 1.2); for (let i = 0; i < 4 && !(await has("[data-action=meeting-play]")); i++) await sleep(0.5); await sel("[data-action=meeting-play]", 0.3); await sleep(9); return true; }
-  if (from.conv) { if ((await ev("JSON.stringify(__choices())").then(JSON.parse)).length) await settle(); await toTingTalk(); const ok = await sel(`[data-action=conv][data-conv=${from.conv}]`, 1.2); if (!ok && process.env.DIAG) note(`   gather: conv ${from.conv} not clickable · convs ${await ev("JSON.stringify([...document.querySelectorAll('[data-action=conv]')].map(e=>e.dataset.conv+(__vis(e)?'':'(hidden)')))")} · dlg ${(await ev("[...document.querySelectorAll('.dlg .txt')].map(x=>x.innerText).join('|')")||'').slice(0,60)}`); return ok; }
+  if (from.conv) { if ((await ev("JSON.stringify(__choices())").then(JSON.parse)).length) await settle(); await toTingTalk(); let ok = await sel(`[data-action=conv][data-conv=${from.conv}]`, 1.2);
+    // the door's ask (外卖到了) can come up on the way: answer it, then once more
+    if (!ok && (await ev("JSON.stringify(__choices())").then(JSON.parse)).length) { await settle(); await toTingTalk(); ok = await sel(`[data-action=conv][data-conv=${from.conv}]`, 1.2); } if (!ok && process.env.DIAG) note(`   gather: conv ${from.conv} not clickable · convs ${await ev("JSON.stringify([...document.querySelectorAll('[data-action=conv]')].map(e=>e.dataset.conv+(__vis(e)?'':'(hidden)')))")} · dlg ${(await ev("[...document.querySelectorAll('.dlg .txt')].map(x=>x.innerText).join('|')")||'').slice(0,60)}`); return ok; }
   const folder = folderOf(from.file);
+  if (!folder) {
+    // a page posted in a thread (Vivi's PRD, her plans): its 打开 bubble in the conversation that holds it
+    await toTingTalk();
+    for (const conv of ["group", "partner", "boss", "xiaozhang", "laozhou"]) {
+      if ((await ev("JSON.stringify(__choices())").then(JSON.parse)).length) { await settle(); await toTingTalk(); }
+      await sel(`[data-action=conv][data-conv=${conv}]`, 0.8);
+      if (await has(`[data-action=open-deliverable][data-doc="${from.file}"]`)) { const ok = await sel(`[data-action=open-deliverable][data-doc="${from.file}"]`, 2); await shotStep("deliverable"); await key("Escape"); await sleep(0.8); return ok; }
+    }
+    return false;
+  }
   if (folder) {
     await toDesktop(); await readLines();
     // the 文件 icon is on the left monitor's desktop
