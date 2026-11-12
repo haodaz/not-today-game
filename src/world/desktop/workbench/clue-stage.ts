@@ -42,7 +42,7 @@ export function clueStage(c: { state: State; events: readonly GameEvent[]; sessi
   const artStyle = art ? html` style="--art:url('${art}')"` : null;
 
   // work-stages-polish 1: 整理好了 shows the settlement sheet instead of the board
-  if (settling(session, day, task)) return settleSheet(state, task, board, s, who, found, session.chain?.key === task.id ? session.chain : null);
+  if (settling(session, day, task)) return settleSheet(state, task, board, s, who, found, session.chain?.key === task.id ? session.chain : null, session.reducedMotion);
 
   // ——— the top: who asked, how many of the demands are answered
   const top = html`<header class="cs-top"><div class="cs-who">${portrait ? html`<img class="cs-av" src="${portrait}" alt="">` : null}<div class="cs-title"><span class="cs-kick">${S("clue.stage.kick")}</span><h2>${S("clue.stage.title", { who: name })}</h2></div></div><div class="cs-count"><span>${S("clue.stage.count", { n: String(done), total: String(board.slots.length) })}</span><div class="cs-pips">${board.slots.map((x) => html`<i class="${cls("cs-pip", x.id in s.slots && "on")}"></i>`)}</div></div></header>`;

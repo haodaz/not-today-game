@@ -38,7 +38,7 @@ export function settleButton(printable: boolean): SafeHtml {
  * approval-chain day the chain beside it with each rank's stamp. `who` is the counterpart (null: no
  * portrait, no "going to" line); `found` the clippings found; `chain` the 2048 grid, if it is still up.
  */
-export function settleSheet(state: State, task: Task, board: TaskBoard, s: BoardState, who: string | null, found: ReadonlySet<string> = new Set(), chain: { readonly cells: readonly number[]; readonly moves: number } | null = null): SafeHtml {
+export function settleSheet(state: State, task: Task, board: TaskBoard, s: BoardState, who: string | null, found: ReadonlySet<string> = new Set(), chain: { readonly cells: readonly number[]; readonly moves: number } | null = null, reduced = false): SafeHtml {
   const fill = (x: string) => fillPlaceholders(x, state.names);
   const portrait = who ? npcPortrait(who) : null;
   const kick = who ? S("sheet.settle.kick", { who: whoName(who, state) }) : "";
@@ -67,9 +67,11 @@ export function settleSheet(state: State, task: Task, board: TaskBoard, s: Board
     const steps = st.ranks.map((r, i) => {
       const egg = r.silhouette && i > reached;
       const state_ = i <= reached ? "done" : i === reached + 1 ? "next" : "wait";
-      return html`<li class="${cls("af-step", state_, r.silhouette && "egg")}"><img src="${r.img}" alt=""><span class="af-rank">${egg ? "?" : r.name}</span><span class="af-stamp">${i <= reached ? S("settle.flow.stamp") : S("settle.flow.wait")}</span></li>`;
+      // settle-polish 1: each stamp comes down in turn from the bottom rank up (`--i` is its place)
+      const at = i <= reached ? html` style="--i:${String(i)}"` : null;
+      return html`<li class="${cls("af-step", state_, r.silhouette && "egg")}"${at}><img src="${r.img}" alt=""><span class="af-rank">${egg ? "?" : r.name}</span><span class="af-stamp">${i <= reached ? S("settle.flow.stamp") : S("settle.flow.wait")}</span></li>`;
     });
-    effect = html`${sheet}<aside class="af"><span class="af-title">${S("settle.flow.title")}</span><ol class="af-steps">${steps}</ol></aside>`;
+    effect = html`${sheet}<aside class="${cls("af", reduced && "reduced")}"><span class="af-title">${S("settle.flow.title")}</span><ol class="af-steps">${steps}</ol></aside>`;
   }
   return settleLayer({ kind: board.stack ? "flow" : "sheet", portrait, kick, title: fill(board.title), record, effect, actions: html`${back}${print}` });
 }

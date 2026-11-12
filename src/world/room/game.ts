@@ -80,7 +80,7 @@ import { boardActions, lockFaceMove } from "@world/desktop/workbench/board";
 import { enterUse, facingOf, lampLit, placeOf, recWorksHere, REC_WORKS, worksHere } from "@world/objects/works";
 import { canSkipPrologue, endPrologue, prologueDone, prologueOn, prologueShowing, renderPrologue } from "@world/opening";
 import { openWork, workActions } from "@world/desktop/workbench/work";
-import { renderFiles } from "@world/desktop/files/view";
+import { eggFlash, renderFiles } from "@world/desktop/files/view";
 import { openObjectFromBar, renderObjectBarUse } from "@world/desktop/workbench/objbar";
 import { filesActions, openFilesApp } from "@world/desktop/files/actions";
 import { callActions, resumeCall } from "@world/desktop/call/actions";
@@ -131,7 +131,7 @@ function renderGameBody(store: Store, session: Session, nowMs: number): SafeHtml
     // screen (the pet in the monitor is the one); R5 (2026-11-08): the checklist's current line in
     // the top bar, not a card over the window (the window fills the frame; a card hid 听听's list).
     const lc = loopContext(state, events);
-    return html`${renderDesktop({ ...shell, nextItem: lc ? nextItemText(checklist(lc)) : null })}${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${host}${launchLayer(state, session)}${workLayer({ state, events, session, nowMs, startDay: store.getStartDay() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${dlgLayer(dlg, session, readsOn, !maskInModal)}<div class="hud-host">${itemsButton(session, state)}${itemsPanel(state, events, session)}${settingsPanel(session)}</div>`;
+    return html`${renderDesktop({ ...shell, nextItem: lc ? nextItemText(checklist(lc)) : null })}${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${host}${launchLayer(state, session)}${workLayer({ state, events, session, nowMs, startDay: store.getStartDay() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${eggFlash(session, nowMs)}${dlgLayer(dlg, session, readsOn, !maskInModal)}<div class="hud-host">${itemsButton(session, state)}${itemsPanel(state, events, session)}${settingsPanel(session)}</div>`;
   }
   // The box does not jump (dialogue correction 2026-11-02): in every view it is anchored to the
   // viewport in the same fixed layer, not to the stage (whose size differs between views). The

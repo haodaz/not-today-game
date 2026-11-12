@@ -650,6 +650,8 @@
    frame, the error cascade, the hand's blood variant (public/npc/hand_blood.png; absent = nothing). */
 .taboo-blur{position:fixed;inset:0;z-index:25;pointer-events:none;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
 .taboo-flash{position:fixed;inset:0;z-index:90;background:#fff;pointer-events:none}
+/* old-folder-egg R2: the black beat after 旧工作's picture, above the taboo flash; it takes the clicks */
+.egg-flash{position:fixed;inset:0;z-index:95;background:#000}
 .taboo-errors{position:fixed;inset:0;z-index:60}
 .taboo-errors .err-dlg{position:absolute;width:320px;background:#f4f5f7;border:1px solid #c9ced6;border-radius:8px;box-shadow:0 12px 30px rgba(0,0,0,.35);font:13px "PingFang SC","Hiragino Sans GB",sans-serif;color:#1d2129;overflow:hidden}
 .taboo-errors .err-dlg .bar{display:flex;gap:8px;align-items:center;padding:12px 14px;min-height:44px}

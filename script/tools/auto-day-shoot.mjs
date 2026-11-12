@@ -4,6 +4,8 @@
 import { spawn } from "node:child_process";
 import fs from "node:fs";
 const [dayArg, lang = "zh", shotdir = "."] = process.argv.slice(2);
+// replay-driver-day2 1: shotStep writes here; a missing folder threw ENOENT on the first shot.
+fs.mkdirSync(shotdir, { recursive: true });
 let day = Number(dayArg);
 const LAST = Number(process.env.UNTIL || dayArg); // UNTIL=6: keep playing day after day in the same page (real flags carry over)
 const ROOT = process.env.PLAY_ROOT || "/Users/aisandbox/Documents/holloween/not-today-game";
@@ -46,6 +48,7 @@ window.__sel = (s) => { const el=[...document.querySelectorAll(s)].find(e=>__vis
 window.__has = (s) => [...document.querySelectorAll(s)].some(e=>__vis(e));
 window.__text = () => (document.body.innerText||'').replace(/\\s+/g,' ');
 window.__choices = () => [...document.querySelectorAll('[data-action=loop-choice]')].filter(__vis).map(__txt);
+window.__events = () => { try { const find = (o, d = 0) => !o || typeof o !== 'object' || d > 4 ? null : Array.isArray(o.events) ? o.events : Object.values(o).map((v) => find(v, d + 1)).find(Boolean) || null; return find(JSON.parse(localStorage.getItem('nt_run') || 'null')) || []; } catch { return []; } };
 `;
 await send("Page.enable"); await send("Runtime.enable");
 await send("Emulation.setDeviceMetricsOverride", { width: 1600, height: 900, deviceScaleFactor: process.env.HIRES ? 2 : 1, mobile: false });
@@ -277,6 +280,26 @@ for (let pass = 0; pass < ITEMS.length; pass++) {
   if (i < 0) break;
   const [it] = ITEMS.splice(i, 1); const j = ITEMS.findIndex((x) => x.id === /^done:(\w+)$/.exec(it.unlock)[1]); ITEMS.splice(j + 1, 0, it);
 }
+// replay-driver-day2 2: the story clock (lunch eaten → 13:30, each task +90 min) means a work day goes
+// boot → msgs → replies and the order → the tasks → pickup → eat → the rest. A stable reorder: each
+// `flag:` task item listed after an `event:pickup:*` item moves to just before it — but only when what
+// unlocks it is already before the pickup (`start`, or `done:<id>` of an earlier item; an event unlock
+// or a chain through the pickup keeps it where it is, since it could not be taken yet).
+{
+  const unlockOk = (x, before) => { if (!x.unlock || x.unlock === "start") return true; const m = /^done:(\w+)$/.exec(x.unlock); return !!m && before.has(m[1]); };
+  for (let p = 0; p < ITEMS.length; p++) {
+    if (!/^event:pickup:/.test(ITEMS[p].done)) continue;
+    const before = new Set(ITEMS.slice(0, p).map((x) => x.id));
+    for (let k = p + 1; k < ITEMS.length; k++) {
+      const x = ITEMS[k];
+      if (!/^flag:task/.test(x.done) || !unlockOk(x, before)) continue;
+      ITEMS.splice(k, 1); ITEMS.splice(p, 0, x); before.add(x.id); p++;
+      note(`(order: ${x.id} before ${ITEMS[p].id})`);
+    }
+  }
+  const held = ITEMS.filter((x, k) => /^flag:task/.test(x.done) && ITEMS.slice(0, k).some((y) => /^event:pickup:/.test(y.done)));
+  if (held.length) note(`(order: ${held.map((x) => `${x.id} (unlock ${x.unlock})`).join(", ")} stay after the pickup: what unlocks them comes after it)`);
+}
 for (const it of ITEMS) {
   currentTaskId = it.id;
   const [kind, ...rest] = it.done.split(":"); const what = rest.join(":");
@@ -469,9 +492,12 @@ for (const it of ITEMS) {
       }
     }
     else if (it.done === "event:pickup:lunch" || it.done === "event:pickup:dinner") {
+      // replay-driver-day2 2: watch the door (the doorbell pulls the camera there and 拿进来 shows; the
+      // item listed means it has arrived) instead of a fixed 160 s; give up after 60 s.
       await toRoom(); let bell = false;
-      for (let i = 0; i < 32 && !bell; i++) { if ((await text()).includes(it.text)) bell = true; else { await sleep(5); await key(" "); } }
-      if (!bell) note("   never unlocked (no arrival in 160 s)");
+      const atDoor = async () => (await has("[data-action=loop-door]")) || /door-view/.test((await ev("document.querySelector('.stage')?.className")) || "") || (await text()).includes(it.text);
+      for (let i = 0; i < 60 && !bell; i++) { if (await atDoor()) bell = true; else { await sleep(1); if (i % 5 === 4) await key(" "); } }
+      if (!bell) note("   never unlocked (no arrival in 60 s)");
       await sel("[data-action=view][data-view=door]", 2.5); await settle();
       if (!bell && (await text()).includes(it.text)) note("   NOTE: arrival only fired on the view change, not on the timer");
       let steps = 0; while (steps < 6 && (await sel("[data-action=loop-door]", 2))) { steps++; await settle(); }
@@ -494,13 +520,29 @@ for (const it of ITEMS) {
       const who = it.done.slice("event:reply:".length);
       // Vivi's lock (G5) refuses the send until her page of the day is opened: her pages first, and once more if the send was refused.
       await toTingTalk(); await interrupts(); await toTingTalk(); ok = await sel(`[data-action=conv][data-conv=${who}]`, 1.5);
-      let picked = await sel("[data-action=chip][data-word=received]", 1) || await sel("[data-action=chip][data-word=fine]", 1); let sent = await sel("[data-action=send]", 2);
+      // which chip was clicked (the report names it when the reply is not in the log)
+      const pickChip = async () => ((await sel("[data-action=chip][data-word=received]", 1)) ? "received" : (await sel("[data-action=chip][data-word=fine]", 1)) ? "fine" : null);
+      let word = await pickChip(); let picked = word !== null; let sent = await sel("[data-action=send]", 2);
       // The lock's refusal lands on her conversation (viviRefuse), where her page's bubble is: if interrupts() opens a page now, the send was refused: once more.
       const docsBefore = globalThis.__docsOpened?.[day]?.size ?? 0;
       await sleep(0.8); await interrupts();
-      if ((globalThis.__docsOpened?.[day]?.size ?? 0) > docsBefore) { note("   reply: refused by Vivi's lock; her page opened, sending again"); await toTingTalk(); ok = await sel(`[data-action=conv][data-conv=${who}]`, 1.5); picked = await sel("[data-action=chip][data-word=received]", 1) || await sel("[data-action=chip][data-word=fine]", 1); sent = await sel("[data-action=send]", 2); note(`   reply again: conv ${ok} chip ${picked} sent ${sent} · chips ${await ev("[...document.querySelectorAll('[data-action=chip]')].filter(__vis).map(b=>b.dataset.conv+':'+b.dataset.word).join(',')")} · sendBtns ${await ev("JSON.stringify([...document.querySelectorAll('[data-action=send]')].filter(__vis).map(b=>b.dataset.conv+(b.disabled?'(off)':'')))")} · dlg ${(await ev("[...document.querySelectorAll('.dlg .txt')].map(x=>x.innerText).join('|')")||'').slice(0,80)} · text ${(await text()).slice(0, 200)}`); }
+      if ((globalThis.__docsOpened?.[day]?.size ?? 0) > docsBefore) { note("   reply: refused by Vivi's lock; her page opened, sending again"); await toTingTalk(); ok = await sel(`[data-action=conv][data-conv=${who}]`, 1.5); word = await pickChip(); picked = word !== null; sent = await sel("[data-action=send]", 2); note(`   reply again: conv ${ok} chip ${picked} sent ${sent} · chips ${await ev("[...document.querySelectorAll('[data-action=chip]')].filter(__vis).map(b=>b.dataset.conv+':'+b.dataset.word).join(',')")} · sendBtns ${await ev("JSON.stringify([...document.querySelectorAll('[data-action=send]')].filter(__vis).map(b=>b.dataset.conv+(b.disabled?'(off)':'')))")} · dlg ${(await ev("[...document.querySelectorAll('.dlg .txt')].map(x=>x.innerText).join('|')")||'').slice(0,80)} · text ${(await text()).slice(0, 200)}`); }
       if (process.env.DIAG) { await shotStep("reply-sent"); note(`   reply: conv ${ok} chip ${picked} sent ${sent} · chips ${await ev("[...document.querySelectorAll('[data-action=chip]')].filter(__vis).map(b=>b.dataset.word).join(',')")} · inner ${(await text()).slice(0, 120)}`); }
-      ok = ok && picked && sent; await settle(); await toRoom();
+      // replay-driver-day2 3: the step ends with the reply:<who> event in the log, else it says which
+      // chip it clicked and what the box showed (once more after reading the box through, if missing).
+      // (a ?day=N debug run is never saved, so __events() is empty there: then the checklist's word is what we have)
+      const replied = () => ev(`(() => { const es = __events(); return es.length === 0 ? true : es.some((e) => e.kind === "reply" && e.recipient === ${JSON.stringify(who)} && e.day === ${day}); })()`);
+      let logged = false; for (let w = 0; w < 6 && !(logged = await replied()); w++) await sleep(0.5);
+      if (!logged) {
+        const box = (await ev("[...document.querySelectorAll('.dlg .txt')].map(x=>x.innerText).join('|')")) || "";
+        note(`   reply: no reply:${who} event after sending · chip clicked ${word ?? "none"} · sent ${sent} · box "${box.slice(0, 120)}"`);
+        await settle(); await toTingTalk(); await sel(`[data-action=conv][data-conv=${who}]`, 1.5);
+        word = await pickChip(); picked = word !== null; sent = await sel("[data-action=send]", 2);
+        for (let w = 0; w < 6 && !(logged = await replied()); w++) await sleep(0.5);
+        if (!logged) note(`   reply: still no reply:${who} event · chip clicked ${word ?? "none"} · chips ${await ev(`[...document.querySelectorAll('[data-action=chip]')].filter(__vis).map(b=>b.dataset.conv+':'+b.dataset.word).join(',')`)} · box "${(((await ev("[...document.querySelectorAll('.dlg .txt')].map(x=>x.innerText).join('|')")) || "")).slice(0, 120)}"`);
+      }
+      note(`   reply: reply:${who} ${logged ? "in the log" : "NOT in the log"}`);
+      ok = ok && logged; await settle(); await toRoom();
     }
     else if (it.done === "event:loan:decided") { await toRoom(); await settle(); ok = true; }
     else if (it.done === "event:beat:desk") { await toRoom(); ok = await sel("[data-action=view][data-view=desk]", 2.5); await settle(); await toRoom(); }

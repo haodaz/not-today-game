@@ -4,13 +4,17 @@
 // the lines and the bodies are all content. A file is listed from its `from` day, and after its
 // optional `afterFlag` (a game flag) or `afterOpen` (a Vivi deliverable the player has opened).
 import raw from "@content/files.json";
+import rawEgg from "@content/files-egg.json";
+import type { GameEvent } from "./events";
 import { parseLine, type SayLine } from "./days/table";
 
 /** What a file shows when opened: a task document, an html page, or plain lines. */
 export type FileBody =
   | { readonly kind: "doc"; readonly ref: string }
   | { readonly kind: "html"; readonly src: string }
-  | { readonly kind: "text"; readonly lines: readonly string[] };
+  | { readonly kind: "text"; readonly lines: readonly string[] }
+  /** old-folder-egg: a picture (only in content/files-egg.json's folder). */
+  | { readonly kind: "image"; readonly src: string };
 
 export interface FileEntry {
   readonly id: string;
@@ -41,6 +45,11 @@ export interface BinEntry extends FileEntry {
 
 export interface FilesData {
   readonly folders: readonly Folder[];
+  /**
+   * old-folder-egg: 旧工作, from content/files-egg.json — not in `folders` (nothing that walks the
+   * three folders sees it). Listed from its `from` day until any of its files is opened.
+   */
+  readonly egg?: Folder & { readonly from: number };
   readonly bin: readonly BinEntry[];
   /** From this day on the bin is empty; `goneLine` is shown instead. */
   readonly gone: number;
@@ -62,6 +71,7 @@ const line = (v: unknown, w: string): SayLine => parseLine(v, w, (where, problem
 
 function body(v: unknown, w: string): FileBody {
   if (!isRecord(v)) fail(w, "must be an object");
+  if (v.kind === "image" || v.image !== undefined) fail(w, "an image body is only allowed in content/files-egg.json");
   keys(v, ["doc", "html", "text"], w);
   const forms = ["doc", "html", "text"].filter((k) => v[k] !== undefined);
   if (forms.length !== 1) fail(w, "must have exactly one of doc, html, text");
@@ -128,7 +138,63 @@ export function parseFiles(input: unknown): FilesData {
   return deepFreeze({ folders, bin, gone: day(input.gone, "gone"), goneLine: line(input.goneLine, "goneLine") });
 }
 
-export const filesData: FilesData = parseFiles(raw);
+/**
+ * old-folder-egg R1: content/files-egg.json's `folder` (旧工作), checked as strictly as files.json:
+ * `id`, `name`, `from`, and `files[]` each `id`, `name`, `date`, `body` `{ kind: "image", src }` (a
+ * path under /egg/). Its files take the folder's `from`. Ids must not clash with `taken`.
+ */
+export function parseEggFolder(input: unknown, taken: ReadonlySet<string> = new Set()): Folder & { readonly from: number } {
+  const failEgg = (where: string, problem: string): never => {
+    throw new Error(`content/files-egg.json ${where}: ${problem}`);
+  };
+  const s = (v: unknown, w: string): string => (typeof v === "string" && v !== "" ? v : failEgg(w, "expected a non-empty string"));
+  const check = (v: Raw, allowed: readonly string[], w: string) => {
+    for (const k of Object.keys(v)) if (!allowed.includes(k)) failEgg(w, `unknown key "${k}"`);
+  };
+  if (!isRecord(input)) return failEgg("", "not an object");
+  check(input, ["_", "_note", "folder"], "top level");
+  const f = input.folder;
+  if (!isRecord(f)) return failEgg("folder", "must be an object");
+  check(f, ["id", "name", "from", "files"], "folder");
+  const from = Number.isInteger(f.from) && (f.from as number) >= 1 ? (f.from as number) : failEgg("folder.from", "expected a day number >= 1");
+  if (!Array.isArray(f.files) || f.files.length === 0) failEgg("folder.files", "must be a non-empty list");
+  const ids = new Set<string>();
+  const files = (f.files as unknown[]).map((x, i): FileEntry => {
+    const w = `folder.files[${i}]`;
+    if (!isRecord(x)) return failEgg(w, "a file must be an object");
+    check(x, ["id", "name", "date", "body"], w);
+    const id = s(x.id, `${w}.id`);
+    if (ids.has(id) || taken.has(id)) failEgg(`${w}.id`, `duplicate file id "${id}"`);
+    ids.add(id);
+    const b = x.body;
+    if (!isRecord(b)) return failEgg(`${w}.body`, "must be an object");
+    check(b, ["kind", "src"], `${w}.body`);
+    if (b.kind !== "image") failEgg(`${w}.body.kind`, `expected "image"`);
+    const src = s(b.src, `${w}.body.src`);
+    if (!src.startsWith("/egg/")) failEgg(`${w}.body.src`, `expected a path under /egg/, got "${src}"`);
+    return { id, name: s(x.name, `${w}.name`), date: s(x.date, `${w}.date`), from, body: { kind: "image", src } };
+  });
+  return { id: s(f.id, "folder.id"), name: s(f.name, "folder.name"), from, files };
+}
+
+const mainFiles = parseFiles(raw);
+export const filesData: FilesData = deepFreeze({
+  ...mainFiles,
+  egg: parseEggFolder(rawEgg, new Set([...mainFiles.folders.flatMap((x) => x.files), ...mainFiles.bin].map((x) => x.id))),
+});
+
+/** old-folder-egg R2: 旧工作 is gone for the run once any of its files has been opened (the `open` log only). */
+export function eggGone(events: readonly GameEvent[], data: FilesData = filesData): boolean {
+  const egg = data.egg;
+  if (!egg) return true;
+  const targets = new Set(egg.files.map((f) => `file:${f.id}`));
+  return events.some((e) => e.kind === "open" && targets.has(e.target));
+}
+
+/** old-folder-egg R1: 旧工作 is listed on `day` (its `from` has come, and it is not gone). */
+export function eggListed(day: number, events: readonly GameEvent[], data: FilesData = filesData): boolean {
+  return data.egg !== undefined && day >= data.egg.from && !eggGone(events, data);
+}
 
 /**
  * The html page a deliverable's `doc` id opens (desktop-ui 2026-11-02): the download file whose

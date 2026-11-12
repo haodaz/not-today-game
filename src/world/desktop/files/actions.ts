@@ -4,7 +4,7 @@
 // the file's `onOpen` line once a day. Closing the window and the open file is session-only.
 import { push } from "@world/loop/dialogue";
 import type { ActionContext, ActionHandler } from "../controller";
-import { ALBUM_TAB, fileListedById, photoOpenId } from "./view";
+import { ALBUM_TAB, EGG_PICTURE_MS, eggEndMs, fileListedById, photoOpenId } from "./view";
 import { albumPhotos, DEVELOP_BLANK_MS, DEVELOP_MS, ON_THE_SPOT_DAY, photoKey, photoStage, roomFacingOf, type DevelopStage } from "@state/photos";
 import { filesData } from "@state/files";
 
@@ -58,8 +58,22 @@ export const filesActions: Record<string, ActionHandler> = {
     const file = id ? fileListedById(id, ctx.store.getEvents(), day) : undefined;
     if (!app || !id || !file) return;
     ctx.session.filesApp = { ...app, open: id };
+    // old-folder-egg R2: 旧工作's picture — the open logged here is all the state (the folder is gone
+    // from it on); the picture shows for a moment, then the black, then the window closes. No line.
+    const egg = filesData.egg?.files.some((f) => f.id === id) === true;
     // Opening a file is one `open` event (the same channel the Vivi lock reads).
     ctx.store.appendEvent({ kind: "open", target: `file:${id}`, t: ctx.session.clock.time });
+    if (egg) {
+      const at = ctx.now?.() ?? Date.now();
+      ctx.session.eggFlashAt = at;
+      ctx.later(EGG_PICTURE_MS + 16, ctx.rerender);
+      ctx.later(eggEndMs(ctx.session.reducedMotion) + 16, () => {
+        if (ctx.session.eggFlashAt !== at) return;
+        ctx.session.eggFlashAt = null;
+        ctx.session.filesApp = null;
+        ctx.rerender();
+      });
+    }
     // Its `onOpen` line plays once a day.
     const sayKey = `${day}:${id}`;
     if (file.onOpen && !ctx.session.filesSaid.has(sayKey)) {

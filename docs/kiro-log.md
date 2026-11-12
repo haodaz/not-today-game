@@ -2593,3 +2593,26 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
   - stack.test gains the swipe-direction and tile-motion cases.
 - Side effect: `script/tools/auto-day-shoot.mjs` still looks for `board-print` on these stages, and it now sits behind 整理好了. Not changed (not my area).
 - `npx tsc --noEmit`: clean. `npx vitest run`: 150 files, 2323 passed. One obsolete snapshot in desk-prints.test.ts, already there before this change.
+
+## 2026-11-13 · old-folder-egg, settle-polish 1–3, replay-driver-day2
+
+- old-folder-egg:
+  - `state/files.ts`: `parseEggFolder` reads content/files-egg.json strictly. Its errors say `content/files-egg.json`; its ids must not clash with files.json's; image sources must be under /egg/.
+  - `FileBody` gains `image`. files.json's parser refuses an image body.
+  - New `filesData.egg` (optional in the type, so `parseFiles` results stay `FilesData`), `eggGone(events)` (any `open file:<egg id>`) and `eggListed(day, events)`.
+  - `files/view.ts`: the 旧工作 tab sits after 相册 and before the bin; it stays listed through the picture/black of its one opening. Also `fileBody` renders `figure.file-image`, and there are `eggPhase` / `eggFlash` / `eggEndMs` (250 ms picture, black until 900 ms, 250 + 300 under reduced motion).
+  - `files/actions.ts` `file-open`: for an egg file it sets `eggFlashAt` and schedules a repaint at 250 ms. At the end of the beat it clears `eggFlashAt` and closes the window. `fileListedById` finds egg files only while the folder is listed, so a second open does nothing.
+  - `model.ts`: new session field `eggFlashAt`.
+  - game.ts draws `eggFlash` over the desktop. The `.egg-flash` style is in room.css (z 95) and the `.file-image` style in desktop.css.
+  - Test: `tests/files-egg.test.ts`.
+- settle-polish:
+  - 1: `settleSheet(..., reduced)`, passed from clue-stage / meeting-stage. Done `.af-step`s carry `style="--i:<rank index>"`, and `.af.reduced` turns the animation off. The CSS keyframe is `af-stamp`: 180 ms, scale 1.6 → 1, rotate into -6deg, 90 ms per step. Test: `tests/settle-polish.test.ts`.
+  - 2: `.sl-effect` has the paper ground (#EFEAE0) and `.sl-frame` is transparent until `data-loaded="1"`. The controller adds a `load` listener to each new `iframe[data-keep]` after the frame keeper's `after` (a WeakSet, so a kept node is not listened twice). Not checked in a browser.
+  - 3: stacked halves under `@media (max-width:1100px)`. A container query was tried first and dropped: `tests/shell.test.ts` requires desktop.css to have no `@container`.
+- replay-driver-day2 (`script/tools/auto-day-shoot.mjs`):
+  - `mkdirSync(shotdir)` at start.
+  - A stable reorder moves `flag:task*` items before an `event:pickup:*` when their unlock is already before it.
+  - The pickup watches the door (`loop-door`, `.stage.door-view`, the item listed) every second for 60 s.
+  - The reply step checks `__events()` (a new helper that reads nt_run) for `reply:<who>` and names the chip and the box when the event is missing.
+  - On day 2 the reorder moves nothing: content has task1 ← replyxz ← eat ← pickup. The driver was not run, because port 5180 answered 000.
+- `npx tsc --noEmit -p .`: clean. `npx vitest run`: 152 files, 2329 passed (the 1 obsolete desk-prints snapshot was already there).

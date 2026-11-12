@@ -90,6 +90,9 @@ html,body{margin:0;background:#2b2e33;font-family:var(--font);color:var(--ink);f
 .win.filesw .f-body p{margin:0 0 6px}
 .win.filesw .f-body.html{padding:0;overflow:hidden}
 .win.filesw .f-frame{width:100%;height:100%;border:0;background:#fff}
+/* old-folder-egg R1: a picture of 旧工作, fit in the pane's full height on a dark ground; no caption */
+.win.filesw .file-image{flex:1;min-height:0;margin:0;display:flex;align-items:center;justify-content:center;background:#1d2129}
+.win.filesw .file-image img{width:100%;height:100%;object-fit:contain;display:block}
 /* 相册 (camera R3): thumbnails in the list; a photo opened large, or beside the live screen with a
    thin red ring on every element whose text differs. */
 .win.filesw .ph-row{align-items:center;justify-content:flex-start}
@@ -1605,8 +1608,10 @@ span.cmp-face-btn{cursor:default}
 .sl-actions .ts-finish{background:#1d2129;color:#efe9df;border:2px solid #1d2129;font:inherit;font-size:16px;letter-spacing:.3em;text-indent:.3em;cursor:pointer}
 .sl-actions .ts-finish:disabled{opacity:.4;cursor:default}
 .sl-actions .ts-offer{display:contents}
-.sl-effect{position:relative;display:flex;flex-direction:column;min-width:0;min-height:0;background:#fff}
-.sl-frame{flex:1;width:100%;border:0;display:block;min-height:0}
+/* settle-polish 2: the paper ground until the page paints; the kept iframe is white once its load fired */
+.sl-effect{position:relative;display:flex;flex-direction:column;min-width:0;min-height:0;background:#EFEAE0}
+.sl-frame{flex:1;width:100%;border:0;display:block;min-height:0;background:transparent}
+.sl-frame[data-loaded="1"]{background:#fff}
 /* the form as it goes out */
 .sl-sheet .sl-effect,.sl-flow .sl-effect{flex-direction:row;flex-wrap:wrap;align-content:flex-start;gap:18px;padding:26px 30px 22px;background:#E6E0D4}
 .st-sheet{flex:1;min-width:360px;max-height:calc(100% - 40px);overflow:auto;box-sizing:border-box;padding:28px 36px 30px;background:#F7F2E7;color:#1d2129;border-radius:2px;box-shadow:0 18px 40px rgba(0,0,0,.25),0 1px 0 rgba(255,255,255,.6) inset;background-image:repeating-linear-gradient(180deg,transparent 0 31px,rgba(29,33,41,.06) 31px 32px)}
@@ -1633,6 +1638,32 @@ span.cmp-face-btn{cursor:default}
 .af-stamp{font-size:11px;letter-spacing:.1em;padding:2px 8px;border-radius:3px;border:1px solid currentColor;color:#9a927f}
 .af-step.done .af-stamp{color:#13A37A;border-color:#13A37A;transform:rotate(-6deg)}
 .af-step.next .af-stamp{color:#C2410C;border-color:#C2410C}
+/* settle-polish 1: the stamps come down one by one from the bottom rank up (--i is the rank's place) */
+.af-step.done .af-stamp{animation:af-stamp 180ms both;animation-delay:calc(var(--i,0) * 90ms)}
+@keyframes af-stamp{from{transform:scale(1.6) rotate(0deg);opacity:0}to{transform:scale(1) rotate(-6deg);opacity:1}}
+.af.reduced .af-step .af-stamp{animation:none}
+/* settle-polish 3: a narrow stage stacks the halves — the record (and its actions) on top at its
+   height, the real thing under it; the flow under the sheet, its steps in two columns. A viewport
+   @media, not a container query: container queries fought the fit (shell.test keeps desktop.css free of them). */
+@media (max-width: 1100px){
+  .sl{grid-template-columns:1fr;grid-template-rows:auto minmax(420px,1fr);overflow:auto}
+  .sl-record{overflow:visible;border-right:0;border-bottom:1px solid rgba(29,33,41,.15)}
+  .sl-rec{flex:none}
+  .sl-sheet .sl-effect,.sl-flow .sl-effect{flex-direction:column;flex-wrap:nowrap}
+  .st-sheet{min-width:0;max-height:none;flex:none}
+  .af{width:auto;max-height:none}
+  .af-steps{display:grid;grid-template-columns:1fr 1fr;column-gap:18px}
+}
 /* the launch page's opening (author 2026-11-12) plays in the dialogue box over the page: the page waits behind it */
 .launch-layer.talking .tl-body{opacity:.6}
 .launch-layer.talking .tl-kuro{display:none} /* the box brings its own Kuro */
+/* the record's dimension rows (the old report page's rows, scoped here since 2026-11-12) */
+.sl-dims .ts-rrow{padding:10px 12px;background:#fff;border:1px solid rgba(29,33,41,.12);border-radius:8px}
+.sl-dims .ts-rname{font-weight:700;margin-bottom:6px}
+.sl-dims .ts-rbars{display:flex;flex-direction:column;gap:6px;margin-bottom:6px}
+.sl-dims .ts-rb{display:grid;grid-template-columns:76px 1fr 54px;gap:8px;align-items:center;font-size:12px;color:var(--ink-2)}
+.sl-dims .ts-rb b{text-align:right;color:#1d2129;font-size:14px}
+.sl-dims .ts-rb b small{font-size:11px;color:var(--ink-2)}
+.sl-dims .ts-rb.her .ts-fill{background:#F6B73C}
+.sl-dims .ts-rb.back .ts-fill{background:#2F6FD6}
+.sl-dims .ts-rb .ts-track{background:rgba(29,33,41,.1)}

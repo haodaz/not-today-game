@@ -375,6 +375,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   const body = new KuroBodyElement(root.ownerDocument);
   // ide R3: the IDE preview keeps its page across renders (reloads only when its URL changes).
   const frames = createFrameKeeper(root.ownerDocument);
+  const loadWatched = new WeakSet<HTMLIFrameElement>();
   let frame = 0;
 
   const fit = () => {
@@ -419,6 +420,14 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     frames.before(root);
     root.innerHTML = renderRoot(deps.store, session, Date.now()).value;
     frames.after(root);
+    // settle-polish 2: a kept iframe says when its page has painted (`data-loaded="1"`; the
+    // settlement's page keeps the paper ground until then). A kept node keeps the attribute; a new
+    // copy starts without it and gets its own listener.
+    for (const f of root.querySelectorAll<HTMLIFrameElement>("iframe[data-keep]")) {
+      if (loadWatched.has(f)) continue;
+      loadWatched.add(f);
+      f.addEventListener("load", () => f.setAttribute("data-loaded", "1"));
+    }
     // Kuro's body lives across renders so its state changes crossfade.
     const slot = root.querySelector<HTMLElement>("[data-kuro-slot]");
     if (slot) body.attach(slot);

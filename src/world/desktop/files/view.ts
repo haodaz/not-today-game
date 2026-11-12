@@ -5,7 +5,7 @@
 // opening one logs `open file:<id>` and plays its `onOpen` line once a day (the action's job). The
 // body is a task document (clause lines), an html page in a browser-style frame (a missing file
 // shows the not-found page, never a crash), or plain text. Pure: context in, markup out.
-import { filesData, fileListed, type BinEntry, type FileEntry, type Folder } from "@state/files";
+import { eggListed, filesData, fileListed, type BinEntry, type FileEntry, type Folder } from "@state/files";
 import { openedFileId } from "@state/events";
 import { docLines } from "@state/days/tasks";
 import type { GameEvent } from "@state/events";
@@ -13,7 +13,7 @@ import type { State } from "@state/types.gen";
 import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t } from "@world/i18n";
 import { fillPlaceholders } from "@world/replies/placeholders";
-import type { AppContext } from "../model";
+import type { AppContext, Session } from "../model";
 import { albumPhotos, roomFacingOf, type Photo } from "@state/photos";
 import { photoPicture, photoPlace, stageOfPhoto, type PhotoView } from "./album";
 import { markDiffs } from "./diff";
@@ -70,9 +70,34 @@ export function sleeptalkFiles(events: readonly GameEvent[], day: number, table?
   return caughtBy(events, day, table).map(({ night, talk }) => ({ id: sleeptalkFileId(night), name: talk.name, from: night + 1, body: { kind: "text", lines: [...talk.lines, ...hint(talk)] } }));
 }
 
-/** A file by id as it is listed today: content's files and bin, or a recording's file. */
+/** A file by id as it is listed today: content's files and bin, a recording's file, or (while it is there) 旧工作's. */
 export function fileListedById(id: string, events: readonly GameEvent[], day: number): FileEntry | BinEntry | undefined {
-  return fileById(id) ?? sleeptalkFiles(events, day).find((f) => f.id === id);
+  return fileById(id) ?? sleeptalkFiles(events, day).find((f) => f.id === id) ?? (eggListed(day, events) ? filesData.egg?.files.find((f) => f.id === id) : undefined);
+}
+
+// ——— old-folder-egg R2: the black beat ———
+
+/** The picture shows this long after the open, then the black. */
+export const EGG_PICTURE_MS = 250;
+/** The black ends here (from the open); with reduced motion the black lasts EGG_BLACK_REDUCED_MS. */
+export const EGG_END_MS = 900;
+export const EGG_BLACK_REDUCED_MS = 300;
+
+/** When the beat ends (ms after the open). */
+export const eggEndMs = (reducedMotion: boolean): number => (reducedMotion ? EGG_PICTURE_MS + EGG_BLACK_REDUCED_MS : EGG_END_MS);
+
+/** The beat's phase now: the picture, the black, or over (null when no beat). */
+export function eggPhase(session: Pick<Session, "eggFlashAt" | "reducedMotion">, nowMs: number): "picture" | "black" | "over" | null {
+  const at = session.eggFlashAt;
+  if (at === null) return null;
+  const dt = nowMs - at;
+  if (dt < EGG_PICTURE_MS) return "picture";
+  return dt < eggEndMs(session.reducedMotion) ? "black" : "over";
+}
+
+/** The full-screen black over the desktop during the beat (nothing before, nothing after). */
+export function eggFlash(session: Pick<Session, "eggFlashAt" | "reducedMotion">, nowMs: number): SafeHtml | null {
+  return eggPhase(session, nowMs) === "black" ? html`<div class="egg-flash" aria-hidden="true"></div>` : null;
 }
 
 /** The dock decoy's name for this app (文件 / 回收站), in the active language. */
@@ -90,6 +115,8 @@ export function fileBody(file: FileEntry, fill: (s: string) => string): SafeHtml
     // A doc reference that resolves to nothing still shows the file, empty (never a crash).
     return html`<div class="f-body doc">${(lines ?? []).map((l) => html`<p>${fill(l)}</p>`)}</div>`;
   }
+  // old-folder-egg R1: a picture, fit inside the pane on a dark ground; no caption.
+  if (body.kind === "image") return html`<figure class="file-image"><img src="${body.src}" alt=""></figure>`;
   // html: the page in the browser's frame (an <iframe>); a missing file shows the not-found page.
   return html`<div class="f-body html"><iframe class="f-frame" src="${body.src}" title="${fill(file.name)}" sandbox></iframe></div>`;
 }
@@ -166,10 +193,17 @@ export function renderFiles(ctx: AppContext, live: LiveScreen | null = null): Sa
   const opened = openedDocs(events);
   const fill = (s: string) => fillPlaceholders(s, state.names);
 
-  // The left column: the three folders, 相册 (camera R3), then the bin.
+  // old-folder-egg: 旧工作 while it is there — and through the picture of its one opening (the
+  // black covers the rest of the beat; the action closes the window when it ends).
+  const egg = filesData.egg;
+  const phase = eggPhase(ctx.session, ctx.nowMs);
+  const eggOn = egg !== undefined && (eggListed(day, events) || (app.tab === egg.id && (phase === "picture" || phase === "black")));
+
+  // The left column: the three folders, 相册 (camera R3), 旧工作 (old-folder-egg), then the bin.
   const tabs = [
     ...filesData.folders.map((folder) => ({ id: folder.id, name: folder.name })),
     ...(hasString("files.album") ? [{ id: ALBUM_TAB, name: t("files.album") }] : []),
+    ...(eggOn ? [{ id: egg.id, name: egg.name }] : []),
     { id: BIN_TAB, name: appName(day, "trash") },
   ];
   const nav = tabs.map(
@@ -185,7 +219,7 @@ export function renderFiles(ctx: AppContext, live: LiveScreen | null = null): Sa
   }
 
   // The selected tab's files.
-  const selectedFolder = filesData.folders.find((f) => f.id === app.tab);
+  const selectedFolder = filesData.folders.find((f) => f.id === app.tab) ?? (eggOn && app.tab === egg.id ? egg : undefined);
   const listed: readonly FileEntry[] = app.tab === BIN_TAB ? binListed(day, flags, opened) : selectedFolder ? folderListed(selectedFolder, day, flags, opened) : [];
   // tape-record R2: the walkman's recordings land in 下载, after content's files.
   const files: readonly FileEntry[] = app.tab === SLEEPTALK_FOLDER ? [...listed, ...sleeptalkFiles(events, day)] : listed;

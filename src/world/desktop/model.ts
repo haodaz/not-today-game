@@ -315,6 +315,8 @@ export interface Session {
    * closed. Session only; opening a file is the `open` event.
    */
   filesApp: { readonly which: "files" | "trash"; readonly tab: string; readonly open: string | null } | null;
+  /** old-folder-egg R2: when (ms) 旧工作's picture was opened — the picture, then the black, then the window closes. */
+  eggFlashAt: number | null;
   /**
    * camera R3 / R8: the photos taken this session, by the index of their `photo` event in the log:
    * where and on which day, when (session ms; the 20 s of developing count from it) and, for a
@@ -552,6 +554,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     reducedMotion: false,
     dockSay: null,
     filesApp: null,
+    eggFlashAt: null,
     photos: {},
     lastPhoto: null,
     photoOpened: {},
