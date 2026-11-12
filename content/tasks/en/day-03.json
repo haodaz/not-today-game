@@ -1391,18 +1391,16 @@
         "motif": {
           "kind": "danmaku",
           "items": [
-            "Tell it big",
-            "The bigger the better",
-            "Self-evolution",
-            "Far beyond a human brain",
-            "Only we can do this",
-            "Investors want to hear this",
-            "A person's projection",
-            "Moving through digital space",
-            "Too conservative",
-            "References as they were",
-            "Not the numbers, the volume",
-            "The direction is right"
+            "This is too conservative; investors don't want to hear how careful we are",
+            "The direction is right, so tell it big, the bigger the better",
+            "Investors must feel only we can do this and nobody else can",
+            "Talk about a person's projection, but not as a little assistant, that was last year's deck",
+            "Talk about moving through digital space, it walks by itself, nobody watching",
+            "References as they were, don't touch them, touch them and a judge goes checking",
+            "Not the numbers, the volume; think it over again",
+            "Before you leave is fine, no rush",
+            "Fix this page and the whole story stands",
+            "People steering AI, I didn't nod at that in the meeting"
           ]
         },
         "tone": "night",

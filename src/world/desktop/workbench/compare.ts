@@ -89,7 +89,7 @@ export function launchMotif(m: LaunchMotif, fill: (x: string) => string): SafeHt
       const lane = i % lanes;
       const dur = 16 + ((i * 7) % 5) * 3; // seconds across the page
       const delay = -((i * 5.3) % dur); // negative: already on its way at first paint
-      const size = 15 + ((i * 3) % 3) * 4;
+      const size = 20 + ((i * 3) % 3) * 6;
       return html`<span class="${cls("tl-dm", i % 5 === 2 && "loud")}" style="top:${(6 + lane * 15).toFixed(0)}%;font-size:${size}px;--dur:${dur}s;--delay:${delay.toFixed(1)}s">${fill(w)}</span>`;
     });
     return html`<div class="tl-danmaku" aria-hidden="true">${rows}</div>`;

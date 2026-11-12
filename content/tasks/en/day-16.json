@@ -211,17 +211,13 @@
         "motif": {
           "kind": "danmaku",
           "items": [
-            "The chairman won't read",
-            "Just make a sound",
-            "Don't stop",
-            "Opening",
-            "Middle",
-            "Beat",
-            "Ending",
-            "The voice notes are in the chat",
-            "The flute is in the files",
-            "Any sound will do",
-            "Don't stop, don't stop"
+            "The chairman won't read, just make a sound",
+            "Don't stop, opening middle beat ending, any sound",
+            "The voice notes are in the boss's and the group's chats, the flute in the files",
+            "The flute at the end of last night's tape, listen to the beat on the walkman",
+            "Any sound will do, just don't stop",
+            "The chairman will nod when it ends, he always nods",
+            "After this sound, the next one"
           ]
         },
         "tone": "night",

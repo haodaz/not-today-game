@@ -241,16 +241,14 @@
         "motif": {
           "kind": "danmaku",
           "items": [
-            "The entity",
-            "Older than people",
-            "Where it came from",
-            "How old",
-            "What it wants",
-            "Make it clear to the client",
-            "Old means reliable",
-            "Not the tech, the origin",
-            "This page needs awe",
-            "Who we are"
+            "Make it sound like a thing, the client's words",
+            "It needs an origin, it can't be something we invented",
+            "Write that it is older than people, Lao Wang's words",
+            "What does it want, the client keeps asking",
+            "In the end it has to land on us",
+            "This page needs awe, don't talk tech",
+            "Old means reliable, the client buys that logic",
+            "Don't write that it wants nothing, how would we sell that"
           ]
         },
         "tone": "paper",

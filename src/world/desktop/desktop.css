@@ -1171,8 +1171,8 @@ span.cmp-face-btn{cursor:default}
 .tone-vellum .tl-body{background:#FBF5E4;box-shadow:8px 8px 0 #8B6B2E}
 .tone-vellum .tl-tag{background:#8B6B2E;color:#FBF5E4}
 .tone-vellum .tl-cta{background:#E9C65A}
-.tone-vellum .tl-dm{background:#FBF5E4;border-color:#8B6B2E;color:#4a3a1a}
-.tone-vellum .tl-dm.loud{background:#8B6B2E;color:#FBF5E4}
+.tone-vellum .tl-dm{color:rgba(90,60,20,.5)}
+.tone-vellum .tl-dm.loud{color:rgba(139,107,46,.8)}
 /* paper: plain cream, no rays (a document day) */
 .launch-layer.tone-paper{background:#F3EFE6}
 .launch-layer.tone-paper::before{background:none}
@@ -1210,8 +1210,10 @@ span.cmp-face-btn{cursor:default}
 @keyframes tl-pop{from{opacity:0;transform:translate(-50%,-30%) rotate(var(--tilt)) scale(.6)}to{opacity:1;transform:translate(-50%,-50%) rotate(var(--tilt)) scale(1)}}
 /* danmaku: the jargon floats across the whole page in lanes, behind the bust and the text */
 .tl-danmaku{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
-.tl-dm{position:absolute;left:100%;white-space:nowrap;padding:5px 14px;border-radius:6px;background:#fff;border:2px solid #1d2129;color:#1d2129;font-weight:700;box-shadow:3px 3px 0 #1d2129;animation:tl-float var(--dur) linear infinite;animation-delay:var(--delay)}
-.tl-dm.loud{background:#E0362B;color:#fff}
+.tl-dm{position:absolute;left:100%;white-space:nowrap;padding:0;background:none;border:0;color:rgba(29,33,41,.55);font-weight:600;letter-spacing:.04em;text-shadow:0 1px 0 rgba(255,255,255,.6);animation:tl-float var(--dur) linear infinite;animation-delay:var(--delay)}
+.tl-dm.loud{color:rgba(200,54,43,.75)}
+.tone-night .tl-dm,.tone-ink .tl-dm{color:rgba(255,255,255,.5);text-shadow:none}
+.tone-night .tl-dm.loud,.tone-ink .tl-dm.loud{color:rgba(242,211,58,.7)}
 @keyframes tl-float{from{transform:translateX(0)}to{transform:translateX(calc(-100vw - 100%))}}
 /* bubble: a thought cloud over the head, the perfect four bars and the promises as numbered callouts */
 .tl-bubble{position:absolute;z-index:3;left:50%;top:3%;width:380px;transform:translateX(-10%);pointer-events:none}

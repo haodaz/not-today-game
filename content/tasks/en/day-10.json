@@ -314,14 +314,14 @@
         "motif": {
           "kind": "danmaku",
           "items": [
-            "Proof act two",
-            "Just fix the typos",
-            "Don't read too closely",
-            "Against the scan",
-            "Word by word",
-            "Don't ask",
-            "It's only proofreading",
-            "Read it, don't remember it"
+            "Just fix the typos, don't read too closely",
+            "Act two of the script, against the scan of that book",
+            "Word by word, don't read whole lines",
+            "Names go by the book, the book is right",
+            "Look up the lake's name, don't make one up",
+            "That line about the sky, fix it by the book, don't read it aloud",
+            "That sign, just copy it as drawn, don't ask what it is",
+            "Hand it in when done, no overtime today"
           ]
         },
         "tone": "vellum",

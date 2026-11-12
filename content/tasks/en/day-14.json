@@ -215,16 +215,13 @@
         "motif": {
           "kind": "danmaku",
           "items": [
-            "A thousand new hires",
-            "Run onboarding",
-            "The ones that talk",
-            "The ones humming in the recording",
-            "The ones that cry on sight",
-            "The name column",
-            "By the process",
-            "All colleagues now",
-            "Don't pick",
-            "All in today"
+            "A lot of new hires this time, a thousand, run the onboarding",
+            "Those that talk, those humming in the recording, those the toy cries at on sight",
+            "Don't skip the name column, fewer than half are on the roster",
+            "Listen to the welcome recording too, there's a number in last night's tape",
+            "By the process, don't pick, they're all colleagues",
+            "All in today, they start tomorrow",
+            "Only the ones with names count as people, that's the process"
           ]
         },
         "tone": "burst",

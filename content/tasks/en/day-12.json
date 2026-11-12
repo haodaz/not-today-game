@@ -211,16 +211,13 @@
         "motif": {
           "kind": "danmaku",
           "items": [
-            "Push through",
-            "Nobody sleeps this week",
-            "You make the rota",
-            "22:00 to 02:00",
-            "02:00 to 04:00",
-            "04:00 to 06:00",
-            "ΥΠΝΟΣ",
-            "Nobody sleeps",
-            "Sleep is an attitude",
-            "It's only this week"
+            "Push through this week everyone, nobody sleeps",
+            "You make the rota, four shifts, 22 to 2, 2 to 4, 4 to 6",
+            "And a row called ΥΠΝΟΣ, don't leave it empty",
+            "The names are in the boss's and the group's chats, the contacts hold one more",
+            "Sleep is an attitude problem, it's only this week",
+            "Play last night's sleep-talk recording backwards",
+            "If nobody sleeps, what is there to schedule, and for whom"
           ]
         },
         "tone": "night",
