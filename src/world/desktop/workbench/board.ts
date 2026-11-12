@@ -434,7 +434,7 @@ const actions: Record<string, ActionHandler> = {
     // the chosen path again is nothing (a turn is a pick, never an undo — a spent step stays spent, like a racer's tuning turns)
     if (s.mods[id] === pathId) return;
     const path = pathId;
-    if (s.mods[id] === undefined && tuneStepsLeft(c.board, s) === 0) return;
+    if (s.mods[id] === undefined && def.after !== "done" && tuneStepsLeft(c.board, s) === 0) return; // the offer is Kuro's gift, not a step
     const before = transcriptLength(ctx, c);
     const held = holdPreview(ctx, c);
     ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "mod", id, path } });
@@ -645,25 +645,9 @@ function tuneTurn(ctx: ActionContext, c: { task: Task; board: TaskBoard }, befor
  * type after). No finish button on a tuning board. Nothing happens if the player changed the board
  * again in the meantime.
  */
-function finishTune(ctx: ActionContext, c: { task: Task; board: TaskBoard }, before: number): void {
-  if (!c.board.tune) return;
-  const s = stateOf(ctx, c.task, c.board);
-  if (!canPrint(c.board, s)) return;
-  const added = Math.max(0, transcriptLength(ctx, c) - before);
-  const ops = ctx.store.getEvents().length;
-  // a turn's lines come after Kuro's busy gap
-  const busy = c.board.tune && added > 0 ? BUSY_MS : 0;
-  setTimeout(() => {
-    const now = currentBoard(ctx);
-    if (!now || now.task.id !== c.task.id || ctx.store.getEvents().length !== ops) return;
-    const st = stateOf(ctx, now.task, now.board);
-    if (!canPrint(now.board, st)) return;
-    const day = ctx.store.getState().day;
-    const was = transcriptLength(ctx, now);
-    printBoard(ctx, now, st);
-    noteIdeLines(ctx, now.task, now.board, day, was);
-    ctx.rerender();
-  }, busy + added * LINE_MS + AFTER_LINES_MS);
+function finishTune(_ctx: ActionContext, _c: { task: Task; board: TaskBoard }, _before: number): void {
+  // author 2026-11-12: the work no longer goes by itself once the offer is answered — the report page
+  // shows first, and the player presses 提交 (board-print). Kept as a hook for the handlers' shape.
 }
 
 /** The board actions; on an IDE board each one types in the transcript lines it adds (ide R4). */

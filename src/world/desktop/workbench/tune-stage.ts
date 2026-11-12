@@ -48,7 +48,8 @@ export function tuneStage(c: { state: State; events: readonly GameEvent[]; sessi
   const base = tuneBase(board, events);
   const offer = tuneOfferPending(board, s);
   const printable = canPrint(board, s);
-  const on = Object.keys(s.mods).length;
+  // the offer taken counts no step: the count and the progress stop at the budget
+  const on = Math.min(Object.keys(s.mods).length, tune.steps);
   const pct = Math.round((on / tune.steps) * 100);
   const reached = tuneReached(board, s);
   const pick = session.tunePick?.key === key ? session.tunePick : null;
