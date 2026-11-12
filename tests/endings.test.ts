@@ -1,4 +1,6 @@
+import "./specimen";
 import fc from "fast-check";
+import "./specimen";
 import { describe, expect, it } from "vitest";
 import { applyChoose } from "@state/days/effects";
 import { dayFiles } from "@state/days/table";

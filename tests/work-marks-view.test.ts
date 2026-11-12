@@ -2,6 +2,7 @@
 // the pens shown in 看克总的, a click that hits / misses, Kuro's reaction line when a kuro spot is
 // caught, the 自己做 units flow with 这里不对 / 下一段, the code surface, and the held dictionary's
 // gloss. The day-1 task tree is replaced (by flag) with fixtures that carry marks / units / code.
+import "./specimen";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@content/strings/zh.json", async (importOriginal) => {

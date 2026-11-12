@@ -1,6 +1,7 @@
 // day-loop addition 2026-11-02: night falls — the day has a threshold. Items carry `when`; the
 // moment the last required day item is done, night falls once: one narration line, the clock to
 // 18:30 if earlier, sting-soft, the evening look; the card then shows tonight's list.
+import "./specimen";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { dayFiles, ITEM_WHEN, parseDayFile } from "@state/days/table";

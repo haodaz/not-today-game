@@ -3,6 +3,7 @@
 // the screen; R5 the checklist on the desktop; R6 工作台's home; R7 the task page; R8 the phone hint;
 // R9 the reply rule; R10 the deliverable's sender; R11 the kept iframe; R12 {dish}; R13 the case and
 // the view; R14 heads and tails.
+import "./specimen";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";

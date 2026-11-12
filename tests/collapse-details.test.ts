@@ -1,6 +1,7 @@
 // collapse-details (2026-11-04): R1 the hexagram, R2 the wrong face, R3 屏幕 3. The meeting is the
 // meeting spec's fixture (.kiro/specs/meeting/board-meeting.json, placeholder text) injected as day-1
 // task3; day 1's stage is overridden per test (content's table is used for every other day).
+import "./specimen";
 import { describe, expect, it, vi } from "vitest";
 import tasks01 from "@content/tasks/day-01.json";
 

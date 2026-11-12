@@ -2,6 +2,7 @@
 // sentence is sent, Kuro asks 「这个怎么做？」 with the three options as chips under its message,
 // the chip is the reply; day 1's document and ledger surfaces (FR1–FR3). The same task events and
 // flags as before; catch flags only when both clauses were read; Kuro's touch exactly as content.
+import "./specimen";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import day01 from "@content/tasks/day-01.json";

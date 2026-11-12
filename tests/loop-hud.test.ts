@@ -1,4 +1,6 @@
+import "./specimen";
 import { describe, expect, it } from "vitest";
+import "./specimen";
 import { dayFiles } from "@state/days/table";
 import type { EventDraft } from "@state/events";
 import { createStore, type Store } from "@state/store";

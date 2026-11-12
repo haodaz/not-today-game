@@ -199,11 +199,18 @@
         "say": [
           {
             "k": "inner",
-            "t": "The file sits where I sent it. Wang received it and nothing since.",
-            "where": "screen:msgs:boss"
+            "t": "Vivi has posted another page. '@tech' means me.",
+            "where": "screen:msgs:group"
           }
         ]
       }
+    },
+    {
+      "id": "replyxz",
+      "text": "Answer Xiao Zhang.",
+      "unlock": "done:eat",
+      "done": "event:reply:xiaozhang",
+      "required": true
     },
     {
       "id": "lunch",
@@ -216,7 +223,7 @@
     {
       "id": "task1",
       "text": "The self-evolving engine: you take over from Xiao Zhang.",
-      "unlock": "done:msgs",
+      "unlock": "done:replyxz",
       "done": "flag:task_d2_1",
       "required": true
     },
@@ -249,7 +256,16 @@
       "text": "Eat.",
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
-      "required": false
+      "required": false,
+      "onDone": {
+        "say": [
+          {
+            "k": "inner",
+            "t": "The file sits at the message I sent. Nothing from the boss since he got it.",
+            "where": "screen:msgs:boss"
+          }
+        ]
+      }
     },
     {
       "id": "box",
@@ -268,7 +284,7 @@
     {
       "id": "dinner",
       "text": "Order dinner.",
-      "unlock": "done:task2",
+      "unlock": "done:task1",
       "done": "event:order:dinner",
       "required": true,
       "rewrite": "Dinner is on its way.",

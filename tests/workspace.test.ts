@@ -2,6 +2,7 @@
 // (greeting, composer, cards; never a board) or a task page (header + its board in its view). The
 // object strip lives in the task header only. Day 1 task3 is the ide fixture board with an object
 // lock (.kiro/specs/ide/board-ide.json, placeholder text), injected; content is not edited.
+import "./specimen";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it, vi } from "vitest";

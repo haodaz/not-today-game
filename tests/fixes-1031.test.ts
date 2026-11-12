@@ -1,5 +1,6 @@
 // The six fixes of 2026-10-31 (no new spec): settings, Kuro's small window, camera levels,
 // night 18's take. The phone fixes are in polish.test.ts.
+import "./specimen";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";

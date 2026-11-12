@@ -199,11 +199,18 @@
         "say": [
           {
             "k": "inner",
-            "t": "文件停在我发的那条。老板收到之后就没动静了。",
-            "where": "screen:msgs:boss"
+            "t": "Vivi 又发了一个网页。@技术，就是我。",
+            "where": "screen:msgs:group"
           }
         ]
       }
+    },
+    {
+      "id": "replyxz",
+      "text": "回小张。",
+      "unlock": "done:eat",
+      "done": "event:reply:xiaozhang",
+      "required": true
     },
     {
       "id": "lunch",
@@ -216,7 +223,7 @@
     {
       "id": "task1",
       "text": "自演化引擎：小张没跑起来，你接着做。",
-      "unlock": "done:msgs",
+      "unlock": "done:replyxz",
       "done": "flag:task_d2_1",
       "required": true
     },
@@ -249,7 +256,16 @@
       "text": "吃。",
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
-      "required": false
+      "required": false,
+      "onDone": {
+        "say": [
+          {
+            "k": "inner",
+            "t": "文件停在我发的那条。老板收到之后就没动静了。",
+            "where": "screen:msgs:boss"
+          }
+        ]
+      }
     },
     {
       "id": "box",
@@ -268,7 +284,7 @@
     {
       "id": "dinner",
       "text": "点个晚饭。",
-      "unlock": "done:task2",
+      "unlock": "done:task1",
       "done": "event:order:dinner",
       "required": true,
       "rewrite": "晚饭在路上。",

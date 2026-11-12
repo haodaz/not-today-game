@@ -3,6 +3,7 @@
 // and close around it. The fixture .kiro/specs/shell/board-shell.json (an IDE board with `ide.files`,
 // an object lock, beats; placeholder text) is day-1 task3; table and meeting variants are drawn from
 // it. Content is not edited.
+import "./specimen";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it, vi } from "vitest";

@@ -369,13 +369,6 @@
       }
     },
     {
-      "id": "task1",
-      "text": "合作协议过一遍。",
-      "unlock": "done:msgs",
-      "done": "flag:task_v17_done",
-      "required": true
-    },
-    {
       "id": "pickup",
       "text": "去门口拿。",
       "unlock": "event:delivery:arrives:lunch",
@@ -413,7 +406,7 @@
     {
       "id": "task2",
       "text": "应收表看一眼。",
-      "unlock": "done:task1",
+      "unlock": "done:msgs",
       "done": "flag:task_receivable_done",
       "required": true
     },

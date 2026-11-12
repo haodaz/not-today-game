@@ -2,6 +2,7 @@
 // pens, the two ways to mark (click a line / drag a span), the code surface, Kuro's reaction when
 // caught, a kuro spot hidden from the diff, the units flow in 自己做, and the held dictionary's gloss.
 // The loader is strict about marks/units/code; the task event records the marks and replays the same.
+import "./specimen";
 import { describe, expect, it, vi } from "vitest";
 
 // Claude's unit chips and (for the gloss) a contract note on a dictionary word: the fixtures below

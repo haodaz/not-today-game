@@ -66,11 +66,11 @@ describe("a file is listed from its day, its flag and the opened Vivi deliverabl
     expect(fileListed(vivi, 4, [], opened(["vivi-plan-1"]))).toBe(true);
   });
   it("afterFlag: only once the game flag is set", () => {
-    // The merged version is there once v17 is gone through (task1): 事情 A (task3) takes a card from it.
+    // The merged version is there once the day's work (v17, task3) is handed in (author 2026-11-12: no contract task).
     const merged = fileById("c-merged")!;
-    expect(merged.afterFlag).toBe("task_v17_done");
+    expect(merged.afterFlag).toBe("task_merge_done");
     expect(fileListed(merged, 1, [], opened([]))).toBe(false);
-    expect(fileListed(merged, 1, ["task_v17_done"], opened([]))).toBe(true);
+    expect(fileListed(merged, 1, ["task_merge_done"], opened([]))).toBe(true);
   });
   it("openedDocs reads `file:<id>` open events from the log", () => {
     const store = storeAt(4, [{ kind: "open", target: "file:vivi-plan-1", t: "10:00" }, { kind: "open", target: "browser", t: "10:00" }]);

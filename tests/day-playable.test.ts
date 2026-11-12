@@ -2,6 +2,7 @@
 // Lunch arrives at the minimum once work is done; `?fast=1` makes delivery minutes seconds; Space /
 // Enter read the box on 屏幕 too, never while typing; 屏幕 before boot says so once a day; the
 // overdue count left the room HUD; the workbench home's title is the app's name alone.
+import "./specimen";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { dayFiles } from "@state/days/table";
 import type { EventDraft } from "@state/events";

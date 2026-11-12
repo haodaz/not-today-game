@@ -2,6 +2,7 @@
 // offers 合并 / 不合 as reply chips; either way the catch flags are set, 通过 follows, and the task
 // event carries `merge`. The strings (`wb.merge` / `wb.keep`) are Claude's: this file falls back to
 // the literals only here, under content's own strings (content's win once they exist).
+import "./specimen";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@content/strings/zh.json", async (importOriginal) => {

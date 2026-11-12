@@ -2,6 +2,7 @@
 // and no lock `face` yet (Claude adds them, R1/R5), so the R1 values are added here to a copy of
 // content/objects.json and read by the real loader; the lock is the shell fixture's day-1 board with
 // its object set to the calculator (and `face: window`), or as it is (the chick, no face).
+import "./specimen";
 import { describe, expect, it, vi } from "vitest";
 import objectsRaw from "@content/objects.json";
 import tasks01 from "@content/tasks/day-01.json";

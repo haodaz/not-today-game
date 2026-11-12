@@ -133,7 +133,7 @@
         },
         {
           "id": "c-v16",
-          "name": "合作协议-v16.docx",
+          "name": "合作协议-20281002.docx",
           "date": "2028-10-02",
           "from": 1,
           "body": {
@@ -142,7 +142,7 @@
         },
         {
           "id": "c-v17",
-          "name": "合作协议-v17.docx",
+          "name": "合作协议-20281015.docx",
           "date": "2028-10-15",
           "from": 1,
           "body": {
@@ -150,12 +150,12 @@
           },
           "onOpen": {
             "k": "inner",
-            "t": "昨天的。第十一条和第六条打架，今天要过。"
+            "t": "昨天的。第十一条和第六条打架。先放着。"
           }
         },
         {
           "id": "c-v18",
-          "name": "合作协议-v18.docx",
+          "name": "合作协议-20281018.docx",
           "date": "2028-10-18",
           "from": 3,
           "body": {
@@ -171,7 +171,7 @@
           "name": "合作协议-合并版-20281016.docx",
           "date": "2028-10-16",
           "from": 1,
-          "afterFlag": "task_v17_done",
+          "afterFlag": "task_merge_done",
           "onOpen": {
             "k": "inner",
             "t": "合并版。名字是按日期起的，很整齐。"
@@ -601,7 +601,7 @@
       "id": "b-clause11-old",
       "name": "第十一条（旧）.txt",
       "since": 1,
-      "afterFlag": "task_v17_done",
+      "afterFlag": "task_merge_done",
       "body": {
         "text": [
           "十一、乙方在任何情况下不得暂停服务。"
@@ -616,7 +616,7 @@
       "id": "b-premerge",
       "name": "合作协议-合并前.docx",
       "since": 1,
-      "afterFlag": "task_v17_done",
+      "afterFlag": "task_merge_done",
       "onOpen": {
         "k": "narration",
         "t": "合并前的。两份各执一词的时候。"

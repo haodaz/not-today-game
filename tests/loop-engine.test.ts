@@ -1,4 +1,6 @@
+import "./specimen";
 import { describe, expect, it } from "vitest";
+import "./specimen";
 import { choiceOffered } from "@state/days/effects";
 import { dayFiles, type Sequence } from "@state/days/table";
 import type { EventDraft } from "@state/events";

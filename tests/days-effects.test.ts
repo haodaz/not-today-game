@@ -1,4 +1,6 @@
+import "./specimen";
 import { describe, expect, it } from "vitest";
+import "./specimen";
 import day10Raw from "@content/days/day-10.json";
 import { choiceOf } from "@state/days/effects";
 import { dayFiles, parseDayFile, taskFlags } from "@state/days/table";

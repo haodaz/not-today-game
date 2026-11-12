@@ -1,0 +1,7 @@
+{
+  "id": "task1",
+  "text": "Go over the agreement.",
+  "unlock": "done:msgs",
+  "done": "flag:task_d10_1",
+  "required": true
+}

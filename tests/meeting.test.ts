@@ -1,6 +1,7 @@
 // meeting (2026-11-04): the meeting view of a work-v2 board. The loader (R1), the meeting card source
 // (R3), the view (R2), playing (R3), and a play-through. Uses the fixture
 // .kiro/specs/meeting/board-meeting.json (placeholder text), injected as day-1 task3; content is not edited.
+import "./specimen";
 import { describe, expect, it, vi } from "vitest";
 import fixture from "../.kiro/specs/meeting/board-meeting.json";
 import tasks01 from "@content/tasks/day-01.json";

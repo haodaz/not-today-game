@@ -442,12 +442,8 @@
                 "text": "Good to see you."
               },
               {
-                "who": "me",
-                "text": "The engine's backend: Xiao Zhang got halfway and could not reach the result on Vivi's page. The rest is yours."
-              },
-              {
                 "who": "kuro",
-                "text": "Her page shows four full bars; this is what the backend has. Each item can be done a few ways; pick them one at a time and the bars will follow. Anything you're unsure of, hand to me."
+                "text": "Her page says four full bars. This is what the backend looks like now."
               }
             ]
           },

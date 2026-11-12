@@ -153,16 +153,9 @@
       }
     },
     {
-      "id": "task1",
-      "text": "合作协议过一遍。",
-      "unlock": "done:msgs",
-      "done": "flag:task_d10_1",
-      "required": true
-    },
-    {
       "id": "task2",
       "text": "应收表改一个数。",
-      "unlock": "done:task1",
+      "unlock": "done:msgs",
       "done": "flag:task_d10_2",
       "required": true
     },
