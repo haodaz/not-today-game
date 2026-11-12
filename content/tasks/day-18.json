@@ -4,11 +4,15 @@
   "tasks": [
     {
       "id": "slip",
-      "title": "寄件单。",
+      "title": "NOT TODAY",
       "app": "docs",
       "done": "task_d18_seen",
       "start": {
         "say": [
+          {
+            "k": "narration",
+            "t": "人终将走入良夜，但不是今日。"
+          },
           {
             "k": "narration",
             "t": "桌上一张寄件单。"
