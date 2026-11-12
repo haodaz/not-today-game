@@ -186,12 +186,11 @@ export interface ComparePage {
   readonly bubbles: readonly string[];
   readonly remark: Readonly<Record<string, string>>;
 }
-export interface BoardGame {
-  readonly kind: "mines";
-  readonly cols: number;
-  readonly rows: number;
-  readonly mines: number;
-}
+export type BoardGame =
+  /** minesweeper: the month; `mines` the days the bosses are away */
+  | { readonly kind: "mines"; readonly cols: number; readonly rows: number; readonly mines: number }
+  /** pipes: the process; turn the pieces until 入口 reaches 入职 */
+  | { readonly kind: "pipes"; readonly cols: number; readonly rows: number };
 export interface BoardStack {
   /** From the bottom up: the rank word and its symbol; `silhouette` ranks are the easter eggs past the top (drawn black). */
   readonly ranks: readonly { readonly name: string; readonly img: string; readonly silhouette?: boolean }[];
@@ -721,12 +720,16 @@ function board(v: unknown, w: string): TaskBoard {
   if (v.game !== undefined) {
     const gw = `${w}.game`;
     if (!isRecord(v.game)) fail(gw, "must be an object");
-    keys(v.game, ["kind", "cols", "rows", "mines"], gw);
-    if (v.game.kind !== "mines") fail(`${gw}.kind`, 'must be "mines"');
     const num = (x: unknown, k: string, lo: number, hi: number): number => (Number.isInteger(x) && (x as number) >= lo && (x as number) <= hi ? (x as number) : fail(`${gw}.${k}`, `must be an integer ${lo}–${hi}`));
-    const cols = num(v.game.cols, "cols", 4, 12), rows = num(v.game.rows, "rows", 3, 10), mines = num(v.game.mines, "mines", 1, 40);
-    if (mines >= cols * rows - 9) fail(`${gw}.mines`, "too many mines for the grid (the first click clears nine cells)");
-    game = { kind: "mines", cols, rows, mines };
+    if (v.game.kind === "mines") {
+      keys(v.game, ["kind", "cols", "rows", "mines"], gw);
+      const cols = num(v.game.cols, "cols", 4, 12), rows = num(v.game.rows, "rows", 3, 10), mines = num(v.game.mines, "mines", 1, 40);
+      if (mines >= cols * rows - 9) fail(`${gw}.mines`, "too many mines for the grid (the first click clears nine cells)");
+      game = { kind: "mines", cols, rows, mines };
+    } else if (v.game.kind === "pipes") {
+      keys(v.game, ["kind", "cols", "rows"], gw);
+      game = { kind: "pipes", cols: num(v.game.cols, "cols", 4, 12), rows: num(v.game.rows, "rows", 3, 8) };
+    } else fail(`${gw}.kind`, 'must be "mines" or "pipes"');
   }
   let stack: BoardStack | undefined;
   if (v.stack !== undefined) {

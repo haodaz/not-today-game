@@ -192,7 +192,12 @@
               }
             ]
           }
-        ]
+        ],
+        "game": {
+          "kind": "pipes",
+          "cols": 8,
+          "rows": 5
+        }
       },
       "deliverable": {
         "id": "d14-onboard",

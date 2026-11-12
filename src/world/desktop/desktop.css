@@ -1758,3 +1758,22 @@ button.mn-cell:hover{background:#fff;transform:translateY(-1px)}
 .mn-state p{margin:0;font-weight:700;color:#C2410C}
 .mn-stamp{display:inline-block;padding:6px 18px;border:3px solid #13A37A;color:#13A37A;font-size:22px;font-weight:900;letter-spacing:.2em;transform:rotate(-6deg);animation:ts-pop 300ms ease-out both}
 .mn.lost .mn-grid{animation:bt-shake 460ms steps(6)}
+/* pipes (author 2026-11-13): the onboarding process as pipe pieces */
+.pp-main{padding:0 28px}
+.pp-board{position:relative;padding:14px 56px}
+.pp-grid{display:grid;grid-template-columns:repeat(var(--cols,8),72px);grid-template-rows:repeat(var(--rows,5),72px);gap:0;background:#2E3A46;padding:6px;border-radius:10px;box-shadow:inset 0 2px 8px rgba(0,0,0,.35)}
+.pp-cell{position:relative;width:72px;height:72px;box-sizing:border-box;border:0;padding:0;background:#3A4856;outline:1px solid rgba(255,255,255,.06);cursor:pointer;font:inherit}
+button.pp-cell:hover{background:#465666}
+.pp-cell.on{background:#2F4A5C}
+.pp-cell.blank{background:#3A4856}
+.pp-svg{width:100%;height:100%;display:block}
+.pp-pipe line{stroke:#AEB7C0;stroke-width:22;stroke-linecap:butt}
+.pp-pipe circle{fill:#AEB7C0}
+.pp-svg.on .pp-pipe line{stroke:#5FD1E6}
+.pp-svg.on .pp-pipe circle{fill:#5FD1E6}
+.pp-end{position:absolute;top:calc(14px + 6px + var(--row,0) * 72px);height:72px;display:flex;align-items:center;font-size:12px;font-weight:900;letter-spacing:.15em;color:#fff;background:#1d2129;padding:0 10px;border-radius:4px}
+.pp-end.from{left:4px}
+.pp-end.to{right:4px}
+.pp-flowline{margin:0 0 0 16px;font-size:14px;color:#3b3833}
+.mn.pp.done .pp-svg.on .pp-pipe line{animation:pp-flow 900ms linear infinite;stroke-dasharray:12 8}
+@keyframes pp-flow{to{stroke-dashoffset:-20}}

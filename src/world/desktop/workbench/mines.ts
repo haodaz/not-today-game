@@ -32,7 +32,7 @@ export interface MinesGrid {
   readonly approvedAt?: number;
 }
 
-export const minesStart = (key: string, game: BoardGame): MinesGrid => ({
+export const minesStart = (key: string, game: Extract<BoardGame, { kind: "mines" }>): MinesGrid => ({
   key, cols: game.cols, rows: game.rows, n: game.mines, mines: null,
   open: Array<boolean>(game.cols * game.rows).fill(false), flags: Array<boolean>(game.cols * game.rows).fill(false),
   over: false, won: false, flagMode: false, opened: 0,
@@ -103,7 +103,7 @@ export const minesRoll = (runId: string, key: string, attempt: number): (() => n
 const WEEK = (): string[] => S("mines.stage.days").split(",");
 
 export function minesStage(task: Task, board: TaskBoard, s: BoardState, session: { readonly mines: MinesGrid | null }, approved: boolean, nowMs: number): SafeHtml {
-  const game = board.game!;
+  const game = board.game as Extract<BoardGame, { kind: "mines" }>;
   const g: MinesGrid | null = session.mines?.key === task.id ? session.mines : null;
   const done = approved && (!g || minesApproving(g, nowMs) || g.won);
   // the people and when they can, from the form, as the month's notes on the left

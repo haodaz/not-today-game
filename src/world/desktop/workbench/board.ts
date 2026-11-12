@@ -21,6 +21,7 @@ import { push } from "@world/loop/dialogue";
 import { battleCmd, battleOffered, battleOver, battleReward, battleTarget, battleTurn, foeImage, startBattle } from "./battle";
 import { fillPlaceholders } from "@world/replies/placeholders";
 import { MINES_DONE_MS, minesFlag, minesOpen, minesRoll, minesStart, type MinesGrid } from "./mines";
+import { PIPES_DONE_MS, pipesRoll, pipesSolve, pipesStart, pipesTurn } from "./pipes";
 import type { ActionContext, ActionHandler } from "../controller";
 import type { AppContext, Session } from "../model";
 import { openWork } from "./work";
@@ -548,7 +549,7 @@ const actions: Record<string, ActionHandler> = {
   // mines (author 2026-11-13): the month on the desk — open a day, mark a day, the schedule done approves the form
   "mines-start"(ctx) {
     const c = currentBoard(ctx);
-    if (!c?.board.game) return;
+    if (c?.board.game?.kind !== "mines") return;
     const attempt = (ctx.session.mines?.key === c.task.id ? 1 : 0) + Math.floor((ctx.now?.() ?? Date.now()) / 1000) % 1000;
     ctx.session.mines = { ...minesStart(c.task.id, c.board.game), approvedAt: undefined, attempt } as MinesGrid;
     ctx.rerender();
@@ -599,6 +600,41 @@ const actions: Record<string, ActionHandler> = {
     ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
     ctx.session.mines = { ...g, won: true, approvedAt: ctx.now?.() ?? Date.now() };
     ctx.later(MINES_DONE_MS + 20, ctx.rerender);
+    ctx.rerender();
+  },
+  // pipes (author 2026-11-13): the process as pipe pieces — a click turns one; connected approves the form
+  "pipes-start"(ctx) {
+    const c = currentBoard(ctx);
+    if (c?.board.game?.kind !== "pipes") return;
+    const attempt = (ctx.session.pipes?.key === c.task.id ? 1 : 0) + Math.floor((ctx.now?.() ?? Date.now()) / 1000) % 1000;
+    ctx.session.pipes = pipesStart(c.task.id, c.board.game, pipesRoll(ctx.store.getRunId(), c.task.id, attempt));
+    ctx.rerender();
+  },
+  "pipes-turn"(ctx, data) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.pipes?.key === c?.task.id ? ctx.session.pipes : null;
+    const i = Number(data.i);
+    if (c?.board.game?.kind !== "pipes" || !g || !Number.isInteger(i)) return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    const next = pipesTurn(g, i);
+    if (next === g) return;
+    if (next.done) {
+      ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+      ctx.session.pipes = { ...next, approvedAt: ctx.now?.() ?? Date.now() };
+      ctx.later(PIPES_DONE_MS + 20, ctx.rerender);
+    } else ctx.session.pipes = next;
+    ctx.rerender();
+  },
+  // dev only: connected at once (the replay driver)
+  "pipes-cheat"(ctx) {
+    if (!import.meta.env.DEV) return;
+    const c = currentBoard(ctx);
+    const g = ctx.session.pipes?.key === c?.task.id ? ctx.session.pipes : null;
+    if (c?.board.game?.kind !== "pipes" || !g) return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+    ctx.session.pipes = { ...pipesSolve(g), approvedAt: ctx.now?.() ?? Date.now() };
+    ctx.later(PIPES_DONE_MS + 20, ctx.rerender);
     ctx.rerender();
   },
   // the chain lost (no move left, not approved): 让克总帮忙 — he stamps it (the approval moment follows)
