@@ -13,7 +13,7 @@ import { desktopActions } from "@world/desktop/actions";
 import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import { mountDesktop, type ActionContext } from "@world/desktop/controller";
 import { initialSession } from "@world/desktop/model";
-import { endingNext, startEnding } from "@world/endings/flow";
+import { endingNext, startEnding, bossActions } from "@world/endings/flow";
 import { DARK_ASSETS, DARK_INNER, darkLayerFor, darkSprites, EYE_COUNT, GIANT_ASSETS, pullFrameVars, renderPullOut, TENTACLE_COUNT } from "@world/endings/pullout";
 import { createPullDriver } from "@world/endings/pullout-dom";
 import { renderEnding } from "@world/endings/view";
@@ -160,6 +160,18 @@ describe("the three ending cuts", () => {
     expect(timers[0]!.ms).toBe(PULL_CUT_MS[ending]);
     timers.shift()!.fn();
     expect(ctx.session.pullOut).toBeNull();
+    // the boss fight (2026-11-13) sits between the pull-out and the pages: its intro first, no page yet
+    expect(ctx.session.boss?.phase).toBe("intro");
+    expect(ctx.session.endingPage).toBeNull();
+    endingNext(ctx);
+    expect(ctx.session.endingPage).toBeNull();
+    bossActions["boss-cheat"](ctx);
+    expect(ctx.session.boss?.phase).toBe("won");
+    bossActions["boss-next"](ctx);
+    bossActions["boss-next"](ctx);
+    expect(ctx.session.boss?.phase).toBe("after");
+    bossActions["boss-done"](ctx);
+    expect(ctx.session.boss).toBeNull();
     expect(ctx.session.endingPage?.phase).toBe(first);
   });
 
@@ -436,6 +448,12 @@ describe("what appears in the black: the giant for good, the field for bad and s
     startEnding(ctx);
     expect(ctx.session.pullOut?.cutMs).toBe(PULL_MS);
     timers.shift()!.fn();
+    // then the boss fight (2026-11-13), and only after it the credits
+    expect(ctx.session.boss?.phase).toBe("intro");
+    bossActions["boss-cheat"](ctx);
+    bossActions["boss-next"](ctx);
+    bossActions["boss-next"](ctx);
+    bossActions["boss-done"](ctx);
     expect(ctx.session.endingPage?.phase).toBe("credits");
   });
 

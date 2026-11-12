@@ -60,8 +60,9 @@ import { advance, dropQuestion, endsInChoice, finishChoice, push, showing, talki
 import { beatQueued, lieDownOrEnd, openChatIfDue, lookQueued, questionQueued, taskStartKey } from "@world/loop/runtime";
 import { askedOn, knows } from "@state/recognise";
 import { gateAdvance } from "@world/motion/reveal";
-import { endingNext } from "@world/endings/flow";
+import { endingNext, bossActions } from "@world/endings/flow";
 import { renderEnding } from "@world/endings/view";
+import { bossStart, renderBoss } from "@world/endings/boss";
 import { boxObjectFor, CASE_WOBBLE_MS, doorMeal, itemsButton, itemsPanel, openBoxBefore, openBoxReady, raidShowing, renderChecklist, renderRoom, settingsPanel, SLIP_ITEM, walkmanShown } from "./hud";
 import { looseContent, stuckLineKey } from "./case";
 import { jitter } from "@state/seed";
@@ -105,6 +106,8 @@ function renderGameBody(store: Store, session: Session, nowMs: number): SafeHtml
   const events = store.getEvents();
   // The run has ended: its pages replace every view (san-and-endings).
   if (state.ending !== "none") return renderEnding({ state, events, session, startDay: store.getStartDay(), nowMs });
+  // dev (`&boss=`): the day-18 fight on its own, with no ending logged.
+  if (session.boss) return renderBoss(session.boss, nowMs);
   // opening R2: the dream before day 1, its own black page with the box over it (and its fade).
   if (prologueShowing(session)) {
     const box = session.opening ? null : dialogueBox(state, events, session, nowMs);
@@ -1847,6 +1850,8 @@ export const loopActions: Record<string, ActionHandler> = {
   "ending-next"(ctx) {
     endingNext(ctx);
   },
+  // day 18's boss fight (2026-11-13): between the pull-out and the pages.
+  ...bossActions,
 
   // Talking to Kuro (dialogue FR2): its body or the desktop pill, the player's box, leaving.
   ...kuroActions,

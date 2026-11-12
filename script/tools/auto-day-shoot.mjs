@@ -637,6 +637,19 @@ for (const it of ITEMS) {
   if (errors.length) { note("   JS: " + errors.join(" | ")); errors.length = 0; }
   if (process.env.STOP_AFTER === it.id) break;
 }
+// day 18's boss fight (2026-11-13): after the pull-out (6 s) the fight sits before the pages; the dev cheat wins it, the box clicks through
+if (day === 18) {
+  for (let k = 0; k < 40 && !(await has("[data-action=boss-next], [data-action=boss-cheat], [data-action=ending-next]")); k++) await sleep(0.5);
+  if (await has("[data-action=boss-cheat], [data-action=boss-next]")) {
+    await shotStep("boss-intro");
+    for (let k = 0; k < 12 && (await has("[data-action=boss-next]")) && !(await has("[data-action=boss-cheat]")); k++) { await sel("[data-action=boss-next]", 0.3); }
+    if (await has("[data-action=boss-cheat]")) { await sleep(1.2); await shotStep("boss-fight"); await ev("(()=>{const b=document.querySelector('[data-action=boss-cheat]'); if(b) b.click(); return !!b})()"); await sleep(0.5); }
+    for (let k = 0; k < 12 && (await has("[data-action=boss-next]")); k++) await sel("[data-action=boss-next]", 0.4);
+    await shotStep("boss-after");
+    if (await has("[data-action=boss-done]")) await sel("[data-action=boss-done]", 0.6);
+    note(`   boss: walked · pages=${await has("[data-action=ending-next]")}`);
+  }
+}
 const judged = await ev(`(()=>{ const t = localStorage.getItem('nt_run') || ''; return (t.match(/\\{[^{}]*"kind":"(give|boardJudge)"[^{}]*\\}/g) || []).join(' | ') + ' · san ' + ((t.match(/"san":(\\d+)/g)||[]).slice(-1)[0]||'?'); })()`);
 if (judged) note(`   board events: ${judged}`);
 const final = await text();

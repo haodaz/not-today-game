@@ -27,6 +27,7 @@ import { createHandLayer } from "@world/objects/layer";
 import { createNav } from "@world/room/nav";
 import { settleSession } from "@world/dialogue/place";
 import { createPullDriver } from "@world/endings/pullout-dom";
+import { bossStart } from "@world/endings/boss";
 import { clearAll, createProfileWriter, createRunSlot, restartRun } from "@state/saves";
 import { createStore, type Store } from "@state/store";
 import { parseBeatParams } from "@world/desktop/beat";
@@ -201,6 +202,14 @@ function startGame(store: Store, saved: boolean, prologue = false): void {
   if (!saved) {
     const which = previewParam(search);
     if (which && startPreview(game.session, store.getState().day, which)) game.rerender();
+  }
+  // `&boss=bad|survive|good` (dev, 2026-11-13): the day-18 fight on its own — party from `found=` / `seed=`, no ending logged.
+  const boss = params.get("boss");
+  if (import.meta.env.DEV && (boss === "bad" || boss === "survive" || boss === "good")) {
+    game.session.view = "desk";
+    game.session.dialogue = { queue: [], line: 0 };
+    game.session.boss = bossStart(store.getState(), boss, Date.now());
+    game.rerender();
   }
 }
 

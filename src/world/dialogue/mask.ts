@@ -40,6 +40,12 @@ export const MASK_ALLOWS: ReadonlySet<string> = new Set([
   "settings-confirm-cancel",
   "loop-mute",
   "ending-next",
+  // day 18's boss fight (2026-11-13): its box, its menu, its way out.
+  "boss-next",
+  "boss-move",
+  "boss-retry",
+  "boss-done",
+  "boss-cheat",
   "taboo-error-ok",
   // opening R2: 跳过 over the prologue.
   "opening-skip",

@@ -8,6 +8,7 @@ import { constants } from "@state/variables";
 import type { ActionContext } from "@world/desktop/controller";
 import { PULL_CUT_MS, pullFrom } from "@world/room/splat/pullout";
 import { creditLines, creditsShown, CREDIT_LINE_MS } from "./credits";
+import { BOSS_TICK_MS, bossCheat, bossChoose, bossNext, bossRetry, bossStart, bossTick } from "./boss";
 
 export interface EndingHost {
   /** Bad: clear `nt_run`, add 1 to the profile's runs, back to the title page. */
@@ -42,7 +43,7 @@ export function startEnding(ctx: ActionContext): void {
   const { session, store } = ctx;
   const state = store.getState();
   const ending = state.ending as Ending | "none";
-  if (ending === "none" || session.endingPage || session.pullOut) return;
+  if (ending === "none" || session.endingPage || session.pullOut || session.boss) return;
   session.dialogue = { queue: [], line: 0 };
   session.kuroInput = false;
   session.historyOpen = false;
@@ -60,13 +61,70 @@ export function startEnding(ctx: ActionContext): void {
     ctx.later(pull.cutMs, () => {
       if (ctx.session.pullOut !== pull) return;
       ctx.session.pullOut = null;
-      firstPage(ctx, ending);
+      // the boss fight (author 2026-11-13): the pull-out showed the whole of it; now the fight, then the pages
+      ctx.session.boss = bossStart(ctx.store.getState(), ending, nowOf(ctx));
+      ctx.rerender();
     });
     ctx.rerender();
     return;
   }
   firstPage(ctx, ending);
 }
+
+/** The fight's clock: ticks while it runs or an act plays; stops to wait for a choice, a line or the end. */
+function runBoss(ctx: ActionContext): void {
+  const tick = () => {
+    const b = ctx.session.boss;
+    if (!b) return;
+    const next = bossTick(b, nowOf(ctx));
+    ctx.session.boss = next;
+    if (next.phase === "run" || next.phase === "act") ctx.later(BOSS_TICK_MS, tick);
+    ctx.rerender();
+  };
+  ctx.later(BOSS_TICK_MS, tick);
+}
+
+/** The boss fight's actions: the text box, the player's move, a retry, the way out to the pages. */
+export const bossActions = {
+  "boss-next"(ctx: ActionContext): void {
+    const b = ctx.session.boss;
+    if (!b) return;
+    const next = bossNext(b, nowOf(ctx));
+    ctx.session.boss = next;
+    if (next.phase === "run" && b.phase !== "run") runBoss(ctx);
+    ctx.rerender();
+  },
+  "boss-move"(ctx: ActionContext, data: DOMStringMap): void {
+    const b = ctx.session.boss;
+    if (!b || !data.move) return;
+    const next = bossChoose(b, data.move, nowOf(ctx));
+    if (next === b) return;
+    ctx.session.boss = next;
+    runBoss(ctx);
+    ctx.rerender();
+  },
+  "boss-retry"(ctx: ActionContext): void {
+    const b = ctx.session.boss;
+    if (!b || b.phase !== "lost") return;
+    ctx.session.boss = bossRetry(b, ctx.store.getState(), nowOf(ctx));
+    runBoss(ctx);
+    ctx.rerender();
+  },
+  "boss-done"(ctx: ActionContext): void {
+    const b = ctx.session.boss;
+    if (!b || b.phase !== "after") return;
+    ctx.session.boss = null;
+    firstPage(ctx, b.ending);
+  },
+  // dev only (the replay driver, tests): the boss down at once
+  "boss-cheat"(ctx: ActionContext): void {
+    if (!import.meta.env.DEV) return;
+    const b = ctx.session.boss;
+    if (!b || b.phase === "won" || b.phase === "after") return;
+    ctx.session.boss = bossCheat(b, nowOf(ctx));
+    ctx.rerender();
+  },
+};
 
 /** How long the collapse runs to white before its one line shows (three-meters; reduced motion cuts it). */
 export const COLLAPSE_TO_WHITE_MS = 4000;

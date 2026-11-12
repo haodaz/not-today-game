@@ -13,6 +13,7 @@ import { fillPlaceholders } from "@world/replies/placeholders";
 import { creditLines, creditsShown, lastLineKey } from "./credits";
 import { youAndYou } from "./youandyou";
 import { renderPullOut } from "./pullout";
+import { renderBoss } from "./boss";
 import { COLLAPSE_TO_WHITE_MS } from "./flow";
 
 export interface EndingModel {
@@ -80,6 +81,8 @@ export function renderCollapse(m: EndingModel): SafeHtml {
 export function renderEnding(m: EndingModel): SafeHtml {
   // Night 18: the pull-out first; the pages wait (room-scene addition 2026-11-01).
   if (m.session.pullOut) return renderPullOut(m);
+  // the boss fight (author 2026-11-13): after the pull-out, before the pages
+  if (m.session.boss) return renderBoss(m.session.boss, m.nowMs);
   const ending = m.state.ending as Ending;
   const phase = m.session.endingPage?.phase ?? (ending === "collapse" ? "collapse" : ending === "bad" ? "you" : "credits");
   if (phase === "collapse") return renderCollapse(m);

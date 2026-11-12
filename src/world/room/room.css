@@ -672,3 +672,66 @@
 .dict-guide .row{display:flex;gap:8px;justify-content:flex-end}
 .dict-guide button{font:inherit;font-size:13px;padding:6px 14px;border-radius:8px;border:1px solid rgba(0,0,0,.18);background:#fff;color:#1d2129;cursor:pointer}
 .dict-guide button.go{background:#1d2129;color:#fff;border-color:#1d2129}
+/* day 18's boss fight (author 2026-11-13): ATB, side-scrolling; the party left, the huge Kuro right */
+.boss-page{position:relative;width:1600px;height:900px;overflow:hidden;background:#05060a;color:#efe9df;font-family:"PingFang SC","Hiragino Sans GB",sans-serif}
+.bs-backdrop{position:absolute;inset:0;background:url(/room/dark/tentacles.png) center/900px repeat;opacity:.35;filter:saturate(.6) brightness(.7);animation:bs-drift 40s linear infinite}
+.bs-backdrop::after{content:"";position:absolute;inset:0;background:radial-gradient(70% 80% at 72% 55%,rgba(185,28,28,.28),transparent 60%),linear-gradient(180deg,rgba(0,0,0,.2),rgba(0,0,0,.75))}
+@keyframes bs-drift{to{background-position:900px 300px}}
+.bs-field{position:absolute;inset:0}
+.bs-party{position:absolute;left:90px;bottom:200px;display:flex;flex-direction:column;align-items:flex-start;gap:14px;transition:transform 1.6s ease-in-out}
+.bs-member{position:relative;display:flex;align-items:flex-end;gap:14px;transition:opacity 400ms}
+.bs-member.player .bs-sprite{height:260px;animation:bs-breathe 2.6s ease-in-out infinite}
+.bs-member.object .bs-sprite{height:64px;animation:bs-breathe 3.4s ease-in-out infinite}
+.bs-member.qkuro .bs-sprite{height:120px;animation:bs-breathe 2s ease-in-out infinite}
+.bs-member.object{margin-left:40px}
+.bs-member.down{opacity:.35;filter:grayscale(1)}
+.bs-member.hurt .bs-sprite{animation:bs-hurt 400ms ease-out both}
+.bs-member.acting.player .bs-sprite{animation:bs-lunge 900ms ease-out both}
+.bs-member.ready .bs-plate{outline:2px solid #F6B73C;outline-offset:2px}
+@keyframes bs-breathe{0%,100%{transform:translateY(0) scaleY(1)}50%{transform:translateY(3px) scaleY(.985)}}
+@keyframes bs-hurt{0%{transform:translateX(0)}30%{transform:translateX(-18px)}60%{transform:translateX(10px)}100%{transform:translateX(0)}}
+@keyframes bs-lunge{0%{transform:translateX(0)}35%{transform:translateX(120px)}100%{transform:translateX(0)}}
+.bs-plate{display:flex;flex-direction:column;gap:4px;min-width:170px;padding:6px 10px;background:rgba(5,6,10,.7);border:1px solid rgba(255,255,255,.18);border-radius:6px}
+.bs-plate.boss{min-width:260px}
+.bs-name{font-size:13px;letter-spacing:.15em;color:#efe9df}
+.bs-bar{display:block;height:8px;background:rgba(255,255,255,.12);border-radius:4px;overflow:hidden}
+.bs-bar b{display:block;height:100%;transition:width 300ms}
+.bs-bar.hp b{background:linear-gradient(90deg,#13A37A,#7fe0b8)}
+.bs-bar.atb{height:5px}
+.bs-bar.atb b{background:#F6B73C;transition:width 120ms linear}
+.bs-num{position:absolute;left:60px;top:-10px;font:900 28px/1 "PingFang SC",sans-serif;color:#fff;text-shadow:0 2px 0 #000;animation:bs-num 900ms ease-out both}
+.bs-num.heal{color:#7fe0b8}
+.bs-num.big{font-size:44px;left:auto;right:420px;top:200px;color:#F6B73C}
+@keyframes bs-num{0%{transform:translateY(10px);opacity:0}20%{opacity:1}100%{transform:translateY(-40px);opacity:0}}
+.bs-boss{position:absolute;right:-40px;bottom:0;width:980px;height:900px}
+.bs-boss-img{position:absolute;right:0;bottom:0;height:880px;filter:drop-shadow(0 0 40px rgba(185,28,28,.55));animation:bs-loom 5s ease-in-out infinite}
+.bs-boss.stage2 .bs-boss-img{filter:drop-shadow(0 0 60px rgba(185,28,28,.8))}
+.bs-boss.hurt .bs-boss-img{animation:bs-boss-hurt 500ms steps(4) both}
+.bs-boss.acting .bs-boss-img{animation:bs-boss-act 900ms ease-in-out both}
+.bs-boss.down .bs-boss-img{animation:bs-boss-down 2.4s ease-in both;filter:grayscale(.6) brightness(.5)}
+.bs-boss .bs-plate{position:absolute;left:120px;top:60px}
+@keyframes bs-loom{0%,100%{transform:translateY(0)}50%{transform:translateY(12px)}}
+@keyframes bs-boss-hurt{0%,100%{transform:translateX(0);filter:brightness(1)}25%{transform:translateX(14px);filter:brightness(2.2)}50%{transform:translateX(-10px)}75%{transform:translateX(6px);filter:brightness(1.6)}}
+@keyframes bs-boss-act{0%{transform:translateX(0)}40%{transform:translateX(-140px) translateY(-20px)}100%{transform:translateX(0)}}
+@keyframes bs-boss-down{to{transform:translateY(120px);opacity:0}}
+.bs-prop{position:absolute;left:330px;bottom:380px;height:70px;animation:bs-fly 900ms ease-in both}
+.bs-prop.flip{height:90px;animation:bs-fly-spin 900ms ease-in both}
+@keyframes bs-fly{0%{transform:translate(0,0) rotate(0);opacity:1}80%{opacity:1}100%{transform:translate(760px,-140px) rotate(540deg);opacity:0}}
+@keyframes bs-fly-spin{0%{transform:translate(0,0) rotate(0);opacity:1}80%{opacity:1}100%{transform:translate(720px,-80px) rotate(-900deg);opacity:0}}
+.bs-flash{position:absolute;inset:0;background:#fff;animation:bs-flash 500ms ease-out both;pointer-events:none}
+@keyframes bs-flash{0%{opacity:.9}100%{opacity:0}}
+.boss-page.shake .bs-field{animation:bt-shake 460ms steps(6)}
+.bs-box{position:absolute;left:80px;right:80px;bottom:40px;min-height:96px;padding:22px 30px;background:rgba(5,6,10,.85);border:2px solid rgba(255,255,255,.3);border-radius:8px;font-size:22px;line-height:1.6}
+.bs-box p{margin:0}
+.bs-box.more{cursor:pointer}
+.bs-hit{position:absolute;inset:0;border:0;padding:0;margin:0;background:transparent;cursor:pointer}
+.bs-caret{position:absolute;right:22px;bottom:14px;width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:12px solid #efe9df;animation:bs-caret 900ms ease-in-out infinite alternate}
+@keyframes bs-caret{to{transform:translateY(4px);opacity:.4}}
+.bs-menu{position:absolute;left:80px;bottom:150px;display:flex;gap:10px;flex-wrap:wrap;max-width:720px}
+.bs-cmd{padding:10px 20px;border:2px solid #F6B73C;background:rgba(5,6,10,.85);color:#F6B73C;font:900 18px/1 inherit;letter-spacing:.1em;cursor:pointer;border-radius:4px}
+.bs-cmd:hover{background:#F6B73C;color:#05060a}
+.bs-box .bs-cmd{margin-top:12px}
+/* the assimilated player, after: across the field, on Kuro's side, facing back */
+.boss-page.after.strong .bs-party{transform:translateX(1040px)}
+.boss-page.after.strong .bs-member.player .bs-sprite{transform:scaleX(-1);filter:brightness(.35) drop-shadow(0 0 24px rgba(185,28,28,.9))}
+.boss-page.after.strong .bs-member.object,.boss-page.after.strong .bs-member.qkuro{opacity:0}

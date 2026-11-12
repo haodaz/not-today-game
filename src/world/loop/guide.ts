@@ -155,7 +155,7 @@ export function guideNow(state: State, events: readonly GameEvent[], session: Se
  * every room move (回房间 too), the bed and getting up, the 道具 strip and the objects' own layers,
  * the coach marks, the call's controls, the pointer's dock peek.
  */
-const ALLOW_PREFIXES = ["settings-", "kuro-", "onboard-", "call-", "obj-", "objbar-", "dlg-history", "vf-", "rise", "prints-"];
+const ALLOW_PREFIXES = ["settings-", "kuro-", "onboard-", "call-", "obj-", "objbar-", "dlg-history", "vf-", "rise", "prints-", "boss-"];
 export const GUIDE_ALLOWS: ReadonlySet<string> = new Set([
   "loop-advance",
   "loop-choice",

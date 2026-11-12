@@ -182,6 +182,8 @@ export interface Session {
    * framing, since when, and where this ending cuts it. While set, the pages wait.
    */
   pullOut: { ending: "bad" | "survive" | "good"; from: "room" | "desk" | "bed"; startMs: number; cutMs: number } | null;
+  /** Day 18's boss fight (author 2026-11-13): after the pull-out, before the ending pages. */
+  boss: import("../endings/boss").BossBattle | null;
   /** The object lifted off the desk bar (polish FR1); never at the same time as the phone. */
   holding: string | null;
   /**
@@ -526,6 +528,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     caseStuck: -1,
     caseShake: null,
     pullOut: null,
+    boss: null,
     collection: EMPTY_COLLECTION,
     bookOpen: false,
     holding: null,
