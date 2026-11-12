@@ -129,8 +129,8 @@
                 "text": "I'm here if you need me."
               },
               {
-                "who": "kuro",
-                "text": "Lao Wang wants 'consciousness' in. Four rows: say it first, the rival, proof, one line. The material is in the chats with the boss, the group and Lao Zhou, one line at a time; the table is locked, and the code came to the pager."
+                "who": "me",
+                "text": "He wants 'consciousness'. The things he has said himself will serve better than anything I could write."
               }
             ]
           },
@@ -209,9 +209,9 @@
         "who": "boss",
         "note": [
           "The boss wants 'consciousness' written in.",
-          "The material is scattered through the boss's, the group's and Lao Zhou's chats, one sentence at a time."
+          "The lines he has said are scattered through his, the group's and Lao Zhou's chats."
         ],
-        "call": "The table is locked: the code is on the pager. Find all four cells and fill them in!",
+        "call": "Find them one by one and piece together the page he wants.",
         "cta": "Start work",
         "motif": {
           "kind": "danmaku",
@@ -228,7 +228,8 @@
             "Investors like this"
           ]
         },
-        "tone": "paper"
+        "tone": "paper",
+        "art": "/launch/day-04.jpg"
       }
     },
     {

@@ -131,8 +131,8 @@
                 "text": "Take it one step at a time."
               },
               {
-                "who": "kuro",
-                "text": "Vivi wants the 'avatar' page. Four rows: name, what it does, it and you, limits. The material is in Vivi's PRD, her chat, the group and v17; the table is locked, and the four digits are in Vivi's chat."
+                "who": "me",
+                "text": "'Avatar'. The things she has written herself, pieced together, are what she wants."
               }
             ]
           },
@@ -210,10 +210,10 @@
       "launch": {
         "who": "partner",
         "note": [
-          "Vivi wants the 'avatar' page: the name, what it can do, it and you, the boundary.",
-          "The material is in her PRD, her private chat, the group, and v17."
+          "Vivi wants the 'avatar' page.",
+          "Her own PRD, her chat and the group have all touched on it."
         ],
-        "call": "The table is locked: the four digits are in Vivi's private chat. Piece together the page she wants!",
+        "call": "Piece together the page she wants.",
         "cta": "Start work",
         "motif": {
           "kind": "bubble",
@@ -226,7 +226,8 @@
             "It's all in the PRD"
           ]
         },
-        "tone": "blue"
+        "tone": "blue",
+        "art": "/launch/day-05.jpg"
       }
     },
     {

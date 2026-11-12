@@ -144,8 +144,8 @@
                 "text": "You've been working so hard."
               },
               {
-                "who": "kuro",
-                "text": "The ontology page, for the client. Five rows: what it is, where it comes from, how old, what it wants, us. The material is in the chats with the boss and the group; the table is locked, and the key is in last night's recording, played backwards."
+                "who": "me",
+                "text": "The entity. The boss has said it, the client has asked it; put it together."
               }
             ]
           },
@@ -232,10 +232,10 @@
       "launch": {
         "who": "boss",
         "note": [
-          "The entity page, for the client: what it is, where it came from, how old, what it wants, us.",
-          "The material is in the boss's and the group's chats."
+          "The entity page, for the client.",
+          "What the boss and the group have said is enough."
         ],
-        "call": "The table is locked: the key is in last night's recording, played backwards. Fill all five cells!",
+        "call": "Piece it together and send it to the group.",
         "cta": "Start work",
         "motif": {
           "kind": "danmaku",
@@ -252,7 +252,8 @@
             "Who we are"
           ]
         },
-        "tone": "paper"
+        "tone": "paper",
+        "art": "/launch/day-06.jpg"
       }
     },
     {

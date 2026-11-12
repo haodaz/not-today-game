@@ -302,7 +302,9 @@ for (const it of ITEMS) {
       for (let k = 0; k < 2 && (await has("[data-action=open-deliverable]")) && !(await has(`[data-action=wb-nav][data-page='task:${it.id}']`)); k++) { note(`   vivi lock: opening her pages first · docs ${await ev("JSON.stringify([...document.querySelectorAll('[data-action=open-deliverable]')].filter(__vis).map(e=>e.dataset.doc))")}`); await interrupts(); await toWorkbench(); await goHome(); }
       if (process.env.DIAG) note(`   probe: lock=${(await text()).includes(S("vivi.lock"))} deliv=${await has("[data-action=open-deliverable]")} taskLink=${await has(`[data-action=wb-nav][data-page='task:${it.id}']`)} pages=${await ev("JSON.stringify([...document.querySelectorAll('[data-action=wb-nav]')].filter(__vis).map(e=>e.dataset.page))")} opens=${await ev("(localStorage.getItem('nt_run')||'').match(/file:[a-z0-9-]+|task:[a-z0-9]+/g)?.join(',')")}`);
       await sel(`[data-action=wb-nav][data-page='task:${it.id}']`, 1.2);   // workspace: a task lives on its own page (在办 card / session list)
-      if ((await ev("JSON.stringify(__choices())").then(JSON.parse)).length) { await shotStep(`ask-${it.id}`); await settle(); await sleep(1); }  // launch: 要开始工作吗？ → 开始
+      // launch: 要开始工作吗？ → 开始 (the ask renders a beat after the row click: wait for it or for the launch page)
+      for (let w = 0; w < 8 && !(await ev("JSON.stringify(__choices())").then(JSON.parse)).length && !(await has("[data-action=task-launch]")); w++) await sleep(0.5);
+      if ((await ev("JSON.stringify(__choices())").then(JSON.parse)).length) { await shotStep(`ask-${it.id}`); await settle(); await sleep(1); }
       if (await has("[data-action=task-launch]")) { await shotStep(`launch-${it.id}`); await sel("[data-action=task-launch]", 1.2); note("   launch: 开始工作"); await sleep(0.6); }  // every board task opens on its launch page
       if (board?.tune) {
         // tune (2026-11-08): a module's source first (a conv), then one path per module (the first open chip each
@@ -319,7 +321,10 @@ for (const it of ITEMS) {
           if (card) {
             const [mod, path] = card.split("/");
             if (!(await sel(`[data-action=tune-select][data-mod=${mod}][data-path="${path}"]`, 0.4))) break;
-            if (!(await sel("[data-action=tune-act]:not([disabled])", 0.6))) { note("   tune: 行动 not enabled after a pick"); break; }
+            // Kuro's lines may still be typing (busy): 行动 lights once they are in
+            let lit = false; for (let w = 0; w < 10 && !(lit = await has("[data-action=tune-act]:not([disabled])")); w++) await sleep(0.5);
+            if (!lit) { note(`   tune: 行动 not enabled after a pick · act ${await ev("JSON.stringify([...document.querySelectorAll('[data-action=tune-act]')].map(b=>b.disabled))")} sel ${await ev("JSON.stringify([...document.querySelectorAll('[data-action=tune-select]')].map(b=>b.getAttribute('aria-pressed')))")}`); break; }
+            if (!(await sel("[data-action=tune-act]:not([disabled])", 0.6))) break;
             picks++; continue;
           }
           if (turns < 14 && (await ev("(()=>{const a=[...document.querySelectorAll('.ts-node:not(.set):not(.locked):not(.cur)')].filter(__vis)[0]; if(!a) return false; a.click(); return true})()"))) { turns++; await sleep(0.8); continue; }

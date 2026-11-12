@@ -872,10 +872,10 @@
       "launch": {
         "who": "partner",
         "note": [
-          "Yesterday's bars are still there; today Vivi moved the line to 80.",
-          "Xiao Zhang sent a few more options, each with its return and its cost."
+          "Vivi saw yesterday's; she says it isn't enough yet.",
+          "Xiao Zhang sent a few more ways to do it."
         ],
-        "call": "Keep tuning and push all four bars over today's line!",
+        "call": "Keep going until she nods.",
         "cta": "Start work",
         "motif": {
           "kind": "bubble",

@@ -20,6 +20,7 @@ import { cardText, finishLabel, renderBoard } from "./board";
 import { openWork } from "./work";
 import { tunePane } from "./shell";
 import { tuneStage } from "./tune-stage";
+import { clueStage } from "./clue-stage";
 import { tuneOfferPending, tuneOffers } from "@state/days/board";
 import { isNight } from "../beat";
 import type { AppContext } from "../model";
@@ -183,6 +184,9 @@ function genericWorkLayer(c: { state: State; events: readonly GameEvent[]; sessi
   if (board.tune) {
     // tune stage (author 2026-11-12): the research-node screen, not the config pane and the preview
     body = tuneStage({ state, events, session, nowMs }, task, board);
+  } else if (board.kind === "table" && !board.meeting && board.view !== "ide") {
+    // clue stage (2026-11-12): the evidence board, not the table pane
+    body = clueStage({ state, events, session, nowMs }, task, board);
   } else {
     body = html`<div class="wl-generic">${renderBoard(app, task)}</div>`;
   }
