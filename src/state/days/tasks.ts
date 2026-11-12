@@ -1227,7 +1227,9 @@ function localiseTask(zh: Task, en: Task, w: string): Task {
     if (zh.board.slots.length !== en.board.slots.length || zh.board.cards.length !== en.board.cards.length) fail(`${w}.board`, "board shape differs from the Chinese");
     // ide R1: the view and the preview are shared; the beats differ only in their lines' text.
     // shell R4: the en `ide.files` carry their own names and code; only their keys must match.
-    const ideShape = (b: TaskBoard) => (b.ide ? { src: b.ide.src, pages: b.ide.pages, files: b.ide.files ? Object.keys(b.ide.files).sort() : null, diff: b.ide.diff ? Object.keys(b.ide.diff).sort() : null, api: !!b.ide.api } : null);
+    // en pages (2026-11-13): the English build serves its own copy of a player page under
+    // /docs/player/en/ — the same page, translated; the path differs by that folder only.
+    const ideShape = (b: TaskBoard) => (b.ide ? { src: b.ide.src.replace("/docs/player/en/", "/docs/player/"), pages: b.ide.pages, files: b.ide.files ? Object.keys(b.ide.files).sort() : null, diff: b.ide.diff ? Object.keys(b.ide.diff).sort() : null, api: !!b.ide.api } : null);
     if (zh.board.view !== en.board.view || !sameJson(ideShape(zh.board), ideShape(en.board))) fail(`${w}.board`, "view or ide differs from the Chinese");
     // meeting R1: the people's ids and tiles, the lines' times / speakers / cards, the layout and the
     // seats are shared; only the names and the line text differ.

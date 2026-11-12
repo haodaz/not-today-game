@@ -295,7 +295,7 @@
         },
         "view": "ide",
         "ide": {
-          "src": "/docs/player/day-01-space.html",
+          "src": "/docs/player/en/day-01-space.html",
           "pages": {
             "r1": 2,
             "r2": 4,

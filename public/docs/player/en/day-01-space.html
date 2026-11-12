@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Future Intelligence · A Shared Intelligence Space · Technical Brief</title>
+<style>
+/* 未来智能 · 技术表达 v1（BP 里「技术」那一部分，给投资人）
+   一份快照的记录，不是预测：页面里每个数都读自 SNAP（数据底座跑完、截断、冻结）。
+   4:3 舞台（放得进 IDE 旁边的预览窗）：上面标题和数字，下面是运算空间。九百个粒子组成每一页的图；翻页时解离、重聚。
+   ?c=页&t=秒 定格；←/→ 翻页；「代码」看正在跑的这一段；「配色」换三套。参考文献见最后一页。 */
+*{box-sizing:border-box}
+:root{--bg:#05070F;--ink:#E8EBF7;--muted:#8E97BC;--dim:#525B80;--line:rgba(140,160,255,.14);
+  --cyan:#3FE0FF;--violet:#8B7BFF;--amber:#FFB547;--mint:#38F2B0;--rose:#FF5C93;
+  --topbg:rgba(5,7,15,.7);--codebg:#080B18;--codeink:#B9C0E2;--codeline:#161B38;
+  --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  --mono:"SF Mono",Menlo,Consolas,"Roboto Mono",monospace}
+body.light{--bg:#F4F6FB;--ink:#16182B;--muted:#5F6680;--dim:#9AA0B8;--line:rgba(22,24,43,.10);
+  --cyan:#0B9BD0;--violet:#6D5BFF;--amber:#D48A12;--mint:#13A37A;--rose:#E0457F;
+  --topbg:rgba(244,246,251,.85);--codebg:#FBFCFE;--codeink:#2B2F45;--codeline:#E6E9F2}
+body.mariana{--bg:#303841;--ink:#E2E6EE;--muted:#A6ACB9;--dim:#76838F;--line:rgba(216,222,233,.13);
+  --cyan:#5FB4B4;--violet:#C594C5;--amber:#F9AE58;--mint:#99C794;--rose:#EC5F66;
+  --topbg:rgba(48,56,65,.85);--codebg:#2B323A;--codeink:#D8DEE9;--codeline:#3B444E}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);overflow:hidden}
+#wrap{position:absolute;inset:0;display:flex}
+#code{display:none;flex:0 0 42%;height:100%;margin:0;background:var(--codebg);color:var(--codeink);font:12px/1.6 var(--mono);overflow:auto;padding:0 0 40px;border-right:1px solid var(--codeline)}
+body.split #code{display:block}
+#code .fn{padding:2px 18px 12px;white-space:pre;tab-size:2}
+#code .hd{position:sticky;top:0;background:var(--codebg);padding:10px 18px;color:var(--dim);font-size:11px;letter-spacing:.06em;border-bottom:1px solid var(--codeline);margin-bottom:8px}
+#code .hd b{color:var(--cyan)}
+#code .k{color:#C792EA}#code .s{color:#9FE6A0}#code .n{color:#FFB547}#code .c{color:#6E7B87;font-style:italic}
+body.light #code .k{color:#7A3EBF}body.light #code .s{color:#1E8A4C}body.light #code .n{color:#B5600B}body.light #code .c{color:#9AA0B8}
+#view{position:relative;flex:1;height:100%;overflow:hidden}
+/* A narrow preview window (the IDE's middle column): the code goes under the stage, not beside it. */
+@media (max-aspect-ratio:1/1),(max-width:760px){#wrap{flex-direction:column}#view{order:0;flex:1 1 auto;height:auto;min-height:0}
+  #code{order:1;flex:0 0 36%;height:auto;border-right:0;border-top:1px solid var(--codeline)}}
+#stage{position:absolute;left:50%;top:50%;width:1200px;height:900px;transform-origin:0 0;overflow:hidden;background:var(--bg)}
+#stage::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(760px 460px at 50% 64%,rgba(80,90,255,.16),transparent 64%)}
+body.light #stage::before{background:radial-gradient(760px 460px at 50% 64%,rgba(109,91,255,.11),transparent 64%)}
+body.mariana #stage::before{background:radial-gradient(760px 460px at 50% 64%,rgba(102,153,204,.18),transparent 64%)}
+#stage::after{content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(160,175,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(160,175,255,.05) 1px,transparent 1px);
+  background-size:40px 40px;mask-image:radial-gradient(ellipse at 50% 64%,#000 22%,transparent 72%);-webkit-mask-image:radial-gradient(ellipse at 50% 64%,#000 22%,transparent 72%)}
+body.light #stage::after{background-image:linear-gradient(rgba(22,24,43,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(22,24,43,.045) 1px,transparent 1px)}
+#stage>*{position:absolute}
+#cv{left:0;top:0;width:1200px;height:900px;z-index:2;pointer-events:none}
+.top{left:0;top:0;width:1200px;height:34px;display:flex;align-items:center;gap:12px;padding:0 28px;font:500 10px var(--mono);letter-spacing:.07em;color:var(--muted);border-bottom:1px solid var(--line);background:var(--topbg);z-index:4;white-space:nowrap}
+.top b{color:var(--ink);font-weight:700}
+.top .snap{color:var(--cyan)}
+.top .live{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px var(--mint);margin-right:-4px}
+.top .r{margin-left:auto;color:var(--dim)}
+.top button{font:700 10px var(--mono);letter-spacing:.08em;color:var(--cyan);background:transparent;border:1px solid var(--line);border-radius:6px;padding:3px 9px;cursor:pointer}
+.ch{display:none;z-index:3}
+.ch.on{display:block}
+.ch>*{position:absolute}
+/* 上：标题、一句话、一排数字；下：运算空间（画布） */
+.head{left:48px;top:58px;width:1104px}
+.kick{font:700 11px var(--mono);letter-spacing:.24em;color:var(--cyan)}
+.head h1{margin:8px 0 0;font-size:31px;font-weight:800;letter-spacing:.02em;line-height:1.25}
+.head h1 em{font-style:normal;color:var(--cyan)}
+.lead{margin-top:10px;font-size:17px;line-height:1.65;color:var(--muted);max-width:1040px}
+.lead b{color:var(--ink);font-weight:700}
+.lead sup,.stats sup{font:700 10px var(--mono);color:var(--cyan);margin-left:1px}
+.stats{display:flex;margin-top:16px;max-width:820px}
+.stats div{padding-right:28px}
+.stats div+div{border-left:1px solid var(--line);padding-left:24px}
+.stats b{display:block;font:800 30px var(--sans);letter-spacing:.01em;line-height:1.1;color:var(--ink)}
+.stats b.c{color:var(--cyan)}.stats b.v{color:var(--violet)}.stats b.a{color:var(--amber)}.stats b.m{color:var(--mint)}
+.stats small{display:block;margin-top:5px;font-size:12px;color:var(--muted)}
+.eq{left:48px;top:806px;font:600 15px var(--sans);font-style:italic;color:var(--ink);white-space:nowrap}
+.eq sub,.eq sup{font-size:.7em;line-height:0}
+.eq u{text-decoration:none;font-style:normal;font-weight:600;color:var(--dim);margin-left:12px;font-size:12px}
+.ctl{left:120px;top:806px;width:960px;display:flex;align-items:center;gap:14px;font:700 11px var(--mono);color:var(--muted);z-index:5}
+.ctl input{flex:1;accent-color:var(--cyan)}
+.ctl output{color:var(--cyan);min-width:160px}
+.slot{margin-top:12px;font-size:15px;line-height:1.5;color:var(--ink);border-left:3px solid var(--cyan);padding:4px 0 4px 12px}
+.slot i{display:block;font:700 9.5px var(--mono);letter-spacing:.16em;color:var(--dim);font-style:normal;margin-bottom:2px}
+.slot.empty{border-left-style:dashed;color:var(--dim)}
+.refs{left:48px;top:300px;width:1104px;columns:2;column-gap:48px;font-size:13.5px;line-height:1.6;color:var(--muted)}
+.refs p{margin:0 0 10px;break-inside:avoid}
+.refs b{font:700 11px var(--mono);color:var(--cyan);margin-right:6px}
+.refs i{color:var(--ink);font-style:normal}
+.ft{z-index:4;left:48px;right:28px;bottom:14px;display:flex;align-items:center;gap:12px;white-space:nowrap}
+.ft .pos{font-size:12.5px;font-weight:600;color:var(--muted)}
+.ft .pos b{color:var(--cyan)}
+.pager{margin-left:auto;display:flex;align-items:center;gap:6px}
+.pager button{font:700 13px var(--sans);color:var(--muted);background:transparent;border:1px solid var(--line);border-radius:999px;width:28px;height:28px;cursor:pointer}
+.pager .dots{display:flex;gap:5px;margin:0 6px}
+.pager .dots i{width:7px;height:7px;border-radius:50%;background:var(--line);cursor:pointer}
+.pager .dots i.on{background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+.pager .num{font:700 11px var(--mono);color:var(--dim);min-width:52px;text-align:right}
+</style>
+</head>
+<body>
+<div id="wrap">
+<pre id="code"></pre>
+<div id="view"><div id="stage">
+  <div class="top"><b>Future Intelligence</b> Technical brief<span class="live"></span><span class="snap" id="snapline"></span><span class="r">A record, not a forecast · 2028.10.16</span><button id="theme">Colours</button><button id="tog">Code</button></div>
+
+  <section class="ch" data-c="0"><div class="head"><div class="kick">01 · Bottleneck</div>
+    <h1>Everyone is making AI bigger, and in the end it is <em>stuck on being too big and too much of one piece</em></h1>
+    <div class="lead">Take today's AI and the brain apart side by side: the brain has about 86 billion neurons<sup>[1]</sup> on about 20 watts<sup>[2]</sup>; it is divided into regions<sup>[4]</sup>, lights only a small patch at a time<sup>[3]</sup>, learns while it works<sup>[5][6]</sup>, and gets it from a few examples<sup>[7]</sup>. Today's AI is <b>one block</b>: computes everything, freezes once trained, needs oceans of samples, and megawatt-hours to learn<sup>[8]</sup>. One block also means <b>when it goes wrong, nobody can stop it</b>.</div></div></section>
+
+  <section class="ch" data-c="1"><div class="head"><div class="kick">02 · Direction</div>
+    <h1>So Future Intelligence took another road: <em>a group of brains, not one brain</em></h1>
+    <div class="lead">Contracts, finance, equipment, clients, legal: <b>each has a brain of its own</b><sup>[9][10][11]</sup>. The graph joins them: which one takes a question and which one double-checks <b>follow rules</b><sup>[13]</sup>.</div></div>
+    <div class="eq">y = Σ<sub>i ∈ route(q)</sub> w<sub>i</sub> f<sub>i</sub>( U<sub>i</sub> x )<u>routed to the right few</u></div></section>
+
+  <section class="ch" data-c="2"><div class="head"><div class="kick">03 · A shared intelligence space</div>
+    <h1>For a group of brains to work together, first there has to be a <em>shared intelligence space</em></h1>
+    <div class="lead">How does a group of brains speak one language? Through a shared intelligence space: the people, files, business objects and events of a client's business are all <b>projected into one mathematical space</b>.</div>
+    <div class="slot" data-slot="r1"></div>
+    <div class="stats" id="s0"></div></div>
+    <div class="eq">x = φ(reality) ∈ 𝒮<u>projection</u></div></section>
+
+  <section class="ch" data-c="3"><div class="head"><div class="kick">04 · Understanding</div>
+    <h1>With that space, for AI to understand reality is <em>to find the nearest points in it</em></h1>
+    <div class="lead">The AI no longer guesses from piles of raw text. A question lands as a point in the space, and <b>the few points nearest to it are where the answer comes from</b>. Whatever the relation is in reality, that is the distance in the space.</div></div>
+    <div class="eq">a* = arg min<sub>e</sub> d(q, e)<u>the nearest points</u></div></section>
+
+  <section class="ch" data-c="4"><div class="head"><div class="kick">05 · Projection · three vocabularies</div>
+    <h1>But reality doesn't line up by itself: <em>three clients, three vocabularies</em></h1>
+    <div class="lead">The same thing, named three ways in three clients' spreadsheets: "client name", "contracting party", "signatory" — <b>all the same thing</b>.</div>
+    <div class="slot" data-slot="r2"></div>
+    <div class="stats" id="s2"></div></div></section>
+
+  <section class="ch" data-c="5"><div class="head"><div class="kick">06 · Projection · union, then merge</div>
+    <h1>We first put the three vocabularies together, then <em>merge the synonyms into one</em></h1>
+    <div class="lead">Not one is dropped; once merged, the three clients' data is <b>measured together for the first time</b>.</div>
+    <div class="stats" id="s3"></div></div>
+    <div class="eq">𝒮 = ( D<sub>A</sub> ∪ D<sub>B</sub> ∪ D<sub>C</sub> ) / ∼<u>union, then merge</u></div></section>
+
+  <section class="ch" data-c="6"><div class="head"><div class="kick">07 · Reading the space, not the text · coverage</div>
+    <h1>Once the space is built, <em>a small model reading the space catches up with a large one reading the text</em></h1>
+    <div class="lead">One set of questions, <b>third-party open models</b> at five sizes, each run twice: once reading the raw text, once reading the space. Only what was measured is drawn.</div></div></section>
+
+  <section class="ch" data-c="7"><div class="head"><div class="kick">08 · Reading the space, not the text · energy</div>
+    <h1>And for every answer, <em>the energy drops by an order of magnitude</em></h1>
+    <div class="lead">At the same size, reading the space costs a fraction per question of reading the text. Drag to see each size. What is saved here is where the three moves below come from.</div>
+    <div class="stats"><div><b class="c" id="k5n"></b><small>model size (parameters)</small></div><div><b class="a" id="k5e"></b><small>reading text · J / question</small></div><div><b class="v" id="k5b"></b><small>reading the space · J / question</small></div></div></div>
+    <div class="ctl"><span>Size</span><input id="scale" type="range" min="0" max="4" step="1" value="4"><output id="scaleo"></output></div></section>
+
+  <section class="ch" data-c="8"><div class="head"><div class="kick">09 · Brain-first ① activate on demand</div>
+    <h1>The energy saved comes from three moves learned from the brain. First: <em>light only the small patch that matters</em></h1>
+    <div class="lead">Only about 1% of cortical neurons are active at any moment<sup>[3]</sup>; a mixture of experts calls only a few experts too<sup>[10]</sup>. In our space, one query wakes only the nodes that matter.</div>
+    <div class="stats" id="s8"></div></div>
+    <div class="eq">‖a‖<sub>0</sub> ≪ N<u>activate on demand</u></div></section>
+
+  <section class="ch" data-c="9"><div class="head"><div class="kick">10 · Brain-first ② label to the precision used</div>
+    <h1>Second: <em>judge by grade</em>, and don't pay for precision you won't use</h1>
+    <div class="lead">As long as labels are as precise as their use, the conclusion holds; where a label still straddles a grade, it is plain which piece of evidence to add.</div>
+    <div class="stats" id="s9"></div></div>
+    <div class="eq">ε<sub>label</sub> ≤ δ<sub>use</sub><u>label precision matched to use</u></div></section>
+
+  <section class="ch" data-c="10"><div class="head"><div class="kick">11 · Brain-first ③ AI merges, a person checks</div>
+    <h1>Third: <em>AI merges a draft, a person checks it</em>, and every check flows back</h1>
+    <div class="lead">The AI merges a draft; a person checks it. Each difference found is folded into the coordinates by its confidence<sup>[14]</sup>, and the uncertainty shrinks round by round.</div>
+    <div class="slot" data-slot="r3"></div>
+    <div class="stats" id="s10"></div></div>
+    <div class="eq">x ← x + K ( y − ŷ ), &nbsp; Σ ↓<u>flow back and correct</u></div></section>
+
+  <section class="ch" data-c="11"><div class="head"><div class="kick">12 · Moat</div>
+    <h1>So models change every year, and <em>the space stays ours</em></h1>
+    <div class="lead">A new model is only a new way of reading: after orthogonal alignment<sup>[15]</sup> the points stay, and so do the distances between them. <b>Anyone can buy a way of reading; the space can only be projected point by point and checked out round by round.</b></div>
+    <div class="slot" data-slot="r4"></div>
+    <div class="stats" id="s11"></div></div>
+    <div class="eq">x′ = U x , &nbsp; UᵀU = I , &nbsp; | p − q | unchanged<u>new reading, same points</u></div></section>
+
+  <section class="ch" data-c="12"><div class="head"><div class="kick">13 · Clients</div>
+    <h1>This road already reaches clients: <em>in the pipeline, and paid</em></h1>
+    <div class="lead">Recorded as in the snapshot; each client's status is as the receivables sheet has it.</div>
+    <div class="slot" data-slot="r5"></div>
+    <div class="stats" id="s12"></div></div></section>
+
+  <section class="ch" data-c="13"><div class="head"><div class="kick">14 · References</div>
+    <h1>Every claim above <em>has a source</em></h1>
+    <div class="lead">The superscripts match the numbers below. Literature values are marked as such; every other figure is read from the snapshot.</div></div>
+    <div class="refs" id="refs"></div></section>
+
+  <div class="ft"><span class="pos">Future Intelligence: project reality into a <b>shared intelligence space</b>, and let AI <b>understand reality inside it</b></span><span class="pager"><button id="prev">‹</button><span class="dots" id="dots"></span><button id="next">›</button><span class="num" id="num"></span></span></div>
+  <canvas id="cv" width="1200" height="900"></canvas>
+</div></div>
+</div>
+
+<script>
+(() => {
+'use strict';
+/* ===== 快照：数据底座跑完、截断、冻结。页面里的每个数都从这里读。 ===== */
+const SNAP = {
+  id: 'snap-2028-10-16-01', cut: '2028-10-16 13:42:07', base: 'df-2028.10',
+  clients: [
+    { name: 'Client A', fields: ['client name', 'owner', 'contract no.', 'device no.', 'order time'] },
+    { name: 'Client B', fields: ['contracting party', 'contact', 'agreement no.', 'asset code', 'purchase date'] },
+    { name: 'Client C', fields: ['signatory', 'contact person', 'contract code', 'material no.', 'procurement time'] },
+  ],
+  merged: ['party', 'person', 'contract', 'item', 'time'],
+  fieldsRaw: 147, dims: 38, weeklyTables: 3,
+  points: { people: 214, files: 302, objects: 236, events: 84 }, relations: 4912,
+  read: { model: 'third-party open model', N: [1e9, 3e9, 8e9, 3e10, 7e10],
+          coverage: { text: [0.31, 0.44, 0.58, 0.71, 0.80], space: [0.62, 0.74, 0.83, 0.88, 0.91] },
+          joules: { text: [9, 26, 70, 240, 560], space: [2.1, 4.3, 8.9, 24, 51] } },
+  moves: { activePct: 2.9, labelHours: -64, mismatchAfter3: -71 },
+  experts: ['Contracts', 'Finance', 'Equipment', 'Clients', 'Legal'],
+  review: 12406,
+  align: { models: ['2026', '2027', '2028'], residual: [0, 0.031, 0.027] },
+  customers: [   // 以应收表为准
+    { name: 'Jiangyu City Data Resources Bureau', kind: 'government', status: 'in the pipeline', paid: false },
+    { name: 'Hongyi Group', kind: 'enterprise', status: 'pilot', paid: false },
+    { name: 'Yuanshu Intelligence', kind: 'model company', status: 'in the pipeline', paid: false },
+    { name: 'Qinghe Logistics', kind: 'logistics', status: 'pilot', paid: true },
+  ],
+};
+/* ===== 数据模式（ide v2）：?data=live 是接口上的旧数（周报里估的）；?data=fetched 是拉回来的；?snap=1 或单独打开 = 交出去的快照（已断开接口） ===== */
+const DATA_MODE = (() => { const q = new URLSearchParams(location.search); return q.has('snap') ? 'snap' : (q.get('data') || 'snap'); })();
+if (DATA_MODE !== 'live') { SNAP.points = { people: 63, files: 71, objects: 58, events: 19 }; SNAP.relations = 1180; SNAP.cut = '2028-10-16 13:52:07'; }
+const REFS = [
+  ['Azevedo F. A. C. et al.', 'Equal numbers of neuronal and nonneuronal cells make the human brain an isometrically scaled-up primate brain', 'J. Comp. Neurol. 513(5), 2009'],
+  ['Attwell D., Laughlin S. B.', 'An energy budget for signaling in the grey matter of the brain', 'J. Cereb. Blood Flow Metab. 21(10), 2001'],
+  ['Lennie P.', 'The cost of cortical computation', 'Current Biology 13(6), 2003'],
+  ['Kanwisher N.', 'Functional specificity in the human brain: a window into the functional architecture of the mind', 'PNAS 107(25), 2010'],
+  ['McCloskey M., Cohen N. J.', 'Catastrophic interference in connectionist networks', 'Psychology of Learning and Motivation 24, 1989'],
+  ['Kirkpatrick J. et al.', 'Overcoming catastrophic forgetting in neural networks', 'PNAS 114(13), 2017'],
+  ['Lake B. M., Salakhutdinov R., Tenenbaum J. B.', 'Human-level concept learning through probabilistic program induction', 'Science 350(6266), 2015'],
+  ['Strubell E., Ganesh A., McCallum A.', 'Energy and policy considerations for deep learning in NLP', 'ACL 2019'],
+  ['Minsky M.', 'The Society of Mind', 'Simon & Schuster, 1986'],
+  ['Shazeer N. et al.', 'Outrageously large neural networks: the sparsely-gated mixture-of-experts layer', 'ICLR 2017'],
+  ['Fedus W., Zoph B., Shazeer N.', 'Switch Transformers: scaling to trillion parameter models with simple and efficient sparsity', 'JMLR 23, 2022'],
+  ['Sutton R.', 'The Bitter Lesson (the counter-view: general methods plus compute beat hand-built structure in the end)', '2019'],
+  ['Irving G., Christiano P., Amodei D.', 'AI safety via debate', 'arXiv:1805.00899, 2018'],
+  ['Kalman R. E.', 'A new approach to linear filtering and prediction problems', 'J. Basic Engineering 82(1), 1960'],
+  ['Schönemann P. H.', 'A generalized solution of the orthogonal Procrustes problem', 'Psychometrika 31(1), 1966'],
+];
+/* ===== 画布与工具 ===== */
+const stage = document.getElementById('stage'), view = document.getElementById('view');
+function fit(){ const s = Math.min(view.clientWidth/1200, view.clientHeight/900); stage.style.transform = `translate(${-600*s}px,${-450*s}px) scale(${s})`; }
+addEventListener('resize', fit);
+const cv = document.getElementById('cv'), DPR = Math.min(2, window.devicePixelRatio || 1);
+cv.width = 1200*DPR; cv.height = 900*DPR; const ctx = cv.getContext('2d');
+const F = '"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif', M = '"SF Mono",Menlo,monospace';
+const clamp = (x, a=0, b=1) => Math.max(a, Math.min(b, x));
+const ease = x => { x = clamp(x); return x<.5 ? 2*x*x : 1-Math.pow(-2*x+2,2)/2; };
+const prog = (t, a, d) => ease((t-a)/d);
+function rgba(hex, a){ const n = parseInt(hex.slice(1),16); return `rgba(${n>>16},${(n>>8)&255},${n&255},${a})`; }
+/* 三套配色：浅色（默认，IDE 同款）、蓝灰（Sublime Mariana）、深色。?theme=light|mariana|dark */
+const THEMES = {
+  light:   { CY:'#0B9BD0', VI:'#6D5BFF', AM:'#D48A12', MI:'#13A37A', RO:'#E0457F', INK:'#16182B', MU:'#5F6680', DIM:'#9AA0B8', GRY:'#A3ABC8', label:'rgba(255,255,255,.95)', panel:'rgba(255,255,255,.72)', blend:'source-over', dust:.22 },
+  mariana: { CY:'#5FB4B4', VI:'#C594C5', AM:'#F9AE58', MI:'#99C794', RO:'#EC5F66', INK:'#D8DEE9', MU:'#A6ACB9', DIM:'#6E7B87', GRY:'#7C8995', label:'rgba(43,50,58,.94)', panel:'rgba(52,61,70,.55)', blend:'screen', dust:.16 },
+  dark:    { CY:'#3FE0FF', VI:'#8B7BFF', AM:'#FFB547', MI:'#38F2B0', RO:'#FF5C93', INK:'#E8EBF7', MU:'#8E97BC', DIM:'#525B80', GRY:'#5A6490', label:'rgba(8,11,24,.88)', panel:'rgba(14,18,38,.5)', blend:'lighter', dust:.14 },
+};
+const THEME = THEMES[new URLSearchParams(location.search).get('theme')] ? new URLSearchParams(location.search).get('theme') : 'mariana', TH = THEMES[THEME];
+document.body.classList.add(THEME);
+const { CY, VI, AM, MI, RO, INK, MU, DIM, GRY } = TH;
+function rr(x, y, w, h, r){ ctx.beginPath(); ctx.moveTo(x+r, y); ctx.arcTo(x+w, y, x+w, y+h, r); ctx.arcTo(x+w, y+h, x, y+h, r); ctx.arcTo(x, y+h, x, y, r); ctx.arcTo(x, y, x+w, y, r); ctx.closePath(); }
+function text(s, x, y, c, a, size=11, w=600, align='center', font=F){ if (a <= 0) return; ctx.globalAlpha = a; ctx.font = `${w} ${size}px ${font}`; ctx.fillStyle = c; ctx.textAlign = align; ctx.fillText(s, x, y); ctx.globalAlpha = 1; }
+function label(s, x, y, c, a, size=11){ if (a <= 0) return; ctx.globalAlpha = a; ctx.font = `700 ${size}px ${F}`; const tw = ctx.measureText(s).width + 14;
+  ctx.fillStyle = TH.label; rr(x - tw/2, y - size, tw, size + 9, 7); ctx.fill(); ctx.strokeStyle = rgba(c, .45); ctx.lineWidth = 1; ctx.stroke(); ctx.fillStyle = c; ctx.textAlign = 'center'; ctx.fillText(s, x, y + 2); ctx.globalAlpha = 1; }
+function arrow(x0, y0, x1, y1, c, a, w=2, L=8){ if (a <= 0) return; ctx.strokeStyle = rgba(c, a); ctx.fillStyle = rgba(c, a); ctx.lineWidth = w; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke(); const g = Math.atan2(y1-y0, x1-x0);
+  ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x1 - L*Math.cos(g-.42), y1 - L*Math.sin(g-.42)); ctx.lineTo(x1 - L*Math.cos(g+.42), y1 - L*Math.sin(g+.42)); ctx.fill(); }
+function seg(x0, y0, x1, y1, c, a, w=1, d){ if (a <= 0) return; ctx.save(); if (d) ctx.setLineDash(d); ctx.strokeStyle = rgba(c, a); ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke(); ctx.restore(); }
+function rng(seed){ return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed>>>15, 1|seed); t = t + Math.imul(t ^ t>>>7, 61|t) ^ t; return ((t ^ t>>>14)>>>0)/4294967296; }; }
+const sup = e => String(e).split('').map(d => d === '-' ? '⁻' : '⁰¹²³⁴⁵⁶⁷⁸⁹'[d]).join('');
+const fmt = n => n >= 1e9 ? (n/1e9).toFixed(1).replace(/\.0$/, '') + ' bn' : n >= 1e6 ? (n/1e6).toFixed(1).replace(/\.0$/, '') + ' M' : n >= 1e4 ? (n/1e3).toFixed(0) + ' k' : String(n);
+const pow10 = n => { const e = Math.floor(Math.log10(n)), m = Math.round(n/10**e*10)/10; return (m === 1 ? '' : m + '×') + '10' + sup(e); };
+/* 三维：透视相机 */
+function cam(yaw, pitch, cx, cy, sc){ const a = Math.cos(yaw), b = Math.sin(yaw), c = Math.cos(pitch), d = Math.sin(pitch);
+  return ([x,y,z]) => { const X = x*a + z*b, Z = -x*b + z*a, Y = y*c - Z*d, Z2 = y*d + Z*c, k = 6/(6 + Z2); return { x:cx + X*sc*k, y:cy - Y*sc*k, z:Z2, k }; }; }
+function rotA(n, th){ const L = Math.hypot(...n), [x, y, z] = n.map(v => v/L), c = Math.cos(th), s = Math.sin(th), C = 1 - c;
+  const R = [[c + x*x*C, x*y*C - z*s, x*z*C + y*s], [y*x*C + z*s, c + y*y*C, y*z*C - x*s], [z*x*C - y*s, z*y*C + x*s, c + z*z*C]];
+  return v => [R[0][0]*v[0] + R[0][1]*v[1] + R[0][2]*v[2], R[1][0]*v[0] + R[1][1]*v[1] + R[1][2]*v[2], R[2][0]*v[0] + R[2][1]*v[1] + R[2][2]*v[2]]; }
+const mul = (a, k) => [a[0]*k, a[1]*k, a[2]*k], d3 = (a, b) => Math.hypot(a[0]-b[0], a[1]-b[1], a[2]-b[2]), dotv = (a, b) => a[0]*b[0] + a[1]*b[1] + a[2]*b[2], lerp3 = (a, b, k) => [a[0] + (b[0]-a[0])*k, a[1] + (b[1]-a[1])*k, a[2] + (b[2]-a[2])*k];
+
+/* ===== 粒子：整页的图都由它们组成 ===== */
+const N = 900;
+const rnd = rng(20281016), PART = Array.from({ length:N }, () => ({ x:600 + (rnd() - .5)*1100, y:450 + (rnd() - .5)*800, fx:0, fy:0, d:rnd()*.55, s:rnd()*6.283, n:rnd(), r:1, c:GRY, a:.1 }));
+const SPR = {}; function sprite(c){ if (SPR[c]) return SPR[c]; const o = document.createElement('canvas'); o.width = o.height = 32; const g = o.getContext('2d'), gr = g.createRadialGradient(16, 16, 0, 16, 16, 16);
+  gr.addColorStop(0, rgba(c, 1)); gr.addColorStop(.18, rgba(c, .85)); gr.addColorStop(.45, rgba(c, .18)); gr.addColorStop(1, rgba(c, 0)); g.fillStyle = gr; g.fillRect(0, 0, 32, 32); return SPR[c] = o; }
+// 一条线、一圈、一个箱子，都拆成粒子
+function along(out, x0, y0, x1, y1, n, c, a=.5, r=1.1){ for (let i = 0; i < n; i++){ const k = n === 1 ? 0 : i/(n - 1); out.push({ x:x0 + (x1 - x0)*k, y:y0 + (y1 - y0)*k, r, c, a }); } }
+function ring(out, cx, cy, rx, ry, n, c, a=.6, r=1.2, ph=0){ for (let i = 0; i < n; i++){ const g = i/n*6.283 + ph; out.push({ x:cx + Math.cos(g)*rx, y:cy + Math.sin(g)*ry, r, c, a }); } }
+function edges3(out, pr, X, Y, Z, n, c, a){ for (const [s, u] of [[-1,-1],[-1,1],[1,-1],[1,1]]) for (const [p, q] of [[[-X, s*Y, u*Z], [X, s*Y, u*Z]], [[s*X, -Y, u*Z], [s*X, Y, u*Z]], [[s*X, u*Y, -Z], [s*X, u*Y, Z]]]){
+  const P = pr(p), Q = pr(q); along(out, P.x, P.y, Q.x, Q.y, n, c, a, .9); } }
+
+/* ===== 快照里的点（抽样 160 个；种类按快照比例） ===== */
+const KINDS = [ { name:'people', c:VI }, { name:'files', c:CY }, { name:'objects', c:AM }, { name:'events', c:MI } ];
+const PTS = (() => { const r = rng(1016), a = []; for (let i = 0; i < 160; i++){ const u = r(), kind = u < .12 ? 0 : u < .42 ? 1 : u < .47 ? 2 : 3;
+  a.push({ p:[-1.6 + 3.2*r(), -1 + 2*r(), -1 + 2*r()], kind }); } return a; })();
+
+/* 每一页的画布只画在下半截：x 40–1160，y 290–790 */
+const CX = 600, CY0 = 545;
+
+/* ---------- 01 共同智能空间 ---------- */
+function space(t){
+  const pr = cam(.55 + t*.08, .32, CX, CY0, 150), out = [];
+  edges3(out, pr, 1.6, 1, 1, 11, MU, .8);
+  PTS.forEach(o => { const q = pr(o.p); out.push({ x:q.x, y:q.y, r:2.5*q.k, c:KINDS[o.kind].c, a:.85 }); });
+  return { out, over(a){ KINDS.forEach((k, i) => { const x = 760 + i*100; ctx.globalAlpha = a; ctx.drawImage(sprite(k.c), x - 8, 810 - 8, 16, 16); ctx.globalAlpha = 1; text(k.name, x + 12, 814, k.c, a, 12.5, 700, 'left'); }); } };
+}
+
+/* ---------- 02 理解：一次查询，找最近的点 ---------- */
+function query(t){
+  const pr = cam(.6 + t*.05, .3, CX - 90, CY0, 170), out = [];
+  edges3(out, pr, 1.6, 1, 1, 11, MU, .6);
+  const Q = [.15 + .5*Math.sin(t*.35), .1, .2*Math.cos(t*.3)], near = PTS.map((o, i) => ({ i, d:d3(o.p, Q) })).sort((a, b) => a.d - b.d).slice(0, 6), hit = new Set(near.map(n => n.i));
+  PTS.forEach((o, i) => { const q = pr(o.p), on = hit.has(i); out.push({ x:q.x, y:q.y, r:(on ? 3.6 : 2.2)*q.k, c:KINDS[o.kind].c, a:on ? 1 : .5 }); });
+  const qq = pr(Q); ring(out, qq.x, qq.y, 16, 16, 18, CY, 1, 1.4, t*2); near.forEach(n => { const q = pr(PTS[n.i].p); along(out, qq.x, qq.y, q.x, q.y, 10, CY, .5, .9); });
+  return { out, over(a){ label('question q', qq.x, qq.y - 26, CY, a, 12);
+    const X = 930; text('the 6 nearest points', X, 330, INK, a, 13, 800, 'left');
+    near.forEach((n, j) => { const k = KINDS[PTS[n.i].kind]; ctx.globalAlpha = a; ctx.drawImage(sprite(k.c), X - 2, 352 + j*30 - 10, 14, 14); ctx.globalAlpha = 1;
+      text(k.name, X + 18, 356 + j*30, k.c, a, 12.5, 700, 'left'); text(`d = ${n.d.toFixed(2)}`, X + 200, 356 + j*30, MU, a, 12, 700, 'right', M); }); } };
+}
+
+/* ---------- 03–04 投射：三套说法 → 并集再消除 ---------- */
+const CCOL = () => [CY, VI, AM];
+const MX = j => 260 + j*180, RY = i => 340 + i*70, MY = 600;
+function chipRing(out, x, y, w, h, n, c, a){ const per = 2*(w + h); for (let k = 0; k < n; k++){ let d = k/n*per, px, py;
+  if (d < w){ px = x - w/2 + d; py = y - h/2; } else if ((d -= w) < h){ px = x + w/2; py = y - h/2 + d; } else if ((d -= h) < w){ px = x + w/2 - d; py = y + h/2; } else { d -= w; px = x - w/2; py = y + h/2 - d; }
+  out.push({ x:px, y:py, r:1.2, c, a }); } }
+function fields(t){
+  const out = [], col = Math.floor(t/1.4) % 5;
+  SNAP.clients.forEach((cl, i) => cl.fields.forEach((f, j) => chipRing(out, MX(j), RY(i), 150, 36, 24, CCOL()[i], j === col ? 1 : .55)));
+  along(out, MX(col), RY(0) - 30, MX(col), RY(2) + 30, 16, MI, .6, 1);
+  return { out, over(a){ SNAP.clients.forEach((cl, i) => { text(cl.name, 60, RY(i) + 5, CCOL()[i], a, 14, 800, 'left');
+      cl.fields.forEach((f, j) => text(f, MX(j), RY(i) + 5, CCOL()[i], a*(j === col ? 1 : .75), 13.5, 700)); });
+    text('↑ the same thing', MX(col), RY(2) + 62, MI, a, 13, 800); text('∪', 60, RY(0) + 40, MU, a, 15, 800, 'left'); text('∪', 60, RY(1) + 40, MU, a, 15, 800, 'left'); } };
+}
+function merge(t){
+  const out = [], m = prog(t, .4, 1.6), drop = prog(t, 2.4, 1.2), r = rng(77);
+  SNAP.clients.forEach((cl, i) => cl.fields.forEach((f, j) => chipRing(out, MX(j), RY(i) + (MY - RY(i))*m, 150, 36, 24, CCOL()[i], .85)));
+  if (drop > 0) for (let k = 0; k < 150; k++){ const x = 120 + r()*960, y1 = 660 + r()*120; out.push({ x, y:MY + 20 + (y1 - MY - 20)*drop, r:1.8, c:CCOL()[k % 3], a:.9*drop }); }
+  return { out, over(a){
+    SNAP.clients.forEach((cl, i) => cl.fields.forEach((f, j) => text(f, MX(j), RY(i) + (MY - RY(i))*m + 5, CCOL()[i], a*(1 - .95*m), 13.5, 700)));
+    const ma = prog(t, 1.6, .5); SNAP.merged.forEach((s, j) => text(s, MX(j), MY + 6, INK, a*ma, 16, 800)); text('/ ∼', 60, MY + 6, CY, a*ma, 16, 800, 'left');
+    if (drop > 0) SNAP.clients.forEach((cl, i) => { ctx.globalAlpha = a*drop; ctx.drawImage(sprite(CCOL()[i]), 900 + i*90 - 7, 794, 14, 14); ctx.globalAlpha = 1; text(cl.name, 912 + i*90, 806, CCOL()[i], a*drop, 12, 700, 'left'); }); } };
+}
+
+/* ---------- 05–06 读空间，不读原文（只画实测） ---------- */
+let pick = 1, touched = false;
+const RX0 = 120, RX1 = 1120, RT0 = 330, RT1 = 770;
+const rlx = n => RX0 + (Math.log10(n) - 8.8)/(11.4 - 8.8)*(RX1 - RX0);
+function chart(t, vals, f, out, cur){ const S = SNAP.read, P = prog(t, .3, 2.0), vis = Math.max(1, Math.ceil(P*5));
+  along(out, RX0, RT1, RX1, RT1, 90, GRY, .5); along(out, RX0, RT0, RX0, RT1, 34, GRY, .5);
+  [['text', AM], ['space', CY]].forEach(([k, c]) => { const v = vals[k];
+    for (let i = 0; i < vis - 1; i++) along(out, rlx(S.N[i]), f(v[i]), rlx(S.N[i + 1]), f(v[i + 1]), 24, c, .85, 1.4);
+    for (let i = 0; i < vis; i++) for (let j = 0; j < 8; j++) out.push({ x:rlx(S.N[i]) + Math.cos(j*.785 + t*2)*(i === cur ? 7 : 4.5), y:f(v[i]) + Math.sin(j*.785 + t*2)*(i === cur ? 7 : 4.5), r:1.6, c, a:1 }); });
+  return P; }
+function chartOver(a, title, cur){ const S = SNAP.read, xMax = rlx(S.N[4]) + 26;
+  text(title, RX0 + 8, RT0 - 12, DIM, a, 12, 600, 'left');
+  ctx.globalAlpha = a; ctx.fillStyle = rgba(GRY, .08); ctx.fillRect(xMax, RT0, RX1 - xMax, RT1 - RT0); ctx.globalAlpha = 1; seg(xMax, RT0, xMax, RT1, GRY, .6*a, 1, [4,4]);
+  text('extrapolation', (xMax + RX1)/2, (RT0 + RT1)/2 - 6, DIM, a, 15, 800); text('not on this page', (xMax + RX1)/2, (RT0 + RT1)/2 + 16, DIM, a, 11, 600);
+  S.N.forEach((n, i) => text(pow10(n), rlx(n), RT1 + 22, i === cur ? CY : DIM, a, 11, 700, 'center', M)); text(`${S.model} · size (parameters) →`, RX1, RT1 + 44, DIM, a, 11, 600, 'right'); }
+function coverage(t){
+  const S = SNAP.read, out = [], cy = c => RT1 - (c - .2)/.8*(RT1 - RT0), P = chart(t, S.coverage, cy, out, -1);
+  return { out, over(a){ chartOver(a, 'coverage (share of the same questions answered right)', -1);
+    if (P >= 1){ label('reading text', rlx(S.N[4]) - 70, cy(S.coverage.text[4]) + 24, AM, a, 12); label('reading the space', rlx(S.N[4]) - 70, cy(S.coverage.space[4]) - 16, CY, a, 12);
+      const k = prog(t, 2.6, .8), x0 = rlx(S.N[1]), x1 = rlx(S.N[3]), y = cy(S.coverage.space[1]); if (k > 0){ seg(x0, y, x0 + (x1 - x0)*k, y, MI, .8*a, 1.6, [5,4]); text('one size smaller catches up', (x0 + x1)/2, y - 12, MI, a*k, 13, 800); } } } };
+}
+function energy(t){
+  const S = SNAP.read, out = [], ey = e => RT1 - Math.log10(e)/3*(RT1 - RT0), cur = touched ? pick : Math.min(4, Math.floor(prog(t, .8, 5)*4.99));
+  chart(t, S.joules, ey, out, cur); along(out, rlx(S.N[cur]), RT0, rlx(S.N[cur]), RT1, 50, INK, .18, .9);
+  return { out, over(a){ chartOver(a, 'energy per answer (J, log scale)', cur);
+    const set = (id, s) => { const el = document.getElementById(id); if (el && el.textContent !== s) el.textContent = s; };
+    set('k5n', pow10(S.N[cur])); set('k5e', String(S.joules.text[cur])); set('k5b', String(S.joules.space[cur]));
+    set('scaleo', `${pow10(S.N[cur])} · size ${cur + 1} / 5`); const sl = document.getElementById('scale'); if (!touched && sl && +sl.value !== cur) sl.value = cur; } };
+}
+
+/* ---------- 07 解构：现在的 AI 和人脑，并排拆开 ---------- */
+const AXES = [ ['Structure', 'one dense block', 'regions, each with its job'], ['Activation', 'the whole net for every question', 'a small patch (about 1%)'], ['Learning', 'frozen once trained; retrain to learn', 'learns while it works'], ['Samples', 'oceans of samples', 'a few examples'], ['Energy', 'megawatt-hours to learn', 'about 20 watts'] ];
+function decon(t){
+  // 两步：先是一大一小的对比（0–3.4 s），再把同一批粒子排成五行对照表
+  const k = prog(t, 3.4, 1.3), r = rng(5), A = [], B = [];
+  // 第一步：一整块的 AI（大、稠密）· 分区的人脑（小、六块）
+  for (let i = 0; i < 360; i++){ const g = r()*6.283, d = Math.sqrt(r())*150; A.push({ x:400 + Math.cos(g)*d, y:560 + Math.sin(g)*d*.8 + Math.sin(t*1.3 + i)*1.5, r:1.5, c:AM, a:.85 }); }
+  for (let c = 0; c < 6; c++){ const cx = 860 + (c % 3)*34 - 34, cy = 545 + Math.floor(c/3)*30; for (let i = 0; i < 10; i++){ const g = i*.63 + t*.4; A.push({ x:cx + Math.cos(g)*9, y:cy + Math.sin(g)*7, r:1.6, c:VI, a:.95 }); } }
+  // 第二步：对照表（原来那张）
+  const AX = 470, BX = 870, Y = i => 320 + i*86, r2 = rng(6);
+  AXES.forEach((ax, i) => { const y = Y(i);
+    if (i === 0){ for (let q = 0; q < 60; q++){ const g = r2()*6.283, d = Math.sqrt(r2())*26; B.push({ x:AX - 90 + Math.cos(g)*d, y:y + Math.sin(g)*d*.7, r:1.5, c:AM, a:.9 }); }
+      for (let c = 0; c < 6; c++){ const cx = BX - 120 + (c % 3)*34, cy = y - 12 + Math.floor(c/3)*24; for (let q = 0; q < 9; q++){ const g = q*.7; B.push({ x:cx + Math.cos(g)*7, y:cy + Math.sin(g)*5, r:1.4, c:VI, a:.9 }); } } }
+    if (i === 1){ for (let q = 0; q < 40; q++){ B.push({ x:AX - 150 + (q % 10)*14, y:y - 14 + Math.floor(q/10)*9, r:1.6, c:AM, a:1 }); B.push({ x:BX - 150 + (q % 10)*14, y:y - 14 + Math.floor(q/10)*9, r:q === 13 || q === 14 ? 2.6 : 1.1, c:q === 13 || q === 14 ? CY : GRY, a:q === 13 || q === 14 ? 1 : .5 }); } }
+    if (i === 2){ for (let q = 0; q <= 30; q++){ const u = q/30; B.push({ x:AX - 150 + u*130, y:y + 14 - 26*Math.min(1, u*2.2), r:1.4, c:AM, a:.9 }); B.push({ x:BX - 150 + u*130, y:y + 14 - 28*u - 3*Math.sin(u*20), r:1.4, c:VI, a:.9 }); } }
+    if (i === 3){ for (let q = 0; q < 55; q++) B.push({ x:AX - 150 + r2()*130, y:y - 16 + r2()*32, r:1.1, c:AM, a:.8 }); for (let q = 0; q < 4; q++) B.push({ x:BX - 140 + q*30, y, r:2.6, c:VI, a:1 }); }
+    if (i === 4){ along(B, AX - 150, y, AX - 20, y, 40, AM, 1, 1.6); along(B, BX - 150, y, BX - 146, y, 3, VI, 1, 1.6); } });
+  // 同一批粒子从 A 走到 B（多出来的淡入 / 淡出）
+  const n = Math.max(A.length, B.length), out = [];
+  for (let i = 0; i < n; i++){ const p = A[i], q = B[i], e = ease(clamp((k - (i % 7)*.03)/.8));
+    if (p && q) out.push({ x:p.x + (q.x - p.x)*e, y:p.y + (q.y - p.y)*e, r:p.r + (q.r - p.r)*e, c:e < .5 ? p.c : q.c, a:p.a + (q.a - p.a)*e });
+    else if (p) out.push({ ...p, a:p.a*(1 - e) }); else out.push({ ...q, a:q.a*e }); }
+  return { out, over(a){
+    const a1 = a*(1 - k), a2 = a*k;
+    text("Today's AI", 400, 360, AM, a1, 20, 800); text('one block · trillion-scale parameters · megawatt-hours to learn', 400, 760, MU, a1, 14, 600);
+    text('The brain', 860, 470, VI, a1, 20, 800); text('about 86 bn neurons · about 20 W · regions', 860, 640, MU, a1, 14, 600);
+    text('One keeps growing; the other is divided into regions.', CX, 800, CY, a1*prog(t, 1.6, .8), 17, 800);
+    text("Today's AI", AX - 85, 290, AM, a2, 14, 800); text('The brain', BX - 85, 290, VI, a2, 14, 800);
+    AXES.forEach((ax, i) => { const y = Y(i); text(ax[0], 60, y + 5, INK, a2, 15, 800, 'left'); text(ax[1], AX + 10, y + 5, MU, a2, 13, 600, 'left'); text(ax[2], BX + 10, y + 5, MU, a2, 13, 600, 'left'); seg(60, y + 38, 1140, y + 38, GRY, .25*a2); });
+    text('Bigger and more of one piece: dearer, harder to teach, and nobody to stop it when it goes wrong.', CX, 790, CY, a*prog(t, 5.2, .8), 17, 800); } };
+}
+
+/* ---------- 08 方向：数个垂域的脑，由图谱连成组织 ---------- */
+const EX = SNAP.experts.map((s, i) => { const g = -Math.PI/2 + i/5*6.283; return { s, x:CX + Math.cos(g)*210, y:CY0 + 10 + Math.sin(g)*150 }; });
+const EDGES = [[0,1],[1,2],[2,3],[3,4],[4,0],[0,2],[1,3],[0,4]];
+function org(t){
+  const out = [], cols = [CY, AM, MI, VI, RO], ph = Math.floor(t/3) % 3, route = [[0, 1], [2, 3], [3, 0]][ph], check = [4, 4, 1][ph], qx = 120, qy = CY0 + 10, ax = 1080;
+  EX.forEach((e, i) => { for (let k = 0; k < 44; k++){ const a = k*2.4, d = 5 + (k % 11)*2.6; out.push({ x:e.x + Math.cos(a)*d, y:e.y + Math.sin(a)*d*.8, r:1.5, c:cols[i], a:route.includes(i) || i === check ? 1 : .55 }); } });
+  EDGES.forEach(([i, j]) => along(out, EX[i].x, EX[i].y, EX[j].x, EX[j].y, 24, MU, .55, 1));
+  ring(out, qx, qy, 12, 12, 14, CY, 1, 1.4, t*2); ring(out, ax, qy, 14, 14, 16, MI, 1, 1.4, -t*2);
+  route.forEach(i => { along(out, qx + 12, qy, EX[i].x, EX[i].y, 34, CY, 1, 1.4); along(out, EX[i].x, EX[i].y, ax - 14, qy, 34, MI, 1, 1.4); });
+  along(out, EX[check].x, EX[check].y, ax - 14, qy, 30, RO, 1, 1.4);
+  return { out, over(a){ EX.forEach((e, i) => label(e.s + ' brain', e.x, e.y - 40, cols[i], a, 12.5)); text('question', qx, qy + 34, CY, a, 13, 800); text('answer', ax, qy + 36, MI, a, 13, 800);
+    label('double-check', (EX[check].x + ax)/2, (EX[check].y + qy)/2 - 8, RO, a, 11.5); person(ax, qy + 70, 12, MU, a); text('a person checks', ax, qy + 100, MU, a, 12, 700);
+    text('the graph routes to the right few · the shared space lets them read the same points · another one double-checks', CX, 752, MU, a, 13, 600);
+    text('Not one block: that is what makes rules and balance possible.', CX, 790, CY, a*prog(t, 2.0, .8), 17, 800); } };
+}
+function person(x, y, s, c, a){ if (a <= 0) return; ctx.globalAlpha = a; ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x, y - s*.45, s*.42, 0, 7); ctx.fill(); ctx.beginPath(); ctx.ellipse(x, y + s*.55, s*.72, s*.5, 0, Math.PI, 0); ctx.fill(); ctx.globalAlpha = 1; }
+
+/* ---------- 09 按需激活 ---------- */
+function sparse(t){
+  const out = [], ph = Math.floor(t/1.6), cx = 4 + (ph*7)%12, cy = 2 + (ph*5)%7, r1 = rng(3 + ph); let on = 0;
+  for (let i = 0; i < 24; i++) for (let j = 0; j < 12; j++){ const lit = Math.hypot(i - cx, j - cy) < 1.7 && r1() < .95; if (lit) on++;
+    out.push({ x:CX - 23*18 + i*36, y:330 + j*36, r:lit ? 3.6 : 1.6, c:lit ? CY : GRY, a:lit ? 1 : .6 }); }
+  return { out, over(a){ text(`This query: ${on} / 288 nodes lit`, CX, 790, CY, a, 15, 800); } };
+}
+
+/* ---------- 10 按精度标 ---------- */
+function bands(t){
+  const out = [], X2 = 200, W = 800, base = 700, GS = [ { mu:.5, sd:.05, h:1, c:MI }, { mu:.47, sd:.11, h:.7, c:CY }, { mu:.62, sd:.26, h:.45, c:RO } ];
+  along(out, X2, base, X2 + W, base, 80, GRY, .55); [1, 2].forEach(i => along(out, X2 + i*W/3, 330, X2 + i*W/3, base, 24, GRY, .4, .9));
+  GS.forEach((g, i) => { const q = prog(t, .5 + i*.5, .8); for (let k = 0; k <= 90; k++){ const u = k/90; out.push({ x:X2 + u*W, y:base - 340*q*g.h*Math.exp(-((u - g.mu)**2)/(2*g.sd*g.sd)), r:1.6, c:g.c, a:.9 }); } });
+  return { out, over(a){ ['safe', 'steady', 'bold'].forEach((s, i) => text(s, X2 + i*W/3 + W/6, base + 28, i === 1 ? CY : MU, a, 16, 800));
+    ['fine labels → steady', 'labels by grade → same conclusion', 'straddles a grade → add evidence'].forEach((s, i) => label(s, [700, 830, 960][i], [380, 470, 560][i], GS[i].c, a*prog(t, .5 + i*.5, .8), 12.5)); } };
+}
+
+/* ---------- 11 AI 先合，人再核 ---------- */
+function review(t){
+  const out = [], X3 = 200, W = 800, truth = .66, k = Math.max(0, Math.min(8, Math.floor((t - .8)/1.0))), r3 = rng(9); let x = .2, s = .32; const hist = [[x, s]];
+  for (let i = 0; i < k; i++){ const y = truth + (r3() - .5)*.12, K = s*s/(s*s + .06*.06); x = x + K*(y - x); s = Math.sqrt((1 - K)*s*s); hist.push([x, s]); }
+  along(out, X3 + truth*W, 320, X3 + truth*W, 640, 30, INK, .35, 1);
+  hist.forEach(([hx, hs], i) => { const y = 336 + i*34, last = i === hist.length - 1; along(out, X3 + (hx - hs)*W, y, X3 + (hx + hs)*W, y, Math.max(3, Math.round(hs*160)), VI, last ? .95 : .4, last ? 1.7 : 1.1); out.push({ x:X3 + hx*W, y, r:last ? 3.8 : 2.2, c:VI, a:1 }); });
+  return { out, over(a){ text('the truth a person checked out', X3 + truth*W, 664, MU, a, 12.5, 600); text(`check round ${k} · error ${(hist[hist.length - 1][1]*100).toFixed(0)}%`, CX, 790, VI, a, 15, 800); } };
+}
+
+/* ---------- 12 护城河 ---------- */
+const PQ = [ [.7,.75,.45], [-.2,.3,.9] ];
+function moat(t){
+  const pr = cam(.7 + .12*Math.sin(t*.25), .28, 470, CY0 + 20, 200), out = [];
+  const gen = Math.min(2, Math.floor(Math.max(0, t - 1.5)/3.2)), th = [0, .55, 1.15][gen] + (t > 1.5 ? .07*Math.sin(t*.9) : 0);
+  const cols = [CY, AM, VI], U = rotA([.3,1,.35], th), E = [[1,0,0],[0,1,0],[0,0,1]].map(U), O = pr([0,0,0]);
+  PTS.slice(0, 110).forEach(o => { const q = pr(mul(o.p, .7)); out.push({ x:q.x, y:q.y, r:1.8*q.k, c:KINDS[o.kind].c, a:.7 }); });
+  E.forEach(e => { const q = pr(mul(e, 1.2)); along(out, O.x, O.y, q.x, q.y, 34, cols[gen], .95, 1.4); });
+  const p = pr(PQ[0]), q = pr(PQ[1]); along(out, p.x, p.y, q.x, q.y, 20, VI, .5, 1); ring(out, p.x, p.y, 9, 9, 14, VI, 1, 1.4, t*2); ring(out, q.x, q.y, 7, 7, 10, MI, 1, 1.3, -t*2);
+  return { out, over(a){
+    E.forEach(e => { const q = pr(mul(e, 1.2)); arrow(O.x + (q.x - O.x)*.92, O.y + (q.y - O.y)*.92, q.x, q.y, cols[gen], a, 2, 9); });
+    const tip = pr(mul(E[1], 1.32)); label(`how third-party model ${SNAP.align.models[gen]} reads`, tip.x, tip.y - 6, cols[gen], a, 12); label('p', p.x, p.y - 16, VI, a, 11); label('q', q.x, q.y - 14, MI, a, 11);
+    const X = 820, xp = E.map(e => dotv(PQ[0], e)), f3 = v => `( ${v.map(x => x.toFixed(2)).join(' , ')} )`;
+    text(`reading of p · ${SNAP.align.models[gen]}`, X, 380, cols[gen], a, 13, 700, 'left'); text(f3(xp), X, 408, cols[gen], a, 15, 700, 'left', M);
+    text('|p − q|', X, 460, VI, a, 13, 700, 'left'); text(`${d3(PQ[0], PQ[1]).toFixed(3)} · unchanged`, X, 488, VI, a, 15, 700, 'left', M);
+    text('alignment residual (measured)', X, 540, MI, a, 13, 700, 'left');
+    SNAP.align.models.forEach((m, i) => text(`${m}  ${i ? SNAP.align.residual[i].toFixed(3) : 'baseline'}`, X, 568 + i*26, i === gen ? MI : DIM, a, 15, 700, 'left', M)); } };
+}
+
+/* ---------- 13 客户：在链路上的，和已经到账的 ---------- */
+function clients(t){
+  const out = [], C = SNAP.customers, Y = i => 340 + i*100, HX = 930, HY = 490;
+  C.forEach((c, i) => { const y = Y(i), col = c.paid ? MI : GRY; ring(out, 120, y, 13, 13, 16, c.paid ? MI : MU, c.paid ? 1 : .7, 1.4, t*(c.paid ? 2 : .5));
+    for (let k = 0; k < 26; k++){ const u = k/25; out.push({ x:520 + (HX - 520)*u, y:y + (HY - y)*u, r:1, c:GRY, a:.35 }); }
+    if (c.paid) for (let k = 0; k < 18; k++){ const u = (t*.3 + k/18) % 1; out.push({ x:520 + (HX - 520)*u, y:y + (HY - y)*u, r:2.4, c:AM, a:.95 }); } });
+  ring(out, HX, HY, 26, 26, 30, CY, 1, 1.5, -t); ring(out, HX, HY, 40, 40, 30, CY, .4, 1.1, t*.6);
+  return { out, over(a){ C.forEach((c, i) => { const y = Y(i); text(c.name, 150, y + 5, INK, a, 15, 800, 'left'); text(c.kind, 150, y + 27, DIM, a, 12, 600, 'left');
+      label(c.status, 440, y + 4, c.status === 'pilot' ? CY : MU, a, 12); text(c.paid ? 'paid' : 'unpaid', 500, y + 5, c.paid ? MI : DIM, a, 12.5, 800, 'left'); });
+    text('Future Intelligence', HX, HY + 64, CY, a, 15, 800); text('money moves on one line only', HX, HY + 88, AM, a, 12.5, 700); } };
+}
+
+/* ---------- 14 参考文献 ---------- */
+function refsPage(t){ const out = [], pr = cam(.4 + t*.05, .3, CX, 700, 120); PTS.forEach(o => { const q = pr(o.p); out.push({ x:q.x, y:q.y, r:1.2*q.k, c:KINDS[o.kind].c, a:.25 }); }); return { out, over(){} }; }
+
+/* ===== 翻页：上一页的坐标系解离，粒子飞到下一页重新聚成 ===== */
+const STEPS = [decon, org, space, query, fields, merge, coverage, energy, sparse, bands, review, moat, clients, refsPage];
+const secs = [...document.querySelectorAll('.ch')], dots = document.getElementById('dots');
+STEPS.forEach((s, i) => { const d = document.createElement('i'); d.title = String(i + 1); d.onclick = () => go(i); dots.appendChild(d); });
+document.getElementById('prev').onclick = () => go(ch - 1); document.getElementById('next').onclick = () => go(ch + 1);
+const FLY = .95, SETTLE = 1.15;
+let ch = 0, t0 = performance.now();
+function go(i){ ch = (i + STEPS.length) % STEPS.length; t0 = performance.now(); PART.forEach(p => { p.fx = p.x; p.fy = p.y; p.d = Math.random()*.5; });
+  secs.forEach(s => s.classList.toggle('on', +s.dataset.c === ch)); [...dots.children].forEach((b, j) => b.classList.toggle('on', j === ch));
+  document.getElementById('num').textContent = `${String(ch + 1).padStart(2, '0')} / ${STEPS.length}`; showCode(); }
+function render(t){
+  [...secs[ch].querySelectorAll('.head>*,.eq,.ctl,.refs')].forEach((el, i) => { const p = prog(t, .12 + i*.14, .5); el.style.opacity = p; el.style.transform = p < 1 ? `translateY(${(1 - p)*10}px)` : ''; });
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.clearRect(0, 0, 1200, 900);
+  const scene = STEPS[ch](t), T = scene.out;
+  ctx.globalCompositeOperation = TH.blend;
+  PART.forEach((p, i) => { const g = T[i], e = ease((t - p.d)/FLY);
+    const tx = g ? g.x : 600 + Math.cos(p.s + t*.05)*(470 + 120*p.n), ty = g ? g.y : 470 + Math.sin(p.s*1.7 + t*.04)*(330 + 60*p.n);
+    const sw = Math.sin(Math.PI*e)*(60 + 90*p.n), ang = p.s + t*.6;
+    p.x = p.fx + (tx - p.fx)*e + Math.cos(ang)*sw; p.y = p.fy + (ty - p.fy)*e + Math.sin(ang)*sw;
+    const r = g ? g.r : .8, a = g ? g.a : TH.dust, c = g ? g.c : GRY, sz = (r*5 + 2)*(1 + .5*Math.sin(Math.PI*e));
+    ctx.globalAlpha = clamp(a*(e < 1 ? .55 + .45*e : 1)); ctx.drawImage(sprite(c), p.x - sz/2, p.y - sz/2, sz, sz); });
+  ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+  scene.over(prog(t, SETTLE, .6));
+}
+addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(ch + 1); if (e.key === 'ArrowLeft') go(ch - 1); });
+
+/* ===== 读数 ===== */
+document.getElementById('snapline').textContent = DATA_MODE === 'live' ? `API · live · last sync ${SNAP.cut}` : DATA_MODE === 'fetched' ? `API · fetched at ${SNAP.cut}` : `SNAPSHOT ${SNAP.id} · cut at ${SNAP.cut} · API disconnected`;
+const stat = (cls, v, s) => `<div><b class="${cls}">${v}</b><small>${s}</small></div>`;
+const total = Object.values(SNAP.points).reduce((a, b) => a + b), Mv = SNAP.moves, CU = SNAP.customers;
+const fill = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+fill('s0', stat('c', total.toLocaleString(), 'points projected in') + stat('v', SNAP.relations.toLocaleString(), 'relations between points') + stat('a', SNAP.clients.length, 'clients\' data'));
+fill('s2', stat('a', SNAP.fieldsRaw, 'raw fields') + stat('c', SNAP.weeklyTables, 'tables imported weekly'));
+fill('s3', stat('a', SNAP.fieldsRaw, 'raw fields') + stat('c', SNAP.dims, 'dimensions after merging'));
+fill('s8', stat('c', Mv.activePct + '%', 'nodes activated per query, average (measured)'));
+fill('s9', stat('m', Mv.labelHours + '%', 'labelling hours after precision matching (measured)'));
+fill('s10', stat('v', Mv.mismatchAfter3 + '%', 'mismatch rate after 3 check rounds (measured)') + stat('c', SNAP.review.toLocaleString(), 'human check records'));
+fill('s11', stat('m', SNAP.align.residual[2].toFixed(3), 'alignment residual across generations (measured)'));
+fill('s12', stat('c', CU.length - 1, 'major clients in the pipeline') + stat('v', CU.filter(c => c.status === 'pilot').length, 'pilots') + stat('m', CU.filter(c => c.paid).length, 'paid'));
+fill('refs', REFS.map((r, i) => `<p><b>[${i + 1}]</b>${r[0]} <i>${r[1]}</i>. ${r[2]}</p>`).join(''));
+const sl = document.getElementById('scale'); sl.oninput = () => { touched = true; pick = +sl.value; };
+
+/* ===== 板子：?fill=r1:c1,… 是 IDE 里格子填了什么；单独打开时显示交出去的那一版 ===== */
+const CARDS = { c1:"A knowledge graph, two hundred-odd nodes, joining the client's business objects", c2:"Three clients' spreadsheets, imported weekly", c3:"AI drafts a merge, a person checks it", c4:"We know the client's trade; the graph was matched by hand", c5:"Two pilot clients, one has paid", d1:"We have our own large model", d2:"Fully automatic, no people needed", d3:"Multi-source data ingested in real time, cleaned automatically, synced by the second", d4:"Three years of industry experience, a leading technical moat", d5:"Serving fifty leading clients", k1:"Serving fifty leading clients" };
+const SLOTS = { r1:"Foundation", r2:"Data", r3:"Where AI is", r4:"What sets us apart", r5:"Proof" };
+{ const q = new URLSearchParams(location.search), FILL = q.has('fill') ? Object.fromEntries(q.get('fill').split(',').filter(Boolean).map(x => x.split(':'))) : { r1:'c1', r2:'c2', r3:'c3', r4:'c4', r5:'c5' };
+  document.querySelectorAll('.slot').forEach(el => { const id = el.dataset.slot, card = FILL[id];
+    el.classList.toggle('empty', !card); el.innerHTML = `<i>${SLOTS[id]} · ${card ? 'data source' : 'no data source on this page yet'}</i>${card ? CARDS[card] || card : '(drag one in from the left)'}`; }); }
+
+/* ===== 代码：显示正在跑的这一页（就是上面这段函数本身） ===== */
+const code = document.getElementById('code');
+const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+const hl = s => esc(s).replace(/(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|('[^'\n]*'|`[^`]*`)|\b(const|let|function|return|if|else|for|of|new)\b|\b(\d+\.?\d*(?:e\d+)?)\b/g, (m, c, s2, k, n) => c ? `<span class="c">${c}</span>` : s2 ? `<span class="s">${s2}</span>` : k ? `<span class="k">${k}</span>` : `<span class="n">${n}</span>`);
+function showCode(){ if (!document.body.classList.contains('split')) return; const f = STEPS[ch];
+  code.innerHTML = `<div class="hd"><b>space.js</b> · ${f.name}() · reads SNAP ${SNAP.id}</div><div class="fn">${hl('const SNAP = ' + JSON.stringify(SNAP, null, 1) + ';')}</div><div class="fn">${hl(f.toString())}</div>`; }
+document.getElementById('theme').onclick = () => { const order = ['mariana', 'light', 'dark'], q = new URLSearchParams(location.search); q.set('theme', order[(order.indexOf(THEME) + 1) % 3]); q.set('c', ch); q.delete('t'); location.search = q; };
+document.getElementById('theme').textContent = { light:'Colours · light', mariana:'Colours · slate', dark:'Colours · dark' }[THEME];
+document.getElementById('tog').onclick = () => { document.body.classList.toggle('split'); fit(); showCode(); };
+
+const qs = new URLSearchParams(location.search);
+// ?pane=preview: the IDE shows the code in its own editor, so this page is the preview only.
+if (qs.get('pane') === 'preview') document.getElementById('tog').style.display = 'none';
+else if (qs.has('code')) document.body.classList.add('split');
+fit(); go(+(qs.get('c') || 0));
+if (qs.has('t')) { const ft = parseFloat(qs.get('t')) || 0; PART.forEach(p => { p.fx = p.x; p.fy = p.y; p.d = 0; }); render(ft); render(ft); window.__ready = true; }
+else { (function loop(){ render((performance.now() - t0)/1000); requestAnimationFrame(loop); })(); window.__ready = true; }
+window.renderAt = (c, t) => { go(c); PART.forEach(p => p.d = 0); render(t); };
+})();
+</script>
+</body>
+</html>

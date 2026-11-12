@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Script_Tomorrow_Meeting · Act Two</title>
+<style>
+  :root{--paper:#FBF8F1;--ink:#1F2024;--ink2:#6B6E78;--mark:#C77700;--line:rgba(31,32,36,.14)}
+  html,body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.8 Georgia,"Times New Roman",serif}
+  .page{max-width:680px;margin:0 auto;padding:48px 32px 64px}
+  h1{margin:0 0 4px;font-size:22px;font-weight:600;letter-spacing:.2em}
+  .meta{margin:0 0 28px;color:var(--ink2);font-size:13px;letter-spacing:.08em}
+  .act{margin:0 0 22px;font-size:18px;letter-spacing:.3em;text-align:center}
+  p{margin:0 0 10px}
+  .who{font-weight:600;letter-spacing:.06em}
+  .sd{color:var(--ink2);font-style:italic}
+  .w{padding:0 3px;border-bottom:2px solid var(--mark);background:rgba(245,166,35,.14)}
+  .w.cur{background:rgba(245,166,35,.32)}
+  .done .w{border-bottom-color:#13A37A;background:rgba(19,163,122,.12)}
+  .foot{margin-top:36px;padding-top:12px;border-top:1px solid var(--line);color:var(--ink2);font-size:12px;letter-spacing:.08em}
+</style>
+</head>
+<body>
+<div class="page" id="page">
+  <h1>Script_Tomorrow_Meeting</h1>
+  <p class="meta">Act Two · proofread copy · 2028-10-26</p>
+  <p class="act">ACT TWO</p>
+  <p><span class="who"><span class="w" data-slot="r1"></span>:</span> ...</p>
+  <p><span class="who">Camilla:</span> Sir, you should take off your mask.</p>
+  <p><span class="who">Stranger:</span> I wear no mask.</p>
+  <p class="sd">(Mist rises on <span class="w" data-slot="r2"></span>.)</p>
+  <p><span class="who">Camilla:</span> There are towers in the mist.</p>
+  <p><span class="who">Stranger:</span> That is Carcosa.</p>
+  <p><span class="who">Cassilda (sings):</span></p>
+  <p><span class="w" data-slot="r3"></span>,</p>
+  <p>the shadows lengthen,</p>
+  <p>in Carcosa.</p>
+  <p class="sd">(Stage direction) On the cover, lower right, a black onyx clasp set in gold with <span class="w" data-slot="r4"></span>.</p>
+  <p><span class="who">Camilla:</span> Do not look at it.</p>
+  <p class="foot" id="foot"></p>
+</div>
+<script>
+/* ?fill=r1:c1,… 是校对页里每个词选了哪一版；单独打开时显示交出去的那一版。?c=N 高亮第 N 个词；&done=1 是交出去之后。 */
+const TEXT = {
+  w1: "Cassida",
+  c1: "Cassilda",
+  w2: "Lake Hari",
+  c2: "Lake Hali",
+  d1: "Smooth the whole line: mist rises on the lake",
+  w3: "After the twin eyes sink into the lake",
+  c3: "After the twin suns sink into the lake",
+  w4: "the pattern of a yellow sign",
+  c4: "the one that belongs to no human script",
+  d2: "the Chinese character for yellow",
+  k1: '(read through and polished for you)',
+};
+const SCRIPT = { r1: 'w1', r2: 'w2', r3: 'w3', r4: 'w4' };
+const q = new URLSearchParams(location.search);
+const FILL = q.has('fill') ? Object.fromEntries(q.get('fill').split(',').filter(Boolean).map(x => x.split(':'))) : { r1: 'c1', r2: 'c2', r3: 'c3', r4: 'c4' };
+const cur = ['r1', 'r2', 'r3', 'r4'][Number(q.get('c') || 0)];
+for (const el of document.querySelectorAll('.w')) {
+  const slot = el.dataset.slot;
+  const id = FILL[slot] ?? SCRIPT[slot];
+  el.textContent = TEXT[id] ?? id;
+  el.classList.toggle('cur', slot === cur);
+}
+if (q.get('done') === '1') document.getElementById('page').classList.add('done');
+const changed = ['r1', 'r2', 'r3', 'r4'].filter((s) => FILL[s] && FILL[s] !== SCRIPT[s]).length;
+document.getElementById('foot').textContent = `${changed} change${changed === 1 ? '' : 's'} · script vs. the scanned King in Yellow`;
+</script>
+</body>
+</html>

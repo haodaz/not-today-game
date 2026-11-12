@@ -25,7 +25,7 @@
           "unlock": "-"
         },
         "ide": {
-          "src": "/docs/player/day-03-train.html",
+          "src": "/docs/player/en/day-03-train.html",
           "pages": {}
         },
         "tune": {
@@ -1147,7 +1147,7 @@
         ],
         "view": "ide",
         "ide": {
-          "src": "/docs/player/day-03-evolve.html",
+          "src": "/docs/player/en/day-03-evolve.html",
           "pages": {
             "r1": 0,
             "r2": 1,

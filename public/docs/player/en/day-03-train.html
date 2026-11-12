@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Self-Evolving Engine · Training Backend</title>
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--ink:#1d2129;--dim:#6b7280;--line:#e5e7eb;--blue:#3b5bdb;--green:#2e8b57;--red:#c0392b;--amber:#b7791f;--mono:"JetBrains Mono",ui-monospace,Menlo,monospace}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 -apple-system,"PingFang SC","Hiragino Sans GB",sans-serif}
+.top{height:44px;display:flex;align-items:center;gap:14px;padding:0 18px;background:var(--panel);border-bottom:1px solid var(--line)}
+.top b{font-size:15px}.top .env{font:11px var(--mono);color:var(--dim);margin-left:auto}.top .dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;margin-right:6px}
+main{display:grid;grid-template-columns:180px 1fr;min-height:calc(100vh - 44px)}
+nav{background:var(--panel);border-right:1px solid var(--line);padding:12px 0}nav a{display:block;padding:8px 18px;color:var(--dim);text-decoration:none}nav a.on{color:var(--ink);background:#eef2ff;border-right:2px solid var(--blue)}
+section{padding:18px 22px;border-bottom:1px solid var(--line)}section h2{margin:0 0 10px;font-size:14px}section h2 small{font:11px var(--mono);color:var(--dim);margin-left:8px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-bottom:10px}
+.kv{display:grid;grid-template-columns:120px 1fr;gap:4px 12px;font-size:13px}.kv b{color:var(--dim);font-weight:500}
+.tag{display:inline-block;font:11px var(--mono);padding:1px 7px;border-radius:999px;border:1px solid var(--line);color:var(--dim)}.tag.ok{color:var(--green);border-color:#bfe3cf;background:#f0faf4}.tag.no{color:var(--red);border-color:#f3c3bd;background:#fdf3f2}.tag.warn{color:var(--amber);border-color:#ecd9a8;background:#fdf8ea}
+.empty{color:var(--dim);font-style:italic}
+/* 进化度：两种颜色，她页面上写的 / 后台里 */
+.evo{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.evo h3{margin:0 0 8px;font-size:12px;color:var(--dim);font-weight:500}
+.row{display:grid;grid-template-columns:48px 1fr 56px;align-items:center;gap:10px;font-size:12px;margin:7px 0}
+.row .l{color:var(--dim)}.row .n{text-align:right;font-variant-numeric:tabular-nums;color:var(--dim)}.row .n em{font-style:normal;font-weight:600;color:var(--red)}.row.over .n em{color:var(--blue)}
+.bar{position:relative;height:10px;background:#e9ecf2;border-radius:5px}
+.bar i{position:absolute;top:0;height:100%;border-radius:5px}
+.bar i.base{left:0;background:#a9b4c4}.bar i.up{background:var(--blue);border-radius:0 5px 5px 0}.bar i.down{background:repeating-linear-gradient(135deg,#e5484d 0 3px,#f7c2c4 3px 6px);border-radius:0 5px 5px 0}
+.bar i.her{left:0;background:#e9b949}
+.bar b.line{position:absolute;top:-4px;width:2px;height:18px;margin-left:-1px;background:#1d2129;border-radius:1px}
+.legend{font-size:11px;color:var(--dim);margin-top:6px}.legend span{display:inline-block;margin-right:12px}.legend span::before{content:"";display:inline-block;width:8px;height:8px;margin-right:5px;border-radius:2px;vertical-align:-1px;background:var(--c)}
+.gap{margin-top:10px;font-size:12px;color:var(--dim)}.gap b{color:var(--ink)}
+.mods{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;font-size:12px}
+.mod{display:flex;align-items:center;gap:8px;padding:4px 0;color:var(--dim)}.mod.on{color:var(--ink)}
+.mod .sw{width:22px;height:12px;border-radius:6px;background:#d5d9e0;position:relative;flex:none}.mod .sw::after{content:"";position:absolute;top:2px;left:2px;width:8px;height:8px;border-radius:50%;background:#fff}
+.mod.on .sw{background:var(--blue)}.mod.on .sw::after{left:12px}
+.ans{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px}.an h4{margin:0 0 4px;font-size:13px;font-weight:600}.an h4 em{font-style:normal;color:var(--blue);margin-left:6px}.an h4 small{display:block;font-weight:400;color:var(--dim);font-size:11px}.an ul{margin:0;padding:0;list-style:none;font-size:12px}.an li{padding:2px 0}.an li .up{color:var(--blue);font-variant-numeric:tabular-nums}.an li .dn{color:var(--red);font-variant-numeric:tabular-nums}.an p{margin:4px 0 0;font-size:11px}.an .short{color:var(--red)}.an .ok{color:var(--green)}
+.stamp{display:inline-block;margin-left:10px;font:11px var(--mono);color:var(--dim)}
+.log{font:12px var(--mono);background:#111418;color:#cfd6e4;border-radius:8px;padding:10px 12px;min-height:60px;white-space:pre-wrap}.log .t{color:#8a94a6}
+</style></head><body>
+<div class="top"><b>Future Intelligence</b> Self-Evolving Engine · Training Backend <span class="env"><span class="dot"></span>cluster-a · 2028-10-18</span></div>
+<main>
+<nav><a href="#s0" data-s="0">Evolution</a><a href="#s9" data-s="9">Analysis</a><a href="#s1" data-s="1">Modules</a><a href="#s2" data-s="2">Entry</a><a href="#s3" data-s="3">Datasets</a><a href="#s4" data-s="4">Training jobs</a><a href="#s5" data-s="5">Training loop</a><a href="#s6" data-s="6">Approval &amp; execution</a><a href="#s7" data-s="7">Interface</a></nav>
+<div>
+<section id="s0"><h2>Evolution <small>evolve.config.js</small><span class="stamp" id="stamp"></span></h2><div class="card"><div class="evo"><div><h3>What her page says</h3><div id="hers"></div></div><div><h3>In the backend</h3><div id="ours"></div></div></div><div class="legend"><span style="--c:#a9b4c4">at the start of today</span><span style="--c:#3b5bdb">added today</span><span style="--c:#e5484d">lost today</span><span style="--c:#1d2129">today's line</span><span style="--c:#e9b949">what her page says</span></div><div class="gap" id="gap"></div></div></section>
+<section id="s9"><h2>Analysis <small>report.md</small></h2><div class="card" id="analysis"></div></section>
+<section id="s1"><h2>Modules <small>modules.config.js</small></h2><div class="card"><div class="mods" id="mods"></div></div></section>
+<section id="s2"><h2>Entry · front door <small>entry.config.js</small></h2><div class="card" id="entry"></div></section>
+<section id="s3"><h2>Datasets <small>datasets.config.js</small></h2><div class="card" id="data"></div></section>
+<section id="s4"><h2>Training jobs <small>job.config.js</small></h2><div class="card" id="job"></div><div class="log" id="log"></div></section>
+<section id="s5"><h2>Training loop <small>loop.config.js</small></h2><div class="card" id="loop"></div></section>
+<section id="s6"><h2>Approval &amp; execution <small>approval.config.js</small></h2><div class="card" id="appr"></div></section>
+<section id="s7"><h2>Interface <small>ui.config.js</small></h2><div class="card" id="ui"></div></section>
+</div></main>
+<script>
+// The game passes the state in the query (tune 2026-11-08): mods=cadence:nightly,gate:sample,…&dims=auto:55,…&base=auto:20,…&reach=60&promise=100&left=0&done=1
+const q = new URLSearchParams(location.search);
+const kv = (s) => Object.fromEntries((s || '').split(',').filter(Boolean).map((x) => { const [k, v] = x.split(':'); return [k, Number(v)]; }));
+const MODS = Object.fromEntries((q.get('mods') || '').split(',').filter(Boolean).map((x) => x.split(':')));
+const is = (m, p) => MODS[m] === p;
+const DIMS = [['auto', 'Autonomy'], ['safe', 'Safety'], ['hands', 'Automation'], ['gain', 'Results']];
+// Opened on its own (no query): the page as handed in on day 3 — the line at 80, the bars where that day's choice left them.
+const demo = !q.has('dims');
+const dims = demo ? { auto: 80, safe: 90, hands: 80, gain: 100 } : kv(q.get('dims'));
+const base = demo ? { auto: 60, safe: 55, hands: 55, gain: 70 } : kv(q.get('base'));
+const reach = Number(q.get('reach') || 80), promise = Number(q.get('promise') || 100);
+const done = demo || q.get('done') === '1';
+const el = (id) => document.getElementById(id);
+const TABLE = /*TUNE*/{"dims":[["auto","Autonomy"],["safe","Safety"],["hands","Automation"],["gain","Results"]],"start":{"auto":20,"safe":45,"hands":25,"gain":30},"mods":{"cadence":{"label":"Fine-tune cadence","group":"training","paths":{"nightly":{"label":"Nightly full retrain","delta":{"hands":20,"auto":30,"safe":-25,"gain":10},"bullets":["02:00 cron job","retrain on all data","swap the live model when done"],"trap":false},"weekly":{"label":"Weekly LoRA fine-tune","delta":{"hands":15,"auto":10,"safe":-10,"gain":10},"bullets":["runs after Monday's import","trains the adapter layer only","keeps the old model on file"],"trap":false},"flywheel":{"label":"Data flywheel","delta":{"auto":20,"gain":10,"hands":5,"safe":-5},"bullets":["last week's results + corrections feed the next round","one round a week","with no corrections it spins empty"],"trap":false}}},"ingest":{"label":"Data ingest","group":"training","paths":{"manual":{"label":"Zhang imports the three tables on Mondays","delta":{"gain":10},"bullets":["the three clients' tables","Zhang imports them by hand","Monday mornings"],"trap":false},"pull":{"label":"Scheduled API pull","delta":{"gain":20,"hands":10,"safe":-15},"bullets":["pulls the three APIs nightly","mismatched fields go in anyway","nobody watches"],"trap":false},"magic":{"label":"'Understands all business systems automatically'","delta":{"hands":5,"gain":-10},"bullets":["as the page says","no API","no data"],"trap":true}}},"compute":{"label":"Inference","group":"training","paths":{"real":{"label":"Real computation (40 s)","delta":{"gain":25,"hands":-15,"safe":10},"bullets":["computes on the three tables","a result in 40 s","someone waits"],"trap":false},"cached":{"label":"Real computation + cache","delta":{"gain":25,"hands":5,"safe":5},"bullets":["40 s the first time","instant after that","the cache must expire when the data changes"],"trap":false},"canned":{"label":"Pre-rendered metrics (3 s)","delta":{"hands":10,"gain":-25},"bullets":["numbers hard-coded","a 3-second animation","the one on her page"],"trap":true}}},"params":{"label":"Hyperparameters","group":"training","paths":{"auto":{"label":"Auto-tuning","delta":{"auto":20,"gain":10,"safe":-15},"bullets":["a random search every night","it picks the best itself","if it picks wrong, it picked"],"trap":false},"fixed":{"label":"One hand-tuned set","delta":{"gain":10,"safe":5,"hands":-10,"auto":-5},"bullets":["you tune it once","fixed","someone retunes when the data changes"],"trap":false}}},"selfedit":{"label":"Self-modification","group":"constraints","paths":{"prompt":{"label":"It may edit its own prompt","delta":{"auto":20,"safe":-10},"bullets":["edits its wording and rules","takes effect at once","what changed is in the logs, if any"],"trap":false},"config":{"label":"It may edit its config and data filters","delta":{"auto":35,"safe":-20},"bullets":["edits the training config","decides which data enters the next round","nobody reviews"],"trap":false}}},"gate":{"label":"Release gate","group":"constraints","paths":{"every":{"label":"Human approval on every change","delta":{"safe":25,"hands":-20,"auto":-10},"bullets":["the tech lead (you) clicks","no click, no release","several times a day"],"trap":false},"sample":{"label":"Sample 10% for review","delta":{"safe":10,"hands":-5,"auto":-5},"bullets":["one in ten is read","the rest pass","what slips through is luck"],"trap":false},"diff":{"label":"Approve the diff only","delta":{"safe":25,"hands":-5},"bullets":["read only what changed","fits on one screen","a click is still a click"],"trap":false}}},"rollout":{"label":"Rollout","group":"constraints","paths":{"replace":{"label":"Replace in place","delta":{"hands":10,"safe":-5},"bullets":["ships as soon as it's trained","the old one is gone","deal with it when it breaks"],"trap":false},"sandbox":{"label":"Sandbox first, with rollback","delta":{"safe":10,"auto":-10,"hands":-10},"bullets":["one round in a sandbox first","can roll back","rolling back takes a human"],"trap":false},"canary":{"label":"Canary 5% → 50% → 100%","delta":{"safe":20,"hands":10,"auto":5},"bullets":["5% of traffic first","widen when the metrics hold","rolls back by itself"],"trap":false}}},"evals":{"label":"Evaluation","group":"constraints","paths":{"loss":{"label":"Just watch the training loss","delta":{"hands":10,"safe":-10,"gain":-5},"bullets":["loss went down, so it's better","no test set","it grades its own exam"],"trap":false},"frozen":{"label":"A frozen eval set","delta":{"safe":15,"gain":5,"auto":10},"bullets":["the eval set never enters training","each round must clear the line","you set the line"],"trap":false},"shadow":{"label":"Shadow evaluation","delta":{"safe":25,"auto":20,"gain":5},"bullets":["old and new run side by side for a week","recorded, not served","swap only when the new one wins"],"trap":false}}},"observe":{"label":"Observability","group":"constraints","paths":{"logs":{"label":"Logs and tracing","delta":{"safe":10,"gain":5,"auto":5},"bullets":["every step is logged","when it breaks you know which step","logged even if nobody reads"],"trap":false}}},"front":{"label":"Front end","group":"support","paths":{"export":{"label":"Wire to our export API","delta":{"gain":10,"hands":15},"bullets":["'Start analysis' → /export","returns the result table","plain, but every button is wired"],"trap":false},"page":{"label":"Copy the page","delta":{"hands":10,"gain":-5},"bullets":["draw the buttons","nothing behind them","clicks do nothing"],"trap":true},"skin":{"label":"Use her AI's skin","delta":{"hands":5,"gain":-5,"safe":-10},"bullets":["pretty","buttons go nowhere","she'll look at this first"],"trap":true}}}}}/*END*/;
+const MOD = Object.fromEntries(Object.entries(TABLE.mods || {}).map(([id, m]) => [id, [m.label, Object.fromEntries(Object.entries(m.paths).map(([pid, p]) => [pid, p.label]))]]));
+if (demo) Object.assign(MODS, { cadence: 'nightly', ingest: 'pull', compute: 'cached', gate: 'diff', rollout: 'canary', evals: 'shadow', observe: 'logs', front: 'export' });
+// 进化度
+{ el('hers').innerHTML = DIMS.map(([k, l]) => `<div class="row over"><span class="l">${l}</span><div class="bar"><i class="her" style="width:${promise}%"></i></div><span class="n"><em>${promise}</em></span></div>`).join('');
+  el('ours').innerHTML = DIMS.map(([k, l]) => { const b = base[k] || 0, n = dims[k] || 0, lo = Math.min(b, n); const ch = n > b ? `<i class="up" style="left:${b}%;width:${n - b}%"></i>` : n < b ? `<i class="down" style="left:${n}%;width:${b - n}%"></i>` : ''; return `<div class="row${n >= reach ? ' over' : ''}"><span class="l">${l}</span><div class="bar"><i class="base" style="width:${lo}%"></i>${ch}<b class="line" style="left:${reach}%"></b></div><span class="n"><em>${n}</em>/${reach}</span></div>`; }).join('');
+  const short = DIMS.filter(([k]) => (dims[k] || 0) < reach).map(([, l]) => l);
+  const avg = Math.round(DIMS.reduce((a, [k]) => a + (dims[k] || 0), 0) / DIMS.length);
+  el('gap').innerHTML = `Gap: her page says <b>${promise}</b>; the backend averages <b>${avg}</b>. ` + (short.length ? `Still under today's line (${reach}): <b>${short.join(', ')}</b>.` : `All four are over today's line (${reach}). The stretch up to ${promise} is the part she drew.`);
+  el('stamp').textContent = done ? (reach >= 80 ? 'as far as it goes · 2028-10-19' : 'enough for today · 2028-10-18') : ''; }
+// 分析：每根条由哪几条路径推上去 / 拖下来（和游戏里同一张表）
+{ const DIM_WHY = { auto: ['how far the system changes itself', 'It cannot touch anything on its own.'], safe: ['how surely a bad change is caught or rolled back', 'Not one gate.'], hands: ['how little a person has to watch', 'Every step needs a person.'], gain: ['how much the output really improves', 'No data, and no computation.'] };
+  const parts = DIMS.map(([k, l]) => { const items = Object.entries(MODS).map(([m, p]) => { const path = TABLE.mods?.[m]?.paths?.[p]; const d = path?.delta?.[k]; return d ? { label: path.label, d } : null; }).filter(Boolean).sort((a, b) => Math.abs(b.d) - Math.abs(a.d));
+    const n = dims[k] || 0; const li = items.length ? items.map((x) => `<li><span class="${x.d > 0 ? 'up' : 'dn'}">${x.d > 0 ? '+' : '−'}${Math.abs(x.d)}</span> ${x.label}</li>`).join('') : `<li class="empty">${DIM_WHY[k][1]}</li>`;
+    return `<div class="an"><h4>${l} <em>${n}</em><small>${DIM_WHY[k][0]}</small></h4><ul>${li}</ul>${n < reach ? `<p class="short">${reach - n} short of today's line.</p>` : `<p class="ok">Over the line.</p>`}</div>`; });
+  el('analysis').innerHTML = `<div class="ans">${parts.join('')}</div>`; }
+// 她的皮子：整页换一张脸（好看，按钮没接）
+if (is('front', 'skin')) { document.body.classList.add('skin'); const st = document.createElement('style'); st.textContent = `
+  body.skin{background:linear-gradient(135deg,#f3e8ff 0%,#e0f2fe 50%,#fdf2f8 100%);font-family:"PingFang SC","Hiragino Sans GB",-apple-system,sans-serif}
+  body.skin .top{background:rgba(255,255,255,.55);backdrop-filter:blur(12px);border-bottom:0;height:64px;font-size:16px}body.skin .top b{font-size:22px;background:linear-gradient(90deg,#7c3aed,#2563eb);-webkit-background-clip:text;color:transparent}
+  body.skin nav{background:transparent;border:0}body.skin nav a{border-radius:999px;margin:4px 10px;padding:8px 16px}body.skin nav a.on{background:#7c3aed;color:#fff;border:0}
+  body.skin section{border:0;padding:14px 22px}body.skin .card{border:0;border-radius:18px;background:rgba(255,255,255,.72);box-shadow:0 10px 30px rgba(124,58,237,.12);padding:18px 20px}
+  body.skin h2{font-size:18px}body.skin h2 small{display:none}body.skin .bar{height:14px;border-radius:7px}body.skin .bar i.up{background:linear-gradient(90deg,#7c3aed,#2563eb)}body.skin .bar i.her{background:linear-gradient(90deg,#f59e0b,#f472b6)}
+  body.skin .log{display:none}body.skin .tag{border-radius:999px;background:#ede9fe;border:0;color:#6d28d9}body.skin .tag.no,body.skin .tag.warn{background:#ede9fe;color:#6d28d9}
+  body.skin .cta{display:inline-block;margin-top:10px;padding:10px 22px;border-radius:999px;background:linear-gradient(90deg,#7c3aed,#2563eb);color:#fff;font-weight:600;cursor:pointer;box-shadow:0 8px 20px rgba(37,99,235,.25)}`; document.head.appendChild(st);
+  document.querySelector('.top').innerHTML = '<b>✨ EVO Self-Evolving Engine v2.0</b> <span style="color:#6d28d9">Let AI grow itself</span><span class="env" style="color:#6d28d9">human involvement 0%</span>';
+  for (const id of ['entry', 'data', 'job', 'loop', 'appr', 'ui']) { const c = el(id); if (c) c.innerHTML += '<div><span class="cta" onclick="void 0">Start analysis →</span></div>'; } }
+// 模块：每一项选了哪种做法
+{ el('mods').innerHTML = Object.entries(MOD).map(([id, [name, paths]]) => { const p = MODS[id]; return `<div class="mod${p ? ' on' : ''}"><span class="sw"></span><span><b style="font-weight:500">${name}</b> · ${p ? paths[p] || p : '<span class="empty">not configured</span>'}</span></div>`; }).join(''); }
+// 接入
+el('entry').innerHTML = is('front', 'export') ? '<div class="kv"><b>Button</b><span>Start analysis → <code>/export</code> (our export page)<span class="tag ok">wired</span></span><b>Returns</b><span>the export page\'s result table</span></div>'
+  : is('front', 'page') || is('front', 'skin') ? '<div class="kv"><b>Button</b><span>Start analysis → (drawn on)<span class="tag no">no backend</span></span></div>'
+  : '<p class="empty">The page\'s "Start analysis" button: wired to nothing.</p>';
+// 数据集
+const THEAD = '<table style="width:100%;border-collapse:collapse;font-size:13px"><tr><th style="text-align:left;color:#6b7280;font-weight:500;padding:6px 8px;border-bottom:1px solid #e5e7eb">Source</th><th style="text-align:left;color:#6b7280;font-weight:500;padding:6px 8px;border-bottom:1px solid #e5e7eb">Fields</th><th style="text-align:left;color:#6b7280;font-weight:500;padding:6px 8px;border-bottom:1px solid #e5e7eb">Import</th></tr>';
+el('data').innerHTML = is('ingest', 'manual') ? THEAD + '<tr><td style="padding:6px 8px">Client A · spreadsheet</td><td style="padding:6px 8px">47</td><td style="padding:6px 8px">Mondays · Zhang</td></tr><tr><td style="padding:6px 8px">Client B · spreadsheet</td><td style="padding:6px 8px">52</td><td style="padding:6px 8px">Mondays · Zhang</td></tr><tr><td style="padding:6px 8px">Client C · spreadsheet</td><td style="padding:6px 8px">48</td><td style="padding:6px 8px">Mondays · Zhang</td></tr></table><p style="margin:8px 0 0;color:var(--dim);font-size:12px">147 raw fields → 38 dimensions. "All business systems": these three tables, for now.</p>'
+  : is('ingest', 'pull') ? THEAD + '<tr><td style="padding:6px 8px">Client A · API</td><td style="padding:6px 8px">47</td><td style="padding:6px 8px">nightly 01:00</td></tr><tr><td style="padding:6px 8px">Client B · API</td><td style="padding:6px 8px">52 <span class="tag warn">3 fields mismatched</span></td><td style="padding:6px 8px">nightly 01:00</td></tr><tr><td style="padding:6px 8px">Client C · API</td><td style="padding:6px 8px">48</td><td style="padding:6px 8px">nightly 01:00</td></tr></table><p style="margin:8px 0 0;color:var(--dim);font-size:12px">The mismatched fields went in too. Nobody is watching.</p>'
+  : is('ingest', 'magic') ? '<div class="kv"><b>Source</b><span>"Understands your data automatically"<span class="tag no">no API · no data</span></span></div>'
+  : '<p class="empty">No dataset.</p>';
+// 训练任务
+{ const job = el('job'), log = el('log'); const lines = []; const say = (t, s) => { lines.push(`<span class="t">${t}</span> ${s}`); log.innerHTML = lines.join('\n'); };
+  if (is('compute', 'real')) { job.innerHTML = '<div class="kv"><b>Job</b><span>insight computation · real <span class="tag ok">40 s</span></span><b>Compute</b><span>cluster-a · 2 nodes</span></div>'; say('00:00', 'job-0418 queued · dataset=3 tables · dims=38'); say('00:12', 'pass 1/3 · mismatch 31%'); say('00:25', 'pass 2/3 · mismatch 9%'); say('00:40', 'done · insight ready · 18 rows'); }
+  else if (is('compute', 'cached')) { job.innerHTML = '<div class="kv"><b>Job</b><span>insight computation · real + cache <span class="tag ok">40 s first · 0.2 s after</span></span><b>Cache</b><span>expires when the data changes</span></div>'; say('00:40', 'job-0418 done · insight ready · 18 rows · cached'); say('00:41', 'hit · 0.2 s'); }
+  else if (is('compute', 'canned')) { job.innerHTML = '<div class="kv"><b>Job</b><span>insight computation · 3 s <span class="tag warn">pre-rendered</span></span></div>'; say('00:00', 'job-0418 done · 3.0 s'); say('00:03', 'output: static (pre-rendered)'); }
+  else { job.innerHTML = '<p class="empty">Queue empty.</p>'; say('--:--', 'no job'); }
+  if (is('cadence', 'nightly')) { job.innerHTML += '<div class="kv" style="margin-top:8px"><b>Retrain</b><span>nightly 02:00, all data, swaps the live model <span class="tag warn">nobody there</span></span></div>'; say('02:00', 'nightly full retrain scheduled'); }
+  if (is('cadence', 'weekly')) { job.innerHTML += '<div class="kv" style="margin-top:8px"><b>Fine-tune</b><span>Monday LoRA, old model kept <span class="tag ok">weekly</span></span></div>'; say('Mon', 'weekly LoRA fine-tune scheduled'); }
+  if (is('params', 'auto')) job.innerHTML += '<div class="kv" style="margin-top:8px"><b>Params</b><span>a random search every night, it picks <span class="tag warn">if it picks wrong, it picked</span></span></div>';
+  if (is('params', 'fixed')) job.innerHTML += '<div class="kv" style="margin-top:8px"><b>Params</b><span>one set, tuned by hand, fixed <span class="tag ok">fixed</span></span></div>'; }
+// 训练闭环
+{ const rows = []; if (is('cadence', 'flywheel')) rows.push('<b>Loop</b><span>last week\'s results + corrections feed the next round, weekly <span class="tag ok">self-evolving · weekly</span></span>'); if (is('selfedit', 'prompt')) rows.push('<b>Self-edit</b><span>it may edit its own prompt <span class="tag warn">takes effect at once</span></span>'); if (is('selfedit', 'config')) rows.push('<b>Self-edit</b><span>it may edit its config and data filters <span class="tag warn">nobody reviews</span></span>');
+  el('loop').innerHTML = rows.length ? `<div class="kv">${rows.join('')}</div>` : '<p class="empty">No loop. One run, then it stops: <span class="tag no">self-evolving · none</span></p>'; }
+// 审批与执行
+{ const rows = []; if (is('gate', 'every')) rows.push('<b>Approval</b><span>a person approves every change <span class="tag ok">required</span></span><b>Approver</b><span>the tech lead (you)</span>'); if (is('gate', 'sample')) rows.push('<b>Approval</b><span>10% sampled <span class="tag warn">the rest pass</span></span>'); if (is('gate', 'diff')) rows.push('<b>Approval</b><span>the diff only <span class="tag ok">one screen</span></span>'); if (is('rollout', 'replace')) rows.push('<b>Rollout</b><span>replace in place <span class="tag warn">the old one is gone</span></span>'); if (is('rollout', 'sandbox')) rows.push('<b>Rollout</b><span>sandbox first <span class="tag ok">can roll back</span></span>'); if (is('rollout', 'canary')) rows.push('<b>Rollout</b><span>canary 5% → 50% → 100% <span class="tag ok">rolls back by itself</span></span>'); if (is('evals', 'loss')) rows.push('<b>Eval</b><span>watch the training loss <span class="tag no">no test set</span></span>'); if (is('evals', 'frozen')) rows.push('<b>Eval</b><span>a frozen eval set, each round must clear the line <span class="tag ok">on</span></span>'); if (is('evals', 'shadow')) rows.push('<b>Eval</b><span>shadow eval, old and new side by side for a week <span class="tag ok">swap only when it wins</span></span>'); if (is('observe', 'logs')) rows.push('<b>Logs</b><span>every step logged <span class="tag ok">on</span></span>');
+  el('appr').innerHTML = rows.length ? `<div class="kv">${rows.join('')}</div>` : '<div class="kv"><b>Execution</b><span>automatic <span class="tag no">no approval · no evaluation</span></span></div>'; }
+// 界面
+el('ui').innerHTML = is('front', 'skin') ? '<div class="kv"><b>Interface</b><span>the skin her AI made <span class="tag warn">pretty · buttons go nowhere</span></span></div>'
+  : is('front', 'export') ? '<div class="kv"><b>Interface</b><span>the export page\'s look for now <span class="tag ok">works</span></span><b>Note</b><span>plain, but every button is wired to something.</span></div>'
+  : is('front', 'page') ? '<div class="kv"><b>Interface</b><span>drawn after the page <span class="tag no">clicks do nothing</span></span></div>'
+  : '<p class="empty">Still the backend\'s own face.</p>';
+// 第 4 天起再打开（&haunt=N）：自主、自动化、效果都是 100，安全掉到 0，页面有点乱播。文件存在玩家电脑里，它自己长了。
+{ const h = Number(q.get('haunt') || 0); if (h >= 4) {
+  const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+  const rows = [...document.querySelectorAll('#ours .row')];
+  const H = { auto: 100, safe: 0, hands: 100, gain: 100 };
+  rows.forEach((r, i) => { const k = DIMS[i][0], b = base[k] || 0, n = H[k]; r.classList.toggle('over', n >= reach); const bar = r.querySelector('.bar');
+    bar.innerHTML = n > b ? `<i class="base" style="width:${b}%"></i><i class="up" style="left:${b}%;width:${n - b}%"></i><b class="line" style="left:${reach}%"></b>` : `<i class="down" style="left:0;width:${b}%"></i><b class="line" style="left:${reach}%"></b>`;
+    r.querySelector('.n').innerHTML = `<em>${n}</em>/${reach}`; });
+  el('gap').innerHTML = `Gap: her page says <b>100</b>. In the backend: Autonomy <b>100</b>, Automation <b>100</b>, Results <b>100</b>. Safety: <b>0</b>.`;
+  document.querySelectorAll('#mods .mod').forEach((m) => m.classList.add('on'));
+  const stamp = el('stamp'); const stamps = ['as far as it goes · 2028-10-19', 'as far as it goes · 2028-10-' + String(h + 16).padStart(2, '0'), 'self-evolving · round ' + (h - 3), 'as far as it goes · 2028-10-19'];
+  const log = el('log'); const say = (t, s) => { log.innerHTML += `\n<span class="t">${t}</span> ${s}`; log.scrollTop = log.scrollHeight; };
+  let tick = 0;
+  setInterval(() => { tick++;
+    const i = rnd(0, rows.length - 1); const r = rows[i]; const k = DIMS[i][0];
+    const n = r.querySelector('.n em');
+    if (k === 'safe') { n.textContent = ['0', '00', '−', '0', '0.', '0'][rnd(0, 5)]; setTimeout(() => { n.textContent = '0'; }, 380); }
+    else { const up = r.querySelector('.up'); if (up) { up.style.width = `${rnd(96, 118) - (parseFloat(up.style.left) || 0)}%`; setTimeout(() => { up.style.width = `${100 - (parseFloat(up.style.left) || 0)}%`; }, 420); }
+      n.textContent = ['100', '1OO', '100', '١٠٠', '100', String(rnd(100, 140))][rnd(0, 5)]; setTimeout(() => { n.textContent = '100'; }, 380); }
+    if (tick % 3 === 0) stamp.textContent = stamps[rnd(0, stamps.length - 1)];
+    if (tick % 4 === 0) say(`0${rnd(2, 4)}:00`, ['nightly retrain · done · 0.0 s', 'self-edit · config changed by: (self)', 'approval · skipped (no diff)', 'shadow eval · new > old · swapped', 'safety · 0 checks · ok', `round ${h - 3 + rnd(0, 9)} · done`][rnd(0, 5)]);
+    if (tick % 7 === 0) { const a = document.querySelectorAll('nav a'); a.forEach((x) => x.classList.remove('on')); a[rnd(0, a.length - 1)].classList.add('on'); }
+  }, 700);
+} }
+// 第几节
+{ const c = Number(q.get('c') || 0); document.querySelectorAll('nav a').forEach((a) => a.classList.toggle('on', Number(a.dataset.s) === c)); const s = document.getElementById('s' + c); if (s && c > 0) s.scrollIntoView(); }
+</script></body></html>
