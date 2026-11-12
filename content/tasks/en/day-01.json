@@ -153,12 +153,12 @@
     },
     {
       "id": "task3",
-      "title": "v17 · Future Intelligence, the technical story.",
+      "title": "Future Intelligence, the technical story (v17)",
       "app": "docs",
       "done": "task_merge_done",
       "board": {
         "kind": "table",
-        "title": "Future Intelligence · the technical story v17",
+        "title": "Future Intelligence, the technical story (v17)",
         "columns": [
           "",
           "What Lao Wang wants made clear",
@@ -518,6 +518,7 @@
       "launch": {
         "who": "boss",
         "note": [
+          "Merge v15 and v16 into v17 and send it to the boss.",
           "What the boss said is far too vague: a riddler through and through.",
           "Maybe some things he said before can help?"
         ],

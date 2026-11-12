@@ -311,15 +311,19 @@ for (const it of ITEMS) {
         await toWorkbench(); await goHome(); await sel(`[data-action=wb-nav][data-page='task:${it.id}']`, 1.2);
         await shotStep(`tune-${it.id}`);
         let picks = 0, turns = 0;
+        // tune stage (2026-11-12): a node's action cards (tune-select), then 行动 (tune-act); with no card
+        // on this node, the next open node (.ts-node:not(.set)); Kuro's remark types in between (busy).
         for (let k = 0; k < 60; k++) {
           await sleep(1.6); await unmask(); await ev(HELPERS);
-          const next = await ev("(()=>{const c=[...document.querySelectorAll('[data-action=board-mod]:not([disabled])')].filter(__vis).find(e=>e.dataset.chosen===''); return c? c.dataset.mod+'/'+c.dataset.path : ''})()");
-          // the pane shows one module per card: with nothing open on this card, turn to the next (‹ › arrows)
-          if (!next && turns < 14 && (await ev("(()=>{const a=[...document.querySelectorAll('.sh-tune-arrow[data-action=shell-tune-go]:not([disabled])')].filter(__vis).sort((x,y)=>Number(y.dataset.index)-Number(x.dataset.index))[0]; if(!a) return false; a.click(); return true})()"))) { turns++; await sleep(0.8); continue; }
-          if (!next) { note(`   tune: no open option after ${picks} picks · mods ${await ev("JSON.stringify([...document.querySelectorAll('[data-action=board-mod]')].map(e=>e.dataset.mod+'/'+e.dataset.path+':'+(e.dataset.chosen??'-')+(e.disabled?'(off)':'')+(__vis(e)?'':'(hidden)')).slice(0,12))")}`); break; }
-          const [mod, path] = next.split("/");
-          if (!(await sel(`[data-action=board-mod][data-mod=${mod}][data-path=${path}]`, 0.4))) break;
-          picks++;
+          const card = await ev("(()=>{const c=[...document.querySelectorAll('[data-action=tune-select]')].filter(__vis)[0]; return c? c.dataset.mod+'/'+c.dataset.path : ''})()");
+          if (card) {
+            const [mod, path] = card.split("/");
+            if (!(await sel(`[data-action=tune-select][data-mod=${mod}][data-path="${path}"]`, 0.4))) break;
+            if (!(await sel("[data-action=tune-act]:not([disabled])", 0.6))) { note("   tune: 行动 not enabled after a pick"); break; }
+            picks++; continue;
+          }
+          if (turns < 14 && (await ev("(()=>{const a=[...document.querySelectorAll('.ts-node:not(.set):not(.locked):not(.cur)')].filter(__vis)[0]; if(!a) return false; a.click(); return true})()"))) { turns++; await sleep(0.8); continue; }
+          note(`   tune: no card after ${picks} picks · nodes ${await ev("JSON.stringify([...document.querySelectorAll('.ts-node')].map(e=>e.className.replace('ts-node','').trim()||'open'))")}`); break;
         }
         // the end of the work: Kuro's lines type in first (busy), then his offer (不接) or 提交 — wait for either
         for (let w = 0; w < 14 && !(await has("[data-action=board-keep]")) && !(await has("[data-action=board-print]:not([disabled])")); w++) await sleep(1);

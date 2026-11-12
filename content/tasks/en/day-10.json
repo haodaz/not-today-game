@@ -4,12 +4,12 @@
   "tasks": [
     {
       "id": "work",
-      "title": "Proofread Act Two: just fix the typos, don't read too closely.",
+      "title": "Script, act two: proofreading",
       "app": "code",
       "done": "task_d10_work",
       "board": {
         "kind": "table",
-        "title": "Proof the script's second act: fix the typos, don't read too closely.",
+        "title": "Script, act two: proofreading",
         "columns": [
           "the script",
           "the book"
@@ -306,10 +306,11 @@
       "launch": {
         "who": "laozhou",
         "note": [
-          "Lao Zhou wants act two proofread: fix the typos, don't read too closely.",
-          "Against the script and the scan of that book, one word at a time."
+          "Lao Zhou's brief: fix the typos, don't read too closely.",
+          "Lao Zhou wants act two proofed: fix the typos, don't read too closely.",
+          "Four words; the script spells them one way, the book another."
         ],
-        "call": "The table is locked: the key is in last night's recording, played backwards. Don't read whole lines; fix and hand in!",
+        "call": "Fix them by the book, don't read them aloud, hand it in when done.",
         "cta": "Start work",
         "motif": {
           "kind": "danmaku",

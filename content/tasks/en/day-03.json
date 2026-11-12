@@ -4,13 +4,13 @@
   "tasks": [
     {
       "id": "task1",
-      "title": "The self-evolving engine, continued.",
+      "title": "AI self-evolving engine — delivery, continued",
       "app": "docs",
       "done": "task_d3_1",
       "board": {
         "kind": "table",
         "view": "ide",
-        "title": "Self-evolving engine · training backend",
+        "title": "AI self-evolving engine — delivery, continued",
         "columns": [
           ""
         ],
@@ -893,12 +893,12 @@
     },
     {
       "id": "task3",
-      "title": "v18 · What he said in the meeting: make the AI theory bigger (self-evolution).",
+      "title": "Future Intelligence, the technical story (v18)",
       "app": "docs",
       "done": "task_d3_3",
       "board": {
         "kind": "table",
-        "title": "Future Intelligence's AI theory (after the meeting)",
+        "title": "Future Intelligence, the technical story (v18)",
         "columns": [
           "",
           "What Lao Wang asked for",
@@ -1319,6 +1319,7 @@
       "launch": {
         "who": "boss",
         "note": [
+          "What he said in the meeting: tell the AI theory big (self-evolution).",
           "The meeting is over. The boss wants the AI theory told big; v18 is still yesterday's business.",
           "He doesn't want new things, he wants new words."
         ],

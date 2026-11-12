@@ -4,13 +4,13 @@
   "tasks": [
     {
       "id": "task1",
-      "title": "自演化引擎：小张没跑起来，你接着做。",
+      "title": "AI自演化引擎-技术落地",
       "app": "docs",
       "done": "task_d2_1",
       "board": {
         "kind": "table",
         "view": "ide",
-        "title": "自演化引擎 · 训练后台",
+        "title": "AI自演化引擎-技术落地",
         "columns": [
           ""
         ],
@@ -683,6 +683,7 @@
       "launch": {
         "who": "partner",
         "note": [
+          "小张没跑起来，你接着做。",
           "Vivi 的理想状态也太理想了！",
           "殊不知，每一个训练都是同时有回报和风险的。"
         ],

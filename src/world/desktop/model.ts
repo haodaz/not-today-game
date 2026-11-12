@@ -354,6 +354,8 @@ export interface Session {
   ideTyping: { key: string; times: number[] } | null;
   /** tune (2026-11-08): the parameter card shown, per task page key (the carousel). */
   tuneIndex: Record<string, number>;
+  /** tune stage (2026-11-12): the action card picked, before 行动 (`path: null` = Kuro's card). Session only. */
+  tunePick: { key: string; mod: string; path: string | null } | null;
   /** tune: while Kuro "executes" a choice the preview keeps its previous page (then it changes, then Kuro speaks). */
   ideHold: { key: string; until: number; src: string } | null;
   /**
@@ -555,6 +557,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     boardLockOpen: false,
     ideTyping: null,
     tuneIndex: {},
+    tunePick: null,
     ideHold: null,
     meetingPlay: null,
     shell: {},

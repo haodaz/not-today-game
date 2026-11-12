@@ -457,6 +457,24 @@ const actions: Record<string, ActionHandler> = {
     finishTune(ctx, c, before);
     ctx.rerender();
   },
+  // tune stage (2026-11-12): a card picked (not spent yet), then 行动 spends it as board-mod / board-assist-mod.
+  "tune-select"(ctx, data) {
+    const c = currentBoard(ctx);
+    if (!c || !c.board.tune || !data.mod) return;
+    const key = `${ctx.store.getState().day}:${c.task.id}`;
+    const path = data.path ? data.path : null;
+    const same = ctx.session.tunePick?.key === key && ctx.session.tunePick.mod === data.mod && ctx.session.tunePick.path === path;
+    ctx.session.tunePick = same ? null : { key, mod: data.mod, path };
+    ctx.rerender();
+  },
+  "tune-act"(ctx) {
+    const c = currentBoard(ctx);
+    const pick = ctx.session.tunePick;
+    if (!c || !c.board.tune || !pick || pick.key !== `${ctx.store.getState().day}:${c.task.id}`) return;
+    ctx.session.tunePick = null;
+    if (pick.path === null) actions["board-assist-mod"]!(ctx, { mod: pick.mod } as DOMStringMap, null as never);
+    else actions["board-mod"]!(ctx, { mod: pick.mod, path: pick.path } as DOMStringMap, null as never);
+  },
   // tune: 不接 — Kuro's end-of-work offer declined; the work goes as it is.
   "board-keep"(ctx) {
     const c = currentBoard(ctx);

@@ -19,6 +19,7 @@ import { hasString, t, tr } from "@world/i18n";
 import { cardText, finishLabel, renderBoard } from "./board";
 import { openWork } from "./work";
 import { tunePane } from "./shell";
+import { tuneStage } from "./tune-stage";
 import { tuneOfferPending, tuneOffers } from "@state/days/board";
 import { isNight } from "../beat";
 import type { AppContext } from "../model";
@@ -180,16 +181,8 @@ function genericWorkLayer(c: { state: State; events: readonly GameEvent[]; sessi
   const key = `${state.day}:${task.id}`;
   let body: SafeHtml;
   if (board.tune) {
-    const s = boardState(board, state.day, task.id, events);
-    const ops = ideOps(task, state.day, events);
-    const typing = session.ideTyping?.key === key ? session.ideTyping.times : [];
-    const busy = typing.some((t) => t > nowMs);
-    const hold = session.ideHold && session.ideHold.key === key && session.ideHold.until > nowMs ? session.ideHold.src : null;
-    const src = hold ?? ideSrc(board, s, ops, null, tuneCarried(board, events));
-    const offer = !busy && tuneOfferPending(board, s)
-      ? html`<div class="wl-offer">${tuneOffers(board).map(({ mod, path }) => html`<button type="button" class="wl-cta" data-action="board-mod" data-mod="${mod.id}" data-path="${path.id}">${path.label}</button>`)}${hasString("board.tune.keep") ? html`<button type="button" class="wl-cta ghost" data-action="board-keep">${tr("board.tune.keep")}</button>` : null}</div>`
-      : null;
-    body = html`<div class="wl-tune"><div class="wl-tune-left">${tunePane(board, s, state.day, events, true, session, key, busy)}${offer}</div><div class="wl-right"><div class="wl-page"><iframe class="ide-frame" data-keep="ide-tune" src="${src}" title="${fill(task.title)}" sandbox="allow-scripts"></iframe></div></div></div>`;
+    // tune stage (author 2026-11-12): the research-node screen, not the config pane and the preview
+    body = tuneStage({ state, events, session, nowMs }, task, board);
   } else {
     body = html`<div class="wl-generic">${renderBoard(app, task)}</div>`;
   }
