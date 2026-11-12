@@ -348,7 +348,7 @@ export interface TaskLaunch {
   /** The page's ground: one of a few named looks, so no two days share one (default "burst"). */
   readonly tone?: LaunchTone;
 }
-export type LaunchTone = "burst" | "night" | "paper" | "ink" | "blue";
+export type LaunchTone = "burst" | "night" | "paper" | "ink" | "blue" | "vellum";
 export interface LaunchMotif {
   readonly kind: "fan" | "danmaku" | "bubble";
   readonly items: readonly string[];
@@ -1039,7 +1039,7 @@ function judge(v: unknown, w: string): TaskJudge {
 function launch(v: unknown, w: string): TaskLaunch {
   if (!isRecord(v)) fail(w, "must be an object");
   keys(v, ["who", "note", "call", "cta", "motif", "art", "tone"], w);
-  const TONES = ["burst", "night", "paper", "ink", "blue"];
+  const TONES = ["burst", "night", "paper", "ink", "blue", "vellum"];
   if (v.tone !== undefined && !TONES.includes(v.tone as string)) fail(`${w}.tone`, `must be one of ${TONES.join(", ")}`);
   if (!Array.isArray(v.note) || v.note.length === 0 || !v.note.every((x) => typeof x === "string" && x !== "")) fail(`${w}.note`, "must be a non-empty list of strings");
   let motif: LaunchMotif | undefined;

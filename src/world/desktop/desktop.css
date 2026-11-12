@@ -1164,6 +1164,15 @@ span.cmp-face-btn{cursor:default}
 .launch-layer.tone-ink::after{background-image:radial-gradient(rgba(255,255,255,.10) 1.3px,transparent 1.6px)}
 .tone-ink .tl-tag{background:#F2D33A;color:#1d2129}
 .tone-ink .tl-dm{background:#F2D33A;color:#1d2129}
+/* vellum: yellowed paper with a faint grain (the script day, the approval form) */
+.launch-layer.tone-vellum{background:#EFE3C3}
+.launch-layer.tone-vellum::before{inset:0;background-image:repeating-linear-gradient(0deg,rgba(120,90,30,.06) 0 1px,transparent 1px 28px),radial-gradient(120% 90% at 70% 40%,rgba(255,250,230,.9) 0%,rgba(239,227,195,0) 60%);opacity:1}
+.launch-layer.tone-vellum::after{background-image:radial-gradient(rgba(90,60,20,.14) 1px,transparent 1.4px);background-size:7px 7px}
+.tone-vellum .tl-body{background:#FBF5E4;box-shadow:8px 8px 0 #8B6B2E}
+.tone-vellum .tl-tag{background:#8B6B2E;color:#FBF5E4}
+.tone-vellum .tl-cta{background:#E9C65A}
+.tone-vellum .tl-dm{background:#FBF5E4;border-color:#8B6B2E;color:#4a3a1a}
+.tone-vellum .tl-dm.loud{background:#8B6B2E;color:#FBF5E4}
 /* paper: plain cream, no rays (a document day) */
 .launch-layer.tone-paper{background:#F3EFE6}
 .launch-layer.tone-paper::before{background:none}
