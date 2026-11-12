@@ -215,7 +215,7 @@
     },
     {
       "id": "task1",
-      "text": "小张发来的自演化引擎：先跑起来。",
+      "text": "自演化引擎：小张没跑起来，你接着做。",
       "unlock": "done:msgs",
       "done": "flag:task_d2_1",
       "required": true

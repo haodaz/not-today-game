@@ -4,7 +4,7 @@
   "tasks": [
     {
       "id": "task1",
-      "title": "Zhang's self-evolving engine: get it running.",
+      "title": "The self-evolving engine: Xiao Zhang couldn't get it running; you take over.",
       "app": "docs",
       "done": "task_d2_1",
       "board": {
@@ -443,7 +443,7 @@
               },
               {
                 "who": "me",
-                "text": "From Zhang. The self-evolving engine's backend, half done; it can't produce what her page shows."
+                "text": "The engine's backend: Xiao Zhang got halfway and could not reach the result on Vivi's page. The rest is yours."
               },
               {
                 "who": "kuro",
