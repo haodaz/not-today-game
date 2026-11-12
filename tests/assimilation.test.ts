@@ -24,7 +24,7 @@ vi.mock("@state/days/tasks", async (importOriginal) => {
   const parsed = real.parseTaskFile(raw, "day-07.json");
   const files = new Map(real.taskFiles);
   files.set(7, parsed.tasks);
-  const byFlag = (day: number, flag: string) => (day === 7 ? parsed.tasks.find((t: any) => t.done === flag) ?? real.taskByFlag(day, flag) : real.taskByFlag(day, flag));
+  const byFlag = (day: number, flag: string) => (day === 7 ? parsed.tasks.find((t: any) => t.done === flag) ?? files.get(day)?.find((x: any) => x.done === flag) : files.get(day)?.find((x: any) => x.done === flag));
   return { ...real, taskFiles: files, taskByFlag: byFlag };
 });
 

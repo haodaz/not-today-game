@@ -5,7 +5,7 @@
 import "./specimen";
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import day01 from "@content/tasks/day-01.json";
+import { day01TasksRaw } from "./specimen-raw";
 import { applyEvent } from "@state/events";
 import { parseTaskFile, taskFiles, type Task } from "@state/days/tasks";
 import { createStore, type Store } from "@state/store";
@@ -31,7 +31,7 @@ describe("the loader accepts the document and the ledger, strictly", () => {
   });
 
   const bad = (edit: (t: Record<string, any>[]) => void) => {
-    const raw = structuredClone(day01) as { tasks: Record<string, any>[] };
+    const raw = day01TasksRaw() as { tasks: Record<string, any>[] };
     edit(raw.tasks);
     return () => parseTaskFile(raw, "day-01.json");
   };
@@ -49,7 +49,7 @@ describe("the loader accepts the document and the ledger, strictly", () => {
     expect(bad(edit)).toThrow(msg);
   });
   it("a task without a surface object parses exactly as before", () => {
-    const raw = structuredClone(day01) as { tasks: Record<string, unknown>[] };
+    const raw = day01TasksRaw() as { tasks: Record<string, unknown>[] };
     delete raw.tasks[0]!.doc;
     delete raw.tasks[1]!.ledger;
     const parsed = parseTaskFile(raw, "day-01.json");

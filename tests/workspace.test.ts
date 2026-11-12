@@ -10,7 +10,7 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("@state/days/tasks", async (importOriginal) => {
   const real = await importOriginal<typeof import("@state/days/tasks")>();
   const fx = (await import("../.kiro/specs/ide/board-ide.json")).default as any;
-  const d1 = (await import("@content/tasks/day-01.json")).default as any;
+  const d1 = (await import("./specimen-raw")).day01TasksRaw() as any;
   const raw = structuredClone(d1);
   const board = structuredClone(fx.board);
   board.given.lock = { object: "chick", codes: ["0000", "1111"], answer: "0000" };
@@ -19,7 +19,7 @@ vi.mock("@state/days/tasks", async (importOriginal) => {
   const t3 = parsed.tasks.find((t: any) => t.id === "task3")!;
   const files = new Map(real.taskFiles);
   files.set(1, parsed.tasks);
-  return { ...real, taskFiles: files, taskByFlag: (day: number, flag: string) => (day === 1 && flag === t3.done ? t3 : real.taskByFlag(day, flag)) };
+  return { ...real, taskFiles: files, taskByFlag: (day: number, flag: string) => (day === 1 && flag === t3.done ? t3 : files.get(day)?.find((x: any) => x.done === flag)) };
 });
 
 import { createStore, type Store } from "@state/store";

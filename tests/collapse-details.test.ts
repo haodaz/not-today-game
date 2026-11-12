@@ -13,7 +13,7 @@ vi.mock("@state/stages", async (importOriginal) => {
 vi.mock("@state/days/tasks", async (importOriginal) => {
   const real = await importOriginal<typeof import("@state/days/tasks")>();
   const fx = (await import("../.kiro/specs/meeting/board-meeting.json")).default as any;
-  const d1 = (await import("@content/tasks/day-01.json")).default as any;
+  const d1 = (await import("./specimen-raw")).day01TasksRaw() as any;
   const raw = structuredClone(d1);
   raw.tasks = raw.tasks.map((t: any) =>
     t.id === "task3" ? { id: t.id, title: t.title, app: t.app, done: t.done, board: structuredClone(fx.board), deliverable: structuredClone(fx.deliverable), judge: structuredClone(fx.judge) } : t,
@@ -22,7 +22,7 @@ vi.mock("@state/days/tasks", async (importOriginal) => {
   const t3 = parsed.tasks.find((t: any) => t.id === "task3")!;
   const files = new Map(real.taskFiles);
   files.set(1, parsed.tasks);
-  return { ...real, taskFiles: files, taskByFlag: (day: number, flag: string) => (day === 1 && flag === t3.done ? t3 : real.taskByFlag(day, flag)) };
+  return { ...real, taskFiles: files, taskByFlag: (day: number, flag: string) => (day === 1 && flag === t3.done ? t3 : files.get(day)?.find((x: any) => x.done === flag)) };
 });
 
 import { stageOf } from "@state/stages";

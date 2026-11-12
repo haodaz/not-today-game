@@ -117,7 +117,7 @@ vi.mock("@state/days/tasks", async (importOriginal) => {
       // A `hand` board on any day (only read through the log; never appended to a store): the
       // "which nights the hand comes" tests print it on every day 1–17.
       if (flag === "fixture_hand") return handBoard11;
-      return real.taskByFlag(day, flag);
+      return files.get(day)?.find((x: any) => x.done === flag);
     },
   };
 });

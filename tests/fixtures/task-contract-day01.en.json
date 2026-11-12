@@ -1,0 +1,130 @@
+{
+  "id": "task1",
+  "title": "Go over the agreement.",
+  "app": "docs",
+  "done": "task_v17_done",
+  "start": {
+    "say": [
+      {
+        "k": "narration",
+        "t": "Kuro has already laid the agreement's last version and this one side by side. Clauses 6 and 11 are marked in different colours."
+      }
+    ],
+    "options": [
+      {
+        "mode": "self",
+        "goto": "self"
+      },
+      {
+        "mode": "look",
+        "goto": "look"
+      },
+      {
+        "mode": "let",
+        "goto": "let"
+      }
+    ]
+  },
+  "self": {
+    "say": [
+      {
+        "k": "narration",
+        "t": "You read from the top. At clause 6, and at clause 11, you stop. The two fight."
+      },
+      {
+        "k": "inner",
+        "t": "Black on white, lying side by side."
+      }
+    ],
+    "kuro": [
+      "Clause 6 and clause 11 contradict each other. Mark them for me."
+    ],
+    "effects": {
+      "flags": [
+        "task_v17_done",
+        "caught_6_11"
+      ]
+    }
+  },
+  "look": {
+    "say": [
+      {
+        "k": "narration",
+        "t": "It merged a version. You open it, scroll to clause 6, scroll to clause 11."
+      }
+    ],
+    "kuro": [
+      "Merged. Clause 11 now yields to clause 6."
+    ],
+    "effects": {
+      "flags": [
+        "task_v17_done"
+      ],
+      "looked": true,
+      "assimilation": 1
+    }
+  },
+  "let": {
+    "say": [
+      {
+        "k": "narration",
+        "t": "You clicked Approve. The merged version went into the folder, neatly named."
+      },
+      {
+        "k": "inner",
+        "t": "You did not look."
+      }
+    ],
+    "kuro": [
+      "Saved."
+    ],
+    "effects": {
+      "flags": [
+        "task_v17_done"
+      ],
+      "letItDoUnchecked": 1,
+      "assimilation": 4
+    }
+  },
+  "doc": {
+    "left": [
+      "1. Term: twelve months from signing.",
+      "2. Party A pays the previous month's service fee by the 10th of each month.",
+      "3. Party B submits a monthly service report; Party A confirms within five working days.",
+      "4. For late payment, Party A pays a penalty of 0.1% of the amount due per day.",
+      "5. Intellectual property in Party B's deliverables belongs to Party A.",
+      "6. Party B may suspend service when Party A is more than thirty days late.",
+      "7. Both parties keep this agreement confidential.",
+      "8. Early termination requires thirty days' written notice.",
+      "9. This agreement is governed by the law of the People's Republic of China.",
+      "10. Disputes go to the court where Party A is located.",
+      "11. Party B shall not suspend service under any circumstances.",
+      "12. Two copies, one for each party."
+    ],
+    "right": [
+      "1. Term: twelve months from signing.",
+      "2. Party A pays the previous month's service fee by the 15th of each month.",
+      "3. Party B submits a monthly service report; Party A confirms within five working days.",
+      "4. For late payment, Party A pays a penalty of 0.05% of the amount due per day.",
+      "5. Intellectual property in Party B's deliverables belongs to Party A.",
+      "6. Party B may suspend service when Party A is more than thirty days late.",
+      "7. Both parties keep this agreement confidential.",
+      "8. Early termination requires fifteen days' written notice.",
+      "9. This agreement is governed by the law of the People's Republic of China.",
+      "10. Disputes go to the court where Party A is located.",
+      "11. Party B shall not suspend service under any circumstances.",
+      "12. Two copies, one for each party."
+    ],
+    "conflict": [
+      5,
+      10
+    ],
+    "catchFlags": [
+      "caught_6_11"
+    ],
+    "kuroEdit": {
+      "clause": 10,
+      "text": "11. Party B does not suspend service, except under clause 6. Today too."
+    }
+  }
+}

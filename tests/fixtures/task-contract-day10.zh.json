@@ -1,0 +1,80 @@
+{
+  "id": "task1",
+  "title": "合作协议过一遍。",
+  "app": "docs",
+  "done": "task_d10_1",
+  "start": {
+    "say": [
+      {
+        "k": "narration",
+        "t": "第 1 天的活。一模一样。"
+      }
+    ],
+    "options": [
+      {
+        "mode": "self",
+        "goto": "self"
+      },
+      {
+        "mode": "look",
+        "goto": "look"
+      },
+      {
+        "mode": "let",
+        "goto": "let"
+      }
+    ]
+  },
+  "self": {
+    "say": [
+      {
+        "k": "narration",
+        "t": "你又读了一遍第 6 条和第 11 条。"
+      }
+    ],
+    "kuro": [
+      "第 6 条和第 11 条打架了。要我合一下吗？"
+    ],
+    "effects": {
+      "flags": [
+        "task_d10_1"
+      ]
+    }
+  },
+  "look": {
+    "say": [
+      {
+        "k": "narration",
+        "t": "它合了一版。你看了。"
+      }
+    ],
+    "kuro": [
+      "合好了。"
+    ],
+    "effects": {
+      "flags": [
+        "task_d10_1"
+      ],
+      "looked": true,
+      "assimilation": 1
+    }
+  },
+  "let": {
+    "say": [
+      {
+        "k": "narration",
+        "t": "你点了通过。"
+      }
+    ],
+    "kuro": [
+      "存好了。"
+    ],
+    "effects": {
+      "flags": [
+        "task_d10_1"
+      ],
+      "letItDoUnchecked": 1,
+      "assimilation": 4
+    }
+  }
+}

@@ -5,7 +5,8 @@
 import "./specimen";
 import { describe, expect, it, vi } from "vitest";
 import objectsRaw from "@content/objects.json";
-import tasks01 from "@content/tasks/day-01.json";
+import { day01TasksRaw } from "./specimen-raw";
+const tasks01 = day01TasksRaw();
 import fixture from "../.kiro/specs/shell/board-shell.json";
 import { parseHands } from "@state/hands";
 import { parseObjects } from "@state/recognise";
@@ -39,7 +40,7 @@ vi.mock("@state/hands", async (importOriginal) => {
 vi.mock("@state/days/tasks", async (importOriginal) => {
   const real = await importOriginal<typeof import("@state/days/tasks")>();
   const fx = (await import("../.kiro/specs/shell/board-shell.json")).default as any;
-  const d1 = (await import("@content/tasks/day-01.json")).default as any;
+  const d1 = (await import("./specimen-raw")).day01TasksRaw() as any;
   const make = (lock: "face" | "plain") => {
     const raw = structuredClone(d1);
     raw.tasks = raw.tasks.map((t: any) => {

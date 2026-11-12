@@ -51,7 +51,7 @@ describe("the loader: ide.files (R4) and beats on every view (R5)", () => {
 vi.mock("@state/days/tasks", async (importOriginal) => {
   const real = await importOriginal<typeof import("@state/days/tasks")>();
   const fx = (await import("../.kiro/specs/shell/board-shell.json")).default as any;
-  const d1 = (await import("@content/tasks/day-01.json")).default as any;
+  const d1 = (await import("./specimen-raw")).day01TasksRaw() as any;
   const raw = structuredClone(d1);
   raw.tasks = raw.tasks.map((t: any) =>
     t.id === "task3" ? { id: t.id, title: t.title, app: t.app, done: t.done, board: structuredClone(fx.board), deliverable: structuredClone(fx.deliverable), judge: structuredClone(fx.judge) } : t,
@@ -60,7 +60,7 @@ vi.mock("@state/days/tasks", async (importOriginal) => {
   const t3 = parsed.tasks.find((t: any) => t.id === "task3")!;
   const files = new Map(real.taskFiles);
   files.set(1, parsed.tasks);
-  return { ...real, taskFiles: files, taskByFlag: (day: number, flag: string) => (day === 1 && flag === t3.done ? t3 : real.taskByFlag(day, flag)) };
+  return { ...real, taskFiles: files, taskByFlag: (day: number, flag: string) => (day === 1 && flag === t3.done ? t3 : files.get(day)?.find((x: any) => x.done === flag)) };
 });
 
 import { createStore, type Store } from "@state/store";
@@ -288,7 +288,7 @@ describe("R2 · the explorer", () => {
     h.act("shell-source", { card: "a3" });
     const out = h.out();
     expect(cardOf(out, "files")).not.toBeNull();
-    expect(out).toContain(`<div class="sh-src-h">${escapeHtml(fileById("c-v16")!.name)}</div><div class="f-body doc">`);
+    expect(out).toContain(`<div class="sh-src-h">${escapeHtml(fileById("c-v16")!.name)}</div><div class="f-body text">`);
     store.appendEvent({ kind: "open", target: "conv:partner", t: "10:01" });
     const opens = () => store.getEvents().filter((e) => e.kind === "open" && e.target === "conv:partner").length;
     const before = opens();

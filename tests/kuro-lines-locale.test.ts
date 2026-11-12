@@ -1,3 +1,4 @@
+import "./specimen";
 // The zh build's Kuro speaks Chinese (kuro-language-rule 2026-11-04); the en build keeps its English
 // lines from the twin file. Branch `kuro` lines used to be shared English constants.
 import { afterEach, describe, expect, it } from "vitest";

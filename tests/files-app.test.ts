@@ -2,6 +2,7 @@
 // content; a file is listed from its day (and flag / opened Vivi deliverable); opening a file logs
 // `open file:<id>` and plays its `onOpen` line once a day; the bin follows the day (empty from
 // `gone`); nothing is invented by code. The loader is strict.
+import "./specimen";
 import { describe, expect, it } from "vitest";
 import raw from "@content/files.json";
 import { binEmpty, binListed, fileById, folderListed, openedDocs, renderFiles } from "@world/desktop/files/view";
@@ -119,12 +120,14 @@ describe("opening a file: one event, the onOpen line once a day, the body", () =
     expect(ctx.store.getEvents().filter((e) => e.kind === "open" && e.target === "file:c-v01")).toHaveLength(2);
   });
 
-  it("a doc body shows the task document's clause lines", () => {
+  it("a text body shows the contract's clauses (the contract files carry their own text since 2026-11-12)", () => {
     const ctx = ctxOf(storeAt(1));
     openFilesApp(ctx, "files");
     act(ctx, "file-open", { file: "c-v16" });
     const out = render(ctx)!;
-    const lines = docLines("day-01:task1:left")!;
+    const body = fileById("c-v16")!.body;
+    expect(body?.kind).toBe("text");
+    const lines = body?.kind === "text" ? body.lines : [];
     expect(lines.length).toBeGreaterThan(0);
     for (const l of lines) expect(out).toContain(l);
   });

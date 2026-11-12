@@ -179,7 +179,7 @@ vi.mock("@state/days/tasks", async (importOriginal) => {
   const boardT = parsed.tasks.find((t: any) => t.id === "task4")!;
   const files = new Map(real.taskFiles);
   files.set(7, parsed.tasks);
-  return { ...real, taskFiles: files, taskByFlag: (day: number, flag: string) => (day === 7 && flag === "task_d7_4" ? boardT : real.taskByFlag(day, flag)) };
+  return { ...real, taskFiles: files, taskByFlag: (day: number, flag: string) => (day === 7 && flag === "task_d7_4" ? boardT : files.get(day)?.find((x: any) => x.done === flag)) };
 });
 
 import { taskByFlag } from "@state/days/tasks";

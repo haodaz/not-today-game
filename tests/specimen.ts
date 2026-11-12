@@ -36,3 +36,38 @@ export function restoreContractSpecimen(): void {
 }
 
 restoreContractSpecimen();
+
+// The trees too (2026-11-12): content/tasks has no contract task any more; the fixture trees go back
+// into taskFiles for the same test files, at the place they had (day 1 first, day 10 after `work`).
+import { localiseTasks, parseTaskFile, taskFiles, type Task } from "@state/days/tasks";
+import zhTasks01 from "@content/tasks/day-01.json";
+import enTasks01 from "@content/tasks/en/day-01.json";
+import zhTasks10 from "@content/tasks/day-10.json";
+import enTasks10 from "@content/tasks/en/day-10.json";
+import tree01 from "./fixtures/task-contract-day01.zh.json";
+import tree01en from "./fixtures/task-contract-day01.en.json";
+import tree10 from "./fixtures/task-contract-day10.zh.json";
+import tree10en from "./fixtures/task-contract-day10.en.json";
+
+type RawTasks = { day: number; tasks: Record<string, unknown>[] } & Record<string, unknown>;
+
+function withTree(raw: unknown, tree: unknown, after: string | null): RawTasks {
+  const d = structuredClone(raw) as RawTasks;
+  const i = after === null ? 0 : d.tasks.findIndex((x) => x.id === after) + 1;
+  d.tasks.splice(i, 0, structuredClone(tree) as Record<string, unknown>);
+  return d;
+}
+
+export function restoreContractTrees(): void {
+  const files = taskFiles as Map<number, readonly Task[]>;
+  const put = (day: number, zh: unknown, en: unknown, zhTree: unknown, enTree: unknown, after: string | null) => {
+    const label = `day-${String(day).padStart(2, "0")}.json`;
+    const z = parseTaskFile(withTree(zh, zhTree, after), label).tasks;
+    const e = parseTaskFile(withTree(en, enTree, after), `en/${label}`).tasks;
+    files.set(day, localiseTasks(z, e, `en/${label}`));
+  };
+  put(1, zhTasks01, enTasks01, tree01, tree01en, null);
+  put(10, zhTasks10, enTasks10, tree10, tree10en, "work");
+}
+
+restoreContractTrees();

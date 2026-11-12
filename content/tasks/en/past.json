@@ -18,15 +18,6 @@
       "me": "Go over the investor FAQ.",
       "kuro": "Question 3 and question 9 contradict each other. I left one spot for you to look at.",
       "result": "Sent · it did it, I looked"
-    },
-    {
-      "id": "past-3",
-      "title": "Go over contract v16.",
-      "date": "2028-10-15",
-      "mode": "self",
-      "me": "Go over contract v16.",
-      "kuro": "You read it all yourself. Clause 8 became thirty days, the boss's words.",
-      "result": "Sent · did it myself"
     }
   ]
 }

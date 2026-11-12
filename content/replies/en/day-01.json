@@ -244,7 +244,7 @@
       "incoming": [
         {
           "t": "09:40",
-          "text": "Morning {calledBy}! v17: do I write it the old way or wait for you?",
+          "text": "Morning {calledBy}! The field names: do I write them the old way or wait for you?",
           "kind": "work"
         },
         {
@@ -285,7 +285,7 @@
           {
             "who": "xiaozhang",
             "t": "09:43",
-            "text": "Then I'll write it on v16 ok"
+            "text": "Then I'll go with the old field names ok"
           }
         ],
         "effects": {

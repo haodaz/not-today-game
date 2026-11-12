@@ -244,7 +244,7 @@
       "incoming": [
         {
           "t": "09:40",
-          "text": "{calledBy}早！v17 我按旧的写还是等你",
+          "text": "{calledBy}早！字段名我按旧的写还是等你",
           "kind": "work"
         },
         {
@@ -285,7 +285,7 @@
           {
             "who": "xiaozhang",
             "t": "09:43",
-            "text": "那我按 v16 写了哈"
+            "text": "那我按旧字段写了哈"
           }
         ],
         "effects": {

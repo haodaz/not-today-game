@@ -2,6 +2,7 @@
 // twin's shape against the Chinese source (the first difference names its path), swaps text under
 // lang=en, and falls back to Chinese per file when a twin is missing. Day 1 has twins; day 1 renders
 // English end to end.
+import "./specimen";
 import { afterEach, describe, expect, it } from "vitest";
 import { dayFile, localiseDayFile, parseDayFile } from "@state/days/table";
 import { taskByFlag, localiseTasks, parseTaskFile } from "@state/days/tasks";
