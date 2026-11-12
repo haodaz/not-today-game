@@ -721,5 +721,7 @@
   "launch.name.boss": "老王",
   "launch.name.partner": "Vivi",
   "launch.name.laozhou": "老周",
-  "compare.diffNote": "− {a} 的写法 · + {b} 的写法"
+  "compare.diffNote": "− {a} 的写法 · + {b} 的写法",
+  "obj.chick.caption": "A 换 · B 做 · C 回",
+  "obj.chick.full": "今天只能做这么多了。"
 }

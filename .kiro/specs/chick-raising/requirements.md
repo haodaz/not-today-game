@@ -30,11 +30,12 @@ world. Design note (Chinese): `script/notes/chick-raising-2026-11-11.md`.
 - Upgraded (Kuro has taken it over): unchanged — nothing the player presses changes anything.
 
 ## R3 · The caption and the player's line (no Kuro line)
-- While the chick is in 使用 (the room's `held` device), a small caption under the device:
-  `obj.chick.caption` = 「A 换 · B 做 · C 回」 (strings zh/en). Reuse the device footer slot
-  (`renderDevice(..., footer)`), as the lock footer does.
+- While the chick is in 使用 (the room's `held` device), a small caption under the device: the
+  string `obj.chick.caption` (already in content/strings zh + en: 「A 换 · B 做 · C 回」). Reuse the
+  device footer slot (`renderDevice(..., footer)`), as the lock footer does.
 - The first time the 11th care of a day is attempted, the player's own inner line plays once in the
-  box: `obj.chick.full` = 「今天只能做这么多了。」 (`k: "inner"`). Once a day (session memo is fine).
+  box: the string `obj.chick.full` (already in strings: 「今天只能做这么多了。」), `k: "inner"`. Once a
+  day (a session memo is fine). Do not edit content/ — the strings are there.
 
 ## R4 · Tests
 - `tests/chick-raising.test.ts`: stats from events (mix, cap at 10 a day, next day resets the count,
