@@ -687,7 +687,6 @@
   "pane.compare": "The boss's words",
   "compare.page": "Page {n} · {label}",
   "compare.use": "Use {v}",
-  "compare.kuro": "Kuro, you pick",
   "compare.rendering": "Kuro is rendering page {n}…",
   "compare.face.happy": "The boss smiled",
   "compare.face.pout": "The boss pouted",
@@ -710,5 +709,16 @@
   "task.launch.go": "Start",
   "task.launch.must": "No choice but to start",
   "work.back": "Back to the workbench",
-  "work.show": "Open the work page"
+  "work.show": "Open the work page",
+  "compare.next": "Next page",
+  "compare.sum.open": "See the result",
+  "compare.pickTitle": "This page: which version?",
+  "compare.rendering.big": "Kuro is rendering page {n}…",
+  "compare.result.happy": "The boss looked, and smiled.",
+  "compare.result.pout": "The boss looked, and pouted.",
+  "compare.vs": "{v}'s page",
+  "task.launch.tag": "Day {day} · the work",
+  "launch.name.boss": "Lao Wang",
+  "launch.name.partner": "Vivi",
+  "launch.name.laozhou": "Lao Zhou"
 }

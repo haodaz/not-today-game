@@ -235,13 +235,16 @@ describe("G7 · a board task's page (2026-11-08)", () => {
     expect(r.session.workbenchPage).toBe(`task:${task.id}`);
     const out = r.out();
     // over the whole stage, not inside the monitor (author 2026-11-11 night)
-    expect(out).toContain('<div class="launch-layer"><section class="task-launch"');
+    expect(out).toContain('<div class="launch-layer"><div class="tl-tag">');
+    expect(out).toContain('<section class="task-launch"');
     expect(out).toContain(task.launch!.call);
     expect(out).toMatch(new RegExp(`data-action="task-launch" data-task="${task.id}"[^>]*>${task.launch!.cta}</button>`));
     // the second time the row needs no ask
     r.act("task-launch", { task: task.id });
     expect(r.out()).not.toContain("launch-layer");
+    expect(r.out()).toContain('data-screen="choose"');
     expect(r.out()).toContain("compare-pick");
+    expect(r.out()).not.toContain("compare-kuro");
     r.act("wb-nav", { page: "home" });
     r.act("wb-nav", { page: `task:${task.id}` });
     expect(r.session.workbenchPage).toBe(`task:${task.id}`);
@@ -269,13 +272,18 @@ describe("G7 · a board task's page (2026-11-08)", () => {
     expect(g0).toMatchObject({ id: "G7", target: { kind: "board", step: "card", slot: cmp.pages[0]!.slot }, refuse: null, scope: "none" });
     expect(guideRefuses(g0, "dock", { app: "msgs" })).toBe(false);
     // the ring is on the pair, never on one side (that would name the answer)
-    expect(r.out()).toMatch(new RegExp(`class="cmp-vs" data-slot="${cmp.pages[0]!.slot}" data-guide="on"`));
+    expect(r.out()).toMatch(new RegExp(`class="wl-vs" data-slot="${cmp.pages[0]!.slot}" data-guide="on"`));
     expect(r.out()).not.toMatch(/data-action="compare-pick"[^>]*data-guide="on"/);
     // The boss's taste page by page (the slot's answer): the ring moves on; a wrong pick moves on too.
     for (const page of cmp.pages) {
       const answer = task.board!.slots.find((x) => x.id === page.slot)!.answer;
       r.act("compare-pick", { slot: page.slot, card: answer });
+      // the result screen (Kuro renders, 老王's face), then 下一页 / 看结算
+      expect(r.session.workPhase).toEqual({ key: "1:task3", phase: "result", slot: page.slot });
+      expect(r.out()).toContain('data-screen="result"');
+      r.act("compare-next");
     }
+    expect(r.out()).toContain('data-screen="settle"');
     const g = guideNow(store.getState(), store.getEvents(), r.session)!;
     expect(g).toMatchObject({ id: "G7", target: { kind: "board", step: "print" } });
     expect(r.out()).toMatch(/data-action="board-print"[^>]*data-guide="on"/);

@@ -56,7 +56,7 @@ export function panesOf(task: Task, live: boolean): PaneId[] {
   if (surface === "work") return workSurfaceOf(task) ? ["work"] : [];
   // tune (2026-11-08): the 代码 pane of a tuning board is its bars and switches.
   // compare (author 2026-11-11): 老王的话 first, then the preview (and the code when the pages have files); no 文件.
-  if (isCompare(task)) return PANE_ORDER.filter((p) => p === "compare" || p === "preview" || (p === "code" && !!task.board!.ide?.files));
+  if (isCompare(task)) return PANE_ORDER.filter((p) => p === "preview" || (p === "code" && !!task.board!.ide?.files));
   const own: PaneId[] = surface === "ide" ? (task.board!.ide?.files || task.board!.tune ? ["preview", "code"] : ["preview"]) : [surface];
   return PANE_ORDER.filter((p) => p === "files" || own.includes(p));
 }
@@ -67,7 +67,7 @@ export function shellDefaults(task: Task, live: boolean): ShellState {
   // tune: the bars are the work, so 参数 sits above 预览.
   if (task.board?.tune) panes = [...panes].sort((a, b) => (a === "code" ? -1 : b === "code" ? 1 : 0));
   // compare: 老王的话 and the preview open; nothing else.
-  if (isCompare(task)) panes = panes.filter((p) => p === "compare" || p === "preview");
+  if (isCompare(task)) panes = panes.filter((p) => p === "preview");
   // A tuning board has no pages and no sources to list: no explorer. A compare board neither.
   return { explorer: !!task.board && !task.board.tune && !isCompare(task) && live, panes, max: null, slot: null, slotAt: 0, source: null };
 }

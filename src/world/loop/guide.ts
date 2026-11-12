@@ -287,7 +287,7 @@ function boardAnchors(step: "lock" | "merge" | "card" | "slot" | "fetch" | "prin
   }
   if (step === "fetch") return [[["data-action", "board-fetch"]]];
   // compare: the page's version buttons (the slot names the page); else the tray's directions / cards.
-  if (step === "card") return [...(slot !== undefined ? [[["class", "cmp-vs"], ["data-slot", slot]] as const] : []), [["data-action", "board-option"]], [["data-action", "board-card"]]];
+  if (step === "card") return [...(slot !== undefined ? [[["class", "wl-vs"], ["data-slot", slot]] as const] : []), [["data-action", "board-option"]], [["data-action", "board-card"]]];
   if (step === "slot") return [[["data-action", "board-slot"], ["!", "filled"]], [["data-action", "shell-slot"]]];
   return [[["data-action", "board-print"]]];
 }

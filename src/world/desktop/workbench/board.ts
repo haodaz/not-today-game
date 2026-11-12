@@ -506,14 +506,6 @@ const actions: Record<string, ActionHandler> = {
     if (!c || !page || !data.card || (data.card !== page.left && data.card !== page.right)) return;
     comparePick(ctx, c, page.slot, data.card);
   }),
-  // 克总你定: Kuro's card for the page (the boss's taste; it counts as a pick, not as its assist).
-  "compare-kuro": withIde((ctx, data) => {
-    const c = currentBoard(ctx);
-    const page = c?.board.compare?.pages.find((p) => p.slot === data.slot);
-    const card = c && page ? c.board.kuro.fill[page.slot] : undefined;
-    if (!c || !page || !card) return;
-    comparePick(ctx, c, page.slot, card);
-  }),
   // 让克总重新改一稿: every page to Kuro's fill (one assist: judged flawed at night, SAN down a little).
   "compare-redo": withIde((ctx) => {
     const c = currentBoard(ctx);
@@ -522,9 +514,15 @@ const actions: Record<string, ActionHandler> = {
     if (comparePending(c.board, s) !== null || canPrint(c.board, s)) return;
     const held = holdPreview(ctx, c);
     ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "assistFill" } });
+    ctx.session.workPhase = null;
     renderPause(ctx, c, held);
     ctx.rerender();
   }),
+  // 下一页 / 看结算 from the result screen.
+  "compare-next"(ctx) {
+    ctx.session.workPhase = null;
+    ctx.rerender();
+  },
 };
 
 /** compare: the fill and the render pause; a page already holding that card is left alone. */
@@ -533,6 +531,8 @@ function comparePick(ctx: ActionContext, c: { task: Task; board: TaskBoard }, sl
   if (!s.unlocked || s.slots[slot] === card) return;
   const held = holdPreview(ctx, c);
   ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "fill", slot, card } });
+  // the result screen: Kuro renders, then 老王's face (author 2026-11-12: never on the choose screen)
+  ctx.session.workPhase = { key: ideKey(ctx.store.getState().day, c.task), phase: "result", slot };
   renderPause(ctx, c, held);
   ctx.rerender();
 }

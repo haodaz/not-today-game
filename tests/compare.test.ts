@@ -121,7 +121,7 @@ describe("the pane", () => {
     expect(out).toContain('<b class="cmp-key">厚</b>');
     expect(out).toContain(`data-action="compare-pick" data-slot="r1" data-card="${cmp.pages[0]!.left}"`);
     expect(out).toContain(`data-action="compare-pick" data-slot="r1" data-card="${cmp.pages[0]!.right}"`);
-    expect(out).toContain(`data-action="compare-kuro" data-slot="r1"`);
+    expect(out).not.toContain("compare-kuro"); // author 2026-11-12: no 克总你定 on the choose screen
     expect(out.match(/class="cmp-face todo/g)).toHaveLength(5);
     expect(out).toContain(t("compare.page", { n: "1", label: b.slots[0]!.label }));
     expect(out).not.toContain("cmp-sum");

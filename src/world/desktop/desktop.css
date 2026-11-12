@@ -1142,6 +1142,63 @@ span.cmp-face-btn{cursor:default}
 .cmp-verdict.pass{color:#2F9E5C}
 .cmp-verdict.fail{color:#C2410C}
 .cmp-note{margin:0;font-size:12px;color:var(--ink-2)}
+/* launch (author 2026-11-11/12): the task's opening page as a game's level card over the whole stage
+   (「launch 是要有游戏感的」): the desktop dimmed, a day tag, a wide paper card — the counterpart's bust
+   and name tag left, the title / note / call line in the middle, 开始工作 under them, Kuro peeking over
+   the card's bottom-right corner. */
+.launch-layer{position:absolute;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:radial-gradient(120% 90% at 30% 50%,rgba(10,10,11,.7) 40%,rgba(0,0,0,.92) 100%)}
+.tl-tag{position:absolute;left:60px;top:44px;padding:6px 14px;background:rgba(236,231,222,.9);color:#1d2129;font-size:13px;letter-spacing:.2em;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.task-launch{position:relative;display:grid;grid-template-columns:330px 1fr;gap:40px;align-items:center;width:1180px;height:560px;box-sizing:border-box;padding:48px 56px 48px 48px;background:rgba(236,231,222,.92);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.6);border-radius:8px;box-shadow:0 18px 50px rgba(0,0,0,.45);color:#1d2129;animation:m-fade-up 240ms cubic-bezier(.2,.8,.2,1) both}
+.tl-figure{position:relative;display:flex;flex-direction:column;align-items:center;gap:14px}
+.tl-who{width:300px;height:380px;object-fit:cover;object-position:50% 8%;border:1px solid rgba(29,33,41,.25);background:#f1ede6;box-shadow:0 10px 24px rgba(0,0,0,.3)}
+.tl-name{padding:4px 18px;border:1.5px solid rgba(29,33,41,.6);font-size:15px;letter-spacing:.3em;text-indent:.3em}
+.tl-body{display:flex;flex-direction:column;gap:14px;padding-right:120px}
+.tl-title{margin:0 0 6px;font-size:28px;font-weight:500;letter-spacing:.1em;line-height:1.35}
+.tl-note{margin:0;font-size:18px;line-height:1.75}
+.tl-call{margin:14px 0 8px;font-size:18px;line-height:1.75;color:#b3362a;font-weight:600}
+.tl-cta{align-self:flex-start;width:280px;padding:13px 0;text-align:center;border:2px solid rgba(29,33,41,.75);border-radius:0;background:transparent;color:#1d2129;font:inherit;font-size:18px;letter-spacing:.3em;text-indent:.3em;cursor:pointer;transition:background 160ms,color 160ms}
+.tl-cta:hover{background:#1d2129;color:#efe9df}
+.tl-kuro{position:absolute;right:-26px;bottom:-30px;width:190px;height:190px;object-fit:contain;filter:drop-shadow(0 8px 14px rgba(0,0,0,.35));pointer-events:none}
+/* compare (author 2026-11-11): 猜老板的言外之意 — the 老王的话 pane. Light, after the task shell. */
+.cmp{display:flex;flex-direction:column;gap:12px;padding:12px 14px 16px;font-size:13px;color:#1F1F1F}
+.cmp-boss{display:flex;gap:12px;align-items:flex-start}
+.cmp-portrait{width:64px;height:64px;border-radius:50%;object-fit:cover;object-position:50% 20%;background:#F1EDE6;flex:0 0 auto}
+.cmp-bubbles{display:flex;flex-direction:column;gap:6px;min-width:0}
+.cmp-bub{position:relative;padding:7px 11px;border-radius:12px 12px 12px 4px;background:#F2F3F5;line-height:1.5;max-width:520px}
+.cmp-key{color:#C2410C;font-weight:700}
+.cmp-head{display:flex;align-items:baseline;justify-content:space-between;padding-top:4px;border-top:1px solid #EEEEEE}
+.cmp-n{font-weight:600}
+.cmp-of{font-size:12px;color:var(--ink-2)}
+.cmp-vs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cmp-card{display:flex;flex-direction:column;gap:6px;padding:10px 12px 12px;border:1px solid #E5E5E5;border-radius:10px;background:#FFFFFF;color:#1F1F1F;font:inherit;text-align:left;cursor:pointer;line-height:1.5}
+.cmp-card:hover:not(:disabled){background:#F6F7F9}
+.cmp-card.on{border-color:#2F6FEB;background:#F3F7FF}
+.cmp-card:disabled{opacity:.6;cursor:default}
+.cmp-card.read{cursor:default}
+.cmp-card .cmp-v{font-style:normal;font:600 11px var(--mono,ui-monospace,Menlo,monospace);letter-spacing:.08em;color:var(--ink-2)}
+.cmp-card.on .cmp-v{color:#2F6FEB}
+.cmp-card p{margin:0;flex:1}
+.cmp-use{align-self:flex-end;font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid #D9DCE3;color:#2F6FEB}
+.cmp-card.on .cmp-use{background:#2F6FEB;border-color:#2F6FEB;color:#FFFFFF}
+.cmp-tools{display:flex;align-items:center;gap:10px;min-height:28px}
+.cmp-rendering{font-size:12px;color:var(--ink-2);animation:cmp-blink 1s ease-in-out infinite}
+@keyframes cmp-blink{0%,100%{opacity:1}50%{opacity:.35}}
+.cmp-faces{display:flex;gap:8px;padding-top:6px;border-top:1px solid #EEEEEE}
+.cmp-face-btn{border:0;padding:0;background:none;cursor:pointer;font:inherit}
+span.cmp-face-btn{cursor:default}
+.cmp-face{display:inline-flex;width:34px;height:34px;border-radius:50%;border:2px solid #D9DCE3;background:#F7F7F8;align-items:center;justify-content:center;overflow:hidden}
+.cmp-face img{width:100%;height:100%}
+.cmp-face.happy{border-color:#2F9E5C}
+.cmp-face.pout{border-color:#C2410C}
+.cmp-face.cur{box-shadow:0 0 0 2px #2F6FEB}
+.cmp-sum{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:10px;background:#F7F7F8}
+.cmp-score{display:flex;align-items:baseline;gap:10px}
+.cmp-score b{font-size:28px;font-weight:700}
+.cmp-score span{color:var(--ink-2)}
+.cmp-verdict{margin:0}
+.cmp-verdict.pass{color:#2F9E5C}
+.cmp-verdict.fail{color:#C2410C}
+.cmp-note{margin:0;font-size:12px;color:var(--ink-2)}
 /* launch (author 2026-11-11): a task's opening page — like the title page's card, not a web UI (author:
    「可以和登录页面选任务的卡片底色差不多，别做的特别像个网页」): the workbench dimmed behind, a paper card with
    the game's blur and shadow, outlined lettered button, the two figures as on the character select. */
@@ -1156,21 +1213,57 @@ span.cmp-face-btn{cursor:default}
 .tl-call{margin:10px 0 6px;font-size:16px;line-height:1.7;color:#b3362a;font-weight:600}
 .tl-cta{align-self:flex-start;width:240px;padding:11px 0;text-align:center;border:2px solid rgba(29,33,41,.75);border-radius:0;background:transparent;color:#1d2129;font:inherit;font-size:17px;letter-spacing:.3em;text-indent:.3em;cursor:pointer;transition:background 160ms,color 160ms}
 .tl-cta:hover{background:#1d2129;color:#efe9df}
-/* work (author 2026-11-11 night): the day's work page over the whole stage, like the launch card. */
-.work-layer{position:absolute;inset:0;z-index:40;display:flex;align-items:stretch;justify-content:center;padding:28px 40px;background:rgba(10,10,11,.6)}
+/* work (author 2026-11-11/12): the day's work over the whole stage, one screen at a time: choose
+   (the riddles, the page twice), result (the rendered page, 老王's face), settle. */
+.work-layer{position:absolute;inset:0;z-index:40;display:flex;align-items:stretch;justify-content:center;padding:26px 40px;background:radial-gradient(120% 90% at 30% 50%,rgba(10,10,11,.7) 40%,rgba(0,0,0,.92) 100%)}
 .work-stage{display:flex;flex-direction:column;width:100%;max-width:1520px;box-sizing:border-box;background:rgba(236,231,222,.94);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.6);border-radius:8px;box-shadow:0 18px 50px rgba(0,0,0,.45);color:#1d2129;overflow:hidden;animation:m-fade-up 240ms cubic-bezier(.2,.8,.2,1) both}
-.wl-head{display:flex;align-items:center;gap:12px;padding:14px 22px;border-bottom:1px solid rgba(29,33,41,.15)}
+.wl-head{display:flex;align-items:center;gap:12px;padding:14px 26px;border-bottom:1px solid rgba(29,33,41,.15)}
 .wl-title{font-size:18px;letter-spacing:.08em}
 .wl-head .sp{flex:1}
 .wl-back{padding:6px 14px;border:1.5px solid rgba(29,33,41,.6);background:transparent;color:#1d2129;font:inherit;font-size:13px;letter-spacing:.15em;cursor:pointer}
 .wl-back:hover{background:#1d2129;color:#efe9df}
-.wl-body{display:grid;grid-template-columns:minmax(460px,1fr) minmax(520px,1.1fr);gap:18px;padding:16px 22px;flex:1;min-height:0}
-.wl-left{min-width:0;overflow:auto}
-.wl-left .cmp{padding:0}
-.wl-right{display:flex;min-height:0}
-.wl-preview{flex:1;border:1px solid rgba(29,33,41,.2);background:#fff;overflow:hidden}
-.wl-preview .ide-frame{width:100%;height:100%;border:0;display:block}
-.wl-foot{display:flex;justify-content:flex-end;padding:12px 22px 16px;border-top:1px solid rgba(29,33,41,.15)}
-.wl-cta{width:260px;padding:11px 0;text-align:center;border:2px solid rgba(29,33,41,.75);background:transparent;color:#1d2129;font:inherit;font-size:17px;letter-spacing:.3em;text-indent:.3em;cursor:pointer;transition:background 160ms,color 160ms}
+.wl-body{flex:1;min-height:0;display:flex;flex-direction:column;padding:16px 26px 20px}
+/* choose */
+.wl-choose{display:flex;flex-direction:column;gap:12px;flex:1;min-height:0}
+.wl-boss{display:flex;gap:16px;align-items:flex-start}
+.wl-boss .cmp-portrait{width:72px;height:72px}
+.wl-boss .cmp-bubbles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;flex:1}
+.wl-boss .cmp-bub{max-width:none;font-size:14px;line-height:1.65;padding:10px 14px;border-radius:14px 14px 14px 4px}
+.wl-ask{display:flex;align-items:baseline;gap:14px;padding-top:6px;border-top:1px solid rgba(29,33,41,.15)}
+.wl-n{font-weight:600;font-size:16px}
+.wl-of{font-size:12px;color:var(--ink-2)}
+.wl-q{margin-left:auto;font-size:15px;letter-spacing:.1em}
+.wl-vs{display:grid;grid-template-columns:1fr 1fr;gap:16px;flex:1;min-height:0}
+.wl-version{display:flex;flex-direction:column;gap:8px;min-height:0}
+.wl-vhead{display:flex;align-items:center}
+.wl-vname{font:600 12px var(--mono,ui-monospace,Menlo,monospace);letter-spacing:.12em;color:var(--ink-2)}
+.wl-vpage{flex:1;min-height:300px;border:1px solid rgba(29,33,41,.25);background:#fff;overflow:hidden}
+.wl-vpage .ide-frame{width:100%;height:100%;border:0;display:block}
+.wl-use{align-self:center;width:220px;padding:10px 0;text-align:center;border:2px solid rgba(29,33,41,.75);background:transparent;color:#1d2129;font:inherit;font-size:16px;letter-spacing:.3em;text-indent:.3em;cursor:pointer;transition:background 160ms,color 160ms}
+.wl-use:hover{background:#1d2129;color:#efe9df}
+.wl-choose .cmp-faces{border-top:0;padding-top:4px;justify-content:center}
+/* result */
+.wl-result{display:grid;grid-template-columns:1fr 300px;gap:20px;flex:1;min-height:0}
+.wl-result-page{display:flex;min-height:0}
+.wl-page{flex:1;border:1px solid rgba(29,33,41,.25);background:#fff;overflow:hidden}
+.wl-page .ide-frame{width:100%;height:100%;border:0;display:block}
+.wl-rendering{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;border:1px dashed rgba(29,33,41,.3);color:var(--ink-2);font-size:16px;letter-spacing:.1em;animation:cmp-blink 1s ease-in-out infinite}
+.wl-rk{width:120px;height:120px;object-fit:contain}
+.wl-result-side{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
+.wl-face{display:flex;flex-direction:column;align-items:center;gap:8px}
+.wl-face img{width:150px;height:150px;border-radius:50%;border:3px solid #D9DCE3}
+.wl-face.happy img{border-color:#2F9E5C}
+.wl-face.pout img{border-color:#C2410C}
+.wl-face p{margin:0;font-size:17px;letter-spacing:.08em}
+.wl-result-side .cmp-faces{border-top:0}
+/* settle */
+.wl-settle{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
+.wl-settle .cmp-score b{font-size:64px}
+.wl-settle .cmp-faces{border-top:0}
+.wl-settle .cmp-verdict{font-size:18px}
+.wl-settle-actions{display:flex;flex-direction:column;align-items:center;gap:8px}
+.wl-cta{width:300px;padding:12px 0;text-align:center;border:2px solid rgba(29,33,41,.75);background:transparent;color:#1d2129;font:inherit;font-size:17px;letter-spacing:.3em;text-indent:.3em;cursor:pointer;transition:background 160ms,color 160ms}
 .wl-cta:hover:not(:disabled){background:#1d2129;color:#efe9df}
 .wl-cta:disabled{opacity:.4;cursor:default}
+.wl-cta.ghost{border-color:#b3362a;color:#b3362a}
+.wl-cta.ghost:hover:not(:disabled){background:#b3362a;color:#efe9df}

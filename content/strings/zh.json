@@ -687,7 +687,6 @@
   "pane.compare": "老王的话",
   "compare.page": "第 {n} 页 · {label}",
   "compare.use": "用 {v} 的",
-  "compare.kuro": "克总你定",
   "compare.rendering": "克总在渲染第 {n} 页…",
   "compare.face.happy": "老王笑了",
   "compare.face.pout": "老王撇嘴",
@@ -710,5 +709,16 @@
   "task.launch.go": "开始",
   "task.launch.must": "只能开始了",
   "work.back": "回到工作台",
-  "work.show": "打开工作页"
+  "work.show": "打开工作页",
+  "compare.next": "下一页",
+  "compare.sum.open": "看结算",
+  "compare.pickTitle": "这一页，要哪一版？",
+  "compare.rendering.big": "克总在渲染第 {n} 页…",
+  "compare.result.happy": "老王看了，笑了。",
+  "compare.result.pout": "老王看了，撇了撇嘴。",
+  "compare.vs": "{v} 的这一页",
+  "task.launch.tag": "第 {day} 天 · 今天的活",
+  "launch.name.boss": "老王",
+  "launch.name.partner": "Vivi",
+  "launch.name.laozhou": "老周"
 }
