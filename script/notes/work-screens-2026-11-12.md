@@ -32,3 +32,15 @@ The settlement matches the score; it need not be a success.
 `launch.intro` (content) plays in the game's NPC dialogue box over the launch page — Kuro, one line a screen: 从第 1 版改到第 17 版？… / 不用担心！有克总在，工作都会变得很欢乐！ / 让我们轻轻松松，用游戏的办法解决问题吧！ / 你的游戏进度，会真的影响这份工作的效果哦！！ — then the player: ……也不知道这是什么时候加的功能。 开始工作 appears only after (`queueLaunchIntro` in `workbench/actions.ts`; the dialogue layer sits above the launch and work pages now). The right half of the settlement is what that line proves.
 
 Dev: `&filled=1` also spends a tune board's budget; the launched task must be the loop's open item (seed the flags, and the day's earlier event items are not seedable — use the replay for those days).
+
+## Two ways out of a settlement (author 2026-11-13)
+
+「结算页面意味着游戏玩完了，失败了不可能 change it。只可能有 2 个选择」. `settleVerdict` (state): a compare
+board passes at its threshold; a table / meeting board passes with every slot right, or once Kuro has
+fixed it; the tune and the chain never fail at the sheet (the line is a goal; the chain approves before
+the sheet opens — a stuck chain gets 让克总帮忙 on the chain itself, he stamps it). Passed → the send
+button only. Failed → 让克总帮忙 only: the wrong slots take his card (`assistFix`, one assist, judged
+at night like the others; a compare board takes his whole fill), and the story plays in the box over
+the settlement — player 「克总很是认真的忙了一会儿，咱也不知道在忙活啥，咱也不敢问。」, Kuro 「好了，可以发了。」
+「要发吗？」, then 发出去 / 快点发出去 / 发发发 (`settleSend`): every one sends, and the scene changes.
+No 再改改 anywhere. The player's line gets variants later.
