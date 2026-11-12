@@ -264,6 +264,13 @@ export const KURO_CONTENT: KuroContent = {
           "en": "I didn't finish today.",
           "hard": false,
           "minBucket": "low"
+        },
+        {
+          "n": 1810,
+          "zh": "你为什么把工作变成了游戏？",
+          "en": "Why did you turn the work into a game?",
+          "hard": false,
+          "minBucket": "low"
         }
       ],
       "locked": [],
@@ -652,6 +659,17 @@ export const KURO_CONTENT: KuroContent = {
             "mid": "明天干。没干完是因为今天的活太多，不是你太慢。",
             "high": "没干完就没干完。你每次没干完都跟我说一声，好像我是记账的。我记着，不扣分。"
           }
+        },
+        {
+          "unlock": 1810,
+          "low": "Is that bad?",
+          "mid": "Is that bad?",
+          "high": "Is that bad?",
+          "zh": {
+            "low": "这样不好吗。",
+            "mid": "这样不好吗。",
+            "high": "这样不好吗。"
+          }
         }
       ]
     },
@@ -959,6 +977,13 @@ export const KURO_CONTENT: KuroContent = {
           "n": 69,
           "zh": "我今天没干完。",
           "en": "I didn't finish today.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 1810,
+          "zh": "你为什么把工作变成了游戏？",
+          "en": "Why did you turn the work into a game?",
           "hard": false,
           "minBucket": "low"
         }
@@ -1426,6 +1451,17 @@ export const KURO_CONTENT: KuroContent = {
             "mid": "明天干。没干完是因为今天的活太多，不是你太慢。",
             "high": "没干完就没干完。你每次没干完都跟我说一声，好像我是记账的。我记着，不扣分。"
           }
+        },
+        {
+          "unlock": 1810,
+          "low": "Is that bad?",
+          "mid": "Is that bad?",
+          "high": "Is that bad?",
+          "zh": {
+            "low": "这样不好吗。",
+            "mid": "这样不好吗。",
+            "high": "这样不好吗。"
+          }
         }
       ]
     },
@@ -1740,6 +1776,13 @@ export const KURO_CONTENT: KuroContent = {
           "n": 72,
           "zh": "我把你每天早上那句英文记下来了。",
           "en": "I've been writing down your English line each morning.",
+          "hard": false,
+          "minBucket": "low"
+        },
+        {
+          "n": 1810,
+          "zh": "你为什么把工作变成了游戏？",
+          "en": "Why did you turn the work into a game?",
           "hard": false,
           "minBucket": "low"
         }
@@ -2211,6 +2254,17 @@ export const KURO_CONTENT: KuroContent = {
             "low": "记着吧。",
             "mid": "记着吧。每天一句，都是真的。",
             "high": "每天一句，都是真的。等你把它们连起来读一遍，你就知道我一直在说什么了。"
+          }
+        },
+        {
+          "unlock": 1810,
+          "low": "Is that bad?",
+          "mid": "Is that bad?",
+          "high": "Is that bad?",
+          "zh": {
+            "low": "这样不好吗。",
+            "mid": "这样不好吗。",
+            "high": "这样不好吗。"
           }
         }
       ]
