@@ -33,6 +33,7 @@ import { SOKOBAN_DONE_MS, sokobanMove, sokobanSolve, sokobanStart, sokobanUndo, 
 import { MOLES_DONE_MS, MOLES_TICK_MS, molesPause, molesResume, molesRoll, molesSolve, molesStart, molesSweep, molesTap } from "./moles";
 import { PORTRAIT_FILES } from "@world/dialogue/box";
 import { PAC_DONE_MS, PAC_TICK_MS, pacPause, pacResume, pacSolve, pacStart, pacTick, pacTurn, type Dir as PacDir } from "./pacman";
+import { SPOT_SHAKE_MS } from "./spot";
 import type { ActionContext, ActionHandler } from "../controller";
 import type { AppContext, Session } from "../model";
 import { openWork } from "./work";
@@ -1305,6 +1306,16 @@ const actions: Record<string, ActionHandler> = {
     ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
     ctx.session.pacman = { ...pacSolve(g), gen: g.gen + 1, approvedAt: ctx.now?.() ?? Date.now() };
     ctx.later(PAC_DONE_MS + 20, ctx.rerender);
+    ctx.rerender();
+  },
+  // spot the difference (author 2026-11-13): a point at anything but the word that differs — the page shakes, the count goes up
+  "spot-miss"(ctx) {
+    const c = currentBoard(ctx);
+    if (c?.board.game?.kind !== "spot" || !c.board.compare) return;
+    const key = `${String(ctx.store.getState().day)}:${c.task.id}`;
+    const prev = ctx.session.spotMiss?.key === key ? ctx.session.spotMiss.n : 0;
+    ctx.session.spotMiss = { key, n: prev + 1, at: ctx.now?.() ?? Date.now() };
+    ctx.later(SPOT_SHAKE_MS + 20, ctx.rerender);
     ctx.rerender();
   },
   // the chain lost (no move left, not approved): 让克总帮忙 — he stamps it (the approval moment follows)

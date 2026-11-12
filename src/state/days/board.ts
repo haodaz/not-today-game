@@ -576,7 +576,8 @@ export function lockJammed(board: TaskBoard, s: BoardState): boolean {
  * chain approves before the sheet opens).
  */
 export function settleVerdict(board: TaskBoard, s: BoardState): "pass" | "fail" {
-  if (board.tune || board.stack || board.game) return "pass";
+  // a game decides its own board (mines, link …) — but a compare board's game (spot, day 10) only changes how the pick is made
+  if (board.tune || board.stack || (board.game && !board.compare)) return "pass";
   if (board.compare) return comparePending(board, s) === null && compareScore(board, s).pct >= board.compare.threshold ? "pass" : "fail";
   return s.assists > 0 || wrongCount(board, s.slots) === 0 ? "pass" : "fail";
 }

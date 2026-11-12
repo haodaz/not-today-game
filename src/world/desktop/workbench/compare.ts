@@ -32,6 +32,7 @@ import { balanceApproving, balanceStage } from "./balance";
 import { sokobanApproving, sokobanStage } from "./sokoban";
 import { molesApproving, molesStage } from "./moles";
 import { pacApproving, pacStage } from "./pacman";
+import { spotFlipNote, spotPanes } from "./spot";
 import { tunePane } from "./shell";
 import { tuneStage } from "./tune-stage";
 import { clueStage } from "./clue-stage";
@@ -173,7 +174,7 @@ export function workLayer(ctx: { readonly state: State; readonly events: readonl
     const face = html`<div class="${cls("wl-face", right ? "happy" : "pout")}"><img src="${right ? BOSS_FACES.happy : BOSS_FACES.pout}" alt=""><p>${resultLine(task, right)}</p></div>`;
     const render = holding
       ? html`<div class="wl-rendering"><img class="wl-rk" src="${frameUrl(FRAMES.busy[0])}" alt=""><p>${tr("compare.rendering.big", { n: String(n) })}</p></div>`
-      : html`<div class="wl-page"><iframe class="ide-frame" data-keep="ide-result" src="${srcFor(page.slot, card)}" title="${fill(task.title)}" sandbox="allow-scripts"></iframe></div>`;
+      : html`<div class="${cls("wl-page", board.game?.kind === "spot" && !pending && "sp-flipped")}"><iframe class="ide-frame" data-keep="ide-result" src="${srcFor(page.slot, card)}" title="${fill(task.title)}" sandbox="allow-scripts"></iframe>${board.game?.kind === "spot" && !pending ? spotFlipNote() : null}</div>`;
     const next = holding ? null : html`<button type="button" class="wl-cta" data-action="compare-next">${tr(pending ? "compare.next" : "compare.sum.open")}</button>`;
     body = html`<div class="wl-result"><div class="wl-result-page">${render}</div><aside class="wl-result-side">${holding ? null : face}${faces(board, s, page, false)}${next}</aside></div>`;
   } else if (pending) {
@@ -186,8 +187,12 @@ export function workLayer(ctx: { readonly state: State; readonly events: readonl
     const boss = html`<div class="wl-boss"><img class="cmp-portrait" src="${counterpartPortrait(task)}" alt="${counterpartName(task)}"><div class="cmp-bubbles">${bubbles}</div></div>`;
     // the comparison is the content itself (author 2026-11-12): the page's whole code in each version,
     // side by side as cards, the lines that differ marked, 用这版 at each card's foot.
-    const diff = html`<div class="wl-vs" data-slot="${page.slot}">${versionCards(board, page, true, holding)}</div>`;
-    body = html`<div class="wl-choose">${boss}<div class="wl-ask"><span class="wl-n">${tr("compare.page", { n: String(n), label })}</span><span class="wl-of">${n} / ${cmp.pages.length}</span><span class="wl-q">${tr("compare.pickTitle")}</span></div>${hasString("compare.diffNote") ? html`<p class="wl-dnote">${t("compare.diffNote")}</p>` : null}${diff}${faces(board, s, page, false)}</div>`;
+    // spot the difference (author 2026-11-13, day 10): the versions as pages, the word that differs to point at
+    const spot = board.game?.kind === "spot";
+    const diff = spot
+      ? html`<div class="wl-vs sp" data-slot="${page.slot}">${spotPanes(board, page, key, session.spotMiss, nowMs, holding)}</div>`
+      : html`<div class="wl-vs" data-slot="${page.slot}">${versionCards(board, page, true, holding)}</div>`;
+    body = html`<div class="wl-choose">${boss}<div class="wl-ask"><span class="wl-n">${tr("compare.page", { n: String(n), label })}</span><span class="wl-of">${n} / ${cmp.pages.length}</span><span class="wl-q">${tr(spot ? "spot.stage.title" : "compare.pickTitle")}</span></div>${hasString("compare.diffNote") ? html`<p class="wl-dnote">${t("compare.diffNote")}</p>` : null}${diff}${faces(board, s, page, false)}</div>`;
   } else {
     // settle
     screen = "settle";

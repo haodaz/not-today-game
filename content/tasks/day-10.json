@@ -291,7 +291,10 @@
               }
             ]
           }
-        ]
+        ],
+        "game": {
+          "kind": "spot"
+        }
       },
       "deliverable": {
         "id": "d10-act2",

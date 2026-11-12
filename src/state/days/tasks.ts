@@ -210,7 +210,9 @@ export type BoardGame =
   /** whack-a-mole: the audience's faces looking down at their phones; `pages` of `pageMs` each */
   | { readonly kind: "moles"; readonly seats: number; readonly pages: number; readonly pageMs: number }
   /** pac-man: the meeting room as a maze; `maze` rows (# wall, . dot, o pellet, 1–5 the lines, P you, G a ghost) */
-  | { readonly kind: "pacman"; readonly maze: readonly string[] };
+  | { readonly kind: "pacman"; readonly maze: readonly string[] }
+  /** spot the difference: a compare board whose pick is the word that differs, pointed at in the version you trust */
+  | { readonly kind: "spot" };
 export interface BoardStack {
   /** From the bottom up: the rank word and its symbol; `silhouette` ranks are the easter eggs past the top (drawn black). */
   readonly ranks: readonly { readonly name: string; readonly img: string; readonly silhouette?: boolean }[];
@@ -802,7 +804,10 @@ function board(v: unknown, w: string): TaskBoard {
       if (!all.includes("G")) fail(`${gw}.maze`, "must place a ghost (G)");
       for (const n of ["1", "2", "3", "4", "5"]) if (!all.includes(n)) fail(`${gw}.maze`, `must place line ${n}`);
       game = { kind: "pacman", maze };
-    } else fail(`${gw}.kind`, 'must be "mines", "pipes", "match3", "link", "snake", "tetris", "rhythm", "gacha", "balance", "sokoban", "moles" or "pacman"');
+    } else if (v.game.kind === "spot") {
+      keys(v.game, ["kind"], gw);
+      game = { kind: "spot" };
+    } else fail(`${gw}.kind`, 'must be "mines", "pipes", "match3", "link", "snake", "tetris", "rhythm", "gacha", "balance", "sokoban", "moles", "pacman" or "spot"');
   }
   let stack: BoardStack | undefined;
   if (v.stack !== undefined) {

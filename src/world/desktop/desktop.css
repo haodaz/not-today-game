@@ -2046,3 +2046,20 @@ button.lk-cell:hover{transform:translateY(-2px);z-index:1}
 .mn.pm .mn-stamp{border-color:#F6D33A;color:#F6D33A}
 .mn.pm .pp-flowline{color:#cfc8ba}
 .mn.pm.lost .pm-maze{animation:bt-shake 460ms steps(6)}
+/* spot the difference (author 2026-11-13): the versions as pages, one word to point at */
+.sp-panes{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:16px;flex:1;min-height:0}
+.sp-panes.shake{animation:bt-shake 420ms steps(6)}
+.sp-pane{display:flex;flex-direction:column;min-height:0;border:1px solid rgba(29,33,41,.25);background:#FBFCFE;overflow:hidden}
+.sp-pane.v1{background:repeating-linear-gradient(0deg,rgba(0,0,0,.035) 0 1px,transparent 1px 4px),repeating-linear-gradient(90deg,rgba(0,0,0,.025) 0 1px,transparent 1px 3px),#F7F3E8;filter:contrast(1.05) sepia(.08)}
+.sp-pane.v2{background:#F2F6FF}
+.sp-code{flex:1;overflow:auto;padding:14px 0;font:16px/1.9 var(--mono,ui-monospace,Menlo,monospace);color:#2B2F45}
+.sp-line{display:flex;align-items:center;width:100%;box-sizing:border-box;border:0;background:transparent;padding:0 14px 0 0;margin:0;font:inherit;color:inherit;text-align:left;white-space:pre;cursor:pointer}
+.sp-line:hover{background:rgba(29,33,41,.04)}
+.sp-line code{font:inherit}
+.sp-word{all:unset;cursor:pointer}
+.sp-word:hover{background:rgba(29,33,41,.04)}
+.sp-misses{margin:6px 0 0;font-size:13px;color:#8B1E1E}
+.sp-flipped .ide-frame{animation:sp-flip 900ms ease-in-out 400ms both;transform-origin:left center}
+@keyframes sp-flip{0%{transform:perspective(1200px) rotateY(0)}50%{transform:perspective(1200px) rotateY(-70deg);filter:brightness(.6)}100%{transform:perspective(1200px) rotateY(0)}}
+.sp-flip{position:absolute;left:16px;bottom:12px;margin:0;padding:6px 12px;background:rgba(29,33,41,.85);color:#efe9df;font-size:13px;border-radius:4px;animation:ts-pop 300ms 1300ms ease-out both}
+.wl-page{position:relative}
