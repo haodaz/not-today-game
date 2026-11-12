@@ -380,6 +380,8 @@ export interface Session {
   launchShow: string | null;
   /** The launch page whose opening (`launch.intro`, author 2026-11-12) has been queued as dialogue, so it plays once. */
   launchIntro: string | null;
+  /** battle (author 2026-11-13): the chick's battle on the open work (session only; the outcome is a board step). */
+  battle: import("./workbench/battle").BattleState | null;
   /** work (author 2026-11-11 night): the task whose full-screen work page is up (`<day>:<taskId>`), or null; 回到工作台 hides it, 打开工作页 brings it back. */
   workShow: string | null;
   /**
@@ -576,6 +578,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     launched: new Set(),
     launchShow: null,
     launchIntro: null,
+    battle: null,
     workShow: null,
     workPhase: null,
     objbarOpen: false,

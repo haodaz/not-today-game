@@ -35,12 +35,13 @@ export interface BattleState {
   readonly at: number;
 }
 
-interface Move { readonly id: string; readonly power: number; readonly acc: number; readonly crit: number; readonly fx: FxKind; readonly effect?: "growl" | "heal" }
+interface Move { readonly id: string; readonly power: number; readonly acc: number; readonly crit: number; readonly fx: FxKind; readonly effect?: "growl" | "push" | "heal" }
+// the chick means pushing (author 2026-11-13: 「鸡本身代表 push 一个人前进 … 鸡娃」): its moves in that register
 export const OUR_MOVES: readonly Move[] = [
-  { id: "tackle", power: 28, acc: 100, crit: 1 / 8, fx: "shake" },
-  { id: "peck", power: 20, acc: 100, crit: 1 / 4, fx: "hit" },
-  { id: "ember", power: 42, acc: 85, crit: 1 / 8, fx: "flame" },
-  { id: "growl", power: 0, acc: 100, crit: 0, fx: "none", effect: "growl" },
+  { id: "hype", power: 28, acc: 100, crit: 1 / 8, fx: "shake" },
+  { id: "grind", power: 20, acc: 100, crit: 1 / 4, fx: "hit" },
+  { id: "involute", power: 42, acc: 85, crit: 1 / 8, fx: "flame" },
+  { id: "push", power: 0, acc: 100, crit: 0, fx: "none", effect: "push" },
 ];
 const FOE_MOVES: readonly Move[] = [
   { id: "req", power: 24, acc: 100, crit: 1 / 8, fx: "shake" },
@@ -85,6 +86,10 @@ function useMove(move: Move, who: "ours" | "theirs", s: { ours: Fighter; theirs:
     const hit = { ...other, atk: Math.max(-2, other.atk - 1) };
     lines.push({ t: S("battle.atkDown", { who: who === "ours" ? foe : S("battle.ours") }), fx: "none", side: "none" });
     if (who === "ours") theirs = hit; else ours = hit;
+  } else if (move.effect === "push") {
+    const up = { ...me, atk: Math.min(2, me.atk + 1) };
+    lines.push({ t: S("battle.atkUp", { who: who === "ours" ? S("battle.ours") : foe }), fx: "none", side: "none" });
+    if (who === "ours") ours = up; else theirs = up;
   } else if (move.effect === "heal") {
     const healed = { ...me, hp: Math.min(me.max, me.hp + 18) };
     lines.push({ t: S("battle.heal", { foe }), fx: "heal", side: who });
@@ -138,6 +143,35 @@ export function battleCmd(s: BattleState, cmd: string, at: number): BattleState 
 }
 
 export const battleOver = (s: BattleState): boolean => s.phase === "won" || s.phase === "lost" || s.phase === "ran";
+
+// ——— when it is offered, and what a win does ———
+
+import type { TaskBoard } from "@state/days/tasks";
+import type { BoardState } from "@state/days/board";
+import type { GameEvent } from "@state/events";
+
+/** The log's mark that this task's battle was fought (win or lose), once per task. */
+export const battleTarget = (taskId: string): string => `battle:${taskId}`;
+export const battleUsed = (events: readonly GameEvent[], day: number, taskId: string): boolean =>
+  events.some((e) => e.kind === "open" && e.target === battleTarget(taskId) && e.day === day);
+
+/**
+ * 让小鸡上 is on the work screen when the chick is held, the board is one a cell can be pushed on (not
+ * a tuning board, not the chain), a cell is still wrong or empty, and this task's battle is unfought.
+ */
+export function battleOffered(board: TaskBoard, s: BoardState, found: readonly string[], events: readonly GameEvent[], day: number, taskId: string): boolean {
+  if (!found.includes("chick") || board.tune || board.stack) return false;
+  if (!board.slots.some((slot) => s.slots[slot.id] !== slot.answer)) return false;
+  return !battleUsed(events, day, taskId);
+}
+
+/** A win moves the work on one state: the first empty cell takes its answer, else the first wrong one. */
+export function battleReward(board: TaskBoard, s: BoardState): { readonly slot: string; readonly card: string } | null {
+  const empty = board.slots.find((slot) => !(slot.id in s.slots));
+  const wrong = board.slots.find((slot) => s.slots[slot.id] !== slot.answer);
+  const target = empty ?? wrong;
+  return target ? { slot: target.id, card: target.answer } : null;
+}
 
 // ——— the screen ———
 

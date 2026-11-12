@@ -19,6 +19,7 @@ import { hasString, t, tr } from "@world/i18n";
 import { cardText, finishLabel, renderBoard } from "./board";
 import { openWork } from "./work";
 import { browserFrame, settleLayer } from "./settle-layer";
+import { battleOffered, battleScene } from "./battle";
 import { tunePane } from "./shell";
 import { tuneStage } from "./tune-stage";
 import { clueStage } from "./clue-stage";
@@ -136,13 +137,18 @@ export function workLayer(ctx: { readonly state: State; readonly events: readonl
   const holding = !!session.ideHold && session.ideHold.key === key && session.ideHold.until > nowMs;
   const fill = (x: string) => fillPlaceholders(x, state.names);
   const back = hasString("work.back") ? html`<button type="button" class="wl-back" data-action="work-hide">${tr("work.back")}</button>` : null;
-  const head = html`<header class="wl-head"><span class="wl-title">${fill(task.title)}</span><span class="sp"></span>${back}</header>`;
   const phase = session.workPhase?.key === key ? session.workPhase : null;
   const pending = comparePending(board, s);
+  // battle (author 2026-11-13): 让小鸡上 while a page is still to pick and the chick is held, once per task
+  const fight = pending && !session.battle && battleOffered(board, s, state.found as string[], events, state.day, task.id) ? html`<button type="button" class="wl-battle" data-action="battle-start">${tr("battle.go")}</button>` : null;
+  const head = html`<header class="wl-head"><span class="wl-title">${fill(task.title)}</span><span class="sp"></span>${fight}${back}</header>`;
   const srcFor = (slot: string, card: string) => ideSrc(board, { ...s, slots: { ...s.slots, [slot]: card } }, ops, slot, tuneCarried(board, events));
   let body: SafeHtml;
   let screen: string;
-  if (phase?.phase === "result") {
+  if (session.battle?.key === key) {
+    screen = "battle";
+    body = battleScene(session.battle, nowMs);
+  } else if (phase?.phase === "result") {
     // the page just chosen, rendered; 老王's face
     screen = "result";
     const page = cmp.pages.find((p) => p.slot === phase.slot)!;
@@ -189,10 +195,16 @@ function genericWorkLayer(c: { state: State; events: readonly GameEvent[]; sessi
   const app: AppContext = { state, events, startDay: c.startDay, session, night: isNight(session.clock), nowMs };
   const fill = (x: string) => fillPlaceholders(x, state.names);
   const back = hasString("work.back") ? html`<button type="button" class="wl-back" data-action="work-hide">${tr("work.back")}</button>` : null;
-  const head = html`<header class="wl-head"><span class="wl-title">${fill(task.title)}</span><span class="sp"></span>${back}</header>`;
   const key = `${state.day}:${task.id}`;
+  // battle (author 2026-11-13): 让小鸡上 on the board (not at its settlement), once per task
+  const bs = boardState(board, state.day, task.id, events);
+  const settling = session.workPhase?.key === key && session.workPhase.phase === "settle";
+  const fight = !settling && !session.battle && battleOffered(board, bs, state.found as string[], events, state.day, task.id) ? html`<button type="button" class="wl-battle" data-action="battle-start">${tr("battle.go")}</button>` : null;
+  const head = html`<header class="wl-head"><span class="wl-title">${fill(task.title)}</span><span class="sp"></span>${fight}${back}</header>`;
   let body: SafeHtml;
-  if (board.tune) {
+  if (session.battle?.key === key) {
+    body = battleScene(session.battle, nowMs);
+  } else if (board.tune) {
     // tune stage (author 2026-11-12): the research-node screen, not the config pane and the preview
     body = tuneStage({ state, events, session, nowMs }, task, board);
   } else if (board.view === "meeting" && board.meeting) {

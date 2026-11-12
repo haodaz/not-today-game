@@ -18,6 +18,8 @@ import { renderMeeting } from "./meeting";
 import { RENDER_MS } from "./compare";
 import { hasString, t, tr } from "@world/i18n";
 import { push } from "@world/loop/dialogue";
+import { battleCmd, battleOffered, battleOver, battleReward, battleTarget, battleTurn, foeImage, startBattle } from "./battle";
+import { fillPlaceholders } from "@world/replies/placeholders";
 import type { ActionContext, ActionHandler } from "../controller";
 import type { AppContext, Session } from "../model";
 import { openWork } from "./work";
@@ -509,6 +511,37 @@ const actions: Record<string, ActionHandler> = {
       lines: [{ k: "speaker", who: "me", t: t("settle.kuroWork") }, { k: "speaker", who: "kuro", t: t("settle.kuroDone") }, { k: "speaker", who: "kuro", t: t("settle.sendAsk") }],
       ending: { kind: "settleSend", taskId: c.task.id },
     });
+    ctx.rerender();
+  },
+  // battle (author 2026-11-13): 让小鸡上 — the Game Boy battle on the work; once per task, win or lose
+  "battle-start"(ctx) {
+    const c = currentBoard(ctx);
+    if (!c) return;
+    const state = ctx.store.getState();
+    const s = stateOf(ctx, c.task, c.board);
+    if (!battleOffered(c.board, s, state.found as string[], ctx.store.getEvents(), state.day, c.task.id)) return;
+    ctx.store.appendEvent({ kind: "open", target: battleTarget(c.task.id), t: ctx.session.clock.time });
+    const fill = (x: string) => fillPlaceholders(x, state.names);
+    ctx.session.battle = startBattle(ideKey(state.day, c.task), fill(c.task.title), foeImage(c.task), state.day, ctx.now?.() ?? Date.now());
+    ctx.rerender();
+  },
+  "battle-act"(ctx, data) {
+    const b = ctx.session.battle;
+    if (!b) return;
+    const now = ctx.now?.() ?? Date.now();
+    ctx.session.battle = data.cmd === "move" && data.move ? battleTurn(b, data.move, now) : battleCmd(b, data.cmd ?? "", now);
+    ctx.rerender();
+  },
+  // the way back: a win pushes the work one state (one cell takes its answer); lost or ran: nothing
+  "battle-done"(ctx) {
+    const b = ctx.session.battle;
+    const c = currentBoard(ctx);
+    if (!b || !battleOver(b)) return;
+    if (c && b.phase === "won" && b.key === ideKey(ctx.store.getState().day, c.task)) {
+      const reward = battleReward(c.board, stateOf(ctx, c.task, c.board));
+      if (reward) ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "fill", slot: reward.slot, card: reward.card } });
+    }
+    ctx.session.battle = null;
     ctx.rerender();
   },
   // the chain lost (no move left, not approved): 让克总帮忙 — he stamps it (the approval moment follows)

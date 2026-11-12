@@ -294,7 +294,8 @@ export function isOpenTarget(target: string): boolean {
   const conv = /^conv:(.+)$/.exec(target);
   if (conv !== null) return knownRecipients.has(conv[1]!);
   if (/^meeting:/.test(target)) return openedMeetingLine(target) !== null;
-  return /^(file|task):.+$/.test(target);
+  // battle (2026-11-13): `battle:<taskId>` marks the chick's battle fought on that task, once per task
+  return /^(file|task|battle):.+$/.test(target);
 }
 
 /**
