@@ -1914,3 +1914,33 @@ button.lk-cell:hover{transform:translateY(-2px);z-index:1}
 .mn.rh .mn-stamp{border-color:#F6B73C;color:#F6B73C}
 .mn.rh .pp-flowline{color:#cfc8ba}
 .mn.rh.lost .rh-lane{animation:bt-shake 460ms steps(6)}
+/* gacha (author 2026-11-13): the callers as eggs in a capsule machine; the crank turns once */
+.mn.gc{background:linear-gradient(160deg,#FFF4E3,#FFE1D6 55%,#F3E6FF)}
+.gc-main{padding:0 28px}
+.gc-machine{display:flex;flex-direction:column;align-items:center}
+.gc-dome{position:relative;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.9),rgba(255,255,255,.35) 45%,rgba(200,215,235,.45));border:6px solid #2b2f33;box-shadow:inset 0 -20px 40px rgba(0,0,0,.08),0 10px 30px rgba(0,0,0,.18);overflow:hidden}
+.gc-egg{position:absolute;width:64px;height:76px;border-radius:50% 50% 50% 50%/55% 55% 45% 45%;background:linear-gradient(180deg,hsl(var(--hue,20) 85% 62%) 0 52%,#fff 52%);box-shadow:inset -6px -8px 0 rgba(0,0,0,.08),0 4px 8px rgba(0,0,0,.18);display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px;box-sizing:border-box;border:0;font:inherit}
+.gc-egg b{font-size:13px;font-weight:900;color:#1d2129;letter-spacing:.05em}
+.gc-egg.blank{background:linear-gradient(180deg,#d8d4cc 0 52%,#fff 52%)}
+.gc-dome .gc-egg{left:var(--x,60px);top:var(--y,150px);transform:rotate(var(--r,0deg))}
+.gc-dome.turning .gc-egg{animation:gc-tumble 700ms ease-in-out infinite alternate}
+@keyframes gc-tumble{from{transform:translateY(-70px) rotate(calc(var(--i,0) * 90deg))}to{transform:translateY(10px) rotate(calc(var(--i,0) * -70deg))}}
+.gc-dome .gc-egg.stuck{left:98px;top:196px;transform:rotate(8deg);animation:none}
+.gc-body{position:relative;width:300px;height:150px;margin-top:-10px;background:#C2410C;border:6px solid #2b2f33;border-radius:14px 14px 20px 20px;box-shadow:0 14px 30px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:space-between;padding:0 26px;box-sizing:border-box}
+.gc-crank{width:72px;height:72px;border-radius:50%;border:5px solid #2b2f33;background:#F6B73C;cursor:pointer;position:relative;padding:0;transition:transform 120ms}
+.gc-crank i{position:absolute;left:50%;top:50%;width:12px;height:34px;margin:-30px 0 0 -6px;background:#2b2f33;border-radius:6px}
+.gc-crank:hover:not(:disabled){transform:rotate(12deg)}
+.gc-crank:disabled{cursor:default;opacity:.85}
+.gc-crank.turning{animation:gc-crank 1400ms cubic-bezier(.3,.1,.3,1) both}
+@keyframes gc-crank{to{transform:rotate(720deg)}}
+.gc-chute{width:110px;height:96px;border:5px solid #2b2f33;border-radius:10px;background:#1d2129;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 6px 14px rgba(0,0,0,.6)}
+.gc-egg.out{position:relative;cursor:pointer;animation:gc-drop 500ms cubic-bezier(.3,1.4,.5,1) both;overflow:visible}
+@keyframes gc-drop{from{transform:translateY(-120px) rotate(-40deg)}to{transform:translateY(0) rotate(0)}}
+.gc-half{display:none}
+.gc-egg.out.open{background:transparent;box-shadow:none;animation:none}
+.gc-egg.out.open .gc-half{display:block;position:absolute;left:0;width:100%;height:50%;border-radius:50% 50% 0 0/100% 100% 0 0;background:hsl(var(--hue,20) 85% 62%);box-shadow:inset -6px -4px 0 rgba(0,0,0,.08)}
+.gc-egg.out.open .gc-half.top{top:0;animation:gc-lid 500ms ease-out both}
+.gc-egg.out.open .gc-half.bottom{bottom:0;border-radius:0 0 50% 50%/0 0 100% 100%;background:#fff}
+@keyframes gc-lid{to{transform:translateY(-34px) rotate(-18deg)}}
+.gc-egg.out.open b{position:relative;z-index:1;font-size:16px;animation:ts-pop 300ms 200ms ease-out both}
+.mn.gc.done .gc-dome{animation:m3-flash 600ms ease-out both}

@@ -27,6 +27,7 @@ import { linkApproving, linkStage } from "./link";
 import { snakeApproving, snakeStage } from "./snake";
 import { tetrisApproving, tetrisStage } from "./tetris";
 import { rhythmApproving, rhythmStage } from "./rhythm";
+import { gachaApproving, gachaStage } from "./gacha";
 import { tunePane } from "./shell";
 import { tuneStage } from "./tune-stage";
 import { clueStage } from "./clue-stage";
@@ -220,6 +221,9 @@ function genericWorkLayer(c: { state: State; events: readonly GameEvent[]; sessi
   } else if (board.view === "meeting" && board.meeting) {
     // meeting stage (2026-11-12): the meeting above, the template under it
     body = meetingStage(app, task, board);
+  } else if (board.game?.kind === "gacha" && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && (!st.approved || (session.gacha?.key === task.id && gachaApproving(session.gacha, nowMs))); })()) {
+    // gacha (author 2026-11-13): the filled form's callers as eggs in a capsule machine; one turn
+    body = gachaStage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs);
   } else if (board.game?.kind === "rhythm" && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && (!st.approved || (session.rhythm?.key === task.id && rhythmApproving(session.rhythm, nowMs))); })()) {
     // rhythm (author 2026-11-13): the filled form's report as a drum lane, the jargon on the beat
     body = rhythmStage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs);

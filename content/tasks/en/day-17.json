@@ -199,7 +199,29 @@
               }
             ]
           }
-        ]
+        ],
+        "game": {
+          "kind": "gacha",
+          "slot": "r1",
+          "eggs": [
+            {
+              "card": "c1",
+              "label": "Qinghe"
+            },
+            {
+              "card": "d1",
+              "label": "Lao Wang"
+            },
+            {
+              "card": "d2",
+              "label": "Vivi"
+            },
+            {
+              "card": "k1",
+              "label": "Kuro"
+            }
+          ]
+        }
       },
       "deliverable": {
         "id": "d17-reply",

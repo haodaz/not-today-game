@@ -200,7 +200,9 @@ export type BoardGame =
   /** tetris: the week as a well; the shifts fall as pieces; `goal` rows cleared staff it */
   | { readonly kind: "tetris"; readonly cols: number; readonly rows: number; readonly goal: number }
   /** rhythm: the report as a drum lane — `bars` bars of eight beats at `bpm`, the last bar twice as fast */
-  | { readonly kind: "rhythm"; readonly bars: number; readonly bpm: number };
+  | { readonly kind: "rhythm"; readonly bars: number; readonly bpm: number }
+  /** gacha: the callers as eggs; the crank turns once; the egg out is the card the `slot` holds */
+  | { readonly kind: "gacha"; readonly slot: string; readonly eggs: readonly { readonly card: string; readonly label: string }[] };
 export interface BoardStack {
   /** From the bottom up: the rank word and its symbol; `silhouette` ranks are the easter eggs past the top (drawn black). */
   readonly ranks: readonly { readonly name: string; readonly img: string; readonly silhouette?: boolean }[];
@@ -756,7 +758,20 @@ function board(v: unknown, w: string): TaskBoard {
     } else if (v.game.kind === "rhythm") {
       keys(v.game, ["kind", "bars", "bpm"], gw);
       game = { kind: "rhythm", bars: num(v.game.bars, "bars", 2, 8), bpm: num(v.game.bpm, "bpm", 40, 200) };
-    } else fail(`${gw}.kind`, 'must be "mines", "pipes", "match3", "link", "snake", "tetris" or "rhythm"');
+    } else if (v.game.kind === "gacha") {
+      keys(v.game, ["kind", "slot", "eggs"], gw);
+      if (typeof v.game.slot !== "string" || !v.game.slot) fail(`${gw}.slot`, "must be a slot id");
+      if (!Array.isArray(v.game.eggs) || v.game.eggs.length < 2 || v.game.eggs.length > 6) fail(`${gw}.eggs`, "must be 2 to 6 eggs");
+      const eggs = v.game.eggs.map((e, i) => {
+        const ew = `${gw}.eggs[${i}]`;
+        if (!isRecord(e)) fail(ew, "must be an object");
+        keys(e, ["card", "label"], ew);
+        if (typeof e.card !== "string" || !e.card) fail(`${ew}.card`, "must be a card id");
+        if (typeof e.label !== "string" || !e.label) fail(`${ew}.label`, "must be a name");
+        return { card: e.card, label: e.label };
+      });
+      game = { kind: "gacha", slot: v.game.slot, eggs };
+    } else fail(`${gw}.kind`, 'must be "mines", "pipes", "match3", "link", "snake", "tetris", "rhythm" or "gacha"');
   }
   let stack: BoardStack | undefined;
   if (v.stack !== undefined) {

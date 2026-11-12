@@ -199,7 +199,29 @@
               }
             ]
           }
-        ]
+        ],
+        "game": {
+          "kind": "gacha",
+          "slot": "r1",
+          "eggs": [
+            {
+              "card": "c1",
+              "label": "青禾"
+            },
+            {
+              "card": "d1",
+              "label": "老王"
+            },
+            {
+              "card": "d2",
+              "label": "Vivi"
+            },
+            {
+              "card": "k1",
+              "label": "克总"
+            }
+          ]
+        }
       },
       "deliverable": {
         "id": "d17-reply",

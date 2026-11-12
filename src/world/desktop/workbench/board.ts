@@ -27,6 +27,7 @@ import { LINK_DONE_MS, LINK_PATH_MS, linkRoll, linkShuffle, linkSolve, linkStart
 import { SNAKE_DONE_MS, SNAKE_TICK_MS, snakeRoll, snakeSolve, snakeStart, snakeStep, snakeTurn, type SnakeDir } from "./snake";
 import { TETRIS_DONE_MS, TETRIS_FLASH_MS, tetrisDropMs, tetrisKey, tetrisRoll, tetrisSolve, tetrisStart, tetrisTick, type TetrisGame, type TetrisKey } from "./tetris";
 import { RHYTHM_DONE_MS, RHYTHM_TICK_MS, rhythmPause, rhythmResume, rhythmRoll, rhythmSolve, rhythmStart, rhythmSweep, rhythmTap, rhythmWords } from "./rhythm";
+import { GACHA_DONE_MS, GACHA_TURN_MS, gachaOpen, gachaRoll, gachaStart, gachaTurn } from "./gacha";
 import type { ActionContext, ActionHandler } from "../controller";
 import type { AppContext, Session } from "../model";
 import { openWork } from "./work";
@@ -985,6 +986,53 @@ const actions: Record<string, ActionHandler> = {
     ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
     ctx.session.rhythm = { ...rhythmSolve(g), gen: g.gen + 1, approvedAt: ctx.now?.() ?? Date.now() };
     ctx.later(RHYTHM_DONE_MS + 20, ctx.rerender);
+    ctx.rerender();
+  },
+  // gacha (author 2026-11-13): the callers as eggs; the crank turns once; the egg opened approves the form
+  "gacha-start"(ctx) {
+    const c = currentBoard(ctx);
+    if (c?.board.game?.kind !== "gacha") return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    const attempt = Math.floor((ctx.now?.() ?? Date.now()) / 1000) % 1000;
+    ctx.session.gacha = gachaStart(c.task.id, c.board.game, gachaRoll(ctx.store.getRunId(), c.task.id, attempt));
+    ctx.rerender();
+  },
+  "gacha-turn"(ctx) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.gacha?.key === c?.task.id ? ctx.session.gacha : null;
+    if (c?.board.game?.kind !== "gacha" || !g) return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    const next = gachaTurn(g, stateOf(ctx, c.task, c.board).slots[g.slot], ctx.now?.() ?? Date.now());
+    if (next === g) return;
+    ctx.session.gacha = next;
+    ctx.later(GACHA_TURN_MS + 20, ctx.rerender);
+    ctx.rerender();
+  },
+  "gacha-open"(ctx) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.gacha?.key === c?.task.id ? ctx.session.gacha : null;
+    if (c?.board.game?.kind !== "gacha" || !g) return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    const now = ctx.now?.() ?? Date.now();
+    const next = gachaOpen(g, now);
+    if (next === g) return;
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+    ctx.session.gacha = { ...next, approvedAt: now };
+    ctx.later(GACHA_DONE_MS + 20, ctx.rerender);
+    ctx.rerender();
+  },
+  // dev only: turned and opened at once (the replay driver)
+  "gacha-cheat"(ctx) {
+    if (!import.meta.env.DEV) return;
+    const c = currentBoard(ctx);
+    const g = ctx.session.gacha?.key === c?.task.id ? ctx.session.gacha : null;
+    if (c?.board.game?.kind !== "gacha" || !g) return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    const now = ctx.now?.() ?? Date.now();
+    const turned = gachaTurn(g, stateOf(ctx, c.task, c.board).slots[g.slot], now - GACHA_TURN_MS - 1);
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+    ctx.session.gacha = { ...turned, opened: true, approvedAt: now };
+    ctx.later(GACHA_DONE_MS + 20, ctx.rerender);
     ctx.rerender();
   },
   // the chain lost (no move left, not approved): 让克总帮忙 — he stamps it (the approval moment follows)
