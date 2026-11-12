@@ -43,3 +43,13 @@ Claude built the full-stage work screens (compare, tune, clue, meeting, the 2048
 their content; Kiro takes the polish that is pure implementation: the settlement sheet for the clue
 and meeting stages, pointer drag of clippings onto slots, swipe + slide animation + the approval
 moment on the chain. Spec: `.kiro/specs/work-stages-polish/requirements.md`. Content stays Claude's.
+
+## 2026-11-13 batch (written 11-12 night, for the refreshed credits)
+
+| spec | what | why Kiro |
+|---|---|---|
+| `old-folder-egg` | the 旧工作 folder in 文件: Labrador drafts (content `files-egg.json`, stills in `public/egg/labrador/`), opened once → black beat → gone | mechanism + view + test, no words |
+| `settle-polish` | approval-flow stamps come down one by one, the page's ground while the iframe loads, narrow stage stacking | CSS/markup polish on a finished design |
+| `replay-driver-day2` | shot folder auto-created; tasks before pickup; the 回小张 step verified by its event | tooling |
+
+Claude reviews, commits, and replays day 2 / day 13 after.

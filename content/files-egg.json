@@ -1,0 +1,15 @@
+{
+  "_": "The old work folder (author 2026-11-12): design drafts of Kuro as a plain Labrador, from before. Opened once, the screen goes black for a beat and the folder is gone. Parsed by src/state/files.ts (old-folder-egg spec); the images are stills from the author's cocoverse materials.",
+  "folder": {
+    "id": "old",
+    "name": "旧工作",
+    "from": 1,
+    "files": [
+      { "id": "lab1", "name": "kuro_v0_expressions.jpg", "date": "2024.03.12", "body": { "kind": "image", "src": "/egg/labrador/01.jpg" } },
+      { "id": "lab2", "name": "kuro_v0_frames.jpg", "date": "2024.03.12", "body": { "kind": "image", "src": "/egg/labrador/02.jpg" } },
+      { "id": "lab3", "name": "kuro_v0_thinking.jpg", "date": "2024.03.19", "body": { "kind": "image", "src": "/egg/labrador/03.jpg" } },
+      { "id": "lab4", "name": "kuro_v0_happy.jpg", "date": "2024.03.19", "body": { "kind": "image", "src": "/egg/labrador/04.jpg" } },
+      { "id": "lab5", "name": "kuro_v0_assets.jpg", "date": "2024.04.02", "body": { "kind": "image", "src": "/egg/labrador/05.jpg" } }
+    ]
+  }
+}
