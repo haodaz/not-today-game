@@ -398,6 +398,8 @@ export interface Session {
   rhythm: import("./workbench/rhythm").RhythmGame | null;
   /** gacha (author 2026-11-13): the capsule machine (session only; the egg opened is a board step). */
   gacha: import("./workbench/gacha").GachaGame | null;
+  /** balance (author 2026-11-13): the scale under way (session only; level is a board step). */
+  balance: import("./workbench/balance").BalanceGame | null;
   /** work (author 2026-11-11 night): the task whose full-screen work page is up (`<day>:<taskId>`), or null; 回到工作台 hides it, 打开工作页 brings it back. */
   workShow: string | null;
   /** When the work page was last opened (ms): its entry fade plays only right after, not on every re-render (snake 2026-11-13). */
@@ -605,6 +607,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     tetris: null,
     rhythm: null,
     gacha: null,
+    balance: null,
     workShow: null,
     workShownAt: 0,
     workPhase: null,

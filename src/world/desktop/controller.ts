@@ -579,6 +579,12 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
       actions["mc-close"]?.(ctx, {} as DOMStringMap, target);
       return;
     }
+    // balance (2026-11-13): while the crane swings on the work page, space / Enter / J drop the block.
+    if ((e.key === " " || e.key === "Enter" || e.key === "j" || e.key === "J") && session.balance?.running && session.workShow) {
+      e.preventDefault();
+      actions["balance-drop"]?.(ctx, {} as DOMStringMap, target);
+      return;
+    }
     // rhythm (2026-11-13): while the lane runs on the work page, space / Enter / J / F hit the drum.
     if ((e.key === " " || e.key === "Enter" || e.key === "j" || e.key === "J" || e.key === "f" || e.key === "F") && session.rhythm?.running && session.workShow) {
       e.preventDefault();

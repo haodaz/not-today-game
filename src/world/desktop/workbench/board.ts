@@ -28,6 +28,7 @@ import { SNAKE_DONE_MS, SNAKE_TICK_MS, snakeRoll, snakeSolve, snakeStart, snakeS
 import { TETRIS_DONE_MS, TETRIS_FLASH_MS, tetrisDropMs, tetrisKey, tetrisRoll, tetrisSolve, tetrisStart, tetrisTick, type TetrisGame, type TetrisKey } from "./tetris";
 import { RHYTHM_DONE_MS, RHYTHM_TICK_MS, rhythmPause, rhythmResume, rhythmRoll, rhythmSolve, rhythmStart, rhythmSweep, rhythmTap, rhythmWords } from "./rhythm";
 import { GACHA_DONE_MS, GACHA_TURN_MS, gachaOpen, gachaRoll, gachaStart, gachaTurn } from "./gacha";
+import { BALANCE_DONE_MS, BALANCE_TICK_MS, balanceBlocks, balanceDrop, balancePause, balanceResume, balanceSolve, balanceStart } from "./balance";
 import type { ActionContext, ActionHandler } from "../controller";
 import type { AppContext, Session } from "../model";
 import { openWork } from "./work";
@@ -391,6 +392,21 @@ function runRhythm(ctx: ActionContext, gen: number): void {
     ctx.rerender();
   };
   ctx.later(RHYTHM_TICK_MS, tick);
+}
+
+/** balance: the clock only watches the work page — leaving it pauses the crane (继续 resumes with no time lost). */
+function runBalance(ctx: ActionContext, gen: number): void {
+  const g0 = ctx.session.balance;
+  if (!g0 || g0.gen !== gen) return;
+  ctx.session.balance = { ...g0, running: true };
+  const tick = () => {
+    const c = currentBoard(ctx);
+    const g = ctx.session.balance;
+    if (!g || g.gen !== gen || g.done || g.over) return;
+    if (!ctx.session.workShow || c?.board.game?.kind !== "balance" || c.task.id !== g.key) { ctx.session.balance = balancePause(g, ctx.now?.() ?? Date.now()); ctx.rerender(); return; }
+    ctx.later(BALANCE_TICK_MS, tick);
+  };
+  ctx.later(BALANCE_TICK_MS, tick);
 }
 
 function currentBoard(ctx: ActionContext): { task: Task; board: TaskBoard } | null {
@@ -1033,6 +1049,62 @@ const actions: Record<string, ActionHandler> = {
     ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
     ctx.session.gacha = { ...turned, opened: true, approvedAt: now };
     ctx.later(GACHA_DONE_MS + 20, ctx.rerender);
+    ctx.rerender();
+  },
+  // balance (author 2026-11-13): the prices onto the pans from a swinging crane; level approves the form
+  "balance-start"(ctx) {
+    const c = currentBoard(ctx);
+    if (c?.board.game?.kind !== "balance") return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    const gen = (ctx.session.balance?.gen ?? 0) + 1;
+    ctx.session.balance = balanceStart(c.task.id, c.board.game, balanceBlocks(), gen, ctx.now?.() ?? Date.now());
+    runBalance(ctx, gen);
+    ctx.rerender();
+  },
+  "balance-drop"(ctx) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.balance?.key === c?.task.id ? ctx.session.balance : null;
+    if (c?.board.game?.kind !== "balance" || !g || !g.running) return;
+    const now = ctx.now?.() ?? Date.now();
+    const next = balanceDrop(g, now);
+    if (next === g) return;
+    if (next.done) {
+      ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+      ctx.session.balance = { ...next, approvedAt: now };
+      ctx.later(BALANCE_DONE_MS + 20, ctx.rerender);
+    } else ctx.session.balance = next;
+    ctx.rerender();
+  },
+  "balance-resume"(ctx) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.balance;
+    if (c?.board.game?.kind !== "balance" || !g || g.key !== c.task.id || g.done || g.over || g.running) return;
+    const gen = g.gen + 1;
+    ctx.session.balance = balanceResume(g, ctx.now?.() ?? Date.now(), gen);
+    runBalance(ctx, gen);
+    ctx.rerender();
+  },
+  // fallen or tilted: 让克总帮忙 — he levels it himself (approved; the sheet follows)
+  "balance-assist"(ctx) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.balance?.key === c?.task.id ? ctx.session.balance : null;
+    if (c?.board.game?.kind !== "balance" || !g || !g.over) return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+    ctx.session.balance = { ...balanceSolve(g), approvedAt: ctx.now?.() ?? Date.now() };
+    ctx.later(BALANCE_DONE_MS + 20, ctx.rerender);
+    ctx.rerender();
+  },
+  // dev only: level at once (the replay driver)
+  "balance-cheat"(ctx) {
+    if (!import.meta.env.DEV) return;
+    const c = currentBoard(ctx);
+    const g = ctx.session.balance?.key === c?.task.id ? ctx.session.balance : null;
+    if (c?.board.game?.kind !== "balance" || !g) return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+    ctx.session.balance = { ...balanceSolve(g), gen: g.gen + 1, approvedAt: ctx.now?.() ?? Date.now() };
+    ctx.later(BALANCE_DONE_MS + 20, ctx.rerender);
     ctx.rerender();
   },
   // the chain lost (no move left, not approved): 让克总帮忙 — he stamps it (the approval moment follows)

@@ -1944,3 +1944,38 @@ button.lk-cell:hover{transform:translateY(-2px);z-index:1}
 @keyframes gc-lid{to{transform:translateY(-34px) rotate(-18deg)}}
 .gc-egg.out.open b{position:relative;z-index:1;font-size:16px;animation:ts-pop 300ms 200ms ease-out both}
 .mn.gc.done .gc-dome{animation:m3-flash 600ms ease-out both}
+/* balance (author 2026-11-13): the prices onto a scale from a swinging crane */
+.mn.bl{background:linear-gradient(160deg,#F7F2E6,#EADFC8 60%,#E3D6BC)}
+.bl-main{padding:0 28px}
+.bl-stage{position:relative;width:560px;height:420px}
+.bl-crane{position:absolute;left:0;right:0;top:0;height:40px}
+.bl-rail{position:absolute;left:40px;right:40px;top:18px;height:6px;background:#2b2f33;border-radius:3px}
+.bl-hang{position:absolute;left:50%;top:18px;width:0;animation:bl-swing 2400ms ease-in-out infinite}
+@keyframes bl-swing{0%{transform:translateX(0)}25%{transform:translateX(200px)}50%{transform:translateX(0)}75%{transform:translateX(-200px)}100%{transform:translateX(0)}}
+.bl-rope{position:absolute;left:-1px;top:0;width:2px;height:70px;background:#5b4a3a}
+.bl-block{position:relative;display:flex;align-items:center;justify-content:center;gap:4px;box-sizing:border-box;height:30px;width:calc(44px + var(--w,1) * 14px);background:#C98B4B;border:2px solid #5b3a1e;border-radius:4px;color:#2b1a0a;font-size:13px;font-weight:900;box-shadow:inset 0 -4px 0 rgba(0,0,0,.15)}
+.bl-block small{font-size:11px;font-weight:700;opacity:.75}
+.bl-block.hung{position:absolute;left:0;top:70px;transform:translateX(-50%)}
+.bl-block.welded{background:#8a8f94;border-color:#3a3f44;color:#eef0f2;height:34px;width:84px}
+.bl-block.welded::after{content:"";position:absolute;inset:-5px;border:2px dashed #3a3f44;border-radius:6px}
+.bl-block.bad{transform:rotate(calc(var(--off,0) * 40deg - 6deg)) translateX(calc(var(--off,0) * 30px))}
+.bl-scale{position:absolute;left:0;right:0;top:120px;height:300px}
+.bl-post{position:absolute;left:50%;top:60px;width:12px;height:200px;margin-left:-6px;background:#2b2f33}
+.bl-base{position:absolute;left:50%;bottom:0;width:200px;height:16px;margin-left:-100px;background:#2b2f33;border-radius:6px 6px 0 0}
+.bl-beam{position:absolute;left:50%;top:60px;width:440px;height:10px;margin-left:-220px;background:#5b4a3a;border-radius:5px;transform:rotate(var(--tilt,0deg));transform-origin:50% 50%;transition:transform 420ms cubic-bezier(.3,1.3,.5,1)}
+.bl-beam::before{content:"";position:absolute;left:50%;top:-10px;width:30px;height:30px;margin-left:-15px;border-radius:50%;background:#2b2f33}
+.bl-pan{position:absolute;top:10px;width:120px;display:flex;flex-direction:column-reverse;align-items:center;transform:rotate(calc(var(--tilt,0deg) * -1));transform-origin:50% 0}
+.bl-pan.l{left:0}.bl-pan.r{right:0}
+.bl-pan::before{content:"";position:absolute;top:0;left:50%;width:2px;height:120px;margin-left:-1px;background:#5b4a3a}
+.bl-stack{display:flex;flex-direction:column-reverse;align-items:center;margin-top:120px;padding:0 0 4px;border-bottom:8px solid #2b2f33;min-width:120px;border-radius:0 0 40px 40px}
+.bl-stack .bl-block{margin-top:-2px}
+.bl-pointer{position:absolute;left:50%;top:20px;width:4px;height:46px;margin-left:-2px;background:#B91C1C;transform-origin:50% 100%;transform:rotate(var(--tilt,0deg));transition:transform 420ms cubic-bezier(.3,1.3,.5,1)}
+.bl-scale.drift .bl-pointer{animation:bl-drift 3s ease-in-out infinite alternate}
+@keyframes bl-drift{from{transform:rotate(-4deg)}to{transform:rotate(9deg)}}
+.bl-scale.fell .bl-stack .bl-block:not(.welded){animation:bl-fall 700ms ease-in both}
+@keyframes bl-fall{to{transform:translate(60px,220px) rotate(80deg);opacity:0}}
+.bl-ctl{gap:22px}
+.bl-drop{width:84px;height:84px;border-radius:50%;border:4px solid #5b3a1e;background:#C98B4B;color:#2b1a0a;font:900 24px/1 inherit;cursor:pointer;box-shadow:0 6px 0 rgba(0,0,0,.3)}
+.bl-drop:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.3)}
+.mn.bl.lost .bl-scale{animation:bt-shake 460ms steps(6)}
+.mn.bl.done .bl-stage{animation:m3-flash 600ms ease-out both}

@@ -208,7 +208,11 @@
               }
             ]
           }
-        ]
+        ],
+        "game": {
+          "kind": "balance",
+          "fixed": 5
+        }
       },
       "deliverable": {
         "id": "d11-scale",
