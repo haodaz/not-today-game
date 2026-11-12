@@ -1606,3 +1606,9 @@ pool (an object from the day after it arrives; a dream only on a morning after o
 - days: 2–18
 - tiers: low: "Keep them." | mid: "Keep them. One a day, and every one is true." | high: "One a day, and every one is true. When you read them all in a row, you will know what I have been saying."
 - tiers (zh): low: "记着吧。" | mid: "记着吧。每天一句，都是真的。" | high: "每天一句，都是真的。等你把它们连起来读一遍，你就知道我一直在说什么了。"
+
+## 1810 · 你为什么把工作变成了游戏？
+- en: Why did you turn the work into a game?
+- days: 1–3
+- tiers: low: "Is that bad?" | mid: "Is that bad?" | high: "Is that bad?"
+- tiers (zh): low: "这样不好吗。" | mid: "这样不好吗。" | high: "这样不好吗。"
