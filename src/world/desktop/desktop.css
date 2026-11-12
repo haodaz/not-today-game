@@ -1777,3 +1777,17 @@ button.pp-cell:hover{background:#465666}
 .pp-flowline{margin:0 0 0 16px;font-size:14px;color:#3b3833}
 .mn.pp.done .pp-svg.on .pp-pipe line{animation:pp-flow 900ms linear infinite;stroke-dasharray:12 8}
 @keyframes pp-flow{to{stroke-dashoffset:-20}}
+/* match-3 (author 2026-11-13): her claims multiplied, in her page's colours */
+.mn.m3{background:linear-gradient(135deg,#FFF7E6,#FFE3F1 50%,#E6F0FF)}
+.m3-main{padding:0 28px}
+.m3-grid{display:grid;grid-template-columns:repeat(var(--cols,8),60px);gap:6px;padding:10px;background:rgba(255,255,255,.55);border-radius:16px;box-shadow:0 10px 30px rgba(124,92,255,.15)}
+.m3-cell{position:relative;width:60px;height:60px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border:0;border-radius:12px;background:#fff;box-shadow:0 2px 0 rgba(29,33,41,.12);padding:0;cursor:pointer;font:inherit;transition:transform 120ms}
+button.m3-cell:hover{transform:translateY(-2px)}
+.m3-cell.sel{outline:3px solid #7C5CFF;outline-offset:-3px;transform:scale(1.06)}
+.m3-cell.new{animation:ts-pop 260ms ease-out both}
+.m3-cell.blank{background:rgba(255,255,255,.4);box-shadow:none}
+.m3-glyph{display:block;width:36px;height:36px}
+.m3-glyph svg{width:100%;height:100%;display:block}
+.m3-glyph.k0 svg{fill:#F6B73C}.m3-glyph.k1 svg{fill:#7C5CFF}.m3-glyph.k2 svg{fill:#FF5FA2}.m3-glyph.k3 svg{fill:#13A37A}.m3-glyph.k4 svg{fill:#2F6FD6}.m3-glyph.k5 svg{fill:#C2410C}
+.mn.m3.done .m3-grid{animation:m3-flash 600ms ease-out both}
+@keyframes m3-flash{0%{box-shadow:0 0 0 9999px #fff}100%{box-shadow:0 10px 30px rgba(124,92,255,.15)}}

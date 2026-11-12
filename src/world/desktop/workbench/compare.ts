@@ -22,6 +22,7 @@ import { browserFrame, settleLayer } from "./settle-layer";
 import { battleOffered, battleScene } from "./battle";
 import { minesApproving, minesStage } from "./mines";
 import { pipesApproving, pipesStage } from "./pipes";
+import { match3Approving, match3Stage } from "./match3";
 import { tunePane } from "./shell";
 import { tuneStage } from "./tune-stage";
 import { clueStage } from "./clue-stage";
@@ -212,6 +213,9 @@ function genericWorkLayer(c: { state: State; events: readonly GameEvent[]; sessi
   } else if (board.view === "meeting" && board.meeting) {
     // meeting stage (2026-11-12): the meeting above, the template under it
     body = meetingStage(app, task, board);
+  } else if (board.game?.kind === "match3" && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && (!st.approved || (session.match3?.key === task.id && match3Approving(session.match3, nowMs))); })()) {
+    // match-3 (author 2026-11-13): the filled form's page as her claims multiplied, to clear
+    body = match3Stage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs);
   } else if (board.game?.kind === "pipes" && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && (!st.approved || (session.pipes?.key === task.id && pipesApproving(session.pipes, nowMs))); })()) {
     // pipes (author 2026-11-13): the filled form's process as pipe pieces to turn until it runs
     body = pipesStage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs);

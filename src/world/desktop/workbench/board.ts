@@ -22,6 +22,7 @@ import { battleCmd, battleOffered, battleOver, battleReward, battleTarget, battl
 import { fillPlaceholders } from "@world/replies/placeholders";
 import { MINES_DONE_MS, minesFlag, minesOpen, minesRoll, minesStart, type MinesGrid } from "./mines";
 import { PIPES_DONE_MS, pipesRoll, pipesSolve, pipesStart, pipesTurn } from "./pipes";
+import { MATCH3_DONE_MS, match3Roll, match3Start, match3Tap, type Match3Grid } from "./match3";
 import type { ActionContext, ActionHandler } from "../controller";
 import type { AppContext, Session } from "../model";
 import { openWork } from "./work";
@@ -635,6 +636,53 @@ const actions: Record<string, ActionHandler> = {
     ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
     ctx.session.pipes = { ...pipesSolve(g), approvedAt: ctx.now?.() ?? Date.now() };
     ctx.later(PIPES_DONE_MS + 20, ctx.rerender);
+    ctx.rerender();
+  },
+  // match-3 (author 2026-11-13): her claims multiplied — tap two neighbours; enough cleared approves the form
+  "match3-start"(ctx) {
+    const c = currentBoard(ctx);
+    if (c?.board.game?.kind !== "match3") return;
+    const attempt = (ctx.session.match3?.key === c.task.id ? 1 : 0) + Math.floor((ctx.now?.() ?? Date.now()) / 1000) % 1000;
+    ctx.session.match3 = { ...match3Start(c.task.id, c.board.game, match3Roll(ctx.store.getRunId(), c.task.id, attempt)), attempt } as Match3Grid;
+    ctx.rerender();
+  },
+  "match3-tap"(ctx, data) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.match3?.key === c?.task.id ? ctx.session.match3 : null;
+    const i = Number(data.i);
+    if (c?.board.game?.kind !== "match3" || !g || !Number.isInteger(i)) return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    const attempt = (g as Match3Grid & { attempt?: number }).attempt ?? 0;
+    const next = match3Tap(g, i, match3Roll(ctx.store.getRunId(), c.task.id, attempt + 1000 + g.moves));
+    if (next === g) return;
+    if (next.won) {
+      ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+      ctx.session.match3 = { ...next, approvedAt: ctx.now?.() ?? Date.now() };
+      ctx.later(MATCH3_DONE_MS + 20, ctx.rerender);
+    } else ctx.session.match3 = next;
+    ctx.rerender();
+  },
+  // out of moves: 让克总帮忙 — he clears it himself (approved; the sheet follows)
+  "match3-assist"(ctx) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.match3?.key === c?.task.id ? ctx.session.match3 : null;
+    if (c?.board.game?.kind !== "match3" || !g || !g.over) return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+    ctx.session.match3 = { ...g, won: true, over: false, approvedAt: ctx.now?.() ?? Date.now() };
+    ctx.later(MATCH3_DONE_MS + 20, ctx.rerender);
+    ctx.rerender();
+  },
+  // dev only: cleared at once (the replay driver)
+  "match3-cheat"(ctx) {
+    if (!import.meta.env.DEV) return;
+    const c = currentBoard(ctx);
+    const g = ctx.session.match3?.key === c?.task.id ? ctx.session.match3 : null;
+    if (c?.board.game?.kind !== "match3" || !g) return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+    ctx.session.match3 = { ...g, won: true, over: false, cleared: g.goal, approvedAt: ctx.now?.() ?? Date.now() };
+    ctx.later(MATCH3_DONE_MS + 20, ctx.rerender);
     ctx.rerender();
   },
   // the chain lost (no move left, not approved): 让克总帮忙 — he stamps it (the approval moment follows)

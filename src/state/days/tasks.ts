@@ -190,7 +190,9 @@ export type BoardGame =
   /** minesweeper: the month; `mines` the days the bosses are away */
   | { readonly kind: "mines"; readonly cols: number; readonly rows: number; readonly mines: number }
   /** pipes: the process; turn the pieces until 入口 reaches 入职 */
-  | { readonly kind: "pipes"; readonly cols: number; readonly rows: number };
+  | { readonly kind: "pipes"; readonly cols: number; readonly rows: number }
+  /** match-3: her claims multiplied; clear `goal` of them within `moves` */
+  | { readonly kind: "match3"; readonly cols: number; readonly rows: number; readonly kinds: number; readonly goal: number; readonly moves: number };
 export interface BoardStack {
   /** From the bottom up: the rank word and its symbol; `silhouette` ranks are the easter eggs past the top (drawn black). */
   readonly ranks: readonly { readonly name: string; readonly img: string; readonly silhouette?: boolean }[];
@@ -729,7 +731,10 @@ function board(v: unknown, w: string): TaskBoard {
     } else if (v.game.kind === "pipes") {
       keys(v.game, ["kind", "cols", "rows"], gw);
       game = { kind: "pipes", cols: num(v.game.cols, "cols", 4, 12), rows: num(v.game.rows, "rows", 3, 8) };
-    } else fail(`${gw}.kind`, 'must be "mines" or "pipes"');
+    } else if (v.game.kind === "match3") {
+      keys(v.game, ["kind", "cols", "rows", "kinds", "goal", "moves"], gw);
+      game = { kind: "match3", cols: num(v.game.cols, "cols", 5, 10), rows: num(v.game.rows, "rows", 5, 10), kinds: num(v.game.kinds, "kinds", 3, 6), goal: num(v.game.goal, "goal", 3, 500), moves: num(v.game.moves, "moves", 1, 200) };
+    } else fail(`${gw}.kind`, 'must be "mines", "pipes" or "match3"');
   }
   let stack: BoardStack | undefined;
   if (v.stack !== undefined) {

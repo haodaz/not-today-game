@@ -386,6 +386,8 @@ export interface Session {
   mines: import("./workbench/mines").MinesGrid | null;
   /** pipes (author 2026-11-13): the process under way (session only; connected is a board step). */
   pipes: import("./workbench/pipes").PipesGrid | null;
+  /** match-3 (author 2026-11-13): her page's board under way (session only; cleared enough is a board step). */
+  match3: import("./workbench/match3").Match3Grid | null;
   /** work (author 2026-11-11 night): the task whose full-screen work page is up (`<day>:<taskId>`), or null; 回到工作台 hides it, 打开工作页 brings it back. */
   workShow: string | null;
   /**
@@ -585,6 +587,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     battle: null,
     mines: null,
     pipes: null,
+    match3: null,
     workShow: null,
     workPhase: null,
     objbarOpen: false,

@@ -194,7 +194,15 @@
               }
             ]
           }
-        ]
+        ],
+        "game": {
+          "kind": "match3",
+          "cols": 8,
+          "rows": 8,
+          "kinds": 5,
+          "goal": 45,
+          "moves": 20
+        }
       },
       "deliverable": {
         "id": "d5-avatar",
