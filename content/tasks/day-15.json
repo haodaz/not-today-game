@@ -310,6 +310,12 @@
             }
           ],
           "layout": "grid"
+        },
+        "game": {
+          "kind": "moles",
+          "seats": 12,
+          "pages": 3,
+          "pageMs": 22000
         }
       },
       "deliverable": {

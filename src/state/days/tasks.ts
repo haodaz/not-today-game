@@ -206,7 +206,9 @@ export type BoardGame =
   /** balance: the prices dropped from a swinging crane onto two pans; `fixed` is the welded weight on each (oil, wine) */
   | { readonly kind: "balance"; readonly fixed: number }
   /** sokoban: the chairs onto the seat marks; `level` as rows (# wall, . mark, $ chair, @ you) */
-  | { readonly kind: "sokoban"; readonly level: readonly string[] };
+  | { readonly kind: "sokoban"; readonly level: readonly string[] }
+  /** whack-a-mole: the audience's faces looking down at their phones; `pages` of `pageMs` each */
+  | { readonly kind: "moles"; readonly seats: number; readonly pages: number; readonly pageMs: number };
 export interface BoardStack {
   /** From the bottom up: the rank word and its symbol; `silhouette` ranks are the easter eggs past the top (drawn black). */
   readonly ranks: readonly { readonly name: string; readonly img: string; readonly silhouette?: boolean }[];
@@ -786,7 +788,10 @@ function board(v: unknown, w: string): TaskBoard {
       if (count("@") + count("+") !== 1) fail(`${gw}.level`, "must place exactly one @");
       if (count("$") + count("*") !== count(".") + count("*") + count("+") || count("$") + count("*") < 1) fail(`${gw}.level`, "must have as many chairs as marks");
       game = { kind: "sokoban", level };
-    } else fail(`${gw}.kind`, 'must be "mines", "pipes", "match3", "link", "snake", "tetris", "rhythm", "gacha", "balance" or "sokoban"');
+    } else if (v.game.kind === "moles") {
+      keys(v.game, ["kind", "seats", "pages", "pageMs"], gw);
+      game = { kind: "moles", seats: num(v.game.seats, "seats", 4, 24), pages: num(v.game.pages, "pages", 1, 6), pageMs: num(v.game.pageMs, "pageMs", 5000, 120000) };
+    } else fail(`${gw}.kind`, 'must be "mines", "pipes", "match3", "link", "snake", "tetris", "rhythm", "gacha", "balance", "sokoban" or "moles"');
   }
   let stack: BoardStack | undefined;
   if (v.stack !== undefined) {

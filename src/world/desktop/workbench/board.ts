@@ -30,6 +30,8 @@ import { RHYTHM_DONE_MS, RHYTHM_TICK_MS, rhythmPause, rhythmResume, rhythmRoll, 
 import { GACHA_DONE_MS, GACHA_TURN_MS, gachaOpen, gachaRoll, gachaStart, gachaTurn } from "./gacha";
 import { BALANCE_DONE_MS, BALANCE_TICK_MS, balanceBlocks, balanceDrop, balancePause, balanceResume, balanceSolve, balanceStart } from "./balance";
 import { SOKOBAN_DONE_MS, sokobanMove, sokobanSolve, sokobanStart, sokobanUndo, type Dir } from "./sokoban";
+import { MOLES_DONE_MS, MOLES_TICK_MS, molesPause, molesResume, molesRoll, molesSolve, molesStart, molesSweep, molesTap } from "./moles";
+import { PORTRAIT_FILES } from "@world/dialogue/box";
 import type { ActionContext, ActionHandler } from "../controller";
 import type { AppContext, Session } from "../model";
 import { openWork } from "./work";
@@ -408,6 +410,32 @@ function runBalance(ctx: ActionContext, gen: number): void {
     ctx.later(BALANCE_TICK_MS, tick);
   };
   ctx.later(BALANCE_TICK_MS, tick);
+}
+
+/** whack-a-mole: the clock judges each page at its end; leaving the work page pauses it (继续 resumes with no time lost). */
+function runMoles(ctx: ActionContext, gen: number): void {
+  const g0 = ctx.session.moles;
+  if (!g0 || g0.gen !== gen) return;
+  ctx.session.moles = { ...g0, running: true };
+  const tick = () => {
+    const c = currentBoard(ctx);
+    const g = ctx.session.moles;
+    if (!g || g.gen !== gen) return;
+    const now = ctx.now?.() ?? Date.now();
+    if (g.done || g.over) { if (g.running) { ctx.session.moles = { ...g, running: false }; ctx.rerender(); } return; }
+    if (!ctx.session.workShow || c?.board.game?.kind !== "moles" || c.task.id !== g.key) { ctx.session.moles = molesPause(g, now); ctx.rerender(); return; }
+    const next = molesSweep(g, now);
+    if (next.done) {
+      ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+      ctx.session.moles = { ...next, approvedAt: now };
+      ctx.later(MOLES_DONE_MS + 20, ctx.rerender);
+    } else {
+      ctx.session.moles = next;
+      if (!next.over) ctx.later(MOLES_TICK_MS, tick);
+    }
+    ctx.rerender();
+  };
+  ctx.later(MOLES_TICK_MS, tick);
 }
 
 function currentBoard(ctx: ActionContext): { task: Task; board: TaskBoard } | null {
@@ -1148,6 +1176,59 @@ const actions: Record<string, ActionHandler> = {
     ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
     ctx.session.sokoban = { ...sokobanSolve(g), approvedAt: ctx.now?.() ?? Date.now() };
     ctx.later(SOKOBAN_DONE_MS + 20, ctx.rerender);
+    ctx.rerender();
+  },
+  // whack-a-mole (author 2026-11-13): the audience's faces; three pages with enough heads up approve the form
+  "moles-start"(ctx) {
+    const c = currentBoard(ctx);
+    if (c?.board.game?.kind !== "moles") return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    const gen = (ctx.session.moles?.gen ?? 0) + 1;
+    const attempt = gen + Math.floor((ctx.now?.() ?? Date.now()) / 1000) % 1000;
+    ctx.session.moles = molesStart(c.task.id, c.board.game, PORTRAIT_FILES[ctx.store.getState().names.portrait ?? "p1"], molesRoll(ctx.store.getRunId(), c.task.id, attempt), gen, ctx.now?.() ?? Date.now());
+    runMoles(ctx, gen);
+    ctx.rerender();
+  },
+  "moles-tap"(ctx, data) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.moles?.key === c?.task.id ? ctx.session.moles : null;
+    const seat = Number(data.seat);
+    if (c?.board.game?.kind !== "moles" || !g || !g.running || !Number.isInteger(seat)) return;
+    const next = molesTap(g, seat, ctx.now?.() ?? Date.now());
+    if (next === g) return;
+    ctx.session.moles = next;
+    ctx.rerender();
+  },
+  "moles-resume"(ctx) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.moles;
+    if (c?.board.game?.kind !== "moles" || !g || g.key !== c.task.id || g.done || g.over || g.running) return;
+    const gen = g.gen + 1;
+    ctx.session.moles = molesResume(g, ctx.now?.() ?? Date.now(), gen);
+    runMoles(ctx, gen);
+    ctx.rerender();
+  },
+  // the room gone cold: 让克总帮忙 — he keeps their heads up himself (approved; the sheet follows)
+  "moles-assist"(ctx) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.moles?.key === c?.task.id ? ctx.session.moles : null;
+    if (c?.board.game?.kind !== "moles" || !g || !g.over) return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+    ctx.session.moles = { ...molesSolve(g), approvedAt: ctx.now?.() ?? Date.now() };
+    ctx.later(MOLES_DONE_MS + 20, ctx.rerender);
+    ctx.rerender();
+  },
+  // dev only: every head up at once (the replay driver)
+  "moles-cheat"(ctx) {
+    if (!import.meta.env.DEV) return;
+    const c = currentBoard(ctx);
+    const g = ctx.session.moles?.key === c?.task.id ? ctx.session.moles : null;
+    if (c?.board.game?.kind !== "moles" || !g) return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+    ctx.session.moles = { ...molesSolve(g), gen: g.gen + 1, approvedAt: ctx.now?.() ?? Date.now() };
+    ctx.later(MOLES_DONE_MS + 20, ctx.rerender);
     ctx.rerender();
   },
   // the chain lost (no move left, not approved): 让克总帮忙 — he stamps it (the approval moment follows)

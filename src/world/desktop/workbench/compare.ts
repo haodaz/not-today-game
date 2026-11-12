@@ -30,6 +30,7 @@ import { rhythmApproving, rhythmStage } from "./rhythm";
 import { gachaApproving, gachaStage } from "./gacha";
 import { balanceApproving, balanceStage } from "./balance";
 import { sokobanApproving, sokobanStage } from "./sokoban";
+import { molesApproving, molesStage } from "./moles";
 import { tunePane } from "./shell";
 import { tuneStage } from "./tune-stage";
 import { clueStage } from "./clue-stage";
@@ -220,6 +221,9 @@ function genericWorkLayer(c: { state: State; events: readonly GameEvent[]; sessi
   } else if (board.tune) {
     // tune stage (author 2026-11-12): the research-node screen, not the config pane and the preview
     body = tuneStage({ state, events, session, nowMs }, task, board);
+  } else if (board.game?.kind === "moles" && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && (!st.approved || (session.moles?.key === task.id && molesApproving(session.moles, nowMs))); })()) {
+    // whack-a-mole (author 2026-11-13): the filled deck's launch hall, the faces to keep up
+    body = molesStage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs);
   } else if (board.game?.kind === "sokoban" && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && (!st.approved || (session.sokoban?.key === task.id && sokobanApproving(session.sokoban, nowMs))); })()) {
     // sokoban (author 2026-11-13): the filled seating form's room as a warehouse floor, the chairs to push
     body = sokobanStage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs);
