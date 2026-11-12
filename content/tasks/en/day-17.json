@@ -233,7 +233,8 @@
             "Choose"
           ]
         },
-        "tone": "burst"
+        "tone": "paper",
+        "art": "/launch/day-17.jpg"
       }
     },
     {

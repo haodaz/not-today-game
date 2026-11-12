@@ -255,7 +255,8 @@
             "签字就行"
           ]
         },
-        "tone": "paper"
+        "tone": "ink",
+        "art": "/launch/day-13.jpg"
       }
     },
     {

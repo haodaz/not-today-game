@@ -342,7 +342,8 @@
             "No dead air"
           ]
         },
-        "tone": "blue"
+        "tone": "blue",
+        "art": "/launch/day-15.jpg"
       }
     },
     {
