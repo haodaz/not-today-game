@@ -36,3 +36,10 @@ the launch pages, the playtest fixes), and leaves Kiro the pieces that are mecha
 A mechanism change ships with its clean-up list (steering, specs, content, code, notes, memory):
 whoever changes a mechanism removes the old one everywhere. Claude writes the spec; Kiro builds it;
 the author plays it; what she says goes back into the next spec.
+
+## 2026-11-12 — work-stages-polish (handed to Kiro)
+
+Claude built the full-stage work screens (compare, tune, clue, meeting, the 2048 approval chain) and
+their content; Kiro takes the polish that is pure implementation: the settlement sheet for the clue
+and meeting stages, pointer drag of clippings onto slots, swipe + slide animation + the approval
+moment on the chain. Spec: `.kiro/specs/work-stages-polish/requirements.md`. Content stays Claude's.
