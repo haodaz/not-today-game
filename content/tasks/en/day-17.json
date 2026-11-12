@@ -218,7 +218,21 @@
           "Whom, why them, the phone, what to say."
         ],
         "call": "The clues are in the receivables and the call log; the number is in the call log. Pick one person and answer!",
-        "cta": "Start work"
+        "cta": "Start work",
+        "motif": {
+          "kind": "fan",
+          "items": [
+            "Everyone's looking for you",
+            "The same sentence",
+            "Only one reply",
+            "To whom",
+            "Why him",
+            "The call",
+            "Reply what",
+            "All waiting",
+            "Choose"
+          ]
+        }
       }
     },
     {

@@ -165,6 +165,23 @@ function startGame(store: Store, saved: boolean, prologue = false): void {
   }
   // Debug speed, dev builds only (like ?day=): `?fast=1` counts delivery minutes as seconds.
   game.session.deliveryUnitMs = deliveryUnitMs(search, import.meta.env.DEV);
+  // Dev only, beside ?day=N (2026-11-12): `&launch=task3` stands at the desktop with 工作台 on that
+  // task's page, so its launch page (and the work behind it) can be looked at without the morning.
+  const launch = import.meta.env.DEV ? params.get("launch") : null;
+  if (launch) {
+    const s = game.session;
+    // the tower is on (its boot step), so the screen shows the workbench
+    if (!store.getEvents().some((e) => e.kind === "step" && e.name === "boot" && e.day === store.getState().day)) store.appendEvent({ kind: "step", name: "boot", t: s.clock.time });
+    // the morning's messages read (day items chain boot → msgs → the tasks; the rest comes from `seed=flags:`)
+    if (!store.getEvents().some((e) => e.kind === "step" && e.name === "openApp:msgs" && e.day === store.getState().day)) store.appendEvent({ kind: "step", name: "openApp:msgs", t: s.clock.time });
+    // the task's page opened (as 工作台's row does), so the work layer has its task
+    if (!store.getEvents().some((e) => e.kind === "open" && e.target === `task:${launch}` && e.day === store.getState().day)) store.appendEvent({ kind: "open", target: `task:${launch}`, t: s.clock.time });
+    s.view = "desktop";
+    s.leftApp = "workbench";
+    s.workbenchPage = `task:${launch}`;
+    s.launchShow = `${store.getState().day}:${launch}`;
+    game.rerender();
+  }
   // Debug, beside ?day=N (a debug run is never saved): `&night=1` / `&shutdown=1` put that day's
   // night or shutdown beat in the box at once, staged as at bedtime; nothing is logged.
   if (!saved) {

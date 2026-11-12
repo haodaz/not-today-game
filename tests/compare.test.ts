@@ -20,13 +20,14 @@ describe("the content", () => {
     expect(cmp.threshold).toBe(80);
     expect(cmp.pages.map((p) => p.slot)).toEqual(b.slots.map((s) => s.id));
     for (const p of cmp.pages) {
-      expect(p.left).not.toBe(p.right);
+      expect(new Set(p.cards).size).toBe(p.cards.length);
+      expect(p.cards.length).toBe(2);
       expect(p.bubbles.length).toBeGreaterThanOrEqual(1);
       expect(p.bubbles.length).toBeLessThanOrEqual(3);
-      expect(Object.keys(p.remark).sort()).toEqual([p.left, p.right].sort());
+      expect(Object.keys(p.remark).sort()).toEqual([...p.cards].sort());
       // the boss's taste is one of the two
       const answer = b.slots.find((s) => s.id === p.slot)!.answer;
-      expect([p.left, p.right]).toContain(answer);
+      expect(p.cards).toContain(answer);
     }
     expect(b.ide?.diff).toBeUndefined();
     expect(b.ide?.api).toBeUndefined();
@@ -50,7 +51,7 @@ describe("the picks", () => {
     expect(comparePending(b, s)?.slot).toBe("r5");
     expect(canPrint(b, s)).toBe(false);
     const last = cmp.pages[4]!;
-    const wrong = b.slots.find((x) => x.id === last.slot)!.answer === last.left ? last.right : last.left;
+    const wrong = last.cards.find((c) => c !== b.slots.find((x) => x.id === last.slot)!.answer)!;
     s = stepBoard(b, s, { t: "fill", slot: last.slot, card: wrong });
     expect(comparePending(b, s)).toBeNull();
     expect(compareScore(b, s).pct).toBe(80);
@@ -59,7 +60,7 @@ describe("the picks", () => {
     let w = freshBoard(b);
     for (const p of cmp.pages) {
       const answer = b.slots.find((x) => x.id === p.slot)!.answer;
-      const other = answer === p.left ? p.right : p.left;
+      const other = p.cards.find((c) => c !== answer)!;
       w = stepBoard(b, w, { t: "fill", slot: p.slot, card: cmp.pages.indexOf(p) < 2 ? answer : other });
     }
     expect(compareScore(b, w).pct).toBe(40);
@@ -73,7 +74,7 @@ describe("the picks", () => {
   it("Kuro's rewrite is judged flawed at night (SAN down a little) even though every page is his taste", () => {
     const store = createStore({ startDay: 1 });
     const b = board();
-    for (const p of b.compare!.pages) store.appendEvent({ kind: "boardStep", taskId: task().id, op: { t: "fill", slot: p.slot, card: p.left } });
+    for (const p of b.compare!.pages) store.appendEvent({ kind: "boardStep", taskId: task().id, op: { t: "fill", slot: p.slot, card: p.cards[0]! } });
     store.appendEvent({ kind: "boardStep", taskId: task().id, op: { t: "assistFill" } });
     const s = boardState(b, 1, task().id, store.getEvents());
     store.appendEvent({ kind: "task", flag: task().done, mode: "let", slots: { ...s.slots }, assists: s.assists });
@@ -93,7 +94,7 @@ describe("the picks", () => {
     const ops = cmp.pages.map((p) => ({ t: "fill" as const, slot: p.slot, card: b.slots.find((x) => x.id === p.slot)!.answer }));
     const lines = ideTranscript(b, ops);
     expect(lines.slice(0, 2).map((l) => l.on)).toEqual(["open", "open"]);
-    expect(lines[2]).toMatchObject({ on: "compare:cmpPick", who: "me", args: { n: "1", v: cmp.pages[0]!.left === ops[0]!.card ? "v15" : "v16" } });
+    expect(lines[2]).toMatchObject({ on: "compare:cmpPick", who: "me", args: { n: "1", v: cmp.pages[0]!.cards[0] === ops[0]!.card ? "v15" : "v16" } });
     expect(lines[3]).toMatchObject({ on: "compare:cmpRendered", who: "kuro", args: { n: "1" } });
     expect(lines[4]).toMatchObject({ on: "compare:cmpHappy", who: "kuro" });
     const sum = lines.find((l) => l.on === "compare:cmpSum")!;
@@ -105,7 +106,7 @@ describe("the picks", () => {
     expect(after.indexOf(remarks[0]!)).toBeGreaterThan(after.findIndex((l) => l.on === "print"));
     expect(after[after.length - 1]!.on).toBe("send");
     // a wrong pick: the pout
-    const wrongOps = [{ t: "fill" as const, slot: "r1", card: cmp.pages[0]!.left === b.slots[0]!.answer ? cmp.pages[0]!.right : cmp.pages[0]!.left }];
+    const wrongOps = [{ t: "fill" as const, slot: "r1", card: cmp.pages[0]!.cards.find((c) => c !== b.slots[0]!.answer)! }];
     expect(ideTranscript(b, wrongOps).map((l) => l.on)).toContain("compare:cmpPout");
   });
 });
@@ -119,8 +120,8 @@ describe("the pane", () => {
     let out = comparePane(task(), b, s, true, false, null).value;
     expect(out).toContain('<img class="cmp-portrait" src="/npc/boss.png"');
     expect(out).toContain('<b class="cmp-key">厚</b>');
-    expect(out).toContain(`data-action="compare-pick" data-slot="r1" data-card="${cmp.pages[0]!.left}"`);
-    expect(out).toContain(`data-action="compare-pick" data-slot="r1" data-card="${cmp.pages[0]!.right}"`);
+    expect(out).toContain(`data-action="compare-pick" data-slot="r1" data-card="${cmp.pages[0]!.cards[0]}"`);
+    expect(out).toContain(`data-action="compare-pick" data-slot="r1" data-card="${cmp.pages[0]!.cards[1]}"`);
     expect(out).not.toContain("compare-kuro"); // author 2026-11-12: no 克总你定 on the choose screen
     expect(out.match(/class="cmp-face todo/g)).toHaveLength(5);
     expect(out).toContain(t("compare.page", { n: "1", label: b.slots[0]!.label }));
@@ -135,7 +136,7 @@ describe("the pane", () => {
     expect(out).not.toContain("compare-redo");
     // under the bar: the redo
     let w = freshBoard(b);
-    for (const p of cmp.pages) w = stepBoard(b, w, { t: "fill", slot: p.slot, card: b.slots.find((x) => x.id === p.slot)!.answer === p.left ? p.right : p.left });
+    for (const p of cmp.pages) w = stepBoard(b, w, { t: "fill", slot: p.slot, card: p.cards.find((c) => c !== b.slots.find((x) => x.id === p.slot)!.answer)! });
     out = comparePane(task(), b, w, true, false, null).value;
     expect(out.match(/class="cmp-face pout/g)).toHaveLength(5);
     expect(out).toContain('data-action="compare-redo"');

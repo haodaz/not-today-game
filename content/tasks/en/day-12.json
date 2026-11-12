@@ -207,7 +207,22 @@
           "Four slots: 22 to 2, 2 to 4, 4 to 6, and a row called ΥΠΝΟΣ."
         ],
         "call": "The names are in the boss's and the group's chats, one line in the contacts; the key is in last night's sleep-talk recording, backwards. Fill the table!",
-        "cta": "Start work"
+        "cta": "Start work",
+        "motif": {
+          "kind": "danmaku",
+          "items": [
+            "Push through",
+            "Nobody sleeps this week",
+            "You make the rota",
+            "22:00 to 02:00",
+            "02:00 to 04:00",
+            "04:00 to 06:00",
+            "ΥΠΝΟΣ",
+            "Nobody sleeps",
+            "Sleep is an attitude",
+            "It's only this week"
+          ]
+        }
       }
     },
     {

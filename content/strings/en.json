@@ -721,7 +721,7 @@
   "launch.name.boss": "Lao Wang",
   "launch.name.partner": "Vivi",
   "launch.name.laozhou": "Lao Zhou",
-  "compare.diffNote": "− {a}'s line · + {b}'s line",
+  "compare.diffNote": "Each card is the whole page; the marked lines are where the versions differ.",
   "obj.chick.caption": "A next · B do · C back",
   "obj.chick.full": "That's all it can take today."
 }

@@ -214,7 +214,18 @@
           "The material is in her PRD, her private chat, the group, and v17."
         ],
         "call": "The table is locked: the four digits are in Vivi's private chat. Piece together the page she wants!",
-        "cta": "Start work"
+        "cta": "Start work",
+        "motif": {
+          "kind": "bubble",
+          "items": [
+            "A double for everyone",
+            "It sees for you",
+            "It remembers for you",
+            "Boundaries? Later",
+            "A pretty name",
+            "It's all in the PRD"
+          ]
+        }
       }
     },
     {

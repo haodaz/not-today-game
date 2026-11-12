@@ -329,7 +329,19 @@
           "The material is in the meeting record; the audience screenshots are in the files."
         ],
         "call": "The table is locked: of the twelve faces only four are the originals; work out how many were swapped on the calculator, which only lights facing the window. Arrange the deck!",
-        "cta": "Start work"
+        "cta": "Start work",
+        "motif": {
+          "kind": "bubble",
+          "items": [
+            "This afternoon's launch",
+            "Three demo pages",
+            "Watch the reactions live",
+            "Screenshots in the files",
+            "Good reactions only",
+            "A peak per page",
+            "No dead air"
+          ]
+        }
       }
     },
     {

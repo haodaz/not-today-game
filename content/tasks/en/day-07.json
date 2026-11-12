@@ -594,7 +594,21 @@
           "What was said is in the meeting record; a few lines are in the group and the private chats."
         ],
         "call": "The adjournment cell is locked: the word in Lao Zhou's English line before the meeting ended, looked up on the dictionary. Write the minutes up!",
-        "cta": "Start work"
+        "cta": "Start work",
+        "motif": {
+          "kind": "fan",
+          "items": [
+            "By the template",
+            "Preparation",
+            "Sign-in",
+            "Agenda",
+            "Reports",
+            "Adjourn",
+            "It's all in the minutes",
+            "Add nothing of your own",
+            "Keep the format"
+          ]
+        }
       }
     }
   ]

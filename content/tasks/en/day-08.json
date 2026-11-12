@@ -209,7 +209,21 @@
           "The rank table is in the files; the ranks on it are not the company's."
         ],
         "call": "The times are locked: work out sunset yourself; the calculator only lights by the window. Schedule every leader!",
-        "cta": "Start work"
+        "cta": "Start work",
+        "motif": {
+          "kind": "fan",
+          "items": [
+            "Team building",
+            "Our leaders",
+            "Toast time",
+            "The rank table",
+            "Sort by rank",
+            "Three minutes each",
+            "Never keep a leader waiting",
+            "Build the mood",
+            "Those ranks are not the company's"
+          ]
+        }
       }
     },
     {

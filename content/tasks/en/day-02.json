@@ -687,7 +687,18 @@
           "Little does she know: every training brings a return and a risk at once."
         ],
         "call": "Pick the trainings that fit, and get as close to Vivi's bar as you can!",
-        "cta": "Start work"
+        "cta": "Start work",
+        "motif": {
+          "kind": "bubble",
+          "items": [
+            "Results in three seconds",
+            "All four bars full",
+            "APIs? Not needed",
+            "Built in one night",
+            "No more scheduling",
+            "Make one like it"
+          ]
+        }
       }
     },
     {

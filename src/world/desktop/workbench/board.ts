@@ -503,7 +503,7 @@ const actions: Record<string, ActionHandler> = {
   "compare-pick": withIde((ctx, data) => {
     const c = currentBoard(ctx);
     const page = c?.board.compare?.pages.find((p) => p.slot === data.slot);
-    if (!c || !page || !data.card || (data.card !== page.left && data.card !== page.right)) return;
+    if (!c || !page || !data.card || !page.cards.includes(data.card)) return;
     comparePick(ctx, c, page.slot, data.card);
   }),
   // 让克总重新改一稿: every page to Kuro's fill (one assist: judged flawed at night, SAN down a little).

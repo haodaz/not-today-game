@@ -137,6 +137,8 @@ export interface BoardCard {
   readonly hint?: string;
   /** ide v2 day 3: a direction for one page: in no tray, found from the start, fills only that slot. */
   readonly slot?: string;
+  /** compare (author 2026-11-12): this version's other lines of the page's file, by 1-based line number (several diffs per version, not only the slot's line). */
+  readonly patch?: Readonly<Record<string, string>>;
 }
 export interface BoardKuro {
   readonly fill: Readonly<Record<string, string>>;
@@ -179,13 +181,13 @@ export type BoardView = (typeof BOARD_VIEWS)[number];
  */
 export interface ComparePage {
   readonly slot: string;
-  readonly left: string;
-  readonly right: string;
+  /** The versions of this page, in the order of `versions` (two to four cards; author 2026-11-12: day 3 has three wordings). */
+  readonly cards: readonly string[];
   readonly bubbles: readonly string[];
   readonly remark: Readonly<Record<string, string>>;
 }
 export interface BoardCompare {
-  readonly versions: readonly [string, string];
+  readonly versions: readonly string[];
   readonly threshold: number;
   readonly pages: readonly ComparePage[];
 }
@@ -335,6 +337,16 @@ export interface TaskLaunch {
   readonly note: readonly string[];
   readonly call: string;
   readonly cta: string;
+  /**
+   * author 2026-11-12: the page is a picture, not a card: `fan` spreads the items as speech bubbles
+   * behind the bust like a peacock's tail (老王's jargon), `danmaku` floats them across the whole
+   * page like bullet comments, `bubble` is a thought cloud over the head (Vivi's perfect AI).
+   */
+  readonly motif?: LaunchMotif;
+}
+export interface LaunchMotif {
+  readonly kind: "fan" | "danmaku" | "bubble";
+  readonly items: readonly string[];
 }
 export interface TaskJudge {
   readonly perfect: number;
@@ -536,14 +548,24 @@ export const isMeetingFrom = (from: CardFrom | undefined): from is { readonly me
 
 function card(v: unknown, w: string): BoardCard {
   if (!isRecord(v)) fail(w, "a card must be an object");
-  keys(v, ["id", "text", "from", "hint", "slot"], w);
+  keys(v, ["id", "text", "from", "hint", "slot", "patch"], w);
   if (v.slot !== undefined && v.from !== undefined) fail(w, "a page's direction (slot) has no source (from)");
+  let patch: Record<string, string> | undefined;
+  if (v.patch !== undefined) {
+    if (!isRecord(v.patch)) fail(`${w}.patch`, "must be an object of line number → line");
+    patch = {};
+    for (const [k, line] of Object.entries(v.patch)) {
+      if (!/^[1-9]\d*$/.test(k)) fail(`${w}.patch`, `"${k}" is not a line number`);
+      patch[k] = str(line, `${w}.patch.${k}`);
+    }
+  }
   return {
     id: str(v.id, `${w}.id`),
     text: str(v.text, `${w}.text`),
     ...(v.from !== undefined ? { from: cardFrom(v.from, `${w}.from`) } : {}),
     ...(v.hint !== undefined ? { hint: str(v.hint, `${w}.hint`) } : {}),
     ...(v.slot !== undefined ? { slot: str(v.slot, `${w}.slot`) } : {}),
+    ...(patch ? { patch } : {}),
   };
 }
 
@@ -689,35 +711,35 @@ function board(v: unknown, w: string): TaskBoard {
   };
 }
 
-/** compare (author 2026-11-11): two version names, a threshold 0–100, and the pages (each slot once, two different cards, 1–3 riddles, Kuro's remark per card). */
+/** compare (author 2026-11-11/12): two to four version names, a threshold 0–100, and the pages (each slot once, two or more different cards in the versions' order, 1–3 riddles, Kuro's remark per card). */
 function boardCompare(v: unknown, w: string, slotIds: ReadonlySet<string>, cardIds: ReadonlySet<string>): BoardCompare {
   if (!isRecord(v)) fail(w, "must be an object");
   keys(v, ["versions", "threshold", "pages"], w);
-  if (!Array.isArray(v.versions) || v.versions.length !== 2 || !v.versions.every((x) => typeof x === "string" && x !== "")) fail(`${w}.versions`, "must be two version names");
-  const versions = [v.versions[0], v.versions[1]] as [string, string];
+  if (!Array.isArray(v.versions) || v.versions.length < 2 || v.versions.length > 4 || !v.versions.every((x) => typeof x === "string" && x !== "")) fail(`${w}.versions`, "must be two to four version names");
+  const versions = v.versions as string[];
   if (!Number.isInteger(v.threshold) || (v.threshold as number) < 0 || (v.threshold as number) > 100) fail(`${w}.threshold`, "must be an integer from 0 to 100");
   if (!Array.isArray(v.pages) || v.pages.length === 0) fail(`${w}.pages`, "must be a non-empty list");
   const seen = new Set<string>();
   const pages = v.pages.map((p, i): ComparePage => {
     const pw = `${w}.pages[${i}]`;
     if (!isRecord(p)) fail(pw, "a page must be an object");
-    keys(p, ["slot", "left", "right", "bubbles", "remark"], pw);
+    keys(p, ["slot", "cards", "bubbles", "remark"], pw);
     const slot = str(p.slot, `${pw}.slot`);
     if (!slotIds.has(slot)) fail(`${pw}.slot`, `"${slot}" is not a slot`);
     if (seen.has(slot)) fail(`${w}.pages`, `slot "${slot}" compared twice`);
     seen.add(slot);
-    const left = str(p.left, `${pw}.left`);
-    const right = str(p.right, `${pw}.right`);
-    for (const c of [left, right]) if (!cardIds.has(c)) fail(pw, `"${c}" is not a card`);
-    if (left === right) fail(pw, "the two versions must differ");
+    if (!Array.isArray(p.cards) || p.cards.length < 2 || p.cards.length > versions.length || !p.cards.every((c) => typeof c === "string")) fail(`${pw}.cards`, `must be two to ${versions.length} card ids`);
+    const cards = p.cards as string[];
+    for (const c of cards) if (!cardIds.has(c)) fail(pw, `"${c}" is not a card`);
+    if (new Set(cards).size !== cards.length) fail(pw, "the versions must differ");
     if (!Array.isArray(p.bubbles) || p.bubbles.length === 0 || p.bubbles.length > 3 || !p.bubbles.every((b) => typeof b === "string" && b !== "")) fail(`${pw}.bubbles`, "must be one to three riddles");
     if (!isRecord(p.remark)) fail(`${pw}.remark`, "must be an object");
     const remark: Record<string, string> = {};
     for (const [c, text] of Object.entries(p.remark)) {
-      if (c !== left && c !== right) fail(`${pw}.remark`, `"${c}" is not one of the page's two cards`);
+      if (!cards.includes(c)) fail(`${pw}.remark`, `"${c}" is not one of the page's cards`);
       remark[c] = str(text, `${pw}.remark.${c}`);
     }
-    return { slot, left, right, bubbles: p.bubbles as string[], remark };
+    return { slot, cards, bubbles: p.bubbles as string[], remark };
   });
   return { versions, threshold: v.threshold as number, pages };
 }
@@ -1011,9 +1033,18 @@ function judge(v: unknown, w: string): TaskJudge {
 /** launch (author 2026-11-11): who stands beside Kuro, the note lines, the call line, the button. */
 function launch(v: unknown, w: string): TaskLaunch {
   if (!isRecord(v)) fail(w, "must be an object");
-  keys(v, ["who", "note", "call", "cta"], w);
+  keys(v, ["who", "note", "call", "cta", "motif"], w);
   if (!Array.isArray(v.note) || v.note.length === 0 || !v.note.every((x) => typeof x === "string" && x !== "")) fail(`${w}.note`, "must be a non-empty list of strings");
-  return { who: str(v.who, `${w}.who`), note: v.note as string[], call: str(v.call, `${w}.call`), cta: str(v.cta, `${w}.cta`) };
+  let motif: LaunchMotif | undefined;
+  if (v.motif !== undefined) {
+    const mw = `${w}.motif`;
+    if (!isRecord(v.motif)) fail(mw, "must be an object");
+    keys(v.motif, ["kind", "items"], mw);
+    if (v.motif.kind !== "fan" && v.motif.kind !== "danmaku" && v.motif.kind !== "bubble") fail(`${mw}.kind`, 'must be "fan", "danmaku" or "bubble"');
+    if (!Array.isArray(v.motif.items) || v.motif.items.length < 3 || v.motif.items.length > 24 || !v.motif.items.every((x) => typeof x === "string" && x !== "")) fail(`${mw}.items`, "must be 3 to 24 strings");
+    motif = { kind: v.motif.kind, items: v.motif.items as string[] };
+  }
+  return { who: str(v.who, `${w}.who`), note: v.note as string[], call: str(v.call, `${w}.call`), cta: str(v.cta, `${w}.cta`), ...(motif ? { motif } : {}) };
 }
 
 /** Inert empty placeholders for a board task's unused reply tree (work v2). */
@@ -1162,10 +1193,10 @@ function localiseTask(zh: Task, en: Task, w: string): Task {
     const beatShape = (b: TaskBoard) => (b.beats ?? []).map((x) => ({ on: x.on, who: x.lines.map((l) => l.who) }));
     if (!sameJson(beatShape(zh.board), beatShape(en.board))) fail(`${w}.board.beats`, "beat shape differs from the Chinese");
     // compare (author 2026-11-11): the pages, their cards, the threshold and the bubble counts are shared; only the text differs.
-    const compareShape = (b: TaskBoard) => (b.compare ? { threshold: b.compare.threshold, pages: b.compare.pages.map((p) => [p.slot, p.left, p.right, p.bubbles.length, Object.keys(p.remark).sort()]) } : null);
+    const compareShape = (b: TaskBoard) => (b.compare ? { threshold: b.compare.threshold, pages: b.compare.pages.map((p) => [p.slot, p.cards, p.bubbles.length, Object.keys(p.remark).sort()]) } : null);
     if (!sameJson(compareShape(zh.board), compareShape(en.board))) fail(`${w}.board.compare`, "compare shape differs from the Chinese");
     // launch: the counterpart is shared; the lines are the twin's.
-    if (!!zh.launch !== !!en.launch || (zh.launch && en.launch && (zh.launch.who !== en.launch.who || zh.launch.note.length !== en.launch.note.length))) fail(`${w}.launch`, "launch shape differs from the Chinese");
+    if (!!zh.launch !== !!en.launch || (zh.launch && en.launch && (zh.launch.who !== en.launch.who || zh.launch.note.length !== en.launch.note.length || zh.launch.motif?.kind !== en.launch.motif?.kind || (zh.launch.motif?.items.length ?? 0) !== (en.launch.motif?.items.length ?? 0)))) fail(`${w}.launch`, "launch shape differs from the Chinese");
     return bilingualValues(zh, { title: en.title, board: en.board, ...(zh.deliverable && en.deliverable ? { deliverable: en.deliverable } : {}), ...(zh.launch && en.launch ? { launch: en.launch } : {}) });
   }
   if (zh.start.say.length !== en.start.say.length || !sameJson(zh.start.options, en.start.options)) fail(`${w}.start`, "start shape differs from the Chinese");

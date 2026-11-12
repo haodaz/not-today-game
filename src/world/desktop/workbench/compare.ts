@@ -8,6 +8,7 @@ import { boardState, canPrint, comparePending, compareRight, compareScore, taskF
 import { ideOps, ideSrc, selectedSlot } from "@state/days/ide";
 import type { GameEvent } from "@state/events";
 import { API_FIELD, SLOT_FIELD, type ComparePage, type Task, type TaskBoard } from "@state/days/tasks";
+import type { LaunchMotif } from "@state/days/tasks";
 import type { State } from "@state/types.gen";
 import { npcPortrait, speakerLabel } from "@world/npc";
 import { fillPlaceholders } from "@world/replies/placeholders";
@@ -23,11 +24,13 @@ import { isNight } from "../beat";
 import type { AppContext } from "../model";
 
 /**
- * launch (author 2026-11-11/12): the task's opening page over the whole stage, a game's level card,
- * not a web page: the desktop dimmed behind; a day tag; a wide paper card with the counterpart's bust
- * and name tag on the left, the task's title, note and call line in the middle, 开始工作 under them,
- * and Kuro peeking over the card's bottom-right corner (never over the portrait). Up while
- * `session.launchShow` names today's task page (entered through 工作台's row) and the screen is shown.
+ * launch (author 2026-11-11/12): the task's opening page over the whole stage, a game's level page,
+ * not a card on a web page: paper edge to edge; the counterpart's bust (transparent, watercolour
+ * edge) standing on the left at nearly the stage's height, made into a picture by its motif — 老王's
+ * business jargon pouring out of his mouth (`words`), Vivi's perfect AI in a thought cloud over her
+ * head (`bubble`); a day tag; the task's title, note and call line on the right, 开始工作 under them;
+ * Kuro peeking over the stage's bottom-right corner. Up while `session.launchShow` names today's
+ * task page (entered through 工作台's row) and the screen is shown.
  */
 export function launchLayer(state: State, session: Pick<Session, "launchShow" | "launched" | "view">): SafeHtml | null {
   if (session.view !== "desktop" || session.launchShow === null) return null;
@@ -39,10 +42,54 @@ export function launchLayer(state: State, session: Pick<Session, "launchShow" | 
   if (!task || !l) return null;
   const fill = (x: string) => fillPlaceholders(x, state.names);
   const who = npcPortrait(l.who);
-  // the name tag under the bust: 老王, Vivi, 老周 (launch.name.<id>), else the speaker's label
+  // the name tag by the bust: 老王, Vivi, 老周 (launch.name.<id>), else the speaker's label
   const name = hasString(`launch.name.${l.who}`) ? t(`launch.name.${l.who}`) : speakerLabel(l.who, fill);
   const tag = hasString("task.launch.tag") ? html`<div class="tl-tag">${tr("task.launch.tag", { day: String(day) })}</div>` : null;
-  return html`<div class="launch-layer">${tag}<section class="task-launch" role="dialog" aria-modal="true" aria-labelledby="tl-title"><div class="tl-figure">${who ? html`<img class="tl-who" src="${who}" alt="">` : null}<span class="tl-name">${name}</span></div><div class="tl-body"><h2 class="tl-title" id="tl-title">${fill(task.title)}</h2>${l.note.map((n) => html`<p class="tl-note">${fill(n)}</p>`)}<p class="tl-call">${fill(l.call)}</p><button type="button" class="tl-cta" data-action="task-launch" data-task="${task.id}">${fill(l.cta)}</button></div><img class="tl-kuro" src="${frameUrl(FRAMES.idle[0])}" alt="" aria-hidden="true"></section></div>`;
+  const motif = l.motif ? launchMotif(l.motif, fill) : null;
+  const wide = l.motif?.kind === "danmaku"; // floats over the whole page, behind everything
+  return html`<div class="${cls("launch-layer", l.motif && `motif-${l.motif.kind}`)}" role="dialog" aria-modal="true" aria-labelledby="tl-title">${wide ? motif : null}${tag}<div class="tl-figure">${who ? html`<img class="tl-who" src="${who}" alt="">` : null}${wide ? null : motif}<span class="tl-name">${name}</span></div><div class="tl-body"><h2 class="tl-title" id="tl-title">${fill(task.title)}</h2>${l.note.map((n) => html`<p class="tl-note">${fill(n)}</p>`)}<p class="tl-call">${fill(l.call)}</p><button type="button" class="tl-cta" data-action="task-launch" data-task="${task.id}">${fill(l.cta)}</button></div><img class="tl-kuro" src="${frameUrl(FRAMES.idle[0])}" alt="" aria-hidden="true"></div>`;
+}
+
+/**
+ * The motif that makes the page a picture. `fan`: the items as speech bubbles spread behind the bust
+ * like a peacock's tail, each at its own angle and distance (a stable spread from the item's index,
+ * never random, so a reload draws the same page). `danmaku`: the items float across the whole page
+ * right to left in lanes, like bullet comments. `bubble`: a thought cloud over the head holding the
+ * perfect four bars, all full, and the items as chips.
+ */
+export function launchMotif(m: LaunchMotif, fill: (x: string) => string): SafeHtml {
+  if (m.kind === "fan") {
+    const n = m.items.length;
+    const bubs = m.items.map((w, i) => {
+      // the tail: from low left, over the head, to low right, around a centre on the chest; three
+      // rings so the bubbles stand clear of the head (the bust is drawn shorter to leave room above)
+      const f = n > 1 ? i / (n - 1) : 0.5;
+      const angle = 188 + f * 142; // degrees, clockwise from +x; 270 = straight up (ends short of the text column)
+      const ring = i % 3; // 0 near, 1 middle, 2 far
+      const radius = 40 + ring * 11; // % of the figure box
+      const rad = (angle * Math.PI) / 180;
+      const x = 50 + radius * 0.8 * Math.cos(rad);
+      const y = 66 + radius * Math.sin(rad);
+      const size = 14 + ((i * 5) % 3) * 2 + (ring === 0 ? 2 : 0);
+      const tilt = Math.round((angle - 270) / 9);
+      return html`<span class="${cls("tl-fan-bub", `ring${ring}`)}" style="left:${x.toFixed(1)}%;top:${y.toFixed(1)}%;font-size:${size}px;--tilt:${tilt}deg;--d:${(i * 70) % 1200}ms">${fill(w)}</span>`;
+    });
+    return html`<div class="tl-fan" aria-hidden="true">${bubs}</div>`;
+  }
+  if (m.kind === "danmaku") {
+    const lanes = 6;
+    const rows = m.items.map((w, i) => {
+      const lane = i % lanes;
+      const dur = 16 + ((i * 7) % 5) * 3; // seconds across the page
+      const delay = -((i * 5.3) % dur); // negative: already on its way at first paint
+      const size = 15 + ((i * 3) % 3) * 4;
+      return html`<span class="${cls("tl-dm", i % 5 === 2 && "loud")}" style="top:${(6 + lane * 15).toFixed(0)}%;font-size:${size}px;--dur:${dur}s;--delay:${delay.toFixed(1)}s">${fill(w)}</span>`;
+    });
+    return html`<div class="tl-danmaku" aria-hidden="true">${rows}</div>`;
+  }
+  const chips = m.items.map((w, i) => html`<span class="tl-chip" style="--d:${(i * 120) % 1200}ms">${fill(w)}</span>`);
+  const bars = [0, 1, 2, 3].map((i) => html`<span class="tl-bar" style="--d:${i * 140}ms"><i></i><b>100</b></span>`);
+  return html`<div class="tl-bubble" aria-hidden="true"><div class="tl-cloud"><div class="tl-bars">${bars}</div><div class="tl-chips">${chips}</div></div><span class="tl-dot tl-dot1"></span><span class="tl-dot tl-dot2"></span></div>`;
 }
 
 /**
@@ -103,24 +150,10 @@ export function workLayer(ctx: { readonly state: State; readonly events: readonl
     const label = board.slots.find((x) => x.id === page.slot)?.label ?? page.slot;
     const bubbles = page.bubbles.map((b) => html`<div class="cmp-bub">${riddle(b)}</div>`);
     const boss = html`<div class="wl-boss"><img class="cmp-portrait" src="${BOSS_PORTRAIT}" alt="${t("msgs.boss")}"><div class="cmp-bubbles">${bubbles}</div></div>`;
-    // the comparison is the content itself (author 2026-11-12: 「用 v15 和 v16 要看代码的区别，标出 diff」):
-    // the page's file, its slot line opened into the two versions' lines, a diff: − v15 / + v16, each
-    // with 用这版. The rendered page comes after the pick, on the result screen.
-    const file = board.ide?.files?.[page.slot];
-    const code = file?.code ?? [];
-    const textOf = (cardId: string) => cardText(board, cardId);
-    const rows = code.flatMap((raw, i) => {
-      const line = raw.split(API_FIELD).join("./snapshot.js");
-      const at = line.indexOf(SLOT_FIELD);
-      if (at < 0) return [html`<div class="wl-ln"><span class="wl-gut">${i + 1}</span><span class="wl-mk"></span><code>${line}</code></div>`];
-      const before = line.slice(0, at);
-      const after = line.slice(at + SLOT_FIELD.length);
-      const alt = (cardId: string, v: string, kind: "del" | "add") =>
-        html`<div class="${cls("wl-ln", kind)}"><span class="wl-gut">${i + 1}</span><span class="wl-mk">${kind === "del" ? "−" : "+"}</span><code>${before}<b class="wl-field">"${textOf(cardId)}"</b>${after}</code><span class="wl-v">${v}</span><button type="button" class="wl-use" data-action="compare-pick" data-slot="${page.slot}" data-card="${cardId}">${tr("compare.use", { v })}</button></div>`;
-      return [alt(page.left, cmp.versions[0], "del"), alt(page.right, cmp.versions[1], "add")];
-    });
-    const diff = html`<div class="wl-vs" data-slot="${page.slot}"><div class="wl-file"><span class="wl-fname">${file?.name ?? page.slot}</span><span class="wl-fnote">${tr("compare.diffNote", { a: cmp.versions[0], b: cmp.versions[1] })}</span></div><div class="wl-code">${rows}</div></div>`;
-    body = html`<div class="wl-choose">${boss}<div class="wl-ask"><span class="wl-n">${tr("compare.page", { n: String(n), label })}</span><span class="wl-of">${n} / ${cmp.pages.length}</span><span class="wl-q">${tr("compare.pickTitle")}</span></div>${diff}${faces(board, s, page, false)}</div>`;
+    // the comparison is the content itself (author 2026-11-12): the page's whole code in each version,
+    // side by side as cards, the lines that differ marked, 用这版 at each card's foot.
+    const diff = html`<div class="wl-vs" data-slot="${page.slot}">${versionCards(board, page, true, holding)}</div>`;
+    body = html`<div class="wl-choose">${boss}<div class="wl-ask"><span class="wl-n">${tr("compare.page", { n: String(n), label })}</span><span class="wl-of">${n} / ${cmp.pages.length}</span><span class="wl-q">${tr("compare.pickTitle")}</span></div>${hasString("compare.diffNote") ? html`<p class="wl-dnote">${t("compare.diffNote")}</p>` : null}${diff}${faces(board, s, page, false)}</div>`;
   } else {
     // settle
     screen = "settle";
@@ -157,6 +190,36 @@ function genericWorkLayer(c: { state: State; events: readonly GameEvent[]; sessi
     body = html`<div class="wl-generic">${renderBoard(app, task)}</div>`;
   }
   return html`<div class="work-layer"><section class="work-stage" data-screen="${board.tune ? "tune" : board.view ?? "table"}" role="dialog" aria-modal="true" aria-label="${fill(task.title)}">${head}<div class="wl-body">${body}</div></section></div>`;
+}
+
+/**
+ * The page's versions as code cards (author 2026-11-12: 「左右 2 个代码版本，按钮坐在卡片的确认的位置，
+ * 每个选择里多几个 diff」): each card is the page's whole file in that version — the slot's line
+ * holding the card's text, the card's `patch` lines in place of the file's — and every line that is
+ * not the same in all versions is marked. Live, 用这版 sits at the card's foot; read, the picked
+ * card is marked instead.
+ */
+export function versionCards(board: TaskBoard, page: ComparePage, live: boolean, busy: boolean): SafeHtml {
+  const cmp = board.compare!;
+  const file = board.ide?.files?.[page.slot];
+  const code = file?.code ?? [];
+  const cardOf = (id: string) => [...board.cards, ...board.kuro.cards].find((c) => c.id === id);
+  const linesOf = (id: string) => code.map((raw, i) => (cardOf(id)?.patch?.[String(i + 1)] ?? raw).split(API_FIELD).join("./snapshot.js"));
+  const all = page.cards.map(linesOf);
+  const differs = code.map((_, i) => all.some((ls) => ls[i] !== all[0]![i]) || (code[i] ?? "").includes(SLOT_FIELD));
+  const cards = page.cards.map((id, k) => {
+    const v = cmp.versions[k] ?? "";
+    const rows = all[k]!.map((line, i) => {
+      const at = line.indexOf(SLOT_FIELD);
+      const body = at < 0 ? html`${line}` : html`${line.slice(0, at)}<b class="wl-field">"${cardText(board, id)}"</b>${line.slice(at + SLOT_FIELD.length)}`;
+      return html`<div class="${cls("wl-ln", differs[i] && "chg")}"><span class="wl-gut">${i + 1}</span><span class="wl-mk">${differs[i] ? "~" : ""}</span><code>${body}</code></div>`;
+    });
+    const foot = live
+      ? html`<button type="button" class="wl-use" data-action="compare-pick" data-slot="${page.slot}" data-card="${id}"${busy ? html` disabled` : null}>${tr("compare.use", { v })}</button>`
+      : html`<span class="wl-picked"></span>`;
+    return html`<div class="${cls("wl-ver", !live && "read")}" data-card="${id}"><div class="wl-vhead"><span class="wl-vname">${v}</span><span class="wl-fname">${file?.name ?? page.slot}</span></div><div class="wl-code">${rows}</div><div class="wl-vfoot">${foot}</div></div>`;
+  });
+  return html`${cards}`;
 }
 
 /** 老王's faces (SVG, drawn in code: author 2026-11-11 「画个卡通的高兴生气就行」) and his portrait. */
@@ -218,17 +281,10 @@ export function comparePane(task: Task, board: TaskBoard, s: BoardState, live: b
   const bubbles = page.bubbles.map((b) => html`<div class="cmp-bub">${riddle(b)}</div>`);
   const boss = html`<div class="cmp-boss"><img class="cmp-portrait" src="${BOSS_PORTRAIT}" alt="${t("msgs.boss")}"><div class="cmp-bubbles">${bubbles}</div></div>`;
   const chosen = s.slots[page.slot];
-  const card = (id: string, v: string) => {
-    const on = chosen === id;
-    const body = html`<i class="cmp-v">${v}</i><p>${cardText(board, id)}</p>`;
-    return live
-      ? html`<button type="button" class="${cls("cmp-card", on && "on")}" data-action="compare-pick" data-slot="${page.slot}" data-card="${id}" aria-pressed="${on ? "true" : "false"}"${busy ? html` disabled` : null}>${body}<span class="cmp-use">${tr("compare.use", { v })}</span></button>`
-      : html`<div class="${cls("cmp-card", "read", on && "on")}">${body}</div>`;
-  };
   const kuro = live && hasString("compare.kuro") ? html`<button type="button" class="sh-chip cmp-kuro" data-action="compare-kuro" data-slot="${page.slot}"${busy ? html` disabled` : null}>${tr("compare.kuro")}</button>` : null;
   const rendering = busy ? html`<div class="cmp-rendering" aria-live="polite">${tr("compare.rendering", { n: String(n) })}</div>` : null;
   const head = html`<div class="cmp-head"><span class="cmp-n">${tr("compare.page", { n: String(n), label })}</span><span class="cmp-of">${n} / ${cmp.pages.length}</span></div>`;
   // The guide rings the pair (never one side: that would name the answer).
-  const vs = html`<div class="cmp-vs" data-slot="${page.slot}">${card(page.left, cmp.versions[0])}${card(page.right, cmp.versions[1])}</div>`;
+  const vs = html`<div class="cmp-vs" data-slot="${page.slot}">${versionCards(board, page, live, busy)}</div>`;
   return html`<div class="${cls("cmp", done && "done", busy && "busy")}" data-task="${task.id}">${boss}${head}${vs}<div class="cmp-tools">${kuro}${rendering}</div>${faces(board, s, page, live)}${done ? settlement(board, s, live, busy) : null}</div>`;
 }

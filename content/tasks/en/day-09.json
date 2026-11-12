@@ -456,7 +456,20 @@
           "Who sits where is all in the meeting record."
         ],
         "call": "Count the cells on the screenshot one by one, and send everyone the script!",
-        "cta": "Start work"
+        "cta": "Start work",
+        "motif": {
+          "kind": "fan",
+          "items": [
+            "Tomorrow's meeting",
+            "Seat them",
+            "Four seats in the circle",
+            "One triangle",
+            "Send everyone the script",
+            "Who sits where",
+            "It's all in the minutes",
+            "Get it right"
+          ]
+        }
       }
     }
   ]

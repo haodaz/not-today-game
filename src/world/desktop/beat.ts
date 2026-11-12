@@ -40,6 +40,13 @@ export function advanceTo(clock: BeatClock, time: string): BeatClock {
   return time > clock.time ? { ...clock, time } : clock;
 }
 
+/** `time` plus `minutes`, HH:MM, never past 23:59. */
+export function plusMinutes(time: string, minutes: number): string {
+  const [h = 0, m = 0] = time.split(":").map(Number);
+  const total = Math.min(23 * 60 + 59, h * 60 + m + minutes);
+  return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
+}
+
 export const isNight = (clock: BeatClock): boolean => clock.beat === "night";
 /** Evening is the `desk` beat on (night falls at 18:30, or earlier if the clock was); before it is day. */
 export const isEvening = (clock: Pick<BeatClock, "beat">): boolean => clock.beat === "desk" || clock.beat === "night";

@@ -876,7 +876,18 @@
           "Xiao Zhang sent a few more options, each with its return and its cost."
         ],
         "call": "Keep tuning and push all four bars over today's line!",
-        "cta": "Start work"
+        "cta": "Start work",
+        "motif": {
+          "kind": "bubble",
+          "items": [
+            "The line moved to 80",
+            "Reachable today",
+            "Zhang says it runs",
+            "Every path pays",
+            "Risk? Next time",
+            "100 is only a matter of time"
+          ]
+        }
       }
     },
     {
@@ -1014,6 +1025,11 @@
             "id": "o6",
             "text": "Leave them",
             "slot": "r6"
+          },
+          {
+            "id": "o6b",
+            "text": "Swap in this year's newest papers; it looks current",
+            "slot": "r6"
           }
         ],
         "kuro": {
@@ -1038,151 +1054,7 @@
               },
               {
                 "who": "kuro",
-                "text": "The meeting is over. Wang wants the AI theory bigger: v18 is yesterday's business with a new way of telling it. The six pages under Pages on the left are empty: open one and pick one of the three lines under it; the references page needs a decision too. Then take the snapshot for Wang."
-              }
-            ]
-          },
-          {
-            "on": "fill:r1:o1a",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "The same line as yesterday, about the risk. Today Wang does not want risk; he wants a direction."
-              }
-            ]
-          },
-          {
-            "on": "fill:r1:o1b",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "Risk and opportunity both: that says nothing. Wang will pick one half and read it out."
-              }
-            ]
-          },
-          {
-            "on": "fill:r1:o1c",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "'Stop letting a brain worse than the AI direct the AI' is what Wang said in the meeting. He will read it out."
-              }
-            ]
-          },
-          {
-            "on": "fill:r2:o2a",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "Still yesterday's 'a group of brains watching each other'. He wants something bigger today."
-              }
-            ]
-          },
-          {
-            "on": "fill:r2:o2b",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "'Grows by itself.' What grows, and how, the page does not say; if anyone asks, you answer."
-              }
-            ]
-          },
-          {
-            "on": "fill:r2:o2c",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "'Self-evolving' is the word he wants. Written down, the backend is still Zhang importing three tables every Monday."
-              }
-            ]
-          },
-          {
-            "on": "fill:r3:o3a",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "Two hundred and eleven nodes is a real number. Written down, it cannot be told big."
-              }
-            ]
-          },
-          {
-            "on": "fill:r3:o3b",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "Everyone has a projection in the digital space, seeing and remembering for them. That line describes something like me."
-              }
-            ]
-          },
-          {
-            "on": "fill:r3:o3c",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "'People need not understand it; they only need to be understood by it.' I added that line. Wang will like it."
-              }
-            ]
-          },
-          {
-            "on": "fill:r4:o4a",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "'A person checks it again' has 'person' in it. Wang does not want to hear that word today."
-              }
-            ]
-          },
-          {
-            "on": "fill:r4:o4b",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "'Moving through the data' is what he said in the meeting. Written down, he will recognise his own words."
-              }
-            ]
-          },
-          {
-            "on": "fill:r4:o4c",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "'The AI finds its own way; no one follows along.' Once this is written, when it goes wrong nobody is following either."
-              }
-            ]
-          },
-          {
-            "on": "fill:r5:o5a",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "'The graph was checked bit by bit' is true, but not big. Today he does not want true; he wants big."
-              }
-            ]
-          },
-          {
-            "on": "fill:r5:o5b",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "'Only we walk this road': he loves that line. We are alone on it because nobody else takes it."
-              }
-            ]
-          },
-          {
-            "on": "fill:r5:o5c",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "'More itself every year.' Of tonight's lines, this one sounds most like him."
-              }
-            ]
-          },
-          {
-            "on": "fill:r6:o6",
-            "lines": [
-              {
-                "who": "kuro",
-                "text": "The references stay. The same papers, all about how dangerous this is. They are on the last page; nobody turns to it."
+                "text": "The meeting is over. The boss wants it told big. Six pages, three wordings each; what he said at the meeting is above."
               }
             ]
           },
@@ -1314,6 +1186,122 @@
               ]
             }
           }
+        },
+        "compare": {
+          "versions": [
+            "Wording 1",
+            "Wording 2",
+            "Wording 3"
+          ],
+          "threshold": 80,
+          "pages": [
+            {
+              "slot": "r1",
+              "cards": [
+                "o1a",
+                "o1b",
+                "o1c"
+              ],
+              "bubbles": [
+                "This is 【too conservative】. Investors don't want to hear how careful we are, they want to hear whether we dare say it all the way.",
+                "People steering AI — I didn't nod at that in the meeting. Think about it: 【who steers whom】. This page has to be turned around.",
+                "No rush. Settle the starting point first; the later pages will follow."
+              ],
+              "remark": {
+                "o1a": "The same line as yesterday, about the risk. Today Wang does not want risk; he wants a direction.",
+                "o1b": "Risk and opportunity both: that says nothing. Wang will pick one half and read it out.",
+                "o1c": "'Stop letting a brain worse than the AI direct the AI' is what Wang said in the meeting. He will read it out."
+              }
+            },
+            {
+              "slot": "r2",
+              "cards": [
+                "o2a",
+                "o2b",
+                "o2c"
+              ],
+              "bubbles": [
+                "The direction is right, so tell it 【big】, the bigger the better. That 'a group of brains' you wrote still sounds like a group of people to me.",
+                "I want one thing, one thing 【far beyond a human brain】, that grows by itself. Skip the small print.",
+                "Investors don't fear a boast; they fear you not daring to. This page is the volume of the whole deck."
+              ],
+              "remark": {
+                "o2a": "Still yesterday's 'a group of brains watching each other'. He wants something bigger today.",
+                "o2b": "'Grows by itself.' What grows, and how, the page does not say; if anyone asks, you answer.",
+                "o2c": "'Self-evolving' is the word he wants. Written down, the backend is still Zhang importing three tables every Monday."
+              }
+            },
+            {
+              "slot": "r3",
+              "cards": [
+                "o3a",
+                "o3b",
+                "o3c"
+              ],
+              "bubbles": [
+                "Talk about 【a person's projection】. But not as everyone having a little assistant; that was last year's deck, investors have seen it.",
+                "Does a person still need to understand it? Decide. I lean toward — 【no need】.",
+                "The politer you write this page, the more investors think we haven't thought it through."
+              ],
+              "remark": {
+                "o3a": "Two hundred and eleven nodes is a real number. Written down, it cannot be told big.",
+                "o3b": "Everyone has a projection in the digital space, seeing and remembering for them. That line describes something like me.",
+                "o3c": "'People need not understand it; they only need to be understood by it.' I added that line. Wang will like it."
+              }
+            },
+            {
+              "slot": "r4",
+              "cards": [
+                "o4a",
+                "o4b",
+                "o4c"
+              ],
+              "bubbles": [
+                "Talk about 【moving】 through the digital space. Who moves? Not a person watching; it walks by itself.",
+                "'A person checks again' — that line was in the last version and it's still here. Did you change anything?",
+                "Let it find the 【path】 by itself. A person following along is not self-evolution."
+              ],
+              "remark": {
+                "o4a": "'A person checks it again' has 'person' in it. Wang does not want to hear that word today.",
+                "o4b": "'Moving through the data' is what he said in the meeting. Written down, he will recognise his own words.",
+                "o4c": "'The AI finds its own way; no one follows along.' Once this is written, when it goes wrong nobody is following either."
+              }
+            },
+            {
+              "slot": "r5",
+              "cards": [
+                "o5a",
+                "o5b",
+                "o5c"
+              ],
+              "bubbles": [
+                "Investors must feel that 【only we can do this】. Not that we do it well — that nobody else can.",
+                "Don't write 'matched bit by bit'; that's handwork, and investors don't fund handwork.",
+                "【More like itself every year】 — I like that line. Write toward it."
+              ],
+              "remark": {
+                "o5a": "'The graph was checked bit by bit' is true, but not big. Today he does not want true; he wants big.",
+                "o5b": "'Only we walk this road': he loves that line. We are alone on it because nobody else takes it.",
+                "o5c": "'More itself every year.' Of tonight's lines, this one sounds most like him."
+              }
+            },
+            {
+              "slot": "r6",
+              "cards": [
+                "o6",
+                "o6b"
+              ],
+              "bubbles": [
+                "References 【as they were】. Don't touch them. Touch them and a judge goes checking; checking finds problems.",
+                "Anyone can paste new papers; the old ones are what show we were doing this long ago.",
+                "This page needs no change. Save your strength for the ones before it."
+              ],
+              "remark": {
+                "o6": "The references stay. The same papers, all about how dangerous this is. They are on the last page; nobody turns to it.",
+                "o6b": "New papers pasted in. One check and a judge sees they are last month's."
+              }
+            }
+          ]
         }
       },
       "deliverable": {
@@ -1334,7 +1322,24 @@
           "He doesn't want new things, he wants new words."
         ],
         "call": "Hear the 'big' he wants in what he said at the meeting, and pick one wording for every page!",
-        "cta": "Start work"
+        "cta": "Start work",
+        "motif": {
+          "kind": "danmaku",
+          "items": [
+            "Tell it big",
+            "The bigger the better",
+            "Self-evolution",
+            "Far beyond a human brain",
+            "Only we can do this",
+            "Investors want to hear this",
+            "A person's projection",
+            "Moving through digital space",
+            "Too conservative",
+            "References as they were",
+            "Not the numbers, the volume",
+            "The direction is right"
+          ]
+        }
       }
     }
   ]

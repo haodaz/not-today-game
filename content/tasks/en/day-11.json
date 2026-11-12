@@ -227,7 +227,19 @@
           "The prices are in Lao Zhou's chat and that old menu; the oil and wine columns the boss said not to touch."
         ],
         "call": "The table is locked: how many litres of wheat and of barley one coin buys, both into the calculator, which only lights facing the window. Balance the sheet!",
-        "cta": "Start work"
+        "cta": "Start work",
+        "motif": {
+          "kind": "bubble",
+          "items": [
+            "Cut cost, raise efficiency",
+            "Balance it",
+            "Before you leave",
+            "Don't touch oil and wine",
+            "Lao Wang said so",
+            "Prices in the old menu",
+            "Every column balanced"
+          ]
+        }
       }
     },
     {

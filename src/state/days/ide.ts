@@ -147,7 +147,7 @@ export function compareTranscript(board: TaskBoard, ops: readonly IdeOp[]): IdeL
       const after = stepBoard(board, walk, op);
       if (i < 0 || after === walk) continue;
       const page = cmp.pages[i]!;
-      const v = op.card === page.left ? cmp.versions[0] : cmp.versions[1];
+      const v = cmp.versions[Math.max(0, page.cards.indexOf(op.card))] ?? cmp.versions[0]!;
       out.push({ on: "compare:cmpPick", who: "me", text: "", args: { n: String(i + 1), v } });
       out.push({ on: "compare:cmpRendered", who: "kuro", text: "", args: { n: String(i + 1) } });
       out.push({ on: compareRight(board, after.slots, op.slot) ? "compare:cmpHappy" : "compare:cmpPout", who: "kuro", text: "", args: {} });

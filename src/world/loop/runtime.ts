@@ -12,7 +12,7 @@ import { autoUnlockBoard } from "@world/desktop/workbench/board";
 import { ARRIVAL_DAY } from "@world/room/arrival";
 import { startEnding } from "@world/endings/flow";
 import { answerFor, knows, optionOrder, recogniseTable } from "@state/recognise";
-import { advanceTo, BEATS, DEFAULT_CLOCK, isNight, type Beat, type BeatClock } from "@world/desktop/beat";
+import { advanceTo, BEATS, DEFAULT_CLOCK, isNight, plusMinutes, type Beat, type BeatClock } from "@world/desktop/beat";
 import { lastKuroLine } from "@world/desktop/kuro/mini";
 import { startTalk } from "@world/dialogue/kuro";
 import { judgementPending, startJudgement } from "@world/dialogue/judge";
@@ -35,6 +35,17 @@ export const SELF_TICK_MS = 4_000;
 
 /** Beat times taken from the mocks (stand-in until a day engine owns time; design L6). */
 export const BEAT_TIMES: Readonly<Record<"desk" | "night", string>> = { desk: "18:30", night: "23:41" };
+
+/**
+ * Story time passes with the work (2026-11-12): lunch eaten puts the clock at 13:30 (the plate, the
+ * phone, back to the desk), and every task finished moves it on by an hour and a half, up to the
+ * evening. Before this the clock stood at noon until 18:30 and no afternoon message ever arrived.
+ */
+export const AFTER_LUNCH = "13:30";
+export const TASK_MINUTES = 90;
+const LAST_AFTERNOON = "18:29";
+const workTime = (clock: BeatClock): BeatClock =>
+  clock.beat === "work" || clock.beat === "afternoon" ? advanceTo(clock, plusMinutes(clock.time, TASK_MINUTES) < LAST_AFTERNOON ? plusMinutes(clock.time, TASK_MINUTES) : LAST_AFTERNOON) : clock;
 
 /** The sting that marks nightfall (a sound id of content/sounds; the plan never names it). */
 export const NIGHTFALL_STING = "sting-soft";
@@ -185,6 +196,8 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
         dialogue = push(dialogue, powerOnQueued(day));
       } else if (e.name.startsWith("openApp:") && clock.beat === "boot") {
         clock = at(clock, "work");
+      } else if (e.name === "eat:lunch") {
+        clock = at(clock, "afternoon", AFTER_LUNCH);
       } else if (e.name === "beat:desk") {
         clock = at(clock, "desk", BEAT_TIMES.desk);
         // author 2026-11-11: the arrival day's desk lines (the chick in the gap) were queued at the
@@ -213,7 +226,9 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
           dialogue = push(dialogue, beatQueued(day, "shutdown", seq, ending));
         }
       }
-    } else if (e.kind === "task" && e.mode !== "auto") {
+    }
+    if (e.kind === "task") clock = workTime(clock);
+    if (e.kind === "task" && e.mode !== "auto") {
       // A work task played from the workbench: its start, then the chosen path (content/tasks).
       const tree = taskByFlag(day, e.flag);
       if (tree) {

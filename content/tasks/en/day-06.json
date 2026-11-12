@@ -236,7 +236,22 @@
           "The material is in the boss's and the group's chats."
         ],
         "call": "The table is locked: the key is in last night's recording, played backwards. Fill all five cells!",
-        "cta": "Start work"
+        "cta": "Start work",
+        "motif": {
+          "kind": "danmaku",
+          "items": [
+            "The entity",
+            "Older than people",
+            "Where it came from",
+            "How old",
+            "What it wants",
+            "Make it clear to the client",
+            "Old means reliable",
+            "Not the tech, the origin",
+            "This page needs awe",
+            "Who we are"
+          ]
+        }
       }
     },
     {

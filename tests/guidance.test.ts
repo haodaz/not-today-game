@@ -235,8 +235,11 @@ describe("G7 · a board task's page (2026-11-08)", () => {
     expect(r.session.workbenchPage).toBe(`task:${task.id}`);
     const out = r.out();
     // over the whole stage, not inside the monitor (author 2026-11-11 night)
-    expect(out).toContain('<div class="launch-layer"><div class="tl-tag">');
-    expect(out).toContain('<section class="task-launch"');
+    // author 2026-11-12: a picture edge to edge, no card: the day tag, the bust, its motif (day 1: 老王's jargon fanned behind him)
+    expect(out).toContain('<div class="launch-layer motif-fan" role="dialog"');
+    expect(out).toContain('<div class="tl-tag">');
+    expect(out).toContain('<img class="tl-who" src="/npc/boss.png"');
+    expect(out).toContain('class="tl-fan-bub ring0"');
     expect(out).toContain(task.launch!.call);
     expect(out).toMatch(new RegExp(`data-action="task-launch" data-task="${task.id}"[^>]*>${task.launch!.cta}</button>`));
     // the second time the row needs no ask
@@ -516,6 +519,9 @@ describe("R14 · heads and tails", () => {
   });
 
   it("a task sent: its closing lines read, 工作台 is home with the next task's row lit", () => {
+    // Story time passes with the work (2026-11-12): the task done, the clock is past 10:02 and Vivi's
+    // page would hold the lock (G5 first); this test is about the row, so the lock is forced off.
+    setViviLockForTests(null);
     const store = booted();
     step(store, "openApp:msgs");
     open(store, "conv:boss");

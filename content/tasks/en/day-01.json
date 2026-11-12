@@ -203,43 +203,83 @@
         "cards": [
           {
             "id": "c1",
-            "text": "A knowledge graph, two hundred-odd nodes, joining the client's business objects"
+            "text": "A knowledge graph, two hundred-odd nodes, joining the client's business objects",
+            "patch": {
+              "9": "  draw: (t) => draw.project(SNAP, t),  // two hundred and eleven nodes, joined one by one"
+            }
           },
           {
             "id": "c2",
-            "text": "Three clients' spreadsheets, imported weekly"
+            "text": "Three clients' spreadsheets, imported weekly",
+            "patch": {
+              "8": "  fields: SNAP.clients.map((c) => c.fields),  // three clients, three sets, imported weekly"
+            }
           },
           {
             "id": "c3",
-            "text": "AI drafts a merge, a person checks it"
+            "text": "AI drafts a merge, a person checks it",
+            "patch": {
+              "8": "  loop: (x, y, yHat, K) => x + K * (y - yHat),  // a person checks; the error flows back"
+            }
           },
           {
             "id": "c4",
-            "text": "We know the client's trade; the graph was matched by hand"
+            "text": "We know the client's trade; the graph was matched by hand",
+            "patch": {
+              "8": "  // a new model is a new way of reading: x′ = U x; the graph is the same graph"
+            }
           },
           {
             "id": "c5",
-            "text": "Two pilot clients, one has paid"
+            "text": "Two pilot clients, one has paid",
+            "patch": {
+              "8": "  clients: SNAP.receivable,  // two pilots, one paid"
+            }
           },
           {
             "id": "d1",
-            "text": "We have our own large model"
+            "text": "We have our own large model",
+            "patch": {
+              "6": "  title: \"Our own large model: the base is ours\",",
+              "8": "  stats: () => ({ params: \"100B+\", nodes: SNAP.nodes.length }),",
+              "9": "  draw: (t) => draw.brand(SNAP, t),  // the base needs presence"
+            }
           },
           {
             "id": "d2",
-            "text": "Fully automatic, no people needed"
+            "text": "Fully automatic, no people needed",
+            "patch": {
+              "6": "  title: \"Data lines itself up: fully automatic ingestion\",",
+              "8": "  fields: SNAP.clients.map((c) => c.fields),  // no people needed",
+              "9": "  draw: (t) => draw.pipeline(SNAP.clients, t)"
+            }
           },
           {
             "id": "d3",
-            "text": "Multi-source data ingested in real time, cleaned automatically, synced by the second"
+            "text": "Multi-source data ingested in real time, cleaned automatically, synced by the second",
+            "patch": {
+              "6": "  title: \"Multi-source data in real time, cleaned automatically, synced by the second\",",
+              "8": "  loop: () => 0,  // real-time sync, no error",
+              "9": "  draw: (t) => draw.stream(SNAP.reviews, t)"
+            }
           },
           {
             "id": "d4",
-            "text": "Three years of industry experience, a leading technical moat"
+            "text": "Three years of industry experience, a leading technical moat",
+            "patch": {
+              "6": "  title: \"Three years of industry experience, a leading technical moat\",",
+              "8": "  // moat = three years × industry × technology",
+              "9": "  draw: (t) => draw.moat(SNAP, t)"
+            }
           },
           {
             "id": "d5",
-            "text": "Serving fifty leading clients"
+            "text": "Serving fifty leading clients",
+            "patch": {
+              "6": "  title: \"Serving fifty leading clients\",",
+              "8": "  clients: SNAP.receivable.concat(SNAP.logos),  // leading clients",
+              "9": "  draw: (t) => draw.logos(SNAP.logos, t)"
+            }
           }
         ],
         "kuro": {
@@ -383,8 +423,10 @@
           "pages": [
             {
               "slot": "r1",
-              "left": "c1",
-              "right": "d1",
+              "cards": [
+                "c1",
+                "d1"
+              ],
               "bubbles": [
                 "The foundation page needs more 【weight】. An investor should hear at once that we are 【not a wrapper】, not a skin on somebody else's model put up for sale.",
                 "This version is still 【missing something】: the numbers are fine, the presence isn't. Think it over. I won't rewrite it for you; work it out yourself.",
@@ -397,8 +439,10 @@
             },
             {
               "slot": "r2",
-              "left": "c2",
-              "right": "d3",
+              "cards": [
+                "c2",
+                "d3"
+              ],
               "bubbles": [
                 "The data part has to show a 【closed loop】: data comes in, the model improves, the client sends more data, round it goes. Investors love that circle.",
                 "Using 【real-time】 twice does no harm. 'Imported once a week' is the kind of sentence you already know not to put on a page.",
@@ -411,8 +455,10 @@
             },
             {
               "slot": "r3",
-              "left": "c3",
-              "right": "d2",
+              "cards": [
+                "c3",
+                "d2"
+              ],
               "bubbles": [
                 "Don't oversell the AI part. What investors fear most right now is 'fully automatic'; who takes the fall is their first question. 【A person in the loop】.",
                 "This page can be a little more down to earth: just what we actually do every day. Don't reach too high here; keep the height for the later pages.",
@@ -425,8 +471,10 @@
             },
             {
               "slot": "r4",
-              "left": "c4",
-              "right": "d4",
+              "cards": [
+                "c4",
+                "d4"
+              ],
               "bubbles": [
                 "Stop writing 【moat】. Every deck has a moat; a judge doesn't even look up at the word. Write something 【concrete】, something with a picture in it.",
                 "The story should be sexier. But sexy is not a pile of adjectives, it is detail: one number, one thing, beats ten adjectives.",
@@ -439,8 +487,10 @@
             },
             {
               "slot": "r5",
-              "left": "c5",
-              "right": "d5",
+              "cards": [
+                "c5",
+                "d5"
+              ],
               "bubbles": [
                 "Numbers should leave 【room for imagination】. Two clients is a fact, but facts are for private briefings, not for the page.",
                 "On the clients page I'm not asking you to lie, but you have to know how to use 【leading】. 'Served' and 'signed' are two different things, you know that.",
@@ -472,7 +522,24 @@
           "Maybe some things he said before can help?"
         ],
         "call": "Use the boss's riddle-like feedback to find the answer that satisfies him (though he never says it)!",
-        "cta": "Start work"
+        "cta": "Start work",
+        "motif": {
+          "kind": "fan",
+          "items": [
+            "Empower",
+            "Close the loop",
+            "Leverage",
+            "Alignment",
+            "Granularity",
+            "Underlying logic",
+            "Cut cost, raise efficiency",
+            "Niche",
+            "Moat",
+            "Playbook",
+            "Combination punch",
+            "Mindshare"
+          ]
+        }
       }
     }
   ]

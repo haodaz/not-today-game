@@ -212,7 +212,22 @@
           "The material is scattered through the boss's, the group's and Lao Zhou's chats, one sentence at a time."
         ],
         "call": "The table is locked: the code is on the pager. Find all four cells and fill them in!",
-        "cta": "Start work"
+        "cta": "Start work",
+        "motif": {
+          "kind": "danmaku",
+          "items": [
+            "Consciousness",
+            "Write consciousness in",
+            "Does it have a mind",
+            "Emergence",
+            "Awakening",
+            "A self",
+            "It knows it is thinking",
+            "Not statistics, understanding",
+            "Just write it in",
+            "Investors like this"
+          ]
+        }
       }
     },
     {

@@ -68,11 +68,11 @@ describe("ide v2: merge v16/v17, pull the latest data, snapshot (2026-11-08)", (
 
 describe("ide v2, day 3: the memo and the directions (2026-11-08)", () => {
   const task3 = () => taskByFlag(3, "task_d3_3")!;
-  it("day 3's board: every card is a direction for one page, three per page and one for the references; none in the tray", () => {
+  it("day 3's board: every card is a direction for one page, three per page and two for the references (照旧 / 换新的, compare 2026-11-12); none in the tray", () => {
     const b = task3().board!;
     expect(b.cards.every((c) => c.slot !== undefined && c.from === undefined)).toBe(true);
     for (const id of ["r1", "r2", "r3", "r4", "r5"]) expect(b.cards.filter((c) => c.slot === id)).toHaveLength(3);
-    expect(b.cards.filter((c) => c.slot === "r6")).toHaveLength(1);
+    expect(b.cards.filter((c) => c.slot === "r6")).toHaveLength(2);
     expect(mergesLeft(b, freshBoard(b))).toEqual([]);
     expect(trayCards(b, freshBoard(b), 3, [], task3().id)).toEqual([]);
   });

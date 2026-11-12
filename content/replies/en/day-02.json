@@ -248,22 +248,22 @@
     "xiaozhang": {
       "incoming": [
         {
-          "t": "13:40",
+          "t": "13:30",
           "text": "{calledBy}, Vivi posted another one and wants us to copy it",
           "kind": "work"
         },
         {
-          "t": "13:41",
+          "t": "13:31",
           "text": "It's not even the same thing, she doesn't have an API",
           "kind": "work"
         },
         {
-          "t": "13:42",
+          "t": "13:32",
           "text": "Can you look at what we can actually build? Real computation gives a result in forty seconds; her page says three.",
           "kind": "work"
         },
         {
-          "t": "13:43",
+          "t": "13:33",
           "text": "The graph has industries and data. The organisation part, we never touched.",
           "kind": "work"
         },

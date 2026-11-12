@@ -240,7 +240,21 @@
           "Book, page, first line, second line, date: everything to fill is in that scan."
         ],
         "call": "The table is locked: the Latin line in the scan, looked up on the dictionary. See the approval through!",
-        "cta": "Start work"
+        "cta": "Start work",
+        "motif": {
+          "kind": "fan",
+          "items": [
+            "Just an approval",
+            "Don't ask why",
+            "The book",
+            "The page",
+            "The first line",
+            "The second line",
+            "The date",
+            "It's all in the scan",
+            "Just sign"
+          ]
+        }
       }
     },
     {

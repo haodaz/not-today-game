@@ -216,7 +216,20 @@
           "Against the script and the scan of that book, one word at a time."
         ],
         "call": "The table is locked: the key is in last night's recording, played backwards. Don't read whole lines; fix and hand in!",
-        "cta": "Start work"
+        "cta": "Start work",
+        "motif": {
+          "kind": "danmaku",
+          "items": [
+            "Proof act two",
+            "Just fix the typos",
+            "Don't read too closely",
+            "Against the scan",
+            "Word by word",
+            "Don't ask",
+            "It's only proofreading",
+            "Read it, don't remember it"
+          ]
+        }
       }
     },
     {

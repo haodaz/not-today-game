@@ -211,7 +211,22 @@
           "The ones who talk, the ones humming in the recording, the ones the pet cries at on sight, and the name column."
         ],
         "call": "The list is in the roster; listen to the welcome recording too; there is a number in last night's recording. Get the new hires through!",
-        "cta": "Start work"
+        "cta": "Start work",
+        "motif": {
+          "kind": "danmaku",
+          "items": [
+            "A thousand new hires",
+            "Run onboarding",
+            "The ones that talk",
+            "The ones humming in the recording",
+            "The ones that cry on sight",
+            "The name column",
+            "By the process",
+            "All colleagues now",
+            "Don't pick",
+            "All in today"
+          ]
+        }
       }
     },
     {
