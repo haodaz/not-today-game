@@ -231,7 +231,14 @@ const gather = async (card) => {
   const from = card.from; if (!from || from.call) return true;
   // A meeting card is heard in the board's own meeting: open the task page, let it play (fast=1: 0.3 s a line).
   if (from.meeting) { await toWorkbench(); await goHome(); await sel(`[data-action=wb-nav][data-page='task:${currentTaskId}']`, 1.2); for (let i = 0; i < 4 && !(await has("[data-action=meeting-play]")); i++) await sleep(0.5); await sel("[data-action=meeting-play]", 0.3); await sleep(9); return true; }
-  if (from.conv) { await toTingTalk(); return sel(`[data-action=conv][data-conv=${from.conv}]`, 1.2); }
+  if (from.conv) {
+    // Vivi's lock (G5) refuses the switch until her page is opened: her page first, and once more after a refusal
+    await toTingTalk(); await interrupts(); await toTingTalk();
+    let ok = await sel(`[data-action=conv][data-conv=${from.conv}]`, 1.2);
+    const before = globalThis.__docsOpened?.[day]?.size ?? 0; await interrupts();
+    if ((globalThis.__docsOpened?.[day]?.size ?? 0) > before) { await toTingTalk(); ok = await sel(`[data-action=conv][data-conv=${from.conv}]`, 1.2); }
+    return ok;
+  }
   const folder = folderOf(from.file);
   if (folder) {
     await toDesktop(); await readLines();

@@ -950,77 +950,136 @@
           {
             "id": "o1a",
             "text": "A brain that runs everything: when it goes wrong, still no one stops it",
-            "slot": "r1"
+            "slot": "r1",
+            "patch": {
+              "6": "  title: \"A brain that runs everything: when it goes wrong, who stops it\",",
+              "10": "  draw: (t) => draw.contrast(SNAP, t),  // people on one side, AI on the other"
+            }
           },
           {
             "id": "o1b",
             "text": "A brain that big is a risk, and an opportunity",
-            "slot": "r1"
+            "slot": "r1",
+            "patch": {
+              "6": "  title: \"A brain that big: a risk, and an opportunity\",",
+              "10": "  draw: (t) => draw.contrast(SNAP, t, { upside: true }),  // a risk column, an opportunity column"
+            }
           },
           {
             "id": "o1c",
             "text": "Stop letting a brain that is worse than the AI direct the AI's development",
-            "slot": "r1"
+            "slot": "r1",
+            "patch": {
+              "10": "  draw: (t) => draw.contrast(SNAP, t, { loud: true }),  // draw the human side smaller"
+            }
           },
           {
             "id": "o2a",
             "text": "Still a group of brains, watching each other",
-            "slot": "r2"
+            "slot": "r2",
+            "patch": {
+              "6": "  title: \"So what we build is a group of brains, watching each other\",",
+              "9": "  route: (q) => SNAP.brains.filter((b) => b.fits(q)),  // watching each other"
+            }
           },
           {
             "id": "o2b",
             "text": "A group of brains, and it grows by itself",
-            "slot": "r2"
+            "slot": "r2",
+            "patch": {
+              "6": "  title: \"A group of brains, and it grows by itself\",",
+              "9": "  route: (q) => SNAP.brains.grow(q),  // grows by itself"
+            }
           },
           {
             "id": "o2c",
             "text": "Something far beyond a human brain, self-evolving",
-            "slot": "r2"
+            "slot": "r2",
+            "patch": {
+              "9": "  route: (q) => SNAP.brain.evolve(q),  // one, far beyond a human brain",
+              "10": "  draw: (t) => draw.org(SNAP, t, { scale: \"∞\" })"
+            }
           },
           {
             "id": "o3a",
             "text": "Two hundred and eleven nodes, checked one by one by Zhang",
-            "slot": "r3"
+            "slot": "r3",
+            "patch": {
+              "6": "  title: \"A knowledge graph, two hundred-odd nodes\",",
+              "9": "  stats: () => ({ nodes: 211, links: SNAP.links.length }),  // matched one by one by Zhang"
+            }
           },
           {
             "id": "o3b",
             "text": "Everyone has a projection of themselves in the digital space, seeing and remembering for them",
-            "slot": "r3"
+            "slot": "r3",
+            "patch": {
+              "6": "  title: \"Everyone has a projection in the digital space\",",
+              "9": "  stats: () => ({ shadows: SNAP.people.length }),  // sees for them, remembers for them"
+            }
           },
           {
             "id": "o3c",
             "text": "People no longer need to understand it; they only need to be understood by it",
-            "slot": "r3"
+            "slot": "r3",
+            "patch": {
+              "9": "  stats: () => ({ nodes: SNAP.nodes.length, links: SNAP.links.length }),  // no one needs to understand it",
+              "10": "  draw: (t) => draw.project(SNAP, t, { fromAI: true })"
+            }
           },
           {
             "id": "o4a",
             "text": "AI merges a version first; a person checks it again",
-            "slot": "r4"
+            "slot": "r4",
+            "patch": {
+              "6": "  title: \"AI merges a version first; a person checks it again\",",
+              "9": "  nearest: (q) => human.check(SNAP.nodes.sort((a, b) => d(q, a) - d(q, b)).slice(0, 5)),"
+            }
           },
           {
             "id": "o4b",
             "text": "Moving through the data: see the things, see the people, go from one place to the next",
-            "slot": "r4"
+            "slot": "r4",
+            "patch": {
+              "6": "  title: \"Moving through the data: see the things, see the people\",",
+              "9": "  nearest: (q) => SNAP.nodes.sort((a, b) => d(q, a) - d(q, b)).slice(0, 5),  // a person watches it go"
+            }
           },
           {
             "id": "o4c",
             "text": "The AI finds its own way; no one needs to follow along",
-            "slot": "r4"
+            "slot": "r4",
+            "patch": {
+              "9": "  nearest: (q) => SNAP.walk(q),  // it finds its own way",
+              "10": "  draw: (t) => draw.walk(SNAP, t, { follow: false })"
+            }
           },
           {
             "id": "o5a",
             "text": "Knowing the client's trade: the graph was checked out bit by bit",
-            "slot": "r5"
+            "slot": "r5",
+            "patch": {
+              "6": "  title: \"Knowing the client's trade: the graph was checked out bit by bit\",",
+              "9": "  // x′ = U x: a new model, the same graph (formula unchanged)"
+            }
           },
           {
             "id": "o5b",
             "text": "No bet on emergence; efficiency at a human brain's scale: only we walk this road",
-            "slot": "r5"
+            "slot": "r5",
+            "patch": {
+              "6": "  title: \"No bet on emergence: efficiency at a human brain's scale\",",
+              "9": "  // only we walk this road: others bet on emergence, we count efficiency"
+            }
           },
           {
             "id": "o5c",
             "text": "It is more itself every year; only we can do this",
-            "slot": "r5"
+            "slot": "r5",
+            "patch": {
+              "9": "  // x′ = U x: every new model, more like itself",
+              "10": "  draw: (t) => draw.rotate(SNAP, t, { only: \"us\" })"
+            }
           },
           {
             "id": "o6",
@@ -1030,7 +1089,11 @@
           {
             "id": "o6b",
             "text": "Swap in this year's newest papers; it looks current",
-            "slot": "r6"
+            "slot": "r6",
+            "patch": {
+              "4": "  // swapped for this year's",
+              "6": "  cite: (i) => SNAP.refs2028[i],"
+            }
           }
         ],
         "kuro": {

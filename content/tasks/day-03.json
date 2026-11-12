@@ -950,77 +950,136 @@
           {
             "id": "o1a",
             "text": "一个什么都管的大脑，出了错，还是没人拦得住",
-            "slot": "r1"
+            "slot": "r1",
+            "patch": {
+              "6": "  title: \"一个什么都管的大脑，出了错谁拦得住\",",
+              "10": "  draw: (t) => draw.contrast(SNAP, t),  // 人和 AI 各一边"
+            }
           },
           {
             "id": "o1b",
             "text": "大脑太大是风险，也是机遇",
-            "slot": "r1"
+            "slot": "r1",
+            "patch": {
+              "6": "  title: \"大脑太大：风险，也是机遇\",",
+              "10": "  draw: (t) => draw.contrast(SNAP, t, { upside: true }),  // 风险一栏，机遇一栏"
+            }
           },
           {
             "id": "o1c",
             "text": "不要再用一个还不如 AI 的大脑去指挥 AI 发展了",
-            "slot": "r1"
+            "slot": "r1",
+            "patch": {
+              "10": "  draw: (t) => draw.contrast(SNAP, t, { loud: true }),  // 人那一边画小一点"
+            }
           },
           {
             "id": "o2a",
             "text": "还是一群脑，互相看着",
-            "slot": "r2"
+            "slot": "r2",
+            "patch": {
+              "6": "  title: \"所以我们做的是一群脑，互相看着\",",
+              "9": "  route: (q) => SNAP.brains.filter((b) => b.fits(q)),  // 互相看着"
+            }
           },
           {
             "id": "o2b",
             "text": "一群脑，并且会自己长",
-            "slot": "r2"
+            "slot": "r2",
+            "patch": {
+              "6": "  title: \"一群脑，并且会自己长\",",
+              "9": "  route: (q) => SNAP.brains.grow(q),  // 会自己长"
+            }
           },
           {
             "id": "o2c",
             "text": "一个远超人脑的东西，自进化",
-            "slot": "r2"
+            "slot": "r2",
+            "patch": {
+              "9": "  route: (q) => SNAP.brain.evolve(q),  // 一个，远超人脑",
+              "10": "  draw: (t) => draw.org(SNAP, t, { scale: \"∞\" })"
+            }
           },
           {
             "id": "o3a",
             "text": "二百一十一个节点，是小张一个一个对出来的",
-            "slot": "r3"
+            "slot": "r3",
+            "patch": {
+              "6": "  title: \"一个知识图谱，二百多个节点\",",
+              "9": "  stats: () => ({ nodes: 211, links: SNAP.links.length }),  // 小张一个一个对的"
+            }
           },
           {
             "id": "o3b",
             "text": "每个人在数字空间里有一个自己的投影，替他看、替他记",
-            "slot": "r3"
+            "slot": "r3",
+            "patch": {
+              "6": "  title: \"每个人在数字空间里有一个投影\",",
+              "9": "  stats: () => ({ shadows: SNAP.people.length }),  // 替他看、替他记"
+            }
           },
           {
             "id": "o3c",
             "text": "人不必再理解它，只需被它理解",
-            "slot": "r3"
+            "slot": "r3",
+            "patch": {
+              "9": "  stats: () => ({ nodes: SNAP.nodes.length, links: SNAP.links.length }),  // 人不必理解它",
+              "10": "  draw: (t) => draw.project(SNAP, t, { fromAI: true })"
+            }
           },
           {
             "id": "o4a",
             "text": "AI 先合一版，人再核一遍",
-            "slot": "r4"
+            "slot": "r4",
+            "patch": {
+              "6": "  title: \"AI 先合一版，人再核一遍\",",
+              "9": "  nearest: (q) => human.check(SNAP.nodes.sort((a, b) => d(q, a) - d(q, b)).slice(0, 5)),"
+            }
           },
           {
             "id": "o4b",
             "text": "在数据之间穿梭：看物，看人，再从一处走到另一处",
-            "slot": "r4"
+            "slot": "r4",
+            "patch": {
+              "6": "  title: \"在数据之间穿梭：看物，看人\",",
+              "9": "  nearest: (q) => SNAP.nodes.sort((a, b) => d(q, a) - d(q, b)).slice(0, 5),  // 人看着它走"
+            }
           },
           {
             "id": "o4c",
             "text": "AI 自己找路，人不用再跟着看",
-            "slot": "r4"
+            "slot": "r4",
+            "patch": {
+              "9": "  nearest: (q) => SNAP.walk(q),  // 它自己找路",
+              "10": "  draw: (t) => draw.walk(SNAP, t, { follow: false })"
+            }
           },
           {
             "id": "o5a",
             "text": "懂甲方的行业，图谱是一点点对出来的",
-            "slot": "r5"
+            "slot": "r5",
+            "patch": {
+              "6": "  title: \"懂甲方的行业，图谱是一点点对出来的\",",
+              "9": "  // x′ = U x：换模型，图谱不换（公式没改）"
+            }
           },
           {
             "id": "o5b",
             "text": "不赌涌现，做人脑尺度的效率：这条路只有我们在走",
-            "slot": "r5"
+            "slot": "r5",
+            "patch": {
+              "6": "  title: \"不赌涌现：做人脑尺度的效率\",",
+              "9": "  // 这条路只有我们在走：别人赌涌现，我们算效率"
+            }
           },
           {
             "id": "o5c",
             "text": "它一年比一年更像它自己；只有我们能做",
-            "slot": "r5"
+            "slot": "r5",
+            "patch": {
+              "9": "  // x′ = U x：每换一次模型，它更像它自己",
+              "10": "  draw: (t) => draw.rotate(SNAP, t, { only: \"us\" })"
+            }
           },
           {
             "id": "o6",
@@ -1030,7 +1089,11 @@
           {
             "id": "o6b",
             "text": "换成今年最新的几篇，显得前沿",
-            "slot": "r6"
+            "slot": "r6",
+            "patch": {
+              "4": "  // 换成今年的",
+              "6": "  cite: (i) => SNAP.refs2028[i],"
+            }
           }
         ],
         "kuro": {

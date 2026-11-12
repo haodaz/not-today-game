@@ -1,0 +1,19 @@
+# Work screens (2026-11-12)
+
+Author's rule, in her words: 「每个任务都是独立的交互界面」「别新瓶装旧酒，继续放之前的 UI 图」「直接在这个全屏的游戏画布上做成新的交互」「千万别把报告和维度的细节弄丢了」「没有克总处理了」「最后结算的时候先展示出来，再提交」「台词都是看着代码逻辑硬生成出来的…非常别扭」.
+
+Every task: Kuro's card 「要开始工作吗？」 → the launch page (that day's own picture: `launch.art` generated, or the bust + a motif; `launch.tone` for the ground; the brief as plain lines in one white panel) → the work screen on the full stage → the settlement → 提交. The state engines are unchanged (`src/state/days/board.ts`); only the pictures are new. No per-step Kuro card anywhere; Kuro only at a failed end.
+
+## The three screens so far
+
+| screen | file | boards | what it shows |
+|---|---|---|---|
+| compare | `workbench/compare.ts` (`workLayer`) | `board.compare` (days 1, 3 v18, 10) | the counterpart's riddles, the page's whole code in each version side by side (`versionCards`, card `patch` for several diffs), 用这版 at the card's foot; result screen with the rendered page; settlement with the faces |
+| tune stage | `workbench/tune-stage.ts` | `board.tune` (days 2, 3) | the AI training lab backdrop, 研发目标 bars (today's line, her 100), the module as a research node with its paths as action cards (select → 行动), 行动 N/M + progress, the 分析 report per dimension; budget spent → the report page (her page vs the backend) with Kuro's offer, then 提交; the skin path (day 3 `front: skin`) dresses the report as Vivi's page |
+| clue stage | `workbench/clue-stage.ts` | `kind: table`, no tune / meeting / ide (days 4, 5, 6, 8, 11–17 for now) | the evidence board: the demands as pinned notes with a slot each, the found sentences as clippings (the unfound greyed with where to look), the lock card over the notes until its code is read where it lives |
+
+Everything else still falls to `genericWorkLayer` → `renderBoard` (the old pane): the meeting boards (days 7, 9) first of all. Each later day should get its own screen in this spirit (plan in `days-2-18-interaction-plan.md`), with its own key art (`script/tools/gen-image.mjs`, see memory `launch-art-generation`).
+
+## Looking at a screen quickly (dev)
+
+`?lang=zh&day=N&view=desktop&seed=flags:<earlier days' task flags>&launch=<task>` → the launch page; 开始工作 opens the screen. The replay driver (`script/tools/auto-day-shoot.mjs`) knows the three screens (`compare-pick` / `tune-select` + `tune-act` + `.ts-node` / `board-card` + `board-slot`).
