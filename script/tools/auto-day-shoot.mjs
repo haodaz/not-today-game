@@ -356,6 +356,7 @@ for (const it of ITEMS) {
           if (card) {
             const [mod, path] = card.split("/");
             if (!(await sel(`[data-action=tune-select][data-mod=${mod}][data-path="${path}"]`, 0.4))) break;
+            if (picks === 1) await shotStep("tune-node"); // the research-node screen with a card picked (2026-11-13)
             // Kuro's lines may still be typing (busy): 行动 lights once they are in
             let lit = false; for (let w = 0; w < 10 && !(lit = await has("[data-action=tune-act]:not([disabled])")); w++) await sleep(0.5);
             if (!lit) { note(`   tune: 行动 not enabled after a pick · act ${await ev("JSON.stringify([...document.querySelectorAll('[data-action=tune-act]')].map(b=>b.disabled))")} sel ${await ev("JSON.stringify([...document.querySelectorAll('[data-action=tune-select]')].map(b=>b.getAttribute('aria-pressed')))")}`); break; }

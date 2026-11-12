@@ -9,7 +9,7 @@
 // only the picture and the select-then-act step are new.
 import { boardState, canPrint, modFound, pathFound, pathOnMenu, tuneBase, tuneCarried, tuneDims, tuneOfferPending, tuneOffers, tuneReached, tuneStepsLeft } from "@state/days/board";
 import { ideOps, ideSrc, ideTranscript } from "@state/days/ide";
-import { browserFrame, settleLayer } from "./settle-layer";
+import { browserFrame } from "./settle-layer";
 import { fillPlaceholders } from "@world/replies/placeholders";
 import type { GameEvent } from "@state/events";
 import type { Task, TaskBoard, TuneMod, TunePath } from "@state/days/tasks";
@@ -127,22 +127,14 @@ export function tuneStage(c: { state: State; events: readonly GameEvent[]; sessi
   const finish = printable || s.done ? html`<button type="button" class="ts-finish" data-action="board-print"${printable && !busy ? null : html` disabled`}>${finishLabel(task)}</button>` : null;
   const kuro = html`<div class="${cls("ts-kuro", busy && "busy")}"><img class="ts-kimg" src="${frameUrl(FRAMES.idle[0])}" alt="">${busy || say ? html`<div class="ts-say">${busy ? html`<span class="ts-dots">${working}</span>` : kuroText(day, say)}</div>` : html`<div class="ts-say empty"></div>`}${offers}<div class="ts-right">${finish}</div></div>`;
 
-  // ——— the settlement (author 2026-11-12): left the game's ending — each dimension's bar against her
-  // promise and today's line, what each step added or took — right the backend page as it really is
-  // now (it wears Vivi's skin by itself when front:skin was taken); Kuro's offer, if any, under the record
+  // ——— the settlement (author 2026-11-13: 「左边那么好看为什么替换掉」): the lab stays — the node
+  // strip and the 研发目标 panel on the left as during the work — and the middle is the backend page as
+  // it really is now (it wears Vivi's skin by itself when front:skin was taken); Kuro's remark, his
+  // offer if any, and 提交 along the foot. The tune never fails here: the line is a goal, not a gate.
   if (s.done) {
-    const rows = tune.dims.map((d) => {
-      const v = now[d.id] ?? 0;
-      const contrib = steps.filter(({ p }) => p.delta[d.id] !== undefined).map(({ p }) => html`<li class="${cls(p.delta[d.id]! > 0 ? "plus" : "minus")}"><b>${sign(p.delta[d.id]!)}</b> ${p.label}</li>`);
-      const gap = v >= tune.reach ? html`<span class="ts-gap ok">${S("tune.stage.gapOk")}</span>` : html`<span class="ts-gap">${S("tune.stage.gap", { n: String(tune.reach - v) })}</span>`;
-      return html`<div class="ts-rrow"><div class="ts-rname">${d.label}</div><div class="ts-rbars"><div class="ts-rb her"><span>${S("board.tune.promise")}</span><div class="ts-track"><i class="ts-fill" style="width:${tune.promise}%"></i></div><b>${tune.promise}</b></div><div class="ts-rb back"><span>${S("tune.stage.back")}</span><div class="ts-track"><i class="ts-base" style="width:${base[d.id] ?? 0}%"></i><i class="ts-fill" style="width:${v}%"></i><b class="ts-mark reach" style="left:${tune.reach}%"></b></div><b>${v}<small>/${tune.reach}</small></b></div></div><ul class="ts-rlist">${contrib.length ? contrib : html`<li class="none">${S("tune.stage.none")}</li>`}</ul>${gap}</div>`;
-    });
-    const sum = html`<p class="sl-sum">${S("tune.stage.sum", { promise: String(tune.promise), avg: String(avg), reach: String(tune.reach) })}${short.length ? html` ${S("tune.stage.short", { dims: short.join("、") })}` : null}</p>`;
-    const remark = busy || !say ? null : html`<div class="sl-kuro"><img src="${frameUrl(FRAMES.idle[0])}" alt="">${kuroText(day, say)}</div>`;
-    const record = html`${sum}<div class="sl-dims">${rows}</div>${remark}`;
     const fill = (x: string) => fillPlaceholders(x, state.names);
-    const effect = browserFrame(ideSrc(board, s, ops, null, tuneCarried(board, events)), fill(task.title), "ide-settle");
-    return settleLayer({ kind: "backend", title: fill(task.title), record, effect, actions: html`${offers}${finish}` });
+    const page = html`<div class="ts-mid report"><div class="ts-page">${browserFrame(ideSrc(board, s, ops, null, tuneCarried(board, events)), fill(task.title), "ide-settle")}</div></div>`;
+    return html`<div class="ts settle" style="background-image:url('${TUNE_BACKDROP}')"><div class="ts-dim"></div>${top}${panel}${page}${kuro}</div>`;
   }
   return html`<div class="ts" style="background-image:url('${TUNE_BACKDROP}')"><div class="ts-dim"></div>${top}${panel}<div class="ts-mid">${cards}${act}</div>${analysis}${kuro}</div>`;
 }

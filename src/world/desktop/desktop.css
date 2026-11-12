@@ -1674,3 +1674,7 @@ span.cmp-face-btn{cursor:default}
 .sl-kuro.done{color:#13A37A;font-weight:700}
 .sk-stuck{position:absolute;left:50%;bottom:36px;transform:translateX(-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 22px;background:#FAF8EF;border:2px solid #776E65;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.2)}
 .sk-stuck p{margin:0;font-weight:700;color:#C2410C}
+/* the tune settlement on the lab (author 2026-11-13): the panel stays left, the real backend page in the middle */
+.ts.settle{grid-template-columns:320px 1fr}
+.ts-mid.report{grid-column:2/3;align-items:stretch;justify-content:flex-start;padding:6px 24px 6px 8px;min-height:0}
+.ts-page{flex:1;min-height:0;display:flex;background:#fff;border:1.5px solid rgba(29,33,41,.25);border-radius:12px;overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.35)}
