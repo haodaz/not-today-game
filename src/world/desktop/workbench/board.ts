@@ -23,6 +23,7 @@ import { fillPlaceholders } from "@world/replies/placeholders";
 import { MINES_DONE_MS, minesFlag, minesOpen, minesRoll, minesStart, type MinesGrid } from "./mines";
 import { PIPES_DONE_MS, pipesRoll, pipesSolve, pipesStart, pipesTurn } from "./pipes";
 import { MATCH3_DONE_MS, match3Roll, match3Start, match3Tap, type Match3Grid } from "./match3";
+import { LINK_DONE_MS, LINK_PATH_MS, linkRoll, linkShuffle, linkSolve, linkStart, linkTap, type LinkGrid } from "./link";
 import type { ActionContext, ActionHandler } from "../controller";
 import type { AppContext, Session } from "../model";
 import { openWork } from "./work";
@@ -683,6 +684,57 @@ const actions: Record<string, ActionHandler> = {
     ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
     ctx.session.match3 = { ...g, won: true, over: false, cleared: g.goal, approvedAt: ctx.now?.() ?? Date.now() };
     ctx.later(MATCH3_DONE_MS + 20, ctx.rerender);
+    ctx.rerender();
+  },
+  // link-link (author 2026-11-13): his sayings twice over — tap two of the same a line can join; all joined approves the form
+  "link-start"(ctx) {
+    const c = currentBoard(ctx);
+    if (c?.board.game?.kind !== "link") return;
+    const attempt = (ctx.session.link?.key === c.task.id ? 1 : 0) + Math.floor((ctx.now?.() ?? Date.now()) / 1000) % 1000;
+    ctx.session.link = { ...linkStart(c.task.id, c.board.game, linkRoll(ctx.store.getRunId(), c.task.id, attempt)), attempt } as LinkGrid;
+    ctx.rerender();
+  },
+  "link-tap"(ctx, data) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.link?.key === c?.task.id ? ctx.session.link : null;
+    const i = Number(data.i);
+    if (c?.board.game?.kind !== "link" || !g || !Number.isInteger(i)) return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    const attempt = (g as LinkGrid & { attempt?: number }).attempt ?? 0;
+    const now = ctx.now?.() ?? Date.now();
+    const next = linkTap(g, i, now, linkRoll(ctx.store.getRunId(), c.task.id, attempt + 1000 + g.left + g.shuffles * 100));
+    if (next === g) return;
+    if (next.done) {
+      ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+      ctx.session.link = { ...next, approvedAt: now };
+      ctx.later(LINK_DONE_MS + 20, ctx.rerender);
+    } else {
+      ctx.session.link = next;
+      if (next.path) ctx.later(LINK_PATH_MS + 20, ctx.rerender);
+      if (next.aware) ctx.later(2200, ctx.rerender);
+    }
+    ctx.rerender();
+  },
+  // stuck or just tired of it: the live tiles dealt again
+  "link-shuffle"(ctx) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.link?.key === c?.task.id ? ctx.session.link : null;
+    if (c?.board.game?.kind !== "link" || !g || g.done) return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    const attempt = (g as LinkGrid & { attempt?: number }).attempt ?? 0;
+    ctx.session.link = linkShuffle(g, linkRoll(ctx.store.getRunId(), c.task.id, attempt + 5000 + g.shuffles));
+    ctx.rerender();
+  },
+  // dev only: joined at once (the replay driver)
+  "link-cheat"(ctx) {
+    if (!import.meta.env.DEV) return;
+    const c = currentBoard(ctx);
+    const g = ctx.session.link?.key === c?.task.id ? ctx.session.link : null;
+    if (c?.board.game?.kind !== "link" || !g) return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+    ctx.session.link = { ...linkSolve(g), approvedAt: ctx.now?.() ?? Date.now() };
+    ctx.later(LINK_DONE_MS + 20, ctx.rerender);
     ctx.rerender();
   },
   // the chain lost (no move left, not approved): 让克总帮忙 — he stamps it (the approval moment follows)

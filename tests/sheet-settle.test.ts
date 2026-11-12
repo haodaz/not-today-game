@@ -38,6 +38,8 @@ describe("the settlement sheet (clue stage)", () => {
     expect(session.workPhase).toBeNull();
 
     store.appendEvent({ kind: "boardStep", taskId: task.id, op: { t: "fill", slot: last!.id, card: last!.answer } });
+    // day 4's board carries a game (link-link, 2026-11-13): the form is printable only once the game approved it
+    store.appendEvent({ kind: "boardStep", taskId: task.id, op: { t: "approve" } });
     expect(out()).toContain(`data-action="board-settle">${t("sheet.settle.open")}</button>`);
     act("board-settle");
     expect(session.workPhase).toEqual({ key: `4:${task.id}`, phase: "settle" });
@@ -55,11 +57,12 @@ describe("the settlement sheet (clue stage)", () => {
     expect(sheet).not.toContain('data-action="settle-kuro"');
   });
 
+  // on a plain table board (day 6's, 2026-11-13: a game board always passes its settlement — the game itself decided)
   it("a wrong card fails the settlement: only 让克总帮忙; his card takes the wrong slot and the story asks 要发吗？", () => {
     setLocale("zh");
-    const store = createStore({ startDay: 4 });
+    const store = createStore({ startDay: 6 });
     completeUntil(store, "task1");
-    const task = taskByFlag(4, "task_d4_1")!;
+    const task = taskByFlag(6, "task_d6_1")!;
     const board = task.board!;
     const session = initialSession({ beat: "work", time: "10:00" }, "left", "desktop");
     let now = 1000;
@@ -82,7 +85,7 @@ describe("the settlement sheet (clue stage)", () => {
     act("settle-kuro");
     const last = store.getEvents().at(-1)!;
     expect(last).toMatchObject({ kind: "boardStep", op: { t: "assistFix" } });
-    const queued = session.dialogue.queue.filter((q) => q.key.startsWith(`d4:settle:${task.id}:kuro`));
+    const queued = session.dialogue.queue.filter((q) => q.key.startsWith(`d6:settle:${task.id}:kuro`));
     expect(queued.flatMap((q) => q.lines).map((l) => (l.k === "speaker" ? `${l.who}:${l.t}` : l.k))).toEqual([`me:${t("settle.kuroWork")}`, `kuro:${t("settle.kuroDone")}`, `kuro:${t("settle.sendAsk")}`]);
     expect(queued.at(-1)!.ending).toEqual({ kind: "settleSend", taskId: task.id });
     expect(timers).toHaveLength(0);

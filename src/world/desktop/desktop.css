@@ -1791,3 +1791,23 @@ button.m3-cell:hover{transform:translateY(-2px)}
 .m3-glyph.k0 svg{fill:#F6B73C}.m3-glyph.k1 svg{fill:#7C5CFF}.m3-glyph.k2 svg{fill:#FF5FA2}.m3-glyph.k3 svg{fill:#13A37A}.m3-glyph.k4 svg{fill:#2F6FD6}.m3-glyph.k5 svg{fill:#C2410C}
 .mn.m3.done .m3-grid{animation:m3-flash 600ms ease-out both}
 @keyframes m3-flash{0%{box-shadow:0 0 0 9999px #fff}100%{box-shadow:0 10px 30px rgba(124,92,255,.15)}}
+/* link-link (author 2026-11-13): his sayings twice over, on his page's paper */
+.mn.lk{background:linear-gradient(160deg,#F4F7FB,#E8EEF6 60%,#F7F3EA)}
+.lk-main{padding:0 28px}
+.lk-board{position:relative;padding:52px;background:rgba(255,255,255,.5);border-radius:16px;box-shadow:0 10px 30px rgba(47,111,214,.12)}
+.lk-grid{display:grid;grid-template-columns:repeat(var(--cols,8),52px);grid-template-rows:repeat(var(--rows,6),52px);gap:0}
+.lk-cell{position:relative;width:52px;height:52px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border:0;padding:0;margin:0;cursor:pointer;font:inherit;background:#fff;box-shadow:inset 0 0 0 1px rgba(29,33,41,.12),inset 0 -3px 0 rgba(29,33,41,.1);transition:transform 120ms}
+button.lk-cell:hover{transform:translateY(-2px);z-index:1}
+.lk-cell.sel{box-shadow:inset 0 0 0 3px #2F6FD6;transform:scale(1.06);z-index:1}
+.lk-cell.gone{background:transparent;box-shadow:none;cursor:default}
+.lk-cell.blank{background:rgba(255,255,255,.35);box-shadow:inset 0 0 0 1px rgba(29,33,41,.06)}
+.lk-cell.aware{animation:lk-aware 2s ease-in-out both;z-index:1}
+@keyframes lk-aware{0%{transform:rotateY(0)}35%{transform:rotateY(180deg)}60%{transform:rotateY(180deg)}100%{transform:rotateY(360deg)}}
+.lk-glyph{display:block;width:30px;height:30px}
+.lk-glyph svg{width:100%;height:100%;display:block}
+.lk-glyph.k0 svg{fill:#F6B73C}.lk-glyph.k1 svg{fill:#7C5CFF}.lk-glyph.k2 svg{fill:#FF5FA2}.lk-glyph.k3 svg{fill:#13A37A}.lk-glyph.k4 svg{fill:#2F6FD6}.lk-glyph.k5 svg{fill:#C2410C}.lk-glyph.k6 svg{fill:#0E7490}.lk-glyph.k7 svg{fill:#5B3FA1}.lk-glyph.k8 svg{fill:#8B1E1E}.lk-glyph.k9 svg{fill:#1d2129}.lk-glyph.k10 svg{fill:#B45309}.lk-glyph.k11 svg{fill:#047857}
+.lk-line{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.lk-line polyline{fill:none;stroke:#2F6FD6;stroke-width:6px;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round;animation:lk-fade 650ms ease-out both}
+@keyframes lk-fade{0%{opacity:1}70%{opacity:1}100%{opacity:0}}
+.lk-aware{font-size:13px;color:#8B1E1E;max-width:360px}
+.mn.lk.done .lk-board{animation:m3-flash 600ms ease-out both}

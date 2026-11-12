@@ -192,7 +192,9 @@ export type BoardGame =
   /** pipes: the process; turn the pieces until 入口 reaches 入职 */
   | { readonly kind: "pipes"; readonly cols: number; readonly rows: number }
   /** match-3: her claims multiplied; clear `goal` of them within `moves` */
-  | { readonly kind: "match3"; readonly cols: number; readonly rows: number; readonly kinds: number; readonly goal: number; readonly moves: number };
+  | { readonly kind: "match3"; readonly cols: number; readonly rows: number; readonly kinds: number; readonly goal: number; readonly moves: number }
+  /** link-link: his sayings and their evidence, each twice; join every pair with at most two bends */
+  | { readonly kind: "link"; readonly cols: number; readonly rows: number; readonly kinds: number };
 export interface BoardStack {
   /** From the bottom up: the rank word and its symbol; `silhouette` ranks are the easter eggs past the top (drawn black). */
   readonly ranks: readonly { readonly name: string; readonly img: string; readonly silhouette?: boolean }[];
@@ -734,7 +736,12 @@ function board(v: unknown, w: string): TaskBoard {
     } else if (v.game.kind === "match3") {
       keys(v.game, ["kind", "cols", "rows", "kinds", "goal", "moves"], gw);
       game = { kind: "match3", cols: num(v.game.cols, "cols", 5, 10), rows: num(v.game.rows, "rows", 5, 10), kinds: num(v.game.kinds, "kinds", 3, 6), goal: num(v.game.goal, "goal", 3, 500), moves: num(v.game.moves, "moves", 1, 200) };
-    } else fail(`${gw}.kind`, 'must be "mines", "pipes" or "match3"');
+    } else if (v.game.kind === "link") {
+      keys(v.game, ["kind", "cols", "rows", "kinds"], gw);
+      const cols = num(v.game.cols, "cols", 4, 12), rows = num(v.game.rows, "rows", 3, 10);
+      if ((cols * rows) % 2 !== 0) fail(`${gw}.rows`, "the grid must hold an even number of tiles");
+      game = { kind: "link", cols, rows, kinds: num(v.game.kinds, "kinds", 2, 12) };
+    } else fail(`${gw}.kind`, 'must be "mines", "pipes", "match3" or "link"');
   }
   let stack: BoardStack | undefined;
   if (v.stack !== undefined) {

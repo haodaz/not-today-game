@@ -192,7 +192,13 @@
               }
             ]
           }
-        ]
+        ],
+        "game": {
+          "kind": "link",
+          "cols": 8,
+          "rows": 6,
+          "kinds": 8
+        }
       },
       "deliverable": {
         "id": "d4-mind",
