@@ -4,7 +4,7 @@
   "tasks": [
     {
       "id": "work",
-      "title": "The chairman doesn't read materials. He just wants to hear something. Don't stop.",
+      "title": "The chairman's briefing",
       "app": "code",
       "done": "task_d16_work",
       "board": {
@@ -203,6 +203,7 @@
       "launch": {
         "who": "boss",
         "note": [
+          "Lao Wang: the chairman won't read; just make a sound. Don't stop.",
           "The chairman doesn't read material; a sound is enough. Don't stop.",
           "Opening, middle, beat, ending: the voice notes are in the boss's and the group's chats, the flute in the files."
         ],

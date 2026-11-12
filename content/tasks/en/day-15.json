@@ -4,7 +4,7 @@
   "tasks": [
     {
       "id": "work",
-      "title": "The launch this afternoon: arrange the slides, watch the audience live.",
+      "title": "The launch-event deck",
       "app": "code",
       "done": "task_d15_work",
       "board": {
@@ -325,6 +325,7 @@
       "launch": {
         "who": "partner",
         "note": [
+          "Vivi: this afternoon's launch; lay out the deck and watch the audience live.",
           "The launch this afternoon: three slides to arrange, the audience's reactions to watch live.",
           "The material is in the meeting record; the audience screenshots are in the files."
         ],

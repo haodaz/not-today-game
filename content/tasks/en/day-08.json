@@ -4,7 +4,7 @@
   "tasks": [
     {
       "id": "task1",
-      "title": "Team night: when each leader gives a toast.",
+      "title": "Team-building schedule",
       "app": "code",
       "done": "task_d8_1",
       "board": {
@@ -205,6 +205,7 @@
       "launch": {
         "who": "boss",
         "note": [
+          "Lao Wang: the leaders' toast times — you schedule them.",
           "The team-building schedule: each leader's toast time.",
           "The rank table is in the files; the ranks on it are not the company's."
         ],

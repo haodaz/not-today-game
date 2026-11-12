@@ -4,7 +4,7 @@
   "tasks": [
     {
       "id": "task1",
-      "title": "Lao Wang: put consciousness in.",
+      "title": "Investor material 1/3: \"Consciousness\"",
       "app": "docs",
       "done": "task_d4_1",
       "board": {
@@ -208,6 +208,7 @@
       "launch": {
         "who": "boss",
         "note": [
+          "Lao Wang: write 'consciousness' in.",
           "The boss wants 'consciousness' written in.",
           "The lines he has said are scattered through his, the group's and Lao Zhou's chats."
         ],

@@ -4,7 +4,7 @@
   "tasks": [
     {
       "id": "work",
-      "title": "File a loan request: don't ask why.",
+      "title": "Borrowing approval form",
       "app": "code",
       "done": "task_d13_work",
       "board": {
@@ -236,6 +236,7 @@
       "launch": {
         "who": "laozhou",
         "note": [
+          "Lao Zhou: an approval for a loan; don't ask what for.",
           "Lao Zhou wants a loan approval; don't ask why.",
           "Book, page, first line, second line, date: everything to fill is in that scan."
         ],

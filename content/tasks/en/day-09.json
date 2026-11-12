@@ -160,7 +160,7 @@
     },
     {
       "id": "task3",
-      "title": "Tomorrow's meeting: the seats, and the script for everyone.",
+      "title": "Tomorrow's meeting: the seating",
       "app": "docs",
       "done": "task_d9_3",
       "board": {
@@ -452,6 +452,7 @@
       "launch": {
         "who": "boss",
         "note": [
+          "Lao Zhou: four seats in the circle, one triangle; send everyone the script.",
           "Tomorrow's meeting: seats to arrange, four in the circle and a triangle.",
           "Who sits where is all in the meeting record."
         ],

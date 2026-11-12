@@ -4,7 +4,7 @@
   "tasks": [
     {
       "id": "task1",
-      "title": "Vivi: the 「avatar」 page.",
+      "title": "Investor material 2/3: \"The double\"",
       "app": "docs",
       "done": "task_d5_1",
       "board": {
@@ -210,6 +210,7 @@
       "launch": {
         "who": "partner",
         "note": [
+          "Vivi: the 'double' page; make it warm.",
           "Vivi wants the 'avatar' page.",
           "Her own PRD, her chat and the group have all touched on it."
         ],

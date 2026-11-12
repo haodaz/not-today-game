@@ -4,7 +4,7 @@
   "tasks": [
     {
       "id": "task1",
-      "title": "The ontology page: older than people.",
+      "title": "Investor material 3/3: \"The entity\"",
       "app": "docs",
       "done": "task_d6_1",
       "board": {
@@ -232,6 +232,7 @@
       "launch": {
         "who": "boss",
         "note": [
+          "Lao Wang: the entity page; write that it is older than people.",
           "The entity page, for the client.",
           "What the boss and the group have said is enough."
         ],

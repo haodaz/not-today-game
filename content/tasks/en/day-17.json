@@ -4,7 +4,7 @@
   "tasks": [
     {
       "id": "work",
-      "title": "Everyone is looking for you: reply. You can only reply to one.",
+      "title": "The call back",
       "app": "code",
       "done": "task_d17_work",
       "board": {
@@ -214,6 +214,7 @@
       "launch": {
         "who": "boss",
         "note": [
+          "Everyone is looking for you: call back. Only one.",
           "Everyone is looking for you, saying the same sentence. You can answer only one.",
           "Whom, why them, the phone, what to say."
         ],

@@ -4,7 +4,7 @@
   "tasks": [
     {
       "id": "work",
-      "title": "Cut costs: balance the cost sheet, to Vivi before you log off.",
+      "title": "The cost sheet",
       "app": "code",
       "done": "task_d11_work",
       "board": {
@@ -223,6 +223,7 @@
       "launch": {
         "who": "partner",
         "note": [
+          "Vivi: cut cost, raise efficiency; balance the sheet, before you leave.",
           "Vivi wants costs cut: the cost sheet balanced, to her before you leave.",
           "The prices are in Lao Zhou's chat and that old menu; the oil and wine columns the boss said not to touch."
         ],

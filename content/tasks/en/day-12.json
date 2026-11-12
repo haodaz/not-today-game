@@ -4,7 +4,7 @@
   "tasks": [
     {
       "id": "work",
-      "title": "Everyone push through this week: you make the rota, nobody sleeps.",
+      "title": "This week's rota",
       "app": "code",
       "done": "task_d12_work",
       "board": {
@@ -203,6 +203,7 @@
       "launch": {
         "who": "boss",
         "note": [
+          "Lao Wang: push through this week; you make the rota; nobody sleeps.",
           "The boss says nobody sleeps this week; you draw up the shift table.",
           "Four slots: 22 to 2, 2 to 4, 4 to 6, and a row called ΥΠΝΟΣ."
         ],

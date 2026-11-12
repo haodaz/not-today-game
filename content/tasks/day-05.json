@@ -4,7 +4,7 @@
   "tasks": [
     {
       "id": "task1",
-      "title": "Vivi：「分身」那一页。",
+      "title": "投资人材料 2/3：「分身」",
       "app": "docs",
       "done": "task_d5_1",
       "board": {
@@ -210,6 +210,7 @@
       "launch": {
         "who": "partner",
         "note": [
+          "Vivi：「分身」那一页，要讲得温暖。",
           "Vivi 要「分身」那一页。",
           "她自己的 PRD、私聊和群里都提过。"
         ],

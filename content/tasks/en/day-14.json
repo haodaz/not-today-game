@@ -4,7 +4,7 @@
   "tasks": [
     {
       "id": "work",
-      "title": "Quite a lot of new hires this batch. Run the onboarding.",
+      "title": "New-hire onboarding",
       "app": "code",
       "done": "task_d14_work",
       "board": {
@@ -207,6 +207,7 @@
       "launch": {
         "who": "boss",
         "note": [
+          "Lao Wang: a lot of new hires this time; run the onboarding.",
           "A thousand new hires; the onboarding has to run.",
           "The ones who talk, the ones humming in the recording, the ones the pet cries at on sight, and the name column."
         ],

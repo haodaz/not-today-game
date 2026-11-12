@@ -245,7 +245,7 @@
     },
     {
       "id": "task4",
-      "title": "The morning meeting minutes, by the template.",
+      "title": "Morning meeting minutes",
       "app": "docs",
       "done": "task_d7_4",
       "board": {
@@ -590,6 +590,7 @@
       "launch": {
         "who": "laozhou",
         "note": [
+          "Lao Zhou: by the template, all five steps.",
           "The morning meeting's minutes, by the template: preparation, sign-in, agenda, reports, adjournment.",
           "What was said is in the meeting record; a few lines are in the group and the private chats."
         ],
