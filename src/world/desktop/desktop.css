@@ -1440,36 +1440,6 @@ span.cmp-face-btn{cursor:default}
 .ts-rlist{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:2px;color:#C9D3DB}
 .ts-rlist li.plus b{color:#6EE7B7}.ts-rlist li.minus b{color:#F87171}.ts-rlist li.none{color:#8893A0}
 .ts-gap{display:block;margin-top:4px;color:#F87171}.ts-gap.ok{color:#6EE7B7}
-/* the settlement: the report page in the middle (2026-11-12) */
-.ts.settle{grid-template-columns:320px 1fr}
-.ts-mid.report{grid-column:2/3;align-items:stretch;justify-content:flex-start;padding:6px 24px 6px 8px;overflow:auto}
-.ts-rpage{flex:1;min-height:0;overflow:auto;padding:18px 22px;background:#FBFCFE;border:1.5px solid rgba(29,33,41,.25);border-radius:12px;color:#1d2129;box-shadow:0 12px 30px rgba(0,0,0,.35);font-size:13px}
-.ts-rphead{display:flex;flex-direction:column;gap:2px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(29,33,41,.12)}
-.ts-rpk{font:12px var(--mono,ui-monospace,Menlo,monospace);letter-spacing:.1em;color:var(--ink-2)}
-.ts-rphead h3{margin:0;font-size:20px;font-weight:700}
-.ts-rpnote{font-size:12.5px;color:var(--ink-2)}
-.ts-rrows{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.ts-rrow{padding:10px 12px;background:#fff;border:1px solid rgba(29,33,41,.12);border-radius:8px}
-.ts-rname{font-weight:700;margin-bottom:6px}
-.ts-rbars{display:flex;flex-direction:column;gap:6px;margin-bottom:6px}
-.ts-rb{display:grid;grid-template-columns:76px 1fr 54px;gap:8px;align-items:center;font-size:12px;color:var(--ink-2)}
-.ts-rb b{text-align:right;color:#1d2129;font-size:14px}
-.ts-rb b small{font-size:11px;color:var(--ink-2)}
-.ts-rb.her .ts-fill{background:#F6B73C}
-.ts-rb.back .ts-fill{background:#2F6FD6}
-.ts-rb .ts-track{background:rgba(29,33,41,.1)}
-.ts-rpage .ts-rlist{color:#444}
-.ts-rpage .ts-rlist li.plus b{color:#13A37A}.ts-rpage .ts-rlist li.minus b{color:#E0457F}
-.ts-rpage .ts-gap{color:#E0457F}.ts-rpage .ts-gap.ok{color:#13A37A}
-/* Vivi's skin: her page's look — gradient, rounded, big numbers, buttons wired to nothing */
-.ts-rpage.vivi{background:linear-gradient(135deg,#FFF7E6,#FFE3F1 50%,#E6F0FF);border:0;border-radius:24px;font-family:inherit}
-.ts-rpage.vivi .ts-rphead{border-bottom:0}
-.ts-rpage.vivi .ts-rpk{color:#B3368F;letter-spacing:.2em}
-.ts-rpage.vivi .ts-rphead h3{font-size:30px;background:linear-gradient(90deg,#FF5FA2,#7C5CFF);-webkit-background-clip:text;background-clip:text;color:transparent}
-.ts-rpage.vivi .ts-rrow{border:0;border-radius:18px;box-shadow:0 10px 30px rgba(124,92,255,.15)}
-.ts-rpage.vivi .ts-rb.her b{font-size:22px;color:#FF5FA2}
-.ts-rpage.vivi .ts-rb.her .ts-fill{background:linear-gradient(90deg,#FF5FA2,#7C5CFF)}
-.ts-rpage.vivi .ts-rb.back{opacity:.55}
 .ts-rpbtns{display:flex;gap:10px;margin-top:14px}
 .ts-rpbtns span{width:120px;height:38px;border-radius:19px;background:linear-gradient(90deg,#FF5FA2,#7C5CFF);opacity:.9}
 /* clue stage (2026-11-12): the evidence board over the day's picture */
@@ -1514,6 +1484,11 @@ span.cmp-face-btn{cursor:default}
 .cs-clip{display:block;width:100%;padding:10px 12px;border:2px solid #1d2129;background:#FBF8F1;color:#1d2129;font:inherit;font-size:14px;line-height:1.45;text-align:left;cursor:pointer;box-shadow:3px 3px 0 rgba(0,0,0,.5);transform:rotate(-.5deg)}
 .cs-clip:nth-child(even){transform:rotate(.6deg)}
 .cs-clip.picked{outline:4px solid #F6B73C;transform:translate(-4px,-4px)}
+/* work-stages-polish 2: a found clipping can be dragged (touch too); the slot under it lights */
+.cs-clip[data-action="board-card"]{touch-action:none}
+.cs-tray.lifting{overflow:visible;z-index:5}
+.cs-clip.dragging{position:relative;z-index:20;cursor:grabbing;box-shadow:8px 10px 0 rgba(0,0,0,.45);transition:none}
+.cs-slot.drop{border-color:#F6B73C;border-style:solid;background:#FFF5DA}
 .cs-clip:disabled{opacity:.5;cursor:default}
 .cs-clip.unfound{display:flex;gap:8px;align-items:center;background:rgba(255,255,255,.12);color:#C9D3DB;border-style:dashed;border-color:rgba(255,255,255,.4);box-shadow:none;cursor:default;font-size:12.5px}
 .cs-clip-q{flex:0 0 auto;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.2);text-align:center;line-height:22px;font-weight:800}
@@ -1569,7 +1544,20 @@ span.cmp-face-btn{cursor:default}
 .sk-board{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:0}
 .sk-grid{display:grid;grid-template-columns:repeat(4,118px);grid-auto-rows:118px;gap:12px;padding:12px;background:#BBADA0;border-radius:8px}
 .sk-cell{position:relative;border-radius:5px;background:rgba(238,228,218,.35);overflow:hidden}
-.sk-cell.on{animation:ts-pop 180ms cubic-bezier(.2,.9,.3,1.3) both}
+/* work-stages-polish 3: a swipe moves the chain; the last move slides 120 ms from the tile's old cell
+   (118 px + 12 px gap = 130 px a cell); a merge and a new tile pop after the slide; the approval
+   moment pulses the top tile twice and lights the ladder's top; nothing moves under reduced motion */
+.sk-grid{touch-action:none;user-select:none}
+.sk-cell.slide,.sk-cell.merge{z-index:1}
+.sk-cell.slide{animation:sk-slide 120ms ease-in-out both}
+.sk-cell.merge{animation:sk-slide 120ms ease-in-out both,ts-pop 180ms 120ms cubic-bezier(.2,.9,.3,1.3) forwards}
+.sk-cell.born{animation:ts-pop 180ms 120ms cubic-bezier(.2,.9,.3,1.3) both}
+@keyframes sk-slide{from{transform:translate(calc(var(--dx,0) * 130px),calc(var(--dy,0) * 130px))}to{transform:none}}
+.sk-cell.won{z-index:2;animation:sk-won 380ms ease-in-out 2}
+@keyframes sk-won{0%,100%{transform:scale(1)}50%{transform:scale(1.12);box-shadow:0 0 0 4px #EDC22E,0 0 36px rgba(237,194,46,.9)}}
+.sk-rank.top.lit{opacity:1;background:#EDC22E}
+.sk-rank.top.lit .sk-rn,.sk-rank.top.lit small{color:#F9F6F2}
+.sk.still .sk-cell{animation:none}
 .sk-cell.on img{width:100%;height:100%;object-fit:cover;display:block;mix-blend-mode:multiply}
 .sk-cell .sk-n,.sk-cell .sk-v{display:none}
 .sk-cell.r-0{background:#EEE4DA}.sk-cell.r-1{background:#EDE0C8}.sk-cell.r-2{background:#F2B179}.sk-cell.r-3{background:#F59563}.sk-cell.r-4{background:#F67C5F}.sk-cell.r-5{background:#F65E3B}.sk-cell.r-6{background:#EDCF72}.sk-cell.r-7{background:#EDCC61}.sk-cell.r-8{background:#EDC850}.sk-cell.r-9{background:#EDC53F}.sk-cell.r-10{background:#EDC22E}
@@ -1586,3 +1574,65 @@ span.cmp-face-btn{cursor:default}
 .sk .ts-act{background:#8F7A66;color:#F9F6F2;border:0;box-shadow:none;border-radius:6px;letter-spacing:.2em}
 .sk .wl-cta.ghost{border-color:#8F7A66;color:#8F7A66}
 .sk-cheat{position:absolute;width:1px;height:1px;opacity:0;pointer-events:auto;border:0;padding:0}
+/* the settlement (author 2026-11-12): full screen, two halves — left the game's ending, right the world
+   as it now is (the page, the backend, the sheet, the approval flow), changed by that play */
+.sl{position:relative;flex:1;min-height:0;margin:-16px -26px -20px;display:grid;grid-template-columns:minmax(360px,36%) 1fr;background:#EFEAE0;color:#1d2129;overflow:hidden}
+.sl-record{display:flex;flex-direction:column;gap:14px;padding:26px 30px 22px;min-height:0;overflow:auto;border-right:1px solid rgba(29,33,41,.15);background:#F6F2E9}
+.sl-head{display:flex;align-items:center;gap:14px}
+.sl-av{width:52px;height:52px;border-radius:50%;object-fit:cover;object-position:50% 10%;border:2px solid #1d2129;background:#fff}
+.sl-titles{display:flex;flex-direction:column;gap:2px;min-width:0}
+.sl-kick{font-size:12.5px;letter-spacing:.12em;color:#6b6457}
+.sl-title{margin:0;font-size:20px;font-weight:900;letter-spacing:.02em}
+.sl-rec{flex:1;display:flex;flex-direction:column;gap:14px;min-height:0}
+.sl-rec .cmp-score{flex-direction:column;align-items:flex-start;gap:0}
+.sl-rec .cmp-score b{font-size:72px;line-height:1}
+.sl-rec .cmp-faces{border-top:0;padding-top:0}
+.sl-rec .cmp-verdict{font-size:18px}
+.sl-sum{margin:0;font-size:14px;line-height:1.6;color:#3b3833}
+.sl-sum small{color:#7a7264;margin-left:6px}
+.sl-dims{display:flex;flex-direction:column;gap:10px}
+.sl-dims .ts-rlist{color:#444}
+.sl-dims .ts-rlist li.plus b{color:#13A37A}.sl-dims .ts-rlist li.minus b{color:#E0457F}
+.sl-dims .ts-gap{color:#E0457F}.sl-dims .ts-gap.ok{color:#13A37A}
+.sl-kuro{display:flex;align-items:center;gap:10px;font-size:14px;line-height:1.5;color:#3b3833}
+.sl-kuro img{width:44px;height:44px;object-fit:contain;flex:none}
+.sl-pins{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.sl-pin{display:flex;align-items:center;gap:10px;font-size:14px;color:#7a7264}
+.sl-pin i{width:12px;height:12px;border-radius:50%;border:2px solid #9a927f;flex:none}
+.sl-pin.on{color:#1d2129}.sl-pin.on i{background:#13A37A;border-color:#13A37A}
+.sl-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.sl-actions .wl-cta,.sl-actions .ts-finish{width:auto;min-width:160px;padding:11px 22px}
+.sl-actions .ts-finish{background:#1d2129;color:#efe9df;border:2px solid #1d2129;font:inherit;font-size:16px;letter-spacing:.3em;text-indent:.3em;cursor:pointer}
+.sl-actions .ts-finish:disabled{opacity:.4;cursor:default}
+.sl-actions .ts-offer{display:contents}
+.sl-effect{position:relative;display:flex;flex-direction:column;min-width:0;min-height:0;background:#fff}
+.sl-frame{flex:1;width:100%;border:0;display:block;min-height:0}
+/* the form as it goes out */
+.sl-sheet .sl-effect,.sl-flow .sl-effect{flex-direction:row;flex-wrap:wrap;align-content:flex-start;gap:18px;padding:26px 30px 22px;background:#E6E0D4}
+.st-sheet{flex:1;min-width:360px;max-height:calc(100% - 40px);overflow:auto;box-sizing:border-box;padding:28px 36px 30px;background:#F7F2E7;color:#1d2129;border-radius:2px;box-shadow:0 18px 40px rgba(0,0,0,.25),0 1px 0 rgba(255,255,255,.6) inset;background-image:repeating-linear-gradient(180deg,transparent 0 31px,rgba(29,33,41,.06) 31px 32px)}
+.st-head{display:flex;align-items:center;gap:16px;padding-bottom:14px;margin-bottom:6px;border-bottom:2px solid #1d2129}
+.st-titles{display:flex;flex-direction:column;gap:2px;min-width:0}
+.st-title{margin:0;font-size:22px;font-weight:900;letter-spacing:.02em}
+.st-rows{list-style:none;margin:0;padding:0}
+.st-row{display:grid;grid-template-columns:28px minmax(0,1fr) minmax(0,1.3fr);gap:14px;align-items:start;padding:12px 0;border-bottom:1px dashed rgba(29,33,41,.25)}
+.st-row:last-child{border-bottom:0}
+.st-no{font-weight:900;font-size:18px;line-height:22px}
+.st-ask{display:flex;flex-direction:column;gap:4px;min-width:0}
+.st-label{font-size:14px}
+.st-demand{font-size:12.5px;color:#6b6457;line-height:1.45}
+.st-card{margin:0;font-size:14.5px;line-height:1.5;font-family:"Kaiti SC","STKaiti",serif}
+/* the approval flow beside the form: the real UI of where it got to */
+.af{width:250px;flex:none;max-height:calc(100% - 40px);overflow:auto;box-sizing:border-box;padding:14px 16px;background:#fff;border:1px solid rgba(29,33,41,.2);border-radius:8px;box-shadow:0 12px 30px rgba(0,0,0,.18)}
+.af-title{display:block;font-size:13px;font-weight:700;letter-spacing:.1em;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(29,33,41,.12)}
+.af-steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.af-step{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid rgba(29,33,41,.07);font-size:13px;color:#9a927f;position:relative}
+.af-step img{width:26px;height:26px;border-radius:4px;object-fit:cover;background:#fff;filter:grayscale(1);opacity:.5}
+.af-step.done{color:#1d2129}.af-step.done img{filter:none;opacity:1}
+.af-step.next{color:#1d2129}.af-step.next img{filter:none;opacity:.8}
+.af-step.egg img{filter:brightness(0);opacity:.35}
+.af-stamp{font-size:11px;letter-spacing:.1em;padding:2px 8px;border-radius:3px;border:1px solid currentColor;color:#9a927f}
+.af-step.done .af-stamp{color:#13A37A;border-color:#13A37A;transform:rotate(-6deg)}
+.af-step.next .af-stamp{color:#C2410C;border-color:#C2410C}
+/* the launch page's opening (author 2026-11-12) plays in the dialogue box over the page: the page waits behind it */
+.launch-layer.talking .tl-body{opacity:.6}
+.launch-layer.talking .tl-kuro{display:none} /* the box brings its own Kuro */

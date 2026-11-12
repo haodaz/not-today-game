@@ -7,6 +7,7 @@ import type { ActionContext, ActionHandler } from "../controller";
 import { kuroActions, openStarters, playerBox, starterPages } from "@world/dialogue/kuro";
 import { taskPageId, type Session, type WorkbenchPage } from "../model";
 import { taskForId } from "@state/days/board";
+import type { Task } from "@state/days/tasks";
 import { openWork } from "./work";
 import { taskOpened } from "./sessions";
 import { meetingAutoplay } from "./meeting";
@@ -175,6 +176,7 @@ export const workbenchActions: Record<string, ActionHandler> = {
       ctx.session.wbTaskDay = day < state.day ? day : null;
       // launch: entered through the row today, not passed yet: the opening page is up.
       ctx.session.launchShow = day === state.day && task.launch && !ctx.session.launched.has(`${day}:${taskId}`) ? `${day}:${taskId}` : null;
+      if (ctx.session.launchShow) queueLaunchIntro(ctx.session, task, ctx.session.launchShow);
       visit(ctx.session, page, ctx.session.wbTaskDay);
       closeMenus(ctx.session);
       // meeting R3: the first open of a meeting task today starts it playing by itself.
@@ -191,3 +193,15 @@ export const workbenchActions: Record<string, ActionHandler> = {
     ctx.rerender();
   },
 };
+
+/**
+ * The launch page's opening (author 2026-11-12): `launch.intro` plays in the dialogue box over the
+ * page — Kuro's lines one at a time, the player's answer — once per page; the page's button waits
+ * for it (`launchLayer`). Day 1's v17 page is where Kuro says work is about to become a game.
+ */
+export function queueLaunchIntro(session: Session, task: Task, key: string): void {
+  const intro = task.launch?.intro;
+  if (!intro?.length || session.launchIntro === key) return;
+  session.launchIntro = key;
+  session.dialogue = push(session.dialogue, { key: `${key}:intro`, lines: intro.map((l) => ({ k: "speaker" as const, who: l.who, t: l.text })), ending: { kind: "none" } });
+}

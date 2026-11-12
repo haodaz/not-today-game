@@ -2567,3 +2567,29 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
 - R4: `tests/chick-raising.test.ts`. objects-in-hand: the B-out assertion now includes `{care: "meal"}`, and the `checkup` entry in its snapshot was rewritten by hand to the bars frame (the old content `check` frame is no longer drawn).
 - Not run: `npm run -s validate` (shell limited to tsc and vitest this task).
 - `npx tsc --noEmit`: clean. `npx vitest run`: 146 files, 2314 passed. One obsolete snapshot reported in desk-prints.test.ts; it was already there and is not from this change.
+
+## 2026-11-12 · work-stages-polish 1–3
+
+- 1, the settlement sheet:
+  - The clue and meeting stage foot buttons are now `board-settle` (`sheet.settle.open`), enabled on `canPrint`.
+  - `workPhase` gains `{ key, phase: "settle" }`. compare.ts already narrows on `phase === "result"`.
+  - `board-settle` / `board-settle-back` are in board.ts next to `tune-select`.
+  - New `workbench/settle-sheet.ts` draws the sheet: portrait, `sheet.settle.kick`, the board title, one row per slot (number, label, demand, placed card's text), then 再改改 and 提交.
+  - The meeting stage's counterpart is `task.launch.who`. Without it the sheet has no portrait and no kick line.
+  - guide.ts G7 accepts both new actions; the print step's ring tries `board-settle` first, then `board-print`.
+  - Test: `tests/sheet-settle.test.ts` (day 4 「意识」).
+- 2, drag:
+  - New `workbench/drag.ts` `createClipDrag`, wired in controller.ts next to `createWindowDrag` and dispatching through the action table.
+  - Over a slot it fires `board-card` (skipped when the clipping is already picked), then `board-slot`.
+  - Escape, pointercancel or a release elsewhere fires nothing, and the click after a drag is swallowed.
+  - The tray gets `lifting` (overflow visible) while dragging. The transform is divided by the stage's scale.
+  - Test: `tests/drag.test.ts` (happy-dom).
+- 3, the approval chain:
+  - stack-stage.ts: `swipeDir` (24 px), `tileMotion`, and `from` / `merged` in `StackGrid`.
+  - The slide (120 ms, CSS `--dx`/`--dy`) is drawn only within 400 ms of the move (`chain.at`). Merges and new tiles pop after the slide.
+  - Approval: `approvedAt` holds the stack screen up approved for 1.6 s, with `sk-done`, two pulses of the top tile and the ladder's top `lit`; then the board.
+  - `stack-move` does nothing once approved. `.sk.still` disables all tile animation under reducedMotion.
+  - The swipe is in drag.ts (one `stack-move` per gesture).
+  - stack.test gains the swipe-direction and tile-motion cases.
+- Side effect: `script/tools/auto-day-shoot.mjs` still looks for `board-print` on these stages, and it now sits behind 整理好了. Not changed (not my area).
+- `npx tsc --noEmit`: clean. `npx vitest run`: 150 files, 2323 passed. One obsolete snapshot in desk-prints.test.ts, already there before this change.

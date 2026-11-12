@@ -32,14 +32,16 @@ describe("tune stage", () => {
     for (const m of mods) store.appendEvent({ kind: "boardStep", taskId: task.id, op: { t: "mod", id: m.id, path: m.paths.find((p) => !p.after && !p.from)!.id } });
     const session = initialSession({ beat: "work", time: "10:00" }, "left", "desktop");
     let out = tuneStage({ state: store.getState(), events: store.getEvents(), session, nowMs: 1000 }, task, task.board!).value;
-    expect(out).toContain('class="ts settle"');
-    expect(out).toContain('class="ts-rpage"');
+    // the settlement: left the bars, right the backend page as it really is (author 2026-11-12)
+    expect(out).toContain('class="sl sl-backend"');
+    expect(out).toContain('class="sl-dims"');
+    expect(out).toMatch(/<iframe class="ide-frame sl-frame" data-keep="ide-settle" src="\/docs\/player\/day-03-train\.html\?[^"]*mods=/);
     expect(out).toContain("后台里");
     expect(out).toContain('data-action="board-print"');
     expect(out).not.toContain('data-action="tune-select"');
     store.appendEvent({ kind: "boardStep", taskId: task.id, op: { t: "mod", id: "front", path: "skin" } });
     out = tuneStage({ state: store.getState(), events: store.getEvents(), session, nowMs: 1000 }, task, task.board!).value;
-    expect(out).toContain('class="ts-rpage vivi"');
-    expect(out).toContain("按钮后面还是没有东西");
+    // her skin taken: the page itself wears it (front:skin in the address; the page does the rest)
+    expect(out).toMatch(/<iframe class="ide-frame sl-frame" data-keep="ide-settle" src="[^"]*front(%3A|:)skin/);
   });
 });

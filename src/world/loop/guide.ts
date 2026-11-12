@@ -202,7 +202,7 @@ export function onTarget(target: GuideTarget, action: string, data: Readonly<Rec
       return action === "wb-nav" && data.page === `task:${target.id}`;
     case "board":
       // G7 never refuses; its target is the board's own controls.
-      return action === "task-launch" || action === "compare-pick" || action === "compare-kuro" || action === "compare-redo" || action === "board-lock" || action === "board-mod" || action === "board-keep" || action === "board-merge" || action === "board-fetch" || action === "board-option" || action === "board-card" || action === "board-slot" || action === "shell-slot" || action === "board-print";
+      return action === "task-launch" || action === "compare-pick" || action === "compare-kuro" || action === "compare-redo" || action === "board-lock" || action === "board-mod" || action === "board-keep" || action === "board-merge" || action === "board-fetch" || action === "board-option" || action === "board-card" || action === "board-slot" || action === "shell-slot" || action === "board-print" || action === "board-settle" || action === "board-settle-back";
   }
 }
 
@@ -289,7 +289,8 @@ function boardAnchors(step: "lock" | "merge" | "card" | "slot" | "fetch" | "prin
   // compare: the page's version buttons (the slot names the page); else the tray's directions / cards.
   if (step === "card") return [...(slot !== undefined ? [[["class", "wl-vs"], ["data-slot", slot]] as const] : []), [["data-action", "board-option"]], [["data-action", "board-card"]]];
   if (step === "slot") return [[["data-action", "board-slot"], ["!", "filled"]], [["data-action", "shell-slot"]]];
-  return [[["data-action", "board-print"]]];
+  // work-stages-polish 1: on the clue / meeting stage 提交 is on the settlement sheet; before it, 整理好了.
+  return [[["data-action", "board-settle"]], [["data-action", "board-print"]]];
 }
 
 /** The first opening tag carrying every attribute gets the ring attribute; null when none does. */

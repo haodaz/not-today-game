@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { createStore } from "@state/store";
 import { taskByFlag } from "@state/days/tasks";
 import { boardState, canPrint, freshBoard, stepBoard } from "@state/days/board";
-import { rankOf, stackBest, stackMove, stackStart, stackTarget, type StackGrid } from "../src/world/desktop/workbench/stack-stage";
+import { rankOf, stackBest, stackMove, stackStart, stackTarget, swipeDir, SWIPE_MIN_PX, tileMotion, type StackGrid } from "../src/world/desktop/workbench/stack-stage";
 
 const day13 = () => taskByFlag(13, "task_d13_work")!;
 
@@ -45,5 +45,26 @@ describe("the approval chain", () => {
     const store = createStore({ startDay: 13 });
     store.appendEvent({ kind: "boardStep", taskId: day13().id, op: { t: "approve" } });
     expect(boardState(b, 13, day13().id, store.getEvents()).approved).toBe(true);
+  });
+  it("work-stages-polish 3: a swipe's direction from dx / dy (the main axis), none under 24 px or on the diagonal", () => {
+    expect(SWIPE_MIN_PX).toBe(24);
+    expect(swipeDir(30, 4)).toBe("right");
+    expect(swipeDir(-30, 10)).toBe("left");
+    expect(swipeDir(5, 40)).toBe("down");
+    expect(swipeDir(-12, -25)).toBe("up");
+    expect(swipeDir(23, 0)).toBeNull();
+    expect(swipeDir(-10, 20)).toBeNull();
+    expect(swipeDir(30, 30)).toBeNull();
+    expect(swipeDir(0, 0)).toBeNull();
+  });
+  it("work-stages-polish 3: a move remembers where each tile came from (slide, merge, new) for the 120 ms slide", () => {
+    const g: StackGrid = { key: "k", cells: [0, 2, 0, 2, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0], score: 0, moves: 0, over: false };
+    const left = stackMove(g, "left", () => 0.99);
+    expect(left.cells.slice(0, 8)).toEqual([4, 0, 0, 0, 4, 0, 0, 0]);
+    expect(tileMotion(left, 0)).toEqual({ kind: "merge", dx: 1, dy: 0 });
+    expect(tileMotion(left, 4)).toEqual({ kind: "slide", dx: 2, dy: 0 });
+    const spawned = left.cells.findIndex((v, i) => v !== 0 && i !== 0 && i !== 4);
+    expect(tileMotion(left, spawned)).toEqual({ kind: "born" });
+    expect(tileMotion(left, 1)).toBeNull();
   });
 });

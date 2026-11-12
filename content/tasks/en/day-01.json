@@ -541,7 +541,29 @@
             "Mindshare"
           ]
         },
-        "tone": "burst"
+        "tone": "burst",
+        "intro": [
+          {
+            "who": "kuro",
+            "text": "From v1 all the way to v17? And then back to v1? Work is misery, isn't it?"
+          },
+          {
+            "who": "kuro",
+            "text": "Don't worry! With Kuro around, work is going to be fun!"
+          },
+          {
+            "who": "kuro",
+            "text": "Let's take it easy and solve this the game way!"
+          },
+          {
+            "who": "kuro",
+            "text": "And how far you get in the game really does change how this work turns out!!"
+          },
+          {
+            "who": "me",
+            "text": "...No idea when that feature got added."
+          }
+        ]
       }
     }
   ]

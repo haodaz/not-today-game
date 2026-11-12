@@ -15,6 +15,7 @@ import "./world/motion/motion.css";
 import "./ui/fonts.css";
 import "./ui/title/title.css";
 import { taskForId } from "@state/days/board";
+import { queueLaunchIntro } from "@world/desktop/workbench/actions";
 import { debugStartDay } from "@state/clock";
 import { syncProfile, withCloud } from "./ui/profile-sync";
 import type { State } from "@state/types.gen";
@@ -183,12 +184,16 @@ function startGame(store: Store, saved: boolean, prologue = false): void {
       if (board) {
         if (board.given.lock?.answer) store.appendEvent({ kind: "boardStep", taskId: launch, op: { t: "unlock", code: board.given.lock.answer } });
         for (const slot of board.slots) store.appendEvent({ kind: "boardStep", taskId: launch, op: { t: "fill", slot: slot.id, card: slot.answer } });
+        // a tune board: the budget spent on the first open path of each module, so the settlement is up
+        if (board.tune) for (const m of board.tune.mods.filter((x) => !x.from && x.paths.some((p) => !p.after && !p.from)).slice(0, board.tune.steps)) store.appendEvent({ kind: "boardStep", taskId: launch, op: { t: "mod", id: m.id, path: m.paths.find((p) => !p.after && !p.from)!.id } });
       }
     }
     s.view = "desktop";
     s.leftApp = "workbench";
     s.workbenchPage = `task:${launch}`;
     s.launchShow = `${store.getState().day}:${launch}`;
+    const lt = taskForId(store.getState().day, launch);
+    if (lt) queueLaunchIntro(s, lt, s.launchShow);
     game.rerender();
   }
   // Debug, beside ?day=N (a debug run is never saved): `&night=1` / `&shutdown=1` put that day's

@@ -236,12 +236,25 @@ describe("G7 · a board task's page (2026-11-08)", () => {
     const out = r.out();
     // over the whole stage, not inside the monitor (author 2026-11-11 night)
     // author 2026-11-12: a picture edge to edge, no card: the day tag, the bust, its motif (day 1: 老王's jargon fanned behind him)
-    expect(out).toContain('<div class="launch-layer motif-fan tone-burst" role="dialog"');
+    expect(out).toContain('<div class="launch-layer motif-fan tone-burst talking" role="dialog"'); // talking: the opening is on (2026-11-12)
     expect(out).toContain('<div class="tl-tag">');
     expect(out).toContain('<img class="tl-who" src="/npc/boss.png"');
     expect(out).toContain('class="tl-fan-bub ring0"');
     expect(out).toContain(task.launch!.call);
-    expect(out).toMatch(new RegExp(`data-action="task-launch" data-task="${task.id}"[^>]*>${task.launch!.cta}</button>`));
+    // the opening (author 2026-11-12): the page's lines play in the dialogue box — Kuro, then the player — and the button waits for them
+    const intro = task.launch!.intro!;
+    expect(intro.length).toBeGreaterThan(1);
+    // (Kuro's run and the player's line are split into their own items, as any sequence's are)
+    const queued = r.session.dialogue.queue.filter((q) => q.key.startsWith(`1:${task.id}:intro`));
+    expect(queued.length).toBeGreaterThan(0);
+    expect(queued.flatMap((q) => q.lines).map((l) => (l.k === "speaker" ? `${l.who}:${l.t}` : l.k))).toEqual(intro.map((l) => `${l.who}:${l.text}`));
+    expect(out).not.toContain('data-action="task-launch"');
+    while (r.session.dialogue.queue[0]?.key.startsWith(`1:${task.id}:intro`)) r.act("loop-advance");
+    // entered again before pressing: the opening does not play twice
+    r.act("wb-nav", { page: "home" });
+    r.act("wb-nav", { page: `task:${task.id}`, launch: "1" });
+    expect(r.session.dialogue.queue).toHaveLength(0);
+    expect(r.out()).toMatch(new RegExp(`data-action="task-launch" data-task="${task.id}"[^>]*>${task.launch!.cta}</button>`));
     // the second time the row needs no ask
     r.act("task-launch", { task: task.id });
     expect(r.out()).not.toContain("launch-layer");
@@ -268,6 +281,7 @@ describe("G7 · a board task's page (2026-11-08)", () => {
     r.act("loop-choice", { choice: "go" });
     expect(r.session.workbenchPage).toBe(`task:${task.id}`);
     // launch: the opening page's button is lit first; pressed, the pages.
+    while (r.session.dialogue.queue[0]?.key.startsWith(`1:${task.id}:intro`)) r.act("loop-advance"); // the opening (2026-11-12) first; the guide waits behind it
     expect(guideNow(store.getState(), store.getEvents(), r.session)).toMatchObject({ id: "G7", target: { kind: "board", step: "launch" } });
     expect(r.out()).toMatch(/data-action="task-launch"[^>]*data-guide="on"/);
     r.act("task-launch", { task: task.id });

@@ -18,11 +18,12 @@ import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t, tr } from "@world/i18n";
 import { cardText, finishLabel, renderBoard } from "./board";
 import { openWork } from "./work";
+import { browserFrame, settleLayer } from "./settle-layer";
 import { tunePane } from "./shell";
 import { tuneStage } from "./tune-stage";
 import { clueStage } from "./clue-stage";
 import { meetingStage } from "./meeting-stage";
-import { stackStage } from "./stack-stage";
+import { approving, stackStage } from "./stack-stage";
 import { tuneOfferPending, tuneOffers } from "@state/days/board";
 import { isNight } from "../beat";
 import type { AppContext } from "../model";
@@ -36,7 +37,7 @@ import type { AppContext } from "../model";
  * Kuro peeking over the stage's bottom-right corner. Up while `session.launchShow` names today's
  * task page (entered through 工作台's row) and the screen is shown.
  */
-export function launchLayer(state: State, session: Pick<Session, "launchShow" | "launched" | "view">): SafeHtml | null {
+export function launchLayer(state: State, session: Pick<Session, "launchShow" | "launched" | "view" | "dialogue">): SafeHtml | null {
   if (session.view !== "desktop" || session.launchShow === null) return null;
   const [dayText, taskId] = session.launchShow.split(":");
   const day = Number(dayText);
@@ -55,7 +56,11 @@ export function launchLayer(state: State, session: Pick<Session, "launchShow" | 
   const figure = l.art
     ? html`<div class="tl-figure art"><img class="tl-art" src="${l.art}" alt="">${wide ? null : motif}</div>`
     : html`<div class="tl-figure">${who ? html`<img class="tl-who" src="${who}" alt="">` : null}${wide ? null : motif}<span class="tl-name">${name}</span></div>`;
-  return html`<div class="${cls("launch-layer", l.motif && `motif-${l.motif.kind}`, `tone-${l.tone ?? "burst"}`)}" role="dialog" aria-modal="true" aria-labelledby="tl-title">${wide ? motif : null}${tag}${figure}<div class="tl-body"><h2 class="tl-title" id="tl-title">${fill(task.title)}</h2>${l.note.map((n) => html`<p class="tl-note">${fill(n)}</p>`)}<p class="tl-call">${fill(l.call)}</p><button type="button" class="tl-cta" data-action="task-launch" data-task="${task.id}">${fill(l.cta)}</button></div><img class="tl-kuro" src="${frameUrl(FRAMES.idle[0])}" alt="" aria-hidden="true"></div>`;
+  // the opening (author 2026-11-12): the page's lines play in the dialogue box over the page (queued by
+  // `queueLaunchIntro`); the button comes only after it is through
+  const talking = session.dialogue.queue.some((q) => q.key.startsWith(`${session.launchShow}:intro`)); // still queued, maybe behind the morning's lines (push numbers keys: …:intro#1)
+  const cta = talking ? null : html`<button type="button" class="tl-cta" data-action="task-launch" data-task="${task.id}">${fill(l.cta)}</button>`;
+  return html`<div class="${cls("launch-layer", l.motif && `motif-${l.motif.kind}`, `tone-${l.tone ?? "burst"}`, talking && "talking")}" role="dialog" aria-modal="true" aria-labelledby="tl-title">${wide ? motif : null}${tag}${figure}<div class="tl-body"><h2 class="tl-title" id="tl-title">${fill(task.title)}</h2>${l.note.map((n) => html`<p class="tl-note">${fill(n)}</p>`)}<p class="tl-call">${fill(l.call)}</p>${cta}</div><img class="tl-kuro" src="${frameUrl(FRAMES.idle[0])}" alt="" aria-hidden="true"></div>`;
 }
 
 /**
@@ -169,7 +174,10 @@ export function workLayer(ctx: { readonly state: State; readonly events: readonl
     const pass = sc.pct >= cmp.threshold;
     const finish = html`<button type="button" class="wl-cta" data-action="board-print"${canPrint(board, s) ? null : html` disabled`}>${finishLabel(task)}</button>`;
     const redo = !pass && hasString("compare.redo") ? html`<button type="button" class="wl-cta ghost" data-action="compare-redo"${holding ? html` disabled` : null}>${tr("compare.redo")}</button><p class="cmp-note">${tr("compare.redoNote")}</p>` : null;
-    body = html`<div class="wl-settle"><div class="cmp-score"><b>${sc.pct}%</b><span>${tr("compare.score", { r: String(sc.right), w: String(sc.total - sc.right) })}</span></div>${faces(board, s, cmp.pages[cmp.pages.length - 1]!, false)}<p class="${cls("cmp-verdict", pass ? "pass" : "fail")}">${tr(pass ? "compare.pass" : "compare.fail", { pct: String(cmp.threshold) })}</p><div class="wl-settle-actions">${pass ? finish : redo}</div></div>`;
+    // the settlement (author 2026-11-12): left the game's ending, right the page as it really is now
+    const record = html`<div class="cmp-score"><b>${sc.pct}%</b><span>${tr("compare.score", { r: String(sc.right), w: String(sc.total - sc.right) })}</span></div>${faces(board, s, cmp.pages[cmp.pages.length - 1]!, false)}<p class="${cls("cmp-verdict", pass ? "pass" : "fail")}">${tr(pass ? "compare.pass" : "compare.fail", { pct: String(cmp.threshold) })}</p>`;
+    const effect = browserFrame(ideSrc(board, s, ops, null, tuneCarried(board, events)), fill(task.title), "ide-settle");
+    body = settleLayer({ kind: "page", portrait: counterpartPortrait(task), kick: hasString("sheet.settle.kick") ? t("sheet.settle.kick", { who: counterpartName(task) }) : "", title: fill(task.title), record, effect, actions: html`${pass ? finish : redo}` });
   }
   return html`<div class="work-layer"><section class="work-stage" data-screen="${screen}" role="dialog" aria-modal="true" aria-label="${fill(task.title)}">${head}<div class="wl-body">${body}</div></section></div>`;
 }
@@ -189,9 +197,11 @@ function genericWorkLayer(c: { state: State; events: readonly GameEvent[]; sessi
   } else if (board.view === "meeting" && board.meeting) {
     // meeting stage (2026-11-12): the meeting above, the template under it
     body = meetingStage(app, task, board);
-  } else if (board.stack && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && !st.approved; })()) {
-    // stack (2026-11-12): the form filled goes up the chain — 2048 until the top rank appears
-    body = stackStage(task, board, session, false);
+  } else if (board.stack && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && (!st.approved || (session.chain?.key === task.id && approving(session.chain, nowMs))); })()) {
+    // stack (2026-11-12): the form filled goes up the chain — 2048 until the top rank appears; then
+    // (work-stages-polish 3) the approval moment holds the screen, approved, before the board returns
+    const approved = boardState(board, state.day, task.id, events).approved;
+    body = stackStage(task, board, session, approved, nowMs);
   } else if (board.kind === "table" && !board.meeting && board.view !== "ide") {
     // clue stage (2026-11-12): the evidence board, not the table pane
     body = clueStage({ state, events, session, nowMs }, task, board);

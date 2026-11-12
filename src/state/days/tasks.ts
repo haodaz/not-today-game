@@ -355,6 +355,15 @@ export interface TaskLaunch {
   readonly art?: string;
   /** The page's ground: one of a few named looks, so no two days share one (default "burst"). */
   readonly tone?: LaunchTone;
+  /**
+   * author 2026-11-12: the opening, before the button can be pressed — Kuro speaks, one screen a
+   * line (继续 between), the player answers; then 开始工作. Day 1's page explains why work became a game.
+   */
+  readonly intro?: readonly LaunchLine[];
+}
+export interface LaunchLine {
+  readonly who: "kuro" | "me";
+  readonly text: string;
 }
 export type LaunchTone = "burst" | "night" | "paper" | "ink" | "blue" | "vellum";
 export interface LaunchMotif {
@@ -1056,7 +1065,17 @@ function judge(v: unknown, w: string): TaskJudge {
 /** launch (author 2026-11-11): who stands beside Kuro, the note lines, the call line, the button. */
 function launch(v: unknown, w: string): TaskLaunch {
   if (!isRecord(v)) fail(w, "must be an object");
-  keys(v, ["who", "note", "call", "cta", "motif", "art", "tone"], w);
+  keys(v, ["who", "note", "call", "cta", "motif", "art", "tone", "intro"], w);
+  let intro: LaunchLine[] | undefined;
+  if (v.intro !== undefined) {
+    if (!Array.isArray(v.intro) || v.intro.length === 0 || v.intro.length > 12) fail(`${w}.intro`, "must be 1 to 12 lines");
+    intro = v.intro.map((x, i) => {
+      if (!isRecord(x)) fail(`${w}.intro[${i}]`, "a line must be an object");
+      keys(x, ["who", "text"], `${w}.intro[${i}]`);
+      if (x.who !== "kuro" && x.who !== "me") fail(`${w}.intro[${i}].who`, 'must be "kuro" or "me"');
+      return { who: x.who, text: str(x.text, `${w}.intro[${i}].text`) };
+    });
+  }
   const TONES = ["burst", "night", "paper", "ink", "blue", "vellum"];
   if (v.tone !== undefined && !TONES.includes(v.tone as string)) fail(`${w}.tone`, `must be one of ${TONES.join(", ")}`);
   if (!Array.isArray(v.note) || v.note.length === 0 || !v.note.every((x) => typeof x === "string" && x !== "")) fail(`${w}.note`, "must be a non-empty list of strings");
@@ -1069,7 +1088,7 @@ function launch(v: unknown, w: string): TaskLaunch {
     if (!Array.isArray(v.motif.items) || v.motif.items.length < 3 || v.motif.items.length > 24 || !v.motif.items.every((x) => typeof x === "string" && x !== "")) fail(`${mw}.items`, "must be 3 to 24 strings");
     motif = { kind: v.motif.kind, items: v.motif.items as string[] };
   }
-  return { who: str(v.who, `${w}.who`), note: v.note as string[], call: str(v.call, `${w}.call`), cta: str(v.cta, `${w}.cta`), ...(motif ? { motif } : {}), ...(v.art !== undefined ? { art: str(v.art, `${w}.art`) } : {}), ...(v.tone !== undefined ? { tone: v.tone as LaunchTone } : {}) };
+  return { who: str(v.who, `${w}.who`), note: v.note as string[], call: str(v.call, `${w}.call`), cta: str(v.cta, `${w}.cta`), ...(motif ? { motif } : {}), ...(v.art !== undefined ? { art: str(v.art, `${w}.art`) } : {}), ...(v.tone !== undefined ? { tone: v.tone as LaunchTone } : {}), ...(intro ? { intro } : {}) };
 }
 
 /** Inert empty placeholders for a board task's unused reply tree (work v2). */

@@ -17,3 +17,18 @@ Everything else still falls to `genericWorkLayer` → `renderBoard` (the old pan
 ## Looking at a screen quickly (dev)
 
 `?lang=zh&day=N&view=desktop&seed=flags:<earlier days' task flags>&launch=<task>` → the launch page; 开始工作 opens the screen. The replay driver (`script/tools/auto-day-shoot.mjs`) knows the three screens (`compare-pick` / `tune-select` + `tune-act` + `.ts-node` / `board-card` + `board-slot`).
+
+## The settlement: the game projected back into the real (author, later the same day)
+
+「结算就是把游戏对世界的改变投射回真实」. The work is a game because Kuro cannot do it properly — he makes it 欢乐缤纷 (认知污染), and what it spends is the world. So every task ends on one full-screen page in two halves (`workbench/settle-layer.ts`, `settleLayer`):
+
+- **left, the game's ending**: the score and the faces (compare), each dimension's bar against her promise and today's line with what each step did (tune), clippings found / pinned (clue, meeting), the rank the form reached (the chain); then 再改改 / 提交 / Kuro's offer.
+- **right, what it really looks like now**: the real page in an iframe (`ideSrc` with every pick — the backend page puts on Vivi's skin by itself when `front: skin` was taken), the sheet as it goes out, and on the chain day the approval-flow UI beside it (`.af`, 已批 stamps up to the rank reached). No caption over it and nothing boxed in: the real thing gets the whole half.
+
+The settlement matches the score; it need not be a success.
+
+## The first launch page opens with Kuro (day 1, v17)
+
+`launch.intro` (content) plays in the game's NPC dialogue box over the launch page — Kuro, one line a screen: 从第 1 版改到第 17 版？… / 不用担心！有克总在，工作都会变得很欢乐！ / 让我们轻轻松松，用游戏的办法解决问题吧！ / 你的游戏进度，会真的影响这份工作的效果哦！！ — then the player: ……也不知道这是什么时候加的功能。 开始工作 appears only after (`queueLaunchIntro` in `workbench/actions.ts`; the dialogue layer sits above the launch and work pages now). The right half of the settlement is what that line proves.
+
+Dev: `&filled=1` also spends a tune board's budget; the launched task must be the loop's open item (seed the flags, and the day's earlier event items are not seedable — use the replay for those days).

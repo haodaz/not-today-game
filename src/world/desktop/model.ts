@@ -357,7 +357,7 @@ export interface Session {
   /** tune stage (2026-11-12): the action card picked, before 行动 (`path: null` = Kuro's card). Session only. */
   tunePick: { key: string; mod: string; path: string | null } | null;
   /** stack (2026-11-12): the approval chain's 2048 grid under way (session only; the top reached is a board step). */
-  chain: { key: string; cells: readonly number[]; score: number; moves: number; over: boolean } | null;
+  chain: { key: string; cells: readonly number[]; score: number; moves: number; over: boolean; from?: readonly number[]; merged?: readonly boolean[]; at?: number; approvedAt?: number } | null;
   /** tune: while Kuro "executes" a choice the preview keeps its previous page (then it changes, then Kuro speaks). */
   ideHold: { key: string; until: number; src: string } | null;
   /**
@@ -376,10 +376,16 @@ export interface Session {
   launched: Set<string>;
   /** launch: the task page entered through 工作台's row whose opening page is up now (`<day>:<taskId>`), or null. */
   launchShow: string | null;
+  /** The launch page whose opening (`launch.intro`, author 2026-11-12) has been queued as dialogue, so it plays once. */
+  launchIntro: string | null;
   /** work (author 2026-11-11 night): the task whose full-screen work page is up (`<day>:<taskId>`), or null; 回到工作台 hides it, 打开工作页 brings it back. */
   workShow: string | null;
-  /** work: the page just chosen is on its result screen (`phase: "result"`, the page's slot); null = the choose or settle screen. */
-  workPhase: { key: string; phase: "result"; slot: string } | null;
+  /**
+   * work: the page just chosen is on its result screen (`phase: "result"`, the page's slot; compare);
+   * the clue / meeting stage shows its settlement sheet (`phase: "settle"`, work-stages-polish 1);
+   * null = the choose or settle screen (compare) / the board (clue, meeting).
+   */
+  workPhase: { key: string; phase: "result"; slot: string } | { key: string; phase: "settle" } | null;
   /**
    * object-bar 2026-11-03: an old object opened from the 老物件栏 is being used over the desktop
    * (its drawn device in a modal). It is the same `holding` + `hand.using` the room uses; this flag
@@ -566,6 +572,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     shell: {},
     launched: new Set(),
     launchShow: null,
+    launchIntro: null,
     workShow: null,
     workPhase: null,
     objbarOpen: false,

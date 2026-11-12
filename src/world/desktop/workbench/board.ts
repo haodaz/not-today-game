@@ -5,7 +5,7 @@
 // prints when every slot is filled and the column is open. Every action is a `boardStep` event, so
 // the board rebuilds from the log; printing is the `task` event with `slots` + `assists`. Kuro's own
 // cards never show in the tray. All labels are strings; story text is content. Pure view + actions.
-import { stackBest, stackMove, stackStart, stackTarget, type StackDir } from "./stack-stage";
+import { APPROVE_MS, SLIDE_WINDOW_MS, stackBest, stackMove, stackStart, stackTarget, type StackDir } from "./stack-stage";
 import type { State } from "@state/types.gen";
 import type { GameEvent } from "@state/events";
 import type { Task, TaskBoard } from "@state/days/tasks";
@@ -463,7 +463,7 @@ const actions: Record<string, ActionHandler> = {
   "stack-start"(ctx) {
     const c = currentBoard(ctx);
     if (!c || !c.board.stack) return;
-    ctx.session.chain = stackStart(c.task.id);
+    ctx.session.chain = { ...stackStart(c.task.id), at: ctx.now?.() ?? Date.now() };
     ctx.rerender();
   },
   "stack-move"(ctx, data) {
@@ -472,10 +472,20 @@ const actions: Record<string, ActionHandler> = {
     if (!c || !c.board.stack || !dir || !["up", "down", "left", "right"].includes(dir)) return;
     const g = ctx.session.chain?.key === c.task.id ? ctx.session.chain : null;
     if (!g) return;
-    const next = stackMove(g, dir);
-    ctx.session.chain = next;
     const s = stateOf(ctx, c.task, c.board);
-    if (!s.approved && stackBest(next) >= stackTarget(c.board.stack)) {
+    // work-stages-polish 3: approved, the chain stops (the approval moment, then the board)
+    if (s.approved) return;
+    const moved = stackMove(g, dir);
+    if (moved === g) return;
+    const now = ctx.now?.() ?? Date.now();
+    const next = { ...moved, at: now };
+    ctx.session.chain = next;
+    // the slide is drawn just after the move; one repaint after it shows the tiles at rest
+    ctx.later(SLIDE_WINDOW_MS + 16, ctx.rerender);
+    if (stackBest(next) >= stackTarget(c.board.stack)) {
+      // the approval moment: the stack screen stays up, approved, for APPROVE_MS, then the board
+      ctx.session.chain = { ...next, approvedAt: now };
+      ctx.later(APPROVE_MS + 16, ctx.rerender);
       const before = transcriptLength(ctx, c);
       ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
       noteIdeLines(ctx, c.task, c.board, ctx.store.getState().day, before);
@@ -499,6 +509,20 @@ const actions: Record<string, ActionHandler> = {
     const path = data.path ? data.path : null;
     const same = ctx.session.tunePick?.key === key && ctx.session.tunePick.mod === data.mod && ctx.session.tunePick.path === path;
     ctx.session.tunePick = same ? null : { key, mod: data.mod, path };
+    ctx.rerender();
+  },
+  // work-stages-polish 1: 整理好了 on the clue / meeting stage shows the settlement sheet (only once
+  // 提交 would be allowed); 再改改 goes back to the board.
+  "board-settle"(ctx) {
+    const c = currentBoard(ctx);
+    if (!c || c.board.compare || c.board.tune) return;
+    if (!canPrint(c.board, stateOf(ctx, c.task, c.board))) return;
+    ctx.session.workPhase = { key: ideKey(ctx.store.getState().day, c.task), phase: "settle" };
+    ctx.rerender();
+  },
+  "board-settle-back"(ctx) {
+    if (ctx.session.workPhase?.phase !== "settle") return;
+    ctx.session.workPhase = null;
     ctx.rerender();
   },
   "tune-act"(ctx) {

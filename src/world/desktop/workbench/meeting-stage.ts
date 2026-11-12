@@ -15,7 +15,8 @@ import { FRAMES, frameUrl } from "../kuro/body";
 import type { AppContext, Session } from "../model";
 import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t } from "@world/i18n";
-import { cardText, finishLabel, lockRow } from "./board";
+import { cardText, lockRow } from "./board";
+import { settleButton, settleSheet, settling } from "./settle-sheet";
 import { meetingWindow } from "./meeting";
 import { fillPlaceholders } from "@world/replies/placeholders";
 
@@ -34,6 +35,11 @@ export function meetingStage(ctx: AppContext, task: Task, board: TaskBoard): Saf
   const done = board.slots.filter((x) => x.id in s.slots).length;
   const printable = canPrint(board, s);
   const seating = board.meeting?.layout === "seats";
+  const art = task.launch?.art;
+  const artStyle = art ? html` style="--art:url('${art}')"` : null;
+
+  // work-stages-polish 1: 整理好了 shows the settlement sheet instead of the meeting and the template
+  if (settling(session, day, task)) return settleSheet(state, task, board, s, task.launch?.who ?? null, found);
 
   const top = html`<header class="ms-top"><div class="cs-title"><span class="cs-kick">${S(seating ? "meeting.stage.kickSeats" : "meeting.stage.kick")}</span><h2>${fill(board.title)}</h2></div><div class="cs-count"><span>${S("clue.stage.count", { n: String(done), total: String(board.slots.length) })}</span><div class="cs-pips">${board.slots.map((x) => html`<i class="${cls("cs-pip", x.id in s.slots && "on")}"></i>`)}</div></div></header>`;
 
@@ -67,9 +73,8 @@ export function meetingStage(ctx: AppContext, task: Task, board: TaskBoard): Saf
   const shown = lines.filter((_, i) => (typing[i] ?? 0) <= nowMs);
   const last = [...shown].reverse().find((l) => l.who === "kuro" && l.text);
   const say = last ? last.text : "";
-  const finish = html`<button type="button" class="ts-finish" data-action="board-print"${printable ? null : html` disabled`}>${finishLabel(task)}</button>`;
+  const finish = settleButton(printable);
   const foot = html`<div class="cs-foot"><img class="ts-kimg" src="${frameUrl(FRAMES.idle[0])}" alt="">${say ? html`<div class="ts-say">${kuroText(day, say)}</div>` : html`<div class="ts-say empty"></div>`}<div class="cs-right">${finish}</div></div>`;
 
-  const art = task.launch?.art;
-  return html`<div class="ms"${art ? html` style="--art:url('${art}')"` : null}><div class="cs-dim"></div>${top}<div class="ms-main">${screen}${template}</div>${tray}${foot}</div>`;
+  return html`<div class="ms"${artStyle}><div class="cs-dim"></div>${top}<div class="ms-main">${screen}${template}</div>${tray}${foot}</div>`;
 }

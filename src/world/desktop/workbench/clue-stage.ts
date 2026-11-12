@@ -16,8 +16,9 @@ import { FRAMES, frameUrl } from "../kuro/body";
 import type { Session } from "../model";
 import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t } from "@world/i18n";
-import { cardText, finishLabel, lockRow } from "./board";
-import { npcPortrait, speakerLabel } from "@world/npc";
+import { cardText, lockRow } from "./board";
+import { npcPortrait } from "@world/npc";
+import { whoName, settleButton, settleSheet, settling } from "./settle-sheet";
 import { fillPlaceholders } from "@world/replies/placeholders";
 
 const S = (key: string, args?: Record<string, string>): string => (hasString(key) ? t(key, args) : "");
@@ -33,10 +34,15 @@ export function clueStage(c: { state: State; events: readonly GameEvent[]; sessi
   const placed = new Set(Object.values(s.slots));
   const locked = board.given.lock !== undefined && !s.unlocked;
   const who = task.launch?.who ?? "boss";
-  const name = hasString(`launch.name.${who}`) ? t(`launch.name.${who}`) : speakerLabel(who, fill);
+  const name = whoName(who, state);
   const portrait = npcPortrait(who);
   const done = board.slots.filter((x) => x.id in s.slots).length;
   const printable = canPrint(board, s);
+  const art = task.launch?.art;
+  const artStyle = art ? html` style="--art:url('${art}')"` : null;
+
+  // work-stages-polish 1: 整理好了 shows the settlement sheet instead of the board
+  if (settling(session, day, task)) return settleSheet(state, task, board, s, who, found, session.chain?.key === task.id ? session.chain : null);
 
   // ——— the top: who asked, how many of the demands are answered
   const top = html`<header class="cs-top"><div class="cs-who">${portrait ? html`<img class="cs-av" src="${portrait}" alt="">` : null}<div class="cs-title"><span class="cs-kick">${S("clue.stage.kick")}</span><h2>${S("clue.stage.title", { who: name })}</h2></div></div><div class="cs-count"><span>${S("clue.stage.count", { n: String(done), total: String(board.slots.length) })}</span><div class="cs-pips">${board.slots.map((x) => html`<i class="${cls("cs-pip", x.id in s.slots && "on")}"></i>`)}</div></div></header>`;
@@ -71,9 +77,8 @@ export function clueStage(c: { state: State; events: readonly GameEvent[]; sessi
   const shown = lines.filter((_, i) => (typing[i] ?? 0) <= nowMs);
   const last = [...shown].reverse().find((l) => l.who === "kuro" && l.text);
   const say = last ? last.text : "";
-  const finish = html`<button type="button" class="ts-finish" data-action="board-print"${printable ? null : html` disabled`}>${finishLabel(task)}</button>`;
+  const finish = settleButton(printable);
   const foot = html`<div class="cs-foot"><img class="ts-kimg" src="${frameUrl(FRAMES.idle[0])}" alt="">${say ? html`<div class="ts-say">${kuroText(day, say)}</div>` : html`<div class="ts-say empty"></div>`}<div class="cs-right">${finish}</div></div>`;
 
-  const art = task.launch?.art;
-  return html`<div class="cs"${art ? html` style="--art:url('${art}')"` : null}><div class="cs-dim"></div>${top}${wall}${tray}${foot}</div>`;
+  return html`<div class="cs"${artStyle}><div class="cs-dim"></div>${top}${wall}${tray}${foot}</div>`;
 }

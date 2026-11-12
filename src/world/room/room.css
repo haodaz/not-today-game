@@ -446,7 +446,7 @@
 /* The box does not jump (dialogue correction 2026-11-02): one rule for every view. The box lives in
    this fixed layer over 房间, 桌子, 门 and 屏幕 alike, anchored to the viewport (not to the stage,
    whose size differs by view): the same bottom offset, width and height everywhere. */
-.dlg-layer{position:fixed;inset:0;z-index:30;pointer-events:none}
+.dlg-layer{position:fixed;inset:0;z-index:41;pointer-events:none} /* over the launch and work pages (40) too: the opening plays there (author 2026-11-12) */
 .dlg-layer > *{pointer-events:auto}
 .dlg-layer .dlg{position:fixed;left:50%;bottom:var(--dlg-bottom,60px);transform:translateX(-50%);width:900px;max-width:80vw;height:var(--dlg-h,132px)}
 /* author 2026-11-11: over a chat app the box sits in the upper half, off the thread it talks about. */

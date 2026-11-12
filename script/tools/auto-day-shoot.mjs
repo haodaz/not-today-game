@@ -348,7 +348,9 @@ for (const it of ITEMS) {
         for (let w = 0; w < 8 && !(await has("[data-action=board-print]:not([disabled])")); w++) await sleep(1);
         note(`   tune: ${picks} picks`); await shotStep("board-tuned");
         // stack (2026-11-12): the filled form goes up the chain; the dev cheat approves it (the game itself is 2048)
-        if (await has("[data-action=stack-start]")) { await sel("[data-action=stack-start]", 1); await shotStep("stack"); await sel("[data-action=stack-move][data-dir=left]", 0.5); await sel("[data-action=stack-move][data-dir=up]", 0.5); await shotStep("stack-moved"); await ev("(()=>{const b=document.querySelector('[data-action=stack-cheat]'); if(b) b.click(); return !!b})()"); await sleep(1.2); note(`   stack: approved via dev cheat · ${await has("[data-action=board-print]:not([disabled])")}`); }
+        if (await has("[data-action=stack-start]")) { await sel("[data-action=stack-start]", 1); await shotStep("stack"); await sel("[data-action=stack-move][data-dir=left]", 0.5); await sel("[data-action=stack-move][data-dir=up]", 0.5); await shotStep("stack-moved"); await ev("(()=>{const b=document.querySelector('[data-action=stack-cheat]'); if(b) b.click(); return !!b})()"); await waitFor("[data-action=board-settle]:not([disabled]), [data-action=board-print]:not([disabled])", 10); note(`   stack: approved via dev cheat · ${await has("[data-action=board-settle]:not([disabled]), [data-action=board-print]:not([disabled])")}`); }  // the approval moment holds the chain a beat (work-stages-polish 3) before the board returns
+        // settlement sheet (Kiro 2026-11-12): on the evidence board and the meeting replay 提交 sits behind 整理好了
+        if (await has("[data-action=board-settle]:not([disabled])")) { await sel("[data-action=board-settle]:not([disabled])", 1.2); await shotStep("settle-sheet"); }
         ok = await sel("[data-action=board-print]:not([disabled])", 1.5); note(`   board: printed ${ok}`);
         await settle(); await toRoom();
       } else
@@ -448,7 +450,9 @@ for (const it of ITEMS) {
         else for (const sl of slots) { const trap = process.env.BOARD === "trap" && sl === slots[0] ? board.cards.find((c) => c.id.startsWith("d"))?.id : null; await place(trap ?? sl.answer, sl.id); }
         await shotStep("board-filled");
         // stack (2026-11-12): the filled form goes up the chain; the dev cheat approves it (the game itself is 2048)
-        if (await has("[data-action=stack-start]")) { await sel("[data-action=stack-start]", 1); await shotStep("stack"); await sel("[data-action=stack-move][data-dir=left]", 0.5); await sel("[data-action=stack-move][data-dir=up]", 0.5); await shotStep("stack-moved"); await ev("(()=>{const b=document.querySelector('[data-action=stack-cheat]'); if(b) b.click(); return !!b})()"); await sleep(1.2); note(`   stack: approved via dev cheat · ${await has("[data-action=board-print]:not([disabled])")}`); }
+        if (await has("[data-action=stack-start]")) { await sel("[data-action=stack-start]", 1); await shotStep("stack"); await sel("[data-action=stack-move][data-dir=left]", 0.5); await sel("[data-action=stack-move][data-dir=up]", 0.5); await shotStep("stack-moved"); await ev("(()=>{const b=document.querySelector('[data-action=stack-cheat]'); if(b) b.click(); return !!b})()"); await waitFor("[data-action=board-settle]:not([disabled]), [data-action=board-print]:not([disabled])", 10); note(`   stack: approved via dev cheat · ${await has("[data-action=board-settle]:not([disabled]), [data-action=board-print]:not([disabled])")}`); }  // the approval moment holds the chain a beat (work-stages-polish 3) before the board returns
+        // settlement sheet (Kiro 2026-11-12): on the evidence board and the meeting replay 提交 sits behind 整理好了
+        if (await has("[data-action=board-settle]:not([disabled])")) { await sel("[data-action=board-settle]:not([disabled])", 1.2); await shotStep("settle-sheet"); }
         ok = await sel("[data-action=board-print]:not([disabled])", 1.5); note(`   board: printed ${ok}`);
         await settle(); await toRoom(); await sel("[data-action=view][data-view=desk]", 2); await shotStep("desk-deliverable"); await toRoom();
         results.push; 

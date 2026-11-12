@@ -15,6 +15,7 @@ import { onEmailChange, setEmailDraft } from "@net/email";
 import { appOn, buildShell, initialSession, type AppRenderers, type Session } from "./model";
 import { bringToFront, closeApp, loadPlacement, moveApp, placementOf, savePlacement } from "./placement";
 import { createWindowDrag } from "./windrag";
+import { createClipDrag } from "./workbench/drag";
 import { createDockPeek } from "./dockpeek";
 import { stageOf } from "@state/stages";
 import { coachSteps, renderDesktop, APPS, type AppId } from "./shell";
@@ -608,6 +609,15 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
       console.warn(error);
     }
   });
+  // work-stages-polish 2 / 3: a clipping dragged onto a slot fires board-card then board-slot, as clicks
+  // would; a swipe on the approval chain's grid is one stack-move.
+  const clipDrag = createClipDrag(root, (name, data, el) => {
+    try {
+      actions[name]?.(ctx, data as DOMStringMap, el);
+    } catch (error) {
+      console.warn(error);
+    }
+  });
   // shell R11.2: the dock over full-screen 工作台 hides and peeks up from the bottom edge.
   const dockPeek = createDockPeek(
     root,
@@ -648,6 +658,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
       root.removeEventListener("input", onInput);
       root.removeEventListener("focusin", onFocusIn);
       drag.destroy();
+      clipDrag.destroy();
       dockPeek.destroy();
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("resize", fit);
