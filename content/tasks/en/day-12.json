@@ -129,8 +129,8 @@
                 "text": "I've got your back."
               },
               {
-                "who": "kuro",
-                "text": "Lao Wang says nobody sleeps this week, and you make the rota. Four rows: 22:00 to 02:00, 02:00 to 04:00, 04:00 to 06:00, and one called ΥΠΝΟΣ. The names are in the chats with the boss and the group, and one line in the contacts; the table is locked, and the key is in last night's sleep-talk recording, played backwards."
+                "who": "me",
+                "text": "The rota. If nobody sleeps, what is there to schedule."
               }
             ]
           },
@@ -204,10 +204,9 @@
         "who": "boss",
         "note": [
           "Lao Wang: push through this week; you make the rota; nobody sleeps.",
-          "The boss says nobody sleeps this week; you draw up the shift table.",
-          "Four slots: 22 to 2, 2 to 4, 4 to 6, and a row called ΥΠΝΟΣ."
+          "The names are in the boss's and the group's chats; the contacts hold one more line."
         ],
-        "call": "The names are in the boss's and the group's chats, one line in the contacts; the key is in last night's sleep-talk recording, backwards. Fill the table!",
+        "call": "Fill it and send it to Lao Wang.",
         "cta": "Start work",
         "motif": {
           "kind": "danmaku",

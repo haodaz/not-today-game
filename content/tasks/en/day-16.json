@@ -129,8 +129,8 @@
                 "text": "Hang in there."
               },
               {
-                "who": "kuro",
-                "text": "The chairman does not read materials; he just wants to hear something, and it must not stop. Four rows: opening, middle, beat, ending. The voice notes are in the chats with the boss and the group, the flute is in the files; the table is locked, and the beat is in the flute at the end of last night's recording, on the walkman."
+                "who": "me",
+                "text": "The chairman wants a sound. Any sound; just don't stop."
               }
             ]
           },
@@ -204,10 +204,9 @@
         "who": "boss",
         "note": [
           "Lao Wang: the chairman won't read; just make a sound. Don't stop.",
-          "The chairman doesn't read material; a sound is enough. Don't stop.",
-          "Opening, middle, beat, ending: the voice notes are in the boss's and the group's chats, the flute in the files."
+          "The voice notes are in the boss's and the group's chats; the flute is in the files."
         ],
-        "call": "The table is locked: the flute at the end of last night's recording, its beat on the walkman. Lay out the sound!",
+        "call": "Put a sound together. Don't stop.",
         "cta": "Start work",
         "motif": {
           "kind": "danmaku",

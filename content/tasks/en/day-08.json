@@ -130,8 +130,8 @@
                 "text": "Let's keep things simple today."
               },
               {
-                "who": "kuro",
-                "text": "Team night: when each leader gives a toast. The rank table is in the files, and its ranks are not the company's; the time is locked, sunset has to be worked out, and the calculator only lights up by the window."
+                "who": "me",
+                "text": "Toast times. Not one rank on that table is the company's."
               }
             ]
           },
@@ -206,10 +206,9 @@
         "who": "boss",
         "note": [
           "Lao Wang: the leaders' toast times — you schedule them.",
-          "The team-building schedule: each leader's toast time.",
           "The rank table is in the files; the ranks on it are not the company's."
         ],
-        "call": "The times are locked: work out sunset yourself; the calculator only lights by the window. Schedule every leader!",
+        "call": "Schedule them and send it to the group.",
         "cta": "Start work",
         "motif": {
           "kind": "fan",
@@ -225,7 +224,8 @@
             "Those ranks are not the company's"
           ]
         },
-        "tone": "burst"
+        "tone": "burst",
+        "art": "/launch/day-08.jpg"
       }
     },
     {

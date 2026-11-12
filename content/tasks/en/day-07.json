@@ -385,8 +385,8 @@
                 "text": "Good to see you."
               },
               {
-                "who": "kuro",
-                "text": "The morning minutes, by the template. Five steps: before the meeting, roll call, agenda, reports, closing. What was said is in the meeting record, with a few lines in the group and the chats; the closing row is locked, and the word is in Lao Zhou's last English line, in the dictionary."
+                "who": "me",
+                "text": "The minutes. Lao Zhou wants the format, not the content."
               }
             ]
           },
@@ -591,10 +591,9 @@
         "who": "laozhou",
         "note": [
           "Lao Zhou: by the template, all five steps.",
-          "The morning meeting's minutes, by the template: preparation, sign-in, agenda, reports, adjournment.",
-          "What was said is in the meeting record; a few lines are in the group and the private chats."
+          "Who said what is all in the record."
         ],
-        "call": "The adjournment cell is locked: the word in Lao Zhou's English line before the meeting ended, looked up on the dictionary. Write the minutes up!",
+        "call": "Fill the template and send it to Lao Zhou.",
         "cta": "Start work",
         "motif": {
           "kind": "fan",
@@ -610,7 +609,8 @@
             "Keep the format"
           ]
         },
-        "tone": "paper"
+        "tone": "paper",
+        "art": "/launch/day-07.jpg"
       }
     }
   ]

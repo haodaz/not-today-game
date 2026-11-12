@@ -144,8 +144,8 @@
                 "text": "I noticed some old things on your desk. Let me give them a hand."
               },
               {
-                "who": "kuro",
-                "text": "Lao Zhou wants a loan request filed; do not ask why. Five rows: book, page, line one, line two, date, all of it in that scan; the table is locked, and the Latin line in the scan goes into the dictionary."
+                "who": "me",
+                "text": "A loan approval. Don't ask what for; so I won't."
               }
             ]
           },
@@ -237,10 +237,9 @@
         "who": "laozhou",
         "note": [
           "Lao Zhou: an approval for a loan; don't ask what for.",
-          "Lao Zhou wants a loan approval; don't ask why.",
-          "Book, page, first line, second line, date: everything to fill is in that scan."
+          "Everything to fill in is in that scan."
         ],
-        "call": "The table is locked: the Latin line in the scan, looked up on the dictionary. See the approval through!",
+        "call": "Fill it in and send it for approval.",
         "cta": "Start work",
         "motif": {
           "kind": "fan",

@@ -129,8 +129,8 @@
                 "text": "Pull yourself together."
               },
               {
-                "who": "kuro",
-                "text": "A thousand new hires this batch, and the onboarding has to run. Four rows: the ones who talk, the ones humming in the recording, the ones the pet cries at, the name column. The list is in the roster, and the welcome recording needs listening to; the table is locked, and there is a number in last night's recording."
+                "who": "me",
+                "text": "A thousand new hires. Fewer than half have names on the roster."
               }
             ]
           },
@@ -208,10 +208,9 @@
         "who": "boss",
         "note": [
           "Lao Wang: a lot of new hires this time; run the onboarding.",
-          "A thousand new hires; the onboarding has to run.",
-          "The ones who talk, the ones humming in the recording, the ones the pet cries at on sight, and the name column."
+          "The names are in the roster; the welcome recording is to be listened to."
         ],
-        "call": "The list is in the roster; listen to the welcome recording too; there is a number in last night's recording. Get the new hires through!",
+        "call": "Run it and report to Lao Wang.",
         "cta": "Start work",
         "motif": {
           "kind": "danmaku",

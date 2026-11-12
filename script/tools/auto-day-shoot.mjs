@@ -231,7 +231,7 @@ const gather = async (card) => {
   const from = card.from; if (!from || from.call) return true;
   // A meeting card is heard in the board's own meeting: open the task page, let it play (fast=1: 0.3 s a line).
   if (from.meeting) { await toWorkbench(); await goHome(); await sel(`[data-action=wb-nav][data-page='task:${currentTaskId}']`, 1.2); for (let i = 0; i < 4 && !(await has("[data-action=meeting-play]")); i++) await sleep(0.5); await sel("[data-action=meeting-play]", 0.3); await sleep(9); return true; }
-  if (from.conv) { await toTingTalk(); const ok = await sel(`[data-action=conv][data-conv=${from.conv}]`, 1.2); if (!ok && process.env.DIAG) note(`   gather: conv ${from.conv} not clickable · convs ${await ev("JSON.stringify([...document.querySelectorAll('[data-action=conv]')].map(e=>e.dataset.conv+(__vis(e)?'':'(hidden)')))")} · dlg ${(await ev("[...document.querySelectorAll('.dlg .txt')].map(x=>x.innerText).join('|')")||'').slice(0,60)}`); return ok; }
+  if (from.conv) { if ((await ev("JSON.stringify(__choices())").then(JSON.parse)).length) await settle(); await toTingTalk(); const ok = await sel(`[data-action=conv][data-conv=${from.conv}]`, 1.2); if (!ok && process.env.DIAG) note(`   gather: conv ${from.conv} not clickable · convs ${await ev("JSON.stringify([...document.querySelectorAll('[data-action=conv]')].map(e=>e.dataset.conv+(__vis(e)?'':'(hidden)')))")} · dlg ${(await ev("[...document.querySelectorAll('.dlg .txt')].map(x=>x.innerText).join('|')")||'').slice(0,60)}`); return ok; }
   const folder = folderOf(from.file);
   if (folder) {
     await toDesktop(); await readLines();

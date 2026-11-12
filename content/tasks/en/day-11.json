@@ -145,8 +145,8 @@
                 "text": "Rest if you need to. I'll hold the fort."
               },
               {
-                "who": "kuro",
-                "text": "Vivi wants costs cut: the cost sheet has to balance, to her before you log off. Five rows: wheat, barley, oil, wine, total. The prices are in Lao Zhou's chat and the old menu; the oil and wine columns, Lao Wang says, are not to be touched. The table is locked: how many measures of wheat and of barley a penny buys, both numbers into the calculator, which only lights up facing the window."
+                "who": "me",
+                "text": "The cost sheet. Oil and wine untouchable, so only the grain can move."
               }
             ]
           },
@@ -224,10 +224,9 @@
         "who": "partner",
         "note": [
           "Vivi: cut cost, raise efficiency; balance the sheet, before you leave.",
-          "Vivi wants costs cut: the cost sheet balanced, to her before you leave.",
-          "The prices are in Lao Zhou's chat and that old menu; the oil and wine columns the boss said not to touch."
+          "The prices are in Lao Zhou's chat and that old menu; the oil and wine columns, Lao Wang says, are not to be touched."
         ],
-        "call": "The table is locked: how many litres of wheat and of barley one coin buys, both into the calculator, which only lights facing the window. Balance the sheet!",
+        "call": "Balance it and send it to her before you leave.",
         "cta": "Start work",
         "motif": {
           "kind": "bubble",

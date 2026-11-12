@@ -131,8 +131,8 @@
                 "text": "Pull yourself together."
               },
               {
-                "who": "kuro",
-                "text": "Everyone is looking for you, with the same sentence. You can reply to one. Four rows: to whom, why them, the number, what to say. The clues are in the receivables and the call log; the table is locked, and the number is in the call log."
+                "who": "me",
+                "text": "They are all looking for me, all saying the same sentence. Only one call back."
               }
             ]
           },
@@ -214,11 +214,10 @@
       "launch": {
         "who": "boss",
         "note": [
-          "Everyone is looking for you: call back. Only one.",
-          "Everyone is looking for you, saying the same sentence. You can answer only one.",
-          "Whom, why them, the phone, what to say."
+          "Everyone is looking for you, saying the same sentence. Only one call back.",
+          "The numbers are in the call log; the receivables sheet says who owes whom."
         ],
-        "call": "The clues are in the receivables and the call log; the number is in the call log. Pick one person and answer!",
+        "call": "Pick one and call.",
         "cta": "Start work",
         "motif": {
           "kind": "fan",

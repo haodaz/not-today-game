@@ -145,8 +145,8 @@
                 "text": "I'll keep an eye on you."
               },
               {
-                "who": "kuro",
-                "text": "The launch is this afternoon: three slides to arrange, and the audience watched live. The material is in the meeting record, the audience screenshot in the files; the table is locked: of twelve faces only four are the original ones, so work out how many were swapped on the calculator, which only lights up facing the window."
+                "who": "me",
+                "text": "The launch. I know a few of the faces in the audience. Not many."
               }
             ]
           },
@@ -326,10 +326,9 @@
         "who": "partner",
         "note": [
           "Vivi: this afternoon's launch; lay out the deck and watch the audience live.",
-          "The launch this afternoon: three slides to arrange, the audience's reactions to watch live.",
-          "The material is in the meeting record; the audience screenshots are in the files."
+          "The material is in the minutes; the audience screenshots are in the files."
         ],
-        "call": "The table is locked: of the twelve faces only four are the originals; work out how many were swapped on the calculator, which only lights facing the window. Arrange the deck!",
+        "call": "Lay it out and watch the audience.",
         "cta": "Start work",
         "motif": {
           "kind": "bubble",
