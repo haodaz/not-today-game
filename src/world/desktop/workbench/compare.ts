@@ -22,6 +22,7 @@ import { tunePane } from "./shell";
 import { tuneStage } from "./tune-stage";
 import { clueStage } from "./clue-stage";
 import { meetingStage } from "./meeting-stage";
+import { stackStage } from "./stack-stage";
 import { tuneOfferPending, tuneOffers } from "@state/days/board";
 import { isNight } from "../beat";
 import type { AppContext } from "../model";
@@ -188,6 +189,9 @@ function genericWorkLayer(c: { state: State; events: readonly GameEvent[]; sessi
   } else if (board.view === "meeting" && board.meeting) {
     // meeting stage (2026-11-12): the meeting above, the template under it
     body = meetingStage(app, task, board);
+  } else if (board.stack && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && !st.approved; })()) {
+    // stack (2026-11-12): the form filled goes up the chain — 2048 until the top rank appears
+    body = stackStage(task, board, session, false);
   } else if (board.kind === "table" && !board.meeting && board.view !== "ide") {
     // clue stage (2026-11-12): the evidence board, not the table pane
     body = clueStage({ state, events, session, nowMs }, task, board);

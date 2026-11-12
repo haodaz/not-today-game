@@ -356,6 +356,8 @@ export interface Session {
   tuneIndex: Record<string, number>;
   /** tune stage (2026-11-12): the action card picked, before 行动 (`path: null` = Kuro's card). Session only. */
   tunePick: { key: string; mod: string; path: string | null } | null;
+  /** stack (2026-11-12): the approval chain's 2048 grid under way (session only; the top reached is a board step). */
+  chain: { key: string; cells: readonly number[]; score: number; moves: number; over: boolean } | null;
   /** tune: while Kuro "executes" a choice the preview keeps its previous page (then it changes, then Kuro speaks). */
   ideHold: { key: string; until: number; src: string } | null;
   /**
@@ -558,6 +560,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     ideTyping: null,
     tuneIndex: {},
     tunePick: null,
+    chain: null,
     ideHold: null,
     meetingPlay: null,
     shell: {},

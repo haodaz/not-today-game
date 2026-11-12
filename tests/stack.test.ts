@@ -1,0 +1,46 @@
+// stack (author 2026-11-12): the approval chain as 2048 on day 13's 借阅审批单.
+import "./specimen";
+import { describe, expect, it } from "vitest";
+import { createStore } from "@state/store";
+import { taskByFlag } from "@state/days/tasks";
+import { boardState, canPrint, freshBoard, stepBoard } from "@state/days/board";
+import { rankOf, stackBest, stackMove, stackStart, type StackGrid } from "../src/world/desktop/workbench/stack-stage";
+
+const day13 = () => taskByFlag(13, "task_d13_work")!;
+
+describe("the approval chain", () => {
+  it("day 13's board carries eleven ranks with heads, the top being 2048", () => {
+    const st = day13().board!.stack!;
+    expect(st.ranks).toHaveLength(11);
+    expect(st.ranks[0]!.img).toBe("/npc/gods/r1.jpg");
+    expect(2 ** st.ranks.length).toBe(2048);
+    expect(rankOf(2)).toBe(0);
+    expect(rankOf(2048)).toBe(10);
+  });
+  it("a move slides and merges once per pair, scores, spawns; an unchanged grid stays the same object", () => {
+    const g: StackGrid = { key: "k", cells: [2, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], score: 0, moves: 0, over: false };
+    const left = stackMove(g, "left", () => 0.5);
+    expect(left.cells.slice(0, 2)).toEqual([4, 4]);
+    expect(left.score).toBe(4);
+    expect(left.moves).toBe(1);
+    expect(left.cells.filter((v) => v !== 0)).toHaveLength(3); // one spawned
+    const full: StackGrid = { key: "k", cells: [2, 4, 2, 4, 4, 2, 4, 2, 2, 4, 2, 4, 4, 2, 4, 2], score: 0, moves: 0, over: false };
+    expect(stackMove(full, "left")).toBe(full);
+    const start = stackStart("k", () => 0.5);
+    expect(start.cells.filter((v) => v !== 0)).toHaveLength(2);
+    expect(stackBest({ ...g, cells: [2, 1024, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] })).toBe(1024);
+  });
+  it("the filled form is not handed in until the chain approves it; the approve step unlocks 提交", () => {
+    const b = day13().board!;
+    let s = freshBoard(b);
+    s = { ...s, unlocked: true };
+    for (const slot of b.slots) s = stepBoard(b, s, { t: "fill", slot: slot.id, card: slot.answer });
+    expect(canPrint(b, s)).toBe(false);
+    s = stepBoard(b, s, { t: "approve" });
+    expect(s.approved).toBe(true);
+    expect(canPrint(b, s)).toBe(true);
+    const store = createStore({ startDay: 13 });
+    store.appendEvent({ kind: "boardStep", taskId: day13().id, op: { t: "approve" } });
+    expect(boardState(b, 13, day13().id, store.getEvents()).approved).toBe(true);
+  });
+});

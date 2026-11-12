@@ -221,7 +221,55 @@
               }
             ]
           }
-        ]
+        ],
+        "stack": {
+          "ranks": [
+            {
+              "name": "Bael · clerk",
+              "img": "/npc/gods/r1.jpg"
+            },
+            {
+              "name": "Agares · team lead",
+              "img": "/npc/gods/r2.jpg"
+            },
+            {
+              "name": "Vassago · manager",
+              "img": "/npc/gods/r3.jpg"
+            },
+            {
+              "name": "Gamigin · director",
+              "img": "/npc/gods/r4.jpg"
+            },
+            {
+              "name": "Marbas · VP",
+              "img": "/npc/gods/r5.jpg"
+            },
+            {
+              "name": "Valefor · president",
+              "img": "/npc/gods/r6.jpg"
+            },
+            {
+              "name": "Amon · board member",
+              "img": "/npc/gods/r7.jpg"
+            },
+            {
+              "name": "Barbatos · bishop",
+              "img": "/npc/gods/r8.jpg"
+            },
+            {
+              "name": "Paimon · king",
+              "img": "/npc/gods/r9.jpg"
+            },
+            {
+              "name": "Buer · the entity",
+              "img": "/npc/gods/r10.jpg"
+            },
+            {
+              "name": "Gusion · the seal",
+              "img": "/npc/gods/r11.jpg"
+            }
+          ]
+        }
       },
       "deliverable": {
         "id": "d13-loan",

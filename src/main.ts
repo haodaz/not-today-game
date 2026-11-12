@@ -14,6 +14,7 @@ import "./world/room/cursors.css";
 import "./world/motion/motion.css";
 import "./ui/fonts.css";
 import "./ui/title/title.css";
+import { taskForId } from "@state/days/board";
 import { debugStartDay } from "@state/clock";
 import { syncProfile, withCloud } from "./ui/profile-sync";
 import type { State } from "@state/types.gen";
@@ -176,6 +177,14 @@ function startGame(store: Store, saved: boolean, prologue = false): void {
     if (!store.getEvents().some((e) => e.kind === "step" && e.name === "openApp:msgs" && e.day === store.getState().day)) store.appendEvent({ kind: "step", name: "openApp:msgs", t: s.clock.time });
     // the task's page opened (as 工作台's row does), so the work layer has its task
     if (!store.getEvents().some((e) => e.kind === "open" && e.target === `task:${launch}` && e.day === store.getState().day)) store.appendEvent({ kind: "open", target: `task:${launch}`, t: s.clock.time });
+    // `&filled=1` (dev, 2026-11-12): the task's board unlocked and every slot holding its answer, to look at what comes after the form (the chain, the settlement)
+    if (params.get("filled") === "1") {
+      const board = taskForId(store.getState().day, launch)?.board;
+      if (board) {
+        if (board.given.lock?.answer) store.appendEvent({ kind: "boardStep", taskId: launch, op: { t: "unlock", code: board.given.lock.answer } });
+        for (const slot of board.slots) store.appendEvent({ kind: "boardStep", taskId: launch, op: { t: "fill", slot: slot.id, card: slot.answer } });
+      }
+    }
     s.view = "desktop";
     s.leftApp = "workbench";
     s.workbenchPage = `task:${launch}`;

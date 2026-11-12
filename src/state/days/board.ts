@@ -48,6 +48,8 @@ export interface BoardState {
   readonly done: boolean;
   /** tune: the player answered Kuro's end-of-work offer (took the path, or `keep`): the work may go. */
   readonly decided: boolean;
+  /** stack (2026-11-12): the approval chain reached its top (the hand-in needs it on a board with a `stack`). */
+  readonly approved: boolean;
 }
 
 /**
@@ -57,7 +59,7 @@ export interface BoardState {
 export function freshBoard(board: TaskBoard, carried: Readonly<Record<string, string>> = {}): BoardState {
   const mods: Record<string, string> = {};
   for (const [id, path] of Object.entries(carried)) if (board.tune?.mods.find((m) => m.id === id)?.paths.some((p) => p.id === path)) mods[id] = path;
-  return { unlocked: board.given.lock === undefined, slots: {}, assists: 0, wrongCodes: [], merged: {}, fetched: false, mods, done: false, decided: false };
+  return { unlocked: board.given.lock === undefined, slots: {}, assists: 0, wrongCodes: [], merged: {}, fetched: false, mods, done: false, decided: false, approved: false };
 }
 
 /**
@@ -99,6 +101,8 @@ export function stepBoard(board: TaskBoard, s: BoardState, op: BoardOp): BoardSt
       return { ...s, fetched: true };
     case "keep":
       return board.tune && s.done && !s.decided ? { ...s, decided: true } : s;
+    case "approve":
+      return board.stack && !s.approved ? { ...s, approved: true } : s;
     case "assistMod": {
       // tune: Kuro picks this module's path (its taste); the same rules as the player's pick, one assist.
       const tune = board.tune;
@@ -167,7 +171,8 @@ export function canPrint(board: TaskBoard, s: BoardState): boolean {
   if (board.tune) return s.done && !tuneOfferPending(board, s);
   // compare (author 2026-11-11): every page picked and the boss satisfied enough (the threshold).
   if (board.compare) return s.unlocked && comparePending(board, s) === null && compareScore(board, s).pct >= board.compare.threshold;
-  return s.unlocked && board.slots.every((slot) => slot.id in s.slots) && mergesLeft(board, s).length === 0 && (!board.ide?.api || s.fetched);
+  // stack (2026-11-12): the filled form must also have come back approved from the top of the chain
+  return s.unlocked && board.slots.every((slot) => slot.id in s.slots) && mergesLeft(board, s).length === 0 && (!board.ide?.api || s.fetched) && (!board.stack || s.approved);
 }
 
 // ——— compare (author 2026-11-11): the pages ———
@@ -429,6 +434,9 @@ export function validateBoardStep(day: number, taskId: string, op: BoardOp): voi
       return;
     case "keep":
       if (!board.tune) throw new Error("boardStep: this board has no modules");
+      return;
+    case "approve":
+      if (!board.stack) throw new Error("boardStep: this board has no approval chain");
       return;
     case "assistMod":
       if (!board.tune) throw new Error("boardStep: this board has no modules");

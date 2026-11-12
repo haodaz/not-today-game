@@ -5,6 +5,7 @@
 // prints when every slot is filled and the column is open. Every action is a `boardStep` event, so
 // the board rebuilds from the log; printing is the `task` event with `slots` + `assists`. Kuro's own
 // cards never show in the tray. All labels are strings; story text is content. Pure view + actions.
+import { stackBest, stackMove, stackStart, type StackDir } from "./stack-stage";
 import type { State } from "@state/types.gen";
 import type { GameEvent } from "@state/events";
 import type { Task, TaskBoard } from "@state/days/tasks";
@@ -458,6 +459,39 @@ const actions: Record<string, ActionHandler> = {
     ctx.rerender();
   },
   // tune stage (2026-11-12): a card picked (not spent yet), then 行动 spends it as board-mod / board-assist-mod.
+  // stack (author 2026-11-12): the approval chain as 2048 — start, move, and the top reached records the approval
+  "stack-start"(ctx) {
+    const c = currentBoard(ctx);
+    if (!c || !c.board.stack) return;
+    ctx.session.chain = stackStart(c.task.id);
+    ctx.rerender();
+  },
+  "stack-move"(ctx, data) {
+    const c = currentBoard(ctx);
+    const dir = data.dir as StackDir | undefined;
+    if (!c || !c.board.stack || !dir || !["up", "down", "left", "right"].includes(dir)) return;
+    const g = ctx.session.chain?.key === c.task.id ? ctx.session.chain : null;
+    if (!g) return;
+    const next = stackMove(g, dir);
+    ctx.session.chain = next;
+    const s = stateOf(ctx, c.task, c.board);
+    if (!s.approved && stackBest(next) >= 2 ** c.board.stack.ranks.length) {
+      const before = transcriptLength(ctx, c);
+      ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+      noteIdeLines(ctx, c.task, c.board, ctx.store.getState().day, before);
+    }
+    ctx.rerender();
+  },
+  // dev only: the chain approved at once (the replay driver; never offered in the game)
+  "stack-cheat"(ctx) {
+    if (!import.meta.env.DEV) return;
+    const c = currentBoard(ctx);
+    if (!c || !c.board.stack) return;
+    const s = stateOf(ctx, c.task, c.board);
+    if (s.approved) return;
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+    ctx.rerender();
+  },
   "tune-select"(ctx, data) {
     const c = currentBoard(ctx);
     if (!c || !c.board.tune || !data.mod) return;

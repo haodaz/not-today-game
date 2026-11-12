@@ -186,6 +186,9 @@ export interface ComparePage {
   readonly bubbles: readonly string[];
   readonly remark: Readonly<Record<string, string>>;
 }
+export interface BoardStack {
+  readonly ranks: readonly { readonly name: string; readonly img: string }[];
+}
 export interface BoardCompare {
   readonly versions: readonly string[];
   readonly threshold: number;
@@ -312,6 +315,8 @@ export interface TaskBoard {
   readonly tune?: BoardTune;
   /** compare (author 2026-11-11): the pages compared two versions at a time (only with `view: "ide"`). */
   readonly compare?: BoardCompare;
+  /** stack (author 2026-11-12): the approval chain as 2048 — the ranks from the bottom up (name, head); the top is rank 2^n. */
+  readonly stack?: BoardStack;
 }
 /** Who a deliverable goes to (work v2 addition 2026-11-03 night); absent = `"hand"`. */
 export const DELIVERABLE_TO = ["boss", "partner", "group", "workbench", "hand"] as const;
@@ -582,7 +587,7 @@ function card(v: unknown, w: string): BoardCard {
  */
 function board(v: unknown, w: string): TaskBoard {
   if (!isRecord(v)) fail(w, "must be an object");
-  keys(v, ["kind", "title", "columns", "given", "slots", "cards", "kuro", "view", "ide", "beats", "meeting", "tune", "compare"], w);
+  keys(v, ["kind", "title", "columns", "given", "slots", "cards", "kuro", "view", "ide", "beats", "meeting", "tune", "compare", "stack"], w);
   if (v.kind !== "table") fail(`${w}.kind`, 'must be "table"');
   // Column headers are display-only and may be blank (the label column has no header).
   if (!Array.isArray(v.columns) || v.columns.length === 0 || !v.columns.every((c) => typeof c === "string")) fail(`${w}.columns`, "must be a non-empty list of strings");
@@ -692,6 +697,14 @@ function board(v: unknown, w: string): TaskBoard {
     tune = boardTune(v.tune, `${w}.tune`);
   }
   // compare (author 2026-11-11): the pages, only on an IDE board.
+  let stack: BoardStack | undefined;
+  if (v.stack !== undefined) {
+    const sw = `${w}.stack`;
+    if (!isRecord(v.stack)) fail(sw, "must be an object");
+    keys(v.stack, ["ranks"], sw);
+    if (!Array.isArray(v.stack.ranks) || v.stack.ranks.length < 3 || v.stack.ranks.length > 12) fail(`${sw}.ranks`, "must be 3 to 12 ranks");
+    stack = { ranks: v.stack.ranks.map((r, i) => { if (!isRecord(r)) fail(`${sw}.ranks[${i}]`, "a rank must be an object"); keys(r, ["name", "img"], `${sw}.ranks[${i}]`); return { name: str(r.name, `${sw}.ranks[${i}].name`), img: str(r.img, `${sw}.ranks[${i}].img`) }; }) };
+  }
   let compare: BoardCompare | undefined;
   if (v.compare !== undefined) {
     if (view !== "ide") fail(`${w}.compare`, 'a compare board needs view "ide"');
@@ -713,6 +726,7 @@ function board(v: unknown, w: string): TaskBoard {
     ...(meeting ? { meeting } : {}),
     ...(tune ? { tune } : {}),
     ...(compare ? { compare } : {}),
+    ...(stack ? { stack } : {}),
   };
 }
 

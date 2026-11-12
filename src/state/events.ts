@@ -119,7 +119,9 @@ export type BoardOp =
   /** tune: the player declined the path Kuro brought up at the end (her skin): the work goes as it is. */
   | { readonly t: "keep" }
   /** tune (author 2026-11-08): 克总帮我处理一下 — Kuro picks this module's path (its own taste, `tune.assist`). */
-  | { readonly t: "assistMod"; readonly id: string };
+  | { readonly t: "assistMod"; readonly id: string }
+  /** stack (author 2026-11-12): the approval chain reached its top rank — the form is approved. */
+  | { readonly t: "approve" };
 
 export type EventKind = GameEvent["kind"];
 
