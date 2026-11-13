@@ -812,7 +812,7 @@
 .bs-bossbar.stage2 .bs-bar b{background:linear-gradient(90deg,#3b0764,#a21caf 60%,#f0abfc)}
 .bs-pct{font:900 16px/1 "PingFang SC",sans-serif;color:#fff;min-width:48px;text-align:right}
 /* the assimilated player, after: across the field, on Kuro's side, facing back */
-.boss-page.after.strong .bs-party{transform:translateX(980px)}
+.boss-page.after.strong .bs-party{transform:translateX(900px)}
 /* crossed: Kuro's shape (kuro-you.png faces the party on its own), a red glow */
 .boss-page.after.strong .bs-member.player .bs-sprite{transform:none;filter:drop-shadow(0 0 24px rgba(185,28,28,.9))}
 .boss-page.after.strong .bs-member.object,.boss-page.after.strong .bs-member.qkuro{opacity:0}
