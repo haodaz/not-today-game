@@ -77,20 +77,56 @@
         },
         {
           "k": "narration",
-          "t": "After landing you called. Two rings, hang up. They called back: two rings, hang up. You talked like that for a year."
+          "t": "The second year. The kitchen of the shared flat. Three laptops on the table: two PhDs and one master's.",
+          "backdrop": "/room/dream/table.jpg"
         },
         {
           "k": "narration",
-          "t": "A year later every phone in every hand had turned into a slab of glass. It still worked. Nobody called the number any more."
-        },
-        {
-          "k": "narration",
-          "t": "The last call was incoming."
+          "who": "boss",
+          "t": "Wang Lai was doing cognitive science. He talked without putting his chopsticks down."
         },
         {
           "k": "speaker",
           "who": "boss",
-          "t": "Come back. There's something to build. We'll do it ourselves."
+          "t": "What the lab here builds won't be usable back home for three years. Let's go back and build it ourselves."
+        },
+        {
+          "k": "speaker",
+          "who": "boss",
+          "t": "You're the only one of the three of us who can write code."
+        },
+        {
+          "k": "narration",
+          "who": "partner",
+          "t": "Chen Weiwei was doing a PhD in management. Her slides were already done."
+        },
+        {
+          "k": "speaker",
+          "who": "partner",
+          "t": "I've got the name: Weilai Intelligence. Easy to remember, right?"
+        },
+        {
+          "k": "narration",
+          "t": "She wrote two characters on a napkin: 薇, 莱. Next to them, 未来 — the future."
+        },
+        {
+          "k": "inner",
+          "t": "Two characters. There was no third one on the napkin."
+        },
+        {
+          "k": "speaker",
+          "who": "boss",
+          "t": "If you stayed, the offer you've got here is top tier. I know that."
+        },
+        {
+          "k": "speaker",
+          "who": "boss",
+          "t": "On the technical side, you decide. All of it. I promise."
+        },
+        {
+          "k": "speaker",
+          "who": "partner",
+          "t": "The two of us handle everything else. You just build."
         },
         {
           "k": "inner",
@@ -98,7 +134,15 @@
         },
         {
           "k": "narration",
-          "t": "After that call it never rang again. The one on the desk now is fifteen years later."
+          "t": "That night you called home. Two rings, hang up. They called back: two rings, hang up. You didn't say you were coming back."
+        },
+        {
+          "k": "narration",
+          "t": "A year later every phone in every hand had turned into a slab of glass. It still worked. Nobody called the number any more."
+        },
+        {
+          "k": "narration",
+          "t": "The one on the desk now is fifteen years later. \"On the technical side, you decide\" — nobody said it again in those fifteen years."
         },
         {
           "k": "narration",
