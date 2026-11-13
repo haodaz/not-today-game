@@ -50,9 +50,7 @@
       "choices": [
         {
           "text": "不给。",
-          "effects": {
-            "san": -1
-          },
+          "hand": "refuse",
           "say": [
             {
               "k": "narration",

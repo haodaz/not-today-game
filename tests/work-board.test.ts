@@ -273,11 +273,12 @@ describe("replay", () => {
 
 import { renderBoard } from "@world/desktop/workbench/board";
 import { sentFiles, transcript, sentReplies } from "@world/desktop/messages/transcript";
-import { showing, GIVE_INDEX, REFUSE_INDEX, type DialogueState, type Queued } from "@world/loop/dialogue";
+import { showing, GIVE_INDEX, REFUSE_INDEX, type DialogueState, type Queued, push } from "@world/loop/dialogue";
 import { initialSession, type AppContext } from "@world/desktop/model";
 import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import { t } from "@world/i18n";
 import { dayFiles } from "@state/days/table";
+import { constants } from "@state/variables";
 import type { GameEvent } from "@state/events";
 
 /** A minimal AppContext over a store (for the board surface). */
@@ -376,7 +377,7 @@ describe("a board that goes to a person (to: boss)", () => {
   });
 
   it("it is judged at 躺下 by the slots (given → perfect)", () => {
-    expect(boardJudgement(11, sent().getEvents())).toEqual({ verdict: "perfect", san: -2 }); // meters-v2: a hand night takes its own cut
+    expect(boardJudgement(11, sent().getEvents())).toEqual({ verdict: "perfect", san: constants.handSanPerfect as number }); // meters-v2: a hand night takes its own cut
   });
 
   it("the shutdown box offers no give choice (it was sent, not on the desk)", () => {
@@ -409,9 +410,54 @@ describe("a board that goes to the hand on day 11 (a hand night, no content choi
     const given = day11Printed();
     given.appendEvent({ kind: "give", deliverableId: "d11-hand" });
     expect(deliverableOnDesk(11, given.getEvents())).toBeNull();
-    expect(boardJudgement(11, given.getEvents())).toEqual({ verdict: "perfect", san: -2 }); // meters-v2: the hand's cut
+    expect(boardJudgement(11, given.getEvents())).toEqual({ verdict: "perfect", san: constants.handSanPerfect as number }); // meters-v2: the hand's cut
     // Refuse: nothing is logged, so by 躺下 it was not given → wrong.
     const refused = day11Printed();
     expect(boardJudgement(11, refused.getEvents())).toMatchObject({ verdict: "wrong" });
+  });
+});
+
+// ——— the night's 不给 is the hand's refusal (meters-v2 cleanup, 2026-11-13) ———
+
+import { loopActions } from "@world/room/game";
+import { beatQueued } from "@world/loop/runtime";
+import type { ActionContext } from "@world/desktop/controller";
+
+describe("giving to the hand on a night whose content choice is the refusal", () => {
+  const ctxAt = (store: Store): ActionContext => ({ store, session: initialSession({ beat: "night", time: "23:00" }, "left", "desk"), rerender: () => {}, later: () => {} });
+
+  it("every hand night's content choice is marked as the refusal, with lines and no cost of its own", () => {
+    for (let day = 10; day <= 17; day++) {
+      const choices = dayFiles.get(day)!.beats.shutdown!.choices ?? [];
+      expect(choices.length, `day ${day}`).toBe(1);
+      expect(choices[0], `day ${day}`).toMatchObject({ hand: "refuse" });
+      expect(choices[0]!.effects?.san, `day ${day}`).toBeUndefined();
+      expect(choices[0]!.say?.length ?? 0, `day ${day}`).toBeGreaterThan(0);
+    }
+    for (let day = 1; day <= 9; day++) for (const c of dayFiles.get(day)!.beats.shutdown?.choices ?? []) expect(c.hand, `day ${day}`).toBeUndefined();
+  });
+
+  it("把…递给它 logs the give and finishes the box (nothing but the refusal was left to answer)", () => {
+    const store = day11();
+    store.appendEvent({ kind: "task", flag: "task_d11_1", mode: "self", slots: { ...RIGHT }, assists: 0 });
+    const ctx = ctxAt(store);
+    ctx.session.dialogue = push(ctx.session.dialogue, beatQueued(11, "shutdown", dayFiles.get(11)!.beats.shutdown!));
+    ctx.session.dialogue = { ...ctx.session.dialogue, line: ctx.session.dialogue.queue[0]!.lines.length - 1 };
+    expect(showing(ctx.session.dialogue, store.getState(), store.getEvents())?.choices?.map((c) => c.choice ?? "content")).toEqual(["give", "content"]);
+    loopActions["loop-choice"]!(ctx, { index: String(GIVE_INDEX), choice: "give" } as DOMStringMap, null as never);
+    expect(store.getEvents().at(-1)).toMatchObject({ kind: "give", deliverableId: "d11-hand" });
+    expect(ctx.session.dialogue.queue.length).toBe(0);
+  });
+
+  it("a content choice that is not the refusal keeps the box open after the give", () => {
+    const store = day11();
+    store.appendEvent({ kind: "task", flag: "task_d11_1", mode: "self", slots: { ...RIGHT }, assists: 0 });
+    const ctx = ctxAt(store);
+    const seq = { ...dayFiles.get(11)!.beats.shutdown!, choices: [{ text: "再看一眼。" }] };
+    ctx.session.dialogue = push(ctx.session.dialogue, beatQueued(11, "shutdown", seq));
+    ctx.session.dialogue = { ...ctx.session.dialogue, line: ctx.session.dialogue.queue[0]!.lines.length - 1 };
+    loopActions["loop-choice"]!(ctx, { index: String(GIVE_INDEX), choice: "give" } as DOMStringMap, null as never);
+    expect(store.getEvents().at(-1)).toMatchObject({ kind: "give" });
+    expect(ctx.session.dialogue.queue.length).toBe(1);
   });
 });

@@ -74,3 +74,15 @@ At 躺下, from the log: sent / given → judged by the slots; not sent / not gi
 
 ### Files
 `src/state/days/tasks.ts` (`deliverable.to`), `src/world/desktop/workbench/board.ts` (the send button), `src/state/days/board.ts` (`deliverableOnDesk` only for `hand`; a helper `handNight(day)` = day ≥ 10 or a raid night), `src/world/loop/dialogue.ts` + where the shutdown sequence is queued (the give / refuse choices on hand nights without content choices), the messages views (the player's file card from a `give` with a person `to`: `src/world/desktop/messages/view.ts` and the 工作台 message pane), `src/world/room/hud.ts` (desk only for `hand`). Tests in `tests/work-board.test.ts`: a `to: "boss"` board — the send button, task + give at once, nothing on the desk, the file card in 老板's chat, judged at 躺下, no give choice at shutdown; a `to: "hand"` board on day 11 (no content shutdown choices) — give / refuse offered; refuse → `wrong`.
+
+## Correction 2026-11-13 (meters-v2 cleanup): the night's 不给 is the hand's refusal
+
+Days 10–17 each kept a content shutdown choice 「不给。」 (own lines, `san: -1`) from before the hand
+mechanism; with `hand.give` prepended the player had to answer it even after giving. Now that choice
+carries `"hand": "refuse"` (type `Choice.hand`, the loader and `scripts/validate-content.ts` accept it
+on the shutdown beat only) and no SAN effect of its own: it is the alternative to 把…递给它, with the
+night's own lines after it, and the judgement's `handSanRefused` is its cost. Giving finishes the box
+when every remaining content choice is such a refusal (`src/world/room/game.ts`, the give branch);
+a content choice that is not one still keeps the box open. The generic `hand.refuse` is still added
+only when the content has no choices (none of days 10–17 now). Tests: `tests/work-board.test.ts`
+(the last describe). Claude's change (content + the small code it needs).

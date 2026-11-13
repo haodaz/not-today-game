@@ -78,3 +78,11 @@ those nights. The SAN shown after 躺下 is already the combined number.
   headless run that leaves the view within a second.
 - The late-turn hint once per day; the hand's lines per verdict.
 - Snapshots: one settlement card with the grade; the HUD chip mid-countdown.
+
+## Numbers, second pass (Claude, 2026-11-13)
+
+The full headless replay (every chat turn taken each day, every game won by the dev cheat) collapsed
+on day 16 — about −3.5 SAN a day from the chat alone and −2 a night from a perfect hand-over, on top
+of the judgements. Two constants softened in `content/variables.json`: `chatSanLateFrom` 5 → 6 (only
+the sixth turn of a day costs), `handSanPerfect` −2 → −1. The rest unchanged. Tests read the
+constants, nothing else to touch.

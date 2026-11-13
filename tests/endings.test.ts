@@ -102,8 +102,8 @@ describe("SAN (FR1)", () => {
   });
 
   it("clamps at both ends", () => {
-    const nothing = (day: number) => dayFiles.get(day)!.beats.shutdown!.choices!.findIndex((c) => (c.effects?.san ?? 0) < 0);
-    const low = applyChoose({ ...f(10), san: 0 }, { day: 10, beat: "shutdown", index: nothing(10) });
+    // meters-v2: a stare is the plain SAN cost (the night's 不给 has none of its own now)
+    const low = applyEvent({ ...f(10), san: 0 }, { kind: "stare", day: 10, target: "gap" } as GameEvent);
     expect(low.san).toBe(0);
   });
 

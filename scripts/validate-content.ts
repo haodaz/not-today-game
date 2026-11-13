@@ -143,7 +143,10 @@ export function checkDay(raw: unknown, label: string, t: Tables): string[] {
     for (const [b, seq] of Object.entries(beats)) {
       if (!isRecord(seq) || !Array.isArray(seq.choices)) continue;
       seq.choices.forEach((c, i) => {
-        if (!isRecord(c) || c.say === undefined) return;
+        if (!isRecord(c)) return;
+        // meters-v2 cleanup: `hand: "refuse"` marks a shutdown choice as the hand's refusal (days 10–17).
+        if (c.hand !== undefined && (b !== "shutdown" || c.hand !== "refuse")) say(`beats.${b}.choices[${i}].hand`, 'only a shutdown choice may be the hand\'s refusal ("refuse")');
+        if (c.say === undefined) return;
         const p = `beats.${b}.choices[${i}].say`;
         if (b !== "shutdown") return say(p, "only a shutdown choice may have its own say");
         if (!Array.isArray(c.say) || c.say.length === 0) return say(p, "must be a non-empty list of lines");

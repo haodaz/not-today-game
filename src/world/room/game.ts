@@ -1234,14 +1234,16 @@ export const loopActions: Record<string, ActionHandler> = {
       ctx.rerender();
       return;
     }
-    // Work v2 §4: 把{label}递给它 — hand today's deliverable to the hand. It leaves the desk. On a
-    // raid night the content's own choices stay, so the box does not finish (the player still answers
-    // the hand). On a hand night without content choices (days 11, 12, 14, 15, 17) there is nothing
-    // left to answer, so the box finishes and the day can end.
+    // Work v2 §4: 把{label}递给它 — hand today's deliverable to the hand. It leaves the desk. Content
+    // choices that are not the refusal stay (the box does not finish: the player still answers them);
+    // with none, or only the refusal, left there is nothing to answer, so the box finishes and the day
+    // can end.
     if (q.ending.kind === "beatChoices" && data.choice === "give") {
       const d = deliverableForHand(state.day, events);
       if (d) ctx.store.appendEvent({ kind: "give", deliverableId: d.id });
-      if ((q.sequence?.choices?.length ?? 0) === 0) {
+      // meters-v2 cleanup (2026-11-13): a content choice marked `hand: "refuse"` is the alternative to giving,
+      // not a question after it — with only those left, the box finishes too.
+      if (!q.sequence?.choices?.some((c) => c.hand !== "refuse")) {
         ctx.session.dialogue = finishChoice(ctx.session.dialogue);
         settleSession(ctx.session);
         openChatIfDue(ctx);

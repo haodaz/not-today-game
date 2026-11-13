@@ -71,6 +71,13 @@ export interface Choice {
   readonly cond_show?: { readonly has: string };
   /** night-hand (author 2026-11-06): a shutdown choice's own next lines, right after the pick. */
   readonly say?: readonly SayLine[];
+  /**
+   * meters-v2 cleanup (2026-11-13): on a hand night the content's 不给 is the hand's refusal — the
+   * alternative to 把…递给它, not a question that follows it. Giving ends the box when every content
+   * choice is one; refusing logs the pick as any choice (its say plays), and the judgement charges
+   * `handSanRefused`.
+   */
+  readonly hand?: "refuse";
 }
 
 export interface Sequence {
@@ -294,7 +301,9 @@ function sequence(v: unknown, w: string, allowChoices: boolean, choiceSay = fals
     const cw = `${w}.choices[${i}]`;
     if (!isRecord(c)) fail(cw, "a choice must be an object");
     // `goto` is in the requirements but no day uses it; reject until there is a target to go to.
-    keys(c, choiceSay ? ["text", "effects", "cond_show", "say"] : ["text", "effects", "cond_show"], cw);
+    keys(c, choiceSay ? ["text", "effects", "cond_show", "say", "hand"] : ["text", "effects", "cond_show"], cw);
+    // meters-v2 cleanup: a shutdown choice may be the hand's refusal (days 10–17); nothing else is allowed.
+    if (c.hand !== undefined && c.hand !== "refuse") fail(`${cw}.hand`, 'must be "refuse"');
     let say: SayLine[] | undefined;
     if (c.say !== undefined) {
       if (!Array.isArray(c.say) || c.say.length === 0) fail(`${cw}.say`, "must be a non-empty list");
@@ -311,6 +320,7 @@ function sequence(v: unknown, w: string, allowChoices: boolean, choiceSay = fals
       ...(c.effects !== undefined ? { effects: effects(c.effects, `${cw}.effects`) } : {}),
       ...(cond ? { cond_show: cond } : {}),
       ...(say ? { say } : {}),
+      ...(c.hand === "refuse" ? { hand: "refuse" as const } : {}),
     };
   });
   return { say, choices, ...where };
@@ -467,7 +477,7 @@ function localiseSeq(zh: Sequence | undefined, en: Sequence | undefined, w: stri
   if ((zh.choices?.length ?? 0) !== (en.choices?.length ?? 0)) fail(`${w}.choices`, `choice count differs from the Chinese`);
   const choices = zh.choices?.map((z, i) => {
     const e = en.choices![i]!;
-    if (!same(z.effects, e.effects) || !same(z.cond_show, e.cond_show)) fail(`${w}.choices[${i}]`, `effects or condition differ from the Chinese`);
+    if (!same(z.effects, e.effects) || !same(z.cond_show, e.cond_show) || z.hand !== e.hand) fail(`${w}.choices[${i}]`, `effects, condition or hand differ from the Chinese`);
     // A choice's own lines: line for line, as a sequence's.
     const cw = `${w}.choices[${i}].say`;
     if ((z.say?.length ?? 0) !== (e.say?.length ?? 0)) fail(cw, `${e.say?.length ?? 0} lines, the Chinese has ${z.say?.length ?? 0}`);

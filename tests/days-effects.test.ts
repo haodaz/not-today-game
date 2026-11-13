@@ -28,12 +28,18 @@ describe("step", () => {
 });
 
 describe("choose", () => {
-  it("giving nothing lowers san; flags are added", () => {
-    const { day, index } = choiceDay((e) => (e.san as number) < 0);
-    const store = createStore({ startDay: day });
+  /** The hand night's refusal (meters-v2 cleanup 2026-11-13): the content's 不给, marked `hand: "refuse"`. */
+  const refusalOn = (day: number) => {
+    const index = dayFiles.get(day)!.beats.shutdown!.choices!.findIndex((c) => c.hand === "refuse");
+    expect(index, `day ${day}`).toBeGreaterThanOrEqual(0);
+    return index;
+  };
+
+  it("the night's refusal costs no SAN of its own (the judgement's handSanRefused is its price); flags are added", () => {
+    const store = createStore({ startDay: 10 });
     const san = store.getState().san;
-    store.appendEvent({ kind: "choose", beat: "shutdown", index });
-    expect(store.getState().san).toBeLessThan(san);
+    store.appendEvent({ kind: "choose", beat: "shutdown", index: refusalOn(10) });
+    expect(store.getState().san).toBe(san);
     const flagged = choiceDay((e) => Array.isArray(e.flags));
     const s2 = createStore({ startDay: flagged.day });
     s2.appendEvent({ kind: "choose", beat: "shutdown", index: flagged.index });
@@ -41,13 +47,13 @@ describe("choose", () => {
   });
 
   it("a content shutdown choice on a hand night (10–17) answers the hand with nothing; once a night", () => {
-    const { day, index } = choiceDay((e) => (e.san as number) < 0);
-    expect(day).toBeGreaterThanOrEqual(10);
-    expect(day).toBeLessThanOrEqual(17);
-    const store = createStore({ startDay: day });
-    store.appendEvent({ kind: "choose", beat: "shutdown", index });
-    expect(store.getState().raids[String(day)]).toEqual({ gave: null });
-    expect(() => store.appendEvent({ kind: "choose", beat: "shutdown", index })).toThrow(/already answered/);
+    for (const day of [10, 17]) {
+      const store = createStore({ startDay: day });
+      const index = refusalOn(day);
+      store.appendEvent({ kind: "choose", beat: "shutdown", index });
+      expect(store.getState().raids[String(day)]).toEqual({ gave: null });
+      expect(() => store.appendEvent({ kind: "choose", beat: "shutdown", index })).toThrow(/already answered/);
+    }
     // Night 18 is the branch, not a hand night: its choices write no raid.
     const last = createStore({ startDay: 18 });
     last.appendEvent({ kind: "choose", beat: "shutdown", index: 0 });
