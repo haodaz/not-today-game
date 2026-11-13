@@ -4,7 +4,7 @@
 // content; the game's name is the one constant.
 import { cls, html, type SafeHtml } from "@world/html";
 import { getLocale, t, tr } from "@world/i18n";
-import { figuresLayer } from "@world/room/collection";
+import { figureCard, figuresLayer } from "@world/room/collection";
 import { settingsPanel } from "@world/room/hud";
 import { centre, rectStyle, ROOM_COLLECTION, ROOM_SHOT } from "@world/room/shots";
 import { ROOM_PUSH } from "@world/motion/timing";
@@ -128,5 +128,5 @@ export function renderTitle(m: TitleModel): SafeHtml {
       : null
     : m.screen === "credits" ? creditsPage() : m.screen === "drawer" ? drawerPage(m.collection, m.drawerOpen) : m.screen === "album" ? albumPage(m.collection, m.albumOpen) : m.screen === "questions" ? (m.starting ? null : cardOpen(m) ? questions(m) : menu(m)) : menu(m);
   const account = m.screen === "menu" && !m.moving ? accountChip(m.account) : null;
-  return html`<div class="${cls("stage", "title-page", `screen-${m.screen}`, cardOpen(m) && "card-open", gated && "gated")}" data-screen="${m.screen}">${room(m)}<h1 class="title-name"><img class="title-logo" src="/logo.svg" alt="${GAME_TITLE}"></h1>${middle}${account}<div class="title-ver">${tr("title.version")}<br>${tr("title.byline")}</div><button type="button" class="title-lang" data-action="title-lang">${tr("title.lang")}</button>${settingsPanel({ settingsOpen: m.settingsOpen, muted: m.muted, settingsConfirm: m.settingsConfirm ?? null, ...(m.hintsOn !== undefined ? { hintsOn: m.hintsOn } : {}) }, { home: false, clearAll: true })}${m.opening ? openingLabel(m.opening) : null}</div>`;
+  return html`<div class="${cls("stage", "title-page", `screen-${m.screen}`, cardOpen(m) && "card-open", gated && "gated")}" data-screen="${m.screen}">${room(m)}<h1 class="title-name"><img class="title-logo" src="/logo.svg" alt="${GAME_TITLE}"></h1>${middle}${account}<div class="title-ver">${tr("title.version")}<br>${tr("title.byline")}</div><button type="button" class="title-lang" data-action="title-lang">${tr("title.lang")}</button>${m.screen === "menu" ? figureCard(m.collection, m.figureOpen) : null}${settingsPanel({ settingsOpen: m.settingsOpen, muted: m.muted, settingsConfirm: m.settingsConfirm ?? null, ...(m.hintsOn !== undefined ? { hintsOn: m.hintsOn } : {}) }, { home: false, clearAll: true })}${m.opening ? openingLabel(m.opening) : null}</div>`;
 }

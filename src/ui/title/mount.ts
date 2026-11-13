@@ -1,6 +1,7 @@
 // The title page's DOM side (title-page FR1–FR3, FR7): clicks, typing, keys, the idle events,
 // the rain, and the camera push to the desk where the question card opens (correction
 // 2026-11-01). The view is pure (view.ts); this file owns timers and sound only.
+import { type EndingKind } from "./table";
 import { getLocale, persistLocale, setLocale, type Locale } from "@world/i18n";
 import { applyFit, BACKDROPS } from "@world/fit";
 import { onEmailChange, sendEmailLink, setEmailDraft } from "@net/email";
@@ -370,6 +371,12 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
       deps.sound?.setMuted(model.muted);
     },
     "title-credits": () => set({ ...model, screen: "credits" }),
+    // the ending figurines on the bed (author 2026-11-12): a click opens one large; the page closes it
+    "figure-open": (el) => {
+      const kind = el.dataset.ending as EndingKind | undefined;
+      if (model.screen === "menu" && kind && model.collection.endings[kind] > 0) set({ ...model, figureOpen: kind });
+    },
+    "figure-close": () => set({ ...model, figureOpen: null }),
     "title-back": () => {
       // From an opened object, 返回 goes back to the grid; from the grid (or elsewhere) to the menu.
       if (model.screen === "drawer" && model.drawerOpen) toDrawer(null);

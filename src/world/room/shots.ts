@@ -48,20 +48,20 @@ export const ROOM_SHOT: Shot & Actuators & { readonly desk: Rect; readonly bed: 
 };
 
 /**
- * The collection in 房间 (title-page FR4/FR8; author 2026-11-12: 「放床头吧」): the five ending
- * figures stand in a row on the headboard shelf, in front of the stacked books, one fixed place
- * each (their feet on the shelf top, y ≈ 548); the book lies left of the keyboard. The chair region
- * is for the title's one-pixel cut (FR7).
+ * The collection in 房间 (title-page FR4/FR8; author 2026-11-12: 「放床上吧」): the five ending
+ * figures sit in a row on the bed's blanket by the headboard, one fixed place each, a little
+ * larger toward the camera; the book lies left of the keyboard. The chair region is for the title's
+ * one-pixel cut (FR7).
  */
 export const ROOM_COLLECTION = {
   figures: {
-    bad: { l: 1168, t: 504, w: 22, h: 44 },
-    survive: { l: 1196, t: 514, w: 28, h: 34 },
+    bad: { l: 1255, t: 594, w: 34, h: 62 },
+    survive: { l: 1300, t: 608, w: 46, h: 48 },
     // 回到未来（或许是最后一次）: the carton with the puppy on it (ending matrix 2026-11-13)
-    warm: { l: 1228, t: 508, w: 30, h: 40 },
-    good: { l: 1262, t: 510, w: 26, h: 38 },
+    warm: { l: 1356, t: 596, w: 54, h: 62 },
+    good: { l: 1420, t: 600, w: 42, h: 58 },
     // 温柔的世界: the little bed under a glass dome
-    collapse: { l: 1292, t: 500, w: 28, h: 48 },
+    collapse: { l: 1472, t: 584, w: 44, h: 74 },
   },
   book: { l: 452, t: 500, w: 36, h: 26 },
   chair: { l: 341, t: 543, w: 393, h: 357 },

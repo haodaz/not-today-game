@@ -259,10 +259,25 @@ describe("the collection (FR4, FR8)", () => {
     );
   });
 
+  it("a figurine opens large on the menu (author 2026-11-12): the card carries its name and the ending's line; a missing ending opens nothing", () => {
+    const c = collected(2, { warm: 1, good: 1 });
+    const closed = page(initialTitle(null, c));
+    expect(closed).not.toContain("figure-card");
+    expect(closed).toContain('data-action="figure-open" data-ending="warm"');
+    const open = page({ ...initialTitle(null, c), figureOpen: "warm" });
+    expect(open).toContain('<div class="figure-card" role="dialog" aria-modal="true" aria-label="回到未来（或许是最后一次）" data-ending="warm">');
+    expect(open).toContain('<img src="/room/fig_warm.png" alt="">');
+    expect(open).toContain('<b class="figure-card-name">回到未来（或许是最后一次）</b>');
+    expect(open).toContain('<p class="figure-card-line">世上没有第二个你。纵要认输，不是今日。</p>');
+    expect(open).toContain('data-action="figure-close"');
+    // an ending never reached has no figurine to open
+    expect(page({ ...initialTitle(null, c), figureOpen: "bad" })).not.toContain("figure-card");
+  });
+
   it("a figure per ending reached, in the title room and in 房间 (not at 桌子); its name is a chip", () => {
     const c = collected(2, { bad: 1, good: 3 });
     for (const out of [page(initialTitle(null, c)), room(ctxOf(c))]) {
-      expect([...out.matchAll(/class="figure" tabindex="0" data-ending="(\w+)"/g)].map((m) => m[1])).toEqual(["bad", "good"]);
+      expect([...out.matchAll(/class="figure" tabindex="0" role="button" data-action="figure-open" data-ending="(\w+)"/g)].map((m) => m[1])).toEqual(["bad", "good"]);
       expect(out).toContain('<span class="fig-chip" aria-hidden="true">以我之名</span>');
       expect(out).not.toMatch(/data-ending="good"[^>]*>[^<]*\d/); // no counts
     }

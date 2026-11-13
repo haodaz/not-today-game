@@ -1,6 +1,7 @@
 // The title page's state (title-page FR1–FR3, FR7). Pure: transitions in, a new model out. The
 // page reads the profile through src/ui only; nothing here reaches the game's state except the
 // names the questions give, which the host turns into the run's first event.
+import { type EndingKind } from "./table";
 import type { State } from "@state/types.gen";
 import { PORTRAITS, type Portrait } from "@state/events";
 import type { Collection } from "@world/room/collection";
@@ -80,6 +81,8 @@ export interface TitleModel {
   readonly drawerOpen: string | null;
   /** The photo open large in 影集 ("<day>:<facing>", photo-album R2), or null: the grid. */
   readonly albumOpen: string | null;
+  /** The ending figurine open large on the menu (author 2026-11-12), or null. */
+  readonly figureOpen: EndingKind | null;
   /**
    * opening R1: after 开始, the name printed into the shipping label (`chars` typed so far), the
    * label stuck onto the box, the hold, the fade to black; null before. No input meanwhile.
@@ -91,7 +94,7 @@ export interface TitleModel {
 export type OpeningPhase = "print" | "stick" | "hold" | "fade";
 
 export function initialTitle(save: TitleModel["save"], collection: Collection): TitleModel {
-  return { screen: "menu", save, answers: NO_ANSWERS, settingsOpen: false, muted: false, idle: null, chairCut: false, monitorsAwake: false, starting: false, framing: "room", moving: false, collection, drawerOpen: null, albumOpen: null, opening: null };
+  return { screen: "menu", save, answers: NO_ANSWERS, settingsOpen: false, muted: false, idle: null, chairCut: false, monitorsAwake: false, starting: false, framing: "room", moving: false, collection, drawerOpen: null, albumOpen: null, figureOpen: null, opening: null };
 }
 
 /** The card shows only once the camera has arrived at the desk. */
@@ -157,4 +160,4 @@ export const toQuestions = (m: TitleModel): TitleModel => (m.save ? m : { ...m, 
  * Esc from the card (or 返回 from 制作): back to the menu; the monitors sleep; from the desk the
  * camera pulls back to the room. The answers are kept.
  */
-export const toMenu = (m: TitleModel): TitleModel => ({ ...m, screen: "menu", monitorsAwake: false, settingsOpen: false, framing: "room", moving: m.framing === "desk", drawerOpen: null, albumOpen: null });
+export const toMenu = (m: TitleModel): TitleModel => ({ ...m, screen: "menu", monitorsAwake: false, settingsOpen: false, framing: "room", moving: m.framing === "desk", drawerOpen: null, albumOpen: null, figureOpen: null });

@@ -20,13 +20,23 @@ export interface Collection {
 
 export const EMPTY_COLLECTION: Collection = { finishedRuns: 0, endings: { bad: 0, survive: 0, warm: 0, good: 0, collapse: 0 }, objects: [], kurogotchi: false, photos: [] };
 
-/** A figure per ending reached; hover or focus shows its name as a one-word chip. */
+/** A figure per ending reached; hover or focus shows its name as a one-word chip; a click opens it large (figure-open). */
 export function figuresLayer(c: Collection): SafeHtml {
   const figs = ENDING_KINDS.filter((k) => c.endings[k] > 0).map((k) => {
     const f = titleTable.figures[k];
-    return html`<span class="figure" tabindex="0" data-ending="${k}" style="${rectStyle(ROOM_COLLECTION.figures[k])}" aria-label="${t(f.name)}"><img src="${f.src}" alt=""><span class="fig-chip" aria-hidden="true">${tr(f.name)}</span></span>`;
+    return html`<span class="figure" tabindex="0" role="button" data-action="figure-open" data-ending="${k}" style="${rectStyle(ROOM_COLLECTION.figures[k])}" aria-label="${t(f.name)}"><img src="${f.src}" alt=""><span class="fig-chip" aria-hidden="true">${tr(f.name)}</span></span>`;
   });
   return figs.length ? html`<div class="figures">${figs}</div>` : html``;
+}
+
+/** What each figure says on its card: the ending's own last line (author 2026-11-12: 「可以点了靠近」). */
+const FIGURE_LINE: Readonly<Record<EndingKind, string>> = { bad: "credits.last.bad", survive: "credits.last.survive.cold", warm: "credits.last.survive.warm", good: "ending.good.kuro", collapse: "ending.lines.collapse.2.kuro" };
+
+/** The figure close-up: the figurine large, the ending's name, its line; the page is the way out (figure-close). */
+export function figureCard(c: Collection, kind: EndingKind | null): SafeHtml | null {
+  if (!kind || !(ENDING_KINDS as readonly string[]).includes(kind) || c.endings[kind] <= 0) return null;
+  const f = titleTable.figures[kind];
+  return html`<div class="figure-card" role="dialog" aria-modal="true" aria-label="${t(f.name)}" data-ending="${kind}"><button type="button" class="figure-card-hit" data-action="figure-close" aria-label="${t("dialogue.close")}"></button><div class="figure-card-body"><img src="${f.src}" alt=""><b class="figure-card-name">${tr(f.name)}</b><p class="figure-card-line">${tr(FIGURE_LINE[kind])}</p></div></div>`;
 }
 
 /** The book on the desk: only once a run has finished. */
