@@ -212,6 +212,9 @@ function startGame(store: Store, saved: boolean, prologue = false): void {
     game.session.view = "desk";
     game.session.dialogue = { queue: [], line: 0 };
     game.session.boss = bossStart(store.getState(), boss, Date.now());
+    // `&bosshp=0.55`: the boss already worn down, to look at the change of stage and Q-Kuro's entrance
+    const frac = Number(params.get("bosshp"));
+    if (frac > 0 && frac < 1) game.session.boss = { ...game.session.boss, boss: { ...game.session.boss.boss, hp: Math.round(game.session.boss.boss.max * frac) } };
     game.rerender();
   }
 }

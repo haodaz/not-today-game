@@ -274,7 +274,7 @@ export function renderBoss(b: BossBattle, nowMs: number): SafeHtml {
   // the win is not a kill (author 2026-11-14): the boss dissolves, one tentacle is left standing, and as the words end the
   // camera pulls out once more — behind everything, a far larger Kuro
   const tentacle = over ? html`<img class="bs-tentacle" src="/room/dark/tentacles.png" alt="">` : null;
-  const giant = html`<div class="bs-giant"><img src="${BOSS_IMG[2]}" alt=""></div>`;
+  const giant = html`<div class="bs-giant"></div>`;
   const field = html`<div class="bs-field"><div class="bs-ground"></div><div class="${cls("bs-party", b.phase === "after" && b.strong && "crossed")}">${members}</div>${boss}${tentacle}${prop}${flash}</div>`;
   // the boss's bar: one full-width bar at the very bottom
   const pct = Math.round((100 * Math.max(0, b.boss.hp)) / b.boss.max);
