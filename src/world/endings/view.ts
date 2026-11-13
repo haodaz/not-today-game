@@ -124,7 +124,7 @@ export function renderLines(m: EndingModel, ending: Ending): SafeHtml {
   if (step > all.length) {
     // the ending's own page (author 2026-11-12): the name, the spread picture, one paragraph
     // layout (author 2026-11-12, Sultan's Game reference): the picture on the left, the name and a paragraph on the right
-    const card = html`<div class="ending-card"><div class="ending-art-wrap"><img class="ending-art" src="${ENDING_ART[flavour]}" alt="" draggable="false"></div><div class="ending-text"><small>${tr("ending.name.label")}</small><b>${tr(`ending.name.${flavour}`)}</b><p class="ending-about">${fill(t(`ending.about.${flavour}`, { day: m.state.day }))}</p></div></div>`;
+    const card = html`<div class="ending-card"><div class="ending-art-wrap"><img class="ending-art" src="${ENDING_ART[flavour]}" alt="" draggable="false"></div><div class="ending-text"><small>${tr("ending.name.label")}</small><b>${tr(`ending.name.${flavour}`)}</b><p class="ending-about">${fill(t(`ending.about.${flavour}`, { day: m.state.day }))}</p><span class="ending-go" aria-hidden="true">${tr("ending.next")}</span></div></div>`;
     return html`<div class="stage ending-page lines-page carded" data-flavour="${flavour}">${next()}${card}</div>`;
   }
   const rows = all.slice(0, step).map((l) => {
