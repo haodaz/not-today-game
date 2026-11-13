@@ -322,6 +322,9 @@ for (const it of ITEMS) {
         const shot = await send("Page.captureScreenshot", { format: "jpeg", quality: 70 }); fs.writeFileSync(`${shotdir}/auto-day-${day}-phone.jpg`, Buffer.from(shot.result.data, "base64")); }
       // The app: home → a shop → an item → checkout → 下单 (loop-order); old one-step menus still work as a fallback.
       const step = async (name, s) => { const r = await sel(s, 1.2); if (!r) note(`   phone: no ${name} · ${(await text()).slice(0, 160)}`); return r; };
+      // the last meal's rating can sit on the phone first (评价一下 → a remark → thanks): give it one and go on
+      if (await has("[data-action=phone-remark]")) { await sel("[data-action=phone-remark]", 1.2); note("   phone: rated the last meal"); await sleep(1); if (!(await has("[data-action=phone-shop]"))) { await key("Escape"); await sleep(0.5); await sel("[data-action=loop-phone]", 1.5); } }
+      else if (await has("[data-action=phone-rate]")) { note("   phone: a rating is due (left for later)"); }
       if (await has("[data-action=phone-shop]")) { ok = ok && await step("shop", "[data-action=phone-shop]:not([disabled])") && await step("item", "[data-action=phone-add]:not([disabled])") && await step("checkout", "[data-action=phone-checkout]"); }
       ok = ok && await step("下单", "[data-action=loop-order]:not([disabled])"); await key("Escape"); await settle(); await toRoom();
     }
@@ -343,6 +346,30 @@ for (const it of ITEMS) {
       // launch: 要开始工作吗？ → 开始 (the ask renders a beat after the row click: wait for it or for the launch page)
       for (let w = 0; w < 8 && !(await ev("JSON.stringify(__choices())").then(JSON.parse)).length && !(await has("[data-action=task-launch]")); w++) await sleep(0.5);
       if ((await ev("JSON.stringify(__choices())").then(JSON.parse)).length) { await shotStep(`ask-${it.id}`); await settle(); await sleep(1); }
+      // The work's ask (要开始工作吗？→ 开始) can come a beat after other choices (the door's 拿进来, the meal) and
+      // after lines that must be read first; until it is answered the board is not up. Poll up to 30 s for it,
+      // or for the board itself (day 3's tune board, 2026-11-13; day 10's proofreading the same day).
+      const waitForAsk = async (tag, boardSel) => {
+          for (let w = 0; w < 60; w++) {
+            // the delivery's lines (the door, the box) must be read through before the ask can come
+            if (await has("[data-action=loop-advance]")) { await sel("[data-action=loop-advance]", 0.3); }
+            const ch = await ev("JSON.stringify(__choices())").then((x) => (x ? JSON.parse(x) : []));
+            // a choice taken on the way (the door's 拿进来) leaves us in the room: back to the task's page, the ask comes there
+            if (await ev("[...document.querySelectorAll(" + JSON.stringify(boardSel) + ")].some(__vis)")) { note(`   ${tag}: the board is up (after ${w / 2} s)`); break; }
+            if (!ch.length && !(await has(".monitor")) && !(await has("[data-action=loop-advance]"))) { await toWorkbench(); await goHome(); await sel(`[data-action=wb-nav][data-page='task:${it.id}']`, 1.2); note(`   ${tag}: back to the task page (after ${w / 2} s)`); continue; }
+            if (w % 20 === 0) note(`   ${tag}: waiting for the ask (${w / 2} s) · choices ${JSON.stringify(ch)} · ask ${(await text()).includes(S("task.launch.ask"))} · buttons ${await ev("JSON.stringify([...document.querySelectorAll('button')].filter(__vis).map(__txt).slice(0,12))")}`);
+            const go = ch.find((c) => /^(开始|Start)/.test(String(c).replace(/^[◇◆▶○●\s]+/, "").trim()));   // the chip text carries its ◇
+            if (go) { await click(go, 1.2); note(`   choice → ◇${go} (the work's ask, after ${w / 2} s)`); await sleep(0.8); break; }
+            // another choice up (the door's 拿进来 / 再等等, the meal): take the first, as settle would
+            if (ch.length) { await click(ch[0], 1); note(`   choice → ◇${ch[0]} (on the way to the work's ask)`); await sleep(0.5); continue; }
+            // the ask's buttons may not be loop-choice ones: by text, when the ask line is on screen
+            if ((await text()).includes(S("task.launch.ask")) && (await click(S("task.launch.go") || "开始", 1.2))) { note(`   choice → ◇开始 (the work's ask by text, after ${w / 2} s)`); await sleep(0.8); break; }
+            // visible only: the tune stage's cards can sit hidden in the DOM behind the ask
+            if (await ev("[...document.querySelectorAll(boardSel)].some(__vis)")) { note(`   ${tag}: the board is up (after ${w / 2} s)`); break; }
+            await sleep(0.5);
+          }
+      };
+      if (board && !board.tune) await waitForAsk("board", "[data-action=task-launch],[data-action=compare-pick],[data-action=board-slot],[data-action=shell-slot],[data-action=board-lock]");
       if (await has("[data-action=task-launch]")) { await shotStep(`launch-${it.id}`); await sel("[data-action=task-launch]", 1.2); note("   launch: 开始工作"); await sleep(0.6); }  // every board task opens on its launch page
       if (board?.tune) {
         // tune (2026-11-08): a module's source first (a conv), then one path per module (the first open chip each
@@ -352,21 +379,7 @@ for (const it of ITEMS) {
         await toWorkbench(); await goHome(); await sel(`[data-action=wb-nav][data-page='task:${it.id}']`, 1.2);
         // the ask 要开始工作吗？→ 开始 may come up only now (a delivery at the door took the first beat in a continued run, 2026-11-13)
         // the ask comes a few seconds after the door's delivery played out: poll up to 12 s for it (or for the board itself)
-        for (let w = 0; w < 60; w++) {
-          // the delivery's lines (the door, the box) must be read through before the ask can come
-          if (await has("[data-action=loop-advance]")) { await sel("[data-action=loop-advance]", 0.3); }
-          const ch = await ev("JSON.stringify(__choices())").then((x) => (x ? JSON.parse(x) : []));
-          if (w % 20 === 0) note(`   tune: waiting for the ask (${w / 2} s) · choices ${JSON.stringify(ch)} · ask ${(await text()).includes(S("task.launch.ask"))} · buttons ${await ev("JSON.stringify([...document.querySelectorAll('button')].filter(__vis).map(__txt).slice(0,12))")}`);
-          const go = ch.find((c) => /^(开始|Start)/.test(String(c).trim()));
-          if (go) { await click(go, 1.2); note(`   choice → ◇${go} (the work's ask, after ${w / 2} s)`); await sleep(0.8); break; }
-          // another choice up (the door's 拿进来 / 再等等, the meal): take the first, as settle would
-          if (ch.length) { await click(ch[0], 1); note(`   choice → ◇${ch[0]} (on the way to the work's ask)`); await sleep(0.5); continue; }
-          // the ask's buttons may not be loop-choice ones: by text, when the ask line is on screen
-          if ((await text()).includes(S("task.launch.ask")) && (await click(S("task.launch.go") || "开始", 1.2))) { note(`   choice → ◇开始 (the work's ask by text, after ${w / 2} s)`); await sleep(0.8); break; }
-          // visible only: the tune stage's cards can sit hidden in the DOM behind the ask
-          if (await ev("[...document.querySelectorAll('[data-action=task-launch],[data-action=shell-tune-go],[data-action=tune-select]')].some(__vis)")) { note(`   tune: the board is up (after ${w / 2} s)`); break; }
-          await sleep(0.5);
-        }
+        await waitForAsk("tune", "[data-action=task-launch],[data-action=shell-tune-go],[data-action=tune-select]");
         // the launch page may only be up now (after the source conv): 开始工作, then the typing line; and a continued board (day 3) may wait behind the shell's go button (2026-11-13)
         for (let w = 0; w < 6 && !(await has("[data-action=task-launch], [data-action=shell-tune-go], [data-action=tune-select]")); w++) await sleep(0.5);
         if (await has("[data-action=task-launch]")) { await shotStep(`launch-${it.id}`); await sel("[data-action=task-launch]", 1.2); note("   launch: 开始工作 (after the source)"); await sleep(1.5); }
