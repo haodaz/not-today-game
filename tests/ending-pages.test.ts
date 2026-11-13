@@ -10,7 +10,7 @@ import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
 import { initialSession, type EndingPhase, type Session } from "@world/desktop/model";
 import { endingHost, endingNext } from "@world/endings/flow";
-import { endingLines, pageSteps, TENDER_KEYS, WAKE_KEYS, WAKE_SAY } from "@world/endings/pages";
+import { TENDER_KEYS, WAKE_KEYS, WAKE_PHOTO, WAKE_SAY, endingLines, pageSteps } from "@world/endings/pages";
 import { renderEnding, renderLines, renderTender, renderWake, type EndingModel } from "@world/endings/view";
 import { escapeHtml } from "@world/html";
 import { hasString, setLocale, t } from "@world/i18n";
@@ -45,19 +45,23 @@ describe("tender — the fake day 1", () => {
 });
 
 describe("wake — the waking", () => {
-  it("three captions, then `said` with 早上好 alone; the photo is d06_bed.jpg", () => {
-    expect(pageSteps("wake", "bad", stateOf("bad"))).toBe(4);
-    for (let step = 1; step <= 3; step++) {
+  it("five steps: three captions one per click, then 早上好 in the same box as your own line, then black (author 2026-11-12)", () => {
+    expect(pageSteps("wake", "bad", stateOf("bad"))).toBe(5);
+    for (let step = 1; step <= WAKE_KEYS.length; step++) {
       const out = renderWake(model("bad", "wake", step)).value;
-      expect(out).toContain(`data-step="${step}"`);
-      expect(out).not.toContain(" said");
-      expect(out).toContain(esc(WAKE_KEYS[step - 1]!));
-      expect(out).toContain('src="/room/photos/d06_bed.jpg"');
+      expect(out).toContain(`class="stage ending-page wake-page" data-step="${step}"`);
+      expect(out).toContain(`<img class="wake-photo" src="${WAKE_PHOTO}"`);
+      for (let i = 0; i < step; i++) expect(out).toContain(esc(WAKE_KEYS[i]!));
+      expect(out).not.toContain(esc(WAKE_SAY));
     }
     const said = renderWake(model("bad", "wake", 4)).value;
-    expect(said).toContain('class="stage ending-page wake-page said"');
-    expect(said).toContain(`<p class="wake-say">${esc(WAKE_SAY)}</p>`);
-    for (const k of WAKE_KEYS) expect(said).not.toContain(esc(k));
+    expect(said).toContain('class="stage ending-page wake-page said" data-step="4"');
+    expect(said).toContain(`<p class="cap now wake-say">${esc(WAKE_SAY)}</p>`);
+    expect(said).toContain(esc(WAKE_KEYS[2]!));
+    const black = renderWake(model("bad", "wake", 5)).value;
+    expect(black).toContain('class="stage ending-page wake-page said black" data-step="5"');
+    expect(black).not.toContain("wake-photo");
+    expect(black).not.toContain("end-caps");
   });
 });
 

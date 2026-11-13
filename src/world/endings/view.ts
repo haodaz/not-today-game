@@ -95,15 +95,18 @@ export function renderTender(m: EndingModel): SafeHtml {
 }
 
 /**
- * 以我之名's waking (endings-matrix): the bed wall's photo (the painting of you in the bed), three
- * captions one per click, then the page darkens and 早上好 shows alone — you say it.
+ * 以我之名's waking (endings-matrix; author 2026-11-12: 「早上好是对话框里说，说了黑屏就行」): the bed
+ * wall's photo (someone asleep in the bed), three captions one per click, then 早上好 in the same
+ * box as your own line (your colour), then the screen goes black.
  */
 export function renderWake(m: EndingModel): SafeHtml {
-  const step = Math.min(WAKE_KEYS.length + 1, Math.max(1, stepOf(m)));
+  const step = Math.min(WAKE_KEYS.length + 2, Math.max(1, stepOf(m)));
   const said = step > WAKE_KEYS.length;
-  const caps = said ? null : html`<div class="dlg end-caps">${WAKE_KEYS.slice(0, step).map((k, i) => html`<p class="${cls("cap", i === step - 1 && "now")}">${tr(k)}</p>`)}</div>`;
-  const say = said ? html`<p class="wake-say">${tr(WAKE_SAY)}</p>` : null;
-  return html`<div class="${cls("stage", "ending-page", "wake-page", said && "said")}" data-step="${step}">${next()}<img class="wake-photo" src="${WAKE_PHOTO}" alt="" draggable="false"><div class="wake-dark" aria-hidden="true"></div>${caps}${say}</div>`;
+  const black = step > WAKE_KEYS.length + 1;
+  const caps = black
+    ? null
+    : html`<div class="dlg end-caps">${WAKE_KEYS.slice(0, Math.min(step, WAKE_KEYS.length)).map((k, i) => html`<p class="${cls("cap", !said && i === step - 1 && "now")}">${tr(k)}</p>`)}${said ? html`<p class="cap now wake-say">${tr(WAKE_SAY)}</p>` : null}</div>`;
+  return html`<div class="${cls("stage", "ending-page", "wake-page", said && "said", black && "black")}" data-step="${step}">${next()}${black ? null : html`<img class="wake-photo" src="${WAKE_PHOTO}" alt="" draggable="false">`}${caps}</div>`;
 }
 
 /**

@@ -20,7 +20,7 @@ export const ENDING_PAGES: Readonly<Record<Ending, readonly EndingPhase[]>> = {
 
 /** The fake day 1's captions (collapse). */
 export const TENDER_KEYS = ["ending.tender.1", "ending.tender.2", "ending.tender.3", "ending.tender.4"] as const;
-/** The waking's captions (bad); its fourth step is `WAKE_SAY` alone. */
+/** The waking's captions (bad); its fourth step adds `WAKE_SAY` to the box as your own line; the fifth is black. */
 export const WAKE_KEYS = ["ending.wake.1", "ending.wake.2", "ending.wake.3"] as const;
 export const WAKE_SAY = "ending.wake.say";
 /** The waking's photo: the wall with the painting of you in the bed. */
@@ -51,7 +51,7 @@ export function endingLines(flavour: EndingFlavour, has: (key: string) => boolea
 /** How many clicks a page has before the next one moves on (1 for the plain pages). */
 export function pageSteps(phase: EndingPhase, ending: Ending, state: State): number {
   if (phase === "tender") return TENDER_KEYS.length;
-  if (phase === "wake") return WAKE_KEYS.length + 1;
+  if (phase === "wake") return WAKE_KEYS.length + 2;
   // every line, then the ending's name card
   if (phase === "lines") return endingLines(endingFlavour(ending, state)).length + 1;
   return 1;
