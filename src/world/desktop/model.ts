@@ -3,6 +3,7 @@
 // played); it is never saved and never changes game state.
 import type { GameEvent } from "@state/events";
 import type { State } from "@state/types.gen";
+import type { Ending } from "@state/endings";
 import { html, type SafeHtml } from "@world/html";
 import { tr } from "@world/i18n";
 import type { DoorBeat } from "@world/delivery/door";
@@ -25,6 +26,9 @@ import { renderCall } from "./call/view";
 import type { AppId, MonitorModel, ShellModel, Side } from "./shell";
 import { defaultPlacement, windowsOn } from "./placement";
 import { WALL_FADE_MS, wallpaperFor } from "./wallpaper";
+
+/** The ending pages, in the orders of src/world/endings/flow.ts `ENDING_PAGES`. */
+export type EndingPhase = "collapse" | "you" | "credits" | "after" | "tender" | "wake" | "lines";
 
 /** 工作台's pages (its 消息 pane moved to 听听, tingtalk 2026-11-04). */
 export type WorkbenchPage = "home" | "docs" | "ledger" | "code" | TaskPage;
@@ -168,7 +172,11 @@ export interface Session {
   bookOpen: boolean;
   /** Where the ending pages are (san-and-endings): the collapse run-to-white + line (collapse only),
    *  你和你 (bad only), the credits, then after. */
-  endingPage: { phase: "collapse" | "you" | "credits" | "after"; startMs: number; skipped: boolean } | null;
+  /**   endings-matrix (2026-11-13): `tender` (the fake day 1, collapse), `wake` (the waking, bad) and
+   *  `lines` (the player and Kuro, every ending); `step` is the click within a stepped page (1..). */
+  endingPage: { phase: EndingPhase; startMs: number; skipped: boolean; step?: number } | null;
+  /** dev (`&endpage=`): an ending page looked at with no ending logged; the pages read this ending. */
+  endingPreview: Ending | null;
   /** The 道具 strip is open over the current view (day-loop correction 2026-11-01). */
   itemsOpen: boolean;
   /** The blind-box case overlay is open over 房间 (blind-box 2026-11-03); session only. */
@@ -531,6 +539,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     closerSeq: 0,
     judging: null,
     endingPage: null,
+    endingPreview: null,
     itemsOpen: false,
     caseOpen: false,
     caseStuck: -1,

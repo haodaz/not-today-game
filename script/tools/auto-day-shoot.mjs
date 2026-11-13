@@ -661,6 +661,19 @@ if (day === 18) {
     if (await has("[data-action=boss-done]")) await sel("[data-action=boss-done]", 0.6);
     note(`   boss: walked · pages=${await has("[data-action=ending-next]")}`);
   }
+  // endings-matrix (2026-11-13): click through the pages (wake, 你和你, the credits, the lines and the
+  // name card…); one frame per page and per step, named by the page's class (`tender-page-2`). It stops
+  // on 第一日 / day 19 (the next click would start a new run), or when the host took the page away.
+  const pages = [];
+  for (let k = 0; k < 60; k++) {
+    const cls = (await ev("(()=>{const p=document.querySelector('.ending-page'); if(!p) return ''; const c=[...p.classList].find(x=>/-page$|^first-day$|^day-19$/.test(x))||''; return c+(p.dataset.step?'-'+p.dataset.step:'')+(p.classList.contains('carded')?'-card':'')})()")) || "";
+    if (!cls) break;
+    if (pages[pages.length - 1] !== cls) { pages.push(cls); await shotStep(cls); }
+    if (/^(first-day|day-19)/.test(cls)) break;
+    if (!(await has("[data-action=ending-next]"))) break;
+    await sel("[data-action=ending-next]", 0.7);
+  }
+  if (pages.length) note(`   ending pages: ${pages.join(" → ")}`);
 }
 const judged = await ev(`(()=>{ const t = localStorage.getItem('nt_run') || ''; return (t.match(/\\{[^{}]*"kind":"(give|boardJudge)"[^{}]*\\}/g) || []).join(' | ') + ' · san ' + ((t.match(/"san":(\\d+)/g)||[]).slice(-1)[0]||'?'); })()`);
 if (judged) note(`   board events: ${judged}`);

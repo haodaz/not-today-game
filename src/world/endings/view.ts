@@ -14,7 +14,10 @@ import { creditLines, creditsShown, lastLineKey } from "./credits";
 import { youAndYou } from "./youandyou";
 import { renderPullOut } from "./pullout";
 import { renderBoss } from "./boss";
-import { COLLAPSE_TO_WHITE_MS } from "./flow";
+import { COLLAPSE_TO_WHITE_MS, endingOf } from "./flow";
+import { ENDING_PAGES, endingLines, TENDER_KEYS, TENDER_PHOTO, WAKE_KEYS, WAKE_PHOTO, WAKE_SAY } from "./pages";
+import { endingFlavour } from "@state/endings";
+import { FRAMES, frameUrl } from "@world/desktop/kuro/body";
 
 export interface EndingModel {
   readonly state: State;
@@ -78,15 +81,68 @@ export function renderCollapse(m: EndingModel): SafeHtml {
   return html`<div class="${cls("stage", "ending-page", "collapse-page", toWhite && "to-white")}" data-day="${m.state.day}">${next()}<div class="collapse-white" aria-hidden="true"></div>${toWhite ? null : line}</div>`;
 }
 
+/** The click within a stepped page (1 when none yet). */
+const stepOf = (m: EndingModel): number => m.session.endingPage?.step ?? 1;
+
+/**
+ * 温柔的世界's fake day 1 (endings-matrix): the day-1 room, bright, a soft white vignette; the four
+ * captions one per click, low in the middle, in the box's plain narration.
+ */
+export function renderTender(m: EndingModel): SafeHtml {
+  const step = Math.min(TENDER_KEYS.length, Math.max(1, stepOf(m)));
+  const caps = TENDER_KEYS.slice(0, step).map((k, i) => html`<p class="${cls("cap", i === step - 1 && "now")}">${tr(k)}</p>`);
+  return html`<div class="stage ending-page tender-page" data-step="${step}" style="--photo:url('${TENDER_PHOTO}')">${next()}<div class="tender-glow" aria-hidden="true"></div><div class="dlg end-caps">${caps}</div></div>`;
+}
+
+/**
+ * 以我之名's waking (endings-matrix): the bed wall's photo (the painting of you in the bed), three
+ * captions one per click, then the page darkens and 早上好 shows alone — you say it.
+ */
+export function renderWake(m: EndingModel): SafeHtml {
+  const step = Math.min(WAKE_KEYS.length + 1, Math.max(1, stepOf(m)));
+  const said = step > WAKE_KEYS.length;
+  const caps = said ? null : html`<div class="dlg end-caps">${WAKE_KEYS.slice(0, step).map((k, i) => html`<p class="${cls("cap", i === step - 1 && "now")}">${tr(k)}</p>`)}</div>`;
+  const say = said ? html`<p class="wake-say">${tr(WAKE_SAY)}</p>` : null;
+  return html`<div class="${cls("stage", "ending-page", "wake-page", said && "said")}" data-step="${step}">${next()}<img class="wake-photo" src="${WAKE_PHOTO}" alt="" draggable="false"><div class="wake-dark" aria-hidden="true"></div>${caps}${say}</div>`;
+}
+
+/**
+ * The player and Kuro (endings-matrix, every ending): black; the pairs of the ending's flavour one
+ * line per click, stacking upward like the credits, Kuro's with its small portrait; after the last,
+ * the ending's name card. `{day}` is the day the run ended.
+ */
+export function renderLines(m: EndingModel, ending: Ending): SafeHtml {
+  const flavour = endingFlavour(ending, m.state);
+  const all = endingLines(flavour);
+  const step = Math.min(all.length + 1, Math.max(1, stepOf(m)));
+  const fill = (s: string) => fillPlaceholders(s, m.state.names);
+  // Q-Kuro beside you on good / the warm survive; elsewhere the plain dark face the chat window shows.
+  const face = flavour === "good" || flavour === "survive.warm" ? "/battle/q-kuro.png" : frameUrl(FRAMES.idle[0]);
+  if (step > all.length) {
+    const card = html`<div class="ending-card"><small>${tr("ending.name.label")}</small><b>${tr(`ending.name.${flavour}`)}</b></div>`;
+    return html`<div class="stage ending-page lines-page carded" data-flavour="${flavour}">${next()}${card}</div>`;
+  }
+  const rows = all.slice(0, step).map((l) => {
+    const text = fill(t(l.key, { day: m.state.day }));
+    return l.who === "kuro"
+      ? html`<li class="ln kuro"><img class="ln-av" src="${face}" alt="" aria-hidden="true" draggable="false"><span>${text}</span></li>`
+      : html`<li class="ln you"><span>${text}</span></li>`;
+  });
+  return html`<div class="stage ending-page lines-page" data-flavour="${flavour}" data-step="${step}">${next()}<ol class="lines">${rows}</ol></div>`;
+}
+
 export function renderEnding(m: EndingModel): SafeHtml {
   // Night 18: the pull-out first; the pages wait (room-scene addition 2026-11-01).
   if (m.session.pullOut) return renderPullOut(m);
   // the boss fight (author 2026-11-13): after the pull-out, before the pages
   if (m.session.boss) return renderBoss(m.session.boss, m.nowMs);
-  const ending = m.state.ending as Ending;
-  const phase = m.session.endingPage?.phase ?? (ending === "collapse" ? "collapse" : ending === "bad" ? "you" : "credits");
+  const ending = endingOf(m.state, m.session) as Ending;
+  const phase = m.session.endingPage?.phase ?? ENDING_PAGES[ending][0]!;
   if (phase === "collapse") return renderCollapse(m);
   if (phase === "you") return renderYouAndYou(m);
   if (phase === "credits") return renderCredits(m, ending);
+  if (phase === "tender") return renderTender(m);
+  if (phase === "wake") return renderWake(m);
+  if (phase === "lines") return renderLines(m, ending);
   return renderAfter(m, ending);
 }

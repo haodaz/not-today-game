@@ -260,10 +260,16 @@ describe("credits are Kuro's log (FR3)", () => {
     expect(creditsShown(5, 0, 0, true)).toBe(5);
   });
 
-  it("the pages: collapse white+line → credits → home; bad 你和你 → credits → home; survive credits → 第一日 → new run; good → day 19", () => {
+  it("the pages (endings-matrix): collapse white → credits → day 1 → lines → home; bad waking → 你和你 → credits → lines → home; survive credits → lines → 第一日 → new run; good credits → lines → day 19", () => {
     const calls: string[] = [];
     endingHost.afterBad = () => void calls.push("afterBad");
     endingHost.newRun = () => void calls.push("newRun");
+    const want = {
+      collapse: [["collapse", "credits", "tender", "lines"], "afterBad"],
+      bad: [["wake", "you", "credits", "lines"], "afterBad"],
+      survive: [["credits", "lines", "after"], "newRun"],
+      good: [["credits", "lines", "after"], null],
+    } as const;
     for (const [ending, state] of [
       ["collapse", { ...f(3), san: 0 }],
       ["bad", MAXED(LAST)],
@@ -278,24 +284,16 @@ describe("credits are Kuro's log (FR3)", () => {
       // No bedtime branch in this log, so no pull-out (that flow is in tests/pullout.test.ts): the pages at once.
       expect(ctx.session.pullOut).toBeNull();
       expect(timers.every((t) => t.ms !== 6000)).toBe(true);
-      const phases = [ctx.session.endingPage!.phase];
-      for (let i = 0; i < 5; i++) {
+      // Every click, until the host is called (or 60 clicks: good's day 19 stays).
+      const phases: string[] = [ctx.session.endingPage!.phase];
+      for (let i = 0; i < 60 && calls.length === 0; i++) {
         endingNext(ctx);
-        phases.push(ctx.session.endingPage!.phase);
+        const p = ctx.session.endingPage!.phase;
+        if (p !== phases[phases.length - 1]) phases.push(p);
       }
-      if (ending === "collapse") {
-        // collapse → the run-to-white + line, then the credits, then home (no 你和你, no day 1).
-        expect(phases.slice(0, 2)).toEqual(["collapse", "credits"]);
-        expect(phases).not.toContain("after");
-        expect(calls[0]).toBe("afterBad");
-      } else if (ending === "bad") {
-        expect(phases.slice(0, 2)).toEqual(["you", "credits"]);
-        expect(calls[0]).toBe("afterBad");
-      } else {
-        expect(phases[0]).toBe("credits");
-        expect(phases).toContain("after");
-        expect(calls.includes("newRun")).toBe(ending === "survive");
-      }
+      const [order, host] = want[ending];
+      expect(phases).toEqual(order);
+      expect(calls).toEqual(host ? [host] : []);
     }
   });
 });

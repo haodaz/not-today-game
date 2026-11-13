@@ -2616,3 +2616,19 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
   - The reply step checks `__events()` (a new helper that reads nt_run) for `reply:<who>` and names the chip and the box when the event is missing.
   - On day 2 the reorder moves nothing: content has task1 ← replyxz ← eat ← pickup. The driver was not run, because port 5180 answered 000.
 - `npx tsc --noEmit -p .`: clean. `npx vitest run`: 152 files, 2329 passed (the 1 obsolete desk-prints snapshot was already there).
+
+## 2026-11-13 · endings-matrix (the pages)
+
+- New `src/world/endings/pages.ts`:
+  - `ENDING_PAGES`: collapse = collapse, credits, tender, lines; bad = wake, you, credits, lines; survive and good = credits, lines, after.
+  - `pageSteps`: tender 4, wake 3 + said, lines = number of lines + the name card.
+  - `endingLines(flavour)` walks `ending.lines.<flavour>.<n>.you|kuro` until neither exists. Also `nextPage` and the caption keys and photo paths.
+- `flow.ts`: `firstPage` / `endingNext` now run on that table. A stepped page takes a click per step; the credits keep their show-all-first click. After the last page: `afterBad` (collapse, bad) or `newRun` (survive); good's day 19 stays. New `endingOf(state, session)` and `goToPage`.
+- `model.ts`: new `EndingPhase` type; `endingPage.step?`; new `endingPreview` (dev).
+- `sound/plan.ts`: tender and lines play the credits song.
+- `view.ts`: new `renderTender`, `renderWake` (`said` at step 4, with `ending.wake.say`) and `renderLines` (Kuro's portrait is q-kuro.png for good and survive.warm, else the chat pill's idle frame; then the `.ending-card`).
+- room.css: styles for the three pages. Fades use `m-fade-*` and are off under `prefers-reduced-motion`.
+- main.ts: `&endpage=tender|wake|lines` (tender → collapse, wake → bad, lines → the `boss=` ending). It sets `endingPreview` and the page with no ending logged. game.ts renders the preview, and its last click calls no host.
+- Driver: the day-18 tail clicks through the pages and shoots one frame per page/step, named by its class. Not run.
+- Tests: the endings.test page-order case is rewritten to the exact table; pullout.test's bad first page is now `wake`; sound.test covers tender/lines/wake; new `tests/ending-pages.test.ts` (with one snapshot written).
+- Content note for Claude: `ending.lines.bad.2.kuro` says 他 / "him" for the one asleep in the bed, who is the player. voices.md forbids 他/她 for the player. Not changed.

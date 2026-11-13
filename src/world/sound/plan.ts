@@ -96,7 +96,7 @@ export const EVENING_MUSIC_GAIN = 0.7;
 export interface PlanSession {
   readonly clock: Pick<BeatClock, "beat">;
   /** The ending pages (san-and-endings): the credits are the full song. */
-  readonly endingPage?: { readonly phase: "collapse" | "you" | "credits" | "after" } | null;
+  readonly endingPage?: { readonly phase: "collapse" | "you" | "credits" | "after" | "tender" | "wake" | "lines" } | null;
   /** The walkman on the desk is playing the theme (a click; session only). */
   readonly walkman?: boolean;
   /** Where the player is (the duck). */
@@ -125,7 +125,8 @@ export function soundPlan(
   // the music is the full song, however the run ended.
   if (state.ending !== "none") {
     const phase = session.endingPage?.phase;
-    const when = phase === "credits" || phase === "after" ? "credits" : ENDING_WHEN[state.ending];
+    // endings-matrix: the song plays on from the credits through the fake day 1 and the lines.
+    const when = phase === "credits" || phase === "tender" || phase === "lines" || phase === "after" ? "credits" : ENDING_WHEN[state.ending];
     return { bed: null, bedLevel: 1, stinger: null, duck: 1, rain: 0, ...base, ...musicPart(table, when) };
   }
 

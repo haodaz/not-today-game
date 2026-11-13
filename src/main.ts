@@ -217,6 +217,20 @@ function startGame(store: Store, saved: boolean, prologue = false): void {
     if (frac > 0 && frac < 1) game.session.boss = { ...game.session.boss, boss: { ...game.session.boss.boss, hp: Math.round(game.session.boss.boss.max * frac) } };
     game.rerender();
   }
+  // `&endpage=tender|wake|lines` (dev, endings-matrix): straight to that page of the ending `boss=` names
+  // (tender is collapse's, wake is bad's), with no fight and no ending logged; its last click stays.
+  const endpage = params.get("endpage");
+  if (import.meta.env.DEV && (endpage === "tender" || endpage === "wake" || endpage === "lines")) {
+    const ending = endpage === "tender" ? "collapse" : endpage === "wake" ? "bad" : boss === "bad" || boss === "survive" || boss === "good" ? boss : null;
+    if (ending) {
+      game.session.boss = null;
+      game.session.view = "desk";
+      game.session.dialogue = { queue: [], line: 0 };
+      game.session.endingPreview = ending;
+      game.session.endingPage = { phase: endpage, startMs: Date.now(), skipped: false, step: 1 };
+      game.rerender();
+    }
+  }
 }
 
 /** Dev only: the `&seed=` patch (see createStore's `patch`). Unknown keys are ignored; nothing is validated beyond numbers. */

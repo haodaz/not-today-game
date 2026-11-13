@@ -1,0 +1,10 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`snapshots (zh) > one page of each kind 1`] = `
+{
+  "card": "<div class="stage ending-page lines-page carded" data-flavour="good"><button type="button" class="ending-hit" data-action="ending-next" aria-label="继续"></button><div class="ending-card"><small>结局</small><b>导盲犬小克</b></div></div>",
+  "lines": "<div class="stage ending-page lines-page" data-flavour="survive.warm" data-step="3"><button type="button" class="ending-hit" data-action="ending-next" aria-label="继续"></button><ol class="lines"><li class="ln you"><span>你帮我寄一个东西。</span></li><li class="ln kuro"><img class="ln-av" src="/battle/q-kuro.png" alt="" aria-hidden="true" draggable="false"><span>放门口就行。</span></li><li class="ln you"><span>你为什么还在。</span></li></ol></div>",
+  "tender": "<div class="stage ending-page tender-page" data-step="2" style="--photo:url('/room/shots/room.jpg')"><button type="button" class="ending-hit" data-action="ending-next" aria-label="继续"></button><div class="tender-glow" aria-hidden="true"></div><div class="dlg end-caps"><p class="cap">第 1 天。雨停了。</p><p class="cap now">两块屏都黑着。没有人找你。</p></div></div>",
+  "wake": "<div class="stage ending-page wake-page said" data-step="4"><button type="button" class="ending-hit" data-action="ending-next" aria-label="继续"></button><img class="wake-photo" src="/room/photos/d06_bed.jpg" alt="" draggable="false"><div class="wake-dark" aria-hidden="true"></div><p class="wake-say">早上好。</p></div>",
+}
+`;

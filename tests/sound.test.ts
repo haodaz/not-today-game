@@ -226,6 +226,9 @@ describe("soundPlan", () => {
       expect(soundPlan(stateOn(18, ending), { ...at("night"), endingPage: { phase: "after" } }, soundTable, "zh").music).toBe("theme");
     }
     expect(soundPlan(stateOn(18, "bad"), { ...at("night"), endingPage: { phase: "you" } }, soundTable, "zh").music).toBe("end-go");
+    // endings-matrix: the song plays on through the fake day 1 and the lines; the waking keeps the ending's tune.
+    for (const phase of ["tender", "lines"] as const) expect(soundPlan(stateOn(9, "collapse"), { ...at("night"), endingPage: { phase } }, soundTable, "zh").music).toBe("theme");
+    expect(soundPlan(stateOn(18, "bad"), { ...at("night"), endingPage: { phase: "wake" } }, soundTable, "zh").music).toBe("end-go");
     expect(soundPlan(stateOn(18, "good"), { ...at("night"), endingPage: null }, soundTable, "zh").music).toBe("end-stay");
   });
 

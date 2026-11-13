@@ -539,6 +539,39 @@
 .collapse-page .collapse-line{position:relative;z-index:2;margin:0;max-width:60%;text-align:center;font-size:22px;line-height:1.8;letter-spacing:.14em;pointer-events:none;animation:m-fade-in 600ms ease both}
 @media (prefers-reduced-motion:reduce){.collapse-page.to-white .collapse-white{animation:none}.collapse-page .collapse-line{animation:none}}
 
+/* endings-matrix (2026-11-13): the captions of the fake day 1 and the waking, in the box's plain
+   narration, centred low; each new one fades in (none under reduced motion). */
+.ending-page .end-caps{position:absolute;left:50%;bottom:72px;transform:translateX(-50%);width:880px;min-height:0;z-index:2;pointer-events:none;display:flex;flex-direction:column;gap:6px;padding:22px 34px;box-sizing:border-box}
+.ending-page .end-caps .cap{margin:0;font:22px/1.7 var(--font-game-text,inherit);letter-spacing:.06em;text-align:center}
+.ending-page .end-caps .cap.now{animation:m-fade-in 600ms ease both}
+/* 温柔的世界's fake day 1: the lightest page in the game — the day-1 room, a soft white vignette, one tone */
+.tender-page{background:#fbf8f2 var(--photo) center/cover no-repeat;color:#5b5348}
+.tender-page .tender-glow{position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse 75% 70% at 50% 45%,rgba(255,253,248,.35) 0%,rgba(255,253,248,.7) 60%,rgba(255,253,248,.96) 100%)}
+.tender-page .end-caps{background:rgba(255,253,248,.72);border-radius:6px;color:#5b5348}
+/* 以我之名's waking: the 1024² bed photo covers the stage's height, centred, a dark letterbox at the sides */
+.wake-page{background:#0b0b0d;color:#efe9df}
+.wake-page .wake-photo{position:absolute;left:50%;top:50%;height:100%;width:auto;max-width:none;transform:translate(-50%,-50%);z-index:0;pointer-events:none}
+.wake-page .wake-dark{position:absolute;inset:0;z-index:1;background:#000;opacity:0;pointer-events:none;transition:opacity 900ms ease}
+.wake-page .end-caps{background:rgba(10,10,12,.62);border-radius:6px;color:#efe9df}
+.wake-page.said .wake-dark{opacity:.94}
+/* 早上好: alone, large, in the player's own text colour (the box's inner lines) */
+.wake-page .wake-say{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);z-index:2;margin:0;text-align:center;font:44px/1.4 var(--font-game-text,inherit);letter-spacing:.3em;color:#c99a92;pointer-events:none;animation:m-fade-in 900ms ease both}
+/* the player and Kuro: black; the lines stack upward like the credits */
+.lines-page{background:#0d0e10;color:#f4efe6}
+.lines-page .lines{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:820px;max-height:820px;overflow:hidden;margin:0;padding:0;list-style:none;display:flex;flex-direction:column;justify-content:flex-end;gap:14px;z-index:2;pointer-events:none;font:19px/1.6 var(--font-game-text,inherit)}
+.lines-page .ln{display:flex;align-items:center;gap:12px}
+.lines-page .ln:last-child{animation:m-fade-up var(--m-item-in,400ms) var(--m-ease,ease) both}
+.lines-page .ln.you{justify-content:flex-end;color:#c99a92}
+.lines-page .ln.kuro{justify-content:flex-start}
+.lines-page .ln-av{width:40px;height:40px;object-fit:contain;flex:none}
+.lines-page .ending-card{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:12px;pointer-events:none;animation:m-fade-in 900ms ease both}
+.lines-page .ending-card small{font-size:14px;letter-spacing:.5em;color:#9aa3b0}
+.lines-page .ending-card b{font:700 38px/1.4 var(--font-title,inherit);letter-spacing:.16em;text-align:center}
+@media (prefers-reduced-motion:reduce){
+  .ending-page .end-caps .cap.now,.wake-page .wake-say,.lines-page .ln:last-child,.lines-page .ending-card{animation:none}
+  .wake-page .wake-dark{transition:none}
+}
+
 /* The splat layer (room-scene design S5, S8, S10): only during a 房间 ↔ 桌子 move, between the
    CSS push's backdrop copy and the (transparent) arriving stage, at the stage's own fit. */
 /* The box is the stage rectangle (left/top/scale set from fit.ts by layer.ts) and clips everything

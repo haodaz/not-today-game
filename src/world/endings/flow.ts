@@ -8,6 +8,8 @@ import { constants } from "@state/variables";
 import type { ActionContext } from "@world/desktop/controller";
 import { PULL_CUT_MS, pullFrom } from "@world/room/splat/pullout";
 import { creditLines, creditsShown, CREDIT_LINE_MS } from "./credits";
+import type { EndingPhase } from "@world/desktop/model";
+import { ENDING_PAGES, nextPage, pageSteps } from "./pages";
 import { BOSS_TICK_MS, bossCheat, bossChoose, bossNext, bossRetry, bossStart, bossTick } from "./boss";
 
 export interface EndingHost {
@@ -129,17 +131,25 @@ export const bossActions = {
 /** How long the collapse runs to white before its one line shows (three-meters; reduced motion cuts it). */
 export const COLLAPSE_TO_WHITE_MS = 4000;
 
-function firstPage(ctx: ActionContext, ending: Ending): void {
-  // collapse: the room's collapse look runs to white, then the one line, then the credits like the
-  // others. bad: 你和你 first. survive / good: straight to the credits.
-  const phase = ending === "collapse" ? "collapse" : ending === "bad" ? "you" : "credits";
-  ctx.session.endingPage = { phase, startMs: nowOf(ctx), skipped: false };
+/** The ending the pages show: the logged one, or (dev `&endpage=`) the one being looked at. */
+export function endingOf(state: Pick<State, "ending">, session: { readonly endingPreview?: Ending | null }): Ending | "none" {
+  return state.ending !== "none" ? (state.ending as Ending) : (session.endingPreview ?? "none");
+}
+
+/** Goes to `phase` of the ending's pages (endings-matrix: `ENDING_PAGES`), from its first step. */
+export function goToPage(ctx: ActionContext, phase: EndingPhase): void {
+  ctx.session.endingPage = { phase, startMs: nowOf(ctx), skipped: false, step: 1 };
   if (phase === "collapse") {
     // After the run-to-white, the line stays until a click; nothing auto-advances past it.
     ctx.later(COLLAPSE_TO_WHITE_MS + 20, ctx.rerender);
   } else if (phase === "credits") {
     rollCredits(ctx);
   }
+}
+
+function firstPage(ctx: ActionContext, ending: Ending): void {
+  // endings-matrix: collapse runs to white; bad wakes; survive / good roll the credits.
+  goToPage(ctx, ENDING_PAGES[ending][0]!);
   ctx.rerender();
 }
 
@@ -158,31 +168,36 @@ function rollCredits(ctx: ActionContext): void {
 /** A click (or Enter / Space) on an ending page. */
 export function endingNext(ctx: ActionContext): void {
   const { session, store } = ctx;
-  const ending = store.getState().ending as Ending | "none";
+  const state = store.getState();
+  const ending = endingOf(state, session);
   const page = session.endingPage;
   // During the pull-out nothing moves on (no page yet; a click does nothing).
   if (ending === "none" || !page || session.pullOut) return;
-  if (page.phase === "collapse") {
-    // The run-to-white and the line have shown: on to the credits (no 你和你, no day 1).
-    session.endingPage = { phase: "credits", startMs: nowOf(ctx), skipped: false };
-    rollCredits(ctx);
-  } else if (page.phase === "you") {
-    session.endingPage = { phase: "credits", startMs: nowOf(ctx), skipped: false };
-    rollCredits(ctx);
-  } else if (page.phase === "credits") {
-    const total = creditLines(store.getState()).length + 1;
+  if (page.phase === "credits") {
+    const total = creditLines(state).length + 1;
     if (!page.skipped && creditsShown(total, page.startMs, nowOf(ctx), false) < total) {
       // Never skipped entirely: the first click shows the whole log.
       page.skipped = true;
-    } else if (ending === "bad" || ending === "collapse") {
-      // The run is over: back to the title (collapse and bad both clear the run). No day 1 here.
-      endingHost.afterBad();
-    } else {
-      session.endingPage = { phase: "after", startMs: nowOf(ctx), skipped: false };
+      ctx.rerender();
+      return;
     }
-  } else if (ending === "survive") {
-    endingHost.newRun();
+  } else {
+    // A stepped page (tender, wake, lines): a click shows its next step; the click after its last moves on.
+    const step = page.step ?? 1;
+    if (step < pageSteps(page.phase, ending, state)) {
+      page.step = step + 1;
+      ctx.rerender();
+      return;
+    }
   }
+  const next = nextPage(ending, page.phase);
+  if (next) goToPage(ctx, next);
+  // dev (`&endpage=`): no run ended, so nothing is cleared; the last page stays.
+  else if (state.ending === "none") return void ctx.rerender();
+  // The run is over: back to the title (collapse and bad both clear the run).
+  else if (ending === "bad" || ending === "collapse") endingHost.afterBad();
+  // 第一日: a new run.
+  else if (ending === "survive") endingHost.newRun();
   // Day 19 (good) stays: it is the end.
   ctx.rerender();
 }

@@ -145,7 +145,7 @@ describe("the three ending cuts", () => {
 
   it.each([
     ["survive", () => f(LAST), "credits"],
-    ["bad", () => ({ ...f(LAST), assimilation: constants.assimilationMax as number }), "you"],
+    ["bad", () => ({ ...f(LAST), assimilation: constants.assimilationMax as number }), "wake"],
     ["good", goodLast, "credits"],
   ] as const)("%s on night 18: the pull-out first, no page, clicks do nothing; at its cut the ending card", (ending, state, first) => {
     const { ctx, timers } = ctxAt(state(), ending);
@@ -187,7 +187,7 @@ describe("the three ending cuts", () => {
   it("assimilation at max on day 18 is bad at its lie-down, with SAN high (ending matrix 2026-11-13); SAN 0 is collapse", () => {
     const { ctx } = ctxAt({ ...f(LAST), assimilation: constants.assimilationMax as number }, "bad", 1000, true);
     startEnding(ctx);
-    expect(ctx.session.endingPage?.phase).toBe("you");
+    expect(ctx.session.endingPage?.phase).toBe("wake");
   });
 
   it("before the last day there is no pull-out (a SAN-0 collapse on day 3 goes straight to its page)", () => {

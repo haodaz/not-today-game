@@ -106,6 +106,8 @@ function renderGameBody(store: Store, session: Session, nowMs: number): SafeHtml
   const events = store.getEvents();
   // The run has ended: its pages replace every view (san-and-endings).
   if (state.ending !== "none") return renderEnding({ state, events, session, startDay: store.getStartDay(), nowMs });
+  // dev (`&endpage=`): an ending's page looked at with no ending logged.
+  if (session.endingPreview && session.endingPage && !session.boss) return renderEnding({ state, events, session, startDay: store.getStartDay(), nowMs });
   // dev (`&boss=`): the day-18 fight on its own, with no ending logged.
   if (session.boss) return renderBoss(session.boss, nowMs);
   // opening R2: the dream before day 1, its own black page with the box over it (and its fade).
@@ -2052,7 +2054,7 @@ export function keyboardToObjKey(object: string | null, key: string): string | n
 /** Keys: space / Enter read on in the room and at the door; Esc goes back to the room. */
 export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
   // The run has ended: Enter / Space go on; nothing else does anything.
-  if (ctx.store.getState().ending !== "none") {
+  if (ctx.store.getState().ending !== "none" || (ctx.session.endingPreview && ctx.session.endingPage)) {
     if (e.key === "Enter" || e.key === " ") endingNext(ctx);
     return true;
   }
