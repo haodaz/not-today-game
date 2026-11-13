@@ -1696,6 +1696,17 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.session.bookOpen = true;
     ctx.rerender();
   },
+  // the ending figurines on the bed (author 2026-11-12): a click opens one large; the page closes it
+  "figure-open"(ctx, data) {
+    const kind = data.ending as keyof typeof ctx.session.collection.endings | undefined;
+    if (!kind || !(kind in ctx.session.collection.endings) || ctx.session.collection.endings[kind] <= 0) return;
+    ctx.session.figureOpen = kind;
+    ctx.rerender();
+  },
+  "figure-close"(ctx) {
+    ctx.session.figureOpen = null;
+    ctx.rerender();
+  },
   "book-close"(ctx) {
     ctx.session.bookOpen = false;
     ctx.rerender();

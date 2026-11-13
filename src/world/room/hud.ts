@@ -27,7 +27,7 @@ import { boxArrived } from "./arrival";
 import { deskLayout, objectSlot } from "./desk";
 import { fxPlan, renderFx } from "./fx";
 import { fixedRects, hotIdsIn, hotViewOf, type HotId, type HotView } from "./splat/hotspots";
-import { bookReader, deskBook, figuresLayer } from "./collection";
+import { bookReader, deskBook, figureCard, figuresLayer } from "./collection";
 import { knows } from "@state/recognise";
 import { bpm, sanBand } from "@state/endings";
 import { emailRow, type EmailRow } from "@net/email";
@@ -572,7 +572,7 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const waiting = placedThingsWait(session, view, nowMs);
   const fade = placedThingsFade(session, view, nowMs);
   // 房间 carries what finished runs left on the desk: the figures, and the book (title-page FR4/FR8).
-  const kept = view === "room" && !waiting ? html`${figuresLayer(session.collection)}${deskBook(session.collection)}` : null;
+  const kept = view === "room" && !waiting ? html`${figuresLayer(session.collection)}${deskBook(session.collection)}${figureCard(session.collection, session.figureOpen)}` : null;
   const hotView = hotViewOf(view);
   // A line's backdrop covers the frame (dialogue 2026-11-02): the still's placed things, its
   // evening look and the collapse shader step aside until the sequence ends.

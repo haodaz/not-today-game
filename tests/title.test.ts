@@ -274,6 +274,19 @@ describe("the collection (FR4, FR8)", () => {
     expect(page({ ...initialTitle(null, c), figureOpen: "bad" })).not.toContain("figure-card");
   });
 
+  it("in 房间 a figurine opens large too, through the room's own actions; the page closes it", () => {
+    const ctx = ctxOf(collected(1, { collapse: 1 }));
+    expect(room(ctx)).not.toContain("figure-card");
+    loopActions["figure-open"]!(ctx, { ending: "collapse" } as DOMStringMap, null as never);
+    expect(ctx.session.figureOpen).toBe("collapse");
+    expect(room(ctx)).toContain('<div class="figure-card" role="dialog" aria-modal="true" aria-label="温柔的世界" data-ending="collapse">');
+    loopActions["figure-close"]!(ctx, {} as DOMStringMap, null as never);
+    expect(ctx.session.figureOpen).toBeNull();
+    // an ending never reached opens nothing
+    loopActions["figure-open"]!(ctx, { ending: "good" } as DOMStringMap, null as never);
+    expect(ctx.session.figureOpen).toBeNull();
+  });
+
   it("a figure per ending reached, in the title room and in 房间 (not at 桌子); its name is a chip", () => {
     const c = collected(2, { bad: 1, good: 3 });
     for (const out of [page(initialTitle(null, c)), room(ctxOf(c))]) {

@@ -170,6 +170,8 @@ export interface Session {
   collection: Collection;
   /** The gamebook reader is open (title-page FR4). */
   bookOpen: boolean;
+  /** An ending figurine on the bed open large in 房间 (author 2026-11-12), or null. */
+  figureOpen: import("../../ui/title/table").EndingKind | null;
   /** Where the ending pages are (san-and-endings): the collapse run-to-white + line (collapse only),
    *  你和你 (bad only), the credits, then after. */
   /**   endings-matrix (2026-11-13): `tender` (the fake day 1, collapse), `wake` (the waking, bad) and
@@ -548,6 +550,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     boss: null,
     collection: EMPTY_COLLECTION,
     bookOpen: false,
+    figureOpen: null,
     holding: null,
     lampOn: null,
     hand: initialHand(),
