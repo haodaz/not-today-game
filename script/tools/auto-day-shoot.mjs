@@ -292,7 +292,8 @@ for (let pass = 0; pass < ITEMS.length; pass++) {
     const before = new Set(ITEMS.slice(0, p).map((x) => x.id));
     for (let k = p + 1; k < ITEMS.length; k++) {
       const x = ITEMS[k];
-      if (!/^flag:task/.test(x.done) || !unlockOk(x, before)) continue;
+      // a night task (`when: night`, e.g. day 3's v18 after the 18:00 call — story clock 2026-11-12) stays where the day lists it
+      if (!/^flag:task/.test(x.done) || x.when === "night" || !unlockOk(x, before)) continue;
       ITEMS.splice(k, 1); ITEMS.splice(p, 0, x); before.add(x.id); p++;
       note(`(order: ${x.id} before ${ITEMS[p].id})`);
     }
@@ -345,6 +346,10 @@ for (const it of ITEMS) {
         // tune (2026-11-08): a module's source first (a conv), then one path per module (the first open chip each
         // turn, Kuro speaks between), the end-of-work offer declined (不接), then 提交.
         for (const m of board.tune.mods) if (m.from?.conv) { await toTingTalk(); await sel(`[data-action=conv][data-conv=${m.from.conv}]`, 1); }
+        // the launch page may only be up now (after the source conv): 开始工作, then the typing line; and a continued board (day 3) may wait behind the shell's go button (2026-11-13)
+        for (let w = 0; w < 6 && !(await has("[data-action=task-launch], [data-action=shell-tune-go], [data-action=tune-select]")); w++) await sleep(0.5);
+        if (await has("[data-action=task-launch]")) { await shotStep(`launch-${it.id}`); await sel("[data-action=task-launch]", 1.2); note("   launch: 开始工作 (after the source)"); await sleep(1.5); }
+        if (await has("[data-action=shell-tune-go]")) { await sel("[data-action=shell-tune-go]", 1.2); note("   tune: go"); await sleep(1); }
         await toWorkbench(); await goHome(); await sel(`[data-action=wb-nav][data-page='task:${it.id}']`, 1.2);
         await shotStep(`tune-${it.id}`);
         let picks = 0, turns = 0;
