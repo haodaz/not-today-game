@@ -3,9 +3,10 @@
 // continued run) are history, never recorded again. A debug run (`?day=N`) touches no save, so it
 // records nothing (`enabled: false`). One ending per run: a second ending event is ignored.
 import type { Store } from "@state/store";
-import type { Ending } from "@state/endings";
+import { endingFlavour, type Ending } from "@state/endings";
 
-export type EndingKind = Exclude<Ending, "none">;
+/** The profile's ending kinds: survive's warm flavour (回到未来（或许是最后一次）) counts on its own as `warm`. */
+export type EndingKind = Exclude<Ending, "none"> | "warm";
 
 /** Calls `record` for the first ending event appended after now; returns the unsubscribe. */
 export function watchEndings(store: Store, record: (kind: EndingKind) => void, enabled = true): () => void {
@@ -19,7 +20,8 @@ export function watchEndings(store: Store, record: (kind: EndingKind) => void, e
     for (const e of fresh) {
       if (e.kind !== "ending" || done) continue;
       done = true;
-      record(e.ending as EndingKind);
+      const kind = e.ending as Exclude<Ending, "none">;
+      record(endingFlavour(kind, store.getState()) === "survive.warm" ? "warm" : kind);
     }
   });
 }

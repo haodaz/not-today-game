@@ -155,3 +155,4 @@ dist/
 .env*
 dist-dev/
 public/battle/**/*.src.png
+public/room/*.src.png

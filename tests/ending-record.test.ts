@@ -1,6 +1,7 @@
 // A fresh load writes nothing to the profile; an ending is recorded only when it is appended after
 // the watch began (never replayed from a save, never in a ?day=N debug run); the desk book never
 // renders while no run has finished.
+import { f } from "@state/fday";
 import { describe, expect, it } from "vitest";
 import { createProfileWriter } from "@state/saves";
 import { readProfile } from "@state/profile-read";
@@ -14,10 +15,12 @@ import { mountTitle } from "../src/ui/title/mount";
 import { readCollection } from "../src/ui/collection";
 
 /** A minimal store: a log and listeners (the real one rejects an ending that is not due). */
-function fakeStore(initial: unknown[] = []): Store & { push(e: unknown): void } {
+function fakeStore(initial: unknown[] = [], affinity = 0): Store & { push(e: unknown): void } {
   const events = [...initial];
   const listeners = new Set<() => void>();
   return {
+    // the watcher reads the run's state at the ending for survive's flavour (ending matrix 2026-11-13)
+    getState: () => ({ ...f(18), affinity }),
     getEvents: () => events,
     subscribe: (l: () => void) => (listeners.add(l), () => listeners.delete(l)),
     push: (e: unknown) => (events.push(e), listeners.forEach((l) => l())),
@@ -85,19 +88,30 @@ describe("recordEnding runs only for an ending appended after the watch began", 
     watchEndings(store, (k) => profile.recordEnding(k));
     expect(readProfile(storage)).toBeNull();
     store.push(ending("good"));
-    expect(readProfile(storage)).toMatchObject({ endings: { bad: 0, survive: 0, good: 1 }, finishedRuns: 1 });
+    expect(readProfile(storage)).toMatchObject({ endings: { bad: 0, survive: 0, warm: 0, good: 1 }, finishedRuns: 1 });
+  });
+
+  it("survive with high affinity is recorded as warm (回到未来（或许是最后一次）), with low affinity as survive", () => {
+    for (const [affinity, key] of [[100, "warm"], [0, "survive"]] as const) {
+      const storage = memoryStorage();
+      const profile = createProfileWriter(storage);
+      const store = fakeStore([], affinity);
+      watchEndings(store, (k) => profile.recordEnding(k));
+      store.push(ending("survive"));
+      expect(readProfile(storage)).toMatchObject({ endings: { [key]: 1 }, finishedRuns: 1 });
+    }
   });
 });
 
 describe("the desk book", () => {
   it("never renders while finishedRuns is 0; renders once a run has finished", () => {
     expect(deskBook(EMPTY_COLLECTION)).toBeNull();
-    expect(deskBook({ finishedRuns: 1, endings: { bad: 0, survive: 1, good: 0, collapse: 0 }, objects: [], kurogotchi: false })).not.toBeNull();
+    expect(deskBook({ finishedRuns: 1, endings: { bad: 0, survive: 1, warm: 0, good: 0, collapse: 0 }, objects: [], kurogotchi: false })).not.toBeNull();
     const store = createStore({ startDay: 13 });
     const session = initialSession({ beat: "work", time: "10:00" }, "left", "room");
     const room = (c: typeof session.collection) => renderRoom({ state: store.getState(), events: store.getEvents(), session: { ...session, collection: c } }).value;
     expect(room(EMPTY_COLLECTION)).not.toContain("desk-book");
     expect(room(EMPTY_COLLECTION)).not.toContain('class="figure"');
-    expect(room({ finishedRuns: 2, endings: { bad: 0, survive: 2, good: 0, collapse: 0 }, objects: [], kurogotchi: false })).toContain("desk-book");
+    expect(room({ finishedRuns: 2, endings: { bad: 0, survive: 2, warm: 0, good: 0, collapse: 0 }, objects: [], kurogotchi: false })).toContain("desk-book");
   });
 });

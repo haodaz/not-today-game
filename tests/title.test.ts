@@ -23,7 +23,7 @@ import { renderTitle } from "../src/ui/title/view";
 afterEach(() => setLocale("zh"));
 
 const collected = (finishedRuns: number, endings: Partial<Collection["endings"]> = {}): Collection => {
-  const e = { bad: 0, survive: 0, good: 0, collapse: 0, ...endings };
+  const e = { bad: 0, survive: 0, warm: 0, good: 0, collapse: 0, ...endings };
   return { finishedRuns, endings: e, objects: [], kurogotchi: e.good >= 1, photos: [] };
 };
 const page = (m: TitleModel) => renderTitle(m).value;
@@ -290,7 +290,7 @@ describe("the collection (FR4, FR8)", () => {
     writer.recordEnding("bad");
     writer.recordEnding("bad");
     writer.recordEnding("good");
-    expect(readProfile(storage)).toEqual({ runs: 1, endings: { bad: 2, survive: 0, good: 1, collapse: 0 }, finishedRuns: 3 });
+    expect(readProfile(storage)).toEqual({ runs: 1, endings: { bad: 2, survive: 0, warm: 0, good: 1, collapse: 0 }, finishedRuns: 3 });
     expect(readCollection(storage)).toEqual(collected(3, { bad: 2, good: 1 }));
   });
 });

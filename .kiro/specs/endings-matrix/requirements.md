@@ -64,8 +64,8 @@ centred; the click after that leaves the page (the host call or `after`). Class 
 Every page is one click target (`ending-hit`, as today). Reduced motion: no fades.
 
 ## The title's collection (`src/ui/title/*`, `src/ui/collection.ts`)
-The figure names are already renamed in strings (`title.fig.*`). Nothing else changes there now:
-the profile keeps counting `bad / survive / good / collapse` (the flavour is not recorded).
+Done by Claude: five figures (`bad / survive / warm / good / collapse`, the profile records survive's
+warm flavour as `warm`), their cutouts and places on the desk. Nothing to do here.
 
 ## Dev route (`src/main.ts`)
 `?day=18&boss=bad|survive|good` already starts the fight. Add `&endpage=tender|wake|lines` to jump

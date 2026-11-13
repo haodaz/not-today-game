@@ -48,9 +48,17 @@
       "src": "/room/fig_survive.png",
       "name": "title.fig.survive"
     },
+    "warm": {
+      "src": "/room/fig_warm.png",
+      "name": "title.fig.warm"
+    },
     "good": {
       "src": "/room/fig_good.png",
       "name": "title.fig.good"
+    },
+    "collapse": {
+      "src": "/room/fig_collapse.png",
+      "name": "title.fig.collapse"
     }
   },
   "book": {
