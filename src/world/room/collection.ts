@@ -5,6 +5,8 @@
 import { cls, html, type SafeHtml } from "@world/html";
 import { t, tr } from "@world/i18n";
 import { titleTable, ENDING_KINDS, type EndingKind } from "../../ui/title/table";
+import type { EndingFlavour } from "@state/endings";
+import { ENDING_ART } from "@world/endings/pages";
 import { rectStyle, ROOM_COLLECTION } from "./shots";
 
 export interface Collection {
@@ -32,11 +34,19 @@ export function figuresLayer(c: Collection): SafeHtml {
 /** What each figure says on its card: the ending's own last line (author 2026-11-12: 「可以点了靠近」). */
 const FIGURE_LINE: Readonly<Record<EndingKind, string>> = { bad: "credits.last.bad", survive: "credits.last.survive.cold", warm: "credits.last.survive.warm", good: "ending.good.kuro", collapse: "ending.lines.collapse.2.kuro" };
 
-/** The figure close-up: the figurine large, the ending's name, its line; the page is the way out (figure-close). */
+/** The collection's kinds → the ending page's flavours (the pictures and names are the ending's own). */
+const FLAVOUR_OF: Readonly<Record<EndingKind, EndingFlavour>> = { bad: "bad", survive: "survive.cold", warm: "survive.warm", good: "good", collapse: "collapse" };
+
+/**
+ * The figure close-up = the ending's own page again (author 2026-11-13: the 结局图鉴): the etching
+ * spread over the stage, 达成结局, the name large, the ending's line; the figurine as a small stamp
+ * above the label. The page is the way out (figure-close).
+ */
 export function figureCard(c: Collection, kind: EndingKind | null): SafeHtml | null {
   if (!kind || !(ENDING_KINDS as readonly string[]).includes(kind) || c.endings[kind] <= 0) return null;
   const f = titleTable.figures[kind];
-  return html`<div class="figure-card" role="dialog" aria-modal="true" aria-label="${t(f.name)}" data-ending="${kind}"><button type="button" class="figure-card-hit" data-action="figure-close" aria-label="${t("dialogue.close")}"></button><div class="figure-card-body"><img src="${f.src}" alt=""><b class="figure-card-name">${tr(f.name)}</b><p class="figure-card-line">${tr(FIGURE_LINE[kind])}</p></div></div>`;
+  const flavour = FLAVOUR_OF[kind];
+  return html`<div class="figure-card" role="dialog" aria-modal="true" aria-label="${t(f.name)}" data-ending="${kind}"><button type="button" class="figure-card-hit" data-action="figure-close" aria-label="${t("dialogue.close")}"></button><img class="figure-card-art" src="${ENDING_ART[flavour]}" alt="" draggable="false"><div class="figure-card-body"><img class="figure-card-stamp" src="${f.src}" alt=""><small>${tr("ending.name.label")}</small><b class="figure-card-name">${tr(`ending.name.${flavour}`)}</b><p class="figure-card-line">${tr(FIGURE_LINE[kind])}</p><span class="figure-card-go" aria-hidden="true">${tr("dialogue.close")}</span></div></div>`;
 }
 
 /** The book on the desk: only once a run has finished. */

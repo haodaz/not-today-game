@@ -266,7 +266,8 @@ describe("the collection (FR4, FR8)", () => {
     expect(closed).toContain('data-action="figure-open" data-ending="warm"');
     const open = page({ ...initialTitle(null, c), figureOpen: "warm" });
     expect(open).toContain('<div class="figure-card" role="dialog" aria-modal="true" aria-label="回到未来（或许是最后一次）" data-ending="warm">');
-    expect(open).toContain('<img src="/room/fig_warm.png" alt="">');
+    expect(open).toContain('<img class="figure-card-art" src="/ending/warm.jpg" alt="" draggable="false">');
+    expect(open).toContain('<img class="figure-card-stamp" src="/room/fig_warm.png" alt="">');
     expect(open).toContain('<b class="figure-card-name">回到未来（或许是最后一次）</b>');
     expect(open).toContain('<p class="figure-card-line">世上没有第二个你。纵要认输，不是今日。</p>');
     expect(open).toContain('data-action="figure-close"');
