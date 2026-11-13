@@ -184,8 +184,7 @@ describe("the three ending cuts", () => {
     expect(ctx.session.endingPage?.phase).toBe("collapse");
   });
 
-  it("a SAN-0 bad ending at day 18's shutdown is now collapse, not bad (three-meters)", () => {
-    // assimilation at max is bad even with SAN high; SAN 0 is collapse.
+  it("assimilation at max on day 18 is bad at its lie-down, with SAN high (ending matrix 2026-11-13); SAN 0 is collapse", () => {
     const { ctx } = ctxAt({ ...f(LAST), assimilation: constants.assimilationMax as number }, "bad", 1000, true);
     startEnding(ctx);
     expect(ctx.session.endingPage?.phase).toBe("you");

@@ -1,5 +1,7 @@
 # Three numbers: SAN, assimilation, affinity (author 2026-11-03)
 
+> **Superseded in part (2026-11-13):** the endings section — see `.kiro/specs/endings-matrix/requirements.md`. Assimilation at max no longer ends a run at the shutdown beat; it is 以我之名 at day 18's lie-down, after the fight. The good ending also needs no object upgraded.
+
 Author: 「san 值 / 同化度 / 好感度要不要做成 3 个数字（目前使用克总掉 san，但其实是长同化），剧情上就好判定很多」「早点调整，后面再做设计的时候能简单」. Design: `script/notes/机制设计稿-干活.md`.
 
 | | What it is | What moves it | What the player sees |

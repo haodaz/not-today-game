@@ -1,7 +1,7 @@
 // The credits are Kuro's log (san-and-endings FR3, design E4): one line per stored evidence entry,
 // in day order — the day, what the player did (the entry's note), and which way it moved Kuro.
 // Built only from `judgement.evidence`; never generated at credits time.
-import type { Ending } from "@state/endings";
+import { endingFlavour, type Ending } from "@state/endings";
 import type { JudgementDelta } from "@state/judgement";
 import { RIGHT_DELTA } from "@state/recognise";
 import type { State } from "@state/types.gen";
@@ -57,8 +57,8 @@ export function creditLines(state: State): CreditLine[] {
     });
 }
 
-/** The ending's last line (content: `credits.last.<kind>`); good's is the plain red/blue line. */
-export const lastLineKey = (ending: Ending): string => `credits.last.${ending}`;
+/** The ending's last line (content: `credits.last.<flavour>`: survive by its warm / cold flavour); good's is the plain red/blue line. */
+export const lastLineKey = (ending: Ending, state: State): string => `credits.last.${endingFlavour(ending, state)}`;
 
 /**
  * How many lines show at `nowMs` (the evidence lines, then the last one). A click jumps to the end

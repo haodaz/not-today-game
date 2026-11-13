@@ -1,5 +1,7 @@
 # san-and-endings — requirements
 
+> **Superseded in part (2026-11-13):** the exits and the pages — see `.kiro/specs/three-meters/requirements.md` and `.kiro/specs/endings-matrix/requirements.md`.
+
 SAN is the only failure meter and it is never shown. Endings are three exits from the same last night. Nicknames the author and Claude use: bad = 「第一日，改」, survive = 「回到第一日」, good = 「第十九日」.
 
 ## FR1. SAN

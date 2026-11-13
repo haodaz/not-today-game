@@ -263,7 +263,7 @@ describe("the collection (FR4, FR8)", () => {
     const c = collected(2, { bad: 1, good: 3 });
     for (const out of [page(initialTitle(null, c)), room(ctxOf(c))]) {
       expect([...out.matchAll(/class="figure" tabindex="0" data-ending="(\w+)"/g)].map((m) => m[1])).toEqual(["bad", "good"]);
-      expect(out).toContain('<span class="fig-chip" aria-hidden="true">第一日，改</span>');
+      expect(out).toContain('<span class="fig-chip" aria-hidden="true">以我之名</span>');
       expect(out).not.toMatch(/data-ending="good"[^>]*>[^<]*\d/); // no counts
     }
     expect(room(ctxOf(c, "desk"))).not.toContain('class="figure"');

@@ -376,8 +376,8 @@ export function syncLoop(ctx: ActionContext, nowMs: number = Date.now()): void {
   // Object-upgrade 2026-11-03: an upgraded (not-yet-taken) object's board lock opens by itself once
   // the board task is the open one — the ability is automatic now. Logged as the object's own step.
   autoUnlockBoard(ctx);
-  // At this shutdown beat, not mid-beat (san-and-endings FR1): SAN at 0 is collapse, assimilation at
-  // the max is bad (three-meters) — whichever is due is the one appended.
+  // At this shutdown beat, not mid-beat (san-and-endings FR1): SAN at 0 is collapse. Assimilation at
+  // the max no longer ends a run here (ending matrix 2026-11-13): 以我之名 waits for day 18's fight.
   if (fx.shutdown && dueAtShutdown(store.getState())) {
     ctx.later(0, () => {
       const due = dueAtShutdown(ctx.store.getState());

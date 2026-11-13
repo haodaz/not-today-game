@@ -51,7 +51,7 @@ export function renderCredits(m: EndingModel, ending: Ending): SafeHtml {
     (l) =>
       html`<li><span class="d">${tr("shell.day", { day: l.day })}</span> · <span class="what">${l.note}</span> · <span class="dir">${l.moved.map((x) => html`${tr(`credits.dim.${x.dim}`)}${x.dir > 0 ? "↑" : "↓"}`)}</span></li>`,
   );
-  const last = shown >= total ? html`<li class="last">${tr(lastLineKey(ending))}</li>` : null;
+  const last = shown >= total ? html`<li class="last">${tr(lastLineKey(ending, m.state))}</li>` : null;
   // The song's title and the words' author, once the strings carry them (content/strings/*.json,
   // key `credits.song`); the full song plays under the roll (sound spec, `when: credits`).
   const song = hasString("credits.song") ? html`<p class="song">${tr("credits.song")}</p>` : null;

@@ -123,10 +123,10 @@ describe("SAN (FR1)", () => {
 });
 
 describe("the three exits (FR2)", () => {
-  it("property: the bad ending fires exactly once per run", () => {
+  it("property: the bad ending fires exactly once per run (at the last day's lie-down)", () => {
     fc.assert(
-      fc.property(fc.integer({ min: 1, max: LAST }), fc.integer({ min: 1, max: 4 }), (day, tries) => {
-        const store = storeOver(MAXED(day));
+      fc.property(fc.integer({ min: 1, max: 4 }), (tries) => {
+        const store = storeOver(MAXED(LAST));
         let accepted = 0;
         for (let i = 0; i < tries; i++) {
           try {
@@ -145,27 +145,28 @@ describe("the three exits (FR2)", () => {
     );
   });
 
-  it("bad (assimilation at max) comes at the shutdown beat, not before; and only once however often the beat is seen", () => {
+  it("assimilation at max no longer ends a run at the shutdown beat (ending matrix 2026-11-13): the run goes on to day 18", () => {
     const store = storeOver(MAXED(3));
     const { ctx, timers } = ctxFor(store);
     syncLoop(ctx, 0);
-    expect(dueAtShutdown(store.getState())).toBe("bad");
+    expect(dueAtShutdown(store.getState())).toBeNull();
     store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
-    syncLoop(ctx, 0);
-    expect(store.events.some((e) => e.kind === "ending")).toBe(false); // not mid-day
     store.appendEvent({ kind: "step", name: "beat:shutdown", t: "23:00" });
     syncLoop(ctx, 0);
     syncLoop(ctx, 0);
     for (const t of [...timers]) t.fn();
-    for (const t of [...timers]) t.fn();
-    expect(store.events.filter((e) => e.kind === "ending")).toEqual([{ kind: "ending", ending: "bad", day: 3 }]);
+    expect(store.events.some((e) => e.kind === "ending")).toBe(false);
+    // bad is not accepted before the last day's lie-down
+    expect(() => store.appendEvent({ kind: "ending", ending: "bad" })).toThrow(/not due/);
   });
 
-  it("assimilation 100 at the shutdown beat → bad, with SAN still high", () => {
-    const s = { ...f(3), assimilation: constants.assimilationMax as number, san: 100 };
-    expect(dueAtShutdown(s)).toBe("bad");
-    // Below the max: nothing is due (SAN is fine too).
-    expect(dueAtShutdown({ ...s, assimilation: (constants.assimilationMax as number) - 1 })).toBeNull();
+  it("assimilation 100 at the last lie-down → bad (以我之名), with SAN still high; the shutdown beat only knows collapse", () => {
+    const s = { ...f(LAST), assimilation: constants.assimilationMax as number, san: 100 };
+    expect(dueAtShutdown(s)).toBeNull();
+    expect(dueAtLieDown(s)).toBe("bad");
+    expect(dueAtShutdown({ ...s, san: 0 })).toBe("collapse");
+    // Below the max: survive (or good) at the lie-down.
+    expect(dueAtLieDown({ ...s, assimilation: (constants.assimilationMax as number) - 1 })).toBe("survive");
   });
 
   it("an ending is only accepted when it is due", () => {
@@ -183,6 +184,7 @@ describe("the three exits (FR2)", () => {
       ["all six recognised", { ...good, recognised: good.recognised.slice(1) }],
       ["affinity", { ...good, affinity: (constants.affinityThreshold as number) - 1 }],
       ["assimilation", { ...good, assimilation: (constants.assimilationGoodMax as number) + 1 }],
+      ["an upgraded object (ending matrix 2026-11-13)", { ...good, upgraded: { ...good.upgraded, chick: true } }],
     ];
     for (const [what, s] of drops) expect(dueAtLieDown(s), what).toBe("survive");
     // Exactly at the max is still good; one over is survive (three-meters).
@@ -264,7 +266,7 @@ describe("credits are Kuro's log (FR3)", () => {
     endingHost.newRun = () => void calls.push("newRun");
     for (const [ending, state] of [
       ["collapse", { ...f(3), san: 0 }],
-      ["bad", MAXED(3)],
+      ["bad", MAXED(LAST)],
       ["survive", f(LAST)],
       ["good", goodState()],
     ] as const) {
