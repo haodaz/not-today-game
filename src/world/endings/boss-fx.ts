@@ -8,6 +8,7 @@
 // No WebGL, a failed import or a failed init: nothing is drawn and the fight plays as before.
 import type { ActionContext } from "@world/desktop/controller";
 import { ACT_MS, BOSS_BG, type Act, type BossBattle, type Fx } from "./boss";
+import { hasString, t } from "@world/i18n";
 
 type Hook = { after(): void; destroy(): void };
 type Pixi = typeof import("pixi.js");
@@ -24,6 +25,7 @@ const COLOR = { ours: 0xf6b73c, boss: 0xb91c1c, heal: 0x7fe0b8, white: 0xffffff,
 
 export function createBossFx(deps: { readonly load?: () => Promise<Pixi>; readonly nowMs?: () => number } = {}): (root: HTMLElement, ctx: ActionContext) => Hook {
   return (root, ctx) => {
+    const critLine = hasString("boss.crit") ? t("boss.crit") : "";
     const doc = root.ownerDocument;
     const canvas = doc.createElement("canvas");
     canvas.className = "bs-canvas";
@@ -36,6 +38,9 @@ export function createBossFx(deps: { readonly load?: () => Promise<Pixi>; readon
     let failed = false;
     let lastActAt = -1;
     let preloaded = false;
+    let lastStage = 1;
+    let lastJoined = false;
+    let wonAt = -1;
     const particles: Particle[] = [];
     const timers = new Set<ReturnType<typeof setTimeout>>();
     const later = (ms: number, fn: () => void) => { const id = setTimeout(() => { timers.delete(id); fn(); }, ms); timers.add(id); };
@@ -162,6 +167,7 @@ export function createBossFx(deps: { readonly load?: () => Promise<Pixi>; readon
         if (act.move.dodge) { const p = targetPoint(live, b, act.who); if (p) rings(p, COLOR.white); return; }
         const targets = act.hits.length ? act.hits.map((h) => h.id) : [act.target === "all" ? "player" : act.target];
         const missed = act.hits.length === 0;
+        const crit = act.text.some((x) => x === critLine);
         for (const id of targets) {
           const p = targetPoint(live, b, id);
           if (!p) continue;
@@ -169,7 +175,8 @@ export function createBossFx(deps: { readonly load?: () => Promise<Pixi>; readon
           if (!ours) { dark(p, color, act.move.all === true); continue; }
           if (act.move.fx === "strike") slash(p, color);
           if (act.move.fx === "shake") rings(p, color);
-          impact(p, color, act.move.fx === "flip" || act.move.fx === "throw");
+          impact(p, color, act.move.fx === "flip" || act.move.fx === "throw" || crit);
+          if (crit) for (let i = 0; i < 30; i++) spark(p.x, p.y, COLOR.white, 1.1, 700 + Math.random() * 500, 0.001, 5);
         }
         if (!missed) weight(live, !ours || act.move.fx === "flip");
       });
@@ -200,7 +207,15 @@ export function createBossFx(deps: { readonly load?: () => Promise<Pixi>; readon
         if (!failed && canvas.parentElement !== page) page.appendChild(canvas);
         boot();
         const b = ctx.session.boss;
-        if (!b?.act || b.act.at === lastActAt) return;
+        if (!b) return;
+        // the boss's change of stage: a purple burst over it and the page flashed
+        if (b.boss.stage !== lastStage) { lastStage = b.boss.stage; if (b.boss.stage === 2) later(80, () => { const p = targetPoint(page, b, "boss"); if (p) { dark({ x: p.x + 120, y: p.y + 80 }, COLOR.stage2, true); impact(p, COLOR.stage2, true); weight(page, true); } }); }
+        // Q-Kuro's entrance: rings and sparkles where it stands
+        if (b.joined !== lastJoined) { lastJoined = b.joined; if (b.joined) later(120, () => { const p = targetPoint(page, b, "qkuro"); if (p) { rings(p, COLOR.heal); sparkles(p); } }); }
+        // the win: the boss dissolving into shards, once
+        if ((b.phase === "won" || b.phase === "after") && wonAt < 0) { wonAt = (deps.nowMs ?? Date.now)(); const p = targetPoint(page, b, "boss"); if (p) for (let i = 0; i < 6; i++) later(i * 180, () => { if (!pixi || !layer) return; dark({ x: p.x + (Math.random() - 0.5) * 300, y: p.y + (Math.random() - 0.5) * 300 }, COLOR.boss, i % 2 === 0); }); }
+        if (b.phase === "intro" || b.phase === "run") { if (b.phase === "intro") { wonAt = -1; lastStage = 1; lastJoined = false; } }
+        if (!b.act || b.act.at === lastActAt) return;
         lastActAt = b.act.at;
         spawn(page, b, b.act);
       },

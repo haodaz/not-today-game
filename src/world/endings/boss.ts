@@ -270,7 +270,12 @@ export function renderBoss(b: BossBattle, nowMs: number): SafeHtml {
   </div>`;
   const prop = acting && (acting.move.fx === "throw" || acting.move.fx === "flip") ? html`<img class="${cls("bs-prop", acting.move.fx)}" src="${PROP[acting.move.fx]}" alt="">` : null;
   const flash = acting && acting.move.fx === "flash" ? html`<i class="bs-flash"></i>` : null;
-  const field = html`<div class="bs-field"><div class="bs-ground"></div><div class="${cls("bs-party", b.phase === "after" && b.strong && "crossed")}">${members}</div>${boss}${prop}${flash}</div>`;
+  const over = b.phase === "won" || b.phase === "after";
+  // the win is not a kill (author 2026-11-14): the boss dissolves, one tentacle is left standing, and as the words end the
+  // camera pulls out once more — behind everything, a far larger Kuro
+  const tentacle = over ? html`<img class="bs-tentacle" src="/room/dark/tentacles.png" alt="">` : null;
+  const giant = html`<div class="bs-giant"><img src="${BOSS_IMG[2]}" alt=""></div>`;
+  const field = html`<div class="bs-field"><div class="bs-ground"></div><div class="${cls("bs-party", b.phase === "after" && b.strong && "crossed")}">${members}</div>${boss}${tentacle}${prop}${flash}</div>`;
   // the boss's bar: one full-width bar at the very bottom
   const pct = Math.round((100 * Math.max(0, b.boss.hp)) / b.boss.max);
   const bossbar = html`<div class="${cls("bs-bossbar", `stage${String(b.boss.stage)}`)}"><span class="bs-name">${S("boss.name")}</span>${bar(b.boss.hp, b.boss.max, "hp")}<span class="bs-pct">${String(pct)}%</span></div>`;
@@ -282,8 +287,9 @@ export function renderBoss(b: BossBattle, nowMs: number): SafeHtml {
       ? html`<div class="bs-box"><button type="button" class="bs-cmd" data-action="boss-done">${S("boss.done")}</button></div>`
       : html`<div class="${cls("bs-box", clickable && "more")}"><p>${acting ? acting.text.join(" ") : b.log}</p>${clickable ? html`<i class="bs-caret"></i><button type="button" class="bs-hit" data-action="boss-next" aria-label="${S("boss.done")}"></button>` : null}</div>`;
   const cheat = import.meta.env.DEV && b.phase !== "after" && b.phase !== "won" ? html`<button type="button" class="sk-cheat" data-action="boss-cheat" aria-hidden="true" tabindex="-1"></button>` : null;
-  return html`<div class="${cls("boss-page", `end-${b.ending}`, b.strong && "strong", b.phase === "after" && "after", acting?.move.fx === "shake" && "shake", b.boss.stage === 2 && "stage2")}" data-phase="${b.phase}">${cheat}
+  return html`<div class="${cls("boss-page", `end-${b.ending}`, b.strong && "strong", b.phase === "after" && "after", acting?.move.fx === "shake" && "shake", b.boss.stage === 2 && "stage2", b.party.length > 6 && "many")}" data-phase="${b.phase}">${cheat}
     <div class="bs-bg"></div>
+    ${giant}
     ${field}
     <div class="bs-top">${plates}</div>
     ${atb}
