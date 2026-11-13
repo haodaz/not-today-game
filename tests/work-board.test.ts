@@ -376,7 +376,7 @@ describe("a board that goes to a person (to: boss)", () => {
   });
 
   it("it is judged at 躺下 by the slots (given → perfect)", () => {
-    expect(boardJudgement(11, sent().getEvents())).toEqual({ verdict: "perfect", san: 0 });
+    expect(boardJudgement(11, sent().getEvents())).toEqual({ verdict: "perfect", san: -2 }); // meters-v2: a hand night takes its own cut
   });
 
   it("the shutdown box offers no give choice (it was sent, not on the desk)", () => {
@@ -409,7 +409,7 @@ describe("a board that goes to the hand on day 11 (a hand night, no content choi
     const given = day11Printed();
     given.appendEvent({ kind: "give", deliverableId: "d11-hand" });
     expect(deliverableOnDesk(11, given.getEvents())).toBeNull();
-    expect(boardJudgement(11, given.getEvents())).toEqual({ verdict: "perfect", san: 0 });
+    expect(boardJudgement(11, given.getEvents())).toEqual({ verdict: "perfect", san: -2 }); // meters-v2: the hand's cut
     // Refuse: nothing is logged, so by 躺下 it was not given → wrong.
     const refused = day11Printed();
     expect(boardJudgement(11, refused.getEvents())).toMatchObject({ verdict: "wrong" });

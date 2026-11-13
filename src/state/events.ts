@@ -4,7 +4,7 @@
 import type { State } from "./types.gen";
 import { withFlags } from "./flags";
 import { applyChoose, applyStep, applyTask, clampSan, type TaskEventMode } from "./days/effects";
-import { validateBoardStep } from "./days/board";
+import { validateBoardStep, type BoardVerdict } from "./days/board";
 import { dayFile } from "./days/table";
 import { applyDeclineUpgrade, applyUpgrade, type DeclineKind } from "./upgrades";
 import { applyOrder, applyPickup, applyUseItem } from "./delivery/effects";
@@ -62,7 +62,7 @@ export type GameEvent =
    * `merge` (work FR1): after reading both conflicting clauses, the player's 合并 (true) or 不合
    * (false). A record only: the self path's effects, catch flags included, either way.
    */
-  | { kind: "task"; day: number; flag: string; mode: TaskEventMode; missed?: true; merge?: boolean; marks?: readonly { readonly clause: number; readonly hit: boolean }[]; slots?: Readonly<Record<string, string>>; assists?: number }
+  | { kind: "task"; day: number; flag: string; mode: TaskEventMode; missed?: true; merge?: boolean; marks?: readonly { readonly clause: number; readonly hit: boolean }[]; slots?: Readonly<Record<string, string>>; assists?: number; quality?: BoardVerdict }
   // work v2 (2026-11-03): one step on a board (lock / fill / clear / Kuro's assist). The board is
   // rebuilt from these on reload; nothing changes in state (the `task` event at print carries the result).
   | { kind: "boardStep"; day: number; taskId: string; op: BoardOp }
@@ -72,6 +72,10 @@ export type GameEvent =
   // work v2: the night's board judgement (the runtime computes it from the log at 躺下); SAN by the
   // judge's delta (never up). `verdict` is which line plays.
   | { kind: "boardJudge"; day: number; verdict: "perfect" | "flawed" | "wrong"; san: number }
+  // meters-v2 (author 2026-11-12): a stare held past `stareMs` on one of the room's things (the gap,
+  // the window at night, a developed photo with a trace…): SAN by `stareSan`. The runtime appends it
+  // once per thing per day; the reducer only takes the cost.
+  | { kind: "stare"; day: number; target: string }
   // object-upgrade spec (2026-11-01): accepting / declining Kuro's offer (one object at a time;
   // the day-13 全员升级 is gone, 2026-11-06).
   | { kind: "upgrade"; day: number; object: string }
@@ -163,6 +167,7 @@ export const eventKinds: readonly EventKind[] = [
   "useAt",
   "photo",
   "record",
+  "stare",
 ];
 
 /**
@@ -170,6 +175,12 @@ export const eventKinds: readonly EventKind[] = [
  * the next morning). The tape must be found and not upgraded. One a night is the action's rule
  * (it reads the log, as `useAt`'s once-a-day does); a second one would change nothing.
  */
+/** meters-v2: a stare held too long. `target` names the thing (a token); the cost is `stareSan`. */
+function applyStare(state: State, event: { readonly target: string }): State {
+  if (typeof event.target !== "string" || !/^[a-z][a-z0-9:_-]*$/i.test(event.target)) throw new Error(`stare: target must be a token, got ${JSON.stringify(event.target)}`);
+  return { ...state, san: clampSan(state.san + (constants.stareSan as number)) };
+}
+
 function applyRecord(state: State): State {
   if (!(state.found as string[]).includes("tape")) throw new Error("record: the walkman has not been found");
   if (state.upgraded.tape === true) throw new Error("record: an upgraded walkman cannot record");
@@ -272,12 +283,16 @@ function applyChat(state: State, event: Extract<GameEvent, { kind: "chat" }>): S
   if (event.taboo !== undefined && !(CHAT_TABOOS as readonly unknown[]).includes(event.taboo)) throw new Error(`chat: unknown taboo ${JSON.stringify(event.taboo)}`);
   if (event.forgotten !== undefined && event.forgotten !== true) throw new Error("chat: forgotten must be true");
   if (event.forgotten && event.taboo !== "flicker") throw new Error("chat: only a flicker forgets");
-  const spent = { ...state, chatTurnsToday: state.chatTurnsToday + 1 };
+  const turn = state.chatTurnsToday + 1;
+  // meters-v2 (author 2026-11-12): talking with it late into the night costs — from the
+  // chatSanLateFrom-th turn of a day, chatSanLate each; every taboo answer costs chatSanTaboo, the
+  // nosebleed one more. Affinity is the day's judgement (chat.ts), not here.
+  const late = turn >= (constants.chatSanLateFrom as number) ? (constants.chatSanLate as number) : 0;
+  const taboo = event.taboo !== undefined ? (constants.chatSanTaboo as number) - (event.taboo === "blood" ? 1 : 0) : 0;
+  const spent = { ...state, chatTurnsToday: turn, san: clampSan(state.san + late + taboo) };
   // The flicker: the turn is spent; neither the question nor the answer goes into memory.
   if (event.forgotten) return spent;
-  // The nosebleed costs one SAN (the only taboo that touches state).
-  const bled = event.taboo === "blood" ? { ...spent, san: clampSan(spent.san - 1) } : spent;
-  return rememberTurn(bled, event.day, event.said, event.answer, event.offline);
+  return rememberTurn(spent, event.day, event.said, event.answer, event.offline);
 }
 
 const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
@@ -444,6 +459,8 @@ export function applyEvent(state: State, event: GameEvent): State {
       return applyGive(state, event);
     case "boardJudge":
       return applyBoardJudge(state, event);
+    case "stare":
+      return applyStare(state, event);
     case "upgrade":
       return applyUpgrade(state, event);
     case "declineUpgrade":

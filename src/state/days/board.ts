@@ -2,6 +2,7 @@
 // slots from a card tray, or let Kuro step in — assembled into a result that lands on the desk and
 // is handed to the hand at night. The board state is a pure fold over the `boardStep` events (so it
 // replays), and the night judgement is a pure function of the log. No clock, no rendering here.
+import { constants } from "../variables";
 import type { BoardOp, GameEvent } from "../events";
 import type { State } from "../types.gen";
 import { meetingCardFound } from "./meeting";
@@ -492,13 +493,20 @@ export function handNight(day: number): boolean {
 export type BoardVerdict = "perfect" | "flawed" | "wrong";
 
 /** The task event that printed a board on a day (its slots + assists), or null (not printed). */
-export function printedBoard(day: number, events: readonly GameEvent[]): { flag: string; slots: Readonly<Record<string, string>>; assists: number } | null {
+export function printedBoard(day: number, events: readonly GameEvent[]): { flag: string; slots: Readonly<Record<string, string>>; assists: number; quality: BoardVerdict | null } | null {
   for (const e of events) {
     if (e.kind !== "task" || e.day !== day || e.slots === undefined) continue;
     const tree = taskByFlag(day, e.flag);
-    if (tree?.board) return { flag: e.flag, slots: e.slots, assists: e.assists ?? 0 };
+    if (tree?.board) return { flag: e.flag, slots: e.slots, assists: e.assists ?? 0, quality: e.quality ?? null };
   }
   return null;
+}
+
+/** meters-v2: the hand's own cost on its nights (10–17), by the verdict; `refused` when nothing was given. */
+export function handCost(day: number, verdict: BoardVerdict | "refused"): number {
+  if (!handNight(day)) return 0;
+  const key = verdict === "refused" ? "handSanRefused" : verdict === "perfect" ? "handSanPerfect" : verdict === "flawed" ? "handSanFlawed" : "handSanWrong";
+  return constants[key] as number;
 }
 
 /**
@@ -610,9 +618,17 @@ export function boardJudgement(day: number, events: readonly GameEvent[]): { ver
   if (!given) verdict = "wrong";
   // compare (author 2026-11-11): a draft Kuro rewrote to the boss's taste is never perfect: SAN goes down a little.
   else if (board.compare && printed.assists > 0) verdict = "flawed";
+  // meters-v2: a game board is judged by the game's own grade of the play (the task event's `quality`);
+  // an object lock's wrong readings still count (lock-by-device R3): at wrongAt they make it wrong, any make it at least flawed.
+  else if (board.game && !board.compare) {
+    const q = printed.quality ?? "perfect";
+    verdict = readings >= judge.wrongAt ? "wrong" : readings > 0 && q === "perfect" ? "flawed" : q;
+  }
   else if (wrong === 0) verdict = "perfect";
   else if (wrong < judge.wrongAt) verdict = "flawed";
   else verdict = "wrong";
-  const san = verdict === "perfect" ? judge.perfect : verdict === "flawed" ? judge.flawed : judge.wrong;
+  const own = verdict === "perfect" ? judge.perfect : verdict === "flawed" ? judge.flawed : judge.wrong;
+  // meters-v2: on a hand night the hand takes its own cut as well, by the verdict (or for nothing given).
+  const san = own + handCost(day, given ? verdict : "refused");
   return { verdict, san };
 }

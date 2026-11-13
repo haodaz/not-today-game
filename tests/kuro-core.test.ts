@@ -102,7 +102,7 @@ describe("a starter is answered by the core, never the function", () => {
     expect(lines[1]!.length).toBeGreaterThanOrEqual(3);
     expect(lines[1]!.length).toBeLessThanOrEqual(5);
     if (hasString("kuro.unreadable")) expect(lines[2]).toBe(t("kuro.unreadable"));
-    expect(store.getState().san).toBe(san - 1);
+    expect(store.getState().san).toBe(san - 3); // meters-v2: a taboo answer −2, the nosebleed one more
     expect(bleedingToday(store.getEvents(), 3)).toBe(true);
   });
 

@@ -101,7 +101,7 @@ describe("the four consequences", () => {
   it("blood: the reply shows, then the narration line (when strings have it); the hand bleeds for the day; SAN −1", async () => {
     const before = storeAt(3).getState().san;
     const { store, ctx } = await askOnce(3, "blood");
-    expect(store.getState().san).toBe(before - 1);
+    expect(store.getState().san).toBe(before - 3); // meters-v2: a taboo answer −2, the nosebleed one more
     expect(chats(store)[0]).toMatchObject({ taboo: "blood" });
     expect(bleedingToday(store.getEvents(), 3)).toBe(true);
     const head = ctx.session.dialogue.queue[0]!;

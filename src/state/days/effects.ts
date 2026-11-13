@@ -78,7 +78,7 @@ export function applyChoose(state: State, event: { readonly day: number; readonl
 
 export function applyTask(
   state: State,
-  event: { readonly day: number; readonly flag: string; readonly mode: string; readonly missed?: true; readonly merge?: boolean; readonly marks?: readonly { readonly clause: number; readonly hit: boolean }[]; readonly slots?: Readonly<Record<string, string>>; readonly assists?: number },
+  event: { readonly day: number; readonly flag: string; readonly mode: string; readonly missed?: true; readonly merge?: boolean; readonly marks?: readonly { readonly clause: number; readonly hit: boolean }[]; readonly slots?: Readonly<Record<string, string>>; readonly assists?: number; readonly quality?: string },
 ): State {
   if (event.missed !== undefined && (event.missed !== true || event.mode !== "self")) throw new Error("task: missed is only for a self path");
   if (event.merge !== undefined && (typeof event.merge !== "boolean" || event.mode !== "self" || event.missed)) throw new Error("task: merge is only for a self path that found the conflict");
@@ -96,6 +96,8 @@ export function applyTask(
     if (event.mode !== "self" && event.mode !== "let") throw new Error("task: a board task is done self or let");
     if (event.slots !== undefined && (typeof event.slots !== "object" || event.slots === null || Array.isArray(event.slots))) throw new Error("task: slots must be an object");
     if (event.assists !== undefined && !(Number.isInteger(event.assists) && event.assists >= 0)) throw new Error("task: assists must be an integer >= 0");
+    // meters-v2: a game board's own grade of the play, read by the night's judgement.
+    if (event.quality !== undefined && !["perfect", "flawed", "wrong"].includes(event.quality)) throw new Error(`task: quality must be perfect / flawed / wrong, got ${JSON.stringify(event.quality)}`);
     // Assimilation (three-meters spec): + assists × assimAssist, + assimKuroCardKept per Kuro card
     // in the printed slots. Kuro's SAN judgement is the night's `boardJudge`, not here.
     const slots = event.slots ?? {};
