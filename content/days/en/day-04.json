@@ -77,21 +77,21 @@
         },
         {
           "k": "narration",
-          "t": "You close your eyes. A card between your fingers, a row of nail marks down its edge."
+          "t": "You close your eyes. A card pinched in your hand, a row of nail marks along its edge."
         },
         {
           "k": "narration",
-          "t": "First week of junior high. The shop by the school gate; the owner slides a phone card out of the drawer like dealing a hand.",
+          "t": "First week of middle school, boarding. The corner shop by the school gate: the owner slid an IC card out of a drawer like he was dealing a hand.",
           "backdrop": "/room/dream/payphone.jpg"
         },
         {
           "k": "speaker",
           "who": "小卖部老板",
-          "t": "Five kuai. Fifty minutes. Make them last."
+          "t": "Five yuan. Fifty minutes. Make it last."
         },
         {
           "k": "narration",
-          "t": "The payphones stand by the gate, three in a row, a queue behind each."
+          "t": "The payphones stood by the gate, three in a row, a queue behind them. One call a week, three minutes each."
         },
         {
           "k": "speaker",
@@ -101,11 +101,11 @@
         {
           "k": "speaker",
           "who": "family",
-          "t": "Hello? ... Have you eaten? Do you have enough money?"
+          "t": "Hello? ... Have you eaten? Is the money enough?"
         },
         {
           "k": "inner",
-          "t": "Enough."
+          "t": "It's enough."
         },
         {
           "k": "speaker",
@@ -114,24 +114,24 @@
         },
         {
           "k": "narration",
-          "t": "The number on the little screen ticks down. You put what you want to say in a queue, most important first."
+          "t": "The number on the screen dropped one tick at a time. You lined up what you had to say, the most important first."
         },
         {
           "k": "narration",
-          "t": "Halfway through a sentence it cuts out. The card is at zero."
+          "t": "Halfway through a sentence, it cut off. The card had hit zero."
         },
         {
           "k": "speaker",
           "who": "同学",
-          "t": "Done yet? My turn!"
+          "t": "Done? My turn!"
         },
         {
           "k": "narration",
-          "t": "You pull the card out. A piece of plastic with no money on it. You don't throw it away."
+          "t": "You pulled the card out. A slip of plastic, no money on it. You didn't throw it away."
         },
         {
           "k": "narration",
-          "t": "Later it turns out to have one more use: on early mornings, before the key arrives, the classroom door's latch is slanted, and a card can push it back."
+          "t": "Later you found it had one more use: on early mornings before the keys came, the classroom door's latch was slanted, and a card could push it back."
         },
         {
           "k": "speaker",
@@ -141,6 +141,10 @@
         {
           "k": "inner",
           "t": "It said IC on the card. Back then I read it as I see."
+        },
+        {
+          "k": "narration",
+          "t": "The one on the desk now is still at zero. \"Is the money enough\" — every call home after that started with it, and every time you said it was."
         },
         {
           "k": "narration",

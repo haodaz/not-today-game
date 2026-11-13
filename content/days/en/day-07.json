@@ -83,7 +83,7 @@
         },
         {
           "k": "narration",
-          "t": "The last study period of senior high. Nobody is reading. The calculator goes round under the desks, upside down.",
+          "t": "The last study period of senior year, six days before the exam. Nobody was reading. The calculator went round under the desks, upside down.",
           "backdrop": "/room/dream/classroom.jpg"
         },
         {
@@ -99,38 +99,51 @@
         {
           "k": "speaker",
           "who": "班长",
-          "t": "This one, then. 5318008."
+          "t": "Then this one. 5318008."
         },
         {
           "k": "speaker",
           "who": "同桌",
-          "t": "...Turn that back over."
+          "t": "...Turn it back over. Now."
         },
         {
           "k": "narration",
-          "t": "The whole class cracks up; the teacher at the front pretends not to hear."
+          "t": "The whole class fell about; the teacher at the front pretended not to hear."
         },
         {
           "k": "speaker",
           "who": "同桌",
-          "t": "Your turn. Something nobody's seen."
+          "t": "Your turn. Do one nobody's seen."
         },
         {
           "k": "narration",
-          "t": "You type a string. Upside down it reads BOSS."
+          "t": "You keyed in a string. Upside down, it read BOSS."
         },
         {
           "k": "speaker",
           "who": "班长",
-          "t": "BOSS? You're going to be a boss?"
+          "t": "BOSS? You're going to be the boss one day?"
         },
         {
           "k": "inner",
-          "t": "I only knew when it came out."
+          "t": "I only knew once I'd keyed it in."
+        },
+        {
+          "k": "speaker",
+          "who": "同桌",
+          "t": "Then we're all coming to your company. You're buying lunch."
+        },
+        {
+          "k": "inner",
+          "t": "Okay."
         },
         {
           "k": "narration",
-          "t": "After graduation day you never pressed it again. The boss part came true."
+          "t": "After graduation you never pressed it again. The company got founded. The boss is somebody else. You never asked the two of them to come."
+        },
+        {
+          "k": "narration",
+          "t": "The one on the desk now, upside down, still says BOSS."
         },
         {
           "k": "narration",

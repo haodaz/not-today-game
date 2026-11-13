@@ -67,21 +67,21 @@
         },
         {
           "k": "narration",
-          "t": "You close your eyes. Something in your hand, a black shell, a little smaller than your palm."
+          "t": "You close your eyes. Something in your hand, black shell, a little smaller than your palm."
         },
         {
           "k": "narration",
-          "t": "The last term of primary school. Evening; your father comes home from work, unclips the pager from his belt and puts it in your hand.",
+          "t": "The last term of primary school. Dad was a dispatcher at the freight depot, away three nights a week. That night he came home, unclipped the pager from his belt and put it in your hand.",
           "backdrop": "/room/dream/home_dinner.jpg"
         },
         {
           "k": "speaker",
           "who": "father",
-          "t": "Go on, play. Not that key."
+          "t": "Play with it. Don't press that key."
         },
         {
           "k": "narration",
-          "t": "You press the other keys. The screen scrolls back a line at a time, all digits, all for him."
+          "t": "You press the other keys. The screen scrolls back line by line, all numbers, all people looking for him."
         },
         {
           "k": "speaker",
@@ -91,11 +91,11 @@
         {
           "k": "speaker",
           "who": "father",
-          "t": "Can't break it. It just takes numbers."
+          "t": "Can't break it. It just takes numbers. Someone wants me, it beeps once. When it beeps, you go."
         },
         {
           "k": "sfx",
-          "t": "Bzzz.",
+          "t": "Bzz.",
           "sfx": "pager-buzz"
         },
         {
@@ -105,7 +105,7 @@
         },
         {
           "k": "narration",
-          "t": "A string of digits, out of nowhere. You hold it up, and before you've said a word his hand is already out."
+          "t": "A string of numbers appears. You hold it up; before you can say a word, Dad's hand is already out."
         },
         {
           "k": "speaker",
@@ -114,7 +114,7 @@
         },
         {
           "k": "narration",
-          "t": "One look. Chopsticks down, keys picked up."
+          "t": "One look. Chopsticks down. Keys."
         },
         {
           "k": "speaker",
@@ -128,16 +128,20 @@
         },
         {
           "k": "narration",
-          "t": "There was a payphone at the shop downstairs. Sometimes he made the call and came back up, the food still warm. Sometimes he made the call and walked straight out from there."
+          "t": "There was a payphone at the corner shop downstairs. Sometimes he came back up and the food was still warm. Sometimes he made the call and walked straight out from there."
         },
         {
           "k": "speaker",
           "who": "family",
-          "t": "Go to sleep. Your dad's not coming home tonight."
+          "t": "Go to sleep. Your dad isn't coming home tonight."
         },
         {
           "k": "inner",
-          "t": "What those digits said, I never once understood. It only receives. Who is on the other end, it doesn't say."
+          "t": "What those numbers said, I never once understood. It only receives. Who is on the other end, it doesn't say."
+        },
+        {
+          "k": "narration",
+          "t": "The one on the desk now has no battery, and it beeped once tonight. When it beeps, you go — that was his line. Who wants you, it still doesn't say."
         },
         {
           "k": "narration",

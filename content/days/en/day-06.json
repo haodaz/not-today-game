@@ -57,31 +57,35 @@
         },
         {
           "k": "narration",
-          "t": "You close your eyes. The most expensive thing in the schoolbag: a clamshell, silver grey."
+          "t": "You close your eyes. The most expensive thing in your schoolbag: a clamshell, silver-grey."
         },
         {
           "k": "narration",
-          "t": "First year of senior high, English class. The dictionary goes round under the desks. Not for words: for the kung-fu game on it.",
+          "t": "Tenth grade, English class. The Wenquxing went round under the desks. Not for words: for the kung-fu game.",
           "backdrop": "/room/dream/classroom.jpg"
         },
         {
           "k": "speaker",
           "who": "同桌",
-          "t": "Lend it to me for one lesson. You never play anyway."
+          "t": "Lend it to me for one period. You never play it anyway."
         },
         {
           "k": "speaker",
           "who": "英语老师",
-          "t": "Third row. What is under that desk."
+          "t": "Third row. What is that under the desk."
         },
         {
           "k": "narration",
-          "t": "The one she confiscated was somebody else's. Yours only ever did one thing: English in, Chinese out."
+          "t": "The one she confiscated was somebody else's. Yours only ever did one thing: English in, Chinese out. One word a day, written on the last page."
         },
         {
           "k": "speaker",
           "who": "同桌",
-          "t": "One word a day. What for? It's not on the exam."
+          "t": "One word a day, what for? It's not on the exam."
+        },
+        {
+          "k": "inner",
+          "t": "Not on the exam. Once I've looked it up, it's mine."
         },
         {
           "k": "narration",
@@ -90,16 +94,20 @@
         {
           "k": "speaker",
           "who": "文曲星",
-          "t": "alone  adj. by oneself; lonely. adv. on one's own."
+          "t": "alone  adj. by oneself; lonely.  adv. on one's own."
         },
         {
           "k": "speaker",
           "who": "同桌",
-          "t": "What's there to look up? Everyone knows that one."
+          "t": "What's there to look up, everyone knows that one."
         },
         {
           "k": "inner",
           "t": "I knew it. I looked it up to see if it had any other meaning."
+        },
+        {
+          "k": "narration",
+          "t": "The one on the desk now still lights up grey-green. You looked up a word today too. The meaning it gave isn't the one in the book."
         },
         {
           "k": "narration",

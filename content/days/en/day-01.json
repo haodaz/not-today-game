@@ -266,6 +266,10 @@
         },
         {
           "k": "narration",
+          "t": "The one on the desk now still shows that grave. You put a new battery in today, thinking the same thing."
+        },
+        {
+          "k": "narration",
           "t": "Today is over."
         }
       ]

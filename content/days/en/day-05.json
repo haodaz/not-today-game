@@ -43,26 +43,26 @@
       "say": [
         {
           "k": "narration",
-          "t": "You close your eyes. The earphone cord is wound round your finger."
+          "t": "You close your eyes. The earphone cord wound round your finger."
         },
         {
           "k": "narration",
-          "t": "The summer of second year. A dubbed tape in the walkman; one tape for two people, one earbud each.",
+          "t": "The summer of eighth grade, Xiaoman's balcony. A dubbed tape in the walkman, one tape between two people, one earbud each.",
           "backdrop": "/room/dream/bedroom.jpg"
         },
         {
           "k": "speaker",
           "who": "小满",
-          "t": "Listen to this bit, this bit's the best."
+          "t": "Listen to this bit. This bit's the best."
         },
         {
           "k": "narration",
-          "t": "Side A ends, flip to B. There is a stretch of nothing at the end of side B."
+          "t": "Side A done, flip to side B. The end of side B had a stretch of nothing."
         },
         {
           "k": "speaker",
           "who": "小满",
-          "t": "Shame to waste it. Record something. Go on, it's recording."
+          "t": "Waste to leave it empty. Record something. Go on, it's running."
         },
         {
           "k": "inner",
@@ -71,32 +71,36 @@
         {
           "k": "speaker",
           "who": "小满",
-          "t": "Anything. What you'll be when you grow up."
+          "t": "Anything. What you'll be when you grow up. Say it and I'll keep it. I'll play it back to you one day and we'll see if you made it."
         },
         {
           "k": "narration",
-          "t": "You speak into the walkman's little hole as if it were a person."
+          "t": "You spoke into the walkman's little hole like it was a person."
         },
         {
           "k": "inner",
-          "t": "When I grow up, I'm going to be a super..."
+          "t": "When I grow up, I'm going to be a super—"
         },
         {
           "k": "narration",
-          "t": "Click. The tape runs out."
+          "t": "Click. The tape ran out."
         },
         {
           "k": "speaker",
           "who": "小满",
-          "t": "Ha, it ran out! A super what?"
+          "t": "Hahaha it's out! Super what?"
         },
         {
           "k": "inner",
-          "t": "Never said it. She laughed, and didn't ask again."
+          "t": "I never said. She laughed, and didn't ask again."
         },
         {
           "k": "narration",
-          "t": "That half sentence, all these years, you have been filling in yourself."
+          "t": "She changed schools in ninth grade. The tape stayed with you."
+        },
+        {
+          "k": "narration",
+          "t": "The one on the desk now still has that half sentence at the end of side B. You didn't play it today. Super what — all these years, you filled that in yourself."
         },
         {
           "k": "narration",
