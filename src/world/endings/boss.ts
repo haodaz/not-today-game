@@ -237,7 +237,10 @@ export const BOSS_BG = "/battle/boss-bg.jpg";
 const bar = (v: number, max: number, kind: string): SafeHtml => html`<i class="${cls("bs-bar", kind)}"><b style="width:${String(Math.round((100 * Math.max(0, v)) / Math.max(1, max)))}%"></b></i>`;
 /** The objects' battle forms (author 2026-11-14: one attack form each, the walkman the doctor): `public/battle/party/obj-<id>.png`. */
 const faceOf = (b: BossBattle, m: Member): string => (m.kind === "player" ? `/player/${b.look}.png` : m.kind === "qkuro" ? "/battle/q-kuro.png" : `/battle/party/obj-${m.id}.png`);
-const spriteOf = (b: BossBattle, m: Member, pose: Pose): string => (m.kind === "player" ? `/battle/party/${b.look}-${pose === "hurt" ? "stance" : pose}.png` : m.kind === "qkuro" ? "/battle/q-kuro.png" : `/battle/party/obj-${m.id}.png`);
+/** The assimilated player, once crossed to Kuro's side, in Kuro's shape (author 2026-11-13: 「变成克总的形象」). */
+export const KURO_YOU = "/battle/party/kuro-you.png";
+const spriteOf = (b: BossBattle, m: Member, pose: Pose): string =>
+  m.kind === "player" ? (b.phase === "after" && b.strong ? KURO_YOU : `/battle/party/${b.look}-${pose === "hurt" ? "stance" : pose}.png`) : m.kind === "qkuro" ? "/battle/q-kuro.png" : `/battle/party/obj-${m.id}.png`;
 
 export function renderBoss(b: BossBattle, nowMs: number): SafeHtml {
   const acting = b.act && nowMs - b.act.at < ACT_MS ? b.act : null;

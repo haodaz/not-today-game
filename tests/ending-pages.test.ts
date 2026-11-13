@@ -87,7 +87,7 @@ describe("lines — the player and Kuro", () => {
     }
     const card = renderLines(model(ending, "lines", lines.length + 1, over), ending).value;
     // the ending's own page (author 2026-11-12): the name, the spread picture, one paragraph
-    expect(card).toContain(`<div class="ending-card"><small>${esc("ending.name.label")}</small><b>${esc(`ending.name.${flavour}`)}</b><img class="ending-art" src="${ENDING_ART[flavour as EndingFlavour]}" alt="" draggable="false"><p class="ending-about">`);
+    expect(card).toContain(`<div class="ending-card"><div class="ending-art-wrap"><img class="ending-art" src="${ENDING_ART[flavour as EndingFlavour]}" alt="" draggable="false"></div><div class="ending-text"><small>${esc("ending.name.label")}</small><b>${esc(`ending.name.${flavour}`)}</b><p class="ending-about">`);
     expect(card).toContain(esc(`ending.about.${flavour}`).replace("{day}", String(stateOf(ending).day)));
     expect(card).not.toContain('class="ln ');
   });

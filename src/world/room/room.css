@@ -563,11 +563,15 @@
 .lines-page .ln.you{justify-content:flex-end;color:#c99a92}
 .lines-page .ln.kuro{justify-content:flex-start}
 .lines-page .ln-av{width:40px;height:40px;object-fit:contain;flex:none}
-.lines-page .ending-card{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none;animation:m-fade-in 900ms ease both}
+/* the ending's page: the picture left, the name and the paragraph right, one dark sheet */
+.lines-page.carded{background:#0b0b0d radial-gradient(ellipse 60% 70% at 32% 50%,rgba(60,52,44,.35),transparent 70%)}
+.lines-page .ending-card{position:absolute;inset:0;z-index:2;display:flex;align-items:center;gap:56px;padding:0 96px;box-sizing:border-box;pointer-events:none;animation:m-fade-in 900ms ease both}
+.lines-page .ending-art-wrap{flex:none;width:860px;height:560px;padding:6px;background:#1a1816;box-shadow:0 24px 70px rgba(0,0,0,.7),inset 0 0 0 1px rgba(255,255,255,.08)}
+.lines-page .ending-art{display:block;width:100%;height:100%;object-fit:cover;filter:saturate(.85)}
+.lines-page .ending-text{flex:1;display:flex;flex-direction:column;gap:14px;min-width:0}
 .lines-page .ending-card small{font-size:13px;letter-spacing:.5em;color:#9aa3b0}
-.lines-page .ending-card b{font:700 34px/1.3 var(--font-title,inherit);letter-spacing:.16em;text-align:center}
-.lines-page .ending-art{display:block;width:1040px;height:580px;object-fit:cover;margin-top:6px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
-.lines-page .ending-about{margin:10px 0 0;max-width:900px;text-align:center;font:17px/1.9 var(--font-game-text,inherit);letter-spacing:.08em;color:#d9d2c4}
+.lines-page .ending-card b{font:700 40px/1.3 var(--font-title,inherit);letter-spacing:.14em;color:#f4efe6}
+.lines-page .ending-about{margin:6px 0 0;font:16px/2 var(--font-game-text,inherit);letter-spacing:.06em;color:#cfc8ba;text-align:left}
 @media (prefers-reduced-motion:reduce){
   .ending-page .end-caps .cap.now,.lines-page .ln:last-child,.lines-page .ending-card{animation:none}
 }
@@ -806,7 +810,8 @@
 .bs-pct{font:900 16px/1 "PingFang SC",sans-serif;color:#fff;min-width:48px;text-align:right}
 /* the assimilated player, after: across the field, on Kuro's side, facing back */
 .boss-page.after.strong .bs-party{transform:translateX(980px)}
-.boss-page.after.strong .bs-member.player .bs-sprite{transform:scaleX(-1);filter:brightness(.35) drop-shadow(0 0 24px rgba(185,28,28,.9))}
+/* crossed: Kuro's shape (kuro-you.png faces the party on its own), a red glow */
+.boss-page.after.strong .bs-member.player .bs-sprite{transform:none;filter:drop-shadow(0 0 24px rgba(185,28,28,.9))}
 .boss-page.after.strong .bs-member.object,.boss-page.after.strong .bs-member.qkuro{opacity:0}
 /* the effects canvas (boss-fx): over everything but the words; the hit's weight as classes */
 .bs-canvas{position:absolute;left:0;top:0;width:1600px;height:900px;pointer-events:none;z-index:3}

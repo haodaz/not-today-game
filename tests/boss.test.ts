@@ -102,6 +102,8 @@ describe("the boss fight", () => {
     expect(renderBoss(done, 2000).value).toContain('data-action="boss-done"');
     const strong = bossCheat({ ...bossStart(withState({ assimilation: 100 }), "bad", 0), phase: "run" }, 100);
     const strongAfter = bossNext(bossNext(strong, 100), 100);
+    // crossed to Kuro's side, in Kuro's shape (author 2026-11-13)
+    expect(renderBoss(strongAfter, 2000).value).toContain('/battle/party/kuro-you.png');
     expect(renderBoss(strongAfter, 100).value).toContain("boss-page end-bad strong after");
     // the loss: the player down; a retry starts the fight again, running
     const dying: BossBattle = { ...b, phase: "act", act: { who: "boss", target: "player", move: { id: "tentacle", power: 1, acc: 100, fx: "strike" }, at: 0, text: [], hits: [] }, party: b.party.map((m) => (m.id === "player" ? { ...m, hp: 0 } : m)) };
