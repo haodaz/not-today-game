@@ -563,17 +563,17 @@
 .lines-page .ln.you{justify-content:flex-end;color:#c99a92}
 .lines-page .ln.kuro{justify-content:flex-start}
 .lines-page .ln-av{width:40px;height:40px;object-fit:contain;flex:none}
-/* the ending's page (author 2026-11-12): the picture left, the words right in the title page's own dress —
-   black, the bordered boxes, the letter-spaced text, the grey small line — so the two pages answer each other */
+/* the ending's page (author 2026-11-12/13): the picture spread over the whole page, no frame (「别给素材图加框」),
+   the words over its dark right side in the title page's dress; the name is the headline, big (「大大的标题」) */
 .lines-page.carded{background:#000}
-.lines-page .ending-card{position:absolute;inset:0;z-index:2;display:flex;align-items:center;gap:64px;padding:0 112px 0 96px;box-sizing:border-box;pointer-events:none;animation:m-fade-in 900ms ease both;color:#efe9df}
-.lines-page .ending-art-wrap{flex:none;width:860px;height:560px;padding:6px;border:2px solid rgba(239,233,223,.55);box-sizing:border-box;background:#000}
-.lines-page .ending-art{display:block;width:100%;height:100%;object-fit:cover;filter:grayscale(.15) contrast(1.02)}
-.lines-page .ending-text{flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:18px;min-width:0}
-.lines-page .ending-card small{font-size:12px;letter-spacing:.4em;color:rgba(239,233,223,.55)}
-.lines-page .ending-card b{display:block;padding:12px 28px;border:2px solid rgba(239,233,223,.75);font:500 20px/1.5 var(--font-game-ui,inherit);letter-spacing:.3em;text-indent:.3em;color:#efe9df;white-space:nowrap}
-.lines-page .ending-about{margin:6px 0 0;font:15px/2.1 var(--font-game-text,inherit);letter-spacing:.1em;color:rgba(239,233,223,.82);text-align:left}
-.lines-page .ending-go{display:block;width:260px;margin-top:10px;padding:12px 0;text-align:center;border:2px solid rgba(239,233,223,.45);font-size:16px;letter-spacing:.3em;text-indent:.3em;color:rgba(239,233,223,.7)}
+.lines-page .ending-card{position:absolute;inset:0;z-index:2;pointer-events:none;animation:m-fade-in 900ms ease both;color:#efe9df}
+.lines-page .ending-art-wrap{position:absolute;inset:0;z-index:0}
+.lines-page .ending-art{display:block;width:100%;height:100%;object-fit:cover;object-position:left center}
+.lines-page .ending-text{position:absolute;right:96px;top:50%;transform:translateY(-50%);width:520px;z-index:1;display:flex;flex-direction:column;align-items:flex-start;gap:16px}
+.lines-page .ending-card small{font-size:13px;letter-spacing:.5em;color:rgba(239,233,223,.6)}
+.lines-page .ending-card b{display:block;font:700 56px/1.2 var(--font-title,inherit);letter-spacing:.14em;color:#efe9df;text-shadow:0 2px 24px rgba(0,0,0,.9)}
+.lines-page .ending-about{margin:8px 0 0;font:15px/2.1 var(--font-game-text,inherit);letter-spacing:.1em;color:rgba(239,233,223,.85);text-align:left;text-shadow:0 1px 12px rgba(0,0,0,.9)}
+.lines-page .ending-go{display:block;width:260px;margin-top:14px;padding:12px 0;text-align:center;border:2px solid rgba(239,233,223,.5);font-size:16px;letter-spacing:.3em;text-indent:.3em;color:rgba(239,233,223,.75);background:rgba(0,0,0,.35)}
 
 @media (prefers-reduced-motion:reduce){
   .ending-page .end-caps .cap.now,.lines-page .ln:last-child,.lines-page .ending-card{animation:none}
