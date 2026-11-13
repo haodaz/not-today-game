@@ -346,6 +346,25 @@ for (const it of ITEMS) {
         // tune (2026-11-08): a module's source first (a conv), then one path per module (the first open chip each
         // turn, Kuro speaks between), the end-of-work offer declined (不接), then 提交.
         for (const m of board.tune.mods) if (m.from?.conv) { await toTingTalk(); await sel(`[data-action=conv][data-conv=${m.from.conv}]`, 1); }
+        // back from 汀汀 to the task's own page in 工作台 (the source conv left us in the chat list, 2026-11-13)
+        await toWorkbench(); await goHome(); await sel(`[data-action=wb-nav][data-page='task:${it.id}']`, 1.2);
+        // the ask 要开始工作吗？→ 开始 may come up only now (a delivery at the door took the first beat in a continued run, 2026-11-13)
+        // the ask comes a few seconds after the door's delivery played out: poll up to 12 s for it (or for the board itself)
+        for (let w = 0; w < 60; w++) {
+          // the delivery's lines (the door, the box) must be read through before the ask can come
+          if (await has("[data-action=loop-advance]")) { await sel("[data-action=loop-advance]", 0.3); }
+          const ch = await ev("JSON.stringify(__choices())").then((x) => (x ? JSON.parse(x) : []));
+          if (w % 20 === 0) note(`   tune: waiting for the ask (${w / 2} s) · choices ${JSON.stringify(ch)} · ask ${(await text()).includes(S("task.launch.ask"))} · buttons ${await ev("JSON.stringify([...document.querySelectorAll('button')].filter(__vis).map(__txt).slice(0,12))")}`);
+          const go = ch.find((c) => /^(开始|Start)/.test(String(c).trim()));
+          if (go) { await click(go, 1.2); note(`   choice → ◇${go} (the work's ask, after ${w / 2} s)`); await sleep(0.8); break; }
+          // another choice up (the door's 拿进来 / 再等等, the meal): take the first, as settle would
+          if (ch.length) { await click(ch[0], 1); note(`   choice → ◇${ch[0]} (on the way to the work's ask)`); await sleep(0.5); continue; }
+          // the ask's buttons may not be loop-choice ones: by text, when the ask line is on screen
+          if ((await text()).includes(S("task.launch.ask")) && (await click(S("task.launch.go") || "开始", 1.2))) { note(`   choice → ◇开始 (the work's ask by text, after ${w / 2} s)`); await sleep(0.8); break; }
+          // visible only: the tune stage's cards can sit hidden in the DOM behind the ask
+          if (await ev("[...document.querySelectorAll('[data-action=task-launch],[data-action=shell-tune-go],[data-action=tune-select]')].some(__vis)")) { note(`   tune: the board is up (after ${w / 2} s)`); break; }
+          await sleep(0.5);
+        }
         // the launch page may only be up now (after the source conv): 开始工作, then the typing line; and a continued board (day 3) may wait behind the shell's go button (2026-11-13)
         for (let w = 0; w < 6 && !(await has("[data-action=task-launch], [data-action=shell-tune-go], [data-action=tune-select]")); w++) await sleep(0.5);
         if (await has("[data-action=task-launch]")) { await shotStep(`launch-${it.id}`); await sel("[data-action=task-launch]", 1.2); note("   launch: 开始工作 (after the source)"); await sleep(1.5); }
