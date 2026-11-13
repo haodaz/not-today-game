@@ -28,6 +28,9 @@ export const WAKE_PHOTO = "/room/photos/d06_bed.jpg";
 /** The fake day 1's still: the day-1 room. */
 export const TENDER_PHOTO = "/room/shots/room.jpg";
 
+/** The ending's spread picture (author 2026-11-12: 「结局本身是有结局图的」; the gamebook's own for 回到未来 and 导盲犬小克). */
+export const ENDING_ART: Readonly<Record<EndingFlavour, string>> = { collapse: "/ending/collapse.jpg", bad: "/ending/bad.jpg", "survive.warm": "/ending/warm.jpg", "survive.cold": "/ending/survive.jpg", good: "/ending/good.jpg" };
+
 export interface EndingLine {
   readonly who: "you" | "kuro";
   readonly key: string;

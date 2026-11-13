@@ -156,3 +156,4 @@ dist/
 dist-dev/
 public/battle/**/*.src.png
 public/room/*.src.png
+public/ending/*.src.png

@@ -15,7 +15,7 @@ import { youAndYou } from "./youandyou";
 import { renderPullOut } from "./pullout";
 import { renderBoss } from "./boss";
 import { COLLAPSE_TO_WHITE_MS, endingOf } from "./flow";
-import { ENDING_PAGES, endingLines, TENDER_KEYS, TENDER_PHOTO, WAKE_KEYS, WAKE_PHOTO, WAKE_SAY } from "./pages";
+import { ENDING_ART, ENDING_PAGES, endingLines, TENDER_KEYS, TENDER_PHOTO, WAKE_KEYS, WAKE_PHOTO, WAKE_SAY } from "./pages";
 import { endingFlavour } from "@state/endings";
 import { FRAMES, frameUrl } from "@world/desktop/kuro/body";
 
@@ -122,7 +122,8 @@ export function renderLines(m: EndingModel, ending: Ending): SafeHtml {
   // Q-Kuro beside you on good / the warm survive; elsewhere the plain dark face the chat window shows.
   const face = flavour === "good" || flavour === "survive.warm" ? "/battle/q-kuro.png" : frameUrl(FRAMES.idle[0]);
   if (step > all.length) {
-    const card = html`<div class="ending-card"><small>${tr("ending.name.label")}</small><b>${tr(`ending.name.${flavour}`)}</b></div>`;
+    // the ending's own page (author 2026-11-12): the name, the spread picture, one paragraph
+    const card = html`<div class="ending-card"><small>${tr("ending.name.label")}</small><b>${tr(`ending.name.${flavour}`)}</b><img class="ending-art" src="${ENDING_ART[flavour]}" alt="" draggable="false"><p class="ending-about">${fill(t(`ending.about.${flavour}`, { day: m.state.day }))}</p></div>`;
     return html`<div class="stage ending-page lines-page carded" data-flavour="${flavour}">${next()}${card}</div>`;
   }
   const rows = all.slice(0, step).map((l) => {

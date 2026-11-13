@@ -1,6 +1,7 @@
 // endings-matrix (2026-11-13): the three new ending pages — tender (the fake day 1, collapse), wake
 // (the waking, bad), lines (the player and Kuro, every ending) — their steps, what they show, and
 // the dev preview's flow; one snapshot of each kind (zh).
+import type { EndingFlavour } from "@state/endings";
 import { beforeAll, describe, expect, it } from "vitest";
 import type { Ending } from "@state/endings";
 import { createStore } from "@state/store";
@@ -10,7 +11,7 @@ import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
 import { initialSession, type EndingPhase, type Session } from "@world/desktop/model";
 import { endingHost, endingNext } from "@world/endings/flow";
-import { TENDER_KEYS, WAKE_KEYS, WAKE_PHOTO, WAKE_SAY, endingLines, pageSteps } from "@world/endings/pages";
+import { ENDING_ART, TENDER_KEYS, WAKE_KEYS, WAKE_PHOTO, WAKE_SAY, endingLines, pageSteps } from "@world/endings/pages";
 import { renderEnding, renderLines, renderTender, renderWake, type EndingModel } from "@world/endings/view";
 import { escapeHtml } from "@world/html";
 import { hasString, setLocale, t } from "@world/i18n";
@@ -85,7 +86,9 @@ describe("lines — the player and Kuro", () => {
       expect(out).not.toContain("ending-card");
     }
     const card = renderLines(model(ending, "lines", lines.length + 1, over), ending).value;
-    expect(card).toContain(`<div class="ending-card"><small>${esc("ending.name.label")}</small><b>${esc(`ending.name.${flavour}`)}</b></div>`);
+    // the ending's own page (author 2026-11-12): the name, the spread picture, one paragraph
+    expect(card).toContain(`<div class="ending-card"><small>${esc("ending.name.label")}</small><b>${esc(`ending.name.${flavour}`)}</b><img class="ending-art" src="${ENDING_ART[flavour as EndingFlavour]}" alt="" draggable="false"><p class="ending-about">`);
+    expect(card).toContain(esc(`ending.about.${flavour}`).replace("{day}", String(stateOf(ending).day)));
     expect(card).not.toContain('class="ln ');
   });
   it("a pair with only .kuro renders Kuro alone; {day} is the run's last day; the portrait follows the flavour", () => {

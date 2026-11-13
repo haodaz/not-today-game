@@ -563,9 +563,11 @@
 .lines-page .ln.you{justify-content:flex-end;color:#c99a92}
 .lines-page .ln.kuro{justify-content:flex-start}
 .lines-page .ln-av{width:40px;height:40px;object-fit:contain;flex:none}
-.lines-page .ending-card{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:12px;pointer-events:none;animation:m-fade-in 900ms ease both}
-.lines-page .ending-card small{font-size:14px;letter-spacing:.5em;color:#9aa3b0}
-.lines-page .ending-card b{font:700 38px/1.4 var(--font-title,inherit);letter-spacing:.16em;text-align:center}
+.lines-page .ending-card{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none;animation:m-fade-in 900ms ease both}
+.lines-page .ending-card small{font-size:13px;letter-spacing:.5em;color:#9aa3b0}
+.lines-page .ending-card b{font:700 34px/1.3 var(--font-title,inherit);letter-spacing:.16em;text-align:center}
+.lines-page .ending-art{display:block;width:1040px;height:580px;object-fit:cover;margin-top:6px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.lines-page .ending-about{margin:10px 0 0;max-width:900px;text-align:center;font:17px/1.9 var(--font-game-text,inherit);letter-spacing:.08em;color:#d9d2c4}
 @media (prefers-reduced-motion:reduce){
   .ending-page .end-caps .cap.now,.lines-page .ln:last-child,.lines-page .ending-card{animation:none}
 }

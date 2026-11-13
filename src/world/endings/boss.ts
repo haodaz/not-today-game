@@ -99,7 +99,8 @@ export function bossStart(state: State, ending: BossEnding, nowMs: number, seed 
   const hard = ending === "survive" && !qkuroAllowed;
   const player: Member = { id: "player", kind: "player", hp: strong ? PLAYER_HP * 2 : PLAYER_HP, max: strong ? PLAYER_HP * 2 : PLAYER_HP, atk: strong ? 4 : 1, spd: strong ? 900 : 2600, gauge: 0, pose: "stance", guard: false, moves: PLAYER_MOVES };
   const objects: Member[] = (state.found as string[]).filter((id) => state.upgraded[id] !== true && OBJECT_MOVES[id]).map((id) => ({ id, kind: "object" as const, hp: 40, max: 40, atk: 1, spd: 3600, gauge: 0, pose: "stance" as const, guard: false, moves: [OBJECT_MOVES[id]!] }));
-  const boss: BossSide = { hp: BOSS_HP, max: BOSS_HP, atk: hard ? 1.3 : 1, spd: hard ? 2600 : 3200, gauge: 0, stage: 1 };
+  // hard (survive, low affinity; tuned by simulation 2026-11-12: ~half the fights with three objects, most with eight)
+  const boss: BossSide = { hp: BOSS_HP, max: BOSS_HP, atk: hard ? 1.1 : 1, spd: hard ? 3000 : 3200, gauge: 0, stage: 1 };
   const intro = strong ? [S("boss.intro.strong1"), S("boss.intro.strong2"), S("boss.intro.go")] : [S("boss.intro.1"), S("boss.intro.2"), S("boss.intro.me"), S("boss.intro.go")];
   const outro = strong ? [S("boss.outro.strong1"), S("boss.outro.strong2")] : [S("boss.outro.1"), S("boss.outro.2")];
   return { ending, look: lookOf(state), strong, hard, qkuroAllowed, joined: false, party: [player, ...objects], boss, phase: "intro", intro, outro, line: 0, chooser: null, act: null, log: intro[0] ?? "", clockAt: nowMs, turn: 0, seed };
