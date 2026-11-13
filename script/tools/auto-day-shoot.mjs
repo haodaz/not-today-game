@@ -32,6 +32,7 @@ fs.rmSync(`/tmp/nt-auto-${day}`, { recursive: true, force: true }); // a fresh p
 const port = 9334 + day;
 const chrome = spawn(CHROME, ["--headless=new", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--hide-scrollbars", "--mute-audio", "--disk-cache-size=1", "--media-cache-size=1", "--disable-gpu-shader-disk-cache", `--remote-debugging-port=${port}`, "--window-size=1600,900", "--autoplay-policy=no-user-gesture-required", `--user-data-dir=/tmp/nt-auto-${day}`, "about:blank"], { stdio: "ignore" });
 const sleep = (s) => new Promise((r) => setTimeout(r, s * 1000));
+process.on("exit", () => { try { chrome.kill("SIGKILL"); } catch {} }); for (const sig of ["SIGINT", "SIGTERM"]) process.on(sig, () => process.exit(1)); process.on("uncaughtException", (e) => { console.error(e); process.exit(1); });
 let targets;
 for (let i = 0; i < 40; i++) { try { targets = await (await fetch(`http://localhost:${port}/json`)).json(); break; } catch { await sleep(0.25); } }
 const ws = new WebSocket(targets.find((t) => t.type === "page").webSocketDebuggerUrl);
@@ -45,6 +46,7 @@ window.__vis = (e) => e.getClientRects().length > 0;
 window.__txt = (e) => ((e.getAttribute('aria-label')||'')+' '+(e.textContent||'')).replace(/\\s+/g,' ').trim();
 window.__click = (sub) => { let els=[...document.querySelectorAll('button,[role=button]')].filter(e=>__vis(e)&&__txt(e).includes(sub)); if(!els.length) return false; els.sort((a,b)=>__txt(a).length-__txt(b).length); els[0].click(); return true; };
 window.__sel = (s) => { const el=[...document.querySelectorAll(s)].find(e=>__vis(e)); if(!el) return false; el.click(); return true; };
+if (!window.__clicks) { window.__clicks = []; const __d = (e) => { const t = e.target; return (t.tagName || '') + '.' + String(t.className || '').slice(0, 30) + '#' + (t.dataset?.action || '') + ':' + (t.dataset?.slot || t.dataset?.card || ''); }; window.addEventListener('click', (e) => window.__clicks.push({ t: Math.round(performance.now()), c: __d(e) }), true); window.addEventListener('click', () => { const l = window.__clicks[window.__clicks.length - 1]; if (l) l.bubbled = true; }); }
 window.__has = (s) => [...document.querySelectorAll(s)].some(e=>__vis(e));
 window.__text = () => (document.body.innerText||'').replace(/\\s+/g,' ');
 window.__choices = () => [...document.querySelectorAll('[data-action=loop-choice]')].filter(__vis).map(__txt);
@@ -424,6 +426,7 @@ for (const it of ITEMS) {
         // pipes (2026-11-13): the process after the filled form; the dev cheat connects it
         if (await has("[data-action=pipes-start]")) { await sel("[data-action=pipes-start]", 1); await shotStep("pipes"); await ev("(()=>{const b=document.querySelector('[data-action=pipes-cheat]'); if(b) b.click(); return !!b})()"); await waitFor("[data-action=board-settle]:not([disabled]), [data-action=board-print]:not([disabled])", 10); note(`   pipes: connected via dev cheat · ${await has("[data-action=board-settle]:not([disabled]), [data-action=board-print]:not([disabled])")}`); }
         // settlement sheet (Kiro 2026-11-12): on the evidence board and the meeting replay 提交 sits behind 整理好了
+        if (typeof readOn === "function") await readOn();
         if (await has("[data-action=board-settle]:not([disabled])")) { await sel("[data-action=board-settle]:not([disabled])", 1.2); await shotStep("settle-sheet"); }
         ok = await sel("[data-action=board-print]:not([disabled])", 1.5); note(`   board: printed ${ok}`);
         await settle(); await toRoom();
@@ -489,9 +492,33 @@ for (const it of ITEMS) {
               await sleep(0.8); note(`   board: code submitted as a chip → still locked ${await has("[data-action=board-lock]")}`);
             }
           } }
+        if (process.env.PAUSE_AT === "fill") { note("   paused before the fill (PAUSE_AT)"); await sleep(Number(process.env.PAUSE_S || 900)); }
         const greyed = await ev("[...document.querySelectorAll('[data-action=board-card]')].filter(__vis).length + ' cards in the tray, ' + document.querySelectorAll('.bcard.notfound').length + ' still unfound'");
         note(`   tray: ${greyed}`);
-        const place = async (cardId, slotId) => { const a = await sel(`[data-action=board-card][data-card=${cardId}]`, 0.4); let b = await sel(`[data-action=board-slot][data-slot=${slotId}]`, 0.5); if (!b) { b = await sel(`[data-action=shell-slot][data-slot=${slotId}]`, 0.5); if (b && (await has(".picked"))) b = await sel(`[data-action=board-slot][data-slot=${slotId}]`, 0.5); } if (!a || !b) note(`   board: could not place ${cardId} → ${slotId} (card ${a}, slot ${b})`); };
+        // A story can land between two clicks (the dinner's 已送达 lines 6 s after the order with fast=1, a
+        // timed line): the stage is masked, the click is refused, and with the slow headless paint the mask
+        // is not even in the DOM yet when `unmask` looks. So each step is verified and retried: read any
+        // story on, back to the task page if it moved the camera (去门口), pick again, place again.
+        const readOn = async () => { let n = 0; for (let i = 0; i < 12 && ((await has(".dlg-layer .story-mask")) || (await has("[data-action=loop-advance]"))); i++) { await ev("(document.querySelector('.dlg-layer .story-mask')||[...document.querySelectorAll('[data-action=loop-advance]')].find(__vis))?.click()"); n++; await sleep(0.4); } return n; };
+        const onTask = async () => { if (await has(`[data-action=board-slot]`)) return true; await toWorkbench(); await goHome(); await sel(`[data-action=wb-nav][data-page='task:${it.id}']`, 1.2); return has(`[data-action=board-slot]`); };
+        const place = async (cardId, slotId) => {
+          for (let attempt = 0; attempt < 3; attempt++) {
+            if (attempt > 0) { const n = await readOn(); const back = await onTask(); note(`   board: retry ${attempt} for ${cardId} → ${slotId} (read ${n} on · on the task page ${back})`); }
+            const a = await sel(`[data-action=board-card][data-card=${cardId}]`, 0.4);
+            if (a && !(await ev("!!document.querySelector('.picked')"))) { await paint(); }
+            let b = await sel(`[data-action=board-slot][data-slot=${slotId}]`, 0.5);
+            if (!b) { b = await sel(`[data-action=shell-slot][data-slot=${slotId}]`, 0.5); if (b && (await has(".picked"))) b = await sel(`[data-action=board-slot][data-slot=${slotId}]`, 0.5); }
+            if (!a || !b) { note(`   board: could not place ${cardId} → ${slotId} (card ${a}, slot ${b})`); continue; }
+            if (await landed(slotId)) return true;
+            note(`   board: ${cardId} → ${slotId} did not show as filled after 6 s · clicks ${await ev("JSON.stringify(window.__clicks.slice(-4))")} · picked ${await ev("document.querySelector('.picked')?.dataset.card||null")} · slots ${await ev("JSON.stringify([...document.querySelectorAll('[data-action=board-slot]')].filter(__vis).map(e=>e.dataset.slot+':'+(/filled/.test(e.className)?'F':'-')))")} · dlg ${await ev("JSON.stringify((document.querySelector('.dlg-layer')?.innerText||'').replace(/\\s+/g,' ').slice(0,80))")}`);
+          }
+          return false;
+        };
+        const paint = () => ev("new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))");
+        const landed = async (slotId) => { for (let w = 0; w < 24; w++) { await paint(); if (await ev(`[...document.querySelectorAll('[data-action=board-slot][data-slot=${slotId}]')].some(e=>/filled/.test(e.className))`)) return true;
+          // the last fill can take the steps away (day 7: the maze replaces them once the minutes are full): what comes next being up counts
+          if (!(await has("[data-action=board-slot]")) && (await has("[data-action$=-start], [data-action=board-settle]:not([disabled]), [data-action=board-print]:not([disabled]), [data-action=board-keep]"))) return true;
+          await sleep(0.25); } return false; };
         const slots = board?.slots ?? [];
         // ide v2 (2026-11-08): a page per slot — open its file, take the right option chip, keep v17's line
         // where the page differs from v16; then 拉最新数据 once, then 打快照.
@@ -522,6 +549,7 @@ for (const it of ITEMS) {
         } else
         if (process.env.BOARD === "assist") { if (slots[0]) await place(slots[0].answer, slots[0].id); await sel("[data-action=board-assist]", 1); }
         else for (const sl of slots) { const trap = process.env.BOARD === "trap" && sl === slots[0] ? board.cards.find((c) => c.id.startsWith("d"))?.id : null; await place(trap ?? sl.answer, sl.id); }
+        for (let w = 0; w < 30 && !(await has("[data-action$=-start], [data-action=board-settle]:not([disabled]), [data-action=board-print]:not([disabled]), [data-action=board-keep]")); w++) { await readOn(); await paint(); await sleep(0.5); }
         await shotStep("board-filled");
         // stack (2026-11-12): the filled form goes up the chain; the dev cheat approves it (the game itself is 2048)
         if (await has("[data-action=stack-start]")) { await sel("[data-action=stack-start]", 1); await shotStep("stack"); await sel("[data-action=stack-move][data-dir=left]", 0.5); await sel("[data-action=stack-move][data-dir=up]", 0.5); await shotStep("stack-moved"); await ev("(()=>{const b=document.querySelector('[data-action=stack-cheat]'); if(b) b.click(); return !!b})()"); await waitFor("[data-action=board-settle]:not([disabled]), [data-action=board-print]:not([disabled])", 10); note(`   stack: approved via dev cheat · ${await has("[data-action=board-settle]:not([disabled]), [data-action=board-print]:not([disabled])")}`); }  // the approval moment holds the chain a beat (work-stages-polish 3) before the board returns
@@ -550,6 +578,7 @@ for (const it of ITEMS) {
         // pipes (2026-11-13): the process after the filled form; the dev cheat connects it
         if (await has("[data-action=pipes-start]")) { await sel("[data-action=pipes-start]", 1); await shotStep("pipes"); await ev("(()=>{const b=document.querySelector('[data-action=pipes-cheat]'); if(b) b.click(); return !!b})()"); await waitFor("[data-action=board-settle]:not([disabled]), [data-action=board-print]:not([disabled])", 10); note(`   pipes: connected via dev cheat · ${await has("[data-action=board-settle]:not([disabled]), [data-action=board-print]:not([disabled])")}`); }
         // settlement sheet (Kiro 2026-11-12): on the evidence board and the meeting replay 提交 sits behind 整理好了
+        if (typeof readOn === "function") await readOn();
         if (await has("[data-action=board-settle]:not([disabled])")) { await sel("[data-action=board-settle]:not([disabled])", 1.2); await shotStep("settle-sheet"); }
         ok = await sel("[data-action=board-print]:not([disabled])", 1.5); note(`   board: printed ${ok}`);
         await settle(); await toRoom(); await sel("[data-action=view][data-view=desk]", 2); await shotStep("desk-deliverable"); await toRoom();
