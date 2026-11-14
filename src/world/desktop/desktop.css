@@ -2063,3 +2063,49 @@ button.lk-cell:hover{transform:translateY(-2px);z-index:1}
 @keyframes sp-flip{0%{transform:perspective(1200px) rotateY(0)}50%{transform:perspective(1200px) rotateY(-70deg);filter:brightness(.6)}100%{transform:perspective(1200px) rotateY(0)}}
 .sp-flip{position:absolute;left:16px;bottom:12px;margin:0;padding:6px 12px;background:rgba(29,33,41,.85);color:#efe9df;font-size:13px;border-radius:4px;animation:ts-pop 300ms 1300ms ease-out both}
 .wl-page{position:relative}
+/* fill (day11-budget-fill): the cost sheet's own paper — ruled cells, the 要求 cells in the sheet's red,
+   the tray of price tags at the right, 预算 / 已用 like a sheet total; a round grows the grid in place */
+.fl{position:relative;flex:1;min-height:0;margin:-16px -26px -20px;display:grid;grid-template-rows:auto 1fr auto;background:#F7F2E7;color:#1d2129;overflow:hidden;background-image:repeating-linear-gradient(180deg,transparent 0 31px,rgba(29,33,41,.05) 31px 32px)}
+.fl-top{display:flex;align-items:flex-end;justify-content:space-between;padding:18px 28px 8px;border-bottom:2px solid #1d2129;margin:0 28px}
+.fl-top h2{margin:0;font-size:24px;font-weight:900;letter-spacing:.06em}
+.fl-total{display:flex;gap:22px;align-items:baseline;font:15px var(--mono,ui-monospace,Menlo,monospace)}
+.fl-total b{font-size:20px;color:#B42318}
+.fl-main{display:grid;grid-template-columns:1fr 240px;gap:24px;min-height:0;padding:18px 28px}
+.fl-sheet{display:flex;align-items:center;justify-content:center;min-height:0}
+.fl-grid{position:relative;display:grid;grid-template-columns:repeat(var(--n),1fr);width:min(560px,100%);aspect-ratio:1;border:2px solid #1d2129;background:#fff}
+.fl-grid.grow{animation:fl-grow 600ms cubic-bezier(.2,.8,.2,1) both}
+@keyframes fl-grow{from{transform:scale(calc((var(--n) - 1) / var(--n)));transform-origin:0 0}to{transform:none;transform-origin:0 0}}
+.fl-cell{position:relative;display:block;border:0;border-right:1px solid rgba(29,33,41,.25);border-bottom:1px solid rgba(29,33,41,.25);padding:0;margin:0;background:transparent;font:inherit}
+.fl-cell.req{background:rgba(180,35,24,.12)}
+button.fl-cell{cursor:pointer}
+button.fl-cell:not(.on):hover{background:rgba(29,33,41,.08)}
+.fl-cell.on{background:#2F6FEB}
+.fl-cell.on.req{background:#1F4FB8}
+.fl-cell.on.s-1{background:#5B8DEF}.fl-cell.on.s-I2{background:#3D7BE8}.fl-cell.on.s-L3{background:#2F6FEB}.fl-cell.on.s-I4,.fl-cell.on.s-I3{background:#2459C9}.fl-cell.on.s-O4{background:#1E4AAE}.fl-cell.on.s-T4,.fl-cell.on.s-L4,.fl-cell.on.s-S4{background:#183D91}
+.fl-cell.person{background:#F6E7C1}
+.fl-cell.kuro{background:#1d2129}
+.fl-tag{position:absolute;inset:2px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;line-height:1.1;color:#1d2129;text-align:center;overflow:hidden}
+.fl-cell.kuro .fl-tag{color:#F6E7C1}
+.fl-prev{position:absolute;left:0;top:0;width:calc(100% * var(--n) / var(--of));aspect-ratio:1;display:grid;grid-template-columns:repeat(var(--n),1fr);pointer-events:none;animation:fl-fade 600ms ease both}
+.fl-prev i.on{background:rgba(47,111,235,.25)}
+@keyframes fl-fade{from{opacity:1}to{opacity:0}}
+.fl-tray{display:flex;flex-direction:column;gap:8px;min-height:0;overflow:auto}
+.fl-price{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:8px 12px;border:2px solid #1d2129;border-radius:4px 14px 14px 4px;background:#fff;font:inherit;cursor:pointer;text-align:left}
+.fl-price.picked{outline:4px solid #F6B73C}
+.fl-price:disabled{opacity:.4;cursor:default}
+.fl-yen{font:700 16px var(--mono,ui-monospace,Menlo,monospace);color:#B42318}
+.fl-n{font-size:12px;color:#6b6457}
+.fl-mini{display:grid;grid-template-columns:repeat(var(--w),10px);grid-auto-rows:10px;gap:1px}
+.fl-mini i.on{background:#2F6FEB}
+.fl-people{display:flex;flex-direction:column;gap:6px;margin-top:10px;padding-top:10px;border-top:1px dashed rgba(29,33,41,.35)}
+.fl-people-h{font-size:12px;letter-spacing:.2em;color:#6b6457}
+.fl-name{padding:6px 12px;border:1.5px solid #1d2129;border-radius:3px;background:#F6E7C1;font:inherit;font-size:14px;cursor:pointer;text-align:left}
+.fl-name.picked{outline:3px solid #F6B73C}
+.fl-name.used,.fl-name:disabled{background:#e4e1da;color:#9a927f;text-decoration:line-through;cursor:default}
+.fl-foot{display:flex;align-items:center;justify-content:center;gap:16px;padding:10px 28px 18px;min-height:64px}
+.fl-ctl{display:flex;gap:14px;align-items:center}
+.fl-real .fl-rows{list-style:none;margin:0;padding:0}
+.fl-row{padding:10px 0;border-bottom:1px dashed rgba(29,33,41,.25);font-size:15px}
+.fl-row.struck{text-decoration:line-through;text-decoration-thickness:2px;color:#9a927f}
+.fl-sum{margin:14px 0 0;font-weight:700}
+@media (prefers-reduced-motion:reduce){.fl-grid.grow,.fl-prev{animation:none}}

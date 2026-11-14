@@ -419,6 +419,8 @@ export interface Session {
   balance: import("./workbench/balance").BalanceGame | null;
   /** sokoban (author 2026-11-13): the warehouse floor under way (session only; every chair seated is a board step). */
   sokoban: import("./workbench/sokoban").SokobanGame | null;
+  /** fill (day11-budget-fill): the cost sheet's budget fill under way (session only; its end is logged as an `open fill:…`). */
+  fill: import("./workbench/fill").FillGame | null;
   /** whack-a-mole (author 2026-11-13): the launch hall under way (session only; three pages passed is a board step). */
   moles: import("./workbench/moles").MolesGame | null;
   /** pac-man (author 2026-11-13): the meeting maze under way (session only; the five lines eaten is a board step). */
@@ -638,6 +640,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     gacha: null,
     balance: null,
     sokoban: null,
+    fill: null,
     moles: null,
     pacman: null,
     spotMiss: null,

@@ -13,6 +13,8 @@ import { fillPlaceholders } from "@world/replies/placeholders";
 import type { Session } from "../model";
 import { cardText, finishLabel } from "./board";
 import { settleLayer } from "./settle-layer";
+import { fillRecord, fillSheet } from "./fill";
+import type { GameEvent } from "@state/events";
 import { rankOf, stackBest, stackTarget } from "./stack-stage";
 
 const S = (key: string, args?: Record<string, string>): string => (hasString(key) ? t(key, args) : "");
@@ -39,7 +41,7 @@ export function settleButton(printable: boolean): SafeHtml {
  * approval-chain day the chain beside it with each rank's stamp. `who` is the counterpart (null: no
  * portrait, no "going to" line); `found` the clippings found; `chain` the 2048 grid, if it is still up.
  */
-export function settleSheet(state: State, task: Task, board: TaskBoard, s: BoardState, who: string | null, found: ReadonlySet<string> = new Set(), chain: { readonly cells: readonly number[]; readonly moves: number } | null = null, reduced = false): SafeHtml {
+export function settleSheet(state: State, task: Task, board: TaskBoard, s: BoardState, who: string | null, found: ReadonlySet<string> = new Set(), chain: { readonly cells: readonly number[]; readonly moves: number } | null = null, reduced = false, events: readonly GameEvent[] = []): SafeHtml {
   const fill = (x: string) => fillPlaceholders(x, state.names);
   const portrait = who ? npcPortrait(who) : null;
   const kick = who ? S("sheet.settle.kick", { who: whoName(who, state) }) : "";
@@ -74,6 +76,8 @@ export function settleSheet(state: State, task: Task, board: TaskBoard, s: Board
     });
     effect = html`${sheet}<aside class="${cls("af", reduced && "reduced")}"><span class="af-title">${S("settle.flow.title")}</span><ol class="af-steps">${steps}</ol></aside>`;
   }
+  // fill (day11-budget-fill): beside the form, the real cost sheet — the 人 rows the play spent struck through
+  if (board.game?.kind === "fill") effect = html`${sheet}${fillSheet(board.game, fillRecord(events, state.day, task.id), state.names)}`;
   return settleLayer({ kind: board.stack ? "flow" : "sheet", portrait, kick, title: fill(board.title), record: html`${record}${actions.line}`, effect, actions: actions.buttons });
 }
 

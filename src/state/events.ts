@@ -309,8 +309,9 @@ export function isOpenTarget(target: string): boolean {
   const conv = /^conv:(.+)$/.exec(target);
   if (conv !== null) return knownRecipients.has(conv[1]!);
   if (/^meeting:/.test(target)) return openedMeetingLine(target) !== null;
-  // battle (2026-11-13): `battle:<taskId>` marks the chick's battle fought on that task, once per task
-  return /^(file|task|battle):.+$/.test(target);
+  // battle (2026-11-13): `battle:<taskId>` marks the chick's battle fought on that task, once per task;
+  // fill (day11-budget-fill): `fill:<taskId>:…` records how the budget fill ended (spent, Kuro, the people)
+  return /^(file|task|battle|fill):.+$/.test(target);
 }
 
 /**

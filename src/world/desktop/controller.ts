@@ -600,6 +600,19 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
       actions["rhythm-tap"]?.(ctx, {} as DOMStringMap, target);
       return;
     }
+    // fill (day11-budget-fill): while the cost sheet's fill is up on the work page, R turns the pick, Esc drops it.
+    if (session.fill && !session.fill.done && session.workShow && !e.metaKey && !e.ctrlKey) {
+      if (e.key === "r" || e.key === "R") {
+        e.preventDefault();
+        actions["fill-rotate"]?.(ctx, {} as DOMStringMap, target);
+        return;
+      }
+      if (e.key === "Escape" && session.fill.pick) {
+        e.preventDefault();
+        actions["fill-drop"]?.(ctx, {} as DOMStringMap, target);
+        return;
+      }
+    }
     // tetris (2026-11-13): while the well runs on the work page, the arrows move / turn / drop, space drops.
     const tetrisKey = TETRIS_KEYS[e.key];
     if (tetrisKey && session.tetris?.running && session.workShow) {

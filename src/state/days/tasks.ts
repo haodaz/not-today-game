@@ -212,7 +212,25 @@ export type BoardGame =
   /** pac-man: the meeting room as a maze; `maze` rows (# wall, . dot, o pellet, 1–5 the lines, P you, G a ghost) */
   | { readonly kind: "pacman"; readonly maze: readonly string[] }
   /** spot the difference: a compare board whose pick is the word that differs, pointed at in the version you trust */
-  | { readonly kind: "spot" };
+  | { readonly kind: "spot" }
+  /** fill (day11-budget-fill): a budget buys shapes to cover the sheet's 要求 cells, four rounds; `people` are the 1-cell, free 自己人 */
+  | { readonly kind: "fill"; readonly people: readonly FillPerson[]; readonly rounds: readonly FillRound[] };
+/** fill: the shapes a budget can buy (their cells are in src/world/desktop/workbench/fill.ts). */
+export const FILL_SHAPES = ["1", "I2", "I3", "L3", "I4", "O4", "T4", "L4", "S4"] as const;
+export type FillShape = (typeof FILL_SHAPES)[number];
+/** fill: who can be spent as a 自己人 piece, in the order they are offered; `me` comes last. */
+export const FILL_PEOPLE = ["boss", "partner", "xiaozhang", "laozhou", "me"] as const;
+export type FillPerson = (typeof FILL_PEOPLE)[number];
+export const FILL_ROUNDS = 4;
+export interface FillRound {
+  readonly size: number;
+  /** The 要求 cells as indexes `row * size + col`, in content order. */
+  readonly cells: readonly number[];
+  readonly budget: number;
+  readonly pieces: readonly { readonly shape: FillShape; readonly price: number; readonly n: number }[];
+  /** The 自己人 are offered from this round on. */
+  readonly people: boolean;
+}
 export interface BoardStack {
   /** From the bottom up: the rank word and its symbol; `silhouette` ranks are the easter eggs past the top (drawn black). */
   readonly ranks: readonly { readonly name: string; readonly img: string; readonly silhouette?: boolean }[];
@@ -807,7 +825,44 @@ function board(v: unknown, w: string): TaskBoard {
     } else if (v.game.kind === "spot") {
       keys(v.game, ["kind"], gw);
       game = { kind: "spot" };
-    } else fail(`${gw}.kind`, 'must be "mines", "pipes", "match3", "link", "snake", "tetris", "rhythm", "gacha", "balance", "sokoban", "moles", "pacman" or "spot"');
+    } else if (v.game.kind === "fill") {
+      keys(v.game, ["kind", "people", "rounds"], gw);
+      const pw = `${gw}.people`;
+      if (!Array.isArray(v.game.people) || v.game.people.length === 0) fail(pw, "must be a non-empty list");
+      const people = v.game.people.map((x, i) => ((FILL_PEOPLE as readonly unknown[]).includes(x) ? (x as FillPerson) : fail(`${pw}[${i}]`, `must be one of ${FILL_PEOPLE.join(", ")}`)));
+      if (new Set(people).size !== people.length) fail(pw, "lists someone twice");
+      if (people.includes("me") && people[people.length - 1] !== "me") fail(pw, '"me" must come last');
+      if (!Array.isArray(v.game.rounds) || v.game.rounds.length !== FILL_ROUNDS) fail(`${gw}.rounds`, `must be ${FILL_ROUNDS} rounds`);
+      const rounds = v.game.rounds.map((r, ri): FillRound => {
+        const rw = `${gw}.rounds[${ri}]`;
+        if (!isRecord(r)) fail(rw, "must be an object");
+        keys(r, ["size", "cells", "budget", "pieces", "people"], rw);
+        const size = Number.isInteger(r.size) && (r.size as number) >= 3 && (r.size as number) <= 9 ? (r.size as number) : fail(`${rw}.size`, "must be an integer 3–9");
+        if (!Array.isArray(r.cells) || r.cells.length === 0) fail(`${rw}.cells`, "must be a non-empty list");
+        const cells = r.cells.map((c, ci) => {
+          const m = typeof c === "string" ? /^(\d+),(\d+)$/.exec(c) : null;
+          const row = m ? Number(m[1]) : -1, col = m ? Number(m[2]) : -1;
+          if (!m || row >= size || col >= size) fail(`${rw}.cells[${ci}]`, `must be "row,col" inside the ${size}×${size} grid`);
+          return row * size + col;
+        });
+        if (new Set(cells).size !== cells.length) fail(`${rw}.cells`, "lists a cell twice");
+        const budget = Number.isInteger(r.budget) && (r.budget as number) >= 0 ? (r.budget as number) : fail(`${rw}.budget`, "must be an integer >= 0");
+        if (!Array.isArray(r.pieces) || r.pieces.length === 0) fail(`${rw}.pieces`, "must be a non-empty list");
+        const pieces = r.pieces.map((x, xi) => {
+          const xw = `${rw}.pieces[${xi}]`;
+          if (!isRecord(x)) fail(xw, "must be an object");
+          keys(x, ["shape", "price", "n"], xw);
+          if (!(FILL_SHAPES as readonly unknown[]).includes(x.shape)) fail(`${xw}.shape`, `must be one of ${FILL_SHAPES.join(", ")}`);
+          const price = Number.isInteger(x.price) && (x.price as number) >= 0 ? (x.price as number) : fail(`${xw}.price`, "must be an integer >= 0");
+          const n = Number.isInteger(x.n) && (x.n as number) >= 1 ? (x.n as number) : fail(`${xw}.n`, "must be an integer >= 1");
+          return { shape: x.shape as FillShape, price, n };
+        });
+        if (new Set(pieces.map((x) => x.shape)).size !== pieces.length) fail(`${rw}.pieces`, "lists a shape twice");
+        if (r.people !== undefined && typeof r.people !== "boolean") fail(`${rw}.people`, "must be true or false");
+        return { size, cells, budget, pieces, people: r.people === true };
+      });
+      game = { kind: "fill", people, rounds };
+    } else fail(`${gw}.kind`, 'must be "mines", "pipes", "match3", "link", "snake", "tetris", "rhythm", "gacha", "balance", "sokoban", "moles", "pacman", "spot" or "fill"');
   }
   let stack: BoardStack | undefined;
   if (v.stack !== undefined) {

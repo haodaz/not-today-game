@@ -2647,3 +2647,19 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
 - title.json `book` is now unused and optional in its parser. Questions for Claude: change or drop it, and may `/room/book.png` be deleted?
 - Tests: new `tests/bedside-book.test.ts`; updated ending-record, title, object-tutor, lying-view, world-prompts, saves. Snapshots refreshed for the shelf book: loop-hud ×2, navigation ×3, nightfall, title ×3. The `-u` run also removed the old title book entries and the long-standing obsolete desk-prints entry.
 - tsc clean; vitest 170 files, 2406 passed.
+
+## 2026-11-13 · day11-budget-fill
+
+- Loader (`state/days/tasks.ts`): `game.kind: "fill"` with `people` (FILL_PEOPLE: boss, partner, xiaozhang, laozhou, me; each once, me last) and exactly 4 `rounds`.
+  - Each round: `size` 3–9; `cells` "r,c" inside the grid, no duplicates, stored as `r*size+c`; `budget` ≥ 0; `pieces` with `shape` from FILL_SHAPES (1, I2, I3, L3, I4, O4, T4, L4, S4), `price` ≥ 0, `n` ≥ 1, no shape twice; `people` boolean.
+- `state/events.ts`: `isOpenTarget` also accepts `fill:…`. The game's end is one `open fill:<task>:<spent>:<kuro|self>:<people+…>` event (no new event kind).
+- New `workbench/fill.ts`:
+  - Engine: `fillStart`, `fillPick`, `fillRotate`, `fillDrop`, `fillPlace`, `fillLift`, `fillNext`, `fillStuck`, `fillKuro`. Kuro fills in reading order with every person left (you last), then free cells with no name; people left over go on blank cells and are spent anyway.
+  - Solver: `fillSolve` (depth-first, pruned by the cheapest price per cell), `fillPeopleNeeded`, `fillSolveRound` (the cheat; Kuro's fill when the solver finds nothing).
+  - Record: `fillRecord` reads the end event back.
+  - Views: `fillStage` (the sheet's grid, the price tags, 自己人 name tags via `msgs.*` and the login, 预算 / 已用, the grow with the previous pieces faint) and `fillSheet` (the settlement's `settle.fill.row.*` rows, spent ones struck, and `settle.fill.sum`).
+- board.ts: actions `fill-start`, `fill-pick`, `fill-rotate`, `fill-drop`, `fill-place`, `fill-lift`, `fill-next`, `fill-assist` (only when stuck), and dev `fill-cheat` (all rounds left). At the end: the record, then `approve`. `printBoard` adds `quality` (wrong if Kuro filled, else perfect).
+- Wiring: compare.ts dispatches the stage; controller onKey R rotates and Esc drops the pick while `session.fill` and `workShow`; settle-sheet adds the real cost sheet for a fill board; guide G7 accepts `fill-*`; the session gains `fill`; CSS in desktop.css (`.fl*`); the driver gains a `fill-start` / `fill-cheat` line after each sokoban line.
+- Content check: rounds 1–3 pass with 0 自己人; round 4 needs all 5 (including 你). A player who spends anyone in round 3 cannot pass round 4 without Kuro.
+- Tests: new `tests/fill.test.ts` (loader, engine, solver on the content, replay, round-1 snapshot, cheat → perfect, Kuro → wrong, settlement rows). `tests/balance.test.ts` now runs on a day-11 fixture with the balance put back.
+- tsc clean; vitest 171 files, 2416 passed.

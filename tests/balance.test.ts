@@ -1,9 +1,10 @@
-// balance (author 2026-11-13): day 11's 成本表 — the scale after the filled form; the crane swings on the
+// balance (author 2026-11-13): day 11's 成本表 (a fixture since day11-budget-fill) — the scale after the filled form; the crane swings on the
 // clock, a drop lands on the pan under it (square or 歪), three 歪 fall, the last block judges the
 // level; a pause costs no time; level approves the form.
 import "./specimen";
 import { describe, expect, it } from "vitest";
-import { taskByFlag } from "@state/days/tasks";
+import { parseTaskFile, taskByFlag, taskFiles, type Task } from "@state/days/tasks";
+import day11 from "@content/tasks/day-11.json";
 import { createStore } from "@state/store";
 import { boardState, canPrint } from "@state/days/board";
 import type { ActionContext } from "@world/desktop/controller";
@@ -15,12 +16,19 @@ import { setLocale, t } from "@world/i18n";
 import { completeUntil } from "./complete-items";
 
 const GAME = { kind: "balance" as const, fixed: 5 };
+// day11-budget-fill (2026-11-13): day 11 is the budget fill now; the balance stays for another day,
+// tested here on day 11's board with the balance put back (a fixture; content is not edited).
+{
+  const raw = structuredClone(day11) as { tasks: { id: string; board?: { game?: unknown } }[] };
+  raw.tasks.find((x) => x.id === "work")!.board!.game = GAME;
+  (taskFiles as Map<number, readonly Task[]>).set(11, parseTaskFile(raw, "day-11.json").tasks);
+}
 const BLOCKS = [{ label: "麦子", w: 3 }, { label: "大麦", w: 1 }, { label: "盐", w: 2 }, { label: "柴", w: 2 }];
 /** The clock time at which the crane sits over a pan's centre (right, or left). */
 const over = (side: "l" | "r"): number => Math.round((Math.asin(PAN_X) / (2 * Math.PI)) * BALANCE_PERIOD_MS) * (side === "r" ? 1 : -1) + (side === "l" ? BALANCE_PERIOD_MS : 0);
 
 describe("balance", () => {
-  it("day 11's board is a balance; the crane swings on the clock; the welded weights are equal", () => {
+  it("day 11's board (the fixture) is a balance; the crane swings on the clock; the welded weights are equal", () => {
     expect(taskByFlag(11, "task_d11_work")!.board!.game).toEqual(GAME);
     const g = balanceStart("t", GAME, BLOCKS, 1, 1000);
     expect(weight(g, "l")).toBe(5);

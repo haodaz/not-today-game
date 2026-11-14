@@ -29,6 +29,8 @@ import { TETRIS_DONE_MS, TETRIS_FLASH_MS, tetrisDropMs, tetrisKey, tetrisRoll, t
 import { RHYTHM_DONE_MS, RHYTHM_TICK_MS, rhythmPause, rhythmResume, rhythmRoll, rhythmSolve, rhythmStart, rhythmSweep, rhythmTap, rhythmWords } from "./rhythm";
 import { GACHA_DONE_MS, GACHA_TURN_MS, gachaOpen, gachaRoll, gachaStart, gachaTurn } from "./gacha";
 import { BALANCE_DONE_MS, BALANCE_TICK_MS, balanceBlocks, balanceDrop, balancePause, balanceResume, balanceSolve, balanceStart } from "./balance";
+import { FILL_DONE_MS, FILL_GROW_MS, fillDrop, fillKuro, fillLift, fillNext, fillPick, fillPlace, fillRecord, fillRotate, fillSolveRound, fillStart, fillStuck, fillTarget, type FillBoard, type FillGame, type FillPick } from "./fill";
+import type { FillPerson } from "@state/days/tasks";
 import { SOKOBAN_DONE_MS, sokobanMove, sokobanSolve, sokobanStart, sokobanUndo, type Dir } from "./sokoban";
 import { MOLES_DONE_MS, MOLES_TICK_MS, molesPause, molesResume, molesRoll, molesSolve, molesStart, molesSweep, molesTap } from "./moles";
 import { PORTRAIT_FILES } from "@world/dialogue/box";
@@ -1194,6 +1196,67 @@ const actions: Record<string, ActionHandler> = {
     ctx.session.sokoban = sokobanUndo(g);
     ctx.rerender();
   },
+  // fill (day11-budget-fill): the budget buys shapes for the sheet's 要求 cells; four rounds approve the form
+  "fill-start"(ctx) {
+    const c = currentBoard(ctx);
+    if (c?.board.game?.kind !== "fill" || stateOf(ctx, c.task, c.board).approved) return;
+    ctx.session.fill = fillStart(c.task.id, ctx.now?.() ?? Date.now());
+    ctx.rerender();
+  },
+  "fill-pick"(ctx, data) {
+    const f = fillOf(ctx);
+    if (!f) return;
+    const pick: FillPick | null = data.person ? { kind: "person", person: data.person as FillPerson } : data.tray !== undefined && Number.isInteger(Number(data.tray)) ? { kind: "piece", tray: Number(data.tray) } : null;
+    if (!pick) return;
+    ctx.session.fill = fillPick(f.game, f.g, pick);
+    ctx.rerender();
+  },
+  "fill-rotate"(ctx) {
+    const f = fillOf(ctx);
+    if (!f) return;
+    ctx.session.fill = fillRotate(f.g);
+    ctx.rerender();
+  },
+  "fill-drop"(ctx) {
+    const f = fillOf(ctx);
+    if (!f) return;
+    ctx.session.fill = fillDrop(f.g);
+    ctx.rerender();
+  },
+  "fill-place"(ctx, data) {
+    const f = fillOf(ctx);
+    const cell = Number(data.cell);
+    if (!f || !Number.isInteger(cell)) return;
+    ctx.session.fill = fillPlace(f.game, f.g, cell);
+    ctx.rerender();
+  },
+  "fill-lift"(ctx, data) {
+    const f = fillOf(ctx);
+    const id = Number(data.piece);
+    if (!f || !Number.isInteger(id)) return;
+    ctx.session.fill = fillLift(f.g, id);
+    ctx.rerender();
+  },
+  "fill-next"(ctx) {
+    const f = fillOf(ctx);
+    if (!f) return;
+    fillAdvance(ctx, f.c, fillNext(f.game, f.g, ctx.now?.() ?? Date.now()));
+  },
+  // stuck: 让克总帮忙 — Kuro spends every person left (you last) and free cells; the round passes, the game is his
+  "fill-assist"(ctx) {
+    const f = fillOf(ctx);
+    if (!f || !fillStuck(f.game, f.g)) return;
+    fillAdvance(ctx, f.c, fillKuro(f.game, f.g, ctx.now?.() ?? Date.now()));
+  },
+  // dev only: every round left solved at once, by the solver (the replay driver)
+  "fill-cheat"(ctx) {
+    if (!import.meta.env.DEV) return;
+    let f = fillOf(ctx);
+    for (let k = 0; f && k < 8 && !f.g.done; k++) {
+      fillAdvance(ctx, f.c, fillSolveRound(f.game, f.g, ctx.now?.() ?? Date.now()));
+      f = fillOf(ctx);
+    }
+  },
   // dev only: every chair seated at once (the replay driver)
   "sokoban-cheat"(ctx) {
     if (!import.meta.env.DEV) return;
@@ -1458,6 +1521,30 @@ function renderPause(ctx: ActionContext, c: { task: Task; board: TaskBoard }, he
   ctx.later(RENDER_MS + 16, ctx.rerender);
 }
 
+/** fill: the open fill game on the current board, or null. */
+function fillOf(ctx: ActionContext): { c: { task: Task; board: TaskBoard }; game: FillBoard; g: FillGame } | null {
+  const c = currentBoard(ctx);
+  const game = c?.board.game;
+  const g = ctx.session.fill?.key === c?.task.id ? ctx.session.fill : null;
+  if (!c || game?.kind !== "fill" || !g || g.done || stateOf(ctx, c.task, c.board).approved) return null;
+  return { c, game, g };
+}
+
+/** fill: the game moved on; at its end, the record (an `open fill:…`) and the approval, then the moment. */
+function fillAdvance(ctx: ActionContext, c: { task: Task; board: TaskBoard }, next: FillGame): void {
+  if (next.done) {
+    const now = ctx.now?.() ?? Date.now();
+    ctx.store.appendEvent({ kind: "open", target: fillTarget(c.task.id, next), t: ctx.session.clock.time });
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+    ctx.session.fill = { ...next, approvedAt: now };
+    ctx.later(FILL_DONE_MS + 20, ctx.rerender);
+  } else {
+    ctx.session.fill = next;
+    if (next.roundAt !== undefined) ctx.later(FILL_GROW_MS + 20, ctx.rerender);
+  }
+  ctx.rerender();
+}
+
 /** The `task` event (slots + assists) and, for a person's deliverable, the `give` at once (the finish). */
 function printBoard(ctx: ActionContext, c: { task: Task; board: TaskBoard }, s: BoardState): void {
   const open = openWork(ctx.store.getState(), ctx.store.getEvents());
@@ -1468,6 +1555,8 @@ function printBoard(ctx: ActionContext, c: { task: Task; board: TaskBoard }, s: 
     mode: s.assists > 0 ? "let" : "self",
     slots: { ...s.slots },
     assists: s.assists,
+    // fill (day11-budget-fill): a game won by Kuro is graded wrong, won by the player perfect
+    ...(c.board.game?.kind === "fill" ? { quality: fillRecord(ctx.store.getEvents(), ctx.store.getState().day, c.task.id)?.kuro ? ("wrong" as const) : ("perfect" as const) } : {}),
   });
   const d = c.task.deliverable;
   if (d && (d.to ?? "hand") !== "hand") ctx.store.appendEvent({ kind: "give", deliverableId: d.id, t: ctx.session.clock.time });
