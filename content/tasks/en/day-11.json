@@ -210,13 +210,216 @@
           }
         ],
         "game": {
-          "kind": "balance",
-          "fixed": 5
+          "kind": "fill",
+          "people": [
+            "boss",
+            "partner",
+            "xiaozhang",
+            "laozhou",
+            "me"
+          ],
+          "rounds": [
+            {
+              "size": 4,
+              "cells": [
+                "0,1",
+                "1,1",
+                "1,2",
+                "2,2",
+                "3,0",
+                "3,1"
+              ],
+              "budget": 20,
+              "pieces": [
+                {
+                  "shape": "1",
+                  "price": 3,
+                  "n": 3
+                },
+                {
+                  "shape": "I2",
+                  "price": 5,
+                  "n": 2
+                },
+                {
+                  "shape": "L3",
+                  "price": 7,
+                  "n": 2
+                }
+              ]
+            },
+            {
+              "size": 5,
+              "cells": [
+                "0,0",
+                "0,1",
+                "1,0",
+                "1,1",
+                "2,2",
+                "3,1",
+                "3,2",
+                "3,3",
+                "0,4",
+                "4,0"
+              ],
+              "budget": 24,
+              "pieces": [
+                {
+                  "shape": "1",
+                  "price": 3,
+                  "n": 3
+                },
+                {
+                  "shape": "I2",
+                  "price": 5,
+                  "n": 2
+                },
+                {
+                  "shape": "L3",
+                  "price": 7,
+                  "n": 2
+                },
+                {
+                  "shape": "O4",
+                  "price": 8,
+                  "n": 1
+                },
+                {
+                  "shape": "T4",
+                  "price": 8,
+                  "n": 1
+                }
+              ]
+            },
+            {
+              "size": 6,
+              "cells": [
+                "0,0",
+                "0,1",
+                "0,2",
+                "0,3",
+                "2,0",
+                "2,1",
+                "3,0",
+                "3,1",
+                "1,5",
+                "2,5",
+                "3,5",
+                "4,5",
+                "5,1",
+                "5,2",
+                "5,3",
+                "4,2"
+              ],
+              "budget": 32,
+              "pieces": [
+                {
+                  "shape": "1",
+                  "price": 3,
+                  "n": 3
+                },
+                {
+                  "shape": "I2",
+                  "price": 5,
+                  "n": 2
+                },
+                {
+                  "shape": "L3",
+                  "price": 7,
+                  "n": 2
+                },
+                {
+                  "shape": "I4",
+                  "price": 7,
+                  "n": 2
+                },
+                {
+                  "shape": "O4",
+                  "price": 8,
+                  "n": 2
+                },
+                {
+                  "shape": "T4",
+                  "price": 8,
+                  "n": 2
+                }
+              ],
+              "people": true
+            },
+            {
+              "size": 7,
+              "cells": [
+                "0,0",
+                "0,1",
+                "0,2",
+                "0,3",
+                "1,5",
+                "2,5",
+                "3,5",
+                "4,5",
+                "2,0",
+                "2,1",
+                "3,0",
+                "3,1",
+                "5,1",
+                "5,2",
+                "5,3",
+                "4,2",
+                "6,5",
+                "6,6",
+                "5,6",
+                "4,0",
+                "6,0",
+                "3,3",
+                "0,6",
+                "6,3"
+              ],
+              "budget": 38,
+              "pieces": [
+                {
+                  "shape": "1",
+                  "price": 3,
+                  "n": 3
+                },
+                {
+                  "shape": "I2",
+                  "price": 5,
+                  "n": 2
+                },
+                {
+                  "shape": "L3",
+                  "price": 7,
+                  "n": 2
+                },
+                {
+                  "shape": "I4",
+                  "price": 7,
+                  "n": 2
+                },
+                {
+                  "shape": "O4",
+                  "price": 8,
+                  "n": 2
+                },
+                {
+                  "shape": "T4",
+                  "price": 8,
+                  "n": 2
+                },
+                {
+                  "shape": "L4",
+                  "price": 8,
+                  "n": 1
+                }
+              ],
+              "people": true
+            }
+          ]
         }
       },
       "deliverable": {
         "id": "d11-scale",
-        "label": "the cost sheet (balanced)"
+        "label": "Cost sheet (filled)"
       },
       "judge": {
         "perfect": 0,
@@ -227,21 +430,21 @@
       "launch": {
         "who": "partner",
         "note": [
-          "Vivi: cut cost, raise efficiency; balance the sheet, before you leave.",
-          "The prices are in Lao Zhou's chat and that old menu; the oil and wine columns, Lao Wang says, are not to be touched."
+          "Vivi: cut costs, fill the sheet, on my desk before you leave.",
+          "The budget is what it is; every required cell gets filled; the oil and wine columns stay as they are, Lao Wang's orders."
         ],
-        "call": "Balance it and send it to her before you leave.",
+        "call": "Fill it, send it to her before you leave.",
         "cta": "Start work",
         "motif": {
           "kind": "bubble",
           "items": [
-            "Cut cost, raise efficiency",
-            "Balance it",
-            "Before you leave",
-            "Don't touch oil and wine",
-            "Lao Wang said so",
-            "Prices in the old menu",
-            "Every column balanced"
+            "cut costs",
+            "fill it",
+            "before you leave",
+            "the budget is what it is",
+            "not one cell empty",
+            "leave the oil and wine",
+            "Lao Wang said"
           ]
         },
         "tone": "paper",
