@@ -377,6 +377,12 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
       if (model.screen === "menu" && kind && model.collection.endings[kind] > 0) set({ ...model, figureOpen: kind });
     },
     "figure-close": () => set({ ...model, figureOpen: null }),
+    // bedside-book: the book on the headboard shelf opens on the menu too (no run: no names; the whole
+    // book once a run has finished). No box here, so no lines; the first-time lines wait for a run.
+    "book-open": () => {
+      if (model.screen === "menu" && !model.figureOpen) set({ ...model, bookOpen: true });
+    },
+    "book-close": () => set({ ...model, bookOpen: false }),
     "title-back": () => {
       // From an opened object, 返回 goes back to the grid; from the grid (or elsewhere) to the menu.
       if (model.screen === "drawer" && model.drawerOpen) toDrawer(null);
@@ -494,7 +500,8 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
   const onKey = (e: KeyboardEvent) => {
     if (model.starting || model.moving) return;
     if (e.key === "Escape") {
-      if (model.settingsOpen && model.settingsConfirm) set({ ...model, settingsConfirm: null });
+      if (model.bookOpen) set({ ...model, bookOpen: false });
+      else if (model.settingsOpen && model.settingsConfirm) set({ ...model, settingsConfirm: null });
       else if (model.settingsOpen) set({ ...model, settingsOpen: false });
       else if (model.account?.kind === "gate") set({ ...model, account: { kind: "none" } });
       else if (model.screen === "album" && model.albumOpen) set({ ...model, albumOpen: null });

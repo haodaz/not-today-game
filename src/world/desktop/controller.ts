@@ -63,6 +63,8 @@ export interface ActionContext {
   readonly developed?: (key: string) => void;
   /** first-use-hints R2: a hint was seen; write-only, to the host's cross-run profile. Absent = this page only. */
   readonly hintSeen?: (id: string) => void;
+  /** bedside-book: the reader opened for the first time in this profile; write-only. Absent = this session only. */
+  readonly bookRead?: () => void;
   /**
    * voice-babble R3: plays a voice note's babble on the sound player's context at `gain`; returns
    * its stop. Absent (no sound player) = silence.
@@ -309,6 +311,8 @@ export interface DesktopDeps {
   readonly placement?: { readonly storage: Pick<Storage, "getItem" | "setItem"> | null; readonly runId: string };
   /** photo-album R1: told when a room photo is first seen developed (the host writes the profile). */
   readonly onPhotoDeveloped?: (key: string) => void;
+  /** bedside-book: told when the book is first opened in this profile (the host writes the profile). */
+  readonly onBookRead?: () => void;
   /**
    * first-use-hints R2: the hints — whether they are on (设置, `nt_hints`) and which were seen in
    * earlier runs (the profile's), read at mount; `seen` / `setOn` write them back. Absent = no hints.
@@ -485,6 +489,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     now: () => Date.now(),
     developed: deps.onPhotoDeveloped,
     hintSeen: deps.hints?.seenNow,
+    bookRead: deps.onBookRead,
     ...(sound?.babble ? { babble: (plan: BabblePlan, gain: number) => sound.babble!(plan, gain) } : {}),
   };
   const motion: MotionHooks | null = deps.motion ? deps.motion(root, ctx, actions) : null;

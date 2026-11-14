@@ -50,7 +50,7 @@ export const ROOM_SHOT: Shot & Actuators & { readonly desk: Rect; readonly bed: 
 /**
  * The collection in 房间 (title-page FR4/FR8; author 2026-11-12: 「放床上吧」): the five ending
  * figures sit in a row on the bed's blanket by the headboard, one fixed place each, a little
- * larger toward the camera; the book lies left of the keyboard. The chair region is for the title's
+ * larger toward the camera; the book lies on the headboard shelf (bedside-book). The chair region is for the title's
  * one-pixel cut (FR7).
  */
 export const ROOM_COLLECTION = {
@@ -63,7 +63,8 @@ export const ROOM_COLLECTION = {
     // 温柔的世界: the little bed under a glass dome
     collapse: { l: 1472, t: 584, w: 44, h: 74 },
   },
-  book: { l: 452, t: 500, w: 36, h: 26 },
+  // bedside-book: the stack of two books on the headboard shelf (image 1430–1690 × 640–700).
+  book: { l: 1120, t: 500, w: 200, h: 50 },
   chair: { l: 341, t: 543, w: 393, h: 357 },
 } as const;
 

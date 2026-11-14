@@ -126,9 +126,10 @@ export function choiceRows(label: string, geom: BoxGeom, px: number): number {
 /**
  * The screens for one line and its choices (FR1): text pages of ≤ `rows` rows, then choice pages
  * of ≤ `maxChoices` choices and ≤ `choiceRows` rows (each choice ≤ `choiceMaxRows`). The first choice page shares the last text
- * page when their rows add up to ≤ `rows` (a one-row prompt over two choices).
+ * page when their rows add up to ≤ `rows` (a one-row prompt over two choices), or always with `share`
+ * (bedside-book: the bed and rise asks, whose choices sit in the column, never wait a click).
  */
-export function screens(text: string | null, choices: readonly string[] | null, geom: BoxGeom, px: number): Screen[] {
+export function screens(text: string | null, choices: readonly string[] | null, geom: BoxGeom, px: number, share = false): Screen[] {
   const out: Screen[] = [];
   const lines = text ? wrap(text, textArea(geom, px), px) : [];
   for (let i = 0; i < lines.length; i += geom.rows) {
@@ -150,7 +151,7 @@ export function screens(text: string | null, choices: readonly string[] | null, 
     pages.push(cur);
   }
   const last = out[out.length - 1];
-  if (last && pages[0] && last.rows + pages[0].rows <= geom.rows) {
+  if (last && pages[0] && (share || last.rows + pages[0].rows <= geom.rows)) {
     out[out.length - 1] = { ...last, choices: pages[0].choices, choiceRows: pages[0].rows };
     pages.shift();
   }

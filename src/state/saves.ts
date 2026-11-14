@@ -137,6 +137,8 @@ export interface ProfileWriter {
   clear(): void;
   /** first-use-hints R2: a first-use hint was seen: adds `id` to `profile.hints` once. Write-only. */
   recordHint(id: string): void;
+  /** bedside-book: the book by the bed was opened once (`profile.bookRead = true`; gone only with 清除全部). */
+  recordBookRead(): void;
 }
 
 export function createProfileWriter(storage: KeyValueStorage): ProfileWriter {
@@ -173,6 +175,11 @@ export function createProfileWriter(storage: KeyValueStorage): ProfileWriter {
       slot.write({ data: { ...current, kurogotchi: data } });
     },
     clear: () => slot.clear(),
+    recordBookRead() {
+      const current = (slot.read()?.data ?? {}) as ProfileData;
+      if (current.bookRead === true) return;
+      slot.write({ data: { ...current, bookRead: true } });
+    },
     recordHint(id) {
       const current = (slot.read()?.data ?? {}) as ProfileData;
       const was = Array.isArray(current.hints) ? (current.hints as Json[]).filter((v): v is string => typeof v === "string") : [];

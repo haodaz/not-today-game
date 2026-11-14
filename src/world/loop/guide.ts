@@ -174,6 +174,7 @@ export const GUIDE_ALLOWS: ReadonlySet<string> = new Set([
   "opening-skip",
   "loop-mute",
   "hints-set",
+  "book-open",
   "book-close",
   "case-close",
 ]);

@@ -56,7 +56,7 @@ import { isFacing, turnedTo, turnsBetween, type Facing, type TurnDir } from "./f
 
 /** Whose conversation the loan is answered in (day-loop correction 2026-11-01): 老周. */
 export const LOAN_CONVERSATION = "laozhou";
-import { advance, dropQuestion, endsInChoice, finishChoice, push, showing, talking, type DialogueState } from "@world/loop/dialogue";
+import { advance, dropQuestion, endsInChoice, finishChoice, push, showing, talking, type DialogueState, type Queued } from "@world/loop/dialogue";
 import { beatQueued, lieDownOrEnd, openChatIfDue, lookQueued, questionQueued, taskStartKey } from "@world/loop/runtime";
 import { askedOn, knows } from "@state/recognise";
 import { gateAdvance } from "@world/motion/reveal";
@@ -1070,7 +1070,7 @@ export const loopActions: Record<string, ActionHandler> = {
     if (session.view !== "lying" || overlayOpen(session) || session.objbarOpen) return;
     if (session.dialogue.queue.some((q) => q.ending.kind === "riseAsk" || q.ending.kind === "bedAsk")) return;
     const day = store.getState().day;
-    session.dialogue = push(session.dialogue, { key: `d${day}:rise:ask`, lines: [{ k: "inner", t: t("room.rise.ask") }], ending: { kind: "riseAsk" } });
+    session.dialogue = push(session.dialogue, riseAskQueued(day));
     ctx.rerender();
   },
   // Right-click is Esc: it closes what is over the view, then steps the camera out.
@@ -1137,6 +1137,8 @@ export const loopActions: Record<string, ActionHandler> = {
     }
     // guidance R14: Vivi's page read: it closes and the app before it is in front again.
     else if (ended?.kind === "docBack") docBack(ctx);
+    // bedside-book: the take line (and the first time's) read: the reader opens over this view.
+    else if (ended?.kind === "openBook") openBook(ctx);
     // guidance R14: a sent task's lines read: 工作台 is home again, the next task's row lit (guide).
     else if (ended?.kind === "taskHome") {
       if (session.view === "desktop" && taskPageId(session.workbenchPage) !== null) {
@@ -1163,10 +1165,15 @@ export const loopActions: Record<string, ActionHandler> = {
     }
     // 睡 / 再待会儿: sleeping goes on as lying down always did; staying changes nothing.
     if (q.ending.kind === "bedAsk") {
-      if (data.choice !== "sleep" && data.choice !== "stay" && !(data.choice === "record" && q.ending.record)) return;
+      if (data.choice !== "sleep" && data.choice !== "stay" && data.choice !== "read" && !(data.choice === "record" && q.ending.record)) return;
       ctx.session.dialogue = finishChoice(ctx.session.dialogue);
       settleSession(ctx.session);
       if (data.choice === "sleep") loopActions["sleep"]!(ctx, {} as DOMStringMap, null as never);
+      // bedside-book: 看书 — the book from the headboard, read lying down; the ask comes back on closing it.
+      else if (data.choice === "read") {
+        takeBook(ctx, "bed");
+        ctx.rerender();
+      }
       else if (data.choice === "record") {
         recordFromBed(ctx);
         ctx.rerender();
@@ -1213,10 +1220,11 @@ export const loopActions: Record<string, ActionHandler> = {
     }
     // lying-view R6: 起床 goes up to 床 (and the day's `rise` beat plays there, once); 再躺一会儿 stays.
     if (q.ending.kind === "riseAsk") {
-      if (data.choice !== "up" && data.choice !== "stay") return;
+      if (data.choice !== "up" && data.choice !== "stay" && data.choice !== "read") return;
       ctx.session.dialogue = finishChoice(ctx.session.dialogue);
       settleSession(ctx.session);
       if (data.choice === "up") getUp(ctx);
+      else if (data.choice === "read") takeBook(ctx, "rise");
       ctx.rerender();
       return;
     }
@@ -1692,10 +1700,10 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.rerender();
   },
 
-  // The book on the desk (title-page FR4): the gamebook reader, full screen; the chip closes it.
+  // bedside-book: the book on the headboard shelf, from day 1: the take line, then the reader (standing).
   "book-open"(ctx) {
-    if (ctx.session.collection.finishedRuns < 1) return;
-    ctx.session.bookOpen = true;
+    if (ctx.session.bookOpen || ctx.session.book) return;
+    takeBook(ctx, "spot");
     ctx.rerender();
   },
   // the ending figurines on the bed (author 2026-11-12): a click opens one large; the page closes it
@@ -1710,7 +1718,8 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.rerender();
   },
   "book-close"(ctx) {
-    ctx.session.bookOpen = false;
+    if (!ctx.session.bookOpen) return;
+    closeBook(ctx);
     ctx.rerender();
   },
 
@@ -1986,6 +1995,48 @@ export const RECORD_ASK_DAY = 5;
  */
 export function recordOffered(state: State, events: readonly GameEvent[]): boolean {
   return state.day === RECORD_ASK_DAY && (state.found as string[]).includes("tape") && !takenByKuro("tape", state, events) && !recordedOn(events, state.day);
+}
+
+/** lying-view R6: 起床？ (起 / 再躺会儿 / 看书). */
+function riseAskQueued(day: number): Queued {
+  return { key: `d${day}:rise:ask`, lines: [{ k: "inner", t: t("room.rise.ask") }], ending: { kind: "riseAsk" } };
+}
+
+/**
+ * bedside-book: 你拿起了床头的书。 as a one-line inner fragment; the first time in this profile the
+ * player's own 「not today……」 after it; then (on reading on) the reader opens.
+ */
+function takeBook(ctx: ActionContext, from: "bed" | "rise" | "spot"): void {
+  const { session } = ctx;
+  const day = ctx.store.getState().day;
+  const first = session.collection.bookRead !== true;
+  session.book = { from, first };
+  const lines: SayLine[] = [{ k: "inner", t: t("room.book.take") }, ...(first ? [{ k: "speaker" as const, who: "me", t: t("room.book.first") }] : [])];
+  session.dialogue = push(session.dialogue, { key: `d${day}:book:take`, lines, ending: { kind: "openBook" } });
+}
+
+/** The reader opens; the first time, the profile remembers it (the session's collection too). */
+function openBook(ctx: ActionContext): void {
+  const { session } = ctx;
+  if (!session.book) return;
+  if (session.collection.bookRead !== true) {
+    session.collection = { ...session.collection, bookRead: true };
+    ctx.bookRead?.();
+  }
+  session.bookOpen = true;
+}
+
+/** Closed: the first time's mutter; then the ask the read came from, again (the player is still lying there). */
+function closeBook(ctx: ActionContext): void {
+  const { session } = ctx;
+  const book = session.book;
+  session.bookOpen = false;
+  session.book = null;
+  if (!book) return;
+  const day = ctx.store.getState().day;
+  if (book.first) session.dialogue = push(session.dialogue, { key: `d${day}:book:after`, lines: [{ k: "inner", t: t("room.book.after") }], ending: { kind: "none" } });
+  if (book.from === "bed") session.dialogue = push(session.dialogue, bedAskQueued(ctx));
+  else if (book.from === "rise") session.dialogue = push(session.dialogue, riseAskQueued(day));
 }
 
 /** The bed question (睡 / 再待会儿, and 打开录音机 when it is offered). */

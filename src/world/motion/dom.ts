@@ -652,7 +652,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
   }
   let turnMove: TurnMove | null = null;
   /** A still's own parts: its picture's layers and its placed things (never a HUD part, never a keyed one). */
-  const STILL_PARTS = ":scope > :is(.fx, .window-light, .evening-look, .scene, .shot-hit, .desk-things, .facing-things, .figures, .desk-book, .door-spot, .box-open)";
+  const STILL_PARTS = ":scope > :is(.fx, .window-light, .evening-look, .scene, .shot-hit, .desk-things, .facing-things, .figures, .shelf-book, .door-spot, .box-open)";
   const reducedMotion = (): boolean => !!win.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
   /** A rotation about the viewer (who stands --m-turn-p in front of the wall at rest). */
   const aboutViewer = (deg: number | string) => `translateZ(var(--m-turn-p)) rotateY(${typeof deg === "number" ? `${deg}deg` : deg}) translateZ(calc(-1 * var(--m-turn-p)))`;

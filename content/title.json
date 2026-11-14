@@ -61,10 +61,6 @@
       "name": "title.fig.collapse"
     }
   },
-  "book": {
-    "src": "/room/book.png",
-    "reader": "https://haodaz.github.io/nottoday/"
-  },
   "dice": {
     "zh": {
       "login": [

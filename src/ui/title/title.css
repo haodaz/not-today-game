@@ -130,11 +130,15 @@
 /* The collection on the desk (FR4/FR8): figures and the book; a missing image keeps its node. */
 .figures{position:absolute;inset:0;pointer-events:none}
 .figure{position:absolute;pointer-events:auto;outline:none}
-.figure img,.desk-book img{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+.figure img{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
 .figure .fig-chip{position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);white-space:nowrap;padding:3px 8px;border-radius:6px;background:rgba(232,228,220,.85);color:#1d2129;font-size:12px;opacity:0;pointer-events:none;transition:opacity 160ms}
 .figure:hover .fig-chip,.figure:focus-visible .fig-chip{opacity:1}
-.desk-book{position:absolute;border:0;padding:0;margin:0;background:transparent;cursor:pointer}
-.desk-book:focus-visible{outline:2px solid rgba(232,228,220,.7);outline-offset:2px}
+/* bedside-book: the stack on the headboard shelf is the book; 4 % brighter and its name on hover */
+.shelf-book{position:absolute;border:0;padding:0;margin:0;background:transparent;cursor:pointer;border-radius:4px;pointer-events:auto}
+.shelf-book:hover,.shelf-book:focus-visible{background:rgba(255,255,255,.04)}
+.shelf-book:focus-visible{outline:2px solid rgba(232,228,220,.7);outline-offset:2px}
+.shelf-book .fig-chip{position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);white-space:nowrap;padding:3px 8px;border-radius:6px;background:rgba(232,228,220,.85);color:#1d2129;font-size:12px;opacity:0;pointer-events:none;transition:opacity 160ms}
+.shelf-book:hover .fig-chip,.shelf-book:focus-visible .fig-chip{opacity:1}
 /* The figurine close-up = the ending's page again (author 2026-11-13): the etching spread over the stage,
    the words on its dark right side in the title's dress; the figurine a small stamp above the label. */
 .figure-card{position:absolute;inset:0;z-index:55;background:#000;color:#efe9df;animation:m-fade-in 220ms ease both;overflow:hidden}

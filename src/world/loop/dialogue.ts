@@ -29,6 +29,8 @@ export type Ending =
   | { readonly kind: "docBack" }
   /** guidance R14: a sent task's closing lines read: 工作台 returns to its home (the next task lit). */
   | { readonly kind: "taskHome" }
+  /** bedside-book: 你拿起了床头的书。 (and the first time's line) read: the reader opens. */
+  | { readonly kind: "openBook" }
   /** object-tutor R2: `record` adds 打开录音机 between them (night 5, the tape found, nothing recorded yet). */
   | { readonly kind: "bedAsk"; readonly record?: true }
   /** lying-view R6: getting up from the bed: 起床 / 再躺一会儿. */
@@ -333,16 +335,20 @@ export const KURO_ASK_OPTIONS: readonly ChoiceOption[] = [
 export const BED_OPTIONS: readonly ChoiceOption[] = [
   { index: 0, text: null, choice: "sleep", labelKey: "room.bed.sleep" },
   { index: 1, text: null, choice: "stay", labelKey: "room.bed.stay" },
+  // bedside-book: 看书, last (the replay driver picks 睡 / 起 by text)
+  { index: 2, text: null, choice: "read", labelKey: "room.book.read" },
 ];
 /** object-tutor R2: 睡 / 打开录音机 / 再待会儿. */
 export const BED_RECORD_OPTIONS: readonly ChoiceOption[] = [
   { index: 0, text: null, choice: "sleep", labelKey: "room.bed.sleep" },
   { index: 1, text: null, choice: "record", labelKey: "room.bed.record" },
   { index: 2, text: null, choice: "stay", labelKey: "room.bed.stay" },
+  { index: 3, text: null, choice: "read", labelKey: "room.book.read" },
 ];
 export const RISE_OPTIONS: readonly ChoiceOption[] = [
   { index: 0, text: null, choice: "up", labelKey: "room.rise.up" },
   { index: 1, text: null, choice: "stay", labelKey: "room.rise.stay" },
+  { index: 2, text: null, choice: "read", labelKey: "room.book.read" },
 ];
 export const DOOR_ASK_OPTIONS: readonly ChoiceOption[] = [
   { index: 0, text: null, choice: "take", labelKey: "delivery.take" },

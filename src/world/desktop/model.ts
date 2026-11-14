@@ -168,8 +168,13 @@ export interface Session {
   judging: { readonly day: number; readonly startedAt: number } | null;
   /** What finished runs left on the desk (title-page FR4/FR8): set by the host from the profile; presentation only. */
   collection: Collection;
-  /** The gamebook reader is open (title-page FR4). */
+  /** The gamebook reader is open (title-page FR4; bedside-book). */
   bookOpen: boolean;
+  /**
+   * bedside-book: where this read came from (the bed's ask, the rise ask, the shelf book) — closing
+   * the reader asks the same again — and whether it is the profile's first (the mutter on close).
+   */
+  book: { readonly from: "bed" | "rise" | "spot"; readonly first: boolean } | null;
   /** An ending figurine on the bed open large in 房间 (author 2026-11-12), or null. */
   figureOpen: import("../../ui/title/table").EndingKind | null;
   /** Where the ending pages are (san-and-endings): the collapse run-to-white + line (collapse only),
@@ -550,6 +555,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     boss: null,
     collection: EMPTY_COLLECTION,
     bookOpen: false,
+    book: null,
     figureOpen: null,
     holding: null,
     lampOn: null,

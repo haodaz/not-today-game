@@ -28,5 +28,6 @@ export function readCollection(storage: KeyValueStorage): Collection {
   const objects = Array.isArray(p.objects) ? (p.objects as unknown[]).filter((v): v is string => typeof v === "string" && KNOWN_OBJECTS.has(v)) : [];
   // photo-album R1: only photos that still exist in content/photos.json, first-seen order, once each.
   const photos = Array.isArray(p.photos) ? [...new Set((p.photos as unknown[]).filter((v): v is string => typeof v === "string" && KNOWN_PHOTOS.has(v)))] : [];
-  return { finishedRuns: count(p.finishedRuns), endings, objects, kurogotchi: endings.good >= 1, photos };
+  // bedside-book: the first-time lines are said once per profile.
+  return { finishedRuns: count(p.finishedRuns), endings, objects, kurogotchi: endings.good >= 1, photos, ...(p.bookRead === true ? { bookRead: true } : {}) };
 }

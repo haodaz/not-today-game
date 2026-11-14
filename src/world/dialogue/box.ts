@@ -137,7 +137,9 @@ export function lineScreens(state: State, session: Session, events?: readonly Ga
   if (!show) return null;
   const fill = (s: string) => fillPlaceholders(s, state.names);
   const labels = show.choices?.map((c) => (c.text !== null ? fill(c.text) : t(c.labelKey!))) ?? null;
-  const all = screens(show.line ? lineText(state, session.dialogue.queue[0], show.line).text : null, labels, geomFor(session.dialogue.queue[0], show.line?.k), fontPx(getLocale()));
+  // bedside-book: the bed and rise asks gained 看书 (three or four choices): they stay on the prompt's screen.
+  const ask = session.dialogue.queue[0]?.ending.kind;
+  const all = screens(show.line ? lineText(state, session.dialogue.queue[0], show.line).text : null, labels, geomFor(session.dialogue.queue[0], show.line?.k), fontPx(getLocale()), ask === "bedAsk" || ask === "riseAsk");
   return { all, page: Math.min(Math.max(0, session.dialogue.page ?? 0), all.length - 1) };
 }
 

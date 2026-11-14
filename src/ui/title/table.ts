@@ -27,7 +27,8 @@ export interface TitleTable {
   readonly newGame: { readonly monitorsWakeMs: number };
   readonly start: { readonly pushMs: number };
   readonly figures: Readonly<Record<EndingKind, { readonly src: string; readonly name: string }>>;
-  readonly book: { readonly src: string; readonly reader: string };
+  /** bedside-book: no longer read (the book is the shelf stack; the reader is /gamebook/index.html). Optional, so it can go. */
+  readonly book: { readonly src: string; readonly reader: string } | null;
   /** Neutral values for the 🎲 (optional until content has them). */
   /** The 🎲 lists, by language and question (a question with no list has a disabled 🎲). */
   readonly dice: Readonly<Record<"zh" | "en", Readonly<Partial<Record<DiceQuestion, readonly string[]>>>>>;
@@ -81,8 +82,8 @@ export function parseTitle(input: unknown): TitleTable {
     keys(f, ["src", "name"], `figures.${kind}`);
     figures[kind] = Object.freeze({ src: str(f.src, `figures.${kind}.src`), name: str(f.name, `figures.${kind}.name`) });
   }
-  const book = obj(top.book, "book");
-  keys(book, ["src", "reader"], "book");
+  const book = top.book === undefined ? null : obj(top.book, "book");
+  if (book) keys(book, ["src", "reader"], "book");
 
   // dice: { zh|en: { question: [names] } } (2026-11-05: one shared list rolled 「哥」 as a name and 「老板」 as what family calls you).
   const dice = { zh: {}, en: {} } as Record<"zh" | "en", Partial<Record<DiceQuestion, readonly string[]>>>;
@@ -108,7 +109,7 @@ export function parseTitle(input: unknown): TitleTable {
     newGame: Object.freeze({ monitorsWakeMs: ms(newGame.monitorsWakeMs, "newGame.monitorsWakeMs") }),
     start: Object.freeze({ pushMs: ms(start.pushMs, "start.pushMs") }),
     figures: Object.freeze(figures),
-    book: Object.freeze({ src: str(book.src, "book.src"), reader: str(book.reader, "book.reader") }),
+    book: book ? Object.freeze({ src: str(book.src, "book.src"), reader: str(book.reader, "book.reader") }) : null,
     dice: Object.freeze(dice),
   });
 }

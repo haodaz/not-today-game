@@ -51,8 +51,8 @@ describe("R2 · choices in the column on the right", () => {
     expect(dlg).not.toContain('class="more"');
     const col = column(out)!;
     const order = [...col.matchAll(/data-action="loop-choice" data-index="(\d)" data-choice="([a-z]+)"/g)].map((m) => m[2]);
-    expect(order).toEqual(["sleep", "stay"]);
-    expect(rows(out)).toEqual(["plain", "plain"]);
+    expect(order).toEqual(["sleep", "stay", "read"]);
+    expect(rows(out)).toEqual(["plain", "plain", "plain"]);
     expect(col).toContain('<i class="dc-ic plain" aria-hidden="true">◇</i>');
     // A click on the box (or its mask) does not advance while choices are up.
     const before = r.session.dialogue;

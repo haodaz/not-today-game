@@ -83,6 +83,8 @@ export interface TitleModel {
   readonly albumOpen: string | null;
   /** The ending figurine open large on the menu (author 2026-11-12), or null. */
   readonly figureOpen: EndingKind | null;
+  /** bedside-book: the book's reader is open over the menu. Absent = closed. */
+  readonly bookOpen?: boolean;
   /**
    * opening R1: after 开始, the name printed into the shipping label (`chars` typed so far), the
    * label stuck onto the box, the hold, the fade to black; null before. No input meanwhile.

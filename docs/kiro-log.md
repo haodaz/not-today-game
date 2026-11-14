@@ -2632,3 +2632,18 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
 - Driver: the day-18 tail clicks through the pages and shoots one frame per page/step, named by its class. Not run.
 - Tests: the endings.test page-order case is rewritten to the exact table; pullout.test's bad first page is now `wake`; sound.test covers tender/lines/wake; new `tests/ending-pages.test.ts` (with one snapshot written).
 - Content note for Claude: `ending.lines.bad.2.kuro` says 他 / "him" for the one asleep in the bed, who is the player. voices.md forbids 他/她 for the player. Not changed.
+
+## 2026-11-13 · bedside-book
+
+- The shelf book: `collection.ts` `shelfBook()` (a transparent `.shelf-book` button at `ROOM_COLLECTION.book` {1120, 500, 200, 50}, hover chip `room.book`) replaces `deskBook`. It is in 房间 from day 1 and in the title room; CSS is in title.css, and the motion/room selectors are renamed.
+- The URL: `bookUrl(names | null, days)` → `/gamebook/index.html?name&nick&call&boss&ta&days&embed=1` (`BOOK_PAGE`). Empty name fields are left out; `ta` is 她 for she, else 他. `daysLived(state, events)` = day once today's `beat:shutdown` step is in the log, else day − 1. `titleBookDays` = 18 after a finished run, else 0.
+- The choices: `BED_OPTIONS`, `BED_RECORD_OPTIONS` and `RISE_OPTIONS` end with `read` (`room.book.read`). `layout.screens(..., share)` keeps the bed and rise asks' choices on the prompt's screen; without it, three choices with a one-row prompt needed one extra click to show.
+- The flow (game.ts):
+  - `takeBook(from)` pushes `room.book.take`, plus `room.book.first` as `speaker who:me` the first time in the profile, ending in the new `openBook`.
+  - `openBook` sets `bookOpen`; the first time it marks `collection.bookRead` and calls `ctx.bookRead`.
+  - `book-close` pushes `room.book.after` the first time, then the bed ask or the rise ask again when the read came from one.
+  - The session gains `book: { from, first }`. `book-open` is added to `GUIDE_ALLOWS`.
+- The profile: `ProfileWriter.recordBookRead`, `readCollection` → `bookRead`, main.ts `onBookRead` (saved runs only, like the album). The title page opens the reader with no names and no lines, and does not set the flag.
+- title.json `book` is now unused and optional in its parser. Questions for Claude: change or drop it, and may `/room/book.png` be deleted?
+- Tests: new `tests/bedside-book.test.ts`; updated ending-record, title, object-tutor, lying-view, world-prompts, saves. Snapshots refreshed for the shelf book: loop-hud ×2, navigation ×3, nightfall, title ×3. The `-u` run also removed the old title book entries and the long-standing obsolete desk-prints entry.
+- tsc clean; vitest 170 files, 2406 passed.

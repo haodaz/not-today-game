@@ -14,7 +14,7 @@
    placed things move 1.5× (a little parallax); the HUD stays. */
 .room.looking{background-size:calc(1600px * var(--pan-k,1)) calc(900px * var(--pan-k,1));background-position:calc(50% + var(--pan-x,0px)) calc(50% + var(--pan-y,0px))}
 .room.looking > :is(.fx,.door-bg,.evening-look){translate:var(--pan-x,0px) var(--pan-y,0px);scale:var(--pan-k,1)}
-.room.looking > :is(.shot-hit,.desk-things,.facing-things,.figures,.desk-book){translate:var(--pan-px,0px) var(--pan-py,0px)}
+.room.looking > :is(.shot-hit,.desk-things,.facing-things,.figures,.shelf-book){translate:var(--pan-px,0px) var(--pan-py,0px)}
 /* The box opens where it is, on the floor of 房间 (2026-11-02): the open box at its rect while its beat is on show. */
 /* The edges say where you can go (room-turn 2026-11-04): on every facing a soft ← / → at the left /
    right 8 % turns that way; back at 桌子's bottom. Under the HUD. */
@@ -74,7 +74,7 @@
 .room input,.room textarea{-webkit-user-select:text;user-select:text}
 .room img{-webkit-user-drag:none;user-drag:none}
 /* While the head is turned the placed cutouts, which are flat on the stage, step aside. */
-#app.look-turned .desk-things,#app.look-turned .figures,#app.look-turned .desk-book{opacity:0;transition:opacity .15s}
+#app.look-turned .desk-things,#app.look-turned .figures,#app.look-turned .shelf-book{opacity:0;transition:opacity .15s}
 /* The bed wall and the big window wall (room-turn 2026-11-04): 1664×928 stills, cover-fitted and
    centred like room.jpg. */
 .room.bed-view,.m-turn-face.bed-view{background-image:url(/room/shots/bed.jpg)}
@@ -98,7 +98,7 @@
 .room .facing-things > .at > button.slot:hover,.room .facing-things > .at > button.slot:focus-visible{outline:2px solid rgba(232,228,220,.55);outline-offset:2px}
 /* The placed things fade in once the camera has arrived (room-scene correction 2026-11-02); --late
    is how far into the fade a re-render finds them, so a re-render does not restart it. */
-.stage.m-late>.desk-things,.stage.m-late>.facing-things,.stage.m-late>.shot-hit,.stage.m-late>.figures,.stage.m-late>.desk-book{animation:m-fade-in var(--late-dur,200ms) both;animation-delay:var(--late,0ms)}
+.stage.m-late>.desk-things,.stage.m-late>.facing-things,.stage.m-late>.shot-hit,.stage.m-late>.figures,.stage.m-late>.shelf-book{animation:m-fade-in var(--late-dur,200ms) both;animation-delay:var(--late,0ms)}
 /* 今日清单 */
 .room .list{position:absolute;left:28px;top:28px;width:280px;background:var(--paper);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.35);border-radius:10px;padding:12px 16px;box-shadow:0 6px 24px rgba(0,0,0,.12);font-size:15px;line-height:1.7}
 .room .list .h .h{font-size:11px;letter-spacing:.2em;color:#8a7f70;margin-bottom:6px}

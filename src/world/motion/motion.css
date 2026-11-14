@@ -49,7 +49,7 @@
 @keyframes m-turn-rotate{from{transform:translateZ(var(--m-turn-p)) rotateY(0deg) translateZ(calc(-1 * var(--m-turn-p)))}to{transform:translateZ(var(--m-turn-p)) rotateY(var(--m-turn-to)) translateZ(calc(-1 * var(--m-turn-p)))}}
 @keyframes m-turn-rotate-2{from{transform:translateZ(var(--m-turn-p)) rotateY(0deg) translateZ(calc(-1 * var(--m-turn-p)))}50%{transform:translateZ(var(--m-turn-p)) rotateY(calc(var(--m-turn-to) / 2)) translateZ(calc(-1 * var(--m-turn-p)))}to{transform:translateZ(var(--m-turn-p)) rotateY(var(--m-turn-to)) translateZ(calc(-1 * var(--m-turn-p)))}}
 @keyframes m-turn-blur{50%{filter:blur(var(--m-turn-blur))}}
-.stage.m-turning > :is(.fx,.window-light,.evening-look,.scene,.shot-hit,.desk-things,.facing-things,.figures,.desk-book,.door-bg,.door-spot,.door-hand,.door-beat,.gap-glow,.box-open){visibility:hidden}
+.stage.m-turning > :is(.fx,.window-light,.evening-look,.scene,.shot-hit,.desk-things,.facing-things,.figures,.shelf-book,.door-bg,.door-spot,.door-hand,.door-beat,.gap-glow,.box-open){visibility:hidden}
 /* Shutdown: the monitor darkens in place (it changes, it does not leave) */
 @keyframes m-power-off{from{filter:hue-rotate(var(--tint,0deg)) blur(var(--blur,0px)) brightness(1.8)}}
 /* Left ↔ right */

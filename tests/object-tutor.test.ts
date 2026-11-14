@@ -100,12 +100,12 @@ describe("R2 · night 5: 打开录音机", () => {
     const five = night(5);
     five.r.act("bed");
     expect(keys(five.r.session)).toEqual(["d5:bed:ask"]);
-    expect(choices(five.r)).toEqual(["sleep", "record", "stay"]);
-    expect(offered(five.r).map((c) => t(c.labelKey!))).toEqual([t("room.bed.sleep"), t("room.bed.record"), t("room.bed.stay")]);
+    expect(choices(five.r)).toEqual(["sleep", "record", "stay", "read"]);
+    expect(offered(five.r).map((c) => t(c.labelKey!))).toEqual([t("room.bed.sleep"), t("room.bed.record"), t("room.bed.stay"), t("room.book.read")]);
     for (const day of [4, 6]) {
       const n = night(day);
       n.r.act("bed");
-      expect(choices(n.r), `day ${day}`).toEqual(["sleep", "stay"]);
+      expect(choices(n.r), `day ${day}`).toEqual(["sleep", "stay", "read"]);
     }
   });
 
@@ -122,14 +122,14 @@ describe("R2 · night 5: 打开录音机", () => {
     expect(r.session.holding).toBeNull();
     expect(r.session.view).toBe("lying");
     expect(keys(r.session)).toEqual(["d5:bed:ask"]);
-    expect(choices(r)).toEqual(["sleep", "record", "stay"]);
+    expect(choices(r)).toEqual(["sleep", "record", "stay", "read"]);
     // Again, and REC this time: one `record` event; put down, asked without the recorder.
     r.act("loop-choice", { choice: "record" });
     r.act("obj-key", { object: "tape", key: "rec" });
     expect(store.getEvents().filter((e) => e.kind === "record")).toHaveLength(1);
     r.act("loop-put-down");
     expect(r.session.view).toBe("lying");
-    expect(choices(r)).toEqual(["sleep", "stay"]);
+    expect(choices(r)).toEqual(["sleep", "stay", "read"]);
   });
 
   it("not offered without the tape found; a stale 打开录音机 on a two-choice question does nothing", () => {
@@ -139,7 +139,7 @@ describe("R2 · night 5: 打开录音机", () => {
     expect(recordOffered({ ...state, found: (state.found as string[]).filter((x) => x !== "tape") } as typeof state, five.store.getEvents())).toBe(false);
     const n = night(6);
     n.r.act("bed");
-    expect(choices(n.r)).toEqual(["sleep", "stay"]);
+    expect(choices(n.r)).toEqual(["sleep", "stay", "read"]);
     n.r.act("loop-choice", { choice: "record" });
     expect(n.r.session.holding).toBeNull();
     expect(keys(n.r.session)).toEqual(["d6:bed:ask"]);

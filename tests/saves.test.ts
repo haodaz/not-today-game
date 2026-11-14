@@ -161,7 +161,7 @@ describe("profile", () => {
     // photo-album R1: recordPhoto only writes too.
     // playtest-1105 R8: clear (清除全部记录 only) removes it; still no read.
     // first-use-hints R2: recordHint only writes too.
-    expect(Object.keys(writer)).toEqual(["write", "increment", "recordEnding", "recordObject", "recordPhoto", "writeKurogotchi", "clear", "recordHint"]);
+    expect(Object.keys(writer)).toEqual(["write", "increment", "recordEnding", "recordObject", "recordPhoto", "writeKurogotchi", "clear", "recordBookRead", "recordHint"]);
     expect(writer.increment("runs")).toBeUndefined();
     expect(writer.recordEnding("bad")).toBeUndefined();
     expect(writer.recordObject("chick")).toBeUndefined();

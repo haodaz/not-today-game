@@ -8,7 +8,7 @@ import { readProfile } from "@state/profile-read";
 import { memoryStorage } from "@state/slot";
 import { createStore, type Store } from "@state/store";
 import { watchEndings, type EndingKind } from "@world/endings/record";
-import { deskBook, EMPTY_COLLECTION } from "@world/room/collection";
+import { EMPTY_COLLECTION } from "@world/room/collection";
 import { renderRoom } from "@world/room/hud";
 import { initialSession } from "@world/desktop/model";
 import { mountTitle } from "../src/ui/title/mount";
@@ -103,15 +103,15 @@ describe("recordEnding runs only for an ending appended after the watch began", 
   });
 });
 
-describe("the desk book", () => {
-  it("never renders while finishedRuns is 0; renders once a run has finished", () => {
-    expect(deskBook(EMPTY_COLLECTION)).toBeNull();
-    expect(deskBook({ finishedRuns: 1, endings: { bad: 0, survive: 1, warm: 0, good: 0, collapse: 0 }, objects: [], kurogotchi: false })).not.toBeNull();
-    const store = createStore({ startDay: 13 });
+describe("the book by the bed (bedside-book)", () => {
+  it("the shelf book is in 房间 from day 1 whatever the profile; the desk book is gone", () => {
+    const store = createStore({ startDay: 1 });
     const session = initialSession({ beat: "work", time: "10:00" }, "left", "room");
     const room = (c: typeof session.collection) => renderRoom({ state: store.getState(), events: store.getEvents(), session: { ...session, collection: c } }).value;
-    expect(room(EMPTY_COLLECTION)).not.toContain("desk-book");
+    for (const c of [EMPTY_COLLECTION, { finishedRuns: 2, endings: { bad: 0, survive: 2, warm: 0, good: 0, collapse: 0 }, objects: [], kurogotchi: false }]) {
+      expect(room(c)).toContain('class="shelf-book" data-action="book-open"');
+      expect(room(c)).not.toContain("desk-book");
+    }
     expect(room(EMPTY_COLLECTION)).not.toContain('class="figure"');
-    expect(room({ finishedRuns: 2, endings: { bad: 0, survive: 2, warm: 0, good: 0, collapse: 0 }, objects: [], kurogotchi: false })).toContain("desk-book");
   });
 });

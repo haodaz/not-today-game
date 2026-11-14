@@ -138,6 +138,8 @@ function startGame(store: Store, saved: boolean, prologue = false): void {
     placement: { storage: saved ? window.localStorage : null, runId: store.getRunId() },
     // photo-album R1: a room photo seen developed goes into the profile's 影集 (saved runs only).
     onPhotoDeveloped: saved ? (key) => profile.recordPhoto(key) : undefined,
+    // bedside-book: the book's first opening is remembered in the profile (a debug run: this page only).
+    onBookRead: saved ? () => profile.recordBookRead() : undefined,
     // first-use-hints R2: the switch (`nt_hints`, default on) and the hints earlier runs were shown;
     // a hint seen goes into the profile (a debug run only remembers it for the page).
     hints: {
