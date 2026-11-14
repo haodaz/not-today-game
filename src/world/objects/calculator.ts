@@ -9,6 +9,7 @@ import { ringOf } from "@state/stages";
 import { ringIndex, RINGS } from "@world/desktop/rings";
 import { Bits, drawSegLine, finer, SEG_PITCH, type Frame } from "./frame";
 import { step, type ObjectEnv, type Program } from "./program";
+import { BULLS_DIGITS, guessBulls, newBulls, type BullsState } from "./games/bulls";
 import { NO_PRESS, pressed, upgradedHi, type KuroPress } from "./taken";
 
 export const CALC_CELLS = 8;
@@ -53,6 +54,67 @@ export interface CalculatorState {
   readonly history: readonly string[];
   /** Kuro's press tracker (object-upgrade 2026-11-03). */
   readonly press: KuroPress;
+  /** device-games 1: 猜数字 under way (the `game` key enters it; C twice on an empty display leaves). Absent = the calculator. */
+  readonly game?: CalcGame | null;
+}
+
+/** device-games 1: 猜数字 on the display. */
+export interface CalcGame {
+  readonly bulls: BullsState;
+  /** The digits typed for the next guess. */
+  readonly input: string;
+  /** The last guess's `nAmB`, until the next key. */
+  readonly feedback: string | null;
+  /** The display blinks `blinks` times from `blinkAt` (a rejected guess once, a win three times). */
+  readonly blinkAt: number | null;
+  readonly blinks: number;
+  /** The last key was C on an empty display (a second one leaves the mode). */
+  readonly lastC: boolean;
+  /** Games started this time (each a new seeded secret). */
+  readonly n: number;
+}
+/** One blink: off this long, then on this long. */
+export const CALC_BLINK_MS = 160;
+
+const newGame = (env: ObjectEnv, n: number): CalcGame => ({ bulls: newBulls(`${env.seed}:${n}`), input: "", feedback: null, blinkAt: null, blinks: 0, lastC: false, n });
+
+/** What the display shows in 猜数字: the input, the feedback, the secret at the end, or ---- at the start. */
+export function gameDisplay(g: CalcGame): string {
+  if (g.bulls.over) return g.bulls.secret;
+  if (g.input) return g.input;
+  if (g.feedback) return g.feedback;
+  return "-".repeat(BULLS_DIGITS);
+}
+/** Whether the display is off (a blink's dark half) at `t`. */
+export function gameBlinkOff(g: CalcGame, t: number): boolean {
+  if (g.blinkAt === null) return false;
+  const dt = t - g.blinkAt;
+  if (dt < 0 || dt >= g.blinks * 2 * CALC_BLINK_MS) return false;
+  return Math.floor(dt / CALC_BLINK_MS) % 2 === 0;
+}
+
+/** A key in 猜数字. */
+function gameKey(s: CalculatorState, g: CalcGame, key: string, env: ObjectEnv): CalculatorState {
+  const at = (x: Partial<CalcGame>): CalculatorState => ({ ...s, game: { ...g, ...x } });
+  if (key === "off") return { ...s, on: false, game: null };
+  if (key === "C") {
+    if (g.bulls.over) return at({ ...newGame(env, g.n + 1) });
+    if (g.input) return at({ input: "", lastC: false });
+    // the display empty: a second C leaves the mode (the calculator as it was)
+    if (g.lastC) return { ...fresh(s), game: null };
+    return at({ feedback: null, lastC: true });
+  }
+  if (g.bulls.over) return s;
+  if (/^[0-9]$/.test(key)) {
+    const input = g.feedback ? key : g.input.length >= BULLS_DIGITS ? g.input : g.input + key;
+    return at({ input, feedback: null, lastC: false });
+  }
+  if (key === "=") {
+    const r = guessBulls(g.bulls, g.input);
+    if (r.rejected) return at({ blinkAt: env.t, blinks: 1, lastC: false });
+    return at({ bulls: r.state, input: "", feedback: `${String(r.a)}A${String(r.b)}b`, lastC: false, ...(r.won ? { blinkAt: env.t, blinks: 3 } : {}) });
+  }
+  return at({ lastC: false });
 }
 
 /** A number as at most 8 digits (and a point), or E when it does not fit. */
@@ -100,7 +162,11 @@ export function drawCalculator(s: CalculatorState, env: ObjectEnv): Frame {
   // glimpse on loan, only Kuro once taken; object-upgrade 2026-11-03).
   if (env.upgraded) return upgradedHi(env, s.press, { lines: [...s.history.slice(-HISTORY), s.display] });
   const b = new Bits(CALC_W, CALC_H);
-  if (s.on) drawSegLine(b, 1, 1, s.display, CALC_CELLS);
+  // device-games 1: 猜数字 on the same digits (the input, nAmb, the secret; ---- to start)
+  const g = s.game ?? null;
+  if (s.on && g) {
+    if (!gameBlinkOff(g, env.t)) drawSegLine(b, 1, 1, gameDisplay(g), CALC_CELLS);
+  } else if (s.on) drawSegLine(b, 1, 1, s.display, CALC_CELLS);
   const f = finer(b, env.level);
   return { kind: "pixels", w: f.w, h: f.h, bits: f.bits, ink: s.on ? env.lit : 0 };
 }
@@ -118,6 +184,9 @@ export const calculator: Program<CalculatorState> = {
     const s = { ...s0, presses: s0.presses + 1, press: pressed(s0.press, env.t) };
     // Taken: the app is gone; Kuro answers only with talk (no arithmetic, no history).
     if (env.taken) return step(s);
+    // device-games 1: `game` (the title's 玩一局) enters 猜数字; in it every key is the game's.
+    if (key === "game") return env.upgraded ? step(s) : step({ ...s, on: true, game: newGame(env, (s.game?.n ?? -1) + 1) });
+    if (s.game) return step(gameKey(s, s.game, key, env));
     if (key === "off") return step({ ...s, on: false });
     if (key === "C") {
       const u = env.upgraded ? null : unaskedAt(env, s.presses);

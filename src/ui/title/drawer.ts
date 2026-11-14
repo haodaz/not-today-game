@@ -38,11 +38,17 @@ function cellPhoto(id: string): string {
   return id === KURO_ID ? "/objects/kurogotchi/base.png" : `/objects/${id}_front.png`;
 }
 
+/** device-games: the objects that play a game of their own (the calculator 猜数字, the 文曲星 Wordle). */
+export const GAME_IDS: readonly string[] = ["calculator", "dictionary"];
+
 /** The drawer grid: one cell per found object, the Kurogotchi last. Nothing found is not shown. */
 export function drawerGrid(c: Collection): SafeHtml {
   const cells = drawerIds(c).map((id) => {
     const name = hasString(`obj.name.${id}`) ? tr(`obj.name.${id}`) : null;
-    return html`<button type="button" class="${cls("drawer-cell", id === KURO_ID && "kuro")}" data-action="drawer-open" data-object="${id}" aria-label="${t(`obj.name.${id}`)}"><img class="drawer-photo" src="${cellPhoto(id)}" alt="" draggable="false"><span class="drawer-cell-name">${name}</span></button>`;
+    const cell = html`<button type="button" class="${cls("drawer-cell", id === KURO_ID && "kuro")}" data-action="drawer-open" data-object="${id}" aria-label="${t(`obj.name.${id}`)}"><img class="drawer-photo" src="${cellPhoto(id)}" alt="" draggable="false"><span class="drawer-cell-name">${name}</span></button>`;
+    // device-games: 玩一局 under the card opens the device in its game (only these two, only when collected)
+    if (!GAME_IDS.includes(id) || !hasString("objbar.play")) return cell;
+    return html`<div class="drawer-card" data-object="${id}">${cell}<button type="button" class="drawer-play" data-action="drawer-play" data-object="${id}">${tr("objbar.play")}</button></div>`;
   });
   return html`<div class="drawer-grid">${cells}</div>`;
 }
@@ -109,7 +115,7 @@ export interface DrawerObject {
   destroy(): void;
 }
 
-export function createDrawerObject(id: string, root: HTMLElement, deps: DrawerDeps): DrawerObject {
+export function createDrawerObject(id: string, root: HTMLElement, deps: DrawerDeps, opts: { readonly game?: boolean; readonly seed?: string } = {}): DrawerObject {
   const doc = root.ownerDocument;
   const win = doc.defaultView!;
   const raster = systemRaster(doc);
@@ -122,9 +128,12 @@ export function createDrawerObject(id: string, root: HTMLElement, deps: DrawerDe
   const program: Program<unknown> | null = programOf(id);
   const start = win.performance.now();
   // The drawer always shows the original (object-upgrade 2026-11-03): never upgraded, never taken.
-  const env = (): ObjectEnv => ({ day, level: 0, upgraded: false, taken: false, time: session.clock.time, t: win.performance.now() - start, seed: `drawer:${id}`, lit: 1, pager: [], uses: 0 });
+  // device-games: the seed carries the host's day (the word / the secret of the day, not of the open)
+  const env = (): ObjectEnv => ({ day, level: 0, upgraded: false, taken: false, time: session.clock.time, t: win.performance.now() - start, seed: opts.seed ?? `drawer:${id}`, lit: 1, pager: [], uses: 0 });
   // Fresh program state for this open (in memory only; no store, no events).
   if (program) session.hand.programs[id] = program.init(env());
+  // device-games: 玩一局 opens it straight into its game mode (the program's own `game` key).
+  if (program && opts.game && GAME_IDS.includes(id)) session.hand.programs[id] = program.key(session.hand.programs[id], "game", env()).state;
 
   let frame = 0;
   const stage = () => root.querySelector<HTMLElement>(`[data-drawer-stage="${id}"]`);
@@ -183,8 +192,14 @@ export function createDrawerObject(id: string, root: HTMLElement, deps: DrawerDe
       if (program?.keySound) playSfx(program.keySound.id, deps.muted(), program.keySound.rate ? { rate: program.keySound.rate } : {});
       if (walkman(key)) return; // the walkman's transport goes to the theme, not the tape program
       if (program) {
-        const { state: next } = program.key(session.hand.programs[id], key, env());
+        const { state: next, out } = program.key(session.hand.programs[id], key, env());
         session.hand.programs[id] = next;
+        // the device's own sounds (the 文曲星's two beeps on a win)
+        for (const o of out) if ("sound" in o) {
+          const play = () => playSfx(o.sound, deps.muted(), o.rate ? { rate: o.rate } : {});
+          if (o.delay) win.setTimeout(play, o.delay);
+          else play();
+        }
       }
       paint();
     },

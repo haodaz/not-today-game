@@ -2663,3 +2663,25 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
 - Content check: rounds 1–3 pass with 0 自己人; round 4 needs all 5 (including 你). A player who spends anyone in round 3 cannot pass round 4 without Kuro.
 - Tests: new `tests/fill.test.ts` (loader, engine, solver on the content, replay, round-1 snapshot, cheat → perfect, Kuro → wrong, settlement rows). `tests/balance.test.ts` now runs on a day-11 fixture with the balance put back.
 - tsc clean; vitest 171 files, 2416 passed.
+
+## 2026-11-13 · device-games
+
+- Engines (pure, no DOM):
+  - `objects/games/bulls.ts`: `newBulls(seed)` (four distinct digits, first may be 0, from the seed), `scoreBulls`, `guessBulls` → `{ state, a, b, won, over, rejected }`. Eight tries.
+  - `objects/games/wordle.ts`: `WORDLE_ANSWERS` (content/wordle.json, checked: five lower-case letters), `wordleAnswer(seed)`, `newWordle`, `markWordle` (hits first, then near while an unmatched copy is left), `guessWordle` → `{ state, marks, won, over, rejected }`, and `letterMarks` for the strip. Six tries.
+- Calculator: `CalculatorState.game`; the `game` key enters 猜数字.
+  - The display shows `----`, the input, `nAmb` (SEGMENTS' A / b) until the next key, or the secret at the end.
+  - A bad guess blinks once; a win blinks three times; a loss shows the secret steady.
+  - C clears the input, starts a new game when one is over, and on an empty display twice leaves the mode. `off` leaves and switches off.
+  - Outside the mode nothing changed.
+- Dictionary: `DictionaryState.game`; the `game` key opens it on Wordle, with the word from `seed:day`.
+  - Letters type, `back` deletes, `lookup` judges, `power` leaves.
+  - The screen in the mode is a pixel frame at twice the cells' resolution (192 × 50, the same shape): the 6 × 5 grid (hit a lit block with the letter cut out, near a dotted underline, miss plain), the letters used to the right on two lines, and a lost answer scrolling once along the bottom line, then staying.
+  - A win returns two `key-press` beeps.
+- Title drawer (the 老物件 panel):
+  - The calculator and dictionary cards gain `objbar.play` (`drawer-play`) under the card, only when collected.
+  - `createDrawerObject(id, root, deps, { game, seed })` sends `game` after init and now plays the program's own sounds.
+  - The mount's seed is `drawer:<id>:<today>`, so the secret and the word are the day's: a reload or a reopen gets the same one.
+- Not as the spec words it: there are no held keys in the device layer, so "C held" and "back held" are not built (C twice on an empty display, and power, leave). The Wordle strip sits right of the grid, not below it: the screen has no room below.
+- Tests: new `tests/device-games.test.ts` (engines, both modes, the chip, the drawer object in game mode, a calculator snapshot).
+- tsc clean; vitest 172 files, 2429 passed.

@@ -15,7 +15,7 @@ import { arrived, canStart, diceOptions, gateFor, initialTitle, needsGate, pastG
 import { titleTable, type IdleEvent } from "./table";
 import { renderTitle } from "./view";
 import { morph } from "../dom/morph";
-import { createDrawerObject, createKurogotchiDrawer, drawerIds, KURO_ID, type DrawerObject, type KuroDrawerObject, type KuroMemoryStore } from "./drawer";
+import { createDrawerObject, createKurogotchiDrawer, drawerIds, GAME_IDS, KURO_ID, type DrawerObject, type KuroDrawerObject, type KuroMemoryStore } from "./drawer";
 import { albumRing, albumStep, hasAlbum } from "./album";
 import type { OpeningPhase } from "./model";
 import { playSfx } from "@world/loop/sfx";
@@ -241,7 +241,7 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
   };
   const prefersReducedMotion = () => !!win.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
   const todayISO = () => new Date().toISOString().slice(0, 10);
-  const openDrawerObject = (id: string) => {
+  const openDrawerObject = (id: string, game = false) => {
     closeDrawerObject();
     // The Kurogotchi (object-drawer 3) is its own machine, with memory; the eight objects are the
     // store-free device/photo preview.
@@ -262,12 +262,12 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
         sound();
       },
       muted: () => model.muted,
-    });
+    }, { game, seed: `drawer:${id}:${todayISO()}` });
   };
-  const toDrawer = (open: string | null) => {
+  const toDrawer = (open: string | null, game = false) => {
     closeDrawerObject();
     set({ ...model, screen: "drawer", drawerOpen: open });
-    if (open) openDrawerObject(open);
+    if (open) openDrawerObject(open, game);
   };
 
   /** 影集's ← → (photo-album R2): the previous / next collected photo, wrapping. */
@@ -408,6 +408,11 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
       if (id && ids.includes(id)) toDrawer(id);
     },
     "drawer-grid": () => toDrawer(null),
+    // device-games: 玩一局 — the calculator or the 文曲星, opened in its game
+    "drawer-play": (el) => {
+      const id = el.dataset.object;
+      if (id && GAME_IDS.includes(id) && drawerIds(model.collection).includes(id)) toDrawer(id, true);
+    },
     "obj-flip": (el) => {
       if (drawerObj && el.dataset.object === model.drawerOpen) drawerObj.flip();
     },

@@ -75,6 +75,11 @@
 .drawer-photo{width:96px;height:96px;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(0,0,0,.25))}
 .drawer-cell.kuro .drawer-photo{image-rendering:pixelated}
 .drawer-cell-name{font-size:14px;letter-spacing:.1em}
+/* device-games: 玩一局 under the calculator's and the 文曲星's cards */
+.drawer-card{display:flex;flex-direction:column;gap:8px}
+.drawer-card .drawer-cell{flex:1}
+.drawer-play{align-self:center;padding:5px 16px;border:1px solid rgba(29,33,41,.55);border-radius:14px;background:rgba(255,255,255,.55);color:#1d2129;font:inherit;font-size:13px;letter-spacing:.15em;cursor:pointer}
+.drawer-play:hover,.drawer-play:focus-visible{background:#1d2129;color:#efe9df}
 /* An opened object in the middle. */
 .drawer-open{display:flex;flex-direction:column;align-items:center;gap:14px;min-height:360px}
 .drawer-open .drawer-back{align-self:flex-start;width:auto;padding:8px 18px;border:1px solid #8a7f70;border-radius:4px;background:transparent;color:#1d2129;font:inherit;letter-spacing:.15em;cursor:pointer}
