@@ -91,7 +91,8 @@
         },
         {
           "k": "narration",
-          "t": "A week before graduation, somebody noticed it. You never knew who was first."
+          "t": "A week before graduation, somebody noticed it. You never knew who was first.",
+          "backdrop": "/room/dream/schoolyard.jpg"
         },
         {
           "k": "speaker",

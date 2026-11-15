@@ -91,7 +91,8 @@
         },
         {
           "k": "narration",
-          "t": "毕业前一个星期，不知道谁先看见的。"
+          "t": "毕业前一个星期，不知道谁先看见的。",
+          "backdrop": "/room/dream/schoolyard.jpg"
         },
         {
           "k": "speaker",
