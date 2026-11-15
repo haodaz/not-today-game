@@ -25,6 +25,8 @@ export const MASK_ALLOWS: ReadonlySet<string> = new Set([
   "dlg-history-close",
   "settings-open",
   "settings-close",
+  "status-open",
+  "status-close",
   "settings-email-send",
   "settings-lang",
   "settings-home",

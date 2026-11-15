@@ -2685,3 +2685,21 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
 - Not as the spec words it: there are no held keys in the device layer, so "C held" and "back held" are not built (C twice on an empty display, and power, leave). The Wordle strip sits right of the grid, not below it: the screen has no room below.
 - Tests: new `tests/device-games.test.ts` (engines, both modes, the chip, the drawer object in game mode, a calculator snapshot).
 - tsc clean; vitest 172 files, 2429 passed.
+
+## 2026-11-15 · status-panel
+
+- New `src/world/room/status.ts`:
+  - `hudTiles(session, state, { settings })`: the strip 人物 · 道具 · 设置 as 56 px paper tiles, each a 16 × 16 inline pixel SVG (`crispEdges`: head-and-shoulders, open carton, gear) over its word; the open one gets `on` (inverted).
+  - `hearts(affinity)`: 20 a heart, a half for the odd 10, five.
+  - `statusNumbers(state, events)` and `statusPanel(...)`: in the settings layer's card, the portrait (`playerPortraitSrc`), the login, `status.day` with the HUD's beat word, 理智 bar (`band-n` from `sanBand`, `low` flicker under 30 unless reduced motion), 克总 hearts (empty = outline, half = outline + left half), 同化 bar in the ending red with a tick at `assimilationGoodMax`, `status.objects` n / 8 (+ `status.upgraded` when ≥ 1), and `status.chats` (the `chat` events).
+- Wiring:
+  - hud.ts: the room draws `hudTiles` in place of `settingsButton()` + `itemsButton()`, and `statusPanel` beside `settingsPanel`.
+  - game.ts: the desktop's hud-host draws `hudTiles` with settings off (设置 stays the dock's tile there, guidance R15), and the panel beside settings in both views.
+  - Actions `status-open` / `status-close`; settings and status close each other.
+  - Esc closes the panel first. `overlayOpen` counts it (no camera moves under it, as with settings).
+  - `GUIDE_ALLOWS` gets the `status-` prefix; `MASK_ALLOWS` gets status-open and status-close. Session field `statusOpen`.
+- Class names kept: the 道具 tile is still `items-btn` (`on` when open) and the 设置 tile `settings-btn`, so existing selectors and tests hold. The 道具 word no longer flips to 收起 (`hud.itemsClose` is unused now); the tile is inverted instead. desk.test is updated for that.
+- CSS: the old `.items-btn` / `.settings-btn` rules in room.css are replaced by `.hud-tiles` and the panel's `.status .st-*`.
+- Snapshots refreshed (13 in loop-hud, scene, desk-prints, title, nightfall, navigation, late-days, upgrades). Each diff was checked to be only the old two buttons → the new strip.
+- Tests: new `tests/status-panel.test.ts` (the strip, open / close / Esc / outside, the numbers, a day-5 snapshot).
+- tsc clean; vitest 173 files, 2435 passed.

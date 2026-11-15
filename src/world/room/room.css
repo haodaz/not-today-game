@@ -126,9 +126,6 @@
 .room .desk-things > .at > .slot > span{position:absolute;left:50%;bottom:4px;transform:translateX(-50%);white-space:nowrap;padding:2px 6px;border-radius:6px;background:rgba(244,240,232,.8);color:#555}
 .room .desk-things .slot img{max-width:100%;max-height:100%;filter:drop-shadow(0 8px 10px rgba(0,0,0,.35))}
 /* 道具: the button next to ⚙ opens the object strip as a panel over the current view. */
-.items-btn{position:absolute;left:112px;bottom:28px;z-index:18;border:0;border-radius:8px;padding:7px 12px;background:rgba(232,228,220,.62);backdrop-filter:blur(8px);font:13px "PingFang SC","Hiragino Sans GB",sans-serif;color:#333;cursor:pointer}
-.items-btn:hover,.items-btn:focus-visible,.items-btn.on{background:rgba(232,228,220,.9)}
-.hud-host .items-btn{position:fixed;left:96px;bottom:12px;z-index:40}
 .items-panel{position:absolute;left:50%;bottom:84px;transform:translateX(-50%);z-index:17}
 .hud-host .items-panel{position:fixed;bottom:60px;z-index:40}
 .items-strip{display:flex;gap:8px;padding:8px 10px;background:var(--paper,rgba(244,240,232,.85));backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.35);border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,.18)}
@@ -359,9 +356,6 @@
 .room .door-hand{position:absolute;left:50%;bottom:0;transform:translateX(-50%);width:420px;height:220px;background:radial-gradient(ellipse at 50% 100%,rgba(0,0,0,.55),transparent 70%);pointer-events:none}
 /* 镜头 + 菜单 */
 /* ⚙ 设置: one button bottom left; a small centred panel over the dimmed view (day-loop amendment) */
-.settings-btn{position:absolute;left:28px;bottom:28px;z-index:18;border:0;border-radius:8px;padding:7px 12px;background:rgba(232,228,220,.62);backdrop-filter:blur(8px);font:13px "PingFang SC","Hiragino Sans GB",sans-serif;color:#333;cursor:pointer}
-.settings-btn:hover,.settings-btn:focus-visible{background:rgba(232,228,220,.85)}
-.hud-host .settings-btn{position:fixed;left:12px;bottom:12px;z-index:40}
 /* 端盒 (blind-box 2026-11-03): the case over 房间, the room dimmed behind it; a 3 × 3 grid of boxes
    seen from above. Cardboard browns from CSS; if /room/box/*.png exist they back the case and boxes. */
 .case-layer{position:absolute;inset:0;z-index:40}
@@ -840,3 +834,36 @@
 .boss-page.after .bs-top,.boss-page.after .bs-atb,.boss-page.after .bs-bossbar{opacity:0}
 .boss-page.after .bs-box{top:40px;width:420px;margin-left:-210px;min-height:0;padding:12px;text-align:center;background:rgba(5,6,10,.6)}
 .boss-page.after .bs-box .bs-cmd{margin:0}
+
+/* status-panel (2026-11-15): the HUD's game buttons 人物 · 道具 · 设置 — square paper tiles, a pixel icon
+   over the word, the open one inverted; bottom-left where 设置 and 道具 sat */
+.hud-tiles{position:absolute;left:28px;bottom:24px;z-index:18;display:flex;gap:8px}
+.hud-host .hud-tiles{position:fixed;left:12px;bottom:12px;z-index:40}
+.hud-tiles>button{width:56px;height:56px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:4px 0 3px;border:2px solid #2a2622;border-radius:4px;background:rgba(232,228,220,.86);box-shadow:3px 3px 0 rgba(0,0,0,.35);color:#2a2622;font:12px var(--font-game-ui,"PingFang SC","Hiragino Sans GB",sans-serif);letter-spacing:.1em;cursor:pointer}
+.hud-tiles>button:hover,.hud-tiles>button:focus-visible{background:#f4efe6}
+.hud-tiles>button.on{background:#2a2622;color:#f4efe6}
+.hud-tiles .tile-ic{display:block;width:24px;height:24px}
+.hud-tiles .tile-w{line-height:1}
+/* the character panel: the settings layer's card */
+.settings.status{width:340px}
+.status .st-who{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.status .st-face{width:56px;height:56px;border-radius:50%;object-fit:cover;object-position:50% 12%;border:2px solid #2a2622;background:#fff}
+.status .st-name{display:block;font-size:17px}
+.status .st-day{font-size:13px;color:#6b6457}
+.status .st-meter{display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:10px;margin:10px 0}
+.status .st-k{font-size:13px;letter-spacing:.15em;color:#6b6457}
+.status .st-v{font:13px var(--mono,ui-monospace,Menlo,monospace)}
+.status .st-bar{position:relative;height:10px;border:2px solid #2a2622;background:#fff}
+.status .st-bar b{position:absolute;left:0;top:0;bottom:0;background:#4a8b5c}
+.status .st-bar.san.band-1 b{background:#9a9a3c}.status .st-bar.san.band-2 b{background:#c08a2e}.status .st-bar.san.band-3 b,.status .st-bar.san.band-4 b{background:#a4372f}
+.status .st-bar.san.low b{animation:st-flicker 1s steps(1) infinite}
+@keyframes st-flicker{0%{opacity:1}85%{opacity:.25}100%{opacity:1}}
+.status .st-bar.assim{grid-column:2/4}
+.status .st-bar.assim b{background:#8b2f2a}
+.status .st-tick{position:absolute;top:-4px;bottom:-4px;width:2px;margin-left:-1px;background:#2a2622}
+.status .st-hearts{grid-column:2/4;display:flex;gap:4px}
+.status .st-heart{position:relative;width:22px;height:22px;color:#8b2f2a}
+.status .heart-ic{position:absolute;inset:0;width:22px;height:22px}
+.status .st-line{margin:8px 0 0;font-size:14px}
+.status .st-close{display:block;margin:16px 0 0 auto;padding:6px 16px;border:2px solid #2a2622;border-radius:4px;background:transparent;font:inherit;font-size:13px;cursor:pointer}
+@media (prefers-reduced-motion:reduce){.status .st-bar.san.low b{animation:none}}

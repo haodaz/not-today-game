@@ -63,7 +63,8 @@ import { gateAdvance } from "@world/motion/reveal";
 import { endingNext, bossActions } from "@world/endings/flow";
 import { renderEnding } from "@world/endings/view";
 import { bossStart, renderBoss } from "@world/endings/boss";
-import { boxObjectFor, CASE_WOBBLE_MS, doorMeal, itemsButton, itemsPanel, openBoxBefore, openBoxReady, raidShowing, renderChecklist, renderRoom, settingsPanel, SLIP_ITEM, walkmanShown } from "./hud";
+import { boxObjectFor, CASE_WOBBLE_MS, doorMeal, itemsPanel, openBoxBefore, openBoxReady, raidShowing, renderChecklist, renderRoom, settingsPanel, SLIP_ITEM, walkmanShown } from "./hud";
+import { hudTiles, statusPanel } from "./status";
 import { looseContent, stuckLineKey } from "./case";
 import { jitter } from "@state/seed";
 import { deliverableForHand } from "@state/days/board";
@@ -136,14 +137,14 @@ function renderGameBody(store: Store, session: Session, nowMs: number): SafeHtml
     // screen (the pet in the monitor is the one); R5 (2026-11-08): the checklist's current line in
     // the top bar, not a card over the window (the window fills the frame; a card hid 听听's list).
     const lc = loopContext(state, events);
-    return html`${renderDesktop({ ...shell, nextItem: lc ? nextItemText(checklist(lc)) : null })}${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${host}${launchLayer(state, session)}${workLayer({ state, events, session, nowMs, startDay: store.getStartDay() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${eggFlash(session, nowMs)}${dlgLayer(dlg, session, readsOn, !maskInModal)}<div class="hud-host">${itemsButton(session, state)}${itemsPanel(state, events, session)}${settingsPanel(session)}</div>`;
+    return html`${renderDesktop({ ...shell, nextItem: lc ? nextItemText(checklist(lc)) : null })}${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${host}${launchLayer(state, session)}${workLayer({ state, events, session, nowMs, startDay: store.getStartDay() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${eggFlash(session, nowMs)}${dlgLayer(dlg, session, readsOn, !maskInModal)}<div class="hud-host">${hudTiles(session, state, { settings: false })}${itemsPanel(state, events, session)}${settingsPanel(session)}${statusPanel(state, events, session)}</div>`;
   }
   // The box does not jump (dialogue correction 2026-11-02): in every view it is anchored to the
   // viewport in the same fixed layer, not to the stage (whose size differs between views). The
   // settings panel sits above it, in a fixed layer of its own after the box (2026-11-02).
   // camera-viewfinder R1: the box is never opened over the viewfinder (what is queued waits for it).
   const dlg = session.viewfinder ? null : dialogueBox(state, events, session, nowMs);
-  const settings = session.viewfinder ? null : settingsPanel(session);
+  const settings = session.viewfinder ? null : html`${settingsPanel(session)}${statusPanel(state, events, session)}`;
   return html`${renderRoom({ state, events, session, startDay: store.getStartDay(), nowMs, boxOutside: true, runId: store.getRunId() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${dlgLayer(dlg, session, boxReadsOn(state, events, session))}${settings ? html`<div class="hud-host">${settings}</div>` : null}`;
 }
 
@@ -386,7 +387,7 @@ export function backTarget(view: View): View | null {
 /** True when something sits over the view that a "back" should close first (or that blocks the camera). */
 function overlayOpen(s: Session): boolean {
   // camera-viewfinder: the viewfinder is not here (turning works under it); the sheet in hand is.
-  return s.bookOpen || s.historyOpen || s.settingsOpen || s.itemsOpen || s.caseOpen || s.phoneOpen || !!s.holding || talking(s.dialogue) || !!s.pullOut || !!s.endingPage || s.printsView !== null || s.sheetShown !== null;
+  return s.bookOpen || s.historyOpen || s.settingsOpen || s.statusOpen || s.itemsOpen || s.caseOpen || s.phoneOpen || !!s.holding || talking(s.dialogue) || !!s.pullOut || !!s.endingPage || s.printsView !== null || s.sheetShown !== null;
 }
 
 /** The key went to something the player types into: an input, a textarea, anything contenteditable. */
@@ -1726,6 +1727,18 @@ export const loopActions: Record<string, ActionHandler> = {
   // ⚙ 设置 (day-loop amendment: one settings button). 返回首页 is the host's (main.ts).
   "settings-open"(ctx) {
     ctx.session.settingsOpen = true;
+    ctx.session.statusOpen = false;
+    ctx.rerender();
+  },
+  // status-panel: 人物 — the character panel; 关上, Esc or a click outside closes it.
+  "status-open"(ctx) {
+    ctx.session.statusOpen = true;
+    ctx.session.settingsOpen = false;
+    ctx.rerender();
+  },
+  "status-close"(ctx) {
+    if (!ctx.session.statusOpen) return;
+    ctx.session.statusOpen = false;
     ctx.rerender();
   },
   // desk-prints R3: the pile up close, newest first; ← / → page; Esc, × or outside closes. No event.
@@ -2159,6 +2172,10 @@ export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
   // Kuro, then puts down what is held (polish FR1), then steps the camera out.
   if (e.key === "Escape" && ctx.session.historyOpen) {
     loopActions["dlg-history-close"]!(ctx, {} as DOMStringMap, null as never);
+    return true;
+  }
+  if (e.key === "Escape" && ctx.session.statusOpen) {
+    loopActions["status-close"]!(ctx, {} as DOMStringMap, null as never);
     return true;
   }
   if (e.key === "Escape" && ctx.session.settingsOpen) {

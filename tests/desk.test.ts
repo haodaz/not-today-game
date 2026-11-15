@@ -181,12 +181,13 @@ describe("道具: the strip as a panel", () => {
     for (const view of ["room", "desk", "door", "desktop"] as const) {
       const ctx = ctxOf(store, view);
       const before = render(ctx);
-      expect(before, view).toContain(`data-action="items-toggle" aria-expanded="false" aria-controls="items-panel">${t("hud.items")}</button>`);
+      expect(before, view).toMatch(new RegExp(`class="items-btn" data-action="items-toggle" aria-expanded="false" aria-controls="items-panel"><svg[^]*?<span class="tile-w">${t("hud.items")}</span></button>`));
       expect(before).not.toContain('class="items-panel"');
       act(ctx, "items-toggle");
       const open = render(ctx);
       expect(open).toContain(`<div class="items-panel" id="items-panel" role="dialog" aria-label="${t("hud.items")}"><div class="items-strip">`);
-      expect(open).toContain(`aria-expanded="true" aria-controls="items-panel">${t("hud.itemsClose")}</button>`);
+      // status-panel: the tile keeps its word and is inverted while open
+      expect(open).toContain('class="items-btn on" data-action="items-toggle" aria-expanded="true" aria-controls="items-panel">');
       const strip = open.slice(open.indexOf('class="items-strip"'));
       for (const a of ['data-action="loop-phone"', 'data-object="pager" data-action="loop-hold"']) expect(strip, view).toContain(a);
       // The box is in 房间, not a thing to carry (2026-11-02).

@@ -170,6 +170,8 @@ export interface Session {
   collection: Collection;
   /** The gamebook reader is open (title-page FR4; bedside-book). */
   bookOpen: boolean;
+  /** status-panel: the character panel (人物) is open over the view. */
+  statusOpen: boolean;
   /**
    * bedside-book: where this read came from (the bed's ask, the rise ask, the shelf book) — closing
    * the reader asks the same again — and whether it is the profile's first (the mutter on close).
@@ -557,6 +559,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     boss: null,
     collection: EMPTY_COLLECTION,
     bookOpen: false,
+    statusOpen: false,
     book: null,
     figureOpen: null,
     holding: null,

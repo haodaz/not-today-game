@@ -27,6 +27,7 @@ import { boxArrived } from "./arrival";
 import { deskLayout, objectSlot } from "./desk";
 import { fxPlan, renderFx } from "./fx";
 import { fixedRects, hotIdsIn, hotViewOf, type HotId, type HotView } from "./splat/hotspots";
+import { hudTiles, statusPanel } from "./status";
 import { bookReader, bookUrl, daysLived, figureCard, figuresLayer, shelfBook } from "./collection";
 import { knows } from "@state/recognise";
 import { bpm, sanBand } from "@state/endings";
@@ -610,7 +611,7 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const ceilingNight = lying && isEvening(session.clock);
   // box-arrival R1: 房间 and 床 show their box-less stills until the case has arrived (room.css `.nobox`).
   const nobox = !arrived && (view === "room" || view === "bed");
-  return html`<div class="${cls("stage", "room", `${view}-view`, nobox && "nobox", ceilingNight && "ceiling-night", raid && "raid", fade !== null && "m-late", dream && "scene-on", onEdge)}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${renderScene(lineScene)}${scene}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${bare ? null : list}${bare ? null : dayCorner(state, session)}${bare ? null : itemsPanel(state, events, session)}${!bare && (view === "room" || view === "bed" || view === "window") ? casePanel(state, events, session, model.runId ?? "run", nowMs) : null}${view === "desk" ? printsView(state, events, session) : null}${held}${model.boxOutside || bare ? null : dialogueBox(state, events, session, nowMs)}${bare ? null : bottomRight(model)}${bare ? null : settingsButton()}${bare ? null : itemsButton(session, state)}${model.boxOutside || bare ? null : settingsPanel(session)}${bookReader(session.bookOpen ? bookUrl(state.names, daysLived(state, events)) : null)}</div>`;
+  return html`<div class="${cls("stage", "room", `${view}-view`, nobox && "nobox", ceilingNight && "ceiling-night", raid && "raid", fade !== null && "m-late", dream && "scene-on", onEdge)}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${renderScene(lineScene)}${scene}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${bare ? null : list}${bare ? null : dayCorner(state, session)}${bare ? null : itemsPanel(state, events, session)}${!bare && (view === "room" || view === "bed" || view === "window") ? casePanel(state, events, session, model.runId ?? "run", nowMs) : null}${view === "desk" ? printsView(state, events, session) : null}${held}${model.boxOutside || bare ? null : dialogueBox(state, events, session, nowMs)}${bare ? null : bottomRight(model)}${bare ? null : hudTiles(session, state, { settings: true })}${model.boxOutside || bare ? null : settingsPanel(session)}${model.boxOutside || bare ? null : statusPanel(state, events, session)}${bookReader(session.bookOpen ? bookUrl(state.names, daysLived(state, events)) : null)}</div>`;
 }
 
 export { raidShowing };
