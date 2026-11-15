@@ -10,6 +10,8 @@ import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t } from "@world/i18n";
 import { cardText } from "./board";
 import { dice } from "./battle";
+import type { BoardVerdict } from "@state/days/board";
+import { byCount, capAssisted, type GameTally } from "./tally";
 
 const S = (key: string, args?: Record<string, string>): string => (hasString(key) ? t(key, args) : "");
 type Game = Extract<BoardGame, { kind: "gacha" }>;
@@ -89,4 +91,10 @@ export function gachaStage(task: Task, board: TaskBoard, s: BoardState, session:
     <div class="mn-month gc-main"><div class="gc-machine">${dome}<div class="gc-body">${crank}${chute}</div></div>${cheat}</div>
     <div class="mn-foot">${foot}</div>
   </div>`;
+}
+
+/** meters-v2 §1: ≤ 3 pulls → perfect; ≤ 6 → flawed; more → wrong (each start is a pull). */
+export function grade(g: Pick<GachaGame, "opened">, t: GameTally | null = null): BoardVerdict {
+  if (!g.opened) return "wrong";
+  return capAssisted(byCount(Math.max(1, t?.starts ?? 1), 3, 6), t);
 }

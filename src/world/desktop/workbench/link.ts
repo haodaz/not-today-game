@@ -11,6 +11,8 @@ import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t } from "@world/i18n";
 import { cardText } from "./board";
 import { dice } from "./battle";
+import type { BoardVerdict } from "@state/days/board";
+import { byCount, capAssisted, type GameTally } from "./tally";
 
 const S = (key: string, args?: Record<string, string>): string => (hasString(key) ? t(key, args) : "");
 type Game = Extract<BoardGame, { kind: "link" }>;
@@ -177,4 +179,10 @@ export function linkStage(task: Task, board: TaskBoard, s: BoardState, session: 
     <div class="mn-month lk-main">${grid}${cheat}</div>
     <div class="mn-foot">${foot}</div>
   </div>`;
+}
+
+/** meters-v2 §1: no mistaken pair → perfect; ≤ 2 → flawed; more → wrong (Kuro's help: at best flawed). */
+export function grade(g: Pick<LinkGrid, "done">, t: GameTally | null = null): BoardVerdict {
+  if (!g.done) return "wrong";
+  return capAssisted(byCount(t?.mistakes ?? 0, 0, 2), t);
 }

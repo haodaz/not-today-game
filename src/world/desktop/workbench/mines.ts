@@ -11,6 +11,8 @@ import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t } from "@world/i18n";
 import { cardText } from "./board";
 import { dice } from "./battle";
+import type { BoardVerdict } from "@state/days/board";
+import { byCount, capAssisted, type GameTally } from "./tally";
 
 const S = (key: string, args?: Record<string, string>): string => (hasString(key) ? t(key, args) : "");
 
@@ -133,4 +135,11 @@ export function minesStage(task: Task, board: TaskBoard, s: BoardState, session:
     <div class="mn-month"><div class="mn-month-h">${S("mines.stage.month")}</div>${week}${grid}${cheat}</div>
     <div class="mn-foot">${foot}</div>
   </div>`;
+}
+
+/** meters-v2 §1: no mine hit → perfect; one → flawed; more → wrong (Kuro scheduling a lost month counts that hit). */
+export function grade(g: Pick<MinesGrid, "won" | "over">, t: GameTally | null = null): BoardVerdict {
+  if (!g.won) return "wrong";
+  const hits = (t?.fails ?? 0) + (g.over ? 1 : 0);
+  return capAssisted(byCount(hits, 0, 1), t);
 }

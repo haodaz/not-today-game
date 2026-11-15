@@ -16,6 +16,7 @@ import type { AppContext, Session } from "../model";
 import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t } from "@world/i18n";
 import { cardText, lockRow } from "./board";
+import { gradeGame } from "./grades";
 import { settleButton, settleSheet, settling } from "./settle-sheet";
 import { meetingWindow } from "./meeting";
 import { fillPlaceholders } from "@world/replies/placeholders";
@@ -39,7 +40,7 @@ export function meetingStage(ctx: AppContext, task: Task, board: TaskBoard): Saf
   const artStyle = art ? html` style="--art:url('${art}')"` : null;
 
   // work-stages-polish 1: 整理好了 shows the settlement sheet instead of the meeting and the template
-  if (settling(session, day, task)) return settleSheet(state, task, board, s, task.launch?.who ?? null, found, null, session.reducedMotion);
+  if (settling(session, day, task)) return settleSheet(state, task, board, s, task.launch?.who ?? null, found, null, session.reducedMotion, events, gradeGame(board, task.id, day, session, events));
 
   const top = html`<header class="ms-top"><div class="cs-title"><span class="cs-kick">${S(seating ? "meeting.stage.kickSeats" : "meeting.stage.kick")}</span><h2>${fill(board.title)}</h2></div><div class="cs-count"><span>${S("clue.stage.count", { n: String(done), total: String(board.slots.length) })}</span><div class="cs-pips">${board.slots.map((x) => html`<i class="${cls("cs-pip", x.id in s.slots && "on")}"></i>`)}</div></div></header>`;
 

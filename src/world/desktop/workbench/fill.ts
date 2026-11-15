@@ -12,6 +12,7 @@ import type { GameEvent } from "@state/events";
 import type { State } from "@state/types.gen";
 import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t } from "@world/i18n";
+import type { BoardVerdict } from "@state/days/board";
 
 const S = (key: string, args?: Record<string, string>): string => (hasString(key) ? t(key, args) : "");
 export type FillBoard = Extract<BoardGame, { kind: "fill" }>;
@@ -386,3 +387,8 @@ export function fillSheet(b: FillBoard, rec: FillRecord | null, names: Pick<Stat
 }
 
 export { FILL_SHAPES };
+
+/** meters-v2 §1 (moved from printBoard): Kuro filled a round → wrong; the player's own fill → perfect. */
+export function grade(g: Pick<FillGame, "kuro" | "done">): BoardVerdict {
+  return g.done && !g.kuro ? "perfect" : "wrong";
+}

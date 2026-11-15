@@ -10,6 +10,8 @@ import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t } from "@world/i18n";
 import { cardText } from "./board";
 import { dice } from "./battle";
+import type { BoardVerdict } from "@state/days/board";
+import { byCount, capAssisted, type GameTally } from "./tally";
 
 const S = (key: string, args?: Record<string, string>): string => (hasString(key) ? t(key, args) : "");
 type Game = Extract<BoardGame, { kind: "match3" }>;
@@ -148,4 +150,10 @@ export function match3Stage(task: Task, board: TaskBoard, s: BoardState, session
     <div class="mn-month m3-main">${grid}${cheat}</div>
     <div class="mn-foot">${foot}</div>
   </div>`;
+}
+
+/** meters-v2 §1: cleared with ≥ 3 moves left → perfect; cleared → flawed; ran out (ever) / assisted → wrong. */
+export function grade(g: Pick<Match3Grid, "won" | "moves">, t: GameTally | null = null): BoardVerdict {
+  if (!g.won || t?.assisted) return "wrong";
+  return g.moves >= 3 && (t?.fails ?? 0) === 0 ? "perfect" : "flawed";
 }

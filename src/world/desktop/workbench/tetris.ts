@@ -11,6 +11,8 @@ import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t } from "@world/i18n";
 import { cardText } from "./board";
 import { dice } from "./battle";
+import type { BoardVerdict } from "@state/days/board";
+import { byCount, capAssisted, type GameTally } from "./tally";
 
 const S = (key: string, args?: Record<string, string>): string => (hasString(key) ? t(key, args) : "");
 type Game = Extract<BoardGame, { kind: "tetris" }>;
@@ -51,6 +53,8 @@ export interface TetrisGame {
   readonly gen: number;
   readonly running: boolean;
   readonly approvedAt?: number;
+  /** meters-v2 §1: a block was ever locked within the top two rows this game. */
+  readonly nearTop?: boolean;
 }
 
 export const TETRIS_DONE_MS = 1800;
@@ -165,4 +169,14 @@ export function tetrisStage(task: Task, board: TaskBoard, s: BoardState, session
     <div class="mn-month tt-main">${well}${cheat}</div>
     <div class="mn-foot">${foot}</div>
   </div>`;
+}
+
+/** The rows that count as the top for the grade (meters-v2 §1: "never within 2 rows of the top"). */
+export const TETRIS_TOP_ROWS = 2;
+/** Whether any locked block is in the top rows now. */
+export const tetrisNearTop = (g: Pick<TetrisGame, "cells" | "cols">): boolean => g.cells.slice(0, TETRIS_TOP_ROWS * g.cols).some((v) => v !== 0);
+/** meters-v2 §1: the target lines, never near the top → perfect; the target → flawed; topped out (ever) / assisted → wrong. */
+export function grade(g: Pick<TetrisGame, "done"> & { readonly nearTop?: boolean }, t: GameTally | null = null): BoardVerdict {
+  if (!g.done || t?.assisted || (t?.fails ?? 0) > 0) return "wrong";
+  return g.nearTop ? "flawed" : "perfect";
 }

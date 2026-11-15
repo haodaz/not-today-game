@@ -10,6 +10,8 @@ import type { BoardState } from "@state/days/board";
 import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t } from "@world/i18n";
 import { cardText } from "./board";
+import type { BoardVerdict } from "@state/days/board";
+import { capAssisted, type GameTally } from "./tally";
 
 const S = (key: string, args?: Record<string, string>): string => (hasString(key) ? t(key, args) : "");
 type Game = Extract<BoardGame, { kind: "sokoban" }>;
@@ -158,4 +160,47 @@ export function sokobanStage(task: Task, board: TaskBoard, s: BoardState, sessio
     <div class="mn-month sk2-main">${floor}${cheat}</div>
     <div class="mn-foot">${foot}</div>
   </div>`;
+}
+
+/**
+ * meters-v2 §1: the level's par — the fewest steps that seat every chair (a breadth-first search over
+ * player-and-chairs states, as `solvable`). Memoised per level; null when it cannot be found in `limit`.
+ */
+const parMemo = new Map<string, number | null>();
+export function sokobanPar(game: Extract<BoardGame, { kind: "sokoban" }>, limit = 400_000): number | null {
+  const id = game.level.join("\n");
+  if (parMemo.has(id)) return parMemo.get(id)!;
+  const g0 = sokobanStart("par", game);
+  const key = (s: SokobanGame): string => `${String(s.player)}|${[...s.boxes].sort((a, b) => a - b).join(",")}`;
+  const seen = new Set<string>([key(g0)]);
+  let layer: SokobanGame[] = [{ ...g0, history: [] }];
+  let depth = 0;
+  let found: number | null = null;
+  while (layer.length && seen.size < limit && found === null) {
+    depth++;
+    const next: SokobanGame[] = [];
+    for (const cur of layer) {
+      for (const dir of ["up", "down", "left", "right"] as const) {
+        const n = sokobanMove(cur, dir);
+        if (n === cur) continue;
+        if (n.done) { found = depth; break; }
+        const k = key(n);
+        if (seen.has(k)) continue;
+        seen.add(k);
+        next.push({ ...n, history: [] });
+      }
+      if (found !== null) break;
+    }
+    layer = next;
+  }
+  parMemo.set(id, found);
+  return found;
+}
+
+/** meters-v2 §1: seated within par moves → perfect; within par × 1.5 → flawed; more → wrong (an undo is a move). */
+export function grade(g: Pick<SokobanGame, "done" | "moves">, game: Extract<BoardGame, { kind: "sokoban" }>, t: GameTally | null = null): BoardVerdict {
+  if (!g.done) return "wrong";
+  const par = sokobanPar(game);
+  if (par === null) return capAssisted("perfect", t);
+  return capAssisted(g.moves <= par ? "perfect" : g.moves <= par * 1.5 ? "flawed" : "wrong", t);
 }

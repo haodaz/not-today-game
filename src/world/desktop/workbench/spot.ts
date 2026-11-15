@@ -11,6 +11,8 @@ import { SLOT_FIELD } from "@state/days/tasks";
 import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t } from "@world/i18n";
 import { cardText } from "./board";
+import type { BoardVerdict } from "@state/days/board";
+import { byCount, capAssisted, type GameTally } from "./tally";
 
 const S = (key: string, args?: Record<string, string>): string => (hasString(key) ? t(key, args) : "");
 
@@ -38,3 +40,8 @@ export function spotPanes(board: TaskBoard, page: ComparePage, key: string, miss
 
 /** The scan turning its page on its own, over the last page's result (the surprise). */
 export const spotFlipNote = (): SafeHtml => html`<p class="sp-flip">${S("spot.stage.flip")}</p>`;
+
+/** meters-v2 §1: no miss → perfect; ≤ 3 → flawed; more → wrong. */
+export function grade(miss: Pick<SpotMiss, "n"> | null, t: GameTally | null = null): BoardVerdict {
+  return capAssisted(byCount(miss?.n ?? 0, 0, 3), t);
+}

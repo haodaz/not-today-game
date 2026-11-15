@@ -2759,3 +2759,20 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
 - Tests: title.test gains the layer order, rain off, LED absent, the window layer, `parseTitle` with "window", and the grain with and without a canvas (happy-dom, getContext stubbed).
 - Snapshots: 4 title.test snapshots refreshed (markup-only); each diff was checked to be only the new `.amb` layers and `.idle.window`.
 - tsc clean; vitest 175 files, 2448 passed.
+
+## 2026-11-15 · meters-v2 §1 (every game grades its own play)
+
+- Each engine exports a pure `grade(...)`: link, match3, snake, pacman, mines, sokoban (with `sokobanPar`, a BFS for the fewest steps, memoised per level), spot, tetris (+ `tetrisNearTop`), pipes (+ `pipesLeaks`: open ends on the flowing path, not counting the source's left or the sink's right), moles, rhythm, gacha, fill (moved out of `printBoard`), and stack-stage (the day-13 chain: 2048 / 1024 / less). `balance` has no day and no grade.
+- What spans attempts is the new `workbench/tally.ts` `GameTally` (`session.gameTally`, per task): `starts`, `fails`, `assisted`, `mistakes`.
+  - `grades.ts` `noteTally` runs around every board action (board.ts's `withTally` wrapper):
+    - a `*-start` counts a start, plus a fail when the previous session was `over`;
+    - `*-assist` marks `assisted` (at best flawed; match3 and tetris: wrong, per the table);
+    - a link tap whose second tile did not join is a mistake (the board's own "turned back" surprise is not counted).
+- Print site: `printBoard` reads one rule, `gradeGame(board, taskId, day, session, events)`, and adds `quality` when it is not null.
+- Settlement: `settleSheet(..., quality)` shows `settle.quality.<q>` (`qualityLine`) under the pass / fail line. clue-stage and meeting-stage pass the same `gradeGame`. CSS `.sl-quality`.
+- When each game's session is cleared: none of them is ever set back to null during a day. A `*-start` replaces it, and after approval every start is refused, so the final play is still in the session at print time. No game needed grading at resolve time, and `BoardState` was not changed.
+  - The one gap is a page reload between the win and 提交. The session is not saved, so `gradeGame` returns null, no `quality` is printed, and the night reads the old default (perfect). fill is the exception: its end record is in the log, so it still grades after a reload.
+  - Tetris's "never near the top" needs history: `settleTetris` (the one path for ticks and keys) now keeps `nearTop` on the session.
+- Dev cheats grade their solved state (e.g. a cheated sokoban is within par); the replay driver's grades are therefore mostly perfect.
+- Tests: new `tests/grades.test.ts` (one case per engine on a built session, the printed task event with `quality`, the settlement line). No snapshot changed.
+- tsc clean; vitest 176 files, 2463 passed.

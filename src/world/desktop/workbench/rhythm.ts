@@ -12,6 +12,8 @@ import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t } from "@world/i18n";
 import { cardText } from "./board";
 import { dice } from "./battle";
+import type { BoardVerdict } from "@state/days/board";
+import { byCount, capAssisted, type GameTally } from "./tally";
 
 const S = (key: string, args?: Record<string, string>): string => (hasString(key) ? t(key, args) : "");
 type Game = Extract<BoardGame, { kind: "rhythm" }>;
@@ -156,4 +158,10 @@ export function rhythmStage(task: Task, board: TaskBoard, s: BoardState, session
     <div class="mn-month rh-main"><div class="rh-stage">${chairman}${lane}</div>${cheat}</div>
     <div class="mn-foot">${foot}</div>
   </div>`;
+}
+
+/** meters-v2 §1: ≤ 2 misses → perfect; ≤ 6 → flawed; more → wrong (a note never hit is a miss). */
+export function grade(g: Pick<RhythmGame, "notes" | "done">, t: GameTally | null = null): BoardVerdict {
+  if (!g.done && !t?.assisted) return "wrong";
+  return capAssisted(byCount(g.notes.filter((n) => n.hit !== "good").length, 2, 6), t);
 }

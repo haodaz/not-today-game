@@ -2111,3 +2111,6 @@ button.fl-cell:not(.on):hover{background:rgba(29,33,41,.08)}
 @media (prefers-reduced-motion:reduce){.fl-grid.grow,.fl-prev{animation:none}}
 /* meters-v2 §3: from the chatSanLateFrom-th turn the turn counter is in the heart-rate chip's red */
 .kpill .turns.late{color:#e5484d;font-weight:700}
+/* meters-v2 §1: the play's own grade, one short line under the pass / fail line */
+.sl-quality{margin:0;font-size:14px;letter-spacing:.06em;color:#6b6457}
+.sl-quality.perfect{color:#13A37A}.sl-quality.wrong{color:#C2410C}

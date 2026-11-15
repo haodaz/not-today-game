@@ -9,7 +9,7 @@ import { APPROVE_MS, SLIDE_WINDOW_MS, stackBest, stackMove, stackStart, stackTar
 import type { State } from "@state/types.gen";
 import type { GameEvent } from "@state/events";
 import type { Task, TaskBoard } from "@state/days/tasks";
-import { autoUnlock, boardState, canFetch, canPrint, comparePending, settleVerdict, foundCardIds, isKuroCard, isObjectLock, isReadLock, lockCodesOffered, lockJammed, lockObjectAvailable, lockUsedOk, modFound, pathFound, trayCards, tuneCarried, tuneOfferPending, tuneStepsLeft, wrongReadings, type BoardState } from "@state/days/board";
+import { autoUnlock, boardState, canFetch, canPrint, comparePending, settleVerdict, foundCardIds, isKuroCard, isObjectLock, isReadLock, lockCodesOffered, lockJammed, lockObjectAvailable, lockUsedOk, modFound, pathFound, trayCards, tuneCarried, tuneOfferPending, tuneStepsLeft, wrongReadings, type BoardState, type BoardVerdict } from "@state/days/board";
 import { ideOps, ideSrc, ideTranscript } from "@state/days/ide";
 import { cls, html, type SafeHtml } from "@world/html";
 import { FRAMES, frameUrl } from "../kuro/body";
@@ -25,6 +25,8 @@ import { PIPES_DONE_MS, pipesRoll, pipesSolve, pipesStart, pipesTurn } from "./p
 import { MATCH3_DONE_MS, match3Roll, match3Start, match3Tap, type Match3Grid } from "./match3";
 import { LINK_DONE_MS, LINK_PATH_MS, linkRoll, linkShuffle, linkSolve, linkStart, linkTap, type LinkGrid } from "./link";
 import { SNAKE_DONE_MS, SNAKE_TICK_MS, snakeRoll, snakeSolve, snakeStart, snakeStep, snakeTurn, type SnakeDir } from "./snake";
+import { tetrisNearTop } from "./tetris";
+import { gradeGame, noteTally, tallyField } from "./grades";
 import { TETRIS_DONE_MS, TETRIS_FLASH_MS, tetrisDropMs, tetrisKey, tetrisRoll, tetrisSolve, tetrisStart, tetrisTick, type TetrisGame, type TetrisKey } from "./tetris";
 import { RHYTHM_DONE_MS, RHYTHM_TICK_MS, rhythmPause, rhythmResume, rhythmRoll, rhythmSolve, rhythmStart, rhythmSweep, rhythmTap, rhythmWords } from "./rhythm";
 import { GACHA_DONE_MS, GACHA_TURN_MS, gachaOpen, gachaRoll, gachaStart, gachaTurn } from "./gacha";
@@ -343,7 +345,10 @@ function runSnake(ctx: ActionContext, gen: number): void {
 const tetrisRollFor = (ctx: ActionContext, g: TetrisGame): (() => number) => tetrisRoll(ctx.store.getRunId(), g.key, ((g as TetrisGame & { attempt?: number }).attempt ?? 0) * 1000 + g.spawned);
 
 /** tetris: the game after a tick or a key — done approves the form; cleared rows get their flash re-render. */
-function settleTetris(ctx: ActionContext, taskId: string, next: TetrisGame): void {
+function settleTetris(ctx: ActionContext, taskId: string, next0: TetrisGame): void {
+  // meters-v2 §1: remember whether the well ever reached its top two rows (the grade's "never near the top")
+  const prev = ctx.session.tetris;
+  const next: TetrisGame = { ...next0, nearTop: (prev?.key === next0.key && prev.nearTop === true) || tetrisNearTop(next0) };
   if (next.done) {
     ctx.store.appendEvent({ kind: "boardStep", taskId, op: { t: "approve" } });
     ctx.session.tetris = { ...next, approvedAt: ctx.now?.() ?? Date.now() };
@@ -1555,13 +1560,19 @@ function printBoard(ctx: ActionContext, c: { task: Task; board: TaskBoard }, s: 
     mode: s.assists > 0 ? "let" : "self",
     slots: { ...s.slots },
     assists: s.assists,
-    // fill (day11-budget-fill): a game won by Kuro is graded wrong, won by the player perfect
-    ...(c.board.game?.kind === "fill" ? { quality: fillRecord(ctx.store.getEvents(), ctx.store.getState().day, c.task.id)?.kuro ? ("wrong" as const) : ("perfect" as const) } : {}),
+    // meters-v2 §1: every game grades its own play (one rule here for all of them: grades.ts)
+    ...qualityOf(ctx, c),
   });
   const d = c.task.deliverable;
   if (d && (d.to ?? "hand") !== "hand") ctx.store.appendEvent({ kind: "give", deliverableId: d.id, t: ctx.session.clock.time });
   ctx.session.boardPick = null;
   ctx.session.boardLockOpen = false;
+}
+
+/** meters-v2 §1: the play's grade for the task event, when the board has a game and its play is known. */
+function qualityOf(ctx: ActionContext, c: { task: Task; board: TaskBoard }): { quality?: BoardVerdict } {
+  const q = gradeGame(c.board, c.task.id, ctx.store.getState().day, ctx.session, ctx.store.getEvents());
+  return q ? { quality: q } : {};
 }
 
 /** The transcript's length now (to time what a choice adds). */
@@ -1636,7 +1647,18 @@ function finishTune(_ctx: ActionContext, _c: { task: Task; board: TaskBoard }, _
 }
 
 /** The board actions; on an IDE board each one types in the transcript lines it adds (ide R4). */
-export const boardActions: Record<string, ActionHandler> = Object.fromEntries(Object.entries(actions).map(([k, h]) => [k, withIde(h)]));
+/** meters-v2 §1: the tally around a game's action (a start after a loss, Kuro's help, a mistaken pair). */
+const withTally = (name: string, h: ActionHandler): ActionHandler => {
+  const field = tallyField(name);
+  if (!field) return h;
+  return (ctx, data, el) => {
+    const c = currentBoard(ctx);
+    const before = ctx.session[field];
+    h(ctx, data, el);
+    if (c) noteTally(ctx.session, c.task.id, name, before, data);
+  };
+};
+export const boardActions: Record<string, ActionHandler> = Object.fromEntries(Object.entries(actions).map(([k, h]) => [k, withIde(withTally(k, h))]));
 
 /**
  * A board read back from the log, read-only (workspace R1: a handed-in task's page, or an earlier

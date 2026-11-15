@@ -12,6 +12,8 @@ import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t } from "@world/i18n";
 import { cardText } from "./board";
 import { dice } from "./battle";
+import type { BoardVerdict } from "@state/days/board";
+import { byCount, capAssisted, type GameTally } from "./tally";
 
 const S = (key: string, args?: Record<string, string>): string => (hasString(key) ? t(key, args) : "");
 type Game = Extract<BoardGame, { kind: "snake" }>;
@@ -165,3 +167,9 @@ export function snakeStage(task: Task, board: TaskBoard, s: BoardState, session:
   </div>`;
 }
 type SnakeHtml = SafeHtml;
+
+/** meters-v2 §1: deaths across the attempts — none → perfect; one → flawed; more → wrong. */
+export function grade(g: Pick<SnakeGrid, "done" | "over">, t: GameTally | null = null): BoardVerdict {
+  const deaths = (t?.fails ?? 0) + (g.over ? 1 : 0);
+  return capAssisted(g.done ? byCount(deaths, 0, 1) : t?.assisted ? byCount(deaths, 1, 1) : "wrong", t);
+}

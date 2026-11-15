@@ -11,6 +11,8 @@ import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t } from "@world/i18n";
 import { cardText } from "./board";
 import { dice } from "./battle";
+import type { BoardVerdict } from "@state/days/board";
+import { byCount, capAssisted, type GameTally } from "./tally";
 
 const S = (key: string, args?: Record<string, string>): string => (hasString(key) ? t(key, args) : "");
 type Game = Extract<BoardGame, { kind: "pacman" }>;
@@ -217,4 +219,11 @@ export function pacStage(task: Task, board: TaskBoard, s: BoardState, session: {
     <div class="mn-month pm-main">${maze}${cheat}</div>
     <div class="mn-foot">${foot}</div>
   </div>`;
+}
+
+/** meters-v2 §1: every line eaten with no ghost hit → perfect; hit once → flawed; otherwise wrong. */
+export function grade(g: Pick<PacGame, "done" | "over">, t: GameTally | null = null): BoardVerdict {
+  const hits = (t?.fails ?? 0) + (g.over ? 1 : 0);
+  if (!g.done && !t?.assisted) return "wrong";
+  return capAssisted(byCount(hits, 0, 1), t);
 }

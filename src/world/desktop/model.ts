@@ -436,6 +436,8 @@ export interface Session {
   pacman: import("./workbench/pacman").PacGame | null;
   /** spot the difference (author 2026-11-13): the misses on the open page (session only; the picks are the board's). */
   spotMiss: import("./workbench/spot").SpotMiss | null;
+  /** meters-v2 §1: what spans a game's attempts on the open task (losses, Kuro's help, link's mistakes). */
+  gameTally: import("./workbench/tally").GameTally | null;
   /** work (author 2026-11-11 night): the task whose full-screen work page is up (`<day>:<taskId>`), or null; 回到工作台 hides it, 打开工作页 brings it back. */
   workShow: string | null;
   /** When the work page was last opened (ms): its entry fade plays only right after, not on every re-render (snake 2026-11-13). */
@@ -658,6 +660,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     moles: null,
     pacman: null,
     spotMiss: null,
+    gameTally: null,
     workShow: null,
     workShownAt: 0,
     workPhase: null,

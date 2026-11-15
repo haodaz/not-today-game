@@ -8,6 +8,8 @@ import type { BoardStack, Task, TaskBoard } from "@state/days/tasks";
 import type { Session } from "../model";
 import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t } from "@world/i18n";
+import type { BoardVerdict } from "@state/days/board";
+import { byCount, capAssisted, type GameTally } from "./tally";
 
 const S = (key: string, args?: Record<string, string>): string => (hasString(key) ? t(key, args) : "");
 
@@ -203,3 +205,9 @@ export function tileMotion(g: Pick<StackGrid, "cells" | "from" | "merged">, i: n
 }
 
 export type { BoardStack };
+
+/** meters-v2 §1 (day 13): 2048 reached → perfect; 1024 → flawed; less → wrong (Kuro's stamp: at best flawed). */
+export function grade(g: Pick<StackGrid, "cells"> | null, t: GameTally | null = null): BoardVerdict {
+  const best = g ? stackBest(g as StackGrid) : 0;
+  return capAssisted(best >= 2048 ? "perfect" : best >= 1024 ? "flawed" : "wrong", t);
+}

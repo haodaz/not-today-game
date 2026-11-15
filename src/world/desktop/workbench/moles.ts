@@ -11,6 +11,8 @@ import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t } from "@world/i18n";
 import { cardText } from "./board";
 import { dice } from "./battle";
+import type { BoardVerdict } from "@state/days/board";
+import { byCount, capAssisted, type GameTally } from "./tally";
 
 const S = (key: string, args?: Record<string, string>): string => (hasString(key) ? t(key, args) : "");
 type Game = Extract<BoardGame, { kind: "moles" }>;
@@ -134,4 +136,11 @@ export function molesStage(task: Task, board: TaskBoard, s: BoardState, session:
     <div class="mn-month ml-main">${hall}${cheat}</div>
     <div class="mn-foot">${foot}</div>
   </div>`;
+}
+
+/** meters-v2 §1: ≥ 90 % of the heads tapped → perfect; ≥ 70 % → flawed; less → wrong. */
+export function grade(g: Pick<MolesGame, "pops" | "done">, t: GameTally | null = null): BoardVerdict {
+  if (!g.done && !t?.assisted) return "wrong";
+  const share = g.pops.length ? g.pops.filter((p) => p.hit).length / g.pops.length : 0;
+  return capAssisted(share >= 0.9 ? "perfect" : share >= 0.7 ? "flawed" : "wrong", t);
 }

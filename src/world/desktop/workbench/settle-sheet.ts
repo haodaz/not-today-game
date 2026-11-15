@@ -2,7 +2,7 @@
 // 「最后结算的时候先展示出来，再提交」). 整理好了 (`board-settle`) shows it instead of the board: one
 // paper sheet, centred — who it goes to, the board's title, one row per slot with its demand and the
 // card placed in it — and under it the one way out the verdict allows (`settleActions`). Pure view.
-import { canPrint, settleVerdict, type BoardState } from "@state/days/board";
+import { canPrint, settleVerdict, type BoardState, type BoardVerdict } from "@state/days/board";
 import { FRAMES, frameUrl } from "../kuro/body";
 import type { Task, TaskBoard } from "@state/days/tasks";
 import type { State } from "@state/types.gen";
@@ -41,7 +41,7 @@ export function settleButton(printable: boolean): SafeHtml {
  * approval-chain day the chain beside it with each rank's stamp. `who` is the counterpart (null: no
  * portrait, no "going to" line); `found` the clippings found; `chain` the 2048 grid, if it is still up.
  */
-export function settleSheet(state: State, task: Task, board: TaskBoard, s: BoardState, who: string | null, found: ReadonlySet<string> = new Set(), chain: { readonly cells: readonly number[]; readonly moves: number } | null = null, reduced = false, events: readonly GameEvent[] = []): SafeHtml {
+export function settleSheet(state: State, task: Task, board: TaskBoard, s: BoardState, who: string | null, found: ReadonlySet<string> = new Set(), chain: { readonly cells: readonly number[]; readonly moves: number } | null = null, reduced = false, events: readonly GameEvent[] = [], quality: BoardVerdict | null = null): SafeHtml {
   const fill = (x: string) => fillPlaceholders(x, state.names);
   const portrait = who ? npcPortrait(who) : null;
   const kick = who ? S("sheet.settle.kick", { who: whoName(who, state) }) : "";
@@ -78,7 +78,12 @@ export function settleSheet(state: State, task: Task, board: TaskBoard, s: Board
   }
   // fill (day11-budget-fill): beside the form, the real cost sheet — the 人 rows the play spent struck through
   if (board.game?.kind === "fill") effect = html`${sheet}${fillSheet(board.game, fillRecord(events, state.day, task.id), state.names)}`;
-  return settleLayer({ kind: board.stack ? "flow" : "sheet", portrait, kick, title: fill(board.title), record: html`${record}${actions.line}`, effect, actions: actions.buttons });
+  return settleLayer({ kind: board.stack ? "flow" : "sheet", portrait, kick, title: fill(board.title), record: html`${record}${actions.line}${qualityLine(quality)}`, effect, actions: actions.buttons });
+}
+
+/** meters-v2 §1: the play's grade as one short line under the pass / fail line (only for a graded game). */
+export function qualityLine(q: BoardVerdict | null): SafeHtml | null {
+  return q && hasString(`settle.quality.${q}`) ? html`<p class="${cls("sl-quality", q)}">${S(`settle.quality.${q}`)}</p>` : null;
 }
 
 /**

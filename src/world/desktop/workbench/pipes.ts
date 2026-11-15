@@ -11,6 +11,8 @@ import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t } from "@world/i18n";
 import { cardText } from "./board";
 import { dice } from "./battle";
+import type { BoardVerdict } from "@state/days/board";
+import { byCount, capAssisted, type GameTally } from "./tally";
 
 const S = (key: string, args?: Record<string, string>): string => (hasString(key) ? t(key, args) : "");
 
@@ -169,4 +171,33 @@ export function pipesStage(task: Task, board: TaskBoard, s: BoardState, session:
     <div class="mn-month pp-main">${grid}${cheat}</div>
     <div class="mn-foot">${foot}</div>
   </div>`;
+}
+
+/**
+ * meters-v2 §1: a leak is an opening on the flowing path that leads nowhere (off the grid, or into a
+ * piece that does not take it), other than the source's left and the sink's right.
+ */
+export function pipesLeaks(g: PipesGrid): number {
+  const on = flow(g);
+  const dirs = [[1, 0, -1], [2, 1, 0], [4, 0, 1], [8, -1, 0]] as const;
+  const back: Record<number, number> = { 1: 4, 2: 8, 4: 1, 8: 2 };
+  let n = 0;
+  for (const i of on) {
+    const o = openings(g.cells[i]!);
+    const x = i % g.cols, y = Math.floor(i / g.cols);
+    for (const [d, dx, dy] of dirs) {
+      if (!(o & d)) continue;
+      if (d === 8 && x === 0 && y === g.from) continue;
+      if (d === 2 && x === g.cols - 1 && y === g.to) continue;
+      const nx = x + dx, ny = y + dy;
+      const j = ny * g.cols + nx;
+      if (nx < 0 || ny < 0 || nx >= g.cols || ny >= g.rows || !(openings(g.cells[j]!) & back[d]!)) n++;
+    }
+  }
+  return n;
+}
+/** meters-v2 §1: no leak → perfect; one → flawed; more → wrong. */
+export function grade(g: PipesGrid, t: GameTally | null = null): BoardVerdict {
+  if (!g.done) return "wrong";
+  return capAssisted(byCount(pipesLeaks(g), 0, 1), t);
 }
