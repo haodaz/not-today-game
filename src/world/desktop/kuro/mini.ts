@@ -1,6 +1,7 @@
 // Kuro on the screens and in the HUD (dialogue FR2). On the desktop it is a status pill (its last
 // line, online / night dot, 今天 n/5) that takes no input; its body at the HUD's bottom right is
 // the call button in every view. Both open the conversation in the dialogue box (dialogue/kuro.ts).
+import { chatLate } from "@world/dialogue/kuro";
 import { taskByFlag } from "@state/days/tasks";
 import { currentOffer } from "@state/upgrades";
 import { constants } from "@state/variables";
@@ -49,7 +50,7 @@ export function renderKuro(ctx: AppContext): SafeHtml {
   const say = ctx.session.dockSay && ctx.nowMs < ctx.session.dockSay.until ? ctx.session.dockSay.text : null;
   const line = say ?? lastKuroLine(ctx);
   const status = ctx.night ? html`<span class="dotl" aria-hidden="true"></span>` : html`<span class="on">${tr("shell.kuro.online")}</span>`;
-  return html`<button type="button" class="${cls("kpill", ctx.night && "blink", say !== null && "say")}" data-action="kuro-call" aria-label="${t("kuro.name")}"><img src="${frameUrl(FRAMES.idle[0], lateRing(ctx.state.day))}" alt=""><span class="ln">${line ? kuroText(ctx.state.day, line) : ""}</span>${status}<span class="turns">${tr("kuro.turns", { n: ctx.state.chatTurnsToday })}</span></button>`;
+  return html`<button type="button" class="${cls("kpill", ctx.night && "blink", say !== null && "say")}" data-action="kuro-call" aria-label="${t("kuro.name")}"><img src="${frameUrl(FRAMES.idle[0], lateRing(ctx.state.day))}" alt=""><span class="ln">${line ? kuroText(ctx.state.day, line) : ""}</span>${status}<span class="${cls("turns", chatLate(ctx.state) && "late")}">${tr("kuro.turns", { n: ctx.state.chatTurnsToday })}</span></button>`;
 }
 
 /**

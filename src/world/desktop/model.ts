@@ -172,6 +172,13 @@ export interface Session {
   bookOpen: boolean;
   /** status-panel: the character panel (人物) is open over the view. */
   statusOpen: boolean;
+  /** meters-v2 §3: the day the first late chat turn was taken (the `chat.late` hint has had its once). */
+  chatLateDay: number | null;
+  /** meters-v2 §2: the stare countdown on the thing in view (session only), and the jolt after it fired. */
+  stare: { readonly target: string; readonly since: number } | null;
+  stareJolt: number | null;
+  /** meters-v2 §4: the hand is still at the gap, its cut line about to play. */
+  handCut: { readonly key: string; readonly day: number } | null;
   /**
    * bedside-book: where this read came from (the bed's ask, the rise ask, the shelf book) — closing
    * the reader asks the same again — and whether it is the profile's first (the mutter on close).
@@ -560,6 +567,10 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     collection: EMPTY_COLLECTION,
     bookOpen: false,
     statusOpen: false,
+    chatLateDay: null,
+    stare: null,
+    stareJolt: null,
+    handCut: null,
     book: null,
     figureOpen: null,
     holding: null,

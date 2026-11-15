@@ -26,6 +26,7 @@ import { fxForGame } from "@world/room/fx/layer";
 import { createHandLayer } from "@world/objects/layer";
 import { createNav } from "@world/room/nav";
 import { settleSession } from "@world/dialogue/place";
+import { stareTick } from "@world/room/stare";
 import { createPullDriver } from "@world/endings/pullout-dom";
 import { bossStart } from "@world/endings/boss";
 import { createBossFx } from "@world/endings/boss-fx";
@@ -133,7 +134,11 @@ function startGame(store: Store, saved: boolean, prologue = false): void {
     },
     onChange: (ctx) => syncLoop(ctx),
     onKey: loopKeys,
-    settle: (ctx) => void settleSession(ctx.session),
+    // meters-v2 §2: before every render the stare countdown starts, keeps, resets or fires
+    settle: (ctx) => {
+      settleSession(ctx.session);
+      stareTick(ctx);
+    },
     // tingtalk R1b: the windows' placement is remembered for this run (a fresh run starts default).
     placement: { storage: saved ? window.localStorage : null, runId: store.getRunId() },
     // photo-album R1: a room photo seen developed goes into the profile's 影集 (saved runs only).

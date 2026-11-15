@@ -67,7 +67,7 @@ import { boxObjectFor, CASE_WOBBLE_MS, doorMeal, itemsPanel, openBoxBefore, open
 import { hudTiles, statusPanel } from "./status";
 import { looseContent, stuckLineKey } from "./case";
 import { jitter } from "@state/seed";
-import { deliverableForHand } from "@state/days/board";
+import { boardJudgement, deliverableForHand, handNight, type BoardVerdict } from "@state/days/board";
 import { printsOnDesk } from "@state/days/prints";
 
 /** How long a stuck box shakes (blind-box 2026-11-03). */
@@ -1255,7 +1255,7 @@ export const loopActions: Record<string, ActionHandler> = {
       if (!q.sequence?.choices?.some((c) => c.hand !== "refuse")) {
         ctx.session.dialogue = finishChoice(ctx.session.dialogue);
         settleSession(ctx.session);
-        openChatIfDue(ctx);
+        if (!handWithdraws(ctx, false)) openChatIfDue(ctx);
       }
       ctx.rerender();
       return;
@@ -1265,7 +1265,7 @@ export const loopActions: Record<string, ActionHandler> = {
     if (q.ending.kind === "beatChoices" && data.choice === "refuse") {
       ctx.session.dialogue = finishChoice(ctx.session.dialogue);
       settleSession(ctx.session);
-      openChatIfDue(ctx);
+      if (!handWithdraws(ctx, true)) openChatIfDue(ctx);
       ctx.rerender();
       return;
     }
@@ -2008,6 +2008,31 @@ export const RECORD_ASK_DAY = 5;
  */
 export function recordOffered(state: State, events: readonly GameEvent[]): boolean {
   return state.day === RECORD_ASK_DAY && (state.found as string[]).includes("tape") && !takenByKuro("tape", state, events) && !recordedOn(events, state.day);
+}
+
+/** meters-v2 §4: how much longer the hand stays before it withdraws, by the verdict it is about to give. */
+export const HAND_PAUSE_MS: Readonly<Record<BoardVerdict | "refused", number>> = { perfect: 0, flawed: 1000, wrong: 2500, refused: 0 };
+
+/**
+ * meters-v2 §4: on a hand night, after the hand-over (or the refusal) the hand stays a while — longer
+ * the worse the verdict the night will give — and then its own line `hand.cut.<verdict>` plays. The
+ * gap keeps glowing meanwhile (`session.handCut`). Returns false when there is no such line.
+ */
+export function handWithdraws(ctx: ActionContext, refused: boolean): boolean {
+  const day = ctx.store.getState().day;
+  if (!handNight(day)) return false;
+  const verdict: BoardVerdict | "refused" = refused ? "refused" : (boardJudgement(day, ctx.store.getEvents())?.verdict ?? "wrong");
+  const key = `hand.cut.${verdict}`;
+  if (!hasString(key)) return false;
+  const cut = { key, day };
+  ctx.session.handCut = cut;
+  ctx.later(HAND_PAUSE_MS[verdict] ?? 0, () => {
+    if (ctx.session.handCut !== cut || ctx.store.getState().day !== day) return;
+    ctx.session.handCut = null;
+    ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${day}:hand:cut`, lines: [{ k: "narration", t: t(key) }], ending: { kind: "none" } });
+    ctx.rerender();
+  });
+  return true;
 }
 
 /** lying-view R6: 起床？ (起 / 再躺会儿 / 看书). */

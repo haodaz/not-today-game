@@ -17,7 +17,7 @@ import { renderLayer, type BodyState } from "@world/desktop/kuro/body";
 import { kuroBodyState } from "@world/desktop/kuro/mini";
 import type { Session } from "@world/desktop/model";
 import { cls, html, type SafeHtml } from "@world/html";
-import { getLocale, hasString, t } from "@world/i18n";
+import { getLocale, hasString, t, tr } from "@world/i18n";
 import { showing, type Queued } from "@world/loop/dialogue";
 import { lineKey, revealBusy } from "@world/motion/reveal";
 import { fillPlaceholders } from "@world/replies/placeholders";
@@ -62,7 +62,9 @@ export function portraitState(state: State, events: readonly GameEvent[], sessio
  * The hand is in the dialogue box: tonight's shutdown sequence on a hand night (days 10–17) or on
  * the last night (18, the branch: the hand reaches out too). Nights 1–9 have no hand.
  */
-export function raidShowing(state: State, session: Pick<Session, "dialogue">): boolean {
+export function raidShowing(state: State, session: Pick<Session, "dialogue"> & { readonly handCut?: Session["handCut"] }): boolean {
+  // meters-v2 §4: the hand stays at the gap until its cut line plays
+  if (session.handCut?.day === state.day) return true;
   return (handNight(state.day) || state.day === (constants.lastDay as number)) && session.dialogue.queue[0]?.key === `d${state.day}:beat:shutdown`;
 }
 
@@ -280,7 +282,7 @@ export function playerRows(p: PlayerBoxModel): ChoiceRow[] {
  * the box, the first option on top. Each row is a button (↑ ↓ move between them, Enter / Space or
  * 1–9 choose: the controller's keys); 说点别的…'s row is the text field once chosen.
  */
-export function renderChoiceColumn(rows: readonly ChoiceRow[], pointer: string | false = false): SafeHtml | null {
+export function renderChoiceColumn(rows: readonly ChoiceRow[], pointer: string | false = false, late: { readonly late?: boolean; readonly lateHint?: boolean } = {}): SafeHtml | null {
   if (!rows.length) return null;
   const items = rows.map((r, i) => {
     if (r.field) {
@@ -289,7 +291,9 @@ export function renderChoiceColumn(rows: readonly ChoiceRow[], pointer: string |
     const attrs = Object.entries(r.data).map(([k, v]) => html` data-${k}="${v}"`);
     return html`<button type="button" class="dc-row" data-action="${r.action}"${attrs} data-focus="dc-${i}" data-n="${i + 1}">${ICON[r.icon]}<span class="dc-l">${r.label}</span></button>`;
   });
-  return html`<div class="${cls("dlg-choices", pointer)}" role="group">${items}</div>`;
+  // meters-v2 §3: a late chat turn — the column in the SAN colour, and once a day the hint under it
+  const hint = late.lateHint ? html`<p class="dc-hint late">${tr("chat.late")}</p>` : null;
+  return html`<div class="${cls("dlg-choices", pointer, late.late && "late")}" role="group">${items}${hint}</div>`;
 }
 
 /**
@@ -312,5 +316,5 @@ export function dialogueBox(state: State, events: readonly GameEvent[], session:
   // content's, or the player's on their turn with Kuro) are the column on the right.
   const rows = player ? playerRows(player) : line ? lineRows(line) : [];
   const box = line ? renderLineBox(line, rows.length > 0) : null;
-  return html`${box}${renderChoiceColumn(rows, line?.pointer ?? false)}${hist}`;
+  return html`${box}${renderChoiceColumn(rows, line?.pointer ?? false, player ?? {})}${hist}`;
 }

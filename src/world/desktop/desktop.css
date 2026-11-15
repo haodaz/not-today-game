@@ -2109,3 +2109,5 @@ button.fl-cell:not(.on):hover{background:rgba(29,33,41,.08)}
 .fl-row.struck{text-decoration:line-through;text-decoration-thickness:2px;color:#9a927f}
 .fl-sum{margin:14px 0 0;font-weight:700}
 @media (prefers-reduced-motion:reduce){.fl-grid.grow,.fl-prev{animation:none}}
+/* meters-v2 §3: from the chatSanLateFrom-th turn the turn counter is in the heart-rate chip's red */
+.kpill .turns.late{color:#e5484d;font-weight:700}

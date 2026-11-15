@@ -2703,3 +2703,24 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
 - Snapshots refreshed (13 in loop-hud, scene, desk-prints, title, nightfall, navigation, late-days, upgrades). Each diff was checked to be only the old two buttons → the new strip.
 - Tests: new `tests/status-panel.test.ts` (the strip, open / close / Esc / outside, the numbers, a day-5 snapshot).
 - tsc clean; vitest 173 files, 2435 passed.
+
+## 2026-11-15 · meters-v2 (the UI: §2 stare, §3 late chat turns, §4 the hand's cut)
+
+- §2: new `src/world/room/stare.ts`.
+  - `stareTarget(state, events, session, nowMs)`:
+    - `gap`: 桌子 from day 4;
+    - `window`: 窗 from day 7, desk / night beats;
+    - `mask`: 床 on day 10;
+    - `box`: 门 on day 18;
+    - `photo:<day>:<facing>`: on 屏幕, a developed room photo open in 相册 whose photos.json room entry exists.
+    - Nothing counts while anything else is open: the box, a panel, held, a move, the hand's pause.
+  - `stareTick(ctx)` runs in main.ts's `settle` before every render. It starts or resets the run in `session.stare`, repaints every 500 ms, and at `stareMs` appends `{ kind: "stare", target }` once per target per day (checked in the log), pushes `stare.<kind>` as an inner line, and sets `session.stareJolt`.
+  - The HUD chip during a run: `stareBpm` climbs from bpm(san) to bpm(0) (`.hr.staring`), shown even before `heartRateFromDay` (it is the countdown); `.hr.jolt` for 600 ms after.
+- §3: `chatLate(state)` = the next turn is the `chatSanLateFrom`-th or later.
+  - The kpill's `.turns` gets `late`; the player's column gets `late` (icons in the chip's red).
+  - The `chat.late` hint shows under the rows until the first late turn of the day is taken (`session.chatLateDay`, set in `turn`), so once a day.
+- §4: game.ts `handWithdraws(ctx, refused)` on hand nights after the give / the refusal. The verdict is `boardJudgement` now (refused, or null → wrong); after `HAND_PAUSE_MS` (perfect 0, flawed 1000, wrong 2500, refused 0) the line `hand.cut.<verdict>` plays as narration. `session.handCut` keeps the gap glowing until then (`raidShowing`). The chat opens after the line is read.
+- Not done: §1 (each game's own `grade()` and the `settle.quality.*` line). Not asked for in this job.
+- Session fields: `chatLateDay`, `stare`, `stareJolt`, `handCut`.
+- Tests: new `tests/meters-v2-ui.test.ts` (targets, start / climb / fire once / reset / leave within a second, the chip snapshot mid-countdown, the late counter and hint once a day, the hand's lines by verdict). No existing snapshot changed.
+- tsc clean; vitest 174 files, 2441 passed.

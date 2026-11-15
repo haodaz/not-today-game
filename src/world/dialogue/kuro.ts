@@ -176,6 +176,8 @@ function turn(ctx: ActionContext, said: string, q: number | null, text: string |
   const state = store.getState();
   const head = session.dialogue.queue[0];
   if (head?.ending.kind !== "kuroTurn" || head.ending.mode !== "chat") return;
+  // meters-v2 §3: the first late turn of the day has been taken: the hint has had its once
+  if (chatLate(state)) session.chatLateDay = state.day;
   // What it said before the question: a flicker brings it back as if the question never was.
   const before = head.lines.at(-1)?.t ?? null;
   logCurrent(session, state);
@@ -321,7 +323,14 @@ export interface PlayerBoxModel {
   readonly screens: readonly Screen[];
   readonly page: number;
   readonly draft: string;
+  /** meters-v2 §3: the turn the player is about to take costs SAN (from `chatSanLateFrom`). */
+  readonly late?: boolean;
+  /** meters-v2 §3: the `chat.late` hint under the input — once a day, until the first late turn is taken. */
+  readonly lateHint?: boolean;
 }
+
+/** meters-v2 §3: the next chat turn today is a late one (the `chatSanLateFrom`-th or after). */
+export const chatLate = (state: Pick<State, "chatTurnsToday">): boolean => state.chatTurnsToday + 1 >= (constants.chatSanLateFrom as number);
 
 /** A starter in the reader's language (zh is the source; en falls back to it). */
 const starterText = (s: { zh: string; en: string }): string => (getLocale() === "en" && s.en ? s.en : s.zh);
@@ -354,8 +363,10 @@ export function playerBox(state: State, events: readonly GameEvent[], session: S
   ];
   const all = screens(null, options.map((o) => o.label), PLAYER_TURN_BOX, px);
   // world-prompts R2: typing keeps the list; the field in place (the model's channel, no row of its own now).
-  if (session.kuroInput) return { name, mode: "input", options, screens: all, page: 0, draft: session.kuroDraft };
-  return { name, mode: "choices", options, screens: all, page: 0, draft: "" };
+  const late = chatLate(state);
+  const lateBits = late ? { late: true, lateHint: session.chatLateDay !== state.day && hasString("chat.late") } : {};
+  if (session.kuroInput) return { name, mode: "input", options, screens: all, page: 0, draft: session.kuroDraft, ...lateBits };
+  return { name, mode: "choices", options, screens: all, page: 0, draft: "", ...lateBits };
 }
 
 /** How many questions a page of the player's box holds (author 2026-11-09: five, then 说点别的… for the next five). */

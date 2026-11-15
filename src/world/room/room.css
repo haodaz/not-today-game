@@ -867,3 +867,13 @@
 .status .st-line{margin:8px 0 0;font-size:14px}
 .status .st-close{display:block;margin:16px 0 0 auto;padding:6px 16px;border:2px solid #2a2622;border-radius:4px;background:transparent;font:inherit;font-size:13px;cursor:pointer}
 @media (prefers-reduced-motion:reduce){.status .st-bar.san.low b{animation:none}}
+/* meters-v2 (2026-11-12): the stare countdown — the heart-rate chip climbing in the SAN red; the jolt
+   when it fires. The chat's late turns: the column's rows and the hint in the same red. */
+.room .hr.staring{color:#e5484d}
+.room .hr.staring i{animation:hr-beat 420ms ease-in-out infinite}
+.room .hr.jolt{animation:hr-jolt 300ms steps(2) 2}
+@keyframes hr-beat{50%{transform:scale(1.35)}}
+@keyframes hr-jolt{50%{translate:4px 0}}
+.dlg-choices.late .dc-row .dc-ic{color:#e5484d}
+.dlg-choices .dc-hint{margin:0;padding:4px 12px;font-size:12px;letter-spacing:.06em;color:#e5484d;text-align:right}
+@media (prefers-reduced-motion:reduce){.room .hr.staring i,.room .hr.jolt{animation:none}}
