@@ -1357,7 +1357,7 @@ span.cmp-face-btn{cursor:default}
 .ts-top{grid-column:1/4;position:relative;z-index:1;display:grid;grid-template-columns:1fr auto;gap:8px 28px;align-items:end;padding:18px 28px 10px}
 .ts-title{display:flex;flex-direction:column;gap:2px;color:#fff}
 .ts-kick{font-size:12px;letter-spacing:.3em;color:#9FE8F0}
-.ts-title h2{margin:0;font-size:34px;font-weight:900;letter-spacing:.06em;font-style:italic;text-shadow:3px 3px 0 #1d2129}
+.ts-title h2{margin:0;font-size:34px;font-weight:900;letter-spacing:.06em;font-style:italic;text-shadow:3px 3px 0 #b3362a}
 .ts-sub{font-size:14px;color:#E8EEF2}
 .ts-progress{display:grid;grid-template-columns:auto 240px auto;gap:10px;align-items:center;color:#fff;font-size:13px}
 .ts-acts{font-weight:700;letter-spacing:.1em}
@@ -1454,7 +1454,8 @@ span.cmp-face-btn{cursor:default}
 .cs-av{width:64px;height:64px;border-radius:50%;object-fit:cover;object-position:50% 10%;border:3px solid #fff;background:#fff}
 .cs-title{display:flex;flex-direction:column;gap:2px}
 .cs-kick{font-size:12px;letter-spacing:.3em;color:#F6B73C}
-.cs-title h2{margin:0;font-size:28px;font-weight:900;letter-spacing:.04em;text-shadow:3px 3px 0 #1d2129}
+/* The heading is printed twice, misregistered (author 2026-11-15: 「重影很有意思，改成 2 个颜色」): ink on top, the poster red 3 px off */
+.cs-title h2{margin:0;font-size:28px;font-weight:900;letter-spacing:.04em;text-shadow:3px 3px 0 #b3362a}
 .cs-count{display:flex;flex-direction:column;align-items:flex-end;gap:6px;font-size:13px}
 .cs-pips{display:flex;gap:6px}
 .cs-pip{width:22px;height:10px;border-radius:5px;border:1.5px solid rgba(255,255,255,.7);background:rgba(255,255,255,.12)}
@@ -1504,7 +1505,7 @@ span.cmp-face-btn{cursor:default}
 /* meeting stage (2026-11-12): the meeting above, the template under it, over the day's picture */
 .ms{position:relative;flex:1;min-height:0;margin:-16px -26px -20px;display:grid;grid-template-columns:1fr 320px;grid-template-rows:auto 1fr auto;gap:0 18px;background:#14181F var(--art,none) center/cover no-repeat;color:#1d2129;overflow:hidden}
 .ms-top{grid-column:1/3;position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;padding:14px 28px 6px;color:#fff}
-.ms-top h2{margin:0;font-size:24px;font-weight:900;letter-spacing:.04em;text-shadow:3px 3px 0 #1d2129}
+.ms-top h2{margin:0;font-size:24px;font-weight:900;letter-spacing:.04em;text-shadow:3px 3px 0 #b3362a}
 .ms-main{position:relative;z-index:1;display:grid;grid-template-rows:minmax(0,1.2fr) auto;gap:10px;min-height:0;padding:4px 0 4px 28px}
 .ms-screen{min-height:0;border:3px solid #1d2129;border-radius:12px;background:#fff;box-shadow:8px 8px 0 #1d2129;overflow:hidden}
 .ms-screen .mt-left{height:100%;box-sizing:border-box;display:flex;flex-direction:column;gap:8px;padding:10px 12px;background:#fff;color:#1d2129}
