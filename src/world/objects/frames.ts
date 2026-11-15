@@ -1,17 +1,19 @@
-// The chick's frames are content (voices: "one of an enumerated set of 32×16 frames"; code never
-// draws or rewrites them). They live in `content/frames/chick.json`, written by Claude:
-//   { "frames": { "<id>": [16 rows of 32 characters, '#' ink, '.' none], … },
-//     "icons":  { "<icon>": [4 rows of 4 characters], … } }
+// The chick's frames are content (voices: "one of an enumerated set of frames"; code never draws or
+// rewrites them). They live in `content/frames/chick.json`, written by Claude (chick-face v2,
+// 2026-11-15: a 48×32 LCD for the pet alone; the icons are printed on the shell around the glass):
+//   { "frames": { "<id>": [32 rows of 48 characters, '#' ink, '.' none], … },
+//     "icons":  { "<icon>": [9 rows of 9 characters], … } }
 // with every id in CHICK_FRAMES and every icon in CHICK_ICONS. Read strictly when the file is there;
 // until it is, every frame is blank and `missingChickFrames()` lists what is owed (TODO for Claude).
 
-export const CHICK_W = 32;
-export const CHICK_H = 16;
-export const ICON_SIZE = 4;
+export const CHICK_W = 48;
+export const CHICK_H = 32;
+/** The printed icons on the shell (never on the LCD). */
+export const ICON_SIZE = 9;
 /** The enumerated set: idle (two), a turn, eating (two, a heart top right), lights off (two eyes), the check-up line, a nod, the grave, the upgraded smile (two). */
 export const CHICK_FRAMES = ["idle-1", "idle-2", "turn", "eat-1", "eat-2", "dark", "check", "nod", "grave", "smile-1", "smile-2"] as const;
 export type ChickFrameId = (typeof CHICK_FRAMES)[number];
-/** The eight icons across the top, in A's order. */
+/** The eight icons printed around the glass, in A's order (four above, four below). */
 export const CHICK_ICONS = ["meal", "light", "play", "medicine", "toilet", "checkup", "training", "attention"] as const;
 export type ChickIcon = (typeof CHICK_ICONS)[number];
 

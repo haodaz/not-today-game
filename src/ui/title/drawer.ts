@@ -194,6 +194,8 @@ export function createDrawerObject(id: string, root: HTMLElement, deps: DrawerDe
       if (program) {
         const { state: next, out } = program.key(session.hand.programs[id], key, env());
         session.hand.programs[id] = next;
+        // chick-face v2: the selected icon is lit on the shell, which is markup, not the canvas
+        if (id === "chick") render();
         // the device's own sounds (the 文曲星's two beeps on a win)
         for (const o of out) if ("sound" in o) {
           const play = () => playSfx(o.sound, deps.muted(), o.rate ? { rate: o.rate } : {});

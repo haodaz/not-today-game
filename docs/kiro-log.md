@@ -2724,3 +2724,26 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
 - Session fields: `chatLateDay`, `stare`, `stareJolt`, `handCut`.
 - Tests: new `tests/meters-v2-ui.test.ts` (targets, start / climb / fire once / reset / leave within a second, the chip snapshot mid-countdown, the late counter and hint once a day, the hand's lines by verdict). No existing snapshot changed.
 - tsc clean; vitest 174 files, 2441 passed.
+
+## 2026-11-15 · chick-face v2
+
+- frames.ts: `CHICK_W` 48, `CHICK_H` 32, `ICON_SIZE` 9; header comment updated (48×32 LCD for the pet, the icons printed on the shell).
+- chick.ts `drawChick`:
+  - The menu strip on the LCD is gone; A / B / C behave as before.
+  - `check` blits the content's template, then per stat clears and fills the bar's inside: `STAT_BAR_X` 15, rows `3 + 8i` (`STAT_ROW_H` 8, `STAT_BAR_Y` 3, `STAT_BAR_H` 4), width min(stat, 28) (`STAT_BAR_MAX`).
+  - The clear is beyond the spec: the template ships with sample fills in its bars, which would otherwise show for a stat of 0.
+  - `STAT_MARK` removed.
+- devices.ts:
+  - New `chickIconRows(menu, upgraded)`: two rows of four printed icons (the content's 9×9 bitmaps as crisp inline SVG), meal · light · play · medicine above the glass and toilet · checkup · training · attention below it.
+  - The selected one is `on` (a dark rounded square, the icon in the LCD green); none when upgraded.
+- devices.css:
+  - The bezel is 200×180 at top 62; the glass 152×104 (144×96 inside, 3 px a cell) at top 38; icon rows at 12 and 150; the brand up to 40.
+  - Buttons and labels stay where they were (the bezel ends at 242, the buttons start at 250). The back face is untouched.
+- Unchanged: `DEVICE_BACKING` and the held / drawer canvases (768×512 backing → 144×96 CSS is exactly 3 px a cell).
+- Tests:
+  - objects-in-hand: the fixtures use the constants; the backing size is read from them; the menu cases assert the LCD is the same with and without a menu.
+  - chick-raising: the status checks are moved to the new geometry.
+  - taken.test: unchanged and passing.
+  - New `tests/chick-face.test.ts`.
+- Snapshots: only the objects-in-hand per-icon chick frames entry (synthetic fixture) was renamed and rewritten. No other snapshot carried the egg's markup.
+- tsc clean; vitest 175 files, 2444 passed.

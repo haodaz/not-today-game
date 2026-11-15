@@ -41,11 +41,12 @@ export interface ChickState {
 }
 
 /** chick-raising R2: the status screen's rows (4 px each), the bar's start and its longest length. */
-export const STAT_ROW_H = 4;
-export const STAT_BAR_X = 10;
-export const STAT_BAR_MAX = 18;
-/** The mark at the start of each row (the icon whose care raises that stat), in STAT_ORDER. */
-const STAT_MARK: Readonly<Record<ChickStat, ChickIcon>> = { atk: "training", def: "medicine", hp: "meal", spd: "play" };
+export const STAT_ROW_H = 8;
+export const STAT_BAR_X = 15;
+export const STAT_BAR_MAX = 28;
+/** chick-face v2: each bar's inside starts this far down its row, and is this tall. */
+export const STAT_BAR_Y = 3;
+export const STAT_BAR_H = 4;
 const FULL_KEY = "obj.chick.full";
 
 /** What B does with each icon: meal eats, light goes dark, check-up shows the line; the rest nod. */
@@ -95,21 +96,16 @@ export function drawChick(s: ChickState, env: ObjectEnv, table: ChickFrames = ch
   // The new world: the same picture, smooth and in colour; it is always smiling. Once Kuro has moved
   // in, Kuro's pose fills it instead (a glimpse while on loan, only Kuro once taken; object-upgrade).
   if (env.upgraded) return upgradedHi(env, s.press, { lines: [], picture: { w: b.w, h: b.h, bits: b.bits } });
+  // chick-face v2: the icons are printed on the shell (devices.ts), never on the LCD; the menu's
+  // selection is lit there. The LCD is the pet's alone.
   if (id === "check") {
-    // chick-raising R2: the status screen is four bars (攻 防 血 敏), drawn here, no text; the
-    // menu strip is not laid over it (A brings the strip back).
-    b.rect(0, 0, b.w, b.h, 0);
+    // chick-raising R2 / chick-face v2: the content's status template (the four marks and the bar
+    // frames, 攻 防 血 敏) with each bar's inside filled from x = 15 to the stat (≤ 28). The inside is
+    // cleared first: the template's own sample fill is not a number.
     STAT_ORDER.forEach((stat, i) => {
-      const y = i * STAT_ROW_H;
-      b.blit(table.icons.get(STAT_MARK[stat]) ?? [], 0, y);
-      b.rect(STAT_BAR_X, y + 1, Math.min(env.stats?.[stat] ?? 0, STAT_BAR_MAX), 2, 1);
-    });
-  } else if (s.menu !== null && id !== "grave") {
-    CHICK_ICONS.forEach((icon, i) => {
-      const x = i * ICON_SIZE;
-      b.rect(x, 0, ICON_SIZE, ICON_SIZE, 0);
-      b.blit(table.icons.get(icon) ?? [], x, 0);
-      if (i === s.menu) b.invert(x, 0, ICON_SIZE, ICON_SIZE);
+      const y = STAT_BAR_Y + i * STAT_ROW_H;
+      b.rect(STAT_BAR_X, y, STAT_BAR_MAX, STAT_BAR_H, 0);
+      b.rect(STAT_BAR_X, y, Math.min(env.stats?.[stat] ?? 0, STAT_BAR_MAX), STAT_BAR_H, 1);
     });
   }
   if (s.flashAt !== null && env.t - s.flashAt >= 0 && env.t - s.flashAt < CHICK_FLASH_MS) b.invert(0, 0, b.w, b.h);

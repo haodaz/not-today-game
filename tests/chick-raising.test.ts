@@ -8,7 +8,7 @@ import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
 import { initialSession } from "@world/desktop/model";
 import { t } from "@world/i18n";
-import { chick, drawChick, STAT_BAR_X, type ChickState } from "@world/objects/chick";
+import { chick, drawChick, STAT_BAR_MAX, STAT_BAR_X, type ChickState } from "@world/objects/chick";
 import type { PixelFrame } from "@world/objects/frame";
 import { CHICK_ICONS, CHICK_W } from "@world/objects/frames";
 import type { ObjectEnv } from "@world/objects/program";
@@ -62,22 +62,25 @@ describe("R1 / R2 · the program returns { care }", () => {
 });
 
 describe("R2 · the status screen", () => {
-  it("four bars, 攻 防 血 敏, each min(stat, 18) px from x = 10", () => {
-    const e = env({ stats: { atk: 3, def: 0, hp: 25, spd: 1 } });
+  it("chick-face v2: the content's template, each bar filled from x = 15, rows 3 + 8i, 4 tall, width = stat, capped at 28", () => {
+    const e = env({ stats: { atk: 3, def: 0, hp: 40, spd: 1 } });
     const s = pressOn("checkup", e).state;
     expect(s.act?.kind).toBe("check");
     const f = drawChick(s, e) as PixelFrame;
     const on = (x: number, y: number) => f.bits[y * CHICK_W + x] === 1;
-    // 攻 (row 0): 3 px at y = 1..2.
-    expect([on(STAT_BAR_X, 1), on(STAT_BAR_X + 2, 2), on(STAT_BAR_X + 3, 1)]).toEqual([true, true, false]);
-    // 防 (row 1): nothing.
-    expect(on(STAT_BAR_X, 5)).toBe(false);
-    // 血 (row 2): capped at 18.
-    expect([on(STAT_BAR_X + 17, 9), on(STAT_BAR_X + 18, 9)]).toEqual([true, false]);
-    // 敏 (row 3): one pixel.
-    expect([on(STAT_BAR_X, 13), on(STAT_BAR_X + 1, 13)]).toEqual([true, false]);
-    // Nothing between the mark and the bar.
-    for (let y = 0; y < 16; y++) for (const x of [8, 9]) expect(on(x, y)).toBe(false);
+    const row = (i: number) => 3 + 8 * i;
+    expect([STAT_BAR_X, STAT_BAR_MAX]).toEqual([15, 28]);
+    // 攻: 3 px, the whole 4 rows tall
+    for (let y = row(0); y < row(0) + 4; y++) expect([on(STAT_BAR_X, y), on(STAT_BAR_X + 2, y), on(STAT_BAR_X + 3, y)]).toEqual([true, true, false]);
+    // 防: nothing inside its frame (the template's own sample fill is cleared)
+    for (let x = STAT_BAR_X; x < STAT_BAR_X + STAT_BAR_MAX; x++) expect(on(x, row(1) + 1)).toBe(false);
+    // 血: capped at 28 (the frame's right edge at x = 43 stays drawn)
+    expect([on(STAT_BAR_X + 27, row(2)), on(STAT_BAR_X + 28, row(2) + 1)]).toEqual([true, true]);
+    expect(on(STAT_BAR_X + 28, row(2) + 1)).toBe(on(STAT_BAR_X + 28, row(1) + 1));
+    // 敏: one pixel
+    expect([on(STAT_BAR_X, row(3)), on(STAT_BAR_X + 1, row(3))]).toEqual([true, false]);
+    // the template's marks down the left are there
+    expect([...Array(4).keys()].every((i) => [...Array(10).keys()].some((x) => on(x, row(i) + 1)))).toBe(true);
   });
 });
 

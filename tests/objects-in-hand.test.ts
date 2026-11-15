@@ -19,7 +19,7 @@ import { calculator, formatNumber, lightLevel, lightZone, unaskedAt, UPSIDE_DOWN
 import { chick, chickFrameAt, CHICK_IDLE_MS, drawChick, ICON_ACT, turnTimes, type ChickState } from "@world/objects/chick";
 import { dictionary, lookup, type DictionaryState } from "@world/objects/dictionary";
 import { ascii, DOT_GLYPHS, finer, rowWidth, SEGMENTS, type Frame, type PixelFrame } from "@world/objects/frame";
-import { CHICK_FRAMES, CHICK_H, CHICK_ICONS, CHICK_W, missingChickFrames, parseChickFrames, type ChickFrames } from "@world/objects/frames";
+import { CHICK_FRAMES, CHICK_H, CHICK_ICONS, CHICK_W, ICON_SIZE, missingChickFrames, parseChickFrames, type ChickFrames } from "@world/objects/frames";
 import { DOWN, dragTurn, easeBack, flipsOver, handStep, keysLive, RETURN_MS, TURN_PITCH, TURN_YAW, type Hand } from "@world/objects/hand";
 import { arrivedMessages, KEY_DOWN_MS, PROGRAMS } from "@world/objects/index";
 import { batteryBars, pager, pagerHistory, PAGER_HISTORY, type PagerState } from "@world/objects/pager";
@@ -39,16 +39,17 @@ const msg = (day: number, text: string): PagerMessage => ({ day, text, meaning: 
 
 /** Test-only frames (not content): each frame a different mark, so a snapshot shows which one is up. */
 function testFrames(): ChickFrames {
-  const blank = () => Array.from({ length: 16 }, () => ".".repeat(32));
+  // chick-face v2: frames at the constants' size (48 × 32), icons 9 × 9
+  const blank = () => Array.from({ length: CHICK_H }, () => ".".repeat(CHICK_W));
   const frames: Record<string, string[]> = {};
   CHICK_FRAMES.forEach((id, i) => {
     const rows = blank();
     // A bar at row 6 + i % 8 whose length says the index; the frame's id is readable from it.
-    rows[6 + (i % 8)] = "#".repeat(i + 1).padEnd(32, ".");
+    rows[6 + (i % 8)] = "#".repeat(i + 1).padEnd(CHICK_W, ".");
     frames[id] = rows;
   });
   const icons: Record<string, string[]> = {};
-  CHICK_ICONS.forEach((id, i) => (icons[id] = ["#..#", i % 2 ? "####" : "....", "....", "#..#"]));
+  CHICK_ICONS.forEach((id, i) => (icons[id] = Array.from({ length: ICON_SIZE }, (_, r) => (r === i ? "#".repeat(ICON_SIZE) : "#".padEnd(ICON_SIZE, ".")))));
   return parseChickFrames({ frames, icons });
 }
 
@@ -122,7 +123,7 @@ describe("loaders (FR4)", () => {
   });
   it("chick frames are content: strict when present, and owed (TODO for Claude) while absent", () => {
     expect(() => parseChickFrames({ frames: { wave: [] }, icons: {} })).toThrow(/not one of/);
-    expect(() => parseChickFrames({ frames: { "idle-1": ["#"] }, icons: {} })).toThrow(/16 rows/);
+    expect(() => parseChickFrames({ frames: { "idle-1": ["#"] }, icons: {} })).toThrow(new RegExp(`${CHICK_H} rows`));
     expect(missingChickFrames(testFrames())).toEqual([]);
     expect(missingChickFrames({ frames: new Map(), icons: new Map() })).toHaveLength(CHICK_FRAMES.length + CHICK_ICONS.length);
   });
@@ -546,7 +547,7 @@ describe("holding and using (FR1)", () => {
       expect([...ghostBits("chick", 0).bits].every((b) => b === 1)).toBe(true); // every pixel ghosts
       expect([...ghostBits("pager", 0).bits].some((b) => b === 1)).toBe(true); // the 8. of every cell
       // The markup backing is channel × 16 (chick 32×16 → 512×256) for every object.
-      expect(render(used("chick"))).toMatch(/<canvas class="dev" data-screen="chick" width="512" height="256"/);
+      expect(render(used("chick"))).toMatch(new RegExp(`<canvas class="dev" data-screen="chick" width="${CHICK_W * 16}" height="${CHICK_H * 16}"`));
       expect(render(used("pager"))).toMatch(new RegExp(`width="${CHANNELS.pager!.w * 16}" height="${CHANNELS.pager!.h * 16}"`));
       // The canvas fills the glass, centred, aspect kept, never smoothed.
       const css = readFileSync(resolve(__dirname, "../src/world/room/devices.css"), "utf8");
@@ -866,7 +867,7 @@ describe("holding and using (FR1)", () => {
 describe("programs (FR2, FR3)", () => {
   const press = <S>(p: (typeof PROGRAMS)[string], keys: string[], e: ObjectEnv): S => keys.reduce((s, k, i) => p.key(s, k, { ...e, t: e.t + i }).state, p.init(e)) as S;
 
-  it("chick: A cycles the eight icons (the selected one inverted); B acts; C goes back to idle; a half-tone higher on success", () => {
+  it("chick: A cycles the eight icons (chick-face v2: printed on the shell, nothing on the LCD); B acts; C goes back to idle; a half-tone higher on success", () => {
     const table = testFrames();
     const e = env({ t: 100 });
     const frames: Record<string, string> = {};
@@ -874,6 +875,8 @@ describe("programs (FR2, FR3)", () => {
       const s = press<ChickState>(chick, [...Array(i + 1).fill("A"), "B"], e);
       expect(s.act?.kind).toBe(ICON_ACT[icon]);
       frames[icon] = ascii(drawChick(s, { ...e, t: 150 }, table) as PixelFrame);
+      // with the menu set the LCD shows the same picture as with it null
+      expect(ascii(drawChick({ ...s, menu: null }, { ...e, t: 150 }, table) as PixelFrame)).toBe(frames[icon]);
     });
     // chick-raising R1: B on 喂食 is also a care (index.ts logs it).
     expect(chick.key(press(chick, ["A"], e), "B", e).out).toEqual([{ care: "meal" }, { sound: "chick-beep", rate: SEMITONE, delay: 120 }]);

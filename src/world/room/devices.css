@@ -16,9 +16,18 @@
   background:radial-gradient(ellipse at 34% 26%,#fff6c9 0%,#ffd84d 32%,#f2b519 70%,#d98f0c 100%);
   box-shadow:inset -10px -14px 0 rgba(160,90,0,.25),inset 8px 10px 0 rgba(255,255,255,.35),0 18px 40px rgba(0,0,0,.5)}
 .dev-shell.egg::before{content:"";position:absolute;left:50%;top:-22px;width:34px;height:30px;margin-left:-17px;border:6px solid #c9ccd3;border-bottom:none;border-radius:20px 20px 0 0}
-.dev-shell.egg .bezel{position:absolute;left:50%;top:78px;width:200px;height:150px;margin-left:-100px;border-radius:46% 46% 40% 40% / 50% 50% 40% 40%;background:#f7f3e6;box-shadow:inset 0 4px 0 rgba(0,0,0,.12)}
-.dev-shell.egg .glass{position:absolute;left:24px;top:22px;width:152px;height:106px;border-radius:10px;background:var(--lcd);box-shadow:inset 0 3px 0 var(--lcd-dark),inset 0 0 0 3px #8f9b78;display:flex;align-items:center;justify-content:center;padding:4px}
-.dev-shell.egg .brand{position:absolute;top:44px;width:100%;text-align:center;font:700 13px/1 "Arial Rounded MT Bold","PingFang SC",sans-serif;color:#b8560a;letter-spacing:2px}
+/* chick-face v2 (2026-11-15): the rows are .egg-top / .egg-bottom, never .top (desktop.css paints a white monitor bar on any .top). The bezel grows to hold two rows of printed icons around a 3 : 2 glass
+   (48 × 32 at 3 px a cell = 144 × 96 inside, 152 × 104 with its 4 px padding) */
+.dev-shell.egg .bezel{position:absolute;left:50%;top:62px;width:200px;height:180px;margin-left:-100px;border-radius:46% 46% 40% 40% / 44% 44% 36% 36%;background:#f7f3e6;box-shadow:inset 0 4px 0 rgba(0,0,0,.12)}
+.dev-shell.egg .egg-icons{position:absolute;left:24px;width:152px;height:20px;display:flex;justify-content:space-between;align-items:center;padding:0 6px;box-sizing:border-box}
+.dev-shell.egg .egg-icons.egg-top{top:12px}
+.dev-shell.egg .egg-icons.egg-bottom{top:150px}
+.dev-shell.egg .egg-ic{display:block;width:20px;height:20px;padding:1px;box-sizing:border-box;border-radius:4px;color:rgba(154,90,0,.7)}
+.dev-shell.egg .egg-ic svg{display:block;width:18px;height:18px}
+.dev-shell.egg .egg-ic.on{background:#2b3324;color:var(--lcd)}
+.dev-shell.upgraded.egg .egg-ic{color:#9aa4b5}
+.dev-shell.egg .glass{position:absolute;left:24px;top:38px;width:152px;height:104px;box-sizing:border-box;border-radius:10px;background:var(--lcd);box-shadow:inset 0 3px 0 var(--lcd-dark),inset 0 0 0 3px #8f9b78;display:flex;align-items:center;justify-content:center;padding:4px}
+.dev-shell.egg .brand{position:absolute;top:40px;width:100%;text-align:center;font:700 13px/1 "Arial Rounded MT Bold","PingFang SC",sans-serif;color:#b8560a;letter-spacing:2px}
 .dev-shell.egg .btns{position:absolute;left:0;right:0;top:250px;display:flex;justify-content:center;gap:22px}
 .dev-shell.egg .btns button{width:40px;height:40px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff8fa3,#e0395a 70%);box-shadow:0 4px 0 #9b1f39,inset 0 2px 0 rgba(255,255,255,.4);color:transparent}
 .dev-shell.egg .btns button.down{box-shadow:0 1px 0 #9b1f39;transform:translateY(3px)}
