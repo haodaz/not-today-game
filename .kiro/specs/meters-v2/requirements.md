@@ -86,3 +86,22 @@ on day 16 — about −3.5 SAN a day from the chat alone and −2 a night from a
 of the judgements. Two constants softened in `content/variables.json`: `chatSanLateFrom` 5 → 6 (only
 the sixth turn of a day costs), `handSanPerfect` −2 → −1. The rest unchanged. Tests read the
 constants, nothing else to touch.
+
+## §1 corrections (Claude, 2026-11-15) — read with §1
+
+- The strings exist: `settle.quality.perfect / flawed / wrong` in `content/strings/{zh,en}.json`.
+  The line goes on the settlement sheet (`src/world/desktop/workbench/settle-sheet.ts`), under the
+  `settle.pass` / `settle.fail` line, only when the task event carries a `quality`.
+- **Day 11 is `fill`, not `balance`** (day11-budget-fill). `balance` has no day: no `grade` for it.
+  `printBoard` (`board.ts` ~line 1559) already grades fill inline (Kuro's fill → `wrong`, else
+  `perfect`); move that into `grade()` in `fill.ts` and read it the same way as the others, so the
+  print site has one rule for every game.
+- **Day 13 is the approval chain (`stack-stage.ts`, `session.chain`)**: perfect = 2048 reached,
+  flawed = 1024, wrong = less. Day 10's session is `session.spotMiss`.
+- The session fields are on `Session` (`src/world/desktop/model.ts` ~lines 388–438: `link`,
+  `match3`, `snake`, `pacman`, `mines`, `sokoban`, `spotMiss`, `fill`, `tetris`, `chain`, `pipes`,
+  `moles`, `rhythm`, `gacha`). **Check when each is cleared**: if a game's session is null by the
+  time the board is printed, grade it at the moment the game resolves (its win / over action) and
+  keep the verdict on the board state (`BoardState.quality`), so `printBoard` reads one field. Say
+  in the log which games needed that.
+- `grade()` is pure; one test per engine on a built session (not through the DOM).
