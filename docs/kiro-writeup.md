@@ -1,7 +1,7 @@
 # How Kiro was used — NOT TODAY (Kiroween 2026)
 
 Draft for the Devpost "write-up on how Kiro was used" field. Numbers are taken from the tree on
-2026-11-12; update them before submitting (`npx vitest run`, `ls .kiro/specs | wc -l`).
+2026-11-15; update them before submitting (`npx vitest run`, `ls .kiro/specs | wc -l`).
 
 ## In one paragraph
 
@@ -11,7 +11,7 @@ requirements file under `.kiro/specs/`, five steering files set the product, the
 structure and the technical rules, and three hooks act as quality gates on save. Kiro wrote the
 game code; a human author made every decision; Claude wrote the story content and the specs. The
 whole history is public: `.kiro/` is at the root of the repo, and `docs/kiro-log.md` is Kiro's own
-log of every job (2,600+ lines).
+log of every job (2,700+ lines).
 
 ## Which Kiro
 
@@ -20,7 +20,7 @@ log of every job (2,600+ lines).
 
 ## Specs vs vibe
 
-Spec-driven, almost entirely. There are **63 spec folders** under `.kiro/specs/`. Each job Kiro
+Spec-driven, almost entirely. There are **68 spec folders** under `.kiro/specs/`. Each job Kiro
 did began with `requirements.md` written in English by Claude from the author's decisions; Kiro
 wrote `design.md` and `tasks.md` where the job needed them (16 designs, 39 task lists at the last
 count), then implemented, then logged what it did and what it decided in `docs/kiro-log.md`.
@@ -39,6 +39,13 @@ A few things show how the specs were used, not just filed:
   not exist, the spec told it to stop and report the key rather than invent text. The log shows it
   doing exactly that (for example the `endings-matrix` job reported one line that broke a voices
   rule instead of editing it).
+
+- **One spec, one job, one review.** The last week ran as a chain: Claude writes a spec in English
+  from the author's words (the book by the bed, day 11's budget fill, the two device games, the
+  character panel), the author pastes a one-paragraph command into Kiro, Kiro implements and
+  reports back with its decisions and open questions, Claude answers the questions, runs the
+  suite, plays the result in a browser and commits with Kiro's credit. Where Kiro needed content
+  (the shape of day 11's game data) it stopped and asked for the schema instead of inventing it.
 
 "Vibe" was used for one class of work only: small visual fixes after a playtest, listed in the log
 under "six fixes (no new spec)" and similar headings.
@@ -79,9 +86,9 @@ Three `PostFileSave` hooks in `.kiro/hooks/`, all "agent" hooks that run a scrip
 
 ## Testing
 
-- **2,391 tests in 168 files** (vitest), all pure: the state layer is reducers over an event log,
+- **2,435 tests in 173 files** (vitest), all pure: the state layer is reducers over an event log,
   so a whole 18-day run can be replayed headlessly in a test.
-- **Property-based testing with fast-check**: 92 `fc.property` calls across 40 test files. Examples:
+- **Property-based testing with fast-check**: 92 `fc.property` calls across 38 test files. Examples:
   SAN never leaves 0..100 whatever the run does; an ending fires exactly once per run; the
   day-18 pull-out's island only shrinks and the dark only grows; the match-3 board never has a
   move-less state after a refill; the sokoban levels are solvable (BFS) and a known solution
@@ -116,7 +123,7 @@ skeleton).
 ## What we learned about Kiro
 
 - A spec that says what *not* to touch is worth more than one that lists features: the
-  content/code boundary never leaked in 600+ commits.
+  content/code boundary never leaked in 660+ commits.
 - Dated correction sections in the same spec beat new specs for small changes; the log stays
   readable by spec name.
 - Hooks are best as gates that *report*, not fix; the one hook that ran tests on every save was the
