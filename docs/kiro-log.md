@@ -2747,3 +2747,15 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
   - New `tests/chick-face.test.ts`.
 - Snapshots: only the objects-in-hand per-icon chick frames entry (synthetic fixture) was renamed and rewritten. No other snapshot carried the egg's markup.
 - tsc clean; vitest 175 files, 2444 passed.
+
+## 2026-11-15 · title-ambient
+
+- view.ts `ambient(m)` is printed right after `.title-photo` inside `.title-room`: `.amb.daylight`, `.amb.daylight.b`, `.amb.rain` (`off` when `m.rain` is false), `.amb.led` (not printed when `monitorsAwake` or the `monitor_right` idle is on), `.amb.grain`. All `aria-hidden`; `.amb` is `pointer-events:none`. The new idle layer `<div class="idle window [on]">` comes after the lamp.
+- table.ts: `IDLE_LAYERS` gains `"window"`. Content event `far_lightning` is Claude's (not added).
+- model.ts: `TitleModel.rain` (initial true). mount.ts mirrors `rainOn` into the model at the `rain_stops` idle's two flips.
+- mount.ts: new `applyGrain(root, random)` builds a 128×128 grey-noise canvas once and sets `--t-grain` on the root. Without a 2d context nothing is set and nothing throws. Called at mount (its own Math.random; the title's dice keep theirs).
+- title.css: the keyframes as the spec gives them: daylight 11 s / 17 s at half strength, the LED 2.4 s, grain `steps(8)` 800 ms, and `t-drift` now also translates 0 0 → −14px 6px. Reduced motion: rain hidden, grain static, LED .5, daylight held at mid.
+  - Rain differs from the spec's letter: the second depth (9 px, 5.1 s, half as bright) is on `::after`, not a second `background-image` on the same element. Two animations on one property do not add (the last would win), so the two speeds need two elements.
+- Tests: title.test gains the layer order, rain off, LED absent, the window layer, `parseTitle` with "window", and the grain with and without a canvas (happy-dom, getContext stubbed).
+- Snapshots: 4 title.test snapshots refreshed (markup-only); each diff was checked to be only the new `.amb` layers and `.idle.window`.
+- tsc clean; vitest 175 files, 2448 passed.

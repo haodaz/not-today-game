@@ -16,7 +16,7 @@ import { renderRoom } from "@world/room/hud";
 import { loopActions, loopKeys } from "@world/room/game";
 import { readCollection } from "../src/ui/collection";
 import { arrived, cardOpen, canStart, diceOptions, initialTitle, NO_ANSWERS, QUESTIONS, rowsShown, toMenu, toNames, toQuestions, turnPortrait, withAnswer, withPronoun, type Answers, type TitleModel } from "../src/ui/title/model";
-import { idleDelay, pickIdle } from "../src/ui/title/mount";
+import { applyGrain, idleDelay, pickIdle } from "../src/ui/title/mount";
 import { parseTitle, titleTable } from "../src/ui/title/table";
 import { renderTitle } from "../src/ui/title/view";
 
@@ -327,5 +327,50 @@ describe("the collection (FR4, FR8)", () => {
     writer.recordEnding("good");
     expect(readProfile(storage)).toEqual({ runs: 1, endings: { bad: 2, survive: 0, warm: 0, good: 1, collapse: 0 }, finishedRuns: 3 });
     expect(readCollection(storage)).toEqual(collected(3, { bad: 2, good: 1 }));
+  });
+});
+
+describe("title-ambient: the layer that never stops", () => {
+  const base = initialTitle(null, EMPTY_COLLECTION);
+  const room = (out: string) => out.slice(out.indexOf('<div class="title-room'), out.indexOf('<div class="title-vig">'));
+  it("the four ambient layers in order inside .title-room, after the photo, before the idle layers", () => {
+    const r = room(page(base));
+    const order = [...r.matchAll(/<div class="amb ([a-z ]+)"/g)].map((m) => m[1]);
+    expect(order).toEqual(["daylight", "daylight b", "rain", "led", "grain"]);
+    expect(r.indexOf('class="title-photo"')).toBeLessThan(r.indexOf('class="amb daylight"'));
+    expect(r.indexOf('class="amb grain"')).toBeLessThan(r.indexOf('class="idle'));
+  });
+  it("rain off while paused; no standby light once a screen is lit", () => {
+    expect(page({ ...base, rain: false })).toContain('<div class="amb rain off"');
+    expect(page(base)).toContain('<div class="amb rain"');
+    expect(page({ ...base, monitorsAwake: true })).not.toContain("amb led");
+    expect(page({ ...base, idle: { id: "x", layer: "monitor_right" } })).not.toContain("amb led");
+  });
+  it("the window idle layer prints, and is on for an event on it; parseTitle accepts it", () => {
+    expect(page(base)).toContain('<div class="idle window"></div>');
+    expect(page({ ...base, idle: { id: "far_lightning", layer: "window" } })).toContain('<div class="idle window on"></div>');
+    const raw = structuredClone(titleFile) as any;
+    raw.idle.events[0].layer = "window";
+    expect(parseTitle(raw).idle.events[0]!.layer).toBe("window");
+  });
+});
+
+describe("title-ambient: the grain tile", () => {
+  it("with a canvas the root gets --t-grain; without one nothing is set and nothing throws", async () => {
+    const { Window } = await import("happy-dom");
+    const win = new Window();
+    const root = win.document.createElement("div") as unknown as HTMLElement;
+    const proto = (win as unknown as { HTMLCanvasElement: { prototype: { getContext: unknown; toDataURL: unknown } } }).HTMLCanvasElement.prototype;
+    const real = { getContext: proto.getContext, toDataURL: proto.toDataURL };
+    proto.getContext = () => null;
+    expect(applyGrain(root)).toBe(false);
+    expect(root.style.getPropertyValue("--t-grain")).toBe("");
+    let put = 0;
+    proto.getContext = () => ({ createImageData: (w: number, h: number) => ({ data: new Uint8ClampedArray(w * h * 4) }), putImageData: () => void put++ });
+    proto.toDataURL = () => "data:image/png;base64,AAAA";
+    expect(applyGrain(root, () => 0.5)).toBe(true);
+    expect(put).toBe(1);
+    expect(root.style.getPropertyValue("--t-grain")).toBe("url(data:image/png;base64,AAAA)");
+    Object.assign(proto, real);
   });
 });

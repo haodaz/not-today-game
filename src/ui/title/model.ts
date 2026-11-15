@@ -68,6 +68,8 @@ export interface TitleModel {
   readonly chairCut: boolean;
   /** 新游戏 woke the monitors; Esc from the questions puts them to sleep. */
   readonly monitorsAwake: boolean;
+  /** title-ambient: the rain is on (the `rain_stops` idle pauses it); the glass's streaks fade while it is off. */
+  readonly rain: boolean;
   /** 开始 was pressed: the card closes, the lamp goes off, the game takes over at the desk. */
   readonly starting: boolean;
   /**
@@ -96,7 +98,7 @@ export interface TitleModel {
 export type OpeningPhase = "print" | "stick" | "hold" | "fade";
 
 export function initialTitle(save: TitleModel["save"], collection: Collection): TitleModel {
-  return { screen: "menu", save, answers: NO_ANSWERS, settingsOpen: false, muted: false, idle: null, chairCut: false, monitorsAwake: false, starting: false, framing: "room", moving: false, collection, drawerOpen: null, albumOpen: null, figureOpen: null, opening: null };
+  return { screen: "menu", save, answers: NO_ANSWERS, settingsOpen: false, muted: false, idle: null, chairCut: false, monitorsAwake: false, rain: true, starting: false, framing: "room", moving: false, collection, drawerOpen: null, albumOpen: null, figureOpen: null, opening: null };
 }
 
 /** The card shows only once the camera has arrived at the desk. */

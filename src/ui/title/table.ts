@@ -7,7 +7,8 @@ export const DICE_QUESTIONS = ["login", "nick", "bossCalls", "calledBy"] as cons
 export type DiceQuestion = (typeof DICE_QUESTIONS)[number];
 
 /** The DOM layers an idle event may light (title-page FR7). */
-export const IDLE_LAYERS = ["lamp", "monitor_right", "chair", "gap", "rain"] as const;
+// title-ambient: `window` is a far flash of lightning through the curtain.
+export const IDLE_LAYERS = ["lamp", "monitor_right", "chair", "gap", "rain", "window"] as const;
 export type IdleLayer = (typeof IDLE_LAYERS)[number];
 
 export interface IdleEvent {

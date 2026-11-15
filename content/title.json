@@ -30,6 +30,11 @@
         "id": "rain_stops",
         "layer": "rain",
         "ms": 3000
+      },
+      {
+        "id": "far_lightning",
+        "layer": "window",
+        "ms": 120
       }
     ]
   },

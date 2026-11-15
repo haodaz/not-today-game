@@ -72,10 +72,38 @@ export function pickIdle(random: () => number): IdleEvent {
   return list[Math.min(list.length - 1, Math.floor(random() * list.length))]!;
 }
 
+/**
+ * title-ambient: the film grain's tile, made once — a 128 × 128 canvas of random grey pixels, set on
+ * the root as `--t-grain`. Without a canvas (jsdom, happy-dom) nothing is set: the layer is clear.
+ */
+export const GRAIN_SIZE = 128;
+export function applyGrain(root: HTMLElement, random: () => number = Math.random): boolean {
+  try {
+    const c = root.ownerDocument.createElement("canvas");
+    c.width = GRAIN_SIZE;
+    c.height = GRAIN_SIZE;
+    const g = c.getContext("2d");
+    if (!g) return false;
+    const img = g.createImageData(GRAIN_SIZE, GRAIN_SIZE);
+    for (let i = 0; i < GRAIN_SIZE * GRAIN_SIZE; i++) {
+      const v = Math.floor(random() * 256);
+      img.data[i * 4] = img.data[i * 4 + 1] = img.data[i * 4 + 2] = v;
+      img.data[i * 4 + 3] = 255;
+    }
+    g.putImageData(img, 0, 0);
+    root.style.setProperty("--t-grain", `url(${c.toDataURL()})`);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () => void; model: () => TitleModel } {
   const random = deps.random ?? Math.random;
   const doc = root.ownerDocument;
   const win = doc.defaultView!;
+  // title-ambient: the grain's tile (its own randomness: the run's dice stay as they were)
+  applyGrain(root);
   let model: TitleModel = { ...initialTitle(deps.save, deps.collection), muted: deps.sound?.muted ?? false, ...(deps.hints ? { hintsOn: deps.hints.on } : {}), ...(deps.account ? { account: { kind: "checking" } as Account } : {}) };
   /** When the running camera move began (performance.now), or null. */
   let movedAt: number | null = null;
@@ -191,9 +219,11 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
       const e = pickIdle(random);
       if (e.layer === "rain") {
         rainOn = false;
+        set({ ...model, rain: rainOn });
         sound();
         later(e.ms, () => {
           rainOn = true;
+          set({ ...model, rain: rainOn });
           sound();
           idleNext(false);
         });

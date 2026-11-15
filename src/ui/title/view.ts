@@ -17,6 +17,16 @@ import { albumPage, hasAlbum } from "./album";
 /** The game's name, as on the box (not story text). */
 export const GAME_TITLE = "NOT TODAY";
 
+/**
+ * title-ambient (author 2026-11-15): the layer that never stops — the window's light breathing on two
+ * periods, rain on the glass (off while the rain is paused), the right monitor's standby light (gone
+ * once a screen is lit), film grain (the mount sets its tile). CSS keyframes only; nothing to click.
+ */
+function ambient(m: TitleModel): SafeHtml {
+  const lit = m.monitorsAwake || m.idle?.layer === "monitor_right";
+  return html`<div class="amb daylight" aria-hidden="true"></div><div class="amb daylight b" aria-hidden="true"></div><div class="${cls("amb", "rain", !m.rain && "off")}" aria-hidden="true"></div>${lit ? null : html`<div class="amb led" aria-hidden="true"></div>`}<div class="amb grain" aria-hidden="true"></div>`;
+}
+
 /** The room behind it, darkened, pushing in slowly; the idle layers and the figures move with it. */
 function room(m: TitleModel): SafeHtml {
   const on = (layer: string) => m.idle?.layer === layer;
@@ -27,7 +37,7 @@ function room(m: TitleModel): SafeHtml {
   const p = centre(ROOM_SHOT.desk);
   const cam = `--m-tx:${Math.round(p.x * (1 - ROOM_PUSH))}px;--m-ty:${Math.round(p.y * (1 - ROOM_PUSH))}px;--m-z:${ROOM_PUSH}`;
   const camCls = m.moving ? (m.framing === "desk" ? "cam-in" : "cam-out") : m.framing === "desk" && "cam-desk";
-  return html`<div class="${cls("title-room", camCls, m.starting && "starting")}" style="${cam}"><div class="title-photo"></div><div class="${cls("idle", "chair", m.chairCut && "cut")}" style="${rectStyle(ROOM_COLLECTION.chair)}"></div>${mon("left")}${mon("right")}<div class="${cls("idle", "gap", on("gap") && "on")}" style="${rectStyle(ROOM_SHOT.gap)}"></div>${figuresLayer(m.collection)}${shelfBook()}<div class="${cls("idle", "lamp", on("lamp") && "on", m.starting && "off")}"></div></div><div class="title-vig"></div>`;
+  return html`<div class="${cls("title-room", camCls, m.starting && "starting")}" style="${cam}"><div class="title-photo"></div>${ambient(m)}<div class="${cls("idle", "chair", m.chairCut && "cut")}" style="${rectStyle(ROOM_COLLECTION.chair)}"></div>${mon("left")}${mon("right")}<div class="${cls("idle", "gap", on("gap") && "on")}" style="${rectStyle(ROOM_SHOT.gap)}"></div>${figuresLayer(m.collection)}${shelfBook()}<div class="${cls("idle", "lamp", on("lamp") && "on", m.starting && "off")}"></div><div class="${cls("idle", "window", on("window") && "on")}"></div></div><div class="title-vig"></div>`;
 }
 
 function menu(m: TitleModel): SafeHtml {
