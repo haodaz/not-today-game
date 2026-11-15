@@ -85,3 +85,11 @@ their mid opacity. The drift already follows the game's rule in `motion.css`; fo
 ## Not in this spec
 New idle events (Claude's content); the logo and menu (still, on purpose); the Kuro figures on the
 desk; any sound change; the in-run room views (this is the title page only).
+
+## The author's verdict (2026-11-15, after seeing it live) — this is the state of the page
+
+Kept: the window light breathing, the monitor's standby light (「最好的亮点」), the far lightning.
+Cut the same evening: the rain (「有点傻」), the film grain (「晃眼」), and the slow push / drift
+(「突兀」) — the room photo holds still; only light moves. `TitleModel.rain`, `applyGrain` and the
+`t-drift` keyframes are gone with them. The title page's own language button (bottom right) is gone
+too: 设置 already has the language row.

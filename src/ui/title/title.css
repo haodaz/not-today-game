@@ -1,9 +1,8 @@
 /* The title page (title-page FR1–FR3, FR7, FR8; mocks design/chrome/title.html, title-questions.html).
    The world fills the screen; the menu is a short column of outlined words laid on it. */
 .title-page{position:relative;width:1600px;height:900px;overflow:hidden;color:#efe9df;background:#000;transform:scale(var(--scale,1));transform-origin:0 0}
-.title-room{position:absolute;inset:0;transform-origin:center;animation:t-drift 120s ease-in-out infinite alternate}
-/* title-ambient: the push is also a slow pan (a camera, not a zoom) */
-@keyframes t-drift{from{scale:1;translate:0 0}to{scale:1.07;translate:-14px 6px}}
+/* No slow push: the author cut it (2026-11-15, 「推进很突兀」); the picture holds still, the light moves. */
+.title-room{position:absolute;inset:0;transform-origin:center}
 .title-photo{position:absolute;inset:0;background:#0a0a0b url(/room/shots/room_nobox.jpg) center/cover;filter:brightness(.4) saturate(.8)}
 .title-vig{position:absolute;inset:0;background:radial-gradient(120% 90% at 30% 50%,transparent 40%,rgba(0,0,0,.55) 100%);pointer-events:none}
 /* The waiting room: one small thing at a time (FR7). */
@@ -27,8 +26,6 @@
 .title-start{margin-top:14px}
 .title-start:disabled{border-color:rgba(239,233,223,.3);opacity:.4;cursor:default}
 .title-ver{position:absolute;left:112px;bottom:40px;font-size:12px;letter-spacing:.1em;color:rgba(239,233,223,.55);line-height:1.9}
-.title-lang{position:absolute;right:48px;bottom:40px;border:0;background:none;padding:0;font-size:13px;letter-spacing:.15em;color:rgba(239,233,223,.7);cursor:pointer}
-.title-lang:hover,.title-lang:focus-visible{color:#efe9df}
 /* The camera (correction 2026-11-01): 新游戏 pushes to 桌子 along 房间→桌子's path; Esc pulls back. */
 .title-room.cam-in,.title-room.cam-out,.title-room.cam-desk{transform-origin:0 0}
 /* --t-ago (negative, set by the mount on re-render) resumes a running move where it was. */
@@ -204,35 +201,20 @@
 .title-pick .pick-label{font-size:17px;letter-spacing:.2em;text-indent:.2em;color:#1d2129;min-width:5em;text-align:center}
 
 /* title-ambient (author 2026-11-15): the layer that never stops, under the vignette, over the photo.
-   Two periods that are not multiples of each other keep the window's light from looking like a loop. */
+   Two periods that are not multiples of each other keep the window's light from looking like a loop.
+   Rain on the glass and film grain were tried and cut the same evening (author: 「雨有点傻」「噪点晃眼」). */
 .title-room .amb{position:absolute;pointer-events:none}
 .title-room .amb.daylight{inset:0;background:linear-gradient(90deg,rgba(205,218,236,.9) 0,rgba(205,218,236,.35) 120px,transparent 420px);opacity:.06;animation:t-daylight 11s ease-in-out infinite}
 .title-room .amb.daylight.b{animation-name:t-daylight-half;animation-duration:17s}
 @keyframes t-daylight{0%,100%{opacity:.06}50%{opacity:.16}}
 @keyframes t-daylight-half{0%,100%{opacity:.03}50%{opacity:.08}}
-/* rain on the glass only (the bright strip at the far left, down to the sill): two depths of streaks.
-   Each depth is a pseudo-element: vertical dashes falling (background-position), cut into 1 px columns
-   tilted 8° by a mask (a gradient angle draws stripes, not a direction of fall; two animations on one
-   property would not add, so two elements). */
-.title-room .amb.rain{left:0;top:0;width:38px;height:445px;opacity:.45;transition:opacity 600ms ease;overflow:hidden}
-.title-room .amb.rain::before,.title-room .amb.rain::after{content:"";position:absolute;inset:0;background-size:38px 240px;animation:t-rain 3.2s linear infinite}
-.title-room .amb.rain::before{background-image:repeating-linear-gradient(180deg,transparent 0 26px,rgba(220,230,245,.6) 26px 40px);-webkit-mask-image:repeating-linear-gradient(98deg,transparent 0 13px,#000 13px 14px);mask-image:repeating-linear-gradient(98deg,transparent 0 13px,#000 13px 14px)}
-/* the second depth: closer columns, longer gaps, slower, half as bright */
-.title-room .amb.rain::after{background-image:repeating-linear-gradient(180deg,transparent 0 50px,rgba(220,230,245,.3) 50px 60px);-webkit-mask-image:repeating-linear-gradient(96deg,transparent 0 8px,#000 8px 9px);mask-image:repeating-linear-gradient(96deg,transparent 0 8px,#000 8px 9px);animation-duration:5.1s}
-.title-room .amb.rain.off{opacity:0}
-@keyframes t-rain{from{background-position:0 0}to{background-position:0 240px}}
 /* the right monitor's standby light: the sleep pulse (gone while a screen is lit) */
 .title-room .amb.led{left:884px;top:454px;width:3px;height:3px;background:#f0a030;box-shadow:0 0 4px 1px rgba(240,160,48,.55);animation:t-led 2.4s ease-in-out infinite}
 @keyframes t-led{0%,100%{opacity:.25}50%{opacity:1}}
-/* film grain: the mount's tile, eight offsets a cycle — footage, not a picture */
-.title-room .amb.grain{inset:0;background-image:var(--t-grain,none);background-size:128px 128px;mix-blend-mode:overlay;opacity:.12;animation:t-grain 800ms steps(8) infinite}
-@keyframes t-grain{from{background-position:0 0}to{background-position:-96px -160px}}
 /* the far lightning through the curtain (idle layer `window`): no transition */
 .title-page .idle.window{inset:0;background:linear-gradient(90deg,rgba(205,218,236,.9) 0,rgba(205,218,236,.35) 120px,transparent 420px);opacity:0}
 .title-page .idle.window.on{opacity:.5}
 @media (prefers-reduced-motion:reduce){
-  .title-room .amb.rain{display:none}
-  .title-room .amb.grain{animation:none}
   .title-room .amb.led{animation:none;opacity:.5}
   .title-room .amb.daylight{animation:none;opacity:.11}
   .title-room .amb.daylight.b{opacity:.055}

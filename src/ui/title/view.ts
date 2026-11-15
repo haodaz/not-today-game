@@ -19,12 +19,13 @@ export const GAME_TITLE = "NOT TODAY";
 
 /**
  * title-ambient (author 2026-11-15): the layer that never stops — the window's light breathing on two
- * periods, rain on the glass (off while the rain is paused), the right monitor's standby light (gone
- * once a screen is lit), film grain (the mount sets its tile). CSS keyframes only; nothing to click.
+ * periods and the right monitor's standby light (gone once a screen is lit). CSS keyframes only;
+ * nothing to click. The author cut the rain, the film grain and the slow push the same evening
+ * (「雨有点傻」「噪点晃眼」「推进突兀」): the standby light is the thing that works.
  */
 function ambient(m: TitleModel): SafeHtml {
   const lit = m.monitorsAwake || m.idle?.layer === "monitor_right";
-  return html`<div class="amb daylight" aria-hidden="true"></div><div class="amb daylight b" aria-hidden="true"></div><div class="${cls("amb", "rain", !m.rain && "off")}" aria-hidden="true"></div>${lit ? null : html`<div class="amb led" aria-hidden="true"></div>`}<div class="amb grain" aria-hidden="true"></div>`;
+  return html`<div class="amb daylight" aria-hidden="true"></div><div class="amb daylight b" aria-hidden="true"></div>${lit ? null : html`<div class="amb led" aria-hidden="true"></div>`}`;
 }
 
 /** The room behind it, darkened, pushing in slowly; the idle layers and the figures move with it. */
@@ -138,5 +139,5 @@ export function renderTitle(m: TitleModel): SafeHtml {
       : null
     : m.screen === "credits" ? creditsPage() : m.screen === "drawer" ? drawerPage(m.collection, m.drawerOpen) : m.screen === "album" ? albumPage(m.collection, m.albumOpen) : m.screen === "questions" ? (m.starting ? null : cardOpen(m) ? questions(m) : menu(m)) : menu(m);
   const account = m.screen === "menu" && !m.moving ? accountChip(m.account) : null;
-  return html`<div class="${cls("stage", "title-page", `screen-${m.screen}`, cardOpen(m) && "card-open", gated && "gated")}" data-screen="${m.screen}">${room(m)}<h1 class="title-name"><img class="title-logo" src="/logo.svg" alt="${GAME_TITLE}"></h1>${middle}${account}<div class="title-ver">${tr("title.version")}<br>${tr("title.byline")}</div><button type="button" class="title-lang" data-action="title-lang">${tr("title.lang")}</button>${m.screen === "menu" ? figureCard(m.collection, m.figureOpen) : null}${m.screen === "menu" && m.bookOpen ? bookReader(bookUrl(null, titleBookDays(m.collection))) : null}${settingsPanel({ settingsOpen: m.settingsOpen, muted: m.muted, settingsConfirm: m.settingsConfirm ?? null, ...(m.hintsOn !== undefined ? { hintsOn: m.hintsOn } : {}) }, { home: false, clearAll: true })}${m.opening ? openingLabel(m.opening) : null}</div>`;
+  return html`<div class="${cls("stage", "title-page", `screen-${m.screen}`, cardOpen(m) && "card-open", gated && "gated")}" data-screen="${m.screen}">${room(m)}<h1 class="title-name"><img class="title-logo" src="/logo.svg" alt="${GAME_TITLE}"></h1>${middle}${account}<div class="title-ver">${tr("title.version")}<br>${tr("title.byline")}</div>${m.screen === "menu" ? figureCard(m.collection, m.figureOpen) : null}${m.screen === "menu" && m.bookOpen ? bookReader(bookUrl(null, titleBookDays(m.collection))) : null}${settingsPanel({ settingsOpen: m.settingsOpen, muted: m.muted, settingsConfirm: m.settingsConfirm ?? null, ...(m.hintsOn !== undefined ? { hintsOn: m.hintsOn } : {}) }, { home: false, clearAll: true })}${m.opening ? openingLabel(m.opening) : null}</div>`;
 }
