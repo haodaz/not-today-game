@@ -155,20 +155,28 @@ describe("R1 / R2 · the guide state and the six moments", () => {
     expect(guideNow(store.getState(), store.getEvents(), r.session)?.id).not.toBe("G3b");
   });
 
-  it("G4: lunch first: the phone is lit at 桌子; on the desktop only the work's steps refuse guide.lunch.first; off once ordered", () => {
+  it("G4: lunch first: the phone is lit at 桌子, the desk in the room, the room tile on the screen; on day 1 everything off that path refuses guide.lunch.first (2026-11-16); off once ordered", () => {
     const store = booted();
     step(store, "openApp:msgs");
     open(store, "conv:boss");
     store.appendEvent({ kind: "reply", choice: "fine", recipient: "boss", t: "09:05" }); // day 1: lunch unlocks after the reply (2026-11-08)
     const desk = rig(store, "desk");
-    expect(guideNow(store.getState(), store.getEvents(), desk.session)).toMatchObject({ id: "G4", target: { kind: "phone" }, refuse: "guide.lunch.first", scope: "work" });
+    expect(guideNow(store.getState(), store.getEvents(), desk.session)).toMatchObject({ id: "G4", target: { kind: "phone" }, refuse: "guide.lunch.first", scope: "all" });
     expect(desk.out()).toMatch(/data-action="loop-phone"[^>]*data-guide="on"/);
+    // the ring leads there: the desk from the room, the room tile from the screen
+    expect(rig(store, "room").out()).toMatch(/data-action="view" data-view="desk"[^>]*data-guide="on"/);
+    expect(rig(store).out()).toMatch(/data-action="view" data-view="room"[^>]*data-guide="on"/);
     const g = guideNow(store.getState(), store.getEvents(), rig(store).session);
     expect(g?.id).toBe("G4");
     expect(guideRefuses(g, "wb-send", {})).toBe(true);
     expect(guideRefuses(g, "wb-nav", { page: "task:task1" })).toBe(true);
-    expect(guideRefuses(g, "wb-nav", { page: "home" })).toBe(false);
-    expect(guideRefuses(g, "dock", { app: "workbench" })).toBe(false);
+    // day 1: the other threads and apps wait too; the way to the phone and the phone's own buttons do not
+    expect(guideRefuses(g, "conv", { conv: "partner" })).toBe(true);
+    expect(guideRefuses(g, "dock", { app: "workbench" })).toBe(true);
+    expect(guideRefuses(g, "view", { view: "room" })).toBe(false);
+    expect(guideRefuses(g, "loop-phone", {})).toBe(false);
+    expect(guideRefuses(g, "phone-add", {})).toBe(false);
+    expect(guideRefuses(g, "loop-order", {})).toBe(false);
     orderLunch(store);
     expect(guideNow(store.getState(), store.getEvents(), desk.session)?.id).not.toBe("G4");
   });

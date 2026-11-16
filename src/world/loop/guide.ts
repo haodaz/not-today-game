@@ -131,7 +131,11 @@ export function guideNow(state: State, events: readonly GameEvent[], session: Se
   const msgs = lc.file.items.find((it) => it.done.kind === "event" && it.done.event.type === "openApp" && it.done.event.app === "msgs");
   const msgsSaid = !msgs || !session.dialogue.queue.some((q) => q.key === `d${day}:${msgs.id}:onDone`);
   if (lunch && states.get(lunch.id)!.unlocked && !states.get(lunch.id)!.done && (!msgs || states.get(msgs.id)!.done) && msgsSaid) {
-    return { id: "G4", target: { kind: "phone" }, refuse: "guide.lunch.first", scope: "work" };
+    // author 2026-11-16 (playtest): on day 1 the player was left at the screen with 「点个餐吧」 and
+    // wandered into Vivi's thread; that day the lunch guide refuses everything off the path (the
+    // way back to the room, the desk, the phone and its own buttons are allowed). Later days keep
+    // the lighter rule: only the work waits.
+    return { id: "G4", target: { kind: "phone" }, refuse: "guide.lunch.first", scope: day === 1 ? "all" : "work" };
   }
 
   // G1b (author 2026-11-08): day 1, the tower on, not yet at the screen: the screens are lit and
@@ -155,7 +159,7 @@ export function guideNow(state: State, events: readonly GameEvent[], session: Se
  * every room move (回房间 too), the bed and getting up, the 道具 strip and the objects' own layers,
  * the coach marks, the call's controls, the pointer's dock peek.
  */
-const ALLOW_PREFIXES = ["settings-", "status-", "kuro-", "onboard-", "call-", "obj-", "objbar-", "dlg-history", "vf-", "rise", "prints-", "boss-"];
+const ALLOW_PREFIXES = ["settings-", "status-", "kuro-", "onboard-", "call-", "obj-", "objbar-", "dlg-history", "vf-", "rise", "prints-", "boss-", "phone-"];
 export const GUIDE_ALLOWS: ReadonlySet<string> = new Set([
   "loop-advance",
   "loop-choice",
@@ -177,6 +181,7 @@ export const GUIDE_ALLOWS: ReadonlySet<string> = new Set([
   "book-open",
   "book-close",
   "case-close",
+  "loop-order",
 ]);
 export const guideAllows = (action: string): boolean => GUIDE_ALLOWS.has(action) || ALLOW_PREFIXES.some((p) => action.startsWith(p));
 
@@ -247,7 +252,9 @@ export function ringAnchors(target: GuideTarget): readonly (readonly (readonly [
     case "clauses":
       return target.indexes.map((i) => [["data-action", "wb-clause"], ["data-i", String(i)]] as const);
     case "phone":
-      return [[["data-action", "loop-phone"]]];
+      // author 2026-11-16 (playtest): the phone is on the desk, so the ring shows the way there — the
+      // phone itself (desk view), the desk (room view), the dock's room tile (the screen).
+      return [[["data-action", "loop-phone"]], [["data-action", "view"], ["data-view", "desk"]], [["data-action", "view"], ["data-view", "room"]]];
     case "task":
       return [[["data-action", "wb-nav"], ["data-page", `task:${target.id}`]]];
     case "board":
