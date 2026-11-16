@@ -1808,13 +1808,10 @@ body:has(.stage[data-day="10"]) .cs-label{color:#8f7410;border-bottom-color:rgba
 .sk .ts-act{background:#8F7A66;color:#F9F6F2;border:0;box-shadow:none;border-radius:6px;letter-spacing:.2em}
 .sk .wl-cta.ghost{border-color:#8F7A66;color:#8F7A66}
 .sk-cheat{position:absolute;width:1px;height:1px;opacity:0;pointer-events:auto;border:0;padding:0}
-/* approval chain, material pass (2026-11-16): the same 2048, given things to be made of. The board is
-   a walnut tray with felt wells; the tiles are thick tokens (lit top edge, a darker foot); the ladder
-   is the form's routing slip, one ruled line per desk, and each desk the form has reached carries a
-   red ring stamp; the two desks above the seal are not on the paper any more (the slip goes dark and
-   wet up there). No signs anywhere: this is day 13. */
-.sk{background:radial-gradient(120% 95% at 62% 46%,#F8F3E6 0%,#EFE6D2 62%,#DDD0B7 100%)}
-.sk-top h2{color:#5B4A3C;text-shadow:0 1px 0 rgba(255,255,255,.7)}
+/* approval chain, the ladder only (2026-11-16). The board, tiles and keys stay exactly as 2048 looks
+   (author: 「2048就长这样」, do not restyle the main grid). The ladder is the form's routing slip: one
+   ruled line per desk, a red ring stamp on each desk the form has reached, the seal's line in gold,
+   and the two desks above the seal dark and wet. */
 .sk-score{font-family:var(--mono,ui-monospace,Menlo,monospace);letter-spacing:.04em}
 .sk-score b{font-family:inherit;letter-spacing:.02em;color:#5B4A3C}
 .sk-ladder{align-self:end;gap:0;padding:0;overflow:hidden;border-radius:3px;background:
@@ -1847,22 +1844,6 @@ body:has(.stage[data-day="10"]) .cs-label{color:#8f7410;border-bottom-color:rgba
 .sk-rank.egg .sk-rn,.sk-rank.egg small{color:#B9A79A}
 .sk-rank.egg img{background:#2A1F1C;border-radius:50% 46% 52% 44%}
 .sk-rank.egg::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(60% 120% at 22% 0%,rgba(150,60,60,.28),transparent 70%),linear-gradient(100deg,transparent 46%,rgba(255,235,225,.1) 50%,transparent 55%)}
-/* the tray */
-.sk-grid{padding:14px;border-radius:12px;background:radial-gradient(130% 130% at 30% 20%,#5A4334,#3A2A22 70%);
-  box-shadow:inset 0 1px 0 rgba(255,220,180,.22),inset 0 -2px 0 rgba(0,0,0,.4),0 2px 0 #2A1D17,0 22px 34px -16px rgba(50,30,15,.65)}
-.sk-cell{border-radius:8px;background:#2F2620;box-shadow:inset 0 3px 6px rgba(0,0,0,.6),inset 0 -1px 0 rgba(255,220,180,.09)}
-.sk-cell.on{box-shadow:inset 0 2px 0 rgba(255,255,255,.55),inset 0 -6px 0 rgba(70,35,10,.2),inset 0 0 0 1px rgba(70,35,10,.12),0 3px 4px rgba(0,0,0,.5)}
-.sk-cell.on img{height:calc(100% - 5px)}
-.sk-cell.top{box-shadow:inset 0 2px 0 rgba(255,255,255,.6),inset 0 -6px 0 rgba(120,80,0,.3),0 0 0 3px #EDC22E,0 0 26px rgba(237,194,46,.65)}
-.sk-cell.egg{background:#1E1513;box-shadow:inset 0 2px 0 rgba(255,220,210,.14),inset 0 -6px 0 rgba(0,0,0,.5),0 3px 4px rgba(0,0,0,.5)}
-/* the keys */
-.sk .sk-arrow{border-radius:8px;background:linear-gradient(#6A5444,#4B3A2F);color:#F3E9D8;text-shadow:0 -1px 0 rgba(0,0,0,.5);
-  box-shadow:inset 0 1px 0 rgba(255,225,190,.3),0 3px 0 #2A1D17,0 5px 8px rgba(40,25,10,.35);transition:transform 60ms,box-shadow 60ms}
-.sk .sk-arrow:hover:not(:disabled){background:linear-gradient(#77604E,#554236)}
-.sk .sk-arrow:active:not(:disabled){transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,225,190,.2),0 1px 0 #2A1D17}
-.sk .sk-arrow:disabled{background:#CDC1B4;color:#F3E9D8;box-shadow:0 2px 0 #B3A596;text-shadow:none}
-.sk-pad{gap:9px 7px}
-.sk-done{border-radius:3px;background:none;color:#BE281C;border:3px double #BE281C;font-size:18px;transform:rotate(-4deg);mix-blend-mode:multiply}
 /* the settlement (author 2026-11-12): full screen, two halves — left the game's ending, right the world
    as it now is (the page, the backend, the sheet, the approval flow), changed by that play */
 .sl{position:relative;flex:1;min-height:0;margin:-16px -26px -20px;display:grid;grid-template-columns:minmax(360px,36%) 1fr;background:#EFEAE0;color:#1d2129;overflow:hidden}
