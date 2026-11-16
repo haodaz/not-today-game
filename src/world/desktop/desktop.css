@@ -1437,6 +1437,22 @@ span.cmp-face-btn{cursor:default}
 .ts-act:disabled,.ts-finish:disabled{background:#CFCFCF;color:#777;box-shadow:3px 3px 0 #555;cursor:default}
 .ts-act:not(:disabled):hover,.ts-finish:not(:disabled):hover{transform:translate(2px,2px);box-shadow:4px 4px 0 #1d2129}
 .ts-finish{background:#6EE7B7}
+/* stage chrome, material pass (author 2026-11-16, same hand as the clue stage's; Claude): what every work stage shares — the frame's
+   head, Kuro's remark, the one big button — in the same things-on-a-desk register: a paper slip, an enamelled plate. No hard black
+   outlines, no offset block shadows. Styles only. */
+.work-stage{--ws-paper:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .32 0 0 0 0 .25 0 0 0 0 .15 0 0 0 .16 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.wl-head{background:var(--ws-paper),linear-gradient(180deg,#ece5d6,#e3dbc9);border-bottom:1px solid rgba(60,46,30,.28);box-shadow:inset 0 1px 0 rgba(255,255,255,.6)}
+.wl-title{color:#2a241c;font-weight:600}
+.wl-back{border:1px solid rgba(60,46,30,.5);border-radius:2px;color:#3a3024;background:rgba(255,255,255,.3);box-shadow:0 1px 1px rgba(0,0,0,.12)}
+.wl-back:hover{background:#3a3024;color:#f1eadb}
+.ts-kimg{filter:drop-shadow(0 3px 5px rgba(0,0,0,.55))}
+.ts-say{border:0;border-radius:3px 12px 12px 12px;background:var(--ws-paper),linear-gradient(180deg,#fbf7ea,#f1e9d4);color:#2a241c;box-shadow:inset 0 1px 0 rgba(255,255,255,.65),0 1px 2px rgba(0,0,0,.35),0 10px 18px -8px rgba(0,0,0,.65)}
+.ts-act,.ts-finish{border:0;border-radius:3px;background:linear-gradient(180deg,#f6e2a6 0%,#d6ad52 48%,#b88a30 100%);color:#2c1e06;text-shadow:0 1px 0 rgba(255,246,214,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -3px 0 rgba(96,64,12,.45),inset 0 0 0 1px rgba(110,78,20,.5),0 2px 3px rgba(0,0,0,.4),0 14px 22px -10px rgba(0,0,0,.75);transition:transform 120ms,filter 120ms}
+.ts-finish{background:linear-gradient(180deg,#bfeedb 0%,#62bd9b 48%,#3a8f71 100%);color:#0d2e22;text-shadow:0 1px 0 rgba(220,255,240,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -3px 0 rgba(14,70,50,.45),inset 0 0 0 1px rgba(20,84,62,.5),0 2px 3px rgba(0,0,0,.4),0 14px 22px -10px rgba(0,0,0,.75)}
+.ts-act:disabled,.ts-finish:disabled{background:linear-gradient(180deg,#c9c5bb,#a19c91);color:#5d584e;text-shadow:0 1px 0 rgba(255,255,255,.35);box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 0 0 1px rgba(70,64,54,.35),0 1px 2px rgba(0,0,0,.35)}
+.ts-act:not(:disabled):hover,.ts-finish:not(:disabled):hover{transform:translateY(1px);filter:brightness(1.05);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -2px 0 rgba(96,64,12,.45),inset 0 0 0 1px rgba(110,78,20,.5),0 1px 2px rgba(0,0,0,.4),0 8px 14px -8px rgba(0,0,0,.75)}
+.ts-offer .wl-cta{border:0;border-radius:3px;background:linear-gradient(180deg,#f6e2a6,#d6ad52 55%,#b88a30);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 0 0 1px rgba(110,78,20,.5),0 2px 3px rgba(0,0,0,.4),0 10px 16px -8px rgba(0,0,0,.7)}
+.ts-offer .wl-cta.ghost{background:var(--ws-paper),linear-gradient(180deg,#fbf7ea,#f1e9d4);box-shadow:inset 0 0 0 1px rgba(60,46,30,.35),0 1px 2px rgba(0,0,0,.3)}
 .ts-report{position:relative;z-index:1;align-self:start;margin:6px 24px 0 0;padding:14px 16px;background:rgba(20,26,36,.88);border:1.5px solid rgba(255,255,255,.25);border-radius:12px;color:#fff;box-shadow:0 12px 30px rgba(0,0,0,.35);max-height:100%;overflow:auto;font-size:12.5px}
 .ts-rsum{margin:0 0 10px;line-height:1.6;color:#E8EEF2}
 .ts-rdims{display:flex;flex-direction:column;gap:8px}
