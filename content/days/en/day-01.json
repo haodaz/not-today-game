@@ -191,8 +191,12 @@
         },
         {
           "k": "narration",
-          "t": "Ninety-six. Since first grade you had never scored under a hundred. In that very second it chirped in your desk drawer.",
+          "t": "Ninety-six. Since first grade you had never scored under a hundred. Four points off, and four huge red crosses: it looks like a paper full of mistakes.",
           "prop": "/room/props/exam_96.png"
+        },
+        {
+          "k": "inner",
+          "t": "The chick beeped. As if it agreed with me. It was only hungry, of course."
         },
         {
           "k": "speaker",

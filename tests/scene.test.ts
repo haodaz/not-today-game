@@ -87,16 +87,16 @@ describe("the loader", () => {
 });
 
 describe("sceneOf", () => {
-  it("day 1's dream (dreams 2026-11-06): the classroom from line 4, the 96 from line 6, the dinner table from 12, the 100 back in the classroom from 17; kept to the end", () => {
+  it("day 1's dream (dreams 2026-11-06): the classroom from line 4, the 96 from line 6, the dinner table from 13, the 100 back in the classroom from 18 (the four-crosses line added 2026-11-16); kept to the end", () => {
     const at = (line: number) => sceneOf(nightAt(1, line));
     expect(at(0)).toEqual(NO_SCENE);
     expect(at(4)).toEqual(NO_SCENE);
     expect(at(5)).toEqual({ backdrop: "/room/dream/classroom.jpg", prop: null });
     expect(at(7)).toEqual({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_96.png" });
-    expect(at(12)).toEqual({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_96.png" });
-    expect(at(13)).toEqual({ backdrop: "/room/dream/home_dinner.jpg", prop: "/room/props/exam_96.png" });
-    expect(at(18)).toEqual({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_100.png" });
-    expect(at(22)).toEqual({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_100.png" });
+    expect(at(13)).toEqual({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_96.png" });
+    expect(at(14)).toEqual({ backdrop: "/room/dream/home_dinner.jpg", prop: "/room/props/exam_96.png" });
+    expect(at(19)).toEqual({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_100.png" });
+    expect(at(23)).toEqual({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_100.png" });
   });
   it("day 11: office_busy, then office (a later backdrop replaces it)", () => {
     expect(sceneOf(nightAt(11, 2)).backdrop).toBe("/room/dream/office_busy.jpg");
@@ -142,14 +142,14 @@ describe("the stage", () => {
   });
   it("snapshots day 1's dream: the line with backdrop, prop and portrait; then the 100", () => {
     const store = atDay(1);
-    const teacher = dayFiles.get(1)!.beats.night!.say[10]!;
+    const teacher = dayFiles.get(1)!.beats.night!.say[11]!;
     expect(teacher.k).toBe("speaker");
-    const withPortrait = stageOf(store, nightAt(1, 10));
+    const withPortrait = stageOf(store, nightAt(1, 11));
     expect(sceneHtml(withPortrait)).toContain('data-src="/room/dream/classroom.jpg"');
     expect(sceneHtml(withPortrait)).toContain('<img class="scene-prop" data-src="/room/props/exam_96.png" src="/room/props/exam_96.png"');
     // The speaker's bust sits in the box's slot.
     expect(withPortrait).toContain(`class="npc-portrait" src="/npc/${teacher.who}.png"`);
-    const hundred = stageOf(store, nightAt(1, 18));
+    const hundred = stageOf(store, nightAt(1, 19));
     expect(sceneHtml(hundred)).toContain('src="/room/props/exam_100.png"');
     expect(hundred).not.toContain("exam_96");
     expect({ withPortrait, hundred }).toMatchSnapshot();
