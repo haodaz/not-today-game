@@ -52,16 +52,17 @@ Kiro features **not** used: MCP servers (there is no `.kiro/settings/mcp.json`),
 
 Vite and TypeScript, no framework, one store. State is `f(day) ⊕ replay(events)`: every player action is an event, and replaying the same log gives the same state. The day is a counter advanced only by lying down; nothing reads the wall clock for story. Everything that is story lives in `content/` as data, read by strict loaders that fail at import, so `src/` holds no story string. The desktop is DOM. Object screens are canvases drawn at integer pixels. The room is a set of photographed stills you turn between, with the collapse drawn by a WebGL shader over them.
 
-## Numbers (from the tree, 2026-11-06)
+## Numbers (from the tree, 2026-11-16)
 
 | What | Number | Taken from |
 |---|---|---|
 | Days | 18 | `content/days/day-01.json` … `day-18.json` (directory listing); `validate-content` reports `days: 18 files, 0 problems` inside the test suite |
-| Tests | 2,156 passing in 130 files | `npx vitest run` |
-| Content files | 186 | directory listings of `content/` and its subfolders |
-| Specs | 52 folders (39 with `tasks.md`, 16 with `design.md`) | listings of `.kiro/specs/` |
+| Tests | 2,536 passing in 180 files | `npx vitest run` |
+| Content files | 193 | directory listings of `content/` and its subfolders |
+| Specs | 76 folders (39 with `tasks.md`, 16 with `design.md`; the later ones are a single `requirements.md` each, the job in one page) | listings of `.kiro/specs/` |
 | Steering files | 5 | listing of `.kiro/steering/` |
 | Hooks | 3 | listing of `.kiro/hooks/` |
+| Kiro log entries | 114 | `docs/kiro-log.md`, one per job |
 
 ## What is new and what is not
 
