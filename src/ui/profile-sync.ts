@@ -26,6 +26,8 @@ export function mergeProfile(local: unknown, cloud: unknown): ProfileData {
   for (const k of ["finishedRuns", "runs"]) if (k in l || k in c) out[k] = Math.max(count(l[k]), count(c[k]));
   for (const k of ["objects", "photos", "hints"]) if (k in l || k in c) out[k] = union(l[k], c[k]);
   if (l.kurogotchi === undefined && c.kurogotchi !== undefined) out.kurogotchi = c.kurogotchi;
+  // title-badge: the look follows the account — the cloud's when both are set, else whichever exists
+  if (c.look !== undefined) out.look = c.look;
   return out as ProfileData;
 }
 

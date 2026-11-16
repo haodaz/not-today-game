@@ -1,6 +1,7 @@
 // The title page's DOM side (title-page FR1–FR3, FR7): clicks, typing, keys, the idle events,
 // the rain, and the camera push to the desk where the question card opens (correction
 // 2026-11-01). The view is pure (view.ts); this file owns timers and sound only.
+import type { Portrait } from "@state/events";
 import { type EndingKind } from "./table";
 import { getLocale, persistLocale, setLocale, type Locale } from "@world/i18n";
 import { applyFit, BACKDROPS } from "@world/fit";
@@ -35,6 +36,8 @@ export interface TitleDeps {
   readonly voice?: "m" | "f";
   /** The Kurogotchi's cross-run memory (object-drawer 3): read on open, written after every change. */
   readonly kuroMemory?: KuroMemoryStore;
+  /** title-badge: the profile's look, read on mount and written on every turn of the badge's ‹ ›. */
+  readonly look?: { readonly read: () => Portrait | null; readonly write: (p: Portrait) => void };
   /** first-use-hints R2: the hints' switch (`nt_hints`): read on open, written on change. Absent = no row. */
   readonly hints?: { readonly on: boolean; readonly setOn: (on: boolean) => void };
   /** playtest-1105 R8: 重新开始这一局, confirmed: clear the run save and show the title again. */
@@ -76,7 +79,7 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
   const random = deps.random ?? Math.random;
   const doc = root.ownerDocument;
   const win = doc.defaultView!;
-  let model: TitleModel = { ...initialTitle(deps.save, deps.collection), muted: deps.sound?.muted ?? false, ...(deps.hints ? { hintsOn: deps.hints.on } : {}), ...(deps.account ? { account: { kind: "checking" } as Account } : {}) };
+  let model: TitleModel = { ...initialTitle(deps.save, deps.collection), muted: deps.sound?.muted ?? false, ...(deps.hints ? { hintsOn: deps.hints.on } : {}), ...(deps.account ? { account: { kind: "checking" } as Account } : {}), look: deps.look?.read() ?? "p1" };
   /** When the running camera move began (performance.now), or null. */
   let movedAt: number | null = null;
   const timers = new Set<number>();
@@ -423,6 +426,17 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
       else drawerObj?.key(key);
     },
     // The character select's ‹ › (author 2026-11-09): the next look; the questions are untouched.
+    // title-badge: the staff badge over the menu; its ‹ › change the profile's look at once
+    "badge-open": () => {
+      if (model.screen === "menu" && (model.account?.kind === "user" || model.account?.kind === "guest")) set({ ...model, badgeOpen: true });
+    },
+    "badge-close": () => set({ ...model, badgeOpen: false }),
+    "badge-turn": (el) => {
+      if (!model.badgeOpen) return;
+      const look = turnPortrait({ ...model.answers, portrait: model.look }, el.dataset.by === "-1" ? -1 : 1);
+      set({ ...model, look });
+      deps.look?.write(look);
+    },
     "title-pick-turn": (el) => {
       const by = el.dataset.by === "-1" ? -1 : 1;
       set(withPortrait(model, turnPortrait(model.answers, by)));
@@ -457,6 +471,7 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     "auth-upgrade": () => {
       if (!deps.account || model.account?.kind !== "guest") return;
       deps.account.storage.removeItem(GUEST_KEY);
+      set({ ...model, badgeOpen: false });
       void net.logout().then(() => openGate("stay"));
     },
     "auth-cancel": () => {
@@ -465,7 +480,8 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     "auth-logout": () => {
       if (!deps.account || model.account?.kind !== "user") return;
       deps.account.storage.removeItem(GUEST_KEY);
-      void net.logout().then(() => set({ ...model, account: { kind: "none" } }));
+      // title-badge: the badge closes with it (nobody is signed in to wear it)
+      void net.logout().then(() => set({ ...model, account: { kind: "none" }, badgeOpen: false }));
     },
   };
 
@@ -503,6 +519,7 @@ export function mountTitle(root: HTMLElement, deps: TitleDeps): { destroy: () =>
     if (model.starting || model.moving) return;
     if (e.key === "Escape") {
       if (model.bookOpen) set({ ...model, bookOpen: false });
+      else if (model.badgeOpen) set({ ...model, badgeOpen: false });
       else if (model.settingsOpen && model.settingsConfirm) set({ ...model, settingsConfirm: null });
       else if (model.settingsOpen) set({ ...model, settingsOpen: false });
       else if (model.account?.kind === "gate") set({ ...model, account: { kind: "none" } });

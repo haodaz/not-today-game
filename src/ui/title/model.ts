@@ -53,6 +53,10 @@ export interface TitleModel {
   readonly screen: Screen;
   /** login-first: absent in pure renders and tests without a backend (the menu as before). */
   readonly account?: Account;
+  /** title-badge: the staff badge open over the menu. */
+  readonly badgeOpen: boolean;
+  /** title-badge: the profile's look (the badge's portrait, and the question card's starting pick). */
+  readonly look: Portrait;
   /** The saved run, if any: then there is 继续 · 第 N 天 and no 新游戏 (FR2). */
   readonly save: { readonly day: number } | null;
   readonly answers: Answers;
@@ -96,7 +100,7 @@ export interface TitleModel {
 export type OpeningPhase = "print" | "stick" | "hold" | "fade";
 
 export function initialTitle(save: TitleModel["save"], collection: Collection): TitleModel {
-  return { screen: "menu", save, answers: NO_ANSWERS, settingsOpen: false, muted: false, idle: null, chairCut: false, monitorsAwake: false, starting: false, framing: "room", moving: false, collection, drawerOpen: null, albumOpen: null, figureOpen: null, opening: null };
+  return { screen: "menu", save, answers: NO_ANSWERS, settingsOpen: false, muted: false, idle: null, chairCut: false, monitorsAwake: false, starting: false, framing: "room", moving: false, collection, drawerOpen: null, albumOpen: null, figureOpen: null, opening: null, badgeOpen: false, look: "p1" };
 }
 
 /** The card shows only once the camera has arrived at the desk. */
@@ -157,9 +161,10 @@ export const portraitNo = (p: Portrait): number => PORTRAITS.indexOf(p) + 1;
  * 新游戏: the camera pushes to the desk (the menu fades, the monitors wake during the push); the
  * question card opens when it arrives (FR7, correction 2026-11-01). Never while a save exists.
  */
-export const toQuestions = (m: TitleModel): TitleModel => (m.save ? m : { ...m, screen: "questions", monitorsAwake: true, framing: "desk", moving: true });
+// title-badge: the card's portrait pick starts from the profile's look (the pick itself is this run's).
+export const toQuestions = (m: TitleModel): TitleModel => (m.save ? m : { ...m, screen: "questions", monitorsAwake: true, framing: "desk", moving: true, badgeOpen: false, answers: { ...m.answers, portrait: m.look } });
 /**
  * Esc from the card (or 返回 from 制作): back to the menu; the monitors sleep; from the desk the
  * camera pulls back to the room. The answers are kept.
  */
-export const toMenu = (m: TitleModel): TitleModel => ({ ...m, screen: "menu", monitorsAwake: false, settingsOpen: false, framing: "room", moving: m.framing === "desk", drawerOpen: null, albumOpen: null, figureOpen: null });
+export const toMenu = (m: TitleModel): TitleModel => ({ ...m, screen: "menu", monitorsAwake: false, settingsOpen: false, framing: "room", moving: m.framing === "desk", drawerOpen: null, albumOpen: null, figureOpen: null, badgeOpen: false });

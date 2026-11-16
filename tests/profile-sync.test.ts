@@ -33,6 +33,11 @@ describe("mergeProfile", () => {
     expect(mergeProfile(local, null)).toEqual(local);
     expect(mergeProfile(null, local)).toEqual(local);
     expect((mergeProfile({ objects: ["chick"] }, { kurogotchi: { name: "x" } }) as Record<string, unknown>).kurogotchi).toEqual({ name: "x" });
+    // title-badge §3: the look — the cloud's when both are set, else whichever exists.
+    expect((mergeProfile({ look: "p2" }, { look: "p3" }) as Record<string, unknown>).look).toBe("p3");
+    expect((mergeProfile({ look: "p2" }, { runs: 1 }) as Record<string, unknown>).look).toBe("p2");
+    expect((mergeProfile({ runs: 1 }, { look: "p3" }) as Record<string, unknown>).look).toBe("p3");
+    expect((mergeProfile({ runs: 1 }, { runs: 2 }) as Record<string, unknown>).look).toBeUndefined();
     expect(mergeProfile("junk", 3)).toEqual({});
     expect((mergeProfile({ endings: "no" }, { endings: { good: "2" } }) as Record<string, unknown>).endings).toEqual({ good: 0 });
   });

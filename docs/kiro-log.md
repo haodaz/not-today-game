@@ -2776,3 +2776,29 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
 - Dev cheats grade their solved state (e.g. a cheated sokoban is within par); the replay driver's grades are therefore mostly perfect.
 - Tests: new `tests/grades.test.ts` (one case per engine on a built session, the printed task event with `quality`, the settlement line). No snapshot changed.
 - tsc clean; vitest 176 files, 2463 passed.
+## 2026-11-15 · title-badge (the account as a staff badge at the end of the menu)
+- The tree is taken as it stands after the author's cut of title-ambient (only `.amb.daylight`, `.amb.daylight.b` and `.amb.led`; no rain, no grain).
+- view.ts:
+  - `accountChip` and `.title-account` (with its CSS) are removed.
+  - `menu()` ends, after 制作, with `<button class="title-badge user|guest" data-action="badge-open" aria-label=badge.open>`. Inside it: a CSS lanyard (two 2 px lines and a ring), the 56 px look, and the name (the email's part before `@`, or `badge.guest`) over `badge.company`. Only a `user` or a `guest` wears it.
+  - New `badgeCard(m)`: a `title-card` dialog. Left: the big look with ‹ › (`badge-turn`) and `title.pick.n`. Right: the name, `badge.company · badge.role`, then `auth.signedAs` or `auth.guestHint`. Bottom: `auth-logout` or `auth-upgrade`, plus 返回 (`badge-close`).
+  - Click-outside is a full-stage `.title-badge-dim` button carrying `badge-close`. It is printed before the card and has `tabindex=-1`.
+  - The menu is `inert` while the card is open.
+- model.ts: `badgeOpen` (false) and `look` ("p1"). `toQuestions` sets `answers.portrait = look` and closes the badge. `toMenu` closes it.
+- mount.ts:
+  - New dep `look { read, write }`, read on mount.
+  - `badge-open` acts only on the menu with a user or guest. `badge-turn` acts only while the card is open, turns through `PORTRAITS` from the look, and writes at once.
+  - Esc closes the badge, after the book. Logout and upgrade close it too.
+- State and profile:
+  - saves.ts: `ProfileWriter.writeLook`, next to `writeKurogotchi`; it is a no-op when the look is unchanged.
+  - collection.ts: `readLook`, which returns null for anything not in `PORTRAITS`.
+  - profile-sync.ts: `mergeProfile` keeps the cloud's look when both sides have one, and otherwise whichever side has it.
+  - main.ts wires the look dep to `readLook` and `profile.writeLook`.
+- A pick on the question card is this run's only. It is not written back.
+- title.css: the badge overrides the menu's outlined-word rules. It has a paper-cream background and a 3 px top rule. Hover and focus lift it 2 px with a deeper shadow and do not invert it. The card is 640 px, laid out as a grid.
+- Tests:
+  - title-auth.test: the chip assertions are now badge assertions (guest name, user local part, 退出登录 inside the opened badge, the upgrade path through the badge). New blocks cover the staff badge (menu order, the no-badge kinds, the card's markup and inert menu, the mounted open, turn, write, close, dim and Esc, the question card starting from the look with no write-back) and `readLook`.
+  - saves.test: the writer's key list gains `writeLook`.
+  - profile-sync.test: `mergeProfile` with `look`.
+- Snapshots: none changed. The title snapshots render with no account, so no badge is printed. The snapshot directory was diffed before and after and is identical, so there was nothing to refresh.
+- tsc clean; vitest 176 files, 2468 passed.

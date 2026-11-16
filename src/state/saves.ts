@@ -133,6 +133,8 @@ export interface ProfileWriter {
    * `profile.kurogotchi` with `data` (opaque JSON here; the drawer owns its shape).
    */
   writeKurogotchi(data: Json): void;
+  /** title-badge: the profile's look (the badge's portrait), replacing `profile.look`. */
+  writeLook(look: string): void;
   /** playtest-1105 R8: 清除全部 only — removes the profile and its backup. */
   clear(): void;
   /** first-use-hints R2: a first-use hint was seen: adds `id` to `profile.hints` once. Write-only. */
@@ -173,6 +175,11 @@ export function createProfileWriter(storage: KeyValueStorage): ProfileWriter {
     writeKurogotchi(data) {
       const current = (slot.read()?.data ?? {}) as ProfileData;
       slot.write({ data: { ...current, kurogotchi: data } });
+    },
+    writeLook(look) {
+      const current = (slot.read()?.data ?? {}) as ProfileData;
+      if (current.look === look) return;
+      slot.write({ data: { ...current, look } });
     },
     clear: () => slot.clear(),
     recordBookRead() {

@@ -43,7 +43,7 @@ import { createMotion } from "@world/motion/dom";
 import { loopActions, loopKeys, renderGame } from "@world/room/game";
 import { startPrologue } from "@world/opening";
 import { createSoundPlayer } from "@world/sound/player";
-import { readCollection, readKurogotchi } from "./ui/collection";
+import { readCollection, readKurogotchi, readLook } from "./ui/collection";
 import { readHintsOn, readHintsSeen, writeHintsOn } from "./ui/hints";
 import { mountTitle } from "./ui/title/mount";
 import { asMemory, type KuroMemory } from "@world/objects/kurogotchi";
@@ -290,6 +290,8 @@ if (jump !== null) {
     account: { storage: window.localStorage, origin: window.location.origin },
     sound,
     kuroMemory,
+    // title-badge §3: the profile's look, worn on the menu's badge and the default for a new run.
+    look: { read: () => readLook(window.localStorage), write: (p) => profile.writeLook(p) },
     // first-use-hints R2: the same switch as in the game.
     hints: { on: readHintsOn(window.localStorage), setOn: (on) => writeHintsOn(window.localStorage, on) },
     // playtest-1105 R8: from the title's settings, each after its question; the page reloads on the title.

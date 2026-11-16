@@ -2,6 +2,7 @@
 // endings were reached. src/ui is the only place allowed to read the profile; the host hands the
 // result to the title page and the room view as presentation, never to the story or the state.
 import type { KeyValueStorage } from "@state/slot";
+import { PORTRAITS, type Portrait } from "@state/events";
 import { readProfile } from "@state/profile-read";
 import { recogniseTable } from "@state/recognise";
 import { photoKey, photosTable } from "@state/photos";
@@ -17,6 +18,12 @@ const KNOWN_PHOTOS: ReadonlySet<string> = new Set(photosTable.room.map((r) => ph
 /** The Kurogotchi's saved memory, as opaque JSON (the drawer validates its shape), or null. */
 export function readKurogotchi(storage: KeyValueStorage): unknown {
   return readProfile(storage)?.kurogotchi ?? null;
+}
+
+/** title-badge: the profile's look (one of the three portraits), or null. */
+export function readLook(storage: KeyValueStorage): Portrait | null {
+  const v = readProfile(storage)?.look;
+  return typeof v === "string" && (PORTRAITS as readonly string[]).includes(v) ? (v as Portrait) : null;
 }
 
 export function readCollection(storage: KeyValueStorage): Collection {

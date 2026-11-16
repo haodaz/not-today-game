@@ -52,7 +52,44 @@ function menu(m: TitleModel): SafeHtml {
   const drawer = hasDrawer(m.collection) ? html`<button type="button" data-action="title-drawer">${tr("title.drawer")}</button>` : null;
   // 影集 beside it, once the camera has been found in any run (photo-album R2).
   const album = hasAlbum(m.collection) ? html`<button type="button" data-action="title-album">${tr("title.album")}</button>` : null;
-  return html`<nav class="${cls("title-menu", fade)}" aria-label="${t("title.settings")}"${m.screen === "questions" ? html` inert` : null}>${first}<button type="button" data-action="title-settings" aria-haspopup="dialog">${tr("title.settings")}</button>${drawer}${album}<button type="button" data-action="title-credits">${tr("title.credits")}</button></nav>`;
+  const inert = m.screen === "questions" || m.badgeOpen;
+  return html`<nav class="${cls("title-menu", fade)}" aria-label="${t("title.settings")}"${inert ? html` inert` : null}>${first}<button type="button" data-action="title-settings" aria-haspopup="dialog">${tr("title.settings")}</button>${drawer}${album}<button type="button" data-action="title-credits">${tr("title.credits")}</button>${badge(m)}</nav>`;
+}
+
+/** title-badge: who wears the badge — a user or a guest; nobody else has one. */
+type Wearer = Extract<Account, { kind: "user" | "guest" }>;
+function wearer(a: Account | undefined): Wearer | null {
+  return a && (a.kind === "user" || a.kind === "guest") ? a : null;
+}
+
+/** The name on the badge: the email's part before `@`, or `badge.guest`. */
+function badgeName(a: Wearer): SafeHtml {
+  return a.kind === "user" ? html`${a.email.split("@")[0] ?? a.email}` : tr("badge.guest");
+}
+
+/**
+ * title-badge §1 (author 2026-11-15): the account as the menu's last card, a staff badge hanging
+ * from a lanyard — the look on the left, the name and the company on the right.
+ */
+function badge(m: TitleModel): SafeHtml | null {
+  const a = wearer(m.account);
+  if (!a) return null;
+  return html`<button type="button" class="${cls("title-badge", a.kind)}" data-action="badge-open" aria-haspopup="dialog" aria-label="${t("badge.open")}"><span class="lanyard" aria-hidden="true"></span><span class="face"><img src="/player/${PORTRAIT_FILES[m.look]}.png" alt="" draggable="false"></span><span class="who"><span class="name">${badgeName(a)}</span><span class="co">${tr("badge.company")}</span></span></button>`;
+}
+
+/**
+ * title-badge §2: the badge open — the look large with ‹ › (each turn is written at once), the
+ * name, the company and the role, who is signed in, and 退出登录 / 注册 and 返回.
+ */
+function badgeCard(m: TitleModel): SafeHtml | null {
+  const a = wearer(m.account);
+  if (!a || m.screen !== "menu" || !m.badgeOpen) return null;
+  const p = m.look;
+  const who = a.kind === "user" ? tr("auth.signedAs", { email: a.email }) : tr("auth.guestHint");
+  const act = a.kind === "user"
+    ? html`<button type="button" class="auth-logout" data-action="auth-logout">${tr("auth.logout")}</button>`
+    : html`<button type="button" class="auth-logout" data-action="auth-upgrade">${tr("auth.upgrade")}</button>`;
+  return html`<button type="button" class="title-badge-dim" data-action="badge-close" tabindex="-1" aria-label="${t("title.back")}"></button><section class="title-card title-badge-card" role="dialog" aria-modal="true" aria-labelledby="title-badge-h"><div class="title-pick" role="group" aria-label="${t("badge.look")}"><div class="big" data-portrait="${p}"><img src="/player/${PORTRAIT_FILES[p]}.png" alt="" draggable="false"></div><div class="pick-row"><button type="button" class="arrow prev" data-action="badge-turn" data-by="-1" aria-label="${t("badge.look")}">‹</button><div class="pick-label">${tr("title.pick.n", { n: portraitNo(p) })}</div><button type="button" class="arrow next" data-action="badge-turn" data-by="1" aria-label="${t("badge.look")}">›</button></div></div><div class="badge-info"><h2 id="title-badge-h" class="badge-name">${badgeName(a)}</h2><div class="badge-co">${tr("badge.company")} · ${tr("badge.role")}</div><div class="badge-who">${who}</div></div><div class="title-badge-foot">${act}<button type="button" class="title-back" data-action="badge-close">${tr("title.back")}</button></div></section>`;
 }
 
 /**
@@ -64,13 +101,6 @@ function gateCard(a: Extract<Account, { kind: "gate" }>): SafeHtml {
   const status = a.status === "error" ? html`<div class="auth-status error">${tr(a.mode === "register" ? "auth.errorRegister" : "auth.error")}${a.reason ? html`<div class="auth-reason">${a.reason}</div>` : null}</div>` : a.status === "confirm" ? html`<div class="auth-status">${tr("auth.confirm")}</div>` : a.status === "busy" ? html`<div class="auth-status">${tr("auth.busy")}</div>` : html`<div class="auth-status hint">${tr("auth.hint")}</div>`;
   const other = a.mode === "login" ? html`<button type="button" class="auth-switch" data-action="auth-mode" data-mode="register">${tr("auth.toRegister")}</button>` : html`<button type="button" class="auth-switch" data-action="auth-mode" data-mode="login">${tr("auth.toLogin")}</button>`;
   return html`<section class="title-card title-auth" role="dialog" aria-modal="true" aria-labelledby="title-auth-h" data-mode="${a.mode}"><h2 id="title-auth-h">${tr(a.mode === "register" ? "auth.title" : "auth.titleLogin")}</h2><div class="auth-sub">${tr("auth.sub")}</div><div class="row"><label for="auth-email">${tr("auth.email")}</label><input id="auth-email" type="email" data-input="auth-email" data-focus="auth-email" value="${a.email}" autocomplete="email" spellcheck="false"${busy ? html` disabled` : null}></div><div class="row"><label for="auth-password">${tr("auth.password")}</label><input id="auth-password" type="password" data-input="auth-password" data-focus="auth-password" value="${a.password}" autocomplete="${a.mode === "register" ? "new-password" : "current-password"}"${busy ? html` disabled` : null}></div>${status}<button type="button" class="title-start ready" data-action="auth-submit"${busy ? html` disabled` : null}>${tr(a.mode === "register" ? "auth.register" : "auth.login")}</button><div class="auth-foot">${other}<button type="button" class="auth-guest" data-action="auth-guest"${busy ? html` disabled` : null}>${tr("auth.guest")}</button></div><div class="auth-guest-hint">${tr("auth.guestHint")}</div><button type="button" class="auth-cancel" data-action="auth-cancel"${busy ? html` disabled` : null}>${tr("settings.cancel")}</button></section>`;
-}
-
-/** The identity chip (author 2026-11-09): only who you are — 游客, or the email with 退出登录; nothing for nobody. */
-function accountChip(a: Account | undefined): SafeHtml | null {
-  if (!a || a.kind !== "user" && a.kind !== "guest") return null;
-  if (a.kind === "guest") return html`<div class="title-account guest"><span class="who">${tr("auth.guestNow")}</span><button type="button" class="auth-logout" data-action="auth-upgrade">${tr("auth.upgrade")}</button></div>`;
-  return html`<div class="title-account user"><span class="who">${a.email}</span><button type="button" class="auth-logout" data-action="auth-logout">${tr("auth.logout")}</button></div>`;
 }
 
 function questionRow(m: TitleModel, q: Question, current: boolean): SafeHtml {
@@ -138,6 +168,6 @@ export function renderTitle(m: TitleModel): SafeHtml {
       ? gateCard(m.account)
       : null
     : m.screen === "credits" ? creditsPage() : m.screen === "drawer" ? drawerPage(m.collection, m.drawerOpen) : m.screen === "album" ? albumPage(m.collection, m.albumOpen) : m.screen === "questions" ? (m.starting ? null : cardOpen(m) ? questions(m) : menu(m)) : menu(m);
-  const account = m.screen === "menu" && !m.moving ? accountChip(m.account) : null;
-  return html`<div class="${cls("stage", "title-page", `screen-${m.screen}`, cardOpen(m) && "card-open", gated && "gated")}" data-screen="${m.screen}">${room(m)}<h1 class="title-name"><img class="title-logo" src="/logo.svg" alt="${GAME_TITLE}"></h1>${middle}${account}<div class="title-ver">${tr("title.version")}<br>${tr("title.byline")}</div>${m.screen === "menu" ? figureCard(m.collection, m.figureOpen) : null}${m.screen === "menu" && m.bookOpen ? bookReader(bookUrl(null, titleBookDays(m.collection))) : null}${settingsPanel({ settingsOpen: m.settingsOpen, muted: m.muted, settingsConfirm: m.settingsConfirm ?? null, ...(m.hintsOn !== undefined ? { hintsOn: m.hintsOn } : {}) }, { home: false, clearAll: true })}${m.opening ? openingLabel(m.opening) : null}</div>`;
+  const badgeOpen = gated ? null : badgeCard(m);
+  return html`<div class="${cls("stage", "title-page", `screen-${m.screen}`, cardOpen(m) && "card-open", gated && "gated", badgeOpen && "badge-open")}" data-screen="${m.screen}">${room(m)}<h1 class="title-name"><img class="title-logo" src="/logo.svg" alt="${GAME_TITLE}"></h1>${middle}${badgeOpen}<div class="title-ver">${tr("title.version")}<br>${tr("title.byline")}</div>${m.screen === "menu" ? figureCard(m.collection, m.figureOpen) : null}${m.screen === "menu" && m.bookOpen ? bookReader(bookUrl(null, titleBookDays(m.collection))) : null}${settingsPanel({ settingsOpen: m.settingsOpen, muted: m.muted, settingsConfirm: m.settingsConfirm ?? null, ...(m.hintsOn !== undefined ? { hintsOn: m.hintsOn } : {}) }, { home: false, clearAll: true })}${m.opening ? openingLabel(m.opening) : null}</div>`;
 }

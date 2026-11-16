@@ -175,12 +175,32 @@
 .title-auth .auth-status.hint{color:#7a7266}
 .title-auth .title-start{margin-top:14px}
 .title-auth .auth-foot{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:12px}
-.title-auth .auth-switch,.title-auth .auth-guest,.title-account .auth-logout{background:transparent;border:0;padding:0;font:inherit;font-size:14px;color:#2a2622;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.title-auth .auth-switch,.title-auth .auth-guest,.title-badge-card .auth-logout{background:transparent;border:0;padding:0;font:inherit;font-size:14px;color:#2a2622;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .title-auth .auth-guest{letter-spacing:.1em}
 .title-auth .auth-guest-hint{font-size:12px;color:#7a7266;margin-top:6px;text-align:right}
-.title-account{position:absolute;right:40px;top:28px;display:flex;align-items:center;gap:10px;padding:6px 12px;border:1px solid rgba(239,233,223,.35);border-radius:999px;font-size:13px;letter-spacing:.08em;color:rgba(239,233,223,.8);background:rgba(0,0,0,.25)}
-.title-account .who{max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.title-account .auth-logout{background:transparent;border:0;padding:0;font:inherit;font-size:12px;color:rgba(239,233,223,.7);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+/* title-badge §1 (author 2026-11-15): the account as the menu's last card, a staff badge on a lanyard */
+.title-menu .title-badge{position:relative;display:flex;align-items:center;gap:14px;width:260px;margin-top:22px;padding:10px 12px;box-sizing:border-box;text-align:left;text-indent:0;letter-spacing:normal;background:rgba(236,231,222,.88);border:1px solid rgba(255,255,255,.6);border-top:3px solid #8a7f70;border-radius:6px;color:#1d2129;box-shadow:0 4px 14px rgba(0,0,0,.35);transition:transform 160ms,box-shadow 160ms}
+.title-menu .title-badge:hover,.title-menu .title-badge:focus-visible{background:rgba(236,231,222,.88);color:#1d2129;transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.45);outline:none}
+.title-badge .lanyard{position:absolute;left:50%;top:-30px;width:28px;height:28px;transform:translateX(-50%);pointer-events:none;background:radial-gradient(circle at 50% calc(100% - 4px),transparent 3px,rgba(239,233,223,.85) 3px,rgba(239,233,223,.85) 5px,transparent 5px)}
+.title-badge .lanyard::before,.title-badge .lanyard::after{content:"";position:absolute;bottom:6px;width:2px;height:26px;background:rgba(239,233,223,.7)}
+.title-badge .lanyard::before{left:6px;transform:rotate(-18deg);transform-origin:bottom}
+.title-badge .lanyard::after{right:6px;transform:rotate(18deg);transform-origin:bottom}
+.title-badge .face{flex:0 0 56px;width:56px;height:56px;border-radius:4px;overflow:hidden;background:rgba(0,0,0,.08)}
+.title-badge .face img{width:100%;height:100%;object-fit:cover;display:block}
+.title-badge .who{display:flex;flex-direction:column;gap:4px;min-width:0;padding-left:14px;border-left:1px solid rgba(0,0,0,.15)}
+.title-badge .name{font-size:18px;letter-spacing:.3em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.title-badge .co{font-size:12px;letter-spacing:.15em;color:#5a5248}
+/* title-badge §2: the badge open */
+.title-badge-dim{position:absolute;inset:0;background:rgba(0,0,0,.35);border:0;padding:0;cursor:default}
+.title-card.title-badge-card{width:640px;display:grid;grid-template-columns:240px 1fr;grid-template-areas:"p i" "f f";column-gap:36px;row-gap:18px}
+.title-badge-card .title-pick{grid-area:p}
+.title-badge-card .badge-info{grid-area:i;align-self:center;display:flex;flex-direction:column;gap:10px;min-width:0}
+.title-badge-card .badge-name{margin:0;font-size:26px;letter-spacing:.2em;overflow-wrap:anywhere}
+.title-badge-card .badge-co{font-size:14px;letter-spacing:.12em;color:#5a5248}
+.title-badge-card .badge-who{font-size:13px;color:#7a7266;overflow-wrap:anywhere}
+.title-badge-foot{grid-area:f;display:flex;align-items:center;justify-content:space-between;gap:20px;padding-top:16px;border-top:1px solid rgba(0,0,0,.12)}
+.title-badge-foot .title-back{width:160px;padding:9px 0;border:1px solid #2a2622;border-radius:4px;color:#1d2129;font:inherit;font-size:15px}
+.title-badge-foot .title-back:hover,.title-badge-foot .title-back:focus-visible{background:#2a2622;color:#efe9df}
 .title-auth .auth-cancel{display:block;margin:12px auto 0;background:transparent;border:0;padding:4px 10px;font:inherit;font-size:14px;letter-spacing:.2em;text-indent:.2em;color:#5a5248;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 /* the character select (author's sketch 2026-11-09): a fixed card — the rows left, 选择形象 right, a rule, then 取消 / 开始 */
 .title-card.title-q{width:1060px;height:600px;display:grid;grid-template-columns:1fr 330px;grid-template-rows:auto 1fr auto;grid-template-areas:"h h" "l p" "f f";column-gap:44px;row-gap:8px;padding:30px 40px 28px}
