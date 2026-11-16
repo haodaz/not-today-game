@@ -260,7 +260,8 @@ function replyBar(ctx: AppContext, conversation: string, register: Register): Sa
     ? html`<div class="inner">${session.inner.text !== null ? fillPlaceholders(session.inner.text, state.names) : session.inner.key ? tr(session.inner.key) : null}</div>`
     : null;
   const send = html`<button type="button" data-conv="${conversation}" class="send" data-action="send"${canSend ? null : html` disabled`}>${tr("msgs.send")}</button>`;
-  if (register === "ding") return html`<div class="reply">${hint}${chips}${send}${kbd}${inner}</div>`;
+  // author 2026-11-16 (Windows playtest): 发送 sits at the end of the input's row, not floating after the chips.
+  if (register === "ding") return html`<div class="reply">${hint}${chips}<div class="kbd-row">${kbd}${send}</div>${inner}</div>`;
   // WeChat's composer: the chips above, a tall white input, a grey Send. The row of empty tool
   // placeholders is gone until each glyph has a function (desktop-ui 2026-11-02, point 2).
   return html`<div class="reply wx-composer">${hint}<div class="chips">${chips}</div>${kbd ?? html`<div class="kbd"></div>`}${send}${inner}</div>`;

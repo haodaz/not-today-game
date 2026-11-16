@@ -128,7 +128,9 @@ img.av-img{display:block;width:100%;height:100%;object-fit:cover;border-radius:i
 .conv{flex:1;display:flex;flex-direction:column;min-width:0}
 .conv .head{height:48px;display:flex;align-items:center;padding:0 18px;border-bottom:1px solid var(--line);font-weight:500}
 .conv .head small{margin-left:10px;color:var(--ink-3);font-weight:400}
-.msgs{flex:1;overflow:hidden;padding:18px;display:flex;flex-direction:column;justify-content:flex-end;gap:12px}
+.msgs{flex:1;overflow:hidden;padding:18px;display:flex;flex-direction:column;justify-content:flex-start;gap:12px}
+/* author 2026-11-16: a thread reads from the top like a real chat (the boss's note in the upper half); a long one is scrolled to its newest bubble after each render (controller) */
+.reply .kbd-row{width:100%;display:flex;gap:10px;align-items:center}.reply .kbd-row .kbd{flex:1 1 auto;width:auto}
 .m{display:flex;gap:10px;max-width:72%}.m .av{width:30px;height:30px;border-radius:8px;background:#dfe3ea;flex:0 0 auto;overflow:hidden}
 .m .bub{background:var(--them);padding:8px 12px;border-radius:4px 12px 12px 12px;line-height:1.55}
 .m .who{font-size:11px;color:var(--ink-3);margin-bottom:3px}

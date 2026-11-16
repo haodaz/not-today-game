@@ -441,6 +441,9 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     const slot = root.querySelector<HTMLElement>("[data-kuro-slot]");
     if (slot) body.attach(slot);
     fit();
+    // author 2026-11-16: a thread reads from the top (the boss's note in the upper half); when it is
+    // longer than its pane, show its newest bubble (the markup is fresh each render, so the scroll is too).
+    for (const el of root.querySelectorAll<HTMLElement>(".msgs")) el.scrollTop = el.scrollHeight;
     motion?.after();
     // world-prompts R1: the prompt's glow and pill go where its target is now drawn; drawn once, its
     // condition passing from now on is it being seen.
