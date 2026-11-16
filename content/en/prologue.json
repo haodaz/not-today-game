@@ -32,7 +32,7 @@
       "k": "narration",
       "who": "partner",
       "t": "Someone stops you in the corridor. This is Chen Weiwei, Vivi, your partner.",
-      "backdrop": "/room/dream/office.jpg"
+      "backdrop": "/room/dream/corridor_noon.jpg"
     },
     {
       "k": "narration",
@@ -60,7 +60,8 @@
     },
     {
       "k": "narration",
-      "t": "The hundredth employee arrives in the afternoon. His backpack still on, he wipes his hand on his trousers before holding it out."
+      "t": "The hundredth employee arrives in the afternoon. His backpack still on, he wipes his hand on his trousers before holding it out.",
+      "backdrop": "/room/dream/office_day.jpg"
     },
     {
       "k": "speaker",

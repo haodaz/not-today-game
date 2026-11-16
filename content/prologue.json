@@ -32,7 +32,7 @@
       "k": "narration",
       "who": "partner",
       "t": "一个人在走廊里拦住你。她是陈薇薇，也叫 Vivi，你的合伙人。",
-      "backdrop": "/room/dream/office.jpg"
+      "backdrop": "/room/dream/corridor_noon.jpg"
     },
     {
       "k": "narration",
@@ -60,7 +60,8 @@
     },
     {
       "k": "narration",
-      "t": "第一百个员工是下午来的。双肩包还没放下，伸手之前先在裤子上擦了一下。"
+      "t": "第一百个员工是下午来的。双肩包还没放下，伸手之前先在裤子上擦了一下。",
+      "backdrop": "/room/dream/office_day.jpg"
     },
     {
       "k": "speaker",
