@@ -1503,6 +1503,60 @@ span.cmp-face-btn{cursor:default}
 .cs-foot .ts-say{justify-self:start}
 .cs-right{grid-area:right}
 .cs-right{display:flex;align-items:center;gap:14px}
+/* clue stage, material pass (author 2026-11-16: 「提升工作任务中的精细度、背景质感」; Claude). The board stops being a comic panel
+   over a blacked-out picture and becomes things lying in that day's picture: a leather blotter, paper notes held by masking tape,
+   embossed label tape, a card tray, a manila band with a brass clasp. Soft, layered shadows instead of hard offsets; no black
+   outlines. While the form is locked the notes lie face down (they were blurred). Styles only: no markup changed. */
+.cs{--cs-paper:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .32 0 0 0 0 .25 0 0 0 0 .15 0 0 0 .16 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");--cs-fibre:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.04 .9' numOctaves='2' seed='8' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .22 0 0 0 0 .12 0 0 0 .12 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");--cs-leather:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.55' numOctaves='4' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .92 0 0 0 0 .8 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");--cs-ink:#2a241c}
+.cs-dim{background:radial-gradient(130% 95% at 42% 30%,rgba(18,12,8,.34) 0%,rgba(16,11,7,.62) 55%,rgba(8,5,3,.88) 100%)}
+.cs-av{border:2px solid #efe6d2;box-shadow:0 2px 6px rgba(0,0,0,.5)}
+.cs-kick{color:#d9b56a}
+.cs-pip{height:9px;border:1px solid rgba(233,214,170,.55);background:rgba(233,214,170,.08);box-shadow:inset 0 1px 1px rgba(0,0,0,.4)}
+.cs-pip.on{background:linear-gradient(180deg,#f3dc9a,#b98f3a);border-color:#e8cf8a;box-shadow:0 0 6px rgba(240,200,110,.45)}
+.cs-wall{margin:4px 0 8px 22px;padding:26px 24px 22px;border-radius:5px;background:var(--cs-leather),linear-gradient(160deg,rgba(26,20,16,.5),rgba(14,10,8,.62));-webkit-backdrop-filter:blur(10px) saturate(1.15) brightness(.7);backdrop-filter:blur(10px) saturate(1.15) brightness(.7);box-shadow:inset 0 0 0 1px rgba(255,236,200,.1),inset 0 0 0 7px rgba(0,0,0,.14),inset 0 0 0 8px rgba(255,236,200,.07),inset 0 24px 40px -24px rgba(255,220,160,.1),0 18px 40px -18px rgba(0,0,0,.8)}
+.cs-notes{gap:26px 24px}
+.cs-note{padding:26px 20px 18px;border:0;border-radius:1px 2px 2px 1px;background:var(--cs-paper),var(--cs-fibre),linear-gradient(180deg,#f6eed9,#eee3c8);color:var(--cs-ink);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -14px 18px -16px rgba(120,90,50,.28),0 1px 1px rgba(0,0,0,.3),0 7px 12px -5px rgba(0,0,0,.5),0 22px 28px -20px rgba(0,0,0,.7);transform:rotate(-.7deg)}
+.cs-note.k-1{background:var(--cs-paper),var(--cs-fibre),linear-gradient(180deg,#f3e6df,#eadbd2);transform:rotate(.6deg)}
+.cs-note.k-2{background:var(--cs-paper),repeating-linear-gradient(180deg,transparent 0 27px,rgba(70,96,130,.16) 27px 28px),linear-gradient(180deg,#e9eef0,#dfe6e8);transform:rotate(-.35deg)}
+.cs-note.k-3{background:var(--cs-paper),repeating-linear-gradient(180deg,transparent 0 27px,rgba(70,110,80,.15) 27px 28px),linear-gradient(180deg,#e9eee0,#dee6d3);transform:rotate(.8deg)}
+.cs-pin{top:-11px;width:74px;height:22px;margin-left:-37px;border:0;border-radius:1px;background:linear-gradient(180deg,rgba(238,226,186,.82),rgba(222,206,160,.78));box-shadow:0 1px 2px rgba(0,0,0,.28);transform:rotate(-2.2deg);clip-path:polygon(0 12%,4% 0,9% 14%,14% 2%,100% 0,98% 30%,100% 62%,97% 100%,6% 100%,2% 84%,5% 60%,1% 40%)}
+.cs-note.k-1 .cs-pin{transform:rotate(1.6deg)}.cs-note.k-3 .cs-pin{transform:rotate(3deg)}
+.cs-label{padding:3px 10px 2px;margin-bottom:8px;border-radius:2px;background:linear-gradient(180deg,#3a3a3c,#232325);color:#f4f4f0;font-weight:700;text-shadow:0 1px 0 rgba(0,0,0,.6),0 -1px 0 rgba(255,255,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 1px 2px rgba(0,0,0,.35)}
+.cs-demand{font-weight:600;color:var(--cs-ink)}
+.cs-slot{position:relative;border:1.5px dashed rgba(70,54,36,.42);border-radius:2px;background:rgba(255,255,255,.3);color:var(--cs-ink)}
+.cs-slot.empty:disabled{color:#8a7d6a}
+.cs-slot.empty.ready{border-color:#2f8f6d;background:rgba(214,240,226,.7);color:#17603f}
+.cs-slot.filled{border:0;background:var(--cs-paper),linear-gradient(180deg,#fdfaf0,#f6f0df);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 1px 2px rgba(0,0,0,.3),0 5px 9px -4px rgba(0,0,0,.45);transform:rotate(.35deg)}
+.cs-slot.filled::before{content:"";position:absolute;left:14px;top:-10px;width:9px;height:27px;border:2px solid #9aa1a8;border-radius:6px;box-shadow:1px 1px 0 rgba(0,0,0,.25),inset 1px 0 0 rgba(255,255,255,.5)}
+.cs-slot.filled .cs-slot-t{padding-left:22px}
+.cs-slot.drop{border-color:#c79a3a;background:rgba(255,240,205,.8)}
+/* locked: the notes are there, face down */
+.cs-wall.locked .cs-notes{filter:none;opacity:1}
+.cs-wall.locked .cs-note{background:var(--cs-paper),var(--cs-fibre),repeating-linear-gradient(135deg,rgba(120,96,60,.07) 0 2px,transparent 2px 9px),linear-gradient(180deg,#d9caa6,#cbbb95)}
+.cs-wall.locked .cs-note > :not(.cs-pin){visibility:hidden}
+/* face down they need no room for their text: five still fit under the lock band without the last one being cut */
+.cs-wall.locked .cs-notes{gap:22px 24px}
+.cs-wall.locked .cs-note{height:108px;box-sizing:border-box}
+/* show the rule: a face-down note is tied shut, red string crossed over it, a brass seal with a keyhole where the strings meet */
+.cs-wall.locked .cs-note::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,transparent calc(50% - 1.5px),rgba(60,10,6,.35) calc(50% - 1.5px) calc(50% - 1px),#a5362a calc(50% - 1px) calc(50% + 1px),rgba(60,10,6,.35) calc(50% + 1px) calc(50% + 1.5px),transparent calc(50% + 1.5px)),linear-gradient(90deg,transparent calc(50% - 1.5px),rgba(60,10,6,.35) calc(50% - 1.5px) calc(50% - 1px),#a5362a calc(50% - 1px) calc(50% + 1px),rgba(60,10,6,.35) calc(50% + 1px) calc(50% + 1.5px),transparent calc(50% + 1.5px))}
+.cs-wall.locked .cs-note::after{content:"";position:absolute;left:50%;top:50%;width:38px;height:38px;margin:-19px 0 0 -19px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 50% 42%,#3a2a10 0 5px,transparent 5.6px),linear-gradient(#3a2a10,#3a2a10) 50% 74%/5px 13px no-repeat,radial-gradient(circle at 34% 30%,#fbeab0,#c39a3f 55%,#7a5a17);box-shadow:0 2px 4px rgba(0,0,0,.5),inset 0 -2px 3px rgba(80,50,0,.5),inset 0 1px 1px rgba(255,255,255,.5)}
+.cs-lock{margin:0 0 22px;padding:14px 18px 16px 58px;border:0;border-radius:3px;background:var(--cs-paper),var(--cs-fibre),linear-gradient(180deg,#e9d6a6,#dcc68f);color:var(--cs-ink);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -1px 0 rgba(120,90,40,.35),0 2px 3px rgba(0,0,0,.35),0 14px 22px -12px rgba(0,0,0,.7)}
+.cs-lock-h{font-size:16px;letter-spacing:.08em}
+.cs-lock-icon{position:absolute;left:18px;top:14px;width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 34% 30%,#fbeab0,#c39a3f 55%,#7a5a17);box-shadow:0 2px 3px rgba(0,0,0,.45),inset 0 -2px 3px rgba(80,50,0,.5)}
+.cs-lock-icon::before{left:9px;top:9px;width:8px;height:8px;border:0;border-radius:50%;background:#5c4310;box-shadow:inset 0 1px 1px rgba(0,0,0,.6)}
+.cs-lock-icon::after{content:"";position:absolute;left:12px;top:22px;width:2px;height:34px;background:linear-gradient(180deg,#8a2a22,#b3362a);box-shadow:1px 0 0 rgba(0,0,0,.2);transform:rotate(8deg);transform-origin:top}
+.cs-lock .bcode{padding:7px 16px;border:1.5px solid #8a2a22;border-radius:2px;background:rgba(255,255,255,.18);color:#8a2a22;box-shadow:none;letter-spacing:.16em}
+.cs-lock .bcode:hover{background:#8a2a22;color:#f6eed9}
+.cs-lock .bchip{border:1px solid rgba(70,54,36,.5);border-radius:2px;background:var(--cs-paper),#f6eed9;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+.cs-lock .block{border:1px solid rgba(70,54,36,.35);border-radius:2px;background:rgba(255,255,255,.35)}
+.cs-tray{padding:14px 14px 16px;border:0;border-radius:5px;background:var(--cs-leather),linear-gradient(170deg,rgba(24,18,14,.55),rgba(12,9,7,.68));-webkit-backdrop-filter:blur(10px) saturate(1.15) brightness(.7);backdrop-filter:blur(10px) saturate(1.15) brightness(.7);box-shadow:inset 0 0 0 1px rgba(255,236,200,.12),inset 0 22px 30px -22px rgba(255,220,160,.1),0 18px 40px -18px rgba(0,0,0,.8)}
+.cs-tray-h{color:#d9b56a;padding-bottom:8px;border-bottom:1px solid rgba(233,214,170,.18)}
+.cs-clips{gap:10px}
+.cs-clip{border:0;border-radius:1px;background:var(--cs-paper),linear-gradient(180deg,#fbf6e8,#f1e9d3);color:var(--cs-ink);box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 1px 1px rgba(0,0,0,.3),0 5px 9px -4px rgba(0,0,0,.55)}
+.cs-clip.picked{outline:2px solid #e2bd62;outline-offset:2px;transform:translate(-3px,-3px) rotate(-.5deg);box-shadow:0 12px 18px -8px rgba(0,0,0,.7)}
+.cs-clip.dragging{box-shadow:0 16px 24px -8px rgba(0,0,0,.7)}
+.cs-clip.unfound{background:rgba(217,202,166,.1);color:#cfc3aa;border:1px dashed rgba(233,214,170,.3);box-shadow:none}
+.cs-clip-q{background:rgba(233,214,170,.16);color:#e2cf9f}
 /* meeting stage (2026-11-12): the meeting above, the template under it, over the day's picture */
 .ms{position:relative;flex:1;min-height:0;margin:-16px -26px -20px;display:grid;grid-template-columns:1fr 320px;grid-template-rows:auto 1fr auto;gap:0 18px;background:#14181F var(--art,none) center/cover no-repeat;color:#1d2129;overflow:hidden}
 .ms-top{grid-column:1/3;position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;padding:14px 28px 6px;color:#fff}
