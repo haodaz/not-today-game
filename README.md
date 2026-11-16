@@ -74,7 +74,10 @@ Written for people who have never seen it, one picture set each, on X (@vibeddin
 
 | Date | Post |
 |---|---|
-| 2026-11-02 | [The protagonist got through a whole day](https://x.com/vibedding/status/2117272867804955098) — first full day: lunch, and a box with no sender |
+| 2026-10-31 | [Day 2: changed a core mechanic](https://x.com/vibedding/status/2116507882380263703) — lie down = next day; Kiro re-cut the spec in one message |
+| 2026-11-01 | [Day 3: the people who text you got faces](https://x.com/vibedding/status/2116912743567491299) — portraits for the boss, the co-founder, parents, a teacher from 1997; relatives stay silhouettes |
+| 2026-11-01 | [The game has a song now](https://x.com/vibedding/status/2117005804502982780) — Not Today, words by the author, sung by Suno |
+| 2026-11-02 | [The protagonist got through a whole day](https://x.com/vibedding/status/2117272867804955098) — first full day: lunch, and a box with no sender ([dev note to Kiro](https://x.com/vibedding/status/2117272941805133930)) |
 | 2026-11-03 | [Did your childhood have these too?](https://x.com/vibedding/status/2117669655322223063) — the four old things |
 | 2026-11-04 | [People playing my game still feel like they're at work](https://x.com/vibedding/status/2118097104535158804) — the office chat, the boss's voice note |
 | 2026-11-05 | [The old things don't disappear when it ends](https://x.com/vibedding/status/2118353573700403278) — they wait on the title screen and still work |
