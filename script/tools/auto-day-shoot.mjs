@@ -356,7 +356,11 @@ for (const it of ITEMS) {
       // after lines that must be read first; until it is answered the board is not up. Poll up to 30 s for it,
       // or for the board itself (day 3's tune board, 2026-11-13; day 10's proofreading the same day).
       const waitForAsk = async (tag, boardSel) => {
+          let started = false;
           for (let w = 0; w < 60; w++) {
+            // work-mode (2026-11-16): 开始工作 on the work bar is the one way into the day's game (no ask any more);
+            // once pressed, the launch page's opening lines play first (advanced below), then its CTA
+            if (!started && (await has("[data-action=work-start]:not([disabled])"))) { started = true; await sel("[data-action=work-start]:not([disabled])", 1.2); note(`   ${tag}: 开始工作 on the work bar (after ${w / 2} s)`); }
             // the delivery's lines (the door, the box) must be read through before the ask can come
             if (await has("[data-action=loop-advance]")) { await sel("[data-action=loop-advance]", 0.3); }
             const ch = await ev("JSON.stringify(__choices())").then((x) => (x ? JSON.parse(x) : []));

@@ -45,23 +45,23 @@ describe("R1 · a new player can see the computer", () => {
     expect(r.out()).not.toContain('class="onboard"');
   });
 
-  it("工作台 opens as a window; the green light makes it full screen (work mode: the work bar in the dock's place) and back", () => {
+  it("工作台 opens full screen (work mode: the work bar in the dock's place); the green light makes it a window and back", () => {
     const r = rig(booted(), "desktop");
+    // work-mode §1 (author 2026-11-16): entering 工作台 is entering work mode
     r.act("dock", { app: "workbench" });
     let out = r.out();
-    // guidance R15: the window fills the OS area under the 28 px top bar down to the dock.
-    expect(out).toMatch(/<div class="win wb" data-win="workbench" style="left:0px;top:28px;width:1440px;height:800px"><div class="bar app-top"/);
-    expect(out).toContain('<div class="dock">');
+    expect(out).toContain('<div class="win wb full" data-win="workbench">');
+    expect(out).toContain('<div class="work-bar"><button type="button" class="wk-start" data-action="work-start"');
+    expect(out).not.toContain('<div class="dock');
     // The sidebar toggle is in the window's top bar.
     expect(out).toMatch(/<div class="bar app-top"[^>]*>.*data-action="wb-sidebar"/s);
     r.act("win-full", { app: "workbench" });
     out = r.out();
-    expect(out).toContain('<div class="win wb full" data-win="workbench">');
-    // work-mode §1: the dock row is the work bar (two buttons), not a hiding dock
-    expect(out).toContain('<div class="work-bar"><button type="button" class="wk-start" data-action="work-start"');
-    expect(out).not.toContain('<div class="dock');
+    // guidance R15: as a window it fills the OS area under the 28 px top bar down to the dock.
+    expect(out).toMatch(/<div class="win wb" data-win="workbench" style="left:0px;top:28px;width:1440px;height:800px"><div class="bar app-top"/);
+    expect(out).toContain('<div class="dock">');
     r.act("win-full", { app: "workbench" });
-    expect(r.out()).toContain('<div class="win wb" data-win="workbench" style=');
+    expect(r.out()).toContain('<div class="win wb full" data-win="workbench">');
   });
 
   it("the onboarding state is remembered with the run's placement; a placement saved before it means seen", () => {
