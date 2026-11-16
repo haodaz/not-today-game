@@ -82,27 +82,27 @@
         },
         {
           "k": "narration",
-          "who": "boss",
+          "who": "boss_young",
           "t": "王莱读的是认知科学。他说话的时候筷子不放下。"
         },
         {
           "k": "speaker",
-          "who": "boss",
+          "who": "boss_young",
           "t": "这边实验室做的东西，回去三年都用不上。回去，我们自己做。"
         },
         {
           "k": "speaker",
-          "who": "boss",
+          "who": "boss_young",
           "t": "你是我们仨里唯一会写代码的。"
         },
         {
           "k": "narration",
-          "who": "partner",
+          "who": "partner_young",
           "t": "陈薇薇读的是管理学博士。她的 PPT 已经做好了。"
         },
         {
           "k": "speaker",
-          "who": "partner",
+          "who": "partner_young",
           "t": "名字我想好了：未来智能。好记吧。"
         },
         {
@@ -115,17 +115,17 @@
         },
         {
           "k": "speaker",
-          "who": "boss",
+          "who": "boss_young",
           "t": "你留下的话，这边的 offer 是最好的那一档，我知道。"
         },
         {
           "k": "speaker",
-          "who": "boss",
+          "who": "boss_young",
           "t": "技术上你说了算。全部。我保证。"
         },
         {
           "k": "speaker",
-          "who": "partner",
+          "who": "partner_young",
           "t": "我们俩管别的，你只管做东西。"
         },
         {

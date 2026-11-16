@@ -1,5 +1,5 @@
 {
-  "_note": "Who has a face. id = the `who` used in days/replies and the conversation id in messages. portrait: bust for the dialogue box (same slot and size as the player portrait). avatar: 256 px square for the messages list, bubbles and 朋友圈. Speakers not listed here (member, 寻呼机, 屏幕, 缝里, 输入框) have no portrait; `member` and family-group relatives use the silhouettes.",
+  "_note": "Who has a face. id = the `who` used in days/replies and the conversation id in messages. portrait: bust for the dialogue box (same slot and size as the player portrait). avatar: 256 px square for the messages list, bubbles and 朋友圈. Speakers not listed here (member, 寻呼机, 屏幕, 缝里, 输入框) have no portrait; `member` and family-group relatives use the silhouettes. The dreams' people (2026-11-16): one id per person per age — 同桌 / 班长 are the primary-school ones, 高中同桌 / 高中班长 the high-school ones, 小满 / 小满初中 the same girl at twelve and fourteen; boss_young / partner_young are 王莱 and 陈薇薇 the year the company was named. Their `name` keys reuse the plain labels, so the player reads 同桌, 班长, 小满 as before.",
   "npcs": {
     "boss": {
       "name": "msgs.boss",
@@ -35,6 +35,66 @@
       "name": "msgs.father",
       "portrait": "/npc/father.png",
       "avatar": "/npc/father_av.png"
+    },
+    "同桌": {
+      "name": "who.同桌",
+      "portrait": "/npc/tongzhuo_primary.png",
+      "avatar": "/npc/tongzhuo_primary_av.png"
+    },
+    "小满": {
+      "name": "who.小满",
+      "portrait": "/npc/xiaoman.png",
+      "avatar": "/npc/xiaoman_av.png"
+    },
+    "小满初中": {
+      "name": "who.小满",
+      "portrait": "/npc/xiaoman_teen.png",
+      "avatar": "/npc/xiaoman_teen_av.png"
+    },
+    "阿凯": {
+      "name": "who.阿凯",
+      "portrait": "/npc/akai.png",
+      "avatar": "/npc/akai_av.png"
+    },
+    "班长": {
+      "name": "who.班长",
+      "portrait": "/npc/banzhang_primary.png",
+      "avatar": "/npc/banzhang_primary_av.png"
+    },
+    "小卖部老板": {
+      "name": "who.小卖部老板",
+      "portrait": "/npc/shopkeeper.png",
+      "avatar": "/npc/shopkeeper_av.png"
+    },
+    "初一同学": {
+      "name": "who.同学",
+      "portrait": "/npc/classmate_junior.png",
+      "avatar": "/npc/classmate_junior_av.png"
+    },
+    "英语老师": {
+      "name": "who.英语老师",
+      "portrait": "/npc/english_teacher.png",
+      "avatar": "/npc/english_teacher_av.png"
+    },
+    "高中同桌": {
+      "name": "who.同桌",
+      "portrait": "/npc/tongzhuo_high.png",
+      "avatar": "/npc/tongzhuo_high_av.png"
+    },
+    "高中班长": {
+      "name": "who.班长",
+      "portrait": "/npc/banzhang_high.png",
+      "avatar": "/npc/banzhang_high_av.png"
+    },
+    "boss_young": {
+      "name": "who.王莱",
+      "portrait": "/npc/boss_young.png",
+      "avatar": "/npc/boss_young_av.png"
+    },
+    "partner_young": {
+      "name": "who.薇薇",
+      "portrait": "/npc/partner_young.png",
+      "avatar": "/npc/partner_young_av.png"
     }
   },
   "silhouettes": [

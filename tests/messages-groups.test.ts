@@ -128,14 +128,20 @@ describe("prefix → who: an npc id or name in either language, else a silhouett
     for (const stranger of ["大姨", "Big Aunt", "二舅", "市场部", "valueOf", "constructor", "__proto__", ""]) expect(npcIdOf(stranger), stranger).toBeNull();
   });
 
-  it("every npc.json entry resolves by its own id and by its name in both languages", () => {
+  it("every npc.json entry resolves by its own id; a name resolves to the first entry carrying it", () => {
+    // The dreams' age variants (小满初中, 高中同桌, boss_young…) share a name key with the plain entry: a
+    // message prefixed 老王 or 小满 is the plain one. The plain entry comes first in npc.json.
+    const firstWithName: Record<string, string> = {};
+    for (const [id, entry] of Object.entries(npcData.npcs)) firstWithName[entry.name] ??= id;
     for (const [id, entry] of Object.entries(npcData.npcs)) {
       expect(npcIdOf(id), id).toBe(id);
       for (const l of ["zh", "en"] as const) {
         const name = stringIn(l, entry.name);
-        if (name) expect(npcIdOf(name), `${id} (${l})`).toBe(id);
+        if (name) expect(npcIdOf(name), `${id} (${l})`).toBe(firstWithName[entry.name]);
       }
     }
+    expect(npcIdOf("小满")).toBe("小满");
+    expect(npcIdOf(stringIn("zh", "msgs.boss")!)).toBe("boss");
   });
 
   it("the tag in the dialogue box and the history is the NPC's name, in the active language", () => {

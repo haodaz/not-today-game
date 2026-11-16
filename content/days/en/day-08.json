@@ -82,27 +82,27 @@
         },
         {
           "k": "narration",
-          "who": "boss",
+          "who": "boss_young",
           "t": "Wang Lai was doing cognitive science. He talked without putting his chopsticks down."
         },
         {
           "k": "speaker",
-          "who": "boss",
+          "who": "boss_young",
           "t": "What the lab here builds won't be usable back home for three years. Let's go back and build it ourselves."
         },
         {
           "k": "speaker",
-          "who": "boss",
+          "who": "boss_young",
           "t": "You're the only one of the three of us who can write code."
         },
         {
           "k": "narration",
-          "who": "partner",
+          "who": "partner_young",
           "t": "Chen Weiwei was doing a PhD in management. Her slides were already done."
         },
         {
           "k": "speaker",
-          "who": "partner",
+          "who": "partner_young",
           "t": "I've got the name: Weilai Intelligence. Easy to remember, right?"
         },
         {
@@ -115,17 +115,17 @@
         },
         {
           "k": "speaker",
-          "who": "boss",
+          "who": "boss_young",
           "t": "If you stayed, the offer you've got here is top tier. I know that."
         },
         {
           "k": "speaker",
-          "who": "boss",
+          "who": "boss_young",
           "t": "On the technical side, you decide. All of it. I promise."
         },
         {
           "k": "speaker",
-          "who": "partner",
+          "who": "partner_young",
           "t": "The two of us handle everything else. You just build."
         },
         {
