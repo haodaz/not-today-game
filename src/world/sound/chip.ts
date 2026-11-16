@@ -5,9 +5,9 @@
 import type { ANode } from "./player";
 import type { BabbleBuffer, BabbleContext } from "./babble-player";
 
-export type ChipId = "cursor" | "text" | "hit" | "shake" | "flame" | "flash" | "throw" | "flip" | "heal" | "down" | "win" | "lose" | "stage2" | "join";
+export type ChipId = "cursor" | "text" | "hit" | "shake" | "flame" | "flash" | "throw" | "flip" | "heal" | "down" | "win" | "lose" | "stage2" | "join" | "tick" | "match" | "wrong" | "clear";
 
-export const CHIP_IDS: readonly ChipId[] = ["cursor", "text", "hit", "shake", "flame", "flash", "throw", "flip", "heal", "down", "win", "lose", "stage2", "join"];
+export const CHIP_IDS: readonly ChipId[] = ["cursor", "text", "hit", "shake", "flame", "flash", "throw", "flip", "heal", "down", "win", "lose", "stage2", "join", "tick", "match", "wrong", "clear"];
 
 /** The master scale for every chip, so they sit under the music. */
 export const CHIP_GAIN = 0.25;
@@ -54,6 +54,11 @@ export const CHIP_RECIPES: Readonly<Record<ChipId, readonly ChipStep[]>> = {
   lose: [sq(0, 196, 250), sq(250, 147, 250)],
   stage2: [{ at: 0, kind: "noise", from: 0, ms: 1200, env: [0, 0.9, 0] }, sq(0, 55, 1200, { gain: 0.6 })],
   join: [...HEAL, SHAKE_TONE(180, 150)],
+  // game-sfx (2026-11-16): the work games' four
+  tick: [sq(0, 660, 20, { gain: 0.6 })],
+  match: [sq(0, 784, 50), sq(50, 1047, 50)],
+  wrong: [sq(0, 196, 160, { tremolo: { hz: 30, depth: 0.8 } })],
+  clear: [sq(0, 1047, 70), sq(70, 1319, 70), sq(140, 1568, 70)],
 };
 
 /** What a chip needs of the context: the babble's slice (the real AudioContext has all of it). */

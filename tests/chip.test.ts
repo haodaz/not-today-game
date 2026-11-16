@@ -93,6 +93,14 @@ describe("the recipes", () => {
     expect(CHIP_RECIPES.join[3]).toMatchObject({ from: 80, ms: 150, tremolo: { hz: 8 } });
     expect(CHIP_RECIPES.stage2[0]!.env).toEqual([0, 0.9, 0]);
   });
+
+  it("game-sfx: the four new recipes — tick, match, wrong, clear", () => {
+    for (const id of ["tick", "match", "wrong", "clear"] as const) expect(CHIP_IDS).toContain(id);
+    expect(CHIP_RECIPES.tick).toEqual([{ at: 0, kind: "osc", wave: "square", from: 660, ms: 20, gain: 0.6 }]);
+    expect(CHIP_RECIPES.match.map((s) => [s.at, s.from, s.ms])).toEqual([[0, 784, 50], [50, 1047, 50]]);
+    expect(CHIP_RECIPES.wrong).toEqual([{ at: 0, kind: "osc", wave: "square", from: 196, ms: 160, tremolo: { hz: 30, depth: 0.8 } }]);
+    expect(CHIP_RECIPES.clear.map((s) => [s.at, s.from, s.ms])).toEqual([[0, 1047, 70], [70, 1319, 70], [140, 1568, 70]]);
+  });
 });
 
 describe("playChip", () => {

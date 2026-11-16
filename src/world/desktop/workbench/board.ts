@@ -27,6 +27,7 @@ import { LINK_DONE_MS, LINK_PATH_MS, linkRoll, linkShuffle, linkSolve, linkStart
 import { SNAKE_DONE_MS, SNAKE_TICK_MS, snakeRoll, snakeSolve, snakeStart, snakeStep, snakeTurn, type SnakeDir } from "./snake";
 import { tetrisNearTop } from "./tetris";
 import { gradedInLog, gradeGame, noteTally, tallyField } from "./grades";
+import { assistChip, gameChip, gameChipAfter, MINES_LOSE_AFTER_MS, spotFoundChip, type GameChipFrom } from "./game-sfx";
 import { TETRIS_DONE_MS, TETRIS_FLASH_MS, tetrisDropMs, tetrisKey, tetrisRoll, tetrisSolve, tetrisStart, tetrisTick, type TetrisGame, type TetrisKey } from "./tetris";
 import { RHYTHM_DONE_MS, RHYTHM_TICK_MS, rhythmPause, rhythmResume, rhythmRoll, rhythmSolve, rhythmStart, rhythmSweep, rhythmTap, rhythmWords } from "./rhythm";
 import { GACHA_DONE_MS, GACHA_TURN_MS, gachaOpen, gachaRoll, gachaStart, gachaTurn } from "./gacha";
@@ -336,6 +337,7 @@ function runSnake(ctx: ActionContext, gen: number): void {
       ctx.session.snake = next;
       if (!next.over) ctx.later(SNAKE_TICK_MS, tick);
     }
+    gameSound(ctx, "snake", g, ctx.session.snake, { via: "clock" });
     ctx.rerender();
   };
   ctx.later(SNAKE_TICK_MS, tick);
@@ -374,6 +376,7 @@ function runTetris(ctx: ActionContext, gen: number): void {
     }
     settleTetris(ctx, c.task.id, tetrisTick(g, tetrisRollFor(ctx, g), ctx.now?.() ?? Date.now()));
     const after = ctx.session.tetris;
+    gameSound(ctx, "tetris", g, after, { via: "clock" });
     if (after && !after.done && !after.over) ctx.later(tetrisDropMs(after.lines), tick);
     ctx.rerender();
   };
@@ -401,6 +404,7 @@ function runRhythm(ctx: ActionContext, gen: number): void {
       ctx.session.rhythm = next;
       if (!next.over) ctx.later(RHYTHM_TICK_MS, tick);
     }
+    gameSound(ctx, "rhythm", g, ctx.session.rhythm, { via: "clock" });
     ctx.rerender();
   };
   ctx.later(RHYTHM_TICK_MS, tick);
@@ -442,6 +446,7 @@ function runMoles(ctx: ActionContext, gen: number): void {
       ctx.session.moles = next;
       if (!next.over) ctx.later(MOLES_TICK_MS, tick);
     }
+    gameSound(ctx, "moles", g, ctx.session.moles, { via: "clock" });
     ctx.rerender();
   };
   ctx.later(MOLES_TICK_MS, tick);
@@ -468,6 +473,7 @@ function runPac(ctx: ActionContext, gen: number): void {
       ctx.session.pacman = next;
       if (!next.over) ctx.later(PAC_TICK_MS, tick);
     }
+    gameSound(ctx, "pacman", g, ctx.session.pacman, { via: "clock" });
     ctx.rerender();
   };
   ctx.later(PAC_TICK_MS, tick);
@@ -1388,7 +1394,9 @@ const actions: Record<string, ActionHandler> = {
     if (c?.board.game?.kind !== "spot" || !c.board.compare) return;
     const key = `${String(ctx.store.getState().day)}:${c.task.id}`;
     const prev = ctx.session.spotMiss?.key === key ? ctx.session.spotMiss.n : 0;
+    const was = { key, n: prev, at: 0 };
     ctx.session.spotMiss = { key, n: prev + 1, at: ctx.now?.() ?? Date.now() };
+    gameSound(ctx, "spotMiss", was, ctx.session.spotMiss);
     ctx.later(SPOT_SHAKE_MS + 20, ctx.rerender);
     ctx.rerender();
   },
@@ -1519,6 +1527,8 @@ function comparePick(ctx: ActionContext, c: { task: Task; board: TaskBoard }, sl
   if (!s.unlocked || s.slots[slot] === card) return;
   const held = holdPreview(ctx, c);
   ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "fill", slot, card } });
+  // game-sfx: on a spot board the pick is a difference found; the last one clears the game
+  if (c.board.game?.kind === "spot") ctx.chip?.(spotFoundChip(comparePending(c.board, stateOf(ctx, c.task, c.board)) === null));
   // the result screen: Kuro renders, then 老王's face (author 2026-11-12: never on the choose screen)
   ctx.session.workPhase = { key: ideKey(ctx.store.getState().day, c.task), phase: "result", slot };
   renderPause(ctx, c, held);
@@ -1665,13 +1675,35 @@ const withTally = (name: string, h: ActionHandler): ActionHandler => {
     noteTally(ctx.session, c.task.id, name, before, data);
     // game-grade-log §2: the grade goes into the log when it changes, so a reload before 提交 keeps
     // it. fill keeps its own record in the log and is left alone.
-    if (field === "fill") return;
-    const day = ctx.store.getState().day;
-    const events = ctx.store.getEvents();
-    const quality = gradeGame(c.board, c.task.id, day, ctx.session, events);
-    if (quality && gradedInLog(events, day, c.task.id) !== quality) ctx.store.appendEvent({ kind: "graded", task: c.task.id, quality });
+    if (field !== "fill") {
+      const day = ctx.store.getState().day;
+      const events = ctx.store.getEvents();
+      const quality = gradeGame(c.board, c.task.id, day, ctx.session, events);
+      if (quality && gradedInLog(events, day, c.task.id) !== quality) ctx.store.appendEvent({ kind: "graded", task: c.task.id, quality });
+    }
+    // game-sfx: the action's sound, from the change it made
+    gameSound(ctx, field, before, ctx.session[field], { action: name, data });
   };
 };
+
+/**
+ * game-sfx: plays the sound of one change of a game's session field (at most one, plus the mine's
+ * loss a beat later). A start or an assist that changed the game clicks `cursor` first; a start is
+ * a fresh board and sounds nothing more; an assist that ends the game is `heal`. Absent chip = silence.
+ */
+function gameSound(ctx: ActionContext, field: keyof Session, before: unknown, after: unknown, from: GameChipFrom = {}): void {
+  const chip = ctx.chip;
+  if (!chip) return;
+  const start = from.action?.endsWith("-start") === true;
+  const assist = from.action?.endsWith("-assist") === true;
+  if ((start || assist) && after !== before) chip("cursor");
+  if (start) return;
+  const id = gameChip(field, before, after, from);
+  const play = assist ? assistChip(id) : id;
+  if (play) chip(play);
+  const then = gameChipAfter(field, before, after);
+  if (then) ctx.later(MINES_LOSE_AFTER_MS, () => chip(then));
+}
 export const boardActions: Record<string, ActionHandler> = Object.fromEntries(Object.entries(actions).map(([k, h]) => [k, withIde(withTally(k, h))]));
 
 /**
