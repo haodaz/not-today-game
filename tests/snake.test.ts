@@ -122,7 +122,7 @@ describe("snake", () => {
     session.snake = { ...session.snake!, over: true, running: false };
     expect(out()).toContain(`data-action="snake-assist">${t("settle.kuro")}</button>`);
     act("snake-assist");
-    expect(store.getEvents().at(-1)).toMatchObject({ kind: "boardStep", op: { t: "approve" } });
+    expect(store.getEvents().filter((e) => e.kind !== "graded").at(-1)).toMatchObject({ kind: "boardStep", op: { t: "approve" } });
     expect(canPrint(board, boardState(board, 6, task.id, store.getEvents()))).toBe(true);
     expect(out()).toContain(t("snake.stage.won"));
     now = 4000;

@@ -128,7 +128,7 @@ describe("pac-man", () => {
     session.pacman = { ...session.pacman!, over: true, running: false };
     expect(out()).toContain(`data-action="pacman-assist">${t("settle.kuro")}</button>`);
     act("pacman-assist");
-    expect(store.getEvents().at(-1)).toMatchObject({ kind: "boardStep", op: { t: "approve" } });
+    expect(store.getEvents().filter((e) => e.kind !== "graded").at(-1)).toMatchObject({ kind: "boardStep", op: { t: "approve" } });
     expect(canPrint(board, boardState(board, 7, task.id, store.getEvents()))).toBe(true);
     expect(out()).toContain(t("pacman.stage.won"));
     now += 6000;

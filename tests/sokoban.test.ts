@@ -98,7 +98,7 @@ describe("sokoban", () => {
     expect(session.sokoban!.player).toBe(p0);
     // the dev cheat seats them all: approved; the stamp; then the meeting stage with its send
     act("sokoban-cheat");
-    expect(store.getEvents().at(-1)).toMatchObject({ kind: "boardStep", op: { t: "approve" } });
+    expect(store.getEvents().filter((e) => e.kind !== "graded").at(-1)).toMatchObject({ kind: "boardStep", op: { t: "approve" } });
     expect(canPrint(board, boardState(board, 9, task.id, store.getEvents()))).toBe(true);
     expect(out()).toContain(t("sokoban.stage.won"));
     now += 6000;

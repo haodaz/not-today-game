@@ -108,7 +108,7 @@ describe("whack-a-mole", () => {
     session.moles = { ...session.moles!, over: true, running: false };
     expect(out()).toContain(`data-action="moles-assist">${t("settle.kuro")}</button>`);
     act("moles-assist");
-    expect(store.getEvents().at(-1)).toMatchObject({ kind: "boardStep", op: { t: "approve" } });
+    expect(store.getEvents().filter((e) => e.kind !== "graded").at(-1)).toMatchObject({ kind: "boardStep", op: { t: "approve" } });
     expect(canPrint(board, boardState(board, 15, task.id, store.getEvents()))).toBe(true);
     expect(out()).toContain(t("moles.stage.won"));
     now += 6000;

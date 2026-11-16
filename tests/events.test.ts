@@ -30,6 +30,7 @@ describe("the twelve event kinds", () => {
         "useAt", "photo",
         "record",
         "stare",
+        "graded",
       ].sort(),
     );
   });
@@ -114,6 +115,18 @@ describe("kinds with no reducer in this spec", () => {
 
   it.each(noOps.map((draft) => [draft.kind, draft] as const))("%s leaves state deep-equal", (_kind, draft) => {
     expect(applyEvent(baseState(), at(draft))).toEqual(baseState());
+  });
+});
+
+describe("graded (game-grade-log)", () => {
+  it("validates the task token and the quality; a good one leaves state identical", () => {
+    const good = applyEvent(baseState(), at({ kind: "graded", task: "d8_t1", quality: "flawed" }));
+    expect(good).toEqual(baseState());
+    for (const quality of ["perfect", "flawed", "wrong"] as const) expect(applyEvent(baseState(), at({ kind: "graded", task: "a:b-c_1", quality }))).toEqual(baseState());
+    expect(() => applyEvent(baseState(), at({ kind: "graded", task: "", quality: "perfect" }))).toThrow(/graded: task/);
+    expect(() => applyEvent(baseState(), at({ kind: "graded", task: "the task", quality: "perfect" }))).toThrow(/graded: task/);
+    expect(() => applyEvent(baseState(), at({ kind: "graded", task: 3 as never, quality: "perfect" }))).toThrow(/graded: task/);
+    expect(() => applyEvent(baseState(), at({ kind: "graded", task: "t", quality: "great" as never }))).toThrow(/graded: quality/);
   });
 });
 

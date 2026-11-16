@@ -9,7 +9,7 @@ import type { ActionContext } from "@world/desktop/controller";
 import { initialSession } from "@world/desktop/model";
 import { setLocale, t } from "@world/i18n";
 import { boardActions } from "@world/desktop/workbench/board";
-import { gradeGame } from "@world/desktop/workbench/grades";
+import { gradedInLog, gradeGame } from "@world/desktop/workbench/grades";
 import { freshTally, type GameTally } from "@world/desktop/workbench/tally";
 import { qualityLine } from "@world/desktop/workbench/settle-sheet";
 import { grade as link } from "@world/desktop/workbench/link";
@@ -143,5 +143,75 @@ describe("the printed task event and the settlement", () => {
     expect(store.getEvents().find((e) => e.kind === "task" && e.flag === task.done)).toMatchObject({ quality: "flawed" });
     expect(qualityLine("flawed")!.value).toBe(`<p class="sl-quality flawed">${t("settle.quality.flawed")}</p>`);
     expect(qualityLine(null)).toBeNull();
+  });
+});
+
+// game-grade-log: the grade goes into the log as the play goes, so a reload before 提交 keeps it.
+describe("the graded event", () => {
+  const setup = () => {
+    const task = taskByFlag(8, "task_d8_1")!;
+    const store = createStore({ startDay: 8 });
+    completeUntil(store, "task1");
+    const b = task.board!;
+    expect(b.game?.kind).toBe("mines");
+    store.appendEvent({ kind: "boardStep", taskId: task.id, op: { t: "unlock", code: b.given.lock!.answer } });
+    for (const sl of b.slots) store.appendEvent({ kind: "boardStep", taskId: task.id, op: { t: "fill", slot: sl.id, card: sl.answer } });
+    const session = initialSession({ beat: "work", time: "10:00" }, "left", "desktop");
+    const ctx: ActionContext = { store, session, rerender: () => {}, later: () => {}, now: () => 1000 };
+    const act = (n: string) => boardActions[n]!(ctx, {} as DOMStringMap, null as never);
+    const graded = () => store.getEvents().filter((e) => e.kind === "graded").map((e) => (e as { task: string; quality: string; day: number }));
+    return { task, store, b, session, act, graded };
+  };
+  /** What a reload leaves: the session is new, the log is the same. */
+  const reload = (session: ReturnType<typeof initialSession>) => {
+    session.mines = null;
+    session.gameTally = null;
+  };
+
+  it("a win writes perfect; the same grade twice writes one event", () => {
+    const { task, act, graded } = setup();
+    act("mines-start");
+    expect(graded()).toEqual([{ kind: "graded", day: 8, task: task.id, quality: "wrong" }]);
+    act("mines-cheat");
+    act("mines-cheat"); // already approved: the grade stays perfect, nothing more is written
+    expect(graded().map((e) => e.quality)).toEqual(["wrong", "perfect"]);
+    expect(gradedInLog(graded() as never, 8, task.id)).toBe("perfect");
+    expect(gradedInLog(graded() as never, 9, task.id)).toBeNull();
+    expect(gradedInLog(graded() as never, 8, "other")).toBeNull();
+  });
+
+  it("a restart after a loss writes wrong once; the win after it flawed", () => {
+    const { act, session, graded } = setup();
+    act("mines-start");
+    session.mines = { ...session.mines!, over: true };
+    act("mines-start");
+    expect(graded().map((e) => e.quality)).toEqual(["wrong"]);
+    act("mines-cheat");
+    expect(graded().map((e) => e.quality)).toEqual(["wrong", "flawed"]);
+  });
+
+  it("the session gone: gradeGame reads the log's last grade; with neither, null; the session wins while it exists", () => {
+    const { task, b, store, session, act } = setup();
+    expect(gradeGame(b, task.id, 8, session, store.getEvents())).toBeNull();
+    act("mines-start");
+    session.mines = { ...session.mines!, over: true };
+    act("mines-start");
+    act("mines-cheat");
+    reload(session);
+    expect(gradeGame(b, task.id, 8, session, store.getEvents())).toBe("flawed");
+    expect(gradeGame(b, task.id, 8, session)).toBeNull(); // no log given: nothing to read
+    session.mines = { key: task.id, won: true, over: false } as never; // a session again: it wins over the log
+    expect(gradeGame(b, task.id, 8, session, store.getEvents())).toBe("perfect");
+  });
+
+  it("printBoard's task event carries the log's grade after the session is cleared", () => {
+    const { task, store, session, act } = setup();
+    act("mines-start");
+    session.mines = { ...session.mines!, over: true };
+    act("mines-start");
+    act("mines-cheat");
+    reload(session);
+    act("board-print");
+    expect(store.getEvents().find((e) => e.kind === "task" && e.flag === task.done)).toMatchObject({ quality: "flawed" });
   });
 });

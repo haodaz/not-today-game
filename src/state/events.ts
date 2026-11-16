@@ -76,6 +76,9 @@ export type GameEvent =
   // the window at night, a developed photo with a trace…): SAN by `stareSan`. The runtime appends it
   // once per thing per day; the reducer only takes the cost.
   | { kind: "stare"; day: number; target: string }
+  // game-grade-log (2026-11-15): the grade of the play on this task's game as it stands after an
+  // action, written when it changes. A record only: it lets the print site grade after a reload.
+  | { kind: "graded"; day: number; task: string; quality: BoardVerdict }
   // object-upgrade spec (2026-11-01): accepting / declining Kuro's offer (one object at a time;
   // the day-13 全员升级 is gone, 2026-11-06).
   | { kind: "upgrade"; day: number; object: string }
@@ -131,7 +134,7 @@ export type BoardOp =
 
 export type EventKind = GameEvent["kind"];
 
-/** Exactly these kinds (world-state 12, delivery 3, desktop-ui 1, day-loop 3, object-upgrade 2, san-and-endings 1, title-page 1, dialogue 1, late-days 1, kuro-chat 1, work v2 3, the call 2, objects-in-room 1, camera 1, tape-record 1). Nothing else may be appended. */
+/** Exactly these kinds (world-state 12, delivery 3, desktop-ui 1, day-loop 3, object-upgrade 2, san-and-endings 1, title-page 1, dialogue 1, late-days 1, kuro-chat 1, work v2 3, the call 2, objects-in-room 1, camera 1, tape-record 1, meters-v2 1, game-grade-log 1). Nothing else may be appended. */
 export const eventKinds: readonly EventKind[] = [
   "openLayer",
   "recognise",
@@ -168,6 +171,7 @@ export const eventKinds: readonly EventKind[] = [
   "photo",
   "record",
   "stare",
+  "graded",
 ];
 
 /**
@@ -179,6 +183,15 @@ export const eventKinds: readonly EventKind[] = [
 function applyStare(state: State, event: { readonly target: string }): State {
   if (typeof event.target !== "string" || !/^[a-z][a-z0-9:_-]*$/i.test(event.target)) throw new Error(`stare: target must be a token, got ${JSON.stringify(event.target)}`);
   return { ...state, san: clampSan(state.san + (constants.stareSan as number)) };
+}
+
+const VERDICTS: readonly string[] = ["perfect", "flawed", "wrong"];
+
+/** game-grade-log: a game's grade in the log. Validated; no state effect (the print site reads it). */
+function applyGraded(state: State, event: { readonly task: string; readonly quality: string }): State {
+  if (typeof event.task !== "string" || !/^[a-z][a-z0-9:_-]*$/i.test(event.task)) throw new Error(`graded: task must be a token, got ${JSON.stringify(event.task)}`);
+  if (!VERDICTS.includes(event.quality)) throw new Error(`graded: quality must be perfect, flawed or wrong, got ${JSON.stringify(event.quality)}`);
+  return state;
 }
 
 function applyRecord(state: State): State {
@@ -462,6 +475,8 @@ export function applyEvent(state: State, event: GameEvent): State {
       return applyBoardJudge(state, event);
     case "stare":
       return applyStare(state, event);
+    case "graded":
+      return applyGraded(state, event);
     case "upgrade":
       return applyUpgrade(state, event);
     case "declineUpgrade":

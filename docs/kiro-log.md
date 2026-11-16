@@ -2802,3 +2802,21 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
   - profile-sync.test: `mergeProfile` with `look`.
 - Snapshots: none changed. The title snapshots render with no account, so no badge is printed. The snapshot directory was diffed before and after and is identical, so there was nothing to refresh.
 - tsc clean; vitest 176 files, 2468 passed.
+## 2026-11-15 · game-grade-log (the game's grade survives a reload)
+- events.ts:
+  - New kind `{ kind: "graded"; day; task; quality: BoardVerdict }`, listed after `"stare"`.
+  - `applyGraded` throws `graded: task …` for a task that is not a token (`/^[a-z][a-z0-9:_-]*$/i`) and `graded: quality …` for anything outside perfect / flawed / wrong. Otherwise it returns the state unchanged.
+  - The kinds comment now counts meters-v2 1 and game-grade-log 1.
+- board.ts `withTally`: after `noteTally` it computes `gradeGame(...)` with the store's day and log. It appends `graded` only when the grade is non-null and differs from the last `graded` for (day, task). It only runs on the actions `withTally` already wraps. fill is skipped (`field === "fill"`) because it keeps its own record. spot is not in `FIELD`, so it is untouched.
+- grades.ts:
+  - New export `gradedInLog(events, day, taskId)`, which returns the last matching `graded` quality or null.
+  - In `gradeGame`, every session-backed game (the chain and link … gacha) returns `gradedInLog` when its session is gone, instead of null. The session still wins while it exists.
+  - fill keeps its record path. spot stays session-only, which is the accepted gap.
+  - The comment is rewritten; the "as before this spec" sentence is gone.
+- Side effect: the settlement sheet's quality line (clue-stage and meeting-stage both call `gradeGame`) now also shows after a reload.
+- Tests:
+  - events.test: `graded` is in the kinds list. A new block checks that a good event leaves state equal, and that bad tasks (empty, with a space, a number) and a bad quality throw.
+  - grades.test: a new "the graded event" block on the day-8 mines board. A win writes wrong then perfect. A second cheat writes nothing more. A restart after a loss writes wrong once, then flawed. After a "reload" (session.mines and gameTally set to null), `gradeGame` reads flawed from the log. With no log it returns null, and a session that is present wins over the log. `board-print` after the reload carries `quality: "flawed"`. `gradedInLog` filters by day and task.
+  - gacha, link, mines, moles, pacman, pipes, rhythm, snake, sokoban: each "approve is the last event" check now reads the last event other than `graded`. A `graded` event now follows the approval, so `.at(-1)` saw the grade. What each test checks is otherwise unchanged.
+- Replay tests passed unchanged. No snapshot changed: the snapshot folder was diffed before and after and is identical, so there was nothing to refresh.
+- tsc clean; vitest 176 files, 2473 passed.

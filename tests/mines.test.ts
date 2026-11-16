@@ -85,7 +85,7 @@ describe("minesweeper", () => {
     for (let i = 0; i < 35; i++) if (!mines[i] && !session.mines!.open[i] && !session.mines!.flags[i]) act("mines-open", { i: String(i) });
     if (!session.mines!.won) { act("mines-mode"); act("mines-open", { i: "3" }); act("mines-mode"); act("mines-open", { i: "3" }); }
     expect(session.mines!.won).toBe(true);
-    expect(store.getEvents().at(-1)).toMatchObject({ kind: "boardStep", op: { t: "approve" } });
+    expect(store.getEvents().filter((e) => e.kind !== "graded").at(-1)).toMatchObject({ kind: "boardStep", op: { t: "approve" } });
     expect(canPrint(board, boardState(board, 8, task.id, store.getEvents()))).toBe(true);
     // the done state holds a beat, then the board (the sheet's 整理好了) returns
     expect(out()).toContain(t("mines.stage.won"));

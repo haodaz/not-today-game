@@ -130,7 +130,7 @@ describe("link-link", () => {
     session.link = { ...session.link!, cells: session.link!.cells.map((_, i) => (i === 0 || i === 1 ? 2 : -1)), left: 1 };
     act("link-tap", { i: "0" });
     act("link-tap", { i: "1" });
-    expect(store.getEvents().at(-1)).toMatchObject({ kind: "boardStep", op: { t: "approve" } });
+    expect(store.getEvents().filter((e) => e.kind !== "graded").at(-1)).toMatchObject({ kind: "boardStep", op: { t: "approve" } });
     expect(canPrint(board, boardState(board, 4, task.id, store.getEvents()))).toBe(true);
     expect(out()).toContain(t("link.stage.won"));
     now = 4000;

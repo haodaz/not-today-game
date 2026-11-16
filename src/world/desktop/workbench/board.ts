@@ -26,7 +26,7 @@ import { MATCH3_DONE_MS, match3Roll, match3Start, match3Tap, type Match3Grid } f
 import { LINK_DONE_MS, LINK_PATH_MS, linkRoll, linkShuffle, linkSolve, linkStart, linkTap, type LinkGrid } from "./link";
 import { SNAKE_DONE_MS, SNAKE_TICK_MS, snakeRoll, snakeSolve, snakeStart, snakeStep, snakeTurn, type SnakeDir } from "./snake";
 import { tetrisNearTop } from "./tetris";
-import { gradeGame, noteTally, tallyField } from "./grades";
+import { gradedInLog, gradeGame, noteTally, tallyField } from "./grades";
 import { TETRIS_DONE_MS, TETRIS_FLASH_MS, tetrisDropMs, tetrisKey, tetrisRoll, tetrisSolve, tetrisStart, tetrisTick, type TetrisGame, type TetrisKey } from "./tetris";
 import { RHYTHM_DONE_MS, RHYTHM_TICK_MS, rhythmPause, rhythmResume, rhythmRoll, rhythmSolve, rhythmStart, rhythmSweep, rhythmTap, rhythmWords } from "./rhythm";
 import { GACHA_DONE_MS, GACHA_TURN_MS, gachaOpen, gachaRoll, gachaStart, gachaTurn } from "./gacha";
@@ -1655,7 +1655,15 @@ const withTally = (name: string, h: ActionHandler): ActionHandler => {
     const c = currentBoard(ctx);
     const before = ctx.session[field];
     h(ctx, data, el);
-    if (c) noteTally(ctx.session, c.task.id, name, before, data);
+    if (!c) return;
+    noteTally(ctx.session, c.task.id, name, before, data);
+    // game-grade-log §2: the grade goes into the log when it changes, so a reload before 提交 keeps
+    // it. fill keeps its own record in the log and is left alone.
+    if (field === "fill") return;
+    const day = ctx.store.getState().day;
+    const events = ctx.store.getEvents();
+    const quality = gradeGame(c.board, c.task.id, day, ctx.session, events);
+    if (quality && gradedInLog(events, day, c.task.id) !== quality) ctx.store.appendEvent({ kind: "graded", task: c.task.id, quality });
   };
 };
 export const boardActions: Record<string, ActionHandler> = Object.fromEntries(Object.entries(actions).map(([k, h]) => [k, withIde(withTally(k, h))]));

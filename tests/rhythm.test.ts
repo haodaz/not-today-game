@@ -113,7 +113,7 @@ describe("rhythm", () => {
     session.rhythm = { ...session.rhythm!, over: true, running: false };
     expect(out()).toContain(`data-action="rhythm-assist">${t("settle.kuro")}</button>`);
     act("rhythm-assist");
-    expect(store.getEvents().at(-1)).toMatchObject({ kind: "boardStep", op: { t: "approve" } });
+    expect(store.getEvents().filter((e) => e.kind !== "graded").at(-1)).toMatchObject({ kind: "boardStep", op: { t: "approve" } });
     expect(canPrint(board, boardState(board, 16, task.id, store.getEvents()))).toBe(true);
     expect(out()).toContain(t("rhythm.stage.won"));
     now += 6000;

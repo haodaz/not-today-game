@@ -30,30 +30,44 @@ const FIELD: Readonly<Record<string, keyof Session>> = {
 const own = <T extends { key: string }>(g: T | null | undefined, taskId: string): T | null => (g && g.key === taskId ? g : null);
 
 /**
- * The grade of the play on this board now, or null: a board with no game, or a game whose session is
- * gone (a reload after the win: the night's judgement then reads no `quality`, as before this spec).
- * fill keeps its record in the log, so a reload still grades it.
+ * The last `graded` event for this task on this day (game-grade-log §3), or null. board.ts's wrapper
+ * writes one whenever a game's grade changes.
+ */
+export function gradedInLog(events: readonly GameEvent[], day: number, taskId: string): BoardVerdict | null {
+  for (let i = events.length - 1; i >= 0; i--) {
+    const e = events[i]!;
+    if (e.kind === "graded" && e.day === day && e.task === taskId) return e.quality;
+  }
+  return null;
+}
+
+/**
+ * The grade of the play on this board now, or null for a board with no game. The session wins while
+ * it exists; once it is gone (a reload after the win) the last `graded` event in the log stands in
+ * (game-grade-log), and null only when there is none. fill reads its own record in the log; spot's
+ * grade is the tally's and stays session-only (a known gap).
  */
 export function gradeGame(board: TaskBoard, taskId: string, day: number, session: Session, events: readonly GameEvent[] = []): BoardVerdict | null {
   const t = session.gameTally?.key === taskId ? session.gameTally : null;
+  const logged = () => gradedInLog(events, day, taskId);
   if (board.stack) {
     const g = own(session.chain, taskId);
-    return g ? stackGrade(g, t) : null;
+    return g ? stackGrade(g, t) : logged();
   }
   const game = board.game;
   if (!game) return null;
   switch (game.kind) {
-    case "link": { const g = own(session.link, taskId); return g ? linkGrade(g, t) : null; }
-    case "match3": { const g = own(session.match3, taskId); return g ? match3Grade(g, t) : null; }
-    case "snake": { const g = own(session.snake, taskId); return g ? snakeGrade(g, t) : null; }
-    case "pacman": { const g = own(session.pacman, taskId); return g ? pacGrade(g, t) : null; }
-    case "mines": { const g = own(session.mines, taskId); return g ? minesGrade(g, t) : null; }
-    case "sokoban": { const g = own(session.sokoban, taskId); return g ? sokobanGrade(g, game, t) : null; }
-    case "tetris": { const g = own(session.tetris, taskId); return g ? tetrisGrade(g, t) : null; }
-    case "pipes": { const g = own(session.pipes, taskId); return g ? pipesGrade(g, t) : null; }
-    case "moles": { const g = own(session.moles, taskId); return g ? molesGrade(g, t) : null; }
-    case "rhythm": { const g = own(session.rhythm, taskId); return g ? rhythmGrade(g, t) : null; }
-    case "gacha": { const g = own(session.gacha, taskId); return g ? gachaGrade(g, t) : null; }
+    case "link": { const g = own(session.link, taskId); return g ? linkGrade(g, t) : logged(); }
+    case "match3": { const g = own(session.match3, taskId); return g ? match3Grade(g, t) : logged(); }
+    case "snake": { const g = own(session.snake, taskId); return g ? snakeGrade(g, t) : logged(); }
+    case "pacman": { const g = own(session.pacman, taskId); return g ? pacGrade(g, t) : logged(); }
+    case "mines": { const g = own(session.mines, taskId); return g ? minesGrade(g, t) : logged(); }
+    case "sokoban": { const g = own(session.sokoban, taskId); return g ? sokobanGrade(g, game, t) : logged(); }
+    case "tetris": { const g = own(session.tetris, taskId); return g ? tetrisGrade(g, t) : logged(); }
+    case "pipes": { const g = own(session.pipes, taskId); return g ? pipesGrade(g, t) : logged(); }
+    case "moles": { const g = own(session.moles, taskId); return g ? molesGrade(g, t) : logged(); }
+    case "rhythm": { const g = own(session.rhythm, taskId); return g ? rhythmGrade(g, t) : logged(); }
+    case "gacha": { const g = own(session.gacha, taskId); return g ? gachaGrade(g, t) : logged(); }
     case "spot": return session.spotMiss?.key === `${String(day)}:${taskId}` ? spotGrade(session.spotMiss, t) : spotGrade(null, t);
     case "fill": {
       const g = own(session.fill, taskId);

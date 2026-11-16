@@ -67,12 +67,12 @@ describe("gacha", () => {
     expect(out()).toContain('class="gc-crank turning"');
     // an open while still turning does nothing
     act("gacha-open");
-    expect(store.getEvents().at(-1)).not.toMatchObject({ kind: "boardStep", op: { t: "approve" } });
+    expect(store.getEvents().filter((e) => e.kind !== "graded").at(-1)).not.toMatchObject({ kind: "boardStep", op: { t: "approve" } });
     now = 1000 + GACHA_TURN_MS + 10;
     expect(out()).toContain('data-action="gacha-open"');
     expect(out()).toContain("青禾");
     act("gacha-open");
-    expect(store.getEvents().at(-1)).toMatchObject({ kind: "boardStep", op: { t: "approve" } });
+    expect(store.getEvents().filter((e) => e.kind !== "graded").at(-1)).toMatchObject({ kind: "boardStep", op: { t: "approve" } });
     expect(canPrint(board, boardState(board, 17, task.id, store.getEvents()))).toBe(true);
     expect(out()).toContain(t("gacha.stage.won", { name: "青禾" }));
     expect(out()).toContain('class="gc-egg blank stuck"');
