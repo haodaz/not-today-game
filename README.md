@@ -74,7 +74,10 @@ Written for people who have never seen it, one picture set each, on X (@vibeddin
 
 | Date | Post |
 |---|---|
+| 2026-11-02 | [The protagonist got through a whole day](https://x.com/vibedding/status/2117272867804955098) — first full day: lunch, and a box with no sender |
 | 2026-11-03 | [Did your childhood have these too?](https://x.com/vibedding/status/2117669655322223063) — the four old things |
+| 2026-11-04 | [People playing my game still feel like they're at work](https://x.com/vibedding/status/2118097104535158804) — the office chat, the boss's voice note |
+| 2026-11-05 | [The old things don't disappear when it ends](https://x.com/vibedding/status/2118353573700403278) — they wait on the title screen and still work |
 | 2026-11-12 | [Your "AI assistant" runs your job for you](https://x.com/vibedding/status/2120972665301373335) — the work screens, the tasks as games, the game projecting back into the deliverable |
 | 2026-11-13 | [Battle moves: throw the laptop, flip the desk](https://x.com/vibedding/status/2121211339158753748) |
 | 2026-11-15 | [The old things you collect are real](https://x.com/vibedding/status/2122048341538164888) — the chick, Bulls and Cows on the calculator, Wordle on the dictionary |
