@@ -95,6 +95,11 @@
       "name": "who.薇薇",
       "portrait": "/npc/partner_young.png",
       "avatar": "/npc/partner_young_av.png"
+    },
+    "laozhou_young": {
+      "name": "msgs.laozhou",
+      "portrait": "/npc/laozhou_young.png",
+      "avatar": "/npc/laozhou_young_av.png"
     }
   },
   "silhouettes": [
