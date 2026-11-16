@@ -203,10 +203,12 @@
 .title-badge-foot .title-back:hover,.title-badge-foot .title-back:focus-visible{background:#2a2622;color:#efe9df}
 .title-auth .auth-cancel{display:block;margin:12px auto 0;background:transparent;border:0;padding:4px 10px;font:inherit;font-size:14px;letter-spacing:.2em;text-indent:.2em;color:#5a5248;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 /* the character select (author's sketch 2026-11-09): a fixed card — the rows left, 选择形象 right, a rule, then 取消 / 开始 */
-.title-card.title-q{width:1060px;height:600px;display:grid;grid-template-columns:1fr 330px;grid-template-rows:auto 1fr auto;grid-template-areas:"h h" "l p" "f f";column-gap:44px;row-gap:8px;padding:30px 40px 28px}
+.title-card.title-q{width:1060px;min-height:600px;max-height:840px;display:grid;grid-template-columns:1fr 330px;grid-template-rows:auto 1fr auto;grid-template-areas:"h h" "l p" "f f";column-gap:44px;row-gap:8px;padding:30px 40px 28px}
 .title-card.title-q h2{grid-area:h;margin-bottom:4px}
 .title-q-left{grid-area:l;min-width:0;align-self:start}
 .title-q-left .row{margin:16px 0}
+/* 2026-11-16: the English prompts need two lines at 150px and spilled to three (the footer fell off the card on Windows); a wider label keeps every row at two lines */
+.title-q-left .row label,.title-q-left .row > span:first-child{width:200px}
 .title-q-left .row.done{opacity:1;animation:none}
 .title-q-foot{grid-area:f;display:flex;align-items:center;gap:40px;padding-top:18px;border-top:1px solid rgba(0,0,0,.12)}
 .title-q-foot .title-start,.title-q-foot .title-cancel{flex:1 1 0;margin:0;padding:11px 0;border:1px solid #2a2622;border-radius:4px;background:transparent;color:#1d2129;font:inherit;font-size:16px;letter-spacing:.3em;text-indent:.3em;cursor:pointer}

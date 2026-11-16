@@ -202,6 +202,9 @@ const toWorkbench = async () => {
     if (!(await wbOpen())) { const dk = await sel("[data-action=dock][data-app=workbench]", 2); if (!dk) await click(S("wb.title"), 2); if (!(await wbOpen())) { const line = await text();
         // G5: Vivi's page first (「Vivi 在群里发了个网页，先点开看一眼。」): the refusal names it; open her card(s), then try again.
         if (line.includes(S("vivi.lock"))) { note("   (Vivi's page first: following the ring to her card)"); await readLines(); if (!(await followRing())) await interrupts(); await readLines(); continue; }
+        // 2026-11-16: the lock's line is not always caught in `text()` (read before it was sampled); a ring on the
+        // screen is the same instruction — follow it whenever the workbench did not open.
+        if (await followRing()) { note("   (a ring was on: followed it before trying again)"); await readLines(); continue; }
         note(`   (dock workbench ${dk}: still no 工作台 · screen ${await has("[data-action=screen]")} · line: ${line.slice(0, 200)}`); await shotStep("wb-missing"); } await readLines(); }
     // 工作台 can be on the other monitor (a page opened on the right moved the focus): look there, then back.
     for (const side of ["right", "left"]) { if (await wbOpen()) break; await readLines(); await sel(`[data-action=screen][data-screen=${side}]`, 1.2); await readLines(); if (!(await has("[data-action=wb-nav]"))) { await sel("[data-action=dock][data-app=workbench]", 1.5); await readLines(); } }
