@@ -167,7 +167,7 @@ describe("看一眼桌子: entering 桌子", () => {
 });
 
 describe("关机: in the work system's own top bar", () => {
-  it("disabled until the item is open; then the shutdown beat, both monitors dark, back to 房间", () => {
+  it("disabled until the item is open; then the shutdown beat, both monitors dark, back to 桌子 (navigation-polish)", () => {
     const store = atDay(1);
     store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
     const { ctx, timers } = ctxOf(store, "desktop", { beat: "work", time: "10:00" });
@@ -182,7 +182,7 @@ describe("关机: in the work system's own top bar", () => {
     const back = timers.find((x) => x.ms === SHUTDOWN_TO_ROOM_MS)!;
     expect(ctx.session.view).toBe("desktop");
     back.fn();
-    expect(ctx.session.view).toBe("room");
+    expect(ctx.session.view).toBe("desk");
   });
 });
 

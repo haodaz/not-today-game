@@ -9,7 +9,7 @@
 // No game logic here: it reads the store and the session and writes only `session.reveal`.
 import { dayFile } from "@state/days/table";
 import type { ActionContext, ActionHandler, MotionHooks } from "@world/desktop/controller";
-import { loopContext, checklist } from "@world/loop/checklist";
+import { loopContext, checklistDoneCount } from "@world/loop/checklist";
 import { kuroInBox, showing } from "@world/loop/dialogue";
 import { createTentacleDriver } from "@world/desktop/browser/tentacles-dom";
 import { crawlKeyframes, crawlMs, edgePath } from "@world/late/crawl";
@@ -76,7 +76,6 @@ interface Outgoing {
   readonly dlg: HTMLElement | null;
   readonly dlgLayer: HTMLElement | null;
   readonly items: { id: string; el: HTMLElement; height: number }[];
-  readonly doneText: string | null;
   readonly doorBg: HTMLElement | null;
   readonly doorHand: HTMLElement | null;
   readonly gap: HTMLElement | null;
@@ -238,7 +237,6 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       dlg: stage ? q(stage, ":scope > .dlg") : null,
       dlgLayer: q(root, ".dlg-layer"),
       items: list ? qa(list, ":scope > .it").map((el) => ({ id: el.dataset.id ?? "", el, height: el.offsetHeight })) : [],
-      doneText: list ? (q(list, ":scope > .done")?.textContent ?? null) : null,
       doorBg: q(root, ".door-bg.chain"),
       doorHand: q(root, ".door-hand"),
       gap: q(root, ".gap-glow"),
@@ -445,11 +443,11 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     return new Set((file?.items ?? []).filter((it) => it.sfx).map((it) => it.id));
   }
 
-  function tickGhost(item: { id: string; el: HTMLElement; height: number }, index: number, doneText: string | null, t: number): void {
+  function tickGhost(item: { id: string; el: HTMLElement; height: number }, index: number, t: number): void {
     const fold = exitOf(MOTION.itemIn);
     const foldAt = t + MOTION.tickFill + MOTION.tickHold;
     item.el.style.height = `${item.height}px`;
-    // Render once more when it folds, so the new count shows then.
+    // Render once more when it folds (navigation-polish: there is no count on the card any more).
     after(foldAt - t, ctx.rerender);
     addGhost({
       el: item.el,
@@ -463,15 +461,9 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
         list.insertBefore(item.el, its[index] ?? null);
         return true;
       },
-      apply: (g, now, r) => {
+      apply: (g, now) => {
         g.classList.add("m-tick");
         g.style.setProperty("--m-t", `${Math.round(t - now)}ms`);
-        // The count changes when the item folds into it, not before.
-        if (now < foldAt) {
-          const done = q(r, ".room .list > .done");
-          if (done && doneText !== null) done.textContent = doneText;
-          else if (done) done.style.visibility = "hidden";
-        }
       },
     });
   }
@@ -483,7 +475,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
     // replaced at once; only a line whose item is gone leaves with its exit.
     const ids = qa(list, ":scope > .it").map((el) => el.dataset.id ?? "");
     const lc = loopContext(ctx.store.getState(), ctx.store.getEvents());
-    const doneCount = lc ? checklist(lc).doneCount : 0;
+    const doneCount = lc ? checklistDoneCount(lc) : 0;
     let bell = false;
     if (lastItems && sameDay) {
       const sounds = itemSounds();
@@ -496,7 +488,7 @@ export function createMotion(root: HTMLElement, ctx: ActionContext, actions: Rec
       });
       out.items.forEach((item, index) => {
         if (ids.includes(item.id)) return;
-        if (doneCount > lastDone) tickGhost(item, index, out!.doneText, t);
+        if (doneCount > lastDone) tickGhost(item, index, t);
         else
           fadeGhost(item.el, `item:${item.id}`, (r) => {
             const l = q(r, ".room .list");

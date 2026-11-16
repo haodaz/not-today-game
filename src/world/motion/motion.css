@@ -68,7 +68,7 @@
 @keyframes m-strike{from{scale:0 1}}
 @keyframes m-fold{to{height:0;opacity:0;margin:0;padding:0}}
 .room .list .it.m-tick{position:relative;overflow:hidden;animation:m-fold var(--m-item-out) var(--m-ease) calc(var(--m-t,0ms) + var(--m-tick-fill) + var(--m-tick-hold)) both}
-.room .list .it.m-tick i{animation:m-tick-fill var(--m-tick-fill) var(--m-ease) var(--m-t,0ms) both}
+.room .list .it.m-tick i:not(.mark){animation:m-tick-fill var(--m-tick-fill) var(--m-ease) var(--m-t,0ms) both}
 .room .list .it.m-tick::after{content:"";position:absolute;left:20px;right:0;top:55%;height:1.5px;background:currentColor;transform-origin:left center;animation:m-strike var(--m-strike) var(--m-ease) calc(var(--m-t,0ms) + var(--m-tick-fill)) both}
 
 /* Kuro: crossfade, bob, glow at night; a new line comes out of the body's corner */

@@ -15,7 +15,9 @@ import { renderDoorView } from "@world/delivery/view";
 import { cls, html, raw, type SafeHtml } from "@world/html";
 import { bleedingToday } from "@world/dialogue/taboo";
 import { getLocale, hasString, t, tr, type Locale } from "@world/i18n";
-import { booted, checklist, deskMeal, itemStates, loopContext, type ChecklistView } from "@world/loop/checklist";
+import { booted, checklist, deskMeal, itemStates, loopContext, openItemFor, WORK_LINE_ID, type ChecklistView, type LoopContext } from "@world/loop/checklist";
+import { guideNow, type Guide } from "@world/loop/guide";
+import type { EventToken } from "@state/days/table";
 import { itemOf } from "@state/delivery/shops";
 import { ordersOn } from "@world/delivery/meals";
 import { isEvening, isNight } from "@world/desktop/beat";
@@ -67,12 +69,38 @@ export function boxObjectFor(day: number): string | null {
   return Object.entries(FOUND_ON_DAY).find(([, d]) => d === day)?.[0] ?? null;
 }
 
+/**
+ * navigation-polish: the checklist line the guide is pointing at, when its target belongs to one
+ * (the tower → 开机, 听听 → 看一眼消息, the boss's thread → the reply, the phone → the order, a work
+ * page → the work line). Null for a guide with no line of its own: the checklist's own rule leads.
+ */
+export function guidedItem(lc: LoopContext, g: Guide | null): string | null {
+  if (!g) return null;
+  const by = (match: (e: EventToken) => boolean): string | null => openItemFor(lc, match)?.id ?? null;
+  switch (g.target.kind) {
+    case "tower": return by((e) => e.type === "boot");
+    case "dock": return by((e) => e.type === "openApp");
+    case "conv":
+    case "reply": return by((e) => e.type === "reply");
+    case "phone": return by((e) => e.type === "order");
+    case "task":
+    case "board":
+    case "card":
+    case "clauses": return WORK_LINE_ID;
+    default: return null;
+  }
+}
+
+/** The checklist as the player sees it now: the guide's line leads when there is one. */
+export const checklistNow = (lc: LoopContext, state: State, events: readonly GameEvent[], session: Session): ChecklistView => checklist(lc, guidedItem(lc, guideNow(state, events, session)));
+
 export function renderChecklist(view: ChecklistView): SafeHtml {
   // The checklist only watches (day-loop correction 2026-11-01): no line is a button.
   // playtest-1105 R7: all of today's work tasks are one line, with how many are done.
-  const lines = view.lines.map((l) => html`<div class="${cls("it", l.state)}" data-id="${l.id}"><i></i>${l.work ? tr("checklist.work", { done: l.work.done, total: l.work.total }) : l.text}</div>`);
-  const done = view.doneCount > 0 ? html`<div class="done">${tr("hud.done", { n: view.doneCount })}</div>` : null;
-  return html`<div class="list"><div class="h">${tr(view.heading === "tonight" ? "hud.tonight" : "hud.today")}</div>${done}${lines}</div>`;
+  // navigation-polish (author's playtest 2026-11-16): no done count; the current line carries the
+  // marker in full ink, every other open line is dimmed (`later`) with no marker.
+  const lines = view.lines.map((l) => html`<div class="${cls("it", l.state, l.state === "locked" && "later")}" data-id="${l.id}">${l.state === "now" ? html`<i class="mark" aria-hidden="true">▸</i>` : null}${l.work ? tr("checklist.work", { done: l.work.done, total: l.work.total }) : l.text}</div>`);
+  return html`<div class="list"><div class="h">${tr(view.heading === "tonight" ? "hud.tonight" : "hud.today")}</div>${lines}</div>`;
 }
 
 function dayCorner(state: State, session: Session, nowMs = 0): SafeHtml {
@@ -568,7 +596,7 @@ function edgeHint(session: Session, view: string, nowMs: number): SafeHtml | nul
 export function renderRoom(model: RoomModel): SafeHtml {
   const { state, events, session } = model;
   const lc = loopContext(state, events);
-  const list = lc ? renderChecklist(checklist(lc)) : null;
+  const list = lc ? renderChecklist(checklistNow(lc, state, events, session)) : null;
   // The four facings and 桌子 (屏幕 is the desktop's own render).
   // lying-view R2: and the ceiling from the bed.
   const view = isFacing(session.view) || session.view === "desk" || session.view === "table" || session.view === "lying" ? session.view : "room";

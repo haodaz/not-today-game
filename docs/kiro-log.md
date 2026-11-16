@@ -2867,3 +2867,99 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
 - tsc clean; vitest 177 files, 2485 passed, **3 failed, unrelated**: `tests/dialogue.test.ts` (one paged-line snapshot) and `tests/scene.test.ts` (two day-1 dream cases).
   - `content/days/day-01.json` and `content/days/en/day-01.json` were edited at 08:47, during this job and not by Kiro. The dream's last screen now starts at 「后来你按过背面那个小孔。…」, and the line indices the scene tests pin have moved.
   - I did not refresh that snapshot or edit those tests. Whoever changed the content should confirm the new text and line numbers first.
+## 2026-11-16 · game-sfx (the work games make sounds)
+- chip.ts: four new ids: `tick` (660 Hz, 20 ms, gain 0.6), `match` (784 then 1047 Hz, 50 ms each), `wrong` (196 Hz, 160 ms, 30 Hz tremolo), `clear` (1047 / 1319 / 1568 Hz, 70 ms each).
+  - `wrong`'s tremolo depth is 0.8 (gain 1 ↔ 0.2), in the shape battle-sfx used for `shake`.
+- New `src/world/desktop/workbench/game-sfx.ts`:
+  - `gameChip(field, before, after, from?)` covers every row of the table.
+  - It returns null for a null side, a different game `key`, the same object or a field the table doesn't name.
+  - It checks the end first (clear / win / lose), then `match`, then `wrong`, then `tick`.
+- The optional 4th argument `from` (an addition to the spec's three-argument signature) carries what the state alone cannot tell:
+  - `via: "clock"`: a timer's step never sounds `tick`, so gravity and the snake's plain step are silent. Tetris needs this because its "down" key and its gravity tick produce the same change.
+  - `action` / `data`:
+    - match3's swap that cleared nothing returns the same state as a deselect; the tapped index tells them apart.
+    - moles' tap on an empty hole returns the game unchanged, so an unchanged `moles-tap` is `wrong`. The special seat and a paused or finished game are excluded.
+  - No engine was changed.
+- Choices per game:
+  - pipes: the flow reaching a new tile beats a leak. Almost every extension opens a new end, so leaks-first would sound `wrong` nearly every turn.
+  - gacha: a game opens exactly one capsule and that ends it, so the opening is `clear`; gacha's `match` never fires.
+  - fill: only a pick ticks (the table names a pick). Place, lift, rotate and drop are silent.
+  - link: a shuffle is silent.
+- Extra exports:
+  - `gameChipAfter` / `MINES_LOSE_AFTER_MS = 150`: the mine's `lose` after its `wrong`.
+  - `spotFoundChip(allFound)`: spot's found differences are compare picks, not a session field.
+  - `assistChip`: an assist's `clear` / `win` becomes `heal`.
+- board.ts wiring, through one helper `gameSound`:
+  - In `withTally`, after the graded write, which I restructured so fill reaches the sound too.
+  - The five clocks after their step, `via: "clock"`: runSnake, runTetris, runRhythm, runMoles, runPac.
+  - `spot-miss`, with a synthesized `{ n: prev }` before, so the first miss also sounds.
+  - `comparePick` on a spot board: `match`, or `clear` when no page is still pending.
+- Moments the spec's timer list names but that have no state change to sound:
+  - match3's cascade runs synchronously in `settle`, so a tap already sounds its clears.
+  - gacha's turn and fill's rounds only schedule re-renders.
+- `*-start` and `*-assist` click `cursor` only when they changed the game. A start sounds nothing else: it is a fresh board, and comparing it with the lost game would only make spurious ticks.
+- Cheats, being actions, sound `clear` too (dev only).
+- Tests:
+  - chip.test: the four new recipes.
+  - New `tests/game-sfx.test.ts` (32 cases):
+    - every row of the table, with literal states, plus pipes over the engine's own grid;
+    - same state, null sides and another key give null;
+    - clear beats match; the assist mapping; the mines follow-up.
+  - On the real day boards with a chip spy: link (pick, then pair), match3, snake, pacman, mines (reveal, the mine with its delayed lose, the assist's heal), sokoban, spot, fill, tetris (the key ticks; the gravity tick that moves the piece records nothing), the chain, pipes, moles, rhythm, gacha, and chip absent.
+- Snapshots: none changed (diffed before and after).
+- tsc clean; vitest 178 files, 2521 passed. The three day-1 failures reported in battle-sfx no longer occur.
+## 2026-11-16 · navigation-polish (离开屏幕, leaving lands on 桌子, the checklist's current item)
+- Dock (shell.ts):
+  - The room tile (`room-tile`, `view room`) and the separator after it are gone; 设置 stays at the right end.
+  - `tileAt` drops the same two entries, so the coach card's arrow still points at the right tile.
+  - The `.room-tile` glyph rule is removed from desktop.css.
+- 离开屏幕: `leaveControl()` in shell.ts, `<button class="leave-screen" data-action="view" data-view="desk">` with a CSS chevron and `desktop.leave`.
+  - game.ts renders it in the desktop's `.hud-host` (the fixed HUD layer), so it is off the monitor at the stage's left edge, vertically centred.
+  - room.css: 36 × 140 px, the paper tone, `writing-mode: vertical-rl`, z-index 42 (above `.dlg-layer`'s 41 and its dim).
+  - It is left out while the coach marks are up (`shell.onboard` set). The ending pages never render the desktop, so it is absent there too.
+  - The guide's ring finds it through the existing `view desk` anchor for `phone`.
+- **Open question, not changed**: the story mask (`MASK_ALLOWS`) does not allow `view`. During a two-line story the control shows above the dim, but a click on it waits for the story, like every other move. The spec says the *guidance* wrapper allows `view` (it does), and is silent on the mask. Adding `view` to `MASK_ALLOWS` would let the player walk away mid-story; I left that to the author.
+- Where leaving lands:
+  - Esc, `nav-back` and `nav-esc` on the screen already went to 桌子 (`backTarget`). Esc on 桌子 still goes to the room.
+  - The two screen → room paths were the dock tile (gone) and the shutdown's auto-leave (`SHUTDOWN_TO_ROOM_MS`). The auto-leave now goes to 桌子, and the constant keeps its name.
+  - Room-side paths are untouched (`boxPlaced`, `fromItemsPanel` from 门).
+  - guide.ts (Claude's) still has a third `view room` anchor for `phone`, and a comment about the dock's room tile. The anchor no longer matches anything on the screen and is harmless; it is left for Claude to tidy.
+- Checklist (checklist.ts):
+  - `ChecklistView` has no `doneCount`. The count moved to `checklistDoneCount(lc)`, which the motion layer uses to tell a ticked line from one that went away. motion/dom.ts dropped `doneText` and the `.done` update.
+  - `LineState` `next` became `later`.
+  - Order: the current item (`now`), every other open item (`later`, no longer capped at one), then the waiting meals.
+  - The current item is `checklist(lc, current)`'s `current` when given and usable, else the first usable *required* item, else the first usable one.
+  - hud.ts `guidedItem(lc, guide)` maps the guide's target to a line: tower → boot, 听听 → openApp, the boss's thread / reply → reply, phone → order, task / board / card / clauses → the work line, others → null. `checklistNow` uses it in the room's card and in the screen's top-bar line (`nextItemText`).
+- Checklist rendering (hud.ts `renderChecklist`): no `hud.done` line; the current line has `<i class="mark">▸</i>`; other lines have no marker (the old checkbox `<i>` is gone); a locked line is also `later`.
+- CSS:
+  - room.css's old list rules had doubled selectors (`.room .list .h .h`, `.it .it`…) that matched nothing. I replaced them with working ones: `.now` in full ink, `.later` and `.wait` at 60 % opacity.
+  - motion.css: the tick's fill animation no longer paints the ▸ glyph (`i:not(.mark)`).
+- Replay driver (`script/tools/auto-day-shoot.mjs`):
+  - `toRoom`: on the screen it clicks `.leave-screen[data-action=view][data-view=desk]`, then presses Esc to reach the room.
+  - `inRoom` also requires that no `.leave-screen` is present, because the control carries `view desk` too.
+  - The checklist text matching is unchanged.
+  - Not run against the live site (no dev server in this job).
+- Tests:
+  - New `tests/navigation-polish.test.ts` (7 cases):
+    - the dock has no room tile, and the leave control is on the screen outside the monitor with `view desk` and the string;
+    - it is absent under the coach marks;
+    - the CSS: position, size, z-index above the box's layer, vertical writing;
+    - screen → 桌子 by the control, Esc on the screen → 桌子, Esc on 桌子 → 房间;
+    - one open item gives one line with the marker and no done line;
+    - done items are absent, the current item comes first, the others are `later`, the meal waits last;
+    - the guide's item leads.
+  - Updated to the new behaviour:
+    - guidance R15 and G4: the dock starts with an app, and the screen's ring is on the leave control.
+    - actuators: shutdown → 桌子.
+    - loop-hud: the leave control in place of the tile; the day-17 regex accepts the marker.
+    - loop-engine: `later`, `checklistDoneCount`.
+    - playtest-1105 R7: no `<i></i>`, `checklistDoneCount`.
+    - motion-dom: screen → 桌子 → screen in place of screen → room → screen.
+- Snapshots: 41 refreshed in 10 files (desk-prints, desktop-snapshots, dock, late-days, loop-hud, navigation, nightfall, scene, title, upgrades). I diffed them before and after with a normaliser that removes this spec's changes:
+  - the room tile and its separator;
+  - the leave control;
+  - the done line, the checkbox and the marker;
+  - `next` → `later`;
+  - the list's order.
+  - Every changed entry was equal after normalising, except dock.test's geometry numbers (tiles 11 → 10, dock width 647 → 591 px, one tile and one gap fewer), which are expected. All refreshes are markup-only.
+- tsc clean; vitest 180 files, 2536 passed.

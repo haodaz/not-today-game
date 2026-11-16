@@ -348,7 +348,7 @@ describe("R6 · Kuro in the room: one box, and not only the idiom", () => {
 
 describe("R7 · the day's work is one checklist line", () => {
   it("all task items (flag:task_*) are one line, checklist.work with {done}/{total}; the other items stay", async () => {
-    const { checklist, loopContext } = await import("@world/loop/checklist");
+    const { checklist, checklistDoneCount, loopContext } = await import("@world/loop/checklist");
     const { renderChecklist } = await import("@world/room/hud");
     const { dayFiles } = await import("@state/days/table");
     const { t } = await import("@world/i18n");
@@ -359,7 +359,7 @@ describe("R7 · the day's work is one checklist line", () => {
     expect(tasks.length).toBeGreaterThan(1);
     const list = () => renderChecklist(checklist(loopContext(store.getState(), store.getEvents())!)).value;
     let out = list();
-    expect(out).toContain(`data-id="work"><i></i>${t("checklist.work", { done: 0, total: tasks.length })}</div>`);
+    expect(out).toContain(`data-id="work">${t("checklist.work", { done: 0, total: tasks.length })}</div>`);
     for (const task of tasks) expect(out).not.toContain(task.text);
     // The other items keep their own lines.
     expect(out).toContain(dayFiles.get(1)!.items.find((it) => it.id === "lunch")!.text);
@@ -367,12 +367,12 @@ describe("R7 · the day's work is one checklist line", () => {
     out = list();
     expect(out.match(/data-id="work"/g)).toHaveLength(1);
     expect(out).toContain(t("checklist.work", { done: 1, total: tasks.length }));
-    const before = checklist(loopContext(store.getState(), store.getEvents())!).doneCount;
+    const before = checklistDoneCount(loopContext(store.getState(), store.getEvents())!);
     for (const task of tasks.slice(1)) store.appendEvent({ kind: "task", flag: (task.done as { flag: string }).flag, mode: "self" });
     const view = checklist(loopContext(store.getState(), store.getEvents())!);
     expect(view.lines.some((l) => l.id === "work")).toBe(false);
-    // All done: the line folds into the done count as one thing.
-    expect(view.doneCount).toBe(before + 1);
+    // All done: the line goes, and counts as one done thing (navigation-polish: the count is not on the card).
+    expect(checklistDoneCount(loopContext(store.getState(), store.getEvents())!)).toBe(before + 1);
   });
 });
 

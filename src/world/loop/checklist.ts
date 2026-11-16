@@ -1,6 +1,7 @@
 // The checklist (今日): a pure function of the day file, the state and today's events (design L3).
-// Nothing about it is stored. At most the current item and the next unlocked one are shown, plus
-// any item waiting on a delivery (rewrite, L4); finished items collapse into a count.
+// Nothing about it is stored. navigation-polish (author's playtest 2026-11-16): the current item
+// first, marked; the other open items after it, dimmed; then any item waiting on a delivery
+// (rewrite, L4). Finished items are not listed and not counted on the card.
 import { CALL_ITEM_ID, dayFile, type DayFile, type EventToken, type Item, type Token } from "@state/days/table";
 import type { GameEvent } from "@state/events";
 import type { State } from "@state/types.gen";
@@ -142,7 +143,8 @@ export function deskMeal(ctx: LoopContext): { readonly meal: "lunch" | "dinner";
   return null;
 }
 
-export type LineState = "now" | "next" | "wait" | "locked";
+/** `now`: the current item (the one marker); `later`: another open item (dimmed); `wait`: a meal on its way; `locked`: held by `requiredPending`. */
+export type LineState = "now" | "later" | "wait" | "locked";
 
 /** A line only shows what is happening; it is never a button (day-loop correction 2026-11-01). */
 export interface ChecklistLine {
@@ -164,17 +166,32 @@ export const isWorkTask = (it: Item): boolean => it.done.kind === "flag" && it.d
 export interface ChecklistView {
   /** Which list the card shows: the day's, or (after nightfall) the night's. */
   readonly heading: "today" | "tonight";
-  readonly doneCount: number;
   readonly lines: readonly ChecklistLine[];
   /** Every required item is done and the bed can be used. */
   readonly bedOpen: boolean;
 }
 
-export function checklist(ctx: LoopContext): ChecklistView {
+/**
+ * The card. `current` is the item the guide points at, if the caller knows one; it leads when it is
+ * open and usable. Otherwise the first open, usable required item leads (else the first usable one).
+ */
+export function checklist(ctx: LoopContext, current: string | null = null): ChecklistView {
+  return build(ctx, current).view;
+}
+
+/**
+ * How many of this list's items are done (the work tasks counting as one once all are). Not shown on
+ * the card any more; the motion layer reads it to tell a line that was ticked from one that went away.
+ */
+export function checklistDoneCount(ctx: LoopContext): number {
+  return build(ctx, null).doneCount;
+}
+
+function build(ctx: LoopContext, current: string | null): { view: ChecklistView; doneCount: number } {
   const states = itemStates(ctx);
   const pending = requiredPending(ctx, states);
   const waits: ChecklistLine[] = [];
-  const open: ChecklistLine[] = [];
+  const open: (ChecklistLine & { required: boolean })[] = [];
   let doneCount = 0;
   let bedOpen = false;
   const heading = nightfallReached(ctx, states) ? "tonight" : "today";
@@ -200,7 +217,7 @@ export function checklist(ctx: LoopContext): ChecklistView {
       workPlaced = true;
       if (!states.get(first.id)!.unlocked) continue;
       const locked = first.locked === "requiredPending" && pending.length > 0;
-      open.push({ id: WORK_LINE_ID, text: "", state: locked ? "locked" : "next", work: { done: tasksDone, total: tasks.length } });
+      open.push({ id: WORK_LINE_ID, text: "", state: locked ? "locked" : "later", work: { done: tasksDone, total: tasks.length }, required: first.required });
       continue;
     }
     if (waiting(it, st, ctx)) {
@@ -216,11 +233,15 @@ export function checklist(ctx: LoopContext): ChecklistView {
     if (it.id === CALL_ITEM_ID) continue;
     const locked = it.locked === "requiredPending" && pending.length > 0;
     if (isBed(it) && !locked) bedOpen = true;
-    open.push({ id: it.id, text: it.text, state: locked ? "locked" : "next" });
+    open.push({ id: it.id, text: it.text, state: locked ? "locked" : "later", required: it.required });
   }
-  // The first open, unlocked-and-usable item is the current one; one more is shown after it.
-  const shown = open.slice(0, 2).map((l, i) => (i === 0 && l.state !== "locked" ? { ...l, state: "now" as const } : l));
-  return { heading, doneCount, lines: [...shown.slice(0, 1), ...waits, ...shown.slice(1)], bedOpen };
+  // The current item: the guide's (when given and usable), else the first usable required one, else the first usable one.
+  const usable = open.filter((l) => l.state !== "locked");
+  const lead = (current !== null ? usable.find((l) => l.id === current) : undefined) ?? usable.find((l) => l.required) ?? usable[0];
+  const strip = ({ required: _r, ...l }: ChecklistLine & { required: boolean }): ChecklistLine => l;
+  const rest = open.filter((l) => l !== lead).map(strip);
+  const lines = lead ? [{ ...strip(lead), state: "now" as const }, ...rest, ...waits] : [...rest, ...waits];
+  return { view: { heading, lines, bedOpen }, doneCount };
 }
 
 /** The first unlocked, unfinished work task (a `flag:` item that does not tick itself). */

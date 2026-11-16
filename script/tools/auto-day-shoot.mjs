@@ -121,14 +121,17 @@ const settle = async (rightOption = null) => {
     if (/[▶▼]/.test(t)) { await key(" "); await sleep(0.25); quiet = 0; } else { await key(" "); quiet++; }
   }
 };
-const inRoom = async () => (await has("[data-action=view][data-view=desk]")) && (await has("[data-action=bed]")) && !(await has("[data-action=view][data-view=room]"));
+// navigation-polish: the screen's 离开屏幕 also carries `view desk`; the room is where it is not.
+const inRoom = async () => (await has("[data-action=view][data-view=desk]")) && (await has("[data-action=bed]")) && !(await has("[data-action=view][data-view=room]")) && !(await has(".leave-screen"));
 const toRoom = async () => { if (await has("[data-action=onboard-skip]")) await sel("[data-action=onboard-skip]", 0.6);
   for (let i = 0; i < 8; i++) {
     if (await inRoom()) return true;
     // box-arrival: the case left open at 窗 blocks the turn: close it first (author 2026-11-11 run)
     if (await has("[data-action=case-close]")) { await sel("[data-action=case-close]", 0.8); continue; }
     await key(" ");
-    if (await has("[data-action=view][data-view=room]")) await sel("[data-action=view][data-view=room]", 2.2);
+    // navigation-polish (2026-11-16): the screen has no room tile; 离开屏幕 lands on 桌子, and Esc there goes to the room
+    if (await has(".leave-screen")) { await sel(".leave-screen[data-action=view][data-view=desk]", 2.2); await key("Escape"); await sleep(1.2); }
+    else if (await has("[data-action=view][data-view=room]")) await sel("[data-action=view][data-view=room]", 2.2);
     else { const face = await ev("(document.querySelector('.stage.room')?.className.match(/(\\w+)-view/) || [])[1] || ''");
       if (face === 'bed') { await key("ArrowLeft"); await sleep(1.2); }                       // 四面墙（room-turn）：床在右边，转回来
       else if (face === 'door' || face === 'window') { await key("ArrowRight"); await sleep(1.2); }

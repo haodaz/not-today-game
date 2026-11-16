@@ -54,7 +54,7 @@ const step = (store: Store, name: string) => store.appendEvent({ kind: "step", n
 // ——— R15 ———
 
 describe("R15 · the screen is the whole frame", () => {
-  it("no floating 回房间 or ⚙; the window fills under the top bar down to the dock; 回房间 and 设置 are dock tiles that act", () => {
+  it("no floating ⚙; the window fills under the top bar down to the dock; 设置 is a dock tile and 离开屏幕 sits off the monitor (navigation-polish); both act", () => {
     const r = rig(booted());
     r.session.leftApp = "workbench";
     const out = r.out();
@@ -63,12 +63,15 @@ describe("R15 · the screen is the whole frame", () => {
     expect(WINDOW_RECT).toEqual({ left: 0, top: 28, width: 1440, height: 800 });
     expect(out).toContain(`data-win="workbench" style="left:0px;top:28px;width:1440px;height:800px"`);
     const dock = /<div class="dock">.*?<\/div>/s.exec(out)![0];
-    expect(dock).toMatch(/^<div class="dock"><button type="button" class="app nav room-tile" data-action="view" data-view="room"/);
+    // navigation-polish: no room tile in the dock; 离开屏幕 sits off the monitor and goes to 桌子
+    expect(dock).toMatch(/^<div class="dock"><button type="button" class="app [^"]*" data-action="dock"/);
+    expect(dock).not.toContain("room-tile");
+    expect(out).toContain('class="leave-screen" data-action="view" data-view="desk"');
     expect(dock).toMatch(/class="app nav settings-tile" data-action="settings-open"[^>]*>[^]*<\/button><\/div>$/);
     r.act("settings-open");
     expect(r.session.settingsOpen).toBe(true);
-    r.act("view", { view: "room" });
-    expect(r.session.view).toBe("room");
+    r.act("view", { view: "desk" });
+    expect(r.session.view).toBe("desk");
     const css = readFileSync(resolve(__dirname, "../src/world/desktop/desktop.css"), "utf8");
     expect(css).toContain(".stage.one-monitor{padding:0;gap:0}");
     expect(css).toContain(".stage.one-monitor > .monitor{border-radius:0;box-shadow:none}");
@@ -155,7 +158,7 @@ describe("R1 / R2 · the guide state and the six moments", () => {
     expect(guideNow(store.getState(), store.getEvents(), r.session)?.id).not.toBe("G3b");
   });
 
-  it("G4: lunch first: the phone is lit at 桌子, the desk in the room, the room tile on the screen; on day 1 everything off that path refuses guide.lunch.first (2026-11-16); off once ordered", () => {
+  it("G4: lunch first: the phone is lit at 桌子, the desk in the room, 离开屏幕 on the screen; on day 1 everything off that path refuses guide.lunch.first (2026-11-16); off once ordered", () => {
     const store = booted();
     step(store, "openApp:msgs");
     open(store, "conv:boss");
@@ -163,9 +166,9 @@ describe("R1 / R2 · the guide state and the six moments", () => {
     const desk = rig(store, "desk");
     expect(guideNow(store.getState(), store.getEvents(), desk.session)).toMatchObject({ id: "G4", target: { kind: "phone" }, refuse: "guide.lunch.first", scope: "all" });
     expect(desk.out()).toMatch(/data-action="loop-phone"[^>]*data-guide="on"/);
-    // the ring leads there: the desk from the room, the room tile from the screen
+    // the ring leads there: the desk from the room, 离开屏幕 from the screen (navigation-polish)
     expect(rig(store, "room").out()).toMatch(/data-action="view" data-view="desk"[^>]*data-guide="on"/);
-    expect(rig(store).out()).toMatch(/data-action="view" data-view="room"[^>]*data-guide="on"/);
+    expect(rig(store).out()).toMatch(/class="leave-screen" data-action="view" data-view="desk"[^>]*data-guide="on"/);
     const g = guideNow(store.getState(), store.getEvents(), rig(store).session);
     expect(g?.id).toBe("G4");
     expect(guideRefuses(g, "wb-send", {})).toBe(true);

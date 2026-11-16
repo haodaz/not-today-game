@@ -20,7 +20,7 @@ import { fillPlaceholders } from "@world/replies/placeholders";
 import { shellActions, type ActionContext, type ActionHandler } from "@world/desktop/controller";
 import { appOn, buildShell, taskPageId, VIEWS, type Session, type View } from "@world/desktop/model";
 import { bringToFront, closeApp } from "@world/desktop/placement";
-import { renderDesktop, shownStill, type AppId } from "@world/desktop/shell";
+import { leaveControl, renderDesktop, shownStill, type AppId } from "@world/desktop/shell";
 import { placeOrder } from "@world/delivery/commands";
 import { phonePage } from "@world/delivery/app";
 import { nextInputs, startDoor, stepDoor, type DoorInput } from "@world/delivery/door";
@@ -63,7 +63,7 @@ import { gateAdvance } from "@world/motion/reveal";
 import { endingNext, bossActions } from "@world/endings/flow";
 import { renderEnding } from "@world/endings/view";
 import { bossStart, renderBoss } from "@world/endings/boss";
-import { boxObjectFor, CASE_WOBBLE_MS, doorMeal, itemsPanel, openBoxBefore, openBoxReady, raidShowing, renderChecklist, renderRoom, settingsPanel, SLIP_ITEM, walkmanShown } from "./hud";
+import { boxObjectFor, CASE_WOBBLE_MS, checklistNow, doorMeal, itemsPanel, openBoxBefore, openBoxReady, raidShowing, renderChecklist, renderRoom, settingsPanel, SLIP_ITEM, walkmanShown } from "./hud";
 import { hudTiles, statusPanel } from "./status";
 import { looseContent, stuckLineKey } from "./case";
 import { jitter } from "@state/seed";
@@ -133,11 +133,12 @@ function renderGameBody(store: Store, session: Session, nowMs: number): SafeHtml
     const readsOn = boxReadsOn(state, events, session);
     const maskInModal = objUse !== null && dlg !== null;
     const host = objUse ? html`<div class="${cls("objbar-host", maskInModal && "over-box")}">${objUse}${maskInModal ? boxMask(session, readsOn) : null}</div>` : null;
-    // guidance R15: no floating 回房间 or ⚙ (they are dock tiles now); R4: no stage Kuro body on the
+    // guidance R15: no floating ⚙ (a dock tile); navigation-polish: 离开屏幕 is the one control off the
+    // monitor, at the stage's left edge (in the HUD's fixed layer, above the box's dim). R4: no stage Kuro body on the
     // screen (the pet in the monitor is the one); R5 (2026-11-08): the checklist's current line in
     // the top bar, not a card over the window (the window fills the frame; a card hid 听听's list).
     const lc = loopContext(state, events);
-    return html`${renderDesktop({ ...shell, nextItem: lc ? nextItemText(checklist(lc)) : null })}${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${host}${launchLayer(state, session)}${workLayer({ state, events, session, nowMs, startDay: store.getStartDay() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${eggFlash(session, nowMs)}${dlgLayer(dlg, session, readsOn, !maskInModal)}<div class="hud-host">${hudTiles(session, state, { settings: false })}${itemsPanel(state, events, session)}${settingsPanel(session)}${statusPanel(state, events, session)}</div>`;
+    return html`${renderDesktop({ ...shell, nextItem: lc ? nextItemText(checklistNow(lc, state, events, session)) : null })}${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${host}${launchLayer(state, session)}${workLayer({ state, events, session, nowMs, startDay: store.getStartDay() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${eggFlash(session, nowMs)}${dlgLayer(dlg, session, readsOn, !maskInModal)}<div class="hud-host">${shell.onboard === null || shell.onboard === undefined ? leaveControl() : null}${hudTiles(session, state, { settings: false })}${itemsPanel(state, events, session)}${settingsPanel(session)}${statusPanel(state, events, session)}</div>`;
   }
   // The box does not jump (dialogue correction 2026-11-02): in every view it is anchored to the
   // viewport in the same fixed layer, not to the stage (whose size differs between views). The
@@ -164,7 +165,7 @@ function dlgLayer(dlg: SafeHtml | null, session: Session, readsOn: boolean, with
 
 /** The checklist's line that is on now (the first open one), for the desktop's top bar; null when none. */
 function nextItemText(view: ChecklistView): string | null {
-  const line = view.lines.find((l) => l.state === "now") ?? view.lines.find((l) => l.state === "next") ?? null;
+  const line = view.lines.find((l) => l.state === "now") ?? view.lines.find((l) => l.state === "later") ?? null;
   if (!line) return null;
   return line.work ? t("checklist.work", { done: String(line.work.done), total: String(line.work.total) }) : line.text;
 }
@@ -927,7 +928,8 @@ export const loopActions: Record<string, ActionHandler> = {
     const day = ctx.store.getState().day;
     ctx.later(SHUTDOWN_TO_ROOM_MS, () => {
       if (ctx.store.getState().day !== day || ctx.session.view !== "desktop") return;
-      loopActions["view"]!(ctx, { view: "room" } as DOMStringMap, null as never);
+      // navigation-polish: leaving the screen lands on 桌子, never the room's far view.
+      loopActions["view"]!(ctx, { view: "desk" } as DOMStringMap, null as never);
     });
     ctx.rerender();
   },

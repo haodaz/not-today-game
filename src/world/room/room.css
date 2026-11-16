@@ -101,12 +101,13 @@
 .stage.m-late>.desk-things,.stage.m-late>.facing-things,.stage.m-late>.shot-hit,.stage.m-late>.figures,.stage.m-late>.shelf-book{animation:m-fade-in var(--late-dur,200ms) both;animation-delay:var(--late,0ms)}
 /* 今日清单 */
 .room .list{position:absolute;left:28px;top:28px;width:280px;background:var(--paper);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.35);border-radius:10px;padding:12px 16px;box-shadow:0 6px 24px rgba(0,0,0,.12);font-size:15px;line-height:1.7}
-.room .list .h .h{font-size:11px;letter-spacing:.2em;color:#8a7f70;margin-bottom:6px}
-.room .list .done .done{color:#9a9a9a;font-size:13px}
-.room .list .it .it{display:flex;gap:8px;align-items:baseline;width:100%;background:none;border:0;padding:0;font:inherit;color:inherit;text-align:left}
-.room .list .it i .it i{width:12px;height:12px;border:1.5px solid #555;border-radius:2px;flex:0 0 auto;transform:translateY(2px)}
-.room .list .it.now .it.now{font-weight:600}.room .list .it.next .it.next{color:#777}.room .list .it.wait i .it.wait i{border-style:dashed}.room .list .it.wait .it.wait{color:#9a6400}
-.room .list .it.locked .it.locked{color:#9a9a9a}
+.room .list .h{font-size:11px;letter-spacing:.2em;color:#8a7f70;margin-bottom:6px}
+/* navigation-polish (author's playtest 2026-11-16): no done count; the current line leads with ▸ in full ink, the rest dimmed */
+.room .list .it{display:flex;gap:8px;align-items:baseline;width:100%;background:none;border:0;padding:0;font:inherit;color:inherit;text-align:left}
+.room .list .it .mark{font-style:normal;flex:0 0 auto;color:var(--ink)}
+.room .list .it.now{font-weight:600;color:var(--ink)}
+.room .list .it.later{opacity:.6}
+.room .list .it.wait{opacity:.6;color:#9a6400}
 /* guidance R5: on 屏幕 the same card over the OS area's top-left, under the 28 px top bar; it takes no clicks. */
 .os-list{position:absolute;left:0;top:28px;z-index:6;pointer-events:none}
 /* The checklist only watches: no line is a button, no hover state. */
@@ -877,3 +878,10 @@
 .dlg-choices.late .dc-row .dc-ic{color:#e5484d}
 .dlg-choices .dc-hint{margin:0;padding:4px 12px;font-size:12px;letter-spacing:.06em;color:#e5484d;text-align:right}
 @media (prefers-reduced-motion:reduce){.room .hr.staring i,.room .hr.jolt{animation:none}}
+
+/* navigation-polish (author 2026-11-16): 离开屏幕 — off the monitor, at the stage's left edge, vertically centred;
+   a paper pill like the HUD's cards, a left chevron drawn in CSS, the word written top to bottom (zh and en alike). */
+.hud-host .leave-screen{position:fixed;left:12px;top:50%;transform:translateY(-50%);z-index:42;width:36px;height:140px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:10px 0;background:rgba(232,228,220,.82);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.45);border-radius:18px;box-shadow:0 6px 24px rgba(0,0,0,.22);color:#1d2129;font:inherit;font-size:13px;letter-spacing:.2em;cursor:pointer;transition:background 160ms,transform 160ms}
+.hud-host .leave-screen:hover,.hud-host .leave-screen:focus-visible{background:rgba(244,240,232,.95);transform:translateY(-50%) translateX(2px);outline:none}
+.hud-host .leave-screen .chev{width:8px;height:8px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-left:3px;flex:0 0 auto}
+.hud-host .leave-screen .word{writing-mode:vertical-rl;white-space:nowrap;line-height:1}

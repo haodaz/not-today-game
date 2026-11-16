@@ -93,8 +93,9 @@ describe("the live DOM after a render (fix 2026-10-31)", () => {
       ['[data-action="view"][data-view="desk"]', "room → desk"],
       // The left monitor (工作台): the right one has 听听, whose 看一眼消息 tells day 1's story (tingtalk 2026-11-04).
       ['[data-view="desktop"][data-screen="left"]', "desk → screen"],
-      ['[data-action="view"][data-view="room"]', "screen → room"],
-      ['[data-action="view"][data-view="desktop"]', "room → screen"],
+      // navigation-polish: 离开屏幕 lands on 桌子; the desk's own way back goes on to the room
+      ['.leave-screen[data-action="view"][data-view="desk"]', "screen → desk"],
+      ['[data-view="desktop"][data-screen="left"]', "desk → screen"],
     ];
     for (const [selector, what] of moves) {
       await click(root, selector);

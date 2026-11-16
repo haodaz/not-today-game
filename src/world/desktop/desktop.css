@@ -31,10 +31,9 @@ html,body{margin:0;background:#2b2e33;font-family:var(--font);color:var(--ink);f
 /* dock tiles are icons (correction 2026-11-02): 64px, the glyph is in the svg; no text, a dot under the open app */
 /* Ten items (four apps, a separator, five decoys; 听听 joined, tingtalk 2026-11-04) at 48 px: 535 px wide, centred. --dock-reserve is the room the dock may take; the Kuro pill starts to its right (tests/dock.test.ts checks the arithmetic). */
 .os{--dock-reserve:690px}
-/* guidance R15: 回房间 (left end) and 设置 (right end) are dock tiles: a glyph on a light tile. */
+/* guidance R15: 设置 (right end) is a dock tile: a glyph on a light tile (navigation-polish: the room tile is gone). */
 .dock .app.nav{display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.06);border-radius:12px;color:var(--ink-2);font-size:22px;line-height:1}
 .dock .app.nav:hover,.dock .app.nav:focus-visible{background:rgba(0,0,0,.12)}
-.dock .app.room-tile .glyph::before{content:"⌂"}
 .dock .app.settings-tile .glyph::before{content:"⚙"}
 .monitor.night .dock .app.nav{color:#c9cdd4;background:rgba(255,255,255,.08)}
 .dock{--tile:48px;gap:8px;padding:8px 12px 14px;align-items:center}

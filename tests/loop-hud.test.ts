@@ -54,7 +54,8 @@ describe("FR5 checklist snapshots", () => {
     const store = storeAt(17, [step("boot"), step("openApp:msgs")]);
     // playtest-1105 R7: it is a work task (`flag:task_*`), so it is counted on the one work line.
     const before = list(store);
-    const work = /data-id="work"><i><\/i>[^<]*（(\d+)\/(\d+)）/;
+    // navigation-polish: the current line carries the ▸ marker, the others none
+    const work = /data-id="work">(?:<i class="mark" aria-hidden="true">▸<\/i>)?[^<]*（(\d+)\/(\d+)）/;
     expect(before).not.toContain(self.text);
     const [, d0] = work.exec(before)!;
     store.appendEvent({ kind: "task", flag: (self.done as { flag: string }).flag, mode: "self" });
@@ -126,9 +127,10 @@ describe("room HUD (FR6)", () => {
     loopActions.view!(ctx, { view: "desktop" } as DOMStringMap, null as never);
     const desk = renderGame(store, ctx.session, 0).value;
     expect(desk.match(/class="monitor/g)).toHaveLength(1);
-    // guidance R15: 回房间 is the dock's left tile now (no floating button).
+    // navigation-polish: the way off the screen is 离开屏幕 at the stage's left edge, to 桌子 (no dock tile, no floating 回房间).
     expect(desk).not.toContain('class="back-room"');
-    expect(desk).toContain('class="app nav room-tile" data-action="view" data-view="room"');
+    expect(desk).not.toContain("room-tile");
+    expect(desk).toContain('class="leave-screen" data-action="view" data-view="desk"');
     expect(store.getEvents().at(-1)).toMatchObject({ kind: "step", name: "openApp:workbench" });
     loopActions.screen!(ctx, { screen: "right" } as DOMStringMap, null as never);
     expect(store.getEvents().at(-1)).toMatchObject({ kind: "step", name: "openApp:msgs" });

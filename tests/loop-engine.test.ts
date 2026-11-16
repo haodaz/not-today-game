@@ -5,7 +5,7 @@ import { choiceOffered } from "@state/days/effects";
 import { dayFiles, type Sequence } from "@state/days/table";
 import type { EventDraft } from "@state/events";
 import { createStore, type Store } from "@state/store";
-import { checklist, loopContext, mealToOrder, openItemFor, openTask, selfTicking } from "@world/loop/checklist";
+import { checklist, checklistDoneCount, loopContext, mealToOrder, openItemFor, openTask, selfTicking } from "@world/loop/checklist";
 import { advance, EMPTY_DIALOGUE, finishChoice, push, showing } from "@world/loop/dialogue";
 import { arrivalDue, msUntilDue } from "@world/loop/waiting";
 
@@ -27,31 +27,31 @@ const text1 = (id: string) => item1(id).text;
 const rewrite1 = (id: string) => item1(id).rewrite!;
 
 describe("checklist (FR1)", () => {
-  it("day 1 opens with only 开机, then shows the current item and one more", () => {
+  it("day 1 opens with only 开机, then the current item first and the other open items after it (navigation-polish)", () => {
     const store = storeAt(1);
     expect(texts(store)).toEqual([`now:${text1("boot")}`]);
     store.appendEvent(step("boot"));
-    expect(view(store).doneCount).toBe(1);
+    expect(checklistDoneCount(loopContext(store.getState(), store.getEvents())!)).toBe(1);
     expect(texts(store)).toEqual([`now:${text1("msgs")}`]);
     store.appendEvent(step("openApp:msgs"));
     // 2026-11-08: the boss is replied to right after reading him; lunch comes after the reply.
-    expect(texts(store)).toEqual([`now:${text1("reply")}`, `next:${WORK1}`]);
+    expect(texts(store)).toEqual([`now:${text1("reply")}`, `later:${WORK1}`]);
     store.appendEvent({ kind: "reply", choice: "fine", recipient: "boss", t: "09:05" });
-    expect(texts(store)).toEqual([`now:${text1("lunch")}`, `next:${WORK1}`]);
+    expect(texts(store)).toEqual([`now:${text1("lunch")}`, `later:${WORK1}`]);
   });
 
   it("after ordering, lunch waits with its rewrite text, unticked, until it arrives", () => {
     const store = storeAt(1, [step("boot"), step("openApp:msgs"), { kind: "reply", choice: "fine", recipient: "boss", t: "09:05" }, { kind: "order", meal: "lunch", shopId: "huangmenji", itemId: "hmj", t: "11:30" }]);
     expect(texts(store)).toEqual([`now:${WORK1}`, `wait:${rewrite1("lunch")}`]);
     store.appendEvent(step("delivery:arrives:lunch", "12:04"));
-    expect(texts(store)).toEqual([`now:${WORK1}`, `next:${text1("pickup")}`]);
+    expect(texts(store)).toEqual([`now:${WORK1}`, `later:${text1("pickup")}`]);
   });
 
   it("an event before its item unlocks counts only once it does", () => {
     const store = storeAt(1, [step("openApp:msgs")]);
     expect(texts(store)).toEqual([`now:${text1("boot")}`]);
     store.appendEvent(step("boot"));
-    expect(view(store).doneCount).toBe(2);
+    expect(checklistDoneCount(loopContext(store.getState(), store.getEvents())!)).toBe(2);
   });
 
   it("the bed stays locked until every required item is done", () => {

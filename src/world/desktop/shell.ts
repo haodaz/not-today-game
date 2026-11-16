@@ -141,10 +141,8 @@ export const COACH = { cardW: 300, above: 14, arrow: 10, margin: 12 } as const;
 /** Where a dock tile is on the monitor: its centre x and its top y (stage px of the monitor). */
 export function tileAt(target: CoachTarget, decoys: readonly DockEntry[]): { readonly cx: number; readonly top: number } | null {
   const g = DOCK_GEOM;
-  // guidance R15: 回房间 at the left end, 设置 at the right end, each behind a separator (as dock() draws).
+  // guidance R15: 设置 at the right end, behind a separator (as dock() draws); navigation-polish: no room tile.
   const items: ({ kind: "tile"; id: string } | { kind: "sep" })[] = [
-    { kind: "tile" as const, id: "nav:room" },
-    { kind: "sep" as const },
     ...APPS.map((id) => ({ kind: "tile" as const, id })),
     ...(decoys.length ? [{ kind: "sep" as const }] : []),
     ...decoys.map((d) => ({ kind: "tile" as const, id: `decoy:${d.id}` })),
@@ -283,14 +281,23 @@ function dock(m: ShellModel, hides = false): SafeHtml {
     (d) =>
       html`<button type="button" class="${cls("app", "decoy")}" data-action="decoy" data-decoy="${d.id}"${d.gone ? html` data-gone="1"` : null} title="${d.name}" aria-label="${d.name}">${dockTile(d.icon)}${dockName(d.name)}</button>`,
   );
-  // guidance R15: 回房间 at the left end and 设置 at the right end are dock tiles (no floating buttons).
-  // The tiles are icons (the glyph is CSS, no text); their separators are the decoys' line, unnamed.
+  // guidance R15: 设置 at the right end is a dock tile (an icon; the glyph is CSS), behind the decoys'
+  // line. navigation-polish (author 2026-11-16): the room tile is gone; leaving is 离开屏幕 at the stage's left edge.
   const navSep = html`<span class="sep nav-sep" aria-hidden="true"></span>`;
-  const back = t("desktop.back");
-  const room = html`<button type="button" class="app nav room-tile" data-action="view" data-view="room" title="${back}" aria-label="${back}"><span class="glyph" aria-hidden="true"></span>${dockName(back)}</button>`;
   const set = t("settings.button");
   const settings = html`<button type="button" class="app nav settings-tile" data-action="settings-open" aria-haspopup="dialog" title="${set}" aria-label="${set}"><span class="glyph" aria-hidden="true"></span>${dockName(set)}</button>`;
-  return html`<div class="${cls("dock", hides && "auto", hides && m.dock.peek && "peek")}">${room}${navSep}${apps}${decoys.length ? html`<span class="sep" role="separator"></span>` : null}${extra}${navSep}${settings}</div>`;
+  return html`<div class="${cls("dock", hides && "auto", hides && m.dock.peek && "peek")}">${apps}${decoys.length ? html`<span class="sep" role="separator"></span>` : null}${extra}${navSep}${settings}</div>`;
+}
+
+/**
+ * navigation-polish (author's playtest 2026-11-16: 「回房间不要放在 dock 里面，放左边旁边，明显一点。或者叫
+ * 离开屏幕。」): the way off the screen, outside the monitor at the stage's left edge — a vertical pill
+ * with a chevron and 离开屏幕 written top to bottom. It goes to 桌子 (`view desk`), as Esc does. The
+ * caller leaves it out while the coach marks are up; the ending pages never render the desktop.
+ */
+export function leaveControl(): SafeHtml {
+  const leave = t("desktop.leave");
+  return html`<button type="button" class="leave-screen" data-action="view" data-view="desk" title="${leave}" aria-label="${leave}"><span class="chev" aria-hidden="true"></span><span class="word">${leave}</span></button>`;
 }
 
 /** A decoy's small system window: the real apps' chrome, one centred grey line, a close control. */
