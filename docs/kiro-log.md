@@ -3015,3 +3015,4 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
   - 1 new: run-diary's reader spread.
   - No snapshot carried the reader or the bed ask before.
 - tsc clean; vitest 181 files, 2546 passed.
+- Re-check (run-diary requested again, 12:19): spec unchanged since 10:46 (before the work above, 11:10–11:33); all changes still in the tree; nothing redone; tsc clean, vitest 181 files / 2546 passed.

@@ -702,6 +702,22 @@ for (const it of ITEMS) {
     }
     else if (it.done === "event:lieDown") {
       await toRoom(); ok = await sel("[data-action=bed]", 2.5); await settle();
+      // READ=1 (run-diary, 2026-11-16): at the bed ask, open the diary first — the take line, the first-time
+      // line, the spread; turn forward and back; Esc; the after line; the ask comes back and 睡 follows.
+      if (process.env.READ === "1") {
+        const read = await click(S("room.book.read"), 2);
+        note(`   diary: 看书 ${read ? "pressed" : "absent"}`);
+        if (read) {
+          for (let n = 0; n < 4 && (await has("[data-action=loop-advance]")); n++) { await shotStep("book-line"); await sel("[data-action=loop-advance]", 0.8); }
+          await sleep(1); await shotStep("book-spread");
+          note(`   diary: spread ${await ev("document.querySelector('.book-reader')?.className")} · pages ${await ev("JSON.stringify([...document.querySelectorAll('.bk-page')].map(p => (p.textContent || '').trim().slice(0, 40)))")}`);
+          await key("ArrowLeft"); await sleep(0.8); await shotStep("book-prev");
+          await key("ArrowRight"); await sleep(0.8); await shotStep("book-next");
+          await key("Escape"); await sleep(0.8);
+          for (let n = 0; n < 4 && (await has("[data-action=loop-advance]")); n++) { await shotStep("book-after"); await sel("[data-action=loop-advance]", 0.8); }
+          await settle(); if (!(await has("[data-action=loop-choice]"))) await sel("[data-action=bed]", 2.5);
+        }
+      }
       let slept = (await click(S("room.bed.sleep"), 3)) || /第 \d+ 天 · 早上|今天过去了|Day \d+ · morning|The day is over/i.test(await text());
       if (slept) { for (let n = 0; n < 70; n++) { await sleep(1.3); await shotStep("night"); if (/第 \d+ 天 · 早上|Day \d+ · morning/.test(await text())) break; await key("Enter"); } }
       // A night beat can ask first (the gap, the hand): take its first choice, advance, then try to sleep again.
