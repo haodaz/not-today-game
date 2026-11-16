@@ -253,8 +253,8 @@ export function ringAnchors(target: GuideTarget): readonly (readonly (readonly [
       return target.indexes.map((i) => [["data-action", "wb-clause"], ["data-i", String(i)]] as const);
     case "phone":
       // author 2026-11-16 (playtest): the phone is on the desk, so the ring shows the way there — the
-      // phone itself (desk view), the desk (room view), the dock's room tile (the screen).
-      return [[["data-action", "loop-phone"]], [["data-action", "view"], ["data-view", "desk"]], [["data-action", "view"], ["data-view", "room"]]];
+      // phone itself (desk view); else 桌子 (the room's hit, or 离开屏幕 on the screen: both are `view desk`).
+      return [[["data-action", "loop-phone"]], [["data-action", "view"], ["data-view", "desk"]]];
     case "task":
       return [[["data-action", "wb-nav"], ["data-page", `task:${target.id}`]]];
     case "board":
