@@ -31,7 +31,8 @@ import { fxPlan, renderFx } from "./fx";
 import { fixedRects, hotIdsIn, hotViewOf, type HotId, type HotView } from "./splat/hotspots";
 import { hudTiles, statusPanel } from "./status";
 import { STARE_JOLT_MS, stareBpm, stareProgress } from "./stare";
-import { bookReader, bookUrl, daysLived, figureCard, figuresLayer, shelfBook } from "./collection";
+import { diaryBookPages, diaryReader, figureCard, figuresLayer, shelfBook } from "./collection";
+import { diary, diaryDays } from "@state/diary";
 import { knows } from "@state/recognise";
 import { bpm, sanBand } from "@state/endings";
 import { emailRow, type EmailRow } from "@net/email";
@@ -606,8 +607,9 @@ export function renderRoom(model: RoomModel): SafeHtml {
   // The placed things belong to the arriving framing: they wait for the camera, then fade in.
   const waiting = placedThingsWait(session, view, nowMs);
   const fade = placedThingsFade(session, view, nowMs);
-  // 房间 carries what finished runs left on the bed (the figures) and the book on the headboard shelf, from day 1 (bedside-book).
-  const kept = view === "room" && !waiting ? html`${figuresLayer(session.collection)}${shelfBook()}${figureCard(session.collection, session.figureOpen)}` : null;
+  // 房间 carries what finished runs left on the bed (the figures) and the book on the headboard shelf (bedside-book);
+  // run-diary: the book is this run's diary, so it is on the shelf once a day has been written (diaryDays ≥ 1).
+  const kept = view === "room" && !waiting ? html`${figuresLayer(session.collection)}${diaryDays(state, events) >= 1 ? shelfBook() : null}${figureCard(session.collection, session.figureOpen)}` : null;
   const hotView = hotViewOf(view);
   // A line's backdrop covers the frame (dialogue 2026-11-02): the still's placed things, its
   // evening look and the collapse shader step aside until the sequence ends.
@@ -645,7 +647,7 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const ceilingNight = lying && isEvening(session.clock);
   // box-arrival R1: 房间 and 床 show their box-less stills until the case has arrived (room.css `.nobox`).
   const nobox = !arrived && (view === "room" || view === "bed");
-  return html`<div class="${cls("stage", "room", `${view}-view`, nobox && "nobox", ceilingNight && "ceiling-night", raid && "raid", fade !== null && "m-late", dream && "scene-on", onEdge)}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${renderScene(lineScene)}${scene}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${bare ? null : list}${bare ? null : dayCorner(state, session, nowMs)}${bare ? null : itemsPanel(state, events, session)}${!bare && (view === "room" || view === "bed" || view === "window") ? casePanel(state, events, session, model.runId ?? "run", nowMs) : null}${view === "desk" ? printsView(state, events, session) : null}${held}${model.boxOutside || bare ? null : dialogueBox(state, events, session, nowMs)}${bare ? null : bottomRight(model)}${bare ? null : hudTiles(session, state, { settings: true })}${model.boxOutside || bare ? null : settingsPanel(session)}${model.boxOutside || bare ? null : statusPanel(state, events, session)}${bookReader(session.bookOpen ? bookUrl(state.names, daysLived(state, events)) : null)}</div>`;
+  return html`<div class="${cls("stage", "room", `${view}-view`, nobox && "nobox", ceilingNight && "ceiling-night", raid && "raid", fade !== null && "m-late", dream && "scene-on", onEdge)}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${renderScene(lineScene)}${scene}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${bare ? null : list}${bare ? null : dayCorner(state, session, nowMs)}${bare ? null : itemsPanel(state, events, session)}${!bare && (view === "room" || view === "bed" || view === "window") ? casePanel(state, events, session, model.runId ?? "run", nowMs) : null}${view === "desk" ? printsView(state, events, session) : null}${held}${model.boxOutside || bare ? null : dialogueBox(state, events, session, nowMs)}${bare ? null : bottomRight(model)}${bare ? null : hudTiles(session, state, { settings: true })}${model.boxOutside || bare ? null : settingsPanel(session)}${model.boxOutside || bare ? null : statusPanel(state, events, session)}${session.bookOpen ? diaryReader(diaryBookPages(diary(state, events)), session.bookSpread) : null}</div>`;
 }
 
 export { raidShowing };

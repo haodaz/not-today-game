@@ -232,8 +232,10 @@ describe("the waiting room (FR7)", () => {
 });
 
 describe("the collection (FR4, FR8)", () => {
-  const ctxOf = (collection: Collection, view: "room" | "desk" = "room") => {
+  // run-diary: `written` logs day 1's shutdown, so the run's diary has its first page (the shelf book is there).
+  const ctxOf = (collection: Collection, view: "room" | "desk" = "room", written = false) => {
     const store = createStore({ startDay: 1 });
+    if (written) store.appendEvent({ kind: "step", name: "beat:shutdown", t: "23:00" });
     const session = initialSession(DEFAULT_CLOCK, "left", view);
     session.collection = collection;
     const ctx: ActionContext = { store, session, rerender: () => {}, later: () => {} };
@@ -242,18 +244,21 @@ describe("the collection (FR4, FR8)", () => {
   const room = (ctx: ActionContext) => renderRoom({ state: ctx.store.getState(), events: ctx.store.getEvents(), session: ctx.session }).value;
 
   it("snapshot: the room without and with a finished run (bedside-book: the shelf book in both)", () => {
+    // run-diary: (title kept for its snapshot key) day 1's morning has no diary yet, so no shelf book in either
     const without = room(ctxOf(EMPTY_COLLECTION));
-    expect(without).toContain('class="shelf-book" data-action="book-open"');
+    expect(without).not.toContain('class="shelf-book"');
     expect(without).toMatchSnapshot();
     const withRun = room(ctxOf(collected(1, { survive: 1 })));
-    expect(withRun).toContain('class="shelf-book" data-action="book-open"');
+    expect(withRun).not.toContain('class="shelf-book"');
     expect(withRun).toMatchSnapshot();
+    expect(room(ctxOf(EMPTY_COLLECTION, "room", true))).toContain('class="shelf-book" data-action="book-open"');
   });
 
-  it("property: the shelf book is there from day 1, in 房间 and in the title room, whatever the profile; never the desk book", () => {
+  it("property: the shelf book is in the title room always, and in 房间 once a day is written, whatever the profile; never the desk book", () => {
     fc.assert(
       fc.property(fc.nat(5), (n) => {
-        expect(room(ctxOf(collected(n)))).toContain('class="shelf-book"');
+        expect(room(ctxOf(collected(n), "room", true))).toContain('class="shelf-book"');
+        expect(room(ctxOf(collected(n)))).not.toContain('class="shelf-book"');
         expect(page(initialTitle(null, collected(n)))).toContain('class="shelf-book"');
         expect(room(ctxOf(collected(n))) + page(initialTitle(null, collected(n)))).not.toContain("desk-book");
       }),
@@ -300,12 +305,16 @@ describe("the collection (FR4, FR8)", () => {
     expect(room(ctxOf(EMPTY_COLLECTION))).not.toContain("figures");
   });
 
-  it("the book opens the reader full-screen (after its take line) with a close chip; Esc closes it; from day 1", () => {
-    const ctx = ctxOf(EMPTY_COLLECTION);
+  it("the book opens the diary (after its take line) with a close chip; Esc closes it; once a day is written", () => {
+    const none = ctxOf(EMPTY_COLLECTION);
+    loopActions["book-open"]!(none, {} as DOMStringMap, null as never);
+    expect(none.session.book).toBeNull(); // day 1's morning: no book yet
+    const ctx = ctxOf(EMPTY_COLLECTION, "room", true);
     loopActions["book-open"]!(ctx, {} as DOMStringMap, null as never);
     expect(ctx.session.bookOpen).toBe(false);
     for (let i = 0; i < 4 && !ctx.session.bookOpen; i++) loopActions["loop-advance"]!(ctx, {} as DOMStringMap, null as never);
-    expect(room(ctx)).toContain('<iframe src="/gamebook/index.html?');
+    expect(room(ctx)).toContain('class="book-reader diary"');
+    expect(room(ctx)).not.toContain("<iframe");
     expect(room(ctx)).toContain('data-action="book-close"');
     expect(loopKeys(ctx, { key: "Escape" } as KeyboardEvent)).toBe(true);
     expect(ctx.session.bookOpen).toBe(false);

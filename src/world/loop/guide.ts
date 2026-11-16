@@ -180,6 +180,8 @@ export const GUIDE_ALLOWS: ReadonlySet<string> = new Set([
   "hints-set",
   "book-open",
   "book-close",
+  // run-diary: turning the diary's pages, like opening and closing it
+  "book-turn",
   "case-close",
   "loop-order",
 ]);

@@ -2963,3 +2963,55 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
   - the list's order.
   - Every changed entry was equal after normalising, except dock.test's geometry numbers (tiles 11 → 10, dock width 647 → 591 px, one tile and one gap fewer), which are expected. All refreshes are markup-only.
 - tsc clean; vitest 180 files, 2536 passed.
+- Re-check (same request again, 11:05): spec unchanged since 10:29, all changes above still in the tree, nothing redone; tsc clean, vitest 180 files / 2536 passed.
+## 2026-11-16 · run-diary (the run's book is its diary, read as an open spread)
+- collection.ts:
+  - New `diaryText(line)` prints a line with `t`, printing `{ key }` arguments with `t(key)` first; strings and numbers pass as they are.
+  - New `diaryBookPages(days)`:
+    - each day's lines in order: the head (`head`), the weather line under it (`weather`, when the second line is `diary.weather`), the rest one paragraph each;
+    - packed by a fixed budget, `DIARY_PAGE_LINES = 20` per page, a paragraph costing `ceil(chars / 28)` (`DIARY_CHARS_PER_LINE`) and the head 2; no DOM measuring;
+    - every day starts on a left page, with an empty filler page first when needed;
+    - after the last day, one page with `diary.blank`; no days, no pages.
+  - New `diarySpreads`, `clampSpread` (no wrap) and `diaryOpenSpread`, which gives the last written day's first page, always a left page.
+  - New `diaryReader(pages, spread)`: `.book-reader.diary` with a dim, a 1180 × 760 two-page spread, the gutter shadow, page numbers in the outer bottom corners and the close chip. The halves are two transparent `book-turn` buttons (`data-by="-1|1"`, `tabindex=-1`, `aria-hidden`, disabled at the ends); no new strings.
+- The gamebook stays for the title page only:
+  - `bookReader(src)` (the iframe) and `BOOK_PAGE` stay.
+  - `bookUrl` is now `bookUrl(days)`, without the names that only the run passed. The title's URL is unchanged (`?days=N&embed=1`).
+  - `daysLived` is removed; its one use (hud.ts) now uses `diaryDays`.
+- hud.ts: the room's shelf book shows only when `diaryDays ≥ 1`. The reader is `diaryReader(diaryBookPages(diary(state, events)), session.bookSpread)` while `bookOpen`.
+- model.ts: new `Session.bookSpread: number` (initial 0).
+- game.ts:
+  - `openBook` sets `bookSpread` to `diaryOpenSpread`.
+  - New `book-turn` action, which clamps the spread and does not wrap.
+  - `book-open` and both asks' `read` do nothing without a diary (`hasDiary`).
+  - `loopKeys`: while the book is open it takes Esc (close), → / Space / PageDown (forward), ← / PageUp (back), and swallows Enter / Backspace. So lying in bed the arrows turn pages instead of asking 要起来吗？, and Space does not read on.
+- dialogue.ts `options`: the bed ask (with or without the recorder) and the rise ask drop 看书 when `diaryDays < 1`. 看书 is the last option, so the other indexes are unchanged. A caller with no events (motion) keeps the full list.
+- guide.ts (Claude's): I added `book-turn` to `GUIDE_ALLOWS` beside `book-open` / `book-close`. Without it, a day's guide with scope `all` would refuse a click on a page half. This is the only change there.
+- room.css:
+  - the spread: paper pages, `overflow: hidden` on the page and its body, 17 px at line-height 1.9, heading 26 px, weather 14 px;
+  - the gutter as a gradient;
+  - the halves with w-resize / e-resize cursors.
+  - The budget fits the box: 640 px of text height / 32.3 px per line ≈ 19.8 lines, and 462 px / 17 px ≈ 27 characters per line. Paragraphs have no margin, so the 20-line budget holds.
+- The title page is unchanged: its shelf book, its iframe reader and the title.css rules.
+- Tests:
+  - New `tests/run-diary.test.ts` (11 cases):
+    - lines printed with `{ key }` arguments;
+    - a day's head, weather, paragraphs and the blank page last; no days, no pages or reader;
+    - a long day packs onto two pages within the budget, the next day on a left page, the filler, the order kept;
+    - the reader's markup (spread, numbers, halves, close, no iframe, the last spread's blank page), plus one snapshot;
+    - the CSS sizes;
+    - opens on the last written day's spread, with `bookSpread` in the session;
+    - turning by halves and by → / Space / PageDown / ← / PageUp, no wrap at either end, Esc closes;
+    - lying in bed the arrows turn pages instead of raising the rise ask;
+    - zero days: no shelf book, no 看书 in either ask, and book-open / read do nothing; one day: all of them.
+  - Updated:
+    - bedside-book: the title's `bookUrl(days)`, `diaryDays`, and the reading rig logs day 1's shutdown.
+    - title.test: the run's book is the diary, absent on day 1's morning; the property splits the title room (always) from 房间 (once written). The snapshot test's title is kept for its snapshot key.
+    - ending-record: the shelf book once written, absent before.
+    - lying-view: day 1's morning rise ask without 看书.
+    - world-prompts: the bed-ask column test logs the shutdown, so its three rows stay.
+- Snapshots:
+  - 6 refreshed: loop-hud 1, navigation 2, nightfall 1, title 2. A script that removes the shelf-book button from the old entry matched every new entry exactly, so the refresh is markup-only: day 1's morning rooms lose the shelf book.
+  - 1 new: run-diary's reader spread.
+  - No snapshot carried the reader or the bed ask before.
+- tsc clean; vitest 181 files, 2546 passed.

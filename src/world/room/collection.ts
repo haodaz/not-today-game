@@ -8,8 +8,7 @@ import { titleTable, ENDING_KINDS, type EndingKind } from "../../ui/title/table"
 import type { EndingFlavour } from "@state/endings";
 import { ENDING_ART } from "@world/endings/pages";
 import { rectStyle, ROOM_COLLECTION } from "./shots";
-import type { GameEvent } from "@state/events";
-import type { State } from "@state/types.gen";
+import type { DiaryLine, DiaryPage } from "@state/diary";
 
 export interface Collection {
   readonly finishedRuns: number;
@@ -61,42 +60,110 @@ export function shelfBook(): SafeHtml {
   return html`<button type="button" class="shelf-book" data-action="book-open" style="${rectStyle(ROOM_COLLECTION.book)}" aria-label="${t("room.book")}"><span class="fig-chip" aria-hidden="true">${tr("room.book")}</span></button>`;
 }
 
-/** bedside-book: the gamebook page shipped with the game (public/gamebook/index.html). */
+/** bedside-book: the gamebook page shipped with the game (public/gamebook/index.html): the title page's book only. */
 export const BOOK_PAGE = "/gamebook/index.html";
 
-/** The names the book is told (the title page has none). */
-export type BookNames = Pick<State["names"], "login" | "nick" | "calledBy" | "bossCalls" | "pronoun">;
-
 /**
- * bedside-book: the reader's URL. Each non-empty name field fills the book's own question (the
- * gate is skipped); `ta` is 她 for she, else 他; `days` is how many days the book may open; the
- * book's own hint card is hidden (`embed=1`).
+ * The title page's book (no run, no names): `days` is how many days the gamebook may open; its own
+ * hint card is hidden (`embed=1`). run-diary: the run's book is the diary, not this page.
  */
-export function bookUrl(names: BookNames | null, days: number): string {
-  const q: [string, string][] = [];
-  if (names) {
-    const put = (k: string, v: string) => void (v.trim() !== "" && q.push([k, v.trim()]));
-    put("name", names.login);
-    put("nick", names.nick);
-    put("call", names.calledBy);
-    put("boss", names.bossCalls);
-    q.push(["ta", names.pronoun === "she" ? "她" : "他"]);
-  }
-  q.push(["days", String(Math.max(0, Math.floor(days)))], ["embed", "1"]);
-  return `${BOOK_PAGE}?${q.map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join("&")}`;
-}
-
-/** The days lived: today counts once its shutdown beat has happened (the day's story shows the next morning). */
-export function daysLived(state: Pick<State, "day">, events: readonly GameEvent[]): number {
-  const shut = events.some((e) => e.kind === "step" && e.day === state.day && e.name === "beat:shutdown");
-  return shut ? state.day : state.day - 1;
+export function bookUrl(days: number): string {
+  return `${BOOK_PAGE}?days=${String(Math.max(0, Math.floor(days)))}&embed=1`;
 }
 
 /** On the title page (no run): the whole book once a run has finished, else nothing yet. */
 export const titleBookDays = (c: Pick<Collection, "finishedRuns">): number => (c.finishedRuns >= 1 ? 18 : 0);
 
-/** The gamebook reader, full screen, with a close chip top-right; `src` is `bookUrl(...)`. */
+/** The title page's gamebook reader, full screen, with a close chip top-right; `src` is `bookUrl(...)`. */
 export function bookReader(src: string | null): SafeHtml | null {
   if (src === null) return null;
   return html`<div class="${cls("book-reader")}" role="dialog" aria-modal="true" aria-label="${t("room.book")}"><iframe src="${src}" title="${t("room.book")}"></iframe><button type="button" class="book-close" data-action="book-close">${tr("dialogue.close")}</button></div>`;
+}
+
+// ——— run-diary (author 2026-11-16): the run's book is this run's diary, read as an open spread ———
+
+/** The packing budget of one page: about 20 lines of text, a paragraph `ceil(chars / 28)` lines (no DOM measuring). */
+export const DIARY_PAGE_LINES = 20;
+export const DIARY_CHARS_PER_LINE = 28;
+/** The heading counts as two lines (its larger face and the space under it); the weather line as one. */
+const HEAD_LINES = 2;
+
+export type DiaryBlock = { readonly kind: "head" | "weather" | "p" | "blank"; readonly text: string };
+/** One page of the book: the day it belongs to (null for a filler or the blank page) and its blocks. */
+export interface BookPage {
+  readonly day: number | null;
+  readonly blocks: readonly DiaryBlock[];
+}
+
+/** A line printed: its `{ key }` arguments printed first, strings and numbers as they are. */
+export function diaryText(line: DiaryLine): string {
+  const vars: Record<string, string | number> = {};
+  for (const [k, v] of Object.entries(line.args ?? {})) vars[k] = typeof v === "object" ? t(v.key) : v;
+  return t(line.key, vars);
+}
+
+const cost = (b: DiaryBlock): number => (b.kind === "head" ? HEAD_LINES : Math.max(1, Math.ceil(Array.from(b.text).length / DIARY_CHARS_PER_LINE)));
+
+/**
+ * The diary packed into pages: each day's lines in order (the head, the weather, then one paragraph
+ * per line), as many pages as it needs, every day starting on a new left page (an empty filler page
+ * before it when needed); after the last day one page with `diary.blank` alone. No days: no pages.
+ */
+export function diaryBookPages(days: readonly DiaryPage[]): BookPage[] {
+  const pages: BookPage[] = [];
+  if (days.length === 0) return pages;
+  for (const d of days) {
+    if (pages.length % 2 === 1) pages.push({ day: null, blocks: [] });
+    let blocks: DiaryBlock[] = [];
+    let used = 0;
+    d.lines.forEach((line, i) => {
+      const block: DiaryBlock = { kind: i === 0 ? "head" : i === 1 && line.key === "diary.weather" ? "weather" : "p", text: diaryText(line) };
+      const c = cost(block);
+      if (blocks.length > 0 && used + c > DIARY_PAGE_LINES) {
+        pages.push({ day: d.day, blocks });
+        blocks = [];
+        used = 0;
+      }
+      blocks.push(block);
+      used += c;
+    });
+    pages.push({ day: d.day, blocks });
+  }
+  pages.push({ day: null, blocks: [{ kind: "blank", text: t("diary.blank") }] });
+  return pages;
+}
+
+/** How many spreads the pages make (two pages each; the last may have an empty right page). */
+export const diarySpreads = (pages: readonly BookPage[]): number => Math.ceil(pages.length / 2);
+
+/** The spread the book opens on: the last written day's first page (always a left page). */
+export function diaryOpenSpread(pages: readonly BookPage[]): number {
+  const last = pages.reduce((m, p) => (p.day !== null ? Math.max(m, p.day) : m), 0);
+  const i = pages.findIndex((p) => p.day === last);
+  return i < 0 ? 0 : Math.floor(i / 2);
+}
+
+/** A spread index kept inside the book (no wrap at either end). */
+export const clampSpread = (pages: readonly BookPage[], spread: number): number => Math.max(0, Math.min(diarySpreads(pages) - 1, Math.floor(spread)));
+
+function pageHtml(page: BookPage | undefined, no: number, side: "left" | "right"): SafeHtml {
+  const blocks = (page?.blocks ?? []).map((b) =>
+    b.kind === "head" ? html`<h3 class="bk-head">${b.text}</h3>` : b.kind === "weather" ? html`<p class="bk-weather">${b.text}</p>` : b.kind === "blank" ? html`<p class="bk-blank">${b.text}</p>` : html`<p>${b.text}</p>`,
+  );
+  return html`<div class="${cls("bk-page", side, !page && "none")}"${page?.day ? html` data-day="${page.day}"` : null}><div class="bk-body">${blocks}</div>${page ? html`<span class="bk-no">${no}</span>` : null}</div>`;
+}
+
+/**
+ * run-diary: the book open — a full-screen dim, a centred spread of two pages (the gutter between),
+ * the page numbers in the outer bottom corners, the close chip top-right. A click on the right half
+ * turns forward, on the left half back (`book-turn`); the ends do not wrap. Nothing scrolls.
+ */
+export function diaryReader(pages: readonly BookPage[], spread: number): SafeHtml | null {
+  if (pages.length === 0) return null;
+  const k = clampSpread(pages, spread);
+  const last = diarySpreads(pages) - 1;
+  const left = pageHtml(pages[2 * k], 2 * k + 1, "left");
+  const right = pageHtml(pages[2 * k + 1], 2 * k + 2, "right");
+  const turn = (by: -1 | 1, off: boolean) => html`<button type="button" class="${cls("bk-turn", by < 0 ? "prev" : "next")}" data-action="book-turn" data-by="${by}" tabindex="-1" aria-hidden="true"${off ? html` disabled` : null}></button>`;
+  return html`<div class="book-reader diary" role="dialog" aria-modal="true" aria-label="${t("room.book")}"><div class="bk-dim"></div><div class="bk-spread" data-spread="${k}" data-spreads="${last + 1}">${left}${right}<i class="bk-gutter" aria-hidden="true"></i>${turn(-1, k <= 0)}${turn(1, k >= last)}</div><button type="button" class="book-close" data-action="book-close">${tr("dialogue.close")}</button></div>`;
 }

@@ -41,7 +41,10 @@ const lineBox = (s: string) => /<div class="dlg[ "][\s\S]*?(?=<div class="dlg-ch
 
 describe("R2 · choices in the column on the right", () => {
   it("a choice beat: its options are rows in the column (not inside .dlg), in content order, ◇; the box keeps the line and does not read on", () => {
-    const r = rig(createStore({ startDay: 1 }));
+    const store = createStore({ startDay: 1 });
+    // run-diary: at the bed ask day 1 is written (its shutdown is logged), so 看书 is the third row
+    store.appendEvent({ kind: "step", name: "beat:shutdown", t: "23:00" });
+    const r = rig(store);
     r.session.dialogue = push(EMPTY_DIALOGUE, { key: "b", lines: [{ k: "inner", t: "睡吗？" }], ending: { kind: "bedAsk" } });
     const out = r.box();
     const dlg = lineBox(out);

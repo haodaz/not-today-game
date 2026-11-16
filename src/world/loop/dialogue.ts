@@ -5,6 +5,7 @@ import type { BeatName, Place, SayLine, Sequence } from "@state/days/table";
 import { choiceOffered } from "@state/days/effects";
 import { recogniseTable } from "@state/recognise";
 import type { GameEvent } from "@state/events";
+import { diaryDays } from "@state/diary";
 import { deliverableForHand, handDeliverableOf, handNight } from "@state/days/board";
 import { hasString, t } from "@world/i18n";
 import type { State } from "@state/types.gen";
@@ -381,8 +382,11 @@ function options(q: Queued, state: State, events?: readonly GameEvent[]): Choice
   if (q.ending.kind === "loan") return [...LOAN_OPTIONS];
   if (q.ending.kind === "kuroAsk") return [...KURO_ASK_OPTIONS];
   if (q.ending.kind === "kuroOffer") return [...KURO_OFFER_OPTIONS];
-  if (q.ending.kind === "bedAsk") return q.ending.record ? [...BED_RECORD_OPTIONS] : [...BED_OPTIONS];
-  if (q.ending.kind === "riseAsk") return [...RISE_OPTIONS];
+  // run-diary: 看书 is offered once a day has been written (diaryDays ≥ 1); it is the last option, so
+  // the others keep their indexes. Without the log (a caller that only asks whether choices show) it stays.
+  const book = (opts: readonly ChoiceOption[]): ChoiceOption[] => (events && diaryDays(state, events) < 1 ? opts.filter((o) => o.choice !== "read") : [...opts]);
+  if (q.ending.kind === "bedAsk") return book(q.ending.record ? BED_RECORD_OPTIONS : BED_OPTIONS);
+  if (q.ending.kind === "riseAsk") return book(RISE_OPTIONS);
   if (q.ending.kind === "doorAsk") return [...DOOR_ASK_OPTIONS];
   if (q.ending.kind === "eatAsk") return [...EAT_ASK_OPTIONS];
   if (q.ending.kind === "workAsk") return [...WORK_ASK_OPTIONS];

@@ -1,23 +1,22 @@
 // bedside-book (author 2026-11-13): the book on the headboard shelf, read lying down (the bed and rise
-// asks' 看书) or standing (the shelf book); its URL from the player's names and the days lived; the
-// first-time lines once per profile; the ask again after closing.
+// asks' 看书) or standing (the shelf book); run-diary: it is this run's diary (tests/run-diary.test.ts),
+// the title keeps the gamebook's URL; the first-time lines once per profile; the ask again after closing.
 import { describe, expect, it } from "vitest";
 import { createProfileWriter } from "@state/saves";
 import { createStore } from "@state/store";
-import type { State } from "@state/types.gen";
 import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
 import { initialSession } from "@world/desktop/model";
 import { setLocale, t } from "@world/i18n";
 import { BED_OPTIONS, BED_RECORD_OPTIONS, push, RISE_OPTIONS } from "@world/loop/dialogue";
-import { bookUrl, daysLived, EMPTY_COLLECTION, titleBookDays } from "@world/room/collection";
+import { bookUrl, EMPTY_COLLECTION, titleBookDays } from "@world/room/collection";
+import { diaryDays } from "@state/diary";
 import { loopActions } from "@world/room/game";
 import { readCollection } from "../src/ui/collection";
 import { memoryStorage } from "@state/slot";
 
 setLocale("zh");
 
-const names: State["names"] = { login: "林 晚", nick: "小晚", calledBy: "老大", bossCalls: "小林", pronoun: "she", portrait: "p1" };
 
 describe("the choices", () => {
   it("the bed, the bed with the recorder, and the rise ask each end with 看书", () => {
@@ -32,22 +31,20 @@ describe("the choices", () => {
   });
 });
 
-describe("the reader's URL", () => {
-  it("the names, 她 / 他, the days, embed; empty fields left out", () => {
-    expect(bookUrl(names, 3)).toBe(`/gamebook/index.html?name=${encodeURIComponent("林 晚")}&nick=${encodeURIComponent("小晚")}&call=${encodeURIComponent("老大")}&boss=${encodeURIComponent("小林")}&ta=${encodeURIComponent("她")}&days=3&embed=1`);
-    expect(bookUrl({ ...names, pronoun: "he" }, 0)).toContain(`ta=${encodeURIComponent("他")}`);
-    expect(bookUrl({ ...names, pronoun: null }, 0)).toContain(`ta=${encodeURIComponent("他")}`);
-    const bare = bookUrl({ login: "", nick: "  ", calledBy: "", bossCalls: "", pronoun: null }, 1);
-    expect(bare).toBe(`/gamebook/index.html?ta=${encodeURIComponent("他")}&days=1&embed=1`);
+describe("the title page's book (run-diary: the run's book is the diary; only the title keeps the gamebook)", () => {
+  it("the title's URL: the days and embed, no names", () => {
+    expect(bookUrl(18)).toBe("/gamebook/index.html?days=18&embed=1");
+    expect(bookUrl(0)).toBe("/gamebook/index.html?days=0&embed=1");
+    expect(bookUrl(-2.5)).toBe("/gamebook/index.html?days=0&embed=1");
   });
-  it("days lived: today counts once its shutdown beat happened; the title gives 18 after a finished run, else 0", () => {
+  it("the diary's days: today counts once its shutdown beat happened; the title gives 18 after a finished run, else 0", () => {
     const store = createStore({ startDay: 1 });
-    expect(daysLived(store.getState(), store.getEvents())).toBe(0);
+    expect(diaryDays(store.getState(), store.getEvents())).toBe(0);
     store.appendEvent({ kind: "step", name: "beat:shutdown", t: "23:00" });
-    expect(daysLived(store.getState(), store.getEvents())).toBe(1);
+    expect(diaryDays(store.getState(), store.getEvents())).toBe(1);
     store.appendEvent({ kind: "lieDown" });
     // the morning of day 2: day 1 is there, day 2 is not yet
-    expect(daysLived(store.getState(), store.getEvents())).toBe(1);
+    expect(diaryDays(store.getState(), store.getEvents())).toBe(1);
     expect(titleBookDays(EMPTY_COLLECTION)).toBe(0);
     expect(titleBookDays({ finishedRuns: 1 })).toBe(18);
   });
@@ -56,6 +53,8 @@ describe("the reader's URL", () => {
 describe("reading", () => {
   const rig = (bookRead = false) => {
     const store = createStore({ startDay: 1 });
+    // run-diary: the book is there once a day is written (day 1 after its shutdown, at the bed ask)
+    store.appendEvent({ kind: "step", name: "beat:shutdown", t: "23:00" });
     const session = initialSession(DEFAULT_CLOCK, "left", "lying");
     session.collection = { ...EMPTY_COLLECTION, ...(bookRead ? { bookRead: true } : {}) };
     let marked = 0;

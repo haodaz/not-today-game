@@ -106,6 +106,10 @@ describe("recordEnding runs only for an ending appended after the watch began", 
 describe("the book by the bed (bedside-book)", () => {
   it("the shelf book is in 房间 from day 1 whatever the profile; the desk book is gone", () => {
     const store = createStore({ startDay: 1 });
+    // run-diary: the shelf book is the run's diary, there once a day is written (day 1 after its shutdown)
+    const morning = renderRoom({ state: store.getState(), events: store.getEvents(), session: initialSession({ beat: "work", time: "10:00" }, "left", "room") }).value;
+    expect(morning).not.toContain('class="shelf-book"');
+    store.appendEvent({ kind: "step", name: "beat:shutdown", t: "23:00" });
     const session = initialSession({ beat: "work", time: "10:00" }, "left", "room");
     const room = (c: typeof session.collection) => renderRoom({ state: store.getState(), events: store.getEvents(), session: { ...session, collection: c } }).value;
     for (const c of [EMPTY_COLLECTION, { finishedRuns: 2, endings: { bad: 0, survive: 2, warm: 0, good: 0, collapse: 0 }, objects: [], kurogotchi: false }]) {
