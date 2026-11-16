@@ -68,6 +68,18 @@ Vite and TypeScript, no framework, one store. State is `f(day) ⊕ replay(events
 - **Written before the jam**, by the author with Claude: the story, the setting bible, an 18-day branching Chinese gamebook and the watercolour concept art.
 - **Made during the jam**, in this repository: all game code, the content tables that turn the gamebook into a playable day loop, and the assets in `public/`.
 
+## Posts about the game
+
+Written for people who have never seen it, one picture set each, on X (@vibedding):
+
+| Date | Post |
+|---|---|
+| 2026-11-03 | [Did your childhood have these too?](https://x.com/vibedding/status/2117669655322223063) — the four old things |
+| 2026-11-12 | [Your "AI assistant" runs your job for you](https://x.com/vibedding/status/2120972665301373335) — the work screens, the tasks as games, the game projecting back into the deliverable |
+| 2026-11-13 | [Battle moves: throw the laptop, flip the desk](https://x.com/vibedding/status/2121211339158753748) |
+| 2026-11-15 | [The old things you collect are real](https://x.com/vibedding/status/2122048341538164888) — the chick, Bulls and Cows on the calculator, Wordle on the dictionary |
+| 2026-11-16 | [In 1997 every kid in China wanted a Tamagotchi](https://x.com/vibedding/status/2122321184628904280) — night one, the author's own childhood |
+
 ## Licence
 
 - **Code:** MIT (see `LICENSE`).
