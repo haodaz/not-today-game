@@ -75,7 +75,9 @@ export function meetingStage(ctx: AppContext, task: Task, board: TaskBoard): Saf
   const last = [...shown].reverse().find((l) => l.who === "kuro" && l.text);
   const say = last ? last.text : "";
   const finish = settleButton(printable);
-  const foot = html`<div class="cs-foot"><img class="ts-kimg" src="${frameUrl(FRAMES.idle[0])}" alt="">${say ? html`<div class="ts-say">${kuroText(day, say)}</div>` : html`<div class="ts-say empty"></div>`}<div class="cs-right">${finish}</div></div>`;
+  // work-mode §3: 让它补全 is Kuro's offer on the stage, beside the hand-in (never a workspace chip)
+  const assist = !printable && hasString("board.assist") ? html`<button type="button" class="ts-assist" data-action="board-assist">${S("board.assist")}</button>` : null;
+  const foot = html`<div class="cs-foot"><img class="ts-kimg" src="${frameUrl(FRAMES.idle[0])}" alt="">${say ? html`<div class="ts-say">${kuroText(day, say)}</div>` : html`<div class="ts-say empty"></div>`}<div class="cs-right">${assist}${finish}</div></div>`;
 
   return html`<div class="ms"${artStyle}><div class="cs-dim"></div>${top}<div class="ms-main">${screen}${template}</div>${tray}${foot}</div>`;
 }

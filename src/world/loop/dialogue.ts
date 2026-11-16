@@ -41,7 +41,6 @@ export type Ending =
   /** author 2026-11-11: at the little table with the meal: 现在吃吗？ 吃 / 再等等. */
   | { readonly kind: "eatAsk"; readonly meal: "lunch" | "dinner" }
   /** launch (author 2026-11-11): 工作台's row clicked: Kuro 要开始工作吗？ 开始 / 只能开始了; either opens the task page. */
-  | { readonly kind: "workAsk"; readonly taskId: string }
   /** settlement (author 2026-11-13): Kuro has fixed the work — 要发吗？ every option sends it. */
   | { readonly kind: "settleSend"; readonly taskId: string }
   /** Kuro's upgrade offer as a line in the box (dialogue spec): 升级 / 不了. */
@@ -57,7 +56,7 @@ export type Ending =
 
 /** Endings that wait for a choice (Kuro's turn waits for the player's box). */
 export const endsInChoice = (e: Ending): boolean =>
-  e.kind === "beatChoices" || e.kind === "loan" || e.kind === "recognise" || e.kind === "kuroOffer" || e.kind === "kuroAsk" || e.kind === "bedAsk" || e.kind === "riseAsk" || e.kind === "doorAsk" || e.kind === "eatAsk" || e.kind === "workAsk" || e.kind === "settleSend" || e.kind === "kuroTurn" || e.kind === "kuroWait";
+  e.kind === "beatChoices" || e.kind === "loan" || e.kind === "recognise" || e.kind === "kuroOffer" || e.kind === "kuroAsk" || e.kind === "bedAsk" || e.kind === "riseAsk" || e.kind === "doorAsk" || e.kind === "eatAsk" || e.kind === "settleSend" || e.kind === "kuroTurn" || e.kind === "kuroWait";
 
 export interface Queued {
   /** Where it came from (for tests and to avoid queueing the same thing twice). */
@@ -230,6 +229,20 @@ export interface Here {
   readonly conversation?: string | null;
   /** 工作台's page when 工作台 is in front (`msgs` is its 消息 pane); absent = null. */
   readonly page?: string | null;
+  /** work-mode §5: 工作台 full screen in front (work mode): the messages' and the afternoon's lines wait. Absent = false. */
+  readonly work?: boolean;
+}
+
+/**
+ * work-mode §5: what the box holds back while work mode is on — the messages' lines (a TingTalk /
+ * 喂信 arrival, `screen:msgs…`), an item's unlock and done lines (the timed afternoon lines) and
+ * nightfall. They play once 退出工作模式 is pressed. The work's own lines (the launch opening, the
+ * task's lines, Kuro on the stage) are not held.
+ */
+export function workHolds(q: Pick<Queued, "key" | "lines">, line: number): boolean {
+  if (/:(onUnlock|onDone)$/.test(q.key) || q.key.endsWith(":nightfall")) return true;
+  const where = q.lines[Math.min(line, q.lines.length - 1)]?.where;
+  return where !== undefined && where.startsWith("screen:msgs");
 }
 
 /**
@@ -269,7 +282,7 @@ export function placeMatches(where: Place | undefined, here: Here): boolean {
 }
 
 /** Can this item play from `line` here? An item with no lines (a prompt) always can. */
-const playsFrom = (q: Queued, line: number, here: Here): boolean => q.lines.length === 0 || placeMatches(q.lines[Math.min(line, q.lines.length - 1)]?.where, here);
+const playsFrom = (q: Queued, line: number, here: Here): boolean => !(here.work && workHolds(q, line)) && (q.lines.length === 0 || placeMatches(q.lines[Math.min(line, q.lines.length - 1)]?.where, here));
 
 /**
  * Brings the queue in line with where the player is. Pure; idempotent.
@@ -355,10 +368,6 @@ export const DOOR_ASK_OPTIONS: readonly ChoiceOption[] = [
   { index: 0, text: null, choice: "take", labelKey: "delivery.take" },
   { index: 1, text: null, choice: "wait", labelKey: "delivery.wait" },
 ];
-export const WORK_ASK_OPTIONS: readonly ChoiceOption[] = [
-  { index: 0, text: null, choice: "go", labelKey: "task.launch.go" },
-  { index: 1, text: null, choice: "must", labelKey: "task.launch.must" },
-];
 export const SETTLE_SEND_OPTIONS: readonly ChoiceOption[] = [
   { index: 0, text: null, choice: "go", labelKey: "settle.send.go" },
   { index: 1, text: null, choice: "fast", labelKey: "settle.send.fast" },
@@ -389,7 +398,6 @@ function options(q: Queued, state: State, events?: readonly GameEvent[]): Choice
   if (q.ending.kind === "riseAsk") return book(RISE_OPTIONS);
   if (q.ending.kind === "doorAsk") return [...DOOR_ASK_OPTIONS];
   if (q.ending.kind === "eatAsk") return [...EAT_ASK_OPTIONS];
-  if (q.ending.kind === "workAsk") return [...WORK_ASK_OPTIONS];
   if (q.ending.kind === "settleSend") return [...SETTLE_SEND_OPTIONS];
   if (q.ending.kind === "recognise") {
     // No hints: the same look for every option; the order is the run's, not content's.

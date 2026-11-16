@@ -100,7 +100,8 @@ import { meetingFurthest, meetingTarget } from "@state/days/meeting";
 import { taskByFlag, taskFiles } from "@state/days/tasks";
 import type { ActionContext } from "@world/desktop/controller";
 import { initialSession, type AppContext, type Session } from "@world/desktop/model";
-import { renderBoard } from "@world/desktop/workbench/board";
+import { cardText, renderBoard } from "@world/desktop/workbench/board";
+import { workLayer } from "@world/desktop/workbench/compare";
 import { gridColumns, initials, MEETING_LINE_MS, MEETING_LINE_MS_FAST, meetingLineMs } from "@world/desktop/workbench/meeting";
 import { renderWorkbench } from "@world/desktop/workbench/view";
 import { escapeHtml } from "@world/html";
@@ -179,11 +180,13 @@ describe("the meeting view (meeting R2)", () => {
       expect(out).toContain(`data-action="shell-slot" data-slot="${slot}" title="${label}"><span class="sh-fn">${label}</span><span class="sh-dot" aria-hidden="true"></span></button>`);
     }
     expect(out).not.toContain("mt-row");
-    // The meeting's cards wait for their lines in 素材; assist and print are the composer's chips.
+    // The meeting's cards wait for their lines in 素材; work-mode §4: the found ones are listed, not
+    // picked, and the composer has no 让它补全 / hand-in (they are on the stage's foot row).
     expect(out).toContain('<div class="sh-file card notfound" aria-disabled="true" title="hint-m1"><span class="sh-fn">hint-m1</span></div>');
-    expect(out).toContain('data-card="a1"');
-    expect(out).toContain('data-action="board-assist"');
-    expect(out).toContain(`data-action="board-print" disabled>${escapeHtml(t("board.send.boss"))}</button>`);
+    const a1 = escapeHtml(cardText(board(), "a1"));
+    expect(out).toContain(`<div class="sh-file card" title="${a1}"><span class="sh-fn">${a1}</span>`);
+    for (const action of ["board-card", "board-slot", "board-lock", "board-kuro-lock", "board-assist", "board-print", "board-code", "work-show"]) expect(out, action).not.toContain(`data-action="${action}"`);
+    expect(out).toContain('<div class="sh-composer"></div>');
     expect(out).not.toContain("btable");
   });
 
@@ -306,17 +309,34 @@ describe("a play-through of the meeting board", () => {
     const store = day1();
     const h = harness(store);
     h.act("wb-nav", { page: "task:task3" });
-    expect(h.out()).not.toContain('data-card="m1"');
+    // the workspace lists a found card by its text (work-mode §4: nothing to pick there)
+    const listed = (id: string) => `<div class="sh-file card" title="${escapeHtml(cardText(board(), id))}">`;
+    expect(h.out()).not.toContain(listed("m1"));
     h.step(); // line 1 names m1
-    expect(h.out()).toContain('data-card="m1"');
-    expect(h.out()).not.toContain('data-card="m2"');
+    expect(h.out()).toContain(listed("m1"));
+    expect(h.out()).not.toContain(listed("m2"));
     for (let i = 0; i < 3; i++) h.step();
-    expect(h.out()).toContain('data-card="m2"');
+    expect(h.out()).toContain(listed("m2"));
+    // work-mode: the day's game is the only way to change the work — on the stage, opened from the bar
+    h.session.wbFull = true;
+    h.session.focus = "left";
+    h.session.leftApp = "workbench";
+    h.act("work-start");
+    // the fixture task has no launch page: 开始工作 opens its stage at once
+    expect(h.session.launchShow).toBeNull();
+    expect(h.session.workShow).toBe("1:task3");
+    const stage = () => workLayer({ state: store.getState(), events: store.getEvents(), session: h.session, nowMs: 0 })?.value ?? "";
+    expect(stage()).toContain('data-screen="meeting"');
+    expect(stage()).toContain(`<div class="cs-right"><button type="button" class="ts-assist" data-action="board-assist">${escapeHtml(t("board.assist"))}</button>`);
     for (const [slot, card] of [["s1", "m1"], ["s2", "m2"], ["s3", "a1"]]) {
       h.act("board-card", { card: card! });
       h.act("board-slot", { slot: slot! });
     }
-    expect(h.out()).toContain(`data-action="board-print">${escapeHtml(t("board.send.boss"))}</button>`);
+    // all placed: the foot row's 整理好了 is on, 让它补全 is gone; the settlement carries the hand-in
+    expect(stage()).toMatch(/<div class="cs-right"><button type="button" class="ts-finish" data-action="board-settle">/);
+    expect(h.out()).not.toContain('data-action="board-print"');
+    h.act("board-settle");
+    expect(stage()).toContain(`data-action="board-print">${escapeHtml(t("board.send.boss"))}</button>`);
     h.act("board-print");
     const events = store.getEvents();
     expect(events.some((e) => e.kind === "task" && e.flag === DONE)).toBe(true);

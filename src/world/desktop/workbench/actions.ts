@@ -148,16 +148,8 @@ export const workbenchActions: Record<string, ActionHandler> = {
       if (!Number.isInteger(day) || day < 1 || day > state.day) return;
       const task = taskForId(day, taskId);
       if (!task) return;
-      // launch (author 2026-11-11): today's task under way, its opening page not passed yet: Kuro asks
-      // 要开始工作吗？ first (the answer comes back here with `data.launch`); the page itself then opens
-      // on its launch card.
-      if (day === state.day && task.launch && data.launch !== "1" && !ctx.session.launched.has(`${day}:${taskId}`) && openWork(state, events)?.tree?.id === taskId && hasString("task.launch.ask")) {
-        if (!ctx.session.dialogue.queue.some((q) => q.ending.kind === "workAsk")) {
-          ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${day}:launch:${taskId}:ask`, lines: [{ k: "speaker", who: "kuro", t: t("task.launch.ask") }], ending: { kind: "workAsk", taskId } });
-        }
-        ctx.rerender();
-        return;
-      }
+      // work-mode §2 (author 2026-11-16): a row opens the page to look at and never launches; 开始工作 on
+      // the work bar is the one way into the day's game (no 要开始工作吗 any more).
       let first = false;
       if (day < state.day) {
         // 最近: an earlier day's task, read-only; only one that was opened that day.
@@ -174,9 +166,6 @@ export const workbenchActions: Record<string, ActionHandler> = {
       }
       ctx.session.workbenchPage = page;
       ctx.session.wbTaskDay = day < state.day ? day : null;
-      // launch: entered through the row today, not passed yet: the opening page is up.
-      ctx.session.launchShow = day === state.day && task.launch && !ctx.session.launched.has(`${day}:${taskId}`) ? `${day}:${taskId}` : null;
-      if (ctx.session.launchShow) queueLaunchIntro(ctx.session, task, ctx.session.launchShow);
       visit(ctx.session, page, ctx.session.wbTaskDay);
       closeMenus(ctx.session);
       // meeting R3: the first open of a meeting task today starts it playing by itself.

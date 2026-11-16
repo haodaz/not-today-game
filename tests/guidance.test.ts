@@ -228,7 +228,7 @@ describe("the box owns the screen (2026-11-08)", () => {
 });
 
 describe("G7 · a board task's page (2026-11-08)", () => {
-  it("launch (author 2026-11-11): the row click asks 要开始工作吗？; 开始 / 只能开始了 open the task on its launch card; 开始工作 shows the work", () => {
+  it("launch (work-mode §2, author 2026-11-16): the row click opens the page to look at and never launches; 开始工作 on the bar opens the launch card; its CTA shows the work", () => {
     const store = booted();
     step(store, "openApp:msgs");
     open(store, "conv:boss");
@@ -239,11 +239,17 @@ describe("G7 · a board task's page (2026-11-08)", () => {
     r.session.leftApp = "workbench";
     r.session.workbenchPage = "home";
     r.act("wb-nav", { page: `task:${task.id}` });
-    expect(r.session.workbenchPage).toBe("home");
-    expect(r.session.dialogue.queue[0]?.ending).toEqual({ kind: "workAsk", taskId: task.id });
-    expect(r.session.dialogue.queue[0]?.lines[0]?.t).toBe(t("task.launch.ask"));
-    r.act("loop-choice", { choice: "must" });
+    // a row: the page, no ask, no launch page
     expect(r.session.workbenchPage).toBe(`task:${task.id}`);
+    expect(r.session.launchShow).toBeNull();
+    expect(r.session.dialogue.queue).toHaveLength(0);
+    expect(r.out()).not.toContain("launch-layer");
+    r.act("wb-nav", { page: "home" });
+    // 开始工作: today's current task, never a row — its launch page
+    r.act("work-start");
+    expect(r.session.wbFull).toBe(true);
+    expect(r.session.workbenchPage).toBe(`task:${task.id}`);
+    expect(r.session.launchShow).toBe(`1:${task.id}`);
     const out = r.out();
     // over the whole stage, not inside the monitor (author 2026-11-11 night)
     // author 2026-11-12: a picture edge to edge, no card: the day tag, the bust, its motif (day 1: 老王's jargon fanned behind him)
@@ -261,21 +267,17 @@ describe("G7 · a board task's page (2026-11-08)", () => {
     expect(queued.flatMap((q) => q.lines).map((l) => (l.k === "speaker" ? `${l.who}:${l.t}` : l.k))).toEqual(intro.map((l) => `${l.who}:${l.text}`));
     expect(out).not.toContain('data-action="task-launch"');
     while (r.session.dialogue.queue[0]?.key.startsWith(`1:${task.id}:intro`)) r.act("loop-advance");
-    // entered again before pressing: the opening does not play twice
-    r.act("wb-nav", { page: "home" });
-    r.act("wb-nav", { page: `task:${task.id}`, launch: "1" });
+    // 开始工作 again before pressing: the opening does not play twice
+    r.act("work-start");
     expect(r.session.dialogue.queue).toHaveLength(0);
     expect(r.out()).toMatch(new RegExp(`data-action="task-launch" data-task="${task.id}"[^>]*>${task.launch!.cta}</button>`));
-    // the second time the row needs no ask
     r.act("task-launch", { task: task.id });
     expect(r.out()).not.toContain("launch-layer");
     expect(r.out()).toContain('data-screen="choose"');
     expect(r.out()).toContain("compare-pick");
     expect(r.out()).not.toContain("compare-kuro");
-    r.act("wb-nav", { page: "home" });
-    r.act("wb-nav", { page: `task:${task.id}` });
-    expect(r.session.workbenchPage).toBe(`task:${task.id}`);
-    expect(r.session.dialogue.queue.some((q) => q.ending.kind === "workAsk")).toBe(false);
+    // the stage has no way back (work-mode §3)
+    expect(r.out()).not.toContain("wl-back");
   });
 
   it("compare (author 2026-11-11): the page's version buttons are lit page by page; every page picked and the boss content, 发给老王; nothing is refused", () => {
@@ -288,8 +290,7 @@ describe("G7 · a board task's page (2026-11-08)", () => {
     const r = rig(store);
     r.session.leftApp = "workbench";
     r.session.workbenchPage = "home";
-    r.act("wb-nav", { page: `task:${task.id}` });
-    r.act("loop-choice", { choice: "go" });
+    r.act("work-start");
     expect(r.session.workbenchPage).toBe(`task:${task.id}`);
     // launch: the opening page's button is lit first; pressed, the pages.
     while (r.session.dialogue.queue[0]?.key.startsWith(`1:${task.id}:intro`)) r.act("loop-advance"); // the opening (2026-11-12) first; the guide waits behind it

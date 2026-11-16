@@ -45,7 +45,7 @@ describe("R1 · a new player can see the computer", () => {
     expect(r.out()).not.toContain('class="onboard"');
   });
 
-  it("工作台 opens as a window; the green light makes it full screen (the dock hides, peeks) and back", () => {
+  it("工作台 opens as a window; the green light makes it full screen (work mode: the work bar in the dock's place) and back", () => {
     const r = rig(booted(), "desktop");
     r.act("dock", { app: "workbench" });
     let out = r.out();
@@ -57,7 +57,9 @@ describe("R1 · a new player can see the computer", () => {
     r.act("win-full", { app: "workbench" });
     out = r.out();
     expect(out).toContain('<div class="win wb full" data-win="workbench">');
-    expect(out).toContain('<div class="dock auto">');
+    // work-mode §1: the dock row is the work bar (two buttons), not a hiding dock
+    expect(out).toContain('<div class="work-bar"><button type="button" class="wk-start" data-action="work-start"');
+    expect(out).not.toContain('<div class="dock');
     r.act("win-full", { app: "workbench" });
     expect(r.out()).toContain('<div class="win wb" data-win="workbench" style=');
   });

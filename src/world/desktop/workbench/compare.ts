@@ -129,7 +129,9 @@ export function launchMotif(m: LaunchMotif, fill: (x: string) => string): SafeHt
  *   result  — Kuro renders the chosen page (the preview holds for RENDER_MS with 克总在渲染…), then
  *             the page large with 老王's face and a line (笑了 / 撇嘴); 下一页, or 看结算 after the last.
  *   settle  — the satisfaction, the faces, 发给老板 at the bar or 让克总按他的意思重新改一稿 under it.
- * Up while `session.workShow` names today's live board task; gone once the task is done.
+ * Up while `session.workShow` names today's live board task; gone once the task is done. work-mode §3
+ * (author 2026-11-16: 「中途不能退出，开始了就做完」): modal — no way back on its header; it closes by itself
+ * at the hand-in.
  */
 /** The stage's entry fade (CSS `.work-stage.in`) plays only this long after the page opened — a re-render later must not replay it. */
 const WORK_IN_MS = 400;
@@ -153,12 +155,11 @@ export function workLayer(ctx: { readonly state: State; readonly events: readonl
   const key = `${state.day}:${taskId}`;
   const holding = !!session.ideHold && session.ideHold.key === key && session.ideHold.until > nowMs;
   const fill = (x: string) => fillPlaceholders(x, state.names);
-  const back = hasString("work.back") ? html`<button type="button" class="wl-back" data-action="work-hide">${tr("work.back")}</button>` : null;
   const phase = session.workPhase?.key === key ? session.workPhase : null;
   const pending = comparePending(board, s);
   // battle (author 2026-11-13): 让小鸡上 while a page is still to pick and the chick is held, once per task
   const fight = pending && !session.battle && battleOffered(board, s, state.found as string[], events, state.day, task.id) ? html`<button type="button" class="wl-battle" data-action="battle-start">${tr("battle.go")}</button>` : null;
-  const head = html`<header class="wl-head"><span class="wl-title">${fill(task.title)}</span><span class="sp"></span>${fight}${back}</header>`;
+  const head = html`<header class="wl-head"><span class="wl-title">${fill(task.title)}</span><span class="sp"></span>${fight}</header>`;
   const srcFor = (slot: string, card: string) => ideSrc(board, { ...s, slots: { ...s.slots, [slot]: card } }, ops, slot, tuneCarried(board, events));
   let body: SafeHtml;
   let screen: string;
@@ -215,13 +216,12 @@ function genericWorkLayer(c: { state: State; events: readonly GameEvent[]; sessi
   const { state, events, session, nowMs } = c;
   const app: AppContext = { state, events, startDay: c.startDay, session, night: isNight(session.clock), nowMs };
   const fill = (x: string) => fillPlaceholders(x, state.names);
-  const back = hasString("work.back") ? html`<button type="button" class="wl-back" data-action="work-hide">${tr("work.back")}</button>` : null;
   const key = `${state.day}:${task.id}`;
   // battle (author 2026-11-13): 让小鸡上 on the board (not at its settlement), once per task
   const bs = boardState(board, state.day, task.id, events);
   const settling = session.workPhase?.key === key && session.workPhase.phase === "settle";
   const fight = !settling && !session.battle && battleOffered(board, bs, state.found as string[], events, state.day, task.id) ? html`<button type="button" class="wl-battle" data-action="battle-start">${tr("battle.go")}</button>` : null;
-  const head = html`<header class="wl-head"><span class="wl-title">${fill(task.title)}</span><span class="sp"></span>${fight}${back}</header>`;
+  const head = html`<header class="wl-head"><span class="wl-title">${fill(task.title)}</span><span class="sp"></span>${fight}</header>`;
   let body: SafeHtml;
   if (session.battle?.key === key) {
     body = battleScene(session.battle, nowMs);

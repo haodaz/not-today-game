@@ -27,6 +27,7 @@ import type { BabblePlan } from "@world/sound/babble";
 import type { ChipId } from "@world/sound/chip";
 import { t } from "@world/i18n";
 import { maskBlocks } from "@world/dialogue/mask";
+import { workBlocks } from "./workbench/work-mode";
 import { guideNow, guideRefuses, refuseLine } from "@world/loop/guide";
 import { callBlocks } from "@world/loop/call";
 import { noteHints, promptShown, promptUsed, seeHint, TYPING_HINT } from "@world/hints/hints";
@@ -371,6 +372,8 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
       // world-prompts R1: a room prompt blocks nothing; an action on its target ends it (seen).
       (c, data, el) => {
         if (maskBlocks(session.dialogue, name, session.objbarOpen && session.view === "desktop") || callBlocks(session, name) || coachBlocks(session, name)) return;
+        // work-mode §3: once the day's game is started it runs to its end; the ways out wait.
+        if (workBlocks(c, name, data ?? {})) return;
         // guidance R1: at a guided moment an action that is not on the lit thing (nor always
         // allowed) answers with the guide's one line and does nothing else.
         if (guideBlocks(c, name, data ?? {})) return;

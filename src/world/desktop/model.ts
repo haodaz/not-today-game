@@ -26,6 +26,7 @@ import { renderCall } from "./call/view";
 import type { AppId, MonitorModel, ShellModel, Side } from "./shell";
 import { defaultPlacement, windowsOn } from "./placement";
 import { WALL_FADE_MS, wallpaperFor } from "./wallpaper";
+import { inWorkMode, workBar } from "./workbench/work-mode";
 
 /** The ending pages, in the orders of src/world/endings/flow.ts `ENDING_PAGES`. */
 export type EndingPhase = "collapse" | "you" | "credits" | "after" | "tender" | "wake" | "lines";
@@ -800,7 +801,9 @@ export function buildShell(
   if (right.monitor.app) shown.set(right.monitor.app, right.badge);
   const badgeOf = (app: AppId): number =>
     shown.get(app) ?? (app === "msgs" ? apps.msgs(ctx).badge : app === "tingtalk" ? apps.tingtalk(ctx).badge : app === "workbench" ? apps.workbench(ctx).badge : apps.browser(ctx).badge);
-  const badges = { msgs: badgeOf("msgs"), tingtalk: badgeOf("tingtalk"), workbench: badgeOf("workbench"), browser: badgeOf("browser") };
+  // work-mode §5: nothing from outside reaches into work mode — no badge anywhere (the other monitor's tab neither).
+  const quiet = inWorkMode(session);
+  const badges = quiet ? { msgs: 0, tingtalk: 0, workbench: 0, browser: 0 } : { msgs: badgeOf("msgs"), tingtalk: badgeOf("tingtalk"), workbench: badgeOf("workbench"), browser: badgeOf("browser") };
   // 调度中心 (tingtalk R1b): every open window, on its monitor, front first; the shown ones reuse their model.
   const mc =
     session.mcOpen && !off
@@ -831,6 +834,8 @@ export function buildShell(
     // onboarding-steps R1: the coach mark now, while the first visit's steps are up.
     onboard: session.onboard === "due" && !off ? session.onboardStep : null,
     wallpaper: wallpaperNow(state.day, session, nowMs),
+    // work-mode §1: the work bar's primary and its way out
+    work: workBar(state, events, session),
   };
 }
 

@@ -18,7 +18,7 @@ import { FRAMES, frameUrl } from "../kuro/body";
 import { kuroText } from "../kuro/voice";
 import { sentFiles, sentReplies, transcript } from "../messages/transcript";
 import { taskPageId, type AppContext, type PaneId, type Session, type ShellState } from "../model";
-import { boardActions, cardText, finishLabel, lockRow, renderBoardRead, table } from "./board";
+import { boardActions, cardText, finishLabel, lockRow, renderBoardLive, renderBoardRead } from "./board";
 import { meetingWindow } from "./meeting";
 import { ICONS } from "../icons";
 import { moveApp, otherSide } from "../placement";
@@ -124,6 +124,9 @@ const hasViewableSource = (board: TaskBoard, cardId: string): boolean => {
 function explorer(ctx: AppContext, task: Task, board: TaskBoard, s: BoardState, st: ShellState, selected: string): SafeHtml {
   const { state, events, session } = ctx;
   const ide = board.view === "ide";
+  // work-mode §4: outside days 1–3's IDE the workspace shows the work and nothing to press on it —
+  // no card to pick, no lock to open (the day's game on the stage does that).
+  const readOnly = !ide;
   const seats = board.view === "meeting" ? board.meeting?.seats : undefined;
   // A missing folder name shows as missing (the strings convention), never as its key.
   const folder = (key: string, rows: SafeHtml[]) => html`<div class="sh-folder"><div class="sh-frow"><span class="sh-tw">${ICONS.down}</span>${tr(key)}</div>${rows}</div>`;
@@ -136,7 +139,7 @@ function explorer(ctx: AppContext, task: Task, board: TaskBoard, s: BoardState, 
     // An unfilled slot's dot (like an unsaved file): drawn by CSS, no text glyph (R9).
     const dot = filled ? null : html`<span class="sh-dot" aria-hidden="true"></span>`;
     // R12.1: one line with an ellipsis; the full name in the row's title.
-    return html`<button type="button" class="${cls("sh-file", selected === slot.id && "on", session.boardPick && "target")}" data-action="shell-slot" data-slot="${slot.id}" title="${name}"><span class="sh-fn">${name}</span>${seatTag}${dot}</button>`;
+    return html`<button type="button" class="${cls("sh-file", selected === slot.id && "on", !readOnly && session.boardPick && "target")}" data-action="shell-slot" data-slot="${slot.id}" title="${name}"><span class="sh-fn">${name}</span>${seatTag}${dot}</button>`;
   });
   const found = foundCardIds(board, state.day, events, task.id);
   const placed = new Set(Object.values(s.slots));
@@ -150,9 +153,10 @@ function explorer(ctx: AppContext, task: Task, board: TaskBoard, s: BoardState, 
       const open = hasViewableSource(board, c.id) ? html`<button type="button" class="sh-src" data-action="shell-source" data-card="${c.id}" aria-label="${paneName("files", task)}" title="${paneName("files", task)}">${ICONS.external}</button>` : null;
       // R12.1: long card text is one line with an ellipsis; the full text in the row's title.
       const text = cardText(board, c.id);
+      if (readOnly) return html`<div class="sh-file card" title="${text}"><span class="sh-fn">${text}</span>${open}</div>`;
       return html`<div class="${cls("sh-file", "card", session.boardPick === c.id && "picked")}" title="${text}"><button type="button" class="sh-pick" data-action="board-card" data-card="${c.id}">${text}</button>${open}</div>`;
     });
-  const lock = lockRow(board, s, state, events, session);
+  const lock = readOnly ? null : lockRow(board, s, state, events, session);
   // ide v2 day 3: the memo (老王's directions, the given rows) above the pages; no sources folder when
   // every card is a page's direction.
   const directions = board.cards.some((c) => c.slot !== undefined);
@@ -278,10 +282,13 @@ function codePane(board: TaskBoard, s: BoardState, session: Session, selected: s
   return html`<div class="sh-editor"><div class="sh-tabs"><span class="sh-tab on">${file.name}</span>${fetch}</div>${mergeBar}<div class="sh-code">${lines}</div>${chips}</div>`;
 }
 
-/** 表格: the board's table as today (the given rows and the slots); live, or read back. */
+/**
+ * 表格: the board's table, read back; or, while the work is under way, its live state with nothing to
+ * press (work-mode §4: the day's game is the only thing that changes it).
+ */
 function tablePane(ctx: AppContext, task: Task, board: TaskBoard, s: BoardState, live: boolean, day: number): SafeHtml {
   if (!live) return renderBoardRead(board, boardSlotsOn(task, day, ctx.events));
-  return html`<div class="surface board"><div class="btitle">${board.title}</div>${table(board, s, ctx.state, ctx.session)}</div>`;
+  return renderBoardLive(board, s);
 }
 
 /** 文件: the content of a 素材 card's source (the file's text, or the conversation lines), read only. */
@@ -408,17 +415,17 @@ function conversation(ctx: AppContext, task: Task, day: number, live: boolean, f
       const keep = offer.length && hasString("board.tune.keep") ? html`<button type="button" class="sh-chip" data-action="board-keep">${tr("board.tune.keep")}</button>` : null;
       chips = html`${offer}${keep}`;
     } else if (board.compare) {
-      // compare: the work runs on the full-screen work page; here only the way back to it (and the
-      // hand-in once it is allowed). No 让它补全: Kuro's rewrite is offered there, at the settlement.
-      const key = `${day}:${task.id}`;
-      const show = session.launched.has(key) && session.workShow !== key && hasString("work.show") ? html`<button type="button" class="sh-chip primary" data-action="work-show" data-task="${task.id}">${tr("work.show")}</button>` : null;
+      // compare: the work runs on the full-screen work page; here only its hand-in once it is allowed
+      // (work-mode §2: the way back to the stage is the work bar's 继续工作, not a chip here).
       const finish = html`<button type="button" class="sh-chip" data-action="board-print"${canPrint(board, s) ? null : html` disabled`}>${finishLabel(task)}</button>`;
-      chips = html`${show}${finish}`;
-    } else {
-      const label = board.view === "ide" && hasString("board.ide.snapshot") ? tr("board.ide.snapshot") : finishLabel(task);
+      chips = html`${finish}`;
+    } else if (board.view === "ide") {
+      // days 1–3's IDE (frozen for looks): 让它补全 and 打快照 stay where they were
+      const label = hasString("board.ide.snapshot") ? tr("board.ide.snapshot") : finishLabel(task);
       const finish = html`<button type="button" class="sh-chip primary" data-action="board-print"${canPrint(board, s) ? null : html` disabled`}>${label}</button>`;
       chips = html`${assist}${finish}`;
     }
+    // work-mode §4: a table or meeting board has no chips here — the hand-in and 让它补全 are on the stage.
   }
   return html`<div class="sh-conv"><div class="sh-thread">${rows}${dots}</div><div class="sh-composer">${chips}</div></div>`;
 }
@@ -571,7 +578,8 @@ export const taskShellActions: Record<string, ActionHandler> = {
     const p = pageOf(ctx);
     const slot = data.slot;
     if (!p || !p.task.board || !slot || !p.task.board.slots.some((x) => x.id === slot)) return;
-    if (ctx.session.boardPick && p.live) boardActions["board-slot"]!(ctx, data, el);
+    // work-mode §4: only days 1–3's IDE places from the explorer; elsewhere a row only selects.
+    if (ctx.session.boardPick && p.live && p.task.board.view === "ide") boardActions["board-slot"]!(ctx, data, el);
     const st = stateFor(ctx, p);
     st.slot = slot;
     st.slotAt = ideOps(p.task, p.day, ctx.store.getEvents()).length;

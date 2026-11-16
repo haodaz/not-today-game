@@ -1718,6 +1718,25 @@ export function renderBoardRead(board: TaskBoard, slots: Readonly<Record<string,
   return html`<div class="surface board read"><div class="btitle">${board.title}</div><table class="btable">${rows}</table></div>`;
 }
 
+/**
+ * work-mode §4 (author 2026-11-16: 「就在 workspace 里能看到一个真正的工作……但是改变它用的是当日的游戏」): the
+ * board as the workspace shows it while the work is under way — the live state, nothing to press.
+ * The same `surface board` / `.btable` / `.blabel` / `.bslot` / `.filled` structure as the read-back
+ * (so the sheet styling applies): the given column (▒▒▒▒ while locked), each slot as its card's text
+ * or empty, and `.target` on the slot the game fills next (the first empty one).
+ */
+export function renderBoardLive(board: TaskBoard, s: BoardState): SafeHtml {
+  const locked = board.given.lock !== undefined && !s.unlocked;
+  const next = board.slots.find((slot) => !(slot.id in s.slots))?.id;
+  const head = board.columns.map((c) => html`<th>${c}</th>`);
+  const rows = board.slots.map((slot) => {
+    const given = locked ? html`<span class="bmask">▒▒▒▒</span>` : html`${board.given.rows[slot.id] ?? ""}`;
+    const id = s.slots[slot.id];
+    return html`<tr><td class="blabel">${slot.label}</td><td class="bgiven">${given}</td><td><span class="${cls("bslot", id && "filled", slot.id === next && "target")}" data-slot="${slot.id}">${id ? cardText(board, id) : ""}</span></td></tr>`;
+  });
+  return html`<div class="${cls("surface", "board", "live", locked && "locked")}"><div class="btitle">${board.title}</div><table class="btable"><tr>${head}</tr>${rows}</table></div>`;
+}
+
 /** Whether `id` placed in a slot is a Kuro card (for any view that wants to know; it still looks plain). */
 export const slotHoldsKuroCard = (board: TaskBoard, s: BoardState, slotId: string): boolean => {
   const id = s.slots[slotId];

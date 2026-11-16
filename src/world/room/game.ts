@@ -77,7 +77,8 @@ export const CASE_SHAKE_MS = 200;
 import { pointed } from "./pointer";
 import { itemPageId, readingPageId, type KuroCloses } from "@state/closes";
 import { browserPage } from "@world/desktop/browser/data";
-import { composerActions, workbenchActions, workbenchUiActions } from "@world/desktop/workbench/actions";
+import { composerActions, queueLaunchIntro, workbenchActions, workbenchUiActions } from "@world/desktop/workbench/actions";
+import { gameRunning, workNow } from "@world/desktop/workbench/work-mode";
 import { meetingActions } from "@world/desktop/workbench/meeting";
 import { taskShellActions } from "@world/desktop/workbench/shell";
 import { boardActions, lockFaceMove } from "@world/desktop/workbench/board";
@@ -140,7 +141,7 @@ function renderGameBody(store: Store, session: Session, nowMs: number): SafeHtml
     // screen (the pet in the monitor is the one); R5 (2026-11-08): the checklist's current line in
     // the top bar, not a card over the window (the window fills the frame; a card hid 听听's list).
     const lc = loopContext(state, events);
-    return html`${renderDesktop({ ...shell, nextItem: lc ? nextItemText(checklistNow(lc, state, events, session)) : null })}${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${host}${launchLayer(state, session)}${workLayer({ state, events, session, nowMs, startDay: store.getStartDay() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${eggFlash(session, nowMs)}${dlgLayer(dlg, session, readsOn, !maskInModal)}<div class="hud-host">${shell.onboard === null || shell.onboard === undefined ? leaveControl() : null}${hudTiles(session, state, { settings: false })}${itemsPanel(state, events, session)}${settingsPanel(session)}${statusPanel(state, events, session)}</div>`;
+    return html`${renderDesktop({ ...shell, nextItem: lc ? nextItemText(checklistNow(lc, state, events, session)) : null })}${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${host}${launchLayer(state, session)}${workLayer({ state, events, session, nowMs, startDay: store.getStartDay() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${eggFlash(session, nowMs)}${dlgLayer(dlg, session, readsOn, !maskInModal)}<div class="hud-host">${(shell.onboard === null || shell.onboard === undefined) && !gameRunning(state, events, session) ? leaveControl() : null}${hudTiles(session, state, { settings: false })}${itemsPanel(state, events, session)}${settingsPanel(session)}${statusPanel(state, events, session)}</div>`;
   }
   // The box does not jump (dialogue correction 2026-11-02): in every view it is anchored to the
   // viewport in the same fixed layer, not to the stage (whose size differs between views). The
@@ -675,6 +676,12 @@ function arrive(ctx: ActionContext, view: View, data: DOMStringMap): void {
     // The old picture's layer goes once its fade has run.
     if (ctx.session.wallFade && ctx.session.wallFade !== was) ctx.later(WALL_FADE_MS + 16, ctx.rerender);
   }
+  // work-mode §3: a game started and not handed in (a reload, a lock's trip to a facing) comes back in
+  // work mode, 工作台 in front: the bar offers 继续工作 and nothing else answers.
+  if (view === "desktop" && gameRunning(ctx.store.getState(), ctx.store.getEvents(), ctx.session)) {
+    ctx.session.wbFull = true;
+    ctx.session.focus = bringToFront(ctx.session, "workbench");
+  }
   // The desktop opens on the monitor with the current app; looking at it counts.
   if (view === "desktop") lookAt(ctx, shownApp(ctx.session));
   // 看一眼桌子: arriving at 桌子 while the item is open is the look; the desk beat plays here.
@@ -1196,16 +1203,6 @@ export const loopActions: Record<string, ActionHandler> = {
       ctx.rerender();
       return;
     }
-    // launch (author 2026-11-11): 开始 / 只能开始了 both open the task page (on its launch card).
-    if (q.ending.kind === "workAsk") {
-      if (data.choice !== "go" && data.choice !== "must") return;
-      const taskId = q.ending.taskId;
-      ctx.session.dialogue = finishChoice(ctx.session.dialogue);
-      settleSession(ctx.session);
-      workbenchActions["wb-nav"]!(ctx, { page: `task:${taskId}`, launch: "1" } as DOMStringMap, null as never);
-      ctx.rerender();
-      return;
-    }
     // settlement (author 2026-11-13): 发出去 / 快点发出去 / 发发发 — every one sends the work Kuro fixed
     if (q.ending.kind === "settleSend") {
       if (data.choice !== "go" && data.choice !== "fast" && data.choice !== "now") return;
@@ -1318,15 +1315,40 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.session.workShownAt = ctx.now?.() ?? Date.now();
     ctx.rerender();
   },
-  // work (author 2026-11-11 night): the full-screen work page hidden (回到工作台) and brought back (打开工作页).
-  "work-hide"(ctx) {
-    ctx.session.workShow = null;
+  // work-mode §2 (author 2026-11-16): 开始工作 on the work bar is the one way into the day's game. It
+  // targets today's current task, never a row: a board task not launched → its launch page (the
+  // opening plays; its CTA opens the stage); one already started → its stage; a task without a board
+  // → its task page with the modes it has.
+  "work-start"(ctx) {
+    const state = ctx.store.getState();
+    const events = ctx.store.getEvents();
+    const now = workNow(state, events, ctx.session);
+    if (!now) return;
+    const { task, key } = now;
+    ctx.session.wbFull = true;
+    ctx.session.focus = bringToFront(ctx.session, "workbench");
+    // the task page is under the stage (the workspace shows the work, read-only)
+    workbenchActions["wb-nav"]!(ctx, { page: `task:${task.id}` } as DOMStringMap, null as never);
+    if (task.board) {
+      if (task.launch && !now.started) {
+        ctx.session.launchShow = key;
+        queueLaunchIntro(ctx.session, task, key);
+      } else {
+        ctx.session.launched.add(key);
+        ctx.session.launchShow = null;
+        ctx.session.workShow = key;
+        ctx.session.workShownAt = ctx.now?.() ?? Date.now();
+      }
+    }
     ctx.rerender();
   },
-  "work-show"(ctx, data) {
-    if (!data.task) return;
-    ctx.session.workShow = `${ctx.store.getState().day}:${data.task}`;
-    ctx.session.workShownAt = ctx.now?.() ?? Date.now();
+  // work-mode §1: 退出工作模式 — the full chrome closes, the desktop and its dock come back; never while
+  // a game runs. What the box held back meanwhile (§5) plays now.
+  "work-exit"(ctx) {
+    if (gameRunning(ctx.store.getState(), ctx.store.getEvents(), ctx.session)) return;
+    ctx.session.wbFull = false;
+    ctx.session.dockPeek = false;
+    settleSession(ctx.session);
     ctx.rerender();
   },
   // 道具 (day-loop correction 2026-11-01): the strip as a panel over the current view.
@@ -2285,6 +2307,8 @@ export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
     loopActions["wb-sidebar"]!(ctx, {} as DOMStringMap, null as never);
     return true;
   }
+  // work-mode §3: while the day's game runs on the screen, Esc does nothing (no way back out of it).
+  if (e.key === "Escape" && ctx.session.view === "desktop" && gameRunning(ctx.store.getState(), ctx.store.getEvents(), ctx.session)) return true;
   // Esc closes 工作台's sidebar or its title dropdown before stepping the camera out.
   if (e.key === "Escape" && (ctx.session.wbSidebar || ctx.session.wbTitleMenu) && ctx.session.view === "desktop") {
     loopActions[ctx.session.wbSidebar ? "wb-sidebar-close" : "wb-titlemenu-close"]!(ctx, {} as DOMStringMap, null as never);

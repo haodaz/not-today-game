@@ -93,6 +93,12 @@ export interface ShellModel {
   /** guidance R5: the room's 今日 card, over the OS area's top-left under the top bar (absent: none). */
   /** guidance R5 (2026-11-08): the checklist's current line, shown in the top bar after the app's name. */
   readonly nextItem?: string | null;
+  /**
+   * work-mode §1: the work bar that stands in the dock's place over full-screen 工作台 — the primary's
+   * label (`work.start` / `work.resume` / `work.allDone`), whether it can be pressed, and whether
+   * 退出工作模式 is drawn (not while a game runs). Absent: 开始工作, pressable, with the exit.
+   */
+  readonly work?: { readonly label: "work.start" | "work.resume" | "work.allDone"; readonly enabled: boolean; readonly exit: boolean };
 }
 
 // ——— coach marks (onboarding-steps R1) ————————————————————————————————————————————————
@@ -290,6 +296,18 @@ function dock(m: ShellModel, hides = false): SafeHtml {
 }
 
 /**
+ * work-mode §1 (author 2026-11-16: 「直接把 dock 的位置改成 2 个按钮："开始工作" "退出工作模式"」): in work
+ * mode the dock row is the work bar — exactly two buttons, the primary lit like the launch page's
+ * CTA and the quiet way out. No tiles, no decoys, no settings, no badges, no auto-hide.
+ */
+function workBar(m: ShellModel): SafeHtml {
+  const w = m.work ?? { label: "work.start" as const, enabled: true, exit: true };
+  const start = html`<button type="button" class="wk-start" data-action="work-start"${w.enabled ? null : html` disabled`}>${tr(w.label)}</button>`;
+  const exit = w.exit ? html`<button type="button" class="wk-exit" data-action="work-exit">${tr("work.exit")}</button>` : null;
+  return html`<div class="work-bar">${start}${exit}</div>`;
+}
+
+/**
  * navigation-polish (author's playtest 2026-11-16: 「回房间不要放在 dock 里面，放左边旁边，明显一点。或者叫
  * 离开屏幕。」): the way off the screen, outside the monitor at the stage's left edge — a vertical pill
  * with a chevron and 离开屏幕 written top to bottom. It goes to 桌子 (`view desk`), as Esc does. The
@@ -310,7 +328,7 @@ function decoyWindow(m: ShellModel): SafeHtml | null {
 function monitor(m: ShellModel, mon: MonitorModel): SafeHtml {
   // Not on yet: a black screen and nothing else.
   if (m.off) return html`<div class="monitor off" data-side="${mon.side}" data-ring="${m.ring}" data-app="${mon.app}"><div class="os"></div></div>`;
-  return html`<div class="${cls("monitor", m.night && "night")}" data-side="${mon.side}" data-ring="${m.ring}" data-app="${mon.app}"><div class="os">${wallpaper(m)}${topBar(m, mon)}${windowFrame(m, mon)}${mon.side === "left" ? decoyWindow(m) : null}${dock(m, dockHides(mon))}${mon.overlay}${mon.side === "left" ? coachMark(m) : null}</div></div>`;
+  return html`<div class="${cls("monitor", m.night && "night")}" data-side="${mon.side}" data-ring="${m.ring}" data-app="${mon.app}"><div class="os">${wallpaper(m)}${topBar(m, mon)}${windowFrame(m, mon)}${mon.side === "left" ? decoyWindow(m) : null}${dockHides(mon) ? workBar(m) : dock(m)}${mon.overlay}${mon.side === "left" ? coachMark(m) : null}</div></div>`;
 }
 
 /** The other monitor, as a thin tab on its side: the apps on it (front first) and their badges. */

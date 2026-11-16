@@ -7,7 +7,7 @@ import { isNight } from "@world/desktop/beat";
 import { frontApp, shownConversation, type Session } from "@world/desktop/model";
 import { settle, type Here } from "@world/loop/dialogue";
 
-export function hereOf(s: Pick<Session, "view" | "focus" | "leftApp" | "rightApp" | "clock" | "workbenchPage" | "conversation" | "homeConversation">): Here {
+export function hereOf(s: Pick<Session, "view" | "focus" | "leftApp" | "rightApp" | "clock" | "workbenchPage" | "conversation" | "homeConversation"> & { readonly wbFull?: boolean }): Here {
   const app = frontApp(s);
   return {
     // 床 and 窗 are walls of the room (room-turn 2026-11-04): a line for the room plays there too.
@@ -18,6 +18,8 @@ export function hereOf(s: Pick<Session, "view" | "focus" | "leftApp" | "rightApp
     night: isNight(s.clock),
     conversation: shownConversation(s),
     page: app === "workbench" ? s.workbenchPage : null,
+    // work-mode §5: 工作台 full screen in front holds the messages' and the afternoon's lines back
+    ...(s.view === "desktop" && s.wbFull === true && app === "workbench" ? { work: true } : {}),
   };
 }
 

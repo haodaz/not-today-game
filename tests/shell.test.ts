@@ -617,7 +617,7 @@ describe("R11.1 · a task without a board: the thread is the conversation, the s
   });
 });
 
-describe("R11.2 · the dock over full-screen 工作台", () => {
+describe("R11.2 / work-mode §1 · over full-screen 工作台 the dock is the work bar", () => {
   const desktop = (patch: Partial<Session>) => {
     const store = day1();
     const h = harness(store);
@@ -626,9 +626,18 @@ describe("R11.2 · the dock over full-screen 工作台", () => {
   };
   const dockClass = (out: string) => /<div class="(dock[^"]*)">/.exec(out)?.[1];
 
-  it("hidden while full-screen 工作台 is in front on the left monitor; up while peeking; other apps, and its window, keep it", () => {
-    expect(dockClass(desktop({ leftApp: "workbench", wbFull: true }))).toBe("dock auto");
-    expect(dockClass(desktop({ leftApp: "workbench", wbFull: true, dockPeek: true }))).toBe("dock auto peek");
+  it("work mode (full-screen 工作台 in front): exactly two buttons where the dock was, no tiles, no auto-hide; other apps, and its window, keep the plain dock", () => {
+    // work-mode §1 (author 2026-11-16): 「直接把 dock 的位置改成 2 个按钮："开始工作" "退出工作模式"」
+    for (const patch of [{ leftApp: "workbench" as const, wbFull: true }, { leftApp: "workbench" as const, wbFull: true, dockPeek: true }]) {
+      const out = desktop(patch);
+      expect(dockClass(out)).toBeUndefined();
+      const bar = /<div class="work-bar">.*?<\/div>/s.exec(out)![0];
+      expect(bar).toBe(`<div class="work-bar"><button type="button" class="wk-start" data-action="work-start">${escapeHtml(t("work.start"))}</button><button type="button" class="wk-exit" data-action="work-exit">${escapeHtml(t("work.exit"))}</button></div>`);
+      expect(out).not.toContain('data-action="dock"');
+      expect(out).not.toContain('data-action="decoy"');
+      expect(out).not.toContain("settings-tile");
+      expect(out).not.toContain('class="badge"');
+    }
     // playtest-1105 R1: 工作台 in its window keeps the dock.
     expect(dockClass(desktop({ leftApp: "workbench" }))).toBe("dock");
     expect(dockClass(desktop({ leftApp: "msgs", place: { msgs: "left", tingtalk: "right", workbench: "left", browser: "left" } }))).toBe("dock");
@@ -702,17 +711,19 @@ describe("R12.1 · explorer rows keep their height, top-aligned; long text one l
   });
 });
 
-describe("R12.2 · Kuro's pill hides and peeks with the dock over 工作台", () => {
+describe("R12.2 · Kuro's pill hides and peeks with the dock; in work mode it stays out of the bar's way", () => {
   const desk = (patch: Partial<Session>) => {
     const store = day1();
     const h = harness(store);
     Object.assign(h.session, { focus: "left" }, patch);
     return renderDesktop(buildShell(store.getState(), store.getEvents(), h.session, desktopApps, 0, 1)).value;
   };
-  it("the pill is the dock's next sibling, so the dock's auto / peek reach it", () => {
+  it("the pill is the work bar's next sibling in work mode, so the bar's rule hides it", () => {
+    const c = readFileSync(resolve(__dirname, "../src/world/desktop/desktop.css"), "utf8");
+    expect(c).toContain(".work-bar ~ .kpill{transform:translateY(calc(100% + 40px));opacity:0;pointer-events:none}");
     for (const patch of [{ leftApp: "workbench" as const, wbFull: true }, { leftApp: "workbench" as const, wbFull: true, dockPeek: true }]) {
       const out = desk(patch);
-      const at = out.indexOf('<div class="dock auto');
+      const at = out.indexOf('<div class="work-bar');
       const end = out.indexOf('<button type="button" class="kpill');
       expect(at).toBeGreaterThan(-1);
       expect(end).toBeGreaterThan(at);
