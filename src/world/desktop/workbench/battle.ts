@@ -8,6 +8,7 @@
 import type { Task } from "@state/days/tasks";
 import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t } from "@world/i18n";
+import type { ChipId } from "@world/sound/chip";
 
 const S = (key: string, args?: Record<string, string>): string => (hasString(key) ? t(key, args) : key);
 
@@ -143,6 +144,27 @@ export function battleCmd(s: BattleState, cmd: string, at: number): BattleState 
 }
 
 export const battleOver = (s: BattleState): boolean => s.phase === "won" || s.phase === "lost" || s.phase === "ran";
+
+const LINE_CHIP: Readonly<Record<FxKind, ChipId>> = { hit: "hit", shake: "shake", flame: "flame", down: "down", heal: "heal", none: "text" };
+
+/**
+ * battle-sfx: the sound of a change, or null. The end of the fight is its own (won → win, lost →
+ * lose, ran → text); otherwise a new line up (its `at` or its queue changed, in the text phase) sounds
+ * by its fx. Nothing changed, or a menu turned (FIGHT ↔ the moves), is silent here — the press's
+ * cursor is the action's.
+ */
+export function battleChip(prev: BattleState | null, next: BattleState): ChipId | null {
+  if (prev === next) return null;
+  if (next.phase !== prev?.phase) {
+    if (next.phase === "won") return "win";
+    if (next.phase === "lost") return "lose";
+    if (next.phase === "ran") return "text";
+  }
+  if (next.phase !== "text") return null;
+  if (prev && prev.phase === "text" && next.at === prev.at && next.queue === prev.queue) return null;
+  const line = next.queue[0];
+  return line ? LINE_CHIP[line.fx] : null;
+}
 
 // ——— when it is offered, and what a win does ———
 

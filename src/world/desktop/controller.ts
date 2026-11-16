@@ -24,6 +24,7 @@ import type { LookApi } from "@world/room/nav";
 import { soundPlan } from "@world/sound/plan";
 import type { SoundPlayer } from "@world/sound/player";
 import type { BabblePlan } from "@world/sound/babble";
+import type { ChipId } from "@world/sound/chip";
 import { t } from "@world/i18n";
 import { maskBlocks } from "@world/dialogue/mask";
 import { guideNow, guideRefuses, refuseLine } from "@world/loop/guide";
@@ -70,6 +71,8 @@ export interface ActionContext {
    * its stop. Absent (no sound player) = silence.
    */
   readonly babble?: (plan: BabblePlan, gain: number) => () => void;
+  /** battle-sfx: one 8-bit chip sound on the sound player's context. Absent (no sound player) = silence. */
+  readonly chip?: (id: ChipId) => void;
 }
 
 /** The motion layer around each render (polish): see world/motion/dom.ts. */
@@ -491,6 +494,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     hintSeen: deps.hints?.seenNow,
     bookRead: deps.onBookRead,
     ...(sound?.babble ? { babble: (plan: BabblePlan, gain: number) => sound.babble!(plan, gain) } : {}),
+    ...(sound?.chip ? { chip: (id: ChipId) => sound.chip!(id) } : {}),
   };
   const motion: MotionHooks | null = deps.motion ? deps.motion(root, ctx, actions) : null;
   const splat = deps.splat ? deps.splat(root, ctx) : null;

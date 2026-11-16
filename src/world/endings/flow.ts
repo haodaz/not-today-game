@@ -10,7 +10,7 @@ import { PULL_CUT_MS, pullFrom } from "@world/room/splat/pullout";
 import { creditLines, creditsShown, CREDIT_LINE_MS } from "./credits";
 import type { EndingPhase } from "@world/desktop/model";
 import { ENDING_PAGES, nextPage, pageSteps } from "./pages";
-import { BOSS_TICK_MS, bossCheat, bossChoose, bossNext, bossRetry, bossStart, bossTick } from "./boss";
+import { BOSS_TICK_MS, bossCheat, bossChip, bossChoose, bossNext, bossRetry, bossStart, bossTick, type BossBattle } from "./boss";
 
 export interface EndingHost {
   /** Bad: clear `nt_run`, add 1 to the profile's runs, back to the title page. */
@@ -73,6 +73,19 @@ export function startEnding(ctx: ActionContext): void {
   firstPage(ctx, ending);
 }
 
+/** battle-sfx: after the act's own sound, a fall waits this long (never the same instant). */
+export const DOWN_AFTER_MS = 150;
+
+/** battle-sfx: the change's sounds on the chip; `down` a beat after the rest. Absent `chip` = silence. */
+function bossSounds(ctx: ActionContext, prev: BossBattle | null, next: BossBattle): void {
+  const chip = ctx.chip;
+  if (!chip) return;
+  for (const id of bossChip(prev, next)) {
+    if (id === "down") ctx.later(DOWN_AFTER_MS, () => chip("down"));
+    else chip(id);
+  }
+}
+
 /** The fight's clock: ticks while it runs or an act plays; stops to wait for a choice, a line or the end. */
 function runBoss(ctx: ActionContext): void {
   const tick = () => {
@@ -80,6 +93,7 @@ function runBoss(ctx: ActionContext): void {
     if (!b) return;
     const next = bossTick(b, nowOf(ctx));
     ctx.session.boss = next;
+    bossSounds(ctx, b, next);
     if (next.phase === "run" || next.phase === "act") ctx.later(BOSS_TICK_MS, tick);
     ctx.rerender();
   };
@@ -93,6 +107,7 @@ export const bossActions = {
     if (!b) return;
     const next = bossNext(b, nowOf(ctx));
     ctx.session.boss = next;
+    bossSounds(ctx, b, next);
     if (next.phase === "run" && b.phase !== "run") runBoss(ctx);
     ctx.rerender();
   },
@@ -101,7 +116,9 @@ export const bossActions = {
     if (!b || !data.move) return;
     const next = bossChoose(b, data.move, nowOf(ctx));
     if (next === b) return;
+    ctx.chip?.("cursor");
     ctx.session.boss = next;
+    bossSounds(ctx, b, next);
     runBoss(ctx);
     ctx.rerender();
   },

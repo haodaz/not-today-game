@@ -14,6 +14,7 @@ import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t } from "@world/i18n";
 import { PORTRAIT_FILES } from "@world/dialogue/box";
 import { dice } from "@world/desktop/workbench/battle";
+import type { ChipId } from "@world/sound/chip";
 
 const S = (key: string, args?: Record<string, string>): string => (hasString(key) ? t(key, args) : key);
 
@@ -218,6 +219,35 @@ export function bossNext(b: BossBattle, nowMs: number): BossBattle {
 
 /** The fight again from the top (the ending is already decided; losing only costs a retry). */
 export const bossRetry = (b: BossBattle, state: State, nowMs: number): BossBattle => ({ ...bossStart(state, b.ending, nowMs, `${b.seed}+`), phase: "run", clockAt: nowMs, log: "" });
+
+const ACT_CHIP: Readonly<Record<Fx, ChipId>> = { throw: "throw", flip: "flip", strike: "hit", shake: "shake", flash: "flash", heal: "heal", none: "text" };
+
+/**
+ * battle-sfx: the sounds of a change, in order (an act can carry two). A new act sounds by its move's
+ * fx, then `down` if someone (a party member or the boss) fell in it; the boss's second form, Q-Kuro
+ * joining, the win and the loss each have their own; a click that only moves the intro or outro on
+ * is `text`. The flow plays `down` a beat after the rest.
+ */
+export function bossChip(prev: BossBattle | null, next: BossBattle): ChipId[] {
+  if (prev === next) return [];
+  const out: ChipId[] = [];
+  if (next.act && next.act.at !== prev?.act?.at) {
+    out.push(ACT_CHIP[next.act.move.fx]);
+    const fell = (id: string, hp: number) => {
+      const was = id === "boss" ? prev?.boss.hp : prev?.party.find((m) => m.id === id)?.hp;
+      return was !== undefined && was > 0 && hp <= 0;
+    };
+    if (fell("boss", next.boss.hp) || next.party.some((m) => fell(m.id, m.hp))) out.push("down");
+  }
+  if (next.boss.stage === 2 && prev?.boss.stage === 1) out.push("stage2");
+  if (!prev?.joined && next.joined) out.push("join");
+  if (next.phase !== prev?.phase) {
+    if (next.phase === "won") out.push("win");
+    if (next.phase === "lost") out.push("lose");
+  }
+  if (out.length === 0 && prev && (prev.phase === "intro" || prev.phase === "won") && (next.line !== prev.line || next.phase !== prev.phase)) out.push("text");
+  return out;
+}
 
 /** Dev / tests: the boss down at once. */
 export const bossCheat = (b: BossBattle, nowMs: number): BossBattle => resolve({ ...b, boss: { ...b.boss, hp: 0 } }, nowMs);

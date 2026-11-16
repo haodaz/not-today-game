@@ -13,6 +13,7 @@ import { DUCK_MS, type SoundPlan } from "./plan";
 import { musicFiles, sfxFileUrl, soundTable, type Degrade, type SoundTable } from "./table";
 import type { BabblePlan } from "./babble";
 import { babbleContext, playBabble } from "./babble-player";
+import { playChip, type ChipId } from "./chip";
 
 /** The small slice of the Web Audio API used here; the real classes fit, and tests fake it. */
 export interface AParam {
@@ -102,6 +103,11 @@ export interface SoundPlayer {
    * (the table's, or 0 when muted). One at a time: a new one stops the last. Returns its stop.
    */
   babble?(plan: BabblePlan, gain: number): () => void;
+  /**
+   * battle-sfx: one 8-bit chip sound, made live on this context into the master. Unlocks on first
+   * use as `babble` does; nothing when muted or when there is no context.
+   */
+  chip?(id: ChipId): void;
   destroy(): void;
 }
 
@@ -660,6 +666,14 @@ export function createSoundPlayer(deps: PlayerDeps = {}): SoundPlayer {
       } catch {
         return () => {};
       }
+    },
+    chip(id) {
+      if (muted) return;
+      // A click is a gesture: the context may be made here.
+      if (!ctx) player.unlock();
+      const c = babbleContext(ctx);
+      if (!c || !master) return;
+      playChip(c, master, id);
     },
     destroy() {
       stopBabble();

@@ -2820,3 +2820,50 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
   - gacha, link, mines, moles, pacman, pipes, rhythm, snake, sokoban: each "approve is the last event" check now reads the last event other than `graded`. A `graded` event now follows the approval, so `.at(-1)` saw the grade. What each test checks is otherwise unchanged.
 - Replay tests passed unchanged. No snapshot changed: the snapshot folder was diffed before and after and is identical, so there was nothing to refresh.
 - tsc clean; vitest 176 files, 2473 passed.
+## 2026-11-16 · battle-sfx (8-bit sounds for the battles, made on the chip)
+- New `src/world/sound/chip.ts`:
+  - `ChipId` (14 ids) and `CHIP_IDS`.
+  - `CHIP_RECIPES`, kept as data and following the spec's table. Each step is `{ at, kind, wave?, from, to?, ms, gain?, env?, filter?, tremolo? }`.
+    - Shape change: I added an optional `env`, the gain's shape as points spread evenly over the step. The spec's step shape had only `gain`, which cannot express "1 → 0" or "0 → 0.9 → 0".
+    - For noise steps, `from` is 0 and unused.
+  - `CHIP_GAIN = 0.25`.
+  - `playChip(ctx, out, id, gain)`:
+    - Schedules on `currentTime + 10 ms` and starts and stops every source up front, so nothing needs cancelling.
+    - Noise uses a 1 s white-noise buffer, made once per context (WeakMap) and looped.
+    - Tremolo is a square LFO into the step's gain, swinging between full and `1 − depth` (shake: depth 0.7, which gives 1 ↔ 0.3).
+    - A missing method or a throwing context means silence.
+- Recipe choices the spec left open:
+  - stage2's 55 Hz square at gain 0.6.
+  - join = heal, then the shake's tremolo square cut to 150 ms at 180 ms, with no noise tail.
+  - Filter Q: bandpass 1.5, lowpass 0.7.
+  - throw = the bandpass whoosh, then `hit` shifted to 250 ms.
+- `ChipContext` is the babble's `BabbleContext`, and the player reuses `babbleContext(ctx)`. No interface in player.ts needed a new method.
+- player.ts: `SoundPlayer.chip?(id)`. It is a no-op when muted, unlocks on first use like `babble`, and is silent with no context. controller.ts: `ActionContext.chip?`, wired from `sound.chip` next to `babble`.
+- `battleChip(prev, next)` in battle.ts:
+  - A change to won, lost or ran gives win, lose or text.
+  - Otherwise, in the text phase, a new line (its `at` **or its queue** changed) sounds by its fx.
+  - Same object, or a menu turn: null.
+  - Comparing the queue as well as `at` is an addition: two taps in the same ms would otherwise be silent.
+- `bossChip(prev, next)` in boss.ts:
+  - A new act gives its fx's sound, then `down` if someone went from hp > 0 to ≤ 0.
+  - Then stage2, join, and win / lose.
+  - When nothing else sounded and the previous phase was intro or won, a line or phase change is `text`, so a `boss-next` click ticks.
+  - The choose prompt appearing on a tick is silent.
+- Wiring:
+  - board.ts `battle-act`: `cursor` for move / fight / run / back, then `battleChip`. `battle-done`: `cursor`.
+  - flow.ts:
+    - `bossSounds` runs after every clock tick, `boss-next` and `boss-move`.
+    - `boss-move` plays `cursor` first, only when the move was taken.
+    - `down` waits `DOWN_AFTER_MS = 150` through `ctx.later`.
+    - Not wired: retry and cheat.
+- Tests: new `tests/chip.test.ts` (15 cases):
+  - the recipes' table and shapes;
+  - playChip on a fake context: nodes, the noise buffer cached, start before stop, the order;
+  - a missing method, or a context that throws: no throw;
+  - the player's chip: unlock, muted, no Web Audio;
+  - the battleChip and bossChip tables;
+  - the actions with a chip spy: battle move, boss move with the delayed down, boss-next, a clock tick, chip absent.
+- Snapshots: none changed by this job (diffed before and after).
+- tsc clean; vitest 177 files, 2485 passed, **3 failed, unrelated**: `tests/dialogue.test.ts` (one paged-line snapshot) and `tests/scene.test.ts` (two day-1 dream cases).
+  - `content/days/day-01.json` and `content/days/en/day-01.json` were edited at 08:47, during this job and not by Kiro. The dream's last screen now starts at 「后来你按过背面那个小孔。…」, and the line indices the scene tests pin have moved.
+  - I did not refresh that snapshot or edit those tests. Whoever changed the content should confirm the new text and line numbers first.

@@ -18,7 +18,7 @@ import { renderMeeting } from "./meeting";
 import { RENDER_MS } from "./compare";
 import { hasString, t, tr } from "@world/i18n";
 import { push } from "@world/loop/dialogue";
-import { battleCmd, battleOffered, battleOver, battleReward, battleTarget, battleTurn, foeImage, startBattle } from "./battle";
+import { battleChip, battleCmd, battleOffered, battleOver, battleReward, battleTarget, battleTurn, foeImage, startBattle } from "./battle";
 import { fillPlaceholders } from "@world/replies/placeholders";
 import { MINES_DONE_MS, minesFlag, minesOpen, minesRoll, minesStart, type MinesGrid } from "./mines";
 import { PIPES_DONE_MS, pipesRoll, pipesSolve, pipesStart, pipesTurn } from "./pipes";
@@ -709,7 +709,12 @@ const actions: Record<string, ActionHandler> = {
     const b = ctx.session.battle;
     if (!b) return;
     const now = ctx.now?.() ?? Date.now();
-    ctx.session.battle = data.cmd === "move" && data.move ? battleTurn(b, data.move, now) : battleCmd(b, data.cmd ?? "", now);
+    // battle-sfx: a menu press clicks first; then whatever the change sounds like (the new line, the end)
+    if (data.cmd === "move" || data.cmd === "fight" || data.cmd === "run" || data.cmd === "back") ctx.chip?.("cursor");
+    const next = data.cmd === "move" && data.move ? battleTurn(b, data.move, now) : battleCmd(b, data.cmd ?? "", now);
+    ctx.session.battle = next;
+    const sound = battleChip(b, next);
+    if (sound) ctx.chip?.(sound);
     ctx.rerender();
   },
   // the way back: a win pushes the work one state (one cell takes its answer); lost or ran: nothing
@@ -717,6 +722,7 @@ const actions: Record<string, ActionHandler> = {
     const b = ctx.session.battle;
     const c = currentBoard(ctx);
     if (!b || !battleOver(b)) return;
+    ctx.chip?.("cursor");
     if (c && b.phase === "won" && b.key === ideKey(ctx.store.getState().day, c.task)) {
       const reward = battleReward(c.board, stateOf(ctx, c.task, c.board));
       if (reward) ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "fill", slot: reward.slot, card: reward.card } });
