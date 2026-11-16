@@ -16,12 +16,12 @@ html,body{margin:0;background:#2b2e33;font-family:var(--font);color:var(--ink);f
 .monitor{width:1440px;height:900px;background:var(--bg);border-radius:6px;overflow:hidden;position:relative;box-shadow:0 0 0 10px #1a1c1f,0 0 0 11px #3a3d42,0 30px 60px rgba(0,0,0,.6);filter:hue-rotate(var(--tint)) blur(var(--blur))}
 .monitor .os{position:absolute;inset:0;transform:translate(var(--drift-x),var(--drift-y))}
 /* 顶栏 */
-.top .next-item{display:inline-flex;align-items:center;gap:6px;color:var(--ink);font-weight:500;white-space:nowrap;max-width:420px;overflow:hidden;text-overflow:ellipsis}
-.top .next-item i{width:10px;height:10px;border:1.5px solid #555;border-radius:2px;flex:0 0 auto}
-.top{height:28px;box-sizing:border-box;display:flex;align-items:center;gap:18px;padding:0 16px;background:rgba(255,255,255,.85);border-bottom:1px solid var(--line);font-size:12px;color:var(--ink-2);backdrop-filter:blur(8px)}
-.top .brand{font-weight:600;color:var(--ink);letter-spacing:.02em}
-.top .day{margin-left:auto;display:flex;gap:14px;align-items:center}
-.top .kuro-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px rgba(47,163,107,.15)}
+.os > .top .next-item{display:inline-flex;align-items:center;gap:6px;color:var(--ink);font-weight:500;white-space:nowrap;max-width:420px;overflow:hidden;text-overflow:ellipsis}
+.os > .top .next-item i{width:10px;height:10px;border:1.5px solid #555;border-radius:2px;flex:0 0 auto}
+.os > .top{height:28px;box-sizing:border-box;display:flex;align-items:center;gap:18px;padding:0 16px;background:rgba(255,255,255,.85);border-bottom:1px solid var(--line);font-size:12px;color:var(--ink-2);backdrop-filter:blur(8px)}
+.os > .top .brand{font-weight:600;color:var(--ink);letter-spacing:.02em}
+.os > .top .day{margin-left:auto;display:flex;gap:14px;align-items:center}
+.os > .top .kuro-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px rgba(47,163,107,.15)}
 /* dock */
 .dock{position:absolute;left:50%;bottom:0px;transform:translateX(-50%);display:flex;gap:10px;padding:8px 12px;background:rgba(255,255,255,.72);border:1px solid rgba(0,0,0,.06);border-radius:16px 16px 0 0;backdrop-filter:blur(12px);box-shadow:0 8px 30px rgba(0,0,0,.08)}
 .dock .app{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;white-space:nowrap;letter-spacing:-.02em;position:relative;cursor:pointer}
@@ -382,9 +382,9 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .win .bar[data-drag-win]{user-select:none;touch-action:none}
 .win.dragging{z-index:30;opacity:.92}
 /* 调度中心's button in the top bar (and F3). */
-.top .sys-mc{margin-left:10px;display:inline-flex;gap:2px;align-items:center;border:1px solid var(--line);border-radius:6px;background:#fff;padding:3px 6px;cursor:pointer}
-.top .sys-mc i{width:6px;height:5px;border:1px solid var(--ink-2);border-radius:1px}
-.top .sys-mc.on{border-color:var(--accent)}.top .sys-mc.on i{border-color:var(--accent)}
+.os > .top .sys-mc{margin-left:10px;display:inline-flex;gap:2px;align-items:center;border:1px solid var(--line);border-radius:6px;background:#fff;padding:3px 6px;cursor:pointer}
+.os > .top .sys-mc i{width:6px;height:5px;border:1px solid var(--ink-2);border-radius:1px}
+.os > .top .sys-mc.on{border-color:var(--accent)}.os > .top .sys-mc.on i{border-color:var(--accent)}
 /* 调度中心 / Mission Control: over both monitors, the screens on top, the windows spread under it. */
 .mc{position:absolute;inset:0;z-index:60;background:rgba(20,24,30,.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);display:flex;flex-direction:column;align-items:center;padding:24px 40px;gap:28px;box-sizing:border-box}
 .mc-screens{display:flex;gap:24px}
@@ -409,7 +409,7 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .mc-win.dragging{z-index:2;opacity:.9}
 .mc-frame{display:block;width:100%;height:100%;background:#fff}
 /* 关机 next to the clock in the system's own top bar. */
-.top .sys-off{margin-left:10px;border:1px solid var(--line);border-radius:6px;background:#fff;padding:1px 9px;font:inherit;font-size:12px;color:var(--ink-2);cursor:pointer}
+.os > .top .sys-off{margin-left:10px;border:1px solid var(--line);border-radius:6px;background:#fff;padding:1px 9px;font:inherit;font-size:12px;color:var(--ink-2);cursor:pointer}
 .top .sys-off:hover,.top .sys-off:focus-visible{border-color:#c0392b;color:#c0392b}
 .top .sys-off:disabled{opacity:.45;cursor:default;border-color:var(--line);color:var(--ink-3)}
 .kpill.blink{box-shadow:0 0 0 2px rgba(246,166,35,.6),0 0 24px 4px rgba(246,166,35,.3)}
@@ -1453,6 +1453,72 @@ span.cmp-face-btn{cursor:default}
 .ts-act:not(:disabled):hover,.ts-finish:not(:disabled):hover{transform:translateY(1px);filter:brightness(1.05);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -2px 0 rgba(96,64,12,.45),inset 0 0 0 1px rgba(110,78,20,.5),0 1px 2px rgba(0,0,0,.4),0 8px 14px -8px rgba(0,0,0,.75)}
 .ts-offer .wl-cta{border:0;border-radius:3px;background:linear-gradient(180deg,#f6e2a6,#d6ad52 55%,#b88a30);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 0 0 1px rgba(110,78,20,.5),0 2px 3px rgba(0,0,0,.4),0 10px 16px -8px rgba(0,0,0,.7)}
 .ts-offer .wl-cta.ghost{background:var(--ws-paper),linear-gradient(180deg,#fbf7ea,#f1e9d4);box-shadow:inset 0 0 0 1px rgba(60,46,30,.35),0 1px 2px rgba(0,0,0,.3)}
+/* tune stage, interface pass (2026-11-16): days 2–3 are the early, technical end of the slope, so this
+   stage is a console, not paper. Panels are instrument glass with corner brackets; bars carry tick
+   marks; each path card is a module card (a printed pattern per slot, a foil sheen, a status
+   strip); the act button shows its rule: dark and dashed until a card is picked, lit amber after. */
+.ts-title h2{font-style:normal;font-family:var(--mono,ui-monospace,Menlo,monospace);font-weight:800;letter-spacing:.02em;text-shadow:0 0 18px rgba(159,232,240,.55),0 1px 0 rgba(0,0,0,.6)}
+.ts-kick{font-family:var(--mono,ui-monospace,Menlo,monospace)}
+.ts-pbar{height:10px;border:1px solid rgba(159,232,240,.55);border-radius:2px;background:rgba(8,16,24,.6) repeating-linear-gradient(90deg,transparent 0 23px,rgba(159,232,240,.35) 23px 24px)}
+.ts-pbar i{box-shadow:0 0 10px rgba(246,183,60,.8)}
+.ts-node{height:8px;border-width:1px;border-radius:1px;border-color:rgba(159,232,240,.6);background:rgba(8,16,24,.5)}
+.ts-node.set{box-shadow:0 0 8px rgba(246,183,60,.7)}
+.ts-node.cur{outline:1px solid #9FE8F0;outline-offset:3px}
+.ts .ts-goal,.ts .ts-report{border:1px solid rgba(159,232,240,.28);border-radius:3px;background:linear-gradient(180deg,rgba(14,26,36,.82),rgba(10,18,26,.9));-webkit-backdrop-filter:blur(10px) saturate(1.2);backdrop-filter:blur(10px) saturate(1.2);
+  box-shadow:inset 0 1px 0 rgba(159,232,240,.18),0 18px 34px -12px rgba(0,0,0,.7)}
+.ts-goal::before,.ts-report::before,.ts-goal::after,.ts-report::after{content:"";position:absolute;width:14px;height:14px;pointer-events:none;border:2px solid #9FE8F0;opacity:.85}
+.ts-goal::before,.ts-report::before{left:-1px;top:-1px;border-right:0;border-bottom:0}
+.ts-goal::after,.ts-report::after{right:-1px;bottom:-1px;border-left:0;border-top:0}
+.ts-goal-h{font-family:var(--mono,ui-monospace,Menlo,monospace);padding-bottom:8px;border-bottom:1px solid rgba(159,232,240,.2)}
+.ts-engine{background:linear-gradient(90deg,rgba(246,183,60,.22),rgba(246,183,60,.04));border-radius:2px;border-left:3px solid #F6B73C;color:#fff;box-shadow:inset 0 0 0 1px rgba(246,183,60,.25)}
+.ts-eicon{box-shadow:0 0 0 2px rgba(8,16,24,.8),0 0 0 3px rgba(159,232,240,.6),0 0 16px #9FE8F0}
+.ts-sv b{font-family:var(--mono,ui-monospace,Menlo,monospace)}
+.ts-track{height:8px;border-radius:1px;background:rgba(255,255,255,.1) repeating-linear-gradient(90deg,transparent 0 10%,rgba(8,16,24,.9) 10% calc(10% + 1px))}
+.ts-track i{border-radius:1px;mix-blend-mode:screen}
+.ts-fill{box-shadow:0 0 8px rgba(255,255,255,.55)}
+.ts-stat.ok .ts-fill{box-shadow:0 0 10px rgba(110,231,183,.8)}
+.ts-mark{border-radius:0;width:2px;top:-5px;bottom:-5px}
+.ts-mark.reach{box-shadow:0 0 6px #4EA8FF}
+.ts .ts-rdim{border-radius:2px;border-left:2px solid rgba(159,232,240,.35);background:rgba(159,232,240,.05)}
+/* the cartridges */
+.ts-card{border:1px solid #0B121A;border-radius:8px;background:linear-gradient(180deg,#F7F5EF,#ECE9E0);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.7),0 0 0 1px rgba(159,232,240,.25),0 16px 28px -8px rgba(0,0,0,.65)}
+.ts-card::after{content:"";position:absolute;left:14px;right:14px;bottom:9px;height:3px;border-radius:2px;background:repeating-linear-gradient(90deg,rgba(29,33,41,.28) 0 6px,transparent 6px 10px)}
+.ts-card.sel{box-shadow:inset 0 0 0 1px rgba(255,255,255,.7),0 0 0 2px #F6B73C,0 0 26px rgba(246,183,60,.6),0 20px 30px -8px rgba(0,0,0,.7)}
+.ts-card.sel::after{background:linear-gradient(90deg,#F6B73C,#F28A1E);box-shadow:0 0 8px rgba(246,183,60,.9)}
+.ts-card.read.on{box-shadow:inset 0 0 0 1px rgba(255,255,255,.7),0 0 0 2px #6EE7B7,0 0 22px rgba(110,231,183,.45)}
+.ts-card.read.on::after{background:#13A37A}
+.ts-card.hidden{background:repeating-linear-gradient(135deg,#C9CDD2 0 10px,#BFC4CA 10px 20px)}
+.ts-cart{border-bottom:1px solid #0B121A;overflow:hidden}
+.ts-cart::before{content:"";position:absolute;inset:0;pointer-events:none;background:
+  linear-gradient(112deg,transparent 38%,rgba(255,255,255,.42) 47%,rgba(255,255,255,.08) 52%,transparent 60%),
+  repeating-linear-gradient(0deg,rgba(255,255,255,.2) 0 1px,transparent 1px 16px),
+  repeating-linear-gradient(90deg,rgba(255,255,255,.2) 0 1px,transparent 1px 16px),
+  radial-gradient(90% 120% at 0% 100%,rgba(11,18,26,.35),transparent 60%)}
+.ts-cart.k-1::before{background:
+  linear-gradient(112deg,transparent 38%,rgba(255,255,255,.42) 47%,rgba(255,255,255,.08) 52%,transparent 60%),
+  repeating-radial-gradient(circle at 28% 62%,rgba(255,255,255,.26) 0 1px,transparent 1px 13px),
+  radial-gradient(90% 120% at 0% 100%,rgba(11,18,26,.35),transparent 60%)}
+.ts-cart.k-2::before{background:
+  linear-gradient(112deg,transparent 38%,rgba(255,255,255,.42) 47%,rgba(255,255,255,.08) 52%,transparent 60%),
+  repeating-linear-gradient(135deg,rgba(255,255,255,.22) 0 1px,transparent 1px 11px),
+  repeating-linear-gradient(45deg,rgba(11,18,26,.12) 0 1px,transparent 1px 22px),
+  radial-gradient(90% 120% at 0% 100%,rgba(11,18,26,.35),transparent 60%)}
+.ts-cart.kuro::before{display:none}
+.ts-cglyph{font-style:normal;font-family:var(--mono,ui-monospace,Menlo,monospace);font-size:44px;color:transparent;-webkit-text-stroke:1.5px rgba(11,18,26,.55);right:14px;bottom:6px}
+.ts-stamp{left:auto;right:12px;top:12px;transform:none;border-radius:2px;background:#0B121A;color:#6EE7B7;font-family:var(--mono,ui-monospace,Menlo,monospace);box-shadow:0 0 0 1px rgba(110,231,183,.6),0 0 12px rgba(110,231,183,.5)}
+.ts-bi{border-radius:5px;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -2px 0 rgba(0,0,0,.2),0 1px 2px rgba(0,0,0,.3)}
+.ts-bonus b{font-family:var(--mono,ui-monospace,Menlo,monospace)}
+/* the act button: its rule is visible (two extra classes to sit above the per-day slope rules) */
+.work-layer .work-stage .ts .ts-act,.work-layer .work-stage .ts .ts-finish{border-radius:3px;border:1px solid rgba(255,236,190,.9);background:linear-gradient(180deg,#FFD979,#F6A62E 60%,#E8861A);color:#1d1406;text-shadow:0 1px 0 rgba(255,240,200,.6);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -3px 0 rgba(120,60,0,.35),0 0 0 4px rgba(246,183,60,.18),0 0 28px rgba(246,183,60,.7),0 10px 18px -6px rgba(0,0,0,.7);animation:ts-armed 1.8s ease-in-out infinite}
+.work-layer .work-stage .ts .ts-finish{border-color:rgba(210,255,236,.9);background:linear-gradient(180deg,#B9F5DD,#52C79C 60%,#2E9C78);color:#06261b;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -3px 0 rgba(0,70,45,.35),0 0 0 4px rgba(110,231,183,.18),0 0 28px rgba(110,231,183,.6),0 10px 18px -6px rgba(0,0,0,.7)}
+.work-layer .work-stage .ts .ts-act:disabled,.work-layer .work-stage .ts .ts-finish:disabled{animation:none;border:1px dashed rgba(159,232,240,.45);background:rgba(10,18,26,.72);color:rgba(232,238,242,.42);text-shadow:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.4);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.work-layer .work-stage .ts .ts-act:not(:disabled):hover,.work-layer .work-stage .ts .ts-finish:not(:disabled):hover{transform:translateY(1px);filter:brightness(1.07)}
+@keyframes ts-armed{0%,100%{filter:brightness(1)}50%{filter:brightness(1.12)}}
+.ts.still .ts-act,.ts.still .ts-finish{animation:none}
+@media (prefers-reduced-motion:reduce){.ts .ts-act,.ts .ts-finish{animation:none}}
 .ts-report{position:relative;z-index:1;align-self:start;margin:6px 24px 0 0;padding:14px 16px;background:rgba(20,26,36,.88);border:1.5px solid rgba(255,255,255,.25);border-radius:12px;color:#fff;box-shadow:0 12px 30px rgba(0,0,0,.35);max-height:100%;overflow:auto;font-size:12.5px}
 .ts-rsum{margin:0 0 10px;line-height:1.6;color:#E8EEF2}
 .ts-rdims{display:flex;flex-direction:column;gap:8px}
@@ -1742,6 +1808,61 @@ body:has(.stage[data-day="10"]) .cs-label{color:#8f7410;border-bottom-color:rgba
 .sk .ts-act{background:#8F7A66;color:#F9F6F2;border:0;box-shadow:none;border-radius:6px;letter-spacing:.2em}
 .sk .wl-cta.ghost{border-color:#8F7A66;color:#8F7A66}
 .sk-cheat{position:absolute;width:1px;height:1px;opacity:0;pointer-events:auto;border:0;padding:0}
+/* approval chain, material pass (2026-11-16): the same 2048, given things to be made of. The board is
+   a walnut tray with felt wells; the tiles are thick tokens (lit top edge, a darker foot); the ladder
+   is the form's routing slip, one ruled line per desk, and each desk the form has reached carries a
+   red ring stamp; the two desks above the seal are not on the paper any more (the slip goes dark and
+   wet up there). No signs anywhere: this is day 13. */
+.sk{background:radial-gradient(120% 95% at 62% 46%,#F8F3E6 0%,#EFE6D2 62%,#DDD0B7 100%)}
+.sk-top h2{color:#5B4A3C;text-shadow:0 1px 0 rgba(255,255,255,.7)}
+.sk-score{font-family:var(--mono,ui-monospace,Menlo,monospace);letter-spacing:.04em}
+.sk-score b{font-family:inherit;letter-spacing:.02em;color:#5B4A3C}
+.sk-ladder{align-self:end;gap:0;padding:0;overflow:hidden;border-radius:3px;background:
+  linear-gradient(90deg,transparent 53px,rgba(180,50,30,.22) 53px,rgba(180,50,30,.22) 54px,transparent 54px),
+  linear-gradient(#FCF8EC,#F4EDD9);
+  box-shadow:0 1px 0 rgba(255,255,255,.8) inset,0 1px 2px rgba(60,40,20,.25),0 14px 26px -14px rgba(60,40,20,.5);transform:rotate(-.35deg)}
+.sk-rank{position:relative;flex:none;grid-template-columns:36px 1fr auto;gap:12px;padding:4px 14px 4px 9px;border-radius:0;border-top:1px solid rgba(119,110,101,.2);opacity:1}
+.sk-rank > *{opacity:.34;filter:saturate(.3)}
+.sk-rank.seen{background:none}
+.sk-rank.seen > *{opacity:1;filter:none}
+.sk-rank img{width:36px;height:36px;border-radius:0}
+.sk-rn{font-size:13px;letter-spacing:.08em;color:#4E4138}
+.sk-rank small{color:#8F7A66}
+/* reached: a ring stamp over the number, each one pressed at its own angle */
+.sk-rank.seen::after{content:"";position:absolute;right:50px;top:50%;width:22px;height:22px;margin-top:-11px;border-radius:50%;
+  border:1.5px solid rgba(190,40,28,.75);box-shadow:inset 0 0 0 2.5px rgba(252,248,236,0),inset 0 0 0 3.5px rgba(190,40,28,.45);
+  transform:rotate(-14deg) scale(1.02,.96);mix-blend-mode:multiply;
+  -webkit-mask:radial-gradient(circle at 30% 28%,#000 0 62%,rgba(0,0,0,.45) 78%,#000 100%);mask:radial-gradient(circle at 30% 28%,#000 0 62%,rgba(0,0,0,.45) 78%,#000 100%)}
+.sk-rank.seen:nth-child(3n)::after{transform:rotate(9deg) translate(2px,-1px)}
+.sk-rank.seen:nth-child(3n+1)::after{transform:rotate(-27deg) translate(-2px,1px) scale(.96)}
+/* the seal: the one line on the slip printed in gold */
+.sk-rank.top{box-shadow:none;background:linear-gradient(90deg,rgba(237,194,46,.1),rgba(237,194,46,.34) 60%,rgba(237,194,46,.1));border-top-color:rgba(160,120,20,.5);border-bottom:1px solid rgba(160,120,20,.5)}
+.sk-rank.top > *{opacity:.8;filter:none}
+.sk-rank.top.lit{background:linear-gradient(90deg,#D9A91C,#F1CE4B 55%,#D9A91C)}
+.sk-rank.top.lit > *{opacity:1}
+/* above the seal */
+.sk-rank.egg{background:#1E1513;border-top-color:rgba(0,0,0,.6)}
+.sk-rank.egg + .sk-rank.egg{background:linear-gradient(#0E0A0A,#1E1513)}
+.sk-rank.egg > *{opacity:.5;filter:none}
+.sk-rank.egg .sk-rn,.sk-rank.egg small{color:#B9A79A}
+.sk-rank.egg img{background:#2A1F1C;border-radius:50% 46% 52% 44%}
+.sk-rank.egg::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(60% 120% at 22% 0%,rgba(150,60,60,.28),transparent 70%),linear-gradient(100deg,transparent 46%,rgba(255,235,225,.1) 50%,transparent 55%)}
+/* the tray */
+.sk-grid{padding:14px;border-radius:12px;background:radial-gradient(130% 130% at 30% 20%,#5A4334,#3A2A22 70%);
+  box-shadow:inset 0 1px 0 rgba(255,220,180,.22),inset 0 -2px 0 rgba(0,0,0,.4),0 2px 0 #2A1D17,0 22px 34px -16px rgba(50,30,15,.65)}
+.sk-cell{border-radius:8px;background:#2F2620;box-shadow:inset 0 3px 6px rgba(0,0,0,.6),inset 0 -1px 0 rgba(255,220,180,.09)}
+.sk-cell.on{box-shadow:inset 0 2px 0 rgba(255,255,255,.55),inset 0 -6px 0 rgba(70,35,10,.2),inset 0 0 0 1px rgba(70,35,10,.12),0 3px 4px rgba(0,0,0,.5)}
+.sk-cell.on img{height:calc(100% - 5px)}
+.sk-cell.top{box-shadow:inset 0 2px 0 rgba(255,255,255,.6),inset 0 -6px 0 rgba(120,80,0,.3),0 0 0 3px #EDC22E,0 0 26px rgba(237,194,46,.65)}
+.sk-cell.egg{background:#1E1513;box-shadow:inset 0 2px 0 rgba(255,220,210,.14),inset 0 -6px 0 rgba(0,0,0,.5),0 3px 4px rgba(0,0,0,.5)}
+/* the keys */
+.sk .sk-arrow{border-radius:8px;background:linear-gradient(#6A5444,#4B3A2F);color:#F3E9D8;text-shadow:0 -1px 0 rgba(0,0,0,.5);
+  box-shadow:inset 0 1px 0 rgba(255,225,190,.3),0 3px 0 #2A1D17,0 5px 8px rgba(40,25,10,.35);transition:transform 60ms,box-shadow 60ms}
+.sk .sk-arrow:hover:not(:disabled){background:linear-gradient(#77604E,#554236)}
+.sk .sk-arrow:active:not(:disabled){transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,225,190,.2),0 1px 0 #2A1D17}
+.sk .sk-arrow:disabled{background:#CDC1B4;color:#F3E9D8;box-shadow:0 2px 0 #B3A596;text-shadow:none}
+.sk-pad{gap:9px 7px}
+.sk-done{border-radius:3px;background:none;color:#BE281C;border:3px double #BE281C;font-size:18px;transform:rotate(-4deg);mix-blend-mode:multiply}
 /* the settlement (author 2026-11-12): full screen, two halves — left the game's ending, right the world
    as it now is (the page, the backend, the sheet, the approval flow), changed by that play */
 .sl{position:relative;flex:1;min-height:0;margin:-16px -26px -20px;display:grid;grid-template-columns:minmax(360px,36%) 1fr;background:#EFEAE0;color:#1d2129;overflow:hidden}
