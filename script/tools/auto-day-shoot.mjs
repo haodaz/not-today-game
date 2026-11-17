@@ -172,7 +172,8 @@ const toDesktop = async () => { for (let n = 0; n < 8 && (await has("[data-actio
   }
   if (!(await has("[data-action=screen]"))) { note(`   (screen not entered: stage=${await ev("document.querySelector('.stage')?.className")} acts=${await ev("JSON.stringify([...new Set([...document.querySelectorAll('[data-action]')].filter(__vis).map(e=>e.dataset.action+':'+(e.dataset.view||'')))])")} · ${(await text()).slice(0, 100)}`); await shotStep("screen-refused"); }
   if (await has("[data-action=onboard-skip]")) { note("   (coach marks: skipped)"); await sel("[data-action=onboard-skip]", 0.6); } };
-const toTingTalk = async () => { await toRoom(); await sel("[data-action=view][data-view=desktop][data-screen=right]", 2); if (await has("[data-action=onboard-skip]")) await sel("[data-action=onboard-skip]", 0.6);
+const toTingTalk = async () => {
+  await unfull(); await toRoom(); await sel("[data-action=view][data-view=desktop][data-screen=right]", 2); if (await has("[data-action=onboard-skip]")) await sel("[data-action=onboard-skip]", 0.6);
   // playtest-1105 R1: nothing is open on a first visit; 汀汀 opens from the dock (the left monitor's).
   if (!(await has("[data-action=conv]"))) { await sel("[data-action=view][data-view=desktop][data-screen=left]", 1.5); if (await has("[data-action=onboard-skip]")) await sel("[data-action=onboard-skip]", 0.6); await sel("[data-action=dock][data-app=tingtalk]", 1.5); }
   await ev(HELPERS);
@@ -238,8 +239,12 @@ const toWorkbench = async () => {
 const lastEvents = () => ev(`(()=>{ const t = localStorage.getItem('nt_run') || ''; return (t.match(/"kind":"[a-zA-Z]+"(,"[a-zA-Z]+":"[^"]*")?/g) || []).slice(-4).join(' ').replace(/"kind":/g,''); })()`);
 // Open a card's source (day graph): a conversation, a file in 文件, or a Vivi page from its bubble; a call is already over.
 let currentTaskId = null;
+// work-mode (2026-11-16): the workbench opened from the dock fills the screen and hides the dock, so a source
+// opened while it is full lands behind it ("files: c-v17 not listed · visible []"); un-full it first.
+const unfull = async () => { if (await has(".win.full[data-win=workbench]")) { await sel("[data-action=win-full]", 0.8); note("   (un-fulled the workbench to reach a source)"); } };
 const gather = async (card) => {
   const from = card.from; if (!from || from.call) return true;
+  await unfull();
   // A meeting card is heard in the board's own meeting: open the task page, let it play (fast=1: 0.3 s a line).
   if (from.meeting) { await toWorkbench(); await goHome(); await sel(`[data-action=wb-nav][data-page='task:${currentTaskId}']`, 1.2); for (let i = 0; i < 4 && !(await has("[data-action=meeting-play]")); i++) await sleep(0.5); await sel("[data-action=meeting-play]", 0.3); await sleep(9); return true; }
   if (from.conv) { if ((await ev("JSON.stringify(__choices())").then(JSON.parse)).length) await settle(); await toTingTalk(); let ok = await sel(`[data-action=conv][data-conv=${from.conv}]`, 1.2);
