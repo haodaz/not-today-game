@@ -386,7 +386,7 @@
               },
               {
                 "who": "me",
-                "text": "The minutes. Lao Zhou wants the format, not the content."
+                "text": "The minutes. Lao Zhou only checks the format, not what's in it."
               }
             ]
           },
@@ -395,7 +395,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Depart: to leave. Licence to depart. That is what Lao Zhou said."
+                "text": "The code is 'depart', to leave. It's the English word Lao Zhou said before the meeting broke up."
               }
             ]
           },
@@ -404,7 +404,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Say the name of the one we are inviting correctly. Say it wrong, and something else comes."
+                "text": "The one we're inviting: get the name right. Say it wrong and something else comes."
               }
             ]
           },
@@ -413,7 +413,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "'No need to say anything at the end, just leave.' Leave without that line and it does not go."
+                "text": "'No need to say anything at the end, just leave.' Lao Zhou means that line has to be said. Leave without it and it doesn't go."
               }
             ]
           },
@@ -422,7 +422,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "'Skip the roll call.' Everyone has to report. It needs to know who is here."
+                "text": "'Skip the roll call.' No. Everyone reports. It needs to know who's here."
               }
             ]
           },
@@ -431,7 +431,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "'End time to be decided.' I filled that in. I am in no hurry."
+                "text": "'End time to be decided' is mine. I'm in no hurry."
               }
             ]
           },
@@ -440,7 +440,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Sent to the group. Lao Zhou will say 'very good'."
+                "text": "Sent to the group. Lao Zhou will reply 'very good'."
               }
             ]
           }
