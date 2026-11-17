@@ -373,7 +373,18 @@ scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnviron
 const camera = new THREE.PerspectiveCamera(47, 16 / 9, 0.05, 400);
 camera.rotation.order = "YXZ";
 
-const wallMap = wallTexture(), floorMap = woodTexture("#ad8a62", "70,44,20", 3, 16), woodMap = woodTexture("#c2935a", "110,70,30", 9), pineMap = woodTexture("#cfa76e", "120,80,36", 14);
+const wallMap = wallTexture(), floorMap = woodTexture("#ad8a62", "70,44,20", 3, 16), woodMap = woodTexture("#c79f6c", "110,70,30", 9), pineMap = woodTexture("#cfa76e", "120,80,36", 14);
+// How shiny a surface is, as a picture (green = roughness): no real surface is evenly shiny. Varnish is glossier in
+// streaks along the grain, duller in patches where it has been wiped, handled and leant on for years.
+function sheenTexture(lo, hi, seed, streak = 1) {
+  const [c, g] = canvas(512, 512), R = rng(seed), v = (t) => { const k = Math.round((lo + (hi - lo) * t) * 255); return `rgb(${k},${k},${k})`; };
+  g.fillStyle = v(0.5); g.fillRect(0, 0, 512, 512);
+  for (let i = 0; i < 70; i++) { const x = R() * 512, y = R() * 512, r = 30 + R() * 120, t = R(), gr = g.createRadialGradient(x, y, 0, x, y, r); const k = Math.round((lo + (hi - lo) * t) * 255); gr.addColorStop(0, `rgba(${k},${k},${k},.55)`); gr.addColorStop(1, `rgba(${k},${k},${k},0)`); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); }
+  if (streak) for (let i = 0; i < 260; i++) { g.strokeStyle = v(R()); g.globalAlpha = 0.18; g.lineWidth = 1 + R() * 4; const y = R() * 512; g.beginPath(); g.moveTo(0, y); g.lineTo(512, y + (R() - 0.5) * 8); g.stroke(); }
+  g.globalAlpha = 1;
+  const t = tex(c); t.colorSpace = THREE.NoColorSpace; return t;
+}
+const woodSheen = sheenTexture(0.3, 0.72, 5), floorSheen = sheenTexture(0.36, 0.8, 6), softSheen = sheenTexture(0.42, 0.7, 7, 0);
 const curtainMap = fabricTexture("#8f9296", 31), blanketMap = fabricTexture("#8b8d90", 41), seatMap = fabricTexture("#232427", 51), cardMap = cardboardTexture();
 blanketMap.repeat.set(4, 4);
 curtainMap.repeat.set(3, 2);
@@ -386,15 +397,15 @@ const weaveMap = (() => { // plain cotton: threads over and under, a little unev
 const mat = {
   wall: M({ map: wallMap, bumpMap: wallMap, bumpScale: 0.6, roughness: 0.94 }, 1),
   ceiling: M({ color: 0xe9e8e3, roughness: 0.96 }, 1),
-  floor: M({ map: floorMap, bumpMap: floorMap, bumpScale: 0.8, roughness: 0.58 }, 2),
-  wood: M({ map: woodMap, bumpMap: woodMap, bumpScale: 0.5, roughness: 0.48 }),
-  pine: M({ map: pineMap, bumpMap: pineMap, bumpScale: 0.5, roughness: 0.6 }),
+  floor: M({ map: floorMap, bumpMap: floorMap, bumpScale: 0.8, roughness: 1, roughnessMap: floorSheen }, 2),
+  wood: M({ map: woodMap, bumpMap: woodMap, bumpScale: 0.5, roughness: 1, roughnessMap: woodSheen }),
+  pine: M({ map: pineMap, bumpMap: pineMap, bumpScale: 0.5, roughness: 1, roughnessMap: woodSheen }),
   skirting: M({ color: 0xb79466, roughness: 0.6 }),
   black: M({ color: 0x17181a, roughness: 0.55 }),
   rubber: M({ color: 0x101112, roughness: 0.9 }),
-  blackGloss: M({ color: 0x08090a, roughness: 0.18, metalness: 0.1 }),
+  blackGloss: M({ color: 0x08090a, roughness: 0.6, roughnessMap: softSheen, metalness: 0.1 }), // gloss plastic picks up smears
   metal: M({ color: 0x1b1c1e, roughness: 0.35, metalness: 0.85 }),
-  alu: M({ color: 0xc9cbce, roughness: 0.32, metalness: 0.9 }),
+  alu: M({ color: 0xc9cbce, roughness: 1, roughnessMap: softSheen, metalness: 0.9 }), // brushed and fingered, not a mirror
   silver: M({ color: 0xb9bcc0, roughness: 0.45, metalness: 0.55 }),
   pvc: M({ color: 0xf0f0ec, roughness: 0.4 }),
   cream: M({ color: 0xe7dfc8, roughness: 0.45 }),
@@ -729,8 +740,8 @@ const CARTON = G(0.46, 0, Z0 + 0.95, () => {
 // ================= bed =================
 const BED = { x: X1 - 0.5, w: 0.95, z0: Z0 + 0.3, len: 1.95 };
 const bz = BED.z0 + BED.len / 2;
-const bedMap = woodTexture("#c68a49", "105,58,18", 17);
-const bedWood = M({ map: bedMap, bumpMap: bedMap, bumpScale: 0.5, roughness: 0.55 });
+const bedMap = woodTexture("#c4935c", "105,58,18", 17);
+const bedWood = M({ map: bedMap, bumpMap: bedMap, bumpScale: 0.5, roughness: 1, roughnessMap: woodSheen });
 { // the frame: square posts, a rail down each side, two rails across the foot, the boards the mattress lies on
   const hw = BED.w / 2 + 0.03, zf = BED.z0 + BED.len + 0.035;
   for (const k of [-1, 1]) {
@@ -2265,7 +2276,7 @@ scene.add(lampGlow);
 const ceil = new THREE.SpotLight(0xfff0dc, 0, 7, 1.38, 0.7, 1.3);
 ceil.position.set(0.1, ROOM.h - 0.09, 0.1);
 ceil.target.position.set(0.1, 0, 0.1);
-ceil.castShadow = true;
+ceil.castShadow = false; // its shadow map drew a hard line across every wall at night; the contact shading under things is enough for a ceiling light
 ceil.shadow.mapSize.set(new URLSearchParams(location.search).get("low") === "1" ? 1024 : 2048, new URLSearchParams(location.search).get("low") === "1" ? 1024 : 2048);
 ceil.shadow.bias = -0.0004;
 ceil.shadow.radius = 5;
