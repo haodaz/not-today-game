@@ -1081,6 +1081,26 @@ OBJ.tape = G(DX + 0.47, top, DZ - 0.07, () => {
   box(0.006, 0.004, 0.016, mat.cream, -0.17, 0.004, 0.21, { r: 0.0015, ry: 0.4 });
   for (const [x, z, rz] of [[-0.12, 0.26, 0.5], [-0.215, 0.235, -0.4]]) { tube([[-0.17, 0.003, 0.215], [(-0.17 + x) / 2 + 0.01, 0.003, (0.215 + z) / 2 + 0.01], [x, 0.006, z]], 0.0009, mat.cream, { seg: 14 }); ball(0.0072, mat.cream, x, 0.0066, z, { s: [1, 0.72, 1] }); cyl(0.0056, 0.002, M({ color: 0x8b8e92, roughness: 0.4, metalness: 0.7 }), x, 0.0118, z, { seg: 16 }); }
 }, { ry: 0.12, float: 0.22 });
+// After an ending, and only then, a walkman sits left front by the cup (content/desk.json `walkman`): clicking it
+// plays the theme song. Its own small build, so its reels can turn; never there during a run.
+const WALKMAN = { g: null, reels: [], playing: false };
+WALKMAN.g = G(DX - 0.36, top, DZ + 0.2, () => {
+  const body = M({ color: 0xd4d3cd, roughness: 0.5 }), door = M({ color: 0xc4c3bd, roughness: 0.45 });
+  slab(RR(0.09, 0.118, 0.007), 0.026, body, 0, 0.002, 0, 0.002);
+  slab(RR(0.074, 0.056, 0.004), 0.0003, door, 0, 0.0302, 0.008, 0.0001);
+  box(0.06, 0.0004, 0.038, M({ color: 0xe9e6dc, roughness: 0.7 }), 0, 0.0309, 0.008, { cast: false, noEdge: true });
+  for (const [k, r] of [[-1, 0.0105], [1, 0.0105]]) {
+    cyl(r, 0.0006, M({ color: 0x2a1c14, roughness: 0.35 }), k * 0.0168, 0.0313, 0.0125, { cast: false, seg: 28 });
+    WALKMAN.reels.push(G(k * 0.0168, 0.0316, 0.0125, () => { // the hub and its six teeth turn together
+      cyl(0.0056, 0.0008, mat.pvc, 0, 0, 0, { cast: false, seg: 20 });
+      for (let t = 0; t < 6; t++) box(0.0012, 0.001, 0.0026, mat.pvc, Math.cos(t * 1.047) * 0.0036, 0.0003, Math.sin(t * 1.047) * 0.0036, { ry: -t * 1.047 + Math.PI / 2, cast: false, noEdge: true });
+    }));
+  }
+  slab(RR(0.062, 0.04, 0.003), 0.0006, M({ color: 0x20262a, roughness: 0.04, transparent: true, opacity: 0.28, depthWrite: false }, 3), 0, 0.0326, 0.008, 0.0002, { cast: false });
+  for (let i = 0; i < 5; i++) box(0.0125, 0.007, 0.004, i === 4 ? mat.red : door, -0.03 + i * 0.015, 0.02, 0.0612, { r: 0.001 });
+  cyl(0.009, 0.004, M({ color: 0x55585c, roughness: 0.5 }), 0.0462, 0.016, -0.03, { rz: Math.PI / 2, seg: 24 });
+}, { ry: -0.2, float: 0.22 });
+WALKMAN.g.visible = false;
 // 5. the phone card: thin plastic with rounded corners, a landscape in blue ink wash, a gold chip with its eight contacts
 OBJ.iccard = G(DX + 0.08, top, DZ + 0.28, () => {
   const t = face(512, 320, "#eef2f3", (g, w, h) => {
@@ -2622,6 +2642,7 @@ function frame(now) {
     }
     rainGeo.attributes.position.needsUpdate = true;
   }
+  if (WALKMAN.playing) for (const r of WALKMAN.reels) r.rotation.y -= dt * 2.2;
   updateFar(now / 1000, dt);
   composer.render();
   if (++framesDrawn === 3) { try { window.parent !== window && window.parent.postMessage({ source: "nt-room", type: "ready" }, "*"); } catch {} if (q.get("wake") === "1") setTimeout(wake, 0); /* ?wake=1: the flash starts by itself, after ready */ document.getElementById("loading").style.opacity = "0"; perf.first = (now - T0) / 1000; perf.t = now; perf.n = 0; }
@@ -2664,6 +2685,7 @@ const PLACES = {
 const _hp = new THREE.Vector3();
 function pickAt() {
   for (const id in OBJ) if (OBJ[id].visible && ray.intersectObject(OBJ[id], true).length) return id;
+  if (WALKMAN.g.visible && ray.intersectObject(WALKMAN.g, true).length) return "walkman";
   if (ray.intersectObject(DESKPHONE, true).length) return "deskphone";
   if (PRINTS.visible && ray.intersectObject(PRINTS, true).length) return "prints";
   if (ray.intersectObject(MON[0], true).length) return "screen-left";
@@ -2679,7 +2701,7 @@ const aim = (e) => { const r = canvasEl.getBoundingClientRect(); ray.setFromCame
 const _lb = new THREE.Box3(), _lv = new THREE.Vector3();
 /** Where a named thing is in the picture right now: [x, y, w, h] as fractions of the frame (y down), or null if it is not in view. */
 function locate(id) {
-  const o = OBJ[id] ?? { deskphone: DESKPHONE, prints: PRINTS, "screen-left": MON[0].children[5], "screen-right": MON[1].children[5], mug: COFFEE.inner, lamp: SHADE, switch: SWITCH }[id];
+  const o = OBJ[id] ?? { walkman: WALKMAN.g, deskphone: DESKPHONE, prints: PRINTS, "screen-left": MON[0].children[5], "screen-right": MON[1].children[5], mug: COFFEE.inner, lamp: SHADE, switch: SWITCH }[id];
   if (o) { if (!o.visible || (o.parent && !o.parent.visible)) return null; _lb.setFromObject(o); } else if (PLACES[id]) _lb.copy(PLACES[id]); else return null;
   let x0 = 1, y0 = 1, x1 = 0, y1 = 0, seen = 0;
   camera.updateMatrixWorld();
@@ -2842,6 +2864,7 @@ function command(m) {
   if (m.objects !== undefined) { state.objects = Array.isArray(m.objects) ? m.objects.map(String) : null; applyDay(); }
   if (m.pause != null) renderer.setAnimationLoop(m.pause ? null : frame); // a frame the game has hidden should not go on drawing
   if (m.prints != null) PRINTS.visible = !!m.prints;
+  if (m.walkman != null) { WALKMAN.g.visible = !!m.walkman; WALKMAN.playing = m.walkman === "playing"; } // true / "stopped" = there, still; "playing" = there, reels turning; false = not there
   if (m.chick != null && m.chick !== CHICK_FACE.name) CHICK_FACE.paint(String(m.chick));
   if (m.locate) { const rects = {}; for (const id of m.locate) rects[id] = locate(id); try { window.parent.postMessage({ source: "nt-room", type: "where", rects, face: state.face, spot: state.desk ? state.spot : null, moving: !!state.turn || Math.abs(state.deskK - (state.desk ? 1 : 0)) > 0.01 }, "*"); } catch {} }
   if (m.far != null) FAR.to = Math.max(0, Math.min(1, Number(m.far)));
