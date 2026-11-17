@@ -843,10 +843,7 @@ G(DOOR.x1 + 0.55, 2.25, Z1, () => { // the consumer unit, high on the wall
   box(0.26, 0.16, 0.004, M({ color: 0xd9dde0, roughness: 0.3, transparent: true, opacity: 0.7 }, 3), 0, 0, -0.062, { r: 0.002, cast: false });
   for (let i = 0; i < 6; i++) { box(0.016, 0.06, 0.012, M({ color: 0xe6e6e2, roughness: 0.5 }), -0.07 + i * 0.022, 0, -0.056, { cast: false }); box(0.008, 0.016, 0.01, i === 0 ? mat.red : mat.black, -0.07 + i * 0.022, 0.006, -0.064, { cast: false, noEdge: true }); }
 });
-G(X0 + 0.24, 0, Z1 - 0.2, () => { // a takeaway bag in the corner by the door
-  box(0.3, 0.36, 0.14, mat.paper, 0, 0.18, 0);
-  for (const s of [-1, 1]) tube([[-0.07, 0.36, s * 0.06], [-0.05, 0.46, s * 0.055], [0.05, 0.46, s * 0.055], [0.07, 0.36, s * 0.06]], 0.003, mat.paper);
-}, { ry: 0.12, float: 0.3 });
+// (the takeaway bag by the door is built further down, once the kraft paper exists)
 // what collects inside a door: a mat, the outdoor shoes, an umbrella in the corner
 box(0.6, 0.008, 0.38, M({ map: seatMap, bumpMap: seatMap, bumpScale: 1.5, color: 0x9a968c, roughness: 1 }), dx + 0.05, 0.004, Z1 - 0.28, { r: 0.003, cast: false });
 function shoe(x, z, turn, upper) {
@@ -1198,6 +1195,44 @@ const kraft = M({ map: kraftMap, bumpMap: kraftMap, bumpScale: 0.3, roughness: 0
 const sleeveMat = M({ map: ridgeMap, bumpMap: ridgeMap, bumpScale: 2.5, roughness: 0.9, side: THREE.DoubleSide });
 const clear = M({ color: 0xffffff, roughness: 0.04, transparent: true, opacity: 0.2, depthWrite: false, side: THREE.DoubleSide }, 3);
 const F = (color, roughness = 0.6, extra = {}) => M({ color, roughness, ...extra });
+G(X0 + 0.24, 0, Z1 - 0.2, () => { // a takeaway bag in the corner by the door
+  // (author 2026-11-18: 门口的外卖袋子就是一个正方体加2提手) A real one: kraft paper that has been carried — the sides folded in
+  // on their gussets, the front and back pushed out by what was in it, the mouth open and a little crushed, a pinked
+  // edge, twisted paper handles on glued patches (one fallen outward), the slip stapled on, grease come through low down.
+  const W = 0.3, H = 0.36, D = 0.15, R = rng(505), N = 22, K = 72, pos = [], uv = [], idx = [];
+  const ring = (a) => { // a rounded rectangle, by angle → [x, z, which side: 0 front/back, 1 the gusset sides]
+    const c = Math.cos(a), sn = Math.sin(a), k = Math.min(W / 2 / Math.abs(c || 1e-9), D / 2 / Math.abs(sn || 1e-9)); return [c * k, sn * k, Math.abs(c) * k > W / 2 - 0.002 ? 1 : 0]; };
+  for (let i = 0; i <= N; i++) { const v = i / N, y = v * H;
+    for (let k = 0; k <= K; k++) { const a = (k / K) * Math.PI * 2, [x0, z0, side] = ring(a); let x = x0, z = z0;
+      const lean = 0.05 * Math.sin(a * 3 + 1) + 0.03 * Math.sin(a * 7 + v * 5); // carried, set down, not square any more
+      if (side) x -= Math.sign(x) * 0.03 * v * (1 - Math.abs(z0) / (D / 2)) * 1.6; // the gusset folds in, more toward the top
+      else z += Math.sign(z) * (0.014 * Math.sin(Math.PI * Math.min(1, v * 1.25)) * (1 - Math.pow(Math.abs(x0) / (W / 2), 2)) - 0.012 * v * v); // pushed out by the boxes; the mouth drawn in
+      x += lean * 0.012 * v; z += lean * 0.008 * v + 0.004 * Math.sin(v * 9 + a * 2) * v;
+      const top = i === N ? 0.0018 * ((k % 2) ? 1 : -1) + 0.007 * Math.sin(a * 2 + 0.6) : 0; // the pinked edge, not level
+      pos.push(x, y + top, z); uv.push(k / K * 3, v * 1.6); } }
+  for (let i = 0; i < N; i++) for (let k = 0; k < K; k++) { const a = i * (K + 1) + k, b = a + K + 1; idx.push(a, b, a + 1, b, b + 1, a + 1); }
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2)); g.setIndex(idx); g.computeVertexNormals();
+  const shell = M({ map: kraftMap, bumpMap: kraftMap, bumpScale: 0.3, roughness: 0.85 }); shell.side = THREE.DoubleSide; shell.shadowSide = THREE.DoubleSide; /* paper: seen from inside as well, through the open mouth */
+  place(new THREE.Mesh(g, shell), 0, 0, 0, { noEdge: true });
+  box(W - 0.004, 0.003, D - 0.004, kraft, 0, 0.0015, 0, { cast: false, noEdge: true }); // its bottom
+  box(W - 0.1, 0.002, D - 0.05, F(0x1c1814, 1), 0, H * 0.62, 0, { cast: false, noEdge: true }); // the dark inside it
+  box(0.15, 0.045, 0.085, M({ color: 0xf2f0ea, roughness: 0.6 }), 0, H * 0.66, 0.004, { r: 0.008, cast: false, rz: 0.05 }); // the lid of the box that is still in it
+  for (const k of [-1, 1]) cyl(0.0028, 0.2, M({ color: 0xcdb48a, roughness: 0.8 }), 0.1 + k * 0.006, H * 0.78, -0.02, { rz: -0.35, rx: 0.2 * k, cast: false, noEdge: true, seg: 6 }); // chopsticks, not taken out
+  // handles: twisted paper cord. The back one stands; the front one has fallen forward over the edge.
+  const cord = M({ color: 0xb08a58, roughness: 0.95 });
+  tube([[-0.07, H - 0.03, -D / 2 + 0.016], [-0.066, H + 0.03, -D / 2 + 0.02], [-0.04, H + 0.095, -D / 2 + 0.03], [0.02, H + 0.1, -D / 2 + 0.034], [0.064, H + 0.04, -D / 2 + 0.022], [0.07, H - 0.03, -D / 2 + 0.016]], 0.0032, cord);
+  tube([[-0.07, H - 0.03, D / 2 - 0.016], [-0.072, H + 0.012, D / 2 + 0.004], [-0.05, H + 0.01, D / 2 + 0.06], [0.01, H - 0.02, D / 2 + 0.085], [0.06, H - 0.005, D / 2 + 0.05], [0.07, H - 0.03, D / 2 - 0.016]], 0.0032, cord);
+  for (const sz of [-1, 1]) box(0.19, 0.03, 0.0012, kraft, 0, H - 0.03, sz * (D / 2 - 0.014), { cast: false, noEdge: true }); // the patches the cords are glued under
+  // on the front: the slip, stapled by one corner and curling; the shop's stamp; grease
+  const slip = face(96, 150, "#f7f6f1", (c) => { c.fillStyle = "#2b2b2b"; c.fillRect(14, 10, 68, 9); for (let i = 0; i < 9; i++) c.fillRect(10, 30 + i * 11, 34 + ((i * 23) % 44), 3); c.fillRect(10, 134, 76, 5); });
+  box(0.062, 0.096, 0.0006, M({ map: slip, roughness: 0.85, side: THREE.DoubleSide }), 0.062, 0.215, D / 2 + 0.017, { cast: false, noEdge: true, rz: -0.07, rx: -0.06 });
+  box(0.009, 0.0016, 0.0014, mat.alu, 0.05, 0.259, D / 2 + 0.0185, { cast: false, noEdge: true, rz: -0.07 });
+  const [dc, dg] = canvas(256, 256); dg.clearRect(0, 0, 256, 256);
+  dg.strokeStyle = "rgba(150,40,30,.62)"; dg.lineWidth = 7; dg.beginPath(); dg.arc(96, 92, 50, 0, 7); dg.stroke(); dg.lineWidth = 3; dg.beginPath(); dg.arc(96, 92, 38, 0, 7); dg.stroke(); dg.fillStyle = "rgba(150,40,30,.6)"; for (let i = 0; i < 3; i++) dg.fillRect(72, 78 + i * 12, 48 - i * 10, 5); // the stamp: two rings and three bars, no words
+  for (let i = 0; i < 5; i++) { const x = 150 + R() * 60, y = 190 + R() * 40, r = 14 + R() * 26, gr = dg.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, "rgba(70,45,15,.5)"); gr.addColorStop(1, "rgba(70,45,15,0)"); dg.fillStyle = gr; dg.fillRect(0, 0, 256, 256); } // where the oil came through
+  const dt = new THREE.CanvasTexture(dc); dt.colorSpace = THREE.SRGBColorSpace;
+  box(0.27, 0.3, 0.0004, M({ map: dt, transparent: true, roughness: 0.9, depthWrite: false }, 3), -0.01, 0.17, D / 2 + 0.0145, { cast: false, noEdge: true });
+}, { ry: Math.PI + 0.22, float: 0.3 }); // its printed side to the room
 const wet = (color, opacity = 0.8) => M({ color, roughness: 0.05, transparent: true, opacity, depthWrite: false }, 3);
 const food = {
   rice: M({ map: riceMap, bumpMap: riceMap, bumpScale: 1.2, roughness: 0.75 }), grain: F(0xf6f3ea, 0.6), chicken: F(0x7a431f, 0.22), sauce: F(0x4a2410, 0.1),
@@ -2855,6 +2890,7 @@ function updateBoss(s, dt) {
 // nothing is drawn away: the crowd of eyes shuts until only the pair is left, the head goes down, the ones that stood
 // up lie down and the red goes out of the ground; and the eye comes back down, through where the ceiling was, into
 // the room — clean, in the morning, and the small one sitting in it. { home: true }; posts "home" at the end; silent.
+let PEEK = null;
 const HOMEWARD = { at: 0, told: false, S: 13.5 };
 function buildPup() { // the small one: a black pup, sitting; two small lights for eyes; what he has instead of a tail
   const g = (HOMEWARD.pup = new THREE.Group()), bm = M({ color: 0x0b0b0e, roughness: 0.55 }), em = new THREE.MeshBasicMaterial({ color: 0xffb060, toneMapped: false });
@@ -3049,6 +3085,7 @@ function frame(now) {
   updateFar(now / 1000, dt);
   updateBoss(now / 1000, dt);
   updateCondense(now / 1000);
+  if (PEEK) { camera.position.set(PEEK[0], PEEK[1], PEEK[2]); camera.lookAt(PEEK[3], PEEK[4], PEEK[5]); if (PEEK[6] && camera.fov !== PEEK[6]) { camera.fov = PEEK[6]; camera.updateProjectionMatrix(); } } // { peek: [ex, ey, ez, tx, ty, tz, fov] }: a close look at one thing while it is being built; never sent by the game
   composer.render();
   if (++framesDrawn === (document.body.classList.contains("embed") ? 1 : 3)) { try { window.parent !== window && window.parent.postMessage({ source: "nt-room", type: "ready" }, "*"); } catch {} if (q.get("wake") === "1") setTimeout(wake, 0); /* ?wake=1: the flash starts by itself, after ready */ document.getElementById("loading").style.opacity = "0"; perf.first = (now - T0) / 1000; perf.t = now; perf.n = 0; }
   if (framesDrawn > 3 && ++perf.n === 90) { document.getElementById("perf").textContent = `首屏 ${perf.first.toFixed(1)} 秒 · ${Math.round(90000 / (now - perf.t))} 帧/秒${LOW ? " · 低配" : ""}`; perf.t = now; perf.n = 0; }
@@ -3311,6 +3348,7 @@ function command(m) {
   if (m.dislocate) bossEvent("dislocate");
   if (m.rise) bossEvent("rise");
   if (m.leave) bossEvent("leave");
+  if (m.peek !== undefined) PEEK = m.peek;
   if (m.home != null) home(!!m.home);
   if (m.rush && CON.at && CON.told && !CON.rush) CON.rush = performance.now() / 1000; // only once the whole of him has been seen ("eye")
   if (m.greatLook != null) CON.look = m.greatLook;
