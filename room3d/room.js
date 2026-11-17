@@ -2334,7 +2334,9 @@ const perf = { first: 0, t: 0, n: 0 };
 const FAR = { on: false, k: 0, g: new THREE.Group(), head: new THREE.Group() };
 FAR.g.visible = false;
 scene.add(FAR.g);
-{
+// built the first time the bar is moved: three thousand tentacles are not worth making for someone who only looks out of the window
+function buildFar() {
+  FAR.built = true;
   const R = rng(1818);
   const dark = M({ map: hideMap, bumpMap: hideMap, bumpScale: 5, roughness: 0.3, color: 0x5a5560 }, 3);
   const wine = M({ color: 0x3a0d18, roughness: 0.32 }, 3);
@@ -2384,6 +2386,7 @@ scene.add(FAR.g);
 }
 const _fp = new THREE.Vector3(), _fl = new THREE.Vector3(), _fq = new THREE.Quaternion(), _fm = new THREE.Matrix4();
 function updateFar(s, dt) {
+  if (!FAR.built) { if (!((FAR.to ?? 0) > 0)) return; buildFar(); }
   FAR.k += ((FAR.to ?? 0) - FAR.k) * (1 - Math.exp(-dt * 5)); if (Math.abs(FAR.k - (FAR.to ?? 0)) < 0.0005) FAR.k = FAR.to ?? 0; // the player's own hand on the bar (author: 做成滑杆，到时候是用户拉远的)
   const k = FAR.k, e = k * k * (3 - 2 * k);
   FAR.g.visible = k > 0;

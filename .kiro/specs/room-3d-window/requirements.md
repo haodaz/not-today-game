@@ -15,7 +15,7 @@ day-10 faces and the wake flash are later specs built on the same host.
   anything under `room3d/`.** three.js is in its own chunk, loaded only when the page is loaded.
 - `room3d/index.html?embed=1` shows only the picture, filling its frame, and is driven by
   `postMessage({ target: "nt-room", ... })` from the parent:
-  `day` 1–18 · `time` 13.5–24 (hours) · `face` 0 desk wall / 1 bed / 2 door / 3 window ·
+  `day` 1–18 · `time` 6–24 (hours; full daylight before 16.8) · `face` 0 desk wall / 1 bed / 2 door / 3 window ·
   `spot` `"desk" | "meal" | "win" | "slit" | null` · `lamp`, `ceil`, `rain`, `outer`, `eaten` booleans ·
   `far` 0–1 · `wake: true` · `vision: true`. It posts `{ source: "nt-room", type: "ready" }` to the
   parent after its first frames. `?embed=1&low=1` is the low-spec render.
@@ -75,8 +75,8 @@ A pure function `outsideCommand(state, session): RoomCommand` in a new
   outer: false, eaten: false, far: 0 }
 ```
 
-`hour` = `hh + mm / 60` from `session.clock.time` ("HH:MM"), clamped to **[13.5, 24]** (the room is
-not modelled before 13.5; a morning look-out is a daylight look-out). `day` clamped to [1, 18].
+`hour` = `hh + mm / 60` from `session.clock.time` ("HH:MM"), clamped to **[6, 24]**. `day` clamped
+to [1, 18].
 
 The controller posts the command to `iframe.contentWindow` with origin `"*"` (the page is same-origin
 but the proto checks only `target`): once on the iframe's `load` event, again whenever the command
@@ -101,7 +101,7 @@ host is removed.
 - the glass hit is on the 窗 facing on day 1 and day 18, with its title; not on 房间 / 床 / 门.
 - `window-out` opens (host + iframe with the `?embed=1` src + the back pill with its word);
   `window-back` and Esc close; `window-out` while a dialogue line is queued does nothing.
-- `outsideCommand`: 09:03 → time 13.5; 18:30 → 18.5, lamp true by default; `lampOn: false` wins;
+- `outsideCommand`: 09:03 → time 9.05; 05:00 → 6; 18:30 → 18.5, lamp true by default; `lampOn: false` wins;
   day 4 → rain true, day 10 → rain false (`content/stages.json` weather table); day clamped.
 - the stare countdown does not run while `outside` is set (through the stare module's exported
   behaviour, the way `tests/meters-v2-ui.test.ts` drives it).
