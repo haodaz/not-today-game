@@ -26,6 +26,20 @@ export type Look = "he" | "she" | "none";
 export type Pose = "stance" | "strike" | "throw" | "flip" | "hurt";
 export type Fx = "throw" | "flip" | "strike" | "shake" | "flash" | "heal" | "none";
 export type Phase = "intro" | "run" | "choose" | "act" | "won" | "lost" | "after";
+/** A line of the intro or the outro: its text and, when someone other than the box's own voice says it, their portrait. */
+export interface BossLine { readonly t: string; readonly face?: string; readonly who?: string }
+/**
+ * 对不起 (author 2026-11-16): the four colleagues the last day's pacman let pass. Before the fight each
+ * appears as they were at thirty-something and says one line; each is a buff named 对不起 on the
+ * party; after the fall each says one line at the curtain, as they are now.
+ */
+export const COLLEAGUES = [
+  { id: "boss", young: "/npc/boss_young.png", now: "/npc/boss.png", av: "/npc/boss_young_av.png" },
+  { id: "partner", young: "/npc/partner_young.png", now: "/npc/partner.png", av: "/npc/partner_young_av.png" },
+  { id: "xiaozhang", young: "/npc/xiaozhang.png", now: "/npc/xiaozhang.png", av: "/npc/xiaozhang_av.png" },
+  { id: "laozhou", young: "/npc/laozhou_young.png", now: "/npc/laozhou.png", av: "/npc/laozhou_young_av.png" },
+] as const;
+export type ColleagueId = (typeof COLLEAGUES)[number]["id"];
 
 /**
  * A move: damage (`power` > 0), or one of the status effects — `heal` (n, on the player; `healAll`
@@ -60,7 +74,7 @@ export interface Member {
   readonly guard: boolean;
   readonly moves: readonly Move[];
 }
-export interface BossSide { readonly hp: number; readonly max: number; readonly atk: number; readonly spd: number; readonly gauge: number; readonly stage: 1 | 2 }
+export interface BossSide { readonly hp: number; readonly max: number; readonly atk: number; readonly spd: number; readonly gauge: number; readonly stage: 1 | 2 | 3 }
 export interface Act { readonly who: string; readonly target: string; readonly move: Move; readonly at: number; readonly text: readonly string[]; readonly hits: readonly { readonly id: string; readonly n: number }[] }
 export interface BossBattle {
   readonly ending: BossEnding;
@@ -73,9 +87,12 @@ export interface BossBattle {
   readonly boss: BossSide;
   readonly phase: Phase;
   /** The lines read before the fight and after it; `line` is the one up. */
-  readonly intro: readonly string[];
-  readonly outro: readonly string[];
+  readonly intro: readonly BossLine[];
+  readonly outro: readonly BossLine[];
   readonly line: number;
+  /** 对不起: the pacman let every colleague pass; their buffs are on (by colleague id). */
+  readonly mercy: boolean;
+  readonly buffs: readonly ColleagueId[];
   readonly chooser: string | null;
   readonly act: Act | null;
   /** The text box's last line. */
@@ -88,6 +105,8 @@ export interface BossBattle {
 export const ACT_MS = 900;
 export const BOSS_TICK_MS = 100;
 export const STAGE2_AT = 0.5;
+/** 炸 (author 2026-11-16): under a fifth of its HP the boss bursts into its last form (`.final` on the page). */
+export const STAGE3_AT = 0.2;
 export const QKURO_JOINS_AT = 0.6;
 const BOSS_HP = 520;
 const PLAYER_HP = 130;
@@ -113,21 +132,35 @@ export const OBJECT_MOVES: Readonly<Record<string, readonly Move[]>> = {
 const QKURO_MOVES: readonly Move[] = [{ id: "bark", power: 20, acc: 100, fx: "shake" }, { id: "lick", power: 0, acc: 100, fx: "heal", heal: 18 }];
 const BOSS_MOVES_1: readonly Move[] = [{ id: "tentacle", power: 28, acc: 95, fx: "strike" }, { id: "gaze", power: 15, acc: 100, fx: "shake", all: true }];
 const BOSS_MOVES_2: readonly Move[] = [{ id: "swallow", power: 44, acc: 90, fx: "strike" }, { id: "eyes", power: 24, acc: 100, fx: "flash", all: true }];
+const BOSS_MOVES_3: readonly Move[] = [{ id: "burst", power: 34, acc: 100, fx: "shake", all: true }, { id: "swallow", power: 50, acc: 90, fx: "strike" }, { id: "eyes", power: 24, acc: 100, fx: "flash", all: true }];
+const BOSS_MOVES: Readonly<Record<1 | 2 | 3, readonly Move[]>> = { 1: BOSS_MOVES_1, 2: BOSS_MOVES_2, 3: BOSS_MOVES_3 };
+
+/** What each colleague's 对不起 does to the party (named on the chips; the rule is in bossStart). */
+export const BUFF_EFFECT: Readonly<Record<ColleagueId, string>> = { boss: "atk", partner: "hp", xiaozhang: "spd", laozhou: "objects" };
 
 export const lookOf = (state: State): Look => PORTRAIT_FILES[state.names.portrait ?? "p1"] as Look;
 
 /** The party and the boss from the run's state: the ending decides the fight's shape. */
-export function bossStart(state: State, ending: BossEnding, nowMs: number, seed = `boss:${String(state.day)}`): BossBattle {
+export function bossStart(state: State, ending: BossEnding, nowMs: number, seed = `boss:${String(state.day)}`, opts: { readonly mercy?: boolean } = {}): BossBattle {
   const strong = ending === "bad";
   const qkuroAllowed = !strong && state.affinity >= (constants.affinityThreshold as number);
   const hard = ending === "survive" && !qkuroAllowed;
-  const player: Member = { id: "player", kind: "player", hp: strong ? PLAYER_HP * 2 : PLAYER_HP, max: strong ? PLAYER_HP * 2 : PLAYER_HP, atk: strong ? 4 : 1, spd: strong ? 900 : 2600, gauge: 0, pose: "stance", guard: false, moves: PLAYER_MOVES };
-  const objects: Member[] = (state.found as string[]).filter((id) => state.upgraded[id] !== true && OBJECT_MOVES[id]).map((id) => ({ id, kind: "object" as const, hp: 40, max: 40, atk: 1, spd: 3600, gauge: 0, pose: "stance" as const, guard: false, moves: OBJECT_MOVES[id]! }));
+  // 对不起: the assimilated player has no colleagues to be sorry to
+  const mercy = opts.mercy === true && !strong;
+  const buffs: ColleagueId[] = mercy ? COLLEAGUES.map((c) => c.id) : [];
+  const hp0 = (strong ? PLAYER_HP * 2 : PLAYER_HP) + (buffs.includes("partner") ? 30 : 0);
+  const player: Member = { id: "player", kind: "player", hp: hp0, max: hp0, atk: (strong ? 4 : 1) * (buffs.includes("boss") ? 1.15 : 1), spd: strong ? 900 : buffs.includes("xiaozhang") ? 2200 : 2600, gauge: 0, pose: "stance", guard: false, moves: PLAYER_MOVES };
+  const objects: Member[] = (state.found as string[]).filter((id) => state.upgraded[id] !== true && OBJECT_MOVES[id]).map((id) => ({ id, kind: "object" as const, hp: 40, max: 40, atk: buffs.includes("laozhou") ? 1.2 : 1, spd: 3600, gauge: 0, pose: "stance" as const, guard: false, moves: OBJECT_MOVES[id]! }));
   // hard (survive, low affinity; tuned by simulation 2026-11-12: ~half the fights with three objects, most with eight)
   const boss: BossSide = { hp: BOSS_HP, max: BOSS_HP, atk: hard ? 1.1 : 1, spd: hard ? 3000 : 3200, gauge: 0, stage: 1 };
-  const intro = strong ? [S("boss.intro.strong1"), S("boss.intro.strong2"), S("boss.intro.go")] : [S("boss.intro.1"), S("boss.intro.2"), S("boss.intro.me"), S("boss.intro.go")];
-  const outro = strong ? [S("boss.outro.strong1"), S("boss.outro.strong2")] : [S("boss.outro.1"), S("boss.outro.2")];
-  return { ending, look: lookOf(state), strong, hard, qkuroAllowed, joined: false, party: [player, ...objects], boss, phase: "intro", intro, outro, line: 0, chooser: null, act: null, log: intro[0] ?? "", clockAt: nowMs, turn: 0, seed };
+  const L = (key: string): BossLine => ({ t: S(key) });
+  // 对不起: before the fight, each colleague as they were, one line each (click to go on)
+  const sorry: BossLine[] = mercy ? COLLEAGUES.map((c) => ({ t: S(`boss.mercy.${c.id}`), face: c.young, who: c.id })) : [];
+  const intro = strong ? [L("boss.intro.strong1"), L("boss.intro.strong2"), L("boss.intro.go")] : [...sorry, L("boss.intro.1"), L("boss.intro.2"), L("boss.intro.me"), L("boss.intro.go")];
+  // the curtain: after the fall, each colleague as they are now, one line each
+  const curtain: BossLine[] = mercy ? COLLEAGUES.map((c) => ({ t: S(`boss.curtain.${c.id}`), face: c.now, who: c.id })) : [];
+  const outro = strong ? [L("boss.outro.strong1"), L("boss.outro.strong2")] : [L("boss.outro.1"), ...curtain, L("boss.outro.2")];
+  return { ending, look: lookOf(state), strong, hard, qkuroAllowed, joined: false, party: [player, ...objects], boss, phase: "intro", intro, outro, line: 0, mercy, buffs, chooser: null, act: null, log: intro[0]?.t ?? "", clockAt: nowMs, turn: 0, seed };
 }
 
 const alive = (m: Member): boolean => m.hp > 0;
@@ -177,7 +210,7 @@ function partyAct(b: BossBattle, who: Member, move: Move, nowMs: number, roll: (
 
 /** The boss's move: one of the stage's, on one party member or all. */
 function bossAct(b: BossBattle, nowMs: number, roll: () => number): BossBattle {
-  const moves = b.boss.stage === 2 ? BOSS_MOVES_2 : BOSS_MOVES_1;
+  const moves = BOSS_MOVES[b.boss.stage];
   const move = moves[Math.floor(roll() * moves.length)]!;
   const live = b.party.filter(alive);
   const targets = move.all ? live : [live[Math.floor(roll() * live.length)]!];
@@ -199,10 +232,14 @@ function bossAct(b: BossBattle, nowMs: number, roll: () => number): BossBattle {
 function resolve(b: BossBattle, nowMs: number): BossBattle {
   let next: BossBattle = { ...b, act: null, party: b.party.map((m) => ({ ...m, pose: m.kind === "player" ? "stance" : m.pose })), clockAt: nowMs };
   const player = next.party.find((m) => m.id === "player")!;
-  if (next.boss.hp <= 0) return { ...next, phase: "won", line: 0, log: next.outro[0] ?? "" };
+  if (next.boss.hp <= 0) return { ...next, phase: "won", line: 0, log: next.outro[0]?.t ?? "" };
   if (player.hp <= 0) return { ...next, phase: "lost", log: S("boss.lost") };
   if (next.boss.stage === 1 && next.boss.hp <= next.boss.max * STAGE2_AT) {
     next = { ...next, boss: { ...next.boss, stage: 2 }, log: S("boss.stage2") };
+  }
+  // 炸 (author 2026-11-16): the last form, huge, all tentacles
+  if (next.boss.stage === 2 && next.boss.hp <= next.boss.max * STAGE3_AT) {
+    next = { ...next, boss: { ...next.boss, stage: 3 }, log: S("boss.stage3") };
   }
   if (next.qkuroAllowed && !next.joined && next.boss.hp <= next.boss.max * QKURO_JOINS_AT) {
     const q: Member = { id: "qkuro", kind: "qkuro", hp: 70, max: 70, atk: 1, spd: 3000, gauge: 0.5, pose: "stance", guard: false, moves: QKURO_MOVES };
@@ -243,19 +280,19 @@ export function bossChoose(b: BossBattle, moveId: string, nowMs: number): BossBa
 export function bossNext(b: BossBattle, nowMs: number): BossBattle {
   if (b.phase === "intro") {
     const line = b.line + 1;
-    if (line < b.intro.length) return { ...b, line, log: b.intro[line]! };
+    if (line < b.intro.length) return { ...b, line, log: b.intro[line]!.t };
     return { ...b, phase: "run", clockAt: nowMs, log: "" };
   }
   if (b.phase === "won") {
     const line = b.line + 1;
-    if (line < b.outro.length) return { ...b, line, log: b.outro[line]! };
+    if (line < b.outro.length) return { ...b, line, log: b.outro[line]!.t };
     return { ...b, phase: "after" };
   }
   return b;
 }
 
 /** The fight again from the top (the ending is already decided; losing only costs a retry). */
-export const bossRetry = (b: BossBattle, state: State, nowMs: number): BossBattle => ({ ...bossStart(state, b.ending, nowMs, `${b.seed}+`), phase: "run", clockAt: nowMs, log: "" });
+export const bossRetry = (b: BossBattle, state: State, nowMs: number): BossBattle => ({ ...bossStart(state, b.ending, nowMs, `${b.seed}+`, { mercy: b.mercy }), phase: "run", clockAt: nowMs, log: "" });
 
 const ACT_CHIP: Readonly<Record<Fx, ChipId>> = { throw: "throw", flip: "flip", strike: "hit", shake: "shake", flash: "flash", heal: "heal", none: "text" };
 
@@ -276,7 +313,7 @@ export function bossChip(prev: BossBattle | null, next: BossBattle): ChipId[] {
     };
     if (fell("boss", next.boss.hp) || next.party.some((m) => fell(m.id, m.hp))) out.push("down");
   }
-  if (next.boss.stage === 2 && prev?.boss.stage === 1) out.push("stage2");
+  if ((next.boss.stage === 2 && prev?.boss.stage === 1) || (next.boss.stage === 3 && prev?.boss.stage === 2)) out.push("stage2");
   if (!prev?.joined && next.joined) out.push("join");
   if (next.phase !== prev?.phase) {
     if (next.phase === "won") out.push("win");
@@ -297,7 +334,7 @@ export const bossCheat = (b: BossBattle, nowMs: number): BossBattle => resolve({
 // HP as one full-width bar at the very bottom; the text box under the statuses; the moves by the
 // player's feet.
 
-const BOSS_IMG = { 1: "/battle/boss-stage1.png", 2: "/battle/boss-stage2.png" } as const;
+const BOSS_IMG = { 1: "/battle/boss-stage1.png", 2: "/battle/boss-stage2.png", 3: "/battle/boss-stage2.png" } as const;
 const PROP = { throw: "/battle/prop-laptop.png", flip: "/battle/prop-keyboard.png" } as const;
 export const BOSS_BG = "/battle/boss-bg.jpg";
 
@@ -353,17 +390,21 @@ export function renderBoss(b: BossBattle, nowMs: number): SafeHtml {
   const chooser = b.phase === "choose" && b.chooser !== null ? b.party.find((m) => m.id === b.chooser) ?? null : null;
   const menu = chooser ? html`<div class="${cls("bs-menu", chooser.kind)}" data-owner="${chooser.id}"><span class="bs-menu-h">${name(b, chooser.id)}</span>${chooser.moves.map((m) => html`<button type="button" class="${cls("bs-cmd", effectKind(m))}" data-action="boss-move" data-move="${m.id}"><b class="bs-cmd-name">${moveName(chooser.id, m)}</b><span class="bs-cmd-eff">${moveEffect(chooser.id, m)}</span></button>`)}</div>` : null;
   const clickable = b.phase === "intro" || b.phase === "won";
+  // 对不起: the line up now may be a colleague's (their portrait beside the words)
+  const said = b.phase === "intro" ? b.intro[b.line] : b.phase === "won" ? b.outro[b.line] : undefined;
+  const portrait = said?.face ? html`<img class="bs-portrait" src="${said.face}" alt="" data-who="${said.who ?? ""}">` : null;
+  const buffs = b.buffs.length ? html`<div class="bs-buffs">${b.buffs.map((id) => { const c = COLLEAGUES.find((x) => x.id === id)!; return html`<span class="bs-buff" data-who="${id}" data-effect="${BUFF_EFFECT[id]}"><img src="${c.av}" alt=""><b>${S("boss.buff.title")}·${S(`boss.party.${id}`)}</b><small>${S(`boss.buff.${id}`)}</small></span>`; })}</div>` : null;
   const box = b.phase === "lost"
     ? html`<div class="bs-box"><p>${b.log}</p><button type="button" class="bs-cmd" data-action="boss-retry">${S("boss.retry")}</button></div>`
     : b.phase === "after"
       ? html`<div class="bs-box"><button type="button" class="bs-cmd" data-action="boss-done">${S("boss.done")}</button></div>`
-      : html`<div class="${cls("bs-box", clickable && "more")}"><p>${acting ? acting.text.join(" ") : b.log}</p>${clickable ? html`<i class="bs-caret"></i><button type="button" class="bs-hit" data-action="boss-next" aria-label="${S("boss.done")}"></button>` : null}</div>`;
+      : html`<div class="${cls("bs-box", clickable && "more", portrait && "portrait")}">${portrait}<p>${acting ? acting.text.join(" ") : b.log}</p>${clickable ? html`<i class="bs-caret"></i><button type="button" class="bs-hit" data-action="boss-next" aria-label="${S("boss.done")}"></button>` : null}</div>`;
   const cheat = import.meta.env.DEV && b.phase !== "after" && b.phase !== "won" ? html`<button type="button" class="sk-cheat" data-action="boss-cheat" aria-hidden="true" tabindex="-1"></button>` : null;
-  return html`<div class="${cls("boss-page", `end-${b.ending}`, b.strong && "strong", b.phase === "after" && "after", acting?.move.fx === "shake" && "shake", b.boss.stage === 2 && "stage2", b.party.length > 6 && "many")}" data-phase="${b.phase}">${cheat}
+  return html`<div class="${cls("boss-page", `end-${b.ending}`, b.strong && "strong", b.phase === "after" && "after", acting?.move.fx === "shake" && "shake", b.boss.stage >= 2 && "stage2", b.boss.stage === 3 && "final", b.mercy && "mercy", b.party.length > 6 && "many")}" data-phase="${b.phase}">${cheat}
     <div class="bs-bg"></div>
     ${giant}
     ${field}
-    <div class="bs-top">${plates}</div>
+    <div class="bs-top">${plates}</div>${buffs}
     ${atb}
     ${box}${menu}
     ${bossbar}

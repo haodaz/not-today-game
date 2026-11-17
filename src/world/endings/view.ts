@@ -133,7 +133,9 @@ export function renderLines(m: EndingModel, ending: Ending): SafeHtml {
       ? html`<li class="ln kuro"><img class="ln-av" src="${face}" alt="" aria-hidden="true" draggable="false"><span>${text}</span></li>`
       : html`<li class="ln you"><span>${text}</span></li>`;
   });
-  return html`<div class="stage ending-page lines-page" data-flavour="${flavour}" data-step="${step}">${next()}<ol class="lines">${rows}</ol></div>`;
+  // the slip (author 2026-11-16: 「只有第18天的存活结局有 … 把老物件寄出去用的」): the waybill out of the box, filled, on the survive pages only
+  const slip = flavour === "survive.warm" || flavour === "survive.cold" ? html`<img class="ending-slip" src="/room/desk/slip.png" alt="" draggable="false">` : null;
+  return html`<div class="stage ending-page lines-page" data-flavour="${flavour}" data-step="${step}">${next()}${slip}<ol class="lines">${rows}</ol></div>`;
 }
 
 export function renderEnding(m: EndingModel): SafeHtml {

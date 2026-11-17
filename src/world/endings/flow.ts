@@ -64,7 +64,9 @@ export function startEnding(ctx: ActionContext): void {
       if (ctx.session.pullOut !== pull) return;
       ctx.session.pullOut = null;
       // the boss fight (author 2026-11-13): the pull-out showed the whole of it; now the fight, then the pages
-      ctx.session.boss = bossStart(ctx.store.getState(), ending, nowOf(ctx));
+      // 对不起 (author 2026-11-16): the last day's corridor cleared with no colleague swallowed
+      const mercy = ctx.store.getEvents().some((e) => e.kind === "step" && e.name === "mercy" && e.day === ctx.store.getState().day);
+      ctx.session.boss = bossStart(ctx.store.getState(), ending, nowOf(ctx), undefined, { mercy });
       ctx.rerender();
     });
     ctx.rerender();

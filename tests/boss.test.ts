@@ -5,7 +5,7 @@ import "./specimen";
 import { describe, expect, it } from "vitest";
 import { constants } from "@state/variables";
 import type { State } from "@state/types.gen";
-import { ACT_MS, bossChoose, bossCheat, bossNext, bossRetry, bossStart, bossTick, QKURO_JOINS_AT, renderBoss, STAGE2_AT, type BossBattle } from "@world/endings/boss";
+import { ACT_MS, bossChoose, bossCheat, bossNext, bossRetry, bossStart, bossTick, COLLEAGUES, QKURO_JOINS_AT, renderBoss, STAGE2_AT, STAGE3_AT, type BossBattle } from "@world/endings/boss";
 import { setLocale, t } from "@world/i18n";
 import { createStore } from "@state/store";
 
@@ -117,9 +117,9 @@ describe("the boss fight", () => {
     // the win: the outro lines, then after, with the assimilated's crossing in the markup
     const won = bossCheat(after, 2000);
     expect(won.phase).toBe("won");
-    expect(won.log).toBe(won.outro[0]);
+    expect(won.log).toBe(won.outro[0]!.t);
     const after1 = bossNext(won, 2000);
-    expect(after1.log).toBe(won.outro[1]);
+    expect(after1.log).toBe(won.outro[1]!.t);
     const done = bossNext(after1, 2000);
     expect(done.phase).toBe("after");
     expect(renderBoss(done, 2000).value).toContain('data-action="boss-done"');
@@ -137,5 +137,56 @@ describe("the boss fight", () => {
     expect(again.phase).toBe("run");
     expect(again.party[0]!.hp).toBe(again.party[0]!.max);
     expect(again.boss.hp).toBe(again.boss.max);
+  });
+});
+
+describe("对不起 and the last form (author 2026-11-16)", () => {
+  it("mercy: the four colleagues speak before the fight with their young portraits, each a named buff; they speak again at the curtain; a retry keeps it; the assimilated has none", () => {
+    setLocale("zh");
+    const plain = bossStart(withState({ affinity: 100, found: ["chick", "camera"] as State["found"] }), "survive", 0);
+    const b = bossStart(withState({ affinity: 100, found: ["chick", "camera"] as State["found"] }), "survive", 0, undefined, { mercy: true });
+    expect(b.mercy).toBe(true);
+    expect(b.buffs).toEqual(COLLEAGUES.map((c) => c.id));
+    expect(b.intro).toHaveLength(plain.intro.length + 4);
+    expect(b.intro[0]).toEqual({ t: t("boss.mercy.boss"), face: "/npc/boss_young.png", who: "boss" });
+    expect(b.intro[3]!.face).toBe("/npc/laozhou_young.png");
+    expect(b.log).toBe(t("boss.mercy.boss"));
+    // the buffs on the party: 老王 harder punches, Vivi more blood, 小张 faster, 老周 fiercer objects
+    expect(b.party[0]!.atk).toBeCloseTo(1.15, 5);
+    expect(b.party[0]!.max).toBe(plain.party[0]!.max + 30);
+    expect(b.party[0]!.spd).toBeLessThan(plain.party[0]!.spd);
+    expect(b.party[1]!.atk).toBeCloseTo(1.2, 5);
+    const html = renderBoss(b, 0).value;
+    expect(html).toContain('<img class="bs-portrait" src="/npc/boss_young.png" alt="" data-who="boss">');
+    expect(html).toContain('class="bs-buff" data-who="partner" data-effect="hp"');
+    expect(html).toContain(`${t("boss.buff.title")}·${t("boss.party.partner")}`);
+    expect(html).toContain("boss-page end-survive mercy");
+    // the fifth click is the fight's own first line, no portrait
+    let c = b; for (let i = 0; i < 4; i++) c = bossNext(c, 0);
+    expect(c.log).toBe(t("boss.intro.1"));
+    expect(renderBoss(c, 0).value).not.toContain("bs-portrait");
+    // the curtain: 它倒下了, the four as they are now, then your line
+    expect(b.outro.map((l) => l.face ?? null)).toEqual([null, "/npc/boss.png", "/npc/partner.png", "/npc/xiaozhang.png", "/npc/laozhou.png", null]);
+    expect(b.outro[1]!.t).toBe(t("boss.curtain.boss"));
+    const again = bossRetry({ ...b, phase: "lost" }, withState({ affinity: 100 }), 10);
+    expect(again.mercy).toBe(true);
+    expect(bossStart(withState({ assimilation: 100 }), "bad", 0, undefined, { mercy: true }).buffs).toEqual([]);
+    expect(plain.buffs).toEqual([]);
+    expect(renderBoss(plain, 0).value).not.toContain("bs-buffs");
+  });
+
+  it("under a fifth of its HP the boss bursts: stage 3, the page's final class, the burst move", () => {
+    let b = bossStart(withState({ affinity: 0 }), "survive", 0);
+    b = { ...b, phase: "run", clockAt: 0, boss: { ...b.boss, stage: 2 } };
+    const low: BossBattle = { ...b, phase: "act", act: { who: "player", target: "boss", move: b.party[0]!.moves[0]!, at: 0, text: [], hits: [] }, boss: { ...b.boss, hp: Math.floor(b.boss.max * STAGE3_AT) - 1 } };
+    const after = bossTick(low, ACT_MS);
+    expect(after.boss.stage).toBe(3);
+    expect(after.log).toBe(t("boss.stage3"));
+    expect(renderBoss(after, ACT_MS).value).toContain("boss-page end-survive stage2 final");
+    // its moves now include 炸 on everyone
+    const ready: BossBattle = { ...after, boss: { ...after.boss, gauge: 0.999 }, party: after.party.map((m) => ({ ...m, gauge: 0 })), clockAt: ACT_MS };
+    const ids = new Set<string>();
+    for (let i = 0; i < 12; i++) { const hit = bossTick({ ...ready, seed: `s${String(i)}` }, ACT_MS + 100); if (hit.act) ids.add(hit.act.move.id); }
+    expect([...ids].some((id) => id === "burst" || id === "swallow" || id === "eyes")).toBe(true);
   });
 });

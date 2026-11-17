@@ -1001,3 +1001,13 @@
 .desk3d-marks > .room-mark.lifted{visibility:hidden}
 /* the way back on 桌子 stays the bottom 6 % of the stage (nav.ts): HTML over the frame, so the pointer reaches it */
 .room > .desk3d-back{position:absolute;left:0;right:0;bottom:0;height:6%;background:transparent}
+/* the slip on the survive endings' lines page (author 2026-11-16): the filled waybill out of the box */
+.lines-page .ending-slip{position:absolute;right:7%;top:9%;width:240px;transform:rotate(5deg);filter:drop-shadow(0 10px 24px rgba(0,0,0,.65));opacity:.92;pointer-events:none}
+/* 对不起 (author 2026-11-16): a colleague's portrait beside their line in the fight's box; the buff chips under the plates */
+.boss-page .bs-box.portrait{display:flex;align-items:flex-end;gap:14px}
+.boss-page .bs-portrait{width:120px;height:150px;object-fit:cover;object-position:top;border-radius:6px;box-shadow:0 6px 18px rgba(0,0,0,.6);flex:0 0 auto}
+.boss-page .bs-buffs{position:absolute;left:14px;top:118px;display:flex;gap:8px;z-index:3}
+.boss-page .bs-buff{display:flex;align-items:center;gap:6px;padding:3px 8px 3px 4px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.18);border-radius:999px;color:#eee;font-size:11px}
+.boss-page .bs-buff img{width:22px;height:22px;border-radius:50%;object-fit:cover}
+.boss-page .bs-buff b{font-weight:700}
+.boss-page .bs-buff small{opacity:.75}
