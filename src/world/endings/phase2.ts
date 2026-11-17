@@ -10,6 +10,7 @@ import type { SafeHtml } from "@world/html";
 import type { Session } from "@world/desktop/model";
 import { IMPACT_DELAY } from "./boss-fx";
 import { renderBoss, type BossBattle } from "./boss";
+import { HOME_KEYS } from "./pages";
 
 /** The room's boss mode: names and timings (room3d/, the other session's). */
 export const PHASE2 = {
@@ -62,7 +63,19 @@ export const P2_CMD = {
   condense: (): object => ({ target: T, condense: true }),
   home: (): object => ({ target: T, home: true }),
   rush: (): object => ({ target: T, rush: true }),
+  /** R9: the big Kuro on the bed in the room the frame came home to (hidden until shown). */
+  kuro: (on: boolean): object => ({ target: T, kuro: on }),
 } as const;
+
+/** R9: the homecoming page's step that shows him (`ending.home.kuro`): `{ kuro: true }` goes then. */
+export const HOME_KURO_STEP = HOME_KEYS.indexOf("ending.home.kuro") + 1;
+
+/**
+ * R9 (good): after `boss-done` the frame keeps the room it came home to — hidden and paused through
+ * the objects page, shown behind the homecoming page, reset when the talk in the dark begins. The
+ * session says so by keeping `phase2` at `home` with no fight.
+ */
+export const homeKept = (session: Pick<Session, "boss" | "phase2">): boolean => session.boss === null && session.phase2?.stage === "home";
 
 export type Phase2 = NonNullable<Session["phase2"]>;
 
@@ -93,8 +106,10 @@ export interface BossPosted {
   /** R8: the `since` of the homing / rushing stage each was posted for. */
   readonly homed: number | null;
   readonly rushed: number | null;
+  /** R9: `{ kuro: true }` was posted on the homecoming page. */
+  readonly kuro: boolean;
 }
-export const NO_BOSS_POSTS: BossPosted = { key: null, bossAt: null, paused: false, dislocated: null, rose: null, strikeAt: null, hurtAt: null, left: null, condensed: null, homed: null, rushed: null };
+export const NO_BOSS_POSTS: BossPosted = { key: null, bossAt: null, paused: false, dislocated: null, rose: null, strikeAt: null, hurtAt: null, left: null, condensed: null, homed: null, rushed: null, kuro: false };
 
 export interface BossWant {
   readonly key: string;
@@ -183,6 +198,30 @@ export function bossPosts(prev: BossPosted, want: BossWant): { readonly posts: r
     }
   }
   return { posts, next, recheckMs };
+}
+
+/**
+ * R9: the posts while the frame keeps the room it came home to (no fight on): paused while hidden
+ * (the objects page), running while it stands behind the homecoming page, and `{ kuro: true }` once
+ * from the step that shows him. Nothing resets the room here (no `boss: false`): that is the talk
+ * in the dark's, when the session lets the room go.
+ */
+export function homePosts(prev: BossPosted, want: { readonly shown: boolean; readonly kuro: boolean }): { readonly posts: readonly object[]; readonly next: BossPosted } {
+  const posts: object[] = [];
+  let next = prev;
+  if (!want.shown && !next.paused) {
+    posts.push(P2_CMD.pause(true));
+    next = { ...next, paused: true };
+  }
+  if (want.shown && next.paused) {
+    posts.push(P2_CMD.pause(false));
+    next = { ...next, paused: false };
+  }
+  if (want.shown && want.kuro && !next.kuro) {
+    posts.push(P2_CMD.kuro(true));
+    next = { ...next, kuro: true };
+  }
+  return { posts, next };
 }
 
 // ——— the page ———

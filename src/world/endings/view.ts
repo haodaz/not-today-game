@@ -13,7 +13,7 @@ import { fillPlaceholders } from "@world/replies/placeholders";
 import { cardPhase, creditRoll, lastLineKey, rollShown } from "./credits";
 import { youAndYou } from "./youandyou";
 import { renderPullOut } from "./pullout";
-import { bossScene } from "@world/room/outside";
+import { bossScene, homeHost } from "@world/room/outside";
 import { COLLAPSE_TO_WHITE_MS, endingOf } from "./flow";
 import { ENDING_ART, endingLines, endingObjects, pagesFor, HOME_CAPTIONS, HOME_KEYS, HOME_PHOTO, SURVIVE_OBJECT_KEYS, TENDER_KEYS, TENDER_PHOTO, WAKE_KEYS, WAKE_PHOTO, WAKE_SAY } from "./pages";
 import { endingFlavour } from "@state/endings";
@@ -185,6 +185,11 @@ export function renderHome(m: EndingModel): SafeHtml {
   const step = Math.min(HOME_KEYS.length, Math.max(1, stepOf(m)));
   const objects = endingObjects(m.state);
   const caps = HOME_KEYS.slice(0, step).map((k, i) => html`<p class="${cls("cap", i === step - 1 && "now", k === "ending.home.kuro" && "kuro")}">${tr(k)}</p>`);
+  // boss-phase2-world R9: the frame came home and kept that room — it stands behind the page (the
+  // objects on its desk, the big Kuro on its bed, shown at his step); the page keeps its captions and
+  // its click target, and draws none of the still's own things
+  const host = homeHost(m.state.day, m.session);
+  if (host) return html`<div class="stage ending-page home-page world" data-step="${step}">${host}${next()}<div class="dlg end-caps">${caps}</div></div>`;
   const desk = html`<div class="home-desk">${objects.map((id) => html`<img src="/objects/${id}_front.png" alt="" draggable="false">`)}</div>`;
   const kuro = step >= HOME_KEYS.length ? html`<img class="home-kuro" src="/battle/q-kuro.png" alt="" draggable="false">` : null;
   return html`<div class="stage ending-page home-page" data-step="${step}" style="--photo:url('${HOME_PHOTO}')">${next()}${desk}${kuro}<div class="dlg end-caps">${caps}</div></div>`;

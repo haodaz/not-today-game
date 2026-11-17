@@ -10,7 +10,7 @@ import { PULL_CUT_MS, pullFrom } from "@world/room/splat/pullout";
 import { creditRoll, CREDIT_LINE_MS, CREDIT_TICK_MS, rollShown } from "./credits";
 import type { EndingPhase } from "@world/desktop/model";
 import { pagesFor, ENDING_PAGES, nextPage, pageSteps } from "./pages";
-import { dislocateNetMs, PHASE2, PHASE2_MSG, RELEASE_NET_MS } from "./phase2";
+import { dislocateNetMs, homeKept, PHASE2, PHASE2_MSG, RELEASE_NET_MS } from "./phase2";
 import { BOSS_TICK_MS, bossCheat, bossChip, bossChoose, bossNext, bossRetry, bossStart, bossTick, type BossBattle } from "./boss";
 
 export interface EndingHost {
@@ -317,8 +317,10 @@ export const bossActions = {
     const stage = ctx.session.phase2?.stage;
     if (stage === "leaving" || stage === "left" || stage === "condensing" || stage === "eye" || stage === "rushing" || stage === "out" || stage === "homing") return;
     ctx.session.boss = null;
-    // boss-phase2-world R1: the room leaves its boss mode (the layer posts `boss: false` and the pause)
-    ctx.session.phase2 = null;
+    // boss-phase2-world R1: the room leaves its boss mode (the layer posts `boss: false` and the pause).
+    // R9 (good, home in the world): not yet — the frame keeps the room it came home to, hidden and
+    // paused, for the homecoming page; the talk in the dark resets it (goToPage).
+    if (!(b.ending === "good" && ctx.session.phase2?.stage === "home" && ctx.session.bossRoom === "ready")) ctx.session.phase2 = null;
     firstPage(ctx, b.ending);
   },
   // dev only (the replay driver, tests): the boss down at once
@@ -343,6 +345,9 @@ export function endingOf(state: Pick<State, "ending">, session: { readonly endin
 /** Goes to `phase` of the ending's pages (endings-matrix: `ENDING_PAGES`), from its first step. */
 export function goToPage(ctx: ActionContext, phase: EndingPhase): void {
   ctx.session.endingPage = { phase, startMs: nowOf(ctx), skipped: false, step: 1 };
+  // R9: past the objects page and the homecoming, the room the frame came home to is let go (the
+  // layer posts `boss: false` and the pause, and the host is not drawn again)
+  if (phase !== "objects" && phase !== "home" && homeKept(ctx.session)) ctx.session.phase2 = null;
   if (phase === "collapse") {
     // After the run-to-white, the line stays until a click; nothing auto-advances past it.
     ctx.later(COLLAPSE_TO_WHITE_MS + 20, ctx.rerender);

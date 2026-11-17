@@ -15,7 +15,7 @@ import { cls, html, type SafeHtml } from "@world/html";
 import { t } from "@world/i18n";
 import { printsOnDesk } from "@state/days/prints";
 import { chickFrameNow } from "@world/objects/index";
-import { actWant, bossPosts, NO_BOSS_POSTS, PHASE2, phase2HostStyle, renderBossPage, type BossPosted } from "@world/endings/phase2";
+import { actWant, bossPosts, HOME_KURO_STEP, homeKept, homePosts, NO_BOSS_POSTS, PHASE2, phase2HostStyle, renderBossPage, type BossPosted } from "@world/endings/phase2";
 import { CHICK_STEP_MS, clampDay, deskCommand, deskPick, desk3dOn, locateCommand, LOCATE_RETRY_MS, NOTHING_POSTED, outsideCommand, pickBlocked, rectsFromWhere, ROOM_READY_NET_MS, roomPosts, type RoomPosted, type RoomWant } from "./desk3d";
 
 export { outsideCommand, roomHour, ROOM_TARGET, type RoomCommand } from "./desk3d";
@@ -81,6 +81,16 @@ export function roomHost(day: number, session: Pick<Session, "view" | "deskPhoto
  * `.boss-page` (the page re-renders every tick; the kept frame does not), under it, hidden until the
  * burst; then shown, fading in over the field as the eye is dislocated.
  */
+/**
+ * boss-phase2-world R9 (good): the room the frame came home to, behind the homecoming page — the
+ * shared frame's host, kind `home`, the page's first child (under its captions and its click target;
+ * inside the page so it is fitted with it). Null unless the frame kept that room.
+ */
+export function homeHost(day: number, session: Pick<Session, "boss" | "phase2" | "roomFrame">): SafeHtml | null {
+  if (!homeKept(session)) return null;
+  return outsideHost({ kind: "home", src: outsideSrc(session.roomFrame?.day ?? day), phase: "loading", label: null, keep: ROOM_KEEP, dim: false, shared: true });
+}
+
 export function bossScene(day: number, session: Session, nowMs: number): SafeHtml {
   const b = session.boss!;
   const host = outsideHost({ kind: "boss", src: outsideSrc(session.roomFrame?.day ?? day), phase: "loading", label: null, keep: ROOM_KEEP, dim: false, shared: true, extra: session.phase2 ? "shown" : null, style: phase2HostStyle(session.phase2, session.reducedMotion, nowMs) });
@@ -119,10 +129,10 @@ export function createRoom3dLayer(onMessage: (ctx: ActionContext, msg: RoomMessa
     const now = () => ctx.now?.() ?? Date.now();
     const wakeFrame = (): HTMLIFrameElement | null => root.querySelector<HTMLIFrameElement>(`iframe[data-keep="${WAKE_KEEP}"]`);
     const sharedHost = (): HTMLElement | null => root.querySelector<HTMLElement>(".outside-host.room");
-    const mode = (): RoomWant["mode"] | "boss" => {
+    const mode = (): RoomWant["mode"] | "boss" | "home" => {
       const h = sharedHost();
       const kind = h?.dataset.host;
-      return kind === "desk" || kind === "window" || kind === "boss" ? kind : "hidden";
+      return kind === "desk" || kind === "window" || kind === "boss" || kind === "home" ? kind : "hidden";
     };
     const want = (): RoomWant => {
       const m = mode() as RoomWant["mode"];
@@ -142,6 +152,16 @@ export function createRoom3dLayer(onMessage: (ctx: ActionContext, msg: RoomMessa
         bossPosted = plan.next;
         for (const p of plan.posts) send(p);
         if (plan.recheckMs !== null) ctx.later(plan.recheckMs + 5, sync);
+        posted = { ...NOTHING_POSTED, paused: bossPosted.paused };
+        return;
+      }
+      // R9 (good): the frame keeps the room it came home to — paused while hidden, shown behind the
+      // homecoming page with the big Kuro from its third step; no reset until the session lets it go
+      if (bossPosted.key !== null && homeKept(ctx.session)) {
+        const page = ctx.session.endingPage;
+        const plan = homePosts(bossPosted, { shown: mode() === "home", kuro: page?.phase === "home" && (page.step ?? 1) >= HOME_KURO_STEP });
+        bossPosted = plan.next;
+        for (const p of plan.posts) send(p);
         posted = { ...NOTHING_POSTED, paused: bossPosted.paused };
         return;
       }

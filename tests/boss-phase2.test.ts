@@ -12,7 +12,8 @@ import { initialSession, type Session } from "@world/desktop/model";
 import { setLocale } from "@world/i18n";
 import { ACT_MS, bossStart, PLAYER_MOVES, renderBoss, type BossBattle } from "@world/endings/boss";
 import { IMPACT_DELAY } from "@world/endings/boss-fx";
-import { bossActions, onBossRoom } from "@world/endings/flow";
+import { bossActions, endingNext, onBossRoom } from "@world/endings/flow";
+import { renderEnding } from "@world/endings/view";
 import { bossPosts, NO_BOSS_POSTS, P2_CMD, PHASE2, phase2PageAttrs, RELEASE_NET_MS, type BossWant } from "@world/endings/phase2";
 import { settleRoomFrame } from "@world/room/desk3d";
 import { bossScene, createRoom3dLayer } from "@world/room/outside";
@@ -20,9 +21,11 @@ import { onRoomMessage } from "@world/room/wake";
 
 setLocale("zh");
 
-function rig(opts: { readonly reduced?: boolean } = {}) {
+function rig(opts: { readonly reduced?: boolean; readonly chick?: boolean } = {}) {
   const store = createStore({ startDay: 1 });
   store.appendEvent({ kind: "names", names: { login: "林一", nick: "一一", calledBy: "老大", bossCalls: "小林", pronoun: "she", portrait: "p1" } });
+  // R9: an old object left to speak, so the good ending has its objects page before the homecoming
+  if (opts.chick) store.appendEvent({ kind: "openLayer", objectId: "chick" });
   while (store.getState().day < 18) store.appendEvent({ kind: "lieDown" });
   let now = 1000;
   const timers: { at: number; fn: () => void }[] = [];
@@ -50,7 +53,9 @@ function rig(opts: { readonly reduced?: boolean } = {}) {
   const posted: unknown[] = [];
   const win = { postMessage: (m: unknown) => void posted.push(m) } as unknown as Window;
   const paint = () => {
-    root.innerHTML = session.boss ? bossScene(18, session, now).value.replace(/ src="[^"]*"/g, "") : "";
+    // the fight's page; after it the ending pages (R9: the homecoming may stand in the frame)
+    const markup = session.boss ? bossScene(18, session, now).value : session.endingPage ? renderEnding({ state: store.getState(), events: store.getEvents(), session, startDay: 1, nowMs: now }).value : "";
+    root.innerHTML = markup.replace(/ src="[^"]*"/g, "");
     const f = root.querySelector<HTMLIFrameElement>('iframe[data-keep="room3d:room"]');
     if (f) Object.defineProperty(f, "contentWindow", { get: () => win, configurable: true });
   };
@@ -406,5 +411,98 @@ describe("R8 · the good ending comes home; the survive ending ends on the rush"
   it("the fallback (no frame) keeps the way out on survive", () => {
     const b = { ...bossStart(({ ...createStore({ startDay: 18 }).getState(), day: 18, affinity: 0 } as never), "survive", 0), phase: "after" as const };
     expect(renderBoss(b, 0).value).toContain('data-action="boss-done"');
+  });
+});
+
+describe("R9 · the good ending's homecoming stands in the room the frame came home to", () => {
+  /** The good fight won in the world and come home ("home"), the outro read, 继续 pressed. */
+  function cameHome() {
+    const r = rig({ chick: true });
+    r.from("ready");
+    r.advance(600);
+    const b = bossStart(r.store.getState(), "good", r.now());
+    r.session.boss = { ...b, phase: "choose", chooser: "player", boss: { ...b.boss, stage: 2, hp: 1, max: 180, gauge: 0 }, clockAt: r.now(), log: "" } as BossBattle;
+    r.session.phase2 = { stage: "up", since: r.now() };
+    r.frame();
+    r.act("boss-move", { move: "strike" });
+    r.advance(ACT_MS + 200);
+    r.frame();
+    r.from("home");
+    while (r.session.boss?.phase === "won") r.act("boss-next");
+    r.frame();
+    const before = r.posted.length;
+    // no ending is logged in this store: the pages run as the dev preview of the good ending
+    r.session.endingPreview = "good";
+    r.act("boss-done");
+    return { r, before };
+  }
+  const ctxOf = (r: ReturnType<typeof rig>) => r.ctx;
+  const toPage = (r: ReturnType<typeof rig>, phase: string) => {
+    for (let i = 0; i < 40 && r.session.endingPage?.phase !== phase; i++) endingNext(ctxOf(r));
+    r.frame();
+  };
+
+  it("boss-done keeps the frame (no boss:false): hidden and paused through the objects page", () => {
+    const { r, before } = cameHome();
+    expect(r.session.boss).toBeNull();
+    expect(r.session.phase2?.stage).toBe("home");
+    expect(r.session.endingPage?.phase).toBe("objects");
+    r.frame();
+    expect(r.root.querySelector(".outside-host")).toBeNull();
+    expect(r.posted.slice(before)).toEqual([P2_CMD.pause(true)]);
+    r.frame();
+    expect(r.posted.slice(before)).toEqual([P2_CMD.pause(true)]);
+    r.done();
+  });
+
+  it("the homecoming page: the frame shown behind it (unpaused), no still, no placeholder; kuro once at step 3; reset at lines", () => {
+    const { r, before } = cameHome();
+    r.frame();
+    toPage(r, "home");
+    const page = r.root.querySelector<HTMLElement>(".home-page")!;
+    expect(page.classList.contains("world")).toBe(true);
+    expect(page.getAttribute("style")).toBeNull();
+    expect(page.firstElementChild!.classList.contains("outside-host")).toBe(true);
+    expect(page.querySelector('iframe[data-keep="room3d:room"]')).not.toBeNull();
+    expect(page.querySelector('[data-action="ending-next"]')).not.toBeNull();
+    expect(page.querySelector(".home-kuro")).toBeNull();
+    expect(page.querySelector(".home-desk")).toBeNull();
+    expect(r.posted.slice(before)).toEqual([P2_CMD.pause(true), P2_CMD.pause(false)]);
+    // steps 2 and 3: him at the third, once
+    endingNext(ctxOf(r));
+    r.frame();
+    expect(r.posted.slice(before)).toHaveLength(2);
+    endingNext(ctxOf(r));
+    r.frame();
+    expect(r.session.endingPage!.step).toBe(3);
+    expect(r.posted.at(-1)).toEqual(P2_CMD.kuro(true));
+    r.frame();
+    expect(r.posted.filter((p) => JSON.stringify(p) === JSON.stringify(P2_CMD.kuro(true)))).toHaveLength(1);
+    expect(r.root.querySelector(".home-kuro")).toBeNull();
+    // on to the talk in the dark: the room let go, the host gone
+    const n = r.posted.length;
+    endingNext(ctxOf(r));
+    expect(r.session.endingPage!.phase).toBe("lines");
+    expect(r.session.phase2).toBeNull();
+    r.frame();
+    expect(r.root.querySelector(".outside-host")).toBeNull();
+    expect(r.posted.slice(n)).toEqual([P2_CMD.off(), P2_CMD.pause(true)]);
+    r.done();
+  });
+
+  it("the fallback: no frame (or the win not in the world): the homecoming as today, and boss-done lets phase2 go", () => {
+    const r = rig();
+    // the frame never said ready
+    const b = bossStart(r.store.getState(), "good", r.now());
+    r.session.boss = { ...b, phase: "after" };
+    r.session.phase2 = { stage: "home", since: r.now() };
+    r.act("boss-done");
+    expect(r.session.phase2).toBeNull();
+    toPage(r, "home");
+    const page = r.root.querySelector<HTMLElement>(".home-page")!;
+    expect(page.classList.contains("world")).toBe(false);
+    expect(page.getAttribute("style")).toContain("--photo:url(");
+    expect(r.root.querySelector(".outside-host")).toBeNull();
+    r.done();
   });
 });
