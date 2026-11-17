@@ -123,13 +123,10 @@ stays the swap; the good ending's homecoming (`{ home: true }`) comes when the r
 Built by the room (2026-11-17), to wire, with the same pattern as R7 (stages on `Session.phase2`,
 posts once from `bossPosts`, nets, names and timings in `phase2.ts`):
 
-- `{ home: true }` — **good ending only**, after the win in the world (phase `won`, `phase2` = `up`):
-  13.5 s — the crowd of eyes shuts to the pair, the head goes down, the tentacles lie flat, the room
-  appears (morning, the day-1 look, lamp and ceiling light off), the eye comes down into it, a small
-  black dog sits on the bed; posts `{ source: "nt-room", type: "home" }`. Silent: no line there (the
-  author: 「No one like you.」 belongs to the ending pages with the song). Stage `homing` from the win
-  (the page `.homing`: the party and its mound fade as on `.leaving`; the outro lines read over it);
-  `home` (or a 15 s net) → stage `home`; `boss-done` is not offered before it. Nothing else posted.
+- Good ending — **superseded 2026-11-18** (author: 「都说剧情切换的就行」, the story cuts): no
+  descent after the win. The outro reads on the world as it stands; `boss-done` after the last line,
+  as for 同化. The room comes back on the home page (R9) by a cut. (`{ home: true }`, the 13.5 s
+  descent, stays in the room unused; the `homing` / `home` stages are no longer entered.)
 - `{ rush: true }` — **survive only**, after `eye` (R7): the greater Kuro turns to face us from a
   little above (3.4 s) and comes on through the frame; posts `{ type: "out" }` when the frame is
   dark (~4.2 s after the command); the frame stays dark. Stage `rushing` as soon as `eye` arrives
@@ -141,29 +138,31 @@ posts once from `bossPosts`, nets, names and timings in `phase2.ts`):
 - Tests in `tests/boss-phase2.test.ts` for both, as R7's: the posts once, the page classes, the nets,
   the way out held / automatic.
 
-## R9 — The good ending's homecoming page stands in the room the frame came home to
+## R9 — The good ending's homecoming page stands in the room, by cuts
 
-Author 2026-11-18 (memory good-ending-script): after the fight the old objects speak (ending page
-`objects`), then the player walks home (page `home`: the desk, 「点个外卖吧」 in the ear, then the big
-Kuro crouched on the bed — `src/world/endings/view.ts` renderHome, `pages.ts` HOME_KEYS), then the
-talk in the dark (`lines`). The room's `{ home }` (R8) already ends on exactly that room: the clean
-morning, every old object on the desk, the carton open, and the big Kuro on the bed, who stays
-hidden until the game posts `{ kuro: true }` (the room's command; `{ kuro: false }` hides him again).
+Author 2026-11-18: 「玩家视角在桌子上（剧情直接推的），然后耳边点个外卖，然后移到床的位置看到有个克总。都说剧情
+切换的就行」. The page `home` (`view.ts` renderHome; captions HOME_KEYS: the desk, 「点个外卖吧」, Kuro
+on the bed) drives the room frame, which has: `{ home: "cut" }` — the good ending's end state at once,
+from any state (clean morning, the eight objects on the desk, the carton open, nobody on the bed;
+posts "home" immediately); the ordinary `{ face, spot }` moves (the desk close-up `face: 0, spot:
+"desk"` walks in ~1 s; `spot: null` must come before a `face` change; a turn takes ~1.5 s); and
+`{ kuro: true | false }` (the big Kuro on the bed, a cut; he faces the eye and reads from face 1).
 
-- **Good ending only.** On `boss-done` the frame is **not** reset (no `{ boss: false }`, no pause
-  release): it is hidden (`display: none`) and paused as it is, in its `{ home }` end state.
-- Page `objects`: the frame stays hidden.
-- Page `home`: the frame is shown behind the page (same host as `bossScene`, kind `home`, before
-  the page, under it; `{ pause: false }`), the page's own still (`--photo`) and its placeholder
-  Kuro (`.home-kuro`) are **not** rendered when the frame is up (the page keeps the captions and
-  the click target; `.home-page.world`). At the third caption (`ending.home.kuro`, the step that
-  shows him) post `{ kuro: true }` once.
-- Leaving `home` (the `lines` page, black): post `{ boss: false }` and `{ pause: true }`, hide the
-  host — the reset R8 did at `boss-done` happens here instead.
-- Fallback: no frame (`bossRoom` off, or the win not in the world): the page renders as today
-  (the still, the placeholder).
-- Names and timings in `phase2.ts` as before; tests in `tests/boss-phase2.test.ts`: the frame kept
-  through `objects`, shown at `home`, `kuro` posted at step 3 once, reset at `lines`; the fallback.
+- **Good ending only; the frame kept.** On `boss-done` the frame is not reset: hidden
+  (`display: none`), paused, whatever state it is in. Page `objects`: hidden.
+- Page `home`, step 1 (the desk): the frame shown behind the page (same host as `bossScene`, kind
+  `home`, before the page, under it; `.home-page.world`; the page's own still and placeholder
+  `.home-kuro` not rendered), `{ pause: false }`, then `{ home: "cut" }`, then `{ face: 0, spot:
+  "desk" }` — the eye on the desk, the objects just put down.
+- Step 2 (「点个外卖吧」): nothing posted.
+- Step 3 (Kuro): `{ kuro: true }`, then `{ spot: null }`, then `{ face: 1 }` — the eye turns to the
+  bed and he is on it. Each post once.
+- Leaving `home` (the `lines` page, black): `{ boss: false }`, `{ pause: true }`, hide the host.
+- Fallback: no frame (`bossRoom` off, or the win not in the world): the page renders as today (the
+  still, the placeholder).
+- Names in `phase2.ts`; tests in `tests/boss-phase2.test.ts`: kept through `objects`, the three
+  posts of step 1 in order, nothing at step 2, the three of step 3 in order, the reset at `lines`,
+  the fallback.
 
 ## Out of scope
 
