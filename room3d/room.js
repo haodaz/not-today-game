@@ -2507,7 +2507,7 @@ function buildFar() {
   // with the lit eyes), stood up far behind the room as one great card, its edges lost in the smoke.
   const CAM = new THREE.Vector3(9, 7.5, 17), AIM = new THREE.Vector3(-2, 5.5, -6);
   FAR.cam2 = new THREE.Vector3(58, 104, 124); FAR.aim2 = new THREE.Vector3(-2, 22, -6); // further: he stays the size he is, the room shrinks, the ground turns out to be round
-  FAR.RP = 150; // a small world: from as high as the eye ends up, its edge is a curve and not a line (author: 最后甚至感觉是一个星球的半平面)
+  FAR.RP = 300; // wide enough that its edge runs from one side of the frame to the other and still bends (author on the 150 m one: 没铺满地面 — black to the left and right of a small globe)
   const dropAt = (r) => FAR.RP - Math.sqrt(Math.max(0, FAR.RP * FAR.RP - r * r));
   FAR.cam = CAM; FAR.aim = AIM;
   const pic = new THREE.TextureLoader().load("/battle/boss-giant.jpg"); pic.colorSpace = THREE.SRGBColorSpace;
@@ -2522,22 +2522,30 @@ function buildFar() {
   const [gc, gg] = canvas(1024, 1024);
   gg.fillStyle = "#000"; gg.fillRect(0, 0, 1024, 1024);
   for (let i = 0; i < 70; i++) { gg.strokeStyle = `rgba(255,${20 + Math.floor(R() * 50)},16,${0.4 + R() * 0.6})`; gg.lineWidth = 1 + R() * 3.5; gg.beginPath(); let x = R() * 1024, y = R() * 1024, a = R() * 6.28; gg.moveTo(x, y); for (let k = 0; k < 9; k++) { a += (R() - 0.5) * 1.5; x += Math.cos(a) * (30 + R() * 70); y += Math.sin(a) * (30 + R() * 70); gg.lineTo(x, y); } gg.stroke(); }
-  const cracks = new THREE.CanvasTexture(gc); cracks.wrapS = cracks.wrapT = THREE.RepeatWrapping; cracks.repeat.set(22, 11); cracks.anisotropy = 8; // fewer, larger: at ninety repeats the cracks beat against the pixels into a hatch cracks.colorSpace = THREE.SRGBColorSpace;
-  const ground = new THREE.Mesh(new THREE.SphereGeometry(FAR.RP, 128, 64, 0, Math.PI * 2, 0, 1.45), M({ color: 0x0b0a0a, roughness: 0.95, emissive: 0xffffff, emissiveMap: cracks, emissiveIntensity: 1.3 }, 3)); ground.position.y = -FAR.RP - 0.35; /* a world, not a floor */ ground.userData.noEdge = true; FAR.g.add(ground);
+  const cracks = new THREE.CanvasTexture(gc); cracks.wrapS = cracks.wrapT = THREE.RepeatWrapping; cracks.repeat.set(40, 16); cracks.anisotropy = 8; // fewer, larger: at ninety repeats the cracks beat against the pixels into a hatch cracks.colorSpace = THREE.SRGBColorSpace;
+  const ground = new THREE.Mesh(new THREE.SphereGeometry(FAR.RP, 160, 80, 0, Math.PI * 2, 0, 1.2), M({ color: 0x0b0a0a, roughness: 0.95, emissive: 0xffffff, emissiveMap: cracks, emissiveIntensity: 1.3 }, 3)); ground.position.y = -FAR.RP - 0.35; /* a world, not a floor */ ground.userData.noEdge = true; FAR.g.add(ground);
   const geos = [], c3 = new THREE.Vector3();
   // the fight only ever sees the near part of this world, from one place: a lighter build, so a slow machine is not
   // held up at the moment the eye is turned (the full count is for the pull-back, which goes to the far side)
-  const LIGHT = BOSS.on, COUNT = LIGHT ? 1250 : 3200, REACH = LIGHT ? 84 : 136;
-  for (let i = 0; i < COUNT; i++) { // enough of them that no ground shows between
-    const a = R() * Math.PI * 2, d = 3.4 + Math.pow(R(), 0.6) * REACH, len = 5 + R() * 9 + d * 0.22, r = 0.07 + R() * 0.16 + d * 0.028; // slender beside the room, so the room keeps its size; thick only far off, where distance makes them small again
+  // The ground is laid in batches so the fight can start on a light one and the rest can come later. Author on the
+  // result: 「超美，但是没铺满地面」 — no ground may show: where the room stood there is no room in the fight, so they
+  // run right up to the middle there; and before the eye pulls out to the far side the outer batches are added.
+  const LIGHT = BOSS.on;
+  const lay = (COUNT, NEAR, REACH, POW) => { const geos = []; for (let i = 0; i < COUNT; i++) {
+    const a = R() * Math.PI * 2, d = NEAR + Math.pow(R(), POW) * (REACH - NEAR), len = 5 + R() * 9 + d * 0.22, r = 0.07 + R() * 0.16 + Math.min(d, 120) * 0.028 + Math.max(0, d - 120) * 0.02; // slender beside the room, so the room keeps its size; thick only far off, where distance makes them small again
     let x = Math.cos(a) * d, z = Math.sin(a) * d, th = a + Math.PI / 2 + (R() - 0.5) * 1.2; const pts = [], n = 8, hump = 1 + Math.floor(R() * (n - 2));
     for (let k = 0; k <= n; k++) { pts.push(new THREE.Vector3(x, (k === 0 ? -0.9 - r : -0.35 + r * 0.55 * (1 - k / n) + (k === hump ? r * (0.8 + R() * 2.2) : 0)) - dropAt(Math.hypot(x, z)), z)); th += (R() - 0.5) * 0.7; x += Math.cos(th) * len / n; z += Math.sin(th) * len / n; }
     const curve = new THREE.CatmullRomCurve3(pts, false, "centripetal"), geo = new THREE.TubeGeometry(curve, 22, 1, 6), P = geo.attributes.position;
     for (let v = 0; v < P.count; v++) { const t = Math.floor(v / 7) / 22, rr = r * Math.pow(1 - t, 0.7) * (1 + 0.05 * Math.sin(t * 60)) + 0.01; curve.getPointAt(Math.min(1, t), c3); P.setXYZ(v, c3.x + (P.getX(v) - c3.x) * rr, c3.y + (P.getY(v) - c3.y) * rr, c3.z + (P.getZ(v) - c3.z) * rr); }
     geo.computeVertexNormals(); geos.push(geo);
-  }
+  } return geos; };
   const hideFar = hideMap.clone(); hideFar.repeat.set(10, 2); hideFar.needsUpdate = true;
-  const carpet = new THREE.Mesh(mergeGeometries(geos), M({ map: hideFar, bumpMap: hideFar, bumpScale: 4, roughness: 0.3, color: 0xd98a8a, emissive: 0xff2616, emissiveMap: hideFar, emissiveIntensity: 0.34 }, 3)); carpet.userData.noEdge = true; /* flesh under the hide, and wet */ carpet.frustumCulled = false; FAR.g.add(carpet);
+  const carpetMat = M({ map: hideFar, bumpMap: hideFar, bumpScale: 4, roughness: 0.3, color: 0xd98a8a, emissive: 0xff2616, emissiveMap: hideFar, emissiveIntensity: 0.34 }, 3);
+  const put = (geos) => { const m = new THREE.Mesh(mergeGeometries(geos), carpetMat); m.userData.noEdge = true; m.frustumCulled = false; FAR.g.add(m); for (const g of geos) g.dispose(); };
+  if (LIGHT) { put(lay(1500, 0.5, 86, 0.62)); FAR.light = true; } // the fight: the near field only, right up to the middle (no room stands there)
+  else put(lay(3200, 3.4, 139, 0.6).concat(lay(2300, 120, 285, 0.9)));
+  FAR.rest = () => { if (!FAR.light) return; FAR.light = false; put(lay(1500, 70, 139, 0.75).concat(lay(2300, 120, 285, 0.9))); }; // the far side, out to the world's edge, before the eye leaves // the far side, for when the eye leaves the fight
+
   FAR.dome = new THREE.Mesh(new THREE.SphereGeometry(200, 32, 16), new THREE.MeshBasicMaterial({ color: 0x1d1d1f, side: THREE.BackSide, fog: false, transparent: true, opacity: 0, depthWrite: false })); FAR.dome.renderOrder = -2; FAR.g.add(FAR.dome);
   FAR.glow = new THREE.PointLight(0xffd9a8, 0, 70, 1.2); FAR.glow.position.set(0.1, 2.4, 0.1); FAR.g.add(FAR.glow);
   { const [oc, og] = canvas(256, 256), gr = og.createRadialGradient(128, 128, 0, 128, 128, 128);
@@ -2578,7 +2586,7 @@ function updateBoss(s, dt) {
   // dim; the eyes are the last thing to light. Then the game is told.
   if (BOSS.rising) {
     BOSS.r = Math.min(1, (s - BOSS.rising) / 5.5);
-    if (BOSS.r >= 1 && !BOSS.told) { BOSS.told = true; BOSS.rising = 0; BOSS.ring = true; BOSS.to = 0.3; try { window.parent.postMessage({ source: "nt-room", type: "risen" }, "*"); } catch {} }
+    if (BOSS.r >= 1 && !BOSS.told) { setTimeout(() => FAR.rest?.(), 2500); BOSS.told = true; BOSS.rising = 0; BOSS.ring = true; BOSS.to = 0.3; try { window.parent.postMessage({ source: "nt-room", type: "risen" }, "*"); } catch {} }
   }
   // the dislocation (author 2026-11-17: 视角异位，不是直接切换): the eye starts where the first phase's eye was — low, level, the
   // ground a line across the frame — and is turned and lifted until it is looking down on the red world. The ring
@@ -2597,7 +2605,7 @@ function updateBoss(s, dt) {
 function bossEvent(kind) {
   const s = performance.now() / 1000;
   if (kind === "dislocate") { if (!BOSS.dis) { BOSS.p = 0; BOSS.ring = false; BOSS.to = 0; BOSS.dis = performance.now(); } return; }
-  if (kind === "leave") { if (BOSS.on && !BOSS.leave) { BOSS.leave = true; BOSS.left = false; BOSS.to = 0; BOSS.ring = false; BOSS.until = 0; } return; } // the ring sinks back; he stays
+  if (kind === "leave") { if (BOSS.on && !BOSS.leave) { FAR.rest?.(); BOSS.leave = true; BOSS.left = false; BOSS.to = 0; BOSS.ring = false; BOSS.until = 0; } return; } // the ring sinks back; he stays
   if (kind === "rise") { if (BOSS.r < 1 && !BOSS.rising) { BOSS.rising = s; BOSS.told = false; } return; }
   if (BOSS.r < 1) return; // nothing strikes before he is there
   if (kind === "strike") { BOSS.to = 1; BOSS.until = s + 0.75; }
@@ -2605,7 +2613,7 @@ function bossEvent(kind) {
 }
 function updateFar(s, dt) {
   if (BOSS.on) FAR.to = BOSS.leave ? 1 : 0.56;
-  if (!FAR.built) { if (!((FAR.to ?? 0) > 0)) return; buildFar(); }
+  if (!FAR.built) { if (!((FAR.to ?? 0) > 0)) { if (!gtao.enabled) gtao.enabled = true; return; } buildFar(); }
   if (BOSS.on && BOSS.leave) FAR.k = Math.min(1, FAR.k + dt * (1 - 0.56) / LEAVE_S); // the win: the eye goes on out at an even pace, nine seconds to the far end
   else FAR.k += ((FAR.to ?? 0) - FAR.k) * (1 - Math.exp(-dt * 5)); if (Math.abs(FAR.k - (FAR.to ?? 0)) < 0.0005) FAR.k = FAR.to ?? 0; // the player's own hand on the bar (author: 做成滑杆，到时候是用户拉远的)
   const k = FAR.k, e = k * k * (3 - 2 * k);
@@ -2664,6 +2672,11 @@ function updateFar(s, dt) {
     camera.rotateZ(-DIS_ROLL * Math.sin(Math.PI * q));
     camera.updateMatrixWorld();
     FAR.card.quaternion.copy(camera.quaternion);
+  }
+  { // out here the near plane at 5 cm leaves no depth precision at 200 m (surfaces flicker against each other as the eye
+    // drifts), and the contact-shading pass turns to crawling noise on things a pixel wide: both are for the room only
+    const near = k > 0.12 ? 2 : 0.05; if (camera.near !== near) { camera.near = near; camera.updateProjectionMatrix(); }
+    gtao.enabled = k < 0.12;
   }
   const fov = 47 + 6 * e; if (Math.abs(camera.fov - fov) > 0.01) { camera.fov = fov; camera.updateProjectionMatrix(); }
 }
