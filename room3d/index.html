@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>房间试样</title>
+<style>
+  :root { --ink:#1d1d1f; --mute:#6b6b70; --line:#dedee2; --bg:#f6f5f2; --card:#fff; --accent:#b4321e; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.5 -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; }
+  main { max-width:1500px; margin:0 auto; padding:16px; }
+  h1 { font-size:16px; margin:0 0 2px; }
+  .sub { color:var(--mute); margin:0 0 12px; }
+  .pair { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  body.solo .pair { grid-template-columns:1fr; }
+  body.solo .photo { display:none; }
+  figure { margin:0; background:var(--card); border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  figcaption { padding:6px 10px; font-size:12px; color:var(--mute); border-bottom:1px solid var(--line); }
+  figcaption b { color:var(--ink); font-weight:600; }
+  .frame { position:relative; aspect-ratio:16/9; background:#111; overflow:hidden; }
+  .frame img, .frame canvas { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
+  .frame canvas { cursor:grab; touch-action:none; }
+  .frame canvas:active { cursor:grabbing; }
+  #still { opacity:0; transition:opacity 1.4s ease; pointer-events:none; }
+  #loading { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:#f3f2ee; color:#6b6b70; font-size:14px; letter-spacing:.08em; transition:opacity .6s ease; pointer-events:none; }
+  #caption { position:absolute; left:0; right:0; bottom:9%; text-align:center; color:#fff; font-size:clamp(14px, 1.6vw, 22px); letter-spacing:.04em; text-shadow:0 1px 8px #000, 0 0 2px #000; opacity:0; transition:opacity .8s ease; pointer-events:none; }
+  .edge { position:absolute; top:0; bottom:0; width:8%; border:0; background:transparent; color:#fff; font-size:22px; cursor:pointer; opacity:0; transition:opacity .2s; text-shadow:0 1px 6px #000; }
+  .edge:hover { opacity:.9; background:linear-gradient(var(--dir), rgba(0,0,0,.25), transparent); }
+  .edge.l { left:0; --dir:to right; } .edge.r { right:0; --dir:to left; }
+  .panel { margin-top:12px; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px 14px; display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:10px 22px; align-items:center; }
+  label { display:flex; align-items:center; gap:8px; white-space:nowrap; }
+  label span.v { min-width:44px; color:var(--accent); font-variant-numeric:tabular-nums; }
+  input[type=range] { flex:1; min-width:0; accent-color:var(--accent); }
+  button.b { border:1px solid var(--line); background:#fff; border-radius:7px; padding:5px 10px; font:inherit; cursor:pointer; }
+  button.b:hover { border-color:var(--ink); }
+  .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .note { color:var(--mute); font-size:12px; margin-top:10px; }
+  @media (max-width:820px) { .pair { grid-template-columns:1fr; } }
+  /* ?embed=1: only the picture, filling the frame it is put in */
+  body.embed { background:#111; overflow:hidden; }
+  body.embed main { max-width:none; padding:0; }
+  body.embed h1, body.embed .sub, body.embed .panel, body.embed .note, body.embed figcaption, body.embed .edge { display:none; }
+  body.embed figure { border:0; border-radius:0; }
+  body.embed .frame { aspect-ratio:auto; width:100vw; height:100vh; }
+</style>
+</head>
+<body>
+<main>
+  <h1>房间试样：照片 vs 代码搭的房间</h1>
+  <p class="sub">右边没有用任何图片，墙、木纹、被子、老物件、窗外的楼都是打开页面时现算的。按住拖动是转头，点左右边缘是转身。</p>
+  <div class="pair">
+    <figure class="photo">
+      <figcaption><b>现在</b> · 照片 <span id="photoName"></span></figcaption>
+      <div class="frame"><img id="photo" alt=""></div>
+    </figure>
+    <figure>
+      <figcaption><b>试样</b> · 代码搭的房间 <span id="faceName"></span></figcaption>
+      <div class="frame" id="frame">
+        <canvas id="c"></canvas>
+        <img id="still" src="/room/shots/room.jpg" alt="">
+        <div id="caption"></div>
+        <div id="drop" data-on="0" style="display:none;position:absolute;border:2px dashed #ff5fa2;border-radius:8px;pointer-events:none"></div>
+        <div id="loading">正在算这间屋……</div>
+        <button class="edge l" id="turnL" aria-label="向左转">←</button>
+        <button class="edge r" id="turnR" aria-label="向右转">→</button>
+      </div>
+    </figure>
+  </div>
+  <div class="panel">
+    <label>时间 <input id="time" type="range" min="13.5" max="24" step="0.05" value="13.5"><span class="v" id="timeV"></span></label>
+    <label>崩坏 <input id="collapse" type="range" min="0" max="1" step="0.01" value="0"><span class="v" id="collapseV"></span></label>
+    <label>像素 <input id="pixel" type="range" min="0" max="1" step="0.01" value="0"><span class="v" id="pixelV"></span></label>
+    <label>不真实 <input id="unreal" type="range" min="0" max="1" step="0.01" value="0"><span class="v" id="unrealV"></span></label>
+    <label>拉远 <input id="far" type="range" min="0" max="1" step="0.005" value="0"><span class="v" id="farV">0%</span></label>
+    <label>手 <input id="hand" type="range" min="0" max="1" step="0.005" value="0"><span class="v" id="handV" style="min-width:150px"></span></label>
+    <div class="row">咖啡：<button class="b" data-drink="sip">抿一口</button><button class="b" data-drink="gulp">一大口</button><button class="b" data-drink="glug">咕咚咕咚</button><button class="b" data-drink="refill">续杯</button><span style="color:var(--mute);font-size:12px">在桌前直接点杯子也行</span></div>
+    <div class="row">交给它：<button class="b" data-give="perfect">成了</button><button class="b" data-give="flawed">有瑕疵</button><button class="b" data-give="wrong">不对</button><label><input id="dropOn" type="checkbox"> 显示落点</label></div>
+    <div class="row">
+      <label style="flex:1">天数 <input id="day" type="range" min="1" max="18" step="1" value="18"><span class="v" id="dayV" style="min-width:64px"></span></label>
+      <label>外卖 <select id="meal" class="b">
+        <option value="auto">当天的（按时间：午 / 晚）</option>
+        <option value="hmj">黄焖鸡米饭</option><option value="soup">紫菜蛋花汤</option><option value="wonton">扁肉</option><option value="noodle">拌面</option><option value="steamed">蒸饺</option>
+        <option value="onigiri">饭团</option><option value="oden">关东煮</option><option value="battery">纽扣电池</option><option value="water">矿泉水</option>
+        <option value="latte">拿铁（热）</option><option value="americano">美式（冰）</option><option value="mlt">麻辣烫</option>
+        <option value="rice">多出来的米饭（第 4 天）</option><option value="notice">升级通知（第 13 天）</option><option value="phoenix">凤凰饭团（第 15 天）</option><option value="bag">退回的袋子（第 17 天）</option>
+      </select></label>
+      <label><input id="eaten" type="checkbox"> 吃完</label>
+      <label>拿起来细看 <select id="look" class="b"><option value="">不看</option><option value="chick">小鸡</option><option value="camera">拍立得</option><option value="pager">寻呼机</option><option value="iccard">电话卡</option><option value="tape">随身听</option><option value="dictionary">文曲星</option><option value="calculator">计算器</option><option value="phone">翻盖手机</option></select></label>
+      <button class="b" id="wake">试演：醒来闪过</button><button class="b" id="vision">试演：幻视</button>
+    </div>
+    <div class="row">
+      <label><input id="lampOn" type="checkbox"> 台灯</label>
+      <label><input id="ceilOn" type="checkbox"> 吸顶灯</label>
+      <label><input id="rain" type="checkbox"> 下雨</label>
+      <label><input id="outer" type="checkbox"> 窗外有东西</label>
+      <button class="b" id="desk">走到桌前</button><button class="b" id="spot2" style="display:none">走到窗前</button><button class="b" id="bL">← 转身</button><button class="b" id="bR">转身 →</button>
+      <button class="b" id="solo">只看试样 / 并排</button>
+    </div>
+  </div>
+  <p class="note">这是试样，不在游戏里。键盘 ← → 也能转身。 <span id="perf"></span> <a href="?low=1" style="color:inherit">低配</a> / <a href="?" style="color:inherit">正常</a></p>
+</main>
+<script type="module" src="./room.js"></script>
+</body>
+</html>

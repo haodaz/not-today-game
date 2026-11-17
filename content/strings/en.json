@@ -172,6 +172,8 @@
   "desktop.screen.right": "Right",
   "desktop.back": "Back to room",
   "desktop.leave": "Leave the screen",
+  "room.window.look": "Look out of the window",
+  "room.window.back": "Step back from the window",
   "hud.putDown": "Click outside to put it down",
   "settings.button": "Settings",
   "settings.title": "Settings",

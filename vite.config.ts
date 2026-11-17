@@ -16,7 +16,13 @@ const worldDir = fileURLToPath(new URL("./src/world", import.meta.url));
 const kuroDir = fileURLToPath(new URL("./supabase/functions/_shared/kuro", import.meta.url));
 const netDir = fileURLToPath(new URL("./src/net", import.meta.url));
 
+// room3d (2026-11-16): the code-built room is its own page, put in an <iframe> by the game only when a 3D
+// view is shown, so three.js is a second bundle that loads on first use and never on the title page.
+const room3dPage = fileURLToPath(new URL("./room3d/index.html", import.meta.url));
+const mainPage = fileURLToPath(new URL("./index.html", import.meta.url));
+
 export default defineConfig({
+  build: { rollupOptions: { input: { main: mainPage, room3d: room3dPage } } },
   resolve: {
     alias: {
       "@content": contentDir,

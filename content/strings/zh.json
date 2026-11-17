@@ -172,6 +172,8 @@
   "desktop.screen.right": "右屏",
   "desktop.back": "回房间",
   "desktop.leave": "离开屏幕",
+  "room.window.look": "看窗外",
+  "room.window.back": "离开窗边",
   "hud.putDown": "点屏幕外面放下",
   "settings.button": "设置",
   "settings.title": "设置",
