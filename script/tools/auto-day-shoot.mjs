@@ -347,7 +347,10 @@ for (const it of ITEMS) {
         const cards = want.map((sl) => board.cards.find((c) => c.id === (process.env.BOARD === "trap" && sl === board.slots[0] ? (board.cards.find((c) => c.id.startsWith("d"))?.id ?? sl.answer) : sl.answer))).filter(Boolean);
         if (board.given?.lock?.from) { await toWorkbench(); await goHome(); await sel(`[data-action=wb-nav][data-page='task:${it.id}']`, 1.2);
           if (await has("[data-action=board-lock]")) { const lbl = await ev("document.querySelector('[data-action=board-lock]').textContent.trim()"); await sel("[data-action=board-lock]", 0.6); note(`   lock before its source: "${lbl}", chips ${await has("[data-action=board-code]") ? "SHOWN (wrong)" : "hidden"}, 让它试 ${await has("[data-action=board-kuro-lock]") ? "there" : "MISSING"}`); await shotStep("lock-before-source"); await key("Escape"); } }
-        const seen = new Set(); for (const c of cards) { const k = JSON.stringify(c.from ?? null); if (seen.has(k)) continue; seen.add(k); const g = await gather(c); note(`   source ${k}: ${g ? "opened" : "NOT FOUND"} · last events ${await lastEvents()}`); }
+        const seen = new Set(); for (const c of cards) { const k = JSON.stringify(c.from ?? null); if (seen.has(k)) continue; seen.add(k); let g = await gather(c);
+          // a delivery at the door or a line in the box can swallow the first try (day 8 lunch): settle, un-full, once more
+          if (!g) { await settle(); await unfull(); await toRoom(); g = await gather(c); note(`   source ${k}: retried`); }
+          note(`   source ${k}: ${g ? "opened" : "NOT FOUND"} · last events ${await lastEvents()}`); }
       }
       await toWorkbench(); await goHome();
       await interrupts(); await goHome(); // a night task appears after the call
