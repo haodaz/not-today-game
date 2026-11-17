@@ -2506,7 +2506,7 @@ function buildFar() {
   // He is not modelled here: he is the picture the battle already uses (public/battle/boss-giant.jpg, the horned head
   // with the lit eyes), stood up far behind the room as one great card, its edges lost in the smoke.
   const CAM = new THREE.Vector3(9, 7.5, 17), AIM = new THREE.Vector3(-2, 5.5, -6);
-  FAR.cam2 = new THREE.Vector3(40, 60, 85); FAR.aim2 = new THREE.Vector3(-2, 18, -6); // further: he stays the size he is, the room shrinks, the ground turns out to be round
+  FAR.cam2 = new THREE.Vector3(58, 104, 124); FAR.aim2 = new THREE.Vector3(-2, 22, -6); // further: he stays the size he is, the room shrinks, the ground turns out to be round
   FAR.RP = 150; // a small world: from as high as the eye ends up, its edge is a curve and not a line (author: 最后甚至感觉是一个星球的半平面)
   const dropAt = (r) => FAR.RP - Math.sqrt(Math.max(0, FAR.RP * FAR.RP - r * r));
   FAR.cam = CAM; FAR.aim = AIM;
@@ -2526,7 +2526,7 @@ function buildFar() {
   const ground = new THREE.Mesh(new THREE.SphereGeometry(FAR.RP, 128, 64, 0, Math.PI * 2, 0, 1.45), M({ color: 0x0b0a0a, roughness: 0.95, emissive: 0xffffff, emissiveMap: cracks, emissiveIntensity: 1.3 }, 3)); ground.position.y = -FAR.RP - 0.35; /* a world, not a floor */ ground.userData.noEdge = true; FAR.g.add(ground);
   const geos = [], c3 = new THREE.Vector3();
   for (let i = 0; i < 3200; i++) { // enough of them that no ground shows between
-    const a = R() * Math.PI * 2, d = 2.2 + Math.pow(R(), 0.6) * 138, len = 9 + R() * 16 + d * 0.16, r = 0.22 + R() * 0.5 + d * 0.022;
+    const a = R() * Math.PI * 2, d = 3.4 + Math.pow(R(), 0.6) * 136, len = 5 + R() * 9 + d * 0.22, r = 0.07 + R() * 0.16 + d * 0.028; // slender beside the room, so the room keeps its size; thick only far off, where distance makes them small again
     let x = Math.cos(a) * d, z = Math.sin(a) * d, th = a + Math.PI / 2 + (R() - 0.5) * 1.2; const pts = [], n = 8, hump = 1 + Math.floor(R() * (n - 2));
     for (let k = 0; k <= n; k++) { pts.push(new THREE.Vector3(x, (k === 0 ? -0.9 - r : -0.35 + r * 0.55 * (1 - k / n) + (k === hump ? r * (0.8 + R() * 2.2) : 0)) - dropAt(Math.hypot(x, z)), z)); th += (R() - 0.5) * 0.7; x += Math.cos(th) * len / n; z += Math.sin(th) * len / n; }
     const curve = new THREE.CatmullRomCurve3(pts, false, "centripetal"), geo = new THREE.TubeGeometry(curve, 22, 1, 6), P = geo.attributes.position;
@@ -2572,14 +2572,14 @@ function updateFar(s, dt) {
     if (gone) { for (const t of tentacles) t.mesh.visible = false; for (const l of lines) l.visible = false; } // the ink edges of the missing walls would hang in the air as a wire box (author: 房子上面有几条边有点奇怪)
     FAR.orb.visible = gone; FAR.orb.material.opacity = Math.min(1, (k - 0.06) * 6) * 0.2;
     FAR.orb.scale.setScalar(9 + 8 * Math.max(0, (e - 0.42) / 0.58));
-    for (const l of FAR.reds) l.intensity = e * l.userData.i * (0.85 + 0.15 * Math.sin(s * 0.6 + l.userData.ph));
+    for (const l of FAR.reds) l.intensity = Math.min(1, e * 3.5) * l.userData.i * (0.85 + 0.15 * Math.sin(s * 0.6 + l.userData.ph)); // the ground is already red when the eye first clears the walls
   }
   FAR.glow.intensity = e * 10;
   if (!k) return;
   FAR.dome.material.opacity = Math.min(1, e * 1.6);
-  FAR.card.material.opacity = Math.min(1, Math.max(0, e * 4 - 0.5));
+  FAR.card.material.opacity = Math.min(1, Math.max(0, e * 9 - 0.25)); // he is there almost as soon as the ceiling is gone
   FAR.rim.intensity = e * 0.35; FAR.fill.intensity = e * 30;
-  scene.fog.color.lerp(C(0x1d1d1f), e);
+  scene.fog.color.lerp(C(0x1d1d1f), Math.min(1, e * 4)); // the room's own haze is gone as soon as the eye is out of it
   scene.fog.density = scene.fog.density * (1 - e) + (0.016 - 0.0105 * Math.max(0, (e - 0.42) / 0.58)) * e; // the plain goes on into the smoke
   // two legs. First up through the ceiling and back until the room is small in front and he stands over it;
   // then on, up and away: he does not get smaller, the room does, and the plain bends away on every side.
