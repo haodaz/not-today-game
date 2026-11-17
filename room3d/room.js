@@ -2945,21 +2945,18 @@ function updateBoss(s, dt) {
 // the ending pages, with the song). They have a small Kuro of their own with them, so nothing is left behind and
 // nothing is drawn away: the crowd of eyes shuts until only the pair is left, the head goes down, the ones that stood
 // up lie down and the red goes out of the ground; and the eye comes back down, through where the ceiling was, into
-// the room — clean, in the morning, and the small one sitting in it. { home: true }; posts "home" at the end; silent.
+// the room — clean, in the morning, every old thing on the desk, and Kuro, large, crouched on the bed. { home: true };
+// posts "home" at the end; silent (the player walks home in the game's own narration; this is where they arrive).
 let PEEK = null;
 const HOMEWARD = { at: 0, told: false, S: 13.5 };
-function buildPup() { // the small one: a black pup, sitting; two small lights for eyes; what he has instead of a tail
-  const g = (HOMEWARD.pup = new THREE.Group()), bm = M({ color: 0x0b0b0e, roughness: 0.55 }), em = new THREE.MeshBasicMaterial({ color: 0xffb060, toneMapped: false });
-  const P = (geo, m, x, y, z, sx = 1, sy = 1, sz = 1, rx = 0, rz = 0) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.scale.set(sx, sy, sz); o.rotation.set(rx, 0, rz); o.castShadow = true; o.userData.noEdge = true; g.add(o); return o; };
-  const sp = new THREE.SphereGeometry(1, 20, 14);
-  P(sp, bm, 0, 0.1, -0.02, 0.085, 0.1, 0.1); P(sp, bm, 0, 0.17, 0.03, 0.07, 0.09, 0.075); // haunches, chest
-  P(sp, bm, 0, 0.275, 0.06, 0.066, 0.06, 0.066); P(sp, bm, 0, 0.258, 0.122, 0.034, 0.03, 0.05); // head, muzzle
-  for (const k of [-1, 1]) { P(sp, bm, k * 0.064, 0.262, 0.05, 0.016, 0.042, 0.03, 0.1, k * 0.3); // ears, hanging: he is a dog (pricked ones read as a cat)
-    P(new THREE.CylinderGeometry(0.016, 0.02, 0.15, 8), bm, k * 0.034, 0.075, 0.075); P(sp, bm, k * 0.034, 0.012, 0.09, 0.022, 0.012, 0.03); // forelegs, paws
-    P(sp, em, k * 0.027, 0.292, 0.113, 0.0085, 0.0085, 0.004); }
-  for (let i = 0; i < 3; i++) { const a = -0.5 + i * 0.5, c = new THREE.CatmullRomCurve3([new THREE.Vector3(0, 0.05, -0.1), new THREE.Vector3(Math.sin(a) * 0.06, 0.03, -0.17), new THREE.Vector3(Math.sin(a) * 0.13, 0.015, -0.21), new THREE.Vector3(Math.sin(a) * 0.17, 0.05, -0.2)]);
-    const o = new THREE.Mesh(new THREE.TubeGeometry(c, 14, 0.011, 6), bm); o.userData.noEdge = true; o.castShadow = true; g.add(o); }
-  g.position.set(0.93, 0.5, -0.82); g.rotation.y = -0.45; /* on the bed: from the desk wall's eye the floor near by is under the frame */ g.visible = false; room.add(g);
+function buildPup() { // (author 2026-11-18, the good ending as she wrote it: 然后看到一个真实的克总蹲在床上——挺大的那种，小克总的3d形象，我们有)
+  // He is the figure the game already has (public/kuro/k3d_base.png: the black pup with the tentacles), large, on the bed,
+  // stood up to face the desk wall's eye; and under him the dip and the shade he makes in the quilt.
+  const g = (HOMEWARD.pup = new THREE.Group()), t = new THREE.TextureLoader().load("/kuro/k3d_base.png"); t.colorSpace = THREE.SRGBColorSpace;
+  const fig = new THREE.Mesh(new THREE.PlaneGeometry(0.74, 0.74), new THREE.MeshBasicMaterial({ map: t, alphaTest: 0.6, color: 0xe2e0dc, fog: false })); fig.position.y = 0.335; fig.isLine2 = true; /* kept out of the occlusion pass, which draws the whole square and laid a pale veil over the bed */ /* cut out hard: the picture's soft edge and its own cast shade showed as a pale square */ fig.userData.noEdge = true; g.add(fig);
+  const [sc, sg] = canvas(128, 128), gr = sg.createRadialGradient(64, 64, 6, 64, 64, 62); gr.addColorStop(0, "rgba(20,20,26,.5)"); gr.addColorStop(1, "rgba(20,20,26,0)"); sg.fillStyle = gr; sg.fillRect(0, 0, 128, 128);
+  const sh = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.44), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(sc), transparent: true, depthWrite: false })); sh.rotation.x = -Math.PI / 2; sh.position.set(0, 0.035, 0.04); sh.userData.noEdge = true; sh.isLine2 = true; sh.renderOrder = 2; g.add(sh);
+  g.position.set(0.93, 0.5, -0.86); g.rotation.y = Math.atan2(FACES[0].eye.x - 0.93, FACES[0].eye.z + 0.86); g.visible = false; room.add(g);
 }
 function home(on) {
   if (!on) { HOMEWARD.at = 0; HOMEWARD.told = false; if (FAR.built) { FAR.g.position.y = 0; FAR.g.scale.y = 1; } if (HOMEWARD.pup) HOMEWARD.pup.visible = false; return; }
@@ -2970,7 +2967,7 @@ function home(on) {
 function updateHome(s) {
   if (!HOMEWARD.at) return;
   const T = s - HOMEWARD.at;
-  if (BOSS.on) { BOSS.r = 1 - smooth(1.4, 5.6, T); if (T > 5.6) { BOSS.on = false; BOSS.leave = false; command({ day: 1, time: 8.5, lamp: false, ceil: false }); HOMEWARD.pup.visible = true; FAR.to = 0.56; FAR.k = 0.56; } } // the head goes down; then the room is there, and it is morning in it
+  if (BOSS.on) { BOSS.r = 1 - smooth(1.4, 5.6, T); if (T > 5.6) { BOSS.on = false; BOSS.leave = false; command({ day: 2, time: 8.5, lamp: false, ceil: false, objects: ["chick", "camera", "pager", "iccard", "tape", "dictionary", "calculator", "phone"] }); /* all of them carried home, on the desk */ HOMEWARD.pup.visible = true; FAR.to = 0.56; FAR.k = 0.56; } } // the head goes down; then the room is there, and it is morning in it
   if (!BOSS.on) FAR.to = 0.56 * (1 - smooth(6.4, HOMEWARD.S - 0.6, T)); // and the eye comes home
   if (FAR.built) { const q = smooth(2.2, 8.5, T); FAR.g.scale.y = 1 - 0.975 * q; FAR.g.position.y = -0.7 * q; } // they lie down: flat, and a little under the floor's level
   if (T >= HOMEWARD.S && FAR.k < 0.002 && !HOMEWARD.told) { HOMEWARD.told = true; try { window.parent.postMessage({ source: "nt-room", type: "home" }, "*"); } catch {} }
