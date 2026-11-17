@@ -602,7 +602,8 @@ function monitor(x, ry) {
 }
 // 27-inch, not 24: seen from across the room the first pair were small and low against someone sitting there (author 2026-11-16).
 // The top edge now comes to a seated eye (about 1.2 m).
-for (const [x, ry] of [[-0.3, 0.06], [0.3, -0.06]]) { const m = monitor(x, ry); m.scale.set(1.08, 1.16, 1.08); } // as in the photo: nearly in line, taller than wide screens usually are, standing clear of the desk
+const MON = [];
+for (const [x, ry] of [[-0.3, 0.06], [0.3, -0.06]]) { const m = monitor(x, ry); MON.push(m); m.scale.set(1.08, 1.16, 1.08); } // as in the photo: nearly in line, taller than wide screens usually are, standing clear of the desk
 // ---- small makers for precise things: rounded plates, pixel type, printed legends ----
 function RR(w, h, r) { const sh = new THREE.Shape(), x = -w / 2, y = -h / 2; sh.moveTo(x + r, y); sh.lineTo(x + w - r, y); sh.quadraticCurveTo(x + w, y, x + w, y + r); sh.lineTo(x + w, y + h - r); sh.quadraticCurveTo(x + w, y + h, x + w - r, y + h); sh.lineTo(x + r, y + h); sh.quadraticCurveTo(x, y + h, x, y + h - r); sh.lineTo(x, y + r); sh.quadraticCurveTo(x, y, x + r, y); return sh; }
 const FONT = { l: "01100,00100,00100,00100,00100,00100,01110", e: "00000,00000,01110,10001,11111,10000,01110", a: "00000,00000,01110,00001,01111,10001,01111", r: "00000,00000,10110,11001,10000,10000,10000", n: "00000,00000,10110,11001,10001,10001,10001", 0: "01110,10001,10011,10101,11001,10001,01110", 7: "11111,00001,00010,00100,01000,01000,01000", 3: "11110,00001,00001,01110,00001,00001,11110", 4: "00010,00110,01010,10010,11111,00010,00010", ".": "00000,00000,00000,00000,00000,01100,01100" };
@@ -870,6 +871,18 @@ G(X0 + 0.55, 0, 0.95, () => {
 
 // ================= what lies on the desk =================
 const DX = DESK.x, DZ = DESK.z;
+// The phone she actually uses, face up in front of the keyboard (the game's call sheet opens from it), and the
+// printed sheets, which appear on the shut laptop from the day something is printed.
+const DESKPHONE = G(DESK.x - 0.12, DESK.h, DESK.z + 0.3, () => {
+  slab(RR(0.072, 0.15, 0.011), 0.008, mat.blackGloss, 0, 0, 0, 0.0015);
+  box(0.064, 0.0004, 0.14, mat.screen, 0, 0.0083, 0, { cast: false, noEdge: true });
+}, { ry: 0.14, float: 0.2 });
+const PRINTS = G(DESK.x - 0.58, DESK.h + 0.0125, DESK.z + 0.2, () => {
+  const R = rng(31), sheet = M({ color: 0xf4f2ec, roughness: 0.9 }), ink = M({ color: 0x3a3d42, roughness: 0.9 });
+  for (let i = 0; i < 6; i++) box(0.19, 0.0005, 0.268, sheet, (R() - 0.5) * 0.012, 0.0004 + i * 0.0006, (R() - 0.5) * 0.012, { ry: (R() - 0.5) * 0.16, cast: i === 5, noEdge: true });
+  for (let i = 0; i < 11; i++) box(0.05 + R() * 0.1, 0.0002, 0.0035, ink, -0.02 + (R() - 0.5) * 0.02, 0.0041, -0.11 + i * 0.02, { ry: 0.04, cast: false, noEdge: true });
+}, { ry: 0.08 });
+PRINTS.visible = false;
 const OBJ = {};
 // the coffee mug, and drinking from it (author 2026-11-16: sip, a big mouthful, glug glug, refill)
 const COFFEE = { level: 1, hot: 1, act: null, inner: null, liquid: null, steam: [], pour: null };
@@ -2630,7 +2643,6 @@ const BOX = {
 // walls take over everything that could be touched in the photographs; new ways of touching come later).
 // Things first (the eight old objects, the mug, the lamp, the switch), then places, nearest first. null = nothing.
 const PLACES = {
-  screen: B3(DESK.x - 0.64, DESK.h + 0.18, DESK.z - 0.34, DESK.x + 0.64, DESK.h + 0.62, DESK.z - 0.04),
   keyboard: B3(DESK.x - 0.3, DESK.h, DESK.z + 0.02, DESK.x + 0.26, DESK.h + 0.04, DESK.z + 0.22),
   desk: BOX.desk, meal: BOX.meal, window: BOX.win, slit: BOX.slit,
   tower: B3(X0 + 0.54, 0, Z0 + 0.2, X0 + 0.78, 0.45, Z0 + 0.65),
@@ -2644,6 +2656,10 @@ const PLACES = {
 const _hp = new THREE.Vector3();
 function pickAt() {
   for (const id in OBJ) if (OBJ[id].visible && ray.intersectObject(OBJ[id], true).length) return id;
+  if (ray.intersectObject(DESKPHONE, true).length) return "deskphone";
+  if (PRINTS.visible && ray.intersectObject(PRINTS, true).length) return "prints";
+  if (ray.intersectObject(MON[0], true).length) return "screen-left";
+  if (ray.intersectObject(MON[1], true).length) return "screen-right";
   if (ray.intersectObject(COFFEE.inner, true).length) return "mug";
   if (ray.intersectObjects([SHADE, bulb], true).length) return "lamp";
   if (ray.intersectObject(SWITCH, true).length) return "switch";
@@ -2651,6 +2667,31 @@ function pickAt() {
   for (const id in PLACES) { if (id === "desk" && state.desk) continue; const h = ray.ray.intersectBox(PLACES[id], _hp); if (h) { const d = h.distanceTo(ray.ray.origin) + (id === "desk" ? 0.5 : 0); if (d < bd) { bd = d; best = id; } } }
   return best;
 }
+const aim = (e) => { const r = canvasEl.getBoundingClientRect(); ray.setFromCamera(new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1), camera); };
+const _lb = new THREE.Box3(), _lv = new THREE.Vector3();
+/** Where a named thing is in the picture right now: [x, y, w, h] as fractions of the frame (y down), or null if it is not in view. */
+function locate(id) {
+  const o = OBJ[id] ?? { deskphone: DESKPHONE, prints: PRINTS, "screen-left": MON[0].children[5], "screen-right": MON[1].children[5], mug: COFFEE.inner, lamp: SHADE, switch: SWITCH }[id];
+  if (o) { if (!o.visible || (o.parent && !o.parent.visible)) return null; _lb.setFromObject(o); } else if (PLACES[id]) _lb.copy(PLACES[id]); else return null;
+  let x0 = 1, y0 = 1, x1 = 0, y1 = 0, seen = 0;
+  camera.updateMatrixWorld();
+  for (let k = 0; k < 8; k++) {
+    _lv.set(k & 1 ? _lb.max.x : _lb.min.x, k & 2 ? _lb.max.y : _lb.min.y, k & 4 ? _lb.max.z : _lb.min.z).project(camera);
+    if (_lv.z > 1) continue; seen++;
+    const x = (_lv.x + 1) / 2, y = (1 - _lv.y) / 2;
+    x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y);
+  }
+  if (!seen || x1 < 0 || y1 < 0 || x0 > 1 || y0 > 1) return null;
+  const r = (v) => Math.round(v * 10000) / 10000;
+  return [r(x0), r(y0), r(x1 - x0), r(y1 - y0)];
+}
+let hoverId, hoverAt = 0;
+canvasEl.addEventListener("pointermove", (e) => { // embedded: tell the game what the pointer is over, at most twelve times a second
+  if (!document.body.classList.contains("embed") || dragging) return;
+  const now = performance.now(); if (now - hoverAt < 80) return; hoverAt = now;
+  aim(e); const id = pickAt();
+  if (id !== hoverId) { hoverId = id; canvasEl.style.cursor = id ? "pointer" : "default"; try { window.parent.postMessage({ source: "nt-room", type: "hover", id }, "*"); } catch {} }
+});
 const drop = (e) => { // a click that did not drag: if it was on the mug, take a sip
   if (dragging && e && Math.hypot(e.clientX - dragging.x, e.clientY - dragging.y) < 5) {
     const r = canvasEl.getBoundingClientRect();
@@ -2790,10 +2831,12 @@ function command(m) {
   if (m.rain != null) ui("rain", m.rain);
   if (m.outer != null) ui("outer", m.outer);
   if (m.eaten != null) ui("eaten", m.eaten);
+  if (m.prints != null) PRINTS.visible = !!m.prints;
+  if (m.locate) { const rects = {}; for (const id of m.locate) rects[id] = locate(id); try { window.parent.postMessage({ source: "nt-room", type: "where", rects, face: state.face, spot: state.desk ? state.spot : null, moving: !!state.turn || Math.abs(state.deskK - (state.desk ? 1 : 0)) > 0.01 }, "*"); } catch {} }
   if (m.far != null) FAR.to = Math.max(0, Math.min(1, Number(m.far)));
   if (m.wake) wake();
   if (m.vision) document.getElementById("vision").click();
 }
 window.addEventListener("message", (e) => { const m = e.data; if (m && m.target === "nt-room") command(m); });
 if (q.get("embed") === "1") { document.body.classList.add("embed", "solo"); resize(); }
-window.proto = { command, setFace, setSpot, FAR, state, apply, turn, toDesk, frame, handAnchor, work, drink, COFFEE, OUTER, give: (v) => { state.hand = 1; give = { verdict: v, t0: performance.now() / 1000 }; } };
+window.proto = { locate, command, setFace, setSpot, FAR, state, apply, turn, toDesk, frame, handAnchor, work, drink, COFFEE, OUTER, give: (v) => { state.hand = 1; give = { verdict: v, t0: performance.now() / 1000 }; } };
