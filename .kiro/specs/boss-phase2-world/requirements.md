@@ -22,9 +22,14 @@ Embedded page `/room3d/index.html?embed=1&day=18`, commands after `ready`:
   (a second or two) — so post `{ pause: true }` only **500 ms after** `{ boss: true }`, never at once.
   `{ boss: true, risen: true }` starts with the head already up (a reload mid-phase).
   `{ boss: false }` leaves the mode.
-- `{ dislocate: true }` — the camera starts matching phase 1's framing (a flat dark ground seen from
-  the side, eye low) and rolls / pitches / descends into the red world (≈3 s; the room's reply fixes
-  the numbers: duration, roll direction, pitch); posts `{ source: "nt-room", type: "dislocated" }`.
+- `{ dislocate: true }` — **3000 ms**. The camera starts matching phase 1's framing (eye 1.3 m above
+  a flat dark ground, level, the ground's edge a near-straight line at ~60 % of the frame height,
+  black above) and ends in the boss pose (looking down on the round world, the horizon a curve at
+  ~45 %). Easing smoothstep (≈ `cubic-bezier(.42,0,.58,1)`). **Roll 26° × sin(π·q)**: zero at both
+  ends, peak at 1500 ms, the horizon's right end up / left end down (counter-clockwise), then level.
+  The eye rises and tips down continuously over the 3 s. The ring of tentacles starts up at 1860 ms.
+  At the end it posts `{ source: "nt-room", type: "dislocated" }`. The head stays down throughout.
+  `{ boss: true }` alone sits at the end pose (no dislocation).
 - `{ rise: true }` — the head rises from below the frame over **5.5 s**, dim, the eyes and the rest
   of its light coming in over the last ~14 %; at the top it posts `{ source: "nt-room", type:
   "risen" }` once and the ring comes up to its idle. A second `rise` does nothing. `strike` / `hurt`
@@ -33,9 +38,8 @@ Embedded page `/room3d/index.html?embed=1&day=18`, commands after `ready`:
   sink back. `{ hurt: true }` — they drop back at once and the red light under the ground stutters.
 - `{ pause: true | false }` as everywhere.
 
-`boss` / `rise` / `strike` / `hurt` / `risen` are built; `dislocate` / `dislocated` are proposed and
-being built — keep every name and timing as constants in one place (`src/world/endings/phase2.ts`),
-so the room's final numbers change in one edit.
+All of these are built. Keep every name and timing as constants in one place
+(`src/world/endings/phase2.ts`), so a change on the room's side is one edit.
 
 ## R1 — The frame behind the fight
 
@@ -53,10 +57,13 @@ On `boss-done` (the ending pages begin): post `{ boss: false }`, `{ pause: true 
 When `boss.stage` goes 1 → 2 (the burst; the log says 「它炸开了」):
 
 1. show the host (`display: block`, opacity 0), post `{ pause: false }` then `{ dislocate: true }`;
-2. the page gets `.final` from the rules (already) and, for the dislocation's length, `.dislocating`:
-   `.bs-field` turns with the same motion in CSS (rotateX / roll + a drop; the numbers from the
-   room's reply, in `phase2.ts` as CSS custom properties on the page), the party kept upright and
-   landing on the dark ground strip (R3); the host's opacity crosses 0 → 1 over the same time;
+2. the page gets `.final` from the rules (already) and, for 3000 ms, `.dislocating`: `.bs-field`
+   turns with the same motion in CSS — `rotate(0)` → `rotate(-26deg)` at 50 % → `rotate(0)` at 100 %
+   (CSS negative = counter-clockwise, as the room's horizon), easing `cubic-bezier(.42,0,.58,1)`, plus
+   a `rotateX` growing toward the end and the party's drop onto its strip (R3), the party kept
+   upright; the host's opacity 0 → 1 over the first 900 ms (the room's start pose is deliberately
+   close to the 2D field: dark above, ground below). The numbers live in `phase2.ts` as CSS custom
+   properties set on the page (`--dislocate-ms`, `--dislocate-roll`);
 3. on `dislocated` (or a net at the dislocation's length + 500 ms): remove `.dislocating`, post
    `{ rise: true }`;
 4. the fight's clock holds from the burst until `risen` (or a net of the dislocation + 5.5 s + 1 s):

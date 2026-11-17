@@ -2553,7 +2553,9 @@ const _fp = new THREE.Vector3(), _fl = new THREE.Vector3(), _fq = new THREE.Quat
 // does not move. He does not lunge and does not flinch. When he acts, the world acts: the nearest of them rise out of
 // the ground and come down where the party stands. When he is hurt, they drop back and the red under the ground stutters.
 // { boss: true } enters it (the room is gone, the eye sits at one fixed place); { strike: true } / { hurt: true } are events.
-const BOSS = { on: false, k: 0, to: 0, until: 0, flick: 0, r: 0, rising: 0, told: false }; // r: how far the head has risen, 0 below the frame … 1 up
+const BOSS = { on: false, k: 0, to: 0, until: 0, flick: 0, r: 0, rising: 0, told: false, p: 1, dis: 0, ring: false };
+const DIS_MS = 3000, DIS_ROLL = 0.45; // the dislocation: three seconds; the horizon tips 26° at its middle and comes level again
+const _da = new THREE.Vector3(3, 1.3, 12), _dl = new THREE.Vector3(-1, 1.5, 0), _dq = new THREE.Quaternion(), _dm = new THREE.Matrix4(); // r: how far the head has risen, 0 below the frame … 1 up
 function bossTentacles() {
   BOSS.made = true;
   BOSS.mat = M({ map: hideMap, bumpMap: hideMap, bumpScale: 5, roughness: 0.3, color: 0x9a5560, emissive: 0x3a060c, emissiveIntensity: 0.6, side: THREE.DoubleSide }, 3); // his hide, as on the ground: dark wine, wet — not the pale indoor ones
@@ -2572,15 +2574,24 @@ function updateBoss(s, dt) {
   // dim; the eyes are the last thing to light. Then the game is told.
   if (BOSS.rising) {
     BOSS.r = Math.min(1, (s - BOSS.rising) / 5.5);
-    if (BOSS.r >= 1 && !BOSS.told) { BOSS.told = true; BOSS.rising = 0; BOSS.to = 0.3; try { window.parent.postMessage({ source: "nt-room", type: "risen" }, "*"); } catch {} }
+    if (BOSS.r >= 1 && !BOSS.told) { BOSS.told = true; BOSS.rising = 0; BOSS.ring = true; BOSS.to = 0.3; try { window.parent.postMessage({ source: "nt-room", type: "risen" }, "*"); } catch {} }
   }
-  if (BOSS.until && s > BOSS.until) { BOSS.until = 0; BOSS.to = BOSS.r >= 1 ? 0.3 : 0; }
+  // the dislocation (author 2026-11-17: 视角异位，不是直接切换): the eye starts where the first phase's eye was — low, level, the
+  // ground a line across the frame — and is turned and lifted until it is looking down on the red world. The ring
+  // comes up round the middle in its last third. Then the game is told, and can ask for the head.
+  if (BOSS.dis) {
+    BOSS.p = Math.min(1, (performance.now() - BOSS.dis) / DIS_MS);
+    if (BOSS.p > 0.62 && !BOSS.ring) { BOSS.ring = true; BOSS.to = 0.3; }
+    if (BOSS.p >= 1) { BOSS.dis = 0; try { window.parent.postMessage({ source: "nt-room", type: "dislocated" }, "*"); } catch {} }
+  }
+  if (BOSS.until && s > BOSS.until) { BOSS.until = 0; BOSS.to = BOSS.ring ? 0.3 : 0; }
   BOSS.k += (BOSS.to - BOSS.k) * (1 - Math.exp(-dt * (BOSS.to > BOSS.k ? 9 : 2.2))); // up fast, down slowly
   BOSS.flick = Math.max(0, BOSS.flick - dt * 2.5);
   if (FAR.reds) for (const l of FAR.reds) l.intensity *= 1 - 0.8 * BOSS.flick * (0.5 + 0.5 * Math.sin(s * 47 + l.userData.ph));
 }
 function bossEvent(kind) {
   const s = performance.now() / 1000;
+  if (kind === "dislocate") { if (!BOSS.dis) { BOSS.p = 0; BOSS.ring = false; BOSS.to = 0; BOSS.dis = performance.now(); } return; }
   if (kind === "rise") { if (BOSS.r < 1 && !BOSS.rising) { BOSS.rising = s; BOSS.told = false; } return; }
   if (BOSS.r < 1) return; // nothing strikes before he is there
   if (kind === "strike") { BOSS.to = 1; BOSS.until = s + 0.75; }
@@ -2637,6 +2648,15 @@ function updateFar(s, dt) {
     const r = BOSS.on ? BOSS.r : 1, up = r * r * (3 - 2 * r), lit = BOSS.on ? 0.16 + 0.34 * up + 0.5 * smooth(0.86, 1, r) : 1;
     FAR.card.position.set(0, 21 + 1.5 * w - (1 - up) * 62, -85).applyMatrix4(camera.matrixWorld);
     FAR.card.material.color.setScalar(lit);
+  }
+  if (BOSS.on && BOSS.p < 1) { // mid-dislocation: between the first phase's eye and this one, rolled
+    const q = BOSS.p, ez = q * q * (3 - 2 * q);
+    _dm.lookAt(_da, _dl, UP); _dq.setFromRotationMatrix(_dm);
+    camera.position.lerpVectors(_da, camera.position, ez);
+    camera.quaternion.copy(_dq.slerp(camera.quaternion, ez));
+    camera.rotateZ(-DIS_ROLL * Math.sin(Math.PI * q));
+    camera.updateMatrixWorld();
+    FAR.card.quaternion.copy(camera.quaternion);
   }
   const fov = 47 + 6 * e; if (Math.abs(camera.fov - fov) > 0.01) { camera.fov = fov; camera.updateProjectionMatrix(); }
 }
@@ -2983,7 +3003,8 @@ function command(m) {
   if (m.eaten != null) ui("eaten", m.eaten);
   if (m.objects !== undefined) { state.objects = Array.isArray(m.objects) ? m.objects.map(String) : null; applyDay(); }
   if (m.pause != null) renderer.setAnimationLoop(m.pause ? null : frame); // a frame the game has hidden should not go on drawing
-  if (m.boss != null) { BOSS.on = !!m.boss; BOSS.r = m.risen ? 1 : 0; BOSS.rising = 0; BOSS.told = !!m.risen; BOSS.to = m.risen ? 0.3 : 0; if (!BOSS.on) FAR.to = 0; } // { boss: true } = the world, head still down; add risen: true to start with him up
+  if (m.boss != null) { BOSS.on = !!m.boss; BOSS.r = m.risen ? 1 : 0; BOSS.rising = 0; BOSS.told = !!m.risen; BOSS.to = m.risen ? 0.3 : 0; BOSS.ring = !!m.risen; BOSS.p = 1; BOSS.dis = 0; if (!BOSS.on) FAR.to = 0; } // { boss: true } = the world, head still down; add risen: true to start with him up
+  if (m.dislocate) bossEvent("dislocate");
   if (m.rise) bossEvent("rise");
   if (m.strike) bossEvent("strike");
   if (m.hurt) bossEvent("hurt");
