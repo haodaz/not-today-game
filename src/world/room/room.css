@@ -854,7 +854,7 @@
 @keyframes bs-num{0%{transform:translateY(14px) scale(.4);opacity:0}14%{transform:translateY(-10px) scale(1.5);opacity:1}26%{transform:translateY(-6px) scale(1)}100%{transform:translateY(-58px) scale(.96);opacity:0}}
 /* the second stage and the last form (boss-fx reads .stage2 / .final for the air around it) */
 .bs-boss.stage2 .bs-boss-img{animation:bs-loom 3.2s ease-in-out infinite}
-.boss-page.final .bs-boss{transform:scale(1.24);transform-origin:100% 100%}
+/* the last form has its own, larger picture (stage3): no extra scale here, only the light round it */
 .boss-page.final .bs-boss-img{filter:drop-shadow(0 0 90px rgba(200,20,20,.9)) drop-shadow(0 30px 20px rgba(0,0,0,.7))}
 @media (prefers-reduced-motion:reduce){.bs-member .bs-sprite,.bs-boss-img{animation:none!important}.boss-page.bs-struck::after{animation:none;opacity:0}.boss-page.bs-impact .bs-bg,.boss-page.bs-impact .bs-field{filter:none}}
 /* the orders: whose turn it is, and for every move its name and what it does (the rules rewrite's markup) */
@@ -1011,3 +1011,20 @@
 .boss-page .bs-buff img{width:22px;height:22px;border-radius:50%;object-fit:cover}
 .boss-page .bs-buff b{font-weight:700}
 .boss-page .bs-buff small{opacity:.75}
+/* 对不起 (2026-11-17, look only): before the fight each of the four is a photograph from years ago, held up beside
+   one line; in the fight the four are four small cards in the top right corner, all with the same word on them.
+   Nothing here says what the word means. */
+.boss-page .bs-box.portrait{display:flex;align-items:center;gap:30px;min-height:210px;padding:22px 40px 22px 30px}
+.boss-page .bs-box.portrait p{font-size:24px;line-height:1.7;letter-spacing:.04em}
+.boss-page .bs-portrait{width:150px;height:186px;border-radius:1px;object-position:50% 12%;background:#f4f1e8;border:7px solid #f4f1e8;border-bottom-width:22px;box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 14px 30px rgba(0,0,0,.75);filter:sepia(.22) saturate(.85) contrast(.96);transform:rotate(-2.4deg);animation:bs-photo 520ms cubic-bezier(.2,.8,.2,1) both}
+.boss-page .bs-portrait[data-who="partner"],.boss-page .bs-portrait[data-who="laozhou"]{transform:rotate(1.8deg)}
+@keyframes bs-photo{0%{opacity:0;translate:0 14px}100%{opacity:1;translate:0 0}}
+.boss-page[data-phase="after"] .bs-portrait,.boss-page.after .bs-portrait{filter:none;border-color:#e9e6dc;background:#e9e6dc}
+.boss-page .bs-buffs{left:auto;right:26px;top:18px;gap:6px}
+.boss-page .bs-buff{flex-direction:column;align-items:center;gap:3px;width:74px;padding:6px 4px 7px;border-radius:2px;border:1px solid rgba(239,233,223,.22);background:linear-gradient(180deg,rgba(18,20,26,.86),rgba(5,6,10,.82));box-shadow:0 6px 14px rgba(0,0,0,.5);font-size:11px;animation:bs-buff-in 600ms cubic-bezier(.2,.8,.2,1) both}
+.boss-page .bs-buff:nth-child(2){animation-delay:140ms}.boss-page .bs-buff:nth-child(3){animation-delay:280ms}.boss-page .bs-buff:nth-child(4){animation-delay:420ms}
+@keyframes bs-buff-in{0%{opacity:0;transform:translateY(-8px)}100%{opacity:1;transform:none}}
+.boss-page .bs-buff img{width:38px;height:38px;border-radius:1px;object-position:top;border:2px solid #f4f1e8;filter:sepia(.25) saturate(.8)}
+.boss-page .bs-buff b{font:700 13px/1.2 "Songti SC","STSong","Noto Serif CJK SC",serif;letter-spacing:.18em;text-indent:.18em;color:#efe9df}
+.boss-page .bs-buff small{font-size:10px;letter-spacing:.06em;color:#a49d8f;opacity:1}
+@media (prefers-reduced-motion:reduce){.boss-page .bs-portrait,.boss-page .bs-buff{animation:none}}

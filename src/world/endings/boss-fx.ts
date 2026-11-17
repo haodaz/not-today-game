@@ -283,16 +283,7 @@ export function createBossFx(deps: { readonly load?: () => Promise<Pixi>; readon
           const x = 700 + Math.random() * 900, g = circle(x, 800 + Math.random() * 60, 1.5 + Math.random() * 2.5, Math.random() < 0.3 ? 0xffb37a : ambient === 2 ? 0xd1202c : 0xa21caf, 0.85);
           particles.push({ g, vx: -0.02 - Math.random() * 0.05, vy: -0.07 - Math.random() * 0.1, life: 2600 + Math.random() * 1800, age: 0, gravity: -0.00001, spin: 0 });
         }
-        if (ambient === 2) { // the last form: more of it than the picture holds, moving at the bottom and the right edge
-          if (!edge) { edge = new pixi.Graphics(); layer.addChildAt(edge, 0); }
-          edge.clear();
-          const s = ambClock / 1000;
-          for (let i = 0; i < 9; i++) {
-            const x0 = 520 + i * 135, sway = Math.sin(s * (0.5 + i * 0.07) + i * 1.7), h = 190 + 110 * Math.sin(i * 2.3) + 50 * Math.sin(s * 0.4 + i);
-            edge.moveTo(x0, 910).bezierCurveTo(x0 - 30 + sway * 40, 910 - h * 0.4, x0 + 50 + sway * 70, 910 - h * 0.75, x0 + 20 + sway * 120, 910 - h).stroke({ color: 0x0a0306, width: 26 - i, alpha: 0.92, cap: "round" });
-            edge.moveTo(x0, 910).bezierCurveTo(x0 - 30 + sway * 40, 910 - h * 0.4, x0 + 50 + sway * 70, 910 - h * 0.75, x0 + 20 + sway * 120, 910 - h).stroke({ color: 0x5a0d16, width: 3, alpha: 0.55, cap: "round" });
-          }
-        }
+        // (the last form's own picture already fills the right half with tentacles; drawing more over the party read as scratches, so the air is all that changes)
       } else if (edge) { edge.destroy(); edge = null; }
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i]!;
