@@ -201,26 +201,33 @@
           }
         ],
         "game": {
-          "kind": "gacha",
+          "kind": "klotski",
           "slot": "r1",
-          "eggs": [
-            {
+          "level": [
+            "xNNy",
+            "xNNy",
+            "AABB",
+            "CCDD",
+            "s..t"
+          ],
+          "blocks": {
+            "A": {
               "card": "c1",
               "label": "Qinghe"
             },
-            {
+            "B": {
+              "card": "k1",
+              "label": "Kuro"
+            },
+            "C": {
               "card": "d1",
               "label": "Lao Wang"
             },
-            {
+            "D": {
               "card": "d2",
               "label": "Vivi"
-            },
-            {
-              "card": "k1",
-              "label": "Kuro"
             }
-          ]
+          }
         }
       },
       "deliverable": {

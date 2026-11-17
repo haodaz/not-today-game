@@ -8,6 +8,7 @@ import type { ActionContext } from "@world/desktop/controller";
 import { initialSession, type Session } from "@world/desktop/model";
 import { boardActions } from "@world/desktop/workbench/board";
 import { assistChip, gameChip, gameChipAfter, MINES_LOSE_AFTER_MS, spotFoundChip } from "@world/desktop/workbench/game-sfx";
+import { listenMs } from "@world/desktop/workbench/echo";
 import { linkStart, linkTap, linkRoll, type LinkGrid } from "@world/desktop/workbench/link";
 import { flow, pipesLeaks, pipesRoll, pipesStart, pipesTurn } from "@world/desktop/workbench/pipes";
 import { activePop } from "@world/desktop/workbench/moles";
@@ -250,12 +251,13 @@ describe("the board plays them", () => {
     if (r.session.snake!.want === want) expect(r.played).toEqual(["cursor", "tick"]);
   });
 
-  it("pacman (day 7): a turn ticks", () => {
+  it("echo (day 7): start is a cursor; the first voice tapped back in your turn is its seat's tone", () => {
     const r = rig(7, "desk", "task_d7_4", { skip: ["task4"] });
-    r.act("pacman-start");
-    const you = r.session.pacman!.you;
-    r.act("pacman-turn", { dir: you.dir === "up" ? "down" : "up" });
-    expect(r.played).toEqual(["cursor", "tick"]);
+    r.act("echo-start");
+    expect(r.played).toEqual(["cursor"]);
+    r.clock.now = r.session.echo!.listenAt + listenMs(r.session.echo!.round);
+    r.act("echo-tap", { i: "0" });
+    expect(r.played).toEqual(["cursor", "note0"]);
   });
 
   it("mines (day 8): a reveal ticks; the assist after a mine is cursor then heal", () => {

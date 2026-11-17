@@ -201,26 +201,33 @@
           }
         ],
         "game": {
-          "kind": "gacha",
+          "kind": "klotski",
           "slot": "r1",
-          "eggs": [
-            {
+          "level": [
+            "xNNy",
+            "xNNy",
+            "AABB",
+            "CCDD",
+            "s..t"
+          ],
+          "blocks": {
+            "A": {
               "card": "c1",
               "label": "青禾"
             },
-            {
+            "B": {
+              "card": "k1",
+              "label": "克总"
+            },
+            "C": {
               "card": "d1",
               "label": "老王"
             },
-            {
+            "D": {
               "card": "d2",
               "label": "Vivi"
-            },
-            {
-              "card": "k1",
-              "label": "克总"
             }
-          ]
+          }
         }
       },
       "deliverable": {

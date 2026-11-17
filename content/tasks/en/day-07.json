@@ -576,17 +576,32 @@
           "layout": "grid"
         },
         "game": {
-          "kind": "pacman",
-          "maze": [
-            "###############",
-            "#1....#.#....2#",
-            "#.##.##.##.##.#",
-            "#o...........o#",
-            "#.##.#G#G#.##.#",
-            "#....#G#G#...3#",
-            "#.##.#####.##.#",
-            "#4.....P.....5#",
-            "###############"
+          "kind": "echo",
+          "voices": [
+            {
+              "who": "boss",
+              "line": "King. Two hundred."
+            },
+            {
+              "who": "laozhou",
+              "line": "Prince. Twenty-six."
+            },
+            {
+              "who": "partner",
+              "line": "Duke. Thirty-one."
+            },
+            {
+              "who": "xiaozhang",
+              "line": "Earl. Thirty-six. I am the seventy-second."
+            },
+            {
+              "who": "me",
+              "line": "R&D. Headcount of one."
+            },
+            {
+              "who": "m1",
+              "line": ""
+            }
           ]
         }
       },
