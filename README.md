@@ -24,7 +24,7 @@ The game is fully playable offline: Kuro's evening talk falls back to scripted l
 
 Kiro features used in this repository:
 
-- **Specs:** 52 spec folders under [`.kiro/specs/`](.kiro/specs). Each holds a `requirements.md`; Kiro wrote `tasks.md` for 39 of them and `design.md` for 16. Later changes are dated additions inside the same requirements ("Addition 2026-…", "Correction 2026-…").
+- **Specs:** 83 spec folders under [`.kiro/specs/`](.kiro/specs) (as of 2026-11-17). Each holds a `requirements.md` written by Claude from the author's decisions; Kiro wrote `tasks.md` for 39 of them and `design.md` for 16, and implemented the rest from the requirements alone. 156 of the repository's 789 commits are Kiro's work (named in the subject, Kiro as co-author). Later changes are dated additions inside the same requirements ("Addition 2026-…", "Correction 2026-…").
 - **Steering:** 5 files under [`.kiro/steering/`](.kiro/steering). `product.md`, `voices.md` (the four text sources and their grammar), `tech.md` and `structure.md` are always included; `threejs.md` is included only for files under `src/room/**`.
 - **Agent hooks:** 3 `PostFileSave` hooks under [`.kiro/hooks/`](.kiro/hooks).
   - `validate-days-on-save` checks a saved day file.
