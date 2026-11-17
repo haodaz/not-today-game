@@ -198,7 +198,7 @@ export function renderHome(m: EndingModel): SafeHtml {
 export function renderPoster(m: EndingModel, ending: Ending): SafeHtml {
   const flavour = endingFlavour(ending, m.state);
   const fill = (s: string) => fillPlaceholders(s, m.state.names);
-  const card = html`<div class="ending-card"><div class="ending-art-wrap"><img class="ending-art" src="${ENDING_ART[flavour]}" alt="" draggable="false"></div><div class="ending-text"><small>${tr("ending.name.label")}</small><b>${tr(`ending.name.${flavour}`)}</b><p class="ending-about">${fill(t(`ending.about.${flavour}`, { day: m.state.day }))}</p><span class="ending-go" aria-hidden="true">${tr("ending.next")}</span></div></div>`;
+  const card = html`<div class="ending-card"><div class="ending-art-wrap"><img class="ending-art" src="${ENDING_ART[flavour]}" alt="" draggable="false"></div><div class="ending-text"><small>${tr("ending.name.label")}</small><b>${tr(`ending.name.${flavour}`)}</b><p class="ending-about">${fill(t(`ending.about.${flavour}`, { day: m.state.day }))}</p><span class="ending-go" aria-hidden="true">${tr("ending.next")}</span>${flavour === "good" && hasString("ending.poster.good.q") ? html`<p class="poster-q">${tr("ending.poster.good.q")}</p><p class="poster-a">${tr("ending.poster.good.a")}</p>` : null}</div></div>`;
   return html`<div class="stage ending-page poster-page lines-page carded" data-flavour="${flavour}">${next()}${card}</div>`;
 }
 

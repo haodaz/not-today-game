@@ -1133,3 +1133,6 @@
 .home-page .end-caps{background:rgba(10,10,12,.62);border-radius:6px}
 .home-page .end-caps .cap.kuro{color:#f4efe6;font-weight:700}
 @media (prefers-reduced-motion:reduce){.objects-page .eo img{transition:none}.home-page .home-kuro{animation:none}}
+/* the good ending's poster question and Kuro's answer (author 2026-11-18: 混沌克总会梦到血肉羊吗？／不会，但是会咬你的老玩具) */
+.poster-page .poster-q{margin:18px 0 4px;font-size:15px;letter-spacing:.08em;color:#9aa3b0}
+.poster-page .poster-a{margin:0;font-size:15px;color:#efe9df}
