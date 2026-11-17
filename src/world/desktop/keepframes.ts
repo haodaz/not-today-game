@@ -34,11 +34,18 @@ export function createFrameKeeper(doc: Document = document): FrameKeeper {
       if (!park || park.childElementCount === 0) return;
       for (const copy of root.querySelectorAll<HTMLIFrameElement>("iframe[data-keep]")) {
         const old = [...park.children].find((f) => (f as HTMLElement).dataset.keep === copy.dataset.keep) as HTMLIFrameElement | undefined;
-        if (!old || old.getAttribute("src") !== copy.getAttribute("src") || !copy.parentNode || !canMove(copy.parentNode)) continue;
+        if (!old) continue;
+        if (old.getAttribute("src") !== copy.getAttribute("src") || !copy.parentNode || !canMove(copy.parentNode)) {
+          // superseded by its copy: the copy loads in its place
+          old.remove();
+          continue;
+        }
         move(copy.parentNode, old, copy);
         copy.remove();
       }
-      park.replaceChildren();
+      // room-3d-desk R1: a frame marked `data-keep-hold` stays parked (loaded, out of sight) while the
+      // view has no place for it; it goes back on the next render that has its copy. The rest go.
+      for (const child of [...park.children]) if (!(child as HTMLElement).hasAttribute("data-keep-hold")) child.remove();
     },
   };
 }

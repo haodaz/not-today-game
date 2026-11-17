@@ -76,10 +76,11 @@ describe("R2 / R3 · window-out and window-back", () => {
     r.act("window-out");
     expect(r.session.outside).toEqual({ since: 1000 });
     const out = r.room();
-    expect(out).toContain('class="outside-host window" data-host="window"');
+    // room-3d-desk R1: the look-out is the shared room frame, shown on 窗
+    expect(out).toContain('class="outside-host room window" data-host="window"');
     expect(out).toContain('<div class="outside-dim" aria-hidden="true"></div>');
     expect(out).toContain('<iframe class="room3d" src="/room3d/index.html?embed=1&amp;day=4"');
-    expect(out).toContain(`title="${escapeHtml(t("room.window.look"))}" allow="" loading="eager" referrerpolicy="no-referrer"`);
+    expect(out).toContain(`title="${escapeHtml(t("room.window.look"))}" allow="" loading="eager" referrerpolicy="no-referrer" data-keep="room3d:room" data-keep-hold`);
     expect(out).toContain(`data-action="window-back" title="${escapeHtml(t("room.window.back"))}"`);
     expect(out).toContain(`<span class="word">${escapeHtml(t("room.window.back"))}</span>`);
     // a second window-out while open: nothing new
@@ -191,18 +192,19 @@ describe("R4 · the command reaches the page on ready, not before; again when it
     layer.after();
     expect(posted).toHaveLength(2);
     expect((posted[1] as [{ lamp: boolean; time: number }])[0]).toMatchObject({ lamp: false, time: 21 });
-    // closed: the host and the listener go; a later ready posts nothing
+    // closed: the shared frame is hidden, never removed (room-3d-desk R1): paused, once
     r.act("window-back");
     paint();
     layer.after();
     expect(root.querySelector(".outside-host")).toBeNull();
-    window.dispatchEvent(new MessageEvent("message", { data: { source: "nt-room", type: "ready" }, source: win as unknown as MessageEventSource }));
-    expect(posted).toHaveLength(2);
-    // opened again: a fresh look-out waits for its own ready
+    expect(posted.slice(2)).toEqual([[{ target: "nt-room", pause: true }, "*"]]);
+    layer.after();
+    expect(posted).toHaveLength(3);
+    // opened again: shown (unpaused), and the command only if it changed
     r.act("window-out");
     paint();
     layer.after();
-    expect(posted).toHaveLength(2);
+    expect(posted.slice(3)).toEqual([[{ target: "nt-room", pause: false }, "*"]]);
     layer.destroy();
     root.remove();
   });

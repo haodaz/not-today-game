@@ -49,7 +49,8 @@ import { deliverableOnDesk } from "@state/days/board";
 import { printsOnDesk } from "@state/days/prints";
 import { sheetLayer, viewfinderLayer } from "./viewfinder";
 import { wakeHost } from "./wake";
-import { windowHost } from "./outside";
+import { roomHost } from "./outside";
+import { desk3dOn } from "./desk3d";
 
 /** L7: the day the heart-rate widget appears (stages.json if it says; else day 9's narration). */
 export const HEART_RATE_FROM_DAY: number = (stagesFile as { heartRateFromDay?: number }).heartRateFromDay ?? 9;
@@ -296,6 +297,28 @@ function flatHits(view: "bed" | "window", arrived: boolean): SafeHtml {
  * playtest-1105 R4: the things to touch on 门 and 窗 (the coat, the bag, the door, the lock): real
  * buttons at their rects (the nav layer leaves a button alone); a click is one inner line.
  */
+/**
+ * room-3d-desk R4: what the game draws over the room frame on 桌子, at the rectangles the room reported
+ * (session.roomRects): the lit monitors, and a mark on each thing the old hits stood for, carrying the
+ * same action attributes so the guidance ring, the one-time pointers and the prompts find it. The
+ * marks take no clicks (CSS): the room receives the click and reports the pick. The bottom strip is
+ * HTML, so the way back works as on the photo.
+ */
+function deskMarks(state: State, events: readonly GameEvent[], session: Session): SafeHtml {
+  const rects = session.roomRects ?? {};
+  const mark = (id: string, attrs: string, extra: string | false | null = null): SafeHtml | null => {
+    const r = rects[id];
+    return r ? html`<i class="${cls("room-mark", id, extra)}" ${raw(attrs)} style="${rectStyle(r)}" aria-hidden="true"></i>` : null;
+  };
+  const on = booted(state, events);
+  const lit = on
+    ? html`${rects["screen-left"] ? html`<i class="monitor-lit left" style="${rectStyle(rects["screen-left"])}" aria-hidden="true"></i>` : null}${rects["screen-right"] ? html`<i class="monitor-lit right" style="${rectStyle(rects["screen-right"])}" aria-hidden="true"></i>` : null}`
+    : null;
+  const held = heldItem(session);
+  const objects = state.found.map((id, i) => mark(id, `data-object="${id}" data-action="loop-hold"`, cls(pointerCls(session, "hold", i === 0 && held === null), session.holding === id && !session.phoneOpen && "lifted") || null));
+  return html`<div class="desk3d-marks">${lit}${mark("screen-left", 'data-action="view" data-view="desktop" data-screen="left"')}${mark("screen-right", 'data-action="view" data-view="desktop" data-screen="right"')}${mark("deskphone", 'data-action="loop-phone"', session.phoneOpen && "lifted")}${objects}${printsOnDesk(state.day, events).length > 0 ? mark("prints", 'data-action="prints-open"') : null}${slipThing(state, events) ? mark("slip", 'data-action="desk-slip"') : null}${mark("lamp", 'data-action="lamp"')}${on ? null : mark("tower", 'data-action="tower-power"')}</div><div class="desk3d-back" aria-hidden="true"></div>`;
+}
+
 /** room-3d-window R1: the glass on 窗 — the two panes between the frame — looks out into the code-built room. */
 export const GLASS_RECT = fracRect(WINDOW_WALL, 0.385, 0.643, 0.145, 0.56);
 function glassHit(): SafeHtml {
@@ -629,7 +652,9 @@ export function renderRoom(model: RoomModel): SafeHtml {
   // playtest-1105 R4: 门's things to touch sit under the door beat's own spot.
   // playtest-1105 R5: 窗's table up close carries only the meal, large.
   const table = view === "table" ? tableThings(state, events) : null;
-  const scene = waiting || dream ? null : door ? html`${lookHits("door")}${doorContent(state, events, session)}` : hotView ? html`${shotHits(hotView, state, events)}${kept}` : (flat ?? table);
+  // room-3d-desk R2: 桌子 is the shared room frame; its things are the room's, the game draws its marks over them
+  const desk3d = desk3dOn(session);
+  const scene = desk3d ? (waiting || dream ? null : deskMarks(state, events, session)) : waiting || dream ? null : door ? html`${lookHits("door")}${doorContent(state, events, session)}` : hotView ? html`${shotHits(hotView, state, events)}${kept}` : (flat ?? table);
   // The held item sits over everything but the dialogue box (held-object.html).
   // camera-viewfinder: the viewfinder (R1) and the sheet in hand (R3) take the held layer's place;
   // the viewfinder also hides the HUD (the list, the corner, the buttons, Kuro's body).
@@ -642,12 +667,12 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const raid = !door && view !== "bed" && view !== "table" && !lying && !waiting && raidShowing(state, session);
   const gap = (view === "room" || view === "window" ? ROOM_SHOT : DESK_SHOT).gap;
   // 桌子 is the tabletop: everything with state is a placed cutout at its rect (content/desk.json).
-  const top = view === "desk" && !waiting && !dream ? tabletop(deskThings(state, events, session)) : null;
+  const top = view === "desk" && !desk3d && !waiting && !dream ? tabletop(deskThings(state, events, session)) : null;
   // The collapse stack and the evening look apply to all four facings (room-turn R4).
   // The table up close has no stack of its own (its photos would not be pushed in like the still).
   // The ceiling has no edited stage stills either (lying-view R2: its own two photos, day and night).
-  const fx = dream || view === "table" || lying ? null : renderFx(fxPlan(state.day, view as Exclude<typeof view, "table" | "lying">));
-  const evening = dream ? null : eveningLook(view, isEvening(session.clock), lampLit(session));
+  const fx = dream || view === "table" || lying || desk3d ? null : renderFx(fxPlan(state.day, view as Exclude<typeof view, "table" | "lying">));
+  const evening = dream || desk3d ? null : eveningLook(view, isEvening(session.clock), lampLit(session));
   const fadeLen = session.cam?.fade ?? ARRIVE_FADE_MS;
   const late = fade === null ? null : raw(` style="--late:-${Math.round(fade)}ms${fadeLen !== ARRIVE_FADE_MS ? `;--late-dur:${fadeLen}ms` : ""}"`);
   // On a turn edge the cursor is `walk` (room-turn R2; cursors.css reads the class).
@@ -656,7 +681,7 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const ceilingNight = lying && isEvening(session.clock);
   // box-arrival R1: 房间 and 床 show their box-less stills until the case has arrived (room.css `.nobox`).
   const nobox = !arrived && (view === "room" || view === "bed");
-  return html`<div class="${cls("stage", "room", `${view}-view`, nobox && "nobox", ceilingNight && "ceiling-night", raid && "raid", fade !== null && "m-late", dream && "scene-on", onEdge)}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${renderScene(lineScene)}${scene}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${wakeHost(session)}${windowHost(state.day, session)}${bare ? null : list}${bare ? null : dayCorner(state, session, nowMs)}${bare ? null : itemsPanel(state, events, session)}${!bare && (view === "room" || view === "bed" || view === "window") ? casePanel(state, events, session, model.runId ?? "run", nowMs) : null}${view === "desk" ? printsView(state, events, session) : null}${held}${model.boxOutside || bare ? null : dialogueBox(state, events, session, nowMs)}${bare ? null : bottomRight(model)}${bare ? null : hudTiles(session, state, { settings: true })}${model.boxOutside || bare ? null : settingsPanel(session)}${model.boxOutside || bare ? null : statusPanel(state, events, session)}${session.bookOpen ? diaryReader(diaryBookPages(diary(state, events)), session.bookSpread) : null}</div>`;
+  return html`<div class="${cls("stage", "room", `${view}-view`, nobox && "nobox", ceilingNight && "ceiling-night", raid && "raid", fade !== null && "m-late", dream && "scene-on", onEdge)}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${desk3d ? roomHost(state.day, session) : null}${renderScene(lineScene)}${scene}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${wakeHost(session)}${desk3d ? null : roomHost(state.day, session)}${bare ? null : list}${bare ? null : dayCorner(state, session, nowMs)}${bare ? null : itemsPanel(state, events, session)}${!bare && (view === "room" || view === "bed" || view === "window") ? casePanel(state, events, session, model.runId ?? "run", nowMs) : null}${view === "desk" ? printsView(state, events, session) : null}${held}${model.boxOutside || bare ? null : dialogueBox(state, events, session, nowMs)}${bare ? null : bottomRight(model)}${bare ? null : hudTiles(session, state, { settings: true })}${model.boxOutside || bare ? null : settingsPanel(session)}${model.boxOutside || bare ? null : statusPanel(state, events, session)}${session.bookOpen ? diaryReader(diaryBookPages(diary(state, events)), session.bookSpread) : null}</div>`;
 }
 
 export { raidShowing };

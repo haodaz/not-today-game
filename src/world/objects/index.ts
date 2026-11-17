@@ -11,7 +11,8 @@ import type { Session } from "@world/desktop/model";
 import { push } from "@world/loop/dialogue";
 import { calculator, lightLevel } from "./calculator";
 import { takenByKuro } from "./taken";
-import { chick } from "./chick";
+import { chick, chickFrameAt, type ChickState } from "./chick";
+import type { ChickFrameId } from "./frames";
 import { dictionary } from "./dictionary";
 import { pager } from "./pager";
 import { camera, iccard, phone } from "./plain";
@@ -167,4 +168,14 @@ function dropSequences(session: Session, prefix: string): Session["dialogue"] {
   if (queue.length === d.queue.length) return d;
   const headKept = head !== undefined && queue[0] === head;
   return { ...d, queue, line: headKept ? d.line : 0, page: headKept ? d.page : 0 };
+}
+
+/**
+ * room-3d-desk R5: the chick's face now, as the held chick's program would draw it (the same frame
+ * chooser, the same state when it has been picked up today, else a fresh one). The desk chick in the
+ * code-built room shows it; the held device UI is unchanged. Pure (it never starts the program).
+ */
+export function chickFrameNow(state: State, events: readonly GameEvent[], session: Session, nowMs: number, runId = "run"): ChickFrameId {
+  const env = envFor(state, events, session, "chick", nowMs, runId);
+  return chickFrameAt(peekState(session, "chick", env) as ChickState, env);
 }

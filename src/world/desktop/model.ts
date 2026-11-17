@@ -441,6 +441,15 @@ export interface Session {
    */
   /** room-3d-window: the look out of the window in the code-built room, from 窗 (session only; no event). */
   outside: { readonly since: number } | null;
+  /**
+   * room-3d-desk R1: the one shared room frame was asked for (its URL's day is the day it was made;
+   * every command carries the day after that). Never cleared in a page: the frame is hidden, not removed.
+   */
+  roomFrame: { readonly day: number } | null;
+  /** room-3d-desk R4: where the room says the desk's things are now, in stage px (null: not there). */
+  roomRects: Readonly<Record<string, import("@world/room/shots").Rect | null>> | null;
+  /** room-3d-desk R6: 桌子 is the photo (the `desk=photo` URL, or the room never said `ready`). */
+  deskPhoto: boolean;
   wakeFlash: { readonly since: number; readonly phase: "loading" | "up" | "fading"; readonly lined?: boolean } | null;
   /** fill (day11-budget-fill): the cost sheet's budget fill under way (session only; its end is logged as an `open fill:…`). */
   fill: import("./workbench/fill").FillGame | null;
@@ -674,6 +683,9 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     echo: null,
     nonogram: null,
     outside: null,
+    roomFrame: null,
+    roomRects: null,
+    deskPhoto: false,
     wakeFlash: null,
     fill: null,
     moles: null,

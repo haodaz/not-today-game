@@ -26,6 +26,7 @@ import { fxForGame } from "@world/room/fx/layer";
 import { createHandLayer } from "@world/objects/layer";
 import { createRoom3dLayer } from "@world/room/outside";
 import { onRoomMessage } from "@world/room/wake";
+import { settleRoomFrame } from "@world/room/desk3d";
 import { createNav } from "@world/room/nav";
 import { settleSession } from "@world/dialogue/place";
 import { stareTick } from "@world/room/stare";
@@ -141,6 +142,8 @@ function startGame(store: Store, saved: boolean, prologue = false): void {
       settleSession(ctx.session);
       // room-3d-window: the look-out belongs to 窗; any other view (a story moving the player) ends it
       if (ctx.session.outside !== null && ctx.session.view !== "window") ctx.session.outside = null;
+      // room-3d-desk R1: the shared room frame is made on the first lying render (or 桌子 / the look-out)
+      settleRoomFrame(ctx.session, ctx.store.getState().day);
       stareTick(ctx);
     },
     // tingtalk R1b: the windows' placement is remembered for this run (a fresh run starts default).
@@ -174,7 +177,6 @@ function startGame(store: Store, saved: boolean, prologue = false): void {
     hand: createHandLayer(),
     // room-3d-wake: the code-built room's messages (day 4's wake flash).
     room3d: createRoom3dLayer(onRoomMessage),
-    // room-3d-window: the same layer drives the look-out with outsideCommand (its default)
   });
   // What finished runs left on the desk (presentation only; the story never reads it).
   game.session.collection = collection;
@@ -185,6 +187,8 @@ function startGame(store: Store, saved: boolean, prologue = false): void {
   }
   // Debug speed, dev builds only (like ?day=): `?fast=1` counts delivery minutes as seconds.
   game.session.deliveryUnitMs = deliveryUnitMs(search, import.meta.env.DEV);
+  // room-3d-desk R6: `?desk=photo` keeps the photo 桌子 (the author's comparison; the replay driver passes it).
+  game.session.deskPhoto = new URLSearchParams(search).get("desk") === "photo";
   // Dev only, beside ?day=N (2026-11-12): `&launch=task3` stands at the desktop with 工作台 on that
   // task's page, so its launch page (and the work behind it) can be looked at without the morning.
   const launch = import.meta.env.DEV ? params.get("launch") : null;

@@ -314,8 +314,8 @@ export interface DesktopDeps {
   readonly pull?: (root: HTMLElement, ctx: ActionContext) => { after(): void; destroy(): void };
   /** The boss fight's effects layer (2026-11-14): a Pixi canvas over the boss page, loaded when the page is up. */
   readonly bossFx?: (root: HTMLElement, ctx: ActionContext) => { after(): void; destroy(): void };
-  /** The code-built room's host (room-3d-wake): listens for its page's messages while the host is up. */
-  readonly room3d?: (root: HTMLElement, ctx: ActionContext) => { after(): void; destroy(): void };
+  /** The code-built room's frames (room-3d-wake, -window, -desk): their messages, the commands, the desk's picks through `actions`. */
+  readonly room3d?: (root: HTMLElement, ctx: ActionContext, actions: Record<string, ActionHandler>) => { after(): void; destroy(): void };
   /** tingtalk R1b: where the windows' placement is remembered for the run (absent = the page only). */
   readonly placement?: { readonly storage: Pick<Storage, "getItem" | "setItem"> | null; readonly runId: string };
   /** photo-album R1: told when a room photo is first seen developed (the host writes the profile). */
@@ -515,7 +515,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   const bossFx = deps.bossFx ? deps.bossFx(root, ctx) : null;
   const fx = deps.fx ? deps.fx(root, ctx) : null;
   const hand = deps.hand ? deps.hand(root, ctx, actions) : null;
-  const room3d = deps.room3d ? deps.room3d(root, ctx) : null;
+  const room3d = deps.room3d ? deps.room3d(root, ctx, actions) : null;
 
   const onClick = (e: MouseEvent) => {
     const el = (e.target as HTMLElement).closest<HTMLElement>("[data-action]");

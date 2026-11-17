@@ -830,6 +830,25 @@
 @keyframes bs-giant-in{0%{opacity:0}100%{opacity:1}}
 .boss-page.after .bs-field{animation:bs-pull 4s 1.2s cubic-bezier(.3,.1,.2,1) both;transform-origin:50% 76%}
 @keyframes bs-pull{0%{transform:scale(1)}100%{transform:scale(.16) translateY(900px)}}
+/* the fight's gauges as instruments (2026-11-16; author: 目前各种时间条都不精致). Styles only: the speed track, its marks, the
+   status plates, the HP bars and the boss's bar. The motion and effects pass waits for the rules rewrite. */
+.bs-track{width:6px;border:0;border-radius:0;background:linear-gradient(180deg,#F6B73C 0,rgba(246,183,60,.55) 12%,rgba(239,233,223,.22) 40%,rgba(239,233,223,.1) 100%);box-shadow:0 0 0 1px rgba(0,0,0,.6),0 0 12px rgba(0,0,0,.6)}
+.bs-track::before{left:-14px;right:-14px;top:-2px;height:2px;box-shadow:0 0 12px #F6B73C,0 0 2px #fff}
+.bs-track::after{content:"";position:absolute;left:-7px;right:-7px;top:0;bottom:0;pointer-events:none;background:repeating-linear-gradient(180deg,rgba(239,233,223,.55) 0 1px,transparent 1px 10%)}
+.bs-mark{width:36px;height:36px;margin:0 0 -18px -18px;border:1px solid rgba(239,233,223,.7);box-shadow:0 0 0 2px rgba(5,6,10,.9),0 4px 10px rgba(0,0,0,.7);transition:bottom 160ms cubic-bezier(.3,.7,.3,1)}
+.bs-mark.boss{border-color:#ef4444;box-shadow:0 0 0 2px rgba(5,6,10,.9),0 0 12px rgba(185,28,28,.8)}
+.bs-mark.top{border-color:#F6B73C;box-shadow:0 0 0 2px rgba(5,6,10,.9),0 0 16px #F6B73C;transform:scale(1.12)}
+.bs-atb-h{font-size:10px;letter-spacing:.5em;color:#a49d8f}
+.bs-plate{border-radius:2px;border:1px solid rgba(239,233,223,.22);background:linear-gradient(180deg,rgba(18,20,26,.86),rgba(5,6,10,.82));box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 6px 14px rgba(0,0,0,.5)}
+.bs-plate .bs-face{border-radius:1px}
+.bs-bar{position:relative;height:7px;border-radius:0;background:rgba(0,0,0,.65);box-shadow:inset 0 0 0 1px rgba(239,233,223,.22)}
+.bs-bar::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(90deg,transparent 0 calc(10% - 1px),rgba(5,6,10,.85) calc(10% - 1px) 10%)}
+.bs-bar b{transition:width 520ms cubic-bezier(.2,.8,.2,1);background:linear-gradient(180deg,#b6f3da,#3fbf8c 55%,#177a5a);box-shadow:0 0 8px rgba(63,191,140,.5)}
+.bs-bossbar .bs-bar{height:12px;border:0;border-radius:0;background:rgba(0,0,0,.7);box-shadow:inset 0 0 0 1px rgba(239,233,223,.35),0 0 0 3px rgba(5,6,10,.6),0 0 20px rgba(0,0,0,.8)}
+.bs-bossbar .bs-bar b{background:linear-gradient(180deg,#fca5a5,#dc2626 45%,#7f1d1d);box-shadow:0 0 16px rgba(239,68,68,.7)}
+.bs-bossbar.stage2 .bs-bar b{background:linear-gradient(180deg,#f0abfc,#a21caf 45%,#3b0764);box-shadow:0 0 16px rgba(162,28,175,.7)}
+.bs-bossbar .bs-name{font-size:14px;letter-spacing:.5em}
+.bs-pct{font:700 15px/1 var(--mono,ui-monospace,Menlo,monospace);letter-spacing:.04em}
 .boss-page.after .bs-bg{animation:bs-bg-out 4s 1.2s ease-in-out both;transform-origin:50% 76%}
 @keyframes bs-bg-out{100%{transform:scale(.16) translateY(900px);opacity:0}}
 .boss-page.after .bs-top,.boss-page.after .bs-atb,.boss-page.after .bs-bossbar{opacity:0}
@@ -921,3 +940,13 @@
 .outside-host > .leave-screen:hover,.outside-host > .leave-screen:focus-visible{background:rgba(244,240,232,.95);transform:translateY(-50%) translateX(2px);outline:none}
 .outside-host > .leave-screen .chev{width:8px;height:8px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-left:3px;flex:0 0 auto}
 .outside-host > .leave-screen .word{writing-mode:vertical-rl;white-space:nowrap;line-height:1}
+/* room-3d-desk R1 / R2: the shared room frame. Hidden off 桌子 and the look-out (paused by the game); on
+   桌子 it is the backdrop — in the stage's own order (z auto), over the photo (which shows until the room
+   has drawn), under the marks, the back strip, the HUD and the dialogue box. */
+.room > .outside-host.room.hidden{display:none}
+.room > .outside-host.room.desk{z-index:auto}
+.desk3d-marks{position:absolute;inset:0;pointer-events:none}
+.desk3d-marks > .room-mark{position:absolute;display:block;pointer-events:none;border-radius:10px}
+.desk3d-marks > .room-mark.lifted{visibility:hidden}
+/* the way back on 桌子 stays the bottom 6 % of the stage (nav.ts): HTML over the frame, so the pointer reaches it */
+.room > .desk3d-back{position:absolute;left:0;right:0;bottom:0;height:6%;background:transparent}
