@@ -1069,6 +1069,11 @@
 .boss-page.world.final .bs-party::before{display:none}
 .boss-page.world.final::after{content:"";position:absolute;left:0;right:0;bottom:0;height:150px;pointer-events:none;z-index:2;background:linear-gradient(0deg,rgba(0,0,0,.82),rgba(0,0,0,.45) 45%,transparent)}
 .boss-page.world.final .bs-bossbar,.boss-page.world.final .bs-menu{z-index:4}
+/* the one tentacle left standing at the win is a picture made for the flat stage; in the world there are thousands of real ones */
+.boss-page.world .bs-tentacle{display:none}
+/* the flat stage's flash is a sheet of white over everything; over the dark world it turned the whole frame to milk and hid
+   what the world was doing. Here a flash is a bloom of light from where the party stands, and the rest stays visible. */
+.boss-page.world .bs-flash{background:radial-gradient(46% 52% at 50% 78%,rgba(255,236,214,.7),rgba(230,80,60,.28) 46%,transparent 74%)}
 .boss-page.world.final .bs-box{background:rgba(5,6,10,.62);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
 /* room-light-switch R3: the ceiling light. At night a cold, even wash from above inside the evening look
    (its dark layer lifted to 0.25 by the markup); on the ceiling a soft disc at the fitting; by day the

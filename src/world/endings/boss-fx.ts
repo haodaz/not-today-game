@@ -21,7 +21,7 @@ export const JOLT_MS = 320;
 /** When an act's impact lands after it starts, by the move's effect (the projectiles fly first). */
 export const IMPACT_DELAY: Readonly<Record<Fx, number>> = { throw: 640, flip: 620, strike: 300, shake: 200, flash: 120, heal: 150, none: 200 };
 
-const COLOR = { ours: 0xf6b73c, boss: 0xb91c1c, heal: 0x7fe0b8, white: 0xffffff, stage2: 0xa21caf } as const;
+const COLOR = { ours: 0xf6b73c, boss: 0xb91c1c, heal: 0x7fe0b8, white: 0xffffff, stage2: 0xb3122e } as const;
 
 export function createBossFx(deps: { readonly load?: () => Promise<Pixi>; readonly nowMs?: () => number } = {}): (root: HTMLElement, ctx: ActionContext) => Hook {
   return (root, ctx) => {
@@ -74,8 +74,10 @@ export function createBossFx(deps: { readonly load?: () => Promise<Pixi>; readon
       const k = pr.width > 0 ? 1600 / pr.width : 1;
       return { x: (r.left - pr.left + r.width * fx) * k, y: (r.top - pr.top + r.height * fy) * k };
     };
+    /** Phase 2 in the code-built world: there is no boss sprite on the page; what can be reached of him is over the ring, mid-frame. */
+    const inWorld = (page: HTMLElement): boolean => page.classList.contains("world") && page.classList.contains("final");
     const targetPoint = (page: HTMLElement, b: BossBattle, id: string): Pt | null =>
-      id === "boss" ? pointOf(page, ".bs-boss-img", 0.3, 0.42) : pointOf(page, `.bs-member[data-id="${id}"] .bs-sprite`, 0.5, 0.45);
+      id === "boss" ? (inWorld(page) ? { x: 800, y: 560 } : pointOf(page, ".bs-boss-img", 0.3, 0.42)) : pointOf(page, `.bs-member[data-id="${id}"] .bs-sprite`, 0.5, 0.45);
 
     const circle = (x: number, y: number, r: number, color: number, alpha = 1): import("pixi.js").Graphics => {
       const g = new pixi!.Graphics();
@@ -243,7 +245,7 @@ export function createBossFx(deps: { readonly load?: () => Promise<Pixi>; readon
       { // before it lands: the boss gathers itself at the mouth; a thrown thing leaves a trail on its way over
         const now = root.querySelector<HTMLElement>(".boss-page");
         if (now && pixi && layer) {
-          if (!ours) { const m = pointOf(now, ".bs-boss-img", 0.24, 0.5); if (m) charge(m, color, delay); }
+          if (!ours) { const m = inWorld(now) ? null : pointOf(now, ".bs-boss-img", 0.24, 0.5); if (m) charge(m, color, delay); } // in the world he gathers nothing: the ground rises instead
           else if (act.move.fx === "throw" || act.move.fx === "flip") { const a = targetPoint(now, b, act.who), z = targetPoint(now, b, "boss"); if (a && z) trail(a, z, color, delay); }
         }
       }
@@ -266,7 +268,7 @@ export function createBossFx(deps: { readonly load?: () => Promise<Pixi>; readon
           if (act.move.fx === "shake") rings(p, color);
           impact(p, color, act.move.fx === "flip" || act.move.fx === "throw" || crit);
           if (crit) for (let i = 0; i < 30; i++) spark(p.x, p.y, COLOR.white, 1.1, 700 + Math.random() * 500, 0.001, 5);
-          if (id === "boss") { ichor(p, crit ? 30 : 16); if (crit || act.move.fx === "flip") { const foot = pointOf(live, ".bs-boss-img", 0.4, 0.96); if (foot) crack(foot, color); } }
+          if (id === "boss") { ichor(p, crit ? 30 : 16); if (!inWorld(live) && (crit || act.move.fx === "flip")) { const foot = pointOf(live, ".bs-boss-img", 0.4, 0.96); if (foot) crack(foot, color); } }
         }
         if (!missed) weight(live, !ours || act.move.fx === "flip" || crit, !ours);
       });
