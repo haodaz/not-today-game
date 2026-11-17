@@ -12,8 +12,10 @@ Build this after `room-3d-window` (same host pattern, same page). Read that spec
 
 - `room3d/index.html?embed=1`, the message protocol and the `.outside-host` / iframe pattern from
   `room-3d-window`. **Never edit anything under `room3d/`.**
-- Posting `{ target: "nt-room", wake: true }` to the embedded room makes it play the flash by
-  itself: it sets its own light (8:00, collapse 0.33, no tentacles / pixels / outside thing), snaps
+- The page opened as `/room3d/index.html?embed=1&day=4&wake=1` plays the flash by itself right
+  after it posts `ready` (no command needed; the room listens only once its script has run, so a
+  command posted before `ready` may be lost — the URL form avoids the timing altogether). It sets
+  its own light (8:00, collapse 0.33, no tentacles / pixels / outside thing), snaps
   to the desk wall, posts `{ source: "nt-room", type: "wake-line" }` **at once**, looks round once
   (four quarter turns of about a second each; the walls drain clean during the third), and posts
   `{ source: "nt-room", type: "wake-done" }` about six seconds in, when the room is clean.
@@ -48,10 +50,9 @@ Exported as a pure `wakeFlashDue(state, events): boolean` in a new `src/world/ro
 
 Host: the same `.outside-host` markup as the look-out (`src/world/room/outside.ts` / `hud.ts`),
 class `wake`, **no back pill** (nothing to click; the dialogue box is the only thing over it), the
-iframe `src="/room3d/index.html?embed=1"`. On the iframe's `load` post `{ target: "nt-room", day: 4,
-time: 8, face: 0, spot: null, lamp: false, ceil: false, rain: false, outer: false, eaten: false,
-far: 0 }` and then `{ target: "nt-room", wake: true }` (two posts, in that order). On `ready` the
-iframe gets class `ready` (fade-in 600 ms, as the look-out) and `phase` becomes `"up"`.
+iframe `src="/room3d/index.html?embed=1&day=4&wake=1"`. **Post nothing to it**: the URL starts the
+flash. On `ready` the iframe gets class `ready` (fade-in 600 ms, as the look-out) and `phase`
+becomes `"up"`. The order from the room is always `ready` → `wake-line` → `wake-done`.
 
 Messages from that iframe's window:
 
@@ -84,6 +85,7 @@ Messages from that iframe's window:
 - `getUp` on day 4: view 床, the `wake:flash` step appended, `wakeFlash.phase === "loading"`, no
   rise lines queued yet, the host with the iframe in the render; the second `getUp` of the run (a
   reload: fresh session, same events) queues the rise beat at once and no host.
+- the host's iframe src carries `day=4&wake=1`; nothing is posted to it;
 - the message handling as pure functions (`onRoomMessage(session, msg, now)` or equivalent):
   `ready` → `up`; `wake-line` → the player's line queued with `who: "me"` and `t("wake.flash")`;
   `wake-done` → `fading` and the rise beat queued; the 8 s / 15 s nets.

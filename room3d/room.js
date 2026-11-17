@@ -2591,7 +2591,7 @@ function frame(now) {
   }
   updateFar(now / 1000, dt);
   composer.render();
-  if (++framesDrawn === 3) { try { window.parent !== window && window.parent.postMessage({ source: "nt-room", type: "ready" }, "*"); } catch {} document.getElementById("loading").style.opacity = "0"; perf.first = (now - T0) / 1000; perf.t = now; perf.n = 0; }
+  if (++framesDrawn === 3) { try { window.parent !== window && window.parent.postMessage({ source: "nt-room", type: "ready" }, "*"); } catch {} if (q.get("wake") === "1") setTimeout(wake, 0); /* ?wake=1: the flash starts by itself, after ready */ document.getElementById("loading").style.opacity = "0"; perf.first = (now - T0) / 1000; perf.t = now; perf.n = 0; }
   if (framesDrawn > 3 && ++perf.n === 90) { document.getElementById("perf").textContent = `首屏 ${perf.first.toFixed(1)} 秒 · ${Math.round(90000 / (now - perf.t))} 帧/秒${LOW ? " · 低配" : ""}`; perf.t = now; perf.n = 0; }
 }
 

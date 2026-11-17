@@ -52,7 +52,7 @@ While `outside !== null`, the room stage (`.stage.room.window-view`) gets a chil
 `<div class="outside-host">` positioned over the whole stage (absolute, inset 0, scaling with the
 stage like the hits do), with:
 
-- `<iframe class="room3d" src="/room3d/index.html?embed=1" title="${t("room.window.look")}" allow="" loading="eager" referrerpolicy="no-referrer">`,
+- `<iframe class="room3d" src="/room3d/index.html?embed=1&day=${state.day}" title="${t("room.window.look")}" allow="" loading="eager" referrerpolicy="no-referrer">`,
   filling the host, `opacity: 0`, `transition: opacity 600ms`; class `ready` → `opacity: 1`.
 - a dim under it (`background: rgba(0,0,0,.55)`) so the photo darkens while the room is still
   calculating; the proto's own loading word is inside the iframe and stays.
@@ -78,12 +78,14 @@ A pure function `outsideCommand(state, session): RoomCommand` in a new
 `hour` = `hh + mm / 60` from `session.clock.time` ("HH:MM"), clamped to **[6, 24]**. `day` clamped
 to [1, 18].
 
-The controller posts the command to `iframe.contentWindow` with origin `"*"` (the page is same-origin
-but the proto checks only `target`): once on the iframe's `load` event, again whenever the command
-differs from the last one posted (compare `JSON.stringify`), checked in the rerender path while
-`outside` is open. On `message` events with `data.source === "nt-room" && data.type === "ready"`
-from that iframe's window, add class `ready` (the fade-in). Remove the message listener when the
-host is removed.
+The room listens only once its script has run and posts `ready` after its third frame; **anything
+posted before `ready` may be lost.** So: the `day` goes in the URL (`?embed=1&day=N`, so the first
+frame is already the right day); the controller posts the command to `iframe.contentWindow` with
+origin `"*"` (same origin; the proto checks only `target`) **first when the `ready` message arrives**
+(`data.source === "nt-room" && data.type === "ready"` from that iframe's window — never on `load`),
+and again whenever the command differs from the last one posted (compare `JSON.stringify`), checked
+in the rerender path while `outside` is open and ready. On `ready` also add class `ready` (the
+fade-in). Remove the message listener when the host is removed.
 
 ## R5 — What stops while looking out
 
@@ -99,7 +101,8 @@ host is removed.
 `tests/outside.test.ts`:
 
 - the glass hit is on the 窗 facing on day 1 and day 18, with its title; not on 房间 / 床 / 门.
-- `window-out` opens (host + iframe with the `?embed=1` src + the back pill with its word);
+- `window-out` opens (host + iframe with the `?embed=1&day=N` src + the back pill with its word);
+  the command is posted on `ready`, not before;
   `window-back` and Esc close; `window-out` while a dialogue line is queued does nothing.
 - `outsideCommand`: 09:03 → time 9.05; 05:00 → 6; 18:30 → 18.5, lamp true by default; `lampOn: false` wins;
   day 4 → rain true, day 10 → rain false (`content/stages.json` weather table); day clamped.
