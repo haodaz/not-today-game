@@ -230,9 +230,9 @@ function startGame(store: Store, saved: boolean, prologue = false): void {
     game.session.view = "desk";
     game.session.dialogue = { queue: [], line: 0 };
     // `&mercy=1`: the 对不起 run (the corridor cleared with no colleague swallowed) without the day's log;
-    // `&bosshp=0.15` below starts the boss under its last form's line
+    // `&bosshp=0.02` below leaves the first bar a hit from empty (the burst comes after it)
     game.session.boss = bossStart(store.getState(), boss, Date.now(), undefined, { mercy: params.get("mercy") === "1" });
-    // `&bosshp=0.55`: the boss already worn down, to look at the change of stage and Q-Kuro's entrance
+    // `&bosshp=0.55`: the first bar already worn down, to look at Q-Kuro's entrance; `&bosshp=0.02` for the burst
     const frac = Number(params.get("bosshp"));
     if (frac > 0 && frac < 1) game.session.boss = { ...game.session.boss, boss: { ...game.session.boss.boss, hp: Math.round(game.session.boss.boss.max * frac) } };
     game.rerender();

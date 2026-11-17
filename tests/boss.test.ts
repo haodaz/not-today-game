@@ -5,7 +5,7 @@ import "./specimen";
 import { describe, expect, it } from "vitest";
 import { constants } from "@state/variables";
 import type { State } from "@state/types.gen";
-import { ACT_MS, bossChoose, bossCheat, bossNext, bossRetry, bossStart, bossTick, COLLEAGUES, QKURO_JOINS_AT, renderBoss, STAGE2_AT, STAGE3_AT, type BossBattle } from "@world/endings/boss";
+import { ACT_MS, bossChoose, bossCheat, bossNext, bossRetry, bossStart, bossTick, COLLEAGUES, QKURO_JOINS_AT, renderBoss, STAGE2_HP, type BossBattle } from "@world/endings/boss";
 import { setLocale, t } from "@world/i18n";
 import { createStore } from "@state/store";
 
@@ -99,14 +99,19 @@ describe("the boss fight", () => {
     expect(hit.party.some((m) => m.hp < m.max) || hit.act?.text.some((x) => x === t("boss.miss"))).toBe(true);
   });
 
-  it("under half HP the boss changes stage; Q-Kuro joins when allowed; the boss down is the win, the outro, then after; the player down is the loss and a retry", () => {
+  it("the first bar emptied is the second form with its own bar, not the win; Q-Kuro joins when allowed; the second bar emptied is the win, the outro, then after; the player down is the loss and a retry", () => {
     let b = bossStart(withState({ affinity: 100 }), "good", 0);
     b = { ...b, phase: "run", clockAt: 0 };
-    // an act that leaves the boss under the thresholds, resolved
-    const low: BossBattle = { ...b, phase: "act", act: { who: "player", target: "boss", move: b.party[0]!.moves[0]!, at: 0, text: [], hits: [] }, boss: { ...b.boss, hp: Math.floor(b.boss.max * Math.min(STAGE2_AT, QKURO_JOINS_AT)) - 1 } };
+    // an act that empties the first bar, resolved
+    const low: BossBattle = { ...b, phase: "act", act: { who: "player", target: "boss", move: b.party[0]!.moves[0]!, at: 0, text: [], hits: [] }, boss: { ...b.boss, hp: 0 } };
     const after = bossTick(low, ACT_MS);
     expect(after.phase).toBe("run");
     expect(after.boss.stage).toBe(2);
+    expect(after.boss.hp).toBe(STAGE2_HP);
+    expect(after.boss.max).toBe(STAGE2_HP);
+    expect(after.log).toBe(t("boss.qkuroJoins")); // the burst line, then Q-Kuro's entrance over it
+    expect(renderBoss(after, ACT_MS).value).toContain('class="bs-bossbar stage2" data-stage="2"');
+    expect(renderBoss(after, ACT_MS).value).toContain('class="bs-bar hp2"');
     expect(after.joined).toBe(true);
     expect(after.party.at(-1)!.id).toBe("qkuro");
     expect(renderBoss(after, ACT_MS).value).toContain("/battle/boss-stage2.png");
@@ -177,18 +182,18 @@ describe("对不起 and the last form (author 2026-11-16)", () => {
     expect(renderBoss(plain, 0).value).not.toContain("bs-buffs");
   });
 
-  it("under a fifth of its HP the boss bursts: stage 3, the page's final class, the burst move", () => {
+  it("the burst form: the page's final class and the burst move on everyone; the cheat ends the fight from either bar", () => {
     let b = bossStart(withState({ affinity: 0 }), "survive", 0);
-    b = { ...b, phase: "run", clockAt: 0, boss: { ...b.boss, stage: 2 } };
-    const low: BossBattle = { ...b, phase: "act", act: { who: "player", target: "boss", move: b.party[0]!.moves[0]!, at: 0, text: [], hits: [] }, boss: { ...b.boss, hp: Math.floor(b.boss.max * STAGE3_AT) - 1 } };
+    b = { ...b, phase: "run", clockAt: 0 };
+    const low: BossBattle = { ...b, phase: "act", act: { who: "player", target: "boss", move: b.party[0]!.moves[0]!, at: 0, text: [], hits: [] }, boss: { ...b.boss, hp: 0 } };
     const after = bossTick(low, ACT_MS);
-    expect(after.boss.stage).toBe(3);
-    expect(after.log).toBe(t("boss.stage3"));
+    expect(after.boss.stage).toBe(2);
     expect(renderBoss(after, ACT_MS).value).toContain("boss-page end-survive stage2 final");
-    // its moves now include 炸 on everyone
     const ready: BossBattle = { ...after, boss: { ...after.boss, gauge: 0.999 }, party: after.party.map((m) => ({ ...m, gauge: 0 })), clockAt: ACT_MS };
     const ids = new Set<string>();
-    for (let i = 0; i < 12; i++) { const hit = bossTick({ ...ready, seed: `s${String(i)}` }, ACT_MS + 100); if (hit.act) ids.add(hit.act.move.id); }
-    expect([...ids].some((id) => id === "burst" || id === "swallow" || id === "eyes")).toBe(true);
+    for (let i = 0; i < 16; i++) { const hit = bossTick({ ...ready, seed: `s${String(i)}` }, ACT_MS + 100); if (hit.act) ids.add(hit.act.move.id); }
+    expect(ids.has("burst")).toBe(true);
+    expect(bossCheat(b, 10).phase).toBe("won");
+    expect(bossCheat(after, 10).phase).toBe("won");
   });
 });

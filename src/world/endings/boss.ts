@@ -74,7 +74,7 @@ export interface Member {
   readonly guard: boolean;
   readonly moves: readonly Move[];
 }
-export interface BossSide { readonly hp: number; readonly max: number; readonly atk: number; readonly spd: number; readonly gauge: number; readonly stage: 1 | 2 | 3 }
+export interface BossSide { readonly hp: number; readonly max: number; readonly atk: number; readonly spd: number; readonly gauge: number; readonly stage: 1 | 2 }
 export interface Act { readonly who: string; readonly target: string; readonly move: Move; readonly at: number; readonly text: readonly string[]; readonly hits: readonly { readonly id: string; readonly n: number }[] }
 export interface BossBattle {
   readonly ending: BossEnding;
@@ -104,11 +104,15 @@ export interface BossBattle {
 
 export const ACT_MS = 900;
 export const BOSS_TICK_MS = 100;
-export const STAGE2_AT = 0.5;
-/** 炸 (author 2026-11-16): under a fifth of its HP the boss bursts into its last form (`.final` on the page). */
-export const STAGE3_AT = 0.2;
+/**
+ * 炸 (author 2026-11-17: 「血打空了之后，进入下一阶段，不是血满，而是另一个颜色的血条或者被触手缠绕的血条」): the
+ * first bar emptied, the boss bursts into its last form — the huge dog, the tentacles out of every
+ * wall (`.final` on the page) — with a second, shorter bar of its own (`hp2`, wrapped in tentacles).
+ */
+export const STAGE1_HP = 340;
+export const STAGE2_HP = 180;
 export const QKURO_JOINS_AT = 0.6;
-const BOSS_HP = 520;
+const BOSS_HP = STAGE1_HP;
 const PLAYER_HP = 130;
 
 export const PLAYER_MOVES: readonly Move[] = [
@@ -131,9 +135,8 @@ export const OBJECT_MOVES: Readonly<Record<string, readonly Move[]>> = {
 };
 const QKURO_MOVES: readonly Move[] = [{ id: "bark", power: 20, acc: 100, fx: "shake" }, { id: "lick", power: 0, acc: 100, fx: "heal", heal: 18 }];
 const BOSS_MOVES_1: readonly Move[] = [{ id: "tentacle", power: 28, acc: 95, fx: "strike" }, { id: "gaze", power: 15, acc: 100, fx: "shake", all: true }];
-const BOSS_MOVES_2: readonly Move[] = [{ id: "swallow", power: 44, acc: 90, fx: "strike" }, { id: "eyes", power: 24, acc: 100, fx: "flash", all: true }];
-const BOSS_MOVES_3: readonly Move[] = [{ id: "burst", power: 34, acc: 100, fx: "shake", all: true }, { id: "swallow", power: 50, acc: 90, fx: "strike" }, { id: "eyes", power: 24, acc: 100, fx: "flash", all: true }];
-const BOSS_MOVES: Readonly<Record<1 | 2 | 3, readonly Move[]>> = { 1: BOSS_MOVES_1, 2: BOSS_MOVES_2, 3: BOSS_MOVES_3 };
+const BOSS_MOVES_2: readonly Move[] = [{ id: "burst", power: 34, acc: 100, fx: "shake", all: true }, { id: "swallow", power: 44, acc: 90, fx: "strike" }, { id: "eyes", power: 24, acc: 100, fx: "flash", all: true }];
+const BOSS_MOVES: Readonly<Record<1 | 2, readonly Move[]>> = { 1: BOSS_MOVES_1, 2: BOSS_MOVES_2 };
 
 /** What each colleague's 对不起 does to the party (named on the chips; the rule is in bossStart). */
 export const BUFF_EFFECT: Readonly<Record<ColleagueId, string>> = { boss: "atk", partner: "hp", xiaozhang: "spd", laozhou: "objects" };
@@ -232,16 +235,13 @@ function bossAct(b: BossBattle, nowMs: number, roll: () => number): BossBattle {
 function resolve(b: BossBattle, nowMs: number): BossBattle {
   let next: BossBattle = { ...b, act: null, party: b.party.map((m) => ({ ...m, pose: m.kind === "player" ? "stance" : m.pose })), clockAt: nowMs };
   const player = next.party.find((m) => m.id === "player")!;
-  if (next.boss.hp <= 0) return { ...next, phase: "won", line: 0, log: next.outro[0]?.t ?? "" };
+  if (next.boss.hp <= 0 && next.boss.stage === 2) return { ...next, phase: "won", line: 0, log: next.outro[0]?.t ?? "" };
   if (player.hp <= 0) return { ...next, phase: "lost", log: S("boss.lost") };
-  if (next.boss.stage === 1 && next.boss.hp <= next.boss.max * STAGE2_AT) {
-    next = { ...next, boss: { ...next.boss, stage: 2 }, log: S("boss.stage2") };
+  // 炸: the first bar emptied — the last form, with its own shorter bar
+  if (next.boss.stage === 1 && next.boss.hp <= 0) {
+    next = { ...next, boss: { ...next.boss, stage: 2, hp: STAGE2_HP, max: STAGE2_HP, gauge: 0 }, log: S("boss.stage2") };
   }
-  // 炸 (author 2026-11-16): the last form, huge, all tentacles
-  if (next.boss.stage === 2 && next.boss.hp <= next.boss.max * STAGE3_AT) {
-    next = { ...next, boss: { ...next.boss, stage: 3 }, log: S("boss.stage3") };
-  }
-  if (next.qkuroAllowed && !next.joined && next.boss.hp <= next.boss.max * QKURO_JOINS_AT) {
+  if (next.qkuroAllowed && !next.joined && (next.boss.stage === 2 || next.boss.hp <= next.boss.max * QKURO_JOINS_AT)) {
     const q: Member = { id: "qkuro", kind: "qkuro", hp: 70, max: 70, atk: 1, spd: 3000, gauge: 0.5, pose: "stance", guard: false, moves: QKURO_MOVES };
     next = { ...next, joined: true, party: [...next.party, q], log: S("boss.qkuroJoins") };
   }
@@ -313,7 +313,7 @@ export function bossChip(prev: BossBattle | null, next: BossBattle): ChipId[] {
     };
     if (fell("boss", next.boss.hp) || next.party.some((m) => fell(m.id, m.hp))) out.push("down");
   }
-  if ((next.boss.stage === 2 && prev?.boss.stage === 1) || (next.boss.stage === 3 && prev?.boss.stage === 2)) out.push("stage2");
+  if (next.boss.stage === 2 && prev?.boss.stage === 1) out.push("stage2");
   if (!prev?.joined && next.joined) out.push("join");
   if (next.phase !== prev?.phase) {
     if (next.phase === "won") out.push("win");
@@ -324,7 +324,7 @@ export function bossChip(prev: BossBattle | null, next: BossBattle): ChipId[] {
 }
 
 /** Dev / tests: the boss down at once. */
-export const bossCheat = (b: BossBattle, nowMs: number): BossBattle => resolve({ ...b, boss: { ...b.boss, hp: 0 } }, nowMs);
+export const bossCheat = (b: BossBattle, nowMs: number): BossBattle => resolve({ ...b, boss: { ...b.boss, stage: 2, hp: 0 } }, nowMs);
 
 // ——— the screen ———
 // The layout (author 2026-11-14, with Dragon's Crown / 剑与仙女 screenshots): the party stands on one
@@ -334,7 +334,7 @@ export const bossCheat = (b: BossBattle, nowMs: number): BossBattle => resolve({
 // HP as one full-width bar at the very bottom; the text box under the statuses; the moves by the
 // player's feet.
 
-const BOSS_IMG = { 1: "/battle/boss-stage1.png", 2: "/battle/boss-stage2.png", 3: "/battle/boss-stage2.png" } as const;
+const BOSS_IMG = { 1: "/battle/boss-stage1.png", 2: "/battle/boss-stage2.png" } as const;
 const PROP = { throw: "/battle/prop-laptop.png", flip: "/battle/prop-keyboard.png" } as const;
 export const BOSS_BG = "/battle/boss-bg.jpg";
 
@@ -385,7 +385,8 @@ export function renderBoss(b: BossBattle, nowMs: number): SafeHtml {
   const field = html`<div class="bs-field"${acting ? html` data-move="${acting.move.id}" data-eff="${effectKind(acting.move)}" data-who="${acting.who}"` : null}><div class="bs-ground"></div><div class="${cls("bs-party", b.phase === "after" && b.strong && "crossed")}">${members}</div>${boss}${tentacle}${prop}${flash}</div>`;
   // the boss's bar: one full-width bar at the very bottom
   const pct = Math.round((100 * Math.max(0, b.boss.hp)) / b.boss.max);
-  const bossbar = html`<div class="${cls("bs-bossbar", `stage${String(b.boss.stage)}`)}"><span class="bs-name">${S("boss.name")}</span>${bar(b.boss.hp, b.boss.max, "hp")}<span class="bs-pct">${String(pct)}%</span></div>`;
+  // the second form's own bar (hp2): shorter, its own colour, wrapped in tentacles (styled by the look pass)
+  const bossbar = html`<div class="${cls("bs-bossbar", `stage${String(b.boss.stage)}`)}" data-stage="${String(b.boss.stage)}"><span class="bs-name">${S("boss.name")}</span>${bar(b.boss.hp, b.boss.max, b.boss.stage === 2 ? "hp2" : "hp")}<span class="bs-pct">${String(pct)}%</span></div>`;
   // the commands: whoever is up (the player or an old object) and their moves, each with what it does
   const chooser = b.phase === "choose" && b.chooser !== null ? b.party.find((m) => m.id === b.chooser) ?? null : null;
   const menu = chooser ? html`<div class="${cls("bs-menu", chooser.kind)}" data-owner="${chooser.id}"><span class="bs-menu-h">${name(b, chooser.id)}</span>${chooser.moves.map((m) => html`<button type="button" class="${cls("bs-cmd", effectKind(m))}" data-action="boss-move" data-move="${m.id}"><b class="bs-cmd-name">${moveName(chooser.id, m)}</b><span class="bs-cmd-eff">${moveEffect(chooser.id, m)}</span></button>`)}</div>` : null;
@@ -400,7 +401,7 @@ export function renderBoss(b: BossBattle, nowMs: number): SafeHtml {
       ? html`<div class="bs-box"><button type="button" class="bs-cmd" data-action="boss-done">${S("boss.done")}</button></div>`
       : html`<div class="${cls("bs-box", clickable && "more", portrait && "portrait")}">${portrait}<p>${acting ? acting.text.join(" ") : b.log}</p>${clickable ? html`<i class="bs-caret"></i><button type="button" class="bs-hit" data-action="boss-next" aria-label="${S("boss.done")}"></button>` : null}</div>`;
   const cheat = import.meta.env.DEV && b.phase !== "after" && b.phase !== "won" ? html`<button type="button" class="sk-cheat" data-action="boss-cheat" aria-hidden="true" tabindex="-1"></button>` : null;
-  return html`<div class="${cls("boss-page", `end-${b.ending}`, b.strong && "strong", b.phase === "after" && "after", acting?.move.fx === "shake" && "shake", b.boss.stage >= 2 && "stage2", b.boss.stage === 3 && "final", b.mercy && "mercy", b.party.length > 6 && "many")}" data-phase="${b.phase}">${cheat}
+  return html`<div class="${cls("boss-page", `end-${b.ending}`, b.strong && "strong", b.phase === "after" && "after", acting?.move.fx === "shake" && "shake", b.boss.stage === 2 && "stage2", b.boss.stage === 2 && "final", b.mercy && "mercy", b.party.length > 6 && "many")}" data-phase="${b.phase}">${cheat}
     <div class="bs-bg"></div>
     ${giant}
     ${field}
