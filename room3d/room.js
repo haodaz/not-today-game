@@ -2517,6 +2517,28 @@ function buildFar() {
   FAR.card = new THREE.Mesh(new THREE.PlaneGeometry(128, 71.5), new THREE.MeshBasicMaterial({ map: pic, alphaMap: fade, transparent: true, opacity: 0, fog: false, depthWrite: false }));
   FAR.card.renderOrder = -1; FAR.card.userData.noEdge = true;
   FAR.g.add(FAR.card);
+  { // The other eyes (author 2026-11-17: 一开始只有一双，然后忽然一堆大大小小的红眼张开). They are on him all along, shut; in the
+    // fight, a moment after the pair has lit, they open — big ones and small ones, not quite together — and after that
+    // one or another shuts and opens again now and then. Drawn on the card, so they keep their place on his face.
+    const [ec, eg] = canvas(128, 128), gr = eg.createRadialGradient(64, 64, 2, 64, 64, 62);
+    gr.addColorStop(0, "rgba(255,236,190,1)"); gr.addColorStop(0.2, "rgba(255,120,40,1)"); gr.addColorStop(0.5, "rgba(210,20,14,.9)"); gr.addColorStop(0.78, "rgba(120,6,8,.35)"); gr.addColorStop(1, "rgba(60,0,0,0)");
+    eg.fillStyle = gr; eg.beginPath(); eg.ellipse(64, 64, 62, 40, 0, 0, 7); eg.fill();
+    eg.fillStyle = "rgba(10,0,0,.95)"; eg.beginPath(); eg.ellipse(64, 64, 5, 30, 0, 0, 7); eg.fill(); // the slit
+    const et = new THREE.CanvasTexture(ec); et.colorSpace = THREE.SRGBColorSpace;
+    const R2 = rng(4242), geo = new THREE.PlaneGeometry(1, 1);
+    FAR.eyes = [];
+    for (let i = 0; i < 34; i++) {
+      // over the face, the brow and out along what hangs from him; none where the first pair is
+      const a = R2() * Math.PI * 2, rr = Math.sqrt(R2()), x = Math.cos(a) * rr * 34, y = 6 + Math.sin(a) * rr * 21;
+      if (Math.abs(Math.abs(x) - 9) < 5 && Math.abs(y - 17) < 4.5) continue;
+      if (Math.abs(x) < 3.5 && y > 2) continue; // not down the ridge of the snout
+      const big = R2(), size = big < 0.12 ? 3.6 + R2() * 1.6 : big < 0.45 ? 1.8 + R2() * 1.2 : 0.7 + R2() * 0.8;
+      const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: et, transparent: true, opacity: 0, depthTest: false, depthWrite: false, fog: false, toneMapped: false, blending: THREE.AdditiveBlending }));
+      m.position.set(x, y, 0.2); m.rotation.z = (R2() - 0.5) * 1.1 + (x > 0 ? -0.25 : 0.25); m.renderOrder = 1; m.userData = { size, delay: R2() * R2() * 0.55, blinkAt: 4 + R2() * 14, noEdge: true };
+      m.scale.set(size * 1.5, 0.001, 1); m.visible = false;
+      FAR.card.add(m); FAR.eyes.push(m);
+    }
+  }
   // the plain: cracked ground with fire in the cracks, as in the picture, and them lying over it: long, whole,
   // thick where they leave the ground and drawn out to a point (the first build's were short pipes with cut ends)
   const [gc, gg] = canvas(1024, 1024);
@@ -2580,13 +2602,14 @@ function bossTentacles() {
   }
 }
 function updateBoss(s, dt) {
-  if (!BOSS.on) { if (BOSS.k > 0) BOSS.k = Math.max(0, BOSS.k - dt * 2); return; }
+  if (!BOSS.on) { if (BOSS.k > 0) BOSS.k = Math.max(0, BOSS.k - dt * 2); if (FAR.eyes && FAR.eyes[0].visible) for (const m of FAR.eyes) m.visible = false; return; } // outside the fight he has the one pair
   if (!BOSS.made) bossTentacles();
   // the entrance (author 2026-11-17: 巨兽的巨首能否缓缓升起): the head comes up out of the dark over five and a half seconds,
   // dim; the eyes are the last thing to light. Then the game is told.
   if (BOSS.rising) {
     BOSS.r = Math.min(1, (s - BOSS.rising) / 5.5);
-    if (BOSS.r >= 1 && !BOSS.told) { setTimeout(() => FAR.rest?.(), 2500); BOSS.told = true; BOSS.rising = 0; BOSS.ring = true; BOSS.to = 0.3; try { window.parent.postMessage({ source: "nt-room", type: "risen" }, "*"); } catch {} }
+    if (BOSS.r >= 1 && !BOSS.eyesAt) BOSS.eyesAt = s + 0.9; // the pair has lit; a breath, then the rest of them
+    if (BOSS.r >= 1 && !BOSS.told && s > BOSS.eyesAt + 0.8) { setTimeout(() => FAR.rest?.(), 2500); BOSS.told = true; BOSS.rising = 0; BOSS.ring = true; BOSS.to = 0.3; try { window.parent.postMessage({ source: "nt-room", type: "risen" }, "*"); } catch {} }
   }
   // the dislocation (author 2026-11-17: 视角异位，不是直接切换): the eye starts where the first phase's eye was — low, level, the
   // ground a line across the frame — and is turned and lifted until it is looking down on the red world. The ring
@@ -2599,6 +2622,14 @@ function updateBoss(s, dt) {
   if (BOSS.until && s > BOSS.until) { BOSS.until = 0; BOSS.to = BOSS.ring ? 0.3 : 0; }
   BOSS.k += (BOSS.to - BOSS.k) * (1 - Math.exp(-dt * (BOSS.to > BOSS.k ? 9 : 2.2))); // up fast, down slowly
   if (BOSS.leave && !BOSS.left && FAR.k >= 0.999) { BOSS.left = true; try { window.parent.postMessage({ source: "nt-room", type: "left" }, "*"); } catch {} }
+  if (FAR.eyes) for (const m of FAR.eyes) { // shut until their moment; then open with a snap; then the odd slow blink
+    const u = m.userData, t = BOSS.eyesAt ? s - BOSS.eyesAt - u.delay : -1;
+    if (t < 0) { m.visible = false; continue; }
+    let open = Math.min(1, t / 0.09); open = open < 1 ? open : 1 + 0.18 * Math.exp(-(t - 0.09) * 9) * Math.cos((t - 0.09) * 30);
+    const bt = (t - u.blinkAt) % (u.blinkAt * 1.7 + 6); if (t > u.blinkAt && bt < 0.22) open *= Math.abs(bt - 0.11) / 0.11;
+    m.visible = true; m.material.opacity = Math.min(1, t / 0.05) * (0.86 + 0.14 * Math.sin(s * 2.1 + u.delay * 40));
+    m.scale.set(u.size * 1.5, Math.max(0.001, u.size * open), 1);
+  }
   BOSS.flick = Math.max(0, BOSS.flick - dt * 2.5);
   if (FAR.reds) for (const l of FAR.reds) l.intensity *= 1 - 0.8 * BOSS.flick * (0.5 + 0.5 * Math.sin(s * 47 + l.userData.ph));
 }
@@ -3023,7 +3054,7 @@ function command(m) {
   if (m.eaten != null) ui("eaten", m.eaten);
   if (m.objects !== undefined) { state.objects = Array.isArray(m.objects) ? m.objects.map(String) : null; applyDay(); }
   if (m.pause != null) renderer.setAnimationLoop(m.pause ? null : frame); // a frame the game has hidden should not go on drawing
-  if (m.boss != null) { BOSS.on = !!m.boss; BOSS.r = m.risen ? 1 : 0; BOSS.rising = 0; BOSS.told = !!m.risen; BOSS.to = m.risen ? 0.3 : 0; BOSS.ring = !!m.risen; BOSS.p = 1; BOSS.dis = 0; BOSS.leave = false; if (!BOSS.on) FAR.to = 0; } // { boss: true } = the world, head still down; add risen: true to start with him up
+  if (m.boss != null) { BOSS.on = !!m.boss; BOSS.r = m.risen ? 1 : 0; BOSS.rising = 0; BOSS.told = !!m.risen; BOSS.to = m.risen ? 0.3 : 0; BOSS.ring = !!m.risen; BOSS.p = 1; BOSS.dis = 0; BOSS.leave = false; BOSS.eyesAt = m.risen ? performance.now() / 1000 - 3 : 0; if (!BOSS.on) FAR.to = 0; } // { boss: true } = the world, head still down; add risen: true to start with him up
   if (m.dislocate) bossEvent("dislocate");
   if (m.rise) bossEvent("rise");
   if (m.leave) bossEvent("leave");

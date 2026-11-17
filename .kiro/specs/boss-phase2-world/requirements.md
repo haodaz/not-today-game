@@ -30,9 +30,10 @@ Embedded page `/room3d/index.html?embed=1&day=18`, commands after `ready`:
   The eye rises and tips down continuously over the 3 s. The ring of tentacles starts up at 1860 ms.
   At the end it posts `{ source: "nt-room", type: "dislocated" }`. The head stays down throughout.
   `{ boss: true }` alone sits at the end pose (no dislocation).
-- `{ rise: true }` — the head rises from below the frame over **5.5 s**, dim, the eyes and the rest
-  of its light coming in over the last ~14 %; at the top it posts `{ source: "nt-room", type:
-  "risen" }` once and the ring comes up to its idle. A second `rise` does nothing. `strike` / `hurt`
+- `{ rise: true }` — the head rises from below the frame over **5.5 s**, dim, the pair of eyes and the
+  rest of its light coming in over the last ~14 %; 0.9 s later some thirty red eyes, big and small,
+  snap open over half a second; **`risen` is posted after they are open (≈7.2 s from the command)**
+  and the ring comes up to its idle. A second `rise` does nothing. `strike` / `hurt`
   are ignored until it has risen.
 - `{ strike: true }` — the tentacles rise fast and curl down onto the middle (down at ≈0.5 s), then
   sink back. `{ hurt: true }` — they drop back at once and the red light under the ground stutters.

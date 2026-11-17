@@ -20,7 +20,7 @@ export const PHASE2 = {
   /** Its easing (smoothstep). */
   EASE: "cubic-bezier(.42,0,.58,1)",
   /** `{ rise: true }`: the head from below the frame. */
-  RISE_MS: 5500,
+  RISE_MS: 7200, // 5.5 s up, then ~1.7 s for the thirty eyes to open: "risen" comes after them
   /** `{ boss: true }` builds the far world on its first frame: the pause waits this long. */
   PAUSE_AFTER_BOSS_MS: 500,
   /** The frame's fade-in over the field at the burst. */
