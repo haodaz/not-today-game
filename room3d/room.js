@@ -2525,8 +2525,11 @@ function buildFar() {
   const cracks = new THREE.CanvasTexture(gc); cracks.wrapS = cracks.wrapT = THREE.RepeatWrapping; cracks.repeat.set(22, 11); cracks.anisotropy = 8; // fewer, larger: at ninety repeats the cracks beat against the pixels into a hatch cracks.colorSpace = THREE.SRGBColorSpace;
   const ground = new THREE.Mesh(new THREE.SphereGeometry(FAR.RP, 128, 64, 0, Math.PI * 2, 0, 1.45), M({ color: 0x0b0a0a, roughness: 0.95, emissive: 0xffffff, emissiveMap: cracks, emissiveIntensity: 1.3 }, 3)); ground.position.y = -FAR.RP - 0.35; /* a world, not a floor */ ground.userData.noEdge = true; FAR.g.add(ground);
   const geos = [], c3 = new THREE.Vector3();
-  for (let i = 0; i < 3200; i++) { // enough of them that no ground shows between
-    const a = R() * Math.PI * 2, d = 3.4 + Math.pow(R(), 0.6) * 136, len = 5 + R() * 9 + d * 0.22, r = 0.07 + R() * 0.16 + d * 0.028; // slender beside the room, so the room keeps its size; thick only far off, where distance makes them small again
+  // the fight only ever sees the near part of this world, from one place: a lighter build, so a slow machine is not
+  // held up at the moment the eye is turned (the full count is for the pull-back, which goes to the far side)
+  const LIGHT = BOSS.on, COUNT = LIGHT ? 1250 : 3200, REACH = LIGHT ? 84 : 136;
+  for (let i = 0; i < COUNT; i++) { // enough of them that no ground shows between
+    const a = R() * Math.PI * 2, d = 3.4 + Math.pow(R(), 0.6) * REACH, len = 5 + R() * 9 + d * 0.22, r = 0.07 + R() * 0.16 + d * 0.028; // slender beside the room, so the room keeps its size; thick only far off, where distance makes them small again
     let x = Math.cos(a) * d, z = Math.sin(a) * d, th = a + Math.PI / 2 + (R() - 0.5) * 1.2; const pts = [], n = 8, hump = 1 + Math.floor(R() * (n - 2));
     for (let k = 0; k <= n; k++) { pts.push(new THREE.Vector3(x, (k === 0 ? -0.9 - r : -0.35 + r * 0.55 * (1 - k / n) + (k === hump ? r * (0.8 + R() * 2.2) : 0)) - dropAt(Math.hypot(x, z)), z)); th += (R() - 0.5) * 0.7; x += Math.cos(th) * len / n; z += Math.sin(th) * len / n; }
     const curve = new THREE.CatmullRomCurve3(pts, false, "centripetal"), geo = new THREE.TubeGeometry(curve, 22, 1, 6), P = geo.attributes.position;
@@ -2746,7 +2749,7 @@ function frame(now) {
   updateFar(now / 1000, dt);
   updateBoss(now / 1000, dt);
   composer.render();
-  if (++framesDrawn === 3) { try { window.parent !== window && window.parent.postMessage({ source: "nt-room", type: "ready" }, "*"); } catch {} if (q.get("wake") === "1") setTimeout(wake, 0); /* ?wake=1: the flash starts by itself, after ready */ document.getElementById("loading").style.opacity = "0"; perf.first = (now - T0) / 1000; perf.t = now; perf.n = 0; }
+  if (++framesDrawn === (document.body.classList.contains("embed") ? 1 : 3)) { try { window.parent !== window && window.parent.postMessage({ source: "nt-room", type: "ready" }, "*"); } catch {} if (q.get("wake") === "1") setTimeout(wake, 0); /* ?wake=1: the flash starts by itself, after ready */ document.getElementById("loading").style.opacity = "0"; perf.first = (now - T0) / 1000; perf.t = now; perf.n = 0; }
   if (framesDrawn > 3 && ++perf.n === 90) { document.getElementById("perf").textContent = `首屏 ${perf.first.toFixed(1)} 秒 · ${Math.round(90000 / (now - perf.t))} 帧/秒${LOW ? " · 低配" : ""}`; perf.t = now; perf.n = 0; }
 }
 
