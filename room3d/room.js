@@ -2364,7 +2364,7 @@ function apply() {
   skyLight.intensity = (0.5 + 7.5 * day) * (1 - c * 0.15) * (1 - 0.8 * OUTER.k); // daylight stays daylight as the room goes wrong (author: 不一定只有黑乎乎才是恐怖)
   slitLight.intensity = (0.25 + 2.6 * day) * (1 - c * 0.15);
   hemi.color.copy(lightCol);
-  hemi.intensity = (0.05 + 0.42 * day) * (1 - c * 0.2) + ceilOn * 0.1;
+  hemi.intensity = (0.05 + 0.42 * day) * (1 - c * 0.2) + ceilOn * (0.04 + 0.06 * (1 - day));
   sun.intensity = 3.6 * day * (1 - dusk * 0.4) * (1 - c * 0.25) * (1 - 0.95 * OUTER.k);
   sun.color.copy(C(0xfff4e6).lerp(C(0xff9a5c), dusk)).multiply(tint);
   scene.environmentIntensity = (0.04 + 0.32 * day) * (1 - c * 0.3) + ceilOn * 0.06;
@@ -2376,7 +2376,8 @@ function apply() {
   mat.bulb.emissiveIntensity = lampOn * 4;
   const ceilCol = C(0xfff0dc).lerp(C(0xffc9b8), c * 0.6);
   ceil.color.copy(ceilCol); ceilGlow.color.copy(ceilCol);
-  ceil.intensity = ceilOn * 17; ceilGlow.intensity = ceilOn * 1.5;
+  const ceilK = ceilOn * (0.14 + 0.86 * (1 - day)); // author: by day the room is only a little brighter with it on; at night it is the light
+  ceil.intensity = ceilK * 17; ceilGlow.intensity = ceilK * 1.5;
   mat.dish.emissive.copy(ceilCol); mat.dish.emissiveIntensity = ceilOn * 2.6;
   if (ROCKER) ROCKER.rotation.x = ceilOn ? -0.08 : 0.08;
   document.getElementById("lampOn").checked = !!lampOn; document.getElementById("ceilOn").checked = !!ceilOn;
