@@ -830,6 +830,57 @@
 @keyframes bs-giant-in{0%{opacity:0}100%{opacity:1}}
 .boss-page.after .bs-field{animation:bs-pull 4s 1.2s cubic-bezier(.3,.1,.2,1) both;transform-origin:50% 76%}
 @keyframes bs-pull{0%{transform:scale(1)}100%{transform:scale(.16) translateY(900px)}}
+/* the fight, motion and weight pass (2026-11-16; author: 让人物动起来、让招式有效果、打击、发光、震颤; 时间条不精致). Styles and the
+   boss-fx canvas only; no rule of the fight changes. A fighter winds up before it goes and settles after; the boss
+   rears and swells before it strikes; a hit is one hard frame, a jolt, and for a hit on us the edges of the page
+   going dark red. The gauges are instruments, not rounded pills. No neon, no speed lines. */
+@keyframes bs-lunge{0%{transform:translateX(0) rotate(0)}16%{transform:translateX(-28px) rotate(-6deg) scaleX(.94)}38%{transform:translateX(152px) rotate(7deg) scaleX(1.07)}52%{transform:translateX(144px) rotate(3deg)}78%{transform:translateX(-6px) rotate(-1deg)}100%{transform:translateX(0)}}
+@keyframes bs-hurt{0%{transform:translateX(0);filter:brightness(1)}12%{transform:translateX(-26px) rotate(-7deg) scaleY(.94);filter:brightness(3) saturate(0)}30%{transform:translateX(-18px) rotate(-4deg);filter:brightness(1.25)}60%{transform:translateX(9px)}100%{transform:translateX(0)}}
+@keyframes bs-breathe{0%,100%{transform:translateY(0) scaleY(1) rotate(0)}50%{transform:translateY(3px) scaleY(.982) rotate(-.6deg)}}
+.bs-member.object:nth-child(2n) .bs-sprite{animation-delay:-1.1s}
+.bs-member.object:nth-child(3n) .bs-sprite{animation-delay:-2.3s}
+.bs-member.ready .bs-sprite{filter:brightness(1.4) contrast(1.05) drop-shadow(0 0 10px rgba(246,183,60,.55))}
+@keyframes bs-loom{0%,100%{transform:translateY(0) scale(1) rotate(0)}35%{transform:translateY(8px) scale(1.012) rotate(-.5deg)}70%{transform:translateY(14px) scale(1.004) rotate(.4deg)}}
+@keyframes bs-boss-act{0%{transform:translateX(0);filter:brightness(1)}26%{transform:translateX(46px) translateY(-10px) scale(1.04) rotate(2deg);filter:brightness(1.7) drop-shadow(0 0 70px rgba(220,30,30,.95))}46%{transform:translateX(-200px) translateY(-26px) scale(1.07) rotate(-3deg);filter:brightness(1.15)}60%{transform:translateX(-180px) translateY(-18px) scale(1.05)}100%{transform:translateX(0)}}
+@keyframes bs-boss-hurt{0%,100%{transform:translateX(0) rotate(0);filter:brightness(1)}15%{transform:translateX(22px) rotate(2.5deg) scale(.985);filter:brightness(2.8) saturate(.2)}40%{transform:translateX(-12px) rotate(-1deg);filter:brightness(1.3)}70%{transform:translateX(6px)}}
+.bs-boss.hurt .bs-boss-img{animation:bs-boss-hurt 520ms cubic-bezier(.2,.9,.3,1) both}
+/* the one hard frame of a hit, and the page's edges for a hit on us (classes set by boss-fx) */
+.boss-page.bs-impact .bs-bg,.boss-page.bs-impact .bs-field{filter:contrast(1.45) brightness(1.18) saturate(.75)}
+.boss-page.bs-struck::after{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;background:radial-gradient(70% 62% at 50% 50%,transparent 52%,rgba(120,10,10,.5) 82%,rgba(40,0,0,.85) 100%);animation:bs-struck 620ms ease-out both}
+@keyframes bs-struck{0%{opacity:1}100%{opacity:0}}
+.bs-field.bs-jolt-hard{animation:bs-jolt-hard 420ms cubic-bezier(.2,.9,.3,1) both}
+@keyframes bs-jolt-hard{0%{transform:translate(0,0)}10%{transform:translate(-26px,12px) scale(1.018) rotate(-.4deg)}28%{transform:translate(20px,-9px) rotate(.3deg)}46%{transform:translate(-12px,6px)}64%{transform:translate(7px,-3px)}82%{transform:translate(-3px,1px)}100%{transform:translate(0,0)}}
+.bs-num{text-shadow:0 2px 0 #000,0 0 14px rgba(0,0,0,.8)}
+@keyframes bs-num{0%{transform:translateY(14px) scale(.4);opacity:0}14%{transform:translateY(-10px) scale(1.5);opacity:1}26%{transform:translateY(-6px) scale(1)}100%{transform:translateY(-58px) scale(.96);opacity:0}}
+/* the second stage and the last form (boss-fx reads .stage2 / .final for the air around it) */
+.bs-boss.stage2 .bs-boss-img{animation:bs-loom 3.2s ease-in-out infinite}
+.boss-page.final .bs-boss{transform:scale(1.24);transform-origin:100% 100%}
+.boss-page.final .bs-boss-img{filter:drop-shadow(0 0 90px rgba(200,20,20,.9)) drop-shadow(0 30px 20px rgba(0,0,0,.7))}
+@media (prefers-reduced-motion:reduce){.bs-member .bs-sprite,.bs-boss-img{animation:none!important}.boss-page.bs-struck::after{animation:none;opacity:0}.boss-page.bs-impact .bs-bg,.boss-page.bs-impact .bs-field{filter:none}}
+/* the orders: whose turn it is, and for every move its name and what it does (the rules rewrite's markup) */
+.bs-menu{bottom:50px;align-items:stretch;flex-wrap:nowrap;gap:8px;max-width:1240px;padding:8px 10px;background:linear-gradient(180deg,rgba(14,15,20,.9),rgba(5,6,10,.9));border:1px solid rgba(239,233,223,.2);border-left:3px solid #F6B73C;box-shadow:0 14px 30px rgba(0,0,0,.6);animation:bs-menu-in 220ms cubic-bezier(.2,.8,.2,1) both}
+.bs-menu.object{border-left-color:#7fe0b8}
+@keyframes bs-menu-in{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:none}}
+.bs-menu-h{flex:0 0 auto;align-self:center;padding:0 8px 0 4px;font-size:13px;letter-spacing:.3em;color:#a49d8f;writing-mode:vertical-rl}
+.bs-menu .bs-cmd{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-width:150px;max-width:230px;padding:7px 12px 8px;text-align:left;border:1px solid rgba(246,183,60,.55);border-radius:2px;background:rgba(5,6,10,.7);color:#F6B73C;transition:transform 90ms,background 120ms,border-color 120ms}
+.bs-cmd-name{font:900 18px/1.1 inherit;letter-spacing:.12em}
+.bs-cmd-eff{font:400 12.5px/1.45 "PingFang SC",sans-serif;letter-spacing:.02em;color:#cfc8ba}
+.bs-menu .bs-cmd:hover{transform:translateY(-3px);background:rgba(246,183,60,.14);border-color:#F6B73C;color:#ffd98a}
+.bs-menu .bs-cmd:hover .bs-cmd-eff{color:#efe9df}
+.bs-menu .bs-cmd:active{transform:translateY(0)}
+.bs-menu .bs-cmd::before{content:"";width:22px;height:3px;background:currentColor;opacity:.9}
+.bs-menu .bs-cmd:is(.heal,.heal-all){border-color:rgba(127,224,184,.55);color:#7fe0b8}
+.bs-menu .bs-cmd:is(.haste,.haste-all){border-color:rgba(160,200,255,.55);color:#a9c8ff}
+.bs-menu .bs-cmd.stun{border-color:rgba(239,233,223,.6);color:#efe9df}
+.bs-menu .bs-cmd.dodge{border-color:rgba(164,157,143,.6);color:#bdb6a8}
+/* while a status move plays, the one who used it shows it */
+.bs-field[data-eff="dodge"] .bs-member.acting .bs-sprite{animation:bs-feign 900ms ease-in-out both}
+@keyframes bs-feign{0%{transform:none;opacity:1}35%{transform:rotate(-84deg) translate(-30px,38px);opacity:.75}75%{transform:rotate(-84deg) translate(-30px,38px);opacity:.75}100%{transform:none;opacity:1}}
+.bs-field:is([data-eff="heal"],[data-eff="heal-all"]) .bs-member.acting .bs-sprite{animation:bs-lift 900ms ease-out both}
+.bs-field:is([data-eff="haste"],[data-eff="haste-all"]) .bs-member.acting .bs-sprite{animation:bs-lift 600ms ease-out both}
+@keyframes bs-lift{0%{transform:none;filter:brightness(1.25)}40%{transform:translateY(-16px) scale(1.04);filter:brightness(1.9)}100%{transform:none;filter:brightness(1.25)}}
+.bs-field[data-eff="stun"] .bs-boss-img{animation:bs-stunned 900ms steps(6) both}
+@keyframes bs-stunned{0%,100%{transform:none;filter:none}20%{filter:brightness(2.6) saturate(0)}40%{transform:translateX(10px) rotate(1.5deg);filter:saturate(.3)}70%{transform:translateX(-6px) rotate(-1deg);filter:saturate(.3)}}
 /* the fight's gauges as instruments (2026-11-16; author: 目前各种时间条都不精致). Styles only: the speed track, its marks, the
    status plates, the HP bars and the boss's bar. The motion and effects pass waits for the rules rewrite. */
 .bs-track{width:6px;border:0;border-radius:0;background:linear-gradient(180deg,#F6B73C 0,rgba(246,183,60,.55) 12%,rgba(239,233,223,.22) 40%,rgba(239,233,223,.1) 100%);box-shadow:0 0 0 1px rgba(0,0,0,.6),0 0 12px rgba(0,0,0,.6)}

@@ -41,6 +41,11 @@ export function createBossFx(deps: { readonly load?: () => Promise<Pixi>; readon
     let lastStage = 1;
     let lastJoined = false;
     let wonAt = -1;
+    // the air round the boss in its second stage and its last form: embers, and in the last form things moving at the edges
+    let ambient = 0; // 0 none, 1 stage 2, 2 final form
+    let ambAcc = 0;
+    let ambClock = 0;
+    let edge: import("pixi.js").Graphics | null = null;
     const particles: Particle[] = [];
     const timers = new Set<ReturnType<typeof setTimeout>>();
     const later = (ms: number, fn: () => void) => { const id = setTimeout(() => { timers.delete(id); fn(); }, ms); timers.add(id); };
@@ -148,8 +153,83 @@ export function createBossFx(deps: { readonly load?: () => Promise<Pixi>; readon
       layer.addChild(g);
       particles.push({ g, vx: 0, vy: 0, life: 600, age: 0, gravity: 0, spin: 0, ring: { r: all ? 40 : 24, dr: all ? 0.5 : 0.34, color, width: 10 } });
     };
+    /** A wind-up: motes drawn into a point while the move gathers, and a ring closing on it. */
+    const charge = (p: Pt, color: number, ms: number): void => {
+      if (!pixi || !layer || ms < 80) return;
+      const n = 24;
+      for (let i = 0; i < n; i++) later((i / n) * ms * 0.75, () => {
+        if (!pixi || !layer) return;
+        const a = Math.random() * Math.PI * 2, d = 110 + Math.random() * 170, life = 240;
+        const g = circle(p.x + Math.cos(a) * d, p.y + Math.sin(a) * d, 2 + Math.random() * 3, i % 3 ? color : 0x1a0508, 0.9);
+        particles.push({ g, vx: (-Math.cos(a) * d) / life, vy: (-Math.sin(a) * d) / life, life, age: 0, gravity: 0, spin: 0 });
+      });
+      const g = new pixi.Graphics();
+      g.position.set(p.x, p.y);
+      layer.addChild(g);
+      particles.push({ g, vx: 0, vy: 0, life: ms, age: 0, gravity: 0, spin: 0, ring: { r: 90, dr: -78 / ms, color, width: 8 } });
+    };
+    /** What a thrown thing leaves behind it on the way over. */
+    const trail = (from: Pt, to: Pt, color: number, ms: number): void => {
+      const n = 16;
+      for (let i = 1; i < n; i++) later((i / n) * ms, () => {
+        if (!pixi || !layer) return;
+        const t = i / n, x = from.x + (to.x - from.x) * t, y = from.y + (to.y - from.y) * t - Math.sin(t * Math.PI) * 150;
+        for (let k = 0; k < 3; k++) spark(x, y, k ? color : COLOR.white, 0.12, 320 + Math.random() * 200, 0.0006, 4);
+      });
+    };
+    /** The ground under a heavy hit: cracks from the feet, and dust lifting off them. */
+    const crack = (p: Pt, color: number): void => {
+      if (!pixi || !layer) return;
+      const g = new pixi.Graphics();
+      for (let i = 0; i < 7; i++) {
+        let x = 0, y = 0, a = Math.PI * (0.05 + 0.9 * (i / 6)) + (Math.random() - 0.5) * 0.3;
+        g.moveTo(0, 0);
+        for (let k = 0; k < 4; k++) { a += (Math.random() - 0.5) * 0.7; const d = 16 + Math.random() * 26; x += Math.cos(a) * d * 1.6; y += Math.abs(Math.sin(a)) * d * 0.28; g.lineTo(x, y); }
+      }
+      g.stroke({ color: 0x050305, width: 4, alpha: 0.95 });
+      g.position.set(p.x, p.y);
+      layer.addChild(g);
+      particles.push({ g, vx: 0, vy: 0, life: 1500, age: 0, gravity: 0, spin: 0 });
+      const glow = new pixi.Graphics();
+      glow.ellipse(0, 6, 120, 16).fill({ color, alpha: 0.35 });
+      glow.position.set(p.x, p.y);
+      layer.addChild(glow);
+      particles.push({ g: glow, vx: 0, vy: 0, life: 520, age: 0, gravity: 0, spin: 0 });
+      for (let i = 0; i < 14; i++) {
+        const d = circle(p.x + (Math.random() - 0.5) * 200, p.y + Math.random() * 10, 8 + Math.random() * 14, 0x3a3436, 0.5);
+        particles.push({ g: d, vx: (Math.random() - 0.5) * 0.12, vy: -0.03 - Math.random() * 0.05, life: 700 + Math.random() * 500, age: 0, gravity: -0.00002, spin: 0 });
+      }
+    };
+    /** What comes out of the boss when it is cut: dark, heavy, and it falls. */
+    const ichor = (p: Pt, n: number): void => {
+      for (let i = 0; i < n; i++) spark(p.x + (Math.random() - 0.5) * 30, p.y + (Math.random() - 0.5) * 30, i % 4 === 0 ? 0x8f1420 : 0x2a0509, 0.55, 700 + Math.random() * 500, 0.0026, 6);
+    };
+    /** A stun: the light goes out of the boss's head for a moment — a white ring that closes, pale slow shards. */
+    const stun = (p: Pt): void => {
+      if (!pixi || !layer) return;
+      const g = new pixi.Graphics();
+      g.position.set(p.x, p.y);
+      layer.addChild(g);
+      particles.push({ g, vx: 0, vy: 0, life: 420, age: 0, gravity: 0, spin: 0, ring: { r: 150, dr: -0.3, color: COLOR.white, width: 6 } });
+      for (let i = 0; i < 20; i++) spark(p.x, p.y, i % 2 ? COLOR.white : 0xb9c6ff, 0.22, 900 + Math.random() * 500, 0.0002, 5);
+    };
+    /** Haste: thin lights going up past whoever was hurried. */
+    const hurry = (p: Pt): void => {
+      for (let i = 0; i < 14; i++) later(i * 22, () => {
+        if (!pixi || !layer) return;
+        const g = new pixi.Graphics();
+        g.rect(-1, -16, 2, 32).fill({ color: 0xa9c8ff, alpha: 0.9 });
+        g.position.set(p.x + (Math.random() - 0.5) * 90, p.y + 70 + Math.random() * 40);
+        layer.addChild(g);
+        particles.push({ g, vx: 0, vy: -0.5 - Math.random() * 0.25, life: 420, age: 0, gravity: 0, spin: 0 });
+      });
+    };
     /** The weight of a hit: the page frozen a moment, the field jolted. */
-    const weight = (page: HTMLElement, hard: boolean): void => {
+    const weight = (page: HTMLElement, hard: boolean, struck = false): void => {
+      // one hard frame for every hit; for a hit on us the page's edges go dark red (both are classes the CSS draws)
+      page.classList.add("bs-impact");
+      later(90, () => page.classList.remove("bs-impact"));
+      if (struck) { page.classList.remove("bs-struck"); void page.offsetWidth; page.classList.add("bs-struck"); later(640, () => page.classList.remove("bs-struck")); }
       page.classList.add("bs-stop");
       later(HIT_STOP_MS * (hard ? 1.6 : 1), () => page.classList.remove("bs-stop"));
       const field = page.querySelector<HTMLElement>(".bs-field");
@@ -160,11 +240,20 @@ export function createBossFx(deps: { readonly load?: () => Promise<Pixi>; readon
       const ours = act.who !== "boss";
       const color = ours ? (act.who === "qkuro" ? COLOR.heal : COLOR.ours) : b.boss.stage === 2 ? COLOR.stage2 : COLOR.boss;
       const delay = IMPACT_DELAY[act.move.fx];
+      { // before it lands: the boss gathers itself at the mouth; a thrown thing leaves a trail on its way over
+        const now = root.querySelector<HTMLElement>(".boss-page");
+        if (now && pixi && layer) {
+          if (!ours) { const m = pointOf(now, ".bs-boss-img", 0.24, 0.5); if (m) charge(m, color, delay); }
+          else if (act.move.fx === "throw" || act.move.fx === "flip") { const a = targetPoint(now, b, act.who), z = targetPoint(now, b, "boss"); if (a && z) trail(a, z, color, delay); }
+        }
+      }
       later(delay, () => {
         const live = root.querySelector<HTMLElement>(".boss-page");
         if (!live || !pixi || !layer) return;
         if (act.move.fx === "heal") { const p = targetPoint(live, b, act.who === "qkuro" ? "player" : act.who); if (p) sparkles(p); return; }
         if (act.move.dodge) { const p = targetPoint(live, b, act.who); if (p) rings(p, COLOR.white); return; }
+        if (act.move.stun) { const p = targetPoint(live, b, "boss"); if (p) stun(p); weight(live, false); return; }
+        if (act.move.haste) { for (const m of b.party) { if (!act.move.hasteAll && m.id !== act.who && m.id !== "player") continue; const p = targetPoint(live, b, m.id); if (p) hurry(p); } return; }
         const targets = act.hits.length ? act.hits.map((h) => h.id) : [act.target === "all" ? "player" : act.target];
         const missed = act.hits.length === 0;
         const crit = act.text.some((x) => x === critLine);
@@ -172,18 +261,39 @@ export function createBossFx(deps: { readonly load?: () => Promise<Pixi>; readon
           const p = targetPoint(live, b, id);
           if (!p) continue;
           if (missed) { rings(p, 0x9aa0a6); continue; }
-          if (!ours) { dark(p, color, act.move.all === true); continue; }
+          if (!ours) { dark(p, color, act.move.all === true); const foot = pointOf(live, `.bs-member[data-id="${id}"] .bs-sprite`, 0.5, 0.98); if (foot) crack(foot, color); continue; }
           if (act.move.fx === "strike") slash(p, color);
           if (act.move.fx === "shake") rings(p, color);
           impact(p, color, act.move.fx === "flip" || act.move.fx === "throw" || crit);
           if (crit) for (let i = 0; i < 30; i++) spark(p.x, p.y, COLOR.white, 1.1, 700 + Math.random() * 500, 0.001, 5);
+          if (id === "boss") { ichor(p, crit ? 30 : 16); if (crit || act.move.fx === "flip") { const foot = pointOf(live, ".bs-boss-img", 0.4, 0.96); if (foot) crack(foot, color); } }
         }
-        if (!missed) weight(live, !ours || act.move.fx === "flip");
+        if (!missed) weight(live, !ours || act.move.fx === "flip" || crit, !ours);
       });
       void ACT_MS;
     };
 
     const tick = (dt: number): void => {
+      if (ambient && pixi && layer) {
+        ambClock += dt;
+        ambAcc += dt;
+        const every = ambient === 2 ? 40 : 95;
+        while (ambAcc > every) {
+          ambAcc -= every;
+          const x = 700 + Math.random() * 900, g = circle(x, 800 + Math.random() * 60, 1.5 + Math.random() * 2.5, Math.random() < 0.3 ? 0xffb37a : ambient === 2 ? 0xd1202c : 0xa21caf, 0.85);
+          particles.push({ g, vx: -0.02 - Math.random() * 0.05, vy: -0.07 - Math.random() * 0.1, life: 2600 + Math.random() * 1800, age: 0, gravity: -0.00001, spin: 0 });
+        }
+        if (ambient === 2) { // the last form: more of it than the picture holds, moving at the bottom and the right edge
+          if (!edge) { edge = new pixi.Graphics(); layer.addChildAt(edge, 0); }
+          edge.clear();
+          const s = ambClock / 1000;
+          for (let i = 0; i < 9; i++) {
+            const x0 = 520 + i * 135, sway = Math.sin(s * (0.5 + i * 0.07) + i * 1.7), h = 190 + 110 * Math.sin(i * 2.3) + 50 * Math.sin(s * 0.4 + i);
+            edge.moveTo(x0, 910).bezierCurveTo(x0 - 30 + sway * 40, 910 - h * 0.4, x0 + 50 + sway * 70, 910 - h * 0.75, x0 + 20 + sway * 120, 910 - h).stroke({ color: 0x0a0306, width: 26 - i, alpha: 0.92, cap: "round" });
+            edge.moveTo(x0, 910).bezierCurveTo(x0 - 30 + sway * 40, 910 - h * 0.4, x0 + 50 + sway * 70, 910 - h * 0.75, x0 + 20 + sway * 120, 910 - h).stroke({ color: 0x5a0d16, width: 3, alpha: 0.55, cap: "round" });
+          }
+        }
+      } else if (edge) { edge.destroy(); edge = null; }
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i]!;
         p.age += dt;
@@ -203,11 +313,13 @@ export function createBossFx(deps: { readonly load?: () => Promise<Pixi>; readon
         // the painting is fetched while the pull-out still runs, so the intro opens on it, not on black
         if (!preloaded && root.querySelector(".pullout-page, .boss-page")) { preloaded = true; const img = new (root.ownerDocument.defaultView!.Image)(); img.src = BOSS_BG; }
         const page = root.querySelector<HTMLElement>(".boss-page");
-        if (!page) { lastActAt = -1; return; }
+        if (!page) { lastActAt = -1; ambient = 0; return; }
         if (!failed && canvas.parentElement !== page) page.appendChild(canvas);
         boot();
         const b = ctx.session.boss;
         if (!b) return;
+        // `.final` on the page (set by the rules when the last form is out) outranks the stage
+        ambient = b.phase === "won" || b.phase === "after" || b.phase === "lost" ? 0 : page.classList.contains("final") ? 2 : b.boss.stage === 2 ? 1 : 0;
         // the boss's change of stage: a purple burst over it and the page flashed
         if (b.boss.stage !== lastStage) { lastStage = b.boss.stage; if (b.boss.stage === 2) later(80, () => { const p = targetPoint(page, b, "boss"); if (p) { dark({ x: p.x + 120, y: p.y + 80 }, COLOR.stage2, true); impact(p, COLOR.stage2, true); weight(page, true); } }); }
         // Q-Kuro's entrance: rings and sparkles where it stands
@@ -225,6 +337,7 @@ export function createBossFx(deps: { readonly load?: () => Promise<Pixi>; readon
         try { app?.destroy(); } catch { /* already gone */ }
         app = null;
         layer = null;
+        edge = null;
         canvas.remove();
       },
     };
