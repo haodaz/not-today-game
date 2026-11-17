@@ -2626,10 +2626,41 @@ const BOX = {
   slit: B3(X1 - 0.1, SLIT.y0, SLIT.z0, X1 + 0.2, SLIT.y1, SLIT.z1),
   desk: B3(DESK.x - 0.8, 0.6, DESK.z - 0.4, DESK.x + 0.8, 1.35, DESK.z + 0.4),
 };
+// What a click landed on, by name (author 2026-11-16: the 3D desk replaces the desk close-up, and from day 10 the 3D
+// walls take over everything that could be touched in the photographs; new ways of touching come later).
+// Things first (the eight old objects, the mug, the lamp, the switch), then places, nearest first. null = nothing.
+const PLACES = {
+  screen: B3(DESK.x - 0.64, DESK.h + 0.18, DESK.z - 0.34, DESK.x + 0.64, DESK.h + 0.62, DESK.z - 0.04),
+  keyboard: B3(DESK.x - 0.3, DESK.h, DESK.z + 0.02, DESK.x + 0.26, DESK.h + 0.04, DESK.z + 0.22),
+  desk: BOX.desk, meal: BOX.meal, window: BOX.win, slit: BOX.slit,
+  tower: B3(X0 + 0.54, 0, Z0 + 0.2, X0 + 0.78, 0.45, Z0 + 0.65),
+  box: B3(0.46 - 0.24, 0, Z0 + 0.95 - 0.2, 0.46 + 0.24, 0.42, Z0 + 0.95 + 0.2),
+  bed: B3(BED.x - BED.w / 2 - 0.05, 0.25, BED.z0, BED.x + BED.w / 2 + 0.05, 0.75, BED.z0 + BED.len),
+  shelf: B3(BED.x - BED.w / 2 - 0.05, 0.5, BED.z0 - 0.3, BED.x + BED.w / 2 + 0.05, 1.2, BED.z0),
+  door: B3(DOOR.x0, 0, Z1 - 0.12, DOOR.x1, DOOR.h, Z1 + 0.1),
+  coat: B3(0.42 - 0.3, 0.9, Z1 - 0.25, 0.42 + 0.3, 1.95, Z1),
+  bag: B3(X0 + 0.04, 0, Z1 - 0.4, X0 + 0.44, 0.45, Z1),
+};
+const _hp = new THREE.Vector3();
+function pickAt() {
+  for (const id in OBJ) if (OBJ[id].visible && ray.intersectObject(OBJ[id], true).length) return id;
+  if (ray.intersectObject(COFFEE.inner, true).length) return "mug";
+  if (ray.intersectObjects([SHADE, bulb], true).length) return "lamp";
+  if (ray.intersectObject(SWITCH, true).length) return "switch";
+  let best = null, bd = Infinity;
+  for (const id in PLACES) { if (id === "desk" && state.desk) continue; const h = ray.ray.intersectBox(PLACES[id], _hp); if (h) { const d = h.distanceTo(ray.ray.origin) + (id === "desk" ? 0.5 : 0); if (d < bd) { bd = d; best = id; } } }
+  return best;
+}
 const drop = (e) => { // a click that did not drag: if it was on the mug, take a sip
   if (dragging && e && Math.hypot(e.clientX - dragging.x, e.clientY - dragging.y) < 5) {
     const r = canvasEl.getBoundingClientRect();
     ray.setFromCamera(new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1), camera);
+    if (document.body.classList.contains("embed")) { // inside the game the room only says what was touched; the game decides what happens
+      const id = pickAt();
+      if (id === "mug") drink("sip");
+      try { window.parent.postMessage({ source: "nt-room", type: "pick", id, face: state.face, spot: state.desk ? state.spot : null }, "*"); } catch {}
+      dragging = null; return;
+    }
     if (ray.intersectObject(COFFEE.inner, true).length) drink("sip");
     else if (ray.intersectObject(SWITCH, true).length) { state.ceil = !state.ceil; click(); apply(); }
     else if (ray.intersectObjects([SHADE, bulb], true).length) { state.lamp = !(state.lamp ?? state.time >= 18.5); click(); apply(); }
@@ -2733,7 +2764,9 @@ renderer.setAnimationLoop(frame);
 // (so three.js loads only when a 3D view is first shown) and posts { target: "nt-room", ... } messages:
 //   day 1–18 · time 13.5–24 · face 0 desk wall / 1 bed / 2 door / 3 window · spot "desk" | "meal" | "win" | "slit" | null
 //   lamp, ceil true/false · rain, outer true/false · far 0–1 · eaten true/false · wake true · vision true
-// It answers { source: "nt-room", type: "ready" } once the first frames are drawn, and "arrived" when a move ends.
+// It answers { source: "nt-room", type: "ready" } once the first frames are drawn, and { type: "pick", id, face, spot }
+// for a click: chick camera pager iccard tape dictionary calculator phone · mug lamp switch · screen keyboard desk meal
+// window slit tower box bed shelf door coat bag · null. Embedded, a click changes nothing by itself except a sip.
 function setFace(n) {
   if (state.desk) { state.desk = false; }
   state.turn = null; state.face = ((n % 4) + 4) % 4;
