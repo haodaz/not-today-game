@@ -9,6 +9,7 @@ import { advanceTo, isNight } from "@world/desktop/beat";
 import { boxReadsOn, dialogueBox, lineScreens } from "@world/dialogue/box";
 import { logCurrent, logPlayer } from "@world/dialogue/history";
 import { settleSession } from "@world/dialogue/place";
+import { openWakeFlash, queueRise, wakeFlashDue } from "./wake";
 import { noteWallpaper, WALL_FADE_MS } from "@world/desktop/wallpaper";
 import { hintLayer } from "@world/hints/hints";
 import { FACE_FROM_STAGE, FACE_MS, msgFaceDelay, msgFaceSeed, type FaceApp } from "@world/desktop/workbench/collapse";
@@ -715,6 +716,8 @@ export const loopActions: Record<string, ActionHandler> = {
   turn(ctx, data) {
     const dir = data.dir as TurnDir;
     const { session } = ctx;
+    // room-3d-wake R3: the flash covers the stage; the view does not turn under it
+    if (session.wakeFlash) return;
     // guidance R13: the case closes with the view (a turn is a view change, not blocked by it).
     if (session.caseOpen && (dir === "left" || dir === "right")) {
       session.caseOpen = false;
@@ -1069,7 +1072,7 @@ export const loopActions: Record<string, ActionHandler> = {
 
   // Back one camera level (right-click, wheel, the bottom of the stage): nothing over the view first.
   "nav-back"(ctx) {
-    if (overlayOpen(ctx.session)) return;
+    if (overlayOpen(ctx.session) || ctx.session.wakeFlash) return;
     const to = backTarget(ctx.session.view);
     if (to) loopActions["view"]!(ctx, { view: to } as DOMStringMap, null as never);
   },
@@ -1945,12 +1948,14 @@ function getUp(ctx: ActionContext): void {
   const { store, session } = ctx;
   if (session.view !== "lying") return;
   loopActions["view"]!(ctx, { view: "bed" } as DOMStringMap, null as never);
-  const state = store.getState();
-  const seq = loopContext(state, store.getEvents())?.file.beats.rise;
-  if (!seq || session.riseBeatDay === state.day || booted(state, store.getEvents())) return;
-  session.riseBeatDay = state.day;
-  session.dialogue = push(session.dialogue, beatQueued(state.day, "rise", seq));
-  settleSession(session);
+  // room-3d-wake R1/R2: day 4's first getting-up flashes the code-built room first; the rise beat
+  // waits for the flash to end (wake.ts queues it then).
+  if (session.wakeFlash === null && wakeFlashDue(store.getState(), store.getEvents())) {
+    openWakeFlash(ctx);
+    ctx.rerender();
+    return;
+  }
+  queueRise(ctx);
 }
 
 /**
@@ -2333,6 +2338,9 @@ export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
     loopActions["loop-put-down"]!(ctx, {} as DOMStringMap, null as never);
     return true;
   }
+  // room-3d-wake R3: while the flash is up, the keys that move the view do nothing (the panels above
+  // it closed on Esc already, above; the box still reads on with Space / Enter, below).
+  if (ctx.session.wakeFlash && (e.key === "Escape" || e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "Backspace")) return true;
   // lying-view R6: on the ceiling Esc, ← / → and the back key (Backspace) ask whether to get up.
   if (ctx.session.view === "lying" && (e.key === "Escape" || e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "Backspace")) {
     if (typingIn(e.target)) return false;

@@ -24,6 +24,8 @@ import { previewParam, startPreview } from "@world/loop/preview";
 import { splatForGame } from "@world/room/splat";
 import { fxForGame } from "@world/room/fx/layer";
 import { createHandLayer } from "@world/objects/layer";
+import { createRoom3dLayer } from "@world/room/outside";
+import { onRoomMessage } from "@world/room/wake";
 import { createNav } from "@world/room/nav";
 import { settleSession } from "@world/dialogue/place";
 import { stareTick } from "@world/room/stare";
@@ -168,6 +170,8 @@ function startGame(store: Store, saved: boolean, prologue = false): void {
     // The boss fight's hits, slashes, sparks and jolts: one Pixi canvas over the page, loaded on demand.
     bossFx: createBossFx(),
     hand: createHandLayer(),
+    // room-3d-wake: the code-built room's messages (day 4's wake flash).
+    room3d: createRoom3dLayer(onRoomMessage),
   });
   // What finished runs left on the desk (presentation only; the story never reads it).
   game.session.collection = collection;

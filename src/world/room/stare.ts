@@ -26,7 +26,9 @@ function somethingOpen(s: Session, nowMs: number): boolean {
     s.dialogue.queue.length > 0 ||
     s.settingsOpen || s.statusOpen || s.itemsOpen || s.caseOpen || s.phoneOpen || s.bookOpen || s.historyOpen ||
     s.holding !== null || s.printsView !== null || s.sheetShown !== null || !!s.viewfinder ||
-    (s.cam !== null && nowMs < s.cam.until) || !!s.endingPage || !!s.pullOut || !!s.boss || s.figureOpen !== null || s.handCut !== null
+    (s.cam !== null && nowMs < s.cam.until) || !!s.endingPage || !!s.pullOut || !!s.boss || s.figureOpen !== null || s.handCut !== null ||
+    // room-3d-wake R3: the code-built room's flash over the stage
+    s.wakeFlash !== null
   );
 }
 

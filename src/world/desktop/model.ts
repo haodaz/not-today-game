@@ -435,6 +435,11 @@ export interface Session {
   echo: import("./workbench/echo").EchoGame | null;
   /** nonogram (game-swaps): a plain task's 数织 under way (session only; the hand-in is the task event). */
   nonogram: import("./workbench/nonogram").NonogramGame | null;
+  /**
+   * room-3d-wake: day 4's wake flash over the stage (session only; its `wake:flash` step is the
+   * record). `lined`: the room's `wake-line` was already queued (a reloaded frame posts it again).
+   */
+  wakeFlash: { readonly since: number; readonly phase: "loading" | "up" | "fading"; readonly lined?: boolean } | null;
   /** fill (day11-budget-fill): the cost sheet's budget fill under way (session only; its end is logged as an `open fill:…`). */
   fill: import("./workbench/fill").FillGame | null;
   /** whack-a-mole (author 2026-11-13): the launch hall under way (session only; three pages passed is a board step). */
@@ -666,6 +671,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     klotski: null,
     echo: null,
     nonogram: null,
+    wakeFlash: null,
     fill: null,
     moles: null,
     pacman: null,
