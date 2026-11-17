@@ -11,11 +11,13 @@ import { hasString } from "@world/i18n";
  * `afterBad`; survive: `newRun`) or the page stays (good's day 19). The bad ending's fight and the
  * day-18 pull-out come before its first page.
  */
+// Author 2026-11-17: the dialogue first, then the credits (the same roll for every ending, the song
+// under it), then the ending's poster; the host after that.
 export const ENDING_PAGES: Readonly<Record<Ending, readonly EndingPhase[]>> = {
-  collapse: ["collapse", "credits", "tender", "lines"],
-  bad: ["wake", "you", "credits", "lines"],
-  survive: ["credits", "lines", "after"],
-  good: ["credits", "lines", "after"],
+  collapse: ["collapse", "tender", "lines", "credits", "poster"],
+  bad: ["wake", "you", "lines", "credits", "poster"],
+  survive: ["lines", "credits", "poster", "after"],
+  good: ["lines", "credits", "poster", "after"],
 };
 
 /** The fake day 1's captions (collapse). */
@@ -56,7 +58,7 @@ export function pageSteps(phase: EndingPhase, ending: Ending, state: State): num
   if (phase === "tender") return TENDER_KEYS.length;
   if (phase === "wake") return WAKE_KEYS.length + 2;
   // every line, then the ending's name card
-  if (phase === "lines") return endingLines(endingFlavour(ending, state)).length + 1;
+  if (phase === "lines") return endingLines(endingFlavour(ending, state)).length;
   return 1;
 }
 

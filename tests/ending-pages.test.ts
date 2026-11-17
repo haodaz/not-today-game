@@ -12,7 +12,7 @@ import type { ActionContext } from "@world/desktop/controller";
 import { initialSession, type EndingPhase, type Session } from "@world/desktop/model";
 import { endingHost, endingNext } from "@world/endings/flow";
 import { ENDING_ART, TENDER_KEYS, WAKE_KEYS, WAKE_PHOTO, WAKE_SAY, endingLines, pageSteps } from "@world/endings/pages";
-import { renderEnding, renderLines, renderTender, renderWake, type EndingModel } from "@world/endings/view";
+import { renderEnding, renderLines, renderTender, renderWake, type EndingModel, renderPoster } from "@world/endings/view";
 import { escapeHtml } from "@world/html";
 import { hasString, setLocale, t } from "@world/i18n";
 
@@ -85,7 +85,9 @@ describe("lines — the player and Kuro", () => {
       for (const l of lines.slice(0, step)) expect(out).toContain(esc(l.key, { day: 9 }));
       expect(out).not.toContain("ending-card");
     }
-    const card = renderLines(model(ending, "lines", lines.length + 1, over), ending).value;
+    // author 2026-11-17: the poster is its own last page, after the credits
+    expect(renderLines(model(ending, "lines", lines.length + 1, over), ending).value).not.toContain("ending-card");
+    const card = renderPoster(model(ending, "poster", 1, over), ending).value;
     // the ending's own page (author 2026-11-12): the name, the spread picture, one paragraph
     expect(card).toContain(`<div class="ending-card"><div class="ending-art-wrap"><img class="ending-art" src="${ENDING_ART[flavour as EndingFlavour]}" alt="" draggable="false"></div><div class="ending-text"><small>${esc("ending.name.label")}</small><b>${esc(`ending.name.${flavour}`)}</b><p class="ending-about">`);
     expect(card).toContain(esc(`ending.about.${flavour}`).replace("{day}", String(stateOf(ending).day)));
@@ -123,7 +125,8 @@ describe("the dev preview (&endpage=)", () => {
       if (seen[seen.length - 1] !== page) seen.push(page);
       endingNext(ctx);
     }
-    expect(seen).toEqual(["tender-page", "lines-page"]);
+    // author 2026-11-17: the dialogue, then the credits (a click shows the whole roll, the next moves on), then the poster
+    expect(seen).toEqual(["tender-page", "lines-page", "credits-page", "poster-page"]);
     expect(calls).toEqual([]);
   });
 });
@@ -134,7 +137,7 @@ describe("snapshots (zh)", () => {
       tender: renderTender(model("collapse", "tender", 2)).value,
       wake: renderWake(model("bad", "wake", 4)).value,
       lines: renderLines(model("survive", "lines", 3, { affinity: THRESHOLD }), "survive").value,
-      card: renderLines(model("good", "lines", 99), "good").value,
+      card: renderPoster(model("good", "poster", 1), "good").value,
     }).toMatchSnapshot();
   });
 });

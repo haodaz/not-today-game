@@ -16,7 +16,7 @@ import { constants, membersOf } from "@state/variables";
 import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
 import { initialSession } from "@world/desktop/model";
-import { CREDIT_CARD_MS, creditCards, creditLines, creditRoll, creditsShown, CREDIT_LINE_MS, deltaOf, memoryStill, rollShown } from "@world/endings/credits";
+import { CARD_MEMORY_AT_MS, CARD_TEXT_AT_MS, cardPhase, CREDIT_CARD_MS, creditCards, creditLines, creditRoll, creditsShown, CREDIT_LINE_MS, deltaOf, memoryStill, rollShown } from "@world/endings/credits";
 import { endingHost, endingNext, startEnding } from "@world/endings/flow";
 import { renderCredits, renderYouAndYou } from "@world/endings/view";
 import { youAndYou } from "@world/endings/youandyou";
@@ -266,10 +266,10 @@ describe("credits are Kuro's log (FR3)", () => {
     endingHost.afterBad = () => void calls.push("afterBad");
     endingHost.newRun = () => void calls.push("newRun");
     const want = {
-      collapse: [["collapse", "credits", "tender", "lines"], "afterBad"],
-      bad: [["wake", "you", "credits", "lines"], "afterBad"],
-      survive: [["credits", "lines", "after"], "newRun"],
-      good: [["credits", "lines", "after"], null],
+      collapse: [["collapse", "tender", "lines", "credits", "poster"], "afterBad"],
+      bad: [["wake", "you", "lines", "credits", "poster"], "afterBad"],
+      survive: [["lines", "credits", "poster", "after"], "newRun"],
+      good: [["lines", "credits", "poster", "after"], null],
     } as const;
     for (const [ending, state] of [
       ["collapse", { ...f(3), san: 0 }],
@@ -321,7 +321,12 @@ describe("the credits like a film's (author 2026-11-17)", () => {
   it("the old objects the run met, in the order they came, each with its picture, its line and its memory's still; the same roll for every ending", () => {
     const cards = creditCards({ found: ["tape", "chick", "camera"] as never });
     expect(cards.map((c) => c.id)).toEqual(["chick", "camera", "tape"]);
-    expect(cards[0]).toEqual({ id: "chick", image: "/objects/chick_front.png", name: "obj.name.chick", note: "credits.obj.chick", still: "/room/dream/classroom.jpg" });
+    expect(cards[0]).toMatchObject({ id: "chick", image: "/objects/chick_front.png", name: "obj.name.chick", note: "credits.obj.chick", still: "/room/dream/classroom.jpg" });
+    // the memory: the dream's backdrop, the first one in it with a portrait (the teacher), their line
+    expect(cards[0]!.memory).toMatchObject({ backdrop: "/room/dream/classroom.jpg", who: "teacher", portrait: "/npc/teacher.png" });
+    expect(typeof cards[0]!.memory!.line).toBe("string");
+    // the card's three beats: the object alone, then the line, then the memory
+    expect([cardPhase(0), cardPhase(CARD_TEXT_AT_MS), cardPhase(CARD_MEMORY_AT_MS), cardPhase(CREDIT_CARD_MS - 1)]).toEqual(["object", "text", "memory", "memory"]);
     expect(cards[2]!.still).toBe("/room/dream/balcony.jpg");
     expect(memoryStill(99)).toBeNull();
     for (const lang of ["zh", "en"] as const) {

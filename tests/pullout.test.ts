@@ -144,9 +144,9 @@ describe("the three ending cuts", () => {
   });
 
   it.each([
-    ["survive", () => f(LAST), "credits"],
+    ["survive", () => f(LAST), "lines"], // author 2026-11-17: the dialogue first, then the credits, then the poster
     ["bad", () => ({ ...f(LAST), assimilation: constants.assimilationMax as number }), "wake"],
-    ["good", goodLast, "credits"],
+    ["good", goodLast, "lines"],
   ] as const)("%s on night 18: the pull-out first, no page, clicks do nothing; at its cut the ending card", (ending, state, first) => {
     const { ctx, timers } = ctxAt(state(), ending);
     startEnding(ctx);
@@ -442,7 +442,7 @@ describe("what appears in the black: the giant for good, the field for bad and s
     expect(GIANT_MARGIN).toBeGreaterThan(BREATH.amp);
   });
 
-  it("good does the full pull-out, then the credits", () => {
+  it("good does the full pull-out, then the fight, then the dialogue", () => {
     const { ctx, timers } = ctxAt(goodLast(), "good");
     startEnding(ctx);
     expect(ctx.session.pullOut?.cutMs).toBe(PULL_MS);
@@ -453,7 +453,7 @@ describe("what appears in the black: the giant for good, the field for bad and s
     bossActions["boss-next"](ctx);
     bossActions["boss-next"](ctx);
     bossActions["boss-done"](ctx);
-    expect(ctx.session.endingPage?.phase).toBe("credits");
+    expect(ctx.session.endingPage?.phase).toBe("lines"); // author 2026-11-17: the dialogue first, then the credits, then the poster
   });
 
   it("the driver writes the giant's vars every frame", () => {

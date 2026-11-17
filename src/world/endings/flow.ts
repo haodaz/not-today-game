@@ -7,7 +7,7 @@ import type { State } from "@state/types.gen";
 import { constants } from "@state/variables";
 import type { ActionContext } from "@world/desktop/controller";
 import { PULL_CUT_MS, pullFrom } from "@world/room/splat/pullout";
-import { creditRoll, CREDIT_LINE_MS, rollShown } from "./credits";
+import { creditRoll, CREDIT_LINE_MS, CREDIT_TICK_MS, rollShown } from "./credits";
 import type { EndingPhase } from "@world/desktop/model";
 import { ENDING_PAGES, nextPage, pageSteps } from "./pages";
 import { dislocateNetMs, PHASE2, PHASE2_MSG, RELEASE_NET_MS } from "./phase2";
@@ -306,7 +306,9 @@ function rollCredits(ctx: ActionContext): void {
   if (!page || page.phase !== "credits" || page.skipped) return;
   const roll = creditRoll(ctx.store.getState());
   if (rollShown(roll, page.startMs, nowOf(ctx), false) >= roll.length) return;
-  ctx.later(CREDIT_LINE_MS, () => {
+  // the cards' beats come at 4 s and 9 s: a finer tick while a card is up; the log's lines at their own pace
+  const current = roll[rollShown(roll, page.startMs, nowOf(ctx), false) - 1];
+  ctx.later(current?.kind === "card" ? CREDIT_TICK_MS : CREDIT_LINE_MS, () => {
     ctx.rerender();
     rollCredits(ctx);
   });

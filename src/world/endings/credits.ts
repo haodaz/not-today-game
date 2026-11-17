@@ -7,6 +7,7 @@
 // last line, the one thing that differs.
 import { objectsFoundOnDay } from "@state/stages";
 import { dayFile } from "@state/days/table";
+import { npcPortrait } from "@world/npc";
 import { endingFlavour, type Ending } from "@state/endings";
 import type { JudgementDelta } from "@state/judgement";
 import { RIGHT_DELTA } from "@state/recognise";
@@ -19,8 +20,26 @@ export type Dimension = (typeof DIMENSIONS)[number];
 
 /** One line per 1.6 s (FR3). */
 export const CREDIT_LINE_MS = 1_600;
-/** One old object's card per 4.5 s (author 2026-11-17: like a film's). */
-export const CREDIT_CARD_MS = 4_500;
+/**
+ * One old object's card per 20 s (author 2026-11-17: 「物件亮相，然后旁边出字。然后是梦里回忆的背景加立绘（一个
+ * 物件20秒左右）」): the object alone, then its line beside it, then its memory — the dream's backdrop
+ * with the portrait of the one who spoke in it and their line.
+ */
+export const CREDIT_CARD_MS = 20_000;
+export const CARD_TEXT_AT_MS = 4_000;
+/** The page re-renders this often while a card plays. */
+export const CREDIT_TICK_MS = 400;
+export const CARD_MEMORY_AT_MS = 9_000;
+export type CardPhase = "object" | "text" | "memory";
+export const cardPhase = (sinceMs: number): CardPhase => (sinceMs < CARD_TEXT_AT_MS ? "object" : sinceMs < CARD_MEMORY_AT_MS ? "text" : "memory");
+
+export interface CreditMemory {
+  readonly backdrop: string;
+  /** The one who spoke in the dream (the first with a portrait) and their first line; null when no one has one. */
+  readonly who: string | null;
+  readonly portrait: string | null;
+  readonly line: string | null;
+}
 
 export interface CreditCard {
   readonly id: string;
@@ -31,6 +50,8 @@ export interface CreditCard {
   readonly note: string;
   /** A still of its memory: the backdrop of the dream of the night it came (null when that night has none). */
   readonly still: string | null;
+  /** The memory as the card's third beat shows it (null when the night has no dream backdrop). */
+  readonly memory: CreditMemory | null;
 }
 
 /** The first backdrop a night's dream shows, as the memory's still. */
@@ -40,12 +61,26 @@ export function memoryStill(day: number): string | null {
   return line ? (line as { backdrop: string }).backdrop : null;
 }
 
+/** The memory: the still, and the first one in the dream who has a portrait, with their first line. */
+export function creditMemory(day: number): CreditMemory | null {
+  const backdrop = memoryStill(day);
+  if (!backdrop) return null;
+  const say = dayFile(day)?.beats.night?.say ?? [];
+  for (const l of say) {
+    const who = (l as { who?: unknown }).who;
+    if (typeof who !== "string" || who === "me" || who === "kuro") continue;
+    const portrait = npcPortrait(who);
+    if (portrait) return { backdrop, who, portrait, line: (l as { t?: string }).t ?? null };
+  }
+  return { backdrop, who: null, portrait: null, line: null };
+}
+
 /** The old objects the run met, in the order they came (stages: objectsFoundOnDay), each with its memory's still. */
 export function creditCards(state: Pick<State, "found">): CreditCard[] {
   return Object.entries(objectsFoundOnDay)
     .filter(([id]) => (state.found as readonly string[]).includes(id))
     .sort((a, b) => a[1] - b[1])
-    .map(([id, day]) => ({ id, image: `/objects/${id}_front.png`, name: `obj.name.${id}`, note: `credits.obj.${id}`, still: memoryStill(day) }));
+    .map(([id, day]) => ({ id, image: `/objects/${id}_front.png`, name: `obj.name.${id}`, note: `credits.obj.${id}`, still: memoryStill(day), memory: creditMemory(day) }));
 }
 
 /** The whole roll in order: the cards, the log's lines, the last line — each with the ms it appears at. */

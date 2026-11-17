@@ -527,6 +527,15 @@
 .credits li.card .txt b{display:block;font-size:20px;letter-spacing:.06em;color:#f4efe6;margin-bottom:4px}
 .credits li.card .txt p{margin:0;font-size:15px;line-height:1.6;color:#c9c3b8}
 .credits li.card .still{width:220px;height:124px;object-fit:cover;border-radius:3px;opacity:.85;filter:saturate(.8) contrast(1.05);box-shadow:0 8px 22px rgba(0,0,0,.6)}
+.credits li.card.object{grid-template-columns:120px 1fr 220px}
+.credits li.card .txt,.credits li.card .still{animation:m-fade-up var(--m-item-in) var(--m-ease) both}
+/* the memory behind the column at the card's third beat (author 2026-11-17: 「梦里回忆的背景加立绘」) */
+.credits-page .credits-memory{position:absolute;inset:0;background:#000 center/cover no-repeat;opacity:0;animation:cred-mem-in 1.2s ease-out both;z-index:1}
+@keyframes cred-mem-in{to{opacity:.55}}
+.credits-page .credits-memory .mem-portrait{position:absolute;right:6%;bottom:0;height:78%;object-fit:contain;object-position:bottom;filter:drop-shadow(0 10px 30px rgba(0,0,0,.8))}
+.credits-page .credits-memory .mem-line{position:absolute;left:6%;bottom:7%;max-width:52%;margin:0;font-size:17px;line-height:1.7;color:#f4efe6;text-shadow:0 1px 8px #000}
+.credits-page.remembering .credits{z-index:2}
+@media (prefers-reduced-motion:reduce){.credits-page .credits-memory{animation:none;opacity:.55}.credits li.card .txt,.credits li.card .still{animation:none}}
 .first-day{background:#fff;color:#1d2129;display:flex;align-items:center;justify-content:center}
 .first-day p{position:relative;z-index:2;margin:0;font-size:28px;letter-spacing:.4em;pointer-events:none}
 /* 崩坏的世界 (three-meters spec): the room goes to white in ~4 s, then black with one line. With

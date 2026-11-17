@@ -10,7 +10,7 @@ import type { Session } from "@world/desktop/model";
 import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t, tr } from "@world/i18n";
 import { fillPlaceholders } from "@world/replies/placeholders";
-import { creditRoll, lastLineKey, rollShown } from "./credits";
+import { cardPhase, creditRoll, lastLineKey, rollShown } from "./credits";
 import { youAndYou } from "./youandyou";
 import { renderPullOut } from "./pullout";
 import { bossScene } from "@world/room/outside";
@@ -50,10 +50,14 @@ export function renderCredits(m: EndingModel, ending: Ending): SafeHtml {
   const roll = creditRoll(m.state);
   const page = m.session.endingPage;
   const shown = page ? rollShown(roll, page.startMs, m.nowMs, page.skipped) : roll.length;
-  const items = roll.slice(0, shown).map((it) => {
+  // the card up now and its beat (object → text → memory); skipped: every card at its last beat
+  const current = shown > 0 ? roll[shown - 1] : undefined;
+  const elapsed = page && current ? m.nowMs - page.startMs - current.at : 0;
+  const items = roll.slice(0, shown).map((it, i) => {
     if (it.kind === "card") {
       const c = it.card;
-      return html`<li class="card" data-object="${c.id}"><img class="obj" src="${c.image}" alt="" draggable="false"><div class="txt"><b>${tr(c.name)}</b><p>${tr(c.note)}</p></div>${c.still ? html`<img class="still" src="${c.still}" alt="" draggable="false">` : null}</li>`;
+      const phase = page?.skipped || i < shown - 1 ? "memory" : cardPhase(elapsed);
+      return html`<li class="${cls("card", phase)}" data-object="${c.id}"><img class="obj" src="${c.image}" alt="" draggable="false">${phase !== "object" ? html`<div class="txt"><b>${tr(c.name)}</b><p>${tr(c.note)}</p></div>` : null}${c.still && phase === "memory" ? html`<img class="still" src="${c.still}" alt="" draggable="false">` : null}</li>`;
     }
     if (it.kind === "line") {
       const l = it.line;
@@ -62,10 +66,13 @@ export function renderCredits(m: EndingModel, ending: Ending): SafeHtml {
     return html`<li class="last">${tr(lastLineKey(ending, m.state))}</li>`;
   });
   const last = null;
+  // the memory behind the column while the card up now is at its third beat: the dream's backdrop, the one who spoke, their line
+  const mem = !page?.skipped && current?.kind === "card" && cardPhase(elapsed) === "memory" ? current.card.memory : null;
+  const memory = mem ? html`<div class="credits-memory" style="background-image:url(${mem.backdrop})">${mem.portrait ? html`<img class="mem-portrait" src="${mem.portrait}" alt="" draggable="false">` : null}${mem.line ? html`<p class="mem-line">${mem.line}</p>` : null}</div>` : null;
   // The song's title and the words' author, once the strings carry them (content/strings/*.json,
   // key `credits.song`); the full song plays under the roll (sound spec, `when: credits`).
   const song = hasString("credits.song") ? html`<p class="song">${tr("credits.song")}</p>` : null;
-  return html`<div class="stage ending-page credits-page" data-ending="${ending}">${next()}<ol class="credits plain">${items}${last}</ol>${song}</div>`;
+  return html`<div class="${cls("stage", "ending-page", "credits-page", memory && "remembering")}" data-ending="${ending}">${next()}${memory}<ol class="credits plain">${items}${last}</ol>${song}</div>`;
 }
 
 /** After the credits: 第一日 (survive) or day 19 (good). Bad has none: the host takes it home. */
@@ -124,16 +131,10 @@ export function renderWake(m: EndingModel): SafeHtml {
 export function renderLines(m: EndingModel, ending: Ending): SafeHtml {
   const flavour = endingFlavour(ending, m.state);
   const all = endingLines(flavour);
-  const step = Math.min(all.length + 1, Math.max(1, stepOf(m)));
+  const step = Math.min(all.length, Math.max(1, stepOf(m)));
   const fill = (s: string) => fillPlaceholders(s, m.state.names);
   // Q-Kuro beside you on good / the warm survive; elsewhere the plain dark face the chat window shows.
   const face = flavour === "good" || flavour === "survive.warm" ? "/battle/q-kuro.png" : frameUrl(FRAMES.idle[0]);
-  if (step > all.length) {
-    // the ending's own page (author 2026-11-12): the name, the spread picture, one paragraph
-    // layout (author 2026-11-12, Sultan's Game reference): the picture on the left, the name and a paragraph on the right
-    const card = html`<div class="ending-card"><div class="ending-art-wrap"><img class="ending-art" src="${ENDING_ART[flavour]}" alt="" draggable="false"></div><div class="ending-text"><small>${tr("ending.name.label")}</small><b>${tr(`ending.name.${flavour}`)}</b><p class="ending-about">${fill(t(`ending.about.${flavour}`, { day: m.state.day }))}</p><span class="ending-go" aria-hidden="true">${tr("ending.next")}</span></div></div>`;
-    return html`<div class="stage ending-page lines-page carded" data-flavour="${flavour}">${next()}${card}</div>`;
-  }
   const rows = all.slice(0, step).map((l) => {
     const text = fill(t(l.key, { day: m.state.day }));
     return l.who === "kuro"
@@ -143,6 +144,19 @@ export function renderLines(m: EndingModel, ending: Ending): SafeHtml {
   // the slip (author 2026-11-16: 「只有第18天的存活结局有 … 把老物件寄出去用的」): the waybill out of the box, filled, on the survive pages only
   const slip = flavour === "survive.warm" || flavour === "survive.cold" ? html`<img class="ending-slip" src="/room/desk/slip.png" alt="" draggable="false">` : null;
   return html`<div class="stage ending-page lines-page" data-flavour="${flavour}" data-step="${step}">${next()}${slip}<ol class="lines">${rows}</ol></div>`;
+}
+
+
+/**
+ * The ending's poster (author 2026-11-12: the name, the spread picture, one paragraph; 2026-11-17: its
+ * own last page, after the credits — 「最后是结局海报」). Layout (Sultan's Game reference): the picture
+ * on the left, the name and a paragraph on the right.
+ */
+export function renderPoster(m: EndingModel, ending: Ending): SafeHtml {
+  const flavour = endingFlavour(ending, m.state);
+  const fill = (s: string) => fillPlaceholders(s, m.state.names);
+  const card = html`<div class="ending-card"><div class="ending-art-wrap"><img class="ending-art" src="${ENDING_ART[flavour]}" alt="" draggable="false"></div><div class="ending-text"><small>${tr("ending.name.label")}</small><b>${tr(`ending.name.${flavour}`)}</b><p class="ending-about">${fill(t(`ending.about.${flavour}`, { day: m.state.day }))}</p><span class="ending-go" aria-hidden="true">${tr("ending.next")}</span></div></div>`;
+  return html`<div class="stage ending-page poster-page lines-page carded" data-flavour="${flavour}">${next()}${card}</div>`;
 }
 
 export function renderEnding(m: EndingModel): SafeHtml {
@@ -159,5 +173,6 @@ export function renderEnding(m: EndingModel): SafeHtml {
   if (phase === "tender") return renderTender(m);
   if (phase === "wake") return renderWake(m);
   if (phase === "lines") return renderLines(m, ending);
+  if (phase === "poster") return renderPoster(m, ending);
   return renderAfter(m, ending);
 }
