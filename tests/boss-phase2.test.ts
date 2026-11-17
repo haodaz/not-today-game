@@ -274,13 +274,14 @@ describe("R7 · the win in the world (survive): the leave, the outro, the conden
     expect(renderBoss(b, 0, { dislocating: false, leaving: true, condensing: true, holdDone: false, style: "" }).value).toContain('data-action="boss-done"');
     expect(renderBoss(b, 0, { dislocating: false, leaving: true, condensing: true, holdDone: false, style: "" }).value).toContain("world leaving condensing");
   });
-  it("the room's messages: left ends the leave, eye ends the condensing; the way out refuses while condensing", () => {
+  it("the room's messages: left ends the leave (and starts the condensing once the outro is read); eye ends the condensing; the way out refuses while condensing", () => {
     const session: { phase2: NonNullable<Session["phase2"]>; boss: BossBattle | null } = { phase2: { stage: "leaving", since: 0 }, boss: { ...bossStart(({ ...createStore({ startDay: 18 }).getState(), day: 18, affinity: 100 } as never), "survive", 0), phase: "after" } };
     const ctx = { session, now: () => 500, rerender: () => {}, later: () => {} } as never as Parameters<typeof onBossRoom>[0];
     expect(onBossRoom(ctx, "eye")).toBe(false);
+    // the outro already read through (the fight is "after"): "left" starts the condensing at once;
+    // never before the leave has ended
     expect(onBossRoom(ctx, "left")).toBe(true);
-    expect(session.phase2.stage).toBe("left");
-    session.phase2 = { stage: "condensing", since: 600 };
+    expect(session.phase2.stage).toBe("condensing");
     bossActions["boss-done"](ctx);
     expect(session.boss).not.toBeNull();
     expect(onBossRoom(ctx, "eye")).toBe(true);

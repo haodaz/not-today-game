@@ -129,13 +129,19 @@ function wonInWorld(ctx: ActionContext, prev: BossBattle, next: BossBattle): voi
 function phase2Left(ctx: ActionContext): void {
   if (ctx.session.phase2?.stage !== "leaving") return;
   ctx.session.phase2 = { stage: "left", since: nowOf(ctx) };
+  // the outro was read through while the eye was still leaving: the condensing starts now
+  if (ctx.session.boss?.phase === "after") startCondense(ctx);
   ctx.rerender();
 }
 
-/** R7: the outro read through — the world condenses to one eye on a far greater Kuro; the way out waits for "eye" or the net. */
+/**
+ * R7: the outro read through and the eye out ("left"): the world condenses to one eye on a far
+ * greater Kuro; the way out waits for "eye" or the net. Never posted before the leave has ended
+ * (the outro can be clicked through in four seconds; the leave takes nine).
+ */
 function startCondense(ctx: ActionContext): void {
   const p = ctx.session.phase2;
-  if (!p || (p.stage !== "leaving" && p.stage !== "left")) return;
+  if (!p || p.stage !== "left") return;
   const now = nowOf(ctx);
   const run = { stage: "condensing" as const, since: now };
   ctx.session.phase2 = run;
