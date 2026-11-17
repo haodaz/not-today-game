@@ -2553,27 +2553,36 @@ const _fp = new THREE.Vector3(), _fl = new THREE.Vector3(), _fq = new THREE.Quat
 // does not move. He does not lunge and does not flinch. When he acts, the world acts: the nearest of them rise out of
 // the ground and come down where the party stands. When he is hurt, they drop back and the red under the ground stutters.
 // { boss: true } enters it (the room is gone, the eye sits at one fixed place); { strike: true } / { hurt: true } are events.
-const BOSS = { on: false, k: 0, to: 0.3, until: 0, flick: 0 };
+const BOSS = { on: false, k: 0, to: 0, until: 0, flick: 0, r: 0, rising: 0, told: false }; // r: how far the head has risen, 0 below the frame … 1 up
 function bossTentacles() {
   BOSS.made = true;
+  BOSS.mat = M({ map: hideMap, bumpMap: hideMap, bumpScale: 5, roughness: 0.3, color: 0x9a5560, emissive: 0x3a060c, emissiveIntensity: 0.6, side: THREE.DoubleSide }, 3); // his hide, as on the ground: dark wine, wet — not the pale indoor ones
   const R = rng(77);
   for (let i = 0; i < 9; i++) {
     const a = -0.9 + (i / 8) * 4.2 + (R() - 0.5) * 0.3, d = 5.5 + R() * 5, x = Math.cos(a) * d, z = Math.sin(a) * d, h = 5 + R() * 5, lean = 0.55 + R() * 0.3;
     const before = tentacles.length;
     tentacle([[x, -1.2, z], [x * 1.04, h * 0.45, z * 1.04], [x * 0.9, h * 0.85, z * 0.9], [x * (1 - lean * 0.6), h, z * (1 - lean * 0.6)], [x * (1 - lean), h * 0.62, z * (1 - lean)], [x * (1 - lean) * 0.8, h * 0.2, z * (1 - lean) * 0.8]], 0.5 + R() * 0.35, 0.7 + R() * 0.3, 0.5, true);
-    const t = tentacles[before]; t.boss = true; t.outer = false; FAR.g.add(t.mesh); // out of the room's group: the room is hidden here
+    const t = tentacles[before]; t.boss = true; t.outer = false; t.mesh.material = BOSS.mat; FAR.g.add(t.mesh); // out of the room's group: the room is hidden here
   }
 }
 function updateBoss(s, dt) {
   if (!BOSS.on) { if (BOSS.k > 0) BOSS.k = Math.max(0, BOSS.k - dt * 2); return; }
   if (!BOSS.made) bossTentacles();
-  if (BOSS.until && s > BOSS.until) { BOSS.until = 0; BOSS.to = 0.3; }
+  // the entrance (author 2026-11-17: 巨兽的巨首能否缓缓升起): the head comes up out of the dark over five and a half seconds,
+  // dim; the eyes are the last thing to light. Then the game is told.
+  if (BOSS.rising) {
+    BOSS.r = Math.min(1, (s - BOSS.rising) / 5.5);
+    if (BOSS.r >= 1 && !BOSS.told) { BOSS.told = true; BOSS.rising = 0; BOSS.to = 0.3; try { window.parent.postMessage({ source: "nt-room", type: "risen" }, "*"); } catch {} }
+  }
+  if (BOSS.until && s > BOSS.until) { BOSS.until = 0; BOSS.to = BOSS.r >= 1 ? 0.3 : 0; }
   BOSS.k += (BOSS.to - BOSS.k) * (1 - Math.exp(-dt * (BOSS.to > BOSS.k ? 9 : 2.2))); // up fast, down slowly
   BOSS.flick = Math.max(0, BOSS.flick - dt * 2.5);
   if (FAR.reds) for (const l of FAR.reds) l.intensity *= 1 - 0.8 * BOSS.flick * (0.5 + 0.5 * Math.sin(s * 47 + l.userData.ph));
 }
 function bossEvent(kind) {
   const s = performance.now() / 1000;
+  if (kind === "rise") { if (BOSS.r < 1 && !BOSS.rising) { BOSS.rising = s; BOSS.told = false; } return; }
+  if (BOSS.r < 1) return; // nothing strikes before he is there
   if (kind === "strike") { BOSS.to = 1; BOSS.until = s + 0.75; }
   if (kind === "hurt") { BOSS.to = 0.06; BOSS.until = s + 0.9; BOSS.flick = 1; }
 }
@@ -2624,7 +2633,11 @@ function updateFar(s, dt) {
   // he is carried with the eye, so he keeps his size whatever the distance
   camera.updateMatrixWorld();
   FAR.card.quaternion.copy(camera.quaternion);
-  FAR.card.position.set(0, 21 + 1.5 * w, -85).applyMatrix4(camera.matrixWorld);
+  { // in the fight he rises: from below the frame, dark, the light coming into him at the end
+    const r = BOSS.on ? BOSS.r : 1, up = r * r * (3 - 2 * r), lit = BOSS.on ? 0.16 + 0.34 * up + 0.5 * smooth(0.86, 1, r) : 1;
+    FAR.card.position.set(0, 21 + 1.5 * w - (1 - up) * 62, -85).applyMatrix4(camera.matrixWorld);
+    FAR.card.material.color.setScalar(lit);
+  }
   const fov = 47 + 6 * e; if (Math.abs(camera.fov - fov) > 0.01) { camera.fov = fov; camera.updateProjectionMatrix(); }
 }
 function frame(now) {
@@ -2970,7 +2983,8 @@ function command(m) {
   if (m.eaten != null) ui("eaten", m.eaten);
   if (m.objects !== undefined) { state.objects = Array.isArray(m.objects) ? m.objects.map(String) : null; applyDay(); }
   if (m.pause != null) renderer.setAnimationLoop(m.pause ? null : frame); // a frame the game has hidden should not go on drawing
-  if (m.boss != null) { BOSS.on = !!m.boss; if (!BOSS.on) FAR.to = 0; }
+  if (m.boss != null) { BOSS.on = !!m.boss; BOSS.r = m.risen ? 1 : 0; BOSS.rising = 0; BOSS.told = !!m.risen; BOSS.to = m.risen ? 0.3 : 0; if (!BOSS.on) FAR.to = 0; } // { boss: true } = the world, head still down; add risen: true to start with him up
+  if (m.rise) bossEvent("rise");
   if (m.strike) bossEvent("strike");
   if (m.hurt) bossEvent("hurt");
   if (m.layout !== undefined) layout(m.layout);
