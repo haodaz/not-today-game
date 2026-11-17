@@ -7,7 +7,7 @@ import type { State } from "@state/types.gen";
 import { constants } from "@state/variables";
 import type { ActionContext } from "@world/desktop/controller";
 import { PULL_CUT_MS, pullFrom } from "@world/room/splat/pullout";
-import { creditLines, creditsShown, CREDIT_LINE_MS } from "./credits";
+import { creditRoll, CREDIT_LINE_MS, rollShown } from "./credits";
 import type { EndingPhase } from "@world/desktop/model";
 import { ENDING_PAGES, nextPage, pageSteps } from "./pages";
 import { dislocateNetMs, PHASE2, PHASE2_MSG, RELEASE_NET_MS } from "./phase2";
@@ -304,8 +304,8 @@ function firstPage(ctx: ActionContext, ending: Ending): void {
 function rollCredits(ctx: ActionContext): void {
   const page = ctx.session.endingPage;
   if (!page || page.phase !== "credits" || page.skipped) return;
-  const total = creditLines(ctx.store.getState()).length + 1;
-  if (creditsShown(total, page.startMs, nowOf(ctx), false) >= total) return;
+  const roll = creditRoll(ctx.store.getState());
+  if (rollShown(roll, page.startMs, nowOf(ctx), false) >= roll.length) return;
   ctx.later(CREDIT_LINE_MS, () => {
     ctx.rerender();
     rollCredits(ctx);
@@ -321,8 +321,8 @@ export function endingNext(ctx: ActionContext): void {
   // During the pull-out nothing moves on (no page yet; a click does nothing).
   if (ending === "none" || !page || session.pullOut) return;
   if (page.phase === "credits") {
-    const total = creditLines(state).length + 1;
-    if (!page.skipped && creditsShown(total, page.startMs, nowOf(ctx), false) < total) {
+    const roll = creditRoll(state);
+    if (!page.skipped && rollShown(roll, page.startMs, nowOf(ctx), false) < roll.length) {
       // Never skipped entirely: the first click shows the whole log.
       page.skipped = true;
       ctx.rerender();

@@ -10,7 +10,7 @@ import type { Session } from "@world/desktop/model";
 import { cls, html, type SafeHtml } from "@world/html";
 import { hasString, t, tr } from "@world/i18n";
 import { fillPlaceholders } from "@world/replies/placeholders";
-import { creditLines, creditsShown, lastLineKey } from "./credits";
+import { creditRoll, lastLineKey, rollShown } from "./credits";
 import { youAndYou } from "./youandyou";
 import { renderPullOut } from "./pullout";
 import { bossScene } from "@world/room/outside";
@@ -46,15 +46,22 @@ export function renderYouAndYou(m: EndingModel): SafeHtml {
 
 /** Kuro's log, one line per stored entry, then the ending's own line. */
 export function renderCredits(m: EndingModel, ending: Ending): SafeHtml {
-  const lines = creditLines(m.state);
+  // author 2026-11-17: like a film's — the old objects one by one with a line and their memory's still, then the log, then the last line
+  const roll = creditRoll(m.state);
   const page = m.session.endingPage;
-  const total = lines.length + 1;
-  const shown = page ? creditsShown(total, page.startMs, m.nowMs, page.skipped) : total;
-  const items = lines.slice(0, Math.min(shown, lines.length)).map(
-    (l) =>
-      html`<li><span class="d">${tr("shell.day", { day: l.day })}</span> · <span class="what">${l.note}</span> · <span class="dir">${l.moved.map((x) => html`${tr(`credits.dim.${x.dim}`)}${x.dir > 0 ? "↑" : "↓"}`)}</span></li>`,
-  );
-  const last = shown >= total ? html`<li class="last">${tr(lastLineKey(ending, m.state))}</li>` : null;
+  const shown = page ? rollShown(roll, page.startMs, m.nowMs, page.skipped) : roll.length;
+  const items = roll.slice(0, shown).map((it) => {
+    if (it.kind === "card") {
+      const c = it.card;
+      return html`<li class="card" data-object="${c.id}"><img class="obj" src="${c.image}" alt="" draggable="false"><div class="txt"><b>${tr(c.name)}</b><p>${tr(c.note)}</p></div>${c.still ? html`<img class="still" src="${c.still}" alt="" draggable="false">` : null}</li>`;
+    }
+    if (it.kind === "line") {
+      const l = it.line;
+      return html`<li><span class="d">${tr("shell.day", { day: l.day })}</span> · <span class="what">${l.note}</span> · <span class="dir">${l.moved.map((x) => html`${tr(`credits.dim.${x.dim}`)}${x.dir > 0 ? "↑" : "↓"}`)}</span></li>`;
+    }
+    return html`<li class="last">${tr(lastLineKey(ending, m.state))}</li>`;
+  });
+  const last = null;
   // The song's title and the words' author, once the strings carry them (content/strings/*.json,
   // key `credits.song`); the full song plays under the roll (sound spec, `when: credits`).
   const song = hasString("credits.song") ? html`<p class="song">${tr("credits.song")}</p>` : null;

@@ -1,6 +1,12 @@
-// The credits are Kuro's log (san-and-endings FR3, design E4): one line per stored evidence entry,
-// in day order — the day, what the player did (the entry's note), and which way it moved Kuro.
-// Built only from `judgement.evidence`; never generated at credits time.
+// The credits (author 2026-11-17: 「谢幕我们可以和电影一样，最后一个一个出那些老物件+一些说明，还有记忆的截图」
+// 「除了对话剧情不同，其实片尾播放的内容是一样的」): the same roll for every ending — first the old
+// objects the run met, one by one in the order they came, each with its picture, a line about it and
+// a still of its memory (the night's dream backdrop); then Kuro's log (san-and-endings FR3, design
+// E4): one line per stored evidence entry, in day order — the day, what the player did (the entry's
+// note), and which way it moved Kuro — built only from `judgement.evidence`; then the ending's own
+// last line, the one thing that differs.
+import { objectsFoundOnDay } from "@state/stages";
+import { dayFile } from "@state/days/table";
 import { endingFlavour, type Ending } from "@state/endings";
 import type { JudgementDelta } from "@state/judgement";
 import { RIGHT_DELTA } from "@state/recognise";
@@ -13,6 +19,51 @@ export type Dimension = (typeof DIMENSIONS)[number];
 
 /** One line per 1.6 s (FR3). */
 export const CREDIT_LINE_MS = 1_600;
+/** One old object's card per 4.5 s (author 2026-11-17: like a film's). */
+export const CREDIT_CARD_MS = 4_500;
+
+export interface CreditCard {
+  readonly id: string;
+  /** The object's picture. */
+  readonly image: string;
+  /** Strings keys: its name and the line about it. */
+  readonly name: string;
+  readonly note: string;
+  /** A still of its memory: the backdrop of the dream of the night it came (null when that night has none). */
+  readonly still: string | null;
+}
+
+/** The first backdrop a night's dream shows, as the memory's still. */
+export function memoryStill(day: number): string | null {
+  const night = dayFile(day)?.beats.night;
+  const line = night?.say.find((l) => typeof (l as { backdrop?: unknown }).backdrop === "string");
+  return line ? (line as { backdrop: string }).backdrop : null;
+}
+
+/** The old objects the run met, in the order they came (stages: objectsFoundOnDay), each with its memory's still. */
+export function creditCards(state: Pick<State, "found">): CreditCard[] {
+  return Object.entries(objectsFoundOnDay)
+    .filter(([id]) => (state.found as readonly string[]).includes(id))
+    .sort((a, b) => a[1] - b[1])
+    .map(([id, day]) => ({ id, image: `/objects/${id}_front.png`, name: `obj.name.${id}`, note: `credits.obj.${id}`, still: memoryStill(day) }));
+}
+
+/** The whole roll in order: the cards, the log's lines, the last line — each with the ms it appears at. */
+export type CreditItem = { readonly kind: "card"; readonly card: CreditCard; readonly at: number } | { readonly kind: "line"; readonly line: CreditLine; readonly at: number } | { readonly kind: "last"; readonly at: number };
+export function creditRoll(state: State): CreditItem[] {
+  const items: CreditItem[] = [];
+  let at = 0;
+  for (const card of creditCards(state)) { items.push({ kind: "card", card, at }); at += CREDIT_CARD_MS; }
+  for (const line of creditLines(state)) { items.push({ kind: "line", line, at }); at += CREDIT_LINE_MS; }
+  items.push({ kind: "last", at });
+  return items;
+}
+
+/** How many of the roll's items show at `nowMs`; a click shows them all (never skips the roll entirely). */
+export function rollShown(roll: readonly CreditItem[], startMs: number, nowMs: number, skipped: boolean): number {
+  if (skipped) return roll.length;
+  return roll.filter((it) => nowMs - startMs >= it.at).length;
+}
 
 export interface CreditLine {
   readonly day: number;

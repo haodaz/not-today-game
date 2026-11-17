@@ -11,11 +11,12 @@ import { f } from "@state/fday";
 import type { Store } from "@state/store";
 import { createStore } from "@state/store";
 import type { State } from "@state/types.gen";
+import { hasString, setLocale } from "@world/i18n";
 import { constants, membersOf } from "@state/variables";
 import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
 import { initialSession } from "@world/desktop/model";
-import { creditLines, creditsShown, CREDIT_LINE_MS, deltaOf } from "@world/endings/credits";
+import { CREDIT_CARD_MS, creditCards, creditLines, creditRoll, creditsShown, CREDIT_LINE_MS, deltaOf, memoryStill, rollShown } from "@world/endings/credits";
 import { endingHost, endingNext, startEnding } from "@world/endings/flow";
 import { renderCredits, renderYouAndYou } from "@world/endings/view";
 import { youAndYou } from "@world/endings/youandyou";
@@ -313,5 +314,29 @@ describe("你和你 (FR2)", () => {
     const out = renderYouAndYou({ state: store.getState(), events: store.getEvents(), session: initialSession(DEFAULT_CLOCK), startDay: 1, nowMs: 0 }).value;
     expect(out).toContain("好。");
     expect(out).toMatchSnapshot();
+  });
+});
+
+describe("the credits like a film's (author 2026-11-17)", () => {
+  it("the old objects the run met, in the order they came, each with its picture, its line and its memory's still; the same roll for every ending", () => {
+    const cards = creditCards({ found: ["tape", "chick", "camera"] as never });
+    expect(cards.map((c) => c.id)).toEqual(["chick", "camera", "tape"]);
+    expect(cards[0]).toEqual({ id: "chick", image: "/objects/chick_front.png", name: "obj.name.chick", note: "credits.obj.chick", still: "/room/dream/classroom.jpg" });
+    expect(cards[2]!.still).toBe("/room/dream/balcony.jpg");
+    expect(memoryStill(99)).toBeNull();
+    for (const lang of ["zh", "en"] as const) {
+      setLocale(lang);
+      for (const c of cards) { expect(hasString(c.name), `${lang} ${c.name}`).toBe(true); expect(hasString(c.note), `${lang} ${c.note}`).toBe(true); }
+    }
+    setLocale("zh");
+    const s = { ...createStore({ startDay: 18 }).getState(), found: ["chick", "camera"] } as State;
+    const roll = creditRoll(s);
+    expect(roll.slice(0, 2).map((it) => it.kind)).toEqual(["card", "card"]);
+    expect(roll[1]!.at).toBe(CREDIT_CARD_MS);
+    expect(roll.at(-1)!.kind).toBe("last");
+    expect(roll[2]!.at).toBe(2 * CREDIT_CARD_MS);
+    expect(rollShown(roll, 0, 0, false)).toBe(1);
+    expect(rollShown(roll, 0, CREDIT_CARD_MS, false)).toBe(2);
+    expect(rollShown(roll, 0, 0, true)).toBe(roll.length);
   });
 });

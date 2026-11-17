@@ -521,6 +521,12 @@
 .credits li .d{color:#c9a86a}.credits li .dir{color:#9aa3b0;letter-spacing:.08em}
 .credits li:last-child{animation:m-fade-up var(--m-item-in) var(--m-ease) both}
 .credits li.last{margin-top:18px;font-size:19px}
+/* the old objects' cards (author 2026-11-17: like a film's credits): the picture, a line, the memory's still */
+.credits li.card{display:grid;grid-template-columns:120px 1fr 220px;gap:22px;align-items:center;padding:10px 0;text-shadow:none}
+.credits li.card .obj{width:120px;height:120px;object-fit:contain;filter:drop-shadow(0 6px 14px rgba(0,0,0,.6))}
+.credits li.card .txt b{display:block;font-size:20px;letter-spacing:.06em;color:#f4efe6;margin-bottom:4px}
+.credits li.card .txt p{margin:0;font-size:15px;line-height:1.6;color:#c9c3b8}
+.credits li.card .still{width:220px;height:124px;object-fit:cover;border-radius:3px;opacity:.85;filter:saturate(.8) contrast(1.05);box-shadow:0 8px 22px rgba(0,0,0,.6)}
 .first-day{background:#fff;color:#1d2129;display:flex;align-items:center;justify-content:center}
 .first-day p{position:relative;z-index:2;margin:0;font-size:28px;letter-spacing:.4em;pointer-events:none}
 /* 崩坏的世界 (three-meters spec): the room goes to white in ~4 s, then black with one line. With
