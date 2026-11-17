@@ -1107,3 +1107,10 @@
 .room .evening-ceil{position:absolute;inset:0;background:linear-gradient(rgba(214,224,236,.22),rgba(214,224,236,.06) 60%,transparent);mix-blend-mode:screen}
 .room .ceil-disc{position:absolute;left:50%;top:42%;width:360px;height:360px;margin:-180px 0 0 -180px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.35),rgba(255,255,255,0) 70%);mix-blend-mode:screen}
 .room.ceil-day::before{content:"";position:absolute;inset:0;background:inherit;filter:brightness(1.06);pointer-events:none}
+/* boss-phase2-world R8 (good): the homecoming — the party and its mound fade as on the leave (placeholders; the
+   look is the other session's); the box is silent until "home" */
+.boss-page.world.homing .bs-party{animation:p2-left 2600ms cubic-bezier(.4,0,.8,.6) both}
+.boss-page.world.homing .bs-strip,.boss-page.world.homing .bs-buffs,.boss-page.world.homing .bs-top,.boss-page.world.homing .bs-atb,.boss-page.world.homing .bs-bossbar{animation:p2-fade 2200ms ease-in both}
+.boss-page.world.homing::after{animation:p2-fade 3000ms ease-in both}
+.boss-page.world.homing .bs-box.silent{visibility:hidden}
+@media (prefers-reduced-motion:reduce){.boss-page.world.homing .bs-top,.boss-page.world.homing .bs-atb,.boss-page.world.homing .bs-bossbar,.boss-page.world.homing .bs-party,.boss-page.world.homing .bs-strip,.boss-page.world.homing .bs-buffs,.boss-page.world.homing::after{animation:none;opacity:0}}

@@ -352,7 +352,7 @@ const spriteOf = (b: BossBattle, m: Member, pose: Pose): string =>
  * party stands on its own dark strip, and the boss's act classes are not drawn (the world acts for it).
  * Without it the page is exactly as before.
  */
-export function renderBoss(b: BossBattle, nowMs: number, world: { readonly dislocating: boolean; readonly leaving?: boolean; readonly condensing?: boolean; readonly holdDone?: boolean; readonly style: string } | null = null): SafeHtml {
+export function renderBoss(b: BossBattle, nowMs: number, world: { readonly dislocating: boolean; readonly leaving?: boolean; readonly condensing?: boolean; readonly homing?: boolean; readonly holdDone?: boolean; readonly style: string } | null = null): SafeHtml {
   const acting = b.act && nowMs - b.act.at < ACT_MS ? b.act : null;
   const hitOf = (id: string) => acting?.hits.find((h) => h.id === id);
   // the statuses, top row: open for the one whose turn it is (or acting), the rest compact until the pointer
@@ -405,11 +405,11 @@ export function renderBoss(b: BossBattle, nowMs: number, world: { readonly dislo
   const box = b.phase === "lost"
     ? html`<div class="bs-box"><p>${b.log}</p><button type="button" class="bs-cmd" data-action="boss-retry">${S("boss.retry")}</button></div>`
     : b.phase === "after"
-      // the world condensing to an eye (survive, in the frame): silence, the way out after it
+      // the world condensing / the greater Kuro rushing out (survive) or the homecoming (good), in the frame: silence, the way out after it
       ? world?.holdDone ? html`<div class="bs-box silent" aria-hidden="true"></div>` : html`<div class="bs-box"><button type="button" class="bs-cmd" data-action="boss-done">${S("boss.done")}</button></div>`
       : html`<div class="${cls("bs-box", clickable && "more", portrait && "portrait")}">${portrait}<p>${acting ? acting.text.join(" ") : b.log}</p>${clickable ? html`<i class="bs-caret"></i><button type="button" class="bs-hit" data-action="boss-next" aria-label="${S("boss.done")}"></button>` : null}</div>`;
   const cheat = import.meta.env.DEV && b.phase !== "after" && b.phase !== "won" ? html`<button type="button" class="sk-cheat" data-action="boss-cheat" aria-hidden="true" tabindex="-1"></button>` : null;
-  return html`<div class="${cls("boss-page", `end-${b.ending}`, b.strong && "strong", b.phase === "after" && "after", acting?.move.fx === "shake" && "shake", b.boss.stage === 2 && "stage2", b.boss.stage === 2 && "final", b.mercy && "mercy", b.party.length > 6 && "many", world && "world", world?.dislocating && "dislocating", world?.leaving && "leaving", world?.condensing && "condensing")}" data-phase="${b.phase}"${world ? html` style="${world.style}"` : null}>${cheat}
+  return html`<div class="${cls("boss-page", `end-${b.ending}`, b.strong && "strong", b.phase === "after" && "after", acting?.move.fx === "shake" && "shake", b.boss.stage === 2 && "stage2", b.boss.stage === 2 && "final", b.mercy && "mercy", b.party.length > 6 && "many", world && "world", world?.dislocating && "dislocating", world?.leaving && "leaving", world?.condensing && "condensing", world?.homing && "homing")}" data-phase="${b.phase}"${world ? html` style="${world.style}"` : null}>${cheat}
     <div class="bs-bg"></div>
     ${giant}
     ${field}

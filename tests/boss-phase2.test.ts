@@ -264,11 +264,12 @@ describe("R7 · the win in the world (survive): the leave, the outro, the conden
   });
   it("the page: .leaving from the leave on, .condensing while it condenses; the way out held until the eye", () => {
     const leaving = phase2PageAttrs({ stage: "leaving", since: 0 }, false, 100);
-    expect([leaving.world, leaving.leaving, leaving.condensing, leaving.holdDone]).toEqual([true, true, false, false]);
+    // R8: on survive in the world the way out is never offered (the rush ends the fight by itself): held from the leave on
+    expect([leaving.world, leaving.leaving, leaving.condensing, leaving.holdDone]).toEqual([true, true, false, true]);
     const cond = phase2PageAttrs({ stage: "condensing", since: 0 }, false, 100);
     expect([cond.leaving, cond.condensing, cond.holdDone]).toEqual([true, true, true]);
     const eye = phase2PageAttrs({ stage: "eye", since: 0 }, false, 100);
-    expect([eye.condensing, eye.holdDone]).toEqual([true, false]);
+    expect([eye.condensing, eye.holdDone]).toEqual([true, true]);
     const b = { ...bossStart(({ ...createStore({ startDay: 18 }).getState(), day: 18, affinity: 100 } as never), "survive", 0), phase: "after" as const };
     expect(renderBoss(b, 0, { dislocating: false, leaving: true, condensing: true, holdDone: true, style: "" }).value).toContain('<div class="bs-box silent" aria-hidden="true"></div>');
     expect(renderBoss(b, 0, { dislocating: false, leaving: true, condensing: true, holdDone: false, style: "" }).value).toContain('data-action="boss-done"');
@@ -285,6 +286,125 @@ describe("R7 · the win in the world (survive): the leave, the outro, the conden
     bossActions["boss-done"](ctx);
     expect(session.boss).not.toBeNull();
     expect(onBossRoom(ctx, "eye")).toBe(true);
-    expect(session.phase2.stage).toBe("eye");
+    // R8: the eye there, the greater Kuro rushes out at once
+    expect(session.phase2.stage).toBe("rushing");
+  });
+});
+
+describe("R8 · the good ending comes home; the survive ending ends on the rush", () => {
+  const posts = (prev: typeof NO_BOSS_POSTS, stage: NonNullable<Session["phase2"]>["stage"], since: number) => bossPosts(prev, { key: "k", phase2: { stage, since }, reduced: false, act: null, now: since });
+  it("bossPosts: home once for homing, rush once for rushing, nothing for home / out", () => {
+    const base = posts(NO_BOSS_POSTS, "up", 0).next;
+    const h = posts(base, "homing", 1000);
+    expect(h.posts).toEqual([P2_CMD.home()]);
+    expect(posts(h.next, "homing", 1000).posts).toEqual([]);
+    expect(posts(h.next, "home", 15000).posts).toEqual([]);
+    const r = posts(base, "rushing", 2000);
+    expect(r.posts).toEqual([P2_CMD.rush()]);
+    expect(posts(r.next, "rushing", 2000).posts).toEqual([]);
+    expect(posts(r.next, "out", 6000).posts).toEqual([]);
+  });
+  it("the page: .homing (the party fades), the way out held until home; rushing silent", () => {
+    const homing = phase2PageAttrs({ stage: "homing", since: 0 }, false, 100);
+    expect([homing.world, homing.homing, homing.leaving, homing.holdDone]).toEqual([true, true, false, true]);
+    const home = phase2PageAttrs({ stage: "home", since: 0 }, false, 100);
+    expect([home.homing, home.holdDone]).toEqual([true, false]);
+    const rushing = phase2PageAttrs({ stage: "rushing", since: 0 }, false, 100);
+    expect([rushing.condensing, rushing.holdDone]).toEqual([true, true]);
+    const b = { ...bossStart(({ ...createStore({ startDay: 18 }).getState(), day: 18, affinity: 100 } as never), "good", 0), phase: "after" as const };
+    const page = (holdDone: boolean) => renderBoss(b, 0, { dislocating: false, homing: true, holdDone, style: "" }).value;
+    expect(page(true)).toContain("world homing");
+    expect(page(true)).toContain('<div class="bs-box silent" aria-hidden="true"></div>');
+    expect(page(true)).not.toContain('data-action="boss-done"');
+    expect(page(false)).toContain('data-action="boss-done"');
+  });
+
+  /** A fight of `ending` in the world, phase 2 up, the boss one hit from down. */
+  function upAndWinning(ending: "good" | "survive") {
+    const r = rig();
+    r.from("ready");
+    r.advance(600);
+    const b = bossStart(r.store.getState(), ending, r.now());
+    r.session.boss = { ...b, phase: "choose", chooser: "player", boss: { ...b.boss, stage: 2, hp: 1, max: 180, gauge: 0 }, clockAt: r.now(), log: "" } as BossBattle;
+    r.session.phase2 = { stage: "up", since: r.now() };
+    r.frame();
+    r.act("boss-move", { move: "strike" });
+    r.advance(ACT_MS + 200);
+    r.frame();
+    return r;
+  }
+  const readOutro = (r: ReturnType<typeof rig>) => {
+    while (r.session.boss?.phase === "won") r.act("boss-next");
+    r.frame();
+  };
+
+  it("good: the win in the world → homing, home posted once; the outro reads over it; no way out until home", () => {
+    const r = upAndWinning("good");
+    expect(r.session.boss!.phase).toBe("won");
+    expect(r.session.phase2!.stage).toBe("homing");
+    expect(r.posted.filter((p) => JSON.stringify(p) === JSON.stringify(P2_CMD.home()))).toHaveLength(1);
+    expect(r.root.querySelector(".boss-page")!.classList.contains("homing")).toBe(true);
+    readOutro(r);
+    expect(r.session.boss!.phase).toBe("after");
+    expect(r.root.querySelector('[data-action="boss-done"]')).toBeNull();
+    r.act("boss-done");
+    expect(r.session.boss).not.toBeNull();
+    r.from("home");
+    expect(r.session.phase2!.stage).toBe("home");
+    r.frame();
+    expect(r.root.querySelector('[data-action="boss-done"]')).not.toBeNull();
+    expect(r.posted.filter((p) => JSON.stringify(p) === JSON.stringify(P2_CMD.home()))).toHaveLength(1);
+    r.act("boss-done");
+    expect(r.session.boss).toBeNull();
+    expect(r.session.endingPage).not.toBeNull();
+    r.done();
+  });
+  it("good: no home within 15 s → the net", () => {
+    const r = upAndWinning("good");
+    const at = r.session.phase2!.since;
+    r.advance(at + PHASE2.HOME_MS + PHASE2.HOME_NET_MS - r.now() - 1);
+    expect(r.session.phase2!.stage).toBe("homing");
+    r.advance(1);
+    expect(r.session.phase2!.stage).toBe("home");
+    r.done();
+  });
+  it("survive: eye → rushing, rush posted once, no button; out → the ending pages by themselves", () => {
+    const r = upAndWinning("survive");
+    expect(r.session.phase2!.stage).toBe("leaving");
+    r.from("left");
+    readOutro(r);
+    expect(r.session.phase2!.stage).toBe("condensing");
+    expect(r.root.querySelector('[data-action="boss-done"]')).toBeNull();
+    r.from("eye");
+    expect(r.session.phase2!.stage).toBe("rushing");
+    r.frame();
+    expect(r.posted.at(-1)).toEqual(P2_CMD.rush());
+    expect(r.root.querySelector('[data-action="boss-done"]')).toBeNull();
+    r.act("boss-done");
+    expect(r.session.boss).not.toBeNull();
+    r.frame();
+    expect(r.posted.filter((p) => JSON.stringify(p) === JSON.stringify(P2_CMD.rush()))).toHaveLength(1);
+    r.from("out");
+    expect(r.session.boss).toBeNull();
+    expect(r.session.phase2).toBeNull();
+    expect(r.session.endingPage).not.toBeNull();
+    r.done();
+  });
+  it("survive: no out within 6 s of the rush → the net goes on to the pages", () => {
+    const r = upAndWinning("survive");
+    r.from("left");
+    readOutro(r);
+    r.from("eye");
+    const at = r.session.phase2!.since;
+    r.advance(at + PHASE2.RUSH_MS + PHASE2.RUSH_NET_MS - r.now() - 1);
+    expect(r.session.boss).not.toBeNull();
+    r.advance(1);
+    expect(r.session.boss).toBeNull();
+    expect(r.session.endingPage).not.toBeNull();
+    r.done();
+  });
+  it("the fallback (no frame) keeps the way out on survive", () => {
+    const b = { ...bossStart(({ ...createStore({ startDay: 18 }).getState(), day: 18, affinity: 0 } as never), "survive", 0), phase: "after" as const };
+    expect(renderBoss(b, 0).value).toContain('data-action="boss-done"');
   });
 });

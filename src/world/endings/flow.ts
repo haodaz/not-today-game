@@ -114,10 +114,13 @@ function runBoss(ctx: ActionContext): void {
 /**
  * R7 (author 2026-11-17, survive only): the boss down in the world — the eye leaves the fight's
  * place (the layer posts `leave`); the outro lines read over it; "left" (or the net) ends the leave.
- * The assimilated's win is the swap, the good ending's homecoming comes later: no camera for them here.
+ * The assimilated's win is the swap (no camera); the good ending comes home instead (R8, `startHome`).
  */
 function wonInWorld(ctx: ActionContext, prev: BossBattle, next: BossBattle): void {
-  if (next.phase !== "won" || prev.phase === "won" || next.ending !== "survive" || ctx.session.phase2?.stage !== "up") return;
+  if (next.phase !== "won" || prev.phase === "won" || ctx.session.phase2?.stage !== "up") return;
+  // R8: the good ending comes home (the assimilated's win stays the swap: no camera)
+  if (next.ending === "good" && !next.strong) return startHome(ctx);
+  if (next.ending !== "survive") return;
   const now = nowOf(ctx);
   const run = { stage: "leaving" as const, since: now };
   ctx.session.phase2 = run;
@@ -153,6 +156,49 @@ function startCondense(ctx: ActionContext): void {
 function phase2Eye(ctx: ActionContext): void {
   if (ctx.session.phase2?.stage !== "condensing") return;
   ctx.session.phase2 = { stage: "eye", since: nowOf(ctx) };
+  // R8: as soon as the eye is there, the greater Kuro turns and comes on through the frame
+  startRush(ctx);
+  ctx.rerender();
+}
+
+/**
+ * R8 (survive): the rush — the layer posts `rush`; the box stays silent, no button; "out" (or the
+ * net) and the fight ends by itself into the ending pages.
+ */
+function startRush(ctx: ActionContext): void {
+  if (ctx.session.phase2?.stage !== "eye") return;
+  const run = { stage: "rushing" as const, since: nowOf(ctx) };
+  ctx.session.phase2 = run;
+  ctx.later(PHASE2.RUSH_MS + PHASE2.RUSH_NET_MS, () => {
+    if (ctx.session.phase2?.since === run.since && ctx.session.phase2.stage === "rushing") phase2Out(ctx);
+  });
+}
+
+/** R8: the frame dark — no click: on to the ending pages, as boss-done does. */
+function phase2Out(ctx: ActionContext): void {
+  const b = ctx.session.boss;
+  if (ctx.session.phase2?.stage !== "rushing" || !b) return;
+  ctx.session.phase2 = { stage: "out", since: nowOf(ctx) };
+  ctx.session.boss = null;
+  ctx.session.phase2 = null;
+  firstPage(ctx, b.ending);
+}
+
+/**
+ * R8 (good): the win in the world comes home — the layer posts `home`; silent; the outro lines read
+ * over it; the way out only after "home" (or the net).
+ */
+function startHome(ctx: ActionContext): void {
+  const run = { stage: "homing" as const, since: nowOf(ctx) };
+  ctx.session.phase2 = run;
+  ctx.later(PHASE2.HOME_MS + PHASE2.HOME_NET_MS, () => {
+    if (ctx.session.phase2?.since === run.since && ctx.session.phase2.stage === "homing") phase2Home(ctx);
+  });
+}
+
+function phase2Home(ctx: ActionContext): void {
+  if (ctx.session.phase2?.stage !== "homing") return;
+  ctx.session.phase2 = { stage: "home", since: nowOf(ctx) };
   ctx.rerender();
 }
 
@@ -197,7 +243,8 @@ function phase2Up(ctx: ActionContext): void {
 
 /**
  * boss-phase2-world: a message from the room frame behind the fight (outside.ts's layer hands it
- * over): `dislocated` → the head rises; `risen` → the clock runs. True when it changed something.
+ * over): `dislocated` → the head rises; `risen` → the clock runs; R7 `left` / `eye`; R8 `out` (the
+ * fight ends by itself) and `home`. True when it changed something.
  */
 export function onBossRoom(ctx: ActionContext, type: string): boolean {
   const p = ctx.session.phase2;
@@ -216,6 +263,14 @@ export function onBossRoom(ctx: ActionContext, type: string): boolean {
   }
   if (type === PHASE2_MSG.eye && p.stage === "condensing") {
     phase2Eye(ctx);
+    return true;
+  }
+  if (type === PHASE2_MSG.out && p.stage === "rushing") {
+    phase2Out(ctx);
+    return true;
+  }
+  if (type === PHASE2_MSG.home && p.stage === "homing") {
+    phase2Home(ctx);
     return true;
   }
   return false;
@@ -257,8 +312,10 @@ export const bossActions = {
   "boss-done"(ctx: ActionContext): void {
     const b = ctx.session.boss;
     if (!b || b.phase !== "after") return;
-    // R7: the world still condensing: the way out is not offered yet
-    if (ctx.session.phase2?.stage === "condensing") return;
+    // R7 / R8: the room not done yet (the leave, the condensing, the rush — that one ends the fight by
+    // itself — or the homecoming): the way out is not offered
+    const stage = ctx.session.phase2?.stage;
+    if (stage === "leaving" || stage === "left" || stage === "condensing" || stage === "eye" || stage === "rushing" || stage === "out" || stage === "homing") return;
     ctx.session.boss = null;
     // boss-phase2-world R1: the room leaves its boss mode (the layer posts `boss: false` and the pause)
     ctx.session.phase2 = null;

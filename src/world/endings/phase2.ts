@@ -38,10 +38,16 @@ export const PHASE2 = {
   /** R7 (survive): `{ condense: true }` — the world shrinks to one eye on a far greater Kuro; "eye" at the end. */
   CONDENSE_MS: 11000,
   CONDENSE_NET_MS: 1500,
+  /** R8 (good): `{ home: true }` — the eyes shut, the head goes down, the room comes back, the eye comes down into it; "home" at the end. */
+  HOME_MS: 13500,
+  HOME_NET_MS: 1500,
+  /** R8 (survive): `{ rush: true }` — the greater Kuro turns to us and comes on through the frame; "out" when it is dark. */
+  RUSH_MS: 4200,
+  RUSH_NET_MS: 1800,
 } as const;
 
 /** The room's messages in boss mode. */
-export const PHASE2_MSG = { dislocated: "dislocated", risen: "risen", left: "left", eye: "eye" } as const;
+export const PHASE2_MSG = { dislocated: "dislocated", risen: "risen", left: "left", eye: "eye", home: "home", out: "out" } as const;
 
 const T = "nt-room";
 export const P2_CMD = {
@@ -54,6 +60,8 @@ export const P2_CMD = {
   hurt: (): object => ({ target: T, hurt: true }),
   leave: (): object => ({ target: T, leave: true }),
   condense: (): object => ({ target: T, condense: true }),
+  home: (): object => ({ target: T, home: true }),
+  rush: (): object => ({ target: T, rush: true }),
 } as const;
 
 export type Phase2 = NonNullable<Session["phase2"]>;
@@ -82,8 +90,11 @@ export interface BossPosted {
   /** R7: the `since` of the leaving / condensing stage each was posted for. */
   readonly left: number | null;
   readonly condensed: number | null;
+  /** R8: the `since` of the homing / rushing stage each was posted for. */
+  readonly homed: number | null;
+  readonly rushed: number | null;
 }
-export const NO_BOSS_POSTS: BossPosted = { key: null, bossAt: null, paused: false, dislocated: null, rose: null, strikeAt: null, hurtAt: null, left: null, condensed: null };
+export const NO_BOSS_POSTS: BossPosted = { key: null, bossAt: null, paused: false, dislocated: null, rose: null, strikeAt: null, hurtAt: null, left: null, condensed: null, homed: null, rushed: null };
 
 export interface BossWant {
   readonly key: string;
@@ -149,6 +160,15 @@ export function bossPosts(prev: BossPosted, want: BossWant): { readonly posts: r
     posts.push(P2_CMD.condense());
     next = { ...next, condensed: phase2.since };
   }
+  // R8: the good ending comes home; the survive ending's greater Kuro rushes out at us
+  if (phase2?.stage === "homing" && next.homed !== phase2.since) {
+    posts.push(P2_CMD.home());
+    next = { ...next, homed: phase2.since };
+  }
+  if (phase2?.stage === "rushing" && next.rushed !== phase2.since) {
+    posts.push(P2_CMD.rush());
+    next = { ...next, rushed: phase2.since };
+  }
   const act = want.act;
   if (phase2?.stage === "up" && act && act.stage === 2) {
     if (act.who === "boss" && next.strikeAt !== act.at) {
@@ -173,18 +193,22 @@ export function bossPosts(prev: BossPosted, want: BossWant): { readonly posts: r
  * dislocation `.dislocating` with its motion's numbers as custom properties (`--dislocate-late`
  * carries the time already gone, so a re-render mid-motion picks it up where it is).
  */
-export function phase2PageAttrs(p2: Phase2 | null, reduced: boolean, nowMs: number): { readonly world: boolean; readonly dislocating: boolean; readonly leaving: boolean; readonly condensing: boolean; readonly holdDone: boolean; readonly style: string } {
-  if (!p2) return { world: false, dislocating: false, leaving: false, condensing: false, holdDone: false, style: "" };
+export function phase2PageAttrs(p2: Phase2 | null, reduced: boolean, nowMs: number): { readonly world: boolean; readonly dislocating: boolean; readonly leaving: boolean; readonly condensing: boolean; readonly homing: boolean; readonly holdDone: boolean; readonly style: string } {
+  if (!p2) return { world: false, dislocating: false, leaving: false, condensing: false, homing: false, holdDone: false, style: "" };
   const dislocating = p2.stage === "dislocating";
   // R7: from the leave on, the party and its mound fade away (they cannot follow the eye); while the
   // world condenses the box is silent and the way out waits for "eye" (or its net)
-  const leaving = p2.stage === "leaving" || p2.stage === "left" || p2.stage === "condensing" || p2.stage === "eye";
-  const condensing = p2.stage === "condensing" || p2.stage === "eye";
-  const holdDone = p2.stage === "condensing";
+  const leaving = p2.stage === "leaving" || p2.stage === "left" || p2.stage === "condensing" || p2.stage === "eye" || p2.stage === "rushing" || p2.stage === "out";
+  const condensing = p2.stage === "condensing" || p2.stage === "eye" || p2.stage === "rushing" || p2.stage === "out";
+  // R8: the good ending's homecoming (the party fades as on the leave; the way out after "home")
+  const homing = p2.stage === "homing" || p2.stage === "home";
+  // the way out is held until the room is done: on survive it is never offered in the world (the
+  // rush ends the fight by itself, R8); on good not before "home"
+  const holdDone = p2.stage === "leaving" || p2.stage === "left" || p2.stage === "condensing" || p2.stage === "eye" || p2.stage === "rushing" || p2.stage === "out" || p2.stage === "homing";
   const ms = dislocateMs(reduced);
   const roll = reduced ? 0 : -PHASE2.DISLOCATE_ROLL_DEG;
   const late = Math.max(0, Math.min(ms, nowMs - p2.since));
-  return { world: true, dislocating, leaving, condensing, holdDone, style: `--dislocate-ms:${String(ms)}ms;--dislocate-roll:${String(roll)}deg;--dislocate-ease:${PHASE2.EASE};--dislocate-late:-${String(Math.round(late))}ms` };
+  return { world: true, dislocating, leaving, condensing, homing, holdDone, style: `--dislocate-ms:${String(ms)}ms;--dislocate-roll:${String(roll)}deg;--dislocate-ease:${PHASE2.EASE};--dislocate-late:-${String(Math.round(late))}ms` };
 }
 
 /** The host's fade-in at the burst, continued across re-renders (`--late`); after the dislocation it is simply on. */
@@ -197,5 +221,5 @@ export function phase2HostStyle(p2: Phase2 | null, reduced: boolean, nowMs: numb
 /** The boss page as the game shows it: the world's classes on it while phase 2 plays in the frame. */
 export function renderBossPage(b: BossBattle, session: Pick<Session, "phase2" | "reducedMotion">, nowMs: number): SafeHtml {
   const a = phase2PageAttrs(session.phase2, session.reducedMotion, nowMs);
-  return renderBoss(b, nowMs, a.world ? { dislocating: a.dislocating, leaving: a.leaving, condensing: a.condensing, holdDone: a.holdDone, style: a.style } : null);
+  return renderBoss(b, nowMs, a.world ? { dislocating: a.dislocating, leaving: a.leaving, condensing: a.condensing, homing: a.homing, holdDone: a.holdDone, style: a.style } : null);
 }
