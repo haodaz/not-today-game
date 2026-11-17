@@ -1582,20 +1582,54 @@ function drape(w, h, d, x, y, z, o = {}) {
   g.computeVertexNormals();
   return place(new THREE.Mesh(g, jacketMat), x, y, z, { noEdge: true, ...o });
 }
-G(0.42, 0, Z1, () => { // hung by the loop inside its collar: the shoulders fall away from the hook, the body hangs straight
+// (2026-11-18, the room one thing at a time: it was a cape — a box drawn in at the top, two boxes for sleeves, a ball for a hood.)
+// A zip hoodie hung by the loop in its collar. Everything hangs from that one point: the shoulders slope away from it,
+// folds run down and out from it, the front has fallen open to the zip's slider and shows the lining, the sleeves hang
+// in front of the body with the weight of their cuffs, the hood lies folded over the collar, its two cords down the front.
+function sheetOf(nu, nv, fn, material) { // a sheet from fn(u, v) → [x, y, z], u and v in 0…1
+  const pos = [], uv = [], idx = [];
+  for (let b = 0; b <= nv; b++) for (let a = 0; a <= nu; a++) { const q = fn(a / nu, b / nv); pos.push(q[0], q[1], q[2]); uv.push(a / nu, b / nv); }
+  for (let b = 0; b < nv; b++) for (let a = 0; a < nu; a++) { const k = b * (nu + 1) + a, m = k + nu + 1; idx.push(k, k + 1, m, m, k + 1, m + 1); }
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2)); g.setIndex(idx); g.computeVertexNormals();
+  return place(new THREE.Mesh(g, material), 0, 0, 0, { noEdge: true });
+}
+G(0.42, 0, Z1, () => {
   cyl(0.024, 0.012, mat.black, 0, 1.8, -0.006, { rx: Math.PI / 2 });
   tube([[0, 1.8, -0.01], [0, 1.8, -0.05], [0, 1.85, -0.075], [0, 1.93, -0.062]], 0.0065, mat.black);
   tube([[0, 1.79, -0.01], [0, 1.76, -0.04], [0, 1.775, -0.065]], 0.0065, mat.black);
-  drape(0.5, 0.82, 0.075, 0, 1.36, -0.078, { from: 0.8, pinch: 0.62 });                       // the body
-  ball(0.105, jacketMat, 0.0, 1.68, -0.1, { s: [1.25, 0.6, 0.55] });                          // the hood, collapsed on itself
-  ball(0.07, jacketMat, 0.0, 1.745, -0.075, { s: [1.0, 0.7, 0.6] });
-  drape(0.13, 0.7, 0.062, 0.225, 1.28, -0.105, { pinch: 0.3, from: 0.75, ph: 2, rz: 0.1 });   // sleeves, a little forward of the body
-  drape(0.13, 0.68, 0.062, -0.23, 1.3, -0.1, { pinch: 0.3, from: 0.75, ph: 4, rz: -0.11 });
-  for (const [x, y] of [[0.26, 0.95], [-0.265, 0.975]]) box(0.12, 0.05, 0.066, M({ color: 0x55564f, roughness: 1 }), x, y, -0.106, { r: 0.02 }); // cuffs
-  box(0.006, 0.7, 0.004, M({ color: 0x2a2b28, roughness: 0.5, metalness: 0.5 }), 0.02, 1.33, -0.123, { cast: false }); // the zip
-  box(0.012, 0.02, 0.005, mat.alu, 0.02, 1.0, -0.126, { cast: false });
-  for (const k of [-1, 1]) box(0.11, 0.004, 0.004, M({ color: 0x4b4c46, roughness: 1 }), k * 0.13, 1.16, -0.124, { rz: k * 0.35, cast: false }); // pocket openings
-  box(0.5, 0.045, 0.082, M({ color: 0x5c5d56, roughness: 1 }), 0, 0.965, -0.08, { r: 0.02 });   // the hem band
+  const shell = M({ map: jacketMap, bumpMap: jacketMap, bumpScale: 1.2, roughness: 1 }); shell.side = THREE.DoubleSide; shell.shadowSide = THREE.DoubleSide;
+  const lining = M({ color: 0x34352f, roughness: 1 }); lining.side = THREE.DoubleSide;
+  const rib = M({ color: 0x585952, roughness: 1 }); rib.side = THREE.DoubleSide; const HY = 1.775, Y0 = 0.985, H = HY - Y0; // from the hem's top to the hook
+  const halfW = (v) => 0.25 - 0.012 * Math.sin(v * 3) - 0.2 * Math.pow(ss(0.8, 1, v), 1.6); // straight, then drawn in to the hook
+  const open = (v) => 0.004 + 0.07 * Math.pow(ss(0.52, 1, v), 1.3) * (1 - 0.75 * ss(0.9, 1, v)); // the zip is done up to the slider; above it the two fronts fall apart
+  const body = (sd, u, v) => { // one front, from the opening (u = 0) round the side to the wall (u = 1)
+    const w = halfW(v), o = open(v), x = sd * (o + (w - o) * Math.sin(u * Math.PI / 2)), away = Math.abs(x) / 0.25;
+    const y = Y0 + v * H - 0.085 * Math.pow(away, 1.6) * ss(0.62, 1, v) + 0.012 * Math.sin(x * 26 + sd) * (1 - v) * (1 - v); // the shoulder falls away from the hook; the hem is not level
+    const ang = Math.atan2(HY - y, x), fan = 0.019 * Math.sin(ang * 13 + sd * 0.7) * ss(0.25, 0.95, v), hang = 0.012 * Math.sin(x * 46 + v * 2.2 + sd) * (1 - v * 0.6); // folds from the hook, and the ones a hanging cloth makes by itself
+    const z = -(0.012 + 0.074 * Math.pow(Math.cos(u * Math.PI / 2), 0.55) * (0.72 + 0.28 * Math.sin(Math.PI * Math.min(1, v * 1.15))) + fan + hang) + 0.012 * ss(0.5, 1, v) * (1 - u) * (1 - u) * -1;
+    return [x, y, z]; };
+  for (const sd of [-1, 1]) sheetOf(30, 56, (u, v) => body(sd, u, v), shell);
+  sheetOf(8, 30, (u, v) => [(u - 0.5) * 0.36 * (1 - 0.75 * ss(0.75, 1, v)), Y0 + 0.02 + v * (H - 0.05), -0.018 - 0.01 * Math.sin(u * 9)], lining); // what the open front shows
+  // the zip: its two tapes down the edges, the slider where they part, the pull hanging from it
+  for (const sd of [-1, 1]) { const pts = []; for (let k = 0; k <= 18; k++) { const q = body(sd, 0, k / 18 * 0.93); pts.push([q[0], q[1], q[2] - 0.002]); } tube(pts, 0.0022, M({ color: 0x8c8d86, roughness: 0.45, metalness: 0.6 }), { cast: false }); }
+  { const q = body(1, 0, 0.5); box(0.011, 0.016, 0.006, mat.alu, 0, q[1], q[2] - 0.004, { cast: false, r: 0.002 }); box(0.006, 0.026, 0.002, mat.alu, 0.001, q[1] - 0.022, q[2] - 0.006, { cast: false, rz: 0.12 }); }
+  // the hem: a knitted band, a little narrower than the body, so the cloth gathers into it
+  sheetOf(40, 3, (u, v) => { const a = (u - 0.5) * Math.PI, x = 0.238 * Math.sin(a) * 1.0; return [x, Y0 - 0.034 + v * 0.062, -(0.016 + 0.074 * Math.pow(Math.cos(a), 0.55) * 0.74) - 0.0015 * Math.sin(u * 190)]; }, rib);
+  // pockets: a welt each, slanted, its lower lip standing off a little
+  for (const sd of [-1, 1]) { const a = body(sd, 0.22, 0.2), b2 = body(sd, 0.5, 0.34); tube([[a[0], a[1], a[2] - 0.004], [(a[0] + b2[0]) / 2, (a[1] + b2[1]) / 2, (a[2] + b2[2]) / 2 - 0.007], [b2[0], b2[1], b2[2] - 0.004]], 0.0038, rib, { cast: false }); }
+  // sleeves: set into the sloping shoulder, hanging a little forward, creased at the elbow, heavy at the cuff
+  for (const sd of [-1, 1]) {
+    const c = new THREE.CatmullRomCurve3([new THREE.Vector3(sd * 0.13, 1.66, -0.055), new THREE.Vector3(sd * 0.2, 1.57, -0.08), new THREE.Vector3(sd * 0.238, 1.38, -0.098), new THREE.Vector3(sd * (0.25 + 0.01 * sd), 1.2, -0.108), new THREE.Vector3(sd * 0.262, 1.045, -0.104)]);
+    const g = new THREE.TubeGeometry(c, 40, 1, 14), P = g.attributes.position, q = new THREE.Vector3();
+    for (let k = 0; k < P.count; k++) { const t = Math.floor(k / 15) / 40, a = (k % 15) / 14 * Math.PI * 2; c.getPointAt(t, q);
+      const r = (0.052 - 0.008 * t) * (1 + 0.07 * Math.sin(t * 34 + a * 2 + sd) * ss(0.25, 0.75, t) + 0.05 * Math.sin(a * 3 + t * 9)) * (1 - 0.3 * Math.exp(-Math.pow((t - 0.52) / 0.05, 2)) * Math.max(0, Math.cos(a))); // creases; the pinch of the elbow
+      P.setXYZ(k, q.x + (P.getX(k) - q.x) * r, q.y + (P.getY(k) - q.y) * r, q.z + (P.getZ(k) - q.z) * r * 0.5); } // a sleeve with no arm in it is flat
+    g.computeVertexNormals(); place(new THREE.Mesh(g, shell), 0, 0, 0, { noEdge: true });
+    sheetOf(18, 3, (u, v) => { const a = u * Math.PI * 2; return [sd * 0.262 + 0.04 * Math.cos(a), 0.985 + v * 0.066, -0.104 + 0.022 * Math.sin(a) - 0.0012 * Math.sin(u * 120)]; }, rib); // the cuff
+  }
+  // the hood: folded forward over the collar, a soft double thickness with a crease across it; its cords
+  sheetOf(26, 16, (u, v) => { const a = (u - 0.5) * 2, w = 0.15 * Math.sqrt(Math.max(0, 1 - Math.pow(Math.abs(a), 2.6))) ; return [a * 0.15, 1.6 + v * 0.2 * (0.55 + 0.45 * Math.sqrt(Math.max(0, 1 - a * a))) + 0.012 * Math.sin(a * 5), -(0.07 + 0.055 * Math.sin(Math.PI * v) * (w / 0.15) + 0.008 * Math.sin(v * 11 + a * 4))]; }, shell);
+  for (const sd of [-1, 1]) { tube([[sd * 0.05, 1.66, -0.118], [sd * 0.056, 1.56, -0.112], [sd * 0.05, 1.46, -0.106], [sd * 0.058, 1.39 + sd * 0.03, -0.104]], 0.0026, M({ color: 0xd8d6cc, roughness: 0.9 }), { cast: false }); cyl(0.0034, 0.02, mat.alu, sd * 0.058, 1.382 + sd * 0.03, -0.104, { cast: false, seg: 8 }); }
 }, { float: 0.25 });
 
 // ================= tentacles =================
