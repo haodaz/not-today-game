@@ -1471,7 +1471,7 @@ const FOUND = { chick: 1, camera: 2, pager: 3, iccard: 4, tape: 5, dictionary: 6
 const DONE = { hmj: "hmj_done", wonton: "wonton_done", mlt: "mlt_done" };
 function applyDay() {
   const day = state.day;
-  for (const id in OBJ) OBJ[id].visible = day >= FOUND[id] || state.inspect === id;
+  for (const id in OBJ) OBJ[id].visible = (state.objects ? state.objects.includes(id) : day >= FOUND[id]) || state.inspect === id; // embedded, the game's own list of what has been found wins over the day table
   const pick = state.meal === "auto" ? MENU(day)[state.time < 17 ? "lunch" : "dinner"] : [state.meal];
   for (const id in MEALS) MEALS[id].visible = false;
   pick.forEach((id, i) => {
@@ -2839,6 +2839,8 @@ function command(m) {
   if (m.rain != null) ui("rain", m.rain);
   if (m.outer != null) ui("outer", m.outer);
   if (m.eaten != null) ui("eaten", m.eaten);
+  if (m.objects !== undefined) { state.objects = Array.isArray(m.objects) ? m.objects.map(String) : null; applyDay(); }
+  if (m.pause != null) renderer.setAnimationLoop(m.pause ? null : frame); // a frame the game has hidden should not go on drawing
   if (m.prints != null) PRINTS.visible = !!m.prints;
   if (m.chick != null && m.chick !== CHICK_FACE.name) CHICK_FACE.paint(String(m.chick));
   if (m.locate) { const rects = {}; for (const id of m.locate) rects[id] = locate(id); try { window.parent.postMessage({ source: "nt-room", type: "where", rects, face: state.face, spot: state.desk ? state.spot : null, moving: !!state.turn || Math.abs(state.deskK - (state.desk ? 1 : 0)) > 0.01 }, "*"); } catch {} }

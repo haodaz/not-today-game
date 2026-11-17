@@ -26,9 +26,12 @@ Build after `room-3d-window`. Read `room-3d-window` and `room-3d-wake` first: th
   `screen-left` / `screen-right` are the glass panels.
 - Hover: `{ source: "nt-room", type: "hover", id | null }` on change, at most every 80 ms; the room
   sets its own pointer cursor over anything pickable.
-- The room decides which objects it shows by its own day table. **Ask of the other session (Claude
-  relays): a `{ objects: [ids] }` command so the game's `state.found` rules.** Until it exists, the
-  room's table is close enough (`content/stages.json` objectsFoundOnDay).
+- `{ objects: [ids] }`: the game's list decides which old objects are on the desk (`null` = the
+  room's own day table). It is separate state from `day`, so post both whenever either changes.
+- `{ pause: true | false }`: stops / restarts the render loop outright. A `display: none` frame may
+  or may not have its animation throttled by the browser, so never rely on that: post
+  `{ pause: true }` when the frame is hidden and `{ pause: false }` when it is shown again.
+  Commands posted while paused still apply and show on the first frame after resume.
 
 ## What the photo 桌子 has today (parity list; `src/world/room/hud.ts` deskThings / tabletop, `shots.ts`)
 
@@ -52,7 +55,8 @@ The pure map: `deskPick(id, state): { action, data } | null` in a new `src/world
 
 One persistent iframe for the room (`data-keep="room3d:room"`, `src=/room3d/index.html?embed=1&day=N`),
 created the first time it is needed and then **hidden, never removed**, across views and re-renders
-(`display: none` when not shown; the page keeps running). It is shown for 桌子 (this spec) and for
+(`display: none` when not shown, **and `{ pause: true }` posted; `{ pause: false }` on showing**).
+It is shown for 桌子 (this spec) and for
 the window look-out (`room-3d-window`: this supersedes its "created on each look-out" line — the
 look-out uses this shared frame too; its back pill and its command stay as specified). The wake
 flash keeps its own `&wake=1` frame.
@@ -72,8 +76,8 @@ room frame (the host from `outside.ts`, kind `desk`), in place of the photo and 
 { target: "nt-room", day, time: hour, face: 0, spot: "desk", lamp: session.lampOn ?? hour >= 18,
   ceil: false, rain: weatherOf(day) === "rain", outer: false, eaten: false, far: 0 }
 ```
-then `{ prints: printsOnDesk(day, events).length > 0 }` and `{ chick: frame }` (R5), each only when
-changed. `hour` as in `outsideCommand` (`room-3d-window`): `hh + mm / 60` from the clock, clamped to
+then `{ objects: state.found }`, `{ prints: printsOnDesk(day, events).length > 0 }` and
+`{ chick: frame }` (R5), each only when changed (`objects` also whenever `day` is re-posted). `hour` as in `outsideCommand` (`room-3d-window`): `hh + mm / 60` from the clock, clamped to
 [6, 24]. Put the command builders in `desk3d.ts` next to `outsideCommand` (share the hour helper).
 
 Everything HTML that sits over the photo today still sits over the frame, unchanged: the edge strip
@@ -127,7 +131,7 @@ placeholder), post `"idle-1"` and leave a TODO naming this spec; the held device
 - `deskPick`: every row of the parity table (found / not-found object, each screen side, deskphone,
   prints, lamp, mug → null, ignored ids → null, `null` → null).
 - the desk command (hour clamp, lamp default and override, rain day 4 / clear day 10) and the
-  `prints` / `chick` posts only on change.
+  `objects` / `prints` / `chick` posts only on change; `pause` true on hide, false on show.
 - `where` → `roomRects` in stage px; `moving` → re-ask (the pure part).
 - picks ignored while something is open; a pick routes to the same action the old hit dispatched
   (spy on the controller).
