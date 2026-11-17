@@ -54,7 +54,7 @@ window.__events = () => { try { const find = (o, d = 0) => !o || typeof o !== 'o
 `;
 await send("Page.enable"); await send("Runtime.enable");
 await send("Emulation.setDeviceMetricsOverride", { width: 1600, height: 900, deviceScaleFactor: process.env.HIRES ? 2 : 1, mobile: false });
-await send("Page.navigate", { url: `http://localhost:${process.env.PORT || 5173}/?lang=${lang}&day=${day}&splat=0&fast=1&fx=0${process.env.FOUND ? "&found=" + process.env.FOUND : ""}${process.env.SEED ? "&seed=" + process.env.SEED.replace(/\+/g, "%2B") : ""}` }); // SEED=flags:a+b,san:80 lays earlier days' flags over a mid-run start (see main.ts debugSeed) // fx=0: the collapse shader stalls SwiftShader
+await send("Page.navigate", { url: `http://localhost:${process.env.PORT || 5173}/?lang=${lang}&day=${day}&splat=0&fast=1&fx=0&desk=photo${process.env.FOUND ? "&found=" + process.env.FOUND : ""}${process.env.SEED ? "&seed=" + process.env.SEED.replace(/\+/g, "%2B") : ""}` }); // SEED=flags:a+b,san:80 lays earlier days' flags over a mid-run start (see main.ts debugSeed) // fx=0: the collapse shader stalls SwiftShader
 for (let i = 0; i < 40; i++) { if ((await ev("document.readyState")) === "complete") break; await sleep(0.25); }
 // Storage turned out to be shared between headless profiles on this machine: start every day from nothing.
 await ev("localStorage.clear(); sessionStorage.clear(); location.reload(); 'cleared'");

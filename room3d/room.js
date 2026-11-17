@@ -884,6 +884,7 @@ const PRINTS = G(DESK.x - 0.58, DESK.h + 0.0125, DESK.z + 0.2, () => {
 }, { ry: 0.08 });
 PRINTS.visible = false;
 const OBJ = {};
+const CHICK_FACE = { paint: null, name: "idle-1" };
 // the coffee mug, and drinking from it (author 2026-11-16: sip, a big mouthful, glug glug, refill)
 const COFFEE = { level: 1, hot: 1, act: null, inner: null, liquid: null, steam: [], pour: null };
 G(DX - 0.44, top, DZ - 0.02, () => {
@@ -1006,12 +1007,19 @@ OBJ.chick = G(DX - 0.33, top, DZ + 0.25, () => {
   lathe(egg(0.0235, 0.0295), M({ color: 0xd9950f, roughness: 0.3 }), 0, 0.0086, 0, { rx: -Math.PI / 2 }).scale.set(1, 1, 0.035); // the seam where the two halves meet
   const bz0 = -28 * U1; // the bezel sits above the egg's middle
   slab(RR(200 * U1, 180 * U1, 60 * U1), 0.0012, M({ color: 0xf7f3e6, roughness: 0.45 }), 0, 0.0158, bz0, 0.0005);
-  const frame = chickFrames.frames["idle-1"], C = 5;
-  label(152 * U1, 104 * U1, face(48 * C + 16, 32 * C + 16, "#aeb89a", (g) => { // the glass: 48 × 32 cells from the content's idle frame
+  // the glass: 48 × 32 cells. The game owns what the chick is doing and says which frame to show ({ chick: "<name>" },
+  // any key of content/frames/chick.json); until it does, the idle frame.
+  const C = 5, [cc, cg] = canvas(48 * C + 16, 32 * C + 16), ctex = tex(cc, false);
+  CHICK_FACE.paint = (name) => {
+    const frame = chickFrames.frames[name] ?? chickFrames.frames["idle-1"], g = cg;
+    g.fillStyle = name === "dark" ? "#6f7762" : "#aeb89a"; g.fillRect(0, 0, cc.width, cc.height);
     g.fillStyle = "rgba(0,0,0,.06)"; for (let y = 0; y < 32; y++) for (let x = 0; x < 48; x++) g.fillRect(8 + x * C, 8 + y * C, C - 1, C - 1);
     g.fillStyle = "#2b3324"; frame.forEach((row, y) => [...row].forEach((ch, x) => { if (ch === "#") g.fillRect(8 + x * C, 8 + y * C, C - 1, C - 1); }));
     g.strokeStyle = "#8f9b78"; g.lineWidth = 6; g.strokeRect(3, 3, 48 * C + 10, 32 * C + 10);
-  }), 0, 0.0177, bz0, { rough: 0.2 });
+    ctex.needsUpdate = true; CHICK_FACE.name = name;
+  };
+  CHICK_FACE.paint("idle-1");
+  label(152 * U1, 104 * U1, ctex, 0, 0.0177, bz0, { rough: 0.2 });
   const names = ["meal", "light", "play", "medicine", "toilet", "checkup", "training", "attention"], [ic, ig] = canvas(600, 540);
   ig.fillStyle = "rgba(154,90,0,.75)";
   names.forEach((n, i) => { const cx = (40 + (i % 4) * 40 + 24) * 3, cy = (i < 4 ? 22 : 160) * 3; chickFrames.icons[n].forEach((row, y) => [...row].forEach((ch, x) => { if (ch === "#") ig.fillRect(cx - 27 + x * 6, cy - 27 + y * 6, 6, 6); })); }); // printed on the bezel, 9 × 9 each
@@ -2832,6 +2840,7 @@ function command(m) {
   if (m.outer != null) ui("outer", m.outer);
   if (m.eaten != null) ui("eaten", m.eaten);
   if (m.prints != null) PRINTS.visible = !!m.prints;
+  if (m.chick != null && m.chick !== CHICK_FACE.name) CHICK_FACE.paint(String(m.chick));
   if (m.locate) { const rects = {}; for (const id of m.locate) rects[id] = locate(id); try { window.parent.postMessage({ source: "nt-room", type: "where", rects, face: state.face, spot: state.desk ? state.spot : null, moving: !!state.turn || Math.abs(state.deskK - (state.desk ? 1 : 0)) > 0.01 }, "*"); } catch {} }
   if (m.far != null) FAR.to = Math.max(0, Math.min(1, Number(m.far)));
   if (m.wake) wake();
