@@ -2605,7 +2605,7 @@ function bossTentacles() {
     const t = tentacles[before]; t.boss = true; t.outer = false; t.mesh.material = BOSS.mat; FAR.g.add(t.mesh); // out of the room's group: the room is hidden here
   }
 }
-const CON = { at: 0, t: 0, told: false, S: 11, Z1: 0.0036, z: 1 };
+const CON = { at: 0, t: 0, told: false, S: 11, Z1: 0.0036, z: 1, zoom: 1, px: 0, py: 0, rx: 0, ry: 0 }; // zoom, px, py: the looking-round of ?great=1 (wheel and drag); 1, 0, 0 in the game
 // The greater one (author 2026-11-17). Not the fight's head again (对位置和大小关系会混淆), not a painted side face (像鸟), not a
 // thin thing of bones either: 「你对比一下龙的模型，可以是海龙或者堕落的龙，没这么细。而且身上也有眼睛。我觉得这个星球缩小了之后只是身上的
 // 一个眼睛，然后随着镜头看到了游动的整体」「起码脖子得这么粗再加触手，头的形状得是这样才不像鱼骨头」「藤蔓过千更长更软可能就有游动感了」.
@@ -2705,7 +2705,7 @@ function buildGreat() {
     const lx = tan.clone().addScaledVector(n, -tan.dot(n)).normalize(), ly = new THREE.Vector3().crossVectors(n, lx).normalize(), at = (a, b, c) => P.clone().addScaledVector(lx, a * sz).addScaledVector(ly, b * sz).addScaledVector(n, c * sz);
     parts.push(limb([at(-1.45, 0.02, -0.1), at(-0.85, 0.62, 0.22), at(0, 0.9, 0.34), at(0.85, 0.56, 0.22), at(1.4, -0.1, -0.1)], (t) => sz * (0.07 + 0.15 * Math.sin(Math.PI * t)), 18, 7)); // thin, and well open (author on the first lids: 眼皮太肿了。这是惺忪龙)
     parts.push(limb([at(-1.45, 0.02, -0.1), at(-0.8, -0.6, 0.2), at(0, -0.78, 0.3), at(0.85, -0.6, 0.2), at(1.4, -0.1, -0.1)], (t) => sz * (0.06 + 0.12 * Math.sin(Math.PI * t)), 18, 7));
-    spots.push([P.clone(), sz * 1.5 + 1.4]); };
+    spots.push([P.clone(), sz * 1.15 + 0.5]); }; /* just the eye itself: a wider clearing left the neck and chest bald (author: 这段儿严重的秃了) */
   for (let i = 0; i < 330; i++) { const t = 0.006 + Math.pow(R(), 1.5) * 0.9, a = R() * 6.28, P = frame(t).clone(), o = out(a); if (Math.abs(t - T0) < 0.006 && o.dot(En) > 0.6) continue;
     eyeAt(P.addScaledVector(o, br(t)), o, _T, (R() < 0.2 ? 1.2 + R() * 0.8 : 0.55 + R() * 0.55) * (1 - 0.45 * t)); }
   for (const sd of [-1, 1]) eyeAt(V(9.4, 3.5, sd * 7.25), V(0.25, 0.12, sd).normalize(), V(1, 0.12, 0).normalize(), 1.75);
@@ -2721,31 +2721,37 @@ function buildGreat() {
   FAR.gWorld = new THREE.Mesh(ball(E.clone().addScaledVector(En, 0.4), En, V(1, 0, 0), 1.14), FAR.eyeMat); FAR.gWorld.userData.noEdge = true; FAR.gWorld.frustumCulled = false; FAR.gWorld.visible = false; H.add(FAR.gWorld); // what the world is, once it is small enough
   // ---- the vines: over a thousand, long and soft. Each leaves him outward and is carried back the way he came; in the
   // shader a wave runs down each to its tip (aW = how far along, its own phase, how far it may swing).
-  const vine = (root, dir, back, L, r, seg = 22) => {
-    const pts = [root.clone()], d = dir.clone().normalize(), b = back.clone().normalize(), side = V(R() - 0.5, R() - 0.5, R() - 0.5).cross(b).normalize(), ph = R() * 6.28, fr = 2 + R() * 4, n = 9;
-    for (let k = 1; k <= n; k++) { const q = k / n; pts.push(root.clone().addScaledVector(d, L * 0.2 * (1 - Math.pow(1 - q, 2.2))).addScaledVector(b, L * Math.pow(q, 1.25)).addScaledVector(side, Math.sin(q * fr + ph) * L * 0.05 * q)); }
-    const kn = 30 + R() * 40, g = limb(pts, (t) => r * (0.8 * Math.pow(1 - t, 2.6) + 0.2 * (1 - t)) * (1 + 0.09 * Math.sin(t * kn + ph)) + 0.03, seg, 6), n2 = g.attributes.position.count, w = new Float32Array(n2 * 3), amp = L * (0.035 + R() * 0.035);
+  const vine = (root, dir, back, L, r, seg = 30) => {
+    // (author: 弯曲太像毛发了，真正的触手没这么顺溜，一下子就细细的) a tentacle is muscle: it keeps its thickness most of the way and
+    // comes to a point only at the end; it does not lie combed — it bends one way and then another, and the end of it curls
+    const pts = [root.clone()], d = dir.clone().normalize(), b = back.clone().normalize(), s1 = V(R() - 0.5, R() - 0.5, R() - 0.5).cross(b).normalize(), s2 = new THREE.Vector3().crossVectors(b, s1), ph = R() * 6.28, f1 = 3 + R() * 5, f2 = 2 + R() * 6, wob = 0.07 + R() * 0.11, n = 14;
+    const curl = R() < 0.6 ? 0.05 + R() * 0.07 : 0, turns = 4 + R() * 5;
+    for (let k = 1; k <= n; k++) { const q = k / n, c = Math.max(0, (q - 0.62) / 0.38), cr = L * curl * c * (1.15 - c);
+      pts.push(root.clone().addScaledVector(d, L * 0.26 * (1 - Math.pow(1 - q, 2.2))).addScaledVector(b, L * 0.9 * Math.pow(q, 1.15) * (1 - 0.25 * c * (curl ? 1 : 0)))
+        .addScaledVector(s1, L * wob * q * Math.sin(q * f1 + ph) + cr * Math.cos(c * turns)).addScaledVector(s2, L * wob * 0.8 * q * Math.sin(q * f2 + ph * 1.7) + cr * Math.sin(c * turns))); }
+    const kn = 30 + R() * 40, g = limb(pts, (t) => r * (0.12 + 0.88 * Math.pow(1 - t, 0.85)) * (1 - Math.pow(t, 9)) * (1 + 0.07 * Math.sin(t * kn + ph)) + 0.02, seg, 6), n2 = g.attributes.position.count, w = new Float32Array(n2 * 3), amp = L * (0.03 + R() * 0.03);
     for (let v = 0; v < n2; v++) { w[v * 3] = Math.floor(v / 7) / seg; w[v * 3 + 1] = ph; w[v * 3 + 2] = amp; }
     g.setAttribute("aW", new THREE.BufferAttribute(w, 3)); (R() < (d.y < -0.25 ? 0.75 : 0.14) ? raw : vines).push(g); };
   const BACK = V(-1, -0.08, 0.04);
-  for (let i = 0; i < 26; i++) { const a = R() * 6.28, P = frame(0.002 + R() * 0.014).clone(), o = out(a); if (o.dot(En) > 0.15) continue; /* none of them across the eye that is the world */ vine(P.addScaledVector(o, 7), o, BACK, 80 + R() * 80, 2.4 + R() * 1.4, 36); } // the long arms, from behind the head
-  for (let i = 0; i < 2600; i++) { const t = 0.006 + Math.pow(R(), 0.85) * 0.93, a = R() * 6.28, P = frame(t).clone(), o = out(a), bk = _T.clone().lerp(BACK, 0.2); /* the curve runs head to tail, so its tangent already points behind him */ /* along him, so the coils of the body can still be read through them */
-    if (t > T0 - 0.04 && t < T0 + 0.006 && o.dot(En) > 0.45) continue; /* none trailing across the eye that is the world */ P.addScaledVector(o, br(t)); if (spots.some((q) => q[0].distanceTo(P) < q[1])) continue; P.addScaledVector(o, -br(t) * 0.2);
-    vine(P, o, bk, (t > 0.45 ? 50 + R() * 130 * t : R() < 0.12 ? 40 + R() * 70 : 12 + R() * 26), (R() < 0.14 ? 2.6 + R() * 1.2 : R() < 0.5 ? 1.5 + R() * 0.9 : 0.8 + R() * 0.6) * Math.min(1, br(t) / 5 + 0.25)); }
+  for (let i = 0; i < 26; i++) { const a = R() * 6.28, P = frame(0.002 + R() * 0.014).clone(), o = out(a); if (o.dot(En) > 0.25) continue; /* none of them across the eye that is the world */ vine(P.addScaledVector(o, 7), o, BACK, 80 + R() * 80, 2.4 + R() * 1.4, 36); } // the long arms, from behind the head
+  for (let i = 0; i < 3380; i++) { const t = i < 380 ? 0.004 + R() * 0.13 : 0.006 + Math.pow(R(), 0.85) * 0.93, /* the first 380 are for the neck and the chest */ a = R() * 6.28, P = frame(t).clone(), o = out(a), bk = _T.clone().lerp(BACK, 0.2); /* the curve runs head to tail, so its tangent already points behind him */ /* along him, so the coils of the body can still be read through them */
+    if (t > T0 - 0.014 && t < T0 + 0.004 && o.dot(En) > 0.72) continue; /* none trailing across the eye that is the world */ P.addScaledVector(o, br(t)); if (spots.some((q) => q[0].distanceTo(P) < q[1])) continue; P.addScaledVector(o, -br(t) * 0.2);
+    const near = o.dot(En) > 0.2 && t < T0 + 0.004 ? Math.max(5, (T0 - t) * 620) : 1e9; /* upstream of the world-eye, on its side: no longer than the way to it */
+    vine(P, o, bk, Math.min(near, t > 0.45 ? 50 + R() * 130 * t : R() < 0.2 ? 45 + R() * 70 : 22 + R() * 34), (R() < (i < 380 ? 0.32 : 0.18) ? 2.8 + R() * 1.6 : R() < 0.6 ? 1.7 + R() * 1.0 : 1.0 + R() * 0.7) * Math.min(1, br(t) / 5 + 0.25)); /* (author: 下面粗粗的触手很好，这里也来点) the neck and chest get the thick ones too */ }
   for (const sd of [-1, 1]) for (let i = 0; i < 9; i++) { const x = 27.5 - i * 2.6; vine(V(x, -1.6 - (i % 2) * 2.4, sd * (1.2 + i * 0.6)), V(0.3, -0.5 - (i % 2) * 0.5, sd).normalize(), BACK, 45 + R() * 45, 0.42 + R() * 0.3, 36); } // (author: 多一些…触须) barbels along the lip and the chin, long
   for (let i = 0; i < 230; i++) { // and the head (author: 头上就该有触手，现在脖子前一段像蚯蚓): cheeks, jaw, chin, the back of the skull
     const under = R() < 0.55, x = under ? -3 + R() * 26 : -5 + R() * 8, a = under ? -1.57 + (R() - 0.5) * 1.5 : R() * 6.28, sn = Math.sin(a), q = Math.max(0, (x - 6) / 22);
     if (!under && sn > 0.2) continue; // the face, the brow and the top of the skull stay bare: he has a face
     const P = V(x, under ? -5.6 + q * 2.2 : 1.2 + 7 * sn * 0.75, (under ? 5.6 - q * 3.4 : 7.6) * Math.cos(a)), o = V(0, sn, Math.cos(a)).normalize();
     if (spots.some((k) => k[0].distanceTo(P) < k[1] + 0.8)) continue;
-    vine(P.addScaledVector(o, -0.6), o, BACK, 16 + R() * 44, 0.7 + R() * 1.3 * (1 - q)); }
+    vine(P.addScaledVector(o, -0.6), o, BACK, o.dot(En) > 0.2 ? 14 + R() * 14 : 16 + R() * 44, 0.7 + R() * 1.3 * (1 - q)); }
   const add = (geos, m) => { const o = new THREE.Mesh(mergeGeometries(geos), m); o.userData.noEdge = true; o.frustumCulled = false; H.add(o); for (const g of geos) g.dispose(); };
   for (const g of parts) for (const k of Object.keys(g.attributes)) if (!["position", "normal", "uv"].includes(k)) g.deleteAttribute(k);
   add(parts, mat); add(vines, vineMat); add(raw, rawMat);
   // set in the frame: going to our left, turned a little toward us, so the body draws away behind him
   H.rotation.set(0.05, Math.PI + 0.14, 0.06, "YXZ"); H.updateMatrix();
   H.position.copy(E.clone().applyMatrix4(H.matrix).multiplyScalar(-1));
-  FAR.gMid = V(-98, 2, 22).applyMatrix4(H.matrix).add(H.position); FAR.gHead = V(6, 0.5, 0).applyMatrix4(H.matrix).add(H.position); /* gHead: for { greatLook: "head" }, a close look at the head while building */ // the middle of him, from the world-eye: where the eye is carried to
+  FAR.gMid = V(-98, 2, 22).applyMatrix4(H.matrix).add(H.position); FAR.gHead = V(6, 0.5, 0).applyMatrix4(H.matrix).add(H.position); FAR.gBody = V(-75, 6, 12).applyMatrix4(H.matrix).add(H.position); /* gHead: for { greatLook: "head" }, a close look at the head while building */ // the middle of him, from the world-eye: where the eye is carried to
   // his own light: cold, from above and ahead of him; a little from below; the red the world throws on his side; his throat
   FAR.gKey = new THREE.DirectionalLight(0xaab0c4, 0); FAR.gKey.position.set(-7, 9, 5); G.add(FAR.gKey, FAR.gKey.target);
   FAR.gFill = new THREE.DirectionalLight(0x8a5a66, 0); FAR.gFill.position.set(3, -7, 8); G.add(FAR.gFill, FAR.gFill.target);
@@ -2763,9 +2769,10 @@ function buildGreat() {
 // world shrinks to a point of red — an eye in a socket, on a flank, one of many — and as it goes on drawing away the eye
 // is carried along him until the whole of him is there, swimming. He does not look at us.
 function updateCondense(s) {
+  if (CON.want && FAR.built && FAR.k >= 0.9) condense(true);
   if (!CON.at || !FAR.built) return;
   const T = s - CON.at, t = Math.min(1, T / CON.S), e = t * t * (3 - 2 * t), after = Math.max(0, T - CON.S);
-  const z = Math.exp(Math.log(CON.Z1) * e) * Math.exp(-0.01 * after); // and it goes on drawing away, very slowly
+  const z = Math.exp(Math.log(CON.Z1) * e) * Math.exp(-0.01 * after) * (1 + (CON.zoom - 1) * e); // and it goes on drawing away, very slowly
   FAR.dome.scale.setScalar((1 + 24 * smooth(0.1, 0.4, t)) / z); /* out past the whole of him: at its own size it was drawn over the far half of his body (a black lump where the vines should trail) */
   if (FAR.reds) for (const l of FAR.reds) l.intensity *= Math.sqrt(z);
   FAR.card.material.opacity *= 1 - smooth(0, 0.22, t); // the first face goes back into the dark
@@ -2773,9 +2780,11 @@ function updateCondense(s) {
   camera.updateMatrixWorld();
   if (camera.far < 9000) { camera.far = 9000; camera.updateProjectionMatrix(); }
   const G = FAR.great, S = FAR.RP * z, show = smooth(0.22, 0.7, t);
-  _cv2.copy(CON.look === "head" ? FAR.gHead : FAR.gMid).applyQuaternion(CON.q).multiplyScalar(-S * smooth(0.45, 1, t)); // carried from the one eye to the middle of him
+  _gq.copy(CON.q).multiply(_ge.setFromEuler(_gv.set(CON.rx, CON.ry, 0, "YXZ"))); /* ?great=1: he can be turned and looked at from any side */
+  _cv2.copy(CON.look === "head" ? FAR.gHead : CON.look === "body" ? FAR.gBody : FAR.gMid).applyQuaternion(_gq).multiplyScalar(-S * smooth(0.45, 1, t)); // carried from the one eye to the middle of him
+  _cv2.addScaledVector(CON.left, -CON.px * S).addScaledVector(CON.up, CON.py * S);
   FAR.g.scale.setScalar(z); FAR.g.position.copy(_cv2); FAR.dome.position.copy(_cv2).multiplyScalar(-1 / z); /* the dark stays round the eye, not round the world */ // the world shrinks about the place where they fought
-  G.visible = show > 0; G.quaternion.copy(CON.q); G.scale.setScalar(S); G.position.set(0, -(FAR.RP + 0.35) * z, 0).add(_cv2);
+  G.visible = show > 0; G.quaternion.copy(_gq); G.scale.setScalar(S); G.position.set(0, -(FAR.RP + 0.35) * z, 0).add(_cv2);
   FAR.greatMat.color.set(0xa87a80).multiplyScalar(show); FAR.vineMat.color.set(0xc08088).multiplyScalar(show); FAR.rawMat.color.set(0xe0585a).multiplyScalar(show); FAR.rawMat.emissiveIntensity = 1.7 * show; FAR.greatMat.emissiveIntensity = 0.22 * show; FAR.vineMat.emissiveIntensity = 0.3 * show; FAR.boneMat.color.set(0xcfc6b0).multiplyScalar(show);
   FAR.eyeMat.emissiveIntensity = 1.25 * show; FAR.gWorld.visible = t > 0.56; /* the world has become the ball in the socket */
   FAR.gKey.intensity = 13 * show; FAR.gFill.intensity = 6.5 * show;
@@ -2789,17 +2798,19 @@ function updateCondense(s) {
   const d = 1.5 * S * (1 + 2.2 * (1 - smooth(0.3, 0.7, t))); FAR.eye2.scale.set(d * 1.15, d, 1); FAR.eye2.material.opacity = smooth(0.3, 0.56, t) * (1 - smooth(0.56, 0.7, t)) * 0.9; /* only a flare over the moment the world turns into an eye */
   if (t >= 1 && !CON.told) { CON.told = true; try { window.parent.postMessage({ source: "nt-room", type: "eye" }, "*"); } catch {} }
 }
-const _cv2 = new THREE.Vector3();
+const _cv2 = new THREE.Vector3(), _gq = new THREE.Quaternion(), _ge = new THREE.Quaternion(), _gv = new THREE.Euler();
 function condense(on) {
   if (!FAR.built) return;
   if (on) {
-    if (CON.at || FAR.k < 0.9) return; // only from the far end
+    if (CON.at) return;
+    if (FAR.k < 0.9) { CON.want = true; if (BOSS.on && !BOSS.leave) bossEvent("leave"); return; } /* asked for before the eye is out (a player who clicks through the outro): it starts by itself once it is */
+    CON.want = false;
     if (!FAR.great) buildGreat();
     camera.updateMatrixWorld();
-    CON.q = camera.quaternion.clone(); CON.left = new THREE.Vector3(-1, 0, 0).applyQuaternion(CON.q); CON.fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(CON.q);
-    CON.Z1 = (2 * camera.position.length() * Math.tan((camera.fov * Math.PI) / 360) * camera.aspect) / ((CON.look === "head" ? 75 : 340) * FAR.RP); /* so that at the end the frame is 340 of his eyes wide, wherever the eye was left */
+    CON.q = camera.quaternion.clone(); CON.left = new THREE.Vector3(-1, 0, 0).applyQuaternion(CON.q); CON.fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(CON.q); CON.up = new THREE.Vector3(0, 1, 0).applyQuaternion(CON.q);
+    CON.Z1 = (2 * camera.position.length() * Math.tan((camera.fov * Math.PI) / 360) * camera.aspect) / ((CON.look === "head" ? 75 : CON.look === "body" ? 130 : 340) * FAR.RP); /* so that at the end the frame is 340 of his eyes wide, wherever the eye was left */
     CON.at = performance.now() / 1000; CON.told = false;
-  } else { CON.at = 0; FAR.g.scale.setScalar(1); FAR.g.position.set(0, 0, 0); FAR.dome.scale.setScalar(1); FAR.dome.position.set(0, 0, 0); if (camera.far !== 400) { camera.far = 400; camera.updateProjectionMatrix(); } if (FAR.eye2) FAR.eye2.visible = false; if (FAR.great) { FAR.great.visible = false; FAR.dust.visible = false; FAR.murk.visible = false; for (const l of [FAR.gKey, FAR.gFill, FAR.gRed, FAR.gMaw]) l.intensity = 0; } }
+  } else { CON.at = 0; CON.want = false; FAR.g.scale.setScalar(1); FAR.g.position.set(0, 0, 0); FAR.dome.scale.setScalar(1); FAR.dome.position.set(0, 0, 0); if (camera.far !== 400) { camera.far = 400; camera.updateProjectionMatrix(); } if (FAR.eye2) FAR.eye2.visible = false; if (FAR.great) { FAR.great.visible = false; FAR.dust.visible = false; FAR.murk.visible = false; for (const l of [FAR.gKey, FAR.gFill, FAR.gRed, FAR.gMaw]) l.intensity = 0; } }
 }
 function updateBoss(s, dt) {
   if (!BOSS.on) { if (BOSS.k > 0) BOSS.k = Math.max(0, BOSS.k - dt * 2); if (FAR.eyes && FAR.eyes[0].visible) for (const m of FAR.eyes) m.visible = false; return; } // outside the fight he has the one pair
@@ -3260,6 +3271,7 @@ function command(m) {
   if (m.rise) bossEvent("rise");
   if (m.leave) bossEvent("leave");
   if (m.greatLook != null) CON.look = m.greatLook;
+  if (m.greatZoom != null) CON.zoom = m.greatZoom; // below 1 = further off
   if (m.condense != null) condense(!!m.condense);
   if (m.strike) bossEvent("strike");
   if (m.hurt) bossEvent("hurt");
@@ -3275,3 +3287,18 @@ function command(m) {
 window.addEventListener("message", (e) => { const m = e.data; if (m && m.target === "nt-room") command(m); });
 if (q.get("embed") === "1") { document.body.classList.add("embed", "solo"); resize(); }
 window.proto = { BOSS, layout, locate, command, setFace, setSpot, FAR, state, apply, turn, toDesk, frame, handAnchor, work, drink, COFFEE, OUTER, give: (v) => { state.hand = 1; give = { verdict: v, t0: performance.now() / 1000 }; } };
+
+// ?great=1 (or =head / =body): straight to the greater Kuro, for looking at him while he is being built. The wheel draws
+// the eye away and back, a drag carries it along him. Not used by the game.
+if (q.get("great")) {
+  const g = q.get("great"); if (g !== "1") CON.look = g;
+  const go = setInterval(() => { if (!FAR.built) { command({ boss: true, risen: true }); return; } if (!BOSS.leave && FAR.k < 0.9) command({ leave: true }); if (FAR.k >= 0.9) { CON.S = 5; command({ condense: true }); clearInterval(go); } }, 300);
+  const el = renderer.domElement; let drag = null;
+  el.addEventListener("wheel", (ev) => { ev.preventDefault(); CON.zoom = Math.min(12, Math.max(0.25, CON.zoom * Math.exp(-ev.deltaY * 0.0015))); }, { passive: false });
+  el.addEventListener("contextmenu", (ev) => ev.preventDefault());
+  el.addEventListener("pointerdown", (ev) => { drag = [ev.clientX, ev.clientY, CON.px, CON.py, CON.rx, CON.ry, ev.shiftKey || ev.button === 2]; el.setPointerCapture(ev.pointerId); });
+  el.addEventListener("pointermove", (ev) => { if (!drag) return; const dx = ev.clientX - drag[0], dy = ev.clientY - drag[1];
+    if (drag[6]) { const k = 340 / el.clientWidth / CON.zoom; CON.px = drag[2] + dx * k; CON.py = drag[3] - dy * k; } /* shift or the right button: carry the eye along him */
+    else { CON.ry = drag[5] + dx * 0.006; CON.rx = Math.max(-1.5, Math.min(1.5, drag[4] + dy * 0.006)); } }); /* a plain drag turns him */
+  el.addEventListener("pointerup", () => { drag = null; });
+}

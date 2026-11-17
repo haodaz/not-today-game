@@ -1075,6 +1075,17 @@
    what the world was doing. Here a flash is a bloom of light from where the party stands, and the rest stays visible. */
 .boss-page.world .bs-flash{background:radial-gradient(46% 52% at 50% 78%,rgba(255,236,214,.7),rgba(230,80,60,.28) 46%,transparent 74%)}
 .boss-page.world.final .bs-box{background:rgba(5,6,10,.62);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+/* the win in the survive endings: the eye goes on out of the world ({ leave }), and the few of them and the patch they
+   stood on are left behind on it — smaller, dimmer, gone within the first seconds; then the world is drawn away to an
+   eye ({ condense }) and nothing of the fight is in the frame at all: no party, no ground, no box */
+.boss-page.world.leaving .bs-party{animation:p2-left 2600ms cubic-bezier(.4,0,.8,.6) both}
+.boss-page.world.leaving .bs-strip,.boss-page.world.leaving .bs-buffs,.boss-page.world.leaving .bs-top,.boss-page.world.leaving .bs-atb,.boss-page.world.leaving .bs-bossbar{animation:p2-fade 2200ms ease-in both}
+.boss-page.world.leaving::after{animation:p2-fade 3000ms ease-in both}
+@keyframes p2-left{0%{opacity:1;transform:translateX(-50%) translateY(0) scale(.6)}100%{opacity:0;transform:translateX(-50%) translateY(34px) scale(.42)}}
+@keyframes p2-fade{0%{opacity:1}100%{opacity:0}}
+.boss-page.world.condensing .bs-party,.boss-page.world.condensing .bs-top,.boss-page.world.condensing .bs-atb,.boss-page.world.condensing .bs-bossbar,.boss-page.world.condensing .bs-strip,.boss-page.world.condensing .bs-buffs,.boss-page.world.condensing .bs-flash,.boss-page.world.condensing .bs-box.silent{visibility:hidden;animation:none}
+.boss-page.world.condensing::after{display:none}
+@media (prefers-reduced-motion:reduce){.boss-page.world.leaving .bs-top,.boss-page.world.leaving .bs-atb,.boss-page.world.leaving .bs-bossbar,.boss-page.world.leaving .bs-party,.boss-page.world.leaving .bs-strip,.boss-page.world.leaving .bs-buffs,.boss-page.world.leaving::after{animation:none;opacity:0}}
 /* room-light-switch R3: the ceiling light. At night a cold, even wash from above inside the evening look
    (its dark layer lifted to 0.25 by the markup); on the ceiling a soft disc at the fitting; by day the
    photo a little brighter — a copy of the stage's own backdrop under everything, not the HUD. */
