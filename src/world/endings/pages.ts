@@ -55,8 +55,10 @@ export const HOME_CAPTIONS = ["ending.home.look", "ending.home.me", "ending.home
 export const HOME_KEYS = ["ending.home.desk", "ending.home.order", "ending.home.kuro"] as const;
 /** The survive endings' objects page: the lines said together. */
 export const SURVIVE_OBJECT_KEYS = ["ending.objects.survive.1", "ending.objects.survive.2", "ending.objects.survive.3"] as const;
-/** The homecoming's still until the room frame plays its own `{ home }`: the day-1 room. */
+/** The homecoming's still when no room frame is kept: the day-1 room. */
 export const HOME_PHOTO = "/room/shots/room.jpg";
+/** The homecoming's third step (author 2026-11-18, 「第一个特别好」 over the 3D room): the bed wall with Kuro sitting in the quilt. */
+export const HOME_PHOTO_KURO = "/room/shots/bed_kuro.jpg";
 
 export interface EndingLine {
   readonly who: "you" | "kuro";

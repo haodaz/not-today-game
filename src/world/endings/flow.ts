@@ -119,7 +119,9 @@ function runBoss(ctx: ActionContext): void {
 function wonInWorld(ctx: ActionContext, prev: BossBattle, next: BossBattle): void {
   if (next.phase !== "won" || prev.phase === "won" || ctx.session.phase2?.stage !== "up") return;
   // R8: the good ending comes home (the assimilated's win stays the swap: no camera)
-  if (next.ending === "good" && !next.strong) return startHome(ctx);
+  // good (author 2026-11-18, cuts): no descent after the win; the outro reads on the world and the
+  // room comes back on the homecoming page by a cut (R9); the frame is kept at boss-done
+  if (next.ending === "good" && !next.strong) return;
   if (next.ending !== "survive") return;
   const now = nowOf(ctx);
   const run = { stage: "leaving" as const, since: now };
@@ -320,7 +322,8 @@ export const bossActions = {
     // boss-phase2-world R1: the room leaves its boss mode (the layer posts `boss: false` and the pause).
     // R9 (good, home in the world): not yet — the frame keeps the room it came home to, hidden and
     // paused, for the homecoming page; the talk in the dark resets it (goToPage).
-    if (!(b.ending === "good" && ctx.session.phase2?.stage === "home" && ctx.session.bossRoom === "ready")) ctx.session.phase2 = null;
+    if (b.ending === "good" && ctx.session.phase2?.stage === "up" && ctx.session.bossRoom === "ready") ctx.session.phase2 = { stage: "home", since: nowOf(ctx) };
+    else ctx.session.phase2 = null;
     firstPage(ctx, b.ending);
   },
   // dev only (the replay driver, tests): the boss down at once

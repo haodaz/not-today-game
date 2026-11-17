@@ -15,7 +15,7 @@ import { youAndYou } from "./youandyou";
 import { renderPullOut } from "./pullout";
 import { bossScene, homeHost } from "@world/room/outside";
 import { COLLAPSE_TO_WHITE_MS, endingOf } from "./flow";
-import { ENDING_ART, endingLines, endingObjects, pagesFor, HOME_CAPTIONS, HOME_KEYS, HOME_PHOTO, SURVIVE_OBJECT_KEYS, TENDER_KEYS, TENDER_PHOTO, WAKE_KEYS, WAKE_PHOTO, WAKE_SAY } from "./pages";
+import { ENDING_ART, endingLines, endingObjects, pagesFor, HOME_CAPTIONS, HOME_KEYS, HOME_PHOTO, HOME_PHOTO_KURO, SURVIVE_OBJECT_KEYS, TENDER_KEYS, TENDER_PHOTO, WAKE_KEYS, WAKE_PHOTO, WAKE_SAY } from "./pages";
 import { endingFlavour } from "@state/endings";
 import { FRAMES, frameUrl } from "@world/desktop/kuro/body";
 
@@ -188,11 +188,13 @@ export function renderHome(m: EndingModel): SafeHtml {
   // boss-phase2-world R9: the frame came home and kept that room — it stands behind the page (the
   // objects on its desk, the big Kuro on its bed, shown at his step); the page keeps its captions and
   // its click target, and draws none of the still's own things
+  // the third step (author 2026-11-18: 「屋子改照片的」「第一个特别好」): a cut to the bed wall's photo with him
+  // sitting in the quilt — the page's own still, whatever the frame; the frame is hidden then
+  if (step >= HOME_KEYS.length) return html`<div class="stage ending-page home-page bed" data-step="${step}" style="--photo:url('${HOME_PHOTO_KURO}')">${next()}<div class="dlg end-caps">${caps}</div></div>`;
   const host = homeHost(m.state.day, m.session);
   if (host) return html`<div class="stage ending-page home-page world" data-step="${step}">${host}${next()}<div class="dlg end-caps">${caps}</div></div>`;
   const desk = html`<div class="home-desk">${objects.map((id) => html`<img src="/objects/${id}_front.png" alt="" draggable="false">`)}</div>`;
-  const kuro = step >= HOME_KEYS.length ? html`<img class="home-kuro" src="/battle/q-kuro.png" alt="" draggable="false">` : null;
-  return html`<div class="stage ending-page home-page" data-step="${step}" style="--photo:url('${HOME_PHOTO}')">${next()}${desk}${kuro}<div class="dlg end-caps">${caps}</div></div>`;
+  return html`<div class="stage ending-page home-page" data-step="${step}" style="--photo:url('${HOME_PHOTO}')">${next()}${desk}<div class="dlg end-caps">${caps}</div></div>`;
 }
 
 /**

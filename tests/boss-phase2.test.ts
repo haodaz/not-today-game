@@ -297,6 +297,29 @@ describe("R7 · the win in the world (survive): the leave, the outro, the conden
 });
 
 describe("R8 · the good ending comes home; the survive ending ends on the rush", () => {
+  it("good (author 2026-11-18, cuts): the win in the world stays as it is — nothing posted, the outro reads, the way out offered; boss-done keeps the room for the homecoming", () => {
+    const r = rig({ chick: true });
+    r.from("ready");
+    r.advance(600);
+    const b = bossStart(r.store.getState(), "good", r.now());
+    r.session.boss = { ...b, phase: "choose", chooser: "player", boss: { ...b.boss, stage: 2, hp: 1, max: 180, gauge: 0 }, clockAt: r.now(), log: "" } as BossBattle;
+    r.session.phase2 = { stage: "up", since: r.now() };
+    r.frame();
+    const before = r.posted.length;
+    r.act("boss-move", { move: "strike" });
+    r.advance(ACT_MS + 200);
+    r.frame();
+    expect(r.session.boss?.phase).toBe("won");
+    expect(r.session.phase2?.stage).toBe("up");
+    expect(r.posted.slice(before).filter((x) => JSON.stringify(x).includes("home"))).toEqual([]);
+    while (r.session.boss?.phase === "won") r.act("boss-next");
+    expect(r.session.boss?.phase).toBe("after");
+    r.session.endingPreview = "good";
+    r.act("boss-done");
+    expect(r.session.boss).toBeNull();
+    expect(r.session.phase2?.stage).toBe("home");
+    r.done();
+  });
   const posts = (prev: typeof NO_BOSS_POSTS, stage: NonNullable<Session["phase2"]>["stage"], since: number) => bossPosts(prev, { key: "k", phase2: { stage, since }, reduced: false, act: null, now: since });
   it("bossPosts: home once for homing, rush once for rushing, nothing for home / out", () => {
     const base = posts(NO_BOSS_POSTS, "up", 0).next;
@@ -343,36 +366,6 @@ describe("R8 · the good ending comes home; the survive ending ends on the rush"
     r.frame();
   };
 
-  it("good: the win in the world → homing, home posted once; the outro reads over it; no way out until home", () => {
-    const r = upAndWinning("good");
-    expect(r.session.boss!.phase).toBe("won");
-    expect(r.session.phase2!.stage).toBe("homing");
-    expect(r.posted.filter((p) => JSON.stringify(p) === JSON.stringify(P2_CMD.home()))).toHaveLength(1);
-    expect(r.root.querySelector(".boss-page")!.classList.contains("homing")).toBe(true);
-    readOutro(r);
-    expect(r.session.boss!.phase).toBe("after");
-    expect(r.root.querySelector('[data-action="boss-done"]')).toBeNull();
-    r.act("boss-done");
-    expect(r.session.boss).not.toBeNull();
-    r.from("home");
-    expect(r.session.phase2!.stage).toBe("home");
-    r.frame();
-    expect(r.root.querySelector('[data-action="boss-done"]')).not.toBeNull();
-    expect(r.posted.filter((p) => JSON.stringify(p) === JSON.stringify(P2_CMD.home()))).toHaveLength(1);
-    r.act("boss-done");
-    expect(r.session.boss).toBeNull();
-    expect(r.session.endingPage).not.toBeNull();
-    r.done();
-  });
-  it("good: no home within 15 s → the net", () => {
-    const r = upAndWinning("good");
-    const at = r.session.phase2!.since;
-    r.advance(at + PHASE2.HOME_MS + PHASE2.HOME_NET_MS - r.now() - 1);
-    expect(r.session.phase2!.stage).toBe("homing");
-    r.advance(1);
-    expect(r.session.phase2!.stage).toBe("home");
-    r.done();
-  });
   it("survive: eye → rushing, rush posted once, no button; out → the ending pages by themselves", () => {
     const r = upAndWinning("survive");
     expect(r.session.phase2!.stage).toBe("leaving");
@@ -455,7 +448,7 @@ describe("R9 · the good ending's homecoming stands in the room the frame came h
     r.done();
   });
 
-  it("the homecoming page: the frame shown behind it (unpaused), no still, no placeholder; kuro once at step 3; reset at lines", () => {
+  it("the homecoming page: the frame shown behind it (unpaused) with the room cut to its end and the eye on the desk; the third step is the bed photo with him, the frame hidden; reset at lines", () => {
     const { r, before } = cameHome();
     r.frame();
     toPage(r, "home");
@@ -467,17 +460,20 @@ describe("R9 · the good ending's homecoming stands in the room the frame came h
     expect(page.querySelector('[data-action="ending-next"]')).not.toBeNull();
     expect(page.querySelector(".home-kuro")).toBeNull();
     expect(page.querySelector(".home-desk")).toBeNull();
-    expect(r.posted.slice(before)).toEqual([P2_CMD.pause(true), P2_CMD.pause(false)]);
-    // steps 2 and 3: him at the third, once
+    expect(r.posted.slice(before)).toEqual([P2_CMD.pause(true), P2_CMD.pause(false), P2_CMD.homeCut(), P2_CMD.deskSpot()]);
+    // step 2 (「点个外卖吧」): nothing posted; step 3: a cut to the bed-wall photo with him, the frame hidden and paused
     endingNext(ctxOf(r));
     r.frame();
-    expect(r.posted.slice(before)).toHaveLength(2);
+    expect(r.posted.slice(before)).toHaveLength(4);
     endingNext(ctxOf(r));
     r.frame();
     expect(r.session.endingPage!.step).toBe(3);
-    expect(r.posted.at(-1)).toEqual(P2_CMD.kuro(true));
-    r.frame();
-    expect(r.posted.filter((p) => JSON.stringify(p) === JSON.stringify(P2_CMD.kuro(true)))).toHaveLength(1);
+    const bed = r.root.querySelector<HTMLElement>(".home-page")!;
+    expect(bed.classList.contains("bed")).toBe(true);
+    expect(bed.getAttribute("style")).toContain("/room/shots/bed_kuro.jpg");
+    expect(bed.querySelector(".outside-host")).toBeNull();
+    expect(r.posted.at(-1)).toEqual(P2_CMD.pause(true));
+    expect(r.posted.filter((p) => JSON.stringify(p) === JSON.stringify(P2_CMD.kuro(true)))).toHaveLength(0);
     expect(r.root.querySelector(".home-kuro")).toBeNull();
     // on to the talk in the dark: the room let go, the host gone
     const n = r.posted.length;
@@ -495,7 +491,7 @@ describe("R9 · the good ending's homecoming stands in the room the frame came h
     // the frame never said ready
     const b = bossStart(r.store.getState(), "good", r.now());
     r.session.boss = { ...b, phase: "after" };
-    r.session.phase2 = { stage: "home", since: r.now() };
+    r.session.phase2 = { stage: "up", since: r.now() };
     r.act("boss-done");
     expect(r.session.phase2).toBeNull();
     toPage(r, "home");

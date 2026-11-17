@@ -155,8 +155,10 @@ posts "home" immediately); the ordinary `{ face, spot }` moves (the desk close-u
   `.home-kuro` not rendered), `{ pause: false }`, then `{ home: "cut" }`, then `{ face: 0, spot:
   "desk" }` — the eye on the desk, the objects just put down.
 - Step 2 (「点个外卖吧」): nothing posted.
-- Step 3 (Kuro): `{ kuro: true }`, then `{ spot: null }`, then `{ face: 1 }` — the eye turns to the
-  bed and he is on it. Each post once.
+- Step 3 (Kuro) — **author 2026-11-18, 「屋子改照片的」「第一个特别好」**: a cut to the still
+  `/room/shots/bed_kuro.jpg` (the bed wall with him sitting in the quilt), the page's own photo full
+  frame as on the photo-room days; the frame is hidden (paused) from this step. `{ kuro }` stays in
+  the room unused.
 - Leaving `home` (the `lines` page, black): `{ boss: false }`, `{ pause: true }`, hide the host.
 - Fallback: no frame (`bossRoom` off, or the win not in the world): the page renders as today (the
   still, the placeholder).

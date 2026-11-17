@@ -62,6 +62,9 @@ export const P2_CMD = {
   leave: (): object => ({ target: T, leave: true }),
   condense: (): object => ({ target: T, condense: true }),
   home: (): object => ({ target: T, home: true }),
+  /** R9 (author 2026-11-18, cuts): the good ending's room at once, and the eye on the desk where the objects were just put down. */
+  homeCut: (): object => ({ target: T, home: "cut" }),
+  deskSpot: (): object => ({ target: T, face: 0, spot: "desk" }),
   rush: (): object => ({ target: T, rush: true }),
   /** R9: the big Kuro on the bed in the room the frame came home to (hidden until shown). */
   kuro: (on: boolean): object => ({ target: T, kuro: on }),
@@ -108,8 +111,10 @@ export interface BossPosted {
   readonly rushed: number | null;
   /** R9: `{ kuro: true }` was posted on the homecoming page. */
   readonly kuro: boolean;
+  /** R9: the room cut to its end state and the eye walked to the desk, once per kept room. */
+  readonly cut: boolean;
 }
-export const NO_BOSS_POSTS: BossPosted = { key: null, bossAt: null, paused: false, dislocated: null, rose: null, strikeAt: null, hurtAt: null, left: null, condensed: null, homed: null, rushed: null, kuro: false };
+export const NO_BOSS_POSTS: BossPosted = { key: null, bossAt: null, paused: false, dislocated: null, rose: null, strikeAt: null, hurtAt: null, left: null, condensed: null, homed: null, rushed: null, kuro: false, cut: false };
 
 export interface BossWant {
   readonly key: string;
@@ -217,9 +222,12 @@ export function homePosts(prev: BossPosted, want: { readonly shown: boolean; rea
     posts.push(P2_CMD.pause(false));
     next = { ...next, paused: false };
   }
-  if (want.shown && want.kuro && !next.kuro) {
-    posts.push(P2_CMD.kuro(true));
-    next = { ...next, kuro: true };
+  // the cuts (author 2026-11-18): the room's end state at once and the eye on the desk, the first time
+  // the page shows the frame; the third step is the bed-wall photo with him on it (the page's own
+  // still, the frame hidden), so `{ kuro }` is not posted
+  if (want.shown && !next.cut) {
+    posts.push(P2_CMD.homeCut(), P2_CMD.deskSpot());
+    next = { ...next, cut: true };
   }
   return { posts, next };
 }
