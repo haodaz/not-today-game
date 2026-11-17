@@ -118,6 +118,29 @@ one eye on the flank of a far greater Kuro, ≈11 s, "eye" or a 12.5 s net); the
 (`.bs-box.silent`), the page `.condensing`, and 继续 is not offered until `eye`. The assimilated's win
 stays the swap; the good ending's homecoming (`{ home: true }`) comes when the room has it.
 
+## R8 — The good ending comes home; the survive ending ends on the greater Kuro rushing out
+
+Built by the room (2026-11-17), to wire, with the same pattern as R7 (stages on `Session.phase2`,
+posts once from `bossPosts`, nets, names and timings in `phase2.ts`):
+
+- `{ home: true }` — **good ending only**, after the win in the world (phase `won`, `phase2` = `up`):
+  13.5 s — the crowd of eyes shuts to the pair, the head goes down, the tentacles lie flat, the room
+  appears (morning, the day-1 look, lamp and ceiling light off), the eye comes down into it, a small
+  black dog sits on the bed; posts `{ source: "nt-room", type: "home" }`. Silent: no line there (the
+  author: 「No one like you.」 belongs to the ending pages with the song). Stage `homing` from the win
+  (the page `.homing`: the party and its mound fade as on `.leaving`; the outro lines read over it);
+  `home` (or a 15 s net) → stage `home`; `boss-done` is not offered before it. Nothing else posted.
+- `{ rush: true }` — **survive only**, after `eye` (R7): the greater Kuro turns to face us from a
+  little above (3.4 s) and comes on through the frame; posts `{ type: "out" }` when the frame is
+  dark (~4.2 s after the command); the frame stays dark. Stage `rushing` as soon as `eye` arrives
+  (post `rush` at once; the box stays silent, no button); `out` (or a 6 s net) → stage `out` and the
+  game goes on to the ending pages **by itself** (the same as `boss-done`: `session.boss = null`,
+  `phase2 = null`, `firstPage`), no click. The 继续 button of R7 is therefore never shown on survive
+  in the world; it stays for the fallback (no frame) and for 同化.
+- 同化: unchanged (the swap; no camera).
+- Tests in `tests/boss-phase2.test.ts` for both, as R7's: the posts once, the page classes, the nets,
+  the way out held / automatic.
+
 ## Out of scope
 
 The room's own animations and colours (the other session); the ending pages after the fight; any
