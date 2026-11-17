@@ -2779,9 +2779,14 @@ function updateCondense(s) {
   if (FAR.eyes) for (const m of FAR.eyes) m.material.opacity *= 1 - smooth(0, 0.15, t);
   camera.updateMatrixWorld();
   if (camera.far < 9000) { camera.far = 9000; camera.updateProjectionMatrix(); }
-  const G = FAR.great, S = FAR.RP * z, show = smooth(0.22, 0.7, t);
-  _gq.copy(CON.q).multiply(_ge.setFromEuler(_gv.set(CON.rx, CON.ry, 0, "YXZ"))); /* ?great=1: he can be turned and looked at from any side */
-  _cv2.copy(CON.look === "head" ? FAR.gHead : CON.look === "body" ? FAR.gBody : FAR.gMid).applyQuaternion(_gq).multiplyScalar(-S * smooth(0.45, 1, t)); // carried from the one eye to the middle of him
+  // { rush: true } (author 2026-11-18, turning him in the preview: 这个视角很酷，我们最后都可以让它在这个视角下冲出屏幕，结束故事): he comes
+  // round to face us, from a little above, the head nearest — and then comes on, through the frame. "out" when it is dark.
+  let rr = 0, rz = 1, rh = 0;
+  if (CON.rush) { const R = s - CON.rush, tn = smooth(0, 3.4, R), go = Math.max(0, R - 3.6); rr = tn; rh = smooth(0.4, 3.4, R); rz = (1 + 3.0 * tn) * Math.exp(5.5 * go * go);
+    if (go > 0.6 && !CON.out) { CON.out = true; try { window.parent.postMessage({ source: "nt-room", type: "out" }, "*"); } catch {} } }
+  const G = FAR.great, S = FAR.RP * z * rz, show = smooth(0.22, 0.7, t) * (CON.out ? 0 : 1);
+  _gq.copy(CON.q).multiply(_ge.setFromEuler(_gv.set(CON.rx + 0.34 * rr, CON.ry + 1.08 * rr, 0, "YXZ"))); /* ?great=1: he can be turned and looked at from any side */
+  _cv2.copy(CON.look === "head" ? FAR.gHead : CON.look === "body" ? FAR.gBody : FAR.gMid).lerp(FAR.gHead, rh).applyQuaternion(_gq).multiplyScalar(-S * smooth(0.45, 1, t)); // carried from the one eye to the middle of him
   _cv2.addScaledVector(CON.left, -CON.px * S).addScaledVector(CON.up, CON.py * S);
   FAR.g.scale.setScalar(z); FAR.g.position.copy(_cv2); FAR.dome.position.copy(_cv2).multiplyScalar(-1 / z); /* the dark stays round the eye, not round the world */ // the world shrinks about the place where they fought
   G.visible = show > 0; G.quaternion.copy(_gq); G.scale.setScalar(S); G.position.set(0, -(FAR.RP + 0.35) * z, 0).add(_cv2);
@@ -2809,8 +2814,8 @@ function condense(on) {
     camera.updateMatrixWorld();
     CON.q = camera.quaternion.clone(); CON.left = new THREE.Vector3(-1, 0, 0).applyQuaternion(CON.q); CON.fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(CON.q); CON.up = new THREE.Vector3(0, 1, 0).applyQuaternion(CON.q);
     CON.Z1 = (2 * camera.position.length() * Math.tan((camera.fov * Math.PI) / 360) * camera.aspect) / ((CON.look === "head" ? 75 : CON.look === "body" ? 130 : 340) * FAR.RP); /* so that at the end the frame is 340 of his eyes wide, wherever the eye was left */
-    CON.at = performance.now() / 1000; CON.told = false;
-  } else { CON.at = 0; CON.want = false; FAR.g.scale.setScalar(1); FAR.g.position.set(0, 0, 0); FAR.dome.scale.setScalar(1); FAR.dome.position.set(0, 0, 0); if (camera.far !== 400) { camera.far = 400; camera.updateProjectionMatrix(); } if (FAR.eye2) FAR.eye2.visible = false; if (FAR.great) { FAR.great.visible = false; FAR.dust.visible = false; FAR.murk.visible = false; for (const l of [FAR.gKey, FAR.gFill, FAR.gRed, FAR.gMaw]) l.intensity = 0; } }
+    CON.at = performance.now() / 1000; CON.told = false; CON.rush = 0; CON.out = false;
+  } else { CON.at = 0; CON.want = false; CON.rush = 0; CON.out = false; FAR.g.scale.setScalar(1); FAR.g.position.set(0, 0, 0); FAR.dome.scale.setScalar(1); FAR.dome.position.set(0, 0, 0); if (camera.far !== 400) { camera.far = 400; camera.updateProjectionMatrix(); } if (FAR.eye2) FAR.eye2.visible = false; if (FAR.great) { FAR.great.visible = false; FAR.dust.visible = false; FAR.murk.visible = false; for (const l of [FAR.gKey, FAR.gFill, FAR.gRed, FAR.gMaw]) l.intensity = 0; } }
 }
 function updateBoss(s, dt) {
   if (!BOSS.on) { if (BOSS.k > 0) BOSS.k = Math.max(0, BOSS.k - dt * 2); if (FAR.eyes && FAR.eyes[0].visible) for (const m of FAR.eyes) m.visible = false; return; } // outside the fight he has the one pair
@@ -2838,11 +2843,45 @@ function updateBoss(s, dt) {
     if (t < 0) { m.visible = false; continue; }
     let open = Math.min(1, t / 0.09); open = open < 1 ? open : 1 + 0.18 * Math.exp(-(t - 0.09) * 9) * Math.cos((t - 0.09) * 30);
     const bt = (t - u.blinkAt) % (u.blinkAt * 1.7 + 6); if (t > u.blinkAt && bt < 0.22) open *= Math.abs(bt - 0.11) / 0.11;
+    if (HOMEWARD.at) open *= 1 - smooth(u.delay * 2.2, u.delay * 2.2 + 0.35, s - HOMEWARD.at); /* the good ending: they shut again, not together */
     m.visible = true; m.material.opacity = Math.min(1, t / 0.05) * (0.86 + 0.14 * Math.sin(s * 2.1 + u.delay * 40));
     m.scale.set(u.size * 1.5, Math.max(0.001, u.size * open), 1);
   }
   BOSS.flick = Math.max(0, BOSS.flick - dt * 2.5);
   if (FAR.reds) for (const l of FAR.reds) l.intensity *= 1 - 0.8 * BOSS.flick * (0.5 + 0.5 * Math.sin(s * 47 + l.userData.ph));
+}
+// The win in the good ending (author 2026-11-17 「可以的」 to this; the line 「No one like you.」 is NOT said here — it belongs to
+// the ending pages, with the song). They have a small Kuro of their own with them, so nothing is left behind and
+// nothing is drawn away: the crowd of eyes shuts until only the pair is left, the head goes down, the ones that stood
+// up lie down and the red goes out of the ground; and the eye comes back down, through where the ceiling was, into
+// the room — clean, in the morning, and the small one sitting in it. { home: true }; posts "home" at the end; silent.
+const HOMEWARD = { at: 0, told: false, S: 13.5 };
+function buildPup() { // the small one: a black pup, sitting; two small lights for eyes; what he has instead of a tail
+  const g = (HOMEWARD.pup = new THREE.Group()), bm = M({ color: 0x0b0b0e, roughness: 0.55 }), em = new THREE.MeshBasicMaterial({ color: 0xffb060, toneMapped: false });
+  const P = (geo, m, x, y, z, sx = 1, sy = 1, sz = 1, rx = 0, rz = 0) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.scale.set(sx, sy, sz); o.rotation.set(rx, 0, rz); o.castShadow = true; o.userData.noEdge = true; g.add(o); return o; };
+  const sp = new THREE.SphereGeometry(1, 20, 14);
+  P(sp, bm, 0, 0.1, -0.02, 0.085, 0.1, 0.1); P(sp, bm, 0, 0.17, 0.03, 0.07, 0.09, 0.075); // haunches, chest
+  P(sp, bm, 0, 0.275, 0.06, 0.066, 0.06, 0.066); P(sp, bm, 0, 0.258, 0.122, 0.034, 0.03, 0.05); // head, muzzle
+  for (const k of [-1, 1]) { P(sp, bm, k * 0.064, 0.262, 0.05, 0.016, 0.042, 0.03, 0.1, k * 0.3); // ears, hanging: he is a dog (pricked ones read as a cat)
+    P(new THREE.CylinderGeometry(0.016, 0.02, 0.15, 8), bm, k * 0.034, 0.075, 0.075); P(sp, bm, k * 0.034, 0.012, 0.09, 0.022, 0.012, 0.03); // forelegs, paws
+    P(sp, em, k * 0.027, 0.292, 0.113, 0.0085, 0.0085, 0.004); }
+  for (let i = 0; i < 3; i++) { const a = -0.5 + i * 0.5, c = new THREE.CatmullRomCurve3([new THREE.Vector3(0, 0.05, -0.1), new THREE.Vector3(Math.sin(a) * 0.06, 0.03, -0.17), new THREE.Vector3(Math.sin(a) * 0.13, 0.015, -0.21), new THREE.Vector3(Math.sin(a) * 0.17, 0.05, -0.2)]);
+    const o = new THREE.Mesh(new THREE.TubeGeometry(c, 14, 0.011, 6), bm); o.userData.noEdge = true; o.castShadow = true; g.add(o); }
+  g.position.set(0.93, 0.5, -0.82); g.rotation.y = -0.45; /* on the bed: from the desk wall's eye the floor near by is under the frame */ g.visible = false; room.add(g);
+}
+function home(on) {
+  if (!on) { HOMEWARD.at = 0; HOMEWARD.told = false; if (FAR.built) { FAR.g.position.y = 0; FAR.g.scale.y = 1; } if (HOMEWARD.pup) HOMEWARD.pup.visible = false; return; }
+  if (HOMEWARD.at || !BOSS.on || !FAR.built) return;
+  if (!HOMEWARD.pup) buildPup();
+  HOMEWARD.at = performance.now() / 1000; HOMEWARD.told = false; BOSS.to = 0; BOSS.ring = false; BOSS.until = 0; BOSS.rising = 0;
+}
+function updateHome(s) {
+  if (!HOMEWARD.at) return;
+  const T = s - HOMEWARD.at;
+  if (BOSS.on) { BOSS.r = 1 - smooth(1.4, 5.6, T); if (T > 5.6) { BOSS.on = false; BOSS.leave = false; command({ day: 1, time: 8.5, lamp: false, ceil: false }); HOMEWARD.pup.visible = true; FAR.to = 0.56; FAR.k = 0.56; } } // the head goes down; then the room is there, and it is morning in it
+  if (!BOSS.on) FAR.to = 0.56 * (1 - smooth(6.4, HOMEWARD.S - 0.6, T)); // and the eye comes home
+  if (FAR.built) { const q = smooth(2.2, 8.5, T); FAR.g.scale.y = 1 - 0.975 * q; FAR.g.position.y = -0.7 * q; } // they lie down: flat, and a little under the floor's level
+  if (T >= HOMEWARD.S && FAR.k < 0.002 && !HOMEWARD.told) { HOMEWARD.told = true; try { window.parent.postMessage({ source: "nt-room", type: "home" }, "*"); } catch {} }
 }
 function bossEvent(kind) {
   const s = performance.now() / 1000;
@@ -2886,7 +2925,8 @@ function updateFar(s, dt) {
   FAR.glow.intensity = BOSS.on ? 0 : e * 10;
   if (!k) return;
   FAR.dome.material.opacity = Math.min(1, e * 1.6);
-  FAR.card.material.opacity = Math.min(1, Math.max(0, e * 9 - 0.25)); // he is there almost as soon as the ceiling is gone
+  FAR.card.material.opacity = Math.min(1, Math.max(0, e * 9 - 0.25)) * (HOMEWARD.at ? 1 - smooth(3.6, 5.6, s - HOMEWARD.at) : 1); // he is there almost as soon as the ceiling is gone
+  if (HOMEWARD.at) { const q = 1 - 0.9 * smooth(3, 9, s - HOMEWARD.at); for (const l of FAR.reds) l.intensity *= q; }
   FAR.rim.intensity = e * 0.35; FAR.fill.intensity = e * 30;
   scene.fog.color.lerp(C(0x1d1d1f), Math.min(1, e * 4)); // the room's own haze is gone as soon as the eye is out of it
   scene.fog.density = scene.fog.density * (1 - e) + (0.016 - 0.0105 * Math.max(0, (e - 0.42) / 0.58)) * e; // the plain goes on into the smoke
@@ -2902,7 +2942,7 @@ function updateFar(s, dt) {
   camera.updateMatrixWorld();
   FAR.card.quaternion.copy(camera.quaternion);
   { // in the fight he rises: from below the frame, dark, the light coming into him at the end
-    const r = BOSS.on ? BOSS.r : 1, up = r * r * (3 - 2 * r), lit = BOSS.on ? 0.16 + 0.34 * up + 0.5 * smooth(0.86, 1, r) : 1;
+    const r = BOSS.on ? BOSS.r : HOMEWARD.at ? 0 : 1, up = r * r * (3 - 2 * r), lit = BOSS.on ? 0.16 + 0.34 * up + 0.5 * smooth(0.86, 1, r) : 1;
     FAR.card.position.set(0, 21 + 1.5 * w - (1 - up) * 62, -85).applyMatrix4(camera.matrixWorld);
     FAR.card.material.color.setScalar(lit);
   }
@@ -3005,6 +3045,7 @@ function frame(now) {
     rainGeo.attributes.position.needsUpdate = true;
   }
   if (WALKMAN.playing) for (const r of WALKMAN.reels) r.rotation.y -= dt * 2.2;
+  updateHome(now / 1000);
   updateFar(now / 1000, dt);
   updateBoss(now / 1000, dt);
   updateCondense(now / 1000);
@@ -3266,10 +3307,12 @@ function command(m) {
   if (m.eaten != null) ui("eaten", m.eaten);
   if (m.objects !== undefined) { state.objects = Array.isArray(m.objects) ? m.objects.map(String) : null; applyDay(); }
   if (m.pause != null) renderer.setAnimationLoop(m.pause ? null : frame); // a frame the game has hidden should not go on drawing
-  if (m.boss != null) { condense(false); BOSS.on = !!m.boss; BOSS.r = m.risen ? 1 : 0; BOSS.rising = 0; BOSS.told = !!m.risen; BOSS.to = m.risen ? 0.3 : 0; BOSS.ring = !!m.risen; BOSS.p = 1; BOSS.dis = 0; BOSS.leave = false; BOSS.eyesAt = m.risen ? performance.now() / 1000 - 3 : 0; if (!BOSS.on) FAR.to = 0; } // { boss: true } = the world, head still down; add risen: true to start with him up
+  if (m.boss != null) { condense(false); home(false); BOSS.on = !!m.boss; BOSS.r = m.risen ? 1 : 0; BOSS.rising = 0; BOSS.told = !!m.risen; BOSS.to = m.risen ? 0.3 : 0; BOSS.ring = !!m.risen; BOSS.p = 1; BOSS.dis = 0; BOSS.leave = false; BOSS.eyesAt = m.risen ? performance.now() / 1000 - 3 : 0; if (!BOSS.on) FAR.to = 0; } // { boss: true } = the world, head still down; add risen: true to start with him up
   if (m.dislocate) bossEvent("dislocate");
   if (m.rise) bossEvent("rise");
   if (m.leave) bossEvent("leave");
+  if (m.home != null) home(!!m.home);
+  if (m.rush && CON.at && CON.told && !CON.rush) CON.rush = performance.now() / 1000; // only once the whole of him has been seen ("eye")
   if (m.greatLook != null) CON.look = m.greatLook;
   if (m.greatZoom != null) CON.zoom = m.greatZoom; // below 1 = further off
   if (m.condense != null) condense(!!m.condense);
