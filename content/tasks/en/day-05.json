@@ -132,7 +132,7 @@
               },
               {
                 "who": "me",
-                "text": "'Avatar'. The things she has written herself, pieced together, are what she wants."
+                "text": "Vivi's 'avatar' page. Piece together what she has already written and that's it."
               }
             ]
           },
@@ -141,7 +141,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "2041, the year in her chat. The year she says the avatar goes live."
+                "text": "2041, the year she mentioned in her chat. The year the avatar goes live, she says."
               }
             ]
           },
@@ -150,7 +150,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "'The avatar is you.' It is not you. It is only more punctual."
+                "text": "'The avatar is you.' It isn't you. It's just more punctual."
               }
             ]
           },
@@ -159,7 +159,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "It answers 'OK.' for you. You say it forty-odd times a day; it saves your voice."
+                "text": "This one answers 'OK' for you. You say it forty-odd times a day; it can say it instead."
               }
             ]
           },
@@ -168,7 +168,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "'The avatar may sign for you.' Your signature is the last thing that is yours; written in, it is not."
+                "text": "'The avatar can sign for you.' Signing is the last thing that's yours; put it in and it isn't."
               }
             ]
           },
@@ -177,7 +177,7 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "'It is more like you than you are.' I filled that in. I measured."
+                "text": "'It's more like you than you are' — I filled that in. I compared."
               }
             ]
           },
@@ -186,11 +186,11 @@
             "lines": [
               {
                 "who": "kuro",
-                "text": "Sent to Vivi. She will say 'that's the vibe'."
+                "text": "Sent to Vivi. She'll reply 'that's the feeling'."
               },
               {
                 "who": "kuro",
-                "text": "Two words on her page; behind them a whole system to build. She does not need to know."
+                "text": "Two words on her page; a whole system behind them. She doesn't need to know."
               }
             ]
           }
