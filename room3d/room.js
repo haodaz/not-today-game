@@ -2557,6 +2557,7 @@ const _fp = new THREE.Vector3(), _fl = new THREE.Vector3(), _fq = new THREE.Quat
 // the ground and come down where the party stands. When he is hurt, they drop back and the red under the ground stutters.
 // { boss: true } enters it (the room is gone, the eye sits at one fixed place); { strike: true } / { hurt: true } are events.
 const BOSS = { on: false, k: 0, to: 0, until: 0, flick: 0, r: 0, rising: 0, told: false, p: 1, dis: 0, ring: false };
+const LEAVE_S = 9;
 const DIS_MS = 3000, DIS_ROLL = 0.45; // the dislocation: three seconds; the horizon tips 26° at its middle and comes level again
 const _da = new THREE.Vector3(3, 1.3, 12), _dl = new THREE.Vector3(-1, 1.5, 0), _dq = new THREE.Quaternion(), _dm = new THREE.Matrix4(); // r: how far the head has risen, 0 below the frame … 1 up
 function bossTentacles() {
@@ -2589,21 +2590,24 @@ function updateBoss(s, dt) {
   }
   if (BOSS.until && s > BOSS.until) { BOSS.until = 0; BOSS.to = BOSS.ring ? 0.3 : 0; }
   BOSS.k += (BOSS.to - BOSS.k) * (1 - Math.exp(-dt * (BOSS.to > BOSS.k ? 9 : 2.2))); // up fast, down slowly
+  if (BOSS.leave && !BOSS.left && FAR.k >= 0.999) { BOSS.left = true; try { window.parent.postMessage({ source: "nt-room", type: "left" }, "*"); } catch {} }
   BOSS.flick = Math.max(0, BOSS.flick - dt * 2.5);
   if (FAR.reds) for (const l of FAR.reds) l.intensity *= 1 - 0.8 * BOSS.flick * (0.5 + 0.5 * Math.sin(s * 47 + l.userData.ph));
 }
 function bossEvent(kind) {
   const s = performance.now() / 1000;
   if (kind === "dislocate") { if (!BOSS.dis) { BOSS.p = 0; BOSS.ring = false; BOSS.to = 0; BOSS.dis = performance.now(); } return; }
+  if (kind === "leave") { if (BOSS.on && !BOSS.leave) { BOSS.leave = true; BOSS.left = false; BOSS.to = 0; BOSS.ring = false; BOSS.until = 0; } return; } // the ring sinks back; he stays
   if (kind === "rise") { if (BOSS.r < 1 && !BOSS.rising) { BOSS.rising = s; BOSS.told = false; } return; }
   if (BOSS.r < 1) return; // nothing strikes before he is there
   if (kind === "strike") { BOSS.to = 1; BOSS.until = s + 0.75; }
   if (kind === "hurt") { BOSS.to = 0.06; BOSS.until = s + 0.9; BOSS.flick = 1; }
 }
 function updateFar(s, dt) {
-  if (BOSS.on) FAR.to = 0.56;
+  if (BOSS.on) FAR.to = BOSS.leave ? 1 : 0.56;
   if (!FAR.built) { if (!((FAR.to ?? 0) > 0)) return; buildFar(); }
-  FAR.k += ((FAR.to ?? 0) - FAR.k) * (1 - Math.exp(-dt * 5)); if (Math.abs(FAR.k - (FAR.to ?? 0)) < 0.0005) FAR.k = FAR.to ?? 0; // the player's own hand on the bar (author: 做成滑杆，到时候是用户拉远的)
+  if (BOSS.on && BOSS.leave) FAR.k = Math.min(1, FAR.k + dt * (1 - 0.56) / LEAVE_S); // the win: the eye goes on out at an even pace, nine seconds to the far end
+  else FAR.k += ((FAR.to ?? 0) - FAR.k) * (1 - Math.exp(-dt * 5)); if (Math.abs(FAR.k - (FAR.to ?? 0)) < 0.0005) FAR.k = FAR.to ?? 0; // the player's own hand on the bar (author: 做成滑杆，到时候是用户拉远的)
   const k = FAR.k, e = k * k * (3 - 2 * k);
   FAR.g.visible = k > 0;
   CEIL.visible = k < 0.03;
@@ -3006,9 +3010,10 @@ function command(m) {
   if (m.eaten != null) ui("eaten", m.eaten);
   if (m.objects !== undefined) { state.objects = Array.isArray(m.objects) ? m.objects.map(String) : null; applyDay(); }
   if (m.pause != null) renderer.setAnimationLoop(m.pause ? null : frame); // a frame the game has hidden should not go on drawing
-  if (m.boss != null) { BOSS.on = !!m.boss; BOSS.r = m.risen ? 1 : 0; BOSS.rising = 0; BOSS.told = !!m.risen; BOSS.to = m.risen ? 0.3 : 0; BOSS.ring = !!m.risen; BOSS.p = 1; BOSS.dis = 0; if (!BOSS.on) FAR.to = 0; } // { boss: true } = the world, head still down; add risen: true to start with him up
+  if (m.boss != null) { BOSS.on = !!m.boss; BOSS.r = m.risen ? 1 : 0; BOSS.rising = 0; BOSS.told = !!m.risen; BOSS.to = m.risen ? 0.3 : 0; BOSS.ring = !!m.risen; BOSS.p = 1; BOSS.dis = 0; BOSS.leave = false; if (!BOSS.on) FAR.to = 0; } // { boss: true } = the world, head still down; add risen: true to start with him up
   if (m.dislocate) bossEvent("dislocate");
   if (m.rise) bossEvent("rise");
+  if (m.leave) bossEvent("leave");
   if (m.strike) bossEvent("strike");
   if (m.hurt) bossEvent("hurt");
   if (m.layout !== undefined) layout(m.layout);
