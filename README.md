@@ -71,7 +71,7 @@ Vite and TypeScript, no framework, one store. State is `f(day) ⊕ replay(events
 
 ## Posts about the game
 
-Written for people who have never seen it, one picture set each, on X (@vibedding):
+Written for people who have never seen it, one picture set each, on X (@vibedding) and in the Kiro Discord:
 
 | Date | Post |
 |---|---|
@@ -86,6 +86,8 @@ Written for people who have never seen it, one picture set each, on X (@vibeddin
 | 2026-11-13 | [Battle moves: throw the laptop, flip the desk](https://x.com/vibedding/status/2121211339158753748) |
 | 2026-11-15 | [The old things you collect are real](https://x.com/vibedding/status/2122048341538164888) — the chick, Bulls and Cows on the calculator, Wordle on the dictionary |
 | 2026-11-16 | [In 1997 every kid in China wanted a Tamagotchi](https://x.com/vibedding/status/2122321184628904280) — night one, the author's own childhood |
+| 2026-11-17 | [The promo video, and an honest ask](https://x.com/vibedding/status/2122694594387235108) — the 98 s promo video; the game cost far more than planned, so a Ko-fi link |
+| 2026-11-17 | [NOT TODAY in Kiro's #built-with-kiro](https://discord.com/channels/1374034175430230016/1572388159344607272) (Discord) — the game, why it matters, how Kiro kept a long, changing design straight; the 98 s promo video |
 
 ## Licence
 
