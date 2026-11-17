@@ -2953,19 +2953,27 @@ function buildPup() { // (author 2026-11-18, the good ending as she wrote it: �
   // He is the figure the game already has (public/kuro/k3d_base.png: the black pup with the tentacles), large, on the bed,
   // stood up to face the desk wall's eye; and under him the dip and the shade he makes in the quilt.
   const g = (HOMEWARD.pup = new THREE.Group()), t = new THREE.TextureLoader().load("/kuro/k3d_base.png"); t.colorSpace = THREE.SRGBColorSpace;
-  const fig = new THREE.Mesh(new THREE.PlaneGeometry(0.74, 0.74), new THREE.MeshBasicMaterial({ map: t, alphaTest: 0.6, color: 0xe2e0dc, fog: false })); fig.position.y = 0.335; fig.isLine2 = true; /* kept out of the occlusion pass, which draws the whole square and laid a pale veil over the bed */ /* cut out hard: the picture's soft edge and its own cast shade showed as a pale square */ fig.userData.noEdge = true; g.add(fig);
+  const fig = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 1.0), new THREE.MeshBasicMaterial({ map: t, alphaTest: 0.6, color: 0xe2e0dc, fog: false })); fig.position.y = 0.415; /* 挺大的那种: he takes up the middle of the bed */ fig.isLine2 = true; /* kept out of the occlusion pass, which draws the whole square and laid a pale veil over the bed */ /* cut out hard: the picture's soft edge and its own cast shade showed as a pale square */ fig.userData.noEdge = true; g.add(fig);
   const [sc, sg] = canvas(128, 128), gr = sg.createRadialGradient(64, 64, 6, 64, 64, 62); gr.addColorStop(0, "rgba(20,20,26,.5)"); gr.addColorStop(1, "rgba(20,20,26,0)"); sg.fillStyle = gr; sg.fillRect(0, 0, 128, 128);
-  const sh = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.44), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(sc), transparent: true, depthWrite: false })); sh.rotation.x = -Math.PI / 2; sh.position.set(0, 0.035, 0.04); sh.userData.noEdge = true; sh.isLine2 = true; sh.renderOrder = 2; g.add(sh);
-  g.position.set(0.93, 0.5, -0.86); g.rotation.y = Math.atan2(FACES[0].eye.x - 0.93, FACES[0].eye.z + 0.86); g.visible = false; room.add(g);
+  const sh = new THREE.Mesh(new THREE.PlaneGeometry(0.95, 0.6), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(sc), transparent: true, depthWrite: false })); sh.rotation.x = -Math.PI / 2; sh.position.set(0, 0.035, 0.04); sh.userData.noEdge = true; sh.isLine2 = true; sh.renderOrder = 2; g.add(sh);
+  g.position.set(1.22, 0.5, -0.78); /* seen from the bed wall's eye (her order: the desk close up, the words, then the eye goes to the bed) */ g.visible = false; room.add(g);
 }
 function home(on) {
   if (!on) { HOMEWARD.at = 0; HOMEWARD.told = false; if (FAR.built) { FAR.g.position.y = 0; FAR.g.scale.y = 1; } if (HOMEWARD.pup) HOMEWARD.pup.visible = false; return; }
+  if (on === "cut") { // (author 2026-11-18: 玩家视角在桌子上（剧情直接推的）…都说剧情切换的就行) no way down from the sky: the story cuts, and the room is simply there, as it ends
+    if (!HOMEWARD.pup) buildPup();
+    if (BOSS.on) command({ boss: false }); HOMEWARD.pup.visible = false;
+    FAR.to = 0; FAR.k = 0; if (FAR.built) { FAR.g.position.y = 0; FAR.g.scale.y = 1; }
+    command({ day: 2, time: 8.5, lamp: false, ceil: false, objects: ["chick", "camera", "pager", "iccard", "tape", "dictionary", "calculator", "phone"] });
+    HOMEWARD.at = performance.now() / 1000 - HOMEWARD.S - 1; HOMEWARD.told = true; try { window.parent.postMessage({ source: "nt-room", type: "home" }, "*"); } catch {}
+    return; }
   if (HOMEWARD.at || !BOSS.on || !FAR.built) return;
   if (!HOMEWARD.pup) buildPup();
   HOMEWARD.at = performance.now() / 1000; HOMEWARD.told = false; BOSS.to = 0; BOSS.ring = false; BOSS.until = 0; BOSS.rising = 0;
 }
 function updateHome(s) {
   if (!HOMEWARD.at) return;
+  if (HOMEWARD.pup && HOMEWARD.pup.visible) HOMEWARD.pup.rotation.y = Math.atan2(camera.position.x - HOMEWARD.pup.position.x, camera.position.z - HOMEWARD.pup.position.z); // a cut-out: it keeps its face to the eye
   const T = s - HOMEWARD.at;
   if (BOSS.on) { BOSS.r = 1 - smooth(1.4, 5.6, T); if (T > 5.6) { BOSS.on = false; BOSS.leave = false; command({ day: 2, time: 8.5, lamp: false, ceil: false, objects: ["chick", "camera", "pager", "iccard", "tape", "dictionary", "calculator", "phone"] }); /* all of them carried home, on the desk */ FAR.to = 0.56; FAR.k = 0.56; } } // the head goes down; then the room is there, and it is morning in it
   if (!BOSS.on) FAR.to = 0.56 * (1 - smooth(6.4, HOMEWARD.S - 0.6, T)); // and the eye comes home
@@ -3402,7 +3410,7 @@ function command(m) {
   if (m.rise) bossEvent("rise");
   if (m.leave) bossEvent("leave");
   if (m.peek !== undefined) PEEK = m.peek;
-  if (m.home != null) home(!!m.home);
+  if (m.home != null) home(m.home === "cut" ? "cut" : !!m.home);
   if (m.kuro != null && HOMEWARD.pup) HOMEWARD.pup.visible = !!m.kuro && !!HOMEWARD.at; // { kuro: true }: only now is he on the bed (her order: the things on the desk → 「点个外卖吧」 in the ear → then he is seen). Posts nothing.
   if (m.rush && CON.at && CON.told && !CON.rush) CON.rush = performance.now() / 1000; // only once the whole of him has been seen ("eye")
   if (m.greatLook != null) CON.look = m.greatLook;
