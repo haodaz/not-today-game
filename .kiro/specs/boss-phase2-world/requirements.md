@@ -92,7 +92,7 @@ classes, with plain placeholder rules.
 
 ## R5 — Fallbacks
 
-- No `ready` within 8 s of the fight's start: phase 2 plays as today (the stage-2 picture, no
+- No `ready` within 15 s of the fight's start (the intro lines take longer than that to read): phase 2 plays as today (the stage-2 picture, no
   frame); one `console.warn`.
 - `prefers-reduced-motion`: the dislocation is a 600 ms cross-fade (no roll); the holds are the
   same.

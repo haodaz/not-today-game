@@ -29,7 +29,7 @@ export const PHASE2 = {
   DISLOCATE_NET_MS: 500,
   RISE_NET_MS: 1000,
   /** R5: no `ready` this long after the fight's start: phase 2 plays as before, with no frame. */
-  READY_NET_MS: 8000,
+  READY_NET_MS: 15000,
   /** R5: reduced motion: the dislocation is a cross-fade this long, no roll. */
   REDUCED_FADE_MS: 600,
 } as const;
