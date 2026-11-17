@@ -1,7 +1,10 @@
 // Day 18's boss fight (author 2026-11-13): after the pull-out shows the whole room as a point and the
 // huge Kuro around it, the fight — an ATB battle, side-scrolling, Grandia-style: every fighter has a
 // gauge that fills with time; full, the player picks a move (the party's objects and Q-Kuro act on
-// their own); the move plays its effect; the boss acts when its own gauge fills. The boss is the
+// their own); the move plays its effect; the boss acts when its own gauge fills. Author 2026-11-16:
+// the old objects are commanded too (「其他老物件不能选择怎么操作，都是自动施法」) — each has two moves and
+// waits for a choice like the player — and every move says what it does on its command
+// (「出招都没写效果」): the effect is a rule here and a line there. The boss is the
 // tentacled black dragon-thing (stage 1), then the mass of tentacles and eyes with half a face
 // (stage 2, under half its HP). Party: the player's look (he / she / none) in full-body sprites, the
 // old objects still in their original state (an upgraded one is assimilated and cannot fight beside
@@ -24,7 +27,26 @@ export type Pose = "stance" | "strike" | "throw" | "flip" | "hurt";
 export type Fx = "throw" | "flip" | "strike" | "shake" | "flash" | "heal" | "none";
 export type Phase = "intro" | "run" | "choose" | "act" | "won" | "lost" | "after";
 
-export interface Move { readonly id: string; readonly power: number; readonly acc: number; readonly fx: Fx; readonly all?: boolean; readonly heal?: number; readonly dodge?: boolean; readonly pose?: Pose }
+/**
+ * A move: damage (`power` > 0), or one of the status effects — `heal` (n, on the player; `healAll`
+ * on everyone standing), `dodge` (the next hit on you is slipped), `haste` (the player's gauge, or
+ * everyone's, jumps ahead by `haste`), `stun` (the boss's gauge back to empty). Every move has a
+ * stated effect line (`boss.eff.<who>.<id>`) that says exactly this.
+ */
+export interface Move {
+  readonly id: string;
+  readonly power: number;
+  readonly acc: number;
+  readonly fx: Fx;
+  readonly all?: boolean;
+  readonly heal?: number;
+  readonly healAll?: boolean;
+  readonly dodge?: boolean;
+  readonly haste?: number;
+  readonly hasteAll?: boolean;
+  readonly stun?: boolean;
+  readonly pose?: Pose;
+}
 export interface Member {
   readonly id: string;
   readonly kind: "player" | "object" | "qkuro";
@@ -77,15 +99,16 @@ export const PLAYER_MOVES: readonly Move[] = [
   { id: "dodge", power: 0, acc: 100, fx: "none", dodge: true },
   { id: "heal", power: 0, acc: 100, fx: "heal", heal: 34 },
 ];
-const OBJECT_MOVES: Readonly<Record<string, Move>> = {
-  chick: { id: "chick", power: 16, acc: 100, fx: "strike" },
-  pager: { id: "pager", power: 14, acc: 100, fx: "shake" },
-  camera: { id: "camera", power: 12, acc: 100, fx: "flash" },
-  tape: { id: "tape", power: 0, acc: 100, fx: "heal", heal: 22 },
-  dictionary: { id: "dictionary", power: 18, acc: 90, fx: "strike" },
-  calculator: { id: "calculator", power: 20, acc: 85, fx: "strike" },
-  iccard: { id: "iccard", power: 10, acc: 100, fx: "strike" },
-  phone: { id: "phone", power: 15, acc: 100, fx: "shake" },
+/** Each old object's two moves: one hit and one that does something else, so the choice is a choice. */
+export const OBJECT_MOVES: Readonly<Record<string, readonly Move[]>> = {
+  chick: [{ id: "chick.peck", power: 16, acc: 100, fx: "strike" }, { id: "chick.hype", power: 0, acc: 100, fx: "shake", haste: 0.6 }],
+  pager: [{ id: "pager.buzz", power: 14, acc: 100, fx: "shake" }, { id: "pager.page", power: 0, acc: 100, fx: "shake", haste: 0.3, hasteAll: true }],
+  camera: [{ id: "camera.shutter", power: 12, acc: 100, fx: "flash" }, { id: "camera.flash", power: 0, acc: 100, fx: "flash", stun: true }],
+  tape: [{ id: "tape.rewind", power: 0, acc: 100, fx: "heal", heal: 22 }, { id: "tape.play", power: 0, acc: 100, fx: "heal", heal: 10, healAll: true }],
+  dictionary: [{ id: "dictionary.lookup", power: 18, acc: 90, fx: "strike" }, { id: "dictionary.slam", power: 28, acc: 65, fx: "strike" }],
+  calculator: [{ id: "calculator.sum", power: 20, acc: 85, fx: "strike" }, { id: "calculator.clear", power: 0, acc: 100, fx: "flash", stun: true }],
+  iccard: [{ id: "iccard.swipe", power: 10, acc: 100, fx: "strike" }, { id: "iccard.topup", power: 0, acc: 100, fx: "heal", heal: 15 }],
+  phone: [{ id: "phone.ring", power: 15, acc: 100, fx: "shake" }, { id: "phone.call", power: 0, acc: 100, fx: "shake", haste: 0.5 }],
 };
 const QKURO_MOVES: readonly Move[] = [{ id: "bark", power: 20, acc: 100, fx: "shake" }, { id: "lick", power: 0, acc: 100, fx: "heal", heal: 18 }];
 const BOSS_MOVES_1: readonly Move[] = [{ id: "tentacle", power: 28, acc: 95, fx: "strike" }, { id: "gaze", power: 15, acc: 100, fx: "shake", all: true }];
@@ -99,7 +122,7 @@ export function bossStart(state: State, ending: BossEnding, nowMs: number, seed 
   const qkuroAllowed = !strong && state.affinity >= (constants.affinityThreshold as number);
   const hard = ending === "survive" && !qkuroAllowed;
   const player: Member = { id: "player", kind: "player", hp: strong ? PLAYER_HP * 2 : PLAYER_HP, max: strong ? PLAYER_HP * 2 : PLAYER_HP, atk: strong ? 4 : 1, spd: strong ? 900 : 2600, gauge: 0, pose: "stance", guard: false, moves: PLAYER_MOVES };
-  const objects: Member[] = (state.found as string[]).filter((id) => state.upgraded[id] !== true && OBJECT_MOVES[id]).map((id) => ({ id, kind: "object" as const, hp: 40, max: 40, atk: 1, spd: 3600, gauge: 0, pose: "stance" as const, guard: false, moves: [OBJECT_MOVES[id]!] }));
+  const objects: Member[] = (state.found as string[]).filter((id) => state.upgraded[id] !== true && OBJECT_MOVES[id]).map((id) => ({ id, kind: "object" as const, hp: 40, max: 40, atk: 1, spd: 3600, gauge: 0, pose: "stance" as const, guard: false, moves: OBJECT_MOVES[id]! }));
   // hard (survive, low affinity; tuned by simulation 2026-11-12: ~half the fights with three objects, most with eight)
   const boss: BossSide = { hp: BOSS_HP, max: BOSS_HP, atk: hard ? 1.1 : 1, spd: hard ? 3000 : 3200, gauge: 0, stage: 1 };
   const intro = strong ? [S("boss.intro.strong1"), S("boss.intro.strong2"), S("boss.intro.go")] : [S("boss.intro.1"), S("boss.intro.2"), S("boss.intro.me"), S("boss.intro.go")];
@@ -110,6 +133,10 @@ export function bossStart(state: State, ending: BossEnding, nowMs: number, seed 
 const alive = (m: Member): boolean => m.hp > 0;
 const name = (b: BossBattle, id: string): string => (id === "boss" ? S("boss.name") : id === "player" ? S("boss.party.player") : id === "qkuro" ? S("boss.party.qkuro") : S(`boss.party.${id}`));
 const moveName = (who: string, move: Move): string => S(who === "boss" ? `boss.move.boss.${move.id}` : who === "player" ? `boss.move.${move.id}` : who === "qkuro" ? `boss.move.qkuro.${move.id}` : `boss.move.obj.${move.id}`);
+/** What the move does, in one line, as the command shows it (the rule in partyAct is the same thing). */
+export const moveEffect = (who: string, move: Move): string => S(who === "player" ? `boss.eff.${move.id}` : `boss.eff.obj.${move.id}`);
+/** The status a move carries, for the field's data-eff (the fx layer reads it). */
+export const effectKind = (move: Move): string => (move.dodge ? "dodge" : move.stun ? "stun" : move.haste ? (move.hasteAll ? "haste-all" : "haste") : move.heal ? (move.healAll ? "heal-all" : "heal") : "hit");
 
 /** A party move on the boss (or on the party, healing / guarding): the act, with its text and the sides after it. */
 function partyAct(b: BossBattle, who: Member, move: Move, nowMs: number, roll: () => number): BossBattle {
@@ -120,9 +147,17 @@ function partyAct(b: BossBattle, who: Member, move: Move, nowMs: number, roll: (
   if (move.dodge) {
     party = party.map((m) => (m.id === who.id ? { ...m, guard: true } : m));
     text.push(S("boss.dodge", { who: name(b, who.id) }));
+  } else if (move.stun) {
+    boss = { ...boss, gauge: 0 };
+    text.push(S("boss.stun"));
+  } else if (move.haste) {
+    const n = move.haste;
+    const all = move.hasteAll === true;
+    party = party.map((m) => (alive(m) && m.id !== who.id && (all || m.id === "player") ? { ...m, gauge: Math.min(1, m.gauge + n) } : m));
+    text.push(S("boss.haste", { who: all ? S("boss.party.all") : S("boss.party.player") }));
   } else if (move.heal) {
     const n = move.heal;
-    const all = who.kind === "qkuro";
+    const all = who.kind === "qkuro" || move.healAll === true;
     party = party.map((m) => (alive(m) && (all || m.id === "player") ? { ...m, hp: Math.min(m.max, m.hp + n) } : m));
     text.push(S("boss.healed", { who: all ? S("boss.party.all") : S("boss.party.player"), n: String(n) }));
     hits.push({ id: "player", n: -n });
@@ -189,17 +224,19 @@ export function bossTick(b: BossBattle, nowMs: number): BossBattle {
   const ready = party.find((m) => alive(m) && m.gauge >= 1);
   if (!ready) return next;
   if (ready.kind === "player") return { ...next, phase: "choose", chooser: "player", log: S("boss.choose") };
-  const move = ready.kind === "qkuro" ? ready.moves[b.turn % ready.moves.length]! : ready.moves[0]!;
+  // the old objects wait for a choice as the player does (author 2026-11-16); Q-Kuro acts by itself
+  if (ready.kind === "object") return { ...next, phase: "choose", chooser: ready.id, log: S("boss.choose.obj", { who: name(b, ready.id) }) };
+  const move = ready.moves[b.turn % ready.moves.length]!;
   return partyAct(next, ready, move, nowMs, roll);
 }
 
-/** The player's choice. */
+/** The choice for whoever is up (the player or one of the old objects): one of their own moves. */
 export function bossChoose(b: BossBattle, moveId: string, nowMs: number): BossBattle {
-  if (b.phase !== "choose") return b;
-  const player = b.party.find((m) => m.id === "player")!;
-  const move = player.moves.find((m) => m.id === moveId);
-  if (!move) return b;
-  return partyAct(b, player, move, nowMs, dice(`${b.seed}:${String(b.turn)}`));
+  if (b.phase !== "choose" || b.chooser === null) return b;
+  const who = b.party.find((m) => m.id === b.chooser);
+  const move = who?.moves.find((m) => m.id === moveId);
+  if (!who || !move) return b;
+  return partyAct(b, who, move, nowMs, dice(`${b.seed}:${String(b.turn)}`));
 }
 
 /** A click on the text box: the next intro line (the last starts the fight), or the next outro line (the last ends it: `after`). */
@@ -274,7 +311,6 @@ const spriteOf = (b: BossBattle, m: Member, pose: Pose): string =>
 
 export function renderBoss(b: BossBattle, nowMs: number): SafeHtml {
   const acting = b.act && nowMs - b.act.at < ACT_MS ? b.act : null;
-  const player = b.party.find((m) => m.id === "player")!;
   const hitOf = (id: string) => acting?.hits.find((h) => h.id === id);
   // the statuses, top row: open for the one whose turn it is (or acting), the rest compact until the pointer
   const plates = b.party.map((m) => {
@@ -309,11 +345,13 @@ export function renderBoss(b: BossBattle, nowMs: number): SafeHtml {
   // camera pulls out once more — behind everything, a far larger Kuro
   const tentacle = over ? html`<img class="bs-tentacle" src="/room/dark/tentacles.png" alt="">` : null;
   const giant = html`<div class="bs-giant"></div>`;
-  const field = html`<div class="bs-field"><div class="bs-ground"></div><div class="${cls("bs-party", b.phase === "after" && b.strong && "crossed")}">${members}</div>${boss}${tentacle}${prop}${flash}</div>`;
+  const field = html`<div class="bs-field"${acting ? html` data-move="${acting.move.id}" data-eff="${effectKind(acting.move)}" data-who="${acting.who}"` : null}><div class="bs-ground"></div><div class="${cls("bs-party", b.phase === "after" && b.strong && "crossed")}">${members}</div>${boss}${tentacle}${prop}${flash}</div>`;
   // the boss's bar: one full-width bar at the very bottom
   const pct = Math.round((100 * Math.max(0, b.boss.hp)) / b.boss.max);
   const bossbar = html`<div class="${cls("bs-bossbar", `stage${String(b.boss.stage)}`)}"><span class="bs-name">${S("boss.name")}</span>${bar(b.boss.hp, b.boss.max, "hp")}<span class="bs-pct">${String(pct)}%</span></div>`;
-  const menu = b.phase === "choose" ? html`<div class="bs-menu">${player.moves.map((m) => html`<button type="button" class="bs-cmd" data-action="boss-move" data-move="${m.id}">${moveName("player", m)}</button>`)}</div>` : null;
+  // the commands: whoever is up (the player or an old object) and their moves, each with what it does
+  const chooser = b.phase === "choose" && b.chooser !== null ? b.party.find((m) => m.id === b.chooser) ?? null : null;
+  const menu = chooser ? html`<div class="${cls("bs-menu", chooser.kind)}" data-owner="${chooser.id}"><span class="bs-menu-h">${name(b, chooser.id)}</span>${chooser.moves.map((m) => html`<button type="button" class="${cls("bs-cmd", effectKind(m))}" data-action="boss-move" data-move="${m.id}"><b class="bs-cmd-name">${moveName(chooser.id, m)}</b><span class="bs-cmd-eff">${moveEffect(chooser.id, m)}</span></button>`)}</div>` : null;
   const clickable = b.phase === "intro" || b.phase === "won";
   const box = b.phase === "lost"
     ? html`<div class="bs-box"><p>${b.log}</p><button type="button" class="bs-cmd" data-action="boss-retry">${S("boss.retry")}</button></div>`

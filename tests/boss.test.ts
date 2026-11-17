@@ -46,7 +46,7 @@ describe("the boss fight", () => {
   it("the intro reads through to the fight; gauges fill on the clock; the player's full gauge waits for a choice; a move hurts the boss and plays for ACT_MS", () => {
     setLocale("zh");
     // high affinity: not the hard fight, so the player's gauge (2600 ms) fills before the boss's (3200)
-    let b = bossStart(withState({ affinity: 100 }), "survive", 0);
+    let b = bossStart(withState({ affinity: 100, found: ["chick", "camera", "pager"] as State["found"] }), "survive", 0);
     b = bossNext(b, 0); b = bossNext(b, 0); b = bossNext(b, 0);
     expect(b.phase).toBe("intro");
     b = bossNext(b, 1000);
@@ -57,6 +57,8 @@ describe("the boss fight", () => {
     expect(r.b.chooser).toBe("player");
     expect(r.b.party[0]!.gauge).toBe(1);
     expect(renderBoss(r.b, r.now).value).toContain('data-action="boss-move" data-move="throw"');
+    // every command says what it does (author 2026-11-16)
+    expect(renderBoss(r.b, r.now).value).toContain(`<span class="bs-cmd-eff">${t("boss.eff.dodge")}</span>`);
     const hp0 = r.b.boss.hp;
     const acted = bossChoose(r.b, "strike", r.now);
     expect(acted.phase).toBe("act");
@@ -68,6 +70,27 @@ describe("the boss fight", () => {
     // 装死: the next hit on the player misses
     const dodge = bossChoose({ ...r.b }, "dodge", r.now);
     expect(dodge.party[0]!.guard).toBe(true);
+    // an object's full gauge waits for a choice too (author 2026-11-16: 「不能选择怎么操作，都是自动施法」)
+    const objReady: BossBattle = { ...acted, phase: "run", act: null, clockAt: r.now + ACT_MS, party: acted.party.map((m) => ({ ...m, gauge: m.id === "camera" ? 0.999 : 0 })), boss: { ...acted.boss, gauge: 0.2 } };
+    const objChoose = bossTick(objReady, r.now + ACT_MS + 100);
+    expect(objChoose.phase).toBe("choose");
+    expect(objChoose.chooser).toBe("camera");
+    const menu = renderBoss(objChoose, r.now + ACT_MS + 100).value;
+    expect(menu).toContain('class="bs-menu object" data-owner="camera"');
+    expect(menu).toContain('data-move="camera.shutter"');
+    expect(menu).toContain(`<span class="bs-cmd-eff">${t("boss.eff.obj.camera.flash")}</span>`);
+    expect(bossChoose(objChoose, "throw", r.now + ACT_MS + 100)).toBe(objChoose); // not the camera's move
+    // 闪光: the boss's gauge back to empty; the act names its effect for the fx layer
+    const flashed = bossChoose(objChoose, "camera.flash", r.now + ACT_MS + 100);
+    expect(flashed.phase).toBe("act");
+    expect(flashed.boss.gauge).toBe(0);
+    expect(flashed.act?.text).toContain(t("boss.stun"));
+    expect(renderBoss(flashed, r.now + ACT_MS + 100).value).toContain('data-move="camera.flash" data-eff="stun" data-who="camera"');
+    // 打鸡血: the player's gauge jumps ahead
+    const chickReady: BossBattle = { ...objReady, party: objReady.party.map((m) => ({ ...m, gauge: m.id === "chick" ? 1 : 0.2 })) };
+    const hyped = bossChoose(bossTick(chickReady, r.now + ACT_MS + 100), "chick.hype", r.now + ACT_MS + 100);
+    expect(hyped.party[0]!.gauge).toBeGreaterThanOrEqual(0.8); // 0.2 + the tick + 0.6
+    expect(hyped.party.find((m) => m.id === "chick")!.gauge).toBe(0);
     // the boss's own gauge: it acts by itself and hurts someone
     const ready: BossBattle = { ...bossTick(acted, r.now + ACT_MS), boss: { ...acted.boss, gauge: 0.999 }, party: acted.party.map((m) => ({ ...m, gauge: 0 })) };
     const hit = bossTick(ready, r.now + ACT_MS + 100);
