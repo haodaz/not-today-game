@@ -30,18 +30,21 @@ import { gradedInLog, gradeGame, noteTally, tallyField } from "./grades";
 import { assistChip, gameChip, gameChipAfter, MINES_LOSE_AFTER_MS, spotFoundChip, type GameChipFrom } from "./game-sfx";
 import { TETRIS_DONE_MS, TETRIS_FLASH_MS, tetrisDropMs, tetrisKey, tetrisRoll, tetrisSolve, tetrisStart, tetrisTick, type TetrisGame, type TetrisKey } from "./tetris";
 import { RHYTHM_DONE_MS, RHYTHM_TICK_MS, rhythmPause, rhythmResume, rhythmRoll, rhythmSolve, rhythmStart, rhythmSweep, rhythmTap, rhythmWords } from "./rhythm";
-import { GACHA_DONE_MS, GACHA_TURN_MS, gachaOpen, gachaRoll, gachaStart, gachaTurn } from "./gacha";
 import { BALANCE_DONE_MS, BALANCE_TICK_MS, balanceBlocks, balanceDrop, balancePause, balanceResume, balanceSolve, balanceStart } from "./balance";
 import { FILL_DONE_MS, FILL_GROW_MS, fillDrop, fillKuro, fillLift, fillNext, fillPick, fillPlace, fillRecord, fillRotate, fillSolveRound, fillStart, fillStuck, fillTarget, type FillBoard, type FillGame, type FillPick } from "./fill";
 import type { FillPerson } from "@state/days/tasks";
 import { SOKOBAN_DONE_MS, sokobanMove, sokobanSolve, sokobanStart, sokobanUndo, type Dir } from "./sokoban";
+import { KLOTSKI_DONE_MS, KLOTSKI_SLIDE_MS, klotskiCard, klotskiPick, klotskiPush, klotskiSolve, klotskiStart, klotskiUndo, type KlotskiDir, type KlotskiGame } from "./klotski";
+import { ECHO_DONE_MS, ECHO_LIT_MS, echoAgain, echoSolve, echoStart, echoTap, echoVoiceTimes, listenMs, type EchoGame } from "./echo";
+import { grade as nonogramGrade, NONO_FLASH_MS, NONO_REVEAL_MS, nonogramRevealed, nonogramSolve, nonogramStart, nonogramTap } from "./nonogram";
+import type { ChipId } from "@world/sound/chip";
 import { MOLES_DONE_MS, MOLES_TICK_MS, molesPause, molesResume, molesRoll, molesSolve, molesStart, molesSweep, molesTap } from "./moles";
 import { PORTRAIT_FILES } from "@world/dialogue/box";
 import { PAC_DONE_MS, PAC_TICK_MS, pacPause, pacResume, pacSolve, pacStart, pacTick, pacTurn, type Dir as PacDir } from "./pacman";
 import { SPOT_SHAKE_MS } from "./spot";
 import type { ActionContext, ActionHandler } from "../controller";
 import type { AppContext, Session } from "../model";
-import { openWork } from "./work";
+import { handInSideGame, openWork } from "./work";
 import { openObjectFromBar } from "./objbar";
 import { lockReading } from "./lockread";
 import { pressKey } from "@world/objects/index";
@@ -486,6 +489,51 @@ function currentBoard(ctx: ActionContext): { task: Task; board: TaskBoard } | nu
 
 const stateOf = (ctx: ActionContext, task: Task, board: TaskBoard): BoardState =>
   boardState(board, ctx.store.getState().day, task.id, ctx.store.getEvents());
+
+/** game-swaps §3: today's open plain task with a side game, while its stage is up and it is not handed in. */
+function currentSide(ctx: ActionContext): { task: Task; game: NonNullable<Task["game"]> } | null {
+  const state = ctx.store.getState();
+  const task = openWork(state, ctx.store.getEvents())?.tree;
+  if (!task?.game || task.board || state.flags.includes(task.done)) return null;
+  if (ctx.session.workShow !== `${String(state.day)}:${task.id}`) return null;
+  return { task, game: task.game };
+}
+
+/**
+ * klotski: the block is out. Its card takes the form's slot (a `fill`, which overwrites whatever was
+ * there, Kuro's fill included, and fires the content's `fill:<slot>:<card>` beat), then the form is
+ * approved. The re-renders bring the tentacle after the slide and the form after the hold.
+ */
+function klotskiOut(ctx: ActionContext, c: { task: Task; board: TaskBoard }, g: KlotskiGame): KlotskiGame {
+  const game = c.board.game as Extract<NonNullable<TaskBoard["game"]>, { kind: "klotski" }>;
+  const card = klotskiCard(game, g);
+  const s = stateOf(ctx, c.task, c.board);
+  if (card !== null && s.slots[game.slot] !== card) ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "fill", slot: game.slot, card } });
+  ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+  ctx.later(KLOTSKI_SLIDE_MS + 20, ctx.rerender);
+  ctx.later(KLOTSKI_DONE_MS + 20, ctx.rerender);
+  return { ...g, approvedAt: ctx.now?.() ?? Date.now() };
+}
+
+/**
+ * echo: the round's voices from `g.listenAt` — a tone per voice as it lights (pitch by its seat, a
+ * thud for the empty one) and the re-renders that light and darken the seats, then hand it over. A
+ * voice whose round was replaced (重来, the next round) stays silent.
+ */
+function echoListen(ctx: ActionContext, game: Extract<NonNullable<TaskBoard["game"]>, { kind: "echo" }>, g: EchoGame): void {
+  const now = ctx.now?.() ?? Date.now();
+  const base = Math.max(0, g.listenAt - now);
+  const same = () => { const e = ctx.session.echo; return !!e && e.key === g.key && e.round === g.round && e.listenAt === g.listenAt && !e.wrong; };
+  echoVoiceTimes(g.round).forEach((at, i) => {
+    ctx.later(base + at, () => {
+      if (!same()) return;
+      ctx.chip?.(game.voices[i]!.line === "" ? "thud" : (`note${String(i % 8)}` as ChipId));
+      ctx.rerender();
+    });
+    ctx.later(base + at + ECHO_LIT_MS, () => { if (same()) ctx.rerender(); });
+  });
+  ctx.later(base + listenMs(g.round) + 20, () => { if (same()) ctx.rerender(); });
+}
 
 /**
  * The automatic unlock (object-upgrade 2026-11-03): when the board task is open and its lock needs
@@ -1080,53 +1128,6 @@ const actions: Record<string, ActionHandler> = {
     ctx.later(RHYTHM_DONE_MS + 20, ctx.rerender);
     ctx.rerender();
   },
-  // gacha (author 2026-11-13): the callers as eggs; the crank turns once; the egg opened approves the form
-  "gacha-start"(ctx) {
-    const c = currentBoard(ctx);
-    if (c?.board.game?.kind !== "gacha") return;
-    if (stateOf(ctx, c.task, c.board).approved) return;
-    const attempt = Math.floor((ctx.now?.() ?? Date.now()) / 1000) % 1000;
-    ctx.session.gacha = gachaStart(c.task.id, c.board.game, gachaRoll(ctx.store.getRunId(), c.task.id, attempt));
-    ctx.rerender();
-  },
-  "gacha-turn"(ctx) {
-    const c = currentBoard(ctx);
-    const g = ctx.session.gacha?.key === c?.task.id ? ctx.session.gacha : null;
-    if (c?.board.game?.kind !== "gacha" || !g) return;
-    if (stateOf(ctx, c.task, c.board).approved) return;
-    const next = gachaTurn(g, stateOf(ctx, c.task, c.board).slots[g.slot], ctx.now?.() ?? Date.now());
-    if (next === g) return;
-    ctx.session.gacha = next;
-    ctx.later(GACHA_TURN_MS + 20, ctx.rerender);
-    ctx.rerender();
-  },
-  "gacha-open"(ctx) {
-    const c = currentBoard(ctx);
-    const g = ctx.session.gacha?.key === c?.task.id ? ctx.session.gacha : null;
-    if (c?.board.game?.kind !== "gacha" || !g) return;
-    if (stateOf(ctx, c.task, c.board).approved) return;
-    const now = ctx.now?.() ?? Date.now();
-    const next = gachaOpen(g, now);
-    if (next === g) return;
-    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
-    ctx.session.gacha = { ...next, approvedAt: now };
-    ctx.later(GACHA_DONE_MS + 20, ctx.rerender);
-    ctx.rerender();
-  },
-  // dev only: turned and opened at once (the replay driver)
-  "gacha-cheat"(ctx) {
-    if (!import.meta.env.DEV) return;
-    const c = currentBoard(ctx);
-    const g = ctx.session.gacha?.key === c?.task.id ? ctx.session.gacha : null;
-    if (c?.board.game?.kind !== "gacha" || !g) return;
-    if (stateOf(ctx, c.task, c.board).approved) return;
-    const now = ctx.now?.() ?? Date.now();
-    const turned = gachaTurn(g, stateOf(ctx, c.task, c.board).slots[g.slot], now - GACHA_TURN_MS - 1);
-    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
-    ctx.session.gacha = { ...turned, opened: true, approvedAt: now };
-    ctx.later(GACHA_DONE_MS + 20, ctx.rerender);
-    ctx.rerender();
-  },
   // balance (author 2026-11-13): the prices onto the pans from a swinging crane; level approves the form
   "balance-start"(ctx) {
     const c = currentBoard(ctx);
@@ -1213,6 +1214,75 @@ const actions: Record<string, ActionHandler> = {
     ctx.session.sokoban = sokobanUndo(g);
     ctx.rerender();
   },
+  // klotski (game-swaps §1): the callers as blocks; the one pushed out through the door is called back
+  "klotski-start"(ctx) {
+    const c = currentBoard(ctx);
+    if (c?.board.game?.kind !== "klotski" || stateOf(ctx, c.task, c.board).approved) return;
+    ctx.session.klotski = klotskiStart(c.task.id, c.board.game);
+    ctx.rerender();
+  },
+  "klotski-pick"(ctx, data) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.klotski?.key === c?.task.id ? ctx.session.klotski : null;
+    if (c?.board.game?.kind !== "klotski" || !g || typeof data.block !== "string") return;
+    ctx.session.klotski = klotskiPick(g, data.block);
+    ctx.rerender();
+  },
+  "klotski-push"(ctx, data) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.klotski?.key === c?.task.id ? ctx.session.klotski : null;
+    const dir = data.dir as KlotskiDir;
+    if (c?.board.game?.kind !== "klotski" || !g || !["up", "down", "left", "right"].includes(dir)) return;
+    if (stateOf(ctx, c.task, c.board).approved) return;
+    const next = klotskiPush(g, dir, ctx.now?.() ?? Date.now(), typeof data.block === "string" ? data.block : g.pick);
+    if (next === g) return;
+    ctx.session.klotski = next.done ? klotskiOut(ctx, c, next) : next;
+    ctx.rerender();
+  },
+  "klotski-undo"(ctx) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.klotski?.key === c?.task.id ? ctx.session.klotski : null;
+    if (c?.board.game?.kind !== "klotski" || !g) return;
+    ctx.session.klotski = klotskiUndo(g);
+    ctx.rerender();
+  },
+  // echo (game-swaps §2): the roll call, round by round; the seats in the order they reported
+  "echo-start"(ctx) {
+    const c = currentBoard(ctx);
+    if (c?.board.game?.kind !== "echo" || stateOf(ctx, c.task, c.board).approved) return;
+    const g = echoStart(c.task.id, ctx.now?.() ?? Date.now());
+    ctx.session.echo = g;
+    echoListen(ctx, c.board.game, g);
+    ctx.rerender();
+  },
+  "echo-tap"(ctx, data) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.echo?.key === c?.task.id ? ctx.session.echo : null;
+    if (c?.board.game?.kind !== "echo" || !g || stateOf(ctx, c.task, c.board).approved) return;
+    const now = ctx.now?.() ?? Date.now();
+    const next = echoTap(g, c.board.game, Number(data.i), now);
+    if (next === g) return;
+    if (next.done) {
+      ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+      ctx.session.echo = { ...next, approvedAt: now };
+      ctx.later(ECHO_DONE_MS + 20, ctx.rerender);
+    } else {
+      ctx.session.echo = next;
+      ctx.later(ECHO_LIT_MS + 20, ctx.rerender);
+      if (next.round > g.round) echoListen(ctx, c.board.game, next);
+    }
+    ctx.rerender();
+  },
+  "echo-again"(ctx) {
+    const c = currentBoard(ctx);
+    const g = ctx.session.echo?.key === c?.task.id ? ctx.session.echo : null;
+    if (c?.board.game?.kind !== "echo" || !g) return;
+    const next = echoAgain(g, ctx.now?.() ?? Date.now());
+    if (next === g) return;
+    ctx.session.echo = next;
+    echoListen(ctx, c.board.game, next);
+    ctx.rerender();
+  },
   // fill (day11-budget-fill): the budget buys shapes for the sheet's 要求 cells; four rounds approve the form
   "fill-start"(ctx) {
     const c = currentBoard(ctx);
@@ -1284,6 +1354,69 @@ const actions: Record<string, ActionHandler> = {
     ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
     ctx.session.sokoban = { ...sokobanSolve(g), approvedAt: ctx.now?.() ?? Date.now() };
     ctx.later(SOKOBAN_DONE_MS + 20, ctx.rerender);
+    ctx.rerender();
+  },
+  // dev only: the block the form wants out at once
+  "klotski-cheat"(ctx) {
+    if (!import.meta.env.DEV) return;
+    const c = currentBoard(ctx);
+    const g = ctx.session.klotski?.key === c?.task.id ? ctx.session.klotski : null;
+    if (c?.board.game?.kind !== "klotski" || !g || stateOf(ctx, c.task, c.board).approved) return;
+    const game = c.board.game;
+    const answer = c.board.slots.find((x) => x.id === game.slot)?.answer;
+    const id = Object.keys(game.blocks).find((k) => game.blocks[k]!.card === answer);
+    if (!id) return;
+    ctx.session.klotski = klotskiOut(ctx, c, klotskiSolve(g, id, ctx.now?.() ?? Date.now()));
+    ctx.rerender();
+  },
+  // dev only: every round repeated at once
+  "echo-cheat"(ctx) {
+    if (!import.meta.env.DEV) return;
+    const c = currentBoard(ctx);
+    const g = ctx.session.echo?.key === c?.task.id ? ctx.session.echo : null;
+    if (c?.board.game?.kind !== "echo" || !g || stateOf(ctx, c.task, c.board).approved) return;
+    ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+    ctx.session.echo = { ...echoSolve(g, c.board.game.voices.length), approvedAt: ctx.now?.() ?? Date.now() };
+    ctx.later(ECHO_DONE_MS + 20, ctx.rerender);
+    ctx.rerender();
+  },
+  // nonogram (game-swaps §3): a plain task's side game, on its stage after 自己做; the hand-in runs `self`
+  "nonogram-start"(ctx) {
+    const c = currentSide(ctx);
+    if (!c) return;
+    ctx.session.nonogram = nonogramStart(c.task.id, c.game);
+    ctx.chip?.("cursor");
+    ctx.rerender();
+  },
+  "nonogram-tap"(ctx, data) {
+    const c = currentSide(ctx);
+    const g = c && ctx.session.nonogram?.key === c.task.id ? ctx.session.nonogram : null;
+    if (!c || !g) return;
+    const now = ctx.now?.() ?? Date.now();
+    const next = nonogramTap(g, c.game, Number(data.i), now);
+    if (next === g) return;
+    ctx.session.nonogram = next;
+    if (next.mistakes > g.mistakes) ctx.later(NONO_FLASH_MS + 20, ctx.rerender);
+    if (next.done) ctx.later(NONO_REVEAL_MS + 20, ctx.rerender);
+    gameSound(ctx, "nonogram", g, next, { action: "nonogram-tap", data });
+    ctx.rerender();
+  },
+  "nonogram-hand"(ctx) {
+    const c = currentSide(ctx);
+    const g = c && ctx.session.nonogram?.key === c.task.id ? ctx.session.nonogram : null;
+    if (!c || !g || !nonogramRevealed(g, ctx.now?.() ?? Date.now())) return;
+    if (!handInSideGame(ctx, nonogramGrade(g))) return;
+    ctx.session.workShow = null;
+    ctx.rerender();
+  },
+  // dev only: the picture filled at once
+  "nonogram-cheat"(ctx) {
+    if (!import.meta.env.DEV) return;
+    const c = currentSide(ctx);
+    const g = c && ctx.session.nonogram?.key === c.task.id ? ctx.session.nonogram : null;
+    if (!c || !g || g.done) return;
+    ctx.session.nonogram = nonogramSolve(g, c.game, ctx.now?.() ?? Date.now());
+    ctx.later(NONO_REVEAL_MS + 20, ctx.rerender);
     ctx.rerender();
   },
   // whack-a-mole (author 2026-11-13): the audience's faces; three pages with enough heads up approve the form

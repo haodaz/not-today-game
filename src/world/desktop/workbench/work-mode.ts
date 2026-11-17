@@ -31,17 +31,22 @@ export interface WorkNow {
   readonly running: boolean;
 }
 
-export function workNow(state: State, events: readonly GameEvent[], session: Pick<Session, "launched">): WorkNow | null {
+export function workNow(state: State, events: readonly GameEvent[], session: Pick<Session, "launched" | "workShow">): WorkNow | null {
   const task = openWork(state, events)?.tree;
   if (!task) return null;
   const key = `${state.day}:${task.id}`;
   const done = state.flags.includes(task.done);
+  // game-swaps §3: a plain task's side game runs while its stage is up (自己做 opened it), to the hand-in
+  if (!task.board && task.game) {
+    const side = session.workShow === key && !done;
+    return { task, key, started: side, running: side };
+  }
   const started = task.board ? boardStarted(events, state.day, task.id, session) : false;
   return { task, key, started, running: !!task.board && started && !done };
 }
 
 /** A game runs now (started, not handed in). */
-export const gameRunning = (state: State, events: readonly GameEvent[], session: Pick<Session, "launched">): boolean => workNow(state, events, session)?.running ?? false;
+export const gameRunning = (state: State, events: readonly GameEvent[], session: Pick<Session, "launched" | "workShow">): boolean => workNow(state, events, session)?.running ?? false;
 
 /** Every work task of today's list is handed in. */
 export function allWorkDone(state: State, events: readonly GameEvent[]): boolean {
@@ -65,7 +70,7 @@ export interface WorkBar {
  * With no task open yet and work still to come, 开始工作 waits (disabled). 退出工作模式 is not there
  * while a game runs.
  */
-export function workBar(state: State, events: readonly GameEvent[], session: Pick<Session, "launched">): WorkBar {
+export function workBar(state: State, events: readonly GameEvent[], session: Pick<Session, "launched" | "workShow">): WorkBar {
   const now = workNow(state, events, session);
   const exit = !(now?.running ?? false);
   if (now) return { label: now.started ? "work.resume" : "work.start", enabled: true, exit };

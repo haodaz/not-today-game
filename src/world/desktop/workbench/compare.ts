@@ -27,12 +27,14 @@ import { linkApproving, linkStage } from "./link";
 import { snakeApproving, snakeStage } from "./snake";
 import { tetrisApproving, tetrisStage } from "./tetris";
 import { rhythmApproving, rhythmStage } from "./rhythm";
-import { gachaApproving, gachaStage } from "./gacha";
 import { balanceApproving, balanceStage } from "./balance";
 import { sokobanApproving, sokobanStage } from "./sokoban";
 import { fillApproving, fillStage } from "./fill";
 import { molesApproving, molesStage } from "./moles";
 import { pacApproving, pacStage } from "./pacman";
+import { klotskiApproving, klotskiStage } from "./klotski";
+import { echoApproving, echoStage } from "./echo";
+import { nonogramStage } from "./nonogram";
 import { spotFlipNote, spotPanes } from "./spot";
 import { tunePane } from "./shell";
 import { tuneStage } from "./tune-stage";
@@ -144,7 +146,15 @@ export function workLayer(ctx: { readonly state: State; readonly events: readonl
   const open = openWork(state, events);
   const task = open?.tree?.id === taskId ? open.tree : undefined;
   const board = task?.board;
-  if (!task || !board || state.flags.includes(task.done)) return null;
+  if (!task || state.flags.includes(task.done)) return null;
+  // game-swaps §3: a plain task's side game (自己做 opened it); its hand-in runs the task's self branch
+  if (!board && task.game?.kind === "nonogram") {
+    const fill = (x: string) => fillPlaceholders(x, state.names);
+    const head = html`<header class="wl-head"><span class="wl-title">${fill(task.title)}</span><span class="sp"></span></header>`;
+    const body = nonogramStage(task, task.game, session, nowMs, tr("board.send.workbench"));
+    return html`<div class="work-layer"><section class="${cls("work-stage", nowMs - session.workShownAt < WORK_IN_MS && "in")}" data-screen="nonogram" role="dialog" aria-modal="true" aria-label="${fill(task.title)}">${head}<div class="wl-body">${body}</div></section></div>`;
+  }
+  if (!board) return null;
   // Every other board kind (the tune, the table, the meeting, the old IDE) on the full stage too
   // (author 2026-11-12: 「凡是还挤在真实界面里的游戏操作先搬到全屏层，再逐天细调」): the board's own surface,
   // as the workbench drew it, inside the stage card.
@@ -228,6 +238,12 @@ function genericWorkLayer(c: { state: State; events: readonly GameEvent[]; sessi
   } else if (board.tune) {
     // tune stage (author 2026-11-12): the research-node screen, not the config pane and the preview
     body = tuneStage({ state, events, session, nowMs }, task, board);
+  } else if (board.game?.kind === "klotski" && (() => { const st = boardState(board, state.day, task.id, events); const slot = board.game.slot; return board.slots.every((x) => x.id === slot || x.id in st.slots) && (!st.approved || (session.klotski?.key === task.id && klotskiApproving(session.klotski, nowMs))); })()) {
+    // klotski (game-swaps §1): every slot but the caller filled — the callers as blocks, one out through the door
+    body = klotskiStage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs);
+  } else if (board.game?.kind === "echo" && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && (!st.approved || (session.echo?.key === task.id && echoApproving(session.echo, nowMs))); })()) {
+    // echo (game-swaps §2): the filled minutes' roll call, repeated round by round
+    body = echoStage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs);
   } else if (board.game?.kind === "pacman" && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && (!st.approved || (session.pacman?.key === task.id && pacApproving(session.pacman, nowMs))); })()) {
     // pac-man (author 2026-11-13): the filled minutes' meeting room as a maze, 老周's words the dots
     body = pacStage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs);
@@ -243,9 +259,6 @@ function genericWorkLayer(c: { state: State; events: readonly GameEvent[]; sessi
   } else if (board.game?.kind === "balance" && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && (!st.approved || (session.balance?.key === task.id && balanceApproving(session.balance, nowMs))); })()) {
     // balance (author 2026-11-13): the filled form's prices onto a scale from a swinging crane
     body = balanceStage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs);
-  } else if (board.game?.kind === "gacha" && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && (!st.approved || (session.gacha?.key === task.id && gachaApproving(session.gacha, nowMs))); })()) {
-    // gacha (author 2026-11-13): the filled form's callers as eggs in a capsule machine; one turn
-    body = gachaStage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs);
   } else if (board.game?.kind === "rhythm" && (() => { const st = boardState(board, state.day, task.id, events); return board.slots.every((x) => x.id in st.slots) && (!st.approved || (session.rhythm?.key === task.id && rhythmApproving(session.rhythm, nowMs))); })()) {
     // rhythm (author 2026-11-13): the filled form's report as a drum lane, the jargon on the beat
     body = rhythmStage(task, board, boardState(board, state.day, task.id, events), session, boardState(board, state.day, task.id, events).approved, nowMs);

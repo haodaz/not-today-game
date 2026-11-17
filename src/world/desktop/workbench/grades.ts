@@ -5,8 +5,9 @@ import type { BoardVerdict } from "@state/days/board";
 import type { GameEvent } from "@state/events";
 import type { TaskBoard } from "@state/days/tasks";
 import type { Session } from "../model";
+import { grade as echoGrade } from "./echo";
 import { grade as fillGrade, fillRecord } from "./fill";
-import { grade as gachaGrade } from "./gacha";
+import { grade as klotskiGrade } from "./klotski";
 import { grade as linkGrade } from "./link";
 import { grade as match3Grade } from "./match3";
 import { grade as minesGrade } from "./mines";
@@ -24,7 +25,7 @@ import { freshTally, type GameTally } from "./tally";
 /** The session field each action prefix plays in (the chain's actions are `stack-*`). */
 const FIELD: Readonly<Record<string, keyof Session>> = {
   link: "link", match3: "match3", snake: "snake", pacman: "pacman", mines: "mines", sokoban: "sokoban", tetris: "tetris",
-  pipes: "pipes", moles: "moles", rhythm: "rhythm", gacha: "gacha", stack: "chain", fill: "fill",
+  pipes: "pipes", moles: "moles", rhythm: "rhythm", stack: "chain", fill: "fill", klotski: "klotski", echo: "echo",
 };
 
 const own = <T extends { key: string }>(g: T | null | undefined, taskId: string): T | null => (g && g.key === taskId ? g : null);
@@ -63,11 +64,12 @@ export function gradeGame(board: TaskBoard, taskId: string, day: number, session
     case "pacman": { const g = own(session.pacman, taskId); return g ? pacGrade(g, t) : logged(); }
     case "mines": { const g = own(session.mines, taskId); return g ? minesGrade(g, t) : logged(); }
     case "sokoban": { const g = own(session.sokoban, taskId); return g ? sokobanGrade(g, game, t) : logged(); }
+    case "klotski": { const g = own(session.klotski, taskId); return g ? klotskiGrade(g, game, board.slots.find((x) => x.id === game.slot)?.answer, t) : logged(); }
+    case "echo": { const g = own(session.echo, taskId); return g ? echoGrade(g, t) : logged(); }
     case "tetris": { const g = own(session.tetris, taskId); return g ? tetrisGrade(g, t) : logged(); }
     case "pipes": { const g = own(session.pipes, taskId); return g ? pipesGrade(g, t) : logged(); }
     case "moles": { const g = own(session.moles, taskId); return g ? molesGrade(g, t) : logged(); }
     case "rhythm": { const g = own(session.rhythm, taskId); return g ? rhythmGrade(g, t) : logged(); }
-    case "gacha": { const g = own(session.gacha, taskId); return g ? gachaGrade(g, t) : logged(); }
     case "spot": return session.spotMiss?.key === `${String(day)}:${taskId}` ? spotGrade(session.spotMiss, t) : spotGrade(null, t);
     case "fill": {
       const g = own(session.fill, taskId);
@@ -88,11 +90,13 @@ export function noteTally(session: Session, taskId: string, action: string, befo
   const field = FIELD[prefix];
   if (!field) return;
   const t: GameTally = session.gameTally?.key === taskId ? session.gameTally : freshTally(taskId);
-  const prev = before as { key?: string; over?: boolean; pick?: number | null; left?: number } | null;
+  const prev = before as { key?: string; over?: boolean; done?: boolean; moves?: number; pick?: number | null; left?: number } | null;
   const was = prev && prev.key === taskId ? prev : null;
   const now = session[field] as { key?: string; pick?: number | null; left?: number; aware?: unknown } | null;
   let next = t;
-  if (action.endsWith("-start")) next = { ...next, starts: next.starts + 1, fails: next.fails + (was?.over ? 1 : 0) };
+  // klotski's 重排 is its start pressed over a board under way (game-swaps §1): a fail too
+  const restarted = prefix === "klotski" && !!was && !was.done && (was.moves ?? 0) > 0;
+  if (action.endsWith("-start")) next = { ...next, starts: next.starts + 1, fails: next.fails + (was?.over || restarted ? 1 : 0) };
   if (action.endsWith("-assist")) next = { ...next, assisted: true };
   // a second tile that did not join (the board's own surprise — the pair turning back — is not the player's)
   if (action === "link-tap" && was && now && now !== before && was.pick !== null && was.pick !== undefined && String(was.pick) !== data.i && now.left === was.left && !now.aware) next = { ...next, mistakes: next.mistakes + 1 };

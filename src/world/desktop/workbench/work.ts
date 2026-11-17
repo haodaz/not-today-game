@@ -15,6 +15,7 @@ import type { DayFile, Item } from "@state/days/table";
 import { dayFile } from "@state/days/table";
 import { taskByFlag, type Task, type TaskMark } from "@state/days/tasks";
 import type { TaskMode } from "@state/days/effects";
+import type { BoardVerdict } from "@state/days/board";
 import { canMark, eventMarks, hitWorth, isHidden, pensLeft, spotHit, type Mark } from "./marks";
 import { dictionaryTable } from "@state/hands";
 import type { GameEvent } from "@state/events";
@@ -519,6 +520,7 @@ function complete(
   missed: boolean,
   merge: boolean | null = null,
   marks: readonly { clause: number; hit: boolean }[] | null = null,
+  quality: BoardVerdict | null = null,
 ): void {
   if (open.item.done.kind !== "flag") return;
   ctx.session.work = null;
@@ -529,7 +531,20 @@ function complete(
     ...(missed ? { missed: true as const } : {}),
     ...(merge !== null ? { merge } : {}),
     ...(marks ? { marks } : {}),
+    ...(quality !== null ? { quality } : {}),
   });
+}
+
+/**
+ * game-swaps §3: a plain task's side game handed in — the task's `self` branch runs exactly as
+ * choosing 自己做 did before the game (its say, effects, flags), the `task` event carrying the game's
+ * grade. Only while 自己做 was chosen and the task is open; false otherwise.
+ */
+export function handInSideGame(ctx: ActionContext, quality: BoardVerdict): boolean {
+  const c = current(ctx);
+  if (!c || c.w.mode !== "self" || !c.open.tree?.game) return false;
+  complete(ctx, c.open, "self", false, null, null, quality);
+  return true;
 }
 
 // The board surface's actions (lock / fill / assist / print) are not spread in here: work.ts and
@@ -551,6 +566,13 @@ export const workActions: Record<string, ActionHandler> = {
     const mode = CHIPS.find((x) => x.mode === data.mode)?.mode;
     if (!c || !mode || c.w.mode !== null) return;
     c.w.mode = mode;
+    // game-swaps §3: 自己做 on a task with a side game opens its stage; the hand-in there runs `self`
+    if (mode === "self" && c.open.tree?.game) {
+      ctx.session.workShow = `${String(ctx.store.getState().day)}:${c.open.tree.id}`;
+      ctx.session.workShownAt = nowOf(ctx);
+      ctx.rerender();
+      return;
+    }
     if (!surfaceOf(c.open.tree)) return complete(ctx, c.open, mode, false);
     if (mode !== "self") {
       c.w.busyUntil = nowOf(ctx) + KURO_WORK_MS;

@@ -49,7 +49,7 @@ function boardDay(day: number): { store: Store; task: Task } {
   const task = boardTask(day);
   const item = itemOf(day, task);
   const store = storeAt(day, item);
-  if (workNow(store.getState(), store.getEvents(), { launched: new Set() })?.task.id !== task.id) completeUntil(store, "desk", { skip: [item] });
+  if (workNow(store.getState(), store.getEvents(), { launched: new Set(), workShow: null })?.task.id !== task.id) completeUntil(store, "desk", { skip: [item] });
   return { store, task };
 }
 function rig(store: Store, patch: Partial<Session> = {}) {

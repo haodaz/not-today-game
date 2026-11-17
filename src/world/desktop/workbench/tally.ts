@@ -6,7 +6,7 @@ import type { BoardVerdict } from "@state/days/board";
 export interface GameTally {
   /** The task the counts belong to (a new task starts a fresh tally). */
   readonly key: string;
-  /** Games started (gacha: the pulls). */
+  /** Games started. */
   readonly starts: number;
   /** Games lost and started again (a death, a mine, topped out, ran out…). */
   readonly fails: number;

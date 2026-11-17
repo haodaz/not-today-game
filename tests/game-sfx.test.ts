@@ -135,10 +135,24 @@ describe("gameChip: the table", () => {
     expect(chip("rhythm", g, { over: true }, { via: "clock" })).toBe("lose");
   });
 
-  it("gacha: the crank ticks; the capsule opened is the last, so it clears", () => {
-    const g = { turnedAt: null, picked: null, opened: false };
-    expect(chip("gacha", g, { turnedAt: 100, picked: 1 })).toBe("tick");
-    expect(chip("gacha", { ...g, turnedAt: 100, picked: 1 }, { opened: true })).toBe("clear");
+  it("klotski: a pick or a push ticks, the block out clears", () => {
+    const g = { pick: null, moves: 0, done: false };
+    expect(chip("klotski", g, { pick: "A" })).toBe("tick");
+    expect(chip("klotski", { ...g, pick: "A" }, { moves: 1 })).toBe("tick");
+    expect(chip("klotski", { ...g, pick: "A" }, { moves: 1, done: true })).toBe("clear");
+  });
+  it("echo: a right click is its seat's tone (the empty seat a thud), a wrong one buzzes, the last round clears", () => {
+    const g = { tap: null, fails: 0, done: false };
+    expect(chip("echo", g, { tap: { i: 2, at: 5, dark: false } })).toBe("note2");
+    expect(chip("echo", g, { tap: { i: 5, at: 5, dark: true } })).toBe("thud");
+    expect(chip("echo", g, { tap: { i: 1, at: 5, dark: false }, fails: 1 })).toBe("wrong");
+    expect(chip("echo", g, { tap: { i: 5, at: 5, dark: true }, done: true })).toBe("clear");
+  });
+  it("nonogram: a fill ticks, a wrong fill buzzes, the picture done clears", () => {
+    const g = { filled: [false, false], mistakes: 0, done: false };
+    expect(chip("nonogram", g, { filled: [true, false] })).toBe("tick");
+    expect(chip("nonogram", g, { mistakes: 1 })).toBe("wrong");
+    expect(chip("nonogram", g, { filled: [true, true], done: true })).toBe("clear");
   });
 
   it("spot: a wrong click is wrong; a difference found matches and the last clears (the pick, not a session field)", () => {
@@ -351,12 +365,6 @@ describe("the board plays them", () => {
     expect(r.played).toEqual(["cursor", "match"]);
   });
 
-  it("gacha (day 17): the crank ticks", () => {
-    const r = rig(17, "work", "task_d17_work");
-    r.act("gacha-start");
-    r.act("gacha-turn");
-    expect(r.played).toEqual(["cursor", "tick"]);
-  });
 
   it("with chip absent nothing throws", () => {
     const r = rig(12, "work", "task_d12_work");

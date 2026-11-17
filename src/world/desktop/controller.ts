@@ -640,6 +640,13 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
       actions["pacman-turn"]?.(ctx, { dir: pacDir } as unknown as DOMStringMap, target);
       return;
     }
+    // klotski (game-swaps §1): while the board is up with a block picked, the arrows / WASD push it.
+    const klDir = SNAKE_KEYS[e.key];
+    if (klDir && session.klotski && !session.klotski.done && session.klotski.pick !== null && session.workShow) {
+      e.preventDefault();
+      actions["klotski-push"]?.(ctx, { dir: klDir } as unknown as DOMStringMap, target);
+      return;
+    }
     // sokoban (2026-11-13): while the floor is up on the work page, the arrows / WASD push.
     const sokDir = SNAKE_KEYS[e.key];
     if (sokDir && session.sokoban && !session.sokoban.done && session.workShow) {

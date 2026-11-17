@@ -23,7 +23,9 @@ import { grade as tetris, tetrisNearTop } from "@world/desktop/workbench/tetris"
 import { grade as pipes, pipesLeaks, pipesSolve, pipesStart, pipesRoll } from "@world/desktop/workbench/pipes";
 import { grade as moles } from "@world/desktop/workbench/moles";
 import { grade as rhythm } from "@world/desktop/workbench/rhythm";
-import { grade as gacha } from "@world/desktop/workbench/gacha";
+import { grade as klotski } from "@world/desktop/workbench/klotski";
+import { grade as echo } from "@world/desktop/workbench/echo";
+import { grade as nonogram } from "@world/desktop/workbench/nonogram";
 import { grade as fill } from "@world/desktop/workbench/fill";
 import { grade as chain } from "@world/desktop/workbench/stack-stage";
 import { completeUntil } from "./complete-items";
@@ -103,10 +105,28 @@ describe("each engine's grade", () => {
     expect(rhythm({ done: true, notes: notes(6) })).toBe("flawed");
     expect(rhythm({ done: true, notes: notes(7) })).toBe("wrong");
   });
-  it("gacha: ≤ 3 pulls / ≤ 6 / more", () => {
-    expect(gacha({ opened: true }, tally({ starts: 3 }))).toBe("perfect");
-    expect(gacha({ opened: true }, tally({ starts: 6 }))).toBe("flawed");
-    expect(gacha({ opened: true }, tally({ starts: 7 }))).toBe("wrong");
+  it("klotski: the answer's block out in ≤ 30 / ≤ 60 / more; another block out or none wrong; help at best flawed", () => {
+    const game = { kind: "klotski" as const, slot: "r1", level: ["xNNy", "xNNy", "AABB", "CCDD", "s..t"], blocks: { A: { card: "c1", label: "a" }, C: { card: "d1", label: "c" } } };
+    expect(klotski({ out: "A", moves: 30 }, game, "c1", tally())).toBe("perfect");
+    expect(klotski({ out: "A", moves: 60 }, game, "c1", tally())).toBe("flawed");
+    expect(klotski({ out: "A", moves: 61 }, game, "c1", tally())).toBe("wrong");
+    expect(klotski({ out: "A", moves: 19 }, game, "c1", tally({ assisted: true }))).toBe("flawed");
+    expect(klotski({ out: "C", moves: 8 }, game, "c1", tally())).toBe("wrong");
+    expect(klotski({ out: null, moves: 3 }, game, "c1", tally())).toBe("wrong");
+  });
+  it("echo: rounds failed 0 / ≤ 2 / more; unfinished wrong", () => {
+    expect(echo({ done: true, fails: 0 }, tally())).toBe("perfect");
+    expect(echo({ done: true, fails: 2 }, tally())).toBe("flawed");
+    expect(echo({ done: true, fails: 3 }, tally())).toBe("wrong");
+    expect(echo({ done: true, fails: 0 }, tally({ assisted: true }))).toBe("flawed");
+    expect(echo({ done: false, fails: 0 }, tally())).toBe("wrong");
+  });
+  it("nonogram: mistakes 0 / ≤ 3 / more; unfinished wrong", () => {
+    expect(nonogram({ done: true, mistakes: 0 })).toBe("perfect");
+    expect(nonogram({ done: true, mistakes: 3 })).toBe("flawed");
+    expect(nonogram({ done: true, mistakes: 4 })).toBe("wrong");
+    expect(nonogram({ done: false, mistakes: 0 })).toBe("wrong");
+    expect(nonogram(null)).toBe("wrong");
   });
   it("fill: Kuro's fill wrong, the player's own perfect", () => {
     expect(fill({ done: true, kuro: false })).toBe("perfect");

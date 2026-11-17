@@ -1,8 +1,22 @@
 // pac-man (author 2026-11-13): day 7's minutes — the maze after the filled form; the maze parses, you
 // move tile by tile with a queued turn and stop at walls, dots and lines are eaten on the way, a
 // pellet frightens the ghosts and lets you eat them, a ghost catches you, the five lines are done.
+// game-swaps §2: day 7 moves to echo, pac-man stays as a module — the stage test plays it on day 7's
+// minutes board with an inline maze in place of the board's game (content is never read for it).
 import "./specimen";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+const FIXTURE = vi.hoisted(() => ({ maze: ["#######", "#1...2#", "#.#.#.#", "#o.P.G#", "#.#.#.#", "#3.4.5#", "#######"] }));
+vi.mock("@state/days/tasks", async (importOriginal) => {
+  const real = await importOriginal<typeof import("@state/days/tasks")>();
+  const raw = structuredClone((await import("@content/tasks/day-07.json")).default as any);
+  raw.tasks = raw.tasks.map((t: any) => (t.id === "task4" ? { ...t, board: { ...t.board, game: { kind: "pacman", maze: [...FIXTURE.maze] } } } : t));
+  const parsed = real.parseTaskFile(raw, "day-07.json");
+  const files = new Map(real.taskFiles);
+  files.set(7, parsed.tasks);
+  return { ...real, taskFiles: files, taskByFlag: (day: number, flag: string) => files.get(day)?.find((x: any) => x.done === flag) };
+});
+
 import { taskByFlag } from "@state/days/tasks";
 import { createStore } from "@state/store";
 import { boardState, canPrint } from "@state/days/board";
@@ -14,7 +28,7 @@ import { workLayer } from "@world/desktop/workbench/compare";
 import { setLocale, t } from "@world/i18n";
 import { completeUntil } from "./complete-items";
 
-const MAZE = ["#######", "#1...2#", "#.#.#.#", "#o.P.G#", "#.#.#.#", "#3.4.5#", "#######"];
+const MAZE = FIXTURE.maze;
 const GAME = { kind: "pacman" as const, maze: MAZE };
 
 /** Ticks of 80 ms from `from` until `pred` or `limit` ms. */
@@ -25,19 +39,13 @@ const run = (g: PacGame, from: number, pred: (x: PacGame) => boolean, limit = 60
 };
 
 describe("pac-man", () => {
-  it("day 7's board is a pac-man; a maze parses into walls, dots, lines, pellets, you and the ghosts' homes", () => {
-    const game = taskByFlag(7, "task_d7_4")!.board!.game!;
-    expect(game.kind).toBe("pacman");
+  it("a maze parses into walls, dots, lines, pellets, you and the ghosts' homes", () => {
     const m = parseMaze(MAZE);
     expect(m.cols).toBe(7);
     expect(m.lines).toEqual([1 * 7 + 1, 1 * 7 + 5, 5 * 7 + 1, 5 * 7 + 3, 5 * 7 + 5]);
     expect(m.powers).toEqual([3 * 7 + 1]);
     expect(m.you).toBe(3 * 7 + 3);
     expect(m.homes).toEqual([3 * 7 + 5]);
-    const big = parseMaze((game as Extract<typeof game, { kind: "pacman" }>).maze);
-    expect(big.lines).toHaveLength(5);
-    expect(big.homes.length).toBeGreaterThanOrEqual(3);
-    expect(big.powers).toHaveLength(2);
   });
 
   it("you move a tile at a time, turn at centres, queue a turn, stop at walls; dots and a line are eaten on the way", () => {

@@ -5,8 +5,10 @@
 // reads the DOM and never throws on a null side.
 import type { Session } from "../model";
 import type { ChipId } from "@world/sound/chip";
+import type { EchoGame } from "./echo";
 import type { FillGame } from "./fill";
-import type { GachaGame } from "./gacha";
+import type { KlotskiGame } from "./klotski";
+import type { NonogramGame } from "./nonogram";
 import type { LinkGrid } from "./link";
 import type { Match3Grid } from "./match3";
 import type { MinesGrid } from "./mines";
@@ -102,6 +104,25 @@ export function gameChip(field: keyof Session, before: unknown, after: unknown, 
       if (on < 0) return "wrong";
       return tick(y.moves !== x.moves);
     }
+    case "klotski": {
+      const x = b as unknown as KlotskiGame, y = a as unknown as KlotskiGame;
+      if (y.done && !x.done) return "clear";
+      return tick(y.moves !== x.moves || y.pick !== x.pick);
+    }
+    case "echo": {
+      const x = b as unknown as EchoGame, y = a as unknown as EchoGame;
+      if (y.done && !x.done) return "clear";
+      if (y.fails > x.fails) return "wrong";
+      // a right click lights its seat with the voice's own tone (the empty one: the thud)
+      if (y.tap && y.tap !== x.tap) return y.tap.dark ? "thud" : (`note${String(y.tap.i % 8)}` as ChipId);
+      return null;
+    }
+    case "nonogram": {
+      const x = b as unknown as NonogramGame, y = a as unknown as NonogramGame;
+      if (y.done && !x.done) return "clear";
+      if (y.mistakes > x.mistakes) return "wrong";
+      return tick(y.filled !== x.filled);
+    }
     case "tetris": {
       const x = b as unknown as TetrisGame, y = a as unknown as TetrisGame;
       if (y.done && !x.done) return "clear";
@@ -133,12 +154,6 @@ export function gameChip(field: keyof Session, before: unknown, after: unknown, 
       if (y.over && !x.over) return "lose";
       if (y.last && y.last !== x.last && (!x.last || y.last.at !== x.last.at || y.last.kind !== x.last.kind)) return y.last.kind === "good" ? "match" : "wrong";
       return null;
-    }
-    case "gacha": {
-      const x = b as unknown as GachaGame, y = a as unknown as GachaGame;
-      // the one capsule a game opens is the last: its opening ends the game
-      if (y.opened && !x.opened) return "clear";
-      return tick(y.turnedAt !== null && x.turnedAt === null);
     }
     case "spotMiss": {
       const x = b as unknown as SpotMiss, y = a as unknown as SpotMiss;

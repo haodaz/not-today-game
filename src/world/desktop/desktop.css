@@ -2215,36 +2215,6 @@ button.lk-cell:hover{transform:translateY(-2px);z-index:1}
 .mn.rh .mn-stamp{border-color:#F6B73C;color:#F6B73C}
 .mn.rh .pp-flowline{color:#cfc8ba}
 .mn.rh.lost .rh-lane{animation:bt-shake 460ms steps(6)}
-/* gacha (author 2026-11-13): the callers as eggs in a capsule machine; the crank turns once */
-.mn.gc{background:linear-gradient(160deg,#FFF4E3,#FFE1D6 55%,#F3E6FF)}
-.gc-main{padding:0 28px}
-.gc-machine{display:flex;flex-direction:column;align-items:center}
-.gc-dome{position:relative;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.9),rgba(255,255,255,.35) 45%,rgba(200,215,235,.45));border:6px solid #2b2f33;box-shadow:inset 0 -20px 40px rgba(0,0,0,.08),0 10px 30px rgba(0,0,0,.18);overflow:hidden}
-.gc-egg{position:absolute;width:64px;height:76px;border-radius:50% 50% 50% 50%/55% 55% 45% 45%;background:linear-gradient(180deg,hsl(var(--hue,20) 85% 62%) 0 52%,#fff 52%);box-shadow:inset -6px -8px 0 rgba(0,0,0,.08),0 4px 8px rgba(0,0,0,.18);display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px;box-sizing:border-box;border:0;font:inherit}
-.gc-egg b{font-size:13px;font-weight:900;color:#1d2129;letter-spacing:.05em}
-.gc-egg.blank{background:linear-gradient(180deg,#d8d4cc 0 52%,#fff 52%)}
-.gc-dome .gc-egg{left:var(--x,60px);top:var(--y,150px);transform:rotate(var(--r,0deg))}
-.gc-dome.turning .gc-egg{animation:gc-tumble 700ms ease-in-out infinite alternate}
-@keyframes gc-tumble{from{transform:translateY(-70px) rotate(calc(var(--i,0) * 90deg))}to{transform:translateY(10px) rotate(calc(var(--i,0) * -70deg))}}
-.gc-dome .gc-egg.stuck{left:98px;top:196px;transform:rotate(8deg);animation:none}
-.gc-body{position:relative;width:300px;height:150px;margin-top:-10px;background:#C2410C;border:6px solid #2b2f33;border-radius:14px 14px 20px 20px;box-shadow:0 14px 30px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:space-between;padding:0 26px;box-sizing:border-box}
-.gc-crank{width:72px;height:72px;border-radius:50%;border:5px solid #2b2f33;background:#F6B73C;cursor:pointer;position:relative;padding:0;transition:transform 120ms}
-.gc-crank i{position:absolute;left:50%;top:50%;width:12px;height:34px;margin:-30px 0 0 -6px;background:#2b2f33;border-radius:6px}
-.gc-crank:hover:not(:disabled){transform:rotate(12deg)}
-.gc-crank:disabled{cursor:default;opacity:.85}
-.gc-crank.turning{animation:gc-crank 1400ms cubic-bezier(.3,.1,.3,1) both}
-@keyframes gc-crank{to{transform:rotate(720deg)}}
-.gc-chute{width:110px;height:96px;border:5px solid #2b2f33;border-radius:10px;background:#1d2129;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 6px 14px rgba(0,0,0,.6)}
-.gc-egg.out{position:relative;cursor:pointer;animation:gc-drop 500ms cubic-bezier(.3,1.4,.5,1) both;overflow:visible}
-@keyframes gc-drop{from{transform:translateY(-120px) rotate(-40deg)}to{transform:translateY(0) rotate(0)}}
-.gc-half{display:none}
-.gc-egg.out.open{background:transparent;box-shadow:none;animation:none}
-.gc-egg.out.open .gc-half{display:block;position:absolute;left:0;width:100%;height:50%;border-radius:50% 50% 0 0/100% 100% 0 0;background:hsl(var(--hue,20) 85% 62%);box-shadow:inset -6px -4px 0 rgba(0,0,0,.08)}
-.gc-egg.out.open .gc-half.top{top:0;animation:gc-lid 500ms ease-out both}
-.gc-egg.out.open .gc-half.bottom{bottom:0;border-radius:0 0 50% 50%/0 0 100% 100%;background:#fff}
-@keyframes gc-lid{to{transform:translateY(-34px) rotate(-18deg)}}
-.gc-egg.out.open b{position:relative;z-index:1;font-size:16px;animation:ts-pop 300ms 200ms ease-out both}
-.mn.gc.done .gc-dome{animation:m3-flash 600ms ease-out both}
 /* balance (author 2026-11-13): the prices onto a scale from a swinging crane */
 .mn.bl{background:linear-gradient(160deg,#F7F2E6,#EADFC8 60%,#E3D6BC)}
 .bl-main{padding:0 28px}
@@ -2296,6 +2266,57 @@ button.lk-cell:hover{transform:translateY(-2px);z-index:1}
 .sk2-sil{position:absolute;left:4px;top:-18px;width:48px;filter:brightness(0) opacity(.85);animation:ts-pop 400ms ease-out both}
 .mn.sk2.haunted .sk2-floor{box-shadow:0 12px 30px rgba(0,0,0,.2),0 0 0 2px rgba(139,30,30,.25)}
 .mn.sk2.done .sk2-floor{animation:m3-flash 600ms ease-out both}
+/* klotski (game-swaps §1): the classic wooden 华容道; the door under the bottom row's middle two; the tentacle comes in through it */
+.kl-main{padding:0 28px}
+.kl-board{--cell:64px;position:relative;width:calc(var(--cols) * var(--cell));height:calc(var(--rows) * var(--cell));padding:6px;background:#8a5a33;border-radius:8px;box-shadow:inset 0 0 0 4px #6b4224,0 12px 30px rgba(0,0,0,.25);margin-bottom:14px}
+.kl-board.blank{opacity:.55}
+.kl-block{position:absolute;left:calc(6px + var(--x) * var(--cell) + 2px);top:calc(6px + var(--y) * var(--cell) + 2px);width:calc(var(--w) * var(--cell) - 4px);height:calc(var(--h) * var(--cell) - 4px);border:0;border-radius:6px;background:#E8C99B;box-shadow:inset 0 -5px 0 rgba(0,0,0,.18),inset 0 0 0 2px #c79f68;cursor:pointer;transition:left 120ms ease,top 120ms ease;display:flex;align-items:center;justify-content:center;padding:0}
+.kl-block.small{background:#D9B98A}
+.kl-block.big{background:#B48A5C;cursor:pointer}
+.kl-block.named .kl-name{font-size:15px;font-weight:800;color:#3b2716}
+.kl-block.picked{box-shadow:inset 0 -5px 0 rgba(0,0,0,.18),0 0 0 3px #F6B73C}
+.kl-block:disabled{cursor:default}
+.kl-block.leaving{animation:kl-leave 900ms ease-in forwards;pointer-events:none}
+@keyframes kl-leave{to{transform:translateY(calc(var(--cell) * 2.2));opacity:0}}
+.kl-door{position:absolute;left:calc(6px + 1 * var(--cell));bottom:-6px;width:calc(2 * var(--cell));height:8px;background:#2a1a0e;border-radius:0 0 4px 4px}
+.kl-board.open .kl-door{background:#050505;box-shadow:0 6px 14px rgba(0,0,0,.6)}
+.kl-tentacle{position:absolute;left:calc(6px + 1 * var(--cell) + 10px);bottom:-6px;width:calc(var(--cell) * 1.4);height:calc(var(--rows) * var(--cell) * .9);background:url(/objects/icons/tentacle-overlay.png) center bottom / contain no-repeat;transform-origin:50% 100%;animation:kl-tentacle 3200ms ease-out both;pointer-events:none;z-index:3}
+@keyframes kl-tentacle{from{transform:scaleY(0) rotate(-4deg)}70%{transform:scaleY(1) rotate(3deg)}to{transform:scaleY(1) rotate(0)}}
+.kl-nameless{margin:6px 0 0;font-size:12px;opacity:.75}
+@media (prefers-reduced-motion:reduce){.kl-block{transition:none}.kl-block.leaving{animation:none;opacity:0}.kl-tentacle{animation:none}}
+/* echo (game-swaps §2): the meeting's seats; a lit one speaks, the empty one goes dark */
+.ec-main{padding:0 28px}
+.ec-grid{display:grid;grid-template-columns:repeat(var(--cols,3),150px);gap:10px;margin-bottom:14px}
+.ec-grid.blank{opacity:.55}
+.ec-seat{position:relative;aspect-ratio:16/10;border:0;padding:0;border-radius:8px;background:#2b3038;overflow:visible;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px transparent;transition:box-shadow .15s,filter .15s;cursor:pointer}
+.ec-seat .mt-img{width:100%;height:100%;object-fit:cover;border-radius:8px}
+.ec-seat .mt-init{font-size:22px;font-weight:800;color:#cfd3da}
+.ec-seat .mt-name{position:absolute;left:8px;bottom:6px;font-size:11px;background:rgba(0,0,0,.45);color:#fff;border-radius:4px;padding:1px 6px}
+.ec-seat:disabled{cursor:default}
+.ec-seat.lit,.ec-seat.tapped{box-shadow:0 0 0 3px #6EC88C,0 0 14px rgba(110,200,140,.45)}
+.ec-seat.dark{filter:brightness(.15)}
+.ec-bub{position:absolute;left:50%;bottom:calc(100% + 6px);transform:translateX(-50%);white-space:nowrap;background:#fff;color:#1F1F1F;font-size:12px;padding:3px 8px;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,.25);z-index:2}
+.ec-say{font-size:13px;opacity:.8}
+.ec-say.yours{opacity:1;font-weight:700}
+.ec-say.wrong{color:#C2410C;font-weight:700}
+.mn.ec.done .ec-grid{animation:m3-flash 600ms ease-out both}
+/* nonogram (game-swaps §3): the classic 数织 grid; solved, the lines and the clues go and the picture stays */
+.ng-main{padding:0 28px}
+.ng-board{--cell:34px;display:grid;grid-template-columns:auto calc(var(--cols) * var(--cell));grid-template-rows:auto calc(var(--rows) * var(--cell));gap:4px;margin-bottom:14px}
+.ng-board.blank{opacity:.55}
+.ng-top{display:grid;grid-template-columns:repeat(var(--cols),var(--cell));align-items:end}
+.ng-left{display:grid;grid-template-rows:repeat(var(--rows),var(--cell));justify-items:end}
+.ng-clue{display:flex;gap:4px;font-size:13px;font-weight:700;color:#1d2129;transition:opacity .6s}
+.ng-clue.col{flex-direction:column;align-items:center}
+.ng-clue.row{align-items:center;padding-right:6px}
+.ng-grid{display:grid;grid-template-columns:repeat(var(--cols),var(--cell));grid-template-rows:repeat(var(--rows),var(--cell));background:#fff;box-shadow:0 0 0 2px #1d2129}
+.ng-cell{border:0;padding:0;margin:0;background:#fff;box-shadow:inset 0 0 0 1px #c9ccd2;cursor:pointer;transition:box-shadow .6s,background .1s}
+.ng-cell.on{background:#1d2129}
+.ng-cell.bad{background:#E5484D}
+.ng-cell:disabled{cursor:default}
+.ng-board.solved .ng-cell{box-shadow:none}
+.ng-board.solved .ng-clue{opacity:0}
+.ng-board.solved .ng-grid{box-shadow:none}
 /* whack-a-mole (author 2026-11-13): the launch hall, the faces looking down at their phones */
 .mn.ml{background:linear-gradient(180deg,#141a24,#1f2735 60%,#2a2230);color:#efe9df}
 .mn.ml .cs-title h2,.mn.ml .mn-sub,.mn.ml .cs-kick,.mn.ml .mn-notes-h,.mn.ml .mn-left{color:#efe9df}

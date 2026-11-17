@@ -186,6 +186,9 @@ export interface ComparePage {
   readonly bubbles: readonly string[];
   readonly remark: Readonly<Record<string, string>>;
 }
+/** klotski (game-swaps): the board is 4 columns by 5 rows; the door is under the bottom row's middle two cells. */
+export const KLOTSKI_COLS = 4;
+export const KLOTSKI_ROWS = 5;
 export type BoardGame =
   /** minesweeper: the month; `mines` the days the bosses are away */
   | { readonly kind: "mines"; readonly cols: number; readonly rows: number; readonly mines: number }
@@ -201,8 +204,14 @@ export type BoardGame =
   | { readonly kind: "tetris"; readonly cols: number; readonly rows: number; readonly goal: number }
   /** rhythm: the report as a drum lane — `bars` bars of eight beats at `bpm`, the last bar twice as fast */
   | { readonly kind: "rhythm"; readonly bars: number; readonly bpm: number }
-  /** gacha: the callers as eggs; the crank turns once; the egg out is the card the `slot` holds */
-  | { readonly kind: "gacha"; readonly slot: string; readonly eggs: readonly { readonly card: string; readonly label: string }[] }
+  /**
+   * klotski (game-swaps 2026-11-16, 华容道): the callers as blocks on a 4 × 5 board; the one pushed out
+   * through the door is the card `slot` takes. `level` rows: an upper-case letter a named block
+   * (`blocks`), a lower-case one a nameless block, `N` the nameless big block, `.` empty.
+   */
+  | { readonly kind: "klotski"; readonly slot: string; readonly level: readonly string[]; readonly blocks: Readonly<Record<string, { readonly card: string; readonly label: string }>> }
+  /** echo (game-swaps, 跟读): the roll call repeated round by round; each voice a `meeting.people` id and its line (may be empty) */
+  | { readonly kind: "echo"; readonly voices: readonly { readonly who: string; readonly line: string }[] }
   /** balance: the prices dropped from a swinging crane onto two pans; `fixed` is the welded weight on each (oil, wine) */
   | { readonly kind: "balance"; readonly fixed: number }
   /** sokoban: the chairs onto the seat marks; `level` as rows (# wall, . mark, $ chair, @ you) */
@@ -215,6 +224,24 @@ export type BoardGame =
   | { readonly kind: "spot" }
   /** fill (day11-budget-fill): a budget buys shapes to cover the sheet's 要求 cells, four rounds; `people` are the 1-cell, free 自己人 */
   | { readonly kind: "fill"; readonly people: readonly FillPerson[]; readonly rounds: readonly FillRound[] };
+/**
+ * game-swaps §3: a plain task's side game, played on 自己做 before its `self` branch runs. Only the
+ * nonogram (数织) for now: `picture` rows in `#` / `.`; the clues are derived (runs of `#`).
+ */
+export type TaskGame = { readonly kind: "nonogram"; readonly picture: readonly string[]; readonly rows: readonly (readonly number[])[]; readonly cols: readonly (readonly number[])[] };
+
+/** The runs of `#` in a line, left to right (an empty line's clue is no number at all). */
+export function nonogramRuns(cells: readonly boolean[]): number[] {
+  const out: number[] = [];
+  let run = 0;
+  for (const on of cells) {
+    if (on) run++;
+    else if (run) { out.push(run); run = 0; }
+  }
+  if (run) out.push(run);
+  return out;
+}
+
 /** fill: the shapes a budget can buy (their cells are in src/world/desktop/workbench/fill.ts). */
 export const FILL_SHAPES = ["1", "I2", "I3", "L3", "I4", "O4", "T4", "L4", "S4"] as const;
 export type FillShape = (typeof FILL_SHAPES)[number];
@@ -448,6 +475,8 @@ export interface Task {
   readonly judge?: TaskJudge;
   /** launch (author 2026-11-11): the task's opening page (board tasks). */
   readonly launch?: TaskLaunch;
+  /** game-swaps §3: a plain task's side game (自己做 plays it first). */
+  readonly game?: TaskGame;
 }
 
 type Raw = Record<string, unknown>;
@@ -787,18 +816,54 @@ function board(v: unknown, w: string): TaskBoard {
       keys(v.game, ["kind", "bars", "bpm"], gw);
       game = { kind: "rhythm", bars: num(v.game.bars, "bars", 2, 8), bpm: num(v.game.bpm, "bpm", 40, 200) };
     } else if (v.game.kind === "gacha") {
+      // game-swaps §1: the gacha is gone. Day 17's content still carries one until Claude flips it to
+      // klotski; until then it is read and dropped (the board works as a plain form, no game).
       keys(v.game, ["kind", "slot", "eggs"], gw);
-      if (typeof v.game.slot !== "string" || !v.game.slot) fail(`${gw}.slot`, "must be a slot id");
-      if (!Array.isArray(v.game.eggs) || v.game.eggs.length < 2 || v.game.eggs.length > 6) fail(`${gw}.eggs`, "must be 2 to 6 eggs");
-      const eggs = v.game.eggs.map((e, i) => {
-        const ew = `${gw}.eggs[${i}]`;
+    } else if (v.game.kind === "klotski") {
+      keys(v.game, ["kind", "slot", "level", "blocks"], gw);
+      const slot = str(v.game.slot, `${gw}.slot`);
+      if (!slotIds.has(slot)) fail(`${gw}.slot`, `"${slot}" is not a slot`);
+      const level = v.game.level;
+      if (!Array.isArray(level) || level.length !== KLOTSKI_ROWS || !level.every((r) => typeof r === "string" && r.length === KLOTSKI_COLS && /^[A-Za-z.]+$/.test(r))) fail(`${gw}.level`, `must be ${KLOTSKI_ROWS} rows of ${KLOTSKI_COLS} characters (letters or .)`);
+      const rowsOf = level as string[];
+      // each letter one solid rectangle
+      const seen = new Map<string, { x0: number; y0: number; x1: number; y1: number; n: number }>();
+      rowsOf.forEach((r, y) => [...r].forEach((ch, x) => {
+        if (ch === ".") return;
+        const b = seen.get(ch) ?? { x0: x, y0: y, x1: x, y1: y, n: 0 };
+        seen.set(ch, { x0: Math.min(b.x0, x), y0: Math.min(b.y0, y), x1: Math.max(b.x1, x), y1: Math.max(b.y1, y), n: b.n + 1 });
+      }));
+      for (const [ch, b] of seen) if ((b.x1 - b.x0 + 1) * (b.y1 - b.y0 + 1) !== b.n) fail(`${gw}.level`, `"${ch}" is not one solid rectangle`);
+      const big = seen.get("N");
+      if (!big || rowsOf.join("").split("").filter((c) => c === "N").length !== 4 || big.x1 - big.x0 !== 1 || big.y1 - big.y0 !== 1) fail(`${gw}.level`, "must have exactly one N, the 2 × 2 big block");
+      if (!isRecord(v.game.blocks)) fail(`${gw}.blocks`, "must be an object");
+      const blocks: Record<string, { card: string; label: string }> = {};
+      for (const ch of seen.keys()) if (ch !== "N" && ch === ch.toUpperCase() && !(ch in v.game.blocks)) fail(`${gw}.blocks`, `"${ch}" is in the level but has no entry`);
+      for (const [ch, e] of Object.entries(v.game.blocks)) {
+        const ew = `${gw}.blocks.${ch}`;
+        if (!/^[A-Z]$/.test(ch) || ch === "N" || !seen.has(ch)) fail(ew, `"${ch}" is not a named block of the level`);
         if (!isRecord(e)) fail(ew, "must be an object");
         keys(e, ["card", "label"], ew);
-        if (typeof e.card !== "string" || !e.card) fail(`${ew}.card`, "must be a card id");
-        if (typeof e.label !== "string" || !e.label) fail(`${ew}.label`, "must be a name");
-        return { card: e.card, label: e.label };
+        const card = str(e.card, `${ew}.card`);
+        if (!cardIds.has(card) && !kuroCardIds.has(card)) fail(`${ew}.card`, `"${card}" is not a card or a Kuro card`);
+        blocks[ch] = { card, label: str(e.label, `${ew}.label`) };
+      }
+      game = { kind: "klotski", slot, level: rowsOf, blocks };
+    } else if (v.game.kind === "echo") {
+      keys(v.game, ["kind", "voices"], gw);
+      if (!meeting) fail(gw, "an echo game needs a meeting board (its voices are the meeting's people)");
+      const ids = new Set(meeting.people.map((p) => p.id));
+      if (!Array.isArray(v.game.voices) || v.game.voices.length < 3 || v.game.voices.length > 8) fail(`${gw}.voices`, "must be 3 to 8 voices");
+      const voices = v.game.voices.map((x, i) => {
+        const xw = `${gw}.voices[${i}]`;
+        if (!isRecord(x)) fail(xw, "must be an object");
+        keys(x, ["who", "line"], xw);
+        const who = str(x.who, `${xw}.who`);
+        if (!ids.has(who)) fail(`${xw}.who`, `"${who}" is not one of the meeting's people`);
+        if (typeof x.line !== "string") fail(`${xw}.line`, "must be a string (it may be empty)");
+        return { who, line: x.line };
       });
-      game = { kind: "gacha", slot: v.game.slot, eggs };
+      game = { kind: "echo", voices };
     } else if (v.game.kind === "balance") {
       keys(v.game, ["kind", "fixed"], gw);
       game = { kind: "balance", fixed: num(v.game.fixed, "fixed", 0, 50) };
@@ -862,7 +927,7 @@ function board(v: unknown, w: string): TaskBoard {
         return { size, cells, budget, pieces, people: r.people === true };
       });
       game = { kind: "fill", people, rounds };
-    } else fail(`${gw}.kind`, 'must be "mines", "pipes", "match3", "link", "snake", "tetris", "rhythm", "gacha", "balance", "sokoban", "moles", "pacman", "spot" or "fill"');
+    } else fail(`${gw}.kind`, 'must be "mines", "pipes", "match3", "link", "snake", "tetris", "rhythm", "klotski", "echo", "balance", "sokoban", "moles", "pacman", "spot" or "fill"');
   }
   let stack: BoardStack | undefined;
   if (v.stack !== undefined) {
@@ -1272,7 +1337,7 @@ function boardTask(v: Raw, w: string): Task {
 
 function task(v: unknown, w: string): Task {
   if (!isRecord(v)) fail(w, "a task must be an object");
-  keys(v, ["id", "title", "app", "done", "start", ...PATHS, "doc", "ledger", "code", "board", "deliverable", "judge", "launch"], w);
+  keys(v, ["id", "title", "app", "done", "start", ...PATHS, "doc", "ledger", "code", "board", "deliverable", "judge", "launch", "game"], w);
   // Work v2: a board task carries a board (and usually a deliverable + judge); its three-path tree
   // is optional and unused. A task without a board keeps the old required tree.
   if (v.board !== undefined) return boardTask(v, w);
@@ -1309,7 +1374,23 @@ function task(v: unknown, w: string): Task {
   for (const m of PATHS) {
     if (!(out[m].effects.flags ?? []).includes(done)) fail(`${w}.${m}`, `effects do not set the done flag "${done}"`);
   }
-  return { ...out, ...surface };
+  const game = v.game !== undefined ? taskGame(v.game, `${w}.game`) : undefined;
+  return { ...out, ...surface, ...(game ? { game } : {}) };
+}
+
+/** game-swaps §3: a plain task's side game — only the nonogram: 3–10 equal rows of `#` / `.`; the clues derived. */
+function taskGame(v: unknown, w: string): TaskGame {
+  if (!isRecord(v)) fail(w, "must be an object");
+  if (v.kind !== "nonogram") fail(`${w}.kind`, 'must be "nonogram" (the only side game for now)');
+  keys(v, ["kind", "picture"], w);
+  const pic = v.picture;
+  if (!Array.isArray(pic) || pic.length < 3 || pic.length > 10 || !pic.every((r) => typeof r === "string" && /^[#.]+$/.test(r) && r.length === (pic[0] as string).length) || (pic[0] as string).length < 3 || (pic[0] as string).length > 10) fail(`${w}.picture`, "must be 3 to 10 equal rows of 3 to 10 # / . cells");
+  const picture = pic as string[];
+  if (!picture.join("").includes("#")) fail(`${w}.picture`, "must fill at least one cell");
+  const grid = picture.map((r) => [...r].map((c) => c === "#"));
+  const rows = grid.map((r) => nonogramRuns(r));
+  const cols = grid[0]!.map((_, x) => nonogramRuns(grid.map((r) => r[x]!)));
+  return { kind: "nonogram", picture, rows, cols };
 }
 
 function deepFreeze<T>(value: T): T {

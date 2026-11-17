@@ -425,12 +425,16 @@ export interface Session {
   tetris: import("./workbench/tetris").TetrisGame | null;
   /** rhythm (author 2026-11-13): the drum lane under way (session only; the sheet passed is a board step). */
   rhythm: import("./workbench/rhythm").RhythmGame | null;
-  /** gacha (author 2026-11-13): the capsule machine (session only; the egg opened is a board step). */
-  gacha: import("./workbench/gacha").GachaGame | null;
   /** balance (author 2026-11-13): the scale under way (session only; level is a board step). */
   balance: import("./workbench/balance").BalanceGame | null;
   /** sokoban (author 2026-11-13): the warehouse floor under way (session only; every chair seated is a board step). */
   sokoban: import("./workbench/sokoban").SokobanGame | null;
+  /** klotski (game-swaps): day 17's 华容道 under way (session only; the block out is a fill and an approve). */
+  klotski: import("./workbench/klotski").KlotskiGame | null;
+  /** echo (game-swaps): day 7's roll call repeated under way (session only; the last round is an approve). */
+  echo: import("./workbench/echo").EchoGame | null;
+  /** nonogram (game-swaps): a plain task's 数织 under way (session only; the hand-in is the task event). */
+  nonogram: import("./workbench/nonogram").NonogramGame | null;
   /** fill (day11-budget-fill): the cost sheet's budget fill under way (session only; its end is logged as an `open fill:…`). */
   fill: import("./workbench/fill").FillGame | null;
   /** whack-a-mole (author 2026-11-13): the launch hall under way (session only; three pages passed is a board step). */
@@ -657,9 +661,11 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     snake: null,
     tetris: null,
     rhythm: null,
-    gacha: null,
     balance: null,
     sokoban: null,
+    klotski: null,
+    echo: null,
+    nonogram: null,
     fill: null,
     moles: null,
     pacman: null,

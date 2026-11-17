@@ -107,6 +107,8 @@ export function applyTask(
     return raiseAssimilation(withFlags(state, [event.flag]), gain);
   }
   if (event.slots !== undefined || event.assists !== undefined) throw new Error("task: slots/assists belong to a board task");
+  // game-swaps §3: a plain task's side game grades its play the same way (a record only)
+  if (event.quality !== undefined && (!tree?.game || !["perfect", "flawed", "wrong"].includes(event.quality))) throw new Error(`task: quality on a plain task is a side game's perfect / flawed / wrong, got ${JSON.stringify(event.quality)}`);
   if (event.mode === "auto" || !tree) {
     // Ticked by itself (or a task with no tree): only the done flag.
     return withFlags(state, [event.flag]);
