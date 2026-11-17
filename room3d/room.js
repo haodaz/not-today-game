@@ -2626,7 +2626,9 @@ function buildGreat() {
   const mat = (FAR.greatMat = swim(M({ map: hide, bumpMap: hide, bumpScale: 16, roughness: 0.48, color: 0xa87a80, emissive: 0xc01410, emissiveMap: hide, emissiveIntensity: 0, fog: false, side: THREE.DoubleSide }, 3)));
   const vineMat = (FAR.vineMat = swim(M({ map: hideV, bumpMap: hideV, bumpScale: 16, roughness: 0.46, color: 0xc08088, emissive: 0xff2616, emissiveMap: hideV, emissiveIntensity: 0, fog: false }, 3), true));
   const bone = (FAR.boneMat = swim(M({ color: 0xcfc6b0, roughness: 0.55, fog: false }, 3)));
-  const parts = [], bones = [], vines = [];
+  const parts = [], bones = [], vines = [], raw = [];
+  // (author: 有些位置的触手要有血肉感，不是黑黢黢的龙) the ones from his underside, his throat and his jaw are raw: red meat, wet, lit from inside; a few of the others too
+  const rawMat = (FAR.rawMat = swim(M({ map: hideV, bumpMap: hideV, bumpScale: 14, roughness: 0.22, color: 0xe0585a, emissive: 0xff2412, emissiveMap: hideV, emissiveIntensity: 0, fog: false }, 3), true));
   const V = (x, y, z) => new THREE.Vector3(x, y, z);
   const limb = (pts, rad, seg = 40, sides = 9) => {
     const curve = new THREE.CatmullRomCurve3(pts, false, "centripetal"), geo = new THREE.TubeGeometry(curve, seg, 1, sides), P = geo.attributes.position;
@@ -2724,7 +2726,7 @@ function buildGreat() {
     for (let k = 1; k <= n; k++) { const q = k / n; pts.push(root.clone().addScaledVector(d, L * 0.2 * (1 - Math.pow(1 - q, 2.2))).addScaledVector(b, L * Math.pow(q, 1.25)).addScaledVector(side, Math.sin(q * fr + ph) * L * 0.05 * q)); }
     const kn = 30 + R() * 40, g = limb(pts, (t) => r * (0.8 * Math.pow(1 - t, 2.6) + 0.2 * (1 - t)) * (1 + 0.09 * Math.sin(t * kn + ph)) + 0.03, seg, 6), n2 = g.attributes.position.count, w = new Float32Array(n2 * 3), amp = L * (0.035 + R() * 0.035);
     for (let v = 0; v < n2; v++) { w[v * 3] = Math.floor(v / 7) / seg; w[v * 3 + 1] = ph; w[v * 3 + 2] = amp; }
-    g.setAttribute("aW", new THREE.BufferAttribute(w, 3)); vines.push(g); };
+    g.setAttribute("aW", new THREE.BufferAttribute(w, 3)); (R() < (d.y < -0.25 ? 0.75 : 0.14) ? raw : vines).push(g); };
   const BACK = V(-1, -0.08, 0.04);
   for (let i = 0; i < 26; i++) { const a = R() * 6.28, P = frame(0.002 + R() * 0.014).clone(), o = out(a); if (o.dot(En) > 0.15) continue; /* none of them across the eye that is the world */ vine(P.addScaledVector(o, 7), o, BACK, 80 + R() * 80, 2.4 + R() * 1.4, 36); } // the long arms, from behind the head
   for (let i = 0; i < 2600; i++) { const t = 0.006 + Math.pow(R(), 0.85) * 0.93, a = R() * 6.28, P = frame(t).clone(), o = out(a), bk = _T.clone().lerp(BACK, 0.2); /* the curve runs head to tail, so its tangent already points behind him */ /* along him, so the coils of the body can still be read through them */
@@ -2739,14 +2741,14 @@ function buildGreat() {
     vine(P.addScaledVector(o, -0.6), o, BACK, 16 + R() * 44, 0.7 + R() * 1.3 * (1 - q)); }
   const add = (geos, m) => { const o = new THREE.Mesh(mergeGeometries(geos), m); o.userData.noEdge = true; o.frustumCulled = false; H.add(o); for (const g of geos) g.dispose(); };
   for (const g of parts) for (const k of Object.keys(g.attributes)) if (!["position", "normal", "uv"].includes(k)) g.deleteAttribute(k);
-  add(parts, mat); add(vines, vineMat);
+  add(parts, mat); add(vines, vineMat); add(raw, rawMat);
   // set in the frame: going to our left, turned a little toward us, so the body draws away behind him
   H.rotation.set(0.05, Math.PI + 0.14, 0.06, "YXZ"); H.updateMatrix();
   H.position.copy(E.clone().applyMatrix4(H.matrix).multiplyScalar(-1));
   FAR.gMid = V(-98, 2, 22).applyMatrix4(H.matrix).add(H.position); FAR.gHead = V(6, 0.5, 0).applyMatrix4(H.matrix).add(H.position); /* gHead: for { greatLook: "head" }, a close look at the head while building */ // the middle of him, from the world-eye: where the eye is carried to
   // his own light: cold, from above and ahead of him; a little from below; the red the world throws on his side; his throat
   FAR.gKey = new THREE.DirectionalLight(0xaab0c4, 0); FAR.gKey.position.set(-7, 9, 5); G.add(FAR.gKey, FAR.gKey.target);
-  FAR.gFill = new THREE.DirectionalLight(0x6a5a78, 0); FAR.gFill.position.set(6, -3, 9); G.add(FAR.gFill, FAR.gFill.target);
+  FAR.gFill = new THREE.DirectionalLight(0x8a5a66, 0); FAR.gFill.position.set(3, -7, 8); G.add(FAR.gFill, FAR.gFill.target);
   FAR.gRed = new THREE.PointLight(0xff3a1c, 0, 10, 1.2); FAR.gRed.position.set(0, 0.2, 2.2); G.add(FAR.gRed);
   FAR.gMaw = new THREE.PointLight(0xff2a14, 0, 10, 1.2); FAR.gMaw.position.copy(V(13, -2.5, 0).applyMatrix4(H.matrix).add(H.position)); G.add(FAR.gMaw);
   // and what he moves through: nothing, with a little dust in it and something darker than dark, so that it can be seen that he moves
@@ -2774,9 +2776,9 @@ function updateCondense(s) {
   _cv2.copy(CON.look === "head" ? FAR.gHead : FAR.gMid).applyQuaternion(CON.q).multiplyScalar(-S * smooth(0.45, 1, t)); // carried from the one eye to the middle of him
   FAR.g.scale.setScalar(z); FAR.g.position.copy(_cv2); FAR.dome.position.copy(_cv2).multiplyScalar(-1 / z); /* the dark stays round the eye, not round the world */ // the world shrinks about the place where they fought
   G.visible = show > 0; G.quaternion.copy(CON.q); G.scale.setScalar(S); G.position.set(0, -(FAR.RP + 0.35) * z, 0).add(_cv2);
-  FAR.greatMat.color.set(0xa87a80).multiplyScalar(show); FAR.vineMat.color.set(0xc08088).multiplyScalar(show); FAR.greatMat.emissiveIntensity = 0.22 * show; FAR.vineMat.emissiveIntensity = 0.3 * show; FAR.boneMat.color.set(0xcfc6b0).multiplyScalar(show);
+  FAR.greatMat.color.set(0xa87a80).multiplyScalar(show); FAR.vineMat.color.set(0xc08088).multiplyScalar(show); FAR.rawMat.color.set(0xe0585a).multiplyScalar(show); FAR.rawMat.emissiveIntensity = 1.7 * show; FAR.greatMat.emissiveIntensity = 0.22 * show; FAR.vineMat.emissiveIntensity = 0.3 * show; FAR.boneMat.color.set(0xcfc6b0).multiplyScalar(show);
   FAR.eyeMat.emissiveIntensity = 1.25 * show; FAR.gWorld.visible = t > 0.56; /* the world has become the ball in the socket */
-  FAR.gKey.intensity = 13 * show; FAR.gFill.intensity = 3 * show;
+  FAR.gKey.intensity = 13 * show; FAR.gFill.intensity = 6.5 * show;
   FAR.gRed.intensity = 9 * Math.pow(3 * S, 1.2) * smooth(0.4, 0.8, t); FAR.gRed.distance = 7 * S;
   FAR.gMaw.intensity = 0; FAR.gMaw.distance = 16 * S;
   FAR.murk.visible = show > 0; FAR.murk.quaternion.copy(CON.q); FAR.murk.position.copy(camera.position).addScaledVector(CON.left, -(((s * 9) % 600) - 300)); for (const sp of FAR.murk.children) sp.material.opacity = sp.userData.o * smooth(0.4, 1, t);
