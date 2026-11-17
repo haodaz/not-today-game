@@ -2010,13 +2010,87 @@ const VIEW = [];
   const fade = new THREE.CanvasTexture(fc);
   const pic = new THREE.TextureLoader().load(new URL("./art/outside.jpg", import.meta.url).href); pic.colorSpace = THREE.SRGBColorSpace; pic.anisotropy = 8;
   const flip = pic.clone(); flip.wrapS = THREE.RepeatWrapping; flip.repeat.x = -1; flip.offset.x = 1;
-  for (const [sx, zc, ry, map] of [[-1, (WIN.z0 + WIN.z1) / 2, Math.PI / 2, pic], [1, (SLIT.z0 + SLIT.z1) / 2, -Math.PI / 2, flip]]) {
+  for (const [sx, zc, ry, map] of [[-1, (WIN.z0 + WIN.z1) / 2 - 13, Math.PI / 2, pic], [1, (SLIT.z0 + SLIT.z1) / 2, -Math.PI / 2, flip]]) {
     const x = sx > 0 ? X1 + D : X0 - D;
     const b = new THREE.Mesh(new THREE.PlaneGeometry(600, 400), new THREE.MeshBasicMaterial({ map: back, fog: false, toneMapped: false }));
     b.position.set(x + sx * 1.5, line, zc); b.rotation.y = ry; b.userData.noEdge = true; outside.add(b); VIEW.push(b);
     const m = new THREE.Mesh(new THREE.PlaneGeometry(TW, TH), new THREE.MeshBasicMaterial({ map, alphaMap: fade, transparent: true, depthWrite: false, fog: false, toneMapped: false }));
     m.position.set(x, cy, zc); m.rotation.y = ry; m.userData.noEdge = true; m.isLine2 = true; outside.add(m); VIEW.push(m);
   }
+}
+// ---- what goes wrong across the yard (author 2026-11-16) ----
+// Painted over the picture on a clear sheet, by day and hour. Her list: one window still lit when the rest are dark;
+// something on a balcony that is somewhere else each day; a drip of the wrong colour; windows pushed out from inside;
+// and every light on, with someone standing at each window.
+const WINS = (() => { // the near block's windows, in the picture's own pixels (1664 × 928): [x, y, w, h]
+  const out = [];
+  for (const x of [190, 233.5]) for (const y of [328.5, 396, 466, 537.5]) out.push([x, y, 22, 38]);
+  for (const x of [381.5, 439]) for (const y of [312.5, 387.5, 461, 535, 607.5]) out.push([x, y, 25, 38]);
+  for (const x of [618.5, 666.5, 711.5]) for (const y of [350, 420, 485, 550]) out.push([x, y, 20, 34]);
+  for (const [y0, y1] of [[305, 355], [380, 430], [447, 485], [520, 555]]) { out.push([514, (y0 + y1) / 2, 52, y1 - y0, 1]); out.push([571, (y0 + y1) / 2, 52, y1 - y0, 1]); }
+  return out;
+})();
+const THE_ONE = 10; // front, first column, third floor down: in plain sight from the left pane
+const [ovC, ovG] = canvas(1664, 928), ovTex = new THREE.CanvasTexture(ovC); ovTex.colorSpace = THREE.SRGBColorSpace; ovTex.anisotropy = 8;
+{
+  const D = 60, TW = 86, TH = TW * 928 / 1664, cy = 1.5 + TH * 0.12 - 2;
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(TW, TH), new THREE.MeshBasicMaterial({ map: ovTex, transparent: true, depthWrite: false, fog: false, toneMapped: false }));
+  m.position.set(X0 - D + 0.4, cy, (WIN.z0 + WIN.z1) / 2 - 13); m.rotation.y = Math.PI / 2; m.userData.noEdge = true; m.isLine2 = true; m.renderOrder = 2; outside.add(m);
+}
+let ovKey = "";
+function drawView() {
+  const d = state.day, t = state.time, night = smooth(17.4, 19.4, t), late = t >= 23, dim = 0.06 + 0.9 * (1 - smooth(16.8, 19.6, t));
+  const key = d + ":" + Math.round(night * 20) + ":" + (late ? 1 : 0);
+  if (key === ovKey) return; ovKey = key;
+  const g = ovG; g.clearRect(0, 0, 1664, 928);
+  const allLit = d >= 13, crowd = d >= 15, lightK = Math.max(night, crowd ? 0.7 : 0);
+  const dk = (r, gg, b, a) => `rgba(${Math.round(r * dim)},${Math.round(gg * dim)},${Math.round(b * dim)},${a})`;
+  WINS.forEach(([x, y, w, h, wide], i) => {
+    const r = h2(i * 3.1, d * 7.7);
+    const lit = allLit ? true : late ? (d >= 4 && i === THE_ONE) : r < 0.42 || (d >= 4 && i === THE_ONE);
+    if (!lit || lightK <= 0.02) return;
+    const cold = !allLit && r < 0.1; // a television
+    g.save(); g.shadowColor = cold ? "rgba(150,190,255,.6)" : "rgba(255,180,100,.6)"; g.shadowBlur = 4;
+    const br = 0.62 + 0.38 * h2(i * 1.7, 9.9); // no two rooms are lit alike
+    g.fillStyle = cold ? `rgba(150,180,225,${0.8 * lightK})` : `rgba(${Math.round(250 * br)},${Math.round((170 + r * 40) * br)},${Math.round((90 + r * 50) * br)},${0.84 * lightK})`;
+    g.fillRect(x - w / 2 + 1, y - h / 2 + 1, w - 2, h - 2); g.restore();
+    g.fillStyle = `rgba(60,36,20,${0.5 * lightK})`; g.fillRect(x - 0.6, y - h / 2 + 1, 1.2, h - 2); // the window's own bar
+    if (!crowd && h2(i, 6.6) > 0.5) { g.fillStyle = `rgba(120,70,40,${0.45 * lightK})`; g.fillRect(x - w / 2 + 1, y - h / 2 + 1, w * (0.2 + 0.25 * h2(i, 2.2)), h - 2); } // a curtain half drawn
+    // someone standing there: first only in the one window (day 11), then in a few, then in all of them, and they do not move
+    const n = wide ? 1 + Math.floor(h2(i, 5.5) * 2) : 1, has = crowd || (d >= 13 && r > 0.55) || (d >= 11 && i === THE_ONE);
+    if (has) for (let k = 0; k < n; k++) {
+      const fx = x + (wide ? (k - 0.5) * w * 0.42 + (h2(i, k + 1.3) - 0.5) * 6 : (h2(i, 4.2) - 0.5) * w * 0.3), tall = h2(i * 2.3, k + 7.1), top = y - h * (0.22 + 0.14 * tall) + (wide ? 4 : 0), bw = Math.min(11, w * 0.5) * (0.85 + 0.3 * h2(i, k + 3.3));
+      g.save(); g.beginPath(); g.rect(x - w / 2, y - h / 2, w, h); g.clip(); g.filter = "blur(0.7px)"; // behind glass, a street away: a shape, not a drawing
+      g.fillStyle = `rgba(22,14,10,${0.86 * lightK})`;
+      g.beginPath(); g.ellipse(fx, top + 3, 2.7, 3.3, 0, 0, 7); g.fill();
+      g.beginPath(); g.moveTo(fx - bw / 2, y + h / 2 + 2); g.lineTo(fx - bw / 2, top + 11); g.quadraticCurveTo(fx - bw / 2, top + 7.5, fx - 1.6, top + 6.5); g.lineTo(fx + 1.6, top + 6.5); g.quadraticCurveTo(fx + bw / 2, top + 7.5, fx + bw / 2, top + 11); g.lineTo(fx + bw / 2, y + h / 2 + 2); g.fill();
+      g.restore();
+    }
+  });
+  if (d >= 6) { // the cloth on the balcony rail: a different rail, a different place along it, every day
+    const rails = [364, 438, 498, 566], ri = Math.floor(h2(d * 5.3, 1.7) * 4), cx = 496 + h2(d * 2.9, 8.1) * 90;
+    g.fillStyle = dk(150, 34, 30, 0.95); g.fillRect(cx, rails[ri] - 2, 15, 19);
+    g.fillStyle = dk(110, 22, 20, 0.95); g.fillRect(cx + 9, rails[ri] - 2, 2, 19);
+  }
+  if (d >= 8) { // under one air-conditioner the wall is stained, and it is not water
+    const len = Math.min(170, (d - 7) * 15), gr = g.createLinearGradient(0, 566, 0, 566 + len);
+    gr.addColorStop(0, dk(84, 16, 12, 0.8)); gr.addColorStop(0.7, dk(78, 14, 12, 0.5)); gr.addColorStop(1, dk(70, 12, 10, 0));
+    g.fillStyle = gr; g.fillRect(382.5, 566, 4.5, len); g.fillRect(390, 566, 2.5, len * 0.6); g.fillRect(377, 566, 2, len * 0.35);
+  }
+  if (d >= 16) { // pushed out from inside
+    const n = d === 16 ? 3 : d === 17 ? 6 : 10;
+    for (let k = 0; k < n; k++) {
+      const [x, y, w, h] = WINS[Math.floor(h2(k * 9.1, 3.3) * 22)], rr = Math.max(w, h) * 0.56;
+      g.save(); g.beginPath(); g.rect(x - w / 2 - 2, y - h / 2 - 2, w + 4, h + 5); g.clip(); // it fills the frame and presses on it; it has not come through
+      const gr = g.createRadialGradient(x - rr * 0.25, y - rr * 0.3, 1, x, y, rr);
+      const lum = Math.max(dim, lightK * 0.8);
+      gr.addColorStop(0, `rgba(${Math.round(196 * lum)},${Math.round(128 * lum)},${Math.round(116 * lum)},1)`); gr.addColorStop(0.5, `rgba(${Math.round(128 * lum)},${Math.round(52 * lum)},${Math.round(50 * lum)},1)`); gr.addColorStop(1, `rgba(${Math.round(52 * lum)},${Math.round(16 * lum)},${Math.round(18 * lum)},1)`);
+      g.fillStyle = gr; g.fillRect(x - w / 2 - 2, y - h / 2 - 2, w + 4, h + 5);
+      g.strokeStyle = `rgba(${Math.round(60 * lum)},10,14,.7)`; g.lineWidth = 0.8; g.beginPath(); g.moveTo(x - w * 0.3, y - h * 0.1); g.quadraticCurveTo(x, y + h * 0.1, x + w * 0.35, y - h * 0.25); g.stroke();
+      g.restore();
+    }
+  }
+  ovTex.needsUpdate = true;
 }
 const OUTER = { k: 0, t: 0, eye: new THREE.Group(), light: new THREE.PointLight(0xff2a1a, 0, 9, 1.6) };
 const hideMap = (() => { // wet hide: dark, mottled, pocked; brighter lines where it creases
@@ -2229,6 +2303,7 @@ function apply() {
   const sky = SKY.night.clone().lerp(SKY.day, day).lerp(SKY.dusk, dusk * 0.7);
   sky.lerp(C(0x1a0605), c * (0.8 - 0.5 * day)).lerp(WHITE, white);
   scene.background = sky;
+  drawView();
   for (const m of VIEW) m.material.color.setScalar(0.06 + 0.9 * day).lerp(C(0x3a0c0a), c * 0.45 * (1 - 0.5 * day)).lerp(WHITE, white);
   const lightCol = LIGHT.night.clone().lerp(LIGHT.day, day).lerp(LIGHT.dusk, dusk * 0.8).multiply(tint);
   skyLight.color.copy(lightCol);
@@ -2274,7 +2349,7 @@ function apply() {
 const SPOTS = {
   desk: { face: 0, eye: DESK_EYE, pitch: -1.02, fov: 52, name: "桌面", go: "走到桌前" },
   meal: { face: 3, eye: MEAL_EYE, pitch: -0.74, fov: 30, name: "饭桌", go: "走到饭桌前" },
-  win: { face: 3, eye: new THREE.Vector3(X0 + 0.5, 1.52, (WIN.z0 + WIN.z1) / 2), pitch: -0.02, fov: 36, name: "大窗前", go: "走到窗前" },
+  win: { face: 3, eye: new THREE.Vector3(X0 + 1.05, 1.52, (WIN.z0 + WIN.z1) / 2), pitch: -0.02, fov: 36, name: "大窗前", go: "走到窗前" },
   slit: { face: 1, eye: new THREE.Vector3(X1 - 0.45, 1.5, (SLIT.z0 + SLIT.z1) / 2), pitch: -0.02, fov: 36, name: "小窗前", go: "走到小窗前" },
 };
 const spotsOf = (face) => Object.keys(SPOTS).filter((k) => SPOTS[k].face === face);
@@ -2597,20 +2672,26 @@ async function wake() {
   const cap = document.getElementById("caption"), still = document.getElementById("still");
   if (state.desk) toDesk();
   goal = null;
-  Object.assign(state, { time: 13.5, collapse: 0.82, pixel: 0.8, unreal: 0 });
+  // The morning of day 4 (author 2026-11-16), and light: damp and the first flesh on the walls, nothing else. No
+  // tentacles (the first grows at 0.34), no broken pixels, nothing outside. Morning light. It is not seen again until day 10.
+  const EMBED = document.body.classList.contains("embed"), tell = (type) => { try { EMBED && window.parent.postMessage({ source: "nt-room", type }, "*"); } catch {} };
+  Object.assign(state, { time: 8, collapse: 0.33, pixel: 0, unreal: 0, outer: false, lamp: false, ceil: false });
   KEYS.forEach((key) => { document.getElementById(key).value = String(state[key]); });
+  setFace(0);
   apply();
-  while (state.face !== 0) { turn(1); await wait(750); }
+  tell("wake-line"); // the game says the line in its own dialogue box when embedded
   still.style.opacity = "0";
   cap.textContent = "我这是还没睡醒吗。";
-  cap.style.opacity = "1";
-  await wait(2200);
+  cap.style.opacity = EMBED ? "0" : "1";
+  await wait(1500);
   for (let i = 0; i < 4; i++) {
-    if (i === 2) { goalRate = 1.5; goal = { time: 13.5, collapse: 0, pixel: 0, unreal: 0 }; cap.style.opacity = "0"; } // it drains while her back is to the desk
+    if (i === 2) { goalRate = 1.5; goal = { time: 8, collapse: 0, pixel: 0, unreal: 0 }; cap.style.opacity = "0"; } // it drains while her back is to the desk
     turn(1);
-    await wait(1250);
+    await wait(1000);
   }
   while (goal) await wait(100);
+  tell("wake-done");
+  if (EMBED) { waking = false; return; } // embedded, the game fades this frame out over its own photo
   still.style.opacity = "1"; // the hand-over: the computed room gives way to the photographed one
   await wait(3200);
   still.style.opacity = "0";
