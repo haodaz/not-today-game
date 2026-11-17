@@ -2074,7 +2074,7 @@ const VIEW = [];
   const fade = new THREE.CanvasTexture(fc);
   const pic = new THREE.TextureLoader().load(new URL("./art/outside.jpg", import.meta.url).href); pic.colorSpace = THREE.SRGBColorSpace; pic.anisotropy = 8;
   const flip = pic.clone(); flip.wrapS = THREE.RepeatWrapping; flip.repeat.x = -1; flip.offset.x = 1;
-  for (const [sx, zc, ry, map] of [[-1, (WIN.z0 + WIN.z1) / 2 - 13, Math.PI / 2, pic], [1, (SLIT.z0 + SLIT.z1) / 2, -Math.PI / 2, flip]]) {
+  for (const [sx, zc, ry, map] of [[-1, (WIN.z0 + WIN.z1) / 2 - 10.2, Math.PI / 2, pic], [1, (SLIT.z0 + SLIT.z1) / 2, -Math.PI / 2, flip]]) {
     const x = sx > 0 ? X1 + D : X0 - D;
     const b = new THREE.Mesh(new THREE.PlaneGeometry(600, 400), new THREE.MeshBasicMaterial({ map: back, fog: false, toneMapped: false }));
     b.position.set(x + sx * 1.5, line, zc); b.rotation.y = ry; b.userData.noEdge = true; outside.add(b); VIEW.push(b);
@@ -2099,60 +2099,82 @@ const [ovC, ovG] = canvas(1664, 928), ovTex = new THREE.CanvasTexture(ovC); ovTe
 {
   const D = 60, TW = 86, TH = TW * 928 / 1664, cy = 1.5 + TH * 0.12 - 2;
   const m = new THREE.Mesh(new THREE.PlaneGeometry(TW, TH), new THREE.MeshBasicMaterial({ map: ovTex, transparent: true, depthWrite: false, fog: false, toneMapped: false }));
-  m.position.set(X0 - D + 0.4, cy, (WIN.z0 + WIN.z1) / 2 - 13); m.rotation.y = Math.PI / 2; m.userData.noEdge = true; m.isLine2 = true; m.renderOrder = 2; outside.add(m);
+  m.position.set(X0 - D + 0.4, cy, (WIN.z0 + WIN.z1) / 2 - 10.2); m.rotation.y = Math.PI / 2; m.userData.noEdge = true; m.isLine2 = true; m.renderOrder = 2; outside.add(m);
 }
 let ovKey = "";
+// The lights, the people and the flesh are cut to the picture's own glass, not to boxes laid over it (author: 影子错位,
+// 透视不对). Once the picture has loaded, every window's real shape is read out of it: inside a generous box round
+// each window, the pixels that are not wall-coloured (the wall is warm, glass and frame are neutral) are that window.
+// Whatever is painted for a window is then clipped to that shape, so it follows the frame, skew and all.
+const GLASS = { ready: false, c: null, box: [] };
+{
+  const im = new Image();
+  im.onload = () => {
+    const [mc, mg] = canvas(1664, 928); mg.drawImage(im, 0, 0, 1664, 928);
+    const src = mg.getImageData(0, 0, 1664, 928).data, out = mg.createImageData(1664, 928), o = out.data;
+    WINS.forEach(([x, y, w, h, wide], i) => {
+      const px = wide ? 4 : 9, py = wide ? 4 : 12, x0 = Math.round(x - w / 2 - px), x1 = Math.round(x + w / 2 + px), y0 = Math.round(y - h / 2 - py), y1 = Math.round(y + h / 2 + py);
+      let a0 = 1e9, a1 = -1, b0 = 1e9, b1 = -1, sx = 0, n = 0;
+      for (let yy = y0; yy <= y1; yy++) { // each row is filled from its first glass pixel to its last: no holes, and the skew of the frame is kept
+        let f = -1, l = -1, c = 0;
+        for (let xx = x0; xx <= x1; xx++) { const k = (yy * 1664 + xx) * 4, r = src[k], gg = src[k + 1], bb = src[k + 2], lum = (r + gg + bb) / 3; if (r - bb < 17 && lum < 176) { if (f < 0) f = xx; l = xx; c++; } }
+        if (c < (wide ? 14 : 7)) continue; // a stray neutral pixel or two is not a window
+        for (let xx = f; xx <= l; xx++) { const k = (yy * 1664 + xx) * 4; o[k] = o[k + 1] = o[k + 2] = 255; o[k + 3] = 255; sx += xx; n++; }
+        if (f < a0) a0 = f; if (l > a1) a1 = l; if (yy < b0) b0 = yy; if (yy > b1) b1 = yy;
+      }
+      GLASS.box[i] = n > 60 ? [a0, b0, a1 - a0 + 1, b1 - b0 + 1, sx / n] : null;
+    });
+    mg.putImageData(out, 0, 0);
+    GLASS.c = mc; GLASS.ready = true; ovKey = ""; drawView();
+  };
+  im.src = new URL("./art/outside.jpg", import.meta.url).href;
+}
+const [tmpC, tmpG] = canvas(1664, 928);
 function drawView() {
+  if (!GLASS.ready) return;
   const d = state.day, t = state.time, night = smooth(17.4, 19.4, t), late = t >= 23, dim = 0.06 + 0.9 * (1 - smooth(16.8, 19.6, t));
   const key = d + ":" + Math.round(night * 20) + ":" + (late ? 1 : 0);
   if (key === ovKey) return; ovKey = key;
-  const g = ovG; g.clearRect(0, 0, 1664, 928);
+  const g = tmpG; g.globalCompositeOperation = "source-over"; g.clearRect(0, 0, 1664, 928);
   const allLit = d >= 13, crowd = d >= 15, lightK = Math.max(night, crowd ? 0.7 : 0);
   const dk = (r, gg, b, a) => `rgba(${Math.round(r * dim)},${Math.round(gg * dim)},${Math.round(b * dim)},${a})`;
-  WINS.forEach(([x, y, w, h, wide], i) => {
-    const r = h2(i * 3.1, d * 7.7);
+  const flesh = new Set(d >= 16 ? [10, 3, 15, 8, 20, 1, 12, 6, 17, 9].slice(0, d === 16 ? 3 : d === 17 ? 6 : 10) : []);
+  WINS.forEach((win, i) => {
+    const bx = GLASS.box[i]; if (!bx) return;
+    const [x0, y0, w, h, cx] = bx, wide = win[4], r = h2(i * 3.1, d * 7.7);
+    if (flesh.has(i)) { // pushed full from inside: the colour of the inside of a mouth seen across a street
+      const lum = Math.max(dim * 0.85, lightK * 0.7), gr = g.createRadialGradient(cx - w * 0.15, y0 + h * 0.35, 1, cx, y0 + h / 2, Math.max(w, h) * 0.7);
+      gr.addColorStop(0, `rgba(${Math.round(168 * lum)},${Math.round(120 * lum)},${Math.round(108 * lum)},1)`); gr.addColorStop(0.5, `rgba(${Math.round(104 * lum)},${Math.round(58 * lum)},${Math.round(54 * lum)},1)`); gr.addColorStop(1, `rgba(${Math.round(40 * lum)},${Math.round(20 * lum)},${Math.round(20 * lum)},1)`);
+      g.fillStyle = gr; g.fillRect(x0, y0, w, h);
+      g.strokeStyle = `rgba(${Math.round(60 * lum)},10,14,.7)`; g.lineWidth = 0.8; g.beginPath(); g.moveTo(x0 + w * 0.2, y0 + h * 0.4); g.quadraticCurveTo(cx, y0 + h * 0.6, x0 + w * 0.85, y0 + h * 0.3); g.stroke();
+      return;
+    }
     const lit = allLit ? true : late ? (d >= 4 && i === THE_ONE) : r < 0.42 || (d >= 4 && i === THE_ONE);
     if (!lit || lightK <= 0.02) return;
-    const cold = !allLit && r < 0.1; // a television
-    g.save(); g.shadowColor = cold ? "rgba(150,190,255,.6)" : "rgba(255,180,100,.6)"; g.shadowBlur = 4;
-    const br = 0.62 + 0.38 * h2(i * 1.7, 9.9); // no two rooms are lit alike
-    g.fillStyle = cold ? `rgba(150,180,225,${0.8 * lightK})` : `rgba(${Math.round(250 * br)},${Math.round((170 + r * 40) * br)},${Math.round((90 + r * 50) * br)},${0.84 * lightK})`;
-    g.fillRect(x - w / 2 + 1, y - h / 2 + 1, w - 2, h - 2); g.restore();
-    g.fillStyle = `rgba(60,36,20,${0.5 * lightK})`; g.fillRect(x - 0.6, y - h / 2 + 1, 1.2, h - 2); // the window's own bar
-    if (!crowd && h2(i, 6.6) > 0.5) { g.fillStyle = `rgba(120,70,40,${0.45 * lightK})`; g.fillRect(x - w / 2 + 1, y - h / 2 + 1, w * (0.2 + 0.25 * h2(i, 2.2)), h - 2); } // a curtain half drawn
+    const cold = !allLit && r < 0.1, br = 0.62 + 0.38 * h2(i * 1.7, 9.9); // a television; and no two rooms are lit alike
+    g.fillStyle = cold ? `rgba(150,180,225,${0.8 * lightK})` : `rgba(${Math.round(250 * br)},${Math.round((170 + r * 40) * br)},${Math.round((90 + r * 50) * br)},${0.86 * lightK})`;
+    g.fillRect(x0, y0, w, h);
+    if (!crowd && h2(i, 6.6) > 0.5) { g.fillStyle = `rgba(120,70,40,${0.45 * lightK})`; g.fillRect(x0, y0, w * (0.2 + 0.25 * h2(i, 2.2)), h); } // a curtain half drawn
     // someone standing there: first only in the one window (day 11), then in a few, then in all of them, and they do not move
     const n = wide ? 1 + Math.floor(h2(i, 5.5) * 2) : 1, has = crowd || (d >= 13 && r > 0.55) || (d >= 11 && i === THE_ONE);
     if (has) for (let k = 0; k < n; k++) {
-      const fx = x + (wide ? (k - 0.5) * w * 0.42 + (h2(i, k + 1.3) - 0.5) * 6 : (h2(i, 4.2) - 0.5) * w * 0.3), tall = h2(i * 2.3, k + 7.1), top = y - h * (0.22 + 0.14 * tall) + (wide ? 4 : 0), bw = Math.min(11, w * 0.5) * (0.85 + 0.3 * h2(i, k + 3.3));
-      g.save(); g.beginPath(); g.rect(x - w / 2, y - h / 2, w, h); g.clip(); g.filter = "blur(0.7px)"; // behind glass, a street away: a shape, not a drawing
+      const fx = wide ? x0 + w * (0.3 + 0.4 * k) + (h2(i, k + 1.3) - 0.5) * 5 : cx + (h2(i, 4.2) - 0.5) * w * 0.16, tall = h2(i * 2.3, k + 7.1), top = y0 + h * (0.2 + 0.14 * tall), bw = Math.min(11, w * 0.42) * (0.85 + 0.3 * h2(i, k + 3.3));
       g.fillStyle = `rgba(22,14,10,${0.86 * lightK})`;
       g.beginPath(); g.ellipse(fx, top + 3, 2.7, 3.3, 0, 0, 7); g.fill();
-      g.beginPath(); g.moveTo(fx - bw / 2, y + h / 2 + 2); g.lineTo(fx - bw / 2, top + 11); g.quadraticCurveTo(fx - bw / 2, top + 7.5, fx - 1.6, top + 6.5); g.lineTo(fx + 1.6, top + 6.5); g.quadraticCurveTo(fx + bw / 2, top + 7.5, fx + bw / 2, top + 11); g.lineTo(fx + bw / 2, y + h / 2 + 2); g.fill();
-      g.restore();
+      g.beginPath(); g.moveTo(fx - bw / 2, y0 + h + 2); g.lineTo(fx - bw / 2, top + 11); g.quadraticCurveTo(fx - bw / 2, top + 7.5, fx - 1.6, top + 6.5); g.lineTo(fx + 1.6, top + 6.5); g.quadraticCurveTo(fx + bw / 2, top + 7.5, fx + bw / 2, top + 11); g.lineTo(fx + bw / 2, y0 + h + 2); g.fill();
     }
   });
+  g.globalCompositeOperation = "destination-in"; g.drawImage(GLASS.c, 0, 0); g.globalCompositeOperation = "source-over"; // keep only what falls on glass
+  const og = ovG; og.clearRect(0, 0, 1664, 928); og.drawImage(tmpC, 0, 0);
   if (d >= 6) { // the cloth on the balcony rail: a different rail, a different place along it, every day
     const rails = [364, 438, 498, 566], ri = Math.floor(h2(d * 5.3, 1.7) * 4), cx = 496 + h2(d * 2.9, 8.1) * 90;
-    g.fillStyle = dk(150, 34, 30, 0.95); g.fillRect(cx, rails[ri] - 2, 15, 19);
-    g.fillStyle = dk(110, 22, 20, 0.95); g.fillRect(cx + 9, rails[ri] - 2, 2, 19);
+    og.fillStyle = dk(150, 34, 30, 0.95); og.fillRect(cx, rails[ri] - 2, 15, 19);
+    og.fillStyle = dk(110, 22, 20, 0.95); og.fillRect(cx + 9, rails[ri] - 2, 2, 19);
   }
   if (d >= 8) { // under one air-conditioner the wall is stained, and it is not water
-    const len = Math.min(170, (d - 7) * 15), gr = g.createLinearGradient(0, 566, 0, 566 + len);
+    const len = Math.min(170, (d - 7) * 15), gr = og.createLinearGradient(0, 566, 0, 566 + len);
     gr.addColorStop(0, dk(84, 16, 12, 0.8)); gr.addColorStop(0.7, dk(78, 14, 12, 0.5)); gr.addColorStop(1, dk(70, 12, 10, 0));
-    g.fillStyle = gr; g.fillRect(382.5, 566, 4.5, len); g.fillRect(390, 566, 2.5, len * 0.6); g.fillRect(377, 566, 2, len * 0.35);
-  }
-  if (d >= 16) { // pushed out from inside
-    const n = d === 16 ? 3 : d === 17 ? 6 : 10;
-    for (let k = 0; k < n; k++) {
-      const [x, y, w, h] = WINS[Math.floor(h2(k * 9.1, 3.3) * 22)], rr = Math.max(w, h) * 0.56;
-      g.save(); g.beginPath(); g.rect(x - w / 2 - 2, y - h / 2 - 2, w + 4, h + 5); g.clip(); // it fills the frame and presses on it; it has not come through
-      const gr = g.createRadialGradient(x - rr * 0.25, y - rr * 0.3, 1, x, y, rr);
-      const lum = Math.max(dim, lightK * 0.8);
-      gr.addColorStop(0, `rgba(${Math.round(196 * lum)},${Math.round(128 * lum)},${Math.round(116 * lum)},1)`); gr.addColorStop(0.5, `rgba(${Math.round(128 * lum)},${Math.round(52 * lum)},${Math.round(50 * lum)},1)`); gr.addColorStop(1, `rgba(${Math.round(52 * lum)},${Math.round(16 * lum)},${Math.round(18 * lum)},1)`);
-      g.fillStyle = gr; g.fillRect(x - w / 2 - 2, y - h / 2 - 2, w + 4, h + 5);
-      g.strokeStyle = `rgba(${Math.round(60 * lum)},10,14,.7)`; g.lineWidth = 0.8; g.beginPath(); g.moveTo(x - w * 0.3, y - h * 0.1); g.quadraticCurveTo(x, y + h * 0.1, x + w * 0.35, y - h * 0.25); g.stroke();
-      g.restore();
-    }
+    og.fillStyle = gr; og.fillRect(382.5, 566, 4.5, len); og.fillRect(390, 566, 2.5, len * 0.6); og.fillRect(377, 566, 2, len * 0.35);
   }
   ovTex.needsUpdate = true;
 }
