@@ -439,6 +439,8 @@ export interface Session {
    * room-3d-wake: day 4's wake flash over the stage (session only; its `wake:flash` step is the
    * record). `lined`: the room's `wake-line` was already queued (a reloaded frame posts it again).
    */
+  /** room-3d-window: the look out of the window in the code-built room, from 窗 (session only; no event). */
+  outside: { readonly since: number } | null;
   wakeFlash: { readonly since: number; readonly phase: "loading" | "up" | "fading"; readonly lined?: boolean } | null;
   /** fill (day11-budget-fill): the cost sheet's budget fill under way (session only; its end is logged as an `open fill:…`). */
   fill: import("./workbench/fill").FillGame | null;
@@ -671,6 +673,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     klotski: null,
     echo: null,
     nonogram: null,
+    outside: null,
     wakeFlash: null,
     fill: null,
     moles: null,

@@ -10,6 +10,7 @@ import { boxReadsOn, dialogueBox, lineScreens } from "@world/dialogue/box";
 import { logCurrent, logPlayer } from "@world/dialogue/history";
 import { settleSession } from "@world/dialogue/place";
 import { openWakeFlash, queueRise, wakeFlashDue } from "./wake";
+import { somethingOpen } from "./stare";
 import { noteWallpaper, WALL_FADE_MS } from "@world/desktop/wallpaper";
 import { hintLayer } from "@world/hints/hints";
 import { FACE_FROM_STAGE, FACE_MS, msgFaceDelay, msgFaceSeed, type FaceApp } from "@world/desktop/workbench/collapse";
@@ -717,7 +718,7 @@ export const loopActions: Record<string, ActionHandler> = {
     const dir = data.dir as TurnDir;
     const { session } = ctx;
     // room-3d-wake R3: the flash covers the stage; the view does not turn under it
-    if (session.wakeFlash) return;
+    if (session.wakeFlash || session.outside) return;
     // guidance R13: the case closes with the view (a turn is a view change, not blocked by it).
     if (session.caseOpen && (dir === "left" || dir === "right")) {
       session.caseOpen = false;
@@ -867,6 +868,20 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.rerender();
   },
 
+  // room-3d-window R2: the glass on 窗 looks out into the code-built room, when nothing else is open
+  // over the view; 离开窗边 (and Esc) steps back. Session only.
+  "window-out"(ctx) {
+    const { session } = ctx;
+    const now = ctx.now?.() ?? Date.now();
+    if (session.view !== "window" || session.outside !== null || somethingOpen(session, now)) return;
+    session.outside = { since: now };
+    ctx.rerender();
+  },
+  "window-back"(ctx) {
+    if (ctx.session.outside === null) return;
+    ctx.session.outside = null;
+    ctx.rerender();
+  },
   // 开机: the tower's power button, in 房间 and 桌子.
   "tower-power"(ctx) {
     if (booted(ctx.store.getState(), ctx.store.getEvents())) return;
@@ -1072,7 +1087,7 @@ export const loopActions: Record<string, ActionHandler> = {
 
   // Back one camera level (right-click, wheel, the bottom of the stage): nothing over the view first.
   "nav-back"(ctx) {
-    if (overlayOpen(ctx.session) || ctx.session.wakeFlash) return;
+    if (overlayOpen(ctx.session) || ctx.session.wakeFlash || ctx.session.outside) return;
     const to = backTarget(ctx.session.view);
     if (to) loopActions["view"]!(ctx, { view: to } as DOMStringMap, null as never);
   },
@@ -2211,6 +2226,15 @@ export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
   if (ctx.store.getState().ending !== "none" || (ctx.session.endingPreview && ctx.session.endingPage)) {
     if (e.key === "Enter" || e.key === " ") endingNext(ctx);
     return true;
+  }
+  // room-3d-window R2: looking out, Esc steps back before anything else; the keys that move the view
+  // do nothing (Space / Enter still read the box on, below).
+  if (ctx.session.outside !== null) {
+    if (e.key === "Escape") {
+      loopActions["window-back"]!(ctx, {} as DOMStringMap, null as never);
+      return true;
+    }
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "Backspace") return true;
   }
   // stack (2026-11-12): the approval chain on the work stage takes the arrow keys (as 2048 does).
   if (ctx.session.chain && ctx.session.workShow && ctx.session.view === "desktop") {

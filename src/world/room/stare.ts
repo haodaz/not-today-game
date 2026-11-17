@@ -21,14 +21,14 @@ export const STARE_JOLT_MS = 600;
 export const stareMs = (): number => constants.stareMs as number;
 
 /** Anything open over the view stops a stare (the box, a window, a panel, a held thing, a camera move still running — `cam` keeps the last move's record, so only its `until` counts). */
-function somethingOpen(s: Session, nowMs: number): boolean {
+export function somethingOpen(s: Session, nowMs: number): boolean {
   return (
     s.dialogue.queue.length > 0 ||
     s.settingsOpen || s.statusOpen || s.itemsOpen || s.caseOpen || s.phoneOpen || s.bookOpen || s.historyOpen ||
     s.holding !== null || s.printsView !== null || s.sheetShown !== null || !!s.viewfinder ||
     (s.cam !== null && nowMs < s.cam.until) || !!s.endingPage || !!s.pullOut || !!s.boss || s.figureOpen !== null || s.handCut !== null ||
-    // room-3d-wake R3: the code-built room's flash over the stage
-    s.wakeFlash !== null
+    // room-3d-wake R3 / room-3d-window R5: the code-built room over the stage (the flash, the look-out)
+    s.wakeFlash !== null || s.outside !== null
   );
 }
 

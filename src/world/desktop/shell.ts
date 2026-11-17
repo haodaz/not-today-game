@@ -314,8 +314,12 @@ function workBar(m: ShellModel): SafeHtml {
  * caller leaves it out while the coach marks are up; the ending pages never render the desktop.
  */
 export function leaveControl(): SafeHtml {
-  const leave = t("desktop.leave");
-  return html`<button type="button" class="leave-screen" data-action="view" data-view="desk" title="${leave}" aria-label="${leave}"><span class="chev" aria-hidden="true"></span><span class="word">${leave}</span></button>`;
+  return leavePill(t("desktop.leave"), html` data-action="view" data-view="desk"`);
+}
+
+/** The left-edge pill's markup with its own action attributes (room-3d-window R3: the look-out's way back is the same pill). */
+export function leavePill(word: string, action: SafeHtml): SafeHtml {
+  return html`<button type="button" class="leave-screen"${action} title="${word}" aria-label="${word}"><span class="chev" aria-hidden="true"></span><span class="word">${word}</span></button>`;
 }
 
 /** A decoy's small system window: the real apps' chrome, one centred grey line, a close control. */

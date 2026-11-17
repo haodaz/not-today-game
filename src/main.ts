@@ -139,6 +139,8 @@ function startGame(store: Store, saved: boolean, prologue = false): void {
     // meters-v2 §2: before every render the stare countdown starts, keeps, resets or fires
     settle: (ctx) => {
       settleSession(ctx.session);
+      // room-3d-window: the look-out belongs to 窗; any other view (a story moving the player) ends it
+      if (ctx.session.outside !== null && ctx.session.view !== "window") ctx.session.outside = null;
       stareTick(ctx);
     },
     // tingtalk R1b: the windows' placement is remembered for this run (a fresh run starts default).
@@ -172,6 +174,7 @@ function startGame(store: Store, saved: boolean, prologue = false): void {
     hand: createHandLayer(),
     // room-3d-wake: the code-built room's messages (day 4's wake flash).
     room3d: createRoom3dLayer(onRoomMessage),
+    // room-3d-window: the same layer drives the look-out with outsideCommand (its default)
   });
   // What finished runs left on the desk (presentation only; the story never reads it).
   game.session.collection = collection;

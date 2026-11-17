@@ -916,3 +916,8 @@
 .outside-host.ready > iframe.room3d,.outside-host > iframe.room3d.ready{opacity:1}
 .outside-host.gone > iframe.room3d,.outside-host > iframe.room3d.gone{opacity:0}
 .outside-host.gone > .outside-dim{opacity:0}
+/* room-3d-window R3: the look-out's way back — the left-edge pill of 屏幕 (.hud-host .leave-screen), in the stage's own px, over the room */
+.outside-host > .leave-screen{position:absolute;left:12px;top:50%;transform:translateY(-50%);z-index:2;width:36px;height:140px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:10px 0;background:rgba(232,228,220,.82);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.45);border-radius:18px;box-shadow:0 6px 24px rgba(0,0,0,.22);color:#1d2129;font:inherit;font-size:13px;letter-spacing:.2em;cursor:pointer;transition:background 160ms,transform 160ms}
+.outside-host > .leave-screen:hover,.outside-host > .leave-screen:focus-visible{background:rgba(244,240,232,.95);transform:translateY(-50%) translateX(2px);outline:none}
+.outside-host > .leave-screen .chev{width:8px;height:8px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-left:3px;flex:0 0 auto}
+.outside-host > .leave-screen .word{writing-mode:vertical-rl;white-space:nowrap;line-height:1}

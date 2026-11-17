@@ -184,6 +184,8 @@ export const GUIDE_ALLOWS: ReadonlySet<string> = new Set([
   "book-turn",
   "case-close",
   "loop-order",
+  // room-3d-window: the way back from the look-out is never refused (its way in, the glass, is)
+  "window-back",
 ]);
 export const guideAllows = (action: string): boolean => GUIDE_ALLOWS.has(action) || ALLOW_PREFIXES.some((p) => action.startsWith(p));
 
