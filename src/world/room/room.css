@@ -855,6 +855,10 @@
 /* the second stage and the last form (boss-fx reads .stage2 / .final for the air around it) */
 .bs-boss.stage2 .bs-boss-img{animation:bs-loom 3.2s ease-in-out infinite}
 /* the last form has its own, larger picture (stage3): no extra scale here, only the light round it */
+/* its picture is a rectangle with its own red ground, and where that rectangle stopped it read as a sheet of paper
+   stood on the stage (author 2026-11-17: 边缘截断，感觉就是一个纸片). Its left, top and bottom edges are dissolved into the dark
+   so it comes out of the place instead of standing in front of it. */
+.boss-page.final .bs-boss-img{-webkit-mask-image:linear-gradient(90deg,transparent 0,rgba(0,0,0,.5) 12%,#000 30%),linear-gradient(0deg,transparent 0,#000 20%,#000 86%,transparent 100%);-webkit-mask-composite:source-in;mask-image:linear-gradient(90deg,transparent 0,rgba(0,0,0,.5) 12%,#000 30%),linear-gradient(0deg,transparent 0,#000 20%,#000 86%,transparent 100%);mask-composite:intersect}
 .boss-page.final .bs-boss-img{filter:drop-shadow(0 0 90px rgba(200,20,20,.9)) drop-shadow(0 30px 20px rgba(0,0,0,.7))}
 @media (prefers-reduced-motion:reduce){.bs-member .bs-sprite,.bs-boss-img{animation:none!important}.boss-page.bs-struck::after{animation:none;opacity:0}.boss-page.bs-impact .bs-bg,.boss-page.bs-impact .bs-field{filter:none}}
 /* the orders: whose turn it is, and for every move its name and what it does (the rules rewrite's markup) */
@@ -899,6 +903,11 @@
 .bs-bossbar .bs-bar b{background:linear-gradient(180deg,#fca5a5,#dc2626 45%,#7f1d1d);box-shadow:0 0 16px rgba(239,68,68,.7)}
 .bs-bossbar.stage2 .bs-bar b{background:linear-gradient(180deg,#f0abfc,#a21caf 45%,#3b0764);box-shadow:0 0 16px rgba(162,28,175,.7)}
 .bs-bossbar .bs-name{font-size:14px;letter-spacing:.5em}
+/* the second bar (author 2026-11-17: 另一个颜色的血条…). Another colour and nothing else: the first version also wrapped it in
+   coils and she could not tell what she was looking at (「非常怪，看不明白怎么回事」). A bar has to read as a bar at a glance. */
+.bs-bossbar.stage2 .bs-bar.hp2{background:#0a0306;box-shadow:inset 0 0 0 1px rgba(160,60,70,.6),0 0 0 3px rgba(5,6,10,.7),0 0 26px rgba(140,10,30,.55)}
+.bs-bossbar.stage2 .bs-bar.hp2 b{background:linear-gradient(180deg,#e2a9ae 0,#a21f36 26%,#5a0a1a 70%,#2a040c 100%);box-shadow:0 0 18px rgba(170,20,45,.75)}
+.bs-bossbar.stage2 .bs-name{color:#e7b9be;text-shadow:0 0 12px rgba(170,20,45,.8),0 1px 0 #000}
 .bs-pct{font:700 15px/1 var(--mono,ui-monospace,Menlo,monospace);letter-spacing:.04em}
 .boss-page.after .bs-bg{animation:bs-bg-out 4s 1.2s ease-in-out both;transform-origin:50% 76%}
 @keyframes bs-bg-out{100%{transform:scale(.16) translateY(900px);opacity:0}}
