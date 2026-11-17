@@ -3,90 +3,229 @@
   "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
   "tasks": [
     {
-      "id": "slip",
-      "title": "NOT TODAY",
+      "id": "work",
+      "title": "Clear what is in hand.",
       "app": "docs",
-      "done": "task_d18_seen",
-      "start": {
-        "say": [
+      "done": "task_d18_work",
+      "board": {
+        "kind": "table",
+        "title": "To-do list · 2028-11-02",
+        "columns": [
+          "",
+          "Ticket",
+          "How it closes"
+        ],
+        "given": {
+          "rows": {
+            "r1": "Jiangyu Data Bureau · acceptance report",
+            "r2": "Hongyi Group · invoice",
+            "r3": "Yuanshu AI · renewal",
+            "r4": "Qinghe Logistics · final payment",
+            "r5": "Future Intelligence · year-end summary"
+          }
+        },
+        "slots": [
           {
-            "k": "narration",
-            "t": "Everyone walks into that good night some day. Not today."
+            "id": "r1",
+            "label": "Acceptance report",
+            "answer": "c1"
           },
           {
-            "k": "narration",
-            "t": "A shipping form on the desk."
+            "id": "r2",
+            "label": "Invoice",
+            "answer": "c2"
+          },
+          {
+            "id": "r3",
+            "label": "Renewal",
+            "answer": "c3"
+          },
+          {
+            "id": "r4",
+            "label": "Final payment",
+            "answer": "c4"
+          },
+          {
+            "id": "r5",
+            "label": "Year-end summary",
+            "answer": "c5"
           }
         ],
-        "options": [
+        "cards": [
           {
-            "mode": "self",
-            "goto": "self"
+            "id": "c1",
+            "text": "File it",
+            "from": {
+              "file": "e-receivable"
+            },
+            "hint": "In the receivables: said paid, never paid"
           },
           {
-            "mode": "look",
-            "goto": "look"
+            "id": "c2",
+            "text": "Void it",
+            "from": {
+              "file": "e-receivable"
+            },
+            "hint": "In the receivables: invoiced, no money came"
           },
           {
-            "mode": "let",
-            "goto": "let"
-          }
-        ]
-      },
-      "self": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "You don't fill it in."
+            "id": "c3",
+            "text": "Send it back",
+            "from": {
+              "file": "e-receivable"
+            },
+            "hint": "In the receivables: said paid, never paid"
           },
           {
-            "k": "inner",
-            "t": "Send it to whom."
+            "id": "c4",
+            "text": "Close it",
+            "from": {
+              "file": "e-receivable"
+            },
+            "hint": "In the receivables: the only one that really paid"
+          },
+          {
+            "id": "c5",
+            "text": "Hand it in",
+            "from": {
+              "file": "e-receivable"
+            },
+            "hint": "In the receivables: the last row"
+          },
+          {
+            "id": "d1",
+            "text": "Wait a little",
+            "from": {
+              "file": "e-receivable"
+            },
+            "hint": "What you want to write on every one"
+          },
+          {
+            "id": "d2",
+            "text": "Let it go",
+            "from": {
+              "file": "e-receivable"
+            },
+            "hint": "What you want to write on every one"
           }
         ],
-        "kuro": [],
-        "effects": {
-          "flags": [
-            "task_d18_seen"
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "c2",
+            "r3": "c3",
+            "r4": "c4",
+            "r5": "k1"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "Mail it"
+            }
+          ],
+          "unlock": "-"
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Last one."
+              },
+              {
+                "who": "me",
+                "text": "Last day. Clear what is in hand."
+              }
+            ]
+          },
+          {
+            "on": "fill:r4",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Qinghe really paid. Close it."
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "\"Wait a little.\" It has been three years."
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "\"Mail it\" — I wrote that. The summary goes to the next one."
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Sent to Lao Wang. He will not read it."
+              }
+            ]
+          }
+        ],
+        "game": {
+          "kind": "pacman",
+          "flavour": "last",
+          "maze": [
+            "###############",
+            "#1....#.#....2#",
+            "#.##.##.##.##.#",
+            "#o...........o#",
+            "#.##.#G#G#.##.#",
+            "#....#G#G#...3#",
+            "#.##.#####.##.#",
+            "#4.....P.....5#",
+            "###############"
           ]
         }
       },
-      "look": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "You ask it where to send it."
-          }
-        ],
-        "kuro": [
-          "The box goes where the slip says. Nothing on it says me."
-        ],
-        "effects": {
-          "flags": [
-            "task_d18_seen"
-          ],
-          "looked": true,
-          "assimilation": 1
-        }
+      "deliverable": {
+        "id": "d18-clear",
+        "label": "To-do list",
+        "to": "boss"
       },
-      "let": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "It fills it in for you."
-          }
+      "judge": {
+        "perfect": 0,
+        "flawed": -3,
+        "wrong": -6,
+        "wrongAt": 2
+      },
+      "launch": {
+        "who": "boss",
+        "note": [
+          "Lao Wang: clear everything in hand today.",
+          "Leave nothing for tomorrow."
         ],
-        "kuro": [
-          "Done. Rest now."
-        ],
-        "effects": {
-          "flags": [
-            "task_d18_seen",
-            "slip_filled"
-          ],
-          "letItDoUnchecked": 1,
-          "assimilation": 4
-        }
+        "call": "Five tickets, close them one by one.",
+        "cta": "Start work",
+        "motif": {
+          "kind": "fan",
+          "items": [
+            "Acceptance report",
+            "Invoice",
+            "Renewal",
+            "Final payment",
+            "Year-end summary",
+            "Nothing for tomorrow",
+            "Colleagues in the corridor",
+            "Coffee",
+            "Clock out"
+          ]
+        },
+        "tone": "night"
       }
     }
   ]

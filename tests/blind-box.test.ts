@@ -157,7 +157,7 @@ describe("the hidden box on day 18", () => {
     expect(looseContent(17, boxObjectFor(17), true)).not.toBe(HIDDEN_ID);
   });
 
-  it("on day 18 the hidden box is loose; opening it logs openLayer slip, found does not change, the slip shows on the desk", () => {
+  it("on day 18 the hidden box is loose; opening it logs openLayer slip, found does not change, the slip stays off the desk", () => {
     const store = atDay(18);
     completeUntil(store, "box");
     expect(looseContent(18, boxObjectFor(18), true)).toBe(HIDDEN_ID);
@@ -172,9 +172,10 @@ describe("the hidden box on day 18", () => {
     // `found` never gains "slip".
     expect(store.getState().found).toEqual(foundBefore);
     expect(store.getState().found).not.toContain("slip");
-    // The slip (寄件单) shows on the desk (the tabletop) once the box item is done (unlock: done:box).
-    const deskHtml = renderRoom({ state: store.getState(), events: store.getEvents(), session: initialSession(DEFAULT_CLOCK, "left", "desk") }).value;
-    expect(deskHtml).toContain("/room/desk/slip.png");
+    // Author 2026-11-16: the slip is the waybill for mailing the objects away; it stays in the box until
+    // the ending — never on the desk, never the day's work.
+    ctx.session.view = "desk";
+    expect(renderRoom({ state: store.getState(), events: store.getEvents(), session: ctx.session, runId: store.getRunId() }).value).not.toContain("/room/desk/slip.png");
   });
 });
 

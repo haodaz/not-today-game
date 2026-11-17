@@ -15,10 +15,7 @@ import { loopActions } from "@world/room/game";
 
 const clone = () => structuredClone(day01) as any;
 
-// TODO(Claude): content/tasks/day-18.json names its task "task1" with done
-// "task_d18_1"; content/days/day-18.json names the item "slip" with done
-// "flag:slip_filled" (only the "let" path sets slip_filled). Content decides
-// which is right; until then day 18 is a known gap, logged in docs/kiro-log.md.
+// Day 18's work is the last day's pacman (author 2026-11-16); the slip is an ending's thing now.
 const KNOWN_GAPS = new Set<string>();
 
 describe("task trees (content/tasks)", () => {

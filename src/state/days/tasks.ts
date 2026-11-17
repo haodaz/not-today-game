@@ -219,7 +219,7 @@ export type BoardGame =
   /** whack-a-mole: the audience's faces looking down at their phones; `pages` of `pageMs` each */
   | { readonly kind: "moles"; readonly seats: number; readonly pages: number; readonly pageMs: number }
   /** pac-man: the meeting room as a maze; `maze` rows (# wall, . dot, o pellet, 1–5 the lines, P you, G a ghost) */
-  | { readonly kind: "pacman"; readonly maze: readonly string[] }
+  | { readonly kind: "pacman"; readonly maze: readonly string[]; readonly flavour?: "last" }
   /** spot the difference: a compare board whose pick is the word that differs, pointed at in the version you trust */
   | { readonly kind: "spot" }
   /** fill (day11-budget-fill): a budget buys shapes to cover the sheet's 要求 cells, four rounds; `people` are the 1-cell, free 自己人 */
@@ -879,14 +879,16 @@ function board(v: unknown, w: string): TaskBoard {
       keys(v.game, ["kind", "seats", "pages", "pageMs"], gw);
       game = { kind: "moles", seats: num(v.game.seats, "seats", 4, 24), pages: num(v.game.pages, "pages", 1, 6), pageMs: num(v.game.pageMs, "pageMs", 5000, 120000) };
     } else if (v.game.kind === "pacman") {
-      keys(v.game, ["kind", "maze"], gw);
+      keys(v.game, ["kind", "maze", "flavour"], gw);
+      // day 18 (author 2026-11-16): the last day's pacman wears the colleagues' faces and keeps its own words
+      if (v.game.flavour !== undefined && v.game.flavour !== "last") fail(`${gw}.flavour`, 'must be "last" or absent');
       if (!Array.isArray(v.game.maze) || v.game.maze.length < 5 || v.game.maze.length > 20 || !v.game.maze.every((r) => typeof r === "string" && r.length >= 5 && r.length <= 30)) fail(`${gw}.maze`, "must be 5 to 20 rows of 5 to 30 characters");
       const maze = v.game.maze as string[];
       const all = maze.join("");
       if (all.split("").filter((c) => c === "P").length !== 1) fail(`${gw}.maze`, "must place exactly one P");
       if (!all.includes("G")) fail(`${gw}.maze`, "must place a ghost (G)");
       for (const n of ["1", "2", "3", "4", "5"]) if (!all.includes(n)) fail(`${gw}.maze`, `must place line ${n}`);
-      game = { kind: "pacman", maze };
+      game = { kind: "pacman", maze, ...(v.game.flavour === "last" ? { flavour: "last" as const } : {}) };
     } else if (v.game.kind === "spot") {
       keys(v.game, ["kind"], gw);
       game = { kind: "spot" };

@@ -35,7 +35,7 @@
       "say": [
         {
           "k": "narration",
-          "t": "A shipping form on the desk, waiting for you."
+          "t": "The desk is empty. The box is still by the bed, lid on."
         }
       ]
     },
@@ -125,12 +125,25 @@
       "required": true
     },
     {
-      "id": "slip",
-      "text": "Look at the shipping form on the desk.",
-      "unlock": "done:box",
-      "done": "flag:task_d18_seen",
-      "required": false,
-      "origin": "them"
+      "id": "work",
+      "text": "Clear what is in hand.",
+      "unlock": "done:reply",
+      "done": "flag:task_d18_work",
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "Cleared. The desk is empty."
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "Get through today and it is done."
+          }
+        ],
+        "then": "desk"
+      }
     },
     {
       "id": "reply",
@@ -148,16 +161,15 @@
           {
             "k": "speaker",
             "who": "kuro",
-            "t": "Just get through today."
+            "t": "Last day. Leave nothing."
           }
-        ],
-        "then": "desk"
+        ]
       }
     },
     {
       "id": "desk",
       "text": "Take a look at the desk.",
-      "unlock": "done:reply",
+      "unlock": "done:work",
       "done": "event:beat:desk",
       "required": true,
       "when": "night"

@@ -11,7 +11,7 @@ import { dayFile, taskFlags, type BeatName, type Choice } from "./table";
 import { taskByFlag } from "./tasks";
 
 const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
-const STEP = /^(boot|openApp:(msgs|workbench|browser)|eat:(lunch|dinner)|beat:(desk|shutdown)|delivery:arrives:(lunch|dinner)|chat:any|wake:flash)$/;
+const STEP = /^(boot|openApp:(msgs|workbench|browser)|eat:(lunch|dinner)|beat:(desk|shutdown)|delivery:arrives:(lunch|dinner)|chat:any|wake:flash|mercy)$/;
 
 /** The three ways the player can do a work task (the workbench modes). */
 export const TASK_MODES = ["self", "look", "let"] as const;

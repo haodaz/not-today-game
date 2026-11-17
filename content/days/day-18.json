@@ -35,7 +35,7 @@
       "say": [
         {
           "k": "narration",
-          "t": "桌上有一张寄件单，等你填。"
+          "t": "桌上空了。箱子还在床边，盖着。"
         }
       ]
     },
@@ -125,12 +125,25 @@
       "required": true
     },
     {
-      "id": "slip",
-      "text": "桌上的寄件单，看一眼。",
-      "unlock": "done:box",
-      "done": "flag:task_d18_seen",
-      "required": false,
-      "origin": "them"
+      "id": "work",
+      "text": "把手上的活清掉。",
+      "unlock": "done:reply",
+      "done": "flag:task_d18_work",
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "清完了。桌上空了。"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "今天过完就好了。"
+          }
+        ],
+        "then": "desk"
+      }
     },
     {
       "id": "reply",
@@ -148,16 +161,15 @@
           {
             "k": "speaker",
             "who": "kuro",
-            "t": "今天过完就好了。"
+            "t": "最后一天，别留活。"
           }
-        ],
-        "then": "desk"
+        ]
       }
     },
     {
       "id": "desk",
       "text": "看一眼桌子。",
-      "unlock": "done:reply",
+      "unlock": "done:work",
       "done": "event:beat:desk",
       "required": true,
       "when": "night"

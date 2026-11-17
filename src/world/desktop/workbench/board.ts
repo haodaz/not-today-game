@@ -470,6 +470,8 @@ function runPac(ctx: ActionContext, gen: number): void {
     const next = pacTick(g, now);
     if (next.done) {
       ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "approve" } });
+      // day 18 (author 2026-11-16): the corridor cleared and no colleague swallowed — the fight remembers it
+      if (c.board.game.flavour === "last" && next.eatenGhosts === 0) ctx.store.appendEvent({ kind: "step", name: "mercy", t: ctx.session.clock.time });
       ctx.session.pacman = { ...next, approvedAt: now };
       ctx.later(PAC_DONE_MS + 20, ctx.rerender);
     } else {

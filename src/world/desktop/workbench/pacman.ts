@@ -187,10 +187,21 @@ export const linesEaten = (g: PacGame): number => g.lines.filter((c) => c < 0).l
 // ——— the screen ———
 
 const FACES = ["/npc/xiaozhang_av.png", "/npc/partner_av.png", "/npc/boss_av.png"];
+/** Day 18 (author 2026-11-16): the four colleagues roam the corridor with their own faces, always. */
+export const LAST_FACES = ["/npc/boss_av.png", "/npc/partner_av.png", "/npc/xiaozhang_av.png", "/npc/laozhou_av.png"];
+export const LAST_PEOPLE = ["boss", "partner", "xiaozhang", "laozhou"] as const;
+/** The title with its dead letter (author: 「"豆"闪烁一下暗掉」; en PACK-MAN → P K-MAN): the dead part wrapped, width kept. */
+export function deadTitle(title: string, dead: string): SafeHtml {
+  const i = dead ? title.indexOf(dead) : -1;
+  if (i < 0) return html`${title}`;
+  return html`${title.slice(0, i)}<span class="dead-letter">${dead}</span>${title.slice(i + dead.length)}`;
+}
 const TILE = 38;
 
 export function pacStage(task: Task, board: TaskBoard, s: BoardState, session: { readonly pacman: PacGame | null }, approved: boolean, nowMs: number): SafeHtml {
   const game = board.game as Game;
+  const last = game.flavour === "last";
+  const K = (k: string, args?: Record<string, string>) => S(`pacman.${last ? "last" : "stage"}.${k}`, args);
   const g: PacGame | null = session.pacman?.key === task.id ? session.pacman : null;
   const done = approved && (!g || pacApproving(g, nowMs) || g.done);
   const m = g ?? pacStart(task.id, game, "preview", 0, nowMs);
@@ -203,19 +214,19 @@ export function pacStage(task: Task, board: TaskBoard, s: BoardState, session: {
   });
   const pos = (x: number, y: number) => `left:${String(Math.round(x * TILE))}px;top:${String(Math.round(y * TILE))}px`;
   const you = g ? html`<i class="${cls("pm-you", g.you.dir, g.over && "caught")}" style="${pos(g.you.x, g.you.y)}"></i>` : null;
-  const ghosts = g ? g.ghosts.map((gh) => html`<i class="${cls("pm-ghost", fear && "fear", gh.eaten && "eaten")}" style="${pos(gh.x, gh.y)}"><img src="${fear ? FACES[gh.id % FACES.length]! : "/npc/laozhou_av.png"}" alt=""></i>`) : null;
+  const ghosts = g ? g.ghosts.map((gh) => html`<i class="${cls("pm-ghost", fear && "fear", gh.eaten && "eaten")}" style="${pos(gh.x, gh.y)}"><img src="${last ? LAST_FACES[gh.id % LAST_FACES.length]! : fear ? FACES[gh.id % FACES.length]! : "/npc/laozhou_av.png"}" alt=""></i>`) : null;
   const maze = html`<div class="${cls("pm-maze", fear && "fear")}" style="--cols:${String(m.cols)};--rows:${String(m.rows)}"><div class="pm-grid">${cells}</div>${ghosts}${you}</div>`;
   const notes = board.slots.map((slot) => html`<li class="mn-note"><b>${slot.label}</b><span>${slot.id in s.slots ? cardText(board, s.slots[slot.id]!) : ""}</span></li>`);
   const pad = (["up", "left", "down", "right"] as const).map((d) => html`<button type="button" class="${cls("sk-arrow", "sn-key", d)}" data-action="pacman-turn" data-dir="${d}" aria-label="${d}">${d === "up" ? "▲" : d === "left" ? "◀" : d === "down" ? "▼" : "▶"}</button>`);
   let foot: SafeHtml;
-  if (done) foot = html`<div class="mn-state won"><span class="mn-stamp">${S("pacman.stage.won")}</span><p class="pp-flowline">${S(g && g.eatenGhosts > 0 ? "pacman.stage.leftFaces" : "pacman.stage.left")}</p></div>`;
-  else if (!g) foot = html`<button type="button" class="wl-cta" data-action="pacman-start">${S("pacman.stage.start")}</button>`;
-  else if (g.over) foot = html`<div class="mn-state lost"><p>${S("pacman.stage.caught")}</p><button type="button" class="wl-cta ghost" data-action="pacman-assist">${S("settle.kuro")}</button><button type="button" class="wl-cta ghost" data-action="pacman-start">${S("pacman.stage.again")}</button></div>`;
-  else foot = html`<div class="mn-ctl sn-ctl"><span class="mn-left">${S("pacman.stage.lines", { n: String(linesEaten(g)), of: String(g.lines.length) })} · ${String(g.score)}${fear ? html`<span class="pm-fearnote"> · ${S("pacman.stage.fear")}</span>` : null}</span>${g.running ? html`<div class="sk-pad sn-pad">${pad}</div>` : html`<button type="button" class="mn-mode" data-action="pacman-resume">${S("pacman.stage.resume")}</button>`}<span class="sn-hint">${S("pacman.stage.keys")}</span></div>`;
+  if (done) foot = html`<div class="mn-state won"><span class="mn-stamp">${K("won")}</span><p class="pp-flowline">${S(g && g.eatenGhosts > 0 ? "pacman.stage.leftFaces" : "pacman.stage.left")}</p></div>`;
+  else if (!g) foot = html`<button type="button" class="wl-cta" data-action="pacman-start">${K("start")}</button>`;
+  else if (g.over) foot = html`<div class="mn-state lost"><p>${K("caught")}</p><button type="button" class="wl-cta ghost" data-action="pacman-assist">${S("settle.kuro")}</button><button type="button" class="wl-cta ghost" data-action="pacman-start">${K("again")}</button></div>`;
+  else foot = html`<div class="mn-ctl sn-ctl"><span class="mn-left">${K("lines", { n: String(linesEaten(g)), of: String(g.lines.length) })} · ${String(g.score)}${fear ? html`<span class="pm-fearnote"> · ${K("fear")}</span>` : null}</span>${g.running ? html`<div class="sk-pad sn-pad">${pad}</div>` : html`<button type="button" class="mn-mode" data-action="pacman-resume">${K("resume")}</button>`}<span class="sn-hint">${K("keys")}</span></div>`;
   const cheat = import.meta.env.DEV && g && !approved ? html`<button type="button" class="sk-cheat" data-action="pacman-cheat" aria-hidden="true" tabindex="-1"></button>` : null;
   return html`<div class="${cls("mn pm", done && "done", g?.over && "lost")}" data-screen="pacman">
-    <header class="mn-top"><div class="cs-title"><span class="cs-kick">${S("pacman.stage.kick")}</span><h2>${S("pacman.stage.title")}</h2><span class="mn-sub">${S("pacman.stage.sub")}</span></div></header>
-    <aside class="mn-notes"><span class="mn-notes-h">${S("pacman.stage.notes")}</span><ul>${notes}</ul></aside>
+    <header class="mn-top"><div class="cs-title"><span class="cs-kick">${K("kick")}</span><h2>${last ? deadTitle(K("title"), K("dead")) : K("title")}</h2><span class="mn-sub">${K("sub")}</span></div></header>
+    <aside class="mn-notes"><span class="mn-notes-h">${K("notes")}</span><ul>${notes}</ul></aside>
     <div class="mn-month pm-main">${maze}${cheat}</div>
     <div class="mn-foot">${foot}</div>
   </div>`;

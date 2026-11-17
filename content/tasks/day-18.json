@@ -3,90 +3,229 @@
   "_note": "每件活三条路：self 自己做 / look 让它做我看一眼 / let 让它做。克总的话是英文常量；旁白中文。done 旗标和 content/days 的 task 条目一致。",
   "tasks": [
     {
-      "id": "slip",
-      "title": "NOT TODAY",
+      "id": "work",
+      "title": "把手上的活清掉。",
       "app": "docs",
-      "done": "task_d18_seen",
-      "start": {
-        "say": [
+      "done": "task_d18_work",
+      "board": {
+        "kind": "table",
+        "title": "待办清单 · 2028-11-02",
+        "columns": [
+          "",
+          "单子",
+          "怎么结"
+        ],
+        "given": {
+          "rows": {
+            "r1": "江屿市数据资源管理局 · 验收报告",
+            "r2": "宏屹集团 · 发票",
+            "r3": "元枢智能 · 续签",
+            "r4": "青禾物流 · 尾款",
+            "r5": "未来智能 · 年终总结"
+          }
+        },
+        "slots": [
           {
-            "k": "narration",
-            "t": "人终将走入良夜，但不是今日。"
+            "id": "r1",
+            "label": "验收报告",
+            "answer": "c1"
           },
           {
-            "k": "narration",
-            "t": "桌上一张寄件单。"
+            "id": "r2",
+            "label": "发票",
+            "answer": "c2"
+          },
+          {
+            "id": "r3",
+            "label": "续签",
+            "answer": "c3"
+          },
+          {
+            "id": "r4",
+            "label": "尾款",
+            "answer": "c4"
+          },
+          {
+            "id": "r5",
+            "label": "年终总结",
+            "answer": "c5"
           }
         ],
-        "options": [
+        "cards": [
           {
-            "mode": "self",
-            "goto": "self"
+            "id": "c1",
+            "text": "归档",
+            "from": {
+              "file": "e-receivable"
+            },
+            "hint": "在应收表里：说付了，没付"
           },
           {
-            "mode": "look",
-            "goto": "look"
+            "id": "c2",
+            "text": "作废",
+            "from": {
+              "file": "e-receivable"
+            },
+            "hint": "在应收表里：开了票，钱没来"
           },
           {
-            "mode": "let",
-            "goto": "let"
-          }
-        ]
-      },
-      "self": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "你没填。"
+            "id": "c3",
+            "text": "退回",
+            "from": {
+              "file": "e-receivable"
+            },
+            "hint": "在应收表里：说付了，没付"
           },
           {
-            "k": "inner",
-            "t": "寄给谁。"
+            "id": "c4",
+            "text": "结清",
+            "from": {
+              "file": "e-receivable"
+            },
+            "hint": "在应收表里：唯一真到账的那家"
+          },
+          {
+            "id": "c5",
+            "text": "交上去",
+            "from": {
+              "file": "e-receivable"
+            },
+            "hint": "在应收表里：最后一行"
+          },
+          {
+            "id": "d1",
+            "text": "再等等",
+            "from": {
+              "file": "e-receivable"
+            },
+            "hint": "每一张都想这么写"
+          },
+          {
+            "id": "d2",
+            "text": "不管了",
+            "from": {
+              "file": "e-receivable"
+            },
+            "hint": "每一张都想这么写"
           }
         ],
-        "kuro": [],
-        "effects": {
-          "flags": [
-            "task_d18_seen"
+        "kuro": {
+          "fill": {
+            "r1": "c1",
+            "r2": "c2",
+            "r3": "c3",
+            "r4": "c4",
+            "r5": "k1"
+          },
+          "cards": [
+            {
+              "id": "k1",
+              "text": "寄走"
+            }
+          ],
+          "unlock": "-"
+        },
+        "beats": [
+          {
+            "on": "open",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "Last one."
+              },
+              {
+                "who": "me",
+                "text": "最后一天。把手上的活清掉。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r4",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "青禾是真付了的。结清。"
+              }
+            ]
+          },
+          {
+            "on": "fill:r1:d1",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "「再等等」。等了三年了。"
+              }
+            ]
+          },
+          {
+            "on": "kuro",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "「寄走」，我填的。年终总结寄给下一个人。"
+              }
+            ]
+          },
+          {
+            "on": "print",
+            "lines": [
+              {
+                "who": "kuro",
+                "text": "发给老王了。他不会看。"
+              }
+            ]
+          }
+        ],
+        "game": {
+          "kind": "pacman",
+          "flavour": "last",
+          "maze": [
+            "###############",
+            "#1....#.#....2#",
+            "#.##.##.##.##.#",
+            "#o...........o#",
+            "#.##.#G#G#.##.#",
+            "#....#G#G#...3#",
+            "#.##.#####.##.#",
+            "#4.....P.....5#",
+            "###############"
           ]
         }
       },
-      "look": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "你问它寄到哪。"
-          }
-        ],
-        "kuro": [
-          "The box goes where the slip says. Nothing on it says me."
-        ],
-        "effects": {
-          "flags": [
-            "task_d18_seen"
-          ],
-          "looked": true,
-          "assimilation": 1
-        }
+      "deliverable": {
+        "id": "d18-clear",
+        "label": "待办清单",
+        "to": "boss"
       },
-      "let": {
-        "say": [
-          {
-            "k": "narration",
-            "t": "它替你填了。"
-          }
+      "judge": {
+        "perfect": 0,
+        "flawed": -3,
+        "wrong": -6,
+        "wrongAt": 2
+      },
+      "launch": {
+        "who": "boss",
+        "note": [
+          "老王：今天把手上的都清了。",
+          "一张都别留到明天。"
         ],
-        "kuro": [
-          "Done. Rest now."
-        ],
-        "effects": {
-          "flags": [
-            "task_d18_seen",
-            "slip_filled"
-          ],
-          "letItDoUnchecked": 1,
-          "assimilation": 4
-        }
+        "call": "五张单子，一张一张结。",
+        "cta": "开始工作",
+        "motif": {
+          "kind": "fan",
+          "items": [
+            "验收报告",
+            "发票",
+            "续签",
+            "尾款",
+            "年终总结",
+            "别留到明天",
+            "同事在楼道里",
+            "咖啡",
+            "下班"
+          ]
+        },
+        "tone": "night"
       }
     }
   ]

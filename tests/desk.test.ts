@@ -15,7 +15,7 @@ import { BACKDROPS } from "@world/fit";
 import { setLocale, t } from "@world/i18n";
 import { itemStates, loopContext } from "@world/loop/checklist";
 import { loopActions, loopKeys, renderGame } from "@world/room/game";
-import { boxObjectFor, renderRoom, SLIP_ITEM } from "@world/room/hud";
+import { boxObjectFor, renderRoom } from "@world/room/hud";
 import { syncLoop } from "@world/loop/runtime";
 import { deskGap, deskLayout, fullMonitor, objectSlot, OBJECT_SLOTS, parseDesk } from "@world/room/desk";
 import { DESK_SHOT, rectStyle, ROOM_SHOT, WINDOW_SHOT } from "@world/room/shots";
@@ -117,7 +117,7 @@ describe("each placed thing at its rect", () => {
   });
 });
 
-describe("the meal, the box and the slip", () => {
+describe("the meal and the box", () => {
   it("the meal (room-turn R3): never on 桌子 now; on 窗's little table after 去拿; eaten, its empty box stays at the same place", () => {
     const store = atDay(1);
     completeUntil(store, "pickup");
@@ -148,30 +148,6 @@ describe("the meal, the box and the slip", () => {
     expect("box" in deskLayout).toBe(false);
   });
 
-  it("the slip: on day 18 by the lamp once its line is open; reading it opens 屏幕's 工作台; it stays", () => {
-    const last = constants.lastDay as number;
-    const store = atDay(last);
-    const ctx = ctxOf(store);
-    expect(placed(render(ctx), "slip")).toBeNull();
-    completeUntil(store, SLIP_ITEM);
-    const out = render(ctx);
-    expect(placed(out, "slip")).toBe(rectStyle(deskLayout.slip));
-    expect(out).toMatch(/data-at="slip" style="[^"]+"><button type="button" class="slot slip" data-action="desk-slip" aria-label="[^"]+">/);
-    act(ctx, "desk-slip");
-    expect(ctx.session.view).toBe("desktop");
-    expect(ctx.session.leftApp).toBe("workbench");
-    // Read: it stays on the desk; clicking again does nothing.
-    const lc = loopContext(store.getState(), store.getEvents())!;
-    const item = lc.file.items.find((it) => it.id === SLIP_ITEM)!;
-    if (item.done.kind === "flag") store.appendEvent({ kind: "task", flag: item.done.flag, mode: "self" });
-    expect(itemStates(loopContext(store.getState(), store.getEvents())!).get(SLIP_ITEM)!.done).toBe(true);
-    const back = ctxOf(store);
-    expect(placed(render(back), "slip")).toBe(rectStyle(deskLayout.slip));
-    act(back, "desk-slip");
-    expect(back.session.view).toBe("desk");
-    // Not on other days.
-    expect(placed(render(ctxOf(atDay(last - 1))), "slip")).toBeNull();
-  });
 });
 
 describe("道具: the strip as a panel", () => {
@@ -249,16 +225,6 @@ describe("the tabletop's things are photos (day-loop correction 2026-11-01)", ()
     expect(out).toMatchSnapshot();
   });
 
-  it("day 18 with the slip by the lamp: the slip is a photo in its rect", () => {
-    const last = constants.lastDay as number;
-    const store = atDay(last);
-    completeUntil(store, SLIP_ITEM);
-    const out = tabletopOf(render(ctxOf(store)));
-    expect(photoIn(out, "slip")).toBe("/room/desk/slip.png");
-    expect(placed(out, "slip")).toBe(rectStyle(deskLayout.slip));
-    expect(out).toMatch(/class="slot slip" data-action="desk-slip" aria-label="[^"]+"><img class="desk-photo"/);
-    expect(out).toMatchSnapshot();
-  });
 
   it("the box opens where it is and hands you the object (2026-11-02): held while its beat and the question play; answered, it settles on the desk row; the box stays open in 房间 all day", () => {
     const store = atDay(1);
@@ -312,7 +278,7 @@ describe("the tabletop's things are photos (day-loop correction 2026-11-01)", ()
     expect(ctx.session.holding).toBeNull();
     expect(tabletopOf(render(ctxOf(store, "desk")))).toContain(`data-object="${boxObjectFor(1)}"`);
   });
-  it("the 道具 strip uses the same images (and the slip when it is there)", () => {
+  it("the 道具 strip uses the same images; no slip on it any more (author 2026-11-16: the slip is the ending's)", () => {
     const store = atDay(1);
     const ctx = ctxOf(store);
     ctx.session.itemsOpen = true;
@@ -320,15 +286,9 @@ describe("the tabletop's things are photos (day-loop correction 2026-11-01)", ()
     const out = strip(render(ctx));
     for (const name of ["phone", "cup"]) expect(out, name).toContain(`<img class="desk-photo${name === "cup" ? " cup" : ""}" src="/room/desk/${name}.png"`);
     const last = constants.lastDay as number;
-    const s18 = atDay(last);
-    completeUntil(s18, SLIP_ITEM);
-    const c18 = ctxOf(s18);
+    const c18 = ctxOf(atDay(last));
     c18.session.itemsOpen = true;
-    expect(strip(render(c18))).toContain('src="/room/desk/slip.png"');
-    // Clicking the slip from the strip closes it and goes to the 工作台.
-    act(c18, "desk-slip");
-    expect(c18.session.itemsOpen).toBe(false);
-    expect(c18.session.view).toBe("desktop");
+    expect(strip(render(c18))).not.toContain('src="/room/desk/slip.png"');
   });
 
   it("no CSS shapes remain: no placeholder divs in the markup, no shape rules in the stylesheet", () => {
