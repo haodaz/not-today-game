@@ -2945,7 +2945,7 @@ function updateBoss(s, dt) {
 // the ending pages, with the song). They have a small Kuro of their own with them, so nothing is left behind and
 // nothing is drawn away: the crowd of eyes shuts until only the pair is left, the head goes down, the ones that stood
 // up lie down and the red goes out of the ground; and the eye comes back down, through where the ceiling was, into
-// the room — clean, in the morning, every old thing on the desk, and Kuro, large, crouched on the bed. { home: true };
+// the room — clean, in the morning, every old thing on the desk. { home: true }; Kuro, large, crouched on the bed, only on { kuro: true };
 // posts "home" at the end; silent (the player walks home in the game's own narration; this is where they arrive).
 let PEEK = null;
 const HOMEWARD = { at: 0, told: false, S: 13.5 };
@@ -2967,7 +2967,7 @@ function home(on) {
 function updateHome(s) {
   if (!HOMEWARD.at) return;
   const T = s - HOMEWARD.at;
-  if (BOSS.on) { BOSS.r = 1 - smooth(1.4, 5.6, T); if (T > 5.6) { BOSS.on = false; BOSS.leave = false; command({ day: 2, time: 8.5, lamp: false, ceil: false, objects: ["chick", "camera", "pager", "iccard", "tape", "dictionary", "calculator", "phone"] }); /* all of them carried home, on the desk */ HOMEWARD.pup.visible = true; FAR.to = 0.56; FAR.k = 0.56; } } // the head goes down; then the room is there, and it is morning in it
+  if (BOSS.on) { BOSS.r = 1 - smooth(1.4, 5.6, T); if (T > 5.6) { BOSS.on = false; BOSS.leave = false; command({ day: 2, time: 8.5, lamp: false, ceil: false, objects: ["chick", "camera", "pager", "iccard", "tape", "dictionary", "calculator", "phone"] }); /* all of them carried home, on the desk */ FAR.to = 0.56; FAR.k = 0.56; } } // the head goes down; then the room is there, and it is morning in it
   if (!BOSS.on) FAR.to = 0.56 * (1 - smooth(6.4, HOMEWARD.S - 0.6, T)); // and the eye comes home
   if (FAR.built) { const q = smooth(2.2, 8.5, T); FAR.g.scale.y = 1 - 0.975 * q; FAR.g.position.y = -0.7 * q; } // they lie down: flat, and a little under the floor's level
   if (T >= HOMEWARD.S && FAR.k < 0.002 && !HOMEWARD.told) { HOMEWARD.told = true; try { window.parent.postMessage({ source: "nt-room", type: "home" }, "*"); } catch {} }
@@ -3403,6 +3403,7 @@ function command(m) {
   if (m.leave) bossEvent("leave");
   if (m.peek !== undefined) PEEK = m.peek;
   if (m.home != null) home(!!m.home);
+  if (m.kuro != null && HOMEWARD.pup) HOMEWARD.pup.visible = !!m.kuro && !!HOMEWARD.at; // { kuro: true }: only now is he on the bed (her order: the things on the desk → 「点个外卖吧」 in the ear → then he is seen). Posts nothing.
   if (m.rush && CON.at && CON.told && !CON.rush) CON.rush = performance.now() / 1000; // only once the whole of him has been seen ("eye")
   if (m.greatLook != null) CON.look = m.greatLook;
   if (m.greatZoom != null) CON.zoom = m.greatZoom; // below 1 = further off
