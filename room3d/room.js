@@ -2687,9 +2687,32 @@ function frame(now) {
 canvasEl.addEventListener("pointerdown", (e) => {
   dragging = { x: e.clientX, y: e.clientY, lx: state.look.x, ly: state.look.y };
   canvasEl.setPointerCapture(e.pointerId);
+  // At the desk, a press on one of her things takes hold of it: it can be slid about the desk top and left where
+  // she likes (author 2026-11-16: 把东西拖动换个位置，自己布置). A press that does not move is still a click.
+  if (state.desk && state.spot === "desk" && !state.inspect) {
+    aim(e);
+    let id = null;
+    for (const k in OBJ) if (OBJ[k].visible && ray.intersectObject(OBJ[k], true).length) { id = k; break; }
+    if (!id && ray.intersectObject(DESKPHONE, true).length) id = "deskphone";
+    if (id && ray.ray.intersectPlane(DESK_PLANE, _hp)) { const o = id === "deskphone" ? DESKPHONE : OBJ[id]; dragging.obj = { id, o, dx: o.position.x - _hp.x, dz: o.position.z - _hp.z, moved: false }; }
+  }
 });
 canvasEl.addEventListener("pointermove", (e) => {
   if (!dragging) return;
+  if (dragging.obj) {
+    const d = dragging.obj;
+    if (!d.moved && Math.hypot(e.clientX - dragging.x, e.clientY - dragging.y) < 5) return;
+    d.moved = true;
+    aim(e);
+    if (ray.ray.intersectPlane(DESK_PLANE, _hp)) { // kept on the desk top, in front of the screens' feet
+      d.o.position.x = Math.max(DESK.x - DESK.w / 2 + 0.05, Math.min(DESK.x + DESK.w / 2 - 0.05, _hp.x + d.dx));
+      d.o.position.z = Math.max(DESK.z - DESK.d / 2 + 0.3, Math.min(DESK.z + DESK.d / 2 - 0.05, _hp.z + d.dz));
+      // not into the keyboard: it stops at whichever edge of it is nearer (a first, simple rule; things can still overlap each other)
+      { const kx0 = DESK.x - 0.34, kx1 = DESK.x + 0.3, kz0 = DESK.z - 0.02, kz1 = DESK.z + 0.26, P = d.o.position; if (P.x > kx0 && P.x < kx1 && P.z > kz0 && P.z < kz1) { if (P.z - kz0 < kz1 - P.z) P.z = kz0; else P.z = kz1; } }
+    }
+    canvasEl.style.cursor = "grabbing";
+    return;
+  }
   const w = canvasEl.clientWidth;
   state.look.x = Math.max(-1, Math.min(1, dragging.lx - ((e.clientX - dragging.x) / w) * 2.2));
   state.look.y = Math.max(-1, Math.min(1, dragging.ly - ((e.clientY - dragging.y) / w) * 2.2));
@@ -2756,7 +2779,23 @@ canvasEl.addEventListener("pointermove", (e) => { // embedded: tell the game wha
   aim(e); const id = pickAt();
   if (id !== hoverId) { hoverId = id; canvasEl.style.cursor = id ? "pointer" : "default"; try { window.parent.postMessage({ source: "nt-room", type: "hover", id }, "*"); } catch {} }
 });
-const drop = (e) => { // a click that did not drag: if it was on the mug, take a sip
+const DESK_PLANE = new THREE.Plane(new THREE.Vector3(0, 1, 0), -DESK.h);
+const HOME = {}; // where each thing sits before anyone moves it
+for (const id in OBJ) HOME[id] = [OBJ[id].position.x, OBJ[id].position.z];
+HOME.deskphone = [DESKPHONE.position.x, DESKPHONE.position.z];
+/** Put things where a saved layout says ({ id: [x, z] } measured from the desk's centre, metres); null puts everything back. */
+function layout(map) {
+  for (const id in HOME) { const o = id === "deskphone" ? DESKPHONE : OBJ[id], at = map && map[id]; o.position.x = at ? DESK.x + at[0] : HOME[id][0]; o.position.z = at ? DESK.z + at[1] : HOME[id][1]; }
+}
+const drop = (e) => {
+  if (dragging && dragging.obj && dragging.obj.moved) { // set down: say where, so the game can keep it
+    const d = dragging.obj, r4 = (v) => Math.round(v * 10000) / 10000;
+    click();
+    try { window.parent.postMessage({ source: "nt-room", type: "moved", id: d.id, x: r4(d.o.position.x - DESK.x), z: r4(d.o.position.z - DESK.z) }, "*"); } catch {}
+    canvasEl.style.cursor = "";
+    dragging = null;
+    return;
+  } // a click that did not drag: if it was on the mug, take a sip
   if (dragging && e && Math.hypot(e.clientX - dragging.x, e.clientY - dragging.y) < 5) {
     const r = canvasEl.getBoundingClientRect();
     ray.setFromCamera(new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1), camera);
@@ -2897,6 +2936,7 @@ function command(m) {
   if (m.eaten != null) ui("eaten", m.eaten);
   if (m.objects !== undefined) { state.objects = Array.isArray(m.objects) ? m.objects.map(String) : null; applyDay(); }
   if (m.pause != null) renderer.setAnimationLoop(m.pause ? null : frame); // a frame the game has hidden should not go on drawing
+  if (m.layout !== undefined) layout(m.layout);
   if (m.prints != null) PRINTS.visible = !!m.prints;
   if (m.walkman != null) { WALKMAN.g.visible = !!m.walkman; WALKMAN.playing = m.walkman === "playing"; } // true / "stopped" = there, still; "playing" = there, reels turning; false = not there
   if (m.chick != null && m.chick !== CHICK_FACE.name) CHICK_FACE.paint(String(m.chick));
@@ -2907,4 +2947,4 @@ function command(m) {
 }
 window.addEventListener("message", (e) => { const m = e.data; if (m && m.target === "nt-room") command(m); });
 if (q.get("embed") === "1") { document.body.classList.add("embed", "solo"); resize(); }
-window.proto = { locate, command, setFace, setSpot, FAR, state, apply, turn, toDesk, frame, handAnchor, work, drink, COFFEE, OUTER, give: (v) => { state.hand = 1; give = { verdict: v, t0: performance.now() / 1000 }; } };
+window.proto = { layout, locate, command, setFace, setSpot, FAR, state, apply, turn, toDesk, frame, handAnchor, work, drink, COFFEE, OUTER, give: (v) => { state.hand = 1; give = { verdict: v, t0: performance.now() / 1000 }; } };
