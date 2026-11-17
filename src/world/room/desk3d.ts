@@ -73,12 +73,13 @@ export const desk3dOn = (session: Pick<Session, "view" | "deskPhoto" | "roomFram
 
 /**
  * R1: the shared frame is made the first time it is wanted — the first render of a day's `lying`
- * view (the room is ready by the time the player reaches 桌子), else on entering 桌子 or the look-out.
+ * view (the room is ready by the time the player reaches 桌子), else on entering 桌子 or the look-out,
+ * or when the day-18 fight starts (boss-phase2-world R1).
  * Run before every render (the game's settle); the title page never runs it.
  */
 export function settleRoomFrame(session: Session, day: number): void {
   if (session.roomFrame !== null) return;
-  if (session.view === "lying" || deskWantsRoom(session) || session.outside !== null) session.roomFrame = { day: clampDay(day) };
+  if (session.view === "lying" || deskWantsRoom(session) || session.outside !== null || session.boss !== null) session.roomFrame = { day: clampDay(day) };
 }
 
 // ——— R2 / R4: what to post ———

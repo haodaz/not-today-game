@@ -1035,3 +1035,26 @@
 .boss-page .bs-buff b{font:700 13px/1.2 "Songti SC","STSong","Noto Serif CJK SC",serif;letter-spacing:.18em;text-indent:.18em;color:#efe9df}
 .boss-page .bs-buff small{font-size:10px;letter-spacing:.06em;color:#a49d8f;opacity:1}
 @media (prefers-reduced-motion:reduce){.boss-page .bs-portrait,.boss-page .bs-buff{animation:none}}
+/* boss-phase2-world R1 / R2: the shared room frame behind the fight — the page's own box (1600 × 900 at the
+   top left of #app, as the page), under the page (earlier in #app, no z), hidden until the burst, then
+   fading in over the field (--late carries the time gone, so a re-render picks the fade up where it is). */
+#app > .outside-host.room.boss{position:absolute;left:0;top:0;width:1600px;height:900px;overflow:hidden;display:none;pointer-events:none}
+#app > .outside-host.room.boss.shown{display:block;animation:p2-in var(--fade-ms,900ms) linear both;animation-delay:var(--late,0ms)}
+#app > .outside-host.room.boss > iframe.room3d{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;opacity:0;transition:none}
+#app > .outside-host.room.boss > iframe.room3d.ready{opacity:1}
+@keyframes p2-in{from{opacity:0}to{opacity:1}}
+/* R3: the page in phase 2 over the world (placeholders; the look is the other session's .bs-* pass). Hidden
+   with visibility, not display: the effects layer still measures the boss's place. */
+.boss-page.world{background:transparent}
+.boss-page.world.final .bs-bg,.boss-page.world.final .bs-boss,.boss-page.world.final .bs-ground,.boss-page.world.final .bs-giant{visibility:hidden}
+.boss-page.world .bs-field{perspective:1200px}
+.boss-page.world .bs-strip{position:absolute;left:0;right:0;bottom:0;height:96px;background:linear-gradient(180deg,#0d0d10,#000)}
+.boss-page.world.final .bs-party{left:50%;bottom:70px;transform:translateX(-50%) scale(.6);transform-origin:50% 100%}
+.boss-page.world:not(.dislocating) .bs-field{transform-origin:50% 70%;transform:rotateX(var(--world-tilt,8deg))}
+/* R2: the dislocation — the field turns with the room's horizon (roll 0 → --dislocate-roll at half → 0), tipping
+   back toward the end; the party stays upright and drops onto its strip */
+.boss-page.dislocating .bs-field{transform-origin:50% 70%;animation:p2-turn var(--dislocate-ms,3000ms) var(--dislocate-ease,cubic-bezier(.42,0,.58,1)) both;animation-delay:var(--dislocate-late,0ms)}
+.boss-page.dislocating .bs-party{animation:p2-upright var(--dislocate-ms,3000ms) var(--dislocate-ease,cubic-bezier(.42,0,.58,1)) both;animation-delay:var(--dislocate-late,0ms)}
+@keyframes p2-turn{0%{transform:rotate(0) rotateX(0)}50%{transform:rotate(var(--dislocate-roll,-26deg)) rotateX(2deg)}100%{transform:rotate(0) rotateX(var(--world-tilt,8deg))}}
+@keyframes p2-upright{0%{transform:translateX(-50%) translateY(-60px) scale(.6) rotate(0)}50%{transform:translateX(-50%) translateY(-30px) scale(.6) rotate(calc(var(--dislocate-roll,-26deg) * -1))}100%{transform:translateX(-50%) translateY(0) scale(.6) rotate(0)}}
+@media (prefers-reduced-motion:reduce){.boss-page.dislocating .bs-field,.boss-page.dislocating .bs-party{animation:none}}

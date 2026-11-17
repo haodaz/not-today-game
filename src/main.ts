@@ -38,7 +38,7 @@ import { createStore, type Store } from "@state/store";
 import { parseBeatParams } from "@world/desktop/beat";
 import { mountDesktop } from "@world/desktop/controller";
 import { desktopActions } from "@world/desktop/actions";
-import { endingHost } from "@world/endings/flow";
+import { endingHost, onBossRoom } from "@world/endings/flow";
 import { watchEndings, watchObjects } from "@world/endings/record";
 import { getLocale, initialLocale, setLocale } from "@world/i18n";
 import { syncLoop } from "@world/loop/runtime";
@@ -176,7 +176,7 @@ function startGame(store: Store, saved: boolean, prologue = false): void {
     bossFx: createBossFx(),
     hand: createHandLayer(),
     // room-3d-wake: the code-built room's messages (day 4's wake flash).
-    room3d: createRoom3dLayer(onRoomMessage),
+    room3d: createRoom3dLayer(onRoomMessage, { boss: onBossRoom }),
   });
   // What finished runs left on the desk (presentation only; the story never reads it).
   game.session.collection = collection;

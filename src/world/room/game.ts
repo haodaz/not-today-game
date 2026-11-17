@@ -66,7 +66,8 @@ import { askedOn, knows } from "@state/recognise";
 import { gateAdvance } from "@world/motion/reveal";
 import { endingNext, bossActions } from "@world/endings/flow";
 import { renderEnding } from "@world/endings/view";
-import { bossStart, renderBoss } from "@world/endings/boss";
+import { bossStart } from "@world/endings/boss";
+import { bossScene } from "./outside";
 import { boxObjectFor, CASE_WOBBLE_MS, checklistNow, doorMeal, itemsPanel, openBoxBefore, openBoxReady, raidShowing, renderChecklist, renderRoom, settingsPanel, SLIP_ITEM, walkmanShown } from "./hud";
 import { hudTiles, statusPanel } from "./status";
 import { looseContent, stuckLineKey } from "./case";
@@ -115,7 +116,8 @@ function renderGameBody(store: Store, session: Session, nowMs: number): SafeHtml
   // dev (`&endpage=`): an ending's page looked at with no ending logged.
   if (session.endingPreview && session.endingPage && !session.boss) return renderEnding({ state, events, session, startDay: store.getStartDay(), nowMs });
   // dev (`&boss=`): the day-18 fight on its own, with no ending logged.
-  if (session.boss) return renderBoss(session.boss, nowMs);
+  // boss-phase2-world: the page with the room frame behind it
+  if (session.boss) return bossScene(state.day, session, nowMs);
   // opening R2: the dream before day 1, its own black page with the box over it (and its fade).
   if (prologueShowing(session)) {
     const box = session.opening ? null : dialogueBox(state, events, session, nowMs);

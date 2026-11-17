@@ -10,6 +10,7 @@ import { PULL_CUT_MS, pullFrom } from "@world/room/splat/pullout";
 import { creditLines, creditsShown, CREDIT_LINE_MS } from "./credits";
 import type { EndingPhase } from "@world/desktop/model";
 import { ENDING_PAGES, nextPage, pageSteps } from "./pages";
+import { dislocateNetMs, PHASE2_MSG, RELEASE_NET_MS } from "./phase2";
 import { BOSS_TICK_MS, bossCheat, bossChip, bossChoose, bossNext, bossRetry, bossStart, bossTick, type BossBattle } from "./boss";
 
 export interface EndingHost {
@@ -96,10 +97,74 @@ function runBoss(ctx: ActionContext): void {
     const next = bossTick(b, nowOf(ctx));
     ctx.session.boss = next;
     bossSounds(ctx, b, next);
+    // boss-phase2-world R2: the burst, with the room behind the fight ready: the clock holds for the
+    // dislocation and the head's rise (it runs again on `risen`, or at the net)
+    if (b.boss.stage === 1 && next.boss.stage === 2 && ctx.session.bossRoom === "ready" && ctx.session.phase2 === null) {
+      startPhase2(ctx);
+      ctx.rerender();
+      return;
+    }
     if (next.phase === "run" || next.phase === "act") ctx.later(BOSS_TICK_MS, tick);
     ctx.rerender();
   };
   ctx.later(BOSS_TICK_MS, tick);
+}
+
+/**
+ * boss-phase2-world R2: from the burst — the frame shown and the eye dislocated (the DOM layer posts
+ * `pause: false` and `dislocate` from this), then the head's rise; two nets in case the room's
+ * messages never come. Reduced motion: the dislocation is the frame's cross-fade, then the rise.
+ */
+function startPhase2(ctx: ActionContext): void {
+  const now = nowOf(ctx);
+  const run = { stage: "dislocating" as const, since: now };
+  ctx.session.phase2 = run;
+  const reduced = ctx.session.reducedMotion;
+  const seed = ctx.session.boss?.seed;
+  // the same fight's burst (a retry is a new fight with its own seed)
+  const same = () => ctx.session.phase2 !== null && ctx.session.boss?.seed === seed && ctx.session.phase2.since >= run.since;
+  ctx.later(dislocateNetMs(reduced), () => {
+    if (same() && ctx.session.phase2!.stage === "dislocating") phase2Rising(ctx);
+  });
+  ctx.later(RELEASE_NET_MS, () => {
+    if (same() && ctx.session.phase2!.stage !== "up") phase2Up(ctx);
+  });
+}
+
+function phase2Rising(ctx: ActionContext): void {
+  if (ctx.session.phase2?.stage !== "dislocating") return;
+  ctx.session.phase2 = { stage: "rising", since: nowOf(ctx) };
+  ctx.rerender();
+}
+
+/** The head is up: the clock runs again from now (nothing filled while it held). */
+function phase2Up(ctx: ActionContext): void {
+  const p = ctx.session.phase2;
+  const b = ctx.session.boss;
+  if (!p || p.stage === "up" || !b) return;
+  const now = nowOf(ctx);
+  ctx.session.phase2 = { stage: "up", since: now };
+  ctx.session.boss = { ...b, clockAt: now };
+  if (b.phase === "run" || b.phase === "act") runBoss(ctx);
+  ctx.rerender();
+}
+
+/**
+ * boss-phase2-world: a message from the room frame behind the fight (outside.ts's layer hands it
+ * over): `dislocated` → the head rises; `risen` → the clock runs. True when it changed something.
+ */
+export function onBossRoom(ctx: ActionContext, type: string): boolean {
+  const p = ctx.session.phase2;
+  if (!p || !ctx.session.boss) return false;
+  if (type === PHASE2_MSG.dislocated && p.stage === "dislocating") {
+    phase2Rising(ctx);
+    return true;
+  }
+  if (type === PHASE2_MSG.risen && p.stage !== "up") {
+    phase2Up(ctx);
+    return true;
+  }
+  return false;
 }
 
 /** The boss fight's actions: the text box, the player's move, a retry, the way out to the pages. */
@@ -128,6 +193,8 @@ export const bossActions = {
     const b = ctx.session.boss;
     if (!b || b.phase !== "lost") return;
     ctx.session.boss = bossRetry(b, ctx.store.getState(), nowOf(ctx));
+    // the fight from the top: the head down again (the room is told by the new fight's key)
+    ctx.session.phase2 = null;
     runBoss(ctx);
     ctx.rerender();
   },
@@ -135,6 +202,8 @@ export const bossActions = {
     const b = ctx.session.boss;
     if (!b || b.phase !== "after") return;
     ctx.session.boss = null;
+    // boss-phase2-world R1: the room leaves its boss mode (the layer posts `boss: false` and the pause)
+    ctx.session.phase2 = null;
     firstPage(ctx, b.ending);
   },
   // dev only (the replay driver, tests): the boss down at once

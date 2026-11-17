@@ -450,6 +450,13 @@ export interface Session {
   roomRects: Readonly<Record<string, import("@world/room/shots").Rect | null>> | null;
   /** room-3d-desk R6: 桌子 is the photo (the `desk=photo` URL, or the room never said `ready`). */
   deskPhoto: boolean;
+  /**
+   * boss-phase2-world R2: the holds from the burst (set by the flow): the eye dislocated, the head
+   * rising, then up (the clock runs again). Null before the burst, and when phase 2 plays without the room.
+   */
+  phase2: { readonly stage: "dislocating" | "rising" | "up"; readonly since: number } | null;
+  /** boss-phase2-world R1 / R5: the room frame behind the fight said `ready` ("ready"), or not within 8 s ("off"); null: not yet. */
+  bossRoom: "ready" | "off" | null;
   wakeFlash: { readonly since: number; readonly phase: "loading" | "up" | "fading"; readonly lined?: boolean } | null;
   /** fill (day11-budget-fill): the cost sheet's budget fill under way (session only; its end is logged as an `open fill:…`). */
   fill: import("./workbench/fill").FillGame | null;
@@ -686,6 +693,8 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     roomFrame: null,
     roomRects: null,
     deskPhoto: false,
+    phase2: null,
+    bossRoom: null,
     wakeFlash: null,
     fill: null,
     moles: null,

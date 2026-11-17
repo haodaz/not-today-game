@@ -346,7 +346,13 @@ export const KURO_YOU = "/battle/party/kuro-you.png";
 const spriteOf = (b: BossBattle, m: Member, pose: Pose): string =>
   m.kind === "player" ? (b.phase === "after" && b.strong ? KURO_YOU : `/battle/party/${b.look}-${pose === "hurt" ? "stance" : pose}.png`) : m.kind === "qkuro" ? "/battle/q-kuro.png" : `/battle/party/obj-${m.id}.png`;
 
-export function renderBoss(b: BossBattle, nowMs: number): SafeHtml {
+/**
+ * boss-phase2-world: `world` is set while phase 2 plays in the code-built room behind the page
+ * (phase2.ts): the page is `.world` (and `.dislocating` with its motion's custom properties), the
+ * party stands on its own dark strip, and the boss's act classes are not drawn (the world acts for it).
+ * Without it the page is exactly as before.
+ */
+export function renderBoss(b: BossBattle, nowMs: number, world: { readonly dislocating: boolean; readonly style: string } | null = null): SafeHtml {
   const acting = b.act && nowMs - b.act.at < ACT_MS ? b.act : null;
   const hitOf = (id: string) => acting?.hits.find((h) => h.id === id);
   // the statuses, top row: open for the one whose turn it is (or acting), the rest compact until the pointer
@@ -371,7 +377,8 @@ export function renderBoss(b: BossBattle, nowMs: number): SafeHtml {
     </div>`;
   });
   const bossHit = hitOf("boss");
-  const boss = html`<div class="${cls("bs-boss", `stage${String(b.boss.stage)}`, bossHit && "hurt", acting?.who === "boss" && "acting", (b.phase === "won" || b.phase === "after") && "down")}">
+  const worldActs = world !== null && b.boss.stage === 2;
+  const boss = html`<div class="${cls("bs-boss", `stage${String(b.boss.stage)}`, !worldActs && bossHit && "hurt", !worldActs && acting?.who === "boss" && "acting", (b.phase === "won" || b.phase === "after") && "down")}">
     <img class="bs-boss-img" src="${BOSS_IMG[b.boss.stage]}" alt="">
     ${bossHit ? html`<span class="bs-num big">${String(bossHit.n)}</span>` : null}
   </div>`;
@@ -382,7 +389,7 @@ export function renderBoss(b: BossBattle, nowMs: number): SafeHtml {
   // camera pulls out once more — behind everything, a far larger Kuro
   const tentacle = over ? html`<img class="bs-tentacle" src="/room/dark/tentacles.png" alt="">` : null;
   const giant = html`<div class="bs-giant"></div>`;
-  const field = html`<div class="bs-field"${acting ? html` data-move="${acting.move.id}" data-eff="${effectKind(acting.move)}" data-who="${acting.who}"` : null}><div class="bs-ground"></div><div class="${cls("bs-party", b.phase === "after" && b.strong && "crossed")}">${members}</div>${boss}${tentacle}${prop}${flash}</div>`;
+  const field = html`<div class="bs-field"${acting ? html` data-move="${acting.move.id}" data-eff="${effectKind(acting.move)}" data-who="${acting.who}"` : null}><div class="bs-ground"></div>${world ? html`<div class="bs-strip" aria-hidden="true"></div>` : null}<div class="${cls("bs-party", b.phase === "after" && b.strong && "crossed")}">${members}</div>${boss}${tentacle}${prop}${flash}</div>`;
   // the boss's bar: one full-width bar at the very bottom
   const pct = Math.round((100 * Math.max(0, b.boss.hp)) / b.boss.max);
   // the second form's own bar (hp2): shorter, its own colour, wrapped in tentacles (styled by the look pass)
@@ -401,7 +408,7 @@ export function renderBoss(b: BossBattle, nowMs: number): SafeHtml {
       ? html`<div class="bs-box"><button type="button" class="bs-cmd" data-action="boss-done">${S("boss.done")}</button></div>`
       : html`<div class="${cls("bs-box", clickable && "more", portrait && "portrait")}">${portrait}<p>${acting ? acting.text.join(" ") : b.log}</p>${clickable ? html`<i class="bs-caret"></i><button type="button" class="bs-hit" data-action="boss-next" aria-label="${S("boss.done")}"></button>` : null}</div>`;
   const cheat = import.meta.env.DEV && b.phase !== "after" && b.phase !== "won" ? html`<button type="button" class="sk-cheat" data-action="boss-cheat" aria-hidden="true" tabindex="-1"></button>` : null;
-  return html`<div class="${cls("boss-page", `end-${b.ending}`, b.strong && "strong", b.phase === "after" && "after", acting?.move.fx === "shake" && "shake", b.boss.stage === 2 && "stage2", b.boss.stage === 2 && "final", b.mercy && "mercy", b.party.length > 6 && "many")}" data-phase="${b.phase}">${cheat}
+  return html`<div class="${cls("boss-page", `end-${b.ending}`, b.strong && "strong", b.phase === "after" && "after", acting?.move.fx === "shake" && "shake", b.boss.stage === 2 && "stage2", b.boss.stage === 2 && "final", b.mercy && "mercy", b.party.length > 6 && "many", world && "world", world?.dislocating && "dislocating")}" data-phase="${b.phase}"${world ? html` style="${world.style}"` : null}>${cheat}
     <div class="bs-bg"></div>
     ${giant}
     ${field}

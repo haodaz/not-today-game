@@ -15,6 +15,7 @@ import { cls, html, type SafeHtml } from "@world/html";
 import { t } from "@world/i18n";
 import { printsOnDesk } from "@state/days/prints";
 import { chickFrameNow } from "@world/objects/index";
+import { actWant, bossPosts, NO_BOSS_POSTS, PHASE2, phase2HostStyle, renderBossPage, type BossPosted } from "@world/endings/phase2";
 import { CHICK_STEP_MS, clampDay, deskCommand, deskPick, desk3dOn, locateCommand, LOCATE_RETRY_MS, NOTHING_POSTED, outsideCommand, pickBlocked, rectsFromWhere, ROOM_READY_NET_MS, roomPosts, type RoomPosted, type RoomWant } from "./desk3d";
 
 export { outsideCommand, roomHour, ROOM_TARGET, type RoomCommand } from "./desk3d";
@@ -40,19 +41,21 @@ export type HostPhase = "loading" | "up" | "fading";
  * is the way back (none for the wake flash or the desk); `dim` the shade under a frame still loading.
  * The iframe has no title of its own when `label` is null.
  */
-export function outsideHost(o: { readonly kind: string; readonly src: string; readonly phase: HostPhase; readonly label: string | null; readonly back?: SafeHtml | null; readonly keep?: string; readonly dim?: boolean; readonly shared?: boolean }): SafeHtml {
+export function outsideHost(o: { readonly kind: string; readonly src: string; readonly phase: HostPhase; readonly label: string | null; readonly back?: SafeHtml | null; readonly keep?: string; readonly dim?: boolean; readonly shared?: boolean; readonly extra?: string | null; readonly style?: string | null }): SafeHtml {
   const state = o.phase === "up" ? "ready" : o.phase === "fading" ? "gone" : null;
   const named = o.label !== null ? html` title="${o.label}"` : html` aria-hidden="true" tabindex="-1"`;
   const dim = o.dim === false ? null : html`<div class="outside-dim" aria-hidden="true"></div>`;
   const hold = o.shared ? html` data-keep-hold` : null;
-  return html`<div class="${cls("outside-host", o.shared && "room", o.kind, state)}" data-host="${o.kind}">${dim}<iframe class="${cls("room3d", state)}" src="${o.src}"${named} allow="" loading="eager" referrerpolicy="no-referrer" data-keep="${o.keep ?? `room3d:${o.kind}`}"${hold}></iframe>${o.back ?? null}</div>`;
+  return html`<div class="${cls("outside-host", o.shared && "room", o.kind, state, o.extra)}" data-host="${o.kind}"${o.style ? html` style="${o.style}"` : null}>${dim}<iframe class="${cls("room3d", state)}" src="${o.src}"${named} allow="" loading="eager" referrerpolicy="no-referrer" data-keep="${o.keep ?? `room3d:${o.kind}`}"${hold}></iframe>${o.back ?? null}</div>`;
 }
 
 /** The shared room page: the day it was made in the URL (its first frame is already that day). */
 export const outsideSrc = (day: number): string => `/room3d/index.html?embed=1&day=${String(clampDay(day))}`;
 
 /** Where the shared frame is now: 桌子, the look-out on 窗, or hidden. */
-export function roomMode(session: Pick<Session, "view" | "deskPhoto" | "outside" | "roomFrame">): "desk" | "window" | "hidden" {
+export function roomMode(session: Pick<Session, "view" | "deskPhoto" | "outside" | "roomFrame" | "boss">): "desk" | "window" | "boss" | "hidden" {
+  // boss-phase2-world R1: the fight owns the frame until boss-done
+  if (session.boss) return "boss";
   if (desk3dOn(session)) return "desk";
   if (session.outside !== null && session.view === "window") return "window";
   return "hidden";
@@ -64,12 +67,24 @@ export function roomMode(session: Pick<Session, "view" | "deskPhoto" | "outside"
  * way back; elsewhere hidden (`display: none`) once it has been made. Null before it is made and not
  * wanted.
  */
-export function roomHost(day: number, session: Pick<Session, "view" | "deskPhoto" | "outside" | "roomFrame">): SafeHtml | null {
+export function roomHost(day: number, session: Pick<Session, "view" | "deskPhoto" | "outside" | "roomFrame" | "boss">): SafeHtml | null {
   const mode = roomMode(session);
+  if (mode === "boss") return null;
   if (mode === "hidden" && session.roomFrame === null) return null;
   const src = outsideSrc(session.roomFrame?.day ?? day);
   const look = mode === "window";
   return outsideHost({ kind: mode, src, phase: "loading", label: look ? t("room.window.look") : null, back: look ? leavePill(t("room.window.back"), html` data-action="window-back"`) : null, keep: ROOM_KEEP, dim: look, shared: true });
+}
+
+/**
+ * boss-phase2-world R1 / R2: the fight's page with the shared room frame behind it — a host outside
+ * `.boss-page` (the page re-renders every tick; the kept frame does not), under it, hidden until the
+ * burst; then shown, fading in over the field as the eye is dislocated.
+ */
+export function bossScene(day: number, session: Session, nowMs: number): SafeHtml {
+  const b = session.boss!;
+  const host = outsideHost({ kind: "boss", src: outsideSrc(session.roomFrame?.day ?? day), phase: "loading", label: null, keep: ROOM_KEEP, dim: false, shared: true, extra: session.phase2 ? "shown" : null, style: phase2HostStyle(session.phase2, session.reducedMotion, nowMs) });
+  return html`${host}${renderBossPage(b, session, nowMs)}`;
 }
 
 // ——— the DOM layer ———
@@ -84,7 +99,7 @@ export function roomHost(day: number, session: Pick<Session, "view" | "deskPhoto
  *     (`actions`: the controller's dispatch, guidance and masks included), unless something is open.
  *     No `ready` 8 s after 桌子 showed it: the photo 桌子 for the run.
  */
-export function createRoom3dLayer(onMessage: (ctx: ActionContext, msg: RoomMessage, nowMs: number) => boolean) {
+export function createRoom3dLayer(onMessage: (ctx: ActionContext, msg: RoomMessage, nowMs: number) => boolean, opts: { readonly boss?: (ctx: ActionContext, type: string) => boolean } = {}) {
   return (root: HTMLElement, ctx: ActionContext, actions: Record<string, ActionHandler> = {}): { after(): void; destroy(): void } => {
     const doc = root.ownerDocument;
     const win = doc.defaultView;
@@ -97,16 +112,20 @@ export function createRoom3dLayer(onMessage: (ctx: ActionContext, msg: RoomMessa
     let deskShownAt: number | null = null;
     let warned = false;
     let chickTimer: number | null = null;
+    /** boss-phase2-world: what the fight has posted, and when the fight was first seen (the 8 s net). */
+    let bossPosted: BossPosted = NO_BOSS_POSTS;
+    let fightSeenAt: number | null = null;
+    let bossWarned = false;
     const now = () => ctx.now?.() ?? Date.now();
     const wakeFrame = (): HTMLIFrameElement | null => root.querySelector<HTMLIFrameElement>(`iframe[data-keep="${WAKE_KEEP}"]`);
     const sharedHost = (): HTMLElement | null => root.querySelector<HTMLElement>(".outside-host.room");
-    const mode = (): RoomWant["mode"] => {
+    const mode = (): RoomWant["mode"] | "boss" => {
       const h = sharedHost();
       const kind = h?.dataset.host;
-      return kind === "desk" || kind === "window" ? kind : "hidden";
+      return kind === "desk" || kind === "window" || kind === "boss" ? kind : "hidden";
     };
     const want = (): RoomWant => {
-      const m = mode();
+      const m = mode() as RoomWant["mode"];
       const state = ctx.store.getState();
       const events = ctx.store.getEvents();
       const main = m === "desk" ? deskCommand(state, ctx.session) : m === "window" ? outsideCommand(state, ctx.session) : null;
@@ -116,6 +135,23 @@ export function createRoom3dLayer(onMessage: (ctx: ActionContext, msg: RoomMessa
     const send = (m: object) => readyWin?.postMessage(m, "*");
     const sync = () => {
       if (!readyWin) return;
+      const b = ctx.session.boss;
+      if (mode() === "boss" && b) {
+        // boss-phase2-world: the fight's posts (R1 / R2 / R4)
+        const plan = bossPosts(bossPosted.key === null ? { ...NO_BOSS_POSTS, paused: posted.paused } : bossPosted, { key: b.seed, phase2: ctx.session.phase2, reduced: ctx.session.reducedMotion, act: actWant(b), now: now() });
+        bossPosted = plan.next;
+        for (const p of plan.posts) send(p);
+        if (plan.recheckMs !== null) ctx.later(plan.recheckMs + 5, sync);
+        posted = { ...NOTHING_POSTED, paused: bossPosted.paused };
+        return;
+      }
+      if (bossPosted.key !== null) {
+        // the fight is over (boss-done): the room leaves its boss mode, paused; the desk starts over
+        send({ target: "nt-room", boss: false });
+        send({ target: "nt-room", pause: true });
+        bossPosted = NO_BOSS_POSTS;
+        posted = { ...NOTHING_POSTED, paused: true };
+      }
       const plan = roomPosts(posted, want());
       posted = plan.next;
       for (const p of plan.posts) send(p);
@@ -141,11 +177,17 @@ export function createRoom3dLayer(onMessage: (ctx: ActionContext, msg: RoomMessa
       if (msg.type === "ready") {
         readyWin = shared.contentWindow;
         posted = NOTHING_POSTED;
+        bossPosted = NO_BOSS_POSTS;
         shared.classList.add("ready");
+        if (mode() === "boss" && ctx.session.bossRoom === null) ctx.session.bossRoom = "ready";
         sync();
         return;
       }
       if (e.source !== readyWin) return;
+      if (mode() === "boss") {
+        if (opts.boss?.(ctx, msg.type)) ctx.rerender();
+        return;
+      }
       if (msg.type === "where") {
         const rects = rectsFromWhere(msg);
         if (rects === "moving") ctx.later(LOCATE_RETRY_MS, () => { if (mode() === "desk") send(locateCommand()); });
@@ -204,6 +246,22 @@ export function createRoom3dLayer(onMessage: (ctx: ActionContext, msg: RoomMessa
             ctx.later(ROOM_READY_NET_MS, fallback);
           }
         } else deskShownAt = null;
+        // boss-phase2-world R1 / R5: the fight's frame ready, or not within 8 s of the fight's start
+        if (m === "boss") {
+          if (readyWin && ctx.session.bossRoom === null) ctx.session.bossRoom = "ready";
+          if (ctx.session.bossRoom === null && fightSeenAt === null) {
+            fightSeenAt = now();
+            ctx.later(PHASE2.READY_NET_MS, () => {
+              if (!ctx.session.boss || ctx.session.bossRoom !== null) return;
+              ctx.session.bossRoom = "off";
+              if (!bossWarned) {
+                bossWarned = true;
+                console.warn("boss-phase2-world: the room frame said nothing within 8 s; phase 2 plays without it");
+              }
+              ctx.rerender();
+            });
+          }
+        } else fightSeenAt = null;
         sync();
         chickTick(m === "desk" && readyWin !== null);
         listen(shared !== null || wakeFrame() !== null);

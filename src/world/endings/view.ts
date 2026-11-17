@@ -13,7 +13,7 @@ import { fillPlaceholders } from "@world/replies/placeholders";
 import { creditLines, creditsShown, lastLineKey } from "./credits";
 import { youAndYou } from "./youandyou";
 import { renderPullOut } from "./pullout";
-import { renderBoss } from "./boss";
+import { bossScene } from "@world/room/outside";
 import { COLLAPSE_TO_WHITE_MS, endingOf } from "./flow";
 import { ENDING_ART, ENDING_PAGES, endingLines, TENDER_KEYS, TENDER_PHOTO, WAKE_KEYS, WAKE_PHOTO, WAKE_SAY } from "./pages";
 import { endingFlavour } from "@state/endings";
@@ -142,7 +142,8 @@ export function renderEnding(m: EndingModel): SafeHtml {
   // Night 18: the pull-out first; the pages wait (room-scene addition 2026-11-01).
   if (m.session.pullOut) return renderPullOut(m);
   // the boss fight (author 2026-11-13): after the pull-out, before the pages
-  if (m.session.boss) return renderBoss(m.session.boss, m.nowMs);
+  // boss-phase2-world: the page with the room frame behind it
+  if (m.session.boss) return bossScene(m.state.day, m.session, m.nowMs);
   const ending = endingOf(m.state, m.session) as Ending;
   const phase = m.session.endingPage?.phase ?? ENDING_PAGES[ending][0]!;
   if (phase === "collapse") return renderCollapse(m);
