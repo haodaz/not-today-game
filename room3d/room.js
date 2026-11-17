@@ -1616,7 +1616,7 @@ function updateTentacles(s) {
   let sc = 0;
   if (!SUCK.parent) room.add(SUCK);
   for (const t of tentacles) {
-    const grow = t.outer ? smooth(t.c0, t.c0 + 0.4, OUTER.k) : smooth(t.c0, t.c0 + 0.34, state.collapse);
+    const grow = t.boss ? BOSS.k * t.c0 : t.outer ? smooth(t.c0, t.c0 + 0.4, OUTER.k) : smooth(t.c0, t.c0 + 0.34, state.collapse);
     t.mesh.visible = grow > 0.01;
     if (!t.mesh.visible) continue;
     const P = t.geo.attributes.position.array, Nn = t.geo.attributes.normal.array, { N, RS } = t;
@@ -1625,7 +1625,7 @@ function updateTentacles(s) {
       const rad = live ? t.r * Math.pow(Math.max(0, 1 - k / grow), 0.55) * (1 + 0.09 * Math.sin(tt * 46 - s * 1.5 + t.ph) + 0.03 * Math.sin(i * 2.1)) : 0; // a slow swallow, and rings of skin
       const sw = k * k * t.sway * grow, c = t.centres[ci], n = t.fr.normals[ci], b = t.fr.binormals[ci];
       const cx = c.x + Math.sin(s * 0.6 + k * 5 + t.ph) * sw, cy = c.y + Math.cos(s * 0.45 + k * 4 + t.ph * 1.3) * sw * 0.5, cz = c.z + Math.sin(s * 0.5 + k * 6 + t.ph * 0.7) * sw;
-      if (i % 3 === 1 && live && rad > 0.006 && sc < SUCK_MAX) { // a sucker on the belly, alternating sides
+      if (!t.boss && i % 3 === 1 && live && rad > 0.006 && sc < SUCK_MAX) { // a sucker on the belly, alternating sides
         const a = Math.PI / 2 + ((i / 3) % 2 < 1 ? 0.95 : -0.95), ca = Math.cos(a), sa = Math.sin(a);
         _sd.set(ca * n.x + sa * b.x, ca * n.y + sa * b.y, ca * n.z + sa * b.z);
         _sp.set(cx + _sd.x * rad * 0.9, cy + _sd.y * rad * 0.9, cz + _sd.z * rad * 0.9);
@@ -2548,7 +2548,37 @@ function buildFar() {
   FAR.fill = new THREE.PointLight(0xff8a3a, 0, 140, 1.1); FAR.fill.position.set(-6, 14, -10); FAR.g.add(FAR.fill);
 }
 const _fp = new THREE.Vector3(), _fl = new THREE.Vector3(), _fq = new THREE.Quaternion(), _fm = new THREE.Matrix4();
+// ---- the fight's second phase (author 2026-11-17: 2阶段像个小boss，没有神性 … 变成3d的?) ----
+// Not a bigger monster: a change of scale. This scene is the backdrop — the red world, and over it the head that
+// does not move. He does not lunge and does not flinch. When he acts, the world acts: the nearest of them rise out of
+// the ground and come down where the party stands. When he is hurt, they drop back and the red under the ground stutters.
+// { boss: true } enters it (the room is gone, the eye sits at one fixed place); { strike: true } / { hurt: true } are events.
+const BOSS = { on: false, k: 0, to: 0.3, until: 0, flick: 0 };
+function bossTentacles() {
+  BOSS.made = true;
+  const R = rng(77);
+  for (let i = 0; i < 9; i++) {
+    const a = -0.9 + (i / 8) * 4.2 + (R() - 0.5) * 0.3, d = 5.5 + R() * 5, x = Math.cos(a) * d, z = Math.sin(a) * d, h = 5 + R() * 5, lean = 0.55 + R() * 0.3;
+    const before = tentacles.length;
+    tentacle([[x, -1.2, z], [x * 1.04, h * 0.45, z * 1.04], [x * 0.9, h * 0.85, z * 0.9], [x * (1 - lean * 0.6), h, z * (1 - lean * 0.6)], [x * (1 - lean), h * 0.62, z * (1 - lean)], [x * (1 - lean) * 0.8, h * 0.2, z * (1 - lean) * 0.8]], 0.5 + R() * 0.35, 0.7 + R() * 0.3, 0.5, true);
+    const t = tentacles[before]; t.boss = true; t.outer = false; FAR.g.add(t.mesh); // out of the room's group: the room is hidden here
+  }
+}
+function updateBoss(s, dt) {
+  if (!BOSS.on) { if (BOSS.k > 0) BOSS.k = Math.max(0, BOSS.k - dt * 2); return; }
+  if (!BOSS.made) bossTentacles();
+  if (BOSS.until && s > BOSS.until) { BOSS.until = 0; BOSS.to = 0.3; }
+  BOSS.k += (BOSS.to - BOSS.k) * (1 - Math.exp(-dt * (BOSS.to > BOSS.k ? 9 : 2.2))); // up fast, down slowly
+  BOSS.flick = Math.max(0, BOSS.flick - dt * 2.5);
+  if (FAR.reds) for (const l of FAR.reds) l.intensity *= 1 - 0.8 * BOSS.flick * (0.5 + 0.5 * Math.sin(s * 47 + l.userData.ph));
+}
+function bossEvent(kind) {
+  const s = performance.now() / 1000;
+  if (kind === "strike") { BOSS.to = 1; BOSS.until = s + 0.75; }
+  if (kind === "hurt") { BOSS.to = 0.06; BOSS.until = s + 0.9; BOSS.flick = 1; }
+}
 function updateFar(s, dt) {
+  if (BOSS.on) FAR.to = 0.56;
   if (!FAR.built) { if (!((FAR.to ?? 0) > 0)) return; buildFar(); }
   FAR.k += ((FAR.to ?? 0) - FAR.k) * (1 - Math.exp(-dt * 5)); if (Math.abs(FAR.k - (FAR.to ?? 0)) < 0.0005) FAR.k = FAR.to ?? 0; // the player's own hand on the bar (author: 做成滑杆，到时候是用户拉远的)
   const k = FAR.k, e = k * k * (3 - 2 * k);
@@ -2568,13 +2598,15 @@ function updateFar(s, dt) {
       });
     }
     const gone = k > 0.06;
-    if (FAR.gone !== gone) { if (!gone) apply(); FAR.gone = gone; for (const o of FAR.shell) o.visible = !gone; for (const t of tentacles) if (gone) t.mesh.visible = false; SUCK.visible = !gone; }
-    if (gone) { for (const t of tentacles) t.mesh.visible = false; for (const l of lines) l.visible = false; } // the ink edges of the missing walls would hang in the air as a wire box (author: 房子上面有几条边有点奇怪)
-    FAR.orb.visible = gone; FAR.orb.material.opacity = Math.min(1, (k - 0.06) * 6) * 0.2;
+    if (FAR.gone !== gone) { if (!gone) apply(); FAR.gone = gone; for (const o of FAR.shell) o.visible = !gone; for (const t of tentacles) if (gone && !t.boss) t.mesh.visible = false; SUCK.visible = !gone; }
+    if (gone) { for (const t of tentacles) if (!t.boss) t.mesh.visible = false; for (const l of lines) l.visible = false; } // the ink edges of the missing walls would hang in the air as a wire box (author: 房子上面有几条边有点奇怪)
+    FAR.orb.visible = gone && !BOSS.on; FAR.orb.material.opacity = Math.min(1, (k - 0.06) * 6) * 0.2;
+    if (BOSS.on && room.visible) room.visible = false; // the fight stands where the room was
+    if (!BOSS.on && !room.visible) room.visible = true;
     FAR.orb.scale.setScalar(9 + 8 * Math.max(0, (e - 0.42) / 0.58));
     for (const l of FAR.reds) l.intensity = Math.min(1, e * 3.5) * l.userData.i * (0.85 + 0.15 * Math.sin(s * 0.6 + l.userData.ph)); // the ground is already red when the eye first clears the walls
   }
-  FAR.glow.intensity = e * 10;
+  FAR.glow.intensity = BOSS.on ? 0 : e * 10;
   if (!k) return;
   FAR.dome.material.opacity = Math.min(1, e * 1.6);
   FAR.card.material.opacity = Math.min(1, Math.max(0, e * 9 - 0.25)); // he is there almost as soon as the ceiling is gone
@@ -2679,6 +2711,7 @@ function frame(now) {
   }
   if (WALKMAN.playing) for (const r of WALKMAN.reels) r.rotation.y -= dt * 2.2;
   updateFar(now / 1000, dt);
+  updateBoss(now / 1000, dt);
   composer.render();
   if (++framesDrawn === 3) { try { window.parent !== window && window.parent.postMessage({ source: "nt-room", type: "ready" }, "*"); } catch {} if (q.get("wake") === "1") setTimeout(wake, 0); /* ?wake=1: the flash starts by itself, after ready */ document.getElementById("loading").style.opacity = "0"; perf.first = (now - T0) / 1000; perf.t = now; perf.n = 0; }
   if (framesDrawn > 3 && ++perf.n === 90) { document.getElementById("perf").textContent = `首屏 ${perf.first.toFixed(1)} 秒 · ${Math.round(90000 / (now - perf.t))} 帧/秒${LOW ? " · 低配" : ""}`; perf.t = now; perf.n = 0; }
@@ -2937,6 +2970,9 @@ function command(m) {
   if (m.eaten != null) ui("eaten", m.eaten);
   if (m.objects !== undefined) { state.objects = Array.isArray(m.objects) ? m.objects.map(String) : null; applyDay(); }
   if (m.pause != null) renderer.setAnimationLoop(m.pause ? null : frame); // a frame the game has hidden should not go on drawing
+  if (m.boss != null) { BOSS.on = !!m.boss; if (!BOSS.on) FAR.to = 0; }
+  if (m.strike) bossEvent("strike");
+  if (m.hurt) bossEvent("hurt");
   if (m.layout !== undefined) layout(m.layout);
   if (m.prints != null) PRINTS.visible = !!m.prints;
   if (m.walkman != null) { WALKMAN.g.visible = !!m.walkman; WALKMAN.playing = m.walkman === "playing"; } // true / "stopped" = there, still; "playing" = there, reels turning; false = not there
@@ -2948,4 +2984,4 @@ function command(m) {
 }
 window.addEventListener("message", (e) => { const m = e.data; if (m && m.target === "nt-room") command(m); });
 if (q.get("embed") === "1") { document.body.classList.add("embed", "solo"); resize(); }
-window.proto = { layout, locate, command, setFace, setSpot, FAR, state, apply, turn, toDesk, frame, handAnchor, work, drink, COFFEE, OUTER, give: (v) => { state.hand = 1; give = { verdict: v, t0: performance.now() / 1000 }; } };
+window.proto = { BOSS, layout, locate, command, setFace, setSpot, FAR, state, apply, turn, toDesk, frame, handAnchor, work, drink, COFFEE, OUTER, give: (v) => { state.hand = 1; give = { verdict: v, t0: performance.now() / 1000 }; } };
