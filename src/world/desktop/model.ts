@@ -218,6 +218,8 @@ export interface Session {
    * in the evening, off by day). Session only (the `useAt` event records what it meant).
    */
   lampOn: boolean | null;
+  /** room-light-switch R1: the ceiling light, by the wall switch (session only, like the lamp; never by itself). */
+  ceilOn: boolean;
   /** Holding and using it, its programs, its light (objects-in-hand FR1); session only. */
   hand: HandSession;
   /** The dialogue line's per-character reveal (polish FR3); set by the motion layer only. */
@@ -608,6 +610,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     figureOpen: null,
     holding: null,
     lampOn: null,
+    ceilOn: false,
     hand: initialHand(),
     reveal: null,
     work: null,

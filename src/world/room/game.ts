@@ -1086,6 +1086,15 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.session.lampOn = !lampLit(ctx.session);
     ctx.rerender();
   },
+  // room-light-switch R2: the wall switch by the door (门, 窗; and the code-built desk's pick): the
+  // ceiling light on / off, with the lamp's click. Not over a line, a panel or the look-out.
+  switch(ctx) {
+    const { session } = ctx;
+    if (!(isFacing(session.view) || session.view === "desk") || session.dialogue.queue.length > 0 || overlayOpen(session) || session.outside || session.wakeFlash) return;
+    ctx.play?.("lamp-click");
+    session.ceilOn = !session.ceilOn;
+    ctx.rerender();
+  },
 
   // Back one camera level (right-click, wheel, the bottom of the stage): nothing over the view first.
   "nav-back"(ctx) {

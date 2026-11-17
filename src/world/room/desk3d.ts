@@ -50,16 +50,20 @@ export function roomHour(time: string): number {
   return Math.min(24, Math.max(6, h));
 }
 
-function command(state: Pick<State, "day">, session: Pick<Session, "clock" | "lampOn">, face: RoomCommand["face"], spot: RoomCommand["spot"]): RoomCommand {
+/** What a command reads of the session (the ceiling light may be left out: off). */
+type CommandSession = Pick<Session, "clock" | "lampOn"> & Partial<Pick<Session, "ceilOn">>;
+
+function command(state: Pick<State, "day">, session: CommandSession, face: RoomCommand["face"], spot: RoomCommand["spot"]): RoomCommand {
   const hour = roomHour(session.clock.time);
   const day = clampDay(state.day);
-  return { target: ROOM_TARGET, day, time: hour, face, spot, lamp: session.lampOn ?? hour >= 18, ceil: false, rain: weatherOf(day) === "rain", outer: false, eaten: false, far: 0 };
+  // room-light-switch R4: the ceiling light is the wall switch's
+  return { target: ROOM_TARGET, day, time: hour, face, spot, lamp: session.lampOn ?? hour >= 18, ceil: session.ceilOn ?? false, rain: weatherOf(day) === "rain", outer: false, eaten: false, far: 0 };
 }
 
 /** room-3d-window R4: the window, seen from it, at the story's time; the lamp as the player left it (by default on from 18:00). */
-export const outsideCommand = (state: Pick<State, "day">, session: Pick<Session, "clock" | "lampOn">): RoomCommand => command(state, session, 3, "win");
+export const outsideCommand = (state: Pick<State, "day">, session: CommandSession): RoomCommand => command(state, session, 3, "win");
 /** R2: the desk wall, walked up to the desk. */
-export const deskCommand = (state: Pick<State, "day">, session: Pick<Session, "clock" | "lampOn">): RoomCommand => command(state, session, 0, "desk");
+export const deskCommand = (state: Pick<State, "day">, session: CommandSession): RoomCommand => command(state, session, 0, "desk");
 
 // ——— R1: the shared frame ———
 
@@ -191,6 +195,9 @@ export function deskPick(id: unknown, state: Pick<State, "found">): { readonly a
       return { action: "lamp", data: {} };
     case "tower":
       return { action: "tower-power", data: {} };
+    // room-light-switch R4: the wall switch, from the desk too
+    case "switch":
+      return { action: "switch", data: {} };
     default:
       // the mug sips by itself; the places and the rest are not 桌子's
       return null;

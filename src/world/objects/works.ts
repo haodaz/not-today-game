@@ -18,6 +18,8 @@ export const facingOf = (view: View): Facing => (isFacing(view) ? view : view ==
 
 /** The desk lamp is lit: as last clicked, else as the hour has it (on in the evening). */
 export const lampLit = (session: Pick<Session, "lampOn" | "clock">): boolean => session.lampOn ?? isEvening(session.clock);
+/** room-light-switch R1: the ceiling light is on only when the player turned it on. */
+export const ceilLit = (session: Pick<Session, "ceilOn">): boolean => session.ceilOn;
 
 /** Where the player is, as the `works` rule reads it. */
 export function placeOf(session: Pick<Session, "view" | "lampOn" | "clock">): Place {

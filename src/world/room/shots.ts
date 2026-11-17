@@ -175,4 +175,9 @@ export const LOOK_SPOTS: Readonly<Record<"door" | "window", readonly LookSpot[]>
   ],
 };
 
+/** room-light-switch R2: the wall switch's plate by the door, on 门 and seen from 窗. */
+export const SWITCH_SPOTS: Readonly<Record<"door" | "window", Rect>> = {
+  door: fracRect(DOOR_WALL, 0.695, 0.745, 0.355, 0.425),
+  window: fracRect(WINDOW_WALL, 0.135, 0.175, 0.39, 0.45),
+};
 export const rectStyle = (r: Rect): string => `left:${r.l}px;top:${r.t}px;width:${r.w}px;height:${r.h}px`;
