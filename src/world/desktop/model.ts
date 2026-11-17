@@ -456,7 +456,7 @@ export interface Session {
    * boss-phase2-world R2: the holds from the burst (set by the flow): the eye dislocated, the head
    * rising, then up (the clock runs again). Null before the burst, and when phase 2 plays without the room.
    */
-  phase2: { readonly stage: "dislocating" | "rising" | "up"; readonly since: number } | null;
+  phase2: { readonly stage: "dislocating" | "rising" | "up" | "leaving" | "left" | "condensing" | "eye"; readonly since: number } | null;
   /** boss-phase2-world R1 / R5: the room frame behind the fight said `ready` ("ready"), or not within 8 s ("off"); null: not yet. */
   bossRoom: "ready" | "off" | null;
   wakeFlash: { readonly since: number; readonly phase: "loading" | "up" | "fading"; readonly lined?: boolean } | null;

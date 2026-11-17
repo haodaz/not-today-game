@@ -8,12 +8,12 @@ import { describe, expect, it, vi } from "vitest";
 import { createStore } from "@state/store";
 import { DEFAULT_CLOCK } from "@world/desktop/beat";
 import type { ActionContext } from "@world/desktop/controller";
-import { initialSession } from "@world/desktop/model";
+import { initialSession, type Session } from "@world/desktop/model";
 import { setLocale } from "@world/i18n";
-import { ACT_MS, bossStart, PLAYER_MOVES, type BossBattle } from "@world/endings/boss";
+import { ACT_MS, bossStart, PLAYER_MOVES, renderBoss, type BossBattle } from "@world/endings/boss";
 import { IMPACT_DELAY } from "@world/endings/boss-fx";
 import { bossActions, onBossRoom } from "@world/endings/flow";
-import { bossPosts, NO_BOSS_POSTS, P2_CMD, PHASE2, RELEASE_NET_MS, type BossWant } from "@world/endings/phase2";
+import { bossPosts, NO_BOSS_POSTS, P2_CMD, PHASE2, phase2PageAttrs, RELEASE_NET_MS, type BossWant } from "@world/endings/phase2";
 import { settleRoomFrame } from "@world/room/desk3d";
 import { bossScene, createRoom3dLayer } from "@world/room/outside";
 import { onRoomMessage } from "@world/room/wake";
@@ -248,5 +248,42 @@ describe("R5 · no ready within 8 s", () => {
     expect(r.session.boss).not.toBe(b);
     warn.mockRestore();
     r.done();
+  });
+});
+
+describe("R7 · the win in the world (survive): the leave, the outro, the condensing to an eye", () => {
+  it("bossPosts: leave once for the leaving stage, condense once for the condensing stage, nothing for left / eye", () => {
+    const base = bossPosts(NO_BOSS_POSTS, { key: "k", phase2: { stage: "up", since: 0 }, reduced: false, act: null, now: 1000 }).next;
+    const a = bossPosts(base, { key: "k", phase2: { stage: "leaving", since: 2000 }, reduced: false, act: null, now: 2000 });
+    expect(a.posts).toEqual([{ target: "nt-room", leave: true }]);
+    expect(bossPosts(a.next, { key: "k", phase2: { stage: "leaving", since: 2000 }, reduced: false, act: null, now: 2500 }).posts).toEqual([]);
+    expect(bossPosts(a.next, { key: "k", phase2: { stage: "left", since: 9000 }, reduced: false, act: null, now: 9000 }).posts).toEqual([]);
+    const c = bossPosts(a.next, { key: "k", phase2: { stage: "condensing", since: 12000 }, reduced: false, act: null, now: 12000 });
+    expect(c.posts).toEqual([{ target: "nt-room", condense: true }]);
+    expect(bossPosts(c.next, { key: "k", phase2: { stage: "eye", since: 23000 }, reduced: false, act: null, now: 23000 }).posts).toEqual([]);
+  });
+  it("the page: .leaving from the leave on, .condensing while it condenses; the way out held until the eye", () => {
+    const leaving = phase2PageAttrs({ stage: "leaving", since: 0 }, false, 100);
+    expect([leaving.world, leaving.leaving, leaving.condensing, leaving.holdDone]).toEqual([true, true, false, false]);
+    const cond = phase2PageAttrs({ stage: "condensing", since: 0 }, false, 100);
+    expect([cond.leaving, cond.condensing, cond.holdDone]).toEqual([true, true, true]);
+    const eye = phase2PageAttrs({ stage: "eye", since: 0 }, false, 100);
+    expect([eye.condensing, eye.holdDone]).toEqual([true, false]);
+    const b = { ...bossStart(({ ...createStore({ startDay: 18 }).getState(), day: 18, affinity: 100 } as never), "survive", 0), phase: "after" as const };
+    expect(renderBoss(b, 0, { dislocating: false, leaving: true, condensing: true, holdDone: true, style: "" }).value).toContain('<div class="bs-box silent" aria-hidden="true"></div>');
+    expect(renderBoss(b, 0, { dislocating: false, leaving: true, condensing: true, holdDone: false, style: "" }).value).toContain('data-action="boss-done"');
+    expect(renderBoss(b, 0, { dislocating: false, leaving: true, condensing: true, holdDone: false, style: "" }).value).toContain("world leaving condensing");
+  });
+  it("the room's messages: left ends the leave, eye ends the condensing; the way out refuses while condensing", () => {
+    const session: { phase2: NonNullable<Session["phase2"]>; boss: BossBattle | null } = { phase2: { stage: "leaving", since: 0 }, boss: { ...bossStart(({ ...createStore({ startDay: 18 }).getState(), day: 18, affinity: 100 } as never), "survive", 0), phase: "after" } };
+    const ctx = { session, now: () => 500, rerender: () => {}, later: () => {} } as never as Parameters<typeof onBossRoom>[0];
+    expect(onBossRoom(ctx, "eye")).toBe(false);
+    expect(onBossRoom(ctx, "left")).toBe(true);
+    expect(session.phase2.stage).toBe("left");
+    session.phase2 = { stage: "condensing", since: 600 };
+    bossActions["boss-done"](ctx);
+    expect(session.boss).not.toBeNull();
+    expect(onBossRoom(ctx, "eye")).toBe(true);
+    expect(session.phase2.stage).toBe("eye");
   });
 });

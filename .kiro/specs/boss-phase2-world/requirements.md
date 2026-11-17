@@ -107,6 +107,17 @@ clock; `dislocated` → `rise`; `risen` → the clock runs; the nets; a boss act
 `strike`, a hit on the boss posts `hurt`, nothing in stage 1; `boss-done` posts `boss:false` +
 `pause` and hides; the no-ready fallback. Existing `tests/boss.test.ts` unchanged.
 
+## R7 — The win in the world (survive only; built by Claude 2026-11-17)
+
+Author: 「打赢之后的存活结局要不要接镜头继续拉远。可以做成这个星球凝聚成一个红点，然后变成更大克总的一个
+眼睛。」 With the frame in use and the ending `survive`: the boss down → `phase2 = leaving` and the layer
+posts `{ leave: true }` (the eye goes on out, ≈9 s, "left" or a 12 s net); the page gets `.leaving`
+(the party and its mound fade away — they cannot follow the eye; the look pass's); the outro lines read
+over it as usual. The last outro line clicked → `condensing`: `{ condense: true }` (the world shrinks to
+one eye on the flank of a far greater Kuro, ≈11 s, "eye" or a 12.5 s net); the box is silent
+(`.bs-box.silent`), the page `.condensing`, and 继续 is not offered until `eye`. The assimilated's win
+stays the swap; the good ending's homecoming (`{ home: true }`) comes when the room has it.
+
 ## Out of scope
 
 The room's own animations and colours (the other session); the ending pages after the fight; any

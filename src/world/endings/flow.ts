@@ -10,7 +10,7 @@ import { PULL_CUT_MS, pullFrom } from "@world/room/splat/pullout";
 import { creditLines, creditsShown, CREDIT_LINE_MS } from "./credits";
 import type { EndingPhase } from "@world/desktop/model";
 import { ENDING_PAGES, nextPage, pageSteps } from "./pages";
-import { dislocateNetMs, PHASE2_MSG, RELEASE_NET_MS } from "./phase2";
+import { dislocateNetMs, PHASE2, PHASE2_MSG, RELEASE_NET_MS } from "./phase2";
 import { BOSS_TICK_MS, bossCheat, bossChip, bossChoose, bossNext, bossRetry, bossStart, bossTick, type BossBattle } from "./boss";
 
 export interface EndingHost {
@@ -105,9 +105,49 @@ function runBoss(ctx: ActionContext): void {
       return;
     }
     if (next.phase === "run" || next.phase === "act") ctx.later(BOSS_TICK_MS, tick);
+    wonInWorld(ctx, b, next);
     ctx.rerender();
   };
   ctx.later(BOSS_TICK_MS, tick);
+}
+
+/**
+ * R7 (author 2026-11-17, survive only): the boss down in the world — the eye leaves the fight's
+ * place (the layer posts `leave`); the outro lines read over it; "left" (or the net) ends the leave.
+ * The assimilated's win is the swap, the good ending's homecoming comes later: no camera for them here.
+ */
+function wonInWorld(ctx: ActionContext, prev: BossBattle, next: BossBattle): void {
+  if (next.phase !== "won" || prev.phase === "won" || next.ending !== "survive" || ctx.session.phase2?.stage !== "up") return;
+  const now = nowOf(ctx);
+  const run = { stage: "leaving" as const, since: now };
+  ctx.session.phase2 = run;
+  ctx.later(PHASE2.LEAVE_MS + PHASE2.LEAVE_NET_MS, () => {
+    if (ctx.session.phase2?.since === run.since && ctx.session.phase2.stage === "leaving") phase2Left(ctx);
+  });
+}
+
+function phase2Left(ctx: ActionContext): void {
+  if (ctx.session.phase2?.stage !== "leaving") return;
+  ctx.session.phase2 = { stage: "left", since: nowOf(ctx) };
+  ctx.rerender();
+}
+
+/** R7: the outro read through — the world condenses to one eye on a far greater Kuro; the way out waits for "eye" or the net. */
+function startCondense(ctx: ActionContext): void {
+  const p = ctx.session.phase2;
+  if (!p || (p.stage !== "leaving" && p.stage !== "left")) return;
+  const now = nowOf(ctx);
+  const run = { stage: "condensing" as const, since: now };
+  ctx.session.phase2 = run;
+  ctx.later(PHASE2.CONDENSE_MS + PHASE2.CONDENSE_NET_MS, () => {
+    if (ctx.session.phase2?.since === run.since && ctx.session.phase2.stage === "condensing") phase2Eye(ctx);
+  });
+}
+
+function phase2Eye(ctx: ActionContext): void {
+  if (ctx.session.phase2?.stage !== "condensing") return;
+  ctx.session.phase2 = { stage: "eye", since: nowOf(ctx) };
+  ctx.rerender();
 }
 
 /**
@@ -160,8 +200,16 @@ export function onBossRoom(ctx: ActionContext, type: string): boolean {
     phase2Rising(ctx);
     return true;
   }
-  if (type === PHASE2_MSG.risen && p.stage !== "up") {
+  if (type === PHASE2_MSG.risen && (p.stage === "dislocating" || p.stage === "rising")) {
     phase2Up(ctx);
+    return true;
+  }
+  if (type === PHASE2_MSG.left && p.stage === "leaving") {
+    phase2Left(ctx);
+    return true;
+  }
+  if (type === PHASE2_MSG.eye && p.stage === "condensing") {
+    phase2Eye(ctx);
     return true;
   }
   return false;
@@ -176,6 +224,8 @@ export const bossActions = {
     ctx.session.boss = next;
     bossSounds(ctx, b, next);
     if (next.phase === "run" && b.phase !== "run") runBoss(ctx);
+    // R7 (survive, in the world): the outro read through — the world condenses before the way out
+    if (next.phase === "after" && b.phase === "won" && next.ending === "survive") startCondense(ctx);
     ctx.rerender();
   },
   "boss-move"(ctx: ActionContext, data: DOMStringMap): void {
@@ -201,6 +251,8 @@ export const bossActions = {
   "boss-done"(ctx: ActionContext): void {
     const b = ctx.session.boss;
     if (!b || b.phase !== "after") return;
+    // R7: the world still condensing: the way out is not offered yet
+    if (ctx.session.phase2?.stage === "condensing") return;
     ctx.session.boss = null;
     // boss-phase2-world R1: the room leaves its boss mode (the layer posts `boss: false` and the pause)
     ctx.session.phase2 = null;
@@ -212,6 +264,7 @@ export const bossActions = {
     const b = ctx.session.boss;
     if (!b || b.phase === "won" || b.phase === "after") return;
     ctx.session.boss = bossCheat(b, nowOf(ctx));
+    wonInWorld(ctx, b, ctx.session.boss);
     ctx.rerender();
   },
 };
