@@ -159,7 +159,9 @@ describe("对不起 and the last form (author 2026-11-16)", () => {
     const html = renderBoss(b, 0).value;
     expect(html).toContain('<img class="bs-portrait" src="/npc/boss_young.png" alt="" data-who="boss">');
     expect(html).toContain('class="bs-buff" data-who="partner" data-effect="hp"');
-    expect(html).toContain(`${t("boss.buff.title")}·${t("boss.party.partner")}`);
+    // every buff is called just 对不起 (author: 「都叫"对不起"」); the portrait says whose
+    expect(html.split(`<b>${t("boss.buff.title")}</b>`).length - 1).toBe(4);
+    expect(html).not.toContain(`${t("boss.buff.title")}·`);
     expect(html).toContain("boss-page end-survive mercy");
     // the fifth click is the fight's own first line, no portrait
     let c = b; for (let i = 0; i < 4; i++) c = bossNext(c, 0);

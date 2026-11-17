@@ -393,7 +393,7 @@ export function renderBoss(b: BossBattle, nowMs: number): SafeHtml {
   // 对不起: the line up now may be a colleague's (their portrait beside the words)
   const said = b.phase === "intro" ? b.intro[b.line] : b.phase === "won" ? b.outro[b.line] : undefined;
   const portrait = said?.face ? html`<img class="bs-portrait" src="${said.face}" alt="" data-who="${said.who ?? ""}">` : null;
-  const buffs = b.buffs.length ? html`<div class="bs-buffs">${b.buffs.map((id) => { const c = COLLEAGUES.find((x) => x.id === id)!; return html`<span class="bs-buff" data-who="${id}" data-effect="${BUFF_EFFECT[id]}"><img src="${c.av}" alt=""><b>${S("boss.buff.title")}·${S(`boss.party.${id}`)}</b><small>${S(`boss.buff.${id}`)}</small></span>`; })}</div>` : null;
+  const buffs = b.buffs.length ? html`<div class="bs-buffs">${b.buffs.map((id) => { const c = COLLEAGUES.find((x) => x.id === id)!; return html`<span class="bs-buff" data-who="${id}" data-effect="${BUFF_EFFECT[id]}"><img src="${c.av}" alt=""><b>${S("boss.buff.title")}</b><small>${S(`boss.buff.${id}`)}</small></span>`; })}</div>` : null;
   const box = b.phase === "lost"
     ? html`<div class="bs-box"><p>${b.log}</p><button type="button" class="bs-cmd" data-action="boss-retry">${S("boss.retry")}</button></div>`
     : b.phase === "after"
