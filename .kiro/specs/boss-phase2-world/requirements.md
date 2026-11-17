@@ -141,6 +141,30 @@ posts once from `bossPosts`, nets, names and timings in `phase2.ts`):
 - Tests in `tests/boss-phase2.test.ts` for both, as R7's: the posts once, the page classes, the nets,
   the way out held / automatic.
 
+## R9 — The good ending's homecoming page stands in the room the frame came home to
+
+Author 2026-11-18 (memory good-ending-script): after the fight the old objects speak (ending page
+`objects`), then the player walks home (page `home`: the desk, 「点个外卖吧」 in the ear, then the big
+Kuro crouched on the bed — `src/world/endings/view.ts` renderHome, `pages.ts` HOME_KEYS), then the
+talk in the dark (`lines`). The room's `{ home }` (R8) already ends on exactly that room: the clean
+morning, every old object on the desk, the carton open, and the big Kuro on the bed, who stays
+hidden until the game posts `{ kuro: true }` (the room's command; `{ kuro: false }` hides him again).
+
+- **Good ending only.** On `boss-done` the frame is **not** reset (no `{ boss: false }`, no pause
+  release): it is hidden (`display: none`) and paused as it is, in its `{ home }` end state.
+- Page `objects`: the frame stays hidden.
+- Page `home`: the frame is shown behind the page (same host as `bossScene`, kind `home`, before
+  the page, under it; `{ pause: false }`), the page's own still (`--photo`) and its placeholder
+  Kuro (`.home-kuro`) are **not** rendered when the frame is up (the page keeps the captions and
+  the click target; `.home-page.world`). At the third caption (`ending.home.kuro`, the step that
+  shows him) post `{ kuro: true }` once.
+- Leaving `home` (the `lines` page, black): post `{ boss: false }` and `{ pause: true }`, hide the
+  host — the reset R8 did at `boss-done` happens here instead.
+- Fallback: no frame (`bossRoom` off, or the win not in the world): the page renders as today
+  (the still, the placeholder).
+- Names and timings in `phase2.ts` as before; tests in `tests/boss-phase2.test.ts`: the frame kept
+  through `objects`, shown at `home`, `kuro` posted at step 3 once, reset at `lines`; the fallback.
+
 ## Out of scope
 
 The room's own animations and colours (the other session); the ending pages after the fight; any
