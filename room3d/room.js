@@ -23,7 +23,7 @@ const ROOM = { w: 3.7, d: 4.2, h: 2.7 }; // width read off the photo (window wal
 const X0 = -ROOM.w / 2, X1 = ROOM.w / 2, Z0 = -ROOM.d / 2, Z1 = ROOM.d / 2;
 const DESK = { x: X0 + 0.33 + 0.81, z: Z0 + 0.42, w: 1.62, d: 0.74, h: 0.75 }; // a hand's width off the window wall, as in the photo, so the window and the pipe come into the picture // measured off the photo it replaces (room.jpg): the pair of screens is about two thirds of the desk's width
 const EYE = new THREE.Vector3(0.15, 1.16, 1.2);
-const DESK_EYE = new THREE.Vector3(DESK.x + 0.02, 1.56, DESK.z + 0.62);
+const DESK_EYE = new THREE.Vector3(DESK.x + 0.02, 1.7, DESK.z + 0.66); // high enough that the whole desk top is in the picture
 const FACES = [
   { name: "桌墙", yaw: 0, photo: "/room/shots/room.jpg", eye: [-0.1, 1.25, 0.8], pitch: -0.07, fov: 52 },
   { name: "床墙", yaw: -Math.PI / 2, photo: "/room/shots/bed.jpg", eye: [-0.95, 1.22, 1.15], pitch: -0.17, yawOff: 0.5 },
@@ -880,7 +880,13 @@ G(DX - 0.44, top, DZ - 0.02, () => {
     COFFEE.liquid = cyl(0.0372, 0.002, mat.coffee, 0, 0.078, 0, { cast: false, noEdge: true, seg: 40 });
     torus(0.024, 0.006, mat.ceramic, 0.048, 0.047, 0, { arc: Math.PI, rz: -Math.PI / 2 });
   });
-  for (let i = 0; i < 5; i++) COFFEE.steam.push(ball(0.012, M({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false, roughness: 1 }, 3), 0, 0.1, 0, { cast: false }));
+  { // steam: not white balls (author: 很傻). A few faint wisps, each a soft smear that thins and leans as it rises.
+    const [sc, sg] = canvas(64, 128), gr = sg.createRadialGradient(32, 64, 0, 32, 64, 32);
+    gr.addColorStop(0, "rgba(255,255,255,.9)"); gr.addColorStop(0.5, "rgba(255,255,255,.28)"); gr.addColorStop(1, "rgba(255,255,255,0)");
+    sg.setTransform(1, 0, 0, 2, 0, -64); sg.fillStyle = gr; sg.fillRect(0, 0, 64, 128);
+    const st = new THREE.CanvasTexture(sc);
+    for (let i = 0; i < 6; i++) { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: st, transparent: true, opacity: 0, depthWrite: false })); sp.isLine2 = true; sp.userData.noEdge = true; cur.add(sp); COFFEE.steam.push(sp); }
+  }
   COFFEE.pour = cyl(0.0035, 0.32, mat.coffee, 0, 0.25, 0, { cast: false, noEdge: true });
   COFFEE.pour.visible = false;
 }, { ry: -0.5, float: 0.18 });
@@ -951,7 +957,13 @@ function updateCoffee(s, dt) {
   COFFEE.liquid.scale.set((0.0348 + L * 0.0028) / 0.0372, 1, (0.0348 + L * 0.0028) / 0.0372 * (1 + tilt * 0.25));
   COFFEE.liquid.rotation.x = -tilt * 0.85; // the coffee stays level while the mug does not
   COFFEE.hot = Math.max(0, COFFEE.hot - dt / 45);
-  COFFEE.steam.forEach((m, i) => { const ph = (s * 0.22 + i / 5) % 1; m.position.set(Math.sin(s * 0.9 + i * 2) * 0.012 * ph, 0.092 + ph * 0.13 + lift * 0.2, Math.cos(s * 0.7 + i) * 0.01 * ph + lift * 0.14); m.scale.setScalar(0.5 + ph * 1.3); m.material.opacity = L > 0.05 ? 0.13 * COFFEE.hot * Math.sin(ph * Math.PI) : 0; });
+  COFFEE.steam.forEach((m, i) => {
+    const ph = (s * 0.11 + i / 6 + 0.13 * Math.sin(i * 7.1)) % 1, lean = ph * ph;
+    m.position.set(Math.sin(s * 0.5 + i * 2.1) * 0.01 * ph + 0.012 * lean, 0.1 + ph * 0.11, Math.cos(s * 0.4 + i * 1.3) * 0.008 * ph + (i % 2 ? 0.006 : -0.006));
+    m.scale.set(0.012 + 0.016 * ph, 0.03 + 0.05 * ph, 1);
+    m.material.rotation = 0.25 * Math.sin(s * 0.3 + i) + 0.3 * lean;
+    m.material.opacity = L > 0.05 ? 0.2 * COFFEE.hot * Math.pow(Math.sin(ph * Math.PI), 1.5) : 0;
+  });
   for (const m of COFFEE.steam) m.visible = lift < 0.05;
   mat.coffee.color.copy(C(0x150a05).lerp(C(0x4a0508), smooth(0.5, 0.9, state.collapse))); // late on, it is not coffee-coloured any more
 }
@@ -1517,13 +1529,13 @@ function tentacle(points, r, c0, sway = 0.06, outer = false) {
   const centres = curve.getSpacedPoints(N), fr = curve.computeFrenetFrames(N, false);
   const count = (N + 1) * (RS + 1);
   const pos = new Float32Array(count * 3), nor = new Float32Array(count * 3), col = new Float32Array(count * 3), idx = [];
-  for (let i = 0; i < N; i++) for (let j = 0; j < RS; j++) { const a = i * (RS + 1) + j, b = a + RS + 1; idx.push(a, b, a + 1, b, b + 1, a + 1); }
+  for (let i = 0; i < N; i++) for (let j = 0; j < RS; j++) { const a = i * (RS + 1) + j, b = a + RS + 1; idx.push(a, a + 1, b, b, a + 1, b + 1); } // wound so the outside is the front: the other way round every face was lit as its own back, which is why they stayed black
   for (let i = 0; i <= N; i++) for (let j = 0; j <= RS; j++) {
     const ang = (j / RS) * Math.PI * 2, under = Math.max(0, Math.sin(ang)), sucker = Math.pow(0.5 + 0.5 * Math.sin(i * 1.35), 6);
     const o = (i * (RS + 1) + j) * 3, mot = h2(i * 0.37, j * 0.9 + points.length), spot = h2(Math.floor(i / 3) * 1.7, Math.floor(j / 2) * 2.3) > 0.82 ? 1 : 0;
     // back: a dark, mottled hide, wine at the edges; belly: pale raw flesh, where the suckers sit
-    const top = [0.4 + 0.14 * mot + 0.16 * spot, 0.07 + 0.04 * mot + 0.08 * spot, 0.13 + 0.06 * mot + 0.05 * spot], belly = [0.62 + 0.1 * mot, 0.3 + 0.08 * mot, 0.3 + 0.06 * mot];
-    const kk = Math.pow(Math.min(1, Math.max(0, Math.sin(ang) + 0.45) / 1.2), 0.8) * (0.85 + 0.15 * sucker); // the belly comes well up the flanks
+    const top = [0.15 + 0.07 * mot + 0.1 * spot, 0.022 + 0.015 * mot + 0.03 * spot, 0.05 + 0.03 * mot + 0.02 * spot], belly = [0.5 + 0.08 * mot, 0.2 + 0.05 * mot, 0.2 + 0.04 * mot]; // lit properly now, so the colours are the real ones: dark wine above, raw below
+    const kk = Math.pow(Math.min(1, Math.max(0, Math.sin(ang) + 0.1) / 1.0), 1.3) * (0.85 + 0.15 * sucker); // the belly comes well up the flanks
     col[o] = top[0] + (belly[0] - top[0]) * kk; col[o + 1] = top[1] + (belly[1] - top[1]) * kk; col[o + 2] = top[2] + (belly[2] - top[2]) * kk;
   }
   const geo = new THREE.BufferGeometry();
