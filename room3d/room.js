@@ -2507,7 +2507,8 @@ function buildFar() {
   // with the lit eyes), stood up far behind the room as one great card, its edges lost in the smoke.
   const CAM = new THREE.Vector3(9, 7.5, 17), AIM = new THREE.Vector3(-2, 5.5, -6);
   FAR.cam2 = new THREE.Vector3(40, 60, 85); FAR.aim2 = new THREE.Vector3(-2, 18, -6); // further: he stays the size he is, the room shrinks, the ground turns out to be round
-  FAR.RP = 500;
+  FAR.RP = 150; // a small world: from as high as the eye ends up, its edge is a curve and not a line (author: 最后甚至感觉是一个星球的半平面)
+  const dropAt = (r) => FAR.RP - Math.sqrt(Math.max(0, FAR.RP * FAR.RP - r * r));
   FAR.cam = CAM; FAR.aim = AIM;
   const pic = new THREE.TextureLoader().load("/battle/boss-giant.jpg"); pic.colorSpace = THREE.SRGBColorSpace;
   const [fc, fg] = canvas(512, 512), grad = fg.createRadialGradient(256, 236, 120, 256, 256, 256);
@@ -2521,13 +2522,13 @@ function buildFar() {
   const [gc, gg] = canvas(1024, 1024);
   gg.fillStyle = "#000"; gg.fillRect(0, 0, 1024, 1024);
   for (let i = 0; i < 70; i++) { gg.strokeStyle = `rgba(255,${20 + Math.floor(R() * 50)},16,${0.4 + R() * 0.6})`; gg.lineWidth = 1 + R() * 3.5; gg.beginPath(); let x = R() * 1024, y = R() * 1024, a = R() * 6.28; gg.moveTo(x, y); for (let k = 0; k < 9; k++) { a += (R() - 0.5) * 1.5; x += Math.cos(a) * (30 + R() * 70); y += Math.sin(a) * (30 + R() * 70); gg.lineTo(x, y); } gg.stroke(); }
-  const cracks = new THREE.CanvasTexture(gc); cracks.wrapS = cracks.wrapT = THREE.RepeatWrapping; cracks.repeat.set(90, 45); cracks.colorSpace = THREE.SRGBColorSpace;
-  const ground = new THREE.Mesh(new THREE.SphereGeometry(FAR.RP, 128, 64, 0, Math.PI * 2, 0, 0.7), M({ color: 0x0b0a0a, roughness: 0.95, emissive: 0xffffff, emissiveMap: cracks, emissiveIntensity: 1.3 }, 3)); ground.position.y = -FAR.RP - 0.35; /* a world, not a floor */ ground.userData.noEdge = true; FAR.g.add(ground);
+  const cracks = new THREE.CanvasTexture(gc); cracks.wrapS = cracks.wrapT = THREE.RepeatWrapping; cracks.repeat.set(22, 11); cracks.anisotropy = 8; // fewer, larger: at ninety repeats the cracks beat against the pixels into a hatch cracks.colorSpace = THREE.SRGBColorSpace;
+  const ground = new THREE.Mesh(new THREE.SphereGeometry(FAR.RP, 128, 64, 0, Math.PI * 2, 0, 1.45), M({ color: 0x0b0a0a, roughness: 0.95, emissive: 0xffffff, emissiveMap: cracks, emissiveIntensity: 1.3 }, 3)); ground.position.y = -FAR.RP - 0.35; /* a world, not a floor */ ground.userData.noEdge = true; FAR.g.add(ground);
   const geos = [], c3 = new THREE.Vector3();
   for (let i = 0; i < 3200; i++) { // enough of them that no ground shows between
-    const a = R() * Math.PI * 2, d = 2.2 + Math.pow(R(), 0.55) * 250, len = 9 + R() * 16 + d * 0.16, r = 0.22 + R() * 0.5 + d * 0.022;
+    const a = R() * Math.PI * 2, d = 2.2 + Math.pow(R(), 0.6) * 138, len = 9 + R() * 16 + d * 0.16, r = 0.22 + R() * 0.5 + d * 0.022;
     let x = Math.cos(a) * d, z = Math.sin(a) * d, th = a + Math.PI / 2 + (R() - 0.5) * 1.2; const pts = [], n = 8, hump = 1 + Math.floor(R() * (n - 2));
-    for (let k = 0; k <= n; k++) { pts.push(new THREE.Vector3(x, (k === 0 ? -0.9 - r : -0.35 + r * 0.55 * (1 - k / n) + (k === hump ? r * (0.8 + R() * 2.2) : 0)) - (x * x + z * z) / (2 * FAR.RP), z)); th += (R() - 0.5) * 0.7; x += Math.cos(th) * len / n; z += Math.sin(th) * len / n; }
+    for (let k = 0; k <= n; k++) { pts.push(new THREE.Vector3(x, (k === 0 ? -0.9 - r : -0.35 + r * 0.55 * (1 - k / n) + (k === hump ? r * (0.8 + R() * 2.2) : 0)) - dropAt(Math.hypot(x, z)), z)); th += (R() - 0.5) * 0.7; x += Math.cos(th) * len / n; z += Math.sin(th) * len / n; }
     const curve = new THREE.CatmullRomCurve3(pts, false, "centripetal"), geo = new THREE.TubeGeometry(curve, 22, 1, 6), P = geo.attributes.position;
     for (let v = 0; v < P.count; v++) { const t = Math.floor(v / 7) / 22, rr = r * Math.pow(1 - t, 0.7) * (1 + 0.05 * Math.sin(t * 60)) + 0.01; curve.getPointAt(Math.min(1, t), c3); P.setXYZ(v, c3.x + (P.getX(v) - c3.x) * rr, c3.y + (P.getY(v) - c3.y) * rr, c3.z + (P.getZ(v) - c3.z) * rr); }
     geo.computeVertexNormals(); geos.push(geo);
@@ -2542,7 +2543,7 @@ function buildFar() {
     FAR.orb = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(oc), transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }));
     FAR.orb.position.set(0.1, 2.2, 0.1); FAR.orb.visible = false; FAR.orb.isLine2 = true; /* so the occlusion pass leaves it alone, as it does the ink lines */ FAR.g.add(FAR.orb); } // the room, seen from out here, is a lamp
   FAR.reds = []; // the red comes up from between them, here and there, and breathes
-  for (let i = 0; i < 9; i++) { const a = i * 2.4 + 0.7, d = i === 0 ? 7 : 14 + i * 12, l = new THREE.PointLight(0xff2414, 0, 55 + d * 0.5, 1.15); l.position.set(Math.cos(a) * d, 1.2 - (d * d) / (2 * FAR.RP), Math.sin(a) * d); l.userData = { i: (160 + d * 6) * 3.6, ph: i * 1.9 }; FAR.g.add(l); FAR.reds.push(l); }
+  for (let i = 0; i < 9; i++) { const a = i * 2.4 + 0.7, d = i === 0 ? 7 : 14 + i * 12, l = new THREE.PointLight(0xff2414, 0, 55 + d * 0.5, 1.15); l.position.set(Math.cos(a) * d, 1.2 - dropAt(d), Math.sin(a) * d); l.userData = { i: (160 + d * 6) * 3.6, ph: i * 1.9 }; FAR.g.add(l); FAR.reds.push(l); }
   FAR.rim = new THREE.DirectionalLight(0xb9bcc6, 0); FAR.rim.position.set(-20, 30, -40); FAR.rim.target.position.set(-10.5, 12, -12); FAR.g.add(FAR.rim, FAR.rim.target);
   FAR.fill = new THREE.PointLight(0xff8a3a, 0, 140, 1.1); FAR.fill.position.set(-6, 14, -10); FAR.g.add(FAR.fill);
 }
