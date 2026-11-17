@@ -15,7 +15,7 @@ import { youAndYou } from "./youandyou";
 import { renderPullOut } from "./pullout";
 import { bossScene } from "@world/room/outside";
 import { COLLAPSE_TO_WHITE_MS, endingOf } from "./flow";
-import { ENDING_ART, ENDING_PAGES, endingLines, TENDER_KEYS, TENDER_PHOTO, WAKE_KEYS, WAKE_PHOTO, WAKE_SAY } from "./pages";
+import { ENDING_ART, endingLines, endingObjects, pagesFor, HOME_CAPTIONS, HOME_KEYS, HOME_PHOTO, SURVIVE_OBJECT_KEYS, TENDER_KEYS, TENDER_PHOTO, WAKE_KEYS, WAKE_PHOTO, WAKE_SAY } from "./pages";
 import { endingFlavour } from "@state/endings";
 import { FRAMES, frameUrl } from "@world/desktop/kuro/body";
 
@@ -148,6 +148,49 @@ export function renderLines(m: EndingModel, ending: Ending): SafeHtml {
 
 
 /**
+ * After the fight the old objects speak (author 2026-11-18). Good: one by one in the author's order,
+ * each in its battle form with its line; said, it turns back into itself and lies on the ground; then
+ * three captions — the look at little Kuro (who walks off the other way), the silence, the carrying
+ * home. Survive: the ones still unassimilated stand together and the lines are said by no one in
+ * particular, one per click. The page is skipped when no object is left (pages order).
+ */
+export function renderObjects(m: EndingModel, ending: Ending): SafeHtml {
+  const objects = endingObjects(m.state);
+  const step = Math.max(1, stepOf(m));
+  if (ending === "good") {
+    const spoken = Math.min(step, objects.length);
+    const cap = step - objects.length; // 1..3 once every object has spoken
+    const standing = objects.map((id, i) => {
+      const said = i < spoken - 1 || cap > 0;
+      const now = i === spoken - 1 && cap <= 0;
+      return html`<div class="${cls("eo", said && "down", now && "now")}" data-object="${id}"><img class="eo-form" src="/battle/party/obj-${id}.png" alt="" draggable="false"><img class="eo-real" src="/objects/${id}_front.png" alt="" draggable="false"></div>`;
+    });
+    const speaking = cap <= 0 ? objects[spoken - 1] : undefined;
+    const line = speaking ? html`<p class="cap now eo-line">${tr(`ending.objects.good.${speaking}`)}</p>` : null;
+    const caps = cap > 0 ? HOME_CAPTIONS.slice(0, Math.min(cap, HOME_CAPTIONS.length)).map((k, i) => html`<p class="${cls("cap", i === cap - 1 && "now")}">${tr(k)}</p>`) : null;
+    return html`<div class="stage ending-page objects-page good" data-step="${step}">${next()}<div class="eo-ground">${standing}</div><div class="dlg end-caps">${line}${caps}</div></div>`;
+  }
+  const n = Math.min(step, SURVIVE_OBJECT_KEYS.length);
+  const standing = objects.map((id) => html`<div class="eo" data-object="${id}"><img class="eo-form" src="/battle/party/obj-${id}.png" alt="" draggable="false"></div>`);
+  const caps = SURVIVE_OBJECT_KEYS.slice(0, n).map((k, i) => html`<p class="${cls("cap", i === n - 1 && "now")}">${tr(k)}</p>`);
+  return html`<div class="stage ending-page objects-page survive" data-step="${step}">${next()}<div class="eo-ground together">${standing}</div><div class="dlg end-caps">${caps}</div></div>`;
+}
+
+/**
+ * The homecoming (good ending, author 2026-11-18): the room — the frame's own `{ home }` when it plays,
+ * else the day-1 still — with the objects on the desk; the desk, 「点个外卖吧」 in the ear, then the big
+ * Kuro crouched on the bed with its one line; then the dark and the talk (the lines page).
+ */
+export function renderHome(m: EndingModel): SafeHtml {
+  const step = Math.min(HOME_KEYS.length, Math.max(1, stepOf(m)));
+  const objects = endingObjects(m.state);
+  const caps = HOME_KEYS.slice(0, step).map((k, i) => html`<p class="${cls("cap", i === step - 1 && "now", k === "ending.home.kuro" && "kuro")}">${tr(k)}</p>`);
+  const desk = html`<div class="home-desk">${objects.map((id) => html`<img src="/objects/${id}_front.png" alt="" draggable="false">`)}</div>`;
+  const kuro = step >= HOME_KEYS.length ? html`<img class="home-kuro" src="/battle/q-kuro.png" alt="" draggable="false">` : null;
+  return html`<div class="stage ending-page home-page" data-step="${step}" style="--photo:url('${HOME_PHOTO}')">${next()}${desk}${kuro}<div class="dlg end-caps">${caps}</div></div>`;
+}
+
+/**
  * The ending's poster (author 2026-11-12: the name, the spread picture, one paragraph; 2026-11-17: its
  * own last page, after the credits — 「最后是结局海报」). Layout (Sultan's Game reference): the picture
  * on the left, the name and a paragraph on the right.
@@ -166,7 +209,7 @@ export function renderEnding(m: EndingModel): SafeHtml {
   // boss-phase2-world: the page with the room frame behind it
   if (m.session.boss) return bossScene(m.state.day, m.session, m.nowMs);
   const ending = endingOf(m.state, m.session) as Ending;
-  const phase = m.session.endingPage?.phase ?? ENDING_PAGES[ending][0]!;
+  const phase = m.session.endingPage?.phase ?? pagesFor(ending, m.state)[0]!;
   if (phase === "collapse") return renderCollapse(m);
   if (phase === "you") return renderYouAndYou(m);
   if (phase === "credits") return renderCredits(m, ending);
@@ -174,5 +217,7 @@ export function renderEnding(m: EndingModel): SafeHtml {
   if (phase === "wake") return renderWake(m);
   if (phase === "lines") return renderLines(m, ending);
   if (phase === "poster") return renderPoster(m, ending);
+  if (phase === "objects") return renderObjects(m, ending);
+  if (phase === "home") return renderHome(m);
   return renderAfter(m, ending);
 }

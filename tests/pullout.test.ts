@@ -144,9 +144,9 @@ describe("the three ending cuts", () => {
   });
 
   it.each([
-    ["survive", () => f(LAST), "lines"], // author 2026-11-17: the dialogue first, then the credits, then the poster
+    ["survive", () => f(LAST), "lines"], // no old object in this fixture: the objects page is skipped; good below has them
     ["bad", () => ({ ...f(LAST), assimilation: constants.assimilationMax as number }), "wake"],
-    ["good", goodLast, "lines"],
+    ["good", goodLast, "objects"],
   ] as const)("%s on night 18: the pull-out first, no page, clicks do nothing; at its cut the ending card", (ending, state, first) => {
     const { ctx, timers } = ctxAt(state(), ending);
     startEnding(ctx);
@@ -453,7 +453,7 @@ describe("what appears in the black: the giant for good, the field for bad and s
     bossActions["boss-next"](ctx);
     bossActions["boss-next"](ctx);
     bossActions["boss-done"](ctx);
-    expect(ctx.session.endingPage?.phase).toBe("lines"); // author 2026-11-17: the dialogue first, then the credits, then the poster
+    expect(ctx.session.endingPage?.phase).toBe("objects"); // author 2026-11-18: the old objects speak first
   });
 
   it("the driver writes the giant's vars every frame", () => {

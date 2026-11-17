@@ -1114,3 +1114,22 @@
 .boss-page.world.homing::after{animation:p2-fade 3000ms ease-in both}
 .boss-page.world.homing .bs-box.silent{visibility:hidden}
 @media (prefers-reduced-motion:reduce){.boss-page.world.homing .bs-top,.boss-page.world.homing .bs-atb,.boss-page.world.homing .bs-bossbar,.boss-page.world.homing .bs-party,.boss-page.world.homing .bs-strip,.boss-page.world.homing .bs-buffs,.boss-page.world.homing::after{animation:none;opacity:0}}
+/* after the fight the old objects speak (author 2026-11-18): their battle forms on a dark ground; said, each turns back into itself and lies down */
+.objects-page{background:#0b0b0d;color:#efe9df}
+.objects-page .eo-ground{position:absolute;left:0;right:0;bottom:250px;display:flex;justify-content:center;align-items:flex-end;gap:28px;z-index:1}
+.objects-page .eo{position:relative;width:120px;height:140px}
+.objects-page .eo img{position:absolute;left:50%;bottom:0;transform:translateX(-50%);max-width:120px;max-height:140px;object-fit:contain;transition:opacity .5s,transform .6s}
+.objects-page .eo .eo-real{opacity:0;max-width:72px;max-height:72px;transform:translateX(-50%) translateY(-30px)}
+.objects-page .eo.now .eo-form{filter:drop-shadow(0 0 18px rgba(255,255,255,.35))}
+.objects-page .eo.down .eo-form{opacity:0;transform:translateX(-50%) translateY(10px)}
+.objects-page .eo.down .eo-real{opacity:1;transform:translateX(-50%) translateY(0)}
+.objects-page .end-caps{background:rgba(10,10,12,.62);border-radius:6px}
+.objects-page .end-caps .eo-line{color:#f4efe6}
+/* the homecoming (good): the day-1 room, the objects on the desk, the big Kuro crouched on the bed */
+.home-page{background:#111 var(--photo) center/cover no-repeat;color:#efe9df}
+.home-page .home-desk{position:absolute;left:215px;top:470px;width:824px;display:flex;gap:6px;align-items:flex-end;z-index:1}
+.home-page .home-desk img{width:52px;height:52px;object-fit:contain;filter:drop-shadow(0 4px 8px rgba(0,0,0,.6))}
+.home-page .home-kuro{position:absolute;left:1120px;bottom:300px;width:300px;z-index:1;animation:m-fade-in 900ms ease both;filter:drop-shadow(0 12px 30px rgba(0,0,0,.7))}
+.home-page .end-caps{background:rgba(10,10,12,.62);border-radius:6px}
+.home-page .end-caps .cap.kuro{color:#f4efe6;font-weight:700}
+@media (prefers-reduced-motion:reduce){.objects-page .eo img{transition:none}.home-page .home-kuro{animation:none}}

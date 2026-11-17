@@ -11,6 +11,7 @@ import { f } from "@state/fday";
 import type { Store } from "@state/store";
 import { createStore } from "@state/store";
 import type { State } from "@state/types.gen";
+import { endingObjects, nextPage, pagesFor } from "@world/endings/pages";
 import { hasString, setLocale } from "@world/i18n";
 import { constants, membersOf } from "@state/variables";
 import { DEFAULT_CLOCK } from "@world/desktop/beat";
@@ -268,8 +269,8 @@ describe("credits are Kuro's log (FR3)", () => {
     const want = {
       collapse: [["collapse", "tender", "lines", "credits", "poster"], "afterBad"],
       bad: [["wake", "you", "lines", "credits", "poster"], "afterBad"],
-      survive: [["lines", "credits", "poster", "after"], "newRun"],
-      good: [["lines", "credits", "poster", "after"], null],
+      survive: [["lines", "credits", "poster", "after"], "newRun"], // this fixture met no old object: the objects page is skipped (pagesFor)
+      good: [["objects", "home", "lines", "credits", "poster", "after"], null],
     } as const;
     for (const [ending, state] of [
       ["collapse", { ...f(3), san: 0 }],
@@ -343,5 +344,17 @@ describe("the credits like a film's (author 2026-11-17)", () => {
     expect(rollShown(roll, 0, 0, false)).toBe(1);
     expect(rollShown(roll, 0, CREDIT_CARD_MS, false)).toBe(2);
     expect(rollShown(roll, 0, 0, true)).toBe(roll.length);
+  });
+});
+
+describe("the objects page (author 2026-11-18)", () => {
+  it("is in the run's pages only when an old object is left unassimilated; good lists them in the author's order", () => {
+    expect(pagesFor("survive", { found: [] as never, upgraded: {} })).toEqual(["lines", "credits", "poster", "after"]);
+    expect(pagesFor("survive", { found: ["tape"] as never, upgraded: { tape: true } })).toEqual(["lines", "credits", "poster", "after"]);
+    expect(pagesFor("survive", { found: ["tape", "chick"] as never, upgraded: { tape: true } })).toEqual(["objects", "lines", "credits", "poster", "after"]);
+    expect(pagesFor("good", { found: ["phone", "chick", "pager"] as never, upgraded: {} })).toEqual(["objects", "home", "lines", "credits", "poster", "after"]);
+    expect(endingObjects({ found: ["phone", "chick", "pager"] as never, upgraded: {} })).toEqual(["chick", "pager", "phone"]);
+    expect(nextPage("survive", "objects", { found: ["chick"] as never, upgraded: {} })).toBe("lines");
+    expect(nextPage("good", "objects", { found: ["chick"] as never, upgraded: {} })).toBe("home");
   });
 });

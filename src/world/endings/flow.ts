@@ -9,7 +9,7 @@ import type { ActionContext } from "@world/desktop/controller";
 import { PULL_CUT_MS, pullFrom } from "@world/room/splat/pullout";
 import { creditRoll, CREDIT_LINE_MS, CREDIT_TICK_MS, rollShown } from "./credits";
 import type { EndingPhase } from "@world/desktop/model";
-import { ENDING_PAGES, nextPage, pageSteps } from "./pages";
+import { pagesFor, ENDING_PAGES, nextPage, pageSteps } from "./pages";
 import { dislocateNetMs, PHASE2, PHASE2_MSG, RELEASE_NET_MS } from "./phase2";
 import { BOSS_TICK_MS, bossCheat, bossChip, bossChoose, bossNext, bossRetry, bossStart, bossTick, type BossBattle } from "./boss";
 
@@ -353,7 +353,7 @@ export function goToPage(ctx: ActionContext, phase: EndingPhase): void {
 
 function firstPage(ctx: ActionContext, ending: Ending): void {
   // endings-matrix: collapse runs to white; bad wakes; survive / good roll the credits.
-  goToPage(ctx, ENDING_PAGES[ending][0]!);
+  goToPage(ctx, pagesFor(ending, ctx.store.getState())[0]!);
   ctx.rerender();
 }
 
@@ -396,7 +396,7 @@ export function endingNext(ctx: ActionContext): void {
       return;
     }
   }
-  const next = nextPage(ending, page.phase);
+  const next = nextPage(ending, page.phase, state);
   if (next) goToPage(ctx, next);
   // dev (`&endpage=`): no run ended, so nothing is cleared; the last page stays.
   else if (state.ending === "none") return void ctx.rerender();

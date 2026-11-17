@@ -29,7 +29,7 @@ import { WALL_FADE_MS, wallpaperFor } from "./wallpaper";
 import { inWorkMode, workBar } from "./workbench/work-mode";
 
 /** The ending pages, in the orders of src/world/endings/flow.ts `ENDING_PAGES`. */
-export type EndingPhase = "collapse" | "you" | "credits" | "after" | "tender" | "wake" | "lines" | "poster";
+export type EndingPhase = "collapse" | "you" | "credits" | "after" | "tender" | "wake" | "lines" | "poster" | "objects" | "home";
 
 /** 工作台's pages (its 消息 pane moved to 听听, tingtalk 2026-11-04). */
 export type WorkbenchPage = "home" | "docs" | "ledger" | "code" | TaskPage;
