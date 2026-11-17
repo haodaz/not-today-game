@@ -225,7 +225,8 @@
             "下班"
           ]
         },
-        "tone": "night"
+        "tone": "night",
+        "art": "/launch/day-18.jpg"
       }
     }
   ]
