@@ -225,7 +225,12 @@ export function sceneOf(d: DialogueState): Scene {
     if (q.voice !== "kuro" && (l.k === "speaker" || l.k === "narration") && l.who !== undefined && l.who !== "me") stand = npcStand(l.who);
   }
   if (backdrop === null && prop === null) return NO_SCENE;
-  return { backdrop, prop, ...(backdrop !== null && stand !== null ? { stand } : {}) };
+  // With a prop on (the 96): the prop holds the middle for the narration; the NPC takes it only for
+  // their own line (author 2026-11-18: 卷子出现的时候是卷子，老师说话的时候才是老师).
+  const cur = q.lines[Math.min(d.line, q.lines.length - 1)];
+  const speaking = q.voice !== "kuro" && !!cur && (cur.k === "speaker" || cur.k === "narration") && cur.who !== undefined && cur.who !== "me";
+  const show = backdrop !== null && stand !== null && (prop === null || speaking);
+  return { backdrop, prop, ...(show ? { stand: stand! } : {}) };
 }
 
 // ——— a line waits for its place (dialogue addition 2026-11-02) ———

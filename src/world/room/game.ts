@@ -171,9 +171,8 @@ function dlgLayer(dlg: SafeHtml | null, session: Session, readsOn: boolean, with
   // day1-playtest-1117 R5: a line about the open thread is its card: at the thread's bottom, above the input row
   const thread = chat && threadCardFor(session.dialogue) !== null;
   // Standing NPCs (author 2026-11-18): the speaker stands over the story mask and under the box, in full colour.
-  // A prop on show (the 96, a photo) keeps the middle: the person stands aside, on the left.
-  const scene = sceneOf(session.dialogue);
-  const standImg = scene.stand === undefined ? null : html`<img class="${cls("scene-stand", scene.prop !== null && "aside")}" src="${scene.stand}" alt="" aria-hidden="true" draggable="false">`;
+  const stand = sceneOf(session.dialogue).stand;
+  const standImg = stand === undefined ? null : html`<img class="scene-stand" src="${stand}" alt="" aria-hidden="true" draggable="false">`;
   return html`<div class="${cls("dlg-layer", story && "masked", chat && !thread && "top", thread && "thread")}">${withMask ? boxMask(session, readsOn) : null}${standImg}${dlg}</div>`;
 }
 

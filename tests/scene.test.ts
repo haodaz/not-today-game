@@ -146,10 +146,15 @@ describe("the stage", () => {
     expect(teacher.k).toBe("speaker");
     const withPortrait = stageOf(store, nightAt(1, 11));
     expect(sceneHtml(withPortrait)).toContain('data-src="/room/dream/classroom.jpg"');
-    expect(sceneHtml(withPortrait)).toContain('<img class="scene-prop" data-src="/room/props/exam_96.png" src="/room/props/exam_96.png"');
-    // Standing NPCs (author 2026-11-18): the teacher stands in the frame (drawn in the box's layer), so the box has no bust.
+    // Standing NPCs (author 2026-11-18): 卷子出现的时候是卷子，老师说话的时候才是老师. Her line: she stands
+    // in the middle (drawn in the box's layer), the 96 is put away, the box has no bust.
     expect(sceneOf(nightAt(1, 11)).stand).toBe(`/npc/stand/${teacher.who}.webp`);
+    expect(sceneHtml(withPortrait)).not.toContain("scene-prop");
     expect(withPortrait).not.toContain("npc-portrait");
+    // The narration after it: the 96 is back in the middle, nobody stands.
+    const narration = stageOf(store, nightAt(1, 12));
+    expect(sceneOf(nightAt(1, 12)).stand).toBeUndefined();
+    expect(sceneHtml(narration)).toContain('<img class="scene-prop" data-src="/room/props/exam_96.png" src="/room/props/exam_96.png"');
     const hundred = stageOf(store, nightAt(1, 19));
     expect(sceneHtml(hundred)).toContain('src="/room/props/exam_100.png"');
     expect(hundred).not.toContain("exam_96");
