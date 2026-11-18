@@ -107,7 +107,7 @@ describe("which app shows which conversation", () => {
 describe("看一眼消息 is done by opening 听听 (the boss lives there)", () => {
   it("showing 听听 fires the openApp:msgs step once a day, so day 1's 「进屏幕，看一眼消息」 completes; 工作台 and Hi信 do not", () => {
     const store = storeAt(1);
-    store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
+    store.appendEvent({ kind: "step", name: "rise", t: "09:03" }); store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
     const session = initialSession({ beat: "boot", time: "09:03" }, "left", "desktop");
     const ctx: ActionContext = { store, session, rerender: () => {}, later: () => {} };
     const steps = () => store.getEvents().filter((e) => e.kind === "step" && e.name === "openApp:msgs").length;

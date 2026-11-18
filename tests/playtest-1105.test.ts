@@ -10,7 +10,7 @@ import { loopActions, renderGame } from "@world/room/game";
 
 function booted(day = 1): Store {
   const store = createStore({ startDay: day });
-  store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
+  store.appendEvent({ kind: "step", name: "rise", t: "09:03" }); store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
   return store;
 }
 function rig(store: Store, view: Session["view"] = "room", clock: BeatClock = DEFAULT_CLOCK) {

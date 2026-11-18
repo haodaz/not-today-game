@@ -27,11 +27,13 @@ const text1 = (id: string) => item1(id).text;
 const rewrite1 = (id: string) => item1(id).rewrite!;
 
 describe("checklist (FR1)", () => {
-  it("day 1 opens with only 开机, then the current item first and the other open items after it (navigation-polish)", () => {
+  it("day 1 opens with only 起床, then 开机, then the current item first and the other open items after it (navigation-polish; day1-playtest-1117 R1)", () => {
     const store = storeAt(1);
+    expect(texts(store)).toEqual([`now:${text1("rise")}`]);
+    store.appendEvent(step("rise"));
     expect(texts(store)).toEqual([`now:${text1("boot")}`]);
     store.appendEvent(step("boot"));
-    expect(checklistDoneCount(loopContext(store.getState(), store.getEvents())!)).toBe(1);
+    expect(checklistDoneCount(loopContext(store.getState(), store.getEvents())!)).toBe(2);
     expect(texts(store)).toEqual([`now:${text1("msgs")}`]);
     store.appendEvent(step("openApp:msgs"));
     // 2026-11-08: the boss is replied to right after reading him; lunch comes after the reply.
@@ -41,17 +43,17 @@ describe("checklist (FR1)", () => {
   });
 
   it("after ordering, lunch waits with its rewrite text, unticked, until it arrives", () => {
-    const store = storeAt(1, [step("boot"), step("openApp:msgs"), { kind: "reply", choice: "fine", recipient: "boss", t: "09:05" }, { kind: "order", meal: "lunch", shopId: "huangmenji", itemId: "hmj", t: "11:30" }]);
+    const store = storeAt(1, [step("rise"), step("boot"), step("openApp:msgs"), { kind: "reply", choice: "fine", recipient: "boss", t: "09:05" }, { kind: "order", meal: "lunch", shopId: "huangmenji", itemId: "hmj", t: "11:30" }]);
     expect(texts(store)).toEqual([`now:${WORK1}`, `wait:${rewrite1("lunch")}`]);
     store.appendEvent(step("delivery:arrives:lunch", "12:04"));
     expect(texts(store)).toEqual([`now:${WORK1}`, `later:${text1("pickup")}`]);
   });
 
   it("an event before its item unlocks counts only once it does", () => {
-    const store = storeAt(1, [step("openApp:msgs")]);
+    const store = storeAt(1, [step("rise"), step("openApp:msgs")]);
     expect(texts(store)).toEqual([`now:${text1("boot")}`]);
     store.appendEvent(step("boot"));
-    expect(checklistDoneCount(loopContext(store.getState(), store.getEvents())!)).toBe(2);
+    expect(checklistDoneCount(loopContext(store.getState(), store.getEvents())!)).toBe(3);
   });
 
   it("the bed stays locked until every required item is done", () => {
@@ -66,7 +68,7 @@ describe("checklist (FR1)", () => {
   });
 
   it("names the work task, the self-ticking item and the meal to order", () => {
-    const d1 = storeAt(1, [step("boot"), step("openApp:msgs"), { kind: "reply", choice: "fine", recipient: "boss", t: "09:05" }]);
+    const d1 = storeAt(1, [step("rise"), step("boot"), step("openApp:msgs"), { kind: "reply", choice: "fine", recipient: "boss", t: "09:05" }]);
     const ctx = loopContext(d1.getState(), d1.getEvents())!;
     expect(openTask(ctx)?.id).toBe("task1");
     expect(mealToOrder(ctx)).toBe("lunch");
@@ -75,7 +77,7 @@ describe("checklist (FR1)", () => {
   });
 
   it("a line is never an action; the world asks which item an event would do (day-loop correction)", () => {
-    const store = storeAt(1);
+    const store = storeAt(1, [step("rise")]);
     expect(Object.keys(view(store).lines[0]!)).toEqual(["id", "text", "state"]);
     const ctx = () => loopContext(store.getState(), store.getEvents())!;
     expect(openItemFor(ctx(), (e) => e.type === "boot")?.id).toBe("boot");

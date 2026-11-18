@@ -9,6 +9,8 @@ import type { ActionContext, ActionHandler } from "../controller";
 import { babblePlan } from "@world/sound/babble";
 import { voiceTable } from "@world/sound/voice-table";
 import { getLocale } from "@world/i18n";
+import { releaseQuiet } from "@world/loop/quiet";
+import { settleSession } from "@world/dialogue/place";
 
 function delayOf(step: Step, ctx: ActionContext): number {
   switch (step.at.kind) {
@@ -25,9 +27,14 @@ function delayOf(step: Step, ctx: ActionContext): number {
 
 /** Plays a just-sent plan step by step; when done (or at a nextBoot step) it becomes history. */
 export function playPlan(ctx: ActionContext, index: number, steps: readonly Step[]): void {
+  // day1-playtest-1117 R5: the thread quiet: what waited for it (a reply item's onDone) plays now
+  const quiet = () => {
+    if (releaseQuiet(ctx.session, ctx.store.getEvents())) settleSession(ctx.session);
+  };
   const next = (k: number) => {
     if (k >= steps.length) {
       ctx.session.progress.delete(index);
+      quiet();
       ctx.rerender();
       return;
     }
@@ -36,6 +43,7 @@ export function playPlan(ctx: ActionContext, index: number, steps: readonly Step
     if (delay < 0) {
       // 已读 at the next boot: settled history shows it from tomorrow.
       ctx.session.progress.delete(index);
+      quiet();
       ctx.rerender();
       return;
     }
@@ -150,7 +158,11 @@ export const messageActions: Record<string, ActionHandler> = {
     session.selected = null;
     session.draft = "";
     if (!plan.steps.length) return ctx.rerender();
+    // R5: the answer counts as playing from the moment the reply is logged (the loop reacts to the
+    // event at once and holds the reply item's onDone lines while it plays)
+    const index = store.getEvents().length;
+    session.progress.set(index, 0);
     store.appendEvent({ kind: "reply", choice: word, recipient, t: now, ...(text !== undefined ? { text } : {}) });
-    playPlan(ctx, store.getEvents().length - 1, plan.steps);
+    playPlan(ctx, index, plan.steps);
   },
 };

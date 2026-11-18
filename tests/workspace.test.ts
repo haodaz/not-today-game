@@ -40,7 +40,7 @@ const title = (id: string) => escapeHtml(tasks().find((x) => x.id === id)!.title
 /** Day 1, booted, messages seen; `done` tasks handed in; `found` objects opened. */
 function day1(done: string[] = [], found: string[] = []): Store {
   const store = createStore({ startDay: 1 });
-  store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
+  store.appendEvent({ kind: "step", name: "rise", t: "09:03" }); store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
   store.appendEvent({ kind: "step", name: "openApp:msgs", t: "09:04" });
   for (const id of found) store.appendEvent({ kind: "openLayer", objectId: id });
   for (const id of done) store.appendEvent({ kind: "task", flag: doneFlag(id), mode: "self" });

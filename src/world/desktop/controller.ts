@@ -88,7 +88,12 @@ export interface MotionHooks {
 /** onboarding-steps R1: the coach card's own controls; nothing else answers while it is up. */
 export const COACH_ACTIONS: ReadonlySet<string> = new Set(["onboard-next", "onboard-skip", "onboard-ok"]);
 /** A coach mark is up on 屏幕 (the run's first visit). */
-export const coachShowing = (s: Pick<Session, "view" | "onboard">): boolean => s.view === "desktop" && s.onboard === "due";
+/** day1-playtest-1117 R4: the first visit's own line, said before the coach marks. */
+export const SCREEN_FIRST_LINE = "screen.first.me";
+export const screenFirstKey = (day: number): string => `d${String(day)}:screen:first`;
+/** The first visit's line is still in the box: the coach marks wait for it. */
+export const screenLineUp = (s: Pick<Session, "dialogue">): boolean => s.dialogue.queue.some((q) => q.key.endsWith(":screen:first"));
+export const coachShowing = (s: Pick<Session, "view" | "onboard" | "dialogue">): boolean => s.view === "desktop" && s.onboard === "due" && !screenLineUp(s);
 /** first-use-hints R1.12: Kuro's pill says `kuro.hint.typing` for a decoy line's time (its usual line). Session only. */
 export function sayTyping(ctx: ActionContext): void {
   const now = ctx.now?.() ?? Date.now();
@@ -130,7 +135,7 @@ export function choiceKey(root: HTMLElement, e: Pick<KeyboardEvent, "key" | "met
 /** world-prompts R1: the room prompt on the page now (its id), or null. It blocks nothing. */
 export const promptUp = (root: HTMLElement): string | null => root.querySelector<HTMLElement>(":scope > .prompt-layer")?.dataset.hint ?? null;
 /** Is `action` held back by the coach marks now? */
-export const coachBlocks = (s: Pick<Session, "view" | "onboard">, action: string): boolean => coachShowing(s) && !COACH_ACTIONS.has(action);
+export const coachBlocks = (s: Pick<Session, "view" | "onboard" | "dialogue">, action: string): boolean => coachShowing(s) && !COACH_ACTIONS.has(action);
 
 /**
  * guidance R1: the guide refuses `action` now: its line goes to the box (one inner fragment) and

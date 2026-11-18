@@ -26,6 +26,8 @@ export function happened(event: EventToken, ctx: LoopContext): boolean {
   switch (event.type) {
     case "boot":
       return hasStep(ctx, "boot");
+    case "rise":
+      return hasStep(ctx, "rise");
     case "openApp":
       return hasStep(ctx, `openApp:${event.app}`);
     case "order":

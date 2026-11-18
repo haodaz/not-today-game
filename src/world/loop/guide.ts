@@ -19,6 +19,8 @@ import { hasString, t } from "@world/i18n";
 
 /** What a guide lights (the small union of the spec; `task` is R14's next task on 工作台's home). */
 export type GuideTarget =
+  /** day1-playtest-1117 R1 / R2: day 1's first thing, the rise spot at the bed's edge on the ceiling. */
+  | { readonly kind: "rise" }
   | { readonly kind: "tower" }
   | { readonly kind: "screen" }
   | { readonly kind: "dock"; readonly app: "tingtalk" }
@@ -39,7 +41,7 @@ export type GuideTarget =
 export type GuideScope = "all" | "work" | "none";
 
 export interface Guide {
-  readonly id: "G1" | "G1b" | "G2" | "G3" | "G3b" | "G4" | "G5" | "G6" | "G7" | "next";
+  readonly id: "G0" | "G1" | "G1b" | "G2" | "G3" | "G3b" | "G4" | "G5" | "G6" | "G7" | "next";
   readonly target: GuideTarget;
   /** The refuse line's strings key, or null (no line of its own). */
   readonly refuse: string | null;
@@ -138,8 +140,12 @@ export function guideNow(state: State, events: readonly GameEvent[], session: Se
     return { id: "G4", target: { kind: "phone" }, refuse: "guide.lunch.first", scope: day === 1 ? "all" : "work" };
   }
 
+  // G0 (day1-playtest-1117 R1): day 1 on the ceiling, not up yet: the rise spot is lit; nothing refused.
+  if (day === 1 && session.view === "lying" && !stepToday(events, day, "rise") && !booted(state, events)) return { id: "G0", target: { kind: "rise" }, refuse: null, scope: "none" };
+
   // G1b (author 2026-11-08): day 1, the tower on, not yet at the screen: the screens are lit and
   // the room's other things answer guide.screen.first (turning and the screen itself are allowed).
+  // day1-playtest-1117 R3: the path is lit — the desk in the room, then the screens at the desk.
   if (day === 1 && booted(state, events) && !desktop && session.view !== "lying" && !stepToday(events, day, "openApp:msgs")) {
     return { id: "G1b", target: { kind: "screen" }, refuse: "guide.screen.first", scope: "all" };
   }
@@ -186,12 +192,16 @@ export const GUIDE_ALLOWS: ReadonlySet<string> = new Set([
   "loop-order",
   // room-3d-window: the way back from the look-out is never refused (its way in, the glass, is)
   "window-back",
+  // day1-playtest-1117 R2: the ceiling's own lines
+  "lying-look",
 ]);
 export const guideAllows = (action: string): boolean => GUIDE_ALLOWS.has(action) || ALLOW_PREFIXES.some((p) => action.startsWith(p));
 
 /** The action is the guide's target (a click on the lit thing). */
 export function onTarget(target: GuideTarget, action: string, data: Readonly<Record<string, string | undefined>>): boolean {
   switch (target.kind) {
+    case "rise":
+      return action === "rise";
     case "tower":
       return action === "tower-power";
     case "screen":
@@ -236,10 +246,13 @@ export function refuseLine(session: Session, day: number, g: Guide): void {
 /** The elements a target lights, in the order they are tried (attribute pairs; the first match wins). */
 export function ringAnchors(target: GuideTarget): readonly (readonly (readonly [string, string])[])[] {
   switch (target.kind) {
+    case "rise":
+      return [[["data-action", "rise"]]];
     case "tower":
       return [[["data-action", "tower-power"]]];
     case "screen":
-      return [[["data-action", "view"], ["data-view", "desktop"]]];
+      // day1-playtest-1117 R3: desk first (the room's desk), then the screens (at the desk)
+      return [[["data-action", "view"], ["data-view", "desk"]], [["data-action", "view"], ["data-view", "desktop"]]];
     case "dock":
       return [[["data-action", "dock"], ["data-app", target.app]]];
     case "conv":

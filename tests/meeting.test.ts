@@ -117,7 +117,7 @@ const doneFlag = (id: string) => taskFiles.get(1)!.find((x) => x.id === id)!.don
 /** Day 1 with task3 (the meeting board) under way: booted, messages seen, task1 and task2 handed in. */
 function day1(): Store {
   const store = createStore({ startDay: 1 });
-  store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
+  store.appendEvent({ kind: "step", name: "rise", t: "09:03" }); store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
   store.appendEvent({ kind: "step", name: "openApp:msgs", t: "09:04" });
   for (const id of ["task1", "task2"]) store.appendEvent({ kind: "task", flag: doneFlag(id), mode: "self" });
   return store;

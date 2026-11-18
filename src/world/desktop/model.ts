@@ -220,6 +220,8 @@ export interface Session {
   lampOn: boolean | null;
   /** room-light-switch R1: the ceiling light, by the wall switch (session only, like the lamp; never by itself). */
   ceilOn: boolean;
+  /** day1-playtest-1117 R2: the ceiling's lines said since the player last lay down (once each), with the day. */
+  lyingSaid: { readonly day: number; readonly said: readonly string[] } | null;
   /** Holding and using it, its programs, its light (objects-in-hand FR1); session only. */
   hand: HandSession;
   /** The dialogue line's per-character reveal (polish FR3); set by the motion layer only. */
@@ -243,6 +245,8 @@ export interface Session {
   inner: { readonly text: string | null; readonly key: string | null } | null;
   /** Live plans: event index → how many plan steps have played. Absent = settled history. */
   progress: Map<number, number>;
+  /** day1-playtest-1117 R5: a reply item's onDone lines waiting for that thread to go quiet. */
+  quietHeld: readonly { readonly who: string; readonly q: import("@world/loop/dialogue").Queued }[];
   workbenchPage: WorkbenchPage;
   /** workspace R2: the day of the task page shown (an earlier day's, read-only), or null = today. */
   wbTaskDay: number | null;
@@ -611,6 +615,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     holding: null,
     lampOn: null,
     ceilOn: false,
+    lyingSaid: null,
     hand: initialHand(),
     reveal: null,
     work: null,
@@ -623,6 +628,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     draft: "",
     inner: null,
     progress: new Map(),
+    quietHeld: [],
     workbenchPage: "home",
     wbTaskDay: null,
     wbSidebar: false,
@@ -871,7 +877,8 @@ export function buildShell(
     scene: sceneOf(session.dialogue),
     callOverlay: renderCall(ctx),
     // onboarding-steps R1: the coach mark now, while the first visit's steps are up.
-    onboard: session.onboard === "due" && !off ? session.onboardStep : null,
+    // day1-playtest-1117 R4: not while the first visit's own line is in the box
+    onboard: session.onboard === "due" && !off && !session.dialogue.queue.some((q) => q.key.endsWith(":screen:first")) ? session.onboardStep : null,
     wallpaper: wallpaperNow(state.day, session, nowMs),
     // work-mode §1: the work bar's primary and its way out
     work: workBar(state, events, session),

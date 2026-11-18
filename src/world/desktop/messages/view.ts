@@ -2,6 +2,8 @@
 // WeChat desktop (家里 and 朋友圈); 工作台's 消息 pane, the company's system, looks like DingTalk
 // (the work conversations, 已读/未读 receipts, the boss's DING). Same transcripts, same reply bars,
 // same events: only the markup differs. Pure: context in, markup out.
+import { itemStates, loopContext } from "@world/loop/checklist";
+import { threadCardFor } from "@world/loop/dialogue";
 import { isDeregistered, menu } from "@state/replies/resolve";
 import type { State } from "@state/types.gen";
 import { cls, html, raw, type SafeHtml } from "@world/html";
@@ -120,7 +122,7 @@ function renderBubble(b: Bubble, c: BubbleCtx, receipt: "read" | "unread" | null
       if (b.side === "me") {
         const inner = b.labelKey ? html`<div class="bub">${tr(b.labelKey)}</div>` : renderBody(b.body, c.names, c.register, false, voiceView(b, c, index));
         const rc =
-          receipt === "read" ? html`<div class="rcpt read">${tr("reply.status.read")}</div>`
+          receipt === "read" ? html`<div class="rcpt read">${tr(hasString("wb.msgs.read") ? "wb.msgs.read" : "reply.status.read")}</div>`
           : receipt === "unread" && hasString("wb.msgs.unread") ? html`<div class="rcpt unread">${tr("wb.msgs.unread")}</div>`
           : null;
         return html`${st}<div class="m me">${bubbleAvatar("me", "me")}<div>${inner}${rc}</div></div>`;
@@ -155,7 +157,10 @@ function renderBubblesNow(bubbles: readonly Bubble[], c: BubbleCtx): (SafeHtml |
     if (b.kind === "msg" && b.side === "me") {
       mine = i;
       receipts.set(i, "unread");
-    } else if (b.kind === "read" && mine !== null) receipts.set(mine, "read");
+    } else if (mine !== null && (b.kind === "read" || b.kind === "typing" || (b.kind === "msg" && b.side === "them"))) {
+      // day1-playtest-1117 R5: 未读 turns 已读 just before the other side starts answering
+      receipts.set(mine, "read");
+    }
   });
   let lastT: string | null = null;
   return bubbles.map((b, i) => {
@@ -229,6 +234,17 @@ function dingRow(c: ConversationData, active: boolean, today: number, names: Sta
   return html`<button type="button" class="${cls("row", active && "on")}" data-action="conv" data-conv="${c.id}"><span class="av-wrap">${avImg(c.id, "av av-img", true)}</span><div class="t"><b>${nameOf(c.id)}</b><small>${preview}</small></div><div class="meta">${when}${c.unread > 0 ? html`<br><span class="n">${c.unread}</span>` : null}</div></button>`;
 }
 
+/** R5: the prompt key heading this thread's choices now, or null: the day's reply to it is open and content has the line. */
+export function replyPromptKey(ctx: Pick<AppContext, "state" | "events">, conversation: string): string | null {
+  const key = `msgs.reply.prompt.d${String(ctx.state.day)}`;
+  if (!hasString(key)) return null;
+  const lc = loopContext(ctx.state, ctx.events);
+  const item = lc?.file.items.find((it) => it.done.kind === "event" && it.done.event.type === "reply" && it.done.event.recipient === conversation);
+  if (!lc || !item) return null;
+  const st = itemStates(lc).get(item.id);
+  return st?.unlocked && !st.done ? key : null;
+}
+
 function replyBar(ctx: AppContext, conversation: string, register: Register): SafeHtml {
   const { state, session } = ctx;
   const day = state.day;
@@ -238,7 +254,10 @@ function replyBar(ctx: AppContext, conversation: string, register: Register): Sa
   // first time its bar is shown in the run; it is seen when the player leaves the thread).
   const ownHint = hasString(`reply.hint.${conversation}`);
   const otherHint = !ownHint && hasString("reply.hint.other") && !session.replyHintSeen.has(conversation);
-  const hint = ownHint ? html`<div class="hint">${tr(`reply.hint.${conversation}`)}</div>` : otherHint ? html`<div class="hint">${tr("reply.hint.other")}</div>` : null;
+  // day1-playtest-1117 R5: when the day's reply to this thread is the thing to do, its prompt
+  // (`msgs.reply.prompt.d<day>`, when content has one) heads the choices; the choices are the guide
+  const prompt = replyPromptKey(ctx, conversation);
+  const hint = prompt ? html`<div class="hint prompt">${tr(prompt)}</div>` : ownHint ? html`<div class="hint">${tr(`reply.hint.${conversation}`)}</div>` : otherHint ? html`<div class="hint">${tr("reply.hint.other")}</div>` : null;
   const chips = items
     .filter((item) => item.kind !== "free")
     .map((item) => {
@@ -256,7 +275,7 @@ function replyBar(ctx: AppContext, conversation: string, register: Register): Sa
   // author 2026-11-11: the picked word sits in the input box, as typed, so 发送 is the next thing.
   if (kbd === null && chosen && !gone) kbd = html`<div class="kbd draft">${tr(labelKey(conversation, session.selected!)!)}</div>`;
   const canSend = !gone && (chosen || (free && session.draft.trim() !== ""));
-  const inner = session.inner
+  const inner = session.inner && !prompt
     ? html`<div class="inner">${session.inner.text !== null ? fillPlaceholders(session.inner.text, state.names) : session.inner.key ? tr(session.inner.key) : null}</div>`
     : null;
   const send = html`<button type="button" data-conv="${conversation}" class="send" data-action="send"${canSend ? null : html` disabled`}>${tr("msgs.send")}</button>`;
@@ -347,6 +366,8 @@ function renderWorkMessagesNow(ctx: AppContext): { pane: SafeHtml; badge: number
   // The role line under the name (msgs.<id>.role, e.g. Vivi's 合伙人 · VP), when strings have one.
   const role = hasString(`msgs.${active.id}.role`) ? html`<small>${tr(`msgs.${active.id}.role`)}</small>` : null;
   const c: BubbleCtx = { today, names, conv: active.id, register: "ding", voice: ctx.session.voice, nowMs: ctx.nowMs };
-  const conv = html`<div class="conv ding"><div class="head"><b>${nameOf(active.id)}</b> ${role}</div><div class="msgs">${renderBubbles(active.bubbles, c)}</div>${replyBar(ctx, active.id, "ding")}</div>`;
+  // R5: while a line card about this thread is up, the thread leaves room for it at the bottom
+  const carded = threadCardFor(ctx.session.dialogue) === active.id;
+  const conv = html`<div class="${cls("conv", "ding", carded && "carded")}"><div class="head"><b>${nameOf(active.id)}</b> ${role}</div><div class="msgs">${renderBubbles(active.bubbles, c)}</div>${replyBar(ctx, active.id, "ding")}</div>`;
   return { pane: html`${list}${conv}`, badge };
 }

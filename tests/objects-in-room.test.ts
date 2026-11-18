@@ -287,7 +287,7 @@ describe("R1 / R2 · using it at a place", () => {
 const DONE = (tasks01 as any).tasks.find((x: any) => x.id === "task3").done as string;
 function day1(objects: readonly string[]): Store {
   const store = createStore({ startDay: 1 });
-  store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
+  store.appendEvent({ kind: "step", name: "rise", t: "09:03" }); store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
   store.appendEvent({ kind: "step", name: "openApp:msgs", t: "09:04" });
   for (const id of objects) store.appendEvent({ kind: "openLayer", objectId: id });
   for (const id of ["task1", "task2"]) {

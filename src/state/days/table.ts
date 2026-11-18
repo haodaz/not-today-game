@@ -100,6 +100,8 @@ export type Token =
 
 export type EventToken =
   | { readonly type: "boot" }
+  /** day1-playtest-1117 R1: got up from the bed (the 起床 answer), once a day. */
+  | { readonly type: "rise" }
   | { readonly type: "openApp"; readonly app: string }
   | { readonly type: "order"; readonly meal: string }
   | { readonly type: "arrives"; readonly meal: string }
@@ -195,6 +197,8 @@ export function parseToken(raw: string, where: string): Token {
   switch (type) {
     case "boot":
       return { kind: "event", event: { type: "boot" } };
+    case "rise":
+      return { kind: "event", event: { type: "rise" } };
     case "openApp":
       return { kind: "event", event: { type: "openApp", app: a && APPS.includes(a) ? a : fail(where, `unknown app in "${raw}"`) } };
     case "order":

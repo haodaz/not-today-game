@@ -11,6 +11,7 @@ import { logCurrent, logPlayer } from "@world/dialogue/history";
 import { settleSession } from "@world/dialogue/place";
 import { openWakeFlash, queueRise, wakeFlashDue } from "./wake";
 import { somethingOpen } from "./stare";
+import { SCREEN_FIRST_LINE, screenFirstKey } from "@world/desktop/controller";
 import { noteWallpaper, WALL_FADE_MS } from "@world/desktop/wallpaper";
 import { hintLayer } from "@world/hints/hints";
 import { FACE_FROM_STAGE, FACE_MS, msgFaceDelay, msgFaceSeed, type FaceApp } from "@world/desktop/workbench/collapse";
@@ -60,7 +61,7 @@ import { isFacing, turnedTo, turnsBetween, type Facing, type TurnDir } from "./f
 
 /** Whose conversation the loan is answered in (day-loop correction 2026-11-01): 老周. */
 export const LOAN_CONVERSATION = "laozhou";
-import { advance, dropQuestion, endsInChoice, finishChoice, push, showing, talking, type DialogueState, type Queued } from "@world/loop/dialogue";
+import { advance, dropQuestion, endsInChoice, finishChoice, push, showing, talking, threadCardFor, type DialogueState, type Queued } from "@world/loop/dialogue";
 import { beatQueued, lieDownOrEnd, openChatIfDue, lookQueued, questionQueued, taskStartKey } from "@world/loop/runtime";
 import { askedOn, knows } from "@state/recognise";
 import { gateAdvance } from "@world/motion/reveal";
@@ -167,7 +168,9 @@ function dlgLayer(dlg: SafeHtml | null, session: Session, readsOn: boolean, with
   const story = storyMasked(session.dialogue);
   // author 2026-11-11: over a chat app the box sits in the upper half, off the thread it talks about.
   const chat = session.view === "desktop" && (appOn(session) === "tingtalk" || appOn(session) === "msgs");
-  return html`<div class="${cls("dlg-layer", story && "masked", chat && "top")}">${withMask ? boxMask(session, readsOn) : null}${dlg}</div>`;
+  // day1-playtest-1117 R5: a line about the open thread is its card: at the thread's bottom, above the input row
+  const thread = chat && threadCardFor(session.dialogue) !== null;
+  return html`<div class="${cls("dlg-layer", story && "masked", chat && !thread && "top", thread && "thread")}">${withMask ? boxMask(session, readsOn) : null}${dlg}</div>`;
 }
 
 /** The checklist's line that is on now (the first open one), for the desktop's top bar; null when none. */
@@ -620,7 +623,10 @@ function takePhoto(ctx: ActionContext): void {
 }
 
 /** playtest-1105 R1: the bare desktop (macOS: no window open) and the onboarding card, once a run. */
-export function firstDesktop(session: Session): void {
+export function firstDesktop(session: Session, day?: number): void {
+  // day1-playtest-1117 R4: before the coach marks, the protagonist's one line over the screen; the
+  // marks wait until it is read (controller.ts `coachShowing`, model.ts)
+  if (day !== undefined && hasString(SCREEN_FIRST_LINE)) session.dialogue = push(session.dialogue, { key: screenFirstKey(day), lines: [{ k: "speaker", who: "me", t: t(SCREEN_FIRST_LINE) }], ending: { kind: "none" } });
   session.leftApp = null;
   session.rightApp = null;
   session.stack = [];
@@ -672,7 +678,7 @@ function arrive(ctx: ActionContext, view: View, data: DOMStringMap): void {
   lookedAway(ctx);
   // playtest-1105 R1: the run's first time at the computer is the bare desktop (no window open, the
   // dock there) with the onboarding card.
-  if (view === "desktop" && ctx.session.onboard === "no") firstDesktop(ctx.session);
+  if (view === "desktop" && ctx.session.onboard === "no") firstDesktop(ctx.session, ctx.store.getState().day);
   // onboarding-steps R2: a new day's first visit crossfades from the last wallpaper shown.
   if (view === "desktop") {
     const was = ctx.session.wallFade;
@@ -1112,6 +1118,20 @@ export const loopActions: Record<string, ActionHandler> = {
     if (session.dialogue.queue.some((q) => q.ending.kind === "riseAsk" || q.ending.kind === "bedAsk")) return;
     const day = store.getState().day;
     session.dialogue = push(session.dialogue, riseAskQueued(day));
+    ctx.rerender();
+  },
+  // day1-playtest-1117 R2: the ceiling light, or anywhere else on the ceiling: one inner line, each at
+  // most once per lying-down (clicking around never stacks lines); nothing while a line is up.
+  "lying-look"(ctx, data) {
+    const { store, session } = ctx;
+    const look = data.look === "lamp" ? "lamp" : "ceiling";
+    if (session.view !== "lying" || session.dialogue.queue.length > 0 || overlayOpen(session) || session.objbarOpen) return;
+    const day = store.getState().day;
+    const said = session.lyingSaid?.day === day ? session.lyingSaid.said : [];
+    const key = `room.lying.${look}`;
+    if (said.includes(look) || !hasString(key)) return;
+    session.lyingSaid = { day, said: [...said, look] };
+    session.dialogue = push(session.dialogue, { key: `d${day}:lying:${look}`, lines: [{ k: "inner", t: t(key) }], ending: { kind: "none" } });
     ctx.rerender();
   },
   // Right-click is Esc: it closes what is over the view, then steps the camera out.
@@ -1974,6 +1994,10 @@ function getUp(ctx: ActionContext): void {
   const { store, session } = ctx;
   if (session.view !== "lying") return;
   loopActions["view"]!(ctx, { view: "bed" } as DOMStringMap, null as never);
+  // day1-playtest-1117 R1: getting up is a step of its own (day 1's first checklist item), once a day
+  if (store.getState().ending === "none") stepOnce(ctx, "rise");
+  // R2: the ceiling's lines may come again the next time the player lies down
+  session.lyingSaid = null;
   // room-3d-wake R1/R2: day 4's first getting-up flashes the code-built room first; the rise beat
   // waits for the flash to end (wake.ts queues it then).
   if (session.wakeFlash === null && wakeFlashDue(store.getState(), store.getEvents())) {

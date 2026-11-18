@@ -58,6 +58,8 @@ describe("开机: the tower's power button (房间; 桌子 is the tabletop, the 
   it("off: a hotspot with a faint light; pressing it boots; then it is only the picture", () => {
     for (const [view, shot] of [["room", ROOM_SHOT]] as const) {
       const store = atDay(1);
+      // day1-playtest-1117 R1: up from the bed first; the tower is the next item
+      store.appendEvent({ kind: "step", name: "rise", t: "09:03" });
       const { ctx } = ctxOf(store, view);
       const before = render(ctx);
       expect(before).toContain(`<button type="button" class="shot-hit tower-hit" data-action="tower-power" style="${rectStyle(shot.tower)}" aria-label="${t("room.tower.off")}" data-hot="tower"><i class="tower-led"></i></button>`);
@@ -169,7 +171,7 @@ describe("看一眼桌子: entering 桌子", () => {
 describe("关机: in the work system's own top bar", () => {
   it("disabled until the item is open; then the shutdown beat, both monitors dark, back to 桌子 (navigation-polish)", () => {
     const store = atDay(1);
-    store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
+    store.appendEvent({ kind: "step", name: "rise", t: "09:03" }); store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
     const { ctx, timers } = ctxOf(store, "desktop", { beat: "work", time: "10:00" });
     expect(render(ctx)).toContain('data-action="desktop-shutdown" disabled');
     act(ctx, "desktop-shutdown");

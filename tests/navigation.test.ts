@@ -132,7 +132,7 @@ describe("hover: 4 % brighter, under a ray through the camera", () => {
     const c = fixedRects("room").tower!;
     mouse("mousemove", m.stage(), c.l + c.w / 2, c.t + c.h / 2);
     expect(hovered(m)).toEqual(["tower"]);
-    m.store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
+    m.store.appendEvent({ kind: "step", name: "rise", t: "09:03" }); m.store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
     await frame();
     mouse("mousemove", m.stage(), c.l + c.w / 2, c.t + c.h / 2);
     expect(hovered(m)).toEqual([]);
@@ -158,7 +158,7 @@ describe("point to go", () => {
 
       const store = createStore({ startDay: 1 });
 
-      store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
+      store.appendEvent({ kind: "step", name: "rise", t: "09:03" }); store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
 
       return store;
 
@@ -290,7 +290,7 @@ describe("back: right-click, the bottom 6 %, the wheel, Esc", () => {
     expect(m.session.view).toBe("room");
     // 屏幕: the desktop around the windows pulls out; a window scrolls.
     const booted = createStore({ startDay: 1 });
-    booted.appendEvent({ kind: "step", name: "boot", t: "09:03" });
+    booted.appendEvent({ kind: "step", name: "rise", t: "09:03" }); booted.appendEvent({ kind: "step", name: "boot", t: "09:03" });
     const d = mount({ view: "desktop", store: booted });
     await frame();
     const win = d.root.querySelector(".win")!;

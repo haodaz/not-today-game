@@ -73,7 +73,7 @@ const treeOf = (raw: unknown, label: string) => parseTaskFile(raw, label).tasks[
 
 function open(hold = false): { store: Store; ctx: ActionContext; app: () => AppContext; wait: (ms: number) => void } {
   const store = createStore({ startDay: 1 });
-  store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
+  store.appendEvent({ kind: "step", name: "rise", t: "09:03" }); store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
   store.appendEvent({ kind: "step", name: "openApp:msgs", t: "09:04" });
   const session = initialSession({ beat: "work", time: "10:00" }, "right", "desktop");
   if (hold) session.holding = "dictionary";

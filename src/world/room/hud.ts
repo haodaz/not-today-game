@@ -23,7 +23,7 @@ import { ordersOn } from "@world/delivery/meals";
 import { isEvening, isNight } from "@world/desktop/beat";
 import { ceilLit, lampLit } from "@world/objects/works";
 import { hudKuro } from "@world/desktop/kuro/mini";
-import { DESK_SHOT, DOOR_SHOT, FLAT_HOTS, fracRect, SWITCH_SPOTS, isFlatFacing, LOOK_SPOTS, rectStyle, WINDOW_WALL, ROOM_SHOT, TABLE_SHOT, WINDOW_SHOT, type FlatHotId, type Rect } from "./shots";
+import { CEILING_LAMP, DESK_SHOT, DOOR_SHOT, FLAT_HOTS, fracRect, RISE_BAND, SWITCH_SPOTS, isFlatFacing, LOOK_SPOTS, rectStyle, WINDOW_WALL, ROOM_SHOT, TABLE_SHOT, WINDOW_SHOT, type FlatHotId, type Rect } from "./shots";
 import { isFacing } from "./facings";
 import { boxArrived } from "./arrival";
 import { deskLayout, objectSlot } from "./desk";
@@ -50,7 +50,7 @@ import { printsOnDesk } from "@state/days/prints";
 import { sheetLayer, viewfinderLayer } from "./viewfinder";
 import { wakeHost } from "./wake";
 import { roomHost } from "./outside";
-import { desk3dOn } from "./desk3d";
+import { desk3dOn, glowTarget } from "./desk3d";
 
 /** L7: the day the heart-rate widget appears (stages.json if it says; else day 9's narration). */
 export const HEART_RATE_FROM_DAY: number = (stagesFile as { heartRateFromDay?: number }).heartRateFromDay ?? 9;
@@ -82,6 +82,7 @@ export function guidedItem(lc: LoopContext, g: Guide | null): string | null {
   if (!g) return null;
   const by = (match: (e: EventToken) => boolean): string | null => openItemFor(lc, match)?.id ?? null;
   switch (g.target.kind) {
+    case "rise": return by((e) => e.type === "rise");
     case "tower": return by((e) => e.type === "boot");
     case "dock": return by((e) => e.type === "openApp");
     case "conv":
@@ -306,9 +307,13 @@ function flatHits(view: "bed" | "window", arrived: boolean): SafeHtml {
  */
 function deskMarks(state: State, events: readonly GameEvent[], session: Session): SafeHtml {
   const rects = session.roomRects ?? {};
+  // day1-playtest-1117 R6: the guided object glows in the room itself; its mark keeps the ring's
+  // anchor but draws no ring of its own (room.css), so nothing is left behind when it is dragged
+  const g = guideNow(state, events, session);
+  const glow = glowTarget(g?.target.kind ?? null, session.hintsOn && session.hintQueue[0] === "phone" ? "phone" : null);
   const mark = (id: string, attrs: string, extra: string | false | null = null): SafeHtml | null => {
     const r = rects[id];
-    return r ? html`<i class="${cls("room-mark", id, extra)}" ${raw(attrs)} style="${rectStyle(r)}" aria-hidden="true"></i>` : null;
+    return r ? html`<i class="${cls("room-mark", id, extra)}" ${raw(attrs)}${id === glow ? raw(" data-glow") : null} style="${rectStyle(r)}" aria-hidden="true"></i>` : null;
   };
   const on = booted(state, events);
   const lit = on
@@ -321,6 +326,15 @@ function deskMarks(state: State, events: readonly GameEvent[], session: Session)
 
 /** room-3d-window R1: the glass on 窗 — the two panes between the frame — looks out into the code-built room. */
 export const GLASS_RECT = fracRect(WINDOW_WALL, 0.385, 0.643, 0.145, 0.56);
+/**
+ * day1-playtest-1117 R2: the ceiling's two hits — the rise spot (a band at the bed's edge: 要起来吗)
+ * and the ceiling light (one line). A click anywhere else on the ceiling is the nav layer's (its line).
+ */
+function ceilingHits(): SafeHtml {
+  const rise = t("hint.short.rise");
+  return html`<button type="button" class="look-hit rise-spot" data-action="rise" style="${rectStyle(RISE_BAND)}" aria-label="${rise}"></button><button type="button" class="look-hit ceil-lamp" data-action="lying-look" data-look="lamp" style="${rectStyle(CEILING_LAMP)}" aria-hidden="true" tabindex="-1"></button>`;
+}
+
 /** room-light-switch R2: the wall switch by the door, on 门 and on 窗: the ceiling light on and off. */
 function switchHit(view: "door" | "window"): SafeHtml {
   const label = t("room.switch");
@@ -666,7 +680,7 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const table = view === "table" ? tableThings(state, events) : null;
   // room-3d-desk R2: 桌子 is the shared room frame; its things are the room's, the game draws its marks over them
   const desk3d = desk3dOn(session);
-  const scene = desk3d ? (waiting || dream ? null : deskMarks(state, events, session)) : waiting || dream ? null : door ? html`${lookHits("door")}${switchHit("door")}${doorContent(state, events, session)}` : hotView ? html`${shotHits(hotView, state, events)}${kept}` : (flat ?? table);
+  const scene = desk3d ? (waiting || dream ? null : deskMarks(state, events, session)) : waiting || dream ? null : lying ? ceilingHits() : door ? html`${lookHits("door")}${switchHit("door")}${doorContent(state, events, session)}` : hotView ? html`${shotHits(hotView, state, events)}${kept}` : (flat ?? table);
   // The held item sits over everything but the dialogue box (held-object.html).
   // camera-viewfinder: the viewfinder (R1) and the sheet in hand (R3) take the held layer's place;
   // the viewfinder also hides the HUD (the list, the corner, the buttons, Kuro's body).

@@ -116,7 +116,7 @@ describe("R1 / R2 · the seeded lines", () => {
 
 function day1(): Store {
   const store = createStore({ startDay: 1 });
-  store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
+  store.appendEvent({ kind: "step", name: "rise", t: "09:03" }); store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
   store.appendEvent({ kind: "step", name: "openApp:msgs", t: "09:04" });
   for (const id of ["task1", "task2"]) store.appendEvent({ kind: "task", flag: doneFlag(id), mode: "self" });
   return store;
@@ -246,7 +246,7 @@ describe("R2 · the wrong face (stage ≥ 1, collapse-early R1)", () => {
 describe("R3 · 屏幕 3 in 调度中心 (stage 5, the first opening of the day)", () => {
   const at = (day: number) => {
     const store = createStore({ startDay: day });
-    store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
+    store.appendEvent({ kind: "step", name: "rise", t: "09:03" }); store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
     const session: Session = initialSession({ beat: "work", time: "10:00" }, "left", "desktop");
     const ctx: ActionContext = { store, session, rerender: () => {}, later: () => {}, now: () => 0 };
     const toggle = () => shellActions["mc-toggle"]!(ctx, {} as DOMStringMap, null as never);
@@ -272,7 +272,7 @@ describe("R3 · 屏幕 3 in 调度中心 (stage 5, the first opening of the day)
     h.toggle(); // opened again the same day
     expect(screen3(h.out())).toBeNull();
     // Nothing was logged by opening it.
-    expect(h.store.getEvents().map((e) => e.kind)).toEqual(["step"]);
+    expect(h.store.getEvents().map((e) => e.kind)).toEqual(["step", "step"]);
   });
 
   it("a new stage-5 day brings it back once; never below stage 5", () => {
@@ -280,7 +280,7 @@ describe("R3 · 屏幕 3 in 调度中心 (stage 5, the first opening of the day)
     h.toggle();
     h.toggle();
     h.store.appendEvent({ kind: "lieDown" });
-    h.store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
+    h.store.appendEvent({ kind: "step", name: "rise", t: "09:03" }); h.store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
     h.toggle();
     expect(screen3(h.out())).not.toBeNull();
     for (const day of [10, 12]) {

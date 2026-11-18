@@ -36,7 +36,7 @@ const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
 const NIGHT: BeatClock = { beat: "night", time: "23:41" };
 function booted(day = 1): Store {
   const store = createStore({ startDay: day });
-  store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
+  store.appendEvent({ kind: "step", name: "rise", t: "09:03" }); store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
   return store;
 }
 const shownIn = (s: string) => /<div class="prompt-layer" data-hint="([A-Za-z]+)"/.exec(s)?.[1] ?? null;
@@ -111,14 +111,14 @@ describe("R1 · each room hint is a glow and a prompt, ended by its target", () 
     const s2 = createStore({ startDay: 1 });
     const r2 = rig(s2, "room", "tower");
     expectShown(r2.out(), "tower", "room");
-    s2.appendEvent({ kind: "step", name: "boot", t: "09:03" });
+    s2.appendEvent({ kind: "step", name: "rise", t: "09:03" }); s2.appendEvent({ kind: "step", name: "boot", t: "09:03" });
     r2.out();
     expect(r2.seen).toEqual(["tower"]);
     // Not drawn yet when it passed: not seen (it may be taught later).
     const s3 = createStore({ startDay: 1 });
     const r3 = rig(s3, "door", "tower");
     r3.out();
-    s3.appendEvent({ kind: "step", name: "boot", t: "09:03" });
+    s3.appendEvent({ kind: "step", name: "rise", t: "09:03" }); s3.appendEvent({ kind: "step", name: "boot", t: "09:03" });
     r3.out();
     expect(r3.seen).toEqual([]);
   });
@@ -197,12 +197,12 @@ describe("R1 · each room hint is a glow and a prompt, ended by its target", () 
     const found = objectsFoundOnDay.chick!;
     const store = createStore({ startDay: found });
     store.appendEvent({ kind: "openLayer", objectId: "chick" });
-    store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
+    store.appendEvent({ kind: "step", name: "rise", t: "09:03" }); store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
     const r = rig(store, "desk", "chickHint");
     r.out();
     expect(r.session.dialogue.queue).toEqual([]); // not the day it is found
     store.appendEvent({ kind: "lieDown" });
-    store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
+    store.appendEvent({ kind: "step", name: "rise", t: "09:03" }); store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
     // Not while a box is up.
     r.session.dialogue = push(EMPTY_DIALOGUE, { key: "w", lines: [{ k: "inner", t: "x" }], ending: { kind: "none" } });
     r.out();

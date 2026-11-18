@@ -61,7 +61,7 @@ describe("the loader accepts the document and the ledger, strictly", () => {
 /** Day 1 with `task` open: boot, messages seen, and the tasks before it done (self). */
 function dayWith(taskId: "task1" | "task2" | "task3", day = 1): Store {
   const store = createStore({ startDay: day });
-  store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
+  store.appendEvent({ kind: "step", name: "rise", t: "09:03" }); store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
   store.appendEvent({ kind: "step", name: "openApp:msgs", t: "09:04" });
   for (const id of ["task1", "task2"] as const) {
     if (id === taskId) break;

@@ -1,6 +1,7 @@
 // The day-loop runtime (design L5/L6): after every store change it looks at what just happened and
 // fills the dialogue box, plays sounds, ticks self-ticking items, runs delivery waiting, and moves
 // the stand-in beat clock. Everything it adds to the log goes through store.appendEvent.
+import { holdUntilQuiet, releaseQuiet, replyLive } from "./quiet";
 import type { BeatName, Item, SayLine, Sequence } from "@state/days/table";
 import { taskByFlag } from "@state/days/tasks";
 import type { Meal } from "@state/delivery/table";
@@ -362,10 +363,23 @@ export function syncLoop(ctx: ActionContext, nowMs: number = Date.now()): void {
       memo.orders.set(e.meal, { atMs: nowMs, workDone: workDone(lc).length });
     }
   }
+  const before = memo.items;
   memo.items = new Map(itemStates(lc));
   memo.seen = events.length;
-  session.dialogue = fx.dialogue;
+  // day1-playtest-1117 R5: a reply item's onDone waits until the answer it set off has landed
+  let dialogue = fx.dialogue;
+  for (const item of lc.file.items) {
+    if (item.done.kind !== "event" || item.done.event.type !== "reply" || before.get(item.id)?.done || !memo.items.get(item.id)?.done) continue;
+    const who = item.done.event.recipient;
+    const key = `d${state.day}:${item.id}:onDone`;
+    const at = dialogue.queue.findIndex((q) => q.key === key);
+    if (at < 0 || !replyLive(session, events, who)) continue;
+    holdUntilQuiet(session, who, dialogue.queue[at]!);
+    dialogue = { ...dialogue, queue: dialogue.queue.filter((_, i) => i !== at), ...(at === 0 ? { line: 0 } : {}) };
+  }
+  session.dialogue = dialogue;
   session.clock = fx.clock;
+  releaseQuiet(session, events);
   // New lines play only where they belong; the rest wait (dialogue addition 2026-11-02).
   settleSession(session);
   for (const id of fx.sounds) ctx.play?.(id);

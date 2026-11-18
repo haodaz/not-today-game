@@ -276,10 +276,11 @@
     }
   },
   "items": [
+    {"id": "rise", "text": "Get up.", "unlock": "start", "done": "event:rise", "required": true},
     {
       "id": "boot",
       "text": "Press the tower under the desk. Boot up.",
-      "unlock": "start",
+      "unlock": "done:rise",
       "done": "event:boot",
       "required": true
     },

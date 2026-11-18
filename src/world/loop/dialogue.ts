@@ -234,6 +234,16 @@ export interface Here {
 }
 
 /**
+ * day1-playtest-1117 R5: the conversation whose line card is up now (the current line's `where` is
+ * `screen:msgs:<id>`), or null. That card sits at the bottom of the thread, above its input row.
+ */
+export function threadCardFor(d: Pick<DialogueState, "queue" | "line">): string | null {
+  const q = d.queue[0];
+  const where = q?.lines[Math.min(d.line, q.lines.length - 1)]?.where;
+  return where !== undefined && where.startsWith("screen:msgs:") ? where.slice("screen:msgs:".length) : null;
+}
+
+/**
  * work-mode §5: what the box holds back while work mode is on — the messages' lines (a TingTalk /
  * 喂信 arrival, `screen:msgs…`), an item's unlock and done lines (the timed afternoon lines) and
  * nightfall. They play once 退出工作模式 is pressed. The work's own lines (the launch opening, the

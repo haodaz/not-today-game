@@ -96,6 +96,8 @@ export interface RoomPosted {
   readonly objects: string | null;
   readonly prints: boolean | null;
   readonly chick: string | null;
+  /** day1-playtest-1117 R6: the 3D object glowing as the guide's target (null: none; undefined: never posted). */
+  readonly glow?: string | null;
   readonly paused: boolean;
 }
 export const NOTHING_POSTED: RoomPosted = { main: null, day: null, faceSpot: null, objects: null, prints: null, chick: null, paused: false };
@@ -107,6 +109,8 @@ export interface RoomWant {
   readonly objects: readonly string[];
   readonly prints: boolean;
   readonly chick: string;
+  /** R6: the guided 3D object (it glows in the scene itself, so the glow goes where it is dragged). */
+  readonly glow?: string | null;
 }
 
 /**
@@ -147,6 +151,12 @@ export function roomPosts(prev: RoomPosted, want: RoomWant): { readonly posts: r
       next = { ...next, prints: want.prints };
       locate = true;
     }
+    // R6: the guided object glows in the room; posted on change (null stops it)
+    const glow = want.glow ?? null;
+    if (glow !== (prev.glow ?? null) && !(prev.glow === undefined && glow === null)) {
+      posts.push({ target: ROOM_TARGET, glow: glow });
+      next = { ...next, glow };
+    }
     if (want.chick !== prev.chick) {
       posts.push({ target: ROOM_TARGET, chick: want.chick });
       next = { ...next, chick: want.chick };
@@ -173,6 +183,17 @@ export function rectsFromWhere(msg: Readonly<Record<string, unknown>>): Record<s
   }
   return out;
 }
+
+/**
+ * day1-playtest-1117 R6: the guide's target on 桌子 as a 3D object of the room (it glows there; the
+ * DOM ring is only for what is not a moving object): the desk phone for the lunch order (the guide
+ * G4, or the phone's prompt), or null.
+ */
+export function glowTarget(guideKind: string | null, prompt: string | null): string | null {
+  if (guideKind === "phone" || prompt === "phone") return "deskphone";
+  return null;
+}
+export const GLOWING_IDS: readonly string[] = ["deskphone", ...DESK_OBJECTS];
 
 // ——— R3: picks ———
 

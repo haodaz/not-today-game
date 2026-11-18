@@ -276,10 +276,11 @@
     }
   },
   "items": [
+    {"id": "rise", "text": "起床。", "unlock": "start", "done": "event:rise", "required": true},
     {
       "id": "boot",
       "text": "按一下桌底下的主机，开机。",
-      "unlock": "start",
+      "unlock": "done:rise",
       "done": "event:boot",
       "required": true
     },

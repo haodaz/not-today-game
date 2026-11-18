@@ -39,6 +39,7 @@ describe("1. lunch arrives at the minimum once a work item is done (checkArrival
     const { minMinutes, waitMinutes } = dayFiles.get(1)!.delivery;
     expect([minMinutes, waitMinutes]).toEqual([2, 6]);
     const store = createStore({ startDay: 1 });
+    store.appendEvent(step("rise"));
     store.appendEvent(step("boot"));
     store.appendEvent(step("openApp:msgs"));
     const ctx = ctxFor(store);

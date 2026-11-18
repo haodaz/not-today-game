@@ -16,7 +16,8 @@ import { t } from "@world/i18n";
 import { printsOnDesk } from "@state/days/prints";
 import { chickFrameNow } from "@world/objects/index";
 import { actWant, bossPosts, HOME_KURO_STEP, homeKept, homePosts, NO_BOSS_POSTS, PHASE2, phase2HostStyle, renderBossPage, type BossPosted } from "@world/endings/phase2";
-import { CHICK_STEP_MS, clampDay, deskCommand, deskPick, desk3dOn, locateCommand, LOCATE_RETRY_MS, NOTHING_POSTED, outsideCommand, pickBlocked, rectsFromWhere, ROOM_READY_NET_MS, roomPosts, type RoomPosted, type RoomWant } from "./desk3d";
+import { guideNow } from "@world/loop/guide";
+import { CHICK_STEP_MS, clampDay, glowTarget, deskCommand, deskPick, desk3dOn, locateCommand, LOCATE_RETRY_MS, NOTHING_POSTED, outsideCommand, pickBlocked, rectsFromWhere, ROOM_READY_NET_MS, roomPosts, type RoomPosted, type RoomWant } from "./desk3d";
 
 export { outsideCommand, roomHour, ROOM_TARGET, type RoomCommand } from "./desk3d";
 
@@ -140,7 +141,10 @@ export function createRoom3dLayer(onMessage: (ctx: ActionContext, msg: RoomMessa
       const events = ctx.store.getEvents();
       const main = m === "desk" ? deskCommand(state, ctx.session) : m === "window" ? outsideCommand(state, ctx.session) : null;
       if (m !== "desk") return { mode: m, main, objects: [], prints: false, chick: "" };
-      return { mode: m, main, objects: [...(state.found as readonly string[])], prints: printsOnDesk(state.day, events).length > 0, chick: chickFrameNow(state, events, ctx.session, now(), ctx.store.getRunId?.() ?? "run") };
+      // R6: the guided object glows in the room itself
+      const g = guideNow(state, events, ctx.session);
+      const glow = glowTarget(g?.target.kind ?? null, root.querySelector<HTMLElement>(":scope > .prompt-layer")?.dataset.hint ?? null);
+      return { mode: m, main, objects: [...(state.found as readonly string[])], prints: printsOnDesk(state.day, events).length > 0, chick: chickFrameNow(state, events, ctx.session, now(), ctx.store.getRunId?.() ?? "run"), glow };
     };
     const send = (m: object) => readyWin?.postMessage(m, "*");
     const sync = () => {
@@ -206,6 +210,11 @@ export function createRoom3dLayer(onMessage: (ctx: ActionContext, msg: RoomMessa
       if (e.source !== readyWin) return;
       if (mode() === "boss") {
         if (opts.boss?.(ctx, msg.type)) ctx.rerender();
+        return;
+      }
+      // R6: an object set down after a drag — where everything is now (the marks and any DOM ring follow)
+      if (msg.type === "moved") {
+        if (mode() === "desk") send(locateCommand());
         return;
       }
       if (msg.type === "where") {

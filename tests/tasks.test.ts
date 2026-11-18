@@ -84,7 +84,7 @@ describe("task event plays the tree", () => {
 
   it("the ask box (sentence, chip, 通过) plays start + the path in the dialogue box, Kuro's lines in the small window", () => {
     const store = createStore({ startDay: 1 });
-    store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
+    store.appendEvent({ kind: "step", name: "rise", t: "09:03" }); store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
     store.appendEvent({ kind: "step", name: "openApp:msgs", t: "09:04" });
     let now = 0;
     const ctx: ActionContext = { ...ctxFor(store), now: () => now };

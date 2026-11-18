@@ -23,7 +23,7 @@ describe("day files", () => {
     ["an unknown condition", (d: any) => (d.items[0].unlock = "whenever"), /unknown condition/],
     ["an unknown event", (d: any) => (d.items[0].done = "event:dance"), /unknown event/],
     ["a reference to a missing item", (d: any) => (d.items[1].unlock = "done:nope"), /unknown item "nope"/],
-    ["a duplicate id", (d: any) => (d.items[1].id = "boot"), /duplicate item id/],
+    ["a duplicate id", (d: any) => (d.items[1].id = "rise"), /duplicate item id/],
     ["a goto choice", (d: any) => (d.beats.shutdown.choices = [{ text: "x", goto: "y" }]), /unknown key "goto"/],
     ["an old night-raid effect (item_dream, removed 2026-11-06)", (d: any) => (d.beats.shutdown.choices = [{ text: "x", effects: { item_dream: "chick" } }]), /unknown key "item_dream"/],
     ["an old night-raid effect (item_lost, removed 2026-11-06)", (d: any) => (d.beats.shutdown.choices = [{ text: "x", effects: { item_lost: "loan" } }]), /unknown key "item_lost"/],

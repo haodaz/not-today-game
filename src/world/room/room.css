@@ -1144,3 +1144,10 @@
 .boss-page .bs-box.portrait{background:rgba(244,239,230,.94);color:#1a1a1a;border-color:rgba(0,0,0,.25)}
 .boss-page .bs-box.portrait p{color:#1a1a1a}
 .boss-page .bs-box.portrait .bs-caret{border-top-color:#1a1a1a}
+/* day1-playtest-1117 R5: a line about the open thread is its card — at the thread's bottom, above the input row,
+   never over 老王's text in the upper part; the thread leaves that room for it (desktop.css .conv.carded) */
+.dlg-layer.thread .dlg{top:auto;bottom:var(--dlg-thread-bottom,calc(var(--stage-w,1440px) * .13))}
+/* day1-playtest-1117 R6: the guided 3D object glows in the room itself (room3d `glow`); its mark keeps the
+   guide's anchor but draws no ring, so nothing is left where the object was before a drag */
+.desk3d-marks > .room-mark[data-glow][data-guide="on"]{box-shadow:none;animation:none}
+.desk3d-marks > .room-mark[data-glow][data-guide="on"]::after{content:none}

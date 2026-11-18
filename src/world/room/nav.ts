@@ -280,11 +280,12 @@ export function createNav(deps: NavDeps = {}) {
       if (!p) return;
       const stage = root.querySelector<HTMLElement>(":scope > .stage:not(.m-ghost):not(.m-backdrop)");
       const height = stage?.classList.contains("room") ? STAGE_H : (stage?.getBoundingClientRect().height ?? STAGE_H);
-      // lying-view R6: on the ceiling a click anywhere (Kuro's body is its own button) asks whether to get up.
+      // day1-playtest-1117 R2: on the ceiling only the rise spot (its own button, at the bed's edge)
+      // asks whether to get up; the light is a button too; anywhere else the ceiling has its line.
       if (ctx.session.view === "lying" && !ctx.session.viewfinder) {
         e.preventDefault();
         e.stopPropagation();
-        return run("rise");
+        return run("lying-look", { look: "ceiling" });
       }
       // The bottom strip is back only where there is a level to go back to (桌子, 屏幕); on a
       // facing a click there is a click on what is there (the bed, the table).

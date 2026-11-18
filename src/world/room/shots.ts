@@ -175,6 +175,14 @@ export const LOOK_SPOTS: Readonly<Record<"door" | "window", readonly LookSpot[]>
   ],
 };
 
+/**
+ * day1-playtest-1117 R2: the ceiling from the bed (ceiling_day / _night.jpg, 1664×928): the rise spot
+ * is a band along the bottom (the bed's edge, the bottom 18 % of the stage, full width); the ceiling
+ * light's fitting is a hotspot of its own (measured on the photo).
+ */
+export const CEILING = { w: 1664, h: 928 } as const;
+export const RISE_BAND: Rect = { l: 0, t: 738, w: 1600, h: 162 };
+export const CEILING_LAMP: Rect = fracRect(CEILING, 0.4, 0.575, 0.09, 0.335);
 /** room-light-switch R2: the wall switch's plate by the door, on 门 and seen from 窗. */
 export const SWITCH_SPOTS: Readonly<Record<"door" | "window", Rect>> = {
   door: fracRect(DOOR_WALL, 0.695, 0.745, 0.355, 0.425),

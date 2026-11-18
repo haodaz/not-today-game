@@ -501,7 +501,7 @@ button.chip,button.app,button.it,button.q{font:inherit;color:inherit}
 .ob-use-body .held.obj .face{position:relative}
 .conv.ding .rcpt{font-size:11px;margin-top:3px;text-align:right}
 .conv.ding .rcpt.read{color:var(--ink-3)}
-.conv.ding .rcpt.unread{color:var(--accent)}
+.conv.ding .rcpt.unread{color:var(--ink-3)} /* day1-playtest-1117 R5: a small grey 未读, as TingTalk */
 .m .voice .ding{font-size:10px;font-weight:600;letter-spacing:.04em;color:#fff;background:var(--accent);border-radius:8px;padding:0 6px;line-height:16px;margin-right:2px}
 .m .card.task{background:#fff;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;padding:10px 12px;color:var(--ink)}
 /* Vivi's deliverable: a clickable card that opens its page (desktop-ui 2026-11-02). */
@@ -2486,3 +2486,6 @@ body:has(.stage:is([data-day="10"],[data-day="11"],[data-day="12"],[data-day="13
 .dead-letter{display:inline-block;animation:dead-letter 2.6s 3.2s linear both}
 @keyframes dead-letter{0%,6%{opacity:1}7%{opacity:.15}9%{opacity:1}22%{opacity:1}23%{opacity:.1}24%{opacity:.9}26%{opacity:.2}30%{opacity:1}55%{opacity:1}56%{opacity:.08}58%{opacity:.6}60%{opacity:.08}66%{opacity:.4}70%,100%{opacity:.07}}
 @media (prefers-reduced-motion:reduce){.dead-letter{animation:none;opacity:.07}}
+/* day1-playtest-1117 R5: room at the thread's foot for the line card, so it never covers the newest message */
+.conv.ding.carded .msgs{padding-bottom:170px}
+.conv.ding .reply .hint.prompt{color:var(--ink-1,#1d2129);font-weight:600}

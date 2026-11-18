@@ -39,11 +39,11 @@ describe("FR5 checklist snapshots", () => {
   });
 
   it("day 1 after ordering lunch", () => {
-    expect(list(storeAt(1, [step("boot"), step("openApp:msgs"), { kind: "reply", choice: "fine", recipient: "boss", t: "09:05" }, orderLunch]))).toMatchSnapshot();
+    expect(list(storeAt(1, [step("rise"), step("boot"), step("openApp:msgs"), { kind: "reply", choice: "fine", recipient: "boss", t: "09:05" }, orderLunch]))).toMatchSnapshot();
   });
 
   it("day 1 after lunch arrives", () => {
-    const out = list(storeAt(1, [step("boot"), step("openApp:msgs"), { kind: "reply", choice: "fine", recipient: "boss", t: "09:05" }, orderLunch, step("delivery:arrives:lunch", "12:04")]));
+    const out = list(storeAt(1, [step("rise"), step("boot"), step("openApp:msgs"), { kind: "reply", choice: "fine", recipient: "boss", t: "09:05" }, orderLunch, step("delivery:arrives:lunch", "12:04")]));
     // Item text is content's (day-loop rule 2026-11-01): read from the day file.
     expect(out).toContain(dayFiles.get(1)!.items.find((it) => it.id === "pickup")!.text);
     expect(out).toMatchSnapshot();
@@ -171,7 +171,7 @@ describe("runtime (design L5/L6)", () => {
   });
 
   it("an unlock with a sound plays it and queues its onUnlock lines", () => {
-    const store = storeAt(1, [step("boot"), step("openApp:msgs"), { kind: "reply", choice: "fine", recipient: "boss", t: "09:05" }, orderLunch]);
+    const store = storeAt(1, [step("rise"), step("boot"), step("openApp:msgs"), { kind: "reply", choice: "fine", recipient: "boss", t: "09:05" }, orderLunch]);
     const lc = loopContext(store.getState(), store.getEvents())!;
     const memo = freshMemo(lc, store.getEvents(), 0);
     store.appendEvent(step("delivery:arrives:lunch", "12:04"));
@@ -197,7 +197,7 @@ describe("runtime (design L5/L6)", () => {
   });
 
   it("delivery arrives after the minimum once the next work item is done", () => {
-    const store = storeAt(1, [step("boot"), step("openApp:msgs")]);
+    const store = storeAt(1, [step("rise"), step("boot"), step("openApp:msgs")]);
     const { ctx } = fakeCtx(store);
     syncLoop(ctx, 0);
     store.appendEvent(orderLunch);

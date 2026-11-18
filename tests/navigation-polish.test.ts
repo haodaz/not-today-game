@@ -37,7 +37,7 @@ const past = (s: Session) => {
 
 describe("离开屏幕", () => {
   it("the dock has no room tile; the leave control is on the screen, off the monitor, with view desk and the string", () => {
-    const store = storeAt(1, [step("boot")]);
+    const store = storeAt(1, [step("rise"), step("boot")]);
     const r = rig(store, "desktop");
     past(r.session);
     const out = r.out();
@@ -56,7 +56,7 @@ describe("离开屏幕", () => {
   });
 
   it("absent while the coach marks are up (day 1's first visit)", () => {
-    const store = storeAt(1, [step("boot")]);
+    const store = storeAt(1, [step("rise"), step("boot")]);
     const r = rig(store, "room");
     r.session.onboard = "no"; // a new run: the first desktop visit brings the coach marks
     r.go("desktop");
@@ -80,7 +80,7 @@ describe("离开屏幕", () => {
 
 describe("where leaving lands", () => {
   it("leaving from the screen → 桌子; Esc on the screen → 桌子; Esc on 桌子 → 房间", () => {
-    const store = storeAt(1, [step("boot")]);
+    const store = storeAt(1, [step("rise"), step("boot")]);
     const r = rig(store, "desktop");
     past(r.session);
     r.go("desk");
@@ -104,20 +104,20 @@ describe("the checklist", () => {
   const html = (store: Store) => renderChecklist(view(store)).value;
 
   it("one item open: one line under the heading, with the marker, nothing else (no done line)", () => {
-    const store = storeAt(1, [step("boot")]);
+    const store = storeAt(1, [step("rise"), step("boot")]);
     const out = html(store);
     expect(out).toBe(`<div class="list"><div class="h">${t("hud.today")}</div><div class="it now" data-id="msgs"><i class="mark" aria-hidden="true">▸</i>${dayFiles.get(1)!.items.find((i) => i.id === "msgs")!.text}</div></div>`);
     expect(out).not.toContain('class="done"');
     expect(out).not.toContain(t("hud.done", { n: 1 }));
-    expect(checklistDoneCount(loopContext(store.getState(), store.getEvents())!)).toBe(1);
+    expect(checklistDoneCount(loopContext(store.getState(), store.getEvents())!)).toBe(2);
     expect("doneCount" in view(store)).toBe(false);
   });
 
   it("done items are absent; the current item leads with ▸; every other open item is `later` with no marker; a meal on its way comes last", () => {
-    const store = storeAt(1, [step("boot"), step("openApp:msgs"), { kind: "reply", choice: "fine", recipient: "boss", t: "09:05" }, { kind: "order", meal: "lunch", shopId: "huangmenji", itemId: "hmj", t: "11:30" }]);
+    const store = storeAt(1, [step("rise"), step("boot"), step("openApp:msgs"), { kind: "reply", choice: "fine", recipient: "boss", t: "09:05" }, { kind: "order", meal: "lunch", shopId: "huangmenji", itemId: "hmj", t: "11:30" }]);
     const v = view(store);
     const items = dayFiles.get(1)!.items;
-    for (const id of ["boot", "msgs", "reply"]) expect(v.lines.some((l) => l.id === id), id).toBe(false);
+    for (const id of ["rise", "boot", "msgs", "reply"]) expect(v.lines.some((l) => l.id === id), id).toBe(false);
     expect(v.lines[0]!.state).toBe("now");
     expect(v.lines.filter((l) => l.state === "now")).toHaveLength(1);
     expect(v.lines.slice(1).every((l) => l.state !== "now")).toBe(true);
@@ -129,7 +129,7 @@ describe("the checklist", () => {
   });
 
   it("the current item is the guide's when it has one (the phone → the lunch order), else the first open required item", () => {
-    const store = storeAt(1, [step("boot"), step("openApp:msgs"), { kind: "reply", choice: "fine", recipient: "boss", t: "09:05" }]);
+    const store = storeAt(1, [step("rise"), step("boot"), step("openApp:msgs"), { kind: "reply", choice: "fine", recipient: "boss", t: "09:05" }]);
     const lc = loopContext(store.getState(), store.getEvents())!;
     expect(guidedItem(lc, { id: "G4", target: { kind: "phone" }, refuse: null, scope: "all" })).toBe("lunch");
     expect(guidedItem(lc, { id: "G7", target: { kind: "board", step: "lock" }, refuse: null, scope: "none" })).toBe("work");

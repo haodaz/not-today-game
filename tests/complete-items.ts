@@ -34,6 +34,9 @@ function tryComplete(store: Store, it: Item): boolean {
   if (d.kind !== "event") return false;
   const e = d.event;
   switch (e.type) {
+    case "rise":
+      store.appendEvent({ kind: "step", name: "rise", t: "09:03" });
+      return true;
     case "boot":
       store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
       return true;

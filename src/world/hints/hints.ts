@@ -17,7 +17,7 @@ import { isFacing, turnsBetween, type Facing } from "@world/room/facings";
 import { boxArrived } from "@world/room/arrival";
 
 /** The room's hints, in R1's order (the tie-break when two come due at once). */
-export const HINT_IDS = ["tower", "screen", "turn", "phone", "door", "table", "box", "items", "kuro", "bed", "chickHint"] as const;
+export const HINT_IDS = ["rise", "tower", "desk", "screen", "turn", "phone", "door", "table", "box", "items", "kuro", "bed", "chickHint"] as const;
 export type HintId = (typeof HINT_IDS)[number];
 /** R1.12: 工作台's input, first focus: Kuro's pill says its line (no card). Seen like the others. */
 export const TYPING_HINT = "typing";
@@ -38,7 +38,14 @@ const doneItem = (lc: LoopContext, id: string | undefined) => (id ? itemStates(l
 
 /** Each hint's condition (R1). */
 const DUE: Readonly<Record<HintId, (c: Ctx) => boolean>> = {
+  // day1-playtest-1117 R2: the rise spot, while the day's 起床 is open
+  rise: ({ lc }) => {
+    const it = lc ? itemByEvent(lc, "rise") : undefined;
+    return !!lc && unlocked(lc, it?.id) && !doneItem(lc, it?.id);
+  },
   tower: ({ state, events }) => state.day === 1 && !booted(state, events),
+  // day1-playtest-1117 R3: the tower on, the screen not visited yet: first the desk (靠近书桌), then the screen (使用电脑)
+  desk: ({ state, events, session }) => booted(state, events) && session.onboard === "no" && session.view !== "desk",
   // Right after the power-on lines (a hint waits for the box): on, and 屏幕 not visited yet this run.
   screen: ({ state, events, session }) => booted(state, events) && session.onboard === "no",
   // Back in the room from the computer: the run has been to 屏幕 (its coach marks are over).
@@ -78,10 +85,15 @@ function wayTo(view: string, to: Facing): Anchor | null {
 /** Where each hint points in the view the player is in, or null when it is not on screen there. */
 export function anchorFor(id: HintId, view: string): Anchor | null {
   switch (id) {
+    case "rise":
+      return view === "lying" ? act("rise") : null;
     case "tower":
       return view === "room" ? act("tower-power") : null;
+    case "desk":
+      return view === "room" ? act("view", "desk") : null;
     case "screen":
-      return view === "room" || view === "desk" ? act("view", "desktop") : null;
+      // day1-playtest-1117 R3: 使用电脑 at the desk, on the monitors (the room's way is 靠近书桌)
+      return view === "desk" ? act("view", "desktop") : null;
     case "turn":
       // From the bed wall (the morning, author 2026-11-10) the edge that turns to the desk.
       return view === "room" ? { kind: "edge", side: "right" } : view === "bed" ? wayTo(view, "room") : null;
