@@ -3060,6 +3060,7 @@ function updateFar(s, dt) {
   const fov = 47 + 6 * e; if (Math.abs(camera.fov - fov) > 0.01) { camera.fov = fov; camera.updateProjectionMatrix(); }
 }
 function frame(now) {
+  glowFrame(now);
   const dt = Math.min(0.05, (now - last) / 1000);
   last = now;
   if (state.turn) {
@@ -3241,6 +3242,22 @@ function locate(id) {
   const r = (v) => Math.round(v * 10000) / 10000;
   return [r(x0), r(y0), r(x1 - x0), r(y1 - y0)];
 }
+// day1-playtest-1117 R6: the guide's glow is in the room itself: a soft warm ring on the desk under the
+// guided thing, pulsing, sized to it, following it every frame (so a drag takes the glow along).
+const thingOf = (id) => OBJ[id] ?? { walkman: WALKMAN.g, deskphone: DESKPHONE, prints: PRINTS, mug: COFFEE.inner, lamp: SHADE }[id] ?? null;
+const GLOW = { id: null, mesh: new THREE.Mesh(new THREE.RingGeometry(0.62, 1, 48), new THREE.MeshBasicMaterial({ color: 0xffd27a, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide })) };
+GLOW.mesh.rotation.x = -Math.PI / 2; GLOW.mesh.visible = false; GLOW.mesh.renderOrder = 2; scene.add(GLOW.mesh);
+const _gb = new THREE.Box3(), _gc = new THREE.Vector3(), _gs = new THREE.Vector3();
+function glowFrame(now) {
+  const o = GLOW.id ? thingOf(GLOW.id) : null;
+  if (!o || !o.visible || (o.parent && !o.parent.visible)) { GLOW.mesh.visible = false; return; }
+  _gb.setFromObject(o); _gb.getCenter(_gc); _gb.getSize(_gs);
+  const r = Math.max(_gs.x, _gs.z) * 0.62 + 0.012;
+  GLOW.mesh.visible = true;
+  GLOW.mesh.position.set(_gc.x, _gb.min.y + 0.0015, _gc.z);
+  GLOW.mesh.scale.setScalar(r);
+  GLOW.mesh.material.opacity = 0.32 + 0.22 * Math.sin(now / 1000 * 3.4);
+}
 let hoverId, hoverAt = 0;
 canvasEl.addEventListener("pointermove", (e) => { // embedded: tell the game what the pointer is over, at most twelve times a second
   if (!document.body.classList.contains("embed") || dragging) return;
@@ -3420,6 +3437,7 @@ function command(m) {
   if (m.hurt) bossEvent("hurt");
   if (m.layout !== undefined) layout(m.layout);
   if (m.prints != null) PRINTS.visible = !!m.prints;
+  if (m.glow !== undefined) GLOW.id = m.glow ? String(m.glow) : null; // day1-playtest-1117 R6: { glow: id } / { glow: null }
   if (m.walkman != null) { WALKMAN.g.visible = !!m.walkman; WALKMAN.playing = m.walkman === "playing"; } // true / "stopped" = there, still; "playing" = there, reels turning; false = not there
   if (m.chick != null && m.chick !== CHICK_FACE.name) CHICK_FACE.paint(String(m.chick));
   if (m.locate) { const rects = {}; for (const id of m.locate) rects[id] = locate(id); try { window.parent.postMessage({ source: "nt-room", type: "where", rects, face: state.face, spot: state.desk ? state.spot : null, moving: !!state.turn || Math.abs(state.deskK - (state.desk ? 1 : 0)) > 0.01 }, "*"); } catch {} }

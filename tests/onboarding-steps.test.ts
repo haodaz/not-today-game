@@ -40,6 +40,10 @@ function firstVisit(store = booted()) {
   const act = (name: string, data: Record<string, string> = {}) => (loopActions[name] ?? shellActions[name])!(ctx, data as DOMStringMap, null as never);
   const out = () => renderGame(store, session, 0).value;
   act("view", { view: "desktop", screen: "right" });
+  // day1-playtest-1117 R4: the first visit's own line comes first; the coach marks wait until it is read.
+  expect(session.dialogue.queue.map((q) => q.key)).toEqual([`d${String(store.getState().day)}:screen:first`]);
+  expect(out()).not.toContain('class="coach"');
+  act("loop-advance");
   return { store, session, ctx, act, out };
 }
 const ORDER = ["msgs", "tingtalk", "workbench", "browser", "files"];

@@ -3016,3 +3016,32 @@ Spec: `.kiro/specs/tingtalk/requirements.md`, tasks 1–5.
   - No snapshot carried the reader or the bed ask before.
 - tsc clean; vitest 181 files, 2546 passed.
 - Re-check (run-diary requested again, 12:19): spec unchanged since 10:46 (before the work above, 11:10–11:33); all changes still in the tree; nothing redone; tsc clean, vitest 181 files / 2546 passed.
+
+## 2026-11-18 · day1-playtest-1117 (起床 first, the ceiling, desk then screen, 老王's thread, the 3D glow)
+
+Kiro's credits ran out mid-job. Kiro's part is commit f7d8c22 as it stood; Claude finished the job
+and wrote this entry (Kiro wrote none for it).
+
+- **Kiro (f7d8c22):** R1 `event:rise` and 起床 as day 1's first item (the one content edit, both
+  languages); R2 the ceiling's rise band, lamp and ceiling lines (once per lying-down); R3 the `desk`
+  hint and the guide path desk → screens; R4 the first-visit line before the coach marks; R5 read
+  marks (未读 → 已读 before the answer), the reply prompt over the choices, the line card at the
+  thread's foot, a reply item's onDone held until the answer has landed (`loop/quiet.ts`); R6 the host
+  posts `glow` to room3d and re-locates after a drag. Stopped with 19 tests still on the old behaviour.
+- **Claude (finishing):**
+  - The 19 tests updated to the new behaviour (hints desk → screen, the first-visit line before the
+    coach marks, the ceiling's spot and lines); 14 snapshot lines refreshed after checking each: all
+    are day 1's current item 开机 → 起床.
+  - R5 bug found in the browser: the held onDone is queued in pieces when it mixes Kuro's line with
+    the player's (`d1:reply:onDone#1`, `d1:reply:onDone`); only the exact key was held, so the `#1`
+    piece (听他说完话) played at once. Every piece is held now, and released straight onto the queue
+    (`push` would drop the later piece as a repeat). New test `tests/day1-playtest-1117.test.ts`.
+  - R6 room3d's side: `{ glow: id | null }` draws a soft pulsing ring on the desk under the thing,
+    sized to it and following it every frame.
+  - Content: `room.boot.hint` removed (zh/en). After the tower the protagonist said 点击屏幕，使用电脑,
+    which is the guide talking in her mouth and skipped the desk; the guide lights the path instead.
+- Walked day 1 in the browser (fresh run): ceiling line and lamp line once each, only the band asks
+  要起来吗 → 起床 ticks → tower (no line) → desk lit 靠近书桌 → screens lit 使用电脑 → 办公越久…… →
+  coach marks one at a time → 老王: card at the foot, prompt over the choices → sent: 未读, his answer,
+  已读, then 听他说完话 → 点个餐吧 → the phone glows on the 3D desk and the glow follows a drag.
+- tsc clean; validate clean; vitest 191 files, 2631 passed.

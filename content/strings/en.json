@@ -1189,7 +1189,6 @@
   "obj.tape.reverseNone": "(Played backwards: only hiss.)",
   "files.sleeptalk.backHint": "(Played backwards, there seems to be one more line.)",
   "room.boot.on": "The computer hums. Both screens light up.",
-  "room.boot.hint": "Click a screen to use the computer.",
   "onboard.title": "What's on this computer",
   "onboard.tingtalk": "Work messages. The boss, the partner and colleagues find you here. Today's work comes from here.",
   "onboard.workbench": "Where the work gets done. Kuro is here, and finished work is handed in from here.",

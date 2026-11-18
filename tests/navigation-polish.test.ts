@@ -61,6 +61,8 @@ describe("离开屏幕", () => {
     r.session.onboard = "no"; // a new run: the first desktop visit brings the coach marks
     r.go("desktop");
     expect(r.session.onboard).toBe("due");
+    // day1-playtest-1117 R4: the first visit's line first; the coach marks after it.
+    loopActions["loop-advance"]!(r.ctx, {} as DOMStringMap, null as never);
     expect(r.out()).toContain('class="coach"');
     expect(r.out()).not.toContain("leave-screen");
   });

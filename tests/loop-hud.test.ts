@@ -161,7 +161,7 @@ describe("runtime (design L5/L6)", () => {
     syncLoop(ctx, 0);
     expect(ctx.session.dialogue.queue[0]!.lines).toEqual([
       { k: "narration", t: t("room.boot.on") },
-      { k: "inner", t: t("room.boot.hint") },
+      // day1-playtest-1117: no room.boot.hint — the protagonist does not say how to reach the screen; the guide lights the desk, then the screens
     ]);
     expect(ctx.session.clock).toEqual(DEFAULT_CLOCK);
     // Not again on a later first look (a reload once the tower is on).

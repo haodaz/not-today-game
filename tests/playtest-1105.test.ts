@@ -28,6 +28,9 @@ describe("R1 · a new player can see the computer", () => {
     r.session.onboard = "no"; // as mountDesktop starts a run
     r.act("view", { view: "desktop", screen: "left" });
     expect([r.session.leftApp, r.session.rightApp]).toEqual([null, null]);
+    // day1-playtest-1117 R4: the line 办公越久…… first, then the coach marks.
+    expect(r.out()).not.toContain('class="coach"');
+    r.act("loop-advance");
     const out = r.out();
     expect(out).not.toContain('class="win');
     expect(out).toContain('<div class="dock">');
@@ -123,7 +126,7 @@ describe("R3 · the day's opening, and powering on", () => {
     expect(r.session.dialogue.queue.map((q) => q.key)).toContain("d2:beat:boot");
   });
 
-  it("the tower says room.boot.on (narration) then room.boot.hint (inner); the screens are lit from then on", async () => {
+  it("the tower says room.boot.on (narration) and nothing more; the screens are lit from then on", async () => {
     const { syncLoop } = await import("@world/loop/runtime");
     const { EMPTY_DIALOGUE } = await import("@world/loop/dialogue");
     const { t } = await import("@world/i18n");
@@ -137,7 +140,7 @@ describe("R3 · the day's opening, and powering on", () => {
     expect(r.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:power-on"]);
     expect(r.session.dialogue.queue[0]!.lines).toEqual([
       { k: "narration", t: t("room.boot.on") },
-      { k: "inner", t: t("room.boot.hint") },
+      // day1-playtest-1117: no room.boot.hint — the protagonist does not say how to reach the screen; the guide lights the desk, then the screens
     ]);
     expect(r.out().match(/class="monitor-lit (left|right)"/g)).toHaveLength(2);
   });

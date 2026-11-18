@@ -123,10 +123,16 @@ describe("R1 · each room hint is a glow and a prompt, ended by its target", () 
     expect(r3.seen).toEqual([]);
   });
 
-  it("2 screen: the tower is on and 屏幕 not visited yet: a monitor", () => {
-    const r = rig(booted(), "room", "screen");
+  // day1-playtest-1117 R3: desk first (靠近书桌 in 房间), then the screen (使用电脑 at 桌子).
+  it("2 desk, then screen: the tower is on and 屏幕 not visited yet: the desk in 房间, a monitor at 桌子", () => {
+    const r = rig(booted(), "room", "desk");
     r.session.onboard = "no";
-    onceOnly(r, "screen", "room", ["view", { view: "desktop", screen: "left" }]);
+    onceOnly(r, "desk", "room", ["view", { view: "desk" }]);
+    const s = rig(booted(), "desk", "screen");
+    s.session.onboard = "no";
+    onceOnly(s, "screen", "desk", ["view", { view: "desktop", screen: "left" }]);
+    // In 房间 the screen's prompt is not drawn (its way there is the desk's).
+    expect(anchorFor("screen", "room")).toBeNull();
   });
 
   it("3 turn: back in 房间 from the computer: the right turn edge; turning that way ends it", () => {
@@ -250,6 +256,11 @@ describe("R1 · rules", () => {
     const c = rig(booted(), "desk", null);
     c.session.onboard = "no";
     c.act("view", { view: "desktop", screen: "left" });
+    // day1-playtest-1117 R4: the first visit's own line comes first; the coach marks wait for it.
+    const before = renderGame(c.store, c.session, 0).value;
+    expect(before).not.toContain('class="coach"');
+    expect(c.session.dialogue.queue[0]?.key).toBe("d1:screen:first");
+    c.act("loop-advance");
     const coach = renderGame(c.store, c.session, 0).value;
     expect(coach).toContain('<div class="coach" data-step="1" data-target="msgs">');
     expect(coach).not.toContain("prompt-layer");
@@ -260,14 +271,14 @@ describe("R1 · rules", () => {
     const r = rig(store, "room", null);
     r.session.hintsSeen = [];
     r.session.onboard = "no";
-    r.out(); // screen comes due (on, not yet at the computer)
+    r.out(); // desk and screen come due (on, not yet at the computer)
     store.appendEvent({ kind: "step", name: "openApp:msgs", t: "09:05" });
     store.appendEvent({ kind: "reply", choice: "fine", recipient: "boss", t: "09:05" }); // day 1: lunch comes after the reply (2026-11-08)
     const out = r.out(); // then phone
     expect(prompts(out)).toBe(1);
-    expect(r.session.hintQueue.slice(0, 2)).toEqual(["screen", "phone"]);
-    expect(shownIn(out)).toBe("screen");
-    // On 桌子 the monitors are there too: still screen first; once it is seen, phone.
+    expect(r.session.hintQueue.slice(0, 3)).toEqual(["desk", "screen", "phone"]);
+    expect(shownIn(out)).toBe("desk");
+    // On 桌子 (day1-playtest-1117 R3) the desk is done and the monitors are there: screen; once it is seen, phone.
     r.session.view = "desk";
     expect(shownIn(r.out())).toBe("screen");
     r.use("view", { view: "desktop" });

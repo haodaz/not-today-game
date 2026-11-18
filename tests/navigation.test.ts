@@ -916,8 +916,8 @@ describe("the CSS the controls rely on", () => {
   });
 });
 
-describe("the ceiling (lying-view R6): no back control; a click asks whether to get up", () => {
-  it("a click anywhere on the ceiling asks 要起来吗？; the bottom strip and the wheel do not leave; 起床 goes up to 床", async () => {
+describe("the ceiling (lying-view R6, day1-playtest-1117 R2): no back control; the rise spot asks whether to get up", () => {
+  it("only the rise spot asks 要起来吗？; the ceiling and its light each say one line, once; the wheel does not leave; 起床 goes up to 床", async () => {
     const m = mount({ view: "lying" });
     await frame();
     mouse("mousemove", m.stage(), 800, 880);
@@ -926,14 +926,28 @@ describe("the ceiling (lying-view R6): no back control; a click asks whether to 
     m.stage().dispatchEvent(new WheelEvent("wheel", { bubbles: true, deltaY: 100 }));
     expect(m.session.view).toBe("lying");
     expect(m.session.dialogue.queue).toEqual([]);
-    await click(m, 800, 890);
+    // Anywhere on the ceiling: its line, once (a second click there says nothing).
+    await click(m, 600, 300);
+    expect(m.session.view).toBe("lying");
+    expect(m.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:lying:ceiling"]);
+    m.session.dialogue = { ...m.session.dialogue, queue: [] };
+    await frame();
+    await click(m, 300, 200);
+    expect(m.session.dialogue.queue).toEqual([]);
+    // The light: its own line.
+    m.root.querySelector<HTMLElement>('[data-action="lying-look"][data-look="lamp"]')!.click();
+    expect(m.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:lying:lamp"]);
+    m.session.dialogue = { ...m.session.dialogue, queue: [] };
+    await frame();
+    // The rise spot: 要起来吗？
+    m.root.querySelector<HTMLElement>('[data-action="rise"]')!.click();
     expect(m.session.view).toBe("lying");
     expect(m.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:rise:ask"]);
     await frame();
     m.root.querySelector<HTMLElement>('[data-action="loop-choice"][data-choice="stay"]')!.click();
     await frame();
     expect(m.session.view).toBe("lying");
-    await click(m, 600, 300);
+    m.root.querySelector<HTMLElement>('[data-action="rise"]')!.click();
     await frame();
     m.root.querySelector<HTMLElement>('[data-action="loop-choice"][data-choice="up"]')!.click();
     await frame();

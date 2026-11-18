@@ -101,6 +101,10 @@ describe("R1 / R2 · the guide state and the six moments", () => {
     expect(guideRefuses(g, "lamp", {})).toBe(true); // the bed keeps its own line (always allowed)
     expect(guideRefuses(g, "view", { view: "desktop" })).toBe(false);
     expect(guideRefuses(g, "view", { view: "door" })).toBe(false);
+    // day1-playtest-1117 R3: the path is lit — the desk in 房间, then the monitors at 桌子.
+    expect(r.out()).toMatch(/data-action="view" data-view="desk"[^>]*data-guide="on"/);
+    expect(guideRefuses(g, "view", { view: "desk" })).toBe(false);
+    r.session.view = "desk";
     expect(r.out()).toMatch(/data-action="view" data-view="desktop"[^>]*data-guide="on"/);
     step(store, "openApp:msgs");
     expect(guideNow(store.getState(), store.getEvents(), r.session)?.id).not.toBe("G1b");

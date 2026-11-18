@@ -3,7 +3,7 @@
 // in `session.progress`). Until then the lines wait here, not in the box. Session only.
 import type { GameEvent } from "@state/events";
 import type { Session } from "@world/desktop/model";
-import { push, type Queued } from "./dialogue";
+import type { Queued } from "./dialogue";
 
 /** Whether a reply to `who` is still playing its answer. */
 export function replyLive(session: Pick<Session, "progress">, events: readonly GameEvent[], who: string): boolean {
@@ -23,14 +23,15 @@ export function holdUntilQuiet(session: Pick<Session, "quietHeld">, who: string,
 export function releaseQuiet(session: Pick<Session, "quietHeld" | "progress" | "dialogue">, events: readonly GameEvent[]): boolean {
   if (session.quietHeld.length === 0) return false;
   const keep: Session["quietHeld"][number][] = [];
-  let released = false;
+  const out: Queued[] = [];
   for (const h of session.quietHeld) {
     if (replyLive(session, events, h.who)) keep.push(h);
-    else {
-      session.dialogue = push(session.dialogue, h.q);
-      released = true;
-    }
+    else out.push(h.q);
   }
   session.quietHeld = keep;
-  return released;
+  if (out.length === 0) return false;
+  // Straight onto the queue, in order: the pieces are already split (`<key>#1`, …, `<key>`), and
+  // `push` would take a later piece for a repeat of the first and drop it (Claude, day1-playtest-1117).
+  session.dialogue = { ...session.dialogue, queue: [...session.dialogue.queue, ...out] };
+  return true;
 }

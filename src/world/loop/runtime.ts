@@ -372,10 +372,14 @@ export function syncLoop(ctx: ActionContext, nowMs: number = Date.now()): void {
     if (item.done.kind !== "event" || item.done.event.type !== "reply" || before.get(item.id)?.done || !memo.items.get(item.id)?.done) continue;
     const who = item.done.event.recipient;
     const key = `d${state.day}:${item.id}:onDone`;
-    const at = dialogue.queue.findIndex((q) => q.key === key);
-    if (at < 0 || !replyLive(session, events, who)) continue;
-    holdUntilQuiet(session, who, dialogue.queue[at]!);
-    dialogue = { ...dialogue, queue: dialogue.queue.filter((_, i) => i !== at), ...(at === 0 ? { line: 0 } : {}) };
+    // A sequence that mixes Kuro's lines with others is queued in pieces (`<key>#1`, …, `<key>`):
+    // every piece waits, in order (day1-playtest-1117 fix by Claude: the `#1` piece played at once).
+    const piece = (k: string) => k === key || k.startsWith(`${key}#`);
+    const held = dialogue.queue.filter((q) => piece(q.key));
+    if (held.length === 0 || !replyLive(session, events, who)) continue;
+    for (const q of held) holdUntilQuiet(session, who, q);
+    const headHeld = piece(dialogue.queue[0]!.key);
+    dialogue = { ...dialogue, queue: dialogue.queue.filter((q) => !piece(q.key)), ...(headHeld ? { line: 0 } : {}) };
   }
   session.dialogue = dialogue;
   session.clock = fx.clock;
