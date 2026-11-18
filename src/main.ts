@@ -286,7 +286,8 @@ if (jump !== null) {
       console.warn(`?upgraded: ${id} skipped (${(e as Error).message})`); // not offered yet on this day
     }
   }
-  startGame(store, false);
+  // Dev only (2026-11-18): `&prologue=1` plays the opening dream first, to look at its scenes.
+  startGame(store, false, import.meta.env.DEV && params.get("prologue") === "1");
   // Dev only (2026-11-09): a debug run signs in too, so Kuro answers online (kuroOnline needs a
   // session); its run id is fresh each load and nothing of it is pushed or saved.
   if (import.meta.env.DEV) void net.signIn();

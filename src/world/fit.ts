@@ -60,6 +60,9 @@ export function applyFit(root: HTMLElement, stage: HTMLElement, size: { w: numbe
   // world-prompts R2: the stage's place in the window, for the fixed layers sized by it (the choices column).
   root.style.setProperty("--stage-l", `${fit.left}px`);
   root.style.setProperty("--stage-w", `${size.w * fit.scale}px`);
+  // Standing NPCs (author 2026-11-18): the stand is drawn in the box's fixed layer, sized and footed by the stage.
+  root.style.setProperty("--stage-t", `${fit.top}px`);
+  root.style.setProperty("--stage-h", `${size.h * fit.scale}px`);
   // No photo (the day-18 pull-out happens over black): the letterbox is plain black.
   root.style.setProperty("--letterbox", backdrop ? `url(${backdrop})` : "none");
   return fit;

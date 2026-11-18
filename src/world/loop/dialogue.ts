@@ -8,6 +8,7 @@ import type { GameEvent } from "@state/events";
 import { diaryDays } from "@state/diary";
 import { deliverableForHand, handDeliverableOf, handNight } from "@state/days/board";
 import { hasString, t } from "@world/i18n";
+import { npcStand } from "@world/npc";
 import type { State } from "@state/types.gen";
 
 export type Ending =
@@ -194,6 +195,11 @@ export function placedLines(seq: Sequence): readonly SayLine[] {
 export interface Scene {
   readonly backdrop: string | null;
   readonly prop: string | null;
+  /**
+   * Standing NPCs (author 2026-11-18): while a backdrop is on, the NPC saying the line on show stands
+   * in the middle of the frame behind the box (npc.json `stand`); absent otherwise.
+   */
+  readonly stand?: string;
 }
 export const NO_SCENE: Scene = { backdrop: null, prop: null };
 
@@ -207,11 +213,19 @@ export function sceneOf(d: DialogueState): Scene {
   if (!q) return NO_SCENE;
   let backdrop: string | null = null;
   let prop: string | null = null;
+  // Standing NPCs: the last NPC who spoke stays standing through the narration and the player's
+  // lines, as in a visual novel, until another person speaks or the backdrop changes.
+  let stand: string | null = null;
   for (const l of q.lines.slice(0, Math.min(d.line, q.lines.length - 1) + 1)) {
-    if (l.backdrop !== undefined) backdrop = l.backdrop === "" ? null : l.backdrop;
+    if (l.backdrop !== undefined) {
+      backdrop = l.backdrop === "" ? null : l.backdrop;
+      stand = null;
+    }
     if (l.prop !== undefined) prop = l.prop === "" ? null : l.prop;
+    if (q.voice !== "kuro" && (l.k === "speaker" || l.k === "narration") && l.who !== undefined && l.who !== "me") stand = npcStand(l.who);
   }
-  return backdrop === null && prop === null ? NO_SCENE : { backdrop, prop };
+  if (backdrop === null && prop === null) return NO_SCENE;
+  return { backdrop, prop, ...(backdrop !== null && stand !== null ? { stand } : {}) };
 }
 
 // ——— a line waits for its place (dialogue addition 2026-11-02) ———

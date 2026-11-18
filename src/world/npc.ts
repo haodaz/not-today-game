@@ -10,6 +10,8 @@ export interface NpcEntry {
   readonly portrait: string;
   /** 256 px square for the messages list and bubbles. */
   readonly avatar: string;
+  /** A standing half-body cut-out for scenes with a backdrop (author 2026-11-18), when there is one. */
+  readonly stand?: string;
 }
 
 export interface NpcData {
@@ -21,6 +23,7 @@ const isStr = (v: unknown): v is string => typeof v === "string";
 const isObj = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 const TOP_KEYS = ["_note", "npcs", "silhouettes"] as const;
 const NPC_KEYS = ["name", "portrait", "avatar"] as const;
+const NPC_OPTIONAL = ["stand"] as const;
 
 function fail(where: string, msg: string): never {
   throw new Error(`content/npc.json ${where}: ${msg}`);
@@ -35,9 +38,10 @@ export function parseNpc(raw: unknown): NpcData {
   const npcs: Record<string, NpcEntry> = Object.create(null);
   for (const [id, entry] of Object.entries(raw.npcs as Record<string, unknown>)) {
     if (!isObj(entry)) fail(`npcs.${id}`, "must be an object");
-    for (const k of Object.keys(entry)) if (!(NPC_KEYS as readonly string[]).includes(k)) fail(`npcs.${id}`, `unknown key "${k}"`);
+    for (const k of Object.keys(entry)) if (![...NPC_KEYS, ...NPC_OPTIONAL].includes(k as never)) fail(`npcs.${id}`, `unknown key "${k}"`);
     for (const k of NPC_KEYS) if (!isStr(entry[k])) fail(`npcs.${id}.${k}`, "must be a string");
-    npcs[id] = { name: entry.name as string, portrait: entry.portrait as string, avatar: entry.avatar as string };
+    if ("stand" in entry && !isStr(entry.stand)) fail(`npcs.${id}.stand`, "must be a string");
+    npcs[id] = { name: entry.name as string, portrait: entry.portrait as string, avatar: entry.avatar as string, ...(isStr(entry.stand) ? { stand: entry.stand } : {}) };
   }
   if (!Array.isArray(raw.silhouettes) || !raw.silhouettes.every(isStr)) fail("silhouettes", "must be a string array");
   return { npcs: Object.freeze(npcs), silhouettes: raw.silhouettes as string[] };
@@ -48,6 +52,11 @@ export const npcData: NpcData = Object.freeze(parseNpc(npcFile));
 /** The portrait path for a speaker `who`, or null if not a known NPC. */
 export function npcPortrait(who: string): string | null {
   return entryOf(who)?.portrait ?? null;
+}
+
+/** The standing half-body for a speaker `who`, or null (not a known NPC, or none drawn). */
+export function npcStand(who: string): string | null {
+  return entryOf(who)?.stand ?? null;
 }
 
 /** Own entries only (ids come from content and from message text). */

@@ -91,12 +91,12 @@ describe("sceneOf", () => {
     const at = (line: number) => sceneOf(nightAt(1, line));
     expect(at(0)).toEqual(NO_SCENE);
     expect(at(4)).toEqual(NO_SCENE);
-    expect(at(5)).toEqual({ backdrop: "/room/dream/classroom.jpg", prop: null });
-    expect(at(7)).toEqual({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_96.png" });
-    expect(at(13)).toEqual({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_96.png" });
-    expect(at(14)).toEqual({ backdrop: "/room/dream/home_dinner.jpg", prop: "/room/props/exam_96.png" });
-    expect(at(19)).toEqual({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_100.png" });
-    expect(at(23)).toEqual({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_100.png" });
+    expect(at(5)).toMatchObject({ backdrop: "/room/dream/classroom.jpg", prop: null });
+    expect(at(7)).toMatchObject({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_96.png" });
+    expect(at(13)).toMatchObject({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_96.png" });
+    expect(at(14)).toMatchObject({ backdrop: "/room/dream/home_dinner.jpg", prop: "/room/props/exam_96.png" });
+    expect(at(19)).toMatchObject({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_100.png" });
+    expect(at(23)).toMatchObject({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_100.png" });
   });
   it("day 11: office_busy, then office (a later backdrop replaces it)", () => {
     expect(sceneOf(nightAt(11, 2)).backdrop).toBe("/room/dream/office_busy.jpg");
@@ -147,8 +147,9 @@ describe("the stage", () => {
     const withPortrait = stageOf(store, nightAt(1, 11));
     expect(sceneHtml(withPortrait)).toContain('data-src="/room/dream/classroom.jpg"');
     expect(sceneHtml(withPortrait)).toContain('<img class="scene-prop" data-src="/room/props/exam_96.png" src="/room/props/exam_96.png"');
-    // The speaker's bust sits in the box's slot.
-    expect(withPortrait).toContain(`class="npc-portrait" src="/npc/${teacher.who}.png"`);
+    // Standing NPCs (author 2026-11-18): the teacher stands in the frame (drawn in the box's layer), so the box has no bust.
+    expect(sceneOf(nightAt(1, 11)).stand).toBe(`/npc/stand/${teacher.who}.webp`);
+    expect(withPortrait).not.toContain("npc-portrait");
     const hundred = stageOf(store, nightAt(1, 19));
     expect(sceneHtml(hundred)).toContain('src="/room/props/exam_100.png"');
     expect(hundred).not.toContain("exam_96");

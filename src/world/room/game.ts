@@ -61,7 +61,7 @@ import { isFacing, turnedTo, turnsBetween, type Facing, type TurnDir } from "./f
 
 /** Whose conversation the loan is answered in (day-loop correction 2026-11-01): 老周. */
 export const LOAN_CONVERSATION = "laozhou";
-import { advance, dropQuestion, endsInChoice, finishChoice, push, showing, talking, threadCardFor, type DialogueState, type Queued } from "@world/loop/dialogue";
+import { advance, dropQuestion, endsInChoice, finishChoice, push, sceneOf, showing, talking, threadCardFor, type DialogueState, type Queued } from "@world/loop/dialogue";
 import { beatQueued, lieDownOrEnd, openChatIfDue, lookQueued, questionQueued, taskStartKey } from "@world/loop/runtime";
 import { askedOn, knows } from "@state/recognise";
 import { gateAdvance } from "@world/motion/reveal";
@@ -170,7 +170,11 @@ function dlgLayer(dlg: SafeHtml | null, session: Session, readsOn: boolean, with
   const chat = session.view === "desktop" && (appOn(session) === "tingtalk" || appOn(session) === "msgs");
   // day1-playtest-1117 R5: a line about the open thread is its card: at the thread's bottom, above the input row
   const thread = chat && threadCardFor(session.dialogue) !== null;
-  return html`<div class="${cls("dlg-layer", story && "masked", chat && !thread && "top", thread && "thread")}">${withMask ? boxMask(session, readsOn) : null}${dlg}</div>`;
+  // Standing NPCs (author 2026-11-18): the speaker stands over the story mask and under the box, in full colour.
+  // A prop on show (the 96, a photo) keeps the middle: the person stands aside, on the left.
+  const scene = sceneOf(session.dialogue);
+  const standImg = scene.stand === undefined ? null : html`<img class="${cls("scene-stand", scene.prop !== null && "aside")}" src="${scene.stand}" alt="" aria-hidden="true" draggable="false">`;
+  return html`<div class="${cls("dlg-layer", story && "masked", chat && !thread && "top", thread && "thread")}">${withMask ? boxMask(session, readsOn) : null}${standImg}${dlg}</div>`;
 }
 
 /** The checklist's line that is on now (the first open one), for the desktop's top bar; null when none. */

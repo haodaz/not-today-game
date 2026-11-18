@@ -1,40 +1,47 @@
 {
-  "_note": "Who has a face. id = the `who` used in days/replies and the conversation id in messages. portrait: bust for the dialogue box (same slot and size as the player portrait). avatar: 256 px square for the messages list, bubbles and 朋友圈. Speakers not listed here (member, 寻呼机, 屏幕, 缝里, 输入框) have no portrait; `member` and family-group relatives use the silhouettes. The dreams' people (2026-11-16): one id per person per age — 同桌 / 班长 are the primary-school ones, 高中同桌 / 高中班长 the high-school ones, 小满 / 小满初中 the same girl at twelve and fourteen; boss_young / partner_young are 王莱 and 陈薇薇 the year the company was named. Their `name` keys reuse the plain labels, so the player reads 同桌, 班长, 小满 as before.",
+  "_note": "Who has a face. id = the `who` used in days/replies and the conversation id in messages. portrait: bust for the dialogue box (same slot and size as the player portrait). avatar: 256 px square for the messages list, bubbles and 朋友圈. Speakers not listed here (member, 寻呼机, 屏幕, 缝里, 输入框) have no portrait; `member` and family-group relatives use the silhouettes. The dreams' people (2026-11-16): one id per person per age — 同桌 / 班长 are the primary-school ones, 高中同桌 / 高中班长 the high-school ones, 小满 / 小满初中 the same girl at twelve and fourteen; boss_young / partner_young are 王莱 and 陈薇薇 the year the company was named. Their `name` keys reuse the plain labels, so the player reads 同桌, 班长, 小满 as before. stand (optional, author 2026-11-18): a standing half-body cut-out shown in the middle of the frame behind the box while a backdrop is on (dreams, memories, the opening); elsewhere the bust stays in the box.",
   "npcs": {
     "boss": {
       "name": "msgs.boss",
       "portrait": "/npc/boss.png",
-      "avatar": "/npc/boss_av.png"
+      "avatar": "/npc/boss_av.png",
+      "stand": "/npc/stand/boss.webp"
     },
     "partner": {
       "name": "msgs.partner",
       "portrait": "/npc/partner.png",
-      "avatar": "/npc/partner_av.png"
+      "avatar": "/npc/partner_av.png",
+      "stand": "/npc/stand/partner.webp"
     },
     "xiaozhang": {
       "name": "msgs.xiaozhang",
       "portrait": "/npc/xiaozhang.png",
-      "avatar": "/npc/xiaozhang_av.png"
+      "avatar": "/npc/xiaozhang_av.png",
+      "stand": "/npc/stand/xiaozhang.webp"
     },
     "laozhou": {
       "name": "msgs.laozhou",
       "portrait": "/npc/laozhou.png",
-      "avatar": "/npc/laozhou_av.png"
+      "avatar": "/npc/laozhou_av.png",
+      "stand": "/npc/stand/laozhou.webp"
     },
     "teacher": {
       "name": "msgs.teacher",
       "portrait": "/npc/teacher.png",
-      "avatar": "/npc/teacher_av.png"
+      "avatar": "/npc/teacher_av.png",
+      "stand": "/npc/stand/teacher.webp"
     },
     "family": {
       "name": "msgs.family",
       "portrait": "/npc/mother.png",
-      "avatar": "/npc/mother_av.png"
+      "avatar": "/npc/mother_av.png",
+      "stand": "/npc/stand/mother.webp"
     },
     "father": {
       "name": "msgs.father",
       "portrait": "/npc/father.png",
-      "avatar": "/npc/father_av.png"
+      "avatar": "/npc/father_av.png",
+      "stand": "/npc/stand/father.webp"
     },
     "同桌": {
       "name": "who.同桌",
@@ -89,12 +96,14 @@
     "boss_young": {
       "name": "who.王莱",
       "portrait": "/npc/boss_young.png",
-      "avatar": "/npc/boss_young_av.png"
+      "avatar": "/npc/boss_young_av.png",
+      "stand": "/npc/stand/boss_young.webp"
     },
     "partner_young": {
       "name": "who.薇薇",
       "portrait": "/npc/partner_young.png",
-      "avatar": "/npc/partner_young_av.png"
+      "avatar": "/npc/partner_young_av.png",
+      "stand": "/npc/stand/partner_young.webp"
     },
     "laozhou_young": {
       "name": "msgs.laozhou",

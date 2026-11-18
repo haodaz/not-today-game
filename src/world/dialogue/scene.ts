@@ -11,6 +11,8 @@ export { sceneOf, NO_SCENE, type Scene };
 export function renderScene(scene: Scene): SafeHtml | null {
   if (scene.backdrop === null && scene.prop === null) return null;
   const backdrop = scene.backdrop === null ? null : html`<div class="scene-backdrop" data-src="${scene.backdrop}" style="background-image:url(${scene.backdrop})"></div>`;
+  // Standing NPCs (author 2026-11-18) stand in the box's layer (game.ts dlgLayer, over the story mask
+  // so they keep their colour); a prop keeps the middle and the person stands aside.
   const prop = scene.prop === null ? null : html`<img class="scene-prop" data-src="${scene.prop}" src="${scene.prop}" alt="" draggable="false">`;
   return html`<div class="${cls("scene", scene.backdrop !== null && "has-backdrop")}" aria-hidden="true">${backdrop}${prop}</div>`;
 }
