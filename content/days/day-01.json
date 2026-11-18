@@ -77,10 +77,6 @@
         {
           "k": "narration",
           "t": "这屋子是租的，一个人住。床、桌子、门、窗，都在这一间里。"
-        },
-        {
-          "k": "inner",
-          "t": "鼠标挪到画面左边，转过去看桌子。"
         }
       ]
     },
@@ -334,14 +330,6 @@
       "unlock": "done:msgs",
       "done": "event:reply:boss",
       "required": true,
-      "onUnlock": {
-        "say": [
-          {
-            "k": "inner",
-            "t": "工作了十多年，想说的话就那几句。"
-          }
-        ]
-      },
       "onDone": {
         "say": [
           {

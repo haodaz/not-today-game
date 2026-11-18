@@ -77,10 +77,6 @@
         {
           "k": "narration",
           "t": "A rented room, lived in alone. Bed, desk, door, window, all in this one room."
-        },
-        {
-          "k": "inner",
-          "t": "Move the mouse to the left edge and turn to the desk."
         }
       ]
     },
@@ -334,14 +330,6 @@
       "unlock": "done:msgs",
       "done": "event:reply:boss",
       "required": true,
-      "onUnlock": {
-        "say": [
-          {
-            "k": "inner",
-            "t": "After ten-odd years of work, there are only a few things left you want to say."
-          }
-        ]
-      },
       "onDone": {
         "say": [
           {
