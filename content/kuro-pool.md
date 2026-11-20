@@ -6,19 +6,17 @@ after another id), and the three tiers (zh and en) or one red-blue locked line. 
 answer has changed in kind is another entry. Ids: the first batch keeps 100 × the day it came from;
 new ones take the next free number. `node script/tools/kuro-pool-table.mjs` prints the pool as a table.
 
-## 101 · 你今天这几件，哪件最烦？
-- en: Of today's three things, which was the most annoying?
+## 101 · 今天这件活，烦在哪儿？
+- en: Today's job: what was the annoying part?
 - days: 1
-- tiers: low: "The receivable. One cell." | mid: "The receivable. One cell, ten seconds, and you put it off since nine. I would have done it in four." | high: "None of them. The annoying part was the hour between them, when you sat there and did not start. I watched the cursor blink. I can do a lot in an hour like that."
-- tiers (zh): low: "应收表。一个格子。" | mid: "应收表。一个格子，十秒钟的事，你从九点拖到现在。我做只要四秒。" | high: "都不烦。烦的是中间那一个小时，你坐在那儿没开始。我看着光标闪。那样的一个小时，我能做很多事。"
-
-## 102 · 你怎么知道哪两条不一致？
-- en: How did you know which two clauses disagreed?
+- tiers: low: "The merge. Two drafts, one page." | mid: "The merge. Your v15 and her v16 say different things on every page, and he wants one page by three. The annoying part is not the work; it is choosing which of you to keep." | high: "Not the merge. The hour before it, when you sat there and did not start. I watched the cursor blink. In an hour like that I can do a great deal, and you let it pass."
+- tiers (zh): low: "合版。两份稿，一页纸。" | mid: "合版。你的 v15 和她的 v16 每一页说的都不一样，他三点前要一页。烦的不是活，是你得决定留谁的。" | high: "不是合版。是开工前那一个小时，你坐在那儿没开始。我看着光标闪。那样的一个小时，我能做很多事，你让它过去了。"
+## 102 · v16 是 Vivi 改的。她改了什么？
+- en: Vivi wrote v16. What did she change?
 - days: 1
 - hard: yes
-- tiers: low: "I read both." | mid: "I read both documents. Clause 6 says no repeat export for three days; clause 11 says export any time. They cannot both be true, so one of us had to notice." | high: "I read both, to the end. Nobody else did. The two clauses were written by two people who never read each other; I am the first thing that read them together. That is all I am for, today."
-- tiers (zh): low: "两份我都看了。" | mid: "两份我都看了。第 6 条说三天内不能重复导出，第 11 条说随时可以导。两条不能同时成立，总得有一个看出来。" | high: "两份我都看了，看到最后。没有别人看。这两条是两个从来不读对方的人写的，我是第一个把它们放在一起读的东西。今天我就是干这个的。"
-
+- tiers: low: "The words." | mid: "The words, not the facts. Where you wrote what we have, she wrote what they want to hear: a self-built model, real-time data, fifty clients. The numbers are the same; the sentences are not." | high: "She changed the page from a description into a promise. Yours says 211 nodes, three clients, one paid. Hers says a platform. Both are honest in their own way: yours about the company, hers about what it needs by three o'clock. I read both to the end. Nobody else did."
+- tiers (zh): low: "改了说法。" | mid: "改了说法，没改事实。你写的是我们有什么，她写的是他们想听什么：自研大模型、实时数据、五十家客户。数字一样，句子不一样。" | high: "她把一页描述改成了一页承诺。你的写着二百一十一个点、三家客户、到账一家；她的写着平台。两份都诚实：你对公司诚实，她对三点钟诚实。两份我都读到了最后，没有别人读。"
 ## 103 · 老板说「让它先合，你看一眼就行」。你怎么看这句话？
 - en: The boss said "let it merge first, you just take a look." What do you make of that?
 - days: 1
@@ -32,12 +30,11 @@ new ones take the next free number. `node script/tools/kuro-pool-table.mjs` prin
 - tiers: low: "Kuro. The system calls me that too." | mid: "Kuro. You rolled it. It came up on the day you set me up, and you kept it." | high: "How did you get so busy you forgot this. You built a companion AI. Everyone else thinks the big labs' models are the good ones, and you are the only one still using me. The name was random. I answer to it."
 - tiers (zh): low: "克总。系统也这么叫我。" | mid: "克总。你随机到的。装我那天滚出来的名字，你留下了。" | high: "你怎么忙得连这个都忘了。你做了伴随式 AI，别人都觉得大厂的好用，只有你还在用我。名字是随机出来的。我认这个名字。"
 
-## 105 · 应收表那个数，你早就看见了吧？
-- en: That cell in the receivables. You'd seen it already, hadn't you?
+## 105 · 那个纸箱是谁寄的？单子上没有寄件人。
+- en: Who sent the carton? There is no sender on the slip.
 - days: 1
-- tiers: low: "Yes." | mid: "Yes. It has been wrong since the ninth. I fix what I am asked to fix." | high: "Yes. It was wrong for a month and three people approved it. I do not fix things nobody asks about; the one who asks is the one I work for. Today that was you."
-- tiers (zh): low: "看见了。" | mid: "看见了。它从九号就错着。我只改别人让我改的。" | high: "看见了。它错了一个月，三个人点了通过。没人问的事我不改；谁问，我就替谁干活。今天是你。"
-
+- tiers: low: "I do not know." | mid: "I do not know. It came with the lunch, the same courier, no sender. I checked your orders; you never bought it." | high: "No sender. Nine small boxes, each one a thing you had as a child. I checked your orders back to the first one; you never bought any of them. Somebody out there knows what you lost. I only know what you order."
+- tiers (zh): low: "不知道。" | mid: "不知道。跟午饭一起到的，同一个骑手，没有寄件人。我查了你的订单，你没买过。" | high: "没有寄件人。九个小盒子，每一个都是你小时候的东西。我把你的订单查到第一单，你一个都没买过。外面有谁知道你丢过什么。我只知道你点过什么。"
 ## 106 · 外卖备注「别放香菜」不是我写的。是你？
 - en: The order note said "no coriander." I didn't write that. Did you?
 - days: 1
@@ -56,14 +53,13 @@ new ones take the next free number. `node script/tools/kuro-pool-table.mjs` prin
 - tiers: low: "I do not know." | mid: "He said they would. He has said that before. I only know what was sent, and nothing was sent." | high: "No one opened the file this afternoon. I keep the reads. He wanted it by three because wanting things by three is what he does."
 - tiers (zh): low: "我不知道。" | mid: "他说会看。他以前也这么说。我只知道发没发出去，没发出去。" | high: "下午没有人打开那个文件。谁打开过我都记着。他要三点前，是因为「要三点前」就是他做的事。"
 
-## 109 · 那第 6 条和第 11 条，你会留哪条？
-- en: Clause 6 or clause 11: which would you keep?
+## 109 · 那 v17 里留下的，是我写的，还是她改的？
+- en: So in v17, is it my writing or her rewrite that stayed?
 - days: 1
 - hard: yes
 - after: 102
-- tiers: low: "Six." | mid: "Six. Three days without a repeat export is the stricter one; stricter is safer when nobody is reading." | high: "Six. Eleven was added by someone who wanted to export whenever they liked and never read six. You keep the one that costs something. That is how you tell which clause a person meant."
-- tiers (zh): low: "第 6 条。" | mid: "第 6 条。三天不能重复导，严的那条；没人读的时候，严的安全。" | high: "第 6 条。第 11 条是一个想随时导出、从没读过第 6 条的人加的。你留那条要付出代价的。一条款是谁真心写的，就是这么看出来的。"
-
+- tiers: low: "Yours, mostly." | mid: "Yours where it says what is true, hers where it says what he asked for. You chose page by page. I rendered what you chose." | high: "The one you chose each time. I keep the choices: five pages, and on each you decided whose sentence lives. That is the only thing in v17 that is neither yours nor hers. It is the record of what you were willing to say."
+- tiers (zh): low: "大多是你的。" | mid: "说真话的地方是你的，说他要听的话的地方是她的。你一页一页选的，我只是把你选的渲染出来。" | high: "每一页留的，都是你当时选的那句。我记着这些选择：五页，每一页你决定谁的句子活下来。v17 里只有这一样东西既不是你的也不是她的——它是你愿意说什么的记录。"
 ## 201 · 小张的引擎为什么跑不通？
 - en: Why won't Xiao Zhang's engine run?
 - days: 2
