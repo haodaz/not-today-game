@@ -323,7 +323,8 @@ for (const it of ITEMS) {
   if (/^flag:task/.test(it.done) && !deferred.has(it.id)) {
     await toWorkbench();
     if (!(await has("[data-action=work-start]")) && (await has("[data-action=win-full][data-app=workbench]"))) await sel("[data-action=win-full][data-app=workbench]", 1);
-    if (await has("[data-action=work-start][disabled]")) {
+    // only the stomach's hold (data-hold); a bar disabled because no task is open yet (the call's task) is not deferred
+    if (await has("[data-action=work-start][disabled][data-hold]")) {
       // right after the next meal is eaten (the dinner waits for this task, so not at the day's end)
       deferred.add(it.id);
       const here = ITEMS.indexOf(it);

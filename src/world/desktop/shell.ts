@@ -98,7 +98,7 @@ export interface ShellModel {
    * label (`work.start` / `work.resume` / `work.allDone`), whether it can be pressed, and whether
    * 退出工作模式 is drawn (not while a game runs). Absent: 开始工作, pressable, with the exit.
    */
-  readonly work?: { readonly label: "work.start" | "work.resume" | "work.allDone"; readonly enabled: boolean; readonly exit: boolean };
+  readonly work?: { readonly label: "work.start" | "work.resume" | "work.allDone"; readonly enabled: boolean; readonly exit: boolean; readonly hold?: "hungry" | "waiting" };
 }
 
 // ——— coach marks (onboarding-steps R1) ————————————————————————————————————————————————
@@ -302,7 +302,7 @@ function dock(m: ShellModel, hides = false): SafeHtml {
  */
 function workBar(m: ShellModel): SafeHtml {
   const w = m.work ?? { label: "work.start" as const, enabled: true, exit: true };
-  const start = html`<button type="button" class="wk-start" data-action="work-start"${w.enabled ? null : html` disabled`}>${tr(w.label)}</button>`;
+  const start = html`<button type="button" class="wk-start" data-action="work-start"${w.enabled ? null : html` disabled`}${w.hold ? html` data-hold="${w.hold}"` : null}>${tr(w.label)}</button>`;
   const exit = w.exit ? html`<button type="button" class="wk-exit" data-action="work-exit">${tr("work.exit")}</button>` : null;
   return html`<div class="work-bar">${start}${exit}</div>`;
 }

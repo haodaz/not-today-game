@@ -63,6 +63,8 @@ export interface WorkBar {
   readonly label: "work.start" | "work.resume" | "work.allDone";
   readonly enabled: boolean;
   readonly exit: boolean;
+  /** hunger (2026-11-20): why the primary is held when it is held for the stomach's sake (the shell writes it as data-hold). */
+  readonly hold?: WorkHold;
 }
 
 /**
@@ -84,7 +86,8 @@ export function workBar(state: State, events: readonly GameEvent[], session: Pic
   const now = workNow(state, events, session);
   const exit = !(now?.running ?? false);
   // a started game runs to its end whatever the stomach says; a task not started waits for the meal
-  if (now && !now.started && workHold(state, { loop: session.loop ?? null }) !== null) return { label: "work.start", enabled: false, exit };
+  const hold = now && !now.started ? workHold(state, { loop: session.loop ?? null }) : null;
+  if (hold !== null) return { label: "work.start", enabled: false, exit, hold };
   if (now) return { label: now.started ? "work.resume" : "work.start", enabled: true, exit };
   if (allWorkDone(state, events)) return { label: "work.allDone", enabled: false, exit };
   return { label: "work.start", enabled: false, exit };
