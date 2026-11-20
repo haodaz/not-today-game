@@ -155,12 +155,10 @@ describe("看一眼桌子: entering 桌子", () => {
     const { ctx } = ctxOf(store, "room");
     act(ctx, "view", { view: "desk" });
     expect(done(store, "desk")).toBe(false);
+    // 2026-11-20: on day 1 看一眼桌子 opens after dinner is eaten, so night has fallen by then and
+    // entering 桌子 counts at once.
     completeUntil(store, "desk");
-    // Unlocked, but night has not fallen (the box and the pickup are still to do): not yet.
-    act(ctx, "view", { view: "room" });
-    act(ctx, "view", { view: "desk" });
-    expect(done(store, "desk")).toBe(false);
-    completeUntil(store, "desk", { all: true, skip: ["desk"] });
+    expect(nightfallReached(loopContext(store.getState(), store.getEvents())!)).toBe(true);
     act(ctx, "view", { view: "room" });
     act(ctx, "view", { view: "desk" });
     expect(done(store, "desk")).toBe(true);
@@ -200,10 +198,10 @@ describe("躺下: the bed in 房间", () => {
     expect(ctx.session.dialogue.queue).toHaveLength(1);
     ctx.session.dialogue = { queue: [], line: 0 };
     // Night falls (every required day item done); dinner, desk and shutdown are still to do.
-    completeUntil(store, "dinner", { all: true, skip: ["dinner", "desk", "shutdown", "chat"] });
+    completeUntil(store, "dinner", { all: true, skip: ["dinner", "dpick", "deat", "desk", "shutdown", "chat"] });
     expect(nightfallReached(loopContext(store.getState(), store.getEvents())!)).toBe(true);
     act(ctx, "bed");
-    expect(ctx.session.dialogue.queue).toEqual(line("d1:bed:locked", "room.bed.locked"));
+    expect(ctx.session.dialogue.queue).toEqual(line("d1:bed:locked:hungry", "room.bed.hungry")); // 2026-11-20: dinner first
     ctx.session.dialogue = { queue: [], line: 0 };
     // Chat is optional: the bed opens without it.
     completeUntil(store, "bed", { all: true, skip: ["chat"] });

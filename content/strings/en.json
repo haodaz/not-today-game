@@ -1330,5 +1330,9 @@
   "launch.name.laozhou": "Lao Zhou",
   "compare.diffNote": "Each card is the whole page; the marked lines are where the versions differ.",
   "obj.chick.caption": "A next · B do · C back",
-  "obj.chick.full": "That's all it can take today."
+  "obj.chick.full": "That's all it can take today.",
+  "room.bed.hungry": "Haven’t eaten. Can’t sleep on an empty stomach.",
+  "room.bed.screen": "The screen is still on. Shut it down, then sleep.",
+  "room.bed.hungry.kuro": "You haven’t eaten.",
+  "room.bed.screen.kuro": "The screen is still on."
 }

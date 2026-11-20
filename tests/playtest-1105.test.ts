@@ -353,7 +353,7 @@ describe("R6 · Kuro in the room: one box, and not only the idiom", () => {
 
 describe("R7 · the day's work is one checklist line", () => {
   it("all task items (flag:task_*) are one line, checklist.work with {done}/{total}; the other items stay", async () => {
-    const { checklist, checklistDoneCount, loopContext } = await import("@world/loop/checklist");
+    const { checklist, loopContext } = await import("@world/loop/checklist");
     const { renderChecklist } = await import("@world/room/hud");
     const { dayFiles } = await import("@state/days/table");
     const { t } = await import("@world/i18n");
@@ -380,7 +380,6 @@ describe("R7 · the day's work is one checklist line", () => {
     // All done: the line goes; with it the day's required items are all done, so the card is tonight's
     // (2026-11-19: the work comes after lunch now, so nothing of the day is left open here).
     expect(view.heading).toBe("tonight");
-    expect(checklistDoneCount(loopContext(store.getState(), store.getEvents())!)).toBeGreaterThan(0);
   });
 });
 

@@ -31,13 +31,14 @@ const useAts = (store: Store) => store.getEvents().filter((e) => e.kind === "use
 describe("R1 · the bed after nightfall with work left", () => {
   it("says room.bed.locked from where the player stands; no lying down", () => {
     const store = atDay(1);
-    completeUntil(store, "dinner", { all: true, skip: ["dinner", "desk", "shutdown", "chat"] });
+    completeUntil(store, "dinner", { all: true, skip: ["dinner", "dpick", "deat", "desk", "shutdown", "chat"] });
     for (const view of ["bed", "room"] as const) {
       const r = rig(store, view, { beat: "desk", time: "18:30" });
       r.act("bed");
       expect(r.session.view, view).toBe(view);
-      expect(r.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:bed:locked"]);
-      expect(r.lines()).toEqual([t("room.bed.locked")]);
+      // 2026-11-20: dinner not eaten is what holds the bed on day 1, in the protagonist's word
+      expect(r.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:bed:locked:hungry"]);
+      expect(r.lines()).toEqual([t("room.bed.hungry")]);
     }
   });
 });

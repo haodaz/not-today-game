@@ -49,7 +49,7 @@ import { CAMERA_KEYS, DICT_KEYS, FLIPPERS, SHEET_GONE_MS, SHEET_SLIDE_MS, TAPE_K
 import { CAMERA_FLASH_MS, cameraShot, type CameraState } from "@world/objects/plain";
 import { DEVELOP_BLANK_MS, DEVELOP_MS, ON_THE_SPOT_DAY, photoKey, roomFacingOf, roomPhotoOn, sheetsLeft } from "@state/photos";
 import { screenPlaceOf } from "@world/desktop/files/album";
-import { booted, checklist, deskMeal, itemStates, loopContext, mealToOrder, nightfallReached, openItemFor, openTask, type ChecklistView } from "@world/loop/checklist";
+import { booted, checklist, deskMeal, itemStates, loopContext, mealToOrder, nightfallReached, openItemFor, openTask, requiredPending, type ChecklistView } from "@world/loop/checklist";
 import type { EventToken, SayLine } from "@state/days/table";
 import { messageActions } from "@world/desktop/messages/actions";
 import { CROSSFADE_MS, MOTION, viewMoveMs } from "@world/motion/timing";
@@ -985,8 +985,15 @@ export const loopActions: Record<string, ActionHandler> = {
       return;
     }
     // gates R1: work left: one line from where the player stands; no lying down to get up again.
+    // Author 2026-11-20 (「睡前判断是否吃饱，是否关机」): a meal not eaten and a screen still on each get
+    // their own word — the protagonist's on day 1 (the story teaches it), Kuro's after that.
     if (!openFor(ctx, (e) => e.type === "lieDown")) {
-      session.dialogue = push(session.dialogue, { key: `d${day}:bed:locked`, lines: [{ k: "inner", t: t("room.bed.locked") }], ending: { kind: "none" } });
+      const pending = lc ? requiredPending(lc) : [];
+      const hungry = pending.some((it) => it.done.kind === "event" && it.done.event.type === "eat");
+      const screen = pending.some((it) => it.done.kind === "event" && it.done.event.type === "beat" && it.done.event.beat === "shutdown");
+      const why = hungry ? "hungry" : screen ? "screen" : null;
+      const line: SayLine = why === null ? { k: "inner", t: t("room.bed.locked") } : day === 1 ? { k: "inner", t: t(`room.bed.${why}`) } : { k: "speaker", who: "kuro", t: t(`room.bed.${why}.kuro`) };
+      session.dialogue = push(session.dialogue, { key: `d${day}:bed:locked:${why ?? "work"}`, lines: [line], ending: { kind: "none" } });
       ctx.rerender();
       return;
     }

@@ -423,9 +423,39 @@
       "when": "night"
     },
     {
+      "id": "dpick",
+      "text": "Go get it at the door.",
+      "unlock": "event:delivery:arrives:dinner",
+      "done": "event:pickup:dinner",
+      "required": true,
+      "when": "night",
+      "sfx": "doorbell",
+      "onUnlock": {
+        "say": [
+          {
+            "k": "sfx",
+            "t": "Ding-dong.",
+            "sfx": "doorbell"
+          },
+          {
+            "k": "inner",
+            "t": "Dinner is here."
+          }
+        ]
+      }
+    },
+    {
+      "id": "deat",
+      "text": "The table by the window. Eat.",
+      "unlock": "done:dpick",
+      "done": "event:eat:dinner",
+      "required": true,
+      "when": "night"
+    },
+    {
       "id": "desk",
       "text": "Go to the desk and take a look.",
-      "unlock": "done:reply",
+      "unlock": "done:deat",
       "done": "event:beat:desk",
       "required": true,
       "when": "night"
