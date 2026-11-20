@@ -171,8 +171,6 @@ export interface Session {
   collection: Collection;
   /** The gamebook reader is open (title-page FR4; bedside-book). */
   bookOpen: boolean;
-  /** run-diary: the spread of the diary shown while the book is open (reset to the last written day's on opening). */
-  bookSpread: number;
   /** status-panel: the character panel (人物) is open over the view. */
   statusOpen: boolean;
   /** meters-v2 §3: the day the first late chat turn was taken (the `chat.late` hint has had its once). */
@@ -604,7 +602,6 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     boss: null,
     collection: EMPTY_COLLECTION,
     bookOpen: false,
-    bookSpread: 0,
     statusOpen: false,
     chatLateDay: null,
     stare: null,

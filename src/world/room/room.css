@@ -985,25 +985,6 @@
 /* run-diary (author 2026-11-16): the run's book is its diary, an open spread over a full-screen dim. Two paper pages
    side by side (~1180 × 760 on the 1600 × 900 stage), a gutter shadow, the page numbers in the outer bottom corners;
    a click on a half turns (the halves are transparent buttons over the pages). Nothing scrolls. */
-.book-reader.diary{background:transparent}
-.book-reader.diary .bk-dim{position:absolute;inset:0;background:rgba(10,10,12,.72)}
-.book-reader.diary .bk-spread{position:absolute;left:50%;top:50%;width:1180px;height:760px;transform:translate(-50%,-50%);display:grid;grid-template-columns:1fr 1fr;border-radius:6px;box-shadow:0 24px 60px rgba(0,0,0,.5);overflow:hidden}
-.book-reader.diary .bk-page{position:relative;overflow:hidden;background:rgba(240,236,228,.97);color:#1d2129;padding:56px 64px 64px;font-size:17px;line-height:1.9}
-.book-reader.diary .bk-page.left{border-radius:6px 0 0 6px;background:linear-gradient(90deg,rgba(240,236,228,.97) 88%,rgba(214,208,198,.97))}
-.book-reader.diary .bk-page.right{border-radius:0 6px 6px 0;background:linear-gradient(270deg,rgba(240,236,228,.97) 88%,rgba(214,208,198,.97))}
-.book-reader.diary .bk-body{height:100%;overflow:hidden}
-.book-reader.diary .bk-body p{margin:0}
-.book-reader.diary .bk-head{margin:0 0 .2em;font-size:26px;font-weight:600;letter-spacing:.08em;line-height:1.5}
-.book-reader.diary .bk-body .bk-weather{font-size:14px;color:#7a7266;margin-bottom:1em}
-.book-reader.diary .bk-body .bk-blank{color:#8a7f70;font-style:italic}
-.book-reader.diary .bk-no{position:absolute;bottom:22px;font-size:12px;color:#8a7f70;letter-spacing:.1em}
-.book-reader.diary .bk-page.left .bk-no{left:28px}
-.book-reader.diary .bk-page.right .bk-no{right:28px}
-.book-reader.diary .bk-gutter{position:absolute;left:50%;top:0;bottom:0;width:48px;transform:translateX(-50%);background:linear-gradient(90deg,transparent,rgba(0,0,0,.14) 45%,rgba(0,0,0,.2) 50%,rgba(0,0,0,.14) 55%,transparent);pointer-events:none}
-.book-reader.diary .bk-turn{position:absolute;top:0;bottom:0;width:50%;border:0;padding:0;margin:0;background:transparent;cursor:pointer}
-.book-reader.diary .bk-turn.prev{left:0;cursor:w-resize}
-.book-reader.diary .bk-turn.next{right:0;cursor:e-resize}
-.book-reader.diary .bk-turn:disabled{cursor:default}
 /* room-3d-window / room-3d-wake: the code-built room over the whole stage — above the photo, its hits and
    the edge hints, below the held layer (same z, later), the dialogue box (16), 道具 (17) and the HUD tiles (18). */
 .room > .outside-host{position:absolute;inset:0;z-index:15;overflow:hidden;pointer-events:auto}

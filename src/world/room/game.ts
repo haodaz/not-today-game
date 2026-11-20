@@ -24,8 +24,6 @@ import { shellActions, type ActionContext, type ActionHandler } from "@world/des
 import { appOn, buildShell, taskPageId, VIEWS, type Session, type View } from "@world/desktop/model";
 import { bringToFront, closeApp } from "@world/desktop/placement";
 import { leaveControl, renderDesktop, shownStill, type AppId } from "@world/desktop/shell";
-import { clampSpread, diaryBookPages, diaryOpenSpread } from "./collection";
-import { diary, diaryDays } from "@state/diary";
 import { placeOrder } from "@world/delivery/commands";
 import { phonePage } from "@world/delivery/app";
 import { nextInputs, startDoor, stepDoor, type DoorInput } from "@world/delivery/door";
@@ -1232,8 +1230,6 @@ export const loopActions: Record<string, ActionHandler> = {
     // 睡 / 再待会儿: sleeping goes on as lying down always did; staying changes nothing.
     if (q.ending.kind === "bedAsk") {
       if (data.choice !== "sleep" && data.choice !== "stay" && data.choice !== "read" && !(data.choice === "record" && q.ending.record)) return;
-      // run-diary: 看书 is only there once a day has been written
-      if (data.choice === "read" && !hasDiary(ctx)) return;
       ctx.session.dialogue = finishChoice(ctx.session.dialogue);
       settleSession(ctx.session);
       if (data.choice === "sleep") loopActions["sleep"]!(ctx, {} as DOMStringMap, null as never);
@@ -1279,7 +1275,6 @@ export const loopActions: Record<string, ActionHandler> = {
     // lying-view R6: 起床 goes up to 床 (and the day's `rise` beat plays there, once); 再躺一会儿 stays.
     if (q.ending.kind === "riseAsk") {
       if (data.choice !== "up" && data.choice !== "stay" && data.choice !== "read") return;
-      if (data.choice === "read" && !hasDiary(ctx)) return;
       ctx.session.dialogue = finishChoice(ctx.session.dialogue);
       settleSession(ctx.session);
       if (data.choice === "up") getUp(ctx);
@@ -1786,7 +1781,7 @@ export const loopActions: Record<string, ActionHandler> = {
 
   // bedside-book: the book on the headboard shelf, from day 1: the take line, then the reader (standing).
   "book-open"(ctx) {
-    if (ctx.session.bookOpen || ctx.session.book || !hasDiary(ctx)) return;
+    if (ctx.session.bookOpen || ctx.session.book) return;
     takeBook(ctx, "spot");
     ctx.rerender();
   },
@@ -1804,17 +1799,6 @@ export const loopActions: Record<string, ActionHandler> = {
   "book-close"(ctx) {
     if (!ctx.session.bookOpen) return;
     closeBook(ctx);
-    ctx.rerender();
-  },
-  // run-diary: a click on the spread's right half (→ / Space / PageDown) turns forward, the left half
-  // (← / PageUp) back; the first and last spreads do not wrap.
-  "book-turn"(ctx, data) {
-    if (!ctx.session.bookOpen) return;
-    const by = data.by === "-1" ? -1 : 1;
-    const pages = diaryBookPages(diary(ctx.store.getState(), ctx.store.getEvents()));
-    const next = clampSpread(pages, ctx.session.bookSpread + by);
-    if (next === ctx.session.bookSpread) return;
-    ctx.session.bookSpread = next;
     ctx.rerender();
   },
 
@@ -2162,14 +2146,8 @@ function openBook(ctx: ActionContext): void {
     ctx.bookRead?.();
   }
   session.bookOpen = true;
-  // run-diary: the book opens on the day just lived (its first spread), not on page 1.
-  session.bookSpread = diaryOpenSpread(diaryBookPages(diary(ctx.store.getState(), ctx.store.getEvents())));
 }
 
-/** run-diary: there is a book once a day has been written (today counts after its shutdown beat). */
-function hasDiary(ctx: ActionContext): boolean {
-  return diaryDays(ctx.store.getState(), ctx.store.getEvents()) >= 1;
-}
 
 /** Closed: the first time's mutter; then the ask the read came from, again (the player is still lying there). */
 function closeBook(ctx: ActionContext): void {
@@ -2310,11 +2288,6 @@ export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
   if (ctx.session.bookOpen) {
     if (e.key === "Escape") {
       loopActions["book-close"]!(ctx, {} as DOMStringMap, null as never);
-      return true;
-    }
-    const by = e.key === "ArrowRight" || e.key === " " || e.key === "PageDown" ? "1" : e.key === "ArrowLeft" || e.key === "PageUp" ? "-1" : null;
-    if (by) {
-      loopActions["book-turn"]!(ctx, { by } as DOMStringMap, null as never);
       return true;
     }
     if (e.key === "Enter" || e.key === "Backspace") return true;
