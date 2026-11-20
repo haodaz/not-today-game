@@ -9,6 +9,7 @@ import { isWorkTask, itemStates, loopContext } from "@world/loop/checklist";
 import type { ActionContext } from "../controller";
 import { frontApp, type Session } from "../model";
 import { openWork } from "./work";
+import { tooHungryToWork } from "@state/hunger";
 
 /** Work mode: on the screen, 工作台 in front with its full chrome (the shell's `dockHides` case). */
 export const inWorkMode = (s: Pick<Session, "view" | "focus" | "leftApp" | "rightApp" | "wbFull">): boolean => s.view === "desktop" && s.wbFull && frontApp(s) === "workbench";
@@ -70,9 +71,20 @@ export interface WorkBar {
  * With no task open yet and work still to come, 开始工作 waits (disabled). 退出工作模式 is not there
  * while a game runs.
  */
-export function workBar(state: State, events: readonly GameEvent[], session: Pick<Session, "launched" | "workShow">): WorkBar {
+/** hunger (author 2026-11-20): why 开始工作 cannot be pressed now, if it cannot. */
+export type WorkHold = "hungry" | "waiting" | null;
+export function workHold(state: State, session: Pick<Session, "loop">): WorkHold {
+  if (tooHungryToWork(state)) return "hungry";
+  // 「外卖点了之后 … 这期间不能工作，但是用户可以干别的」
+  if ((session.loop?.orders.size ?? 0) > 0) return "waiting";
+  return null;
+}
+
+export function workBar(state: State, events: readonly GameEvent[], session: Pick<Session, "launched" | "workShow"> & Partial<Pick<Session, "loop">>): WorkBar {
   const now = workNow(state, events, session);
   const exit = !(now?.running ?? false);
+  // a started game runs to its end whatever the stomach says; a task not started waits for the meal
+  if (now && !now.started && workHold(state, { loop: session.loop ?? null }) !== null) return { label: "work.start", enabled: false, exit };
   if (now) return { label: now.started ? "work.resume" : "work.start", enabled: true, exit };
   if (allWorkDone(state, events)) return { label: "work.allDone", enabled: false, exit };
   return { label: "work.start", enabled: false, exit };

@@ -1337,5 +1337,10 @@
   "room.bed.screen.kuro": "The screen is still on.",
   "checklist.wait.head": "Delivery",
   "checklist.wait.text": "On its way",
-  "wb.hello.none": "No work left today. Look around as you like."
+  "wb.hello.none": "No work left today. Look around as you like.",
+  "status.fullness": "Fullness",
+  "hunger.work.me": "Haven’t eaten; my hands shake. Eat something first.",
+  "hunger.work.kuro": "You haven’t eaten. Eat first.",
+  "hunger.wait.me": "The food isn’t here yet. Start when it is.",
+  "hunger.wait.kuro": "The food is on its way. Start when it is here."
 }

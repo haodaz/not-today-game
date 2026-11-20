@@ -110,6 +110,10 @@
 /* wait-card (author 2026-11-20): the list and the delivery card stack at the top left; the list keeps its class for the motion layer */
 .room .hud-left{position:absolute;left:28px;top:28px;width:280px;display:flex;flex-direction:column;gap:10px;z-index:12}
 .room .hud-left .list{position:static;left:auto;top:auto;width:auto}
+/* empty-box (author 2026-11-20): the eaten meal's box on the table up close, not a button */
+.room .table-things .slot.meal.done{pointer-events:none}
+.room .table-things .slot.meal.done img.done{filter:grayscale(.6) brightness(.9)}
+.room .table-things .slot.meal.done object{display:block;width:100%;height:100%}
 .room .wait-card{background:var(--paper);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.35);border-radius:10px;padding:12px 16px;box-shadow:0 6px 24px rgba(0,0,0,.12);font-size:15px;line-height:1.7;color:var(--ink)}
 .room .wait-card .h{font-size:11px;letter-spacing:.2em;color:#8a7f70;margin-bottom:6px}
 .room .wait-card .it{display:flex;gap:8px;align-items:baseline}
@@ -965,6 +969,11 @@
 .status .st-bar b{position:absolute;left:0;top:0;bottom:0;background:#4a8b5c}
 .status .st-bar.san.band-1 b{background:#9a9a3c}.status .st-bar.san.band-2 b{background:#c08a2e}.status .st-bar.san.band-3 b,.status .st-bar.san.band-4 b{background:#a4372f}
 .status .st-bar.san.low b{animation:st-flicker 1s steps(1) infinite}
+/* hunger (author 2026-11-20): 饱食度 bar and the number that floats off the status tile */
+.status .st-bar.full b{background:#c98a3a}.status .st-bar.full.hungry b{background:#b4452f}
+.hud-tiles .tile-wrap{position:relative;display:inline-block}
+.hud-tiles .st-float{position:absolute;left:50%;top:-6px;transform:translateX(-50%);font-weight:700;font-size:16px;color:#c98a3a;text-shadow:0 1px 4px rgba(0,0,0,.4);pointer-events:none;animation:st-float 2.2s ease-out both}
+@keyframes st-float{from{opacity:0;translate:0 6px}15%{opacity:1}to{opacity:0;translate:0 -34px}}
 @keyframes st-flicker{0%{opacity:1}85%{opacity:.25}100%{opacity:1}}
 .status .st-bar.assim{grid-column:2/4}
 .status .st-bar.assim b{background:#8b2f2a}

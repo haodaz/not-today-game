@@ -80,7 +80,8 @@ import { pointed } from "./pointer";
 import { itemPageId, readingPageId, type KuroCloses } from "@state/closes";
 import { browserPage } from "@world/desktop/browser/data";
 import { composerActions, queueLaunchIntro, workbenchActions, workbenchUiActions } from "@world/desktop/workbench/actions";
-import { gameRunning, workNow } from "@world/desktop/workbench/work-mode";
+import { gameRunning, workHold, workNow } from "@world/desktop/workbench/work-mode";
+import { hungerNumbers, tooHungryToSleep } from "@state/hunger";
 import { meetingActions } from "@world/desktop/workbench/meeting";
 import { taskShellActions } from "@world/desktop/workbench/shell";
 import { boardActions, lockFaceMove } from "@world/desktop/workbench/board";
@@ -144,7 +145,7 @@ function renderGameBody(store: Store, session: Session, nowMs: number): SafeHtml
     // screen (the pet in the monitor is the one); R5 (2026-11-08): the checklist's current line in
     // the top bar, not a card over the window (the window fills the frame; a card hid 听听's list).
     const lc = loopContext(state, events);
-    return html`${renderDesktop({ ...shell, nextItem: lc ? nextItemText(checklistNow(lc, state, events, session)) : null })}${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${host}${launchLayer(state, session)}${workLayer({ state, events, session, nowMs, startDay: store.getStartDay() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${eggFlash(session, nowMs)}${dlgLayer(dlg, session, readsOn, !maskInModal)}<div class="hud-host">${(shell.onboard === null || shell.onboard === undefined) && !gameRunning(state, events, session) ? leaveControl() : null}${hudTiles(session, state, { settings: false })}${itemsPanel(state, events, session)}${settingsPanel(session)}${statusPanel(state, events, session)}</div>`;
+    return html`${renderDesktop({ ...shell, nextItem: lc ? nextItemText(checklistNow(lc, state, events, session)) : null })}${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${host}${launchLayer(state, session)}${workLayer({ state, events, session, nowMs, startDay: store.getStartDay() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${eggFlash(session, nowMs)}${dlgLayer(dlg, session, readsOn, !maskInModal)}<div class="hud-host">${(shell.onboard === null || shell.onboard === undefined) && !gameRunning(state, events, session) ? leaveControl() : null}${hudTiles(session, state, { settings: false, nowMs })}${itemsPanel(state, events, session)}${settingsPanel(session)}${statusPanel(state, events, session)}</div>`;
   }
   // The box does not jump (dialogue correction 2026-11-02): in every view it is anchored to the
   // viewport in the same fixed layer, not to the stage (whose size differs between views). The
@@ -648,6 +649,8 @@ function arrive(ctx: ActionContext, view: View, data: DOMStringMap): void {
   // A finished door beat is forgotten once the player looks away (polish W1).
   if (ctx.session.view === "door" && view !== "door" && ctx.session.door?.state === "onDesk") ctx.session.door = null;
   const from = ctx.session.view;
+  // empty-box: stepping back from the table clears the box that was left on it (author 2026-11-20)
+  if (from === "table" && view !== "table") ctx.session.emptyBox = null;
   ctx.session.view = view;
   if (from !== view && view !== "desktop") startCam(ctx, from, view);
   // The morning's second half (author 2026-11-10): the rise lines are said facing the bed wall; the
@@ -937,6 +940,10 @@ export const loopActions: Record<string, ActionHandler> = {
       return;
     }
     stepOnce(ctx, `eat:${at.meal}`);
+    // author 2026-11-20: 「空盒在近景留着，吃完留在桌上。退回屋子消失，再看小桌消失。」
+    ctx.session.emptyBox = at.meal;
+    // hunger: the number floats off the status tile when the card is closed
+    ctx.session.fullnessFloat = { delta: hungerNumbers().meal, at: ctx.now?.() ?? Date.now() };
     ctx.rerender();
   },
   // playtest-1105 R5: the table itself is a close view, like 桌子: a click leans in to the tabletop
@@ -993,7 +1000,8 @@ export const loopActions: Record<string, ActionHandler> = {
     // their own word — the protagonist's on day 1 (the story teaches it), Kuro's after that.
     if (!openFor(ctx, (e) => e.type === "lieDown")) {
       const pending = lc ? requiredPending(lc) : [];
-      const hungry = pending.some((it) => it.done.kind === "event" && it.done.event.type === "eat");
+      // hunger (2026-11-20): below needSleep with a meal still to eat counts as hungry too
+      const hungry = pending.some((it) => it.done.kind === "event" && it.done.event.type === "eat") || (tooHungryToSleep(store.getState()) && pending.some((it) => it.done.kind === "event" && (it.done.event.type === "order" || it.done.event.type === "pickup" || it.done.event.type === "eat")));
       const screen = pending.some((it) => it.done.kind === "event" && it.done.event.type === "beat" && it.done.event.beat === "shutdown");
       const why = hungry ? "hungry" : screen ? "screen" : null;
       const line: SayLine = why === null ? { k: "inner", t: t("room.bed.locked") } : day === 1 ? { k: "inner", t: t(`room.bed.${why}`) } : { k: "speaker", who: "kuro", t: t(`room.bed.${why}.kuro`) };
@@ -1388,6 +1396,15 @@ export const loopActions: Record<string, ActionHandler> = {
     const events = ctx.store.getEvents();
     const now = workNow(state, events, ctx.session);
     if (!now) return;
+    // hunger (author 2026-11-20): too hungry, or the meal still on its way — one line, nothing opens;
+    // the protagonist's on day 1 (the story teaches it), Kuro's after that
+    const hold = now.started ? null : workHold(state, ctx.session);
+    if (hold !== null) {
+      const line: SayLine = state.day === 1 ? { k: "inner", t: t(`hunger.${hold === "hungry" ? "work" : "wait"}.me`) } : { k: "speaker", who: "kuro", t: t(`hunger.${hold === "hungry" ? "work" : "wait"}.kuro`) };
+      ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${state.day}:work:${hold}`, lines: [line], ending: { kind: "none" } });
+      ctx.rerender();
+      return;
+    }
     const { task, key } = now;
     ctx.session.wbFull = true;
     ctx.session.focus = bringToFront(ctx.session, "workbench");

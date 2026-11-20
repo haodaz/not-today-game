@@ -368,6 +368,11 @@
             "where": "screen:msgs:boss"
           },
           {
+            "k": "inner",
+            "t": "早饭没吃。空着肚子，活是干不动的。",
+            "where": "screen:msgs:boss"
+          },
+          {
             "k": "speaker",
             "who": "kuro",
             "t": "点个餐吧。",

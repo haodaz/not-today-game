@@ -37,7 +37,15 @@
     "assimAssist": 3,
     "assimKuroCardKept": 3,
     "assimUpgrade": 8,
-    "_assimilationNote": "three-meters spec (2026-11-03): letting Kuro work raises assimilation, not SAN loss; assimilation at max is the bad ending, the good one needs it ≤ assimilationGoodMax."
+    "_assimilationNote": "three-meters spec (2026-11-03): letting Kuro work raises assimilation, not SAN loss; assimilation at max is the bad ending, the good one needs it ≤ assimilationGoodMax.",
+    "hunger": {
+      "meal": 40,
+      "work": 30,
+      "sleep": 30,
+      "needWork": 30,
+      "needSleep": 30,
+      "_note": "饱食度（作者 2026-11-20）：起床 20 够不上干活；一顿 +40；交一件活 -30；睡一夜 -30；干活要 ≥30；睡觉要 ≥30（没吃就说去吃）。没有外卖的日子不卡。"
+    }
   },
   "day": {
     "type": "int",
@@ -339,5 +347,14 @@
     "note": "Added by Kiro 2026-10-31 for the san-and-endings spec (docs/kiro-log.md). Set once by the `ending` event: bad at the shutdown beat after SAN reaches 0; survive / good when the last night ends. After it the run takes no more events.",
     "changedBy": "ending event (san-and-endings spec)",
     "default": "none"
+  },
+  "fullness": {
+    "type": "int",
+    "range": [
+      0,
+      100
+    ],
+    "changedBy": "hunger (author 2026-11-20): +meal on eat:<meal>, -work on a task handed in, -sleep on lieDown; see src/state/hunger.ts",
+    "default": 20
   }
 }

@@ -98,7 +98,9 @@ describe("lieDown -> day", () => {
   it("adds exactly one and changes nothing else", () => {
     const after = applyEvent(baseState(), at({ kind: "lieDown" }));
     expect(after.day).toBe(baseState().day + 1);
-    onlyChanged(baseState(), after, ["day"]);
+    // hunger (2026-11-20): a night slept also costs fullness
+    expect(after.fullness).toBeLessThanOrEqual(baseState().fullness);
+    onlyChanged(baseState(), after, ["day", "fullness"]);
   });
 });
 

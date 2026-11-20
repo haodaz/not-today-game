@@ -291,8 +291,8 @@ function windowThings(state: State, events: readonly GameEvent[]): SafeHtml | nu
 }
 
 /** 窗's table up close (playtest-1105 R5): the same meal slot, large on the tabletop; empty table, nothing. */
-function tableThings(state: State, events: readonly GameEvent[]): SafeHtml | null {
-  const meal = mealSlot(state, events);
+function tableThings(state: State, events: readonly GameEvent[], session?: Pick<Session, "emptyBox">): SafeHtml | null {
+  const meal = mealSlot(state, events, session);
   return meal ? html`<div class="facing-things table-things">${placedAt("meal", TABLE_SHOT.meal, meal)}</div>` : null;
 }
 
@@ -430,15 +430,20 @@ export function itemsPanel(state: State, events: readonly GameEvent[], session: 
  * empty box stays until the next meal is taken in: `<sprite>_done.png` where content has one, else
  * the food image greyed (the <object> falls back to its <img> when the _done file is missing).
  */
-function mealSlot(state: State, events: readonly GameEvent[]): SafeHtml | null {
+function mealSlot(state: State, events: readonly GameEvent[], session?: Pick<Session, "emptyBox">): SafeHtml | null {
   const lc = loopContext(state, events);
   const at = lc ? deskMeal(lc) : null;
   if (!lc || !at) return null;
   const order = ordersOn(events, state.day)[at.meal];
   const sprite = order ? itemOf(order.shopId, order.itemId)?.sprite : undefined;
   const food = sprite ? `/${sprite}.png` : null;
-  // author 2026-11-11: eaten, the box is gone (「外卖盒吃完，离开桌子消失就行，不能一直放在那里」).
-  if (at.eaten) return null;
+  // author 2026-11-20: eaten, the empty box stays on the table up close until the player steps back
+  // (session.emptyBox, cleared on leaving the table); then it is gone (her 11-11 rule for the far view).
+  if (at.eaten) {
+    if (session?.emptyBox !== at.meal || !sprite) return null;
+    // the <object> falls back to the greyed food when no <sprite>_done.png exists
+    return html`<div class="slot meal done" aria-hidden="true"><object data="/${sprite}_done.png" type="image/png"><img class="done" src="${food!}" alt=""></object></div>`;
+  }
   return html`<button type="button" class="slot meal" data-action="loop-eat" data-meal="${at.meal}" aria-label="${t("room.meal")}">${food ? html`<img src="${food}" alt="">` : null}</button>`;
 }
 
@@ -699,7 +704,7 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const flat = isFlatFacing(view) ? html`${flatHits(view, arrived)}${view === "window" ? html`${lookHits("window")}${glassHit()}${switchHit("window")}${windowThings(state, events)}` : null}` : null;
   // playtest-1105 R4: 门's things to touch sit under the door beat's own spot.
   // playtest-1105 R5: 窗's table up close carries only the meal, large.
-  const table = view === "table" ? tableThings(state, events) : null;
+  const table = view === "table" ? tableThings(state, events, session) : null;
   // room-3d-desk R2: 桌子 is the shared room frame; its things are the room's, the game draws its marks over them
   const desk3d = desk3dOn(session);
   const scene = desk3d ? (waiting || dream ? null : deskMarks(state, events, session)) : waiting || dream ? null : lying ? ceilingHits() : door ? html`${lookHits("door")}${switchHit("door")}${doorContent(state, events, session)}` : hotView ? html`${shotHits(hotView, state, events)}${kept}` : (flat ?? table);
@@ -731,7 +736,7 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const nobox = !arrived && (view === "room" || view === "bed");
   // room-light-switch R3: by day the ceiling light makes the photo a little brighter (room.css, the backdrop only)
   const ceilDay = !dream && !desk3d && !isEvening(session.clock) && ceilLit(session);
-  return html`<div class="${cls("stage", "room", `${view}-view`, nobox && "nobox", ceilDay && "ceil-day", ceilingNight && "ceiling-night", raid && "raid", fade !== null && "m-late", dream && "scene-on", onEdge)}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${desk3d ? roomHost(state.day, session) : null}${renderScene(lineScene)}${scene}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${wakeHost(session)}${desk3d ? null : roomHost(state.day, session)}${bare ? null : list}${bare ? null : dayCorner(state, session, nowMs)}${bare ? null : itemsPanel(state, events, session)}${!bare && (view === "room" || view === "bed" || view === "window") ? casePanel(state, events, session, model.runId ?? "run", nowMs) : null}${view === "desk" ? printsView(state, events, session) : null}${held}${model.boxOutside || bare ? null : dialogueBox(state, events, session, nowMs)}${bare ? null : bottomRight(model)}${bare ? null : hudTiles(session, state, { settings: true })}${model.boxOutside || bare ? null : settingsPanel(session)}${model.boxOutside || bare ? null : statusPanel(state, events, session)}${session.bookOpen ? bookReader(bookUrl(state.names, daysLived(state, events)), session.bookOpened) : null}</div>`;
+  return html`<div class="${cls("stage", "room", `${view}-view`, nobox && "nobox", ceilDay && "ceil-day", ceilingNight && "ceiling-night", raid && "raid", fade !== null && "m-late", dream && "scene-on", onEdge)}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${desk3d ? roomHost(state.day, session) : null}${renderScene(lineScene)}${scene}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${wakeHost(session)}${desk3d ? null : roomHost(state.day, session)}${bare ? null : list}${bare ? null : dayCorner(state, session, nowMs)}${bare ? null : itemsPanel(state, events, session)}${!bare && (view === "room" || view === "bed" || view === "window") ? casePanel(state, events, session, model.runId ?? "run", nowMs) : null}${view === "desk" ? printsView(state, events, session) : null}${held}${model.boxOutside || bare ? null : dialogueBox(state, events, session, nowMs)}${bare ? null : bottomRight(model)}${bare ? null : hudTiles(session, state, { settings: true, nowMs })}${model.boxOutside || bare ? null : settingsPanel(session)}${model.boxOutside || bare ? null : statusPanel(state, events, session)}${session.bookOpen ? bookReader(bookUrl(state.names, daysLived(state, events)), session.bookOpened) : null}</div>`;
 }
 
 export { raidShowing };

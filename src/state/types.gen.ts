@@ -30,6 +30,7 @@ export interface State {
   judgement: { truth: number; values: number; bond: number; evidence: { day: unknown; eventId: unknown; note: unknown }[] };
   upgraded: Record<string, boolean>;
   ending: "none" | "bad" | "survive" | "good" | "collapse";
+  fullness: number;
 }
 
 export type StateKey = keyof State;

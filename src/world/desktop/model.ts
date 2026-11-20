@@ -174,6 +174,10 @@ export interface Session {
   bookOpen: boolean;
   /** book-cover (author 2026-11-20): the gamebook said its cover was opened — the reader goes dark behind it. */
   bookOpened: boolean;
+  /** empty-box (author 2026-11-20): the meal just eaten leaves its empty box on the table up close until the player steps back. */
+  emptyBox: "lunch" | "dinner" | null;
+  /** hunger (author 2026-11-20): the last fullness change, floated off the status tile while the card is closed. */
+  fullnessFloat: { readonly delta: number; readonly at: number } | null;
   /** status-panel: the character panel (人物) is open over the view. */
   statusOpen: boolean;
   /** meters-v2 §3: the day the first late chat turn was taken (the `chat.late` hint has had its once). */
@@ -606,6 +610,8 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     collection: EMPTY_COLLECTION,
     bookOpen: false,
     bookOpened: false,
+    emptyBox: null,
+    fullnessFloat: null,
     statusOpen: false,
     chatLateDay: null,
     stare: null,

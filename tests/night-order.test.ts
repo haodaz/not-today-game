@@ -46,3 +46,25 @@ describe("day 1's night order", () => {
     expect(bed()).not.toBe(t("room.bed.screen"));
   });
 });
+
+describe("the empty box (author 2026-11-20)", () => {
+  it("stays on the table up close after eating; stepping back clears it; the far view never shows it", async () => {
+    const { completeUntil } = await import("./complete-items");
+    const { renderRoom } = await import("@world/room/hud");
+    const store = createStore({ startDay: 1 });
+    completeUntil(store, "eat");
+    const session = initialSession(DEFAULT_CLOCK, "left", "window");
+    const ctx: ActionContext = { store, session, rerender: () => {}, later: () => {}, now: () => 0 };
+    const room = () => renderRoom({ state: store.getState(), events: store.getEvents(), session, nowMs: 0 }).value;
+    session.view = "table";
+    session.dialogue = { queue: [], line: 0 };
+    loopActions["loop-eat"]!(ctx, { meal: "lunch", now: "1" } as DOMStringMap, null as never);
+    expect(session.emptyBox).toBe("lunch");
+    expect(room()).toContain('class="slot meal done"');
+    expect(room()).toContain("_done.png");
+    loopActions["view"]!(ctx, { view: "window" } as DOMStringMap, null as never);
+    expect(session.emptyBox).toBeNull();
+    session.view = "table";
+    expect(room()).not.toContain("slot meal");
+  });
+});

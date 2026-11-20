@@ -37,7 +37,7 @@ const boardTask = (day: number): Task => {
 };
 /** A run on `day` with every item before `item` done. */
 function storeAt(day: number, item: string): Store {
-  const store = createStore({ startDay: day });
+  const store = createStore({ startDay: day, patch: { fullness: 100 } as never }); // fed: the work bar is not held by hunger here
   completeUntil(store, item);
   return store;
 }
@@ -86,7 +86,7 @@ describe("§1 the work bar", () => {
     store.appendEvent({ kind: "boardStep", taskId: tk.id, op: { t: "fill", slot: tk.board!.slots[0]!.id, card: tk.board!.slots[0]!.answer } });
     // a reload: the session knows nothing, the log does
     expect(workBar(store.getState(), store.getEvents(), rig(store).session)).toEqual({ label: "work.resume", enabled: true, exit: false });
-    const done = createStore({ startDay: 4 });
+    const done = createStore({ startDay: 4, patch: { fullness: 100 } as never });
     completeUntil(done, dayFile(4)!.items.at(-1)!.id, { all: true });
     expect(workBar(done.getState(), done.getEvents(), rig(done).session)).toMatchObject({ label: "work.allDone", enabled: false });
     const r = rig(done, { wbFull: true });

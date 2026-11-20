@@ -129,10 +129,13 @@ describe("the meal and the box", () => {
     const out = render(ctx);
     expect(placed(out, "meal")).toBe(rectStyle(WINDOW_SHOT.meal));
     expect(out).toMatch(/data-at="meal" style="[^"]+"><button type="button" class="slot meal" data-action="loop-eat" data-meal="lunch"/);
-    // author 2026-11-11: eating is asked at the table; eaten, the box is gone from the table.
+    // author 2026-11-11: eating is asked at the table; 2026-11-20: eaten, the empty box stays on the table
+    // up close until the player steps back; the far view (窗) never shows it.
     act(ctx, "loop-eat", { meal: "lunch" });
     act(ctx, "loop-eat", { meal: "lunch" });
     act(ctx, "loop-choice", { choice: "eat" });
+    expect(render(ctx)).toContain('class="slot meal done"');
+    act(ctx, "view", { view: "window" });
     const after = render(ctx);
     expect(placed(after, "meal")).toBeNull();
     expect(after).not.toContain("slot meal");

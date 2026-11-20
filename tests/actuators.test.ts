@@ -111,9 +111,13 @@ describe("吃: the meal on the little table under the window (room-turn R3)", ()
     act(ctx, "loop-eat", { meal: "lunch" });
     act(ctx, "loop-choice", { choice: "eat" });
     expect(done(store, "eat")).toBe(true);
+    // author 2026-11-20: eaten, the empty box stays on the table up close (not a button) until the player steps back
     const after = render(ctx);
-    expect(after).not.toContain("slot meal");
+    expect(after).toContain('class="slot meal done"');
     expect(after).not.toContain("loop-eat");
+    act(ctx, "view", { view: "window" });
+    ctx.session.view = "table";
+    expect(render(ctx)).not.toContain("slot meal");
   });
 
   it("nothing on the table before it is taken in", () => {

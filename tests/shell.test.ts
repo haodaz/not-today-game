@@ -83,7 +83,7 @@ const SRC = "/docs/player/day-01-space.html";
 
 /** Day 1 with task3 (the shell fixture) under way; the chick found (the lock's object). */
 function day1(): Store {
-  const store = createStore({ startDay: 1 });
+  const store = createStore({ startDay: 1, patch: { fullness: 100 } as never }); // fed (hunger 2026-11-20)
   store.appendEvent({ kind: "step", name: "rise", t: "09:03" }); store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
   store.appendEvent({ kind: "step", name: "openApp:msgs", t: "09:04" });
   store.appendEvent({ kind: "openLayer", objectId: "chick" });
@@ -555,7 +555,7 @@ import { shellActions } from "@world/desktop/controller";
 describe("R11.1 · a task without a board: the thread is the conversation, the surface the pane", () => {
   /** Day 1 with task1 (a 文档 task, no board) under way. */
   const onTask1 = () => {
-    const store = createStore({ startDay: 1 });
+    const store = createStore({ startDay: 1, patch: { fullness: 100 } as never }); // fed (hunger 2026-11-20)
     store.appendEvent({ kind: "step", name: "rise", t: "09:03" }); store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
     store.appendEvent({ kind: "step", name: "openApp:msgs", t: "09:04" });
     const h = harness(store);

@@ -1,4 +1,5 @@
 import fc from "fast-check";
+import { hungerNumbers } from "@state/hunger";
 import { describe, expect, it } from "vitest";
 import { f } from "@state/fday";
 import { fold, step } from "@state/replay";
@@ -57,6 +58,7 @@ describe("fold", () => {
   it("step applies the event and derives in one go", () => {
     const next = step(f(1), { kind: "lieDown", day: 1 });
     expect(next.day).toBe(2);
-    expect(next).toEqual(f(2));
+    // hunger (2026-11-20): a night slept costs fullness, so the stepped state is day 2's fresh state minus the night
+    expect(next).toEqual({ ...f(2), fullness: Math.max(0, f(1).fullness - hungerNumbers().sleep) });
   });
 });

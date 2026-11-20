@@ -1337,5 +1337,10 @@
   "room.bed.screen.kuro": "屏幕还开着。",
   "checklist.wait.head": "外卖",
   "checklist.wait.text": "外卖在路上",
-  "wb.hello.none": "今天没有活了。想看什么，自己翻。"
+  "wb.hello.none": "今天没有活了。想看什么，自己翻。",
+  "status.fullness": "饱食度",
+  "hunger.work.me": "没吃饭，手是抖的。先吃点东西。",
+  "hunger.work.kuro": "你还没吃饭。先吃。",
+  "hunger.wait.me": "外卖还没到。到了再开工。",
+  "hunger.wait.kuro": "外卖在路上。到了再开工。"
 }

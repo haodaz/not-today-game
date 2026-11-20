@@ -35,7 +35,7 @@ describe("the strip", () => {
   it("in the room the strip is drawn bottom-left; status-* passes the guide and the box's mask", () => {
     const store = createStore({ startDay: 1 });
     const out = renderRoom({ state: store.getState(), events: store.getEvents(), session: initialSession(DEFAULT_CLOCK, "left", "room") }).value;
-    expect(out).toContain('<div class="hud-tiles"><button type="button" class="status-btn" data-action="status-open"');
+    expect(out).toContain('<div class="hud-tiles"><span class="tile-wrap"><button type="button" class="status-btn" data-action="status-open"');
     for (const a of ["status-open", "status-close"]) {
       expect(MASK_ALLOWS.has(a)).toBe(true);
       expect(GUIDE_ALLOWS.has(a) || guideAllows(a)).toBe(true);

@@ -368,6 +368,11 @@
             "where": "screen:msgs:boss"
           },
           {
+            "k": "inner",
+            "t": "No breakfast. Nothing gets done on an empty stomach.",
+            "where": "screen:msgs:boss"
+          },
+          {
             "k": "speaker",
             "who": "kuro",
             "t": "Order lunch.",

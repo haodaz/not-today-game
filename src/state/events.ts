@@ -4,6 +4,7 @@
 import type { State } from "./types.gen";
 import { withFlags } from "./flags";
 import { applyChoose, applyStep, applyTask, clampSan, type TaskEventMode } from "./days/effects";
+import { afterEat, afterSleep, afterWork } from "./hunger";
 import { validateBoardStep, type BoardVerdict } from "./days/board";
 import { dayFile } from "./days/table";
 import { applyDeclineUpgrade, applyUpgrade, type DeclineKind } from "./upgrades";
@@ -442,8 +443,9 @@ export function applyEvent(state: State, event: GameEvent): State {
     case "letItDo":
       return { ...state, letItDoUnchecked: state.letItDoUnchecked + 1 };
     case "lieDown":
-      // The only thing that moves the day counter; a new day has all its chat turns again.
-      return { ...state, day: state.day + 1, chatTurnsToday: 0 };
+      // The only thing that moves the day counter; a new day has all its chat turns again. A night
+      // slept costs fullness (hunger, 2026-11-20).
+      return afterSleep({ ...state, day: state.day + 1, chatTurnsToday: 0 });
     case "chat":
       return applyChat(state, event);
     case "kuroClosed":
@@ -462,11 +464,13 @@ export function applyEvent(state: State, event: GameEvent): State {
     case "open":
       return applyOpen(state, event);
     case "step":
-      return applyStep(state, event);
+      // a meal eaten fills (hunger, 2026-11-20)
+      return event.name.startsWith("eat:") ? afterEat(applyStep(state, event)) : applyStep(state, event);
     case "choose":
       return applyChoose(state, event);
     case "task":
-      return applyTask(state, event);
+      // work handed in costs fullness (hunger, 2026-11-20); a task that ticked itself does not
+      return afterWork(applyTask(state, event), event.mode);
     case "boardStep":
       return applyBoardStep(state, event);
     case "give":

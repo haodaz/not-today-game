@@ -263,9 +263,10 @@ describe("R5 · 窗's table, and its close view", () => {
     expect(edgeLeads("table", "back")).toBe(true);
     expect(edgeLeads("table", "left")).toBe(true);
     r.act("loop-eat", { meal: "lunch" });
-    r.act("loop-choice", { choice: "eat" }); // author 2026-11-11: 现在吃吗？ first; eaten, the box is gone
+    r.act("loop-choice", { choice: "eat" }); // author 2026-11-11: 现在吃吗？ first
     expect(store.getEvents().filter((e) => e.kind === "step" && e.name === "eat:lunch")).toHaveLength(1);
-    expect(r.out()).not.toContain("slot meal");
+    // author 2026-11-20: eaten, the empty box stays on the table up close until the player steps back
+    expect(r.out()).toContain('class="slot meal done"');
     expect(backTarget("table")).toBe("window");
     r.act("nav-back");
     expect(r.session.view).toBe("window");

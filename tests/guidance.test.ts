@@ -44,7 +44,7 @@ function rig(store: Store, view: Session["view"] = "desktop", clock: BeatClock =
 }
 /** Day 1, the tower on (the first item done), 听听 not opened yet. */
 function booted(): Store {
-  const store = createStore({ startDay: 1 });
+  const store = createStore({ startDay: 1, patch: { fullness: 100 } as never }); // fed (hunger 2026-11-20)
   completeUntil(store, "msgs");
   return store;
 }
@@ -83,7 +83,7 @@ describe("R15 · the screen is the whole frame", () => {
 
 describe("R1 / R2 · the guide state and the six moments", () => {
   it("G1: day 1 standing before the tower: the tower is lit (no new refusal); off once it is on", () => {
-    const store = createStore({ startDay: 1 });
+    const store = createStore({ startDay: 1, patch: { fullness: 100 } as never }); // fed (hunger 2026-11-20)
     const r = rig(store, "room");
     expect(guideNow(store.getState(), store.getEvents(), r.session)).toMatchObject({ id: "G1", target: { kind: "tower" }, refuse: null });
     const out = r.out();
@@ -485,7 +485,7 @@ describe("R8–R13", () => {
   });
 
   it("R10: day 1's 全员 card is Vivi's bubble, its title without the 「Vivi：」 prefix", () => {
-    const store = createStore({ startDay: 1 });
+    const store = createStore({ startDay: 1, patch: { fullness: 100 } as never }); // fed (hunger 2026-11-20)
     const bubbles = transcript({ conversation: "group", state: store.getState(), clock: { beat: "night", time: "23:59" }, replies: [], progress: new Map() } as never);
     const card = bubbles.find((b) => b.kind === "msg" && b.body.type === "deliverable");
     expect(card).toMatchObject({ who: "partner" });
