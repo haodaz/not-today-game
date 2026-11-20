@@ -45,7 +45,7 @@ describe("the numbers", () => {
     expect(store.getState().fullness).toBe(10 + H.meal - H.work + H.meal); // dinner eaten
     store.appendEvent({ kind: "lieDown" });
     expect(store.getState().day).toBe(2);
-    expect(store.getState().fullness).toBe(10 + 2 * H.meal - H.work - H.sleep); // 40
+    expect(store.getState().fullness).toBe(10 + 2 * H.meal - H.work - H.sleep); // 30
     expect(tooHungryToWork(store.getState())).toBe(false);
   });
 });
