@@ -157,7 +157,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "黑里有一点光。不是小鸡的屏，小鸡在底下。"
+          "t": "黑里有一点光。不是小鸡的屏，小鸡在底下。",
+          "backdrop": "/room/dream/gap_pink.jpg"
         },
         {
           "k": "narration",
@@ -169,11 +170,32 @@
         },
         {
           "k": "narration",
-          "t": "你闭上眼睛。眼皮里先是一片灰白，然后一点一点出现一间屋子。不是这间。"
+          "t": "你闭上眼睛。眼皮里先是一片灰白，然后一点一点出现一间屋子。不是这间。",
+          "backdrop": ""
         },
         {
           "k": "narration",
-          "t": "梦里你想起来了：这只是你的。山寨的山寨，街边买的，只能养一只小鸡。你那时候很宝贝它。"
+          "t": "梦里你想起来了：这只是你的。山寨的山寨，街边买的，只能养一只小鸡。你那时候很宝贝它。",
+          "backdrop": "/room/dream/street_2000.jpg"
+        },
+        {
+          "k": "narration",
+          "t": "一块钱一个，校门口的小摊，摊在一张报纸上。你攒了一个星期。",
+          "prop": "/room/props/chick_front.png"
+        },
+        {
+          "k": "narration",
+          "t": "它只会三件事：吃、睡、叫。你把它挂在书包带上，走路都要低头看一眼。"
+        },
+        {
+          "k": "narration",
+          "t": "上课也带着。放在铅笔盒里，压在手心里，怕它叫。",
+          "backdrop": "/room/dream/campus_2000.jpg",
+          "prop": ""
+        },
+        {
+          "k": "inner",
+          "t": "那时候觉得，这是我自己的东西。"
         },
         {
           "k": "narration",
@@ -278,21 +300,21 @@
   "items": [
     {
       "id": "rise",
-      "text": "起床。",
+      "text": "先起床吧。",
       "unlock": "start",
       "done": "event:rise",
       "required": true
     },
     {
       "id": "boot",
-      "text": "按一下桌底下的主机，开机。",
+      "text": "开机：主机在桌子底下，按一下。",
       "unlock": "done:rise",
       "done": "event:boot",
       "required": true
     },
     {
       "id": "msgs",
-      "text": "进屏幕，看一眼消息。",
+      "text": "进屏幕看看消息。",
       "unlock": "done:boot",
       "done": "event:openApp:msgs",
       "required": true,
@@ -333,7 +355,7 @@
     },
     {
       "id": "reply",
-      "text": "回老板。",
+      "text": "给老王回一句。",
       "unlock": "done:msgs",
       "done": "event:reply:boss",
       "required": true,
@@ -357,7 +379,7 @@
     },
     {
       "id": "lunch",
-      "text": "拿手机，点个午饭。",
+      "text": "拿起手机，点个午饭。",
       "unlock": "done:reply",
       "done": "event:order:lunch",
       "required": true,
@@ -373,7 +395,7 @@
     },
     {
       "id": "pickup",
-      "text": "去门口拿。",
+      "text": "外卖到了，去门口拿。",
       "unlock": "event:delivery:arrives:lunch",
       "done": "event:pickup:lunch",
       "required": true,
@@ -394,28 +416,52 @@
     },
     {
       "id": "box",
-      "text": "拆开看看。",
+      "text": "纸箱里有个小盒子，拆开看看。",
       "unlock": "done:pickup",
       "done": "event:openBox",
       "required": true
     },
     {
       "id": "eat",
-      "text": "窗边饭桌，吃。",
+      "text": "外卖在窗边饭桌上，吃饭吧。",
       "unlock": "done:box",
       "done": "event:eat:lunch",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "吃完了。"
+          },
+          {
+            "k": "inner",
+            "t": "回去干活吧。"
+          }
+        ]
+      }
     },
     {
       "id": "task3",
-      "text": "v15 和 v16 合成 v17，发给老王。",
+      "text": "把 v15 和 v16 合成 v17，发给老王。",
       "unlock": "done:eat",
       "done": "flag:task_merge_done",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "今天的活交了。"
+          },
+          {
+            "k": "inner",
+            "t": "剩下的时间是自己的。在屋里转转，摆弄摆弄今天拿到的东西，或者和右下角那只说说话。"
+          }
+        ]
+      }
     },
     {
       "id": "dinner",
-      "text": "手机，点个晚饭。",
+      "text": "拿起手机，点个晚饭。",
       "unlock": "done:task3",
       "done": "event:order:dinner",
       "required": true,
@@ -424,7 +470,7 @@
     },
     {
       "id": "dpick",
-      "text": "去门口拿。",
+      "text": "外卖到了，去门口拿。",
       "unlock": "event:delivery:arrives:dinner",
       "done": "event:pickup:dinner",
       "required": true,
@@ -446,7 +492,7 @@
     },
     {
       "id": "deat",
-      "text": "窗边饭桌，吃。",
+      "text": "晚饭在窗边饭桌上，吃饭吧。",
       "unlock": "done:dpick",
       "done": "event:eat:dinner",
       "required": true,
@@ -454,7 +500,7 @@
     },
     {
       "id": "desk",
-      "text": "去桌子那儿看一眼。",
+      "text": "回桌子那儿坐一会儿，看看今天拿到的东西。",
       "unlock": "done:deat",
       "done": "event:beat:desk",
       "required": true,
@@ -462,7 +508,7 @@
     },
     {
       "id": "shutdown",
-      "text": "屏幕右上角，关机。",
+      "text": "睡前把电脑关了：屏幕右上角。",
       "unlock": "done:desk",
       "done": "event:beat:shutdown",
       "required": true,
@@ -470,15 +516,16 @@
     },
     {
       "id": "chat",
-      "text": "右下角那只，和它说会儿话。",
+      "text": "和右下角那只说说话。",
       "unlock": "done:shutdown",
       "done": "event:chat:any",
       "required": false,
-      "when": "night"
+      "when": "night",
+      "quiet": true
     },
     {
       "id": "bed",
-      "text": "床，躺下。",
+      "text": "想睡了就去床上躺下。",
       "unlock": "done:shutdown",
       "done": "event:lieDown",
       "required": true,

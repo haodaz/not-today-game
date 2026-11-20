@@ -123,7 +123,9 @@ describe("the checklist", () => {
     expect(v.lines[0]!.state).toBe("now");
     expect(v.lines.filter((l) => l.state === "now")).toHaveLength(1);
     expect(v.lines.slice(1).every((l) => l.state !== "now")).toBe(true);
-    expect(v.lines.at(-1)).toMatchObject({ id: "lunch", state: "wait", text: items.find((i) => i.id === "lunch")!.rewrite });
+    // wait-card (2026-11-20): the meal on its way is not a line any more; the view says it is waiting
+    expect(v.lines.some((l) => l.id === "lunch")).toBe(false);
+    expect(v.waiting).toBe(true);
     const out = html(store);
     expect(out.match(/▸/g)).toHaveLength(1);
     expect(out).not.toMatch(/<i><\/i>/);

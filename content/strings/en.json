@@ -1334,5 +1334,8 @@
   "room.bed.hungry": "Haven’t eaten. Can’t sleep on an empty stomach.",
   "room.bed.screen": "The screen is still on. Shut it down, then sleep.",
   "room.bed.hungry.kuro": "You haven’t eaten.",
-  "room.bed.screen.kuro": "The screen is still on."
+  "room.bed.screen.kuro": "The screen is still on.",
+  "checklist.wait.head": "Delivery",
+  "checklist.wait.text": "On its way",
+  "wb.hello.none": "No work left today. Look around as you like."
 }

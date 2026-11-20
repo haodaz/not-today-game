@@ -42,18 +42,21 @@ export function doorLines(view: MealView, after: "delivered" | DoorInput, names:
 export function renderDoorView(view: MealView, beat: DoorBeat | null, names: State["names"]): string {
   const text = (s: string) => escapeHtml(fillPlaceholders(fillDish(s, view), names));
   const p = (cls: string, s: string | null) => (s === null ? [] : [`  <p class="${cls}">${text(s)}</p>`]);
-  const open = (state: string, step?: number) =>
-    `<section class="door-beat" data-day="${view.day}" data-meal="${view.meal}" data-state="${state}"${step === undefined ? "" : ` data-step="${step}"`}>`;
+  // An empty section carries only its data (the desk corner, the state); it is not drawn — the dark
+  // caption box with nothing in it was the stray bar the author saw at the door (2026-11-19).
+  const open = (state: string, step?: number, empty = false) =>
+    `<section class="door-beat" data-day="${view.day}" data-meal="${view.meal}" data-state="${state}"${step === undefined ? "" : ` data-step="${step}"`}${empty ? ' data-empty="1"' : ""}>`;
 
   if (view.phase === "none") {
-    return [open("none"), ...p("door-outside", view.outside), ...p("door-anomaly", view.anomaly), "</section>"].join("\n");
+    const body = [...p("door-outside", view.outside), ...p("door-anomaly", view.anomaly)];
+    return [open("none", undefined, body.length === 0), ...body, "</section>"].join("\n");
   }
-  if (!beat) return [open("idle"), "</section>"].join("\n");
+  if (!beat) return [open("idle", undefined, true), "</section>"].join("\n");
 
   // The door is actions on the door (2026-11-02): no list of steps and no caption here; each
   // fragment plays in the dialogue box as its action happens (doorLines). What stays is the data
   // the desk corner needs: what came back with the bag.
-  const lines = [open(beat.state, DOOR_STATES.indexOf(beat.state))];
+  const lines = [open(beat.state, DOOR_STATES.indexOf(beat.state), beat.state !== "onDesk")];
   if (beat.state === "onDesk") {
     lines.push('  <div class="desk-corner">');
     const extras = [

@@ -87,6 +87,7 @@ export function guidedItem(lc: LoopContext, g: Guide | null): string | null {
     case "conv":
     case "reply": return by((e) => e.type === "reply");
     case "phone": return by((e) => e.type === "order");
+    case "door": return by((e) => e.type === "pickup");
     case "task":
     case "board":
     case "card":
@@ -105,6 +106,27 @@ export function renderChecklist(view: ChecklistView): SafeHtml {
   // marker in full ink, every other open line is dimmed (`later`) with no marker.
   const lines = view.lines.map((l) => html`<div class="${cls("it", l.state, l.state === "locked" && "later")}" data-id="${l.id}">${l.state === "now" ? html`<i class="mark" aria-hidden="true">▸</i>` : null}${l.work ? tr("checklist.work", { done: l.work.done, total: l.work.total }) : l.text}</div>`);
   return html`<div class="list"><div class="h">${tr(view.heading === "tonight" ? "hud.tonight" : "hud.today")}</div>${lines}</div>`;
+}
+
+/** mm:ss of a wait, never below 00:00. */
+export const countdownText = (ms: number): string => {
+  const s = Math.max(0, Math.ceil(ms / 1000));
+  return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+};
+
+/**
+ * wait-card (author 2026-11-20: 「外卖在路上不要和任务在同一个卡片。额外有一个卡片排在下面」): a meal on its way
+ * is its own card under the checklist — 外卖在路上 and the order's own countdown (the roll in
+ * `session.loop.orders`); the countdown shows once a clock is given (nowMs > 0).
+ */
+export function waitCard(view: ChecklistView, session: Session, nowMs: number): SafeHtml | null {
+  if (!view.waiting) return null;
+  let left: number | null = null;
+  for (const o of session.loop?.orders.values() ?? []) {
+    const l = o.atMs + o.waitMs - nowMs;
+    if (nowMs > 0 && (left === null || l < left)) left = l;
+  }
+  return html`<div class="wait-card"><div class="h">${tr("checklist.wait.head")}</div><div class="it"><span>${tr("checklist.wait.text")}</span>${left === null ? null : html`<b class="count">${countdownText(left)}</b>`}</div></div>`;
 }
 
 function dayCorner(state: State, session: Session, nowMs = 0): SafeHtml {
@@ -654,7 +676,9 @@ function edgeHint(session: Session, view: string, nowMs: number): SafeHtml | nul
 export function renderRoom(model: RoomModel): SafeHtml {
   const { state, events, session } = model;
   const lc = loopContext(state, events);
-  const list = lc ? renderChecklist(checklistNow(lc, state, events, session)) : null;
+  const listView = lc ? checklistNow(lc, state, events, session) : null;
+  // An empty list (nothing open: the meal ordered, the rest still locked) draws no card; the delivery card stands alone.
+  const list = listView ? html`<div class="hud-left">${listView.lines.length ? renderChecklist(listView) : null}${waitCard(listView, session, model.nowMs ?? 0)}</div>` : null;
   // The four facings and 桌子 (屏幕 is the desktop's own render).
   // lying-view R2: and the ceiling from the bed.
   const view = isFacing(session.view) || session.view === "desk" || session.view === "table" || session.view === "lying" ? session.view : "room";
@@ -707,7 +731,7 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const nobox = !arrived && (view === "room" || view === "bed");
   // room-light-switch R3: by day the ceiling light makes the photo a little brighter (room.css, the backdrop only)
   const ceilDay = !dream && !desk3d && !isEvening(session.clock) && ceilLit(session);
-  return html`<div class="${cls("stage", "room", `${view}-view`, nobox && "nobox", ceilDay && "ceil-day", ceilingNight && "ceiling-night", raid && "raid", fade !== null && "m-late", dream && "scene-on", onEdge)}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${desk3d ? roomHost(state.day, session) : null}${renderScene(lineScene)}${scene}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${wakeHost(session)}${desk3d ? null : roomHost(state.day, session)}${bare ? null : list}${bare ? null : dayCorner(state, session, nowMs)}${bare ? null : itemsPanel(state, events, session)}${!bare && (view === "room" || view === "bed" || view === "window") ? casePanel(state, events, session, model.runId ?? "run", nowMs) : null}${view === "desk" ? printsView(state, events, session) : null}${held}${model.boxOutside || bare ? null : dialogueBox(state, events, session, nowMs)}${bare ? null : bottomRight(model)}${bare ? null : hudTiles(session, state, { settings: true })}${model.boxOutside || bare ? null : settingsPanel(session)}${model.boxOutside || bare ? null : statusPanel(state, events, session)}${session.bookOpen ? bookReader(bookUrl(state.names, daysLived(state, events))) : null}</div>`;
+  return html`<div class="${cls("stage", "room", `${view}-view`, nobox && "nobox", ceilDay && "ceil-day", ceilingNight && "ceiling-night", raid && "raid", fade !== null && "m-late", dream && "scene-on", onEdge)}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${desk3d ? roomHost(state.day, session) : null}${renderScene(lineScene)}${scene}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${wakeHost(session)}${desk3d ? null : roomHost(state.day, session)}${bare ? null : list}${bare ? null : dayCorner(state, session, nowMs)}${bare ? null : itemsPanel(state, events, session)}${!bare && (view === "room" || view === "bed" || view === "window") ? casePanel(state, events, session, model.runId ?? "run", nowMs) : null}${view === "desk" ? printsView(state, events, session) : null}${held}${model.boxOutside || bare ? null : dialogueBox(state, events, session, nowMs)}${bare ? null : bottomRight(model)}${bare ? null : hudTiles(session, state, { settings: true })}${model.boxOutside || bare ? null : settingsPanel(session)}${model.boxOutside || bare ? null : statusPanel(state, events, session)}${session.bookOpen ? bookReader(bookUrl(state.names, daysLived(state, events)), session.bookOpened) : null}</div>`;
 }
 
 export { raidShowing };

@@ -169,8 +169,12 @@ function dlgLayer(dlg: SafeHtml | null, session: Session, readsOn: boolean, with
   // day1-playtest-1117 R5: a line about the open thread is its card: at the thread's bottom, above the input row
   const thread = chat && threadCardFor(session.dialogue) !== null;
   // Standing NPCs (author 2026-11-18): the speaker stands over the story mask and under the box, in full colour.
-  const stand = sceneOf(session.dialogue).stand;
-  const standImg = stand === undefined ? null : html`<img class="scene-stand" src="${stand}" alt="" aria-hidden="true" draggable="false">`;
+  const scene = sceneOf(session.dialogue);
+  const stand = scene.stand;
+  // two-up (author 2026-11-20): with another person in the scene, the one speaking stands right and lit, the other left and dimmed
+  const standImg = stand === undefined ? null : scene.other !== undefined
+    ? html`<img class="scene-stand other" src="${scene.other}" alt="" aria-hidden="true" draggable="false"><img class="scene-stand speaking" src="${stand}" alt="" aria-hidden="true" draggable="false">`
+    : html`<img class="scene-stand" src="${stand}" alt="" aria-hidden="true" draggable="false">`;
   return html`<div class="${cls("dlg-layer", story && "masked", chat && !thread && "top", thread && "thread")}">${withMask ? boxMask(session, readsOn) : null}${standImg}${dlg}</div>`;
 }
 
@@ -1215,6 +1219,10 @@ export const loopActions: Record<string, ActionHandler> = {
       if (session.view === "desktop" && taskPageId(session.workbenchPage) !== null) {
         session.workbenchPage = "home";
         session.wbTaskDay = null;
+        // author 2026-11-20: the work was sent to the boss, so the screen lands in his thread, not on
+        // 工作台's home (the next step is lit from there).
+        session.wbFull = false;
+        showConversation(session, "boss");
       }
       openChatIfDue(ctx);
     }
@@ -2153,6 +2161,7 @@ function openBook(ctx: ActionContext): void {
     ctx.bookRead?.();
   }
   session.bookOpen = true;
+  session.bookOpened = false;
 }
 
 

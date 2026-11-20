@@ -30,6 +30,8 @@ export type GuideTarget =
   | { readonly kind: "card"; readonly doc: string; readonly conv: string | null }
   | { readonly kind: "clauses"; readonly indexes: readonly number[] }
   | { readonly kind: "phone" }
+  /** author 2026-11-20: a meal is at the door — the door is lit (the room's door hit, then the door's own spot). */
+  | { readonly kind: "door" }
   | { readonly kind: "task"; readonly id: string }
   /** G7 (2026-11-08): a board task's page: the lock, the first card in the tray, an empty slot once a card is picked, 打快照 when full. */
   | { readonly kind: "board"; readonly step: "lock" | "merge" | "card" | "slot" | "fetch" | "print" | "mod" | "offer" | "launch"; readonly slot?: string };
@@ -41,7 +43,7 @@ export type GuideTarget =
 export type GuideScope = "all" | "work" | "none";
 
 export interface Guide {
-  readonly id: "G0" | "G1" | "G1b" | "G2" | "G3" | "G3b" | "G4" | "G5" | "G6" | "G7" | "next";
+  readonly id: "G0" | "G1" | "G1b" | "G2" | "G3" | "G3b" | "G4" | "G5" | "G6" | "G7" | "G8" | "G9" | "next";
   readonly target: GuideTarget;
   /** The refuse line's strings key, or null (no line of its own). */
   readonly refuse: string | null;
@@ -140,6 +142,18 @@ export function guideNow(state: State, events: readonly GameEvent[], session: Se
     return { id: "G4", target: { kind: "phone" }, refuse: "guide.lunch.first", scope: day === 1 ? "all" : "work" };
   }
 
+  // G8 (author 2026-11-20: 「我硬在屋里转了很久才看到外卖」): a meal is at the door and not taken in: the door
+  // is lit, from any facing; nothing is refused.
+  const atDoor = lc.file.items.find((it) => it.done.kind === "event" && it.done.event.type === "pickup" && states.get(it.id)!.unlocked && !states.get(it.id)!.done);
+  if (atDoor && !desktop) return { id: "G8", target: { kind: "door" }, refuse: null, scope: "none" };
+
+  // G9 (author 2026-11-20: 「吃完了，回去干活吧」): day 1, lunch eaten, the work still to do, off the screen:
+  // the desk, then the screens, are lit.
+  const lunchEaten = lc.file.items.find((it) => it.done.kind === "event" && it.done.event.type === "eat" && it.done.event.meal === "lunch");
+  if (day === 1 && !desktop && session.view !== "lying" && lunchEaten && states.get(lunchEaten.id)!.done && open?.tree && !state.flags.includes(open.tree.done)) {
+    return { id: "G9", target: { kind: "screen" }, refuse: null, scope: "none" };
+  }
+
   // G0 (day1-playtest-1117 R1): day 1 on the ceiling, not up yet: the rise spot is lit; nothing refused.
   if (day === 1 && session.view === "lying" && !stepToday(events, day, "rise") && !booted(state, events)) return { id: "G0", target: { kind: "rise" }, refuse: null, scope: "none" };
 
@@ -218,6 +232,8 @@ export function onTarget(target: GuideTarget, action: string, data: Readonly<Rec
       return action === "wb-clause";
     case "phone":
       return action === "loop-phone";
+    case "door":
+      return (action === "view" && data.view === "door") || action === "loop-door" || action === "turn";
     case "task":
       return action === "wb-nav" && data.page === `task:${target.id}`;
     case "board":
@@ -272,6 +288,9 @@ export function ringAnchors(target: GuideTarget): readonly (readonly (readonly [
       // author 2026-11-16 (playtest): the phone is on the desk, so the ring shows the way there — the
       // phone itself (desk view); else 桌子 (the room's hit, or 离开屏幕 on the screen: both are `view desk`).
       return [[["data-action", "loop-phone"]], [["data-action", "view"], ["data-view", "desk"]]];
+    case "door":
+      // the door's own spot when the player faces it; else the way there (房间's door hit)
+      return [[["data-action", "loop-door"]], [["data-action", "view"], ["data-view", "door"]]];
     case "task":
       return [[["data-action", "wb-nav"], ["data-page", `task:${target.id}`]]];
     case "board":

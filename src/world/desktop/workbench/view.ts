@@ -193,7 +193,7 @@ function home(ctx: AppContext, data: WorkbenchDay | null, fill: Fill): SafeHtml 
   const common = items.length ? html`<div class="sect"><h3>${tr("wb.common")}<small>${tr("wb.common.sub")}</small></h3><div class="tabs">${tabs}</div><div class="qa">${items}</div></div>` : null;
   // Home is the greeting, the composer and today's cards: never a board or task content (workspace R1).
   // guidance R6: the greeting follows the clock (12:04 is 下午好).
-  return html`<div class="main home"><div class="hello"><img src="${frameUrl(FRAMES.idle[0])}" alt=""><div><h1>${tr(greetingKeyAt(ctx.session.clock.time))}</h1><p>${tr("wb.hello.sub")}</p></div></div>${composer(ctx, data, fill)}<div class="cards">${doing}${docs}${ledger}${now}${changelog}</div>${common}</div>`;
+  return html`<div class="main home"><div class="hello"><img src="${frameUrl(FRAMES.idle[0])}" alt=""><div><h1>${tr(greetingKeyAt(ctx.session.clock.time))}</h1><p>${tr(openWork(state, ctx.events) ? "wb.hello.sub" : "wb.hello.none")}</p></div></div>${composer(ctx, data, fill)}<div class="cards">${doing}${docs}${ledger}${now}${changelog}</div>${common}</div>`;
 }
 
 

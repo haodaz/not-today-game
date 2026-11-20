@@ -44,8 +44,11 @@ describe("checklist (FR1)", () => {
 
   it("after ordering, lunch waits with its rewrite text, unticked, until it arrives", () => {
     const store = storeAt(1, [step("rise"), step("boot"), step("openApp:msgs"), { kind: "reply", choice: "fine", recipient: "boss", t: "09:05" }, { kind: "order", meal: "lunch", shopId: "huangmenji", itemId: "hmj", t: "11:30" }]);
-    expect(texts(store)).toEqual([`now:${WORK1}`, `wait:${rewrite1("lunch")}`]);
+    // wait-card (2026-11-20): the meal on its way is its own card, not a line of the list
+    expect(texts(store)).toEqual([`now:${WORK1}`]);
+    expect(checklist(loopContext(store.getState(), store.getEvents())!).waiting).toBe(true);
     store.appendEvent(step("delivery:arrives:lunch", "12:04"));
+    expect(checklist(loopContext(store.getState(), store.getEvents())!).waiting).toBe(false);
     expect(texts(store)).toEqual([`now:${WORK1}`, `later:${text1("pickup")}`]);
   });
 

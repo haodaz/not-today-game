@@ -142,7 +142,10 @@ describe("renderMessages", () => {
     for (const key of ["msgs.boss", "msgs.group", "reply.hint.boss", "reply.boss.fine", "reply.boss.salary", "msgs.send"]) {
       expect(work, key).toContain(t(key));
     }
-    expect(work).toContain('class="n">1<');
+    // author 2026-11-20: the others' messages land after the hand-in (15:05+), so the unread count shows then, not at 10:00
+    expect(work).not.toContain('class="n">1<');
+    const later = renderWorkMessages(ctxFor(store, initialSession({ beat: "work", time: "15:10" }))).pane.value;
+    expect(later).toContain('class="n">1<');
     const home = renderMessages(ctxFor(store, initialSession({ beat: "boot", time: "10:00" }))).body.value;
     for (const key of ["msgs.family", "msgs.clan", "msgs.feed"]) expect(home, key).toContain(t(key));
     expect(home).not.toContain('data-conv="boss"');

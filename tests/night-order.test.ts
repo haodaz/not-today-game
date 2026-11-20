@@ -25,8 +25,9 @@ const rig = () => {
 describe("day 1's night order", () => {
   it("dinner → the door → the table → the desk → the shutdown → the bed, in the file", () => {
     const ids = dayFiles.get(1)!.items.filter((it) => it.when === "night").map((it) => it.id);
-    expect(ids).toEqual(["dinner", "dpick", "deat", "desk", "shutdown", "chat", "bed"]);
+    expect(ids).toEqual(["dinner", "dpick", "deat", "desk", "shutdown", "chat", "bed"]); // chat is quiet: in the graph, not on the card
     const by = Object.fromEntries(dayFiles.get(1)!.items.map((it) => [it.id, it]));
+    expect(by.chat!.quiet).toBe(true);
     expect(by.dpick!.unlock).toEqual({ kind: "event", event: { type: "arrives", meal: "dinner" } });
     expect(by.deat!.unlock).toEqual({ kind: "done", id: "dpick" });
     expect(by.desk!.unlock).toEqual({ kind: "done", id: "deat" });

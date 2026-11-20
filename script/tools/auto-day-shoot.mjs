@@ -638,9 +638,10 @@ for (const it of ITEMS) {
       for (let i = 0; i < 60 && !bell; i++) { if (await atDoor()) bell = true; else { await sleep(1); if (i % 5 === 4) await key(" "); } }
       if (!bell) note("   never unlocked (no arrival in 60 s)");
       await sel("[data-action=view][data-view=door]", 2.5); await settle();
+      await shotStep("door-arrived"); // 2026-11-20: the door facing with the delivery outside (author saw a stray dark bar here at night)
       if (!bell && (await text()).includes(it.text)) note("   NOTE: arrival only fired on the view change, not on the timer");
       let steps = 0; while (steps < 6 && (await sel("[data-action=loop-door]", 2))) { steps++; await settle(); }
-      note(`   door steps clicked: ${steps}`); ok = steps > 0; await settle(); await toRoom();
+      note(`   door steps clicked: ${steps}`); ok = steps > 0; await settle(); await shotStep("door-taken"); await toRoom(); await shotStep("door-back");
     }
     else if (it.done === "event:eat:lunch" || it.done === "event:eat:dinner") {
       // 外卖在窗边饭桌（room-turn）: a line still up is read first (day 3's v18 leaves one); the story may have
@@ -732,9 +733,12 @@ for (const it of ITEMS) {
         }
       }
       let slept = (await click(S("room.bed.sleep"), 3)) || /第 \d+ 天 · 早上|今天过去了|Day \d+ · morning|The day is over/i.test(await text());
+      // 2026-11-20: the night's first lines (the pink point between the screens) before anything advances them
+      if (slept) { await sleep(1.6); await shotStep("night-first"); await sleep(2.5); await shotStep("night-second"); }
       if (slept) { for (let n = 0; n < 70; n++) { await sleep(1.3); await shotStep("night"); if (/第 \d+ 天 · 早上|Day \d+ · morning/.test(await text())) break; await key("Enter"); } }
       // A night beat can ask first (the gap, the hand): take its first choice, advance, then try to sleep again.
       for (let k = 0; k < 4 && !slept; k++) { note(`   night k${k}: acts=${(await ev("JSON.stringify([...document.querySelectorAll('[data-action]')].filter(__vis).map(e=>e.dataset.action))")||'').slice(0,400)}`); for (let n = 0; n < 60; n++) { await sleep(1.1); await shotStep("night"); const tx = await text(); if (/第 2 天|Day 2|今天过去了|The day is over/.test(tx) && !(await has("[data-action=loop-advance]"))) break; if (await has("[data-action=loop-advance]")) await sel("[data-action=loop-advance]", 0.5); else await key("Enter"); } const ch = await ev("__choices()"); if (ch && ch.length) { note(`   night choice → ${ch[0]}`); await shotStep("night-choice"); await sel("[data-action=loop-choice]", 1.5); } else if (/缝里|the gap/i.test(await text()) && k < 2) { const want = { 7: "iccard", 10: "tape", 13: "dictionary", 16: "calculator" }[day]; await sel("[data-action=items-toggle]", 0.8); const held = (want && (await sel(`[data-action=loop-hold][data-object=${want}]`, 2))) || (await sel("[data-action=loop-hold]", 2)); note(`   night raid: held up ${want ?? 'an object'} (${held})`); await sleep(2); await key("Escape"); await sleep(0.5); await key("Escape"); } else await key("Enter"); await settle(); await sel("[data-action=bed]", 1.5); slept = (await click(S("room.bed.sleep"), 3)) || /第 \d+ 天 · 早上|今天过去了|Day \d+ · morning|The day is over/i.test(await text()); } if (!slept && day === 18 && ((await has("[data-action=ending-next], .ending, .credits, .boss-page, .pull-out")) || /NOT TODAY|credits/i.test(await text()))) { slept = true; note("   (day 18: lying down is the ending)"); } if (!slept) note("   no 睡 button"); ok = ok && slept;
+      if (slept) { await sleep(1.6); await shotStep("night-first"); await sleep(2.5); await shotStep("night-second"); }
       await settle(); await sleep(6); await settle(); await sleep(8);
     }
     else { note(`   unknown rule ${it.done}`); ok = false; }

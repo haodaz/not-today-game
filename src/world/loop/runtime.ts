@@ -29,7 +29,7 @@ import { hasString, t } from "@world/i18n";
 import { booted, itemStates, loopContext, nightfallReached, selfTicking, workDone, type LoopContext } from "./checklist";
 import { dropWaiting, placedLines, push, type DialogueState, type Ending, type Queued } from "./dialogue";
 import { settleSession } from "@world/dialogue/place";
-import { arrivalDue, msUntilDue, msUntilMinimum } from "./waiting";
+import { arrivalDue, MINUTE, msUntilDue, msUntilMinimum } from "./waiting";
 
 /** How long after it unlocks a self-ticking item ticks itself (the horror is that you watch it). */
 export const SELF_TICK_MS = 4_000;
@@ -299,13 +299,22 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
 }
 
 /** A fresh memo for the current day, seeing everything already in the log as old. */
-export function freshMemo(lc: LoopContext, events: readonly GameEvent[], nowMs: number): LoopMemo {
-  const orders = new Map<string, { atMs: number; workDone: number }>();
+/**
+ * wait-card (author 2026-11-20: 「每次不同的外卖1分钟-2分钟倒计时（做随机一下）」): an order's own wait, rolled
+ * between the day file's minMinutes and waitMinutes (in delivery units; `?fast=1` makes them seconds).
+ */
+export function rollWaitMs(delivery: { readonly minMinutes: number; readonly waitMinutes: number }, unitMs: number, rng: () => number = Math.random): number {
+  const span = Math.max(0, delivery.waitMinutes - delivery.minMinutes);
+  return Math.round((delivery.minMinutes + rng() * span) * unitMs);
+}
+
+export function freshMemo(lc: LoopContext, events: readonly GameEvent[], nowMs: number, unitMs = MINUTE): LoopMemo {
+  const orders = new Map<string, { atMs: number; workDone: number; waitMs: number }>();
   const today = ordersOn(events, lc.state.day);
   for (const meal of ["lunch", "dinner"] as const) {
     const arrived = lc.today.some((e) => e.kind === "step" && e.name === `delivery:arrives:${meal}`);
     // An order placed before a reload restarts its wait from now (design L5).
-    if (today[meal] && !arrived) orders.set(meal, { atMs: nowMs, workDone: workDone(lc).length });
+    if (today[meal] && !arrived) orders.set(meal, { atMs: nowMs, workDone: workDone(lc).length, waitMs: rollWaitMs(lc.file.delivery, unitMs) });
   }
   return { day: lc.state.day, items: new Map(itemStates(lc)), seen: events.length, orders, selfScheduled: new Set(), timers: new Set() };
 }
@@ -344,7 +353,7 @@ export function syncLoop(ctx: ActionContext, nowMs: number = Date.now()): void {
       session.kuroDraft = "";
       session.playerPage = 0;
     }
-    session.loop = freshMemo(lc, events, nowMs);
+    session.loop = freshMemo(lc, events, nowMs, session.deliveryUnitMs);
     // Night already fell before this look (a reload): the evening look stays, nothing replays.
     if (nightfallReached(lc)) session.clock = eveningClock(session.clock);
     // A call answered but not ended before this look (a reload): it resumes and still ends.
@@ -360,7 +369,7 @@ export function syncLoop(ctx: ActionContext, nowMs: number = Date.now()): void {
   // New orders start their wait.
   for (const e of events.slice(memo.seen)) {
     if (e.kind === "order" && e.day === state.day && !memo.orders.has(e.meal)) {
-      memo.orders.set(e.meal, { atMs: nowMs, workDone: workDone(lc).length });
+      memo.orders.set(e.meal, { atMs: nowMs, workDone: workDone(lc).length, waitMs: rollWaitMs(lc.file.delivery, ctx.session.deliveryUnitMs) });
     }
   }
   const before = memo.items;
@@ -492,7 +501,8 @@ function checkArrivals(ctx: ActionContext, lc: LoopContext, nowMs: number): void
       memo.orders.delete(meal);
       continue;
     }
-    const w = { elapsedMs: nowMs - order.atMs, minMinutes: delivery.minMinutes, waitMinutes: delivery.waitMinutes, unitMs: ctx.session.deliveryUnitMs };
+    // wait-card: the long wait is the order's own roll (waitMs), not the file's ceiling
+    const w = { elapsedMs: nowMs - order.atMs, minMinutes: delivery.minMinutes, waitMinutes: order.waitMs / ctx.session.deliveryUnitMs, unitMs: ctx.session.deliveryUnitMs };
     if (arrivalDue({ ...w, workDoneSinceOrder: doneNow > order.workDone })) {
       memo.orders.delete(meal);
       const placed = ordersOn(ctx.store.getEvents(), lc.state.day)[meal as Meal];
@@ -511,6 +521,15 @@ function checkArrivals(ctx: ActionContext, lc: LoopContext, nowMs: number): void
     const wait = worked ? msUntilMinimum(w) : msUntilDue(w);
     ctx.later(Math.max(250, wait), () => {
       memo.timers.delete(key);
+      syncLoop(ctx);
+    });
+  }
+  // wait-card: while an order is on its way the card counts down, so the room redraws every second.
+  if (memo.orders.size > 0 && !memo.timers.has("wait-tick")) {
+    memo.timers.add("wait-tick");
+    ctx.later(1000, () => {
+      memo.timers.delete("wait-tick");
+      ctx.rerender();
       syncLoop(ctx);
     });
   }

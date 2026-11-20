@@ -169,6 +169,8 @@ export interface ChecklistView {
   /** Which list the card shows: the day's, or (after nightfall) the night's. */
   readonly heading: "today" | "tonight";
   readonly lines: readonly ChecklistLine[];
+  /** wait-card (author 2026-11-20): a meal is on its way — its own card under the list, not a line here. */
+  readonly waiting: boolean;
   /** Every required item is done and the bed can be used. */
   readonly bedOpen: boolean;
 }
@@ -219,7 +221,10 @@ function build(ctx: LoopContext, current: string | null): { view: ChecklistView;
       workPlaced = true;
       if (!states.get(first.id)!.unlocked) continue;
       const locked = first.locked === "requiredPending" && pending.length > 0;
-      open.push({ id: WORK_LINE_ID, text: "", state: locked ? "locked" : "later", work: { done: tasksDone, total: tasks.length }, required: first.required });
+      // author 2026-11-20 (「把今天活干完一直在任务顶列表上，而不是真正的当前任务」): with one work task the line
+      // is that task's own words; the count only when there are several.
+      if (tasks.length === 1) open.push({ id: WORK_LINE_ID, text: first.text, state: locked ? "locked" : "later", required: first.required });
+      else open.push({ id: WORK_LINE_ID, text: "", state: locked ? "locked" : "later", work: { done: tasksDone, total: tasks.length }, required: first.required });
       continue;
     }
     if (waiting(it, st, ctx)) {
@@ -233,6 +238,8 @@ function build(ctx: LoopContext, current: string | null): { view: ChecklistView;
     if (!st.unlocked) continue;
     // The call's gate only holds nightfall back; it has no line of its own (the call shows on 屏幕).
     if (it.id === CALL_ITEM_ID) continue;
+    // A quiet item is in the graph but never on the card (author 2026-11-20).
+    if (it.quiet) continue;
     const locked = it.locked === "requiredPending" && pending.length > 0;
     if (isBed(it) && !locked) bedOpen = true;
     open.push({ id: it.id, text: it.text, state: locked ? "locked" : "later", required: it.required });
@@ -242,8 +249,8 @@ function build(ctx: LoopContext, current: string | null): { view: ChecklistView;
   const lead = (current !== null ? usable.find((l) => l.id === current) : undefined) ?? usable.find((l) => l.required) ?? usable[0];
   const strip = ({ required: _r, ...l }: ChecklistLine & { required: boolean }): ChecklistLine => l;
   const rest = open.filter((l) => l !== lead).map(strip);
-  const lines = lead ? [{ ...strip(lead), state: "now" as const }, ...rest, ...waits] : [...rest, ...waits];
-  return { view: { heading, lines, bedOpen }, doneCount };
+  const lines = lead ? [{ ...strip(lead), state: "now" as const }, ...rest] : [...rest];
+  return { view: { heading, lines, waiting: waits.length > 0, bedOpen }, doneCount };
 }
 
 /** The first unlocked, unfinished work task (a `flag:` item that does not tick itself). */

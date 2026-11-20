@@ -242,7 +242,10 @@ function idePages(board: TaskBoard, s: BoardState, session: Session): SafeHtml {
     const cell = cardId
       ? html`<button type="button" class="bslot filled" data-action="board-slot" data-slot="${slot.id}">${cardText(board, cardId)}</button>`
       : html`<button type="button" class="${cls("bslot", "ide-drop", session.boardPick && "target")}" data-action="board-slot" data-slot="${slot.id}" aria-label="${slot.label}"></button>`;
-    return html`<li class="ide-page" data-slot="${slot.id}"><span class="ide-plabel">${slot.label}</span>${cell}</li>`;
+    // author 2026-11-20 (「老王的游戏现在不是暗示，而是具体的 keyword 出现了」): where the row has his own words
+    // (board.given.rows), the label is not shown; the words are the hint.
+    const given = (board.given as { rows?: Record<string, string> } | undefined)?.rows?.[slot.id];
+    return html`<li class="ide-page" data-slot="${slot.id}">${given ? null : html`<span class="ide-plabel">${slot.label}</span>`}${cell}</li>`;
   });
   const header = hasString("board.ide.pages") ? html`<div class="ide-h">${tr("board.ide.pages")}</div>` : null;
   return html`${header}<ol class="ide-pages">${rows}</ol>`;

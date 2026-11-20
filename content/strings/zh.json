@@ -1334,5 +1334,8 @@
   "room.bed.hungry": "还没吃饭。空着肚子睡不着。",
   "room.bed.screen": "屏幕还亮着。关了再睡。",
   "room.bed.hungry.kuro": "你还没吃饭。",
-  "room.bed.screen.kuro": "屏幕还开着。"
+  "room.bed.screen.kuro": "屏幕还开着。",
+  "checklist.wait.head": "外卖",
+  "checklist.wait.text": "外卖在路上",
+  "wb.hello.none": "今天没有活了。想看什么，自己翻。"
 }

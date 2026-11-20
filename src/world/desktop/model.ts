@@ -74,7 +74,8 @@ export interface LoopMemo {
   /** How many events have been looked at. */
   seen: number;
   /** Meal → when it was ordered (session ms) and how many work items were done then. */
-  orders: Map<string, { readonly atMs: number; readonly workDone: number }>;
+  /** wait-card (author 2026-11-20): each order rolls its own wait, between the day's minMinutes and waitMinutes. */
+  orders: Map<string, { readonly atMs: number; readonly workDone: number; readonly waitMs: number }>;
   /** Self-ticking items already scheduled. */
   selfScheduled: Set<string>;
   /** Meals with an arrival check pending. */
@@ -171,6 +172,8 @@ export interface Session {
   collection: Collection;
   /** The gamebook reader is open (title-page FR4; bedside-book). */
   bookOpen: boolean;
+  /** book-cover (author 2026-11-20): the gamebook said its cover was opened — the reader goes dark behind it. */
+  bookOpened: boolean;
   /** status-panel: the character panel (人物) is open over the view. */
   statusOpen: boolean;
   /** meters-v2 §3: the day the first late chat turn was taken (the `chat.late` hint has had its once). */
@@ -602,6 +605,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     boss: null,
     collection: EMPTY_COLLECTION,
     bookOpen: false,
+    bookOpened: false,
     statusOpen: false,
     chatLateDay: null,
     stare: null,

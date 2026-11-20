@@ -107,7 +107,13 @@
 .room .list .it .mark{font-style:normal;flex:0 0 auto;color:var(--ink)}
 .room .list .it.now{font-weight:600;color:var(--ink)}
 .room .list .it.later{opacity:.6}
-.room .list .it.wait{opacity:.6;color:#9a6400}
+/* wait-card (author 2026-11-20): the list and the delivery card stack at the top left; the list keeps its class for the motion layer */
+.room .hud-left{position:absolute;left:28px;top:28px;width:280px;display:flex;flex-direction:column;gap:10px;z-index:12}
+.room .hud-left .list{position:static;left:auto;top:auto;width:auto}
+.room .wait-card{background:var(--paper);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.35);border-radius:10px;padding:12px 16px;box-shadow:0 6px 24px rgba(0,0,0,.12);font-size:15px;line-height:1.7;color:var(--ink)}
+.room .wait-card .h{font-size:11px;letter-spacing:.2em;color:#8a7f70;margin-bottom:6px}
+.room .wait-card .it{display:flex;gap:8px;align-items:baseline}
+.room .wait-card .count{margin-left:auto;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:.05em;color:#8a7f70}
 /* guidance R5: on 屏幕 the same card over the OS area's top-left, under the 28 px top bar; it takes no clicks. */
 .os-list{position:absolute;left:0;top:28px;z-index:6;pointer-events:none}
 /* The checklist only watches: no line is a button, no hover state. */
@@ -320,6 +326,9 @@
 .scene .scene-prop{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-height:60%;max-width:80%;filter:drop-shadow(0 18px 28px rgba(0,0,0,.45));user-select:none}
 /* Standing NPCs (author 2026-11-18): the speaker's half-body in the middle of the frame, feet below the box, the box over the waist */
 .dlg-layer .scene-stand{position:fixed;left:calc(var(--stage-l,0px) + var(--stage-w,100vw) / 2);bottom:calc(100vh - var(--stage-t,0px) - var(--stage-h,100vh));height:calc(var(--stage-h,100vh) * .97);transform:translateX(-50%);filter:contrast(1.06) saturate(1.1) drop-shadow(0 6px 18px rgba(0,0,0,.35));user-select:none;pointer-events:none}
+/* two-up (author 2026-11-20): two people in one scene — the speaker to the right, lit; the other to the left, dimmed */
+.dlg-layer .scene-stand.speaking{left:calc(var(--stage-l,0px) + var(--stage-w,100vw) * .66)}
+.dlg-layer .scene-stand.other{left:calc(var(--stage-l,0px) + var(--stage-w,100vw) * .34);filter:brightness(.55) saturate(.8) drop-shadow(0 6px 18px rgba(0,0,0,.35));transition:filter .3s}
 /* The prologue's page (opening R2): black, the dream's backdrop, 跳过 top-right, the fade out. */
 .stage.opening-page{position:relative;width:1600px;height:900px;background:#000;overflow:hidden}
 .opening-page > .scene{position:absolute;inset:0;pointer-events:none;overflow:hidden}
@@ -346,6 +355,8 @@
 /* 门 (2026-11-02): the door is actions on the door. Only the current step exists, as a spot on the
    thing itself (the chain, the bag, the chain and knob); its caption is its label; 4 % brighter on hover. */
 .room .door-bg{position:absolute;inset:0;background:#000 url(/room/door_chain.png) center/cover;pointer-events:none}
+/* The door beat's section only carries data since 2026-11-02 (its lines play in the box); the dark caption box it still drew was the stray bar the author saw at the door (2026-11-19). Never drawn. */
+.room .door-beat{display:none}
 .room .door-spot{position:absolute;border:0;padding:0;margin:0;background:transparent;cursor:pointer;border-radius:6px}
 .room .door-spot:hover{background:rgba(255,255,255,.04)}
 .room .door-spot:focus-visible{outline:2px solid rgba(232,228,220,.55);outline-offset:2px}

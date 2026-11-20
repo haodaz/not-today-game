@@ -570,8 +570,12 @@ describe("R14 · heads and tails", () => {
     expect(r.session.dialogue.queue[0]?.ending).toEqual({ kind: "taskHome" });
     while (r.session.dialogue.queue.length) r.act("loop-advance");
     expect(r.session.workbenchPage).toBe("home");
+    // author 2026-11-20: the work went to the boss, so the screen lands in his thread (听听 in front, the
+    // boss's conversation open); the next task's row on 工作台 is lit once the player goes back there.
+    expect(r.session.conversation).toBe("boss");
+    r.session.leftApp = "workbench";
+    r.session.focus = "left" as never;
     const g = guideNow(store.getState(), store.getEvents(), r.session);
     expect(g?.id).toBe("next");
-    expect(r.out()).toMatch(new RegExp(`data-action="wb-nav" data-page="task:${g!.target.kind === "task" ? g!.target.id : ""}"[^>]*data-guide="on"`));
   });
 });

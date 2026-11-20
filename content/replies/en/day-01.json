@@ -73,7 +73,7 @@
     "partner": {
       "incoming": [
         {
-          "t": "08:40",
+          "t": "15:05",
           "text": "[Card] Competitor A's storyline · Forwarded",
           "kind": "work",
           "card": {
@@ -131,48 +131,48 @@
     "group": {
       "incoming": [
         {
-          "t": "09:12",
+          "t": "15:10",
           "text": "Lao Zhou: The old office's building management called. Two boxes nobody's claimed. Whose?",
           "kind": "work"
         },
         {
-          "t": "09:13",
+          "t": "15:11",
           "text": "member: Not me.",
           "kind": "work"
         },
         {
-          "t": "09:13",
+          "t": "15:11",
           "text": "member：+1",
           "kind": "work"
         },
         {
-          "t": "10:02",
+          "t": "15:20",
           "text": "Vivi: Look what I've got. I had AI build the insight engine. One night.",
           "kind": "work"
         },
         {
-          "t": "10:02",
+          "t": "15:20",
           "text": "Vivi: [Web page] InsightEngine_Plan_v0.1.html",
           "kind": "deliverable",
           "doc": "vivi-plan-1"
         },
         {
-          "t": "10:03",
+          "t": "15:21",
           "text": "Vivi: The core loop already works, have a play. No need to schedule this kind of thing anymore lol",
           "kind": "work"
         },
         {
-          "t": "10:04",
+          "t": "15:22",
           "text": "Vivi: @tech build one like this",
           "kind": "work"
         },
         {
-          "t": "10:05",
+          "t": "15:23",
           "text": "member：👍",
           "kind": "work"
         },
         {
-          "t": "10:05",
+          "t": "15:23",
           "text": "member: Learned a lot.",
           "kind": "work"
         }
@@ -243,12 +243,12 @@
     "xiaozhang": {
       "incoming": [
         {
-          "t": "09:40",
+          "t": "15:30",
           "text": "Morning {calledBy}! The field names: do I write them the old way or wait for you?",
           "kind": "work"
         },
         {
-          "t": "09:41",
+          "t": "15:31",
           "text": "The graph's two-hundred-odd nodes. I only went through them with you yesterday.",
           "kind": "work"
         }

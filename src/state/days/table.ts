@@ -133,6 +133,8 @@ export interface Item {
   readonly self?: boolean;
   readonly origin?: "them";
   readonly locked?: "requiredPending";
+  /** author 2026-11-20 (「不是要立刻做的，用户可以自行探索的 … 就不用再做成任务了」): in the graph, never on the card. */
+  readonly quiet?: true;
   readonly onUnlock?: Sequence;
   readonly onDone?: Sequence;
   /** late-days FR4: Kuro closes this item's document (工作台 文档) when it is opened. */
@@ -332,7 +334,9 @@ function sequence(v: unknown, w: string, allowChoices: boolean, choiceSay = fals
 
 function item(v: unknown, w: string): Item {
   if (!isRecord(v)) fail(w, "an item must be an object");
-  keys(v, ["id", "text", "unlock", "done", "required", "when", "rewrite", "sfx", "self", "origin", "locked", "onUnlock", "onDone", "kuroCloses", "kuroClosesLine"], w);
+  keys(v, ["id", "text", "unlock", "done", "required", "when", "rewrite", "sfx", "self", "origin", "locked", "quiet", "onUnlock", "onDone", "kuroCloses", "kuroClosesLine"], w);
+  if (v.quiet !== undefined && v.quiet !== true) fail(`${w}.quiet`, "must be true when given");
+  if (v.quiet === true && v.required === true) fail(`${w}.quiet`, "a quiet item cannot be required (nothing would show what holds the day)");
   if (v.when !== undefined && !(ITEM_WHEN as readonly unknown[]).includes(v.when)) fail(`${w}.when`, `must be one of ${ITEM_WHEN.map((x) => `"${x}"`).join(", ")}`);
   // late-days FR4: Kuro may close this item's document when it is opened.
   const closes = parseKuroCloses(v, (field, problem) => fail(`${w}.${field}`, problem));
@@ -350,6 +354,7 @@ function item(v: unknown, w: string): Item {
     unlockRaw,
     doneRaw,
     required: v.required,
+    ...(v.quiet === true ? { quiet: true as const } : {}),
     when: (v.when as ItemWhen | undefined) ?? "day",
     ...(v.rewrite !== undefined ? { rewrite: str(v.rewrite, `${w}.rewrite`) } : {}),
     ...(v.sfx !== undefined ? { sfx: str(v.sfx, `${w}.sfx`) } : {}),
@@ -505,7 +510,7 @@ export function localiseDayFile(zh: DayFile, en: DayFile, label: string): DayFil
     const e = en.items[i]!;
     const w = `${label}.items[${i}]`;
     if (z.id !== e.id) fail(w, `id "${e.id}", the Chinese has "${z.id}"`);
-    if (z.unlockRaw !== e.unlockRaw || z.doneRaw !== e.doneRaw || z.when !== e.when || z.required !== e.required) fail(w, `a non-text field differs from the Chinese`);
+    if (z.unlockRaw !== e.unlockRaw || z.doneRaw !== e.doneRaw || z.when !== e.when || z.required !== e.required || z.quiet !== e.quiet) fail(w, `a non-text field differs from the Chinese`);
     // The onUnlock / onDone sequences are localised first, then `bilingual` wraps the text fields.
     // (Never spread a bilingual object: spreading invokes its getters and flattens them to values.)
     const withSeq = {

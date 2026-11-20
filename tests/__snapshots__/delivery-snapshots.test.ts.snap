@@ -2,19 +2,19 @@
 
 exports[`FR4 door beat snapshots > day 1 lunch: the bag and the cardboard box 1`] = `
 [
-  "<section class="door-beat" data-day="1" data-meal="lunch" data-state="idle">
+  "<section class="door-beat" data-day="1" data-meal="lunch" data-state="idle" data-empty="1">
 </section>",
-  "<section class="door-beat" data-day="1" data-meal="lunch" data-state="delivered" data-step="0">
+  "<section class="door-beat" data-day="1" data-meal="lunch" data-state="delivered" data-step="0" data-empty="1">
 </section>",
-  "<section class="door-beat" data-day="1" data-meal="lunch" data-state="atDoor" data-step="1">
+  "<section class="door-beat" data-day="1" data-meal="lunch" data-state="atDoor" data-step="1" data-empty="1">
 </section>",
-  "<section class="door-beat" data-day="1" data-meal="lunch" data-state="chainOpen" data-step="2">
+  "<section class="door-beat" data-day="1" data-meal="lunch" data-state="chainOpen" data-step="2" data-empty="1">
 </section>",
   "[box narration] 走廊的灯是白的，一个人的脚步下楼。",
-  "<section class="door-beat" data-day="1" data-meal="lunch" data-state="holding" data-step="3">
+  "<section class="door-beat" data-day="1" data-meal="lunch" data-state="holding" data-step="3" data-empty="1">
 </section>",
   "[box narration] 热的。袋口打了个死结。",
-  "<section class="door-beat" data-day="1" data-meal="lunch" data-state="closing" data-step="4">
+  "<section class="door-beat" data-day="1" data-meal="lunch" data-state="closing" data-step="4" data-empty="1">
 </section>",
   "<section class="door-beat" data-day="1" data-meal="lunch" data-state="onDesk" data-step="5">
   <div class="desk-corner">
@@ -29,19 +29,19 @@ exports[`FR4 door beat snapshots > day 1 lunch: the bag and the cardboard box 1`
 
 exports[`FR4 door beat snapshots > day 9 dinner: the bag is moving 1`] = `
 [
-  "<section class="door-beat" data-day="9" data-meal="dinner" data-state="idle">
+  "<section class="door-beat" data-day="9" data-meal="dinner" data-state="idle" data-empty="1">
 </section>",
-  "<section class="door-beat" data-day="9" data-meal="dinner" data-state="delivered" data-step="0">
+  "<section class="door-beat" data-day="9" data-meal="dinner" data-state="delivered" data-step="0" data-empty="1">
 </section>",
-  "<section class="door-beat" data-day="9" data-meal="dinner" data-state="atDoor" data-step="1">
+  "<section class="door-beat" data-day="9" data-meal="dinner" data-state="atDoor" data-step="1" data-empty="1">
 </section>",
-  "<section class="door-beat" data-day="9" data-meal="dinner" data-state="chainOpen" data-step="2">
+  "<section class="door-beat" data-day="9" data-meal="dinner" data-state="chainOpen" data-step="2" data-empty="1">
 </section>",
   "[box narration] 脚步。",
-  "<section class="door-beat" data-day="9" data-meal="dinner" data-state="holding" data-step="3">
+  "<section class="door-beat" data-day="9" data-meal="dinner" data-state="holding" data-step="3" data-empty="1">
 </section>",
   "[box narration] 温的。袋子在轻轻动，像里面有心跳。打开是汤在晃。",
-  "<section class="door-beat" data-day="9" data-meal="dinner" data-state="closing" data-step="4">
+  "<section class="door-beat" data-day="9" data-meal="dinner" data-state="closing" data-step="4" data-empty="1">
 </section>",
   "<section class="door-beat" data-day="9" data-meal="dinner" data-state="onDesk" data-step="5">
   <div class="desk-corner">
@@ -54,19 +54,19 @@ exports[`FR4 door beat snapshots > day 9 dinner: the bag is moving 1`] = `
 
 exports[`FR4 door beat snapshots > day 13 dinner: a notice slid under the door 1`] = `
 [
-  "<section class="door-beat" data-day="13" data-meal="dinner" data-state="idle">
+  "<section class="door-beat" data-day="13" data-meal="dinner" data-state="idle" data-empty="1">
 </section>",
-  "<section class="door-beat" data-day="13" data-meal="dinner" data-state="delivered" data-step="0">
+  "<section class="door-beat" data-day="13" data-meal="dinner" data-state="delivered" data-step="0" data-empty="1">
 </section>",
-  "<section class="door-beat" data-day="13" data-meal="dinner" data-state="atDoor" data-step="1">
+  "<section class="door-beat" data-day="13" data-meal="dinner" data-state="atDoor" data-step="1" data-empty="1">
 </section>",
-  "<section class="door-beat" data-day="13" data-meal="dinner" data-state="chainOpen" data-step="2">
+  "<section class="door-beat" data-day="13" data-meal="dinner" data-state="chainOpen" data-step="2" data-empty="1">
 </section>",
   "[box narration] 没有人。袋子是从门缝底下塞进来的，扁的。",
-  "<section class="door-beat" data-day="13" data-meal="dinner" data-state="holding" data-step="3">
+  "<section class="door-beat" data-day="13" data-meal="dinner" data-state="holding" data-step="3" data-empty="1">
 </section>",
   "[box narration] 扁的。里面是纸：一张升级通知。",
-  "<section class="door-beat" data-day="13" data-meal="dinner" data-state="closing" data-step="4">
+  "<section class="door-beat" data-day="13" data-meal="dinner" data-state="closing" data-step="4" data-empty="1">
 </section>",
   "<section class="door-beat" data-day="13" data-meal="dinner" data-state="onDesk" data-step="5">
   <div class="desk-corner">

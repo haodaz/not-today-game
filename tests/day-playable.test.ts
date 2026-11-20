@@ -69,6 +69,9 @@ describe("1. lunch arrives at the minimum once a work item is done (checkArrival
     syncLoop(ctx);
     store.appendEvent(orderLunch);
     syncLoop(ctx);
+    // wait-card (2026-11-20): each order rolls its own wait; pin this one to the day's ceiling
+    const o = ctx.session.loop!.orders.get("lunch")!;
+    ctx.session.loop!.orders.set("lunch", { ...o, waitMs: minutes(dayFiles.get(1)!.delivery.waitMinutes) });
     vi.advanceTimersByTime(minutes(dayFiles.get(1)!.delivery.waitMinutes) - 1_000);
     expect(arrived(store)).toBe(false);
     vi.advanceTimersByTime(1_300);
