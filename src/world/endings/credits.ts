@@ -55,24 +55,37 @@ export interface CreditCard {
 }
 
 /** The first backdrop a night's dream shows, as the memory's still. */
+/**
+ * The dream's still, as it stands when the first one with a portrait speaks (2026-11-20: the night may
+ * open on a shot of the room before the dream — the pink point between the screens — which is not
+ * the memory); with no one speaking, the first backdrop the dream shows.
+ */
+function memoryWalk(day: number): CreditMemory | null {
+  const say = dayFile(day)?.beats.night?.say ?? [];
+  let current: string | null = null;
+  let first: string | null = null;
+  for (const l of say) {
+    const bd = (l as { backdrop?: unknown }).backdrop;
+    if (typeof bd === "string") {
+      current = bd === "" ? null : bd;
+      first ??= current;
+    }
+    const who = (l as { who?: unknown }).who;
+    if (typeof who !== "string" || who === "me" || who === "kuro") continue;
+    const portrait = npcPortrait(who);
+    const backdrop = current ?? first;
+    if (portrait && backdrop) return { backdrop, who, portrait, line: (l as { t?: string }).t ?? null };
+  }
+  return first ? { backdrop: first, who: null, portrait: null, line: null } : null;
+}
+
 export function memoryStill(day: number): string | null {
-  const night = dayFile(day)?.beats.night;
-  const line = night?.say.find((l) => typeof (l as { backdrop?: unknown }).backdrop === "string");
-  return line ? (line as { backdrop: string }).backdrop : null;
+  return memoryWalk(day)?.backdrop ?? null;
 }
 
 /** The memory: the still, and the first one in the dream who has a portrait, with their first line. */
 export function creditMemory(day: number): CreditMemory | null {
-  const backdrop = memoryStill(day);
-  if (!backdrop) return null;
-  const say = dayFile(day)?.beats.night?.say ?? [];
-  for (const l of say) {
-    const who = (l as { who?: unknown }).who;
-    if (typeof who !== "string" || who === "me" || who === "kuro") continue;
-    const portrait = npcPortrait(who);
-    if (portrait) return { backdrop, who, portrait, line: (l as { t?: string }).t ?? null };
-  }
-  return { backdrop, who: null, portrait: null, line: null };
+  return memoryWalk(day);
 }
 
 /** The old objects the run met, in the order they came (stages: objectsFoundOnDay), each with its memory's still. */

@@ -195,6 +195,11 @@ export interface Scene {
   readonly backdrop: string | null;
   readonly prop: string | null;
   /**
+   * Two-up (author 2026-11-20): the other NPC of the same scene who stood before `stand`, kept at the
+   * side, dimmed, while `stand` speaks — two people in one dream the classic way, one left, one right.
+   */
+  readonly other?: string;
+  /**
    * Standing NPCs (author 2026-11-18): while a backdrop is on, the NPC saying the line on show stands
    * in the middle of the frame behind the box (npc.json `stand`); absent otherwise.
    */
@@ -215,13 +220,20 @@ export function sceneOf(d: DialogueState): Scene {
   // Standing NPCs: the last NPC who spoke stays standing through the narration and the player's
   // lines, as in a visual novel, until another person speaks or the backdrop changes.
   let stand: string | null = null;
+  // two-up: the NPC who stood before the current one, in the same scene (a new backdrop clears both)
+  let other: string | null = null;
   for (const l of q.lines.slice(0, Math.min(d.line, q.lines.length - 1) + 1)) {
     if (l.backdrop !== undefined) {
       backdrop = l.backdrop === "" ? null : l.backdrop;
       stand = null;
+      other = null;
     }
     if (l.prop !== undefined) prop = l.prop === "" ? null : l.prop;
-    if (q.voice !== "kuro" && (l.k === "speaker" || l.k === "narration") && l.who !== undefined && l.who !== "me") stand = npcStand(l.who);
+    if (q.voice !== "kuro" && (l.k === "speaker" || l.k === "narration") && l.who !== undefined && l.who !== "me") {
+      const next = npcStand(l.who);
+      if (next !== null && stand !== null && next !== stand) other = stand;
+      if (next !== null) stand = next;
+    }
   }
   if (backdrop === null && prop === null) return NO_SCENE;
   // With a prop on (the 96): the prop holds the middle for the narration; the NPC takes it only for
@@ -229,7 +241,7 @@ export function sceneOf(d: DialogueState): Scene {
   const cur = q.lines[Math.min(d.line, q.lines.length - 1)];
   const speaking = q.voice !== "kuro" && !!cur && (cur.k === "speaker" || cur.k === "narration") && cur.who !== undefined && cur.who !== "me";
   const show = backdrop !== null && stand !== null && (prop === null || speaking);
-  return { backdrop, prop, ...(show ? { stand: stand! } : {}) };
+  return { backdrop, prop, ...(show ? { stand: stand! } : {}), ...(show && other !== null ? { other } : {}) };
 }
 
 // ——— a line waits for its place (dialogue addition 2026-11-02) ———

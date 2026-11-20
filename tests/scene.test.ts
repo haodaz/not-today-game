@@ -89,14 +89,39 @@ describe("the loader", () => {
 describe("sceneOf", () => {
   it("day 1's dream (dreams 2026-11-06): the classroom from line 4, the 96 from line 6, the dinner table from 13, the 100 back in the classroom from 18 (the four-crosses line added 2026-11-16); kept to the end", () => {
     const at = (line: number) => sceneOf(nightAt(1, line));
-    expect(at(0)).toEqual(NO_SCENE);
-    expect(at(4)).toEqual(NO_SCENE);
-    expect(at(5)).toMatchObject({ backdrop: "/room/dream/classroom.jpg", prop: null });
-    expect(at(7)).toMatchObject({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_96.png" });
-    expect(at(13)).toMatchObject({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_96.png" });
-    expect(at(14)).toMatchObject({ backdrop: "/room/dream/home_dinner.jpg", prop: "/room/props/exam_96.png" });
-    expect(at(19)).toMatchObject({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_100.png" });
+    // author 2026-11-20 (「睡前说到，粉红色的光」): the first three lines show the desk at night with the
+    // pink point in the gap between the screens; the eyes close on line 3 (black again).
+    expect(at(0)).toMatchObject({ backdrop: "/room/dream/gap_pink.jpg", prop: null });
+    expect(at(2)).toMatchObject({ backdrop: "/room/dream/gap_pink.jpg", prop: null });
+    expect(at(3)).toEqual(NO_SCENE);
+    // author 2026-11-20 (the chick's backstory): the street of 2000 with the chick close up, then the schoolyard
+    expect(at(4)).toMatchObject({ backdrop: "/room/dream/street_2000.jpg", prop: null });
+    expect(at(5)).toMatchObject({ backdrop: "/room/dream/street_2000.jpg", prop: "/room/props/chick_front.png" });
+    expect(at(7)).toMatchObject({ backdrop: "/room/dream/campus_2000.jpg", prop: null });
+    expect(at(9)).toMatchObject({ backdrop: "/room/dream/classroom.jpg", prop: null });
+    expect(at(11)).toMatchObject({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_96.png" });
+    expect(at(17)).toMatchObject({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_96.png" });
+    expect(at(18)).toMatchObject({ backdrop: "/room/dream/home_dinner.jpg", prop: "/room/props/exam_96.png" });
     expect(at(23)).toMatchObject({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_100.png" });
+    expect(at(27)).toMatchObject({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_100.png" });
+  });
+  it("two-up (author 2026-11-20): a second person in the same scene keeps the first at the side; a new backdrop clears both", () => {
+    const seq = (line: number): DialogueState => ({ queue: [{ key: "x", lines: [
+      { k: "narration", t: "a", backdrop: "/room/dream/home_dinner.jpg" },
+      { k: "speaker", who: "family", t: "b" },
+      { k: "speaker", who: "father", t: "c" },
+      { k: "narration", t: "d" },
+      { k: "speaker", who: "family", t: "e" },
+      { k: "narration", t: "f", backdrop: "/room/dream/classroom.jpg" },
+      { k: "speaker", who: "teacher", t: "g" },
+    ], ending: { kind: "none" } }], line });
+    expect(sceneOf(seq(1))).toMatchObject({ stand: "/npc/stand/mother.webp" });
+    expect(sceneOf(seq(1)).other).toBeUndefined();
+    expect(sceneOf(seq(2))).toMatchObject({ stand: "/npc/stand/father.webp", other: "/npc/stand/mother.webp" });
+    expect(sceneOf(seq(3))).toMatchObject({ stand: "/npc/stand/father.webp", other: "/npc/stand/mother.webp" }); // the narration keeps them
+    expect(sceneOf(seq(4))).toMatchObject({ stand: "/npc/stand/mother.webp", other: "/npc/stand/father.webp" });
+    expect(sceneOf(seq(6))).toMatchObject({ stand: "/npc/stand/teacher.webp" });
+    expect(sceneOf(seq(6)).other).toBeUndefined();
   });
   it("day 11: office_busy, then office (a later backdrop replaces it)", () => {
     expect(sceneOf(nightAt(11, 2)).backdrop).toBe("/room/dream/office_busy.jpg");
@@ -142,20 +167,20 @@ describe("the stage", () => {
   });
   it("snapshots day 1's dream: the line with backdrop, prop and portrait; then the 100", () => {
     const store = atDay(1);
-    const teacher = dayFiles.get(1)!.beats.night!.say[11]!;
+    const teacher = dayFiles.get(1)!.beats.night!.say[15]!; // 2026-11-20: four lines of the chick's backstory come before the classroom
     expect(teacher.k).toBe("speaker");
-    const withPortrait = stageOf(store, nightAt(1, 11));
+    const withPortrait = stageOf(store, nightAt(1, 15));
     expect(sceneHtml(withPortrait)).toContain('data-src="/room/dream/classroom.jpg"');
     // Standing NPCs (author 2026-11-18): 卷子出现的时候是卷子，老师说话的时候才是老师. Her line: she stands
     // in the middle (drawn in the box's layer), the 96 is put away, the box has no bust.
-    expect(sceneOf(nightAt(1, 11)).stand).toBe(`/npc/stand/${teacher.who}.webp`);
+    expect(sceneOf(nightAt(1, 15)).stand).toBe(`/npc/stand/${teacher.who}.webp`);
     expect(sceneHtml(withPortrait)).not.toContain("scene-prop");
     expect(withPortrait).not.toContain("npc-portrait");
     // The narration after it: the 96 is back in the middle, nobody stands.
-    const narration = stageOf(store, nightAt(1, 12));
-    expect(sceneOf(nightAt(1, 12)).stand).toBeUndefined();
+    const narration = stageOf(store, nightAt(1, 16));
+    expect(sceneOf(nightAt(1, 16)).stand).toBeUndefined();
     expect(sceneHtml(narration)).toContain('<img class="scene-prop" data-src="/room/props/exam_96.png" src="/room/props/exam_96.png"');
-    const hundred = stageOf(store, nightAt(1, 19));
+    const hundred = stageOf(store, nightAt(1, 23));
     expect(sceneHtml(hundred)).toContain('src="/room/props/exam_100.png"');
     expect(hundred).not.toContain("exam_96");
     expect({ withPortrait, hundred }).toMatchSnapshot();
@@ -213,7 +238,7 @@ describe("the motion: a 1.2 s crossfade in, a fade back after the sequence, the 
     const store = atDay(1);
     const { root, session } = mount(store);
     await frame();
-    session.dialogue = nightAt(1, 5);
+    session.dialogue = nightAt(1, 9);
     await rerender(root);
     const bd = live(root, ".stage > .scene > .scene-backdrop")[0]!;
     expect(bd.dataset.src).toBe("/room/dream/classroom.jpg");
@@ -221,7 +246,7 @@ describe("the motion: a 1.2 s crossfade in, a fade back after the sequence, the 
     // Continued across re-renders with a negative delay, not restarted.
     await rerender(root);
     expect(live(root, ".scene-backdrop")[0]!.style.animation).toMatch(/m-fade-in 1200ms \S+ (-\d+|0)ms both/);
-    session.dialogue = nightAt(1, 7);
+    session.dialogue = nightAt(1, 11);
     await rerender(root);
     expect(live(root, ".scene-prop")[0]!.style.animation).toContain(`m-fade-in ${CHOSEN.propIn}ms`);
     // A → B: the classroom stays under the office while it fades in.
