@@ -64,7 +64,7 @@ export interface WorkBar {
   readonly enabled: boolean;
   readonly exit: boolean;
   /** hunger (2026-11-20): why the primary is held when it is held for the stomach's sake (the shell writes it as data-hold). */
-  readonly hold?: WorkHold;
+  readonly hold?: Exclude<WorkHold, null>;
 }
 
 /**
