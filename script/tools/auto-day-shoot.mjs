@@ -323,7 +323,16 @@ for (const it of ITEMS) {
   if (/^flag:task/.test(it.done) && !deferred.has(it.id)) {
     await toWorkbench();
     if (!(await has("[data-action=work-start]")) && (await has("[data-action=win-full][data-app=workbench]"))) await sel("[data-action=win-full][data-app=workbench]", 1);
-    if (await has("[data-action=work-start][disabled]")) { deferred.add(it.id); ITEMS.push(it); note("   (开始工作 is held: the meal first, this task again later)"); await toRoom(); continue; }
+    if (await has("[data-action=work-start][disabled]")) {
+      // right after the next meal is eaten (the dinner waits for this task, so not at the day's end)
+      deferred.add(it.id);
+      const here = ITEMS.indexOf(it);
+      const eatAt = ITEMS.findIndex((x, k) => k > here && /^event:eat:/.test(x.done));
+      ITEMS.splice(eatAt >= 0 ? eatAt + 1 : ITEMS.length, 0, it);
+      note(`   (开始工作 is held: the meal first, this task again ${eatAt >= 0 ? "right after it" : "at the end"})`);
+      await toRoom();
+      continue;
+    }
   }
   if (await has("[data-action=onboard-skip]")) { note("   (coach marks: skipped)"); await sel("[data-action=onboard-skip]", 0.6); }
   const t0 = await text();
