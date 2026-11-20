@@ -88,8 +88,10 @@
 /* Lying down: rise a little, then black; the night's lines play in the black */
 @keyframes m-sleep-rise{to{translate:0 var(--m-sleep-rise)}}
 .stage.m-asleep::after{content:"";position:absolute;inset:0;background:#000;z-index:20;pointer-events:none;animation:m-fade-in var(--m-sleep) var(--m-ease) var(--m-sleep-t,0ms) both}
-.stage.m-asleep > :not(.dlg):not(.dlg-hist-layer){animation:m-sleep-rise var(--m-sleep) var(--m-ease) var(--m-sleep-t,0ms) both}
+.stage.m-asleep > :not(.dlg):not(.dlg-hist-layer):not(.scene){animation:m-sleep-rise var(--m-sleep) var(--m-ease) var(--m-sleep-t,0ms) both}
 .stage.m-asleep > .dlg,.stage.m-asleep > .dlg-hist-layer{z-index:21}
+/* The dream's backdrop plays over the sleep's black, not under it (author 2026-11-19: 「梦里全是黑的」) */
+.stage.m-asleep > .scene{z-index:21}
 /* The next day starts from white */
 .stage.m-wake::before{content:"";position:absolute;inset:0;background:#fff;z-index:60;pointer-events:none;animation:m-fade-out var(--m-wake) var(--m-ease) var(--m-wake-t,0ms) both}
 
