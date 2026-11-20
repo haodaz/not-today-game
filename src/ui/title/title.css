@@ -154,8 +154,10 @@
 .figure-card-line{margin:8px 0 0;font:15px/2.1 var(--font-game-text,inherit);letter-spacing:.1em;color:rgba(239,233,223,.85);text-shadow:0 1px 12px rgba(0,0,0,.9)}
 .figure-card-go{display:block;width:260px;margin-top:14px;padding:12px 0;text-align:center;border:2px solid rgba(239,233,223,.5);font-size:16px;letter-spacing:.3em;text-indent:.3em;color:rgba(239,233,223,.75);background:rgba(0,0,0,.35)}
 @media (prefers-reduced-motion:reduce){.figure-card{animation:none}}
-.book-reader{position:absolute;inset:0;z-index:60;background:#111}
-.book-reader iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff}
+/* book-cover (author 2026-11-20): the cover shows over the room; the ground darkens once the book opens */
+.book-reader{position:absolute;inset:0;z-index:60;background:transparent;transition:background .5s}
+.book-reader.opened{background:#111}
+.book-reader iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent}
 .book-close{position:absolute;right:20px;top:16px;z-index:1;border:0;border-radius:8px;padding:6px 14px;background:rgba(232,228,220,.9);color:#1d2129;font-size:13px;cursor:pointer}
 
 /* Polish 2026-11-05 (Claude, from title shots): the logo hides behind an open panel instead of

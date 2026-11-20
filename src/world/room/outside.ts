@@ -190,6 +190,15 @@ export function createRoom3dLayer(onMessage: (ctx: ActionContext, msg: RoomMessa
       }
     };
     const onWindowMessage = (e: MessageEvent) => {
+      // book-cover (author 2026-11-20): the bedside book's page says its cover was opened → the reader darkens
+      const d = e.data as { source?: unknown; type?: unknown } | null;
+      if (d && typeof d === "object" && d.source === "nt-gamebook" && d.type === "opened") {
+        if (!ctx.session.bookOpened) {
+          ctx.session.bookOpened = true;
+          ctx.rerender();
+        }
+        return;
+      }
       const msg = roomMessage(e.data);
       if (!msg || !e.source) return;
       const wake = wakeFrame();
