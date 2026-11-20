@@ -181,21 +181,21 @@
   "items": [
     {
       "id": "boot",
-      "text": "Boot up.",
+      "text": "Boot the computer first.",
       "unlock": "start",
       "done": "event:boot",
       "required": true
     },
     {
       "id": "msgs",
-      "text": "Glance at the messages.",
+      "text": "Go to the screen and read the messages.",
       "unlock": "done:boot",
       "done": "event:openApp:msgs",
       "required": true
     },
     {
       "id": "lunch",
-      "text": "Order lunch.",
+      "text": "Pick up the phone and order lunch.",
       "unlock": "done:msgs",
       "done": "event:order:lunch",
       "required": true,
@@ -210,7 +210,7 @@
     },
     {
       "id": "pickup",
-      "text": "Go and get it.",
+      "text": "Lunch is at the door. Go get it.",
       "unlock": "event:delivery:arrives:lunch",
       "done": "event:pickup:lunch",
       "required": true,
@@ -227,7 +227,7 @@
     },
     {
       "id": "eat",
-      "text": "Eat.",
+      "text": "Lunch is on the table by the window. Eat.",
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
       "required": false
@@ -241,14 +241,14 @@
     },
     {
       "id": "reply",
-      "text": "Reply to the boss.",
+      "text": "Send the boss a reply.",
       "unlock": "done:task1",
       "done": "event:reply:boss",
       "required": true
     },
     {
       "id": "dinner",
-      "text": "Order dinner.",
+      "text": "Pick up the phone and order dinner.",
       "unlock": "done:task1",
       "done": "event:order:dinner",
       "required": true,
@@ -256,7 +256,7 @@
     },
     {
       "id": "pickupDinner",
-      "text": "Go get it.",
+      "text": "Dinner is at the door. Go get it.",
       "unlock": "event:delivery:arrives:dinner",
       "done": "event:pickup:dinner",
       "required": true,
@@ -273,7 +273,7 @@
     },
     {
       "id": "eatDinner",
-      "text": "The food is cold. By the window, eat.",
+      "text": "Dinner has gone cold. Eat it at the window anyway.",
       "unlock": "done:task3",
       "done": "event:eat:dinner",
       "required": true,
@@ -290,15 +290,15 @@
     },
     {
       "id": "desk",
-      "text": "Take a look at the desk.",
-      "unlock": "done:reply",
+      "text": "Go back to the desk and take a look.",
+      "unlock": "done:eatDinner",
       "done": "event:beat:desk",
       "required": true,
       "when": "night"
     },
     {
       "id": "shutdown",
-      "text": "Shut down.",
+      "text": "Shut the computer down before bed: top right of the screen.",
       "unlock": "done:desk",
       "done": "event:beat:shutdown",
       "required": true,
@@ -306,15 +306,16 @@
     },
     {
       "id": "chat",
-      "text": "Talk to it a while.",
+      "text": "Talk to the one in the corner.",
       "unlock": "done:shutdown",
       "done": "event:chat:any",
       "required": false,
-      "when": "night"
+      "when": "night",
+      "quiet": true
     },
     {
       "id": "bed",
-      "text": "Lie down.",
+      "text": "When you want to sleep, lie down on the bed.",
       "unlock": "done:shutdown",
       "done": "event:lieDown",
       "required": true,

@@ -89,14 +89,14 @@
   "items": [
     {
       "id": "boot",
-      "text": "Boot up.",
+      "text": "Boot the computer first.",
       "unlock": "start",
       "done": "event:boot",
       "required": true
     },
     {
       "id": "msgs",
-      "text": "Glance at the messages.",
+      "text": "Go to the screen and read the messages.",
       "unlock": "done:boot",
       "done": "event:openApp:msgs",
       "required": true,
@@ -147,7 +147,7 @@
     },
     {
       "id": "reply",
-      "text": "Reply to the boss.",
+      "text": "Send the boss a reply.",
       "unlock": "done:msgs",
       "done": "event:reply:boss",
       "required": true,
@@ -168,7 +168,7 @@
     },
     {
       "id": "desk",
-      "text": "Take a look at the desk.",
+      "text": "Go back to the desk and take a look.",
       "unlock": "done:work",
       "done": "event:beat:desk",
       "required": true,
@@ -176,7 +176,7 @@
     },
     {
       "id": "shutdown",
-      "text": "Shut down.",
+      "text": "Shut the computer down before bed: top right of the screen.",
       "unlock": "done:desk",
       "done": "event:beat:shutdown",
       "required": true,
@@ -184,15 +184,16 @@
     },
     {
       "id": "chat",
-      "text": "Talk to it a while.",
+      "text": "Talk to the one in the corner.",
       "unlock": "done:shutdown",
       "done": "event:chat:any",
       "required": false,
-      "when": "night"
+      "when": "night",
+      "quiet": true
     },
     {
       "id": "bed",
-      "text": "Lie down.",
+      "text": "When you want to sleep, lie down on the bed.",
       "unlock": "done:shutdown",
       "done": "event:lieDown",
       "required": true,

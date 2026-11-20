@@ -166,14 +166,14 @@
   "items": [
     {
       "id": "boot",
-      "text": "开机。",
+      "text": "先把电脑开了。",
       "unlock": "start",
       "done": "event:boot",
       "required": true
     },
     {
       "id": "msgs",
-      "text": "看一眼消息。",
+      "text": "进屏幕看看消息。",
       "unlock": "done:boot",
       "done": "event:openApp:msgs",
       "required": true,
@@ -196,7 +196,7 @@
     },
     {
       "id": "lunch",
-      "text": "点个午饭。",
+      "text": "拿起手机，点个午饭。",
       "unlock": "done:msgs",
       "done": "event:order:lunch",
       "required": true,
@@ -227,7 +227,7 @@
     },
     {
       "id": "pickup",
-      "text": "去拿。",
+      "text": "外卖到了，去门口拿。",
       "unlock": "event:delivery:arrives:lunch",
       "done": "event:pickup:lunch",
       "required": true,
@@ -244,7 +244,7 @@
     },
     {
       "id": "eat",
-      "text": "吃。",
+      "text": "外卖在窗边饭桌上，吃饭吧。",
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
       "required": false,
@@ -266,7 +266,7 @@
     },
     {
       "id": "reply",
-      "text": "回老板。",
+      "text": "给老王回一句。",
       "unlock": "done:task2",
       "done": "event:reply:boss",
       "required": true,
@@ -287,7 +287,7 @@
     },
     {
       "id": "dinner",
-      "text": "点个晚饭。",
+      "text": "拿起手机，点个晚饭。",
       "unlock": "done:task2",
       "done": "event:order:dinner",
       "required": true,
@@ -349,15 +349,15 @@
     },
     {
       "id": "desk",
-      "text": "看一眼桌子。",
-      "unlock": "done:task3",
+      "text": "回桌子那儿看一眼。",
+      "unlock": "done:deat",
       "done": "event:beat:desk",
       "required": true,
       "when": "night"
     },
     {
       "id": "shutdown",
-      "text": "关机。",
+      "text": "睡前把电脑关了：屏幕右上角。",
       "unlock": "done:desk",
       "done": "event:beat:shutdown",
       "required": true,
@@ -365,15 +365,16 @@
     },
     {
       "id": "chat",
-      "text": "和它说会儿话。",
+      "text": "和右下角那只说说话。",
       "unlock": "done:shutdown",
       "done": "event:chat:any",
       "required": false,
-      "when": "night"
+      "when": "night",
+      "quiet": true
     },
     {
       "id": "bed",
-      "text": "躺下。",
+      "text": "想睡了就去床上躺下。",
       "unlock": "done:shutdown",
       "done": "event:lieDown",
       "required": true,

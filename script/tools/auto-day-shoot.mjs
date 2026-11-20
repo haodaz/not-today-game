@@ -314,10 +314,17 @@ for (let pass = 0; pass < ITEMS.length; pass++) {
   const held = ITEMS.filter((x, k) => /^flag:task/.test(x.done) && ITEMS.slice(0, k).some((y) => /^event:pickup:/.test(y.done)));
   if (held.length) note(`(order: ${held.map((x) => `${x.id} (unlock ${x.unlock})`).join(", ")} stay after the pickup: what unlocks them comes after it)`);
 }
+const deferred = new Set();
 for (const it of ITEMS) {
   currentTaskId = it.id;
   const [kind, ...rest] = it.done.split(":"); const what = rest.join(":");
   note(`▶ ${it.id} (${it.done}) ${it.text}`);
+  // hunger (2026-11-20): 开始工作 held (too hungry, or a meal on its way) → the meal comes first; this task once more at the end
+  if (/^flag:task/.test(it.done) && !deferred.has(it.id)) {
+    await toWorkbench();
+    if (!(await has("[data-action=work-start]")) && (await has("[data-action=win-full][data-app=workbench]"))) await sel("[data-action=win-full][data-app=workbench]", 1);
+    if (await has("[data-action=work-start][disabled]")) { deferred.add(it.id); ITEMS.push(it); note("   (开始工作 is held: the meal first, this task again later)"); await toRoom(); continue; }
+  }
   if (await has("[data-action=onboard-skip]")) { note("   (coach marks: skipped)"); await sel("[data-action=onboard-skip]", 0.6); }
   const t0 = await text();
   const before = (() => { const m = /已做 (\d+) 件|(\d+) done/.exec(t0); return m ? Number(m[1] ?? m[2]) : -1; })();

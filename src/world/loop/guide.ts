@@ -147,10 +147,10 @@ export function guideNow(state: State, events: readonly GameEvent[], session: Se
   const atDoor = lc.file.items.find((it) => it.done.kind === "event" && it.done.event.type === "pickup" && states.get(it.id)!.unlocked && !states.get(it.id)!.done);
   if (atDoor && !desktop) return { id: "G8", target: { kind: "door" }, refuse: null, scope: "none" };
 
-  // G9 (author 2026-11-20: 「吃完了，回去干活吧」): day 1, lunch eaten, the work still to do, off the screen:
-  // the desk, then the screens, are lit.
+  // G9 (author 2026-11-20: 「吃完了，回去干活吧」, every day): lunch eaten, the work still to do, off the
+  // screen: the desk, then the screens, are lit.
   const lunchEaten = lc.file.items.find((it) => it.done.kind === "event" && it.done.event.type === "eat" && it.done.event.meal === "lunch");
-  if (day === 1 && !desktop && session.view !== "lying" && lunchEaten && states.get(lunchEaten.id)!.done && open?.tree && !state.flags.includes(open.tree.done)) {
+  if (!desktop && session.view !== "lying" && lunchEaten && states.get(lunchEaten.id)!.done && open?.tree && !state.flags.includes(open.tree.done)) {
     return { id: "G9", target: { kind: "screen" }, refuse: null, scope: "none" };
   }
 
