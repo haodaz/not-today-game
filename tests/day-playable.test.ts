@@ -37,7 +37,7 @@ describe("1. lunch arrives at the minimum once a work item is done (checkArrival
 
   it("order at t0, work done at t0 + 30 s: arrival at t0 + 2 min, not at t0 + 6 min", () => {
     const { minMinutes, waitMinutes } = dayFiles.get(1)!.delivery;
-    expect([minMinutes, waitMinutes]).toEqual([2, 6]);
+    expect([minMinutes, waitMinutes]).toEqual([1, 2]); // author 2026-11-19: day 1 waits one to two minutes
     const store = createStore({ startDay: 1 });
     store.appendEvent(step("rise"));
     store.appendEvent(step("boot"));
@@ -69,7 +69,7 @@ describe("1. lunch arrives at the minimum once a work item is done (checkArrival
     syncLoop(ctx);
     store.appendEvent(orderLunch);
     syncLoop(ctx);
-    vi.advanceTimersByTime(minutes(6) - 1_000);
+    vi.advanceTimersByTime(minutes(dayFiles.get(1)!.delivery.waitMinutes) - 1_000);
     expect(arrived(store)).toBe(false);
     vi.advanceTimersByTime(1_300);
     expect(arrived(store)).toBe(true);

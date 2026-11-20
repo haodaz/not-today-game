@@ -258,10 +258,10 @@ describe("R5 · 窗's table, and its close view", () => {
     const out = r.out();
     expect(out).toContain('class="stage room table-view"');
     expect(out).toContain(`data-at="meal" style="${rectStyle(TABLE_SHOT.meal)}"><button type="button" class="slot meal" data-action="loop-eat" data-meal="lunch"`);
-    // The table up close has no turn edges and no other hotspot; it has the way back.
+    // The table up close has no other hotspot; it has the way back, and (author 2026-11-19) it turns like 窗.
     expect(out).not.toContain("table-hit");
     expect(edgeLeads("table", "back")).toBe(true);
-    expect(edgeLeads("table", "left")).toBe(false);
+    expect(edgeLeads("table", "left")).toBe(true);
     r.act("loop-eat", { meal: "lunch" });
     r.act("loop-choice", { choice: "eat" }); // author 2026-11-11: 现在吃吗？ first; eaten, the box is gone
     expect(store.getEvents().filter((e) => e.kind === "step" && e.name === "eat:lunch")).toHaveLength(1);
@@ -360,24 +360,31 @@ describe("R7 · the day's work is one checklist line", () => {
     const store = booted();
     store.appendEvent({ kind: "step", name: "openApp:msgs", t: "09:05" });
     store.appendEvent({ kind: "reply", choice: "fine", recipient: "boss", t: "09:05" }); // day 1: lunch unlocks after the reply (2026-11-08)
+    // author 2026-11-19: day 1's work waits for lunch (pickup → the carton → eat); the work line appears after the meal.
+    const { completeUntil } = await import("./complete-items");
     const tasks = dayFiles.get(1)!.items.filter((it) => it.when === "day" && it.done.kind === "flag" && it.done.flag.startsWith("task_"));
     expect(tasks.length).toBeGreaterThan(1);
     const list = () => renderChecklist(checklist(loopContext(store.getState(), store.getEvents())!)).value;
     let out = list();
-    expect(out).toContain(`data-id="work">${t("checklist.work", { done: 0, total: tasks.length })}</div>`);
-    for (const task of tasks) expect(out).not.toContain(task.text);
-    // The other items keep their own lines.
+    // Before the meal: the other items have their own lines and no work line is there yet.
     expect(out).toContain(dayFiles.get(1)!.items.find((it) => it.id === "lunch")!.text);
+    expect(out).not.toContain('data-id="work"');
+    completeUntil(store, "task2");
+    out = list();
+    // After the meal the work line is the current one (it carries the marker).
+    expect(out).toMatch(new RegExp(`data-id="work">(<i class="mark"[^>]*>▸</i>)?${t("checklist.work", { done: 0, total: tasks.length })}</div>`));
+    for (const task of tasks) expect(out).not.toContain(task.text);
     store.appendEvent({ kind: "task", flag: (tasks[0]!.done as { flag: string }).flag, mode: "self" });
     out = list();
     expect(out.match(/data-id="work"/g)).toHaveLength(1);
     expect(out).toContain(t("checklist.work", { done: 1, total: tasks.length }));
-    const before = checklistDoneCount(loopContext(store.getState(), store.getEvents())!);
     for (const task of tasks.slice(1)) store.appendEvent({ kind: "task", flag: (task.done as { flag: string }).flag, mode: "self" });
     const view = checklist(loopContext(store.getState(), store.getEvents())!);
     expect(view.lines.some((l) => l.id === "work")).toBe(false);
-    // All done: the line goes, and counts as one done thing (navigation-polish: the count is not on the card).
-    expect(checklistDoneCount(loopContext(store.getState(), store.getEvents())!)).toBe(before + 1);
+    // All done: the line goes; with it the day's required items are all done, so the card is tonight's
+    // (2026-11-19: the work comes after lunch now, so nothing of the day is left open here).
+    expect(view.heading).toBe("tonight");
+    expect(checklistDoneCount(loopContext(store.getState(), store.getEvents())!)).toBeGreaterThan(0);
   });
 });
 

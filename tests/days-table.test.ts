@@ -27,7 +27,7 @@ describe("day files", () => {
     ["a goto choice", (d: any) => (d.beats.shutdown.choices = [{ text: "x", goto: "y" }]), /unknown key "goto"/],
     ["an old night-raid effect (item_dream, removed 2026-11-06)", (d: any) => (d.beats.shutdown.choices = [{ text: "x", effects: { item_dream: "chick" } }]), /unknown key "item_dream"/],
     ["an old night-raid effect (item_lost, removed 2026-11-06)", (d: any) => (d.beats.shutdown.choices = [{ text: "x", effects: { item_lost: "loan" } }]), /unknown key "item_lost"/],
-    ["waiting less than the minimum", (d: any) => (d.delivery.waitMinutes = 1), /below minMinutes/],
+    ["waiting less than the minimum", (d: any) => (d.delivery.minMinutes = d.delivery.waitMinutes + 1), /below minMinutes/],
     // A sequence's camera tail (2026-11-08): then is desk / table / room; after needs then.
     ["a then that is not a view", (d: any) => (d.beats.shutdown.then = "bed"), /then/],
     ["after without then", (d: any) => (d.beats.shutdown.after = [{ k: "narration", t: "x" }]), /after.*needs then/],

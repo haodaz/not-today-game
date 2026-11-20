@@ -2445,6 +2445,8 @@ button.fl-cell:not(.on):hover{background:rgba(29,33,41,.08)}
 .work-bar .wk-start:hover:not(:disabled){transform:translate(2px,2px);box-shadow:2px 2px 0 #1d2129}
 .work-bar .wk-start:disabled{background:#e6e3dc;color:#8a8478;border-color:#b9b3a8;box-shadow:none;cursor:default}
 .work-bar .wk-exit{padding:8px 14px;border:1px solid rgba(29,33,41,.25);border-radius:8px;background:transparent;color:#5a5f69;font:inherit;font-size:13px;cursor:pointer}
+/* work-mode: the task page's chips and composer sit clear of the bar (author 2026-11-19: the bar covered 自己做 / 让它做) */
+.win.wb.full .ask{margin-bottom:104px}
 .work-bar .wk-exit:hover{background:rgba(0,0,0,.05);color:#1d2129}
 .monitor.night .work-bar{background:rgba(30,33,38,.8);border-color:rgba(255,255,255,.06)}
 .work-bar ~ .kpill{transform:translateY(calc(100% + 40px));opacity:0;pointer-events:none}

@@ -276,7 +276,13 @@
     }
   },
   "items": [
-    {"id": "rise", "text": "Get up.", "unlock": "start", "done": "event:rise", "required": true},
+    {
+      "id": "rise",
+      "text": "Get up.",
+      "unlock": "start",
+      "done": "event:rise",
+      "required": true
+    },
     {
       "id": "boot",
       "text": "Press the tower under the desk. Boot up.",
@@ -387,13 +393,6 @@
       }
     },
     {
-      "id": "eat",
-      "text": "The table by the window. Eat.",
-      "unlock": "done:pickup",
-      "done": "event:eat:lunch",
-      "required": false
-    },
-    {
       "id": "box",
       "text": "Open them and see.",
       "unlock": "done:pickup",
@@ -401,9 +400,16 @@
       "required": true
     },
     {
+      "id": "eat",
+      "text": "The table by the window. Eat.",
+      "unlock": "done:box",
+      "done": "event:eat:lunch",
+      "required": true
+    },
+    {
       "id": "task2",
       "text": "Look at the receivables.",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_receivable_done",
       "required": true
     },
@@ -458,7 +464,7 @@
     }
   ],
   "delivery": {
-    "minMinutes": 2,
-    "waitMinutes": 6
+    "minMinutes": 1,
+    "waitMinutes": 2
   }
 }

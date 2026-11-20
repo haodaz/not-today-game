@@ -735,12 +735,14 @@ export const loopActions: Record<string, ActionHandler> = {
       session.caseOpen = false;
       session.caseShake = null;
     }
-    if ((dir !== "left" && dir !== "right") || !isFacing(session.view) || overlayOpen(session) || session.objbarOpen) return;
+    // author 2026-11-19 (day-1 playtest): the table up close turns as the window it is under.
+    const from: View = session.view === "table" ? "window" : session.view;
+    if ((dir !== "left" && dir !== "right") || !isFacing(from) || overlayOpen(session) || session.objbarOpen) return;
     if (turning(ctx)) {
       session.turnNext ??= dir;
       return;
     }
-    arrive(ctx, turnedTo(session.view as Facing, dir), {} as DOMStringMap);
+    arrive(ctx, turnedTo(from as Facing, dir), {} as DOMStringMap);
   },
 
   // The dock and the toggle also count as looking at the app now on screen.

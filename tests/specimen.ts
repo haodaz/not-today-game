@@ -19,7 +19,7 @@ function withItem(raw: unknown, item: unknown): RawDay {
   // where it stood: day 1 before 去门口拿, day 10 before 应收表.
   const i = d.items.findIndex((x) => x.id === "pickup" || x.id === "task2");
   d.items.splice(i, 0, structuredClone(item) as Record<string, unknown>);
-  for (const x of d.items) if (x.id === "task2" && x.unlock === "done:msgs") x.unlock = "done:task1";
+  for (const x of d.items) if (x.id === "task2" && (x.unlock === "done:msgs" || x.unlock === "done:eat")) x.unlock = "done:task1"; // day 1: work after lunch since 2026-11-19
   return d;
 }
 

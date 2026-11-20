@@ -276,7 +276,13 @@
     }
   },
   "items": [
-    {"id": "rise", "text": "起床。", "unlock": "start", "done": "event:rise", "required": true},
+    {
+      "id": "rise",
+      "text": "起床。",
+      "unlock": "start",
+      "done": "event:rise",
+      "required": true
+    },
     {
       "id": "boot",
       "text": "按一下桌底下的主机，开机。",
@@ -387,13 +393,6 @@
       }
     },
     {
-      "id": "eat",
-      "text": "窗边饭桌，吃。",
-      "unlock": "done:pickup",
-      "done": "event:eat:lunch",
-      "required": false
-    },
-    {
       "id": "box",
       "text": "拆开看看。",
       "unlock": "done:pickup",
@@ -401,9 +400,16 @@
       "required": true
     },
     {
+      "id": "eat",
+      "text": "窗边饭桌，吃。",
+      "unlock": "done:box",
+      "done": "event:eat:lunch",
+      "required": true
+    },
+    {
       "id": "task2",
       "text": "应收表看一眼。",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_receivable_done",
       "required": true
     },
@@ -458,7 +464,7 @@
     }
   ],
   "delivery": {
-    "minMinutes": 2,
-    "waitMinutes": 6
+    "minMinutes": 1,
+    "waitMinutes": 2
   }
 }
