@@ -20,11 +20,11 @@ const H = hungerNumbers();
 describe("the numbers", () => {
   it("a fresh run wakes at the variable's default, below what work needs; a meal, a task and a night move it within 0–100", () => {
     const s0 = createStore({ startDay: 1 }).getState();
-    expect(s0.fullness).toBe(20);
+    expect(s0.fullness).toBe(10);
     expect(tooHungryToWork(s0)).toBe(true);
     const fed = afterEat(s0);
-    expect(fed.fullness).toBe(20 + H.meal);
-    expect(afterWork(fed, "self").fullness).toBe(20 + H.meal - H.work);
+    expect(fed.fullness).toBe(10 + H.meal);
+    expect(afterWork(fed, "self").fullness).toBe(10 + H.meal - H.work);
     expect(afterWork(fed, "auto").fullness).toBe(fed.fullness); // a task that ticked itself costs nothing
     expect(afterSleep({ ...s0, fullness: 10 }).fullness).toBe(0);
     expect(afterEat({ ...s0, fullness: 90 }).fullness).toBe(100);
@@ -38,14 +38,14 @@ describe("the numbers", () => {
   it("the log drives it: day 1 lunch → work → dinner → sleep lands day 2 at 40; day 2's second task waits for lunch", () => {
     const store = createStore({ startDay: 1 });
     completeUntil(store, "task3");
-    expect(store.getState().fullness).toBe(20 + H.meal); // lunch eaten
+    expect(store.getState().fullness).toBe(10 + H.meal); // lunch eaten
     completeUntil(store, "dinner");
-    expect(store.getState().fullness).toBe(20 + H.meal - H.work); // v17 handed in
+    expect(store.getState().fullness).toBe(10 + H.meal - H.work); // v17 handed in
     completeUntil(store, "bed");
-    expect(store.getState().fullness).toBe(20 + H.meal - H.work + H.meal); // dinner eaten
+    expect(store.getState().fullness).toBe(10 + H.meal - H.work + H.meal); // dinner eaten
     store.appendEvent({ kind: "lieDown" });
     expect(store.getState().day).toBe(2);
-    expect(store.getState().fullness).toBe(20 + 2 * H.meal - H.work - H.sleep); // 40
+    expect(store.getState().fullness).toBe(10 + 2 * H.meal - H.work - H.sleep); // 40
     expect(tooHungryToWork(store.getState())).toBe(false);
   });
 });
@@ -89,7 +89,7 @@ describe("the holds", () => {
   });
   it("the bed: below needSleep with a meal still to come, the hungry word", () => {
     const { store, session, ctx } = rig(2, 10);
-    completeUntil(store, "bed", { all: true, skip: ["dinner", "bed"] });
+    completeUntil(store, "bed", { all: true, skip: ["dinner", "dpick", "deat", "bed"] }); // dinner still to come
     session.view = "room";
     loopActions["bed"]!(ctx, {} as DOMStringMap, null as never);
     expect(showing(session.dialogue, store.getState(), store.getEvents())?.line?.t).toBe(t("room.bed.hungry.kuro"));
@@ -100,7 +100,7 @@ describe("the card and the tile", () => {
   it("the status card has the bar; the number floats off the tile only while the card is closed and the clock runs", () => {
     const store = createStore({ startDay: 1 });
     const session = { ...initialSession(DEFAULT_CLOCK, "left", "room"), statusOpen: true };
-    expect(statusPanel(store.getState(), [], session)!.value).toContain(`<span class="st-k">${t("status.fullness")}</span><span class="st-bar full hungry"><b style="width:20%"></b></span><span class="st-v">20</span>`);
+    expect(statusPanel(store.getState(), [], session)!.value).toContain(`<span class="st-k">${t("status.fullness")}</span><span class="st-bar full hungry"><b style="width:10%"></b></span><span class="st-v">10</span>`);
     const s = { ...initialSession(DEFAULT_CLOCK, "left", "room"), fullnessFloat: { delta: 40, at: 1000 } };
     expect(hudTiles(s, store.getState(), { settings: true, nowMs: 1500 }).value).toContain('<i class="st-float" data-at="1000">+40</i>');
     expect(hudTiles(s, store.getState(), { settings: true, nowMs: 9000 }).value).not.toContain("st-float");

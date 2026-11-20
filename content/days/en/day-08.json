@@ -295,6 +295,36 @@
       "when": "night"
     },
     {
+      "id": "dpick",
+      "text": "Dinner is at the door. Go get it.",
+      "unlock": "event:delivery:arrives:dinner",
+      "done": "event:pickup:dinner",
+      "required": true,
+      "when": "night",
+      "sfx": "doorbell",
+      "onUnlock": {
+        "say": [
+          {
+            "k": "sfx",
+            "t": "Ding-dong.",
+            "sfx": "doorbell"
+          },
+          {
+            "k": "inner",
+            "t": "Dinner is here."
+          }
+        ]
+      }
+    },
+    {
+      "id": "deat",
+      "text": "Dinner is on the table by the window. Eat.",
+      "unlock": "done:dpick",
+      "done": "event:eat:dinner",
+      "required": true,
+      "when": "night"
+    },
+    {
       "id": "task3",
       "text": "Three diagrams, posted to the group.",
       "unlock": "done:reply",

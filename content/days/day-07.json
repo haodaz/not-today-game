@@ -297,6 +297,36 @@
       "when": "night"
     },
     {
+      "id": "dpick",
+      "text": "外卖到了，去门口拿。",
+      "unlock": "event:delivery:arrives:dinner",
+      "done": "event:pickup:dinner",
+      "required": true,
+      "when": "night",
+      "sfx": "doorbell",
+      "onUnlock": {
+        "say": [
+          {
+            "k": "sfx",
+            "t": "叮咚。",
+            "sfx": "doorbell"
+          },
+          {
+            "k": "inner",
+            "t": "晚饭到了。"
+          }
+        ]
+      }
+    },
+    {
+      "id": "deat",
+      "text": "晚饭在窗边饭桌上，吃饭吧。",
+      "unlock": "done:dpick",
+      "done": "event:eat:dinner",
+      "required": true,
+      "when": "night"
+    },
+    {
       "id": "desk",
       "text": "看一眼桌子。",
       "unlock": "done:task4",

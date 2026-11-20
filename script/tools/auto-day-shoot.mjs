@@ -369,11 +369,16 @@ for (const it of ITEMS) {
             // work-mode (2026-11-16): 开始工作 on the work bar is the one way into the day's game (no ask any more);
             // once pressed, the launch page's opening lines play first (advanced below), then its CTA
             if (!started && (await has("[data-action=work-start]:not([disabled])"))) { started = true; await sel("[data-action=work-start]:not([disabled])", 1.2); note(`   ${tag}: 开始工作 on the work bar (after ${w / 2} s)`); }
+            // 2026-11-20: the bar is only there in work mode (full-screen 工作台); un-fulled for a source, go back to it
+            else if (!started && !(await has("[data-action=work-start]")) && (await has(".win[data-win=workbench]:not(.full)")) && (await has("[data-action=win-full][data-app=workbench]"))) { await sel("[data-action=win-full][data-app=workbench]", 1); note(`   ${tag}: back to full-screen 工作台 for the work bar (after ${w / 2} s)`); continue; }
+            // hunger (2026-11-20): 开始工作 held (too hungry, or a meal on its way): wait for it, say so
+            else if (!started && (await has("[data-action=work-start][disabled]"))) { if (w % 10 === 0) note(`   ${tag}: 开始工作 is held (after ${w / 2} s) · ${(await text()).match(/外卖在路上[^\s]*/)?.[0] ?? "hungry?"}`); await sleep(0.5); continue; }
             // the delivery's lines (the door, the box) must be read through before the ask can come
             if (await has("[data-action=loop-advance]")) { await sel("[data-action=loop-advance]", 0.3); }
             const ch = await ev("JSON.stringify(__choices())").then((x) => (x ? JSON.parse(x) : []));
             // a choice taken on the way (the door's 拿进来) leaves us in the room: back to the task's page, the ask comes there
-            if (await ev("[...document.querySelectorAll(" + JSON.stringify(boardSel) + ")].some(__vis)")) { note(`   ${tag}: the board is up (after ${w / 2} s)`); break; }
+            // the read-only workspace shows the same board: only a board reached through 开始工作 counts (2026-11-20, the day-11 failure)
+            if (started && (await ev("[...document.querySelectorAll(" + JSON.stringify(boardSel) + ")].some(__vis)"))) { note(`   ${tag}: the board is up (after ${w / 2} s)`); break; }
             if (!ch.length && !(await has(".monitor")) && !(await has("[data-action=loop-advance]"))) { await toWorkbench(); await goHome(); await sel(`[data-action=wb-nav][data-page='task:${it.id}']`, 1.2); note(`   ${tag}: back to the task page (after ${w / 2} s)`); continue; }
             if (w % 20 === 0) note(`   ${tag}: waiting for the ask (${w / 2} s) · choices ${JSON.stringify(ch)} · ask ${(await text()).includes(S("task.launch.ask"))} · buttons ${await ev("JSON.stringify([...document.querySelectorAll('button')].filter(__vis).map(__txt).slice(0,12))")}`);
             const go = ch.find((c) => /^(开始|Start)/.test(String(c).replace(/^[◇◆▶○●\s]+/, "").trim()));   // the chip text carries its ◇
@@ -383,7 +388,7 @@ for (const it of ITEMS) {
             // the ask's buttons may not be loop-choice ones: by text, when the ask line is on screen
             if ((await text()).includes(S("task.launch.ask")) && (await click(S("task.launch.go") || "开始", 1.2))) { note(`   choice → ◇开始 (the work's ask by text, after ${w / 2} s)`); await sleep(0.8); break; }
             // visible only: the tune stage's cards can sit hidden in the DOM behind the ask
-            if (await ev("[...document.querySelectorAll(boardSel)].some(__vis)")) { note(`   ${tag}: the board is up (after ${w / 2} s)`); break; }
+            if (started && (await ev("[...document.querySelectorAll(boardSel)].some(__vis)"))) { note(`   ${tag}: the board is up (after ${w / 2} s)`); break; }
             await sleep(0.5);
           }
       };

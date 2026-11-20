@@ -2,6 +2,7 @@
 // icon over its word), and the character panel 人物 opens: the portrait and the name, the day, 理智,
 // 克总 as hearts, 同化, the old things, the chats. Numbers only; it explains nothing. Pure view.
 import { sanBand } from "@state/endings";
+import { hungerNumbers } from "@state/hunger";
 import type { State } from "@state/types.gen";
 import { constants, membersOf } from "@state/variables";
 import type { GameEvent } from "@state/events";
@@ -113,7 +114,7 @@ export function statusPanel(state: State, events: readonly GameEvent[], session:
   const who = html`<div class="st-who"><img class="st-face" src="${playerPortraitSrc(state.names.portrait, false)}" alt="" draggable="false"><div><b class="st-name">${name}</b><span class="st-day">${tr("status.day", { n: state.day })} · ${tr(beatLabelKey(session.clock.beat))}</span></div></div>`;
   const san = html`<div class="st-meter"><span class="st-k">${tr("status.san")}</span><span class="${cls("st-bar", "san", `band-${n.band}`, n.san < 30 && !session.reducedMotion && "low")}"><b style="width:${String(n.sanPct)}%"></b></span><span class="st-v">${String(n.san)}</span></div>`;
   // hunger (author 2026-11-20): 饱食度, a plain bar; low = below what work or sleep needs
-  const full = html`<div class="st-meter"><span class="st-k">${tr("status.fullness")}</span><span class="${cls("st-bar", "full", n.fullness < 30 && "hungry")}"><b style="width:${String(n.fullPct)}%"></b></span><span class="st-v">${String(n.fullness)}</span></div>`;
+  const full = html`<div class="st-meter"><span class="st-k">${tr("status.fullness")}</span><span class="${cls("st-bar", "full", n.fullness < hungerNumbers().needWork && "hungry")}"><b style="width:${String(n.fullPct)}%"></b></span><span class="st-v">${String(n.fullness)}</span></div>`;
   const kuro = html`<div class="st-meter"><span class="st-k">${tr("status.kuro")}</span><span class="st-hearts">${n.hearts.map((h) => html`<span class="${cls("st-heart", h)}">${heartIcon(h)}</span>`)}</span></div>`;
   const assim = html`<div class="st-meter"><span class="st-k">${tr("status.assim")}</span><span class="st-bar assim"><b style="width:${String(n.assimPct)}%"></b><i class="st-tick" style="left:${String(n.goodPct)}%"></i></span></div>`;
   const objects = html`<p class="st-line">${tr("status.objects", { n: n.objects, total: n.total })}${n.upgraded >= 1 ? html` · ${tr("status.upgraded", { n: n.upgraded })}` : null}</p>`;
