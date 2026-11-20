@@ -1,0 +1,7 @@
+{
+  "id": "task2",
+  "text": "应收表看一眼。",
+  "unlock": "done:task1",
+  "done": "flag:task_receivable_done",
+  "required": true
+}

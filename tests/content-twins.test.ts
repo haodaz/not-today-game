@@ -10,8 +10,9 @@ import { recogniseTable } from "@state/recognise";
 import { setLocale } from "@world/i18n";
 import zhDay01 from "@content/days/day-01.json";
 import enDay01 from "@content/days/en/day-01.json";
-import zhTask01 from "@content/tasks/day-01.json";
-import enTask01 from "@content/tasks/en/day-01.json";
+import { day01TasksRaw, day01TasksRawEn } from "./specimen-raw";
+const zhTask01 = day01TasksRaw(); // 2026-11-19: contract + ledger specimens in front of v17
+const enTask01 = day01TasksRawEn();
 
 afterEach(() => setLocale("zh"));
 

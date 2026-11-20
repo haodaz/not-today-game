@@ -407,23 +407,16 @@
       "required": true
     },
     {
-      "id": "task2",
-      "text": "Look at the receivables.",
-      "unlock": "done:eat",
-      "done": "flag:task_receivable_done",
-      "required": true
-    },
-    {
       "id": "task3",
       "text": "Merge v15 and v16 into v17 and send it to the boss.",
-      "unlock": "done:task2",
+      "unlock": "done:eat",
       "done": "flag:task_merge_done",
       "required": true
     },
     {
       "id": "dinner",
       "text": "Phone, order dinner.",
-      "unlock": "done:task2",
+      "unlock": "done:task3",
       "done": "event:order:dinner",
       "required": true,
       "rewrite": "Dinner is on its way.",

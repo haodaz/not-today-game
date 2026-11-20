@@ -1,0 +1,7 @@
+{
+  "id": "task2",
+  "text": "Look at the receivables.",
+  "unlock": "done:task1",
+  "done": "flag:task_receivable_done",
+  "required": true
+}

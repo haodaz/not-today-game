@@ -363,22 +363,18 @@ describe("R7 · the day's work is one checklist line", () => {
     // author 2026-11-19: day 1's work waits for lunch (pickup → the carton → eat); the work line appears after the meal.
     const { completeUntil } = await import("./complete-items");
     const tasks = dayFiles.get(1)!.items.filter((it) => it.when === "day" && it.done.kind === "flag" && it.done.flag.startsWith("task_"));
-    expect(tasks.length).toBeGreaterThan(1);
+    expect(tasks.length).toBeGreaterThan(0); // day 1 has one work task since 2026-11-19 (v17)
     const list = () => renderChecklist(checklist(loopContext(store.getState(), store.getEvents())!)).value;
     let out = list();
     // Before the meal: the other items have their own lines and no work line is there yet.
     expect(out).toContain(dayFiles.get(1)!.items.find((it) => it.id === "lunch")!.text);
     expect(out).not.toContain('data-id="work"');
-    completeUntil(store, "task2");
+    completeUntil(store, "task3");
     out = list();
     // After the meal the work line is the current one (it carries the marker).
     expect(out).toMatch(new RegExp(`data-id="work">(<i class="mark"[^>]*>▸</i>)?${t("checklist.work", { done: 0, total: tasks.length })}</div>`));
     for (const task of tasks) expect(out).not.toContain(task.text);
-    store.appendEvent({ kind: "task", flag: (tasks[0]!.done as { flag: string }).flag, mode: "self" });
-    out = list();
-    expect(out.match(/data-id="work"/g)).toHaveLength(1);
-    expect(out).toContain(t("checklist.work", { done: 1, total: tasks.length }));
-    for (const task of tasks.slice(1)) store.appendEvent({ kind: "task", flag: (task.done as { flag: string }).flag, mode: "self" });
+    for (const task of tasks) store.appendEvent({ kind: "task", flag: (task.done as { flag: string }).flag, mode: "self" });
     const view = checklist(loopContext(store.getState(), store.getEvents())!);
     expect(view.lines.some((l) => l.id === "work")).toBe(false);
     // All done: the line goes; with it the day's required items are all done, so the card is tonight's

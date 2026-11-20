@@ -1,7 +1,8 @@
 import "./specimen";
 import { describe, expect, it } from "vitest";
 import "./specimen";
-import day01 from "@content/tasks/day-01.json";
+import { day01TasksRaw } from "./specimen-raw";
+const day01 = day01TasksRaw(); // 2026-11-19: the contract and the ledger trees are specimens now
 import { dayFiles, taskFlags } from "@state/days/table";
 import { parseTaskFile, taskByFlag, taskFiles } from "@state/days/tasks";
 import { createStore, type Store } from "@state/store";

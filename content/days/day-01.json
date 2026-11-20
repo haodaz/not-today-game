@@ -407,23 +407,16 @@
       "required": true
     },
     {
-      "id": "task2",
-      "text": "应收表看一眼。",
-      "unlock": "done:eat",
-      "done": "flag:task_receivable_done",
-      "required": true
-    },
-    {
       "id": "task3",
       "text": "v15 和 v16 合成 v17，发给老王。",
-      "unlock": "done:task2",
+      "unlock": "done:eat",
       "done": "flag:task_merge_done",
       "required": true
     },
     {
       "id": "dinner",
       "text": "手机，点个晚饭。",
-      "unlock": "done:task2",
+      "unlock": "done:task3",
       "done": "event:order:dinner",
       "required": true,
       "rewrite": "晚饭在路上。",
