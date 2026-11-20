@@ -124,7 +124,8 @@ describe("the pane", () => {
     expect(out).toContain(`data-action="compare-pick" data-slot="r1" data-card="${cmp.pages[0]!.cards[1]}"`);
     expect(out).not.toContain("compare-kuro"); // author 2026-11-12: no 克总你定 on the choose screen
     expect(out.match(/class="cmp-face todo/g)).toHaveLength(5);
-    expect(out).toContain(t("compare.page", { n: "1", label: b.slots[0]!.label }));
+    // 2026-11-20: the page is named by the boss's own words (the given row), not the slot's keyword
+    expect(out).toContain(t("compare.page", { n: "1", label: (b.given as { rows: Record<string, string> }).rows[b.slots[0]!.id]! }));
     expect(out).not.toContain("cmp-sum");
     // pages picked to his taste: happy faces; the next page shows
     for (const p of cmp.pages) s = stepBoard(b, s, { t: "fill", slot: p.slot, card: b.slots.find((x) => x.id === p.slot)!.answer });
