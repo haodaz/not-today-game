@@ -9,14 +9,15 @@ import { dayFile } from "./days/table";
 export interface HungerNumbers {
   readonly meal: number;
   readonly work: number;
-  readonly sleep: number;
+  /** What every morning wakes at (author 2026-11-20: 「每天早上不能是 0，是 10 左右」). */
+  readonly wake: number;
   readonly needWork: number;
   readonly needSleep: number;
 }
 
 export function hungerNumbers(): HungerNumbers {
   const h = constants.hunger as Partial<HungerNumbers> | undefined;
-  return { meal: h?.meal ?? 40, work: h?.work ?? 30, sleep: h?.sleep ?? 30, needWork: h?.needWork ?? 30, needSleep: h?.needSleep ?? 30 };
+  return { meal: h?.meal ?? 40, work: h?.work ?? 20, wake: h?.wake ?? 10, needWork: h?.needWork ?? 20, needSleep: h?.needSleep ?? 20 };
 }
 
 export function clampFullness(value: number): number {
@@ -28,8 +29,8 @@ export function clampFullness(value: number): number {
 export const afterEat = (state: State): State => ({ ...state, fullness: clampFullness(state.fullness + hungerNumbers().meal) });
 /** A task handed in by the player (not one that ticked itself). */
 export const afterWork = (state: State, mode: string): State => (mode === "auto" ? state : { ...state, fullness: clampFullness(state.fullness - hungerNumbers().work) });
-/** A night slept. */
-export const afterSleep = (state: State): State => ({ ...state, fullness: clampFullness(state.fullness - hungerNumbers().sleep) });
+/** A night slept: every morning wakes at `wake`, whatever the evening held (the dinner was for the bed and the day's low point). */
+export const afterSleep = (state: State): State => ({ ...state, fullness: clampFullness(hungerNumbers().wake) });
 
 /** The day has a meal to order at all (days without a delivery never hold the player hungry). */
 export function dayHasMeals(day: number): boolean {

@@ -26,7 +26,7 @@ describe("the numbers", () => {
     expect(fed.fullness).toBe(10 + H.meal);
     expect(afterWork(fed, "self").fullness).toBe(10 + H.meal - H.work);
     expect(afterWork(fed, "auto").fullness).toBe(fed.fullness); // a task that ticked itself costs nothing
-    expect(afterSleep({ ...s0, fullness: 10 }).fullness).toBe(0);
+    expect(afterSleep({ ...s0, fullness: 70 }).fullness).toBe(H.wake); // every morning wakes at 10
     expect(afterEat({ ...s0, fullness: 90 }).fullness).toBe(100);
   });
   it("days without a delivery never hold the player hungry", () => {
@@ -35,7 +35,7 @@ describe("the numbers", () => {
     expect(tooHungryToWork({ day: 16, fullness: 0 })).toBe(false);
     expect(tooHungryToSleep({ day: 16, fullness: 0 })).toBe(false);
   });
-  it("the log drives it: day 1 lunch → work → dinner → sleep lands day 2 at 40; day 2's second task waits for lunch", () => {
+  it("the log drives it: day 1 lunch → work → dinner → sleep wakes day 2 at 10 (too hungry to work until lunch)", () => {
     const store = createStore({ startDay: 1 });
     completeUntil(store, "task3");
     expect(store.getState().fullness).toBe(10 + H.meal); // lunch eaten
@@ -45,8 +45,8 @@ describe("the numbers", () => {
     expect(store.getState().fullness).toBe(10 + H.meal - H.work + H.meal); // dinner eaten
     store.appendEvent({ kind: "lieDown" });
     expect(store.getState().day).toBe(2);
-    expect(store.getState().fullness).toBe(10 + 2 * H.meal - H.work - H.sleep); // 30
-    expect(tooHungryToWork(store.getState())).toBe(false);
+    expect(store.getState().fullness).toBe(H.wake); // 10: every morning
+    expect(tooHungryToWork(store.getState())).toBe(true);
   });
 });
 

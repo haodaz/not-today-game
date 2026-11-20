@@ -59,6 +59,6 @@ describe("fold", () => {
     const next = step(f(1), { kind: "lieDown", day: 1 });
     expect(next.day).toBe(2);
     // hunger (2026-11-20): a night slept costs fullness, so the stepped state is day 2's fresh state minus the night
-    expect(next).toEqual({ ...f(2), fullness: Math.max(0, f(1).fullness - hungerNumbers().sleep) });
+    expect(next).toEqual({ ...f(2), fullness: hungerNumbers().wake });
   });
 });
