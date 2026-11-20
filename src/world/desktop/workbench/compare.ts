@@ -45,6 +45,12 @@ import { tuneOfferPending, tuneOffers } from "@state/days/board";
 import { isNight } from "../beat";
 import type { AppContext } from "../model";
 
+/** The page's word on the stage (author 2026-11-20: no keyword where the boss's own words stand): the given row's text, else the slot's label. */
+function pageWord(board: TaskBoard, slotId: string): string {
+  const given = (board.given as { rows?: Record<string, string> } | undefined)?.rows?.[slotId];
+  return given ?? board.slots.find((x) => x.id === slotId)?.label ?? slotId;
+}
+
 /**
  * launch (author 2026-11-11/12): the task's opening page over the whole stage, a game's level page,
  * not a card on a web page: paper edge to edge; the counterpart's bust (transparent, watercolour
@@ -194,7 +200,7 @@ export function workLayer(ctx: { readonly state: State; readonly events: readonl
     screen = "choose";
     const page = pending;
     const n = cmp.pages.indexOf(page) + 1;
-    const label = board.slots.find((x) => x.id === page.slot)?.label ?? page.slot;
+    const label = pageWord(board, page.slot);
     const bubbles = page.bubbles.map((b) => html`<div class="cmp-bub">${riddle(b)}</div>`);
     const boss = html`<div class="wl-boss"><img class="cmp-portrait" src="${counterpartPortrait(task)}" alt="${counterpartName(task)}"><div class="cmp-bubbles">${bubbles}</div></div>`;
     // the comparison is the content itself (author 2026-11-12): the page's whole code in each version,
@@ -365,7 +371,7 @@ function faces(board: TaskBoard, s: BoardState, shown: ComparePage, live: boolea
   const row = cmp.pages.map((p, i) => {
     const picked = p.slot in s.slots;
     const mood = !picked ? "todo" : compareRight(board, s.slots, p.slot) ? "happy" : "pout";
-    const label = `${t("compare.page", { n: String(i + 1), label: board.slots.find((x) => x.id === p.slot)?.label ?? p.slot })} · ${t(`compare.face.${mood}`)}`;
+    const label = `${t("compare.page", { n: String(i + 1), label: pageWord(board, p.slot) })} · ${t(`compare.face.${mood}`)}`;
     const img = mood === "todo" ? null : html`<img src="${BOSS_FACES[mood]}" alt="">`;
     const inner = html`<span class="${cls("cmp-face", mood, p.slot === shown.slot && "cur")}" title="${label}">${img}</span>`;
     return live && picked ? html`<button type="button" class="cmp-face-btn" data-action="shell-slot" data-slot="${p.slot}" aria-label="${label}">${inner}</button>` : html`<span class="cmp-face-btn" aria-label="${label}">${inner}</span>`;
@@ -395,7 +401,7 @@ export function comparePane(task: Task, board: TaskBoard, s: BoardState, live: b
   const cmp = board.compare!;
   const page = pageShown(board, s, slot);
   const n = cmp.pages.indexOf(page) + 1;
-  const label = board.slots.find((x) => x.id === page.slot)?.label ?? page.slot;
+  const label = pageWord(board, page.slot);
   const done = comparePending(board, s) === null;
   const bubbles = page.bubbles.map((b) => html`<div class="cmp-bub">${riddle(b)}</div>`);
   const boss = html`<div class="cmp-boss"><img class="cmp-portrait" src="${counterpartPortrait(task)}" alt="${counterpartName(task)}"><div class="cmp-bubbles">${bubbles}</div></div>`;
