@@ -329,7 +329,10 @@ for (const it of ITEMS) {
       deferred.add(it.id);
       const here = ITEMS.indexOf(it);
       const eatAt = ITEMS.findIndex((x, k) => k > here && /^event:eat:/.test(x.done));
-      ITEMS.splice(eatAt >= 0 ? eatAt + 1 : ITEMS.length, 0, it);
+      // after the meal, and after any task already deferred there (task1 before task2: the second unlocks on the first)
+      let pos = eatAt >= 0 ? eatAt + 1 : ITEMS.length;
+      while (pos < ITEMS.length && deferred.has(ITEMS[pos].id)) pos++;
+      ITEMS.splice(pos, 0, it);
       note(`   (开始工作 is held: the meal first, this task again ${eatAt >= 0 ? "right after it" : "at the end"})`);
       await toRoom();
       continue;
