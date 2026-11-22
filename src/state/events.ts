@@ -375,7 +375,8 @@ function withMember(state: State, key: "found" | "recognised", objectId: string)
 
 /** The title page's answers (title-page T1): every field the variable table lists, of its type. */
 /** The player's portrait choice (the character select, author 2026-11-09): three looks, no gender in their names. */
-export const PORTRAITS = ["p1", "p2", "p3"] as const;
+// texture-pass R6 (2026-11-22): two more faceless looks, cap (帽子口罩) and glare (反光眼镜)
+export const PORTRAITS = ["p1", "p2", "p3", "p4", "p5"] as const;
 export type Portrait = (typeof PORTRAITS)[number];
 
 function applyNames(state: State, event: Extract<GameEvent, { kind: "names" }>): State {
@@ -390,7 +391,7 @@ function applyNames(state: State, event: Extract<GameEvent, { kind: "names" }>):
     if (k === "pronoun") {
       if (n.pronoun !== null && n.pronoun !== "she" && n.pronoun !== "he") throw new Error('names: pronoun must be "she", "he" or null');
     } else if (k === "portrait") {
-      if (!PORTRAITS.includes(withPortrait.portrait as Portrait)) throw new Error('names: portrait must be "p1", "p2" or "p3"');
+      if (!PORTRAITS.includes(withPortrait.portrait as Portrait)) throw new Error('names: portrait must be one of "p1".."p5"');
     } else if (typeof n[k] !== "string") throw new Error(`names: "${k}" must be a string`);
   }
   return { ...state, names: { ...(withPortrait as State["names"]) } };

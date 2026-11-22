@@ -141,7 +141,11 @@ const BOSS_MOVES: Readonly<Record<1 | 2, readonly Move[]>> = { 1: BOSS_MOVES_1, 
 /** What each colleague's 对不起 does to the party (named on the chips; the rule is in bossStart). */
 export const BUFF_EFFECT: Readonly<Record<ColleagueId, string>> = { boss: "atk", partner: "hp", xiaozhang: "spd", laozhou: "objects" };
 
-export const lookOf = (state: State): Look => PORTRAIT_FILES[state.names.portrait ?? "p1"] as Look;
+/** The battle sprites exist for he / she / none; the two newer looks (texture-pass R6) fight in none's until drawn. */
+export const lookOf = (state: State): Look => {
+  const f = PORTRAIT_FILES[state.names.portrait ?? "p1"];
+  return f === "he" || f === "she" || f === "none" ? f : "none";
+};
 
 /** The party and the boss from the run's state: the ending decides the fight's shape. */
 export function bossStart(state: State, ending: BossEnding, nowMs: number, seed = `boss:${String(state.day)}`, opts: { readonly mercy?: boolean } = {}): BossBattle {

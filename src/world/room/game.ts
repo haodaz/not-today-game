@@ -173,12 +173,15 @@ function dlgLayer(dlg: SafeHtml | null, session: Session, readsOn: boolean, with
   // Standing NPCs (author 2026-11-18): the speaker stands over the story mask and under the box, in full colour.
   const scene = sceneOf(session.dialogue, day);
   const stand = scene.stand;
-  // texture-pass R2: the idle loop (webm with alpha) plays over the still in the same box; the still stays under it
-  const loop = (src: string | undefined, cls2: string) => (src === undefined ? null : html`<video class="scene-stand-anim ${cls2}" src="${src}" autoplay muted loop playsinline aria-hidden="true"></video>`);
+  // texture-pass R2: with an idle loop (webm with alpha) the figure is the video alone, the still as its
+  // poster until it plays (author 2026-11-22: the still under the loop read as a second person standing behind)
+  const figure = (src: string, idle: string | undefined, cls2: string) => (idle === undefined
+    ? html`<img class="scene-stand${cls2}" src="${src}" alt="" aria-hidden="true" draggable="false">`
+    : html`<video class="scene-stand-anim${cls2}" src="${idle}" poster="${src}" autoplay muted loop playsinline aria-hidden="true"></video>`);
   // two-up (author 2026-11-20): with another person in the scene, the one speaking stands right and lit, the other left and dimmed
   const standImg = stand === undefined ? null : scene.other !== undefined
-    ? html`<img class="scene-stand other" src="${scene.other}" alt="" aria-hidden="true" draggable="false">${loop(scene.otherIdle, "other")}<img class="scene-stand speaking" src="${stand}" alt="" aria-hidden="true" draggable="false">${loop(scene.standIdle, "speaking")}`
-    : html`<img class="scene-stand" src="${stand}" alt="" aria-hidden="true" draggable="false">${loop(scene.standIdle, "")}`;
+    ? html`${figure(scene.other, scene.otherIdle, " other")}${figure(stand, scene.standIdle, " speaking")}`
+    : figure(stand, scene.standIdle, "");
   return html`<div class="${cls("dlg-layer", story && "masked", chat && !thread && "top", thread && "thread")}">${withMask ? boxMask(session, readsOn) : null}${standImg}${dlg}</div>`;
 }
 

@@ -258,7 +258,7 @@
       "calledBy": "string",
       "bossCalls": "string",
       "pronoun": "she|he|null",
-      "portrait": "p1|p2|p3"
+      "portrait": "p1|p2|p3|p4|p5"
     },
     "changedBy": "title page only",
     "default": {

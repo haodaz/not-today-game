@@ -38,7 +38,8 @@ export const geomFor = (q: Queued | undefined, lineKind?: string): BoxGeom => (q
 export const isDreamNight = (day: number, beat: string): boolean => beat === "night" && dreamNights.includes(day);
 
 /** The three looks' files (public/player): the file names are historical; the choice is 形象 1 / 2 / 3. */
-export const PORTRAIT_FILES: Record<State["names"]["portrait"], string> = { p1: "she", p2: "he", p3: "none" };
+/** texture-pass R6: p4 cap (帽子口罩) and p5 glare (反光眼镜) are the two new faceless looks. */
+export const PORTRAIT_FILES: Record<State["names"]["portrait"], string> = { p1: "she", p2: "he", p3: "none", p4: "cap", p5: "glare" };
 
 /**
  * The player's portrait for inner lines (dialogue addition 2026-11-01): a still, faceless bust by
