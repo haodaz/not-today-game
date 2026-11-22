@@ -1,0 +1,13 @@
+{
+  "_note": "Cutscenes (texture-pass R1). Claude's. A beat names the moment it plays on; files live at public/cut/<beat>/<look>.{mp4,jpg}. `once` = the first time only in a run. Days absent = every day the moment happens.",
+  "beats": {
+    "wake": { "on": "rise", "once": true },
+    "boot": { "on": "boot", "once": true },
+    "door_takeout": { "on": "door:pickup", "days": [1, 2, 3] },
+    "carton": { "on": "carton:open", "once": true },
+    "eat": { "on": "eat:lunch", "days": [1] },
+    "work": { "on": "work:start", "days": [1, 4, 10] },
+    "shutdown": { "on": "shutdown", "days": [1, 10, 17] },
+    "liedown": { "on": "lieDown", "days": [1, 3, 9, 15] }
+  }
+}
