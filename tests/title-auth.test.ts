@@ -306,12 +306,12 @@ describe("the staff badge", () => {
     t.click('[data-action="badge-open"]');
     expect(t.model().badgeOpen).toBe(true);
     expect(t.html()).toContain("title-badge-card");
-    t.click('[data-action="badge-turn"][data-by="1"]');
-    expect(t.model().look).toBe("p1");
+    t.click('[data-action="badge-turn"][data-by="1"]'); // five looks since texture-pass R6: p3 → p4
+    expect(t.model().look).toBe("p4");
     t.click('[data-action="badge-turn"][data-by="1"]');
     t.click('[data-action="badge-turn"][data-by="-1"]');
     t.click('[data-action="badge-turn"][data-by="-1"]');
-    expect(written).toEqual(["p1", "p2", "p1", "p3"]);
+    expect(written).toEqual(["p4", "p5", "p4", "p3"]);
     expect(t.model().look).toBe("p3");
     expect(t.model().answers.portrait).toBe("p1"); // the badge never touches a run's pick
     t.click('.title-badge-foot [data-action="badge-close"]');

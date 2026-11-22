@@ -16,13 +16,16 @@ describe("kuroMood", () => {
     const { store, session } = base();
     expect(kuroMood({ state: store.getState(), events: store.getEvents(), session, night: false })).toBeNull();
   });
-  it("nosebleed for the rest of a day with a taboo answer; god on a hand night with the hand out", () => {
+  it("nosebleed for the rest of a day with a taboo answer; god on a hand night while the hand is at the gap", () => {
     const { store, session } = base();
     store.appendEvent({ kind: "chat", q: 1, taboo: "blood" });
     expect(kuroMood({ state: store.getState(), events: store.getEvents(), session, night: false })).toBe("nosebleed");
-    const s = { ...store.getState(), day: 12, raids: { "12": { gave: null } } } as never;
-    expect(kuroMood({ state: s, events: [], session, night: true })).toBe("god");
-    expect(kuroMood({ state: s, events: [], session, night: false })).toBeNull();
+    const s = { ...store.getState(), day: 12 };
+    expect(kuroMood({ state: s, events: [], session, night: true })).toBeNull(); // no hand out yet
+    const out = { ...session, handCut: { key: "d12:beat:shutdown", day: 12 } };
+    expect(kuroMood({ state: s, events: [], session: out, night: true })).toBe("god");
+    expect(kuroMood({ state: s, events: [], session: out, night: false })).toBeNull();
+    expect(kuroMood({ state: { ...s, day: 18 }, events: [], session: { ...out, handCut: { key: "x", day: 18 } }, night: true })).toBeNull(); // night 18 is Kuro's own
   });
   it("closer when the heart races; favour / listen only while the chat waits", () => {
     const { store, session } = base();

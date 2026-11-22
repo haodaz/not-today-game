@@ -185,10 +185,11 @@ describe("the title page (FR1–FR3)", () => {
     for (const q of QUESTIONS) expect(section).toContain(`data-q="${q}"`);
     // 取消 and 开始 sit in the card's foot, after the columns, whatever is answered.
     expect(section).toMatch(/<div class="title-q-foot"><button type="button" class="title-cancel"[^>]*>取消<\/button><button type="button" class="title-start"[^>]*>开始<\/button><\/div><\/section>$/);
-    // ‹ › turn through the three looks and wrap.
+    // ‹ › turn through the five looks (texture-pass R6 added cap and glare) and wrap.
     expect(turnPortrait(NO_ANSWERS, 1)).toBe("p2");
-    expect(turnPortrait(NO_ANSWERS, -1)).toBe("p3");
-    expect(turnPortrait({ ...NO_ANSWERS, portrait: "p3" }, 1)).toBe("p1");
+    expect(turnPortrait(NO_ANSWERS, -1)).toBe("p5");
+    expect(turnPortrait({ ...NO_ANSWERS, portrait: "p3" }, 1)).toBe("p4");
+    expect(turnPortrait({ ...NO_ANSWERS, portrait: "p5" }, 1)).toBe("p1");
     expect(page({ ...at, answers: { ...at.answers, portrait: "p3" } })).toContain('<div class="big" data-portrait="p3"><img src="/player/none.png"');
     expect(section).toContain('class="title-cancel" data-action="title-back">取消</button>');
     expect(section).not.toContain("title-esc");

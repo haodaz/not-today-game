@@ -22,7 +22,13 @@ export type Body =
    * A shared thing drawn as what it is (desktop-ui 2026-11-03): the `card` from content, with the
    * message's `text` kept as the list preview and fallback. `forwarded` adds the 「转发」 label.
    */
-  | { readonly type: "shared"; readonly card: Card; readonly raw: string; readonly forwarded: boolean };
+  | { readonly type: "shared"; readonly card: Card; readonly raw: string; readonly forwarded: boolean }
+  /** texture-pass R7: a sticker from public/msgs/stickers/<name>.png, written as [贴纸] <name> ([sticker] in English). */
+  | { readonly type: "sticker"; readonly name: string; readonly raw: string };
+
+/** The sticker packs on disk (public/msgs/stickers); a name outside the list stays a text line. */
+export const STICKERS = ["family_blessing", "family_cold", "family_doge", "family_dumpling", "family_eat", "family_fruit", "family_good_night", "family_health", "family_hot", "family_hug", "family_laugh", "family_money", "family_morning_flower", "family_morning_tea", "family_okay", "family_question", "family_rain", "family_sleep_early", "family_thumbs", "family_wave", "office_boss_laugh", "office_cake", "office_clap", "office_coffee", "office_deadline", "office_done", "office_eyes", "office_fist", "office_handshake", "office_late", "office_ok_hand", "office_party", "office_received", "office_rocket", "office_salute", "office_shush", "office_sleep", "office_sweat", "office_thanks", "office_thinking"] as const;
+const STICKER = /^\[(?:贴纸|sticker)\]\s*([a-z0-9_]+)$/i;
 
 // The English twins (content/replies/en/) write the same conventions in English: [voice] 46″,
 // (transcript) …, [card], [photo] / [link] / [document], [recalled a message].
@@ -39,6 +45,8 @@ export function bodyOf(text: string): Body {
   if (CARD.test(text)) return { type: "card", raw: text };
   if (ATTACH.test(text)) return { type: "attach", raw: text };
   if (SYSTEM.test(text)) return { type: "system", raw: text };
+  const sticker = STICKER.exec(text);
+  if (sticker && (STICKERS as readonly string[]).includes(sticker[1]!.toLowerCase())) return { type: "sticker", name: sticker[1]!.toLowerCase(), raw: text };
   return { type: "text", text };
 }
 
@@ -69,6 +77,7 @@ export function previewOf(body: Body): string {
     case "deliverable":
     case "filecard":
     case "shared":
+    case "sticker":
       return body.raw;
   }
 }

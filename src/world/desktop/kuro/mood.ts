@@ -16,21 +16,23 @@ export const CLOSER_BPM = 110;
 export const HAND_NIGHTS = { first: 10, last: 17 } as const;
 
 export interface MoodInputs {
-  readonly state: Pick<State, "day" | "san" | "affinity" | "raids">;
+  readonly state: Pick<State, "day" | "san" | "affinity">;
   readonly events: readonly GameEvent[];
-  readonly session: Pick<Session, "dialogue" | "draft">;
+  readonly session: Pick<Session, "dialogue" | "draft" | "handCut">;
   readonly night: boolean;
 }
 
 /**
- * nosebleed: a taboo was answered today (the rest of the day). god: a hand night, at night, with the
- * hand out (the day's raid exists). closer: the heart rate at or over CLOSER_BPM. favour: affinity in
+ * nosebleed: a taboo was answered today (the rest of the day). god: a hand night, at night, while the
+ * hand is at the gap (the shutdown line waits, or its cut line is due: the same test as box.ts's
+ * raidShowing, repeated here because box → mini → mood would make a cycle). closer: the heart rate at or over CLOSER_BPM. favour: affinity in
  * its top band while the chat waits on the player. listen: the player is typing while the chat waits.
  */
 export function kuroMood(i: MoodInputs): Mood | null {
   const { state, session } = i;
   if (i.events.some((e) => e.kind === "chat" && e.day === state.day && e.taboo !== undefined)) return "nosebleed";
-  if (i.night && state.day >= HAND_NIGHTS.first && state.day <= HAND_NIGHTS.last && state.raids[String(state.day)] !== undefined) return "god";
+  const handOut = session.handCut?.day === state.day || session.dialogue.queue[0]?.key === `d${state.day}:beat:shutdown`;
+  if (i.night && state.day >= HAND_NIGHTS.first && state.day <= HAND_NIGHTS.last && handOut) return "god";
   if (bpm(state.san) >= CLOSER_BPM) return "closer";
   const chatWaits = session.dialogue.queue[0]?.ending.kind === "kuroTurn";
   if (chatWaits && affinityHigh(state as State)) return "favour";

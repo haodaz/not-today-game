@@ -2491,3 +2491,6 @@ body:has(.stage:is([data-day="10"],[data-day="11"],[data-day="12"],[data-day="13
 /* day1-playtest-1117 R5: room at the thread's foot for the line card, so it never covers the newest message */
 .conv.ding.carded .msgs{padding-bottom:170px}
 .conv.ding .reply .hint.prompt{color:var(--ink-1,#1d2129);font-weight:600}
+
+/* texture-pass R7: a sticker is the picture alone, 160 px, no bubble */
+.m .sticker{display:block;width:160px;height:160px;object-fit:contain;image-rendering:auto}

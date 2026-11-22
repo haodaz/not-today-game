@@ -32,7 +32,8 @@ describe("npc.json loader (strict)", () => {
     expect(parseNpc(npcFile)).toEqual(npcData);
     expect(Object.keys(npcData.npcs)).toEqual(["boss", "partner", "xiaozhang", "laozhou", "teacher", "family", "father", "同桌", "小满", "小满初中", "阿凯", "班长", "小卖部老板", "初一同学", "英语老师", "高中同桌", "高中班长", "boss_young", "partner_young", "laozhou_young"]);
     expect(npcData.silhouettes).toHaveLength(6);
-    expect(npcData.npcs.boss).toEqual({ name: "msgs.boss", portrait: "/npc/boss.png", avatar: "/npc/boss_av.png", stand: "/npc/stand/boss.webp" });
+    expect(npcData.npcs.boss).toMatchObject({ name: "msgs.boss", portrait: "/npc/boss.png", avatar: "/npc/boss_av.png", stand: "/npc/stand/boss.webp", idle: true });
+    expect(npcData.npcs.boss?.poses).toContain("laugh"); // texture-pass R2: the pose files beside the plain stand
     // Standing half-bodies (author 2026-11-18): the nine important people, nobody else.
     expect(Object.entries(npcData.npcs).filter(([, e]) => e.stand !== undefined).map(([id]) => id)).toEqual(["boss", "partner", "xiaozhang", "laozhou", "teacher", "family", "father", "boss_young", "partner_young"]);
   });

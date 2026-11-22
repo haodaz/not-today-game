@@ -106,3 +106,13 @@ nothing. English only in commits and logs (hackathon judges may read them). Neve
 
 R1 → R2 → R6 → R4 → R5 → R3 → R7. Each job is its own Kiro run with the repo green (`npm test`,
 `tsc`) before and after. Assets total about 60 MB under `public/`; nothing is deleted or renamed.
+
+## Status (2026-11-22, built by Claude — Kiro had no credits)
+
+- R1 cutscenes: 478dc4f (layer over the box; `__nt` dev handle). R2 poses + idle loops: 2ae9f00, figure =
+  video alone 4117153. R6 looks: 4117153. R4 battle skins: faee263 (stage 3 / defeated art not wired: on
+  a dark ground). R5 hands: fd61549 (not seen in a browser yet). R3 moods: ad0117a (glance / squint
+  unwired: no hover signal). R7: every launch page on its `.v2.jpg`; stickers as `[贴纸] <name>` /
+  `[sticker] <name>` lines (bubbles.ts `STICKERS`), two in day 14's group flood.
+- Still to do: the author's pick of poses per line (content), more cuts per day, the hand-night check
+  in a real run, glance / squint triggers, battle stage 3 cut-outs.

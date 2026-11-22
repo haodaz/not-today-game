@@ -59,6 +59,9 @@ export function renderBody(body: Body, names: State["names"], register: Register
       // voice-babble R4: the bubble is its own play / stop button (day 18 greyed, only hiss).
       return html`${voiceNote(body.sec, pill, voice, body.transcript !== null ? fill(body.transcript) : null)}${trans}`;
     }
+    case "sticker":
+      // texture-pass R7: the picture alone, no bubble (the two chat apps share the pack)
+      return html`<img class="sticker" src="/msgs/stickers/${body.name}.png" alt="" draggable="false">`;
     case "card":
       // A forwarded card: an article card in WeChat, a task card in DingTalk (the same written text).
       return html`<div class="${cls("card", register === "wx" ? "article" : "task")}">${fill(body.raw)}</div>`;
