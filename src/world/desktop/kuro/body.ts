@@ -13,7 +13,10 @@ export const BODY_STATES = ["idle", "busy", "think", "happy", "rest", "crawl", "
  */
 export const MAW_LOOKS = ["maw", "maw2", "maw3"] as const;
 export type MawLook = (typeof MAW_LOOKS)[number];
-export type BodyState = (typeof BODY_STATES)[number] | MawLook;
+/** texture-pass R3: a window mood is one still of its own (public/kuro/win_<mood>.png), cut like the maw. */
+export const MOOD_STATES = ["nosebleed", "god", "closer", "favour", "listen", "calm", "glance", "squint"] as const;
+export type MoodLook = (typeof MOOD_STATES)[number];
+export type BodyState = (typeof BODY_STATES)[number] | MawLook | MoodLook;
 
 /** Two aligned frames per state (public/kuro/). */
 export const FRAMES: Readonly<Record<(typeof BODY_STATES)[number], readonly [string, string]>> = {
@@ -30,6 +33,9 @@ export const FRAMES: Readonly<Record<(typeof BODY_STATES)[number], readonly [str
 export const MAW_FRAMES: Readonly<Record<MawLook, string>> = { maw: "k3d_maw", maw2: "k3d_maw2", maw3: "k3d_maw3" };
 
 export const isMaw = (s: BodyState | null | undefined): s is MawLook => (MAW_LOOKS as readonly string[]).includes(s ?? "");
+export const isMood = (s: BodyState | null | undefined): s is MoodLook => (MOOD_STATES as readonly string[]).includes(s ?? "");
+/** A mood's one frame (never red: the pictures carry their own look). */
+export const moodUrl = (m: MoodLook): string => `/kuro/win_${m}.png`;
 
 /** A frame's file; from the late ring every state's frames are the `_red` ones (late-days FR2). */
 export const frameUrl = (name: string, red = false): string => `/kuro/${name}${red ? "_red" : ""}.png`;
@@ -42,6 +48,8 @@ export const HOLD_MS = 1200;
 export interface BodyInputs {
   /** A maw look, which outranks everything (late-days FR3); null or absent before the late ring. */
   readonly maw?: MawLook | null;
+  /** texture-pass R3: a window mood, under the maw and over every state. */
+  readonly mood?: MoodLook | null;
   readonly night: boolean;
   readonly taskRunning: boolean;
   readonly saidPretty: boolean;
@@ -58,6 +66,7 @@ export interface BodyInputs {
  */
 export function bodyState(i: BodyInputs): BodyState {
   if (i.maw) return i.maw;
+  if (i.mood) return i.mood;
   if (i.night) return "rest";
   if (i.taskRunning) return "busy";
   if (i.saidPretty) return "happy";
@@ -70,6 +79,7 @@ export function bodyState(i: BodyInputs): BodyState {
 export function renderLayer(state: BodyState, red = false): SafeHtml {
   // The maw: one frame, its own look, no second frame to breathe between.
   if (isMaw(state)) return html`<div class="layer cut" data-state="${state}"><img class="f1" src="${frameUrl(MAW_FRAMES[state])}" alt=""></div>`;
+  if (isMood(state)) return html`<div class="layer cut mood" data-state="${state}"><img class="f1" src="${moodUrl(state)}" alt=""></div>`;
   const [a, b] = FRAMES[state];
   return html`<div class="layer" data-state="${state}"${red ? html` data-red="1"` : null}><img class="f1" src="${frameUrl(a, red)}" alt=""><img class="f2" src="${frameUrl(b, red)}" alt=""></div>`;
 }
@@ -98,7 +108,7 @@ export class KuroBodyElement {
 
   set(state: BodyState, red = false): void {
     if (state === this.state && red === this.red) return;
-    const cut = isMaw(state) || isMaw(this.state);
+    const cut = isMaw(state) || isMaw(this.state) || isMood(state) || isMood(this.state);
     const now = Date.now();
     if (!cut && this.state !== null && now - this.changedAt < HOLD_MS) return;
     this.changedAt = now;

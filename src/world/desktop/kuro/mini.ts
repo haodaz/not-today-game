@@ -11,6 +11,7 @@ import { kuroInBox } from "@world/loop/dialogue";
 import type { AppContext } from "../model";
 import { pointerCls } from "@world/room/pointer";
 import { bodyState, frameUrl, FRAMES, renderLayer, type BodyState, type MawLook } from "./body";
+import { kuroMood } from "./mood";
 import { lateRing } from "@world/late/rings";
 import { closerOut } from "@world/late/closer";
 import { kuroDay } from "./days";
@@ -83,6 +84,7 @@ export function kuroBodyState(ctx: AppContext): BodyState {
   const guided = guideNow(ctx.state, ctx.events, session) !== null;
   return bodyState({
     maw: kuroMaw(ctx),
+    mood: kuroMood({ state: ctx.state, events: ctx.events, session, night: ctx.night }),
     night: ctx.night || session.view === "lying",
     taskRunning: kuroWorking(session, ctx.nowMs), // its 3 s of work on a task (work FR3)
     saidPretty: ctx.nowMs < session.happyUntil,
