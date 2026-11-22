@@ -343,12 +343,18 @@ const PROP = { throw: "/battle/prop-laptop.png", flip: "/battle/prop-keyboard.pn
 export const BOSS_BG = "/battle/boss-bg.jpg";
 
 const bar = (v: number, max: number, kind: string): SafeHtml => html`<i class="${cls("bs-bar", kind)}"><b style="width:${String(Math.round((100 * Math.max(0, v)) / Math.max(1, max)))}%"></b></i>`;
-/** The objects' battle forms (author 2026-11-14: one attack form each, the walkman the doctor): `public/battle/party/obj-<id>.png`. */
-const faceOf = (b: BossBattle, m: Member): string => (m.kind === "player" ? `/player/${b.look}.png` : m.kind === "qkuro" ? "/battle/q-kuro.png" : `/battle/party/obj-${m.id}.png`);
+/**
+ * The objects' battle forms. texture-pass R4 (2026-11-22): one set in the kuro-you register,
+ * `public/battle/party2/obj_<id>_{stance,strike,hurt}.png` (and `_assim`, the object gone over to the
+ * boss's side, for when the design puts it there); a throw or a flip is their strike.
+ */
+export const objectSprite = (id: string, pose: Pose | "assim" = "stance"): string =>
+  `/battle/party2/obj_${id}_${pose === "throw" || pose === "flip" ? "strike" : pose}.png`;
+const faceOf = (b: BossBattle, m: Member): string => (m.kind === "player" ? `/player/${b.look}.png` : m.kind === "qkuro" ? "/battle/q-kuro.png" : objectSprite(m.id));
 /** The assimilated player, once crossed to Kuro's side, in Kuro's shape (author 2026-11-13: 「变成克总的形象」). */
 export const KURO_YOU = "/battle/party/kuro-you.png";
 const spriteOf = (b: BossBattle, m: Member, pose: Pose): string =>
-  m.kind === "player" ? (b.phase === "after" && b.strong ? KURO_YOU : `/battle/party/${b.look}-${pose === "hurt" ? "stance" : pose}.png`) : m.kind === "qkuro" ? "/battle/q-kuro.png" : `/battle/party/obj-${m.id}.png`;
+  m.kind === "player" ? (b.phase === "after" && b.strong ? KURO_YOU : `/battle/party/${b.look}-${pose === "hurt" ? "stance" : pose}.png`) : m.kind === "qkuro" ? "/battle/q-kuro.png" : objectSprite(m.id, pose);
 
 /**
  * boss-phase2-world: `world` is set while phase 2 plays in the code-built room behind the page

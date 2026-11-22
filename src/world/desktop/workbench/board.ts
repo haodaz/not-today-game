@@ -761,7 +761,7 @@ const actions: Record<string, ActionHandler> = {
     if (!battleOffered(c.board, s, state.found as string[], ctx.store.getEvents(), state.day, c.task.id)) return;
     ctx.store.appendEvent({ kind: "open", target: battleTarget(c.task.id), t: ctx.session.clock.time });
     const fill = (x: string) => fillPlaceholders(x, state.names);
-    ctx.session.battle = startBattle(ideKey(state.day, c.task), fill(c.task.title), foeImage(c.task), state.day, ctx.now?.() ?? Date.now());
+    ctx.session.battle = startBattle(ideKey(state.day, c.task), fill(c.task.title), foeImage(c.task, state.day), state.day, ctx.now?.() ?? Date.now());
     ctx.rerender();
   },
   "battle-act"(ctx, data) {

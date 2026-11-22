@@ -13,8 +13,13 @@ import type { ChipId } from "@world/sound/chip";
 const S = (key: string, args?: Record<string, string>): string => (hasString(key) ? t(key, args) : key);
 
 export const CHICK_BACK = "/battle/chick-back.gb.png";
-/** The task's monster: the form-and-stamp one for an approval day, the paper one for everything else. */
-export const foeImage = (task: Task): string => (task.board?.stack ? "/battle/mon-stamp.gb.png" : "/battle/mon-brief.gb.png");
+/**
+ * The task's monster. texture-pass R4: days 4–18 each have their own (public/battle/mons/mon_dNN.gb.png,
+ * the day's work drawn as a Game Boy creature); earlier days and no day keep the two generic ones:
+ * the form-and-stamp one for an approval day, the paper one for everything else.
+ */
+export const foeImage = (task: Task, day?: number): string =>
+  day !== undefined && day >= 4 && day <= 18 ? `/battle/mons/mon_d${String(day).padStart(2, "0")}.gb.png` : task.board?.stack ? "/battle/mon-stamp.gb.png" : "/battle/mon-brief.gb.png";
 
 export type FxKind = "shake" | "hit" | "flame" | "down" | "heal" | "none";
 export interface Fighter { readonly hp: number; readonly max: number; readonly atk: number }

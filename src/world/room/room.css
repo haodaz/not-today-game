@@ -760,7 +760,7 @@
 .bs-member.player{order:3}
 .bs-member.player .bs-sprite{height:192px;animation:bs-breathe 2.6s ease-in-out infinite}
 .bs-member.object{order:1}
-.bs-member.object .bs-sprite{height:128px;animation:bs-breathe 3.4s ease-in-out infinite}
+.bs-member.object .bs-sprite{height:160px;animation:bs-breathe 3.4s ease-in-out infinite} /* texture-pass R4: the party2 set is 192 px tall; 160 keeps the row under the player (192) */
 .bs-member.object.acting .bs-sprite{animation:bs-lunge 900ms ease-out both}
 .bs-member.qkuro{order:2}
 .bs-member.qkuro .bs-sprite{height:120px;animation:bs-breathe 2s ease-in-out infinite}
@@ -1168,3 +1168,6 @@
 .dlg-layer .scene-stand-anim.speaking{left:calc(var(--stage-l,0px) + var(--stage-w,100vw) * .66)}
 .dlg-layer .scene-stand-anim.other{left:calc(var(--stage-l,0px) + var(--stage-w,100vw) * .34);filter:brightness(.55) saturate(.8) drop-shadow(0 6px 18px rgba(0,0,0,.35))}
 @media (prefers-reduced-motion:reduce){.dlg-layer .scene-stand-anim{display:none}}
+
+/* texture-pass R4: the 同化 super-battle stands before the giant form (public/battle/boss2/boss_giant.jpg) */
+.boss-page.strong .bs-bg{background-image:url(/battle/boss2/boss_giant.jpg)}
