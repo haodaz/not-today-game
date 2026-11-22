@@ -55,6 +55,8 @@ export interface SayLine {
    * (a line that says nothing keeps the last one, like the backdrop).
    */
   readonly prop?: string;
+  /** texture-pass R2: the standing NPC's pose for this line and after, until the next pose or a new backdrop. */
+  readonly pose?: string;
 }
 /** When an item belongs (day-loop addition 2026-11-02): the day's work, or the evening after nightfall. */
 export const ITEM_WHEN = ["day", "night"] as const;
@@ -255,7 +257,7 @@ function parsePicture(v: unknown, dir: string, w: string, onFail: (where: string
 export function parseLine(v: unknown, w: string, onFail: (where: string, problem: string) => never = fail, withWhere = false): SayLine {
   if (!isRecord(v)) onFail(w, "a line must be an object");
   const r = v as Raw;
-  const allowed = withWhere ? ["k", "t", "sfx", "who", "where", "backdrop", "prop"] : ["k", "t", "sfx", "who"];
+  const allowed = withWhere ? ["k", "t", "sfx", "who", "where", "backdrop", "prop", "pose"] : ["k", "t", "sfx", "who"];
   for (const k of Object.keys(r)) if (!allowed.includes(k)) onFail(w, `unknown key "${k}"`);
   const k = r.k as LineKind;
   if (!LINE_KINDS.includes(k)) onFail(w, `unknown line kind "${String(r.k)}"`);
@@ -269,6 +271,8 @@ export function parseLine(v: unknown, w: string, onFail: (where: string, problem
     ...(r.where !== undefined ? { where: parsePlace(r.where, `${w}.where`, onFail) } : {}),
     ...(r.backdrop !== undefined ? { backdrop: parsePicture(r.backdrop, BACKDROP_DIR, `${w}.backdrop`, onFail, true) } : {}),
     ...(r.prop !== undefined ? { prop: parsePicture(r.prop, PROP_DIR, `${w}.prop`, onFail, true) } : {}),
+    // texture-pass R2: the standing NPC's pose for this line (a pose name from npc.json `poses`)
+    ...(r.pose !== undefined ? { pose: s(r.pose, `${w}.pose`) } : {}),
   };
 }
 
@@ -469,6 +473,7 @@ function assertLineTwin(zh: SayLine, en: SayLine, w: string): void {
   if (zh.sfx !== en.sfx) fail(w, `sfx differs from the Chinese`);
   if (zh.backdrop !== en.backdrop) fail(w, `backdrop differs from the Chinese`);
   if (zh.prop !== en.prop) fail(w, `prop differs from the Chinese`);
+  if (zh.pose !== en.pose) fail(w, `pose differs from the Chinese`);
 }
 function localiseLine(zh: SayLine, en: SayLine, w: string): SayLine {
   assertLineTwin(zh, en, w);

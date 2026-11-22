@@ -12,18 +12,24 @@ export interface NpcEntry {
   readonly avatar: string;
   /** A standing half-body cut-out for scenes with a backdrop (author 2026-11-18), when there is one. */
   readonly stand?: string;
+  /** texture-pass R2: the pose files beside `stand` (`<base>_<pose>.webp`) a line may name with `pose`. */
+  readonly poses?: readonly string[];
+  /** texture-pass R2: `/anim/stand/<base>_idle.webm` exists (a breathing loop over the plain stand). */
+  readonly idle?: true;
 }
 
 export interface NpcData {
   readonly npcs: Readonly<Record<string, NpcEntry>>;
   readonly silhouettes: readonly string[];
+  /** texture-pass R2: from this day an NPC with an `assim` pose stands as it unless a line names a pose. */
+  readonly assimFrom: number;
 }
 
 const isStr = (v: unknown): v is string => typeof v === "string";
 const isObj = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
-const TOP_KEYS = ["_note", "npcs", "silhouettes"] as const;
+const TOP_KEYS = ["_note", "npcs", "silhouettes", "assimFrom"] as const;
 const NPC_KEYS = ["name", "portrait", "avatar"] as const;
-const NPC_OPTIONAL = ["stand"] as const;
+const NPC_OPTIONAL = ["stand", "poses", "idle"] as const;
 
 function fail(where: string, msg: string): never {
   throw new Error(`content/npc.json ${where}: ${msg}`);
@@ -41,10 +47,14 @@ export function parseNpc(raw: unknown): NpcData {
     for (const k of Object.keys(entry)) if (![...NPC_KEYS, ...NPC_OPTIONAL].includes(k as never)) fail(`npcs.${id}`, `unknown key "${k}"`);
     for (const k of NPC_KEYS) if (!isStr(entry[k])) fail(`npcs.${id}.${k}`, "must be a string");
     if ("stand" in entry && !isStr(entry.stand)) fail(`npcs.${id}.stand`, "must be a string");
-    npcs[id] = { name: entry.name as string, portrait: entry.portrait as string, avatar: entry.avatar as string, ...(isStr(entry.stand) ? { stand: entry.stand } : {}) };
+    if ("poses" in entry && !(isStr(entry.stand) && Array.isArray(entry.poses) && entry.poses.every(isStr))) fail(`npcs.${id}.poses`, "must be a string array beside a stand");
+    if ("idle" in entry && !(isStr(entry.stand) && entry.idle === true)) fail(`npcs.${id}.idle`, "must be true beside a stand");
+    npcs[id] = { name: entry.name as string, portrait: entry.portrait as string, avatar: entry.avatar as string, ...(isStr(entry.stand) ? { stand: entry.stand } : {}), ...(Array.isArray(entry.poses) ? { poses: entry.poses as string[] } : {}), ...(entry.idle === true ? { idle: true as const } : {}) };
   }
   if (!Array.isArray(raw.silhouettes) || !raw.silhouettes.every(isStr)) fail("silhouettes", "must be a string array");
-  return { npcs: Object.freeze(npcs), silhouettes: raw.silhouettes as string[] };
+  const assimFrom = raw.assimFrom === undefined ? 19 : raw.assimFrom;
+  if (!(Number.isInteger(assimFrom) && (assimFrom as number) >= 1)) fail("assimFrom", "must be a day number");
+  return { npcs: Object.freeze(npcs), silhouettes: raw.silhouettes as string[], assimFrom: assimFrom as number };
 }
 
 export const npcData: NpcData = Object.freeze(parseNpc(npcFile));
@@ -57,6 +67,30 @@ export function npcPortrait(who: string): string | null {
 /** The standing half-body for a speaker `who`, or null (not a known NPC, or none drawn). */
 export function npcStand(who: string): string | null {
   return entryOf(who)?.stand ?? null;
+}
+
+/** `/npc/stand/boss.webp` → `/npc/stand/boss` (the base the pose and idle files are named from). */
+const standBase = (stand: string): string => stand.replace(/\.webp$/, "");
+
+/**
+ * texture-pass R2: the stand for `who` in `pose` on `day`. A named pose the NPC has → its file; an
+ * unknown or absent pose → the plain stand, except from `assimFrom` on, when an NPC with an `assim`
+ * pose stands as it. Null when `who` has no stand at all.
+ */
+export function npcStandFor(who: string, pose: string | undefined, day: number, data: NpcData = npcData): string | null {
+  const e = Object.hasOwn(data.npcs, who) ? data.npcs[who] : undefined;
+  if (!e?.stand) return null;
+  const has = (p: string) => e.poses?.includes(p) === true;
+  if (pose !== undefined && has(pose)) return `${standBase(e.stand)}_${pose}.webp`;
+  if (day >= data.assimFrom && has("assim")) return `${standBase(e.stand)}_assim.webp`;
+  return e.stand;
+}
+
+/** texture-pass R2: the idle loop for `who`'s plain stand (`/anim/stand/<base>_idle.webm`), or null. */
+export function npcIdle(who: string, data: NpcData = npcData): string | null {
+  const e = Object.hasOwn(data.npcs, who) ? data.npcs[who] : undefined;
+  if (!e?.stand || e.idle !== true) return null;
+  return `/anim/stand/${standBase(e.stand).split("/").pop()}_idle.webm`;
 }
 
 /** Own entries only (ids come from content and from message text). */

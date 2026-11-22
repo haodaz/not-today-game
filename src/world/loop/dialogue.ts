@@ -7,7 +7,7 @@ import { recogniseTable } from "@state/recognise";
 import type { GameEvent } from "@state/events";
 import { deliverableForHand, handDeliverableOf, handNight } from "@state/days/board";
 import { hasString, t } from "@world/i18n";
-import { npcStand } from "@world/npc";
+import { npcIdle, npcStand, npcStandFor } from "@world/npc";
 import type { State } from "@state/types.gen";
 
 export type Ending =
@@ -204,6 +204,9 @@ export interface Scene {
    * in the middle of the frame behind the box (npc.json `stand`); absent otherwise.
    */
   readonly stand?: string;
+  /** texture-pass R2: the idle loop (webm with alpha) over `stand`, when it is the plain stand and one exists. */
+  readonly standIdle?: string;
+  readonly otherIdle?: string;
 }
 export const NO_SCENE: Scene = { backdrop: null, prop: null };
 
@@ -212,27 +215,31 @@ export const NO_SCENE: Scene = { backdrop: null, prop: null };
  * `prop` (`""` clears it). Derived, never stored: when the sequence ends (the queue head changes or
  * empties) the stage goes back to its own still. Pure.
  */
-export function sceneOf(d: DialogueState): Scene {
+export function sceneOf(d: DialogueState, day = 0): Scene {
   const q = d.queue[0];
   if (!q) return NO_SCENE;
   let backdrop: string | null = null;
   let prop: string | null = null;
   // Standing NPCs: the last NPC who spoke stays standing through the narration and the player's
   // lines, as in a visual novel, until another person speaks or the backdrop changes.
+  // texture-pass R2: who stands (by id), and the pose each has been given; the picture is resolved at the end
   let stand: string | null = null;
   // two-up: the NPC who stood before the current one, in the same scene (a new backdrop clears both)
   let other: string | null = null;
+  const poses = new Map<string, string>();
   for (const l of q.lines.slice(0, Math.min(d.line, q.lines.length - 1) + 1)) {
     if (l.backdrop !== undefined) {
       backdrop = l.backdrop === "" ? null : l.backdrop;
       stand = null;
       other = null;
+      poses.clear();
     }
     if (l.prop !== undefined) prop = l.prop === "" ? null : l.prop;
     if (q.voice !== "kuro" && (l.k === "speaker" || l.k === "narration") && l.who !== undefined && l.who !== "me") {
-      const next = npcStand(l.who);
+      const next = npcStand(l.who) === null ? null : l.who;
       if (next !== null && stand !== null && next !== stand) other = stand;
       if (next !== null) stand = next;
+      if (next !== null && l.pose !== undefined) poses.set(next, l.pose);
     }
   }
   if (backdrop === null && prop === null) return NO_SCENE;
@@ -241,7 +248,13 @@ export function sceneOf(d: DialogueState): Scene {
   const cur = q.lines[Math.min(d.line, q.lines.length - 1)];
   const speaking = q.voice !== "kuro" && !!cur && (cur.k === "speaker" || cur.k === "narration") && cur.who !== undefined && cur.who !== "me";
   const show = backdrop !== null && stand !== null && (prop === null || speaking);
-  return { backdrop, prop, ...(show ? { stand: stand! } : {}), ...(show && other !== null ? { other } : {}) };
+  if (!show) return { backdrop, prop };
+  const pic = (who: string) => npcStandFor(who, poses.get(who), day)!;
+  // the idle loop belongs to the plain stand only (it was drawn from it)
+  const idle = (who: string) => (poses.get(who) === undefined && pic(who) === npcStand(who) ? npcIdle(who) : null);
+  const s = pic(stand!), si = idle(stand!);
+  const o = other !== null ? pic(other) : null, oi = other !== null ? idle(other) : null;
+  return { backdrop, prop, stand: s, ...(si !== null ? { standIdle: si } : {}), ...(o !== null ? { other: o } : {}), ...(oi !== null ? { otherIdle: oi } : {}) };
 }
 
 // ——— a line waits for its place (dialogue addition 2026-11-02) ———

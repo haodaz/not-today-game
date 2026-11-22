@@ -13,7 +13,8 @@
     {
       "k": "speaker",
       "who": "boss",
-      "t": "Future Intelligence. Series B. Signed."
+      "t": "Future Intelligence. Series B. Signed.",
+      "pose": "laugh"
     },
     {
       "k": "narration",
@@ -52,7 +53,8 @@
     {
       "k": "speaker",
       "who": "partner",
-      "t": "Hear me out. If this becomes a product, it has to be you. Only you can build it."
+      "t": "Hear me out. If this becomes a product, it has to be you. Only you can build it.",
+      "pose": "p2"
     },
     {
       "k": "narration",
