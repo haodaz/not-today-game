@@ -178,6 +178,12 @@ export interface Session {
   emptyBox: "lunch" | "dinner" | null;
   /** hunger (author 2026-11-20): the last fullness change, floated off the status tile while the card is closed. */
   fullnessFloat: { readonly delta: number; readonly at: number } | null;
+  /** texture-pass R1: the cutscene showing (its files, beat, key and start), or null. Session only. */
+  cut: { readonly beat: string; readonly video: string; readonly poster: string; readonly key: string; readonly at: number } | null;
+  /** texture-pass R1: the cut keys already played this run (`*:<beat>` for once-beats, `d<day>:<beat>` otherwise). */
+  cutsPlayed: Set<string>;
+  /** texture-pass R1: cuts play at all (off under `?fast=1`, in tests, and with reduced motion). */
+  cutsOn: boolean;
   /** status-panel: the character panel (人物) is open over the view. */
   statusOpen: boolean;
   /** meters-v2 §3: the day the first late chat turn was taken (the `chat.late` hint has had its once). */
@@ -612,6 +618,9 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     bookOpened: false,
     emptyBox: null,
     fullnessFloat: null,
+    cut: null,
+    cutsPlayed: new Set(),
+    cutsOn: false,
     statusOpen: false,
     chatLateDay: null,
     stare: null,

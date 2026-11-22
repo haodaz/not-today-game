@@ -1154,3 +1154,11 @@
    guide's anchor but draws no ring, so nothing is left where the object was before a drag */
 .desk3d-marks > .room-mark[data-glow][data-guide="on"]{box-shadow:none;animation:none}
 .desk3d-marks > .room-mark[data-glow][data-guide="on"]::after{content:none}
+
+/* texture-pass R1: a cutscene over everything but the dialogue box (41). Poster first, the video over it; fades in and out on its own. */
+.cut-layer{position:fixed;inset:0;z-index:45;background:#000;cursor:pointer;animation:cut-in 150ms both,cut-out 200ms 3200ms both} /* over the box (41): the line reads after the cut; a click skips */
+.cut-layer .cut-poster,.cut-layer .cut-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cut-layer .cut-video{animation:m-fade-in 300ms both}
+@keyframes cut-in{from{opacity:0}to{opacity:1}}
+@keyframes cut-out{from{opacity:1}to{opacity:0}}
+@media (prefers-reduced-motion:reduce){.cut-layer .cut-video{display:none}}

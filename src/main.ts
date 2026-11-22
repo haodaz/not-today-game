@@ -8,6 +8,7 @@
 // The game opens in English (README); `?lang=zh` opens in Chinese.
 import "./world/desktop/desktop.css";
 import "./world/room/room.css";
+import { cutsSupported } from "./world/cut/layer";
 import "./world/room/devices.css";
 import "./world/room/fx.css";
 import "./world/room/cursors.css";
@@ -187,6 +188,10 @@ function startGame(store: Store, saved: boolean, prologue = false): void {
   }
   // Debug speed, dev builds only (like ?day=): `?fast=1` counts delivery minutes as seconds.
   game.session.deliveryUnitMs = deliveryUnitMs(search, import.meta.env.DEV);
+  // texture-pass R1: cutscenes play in a real browser, never in the fast replay or with reduced motion.
+  game.session.cutsOn = cutsSupported() && new URLSearchParams(search).get("fast") !== "1";
+  // Dev only: the running game at hand in the console (`__nt.session`, `__nt.store`), for looking, never for the story.
+  if (import.meta.env.DEV) (window as unknown as { __nt: unknown }).__nt = game;
   // room-3d-desk R6: `?desk=photo` keeps the photo 桌子 (the author's comparison; the replay driver passes it).
   game.session.deskPhoto = new URLSearchParams(search).get("desk") === "photo";
   // Dev only, beside ?day=N (2026-11-12): `&launch=task3` stands at the desktop with 工作台 on that

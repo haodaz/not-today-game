@@ -40,6 +40,7 @@ import { boxArrived } from "@world/room/arrival";
 import { LOOK_KEYS, nextLook, roomLooks, type LookKey } from "@state/room-looks";
 import { skipToLast, storyMasked } from "@world/dialogue/mask";
 import { tabooActions, tabooLayer } from "@world/dialogue/taboo";
+import { cutActions, cutLayer, cutOn } from "@world/cut/layer";
 import { handOf } from "@state/hands";
 import { handStep, ROLL_MAX, ROLLERS } from "@world/objects/hand";
 import { UPSIDE_DOWN_DEG } from "@world/objects/calculator";
@@ -145,7 +146,7 @@ function renderGameBody(store: Store, session: Session, nowMs: number): SafeHtml
     // screen (the pet in the monitor is the one); R5 (2026-11-08): the checklist's current line in
     // the top bar, not a card over the window (the window fills the frame; a card hid 听听's list).
     const lc = loopContext(state, events);
-    return html`${renderDesktop({ ...shell, nextItem: lc ? nextItemText(checklistNow(lc, state, events, session)) : null })}${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${host}${launchLayer(state, session)}${workLayer({ state, events, session, nowMs, startDay: store.getStartDay() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${eggFlash(session, nowMs)}${dlgLayer(dlg, session, readsOn, !maskInModal)}<div class="hud-host">${(shell.onboard === null || shell.onboard === undefined) && !gameRunning(state, events, session) ? leaveControl() : null}${hudTiles(session, state, { settings: false, nowMs })}${itemsPanel(state, events, session)}${settingsPanel(session)}${statusPanel(state, events, session)}</div>`;
+    return html`${renderDesktop({ ...shell, nextItem: lc ? nextItemText(checklistNow(lc, state, events, session)) : null })}${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${host}${launchLayer(state, session)}${workLayer({ state, events, session, nowMs, startDay: store.getStartDay() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${eggFlash(session, nowMs)}${cutLayer(session, nowMs)}${dlgLayer(dlg, session, readsOn, !maskInModal)}<div class="hud-host">${(shell.onboard === null || shell.onboard === undefined) && !gameRunning(state, events, session) ? leaveControl() : null}${hudTiles(session, state, { settings: false, nowMs })}${itemsPanel(state, events, session)}${settingsPanel(session)}${statusPanel(state, events, session)}</div>`;
   }
   // The box does not jump (dialogue correction 2026-11-02): in every view it is anchored to the
   // viewport in the same fixed layer, not to the stage (whose size differs between views). The
@@ -153,7 +154,7 @@ function renderGameBody(store: Store, session: Session, nowMs: number): SafeHtml
   // camera-viewfinder R1: the box is never opened over the viewfinder (what is queued waits for it).
   const dlg = session.viewfinder ? null : dialogueBox(state, events, session, nowMs);
   const settings = session.viewfinder ? null : html`${settingsPanel(session)}${statusPanel(state, events, session)}`;
-  return html`${renderRoom({ state, events, session, startDay: store.getStartDay(), nowMs, boxOutside: true, runId: store.getRunId() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${dlgLayer(dlg, session, boxReadsOn(state, events, session))}${settings ? html`<div class="hud-host">${settings}</div>` : null}`;
+  return html`${renderRoom({ state, events, session, startDay: store.getStartDay(), nowMs, boxOutside: true, runId: store.getRunId() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${cutLayer(session, nowMs)}${dlgLayer(dlg, session, boxReadsOn(state, events, session))}${settings ? html`<div class="hud-host">${settings}</div>` : null}`;
 }
 
 /**
@@ -435,6 +436,7 @@ function doorAct(ctx: ActionContext, input: DoorInput | null): boolean {
     const moved = stepDoor(beat!, step);
     beat = moved.beat;
     if (moved.emit) store.appendEvent(moved.emit);
+    if (moved.emit?.kind === "pickup") cutOn(ctx, "door:pickup");
     session.door = beat;
   };
   take(next);
@@ -1026,6 +1028,7 @@ export const loopActions: Record<string, ActionHandler> = {
     if (session.view !== "lying") {
       if (session.cam && session.cam.until > (ctx.now?.() ?? Date.now())) return;
       const ms = wayMs(session.view, "lying");
+      cutOn(ctx, "lieDown");
       loopActions["view"]!(ctx, { view: "lying" } as DOMStringMap, null as never);
       ctx.later(ms + 20, () => {
         if (ctx.session.view === "lying") loopActions["sleep"]!(ctx, {} as DOMStringMap, null as never);
@@ -1406,6 +1409,7 @@ export const loopActions: Record<string, ActionHandler> = {
       return;
     }
     const { task, key } = now;
+    if (!now.started) cutOn(ctx, "work:start");
     ctx.session.wbFull = true;
     ctx.session.focus = bringToFront(ctx.session, "workbench");
     // the task page is under the stage (the workspace shows the work, read-only)
@@ -2004,6 +2008,7 @@ export const loopActions: Record<string, ActionHandler> = {
   ...kuroActions,
   // A taboo's error cascade (kuro-chat 2026-11-02): each dialog needs a click.
   ...tabooActions,
+  ...cutActions,
 };
 
 /**
@@ -2111,6 +2116,7 @@ function openCaseAfterArrival(ctx: ActionContext): void {
   }
   session.caseOpen = true;
   session.caseOpenedAt = ctx.now?.() ?? Date.now();
+  cutOn(ctx, "carton:open");
   ctx.later(CASE_WOBBLE_MS + 16, ctx.rerender);
   if (session.caseStuck < 0) session.caseStuck = jitter(`case-stuck:${ctx.store.getRunId()}:${ctx.store.getState().day}`, 0, 3);
 }

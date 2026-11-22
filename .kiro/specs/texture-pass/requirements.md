@@ -18,7 +18,7 @@ nothing. English only in commits and logs (hackathon judges may read them). Neve
 - A pure function `cutFor(state, session, event): { video, poster } | null` in `src/world/cut/plan.ts`
   reads the map, the player's look (`names.portrait` → file name) and `cuts.json`; `once` beats play on
   their first occurrence only (`session.cutsPlayed`). No DOM in this file; this is what the tests cover.
-- The player: a `.cut-layer` over everything but the dialogue box, poster image first, then the video
+- The player: a `.cut-layer` over everything, the dialogue box included (its line reads after the cut), poster image first, then the video
   (`autoplay muted playsinline`, no controls); fades in 150 ms, plays, fades out 200 ms, then the beat
   continues exactly as before. A click or any key skips. `prefers-reduced-motion` or a failed `play()`
   shows the poster for 1.2 s instead. The whole cut never blocks input for more than 3.5 s.
