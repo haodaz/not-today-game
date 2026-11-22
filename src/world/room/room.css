@@ -122,9 +122,9 @@
 .os-list{position:absolute;left:0;top:28px;z-index:6;pointer-events:none}
 /* The checklist only watches: no line is a button, no hover state. */
 /* 右上 */
-.room .day{position:absolute;right:28px;top:28px;text-align:right;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.6);font-size:15px;line-height:1.5}
+.room .day{position:absolute;z-index:12;right:28px;top:28px;text-align:right;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.6);font-size:15px;line-height:1.5}
 .room .day b{display:block;font-size:22px;font-weight:600}.room .day .ov{color:#ffb3ad}
-.room .hr{position:absolute;right:28px;top:118px;background:rgba(232,228,220,.7);backdrop-filter:blur(8px);border-radius:8px;padding:6px 10px;font:12px var(--mono);color:#333;display:flex;gap:8px;align-items:center}
+.room .hr{position:absolute;z-index:12;right:28px;top:118px;background:rgba(232,228,220,.7);backdrop-filter:blur(8px);border-radius:8px;padding:6px 10px;font:12px var(--mono);color:#333;display:flex;gap:8px;align-items:center}
 .room .hr i{width:8px;height:8px;border-radius:50%;background:#e5484d;box-shadow:0 0 0 3px rgba(229,72,77,.2)}
 /* 桌子 is the tabletop (day-loop correction 2026-11-01): everything with state is a cutout placed at
    its rect from content/desk.json; the button inside fills it. */
@@ -1173,6 +1173,6 @@
 .boss-page.strong .bs-bg{background-image:url(/battle/boss2/boss_giant.jpg)}
 
 /* texture-pass R5: the night's god hand behind the box while the hand is out (under the gap's pink line, 14) */
-.room .hand-stage{position:absolute;inset:0;z-index:13;background:#05060a;overflow:hidden;animation:m-fade-in 600ms both}
+.room .hand-stage{position:absolute;inset:0;z-index:11;background:#05060a;overflow:hidden;animation:m-fade-in 600ms both}
 .room .hand-stage img,.room .hand-stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 @media (prefers-reduced-motion:reduce){.room .hand-stage video{display:none}}
