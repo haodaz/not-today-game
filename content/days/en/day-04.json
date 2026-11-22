@@ -15,7 +15,8 @@
         {
           "k": "inner",
           "t": "A new version with no changelog. Where I work that is an incident. Here it is an update.",
-          "where": "screen"
+          "where": "screen",
+          "me": "cross"
         }
       ]
     },
@@ -23,7 +24,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "Today's loose one is flat. An IC card, the magnetic strip scuffed, the corners whitened, rows of pinch marks."
+          "t": "Today's loose one is flat. An IC card, the magnetic strip scuffed, the corners whitened, rows of pinch marks.",
+          "me": "carton"
         },
         {
           "k": "inner",
@@ -43,7 +45,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "You switch off the lamp. The room goes fully dark; only the chick's little screen keeps a trace of light."
+          "t": "You switch off the lamp. The room goes fully dark; only the chick's little screen keeps a trace of light.",
+          "me": "tired"
         }
       ]
     },
@@ -60,7 +63,8 @@
         },
         {
           "k": "narration",
-          "t": "A string of digits on the pager's screen."
+          "t": "A string of digits on the pager's screen.",
+          "me": "scared"
         },
         {
           "k": "speaker",
@@ -77,7 +81,8 @@
         },
         {
           "k": "narration",
-          "t": "You close your eyes. A card pinched in your hand, a row of nail marks along its edge."
+          "t": "You close your eyes. A card pinched in your hand, a row of nail marks along its edge.",
+          "me": ""
         },
         {
           "k": "narration",
@@ -173,7 +178,8 @@
             "k": "speaker",
             "who": "me",
             "t": "The investors read v18 and they're in. Three pages first: consciousness, the avatar, the ontology. Today is consciousness.",
-            "where": "screen:msgs:boss"
+            "where": "screen:msgs:boss",
+            "me": "phone"
           },
           {
             "k": "speaker",
@@ -247,7 +253,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "Two pairs of chopsticks in the bag. You are one person."
+            "t": "Two pairs of chopsticks in the bag. You are one person.",
+            "me": "eat"
           }
         ]
       }
@@ -270,7 +277,8 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "Replied."
+            "t": "Replied.",
+            "me": "desk"
           },
           {
             "k": "speaker",

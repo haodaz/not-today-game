@@ -15,7 +15,8 @@
         {
           "k": "inner",
           "t": "Good to see young people with ideas. The boss said so.",
-          "where": "screen:msgs:boss"
+          "where": "screen:msgs:boss",
+          "me": "phone"
         }
       ]
     },
@@ -23,7 +24,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "The work is done. You push the chair back a little. Your palms are damp."
+          "t": "The work is done. You push the chair back a little. Your palms are damp.",
+          "me": "tired"
         },
         {
           "k": "narration",
@@ -35,7 +37,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "The light goes out. You did not turn it off."
+          "t": "The light goes out. You did not turn it off.",
+          "me": "scared"
         }
       ]
     },
@@ -112,7 +115,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "Today's little box is heavier. A cassette and a walkman. The box's corners worn round."
+          "t": "Today's little box is heavier. A cassette and a walkman. The box's corners worn round.",
+          "me": "carton"
         },
         {
           "k": "narration",
@@ -215,7 +219,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "The rice is hot. A line of print on the bottom of the bowl, unreadable."
+            "t": "The rice is hot. A line of print on the bottom of the bowl, unreadable.",
+            "me": "eat"
           }
         ]
       }
@@ -237,7 +242,8 @@
         "say": [
           {
             "k": "inner",
-            "t": "Forty-four thousand."
+            "t": "Forty-four thousand.",
+            "me": "phone"
           }
         ]
       },

@@ -15,7 +15,8 @@
         {
           "k": "inner",
           "t": "寄给谁。",
-          "where": "screen:msgs"
+          "where": "screen:msgs",
+          "me": "cross"
         }
       ]
     },
@@ -23,7 +24,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "那个黑的，终于松了。"
+          "t": "那个黑的，终于松了。",
+          "me": "carton"
         },
         {
           "k": "narration",
@@ -35,7 +37,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "桌上空了。箱子还在床边，盖着。"
+          "t": "桌上空了。箱子还在床边，盖着。",
+          "me": "stand"
         }
       ]
     },
@@ -47,7 +50,8 @@
         },
         {
           "k": "narration",
-          "t": "它没有要东西。它在等你的手。"
+          "t": "它没有要东西。它在等你的手。",
+          "me": "scared"
         },
         {
           "k": "inner",
@@ -134,7 +138,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "清完了。桌上空了。"
+            "t": "清完了。桌上空了。",
+            "me": "tired"
           },
           {
             "k": "speaker",

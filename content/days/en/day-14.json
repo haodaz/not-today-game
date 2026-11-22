@@ -15,7 +15,8 @@
         {
           "k": "inner",
           "t": "Thirteen months, and the first time he doesn't push.",
-          "where": "screen:msgs"
+          "where": "screen:msgs",
+          "me": "stand"
         }
       ]
     },
@@ -24,7 +25,8 @@
         {
           "k": "narration",
           "t": "The partner posts a landscape. The first time it isn't a work card.",
-          "where": "screen:msgs:partner"
+          "where": "screen:msgs:partner",
+          "me": "phone"
         },
         {
           "k": "narration",
@@ -48,7 +50,8 @@
         },
         {
           "k": "narration",
-          "t": "A hand comes out of the gap. There are more behind it, one after another, past counting."
+          "t": "A hand comes out of the gap. There are more behind it, one after another, past counting.",
+          "me": "scared"
         }
       ],
       "choices": [
@@ -76,7 +79,8 @@
         },
         {
           "k": "narration",
-          "t": "You wait a long time. It doesn't come."
+          "t": "You wait a long time. It doesn't come.",
+          "me": "cross"
         },
         {
           "k": "inner",
@@ -197,7 +201,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "Today's food is good. You can't say where."
+            "t": "Today's food is good. You can't say where.",
+            "me": "eat"
           }
         ]
       }
@@ -213,7 +218,8 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "Replied."
+            "t": "Replied.",
+            "me": "desk"
           },
           {
             "k": "speaker",

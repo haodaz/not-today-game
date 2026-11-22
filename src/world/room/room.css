@@ -1168,6 +1168,13 @@
 .dlg-layer .scene-stand-anim.speaking{left:calc(var(--stage-l,0px) + var(--stage-w,100vw) * .66)}
 .dlg-layer .scene-stand-anim.other{left:calc(var(--stage-l,0px) + var(--stage-w,100vw) * .34);filter:brightness(.55) saturate(.8) drop-shadow(0 6px 18px rgba(0,0,0,.35))}
 @media (prefers-reduced-motion:reduce){.dlg-layer .scene-stand-anim{display:none}}
+/* player-stands (2026-11-22): the player's own figure. Beside an NPC: left, dimmed until the line is theirs; alone: centre, over the room through a dim (.me-on). */
+.dlg-layer .scene-stand.me,.dlg-layer .scene-stand-anim.me{left:calc(var(--stage-l,0px) + var(--stage-w,100vw) * .3);height:calc(var(--stage-h,100vh) * .86);filter:brightness(.6) saturate(.85) drop-shadow(0 6px 18px rgba(0,0,0,.35));transition:filter .3s}
+.dlg-layer .scene-stand.me.lit,.dlg-layer .scene-stand-anim.me.lit{filter:contrast(1.06) saturate(1.1) drop-shadow(0 6px 18px rgba(0,0,0,.35))}
+.dlg-layer .scene-stand.me.alone,.dlg-layer .scene-stand-anim.me.alone{left:calc(var(--stage-l,0px) + var(--stage-w,100vw) / 2)}
+.dlg-layer .scene-stand.speaking.dim,.dlg-layer .scene-stand-anim.speaking.dim{filter:brightness(.55) saturate(.8) drop-shadow(0 6px 18px rgba(0,0,0,.35))}
+.dlg-layer.me-on::before{content:"";position:fixed;left:var(--stage-l,0px);top:var(--stage-t,0px);width:var(--stage-w,100vw);height:var(--stage-h,100vh);background:rgba(4,5,8,.42);animation:m-fade-in 300ms both}
+
 
 /* texture-pass R4: the 同化 super-battle stands before the giant form (public/battle/boss2/boss_giant.jpg) */
 .boss-page.strong .bs-bg{background-image:url(/battle/boss2/boss_giant.jpg)}

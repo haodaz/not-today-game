@@ -2,6 +2,7 @@
 import { describe, expect, it } from "vitest";
 import { EMPTY_DIALOGUE, push, sceneOf } from "@world/loop/dialogue";
 import { npcData, npcIdle, npcStandFor, parseNpc } from "@world/npc";
+import { parseLine } from "@state/days/table";
 
 const BD = "/room/dream/office.jpg";
 const seq = (lines: Parameters<typeof push>[1]["lines"]) => push(EMPTY_DIALOGUE, { key: "t", lines, ending: { kind: "none" } });
@@ -55,5 +56,34 @@ describe("sceneOf with poses", () => {
     expect(s.other).toBe("/npc/stand/partner_angry.webp");
     expect(s.standIdle).toBeUndefined();
     expect(sceneOf({ ...d, line: 2 }, 1).stand).toBe("/npc/stand/boss.webp");
+  });
+});
+
+// player-stands (2026-11-22): the player's own figure by a `me` pose, in their look.
+describe("sceneOf with the player's pose", () => {
+  it("stands at the side with an NPC (lit on the player's lines), alone over the room, until the sequence or a new backdrop", () => {
+    const d = seq([
+      { k: "narration", t: "a", backdrop: BD, me: "stand" },
+      { k: "speaker", who: "boss", t: "b" },
+      { k: "inner", t: "c", me: "cross" },
+      { k: "narration", t: "e", backdrop: "/room/dream/table.jpg" },
+      { k: "narration", t: "f", me: "" },
+    ]);
+    expect(sceneOf({ ...d, line: 0 }, 1, "she")).toMatchObject({ me: "/player/looks/she_stand.webp", meIdle: "/anim/looks/she_stand.webm", meSpeaking: true });
+    expect(sceneOf({ ...d, line: 0 }, 1, "she").stand).toBeUndefined();
+    expect(sceneOf({ ...d, line: 1 }, 1, "cap")).toMatchObject({ stand: "/npc/stand/boss.webp", me: "/player/looks/cap_stand.webp", meSpeaking: false });
+    expect(sceneOf({ ...d, line: 2 }, 1, "cap")).toMatchObject({ stand: "/npc/stand/boss.webp", me: "/player/looks/cap_cross.webp", meSpeaking: true });
+    expect(sceneOf({ ...d, line: 3 }, 1, "cap").me).toBeUndefined(); // a new backdrop sends the player off
+    expect(sceneOf({ ...d, line: 1 }, 1).me).toBeUndefined(); // no look, no figure
+    const room = seq([{ k: "narration", t: "x" }, { k: "inner", t: "y", me: "tired" }, { k: "narration", t: "z", me: "" }]);
+    expect(sceneOf({ ...room, line: 0 }, 3, "he")).toEqual({ backdrop: null, prop: null });
+    expect(sceneOf({ ...room, line: 1 }, 3, "he")).toEqual({ backdrop: null, prop: null, me: "/player/looks/he_tired.webp", meIdle: "/anim/looks/he_tired.webm", meSpeaking: true });
+    expect(sceneOf({ ...room, line: 2 }, 3, "he").me).toBeUndefined();
+  });
+  it("the parser takes a known pose or an empty string only, and the twins must agree", () => {
+    expect(parseLine({ k: "inner", t: "a", me: "tired" }, "x", undefined, true).me).toBe("tired");
+    expect(parseLine({ k: "inner", t: "a", me: "" }, "x", undefined, true).me).toBe("");
+    expect(() => parseLine({ k: "inner", t: "a", me: "fly" }, "x", undefined, true)).toThrow(/not a player pose/);
+    expect(() => parseLine({ k: "inner", t: "a", me: "tired" }, "x")).toThrow(/unknown key "me"/);
   });
 });

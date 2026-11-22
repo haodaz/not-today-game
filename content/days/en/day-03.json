@@ -13,7 +13,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "You make a coffee and sit down."
+          "t": "You make a coffee and sit down.",
+          "me": "stand"
         }
       ]
     },
@@ -22,7 +23,8 @@
         {
           "k": "narration",
           "t": "Done. You walk once round the room, desk to bed, bed to window.",
-          "where": "room"
+          "where": "room",
+          "me": "tired"
         },
         {
           "k": "narration",
@@ -42,7 +44,8 @@
         {
           "k": "inner",
           "t": "It did not answer what I asked. It answered something else.",
-          "where": "screen"
+          "where": "screen",
+          "me": "cross"
         }
       ]
     },
@@ -165,7 +168,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "The loose one in the case. A pager, black shell, the belt clip half snapped off."
+          "t": "The loose one in the case. A pager, black shell, the belt clip half snapped off.",
+          "me": "carton"
         },
         {
           "k": "narration",
@@ -282,7 +286,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "Done. The bowl stays on the little table; tomorrow."
+            "t": "Done. The bowl stays on the little table; tomorrow.",
+            "me": "eat"
           }
         ],
         "then": "room"
@@ -376,7 +381,8 @@
           {
             "k": "speaker",
             "who": "kuro",
-            "t": "You haven't eaten."
+            "t": "You haven't eaten.",
+            "me": "tired"
           },
           {
             "k": "speaker",

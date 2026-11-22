@@ -6,7 +6,7 @@ import { deliveryTable, type Meal } from "@state/delivery/table";
 import type { Store } from "@state/store";
 import { desktopApps } from "@world/desktop/apps";
 import { advanceTo, isNight } from "@world/desktop/beat";
-import { boxReadsOn, dialogueBox, lineScreens } from "@world/dialogue/box";
+import { boxReadsOn, dialogueBox, lineScreens, PORTRAIT_FILES } from "@world/dialogue/box";
 import { logCurrent, logPlayer } from "@world/dialogue/history";
 import { settleSession } from "@world/dialogue/place";
 import { openWakeFlash, queueRise, wakeFlashDue } from "./wake";
@@ -123,7 +123,7 @@ function renderGameBody(store: Store, session: Session, nowMs: number): SafeHtml
   if (prologueShowing(session)) {
     const box = session.opening ? null : dialogueBox(state, events, session, nowMs);
     const settings = settingsPanel(session);
-    return html`${renderPrologue(session, nowMs)}${dlgLayer(box, session, boxReadsOn(state, events, session), true, state.day)}${settings ? html`<div class="hud-host">${settings}</div>` : null}`;
+    return html`${renderPrologue(session, nowMs)}${dlgLayer(box, session, boxReadsOn(state, events, session), true, state.day, PORTRAIT_FILES[state.names.portrait])}${settings ? html`<div class="hud-host">${settings}</div>` : null}`;
   }
   if (session.view === "desktop") {
     const shell = buildShell(state, events, session, desktopApps, nowMs, store.getStartDay());
@@ -146,7 +146,7 @@ function renderGameBody(store: Store, session: Session, nowMs: number): SafeHtml
     // screen (the pet in the monitor is the one); R5 (2026-11-08): the checklist's current line in
     // the top bar, not a card over the window (the window fills the frame; a card hid 听听's list).
     const lc = loopContext(state, events);
-    return html`${renderDesktop({ ...shell, nextItem: lc ? nextItemText(checklistNow(lc, state, events, session)) : null })}${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${host}${launchLayer(state, session)}${workLayer({ state, events, session, nowMs, startDay: store.getStartDay() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${eggFlash(session, nowMs)}${cutLayer(session, nowMs)}${dlgLayer(dlg, session, readsOn, !maskInModal, state.day)}<div class="hud-host">${(shell.onboard === null || shell.onboard === undefined) && !gameRunning(state, events, session) ? leaveControl() : null}${hudTiles(session, state, { settings: false, nowMs })}${itemsPanel(state, events, session)}${settingsPanel(session)}${statusPanel(state, events, session)}</div>`;
+    return html`${renderDesktop({ ...shell, nextItem: lc ? nextItemText(checklistNow(lc, state, events, session)) : null })}${filesWin ? html`<div class="files-host">${filesWin}</div>` : null}${host}${launchLayer(state, session)}${workLayer({ state, events, session, nowMs, startDay: store.getStartDay() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${eggFlash(session, nowMs)}${cutLayer(session, nowMs)}${dlgLayer(dlg, session, readsOn, !maskInModal, state.day, PORTRAIT_FILES[state.names.portrait])}<div class="hud-host">${(shell.onboard === null || shell.onboard === undefined) && !gameRunning(state, events, session) ? leaveControl() : null}${hudTiles(session, state, { settings: false, nowMs })}${itemsPanel(state, events, session)}${settingsPanel(session)}${statusPanel(state, events, session)}</div>`;
   }
   // The box does not jump (dialogue correction 2026-11-02): in every view it is anchored to the
   // viewport in the same fixed layer, not to the stage (whose size differs between views). The
@@ -154,7 +154,7 @@ function renderGameBody(store: Store, session: Session, nowMs: number): SafeHtml
   // camera-viewfinder R1: the box is never opened over the viewfinder (what is queued waits for it).
   const dlg = session.viewfinder ? null : dialogueBox(state, events, session, nowMs);
   const settings = session.viewfinder ? null : html`${settingsPanel(session)}${statusPanel(state, events, session)}`;
-  return html`${renderRoom({ state, events, session, startDay: store.getStartDay(), nowMs, boxOutside: true, runId: store.getRunId() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${cutLayer(session, nowMs)}${dlgLayer(dlg, session, boxReadsOn(state, events, session), true, state.day)}${settings ? html`<div class="hud-host">${settings}</div>` : null}`;
+  return html`${renderRoom({ state, events, session, startDay: store.getStartDay(), nowMs, boxOutside: true, runId: store.getRunId() })}${tabooLayer(session, store.getRunId(), state.day, nowMs)}${cutLayer(session, nowMs)}${dlgLayer(dlg, session, boxReadsOn(state, events, session), true, state.day, PORTRAIT_FILES[state.names.portrait])}${settings ? html`<div class="hud-host">${settings}</div>` : null}`;
 }
 
 /**
@@ -163,7 +163,7 @@ function renderGameBody(store: Store, session: Session, nowMs: number): SafeHtml
  * choice or the player's box it waits for the box's own controls. A story's mask also dims the
  * stage 40 % (dialogue addition 2026-11-02); a one-line fragment's mask is clear.
  */
-function dlgLayer(dlg: SafeHtml | null, session: Session, readsOn: boolean, withMask = true, day = 0): SafeHtml | null {
+function dlgLayer(dlg: SafeHtml | null, session: Session, readsOn: boolean, withMask = true, day = 0, look?: string): SafeHtml | null {
   if (!dlg) return null;
   const story = storyMasked(session.dialogue);
   // author 2026-11-11: over a chat app the box sits in the upper half, off the thread it talks about.
@@ -171,7 +171,7 @@ function dlgLayer(dlg: SafeHtml | null, session: Session, readsOn: boolean, with
   // day1-playtest-1117 R5: a line about the open thread is its card: at the thread's bottom, above the input row
   const thread = chat && threadCardFor(session.dialogue) !== null;
   // Standing NPCs (author 2026-11-18): the speaker stands over the story mask and under the box, in full colour.
-  const scene = sceneOf(session.dialogue, day);
+  const scene = sceneOf(session.dialogue, day, look);
   const stand = scene.stand;
   // texture-pass R2: with an idle loop (webm with alpha) the figure is the video alone, the still as its
   // poster until it plays (author 2026-11-22: the still under the loop read as a second person standing behind)
@@ -179,10 +179,14 @@ function dlgLayer(dlg: SafeHtml | null, session: Session, readsOn: boolean, with
     ? html`<img class="scene-stand${cls2}" src="${src}" alt="" aria-hidden="true" draggable="false">`
     : html`<video class="scene-stand-anim${cls2}" src="${idle}" poster="${src}" autoplay muted loop playsinline aria-hidden="true"></video>`);
   // two-up (author 2026-11-20): with another person in the scene, the one speaking stands right and lit, the other left and dimmed
-  const standImg = stand === undefined ? null : scene.other !== undefined
-    ? html`${figure(scene.other, scene.otherIdle, " other")}${figure(stand, scene.standIdle, " speaking")}`
-    : figure(stand, scene.standIdle, "");
-  return html`<div class="${cls("dlg-layer", story && "masked", chat && !thread && "top", thread && "thread")}">${withMask ? boxMask(session, readsOn) : null}${standImg}${dlg}</div>`;
+  // player-stands (2026-11-22): the player's figure at the left, lit on their own lines; with it, the NPC stands right and dims while the player's line is on
+  const dim = scene.me !== undefined && scene.meSpeaking === true ? " dim" : "";
+  const npcImg = stand === undefined ? null : scene.other !== undefined
+    ? html`${figure(scene.other, scene.otherIdle, " other")}${figure(stand, scene.standIdle, ` speaking${dim}`)}`
+    : figure(stand, scene.standIdle, scene.me !== undefined ? ` speaking${dim}` : "");
+  const meImg = scene.me === undefined ? null : figure(scene.me, scene.meIdle, ` me${stand === undefined ? " alone" : ""}${scene.meSpeaking === true ? " lit" : ""}`);
+  const standImg = html`${meImg}${npcImg}`;
+  return html`<div class="${cls("dlg-layer", story && "masked", scene.me !== undefined && !story && "me-on", chat && !thread && "top", thread && "thread")}">${withMask ? boxMask(session, readsOn) : null}${standImg}${dlg}</div>`;
 }
 
 /** The checklist's line that is on now (the first open one), for the desktop's top bar; null when none. */

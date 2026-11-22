@@ -15,7 +15,8 @@
         {
           "k": "narration",
           "t": "The boss says: Good morning. The first time he has used English.",
-          "where": "screen:msgs:boss"
+          "where": "screen:msgs:boss",
+          "me": "cross"
         }
       ]
     },
@@ -23,7 +24,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "Two things on the desk: the chick and the pager. The pager's grey-green screen, empty."
+          "t": "Two things on the desk: the chick and the pager. The pager's grey-green screen, empty.",
+          "me": "chick"
         }
       ]
     },
@@ -31,7 +33,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "You turn the screens off. The room sinks."
+          "t": "You turn the screens off. The room sinks.",
+          "me": "tired"
         }
       ]
     },
@@ -49,7 +52,8 @@
         },
         {
           "k": "narration",
-          "t": "You turn the pager upside down. 505 reads SOS."
+          "t": "You turn the pager upside down. 505 reads SOS.",
+          "me": "scared"
         },
         {
           "k": "inner",
@@ -57,7 +61,8 @@
         },
         {
           "k": "narration",
-          "t": "You close your eyes. The most expensive thing in your schoolbag: a clamshell, silver-grey."
+          "t": "You close your eyes. The most expensive thing in your schoolbag: a clamshell, silver-grey.",
+          "me": ""
         },
         {
           "k": "narration",
@@ -119,7 +124,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "In the little box, an electronic dictionary. Clamshell, silver-grey, the hinge a little loose."
+          "t": "In the little box, an electronic dictionary. Clamshell, silver-grey, the hinge a little loose.",
+          "me": "carton"
         },
         {
           "k": "narration",
@@ -220,7 +226,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "The note says: no coriander. This time you wrote it."
+            "t": "The note says: no coriander. This time you wrote it.",
+            "me": "eat"
           }
         ]
       }
@@ -243,7 +250,8 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "Replied."
+            "t": "Replied.",
+            "me": "desk"
           },
           {
             "k": "speaker",

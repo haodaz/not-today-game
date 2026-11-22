@@ -72,7 +72,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "Raining. Working from home is not a bad choice."
+          "t": "Raining. Working from home is not a bad choice.",
+          "me": "stand"
         },
         {
           "k": "narration",
@@ -112,7 +113,8 @@
         {
           "k": "narration",
           "t": "The takeout goes on the little table first. I opened the box.",
-          "backdrop": "/room/dream/table.jpg"
+          "backdrop": "/room/dream/table.jpg",
+          "me": "carton"
         },
         {
           "k": "narration",
@@ -136,7 +138,8 @@
         {
           "k": "narration",
           "t": "You put it between the two screens, into the gap. It wedges there. It does not fall.",
-          "where": "desk"
+          "where": "desk",
+          "me": "chick"
         },
         {
           "k": "inner",
@@ -365,7 +368,8 @@
             "k": "speaker",
             "who": "me",
             "t": "Hearing him out, half the day's energy is gone.",
-            "where": "screen:msgs:boss"
+            "where": "screen:msgs:boss",
+            "me": "phone"
           },
           {
             "k": "inner",
@@ -436,7 +440,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "Done eating."
+            "t": "Done eating.",
+            "me": "eat"
           },
           {
             "k": "inner",
@@ -455,7 +460,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "Today’s work is in."
+            "t": "Today’s work is in.",
+            "me": "tired"
           },
           {
             "k": "inner",

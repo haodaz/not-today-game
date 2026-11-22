@@ -116,3 +116,14 @@ R1 → R2 → R6 → R4 → R5 → R3 → R7. Each job is its own Kiro run with 
   `[sticker] <name>` lines (bubbles.ts `STICKERS`), two in day 14's group flood.
 - Still to do: the author's pick of poses per line (content), more cuts per day, the hand-night check
   in a real run, glance / squint triggers, battle stage 3 cut-outs.
+
+## R8 (added 2026-11-22, built): the player's own figure — `me` on a line
+
+- A day-file or prologue line may carry `me: "<pose>"` (`LOOK_POSES`: stand, cross, chick, phone, type, eat,
+  carton, scared, tired, desk) or `me: ""`. From that line the player's figure stands in their chosen look
+  (`/player/looks/<look>_<pose>.webp` + its loop) until `""`, the end of the sequence, or a new backdrop.
+- Beside a standing NPC: the player left (`.me`), the NPC right; whoever's line is on is lit, the other dims.
+  Alone (the room, no backdrop): centre, over a dim (`.dlg-layer.me-on`). A prop on hides the figure.
+- Content (122 fields, zh + en twins): every day's story points, by the player's state at that moment —
+  author: 「第三天干完老王的活，吃冷饭之前该是什么样子」 → `tired`; the carton arrival `carton`; the chick
+  `chick`; the hand nights `scared`; the prologue's adult scenes stand / cross / phone / type / eat / desk / carton.

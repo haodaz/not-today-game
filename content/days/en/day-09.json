@@ -15,7 +15,8 @@
         {
           "k": "inner",
           "t": "That is my heartbeat. It put it there.",
-          "where": "screen"
+          "where": "screen",
+          "me": "scared"
         }
       ]
     },
@@ -23,7 +24,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "You reach into the gap; the chick is there. The crack is wider than yesterday."
+          "t": "You reach into the gap; the chick is there. The crack is wider than yesterday.",
+          "me": "chick"
         }
       ]
     },
@@ -35,7 +37,8 @@
         },
         {
           "k": "inner",
-          "t": "The number in the corner is still ticking."
+          "t": "The number in the corner is still ticking.",
+          "me": "tired"
         }
       ]
     },
@@ -53,7 +56,8 @@
         },
         {
           "k": "narration",
-          "t": "Upside down, 345 reads ShE. The child is talking about a ‘her’."
+          "t": "Upside down, 345 reads ShE. The child is talking about a ‘her’.",
+          "me": "scared"
         },
         {
           "k": "narration",
@@ -163,7 +167,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "A day without a box. A patch of the desk is empty."
+            "t": "A day without a box. A patch of the desk is empty.",
+            "me": "eat"
           }
         ]
       }
@@ -179,7 +184,8 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "Replied."
+            "t": "Replied.",
+            "me": "desk"
           },
           {
             "k": "speaker",

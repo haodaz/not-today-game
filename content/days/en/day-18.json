@@ -15,7 +15,8 @@
         {
           "k": "inner",
           "t": "Send it to whom.",
-          "where": "screen:msgs"
+          "where": "screen:msgs",
+          "me": "cross"
         }
       ]
     },
@@ -23,7 +24,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "The black one has finally come loose."
+          "t": "The black one has finally come loose.",
+          "me": "carton"
         },
         {
           "k": "narration",
@@ -35,7 +37,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "The desk is empty. The box is still by the bed, lid on."
+          "t": "The desk is empty. The box is still by the bed, lid on.",
+          "me": "stand"
         }
       ]
     },
@@ -47,7 +50,8 @@
         },
         {
           "k": "narration",
-          "t": "It isn't asking for anything. It's waiting for your hand."
+          "t": "It isn't asking for anything. It's waiting for your hand.",
+          "me": "scared"
         },
         {
           "k": "inner",
@@ -134,7 +138,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "Cleared. The desk is empty."
+            "t": "Cleared. The desk is empty.",
+            "me": "tired"
           },
           {
             "k": "speaker",

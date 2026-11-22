@@ -20,7 +20,8 @@
         {
           "k": "inner",
           "t": "它可以看见我的桌子了。",
-          "where": "room"
+          "where": "room",
+          "me": "scared"
         }
       ]
     },
@@ -35,7 +36,8 @@
           "k": "speaker",
           "who": "xiaozhang",
           "t": "我走了。你别进去。",
-          "where": "screen:msgs"
+          "where": "screen:msgs",
+          "me": "phone"
         },
         {
           "k": "narration",
@@ -48,7 +50,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "缝里伸出来一只手。墙在呼吸。"
+          "t": "缝里伸出来一只手。墙在呼吸。",
+          "me": "scared"
         }
       ],
       "choices": [
@@ -76,7 +79,8 @@
         },
         {
           "k": "narration",
-          "t": "你翻过来。背面写着一个日期：11 月 1 日。"
+          "t": "你翻过来。背面写着一个日期：11 月 1 日。",
+          "me": "stand"
         },
         {
           "k": "inner",
@@ -199,7 +203,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "小张的头像灰了。饭凉得比平时快。"
+            "t": "小张的头像灰了。饭凉得比平时快。",
+            "me": "eat"
           }
         ]
       }
@@ -215,7 +220,8 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "回完了。"
+            "t": "回完了。",
+            "me": "desk"
           },
           {
             "k": "speaker",

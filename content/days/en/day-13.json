@@ -20,7 +20,8 @@
         {
           "k": "inner",
           "t": "It can see my desk now.",
-          "where": "room"
+          "where": "room",
+          "me": "scared"
         }
       ]
     },
@@ -35,7 +36,8 @@
           "k": "speaker",
           "who": "xiaozhang",
           "t": "I'm going. Don't go in.",
-          "where": "screen:msgs"
+          "where": "screen:msgs",
+          "me": "phone"
         },
         {
           "k": "narration",
@@ -48,7 +50,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "A hand comes out of the gap. The wall is breathing."
+          "t": "A hand comes out of the gap. The wall is breathing.",
+          "me": "scared"
         }
       ],
       "choices": [
@@ -76,7 +79,8 @@
         },
         {
           "k": "narration",
-          "t": "You turn it over. A date on the back: November 1st."
+          "t": "You turn it over. A date on the back: November 1st.",
+          "me": "stand"
         },
         {
           "k": "inner",
@@ -199,7 +203,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "Zhang's avatar has gone grey. The food cools faster than usual."
+            "t": "Zhang's avatar has gone grey. The food cools faster than usual.",
+            "me": "eat"
           }
         ]
       }
@@ -215,7 +220,8 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "Replied."
+            "t": "Replied.",
+            "me": "desk"
           },
           {
             "k": "speaker",

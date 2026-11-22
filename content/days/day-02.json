@@ -17,7 +17,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "杯子还是昨天那个。"
+          "t": "杯子还是昨天那个。",
+          "me": "stand"
         }
       ]
     },
@@ -25,7 +26,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "端盒里松了的那一个。一台拍立得，奶白色的壳，红色的快门。"
+          "t": "端盒里松了的那一个。一台拍立得，奶白色的壳，红色的快门。",
+          "me": "carton"
         },
         {
           "k": "inner",
@@ -37,7 +39,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "你拿起小鸡，翻到背面。那个小孔，黑的。"
+          "t": "你拿起小鸡，翻到背面。那个小孔，黑的。",
+          "me": "chick"
         },
         {
           "k": "narration",
@@ -54,7 +57,8 @@
         {
           "k": "narration",
           "t": "右下角的小窗亮着。你没有立刻躺下。",
-          "where": "room"
+          "where": "room",
+          "me": "tired"
         }
       ]
     },
@@ -205,7 +209,8 @@
           {
             "k": "inner",
             "t": "Vivi 又发了一个网页。@技术，就是我。",
-            "where": "screen:msgs:group"
+            "where": "screen:msgs:group",
+            "me": "phone"
           }
         ]
       }
@@ -267,7 +272,8 @@
           {
             "k": "inner",
             "t": "文件停在我发的那条。老板收到之后就没动静了。",
-            "where": "screen:msgs:boss"
+            "where": "screen:msgs:boss",
+            "me": "desk"
           }
         ]
       }

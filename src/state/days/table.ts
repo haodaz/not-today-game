@@ -57,7 +57,14 @@ export interface SayLine {
   readonly prop?: string;
   /** texture-pass R2: the standing NPC's pose for this line and after, until the next pose or a new backdrop. */
   readonly pose?: string;
+  /**
+   * player-stands (2026-11-22): the player stands in this pose (`LOOK_POSES`) from this line on, at the
+   * side of the frame, in their chosen look; `""` sends them off. A new backdrop clears it like a pose.
+   */
+  readonly me?: string;
 }
+/** The poses drawn for every player look (public/player/looks/<look>_<pose>.webp + anim/looks). */
+export const LOOK_POSES = ["stand", "cross", "chick", "phone", "type", "eat", "carton", "scared", "tired", "desk"] as const;
 /** When an item belongs (day-loop addition 2026-11-02): the day's work, or the evening after nightfall. */
 export const ITEM_WHEN = ["day", "night"] as const;
 export type ItemWhen = (typeof ITEM_WHEN)[number];
@@ -257,7 +264,7 @@ function parsePicture(v: unknown, dir: string, w: string, onFail: (where: string
 export function parseLine(v: unknown, w: string, onFail: (where: string, problem: string) => never = fail, withWhere = false): SayLine {
   if (!isRecord(v)) onFail(w, "a line must be an object");
   const r = v as Raw;
-  const allowed = withWhere ? ["k", "t", "sfx", "who", "where", "backdrop", "prop", "pose"] : ["k", "t", "sfx", "who"];
+  const allowed = withWhere ? ["k", "t", "sfx", "who", "where", "backdrop", "prop", "pose", "me"] : ["k", "t", "sfx", "who"];
   for (const k of Object.keys(r)) if (!allowed.includes(k)) onFail(w, `unknown key "${k}"`);
   const k = r.k as LineKind;
   if (!LINE_KINDS.includes(k)) onFail(w, `unknown line kind "${String(r.k)}"`);
@@ -273,6 +280,7 @@ export function parseLine(v: unknown, w: string, onFail: (where: string, problem
     ...(r.prop !== undefined ? { prop: parsePicture(r.prop, PROP_DIR, `${w}.prop`, onFail, true) } : {}),
     // texture-pass R2: the standing NPC's pose for this line (a pose name from npc.json `poses`)
     ...(r.pose !== undefined ? { pose: s(r.pose, `${w}.pose`) } : {}),
+    ...(r.me !== undefined ? { me: r.me === "" || (LOOK_POSES as readonly string[]).includes(r.me as string) ? (r.me as string) : onFail(`${w}.me`, `not a player pose: ${String(r.me)}`) } : {}),
   };
 }
 
@@ -474,6 +482,7 @@ function assertLineTwin(zh: SayLine, en: SayLine, w: string): void {
   if (zh.backdrop !== en.backdrop) fail(w, `backdrop differs from the Chinese`);
   if (zh.prop !== en.prop) fail(w, `prop differs from the Chinese`);
   if (zh.pose !== en.pose) fail(w, `pose differs from the Chinese`);
+  if (zh.me !== en.me) fail(w, `me differs from the Chinese`);
 }
 function localiseLine(zh: SayLine, en: SayLine, w: string): SayLine {
   assertLineTwin(zh, en, w);

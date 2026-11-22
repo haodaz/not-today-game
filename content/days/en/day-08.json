@@ -15,7 +15,8 @@
         {
           "k": "inner",
           "t": "It put them away for me. Where, it didn't say.",
-          "where": "screen"
+          "where": "screen",
+          "me": "cross"
         }
       ]
     },
@@ -23,7 +24,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "Everything on the desk is where it was. The pager stays on 0.7734."
+          "t": "Everything on the desk is where it was. The pager stays on 0.7734.",
+          "me": "stand"
         }
       ]
     },
@@ -32,7 +34,8 @@
         {
           "k": "narration",
           "t": "A zero-second voice note. You can open it; the bar runs to the end. Nothing.",
-          "where": "screen:msgs"
+          "where": "screen:msgs",
+          "me": "phone"
         }
       ]
     },
@@ -50,11 +53,13 @@
         },
         {
           "k": "inner",
-          "t": "I couldn't place this one. There's a table that reads it, inside the calculator lid."
+          "t": "I couldn't place this one. There's a table that reads it, inside the calculator lid.",
+          "me": "scared"
         },
         {
           "k": "narration",
-          "t": "You close your eyes. Something very light in your hand, plastic, with a click when it shuts."
+          "t": "You close your eyes. Something very light in your hand, plastic, with a click when it shuts.",
+          "me": ""
         },
         {
           "k": "narration",
@@ -154,7 +159,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "The last little box. A broken feature phone, a flip, one corner of the screen cracked."
+          "t": "The last little box. A broken feature phone, a flip, one corner of the screen cracked.",
+          "me": "carton"
         },
         {
           "k": "narration",
@@ -252,7 +258,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "The receipt says 11:47. You ordered at 12:20."
+            "t": "The receipt says 11:47. You ordered at 12:20.",
+            "me": "eat"
           }
         ]
       }
@@ -336,7 +343,8 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "Sent. The group went quiet for a while."
+            "t": "Sent. The group went quiet for a while.",
+            "me": "phone"
           },
           {
             "k": "speaker",

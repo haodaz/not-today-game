@@ -15,7 +15,8 @@
         {
           "k": "inner",
           "t": "The drawer. I have never told anyone about the drawer.",
-          "where": "screen:msgs"
+          "where": "screen:msgs",
+          "me": "scared"
         }
       ]
     },
@@ -35,7 +36,8 @@
         {
           "k": "inner",
           "t": "Home's words, in my own input box.",
-          "where": "screen:msgs:family"
+          "where": "screen:msgs:family",
+          "me": "desk"
         }
       ]
     },
@@ -48,7 +50,8 @@
         },
         {
           "k": "narration",
-          "t": "A hand comes out of the gap, in a glove that fits very well."
+          "t": "A hand comes out of the gap, in a glove that fits very well.",
+          "me": "scared"
         }
       ],
       "choices": [
@@ -207,7 +210,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "You ordered the food. The taste is last year's."
+            "t": "You ordered the food. The taste is last year's.",
+            "me": "eat"
           }
         ]
       }
@@ -223,7 +227,8 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "Replied."
+            "t": "Replied.",
+            "me": "tired"
           },
           {
             "k": "speaker",

@@ -72,7 +72,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "下雨了。在家上班，不失为一个好选择。"
+          "t": "下雨了。在家上班，不失为一个好选择。",
+          "me": "stand"
         },
         {
           "k": "narration",
@@ -112,7 +113,8 @@
         {
           "k": "narration",
           "t": "外卖先放在小桌上。我打开了纸箱。",
-          "backdrop": "/room/dream/table.jpg"
+          "backdrop": "/room/dream/table.jpg",
+          "me": "carton"
         },
         {
           "k": "narration",
@@ -136,7 +138,8 @@
         {
           "k": "narration",
           "t": "你把它放在两块屏之间，放进那条缝里。刚好卡住，不倒。",
-          "where": "desk"
+          "where": "desk",
+          "me": "chick"
         },
         {
           "k": "inner",
@@ -365,7 +368,8 @@
             "k": "speaker",
             "who": "me",
             "t": "听他说完话，感觉一天的精力用掉了一半。",
-            "where": "screen:msgs:boss"
+            "where": "screen:msgs:boss",
+            "me": "phone"
           },
           {
             "k": "inner",
@@ -436,7 +440,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "吃完了。"
+            "t": "吃完了。",
+            "me": "eat"
           },
           {
             "k": "inner",
@@ -455,7 +460,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "今天的活交了。"
+            "t": "今天的活交了。",
+            "me": "tired"
           },
           {
             "k": "inner",

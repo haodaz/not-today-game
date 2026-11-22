@@ -17,7 +17,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "Same mug as yesterday."
+          "t": "Same mug as yesterday.",
+          "me": "stand"
         }
       ]
     },
@@ -25,7 +26,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "The loose one in the case. An instant camera, a cream-white shell, a red shutter."
+          "t": "The loose one in the case. An instant camera, a cream-white shell, a red shutter.",
+          "me": "carton"
         },
         {
           "k": "inner",
@@ -37,7 +39,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "You pick up the chick and turn it over. That small hole, black."
+          "t": "You pick up the chick and turn it over. That small hole, black.",
+          "me": "chick"
         },
         {
           "k": "narration",
@@ -54,7 +57,8 @@
         {
           "k": "narration",
           "t": "The small window in the bottom right is lit. You do not lie down straight away.",
-          "where": "room"
+          "where": "room",
+          "me": "tired"
         }
       ]
     },
@@ -205,7 +209,8 @@
           {
             "k": "inner",
             "t": "Vivi has posted another page. '@tech' means me.",
-            "where": "screen:msgs:group"
+            "where": "screen:msgs:group",
+            "me": "phone"
           }
         ]
       }
@@ -267,7 +272,8 @@
           {
             "k": "inner",
             "t": "The file sits at the message I sent. Nothing from the boss since he got it.",
-            "where": "screen:msgs:boss"
+            "where": "screen:msgs:boss",
+            "me": "desk"
           }
         ]
       }

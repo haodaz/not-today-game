@@ -15,7 +15,8 @@
         {
           "k": "inner",
           "t": "我什么时候有头衔了。",
-          "where": "screen"
+          "where": "screen",
+          "me": "phone"
         }
       ]
     },
@@ -23,7 +24,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "小盒子里，一个太阳能计算器，按键发黄。"
+          "t": "小盒子里，一个太阳能计算器，按键发黄。",
+          "me": "carton"
         },
         {
           "k": "narration",
@@ -50,7 +52,8 @@
         {
           "k": "inner",
           "t": "几个像素。我这辈子就是靠看出这几个像素吃饭的。",
-          "where": "screen"
+          "where": "screen",
+          "me": "cross"
         }
       ]
     },
@@ -58,7 +61,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "你关了屏幕。缝里只是一条缝。"
+          "t": "你关了屏幕。缝里只是一条缝。",
+          "me": "tired"
         }
       ]
     },
@@ -71,7 +75,8 @@
         {
           "k": "speaker",
           "who": "屏幕",
-          "t": "Because the world finally got big enough to hold me."
+          "t": "Because the world finally got big enough to hold me.",
+          "me": "scared"
         },
         {
           "k": "inner",
@@ -79,7 +84,8 @@
         },
         {
           "k": "narration",
-          "t": "你闭上眼睛。七段数码管，绿的。"
+          "t": "你闭上眼睛。七段数码管，绿的。",
+          "me": ""
         },
         {
           "k": "narration",
@@ -253,7 +259,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "汤面上浮着一层油，里面有一张脸。你搅了一下，没了。"
+            "t": "汤面上浮着一层油，里面有一张脸。你搅了一下，没了。",
+            "me": "eat"
           }
         ]
       }
@@ -276,7 +283,8 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "回完了。"
+            "t": "回完了。",
+            "me": "desk"
           },
           {
             "k": "speaker",

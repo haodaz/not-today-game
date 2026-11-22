@@ -16,7 +16,8 @@
         {
           "k": "inner",
           "t": "锁是我锁的。",
-          "where": "screen:msgs"
+          "where": "screen:msgs",
+          "me": "cross"
         }
       ]
     },
@@ -25,7 +26,8 @@
         {
           "k": "narration",
           "t": "门外有脚步，停在门口。你没有开。",
-          "where": "door"
+          "where": "door",
+          "me": "scared"
         }
       ]
     },
@@ -33,7 +35,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "缝里伸出来一只手。它没有摊开掌心。它在敲桌子，一下，一下。"
+          "t": "缝里伸出来一只手。它没有摊开掌心。它在敲桌子，一下，一下。",
+          "me": "scared"
         }
       ],
       "choices": [
@@ -62,7 +65,8 @@
         },
         {
           "k": "narration",
-          "t": "门锁自己转了一下，又转回去。"
+          "t": "门锁自己转了一下，又转回去。",
+          "me": "scared"
         },
         {
           "k": "narration",
@@ -146,7 +150,8 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "回完了。"
+            "t": "回完了。",
+            "me": "tired"
           },
           {
             "k": "speaker",

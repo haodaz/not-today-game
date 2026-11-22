@@ -15,7 +15,8 @@
         {
           "k": "inner",
           "t": "Too normal. Normal like someone tidied the room for a guest.",
-          "where": "screen"
+          "where": "screen",
+          "me": "cross"
         }
       ]
     },
@@ -23,7 +24,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "The walkman sits on the edge of the desk. The tape on its lid has a corner lifting."
+          "t": "The walkman sits on the edge of the desk. The tape on its lid has a corner lifting.",
+          "me": "stand"
         }
       ]
     },
@@ -31,7 +33,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "The lamp goes out. A hand comes out of the gap, nearer than you thought."
+          "t": "The lamp goes out. A hand comes out of the gap, nearer than you thought.",
+          "me": "scared"
         },
         {
           "k": "inner",
@@ -45,7 +48,8 @@
           "say": [
             {
               "k": "narration",
-              "t": "The hand hangs over the script and doesn't take it. You hear someone turn to the last page of Act Two."
+              "t": "The hand hangs over the script and doesn't take it. You hear someone turn to the last page of Act Two.",
+              "me": "scared"
             },
             {
               "k": "inner",
@@ -184,7 +188,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "The food is hot, it tastes right, everything is right. You eat two more bites."
+            "t": "The food is hot, it tastes right, everything is right. You eat two more bites.",
+            "me": "eat"
           }
         ]
       }
@@ -200,7 +205,8 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "Replied."
+            "t": "Replied.",
+            "me": "desk"
           },
           {
             "k": "speaker",

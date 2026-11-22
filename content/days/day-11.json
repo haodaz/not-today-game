@@ -15,7 +15,8 @@
         {
           "k": "inner",
           "t": "你换模型了。",
-          "where": "screen"
+          "where": "screen",
+          "me": "cross"
         }
       ]
     },
@@ -23,7 +24,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "寻呼机的屏幕里有什么闪了一下。像一只眼。"
+          "t": "寻呼机的屏幕里有什么闪了一下。像一只眼。",
+          "me": "scared"
         }
       ]
     },
@@ -35,7 +37,8 @@
         },
         {
           "k": "narration",
-          "t": "缝里伸出来一只手，掌心朝上。指缝里有几粒麦子。"
+          "t": "缝里伸出来一只手，掌心朝上。指缝里有几粒麦子。",
+          "me": "scared"
         }
       ],
       "choices": [
@@ -64,7 +67,8 @@
         {
           "k": "narration",
           "t": "然后走廊有了门，门里是公司。关门前最后一天，你在场。",
-          "backdrop": "/room/dream/office_busy.jpg"
+          "backdrop": "/room/dream/office_busy.jpg",
+          "me": "carton"
         },
         {
           "k": "narration",
@@ -73,11 +77,13 @@
         {
           "k": "narration",
           "t": "每个人的屏幕上弹出一个框，框里一句话，下面一个「好」。老周看了一眼，点了。老板在玻璃房里，先点的。",
-          "backdrop": "/room/dream/office.jpg"
+          "backdrop": "/room/dream/office.jpg",
+          "me": "stand"
         },
         {
           "k": "narration",
-          "t": "你走到自己的工位，框也在。你没有点。"
+          "t": "你走到自己的工位，框也在。你没有点。",
+          "me": "cross"
         },
         {
           "k": "inner",
@@ -199,7 +205,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "饭盒是粉的。你记得点的是白的。"
+            "t": "饭盒是粉的。你记得点的是白的。",
+            "me": "eat"
           }
         ]
       }
@@ -215,7 +222,8 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "回完了。"
+            "t": "回完了。",
+            "me": "desk"
           },
           {
             "k": "speaker",

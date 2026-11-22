@@ -16,7 +16,8 @@
         {
           "k": "inner",
           "t": "I'm the one who locked it.",
-          "where": "screen:msgs"
+          "where": "screen:msgs",
+          "me": "cross"
         }
       ]
     },
@@ -25,7 +26,8 @@
         {
           "k": "narration",
           "t": "Footsteps outside stop at the door. You don't open it.",
-          "where": "door"
+          "where": "door",
+          "me": "scared"
         }
       ]
     },
@@ -33,7 +35,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "A hand comes out of the gap. It does not open its palm. It is tapping the desk, once, once."
+          "t": "A hand comes out of the gap. It does not open its palm. It is tapping the desk, once, once.",
+          "me": "scared"
         }
       ],
       "choices": [
@@ -62,7 +65,8 @@
         },
         {
           "k": "narration",
-          "t": "The lock turns by itself, then turns back."
+          "t": "The lock turns by itself, then turns back.",
+          "me": "scared"
         },
         {
           "k": "narration",
@@ -146,7 +150,8 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "Replied."
+            "t": "Replied.",
+            "me": "tired"
           },
           {
             "k": "speaker",

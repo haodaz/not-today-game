@@ -16,7 +16,8 @@
         {
           "k": "inner",
           "t": "停顿的地方和克总打字的节奏一样。",
-          "where": "screen:msgs"
+          "where": "screen:msgs",
+          "me": "cross"
         }
       ]
     },
@@ -31,7 +32,8 @@
           "k": "speaker",
           "who": "laozhou",
           "t": "这人是不是你",
-          "where": "screen:msgs"
+          "where": "screen:msgs",
+          "me": "phone"
         }
       ]
     },
@@ -44,7 +46,8 @@
         },
         {
           "k": "narration",
-          "t": "缝里伸出来一只手，很慢，像在水里。"
+          "t": "缝里伸出来一只手，很慢，像在水里。",
+          "me": "scared"
         }
       ],
       "choices": [
@@ -68,7 +71,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "那个帖子你又看了一遍。发帖的人在问，仿的电子鸡复位孔怎么不管用。"
+          "t": "那个帖子你又看了一遍。发帖的人在问，仿的电子鸡复位孔怎么不管用。",
+          "me": "phone"
         },
         {
           "k": "narration",
@@ -200,7 +204,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "筷子是方便筷，拆了。你没拆。"
+            "t": "筷子是方便筷，拆了。你没拆。",
+            "me": "eat"
           }
         ]
       }
@@ -216,7 +221,8 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "回完了。"
+            "t": "回完了。",
+            "me": "desk"
           },
           {
             "k": "speaker",

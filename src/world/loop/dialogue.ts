@@ -206,6 +206,11 @@ export interface Scene {
   readonly stand?: string;
   /** texture-pass R2: the idle loop (webm with alpha) over `stand`, when it is the plain stand and one exists. */
   readonly standIdle?: string;
+  /** player-stands (2026-11-22): the player's own figure (a `me` pose in their look), at the side when an NPC stands. */
+  readonly me?: string;
+  readonly meIdle?: string;
+  /** The line on show is the player's (narration, inner): their figure is lit, the NPC's dims. */
+  readonly meSpeaking?: boolean;
   readonly otherIdle?: string;
 }
 export const NO_SCENE: Scene = { backdrop: null, prop: null };
@@ -215,7 +220,11 @@ export const NO_SCENE: Scene = { backdrop: null, prop: null };
  * `prop` (`""` clears it). Derived, never stored: when the sequence ends (the queue head changes or
  * empties) the stage goes back to its own still. Pure.
  */
-export function sceneOf(d: DialogueState, day = 0): Scene {
+/**
+ * `look` (player-stands): the player's look file name (PORTRAIT_FILES: she / he / none / cap / glare); without
+ * it the player never stands (the title, the headless callers).
+ */
+export function sceneOf(d: DialogueState, day = 0, look?: string): Scene {
   const q = d.queue[0];
   if (!q) return NO_SCENE;
   let backdrop: string | null = null;
@@ -227,13 +236,16 @@ export function sceneOf(d: DialogueState, day = 0): Scene {
   // two-up: the NPC who stood before the current one, in the same scene (a new backdrop clears both)
   let other: string | null = null;
   const poses = new Map<string, string>();
+  let me: string | null = null;
   for (const l of q.lines.slice(0, Math.min(d.line, q.lines.length - 1) + 1)) {
     if (l.backdrop !== undefined) {
       backdrop = l.backdrop === "" ? null : l.backdrop;
       stand = null;
       other = null;
       poses.clear();
+      me = null;
     }
+    if (l.me !== undefined) me = l.me === "" ? null : l.me;
     if (l.prop !== undefined) prop = l.prop === "" ? null : l.prop;
     if (q.voice !== "kuro" && (l.k === "speaker" || l.k === "narration") && l.who !== undefined && l.who !== "me") {
       const next = npcStand(l.who) === null ? null : l.who;
@@ -242,19 +254,24 @@ export function sceneOf(d: DialogueState, day = 0): Scene {
       if (next !== null && l.pose !== undefined) poses.set(next, l.pose);
     }
   }
-  if (backdrop === null && prop === null) return NO_SCENE;
+  // player-stands: the player's figure while no prop holds the middle: at the side of a backdrop scene, or
+  // alone over the room (a cut-in for the rest of that sequence, author 2026-11-22: 第三天干完老王的活，吃冷饭之前该是什么样子)
+  const mine = look !== undefined && prop === null && me !== null && q.voice !== "kuro"
+    ? { me: `/player/looks/${look}_${me}.webp`, meIdle: `/anim/looks/${look}_${me}.webm` }
+    : {};
+  if (backdrop === null && prop === null) return "me" in mine ? { ...NO_SCENE, ...mine, meSpeaking: true } : NO_SCENE;
   // With a prop on (the 96): the prop holds the middle for the narration; the NPC takes it only for
   // their own line (author 2026-11-18: 卷子出现的时候是卷子，老师说话的时候才是老师).
   const cur = q.lines[Math.min(d.line, q.lines.length - 1)];
   const speaking = q.voice !== "kuro" && !!cur && (cur.k === "speaker" || cur.k === "narration") && cur.who !== undefined && cur.who !== "me";
   const show = backdrop !== null && stand !== null && (prop === null || speaking);
-  if (!show) return { backdrop, prop };
+  if (!show) return { backdrop, prop, ...mine, ...("me" in mine ? { meSpeaking: true } : {}) };
   const pic = (who: string) => npcStandFor(who, poses.get(who), day)!;
   // the idle loop belongs to the plain stand only (it was drawn from it)
   const idle = (who: string) => (poses.get(who) === undefined && pic(who) === npcStand(who) ? npcIdle(who) : null);
   const s = pic(stand!), si = idle(stand!);
   const o = other !== null ? pic(other) : null, oi = other !== null ? idle(other) : null;
-  return { backdrop, prop, stand: s, ...(si !== null ? { standIdle: si } : {}), ...(o !== null ? { other: o } : {}), ...(oi !== null ? { otherIdle: oi } : {}) };
+  return { backdrop, prop, stand: s, ...(si !== null ? { standIdle: si } : {}), ...(o !== null ? { other: o } : {}), ...(oi !== null ? { otherIdle: oi } : {}), ...mine, ...("me" in mine ? { meSpeaking: !speaking } : {}) };
 }
 
 // ——— a line waits for its place (dialogue addition 2026-11-02) ———

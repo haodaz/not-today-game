@@ -15,7 +15,8 @@
         {
           "k": "inner",
           "t": "抽屉。我没跟任何人说过抽屉。",
-          "where": "screen:msgs"
+          "where": "screen:msgs",
+          "me": "scared"
         }
       ]
     },
@@ -35,7 +36,8 @@
         {
           "k": "inner",
           "t": "家里的话，在我自己的输入框里。",
-          "where": "screen:msgs:family"
+          "where": "screen:msgs:family",
+          "me": "desk"
         }
       ]
     },
@@ -48,7 +50,8 @@
         },
         {
           "k": "narration",
-          "t": "缝里伸出来一只手，戴着一只很合适的手套。"
+          "t": "缝里伸出来一只手，戴着一只很合适的手套。",
+          "me": "scared"
         }
       ],
       "choices": [
@@ -207,7 +210,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "饭是你点的。味道是去年的。"
+            "t": "饭是你点的。味道是去年的。",
+            "me": "eat"
           }
         ]
       }
@@ -223,7 +227,8 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "回完了。"
+            "t": "回完了。",
+            "me": "tired"
           },
           {
             "k": "speaker",

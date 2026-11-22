@@ -15,7 +15,8 @@
         {
           "k": "inner",
           "t": "You changed models.",
-          "where": "screen"
+          "where": "screen",
+          "me": "cross"
         }
       ]
     },
@@ -23,7 +24,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "Something flickers in the pager's screen. Like an eye."
+          "t": "Something flickers in the pager's screen. Like an eye.",
+          "me": "scared"
         }
       ]
     },
@@ -35,7 +37,8 @@
         },
         {
           "k": "narration",
-          "t": "A hand comes out of the gap, palm up. A few grains of wheat between the fingers."
+          "t": "A hand comes out of the gap, palm up. A few grains of wheat between the fingers.",
+          "me": "scared"
         }
       ],
       "choices": [
@@ -64,7 +67,8 @@
         {
           "k": "narration",
           "t": "Then the corridor has a door, and behind it the company. The last day before it closed. You were there.",
-          "backdrop": "/room/dream/office_busy.jpg"
+          "backdrop": "/room/dream/office_busy.jpg",
+          "me": "carton"
         },
         {
           "k": "narration",
@@ -73,11 +77,13 @@
         {
           "k": "narration",
           "t": "A box pops up on every screen: one sentence, and under it 'OK'. Lao Zhou glances and clicks. The boss, in the glass room, clicked first.",
-          "backdrop": "/room/dream/office.jpg"
+          "backdrop": "/room/dream/office.jpg",
+          "me": "stand"
         },
         {
           "k": "narration",
-          "t": "You walk to your desk. The box is there too. You don't click."
+          "t": "You walk to your desk. The box is there too. You don't click.",
+          "me": "cross"
         },
         {
           "k": "inner",
@@ -199,7 +205,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "The box is pink. You remember ordering white."
+            "t": "The box is pink. You remember ordering white.",
+            "me": "eat"
           }
         ]
       }
@@ -215,7 +222,8 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "Replied."
+            "t": "Replied.",
+            "me": "desk"
           },
           {
             "k": "speaker",

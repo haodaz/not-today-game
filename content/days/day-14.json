@@ -15,7 +15,8 @@
         {
           "k": "inner",
           "t": "十三个月，第一次不勉强。",
-          "where": "screen:msgs"
+          "where": "screen:msgs",
+          "me": "stand"
         }
       ]
     },
@@ -24,7 +25,8 @@
         {
           "k": "narration",
           "t": "合伙人发了一张风景。第一次不是工作卡片。",
-          "where": "screen:msgs:partner"
+          "where": "screen:msgs:partner",
+          "me": "phone"
         },
         {
           "k": "narration",
@@ -48,7 +50,8 @@
         },
         {
           "k": "narration",
-          "t": "缝里伸出来一只手。后面还有，一只接一只，数不清。"
+          "t": "缝里伸出来一只手。后面还有，一只接一只，数不清。",
+          "me": "scared"
         }
       ],
       "choices": [
@@ -76,7 +79,8 @@
         },
         {
           "k": "narration",
-          "t": "你等了很久。它没来。"
+          "t": "你等了很久。它没来。",
+          "me": "cross"
         },
         {
           "k": "inner",
@@ -197,7 +201,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "今天的饭很好吃。你说不出哪里好。"
+            "t": "今天的饭很好吃。你说不出哪里好。",
+            "me": "eat"
           }
         ]
       }
@@ -213,7 +218,8 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "回完了。"
+            "t": "回完了。",
+            "me": "desk"
           },
           {
             "k": "speaker",

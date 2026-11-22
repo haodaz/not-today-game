@@ -20,7 +20,8 @@
         {
           "k": "inner",
           "t": "漂亮是它的词。",
-          "where": "screen:msgs"
+          "where": "screen:msgs",
+          "me": "cross"
         }
       ]
     },
@@ -34,7 +35,8 @@
         {
           "k": "narration",
           "t": "里面是你这些天递出去的东西，每一样都在，按天数排好。",
-          "where": "door"
+          "where": "door",
+          "me": "carton"
         },
         {
           "k": "inner",
@@ -61,7 +63,8 @@
         },
         {
           "k": "narration",
-          "t": "缝里伸出来一只手，掌心朝上。今天它没有看桌子，看的是门。"
+          "t": "缝里伸出来一只手，掌心朝上。今天它没有看桌子，看的是门。",
+          "me": "scared"
         }
       ],
       "choices": [
@@ -165,7 +168,8 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "回完了。"
+            "t": "回完了。",
+            "me": "tired"
           },
           {
             "k": "speaker",

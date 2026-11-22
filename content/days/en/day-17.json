@@ -20,7 +20,8 @@
         {
           "k": "inner",
           "t": "Beautiful is its word.",
-          "where": "screen:msgs"
+          "where": "screen:msgs",
+          "me": "cross"
         }
       ]
     },
@@ -34,7 +35,8 @@
         {
           "k": "narration",
           "t": "Inside, everything you handed out these days, every piece, sorted by day.",
-          "where": "door"
+          "where": "door",
+          "me": "carton"
         },
         {
           "k": "inner",
@@ -61,7 +63,8 @@
         },
         {
           "k": "narration",
-          "t": "A hand comes out of the gap, palm up. Tonight it isn't looking at the desk. It is looking at the door."
+          "t": "A hand comes out of the gap, palm up. Tonight it isn't looking at the desk. It is looking at the door.",
+          "me": "scared"
         }
       ],
       "choices": [
@@ -165,7 +168,8 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "Replied."
+            "t": "Replied.",
+            "me": "tired"
           },
           {
             "k": "speaker",

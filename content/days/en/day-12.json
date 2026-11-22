@@ -16,7 +16,8 @@
         {
           "k": "inner",
           "t": "The pauses fall where Kuro's typing pauses.",
-          "where": "screen:msgs"
+          "where": "screen:msgs",
+          "me": "cross"
         }
       ]
     },
@@ -31,7 +32,8 @@
           "k": "speaker",
           "who": "laozhou",
           "t": "Is this you",
-          "where": "screen:msgs"
+          "where": "screen:msgs",
+          "me": "phone"
         }
       ]
     },
@@ -44,7 +46,8 @@
         },
         {
           "k": "narration",
-          "t": "A hand comes out of the gap, slowly, as if through water."
+          "t": "A hand comes out of the gap, slowly, as if through water.",
+          "me": "scared"
         }
       ],
       "choices": [
@@ -68,7 +71,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "You read the post again. Someone asking why the reset hole on a knock-off Tamagotchi doesn't work."
+          "t": "You read the post again. Someone asking why the reset hole on a knock-off Tamagotchi doesn't work.",
+          "me": "phone"
         },
         {
           "k": "narration",
@@ -200,7 +204,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "Disposable chopsticks, already split. You didn't split them."
+            "t": "Disposable chopsticks, already split. You didn't split them.",
+            "me": "eat"
           }
         ]
       }
@@ -216,7 +221,8 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "Replied."
+            "t": "Replied.",
+            "me": "desk"
           },
           {
             "k": "speaker",
