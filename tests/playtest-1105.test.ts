@@ -84,7 +84,7 @@ describe("R2 · dialogue owns the screen", () => {
     r.session.dialogue = push(r.session.dialogue, { key: "t", lines: [{ k: "inner", t: "一句。" }], ending: { kind: "none" } });
     const out = r.out();
     // The mask is the layer's first child, under the box, over the whole screen; it reads on.
-    expect(out).toContain('<div class="dlg-layer"><div class="story-mask clear" data-action="loop-advance" aria-hidden="true"></div><div class="dlg');
+    expect(out).toContain('<div class="dlg-layer" id="dlg-layer"><div class="scene-stands" id="scene-stands"><div class="stand-slot"></div><div class="stand-slot"></div></div><div class="story-mask clear" data-action="loop-advance" aria-hidden="true"></div><div class="dlg');
     const css = (await import("node:fs")).readFileSync(new URL("../src/world/room/room.css", import.meta.url), "utf8");
     expect(css).toContain(".dlg-layer .story-mask{position:fixed;inset:0;");
     expect(css).toContain(".dlg-layer .story-mask.clear{background:transparent}");

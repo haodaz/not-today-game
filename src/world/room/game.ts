@@ -179,11 +179,13 @@ function dlgLayer(dlg: SafeHtml | null, session: Session, readsOn: boolean, with
     ? html`<img class="scene-stand${cls2}" src="${src}" alt="" aria-hidden="true" draggable="false">`
     : html`<video class="scene-stand-anim${cls2}" src="${idle}" poster="${src}" autoplay muted playsinline aria-hidden="true"></video>`);
   // two-up (author 2026-11-20): with another person in the scene, the one speaking stands right and lit, the other left and dimmed
-  // player-stands (2026-11-22): the player's own figure, alone in the frame (sceneOf never gives it beside a person), with its loop
-  const standImg = scene.me !== undefined ? figure(scene.me, scene.meIdle, " me") : stand === undefined ? null : scene.other !== undefined
-    ? html`${figure(scene.other, scene.otherIdle, " other")}${figure(stand, scene.standIdle, " speaking")}`
-    : figure(stand, scene.standIdle, "");
-  return html`<div class="${cls("dlg-layer", story && "masked", scene.me !== undefined && !story && "me-on", chat && !thread && "top", thread && "thread")}">${withMask ? boxMask(session, readsOn) : null}${standImg}${dlg}</div>`;
+  // player-stands (2026-11-22): the player's own figure, alone in the frame (sceneOf never gives it beside a person), with its loop.
+  // Two fixed slots in a keyed layer (2026-11-23): the same figure keeps its <video> element from line to
+  // line, so its loop is one take from appearing to leaving (the author: 人物在出现到结束算是一体的).
+  const side = scene.me === undefined && stand !== undefined && scene.other !== undefined ? figure(scene.other, scene.otherIdle, " other") : null;
+  const main = scene.me !== undefined ? figure(scene.me, scene.meIdle, " me") : stand === undefined ? null : figure(stand, scene.standIdle, scene.other !== undefined ? " speaking" : "");
+  const standImg = html`<div class="scene-stands" id="scene-stands"><div class="stand-slot">${side}</div><div class="stand-slot">${main}</div></div>`;
+  return html`<div class="${cls("dlg-layer", story && "masked", scene.me !== undefined && !story && "me-on", chat && !thread && "top", thread && "thread")}" id="dlg-layer">${standImg}${withMask ? boxMask(session, readsOn) : null}${dlg}</div>`;
 }
 
 /** The checklist's line that is on now (the first open one), for the desktop's top bar; null when none. */
@@ -2175,7 +2177,7 @@ function riseAskQueued(day: number): Queued {
 function takeBook(ctx: ActionContext, from: "bed" | "rise" | "spot"): void {
   const { session } = ctx;
   const day = ctx.store.getState().day;
-  const first = session.collection.bookRead !== true;
+  const first = !session.bookFirstSaid; // once per run (author 2026-11-23): a new run meets the book anew
   session.book = { from, first };
   const lines: SayLine[] = [{ k: "inner", t: t("room.book.take") }, ...(first ? [{ k: "speaker" as const, who: "me", t: t("room.book.first") }] : [])];
   session.dialogue = push(session.dialogue, { key: `d${day}:book:take`, lines, ending: { kind: "openBook" } });
@@ -2189,6 +2191,7 @@ function openBook(ctx: ActionContext): void {
     session.collection = { ...session.collection, bookRead: true };
     ctx.bookRead?.();
   }
+  session.bookFirstSaid = true;
   session.bookOpen = true;
   session.bookOpened = false;
 }

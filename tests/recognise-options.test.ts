@@ -54,7 +54,7 @@ describe("an option with its own lines", () => {
     const { store, pick } = ask(1, "chick");
     const i = rightOf("chick");
     expect(chick().options[i]!.say).toEqual(OWN.rightSay);
-    expect(pick(i)).toEqual([...narr(OWN.rightSay), { k: "inner", t: OWN.rightInner }]);
+    expect(pick(i)).toEqual([...narr(OWN.rightSay), { k: "inner", t: OWN.rightInner, me: "carton" }]);
     expect(store.getState().recognised).toEqual(["chick"]);
   });
 
@@ -73,7 +73,7 @@ describe("an option falling back", () => {
     const i = wrongsOf("chick")[1]!;
     expect(chick().options[i]!.say).toBeUndefined();
     const wrong = chick().wrong!;
-    expect(pick(i)).toEqual([...narr(wrong.say), { k: "inner", t: wrong.inner }]);
+    expect(pick(i)).toEqual([...narr(wrong.say), { k: "inner", t: wrong.inner, me: "carton" }]);
     expect(answerFor("chick", i)).toBe(wrong);
   });
 });
@@ -86,7 +86,7 @@ describe("an object with no right option is no test", () => {
     const plain = pager().options.findIndex((o) => !o.say);
     const { store, ctx, pick } = ask(4, "pager");
     const right = pager().right!;
-    expect(pick(plain)).toEqual([...narr(right.say), { k: "inner", t: right.inner }]);
+    expect(pick(plain)).toEqual([...narr(right.say), { k: "inner", t: right.inner, me: "carton" }]);
     expect(store.getState().recognised).toEqual(["pager"]);
     expect(knows("pager", store.getState(), store.getEvents())).toBe(true);
     expect(store.getState().judgement.evidence.at(-1)).toMatchObject({ day: 4, eventId: "recognise:pager" });

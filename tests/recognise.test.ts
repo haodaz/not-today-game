@@ -208,7 +208,7 @@ describe("when it is asked (FR1)", () => {
     const answer = answered.queue.find((q) => q.key === "d4:recognise:pager:answer")!;
     // Content 2026-11-06: the picked wrong option carries its own lines.
     const wrong = recogniseTable.get("pager")!.options[wrongIndex("pager")]!;
-    expect(answer.lines).toEqual([...wrong.say!.map((t) => ({ k: "narration", t })), { k: "inner", t: wrong.inner! }]);
+    expect(answer.lines).toEqual([...wrong.say!.map((t) => ({ k: "narration", t })), { k: "inner", t: wrong.inner!, me: "carton" }]);
     expect(store.getState().recognised).toEqual([]);
 
     // Same day: picking it up does not ask again.

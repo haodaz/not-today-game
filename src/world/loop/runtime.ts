@@ -118,7 +118,7 @@ export function answerQueued(day: number, object: string, option: number): Queue
   const a = answerFor(object, option);
   return {
     key: `d${day}:recognise:${object}:answer`,
-    lines: [...a.say.map((t) => ({ k: "narration" as const, t })), ...(a.inner !== undefined ? [{ k: "inner" as const, t: a.inner }] : [])],
+    lines: [...a.say.map((t) => ({ k: "narration" as const, t })), ...(a.inner !== undefined ? [{ k: "inner" as const, t: a.inner, me: "carton" }] : [])], // player-stands: holding the box (author 2026-11-23)
     ending: { kind: "none" },
   };
 }

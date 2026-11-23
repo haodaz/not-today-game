@@ -353,8 +353,9 @@ export const GLASS_RECT = fracRect(WINDOW_WALL, 0.385, 0.643, 0.145, 0.56);
  * and the ceiling light (one line). A click anywhere else on the ceiling is the nav layer's (its line).
  */
 function ceilingHits(): SafeHtml {
-  const rise = t("hint.short.rise");
-  return html`<button type="button" class="look-hit rise-spot" data-action="rise" style="${rectStyle(RISE_BAND)}" aria-label="${rise}"></button><button type="button" class="look-hit ceil-lamp" data-action="lying-look" data-look="lamp" style="${rectStyle(CEILING_LAMP)}" aria-hidden="true" tabindex="-1"></button>`;
+  const rise = t("room.rise.up");
+  // the pill (author 2026-11-23: 起床/离开桌子 like 离开窗边, in the lower half of the screen)
+  return html`<button type="button" class="look-hit rise-spot" data-action="rise" style="${rectStyle(RISE_BAND)}" aria-label="${rise}"><span class="go-pill" aria-hidden="true"><i class="chev"></i><span>${tr("room.rise.up")}</span></span></button><button type="button" class="look-hit ceil-lamp" data-action="lying-look" data-look="lamp" style="${rectStyle(CEILING_LAMP)}" aria-hidden="true" tabindex="-1"></button>`;
 }
 
 /** room-light-switch R2: the wall switch by the door, on 门 and on 窗: the ceiling light on and off. */
@@ -676,7 +677,8 @@ function edgeHint(session: Session, view: string, nowMs: number): SafeHtml | nul
   if (!edge || !edgeLeads(view, edge.zone)) return null;
   const since = nowMs > 0 ? Math.max(0, nowMs - edge.since) : HINT_FADE_MS;
   const late = since < HINT_FADE_MS ? raw(` style="--late:-${Math.round(since)}ms"`) : null;
-  const arrow = edge.zone === "back" ? null : html`<i class="arrow"></i>`;
+  // the back zone is a pill at the bottom centre like 离开窗边 (author 2026-11-23: the old band was not obvious)
+  const arrow = edge.zone === "back" ? html`<i class="chev"></i>` : html`<i class="arrow"></i>`;
   return html`<div class="edge-hint ${edge.zone}" aria-hidden="true"${late}>${arrow}<span>${tr(EDGE_LABEL[edge.zone])}</span></div>`;
 }
 export function renderRoom(model: RoomModel): SafeHtml {

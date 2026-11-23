@@ -30,17 +30,33 @@ function morphAttrs(old: Element, next: Element, active: Element | null): void {
 }
 
 function morphChildren(old: Node, next: Node, active: Element | null): void {
-  const have = Array.from(old.childNodes);
   const want = Array.from(next.childNodes);
+  // Keyed children (an id) are matched wherever they are among the old ones and moved into place, so a
+  // layer that keeps its id survives a sibling appearing before it (standing figures 2026-11-23: a
+  // re-created <video> restarted its loop on every click).
+  const keyed = new Map<string, Element>();
+  for (const c of Array.from(old.childNodes)) {
+    if (c.nodeType !== ELEMENT) continue;
+    const k = keyOf(c as Element);
+    if (k !== "" && !keyed.has(k)) keyed.set(k, c as Element);
+  }
   let i = 0;
   for (; i < want.length; i++) {
     const n = want[i]!;
-    const o = have[i];
+    let o: ChildNode | undefined = old.childNodes[i];
+    if (n.nodeType === ELEMENT) {
+      const k = keyOf(n as Element);
+      const match = k === "" ? undefined : keyed.get(k);
+      if (match !== undefined && match !== o) {
+        old.insertBefore(match, o ?? null);
+        o = match;
+      }
+    }
     if (o === undefined) old.appendChild(n);
     else if (sameNode(o, n)) morphNode(o, n, active);
     else old.replaceChild(n, o);
   }
-  for (let j = have.length - 1; j >= i; j--) old.removeChild(have[j]!);
+  while (old.childNodes.length > want.length) old.removeChild(old.lastChild!);
 }
 
 function morphNode(old: Node, next: Node, active: Element | null): void {

@@ -1173,6 +1173,18 @@
 .dlg-layer .scene-stand-anim.speaking{left:calc(var(--stage-l,0px) + var(--stage-w,100vw) * .66)}
 .dlg-layer .scene-stand-anim.other{left:calc(var(--stage-l,0px) + var(--stage-w,100vw) * .34);filter:brightness(.55) saturate(.8) drop-shadow(0 6px 18px rgba(0,0,0,.35))}
 @media (prefers-reduced-motion:reduce){.dlg-layer .scene-stand-anim{display:none}}
+/* figures 2026-11-23: fixed slots (display:contents, so the fixed positioning is untouched); a posed still breathes once, then rests ten seconds, like the loops */
+.dlg-layer .scene-stands,.dlg-layer .stand-slot{display:contents}
+.dlg-layer .scene-stand{transform-origin:50% 100%;animation:stand-breathe 14s ease-in-out infinite}
+@keyframes stand-breathe{0%,30%,100%{transform:translateX(-50%) scale(1)}14%{transform:translateX(-50%) scale(1.012) translateY(-2px)}}
+@media (prefers-reduced-motion:reduce){.dlg-layer .scene-stand{animation:none}}
+/* Kuro as a prop: the window body's frames, a blink now and then */
+.scene .scene-prop.kuro-live{width:min(60vh,60%);aspect-ratio:1;max-width:80%;background:url(/kuro/k3d_base.png) center/contain no-repeat;animation:m-fade-in 300ms both,kuro-prop 9s steps(1) infinite}
+@keyframes kuro-prop{0%,38%{background-image:url(/kuro/k3d_base.png)}40%,43%{background-image:url(/kuro/k3d_blink.png)}44%,70%{background-image:url(/kuro/k3d_base.png)}72%,86%{background-image:url(/kuro/k3d_idle2.png)}88%,100%{background-image:url(/kuro/k3d_base.png)}}
+/* the way on, bottom centre (author 2026-11-23: 起床 / 离开桌子 like 离开窗边, in the lower half): a capsule with a chevron and the word */
+.room .go-pill,.room .edge-hint.back{position:absolute;left:50%;bottom:7%;right:auto;top:auto;height:auto;width:auto;transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:11px 20px;border-radius:999px;background:rgba(244,240,232,.92);color:#1d2129;font-size:15px;letter-spacing:.14em;text-shadow:none;box-shadow:0 8px 22px rgba(0,0,0,.28);pointer-events:none;white-space:nowrap}
+.room .go-pill .chev,.room .edge-hint.back .chev{width:9px;height:9px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);margin-top:-4px;flex:0 0 auto}
+.room .rise-spot:hover .go-pill,.room .rise-spot:focus-visible .go-pill{background:#fff}
 /* player-stands (2026-11-22): the player's own figure, alone, centre, over the room through a dim (.me-on). */
 .dlg-layer .scene-stand.me,.dlg-layer .scene-stand-anim.me{height:calc(var(--stage-h,100vh) * .86)}
 .dlg-layer.me-on::before{content:"";position:fixed;left:var(--stage-l,0px);top:var(--stage-t,0px);width:var(--stage-w,100vw);height:var(--stage-h,100vh);background:rgba(4,5,8,.42);animation:m-fade-in 300ms both}

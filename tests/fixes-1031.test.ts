@@ -91,7 +91,7 @@ describe("(4) Kuro's small window is a pill (dialogue FR2: no window any more)",
     loopActions["kuro-call"]!(ctx, none, null as never);
     const out = renderGame(ctx.store, ctx.session, 0).value;
     // playtest-1105 R2: the box owns the screen (a clear mask under it).
-    expect(out).toMatch(/<div class="dlg-layer( top)?"><div class="story-mask clear[^"]*"[^>]*><\/div><div class="dlg tagged kuro/);
+    expect(out).toMatch(/<div class="dlg-layer( top)?" id="dlg-layer"><div class="scene-stands" id="scene-stands"><div class="stand-slot"><\/div><div class="stand-slot"><\/div><\/div><div class="story-mask clear[^"]*"[^>]*><\/div><div class="dlg tagged kuro/);
     expect(ctx.session.view).toBe("desktop");
   });
 

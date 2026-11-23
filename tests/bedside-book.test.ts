@@ -95,8 +95,9 @@ describe("reading", () => {
     expect(r.marked()).toBe(1);
   });
 
-  it("a profile that has read before: no first-time lines; from the rise ask the rise ask comes back; the shelf book asks nothing after", () => {
+  it("a run that has read before: no first-time lines again; from the rise ask the rise ask comes back; the shelf book asks nothing after", () => {
     const r = rig(true);
+    r.session.bookFirstSaid = true; // the lines are the run's, not the profile's (author 2026-11-23)
     r.session.dialogue = push(r.session.dialogue, { key: "d1:rise:ask", lines: [{ k: "inner", t: t("room.rise.ask") }], ending: { kind: "riseAsk" } });
     r.act("loop-choice", { choice: "read" });
     expect(r.lines()).toEqual([t("room.book.take")]);
@@ -105,6 +106,7 @@ describe("reading", () => {
     expect(r.session.dialogue.queue.map((q) => q.ending.kind)).toEqual(["riseAsk"]);
     expect(r.marked()).toBe(0);
     const s = rig(true);
+    s.session.bookFirstSaid = true;
     s.session.view = "room";
     s.act("book-open");
     s.readOn();

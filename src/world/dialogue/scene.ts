@@ -13,7 +13,10 @@ export function renderScene(scene: Scene): SafeHtml | null {
   const backdrop = scene.backdrop === null ? null : html`<div class="scene-backdrop" data-src="${scene.backdrop}" style="background-image:url(${scene.backdrop})"></div>`;
   // Standing NPCs (author 2026-11-18) stand in the box's layer (game.ts dlgLayer, over the story mask
   // so they keep their colour); while one stands in the middle the prop is put away.
-  const prop = scene.stand !== undefined || scene.prop === null ? null : html`<img class="scene-prop" data-src="${scene.prop}" src="${scene.prop}" alt="" draggable="false">`;
+  // Kuro as a prop (day 1's 这是克总) is the window body's frames, blinking, not a still (author 2026-11-23)
+  const prop = scene.stand !== undefined || scene.prop === null ? null
+    : scene.prop.endsWith("/kuro.png") ? html`<div class="scene-prop kuro-live" data-src="${scene.prop}" role="img"></div>`
+    : html`<img class="scene-prop" data-src="${scene.prop}" src="${scene.prop}" alt="" draggable="false">`;
   return html`<div class="${cls("scene", scene.backdrop !== null && "has-backdrop")}" aria-hidden="true">${backdrop}${prop}</div>`;
 }
 

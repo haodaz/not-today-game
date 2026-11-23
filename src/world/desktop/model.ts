@@ -174,6 +174,8 @@ export interface Session {
   bookOpen: boolean;
   /** book-cover (author 2026-11-20): the gamebook said its cover was opened — the reader goes dark behind it. */
   bookOpened: boolean;
+  /** bedside-book: this run has said the first-time lines (「not today……」 / 剧情还挺真实的) — once per run, not per profile (author 2026-11-23). */
+  bookFirstSaid: boolean;
   /** empty-box (author 2026-11-20): the meal just eaten leaves its empty box on the table up close until the player steps back. */
   emptyBox: "lunch" | "dinner" | null;
   /** hunger (author 2026-11-20): the last fullness change, floated off the status tile while the card is closed. */
@@ -616,6 +618,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     collection: EMPTY_COLLECTION,
     bookOpen: false,
     bookOpened: false,
+    bookFirstSaid: false,
     emptyBox: null,
     fullnessFloat: null,
     cut: null,

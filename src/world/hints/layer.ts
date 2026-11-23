@@ -50,7 +50,9 @@ export function placePrompt(root: HTMLElement): void {
   const edge = layer.dataset.edge === "left" || layer.dataset.edge === "right" ? layer.dataset.edge : null;
   let target: Box | null = edge ? edgeBox(bounds, edge) : null;
   if (!edge && layer.dataset.anchor) {
-    const r = findAnchor(root, layer.dataset.anchor)?.getBoundingClientRect();
+    // a target that carries its own pill (起床 2026-11-23) is ringed at the pill, not across its whole band
+    const anchor = findAnchor(root, layer.dataset.anchor);
+    const r = (anchor?.querySelector<HTMLElement>(".go-pill") ?? anchor)?.getBoundingClientRect();
     if (r) target = { left: r.left, top: r.top, width: r.width, height: r.height };
   }
   // The target left the page (a move in progress): nothing to show until the next render.
