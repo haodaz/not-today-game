@@ -334,7 +334,10 @@ function deskMarks(state: State, events: readonly GameEvent[], session: Session)
   const g = guideNow(state, events, session);
   const glow = glowTarget(g?.target.kind ?? null, session.hintsOn && session.hintQueue[0] === "phone" ? "phone" : null);
   const mark = (id: string, attrs: string, extra: string | false | null = null): SafeHtml | null => {
-    const r = rects[id];
+    const r0 = rects[id];
+    // the tower's projected box runs up behind the desk top (author 2026-11-23: 桌子上 highlight 的方块是什么):
+    // its mark is the part that shows, the lower half under the desk's left edge
+    const r = r0 && id === "tower" ? { ...r0, t: r0.t + r0.h * 0.55, h: r0.h * 0.45 } : r0;
     return r ? html`<i class="${cls("room-mark", id, extra)}" ${raw(attrs)}${id === glow ? raw(" data-glow") : null} style="${rectStyle(r)}" aria-hidden="true"></i>` : null;
   };
   const on = booted(state, events);
