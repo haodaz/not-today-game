@@ -41,9 +41,19 @@ function cellPhoto(id: string): string {
 /** device-games: the objects that play a game of their own (the calculator 猜数字, the 文曲星 Wordle). */
 export const GAME_IDS: readonly string[] = ["calculator", "dictionary"];
 
-/** The drawer grid: one cell per found object, the Kurogotchi last. Nothing found is not shown. */
+/** All the objects there are to find, in content order (the shelf has a slot for each, found or not). */
+export const ALL_IDS = (): string[] => [...recogniseTable.keys()];
+
+/**
+ * The drawer grid (author 2026-11-23: 没有收集感 → a shelf with a slot per object): every object has its
+ * card in content order; a found one shows in colour with its name, the rest as a silhouette with a
+ * question mark; the Kurogotchi's card appears last only once unlocked (a secret, not a slot).
+ */
 export function drawerGrid(c: Collection): SafeHtml {
-  const cells = drawerIds(c).map((id) => {
+  const ids = c.kurogotchi ? [...ALL_IDS(), KURO_ID] : ALL_IDS();
+  const cells = ids.map((id) => {
+    const found = id === KURO_ID || c.objects.includes(id);
+    if (!found) return html`<div class="drawer-cell locked" aria-label="${t("title.drawer.unknown")}"><img class="drawer-photo" src="${cellPhoto(id)}" alt="" draggable="false"><span class="drawer-cell-name">${tr("title.drawer.unknown")}</span></div>`;
     const name = hasString(`obj.name.${id}`) ? tr(`obj.name.${id}`) : null;
     const cell = html`<button type="button" class="${cls("drawer-cell", id === KURO_ID && "kuro")}" data-action="drawer-open" data-object="${id}" aria-label="${t(`obj.name.${id}`)}"><img class="drawer-photo" src="${cellPhoto(id)}" alt="" draggable="false"><span class="drawer-cell-name">${name}</span></button>`;
     // device-games: 玩一局 under the card opens the device in its game (only these two, only when collected)
@@ -56,8 +66,10 @@ export function drawerGrid(c: Collection): SafeHtml {
 /** The page: the grid, or an opened object in the middle (its body filled by the controller). */
 export function drawerPage(c: Collection, open: string | null): SafeHtml {
   const title = hasString("title.drawer") ? tr("title.drawer") : null;
+  const found = ALL_IDS().filter((id) => c.objects.includes(id)).length;
+  const count = open ? null : html`<span class="drawer-count" aria-label="${t("title.drawer.count", { n: found, total: ALL_IDS().length })}">${found}<i>/</i>${ALL_IDS().length}</span>`;
   const body = open ? html`<div class="drawer-open" data-object="${open}"><div class="drawer-stage" data-drawer-stage="${open}"></div><div class="drawer-open-name">${hasString(`obj.name.${open}`) ? tr(`obj.name.${open}`) : null}</div></div>` : drawerGrid(c);
-  return html`<section class="title-drawer-page" aria-labelledby="title-drawer-h"><h2 id="title-drawer-h">${title}</h2>${body}<button type="button" class="title-back" data-action="title-back">${tr("title.back")}</button></section>`;
+  return html`<section class="title-drawer-page" aria-labelledby="title-drawer-h"><h2 id="title-drawer-h">${title}${count}</h2>${body}<button type="button" class="title-back" data-action="title-back">${tr("title.back")}</button></section>`;
 }
 
 // ——— the opened object: a store-free preview ———
@@ -146,8 +158,10 @@ export function createDrawerObject(id: string, root: HTMLElement, deps: DrawerDe
   const paint = () => {
     const s = stage();
     if (!s || !program) return;
-    // A title re-render (an idle event) empties the stage: put the device markup back.
-    if (s.querySelector("canvas.dev") === null) render();
+    // A title re-render (an idle event) empties the stage: put the device markup back. Only when the
+    // shell is gone, not the canvas: the back face has no canvas, and redrawing it every frame ate the
+    // flip button's click (author 2026-11-23).
+    if (s.querySelector(".dev-shell, .drawer-photo-obj") === null) render();
     const e = env();
     const p = session.hand.programs[id];
     for (const c of s.querySelectorAll<HTMLCanvasElement>("canvas.dev")) paintFrame(c, program.draw(p, e), id, raster);

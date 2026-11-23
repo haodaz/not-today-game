@@ -67,22 +67,28 @@
 .title-drawer-page h2{margin:0 0 20px;font-size:16px;letter-spacing:.3em;font-weight:400;color:#5b5346;text-align:center}
 .title-drawer-page .title-back{margin:22px auto 0;color:#1d2129;border-color:#2a2622}
 .title-drawer-page .title-back:hover,.title-drawer-page .title-back:focus-visible{background:#2a2622;color:#efe9df}
-.drawer-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
-.drawer-cell{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 10px;border:1px solid rgba(138,127,112,.5);border-radius:8px;background:rgba(255,255,255,.35);color:#1d2129;font:inherit;cursor:pointer;transition:background 140ms,border-color 140ms}
-.drawer-cell:hover,.drawer-cell:focus-visible{background:rgba(255,255,255,.7);border-color:#8a7f70;outline:none}
-.drawer-photo{width:96px;height:96px;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(0,0,0,.25))}
+.drawer-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;padding:4px 2px}
+/* collection feel (author 2026-11-23): a card per object, paper on the shelf, a plaque for the name; a found one lifts on hover, a missing one is its shadow and a question mark */
+.drawer-cell{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:14px;min-height:228px;padding:22px 12px 16px;border:1px solid rgba(138,127,112,.45);border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,.25));box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 6px 14px rgba(40,30,20,.08);color:#1d2129;font:inherit;cursor:pointer;transition:transform .18s,box-shadow .18s,border-color .18s}
+.drawer-cell:hover,.drawer-cell:focus-visible{transform:translateY(-3px);border-color:#8a7f70;box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 14px 24px rgba(40,30,20,.16);outline:none}
+.drawer-photo{width:132px;height:132px;object-fit:contain;filter:drop-shadow(0 6px 8px rgba(0,0,0,.28))}
 .drawer-cell.kuro .drawer-photo{image-rendering:pixelated}
-.drawer-cell-name{font-size:14px;letter-spacing:.1em}
+.drawer-cell-name{font-size:14px;letter-spacing:.14em;padding:5px 14px;border-radius:999px;background:rgba(42,38,34,.08);color:#2a2622}
+.drawer-cell.locked{cursor:default;border-style:dashed;border-color:rgba(138,127,112,.4);background:rgba(255,255,255,.12);box-shadow:none}
+.drawer-cell.locked .drawer-photo{filter:brightness(0) opacity(.14)}
+.drawer-cell.locked .drawer-cell-name{background:none;color:rgba(91,83,70,.55);letter-spacing:.3em}
+.drawer-count{display:inline-flex;align-items:baseline;gap:4px;margin-left:16px;font-size:13px;letter-spacing:.1em;color:#8a7f70;vertical-align:1px}
+.drawer-count i{font-style:normal;color:#b7ad9f}
 /* device-games: 玩一局 under the calculator's and the 文曲星's cards */
 .drawer-card{display:flex;flex-direction:column;gap:8px}
 .drawer-card .drawer-cell{flex:1}
 .drawer-play{align-self:center;padding:5px 16px;border:1px solid rgba(29,33,41,.55);border-radius:14px;background:rgba(255,255,255,.55);color:#1d2129;font:inherit;font-size:13px;letter-spacing:.15em;cursor:pointer}
 .drawer-play:hover,.drawer-play:focus-visible{background:#1d2129;color:#efe9df}
 /* An opened object in the middle. */
-.drawer-open{display:flex;flex-direction:column;align-items:center;gap:14px;min-height:360px}
+.drawer-open{display:flex;flex-direction:column;align-items:center;gap:14px;min-height:0}
 .drawer-open .drawer-back{align-self:flex-start;width:auto;padding:8px 18px;border:1px solid #8a7f70;border-radius:4px;background:transparent;color:#1d2129;font:inherit;letter-spacing:.15em;cursor:pointer}
 .drawer-open .drawer-back:hover,.drawer-open .drawer-back:focus-visible{background:#2a2622;color:#efe9df}
-.drawer-stage{flex:1;display:flex;align-items:center;justify-content:center;width:100%;min-height:300px}
+.drawer-stage{flex:1;display:flex;align-items:center;justify-content:center;width:100%;min-height:0}
 .drawer-open-name{font-size:15px;letter-spacing:.12em;color:#5b5346}
 .drawer-photo-obj{display:flex;flex-direction:column;align-items:center;gap:12px}
 .drawer-big-photo{max-width:320px;max-height:300px;object-fit:contain;filter:drop-shadow(0 4px 10px rgba(0,0,0,.3))}

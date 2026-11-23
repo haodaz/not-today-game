@@ -1128,6 +1128,8 @@
   "kurogotchi.line.7": "We could stay like this. Not today, though.",
   "kurogotchi.missed": "{n} days. I kept the light on.",
   "title.drawer": "老物件",
+  "title.drawer.unknown": "？？？",
+  "title.drawer.count": "已找到 {n} / {total}",
   "obj.brand.kurogotchi": "克麻歌子",
   "obj.name.chick": "拓麻鸽子",
   "obj.name.camera": "拍立得",

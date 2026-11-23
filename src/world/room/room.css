@@ -421,17 +421,24 @@
 .settings-layer{position:absolute;inset:0;z-index:50}
 .hud-host .settings-layer{position:fixed}
 .settings-dim{position:absolute;inset:0;border:0;padding:0;margin:0;background:rgba(10,10,12,.55);cursor:default}
-.settings{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:320px;background:rgba(244,240,232,.96);border-radius:14px;padding:18px 20px;box-shadow:0 20px 60px rgba(0,0,0,.45);font:15px "PingFang SC","Hiragino Sans GB",sans-serif;color:#1d2129}
-.settings h3{margin:0 0 12px;font-size:12px;letter-spacing:.2em;color:#8a7f70;font-weight:400}
-.settings .row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid rgba(0,0,0,.08)}
-.settings .seg{display:flex;gap:6px;align-items:center}.settings .seg b{color:#aaa;font-weight:400}
-.settings .seg button{border:0;background:none;padding:2px 4px;font:inherit;color:#777;cursor:pointer}
-.settings .seg button.on{color:#8b2f2a;font-weight:600}
-.settings .switch{width:40px;height:22px;border:0;border-radius:11px;background:#bbb;position:relative;cursor:pointer;padding:0}
-.settings .switch i{position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff}
-.settings .switch.on{background:#8b2f2a}.settings .switch.on i{left:21px}
-.settings .actions{display:flex;justify-content:space-between;gap:10px;padding-top:14px;border-top:1px solid rgba(0,0,0,.08)}
-.settings .actions button{flex:1;border:1px solid rgba(0,0,0,.12);background:#fff;border-radius:8px;padding:8px 0;font:inherit;cursor:pointer}
+/* settings card (author 2026-11-23: 太挤了): wider, every row with room, pills for the choices, the dangerous things apart at the bottom */
+.settings{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:460px;max-width:92vw;box-sizing:border-box;background:rgba(244,240,232,.97);border-radius:16px;padding:26px 30px 22px;box-shadow:0 24px 70px rgba(0,0,0,.5);font:15px "PingFang SC","Hiragino Sans GB",sans-serif;color:#1d2129}
+.settings h3{margin:0 0 10px;font-size:13px;letter-spacing:.3em;color:#8a7f70;font-weight:400}
+.settings .row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:15px 0;border-top:1px solid rgba(0,0,0,.07);font-size:15px}
+.settings .row>span:first-child,.settings .row>label:first-child{letter-spacing:.06em}
+.settings .seg{display:flex;gap:4px;align-items:center;padding:3px;border-radius:999px;background:rgba(0,0,0,.06)}.settings .seg b{display:none}
+.settings .seg button{border:0;background:none;padding:5px 14px;border-radius:999px;font:inherit;font-size:14px;color:#6b6358;cursor:pointer;transition:background .15s,color .15s}
+.settings .seg button.on{background:#fff;color:#8b2f2a;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.settings .switch{width:50px;height:28px;border:0;border-radius:14px;background:#c6c0b6;position:relative;cursor:pointer;padding:0;transition:background .15s}
+.settings .switch i{position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .15s}
+.settings .switch.on{background:#8b2f2a}.settings .switch.on i{left:25px}
+.settings .row.email{flex-wrap:wrap;row-gap:8px}
+.settings .email-bound{font-size:13px;color:#2f6b3a;word-break:break-all;padding:4px 10px;border-radius:999px;background:rgba(47,107,58,.08)}
+.settings .row.reset{flex-direction:row;align-items:center;gap:10px;margin-top:4px;padding-top:18px}
+.settings .row.reset button{flex:1;border:1px solid rgba(139,47,42,.4);background:rgba(139,47,42,.04);padding:9px 0;border-radius:9px;font:inherit;font-size:13px;color:#8b2f2a;cursor:pointer;text-decoration:none}
+.settings .row.reset button:hover,.settings .row.reset button:focus-visible{background:#8b2f2a;color:#fff;border-color:#8b2f2a}
+.settings .actions{display:flex;justify-content:space-between;gap:10px;padding-top:16px;margin-top:4px;border-top:1px solid rgba(0,0,0,.07)}
+.settings .actions button{flex:1;border:1px solid rgba(0,0,0,.14);background:#fff;border-radius:10px;padding:11px 0;font:inherit;cursor:pointer}
 .settings .actions button:hover,.settings .actions button:focus-visible{border-color:#8b2f2a;color:#8b2f2a}
 /* world-prompts R1: a room hint is a world prompt. It never blocks (no catcher, no dim, no pointer
    events). The target glows: a 2 px warm white outline with a 14 px glow, pulsing 0.35 → 1 → 0.35
@@ -445,8 +452,6 @@
 .prompt-layer .prompt-dia{font-style:normal;font-size:9px;line-height:1;color:var(--accent,#3b6ef2);text-shadow:none}
 @media (prefers-reduced-motion:reduce){.prompt-layer .prompt-glow{animation:none;opacity:1}}
 /* playtest-1105 R8: 重新开始这一局 / 清除全部记录, quiet links; their question in the same panel. */
-.settings .row.reset{flex-direction:column;align-items:flex-start;gap:6px}
-.settings .row.reset button{border:0;background:none;padding:2px 0;font:inherit;font-size:13px;color:#8b2f2a;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .settings.confirm p{margin:4px 0 16px;line-height:1.6}
 .settings .actions button.danger{background:#8b2f2a;border-color:#8b2f2a;color:#fff}
 /* An upgraded object: the new world's hi-res icon, antialiased, no integer pixels (object-upgrade FR2). */
