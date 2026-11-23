@@ -100,7 +100,8 @@
             "k": "speaker",
             "who": "me",
             "t": "她到了，那边的。剧本第二幕我校，应收表再看一眼，v17 再过一遍，下午老板要用。",
-            "where": "screen:msgs:boss"
+            "where": "screen:msgs:boss",
+            "me": "type"
           },
           {
             "k": "speaker",
@@ -206,7 +207,7 @@
             "k": "speaker",
             "who": "me",
             "t": "回完了。",
-            "me": "desk"
+            "me": "tired"
           },
           {
             "k": "speaker",

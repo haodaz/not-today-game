@@ -110,7 +110,8 @@
             "k": "speaker",
             "who": "me",
             "t": "Wang says send the box today. To whom, he didn't say.",
-            "where": "screen:msgs:boss"
+            "where": "screen:msgs:boss",
+            "me": "type"
           },
           {
             "k": "speaker",
@@ -161,7 +162,8 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "Replied."
+            "t": "Replied.",
+            "me": "tired"
           },
           {
             "k": "speaker",

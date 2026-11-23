@@ -145,7 +145,8 @@
             "k": "speaker",
             "who": "me",
             "t": "第二页，分身。Vivi 牵头，我写。老周借钱的事先放着。",
-            "where": "screen:msgs:boss"
+            "where": "screen:msgs:boss",
+            "me": "type"
           },
           {
             "k": "speaker",
@@ -268,7 +269,8 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "回完了。"
+            "t": "回完了。",
+            "me": "tired"
           },
           {
             "k": "speaker",

@@ -179,7 +179,7 @@
             "who": "me",
             "t": "The investors read v18 and they're in. Three pages first: consciousness, the avatar, the ontology. Today is consciousness.",
             "where": "screen:msgs:boss",
-            "me": "phone"
+            "me": "type"
           },
           {
             "k": "speaker",
@@ -278,7 +278,7 @@
             "k": "speaker",
             "who": "me",
             "t": "Replied.",
-            "me": "desk"
+            "me": "tired"
           },
           {
             "k": "speaker",

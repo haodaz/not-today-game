@@ -100,7 +100,8 @@
             "k": "speaker",
             "who": "me",
             "t": "She's here, the one from over there. I proofread act two, look at the receivables again, go over v17 again; the boss needs it this afternoon.",
-            "where": "screen:msgs:boss"
+            "where": "screen:msgs:boss",
+            "me": "type"
           },
           {
             "k": "speaker",
@@ -206,7 +207,7 @@
             "k": "speaker",
             "who": "me",
             "t": "Replied.",
-            "me": "desk"
+            "me": "tired"
           },
           {
             "k": "speaker",

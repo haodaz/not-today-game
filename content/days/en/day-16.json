@@ -99,7 +99,8 @@
             "k": "speaker",
             "who": "me",
             "t": "All four shops are closed. Their chairman is here; he doesn't read, he wants a sound.",
-            "where": "screen:msgs:boss"
+            "where": "screen:msgs:boss",
+            "me": "type"
           },
           {
             "k": "speaker",

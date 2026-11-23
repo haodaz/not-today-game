@@ -122,7 +122,8 @@
             "k": "speaker",
             "who": "me",
             "t": "Wang asks if I dreamed of the drawer. I never told anyone about the drawer. Launch this afternoon, all of their people there; I set the demo.",
-            "where": "screen:msgs:boss"
+            "where": "screen:msgs:boss",
+            "me": "type"
           },
           {
             "k": "speaker",

@@ -145,7 +145,8 @@
             "k": "speaker",
             "who": "me",
             "t": "Page two, the avatar. Vivi leads, I write. Zhou's loan can wait.",
-            "where": "screen:msgs:boss"
+            "where": "screen:msgs:boss",
+            "me": "type"
           },
           {
             "k": "speaker",
@@ -268,7 +269,8 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "Replied."
+            "t": "Replied.",
+            "me": "tired"
           },
           {
             "k": "speaker",

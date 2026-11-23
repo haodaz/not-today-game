@@ -117,7 +117,8 @@
             "k": "speaker",
             "who": "me",
             "t": "屏幕上的字大半是白的。老板说我今天真漂亮。每个人都在找我，只能回一个。",
-            "where": "screen:msgs:boss"
+            "where": "screen:msgs:boss",
+            "me": "type"
           },
           {
             "k": "speaker",

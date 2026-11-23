@@ -189,7 +189,8 @@
             "k": "speaker",
             "who": "me",
             "t": "Wang got two of them. They come on Friday; team-building first, I set the toast times.",
-            "where": "screen:msgs:boss"
+            "where": "screen:msgs:boss",
+            "me": "type"
           },
           {
             "k": "speaker",
@@ -282,7 +283,8 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "Replied."
+            "t": "Replied.",
+            "me": "tired"
           },
           {
             "k": "speaker",

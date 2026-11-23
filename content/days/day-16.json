@@ -99,7 +99,8 @@
             "k": "speaker",
             "who": "me",
             "t": "四家店都打烊了。那边的董事长来了，不看材料，听个响。",
-            "where": "screen:msgs:boss"
+            "where": "screen:msgs:boss",
+            "me": "type"
           },
           {
             "k": "speaker",

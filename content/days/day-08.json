@@ -189,7 +189,8 @@
             "k": "speaker",
             "who": "me",
             "t": "老板只收到两份。周五那边来，先团建，祝酒时间我排。",
-            "where": "screen:msgs:boss"
+            "where": "screen:msgs:boss",
+            "me": "type"
           },
           {
             "k": "speaker",
@@ -282,7 +283,8 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "回完了。"
+            "t": "回完了。",
+            "me": "tired"
           },
           {
             "k": "speaker",

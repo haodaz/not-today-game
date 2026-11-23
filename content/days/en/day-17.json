@@ -117,7 +117,8 @@
             "k": "speaker",
             "who": "me",
             "t": "Most of the words on screen are white. Wang says I look lovely today. Everyone is looking for me; I can answer one.",
-            "where": "screen:msgs:boss"
+            "where": "screen:msgs:boss",
+            "me": "type"
           },
           {
             "k": "speaker",

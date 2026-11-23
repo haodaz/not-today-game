@@ -110,7 +110,8 @@
             "k": "speaker",
             "who": "me",
             "t": "老板说今天把箱子寄了吧。寄给谁，他没说。",
-            "where": "screen:msgs:boss"
+            "where": "screen:msgs:boss",
+            "me": "type"
           },
           {
             "k": "speaker",
@@ -161,7 +162,8 @@
           {
             "k": "speaker",
             "who": "me",
-            "t": "回完了。"
+            "t": "回完了。",
+            "me": "tired"
           },
           {
             "k": "speaker",

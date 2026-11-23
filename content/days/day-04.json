@@ -179,7 +179,7 @@
             "who": "me",
             "t": "投资人看了 v18，愿意下场。先要三页：意识、分身、本体。今天写意识。",
             "where": "screen:msgs:boss",
-            "me": "phone"
+            "me": "type"
           },
           {
             "k": "speaker",
@@ -278,7 +278,7 @@
             "k": "speaker",
             "who": "me",
             "t": "回完了。",
-            "me": "desk"
+            "me": "tired"
           },
           {
             "k": "speaker",

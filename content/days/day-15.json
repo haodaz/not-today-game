@@ -122,7 +122,8 @@
             "k": "speaker",
             "who": "me",
             "t": "老板问我梦见抽屉了吗。我没跟任何人说过抽屉。下午发布会，那边全员到，演示稿我排。",
-            "where": "screen:msgs:boss"
+            "where": "screen:msgs:boss",
+            "me": "type"
           },
           {
             "k": "speaker",
