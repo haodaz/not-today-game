@@ -26,14 +26,14 @@
         {
           "k": "narration",
           "t": "老周和家里同一天转来一个帖子。1997 年的。",
-          "where": "screen:msgs:laozhou"
+          "where": "screen:msgs:laozhou",
+          "me": "phone"
         },
         {
           "k": "speaker",
           "who": "laozhou",
           "t": "这人是不是你",
-          "where": "screen:msgs",
-          "me": "phone"
+          "where": "screen:msgs"
         }
       ]
     },

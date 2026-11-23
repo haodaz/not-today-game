@@ -4,8 +4,7 @@
     {
       "k": "narration",
       "t": "A bright meeting room, plenty of space. Everyone is waiting.",
-      "backdrop": "/room/dream/office_busy.jpg",
-      "me": "stand"
+      "backdrop": "/room/dream/office_busy.jpg"
     },
     {
       "k": "narration",
@@ -19,8 +18,7 @@
     },
     {
       "k": "narration",
-      "t": "Only then does the room dare to make a sound. Someone slaps the table, someone twists open a bottle of water, someone holds a phone up at the projector. You sit closest to the projector: you can't see the whole screen, but the words are clear.",
-      "me": "cross"
+      "t": "Only then does the room dare to make a sound. Someone slaps the table, someone twists open a bottle of water, someone holds a phone up at the projector. You sit closest to the projector: you can't see the whole screen, but the words are clear."
     },
     {
       "k": "speaker",
@@ -35,8 +33,7 @@
       "k": "narration",
       "who": "partner",
       "t": "Someone stops you in the corridor. This is Chen Weiwei, Vivi, your partner.",
-      "backdrop": "/room/dream/corridor_noon.jpg",
-      "me": "phone"
+      "backdrop": "/room/dream/corridor_noon.jpg"
     },
     {
       "k": "narration",
@@ -66,8 +63,7 @@
     {
       "k": "narration",
       "t": "The hundredth employee arrives in the afternoon. His backpack still on, he wipes his hand on his trousers before holding it out.",
-      "backdrop": "/room/dream/office_day.jpg",
-      "me": "type"
+      "backdrop": "/room/dream/office_day.jpg"
     },
     {
       "k": "speaker",
@@ -81,8 +77,7 @@
     {
       "k": "narration",
       "t": "The company is in the capital; home is a small city. Back for New Year this time, there are two more dishes than usual.",
-      "backdrop": "/room/dream/home_dinner.jpg",
-      "me": "eat"
+      "backdrop": "/room/dream/home_dinner.jpg"
     },
     {
       "k": "speaker",
@@ -105,8 +100,7 @@
     {
       "k": "narration",
       "t": "Then the models got better every year. Something you had spent two years building, one day someone else built with one sentence.",
-      "backdrop": "/room/dream/office_half.jpg",
-      "me": "desk"
+      "backdrop": "/room/dream/office_half.jpg"
     },
     {
       "k": "narration",
@@ -119,14 +113,12 @@
     },
     {
       "k": "narration",
-      "t": "With every pivot a few more desks went empty. A hundred, seventy, fifty.",
-      "me": "tired"
+      "t": "With every pivot a few more desks went empty. A hundred, seventy, fifty."
     },
     {
       "k": "narration",
       "t": "The last time in the office was an evening. The AI-native reform: the office was given up, everyone works from home.",
-      "backdrop": "/room/dream/office_night.jpg",
-      "me": "carton"
+      "backdrop": "/room/dream/office_night.jpg"
     },
     {
       "k": "speaker",
@@ -143,8 +135,7 @@
     },
     {
       "k": "narration",
-      "t": "Your small share wasn't worth much by the time you could sell it. Going back to your hometown: you thought about it, and set it aside again.",
-      "me": "tired"
+      "t": "Your small share wasn't worth much by the time you could sell it. Going back to your hometown: you thought about it, and set it aside again."
     },
     {
       "k": "narration",

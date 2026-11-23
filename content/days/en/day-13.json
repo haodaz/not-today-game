@@ -30,14 +30,14 @@
         {
           "k": "narration",
           "t": "Xiao Zhang's avatar is gone from the group.",
-          "where": "screen:msgs:group"
+          "where": "screen:msgs:group",
+          "me": "phone"
         },
         {
           "k": "speaker",
           "who": "xiaozhang",
           "t": "I'm going. Don't go in.",
-          "where": "screen:msgs",
-          "me": "phone"
+          "where": "screen:msgs"
         },
         {
           "k": "narration",

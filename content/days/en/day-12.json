@@ -26,14 +26,14 @@
         {
           "k": "narration",
           "t": "Lao Zhou and your family forward the same post on the same day. From 1997.",
-          "where": "screen:msgs:laozhou"
+          "where": "screen:msgs:laozhou",
+          "me": "phone"
         },
         {
           "k": "speaker",
           "who": "laozhou",
           "t": "Is this you",
-          "where": "screen:msgs",
-          "me": "phone"
+          "where": "screen:msgs"
         }
       ]
     },

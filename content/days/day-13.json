@@ -30,14 +30,14 @@
         {
           "k": "narration",
           "t": "小张的头像不在群里了。",
-          "where": "screen:msgs:group"
+          "where": "screen:msgs:group",
+          "me": "phone"
         },
         {
           "k": "speaker",
           "who": "xiaozhang",
           "t": "我走了。你别进去。",
-          "where": "screen:msgs",
-          "me": "phone"
+          "where": "screen:msgs"
         },
         {
           "k": "narration",

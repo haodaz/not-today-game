@@ -131,16 +131,18 @@ export function splitVoices(q: Queued): Queued[] {
     if (last && isKuroLine(last[0]!) === isKuroLine(l)) last.push(l);
     else runs.push([l]);
   }
-  // A backdrop / prop lasts until the sequence ends: a later piece's first line carries what was on.
+  // A backdrop / prop / the player's pose lasts until the sequence ends: a later piece's first line carries what was on.
   let backdrop: string | undefined;
   let prop: string | undefined;
+  let me: string | undefined;
   return runs.map((run, i): Queued => {
     const end = i === runs.length - 1;
     const first = run[0]!;
-    const lines = [{ ...first, ...(first.backdrop === undefined && backdrop !== undefined ? { backdrop } : {}), ...(first.prop === undefined && prop !== undefined ? { prop } : {}) }, ...run.slice(1)];
+    const lines = [{ ...first, ...(first.backdrop === undefined && backdrop !== undefined ? { backdrop } : {}), ...(first.prop === undefined && prop !== undefined ? { prop } : {}), ...(first.me === undefined && me !== undefined ? { me } : {}) }, ...run.slice(1)];
     for (const l of run) {
-      if (l.backdrop !== undefined) backdrop = l.backdrop;
+      if (l.backdrop !== undefined) { backdrop = l.backdrop; me = undefined; }
       if (l.prop !== undefined) prop = l.prop;
+      if (l.me !== undefined) me = l.me === "" ? undefined : l.me;
     }
     return {
       key: end ? q.key : `${q.key}#${i + 1}`,
@@ -206,11 +208,13 @@ export interface Scene {
   readonly stand?: string;
   /** texture-pass R2: the idle loop (webm with alpha) over `stand`, when it is the plain stand and one exists. */
   readonly standIdle?: string;
-  /** player-stands (2026-11-22): the player's own figure (a `me` pose in their look), at the side when an NPC stands. */
+  /**
+   * player-stands (2026-11-22): the player's own figure (a `me` pose in their look, with its loop), centre,
+   * and only alone — never while an NPC stands or another person's line is on (author: 独处的时候才有
+   * 主人公形象; 面对另一个人的时候不要出现 — two figures together read as a mess, the loop alone is fine).
+   */
   readonly me?: string;
   readonly meIdle?: string;
-  /** The line on show is the player's (narration, inner): their figure is lit, the NPC's dims. */
-  readonly meSpeaking?: boolean;
   readonly otherIdle?: string;
 }
 export const NO_SCENE: Scene = { backdrop: null, prop: null };
@@ -254,24 +258,28 @@ export function sceneOf(d: DialogueState, day = 0, look?: string): Scene {
       if (next !== null && l.pose !== undefined) poses.set(next, l.pose);
     }
   }
-  // player-stands: the player's figure while no prop holds the middle: at the side of a backdrop scene, or
-  // alone over the room (a cut-in for the rest of that sequence, author 2026-11-22: 第三天干完老王的活，吃冷饭之前该是什么样子)
-  const mine = look !== undefined && prop === null && me !== null && q.voice !== "kuro"
+  // player-stands: the player's figure, alone: no prop in the middle, nobody standing, and the line on show
+  // not another person's (Kuro and the player's own lines are fine); a cut-in for the rest of the sequence
+  // (author 2026-11-22: 第三天干完老王的活，吃冷饭之前该是什么样子)
+  const cur0 = q.lines[Math.min(d.line, q.lines.length - 1)];
+  const someoneElse = !!cur0 && (cur0.k === "speaker" || cur0.k === "narration") && cur0.who !== undefined && cur0.who !== "me" && cur0.who !== "kuro";
+  const npcShown = backdrop !== null && stand !== null;
+  const mine = look !== undefined && prop === null && me !== null && q.voice !== "kuro" && !npcShown && !someoneElse
     ? { me: `/player/looks/${look}_${me}.webp`, meIdle: `/anim/looks/${look}_${me}.webm` }
     : {};
-  if (backdrop === null && prop === null) return "me" in mine ? { ...NO_SCENE, ...mine, meSpeaking: true } : NO_SCENE;
+  if (backdrop === null && prop === null) return "me" in mine ? { ...NO_SCENE, ...mine } : NO_SCENE;
   // With a prop on (the 96): the prop holds the middle for the narration; the NPC takes it only for
   // their own line (author 2026-11-18: 卷子出现的时候是卷子，老师说话的时候才是老师).
   const cur = q.lines[Math.min(d.line, q.lines.length - 1)];
   const speaking = q.voice !== "kuro" && !!cur && (cur.k === "speaker" || cur.k === "narration") && cur.who !== undefined && cur.who !== "me";
   const show = backdrop !== null && stand !== null && (prop === null || speaking);
-  if (!show) return { backdrop, prop, ...mine, ...("me" in mine ? { meSpeaking: true } : {}) };
+  if (!show) return { backdrop, prop, ...mine };
   const pic = (who: string) => npcStandFor(who, poses.get(who), day)!;
   // the idle loop belongs to the plain stand only (it was drawn from it)
   const idle = (who: string) => (poses.get(who) === undefined && pic(who) === npcStand(who) ? npcIdle(who) : null);
   const s = pic(stand!), si = idle(stand!);
   const o = other !== null ? pic(other) : null, oi = other !== null ? idle(other) : null;
-  return { backdrop, prop, stand: s, ...(si !== null ? { standIdle: si } : {}), ...(o !== null ? { other: o } : {}), ...(oi !== null ? { otherIdle: oi } : {}), ...mine, ...("me" in mine ? { meSpeaking: !speaking } : {}) };
+  return { backdrop, prop, stand: s, ...(si !== null ? { standIdle: si } : {}), ...(o !== null ? { other: o } : {}), ...(oi !== null ? { otherIdle: oi } : {}) };
 }
 
 // ——— a line waits for its place (dialogue addition 2026-11-02) ———

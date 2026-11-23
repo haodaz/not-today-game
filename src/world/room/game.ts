@@ -177,15 +177,12 @@ function dlgLayer(dlg: SafeHtml | null, session: Session, readsOn: boolean, with
   // poster until it plays (author 2026-11-22: the still under the loop read as a second person standing behind)
   const figure = (src: string, idle: string | undefined, cls2: string) => (idle === undefined
     ? html`<img class="scene-stand${cls2}" src="${src}" alt="" aria-hidden="true" draggable="false">`
-    : html`<video class="scene-stand-anim${cls2}" src="${idle}" poster="${src}" autoplay muted loop playsinline aria-hidden="true"></video>`);
+    : html`<video class="scene-stand-anim${cls2}" src="${idle}" poster="${src}" autoplay muted playsinline aria-hidden="true"></video>`);
   // two-up (author 2026-11-20): with another person in the scene, the one speaking stands right and lit, the other left and dimmed
-  // player-stands (2026-11-22): the player's figure at the left, lit on their own lines; with it, the NPC stands right and dims while the player's line is on
-  const dim = scene.me !== undefined && scene.meSpeaking === true ? " dim" : "";
-  const npcImg = stand === undefined ? null : scene.other !== undefined
-    ? html`${figure(scene.other, scene.otherIdle, " other")}${figure(stand, scene.standIdle, ` speaking${dim}`)}`
-    : figure(stand, scene.standIdle, scene.me !== undefined ? ` speaking${dim}` : "");
-  const meImg = scene.me === undefined ? null : figure(scene.me, scene.meIdle, ` me${stand === undefined ? " alone" : ""}${scene.meSpeaking === true ? " lit" : ""}`);
-  const standImg = html`${meImg}${npcImg}`;
+  // player-stands (2026-11-22): the player's own figure, alone in the frame (sceneOf never gives it beside a person), with its loop
+  const standImg = scene.me !== undefined ? figure(scene.me, scene.meIdle, " me") : stand === undefined ? null : scene.other !== undefined
+    ? html`${figure(scene.other, scene.otherIdle, " other")}${figure(stand, scene.standIdle, " speaking")}`
+    : figure(stand, scene.standIdle, "");
   return html`<div class="${cls("dlg-layer", story && "masked", scene.me !== undefined && !story && "me-on", chat && !thread && "top", thread && "thread")}">${withMask ? boxMask(session, readsOn) : null}${standImg}${dlg}</div>`;
 }
 

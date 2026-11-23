@@ -7,6 +7,7 @@
 // `&night=1` / `&shutdown=1` preview that day's night or shutdown beat (world/loop/preview.ts).
 // The game opens in English (README); `?lang=zh` opens in Chinese.
 import "./world/desktop/desktop.css";
+import { watchIdleLoops } from "@world/dialogue/idle";
 import "./world/room/room.css";
 import { cutsSupported } from "./world/cut/layer";
 import "./world/room/devices.css";
@@ -114,6 +115,7 @@ function startGame(store: Store, saved: boolean, prologue = false): void {
   watchObjects(store, (id) => profile.recordObject(id), saved);
   const focus = params.get("focus");
   const view = params.get("view");
+  watchIdleLoops(document);
   const game = mountDesktop(root, {
     store,
     clock: parseBeatParams(search),

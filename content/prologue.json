@@ -4,8 +4,7 @@
     {
       "k": "narration",
       "t": "明亮的会议室，宽敞的空间。每个人都在等。",
-      "backdrop": "/room/dream/office_busy.jpg",
-      "me": "stand"
+      "backdrop": "/room/dream/office_busy.jpg"
     },
     {
       "k": "narration",
@@ -19,8 +18,7 @@
     },
     {
       "k": "narration",
-      "t": "整间屋子的人这才敢出声。有人拍桌子，有人去拧矿泉水的盖子，有人举起手机对着投影拍。你坐在离投影最近的位置，看不全屏幕，字倒看得很清楚。",
-      "me": "cross"
+      "t": "整间屋子的人这才敢出声。有人拍桌子，有人去拧矿泉水的盖子，有人举起手机对着投影拍。你坐在离投影最近的位置，看不全屏幕，字倒看得很清楚。"
     },
     {
       "k": "speaker",
@@ -35,8 +33,7 @@
       "k": "narration",
       "who": "partner",
       "t": "一个人在走廊里拦住你。她是陈薇薇，也叫 Vivi，你的合伙人。",
-      "backdrop": "/room/dream/corridor_noon.jpg",
-      "me": "phone"
+      "backdrop": "/room/dream/corridor_noon.jpg"
     },
     {
       "k": "narration",
@@ -66,8 +63,7 @@
     {
       "k": "narration",
       "t": "第一百个员工是下午来的。双肩包还没放下，伸手之前先在裤子上擦了一下。",
-      "backdrop": "/room/dream/office_day.jpg",
-      "me": "type"
+      "backdrop": "/room/dream/office_day.jpg"
     },
     {
       "k": "speaker",
@@ -81,8 +77,7 @@
     {
       "k": "narration",
       "t": "公司在帝都，你家在三线城市。这一年回家过年，菜比平时多两个。",
-      "backdrop": "/room/dream/home_dinner.jpg",
-      "me": "eat"
+      "backdrop": "/room/dream/home_dinner.jpg"
     },
     {
       "k": "speaker",
@@ -105,8 +100,7 @@
     {
       "k": "narration",
       "t": "后来，大模型一年比一年好用。你们花两年做出来的东西，有一天，别人用一句话就做出来了。",
-      "backdrop": "/room/dream/office_half.jpg",
-      "me": "desk"
+      "backdrop": "/room/dream/office_half.jpg"
     },
     {
       "k": "narration",
@@ -119,14 +113,12 @@
     },
     {
       "k": "narration",
-      "t": "每转型一次，工位就空一些。一百个，七十个，五十个。",
-      "me": "tired"
+      "t": "每转型一次，工位就空一些。一百个，七十个，五十个。"
     },
     {
       "k": "narration",
       "t": "最后一次在办公室，是个晚上。AI 原生改革：办公室退了，人人在家办公。",
-      "backdrop": "/room/dream/office_night.jpg",
-      "me": "carton"
+      "backdrop": "/room/dream/office_night.jpg"
     },
     {
       "k": "speaker",
@@ -143,8 +135,7 @@
     },
     {
       "k": "narration",
-      "t": "你那点股份，等到能卖的时候，已经不值什么了。回老家的事，想了又放下。",
-      "me": "tired"
+      "t": "你那点股份，等到能卖的时候，已经不值什么了。回老家的事，想了又放下。"
     },
     {
       "k": "narration",
