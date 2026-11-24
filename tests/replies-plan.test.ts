@@ -30,6 +30,13 @@ describe("lineTiming", () => {
     expect(lineTiming("09:14", "09:14")).toEqual({ kind: "now" });
     expect(lineTiming("09:14", "09:00")).toEqual({ kind: "atBeat", t: "09:14" });
   });
+  it("#23: a line stamped more than an hour ahead of the clock arrives now and never moves the clock (day 2's 16:20 answer in the morning)", () => {
+    expect(lineTiming("16:20", "09:03", true)).toEqual({ kind: "now" });
+    expect(lineTiming("10:03", "09:03", true)).toEqual({ kind: "atBeat", t: "10:03" });
+    expect(lineTiming("10:04", "09:03", true)).toEqual({ kind: "now" });
+    // an incoming line keeps its beat time however far ahead (the afternoon's messages wait for the clock)
+    expect(lineTiming("16:20", "09:03")).toEqual({ kind: "atBeat", t: "16:20" });
+  });
 });
 
 describe("planReply", () => {

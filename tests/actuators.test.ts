@@ -279,7 +279,8 @@ describe("the one-time pointer (day-loop rule 2026-11-01)", () => {
     store.appendEvent({ kind: "openLayer", objectId: "pager" });
     while (store.getState().day < pager.offerFrom) store.appendEvent({ kind: "lieDown" });
     const { ctx } = ctxOf(store, "room");
-    expect(render(ctx)).toContain('class="kuro-btn pointer-once"');
+    // author 2026-11-24 (#22): the offer is made at the object while it is used (objects/index.ts); no pointer on the body
+    expect(render(ctx)).not.toContain('class="kuro-btn pointer-once"');
     act(ctx, "kuro-call");
     act(ctx, "kuro-leave");
     expect(render(ctx)).not.toContain("pointer-once");

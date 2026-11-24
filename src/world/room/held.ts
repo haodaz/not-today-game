@@ -10,7 +10,8 @@ import { renderPhoneApp } from "@world/delivery/app";
 import { bleedingToday } from "@world/dialogue/taboo";
 import { cls, html, raw, type SafeHtml } from "@world/html";
 import { handOf, type KeySpot, type Reel, type Rect } from "@state/hands";
-import { CHICK_H, CHICK_W } from "@world/objects/frames";
+import { CHICK_W } from "@world/objects/frames";
+import { CHICK_SCREEN_H } from "@world/objects/chick";
 import { PAGER_H, PAGER_W } from "@world/objects/pager";
 import { CALC_H, CALC_W } from "@world/objects/calculator";
 import { DICT_COLS, DICT_ROWS, type DictionaryState } from "@world/objects/dictionary";
@@ -20,6 +21,8 @@ import { envFor, peekState } from "@world/objects/index";
 import type { ObjectEnv } from "@world/objects/program";
 import { STAGE_W } from "@world/room/splat/geometry";
 import { hasString, t, tr } from "@world/i18n";
+import { CHICK_ICONS } from "@world/objects/frames";
+import { chickIconMark } from "./devices";
 import { FLIPPERS, isDevice, renderDevice } from "@world/room/devices";
 import { readFooter } from "@world/desktop/workbench/lockread";
 
@@ -32,7 +35,7 @@ export const CELL_H = 12;
  * 2 × 16 dot-matrix cells (6 × 12 each). The card, the tape, the phone and the camera have none.
  */
 export const CHANNELS: Readonly<Record<string, { readonly w: number; readonly h: number }>> = {
-  chick: { w: CHICK_W, h: CHICK_H },
+  chick: { w: CHICK_W, h: CHICK_SCREEN_H }, // chick-face v3 (#24): the pet plus the two icon rows
   pager: { w: PAGER_W, h: PAGER_H },
   calculator: { w: CALC_W, h: CALC_H },
   dictionary: { w: DICT_COLS * CELL_W, h: DICT_ROWS * CELL_H + 1 },
@@ -238,8 +241,12 @@ export function object(state: State, events: readonly GameEvent[], session: Sess
     const read = using && !session.objbarOpen ? readFooter(state, events, session, id, nowMs) : null;
     // chick-raising R3: how its three keys work, a small caption under it (not a Kuro line); not
     // once Kuro has it (then nothing pressed does anything).
-    const caption = using && id === "chick" && !upgraded && hasString("obj.chick.caption") ? html`<p class="dev-caption">${tr("obj.chick.caption")}</p>` : null;
-    const footer = read || caption ? html`${read}${caption}` : null;
+    // author 2026-11-24 (#27): the camera's keys in a line too; (#13) the chick's 说明 opens its how-to card.
+    const capKey = id === "chick" ? "obj.chick.caption" : id === "camera" ? "obj.camera.caption" : null;
+    const helpBtn = id === "chick" && hasString("obj.chick.help") ? html` <button type="button" class="${cls("dev-help-btn", session.chickHelp && "on")}" data-action="chick-help" aria-expanded="${session.chickHelp ? "true" : "false"}">${tr("obj.chick.help")}</button>` : null;
+    const caption = using && capKey && !upgraded && hasString(capKey) ? html`<p class="dev-caption">${tr(capKey)}${helpBtn}</p>` : null;
+    const help = using && id === "chick" && !upgraded && session.chickHelp ? chickHelpCard() : null;
+    const footer = read || caption || help ? html`${read}${caption}${help}` : null;
     const device = renderDevice(id, state, session, env.level, nowMs, open === true, p, footer)!;
     return html`<div class="${cls("held", "obj", "device", upgraded && "upgraded", using && "using", using && "focus", faint && "faint")}" data-object="${id}" data-mode="${using ? "using" : "holding"}" data-face="${session.hand.face}"${attrs}><div class="breathe"><div class="turn"><div class="face front device-face">${device}</div></div></div></div>`;
   }
@@ -248,6 +255,13 @@ export function object(state: State, events: readonly GameEvent[], session: Sess
   // A flippable photo object (iccard, phone, camera) shows the flip button under it in 使用.
   const turn = using && FLIPPERS.includes(id) && hasString("obj.flip") ? html`<div class="turnbar"><button type="button" class="turnbtn" data-action="obj-flip" data-object="${id}">${tr("obj.flip")}</button></div>` : null;
   return html`<div class="${cls("held", "obj", upgraded && "upgraded", using && "using", using && "focus", faint && "faint")}" data-object="${id}" data-mode="${using ? "using" : "holding"}" data-face="${session.hand.face}"${attrs}><div class="breathe"><div class="turn"><div class="face front"><img src="${img}" alt="" draggable="false">${screen(id, state, env.level, using)}${keys}${front}</div><div class="face back"><div class="back-art"><img src="/objects/${id}_back.png" alt="" draggable="false">${back}</div></div></div></div>${turn}</div>`;
+}
+
+/** author 2026-11-24 (#13): the chick's how-to card — the three keys, then the eight icons with what each does. */
+function chickHelpCard(): SafeHtml {
+  const keys = (["A", "B", "C"] as const).map((k) => html`<li><b>${k}</b>${tr(`obj.chick.help.${k}`)}</li>`);
+  const icons = CHICK_ICONS.map((icon) => html`<li>${chickIconMark(icon)}<span>${hasString(`obj.chick.icon.${icon}`) ? tr(`obj.chick.icon.${icon}`) : icon}</span></li>`);
+  return html`<div class="dev-help" role="region" aria-label="${t("obj.chick.help.title")}"><b class="dev-help-t">${tr("obj.chick.help.title")}</b><ul class="dev-help-keys">${keys}</ul><ul class="dev-help-icons">${icons}</ul>${hasString("obj.chick.help.cap") ? html`<p class="dev-help-cap">${tr("obj.chick.help.cap")}</p>` : null}</div>`;
 }
 
 /** The held layer, or null when nothing is held. */

@@ -17,7 +17,7 @@ export function viewfinderLayer(session: Pick<Session, "viewfinder" | "hand">, n
   if (!session.viewfinder) return null;
   const close = hasString("camera.viewfinder.close") ? t("camera.viewfinder.close") : "";
   const flash = cameraFlashing((session.hand.programs.camera as CameraState | undefined) ?? null, nowMs) ? html`<i class="vf-flash" aria-hidden="true"></i>` : null;
-  return html`<div class="vf" data-viewfinder="1"><div class="vf-frame" aria-hidden="true"><i class="c tl"></i><i class="c tr"></i><i class="c bl"></i><i class="c br"></i></div><button type="button" class="vf-shutter" data-action="vf-shutter" aria-label="${hasString("obj.key.camera.shutter") ? t("obj.key.camera.shutter") : ""}"><i class="ring"><i class="dot"></i></i></button><button type="button" class="vf-close" data-action="vf-close" aria-label="${close}">×</button>${flash}</div>`;
+  return html`<div class="vf" data-viewfinder="1"><div class="vf-frame" aria-hidden="true"><i class="c tl"></i><i class="c tr"></i><i class="c bl"></i><i class="c br"></i></div><button type="button" class="vf-shutter" data-action="vf-shutter" aria-label="${hasString("obj.key.camera.shutter") ? t("obj.key.camera.shutter") : ""}"><i class="ring"><i class="dot"></i></i></button><button type="button" class="vf-close" data-action="vf-close" aria-label="${close}">×</button>${hasString("camera.viewfinder.hint") ? html`<p class="vf-hint">${tr("camera.viewfinder.hint")}</p>` : null}${flash}</div>`;
 }
 
 /**

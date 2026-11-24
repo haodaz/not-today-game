@@ -72,8 +72,8 @@ export function startTalk(ctx: ActionContext): void {
   if (talking(session.dialogue)) return;
   const state = store.getState();
   let d = session.dialogue;
-  const offer = isNight(session.clock) ? null : currentOffer(state, store.getEvents());
-  if (offer) d = push(d, item(session, state.day, offer.line, { kind: "kuroOffer", object: offer.object, decline: offer.kind }));
+  // author 2026-11-24 (#22): the upgrade offer is made at the object while it is used (objects/index.ts
+  // offerAtObject), with a lead-in; the chat no longer opens with it out of nowhere.
   // playtest-1105 R6: while today's chat is locked (its checklist item opens after the work), a
   // click is its one line, kuro.room.notYet, with nothing to answer (after the offer, if one waits).
   // (The night beat comes after shutdown, so the chat beat is never locked.)

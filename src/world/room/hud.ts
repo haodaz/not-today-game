@@ -587,6 +587,8 @@ const PROXIES: Readonly<Record<HotId, Proxy>> = {
   monitorR: { cls: "shot-hit monitor-hit", attrs: 'data-action="view" data-view="desktop" data-screen="right"', label: () => `${t("hud.cam.screen")} · ${t("desktop.screen.right")}`, rect: (v) => (v === "desk" ? DESK_SHOT.monitors.right : ROOM_SHOT.monitors.right) },
   lamp: { cls: "shot-hit lamp-hit", attrs: 'data-action="lamp"', label: () => t("room.lamp"), rect: (v) => (v === "desk" ? deskLayout.lamp : ROOM_SHOT.lamp) },
   desk: { cls: "shot-hit", attrs: 'data-action="view" data-view="desk"', label: () => t("hud.cam.desk"), rect: () => ROOM_SHOT.desk },
+  // author 2026-11-24 (#3): the chair is the desk's other way in — 坐到桌前
+  chair: { cls: "shot-hit chair-hit", attrs: 'data-action="view" data-view="desk"', label: () => t("room.chair"), rect: () => ROOM_SHOT.chair },
   // box-arrival R1: there is no carton to point at before it has arrived.
   box: { cls: "shot-hit box-hit", attrs: 'data-action="pick-box"', label: () => t("room.box"), rect: () => ROOM_SHOT.box, shown: (state, events) => boxArrived(state, events) },
   bed: { cls: "shot-hit bed-hit", attrs: 'data-action="bed"', label: () => t("room.bed"), rect: () => ROOM_SHOT.bed },

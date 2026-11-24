@@ -24,10 +24,6 @@
           "k": "narration",
           "t": "The loose one in the case. An instant camera, a cream-white shell, a red shutter.",
           "me": "carton"
-        },
-        {
-          "k": "inner",
-          "t": "The little window on the back says: 10. Ten sheets left."
         }
       ]
     },
@@ -203,6 +199,24 @@
       "onDone": {
         "say": [
           {
+            "k": "speaker",
+            "who": "me",
+            "t": "Wanted it that urgently, and then doesn't open it.",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "He doesn't ask, you don't tell. The enemy holds still; so do I.",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "Mm. Fine. Not much to do today anyway.",
+            "where": "screen:msgs:boss"
+          },
+          {
             "k": "inner",
             "t": "Vivi has posted another page. '@tech' means me.",
             "where": "screen:msgs:group"
@@ -278,7 +292,16 @@
       "text": "One box in the case is loose. Take it out.",
       "unlock": "done:pickup",
       "done": "event:openBox",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "inner",
+            "t": "The instant camera is on the desk too. Next to the chick, lens facing out.",
+            "where": "desk"
+          }
+        ]
+      }
     },
     {
       "id": "reply",

@@ -40,10 +40,43 @@ export interface ChickState {
   readonly fullSaid?: boolean;
 }
 
-/** chick-raising R2: the status screen's rows (4 px each), the bar's start and its longest length. */
+/**
+ * chick-face v3 (author 2026-11-24 #24): the eight icons sit on the LCD, a row of four above the pet
+ * and a row of four below (the shell printed them outside the glass; she wanted them on the screen).
+ * The screen channel is the pet's 48 × 32 plus the two rows; the selected icon is shown inverted.
+ */
+export const ICON_ROW_H = 10;
+export const CHICK_SCREEN_H = CHICK_H + 2 * ICON_ROW_H;
+/** The icons' x in a row of four (9 wide, 3 apart, 1 in from the edge). */
+export const ICON_XS: readonly number[] = [1, 13, 25, 37];
+/** The pet's picture starts under the top row. */
+export const PET_Y = ICON_ROW_H;
+
+/** chick-raising R2: the status screen's rows (8 px each), the bar's start and its longest length. */
 export const STAT_ROW_H = 8;
 export const STAT_BAR_X = 15;
-export const STAT_BAR_MAX = 28;
+/** chick-face v3: the bar is capped at 20 so the number fits after it (two digits, 3 × 5 each, right-aligned at 47). */
+export const STAT_BAR_MAX = 20;
+export const STAT_NUM_X = 41;
+/** A 3 × 5 digit face for the status screen's numbers. */
+const DIGITS: readonly (readonly string[])[] = [
+  ["###", "#.#", "#.#", "#.#", "###"],
+  [".#.", "##.", ".#.", ".#.", "###"],
+  ["###", "..#", "###", "#..", "###"],
+  ["###", "..#", "###", "..#", "###"],
+  ["#.#", "#.#", "###", "..#", "..#"],
+  ["###", "#..", "###", "..#", "###"],
+  ["###", "#..", "###", "#.#", "###"],
+  ["###", "..#", ".#.", ".#.", ".#."],
+  ["###", "#.#", "###", "#.#", "###"],
+  ["###", "#.#", "###", "..#", "###"],
+];
+/** `n` (0–99) in the 3 × 5 face, right-aligned so its last digit ends at `right`. */
+export function drawNumber(b: Bits, n: number, right: number, y: number): void {
+  const text = String(Math.max(0, Math.min(99, Math.floor(n))));
+  let x = right - 2;
+  for (let i = text.length - 1; i >= 0; i--, x -= 4) b.blit(DIGITS[Number(text[i])]!, x, y);
+}
 /** chick-face v2: each bar's inside starts this far down its row, and is this tall. */
 export const STAT_BAR_Y = 3;
 export const STAT_BAR_H = 4;
@@ -90,22 +123,31 @@ export function chickFrameAt(s: ChickState, env: ObjectEnv): ChickFrameId {
 }
 
 export function drawChick(s: ChickState, env: ObjectEnv, table: ChickFrames = chickFrames): Frame {
-  const b = new Bits(CHICK_W, CHICK_H);
+  const b = new Bits(CHICK_W, CHICK_SCREEN_H);
   const id = chickFrameAt(s, env);
-  b.blit(table.frames.get(id) ?? []);
+  b.blit(table.frames.get(id) ?? [], 0, PET_Y);
   // The new world: the same picture, smooth and in colour; it is always smiling. Once Kuro has moved
   // in, Kuro's pose fills it instead (a glimpse while on loan, only Kuro once taken; object-upgrade).
+  // The new world has no menu: the rows stay empty.
   if (env.upgraded) return upgradedHi(env, s.press, { lines: [], picture: { w: b.w, h: b.h, bits: b.bits } });
-  // chick-face v2: the icons are printed on the shell (devices.ts), never on the LCD; the menu's
-  // selection is lit there. The LCD is the pet's alone.
+  // chick-face v3 (#24): the eight icons on the LCD, four above the pet and four below; the one A
+  // selected is shown inverted (a dark cell around it).
+  CHICK_ICONS.forEach((icon, i) => {
+    const x = ICON_XS[i % 4]!;
+    const y = i < 4 ? 0 : PET_Y + CHICK_H + 1;
+    b.blit(table.icons.get(icon) ?? [], x, y);
+    if (s.menu === i) b.invert(x - 1, i < 4 ? 0 : y - 1, ICON_SIZE + 2, ICON_SIZE + 1);
+  });
   if (id === "check") {
-    // chick-raising R2 / chick-face v2: the content's status template (the four marks and the bar
-    // frames, 攻 防 血 敏) with each bar's inside filled from x = 15 to the stat (≤ 28). The inside is
-    // cleared first: the template's own sample fill is not a number.
+    // chick-raising R2 / chick-face v3: the content's status template (the four marks 攻 防 血 敏 at the
+    // left) with, from x = 15, each bar filled to the stat (≤ 20) and the stat's number after it. The
+    // template's own bar frames and sample fill are cleared first: they are not numbers.
     STAT_ORDER.forEach((stat, i) => {
-      const y = STAT_BAR_Y + i * STAT_ROW_H;
-      b.rect(STAT_BAR_X, y, STAT_BAR_MAX, STAT_BAR_H, 0);
-      b.rect(STAT_BAR_X, y, Math.min(env.stats?.[stat] ?? 0, STAT_BAR_MAX), STAT_BAR_H, 1);
+      const y0 = PET_Y + i * STAT_ROW_H;
+      const n = env.stats?.[stat] ?? 0;
+      b.rect(STAT_BAR_X, y0, CHICK_W - STAT_BAR_X, STAT_ROW_H, 0);
+      b.rect(STAT_BAR_X, y0 + STAT_BAR_Y, Math.min(n, STAT_BAR_MAX), STAT_BAR_H, 1);
+      drawNumber(b, n, CHICK_W - 1, y0 + 2);
     });
   }
   if (s.flashAt !== null && env.t - s.flashAt >= 0 && env.t - s.flashAt < CHICK_FLASH_MS) b.invert(0, 0, b.w, b.h);
@@ -117,7 +159,7 @@ const BEEP = "chick-beep";
 
 export const chick: Program<ChickState> = {
   id: "chick",
-  channel: { w: CHICK_W, h: CHICK_H },
+  channel: { w: CHICK_W, h: CHICK_SCREEN_H },
   keySound: { id: BEEP },
   init: (env) => ({ menu: null, act: null, flashAt: null, born: env.t, press: NO_PRESS }),
   key(s, key, env) {

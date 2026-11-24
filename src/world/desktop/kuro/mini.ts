@@ -34,8 +34,9 @@ export function turnsUsedUp(ctx: Pick<AppContext, "state">): boolean {
 
 /** The last thing it said, as the pill shows it (bottom line first: offer, work, idiom). */
 export function lastKuroLine(ctx: AppContext): string | null {
-  const offer = ctx.night ? null : currentOffer(ctx.state, ctx.events);
-  if (offer) return offer.line;
+  // author 2026-11-24 (#22): the offer is its line only while the object it is about is in use
+  const offer = ctx.night || !ctx.session.hand.using ? null : currentOffer(ctx.state, ctx.events);
+  if (offer && ctx.session.holding === offer.object) return offer.line;
   const work = taskLines(ctx);
   if (work.length) return work.at(-1)!;
   if (turnsUsedUp(ctx)) return t("kuro.bedtime");
@@ -126,6 +127,6 @@ export function hudKuro(ctx: AppContext): SafeHtml {
   if (kuroInBox(ctx.session.dialogue)) return html`<div class="hud-kuro talking"><span class="kpet kuro-still" data-state="talk" aria-hidden="true">${renderLayer("talk", lateRing(ctx.state.day))}</span></div>`;
   const unread = kuroUnread(ctx);
   // The first upgrade offer has no checklist line: a one-time pointer on the body (rule 2026-11-01).
-  const offer = pointerCls(ctx.session, "offer", !ctx.night && currentOffer(ctx.state, ctx.events) !== null);
+  const offer = pointerCls(ctx.session, "offer", false); // author 2026-11-24 (#22): the offer comes at the object now; no pointer on the body
   return html`<div class="hud-kuro"><button type="button" class="${cls("kuro-btn", unread && "unread", offer)}" data-action="kuro-call" aria-label="${t("kuro.name")}"><span class="kpet" data-kuro-slot data-state="${kuroBodyState(ctx)}"${redAttr(ctx.state.day)} aria-hidden="true"></span>${unread ? html`<i class="dot"></i>` : null}</button></div>`;
 }

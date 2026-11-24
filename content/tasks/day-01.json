@@ -56,6 +56,8 @@
             "id": "c1",
             "text": "一个知识图谱，二百多个节点，把甲方的业务对象连起来",
             "patch": {
+              "6": "  title: \"底座是一张图谱：二百一十一个点，一根一根连起来的\",",
+              "8": "  stats: () => ({ nodes: SNAP.nodes.length, links: SNAP.links.length }),  // 数得出来的才写",
               "9": "  draw: (t) => draw.project(SNAP, t),  // 二百一十一个点，一根根连的"
             }
           },
@@ -63,28 +65,36 @@
             "id": "c2",
             "text": "三家客户的表格，每周导入一次",
             "patch": {
-              "8": "  fields: SNAP.clients.map((c) => c.fields),  // 三家三套，每周导一次"
+              "6": "  title: \"三家客户，三套表，每周导一次\",",
+              "8": "  fields: SNAP.clients.map((c) => c.fields),  // 三家三套，每周导一次",
+              "9": "  draw: (t) => draw.columns(SNAP.clients, t)  // 三列，各是各的"
             }
           },
           {
             "id": "c3",
             "text": "AI 先合一版，人再核一遍",
             "patch": {
-              "8": "  loop: (x, y, yHat, K) => x + K * (y - yHat),  // 人核一遍，误差回流"
+              "6": "  title: \"AI 先合一版，人再核一遍\",",
+              "8": "  loop: (x, y, yHat, K) => x + K * (y - yHat),  // 人核一遍，误差回流",
+              "9": "  draw: (t) => draw.review(SNAP.reviews, t)  // 每一次核都回流"
             }
           },
           {
             "id": "c4",
             "text": "懂甲方的行业，图谱是一点点对出来的",
             "patch": {
-              "8": "  // 换模型只是换一种读法：x′ = U x，图谱还是那张图谱"
+              "6": "  title: \"护城河不是模型，是对出来的那张图谱\",",
+              "8": "  // 换模型只是换一种读法：x′ = U x，图谱还是那张图谱",
+              "9": "  draw: (t) => draw.rotate(SNAP, t)  // 换模型，图不变"
             }
           },
           {
             "id": "c5",
             "text": "两个试点客户，一个已付款",
             "patch": {
-              "8": "  clients: SNAP.receivable,  // 两个试点，到账一个"
+              "6": "  title: \"两个试点客户，到账一个\",",
+              "8": "  clients: SNAP.receivable,  // 两个试点，到账一个",
+              "9": "  draw: (t) => draw.clients(SNAP.receivable, t)  // 以应收表为准"
             }
           },
           {

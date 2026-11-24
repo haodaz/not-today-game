@@ -226,6 +226,16 @@ export interface Session {
   boss: import("../endings/boss").BossBattle | null;
   /** The object lifted off the desk bar (polish FR1); never at the same time as the phone. */
   holding: string | null;
+  /** author 2026-11-24 (#26): objects held once this run — `hold.first.<id>` plays at the first lift. */
+  firstHeld: Set<string>;
+  /** author 2026-11-24 (#28): Kuro has said where a shot goes (once a run). */
+  photoWhereSaid: boolean;
+  /** author 2026-11-24 (#13): the chick's how-to card is open in 使用. */
+  chickHelp: boolean;
+  /** author 2026-11-24 (#22): real key presses on an object with an upgrade pending, this session; the offer comes at the third. */
+  offerPresses: Record<string, number>;
+  /** author 2026-11-24 (#22): `<day>:<object>` the offer was put while using it today (once a day). */
+  offerShown: string | null;
   /**
    * objects-in-room R1: the desk lamp, as the player last clicked it; null = as the hour has it (lit
    * in the evening, off by day). Session only (the `useAt` event records what it meant).
@@ -632,6 +642,11 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     book: null,
     figureOpen: null,
     holding: null,
+    firstHeld: new Set(),
+    photoWhereSaid: false,
+    chickHelp: false,
+    offerPresses: {},
+    offerShown: null,
     lampOn: null,
     ceilOn: false,
     lyingSaid: null,

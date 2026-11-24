@@ -720,6 +720,21 @@ function arrive(ctx: ActionContext, view: View, data: DOMStringMap): void {
   ctx.rerender();
 }
 
+/**
+ * author 2026-11-24 (#26): the first time an object is in the hand this run, its own inner line
+ * (`hold.first.<id>`: the camera's 「背面的小窗里写着：10。还剩十张。」, moved here from day 2's box beat).
+ */
+function firstHold(ctx: ActionContext, id: string | null): void {
+  if (!id || ctx.session.firstHeld.has(id)) return;
+  const key = `hold.first.${id}`;
+  if (!hasString(key)) return;
+  // Recognised this run: the line came with the answer (runtime.ts); not known at all: the question is still to come.
+  const events = ctx.store.getEvents();
+  if (events.some((e) => e.kind === "recognise" && e.objectId === id) || !knows(id, ctx.store.getState(), events)) return;
+  ctx.session.firstHeld.add(id);
+  ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${ctx.store.getState().day}:${key}`, lines: [{ k: "inner", t: t(key) }], ending: { kind: "none" } });
+}
+
 export const loopActions: Record<string, ActionHandler> = {
   // Everything that moves the player (a hotspot's data-view, the sleep flow, the 道具 strip) goes
   // the shortest way (room-turn R2).
@@ -1527,6 +1542,7 @@ export const loopActions: Record<string, ActionHandler> = {
     session.holding = hand.object;
     restHand(session);
     session.phoneOpen = false;
+    firstHold(ctx, hand.object);
     // The first 举起来 done: its one-time pointer never shows again this run.
     pointed(session, "hold");
     // Picked up and still not known: the question comes back, once a day (recognise FR1).
@@ -1698,6 +1714,16 @@ export const loopActions: Record<string, ActionHandler> = {
   "vf-sheet-away"(ctx) {
     if (ctx.session.sheetShown === null) return;
     ctx.session.sheetShown = null;
+    // author 2026-11-24 (#28): the first shot of the run — Kuro says where it went (相册, in 文件 on the screen)
+    if (!ctx.session.photoWhereSaid && hasString("camera.where")) {
+      ctx.session.photoWhereSaid = true;
+      ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${ctx.store.getState().day}:camera.where`, lines: [{ k: "speaker", who: "kuro", t: t("camera.where") }], ending: { kind: "none" } });
+    }
+    ctx.rerender();
+  },
+  // author 2026-11-24 (#13): the chick's how-to card under it in 使用 (说明 toggles it)
+  "chick-help"(ctx) {
+    ctx.session.chickHelp = !ctx.session.chickHelp;
     ctx.rerender();
   },
   // The hand layer turned it over (a drag that reached the limit): the other face stays up.
@@ -1755,6 +1781,7 @@ export const loopActions: Record<string, ActionHandler> = {
     // Close any held clamshell first, then open the object (same holding + hand.using as the room).
     restHand(session);
     if (!openObjectFromBar(session, state, id)) return; // not found
+    firstHold(ctx, id);
     // objects-in-room R2: used at the desk (屏幕 is 房间's).
     enterUse(ctx, id);
     // The dictionary is a clamshell: using it opens it (as in the room's obj-use).
@@ -1837,6 +1864,7 @@ export const loopActions: Record<string, ActionHandler> = {
     session.phoneOpen = false;
     session.holding = object;
     restHand(session);
+    firstHold(ctx, object);
     ctx.rerender();
   },
 

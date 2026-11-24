@@ -11,7 +11,7 @@ import { cls, html, raw, type SafeHtml } from "@world/html";
 import { hasString, t, tr } from "@world/i18n";
 import { Bits, drawSegLine, finer, SEG_PITCH } from "@world/objects/frame";
 import { CHICK_H, CHICK_ICONS, CHICK_W, chickFrames, ICON_SIZE, type ChickFrames, type ChickIcon } from "@world/objects/frames";
-import type { ChickState } from "@world/objects/chick";
+import { CHICK_SCREEN_H, type ChickState } from "@world/objects/chick";
 import { PAGER_H, PAGER_W, PAGER_DIGITS_X, PAGER_CELLS } from "@world/objects/pager";
 import { CALC_CELLS, CALC_H, CALC_W } from "@world/objects/calculator";
 import { DICT_COLS, DICT_ROWS } from "@world/objects/dictionary";
@@ -87,7 +87,7 @@ export function ghostBits(id: string, level: number): { w: number; h: number; bi
   }
   // Pixel (chick) and dot-matrix (dictionary) channels: every pixel of the channel ghosts.
   const w = id === "chick" ? CHICK_W : DICT_COLS * CELL_W;
-  const h = id === "chick" ? CHICK_H : DICT_ROWS * CELL_H + 1;
+  const h = id === "chick" ? CHICK_SCREEN_H : DICT_ROWS * CELL_H + 1;
   const b = new Bits(w, h);
   b.rect(0, 0, w, h);
   return finer(b, level);
@@ -117,8 +117,8 @@ function glass(ctx: DeviceCtx, cw: number, ch: number): SafeHtml {
   return html`<div class="glass"><canvas class="${cls("dev", upgraded && "hi")}" data-screen="${ctx.object}" width="${cw * DEVICE_BACKING}" height="${ch * DEVICE_BACKING}"></canvas></div>`;
 }
 
-/** chick-face v2: one printed icon — the content's 9 × 9 bitmap as unit squares, crisp. */
-function printedIcon(icon: ChickIcon, on: boolean, table: ChickFrames): SafeHtml {
+/** chick-face v2 / v3: one icon as markup — the content's 9 × 9 bitmap as unit squares, crisp (the how-to card uses it; the LCD draws its own). */
+export function chickIconMark(icon: ChickIcon, on = false, table: ChickFrames = chickFrames): SafeHtml {
   let d = "";
   (table.icons.get(icon) ?? []).forEach((row, y) => [...row].forEach((c, x) => (c === "#" ? (d += `M${x} ${y}h1v1h-1z`) : undefined)));
   return html`<i class="${cls("egg-ic", on && "on")}" data-icon="${icon}"><svg viewBox="0 0 ${String(ICON_SIZE)} ${String(ICON_SIZE)}" shape-rendering="crispEdges" aria-hidden="true"><path d="${d}" fill="currentColor"/></svg></i>`;
@@ -129,12 +129,6 @@ function printedIcon(icon: ChickIcon, on: boolean, table: ChickFrames): SafeHtml
  * (meal · light · play · medicine) and four below (toilet · checkup · training · attention), in A's
  * order; the one A has selected is lit as on a real device. Upgraded, none is marked.
  */
-export function chickIconRows(menu: number | null, upgraded: boolean, table: ChickFrames = chickFrames): { top: SafeHtml; bottom: SafeHtml } {
-  const sel = upgraded ? null : menu;
-  const row = (from: number) => html`<div class="${cls("egg-icons", from === 0 ? "egg-top" : "egg-bottom")}">${CHICK_ICONS.slice(from, from + 4).map((icon, i) => printedIcon(icon, sel === from + i, table))}</div>`;
-  return { top: row(0), bottom: row(4) };
-}
-
 function chick(ctx: DeviceCtx): SafeHtml {
   const down = downKey(ctx);
   const live = ctx.session.hand.using;
@@ -143,8 +137,8 @@ function chick(ctx: DeviceCtx): SafeHtml {
   const front = () => {
     const brand = hasString("obj.brand.chick") ? tr("obj.brand.chick") : null;
     const btn = (k: string) => key("chick", k, down === k, live, "");
-    const icons = chickIconRows((ctx.p as ChickState | null)?.menu ?? null, upgraded);
-    return html`${brand ? html`<div class="brand">${brand}</div>` : null}<div class="bezel">${icons.top}${glass(ctx, CHICK_W, CHICK_H)}${icons.bottom}</div><div class="btns">${btn("A")}${btn("B")}${btn("C")}</div><div class="lbl"><span>A</span><span>B</span><span>C</span></div>`;
+    // chick-face v3 (#24): the icons are on the LCD now (chick.ts draws them); the glass holds the whole screen
+    return html`${brand ? html`<div class="brand">${brand}</div>` : null}<div class="bezel">${glass(ctx, CHICK_W, CHICK_SCREEN_H)}</div><div class="btns">${btn("A")}${btn("B")}${btn("C")}</div><div class="lbl"><span>A</span><span>B</span><span>C</span></div>`;
   };
   // The drawn back (2026-11-03): the egg's warmer shade, a battery cover with `⇩ LR44 × 2`, one
   // screw, the reset pinhole as a real obj-key button, the RESET label. Reset behaviour is unchanged.

@@ -84,6 +84,7 @@ describe("the boxes (calibration.ts) and today's rectangles", () => {
     near(r.monitorR!, ROOM_SHOT.monitors.right);
     near(r.box!, ROOM_SHOT.box);
     near(r.lamp!, ROOM_SHOT.lamp);
+    near(r.chair!, ROOM_SHOT.chair); // author 2026-11-24 (#3)
   });
 
   it("desk: the fixed 桌子 pose gives back the monitors' visible halves (desk.json) and the lamp, clipped to the stage", () => {

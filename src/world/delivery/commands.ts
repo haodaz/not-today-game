@@ -1,5 +1,6 @@
 // The few things the player does with the phone and the door, bound to the store. Each checks
 // what needs the log or the beat time (E8), then appends one event; the reducers check the rest.
+import { loopContext, mealToOrder } from "@world/loop/checklist";
 import { deliveryTable, mealOf, type Meal } from "@state/delivery/table";
 import type { State } from "@state/types.gen";
 import type { Store } from "@state/store";
@@ -31,7 +32,10 @@ export interface OrderInput {
 export function placeOrder(store: Store, { meal, shopId, itemId, now }: OrderInput): State {
   checkBeat(now);
   const day = store.getState().day;
-  if (!windowOpen(meal, now)) throw new Error(`order: the ${meal} window is not open at ${now}`);
+  // author 2026-11-24 (#23): the story's own meal can always be ordered — a reply answered at 16:20 had
+  // pulled day 2's clock past the lunch window, and 下单 threw, silently, on the checklist's own item
+  const lc = loopContext(store.getState(), store.getEvents());
+  if (!windowOpen(meal, now) && !(lc && mealToOrder(lc) === meal)) throw new Error(`order: the ${meal} window is not open at ${now}`);
   if (mealOf(day, meal)?.arrives == null) throw new Error(`order: nothing comes on day ${day} ${meal}`);
   if (ordersOn(store.getEvents(), day)[meal]) throw new Error(`order: already ordered ${meal} on day ${day}`);
   return store.appendEvent({ kind: "order", meal, shopId, itemId, t: now });

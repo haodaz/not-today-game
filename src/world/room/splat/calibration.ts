@@ -53,6 +53,8 @@ export const HOTSPOTS = {
     bed: { c: [10.423, 4.929, 15.198], size: [7.153, 6.144, 0.1], yaw: 0.159 },
     box: { c: [5.157, 6.263, 16.044], size: [3.369, 3.478, 0.1], yaw: 0.159 },
     lamp: { c: [4.149, -0.537, 22.774], size: [2.33, 4.415, 0.1], yaw: 0.159 },
+    // author 2026-11-24 (#3): the chair in front of the desk (image 450–920 × 696–1152), at the desk's depth — 坐到桌前
+    chair: { c: [-5.811, 7.945, 25.905], size: [9.552, 7.288, 0.1], yaw: 0.159 },
     door: DOOR,
   },
   /** From the 桌子 pose at depth 12: the monitors run up out of the frame (their visible lower halves are the rectangles). */

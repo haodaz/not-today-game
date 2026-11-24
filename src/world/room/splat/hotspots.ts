@@ -7,7 +7,7 @@ import { HOTSPOTS } from "./calibration";
 import { basisOf, boxRect, rayBox, rayThrough, STAGE_H, STAGE_W } from "./geometry";
 import { POSES, type Pose } from "./pose";
 
-export const HOT_IDS = ["desk", "monitorL", "monitorR", "tower", "door", "bed", "box", "lamp"] as const;
+export const HOT_IDS = ["desk", "monitorL", "monitorR", "tower", "door", "bed", "box", "lamp", "chair"] as const;
 export type HotId = (typeof HOT_IDS)[number];
 /** The framings that have things to point at. */
 export type HotView = keyof typeof HOTSPOTS;
@@ -23,7 +23,7 @@ export function hotViewOf(view: string): HotView | null {
 
 /** Tab order, and the order the keyboard proxies are laid out in. */
 export const HOT_ORDER: Readonly<Record<HotView, readonly HotId[]>> = {
-  room: ["tower", "monitorL", "monitorR", "lamp", "desk", "box", "bed", "door"],
+  room: ["tower", "monitorL", "monitorR", "lamp", "desk", "chair", "box", "bed", "door"],
   desk: ["monitorL", "monitorR", "lamp"],
   bed: ["door"],
 };

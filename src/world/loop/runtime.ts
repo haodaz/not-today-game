@@ -257,6 +257,8 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
       const first = firstRecogniseOnItsDay(events, e);
       const tutor = first ? tutorQueued(day, e.objectId) : null;
       if (tutor) dialogue = push(dialogue, tutor);
+      // author 2026-11-24 (#26): then the object's own first-hold line (`hold.first.<id>`: the camera's 「还剩十张」)
+      if (first && hasString(`hold.first.${e.objectId}`)) dialogue = push(dialogue, { key: `d${day}:hold.first.${e.objectId}`, lines: [{ k: "inner", t: t(`hold.first.${e.objectId}`) }], ending: { kind: "none" } });
       // box-arrival R5: on the arrival day, then the player's line about the carton; read, it turns to 房间.
       const placed = first && day === ARRIVAL_DAY ? placedQueued(day) : null;
       if (placed) dialogue = push(dialogue, placed);

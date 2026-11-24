@@ -43,6 +43,10 @@ function tryComplete(store: Store, it: Item): boolean {
     case "openApp":
       store.appendEvent({ kind: "step", name: `openApp:${e.app}`, t: "09:05" });
       return true;
+    case "open":
+      // author 2026-11-24 (#11): a conversation / file / the browser opened today
+      store.appendEvent({ kind: "open", target: e.target, t: "18:40" });
+      return true;
     case "beat":
       store.appendEvent({ kind: "step", name: `beat:${e.beat}`, t: "23:00" });
       return true;

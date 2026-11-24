@@ -347,6 +347,13 @@ for (const it of ITEMS) {
     if (it.self === true) { note("   (ticks itself: skipped)"); await settle(); }
     else     if (it.done === "event:boot") { await toRoom(); ok = await sel("[data-action=tower-power]"); if (!ok) { await sel("[data-action=view][data-view=desk]", 2); ok = await sel("[data-action=tower-power]"); } await settle(); }
     else if (it.done === "event:openApp:msgs") { ok = await toTingTalk(); await settle(); await toRoom(); }
+    // author 2026-11-24 (#11): read a thread (day 1: the work group, then the family) before dinner — 汀汀 holds the work threads, 喂信 (msgs) the family
+    else if (/^event:open:conv:/.test(it.done)) {
+      const conv = it.done.slice("event:open:conv:".length);
+      await toTingTalk(); ok = await sel(`[data-action=conv][data-conv=${conv}]`, 1.5);
+      if (!ok) { await sel("[data-action=dock][data-app=msgs]", 1.5); ok = await sel(`[data-action=conv][data-conv=${conv}]`, 1.5); }
+      await settle(); await toRoom();
+    }
     else if (it.done === "event:order:lunch" || it.done === "event:order:dinner") {
       const meal = what; await toRoom(); const d1 = await sel("[data-action=view][data-view=desk]", 2); await until("[data-action=loop-phone]", 8); await settle(); ok = await sel("[data-action=loop-phone]", 1.5);
       if (!ok) { note(`   phone: desk=${d1} phoneBtn=${await has("[data-action=loop-phone]")} · buttons=${await ev("JSON.stringify([...document.querySelectorAll('button,[role=button]')].filter(__vis).map(__txt).slice(0,20))")} · ${(await text()).slice(0, 160)}`);

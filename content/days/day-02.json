@@ -24,10 +24,6 @@
           "k": "narration",
           "t": "端盒里松了的那一个。一台拍立得，奶白色的壳，红色的快门。",
           "me": "carton"
-        },
-        {
-          "k": "inner",
-          "t": "背面的小窗里写着：10。还剩十张。"
         }
       ]
     },
@@ -203,6 +199,24 @@
       "onDone": {
         "say": [
           {
+            "k": "speaker",
+            "who": "me",
+            "t": "要得那么急，发过去又不看。",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "他不问，你不说。敌不动，我不动。",
+            "where": "screen:msgs:boss"
+          },
+          {
+            "k": "speaker",
+            "who": "me",
+            "t": "嗯，也好，今天没什么活。",
+            "where": "screen:msgs:boss"
+          },
+          {
             "k": "inner",
             "t": "Vivi 又发了一个网页。@技术，就是我。",
             "where": "screen:msgs:group"
@@ -278,7 +292,16 @@
       "text": "端盒里松了一个。拿出来。",
       "unlock": "done:pickup",
       "done": "event:openBox",
-      "required": true
+      "required": true,
+      "onDone": {
+        "say": [
+          {
+            "k": "inner",
+            "t": "拍立得也放桌上了。小鸡旁边，镜头朝外。",
+            "where": "desk"
+          }
+        ]
+      }
     },
     {
       "id": "reply",

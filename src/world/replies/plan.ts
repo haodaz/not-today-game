@@ -56,14 +56,20 @@ function checkBeat(now: string): void {
   if (!HHMM.test(now)) throw new Error(`beat time must be HH:MM, got "${now}"`);
 }
 
-/** A line whose time has already passed arrives at once, with its own timestamp. */
-export function lineTiming(t: string, now: string): Timing {
-  return t <= now ? NOW : { kind: "atBeat", t };
+/** author 2026-11-24 (#23): a reply stamped more than this far ahead of the clock was written for a later
+ * moment (day 2's 16:20 answer to the morning's thread); it arrives now and leaves the clock alone,
+ * instead of pulling the day past the lunch window. */
+export const FAR_AHEAD_MIN = 60;
+const minutes = (hhmm: string): number => { const [h = 0, m = 0] = hhmm.split(":").map(Number); return h * 60 + m; };
+
+/** A line whose time has already passed arrives at once, with its own timestamp; a reply's answer far ahead too (`farIsNow`). */
+export function lineTiming(t: string, now: string, farIsNow = false): Timing {
+  return t <= now || (farIsNow && minutes(t) - minutes(now) > FAR_AHEAD_MIN) ? NOW : { kind: "atBeat", t };
 }
 
-function deliver(conversation: string, line: Line, now: string, extra: Partial<Pick<Extract<Action, { type: "deliver" }>, "badge" | "placement" | "noReadReceipt">> = {}): Step {
+function deliver(conversation: string, line: Line, now: string, extra: Partial<Pick<Extract<Action, { type: "deliver" }>, "badge" | "placement" | "noReadReceipt">> = {}, farIsNow = false): Step {
   return {
-    at: lineTiming(line.t, now),
+    at: lineTiming(line.t, now, farIsNow),
     action: {
       type: "deliver",
       conversation,
@@ -136,7 +142,7 @@ export function planReply({ day, recipient, word, state, now, text }: ReplyInput
 
   switch (entry.status) {
     case "reply":
-      for (const line of entry.lines) steps.push(deliver(recipient, line, now));
+      for (const line of entry.lines) steps.push(deliver(recipient, line, now, {}, true));
       break;
     case "read":
       steps.push({ at: readTiming(entry.readAfter), action: { type: "readReceipt", conversation: recipient } });
@@ -149,7 +155,7 @@ export function planReply({ day, recipient, word, state, now, text }: ReplyInput
       });
       break;
     case "recalled":
-      for (const line of entry.lines) steps.push(deliver(recipient, line, now));
+      for (const line of entry.lines) steps.push(deliver(recipient, line, now, {}, true));
       steps.push({
         at: { kind: "afterMs", ms: jitter(`${key}:recall`, ...RECALL_MS) },
         action: { type: "recall", conversation: recipient, count: entry.lines.length },
@@ -162,7 +168,7 @@ export function planReply({ day, recipient, word, state, now, text }: ReplyInput
 
   if (entry.interrupt) {
     const { where, ...line } = entry.interrupt;
-    steps.push(deliver(where, line, now, { badge: where !== recipient }));
+    steps.push(deliver(where, line, now, { badge: where !== recipient }, true));
   }
 
   return { steps, inner, hintKey: null };

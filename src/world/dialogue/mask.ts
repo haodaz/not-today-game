@@ -58,7 +58,7 @@ export const MASK_ALLOWS: ReadonlySet<string> = new Set([
  * sit above the mask (its keys, the turn buttons, the read footer, its ×): they answer while a line
  * is up (a recording plays as lines while its reading is offered).
  */
-export const DEVICE_ALLOWS: ReadonlySet<string> = new Set(["obj-key", "obj-flip", "obj-rotate", "board-read", "objbar-close"]);
+export const DEVICE_ALLOWS: ReadonlySet<string> = new Set(["obj-key", "obj-flip", "obj-rotate", "board-read", "objbar-close", "chick-help"]);
 
 /** Is `action` held back by the mask now? `deviceOpen`: the 老物件栏 modal is open. */
 export function maskBlocks(d: DialogueState, action: string, deviceOpen = false): boolean {

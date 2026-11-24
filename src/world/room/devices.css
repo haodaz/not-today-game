@@ -16,17 +16,13 @@
   background:radial-gradient(ellipse at 34% 26%,#fff6c9 0%,#ffd84d 32%,#f2b519 70%,#d98f0c 100%);
   box-shadow:inset -10px -14px 0 rgba(160,90,0,.25),inset 8px 10px 0 rgba(255,255,255,.35),0 18px 40px rgba(0,0,0,.5)}
 .dev-shell.egg::before{content:"";position:absolute;left:50%;top:-22px;width:34px;height:30px;margin-left:-17px;border:6px solid #c9ccd3;border-bottom:none;border-radius:20px 20px 0 0}
-/* chick-face v2 (2026-11-15): the rows are .egg-top / .egg-bottom, never .top (desktop.css paints a white monitor bar on any .top). The bezel grows to hold two rows of printed icons around a 3 : 2 glass
-   (48 × 32 at 3 px a cell = 144 × 96 inside, 152 × 104 with its 4 px padding) */
+/* chick-face v3 (2026-11-24 #24): the icons are on the LCD; the glass is 48 × 52 at 3 px a cell (144 × 156 inside, 152 × 164 with its 4 px padding) */
 .dev-shell.egg .bezel{position:absolute;left:50%;top:62px;width:200px;height:180px;margin-left:-100px;border-radius:46% 46% 40% 40% / 44% 44% 36% 36%;background:#f7f3e6;box-shadow:inset 0 4px 0 rgba(0,0,0,.12)}
-.dev-shell.egg .egg-icons{position:absolute;left:24px;width:152px;height:20px;display:flex;justify-content:space-between;align-items:center;padding:0 6px;box-sizing:border-box}
-.dev-shell.egg .egg-icons.egg-top{top:12px}
-.dev-shell.egg .egg-icons.egg-bottom{top:150px}
 .dev-shell.egg .egg-ic{display:block;width:20px;height:20px;padding:1px;box-sizing:border-box;border-radius:4px;color:rgba(154,90,0,.7)}
 .dev-shell.egg .egg-ic svg{display:block;width:18px;height:18px}
 .dev-shell.egg .egg-ic.on{background:#2b3324;color:var(--lcd)}
 .dev-shell.upgraded.egg .egg-ic{color:#9aa4b5}
-.dev-shell.egg .glass{position:absolute;left:24px;top:38px;width:152px;height:104px;box-sizing:border-box;border-radius:10px;background:var(--lcd);box-shadow:inset 0 3px 0 var(--lcd-dark),inset 0 0 0 3px #8f9b78;display:flex;align-items:center;justify-content:center;padding:4px}
+.dev-shell.egg .glass{position:absolute;left:24px;top:8px;width:152px;height:164px;box-sizing:border-box;border-radius:10px;background:var(--lcd);box-shadow:inset 0 3px 0 var(--lcd-dark),inset 0 0 0 3px #8f9b78;display:flex;align-items:center;justify-content:center;padding:4px}
 .dev-shell.egg .brand{position:absolute;top:40px;width:100%;text-align:center;font:700 13px/1 "Arial Rounded MT Bold","PingFang SC",sans-serif;color:#b8560a;letter-spacing:2px}
 .dev-shell.egg .btns{position:absolute;left:0;right:0;top:250px;display:flex;justify-content:center;gap:22px}
 .dev-shell.egg .btns button{width:40px;height:40px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff8fa3,#e0395a 70%);box-shadow:0 4px 0 #9b1f39,inset 0 2px 0 rgba(255,255,255,.4);color:transparent}
@@ -57,6 +53,19 @@
 .dev-focus .ob-reading{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--mono);font-size:14px}
 .dev-focus .ob-noreading{color:#b8b2a4;font-size:12px}
 /* chick-raising R3: how the chick's keys work, one small line under it */
+/* author 2026-11-24 (#13): 说明 beside the caption, and the how-to card under the device */
+.dev-focus .dev-help-btn{margin-left:10px;border:1px solid rgba(231,227,215,.5);border-radius:999px;background:transparent;color:#e7e3d7;font:inherit;font-size:11px;letter-spacing:.1em;padding:2px 10px;cursor:pointer}
+.dev-focus .dev-help-btn:hover,.dev-focus .dev-help-btn.on{background:#e7e3d7;color:#2a2c33}
+.dev-focus .dev-help{box-sizing:border-box;width:min(560px,92vw);padding:14px 18px 12px;border-radius:12px;background:#f6f2e9;color:#1d2129;box-shadow:0 14px 34px rgba(0,0,0,.45);font-size:13px;line-height:1.5}
+.dev-focus .dev-help-t{display:block;font-size:14px;margin-bottom:8px}
+.dev-focus .dev-help ul{list-style:none;margin:0;padding:0}
+.dev-focus .dev-help-keys{display:flex;flex-wrap:wrap;gap:4px 18px;margin-bottom:8px}
+.dev-focus .dev-help-keys b{display:inline-block;width:20px;height:20px;line-height:20px;text-align:center;border-radius:50%;background:#e0395a;color:#fff;margin-right:6px;font-size:12px}
+.dev-focus .dev-help-icons{display:grid;grid-template-columns:repeat(4,1fr);gap:6px 12px}
+.dev-focus .dev-help-icons li{display:flex;align-items:center;gap:6px}
+.dev-focus .dev-help-icons .egg-ic{width:18px;height:18px;padding:0;color:#2b3324;flex:none}
+.dev-focus .dev-help-icons .egg-ic svg{width:18px;height:18px}
+.dev-focus .dev-help-cap{margin:8px 0 0;color:#6b6457;font-size:12px}
 .dev-focus .dev-caption{margin:0;color:#e7e3d7;opacity:.72;font-size:12px;letter-spacing:.08em;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 .dev-focus .ob-read{flex:0 0 auto;border:0;border-radius:8px;background:var(--accent);color:#fff;font:inherit;padding:6px 14px;cursor:pointer}
 .dev-focus .ob-read:disabled{background:#4a4d56;color:#a19c90;cursor:default}
@@ -284,6 +293,8 @@
 .room .vf-sheet-view .vf-dim{position:absolute;inset:0;border:0;padding:0;margin:0;background:rgba(10,10,12,.35);cursor:pointer}
 .room .vf-sheet{position:absolute;left:50%;top:calc(50% - 30px);width:480px;height:566px;transform:translate(-50%,-50%);pointer-events:none}
 .room .vf-paper{width:200px;height:236px;box-sizing:border-box;padding:10px 10px 46px;background:#FFFFFF;border-radius:2px;box-shadow:0 6px 16px rgba(0,0,0,.25);transform:scale(2.4);transform-origin:0 0}
+/* author 2026-11-24 (#27): how to shoot, one line at the foot of the viewfinder */
+.room .vf-hint{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);margin:0;padding:6px 14px;border-radius:999px;background:rgba(0,0,0,.45);color:#f4efe6;font-size:13px;letter-spacing:.06em;white-space:nowrap;pointer-events:none}
 .room .vf-line{position:absolute;left:50%;top:calc(50% + 268px);transform:translateX(-50%);width:min(720px,90%);margin:0;text-align:center;color:#f4efe6;font:16px/1.5 var(--font-game-text,sans-serif);text-shadow:0 1px 6px rgba(0,0,0,.6);pointer-events:none}
 @media (prefers-reduced-motion:reduce){.room .vf-flash{display:none}}
 

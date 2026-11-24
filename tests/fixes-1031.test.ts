@@ -116,8 +116,8 @@ describe("(5) four camera levels", () => {
     // The way to each level is a thing to point at: the keyboard proxies, in tab order.
     const proxies = (out: string) => [...out.matchAll(/class="shot-hit[^"]*"[^>]*data-hot="(\w+)"/g)].map((m) => m[1]);
     // box-arrival R1: day 1's morning has no carton yet; from day 2 the box is there.
-    expect(proxies(room(at("room")))).toEqual(["tower", "monitorL", "monitorR", "lamp", "desk", "bed", "door"]);
-    expect(proxies(room(ctxOf(createStore({ startDay: 2 }), initialSession(DEFAULT_CLOCK, "left", "room"))))).toEqual(["tower", "monitorL", "monitorR", "lamp", "desk", "box", "bed", "door"]);
+    expect(proxies(room(at("room")))).toEqual(["tower", "monitorL", "monitorR", "lamp", "desk", "chair", "bed", "door"]);
+    expect(proxies(room(ctxOf(createStore({ startDay: 2 }), initialSession(DEFAULT_CLOCK, "left", "room"))))).toEqual(["tower", "monitorL", "monitorR", "lamp", "desk", "chair", "box", "bed", "door"]);
     expect(proxies(room(at("desk")))).toEqual(["monitorL", "monitorR", "lamp"]);
     expect(proxies(room(at("door")))).toEqual([]);
   });

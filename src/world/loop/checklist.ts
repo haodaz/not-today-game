@@ -52,6 +52,8 @@ export function happened(event: EventToken, ctx: LoopContext): boolean {
       return ctx.state.loan !== "none";
     case "callEnded":
       return ctx.today.some((e) => e.kind === "callEnded");
+    case "open":
+      return ctx.today.some((e) => e.kind === "open" && e.target === event.target);
   }
 }
 

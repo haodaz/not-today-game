@@ -16,7 +16,7 @@ import type { ActionContext } from "@world/desktop/controller";
 import { initialSession, type Session } from "@world/desktop/model";
 import { setLocale, stringIn, t } from "@world/i18n";
 import { calculator, formatNumber, lightLevel, lightZone, unaskedAt, UPSIDE_DOWN_DEG, upsideDownOf, type CalculatorState } from "@world/objects/calculator";
-import { chick, chickFrameAt, CHICK_IDLE_MS, drawChick, ICON_ACT, turnTimes, type ChickState } from "@world/objects/chick";
+import { chick, chickFrameAt, CHICK_IDLE_MS, CHICK_SCREEN_H, drawChick, ICON_ACT, PET_Y, turnTimes, type ChickState } from "@world/objects/chick";
 import { dictionary, lookup, type DictionaryState } from "@world/objects/dictionary";
 import { ascii, DOT_GLYPHS, finer, rowWidth, SEGMENTS, type Frame, type PixelFrame } from "@world/objects/frame";
 import { CHICK_FRAMES, CHICK_H, CHICK_ICONS, CHICK_W, ICON_SIZE, missingChickFrames, parseChickFrames, type ChickFrames } from "@world/objects/frames";
@@ -546,8 +546,8 @@ describe("holding and using (FR1)", () => {
       // The ghost bitmap is the channel's full extent for pixel/dot-matrix, the 8. for seven-segment.
       expect([...ghostBits("chick", 0).bits].every((b) => b === 1)).toBe(true); // every pixel ghosts
       expect([...ghostBits("pager", 0).bits].some((b) => b === 1)).toBe(true); // the 8. of every cell
-      // The markup backing is channel × 16 (chick 32×16 → 512×256) for every object.
-      expect(render(used("chick"))).toMatch(new RegExp(`<canvas class="dev" data-screen="chick" width="${CHICK_W * 16}" height="${CHICK_H * 16}"`));
+      // The markup backing is channel × 16 (chick 48×52 → 768×832, chick-face v3) for every object.
+      expect(render(used("chick"))).toMatch(new RegExp(`<canvas class="dev" data-screen="chick" width="${CHICK_W * 16}" height="${CHICK_SCREEN_H * 16}"`));
       expect(render(used("pager"))).toMatch(new RegExp(`width="${CHANNELS.pager!.w * 16}" height="${CHANNELS.pager!.h * 16}"`));
       // The canvas fills the glass, centred, aspect kept, never smoothed.
       const css = readFileSync(resolve(__dirname, "../src/world/room/devices.css"), "utf8");
@@ -556,21 +556,21 @@ describe("holding and using (FR1)", () => {
       expect(css).toMatch(/\.glass canvas\.dev\{[^}]*height:100%/);
       // A ghost (7.5 % ink) is painted under the lit frame.
       const { g, fills } = fakeContext();
-      const canvas = { width: CHICK_W * 16, height: CHICK_H * 16, getContext: () => g } as unknown as Parameters<typeof paintFrame>[0];
+      const canvas = { width: CHICK_W * 16, height: CHICK_SCREEN_H * 16, getContext: () => g } as unknown as Parameters<typeof paintFrame>[0];
       paintFrame(canvas, drawChick(chick.init(env()), env()) as PixelFrame, "chick", (() => null) as never, { ghost: ghostBits("chick", 0) });
       expect(fills.some((f) => f.style.includes("0.075"))).toBe(true);
     });
 
     it("the gap thins with the scale: a level-0 chick frame is squares of 13, a level-3 frame squares of 1", () => {
-      // Backing = channel × 16; a level-0 frame (32×16) scales by 16: gap round(16/5)=3, square 13.
+      // Backing = channel × 16; a level-0 frame (48×52) scales by 16: gap round(16/5)=3, square 13.
       const l0 = fakeContext();
-      const c0 = { width: CHICK_W * 16, height: CHICK_H * 16, getContext: () => l0.g } as unknown as Parameters<typeof paintFrame>[0];
+      const c0 = { width: CHICK_W * 16, height: CHICK_SCREEN_H * 16, getContext: () => l0.g } as unknown as Parameters<typeof paintFrame>[0];
       paintFrame(c0, drawChick(chick.init(env()), env({ level: 0 })) as PixelFrame, "chick", (() => null) as never, { ghost: ghostBits("chick", 0) });
       expect(l0.fills.length).toBeGreaterThan(0);
       expect(l0.fills.every((f) => f.w === 13 && f.h === 13)).toBe(true);
-      // A level-3 frame (256×128) in the same backing scales by 2: gap round(2/5)=1, square 1.
+      // A level-3 frame (384×416) in the same backing scales by 2: gap round(2/5)=1, square 1.
       const l3 = fakeContext();
-      const c3 = { width: CHICK_W * 16, height: CHICK_H * 16, getContext: () => l3.g } as unknown as Parameters<typeof paintFrame>[0];
+      const c3 = { width: CHICK_W * 16, height: CHICK_SCREEN_H * 16, getContext: () => l3.g } as unknown as Parameters<typeof paintFrame>[0];
       paintFrame(c3, drawChick(chick.init(env()), env({ level: 3 })) as PixelFrame, "chick", (() => null) as never, { ghost: ghostBits("chick", 3) });
       expect(l3.fills.length).toBeGreaterThan(0);
       expect(l3.fills.every((f) => f.w === 1 && f.h === 1)).toBe(true);
@@ -867,7 +867,7 @@ describe("holding and using (FR1)", () => {
 describe("programs (FR2, FR3)", () => {
   const press = <S>(p: (typeof PROGRAMS)[string], keys: string[], e: ObjectEnv): S => keys.reduce((s, k, i) => p.key(s, k, { ...e, t: e.t + i }).state, p.init(e)) as S;
 
-  it("chick: A cycles the eight icons (chick-face v2: printed on the shell, nothing on the LCD); B acts; C goes back to idle; a half-tone higher on success", () => {
+  it("chick: A cycles the eight icons (chick-face v3: on the LCD, the selected one inverted); B acts; C goes back to idle; a half-tone higher on success", () => {
     const table = testFrames();
     const e = env({ t: 100 });
     const frames: Record<string, string> = {};
@@ -875,8 +875,11 @@ describe("programs (FR2, FR3)", () => {
       const s = press<ChickState>(chick, [...Array(i + 1).fill("A"), "B"], e);
       expect(s.act?.kind).toBe(ICON_ACT[icon]);
       frames[icon] = ascii(drawChick(s, { ...e, t: 150 }, table) as PixelFrame);
-      // with the menu set the LCD shows the same picture as with it null
-      expect(ascii(drawChick({ ...s, menu: null }, { ...e, t: 150 }, table) as PixelFrame)).toBe(frames[icon]);
+      // chick-face v3: with the menu set the pet's rows are the same picture; only the icon rows differ (the selected one inverted)
+      const pet = (text: string) => text.split("\n").slice(PET_Y, PET_Y + CHICK_H).join("\n");
+      const none = ascii(drawChick({ ...s, menu: null }, { ...e, t: 150 }, table) as PixelFrame);
+      expect(pet(none)).toBe(pet(frames[icon]!));
+      expect(none).not.toBe(frames[icon]);
     });
     // chick-raising R1: B on 喂食 is also a care (index.ts logs it).
     expect(chick.key(press(chick, ["A"], e), "B", e).out).toEqual([{ care: "meal" }, { sound: "chick-beep", rate: SEMITONE, delay: 120 }]);

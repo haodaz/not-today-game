@@ -1367,6 +1367,12 @@ span.cmp-face-btn{cursor:default}
 .wl-vs{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:16px;flex:1;min-height:0}
 .wl-ver{display:flex;flex-direction:column;min-height:0;border:1px solid rgba(29,33,41,.25);background:#FBFCFE;overflow:hidden}
 .wl-vhead{display:flex;align-items:baseline;gap:12px;padding:8px 14px;border-bottom:1px solid rgba(29,33,41,.12);background:#F1EFE9}
+/* author 2026-11-24 (#10): a live card is one big button — it lifts under the pointer, its head says 整张都能点 */
+.wl-ver.live{cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}
+.wl-ver.live:hover,.wl-ver.live:focus-visible{border-color:#1d2129;box-shadow:0 0 0 3px rgba(29,33,41,.18),0 10px 24px rgba(0,0,0,.14);transform:translateY(-3px);outline:none}
+.wl-ver.live:hover .wl-use{background:#1d2129;color:#efe9df}
+.wl-vhint{margin-left:auto;font-size:11px;letter-spacing:.12em;color:#8a8273;border:1px solid rgba(29,33,41,.25);border-radius:999px;padding:2px 8px}
+.wl-ver.live:hover .wl-vhint{color:#1d2129;border-color:#1d2129}
 .wl-vname{font:700 13px var(--mono,ui-monospace,Menlo,monospace);letter-spacing:.14em;color:#1d2129}
 .wl-fname{font:12px var(--mono,ui-monospace,Menlo,monospace);color:var(--ink-2)}
 .wl-code{flex:1;overflow:auto;padding:14px 0;font:15px/1.85 var(--mono,ui-monospace,Menlo,monospace);color:#2B2F45}

@@ -329,7 +329,10 @@ export function versionCards(board: TaskBoard, page: ComparePage, live: boolean,
     const foot = live
       ? html`<button type="button" class="wl-use" data-action="compare-pick" data-slot="${page.slot}" data-card="${id}"${busy ? html` disabled` : null}>${tr("compare.use", { v })}</button>`
       : html`<span class="wl-picked"></span>`;
-    return html`<div class="${cls("wl-ver", !live && "read")}" data-card="${id}"><div class="wl-vhead"><span class="wl-vname">${v}</span><span class="wl-fname">${file?.name ?? page.slot}</span></div><div class="wl-code">${rows}</div><div class="wl-vfoot">${foot}</div></div>`;
+    // author 2026-11-24 (#10): live, the whole card is the pick (anywhere on it), and its head says so
+    const pick = live && !busy ? html` data-action="compare-pick" data-slot="${page.slot}" data-card="${id}" role="button" tabindex="0"` : null;
+    const hint = live && hasString("compare.pickHint") ? html`<span class="wl-vhint">${tr("compare.pickHint")}</span>` : null;
+    return html`<div class="${cls("wl-ver", !live && "read", live && "live")}" data-card="${id}"${pick}><div class="wl-vhead"><span class="wl-vname">${v}</span><span class="wl-fname">${file?.name ?? page.slot}</span>${hint}</div><div class="wl-code">${rows}</div><div class="wl-vfoot">${foot}</div></div>`;
   });
   return html`${cards}`;
 }

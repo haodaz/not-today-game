@@ -472,9 +472,25 @@
       }
     },
     {
+      "id": "grp",
+      "text": "Look at the work group.",
+      "unlock": "done:task3",
+      "done": "event:open:conv:group",
+      "required": true,
+      "when": "night"
+    },
+    {
+      "id": "fam",
+      "text": "Look at the family thread too.",
+      "unlock": "done:grp",
+      "done": "event:open:conv:family",
+      "required": true,
+      "when": "night"
+    },
+    {
       "id": "dinner",
       "text": "Pick up the phone and order dinner.",
-      "unlock": "done:task3",
+      "unlock": "done:fam",
       "done": "event:order:dinner",
       "required": true,
       "rewrite": "Dinner is on its way.",

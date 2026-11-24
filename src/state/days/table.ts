@@ -124,7 +124,9 @@ export type EventToken =
   /** The loan prompt has been answered (world-state loan is no longer "none"). */
   | { readonly type: "loanDecided" }
   /** The boss's call has ended (day-loop 2026-11-03): the synthetic call item is done, night falls. */
-  | { readonly type: "callEnded" };
+  | { readonly type: "callEnded" }
+  /** author 2026-11-24 (#11): something was opened today (the log's `open` event: `conv:group`, `file:…`, `browser`). */
+  | { readonly type: "open"; readonly target: string };
 
 export interface Item {
   readonly id: string;
@@ -230,6 +232,8 @@ export function parseToken(raw: string, where: string): Token {
       return { kind: "event", event: { type: "beat", beat: a } };
     case "chat":
       return { kind: "event", event: { type: "chat" } };
+    case "open":
+      return { kind: "event", event: { type: "open", target: arg.slice("open:".length) || fail(where, `no target in "${raw}"`) } };
     case "lieDown":
       return { kind: "event", event: { type: "lieDown" } };
     case "loan":

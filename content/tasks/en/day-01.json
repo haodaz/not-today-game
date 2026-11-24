@@ -56,6 +56,8 @@
             "id": "c1",
             "text": "A knowledge graph, two hundred-odd nodes, joining the client's business objects",
             "patch": {
+              "6": "  title: \"The base is a graph: two hundred and eleven nodes, joined one by one\",",
+              "8": "  stats: () => ({ nodes: SNAP.nodes.length, links: SNAP.links.length }),  // only what can be counted",
               "9": "  draw: (t) => draw.project(SNAP, t),  // two hundred and eleven nodes, joined one by one"
             }
           },
@@ -63,28 +65,36 @@
             "id": "c2",
             "text": "Three clients' spreadsheets, imported weekly",
             "patch": {
-              "8": "  fields: SNAP.clients.map((c) => c.fields),  // three clients, three sets, imported weekly"
+              "6": "  title: \"Three clients, three spreadsheets, imported weekly\",",
+              "8": "  fields: SNAP.clients.map((c) => c.fields),  // three clients, three sets, imported weekly",
+              "9": "  draw: (t) => draw.columns(SNAP.clients, t)  // three columns, each its own"
             }
           },
           {
             "id": "c3",
             "text": "AI drafts a merge, a person checks it",
             "patch": {
-              "8": "  loop: (x, y, yHat, K) => x + K * (y - yHat),  // a person checks; the error flows back"
+              "6": "  title: \"AI drafts a merge, a person checks it\",",
+              "8": "  loop: (x, y, yHat, K) => x + K * (y - yHat),  // a person checks; the error flows back",
+              "9": "  draw: (t) => draw.review(SNAP.reviews, t)  // every check flows back"
             }
           },
           {
             "id": "c4",
             "text": "We know the client's trade; the graph was matched by hand",
             "patch": {
-              "8": "  // a new model is a new way of reading: x′ = U x; the graph is the same graph"
+              "6": "  title: \"The moat is not the model; it is the graph we matched by hand\",",
+              "8": "  // a new model is a new way of reading: x′ = U x; the graph is the same graph",
+              "9": "  draw: (t) => draw.rotate(SNAP, t)  // new model, same graph"
             }
           },
           {
             "id": "c5",
             "text": "Two pilot clients, one has paid",
             "patch": {
-              "8": "  clients: SNAP.receivable,  // two pilots, one paid"
+              "6": "  title: \"Two pilot clients, one has paid\",",
+              "8": "  clients: SNAP.receivable,  // two pilots, one paid",
+              "9": "  draw: (t) => draw.clients(SNAP.receivable, t)  // per the receivables sheet"
             }
           },
           {
