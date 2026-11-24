@@ -30,6 +30,8 @@ export interface FileEntry {
   readonly body?: FileBody;
   /** One line played in the box the first time it is opened each day. */
   readonly onOpen?: SayLine;
+  /** author 2026-11-24 (#12): said when the page itself reports it was read to the end (postMessage {nt:"read"}), or on closing it unread. */
+  readonly onRead?: SayLine;
 }
 
 export interface Folder {
@@ -90,7 +92,7 @@ function body(v: unknown, w: string): FileBody {
 function entry(v: unknown, w: string, inBin: boolean): FileEntry | BinEntry {
   if (!isRecord(v)) fail(w, "a file must be an object");
   // A folder file carries `date` and `from`; a bin item carries `since` (its listing day) instead.
-  keys(v, inBin ? ["id", "name", "since", "date", "from", "afterFlag", "afterOpen", "body", "onOpen"] : ["id", "name", "date", "from", "afterFlag", "afterOpen", "body", "onOpen"], w);
+  keys(v, inBin ? ["id", "name", "since", "date", "from", "afterFlag", "afterOpen", "body", "onOpen", "onRead"] : ["id", "name", "date", "from", "afterFlag", "afterOpen", "body", "onOpen", "onRead"], w);
   const since = inBin ? day(v.since, `${w}.since`) : undefined;
   // `from`: the folder's own, or the bin item's `since`.
   const from = v.from !== undefined ? day(v.from, `${w}.from`) : inBin ? since! : day(v.from, `${w}.from`);
@@ -103,6 +105,7 @@ function entry(v: unknown, w: string, inBin: boolean): FileEntry | BinEntry {
     ...(v.afterOpen !== undefined ? { afterOpen: str(v.afterOpen, `${w}.afterOpen`) } : {}),
     ...(v.body !== undefined ? { body: body(v.body, `${w}.body`) } : {}),
     ...(v.onOpen !== undefined ? { onOpen: line(v.onOpen, `${w}.onOpen`) } : {}),
+    ...(v.onRead !== undefined ? { onRead: line(v.onRead, `${w}.onRead`) } : {}),
   };
   return inBin ? { ...base, since: since! } : base;
 }
@@ -216,6 +219,13 @@ export function deliverableOnOpen(doc: string, data: FilesData = filesData): Say
       if (file.afterOpen === doc && file.onOpen) return file.onOpen;
     }
   }
+  return null;
+}
+
+/** author 2026-11-24 (#12): the download file whose html page is `src` (the frame's path), or null. */
+export function fileForPage(src: string, data: FilesData = filesData): FileEntry | null {
+  const path = src.replace(/[?#].*$/, "");
+  for (const folder of data.folders) for (const file of folder.files) if (file.body?.kind === "html" && file.body.src === path) return file;
   return null;
 }
 

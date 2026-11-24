@@ -93,7 +93,8 @@ import { eggFlash, renderFiles } from "@world/desktop/files/view";
 import { openObjectFromBar, renderObjectBarUse } from "@world/desktop/workbench/objbar";
 import { filesActions, openFilesApp } from "@world/desktop/files/actions";
 import { callActions, resumeCall } from "@world/desktop/call/actions";
-import { deliverableOnOpen, deliverablePage } from "@state/files";
+import { deliverablePage } from "@state/files";
+import { sayRead } from "@world/desktop/files/actions";
 import { launchLayer, workLayer } from "@world/desktop/workbench/compare";
 import { viviLock, viviLockHeld, lockedConversation } from "@world/desktop/vivi";
 import { appOfThread } from "@world/desktop/messages/threads";
@@ -834,13 +835,8 @@ export const loopActions: Record<string, ActionHandler> = {
     const vivi = viviLock(state0, ctx.store.getEvents(), ctx.session.clock.time) === doc && ctx.session.view === "desktop";
     if (vivi && hasString("vivi.back")) {
       ctx.session.docReturn = { app: appOn(ctx.session), side: ctx.session.focus };
-      // author 2026-11-11: read first, then the remark at what is on the page (the file's own
-      // onOpen line), then 看完了 and back to the chat.
-      const remark = deliverableOnOpen(doc);
-      const sayKey = `${state0.day}:vivi:${doc}`;
-      const lines: SayLine[] = remark && !ctx.session.filesSaid.has(sayKey) ? [remark] : [];
-      if (remark) ctx.session.filesSaid.add(sayKey);
-      ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${state0.day}:vivi:back`, lines: [...lines, { k: "inner", t: t("vivi.back") }], ending: { kind: "docBack" } });
+      // author 2026-11-24 (#12): the remark and 看完了 come when the page reports it was read (file-read,
+      // files/actions.ts sayRead), or when it is closed — never over the page as it opens.
     }
     ctx.session.focus = bringToFront(ctx.session, "browser");
     ctx.session.browserDoc = page;
@@ -854,10 +850,12 @@ export const loopActions: Record<string, ActionHandler> = {
   // guidance R3: the doc page's own × is gone; the browser bar's ‹ returns to the news page (this
   // action, kept under its name), and red closes the browser.
   "br-doc-close"(ctx) {
+    if (ctx.session.browserDoc) sayRead(ctx, ctx.session.browserDoc); // closed unread: the remark is owed (#12)
     ctx.session.browserDoc = null;
     ctx.rerender();
   },
   "br-back"(ctx) {
+    if (ctx.session.browserDoc) sayRead(ctx, ctx.session.browserDoc);
     ctx.session.browserDoc = null;
     ctx.rerender();
   },

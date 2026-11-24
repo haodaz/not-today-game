@@ -734,6 +734,17 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
   );
   window.addEventListener("keydown", onKey);
   window.addEventListener("resize", fit);
+  // author 2026-11-24 (#12): a document page (Vivi's mockups) says when it has been read to the end
+  const onMessage = (e: MessageEvent) => {
+    const d = e.data as { nt?: unknown; src?: unknown } | null;
+    if (!d || d.nt !== "read" || typeof d.src !== "string") return;
+    try {
+      actions["file-read"]?.(ctx, { src: d.src } as DOMStringMap, root);
+    } catch (error) {
+      console.warn(error);
+    }
+  };
+  window.addEventListener("message", onMessage);
   const unsubscribe = deps.store.subscribe(onStore);
   // 绑定邮箱: the link was opened (here or in another tab): the settings row shows "bound".
   const unsubscribeEmail = onEmailChange(rerender);
@@ -765,6 +776,7 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
       clipDrag.destroy();
       dockPeek.destroy();
       window.removeEventListener("keydown", onKey);
+      window.removeEventListener("message", onMessage);
       window.removeEventListener("resize", fit);
     },
   };

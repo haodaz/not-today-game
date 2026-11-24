@@ -219,6 +219,11 @@
             "html": "/docs/vivi/plan-1-insight.html"
           },
           "onOpen": {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "往下拉，底下有个输入框。随便问它一句试试。"
+          },
+          "onRead": {
             "k": "inner",
             "t": "……这不就是写在皮儿上的硬编码吗。真能不能做你是一个字也没想啊。"
           }
@@ -233,6 +238,11 @@
             "html": "/docs/vivi/prd-insight-engine.html"
           },
           "onOpen": {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "六个模块，一个一个翻。"
+          },
+          "onRead": {
             "k": "inner",
             "t": "五大模块，列了六个。"
           }
@@ -247,6 +257,11 @@
             "html": "/docs/vivi/plan-2-evolve.html"
           },
           "onOpen": {
+            "k": "speaker",
+            "who": "kuro",
+            "t": "有个「开始自演化」的按钮。按一下，看它怎么自己变好。"
+          },
+          "onRead": {
             "k": "inner",
             "t": "……克总，要不你进这个页面泡一泡吧。"
           }

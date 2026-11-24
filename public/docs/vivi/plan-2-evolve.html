@@ -206,5 +206,18 @@ function drawBA(){const c=$('#ba'),x=c.getContext('2d'),w=c.width,h=c.height;x.c
   for(let i=0;i<n;i++){const cx=i*gw+gw/2,base=h-30;x.fillStyle="#cfd6e6";x.fillRect(cx-26,base-before[i]*180,22,before[i]*180);const g=x.createLinearGradient(0,base-180,0,base);g.addColorStop(0,"#3b6cff");g.addColorStop(1,"#00c2a8");x.fillStyle=g;x.fillRect(cx+2,base-after[i]*180,22,after[i]*180);x.fillStyle="#6b7590";x.fillText(lab[i],cx,h-10);x.fillStyle="#17a86a";x.fillText("▲",cx+13,base-after[i]*180-6)}
   x.textAlign="left";x.fillStyle="#cfd6e6";x.fillRect(12,12,12,12);x.fillStyle="#6b7590";x.fillText("Before",30,23);x.fillStyle="#3b6cff";x.fillRect(90,12,12,12);x.fillStyle="#6b7590";x.fillText("After（全部向上）",108,23)}
 </script>
+
+<script>
+// NOT TODAY (2026-11-24): the game listens for {nt:"read"} — sent once, when the page has really been read.
+(function(){
+  var sent=false, ready=false;
+  function tell(){ if(sent) return; sent=true; try{ parent.postMessage({nt:"read", src: location.pathname}, "*"); }catch(e){} }
+  window.__ntReady=function(){ ready=true; check(); };
+  function check(){ if(!ready) return; var h=document.documentElement; if(h.scrollHeight-h.clientHeight-h.scrollTop<40) tell(); }
+  window.addEventListener("scroll", check, {passive:true}); window.addEventListener("resize", check); setInterval(check, 800);
+  // read = the self-evolution run once (its console finished), then the bottom of the page
+  var ev=document.getElementById("evolve"); if(ev){ ev.addEventListener("click", function(){ setTimeout(function(){ window.__ntReady(); }, 9000); }); }
+})();
+</script>
 </body>
 </html>

@@ -209,8 +209,7 @@
           {
             "k": "inner",
             "t": "Vivi has posted another page. '@tech' means me.",
-            "where": "screen:msgs:group",
-            "me": "phone"
+            "where": "screen:msgs:group"
           }
         ]
       }

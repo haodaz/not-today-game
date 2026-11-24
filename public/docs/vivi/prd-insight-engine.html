@@ -103,4 +103,15 @@ POST /v2/insight/analyze
 { &quot;confidence&quot;: 92, &quot;conclusion&quot;: &quot;...&quot; }
 </pre>
 <hr>
-<p><i>本文档由 AI 生成，仅供参考。</i></p></div></body></html>
+<p><i>本文档由 AI 生成，仅供参考。</i></p></div>
+<script>
+// NOT TODAY (2026-11-24): the game listens for {nt:"read"} — sent once, when the page has really been read.
+(function(){
+  var sent=false, ready=true;
+  function tell(){ if(sent) return; sent=true; try{ parent.postMessage({nt:"read", src: location.pathname}, "*"); }catch(e){} }
+  window.__ntReady=function(){ ready=true; check(); };
+  function check(){ if(!ready) return; var h=document.documentElement; if(h.scrollHeight-h.clientHeight-h.scrollTop<40) tell(); }
+  window.addEventListener("scroll", check, {passive:true}); window.addEventListener("resize", check); setInterval(check, 800);
+  
+})();
+</script></body></html>

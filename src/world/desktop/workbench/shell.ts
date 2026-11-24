@@ -299,7 +299,7 @@ function filesPane(ctx: AppContext, board: TaskBoard, st: ShellState, fill: Fill
     const f = fileById(from.file);
     if (f) return html`<div class="sh-source file"><div class="sh-src-h">${fill(f.name)}</div>${fileBody(f, fill)}</div>`;
     const page = deliverablePage(from.file);
-    return page ? html`<div class="sh-source file"><iframe class="f-frame" src="${page}" title="${from.file}" sandbox></iframe></div>` : html`<div class="sh-source empty"></div>`;
+    return page ? html`<div class="sh-source file"><iframe class="f-frame" src="${page}" title="${from.file}" sandbox="allow-scripts"></iframe></div>` : html`<div class="sh-source empty"></div>`;
   }
   if ("conv" in from) {
     const { state, events, session, startDay } = ctx;

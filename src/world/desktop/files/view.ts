@@ -118,7 +118,7 @@ export function fileBody(file: FileEntry, fill: (s: string) => string): SafeHtml
   // old-folder-egg R1: a picture, fit inside the pane on a dark ground; no caption.
   if (body.kind === "image") return html`<figure class="file-image"><img src="${body.src}" alt=""></figure>`;
   // html: the page in the browser's frame (an <iframe>); a missing file shows the not-found page.
-  return html`<div class="f-body html"><iframe class="f-frame" src="${body.src}" title="${fill(file.name)}" sandbox></iframe></div>`;
+  return html`<div class="f-body html"><iframe class="f-frame" src="${body.src}" title="${fill(file.name)}" sandbox="allow-scripts"></iframe></div>`;
 }
 
 /** The file list for the selected tab (a folder or the bin). */

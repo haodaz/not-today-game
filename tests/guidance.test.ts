@@ -522,6 +522,9 @@ describe("R14 · heads and tails", () => {
     r.session.place = { ...r.session.place, browser: "right" };
     r.act("open-deliverable", { doc: "doc-x" });
     expect(r.session.rightApp).toBe("browser");
+    // author 2026-11-24 (#12): nothing over the page as it opens; the tail comes when the page reports it was read
+    expect(r.keys()).not.toContain("d1:vivi:back");
+    r.act("file-read", { src: r.session.browserDoc ?? "" });
     expect(r.keys()).toContain("d1:vivi:back");
     while (r.session.dialogue.queue.length) r.act("loop-advance");
     expect(r.session.browserDoc).toBeNull();

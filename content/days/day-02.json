@@ -209,8 +209,7 @@
           {
             "k": "inner",
             "t": "Vivi 又发了一个网页。@技术，就是我。",
-            "where": "screen:msgs:group",
-            "me": "phone"
+            "where": "screen:msgs:group"
           }
         ]
       }

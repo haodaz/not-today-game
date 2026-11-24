@@ -6,7 +6,9 @@ import { push } from "@world/loop/dialogue";
 import type { ActionContext, ActionHandler } from "../controller";
 import { ALBUM_TAB, EGG_PICTURE_MS, eggEndMs, fileListedById, photoOpenId } from "./view";
 import { albumPhotos, DEVELOP_BLANK_MS, DEVELOP_MS, ON_THE_SPOT_DAY, photoKey, photoStage, roomFacingOf, type DevelopStage } from "@state/photos";
-import { filesData } from "@state/files";
+import { fileForPage, filesData } from "@state/files";
+import { hasString, t } from "@world/i18n";
+import type { SayLine } from "@state/days/table";
 
 /** Open the window on a folder tab (its first folder) or the bin. */
 export function openFilesApp(ctx: ActionContext, which: "files" | "trash"): void {
@@ -100,9 +102,18 @@ export const filesActions: Record<string, ActionHandler> = {
     ctx.rerender();
   },
 
+  // author 2026-11-24 (#12): a page reports it was read to the end ({nt:"read", src}); its file's `onRead` line
+  // is said then (once a day) — the remark comes after the reading, never over it. With Vivi's lock on
+  // (docReturn set: the page was opened from her card), 看完了 follows and the chat comes back.
+  "file-read"(ctx, data) {
+    sayRead(ctx, data.src ?? "");
+  },
   "file-close"(ctx) {
     const app = ctx.session.filesApp;
     if (!app) return;
+    // closed unread: the remark is still owed (author 2026-11-24)
+    const open = app.open ? fileListedById(app.open, ctx.store.getEvents(), ctx.store.getState().day) : null;
+    if (open?.body?.kind === "html") sayRead(ctx, open.body.src);
     ctx.session.filesApp = { ...app, open: null };
     ctx.rerender();
   },
@@ -112,3 +123,24 @@ export const filesActions: Record<string, ActionHandler> = {
     ctx.rerender();
   },
 };
+
+/** The `onRead` line of the page at `src`, once a day; with Vivi's lock on, 看完了 and the way back after it. */
+export function sayRead(ctx: ActionContext, src: string): void {
+  const file = fileForPage(src);
+  const day = ctx.store.getState().day;
+  const lines: SayLine[] = [];
+  if (file?.onRead) {
+    const key = `${day}:${file.id}:read`;
+    if (!ctx.session.filesSaid.has(key)) {
+      ctx.session.filesSaid.add(key);
+      lines.push(file.onRead);
+    }
+  }
+  if (ctx.session.docReturn && (ctx.session.browserDoc ?? "") === src.replace(/[?#].*$/, "")) {
+    // the lock's tail (moved here from open-deliverable, author 2026-11-24 #12: read first, then the remark)
+    const back: SayLine[] = hasString("vivi.back") ? [{ k: "inner", t: t("vivi.back") }] : [];
+    ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${day}:vivi:back`, lines: [...lines, ...back], ending: { kind: "docBack" } });
+  } else if (lines.length && file) ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${day}:file:${file.id}:read`, lines, ending: { kind: "none" } });
+  else return;
+  ctx.rerender();
+}
