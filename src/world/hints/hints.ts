@@ -8,7 +8,7 @@
 import type { GameEvent } from "@state/events";
 import { objectsFoundOnDay } from "@state/stages";
 import type { State } from "@state/types.gen";
-import type { Session } from "@world/desktop/model";
+import { taskPageId, type Session } from "@world/desktop/model";
 import { html, type SafeHtml } from "@world/html";
 import { hasString, t, tr } from "@world/i18n";
 import { push } from "@world/loop/dialogue";
@@ -71,8 +71,10 @@ const DUE: Readonly<Record<HintId, (c: Ctx) => boolean>> = {
   items: ({ state }) => state.found.length > 0,
   kuro: ({ lc }) => !!lc && unlocked(lc, itemByEvent(lc, "chat")?.id),
   bed: ({ lc }) => !!lc && happened({ type: "beat", beat: "shutdown" }, lc),
-  // From the day after the chick was found.
-  chickHint: ({ state }) => state.found.includes("chick") && objectsFoundOnDay.chick !== undefined && state.day > objectsFoundOnDay.chick,
+  // From the day after the chick was found — and only at work (author 2026-11-24 #20: 这句话应该在工作任务的时候才说):
+  // on the desktop with a task page of 工作台 in front.
+  chickHint: ({ state, session }) =>
+    state.found.includes("chick") && objectsFoundOnDay.chick !== undefined && state.day > objectsFoundOnDay.chick && session.view === "desktop" && taskPageId(session.workbenchPage) !== null,
 };
 
 /** The edge of a facing that turns toward `to` (its first turn), or null where there is none. */
