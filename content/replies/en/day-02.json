@@ -2,52 +2,7 @@
   "day": 2,
   "recipients": {
     "boss": {
-      "incoming": [],
-      "fine": {
-        "status": "reply",
-        "lines": [
-          {
-            "who": "boss",
-            "t": "09:13",
-            "text": "Fine. Pull a first version of the storyline, nothing detailed, just get the feel right."
-          }
-        ],
-        "inner": "Just get the feel right. A feel can't be saved as a file."
-      },
-      "received": {
-        "status": "reply",
-        "lines": [
-          {
-            "who": "boss",
-            "t": "09:13",
-            "text": "👌"
-          }
-        ]
-      },
-      "whatever": {
-        "status": "read",
-        "lines": [],
-        "readAfter": "2s",
-        "interrupt": {
-          "who": "partner",
-          "where": "partner",
-          "t": "09:14",
-          "text": "[Card] Storyline · Style reference"
-        },
-        "inner": "I said whatever works, and the partner sent a card at once. They're together on this."
-      },
-      "salary": {
-        "status": "read",
-        "lines": [],
-        "readAfter": "3s",
-        "interrupt": {
-          "who": "boss",
-          "where": "group",
-          "t": "09:20",
-          "text": "Lunch is on me, everyone order. None for me."
-        },
-        "inner": "He's paying. For lunch, not wages."
-      }
+      "incoming": []
     },
     "partner": {
       "incoming": [
@@ -278,6 +233,15 @@
           "kind": "work",
           "cond_show": {
             "has": "sent_d2-vivi-page"
+          }
+        },
+        {
+          "t": "15:00",
+          "text": "{calledBy}, saw the ones you opened up. Thanks. I'll keep running them tomorrow",
+          "kind": "work",
+          "cond_show": {
+            "has": "task_d2_1",
+            "lacks": "sent_d2-vivi-page"
           }
         },
         {

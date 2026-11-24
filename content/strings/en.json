@@ -1381,5 +1381,9 @@
   "obj.chick.icon.toilet": "toilet",
   "obj.chick.icon.checkup": "check-up · the numbers",
   "obj.chick.icon.training": "training · ATK",
-  "obj.chick.icon.attention": "call it"
+  "obj.chick.icon.attention": "call it",
+  "checklist.go": "go",
+  "tune.defer": "Not today",
+  "tune.defer.me": "Not sending it today. I'll look again tomorrow.",
+  "tune.defer.note": "Left Xiao Zhang a line: I've handled part of it; I'll carry on tomorrow."
 }

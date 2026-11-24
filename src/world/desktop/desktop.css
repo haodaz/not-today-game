@@ -1480,6 +1480,9 @@ span.cmp-face-btn{cursor:default}
 .ts-act:disabled,.ts-finish:disabled{background:#CFCFCF;color:#777;box-shadow:3px 3px 0 #555;cursor:default}
 .ts-act:not(:disabled):hover,.ts-finish:not(:disabled):hover{transform:translate(2px,2px);box-shadow:4px 4px 0 #1d2129}
 .ts-finish{background:#6EE7B7}
+/* author 2026-11-24 (#33): 今天先不发 beside 提交 */
+.ts .ts-finish.ghost,.work-layer .work-stage .ts .ts-finish.ghost{background:transparent;color:#e7e3d7;border:2px solid rgba(231,227,215,.75);box-shadow:none;animation:none;margin-left:12px}
+.ts .ts-finish.ghost:hover{background:rgba(231,227,215,.15)}
 /* stage chrome, material pass (author 2026-11-16, same hand as the clue stage's; Claude): what every work stage shares — the frame's
    head, Kuro's remark, the one big button — in the same things-on-a-desk register: a paper slip, an enamelled plate. No hard black
    outlines, no offset block shadows. Styles only. */

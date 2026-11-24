@@ -45,7 +45,8 @@ describe("no checklist line is a button", () => {
     for (const day of dayFiles.keys()) {
       const { ctx } = ctxOf(atDay(day));
       const list = render(ctx).match(/<div class="list">[\s\S]*?<\/div><\/div>/)?.[0] ?? "";
-      expect(list, `day ${day}`).not.toMatch(/<button|data-action/);
+      // author 2026-11-24 (#30): the one button a line may carry is 前往 (go-item); nothing else
+      expect(list.replace(/<button type="button" class="go" data-action="go-item"[^>]*>[^<]*<\/button>/g, ""), `day ${day}`).not.toMatch(/<button|data-action/);
     }
   });
 });

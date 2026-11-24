@@ -1381,5 +1381,9 @@
   "obj.chick.icon.toilet": "上厕所",
   "obj.chick.icon.checkup": "体检 · 看数值",
   "obj.chick.icon.training": "训练 · 攻",
-  "obj.chick.icon.attention": "叫它一声"
+  "obj.chick.icon.attention": "叫它一声",
+  "checklist.go": "前往",
+  "tune.defer": "今天先不发",
+  "tune.defer.me": "今天先不发了。明天再看看。",
+  "tune.defer.note": "给小张留了句话：我处理了一部分，明天接着弄。"
 }

@@ -110,6 +110,9 @@
 /* wait-card (author 2026-11-20): the list and the delivery card stack at the top left; the list keeps its class for the motion layer */
 .room .hud-left{position:absolute;left:28px;top:28px;width:280px;display:flex;flex-direction:column;gap:10px;z-index:12}
 .room .hud-left .list{position:static;left:auto;top:auto;width:auto}
+/* author 2026-11-24 (#30): 前往 on the checklist's current line */
+.room .hud-left .it .go{margin-left:10px;vertical-align:1px;font:inherit;font-size:11px;letter-spacing:.12em;border:1px solid currentColor;border-radius:999px;background:transparent;color:inherit;padding:1px 9px;cursor:pointer;opacity:.7}
+.room .hud-left .it .go:hover{opacity:1;background:rgba(0,0,0,.06)}
 /* empty-box (author 2026-11-20): the eaten meal's box on the table up close, not a button */
 .room .table-things .slot.meal.done{pointer-events:none}
 .room .table-things .slot.meal.done img.done{filter:grayscale(.6) brightness(.9)}

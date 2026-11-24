@@ -12,7 +12,7 @@ const day3 = () => taskByFlag(3, "task_d3_1")!;
 describe("tune stage", () => {
   it("day 3 opens on the first node with its paths as action cards and the four target bars; no Kuro card", () => {
     setLocale("zh");
-    const store = createStore({ startDay: 3, patch: { flags: ["task_receivable_done", "task_merge_done", "task_d2_1", "task_d2_2"] } as never });
+    const store = createStore({ startDay: 3, patch: { flags: ["task_receivable_done", "task_merge_done", "task_d2_1"] } as never });
     const session = initialSession({ beat: "work", time: "10:00" }, "left", "desktop");
     const out = tuneStage({ state: store.getState(), events: store.getEvents(), session, nowMs: 1000 }, day3(), day3().board!).value;
     expect(out).toContain('class="ts-goal"');
@@ -24,7 +24,7 @@ describe("tune stage", () => {
   });
   it("the budget spent: the report page first (她页面上写的 vs 后台里), 提交 after; with the skin path taken it wears Vivi's look", () => {
     setLocale("zh");
-    const store = createStore({ startDay: 3, patch: { flags: ["task_receivable_done", "task_merge_done", "task_d2_1", "task_d2_2"] } as never });
+    const store = createStore({ startDay: 3, patch: { flags: ["task_receivable_done", "task_merge_done", "task_d2_1"] } as never });
     const task = day3();
     const tune = task.board!.tune!;
     // the first path of the first 8 open modules, then the end-of-work offer taken

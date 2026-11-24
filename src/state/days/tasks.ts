@@ -475,6 +475,8 @@ export interface Task {
   readonly judge?: TaskJudge;
   /** launch (author 2026-11-11): the task's opening page (board tasks). */
   readonly launch?: TaskLaunch;
+  /** author 2026-11-24 (#33): under the line, the work may be kept for tomorrow (今天先不发) instead of handed in. */
+  readonly defer?: boolean;
   /** game-swaps §3: a plain task's side game (自己做 plays it first). */
   readonly game?: TaskGame;
 }
@@ -1334,12 +1336,13 @@ function boardTask(v: Raw, w: string): Task {
     ...(v.deliverable !== undefined ? { deliverable: deliverable(v.deliverable, `${w}.deliverable`) } : {}),
     ...(v.judge !== undefined ? { judge: judge(v.judge, `${w}.judge`) } : {}),
     ...(v.launch !== undefined ? { launch: launch(v.launch, `${w}.launch`) } : {}),
+    ...(v.defer !== undefined ? { defer: typeof v.defer === "boolean" ? v.defer : fail(`${w}.defer`, "must be true or false") } : {}),
   };
 }
 
 function task(v: unknown, w: string): Task {
   if (!isRecord(v)) fail(w, "a task must be an object");
-  keys(v, ["id", "title", "app", "done", "start", ...PATHS, "doc", "ledger", "code", "board", "deliverable", "judge", "launch", "game"], w);
+  keys(v, ["id", "title", "app", "done", "start", ...PATHS, "doc", "ledger", "code", "board", "deliverable", "judge", "launch", "game", "defer"], w);
   // Work v2: a board task carries a board (and usually a deliverable + judge); its three-path tree
   // is optional and unused. A task without a board keeps the old required tree.
   if (v.board !== undefined) return boardTask(v, w);

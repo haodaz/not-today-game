@@ -34,6 +34,7 @@ const NEUTRAL: Entry = Object.freeze({ status: "read", lines: Object.freeze([]) 
  */
 export function condHolds(cond: Condition | undefined, state: State): boolean {
   if (!cond) return true;
+  if (cond.lacks !== undefined && state.flags.includes(cond.lacks)) return false;
   if (state.flags.includes(cond.has)) return true;
   return cond.has === LENT && LENT_STATES.includes(state.loan);
 }

@@ -18,6 +18,7 @@ import { renderMeeting } from "./meeting";
 import { RENDER_MS } from "./compare";
 import { hasString, t, tr } from "@world/i18n";
 import { push } from "@world/loop/dialogue";
+import type { SayLine } from "@state/days/table";
 import { battleChip, battleCmd, battleOffered, battleOver, battleReward, battleTarget, battleTurn, foeImage, startBattle } from "./battle";
 import { fillPlaceholders } from "@world/replies/placeholders";
 import { MINES_DONE_MS, minesFlag, minesOpen, minesRoll, minesStart, type MinesGrid } from "./mines";
@@ -1630,6 +1631,23 @@ const actions: Record<string, ActionHandler> = {
     const s = stateOf(ctx, c.task, c.board);
     if (!canPrint(c.board, s)) return;
     printBoard(ctx, c, s);
+    ctx.rerender();
+  },
+  // author 2026-11-24 (#33): 今天先不发 — a deferrable task (content `defer`) under the line is done for the
+  // day but not handed in (no `give`, so no sent_ flag: 小张's thanks reads that); the player's two lines.
+  "board-defer"(ctx) {
+    const c = currentBoard(ctx);
+    if (!c?.task.defer) return;
+    const s = stateOf(ctx, c.task, c.board);
+    if (!s.done) return;
+    const open = openWork(ctx.store.getState(), ctx.store.getEvents());
+    if (!open || open.item.done.kind !== "flag") return;
+    ctx.store.appendEvent({ kind: "task", flag: open.item.done.flag, mode: s.assists > 0 ? "let" : "self", slots: { ...s.slots }, assists: s.assists, ...qualityOf(ctx, c) });
+    ctx.session.boardPick = null;
+    ctx.session.boardLockOpen = false;
+    const day = ctx.store.getState().day;
+    const lines: SayLine[] = [{ k: "inner", t: t("tune.defer.me") }, ...(hasString("tune.defer.note") ? [{ k: "narration" as const, t: t("tune.defer.note") }] : [])];
+    ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${day}:defer:${c.task.id}`, lines, ending: { kind: "none" } });
     ctx.rerender();
   },
   // compare (author 2026-11-11): a version picked for the page: the fill, then Kuro renders the page

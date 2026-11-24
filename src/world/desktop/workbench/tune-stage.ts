@@ -7,7 +7,7 @@
 // 行动 N/6 and the progress; Kuro's remark comes in under the cards; 提交 when the work is done. The
 // state is the tuning board's as before (board-mod, board-assist-mod, board-keep, board-print);
 // only the picture and the select-then-act step are new.
-import { boardState, canPrint, modFound, pathFound, pathOnMenu, tuneBase, tuneCarried, tuneDims, tuneOfferPending, tuneOffers, tuneReached, tuneStepsLeft } from "@state/days/board";
+import { boardState, canPrint, modFound, pathFound, pathOnMenu, tuneBase, tuneCarried, tuneDims, tuneOfferPending, tuneOffers, tuneReached, tuneShort, tuneStepsLeft } from "@state/days/board";
 import { ideOps, ideSrc, ideTranscript } from "@state/days/ide";
 import { browserFrame } from "./settle-layer";
 import { fillPlaceholders } from "@world/replies/placeholders";
@@ -125,7 +125,9 @@ export function tuneStage(c: { state: State; events: readonly GameEvent[]; sessi
     ? html`<div class="ts-offer">${tuneOffers(board).map(({ mod: m, path }) => html`<button type="button" class="wl-cta" data-action="board-mod" data-mod="${m.id}" data-path="${path.id}">${path.label}</button>`)}${hasString("board.tune.keep") ? html`<button type="button" class="wl-cta ghost" data-action="board-keep">${t("board.tune.keep")}</button>` : null}</div>`
     : null;
   const finish = printable || s.done ? html`<button type="button" class="ts-finish" data-action="board-print"${printable && !busy ? null : html` disabled`}>${finishLabel(task)}</button>` : null;
-  const kuro = html`<div class="${cls("ts-kuro", busy && "busy")}"><img class="ts-kimg" src="${frameUrl(FRAMES.idle[0])}" alt="">${busy || say ? html`<div class="ts-say">${busy ? html`<span class="ts-dots">${working}</span>` : kuroText(day, say)}</div>` : html`<div class="ts-say empty"></div>`}${offers}<div class="ts-right">${finish}</div></div>`;
+  // author 2026-11-24 (#33): a deferrable task under today's line can be kept for tomorrow instead (今天先不发)
+  const defer = s.done && task.defer === true && !busy && tuneShort(board, s.mods).length > 0 && hasString("tune.defer") ? html`<button type="button" class="ts-finish ghost" data-action="board-defer">${S("tune.defer")}</button>` : null;
+  const kuro = html`<div class="${cls("ts-kuro", busy && "busy")}"><img class="ts-kimg" src="${frameUrl(FRAMES.idle[0])}" alt="">${busy || say ? html`<div class="ts-say">${busy ? html`<span class="ts-dots">${working}</span>` : kuroText(day, say)}</div>` : html`<div class="ts-say empty"></div>`}${offers}<div class="ts-right">${finish}${defer}</div></div>`;
 
   // ——— the settlement (author 2026-11-13: 「左边那么好看为什么替换掉」): the lab stays — the node
   // strip and the 研发目标 panel on the left as during the work — and the middle is the backend page as

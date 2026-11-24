@@ -247,13 +247,6 @@
       "required": true
     },
     {
-      "id": "task2",
-      "text": "字段名改回来。",
-      "unlock": "done:task1",
-      "done": "flag:task_d2_2",
-      "required": true
-    },
-    {
       "id": "pickup",
       "text": "外卖到了，去门口拿。",
       "unlock": "event:delivery:arrives:lunch",
@@ -302,13 +295,6 @@
           }
         ]
       }
-    },
-    {
-      "id": "reply",
-      "text": "给老王回一句。",
-      "unlock": "done:task2",
-      "done": "event:reply:boss",
-      "required": true
     },
     {
       "id": "dinner",

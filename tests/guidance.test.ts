@@ -439,7 +439,9 @@ describe("R6 / R7 · 工作台's home and the task page", () => {
     expect(greetingKeyAt("12:04")).toBe("wb.hello.afternoon");
     expect(greetingKeyAt("09:03")).toBe("wb.hello.morning");
     expect(greetingKeyAt("19:00")).toBe("wb.hello.evening");
-    expect(r.out()).toContain(`<h1>${t("wb.hello.morning")}</h1>`);
+    // author 2026-11-24 (#7 #32): with the day's work open, 工作台 lands on its task page, not home (the sidebar stays)
+    expect(r.session.workbenchPage).toMatch(/^task:/);
+    expect(r.session.wbSidebar).toBe(true);
   });
 
   it("a task page has no text box; the start narration plays on open; Kuro's busy bubble says wb.busy", () => {

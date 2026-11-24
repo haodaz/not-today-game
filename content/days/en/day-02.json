@@ -247,13 +247,6 @@
       "required": true
     },
     {
-      "id": "task2",
-      "text": "Put the field names back.",
-      "unlock": "done:task1",
-      "done": "flag:task_d2_2",
-      "required": true
-    },
-    {
       "id": "pickup",
       "text": "Lunch is at the door. Go get it.",
       "unlock": "event:delivery:arrives:lunch",
@@ -302,13 +295,6 @@
           }
         ]
       }
-    },
-    {
-      "id": "reply",
-      "text": "Send the boss a reply.",
-      "unlock": "done:task2",
-      "done": "event:reply:boss",
-      "required": true
     },
     {
       "id": "dinner",

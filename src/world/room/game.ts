@@ -735,7 +735,71 @@ function firstHold(ctx: ActionContext, id: string | null): void {
   ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${ctx.store.getState().day}:${key}`, lines: [{ k: "inner", t: t(key) }], ending: { kind: "none" } });
 }
 
+/**
+ * author 2026-11-24 (#7 #32): 工作台 shown on home while the day's work is under way lands on that task's
+ * page (the dock did this; now every way in does).
+ */
+function landOnOpenTask(ctx: ActionContext): void {
+  const { session } = ctx;
+  if (session.view !== "desktop" || shownApp(session) !== "workbench" || session.workbenchPage !== "home") return;
+  const open = openWork(ctx.store.getState(), ctx.store.getEvents());
+  if (!open?.tree || ctx.store.getState().flags.includes(open.tree.done)) return;
+  // guidance R6: the run's first open keeps its sidebar (the past) however the page lands
+  const sidebar = session.wbSidebar;
+  workbenchActions["wb-nav"]!(ctx, { page: `task:${open.tree.id}` } as DOMStringMap, null as never);
+  session.wbSidebar = sidebar;
+}
+
+/**
+ * author 2026-11-24 (#30): 前往 on a checklist line — the same clicks the player would make, in order,
+ * to the last page where that step is done (the eating spot, facing the tower, the phone open, the
+ * thread, the task page). Every click goes through its own handler, so its guards and its log hold.
+ */
+function goToItem(ctx: ActionContext, id: string): void {
+  const state = ctx.store.getState();
+  const events = ctx.store.getEvents();
+  const lc = loopContext(state, events);
+  if (!lc) return;
+  const item = id === "work" ? openWork(state, events)?.item : lc.file.items.find((it) => it.id === id);
+  if (!item) return;
+  const go = (name: string, data: Record<string, string> = {}) => loopActions[name]?.(ctx, data as unknown as DOMStringMap, null as never);
+  const desktop = () => go("view", { view: "desktop", screen: "left" });
+  const thread = (conv: string) => {
+    desktop();
+    go("dock", { app: conv === "family" ? "msgs" : "tingtalk" });
+    go("conv", { conv });
+  };
+  const d = item.done;
+  if (d.kind === "flag") {
+    desktop();
+    go("dock", { app: "workbench" });
+    return;
+  }
+  if (d.kind !== "event") return;
+  const e = d.event;
+  switch (e.type) {
+    case "rise": go("rise"); break;
+    case "boot": go("view", { view: "room" }); break; // the tower's 开机 is pointed at from 房间
+    case "openApp": desktop(); go("dock", { app: e.app === "msgs" ? "tingtalk" : e.app }); break;
+    case "reply": thread(e.recipient); break;
+    case "open": if (e.target.startsWith("conv:")) thread(e.target.slice("conv:".length)); else desktop(); break;
+    case "order": go("view", { view: "desk" }); go("loop-phone"); break;
+    case "arrives": case "pickup": go("view", { view: "door" }); break;
+    case "openBox": go("view", { view: "room" }); go("pick-box"); break;
+    case "eat": go("meal-table"); break;
+    case "beat": if (e.beat === "desk") go("view", { view: "desk" }); else desktop(); break;
+    case "chat": kuroActions["kuro-call"]!(ctx, {} as DOMStringMap, null as never); break;
+    case "lieDown": go("bed"); break;
+    default: break;
+  }
+}
+
 export const loopActions: Record<string, ActionHandler> = {
+  // author 2026-11-24 (#30): 前往 on the checklist
+  "go-item"(ctx, data) {
+    goToItem(ctx, data.id ?? "");
+    ctx.rerender();
+  },
   // Everything that moves the player (a hotspot's data-view, the sleep flow, the 道具 strip) goes
   // the shortest way (room-turn R2).
   view(ctx, data) {
@@ -753,6 +817,7 @@ export const loopActions: Record<string, ActionHandler> = {
       return;
     }
     goTo(ctx, view, data);
+    landOnOpenTask(ctx); // author 2026-11-24 (#32)
   },
 
   // A 90° turn on a facing (room-turn R2): the turn edges and ←/→. Not while something is over the
@@ -781,11 +846,8 @@ export const loopActions: Record<string, ActionHandler> = {
   dock(ctx, data, el) {
     if (viviRefuse(ctx)) return;
     shellActions.dock!(ctx, data, el);
-    // author 2026-11-24 (#7): 工作台 opens on the day's task page while that work is under way, not on home
-    if (data.app === "workbench" && ctx.session.workbenchPage === "home") {
-      const open = openWork(ctx.store.getState(), ctx.store.getEvents());
-      if (open?.tree && !ctx.store.getState().flags.includes(open.tree.done)) workbenchUiActions["wb-nav"]!(ctx, { page: `task:${open.tree.id}` } as DOMStringMap, null as never);
-    }
+    // author 2026-11-24 (#7 #32): 工作台 opens on the day's task page while that work is under way, not on home
+    landOnOpenTask(ctx);
     lookAt(ctx, shownApp(ctx.session));
     lookedAway(ctx);
     // Another app in front is another place (`screen:msgs` ↔ `screen:workbench`).

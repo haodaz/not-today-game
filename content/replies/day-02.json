@@ -2,52 +2,7 @@
   "day": 2,
   "recipients": {
     "boss": {
-      "incoming": [],
-      "fine": {
-        "status": "reply",
-        "lines": [
-          {
-            "who": "boss",
-            "t": "09:13",
-            "text": "好。那个叙事线你先拉一版，不用太细，有感觉就行。"
-          }
-        ],
-        "inner": "有感觉就行。感觉不能存成文件。"
-      },
-      "received": {
-        "status": "reply",
-        "lines": [
-          {
-            "who": "boss",
-            "t": "09:13",
-            "text": "👌"
-          }
-        ]
-      },
-      "whatever": {
-        "status": "read",
-        "lines": [],
-        "readAfter": "2s",
-        "interrupt": {
-          "who": "partner",
-          "where": "partner",
-          "t": "09:14",
-          "text": "[卡片] 叙事线 · 样式参考"
-        },
-        "inner": "我说哪都行，合伙人立刻发来一张卡。他们是一起的。"
-      },
-      "salary": {
-        "status": "read",
-        "lines": [],
-        "readAfter": "3s",
-        "interrupt": {
-          "who": "boss",
-          "where": "group",
-          "t": "09:20",
-          "text": "中午我请，大家点，我的不要饭。"
-        },
-        "inner": "他请客。请的是饭，不是工资。"
-      }
+      "incoming": []
     },
     "partner": {
       "incoming": [
@@ -278,6 +233,15 @@
           "kind": "work",
           "cond_show": {
             "has": "sent_d2-vivi-page"
+          }
+        },
+        {
+          "t": "15:00",
+          "text": "{calledBy}看到你开的那几个了，谢了。明天我接着跑",
+          "kind": "work",
+          "cond_show": {
+            "has": "task_d2_1",
+            "lacks": "sent_d2-vivi-page"
           }
         },
         {

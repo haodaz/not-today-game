@@ -105,7 +105,8 @@ export function renderChecklist(view: ChecklistView): SafeHtml {
   // playtest-1105 R7: all of today's work tasks are one line, with how many are done.
   // navigation-polish (author's playtest 2026-11-16): no done count; the current line carries the
   // marker in full ink, every other open line is dimmed (`later`) with no marker.
-  const lines = view.lines.map((l) => html`<div class="${cls("it", l.state, l.state === "locked" && "later")}" data-id="${l.id}">${l.state === "now" ? html`<i class="mark" aria-hidden="true">▸</i>` : null}${l.work ? tr("checklist.work", { done: l.work.done, total: l.work.total }) : l.text}</div>`);
+  // author 2026-11-24 (#30): the current line carries 前往 — one click lands where that step is done
+  const lines = view.lines.map((l) => html`<div class="${cls("it", l.state, l.state === "locked" && "later")}" data-id="${l.id}">${l.state === "now" ? html`<i class="mark" aria-hidden="true">▸</i>` : null}${l.work ? tr("checklist.work", { done: l.work.done, total: l.work.total }) : l.text}${l.state === "now" && hasString("checklist.go") ? html`<button type="button" class="go" data-action="go-item" data-id="${l.id}">${tr("checklist.go")}</button>` : null}</div>`);
   return html`<div class="list"><div class="h">${tr(view.heading === "tonight" ? "hud.tonight" : "hud.today")}</div>${lines}</div>`;
 }
 
@@ -447,7 +448,8 @@ function mealSlot(state: State, events: readonly GameEvent[], session?: Pick<Ses
   if (at.eaten) {
     if (session?.emptyBox !== at.meal || !sprite) return null;
     // the <object> falls back to the greyed food when no <sprite>_done.png exists
-    return html`<div class="slot meal done" aria-hidden="true"><object data="/${sprite}_done.png" type="image/png"><img class="done" src="${food!}" alt=""></object></div>`;
+    // author 2026-11-24 (#31): a food without its own _done sprite shows the plain empty box, not a see-through bowl
+    return html`<div class="slot meal done" aria-hidden="true"><object data="/${sprite}_done.png" type="image/png"><img class="done" src="/food/box_done.png" alt=""></object></div>`;
   }
   return html`<button type="button" class="slot meal" data-action="loop-eat" data-meal="${at.meal}" aria-label="${t("room.meal")}">${food ? html`<img src="${food}" alt="">` : null}</button>`;
 }

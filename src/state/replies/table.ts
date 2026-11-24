@@ -34,6 +34,8 @@ export interface Interrupt extends Line {
 
 export interface Condition {
   readonly has: string;
+  /** author 2026-11-24 (#33): and this flag must be absent (the work done but not handed in: `sent_<id>` missing). */
+  readonly lacks?: string;
 }
 
 export interface Entry {
@@ -142,8 +144,8 @@ function text(value: unknown, where: string): string {
 
 function condition(value: unknown, where: string): Condition {
   if (!isRecord(value)) throw new ContentError(where, "cond_show must be an object");
-  onlyKeys(value, ["has"], where);
-  return { has: str(value.has, `${where}.has`) };
+  onlyKeys(value, ["has", "lacks"], where);
+  return { has: str(value.has, `${where}.has`), ...(value.lacks !== undefined ? { lacks: str(value.lacks, `${where}.lacks`) } : {}) };
 }
 
 function flags(value: unknown, where: string): string[] {
