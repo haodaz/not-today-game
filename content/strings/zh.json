@@ -1344,5 +1344,19 @@
   "hunger.work.me": "没吃饭，手是抖的。先吃点东西。",
   "hunger.work.kuro": "你还没吃饭。先吃。",
   "hunger.wait.me": "外卖还没到。到了再开工。",
-  "hunger.wait.kuro": "外卖在路上。到了再开工。"
+  "hunger.wait.kuro": "外卖在路上。到了再开工。",
+  "hud.back.desk": "离开桌子",
+  "room.bed.lieAsk": "要躺下吗？",
+  "room.bed.lie": "躺下",
+  "room.chip.tower": "开机",
+  "room.chip.monitorL": "去屏幕前",
+  "room.chip.monitorR": "去屏幕前",
+  "room.chip.lamp": "台灯",
+  "room.chip.desk": "凑近桌子",
+  "room.chip.box": "看看箱子",
+  "room.chip.bed": "躺一会儿",
+  "room.chip.door": "去门口",
+  "reply.laozhou.d1.fine": "还没想。",
+  "reply.laozhou.d1.received": "黄焖鸡吧。",
+  "reply.laozhou.d1.whatever": "随便。"
 }

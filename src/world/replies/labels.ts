@@ -27,9 +27,11 @@ export const GONE_HINT_KEY = "reply.hint.gone";
  * `word.{word}` for a lent object word, `family.{word}` for the family's own words, `reply.{word}`
  * otherwise. Null for `free`: it is the input box.
  */
-export function labelKey(recipient: string, word: string): string | null {
+export function labelKey(recipient: string, word: string, day?: number): string | null {
   if (word === FREE) return null;
   if (objectWords.has(word)) return `word.${word}`;
+  // author 2026-11-24 (#5): a day's thread may word the four replies to fit what was asked (老周's 中午吃啥)
+  if (day !== undefined && hasString(`reply.${recipient}.d${day}.${word}`)) return `reply.${recipient}.d${day}.${word}`;
   // author 2026-11-11: the same four words, but each person hears them in their own wording
   // (`reply.<recipient>.<word>` in strings): 您定 to the boss, 都行，你定 to Vivi.
   if (hasString(`reply.${recipient}.${word}`)) return `reply.${recipient}.${word}`;

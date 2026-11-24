@@ -264,7 +264,7 @@ function replyBar(ctx: AppContext, conversation: string, register: Register): Sa
   const chips = items
     .filter((item) => item.kind !== "free")
     .map((item) => {
-      const label = tr(labelKey(conversation, item.word)!);
+      const label = tr(labelKey(conversation, item.word, ctx.state.day)!);
       if (item.gone) return html`<button type="button" data-conv="${conversation}" class="chip gone" data-action="gone" data-word="${item.word}">${label}</button>`;
       return html`<button type="button" data-conv="${conversation}" class="${cls("chip", item.kind === "object" && "lent", session.selected === item.word && "on")}" data-action="chip" data-word="${item.word}"${gone ? html` disabled` : null}>${label}</button>`;
     });
@@ -276,7 +276,7 @@ function replyBar(ctx: AppContext, conversation: string, register: Register): Sa
   else if (free) kbd = html`<div class="kbd"><input data-input="draft" data-focus="draft" placeholder="${t("msgs.input.free")}" value="${session.draft}"></div>`;
   const chosen = session.selected !== null && items.some((i) => i.word === session.selected && i.kind !== "free");
   // author 2026-11-11: the picked word sits in the input box, as typed, so 发送 is the next thing.
-  if (kbd === null && chosen && !gone) kbd = html`<div class="kbd draft">${tr(labelKey(conversation, session.selected!)!)}</div>`;
+  if (kbd === null && chosen && !gone) kbd = html`<div class="kbd draft">${tr(labelKey(conversation, session.selected!, ctx.state.day)!)}</div>`;
   const canSend = !gone && (chosen || (free && session.draft.trim() !== ""));
   const inner = session.inner && !prompt
     ? html`<div class="inner">${session.inner.text !== null ? fillPlaceholders(session.inner.text, state.names) : session.inner.key ? tr(session.inner.key) : null}</div>`

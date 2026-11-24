@@ -336,7 +336,7 @@
           {
             "who": "laozhou",
             "t": "11:40",
-            "text": "Fine isn't a dish. What are you eating"
+            "text": "Braised chicken then?"
           }
         ]
       },
@@ -345,13 +345,8 @@
         "lines": [
           {
             "who": "laozhou",
-            "t": "11:40",
-            "text": "Received what? I haven't sent anything."
-          },
-          {
-            "who": "laozhou",
             "t": "11:41",
-            "text": "Braised chicken?"
+            "text": "Fine, braised chicken it is"
           }
         ]
       },
@@ -361,7 +356,7 @@
           {
             "who": "laozhou",
             "t": "11:41",
-            "text": "Fine, braised chicken it is."
+            "text": "Whatever means braised chicken"
           }
         ],
         "effects": {

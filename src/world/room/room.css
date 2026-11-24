@@ -1185,6 +1185,11 @@
 .room .go-pill,.room .edge-hint.back{position:absolute;left:50%;bottom:7%;right:auto;top:auto;height:auto;width:auto;transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:11px 20px;border-radius:999px;background:rgba(244,240,232,.92);color:#1d2129;font-size:15px;letter-spacing:.14em;text-shadow:none;box-shadow:0 8px 22px rgba(0,0,0,.28);pointer-events:none;white-space:nowrap}
 .room .go-pill .chev,.room .edge-hint.back .chev{width:9px;height:9px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);margin-top:-4px;flex:0 0 auto}
 .room .rise-spot:hover .go-pill,.room .rise-spot:focus-visible .go-pill{background:#fff}
+.room .back-pill{pointer-events:auto;cursor:pointer;border:0;font:inherit;z-index:14;transition:background .15s,transform .15s}
+.room .back-pill:hover,.room .back-pill:focus-visible{background:#fff;transform:translateX(-50%) translateY(-2px);outline:none}
+/* hover chips (author 2026-11-24 #3): the picked hotspot says what it does, like the book's chip */
+.room .shot-hit[data-chip]::after{content:attr(data-chip);position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);padding:7px 14px;border-radius:999px;background:rgba(244,240,232,.94);color:#1d2129;font-size:14px;letter-spacing:.12em;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.28);opacity:0;transition:opacity .15s;pointer-events:none}
+.room .shot-hit[data-hover][data-chip]::after,.room .shot-hit:focus-visible[data-chip]::after{opacity:1}
 /* player-stands (2026-11-22): the player's own figure, alone, centre, over the room through a dim (.me-on). */
 .dlg-layer .scene-stand.me,.dlg-layer .scene-stand-anim.me{height:calc(var(--stage-h,100vh) * .86)}
 .dlg-layer.me-on::before{content:"";position:fixed;left:var(--stage-l,0px);top:var(--stage-t,0px);width:var(--stage-w,100vw);height:var(--stage-h,100vh);background:rgba(4,5,8,.42);animation:m-fade-in 300ms both}

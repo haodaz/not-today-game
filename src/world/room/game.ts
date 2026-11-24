@@ -1020,8 +1020,20 @@ export const loopActions: Record<string, ActionHandler> = {
       ctx.rerender();
       return;
     }
-    // lying-view R4: the question can be asked: the bed is lain on first (the ceiling, its night
-    // photo), and the question is asked from there.
+    // author 2026-11-24 (#16): from across the room, ask first (要躺下吗？); at 床 itself or lying already, no question before the ceiling.
+    if (session.view !== "lying" && session.view !== "bed") {
+      if (session.dialogue.queue.some((q) => q.ending.kind === "lieAsk")) return;
+      session.dialogue = push(session.dialogue, { key: `d${day}:bed:lie`, lines: [{ k: "inner", t: t("room.bed.lieAsk") }], ending: { kind: "lieAsk" } });
+      ctx.rerender();
+      return;
+    }
+    if (session.view !== "lying") loopActions["view"]!(ctx, { view: "lying" } as DOMStringMap, null as never);
+    session.dialogue = push(session.dialogue, bedAskQueued(ctx));
+    ctx.rerender();
+  },
+  /** 躺下 answered: lie on the bed (the ceiling) and ask the night's question from there (lying-view R4). */
+  "lie-down"(ctx) {
+    const { session } = ctx;
     if (session.view !== "lying") loopActions["view"]!(ctx, { view: "lying" } as DOMStringMap, null as never);
     session.dialogue = push(session.dialogue, bedAskQueued(ctx));
     ctx.rerender();
@@ -1260,6 +1272,15 @@ export const loopActions: Record<string, ActionHandler> = {
       if (q.ending.kind === "kuroAsk") answerAsk(ctx, data.choice === "yes");
       else answerOffer(ctx, data.choice === "yes");
       ctx.rerender();
+      return;
+    }
+    // 躺下 / 再待会儿 at the bed (author 2026-11-24 #16)
+    if (q.ending.kind === "lieAsk") {
+      if (data.choice !== "lie" && data.choice !== "stay") return;
+      ctx.session.dialogue = finishChoice(ctx.session.dialogue);
+      settleSession(ctx.session);
+      if (data.choice === "lie") loopActions["lie-down"]!(ctx, {} as DOMStringMap, null as never);
+      else ctx.rerender();
       return;
     }
     // 睡 / 再待会儿: sleeping goes on as lying down always did; staying changes nothing.

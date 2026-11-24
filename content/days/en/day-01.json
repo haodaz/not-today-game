@@ -173,12 +173,12 @@
         },
         {
           "k": "narration",
-          "t": "You close your eyes. First a grey-white behind the lids, then, bit by bit, a room. Not this one.",
+          "t": "You close your eyes. Dark for a while, then a room comes up, slowly. Not this one.",
           "backdrop": ""
         },
         {
           "k": "narration",
-          "t": "In the dream you remember: this one is yours. A knock-off of a knock-off, bought at a street stall, one chick and nothing else. You treasured it.",
+          "t": "In the dream you remember. This one is yours: a knock-off from a street stall when you were small, one chick on the screen and nothing else. You treasured it.",
           "backdrop": "/room/dream/street_2000.jpg"
         },
         {
@@ -283,7 +283,8 @@
         },
         {
           "k": "narration",
-          "t": "Later you pressed the little hole on the back. Nothing. It stayed a grave."
+          "t": "Later you pressed the little hole on the back. Nothing. It stayed a grave.",
+          "prop": "/room/props/chick_front.png"
         },
         {
           "k": "narration",

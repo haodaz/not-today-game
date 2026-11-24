@@ -458,7 +458,9 @@ describe("the four facings and their turn edges (room-turn 2026-11-04)", () => {
     expect(d.root.querySelector(".edge-hint")).toBeNull();
     mouse("mousemove", d.stage(), 800, 880);
     await frame();
-    expect(d.root.querySelector<HTMLElement>(".edge-hint.back")!.textContent).toBe(t("hud.back"));
+    // #2 / #15 (2026-11-24): 桌子's way back is an always-on clickable pill, 离开桌子; the band still answers a click
+    expect(d.root.querySelector<HTMLElement>(".back-pill")!.textContent).toBe(t("hud.back.desk"));
+    expect(d.root.querySelector(".edge-hint.back")).toBeNull();
     await click(d, 800, 880);
     expect(d.session.view).toBe("room");
   });
@@ -724,6 +726,8 @@ describe("the real layer with a fake scene: look, and 床 held by the splat", ()
     // The bed's proxy in 房间 is the thing to point at.
     const bed = fixedRects("room").bed!;
     await click(m, bed.l + bed.w / 2, bed.t + bed.h / 2);
+    m.root.querySelector<HTMLElement>('[data-action="loop-choice"][data-choice="lie"]')!.click(); // #16: 要躺下吗？ → 躺下
+    await frame();
     expect(m.session.view).toBe("bed");
     expect(m.session.cam).toMatchObject({ to: "bed", turn: { dir: "right", hops: 1 } });
     // 床 is a still: no splat layer, the stage shows bed.jpg.
@@ -750,6 +754,8 @@ describe("the real layer with a fake scene: look, and 床 held by the splat", ()
     await frame();
     const bed = fixedRects("room").bed!;
     await click(m, bed.l + bed.w / 2, bed.t + bed.h / 2);
+    m.root.querySelector<HTMLElement>('[data-action="loop-choice"][data-choice="lie"]')!.click(); // #16
+    await frame();
     expect(m.session.view).toBe("bed");
     // 再待会儿 on the way, then a second turn: it waits for the first, then turns away before lying down.
     m.root.querySelector<HTMLElement>('[data-action="loop-choice"][data-choice="stay"]')!.click();
@@ -790,6 +796,9 @@ describe("the real layer with a fake scene: look, and 床 held by the splat", ()
     await frame();
     expect(m.session.splatReady).toBe(false);
     m.root.querySelector<HTMLElement>('.shot-hit[data-hot="bed"]')!.click();
+    await frame();
+    m.root.querySelector<HTMLElement>('[data-action="loop-choice"][data-choice="lie"]')!.click(); // #16
+    await frame();
     expect(m.session.view).toBe("bed");
     expect(m.session.dialogue.queue.map((q) => q.key)).toEqual(["d1:bed:ask"]);
     await wait(CHOSEN.turn + 80);

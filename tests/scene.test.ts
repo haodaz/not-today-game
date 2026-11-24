@@ -103,7 +103,7 @@ describe("sceneOf", () => {
     expect(at(17)).toMatchObject({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_96.png" });
     expect(at(18)).toMatchObject({ backdrop: "/room/dream/home_dinner.jpg", prop: "/room/props/exam_96.png" });
     expect(at(23)).toMatchObject({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_100.png" });
-    expect(at(27)).toMatchObject({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/exam_100.png" });
+    expect(at(27)).toMatchObject({ backdrop: "/room/dream/classroom.jpg", prop: "/room/props/chick_front.png" }); // #19 (2026-11-24): the chick with its grave, from line 26
   });
   it("two-up (author 2026-11-20): a second person in the same scene keeps the first at the side; a new backdrop clears both", () => {
     const seq = (line: number): DialogueState => ({ queue: [{ key: "x", lines: [

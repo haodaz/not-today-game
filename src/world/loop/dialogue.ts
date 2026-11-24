@@ -15,6 +15,8 @@ export type Ending =
   | { readonly kind: "beatChoices"; readonly day: number; readonly beat: BeatName }
   | { readonly kind: "loan" }
   | { readonly kind: "lieDown" }
+  /** author 2026-11-24 (#16): at the bed, 要躺下吗？ before the ceiling; 躺下 / 再待会儿. */
+  | { readonly kind: "lieAsk" }
   /** "Do you know what this is?" (recognise spec): the options in this run's order (content indexes). */
   | { readonly kind: "recognise"; readonly object: string; readonly order: readonly number[] }
   /** The bed, unlocked: 睡 / 再待会儿 (day-loop addition 2026-11-02). */
@@ -272,7 +274,9 @@ export function sceneOf(d: DialogueState, day = 0, look?: string): Scene {
   // their own line (author 2026-11-18: 卷子出现的时候是卷子，老师说话的时候才是老师).
   const cur = q.lines[Math.min(d.line, q.lines.length - 1)];
   const speaking = q.voice !== "kuro" && !!cur && (cur.k === "speaker" || cur.k === "narration") && cur.who !== undefined && cur.who !== "me";
-  const show = backdrop !== null && stand !== null && (prop === null || speaking);
+  // author 2026-11-24 (#18): while someone without a stand speaks (同桌), the last stand steps aside
+  const standless = !!cur && cur.k === "speaker" && cur.who !== undefined && cur.who !== "me" && cur.who !== "kuro" && npcStand(cur.who) === null;
+  const show = backdrop !== null && stand !== null && (prop === null || speaking) && !standless;
   if (!show) return { backdrop, prop, ...mine };
   const pic = (who: string) => npcStandFor(who, poses.get(who), day)!;
   // the idle loop belongs to the plain stand only (it was drawn from it)
@@ -437,6 +441,10 @@ export const BED_RECORD_OPTIONS: readonly ChoiceOption[] = [
   { index: 2, text: null, choice: "stay", labelKey: "room.bed.stay" },
   { index: 3, text: null, choice: "read", labelKey: "room.book.read" },
 ];
+export const LIE_OPTIONS: readonly ChoiceOption[] = [
+  { index: 0, text: null, choice: "lie", labelKey: "room.bed.lie" },
+  { index: 1, text: null, choice: "stay", labelKey: "room.bed.stay" },
+];
 export const RISE_OPTIONS: readonly ChoiceOption[] = [
   { index: 0, text: null, choice: "up", labelKey: "room.rise.up" },
   { index: 1, text: null, choice: "stay", labelKey: "room.rise.stay" },
@@ -471,6 +479,7 @@ function options(q: Queued, state: State, events?: readonly GameEvent[]): Choice
   if (q.ending.kind === "kuroOffer") return [...KURO_OFFER_OPTIONS];
   if (q.ending.kind === "bedAsk") return q.ending.record ? [...BED_RECORD_OPTIONS] : [...BED_OPTIONS];
   // bedside-book (author 2026-11-24): the book is first met at the bed on night 1, so day 1's morning has no 看书
+  if (q.ending.kind === "lieAsk") return [...LIE_OPTIONS];
   if (q.ending.kind === "riseAsk") return state.day <= 1 ? RISE_OPTIONS.filter((o) => o.choice !== "read") : [...RISE_OPTIONS];
   if (q.ending.kind === "doorAsk") return [...DOOR_ASK_OPTIONS];
   if (q.ending.kind === "eatAsk") return [...EAT_ASK_OPTIONS];

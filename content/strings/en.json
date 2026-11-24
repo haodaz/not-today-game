@@ -1344,5 +1344,19 @@
   "hunger.work.me": "Haven’t eaten; my hands shake. Eat something first.",
   "hunger.work.kuro": "You haven’t eaten. Eat first.",
   "hunger.wait.me": "The food isn’t here yet. Start when it is.",
-  "hunger.wait.kuro": "The food is on its way. Start when it is here."
+  "hunger.wait.kuro": "The food is on its way. Start when it is here.",
+  "hud.back.desk": "Leave the desk",
+  "room.bed.lieAsk": "Lie down?",
+  "room.bed.lie": "Lie down",
+  "room.chip.tower": "Power on",
+  "room.chip.monitorL": "To the screen",
+  "room.chip.monitorR": "To the screen",
+  "room.chip.lamp": "The lamp",
+  "room.chip.desk": "Closer to the desk",
+  "room.chip.box": "Look at the box",
+  "room.chip.bed": "Lie down a while",
+  "room.chip.door": "To the door",
+  "reply.laozhou.d1.fine": "Haven't thought.",
+  "reply.laozhou.d1.received": "Braised chicken?",
+  "reply.laozhou.d1.whatever": "Whatever."
 }

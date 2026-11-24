@@ -62,7 +62,7 @@ describe("开机: the tower's power button (房间; 桌子 is the tabletop, the 
       store.appendEvent({ kind: "step", name: "rise", t: "09:03" });
       const { ctx } = ctxOf(store, view);
       const before = render(ctx);
-      expect(before).toContain(`<button type="button" class="shot-hit tower-hit" data-action="tower-power" style="${rectStyle(shot.tower)}" aria-label="${t("room.tower.off")}" data-hot="tower"><i class="tower-led"></i></button>`);
+      expect(before).toContain(`<button type="button" class="shot-hit tower-hit" data-action="tower-power" style="${rectStyle(shot.tower)}" aria-label="${t("room.tower.off")}" data-hot="tower" data-chip="开机"><i class="tower-led"></i></button>`);
       act(ctx, "tower-power");
       expect(done(store, "boot")).toBe(true);
       expect(store.getEvents().at(-1)).toMatchObject({ kind: "step", name: "boot" });
@@ -210,6 +210,9 @@ describe("躺下: the bed in 房间", () => {
     // Chat is optional: the bed opens without it.
     completeUntil(store, "bed", { all: true, skip: ["chat"] });
     act(ctx, "bed");
+    // author 2026-11-24 (#16): from across the room the bed asks 要躺下吗？ first
+    expect(ctx.session.dialogue.queue).toEqual([{ key: "d1:bed:lie", lines: [{ k: "inner", t: t("room.bed.lieAsk") }], ending: { kind: "lieAsk" } }]);
+    act(ctx, "loop-choice", { choice: "lie" });
     expect(ctx.session.dialogue.queue).toEqual([{ key: "d1:bed:ask", lines: [{ k: "inner", t: t("room.bed.confirm") }], ending: { kind: "bedAsk" } }]);
     expect(store.getState().day).toBe(1);
   });
@@ -218,6 +221,7 @@ describe("躺下: the bed in 房间", () => {
     const { ctx, timers } = ctxOf(store, "room");
     completeUntil(store, "bed", { all: true });
     act(ctx, "bed");
+    act(ctx, "loop-choice", { choice: "lie" }); // #16: 要躺下吗？ → 躺下
     // lying-view R4: after nightfall the bed is lain on first (房间 → 床 → the ceiling).
     for (const x of timers.splice(0)) x.fn();
     expect(ctx.session.view).toBe("lying");

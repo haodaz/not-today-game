@@ -608,7 +608,9 @@ function shotHits(view: HotView, state: State, events: readonly GameEvent[]): Sa
     const r = p.rect?.(view) ?? fixed[id];
     if (!r) return null;
     const tower = id === "tower" ? html`<i class="tower-led"></i>` : null;
-    return html`<button type="button" class="${p.cls}" ${raw(p.attrs)} style="${rectStyle(r)}" aria-label="${p.label(state, events)}" data-hot="${id}">${tower}</button>`;
+    // the hover chip (author 2026-11-24 #3): what pointing at it does, in a word, like the book's chip
+    const chip = hasString(`room.chip.${id}`) ? t(`room.chip.${id}`) : p.label(state, events);
+    return html`<button type="button" class="${p.cls}" ${raw(p.attrs)} style="${rectStyle(r)}" aria-label="${p.label(state, events)}" data-hot="${id}" data-chip="${chip}">${tower}</button>`;
   });
   return html`${litScreens(view, state, events)}${buttons}`;
 }
@@ -675,13 +677,18 @@ const EDGE_LABEL = { left: "hud.turn.left", right: "hud.turn.right", back: "hud.
  * R2), at 桌子 退回 at the bottom. It fades in over 200 ms (continued across re-renders) and sits
  * under the HUD. Only where it leads somewhere (edgeZone and the nav layer decide).
  */
+/** The way back from 桌子 (and the table): a capsule at the bottom centre, clickable (author 2026-11-24: 不好点中 / 叫离开桌子). */
+function backPill(): SafeHtml {
+  return html`<button type="button" class="go-pill back-pill" data-action="nav-back"><i class="chev"></i><span>${tr("hud.back.desk")}</span></button>`;
+}
 function edgeHint(session: Session, view: string, nowMs: number): SafeHtml | null {
   const edge = session.edge;
   if (!edge || !edgeLeads(view, edge.zone)) return null;
+  if (edge.zone === "back") return null; // 2026-11-24 (#2 #15): the desk's way back is the always-on pill below, not a hover band
   const since = nowMs > 0 ? Math.max(0, nowMs - edge.since) : HINT_FADE_MS;
   const late = since < HINT_FADE_MS ? raw(` style="--late:-${Math.round(since)}ms"`) : null;
   // the back zone is a pill at the bottom centre like 离开窗边 (author 2026-11-23: the old band was not obvious)
-  const arrow = edge.zone === "back" ? html`<i class="chev"></i>` : html`<i class="arrow"></i>`;
+  const arrow = html`<i class="arrow"></i>`;
   return html`<div class="edge-hint ${edge.zone}" aria-hidden="true"${late}>${arrow}<span>${tr(EDGE_LABEL[edge.zone])}</span></div>`;
 }
 export function renderRoom(model: RoomModel): SafeHtml {
@@ -743,7 +750,7 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const nobox = !arrived && (view === "room" || view === "bed");
   // room-light-switch R3: by day the ceiling light makes the photo a little brighter (room.css, the backdrop only)
   const ceilDay = !dream && !desk3d && !isEvening(session.clock) && ceilLit(session);
-  return html`<div class="${cls("stage", "room", `${view}-view`, nobox && "nobox", ceilDay && "ceil-day", ceilingNight && "ceiling-night", raid && "raid", fade !== null && "m-late", dream && "scene-on", onEdge)}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${desk3d ? roomHost(state.day, session) : null}${renderScene(lineScene)}${scene}${top}${waiting ? null : edgeHint(session, view, nowMs)}${raid ? html`${handStage(state.day)}<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${wakeHost(session)}${desk3d ? null : roomHost(state.day, session)}${bare ? null : list}${bare ? null : dayCorner(state, session, nowMs)}${bare ? null : itemsPanel(state, events, session)}${!bare && (view === "room" || view === "bed" || view === "window") ? casePanel(state, events, session, model.runId ?? "run", nowMs) : null}${view === "desk" ? printsView(state, events, session) : null}${held}${model.boxOutside || bare ? null : dialogueBox(state, events, session, nowMs)}${bare ? null : bottomRight(model)}${bare ? null : hudTiles(session, state, { settings: true, nowMs })}${model.boxOutside || bare ? null : settingsPanel(session)}${model.boxOutside || bare ? null : statusPanel(state, events, session)}${session.bookOpen ? bookReader(bookUrl(state.names, daysLived(state, events)), session.bookOpened) : null}</div>`;
+  return html`<div class="${cls("stage", "room", `${view}-view`, nobox && "nobox", ceilDay && "ceil-day", ceilingNight && "ceiling-night", raid && "raid", fade !== null && "m-late", dream && "scene-on", onEdge)}" data-day="${state.day}" data-view="${view}" data-san-band="${sanBand(state.san)}"${late}>${fx}${view === "room" && !dream ? windowLight(state.day) : null}${evening}${desk3d ? roomHost(state.day, session) : null}${renderScene(lineScene)}${scene}${top}${waiting ? null : edgeHint(session, view, nowMs)}${edgeLeads(view, "back") && !dream ? backPill() : null}${raid ? html`${handStage(state.day)}<div class="gap-glow" style="--gap-x:${gap.l + gap.w / 2}px;--gap-t:${gap.t}px;--gap-h:${gap.h}px"></div>` : null}${wakeHost(session)}${desk3d ? null : roomHost(state.day, session)}${bare ? null : list}${bare ? null : dayCorner(state, session, nowMs)}${bare ? null : itemsPanel(state, events, session)}${!bare && (view === "room" || view === "bed" || view === "window") ? casePanel(state, events, session, model.runId ?? "run", nowMs) : null}${view === "desk" ? printsView(state, events, session) : null}${held}${model.boxOutside || bare ? null : dialogueBox(state, events, session, nowMs)}${bare ? null : bottomRight(model)}${bare ? null : hudTiles(session, state, { settings: true, nowMs })}${model.boxOutside || bare ? null : settingsPanel(session)}${model.boxOutside || bare ? null : statusPanel(state, events, session)}${session.bookOpen ? bookReader(bookUrl(state.names, daysLived(state, events)), session.bookOpened) : null}</div>`;
 }
 
 export { raidShowing };

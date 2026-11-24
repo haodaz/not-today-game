@@ -129,7 +129,7 @@ export function planReply({ day, recipient, word, state, now, text }: ReplyInput
     type: "own",
     conversation: recipient,
     word,
-    labelKey: labelKey(recipient, word),
+    labelKey: labelKey(recipient, word, day),
     ...(text !== undefined ? { text } : {}),
   };
   const steps: Step[] = [{ at: NOW, action: own }];

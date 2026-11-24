@@ -220,6 +220,8 @@ describe("R4 · lying down before sleeping; Kuro from the bed", () => {
     expect(keys(fromBed.session)).toEqual(["d1:bed:ask"]);
     const fromRoom = rig(store, "room");
     fromRoom.act("bed");
+    expect(keys(fromRoom.session)).toEqual(["d1:bed:lie"]); // #16 (2026-11-24): asked first from across the room
+    fromRoom.act("loop-choice", { choice: "lie" });
     expect(fromRoom.session.view).toBe("bed");
     fromRoom.run();
     expect(fromRoom.session.view).toBe("lying");
