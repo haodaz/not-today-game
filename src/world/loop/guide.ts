@@ -23,7 +23,7 @@ export type GuideTarget =
   | { readonly kind: "rise" }
   | { readonly kind: "tower" }
   | { readonly kind: "screen" }
-  | { readonly kind: "dock"; readonly app: "tingtalk" }
+  | { readonly kind: "dock"; readonly app: "tingtalk" | "workbench" }
   | { readonly kind: "conv"; readonly id: "boss" }
   /** G3b (author 2026-11-08): the reply bar's chips in the boss's thread, until the day's reply is sent. */
   | { readonly kind: "reply"; readonly chosen?: boolean }
@@ -43,7 +43,7 @@ export type GuideTarget =
 export type GuideScope = "all" | "work" | "none";
 
 export interface Guide {
-  readonly id: "G0" | "G1" | "G1b" | "G2" | "G3" | "G3b" | "G4" | "G5" | "G6" | "G7" | "G8" | "G9" | "next";
+  readonly id: "G0" | "G1" | "G1b" | "G2" | "G3" | "G3b" | "G4" | "G5" | "G6" | "G7" | "G8" | "G9" | "G9b" | "next";
   readonly target: GuideTarget;
   /** The refuse line's strings key, or null (no line of its own). */
   readonly refuse: string | null;
@@ -152,6 +152,11 @@ export function guideNow(state: State, events: readonly GameEvent[], session: Se
   const lunchEaten = lc.file.items.find((it) => it.done.kind === "event" && it.done.event.type === "eat" && it.done.event.meal === "lunch");
   if (!desktop && session.view !== "lying" && lunchEaten && states.get(lunchEaten.id)!.done && open?.tree && !state.flags.includes(open.tree.done)) {
     return { id: "G9", target: { kind: "screen" }, refuse: null, scope: "none" };
+  }
+  // G9b (author 2026-11-24 #6: 回去干活吧 left the player at the screen with nothing lit): on the desktop,
+  // lunch eaten, the work still to do and 工作台 not in front: its tile is lit; nothing refused.
+  if (desktop && lunchEaten && states.get(lunchEaten.id)!.done && open?.tree && !state.flags.includes(open.tree.done) && frontApp(session) !== "workbench") {
+    return { id: "G9b", target: { kind: "dock", app: "workbench" }, refuse: null, scope: "none" };
   }
 
   // G0 (day1-playtest-1117 R1): day 1 on the ceiling, not up yet: the rise spot is lit; nothing refused.

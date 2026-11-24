@@ -83,7 +83,8 @@ export function launchLayer(state: State, session: Pick<Session, "launchShow" | 
   // `queueLaunchIntro`); the button comes only after it is through
   const talking = session.dialogue.queue.some((q) => q.key.startsWith(`${session.launchShow}:intro`)); // still queued, maybe behind the morning's lines (push numbers keys: …:intro#1)
   const cta = talking ? null : html`<button type="button" class="tl-cta" data-action="task-launch" data-task="${task.id}">${fill(l.cta)}</button>`;
-  return html`<div class="${cls("launch-layer", l.motif && `motif-${l.motif.kind}`, `tone-${l.tone ?? "burst"}`, talking && "talking")}" role="dialog" aria-modal="true" aria-labelledby="tl-title">${wide ? motif : null}${tag}${figure}<div class="tl-body"><h2 class="tl-title" id="tl-title">${fill(task.title)}</h2>${l.note.map((n) => html`<p class="tl-note">${fill(n)}</p>`)}<p class="tl-call">${fill(l.call)}</p>${cta}</div><img class="tl-kuro" src="${frameUrl(FRAMES.idle[0])}" alt="" aria-hidden="true"></div>`;
+  // data-keep-shell (author 2026-11-24 #9): the poster is one element across the lines, so it fades up once, not per line
+  return html`<div class="${cls("launch-layer", l.motif && `motif-${l.motif.kind}`, `tone-${l.tone ?? "burst"}`, talking && "talking")}" data-keep="launch" data-keep-shell role="dialog" aria-modal="true" aria-labelledby="tl-title">${wide ? motif : null}${tag}${figure}<div class="tl-body"><h2 class="tl-title" id="tl-title">${fill(task.title)}</h2>${l.note.map((n) => html`<p class="tl-note">${fill(n)}</p>`)}<p class="tl-call">${fill(l.call)}</p>${cta}</div><img class="tl-kuro" src="${frameUrl(FRAMES.idle[0])}" alt="" aria-hidden="true"></div>`;
 }
 
 /**

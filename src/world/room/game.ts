@@ -765,6 +765,11 @@ export const loopActions: Record<string, ActionHandler> = {
   dock(ctx, data, el) {
     if (viviRefuse(ctx)) return;
     shellActions.dock!(ctx, data, el);
+    // author 2026-11-24 (#7): 工作台 opens on the day's task page while that work is under way, not on home
+    if (data.app === "workbench" && ctx.session.workbenchPage === "home") {
+      const open = openWork(ctx.store.getState(), ctx.store.getEvents());
+      if (open?.tree && !ctx.store.getState().flags.includes(open.tree.done)) workbenchUiActions["wb-nav"]!(ctx, { page: `task:${open.tree.id}` } as DOMStringMap, null as never);
+    }
     lookAt(ctx, shownApp(ctx.session));
     lookedAway(ctx);
     // Another app in front is another place (`screen:msgs` ↔ `screen:workbench`).

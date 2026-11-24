@@ -44,6 +44,9 @@ export function createFrameKeeper(doc: Document = document): FrameKeeper {
         if (old.tagName !== "IFRAME") {
           for (const { name, value } of Array.from(copy.attributes)) if (old.getAttribute(name) !== value) old.setAttribute(name, value);
           for (const { name } of Array.from(old.attributes)) if (!copy.hasAttribute(name)) old.removeAttribute(name);
+          // a shell (author 2026-11-24 #9 #13: the launch poster and the held object fading / zooming in on
+          // every line): the element itself is kept, so its entrance runs once; its insides are the copy's
+          if (old.hasAttribute("data-keep-shell")) old.replaceChildren(...Array.from(copy.childNodes));
         }
         move(copy.parentNode, old, copy);
         copy.remove();
