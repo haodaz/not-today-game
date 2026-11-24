@@ -214,6 +214,13 @@ describe("R1 · each room hint is a glow and a prompt, ended by its target", () 
     r.out();
     expect(r.session.dialogue.queue.map((q) => q.key)).toEqual(["w"]);
     r.session.dialogue = EMPTY_DIALOGUE;
+    // author 2026-11-24 (#20): not in the room — only at work, on a task page of 工作台
+    r.out();
+    expect(r.session.dialogue.queue).toEqual([]);
+    r.session.view = "desktop";
+    r.session.leftApp = "workbench";
+    r.session.focus = "left";
+    r.session.workbenchPage = "task:task1";
     const out = r.out();
     expect(r.session.dialogue.queue.map((q) => q.key)).toEqual(["hint:chickHint"]);
     expect(r.session.dialogue.queue[0]!.lines).toEqual([{ k: "inner", t: t("hint.chickHint") }]);
