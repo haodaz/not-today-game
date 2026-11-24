@@ -1,7 +1,8 @@
 // ide R3: "the iframe reloads only when the URL changes". The desktop re-renders by replacing the
-// root's HTML, which would reload every iframe on every render. An iframe marked `data-keep="<key>"`
-// is parked outside the root across the render and put back in place of its new copy when the copy
-// has the same `src`. Moving an iframe keeps it loaded only with `moveBefore` (the state-preserving
+// root's HTML, which would reload every iframe on every render. An element marked `data-keep="<key>"`
+// (an iframe; since 2026-11-24 a standing figure's <video> or <img> too — author: 点击一下对话就重新加载
+// 一下动作) is parked outside the root across the render and put back in place of its new copy when
+// the copy has the same `src`; a non-iframe takes the copy's other attributes (class, style). Moving an iframe keeps it loaded only with `moveBefore` (the state-preserving
 // move); where the browser lacks it, nothing is kept and the new copy loads as before.
 
 type Mover = { moveBefore?: (node: Node, child: Node | null) => void };
@@ -19,7 +20,7 @@ export function createFrameKeeper(doc: Document = document): FrameKeeper {
   const move = (parent: Node, node: Node, ref: Node | null) => (parent as unknown as Required<Mover>).moveBefore(node, ref);
   return {
     before(root) {
-      const frames = [...root.querySelectorAll<HTMLIFrameElement>("iframe[data-keep]")];
+      const frames = [...root.querySelectorAll<HTMLElement>("[data-keep]")];
       if (frames.length === 0) return;
       if (!park) {
         park = doc.createElement("div");
@@ -32,13 +33,17 @@ export function createFrameKeeper(doc: Document = document): FrameKeeper {
     },
     after(root) {
       if (!park || park.childElementCount === 0) return;
-      for (const copy of root.querySelectorAll<HTMLIFrameElement>("iframe[data-keep]")) {
-        const old = [...park.children].find((f) => (f as HTMLElement).dataset.keep === copy.dataset.keep) as HTMLIFrameElement | undefined;
+      for (const copy of root.querySelectorAll<HTMLElement>("[data-keep]")) {
+        const old = [...park.children].find((f) => (f as HTMLElement).dataset.keep === copy.dataset.keep) as HTMLElement | undefined;
         if (!old) continue;
         if (old.getAttribute("src") !== copy.getAttribute("src") || !copy.parentNode || !canMove(copy.parentNode)) {
           // superseded by its copy: the copy loads in its place
           old.remove();
           continue;
+        }
+        if (old.tagName !== "IFRAME") {
+          for (const { name, value } of Array.from(copy.attributes)) if (old.getAttribute(name) !== value) old.setAttribute(name, value);
+          for (const { name } of Array.from(old.attributes)) if (!copy.hasAttribute(name)) old.removeAttribute(name);
         }
         move(copy.parentNode, old, copy);
         copy.remove();

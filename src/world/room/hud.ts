@@ -700,7 +700,8 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const waiting = placedThingsWait(session, view, nowMs);
   const fade = placedThingsFade(session, view, nowMs);
   // 房间 carries what finished runs left on the bed (the figures) and the book on the headboard shelf, from day 1 (bedside-book; author 2026-11-20: the novel itself).
-  const kept = view === "room" && !waiting ? html`${figuresLayer(session.collection)}${shelfBook()}${figureCard(session.collection, session.figureOpen)}` : null;
+  // bedside-book (author 2026-11-24): the shelf book is seen from day 2 (night 1 meets it at the bed)
+  const kept = view === "room" && !waiting ? html`${figuresLayer(session.collection)}${state.day >= 2 ? shelfBook() : null}${figureCard(session.collection, session.figureOpen)}` : null;
   const hotView = hotViewOf(view);
   // A line's backdrop covers the frame (dialogue 2026-11-02): the still's placed things, its
   // evening look and the collapse shader step aside until the sequence ends.

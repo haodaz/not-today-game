@@ -233,8 +233,9 @@ describe("the waiting room (FR7)", () => {
 });
 
 describe("the collection (FR4, FR8)", () => {
-  const ctxOf = (collection: Collection, view: "room" | "desk" = "room") => {
-    const store = createStore({ startDay: 1 });
+  // the room from day 2: the shelf book shows from the second day (night 1 meets it at the bed; author 2026-11-24)
+  const ctxOf = (collection: Collection, view: "room" | "desk" = "room", day = 2) => {
+    const store = createStore({ startDay: day });
     const session = initialSession(DEFAULT_CLOCK, "left", view);
     session.collection = collection;
     const ctx: ActionContext = { store, session, rerender: () => {}, later: () => {} };
@@ -251,10 +252,11 @@ describe("the collection (FR4, FR8)", () => {
     expect(withRun).toMatchSnapshot();
   });
 
-  it("property: the shelf book is there from day 1, in 房间 and in the title room, whatever the profile; never the desk book", () => {
+  it("property: the shelf book is there from day 2 in 房间 (never on day 1) and always in the title room, whatever the profile; never the desk book", () => {
     fc.assert(
       fc.property(fc.nat(5), (n) => {
         expect(room(ctxOf(collected(n)))).toContain('class="shelf-book"');
+        expect(room(ctxOf(collected(n), "room", 1))).not.toContain('class="shelf-book"');
         expect(page(initialTitle(null, collected(n)))).toContain('class="shelf-book"');
         expect(room(ctxOf(collected(n))) + page(initialTitle(null, collected(n)))).not.toContain("desk-book");
       }),

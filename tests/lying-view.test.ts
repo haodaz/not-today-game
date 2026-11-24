@@ -334,7 +334,8 @@ describe("R6 · getting up is an ask; the day's `rise` beat plays once after the
       expect(keys(r.session), key).toEqual(["d1:rise:ask"]);
       const m = r.shown()!;
       expect(m.text).toBe(t("room.rise.ask"));
-      expect(m.choices.map((c) => [c.choice, c.label])).toEqual([["up", t("room.rise.up")], ["stay", t("room.rise.stay")], ["read", t("room.book.read")]]);
+      // bedside-book (author 2026-11-24): no 看书 on day 1's morning — the book is first met at the bed on night 1
+      expect(m.choices.map((c) => [c.choice, c.label])).toEqual([["up", t("room.rise.up")], ["stay", t("room.rise.stay")]]);
       // Asked twice, it is there once.
       loopKeys(r.ctx, { key } as KeyboardEvent);
       expect(keys(r.session)).toEqual(["d1:rise:ask"]);

@@ -104,8 +104,9 @@ describe("recordEnding runs only for an ending appended after the watch began", 
 });
 
 describe("the book by the bed (bedside-book)", () => {
-  it("the shelf book is in 房间 from day 1 whatever the profile; the desk book is gone", () => {
-    const store = createStore({ startDay: 1 });
+  it("the shelf book is in 房间 from day 2 whatever the profile (day 1 meets it at the bed first, author 2026-11-24); the desk book is gone", () => {
+    const day1 = createStore({ startDay: 1 });
+    const store = createStore({ startDay: 2 });
     const session = initialSession({ beat: "work", time: "10:00" }, "left", "room");
     const room = (c: typeof session.collection) => renderRoom({ state: store.getState(), events: store.getEvents(), session: { ...session, collection: c } }).value;
     for (const c of [EMPTY_COLLECTION, { finishedRuns: 2, endings: { bad: 0, survive: 2, warm: 0, good: 0, collapse: 0 }, objects: [], kurogotchi: false }]) {
@@ -113,5 +114,6 @@ describe("the book by the bed (bedside-book)", () => {
       expect(room(c)).not.toContain("desk-book");
     }
     expect(room(EMPTY_COLLECTION)).not.toContain('class="figure"');
+    expect(renderRoom({ state: day1.getState(), events: day1.getEvents(), session }).value).not.toContain("shelf-book");
   });
 });

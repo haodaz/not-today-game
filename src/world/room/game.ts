@@ -175,9 +175,10 @@ function dlgLayer(dlg: SafeHtml | null, session: Session, readsOn: boolean, with
   const stand = scene.stand;
   // texture-pass R2: with an idle loop (webm with alpha) the figure is the video alone, the still as its
   // poster until it plays (author 2026-11-22: the still under the loop read as a second person standing behind)
+  // `data-keep`: the keeper carries the element across the full re-render, so its loop runs on (2026-11-24)
   const figure = (src: string, idle: string | undefined, cls2: string) => (idle === undefined
-    ? html`<img class="scene-stand${cls2}" src="${src}" alt="" aria-hidden="true" draggable="false">`
-    : html`<video class="scene-stand-anim${cls2}" src="${idle}" poster="${src}" autoplay muted playsinline aria-hidden="true"></video>`);
+    ? html`<img class="scene-stand${cls2}" src="${src}" data-keep="stand:${src}" alt="" aria-hidden="true" draggable="false">`
+    : html`<video class="scene-stand-anim${cls2}" src="${idle}" poster="${src}" data-keep="stand:${idle}" autoplay muted playsinline aria-hidden="true"></video>`);
   // two-up (author 2026-11-20): with another person in the scene, the one speaking stands right and lit, the other left and dimmed
   // player-stands (2026-11-22): the player's own figure, alone in the frame (sceneOf never gives it beside a person), with its loop.
   // Two fixed slots in a keyed layer (2026-11-23): the same figure keeps its <video> element from line to

@@ -470,7 +470,8 @@ function options(q: Queued, state: State, events?: readonly GameEvent[]): Choice
   if (q.ending.kind === "kuroAsk") return [...KURO_ASK_OPTIONS];
   if (q.ending.kind === "kuroOffer") return [...KURO_OFFER_OPTIONS];
   if (q.ending.kind === "bedAsk") return q.ending.record ? [...BED_RECORD_OPTIONS] : [...BED_OPTIONS];
-  if (q.ending.kind === "riseAsk") return [...RISE_OPTIONS];
+  // bedside-book (author 2026-11-24): the book is first met at the bed on night 1, so day 1's morning has no 看书
+  if (q.ending.kind === "riseAsk") return state.day <= 1 ? RISE_OPTIONS.filter((o) => o.choice !== "read") : [...RISE_OPTIONS];
   if (q.ending.kind === "doorAsk") return [...DOOR_ASK_OPTIONS];
   if (q.ending.kind === "eatAsk") return [...EAT_ASK_OPTIONS];
   if (q.ending.kind === "settleSend") return [...SETTLE_SEND_OPTIONS];
