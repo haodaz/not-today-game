@@ -4,12 +4,9 @@
     "boot": {
       "say": [
         {
-          "k": "narration",
-          "t": "The room is the same as yesterday. The rain has eased a little; the drops on the window stay where they are."
-        },
-        {
           "k": "inner",
-          "t": "Last night's speck of light in the gap: in daylight there is nothing there."
+          "t": "Last night's speck of light in the gap: in daylight there is nothing there.",
+          "where": "desk"
         }
       ]
     },
@@ -17,8 +14,7 @@
       "say": [
         {
           "k": "narration",
-          "t": "Same mug as yesterday.",
-          "me": "stand"
+          "t": "The room is the same as yesterday. The rain has eased a little; the drops on the window stay where they are."
         }
       ]
     },

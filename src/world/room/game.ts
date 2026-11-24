@@ -1277,6 +1277,16 @@ export const loopActions: Record<string, ActionHandler> = {
       ctx.rerender();
       return;
     }
+    // 看书 / 放下 with the shelf book in hand (author 2026-11-24 #4)
+    if (q.ending.kind === "bookAsk") {
+      if (data.choice !== "read" && data.choice !== "put") return;
+      ctx.session.dialogue = finishChoice(ctx.session.dialogue);
+      settleSession(ctx.session);
+      if (data.choice === "read") openBook(ctx);
+      else ctx.session.book = null;
+      ctx.rerender();
+      return;
+    }
     // 躺下 / 再待会儿 at the bed (author 2026-11-24 #16)
     if (q.ending.kind === "lieAsk") {
       if (data.choice !== "lie" && data.choice !== "stay") return;
@@ -2205,7 +2215,8 @@ function takeBook(ctx: ActionContext, from: "bed" | "rise" | "spot"): void {
   const first = !session.bookFirstSaid; // once per run (author 2026-11-23): a new run meets the book anew
   session.book = { from, first };
   const lines: SayLine[] = [{ k: "inner", t: t("room.book.take") }, ...(first ? [{ k: "speaker" as const, who: "me", t: t("room.book.first") }] : [])];
-  session.dialogue = push(session.dialogue, { key: `d${day}:book:take`, lines, ending: { kind: "openBook" } });
+  // author 2026-11-24 (#4): standing at the shelf the book asks first (看书 / 放下); from the bed's asks it opens
+  session.dialogue = push(session.dialogue, { key: `d${day}:book:take`, lines, ending: from === "spot" ? { kind: "bookAsk" } : { kind: "openBook" } });
 }
 
 /** The reader opens; the first time, the profile remembers it (the session's collection too). */

@@ -110,6 +110,7 @@ describe("reading", () => {
     s.session.view = "room";
     s.act("book-open");
     s.readOn();
+    s.act("loop-choice", { choice: "read" }); // #4 (2026-11-24): standing, the book asks 看书 / 放下 first
     expect(s.session.bookOpen).toBe(true);
     s.act("book-close");
     expect(s.session.dialogue.queue).toHaveLength(0);

@@ -17,6 +17,8 @@ export type Ending =
   | { readonly kind: "lieDown" }
   /** author 2026-11-24 (#16): at the bed, 要躺下吗？ before the ceiling; 躺下 / 再待会儿. */
   | { readonly kind: "lieAsk" }
+  /** author 2026-11-24 (#4): the shelf book in hand (standing): 看书 / 放下. */
+  | { readonly kind: "bookAsk" }
   /** "Do you know what this is?" (recognise spec): the options in this run's order (content indexes). */
   | { readonly kind: "recognise"; readonly object: string; readonly order: readonly number[] }
   /** The bed, unlocked: 睡 / 再待会儿 (day-loop addition 2026-11-02). */
@@ -441,6 +443,10 @@ export const BED_RECORD_OPTIONS: readonly ChoiceOption[] = [
   { index: 2, text: null, choice: "stay", labelKey: "room.bed.stay" },
   { index: 3, text: null, choice: "read", labelKey: "room.book.read" },
 ];
+export const BOOK_OPTIONS: readonly ChoiceOption[] = [
+  { index: 0, text: null, choice: "read", labelKey: "room.book.read" },
+  { index: 1, text: null, choice: "put", labelKey: "room.book.put" },
+];
 export const LIE_OPTIONS: readonly ChoiceOption[] = [
   { index: 0, text: null, choice: "lie", labelKey: "room.bed.lie" },
   { index: 1, text: null, choice: "stay", labelKey: "room.bed.stay" },
@@ -480,6 +486,7 @@ function options(q: Queued, state: State, events?: readonly GameEvent[]): Choice
   if (q.ending.kind === "bedAsk") return q.ending.record ? [...BED_RECORD_OPTIONS] : [...BED_OPTIONS];
   // bedside-book (author 2026-11-24): the book is first met at the bed on night 1, so day 1's morning has no 看书
   if (q.ending.kind === "lieAsk") return [...LIE_OPTIONS];
+  if (q.ending.kind === "bookAsk") return [...BOOK_OPTIONS];
   if (q.ending.kind === "riseAsk") return state.day <= 1 ? RISE_OPTIONS.filter((o) => o.choice !== "read") : [...RISE_OPTIONS];
   if (q.ending.kind === "doorAsk") return [...DOOR_ASK_OPTIONS];
   if (q.ending.kind === "eatAsk") return [...EAT_ASK_OPTIONS];

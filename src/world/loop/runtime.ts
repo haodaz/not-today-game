@@ -276,7 +276,9 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
     const is = now.get(item.id)!;
     if (!was.done && is.done) {
       const q = itemQueued(day, item, "onDone");
-      if (q) dialogue = push(dialogue, q);
+      // author 2026-11-24 (#11): a work item's closing lines end on taskHome (the screen lands in the boss's
+      // thread; guidance R14) — board tasks have no lines of their own, so the ending came from nowhere
+      if (q) dialogue = push(dialogue, item.done.kind === "flag" && q.ending.kind === "none" ? { ...q, ending: { kind: "taskHome" } } : q);
     }
     if (!was.unlocked && is.unlocked) {
       if (item.sfx) sounds.push(item.sfx);

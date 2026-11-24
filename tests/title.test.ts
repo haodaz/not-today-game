@@ -308,6 +308,8 @@ describe("the collection (FR4, FR8)", () => {
     loopActions["book-open"]!(ctx, {} as DOMStringMap, null as never);
     expect(ctx.session.bookOpen).toBe(false);
     for (let i = 0; i < 4 && !ctx.session.bookOpen; i++) loopActions["loop-advance"]!(ctx, {} as DOMStringMap, null as never);
+    // #4 (2026-11-24): standing at the shelf the book asks 看书 / 放下 before opening
+    if (!ctx.session.bookOpen) loopActions["loop-choice"]!(ctx, { choice: "read" } as DOMStringMap, null as never);
     expect(room(ctx)).toContain('<iframe src="/gamebook/index.html?');
     expect(room(ctx)).toContain('data-action="book-close"');
     expect(loopKeys(ctx, { key: "Escape" } as KeyboardEvent)).toBe(true);
