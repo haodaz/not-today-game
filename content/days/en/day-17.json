@@ -139,7 +139,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "Answered one. The others are still looking."
+            "t": "Answered one. The others are still looking.",
+            "me": "tired"
           },
           {
             "k": "speaker",

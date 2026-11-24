@@ -166,7 +166,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "The demo is set. The audience is waiting."
+            "t": "The demo is set. The audience is waiting.",
+            "me": "tired"
           },
           {
             "k": "speaker",
@@ -277,7 +278,16 @@
       "unlock": "done:dpick",
       "done": "event:eat:dinner",
       "required": true,
-      "when": "night"
+      "when": "night",
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "Done eating.",
+            "me": "eat"
+          }
+        ]
+      }
     },
     {
       "id": "desk",

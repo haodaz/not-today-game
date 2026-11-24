@@ -234,7 +234,16 @@
       "text": "Lunch is on the table by the window. Eat.",
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
-      "required": false
+      "required": false,
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "Done eating.",
+            "me": "eat"
+          }
+        ]
+      }
     },
     {
       "id": "box",

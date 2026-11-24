@@ -14,7 +14,8 @@
       "say": [
         {
           "k": "narration",
-          "t": "The room is the same as yesterday. The rain has eased a little; the drops on the window stay where they are."
+          "t": "The room is the same as yesterday. The rain has eased a little; the drops on the window stay where they are.",
+          "me": "stand"
         }
       ]
     },
@@ -333,7 +334,16 @@
       "unlock": "done:dpick",
       "done": "event:eat:dinner",
       "required": true,
-      "when": "night"
+      "when": "night",
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "Done eating.",
+            "me": "eat"
+          }
+        ]
+      }
     },
     {
       "id": "desk",

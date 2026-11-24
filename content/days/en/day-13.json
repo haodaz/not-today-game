@@ -151,7 +151,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "The printer runs once. The page goes on the desk."
+            "t": "The printer runs once. The page goes on the desk.",
+            "me": "tired"
           },
           {
             "k": "speaker",
@@ -270,7 +271,16 @@
       "unlock": "done:dpick",
       "done": "event:eat:dinner",
       "required": true,
-      "when": "night"
+      "when": "night",
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "Done eating.",
+            "me": "eat"
+          }
+        ]
+      }
     },
     {
       "id": "desk",

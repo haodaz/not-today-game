@@ -64,8 +64,8 @@ describe("R2 · the switch is a hit", () => {
 });
 
 describe("R3 · the light on the stills", () => {
-  it("night on: the dark layer at 0.25 and the wash; night off: 0.6, no wash; the lamp's glow either way", () => {
-    expect(EVENING_CEIL_DARK).toBe(0.25);
+  it("night on: the dark layer at 0.3 and the warm wash; night off: 0.6, no wash; the lamp's glow either way", () => {
+    expect(EVENING_CEIL_DARK).toBe(0.3); // author 2026-11-24 (#37): a little darker, the wash warm
     const on = eveningLook("room", true, true, true)!.value;
     expect(on).toContain(`--evening-dark:${EVENING_CEIL_DARK}`);
     expect(on).toContain('<i class="evening-ceil"></i>');

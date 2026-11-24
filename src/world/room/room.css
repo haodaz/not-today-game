@@ -1115,7 +1115,9 @@
 /* room-light-switch R3: the ceiling light. At night a cold, even wash from above inside the evening look
    (its dark layer lifted to 0.25 by the markup); on the ceiling a soft disc at the fitting; by day the
    photo a little brighter — a copy of the stage's own backdrop under everything, not the HUD. */
-.room .evening-ceil{position:absolute;inset:0;background:linear-gradient(rgba(214,224,236,.22),rgba(214,224,236,.06) 60%,transparent);mix-blend-mode:screen}
+/* author 2026-11-24 (#37): the ceiling light is warm, not daylight; the window glass keeps the night under it */
+.room .evening-ceil{position:absolute;inset:0;background:linear-gradient(rgba(255,214,150,.26),rgba(255,206,140,.1) 60%,rgba(255,200,130,.04));mix-blend-mode:screen}
+.room .evening-window{position:absolute;background:rgba(8,10,16,.5);box-shadow:0 0 18px 6px rgba(8,10,16,.35)}
 .room .ceil-disc{position:absolute;left:50%;top:42%;width:360px;height:360px;margin:-180px 0 0 -180px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.35),rgba(255,255,255,0) 70%);mix-blend-mode:screen}
 .room.ceil-day::before{content:"";position:absolute;inset:0;background:inherit;filter:brightness(1.06);pointer-events:none}
 /* boss-phase2-world R8 (good): the homecoming — the party and its mound fade as on the leave (placeholders; the

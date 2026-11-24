@@ -234,7 +234,16 @@
       "unlock": "done:dpick",
       "done": "event:eat:dinner",
       "required": true,
-      "when": "night"
+      "when": "night",
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "Done eating.",
+            "me": "eat"
+          }
+        ]
+      }
     },
     {
       "id": "desk",

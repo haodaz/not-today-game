@@ -1385,5 +1385,7 @@
   "checklist.go": "go",
   "tune.defer": "Not today",
   "tune.defer.me": "Not sending it today. I'll look again tomorrow.",
-  "tune.defer.note": "Left Xiao Zhang a line: I've handled part of it; I'll carry on tomorrow."
+  "tune.defer.note": "Left Xiao Zhang a line: I've handled part of it; I'll carry on tomorrow.",
+  "kuro.room.afterWork": "Eat, shut the machine down, then we'll talk.",
+  "hint.lamp": "The room's gone dark. The lamp is on the desk and there's a switch on the wall; turn them on if you like."
 }

@@ -660,7 +660,12 @@ export { isEvening };
  * everything placed. The glow follows the lamp (objects-in-room R1): off when it was clicked off, and
  * by day, lit only when it was clicked on (then without the dark layer).
  */
-export const EVENING_CEIL_DARK = 0.25;
+export const EVENING_CEIL_DARK = 0.3;
+/** author 2026-11-24 (#37): the window glass on each still (stage px): with the light on, it stays night out there. */
+export const WINDOW_GLASS: Readonly<Partial<Record<string, Rect>>> = {
+  room: { l: 0, t: 0, w: 60, h: 480 },
+  window: { l: 632, t: 120, w: 408, h: 360 },
+};
 export function eveningLook(view: string, evening: boolean, lampLit: boolean, ceilLit = false): SafeHtml | null {
   const lamp = lampLit ? (view === "room" ? ROOM_SHOT.lamp : view === "desk" ? deskLayout.lamp : null) : null;
   const glow = lamp ? html`<i class="evening-lamp" style="left:${lamp.l + lamp.w / 2}px;top:${lamp.t + lamp.h / 2}px"></i>` : null;
@@ -670,8 +675,11 @@ export function eveningLook(view: string, evening: boolean, lampLit: boolean, ce
   const ceilNight = evening && ceilLit;
   const wash = ceilNight ? html`<i class="evening-ceil"></i>` : null;
   const disc = ceilNight && view === "lying" ? html`<i class="ceil-disc"></i>` : null;
+  // author 2026-11-24 (#37): the light is indoors — the window keeps the night (it had brightened with the room)
+  const glass = ceilNight ? WINDOW_GLASS[view] : undefined;
+  const night = glass ? html`<i class="evening-window" style="${rectStyle(glass)}"></i>` : null;
   const dark = evening ? (ceilNight ? EVENING_CEIL_DARK : EVENING_DARK) : 0;
-  return html`<div class="${cls("evening-look", !evening && "day-lamp")}" style="--evening-dark:${dark}">${wash}${disc}${glow}</div>`;
+  return html`<div class="${cls("evening-look", !evening && "day-lamp")}" style="--evening-dark:${dark}">${wash}${night}${disc}${glow}</div>`;
 }
 /** The edge hints' words: a turn's way (room-turn R2), or 桌子's way back. */
 const EDGE_LABEL = { left: "hud.turn.left", right: "hud.turn.right", back: "hud.back" } as const;

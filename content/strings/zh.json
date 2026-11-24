@@ -1385,5 +1385,7 @@
   "checklist.go": "前往",
   "tune.defer": "今天先不发",
   "tune.defer.me": "今天先不发了。明天再看看。",
-  "tune.defer.note": "给小张留了句话：我处理了一部分，明天接着弄。"
+  "tune.defer.note": "给小张留了句话：我处理了一部分，明天接着弄。",
+  "kuro.room.afterWork": "吃完饭，把机关了再聊。",
+  "hint.lamp": "屋里暗了。台灯在桌上，墙上也有开关，想开就开。"
 }

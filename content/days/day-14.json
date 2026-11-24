@@ -157,7 +157,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "打印机响了一下。纸放在桌上。"
+            "t": "打印机响了一下。纸放在桌上。",
+            "me": "tired"
           },
           {
             "k": "speaker",
@@ -268,7 +269,16 @@
       "unlock": "done:dpick",
       "done": "event:eat:dinner",
       "required": true,
-      "when": "night"
+      "when": "night",
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "吃完了。",
+            "me": "eat"
+          }
+        ]
+      }
     },
     {
       "id": "desk",

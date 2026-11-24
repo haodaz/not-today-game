@@ -50,3 +50,33 @@ describe("#33 今天先不发", () => {
     expect(thanks.cond_show).toEqual({ has: "task_d2_1", lacks: "sent_d2-vivi-page" });
   });
 });
+
+describe("#37 #39 #40 #41 (the later notes)", () => {
+  it("#37 with the ceiling light on in the evening, the window glass keeps the night; day 1's first evening says the lamp can be lit", async () => {
+    const { eveningLook, WINDOW_GLASS } = await import("@world/room/hud");
+    expect(eveningLook("window", true, false, true)!.value).toContain('class="evening-window"');
+    expect(eveningLook("room", true, false, true)!.value).toContain('class="evening-window"');
+    expect(eveningLook("window", true, false, false)!.value).not.toContain("evening-window");
+    expect(WINDOW_GLASS.window).toBeDefined();
+    expect(t("hint.lamp")).toContain("台灯");
+  });
+  it("#39 workAllDone: false before the work, true once every task item of the day is done", async () => {
+    const { workAllDone } = await import("@world/dialogue/kuro");
+    const { completeUntil } = await import("./complete-items");
+    const store = createStore({ startDay: 1, patch: { fullness: 100 } as never });
+    expect(workAllDone(store.getState(), store.getEvents())).toBe(false);
+    completeUntil(store, "dinner");
+    expect(workAllDone(store.getState(), store.getEvents())).toBe(true);
+  });
+  it("#40 / #41: on the player's turn the box is not reflowed (no has-choices) and there is no red hint", async () => {
+    const { dialogueBox } = await import("@world/dialogue/box");
+    const { EMPTY_DIALOGUE, push } = await import("@world/loop/dialogue");
+    const store = createStore({ startDay: 3 });
+    const session = initialSession({ beat: "night", time: "23:30" }, "left", "room");
+    session.dialogue = { ...push(EMPTY_DIALOGUE, { key: "k", lines: [{ k: "speaker", who: "kuro", t: "嗯。" }], ending: { kind: "kuroTurn", mode: "chat" } }), page: 1 };
+    const out = dialogueBox({ ...store.getState(), chatTurnsToday: 5 }, [], session)!.value;
+    expect(out).toContain('class="dlg-choices');
+    expect(out).not.toContain("has-choices");
+    expect(out).not.toContain("dc-hint");
+  });
+});

@@ -121,7 +121,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "响了。没停。"
+            "t": "响了。没停。",
+            "me": "tired"
           },
           {
             "k": "speaker",

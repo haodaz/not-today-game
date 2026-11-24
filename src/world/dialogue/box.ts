@@ -218,7 +218,7 @@ const historyChip = (): SafeHtml => html`<button type="button" class="hist" data
  * The box itself. `waits`: choices are up (in the column, world-prompts R2), so the text does not
  * read on; it only shows the speaker's last line.
  */
-export function renderLineBox(m: LineBoxModel, waits = m.choices.length > 0): SafeHtml {
+export function renderLineBox(m: LineBoxModel, waits = m.choices.length > 0, reflow = waits): SafeHtml {
   // The whole text area reads on (a click completes a line still appearing first, polish FR3); not while choices are up.
   const body = m.face ? inFace(m.face, m.text) : m.text;
   const txt = waits ? (m.text ? html`<div class="txt">${body}</div>` : null) : html`<button type="button" class="txt" data-action="loop-advance">${body}</button>`;
@@ -232,7 +232,8 @@ export function renderLineBox(m: LineBoxModel, waits = m.choices.length > 0): Sa
   const tag = tagOf(m.tag);
   const me = !m.portrait && m.playerPortrait !== null;
   const hasNpc = !m.portrait && !me && m.npcPortrait !== null;
-  const c = cls("dlg", m.kind !== "line" && m.kind, tag && "tagged", m.tag?.kind === "kuro" && "kuro", me && "me", hasNpc && "npc", waits && "has-choices");
+  // `reflow`: the line's own choices sit in the box's flow; on the player's turn with Kuro (#40) the text stays put
+  const c = cls("dlg", m.kind !== "line" && m.kind, tag && "tagged", m.tag?.kind === "kuro" && "kuro", me && "me", hasNpc && "npc", reflow && "has-choices");
   // One portrait at most: Kuro's for its lines, NPC's for a speaker line, player's for an inner line.
   const portrait = m.portrait
     ? portraitOf(m.portrait, m.red, m.stillPortrait === true)
@@ -293,9 +294,9 @@ export function renderChoiceColumn(rows: readonly ChoiceRow[], pointer: string |
     const attrs = Object.entries(r.data).map(([k, v]) => html` data-${k}="${v}"`);
     return html`<button type="button" class="dc-row" data-action="${r.action}"${attrs} data-focus="dc-${i}" data-n="${i + 1}">${ICON[r.icon]}<span class="dc-l">${r.label}</span></button>`;
   });
-  // meters-v2 §3: a late chat turn — the column in the SAN colour, and once a day the hint under it
-  const hint = late.lateHint ? html`<p class="dc-hint late">${tr("chat.late")}</p>` : null;
-  return html`<div class="${cls("dlg-choices", pointer, late.late && "late")}" role="group">${items}${hint}</div>`;
+  // meters-v2 §3: a late chat turn — the column in the SAN colour. author 2026-11-24 (#41): no red hint under it;
+  // that it is late is Kuro's to say in the talk (the hint read as a second, unrelated cap).
+  return html`<div class="${cls("dlg-choices", pointer, late.late && "late")}" role="group">${items}</div>`;
 }
 
 /**
@@ -317,6 +318,8 @@ export function dialogueBox(state: State, events: readonly GameEvent[], session:
   // world-prompts R2: the box keeps the speaker's last line, name and portrait; the choices (the
   // content's, or the player's on their turn with Kuro) are the column on the right.
   const rows = player ? playerRows(player) : line ? lineRows(line) : [];
-  const box = line ? renderLineBox(line, rows.length > 0) : null;
+  // author 2026-11-24 (#40): on the player's turn the box keeps Kuro's line exactly where it was read
+  // (`has-choices` reflows the text; that looked like the answer drawn twice)
+  const box = line ? renderLineBox(line, rows.length > 0, !player && rows.length > 0) : null;
   return html`${box}${renderChoiceColumn(rows, line?.pointer ?? false, player ?? {})}${hist}`;
 }

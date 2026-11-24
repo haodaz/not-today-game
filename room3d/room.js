@@ -2190,7 +2190,7 @@ const [ovC, ovG] = canvas(1664, 928), ovTex = new THREE.CanvasTexture(ovC); ovTe
 {
   const D = 60, TW = 86, TH = TW * 928 / 1664, cy = 1.5 + TH * 0.12 - 2;
   const m = new THREE.Mesh(new THREE.PlaneGeometry(TW, TH), new THREE.MeshBasicMaterial({ map: ovTex, transparent: true, depthWrite: false, fog: false, toneMapped: false }));
-  m.position.set(X0 - D + 0.4, cy, (WIN.z0 + WIN.z1) / 2 - 10.2); m.rotation.y = Math.PI / 2; m.userData.noEdge = true; m.isLine2 = true; m.renderOrder = 2; outside.add(m);
+  m.position.set(X0 - D + 0.05, cy, (WIN.z0 + WIN.z1) / 2 - 10.2); // author 2026-11-24 (#36): all but on the picture's plane — 0.4 m nearer slid the lights off their windows m.rotation.y = Math.PI / 2; m.userData.noEdge = true; m.isLine2 = true; m.renderOrder = 2; outside.add(m);
 }
 let ovKey = "";
 // The lights, the people and the flesh are cut to the picture's own glass, not to boxes laid over it (author: 影子错位,
@@ -2207,10 +2207,13 @@ const GLASS = { ready: false, c: null, box: [] };
       const px = wide ? 4 : 9, py = wide ? 4 : 12, x0 = Math.round(x - w / 2 - px), x1 = Math.round(x + w / 2 + px), y0 = Math.round(y - h / 2 - py), y1 = Math.round(y + h / 2 + py);
       let a0 = 1e9, a1 = -1, b0 = 1e9, b1 = -1, sx = 0, n = 0;
       for (let yy = y0; yy <= y1; yy++) { // each row is filled from its first glass pixel to its last: no holes, and the skew of the frame is kept
-        let f = -1, l = -1, c = 0;
-        for (let xx = x0; xx <= x1; xx++) { const k = (yy * 1664 + xx) * 4, r = src[k], gg = src[k + 1], bb = src[k + 2], lum = (r + gg + bb) / 3; if (r - bb < 17 && lum < 176) { if (f < 0) f = xx; l = xx; c++; } }
+        // author 2026-11-24 (#36): the row's glass runs (a gap of a mullion's width is bridged), not first-to-last: the
+        // wall between two panes, and a balcony's rail, stayed lit before
+        let f = -1, l = -1, c = 0; const runs = []; let rs = -1, last = -1;
+        for (let xx = x0; xx <= x1; xx++) { const k = (yy * 1664 + xx) * 4, r = src[k], gg = src[k + 1], bb = src[k + 2], lum = (r + gg + bb) / 3; if (r - bb < 17 && lum < 176) { if (f < 0) f = xx; l = xx; c++; if (rs < 0) rs = xx; else if (xx - last > 6) { runs.push([rs, last]); rs = xx; } last = xx; } }
+        if (rs >= 0) runs.push([rs, last]);
         if (c < (wide ? 14 : 7)) continue; // a stray neutral pixel or two is not a window
-        for (let xx = f; xx <= l; xx++) { const k = (yy * 1664 + xx) * 4; o[k] = o[k + 1] = o[k + 2] = 255; o[k + 3] = 255; sx += xx; n++; }
+        for (const [ra, rb] of runs) for (let xx = ra; xx <= rb; xx++) { const k = (yy * 1664 + xx) * 4; o[k] = o[k + 1] = o[k + 2] = 255; o[k + 3] = 255; sx += xx; n++; }
         if (f < a0) a0 = f; if (l > a1) a1 = l; if (yy < b0) b0 = yy; if (yy > b1) b1 = yy;
       }
       GLASS.box[i] = n > 60 ? [a0, b0, a1 - a0 + 1, b1 - b0 + 1, sx / n] : null;

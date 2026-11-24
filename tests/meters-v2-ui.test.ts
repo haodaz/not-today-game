@@ -130,7 +130,7 @@ describe("§3 · the chat's late turns", () => {
     expect(box?.lateHint).toBe(true);
     const out = dialogueBox(state, [], session)!.value;
     expect(out).toContain('class="dlg-choices late"');
-    expect(out).toContain(`<p class="dc-hint late">${t("chat.late")}</p>`);
+    expect(out).not.toContain('class="dc-hint late"'); // author 2026-11-24 (#41): no red hint under the column
     // the first late turn taken: no more hint today
     session.chatLateDay = state.day;
     expect(playerBox(state, [], session)?.lateHint).toBe(false);

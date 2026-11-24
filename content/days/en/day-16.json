@@ -121,7 +121,8 @@
         "say": [
           {
             "k": "narration",
-            "t": "It sounded. It didn't stop."
+            "t": "It sounded. It didn't stop.",
+            "me": "tired"
           },
           {
             "k": "speaker",

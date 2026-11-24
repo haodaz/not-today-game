@@ -78,11 +78,22 @@ export function startTalk(ctx: ActionContext): void {
   // click is its one line, kuro.room.notYet, with nothing to answer (after the offer, if one waits).
   // (The night beat comes after shutdown, so the chat beat is never locked.)
   const locked = !chatBeatNow(session) && chatLocked(state, store.getEvents());
-  d = push(d, item(session, state.day, t(locked ? "kuro.room.notYet" : "kuro.ask"), locked ? { kind: "none" } : { kind: "kuroAsk" }));
+  // author 2026-11-24 (#39): the chat opens after shutdown; with the work already done the refusal says so
+  const lockedKey = locked && workAllDone(state, store.getEvents()) && hasString("kuro.room.afterWork") ? "kuro.room.afterWork" : "kuro.room.notYet";
+  d = push(d, item(session, state.day, t(locked ? lockedKey : "kuro.ask"), locked ? { kind: "none" } : { kind: "kuroAsk" }));
   session.dialogue = d;
   session.kuroInput = false;
   session.playerPage = 0;
   markRead(ctx);
+}
+
+/** author 2026-11-24 (#39): every work task of the day is done (the day has at least one). */
+export function workAllDone(state: State, events: readonly GameEvent[]): boolean {
+  const lc = loopContext(state, events);
+  if (!lc) return false;
+  const states = itemStates(lc);
+  const tasks = lc.file.items.filter((it) => it.done.kind === "flag" && !it.self);
+  return tasks.length > 0 && tasks.every((it) => states.get(it.id)!.done);
 }
 
 /**

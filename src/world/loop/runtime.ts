@@ -296,6 +296,8 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
   const nightfall = !nightfallReached(lc, memo.items) && nightfallReached(lc, now);
   if (nightfall) {
     dialogue = push(dialogue, { key: `d${day}:nightfall`, lines: [{ k: "narration", t: t("day.nightfall") }], ending: { kind: "none" } });
+    // author 2026-11-24 (#37): the first evening says the lamp and the wall switch are there to use
+    if (day === 1 && hasString("hint.lamp")) dialogue = push(dialogue, { key: `d${day}:hint:lamp`, lines: [{ k: "inner", t: t("hint.lamp") }], ending: { kind: "none" } });
     clock = eveningClock(clock);
     sounds.push(NIGHTFALL_STING);
   }
