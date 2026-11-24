@@ -14,19 +14,29 @@ export function replyLive(session: Pick<Session, "progress">, events: readonly G
   return false;
 }
 
+/** author 2026-11-24 (#1): once the answer has landed, a beat to read it before the held line comes. */
+export const READ_PAUSE_MS = 2200;
+
 /** Holds `q` until the thread with `who` is quiet. */
 export function holdUntilQuiet(session: Pick<Session, "quietHeld">, who: string, q: Queued): void {
   session.quietHeld = [...session.quietHeld, { who, q }];
 }
 
-/** The held lines whose thread has gone quiet go to the box now. True when any did. */
-export function releaseQuiet(session: Pick<Session, "quietHeld" | "progress" | "dialogue">, events: readonly GameEvent[]): boolean {
+/**
+ * The held lines whose thread has gone quiet go to the box now. True when any did. With `nowMs`, a
+ * thread counts as quiet only READ_PAUSE_MS after its answer landed (the player reads it first);
+ * without a clock the release is immediate (tests, the headless sync).
+ */
+export function releaseQuiet(session: Pick<Session, "quietHeld" | "progress" | "dialogue">, events: readonly GameEvent[], nowMs?: number): boolean {
   if (session.quietHeld.length === 0) return false;
   const keep: Session["quietHeld"][number][] = [];
   const out: Queued[] = [];
   for (const h of session.quietHeld) {
-    if (replyLive(session, events, h.who)) keep.push(h);
-    else out.push(h.q);
+    if (replyLive(session, events, h.who)) keep.push({ who: h.who, q: h.q });
+    else if (nowMs === undefined) out.push(h.q);
+    else if (h.quietSince === undefined) keep.push({ ...h, quietSince: nowMs });
+    else if (nowMs - h.quietSince >= READ_PAUSE_MS) out.push(h.q);
+    else keep.push(h);
   }
   session.quietHeld = keep;
   if (out.length === 0) return false;

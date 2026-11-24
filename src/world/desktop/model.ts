@@ -259,7 +259,7 @@ export interface Session {
   /** Live plans: event index → how many plan steps have played. Absent = settled history. */
   progress: Map<number, number>;
   /** day1-playtest-1117 R5: a reply item's onDone lines waiting for that thread to go quiet. */
-  quietHeld: readonly { readonly who: string; readonly q: import("@world/loop/dialogue").Queued }[];
+  quietHeld: readonly { readonly who: string; readonly q: import("@world/loop/dialogue").Queued; readonly quietSince?: number }[];
   workbenchPage: WorkbenchPage;
   /** workspace R2: the day of the task page shown (an earlier day's, read-only), or null = today. */
   wbTaskDay: number | null;

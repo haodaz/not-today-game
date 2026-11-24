@@ -9,7 +9,7 @@ import type { ActionContext, ActionHandler } from "../controller";
 import { babblePlan } from "@world/sound/babble";
 import { voiceTable } from "@world/sound/voice-table";
 import { getLocale } from "@world/i18n";
-import { releaseQuiet } from "@world/loop/quiet";
+import { READ_PAUSE_MS, releaseQuiet } from "@world/loop/quiet";
 import { settleSession } from "@world/dialogue/place";
 
 function delayOf(step: Step, ctx: ActionContext): number {
@@ -29,13 +29,21 @@ function delayOf(step: Step, ctx: ActionContext): number {
 export function playPlan(ctx: ActionContext, index: number, steps: readonly Step[]): void {
   // day1-playtest-1117 R5: the thread quiet: what waited for it (a reply item's onDone) plays now
   const quiet = () => {
-    if (releaseQuiet(ctx.session, ctx.store.getEvents())) settleSession(ctx.session);
+    if (releaseQuiet(ctx.session, ctx.store.getEvents(), ctx.now?.() ?? Date.now())) settleSession(ctx.session);
+  };
+  // author 2026-11-24 (#1): the answer landed — a beat to read it, then what waited for the thread
+  const quietAfterPause = () => {
+    quiet();
+    ctx.rerender();
+    ctx.later(READ_PAUSE_MS + 20, () => {
+      quiet();
+      ctx.rerender();
+    });
   };
   const next = (k: number) => {
     if (k >= steps.length) {
       ctx.session.progress.delete(index);
-      quiet();
-      ctx.rerender();
+      quietAfterPause();
       return;
     }
     const s = steps[k]!;
@@ -43,8 +51,7 @@ export function playPlan(ctx: ActionContext, index: number, steps: readonly Step
     if (delay < 0) {
       // 已读 at the next boot: settled history shows it from tomorrow.
       ctx.session.progress.delete(index);
-      quiet();
-      ctx.rerender();
+      quietAfterPause();
       return;
     }
     const run = () => {

@@ -392,7 +392,7 @@ export function syncLoop(ctx: ActionContext, nowMs: number = Date.now()): void {
   }
   session.dialogue = dialogue;
   session.clock = fx.clock;
-  releaseQuiet(session, events);
+  releaseQuiet(session, events, nowMs);
   // New lines play only where they belong; the rest wait (dialogue addition 2026-11-02).
   settleSession(session);
   for (const id of fx.sounds) ctx.play?.(id);
