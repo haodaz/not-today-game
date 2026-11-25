@@ -79,7 +79,9 @@ describe("the holds", () => {
     loopActions["work-start"]!(one.ctx, {} as DOMStringMap, null as never);
     expect(showing(one.session.dialogue, one.store.getState(), one.store.getEvents())?.line?.t).toBe(t("hunger.wait.me"));
     expect(one.session.workShow).toBeNull();
-    const two = rig(4, 10); // day 4: task1 opens with the messages, no reply in between
+    // day 4: the work opens after lunch (2026-11-25, as days 1–3); a stomach still under needWork
+    // there (lunch's +40 from -30) holds it with Kuro's line
+    const two = rig(4, -30);
     completeUntil(two.store, "task1");
     two.session.dialogue = { queue: [], line: 0 };
     loopActions["work-start"]!(two.ctx, {} as DOMStringMap, null as never);

@@ -220,7 +220,7 @@
     {
       "id": "task1",
       "text": "Team night: when each leader gives a toast.",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d8_1",
       "required": true
     },

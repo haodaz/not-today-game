@@ -146,7 +146,7 @@
     {
       "id": "work",
       "text": "这周大家克服一下：值班表你排，谁都不睡。",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d12_work",
       "required": true,
       "onDone": {
@@ -168,7 +168,7 @@
     {
       "id": "task1",
       "text": "对账结果看一眼。",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d12_1",
       "required": true
     },

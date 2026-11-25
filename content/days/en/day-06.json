@@ -189,7 +189,7 @@
     {
       "id": "task1",
       "text": "The ontology page: older than people.",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d6_1",
       "required": true
     },

@@ -215,7 +215,7 @@
     {
       "id": "task1",
       "text": "Lao Wang: put consciousness in.",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d4_1",
       "required": true
     },

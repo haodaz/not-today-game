@@ -137,7 +137,7 @@
     {
       "id": "work",
       "text": "Proofread Act Two: just fix the typos, don't read too closely.",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d10_work",
       "required": true,
       "onDone": {
@@ -159,7 +159,7 @@
     {
       "id": "task2",
       "text": "Change one number in the receivables.",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d10_2",
       "required": true
     },

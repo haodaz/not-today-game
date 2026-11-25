@@ -137,7 +137,7 @@
     {
       "id": "work",
       "text": "剧本第二幕校一下：错字改了就行，别读太细。",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d10_work",
       "required": true,
       "onDone": {
@@ -159,7 +159,7 @@
     {
       "id": "task2",
       "text": "应收表改一个数。",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d10_2",
       "required": true
     },

@@ -130,7 +130,7 @@
     {
       "id": "task1",
       "text": "The first one: billing.",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d9_1",
       "required": true
     },

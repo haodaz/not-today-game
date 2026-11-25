@@ -215,7 +215,7 @@
     {
       "id": "task1",
       "text": "产品方案：报告还是结构。",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d7_1",
       "required": true
     },

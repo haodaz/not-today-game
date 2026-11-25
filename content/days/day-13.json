@@ -144,7 +144,7 @@
     {
       "id": "work",
       "text": "走个借阅审批：别问为什么借。",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d13_work",
       "required": true,
       "onDone": {
@@ -166,7 +166,7 @@
     {
       "id": "task1",
       "text": "升级通知看一眼。",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d13_1",
       "required": true
     },

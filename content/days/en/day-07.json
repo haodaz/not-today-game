@@ -215,7 +215,7 @@
     {
       "id": "task1",
       "text": "The product plan: a report, or a structure.",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d7_1",
       "required": true
     },

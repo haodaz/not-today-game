@@ -150,7 +150,7 @@
     {
       "id": "work",
       "text": "这批新人有点多，入职流程跑一下。",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d14_work",
       "required": true,
       "onDone": {

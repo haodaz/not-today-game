@@ -147,7 +147,7 @@
     {
       "id": "work",
       "text": "降本增效：成本表称平，下班前给 Vivi。",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d11_work",
       "required": true,
       "onDone": {
@@ -169,7 +169,7 @@
     {
       "id": "task1",
       "text": "对账。让它对，你看一眼。",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d11_1",
       "required": true
     },

@@ -150,7 +150,7 @@
     {
       "id": "work",
       "text": "Quite a lot of new hires this batch. Run the onboarding.",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d14_work",
       "required": true,
       "onDone": {

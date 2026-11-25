@@ -159,7 +159,7 @@
     {
       "id": "work",
       "text": "下午发布会：演示稿你排一下，观众反应实时盯着。",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d15_work",
       "required": true,
       "onDone": {
@@ -181,7 +181,7 @@
     {
       "id": "task1",
       "text": "活只剩一件，它做了，你看一眼。",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d15_1",
       "required": true
     },

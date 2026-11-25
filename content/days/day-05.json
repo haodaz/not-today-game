@@ -182,7 +182,7 @@
     {
       "id": "task1",
       "text": "Vivi：「分身」那一页。",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d5_1",
       "required": true
     },

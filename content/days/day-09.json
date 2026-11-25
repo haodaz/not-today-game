@@ -130,7 +130,7 @@
     {
       "id": "task1",
       "text": "第一份：计费。",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d9_1",
       "required": true
     },

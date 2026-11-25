@@ -63,6 +63,13 @@ function dayWith(taskId: "task1" | "task2" | "task3", day = 1): Store {
   const store = createStore({ startDay: day });
   store.appendEvent({ kind: "step", name: "rise", t: "09:03" }); store.appendEvent({ kind: "step", name: "boot", t: "09:03" });
   store.appendEvent({ kind: "step", name: "openApp:msgs", t: "09:04" });
+  // the work opens after lunch on every day with meals (2026-11-25, fullness: lunch before any work)
+  if (day > 1) {
+    store.appendEvent({ kind: "order", meal: "lunch", shopId: "huangmenji", itemId: "hmj", t: "09:05" });
+    store.appendEvent({ kind: "step", name: "delivery:arrives:lunch", t: "09:20" });
+    store.appendEvent({ kind: "pickup", meal: "lunch" });
+    store.appendEvent({ kind: "step", name: "eat:lunch", t: "09:30" });
+  }
   for (const id of ["task1", "task2"] as const) {
     if (id === taskId) break;
     store.appendEvent({ kind: "task", flag: taskFiles.get(day)!.find((x) => x.id === id)!.done, mode: "self" });

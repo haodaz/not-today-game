@@ -159,7 +159,7 @@
     {
       "id": "work",
       "text": "The launch this afternoon: arrange the slides, watch the audience live.",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d15_work",
       "required": true,
       "onDone": {
@@ -181,7 +181,7 @@
     {
       "id": "task1",
       "text": "One job left. It did it. Take a look.",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d15_1",
       "required": true
     },

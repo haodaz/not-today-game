@@ -146,7 +146,7 @@
     {
       "id": "work",
       "text": "Everyone push through this week: you make the rota, nobody sleeps.",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d12_work",
       "required": true,
       "onDone": {
@@ -168,7 +168,7 @@
     {
       "id": "task1",
       "text": "Look at the reconciliation result.",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d12_1",
       "required": true
     },
