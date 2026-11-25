@@ -293,12 +293,6 @@ if (jump !== null) {
       console.warn(`?upgraded: ${id} skipped (${(e as Error).message})`); // not offered yet on this day
     }
   }
-  // Dev only (2026-11-25): `&lunchLeft=1` collects today's lunch and dinner and eats neither, to see
-  // the lunch never eaten on the little table (the room readout).
-  if (import.meta.env.DEV && params.get("lunchLeft") === "1") {
-    store.appendEvent({ kind: "order", meal: "dinner", shopId: "huangmenji", itemId: "hmj", t: "17:30" });
-    for (const meal of ["lunch", "dinner"] as const) store.appendEvent({ kind: "pickup", meal });
-  }
   // Dev only (2026-11-18): `&prologue=1` plays the opening dream first, to look at its scenes.
   startGame(store, false, import.meta.env.DEV && params.get("prologue") === "1");
   // Dev only (2026-11-09): a debug run signs in too, so Kuro answers online (kuroOnline needs a

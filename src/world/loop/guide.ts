@@ -213,8 +213,6 @@ export const GUIDE_ALLOWS: ReadonlySet<string> = new Set([
   "window-back",
   // day1-playtest-1117 R2: the ceiling's own lines
   "lying-look",
-  // room readout 2026-11-25: the lunch never eaten says one line
-  "leftover-look",
 ]);
 export const guideAllows = (action: string): boolean => GUIDE_ALLOWS.has(action) || ALLOW_PREFIXES.some((p) => action.startsWith(p));
 

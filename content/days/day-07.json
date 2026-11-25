@@ -255,7 +255,7 @@
       "text": "外卖在窗边饭桌上，吃饭吧。",
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
-      "required": false,
+      "required": true,
       "onDone": {
         "say": [
           {
