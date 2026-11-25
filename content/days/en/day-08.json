@@ -26,6 +26,18 @@
           "k": "narration",
           "t": "Everything on the desk is where it was. The pager stays on 0.7734.",
           "me": "stand"
+        },
+        {
+          "k": "narration",
+          "t": "Three videos, links to three charts, fourteen pages of graphs, one note. You posted them to the group."
+        },
+        {
+          "k": "narration",
+          "t": "What you wrote: \"Every value and every theory, I first made into pages and charts; only at the end did they become part of the videos. I never had research training. This is the best I can express it, for now.\""
+        },
+        {
+          "k": "narration",
+          "t": "23:13. Nobody in the group replied."
         }
       ]
     },
@@ -225,14 +237,6 @@
       "required": true
     },
     {
-      "id": "task2",
-      "text": "Export those four again.",
-      "unlock": "done:task1",
-      "done": "flag:task_d8_2",
-      "required": true,
-      "origin": "them"
-    },
-    {
       "id": "pickup",
       "text": "Lunch is at the door. Go get it.",
       "unlock": "event:delivery:arrives:lunch",
@@ -273,31 +277,9 @@
       "required": true
     },
     {
-      "id": "reply",
-      "text": "Send the boss a reply.",
-      "unlock": "done:task2",
-      "done": "event:reply:boss",
-      "required": true,
-      "onDone": {
-        "say": [
-          {
-            "k": "speaker",
-            "who": "me",
-            "t": "Replied.",
-            "me": "tired"
-          },
-          {
-            "k": "speaker",
-            "who": "kuro",
-            "t": "The three pictures aren't in yet. Eat after."
-          }
-        ]
-      }
-    },
-    {
       "id": "dinner",
       "text": "Pick up the phone and order dinner.",
-      "unlock": "done:task2",
+      "unlock": "done:task1",
       "done": "event:order:dinner",
       "required": true,
       "rewrite": "Dinner is on its way.",
@@ -340,30 +322,6 @@
             "me": "eat"
           }
         ]
-      }
-    },
-    {
-      "id": "task3",
-      "text": "Three diagrams, posted to the group.",
-      "unlock": "done:reply",
-      "done": "flag:task_d8_3",
-      "required": true,
-      "when": "night",
-      "onDone": {
-        "say": [
-          {
-            "k": "speaker",
-            "who": "me",
-            "t": "Sent. The group went quiet for a while.",
-            "me": "phone"
-          },
-          {
-            "k": "speaker",
-            "who": "kuro",
-            "t": "They're looking at the pictures."
-          }
-        ],
-        "then": "desk"
       }
     },
     {

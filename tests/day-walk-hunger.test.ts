@@ -39,7 +39,7 @@ function walk(day: number): { stuck: string[]; trace: string[] } {
 describe("every day can be finished under the fullness rule", () => {
   // Known deadlocks found by the 2026-11-25 audit (old board-less tasks stacked on the day's game).
   // Fixing a day removes it from this list; a new deadlock anywhere fails the test.
-  const KNOWN: readonly number[] = [7, 11, 12, 13];
+  const KNOWN: readonly number[] = [];
   it("only the known days deadlock", () => {
     const stuck = [...dayFiles.keys()].filter((d) => walk(d).stuck.length > 0).sort((a, b) => a - b);
     expect(stuck).toEqual(KNOWN);

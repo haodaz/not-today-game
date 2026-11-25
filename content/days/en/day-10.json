@@ -157,13 +157,6 @@
       }
     },
     {
-      "id": "task2",
-      "text": "Change one number in the receivables.",
-      "unlock": "done:eat",
-      "done": "flag:task_d10_2",
-      "required": true
-    },
-    {
       "id": "pickup",
       "text": "Lunch is at the door. Go get it.",
       "unlock": "event:delivery:arrives:lunch",
@@ -197,32 +190,9 @@
       }
     },
     {
-      "id": "reply",
-      "text": "Send the boss a reply.",
-      "unlock": "done:task2",
-      "done": "event:reply:boss",
-      "required": true,
-      "onDone": {
-        "say": [
-          {
-            "k": "speaker",
-            "who": "me",
-            "t": "Replied.",
-            "me": "tired"
-          },
-          {
-            "k": "speaker",
-            "who": "kuro",
-            "t": "Order dinner. Nothing will happen today."
-          }
-        ],
-        "then": "desk"
-      }
-    },
-    {
       "id": "dinner",
       "text": "Pick up the phone and order dinner.",
-      "unlock": "done:task2",
+      "unlock": "done:work",
       "done": "event:order:dinner",
       "required": true,
       "rewrite": "Dinner is on its way.",

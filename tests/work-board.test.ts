@@ -69,6 +69,12 @@ describe("the loader accepts the board and rejects bad shapes", () => {
 
 // The factory is hoisted above the imports, so it loads the fixture and day-7 itself and injects the
 // board as day-7 task4 (real content has the tree; Claude swaps it in after this lands).
+// Day 11's old path tasks are gone from content (stale-data audit 2026-11-25); their two flags stay as
+// this test's fixtures: day 11 accepts them as task flags, the mocked boards below carry them.
+vi.mock("@state/days/table", async (importOriginal) => {
+  const real = await importOriginal<typeof import("@state/days/table")>();
+  return { ...real, taskFlags: (day: number) => (day === 11 ? [...real.taskFlags(day), "task_d11_1", "task_d11_2"] : real.taskFlags(day)) };
+});
 vi.mock("@state/days/tasks", async (importOriginal) => {
   const real = await importOriginal<typeof import("@state/days/tasks")>();
   const fx = (await import("../.kiro/specs/work-v2/board-day07.json")).default as any;

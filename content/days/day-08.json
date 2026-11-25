@@ -26,6 +26,18 @@
           "k": "narration",
           "t": "桌上的东西都在原处。寻呼机停在 0.7734。",
           "me": "stand"
+        },
+        {
+          "k": "narration",
+          "t": "三个视频，三张图的链接，十四页图表，一段说明。你发到了群里。"
+        },
+        {
+          "k": "narration",
+          "t": "你写的那段：「每一个价值和理论，我都是先做了页面和图表，最后才变成视频里的一部分素材。毕竟我没经历过研究型训练，这是我目前能做的最好表达了。」"
+        },
+        {
+          "k": "narration",
+          "t": "23:13。群里没有人回。"
         }
       ]
     },
@@ -225,14 +237,6 @@
       "required": true
     },
     {
-      "id": "task2",
-      "text": "把那四份再出一遍。",
-      "unlock": "done:task1",
-      "done": "flag:task_d8_2",
-      "required": true,
-      "origin": "them"
-    },
-    {
       "id": "pickup",
       "text": "外卖到了，去门口拿。",
       "unlock": "event:delivery:arrives:lunch",
@@ -273,31 +277,9 @@
       "required": true
     },
     {
-      "id": "reply",
-      "text": "给老王回一句。",
-      "unlock": "done:task2",
-      "done": "event:reply:boss",
-      "required": true,
-      "onDone": {
-        "say": [
-          {
-            "k": "speaker",
-            "who": "me",
-            "t": "回完了。",
-            "me": "tired"
-          },
-          {
-            "k": "speaker",
-            "who": "kuro",
-            "t": "三张图还没交。交完再吃。"
-          }
-        ]
-      }
-    },
-    {
       "id": "dinner",
       "text": "拿起手机，点个晚饭。",
-      "unlock": "done:task2",
+      "unlock": "done:task1",
       "done": "event:order:dinner",
       "required": true,
       "rewrite": "晚饭在路上。",
@@ -340,30 +322,6 @@
             "me": "eat"
           }
         ]
-      }
-    },
-    {
-      "id": "task3",
-      "text": "三张图，交到群里。",
-      "unlock": "done:reply",
-      "done": "flag:task_d8_3",
-      "required": true,
-      "when": "night",
-      "onDone": {
-        "say": [
-          {
-            "k": "speaker",
-            "who": "me",
-            "t": "发了。群里安静了一会儿。",
-            "me": "phone"
-          },
-          {
-            "k": "speaker",
-            "who": "kuro",
-            "t": "他们在看图。"
-          }
-        ],
-        "then": "desk"
       }
     },
     {

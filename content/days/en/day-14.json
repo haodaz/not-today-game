@@ -170,13 +170,6 @@
       }
     },
     {
-      "id": "task1",
-      "text": "The new hires are sorted. Write something.",
-      "unlock": "done:work",
-      "done": "flag:task_d14_1",
-      "required": false
-    },
-    {
       "id": "pickup",
       "text": "Lunch is at the door. Go get it.",
       "unlock": "event:delivery:arrives:lunch",
@@ -210,32 +203,9 @@
       }
     },
     {
-      "id": "reply",
-      "text": "Send the boss a reply.",
-      "unlock": "done:task1",
-      "done": "event:reply:boss",
-      "required": true,
-      "onDone": {
-        "say": [
-          {
-            "k": "speaker",
-            "who": "me",
-            "t": "Replied.",
-            "me": "tired"
-          },
-          {
-            "k": "speaker",
-            "who": "kuro",
-            "t": "Really nothing today. Order."
-          }
-        ],
-        "then": "desk"
-      }
-    },
-    {
       "id": "dinner",
       "text": "Pick up the phone and order dinner.",
-      "unlock": "done:task1",
+      "unlock": "done:work",
       "done": "event:order:dinner",
       "required": true,
       "rewrite": "Dinner is on its way.",

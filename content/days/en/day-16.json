@@ -25,6 +25,15 @@
       "say": [
         {
           "k": "narration",
+          "t": "A reminder pops up in the corner of the screen: Is the door locked? You never set it."
+        },
+        {
+          "k": "narration",
+          "t": "You went to check. Locked.",
+          "where": "door"
+        },
+        {
+          "k": "narration",
           "t": "Footsteps outside stop at the door. You don't open it.",
           "where": "door",
           "me": "scared"
@@ -134,40 +143,9 @@
       }
     },
     {
-      "id": "task1",
-      "text": "Is the door locked?",
-      "unlock": "done:msgs",
-      "done": "flag:task_d16_1",
-      "required": true,
-      "origin": "them"
-    },
-    {
-      "id": "reply",
-      "text": "Send the boss a reply.",
-      "unlock": "done:task1",
-      "done": "event:reply:boss",
-      "required": true,
-      "onDone": {
-        "say": [
-          {
-            "k": "speaker",
-            "who": "me",
-            "t": "Replied.",
-            "me": "tired"
-          },
-          {
-            "k": "speaker",
-            "who": "kuro",
-            "t": "No dinner tonight."
-          }
-        ],
-        "then": "desk"
-      }
-    },
-    {
       "id": "desk",
       "text": "Go back to the desk and take a look.",
-      "unlock": "done:reply",
+      "unlock": "done:work",
       "done": "event:beat:desk",
       "required": true,
       "when": "night"

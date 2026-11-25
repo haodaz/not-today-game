@@ -3,6 +3,7 @@
 // work read-only; nothing from outside reaches in while work mode is on.
 import "./specimen";
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
 import { dayFile } from "@state/days/table";
 import { taskByFlag, type Task } from "@state/days/tasks";
 import { createStore, type Store } from "@state/store";
@@ -125,16 +126,18 @@ describe("§2 开始工作 targets today's current task", () => {
     again.act("work-start");
     expect(again.session.launchShow).toBeNull();
     expect(again.session.workShow).toBe(`4:${tk.id}`);
-    // day 7: the first tasks have no board — the task page, with its modes
-    const firstItem = dayFile(7)!.items.find((i) => i.done.kind === "flag")!;
-    const d7 = storeAt(7, firstItem.id);
-    const first = workNow(d7.getState(), d7.getEvents(), rig(d7).session);
-    expect(first?.task.board).toBeUndefined();
-    const p = rig(d7, { wbFull: true });
-    p.act("work-start");
-    expect(p.session.workbenchPage).toBe(`task:${first!.task.id}`);
-    expect(p.session.launchShow).toBeNull();
-    expect(p.session.workShow).toBeNull();
+    // Stale-data audit 2026-11-25 (author 11-13: 看一眼 / 让它做 are gone): no day has a work task
+    // without a board or a game any more; 开始工作 always opens a game.
+    // (the content files themselves: the test setup adds practice specimens to the parsed days)
+    for (let day = 1; day <= 18; day++) {
+      const file = JSON.parse(readFileSync(new URL(`../content/days/day-${String(day).padStart(2, "0")}.json`, import.meta.url), "utf8")) as { items: { id: string; done: string; self?: boolean }[] };
+      for (const it of file.items) {
+        if (!it.done.startsWith("flag:task_") || it.self) continue;
+        const task = taskByFlag(day, it.done.slice(5));
+        expect(task, `day ${day} ${it.id}`).toBeDefined();
+        expect(!!(task!.board || task!.game), `day ${day} ${it.id} has a board or a game`).toBe(true);
+      }
+    }
   });
 
   it("a row click opens the page to look at and never launches (no 要开始工作吗)", () => {

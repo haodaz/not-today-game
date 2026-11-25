@@ -25,6 +25,15 @@
       "say": [
         {
           "k": "narration",
+          "t": "屏幕角上弹出一条提醒：门锁好了吗。不是你设的。"
+        },
+        {
+          "k": "narration",
+          "t": "你去看了。锁着。",
+          "where": "door"
+        },
+        {
+          "k": "narration",
           "t": "门外有脚步，停在门口。你没有开。",
           "where": "door",
           "me": "scared"
@@ -134,40 +143,9 @@
       }
     },
     {
-      "id": "task1",
-      "text": "门锁好了吗。",
-      "unlock": "done:msgs",
-      "done": "flag:task_d16_1",
-      "required": true,
-      "origin": "them"
-    },
-    {
-      "id": "reply",
-      "text": "给老王回一句。",
-      "unlock": "done:task1",
-      "done": "event:reply:boss",
-      "required": true,
-      "onDone": {
-        "say": [
-          {
-            "k": "speaker",
-            "who": "me",
-            "t": "回完了。",
-            "me": "tired"
-          },
-          {
-            "k": "speaker",
-            "who": "kuro",
-            "t": "今晚没有饭。"
-          }
-        ],
-        "then": "desk"
-      }
-    },
-    {
       "id": "desk",
       "text": "回桌子那儿看一眼。",
-      "unlock": "done:reply",
+      "unlock": "done:work",
       "done": "event:beat:desk",
       "required": true,
       "when": "night"

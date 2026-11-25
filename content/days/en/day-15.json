@@ -24,6 +24,14 @@
       "say": [
         {
           "k": "narration",
+          "t": "The last piece of work, it had already done. You did it again yourself. Word for word the same."
+        },
+        {
+          "k": "inner",
+          "t": "It has learned to be very like me. Or I have."
+        },
+        {
+          "k": "narration",
           "t": "There's a line in the input box. You didn't type it.",
           "where": "screen:msgs:family"
         },
@@ -179,13 +187,6 @@
       }
     },
     {
-      "id": "task1",
-      "text": "One job left. It did it. Take a look.",
-      "unlock": "done:eat",
-      "done": "flag:task_d15_1",
-      "required": true
-    },
-    {
       "id": "pickup",
       "text": "Lunch is at the door. Go get it.",
       "unlock": "event:delivery:arrives:lunch",
@@ -219,32 +220,9 @@
       }
     },
     {
-      "id": "reply",
-      "text": "Send the boss a reply.",
-      "unlock": "done:task1",
-      "done": "event:reply:boss",
-      "required": true,
-      "onDone": {
-        "say": [
-          {
-            "k": "speaker",
-            "who": "me",
-            "t": "Replied.",
-            "me": "tired"
-          },
-          {
-            "k": "speaker",
-            "who": "kuro",
-            "t": "One job left; it did it. Order."
-          }
-        ],
-        "then": "desk"
-      }
-    },
-    {
       "id": "dinner",
       "text": "Pick up the phone and order dinner.",
-      "unlock": "done:task1",
+      "unlock": "done:work",
       "done": "event:order:dinner",
       "required": true,
       "rewrite": "Dinner is on its way.",

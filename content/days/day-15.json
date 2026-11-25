@@ -24,6 +24,14 @@
       "say": [
         {
           "k": "narration",
+          "t": "最后那件活，它已经做完了。你又做了一遍，和它的一字不差。"
+        },
+        {
+          "k": "inner",
+          "t": "它学得很像。或者我学得很像。"
+        },
+        {
+          "k": "narration",
           "t": "输入框里有一行字，不是你打的。",
           "where": "screen:msgs:family"
         },
@@ -179,13 +187,6 @@
       }
     },
     {
-      "id": "task1",
-      "text": "活只剩一件，它做了，你看一眼。",
-      "unlock": "done:eat",
-      "done": "flag:task_d15_1",
-      "required": true
-    },
-    {
       "id": "pickup",
       "text": "外卖到了，去门口拿。",
       "unlock": "event:delivery:arrives:lunch",
@@ -219,32 +220,9 @@
       }
     },
     {
-      "id": "reply",
-      "text": "给老王回一句。",
-      "unlock": "done:task1",
-      "done": "event:reply:boss",
-      "required": true,
-      "onDone": {
-        "say": [
-          {
-            "k": "speaker",
-            "who": "me",
-            "t": "回完了。",
-            "me": "tired"
-          },
-          {
-            "k": "speaker",
-            "who": "kuro",
-            "t": "只剩一件活，它做了。点饭。"
-          }
-        ],
-        "then": "desk"
-      }
-    },
-    {
       "id": "dinner",
       "text": "拿起手机，点个晚饭。",
-      "unlock": "done:task1",
+      "unlock": "done:work",
       "done": "event:order:dinner",
       "required": true,
       "rewrite": "晚饭在路上。",

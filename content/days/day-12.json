@@ -168,15 +168,8 @@
     {
       "id": "task1",
       "text": "对账结果看一眼。",
-      "unlock": "done:eat",
+      "unlock": "done:work",
       "done": "flag:task_d12_1",
-      "required": true
-    },
-    {
-      "id": "task2",
-      "text": "还钱那件事，记一行。",
-      "unlock": "done:task1",
-      "done": "flag:task_d12_2",
       "required": true
     },
     {
@@ -213,32 +206,9 @@
       }
     },
     {
-      "id": "reply",
-      "text": "给老王回一句。",
-      "unlock": "done:task2",
-      "done": "event:reply:boss",
-      "required": true,
-      "onDone": {
-        "say": [
-          {
-            "k": "speaker",
-            "who": "me",
-            "t": "回完了。",
-            "me": "tired"
-          },
-          {
-            "k": "speaker",
-            "who": "kuro",
-            "t": "还钱那一行记了。点饭。"
-          }
-        ],
-        "then": "desk"
-      }
-    },
-    {
       "id": "dinner",
       "text": "拿起手机，点个晚饭。",
-      "unlock": "done:task2",
+      "unlock": "done:task1",
       "done": "event:order:dinner",
       "required": true,
       "rewrite": "晚饭在路上。",

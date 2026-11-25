@@ -187,13 +187,6 @@
       "required": true
     },
     {
-      "id": "task2",
-      "text": "导出加 CSV。",
-      "unlock": "done:task1",
-      "done": "flag:task_d5_2",
-      "required": true
-    },
-    {
       "id": "pickup",
       "text": "外卖到了，去门口拿。",
       "unlock": "event:delivery:arrives:lunch",
@@ -259,32 +252,9 @@
       }
     },
     {
-      "id": "reply",
-      "text": "给老王回一句。",
-      "unlock": "done:task2",
-      "done": "event:reply:boss",
-      "required": true,
-      "onDone": {
-        "say": [
-          {
-            "k": "speaker",
-            "who": "me",
-            "t": "回完了。",
-            "me": "tired"
-          },
-          {
-            "k": "speaker",
-            "who": "kuro",
-            "t": "今晚早点睡。磁带明天才能听。"
-          }
-        ],
-        "then": "desk"
-      }
-    },
-    {
       "id": "dinner",
       "text": "拿起手机，点个晚饭。",
-      "unlock": "done:task2",
+      "unlock": "done:task1",
       "done": "event:order:dinner",
       "required": true,
       "rewrite": "晚饭在路上。",

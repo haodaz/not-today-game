@@ -213,27 +213,6 @@
       }
     },
     {
-      "id": "task1",
-      "text": "The product plan: a report, or a structure.",
-      "unlock": "done:eat",
-      "done": "flag:task_d7_1",
-      "required": true
-    },
-    {
-      "id": "task2",
-      "text": "The report generator script.",
-      "unlock": "done:task1",
-      "done": "flag:task_d7_2",
-      "required": true
-    },
-    {
-      "id": "task3",
-      "text": "Six plans.",
-      "unlock": "done:task2",
-      "done": "flag:task_d7_3",
-      "required": true
-    },
-    {
       "id": "pickup",
       "text": "Lunch is at the door. Go get it.",
       "unlock": "event:delivery:arrives:lunch",
@@ -274,32 +253,9 @@
       "required": true
     },
     {
-      "id": "reply",
-      "text": "Send the boss a reply.",
-      "unlock": "done:task3",
-      "done": "event:reply:boss",
-      "required": true,
-      "onDone": {
-        "say": [
-          {
-            "k": "speaker",
-            "who": "me",
-            "t": "Replied.",
-            "me": "tired"
-          },
-          {
-            "k": "speaker",
-            "who": "kuro",
-            "t": "There's a call tonight. Order first."
-          }
-        ],
-        "then": "desk"
-      }
-    },
-    {
       "id": "dinner",
       "text": "Pick up the phone and order dinner.",
-      "unlock": "done:task3",
+      "unlock": "done:eat",
       "done": "event:order:dinner",
       "required": true,
       "rewrite": "Dinner is on its way.",

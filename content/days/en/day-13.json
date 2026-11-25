@@ -164,21 +164,6 @@
       }
     },
     {
-      "id": "task1",
-      "text": "Look at the upgrade notice.",
-      "unlock": "done:eat",
-      "done": "flag:task_d13_1",
-      "required": true
-    },
-    {
-      "id": "task2",
-      "text": "Pack away the old things.",
-      "unlock": "done:task1",
-      "done": "flag:task_d13_2",
-      "required": false,
-      "origin": "them"
-    },
-    {
       "id": "pickup",
       "text": "Lunch is at the door. Go get it.",
       "unlock": "event:delivery:arrives:lunch",
@@ -212,32 +197,9 @@
       }
     },
     {
-      "id": "reply",
-      "text": "Send the boss a reply.",
-      "unlock": "done:task2",
-      "done": "event:reply:boss",
-      "required": true,
-      "onDone": {
-        "say": [
-          {
-            "k": "speaker",
-            "who": "me",
-            "t": "Replied.",
-            "me": "tired"
-          },
-          {
-            "k": "speaker",
-            "who": "kuro",
-            "t": "Pack the old things. Order."
-          }
-        ],
-        "then": "desk"
-      }
-    },
-    {
       "id": "dinner",
       "text": "Pick up the phone and order dinner.",
-      "unlock": "done:task2",
+      "unlock": "done:work",
       "done": "event:order:dinner",
       "required": true,
       "rewrite": "Dinner is on its way.",

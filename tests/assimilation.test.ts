@@ -11,11 +11,6 @@ vi.mock("@state/days/tasks", async (importOriginal) => {
   const d7 = (await import("@content/tasks/day-07.json")).default as any;
   const raw = structuredClone(d7);
   raw.tasks = raw.tasks.map((t: any) => {
-    if (t.id === "task1") {
-      // Move the let path's SAN loss into assimilation (what Claude will do in content).
-      t.let.effects = { flags: ["task_d7_1"], assimilation: 4 };
-      return t;
-    }
     if (t.id === "task4") {
       return { id: "task4", title: "对比一下。明天早上要。", app: "docs", done: "task_d7_4", board: structuredClone(fx.board), deliverable: structuredClone(fx.deliverable), judge: structuredClone(fx.judge) };
     }
@@ -51,14 +46,16 @@ describe("the assimilation helper", () => {
 
 describe("a path's assimilation", () => {
   it("raises it by 4, never past 100, and leaves SAN alone", () => {
-    const s = day7();
+    // Day 12's nonogram task keeps a `let` path with assimilation 4 (day 7's old path tasks are gone,
+    // stale-data audit 2026-11-25).
+    const s = f(12);
     const san0 = s.san;
-    const next = applyTask(s, at(7, { kind: "task", flag: "task_d7_1", mode: "let" }));
+    const next = applyTask(s, at(12, { kind: "task", flag: "task_d12_1", mode: "let" }));
     expect(next.assimilation).toBe(4);
     expect(next.san).toBe(san0); // SAN untouched by assimilation
-    expect(next.flags).toContain("task_d7_1");
+    expect(next.flags).toContain("task_d12_1");
     // Applied again on top of 98: clamps at 100.
-    const high = applyTask({ ...s, assimilation: 98 }, at(7, { kind: "task", flag: "task_d7_1", mode: "let" }));
+    const high = applyTask({ ...s, assimilation: 98 }, at(12, { kind: "task", flag: "task_d12_1", mode: "let" }));
     expect(high.assimilation).toBe(100);
   });
 });

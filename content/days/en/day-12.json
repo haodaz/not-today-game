@@ -168,15 +168,8 @@
     {
       "id": "task1",
       "text": "Look at the reconciliation result.",
-      "unlock": "done:eat",
+      "unlock": "done:work",
       "done": "flag:task_d12_1",
-      "required": true
-    },
-    {
-      "id": "task2",
-      "text": "The repayment: log a line.",
-      "unlock": "done:task1",
-      "done": "flag:task_d12_2",
       "required": true
     },
     {
@@ -213,32 +206,9 @@
       }
     },
     {
-      "id": "reply",
-      "text": "Send the boss a reply.",
-      "unlock": "done:task2",
-      "done": "event:reply:boss",
-      "required": true,
-      "onDone": {
-        "say": [
-          {
-            "k": "speaker",
-            "who": "me",
-            "t": "Replied.",
-            "me": "tired"
-          },
-          {
-            "k": "speaker",
-            "who": "kuro",
-            "t": "The repayment line is in. Order."
-          }
-        ],
-        "then": "desk"
-      }
-    },
-    {
       "id": "dinner",
       "text": "Pick up the phone and order dinner.",
-      "unlock": "done:task2",
+      "unlock": "done:task1",
       "done": "event:order:dinner",
       "required": true,
       "rewrite": "Dinner is on its way.",

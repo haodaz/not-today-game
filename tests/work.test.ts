@@ -117,17 +117,6 @@ describe("the choice is a reply", () => {
     expect(after).toContain(`<div class="wm me"><div class="bub">${escapeHtml(t("wb.mode.self"))}</div></div>`);
   });
 
-  it.each(["self", "look", "let"] as const)("a task without a surface completes on the chip: the same event as before (%s)", (mode) => {
-    // Day 1's three tasks all have surfaces now (task3 is 事情 A's board); day 5's 「导出加 CSV」 has none.
-    const csv = taskFiles.get(5)!.find((x) => x.id === "task2")!;
-    const store = dayWith("task2", 5);
-    const { ctx } = ctxFor(store, 5);
-    const before = store.getState();
-    act(ctx, "wb-send");
-    act(ctx, "wb-choose", { mode });
-    expect(lastTask(store)).toEqual({ kind: "task", day: 5, flag: csv.done, mode });
-    expect(store.getState().flags).toEqual(applyEvent(before, { kind: "task", day: 5, flag: csv.done, mode }).flags);
-  });
 });
 
 /** Plays one surface task to 通过 and returns the task event. */

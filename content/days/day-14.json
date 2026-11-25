@@ -170,13 +170,6 @@
       }
     },
     {
-      "id": "task1",
-      "text": "新人排完了。写点什么。",
-      "unlock": "done:work",
-      "done": "flag:task_d14_1",
-      "required": false
-    },
-    {
       "id": "pickup",
       "text": "外卖到了，去门口拿。",
       "unlock": "event:delivery:arrives:lunch",
@@ -210,32 +203,9 @@
       }
     },
     {
-      "id": "reply",
-      "text": "给老王回一句。",
-      "unlock": "done:task1",
-      "done": "event:reply:boss",
-      "required": true,
-      "onDone": {
-        "say": [
-          {
-            "k": "speaker",
-            "who": "me",
-            "t": "回完了。",
-            "me": "tired"
-          },
-          {
-            "k": "speaker",
-            "who": "kuro",
-            "t": "今天真的没事。点饭。"
-          }
-        ],
-        "then": "desk"
-      }
-    },
-    {
       "id": "dinner",
       "text": "拿起手机，点个晚饭。",
-      "unlock": "done:task1",
+      "unlock": "done:work",
       "done": "event:order:dinner",
       "required": true,
       "rewrite": "晚饭在路上。",

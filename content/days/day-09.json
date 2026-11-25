@@ -128,20 +128,6 @@
       }
     },
     {
-      "id": "task1",
-      "text": "第一份：计费。",
-      "unlock": "done:eat",
-      "done": "flag:task_d9_1",
-      "required": true
-    },
-    {
-      "id": "task2",
-      "text": "第二份：那个函数。",
-      "unlock": "done:task1",
-      "done": "flag:task_d9_2",
-      "required": true
-    },
-    {
       "id": "pickup",
       "text": "外卖到了，去门口拿。",
       "unlock": "event:delivery:arrives:lunch",
@@ -175,32 +161,9 @@
       }
     },
     {
-      "id": "reply",
-      "text": "给老王回一句。",
-      "unlock": "done:task2",
-      "done": "event:reply:boss",
-      "required": true,
-      "onDone": {
-        "say": [
-          {
-            "k": "speaker",
-            "who": "me",
-            "t": "回完了。",
-            "me": "tired"
-          },
-          {
-            "k": "speaker",
-            "who": "kuro",
-            "t": "老王晚上还要打来。"
-          }
-        ],
-        "then": "desk"
-      }
-    },
-    {
       "id": "dinner",
       "text": "拿起手机，点个晚饭。",
-      "unlock": "done:task2",
+      "unlock": "done:eat",
       "done": "event:order:dinner",
       "required": true,
       "rewrite": "晚饭在路上。",
