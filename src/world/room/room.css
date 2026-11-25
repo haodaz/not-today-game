@@ -127,7 +127,8 @@
 .room .wait-card{background:var(--paper);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.35);border-radius:10px;padding:12px 16px;box-shadow:0 6px 24px rgba(0,0,0,.12);font-size:15px;line-height:1.7;color:var(--ink)}
 .room .wait-card .h{font-size:11px;letter-spacing:.2em;color:#8a7f70;margin-bottom:6px}
 .room .wait-card .it{display:flex;gap:8px;align-items:baseline}
-.room .wait-card .count{margin-left:auto;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:.05em;color:#8a7f70}
+/* author 2026-11-25 (#76): the countdown must read at a glance: dark ink, larger */
+.room .wait-card .count{margin-left:auto;font-weight:700;font-size:20px;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:.04em;color:var(--ink,#1d2129)}
 /* guidance R5: on 屏幕 the same card over the OS area's top-left, under the 28 px top bar; it takes no clicks. */
 .os-list{position:absolute;left:0;top:28px;z-index:6;pointer-events:none}
 /* The checklist only watches: no line is a button, no hover state. */

@@ -328,7 +328,7 @@
             "k": "speaker",
             "who": "me",
             "t": "看看老王又说了些什么吧。",
-            "where": "screen:msgs:boss"
+            "where": "screen:msgs"
           },
           {
             "k": "speaker",

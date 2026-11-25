@@ -328,7 +328,7 @@
             "k": "speaker",
             "who": "me",
             "t": "Let's see what Lao Wang has to say this time.",
-            "where": "screen:msgs:boss"
+            "where": "screen:msgs"
           },
           {
             "k": "speaker",
