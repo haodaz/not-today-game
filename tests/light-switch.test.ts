@@ -40,7 +40,8 @@ describe("R2 · the switch is a hit", () => {
     for (const view of ["door", "window"] as const) {
       const out = rig(view).room();
       expect(out, view).toContain(`class="look-hit switch" data-action="switch"`);
-      expect(out, view).toContain(`title="${label}" aria-label="${label}"`);
+      // #72 (2026-11-25): no native title; the chip says what a click does (the light is off here)
+      expect(out, view).toContain(`aria-label="${label}" data-chip="${t("room.chip.lightOn")}"`);
     }
     for (const view of ["room", "bed"] as const) expect(rig(view).room(), view).not.toContain('data-action="switch"');
     // not a guided target: refused off the path as room-look is

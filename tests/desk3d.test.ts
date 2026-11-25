@@ -9,7 +9,7 @@ import { createStore, type Store } from "@state/store";
 import { DEFAULT_CLOCK, type BeatClock } from "@world/desktop/beat";
 import type { ActionContext, ActionHandler } from "@world/desktop/controller";
 import { initialSession, type Session } from "@world/desktop/model";
-import { setLocale } from "@world/i18n";
+import { setLocale, t } from "@world/i18n";
 import { EMPTY_DIALOGUE, push } from "@world/loop/dialogue";
 import { EMPTY_COLLECTION } from "@world/room/collection";
 import { deskCommand, deskPick, desk3dOn, LOCATE_IDS, LOCATE_RETRY_MS, NOTHING_POSTED, pickBlocked, rectsFromWhere, ROOM_READY_NET_MS, roomPosts, settleRoomFrame, type RoomWant } from "@world/room/desk3d";
@@ -163,7 +163,7 @@ describe("R2 · 桌子 is the frame; desk=photo is the old tabletop", () => {
     expect(out).toContain('src="/room3d/index.html?embed=1&amp;day=2"');
     expect(out).not.toContain("desk-things");
     expect(out).not.toContain('class="shot-hit monitor-hit"');
-    expect(out).toContain('<i class="room-mark screen-left" data-action="view" data-view="desktop" data-screen="left" style="left:400px;top:90px;width:320px;height:270px" aria-hidden="true"></i>');
+    expect(out).toContain(`<i class="room-mark screen-left" data-action="view" data-view="desktop" data-screen="left" data-chip="${t("room.chip.screenUse")}" style="left:400px;top:90px;width:320px;height:270px" aria-hidden="true"></i>`); // #71: its hover chip
     expect(out).toContain('class="room-mark deskphone" data-action="loop-phone"');
     expect(out).toContain('<div class="desk3d-back" aria-hidden="true"></div>');
     // the frame is hidden — not removed — on another view

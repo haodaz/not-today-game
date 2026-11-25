@@ -375,7 +375,7 @@ describe("R7 · the day's work is one checklist line", () => {
     // After the meal the work line is the current one (it carries the marker); with one task (day 1
     // since 2026-11-20) the line is that task's own words, the count only with several.
     const workText = tasks.length === 1 ? tasks[0]!.text : t("checklist.work", { done: 0, total: tasks.length });
-    expect(out).toMatch(new RegExp(`data-id="work">(<i class="mark"[^>]*>▸</i>)?${workText}(<button[^>]*go-item[^>]*>[^<]*</button>)?</div>`)); // (#30: 前往 may follow)
+    expect(out).toMatch(new RegExp(`data-id="work">(<i class="mark"[^>]*>▸</i>)?<span class="txt">${workText}(<button[^>]*go-item[^>]*>[\\s\\S]*?</button>)?</span></div>`)); // (#30: 前往 may follow; #70 inside the text)
     if (tasks.length > 1) for (const task of tasks) expect(out).not.toContain(task.text);
     for (const task of tasks) store.appendEvent({ kind: "task", flag: (task.done as { flag: string }).flag, mode: "self" });
     const view = checklist(loopContext(store.getState(), store.getEvents())!);

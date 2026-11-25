@@ -55,7 +55,7 @@ describe("FR5 checklist snapshots", () => {
     // playtest-1105 R7: it is a work task (`flag:task_*`), so it is counted on the one work line.
     const before = list(store);
     // navigation-polish: the current line carries the ▸ marker, the others none
-    const work = /data-id="work">(?:<i class="mark" aria-hidden="true">▸<\/i>)?[^<]*（(\d+)\/(\d+)）/;
+    const work = /data-id="work">(?:<i class="mark" aria-hidden="true">▸<\/i>)?<span class="txt">[^<]*（(\d+)\/(\d+)）/; // #70: the text in its span
     expect(before).not.toContain(self.text);
     const [, d0] = work.exec(before)!;
     store.appendEvent({ kind: "task", flag: (self.done as { flag: string }).flag, mode: "self" });

@@ -108,15 +108,18 @@
 .room .list .it.now{font-weight:600;color:var(--ink)}
 .room .list .it.later{opacity:.6}
 /* wait-card (author 2026-11-20): the list and the delivery card stack at the top left; the list keeps its class for the motion layer */
-.room .hud-left{position:absolute;left:28px;top:28px;width:280px;display:flex;flex-direction:column;gap:10px;z-index:12}
+.room .hud-left{position:absolute;left:28px;top:28px;width:340px;display:flex;flex-direction:column;gap:10px;z-index:12}
 .room .hud-left .list{position:static;left:auto;top:auto;width:auto}
 /* author 2026-11-24 (#45): the reader's own page turns, left and right of the book */
 .book-reader .book-pg{position:absolute;top:50%;transform:translateY(-50%);width:56px;height:56px;border-radius:50%;border:1px solid rgba(255,255,255,.4);background:rgba(20,18,16,.55);color:#f4efe6;font-size:30px;line-height:1;cursor:pointer;z-index:3;backdrop-filter:blur(6px)}
 .book-reader .book-pg:hover{background:rgba(20,18,16,.8)}
 .book-reader .book-pg.l{left:24px}.book-reader .book-pg.r{right:24px}
 /* author 2026-11-24 (#30): 前往 on the checklist's current line */
-.room .hud-left .it .go{margin-left:10px;vertical-align:1px;font:inherit;font-size:11px;letter-spacing:.12em;border:1px solid currentColor;border-radius:999px;background:transparent;color:inherit;padding:1px 9px;cursor:pointer;opacity:.7}
-.room .hud-left .it .go:hover{opacity:1;background:rgba(0,0,0,.06)}
+/* author 2026-11-25 (#70): a link at the right end of the line's last row, never a stacked button */
+.room .hud-left .it .txt{display:block;flex:1 1 auto;min-width:0}
+.room .hud-left .it .go{float:right;margin:0 0 0 14px;font:inherit;font-size:13px;font-weight:400;letter-spacing:.08em;border:0;background:transparent;color:inherit;padding:0;cursor:pointer;opacity:.75;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px;white-space:nowrap}
+.room .hud-left .it .go i{font-style:normal;margin-left:3px;text-decoration:none;display:inline-block}
+.room .hud-left .it .go:hover,.room .hud-left .it .go:focus-visible{opacity:1;outline:none}
 /* empty-box (author 2026-11-20): the eaten meal's box on the table up close, not a button */
 .room .table-things .slot.meal.done{pointer-events:none}
 .room .table-things .slot.meal.done img.done{filter:grayscale(.6) brightness(.9)}
@@ -488,6 +491,8 @@
 .prompt-layer{position:fixed;inset:0;z-index:30;pointer-events:none}
 .prompt-layer.lost{visibility:hidden}
 .prompt-layer .prompt-glow{position:fixed;box-sizing:border-box;border:2px solid rgba(255,246,220,.9);border-radius:8px;box-shadow:0 0 14px rgba(255,246,220,.9);animation:prompt-pulse 1.6s ease-in-out infinite}
+/* author 2026-11-25 (#73): no glowing rectangle round the thing; the small label above it is the prompt */
+.prompt-layer .prompt-glow{display:none}
 @keyframes prompt-pulse{0%,100%{opacity:.35}50%{opacity:1}}
 .prompt-layer .prompt-pill{position:fixed;display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:rgba(20,22,28,.55);color:#fff;font:14px/1.2 var(--font-game-ui,"PingFang SC","Hiragino Sans GB",sans-serif);text-shadow:0 1px 1px rgba(0,0,0,.75);white-space:nowrap}
 .prompt-layer .prompt-dia{font-style:normal;font-size:9px;line-height:1;color:var(--accent,#3b6ef2);text-shadow:none}
@@ -539,7 +544,8 @@
    30 % dim behind it (a spread shadow); G6's clauses ring each one without the dim. Reduced motion
    keeps the ring and drops the pulse. */
 [data-guide="on"],[data-guide="clause"]{z-index:8;border-radius:10px;animation:guide-ring 1.2s ease-in-out infinite}
-[data-guide="on"]{box-shadow:0 0 0 2px var(--accent,#2f6feb),0 0 0 9999px rgba(0,0,0,.3)}
+/* author 2026-11-25 (#73): never a dim behind the guided thing (「为了提示，把其他地方都压暗……不好」) */
+[data-guide="on"]{box-shadow:0 0 0 2px var(--accent,#2f6feb)}
 [data-guide="clause"]{box-shadow:0 0 0 2px var(--accent,#2f6feb)}
 /* author 2026-11-11: inside a task page (the launch card, the compare pane) the ring alone, no dim: the dim greyed the whole work page. */
 .sh-frame [data-guide="on"],.task-launch [data-guide="on"],.launch-layer [data-guide="on"],.work-layer [data-guide="on"]{box-shadow:0 0 0 2px var(--accent,#2f6feb)} /* author 2026-11-13: the launch poster and the work screens never veiled either */
@@ -549,6 +555,13 @@
 [data-guide="on"]::after{content:"";position:absolute;left:50%;top:-34px;width:18px;height:18px;margin-left:-9px;border-right:4px solid #fff;border-bottom:4px solid #fff;transform:rotate(45deg);filter:drop-shadow(0 0 3px var(--accent,#2f6feb)) drop-shadow(0 2px 4px rgba(0,0,0,.5));animation:guide-point 1.2s ease-in-out infinite;pointer-events:none;z-index:9}
 @keyframes guide-point{0%,100%{top:-34px}50%{top:-22px}}
 @media (prefers-reduced-motion:reduce){[data-guide="on"],[data-guide="clause"]{animation:none}[data-guide="on"]::after{animation:none}}
+
+/* the same for a spot that carries its own pill (起床): the pill breathes; no line across the screen, no
+   arrow, and no second label from the hints over it */
+.room .rise-spot[data-guide="on"]{box-shadow:none;animation:none;outline:none}
+.room .rise-spot[data-guide="on"]::after{content:none}
+.room .rise-spot[data-guide="on"] .go-pill{animation:chip-breathe 1.6s ease-in-out infinite}
+.prompt-layer[data-hint="rise"]{display:none}
 /* ⚙ 设置 sits above the box in every view (2026-11-02): its fixed layer outranks .dlg-layer (30). */
 .hud-host .settings-layer{z-index:50}
 /* SAN bands (presentation only): the cup photo goes colder as SAN falls. */
@@ -1233,6 +1246,9 @@
 /* hover chips (author 2026-11-24 #3): the picked hotspot says what it does, like the book's chip */
 .room .shot-hit[data-chip]::after{content:attr(data-chip);position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);padding:7px 14px;border-radius:999px;background:rgba(244,240,232,.94);color:#1d2129;font-size:14px;letter-spacing:.12em;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.28);opacity:0;transition:opacity .15s;pointer-events:none}
 .room .shot-hit[data-hover][data-chip]::after,.room .shot-hit:focus-visible[data-chip]::after{opacity:1}
+/* author 2026-11-25 (#71 #72): the same chip on the walls' own buttons (switch, glass, coat…), the ceiling light and the 3D desk's things */
+.room .look-hit[data-chip]::after,.room .desk3d-marks .room-mark[data-chip]::after{content:attr(data-chip);position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);padding:7px 14px;border-radius:999px;background:rgba(244,240,232,.94);color:#1d2129;font-size:14px;letter-spacing:.12em;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.28);opacity:0;transition:opacity .15s;pointer-events:none;z-index:2}
+.room .look-hit[data-chip]:hover::after,.room .look-hit[data-chip]:focus-visible::after,.room .desk3d-marks .room-mark[data-chip][data-hover]::after{opacity:1}
 /* player-stands (2026-11-22): the player's own figure, alone, centre, over the room through a dim (.me-on). */
 .dlg-layer .scene-stand.me,.dlg-layer .scene-stand-anim.me{height:calc(var(--stage-h,100vh) * .86)}
 .dlg-layer.me-on::before{content:"";position:fixed;left:var(--stage-l,0px);top:var(--stage-t,0px);width:var(--stage-w,100vw);height:var(--stage-h,100vh);background:rgba(4,5,8,.42);animation:m-fade-in 300ms both}
@@ -1245,3 +1261,10 @@
 .room .hand-stage{position:absolute;inset:0;z-index:11;background:#05060a;overflow:hidden;animation:m-fade-in 600ms both}
 .room .hand-stage img,.room .hand-stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 @media (prefers-reduced-motion:reduce){.room .hand-stage video{display:none}}
+/* author 2026-11-25 (#73): in the room a guided spot is never a big box. Its own chip (what it does, in a
+   word) stays shown and breathes, with a thin blue edge; the spot itself draws nothing. (At the end of the
+   file and with :is() so it outranks the hover-chip rules above.) */
+.room :is(.shot-hit,.look-hit,.desk3d-marks .room-mark)[data-chip][data-guide="on"]{box-shadow:none;animation:none;outline:none}
+.room :is(.shot-hit,.look-hit,.desk3d-marks .room-mark)[data-chip][data-guide="on"]::after{opacity:1;border:0;width:auto;height:auto;margin:0;left:50%;top:50%;transform:translate(-50%,-50%);filter:none;box-shadow:0 0 0 2px var(--accent,#2f6feb),0 6px 18px rgba(0,0,0,.28);animation:chip-breathe 1.6s ease-in-out infinite;z-index:9}
+@keyframes chip-breathe{0%,100%{box-shadow:0 0 0 2px var(--accent,#2f6feb),0 6px 18px rgba(0,0,0,.28)}50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--accent,#2f6feb) 35%,transparent),0 6px 18px rgba(0,0,0,.28)}}
+@media (prefers-reduced-motion:reduce){.room :is(.shot-hit,.look-hit,.desk3d-marks .room-mark)[data-chip][data-guide="on"]::after{animation:none}}

@@ -8,6 +8,7 @@ import { initialSession } from "@world/desktop/model";
 import { checklist, loopContext } from "@world/loop/checklist";
 import { loopActions } from "@world/room/game";
 import { renderChecklist, renderRoom } from "@world/room/hud";
+import { settleRoomFrame } from "@world/room/desk3d";
 import { replyTable } from "@state/replies/table";
 import { taskForId } from "@state/days/board";
 import { t } from "@world/i18n";
@@ -22,7 +23,7 @@ describe("#30 前往", () => {
   it("the current line carries 前往; a click lands where that step is done (rise → got up; eat → the table)", () => {
     const store = createStore({ startDay: 1 });
     const out = renderChecklist(checklist(loopContext(store.getState(), store.getEvents())!)).value;
-    expect(out).toContain(`data-action="go-item" data-id="rise">${t("checklist.go")}</button>`);
+    expect(out).toContain(`data-action="go-item" data-id="rise">${t("checklist.go")}<i aria-hidden="true">›</i></button>`); // #70
     expect(out.match(/data-action="go-item"/g)).toHaveLength(1);
     const ctx = ctxOf(store);
     ctx.session.view = "lying";
@@ -30,11 +31,14 @@ describe("#30 前往", () => {
     expect(ctx.session.dialogue.queue.some((q) => q.ending.kind === "riseAsk")).toBe(true); // 起床 asks first (day1-playtest R1)
     ctx.session.dialogue = { queue: [], line: 0, page: 0 };
     ctx.session.view = "room";
-    // boot: 房间, where the tower's 开机 is pointed at
+    // boot (#74, 2026-11-25): 桌子, the tower right in front (its mark once the 3D room has said where it is)
     ctx.session.view = "lying";
     loopActions["go-item"]!(ctx, { id: "boot" } as DOMStringMap, null as never);
-    expect(ctx.session.view).toBe("room");
-    expect(renderRoom({ state: store.getState(), events: store.getEvents(), session: ctx.session }).value).toContain('data-hot="tower"');
+    expect(ctx.session.view).toBe("desk");
+    ctx.session.roomRects = { tower: { l: 200, t: 600, w: 80, h: 200 } };
+    settleRoomFrame(ctx.session, 1); // the shared 3D frame, as the first lying render makes it in the game
+    const desk = renderRoom({ state: store.getState(), events: store.getEvents(), session: ctx.session }).value;
+    expect(desk).toMatch(/class="room-mark tower"[^>]*data-action="tower-power"/);
   });
 });
 

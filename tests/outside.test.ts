@@ -58,7 +58,7 @@ describe("R1 · the glass is a hit on 窗", () => {
     for (const day of [1, 18]) {
       const out = rig(day).room();
       expect(out, `day ${day}`).toContain(`class="look-hit glass" ${GLASS}`);
-      expect(out).toContain(`title="${escapeHtml(t("room.window.look"))}" aria-label="${escapeHtml(t("room.window.look"))}"`);
+      expect(out).toContain(`aria-label="${escapeHtml(t("room.window.look"))}" data-chip="${escapeHtml(t("room.chip.glass"))}"`); // #72: the chip, no native title
     }
     for (const view of ["room", "bed", "door"] as const) expect(rig(1, view).room(), view).not.toContain(GLASS);
   });

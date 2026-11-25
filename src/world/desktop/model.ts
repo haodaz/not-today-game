@@ -246,6 +246,8 @@ export interface Session {
   lampOn: boolean | null;
   /** room-light-switch R1: the ceiling light, by the wall switch (session only, like the lamp; never by itself). */
   ceilOn: boolean;
+  /** author 2026-11-25 (#71): the 3D desk thing under the pointer (the room's `hover`), for its chip; session only. */
+  deskHover: string | null;
   /** day1-playtest-1117 R2: the ceiling's lines said since the player last lay down (once each), with the day. */
   lyingSaid: { readonly day: number; readonly said: readonly string[] } | null;
   /** Holding and using it, its programs, its light (objects-in-hand FR1); session only. */
@@ -654,6 +656,7 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     offerShown: null,
     lampOn: null,
     ceilOn: false,
+    deskHover: null,
     lyingSaid: null,
     hand: initialHand(),
     reveal: null,

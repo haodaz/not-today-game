@@ -235,6 +235,15 @@ export function createRoom3dLayer(onMessage: (ctx: ActionContext, msg: RoomMessa
         }
         return;
       }
+      // author 2026-11-25 (#71): what the pointer is over on the 3D desk shows its chip
+      if (msg.type === "hover") {
+        const id = typeof msg.id === "string" ? msg.id : null;
+        if (ctx.session.deskHover !== id) {
+          ctx.session.deskHover = id;
+          ctx.rerender();
+        }
+        return;
+      }
       if (msg.type === "pick") {
         // the keys belong to the game again, not the frame the click went into
         if (doc.activeElement === shared) shared.blur();

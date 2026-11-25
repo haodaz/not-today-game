@@ -783,17 +783,18 @@ function goToItem(ctx: ActionContext, id: string): void {
   const e = d.event;
   switch (e.type) {
     case "rise": go("rise"); break;
-    case "boot": go("view", { view: "room" }); break; // the tower's 开机 is pointed at from 房间
+    // author 2026-11-25 (#74): 前往 lands where the last step is done, as near as the room allows
+    case "boot": go("view", { view: "desk" }); break; // the tower under the desk, right in front
     case "openApp": desktop(); go("dock", { app: e.app === "msgs" ? "tingtalk" : e.app }); break;
     case "reply": thread(e.recipient); break;
     case "open": if (e.target.startsWith("conv:")) thread(e.target.slice("conv:".length)); else desktop(); break;
     case "order": go("view", { view: "desk" }); go("loop-phone"); break;
     case "arrives": case "pickup": go("view", { view: "door" }); break;
     case "openBox": go("view", { view: "room" }); go("pick-box"); break;
-    case "eat": go("meal-table"); break;
+    case "eat": go("view", { view: "window" }); go("meal-table"); break; // up to the little table (its click works from 窗)
     case "beat": if (e.beat === "desk") go("view", { view: "desk" }); else desktop(); break;
     case "chat": kuroActions["kuro-call"]!(ctx, {} as DOMStringMap, null as never); break;
-    case "lieDown": go("bed"); break;
+    case "lieDown": go("view", { view: "bed" }); break; // at the bed; lying down is the player's click
     default: break;
   }
 }

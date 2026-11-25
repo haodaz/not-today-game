@@ -108,7 +108,7 @@ export function renderChecklist(view: ChecklistView): SafeHtml {
   // navigation-polish (author's playtest 2026-11-16): no done count; the current line carries the
   // marker in full ink, every other open line is dimmed (`later`) with no marker.
   // author 2026-11-24 (#30): the current line carries 前往 — one click lands where that step is done
-  const lines = view.lines.map((l) => html`<div class="${cls("it", l.state, l.state === "locked" && "later")}" data-id="${l.id}">${l.state === "now" ? html`<i class="mark" aria-hidden="true">▸</i>` : null}${l.work ? tr("checklist.work", { done: l.work.done, total: l.work.total }) : l.text}${l.state === "now" && hasString("checklist.go") ? html`<button type="button" class="go" data-action="go-item" data-id="${l.id}">${tr("checklist.go")}</button>` : null}</div>`);
+  const lines = view.lines.map((l) => html`<div class="${cls("it", l.state, l.state === "locked" && "later")}" data-id="${l.id}">${l.state === "now" ? html`<i class="mark" aria-hidden="true">▸</i>` : null}<span class="txt">${l.work ? tr("checklist.work", { done: l.work.done, total: l.work.total }) : l.text}${l.state === "now" && hasString("checklist.go") ? html`<button type="button" class="go" data-action="go-item" data-id="${l.id}">${tr("checklist.go")}<i aria-hidden="true">›</i></button>` : null}</span></div>`);
   return html`<div class="list"><div class="h">${tr(view.heading === "tonight" ? "hud.tonight" : "hud.today")}</div>${lines}</div>`;
 }
 
@@ -315,7 +315,9 @@ function flatHits(view: "bed" | "window", arrived: boolean): SafeHtml {
   // box-arrival R1: 床's carton is not there before it has arrived.
   return html`${FLAT_HOTS[view].filter(({ id }) => arrived || id !== "box").map(({ id, rect }) => {
     const p = FLAT_PROXY[id];
-    return html`<button type="button" class="${p.cls}" ${raw(p.attrs)} style="${rectStyle(rect)}" aria-label="${t(p.label)}" data-hot="${id}"></button>`;
+    // author 2026-11-25 (#72): every hotspot says what it does on hover, as 房间's do
+    const chip = hasString(`room.chip.${id}`) ? t(`room.chip.${id}`) : t(p.label);
+    return html`<button type="button" class="${p.cls}" ${raw(p.attrs)} style="${rectStyle(rect)}" aria-label="${t(p.label)}" data-hot="${id}" data-chip="${chip}"></button>`;
   })}`;
 }
 
@@ -341,7 +343,9 @@ function deskMarks(state: State, events: readonly GameEvent[], session: Session)
     // the tower's projected box runs up behind the desk top (author 2026-11-23: 桌子上 highlight 的方块是什么):
     // its mark is the part that shows, the lower half under the desk's left edge
     const r = r0 && id === "tower" ? { ...r0, t: r0.t + r0.h * 0.55, h: r0.h * 0.45 } : r0;
-    return r ? html`<i class="${cls("room-mark", id, extra)}" ${raw(attrs)}${id === glow ? raw(" data-glow") : null} style="${rectStyle(r)}" aria-hidden="true"></i>` : null;
+    // author 2026-11-25 (#71): the thing under the pointer (the room's hover) shows its chip
+    const chip = deskChip(id, state, events, session);
+    return r ? html`<i class="${cls("room-mark", id, extra)}" ${raw(attrs)}${id === glow ? raw(" data-glow") : null}${chip ? html` data-chip="${chip}"` : null}${session.deskHover === id ? raw(" data-hover") : null} style="${rectStyle(r)}" aria-hidden="true"></i>` : null;
   };
   const on = booted(state, events);
   const lit = on
@@ -350,6 +354,18 @@ function deskMarks(state: State, events: readonly GameEvent[], session: Session)
   const held = heldItem(session);
   const objects = state.found.map((id, i) => mark(id, `data-object="${id}" data-action="loop-hold"`, cls(pointerCls(session, "hold", i === 0 && held === null), session.holding === id && !session.phoneOpen && "lifted") || null));
   return html`<div class="desk3d-marks">${lit}${mark("screen-left", 'data-action="view" data-view="desktop" data-screen="left"')}${mark("screen-right", 'data-action="view" data-view="desktop" data-screen="right"')}${mark("deskphone", 'data-action="loop-phone"', session.phoneOpen && "lifted")}${objects}${printsOnDesk(state.day, events).length > 0 ? mark("prints", 'data-action="prints-open"') : null}${slipThing(state, events) ? mark("slip", 'data-action="desk-slip"') : null}${mark("lamp", 'data-action="lamp"')}${on ? null : mark("tower", 'data-action="tower-power"')}</div><div class="desk3d-back" aria-hidden="true"></div>`;
+}
+
+/** author 2026-11-25 (#71): what a 3D desk thing does, in a word, for its hover chip; null: none. */
+function deskChip(id: string, state: State, events: readonly GameEvent[], session: Session): string | null {
+  if (id === "screen-left" || id === "screen-right") return t("room.chip.screenUse");
+  if (id === "tower") return booted(state, events) ? null : t("room.chip.tower");
+  if (id === "deskphone") return t("room.chip.deskphone");
+  if (id === "lamp") return t(lampLit(session) ? "room.chip.lampOff" : "room.chip.lampOn");
+  if (id === "prints") return t("room.chip.prints");
+  if (id === "slip") return t("room.chip.slip");
+  if ((state.found as readonly string[]).includes(id)) return t("room.chip.object");
+  return null;
 }
 
 /** room-3d-window R1: the glass on 窗 — the two panes between the frame — looks out into the code-built room. */
@@ -361,21 +377,23 @@ export const GLASS_RECT = fracRect(WINDOW_WALL, 0.385, 0.643, 0.145, 0.56);
 function ceilingHits(): SafeHtml {
   const rise = t("room.rise.up");
   // the pill (author 2026-11-23: 起床/离开桌子 like 离开窗边, in the lower half of the screen)
-  return html`<button type="button" class="look-hit rise-spot" data-action="rise" style="${rectStyle(RISE_BAND)}" aria-label="${rise}"><span class="go-pill" aria-hidden="true"><i class="chev"></i><span>${tr("room.rise.up")}</span></span></button><button type="button" class="look-hit ceil-lamp" data-action="lying-look" data-look="lamp" style="${rectStyle(CEILING_LAMP)}" aria-hidden="true" tabindex="-1"></button>`;
+  return html`<button type="button" class="look-hit rise-spot" data-action="rise" style="${rectStyle(RISE_BAND)}" aria-label="${rise}"><span class="go-pill" aria-hidden="true"><i class="chev"></i><span>${tr("room.rise.up")}</span></span></button><button type="button" class="look-hit ceil-lamp" data-action="lying-look" data-look="lamp" style="${rectStyle(CEILING_LAMP)}" aria-hidden="true" tabindex="-1" data-chip="${t("room.chip.ceilLamp")}"></button>`;
 }
 
 /** room-light-switch R2: the wall switch by the door, on 门 and on 窗: the ceiling light on and off. */
-function switchHit(view: "door" | "window"): SafeHtml {
+function switchHit(view: "door" | "window", session: Pick<Session, "ceilOn">): SafeHtml {
   const label = t("room.switch");
-  return html`<button type="button" class="look-hit switch" data-action="switch" style="${rectStyle(SWITCH_SPOTS[view])}" title="${label}" aria-label="${label}"></button>`;
+  // author 2026-11-25 (#72): the chip says what a click will do to the ceiling light
+  const chip = t(ceilLit(session) ? "room.chip.lightOff" : "room.chip.lightOn");
+  return html`<button type="button" class="look-hit switch" data-action="switch" style="${rectStyle(SWITCH_SPOTS[view])}" aria-label="${label}" data-chip="${chip}"></button>`;
 }
 function glassHit(): SafeHtml {
   const label = t("room.window.look");
-  return html`<button type="button" class="look-hit glass" data-action="window-out" style="${rectStyle(GLASS_RECT)}" title="${label}" aria-label="${label}"></button>`;
+  return html`<button type="button" class="look-hit glass" data-action="window-out" style="${rectStyle(GLASS_RECT)}" aria-label="${label}" data-chip="${t("room.chip.glass")}"></button>`;
 }
 
 function lookHits(view: "door" | "window"): SafeHtml {
-  return html`${LOOK_SPOTS[view].map(({ look, rect }) => html`<button type="button" class="look-hit ${look}" data-action="room-look" data-look="${look}" style="${rectStyle(rect)}" aria-hidden="true" tabindex="-1"></button>`)}`;
+  return html`${LOOK_SPOTS[view].map(({ look, rect }) => html`<button type="button" class="look-hit ${look}" data-action="room-look" data-look="${look}" style="${rectStyle(rect)}" aria-hidden="true" tabindex="-1"${hasString(`room.chip.look.${look}`) ? html` data-chip="${t(`room.chip.look.${look}`)}"` : null}></button>`)}`;
 }
 
 /** 道具 (day-loop correction 2026-11-01): the button next to ⚙; it opens and closes the strip. */
@@ -654,7 +672,7 @@ function litScreens(view: HotView, state: State, events: readonly GameEvent[]): 
   return html`<i class="monitor-lit left" style="${rectStyle(rects.left)}" aria-hidden="true"></i><i class="monitor-lit right" style="${rectStyle(rects.right)}" aria-hidden="true"></i>`;
 }
 
-function shotHits(view: HotView, state: State, events: readonly GameEvent[]): SafeHtml {
+function shotHits(view: HotView, state: State, events: readonly GameEvent[], session?: Pick<Session, "lampOn" | "clock">): SafeHtml {
   const fixed = fixedRects(view);
   const buttons = hotIdsIn(view).map((id) => {
     const p = PROXIES[id];
@@ -663,7 +681,8 @@ function shotHits(view: HotView, state: State, events: readonly GameEvent[]): Sa
     if (!r) return null;
     const tower = id === "tower" ? html`<i class="tower-led"></i>` : null;
     // the hover chip (author 2026-11-24 #3): what pointing at it does, in a word, like the book's chip
-    const chip = hasString(`room.chip.${id}`) ? t(`room.chip.${id}`) : p.label(state, events);
+    // author 2026-11-25 (#72): the lamp's chip says what a click will do
+    const chip = id === "lamp" && session ? t(lampLit(session) ? "room.chip.lampOff" : "room.chip.lampOn") : hasString(`room.chip.${id}`) ? t(`room.chip.${id}`) : p.label(state, events);
     return html`<button type="button" class="${p.cls}" ${raw(p.attrs)} style="${rectStyle(r)}" aria-label="${p.label(state, events)}" data-hot="${id}" data-chip="${chip}">${tower}</button>`;
   });
   return html`${litScreens(view, state, events)}${buttons}`;
@@ -777,13 +796,13 @@ export function renderRoom(model: RoomModel): SafeHtml {
   const lineScene = sceneOf(session.dialogue);
   const dream = lineScene.backdrop !== null;
   const arrived = boxArrived(state, events);
-  const flat = isFlatFacing(view) ? html`${flatHits(view, arrived)}${view === "window" ? html`${lookHits("window")}${glassHit()}${switchHit("window")}${windowThings(state, events)}` : null}` : null;
+  const flat = isFlatFacing(view) ? html`${flatHits(view, arrived)}${view === "window" ? html`${lookHits("window")}${glassHit()}${switchHit("window", session)}${windowThings(state, events)}` : null}` : null;
   // playtest-1105 R4: 门's things to touch sit under the door beat's own spot.
   // playtest-1105 R5: 窗's table up close carries only the meal, large.
   const table = view === "table" ? tableThings(state, events, session) : null;
   // room-3d-desk R2: 桌子 is the shared room frame; its things are the room's, the game draws its marks over them
   const desk3d = desk3dOn(session);
-  const scene = desk3d ? (waiting || dream ? null : deskMarks(state, events, session)) : waiting || dream ? null : lying ? ceilingHits() : door ? html`${lookHits("door")}${switchHit("door")}${doorContent(state, events, session)}` : hotView ? html`${shotHits(hotView, state, events)}${kept}` : (flat ?? table);
+  const scene = desk3d ? (waiting || dream ? null : deskMarks(state, events, session)) : waiting || dream ? null : lying ? ceilingHits() : door ? html`${lookHits("door")}${switchHit("door", session)}${doorContent(state, events, session)}` : hotView ? html`${shotHits(hotView, state, events, session)}${kept}` : (flat ?? table);
   // The held item sits over everything but the dialogue box (held-object.html).
   // camera-viewfinder: the viewfinder (R1) and the sheet in hand (R3) take the held layer's place;
   // the viewfinder also hides the HUD (the list, the corner, the buttons, Kuro's body).
