@@ -141,8 +141,9 @@ describe("R4 · outsideCommand", () => {
   });
   it("the facing and the rest fixed; the rain from the stages table; the day clamped", () => {
     expect(cmd(1, "09:00")).toEqual({ target: "nt-room", day: 1, time: 9, face: 3, spot: "win", lamp: false, ceil: false, rain: weatherOf(1) === "rain", outer: false, eaten: false, far: 0 });
-    expect(weatherOf(4)).toBe("rain");
-    expect(cmd(4, "09:00").rain).toBe(true);
+    expect(weatherOf(2)).toBe("rain");
+    expect(weatherOf(4)).toBe("clear"); // author 2026-11-24 (#68): at most two rain days in 1–5
+    expect(cmd(2, "09:00").rain).toBe(true);
     expect(weatherOf(10)).not.toBe("rain");
     expect(cmd(10, "09:00").rain).toBe(false);
     expect(cmd(0, "09:00").day).toBe(1);

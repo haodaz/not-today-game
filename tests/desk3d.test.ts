@@ -60,7 +60,7 @@ describe("the desk command and what is posted", () => {
     expect(cmd(1, "18:30").lamp).toBe(true);
     expect(cmd(1, "18:30", false).lamp).toBe(false);
     expect(cmd(1, "10:00", true).lamp).toBe(true);
-    expect(cmd(4, "10:00").rain).toBe(true);
+    expect(cmd(2, "10:00").rain).toBe(true);
     expect(cmd(10, "10:00").rain).toBe(false);
     expect(cmd(30, "10:00").day).toBe(18);
   });

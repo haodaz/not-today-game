@@ -142,9 +142,9 @@
     "byDay": {
       "1": "rain",
       "2": "rain",
-      "3": "rain",
-      "4": "rain",
-      "5": "rain",
+      "3": "overcast",
+      "4": "clear",
+      "5": "overcast",
       "6": "overcast",
       "7": "fog",
       "8": "fog",

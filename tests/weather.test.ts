@@ -20,12 +20,12 @@ const byDay = (stagesFile as unknown as { weather: { byDay: Record<string, strin
 const days = Array.from({ length: 18 }, (_, i) => i + 1);
 
 describe("weather by day", () => {
-  it("every day has one of the kinds, as content says (1–5 rain, 6 overcast, 7–8 fog, 9 rain, 10 clear, …, 17–18 white)", () => {
+  it("every day has one of the kinds, as content says (1–2 rain, 3 overcast, 4 clear, 5–6 overcast, 7–8 fog, 9 rain, 10 clear, …, 17–18 white)", () => {
     for (const day of days) {
       expect(WEATHERS, `day ${day}`).toContain(weatherOf(day));
       expect(weatherOf(day), `day ${day}`).toBe(byDay[String(day)]);
     }
-    expect(days.map(weatherOf)).toEqual(["rain", "rain", "rain", "rain", "rain", "overcast", "fog", "fog", "rain", "clear", "overcast", "overcast", "stopped", "clear", "fog", "overcast", "white", "white"]);
+    expect(days.map(weatherOf)).toEqual(["rain", "rain", "overcast", "clear", "overcast", "overcast", "fog", "fog", "rain", "clear", "overcast", "overcast", "stopped", "clear", "fog", "overcast", "white", "white"]);
     for (const kind of WEATHERS) expect(t(`weather.${kind}`), kind).not.toBe(`weather.${kind}`);
   });
 
