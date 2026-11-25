@@ -35,7 +35,7 @@ explains itself.
 | `san` | the heart-rate chip from day 9 (HUD); the number in 人物 | panel | One real trace per SAN band, in the room itself: the desk lamp's bulb flickers at the lowest band; the mug is already cold when you sit down. Never a drawn overlay. |
 | `assimilation` | the number in 人物 | panel | Kuro's own body in the room: one more tentacle on the HUD body per band; at the top band its shadow on the wall is a size too big. |
 | `affinity` | Kuro's lines and register; the number in 人物 | panel | Where Kuro's eyes rest when idle: on the player at high affinity, on the screen at low. |
-| `fullness` | the number in 人物 (`hunger-fullness`) | panel | A skipped meal stays where it was: the takeaway bag by the door, unopened, still there the next morning. |
+| `fullness` | the number in 人物; **a lunch collected and never eaten stays on the little table by the window, unopened** — beside the dinner that evening, still there the next morning until that day's lunch is collected; a click: one plain line (`leftoverLunch`, built 2026-11-25). Lunch is the one meal the days let you skip. | shown | Done. |
 | `loan`, `balance`, `overdueDays` | the workbench ledger, the checklist, 老周's thread | shown (on the screen, as real work) | none: the workspace shows the work (the workspace is the work, not a game surface). |
 | `letItDoUnchecked` | the workbench's "let it do" marks | shown (on the screen) | none |
 | `repliedNumbers`, `translated`, `readCount`, `replyOptions`, `objectWords` | the pager / dictionary screens; the reply bar | shown (on the devices and screens) | none |

@@ -20,7 +20,8 @@ import { booted, checklist, deskMeal, itemStates, loopContext, openItemFor, WORK
 import { guideNow, type Guide } from "@world/loop/guide";
 import type { EventToken } from "@state/days/table";
 import { itemOf } from "@state/delivery/shops";
-import { ordersOn } from "@world/delivery/meals";
+import { leftoverLunch, ordersOn } from "@world/delivery/meals";
+import { dayHasMeals } from "@state/hunger";
 import { isEvening, isNight } from "@world/desktop/beat";
 import { ceilLit, lampLit } from "@world/objects/works";
 import { hudKuro } from "@world/desktop/kuro/mini";
@@ -291,13 +292,24 @@ function tabletop(things: DeskThings): SafeHtml {
 /** 窗's placed thing (room-turn R3): today's meal on the little table, the same art scaled to its rect. */
 function windowThings(state: State, events: readonly GameEvent[]): SafeHtml | null {
   const meal = mealSlot(state, events);
-  return meal ? html`<div class="facing-things">${placedAt("meal", WINDOW_SHOT.meal, meal)}</div>` : null;
+  const left = leftoverSlot(state, events);
+  return meal || left ? html`<div class="facing-things">${placedAt("leftover", WINDOW_SHOT.leftover, left)}${placedAt("meal", WINDOW_SHOT.meal, meal)}</div>` : null;
+}
+
+/** A lunch never eaten (meals.ts leftoverLunch): the unopened bag; a click is one inner line, it is never eaten. */
+function leftoverSlot(state: State, events: readonly GameEvent[]): SafeHtml | null {
+  if (!dayHasMeals(state.day)) return null;
+  const left = leftoverLunch(events, state.day);
+  if (!left) return null;
+  const when = left.yesterday ? "yesterday" : "today";
+  return html`<button type="button" class="slot meal leftover" data-action="leftover-look" data-when="${when}" aria-label="${t(`room.leftover.${when}`)}"><img src="/food/bag.png" alt=""></button>`;
 }
 
 /** 窗's table up close (playtest-1105 R5): the same meal slot, large on the tabletop; empty table, nothing. */
 function tableThings(state: State, events: readonly GameEvent[], session?: Pick<Session, "emptyBox">): SafeHtml | null {
   const meal = mealSlot(state, events, session);
-  return meal ? html`<div class="facing-things table-things">${placedAt("meal", TABLE_SHOT.meal, meal)}</div>` : null;
+  const left = leftoverSlot(state, events);
+  return meal || left ? html`<div class="facing-things table-things">${placedAt("meal", TABLE_SHOT.meal, meal)}${placedAt("leftover", TABLE_SHOT.leftover, left)}</div>` : null;
 }
 
 /**

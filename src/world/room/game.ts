@@ -1043,6 +1043,18 @@ export const loopActions: Record<string, ActionHandler> = {
   },
   // playtest-1105 R5: the table itself is a close view, like 桌子: a click leans in to the tabletop
   // (the meal large there, eaten with a click on it); Esc or the bottom strip goes back to 窗.
+  // The room as a readout (2026-11-25): the lunch never eaten, unopened on the little table. A click on
+  // it is one inner line; from 窗 it first goes up to the table, like the table itself. Never eaten.
+  "leftover-look"(ctx, data) {
+    const { session, store } = ctx;
+    if (overlayOpen(session) || session.dialogue.queue.length > 0) return;
+    if (session.view === "window") return loopActions["meal-table"]!(ctx, data, null as never);
+    const when = data.when === "yesterday" ? "yesterday" : "today";
+    const key = `room.leftover.${when}`;
+    if (!hasString(key)) return;
+    session.dialogue = push(session.dialogue, { key: `d${store.getState().day}:leftover`, lines: [{ k: "inner", t: t(key) }], ending: { kind: "none" } });
+    ctx.rerender();
+  },
   "meal-table"(ctx) {
     // guidance R13: going to the table closes the case (it is a view change).
     if (ctx.session.view === "window" && ctx.session.caseOpen) ctx.session.caseOpen = false;

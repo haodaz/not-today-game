@@ -27,6 +27,19 @@ export function pickedUp(events: readonly GameEvent[], day: number, meal: Meal):
   return events.some((e) => e.kind === "pickup" && e.day === day && e.meal === meal);
 }
 
+const ate = (events: readonly GameEvent[], day: number, meal: Meal): boolean => events.some((e) => e.kind === "step" && e.day === day && e.name === `eat:${meal}`);
+
+/**
+ * The room as a readout (docs/room-readout.md, author 2026-11-25 「先做外卖袋」): a lunch collected
+ * and never eaten stays on the little table, unopened — beside the dinner that evening, and still
+ * there the next morning until that day's lunch is collected. Which day's lunch it is, or null.
+ * (Lunch is the one meal the day files let the player skip: dinner's 吃 is always required.)
+ */
+export function leftoverLunch(events: readonly GameEvent[], day: number): { readonly day: number; readonly yesterday: boolean } | null {
+  if (pickedUp(events, day, "lunch")) return pickedUp(events, day, "dinner") && !ate(events, day, "lunch") ? { day, yesterday: false } : null;
+  return day > 1 && pickedUp(events, day - 1, "lunch") && !ate(events, day - 1, "lunch") ? { day: day - 1, yesterday: true } : null;
+}
+
 /**
  * E5. Null if nothing comes. If nothing could be ordered (every shop closed), at `arrives`.
  * If ordered, at `arrives` or the order time, whichever is later. Otherwise the default comes

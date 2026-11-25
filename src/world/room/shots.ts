@@ -109,7 +109,7 @@ export const BED_SHOT: { readonly bed: Rect; readonly box: Rect } = {
  * under the window, and where the meal that `deskMeal` picks sits on it. The still shows a takeout
  * box already; a clean still comes later, the rect stays.
  */
-export const WINDOW_SHOT: { readonly mealTable: Rect; readonly meal: Rect; readonly desk: Rect } = {
+export const WINDOW_SHOT: { readonly mealTable: Rect; readonly meal: Rect; readonly leftover: Rect; readonly desk: Rect } = {
   mealTable: { l: 565, t: 600, w: 225, h: 300 },
   // 2026-11-08 (author): the desk and its screens show at the right of this wall too; like the bed on
   // two walls, they can be used from here (window.jpg x 1040–1664, y 340–900, cover-fitted).
@@ -117,6 +117,8 @@ export const WINDOW_SHOT: { readonly mealTable: Rect; readonly meal: Rect; reado
   // playtest-1105 R5: the tabletop is stage x 567–788, y 614–684 (window.jpg x 592–820, y 633–705,
   // cover-fitted); the meal's bottom now sits on its middle, centred on it (it was 10 px high, 10 px left).
   meal: { l: 617, t: 578, w: 120, h: 88 },
+  // A lunch never eaten (room readout, 2026-11-25): the unopened bag at the tabletop's left end.
+  leftover: { l: 562, t: 560, w: 70, h: 96 },
 };
 
 /**
@@ -125,8 +127,11 @@ export const WINDOW_SHOT: { readonly mealTable: Rect; readonly meal: Rect; reado
  * the meal sits large on the top, its bottom on the middle of the boards.
  */
 export const TABLE_ZOOM = { k: 3, x: Math.round(800 - 706 * 3), y: Math.round(450 - 660 * 3) } as const;
-export const TABLE_SHOT: { readonly meal: Rect } = {
+export const TABLE_SHOT: { readonly meal: Rect; readonly leftover: Rect } = {
   meal: { l: 600, t: 170, w: 400, h: 300 },
+  // A lunch never eaten (room readout, 2026-11-25): the unopened bag on the tabletop's front-left
+  // corner, in front of tonight's meal so it is seen (behind it, the meal hid it).
+  leftover: { l: 482, t: 330, w: 150, h: 196 },
 };
 
 /** The flat facings' things to point at, in tab order (fixed rectangles, no splat box). */

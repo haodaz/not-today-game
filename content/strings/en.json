@@ -332,6 +332,8 @@
   "desktop.shutdown": "Shut down",
   "room.bed": "The bed",
   "room.meal": "The meal",
+  "room.leftover.today": "Lunch, never touched. Stone cold now.",
+  "room.leftover.yesterday": "Yesterday's lunch. The bag was never opened.",
   "judge.offline.looked": "You read what I wrote.",
   "judge.offline.checked": "You looked at what it did before letting go.",
   "judge.offline.recognised": "You recognised what was in the box.",
