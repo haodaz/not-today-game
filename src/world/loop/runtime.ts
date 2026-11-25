@@ -238,7 +238,7 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
         const start = startSaid.has(taskStartKey(day, tree.id)) ? [] : tree.start.say;
         // guidance R14: its closing lines read, 工作台 goes home with the next task lit.
         const lines = [...start, ...path.say];
-        if (lines.length) dialogue = push(dialogue, { key: `d${day}:task:${tree.id}`, lines, ending: { kind: "taskHome" } });
+        if (lines.length) dialogue = push(dialogue, { key: `d${day}:task:${tree.id}`, lines, ending: { kind: "taskHome", to: tree.deliverable?.to } });
       }
     } else if (e.kind === "openLayer") {
       // box-arrival R4: on the arrival day the box beat has played at the pickup.
@@ -280,7 +280,14 @@ export function react(memo: LoopMemo, lc: LoopContext, events: readonly GameEven
       const q = itemQueued(day, item, "onDone");
       // author 2026-11-24 (#11): a work item's closing lines end on taskHome (the screen lands in the boss's
       // thread; guidance R14) — board tasks have no lines of their own, so the ending came from nowhere
-      if (q) dialogue = push(dialogue, item.done.kind === "flag" && q.ending.kind === "none" ? { ...q, ending: { kind: "taskHome" } } : q);
+      // author 2026-11-24 (#61 #63): …in the thread of whoever it went to, on every day; the item's own `then` follows the landing
+      if (q && item.done.kind === "flag") {
+        const to = taskByFlag(day, item.done.flag)?.deliverable?.to;
+        const e = q.ending;
+        if (e.kind === "none") dialogue = push(dialogue, { ...q, ending: { kind: "taskHome", to } });
+        else if (e.kind === "toView") dialogue = push(dialogue, { ...q, ending: { kind: "taskHome", to, then: { view: e.view, after: e.after } } });
+        else dialogue = push(dialogue, q);
+      } else if (q) dialogue = push(dialogue, q);
     }
     if (!was.unlocked && is.unlocked) {
       if (item.sfx) sounds.push(item.sfx);
@@ -354,6 +361,8 @@ export function syncLoop(ctx: ActionContext, nowMs: number = Date.now()): void {
       session.dlgLog = [];
       // Lines still waiting for their place never leak into the next day (dialogue addition 2026-11-02).
       session.dialogue = dropWaiting(session.dialogue);
+      // author 2026-11-24 (#66): nor does last night's 要和克总聊聊吗 (a `kuro:` item left in the queue at bedtime)
+      session.dialogue = { ...session.dialogue, queue: session.dialogue.queue.filter((q) => !q.key.startsWith("kuro:")), line: 0, page: 0 };
       session.historyOpen = false;
       session.kuroInput = false;
       session.kuroDraft = "";

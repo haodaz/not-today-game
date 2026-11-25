@@ -219,8 +219,11 @@ export function deskPick(id: unknown, state: Pick<State, "found">): { readonly a
     // room-light-switch R4: the wall switch, from the desk too
     case "switch":
       return { action: "switch", data: {} };
+    // author 2026-11-24 (#64): the mug asks how to drink it (喝一口 / 一口闷 / 先放着)
+    case "mug":
+      return { action: "mug-ask", data: {} };
     default:
-      // the mug sips by itself; the places and the rest are not 桌子's
+      // the places and the rest are not 桌子's
       return null;
   }
 }

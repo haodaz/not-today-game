@@ -414,7 +414,7 @@ const winOf = (out: string) => {
 };
 
 describe("R10 · one top bar", () => {
-  it("工作台's window has exactly one bar: traffic lights, sidebar toggle, ← →, title ▾, pane toggles, 老物件 (a window by default; full screen when chosen)", () => {
+  it("工作台's window has exactly one bar: traffic lights, sidebar toggle, ← →, title ▾, pane toggles (no 老物件 strip since 2026-11-24 #53; a window by default; full screen when chosen)", () => {
     const store = day1();
     const h = onPage(store);
     // playtest-1105 R1: a normal window by default.
@@ -429,11 +429,12 @@ describe("R10 · one top bar", () => {
     expect(bars).toHaveLength(1);
     expect(win).toMatch(/^<div class="win wb full"[^>]*><div class="bar app-top" data-drag-win/);
     const bar = /<div class="bar app-top"[^>]*>(.*?)<\/div><div class="body wb-app">/s.exec(win)![1]!;
-    for (const part of ["tl-g", 'data-action="wb-sidebar"', 'data-action="wb-back"', 'data-action="wb-forward"', 'class="wb-title drop"', 'data-action="shell-explorer"', 'data-action="shell-pane"', "objbar"]) {
+    for (const part of ["tl-g", 'data-action="wb-sidebar"', 'data-action="wb-back"', 'data-action="wb-forward"', 'class="wb-title drop"', 'data-action="shell-explorer"', 'data-action="shell-pane"']) {
       expect(bar, part).toContain(part);
     }
     // The title's ▾ is the down icon (SVG), and the page has no second header.
     expect(bar).toMatch(/class="wb-title drop"[^>]*>.*?<svg class="ic"/s);
+    expect(bar).not.toContain("objbar"); // author 2026-11-24 (#53): the objects live on the desk and in 道具
     expect(win).not.toContain("sh-head");
     expect(win).not.toContain(escapeHtml(t("wb.autosave")));
   });

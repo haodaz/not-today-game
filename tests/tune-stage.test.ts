@@ -28,7 +28,7 @@ describe("tune stage", () => {
     const task = day3();
     const tune = task.board!.tune!;
     // the first path of the first 8 open modules, then the end-of-work offer taken
-    const mods = tune.mods.filter((m) => !m.from && m.paths.some((p) => !p.after && !p.from)).slice(0, tune.steps);
+    const mods = tune.mods.filter((m) => m.paths.some((p) => !p.after && !p.from)).slice(0, tune.steps); // ten (#50)
     for (const m of mods) store.appendEvent({ kind: "boardStep", taskId: task.id, op: { t: "mod", id: m.id, path: m.paths.find((p) => !p.after && !p.from)!.id } });
     const session = initialSession({ beat: "work", time: "10:00" }, "left", "desktop");
     let out = tuneStage({ state: store.getState(), events: store.getEvents(), session, nowMs: 1000 }, task, task.board!).value;

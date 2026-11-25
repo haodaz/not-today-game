@@ -32,8 +32,16 @@ export type Ending =
   | { readonly kind: "toView"; readonly view: "desk" | "table" | "room"; readonly after: readonly SayLine[] }
   /** guidance R14: vivi.back read: Vivi's page closes and the app before it is in front again. */
   | { readonly kind: "docBack" }
-  /** guidance R14: a sent task's closing lines read: 工作台 returns to its home (the next task lit). */
-  | { readonly kind: "taskHome" }
+  /**
+   * guidance R14: a sent task's closing lines read: the screen lands in the thread of whoever the work
+   * went to (`to`: boss / partner / group; author 2026-11-24 #61 #63); `then` is the item's own `then`
+   * (the camera goes there after a beat, `after` said on arrival).
+   */
+  | { readonly kind: "taskHome"; readonly to?: string; readonly then?: { readonly view: "desk" | "table" | "room"; readonly after: readonly SayLine[] } }
+  /** author 2026-11-24 (#51): Kuro's end-of-tune offer (her skin) asked in the box: 换上 / 不换. */
+  | { readonly kind: "tuneOffer"; readonly taskId: string; readonly mod: string; readonly path: string }
+  /** author 2026-11-24 (#64): the mug lifted: 喝一口 / 一口闷 / 先放着. */
+  | { readonly kind: "mugAsk" }
   /** bedside-book: 你拿起了床头的书。 (and the first time's line) read: the reader opens. */
   | { readonly kind: "openBook" }
   /** object-tutor R2: `record` adds 打开录音机 between them (night 5, the tape found, nothing recorded yet). */
@@ -60,7 +68,7 @@ export type Ending =
 
 /** Endings that wait for a choice (Kuro's turn waits for the player's box). */
 export const endsInChoice = (e: Ending): boolean =>
-  e.kind === "beatChoices" || e.kind === "loan" || e.kind === "recognise" || e.kind === "kuroOffer" || e.kind === "kuroAsk" || e.kind === "bedAsk" || e.kind === "riseAsk" || e.kind === "doorAsk" || e.kind === "eatAsk" || e.kind === "settleSend" || e.kind === "kuroTurn" || e.kind === "kuroWait";
+  e.kind === "beatChoices" || e.kind === "loan" || e.kind === "recognise" || e.kind === "kuroOffer" || e.kind === "tuneOffer" || e.kind === "mugAsk" || e.kind === "kuroAsk" || e.kind === "bedAsk" || e.kind === "riseAsk" || e.kind === "doorAsk" || e.kind === "eatAsk" || e.kind === "settleSend" || e.kind === "kuroTurn" || e.kind === "kuroWait";
 
 export interface Queued {
   /** Where it came from (for tests and to avoid queueing the same thing twice). */
@@ -460,6 +468,17 @@ export const DOOR_ASK_OPTIONS: readonly ChoiceOption[] = [
   { index: 0, text: null, choice: "take", labelKey: "delivery.take" },
   { index: 1, text: null, choice: "wait", labelKey: "delivery.wait" },
 ];
+/** author 2026-11-24 (#51): 换上 / 不换 on Kuro's end-of-tune offer. */
+export const TUNE_OFFER_OPTIONS: readonly ChoiceOption[] = [
+  { index: 0, text: null, choice: "yes", labelKey: "tune.offer.yes" },
+  { index: 1, text: null, choice: "no", labelKey: "tune.offer.no" },
+];
+/** author 2026-11-24 (#64): the mug in hand. */
+export const MUG_OPTIONS: readonly ChoiceOption[] = [
+  { index: 0, text: null, choice: "sip", labelKey: "room.mug.sip" },
+  { index: 1, text: null, choice: "gulp", labelKey: "room.mug.gulp" },
+  { index: 2, text: null, choice: "leave", labelKey: "room.mug.leave" },
+];
 export const SETTLE_SEND_OPTIONS: readonly ChoiceOption[] = [
   { index: 0, text: null, choice: "go", labelKey: "settle.send.go" },
   { index: 1, text: null, choice: "fast", labelKey: "settle.send.fast" },
@@ -491,6 +510,8 @@ function options(q: Queued, state: State, events?: readonly GameEvent[]): Choice
   if (q.ending.kind === "doorAsk") return [...DOOR_ASK_OPTIONS];
   if (q.ending.kind === "eatAsk") return [...EAT_ASK_OPTIONS];
   if (q.ending.kind === "settleSend") return [...SETTLE_SEND_OPTIONS];
+  if (q.ending.kind === "tuneOffer") return [...TUNE_OFFER_OPTIONS];
+  if (q.ending.kind === "mugAsk") return [...MUG_OPTIONS];
   if (q.ending.kind === "recognise") {
     // No hints: the same look for every option; the order is the run's, not content's.
     const entry = recogniseTable.get(q.ending.object);

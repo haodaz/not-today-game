@@ -10,7 +10,7 @@ import type { ActionContext } from "@world/desktop/controller";
 import type { Session } from "@world/desktop/model";
 import { settleSession } from "@world/dialogue/place";
 import type { SafeHtml } from "@world/html";
-import { t } from "@world/i18n";
+import { hasString, t } from "@world/i18n";
 import { booted, loopContext } from "@world/loop/checklist";
 import { push } from "@world/loop/dialogue";
 import { beatQueued } from "@world/loop/runtime";
@@ -81,6 +81,8 @@ export function endWakeFlash(ctx: ActionContext): void {
   ctx.later(WAKE_FADE_MS, () => {
     if (ctx.session.wakeFlash?.since !== w.since) return;
     ctx.session.wakeFlash = null;
+    // author 2026-11-24 (#67): back in the ordinary room — the player's one line, then the morning
+    if (hasString("wake.after")) ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${String(WAKE_FLASH_DAY)}:wake:after`, lines: [{ k: "speaker", who: "me", t: t("wake.after") }], ending: { kind: "none" } });
     queueRise(ctx);
     ctx.rerender();
   });

@@ -4,72 +4,14 @@
     "boss": {
       "incoming": [
         {
-          "t": "09:10",
-          "text": "[Voice] 23″",
-          "kind": "work"
-        },
-        {
-          "t": "09:10",
-          "text": "(Transcript) The investors saw v17. They have thoughts. I'll find you this afternoon.",
-          "kind": "work"
-        },
-        {
-          "t": "22:40",
-          "text": "Got it. This one's fine for sure — eighteen. (In Chinese it sounds like \"gonna get rich.\") Lucky number.",
+          "t": "19:05",
+          "text": "Got it. This version's fine for sure. 18 — lucky number.",
           "kind": "odd",
           "cond_show": {
             "has": "sent_d3-theory"
           }
         }
-      ],
-      "fine": {
-        "status": "reply",
-        "lines": [
-          {
-            "who": "boss",
-            "t": "09:10",
-            "text": "[Voice] 23″"
-          },
-          {
-            "who": "boss",
-            "t": "09:10",
-            "text": "(Transcript) Good. This afternoon, then. Finish what's in your hands first."
-          }
-        ],
-        "inner": "He knows it takes me twenty minutes. He's done the sums."
-      },
-      "received": {
-        "status": "reply",
-        "lines": [
-          {
-            "who": "boss",
-            "t": "09:10",
-            "text": "👌"
-          }
-        ]
-      },
-      "whatever": {
-        "status": "reply",
-        "lines": [
-          {
-            "who": "boss",
-            "t": "09:11",
-            "text": "Then go with what it wrote."
-          }
-        ],
-        "effects": {
-          "flags": [
-            "boss_said_follow_it"
-          ]
-        },
-        "inner": "Go with what it wrote. Five words, and my day is handed over."
-      },
-      "salary": {
-        "status": "read",
-        "lines": [],
-        "readAfter": "1s",
-        "inner": "One second. He reads fast today."
-      }
+      ]
     },
     "partner": {
       "incoming": [

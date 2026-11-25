@@ -9,7 +9,7 @@ import { APPROVE_MS, SLIDE_WINDOW_MS, stackBest, stackMove, stackStart, stackTar
 import type { State } from "@state/types.gen";
 import type { GameEvent } from "@state/events";
 import type { Task, TaskBoard } from "@state/days/tasks";
-import { autoUnlock, boardState, canFetch, canPrint, comparePending, settleVerdict, foundCardIds, isKuroCard, isObjectLock, isReadLock, lockCodesOffered, lockJammed, lockObjectAvailable, lockUsedOk, modFound, pathFound, trayCards, tuneCarried, tuneOfferPending, tuneStepsLeft, wrongReadings, type BoardState, type BoardVerdict } from "@state/days/board";
+import { autoUnlock, boardState, canFetch, canPrint, comparePending, settleVerdict, foundCardIds, isKuroCard, isObjectLock, isReadLock, lockCodesOffered, lockJammed, lockObjectAvailable, lockUsedOk, modFound, pathFound, trayCards, tuneCarried, tuneOfferPending, tuneStepsLeft, wrongReadings, type BoardState, type BoardVerdict, tuneMods, tuneShort, tuneOffers } from "@state/days/board";
 import { ideOps, ideSrc, ideTranscript } from "@state/days/ide";
 import { cls, html, type SafeHtml } from "@world/html";
 import { FRAMES, frameUrl } from "../kuro/body";
@@ -1592,6 +1592,42 @@ const actions: Record<string, ActionHandler> = {
     if (pick.path === null) actions["board-assist-mod"]!(ctx, { mod: pick.mod } as DOMStringMap, null as never);
     else actions["board-mod"]!(ctx, { mod: pick.mod, path: pick.path } as DOMStringMap, null as never);
   },
+  // author 2026-11-24 (#51): the settlement read, Kuro asks about her skin in the box (换上 / 不换)
+  "tune-ask"(ctx) {
+    const c = currentBoard(ctx);
+    if (!c?.board.tune) return;
+    const s = stateOf(ctx, c.task, c.board);
+    if (!tuneOfferPending(c.board, s)) return;
+    const offer = tuneOffers(c.board)[0];
+    if (!offer) return;
+    const day = ctx.store.getState().day;
+    const key = `d${day}:tune:ask:${c.task.id}`;
+    if (ctx.session.dialogue.queue.some((q) => q.key === key)) return;
+    const who = t("kuro.name");
+    const lead = hasString(`tune.ask.d${day}`) ? t(`tune.ask.d${day}`) : t("tune.ask.line");
+    ctx.session.dialogue = push(ctx.session.dialogue, { key, lines: [{ k: "speaker", who, t: lead }, { k: "speaker", who, t: offer.path.label }], ending: { kind: "tuneOffer", taskId: c.task.id, mod: offer.mod.id, path: offer.path.id }, voice: "kuro" });
+    ctx.rerender();
+  },
+  // author 2026-11-24 (#60): 克总帮我补一下 — his fix is a scene: the player's line, his working card for a few
+  // seconds, his own line for the day (黑盒), then the fix (assistFix) and 好了，可以发了。
+  "tune-kuro-fix"(ctx) {
+    const c = currentBoard(ctx);
+    if (!c?.board.tune) return;
+    const s = stateOf(ctx, c.task, c.board);
+    if (!s.done || s.assists > 0 || tuneOfferPending(c.board, s) || tuneShort(c.board, tuneMods(s)).length === 0) return;
+    const day = ctx.store.getState().day;
+    const who = t("kuro.name");
+    const own = hasString(`tune.fix.d${day}`) ? t(`tune.fix.d${day}`) : t("tune.fix.line");
+    const w = ctx.session.work;
+    if (w && w.day === day && w.taskId === c.task.id) w.busyUntil = (ctx.now?.() ?? Date.now()) + KURO_FIX_MS;
+    ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${day}:tune:fix:${c.task.id}`, lines: [{ k: "speaker", who: "me", t: t("settle.kuroWork") }, { k: "speaker", who, t: own }], ending: { kind: "none" }, voice: "kuro" });
+    ctx.later(KURO_FIX_MS, () => {
+      ctx.store.appendEvent({ kind: "boardStep", taskId: c.task.id, op: { t: "assistFix" } });
+      ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${day}:tune:fixed:${c.task.id}`, lines: [{ k: "speaker", who, t: t("settle.kuroDone") }], ending: { kind: "none" }, voice: "kuro" });
+      ctx.rerender();
+    });
+    ctx.rerender();
+  },
   // tune: 不接 — Kuro's end-of-work offer declined; the work goes as it is.
   "board-keep"(ctx) {
     const c = currentBoard(ctx);
@@ -1813,6 +1849,9 @@ function tuneTurn(ctx: ActionContext, c: { task: Task; board: TaskBoard }, befor
  * type after). No finish button on a tuning board. Nothing happens if the player changed the board
  * again in the meantime.
  */
+/** author 2026-11-24 (#60): how long Kuro's working card shows before his fix lands. */
+export const KURO_FIX_MS = 3200;
+
 function finishTune(_ctx: ActionContext, _c: { task: Task; board: TaskBoard }, _before: number): void {
   // author 2026-11-12: the work no longer goes by itself once the offer is answered — the report page
   // shows first, and the player presses 提交 (board-print). Kept as a hook for the handlers' shape.

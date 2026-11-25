@@ -59,42 +59,34 @@
       "say": [
         {
           "k": "narration",
-          "t": "Before turning the screens off you open the afternoon's document once more."
-        },
-        {
-          "k": "narration",
-          "t": "One line is gone. A line you added yourself: this field may have no aliases."
-        },
-        {
-          "k": "narration",
-          "t": "It is not in the history either. You do not write it again."
+          "t": "Before the screen went off you opened the backend page once more. Four bars: two over the line, two under. Xiao Zhang's thread ends at 'I'll keep running it tomorrow'."
         },
         {
           "k": "inner",
-          "t": "One line missing. And it had to be that one."
+          "t": "That's as far as it goes. Tomorrow."
         },
         {
           "k": "narration",
-          "t": "Before sleep you pick the instant camera up again. The shutter is as stiff as ever."
+          "t": "Before bed you picked up the instant camera again. The shutter is still stiff; it takes a little force, like pressing something that doesn't want to be pressed. The small window on the back says 10."
         },
         {
           "k": "narration",
-          "t": "The last summer of primary school. The back door of the classroom is open; the sun reaches all the way to the teacher's desk.",
+          "t": "The last summer of primary school, June. The classroom's back door stood open all day; the sun came in through it and reached the blackboard, chalk dust drifting grain by grain in the light. You sat in the second-to-last row by the window, at a desk with a line cut into it by whoever had it before you.",
           "backdrop": "/room/dream/classroom.jpg"
         },
         {
           "k": "narration",
-          "t": "You didn't really know how to talk to people then. The camera was yours to bring to school: the windowsill, the blackboard, the empty corridor."
+          "t": "You weren't good at talking to people then. The camera was one you'd brought to school, something your father had brought back from a trip, a pack of ten sheets. You shot the chalk box on the sill, the half-wiped blackboard, the corridor after school with nobody in it. Places with no one in them came out looking the way you saw them."
         },
         {
           "k": "narration",
-          "t": "A week before graduation, somebody noticed it. You never knew who was first.",
+          "t": "A week before graduation, between classes, nobody remembers who saw it first.",
           "backdrop": "/room/dream/campus_2000.jpg"
         },
         {
           "k": "speaker",
           "who": "小满",
-          "t": "Hey, this thing prints the photo right away? Take one of me!"
+          "t": "Wait, you press it and a photo comes out? For real? Take one of me!"
         },
         {
           "k": "inner",
@@ -103,25 +95,25 @@
         {
           "k": "speaker",
           "who": "小满",
-          "t": "No, no, give me the camera, I'll take one of you."
+          "t": "No, no, give me the camera, I'll take one of you. What do you keep shooting windows for."
         },
         {
           "k": "narration",
-          "t": "You hand it over. She lifts it and presses. The sheet is half out when she tugs it free."
+          "t": "You hand it over. She lifts it, points it at you, presses. The sheet is half out when she tears it free and waves it in the sun, saying it develops faster that way."
         },
         {
           "k": "speaker",
           "who": "阿凯",
-          "t": "Me! Me next!"
+          "t": "Me! Take me!"
         },
         {
           "k": "speaker",
           "who": "小满",
-          "t": "Line up! One each!"
+          "t": "Line up! One each! Stop pushing at the back!"
         },
         {
           "k": "narration",
-          "t": "The camera goes from this hand to that one. You stand at the edge and watch it travel."
+          "t": "The camera goes from hand to hand. Someone pulls a face, someone shoots the teacher's back at the board, someone holds it over their head and presses anything. You stand at the edge and watch it travel further and further, like something that had always belonged to everyone."
         },
         {
           "k": "speaker",
@@ -130,43 +122,39 @@
         },
         {
           "k": "inner",
-          "t": "Ten. Nine now."
+          "t": "Ten. Nine now. Eight."
         },
         {
           "k": "speaker",
           "who": "阿凯",
-          "t": "Hey, you too. Stand in the middle!"
+          "t": "Hey, you too, get in the middle! It's your camera, you have to be in it!"
         },
         {
           "k": "narration",
-          "t": "You step in. Someone counts to three, someone shouts cheese, a flash."
+          "t": "You step in. The front row crouches, the back row stands on tiptoe, someone counts to three, someone says cheese, it flashes."
         },
         {
           "k": "speaker",
           "who": "小满",
-          "t": "It's coming up, it's coming up. Oh. Your eyes are shut."
+          "t": "It's coming up, it's coming up — oh. You blinked."
         },
         {
           "k": "speaker",
           "who": "阿凯",
-          "t": "One more! ... This one, that's half your shoulder."
+          "t": "One more! …This one's got half your shoulder. What are you dodging to the side for."
         },
         {
           "k": "speaker",
           "who": "班长",
-          "t": "No sheets left. Never mind, next time."
+          "t": "Out of paper. Forget it, next time."
         },
         {
           "k": "narration",
-          "t": "There was no next time. The photos from that day were shared out, one each, everyone else's face on them."
+          "t": "There was no next time. The photos from that day got shared out, one each, everyone else on them. The one you got was the corridor, the empty corridor, the one you'd taken yourself."
         },
         {
           "k": "narration",
-          "t": "In junior high you wrote to a few of them. The addresses were copied down on graduation day."
-        },
-        {
-          "k": "narration",
-          "t": "Nobody wrote back."
+          "t": "In middle school you wrote to a few of them, at addresses copied onto the back of a textbook on graduation day. Three letters written, two sent. No one wrote back. Later you decided you'd probably copied the addresses wrong."
         },
         {
           "k": "inner",
@@ -174,7 +162,7 @@
         },
         {
           "k": "narration",
-          "t": "The one on the desk now has fresh film. You still shoot the same things: window sills, blackboards, places with nobody in them."
+          "t": "The one on the desk now has fresh sheets, ten. You still shoot the same things: sills, blackboards. Places with no one in them."
         },
         {
           "k": "narration",

@@ -6,6 +6,20 @@
         {
           "k": "narration",
           "t": "雨还在下。反正在家上班，不用管它。"
+        },
+        {
+          "k": "inner",
+          "t": "老王那边，还是未读。"
+        },
+        {
+          "k": "speaker",
+          "who": "me",
+          "t": "昨天的引擎没做完。今天先把它做完。"
+        },
+        {
+          "k": "speaker",
+          "who": "kuro",
+          "t": "先吃饭，再干活。"
         }
       ]
     },
@@ -152,7 +166,8 @@
         },
         {
           "k": "narration",
-          "t": "第二个说不清剧情。天很低，几乎压到地上。天地之间只剩很薄的一层，有我的天花板那么高。"
+          "t": "第二个说不清剧情。天很低，几乎压到地上。天地之间只剩很薄的一层，有我的天花板那么高。",
+          "backdrop": "/room/dream/gap_pink.jpg"
         },
         {
           "k": "narration",
@@ -191,16 +206,9 @@
       "required": true
     },
     {
-      "id": "msgs",
-      "text": "进屏幕看看消息。",
-      "unlock": "done:boot",
-      "done": "event:openApp:msgs",
-      "required": true
-    },
-    {
       "id": "lunch",
       "text": "拿起手机，点个午饭。",
-      "unlock": "done:msgs",
+      "unlock": "done:boot",
       "done": "event:order:lunch",
       "required": true,
       "rewrite": "午饭在路上。"
@@ -208,7 +216,7 @@
     {
       "id": "task1",
       "text": "自演化引擎：接着做。",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d3_1",
       "required": true
     },
@@ -234,7 +242,7 @@
       "text": "外卖在窗边饭桌上，吃饭吧。",
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
-      "required": false,
+      "required": true,
       "onDone": {
         "say": [
           {
@@ -250,13 +258,6 @@
       "text": "端盒里又松了一个。",
       "unlock": "done:pickup",
       "done": "event:openBox",
-      "required": true
-    },
-    {
-      "id": "reply",
-      "text": "给老王回一句。",
-      "unlock": "done:task1",
-      "done": "event:reply:boss",
       "required": true
     },
     {
@@ -282,6 +283,19 @@
             "sfx": "doorbell"
           }
         ]
+      },
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "饭放小桌上。还没坐下，手机叮了一声。"
+          },
+          {
+            "k": "inner",
+            "t": "汀汀。老板。"
+          }
+        ],
+        "then": "desk"
       }
     },
     {
@@ -366,12 +380,32 @@
         "t": "00:12"
       },
       {
-        "who": "me",
-        "t": "00:32"
+        "who": "boss",
+        "t": "00:15"
+      },
+      {
+        "who": "boss",
+        "t": "00:18"
+      },
+      {
+        "who": "boss",
+        "t": "00:21"
+      },
+      {
+        "who": "boss",
+        "t": "00:24"
+      },
+      {
+        "who": "boss",
+        "t": "00:27"
       },
       {
         "who": "me",
-        "t": "00:45"
+        "t": "00:36"
+      },
+      {
+        "who": "me",
+        "t": "00:48"
       },
       {
         "who": "me",

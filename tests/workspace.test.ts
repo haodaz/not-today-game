@@ -204,14 +204,13 @@ describe("R2 · one navigation: the rail and the session list", () => {
 });
 
 describe("R3 · old objects only while working", () => {
-  it("the object strip is in the task header only; never on home", () => {
+  it("the object strip is gone from 工作台 (author 2026-11-24 #53: the objects live on the desk and in 道具); 使用 from the bar's action still works", () => {
     const h = harness(day1(["task1", "task2"], ["chick"]));
     expect(h.out()).not.toContain("wb-objbar");
     h.act("wb-nav", { page: "task:task3" });
     const head = headOf(h.out());
-    expect(head).toContain('<div class="wb-objbar">');
-    expect(head).toContain('data-action="objbar-open" data-object="chick"');
-    // 使用 over the desktop, as before.
+    expect(head).not.toContain("wb-objbar");
+    // 使用 over the desktop, as before (the board lock's 用小鸡看一眼 goes this way).
     h.act("objbar-open", { object: "chick" });
     expect([h.session.holding, h.session.hand.using, h.session.objbarOpen]).toEqual(["chick", true, true]);
   });

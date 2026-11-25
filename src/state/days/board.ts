@@ -45,6 +45,8 @@ export interface BoardState {
   readonly fetched: boolean;
   /** tune (2026-11-08): module → the path chosen for it (a module with no entry is off). */
   readonly mods: Readonly<Record<string, string>>;
+  /** author 2026-11-24 (#50): yesterday's modules as the day's base (their values count; they are not today's steps). */
+  readonly carried: Readonly<Record<string, string>>;
   /** tune: the work was complete once today (budget spent or line reached): the paths with `after: "done"` are on the menu from then. */
   readonly done: boolean;
   /** tune: the player answered Kuro's end-of-work offer (took the path, or `keep`): the work may go. */
@@ -58,10 +60,15 @@ export interface BoardState {
  * yesterday's work opens with those modules on (`carried`; `tuneCarried` reads them from the log).
  */
 export function freshBoard(board: TaskBoard, carried: Readonly<Record<string, string>> = {}): BoardState {
-  const mods: Record<string, string> = {};
-  for (const [id, path] of Object.entries(carried)) if (board.tune?.mods.find((m) => m.id === id)?.paths.some((p) => p.id === path)) mods[id] = path;
-  return { unlocked: board.given.lock === undefined, slots: {}, assists: 0, wrongCodes: [], merged: {}, fetched: false, mods, done: false, decided: false, approved: false };
+  // author 2026-11-24 (#50): every day is its own ten nodes and ten steps; yesterday's work is the base the
+  // bars start from (`carried`), never today's opened modules (day 3 had opened with 8 of 8 spent)
+  const base: Record<string, string> = {};
+  for (const [id, path] of Object.entries(carried)) if (board.tune?.mods.find((m) => m.id === id)?.paths.some((p) => p.id === path)) base[id] = path;
+  return { unlocked: board.given.lock === undefined, slots: {}, assists: 0, wrongCodes: [], merged: {}, fetched: false, mods: {}, carried: base, done: false, decided: false, approved: false };
 }
+
+/** tune: the modules that count for the bars now — yesterday's base under today's picks. */
+export const tuneMods = (s: Pick<BoardState, "mods" | "carried">): Readonly<Record<string, string>> => ({ ...s.carried, ...s.mods });
 
 /**
  * tune: the modules yesterday's board (`tune.carry`) ended with — on when today's board opens.
@@ -144,7 +151,25 @@ export function stepBoard(board: TaskBoard, s: BoardState, op: BoardOp): BoardSt
     case "assistFix": {
       // settlement (author 2026-11-13): the board failed its judgement; Kuro fixes it his way — every
       // slot that does not hold its answer takes his card (his fill, else the answer); one assist.
-      if (board.tune) return s;
+      // author 2026-11-24 (#60): a tuning board under the line takes Kuro's taste where it is short (his assist paths), one assist
+      if (board.tune) {
+        const tune = board.tune;
+        const short = tuneShort(board, tuneMods(s));
+        if (short.length === 0) return s;
+        const mods: Record<string, string> = { ...s.mods };
+        for (const dim of short) {
+          let best: { id: string; gain: number } | null = null;
+          for (const m of tune.mods) {
+            const pid = tune.assist[m.id];
+            const p = m.paths.find((x) => x.id === pid);
+            const cur = m.paths.find((x) => x.id === (mods[m.id] ?? s.carried[m.id]));
+            const gain = (p?.delta[dim] ?? 0) - (cur?.delta[dim] ?? 0);
+            if (p && gain > 0 && (!best || gain > best.gain)) best = { id: m.id, gain };
+          }
+          if (best) mods[best.id] = tune.assist[best.id]!;
+        }
+        return { ...s, mods, assists: s.assists + 1 };
+      }
       if (board.compare) return { ...s, slots: { ...board.kuro.fill }, unlocked: true, assists: s.assists + 1 };
       const slots = { ...s.slots };
       for (const slot of board.slots) if (slots[slot.id] !== slot.answer) slots[slot.id] = board.kuro.fill[slot.id] ?? slot.answer;
@@ -178,7 +203,8 @@ export function boardState(board: TaskBoard, day: number, taskId: string, events
  * layer finishes.
  */
 export function canPrint(board: TaskBoard, s: BoardState): boolean {
-  if (board.tune) return s.done && !tuneOfferPending(board, s);
+  // author 2026-11-24 (#52): the line is a gate — under it the work waits for Kuro's fix (an assist) or 今天先不发
+  if (board.tune) return s.done && !tuneOfferPending(board, s) && (tuneShort(board, tuneMods(s)).length === 0 || s.assists > 0);
   // compare (author 2026-11-11): every page picked and the boss satisfied enough (the threshold).
   if (board.compare) return s.unlocked && comparePending(board, s) === null && compareScore(board, s).pct >= board.compare.threshold;
   // stack (2026-11-12): the filled form must also have come back approved from the top of the chain
@@ -224,7 +250,7 @@ export function tuneValues(board: TaskBoard, mods: Readonly<Record<string, strin
 }
 
 /** tune: the bars now. */
-export const tuneDims = (board: TaskBoard, s: BoardState): Readonly<Record<string, number>> => tuneValues(board, s.mods);
+export const tuneDims = (board: TaskBoard, s: BoardState): Readonly<Record<string, number>> => tuneValues(board, tuneMods(s));
 
 /** tune: the bars when the board opened today (the carried modules only) — the "before" colour. */
 export function tuneBase(board: TaskBoard, events: readonly GameEvent[]): Readonly<Record<string, number>> {
@@ -468,8 +494,7 @@ export function validateBoardStep(day: number, taskId: string, op: BoardOp): voi
     case "assistFill":
       return;
     case "assistFix":
-      if (board.tune) throw new Error("boardStep: a tuning board is never fixed at the settlement");
-      return;
+      return; // a tuning board too (author 2026-11-24 #60): Kuro's fix where it is short
     default:
       throw new Error(`boardStep: unknown op ${JSON.stringify(op)}`);
   }
@@ -613,7 +638,7 @@ export function boardJudgement(day: number, events: readonly GameEvent[]): { ver
   const lock = board.given.lock;
   const readings = lock && isReadLock(lock) ? wrongReadings(boardState(board, day, tree.id, events)) : 0;
   // tune: a bar further than the slack under today's line counts as a wrong slot.
-  const wrong = (board.tune ? tuneShort(board, boardState(board, day, tree.id, events).mods).length : wrongCount(board, printed.slots)) + readings;
+  const wrong = (board.tune ? tuneShort(board, tuneMods(boardState(board, day, tree.id, events))).length : wrongCount(board, printed.slots)) + readings;
   let verdict: BoardVerdict;
   if (!given) verdict = "wrong";
   // compare (author 2026-11-11): a draft Kuro rewrote to the boss's taste is never perfect: SAN goes down a little.

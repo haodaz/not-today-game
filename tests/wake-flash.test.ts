@@ -152,7 +152,7 @@ describe("the room's messages", () => {
     expect(r.session.wakeFlash).toBeNull();
     expect(r.room()).not.toContain("outside-host");
     // the line not clicked away yet: the rise lines follow it in the queue
-    expect(r.keys()).toEqual(["d4:wake", "d4:beat:rise"]);
+    expect(r.keys()).toEqual(["d4:wake", "d4:wake:after", "d4:beat:rise"]); // #67: 果然只是幻觉 before the morning
     expect(r.session.riseBeatDay).toBe(4);
     // after the flash, messages do nothing
     expect(r.msg("wake-done")).toBe(false);
@@ -166,7 +166,7 @@ describe("the room's messages", () => {
     expect(r.session.wakeFlash!.phase).toBe("fading");
     r.advance(WAKE_FADE_MS);
     expect(r.session.wakeFlash).toBeNull();
-    expect(r.keys()).toEqual(["d4:beat:rise"]);
+    expect(r.keys()).toEqual(["d4:wake:after", "d4:beat:rise"]);
   });
   it("ready but no wake-done within 15 s: ended as if done; the 8 s net does nothing once it is up", () => {
     const r = rig(storeAt(4));
@@ -179,7 +179,7 @@ describe("the room's messages", () => {
     expect(r.session.wakeFlash!.phase).toBe("fading");
     r.advance(WAKE_FADE_MS);
     expect(r.session.wakeFlash).toBeNull();
-    expect(r.keys()).toEqual(["d4:wake", "d4:beat:rise"]);
+    expect(r.keys()).toEqual(["d4:wake", "d4:wake:after", "d4:beat:rise"]); // #67: 果然只是幻觉 before the morning
   });
   it("roomMessage reads only the room page's own messages", () => {
     expect(roomMessage({ source: "nt-room", type: "ready" })).toEqual({ type: "ready" });

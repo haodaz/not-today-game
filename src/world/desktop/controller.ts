@@ -1,6 +1,7 @@
 // The only part of the desktop that touches the DOM. It renders the pure view into `root`, re-renders
 // on store or session change, turns clicks on [data-action] into events or session changes, and
 // scales the stage to the viewport. Game state changes only through store.appendEvent.
+import { landOnOpenTask } from "@world/room/game";
 import type { Store } from "@state/store";
 import type { SafeHtml } from "@world/html";
 import type { BeatClock } from "./beat";
@@ -440,6 +441,8 @@ export function mountDesktop(root: HTMLElement, deps: DesktopDeps): { destroy: (
     }
     motion?.before();
     frames.before(root);
+    // author 2026-11-24 (#32): however 工作台 came to the front, its home lands on the day's open task
+    landOnOpenTask(ctx);
     root.innerHTML = renderRoot(deps.store, session, Date.now()).value;
     frames.after(root);
     // settle-polish 2: a kept iframe says when its page has painted (`data-loaded="1"`; the

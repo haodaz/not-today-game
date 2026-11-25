@@ -44,8 +44,8 @@ describe("deskPick: the parity table", () => {
     expect(deskPick("tower", found)).toEqual({ action: "tower-power", data: {} });
     // room-light-switch R4: the wall switch from the desk
     expect(deskPick("switch", found)).toEqual({ action: "switch", data: {} });
-    // the mug sips by itself
-    expect(deskPick("mug", found)).toBeNull();
+    // author 2026-11-24 (#64): the mug asks how to drink it
+    expect(deskPick("mug", found)).toEqual({ action: "mug-ask", data: {} });
     for (const id of ["keyboard", "desk", "meal", "window", "slit", "box", "bed", "shelf", "door", "coat", "bag", "walkman"]) expect(deskPick(id, found), id).toBeNull();
     expect(deskPick(null, found)).toBeNull();
     expect(deskPick(undefined, found)).toBeNull();

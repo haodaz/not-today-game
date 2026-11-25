@@ -14,7 +14,7 @@ import { initialSession } from "@world/desktop/model";
 import { everyScreen } from "./box-screens";
 import { renderRoom } from "@world/room/hud";
 import { loopActions } from "@world/room/game";
-import { OFFER_AT_PRESS, pressKey } from "@world/objects/index";
+import { offerOnLook } from "@world/objects/index";
 import { t } from "@world/i18n";
 
 const pager = upgradeTable.objects.get("pager")!;
@@ -29,16 +29,16 @@ function storeAt(day: number, found: string[], drafts: EventDraft[] = []): Store
   return store;
 }
 const act = (store: Store): ActionContext => ({ store, session: initialSession(DEFAULT_CLOCK), rerender: () => {}, later: () => {} });
-/** author 2026-11-24 (#22): the offer comes at the object — the pager in 使用, its keys pressed OFFER_AT_PRESS times. */
-function offerBox(store: Store, presses = OFFER_AT_PRESS): { ctx: ActionContext; box: string } {
+/** author 2026-11-24 (#22 / #48): the offer comes at the object — a look at the pager in 使用 (game.ts obj-use → offerOnLook). */
+function offerBox(store: Store): { ctx: ActionContext; box: string; queued: boolean } {
   const ctx = act(store);
   ctx.session.view = "room";
   ctx.session.holding = "pager";
   ctx.session.hand.using = true;
-  for (let i = 0; i < presses; i++) pressKey(ctx, "pager", "fn", { cap: true });
+  const queued = offerOnLook(ctx, "pager", store.getState().day);
   // The lead-in is read first; then every screen of the offer line: the choices may sit on the page after it (dialogue FR1).
   if ((ctx.session.dialogue.queue[0]?.lines.length ?? 0) > 1) loopActions["loop-advance"]!(ctx, {} as DOMStringMap, null as never);
-  return { ctx, box: everyScreen(store.getState(), ctx.session, store.getEvents()) };
+  return { ctx, box: everyScreen(store.getState(), ctx.session, store.getEvents()), queued };
 }
 
 describe("upgrades table", () => {
@@ -63,9 +63,8 @@ describe("offers (FR1)", () => {
     const store = storeAt(pager.offerFrom, ["pager"]);
     const offer = currentOffer(store.getState(), store.getEvents());
     expect(offer).toEqual({ kind: "offer", object: "pager", line: pager.offer });
-    // two presses: nothing yet
-    expect(offerBox(store, OFFER_AT_PRESS - 1).ctx.session.dialogue.queue).toEqual([]);
-    const { ctx, box } = offerBox(store);
+    const { ctx, box, queued } = offerBox(store);
+    expect(queued).toBe(true);
     expect(box).toContain('data-action="loop-choice" data-index="0" data-choice="yes"');
     expect(ctx.session.dialogue.queue.map((q) => q.ending.kind)).toEqual(["kuroOffer"]);
     expect(ctx.session.dialogue.queue[0]!.lines.map((l) => l.t)).toEqual([t("kuro.offer.leadin"), pager.offer]);
@@ -73,15 +72,15 @@ describe("offers (FR1)", () => {
     loopActions["loop-choice"]!(ctx, { index: "0", choice: "yes" } as DOMStringMap, null as never);
     expect(store.getState().upgraded.pager).toBe(true);
     expect(ctx.session.dialogue.queue.map((q) => q.ending.kind)).toEqual([]);
-    // once a day: more presses the same day do not offer again
-    pressKey(ctx, "pager", "fn", { cap: true });
+    // once a day: another look the same day does not offer again
+    expect(offerOnLook(ctx, "pager", store.getState().day)).toBe(false);
     expect(ctx.session.dialogue.queue).toEqual([]);
     // No offer at night, and none from Kuro's body: by day the chat is locked (kuro.room.notYet), at night it only asks.
     const night = act(storeAt(pager.offerFrom, ["pager"]));
     night.session.clock = { beat: "night", time: "23:41" } as typeof night.session.clock;
     night.session.holding = "pager";
     night.session.hand.using = true;
-    for (let i = 0; i < OFFER_AT_PRESS; i++) pressKey(night, "pager", "fn", { cap: true });
+    expect(offerOnLook(night, "pager", pager.offerFrom)).toBe(false);
     expect(night.session.dialogue.queue).toEqual([]);
     loopActions["kuro-call"]!(night, {} as DOMStringMap, null as never);
     expect(night.session.dialogue.queue.map((q) => q.ending.kind)).toEqual(["kuroAsk"]);

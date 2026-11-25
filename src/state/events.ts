@@ -319,7 +319,7 @@ const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
  * 工作台 is `task:<taskId>` (workspace R2: the session list is derived from these opens).
  */
 export function isOpenTarget(target: string): boolean {
-  if (target === "browser") return true;
+  if (target === "browser" || target === "book") return true; // book: the bedside book first taken (#44)
   const conv = /^conv:(.+)$/.exec(target);
   if (conv !== null) return knownRecipients.has(conv[1]!);
   if (/^meeting:/.test(target)) return openedMeetingLine(target) !== null;

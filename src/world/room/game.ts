@@ -86,6 +86,7 @@ import { hungerNumbers, tooHungryToSleep } from "@state/hunger";
 import { meetingActions } from "@world/desktop/workbench/meeting";
 import { taskShellActions } from "@world/desktop/workbench/shell";
 import { boardActions, lockFaceMove } from "@world/desktop/workbench/board";
+import { offerOnLook } from "@world/objects/index";
 import { enterUse, facingOf, lampLit, placeOf, recWorksHere, REC_WORKS, worksHere } from "@world/objects/works";
 import { canSkipPrologue, endPrologue, prologueDone, prologueOn, prologueShowing, renderPrologue } from "@world/opening";
 import { openWork, workActions } from "@world/desktop/workbench/work";
@@ -739,7 +740,10 @@ function firstHold(ctx: ActionContext, id: string | null): void {
  * author 2026-11-24 (#7 #32): 工作台 shown on home while the day's work is under way lands on that task's
  * page (the dock did this; now every way in does).
  */
-function landOnOpenTask(ctx: ActionContext): void {
+export const TASK_THEN_MS = 1800;
+/** author 2026-11-24 (#48): how long a look at an object in 使用 before Kuro's offer comes. */
+export const OFFER_LOOK_MS = 2200;
+export function landOnOpenTask(ctx: ActionContext): void {
   const { session } = ctx;
   if (session.view !== "desktop" || shownApp(session) !== "workbench" || session.workbenchPage !== "home") return;
   const open = openWork(ctx.store.getState(), ctx.store.getEvents());
@@ -1331,10 +1335,20 @@ export const loopActions: Record<string, ActionHandler> = {
       if (session.view === "desktop" && taskPageId(session.workbenchPage) !== null) {
         session.workbenchPage = "home";
         session.wbTaskDay = null;
-        // author 2026-11-20: the work was sent to the boss, so the screen lands in his thread, not on
-        // 工作台's home (the next step is lit from there).
+        // author 2026-11-20 / 2026-11-24 (#61 #63): the work was sent, so the screen lands in the thread
+        // of whoever it went to (the file sits there; their answer comes there), not on 工作台's home.
         session.wbFull = false;
-        showConversation(session, "boss");
+        const to = ended.to === "partner" || ended.to === "group" ? ended.to : "boss";
+        showConversation(session, to);
+      }
+      // the item's own `then`: after a beat in the thread the camera goes there, `after` said on arrival
+      const then = ended.then;
+      if (then) {
+        ctx.later(TASK_THEN_MS, () => {
+          if (session.view !== then.view) loopActions["view"]!(ctx, { view: then.view } as DOMStringMap, null as never);
+          if (then.after.length) session.dialogue = push(session.dialogue, { key: `d${state.day}:then:${then.view}`, lines: then.after, ending: { kind: "none" } });
+          ctx.rerender();
+        });
       }
       openChatIfDue(ctx);
     }
@@ -1396,6 +1410,26 @@ export const loopActions: Record<string, ActionHandler> = {
       ctx.session.dialogue = finishChoice(ctx.session.dialogue);
       settleSession(ctx.session);
       if (data.choice === "take") for (const step of ["openChain", "reach", "close"] as const) if (!doorAct(ctx, step)) break;
+      ctx.rerender();
+      return;
+    }
+    // author 2026-11-24 (#51): 换上 / 不换 on Kuro's end-of-tune offer (asked in the box after the settlement)
+    if (q.ending.kind === "tuneOffer") {
+      const { mod, path } = q.ending;
+      ctx.session.dialogue = finishChoice(ctx.session.dialogue);
+      settleSession(ctx.session);
+      if (data.choice === "yes") boardActions["board-mod"]!(ctx, { mod, path } as DOMStringMap, null as never);
+      else boardActions["board-keep"]!(ctx, {} as DOMStringMap, null as never);
+      ctx.rerender();
+      return;
+    }
+    // author 2026-11-24 (#64): the mug — 喝一口 / 一口闷 / 先放着, each with its own line
+    if (q.ending.kind === "mugAsk") {
+      const choice = data.choice === "sip" || data.choice === "gulp" ? data.choice : "leave";
+      ctx.session.dialogue = finishChoice(ctx.session.dialogue);
+      const evening = ctx.session.clock.beat === "desk" || ctx.session.clock.beat === "night";
+      const key = `room.mug.${choice}.${evening ? "cold" : "warm"}`;
+      if (hasString(key)) ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${ctx.store.getState().day}:mug:${choice}`, lines: [{ k: "inner", t: t(key) }], ending: { kind: "none" } });
       ctx.rerender();
       return;
     }
@@ -1670,6 +1704,10 @@ export const loopActions: Record<string, ActionHandler> = {
       return;
     }
     session.hand.using = true;
+    // author 2026-11-24 (#48): an upgrade pending for this object: a look at it in 使用 brings Kuro's offer (not key presses)
+    ctx.later(OFFER_LOOK_MS, () => {
+      if (session.hand.using && session.holding === id && offerOnLook(ctx, id, ctx.store.getState().day)) ctx.rerender();
+    });
     // The focus comes in with the same timing as 桌子 → 屏幕 (deskScreen, 500 ms): room.css
     // transitions `.held.obj.using` over --m-use; a walk's two steps play as on any move.
     walkSteps(ctx, "desk", "desktop");
@@ -1781,6 +1819,13 @@ export const loopActions: Record<string, ActionHandler> = {
       ctx.session.photoWhereSaid = true;
       ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${ctx.store.getState().day}:camera.where`, lines: [{ k: "speaker", who: "kuro", t: t("camera.where") }], ending: { kind: "none" } });
     }
+    ctx.rerender();
+  },
+  // author 2026-11-24 (#64): the mug on the desk (the 3D room says it was touched): how to drink it
+  "mug-ask"(ctx) {
+    const { session } = ctx;
+    if (session.dialogue.queue.length > 0 || !hasString("room.mug.ask")) return;
+    session.dialogue = push(session.dialogue, { key: `d${ctx.store.getState().day}:mug`, lines: [{ k: "narration", t: t("room.mug.ask") }], ending: { kind: "mugAsk" } });
     ctx.rerender();
   },
   // author 2026-11-24 (#13): the chick's how-to card under it in 使用 (说明 toggles it)
@@ -2302,7 +2347,8 @@ function riseAskQueued(day: number): Queued {
 function takeBook(ctx: ActionContext, from: "bed" | "rise" | "spot"): void {
   const { session } = ctx;
   const day = ctx.store.getState().day;
-  const first = !session.bookFirstSaid; // once per run (author 2026-11-23): a new run meets the book anew
+  // once per run (author 2026-11-23): a new run meets the book anew — in the log (#44: the session forgot it on a reload)
+  const first = !ctx.store.getEvents().some((e) => e.kind === "open" && e.target === "book");
   session.book = { from, first };
   const lines: SayLine[] = [{ k: "inner", t: t("room.book.take") }, ...(first ? [{ k: "speaker" as const, who: "me", t: t("room.book.first") }] : [])];
   // author 2026-11-24 (#4): standing at the shelf the book asks first (看书 / 放下); from the bed's asks it opens
@@ -2318,6 +2364,7 @@ function openBook(ctx: ActionContext): void {
     ctx.bookRead?.();
   }
   session.bookFirstSaid = true;
+  if (!ctx.store.getEvents().some((e) => e.kind === "open" && e.target === "book")) ctx.store.appendEvent({ kind: "open", target: "book", t: session.clock.time });
   session.bookOpen = true;
   session.bookOpened = false;
 }

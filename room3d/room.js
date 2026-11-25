@@ -3366,6 +3366,10 @@ async function wake() {
     await wait(1000);
   }
   while (goal) await wait(100);
+  // author 2026-11-24 (#67): the hand-over is felt — a shake, then black, then the ordinary room
+  { const st = document.createElement("style"); st.textContent = "@keyframes nt-wake-shake{0%,100%{transform:none}20%{transform:translate(-9px,4px)}40%{transform:translate(8px,-6px)}60%{transform:translate(-6px,-3px)}80%{transform:translate(5px,5px)}} body.nt-shake canvas{animation:nt-wake-shake .45s linear} body.nt-black{background:#000} body.nt-black canvas{opacity:0;transition:opacity .25s}"; document.head.appendChild(st); }
+  document.body.classList.add("nt-shake"); await wait(450); document.body.classList.remove("nt-shake");
+  document.body.classList.add("nt-black"); await wait(650);
   tell("wake-done");
   if (EMBED) { waking = false; return; } // embedded, the game fades this frame out over its own photo
   still.style.opacity = "1"; // the hand-over: the computed room gives way to the photographed one

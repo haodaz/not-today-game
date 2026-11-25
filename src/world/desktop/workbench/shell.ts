@@ -23,7 +23,6 @@ import { meetingWindow } from "./meeting";
 import { ICONS } from "../icons";
 import { moveApp, otherSide } from "../placement";
 import { messageActions } from "../messages/actions";
-import { renderObjectBar } from "./objbar";
 import { comparePane } from "./compare";
 import { doneWorkItems, modeChips, openWork, plainSurface, questionText, surfaceOf as workSurfaceOf, workItems, workSendChip } from "./work";
 
@@ -460,7 +459,7 @@ export function renderShell(ctx: AppContext, task: Task, day: number, fill: Fill
   });
   const app = !board && live && WORK_KEY[task.app] ? html`<button type="button" class="btn" data-action="wb-nav" data-page="${task.app}">${tr(WORK_KEY[task.app]!)}</button>` : null;
   const title = html`<span class="tt-name">${fill(task.title)}</span><small class="tt-sub">${who ? html`${who} · ` : null}${status}</small>`;
-  const tools = html`${app}<div class="sh-toggles">${explorerToggle}${toggles}</div>${renderObjectBar(ctx)}`;
+  const tools = html`${app}<div class="sh-toggles">${explorerToggle}${toggles}</div>`; // author 2026-11-24 (#53): no 老物件 strip here — the objects live on the desk and in 道具
   // The frame (R1): the explorer card, the conversation, the pane cards.
   const ex = board && live && st.explorer ? explorer(ctx, task, board, s!, st, selected) : null;
   const carried = board ? tuneCarried(board, events) : {};

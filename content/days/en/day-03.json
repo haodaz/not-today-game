@@ -6,6 +6,20 @@
         {
           "k": "narration",
           "t": "Still raining. Working from home anyway; let it."
+        },
+        {
+          "k": "inner",
+          "t": "His side: still unread."
+        },
+        {
+          "k": "speaker",
+          "who": "me",
+          "t": "The engine isn't done from yesterday. Finish that first."
+        },
+        {
+          "k": "speaker",
+          "who": "kuro",
+          "t": "Eat first. Then the work."
         }
       ]
     },
@@ -152,7 +166,8 @@
         },
         {
           "k": "narration",
-          "t": "The second has no story to tell. The sky is very low, almost on the ground. Between sky and ground only a thin layer is left, as high as my ceiling."
+          "t": "The second has no story to tell. The sky is very low, almost on the ground. Between sky and ground only a thin layer is left, as high as my ceiling.",
+          "backdrop": "/room/dream/gap_pink.jpg"
         },
         {
           "k": "narration",
@@ -191,16 +206,9 @@
       "required": true
     },
     {
-      "id": "msgs",
-      "text": "Go to the screen and read the messages.",
-      "unlock": "done:boot",
-      "done": "event:openApp:msgs",
-      "required": true
-    },
-    {
       "id": "lunch",
       "text": "Pick up the phone and order lunch.",
-      "unlock": "done:msgs",
+      "unlock": "done:boot",
       "done": "event:order:lunch",
       "required": true,
       "rewrite": "Lunch is on its way."
@@ -208,7 +216,7 @@
     {
       "id": "task1",
       "text": "The self-evolving engine, continued.",
-      "unlock": "done:msgs",
+      "unlock": "done:eat",
       "done": "flag:task_d3_1",
       "required": true
     },
@@ -234,7 +242,7 @@
       "text": "Lunch is on the table by the window. Eat.",
       "unlock": "done:pickup",
       "done": "event:eat:lunch",
-      "required": false,
+      "required": true,
       "onDone": {
         "say": [
           {
@@ -250,13 +258,6 @@
       "text": "Another box in the case is loose.",
       "unlock": "done:pickup",
       "done": "event:openBox",
-      "required": true
-    },
-    {
-      "id": "reply",
-      "text": "Send the boss a reply.",
-      "unlock": "done:task1",
-      "done": "event:reply:boss",
       "required": true
     },
     {
@@ -282,6 +283,19 @@
             "sfx": "doorbell"
           }
         ]
+      },
+      "onDone": {
+        "say": [
+          {
+            "k": "narration",
+            "t": "Dinner on the little table. Before you sit, the phone dings."
+          },
+          {
+            "k": "inner",
+            "t": "TingTalk. The boss."
+          }
+        ],
+        "then": "desk"
       }
     },
     {
@@ -366,12 +380,32 @@
         "t": "00:12"
       },
       {
-        "who": "me",
-        "t": "00:32"
+        "who": "boss",
+        "t": "00:15"
+      },
+      {
+        "who": "boss",
+        "t": "00:18"
+      },
+      {
+        "who": "boss",
+        "t": "00:21"
+      },
+      {
+        "who": "boss",
+        "t": "00:24"
+      },
+      {
+        "who": "boss",
+        "t": "00:27"
       },
       {
         "who": "me",
-        "t": "00:45"
+        "t": "00:36"
+      },
+      {
+        "who": "me",
+        "t": "00:48"
       },
       {
         "who": "me",

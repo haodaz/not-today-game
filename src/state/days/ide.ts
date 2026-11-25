@@ -2,7 +2,7 @@
 // (`ideSrc`, R3) and Kuro's transcript (`ideTranscript`, R4) are derived from today's board ops, so
 // a reload or a replay shows the same page and the same lines. No new events.
 import type { BoardOp, GameEvent } from "@state/events";
-import { compareRight, compareScore, freshBoard, stepBoard, tuneReached, tuneStepsLeft, tuneValues, type BoardState } from "./board";
+import { compareRight, compareScore, freshBoard, stepBoard, tuneReached, tuneStepsLeft, tuneValues, type BoardState, tuneMods } from "./board";
 import type { BoardBeatLine, Task, TaskBoard } from "./tasks";
 
 /** One step the IDE view follows: a board op, the print (the `task` event), or the send (`give`). */
@@ -89,8 +89,10 @@ export function nextWork(board: TaskBoard, s: BoardState, from: string): string 
 function tuneQuery(board: TaskBoard, s: BoardState, carried: Readonly<Record<string, string>>, printed: boolean): string {
   const tune = board.tune!;
   const kv = (v: Readonly<Record<string, number>>) => tune.dims.map((d) => `${encodeURIComponent(d.id)}:${v[d.id] ?? 0}`).join(",");
-  const mods = tune.mods.filter((m) => m.id in s.mods).map((m) => `${encodeURIComponent(m.id)}:${encodeURIComponent(s.mods[m.id]!)}`).join(",");
-  return `&mods=${mods}&dims=${kv(tuneValues(board, s.mods))}&base=${kv(tuneValues(board, carried))}&reach=${tune.reach}&promise=${tune.promise}&left=${tuneStepsLeft(board, s)}${printed ? "&done=1" : ""}`;
+  // author 2026-11-24 (#50): the page shows yesterday's base under today's picks
+  const all = tuneMods(s);
+  const mods = tune.mods.filter((m) => m.id in all).map((m) => `${encodeURIComponent(m.id)}:${encodeURIComponent(all[m.id]!)}`).join(",");
+  return `&mods=${mods}&dims=${kv(tuneValues(board, all))}&base=${kv(tuneValues(board, carried))}&reach=${tune.reach}&promise=${tune.promise}&left=${tuneStepsLeft(board, s)}${printed ? "&done=1" : ""}`;
 }
 
 /**

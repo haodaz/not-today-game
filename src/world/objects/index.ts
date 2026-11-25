@@ -25,28 +25,23 @@ import { isNight } from "@world/desktop/beat";
 import { hasString, t } from "@world/i18n";
 import type { SayLine } from "@state/days/table";
 
-/** author 2026-11-24 (#22): the upgrade offer comes while the object is used, at this many real key presses. */
-export const OFFER_AT_PRESS = 3;
-
 /**
- * author 2026-11-24 (#22): Kuro's upgrade offer had come out of nowhere (the chat's first line). Now it
- * comes at the object: while the player presses its keys in 使用 and an upgrade for it is pending, the
- * third press brings Kuro's lead-in and the offer (once a day per object; never at night).
+ * author 2026-11-24 (#22 / #48): Kuro's upgrade offer comes at the object — while it is looked at in 使用
+ * (game.ts obj-use, after OFFER_LOOK_MS), with a lead-in; once a day per object; never at night. Not
+ * on key presses: the camera's shutter would have fired three sheets first. True when it was queued.
  */
-function offerAtObject(ctx: ActionContext, id: string, day: number): void {
+export function offerOnLook(ctx: ActionContext, id: string, day: number): boolean {
   const { store, session } = ctx;
-  if (isNight(session.clock)) return;
+  if (isNight(session.clock)) return false;
   const offer = currentOffer(store.getState(), store.getEvents());
-  if (!offer || offer.object !== id) return;
+  if (!offer || offer.object !== id) return false;
   const key = `${day}:${id}`;
-  if (session.offerShown === key) return;
-  const n = (session.offerPresses[id] ?? 0) + 1;
-  session.offerPresses[id] = n;
-  if (n < OFFER_AT_PRESS) return;
+  if (session.offerShown === key) return false;
   session.offerShown = key;
   const who = t("kuro.name");
   const lines: SayLine[] = [...(hasString("kuro.offer.leadin") ? [{ k: "speaker" as const, who, t: t("kuro.offer.leadin") }] : []), { k: "speaker" as const, who, t: offer.line }];
   session.dialogue = push(session.dialogue, { key: `offer:${day}:${id}`, lines, ending: { kind: "kuroOffer", object: offer.object, decline: offer.kind }, voice: "kuro" });
+  return true;
 }
 
 export const PROGRAMS: Readonly<Record<string, Program<unknown>>> = {
@@ -185,7 +180,6 @@ export function pressKey(ctx: ActionContext, id: string, key: string, opts: { re
       store.appendEvent({ kind: "pressKey", key: `${id}:${o.care}` });
     }
   }
-  if (opts.cap) offerAtObject(ctx, id, env.day);
   return out;
 }
 
