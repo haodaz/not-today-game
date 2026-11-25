@@ -1413,5 +1413,20 @@
   "room.mug.gulp.cold": "一口凉的，下去了。",
   "room.mug.leave.warm": "放回去。",
   "room.mug.leave.cold": "放回去。明天再洗。",
-  "wake.after": "……果然只是幻觉。"
+  "wake.after": "……果然只是幻觉。",
+  "room.book.prev": "上一页",
+  "room.book.next": "下一页",
+  "items.tab.objects": "老物件",
+  "items.tab.photos": "照片",
+  "items.tab.got": "收到的",
+  "items.foundDay": "第 {day} 天到手",
+  "items.unknown": "还没认出来",
+  "items.unknownName": "？？？",
+  "items.upgraded": "已升级",
+  "items.taken": "克总拿走了",
+  "items.hold": "拿起来",
+  "items.empty": "还没有东西。",
+  "items.noPhotos": "还没拍过。",
+  "items.nothingGot": "还没收到什么。",
+  "items.photoDay": "第 {day} 天"
 }

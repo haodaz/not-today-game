@@ -1595,6 +1595,18 @@ export const loopActions: Record<string, ActionHandler> = {
     ctx.session.itemsOpen = !ctx.session.itemsOpen;
     ctx.rerender();
   },
+  // author 2026-11-24 (#49): the 道具 card's tabs and its chosen thing
+  "items-tab"(ctx, data) {
+    const tab = data.tab;
+    if (tab !== "objects" && tab !== "photos" && tab !== "got") return;
+    ctx.session.itemsTab = tab;
+    ctx.session.itemsPick = null;
+    ctx.rerender();
+  },
+  "items-pick"(ctx, data) {
+    ctx.session.itemsPick = data.pick ?? null;
+    ctx.rerender();
+  },
 
   // Day 18's slip by the lamp: reading it is its work task, on 屏幕's 工作台.
   "desk-slip"(ctx) {
@@ -1820,6 +1832,11 @@ export const loopActions: Record<string, ActionHandler> = {
       ctx.session.dialogue = push(ctx.session.dialogue, { key: `d${ctx.store.getState().day}:camera.where`, lines: [{ k: "speaker", who: "kuro", t: t("camera.where") }], ending: { kind: "none" } });
     }
     ctx.rerender();
+  },
+  // author 2026-11-24 (#45): the reader's own ‹ › turn the book's page (its keys never reached the frame)
+  "book-page"(ctx, data) {
+    if (!ctx.session.bookOpen) return;
+    turnBookPage(Number(data.dir) || 1);
   },
   // author 2026-11-24 (#64): the mug on the desk (the 3D room says it was touched): how to drink it
   "mug-ask"(ctx) {
@@ -2460,7 +2477,23 @@ export function keyboardToObjKey(object: string | null, key: string): string | n
 }
 
 /** Keys: space / Enter read on in the room and at the door; Esc goes back to the room. */
+/** author 2026-11-24 (#45): the gamebook's page turn, called into its frame (same origin). */
+function turnBookPage(dir: number): void {
+  const frame = typeof document === "undefined" ? null : document.querySelector<HTMLIFrameElement>(".book-reader iframe");
+  const win = frame?.contentWindow as (Window & { pgGo?: (d: number) => void }) | null | undefined;
+  try {
+    win?.pgGo?.(dir);
+  } catch {
+    // the page is not ready: nothing to turn
+  }
+}
+
 export function loopKeys(ctx: ActionContext, e: KeyboardEvent): boolean {
+  // author 2026-11-24 (#45): with the book open, ← → turn its pages (the frame does not get the keys)
+  if (ctx.session.bookOpen && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+    turnBookPage(e.key === "ArrowRight" ? 1 : -1);
+    return true;
+  }
   // The run has ended: Enter / Space go on; nothing else does anything.
   if (ctx.store.getState().ending !== "none" || (ctx.session.endingPreview && ctx.session.endingPage)) {
     if (e.key === "Enter" || e.key === " ") endingNext(ctx);

@@ -1413,5 +1413,20 @@
   "room.mug.gulp.cold": "One cold mouthful, down.",
   "room.mug.leave.warm": "Back it goes.",
   "room.mug.leave.cold": "Back it goes. Wash it tomorrow.",
-  "wake.after": "…Just my eyes. Of course."
+  "wake.after": "…Just my eyes. Of course.",
+  "room.book.prev": "Previous page",
+  "room.book.next": "Next page",
+  "items.tab.objects": "Old things",
+  "items.tab.photos": "Photos",
+  "items.tab.got": "Received",
+  "items.foundDay": "Day {day}",
+  "items.unknown": "Not placed yet",
+  "items.unknownName": "???",
+  "items.upgraded": "Upgraded",
+  "items.taken": "Kuro has it",
+  "items.hold": "Pick it up",
+  "items.empty": "Nothing yet.",
+  "items.noPhotos": "No photos yet.",
+  "items.nothingGot": "Nothing received yet.",
+  "items.photoDay": "Day {day}"
 }

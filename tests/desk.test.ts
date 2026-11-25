@@ -164,13 +164,15 @@ describe("道具: the strip as a panel", () => {
       expect(before).not.toContain('class="items-panel"');
       act(ctx, "items-toggle");
       const open = render(ctx);
-      expect(open).toContain(`<div class="items-panel" id="items-panel" role="dialog" aria-label="${t("hud.items")}"><div class="items-strip">`);
+      // author 2026-11-24 (#49): a big centred card — tabs, the list, the chosen thing large with 拿起来
+      expect(open).toContain(`<div class="items-panel big" id="items-panel" role="dialog" aria-label="${t("hud.items")}"><div class="ip-head">`);
       // status-panel: the tile keeps its word and is inverted while open
       expect(open).toContain('class="items-btn on" data-action="items-toggle" aria-expanded="true" aria-controls="items-panel">');
-      const strip = open.slice(open.indexOf('class="items-strip"'));
-      for (const a of ['data-action="loop-phone"', 'data-object="pager" data-action="loop-hold"']) expect(strip, view).toContain(a);
-      // The box is in 房间, not a thing to carry (2026-11-02).
-      expect(strip, view).not.toContain('data-action="loop-box"');
+      const card = open.slice(open.indexOf('class="items-panel big"'));
+      for (const a of ['data-action="items-pick" data-pick="pager"', 'data-action="loop-hold" data-object="pager"', 'data-action="items-tab" data-tab="photos"']) expect(card, view).toContain(a);
+      // The box is in 房间, not a thing to carry (2026-11-02); the phone is the desk's, not a 道具.
+      expect(card, view).not.toContain('data-action="loop-box"');
+      expect(card, view).not.toContain('data-action="loop-phone"');
       act(ctx, "items-toggle");
       expect(render(ctx)).not.toContain('class="items-panel"');
       act(ctx, "items-toggle");
@@ -281,17 +283,19 @@ describe("the tabletop's things are photos (day-loop correction 2026-11-01)", ()
     expect(ctx.session.holding).toBeNull();
     expect(tabletopOf(render(ctxOf(store, "desk")))).toContain(`data-object="${boxObjectFor(1)}"`);
   });
-  it("the 道具 strip uses the same images; no slip on it any more (author 2026-11-16: the slip is the ending's)", () => {
+  it("the 道具 card (author 2026-11-24 #49): the phone and the cup stay on the desk, not in it; no slip in 收到的 (author 2026-11-16: the slip is the ending's)", () => {
     const store = atDay(1);
-    const ctx = ctxOf(store);
+    const ctx = ctxOf(store, "desk");
     ctx.session.itemsOpen = true;
-    const strip = (o: string) => o.slice(o.indexOf('class="items-strip"'));
-    const out = strip(render(ctx));
+    const out = render(ctx);
     for (const name of ["phone", "cup"]) expect(out, name).toContain(`<img class="desk-photo${name === "cup" ? " cup" : ""}" src="/room/desk/${name}.png"`);
+    const card = (o: string) => o.slice(o.indexOf('class="items-panel big"'));
+    expect(card(out)).not.toContain('src="/room/desk/phone.png"');
     const last = constants.lastDay as number;
     const c18 = ctxOf(atDay(last));
     c18.session.itemsOpen = true;
-    expect(strip(render(c18))).not.toContain('src="/room/desk/slip.png"');
+    c18.session.itemsTab = "got";
+    expect(card(render(c18))).not.toContain('src="/room/desk/slip.png"');
   });
 
   it("no CSS shapes remain: no placeholder divs in the markup, no shape rules in the stylesheet", () => {

@@ -110,6 +110,10 @@
 /* wait-card (author 2026-11-20): the list and the delivery card stack at the top left; the list keeps its class for the motion layer */
 .room .hud-left{position:absolute;left:28px;top:28px;width:280px;display:flex;flex-direction:column;gap:10px;z-index:12}
 .room .hud-left .list{position:static;left:auto;top:auto;width:auto}
+/* author 2026-11-24 (#45): the reader's own page turns, left and right of the book */
+.book-reader .book-pg{position:absolute;top:50%;transform:translateY(-50%);width:56px;height:56px;border-radius:50%;border:1px solid rgba(255,255,255,.4);background:rgba(20,18,16,.55);color:#f4efe6;font-size:30px;line-height:1;cursor:pointer;z-index:3;backdrop-filter:blur(6px)}
+.book-reader .book-pg:hover{background:rgba(20,18,16,.8)}
+.book-reader .book-pg.l{left:24px}.book-reader .book-pg.r{right:24px}
 /* author 2026-11-24 (#30): 前往 on the checklist's current line */
 .room .hud-left .it .go{margin-left:10px;vertical-align:1px;font:inherit;font-size:11px;letter-spacing:.12em;border:1px solid currentColor;border-radius:999px;background:transparent;color:inherit;padding:1px 9px;cursor:pointer;opacity:.7}
 .room .hud-left .it .go:hover{opacity:1;background:rgba(0,0,0,.06)}
@@ -139,9 +143,43 @@
 .room .desk-things > .at > button.slot:hover,.room .desk-things > .at > button.slot:focus-visible{outline:2px solid rgba(232,228,220,.55);outline-offset:2px}
 .room .desk-things > .at > .slot > span{position:absolute;left:50%;bottom:4px;transform:translateX(-50%);white-space:nowrap;padding:2px 6px;border-radius:6px;background:rgba(244,240,232,.8);color:#555}
 .room .desk-things .slot img{max-width:100%;max-height:100%;filter:drop-shadow(0 8px 10px rgba(0,0,0,.35))}
-/* 道具: the button next to ⚙ opens the object strip as a panel over the current view. */
+/* 道具 (author 2026-11-24 #49): a big centred card — tabs on top, the list left, the chosen thing large on the right */
 .items-panel{position:absolute;left:50%;bottom:84px;transform:translateX(-50%);z-index:17}
+.items-panel.big{top:50%;bottom:auto;transform:translate(-50%,-50%);width:min(1080px,92%);height:min(640px,84%);display:flex;flex-direction:column;background:var(--paper,rgba(244,240,232,.94));backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.4);border-radius:18px;box-shadow:0 24px 70px rgba(0,0,0,.35);color:#2a2622;overflow:hidden}
+.items-panel .ip-head{display:flex;align-items:center;gap:18px;padding:14px 22px;border-bottom:1px solid rgba(42,38,34,.12)}
+.items-panel .ip-h{font-size:18px;letter-spacing:.2em}
+.items-panel .ip-tabs{display:flex;gap:6px;margin-left:8px}
+.items-panel .ip-tab{border:1px solid rgba(42,38,34,.18);border-radius:999px;background:transparent;color:#5b5247;font:inherit;font-size:13px;letter-spacing:.1em;padding:5px 14px;cursor:pointer;display:flex;align-items:center;gap:8px}
+.items-panel .ip-tab i{font-style:normal;font-size:11px;color:#8a7f70}
+.items-panel .ip-tab.on{background:#2a2622;color:#efe9df;border-color:#2a2622}.items-panel .ip-tab.on i{color:#c9bfae}
+.items-panel .ip-close{margin-left:auto;width:34px;height:34px;border-radius:50%;border:1px solid rgba(42,38,34,.2);background:transparent;color:#2a2622;font-size:20px;line-height:1;cursor:pointer}
+.items-panel .ip-body{flex:1;min-height:0;display:grid;grid-template-columns:320px 1fr}
+.items-panel .ip-body.tab-got{grid-template-columns:1fr}
+.items-panel .ip-list{overflow:auto;padding:14px;border-right:1px solid rgba(42,38,34,.12);display:flex;flex-direction:column;gap:6px}
+.items-panel .ip-list.grid{display:grid;grid-template-columns:1fr 1fr;align-content:start;gap:10px}
+.items-panel .ip-row{display:grid;grid-template-columns:52px 1fr;grid-template-rows:auto auto;column-gap:12px;align-items:center;text-align:left;padding:8px 10px;border:1px solid transparent;border-radius:12px;background:transparent;font:inherit;color:inherit;cursor:pointer}
+.items-panel .ip-row img{grid-row:1/3;width:52px;height:52px;object-fit:contain;filter:drop-shadow(0 4px 6px rgba(0,0,0,.25))}
+.items-panel .ip-row.unknown img{filter:grayscale(.8) drop-shadow(0 4px 6px rgba(0,0,0,.25));opacity:.7}
+.items-panel .ip-row .ip-name{font-size:15px}.items-panel .ip-row .ip-day{font-size:12px;color:#8a7f70}
+.items-panel .ip-row:hover{background:rgba(42,38,34,.06)}.items-panel .ip-row.on{background:#fff;border-color:rgba(42,38,34,.2);box-shadow:0 4px 14px rgba(0,0,0,.08)}
+.items-panel .ip-detail{overflow:auto;padding:22px 28px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px}
+.items-panel .ip-big{width:220px;height:220px;display:flex;align-items:center;justify-content:center}
+.items-panel .ip-big img{max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 14px 18px rgba(0,0,0,.3))}
+.items-panel .ip-title{margin:0;font-size:22px;letter-spacing:.08em}
+.items-panel .ip-meta{display:flex;gap:8px;align-items:center;font-size:13px;color:#6b6457;margin:0}
+.items-panel .ip-chip{border:1px solid rgba(42,38,34,.25);border-radius:999px;padding:2px 9px;font-size:12px}
+.items-panel .ip-chip.up{border-color:#13A37A;color:#13A37A}.items-panel .ip-chip.taken{border-color:#8b2f2a;color:#8b2f2a}
+.items-panel .ip-blurb{margin:4px 0 0;max-width:460px;font-size:15px;line-height:1.7;color:#3b3833}
+.items-panel .ip-kuro{margin:0;max-width:460px;font-size:14px;line-height:1.6;color:#5b5247}.items-panel .ip-kuro b{margin-right:8px;font-weight:600;color:#2a2622}
+.items-panel .ip-actions{margin-top:auto;padding-top:10px}
+.items-panel .ip-hold{border:2px solid #2a2622;border-radius:999px;background:#2a2622;color:#efe9df;font:inherit;font-size:14px;letter-spacing:.2em;padding:9px 26px;cursor:pointer}
+.items-panel .ip-empty{margin:auto;color:#8a7f70}
+.items-panel .ip-photo{border:1px solid transparent;border-radius:10px;background:transparent;padding:6px;font:inherit;color:#6b6457;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+.items-panel .ip-photo.on{background:#fff;border-color:rgba(42,38,34,.2)}
+.items-panel .ip-photo-big{display:flex;align-items:center;justify-content:center;max-height:440px}
+.items-panel .ip-got{display:flex;flex-wrap:wrap;gap:16px;padding:22px 28px;align-content:flex-start}
 .hud-host .items-panel{position:fixed;bottom:60px;z-index:40}
+.hud-host .items-panel.big{position:fixed;top:50%;bottom:auto}
 .items-strip{display:flex;gap:8px;padding:8px 10px;background:var(--paper,rgba(244,240,232,.85));backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.35);border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,.18)}
 :is(.room,.items-panel) .slot{width:80px;height:80px;background:transparent;border:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font:11px var(--font);color:#666;position:relative;padding:0}
 :is(.room,.items-panel) button.slot{cursor:pointer}

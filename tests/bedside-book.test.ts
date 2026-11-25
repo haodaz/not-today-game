@@ -38,7 +38,8 @@ describe("the reader's URL", () => {
     expect(bookUrl({ ...names, pronoun: "he" }, 0)).toContain(`ta=${encodeURIComponent("他")}`);
     expect(bookUrl({ ...names, pronoun: null }, 0)).toContain(`ta=${encodeURIComponent("他")}`);
     const bare = bookUrl({ login: "", nick: "  ", calledBy: "", bossCalls: "", pronoun: null }, 1);
-    expect(bare).toBe(`/gamebook/index.html?ta=${encodeURIComponent("他")}&days=1&embed=1`);
+    // author 2026-11-24 (#69): without a login the run's book still starts past its name page (name=你)
+    expect(bare).toBe(`/gamebook/index.html?name=${encodeURIComponent("你")}&ta=${encodeURIComponent("他")}&days=1&embed=1`);
   });
   it("days lived: today counts once its shutdown beat happened; the title gives 18 after a finished run, else 0", () => {
     const store = createStore({ startDay: 1 });

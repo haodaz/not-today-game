@@ -211,6 +211,9 @@ export interface Session {
   endingPreview: Ending | null;
   /** The 道具 strip is open over the current view (day-loop correction 2026-11-01). */
   itemsOpen: boolean;
+  /** author 2026-11-24 (#49): the 道具 card's tab and the thing shown large (an object id, or `photo:<index>`). */
+  itemsTab: "objects" | "photos" | "got";
+  itemsPick: string | null;
   /** The blind-box case overlay is open over 房间 (blind-box 2026-11-03); session only. */
   caseOpen: boolean;
   /** How many stuck boxes have been clicked (the stuck line cycles by this); −1 = not seeded yet. */
@@ -620,6 +623,8 @@ export function initialSession(clock: BeatClock, focus: Side = "left", view: Vie
     endingPage: null,
     endingPreview: null,
     itemsOpen: false,
+    itemsTab: "objects",
+    itemsPick: null,
     caseOpen: false,
     caseStuck: -1,
     caseShake: null,

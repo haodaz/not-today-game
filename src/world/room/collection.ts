@@ -83,7 +83,8 @@ export function bookUrl(names: BookNames | null, days: number): string {
   const q: [string, string][] = [];
   if (names) {
     const put = (k: string, v: string) => void (v.trim() !== "" && q.push([k, v.trim()]));
-    put("name", names.login);
+    // author 2026-11-24 (#69): the run's book never asks for a name — without a login (a dev session) it still starts
+    put("name", names.login.trim() !== "" ? names.login : t("items.unknownName") === "???" ? "you" : "你");
     put("nick", names.nick);
     put("call", names.calledBy);
     put("boss", names.bossCalls);
@@ -103,5 +104,5 @@ export const titleBookDays = (c: Pick<Collection, "finishedRuns">): number => (c
 export function bookReader(src: string | null, opened = false): SafeHtml | null {
   if (src === null) return null;
   // book-cover (author 2026-11-20): the cover alone over the room; once the book says it opened, the dark ground
-  return html`<div class="${cls("book-reader", opened && "opened")}" role="dialog" aria-modal="true" aria-label="${t("room.book")}"><iframe src="${src}" title="${t("room.book")}"></iframe><button type="button" class="book-close" data-action="book-close">${tr("dialogue.close")}</button></div>`;
+  return html`<div class="${cls("book-reader", opened && "opened")}" role="dialog" aria-modal="true" aria-label="${t("room.book")}"><iframe src="${src}" title="${t("room.book")}"></iframe><button type="button" class="book-pg l" data-action="book-page" data-dir="-1" aria-label="${t("room.book.prev")}">‹</button><button type="button" class="book-pg r" data-action="book-page" data-dir="1" aria-label="${t("room.book.next")}">›</button><button type="button" class="book-close" data-action="book-close">${tr("dialogue.close")}</button></div>`;
 }

@@ -34,6 +34,8 @@ import { hudTiles, statusPanel } from "./status";
 import { STARE_JOLT_MS, stareBpm, stareProgress } from "./stare";
 import { bookReader, bookUrl, daysLived, figureCard, figuresLayer, shelfBook } from "./collection";
 import { knows } from "@state/recognise";
+import { iconSrc, iconStateOf } from "@world/desktop/workbench/objbar";
+import { photoPicture, stageOfPhoto } from "@world/desktop/files/album";
 import { bpm, sanBand } from "@state/endings";
 import { emailRow, type EmailRow } from "@net/email";
 import { taskFiles } from "@state/days/tasks";
@@ -423,11 +425,59 @@ export function casePanel(state: State, events: readonly GameEvent[], session: S
 }
 
 /** The object strip as a panel over the current view: the same buttons as on the tabletop. */
-export function itemsPanel(state: State, events: readonly GameEvent[], session: Session): SafeHtml | null {
+/**
+ * author 2026-11-24 (#49): 道具 is a big centred card, not a strip — tabs 老物件 / 照片 / 收到的; on the
+ * left the list, on the right the chosen thing large with its details (the day it came, whether it is
+ * known or upgraded, its line from the credits, Kuro's first word on it), and 拿起来.
+ */
+export function itemsPanel(state: State, events: readonly GameEvent[], session: Session, nowMs = 0): SafeHtml | null {
   if (!session.itemsOpen) return null;
+  const tab = session.itemsTab;
+  const found = state.found as string[];
+  const photos = Object.entries(session.photos).map(([i, p]) => ({ index: Number(i), ...p })).sort((a, b) => a.index - b.index);
   const th = deskThings(state, events, session);
-  // The meal is not in the strip (room-turn R3): eating happens at the window's table.
-  return html`<div class="items-panel" id="items-panel" role="dialog" aria-label="${t("hud.items")}"><div class="items-strip">${th.phone}${th.cup}${th.objects.map((o) => o.html)}${th.slip}${th.deliverable}</div></div>`;
+  const got = [th.slip, th.deliverable].filter((x): x is SafeHtml => x !== null);
+  const counts = { objects: found.length, photos: photos.length, got: got.length };
+  const tabs = (["objects", "photos", "got"] as const).map((id) => html`<button type="button" class="${cls("ip-tab", tab === id && "on")}" data-action="items-tab" data-tab="${id}" aria-pressed="${tab === id ? "true" : "false"}">${tr(`items.tab.${id}`)}<i>${counts[id]}</i></button>`);
+  let body: SafeHtml;
+  if (tab === "objects") {
+    const pick = found.includes(session.itemsPick ?? "") ? session.itemsPick! : (found[found.length - 1] ?? null);
+    const rows = found.map((id) => {
+      const st = iconStateOf(id, state, events);
+      const day = objectsFoundOnDay[id];
+      const name = hasString(`obj.name.${id}`) ? t(`obj.name.${id}`) : id;
+      return html`<button type="button" class="${cls("ip-row", pick === id && "on", !knows(id, state, events) && "unknown")}" data-action="items-pick" data-pick="${id}"><img src="${iconSrc(id, st)}" alt=""><span class="ip-name">${knows(id, state, events) ? name : tr("items.unknownName")}</span>${day !== undefined ? html`<span class="ip-day">${tr("items.foundDay", { day: String(day) })}</span>` : null}</button>`;
+    });
+    let detail: SafeHtml = html`<p class="ip-empty">${tr("items.empty")}</p>`;
+    if (pick) {
+      const known = knows(pick, state, events);
+      const st = iconStateOf(pick, state, events);
+      const name = known && hasString(`obj.name.${pick}`) ? t(`obj.name.${pick}`) : t("items.unknownName");
+      const chips: SafeHtml[] = [];
+      if (!known) chips.push(html`<span class="ip-chip">${tr("items.unknown")}</span>`);
+      if (state.upgraded[pick] === true) chips.push(html`<span class="ip-chip up">${tr("items.upgraded")}</span>`);
+      if (st === "taken") chips.push(html`<span class="ip-chip taken">${tr("items.taken")}</span>`);
+      const day = objectsFoundOnDay[pick];
+      const blurb = known && hasString(`credits.obj.${pick}`) ? html`<p class="ip-blurb">${tr(`credits.obj.${pick}`)}</p>` : null;
+      const word = known && hasString(`kuro.tutor.${pick}`) ? html`<p class="ip-kuro"><b>${tr("kuro.name")}</b>${tr(`kuro.tutor.${pick}`)}</p>` : null;
+      const hold = session.holding === pick ? null : html`<button type="button" class="ip-hold" data-action="loop-hold" data-object="${pick}">${tr("items.hold")}</button>`;
+      detail = html`<div class="ip-big"><img src="${iconSrc(pick, st)}" alt=""></div><h3 class="ip-title">${name}</h3><div class="ip-meta">${day !== undefined ? html`<span>${tr("items.foundDay", { day: String(day) })}</span>` : null}${chips}</div>${blurb}${word}<div class="ip-actions">${hold}</div>`;
+    }
+    body = html`<div class="ip-list" role="list">${rows.length ? rows : html`<p class="ip-empty">${tr("items.empty")}</p>`}</div><div class="ip-detail">${detail}</div>`;
+  } else if (tab === "photos") {
+    const upgraded = state.upgraded.camera === true;
+    const pickIndex = session.itemsPick !== null && /^photo:/.test(session.itemsPick) ? Number(session.itemsPick.slice("photo:".length)) : (photos.at(-1)?.index ?? null);
+    const cells = photos.map((p) => {
+      const stage = stageOfPhoto(p, state.day, nowMs, upgraded);
+      return html`<button type="button" class="${cls("ip-photo", pickIndex === p.index && "on")}" data-action="items-pick" data-pick="photo:${p.index}">${photoPicture(p, stage, upgraded, 0.28)}<span>${tr("items.photoDay", { day: String(p.day) })}</span></button>`;
+    });
+    const big = photos.find((p) => p.index === pickIndex);
+    const detail = big ? html`<div class="ip-photo-big">${photoPicture(big, stageOfPhoto(big, state.day, nowMs, upgraded), upgraded, 0.8)}</div><p class="ip-meta"><span>${tr("items.photoDay", { day: String(big.day) })}</span></p>` : html`<p class="ip-empty">${tr("items.noPhotos")}</p>`;
+    body = html`<div class="ip-list grid" role="list">${cells.length ? cells : html`<p class="ip-empty">${tr("items.noPhotos")}</p>`}</div><div class="ip-detail">${detail}</div>`;
+  } else {
+    body = html`<div class="ip-got">${got.length ? got : html`<p class="ip-empty">${tr("items.nothingGot")}</p>`}</div>`;
+  }
+  return html`<div class="items-panel big" id="items-panel" role="dialog" aria-label="${t("hud.items")}"><div class="ip-head"><b class="ip-h">${tr("hud.items")}</b><nav class="ip-tabs">${tabs}</nav><button type="button" class="ip-close" data-action="items-toggle" aria-label="${t("hud.itemsClose")}">×</button></div><div class="${cls("ip-body", `tab-${tab}`)}">${body}</div></div>`;
 }
 
 /**
